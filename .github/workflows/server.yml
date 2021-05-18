@@ -40,7 +40,7 @@ jobs:
           # GitHub's personal access token with access to `Mind-Sports-Games/lila-maven`
           token: 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
           persist-credentials: false
-          path: lila-maven
+          path: deps/lila-maven
       - uses: actions/cache@v2
         with:
           path: |
@@ -51,13 +51,6 @@ jobs:
         with:
           distribution: zulu
           java-version: 14.0.1
-      - run: ls /home/runner/work/lila/
-      - run: ls /home/runner/work/lila/lila/
-      - run: ls /home/runner/work/lila/lila/lila-maven/
-      - run: ls /home/runner/work/lila/lila/lila-maven/org/
-      - run: ls /home/runner/work/lila/lila/lila-maven/org/lichess/
-      - run: ls /home/runner/work/lila/lila/lila-maven/org/lichess/scalachess_2.13/
-      - run: ls /home/runner/work/lila/lila/lila-maven/org/lichess/scalachess_2.13/10.2.1/
       - run: TZ=UTC git log -1 --date=iso-strict-local --pretty='format:app.version.commit = "%h"%napp.version.date = "%ad"%napp.version.message = """%s"""%n' | tee conf/version.conf
       - run: ./lila -Depoll=true "test;stage"
       - run: cp LICENSE COPYING.md README.md target/universal/stage && git log -n 1 --pretty=oneline > target/universal/stage/commit.txt
