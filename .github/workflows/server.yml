@@ -37,12 +37,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: Mind-Sports-Games/lila-maven
-          ref: refs/heads/master
           # GitHub's personal access token with access to `Mind-Sports-Games/lila-maven`
           token: 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
           persist-credentials: false
           path: lila-maven
-      - uses: actions/checkout@v2
       - uses: actions/cache@v2
         with:
           path: |
@@ -55,7 +53,6 @@ jobs:
           java-version: 14.0.1
       - run: ls /home/runner/work/lila/
       - run: ls /home/runner/work/lila/lila/
-      - run: ls /home/runner/work/lila/lila/lila-maven
       - run: ls /home/runner/work/lila/lila/lila-maven/
       - run: ls /home/runner/work/lila/lila/lila-maven/org/
       - run: ls /home/runner/work/lila/lila/lila-maven/org/lichess/
