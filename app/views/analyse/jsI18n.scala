@@ -27,6 +27,7 @@ private object jsI18n {
     trans.cheatDetected,
     trans.kingInTheCenter,
     trans.threeChecks,
+    // trans.twoChecks,
     trans.variantEnding,
     trans.analysis,
     trans.boardEditor,

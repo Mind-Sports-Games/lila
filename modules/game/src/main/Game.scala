@@ -215,7 +215,7 @@ case class Game(
       Event.Drop(_, game.situation, state, clockEvent, updated.board.crazyData)
     ) :: {
       // abstraction leak, I know.
-      (updated.board.variant.threeCheck && game.situation.check) ?? List(
+      ((updated.board.variant.threeCheck || updated.board.variant.twoCheck) && game.situation.check) ?? List(
         Event.CheckCount(
           white = updated.history.checkCount.white,
           black = updated.history.checkCount.black

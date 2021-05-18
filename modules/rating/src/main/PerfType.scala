@@ -167,6 +167,15 @@ object PerfType {
         iconChar = '-'
       )
 
+  case object TwoCheck
+      extends PerfType(
+        21,
+        key = "twoCheck",
+        name = chess.variant.TwoCheck.name,
+        title = "Two-check variant",
+        iconChar = '.'
+      )
+
   val all: List[PerfType] = List(
     UltraBullet,
     Bullet,

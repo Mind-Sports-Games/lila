@@ -289,6 +289,7 @@ final class User(
                   "chess960"      -> leaderboards.chess960,
                   "kingOfTheHill" -> leaderboards.kingOfTheHill,
                   "threeCheck"    -> leaderboards.threeCheck,
+                  "twoCheck"      -> leaderboards.twoCheck,
                   "antichess"     -> leaderboards.antichess,
                   "atomic"        -> leaderboards.atomic,
                   "horde"         -> leaderboards.horde,

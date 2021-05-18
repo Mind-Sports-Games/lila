@@ -12,6 +12,7 @@ case class Perfs(
     chess960: Perf,
     kingOfTheHill: Perf,
     threeCheck: Perf,
+    twoCheck: Perf,
     antichess: Perf,
     atomic: Perf,
     horde: Perf,
@@ -35,6 +36,7 @@ case class Perfs(
       "chess960"       -> chess960,
       "kingOfTheHill"  -> kingOfTheHill,
       "threeCheck"     -> threeCheck,
+      "twoCheck"       -> threeCheck,
       "antichess"      -> antichess,
       "atomic"         -> atomic,
       "horde"          -> horde,
@@ -112,6 +114,7 @@ case class Perfs(
     "chess960"       -> chess960,
     "kingOfTheHill"  -> kingOfTheHill,
     "threeCheck"     -> threeCheck,
+    "twoCheck"       -> twoCheck,
     "antichess"      -> antichess,
     "atomic"         -> atomic,
     "horde"          -> horde,
@@ -144,6 +147,7 @@ case class Perfs(
       case PerfType.Chess960       => chess960
       case PerfType.KingOfTheHill  => kingOfTheHill
       case PerfType.ThreeCheck     => threeCheck
+      case PerfType.TwoCheck       => twoCheck
       case PerfType.Antichess      => antichess
       case PerfType.Atomic         => atomic
       case PerfType.Horde          => horde
@@ -212,6 +216,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -238,6 +243,7 @@ case object Perfs {
       case chess.variant.Chess960      => Some(_.chess960)
       case chess.variant.KingOfTheHill => Some(_.kingOfTheHill)
       case chess.variant.ThreeCheck    => Some(_.threeCheck)
+      case chess.variant.TwoCheck      => Some(_.twoCheck)
       case chess.variant.Antichess     => Some(_.antichess)
       case chess.variant.Atomic        => Some(_.atomic)
       case chess.variant.Horde         => Some(_.horde)
@@ -267,6 +273,7 @@ case object Perfs {
         chess960 = perf("chess960"),
         kingOfTheHill = perf("kingOfTheHill"),
         threeCheck = perf("threeCheck"),
+        twoCheck = perf("twoCheck"),
         antichess = perf("antichess"),
         atomic = perf("atomic"),
         horde = perf("horde"),
@@ -293,6 +300,7 @@ case object Perfs {
         "chess960"       -> notNew(o.chess960),
         "kingOfTheHill"  -> notNew(o.kingOfTheHill),
         "threeCheck"     -> notNew(o.threeCheck),
+        "twoCheck"       -> notNew(o.twoCheck),
         "antichess"      -> notNew(o.antichess),
         "atomic"         -> notNew(o.atomic),
         "horde"          -> notNew(o.horde),
@@ -321,11 +329,12 @@ case object Perfs {
       chess960: List[User.LightPerf],
       kingOfTheHill: List[User.LightPerf],
       threeCheck: List[User.LightPerf],
+      twoCheck: List[User.LightPerf],
       antichess: List[User.LightPerf],
       atomic: List[User.LightPerf],
       horde: List[User.LightPerf],
       racingKings: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
 }

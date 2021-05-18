@@ -57,6 +57,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         game.variant match {
           case chess.variant.KingOfTheHill => "King in the center"
           case chess.variant.ThreeCheck    => "Three checks"
+          case chess.variant.TwoCheck    => "Two checks"
           case chess.variant.Antichess     => "Lose all your pieces to win"
           case chess.variant.Atomic        => "Explode or mate your opponent's king to win"
           case chess.variant.Horde         => "Destroy the horde to win"
@@ -199,6 +200,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         game.variant match {
           case chess.variant.KingOfTheHill => trans.kingInTheCenter.txt()
           case chess.variant.ThreeCheck    => trans.threeChecks.txt()
+          case chess.variant.TwoCheck      => "Two Check"
           case chess.variant.RacingKings   => trans.raceFinished.txt()
           case _                           => trans.variantEnding.txt()
         }

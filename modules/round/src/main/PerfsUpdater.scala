@@ -33,6 +33,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.kingOfTheHill, ratingsB.kingOfTheHill, game)
               case chess.variant.ThreeCheck =>
                 updateRatings(ratingsW.threeCheck, ratingsB.threeCheck, game)
+              case chess.variant.TwoCheck =>
+                updateRatings(ratingsW.twoCheck, ratingsB.twoCheck, game)
               case chess.variant.Antichess =>
                 updateRatings(ratingsW.antichess, ratingsB.antichess, game)
               case chess.variant.Atomic =>
@@ -82,6 +84,7 @@ final class PerfsUpdater(
       chess960: Rating,
       kingOfTheHill: Rating,
       threeCheck: Rating,
+      twoCheck: Rating,
       antichess: Rating,
       atomic: Rating,
       horde: Rating,
@@ -100,6 +103,7 @@ final class PerfsUpdater(
       chess960 = perfs.chess960.toRating,
       kingOfTheHill = perfs.kingOfTheHill.toRating,
       threeCheck = perfs.threeCheck.toRating,
+      twoCheck = perfs.twoCheck.toRating,
       antichess = perfs.antichess.toRating,
       atomic = perfs.atomic.toRating,
       horde = perfs.horde.toRating,
@@ -151,6 +155,7 @@ final class PerfsUpdater(
           kingOfTheHill =
             addRatingIf(game.ratingVariant.kingOfTheHill, perfs.kingOfTheHill, ratings.kingOfTheHill),
           threeCheck = addRatingIf(game.ratingVariant.threeCheck, perfs.threeCheck, ratings.threeCheck),
+          twoCheck = addRatingIf(game.ratingVariant.twoCheck, perfs.twoCheck, ratings.twoCheck),
           antichess = addRatingIf(game.ratingVariant.antichess, perfs.antichess, ratings.antichess),
           atomic = addRatingIf(game.ratingVariant.atomic, perfs.atomic, ratings.atomic),
           horde = addRatingIf(game.ratingVariant.horde, perfs.horde, ratings.horde),
@@ -170,6 +175,7 @@ final class PerfsUpdater(
           chess960 = r(PT.Chess960, perfs.chess960, perfs1.chess960),
           kingOfTheHill = r(PT.KingOfTheHill, perfs.kingOfTheHill, perfs1.kingOfTheHill),
           threeCheck = r(PT.ThreeCheck, perfs.threeCheck, perfs1.threeCheck),
+          twoCheck = r(PT.TwoCheck, perfs.twoCheck, perfs1.twoCheck),
           antichess = r(PT.Antichess, perfs.antichess, perfs1.antichess),
           atomic = r(PT.Atomic, perfs.atomic, perfs1.atomic),
           horde = r(PT.Horde, perfs.horde, perfs1.horde),

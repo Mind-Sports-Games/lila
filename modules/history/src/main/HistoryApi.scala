@@ -35,6 +35,7 @@ final class HistoryApi(coll: Coll, userRepo: UserRepo, cacheApi: lila.memo.Cache
       game.ratingVariant.chess960.option("chess960"                         -> perfs.chess960),
       game.ratingVariant.kingOfTheHill.option("kingOfTheHill"               -> perfs.kingOfTheHill),
       game.ratingVariant.threeCheck.option("threeCheck"                     -> perfs.threeCheck),
+      game.ratingVariant.twoCheck.option("twoCheck"                         -> perfs.twoCheck),
       game.ratingVariant.antichess.option("antichess"                       -> perfs.antichess),
       game.ratingVariant.atomic.option("atomic"                             -> perfs.atomic),
       game.ratingVariant.horde.option("horde"                               -> perfs.horde),

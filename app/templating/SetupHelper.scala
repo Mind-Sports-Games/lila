@@ -130,6 +130,7 @@ trait SetupHelper { self: I18nHelper =>
       chess.variant.Chess960,
       chess.variant.KingOfTheHill,
       chess.variant.ThreeCheck,
+      chess.variant.TwoCheck,
       chess.variant.Antichess,
       chess.variant.Atomic,
       chess.variant.Horde,
@@ -147,6 +148,7 @@ trait SetupHelper { self: I18nHelper =>
       variantTupleId(chess.variant.Chess960) :+
       variantTupleId(chess.variant.KingOfTheHill) :+
       variantTupleId(chess.variant.ThreeCheck) :+
+      variantTupleId(chess.variant.TwoCheck) :+
       variantTupleId(chess.variant.Antichess) :+
       variantTupleId(chess.variant.Atomic) :+
       variantTupleId(chess.variant.Horde) :+

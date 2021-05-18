@@ -5,11 +5,12 @@ object Dependencies {
 
   val lilaMaven = "lila-maven" at "https://raw.githubusercontent.com/Mind-Sports-Games/lila-maven/master"
   val lilaMavenLocal = "lila-maven-local" at "file:///home/runner/work/lila/lila/deps/lila-maven/"
+  val lilaMavenLocalLakin = "lila-maven-local" at "file:///home/lakin/work/mso/lila-maven/"
 
   val scalalib    = "com.github.ornicar"         %% "scalalib"                        % "7.0.2"
   val hasher      = "com.roundeights"            %% "hasher"                          % "1.2.1"
   val jodaTime    = "joda-time"                   % "joda-time"                       % "2.10.10"
-  val chess       = "org.lichess"                %% "scalachess"                      % "10.2.1"
+  val chess       = "org.lichess"                %% "scalachess"                      % "10.2.1-2check"
   val compression = "org.lichess"                %% "compression"                     % "1.6"
   val maxmind     = "com.sanoma.cda"             %% "maxmind-geoip2-scala"            % "1.3.1-THIB"
   val prismic     = "io.prismic"                 %% "scala-kit"                       % "1.2.19-THIB213"

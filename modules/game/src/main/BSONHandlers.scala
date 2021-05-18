@@ -124,7 +124,7 @@ object BSONHandlers {
               halfMoveClock = decoded.halfMoveClock,
               positionHashes = decoded.positionHashes,
               unmovedRooks = decoded.unmovedRooks,
-              checkCount = if (gameVariant.threeCheck) {
+              checkCount = if (gameVariant.twoCheck) {
                 val counts = r.intsD(F.checkCount)
                 CheckCount(~counts.headOption, ~counts.lastOption)
               } else Game.emptyCheckCount
