@@ -42,6 +42,7 @@ jobs:
           token: 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
           persist-credentials: false
           path: ./.github/lila-maven
+      - uses: ./.github/lila-maven
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
         with:
