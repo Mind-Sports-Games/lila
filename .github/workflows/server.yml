@@ -33,6 +33,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Checkout Mind-Sports-Games/lila-maven
+        uses: actions/checkout@v2
+        with:
+          repository: Mind-Sports-Games/lila-maven
+          # GitHub's personal access token with access to `Mind-Sports-Games/lila-maven`
+          token: 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
+          persist-credentials: false
+          path: deps/lila-maven
       - uses: actions/cache@v2
         with:
           path: |
