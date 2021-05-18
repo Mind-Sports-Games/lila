@@ -52,8 +52,8 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: zulu
-      - run: ls /home/runner/work/lila/
           java-version: 14.0.1
+      - run: ls /home/runner/work/lila/
       - run: ls /home/runner/work/lila/lila/
       - run: ls /home/runner/work/lila/lila/.github/
       - run: ls /home/runner/work/lila/lila/.github/
