@@ -9,6 +9,7 @@ export const perf = {
     chess960: "'",
     kingOfTheHill: '(',
     threeCheck: '.',
+    twoCheck: '.',
     antichess: '@',
     atomic: '>',
     horde: '_',

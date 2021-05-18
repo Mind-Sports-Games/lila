@@ -223,6 +223,9 @@ export default class Setup {
         case '9':
           key = 'racingKings';
           break;
+        case '10':
+          key = 'twoCheck';
+          break;
       }
       const $selected = $ratings
         .hide()

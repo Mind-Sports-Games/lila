@@ -973,9 +973,9 @@ chessground@^7.12.0:
   resolved "https://registry.yarnpkg.com/chessground/-/chessground-7.12.0.tgz#92d9726afc9d019c04ded83997c6ba2e6f8f93ff"
   integrity sha512-MQG7c4Hsy1dCkMFFv4LTaRauVSmWF8/dukion1qLCh5pIcKyoa5onbmbglAdDXOYhBbAZVf1F289wy0DeDEBJQ==
 
-"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#1756be65369dd7c6f36df95d4085c6d11c2a6036":
+"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#2check":
   version "0.8.1"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#1756be65369dd7c6f36df95d4085c6d11c2a6036"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#1d960069864e856da4a8b0c716fc2b9af0c13f79"
   dependencies:
     "@badrap/result" "^0.2.8"
 

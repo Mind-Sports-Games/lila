@@ -38,6 +38,8 @@ export default function status(ctrl: Ctrl): string {
           return noarg('kingInTheCenter');
         case 'threeCheck':
           return noarg('threeChecks');
+        case 'twoCheck':
+          return noarg('twoChecks');
       }
       return noarg('variantEnding');
     case 'unknownFinish':

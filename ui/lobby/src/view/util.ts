@@ -37,6 +37,7 @@ export const perfIcons = {
   Classical: '+',
   Rapid: '#',
   'Three-check': '.',
+  'Two-check': '.',
   Antichess: '@',
   Horde: '_',
   Atomic: '>',

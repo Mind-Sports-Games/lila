@@ -2,6 +2,7 @@ const variantConfirms = {
   chess960: "This is a Chess960 game!\n\nThe starting position of the pieces on the players' home ranks is randomized.",
   kingOfTheHill: 'This is a King of the Hill game!\n\nThe game can be won by bringing the king to the center.',
   threeCheck: 'This is a Three-check game!\n\nThe game can be won by checking the opponent three times.',
+  twoCheck: 'This is a Two-check game!\n\nThe game can be won by checking the opponent two times.',
   antichess:
     'This is an Antichess game!\n\nIf you can take a piece, you must. The game can be won by losing all your pieces, or by being stalemated.',
   atomic:

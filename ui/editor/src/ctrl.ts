@@ -137,6 +137,8 @@ export default class EditorCtrl {
         return this.makeUrl('/analysis/', legalFen);
       case '3check':
         return this.makeUrl('/analysis/threeCheck/', legalFen);
+      case '2check':
+        return this.makeUrl('/analysis/twoCheck/', legalFen);
       case 'kingofthehill':
         return this.makeUrl('/analysis/kingOfTheHill/', legalFen);
       case 'racingkings':
@@ -213,7 +215,7 @@ export default class EditorCtrl {
     this.rules = rules;
     if (rules != 'crazyhouse') this.pockets = undefined;
     else if (!this.pockets) this.pockets = Material.empty();
-    if (rules != '3check') this.remainingChecks = undefined;
+    if (rules != '3check' && rules != '2check') this.remainingChecks = undefined;
     else if (!this.remainingChecks) this.remainingChecks = RemainingChecks.default();
     this.onChange();
   }

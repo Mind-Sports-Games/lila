@@ -12,5 +12,5 @@ export function sanIrreversible(variant: VariantKey, san: string): boolean {
   if (variant === 'crazyhouse') return false;
   if (san.includes('x')) return true; // capture
   if (san.toLowerCase() === san) return true; // pawn move
-  return variant === 'threeCheck' && san.includes('+');
+  return (variant === 'threeCheck' || variant === 'twoCheck') && san.includes('+');
 }
