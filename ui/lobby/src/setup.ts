@@ -223,6 +223,9 @@ export default class Setup {
         case '9':
           key = 'racingKings';
           break;
+        case '100':
+          key = 'linesofaction';
+          break;
       }
       const $selected = $ratings
         .hide()

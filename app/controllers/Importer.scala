@@ -52,7 +52,7 @@ final class Importer(env: Env) extends LilaController(env) {
                         system = false
                       )
                     )
-                  } inject Redirect(routes.Round.watcher(game.id, "white"))
+                  } inject Redirect(routes.Round.watcher(game.id, game.variant.startColor.name))
                 case None => Redirect(routes.Importer.importGame).fuccess
               }
             }(rateLimitedFu)

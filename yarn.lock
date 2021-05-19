@@ -960,23 +960,25 @@ chartjs-color@^2.1.0:
   version "0.10.2"
   resolved "https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249"
 
-chessground@^4.4:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/chessground/-/chessground-4.4.2.tgz#582912aabb5ed32131abdeb6cfcb54d1c4cda7aa"
-  integrity sha512-cCAaTjsnE30hkWSPQRBOr2vlWSmxHS1hzz2kBM+b1VwLjvZRj5bohWtfZsznIgegfZUxZMOvtHsyde8/hhazLg==
-  dependencies:
-    merge "1.2.0"
-    mithril "github:ornicar/mithril.js#v1.0.1"
-
 chessground@^7.12.0:
   version "7.12.0"
   resolved "https://registry.yarnpkg.com/chessground/-/chessground-7.12.0.tgz#92d9726afc9d019c04ded83997c6ba2e6f8f93ff"
   integrity sha512-MQG7c4Hsy1dCkMFFv4LTaRauVSmWF8/dukion1qLCh5pIcKyoa5onbmbglAdDXOYhBbAZVf1F289wy0DeDEBJQ==
 
+"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#loa":
+  version "7.11.1"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#a76d6f0ce16e1b457605f05620a1d79ad64c0d43"
+
 chessops@^0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/chessops/-/chessops-0.9.0.tgz#07e00385a7106477685d372e91a593a83c063df2"
   integrity sha512-yvkZUN0LRLY/2xoslepfldVTgyPqT1QNi7vOlnFDZ2YVQV6XdTJO23+hbHRkkzf8Vb4ihyfFC0JASnVFyiIyow==
+  dependencies:
+    "@badrap/result" "^0.2.8"
+
+"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#loa":
+  version "0.8.1"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#3de65211dd60477ca2f2dfa57112b4f807d9611f"
   dependencies:
     "@badrap/result" "^0.2.8"
 
@@ -3381,11 +3383,6 @@ merge2@^1.2.3, merge2@^1.3.0:
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.4.1.tgz#4368892f885e907455a6fd7dc55c0c9d404990ae"
   integrity sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==
 
-merge@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/merge/-/merge-1.2.0.tgz#7531e39d4949c281a66b8c5a6e0265e8b05894da"
-  integrity sha1-dTHjnUlJwoGma4xabgJl6LBYlNo=
-
 micromatch@^2.3.7:
   version "2.3.11"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-2.3.11.tgz#86677c97d1720b363431d04d0d15293bd38c1565"
@@ -3459,10 +3456,6 @@ minimist@^1.1.0, minimist@^1.1.3, minimist@^1.2.5:
 "mithril@github:ornicar/mithril.js#lila-1":
   version "0.2.1-lila"
   resolved "https://codeload.github.com/ornicar/mithril.js/tar.gz/dd92827aec63f921149ca9a3460ccd981e7025bb"
-
-"mithril@github:ornicar/mithril.js#v1.0.1":
-  version "0.2.1"
-  resolved "https://codeload.github.com/ornicar/mithril.js/tar.gz/d99d36d445fad1b22f4b285963ea065291d99ad4"
 
 mixin-deep@^1.2.0:
   version "1.3.2"

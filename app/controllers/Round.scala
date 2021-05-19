@@ -139,7 +139,7 @@ final class Round(
                 case (Some(player), Some(_)) if player == requestedPov =>
                   Redirect(routes.Round.watcher(gameId, pov.color.name)).fuccess
                 case _ =>
-                  Redirect(routes.Round.watcher(gameId, "white")).fuccess
+                  Redirect(routes.Round.watcher(gameId, pov.game.variant.startColor.name)).fuccess
               }
             case None =>
               watch(pov)
@@ -160,7 +160,7 @@ final class Round(
       case Some(player) if userTv.isEmpty => renderPlayer(pov withColor player.color)
       case _ if pov.game.variant == chess.variant.RacingKings && pov.color.black =>
         if (userTv.isDefined) watch(!pov, userTv)
-        else Redirect(routes.Round.watcher(pov.gameId, "white")).fuccess
+        else Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startColor.name)).fuccess
       case _ =>
         negotiate(
           html = {

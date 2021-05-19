@@ -133,7 +133,8 @@ trait SetupHelper { self: I18nHelper =>
       chess.variant.Antichess,
       chess.variant.Atomic,
       chess.variant.Horde,
-      chess.variant.RacingKings
+      chess.variant.RacingKings,
+      chess.variant.LinesOfAction
     ).map(variantTuple(encode))
 
   def translatedVariantChoicesWithFen(implicit lang: Lang) =
@@ -151,6 +152,7 @@ trait SetupHelper { self: I18nHelper =>
       variantTupleId(chess.variant.Atomic) :+
       variantTupleId(chess.variant.Horde) :+
       variantTupleId(chess.variant.RacingKings) :+
+      variantTupleId(chess.variant.LinesOfAction) :+
       variantTupleId(chess.variant.FromPosition)
 
   def translatedVariantChoicesWithVariantsAndFen(implicit lang: Lang) =

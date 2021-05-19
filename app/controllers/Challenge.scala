@@ -90,7 +90,7 @@ final class Challenge(
           .flatMap {
             case Some(pov) =>
               negotiate(
-                html = Redirect(routes.Round.watcher(pov.gameId, cc.fold("white")(_.name))).fuccess,
+                html = Redirect(routes.Round.watcher(pov.gameId, cc.fold(pov.game.variant.startColor.name)(_.name))).fuccess,
                 api = apiVersion => env.api.roundApi.player(pov, none, apiVersion) map { Ok(_) }
               ) flatMap withChallengeAnonCookie(ctx.isAnon, c, owner = false)
             case None =>
@@ -360,7 +360,7 @@ final class Challenge(
           Json.obj(
             "game" -> {
               env.game.jsonView(g, challenge.initialFen) ++ Json.obj(
-                "url" -> s"${env.net.baseUrl}${routes.Round.watcher(g.id, "white")}"
+                "url" -> s"${env.net.baseUrl}${routes.Round.watcher(g.id, g.variant.startColor.name)}"
               )
             }
           )

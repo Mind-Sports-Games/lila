@@ -43,6 +43,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.racingKings, ratingsB.racingKings, game)
               case chess.variant.Crazyhouse =>
                 updateRatings(ratingsW.crazyhouse, ratingsB.crazyhouse, game)
+              case chess.variant.LinesOfAction =>
+                updateRatings(ratingsW.linesOfAction, ratingsB.linesOfAction, game)
               case chess.variant.Standard =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -87,6 +89,7 @@ final class PerfsUpdater(
       horde: Rating,
       racingKings: Rating,
       crazyhouse: Rating,
+      linesOfAction: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -105,6 +108,7 @@ final class PerfsUpdater(
       horde = perfs.horde.toRating,
       racingKings = perfs.racingKings.toRating,
       crazyhouse = perfs.crazyhouse.toRating,
+      linesOfAction = perfs.linesOfAction.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -156,6 +160,7 @@ final class PerfsUpdater(
           horde = addRatingIf(game.ratingVariant.horde, perfs.horde, ratings.horde),
           racingKings = addRatingIf(game.ratingVariant.racingKings, perfs.racingKings, ratings.racingKings),
           crazyhouse = addRatingIf(game.ratingVariant.crazyhouse, perfs.crazyhouse, ratings.crazyhouse),
+          linesOfAction = addRatingIf(game.ratingVariant.linesOfAction, perfs.linesOfAction, ratings.linesOfAction),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -175,6 +180,7 @@ final class PerfsUpdater(
           horde = r(PT.Horde, perfs.horde, perfs1.horde),
           racingKings = r(PT.RacingKings, perfs.racingKings, perfs1.racingKings),
           crazyhouse = r(PT.Crazyhouse, perfs.crazyhouse, perfs1.crazyhouse),
+          linesOfAction = r(PT.LinesOfAction, perfs.linesOfAction, perfs1.linesOfAction),
           bullet = r(PT.Bullet, perfs.bullet, perfs1.bullet),
           blitz = r(PT.Blitz, perfs.blitz, perfs1.blitz),
           rapid = r(PT.Rapid, perfs.rapid, perfs1.rapid),
