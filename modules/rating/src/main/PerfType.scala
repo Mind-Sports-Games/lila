@@ -158,6 +158,15 @@ object PerfType {
         iconChar = ''
       )
 
+  case object LinesOfAction
+      extends PerfType(
+        100,
+        key = "linesOfAction",
+        name = chess.variant.LinesOfAction.name,
+        title = "Lines Of Action game",
+        iconChar = 'L'
+      )
+
   case object Puzzle
       extends PerfType(
         20,

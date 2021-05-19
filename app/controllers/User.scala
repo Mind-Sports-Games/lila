@@ -292,7 +292,8 @@ final class User(
                   "antichess"     -> leaderboards.antichess,
                   "atomic"        -> leaderboards.atomic,
                   "horde"         -> leaderboards.horde,
-                  "racingKings"   -> leaderboards.racingKings
+                  "racingKings"   -> leaderboards.racingKings,
+                  "linesOfAction" -> leaderboards.linesOfAction
                 )
               )
             }

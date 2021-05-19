@@ -11,6 +11,8 @@ const variantConfirms = {
     'This is a Racing Kings game!\n\nPlayers must race their kings to the eighth rank. Checks are not allowed.',
   crazyhouse:
     'This is a Crazyhouse game!\n\nEvery time a piece is captured, the capturing player gets a piece of the same type and of their color in their pocket.',
+  linesofaction:
+    'This is Lines Of Action, a separate game from chess.'
 };
 
 function storageKey(key) {

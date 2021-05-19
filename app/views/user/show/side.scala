@@ -79,6 +79,7 @@ object side {
         showNonEmptyPerf(u.perfs.atomic, PerfType.Atomic),
         showNonEmptyPerf(u.perfs.horde, PerfType.Horde),
         showNonEmptyPerf(u.perfs.racingKings, PerfType.RacingKings),
+        showNonEmptyPerf(u.perfs.linesOfAction, PerfType.LinesOfAction),
         u.noBot option frag(
           hr,
           showPerf(u.perfs.puzzle, PerfType.Puzzle),

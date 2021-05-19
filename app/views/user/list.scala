@@ -61,7 +61,8 @@ object list {
               userTopPerf(leaderboards.threeCheck, PerfType.ThreeCheck),
               userTopPerf(leaderboards.kingOfTheHill, PerfType.KingOfTheHill),
               userTopPerf(leaderboards.horde, PerfType.Horde),
-              userTopPerf(leaderboards.racingKings, PerfType.RacingKings)
+              userTopPerf(leaderboards.racingKings, PerfType.RacingKings),
+              userTopPerf(leaderboards.linesOfAction, PerfType.LinesOfAction)
             )
           )
         )
