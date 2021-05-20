@@ -158,15 +158,6 @@ object PerfType {
         iconChar = ''
       )
 
-  case object LinesOfAction
-      extends PerfType(
-        100,
-        key = "linesOfAction",
-        name = chess.variant.LinesOfAction.name,
-        title = "Lines Of Action game",
-        iconChar = 'L'
-      )
-
   case object Puzzle
       extends PerfType(
         20,
@@ -174,6 +165,15 @@ object PerfType {
         name = "Training",
         title = "Chess tactics trainer",
         iconChar = '-'
+      )
+
+  case object LinesOfAction
+      extends PerfType(
+        21,
+        key = "linesOfAction",
+        name = chess.variant.LinesOfAction.name,
+        title = "Lines Of Action game",
+        iconChar = '.'
       )
 
   val all: List[PerfType] = List(
