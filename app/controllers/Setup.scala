@@ -22,7 +22,6 @@ final class Setup(
 ) extends LilaController(env)
     with TheftPrevention {
 
-  private val logger = lila.log("setup")
   private def forms     = env.setup.forms
   private def processor = env.setup.processor
 
@@ -75,24 +74,20 @@ final class Setup(
   def friend(userId: Option[String]) =
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
-      logger.info("HERE")
       PostRateLimit(HTTPRequest ipAddress ctx.req) {
         forms
           .friend(ctx)
           .bindFromRequest()
           .fold(
-            err =>{
-              logger.info("BADREQ")
+            err =>
               negotiate(
                 html = keyPages.home(Results.BadRequest),
                 api = _ => jsonFormError(err)
-              )},
+              ),
             config =>
-            {logger.info("GOODREQ")
               userId ?? env.user.repo.enabledById flatMap { destUser =>
                 destUser ?? { env.challenge.granter(ctx.me, _, config.perfType) } flatMap {
                   case Some(denied) =>
-                    logger.info("DENIED")
                     val message = lila.challenge.ChallengeDenied.translated(denied)
                     negotiate(
                       html = BadRequest(html.site.message.challengeDenied(message)).fuccess,
@@ -121,21 +116,18 @@ final class Setup(
                     )
                     (env.challenge.api create challenge) flatMap {
                       case true =>
-                        logger.info("CHALLENGE TRUE")
                         negotiate(
                           html = fuccess(Redirect(routes.Round.watcher(challenge.id, "white"))),
                           api = _ => challengeC.showChallenge(challenge, justCreated = true)
                         )
                       case false =>
-                        logger.info("CHALLENGE FALSE")
                         negotiate(
                           html = fuccess(Redirect(routes.Lobby.home)),
                           api = _ => fuccess(BadRequest(jsonError("Challenge not created")))
                         )
                     }
                 }
-              }  
-            }
+              }
           )
       }(rateLimitedFu)
     }
