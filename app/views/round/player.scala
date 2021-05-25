@@ -52,7 +52,7 @@ object player {
         embedJsUnsafeLoadThen(s"""LichessRound.boot(${safeJsonValue(
           Json
             .obj(
-              "data"   -> data,
+              "data"   -> data.pp("json data"),
               "i18n"   -> jsI18n(pov.game),
               "userId" -> ctx.userId,
               "chat"   -> chatJson

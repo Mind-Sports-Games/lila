@@ -389,11 +389,13 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         g.copy(mode = chess.Mode.Casual)
       else g
     val userIds = g2.userIds.distinct
+    // TODO: why does the initialFen get generated here?
     val fen: Option[FEN] = initialFen orElse {
       (!g2.variant.standardInitialPosition)
         .option(Forsyth >> g2.chess)
         .filterNot(_.initial)
     }
+    println(fen)
     val checkInHours =
       if (g2.isPgnImport) none
       else if (g2.hasClock) 1.some
