@@ -248,6 +248,7 @@ object BinaryFormat {
         case 5 => Some(Bishop)
         // Legacy from when we used to have an 'Antiking' piece
         case 7 if variant.antichess => Some(King)
+        case 8 if variant.linesOfAction => Some(LOAChecker)
         case _                      => None
       }
     private def roleToInt(role: Role): Int =
@@ -258,6 +259,7 @@ object BinaryFormat {
         case Rook   => 3
         case Knight => 4
         case Bishop => 5
+        case LOAChecker => 8
       }
   }
 
