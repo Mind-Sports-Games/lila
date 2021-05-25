@@ -33,8 +33,8 @@ const anna: { [letter: string]: string } = {
   g: 'gustav',
   h: 'hector',
 };
-const roles: { [letter: string]: string } = { P: 'pawn', R: 'rook', N: 'knight', B: 'bishop', Q: 'queen', K: 'king' };
-const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k' };
+const roles: { [letter: string]: string } = { P: 'pawn', R: 'rook', N: 'knight', B: 'bishop', Q: 'queen', K: 'king', L: 'loachecker'};
+const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k', loachecker: 'l' };
 
 const letterPiece: { [letter: string]: string } = {
   p: 'p',
@@ -71,12 +71,14 @@ const namePiece: { [letter: string]: string } = {
   b: 'bishop',
   q: 'queen',
   k: 'king',
+  l: 'loachecker',
   P: 'pawn',
   R: 'rook',
   N: 'knight',
   B: 'bishop',
   Q: 'queen',
   K: 'king',
+  L: 'loachecker',
 };
 const whiteUpperNamePiece: { [letter: string]: string } = {
   p: 'pawn',
@@ -85,12 +87,14 @@ const whiteUpperNamePiece: { [letter: string]: string } = {
   b: 'bishop',
   q: 'queen',
   k: 'king',
+  l: 'loachecker',
   P: 'Pawn',
   R: 'Rook',
   N: 'Knight',
   B: 'Bishop',
   Q: 'Queen',
   K: 'King',
+  L: 'LOAChecker',
 };
 const skipToFile: { [letter: string]: string } = {
   '!': 'a',
@@ -249,7 +253,7 @@ export function renderPieces(pieces: Pieces, style: Style): VNode {
     'div',
     ['white', 'black'].map(color => {
       const lists: any = [];
-      ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn'].forEach(role => {
+      ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn', 'loachecker'].forEach(role => {
         const keys = [];
         for (const [key, piece] of pieces) {
           if (piece.color === color && piece.role === role) keys.push(key);

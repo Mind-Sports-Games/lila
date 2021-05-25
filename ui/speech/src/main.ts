@@ -1,4 +1,4 @@
-const roles: { [letter: string]: string } = { P: 'pawn', R: 'rook', N: 'knight', B: 'bishop', Q: 'queen', K: 'king' };
+const roles: { [letter: string]: string } = { P: 'pawn', R: 'rook', N: 'knight', B: 'bishop', Q: 'queen', K: 'king', L: 'loachecker' };
 
 function renderSan(san: San) {
   let move: string;

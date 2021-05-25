@@ -17,6 +17,7 @@ module.exports = {
     bishop: 'B',
     rook: 'R',
     queen: 'Q',
+    loachecker: 'L',
   },
   arrow: function (vector, brush) {
     return {

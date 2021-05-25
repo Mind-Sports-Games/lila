@@ -359,7 +359,7 @@ let lastTouchMovePos: NumberPair | undefined;
 function sparePieces(ctrl: EditorCtrl, color: Color, _orientation: Color, position: 'top' | 'bottom'): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
 
-  const pieces = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn'].map(function (role) {
+  const pieces = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn', 'loachecker'].map(function (role) {
     return [color, role];
   });
 
