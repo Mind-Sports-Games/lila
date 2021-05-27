@@ -102,7 +102,7 @@ final class Setup(
                     } getOrElse TimeControl.Unlimited
                     val challenge = lila.challenge.Challenge.make(
                       variant = config.variant,
-                      initialFen = config.fen.pp,
+                      initialFen = config.fen.pp("setupfen"),
                       timeControl = timeControl,
                       mode = config.mode,
                       color = config.color.name,
@@ -117,7 +117,7 @@ final class Setup(
                     (env.challenge.api create challenge) flatMap {
                       case true =>
                         negotiate(
-                          html = fuccess(Redirect(routes.Round.watcher(challenge.id, "white"))),
+                          html = fuccess(Redirect(routes.Round.watcher(challenge.id, config.variant.startColor.name))),
                           api = _ => challengeC.showChallenge(challenge, justCreated = true)
                         )
                       case false =>
@@ -294,7 +294,7 @@ final class Setup(
     }
 
   private[controllers] def redirectPov(pov: Pov)(implicit ctx: Context) = {
-    val redir = Redirect(routes.Round.watcher(pov.gameId, "white"))
+    val redir = Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startColor.name))
     if (ctx.isAuth) redir
     else
       redir withCookies env.lilaCookie.cookie(
