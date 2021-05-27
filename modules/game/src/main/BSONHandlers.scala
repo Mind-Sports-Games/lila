@@ -93,11 +93,11 @@ object BSONHandlers {
       val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn = r intD F.startedAtTurn
       val plies         = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnColor     = Color.fromPly(plies)
       val createdAt     = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
       val gameVariant = Variant(r intD F.variant) | chess.variant.Standard
+      val turnColor   = Color.fromPly(if (gameVariant.startColor == White) plies else plies+1)
 
       val decoded = r.bytesO(F.huffmanPgn).map { PgnStorage.Huffman.decode(_, playedPlies) } | {
         val clm      = r.get[CastleLastMove](F.castleLastMove)
