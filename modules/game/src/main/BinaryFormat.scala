@@ -204,10 +204,6 @@ object BinaryFormat {
 
   object piece {
 
-    private val groupedPos = Pos.all grouped 2 collect { case List(p1, p2) =>
-      (p1, p2)
-    } toArray
-
     def write(pieces: PieceMap): ByteArray = {
       def posInt(pos: Pos): Int =
         (pieces get pos).fold(0) { piece =>
@@ -225,7 +221,6 @@ object BinaryFormat {
         intToRole(int & 127, variant) map { role =>
           Piece(Color.fromWhite((int & 128) == 0), role)
         }
-      val pieceInts = ba.value flatMap splitInts
       (Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
