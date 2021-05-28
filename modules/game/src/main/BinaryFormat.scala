@@ -211,11 +211,9 @@ object BinaryFormat {
     def write(pieces: PieceMap): ByteArray = {
       def posInt(pos: Pos): Int =
         (pieces get pos).fold(0) { piece =>
-          piece.color.fold(0, 8) + roleToInt(piece.role)
+          piece.color.fold(0, 128) + roleToInt(piece.role)
         }
-      ByteArray(groupedPos map { case (p1, p2) =>
-        ((posInt(p1) << 4) + posInt(p2)).toByte
-      })
+      ByteArray(Pos.all.map(posInt(_).toByte).toArray)
     }
 
     def read(ba: ByteArray, variant: Variant): PieceMap = {
@@ -224,11 +222,11 @@ object BinaryFormat {
         Array(int >> 4, int & 0x0f)
       }
       def intPiece(int: Int): Option[Piece] =
-        intToRole(int & 7, variant) map { role =>
-          Piece(Color.fromWhite((int & 8) == 0), role)
+        intToRole(int & 127, variant) map { role =>
+          Piece(Color.fromWhite((int & 128) == 0), role)
         }
       val pieceInts = ba.value flatMap splitInts
-      (Pos.all zip pieceInts).view
+      (Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
         }
