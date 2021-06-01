@@ -28,8 +28,6 @@ final class Round(
   private def analyser = env.analyse.analyser
 
   private def renderPlayer(pov: Pov)(implicit ctx: Context): Fu[Result] = {
-    println("RenderPlayer" + pov.game.board)
-    Thread.dumpStack()
     negotiate(
       html =
         if (!pov.game.started) notFound

@@ -52,7 +52,6 @@ final class JsonView(
       withFlags: WithFlags,
       nvui: Boolean
   ): Fu[JsObject] = {
-    println("pJpov" + pov.game.board)
     getSocketStatus(pov.game) zip
       (pov.opponent.userId ?? userRepo.byId) zip
       takebacker.isAllowedIn(pov.game) zip

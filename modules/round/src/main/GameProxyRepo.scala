@@ -7,7 +7,7 @@ final class GameProxyRepo(
     roundSocket: RoundSocket
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  def game(gameId: Game.ID): Fu[Option[Game]] = Game.validId(gameId).pp("game") ?? roundSocket.getGame(gameId).pp("rs_game")
+  def game(gameId: Game.ID): Fu[Option[Game]] = Game.validId(gameId) ?? roundSocket.getGame(gameId)
 
   def pov(gameId: Game.ID, user: lila.user.User): Fu[Option[Pov]] =
     game(gameId) dmap { _ flatMap { Pov(_, user) } }
