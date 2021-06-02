@@ -20,7 +20,7 @@ final class AutomaticEmail(
 
   val regards = """Regards,
 
-The Lichess team"""
+The Playstrategy team"""
 
   def welcome(user: User, email: EmailAddress)(implicit lang: Lang): Funit = {
     lila.mon.email.send.welcome.increment()
@@ -48,7 +48,7 @@ ${Mailer.txt.serviceNote}
       body = alsoSendAsPrivateMessage(user) { implicit lang =>
         s"""Hello,
 
-Thank you for confirming your $title title on Lichess.
+Thank you for confirming your $title title on Playstrategy.
 It is now visible on your profile page: $baseUrl/@/${user.username}.
 
 $regards
@@ -58,7 +58,7 @@ $regards
         implicit val lang = userLang(user)
         mailer send Mailer.Message(
           to = email,
-          subject = s"$title title confirmed on lichess.org",
+          subject = s"$title title confirmed on playstrategy.org",
           text = s"""
 $body
 
@@ -76,7 +76,7 @@ ${Mailer.txt.serviceNote}
     val body = alsoSendAsPrivateMessage(user) { implicit lang =>
       s"""Hello,
 
-It is our pleasure to welcome you as a Lichess coach.
+It is our pleasure to welcome you as a Playstrategy coach.
 Your coach profile awaits you on $baseUrl/coach/edit.
 
 $regards
@@ -87,7 +87,7 @@ $regards
         implicit val lang = userLang(user)
         mailer send Mailer.Message(
           to = email,
-          subject = "Coach profile unlocked on lichess.org",
+          subject = "Coach profile unlocked on playstrategy.org",
           text = s"""
 $body
 
@@ -148,7 +148,7 @@ $regards
     val body =
       s"""Hello,
 
-Following your request, the Lichess account "${user.username} will be fully erased in 24h from now.
+Following your request, the Playstrategy account "${user.username} will be fully erased in 24h from now.
 
 $regards
 """
@@ -157,7 +157,7 @@ $regards
         implicit val lang = userLang(user)
         mailer send Mailer.Message(
           to = email,
-          subject = "lichess.org account erasure",
+          subject = "playstrategy.org account erasure",
           text = s"""
 $body
 

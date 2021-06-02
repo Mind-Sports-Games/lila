@@ -79,5 +79,5 @@ db.donation
 donationToPatron({
   userId: 'thibault',
   date: new Date(ISODate().getTime() - 1000 * 60 * 60 * 24 * 31 * 3),
-  email: 'lichess.contact@gmail.com',
+  email: 'playstrategy.contact@gmail.com',
 });

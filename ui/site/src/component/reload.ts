@@ -28,7 +28,7 @@ export const unload = {
 export const reload = () => {
   if (redirectInProgress) return;
   unload.expected = true;
-  lichess.socket.disconnect();
+  playstrategy.socket.disconnect();
   if (location.hash) location.reload();
   else location.assign(location.href);
 };

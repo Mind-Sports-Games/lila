@@ -33,10 +33,10 @@ export function ctrl(data: BackgroundData, trans: Trans, redraw: Redraw, close: 
     { key: 'transp', name: trans.noarg('transparent') },
   ];
 
-  const announceFail = () => lichess.announce({ msg: 'Failed to save background preference' });
+  const announceFail = () => playstrategy.announce({ msg: 'Failed to save background preference' });
 
   const reloadAllTheThings = () => {
-    if (window.Highcharts) lichess.reload();
+    if (window.Highcharts) playstrategy.reload();
   };
 
   return {

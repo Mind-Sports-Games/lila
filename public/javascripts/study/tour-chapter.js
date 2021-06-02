@@ -1,13 +1,13 @@
 function loadShepherd(f) {
   var theme = 'shepherd-theme-' + ($('body').hasClass('dark') ? 'default' : 'dark');
-  lichess.loadCss('vendor/shepherd/dist/css/' + theme + '.css');
-  lichess.loadScript('vendor/shepherd/dist/js/tether.js', { noVersion: true }).then(function () {
-    lichess.loadScript('vendor/shepherd/dist/js/shepherd.min.js', { noVersion: true }).then(function () {
+  playstrategy.loadCss('vendor/shepherd/dist/css/' + theme + '.css');
+  playstrategy.loadScript('vendor/shepherd/dist/js/tether.js', { noVersion: true }).then(function () {
+    playstrategy.loadScript('vendor/shepherd/dist/js/shepherd.min.js', { noVersion: true }).then(function () {
       f(theme);
     });
   });
 }
-lichess.studyTourChapter = function (study) {
+playstrategy.studyTourChapter = function (study) {
   loadShepherd(function (theme) {
     var onTab = function (tab) {
       return {
@@ -45,9 +45,9 @@ lichess.studyTourChapter = function (study) {
         when: onTab('edit'),
       },
       {
-        title: 'Load an existing lichess game',
+        title: 'Load an existing playstrategy game',
         text:
-          'Paste a lichess game URL<br>' + '(like lichess.org/7fHIU0XI)<br>' + 'to load the game moves in the chapter.',
+          'Paste a playstrategy game URL<br>' + '(like playstrategy.org/7fHIU0XI)<br>' + 'to load the game moves in the chapter.',
         attachTo: '.study__modal .tabs-horiz .game top',
         when: onTab('game'),
       },
@@ -68,7 +68,7 @@ lichess.studyTourChapter = function (study) {
       },
       {
         title: 'Studies support variants',
-        text: 'Yes, you can study crazyhouse,<br>' + 'and all lichess variants!',
+        text: 'Yes, you can study crazyhouse,<br>' + 'and all playstrategy variants!',
         attachTo: '.study__modal label[for=chapter-variant] left',
         when: onTab('init'),
       },

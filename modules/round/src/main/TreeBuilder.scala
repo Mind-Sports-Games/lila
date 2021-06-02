@@ -66,12 +66,12 @@ object TreeBuilder {
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
             comments = Node.Comments {
               drawOfferPlies(g.turns)
-                .option(makeLichessComment(s"${!Color.fromPly(g.turns)} offers draw"))
+                .option(makePlaystrategyComment(s"${!Color.fromPly(g.turns)} offers draw"))
                 .toList :::
                 advice
                   .map(_.makeComment(withEval = false, withBestMove = true))
                   .toList
-                  .map(makeLichessComment)
+                  .map(makePlaystrategyComment)
             }
           )
           advices.get(g.turns + 1).flatMap { adv =>
@@ -90,11 +90,11 @@ object TreeBuilder {
     }
   }
 
-  private def makeLichessComment(text: String) =
+  private def makePlaystrategyComment(text: String) =
     Node.Comment(
       Node.Comment.Id.make,
       Node.Comment.Text(text),
-      Node.Comment.Author.Lichess
+      Node.Comment.Author.Playstrategy
     )
 
   private def withAnalysisChild(
@@ -134,5 +134,5 @@ object TreeBuilder {
 
   private val logChessError = (id: String) =>
     (err: String) =>
-      logger.warn(s"round.TreeBuilder https://lichess.org/$id ${err.linesIterator.toList.headOption}")
+      logger.warn(s"round.TreeBuilder https://playstrategy.org/$id ${err.linesIterator.toList.headOption}")
 }

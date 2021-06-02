@@ -273,7 +273,7 @@
     <item quantity="one">%s सेकंद द्या</item>
     <item quantity="other">%s सेकंद द्या</item>
   </plurals>
-  <string name="thisAccountViolatedTos">या खात्याने Lichess अटींचे उल्लंघन केले</string>
+  <string name="thisAccountViolatedTos">या खात्याने Playstrategy अटींचे उल्लंघन केले</string>
   <string name="openingExplorerAndTablebase">उघडणी अन्वेषक नि साठा</string>
   <string name="takeback">चाल परत घ्या</string>
   <string name="proposeATakeback">चाल मागे घेण्यास विनंती करा</string>
@@ -445,8 +445,8 @@
   <string name="thankYou">आभारी आहे</string>
   <string name="socialMediaLinks">सोशल मीडिया दुवे</string>
   <string name="inlineNotation">इनलाइन संकेत</string>
-  <string name="watchLichessTV">Lichess दूरदर्शन पाहा</string>
-  <string name="previouslyOnLichessTV">यापूर्वी लिचेस चित्रफलकावर</string>
+  <string name="watchPlaystrategyTV">Playstrategy दूरदर्शन पाहा</string>
+  <string name="previouslyOnPlaystrategyTV">यापूर्वी लिचेस चित्रफलकावर</string>
   <string name="onlinePlayers">उपलब्ध खेळाडू</string>
   <string name="activeToday">आज सक्रिय</string>
   <string name="activePlayers">सक्रिय बुद्धिबळपटू</string>
@@ -551,7 +551,7 @@
   <string name="clock">घड्याळ</string>
   <string name="unauthorizedError">प्रवेश अनधिकृत आहे.</string>
   <string name="noInternetConnection">आंतरजालाशी संपर्क  नाही. तरीदेखील तुम्ही offline खेळू शकता</string>
-  <string name="connectedToLichess">तुम्ही आता lichess.org जोडल्या गेला आहात</string>
+  <string name="connectedToPlaystrategy">तुम्ही आता playstrategy.org जोडल्या गेला आहात</string>
   <string name="signedOut">तुम्ही बाहेर निघाला आहात</string>
   <string name="loginSuccessful">तुम्ही आत आला आहात</string>
   <string name="playOnTheBoardOffline">पटावर खेळा</string>
@@ -618,7 +618,7 @@
   <string name="simulClockHint">फिशर क्लॉक सेटअप. आपण जितके अधिक खेळाडू घेता, तितके आपल्याला अधिक वेळ लागेल.</string>
   <string name="simulAddExtraTime">आपणास सिमूलचा सामना करण्यास मदत करण्यासाठी आपण आपल्या घड्याळात अतिरिक्त वेळ घालवू शकता.</string>
   <string name="simulHostExtraTime">जास्तवेळ घ्या</string>
-  <string name="lichessTournaments">लीचेस क्रीडासत्र</string>
+  <string name="playstrategyTournaments">लीचेस क्रीडासत्र</string>
   <string name="tournamentFAQ">क्रीडासत्राचे सामान्य प्रश्न</string>
   <string name="tournamentOfficial">अधिकृत</string>
   <string name="timeBeforeTournamentStarts">क्रीडासत्र सुरू होण्यास बाकी वेळ</string>
@@ -653,8 +653,8 @@
   <string name="weHaveSentYouAnEmailTo">आम्ही %s वर ईमेल पाठवला आहे. पासवर्ड रेसेट करण्यासाठी ईमेल मधील लिंक क्लिक करा.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">नोंदणी करतेवेळी, तुम्ही आमच्या %s ला बांधील आहात.</string>
   <string name="readAboutOur">आमच्या %s बद्दल वाचा.</string>
-  <string name="networkLagBetweenYouAndLichess">आपण आणि लाइचेस दरम्यान नेटवर्कचा अडथळा आहे</string>
-  <string name="timeToProcessAMoveOnLichessServer">लीचेस सर्व्हरवर प्रक्रिया करण्याची वेळ</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">आपण आणि लाइचेस दरम्यान नेटवर्कचा अडथळा आहे</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">लीचेस सर्व्हरवर प्रक्रिया करण्याची वेळ</string>
   <string name="downloadAnnotated">डाउनलोड annotated</string>
   <string name="downloadRaw">डाउनलोड raw</string>
   <string name="downloadImported">डाउनलोड imported</string>
@@ -670,7 +670,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">तुमचा email अगोदरच पंजीकृत आहे: %s</string>
   <string name="kidMode">Kid Mode</string>
   <string name="kidModeExplanation">हे सुरक्षिततेबद्दल आहे. किड मोडमध्ये, सर्व साइट संप्रेषणे अक्षम केली आहेत. आपल्या मुलांना आणि शालेय विद्यार्थ्यांसाठी इतर इंटरनेट वापरकर्त्यांपासून त्यांचे संरक्षण करण्यासाठी हे सक्षम करा.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">किड मोडमध्ये, लीचेस लोगोला %s चिन्ह येते, यावरून आपल्या समजते की आपले पाल्य सुरक्षित आहे.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">किड मोडमध्ये, लीचेस लोगोला %s चिन्ह येते, यावरून आपल्या समजते की आपले पाल्य सुरक्षित आहे.</string>
   <string name="enableKidMode">Kid Mode सुरू करा</string>
   <string name="disableKidMode">Kid Mode बंद करा</string>
   <string name="security">सुरक्षितता</string>
@@ -678,7 +678,7 @@
   <string name="alternativelyYouCanX">याव्यतिरिक्त आपण हे करू शकता %s.</string>
   <string name="revokeAllSessions">सर्व सत्र रद्द करा</string>
   <string name="playChessEverywhere">सगळीकडे बुद्धिबळ खेळा</string>
-  <string name="asFreeAsLichess">लिचेस सारखे निशुल्क</string>
+  <string name="asFreeAsPlaystrategy">लिचेस सारखे निशुल्क</string>
   <string name="builtForTheLoveOfChessNotMoney">बुद्धिबळांच्या प्रेमासाठी तयार केले, पैशासाठी नव्हे</string>
   <string name="everybodyGetsAllFeaturesForFree">प्रत्येकास सर्व वैशिष्ट्ये विनामूल्य मिळतात</string>
   <string name="zeroAdvertisement">शून्य जाहिरात</string>
@@ -718,7 +718,7 @@
   <string name="usernameSuffixInvalid">वापरकर्तानाव शब्दाने किंवा आकड्याने शेवट करा.</string>
   <string name="usernameCharsInvalid">वापरकर्तानावात फक्त अक्षरे, संख्या, अंडरस्कोअर आणि हायफन असू शकतात.</string>
   <string name="usernameUnacceptable">हे वापरकर्तानाव स्वीकार्य नाही.</string>
-  <string name="directlySupportLichess">लीचेसला थेट मदत करा</string>
+  <string name="directlySupportPlaystrategy">लीचेसला थेट मदत करा</string>
   <string name="playChessInStyle">खेळा बुद्धिबळ तुमच्या शैलीत</string>
   <string name="chessBasics">बुद्धिबळ मूलभूत</string>
   <string name="coaches">प्रशिक्षक</string>
@@ -805,7 +805,7 @@
   <string name="agreementAssistance">मी खेळतांना इतर सहाय्य घेणार नाही (संगणक, पुस्तक, डेटाबेस किंवा इतर व्यक्ती).</string>
   <string name="agreementNice">मी इतर खेळाडू सोबत आदरयुक्त व्यवहार ठेवील.</string>
   <string name="agreementAccount">मी एकापेक्षा जास्त खाती उघडणार नाही.</string>
-  <string name="agreementPolicy">मी Lichess च्या सर्व नियमांचे पालन करेल.</string>
+  <string name="agreementPolicy">मी Playstrategy च्या सर्व नियमांचे पालन करेल.</string>
   <string name="searchOrStartNewDiscussion">संभाषण शोधा किंवा नविन सुरू करा</string>
   <string name="edit">सुधार करा</string>
   <string name="rapid">द्रुतगती</string>

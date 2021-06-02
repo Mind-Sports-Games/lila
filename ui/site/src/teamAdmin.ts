@@ -2,7 +2,7 @@ import Tagify from '@yaireo/tagify';
 import debounce from 'debounce-promise';
 import * as xhr from 'common/xhr';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   const input = document.getElementById('form3-leaders') as HTMLInputElement;
 
   const tagify = new Tagify(input, {

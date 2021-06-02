@@ -2,7 +2,7 @@ import * as xhr from 'common/xhr';
 import sparkline from '@fnando/sparkline';
 import throttle from 'common/throttle';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   $('#trainer').each(function (this: HTMLElement) {
     const $trainer = $(this);
     const $board = $('.coord-trainer__board .cg-wrap');
@@ -65,7 +65,7 @@ lichess.load.then(() => {
       })
     );
 
-    lichess.pubsub.on('zen', () => {
+    playstrategy.pubsub.on('zen', () => {
       const zen = !$('body').hasClass('zen');
       $('body').toggleClass('zen', zen);
       window.dispatchEvent(new Event('resize'));
@@ -73,9 +73,9 @@ lichess.load.then(() => {
       requestAnimationFrame(showCharts);
     });
 
-    window.Mousetrap.bind('z', () => lichess.pubsub.emit('zen'));
+    window.Mousetrap.bind('z', () => playstrategy.pubsub.emit('zen'));
 
-    $('#zentog').on('click', () => lichess.pubsub.emit('zen'));
+    $('#zentog').on('click', () => playstrategy.pubsub.emit('zen'));
 
     function showCharts() {
       $side.find('.user_chart').each(function (this: HTMLElement) {

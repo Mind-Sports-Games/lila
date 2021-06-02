@@ -99,8 +99,8 @@ final class Env(
 
   system.scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
     lila.mon.bus.classifiers.update(lila.common.Bus.size)
-    // ensure the Lichess user is online
-    socketEnv.remoteSocket.onlineUserIds.getAndUpdate(_ + User.lichessId)
-    userEnv.repo.setSeenAt(User.lichessId)
+    // ensure the Playstrategy user is online
+    socketEnv.remoteSocket.onlineUserIds.getAndUpdate(_ + User.playstrategyId)
+    userEnv.repo.setSeenAt(User.playstrategyId)
   }
 }

@@ -15,7 +15,7 @@ object layout {
   object bits {
     val doctype                      = raw("<!DOCTYPE html>")
     def htmlTag(implicit lang: Lang) = html(st.lang := lang.code)
-    val topComment                   = raw("""<!-- Lichess is open source! See https://lichess.org/source -->""")
+    val topComment                   = raw("""<!-- Playstrategy is open source! See https://playstrategy.org/source -->""")
     val charset                      = raw("""<meta charset="utf-8">""")
     val viewport = raw(
       """<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">"""
@@ -44,15 +44,15 @@ object layout {
   private def fontPreload(implicit ctx: Context) =
     raw {
       s"""<link rel="preload" href="${assetUrl(
-        s"font/lichess.woff2"
+        s"font/playstrategy.woff2"
       )}" as="font" type="font/woff2" crossorigin>""" +
         !ctx.pref.pieceNotationIsLetter ??
         s"""<link rel="preload" href="${assetUrl(
-          s"font/lichess.chess.woff2"
+          s"font/playstrategy.chess.woff2"
         )}" as="font" type="font/woff2" crossorigin>"""
     }
   private val manifests = raw(
-    """<link rel="manifest" href="/manifest.json"><meta name="twitter:site" content="@lichess">"""
+    """<link rel="manifest" href="/manifest.json"><meta name="twitter:site" content="@playstrategy">"""
   )
 
   private val jsLicense = raw("""<link rel="jslicense" href="/source">""")
@@ -61,14 +61,14 @@ object layout {
     List(512, 256, 192, 128, 64)
       .map { px =>
         s"""<link rel="icon" type="image/png" href="${assetUrl(
-          s"logo/lichess-favicon-$px.png"
+          s"logo/playstrategy-favicon-$px.png"
         )}" sizes="${px}x$px">"""
       }
       .mkString(
         "",
         "",
         s"""<link id="favicon" rel="icon" type="image/png" href="${assetUrl(
-          "logo/lichess-favicon-32.png"
+          "logo/playstrategy-favicon-32.png"
         )}" sizes="32x32">"""
       )
   }
@@ -147,9 +147,9 @@ object layout {
         "display:inline;width:34px;height:34px;vertical-align:top;margin-right:5px;vertical-align:text-top"
     )
 
-  def lichessJsObject(nonce: Nonce)(implicit lang: Lang) =
+  def playstrategyJsObject(nonce: Nonce)(implicit lang: Lang) =
     embedJsUnsafe(
-      s"""lichess={load:new Promise(r=>{window.onload=r}),quantity:${lila.i18n
+      s"""playstrategy={load:new Promise(r=>{window.onload=r}),quantity:${lila.i18n
         .JsQuantity(lang)}};$timeagoLocaleScript""",
       nonce
     )
@@ -158,9 +158,9 @@ object layout {
     frag(
       chessground option chessgroundTag,
       ctx.requiresFingerprint option fingerprintTag,
-      ctx.nonce map lichessJsObject,
+      ctx.nonce map playstrategyJsObject,
       if (netConfig.minifiedAssets)
-        jsModule("lichess")
+        jsModule("playstrategy")
       else
         frag(
           depsTag,
@@ -208,9 +208,9 @@ object layout {
           metaCsp(csp),
           metaThemeColor,
           st.headTitle {
-            if (ctx.blind) "lichess"
-            else if (netConfig.isProd) fullTitle | s"$title • lichess.org"
-            else s"[dev] ${fullTitle | s"$title • lichess.dev"}"
+            if (ctx.blind) "playstrategy"
+            else if (netConfig.isProd) fullTitle | s"$title • playstrategy.org"
+            else s"[dev] ${fullTitle | s"$title • playstrategy.dev"}"
           },
           cssTag("site"),
           ctx.pref.is3d option cssTag("board-3d"),
@@ -223,7 +223,7 @@ object layout {
             content := openGraph.fold(trans.siteDescription.txt())(o => o.description),
             name := "description"
           ),
-          link(rel := "mask-icon", href := assetUrl("logo/lichess.svg"), color := "black"),
+          link(rel := "mask-icon", href := assetUrl("logo/playstrategy.svg"), color := "black"),
           favicons,
           !robots option raw("""<meta content="noindex, nofollow" name="robots">"""),
           noTranslate,
@@ -353,7 +353,7 @@ object layout {
             if (ctx.kid) span(title := trans.kidMode.txt(), cls := "kiddo")(":)")
             else ctx.isBot option botImage,
             a(href := "/")(
-              "lichess",
+              "playstrategy",
               span(if (netConfig.isProd) ".org" else ".dev")
             )
           ),

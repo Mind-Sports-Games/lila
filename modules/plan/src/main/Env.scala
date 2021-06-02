@@ -52,7 +52,7 @@ final class Env(
   val donationGoalSetting = settingStore[Int](
     "donationGoal",
     default = 0,
-    text = "Monthly donation goal in USD from https://lichess.org/costs".some
+    text = "Monthly donation goal in USD from https://playstrategy.org/costs".some
   )
 
   lazy val api = new PlanApi(

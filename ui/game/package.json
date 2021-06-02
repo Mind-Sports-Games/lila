@@ -2,13 +2,13 @@
   "name": "game",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org game",
+  "description": "playstrategy.org game",
   "type": "module",
   "module": "game.js",
   "typings": "game.d.ts",
   "keywords": [
     "chess",
-    "lichess",
+    "playstrategy",
     "play",
     "replay"
   ],
@@ -20,7 +20,7 @@
     "prod": "yarn run compile"
   },
   "devDependencies": {
-    "@types/lichess": "2.0.0",
+    "@types/playstrategy": "2.0.0",
     "typescript": "^4.1.3"
   }
 }

@@ -121,7 +121,7 @@ export default class AnalyseCtrl {
 
     if (this.data.forecast) this.forecast = makeForecast(this.data.forecast, this.data, redraw);
 
-    if (lichess.AnalyseNVUI) this.nvui = lichess.AnalyseNVUI(redraw) as NvuiPlugin;
+    if (playstrategy.AnalyseNVUI) this.nvui = playstrategy.AnalyseNVUI(redraw) as NvuiPlugin;
 
     this.instanciateEvalCache();
 
@@ -154,25 +154,25 @@ export default class AnalyseCtrl {
     this.studyPractice = this.study ? this.study.practice : undefined;
 
     if (location.hash === '#practice' || (this.study && this.study.data.chapter.practice)) this.togglePractice();
-    else if (location.hash === '#menu') lichess.requestIdleCallback(this.actionMenu.toggle, 500);
+    else if (location.hash === '#menu') playstrategy.requestIdleCallback(this.actionMenu.toggle, 500);
 
     keyboard.bind(this);
 
-    lichess.pubsub.on('jump', (ply: string) => {
+    playstrategy.pubsub.on('jump', (ply: string) => {
       this.jumpToMain(parseInt(ply));
       this.redraw();
     });
 
-    lichess.pubsub.on('sound_set', (set: string) => {
+    playstrategy.pubsub.on('sound_set', (set: string) => {
       if (!this.music && set === 'music')
-        lichess.loadScript('javascripts/music/replay.js').then(() => {
-          this.music = window.lichessReplayMusic();
+        playstrategy.loadScript('javascripts/music/replay.js').then(() => {
+          this.music = window.playstrategyReplayMusic();
         });
       if (this.music && set !== 'music') this.music = null;
     });
 
-    lichess.pubsub.on('analysis.change.trigger', this.onChange);
-    lichess.pubsub.on('analysis.chart.click', index => {
+    playstrategy.pubsub.on('analysis.change.trigger', this.onChange);
+    playstrategy.pubsub.on('analysis.chart.click', index => {
       this.jumpToIndex(index);
       this.redraw();
     });
@@ -198,7 +198,7 @@ export default class AnalyseCtrl {
       this.synthetic || this.ongoing ? undefined : treePath.fromNodeList(treeOps.mainlineNodeList(this.tree.root));
     this.fork = makeFork(this);
 
-    lichess.sound.preloadBoardSounds();
+    playstrategy.sound.preloadBoardSounds();
   }
 
   private setPath = (path: Tree.Path): void => {
@@ -316,7 +316,7 @@ export default class AnalyseCtrl {
     return config;
   }
 
-  private throttleSound = (name: string) => throttle(100, () => lichess.sound.play(name));
+  private throttleSound = (name: string) => throttle(100, () => playstrategy.sound.play(name));
 
   private sound = {
     move: this.throttleSound('move'),
@@ -325,7 +325,7 @@ export default class AnalyseCtrl {
   };
 
   private onChange: () => void = throttle(300, () => {
-    lichess.pubsub.emit('analysis.change', this.node.fen, this.path, this.onMainline ? this.node.ply : false);
+    playstrategy.pubsub.emit('analysis.change', this.node.fen, this.path, this.onMainline ? this.node.ply : false);
   });
 
   private updateHref: () => void = debounce(() => {
@@ -371,7 +371,7 @@ export default class AnalyseCtrl {
       if (this.study) this.study.onJump();
     }
     if (this.music) this.music.jump(this.node);
-    lichess.pubsub.emit('ply', this.node.ply);
+    playstrategy.pubsub.emit('ply', this.node.ply);
   }
 
   userJump = (path: Tree.Path): void => {
@@ -778,7 +778,7 @@ export default class AnalyseCtrl {
     this.showComputer(value);
     if (!value && this.practice) this.togglePractice();
     this.onToggleComputer();
-    lichess.pubsub.emit('analysis.comp.toggle', value);
+    playstrategy.pubsub.emit('analysis.comp.toggle', value);
   };
 
   mergeAnalysisData(data: ServerEvalData): void {
@@ -790,7 +790,7 @@ export default class AnalyseCtrl {
     if (data.division) this.data.game.division = data.division;
     if (this.retro) this.retro.onMergeAnalysisData();
     if (this.study) this.study.serverEval.onMergeAnalysisData();
-    lichess.pubsub.emit('analysis.server.progress', this.data);
+    playstrategy.pubsub.emit('analysis.server.progress', this.data);
     this.redraw();
   }
 

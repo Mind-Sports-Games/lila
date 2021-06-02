@@ -19,8 +19,8 @@ case class RelayGame(
 
   def isEmpty = tags.value.isEmpty && root.children.nodes.isEmpty
 
-  lazy val looksLikeLichess = tags(_.Site) exists { site =>
-    RelayGame.lichessDomains exists { domain =>
+  lazy val looksLikePlaystrategy = tags(_.Site) exists { site =>
+    RelayGame.playstrategyDomains exists { domain =>
       site startsWith s"https://$domain/"
     }
   }
@@ -28,7 +28,7 @@ case class RelayGame(
 
 private object RelayGame {
 
-  val lichessDomains = List("lichess.org", "lichess.dev")
+  val playstrategyDomains = List("playstrategy.org", "playstrategy.dev")
 
   val staticTags = List("white", "black", "round", "event", "site")
 }

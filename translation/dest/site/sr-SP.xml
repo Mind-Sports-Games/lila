@@ -290,7 +290,7 @@
     <item quantity="few">Додај %s секунде</item>
     <item quantity="other">Додај %s секунди</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Овај налог није поштовао Lichess услове коришћења</string>
+  <string name="thisAccountViolatedTos">Овај налог није поштовао Playstrategy услове коришћења</string>
   <string name="openingExplorerAndTablebase">Претраживач отварања &amp; база података</string>
   <string name="takeback">Повлачење потеза</string>
   <string name="proposeATakeback">Предложи повлачење потеза</string>
@@ -474,8 +474,8 @@
   <string name="thankYou">Хвала!</string>
   <string name="socialMediaLinks">Линкови за социјалне медије</string>
   <string name="inlineNotation">Нотација у реду</string>
-  <string name="watchLichessTV">Гледајте Личес ТВ</string>
-  <string name="previouslyOnLichessTV">Претходно на Личес ТВ</string>
+  <string name="watchPlaystrategyTV">Гледајте Личес ТВ</string>
+  <string name="previouslyOnPlaystrategyTV">Претходно на Личес ТВ</string>
   <string name="onlinePlayers">Играчи на мрежи</string>
   <string name="activeToday">Активни данас</string>
   <string name="activePlayers">Активни играчи</string>
@@ -585,7 +585,7 @@
   <string name="clock">Сат</string>
   <string name="unauthorizedError">Приступ није одобрен.</string>
   <string name="noInternetConnection">Нема интернет конекције. Можете играти офлајн са менија.</string>
-  <string name="connectedToLichess">Повезани сте на lichess.org</string>
+  <string name="connectedToPlaystrategy">Повезани сте на playstrategy.org</string>
   <string name="signedOut">Одјављени сте</string>
   <string name="loginSuccessful">Пријављени сте</string>
   <string name="playOnTheBoardOffline">Играј у двоје</string>
@@ -653,7 +653,7 @@
   <string name="simulClockHint">Фишерово подешавање сата. Што више играча примиш, више времена ће ти бити потребно.</string>
   <string name="simulAddExtraTime">Можеш додати додатно време на свој сат да ти помогне савладати симултанку.</string>
   <string name="simulHostExtraTime">Додатно време домаћина</string>
-  <string name="lichessTournaments">Личес турнири</string>
+  <string name="playstrategyTournaments">Личес турнири</string>
   <string name="tournamentFAQ">Најчешће постављена питања за арена турнире</string>
   <string name="tournamentOfficial">Службено</string>
   <string name="timeBeforeTournamentStarts">Време пре него турнир започне.</string>
@@ -689,8 +689,8 @@
   <string name="weHaveSentYouAnEmailTo">Послали смо Вам е-поруку на %s. Кликните на дати линк да промените Вашу лозинку.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Registracijom prihvatate ograničenja predviđe našim %s.</string>
   <string name="readAboutOur">Прочитајте о нашем %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Мрежно кашњење између вас и Лицхесса</string>
-  <string name="timeToProcessAMoveOnLichessServer">Време потребно за процесирање на Лицхесс серверу</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Мрежно кашњење између вас и Лицхесса</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Време потребно за процесирање на Лицхесс серверу</string>
   <string name="downloadAnnotated">Преузимање белешки.</string>
   <string name="downloadRaw">Преузмите игру ПГН без ноте за Лицхесс</string>
   <string name="downloadImported">Увезено преузимање</string>
@@ -706,7 +706,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Већ сте се регистровали са овом е-поштом: %s</string>
   <string name="kidMode">Дечји начин</string>
   <string name="kidModeExplanation">Ово је око сигурности. У дечијем моду, све комуникације на сајту су искључене. Укључите ово за вашу децу и ђаке, да их заштитите од других корисника интернета.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">У дечијем моду, логотип личеса добија %s икону, да би знали да су ваша деца сигурна.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">У дечијем моду, логотип личеса добија %s икону, да би знали да су ваша деца сигурна.</string>
   <string name="enableKidMode">Омогућите Дечији режим рада</string>
   <string name="disableKidMode">Онемогућите Дечији режим рада</string>
   <string name="security">Сигурност</string>
@@ -714,7 +714,7 @@
   <string name="alternativelyYouCanX">Алтернативно, можете %s.</string>
   <string name="revokeAllSessions">опозвати све сесије</string>
   <string name="playChessEverywhere">Играј шах свуда</string>
-  <string name="asFreeAsLichess">Бесплатно као лицхесс</string>
+  <string name="asFreeAsPlaystrategy">Бесплатно као лицхесс</string>
   <string name="builtForTheLoveOfChessNotMoney">Од љубави до шаха, а не од новца</string>
   <string name="everybodyGetsAllFeaturesForFree">Сви добијају све функције бесплатно</string>
   <string name="zeroAdvertisement">Без огласа</string>
@@ -755,7 +755,7 @@
   <string name="usernameSuffixInvalid">Корисничко име мора да заврши са словом или бројем.</string>
   <string name="usernameCharsInvalid">Корисничко име може само да садржи слова, бројеве, доње црте и цртице.</string>
   <string name="usernameUnacceptable">Ово корисничко име није прихватљиво.</string>
-  <string name="directlySupportLichess">Директно подржите Личес</string>
+  <string name="directlySupportPlaystrategy">Директно подржите Личес</string>
   <string name="playChessInStyle">Играјте шах у стилу</string>
   <string name="chessBasics">Основе шаха</string>
   <string name="coaches">Тренери</string>
@@ -838,7 +838,7 @@
   <string name="tryToWin">Пробај да победиш (или барем изједначиш) сваку партију коју одиграш.</string>
   <string name="resignLostGames">Предај изгубљене игре (немој пуштати да време истекне).</string>
   <string name="temporaryInconvenience">Извињавамо се на привременој нелагодности,</string>
-  <string name="wishYouGreatGames">и желимо вам одличне партије на lichess.org.</string>
+  <string name="wishYouGreatGames">и желимо вам одличне партије на playstrategy.org.</string>
   <string name="thankYouForReading">Хвала на читању!</string>
   <string name="lifetimeScore">Животни скор</string>
   <string name="currentMatchScore">Скор тренутног меча</string>

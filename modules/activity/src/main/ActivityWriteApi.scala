@@ -41,7 +41,7 @@ final class ActivityWriteApi(
       .void
 
   def forumPost(post: lila.forum.Post): Funit =
-    post.userId.filter(User.lichessId !=) ?? { userId =>
+    post.userId.filter(User.playstrategyId !=) ?? { userId =>
       getOrCreate(userId) flatMap { a =>
         coll.update
           .one(

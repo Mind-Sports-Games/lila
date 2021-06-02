@@ -76,7 +76,7 @@ export function signupStart() {
     if (form.reportValidity()) form.submit();
   };
 
-  lichess
+  playstrategy
     .loadModule('passwordComplexity')
     .then(() => window['passwordComplexity'].addPasswordChangeListener('form3-password'));
 }

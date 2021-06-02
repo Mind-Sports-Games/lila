@@ -394,8 +394,8 @@
   <string name="biography">ბიოგრაფია</string>
   <string name="country">ქვეყანა</string>
   <string name="thankYou">გმადლობთ შეფასებისთვის!</string>
-  <string name="watchLichessTV">უყურეთ ტელევიზიას</string>
-  <string name="previouslyOnLichessTV">წინა Lichess TV-ზე</string>
+  <string name="watchPlaystrategyTV">უყურეთ ტელევიზიას</string>
+  <string name="previouslyOnPlaystrategyTV">წინა Playstrategy TV-ზე</string>
   <string name="onlinePlayers">ონლაინ მოთამაშეები</string>
   <string name="activeToday">აქტიურები დღეს</string>
   <string name="activePlayers">აქტიური მოთამაშეები</string>
@@ -492,7 +492,7 @@
   <string name="clock">დრო</string>
   <string name="unauthorizedError">დაკავშირება შეუძლებელია</string>
   <string name="noInternetConnection">ინტერნეტთან წვდომა არ არის. თქვენ შეგიძლიათ ითამაშოთ ოფფლაინში.</string>
-  <string name="connectedToLichess">კავშირი lichess.org-თან დამყარებულია</string>
+  <string name="connectedToPlaystrategy">კავშირი playstrategy.org-თან დამყარებულია</string>
   <string name="signedOut">თქვენ გამოსული ხართ სისტემიდან</string>
   <string name="loginSuccessful">თქვენი ავტორიზირებული ხართ სისტემაში</string>
   <string name="playOnTheBoardOffline">ადგილობრივი თამაში</string>
@@ -552,7 +552,7 @@
   <string name="simulClockHint">ფიშერის საათის გამართვა. რაც მეტ მოთამაშეს დაუპირისპირდებით, შესაძლოა მით მეტი დრო დაგჭირდეთ.</string>
   <string name="simulAddExtraTime">თქვენ შეგიძლიათ დროის დამატება ერთდროული თამაშისას.</string>
   <string name="simulHostExtraTime">თამაშის შემქნელის დამატები დრო</string>
-  <string name="lichessTournaments">Lichess ტურნირები</string>
+  <string name="playstrategyTournaments">Playstrategy ტურნირები</string>
   <string name="tournamentFAQ">Arena ტურნირის ხშირი შეკითხვები</string>
   <string name="tournamentOfficial">ოფიციალური</string>
   <string name="timeBeforeTournamentStarts">ტურნირის დაწყებამდე დარჩენილი დრო</string>
@@ -574,7 +574,7 @@
   <string name="checkYourEmail">შეამოწმეთ ელ.ფოსტა</string>
   <string name="weHaveSentYouAnEmailClickTheLink">გამოგიგზავნით იმეილზე ლინკას, დააკლიკეთ და გაააქტიურეთ თქვენი ექაუნთი</string>
   <string name="weHaveSentYouAnEmailTo">ჩვენ გავაგზავნეთ შეტყობინება %s მეილზე. შეტყობინებაში დააჭირეთ ლინკს, რომ პაროლი შეცვალოთ.</string>
-  <string name="networkLagBetweenYouAndLichess">ქსელი გარკვეული შუალედი შორის თქვენ და Lichess</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">ქსელი გარკვეული შუალედი შორის თქვენ და Playstrategy</string>
   <string name="downloadAnnotated">ანოტირებულის ჩამოტვირთვა</string>
   <string name="downloadRaw">სუფთას ჩამოტვირთვა</string>
   <string name="downloadImported">იმპორტირებულის ჩამოტვირთვა</string>
@@ -588,7 +588,7 @@
   <string name="kidMode">ბავშვის რეჟიმი</string>
   <string name="security">უსაფრთხოება</string>
   <string name="playChessEverywhere">ითამაშე ჭადრაკი ყველგან</string>
-  <string name="asFreeAsLichess">ისევე უფასო როგორც lichess</string>
+  <string name="asFreeAsPlaystrategy">ისევე უფასო როგორც playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">შექმნილია ჭადრაკის სიყვარულისთვის და არა ფულისთვის</string>
   <string name="zeroAdvertisement">არც ერთი რეკლამა</string>
   <string name="phoneAndTablet">ტელეფონი და ტაბლეტი</string>

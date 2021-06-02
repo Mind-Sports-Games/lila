@@ -42,5 +42,5 @@ object I18nLangPicker {
     if (Registry.langs contains to) Some(to)
     else
       defaultByLanguage.get(to.language) orElse
-        lichessCodes.get(to.language)
+        playstrategyCodes.get(to.language)
 }

@@ -36,7 +36,7 @@ const expandGameIds = (html: string) =>
   );
 
 export const enhance = (str: string) =>
-  expandGameIds(expandMentions(expandUrls(lichess.escapeHtml(str)))).replace(newLineRegex, '<br>');
+  expandGameIds(expandMentions(expandUrls(playstrategy.escapeHtml(str)))).replace(newLineRegex, '<br>');
 
 /* Enhance with iframe expansion */
 

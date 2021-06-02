@@ -3,10 +3,10 @@
   <string name="activity">Aktivnost</string>
   <string name="hostedALiveStream">Gostil prenos v živo</string>
   <plurals name="supportedNbMonths">
-    <item quantity="one">%1$s mesec podpira lichess.org kot %2$s</item>
-    <item quantity="two">%1$s meseca podpira lichess.org kot %2$s</item>
-    <item quantity="few">%1$s mesece podpira lichess.org kot %2$s</item>
-    <item quantity="other">%1$s mesecev podpira lichess.org kot %2$s</item>
+    <item quantity="one">%1$s mesec podpira playstrategy.org kot %2$s</item>
+    <item quantity="two">%1$s meseca podpira playstrategy.org kot %2$s</item>
+    <item quantity="few">%1$s mesece podpira playstrategy.org kot %2$s</item>
+    <item quantity="other">%1$s mesecev podpira playstrategy.org kot %2$s</item>
   </plurals>
   <plurals name="practicedNbPositions">
     <item quantity="one">Treniral %1$s pozicijo na %2$s</item>
@@ -99,7 +99,7 @@
     <item quantity="other">Tekmoval na %s švicarskih turnirjih</item>
   </plurals>
   <string name="rankedInSwissTournament" comment="rankedInSwissTournament&#10;&#10;%1$s is the numerical rank, e.g. #2 if you came second.&#10;&#10;%2$s is the name of the tournament e.g. Carlsen Arena">Uvrščen #%1$s v %2$s</string>
-  <string name="signedUp">Prijavljen na lichess</string>
+  <string name="signedUp">Prijavljen na playstrategy</string>
   <plurals name="joinedNbTeams">
     <item quantity="one">Pridružen %s ekipi</item>
     <item quantity="two">Pridružen %s ekipam</item>

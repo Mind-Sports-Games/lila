@@ -1,7 +1,7 @@
 import { text, form } from 'common/xhr';
 import modal from 'common/modal';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   let autoRefreshEnabled = true;
   let autoRefreshOnHold = false;
 
@@ -38,7 +38,7 @@ lichess.load.then(() => {
         $('.auto-refresh').removeClass('hold');
       });
 
-    $('#communication').on('click', '.line:not(.lichess)', function (this: HTMLDivElement) {
+    $('#communication').on('click', '.line:not(.playstrategy)', function (this: HTMLDivElement) {
       const $l = $(this);
       const roomId = $l.parents('.game').data('room');
       const chan = $l.parents('.game').data('chan');

@@ -1,6 +1,6 @@
 import flatpickr from 'flatpickr';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   $('.flatpickr').each(function (this: HTMLInputElement) {
     const config = this.classList.contains('flatpickr-utc')
       ? {}

@@ -21,7 +21,7 @@ function playerTitle(player) {
 
 function setup(vnode: VNode) {
   const el = vnode.elm as HTMLElement,
-    p = lichess.powertip;
+    p = playstrategy.powertip;
   p.manualUserIn(el);
   p.manualGameIn(el);
 }

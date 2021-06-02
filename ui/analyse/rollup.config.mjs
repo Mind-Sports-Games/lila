@@ -2,7 +2,7 @@ import rollupProject from '@build/rollupProject';
 
 export default rollupProject({
   main: {
-    name: 'LichessAnalyse',
+    name: 'PlaystrategyAnalyse',
     input: 'src/main.ts',
     output: 'analysisBoard', // can't call it analyse.js, triggers adblockers :facepalm:
   },

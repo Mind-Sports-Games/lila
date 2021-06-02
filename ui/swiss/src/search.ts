@@ -18,7 +18,7 @@ export function input(ctrl: TournamentController): VNode {
     'div.search',
     h('input', {
       hook: onInsert((el: HTMLInputElement) =>
-        lichess.userComplete().then(uac => {
+        playstrategy.userComplete().then(uac => {
           uac({
             input: el,
             swiss: ctrl.data.id,

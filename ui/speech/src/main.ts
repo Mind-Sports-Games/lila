@@ -34,7 +34,7 @@ function hackFix(msg: string): string {
 export function say(text: string, cut: boolean) {
   const msg = new SpeechSynthesisUtterance(hackFix(text));
   if (cut) speechSynthesis.cancel();
-  lichess.sound.say(msg);
+  playstrategy.sound.say(msg);
 }
 
 export function step(s: { san?: San }, cut: boolean) {

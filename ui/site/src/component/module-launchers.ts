@@ -1,6 +1,6 @@
 import StrongSocket from './socket';
 
-const li: any = lichess;
+const li: any = playstrategy;
 
 export default function moduleLaunchers() {
   if (li.userAnalysis) startUserAnalysis(li.userAnalysis);
@@ -13,9 +13,9 @@ function startUserAnalysis(cfg) {
 }
 
 function startAnalyse(cfg) {
-  lichess.socket = new StrongSocket(cfg.socketUrl || '/analysis/socket/v5', cfg.socketVersion, {
+  playstrategy.socket = new StrongSocket(cfg.socketUrl || '/analysis/socket/v5', cfg.socketVersion, {
     receive: (t: string, d: any) => analyse.socketReceive(t, d),
   });
   cfg.socketSend = li.socket.send;
-  const analyse = window.LichessAnalyse.start(cfg);
+  const analyse = window.PlaystrategyAnalyse.start(cfg);
 }

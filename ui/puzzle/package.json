@@ -2,10 +2,10 @@
   "name": "puzzle",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org puzzle solver",
+  "description": "playstrategy.org puzzle solver",
   "keywords": [
     "chess",
-    "lichess",
+    "playstrategy",
     "puzzle",
     "training"
   ],
@@ -13,7 +13,7 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@build/rollupProject": "2.0.0",
-    "@types/lichess": "2.0.0",
+    "@types/playstrategy": "2.0.0",
     "@types/chart.js": "^2.9.29"
   },
   "dependencies": {

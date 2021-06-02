@@ -153,7 +153,7 @@ final class MsgApi(
     systemPost(destId, preset.text)
 
   def systemPost(destId: User.ID, text: String) =
-    post(User.lichessId, destId, text, multi = true)
+    post(User.playstrategyId, destId, text, multi = true)
 
   def multiPost(orig: Holder, destSource: Source[User.ID, _], text: String): Fu[Int] =
     destSource

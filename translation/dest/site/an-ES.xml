@@ -273,7 +273,7 @@
     <item quantity="one">Dar %s segundo</item>
     <item quantity="other">Dar %s segundos</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Esta cuenta ha violau los Termins de Servicio de Lichess</string>
+  <string name="thisAccountViolatedTos">Esta cuenta ha violau los Termins de Servicio de Playstrategy</string>
   <string name="openingExplorerAndTablebase">Explorador d\'obriduras y base de datos de finals</string>
   <string name="takeback">Desfer chugada</string>
   <string name="proposeATakeback">Proposar desfer chugada</string>
@@ -445,8 +445,8 @@
   <string name="thankYou">Gracias!</string>
   <string name="socialMediaLinks">Vinclos a retz socials</string>
   <string name="inlineNotation">Notación compacta</string>
-  <string name="watchLichessTV">Veyer Lichess TV</string>
-  <string name="previouslyOnLichessTV">Anteriorment en Lichess TV</string>
+  <string name="watchPlaystrategyTV">Veyer Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Anteriorment en Playstrategy TV</string>
   <string name="onlinePlayers">Chugadors connectaus</string>
   <string name="activeToday">Activos hue</string>
   <string name="activePlayers">Chugadors activos</string>
@@ -551,7 +551,7 @@
   <string name="clock">Reloch</string>
   <string name="unauthorizedError">Acceso no autorizau.</string>
   <string name="noInternetConnection">No tiens connexión a Internet. Puetz chugar sin connexión dende lo menú.</string>
-  <string name="connectedToLichess">Yes connectau a lichess.org</string>
+  <string name="connectedToPlaystrategy">Yes connectau a playstrategy.org</string>
   <string name="signedOut">Has zarrau la sesión</string>
   <string name="loginSuccessful">Connectau</string>
   <string name="playOnTheBoardOffline">Chugar sin connexión</string>
@@ -608,7 +608,7 @@
   <string name="returnToSimulHomepage">Tornar a la pachina de simultanias</string>
   <string name="aboutSimul">En as simultanias, un chugador chuga de vez con bells quantos oponents.</string>
   <string name="aboutSimulImage">De 50 oponents, Fischer ganó 47 partidas, empató dos y perdió una.</string>
-  <string name="aboutSimulRealLife">Lo concepto de simultanias en Lichess se prene d\'a vida real, an l\'anfitrión va de taula en taula fendo las suyas chugadas.</string>
+  <string name="aboutSimulRealLife">Lo concepto de simultanias en Playstrategy se prene d\'a vida real, an l\'anfitrión va de taula en taula fendo las suyas chugadas.</string>
   <string name="aboutSimulRules">Quan la simultania encomienza, cada chugador prencipia una partida con l\'anfitrión, que chuga con blancas. La simultania remata quan s\'acaban totas las partidas.</string>
   <string name="aboutSimulSettings">Las simultanias son siempre partidas amistosas. Las opcions de petición de reminche, desfer chugada y anyadir tiempo son desactivadas.</string>
   <string name="create">Crear</string>
@@ -617,7 +617,7 @@
   <string name="simulClockHint">Configuración de reloch Fischer. Quantos mas oponents, mas tiempo se precisa.</string>
   <string name="simulAddExtraTime">Puetz anyadir tiempo adicional a lo tuyo reloch pa aduyar-te en a simultania.</string>
   <string name="simulHostExtraTime">Tiempo extra de l\'anfitrión</string>
-  <string name="lichessTournaments">Torneyos de Lichess</string>
+  <string name="playstrategyTournaments">Torneyos de Playstrategy</string>
   <string name="tournamentFAQ">Preguntas freqüents d\'os torneyos arena</string>
   <string name="tournamentOfficial">Oficial</string>
   <string name="timeBeforeTournamentStarts">Tiempo antes que prencipie lo torneyo</string>
@@ -652,8 +652,8 @@
   <string name="weHaveSentYouAnEmailTo">T\'hemos ninviau un correu a %s. Restableix la tuya clau fendo clic en o vinclo.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">En rechistrar-te, acceptas las %s.</string>
   <string name="readAboutOur">Leye sobre la nuestra %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Retardo de connexión entre tu y lichess</string>
-  <string name="timeToProcessAMoveOnLichessServer">Tiempo pa procesar un movimiento en o servidor de Lichess</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Retardo de connexión entre tu y playstrategy</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Tiempo pa procesar un movimiento en o servidor de Playstrategy</string>
   <string name="downloadAnnotated">Descargar la partida anotada</string>
   <string name="downloadRaw">Descargar la partida sin anotar</string>
   <string name="downloadImported">Descargar la partida importada</string>
@@ -669,7 +669,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Ya has rechistrau lo correu electronico: %s</string>
   <string name="kidMode">Modo infantil</string>
   <string name="kidModeExplanation">Per seguridat, en o modo infantil se desactivan totas las comunicacions con atros usuarios. Activa esto pa protecher a los menors d\'atros usuarios d\'Internet.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">En o modo infantil, lo logo de lichess tiene un icono de %s, indicando que los ninos son seguros.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">En o modo infantil, lo logo de playstrategy tiene un icono de %s, indicando que los ninos son seguros.</string>
   <string name="enableKidMode">Activar lo modo infantil</string>
   <string name="disableKidMode">Desactivar lo modo infantil</string>
   <string name="security">Seguridat</string>
@@ -677,7 +677,7 @@
   <string name="alternativelyYouCanX">U tamién puetz %s.</string>
   <string name="revokeAllSessions">zarrar totas las sesions</string>
   <string name="playChessEverywhere">Chuga a los escaques an que siga</string>
-  <string name="asFreeAsLichess">Igual de gratis como lichess</string>
+  <string name="asFreeAsPlaystrategy">Igual de gratis como playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Feito per amor a los escaques, no pas per diners</string>
   <string name="everybodyGetsAllFeaturesForFree">Totz tienen acceso gratuito a totas las funcions</string>
   <string name="zeroAdvertisement">Sin anuncios</string>
@@ -717,7 +717,7 @@
   <string name="usernameSuffixInvalid">Lo nombre d\'usuario ha de finalizar con una letra u un numero.</string>
   <string name="usernameCharsInvalid">Lo nombre d\'usuario ha de contener nomás letras, numeros, guións baixos y guións.</string>
   <string name="usernameUnacceptable">Este nombre d\'usuario no ye valido.</string>
-  <string name="directlySupportLichess">Emparar economicament a Lichess</string>
+  <string name="directlySupportPlaystrategy">Emparar economicament a Playstrategy</string>
   <string name="playChessInStyle">Chuga a los escaques con estilo</string>
   <string name="chessBasics">Fundamentos d\'escaques</string>
   <string name="coaches">Entrenadors</string>
@@ -797,14 +797,14 @@
   <string name="tryToWin">Intenta ganar (u, a lo menos, empatar) cada partida que chugues.</string>
   <string name="resignLostGames">Abandona en posicions perdidas (no deixes que lo tiempo s\'acotole sin mas).</string>
   <string name="temporaryInconvenience">Te pedimos disculpas per las molestias</string>
-  <string name="wishYouGreatGames">y esperamos que desfrutes de lichess.org.</string>
+  <string name="wishYouGreatGames">y esperamos que desfrutes de playstrategy.org.</string>
   <string name="thankYouForReading">Gracias per prener-te lo tiempo pa leyer esto!</string>
   <string name="lifetimeScore">Puntuación historica</string>
   <string name="currentMatchScore">Puntuación actual</string>
   <string name="agreementAssistance">Me comprometo a no recibir aduya externa entre las mías partidas (d\'un ordinador, un libro, una base de datos u unatra persona).</string>
   <string name="agreementNice">Me comprometo a respectar siempre a atros chugadors.</string>
   <string name="agreementAccount">Me comprometo a no crear multiples cuentas.</string>
-  <string name="agreementPolicy">Me comprometo a seguir las normas de Lichess.</string>
+  <string name="agreementPolicy">Me comprometo a seguir las normas de Playstrategy.</string>
   <string name="searchOrStartNewDiscussion">Buscar u empecipiar una nueva conversación</string>
   <string name="edit">Editar</string>
   <string name="rapid">Rapidas</string>

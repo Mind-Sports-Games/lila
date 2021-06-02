@@ -72,7 +72,7 @@ object RelayRoundForm {
     "twitch.com",
     "youtube.com",
     "youtu.be",
-    "lichess.org",
+    "playstrategy.org",
     "google.com",
     "vk.com",
     "localhost",

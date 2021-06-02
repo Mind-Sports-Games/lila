@@ -4,7 +4,7 @@ import { bind } from './util';
 import MsgCtrl from '../ctrl';
 
 export default function renderActions(ctrl: MsgCtrl, convo: Convo): VNode[] {
-  if (convo.user.id == 'lichess') return [];
+  if (convo.user.id == 'playstrategy') return [];
   const nodes = [];
   const cls = 'msg-app__convo__action.button.button-empty';
   nodes.push(

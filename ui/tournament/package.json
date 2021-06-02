@@ -2,10 +2,10 @@
   "name": "tournament",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org arena tournament",
+  "description": "playstrategy.org arena tournament",
   "keywords": [
     "chess",
-    "lichess",
+    "playstrategy",
     "arena",
     "tournament"
   ],
@@ -13,7 +13,7 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@build/rollupProject": "2.0.0",
-    "@types/lichess": "2.0.0"
+    "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
     "chat": "2.0.0",

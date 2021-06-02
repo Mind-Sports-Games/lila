@@ -15,7 +15,7 @@ echo -e "Yarn version: $(yarn --version)\n"
 
 echo -e $SEPARATOR
 
-mongo 127.0.0.1:$MONGO_PORT/lichess --eval "print('ok')"
+mongo 127.0.0.1:$MONGO_PORT/playstrategy --eval "print('ok')"
 
 echo -e $SEPARATOR
 

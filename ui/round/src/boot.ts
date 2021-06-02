@@ -9,14 +9,14 @@ export default function (opts: RoundOpts): void {
   const element = document.querySelector('.round__app') as HTMLElement,
     data: RoundData = opts.data;
   if (data.tournament) $('body').data('tournament-id', data.tournament.id);
-  lichess.socket = new lichess.StrongSocket(data.url.socket, data.player.version, {
+  playstrategy.socket = new playstrategy.StrongSocket(data.url.socket, data.player.version, {
     params: { userTv: data.userTv && data.userTv.id },
     receive(t: string, d: any) {
       round.socketReceive(t, d);
     },
     events: {
       tvSelect(o: any) {
-        if (data.tv && data.tv.channel == o.channel) lichess.reload();
+        if (data.tv && data.tv.channel == o.channel) playstrategy.reload();
         else
           $('.tv-channels .' + o.channel + ' .champion').html(
             o.player ? [o.player.title, o.player.name, o.player.rating].filter(x => x).join('&nbsp') : 'Anonymous'
@@ -29,7 +29,7 @@ export default function (opts: RoundOpts): void {
           $meta.length && $('.game__meta').replaceWith($meta);
           $('.crosstable').replaceWith($html.find('.crosstable'));
           startTournamentClock();
-          lichess.contentLoaded();
+          playstrategy.contentLoaded();
         });
       },
       tourStanding(s: TourPlayer[]) {
@@ -57,9 +57,9 @@ export default function (opts: RoundOpts): void {
     return;
   }
   opts.element = element;
-  opts.socketSend = lichess.socket.send;
+  opts.socketSend = playstrategy.socket.send;
 
-  const round: RoundApi = (window['LichessRound'] as RoundMain).app(opts);
+  const round: RoundApi = (window['PlaystrategyRound'] as RoundMain).app(opts);
   const chatOpts = opts.chat;
   if (chatOpts) {
     if (data.tournament?.top) {
@@ -70,7 +70,7 @@ export default function (opts: RoundOpts): void {
       chatOpts.parseMoves = true;
     }
     if (chatOpts.noteId && (chatOpts.noteAge || 0) < 10) chatOpts.noteText = '';
-    chatOpts.instance = lichess.makeChat(chatOpts) as Promise<ChatCtrl>;
+    chatOpts.instance = playstrategy.makeChat(chatOpts) as Promise<ChatCtrl>;
     if (!data.tournament && !data.simul && !data.swiss)
       opts.onChange = (d: RoundData) => chatOpts.instance!.then(chat => chat.preset.setGroup(getPresetGroup(d)));
   }
@@ -79,10 +79,10 @@ export default function (opts: RoundOpts): void {
     .on('change', round.moveOn.toggle)
     .prop('checked', round.moveOn.get())
     .on('click', 'a', () => {
-      lichess.unload.expected = true;
+      playstrategy.unload.expected = true;
       return true;
     });
   if (location.pathname.lastIndexOf('/round-next/', 0) === 0) history.replaceState(null, '', '/' + data.game.id);
-  $('#zentog').on('click', () => lichess.pubsub.emit('zen'));
-  lichess.storage.make('reload-round-tabs').listen(lichess.reload);
+  $('#zentog').on('click', () => playstrategy.pubsub.emit('zen'));
+  playstrategy.storage.make('reload-round-tabs').listen(playstrategy.reload);
 }

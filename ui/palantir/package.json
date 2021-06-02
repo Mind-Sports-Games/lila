@@ -2,17 +2,17 @@
   "name": "palantir",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org webrtc media calls",
+  "description": "playstrategy.org webrtc media calls",
   "keywords": [
     "chess",
-    "lichess",
+    "playstrategy",
     "webrtc"
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@build/rollupProject": "2.0.0",
-    "@types/lichess": "2.0.0"
+    "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
     "@types/webrtc": "^0.0.26"

@@ -129,7 +129,7 @@ object discussion {
     if (appeal isAbout userId) userIdLink(userId.some, params = asMod ?? "?mod")
     else
       span(
-        userIdLink(User.lichessId.some),
+        userIdLink(User.playstrategyId.some),
         isGranted(_.Appeals) option frag(
           " (",
           userIdLink(userId.some),

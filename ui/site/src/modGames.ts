@@ -5,7 +5,7 @@ import { formToXhr } from 'common/xhr';
 
 type OnSelect = (input: HTMLInputElement, shift: boolean) => void;
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   setupTable();
   setupFilter();
   setupActionForm();
@@ -36,7 +36,7 @@ const setupActionForm = () => {
     () =>
       formToXhr(form).then(() => {
         const reload = confirm('Analysis completed. Reload the page?');
-        if (reload) lichess.reload();
+        if (reload) playstrategy.reload();
       }),
     1000
   );

@@ -277,7 +277,7 @@
     <item quantity="one">%s நொடிகள் அளி</item>
     <item quantity="other">%s நொடிகள் அளி</item>
   </plurals>
-  <string name="thisAccountViolatedTos">இந்த கணக்கு Lichess சேவை விதிமுறைகள் மீறியது</string>
+  <string name="thisAccountViolatedTos">இந்த கணக்கு Playstrategy சேவை விதிமுறைகள் மீறியது</string>
   <string name="openingExplorerAndTablebase">உலாவியில் &amp; அட்டவணையை திறக்கிறது</string>
   <string name="takeback">மீட்சி</string>
   <string name="proposeATakeback">மீட்சி கோருக</string>
@@ -407,8 +407,8 @@
   <string name="biography">வாழ்க்கை சரித்திரம்</string>
   <string name="country">நாடு</string>
   <string name="thankYou">நன்றி</string>
-  <string name="watchLichessTV">லிசெஸ் தொலைகாட்சியை பார்க்க</string>
-  <string name="previouslyOnLichessTV">முன்பு லிசெஸ் தொலைகாட்சியில்</string>
+  <string name="watchPlaystrategyTV">லிசெஸ் தொலைகாட்சியை பார்க்க</string>
+  <string name="previouslyOnPlaystrategyTV">முன்பு லிசெஸ் தொலைகாட்சியில்</string>
   <string name="onlinePlayers">இணைய விளையாட்டாளர்கள்</string>
   <string name="activeToday">இன்று பங்குபெற்றவர்கள்</string>
   <string name="activePlayers">பங்குபெற்ற விளையாட்டாளர்கள்</string>

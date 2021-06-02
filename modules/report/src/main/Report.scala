@@ -101,9 +101,9 @@ object Report {
   ) {
     def simplifiedText = text.linesIterator.filterNot(_ startsWith "[AUTOREPORT]") mkString "\n"
 
-    def byHuman = !byLichess && by != ReporterId.irwin
+    def byHuman = !byPlaystrategy && by != ReporterId.irwin
 
-    def byLichess = by == ReporterId.lichess
+    def byPlaystrategy = by == ReporterId.playstrategy
   }
 
   case class Inquiry(mod: User.ID, seenAt: DateTime)
@@ -127,7 +127,7 @@ object Report {
       text: String
   ) extends Reason.WithReason {
     def scored(score: Score) = Candidate.Scored(this, score)
-    def isAutomatic          = reporter.id == ReporterId.lichess
+    def isAutomatic          = reporter.id == ReporterId.playstrategy
     def isAutoComm           = isAutomatic && isComm
     def isAutoBoost          = isAutomatic && isBoost
     def isCoachReview        = isOther && text.contains("COACH REVIEW")

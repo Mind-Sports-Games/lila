@@ -94,7 +94,7 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
           playerFile = none
         )
       )
-    }.pipe(asAttachmentStream(s"lichess_mod_${user.username}_${gameIds.size}_games.pgn"))
+    }.pipe(asAttachmentStream(s"playstrategy_mod_${user.username}_${gameIds.size}_games.pgn"))
       .as(pgnContentType)
 
   private def guessSwisses(user: lila.user.User): Fu[Seq[lila.swiss.Swiss]] = fuccess(Nil)

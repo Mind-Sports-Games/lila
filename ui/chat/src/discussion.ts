@@ -34,7 +34,7 @@ export default function (ctrl: Ctrl): Array<VNode | undefined> {
         hook: {
           insert(vnode) {
             const $el = $(vnode.elm as HTMLElement).on('click', 'a.jump', (e: Event) => {
-              lichess.pubsub.emit('jump', (e.target as HTMLElement).getAttribute('data-ply'));
+              playstrategy.pubsub.emit('jump', (e.target as HTMLElement).getAttribute('data-ply'));
             });
             if (hasMod)
               $el.on('click', '.mod', (e: Event) =>
@@ -88,7 +88,7 @@ function renderInput(ctrl: Ctrl): VNode | undefined {
 let mouchListener: EventListener;
 
 const setupHooks = (ctrl: Ctrl, chatEl: HTMLInputElement) => {
-  const storage = lichess.tempStorage.make('chat.input');
+  const storage = playstrategy.tempStorage.make('chat.input');
   const previousText = storage.get();
   if (previousText) {
     chatEl.value = previousText;
@@ -175,8 +175,8 @@ function selectLines(ctrl: Ctrl): Array<Line> {
 
 function updateText(parseMoves: boolean) {
   return (oldVnode: VNode, vnode: VNode) => {
-    if ((vnode.data as VNodeData).lichessChat !== (oldVnode.data as VNodeData).lichessChat) {
-      (vnode.elm as HTMLElement).innerHTML = enhance.enhance((vnode.data as VNodeData).lichessChat, parseMoves);
+    if ((vnode.data as VNodeData).playstrategyChat !== (oldVnode.data as VNodeData).playstrategyChat) {
+      (vnode.elm as HTMLElement).innerHTML = enhance.enhance((vnode.data as VNodeData).playstrategyChat, parseMoves);
     }
   };
 }
@@ -185,7 +185,7 @@ function renderText(t: string, parseMoves: boolean) {
   if (enhance.isMoreThanText(t)) {
     const hook = updateText(parseMoves);
     return h('t', {
-      lichessChat: t,
+      playstrategyChat: t,
       hook: {
         create: hook,
         update: hook,
@@ -204,7 +204,7 @@ function report(ctrl: Ctrl, line: HTMLElement) {
 function renderLine(ctrl: Ctrl, line: Line): VNode {
   const textNode = renderText(line.t, ctrl.opts.parseMoves);
 
-  if (line.u === 'lichess') return h('li.system', textNode);
+  if (line.u === 'playstrategy') return h('li.system', textNode);
 
   if (line.c) return h('li', [h('span.color', '[' + line.c + ']'), textNode]);
 

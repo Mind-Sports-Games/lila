@@ -100,7 +100,7 @@ export default class RoundController {
 
     this.socket = makeSocket(opts.socketSend, this);
 
-    if (lichess.RoundNVUI) this.nvui = lichess.RoundNVUI(redraw) as NvuiPlugin;
+    if (playstrategy.RoundNVUI) this.nvui = playstrategy.RoundNVUI(redraw) as NvuiPlugin;
 
     if (d.clock)
       this.clock = new ClockController(d, {
@@ -118,7 +118,7 @@ export default class RoundController {
     this.moveOn = new MoveOn(this, 'move-on');
     this.transientMove = new TransientMove(this.socket);
 
-    this.trans = lichess.trans(opts.i18n);
+    this.trans = playstrategy.trans(opts.i18n);
     this.noarg = this.trans.noarg;
 
     setTimeout(this.delayedInit, 200);
@@ -128,20 +128,20 @@ export default class RoundController {
     if (!document.referrer?.includes('/serviceWorker.')) setTimeout(this.showYourMoveNotification, 500);
 
     // at the end:
-    lichess.pubsub.on('jump', ply => {
+    playstrategy.pubsub.on('jump', ply => {
       this.jump(parseInt(ply));
       this.redraw();
     });
 
-    lichess.pubsub.on('sound_set', set => {
+    playstrategy.pubsub.on('sound_set', set => {
       if (!this.music && set === 'music')
-        lichess.loadScript('javascripts/music/play.js').then(() => {
-          this.music = lichess.playMusic();
+        playstrategy.loadScript('javascripts/music/play.js').then(() => {
+          this.music = playstrategy.playMusic();
         });
       if (this.music && set !== 'music') this.music = undefined;
     });
 
-    lichess.pubsub.on('zen', () => {
+    playstrategy.pubsub.on('zen', () => {
       if (this.isPlaying()) {
         const zen = !$('body').hasClass('zen');
         $('body').toggleClass('zen', zen);
@@ -253,7 +253,7 @@ export default class RoundController {
     }
     this.autoScroll();
     if (this.keyboardMove) this.keyboardMove.update(s);
-    lichess.pubsub.emit('ply', ply);
+    playstrategy.pubsub.emit('ply', ply);
     return true;
   };
 
@@ -412,7 +412,7 @@ export default class RoundController {
       });
       if (o.check) sound.check();
       blur.onMove();
-      lichess.pubsub.emit('ply', this.ply);
+      playstrategy.pubsub.emit('ply', this.ply);
     }
     d.game.threefold = !!o.threefold;
     const step = {
@@ -509,8 +509,8 @@ export default class RoundController {
     }
     if (!d.player.spectator && d.game.turns > 1) {
       const key = o.winner ? (d.player.color === o.winner ? 'victory' : 'defeat') : 'draw';
-      lichess.sound.play(key);
-      if (key != 'victory' && d.game.turns > 6 && !d.tournament && !d.swiss && lichess.storage.get('courtesy') == '1')
+      playstrategy.sound.play(key);
+      if (key != 'victory' && d.game.turns > 6 && !d.tournament && !d.swiss && playstrategy.storage.get('courtesy') == '1')
         this.opts.chat?.instance?.then(c => c.post('Good game, well played'));
     }
     if (d.crazyhouse) crazyEndHook();
@@ -523,7 +523,7 @@ export default class RoundController {
     this.redraw();
     this.autoScroll();
     this.onChange();
-    if (d.tv) setTimeout(lichess.reload, 10000);
+    if (d.tv) setTimeout(playstrategy.reload, 10000);
     speech.status(this);
   };
 
@@ -531,10 +531,10 @@ export default class RoundController {
     this.challengeRematched = true;
     xhr.challengeRematch(this.data.game.id).then(
       () => {
-        lichess.pubsub.emit('challenge-app.open');
-        if (lichess.once('rematch-challenge'))
+        playstrategy.pubsub.emit('challenge-app.open');
+        if (playstrategy.once('rematch-challenge'))
           setTimeout(() => {
-            lichess.hopscotch(function () {
+            playstrategy.hopscotch(function () {
               window.hopscotch
                 .configure({
                   i18n: { doneBtn: 'OK, got it' },
@@ -570,10 +570,10 @@ export default class RoundController {
   };
 
   private setQuietMode = () => {
-    const was = lichess.quietMode;
+    const was = playstrategy.quietMode;
     const is = this.isPlaying();
     if (was !== is) {
-      lichess.quietMode = is;
+      playstrategy.quietMode = is;
       $('body')
         .toggleClass('playing', is)
         .toggleClass('no-select', is && this.clock && this.clock.millisOf(this.data.player.color) <= 3e5);
@@ -604,13 +604,13 @@ export default class RoundController {
 
   goBerserk = () => {
     this.socket.berserk();
-    lichess.sound.play('berserk');
+    playstrategy.sound.play('berserk');
   };
 
   setBerserk = (color: Color): void => {
     if (this.goneBerserk[color]) return;
     this.goneBerserk[color] = true;
-    if (color !== this.data.player.color) lichess.sound.play('berserk');
+    if (color !== this.data.player.color) playstrategy.sound.play('berserk');
     this.redraw();
     $('<i data-icon="`">').appendTo($(`.game__meta .player.${color} .user-link`));
   };
@@ -632,7 +632,7 @@ export default class RoundController {
 
   setRedirecting = () => {
     this.redirecting = true;
-    lichess.unload.expected = true;
+    playstrategy.unload.expected = true;
     setTimeout(() => {
       this.redirecting = false;
       this.redraw();
@@ -645,7 +645,7 @@ export default class RoundController {
     if (v && toSubmit) {
       if (this.moveToSubmit) this.actualSendMove('move', this.moveToSubmit);
       else this.actualSendMove('drop', this.dropToSubmit);
-      lichess.sound.play('confirmation');
+      playstrategy.sound.play('confirmation');
     } else this.jump(this.ply);
     this.cancelMove();
     if (toSubmit) this.setLoading(true, 300);
@@ -714,9 +714,9 @@ export default class RoundController {
   private delayedInit = () => {
     const d = this.data;
     if (this.isPlaying() && game.nbMoves(d, d.player.color) === 0 && !this.isSimulHost()) {
-      lichess.sound.play('genericNotify');
+      playstrategy.sound.play('genericNotify');
     }
-    lichess.requestIdleCallback(() => {
+    playstrategy.requestIdleCallback(() => {
       const d = this.data;
       if (this.isPlaying()) {
         if (!d.simul) blur.init(d.steps.length > 2);
@@ -729,7 +729,7 @@ export default class RoundController {
         window.addEventListener('beforeunload', e => {
           const d = this.data;
           if (
-            lichess.unload.expected ||
+            playstrategy.unload.expected ||
             this.nvui ||
             !game.playable(d) ||
             !d.clock ||

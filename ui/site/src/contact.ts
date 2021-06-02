@@ -1,4 +1,4 @@
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   window.location.href = location.hash || '#help-root';
 
   $('a.contact-email-obfuscated').one('click', function (this: HTMLLinkElement) {

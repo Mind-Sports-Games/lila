@@ -108,8 +108,8 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
     }
 
   def embedJsUnsafeLoadThen(js: String)(implicit ctx: Context): Frag =
-    embedJsUnsafe(s"""lichess.load.then(()=>{$js})""")
+    embedJsUnsafe(s"""playstrategy.load.then(()=>{$js})""")
 
   def embedJsUnsafeLoadThen(js: String, nonce: Nonce): Frag =
-    embedJsUnsafe(s"""lichess.load.then(()=>{$js})""", nonce)
+    embedJsUnsafe(s"""playstrategy.load.then(()=>{$js})""", nonce)
 }

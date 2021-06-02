@@ -286,7 +286,7 @@
     <item quantity="one">Dà %s seconda</item>
     <item quantity="other">Give %s seconde</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Stu contu hà offesu i Termi di u Serviziu Lichess</string>
+  <string name="thisAccountViolatedTos">Stu contu hà offesu i Termi di u Serviziu Playstrategy</string>
   <string name="openingExplorerAndTablebase">Spluratore d\' apertura &amp; basa d\' apertura</string>
   <string name="takeback">Ripiglià u colpu</string>
   <string name="proposeATakeback">Prupone di ripiglià u colpu</string>

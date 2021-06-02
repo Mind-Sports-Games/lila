@@ -24,7 +24,7 @@ final class MagicLink(
       implicit val lang = user.realLang | lila.i18n.defaultLang
       mailer send Mailer.Message(
         to = email,
-        subject = trans.logInToLichess.txt(user.username),
+        subject = trans.logInToPlaystrategy.txt(user.username),
         text = s"""
 ${trans.passwordReset_clickOrIgnore.txt()}
 

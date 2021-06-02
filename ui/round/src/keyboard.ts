@@ -22,4 +22,4 @@ export const init = (ctrl: RoundController) =>
       ctrl.redraw();
     })
     .bind('f', ctrl.flipNow)
-    .bind('z', () => lichess.pubsub.emit('zen'));
+    .bind('z', () => playstrategy.pubsub.emit('zen'));

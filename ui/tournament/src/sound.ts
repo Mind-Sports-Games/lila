@@ -11,7 +11,7 @@ function doCountDown(targetTime: number) {
 
     // always play the 0 sound before completing.
     const bestTick = Math.max(0, Math.round(secondsToStart));
-    if (bestTick <= 10) lichess.sound.play('countDown' + bestTick);
+    if (bestTick <= 10) playstrategy.sound.play('countDown' + bestTick);
 
     if (bestTick > 0) {
       const nextTick = Math.min(10, bestTick - 1);
@@ -26,13 +26,13 @@ function doCountDown(targetTime: number) {
 }
 
 export function end(data: TournamentData) {
-  if (data.me && data.isRecentlyFinished && lichess.once('tournament.end.sound.' + data.id)) {
+  if (data.me && data.isRecentlyFinished && playstrategy.once('tournament.end.sound.' + data.id)) {
     let key = 'Other';
     if (data.me.rank < 4) key = '1st';
     else if (data.me.rank < 11) key = '2nd';
     else if (data.me.rank < 21) key = '3rd';
 
-    lichess.sound.play('tournament' + key);
+    playstrategy.sound.play('tournament' + key);
   }
 }
 
@@ -50,6 +50,6 @@ export function countDown(data: TournamentData) {
   // Preload countdown sounds.
   for (let i = 10; i >= 0; i--) {
     const s = 'countDown' + i;
-    lichess.sound.loadStandard(s);
+    playstrategy.sound.loadStandard(s);
   }
 }

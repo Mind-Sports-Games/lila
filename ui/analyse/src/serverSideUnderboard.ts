@@ -28,13 +28,13 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     };
   let lastFen: string;
 
-  if (!lichess.AnalyseNVUI) {
-    lichess.pubsub.on('analysis.comp.toggle', (v: boolean) => {
+  if (!playstrategy.AnalyseNVUI) {
+    playstrategy.pubsub.on('analysis.comp.toggle', (v: boolean) => {
       setTimeout(function () {
         (v ? $menu.find('[data-panel="computer-analysis"]') : $menu.find('span:eq(1)')).trigger('mousedown');
       }, 50);
     });
-    lichess.pubsub.on('analysis.change', (fen: Fen, _, mainlinePly: Ply | false) => {
+    playstrategy.pubsub.on('analysis.change', (fen: Fen, _, mainlinePly: Ply | false) => {
       const $chart = $('#acpl-chart');
       if (fen && fen !== lastFen) {
         inputFen.value = fen;
@@ -72,28 +72,28 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
         }
       }
     });
-    lichess.pubsub.on('analysis.server.progress', (d: AnalyseData) => {
-      if (!lichess.advantageChart) startAdvantageChart();
-      else if (lichess.advantageChart.update) lichess.advantageChart.update(d);
+    playstrategy.pubsub.on('analysis.server.progress', (d: AnalyseData) => {
+      if (!playstrategy.advantageChart) startAdvantageChart();
+      else if (playstrategy.advantageChart.update) playstrategy.advantageChart.update(d);
       if (d.analysis && !d.analysis.partial) $('#acpl-chart-loader').remove();
     });
   }
 
   function chartLoader() {
-    return `<div id="acpl-chart-loader"><span>Stockfish 13+<br>server analysis</span>${lichess.spinnerHtml}</div>`;
+    return `<div id="acpl-chart-loader"><span>Stockfish 13+<br>server analysis</span>${playstrategy.spinnerHtml}</div>`;
   }
   function startAdvantageChart() {
-    if (lichess.advantageChart || lichess.AnalyseNVUI) return;
+    if (playstrategy.advantageChart || playstrategy.AnalyseNVUI) return;
     const loading = !data.treeParts[0].eval || !Object.keys(data.treeParts[0].eval).length;
     const $panel = $panels.filter('.computer-analysis');
     if (!$('#acpl-chart').length) $panel.html('<div id="acpl-chart"></div>' + (loading ? chartLoader() : ''));
     else if (loading && !$('#acpl-chart-loader').length) $panel.append(chartLoader());
-    lichess.loadScript('javascripts/chart/acpl.js').then(function () {
-      lichess.advantageChart!(data, ctrl.trans, $('#acpl-chart')[0] as HTMLElement);
+    playstrategy.loadScript('javascripts/chart/acpl.js').then(function () {
+      playstrategy.advantageChart!(data, ctrl.trans, $('#acpl-chart')[0] as HTMLElement);
     });
   }
 
-  const storage = lichess.storage.make('analysis.panel');
+  const storage = playstrategy.storage.make('analysis.panel');
   const setPanel = function (panel: string) {
     $menu.children('.active').removeClass('active');
     $menu.find(`[data-panel="${panel}"]`).addClass('active');
@@ -101,8 +101,8 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
       .removeClass('active')
       .filter('.' + panel)
       .addClass('active');
-    if ((panel == 'move-times' || ctrl.opts.hunter) && !lichess.movetimeChart)
-      lichess.loadScript('javascripts/chart/movetime.js').then(() => lichess.movetimeChart(data, ctrl.trans));
+    if ((panel == 'move-times' || ctrl.opts.hunter) && !playstrategy.movetimeChart)
+      playstrategy.loadScript('javascripts/chart/movetime.js').then(() => playstrategy.movetimeChart(data, ctrl.trans));
     if ((panel == 'computer-analysis' || ctrl.opts.hunter) && $('#acpl-chart').length)
       setTimeout(startAdvantageChart, 200);
   };
@@ -129,7 +129,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
         if (confirm(ctrl.trans('youNeedAnAccountToDoThat'))) location.href = '/signup';
         return false;
       }
-      formToXhr(this).then(startAdvantageChart, lichess.reload);
+      formToXhr(this).then(startAdvantageChart, playstrategy.reload);
       return false;
     });
   }
@@ -150,7 +150,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
           $(this).html() +
           '</strong><br /><br />' +
           '<pre>' +
-          lichess.escapeHtml(iframe) +
+          playstrategy.escapeHtml(iframe) +
           '</pre><br />' +
           iframe +
           '<br /><br />' +

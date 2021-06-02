@@ -2,13 +2,13 @@
   "name": "ceval",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org local computer analysis",
+  "description": "playstrategy.org local computer analysis",
   "type": "module",
   "module": "dist/main.js",
   "types": "dist/main.d.ts",
   "keywords": [
     "chess",
-    "lichess",
+    "playstrategy",
     "play",
     "replay"
   ],
@@ -20,7 +20,7 @@
     "prod": "yarn run compile"
   },
   "devDependencies": {
-    "@types/lichess": "2.0.0",
+    "@types/playstrategy": "2.0.0",
     "typescript": "^4.1.3"
   },
   "dependencies": {

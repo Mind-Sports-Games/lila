@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>lichess - Sound Test Page</title>
+    <title>playstrategy - Sound Test Page</title>
     <style>
       html,
       body {
@@ -21,13 +21,13 @@
   <body data-asset-version="_av_">
     <h1>Sound Test Page</h1>
     <script>
-      lichess = {
+      playstrategy = {
         load: new Promise(() => {}),
       };
       document.body.setAttribute('data-asset-url', `${location.protocol}//${location.host}`);
     </script>
-    <script src="https://lichess1.org/assets/compiled/deps.min.js"></script>
-    <script src="https://lichess1.org/assets/compiled/site.min.js"></script>
+    <script src="https://assets.playstrategy.org/assets/compiled/deps.min.js"></script>
+    <script src="https://assets.playstrategy.org/assets/compiled/site.min.js"></script>
     <table class="common">
       <thead>
         <tr></tr>
@@ -47,8 +47,8 @@
     </table>
     <script>
       function playSound(set, name) {
-        lichess.sound.changeSet(set);
-        lichess.sound.play(name);
+        playstrategy.sound.changeSet(set);
+        playstrategy.sound.play(name);
       }
       const soundSets = ['standard', 'piano', 'nes', 'sfx', 'futuristic', 'robot', 'lisp'];
       const basics = [
@@ -98,12 +98,12 @@
         ['wrong', 'lisp/Error'],
         ['end', 'lisp/PuzzleStormEnd'],
       ].forEach(([name, sound]) => {
-        lichess.sound.loadOggOrMp3(sound, `${lichess.sound.baseUrl}/${sound}`);
+        playstrategy.sound.loadOggOrMp3(sound, `${playstrategy.sound.baseUrl}/${sound}`);
         var tr = $('<tr>').appendTo($('table.storm tbody'));
         $('<td>')
           .append(
             $('<button>')
-              .on('click', () => lichess.sound.play(sound))
+              .on('click', () => playstrategy.sound.play(sound))
               .text(name)
           )
           .appendTo(tr);

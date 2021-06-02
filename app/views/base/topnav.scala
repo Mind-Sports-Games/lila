@@ -21,7 +21,7 @@ object topnav {
           "/",
           frag(
             span(cls := "play")(trans.play()),
-            span(cls := "home")("lichess.org")
+            span(cls := "home")("playstrategy.org")
           )
         ),
         div(role := "group")(
@@ -55,13 +55,13 @@ object topnav {
           ),
           a(href := routes.Study.allDefault(1))(trans.studyMenu()),
           ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
-          canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.lichessClasses())
+          canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.playstrategyClasses())
         )
       ),
       st.section(
         linkTitle(routes.Tv.index.path, trans.watch()),
         div(role := "group")(
-          a(href := routes.Tv.index)("Lichess TV"),
+          a(href := routes.Tv.index)("Playstrategy TV"),
           a(href := routes.Tv.games)(trans.currentGames()),
           ctx.noKid option a(href := routes.Streamer.index())(trans.streamersMenu()),
           a(href := routes.RelayTour.index())(trans.broadcast.broadcasts()),

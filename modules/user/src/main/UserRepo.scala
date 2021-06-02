@@ -72,8 +72,8 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       } yield xx -> yy
     }
 
-  def lichessAnd(id: ID) = pair(User.lichessId, id) map2 { case (lichess, user) =>
-    Holder(lichess) -> user
+  def playstrategyAnd(id: ID) = pair(User.playstrategyId, id) map2 { case (playstrategy, user) =>
+    Holder(playstrategy) -> user
   }
 
   def namePair(x: ID, y: ID): Fu[Option[(User, User)]] =
@@ -185,7 +185,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       )
       .unit
 
-  def lichess = byId(User.lichessId)
+  def playstrategy = byId(User.playstrategyId)
 
   val irwinId = "irwin"
   def irwin   = byId(irwinId)

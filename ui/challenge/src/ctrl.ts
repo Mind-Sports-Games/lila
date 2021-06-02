@@ -9,7 +9,7 @@ export default function (opts: ChallengeOpts, data: ChallengeData, redraw: () =>
 
   function update(d: ChallengeData) {
     data = d;
-    if (d.i18n) trans = lichess.trans(d.i18n).noarg;
+    if (d.i18n) trans = playstrategy.trans(d.i18n).noarg;
     if (d.reasons) reasons = d.reasons;
     opts.setCount(countActiveIn());
     notifyNew();
@@ -21,12 +21,12 @@ export default function (opts: ChallengeOpts, data: ChallengeData, redraw: () =>
 
   function notifyNew() {
     data.in.forEach(c => {
-      if (lichess.once('c-' + c.id)) {
-        if (!lichess.quietMode && data.in.length <= 3) {
+      if (playstrategy.once('c-' + c.id)) {
+        if (!playstrategy.quietMode && data.in.length <= 3) {
           opts.show();
-          lichess.sound.play('newChallenge');
+          playstrategy.sound.play('newChallenge');
         }
-        const pushSubsribed = parseInt(lichess.storage.get('push-subscribed') || '0', 10) + 86400000 >= Date.now(); // 24h
+        const pushSubsribed = parseInt(playstrategy.storage.get('push-subscribed') || '0', 10) + 86400000 >= Date.now(); // 24h
         !pushSubsribed && c.challenger && notify(showUser(c.challenger) + ' challenges you!');
         opts.pulse();
       }
@@ -52,7 +52,7 @@ export default function (opts: ChallengeOpts, data: ChallengeData, redraw: () =>
           c.declined = true;
           xhr
             .text(`/challenge/${id}/decline`, { method: 'post', body: xhr.form({ reason }) })
-            .catch(() => lichess.announce({ msg: 'Failed to send challenge decline' }));
+            .catch(() => playstrategy.announce({ msg: 'Failed to send challenge decline' }));
         }
       });
     },
@@ -62,7 +62,7 @@ export default function (opts: ChallengeOpts, data: ChallengeData, redraw: () =>
           c.declined = true;
           xhr
             .text(`/challenge/${id}/cancel`, { method: 'post' })
-            .catch(() => lichess.announce({ msg: 'Failed to send challenge cancellation' }));
+            .catch(() => playstrategy.announce({ msg: 'Failed to send challenge cancellation' }));
         }
       });
     },

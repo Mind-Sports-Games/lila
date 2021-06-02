@@ -50,7 +50,7 @@ final class ModApi(
           _ ?? { mod =>
             lila.mon.cheat.autoMark.increment()
             setEngine(mod, sus, v = true) >>
-              noteApi.lichessWrite(sus.user, note)
+              noteApi.playstrategyWrite(sus.user, note)
           }
         }
       }
@@ -87,13 +87,13 @@ final class ModApi(
   }
 
   def autoTroll(sus: Suspect, note: String): Funit =
-    reportApi.getLichessMod flatMap { mod =>
+    reportApi.getPlaystrategyMod flatMap { mod =>
       setTroll(mod, sus, true) >>
-        noteApi.lichessWrite(sus.user, note)
+        noteApi.playstrategyWrite(sus.user, note)
     }
 
   def garbageCollect(sus: Suspect): Funit =
-    reportApi.getLichessMod flatMap { mod =>
+    reportApi.getPlaystrategyMod flatMap { mod =>
       setAlt(mod, sus, v = true) >>
         setTroll(mod, sus, value = false) >>
         logApi.garbageCollect(mod, sus)

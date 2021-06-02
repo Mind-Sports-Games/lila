@@ -1,6 +1,6 @@
 type DateLike = Date | number | string;
 interface ElementWithDate extends Element {
-  lichessDate: Date;
+  playstrategyDate: Date;
 }
 
 // divisors for minutes, hours, days, weeks, months, years
@@ -37,7 +37,7 @@ const formatDiff = (diff: number): string => {
   i *= 2;
 
   if (diff > (i === 0 ? 9 : 1)) i += 1;
-  return lichess.timeagoLocale(diff, i, totalSec)[agoin].replace('%s', diff);
+  return playstrategy.timeagoLocale(diff, i, totalSec)[agoin].replace('%s', diff);
 };
 
 let formatterInst: (date: Date) => string;
@@ -64,16 +64,16 @@ export const findAndRender = (parent?: HTMLElement) =>
       const cl = node.classList,
         abs = cl.contains('abs'),
         set = cl.contains('set');
-      node.lichessDate = node.lichessDate || toDate(node.getAttribute('datetime')!);
+      node.playstrategyDate = node.playstrategyDate || toDate(node.getAttribute('datetime')!);
       if (!set) {
-        const str = formatter()(node.lichessDate);
+        const str = formatter()(node.playstrategyDate);
         if (abs) node.textContent = str;
         else node.setAttribute('title', str);
         cl.add('set');
         if (abs || cl.contains('once')) cl.remove('timeago');
       }
       if (!abs) {
-        const diff = (now - node.lichessDate.getTime()) / 1000;
+        const diff = (now - node.playstrategyDate.getTime()) / 1000;
         node.textContent = formatDiff(diff);
         if (Math.abs(diff) > 9999) cl.remove('timeago'); // ~3h
       }

@@ -37,7 +37,7 @@ module.exports = function (ctrl) {
         var $ref = $('.insight-stale');
         if ($ref.length) {
           $(e).html($ref.show());
-          lichess.refreshInsightForm();
+          playstrategy.refreshInsightForm();
         }
       },
     }),

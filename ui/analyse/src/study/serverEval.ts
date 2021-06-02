@@ -24,8 +24,8 @@ export function ctrl(root: AnalyseCtrl, chapterId: () => string): ServerEvalCtrl
     chart.getSelectedPoints().forEach(p => p.select(false));
   }
 
-  lichess.pubsub.on('analysis.change', (_fen: string, _path: string, mainlinePly: number | false) => {
-    if (!lichess.advantageChart || lastPly() === mainlinePly) return;
+  playstrategy.pubsub.on('analysis.change', (_fen: string, _path: string, mainlinePly: number | false) => {
+    if (!playstrategy.advantageChart || lastPly() === mainlinePly) return;
     const lp = lastPly(typeof mainlinePly === 'undefined' ? lastPly() : mainlinePly),
       el = chartEl(),
       chart = el && el.highcharts;
@@ -47,7 +47,7 @@ export function ctrl(root: AnalyseCtrl, chapterId: () => string): ServerEvalCtrl
     },
     chapterId,
     onMergeAnalysisData() {
-      if (lichess.advantageChart) lichess.advantageChart.update(root.data);
+      if (playstrategy.advantageChart) playstrategy.advantageChart.update(root.data);
     },
     request() {
       root.socket.send('requestAnalysis', chapterId());
@@ -70,10 +70,10 @@ export function view(ctrl: ServerEvalCtrl): VNode {
     {
       hook: onInsert(el => {
         ctrl.lastPly(false);
-        lichess.requestIdleCallback(
+        playstrategy.requestIdleCallback(
           () =>
-            lichess.loadScript('javascripts/chart/acpl.js').then(() => {
-              lichess.advantageChart!(ctrl.root.data, ctrl.root.trans, el);
+            playstrategy.loadScript('javascripts/chart/acpl.js').then(() => {
+              playstrategy.advantageChart!(ctrl.root.data, ctrl.root.trans, el);
               ctrl.chartEl(el as HighchartsHTMLElement);
             }),
           800

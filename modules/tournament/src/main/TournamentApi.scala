@@ -178,7 +178,7 @@ final class TournamentApi(
           }
           .monSuccess(_.tournament.pairing.create)
           .chronometer
-          .logIfSlow(100, logger)(_ => s"Pairings for https://lichess.org/tournament/${tour.id}")
+          .logIfSlow(100, logger)(_ => s"Pairings for https://playstrategy.org/tournament/${tour.id}")
           .result
       }
 

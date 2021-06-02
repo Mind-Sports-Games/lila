@@ -286,7 +286,7 @@
     <item quantity="one">Geef %s seconde</item>
     <item quantity="other">Geef %s seconden</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Deze account heeft de Lichess Servicevoorwaarden geschonden</string>
+  <string name="thisAccountViolatedTos">Deze account heeft de Playstrategy Servicevoorwaarden geschonden</string>
   <string name="openingExplorerAndTablebase">Openingsverkenner &amp; tablebase</string>
   <string name="takeback">Neem zet terug</string>
   <string name="proposeATakeback">Stel zet terugnemen voor</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Bedankt!</string>
   <string name="socialMediaLinks">Links naar sociale media</string>
   <string name="inlineNotation">Geïntegreerde notatie</string>
-  <string name="watchLichessTV">Kijk Lichess TV</string>
-  <string name="previouslyOnLichessTV">Voorheen op Lichess TV</string>
+  <string name="watchPlaystrategyTV">Kijk Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Voorheen op Playstrategy TV</string>
   <string name="onlinePlayers">Online spelers</string>
   <string name="activeToday">Vandaag actief</string>
   <string name="activePlayers">Actieve spelers</string>
@@ -567,7 +567,7 @@
   <string name="clock">Klok</string>
   <string name="unauthorizedError">Toegang geweigerd</string>
   <string name="noInternetConnection">Geen internetverbinding. U kan nog wel offline spelen vanuit het menu.</string>
-  <string name="connectedToLichess">U bent nu verbonden met lichess.org</string>
+  <string name="connectedToPlaystrategy">U bent nu verbonden met playstrategy.org</string>
   <string name="signedOut">U bent uitgelogd</string>
   <string name="loginSuccessful">Inloggen succesvol</string>
   <string name="playOnTheBoardOffline">Speel offline</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Fischer-speeltempo. Hoe meer tegenstanders er zijn, hoe meer tijd je nodig hebt.</string>
   <string name="simulAddExtraTime">Je mag extra tijd aan je eigen klok toevoegen om beter met de simultaan om te kunnen gaan.</string>
   <string name="simulHostExtraTime">Extra tijd voor de simultaangever</string>
-  <string name="lichessTournaments">Lichess toernooien</string>
+  <string name="playstrategyTournaments">Playstrategy toernooien</string>
   <string name="tournamentFAQ">Veelgestelde vragen over Arena toernooien</string>
   <string name="tournamentOfficial">Officieel</string>
   <string name="timeBeforeTournamentStarts">Tijd voordat het toernooi start</string>
@@ -669,8 +669,8 @@
   <string name="weHaveSentYouAnEmailTo">We hebben een email verstuurd naar %s. Klik op de link in de email om je wachtwoord te resetten.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Door je registratie ben je gebonden aan onze %s.</string>
   <string name="readAboutOur">Lees meer over ons %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Netwerkvertraging tussen u en Lichess</string>
-  <string name="timeToProcessAMoveOnLichessServer">Tijd om een zet te verwerken op de lichess server</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Netwerkvertraging tussen u en Playstrategy</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Tijd om een zet te verwerken op de playstrategy server</string>
   <string name="downloadAnnotated">Download de geannoteerde partij</string>
   <string name="downloadRaw">Download PGN</string>
   <string name="downloadImported">Download de geïmporteerde partij</string>
@@ -686,7 +686,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Je hebt je al geregistreerd via deze email: %s</string>
   <string name="kidMode">Kindvriendelijke modus</string>
   <string name="kidModeExplanation">Dit gaat over veiligheid. In kindvriendelijke modus, worden alle communicatiemogelijkheden op de website uitgeschakeld. Activeer dit voor kinderen en scholieren, om hen te beschermen tegen andere internetgebruikers.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">In kindvriendelijke modus, krijgt het Lichess-logo een %s-icoontje, zodat je weet dat je kinderen veilig zijn.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">In kindvriendelijke modus, krijgt het Playstrategy-logo een %s-icoontje, zodat je weet dat je kinderen veilig zijn.</string>
   <string name="enableKidMode">Activeer Kindermodus</string>
   <string name="disableKidMode">Deactiveer Kindermodus</string>
   <string name="security">Beveiliging</string>
@@ -694,7 +694,7 @@
   <string name="alternativelyYouCanX">Als alternatief kunt u %s.</string>
   <string name="revokeAllSessions">alle sessies intrekken</string>
   <string name="playChessEverywhere">Schaak overal</string>
-  <string name="asFreeAsLichess">Zo gratis als lichess</string>
+  <string name="asFreeAsPlaystrategy">Zo gratis als playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Gemaakt met liefde voor het schaken, niet voor geld</string>
   <string name="everybodyGetsAllFeaturesForFree">Iedereen krijgt gratis alle mogelijkheden</string>
   <string name="zeroAdvertisement">Geen advertenties</string>
@@ -734,7 +734,7 @@
   <string name="usernameSuffixInvalid">De gebruikersnaam moet eindigen met een letter of een cijfer.</string>
   <string name="usernameCharsInvalid">De gebruikersnaam mag alleen letters, cijfers, underscores, en koppeltekens bevatten.</string>
   <string name="usernameUnacceptable">Deze gebruikersnaam is niet acceptabel.</string>
-  <string name="directlySupportLichess">Lichess direct ondersteunen</string>
+  <string name="directlySupportPlaystrategy">Playstrategy direct ondersteunen</string>
   <string name="playChessInStyle">Speel schaken in stijl</string>
   <string name="chessBasics">Basis schaken</string>
   <string name="coaches">Coaches</string>
@@ -814,14 +814,14 @@
   <string name="tryToWin">Probeer elke partij die je speelt te winnen (of tenminste gelijk te spelen).</string>
   <string name="resignLostGames">Geef verloren partijen op (laat de klok niet tot 0 lopen).</string>
   <string name="temporaryInconvenience">Onze excuses voor het tijdelijke ongemak,</string>
-  <string name="wishYouGreatGames">en wij wensen u veel goede partijen op lichess.org.</string>
+  <string name="wishYouGreatGames">en wij wensen u veel goede partijen op playstrategy.org.</string>
   <string name="thankYouForReading">Bedankt voor het lezen!</string>
   <string name="lifetimeScore">Levenslange score</string>
   <string name="currentMatchScore">Huidige wedstrijd score</string>
   <string name="agreementAssistance">Ik ga ermee akkoord dat ik tijdens mijn partijen geen hulp krijg (van een schaakcomputer, -boek, -database of ander persoon).</string>
   <string name="agreementNice">Ik ga ermee akkoord dat ik altijd respectvol tegenover andere spelers zal zijn.</string>
   <string name="agreementAccount">Ik ga ermee akkoord dat ik niet meerdere accounts zal aanmaken.</string>
-  <string name="agreementPolicy">Ik ga ermee akkoord dat ik de Lichess-regels zal volgen.</string>
+  <string name="agreementPolicy">Ik ga ermee akkoord dat ik de Playstrategy-regels zal volgen.</string>
   <string name="searchOrStartNewDiscussion">Zoek of start een nieuwe discussie</string>
   <string name="edit">Wijzigen</string>
   <string name="rapid">Rapid</string>
@@ -856,12 +856,12 @@
   <string name="congratsYouWon">Gefeliciteerd, je hebt gewonnen!</string>
   <string name="gameVsX">Partij tegen %1$s</string>
   <string name="resVsX">%1$s tegen %2$s</string>
-  <string name="youJustBecamePatron">Je bent net een Lichess Patroon geworden.</string>
+  <string name="youJustBecamePatron">Je bent net een Playstrategy Patroon geworden.</string>
   <string name="patronAccountExpired">Patroon status is verlopen</string>
   <string name="pleaseReconsiderRenewIt">Overweeg alsjeblieft het te vernieuwen!</string>
   <string name="someoneReviewedYourCoachProfile">Iemand heeft je coachprofiel een beoordeling gegeven.</string>
   <string name="newPendingReview">In afwachting van beoordeling</string>
-  <string name="lostAgainstTOSViolator">Je hebt verloren van iemand die de Lichess voorwaarden heeft geschonden</string>
+  <string name="lostAgainstTOSViolator">Je hebt verloren van iemand die de Playstrategy voorwaarden heeft geschonden</string>
   <string name="refundXpointsTimeControlY">Teruggekregen: %1$s %2$s ratingpunten.</string>
   <string name="timeAlmostUp">De tijd is bijna om!</string>
   <string name="clickToRevealEmailAddress">[Klik om het e-mailadres te tonen]</string>

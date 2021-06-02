@@ -10,7 +10,7 @@ export interface StoredBooleanProp {
   (v: boolean): void;
 }
 
-const storage = lichess.storage;
+const storage = playstrategy.storage;
 
 export function storedProp(k: string, defaultValue: boolean): StoredBooleanProp;
 export function storedProp<T>(k: string, defaultValue: T): StoredProp<T>;

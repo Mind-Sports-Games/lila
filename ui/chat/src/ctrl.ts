@@ -20,14 +20,14 @@ export default function (opts: ChatOpts, redraw: Redraw): Ctrl {
   if (opts.noteId) allTabs.push('note');
   if (opts.plugin) allTabs.push(opts.plugin.tab.key);
 
-  const tabStorage = lichess.storage.make('chat.tab'),
+  const tabStorage = playstrategy.storage.make('chat.tab'),
     storedTab = tabStorage.get();
 
   let moderation: ModerationCtrl | undefined;
 
   const vm: ViewModel = {
     tab: allTabs.find(tab => tab === storedTab) || allTabs[0],
-    enabled: opts.alwaysEnabled || !lichess.storage.get('nochat'),
+    enabled: opts.alwaysEnabled || !playstrategy.storage.get('nochat'),
     placeholderKey: 'talkInChat',
     loading: false,
     timeout: opts.timeout,
@@ -36,7 +36,7 @@ export default function (opts: ChatOpts, redraw: Redraw): Ctrl {
 
   /* If discussion is disabled, and we have another chat tab,
    * then select that tab over discussion */
-  if (allTabs.length > 1 && vm.tab === 'discussion' && lichess.storage.get('nochat')) vm.tab = allTabs[1];
+  if (allTabs.length > 1 && vm.tab === 'discussion' && playstrategy.storage.get('nochat')) vm.tab = allTabs[1];
 
   const post = (text: string): boolean => {
     text = text.trim();
@@ -46,7 +46,7 @@ export default function (opts: ChatOpts, redraw: Redraw): Ctrl {
       alert('Max length: 140 chars. ' + text.length + ' chars used.');
       return false;
     }
-    lichess.pubsub.emit('socket.send', 'talk', text);
+    playstrategy.pubsub.emit('socket.send', 'talk', text);
     return true;
   };
 
@@ -94,7 +94,7 @@ export default function (opts: ChatOpts, redraw: Redraw): Ctrl {
     redraw();
   };
 
-  const trans = lichess.trans(opts.i18n);
+  const trans = playstrategy.trans(opts.i18n);
 
   function instanciateModeration() {
     if (opts.permissions.timeout || opts.permissions.local) {
@@ -131,13 +131,13 @@ export default function (opts: ChatOpts, redraw: Redraw): Ctrl {
     ['chat.permissions', onPermissions],
     ['palantir.toggle', palantir.enabled],
   ];
-  subs.forEach(([eventName, callback]) => lichess.pubsub.on(eventName, callback));
+  subs.forEach(([eventName, callback]) => playstrategy.pubsub.on(eventName, callback));
 
   const destroy = () => {
-    subs.forEach(([eventName, callback]) => lichess.pubsub.off(eventName, callback));
+    subs.forEach(([eventName, callback]) => playstrategy.pubsub.off(eventName, callback));
   };
 
-  const emitEnabled = () => lichess.pubsub.emit('chat.enabled', vm.enabled);
+  const emitEnabled = () => playstrategy.pubsub.emit('chat.enabled', vm.enabled);
   emitEnabled();
 
   return {
@@ -150,7 +150,7 @@ export default function (opts: ChatOpts, redraw: Redraw): Ctrl {
       tabStorage.set(t);
       // It's a lame way to do it. Give me a break.
       if (t === 'discussion')
-        lichess.requestIdleCallback(
+        playstrategy.requestIdleCallback(
           () =>
             $('.mchat__say').each(function (this: HTMLElement) {
               this.focus();
@@ -168,8 +168,8 @@ export default function (opts: ChatOpts, redraw: Redraw): Ctrl {
     setEnabled(v: boolean) {
       vm.enabled = v;
       emitEnabled();
-      if (!v) lichess.storage.set('nochat', '1');
-      else lichess.storage.remove('nochat');
+      if (!v) playstrategy.storage.set('nochat', '1');
+      else playstrategy.storage.remove('nochat');
       redraw();
     },
     redraw,

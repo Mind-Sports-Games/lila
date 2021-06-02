@@ -1,7 +1,7 @@
 SplineFontDB: 3.2
-FontName: lichess
-FullName: lichess
-FamilyName: lichess
+FontName: playstrategy
+FullName: playstrategy
+FamilyName: playstrategy
 Weight: Book
 Version: 1.0
 ItalicAngle: 0
@@ -75,7 +75,7 @@ ShortTable: maxp 16
   0
   0
 EndShort
-LangName: 1033 "" "" "Regular" "FontForge 2.0 : lichess : 5-4-2019" "" "Version 1.0"
+LangName: 1033 "" "" "Regular" "FontForge 2.0 : playstrategy : 5-4-2019" "" "Version 1.0"
 GaspTable: 1 65535 2 0
 Encoding: Custom
 UnicodeInterp: none

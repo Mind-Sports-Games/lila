@@ -286,7 +286,7 @@
     <item quantity="one">Ge %s sekund</item>
     <item quantity="other">Ge %s sekunder</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Detta konto bröt mot användarvillkoren för Lichess</string>
+  <string name="thisAccountViolatedTos">Detta konto bröt mot användarvillkoren för Playstrategy</string>
   <string name="openingExplorerAndTablebase">Öppningsutforskare &amp; slutspelsteori</string>
   <string name="takeback">Gör om drag</string>
   <string name="proposeATakeback">Fråga om du får göra om draget</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Tack!</string>
   <string name="socialMediaLinks">Länkar till sociala medier</string>
   <string name="inlineNotation">Visa notation</string>
-  <string name="watchLichessTV">Titta på Lichess-TV</string>
-  <string name="previouslyOnLichessTV">Föregående Lichess-TV</string>
+  <string name="watchPlaystrategyTV">Titta på Playstrategy-TV</string>
+  <string name="previouslyOnPlaystrategyTV">Föregående Playstrategy-TV</string>
   <string name="onlinePlayers">Inloggade spelare</string>
   <string name="activeToday">Mest aktiva idag</string>
   <string name="activePlayers">Mest aktiva spelare</string>
@@ -567,7 +567,7 @@
   <string name="clock">Klocka</string>
   <string name="unauthorizedError">Tillgång är oauktoriserad</string>
   <string name="noInternetConnection">Ingen internet förbindelse. Du kan spela offline från menyn.</string>
-  <string name="connectedToLichess">Du är nu ansluten till lichess.org</string>
+  <string name="connectedToPlaystrategy">Du är nu ansluten till playstrategy.org</string>
   <string name="signedOut">Du har loggats ut</string>
   <string name="loginSuccessful">Du är nu inloggad</string>
   <string name="playOnTheBoardOffline">Spela 2 på samma enhet</string>
@@ -608,7 +608,7 @@
   <string name="streamersMenu">Videosändningar</string>
   <string name="mobileApp">Mobilapp</string>
   <string name="webmasters">Webbmasters</string>
-  <string name="about">Om Lichess</string>
+  <string name="about">Om Playstrategy</string>
   <string name="aboutX">Om %s</string>
   <string name="xIsAFreeYLibreOpenSourceChessServer">%1$s är en gratis (%2$s), oberoende och reklamfri schackserver med öppen källkod.</string>
   <string name="really">på riktigt</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Inställningar för fischerklocka. Ju fler spelare du tar dig an, desto mer tid kan du behöva.</string>
   <string name="simulAddExtraTime">Du kan lägga till extra tid till dig för att klara av simultanspelet.</string>
   <string name="simulHostExtraTime">Värdens extratid</string>
-  <string name="lichessTournaments">Lichess-turneringar</string>
+  <string name="playstrategyTournaments">Playstrategy-turneringar</string>
   <string name="tournamentFAQ">Turnering: Vanliga frågor</string>
   <string name="tournamentOfficial">Officiell</string>
   <string name="timeBeforeTournamentStarts">Tid tills turneringen börjar</string>
@@ -669,8 +669,8 @@
   <string name="weHaveSentYouAnEmailTo">Vi har skickat ett e-postmeddelande till %s. Tryck på länken i e-posten för att återställa ditt lösenord.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Genom att registrera samtycker du till att vara bunden av våra %s.</string>
   <string name="readAboutOur">Läs om vår %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Nätverksfördröjning mellan dig och lichess</string>
-  <string name="timeToProcessAMoveOnLichessServer">Tid att bearbeta ett drag på lichess server</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Nätverksfördröjning mellan dig och playstrategy</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Tid att bearbeta ett drag på playstrategy server</string>
   <string name="downloadAnnotated">Hämta med noter</string>
   <string name="downloadRaw">Hämta avskalad</string>
   <string name="downloadImported">Hämta importerad</string>
@@ -686,7 +686,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Du har redan registrerat en e-postadress: %s</string>
   <string name="kidMode">Barnsäkert läge</string>
   <string name="kidModeExplanation">Detta är en säkerhetsinställning. I barnsäkert läge är all kommunikation inaktiverad. Använd detta för dina barn och skolelever för att skydda dem från andra internetanvändare.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">I barnsäkert läge får lichess-logotypen en %s ikon, så att du vet att dina barn är säkra.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">I barnsäkert läge får playstrategy-logotypen en %s ikon, så att du vet att dina barn är säkra.</string>
   <string name="enableKidMode">Aktivera barnsäkert läge</string>
   <string name="disableKidMode">Avaktivera barnsäkert läge</string>
   <string name="security">Säkerhet</string>
@@ -694,7 +694,7 @@
   <string name="alternativelyYouCanX">Alternativt kan du %s.</string>
   <string name="revokeAllSessions">återkalla alla sessioner</string>
   <string name="playChessEverywhere">Spela schack var du vill</string>
-  <string name="asFreeAsLichess">Lika gratis som lichess</string>
+  <string name="asFreeAsPlaystrategy">Lika gratis som playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Byggt med kärlek till schack, inte pengar</string>
   <string name="everybodyGetsAllFeaturesForFree">Alla får alla funktioner gratis</string>
   <string name="zeroAdvertisement">Ingen reklam</string>
@@ -734,7 +734,7 @@
   <string name="usernameSuffixInvalid">Användarnamnet måste sluta med en bokstav eller ett nummer.</string>
   <string name="usernameCharsInvalid">Användarnamnet får bara innehålla bokstäver, siffror, understrykningstecken och bindestreck.</string>
   <string name="usernameUnacceptable">Detta användarnamn är inte acceptabelt.</string>
-  <string name="directlySupportLichess">Stöd Lichess</string>
+  <string name="directlySupportPlaystrategy">Stöd Playstrategy</string>
   <string name="playChessInStyle">Spela schack med stil</string>
   <string name="chessBasics">Grunderna i schack</string>
   <string name="coaches">Schacktränare</string>
@@ -814,14 +814,14 @@
   <string name="tryToWin">Försök vinna (eller åtminstone nå remi i) varje parti som du spelar.</string>
   <string name="resignLostGames">Ge upp förlorade partier (i stället för att låta tiden rinna ut).</string>
   <string name="temporaryInconvenience">Vi ber om ursäkt för den tillfälliga olägenheten,</string>
-  <string name="wishYouGreatGames">och önskar dig bra partier på lichess.org.</string>
+  <string name="wishYouGreatGames">och önskar dig bra partier på playstrategy.org.</string>
   <string name="thankYouForReading">Tack för att du läste!</string>
   <string name="lifetimeScore">Livstidspoäng</string>
   <string name="currentMatchScore">Nuvarande matchpoäng</string>
   <string name="agreementAssistance">Jag lovar att jag inte kommer att få hjälp under mina partier (från en schackdator, bok, databas eller annan person).</string>
   <string name="agreementNice">Jag lovar att jag alltid kommer att vara respektfull mot andra spelare.</string>
   <string name="agreementAccount">Jag instämmer med att jag inte kommer att skapa flera konton.</string>
-  <string name="agreementPolicy">Jag instämmer med att jag kommer att följa alla Lichess-regler.</string>
+  <string name="agreementPolicy">Jag instämmer med att jag kommer att följa alla Playstrategy-regler.</string>
   <string name="searchOrStartNewDiscussion">Sök eller starta ny konversation</string>
   <string name="edit">Redigera</string>
   <string name="rapid">Snabbschack</string>
@@ -856,11 +856,11 @@
   <string name="congratsYouWon">Grattis, du vann!</string>
   <string name="gameVsX">Parti mot %1$s</string>
   <string name="resVsX">%1$s mot %2$s</string>
-  <string name="youJustBecamePatron">Du blev precis en Lichess-sponsor.</string>
+  <string name="youJustBecamePatron">Du blev precis en Playstrategy-sponsor.</string>
   <string name="patronAccountExpired">Sponsorkonto utlöpt</string>
   <string name="pleaseReconsiderRenewIt">Överväg gärna att förnya det!</string>
   <string name="someoneReviewedYourCoachProfile">Någon har recenserat din coachprofil.</string>
-  <string name="lostAgainstTOSViolator">Du förlorade mot någon som bröt mot Lichess TOS</string>
+  <string name="lostAgainstTOSViolator">Du förlorade mot någon som bröt mot Playstrategy TOS</string>
   <string name="refundXpointsTimeControlY">Ersättning: %1$s %2$s rankingpoäng.</string>
   <string name="timeAlmostUp">Tiden är nästan slut!</string>
   <string name="clickToRevealEmailAddress">[Klicka för att visa mailadress]</string>

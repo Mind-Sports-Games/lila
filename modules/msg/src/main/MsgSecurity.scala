@@ -123,7 +123,7 @@ final private class MsgSecurity(
       }
 
     def post(contacts: User.Contacts, isNew: Boolean): Fu[Boolean] =
-      fuccess(contacts.dest.id != User.lichessId) >>& {
+      fuccess(contacts.dest.id != User.playstrategyId) >>& {
         fuccess(Granter.byRoles(_.ModMessage)(~contacts.orig.roles)) >>| {
           !relationApi.fetchBlocks(contacts.dest.id, contacts.orig.id) >>&
             (create(contacts) >>| reply(contacts)) >>&

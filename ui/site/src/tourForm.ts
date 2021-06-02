@@ -1,6 +1,6 @@
 import flatpickr from 'flatpickr';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   const $variant = $('#form3-variant'),
     showPosition = () =>
       $('.form3 .position').toggleClass('none', !['1', 'standard'].includes($variant.val() as string));

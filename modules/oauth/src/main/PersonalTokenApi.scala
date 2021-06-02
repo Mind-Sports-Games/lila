@@ -56,5 +56,5 @@ final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.Ex
 
 object PersonalToken {
 
-  val clientId = "lichess_personal_token"
+  val clientId = "playstrategy_personal_token"
 }

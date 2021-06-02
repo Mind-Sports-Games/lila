@@ -430,13 +430,13 @@ export default function (ctrl: AnalyseCtrl): VNode {
             const chatOpts = ctrl.opts.chat;
             chatOpts.instance?.then(c => c.destroy());
             chatOpts.parseMoves = true;
-            chatOpts.instance = lichess.makeChat(chatOpts);
+            chatOpts.instance = playstrategy.makeChat(chatOpts);
           }),
         }),
       ctrl.embed
         ? null
         : h('div.chat__members.none', {
-            hook: onInsert(lichess.watchers),
+            hook: onInsert(playstrategy.watchers),
           }),
     ]
   );

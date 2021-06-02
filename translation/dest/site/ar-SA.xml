@@ -341,7 +341,7 @@
     <item quantity="many">منح %s ثانية</item>
     <item quantity="other">منح %s ثانية</item>
   </plurals>
-  <string name="thisAccountViolatedTos">هذا الحساب انتهك شروط خدمة lichess</string>
+  <string name="thisAccountViolatedTos">هذا الحساب انتهك شروط خدمة playstrategy</string>
   <string name="openingExplorerAndTablebase">مستكشف الافتتاحيات&amp; جدول النهايات</string>
   <string name="takeback">تراجع</string>
   <string name="proposeATakeback">اقتراح تراجع عن النقلة الآخيرة</string>
@@ -557,8 +557,8 @@
   <string name="thankYou">شكرًا لك!</string>
   <string name="socialMediaLinks">روابط وسائل التواصل الاجتماعي</string>
   <string name="inlineNotation">تنسيق التدوين</string>
-  <string name="watchLichessTV">شاهد ليتشيس تي في</string>
-  <string name="previouslyOnLichessTV">سابقاً على تلفاز ليتشيس</string>
+  <string name="watchPlaystrategyTV">شاهد ليتشيس تي في</string>
+  <string name="previouslyOnPlaystrategyTV">سابقاً على تلفاز ليتشيس</string>
   <string name="onlinePlayers">لاعبين متصلين</string>
   <string name="activeToday">نشيط اليوم</string>
   <string name="activePlayers">لاعبين نشطين</string>
@@ -675,7 +675,7 @@
   <string name="clock">الوقت</string>
   <string name="unauthorizedError">الوصول غير مصرح به.</string>
   <string name="noInternetConnection">لايوجد اتصال بالإنترنت. لا يزال يمكنك اللعب دون اتصال من القائمة.</string>
-  <string name="connectedToLichess">أنت الآن متصل بـ lichess.org</string>
+  <string name="connectedToPlaystrategy">أنت الآن متصل بـ playstrategy.org</string>
   <string name="signedOut">تم تسجيل الخروج.</string>
   <string name="loginSuccessful">تم الدخول بنجاح</string>
   <string name="playOnTheBoardOffline">على الرقعة</string>
@@ -746,7 +746,7 @@
   <string name="simulClockHint">ضبط توقيت بالزيادة . كلما زاد عدد اللاعبين كلما احتجت لوقت أطول.</string>
   <string name="simulAddExtraTime">يمكنك زيادة الوقت لساعتك للمساعدة في التزامنية.</string>
   <string name="simulHostExtraTime">التوقيت الإضافي لساعة المضيف</string>
-  <string name="lichessTournaments">مسابقات الموقع</string>
+  <string name="playstrategyTournaments">مسابقات الموقع</string>
   <string name="tournamentFAQ">مسابقة أرينا (سؤال وجواب)</string>
   <string name="tournamentOfficial">رسمية</string>
   <string name="timeBeforeTournamentStarts">الوقت حتى بداية المسابقة</string>
@@ -785,8 +785,8 @@
   <string name="weHaveSentYouAnEmailTo">ارسلنا رسالة إلى %s. اضغط على الرابط فيها لإعادة تعيين كلمة المرور.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">بتسجيلك في الموقع فانت توافق على شروطنا %s</string>
   <string name="readAboutOur">اقرأ عن %s.</string>
-  <string name="networkLagBetweenYouAndLichess">تأخر الاتصال بينك وبيننا</string>
-  <string name="timeToProcessAMoveOnLichessServer">الوفت المطلوب لتنفيذ النقلة على الخادم</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">تأخر الاتصال بينك وبيننا</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">الوفت المطلوب لتنفيذ النقلة على الخادم</string>
   <string name="downloadAnnotated">تحميل مع الشرح</string>
   <string name="downloadRaw">تحميل بدون الشرح</string>
   <string name="downloadImported">تحميل المستورد</string>
@@ -802,7 +802,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">سبق لك تسجيل هذا البريد الإلكتروني %s</string>
   <string name="kidMode">موقع الأطفال</string>
   <string name="kidModeExplanation">هذا يتعلق بالأمان. في نمط الطفل، يتم تعطيل كافة اتصالات المواقع. تمكين هذا للأطفال والطلاب، لحمايتهم من مستخدمي الإنترنت الأخرين.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">في نمط الطفل، يكون لشعار ليتشيس رمز %s، لكي تعرف أن أطفالك آمنين.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">في نمط الطفل، يكون لشعار ليتشيس رمز %s، لكي تعرف أن أطفالك آمنين.</string>
   <string name="enableKidMode">تمكين نمط الطفل</string>
   <string name="disableKidMode">تعطيل نمط الطفل</string>
   <string name="security">الأمان</string>
@@ -810,7 +810,7 @@
   <string name="alternativelyYouCanX">وبدلاً من ذلك يمكنك %s.</string>
   <string name="revokeAllSessions">إلغاء كافة جلسات العمل</string>
   <string name="playChessEverywhere">العب الشطرنج فى كل مكان</string>
-  <string name="asFreeAsLichess">مجاني</string>
+  <string name="asFreeAsPlaystrategy">مجاني</string>
   <string name="builtForTheLoveOfChessNotMoney">تم بناؤه حباً في الشطرنج, وليس المال :)</string>
   <string name="everybodyGetsAllFeaturesForFree">كل المميزات لكل الأعضاء مجاناً</string>
   <string name="zeroAdvertisement">لا دعايات</string>
@@ -854,7 +854,7 @@
   <string name="usernameSuffixInvalid">اسم المستخدم يجب أن ينتهي بحرف أو رقم.</string>
   <string name="usernameCharsInvalid">اسم المستخدم يجب أن يحتوي فقط على حروف وأرقام،خط سفلي ، والواصلات.</string>
   <string name="usernameUnacceptable">اسم المستخدم هذا غير مقبول.</string>
-  <string name="directlySupportLichess">دعم ليتشيس مباشرة</string>
+  <string name="directlySupportPlaystrategy">دعم ليتشيس مباشرة</string>
   <string name="playChessInStyle">لعب الشطرنج في نمط</string>
   <string name="chessBasics">أساسيات الشطرنج</string>
   <string name="coaches">المدربين</string>
@@ -946,7 +946,7 @@
   <string name="tryToWin">حاول فوز (او تعادل على الأقل) كل دور تلعبه.</string>
   <string name="resignLostGames">انسحب اذا كنت على وشك الهزيمة (لا تدع الوقت ينتهي).</string>
   <string name="temporaryInconvenience">نعتذر عن الازعاج المؤقت</string>
-  <string name="wishYouGreatGames">ونتمنى لك ادوار جيدة على Lichess.org.</string>
+  <string name="wishYouGreatGames">ونتمنى لك ادوار جيدة على Playstrategy.org.</string>
   <string name="thankYouForReading">نشكرك على القراءة!</string>
   <string name="lifetimeScore">النتيجة النهائية</string>
   <string name="currentMatchScore">نتيجة المباراة الحالية</string>

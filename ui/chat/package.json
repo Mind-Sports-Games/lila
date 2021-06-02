@@ -2,7 +2,7 @@
   "name": "chat",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org chat ui",
+  "description": "playstrategy.org chat ui",
   "type": "module",
   "module": "dist/main.js",
   "types": "dist/main.d.ts",
@@ -18,6 +18,6 @@
   },
   "devDependencies": {
     "@build/rollupProject": "2.0.0",
-    "@types/lichess": "2.0.0"
+    "@types/playstrategy": "2.0.0"
   }
 }

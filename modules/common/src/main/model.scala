@@ -96,7 +96,7 @@ object EmailAddress {
   def from(str: String): Option[EmailAddress] =
     isValid(str) option EmailAddress(str)
 
-  private def isNoReply(str: String) = str.startsWith("noreply.") && str.endsWith("@lichess.org")
+  private def isNoReply(str: String) = str.startsWith("noreply.") && str.endsWith("@playstrategy.org")
 }
 
 case class Domain private (value: String) extends AnyVal with StringValue {

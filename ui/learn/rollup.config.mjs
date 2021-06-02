@@ -2,7 +2,7 @@ import rollupProject from '@build/rollupProject';
 
 export default rollupProject({
   main: {
-    name: 'LichessLearn',
+    name: 'PlaystrategyLearn',
     input: 'src/main.js',
     output: 'learn',
     js: true,

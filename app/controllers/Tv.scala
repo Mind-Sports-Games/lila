@@ -17,7 +17,7 @@ final class Tv(
 
   def onChannel(chanKey: String) =
     Open { implicit ctx =>
-      (lila.tv.Tv.Channel.byKey get chanKey).fold(notFound)(lichessTv)
+      (lila.tv.Tv.Channel.byKey get chanKey).fold(notFound)(playstrategyTv)
     }
 
   def sides(gameId: String, color: String) =
@@ -38,12 +38,12 @@ final class Tv(
       } map { Json.toJson(_) } map Api.Data.apply
     }
 
-  private def lichessTv(channel: lila.tv.Tv.Channel)(implicit ctx: Context) =
+  private def playstrategyTv(channel: lila.tv.Tv.Channel)(implicit ctx: Context) =
     OptionFuResult(env.tv.tv getGameAndHistory channel) { case (game, history) =>
       val flip    = getBool("flip")
       val natural = Pov naturalOrientation game
       val pov     = if (flip) !natural else natural
-      val onTv    = lila.round.OnLichessTv(channel.key, flip)
+      val onTv    = lila.round.OnPlaystrategyTv(channel.key, flip)
       negotiate(
         html = env.tournament.api.gameView.watcher(pov.game) flatMap { tour =>
           env.api.roundApi.watcher(pov, tour, lila.api.Mobile.Api.currentVersion, tv = onTv.some) zip

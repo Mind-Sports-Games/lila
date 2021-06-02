@@ -2,7 +2,7 @@ import debounce from 'debounce-promise';
 import * as xhr from 'common/xhr';
 import Tagify from '@yaireo/tagify';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   const tagify = new Tagify(document.getElementById('form3-topics') as HTMLInputElement, {
     pattern: /.{2,}/,
     maxTags: 30,

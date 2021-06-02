@@ -92,7 +92,7 @@ final class PostApi(
       }
     }
 
-  private val quickHideCategs = Set("lichess-feedback", "off-topic-discussion")
+  private val quickHideCategs = Set("playstrategy-feedback", "off-topic-discussion")
 
   private def shouldHideOnPost(topic: Topic) =
     topic.visibleOnHome && {

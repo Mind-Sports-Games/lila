@@ -188,7 +188,7 @@ export default rollupProject({
   flatpickr: {
     input: 'src/flatpickr.ts',
     output: 'flatpickr',
-    name: 'LichessFlatpickr',
+    name: 'PlaystrategyFlatpickr',
   },
   teamAdmin: {
     input: 'src/teamAdmin.ts',

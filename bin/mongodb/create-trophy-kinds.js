@@ -2,7 +2,7 @@ db.trophyKind.drop();
 db.trophyKind.insert({
   _id: 'zugMiracle',
   name: 'Zug miracle',
-  url: '//lichess.org/faq#trophies',
+  url: '//playstrategy.org/faq#trophies',
   order: NumberInt(1),
   withCustomImage: false,
 });
@@ -10,7 +10,7 @@ db.trophyKind.insert({
   _id: 'wayOfBerserk',
   name: 'The way of Berserk',
   icon: '`',
-  url: '//lichess.org/faq#trophies',
+  url: '//playstrategy.org/faq#trophies',
   klass: 'fire-trophy',
   order: NumberInt(2),
   withCustomImage: false,
@@ -58,7 +58,7 @@ db.trophyKind.insert({
 });
 db.trophyKind.insert({
   _id: 'developer',
-  name: 'Lichess developer',
+  name: 'Playstrategy developer',
   icon: '\ue000',
   url: 'https://github.com/ornicar/lila/graphs/contributors',
   klass: 'icon3d',
@@ -67,9 +67,9 @@ db.trophyKind.insert({
 });
 db.trophyKind.insert({
   _id: 'moderator',
-  name: 'Lichess moderator',
+  name: 'Playstrategy moderator',
   icon: '\ue002',
-  url: '//lichess.org/report',
+  url: '//playstrategy.org/report',
   klass: 'icon3d',
   order: NumberInt(101),
   withCustomImage: false,
@@ -92,35 +92,35 @@ db.trophyKind.insert({
 db.trophyKind.insert({
   _id: 'zhwc18',
   name: 'Crazyhouse champion 2018',
-  url: '//lichess.org/forum/team-crazyhouse-world-championship/opperwezen-the-2nd-cwc',
+  url: '//playstrategy.org/forum/team-crazyhouse-world-championship/opperwezen-the-2nd-cwc',
   order: NumberInt(1),
   withCustomImage: true,
 });
 db.trophyKind.insert({
   _id: 'atomicwc16',
   name: 'Atomic World Champion 2016',
-  url: '//lichess.org/forum/team-atomic-wc/championship-final',
+  url: '//playstrategy.org/forum/team-atomic-wc/championship-final',
   order: NumberInt(1),
   withCustomImage: true,
 });
 db.trophyKind.insert({
   _id: 'atomicwc17',
   name: 'Atomic World Champion 2017',
-  url: '//lichess.org/forum/team-atomic-wc/awc-2017-its-final-time',
+  url: '//playstrategy.org/forum/team-atomic-wc/awc-2017-its-final-time',
   order: NumberInt(1),
   withCustomImage: true,
 });
 db.trophyKind.insert({
   _id: 'atomicwc18',
   name: 'Atomic World Champion 2018',
-  url: '//lichess.org/forum/team-atomic-wc/announcement-awc-2018',
+  url: '//playstrategy.org/forum/team-atomic-wc/announcement-awc-2018',
   order: NumberInt(1),
   withCustomImage: true,
 });
 db.trophyKind.insert({
   _id: 'acwc18',
   name: 'Antichess World Champion 2018',
-  url: '//lichess.org/forum/team-antichess-wc/congratulations-to-our-new-antichess-world-champion',
+  url: '//playstrategy.org/forum/team-antichess-wc/congratulations-to-our-new-antichess-world-champion',
   order: NumberInt(1),
   withCustomImage: true,
 });

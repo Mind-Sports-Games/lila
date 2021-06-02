@@ -10,7 +10,7 @@ module.exports = function (element, opts) {
 
   m.route.mode = 'hash';
 
-  var trans = lichess.trans(opts.i18n);
+  var trans = playstrategy.trans(opts.i18n);
   var side = mapSide(opts, trans);
   var sideCtrl = side.controller();
 

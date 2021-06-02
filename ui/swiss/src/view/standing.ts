@@ -47,7 +47,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
                         key: p.g,
                         href: `/${p.g}`,
                       },
-                      hook: onInsert(lichess.powertip.manualGame),
+                      hook: onInsert(playstrategy.powertip.manualGame),
                     },
                     p.o ? '*' : p.w === true ? '1' : p.w === false ? '0' : '½'
                   )
@@ -65,7 +65,7 @@ const title = (str: string) => ({ attrs: { title: str } });
 
 let lastBody: MaybeVNodes | undefined;
 
-const preloadUserTips = (vn: VNode) => lichess.powertip.manualUserIn(vn.elm as HTMLElement);
+const preloadUserTips = (vn: VNode) => playstrategy.powertip.manualUserIn(vn.elm as HTMLElement);
 
 export default function standing(ctrl: SwissCtrl, pag: Pager, klass?: string): VNode {
   const tableBody = pag.currentPageResults ? pag.currentPageResults.map(res => playerTr(ctrl, res)) : lastBody;

@@ -51,10 +51,10 @@ export default function (token: string) {
     console.error('Invalid JSON Object for Speech Keywords. Using English default. ' + Error(error).message);
   }
 
-  //Lichess Integration with Board API
+  //Playstrategy Integration with Board API
 
   /**
-   * GLOBAL VARIABLES - Lichess Connectivity
+   * GLOBAL VARIABLES - Playstrategy Connectivity
    */
   const time = new Date(); //A Global time object
   let currentGameId = ''; //Track which is the current Game, in case there are several open games
@@ -90,8 +90,8 @@ export default function (token: string) {
   /**
    * Global Variables for DGT Board Connection (JACM)
    */
-  let localBoard: Chess = startingPosition(); //Board with valid moves played on Lichess and DGT Board. May be half move behind Lichess or half move in advance
-  let DGTgameId = ''; //Used to track if DGT board was setup already with the lichess currentGameId
+  let localBoard: Chess = startingPosition(); //Board with valid moves played on Playstrategy and DGT Board. May be half move behind Playstrategy or half move in advance
+  let DGTgameId = ''; //Used to track if DGT board was setup already with the playstrategy currentGameId
   let boards = Array<{ serialnr: string; state: string }>(); //An array to store all the board recognized by DGT LiveChess
   let liveChessConnection: WebSocket; //Connection Object to LiveChess through websocket
   let isLiveChessConnected = false; //Used to track if a board there is a connection to DGT Live Chess
@@ -205,7 +205,7 @@ export default function (token: string) {
     GET /api/stream/event
     Stream incoming events
 
-    Stream the events reaching a lichess user in real time as ndjson.
+    Stream the events reaching a playstrategy user in real time as ndjson.
 
     Each line is a JSON object containing a type field. Possible values are:
 
@@ -404,7 +404,7 @@ export default function (token: string) {
   /**
    * mainLoop() is a function that tries to keep the streams connected at all times, up to a maximum of 20 retries
    */
-  async function lichessConnectionLoop() {
+  async function playstrategyConnectionLoop() {
     //Program ends after 20 re-connection attempts
     for (let attempts = 0; attempts < 20; attempts++) {
       //Connect to main event stream
@@ -517,7 +517,7 @@ export default function (token: string) {
    * Initialize a ChessBoard when connecting or re-connecting to a game
    *
    * @param {string} gameId - The gameId of the game to store on the board
-   * @param {Object} data - The gameFull event from lichess.org
+   * @param {Object} data - The gameFull event from playstrategy.org
    */
   function initializeChessBoard(gameId: string, data: { initialFen: string; state: { moves: string } }) {
     try {
@@ -866,7 +866,7 @@ export default function (token: string) {
           gameConnectionMap.get(currentGameId)!.connected &&
           gameStateMap.get(currentGameId).status == 'started'
         ) {
-          //There is a game in progress, setup the board as per lichess board
+          //There is a game in progress, setup the board as per playstrategy board
           if (currentGameId != DGTgameId) {
             //We know we have not synchronized yet
             if (verbose) console.info('There is a game in progress, calling liveChessBoardSetUp...');
@@ -876,7 +876,7 @@ export default function (token: string) {
       } else if (message.response == 'feed' && !!message.param.san) {
         //Received move from board
         if (verbose) console.info('onmessage - san: ' + message.param.san);
-        //get last move known to lichess and avoid calling multiple times this function
+        //get last move known to playstrategy and avoid calling multiple times this function
         const lastMove = getLastUCIMove(currentGameId);
         if (message.param.san.length == 0) {
           if (verbose) console.info('onmessage - san is empty');
@@ -906,7 +906,7 @@ export default function (token: string) {
               if (JSON.stringify(lastLegalParam.san) != JSON.stringify(quarantinedlastLegalParam.san)) {
                 //lastLegalParam was altered, this mean a new move was received from LiveChess during quarantine
                 console.warn(
-                  'onmessage - Invalid moved quarantined and not sent to lichess. Newer move interpretration received.'
+                  'onmessage - Invalid moved quarantined and not sent to playstrategy. Newer move interpretration received.'
                 );
                 return;
               }
@@ -936,7 +936,7 @@ export default function (token: string) {
               if (verbose) console.info('onmessage - Move is legal');
               //if received move.color == this.currentGameColor
               if (localBoard.turn == currentGameColor) {
-                //This is a valid new move send it to lichess
+                //This is a valid new move send it to playstrategy
                 if (verbose) console.info('onmessage - Valid Move played: ' + SANMove);
                 await validateAndSendBoardMove(moveObject);
                 //Update the lastSanMove
@@ -944,17 +944,17 @@ export default function (token: string) {
                 //Play the move on local board to keep it in sync
                 localBoard.play(moveObject);
               } else if (compareMoves(lastMove.move, moveObject)) {
-                //This is a valid adjustment - Just making the move from Lichess
+                //This is a valid adjustment - Just making the move from Playstrategy
                 if (verbose) console.info('onmessage - Valid Adjustment: ' + SANMove);
-                //no need to send anything to Lichess moveObject required
-                //lastSanMove will be updated once this move comes back from lichess
+                //no need to send anything to Playstrategy moveObject required
+                //lastSanMove will be updated once this move comes back from playstrategy
                 //Play the move on local board to keep it in sync
                 localBoard.play(moveObject);
               } else {
-                //Invalid Adjustment. Move was legal but does not match last move received from Lichess
+                //Invalid Adjustment. Move was legal but does not match last move received from Playstrategy
                 console.error('onmessage - Invalid Adjustment was made');
                 if (compareMoves(lastMove.move, moveObject)) {
-                  console.error('onmessage - Played move has not been received by Lichess.');
+                  console.error('onmessage - Played move has not been received by Playstrategy.');
                 } else {
                   console.error('onmessage - Expected:' + lastMove.move + ' by ' + lastMove.player);
                   console.error('onmessage - Detected:' + makeUci(moveObject) + ' by ' + localBoard.turn);
@@ -1021,9 +1021,9 @@ export default function (token: string) {
   }
 
   /**
-   * Synchronizes the position on Lichess with the position on the board
+   * Synchronizes the position on Playstrategy with the position on the board
    * If the position does not match, no moves will be received from LiveChess
-   * @param chess - The chessops Chess object with the position on Lichess
+   * @param chess - The chessops Chess object with the position on Playstrategy
    */
   async function sendBoardToLiveChess(chess: Chess) {
     const fen = makeFen(chess.toSetup());
@@ -1057,11 +1057,11 @@ export default function (token: string) {
   }
 
   /**
-   * This function handles sending the move to the right lichess game.
+   * This function handles sending the move to the right playstrategy game.
    * If more than one game is being played, it will ask which game to connect to,
    * waiting for user input. This block causes the method to become async
    *
-   * @param {Object} boardMove - The move in chessops format or string if in lichess format
+   * @param {Object} boardMove - The move in chessops format or string if in playstrategy format
    */
   async function validateAndSendBoardMove(boardMove: NormalMove) {
     //While there is not an active game, keep trying to find one so the move is not lost
@@ -1185,7 +1185,7 @@ export default function (token: string) {
   /**
    * Compare moves in different formats.
    * Fixes issue in which chessops return UCI_960 for castling instead of plain UCI
-   * @param lastMove - the move a string received from lichess
+   * @param lastMove - the move a string received from playstrategy
    * @param moveObject - the move in chessops format after applyng the SAN to localBoard
    * @returns {Boolean} - True if the moves are the same
    */
@@ -1243,7 +1243,7 @@ export default function (token: string) {
     console.log('  ;::|   _.=`\\                   ░ ░       ░  ░  ░   ░  ░      ░        ░      ');
     console.log('  `;:|.=` _.=`\\                  ░                                             ');
     console.log("    '|_.=`   __\\                                                               ");
-    console.log('    `\\_..==`` /                 Lichess.org - DGT Electronic Board Connector   ');
+    console.log('    `\\_..==`` /                 Playstrategy.org - DGT Electronic Board Connector   ');
     console.log("     .'.___.-'.                Developed by Andres Cavallin and Juan Cavallin  ");
     console.log('    /          \\                                  v1.0.7                       ');
     console.log("jgs('--......--')                                                             ");
@@ -1257,6 +1257,6 @@ export default function (token: string) {
    */
   start();
   getProfile();
-  lichessConnectionLoop();
+  playstrategyConnectionLoop();
   DGTliveChessConnectionLoop();
 }

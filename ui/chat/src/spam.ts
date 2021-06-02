@@ -6,10 +6,10 @@ export const selfReport = (txt: string) => {
   if (isKnownSpammer()) return;
   const hasSuspLink = suspLink(txt);
   if (hasSuspLink) xhr.text(`/jslog/${window.location.href.substr(-12)}?n=spam`, { method: 'post' });
-  if (hasSuspLink || followMe(txt)) lichess.storage.set('chat-spam', '1');
+  if (hasSuspLink || followMe(txt)) playstrategy.storage.set('chat-spam', '1');
 };
 
-const isKnownSpammer = () => lichess.storage.get('chat-spam') == '1';
+const isKnownSpammer = () => playstrategy.storage.get('chat-spam') == '1';
 
 const spamRegex = new RegExp(
   [
@@ -48,5 +48,5 @@ const suspLink = (txt: string) => !!txt.match(spamRegex);
 const followMeRegex = /follow me|join my team/i;
 const followMe = (txt: string) => !!txt.match(followMeRegex);
 
-const teamUrlRegex = /lichess\.org\/team\//i;
+const teamUrlRegex = /playstrategy\.org\/team\//i;
 export const hasTeamUrl = (txt: string) => !!txt.match(teamUrlRegex);

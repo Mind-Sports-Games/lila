@@ -244,7 +244,7 @@ final class PlaybanApi(
                 .byId(record.userId)
                 .flatMap {
                   _ ?? { user =>
-                    noteApi.lichessWrite(user, "Closed for ragesit recidive") >>-
+                    noteApi.playstrategyWrite(user, "Closed for ragesit recidive") >>-
                       Bus.publish(lila.hub.actorApi.playban.RageSitClose(user.id), "rageSitClose")
                   }
                 }

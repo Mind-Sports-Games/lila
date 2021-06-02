@@ -171,17 +171,17 @@ final class Env(
     // GC can be aborted by reverting the initial SB mark
     user.repo.isTroll(userId) foreach { troll =>
       if (troll) scheduler.scheduleOnce(1.second) {
-        lichessClose(userId).unit
+        playstrategyClose(userId).unit
       }
     }
   }
   Bus.subscribeFun("rageSitClose") { case lila.hub.actorApi.playban.RageSitClose(userId) =>
-    lichessClose(userId).unit
+    playstrategyClose(userId).unit
   }
-  private def lichessClose(userId: User.ID) =
-    user.repo.lichessAnd(userId) flatMap {
-      _ ?? { case (lichess, user) =>
-        closeAccount(user, lichess)
+  private def playstrategyClose(userId: User.ID) =
+    user.repo.playstrategyAnd(userId) flatMap {
+      _ ?? { case (playstrategy, user) =>
+        closeAccount(user, playstrategy)
       }
     }
 

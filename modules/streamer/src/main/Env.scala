@@ -50,7 +50,7 @@ final class Env(
       "streamerAlwaysFeatured",
       default = UserIds(Nil),
       text =
-        "Twitch streamers who get featured without the keyword - lichess usernames separated by a comma".some
+        "Twitch streamers who get featured without the keyword - playstrategy usernames separated by a comma".some
     )
   }
 
