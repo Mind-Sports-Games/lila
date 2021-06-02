@@ -32,6 +32,7 @@ object jsI18n {
   private val variantTranslations = Vector(
     trans.kingInTheCenter,
     trans.threeChecks,
+    trans.checkersConnected,
     trans.variantEnding
   ).map(_.key)
 

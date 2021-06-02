@@ -43,9 +43,6 @@ object player {
         )
     }
 
-    //println("PlayerStack")
-    //Thread.dumpStack()
-
     bits.layout(
       variant = pov.game.variant,
       title = s"${trans.play.txt()} ${if (ctx.pref.isZen) "ZEN" else playerText(pov.opponent)}",
@@ -55,7 +52,7 @@ object player {
         embedJsUnsafeLoadThen(s"""LichessRound.boot(${safeJsonValue(
           Json
             .obj(
-              "data"   -> data.pp("json data"),
+              "data"   -> data,
               "i18n"   -> jsI18n(pov.game),
               "userId" -> ctx.userId,
               "chat"   -> chatJson

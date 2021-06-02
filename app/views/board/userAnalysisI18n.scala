@@ -45,6 +45,7 @@ object userAnalysisI18n {
     trans.cheatDetected,
     trans.kingInTheCenter,
     trans.threeChecks,
+    trans.checkersConnected,
     trans.variantEnding,
     trans.whitePlays,
     trans.blackPlays,

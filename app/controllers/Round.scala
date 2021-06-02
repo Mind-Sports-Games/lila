@@ -130,7 +130,7 @@ final class Round(
 
   def watcher(gameId: String, color: String) =
     Open { implicit ctx =>
-      proxyPov(gameId.pp("gameId"), color.pp("color")).pp("proxyPov") flatMap {
+      proxyPov(gameId, color) flatMap {
         case Some(pov) =>
           get("pov") match {
             case Some(requestedPov) =>

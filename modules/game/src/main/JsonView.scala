@@ -12,9 +12,6 @@ final class JsonView(rematches: Rematches) {
   import JsonView._
 
   def apply(game: Game, initialFen: Option[FEN]) = {
-    println("game jsonview")
-    Thread.dumpStack()
-    println("gameboard: " + game.chess.board)
     Json
       .obj(
         "id"            -> game.id,
