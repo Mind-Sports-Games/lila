@@ -51,7 +51,7 @@ themes.map { |theme|
   ext = theme[1]
   classes = colors.map { |color|
     roles.map { |role|
-      piece = color[0] + (role == 'knight' ? 'N' : role.upcase[0])
+      piece = color[0] + (role == 'knight' ? 'N' : role == 'loachecker' ? 'P' : role.upcase[0])
       file = source_dir + name + '/' + piece + '.' + ext
       File.open(file, 'r') do|image_file|
         image = image_file.read
@@ -70,7 +70,7 @@ themes.map { |theme|
   ext = theme[1]
   classes = colors.map { |color|
     roles.map { |role|
-      piece = color[0] + (role == 'knight' ? 'N' : role.upcase[0])
+      piece = color[0] + (role == 'knight' ? 'N' : role == 'loachecker' ? 'P' : role.upcase[0])
       '.is2d .' + role + '.' + color + ' {' +
         "background-image:url('/assets/piece/" + name + "/" + piece + "." + ext + "')}"
     }

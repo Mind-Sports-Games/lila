@@ -27,7 +27,7 @@ final class Round(
 
   private def analyser = env.analyse.analyser
 
-  private def renderPlayer(pov: Pov)(implicit ctx: Context): Fu[Result] =
+  private def renderPlayer(pov: Pov)(implicit ctx: Context): Fu[Result] = {
     negotiate(
       html =
         if (!pov.game.started) notFound
@@ -75,6 +75,7 @@ final class Round(
           }
       }
     ) dmap NoCache
+  }
 
   def player(fullId: String) =
     Open { implicit ctx =>
