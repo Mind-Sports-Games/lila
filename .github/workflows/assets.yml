@@ -25,7 +25,7 @@ jobs:
           submodules: recursive
       - uses: webfactory/ssh-agent@v0.5.2
         with:
-            ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
+          ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
       - run: git submodule absorbgitdirs
       - uses: actions/checkout@v2
         with:

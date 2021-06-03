@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: webfactory/ssh-agent@v0.5.2
         with:
-            ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
+          ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
       - name: Checkout Mind-Sports-Games/lila-maven
         uses: actions/checkout@v2
         with:
