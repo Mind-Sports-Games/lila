@@ -15,8 +15,8 @@
     "@build/rollupProject": "2.0.0"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#loa",
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#loa",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git",
     "snabbdom": "^3.0.1",
     "common": "2.0.0"
   },
