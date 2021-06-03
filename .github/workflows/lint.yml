@@ -12,6 +12,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - uses: webfactory/ssh-agent@v0.5.2
+        with:
+          ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
       - uses: actions/checkout@v1
       - run: yarn install
       - run: yarn run lint
