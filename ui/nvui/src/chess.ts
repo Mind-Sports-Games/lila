@@ -33,7 +33,15 @@ const anna: { [letter: string]: string } = {
   g: 'gustav',
   h: 'hector',
 };
-const roles: { [letter: string]: string } = { P: 'pawn', R: 'rook', N: 'knight', B: 'bishop', Q: 'queen', K: 'king', L: 'loachecker'};
+const roles: { [letter: string]: string } = {
+  P: 'pawn',
+  R: 'rook',
+  N: 'knight',
+  B: 'bishop',
+  Q: 'queen',
+  K: 'king',
+  L: 'loachecker',
+};
 const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k', loachecker: 'l' };
 
 const letterPiece: { [letter: string]: string } = {
