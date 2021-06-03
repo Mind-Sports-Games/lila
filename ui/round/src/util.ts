@@ -10,6 +10,7 @@ const pieceScores = {
   rook: 5,
   queen: 9,
   king: 0,
+  loachecker: 0,
 };
 
 export const justIcon = (icon: string): VNodeData => ({
@@ -54,8 +55,8 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
 // {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
 export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
   const diff: MaterialDiff = {
-    white: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0 },
-    black: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0 },
+    white: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0, loachecker: 0 },
+    black: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0, loachecker: 0 },
   };
   for (const p of pieces.values()) {
     const them = diff[opposite(p.color)];

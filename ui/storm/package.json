@@ -16,8 +16,8 @@
     "@types/lichess": "2.0.0"
   },
   "dependencies": {
-    "chessops": "^0.9.0",
-    "chessground": "^7.12.0",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
     "snabbdom": "^3.0.1",
     "common": "2.0.0",
     "puz": "2.0.0"

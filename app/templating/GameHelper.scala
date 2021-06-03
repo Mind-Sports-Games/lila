@@ -62,6 +62,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case chess.variant.Horde         => "Destroy the horde to win"
           case chess.variant.RacingKings   => "Race to the eighth rank to win"
           case chess.variant.Crazyhouse    => "Drop captured pieces on the board"
+          case chess.variant.LinesOfAction => "Lines of Action"
           case _                           => "Variant ending"
         }
       case _ => "Game is still being played"
@@ -200,6 +201,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case chess.variant.KingOfTheHill => trans.kingInTheCenter.txt()
           case chess.variant.ThreeCheck    => trans.threeChecks.txt()
           case chess.variant.RacingKings   => trans.raceFinished.txt()
+          case chess.variant.LinesOfAction => trans.checkersConnected.txt()
           case _                           => trans.variantEnding.txt()
         }
       case _ => ""

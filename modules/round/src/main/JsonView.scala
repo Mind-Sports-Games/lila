@@ -51,7 +51,7 @@ final class JsonView(
       initialFen: Option[FEN],
       withFlags: WithFlags,
       nvui: Boolean
-  ): Fu[JsObject] =
+  ): Fu[JsObject] = {
     getSocketStatus(pov.game) zip
       (pov.opponent.userId ?? userRepo.byId) zip
       takebacker.isAllowedIn(pov.game) zip
@@ -59,15 +59,15 @@ final class JsonView(
         import pov._
         Json
           .obj(
-            "game" -> gameJsonView(game, initialFen),
+            "game" -> gameJsonView(pov.game, initialFen),
             "player" -> {
-              commonPlayerJson(game, player, playerUser, withFlags) ++ Json.obj(
+              commonPlayerJson(pov.game, player, playerUser, withFlags) ++ Json.obj(
                 "id"      -> playerId,
                 "version" -> socket.version.value
               )
             }.add("onGame" -> (player.isAi || socket.onGame(player.color))),
             "opponent" -> {
-              commonPlayerJson(game, opponent, opponentUser, withFlags) ++ Json.obj(
+              commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json.obj(
                 "color" -> opponent.color.name,
                 "ai"    -> opponent.aiLevel
               )
@@ -102,28 +102,29 @@ final class JsonView(
               .add("submitMove" -> {
                 import Pref.SubmitMove._
                 pref.submitMove match {
-                  case _ if game.hasAi || nvui                            => false
+                  case _ if pov.game.hasAi || nvui                            => false
                   case ALWAYS                                             => true
-                  case CORRESPONDENCE_UNLIMITED if game.isCorrespondence  => true
-                  case CORRESPONDENCE_ONLY if game.hasCorrespondenceClock => true
+                  case CORRESPONDENCE_UNLIMITED if pov.game.isCorrespondence  => true
+                  case CORRESPONDENCE_ONLY if pov.game.hasCorrespondenceClock => true
                   case _                                                  => false
                 }
               })
           )
-          .add("clock" -> game.clock.map(clockJson))
-          .add("correspondence" -> game.correspondenceClock)
+          .add("clock" -> pov.game.clock.map(clockJson))
+          .add("correspondence" -> pov.game.correspondenceClock)
           .add("takebackable" -> takebackable)
           .add("moretimeable" -> moretimeable)
           .add("crazyhouse" -> pov.game.board.crazyData)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
-          .add("expiration" -> game.expirable.option {
+          .add("expiration" -> pov.game.expirable.option {
             Json.obj(
-              "idleMillis"   -> (nowMillis - game.movedAt.getMillis),
-              "millisToMove" -> game.timeForFirstMove.millis
+              "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
+              "millisToMove" -> pov.game.timeForFirstMove.millis
             )
           })
       }
+  }
 
   private def commonWatcherJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json

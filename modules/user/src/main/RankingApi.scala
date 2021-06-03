@@ -99,6 +99,7 @@ final class RankingApi(
       horde         <- topPerf(PerfType.Horde.id, nb)
       racingKings   <- topPerf(PerfType.RacingKings.id, nb)
       crazyhouse    <- topPerf(PerfType.Crazyhouse.id, nb)
+      linesOfAction <- topPerf(PerfType.LinesOfAction.id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -112,7 +113,8 @@ final class RankingApi(
       antichess = antichess,
       atomic = atomic,
       horde = horde,
-      racingKings = racingKings
+      racingKings = racingKings,
+      linesOfAction = linesOfAction
     )
 
   object weeklyStableRanking {

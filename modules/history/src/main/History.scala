@@ -14,6 +14,7 @@ case class History(
     horde: RatingsMap,
     racingKings: RatingsMap,
     crazyhouse: RatingsMap,
+    linesOfAction: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -39,6 +40,7 @@ case class History(
       case PerfType.Horde          => horde
       case PerfType.RacingKings    => racingKings
       case PerfType.Crazyhouse     => crazyhouse
+      case PerfType.LinesOfAction  => linesOfAction
       case PerfType.Puzzle         => puzzle
       case PerfType.UltraBullet    => ultraBullet
       case x                       => sys error s"No history for perf $x"
@@ -76,6 +78,7 @@ object History {
           horde = ratingsMap("horde"),
           racingKings = ratingsMap("racingKings"),
           crazyhouse = ratingsMap("crazyhouse"),
+          linesOfAction = ratingsMap("linesOfAction"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),

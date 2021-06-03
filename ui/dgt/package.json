@@ -10,7 +10,7 @@
     "@types/lichess": "2.0.0"
   },
   "dependencies": {
-    "chessops": "^0.9.0"
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git"
   },
   "scripts": {
     "dev": "rollup --config",

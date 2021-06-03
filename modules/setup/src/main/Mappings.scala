@@ -24,7 +24,8 @@ private object Mappings {
     V.Antichess.key,
     V.Atomic.key,
     V.Horde.key,
-    V.RacingKings.key
+    V.RacingKings.key,
+    V.LinesOfAction.key
   )
   val boardApiVariantKeys      = text.verifying(boardApiVariants contains _)
   val time                     = of[Double].verifying(HookConfig validateTime _)

@@ -34,6 +34,7 @@ const sanToRole: { [key: string]: cg.Role } = {
   R: 'rook',
   Q: 'queen',
   K: 'king',
+  L: 'loachecker',
 };
 
 export function ctrl(root: RoundController, step: Step, redraw: Redraw): KeyboardMove {

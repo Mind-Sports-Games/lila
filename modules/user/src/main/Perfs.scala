@@ -17,6 +17,7 @@ case class Perfs(
     horde: Perf,
     racingKings: Perf,
     crazyhouse: Perf,
+    linesOfAction: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -40,6 +41,7 @@ case class Perfs(
       "horde"          -> horde,
       "racingKings"    -> racingKings,
       "crazyhouse"     -> crazyhouse,
+      "linesOfAction"  -> linesOfAction,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -117,6 +119,7 @@ case class Perfs(
     "horde"          -> horde,
     "racingKings"    -> racingKings,
     "crazyhouse"     -> crazyhouse,
+    "linesOfAction"  -> linesOfAction,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
     "blitz"          -> blitz,
@@ -149,6 +152,7 @@ case class Perfs(
       case PerfType.Horde          => horde
       case PerfType.RacingKings    => racingKings
       case PerfType.Crazyhouse     => crazyhouse
+      case PerfType.LinesOfAction  => linesOfAction
       case PerfType.Puzzle         => puzzle
     }
 
@@ -212,6 +216,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -243,6 +248,7 @@ case object Perfs {
       case chess.variant.Horde         => Some(_.horde)
       case chess.variant.RacingKings   => Some(_.racingKings)
       case chess.variant.Crazyhouse    => Some(_.crazyhouse)
+      case chess.variant.LinesOfAction => Some(_.linesOfAction)
       case _                           => none
     }
 
@@ -272,6 +278,7 @@ case object Perfs {
         horde = perf("horde"),
         racingKings = perf("racingKings"),
         crazyhouse = perf("crazyhouse"),
+        linesOfAction = perf("linesOfAction"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -298,6 +305,7 @@ case object Perfs {
         "horde"          -> notNew(o.horde),
         "racingKings"    -> notNew(o.racingKings),
         "crazyhouse"     -> notNew(o.crazyhouse),
+        "linesOfAction"  -> notNew(o.linesOfAction),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
         "blitz"          -> notNew(o.blitz),
@@ -324,8 +332,9 @@ case object Perfs {
       antichess: List[User.LightPerf],
       atomic: List[User.LightPerf],
       horde: List[User.LightPerf],
-      racingKings: List[User.LightPerf]
+      racingKings: List[User.LightPerf],
+      linesOfAction: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
 }

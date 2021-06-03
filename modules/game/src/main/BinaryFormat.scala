@@ -204,18 +204,12 @@ object BinaryFormat {
 
   object piece {
 
-    private val groupedPos = Pos.all grouped 2 collect { case List(p1, p2) =>
-      (p1, p2)
-    } toArray
-
     def write(pieces: PieceMap): ByteArray = {
       def posInt(pos: Pos): Int =
         (pieces get pos).fold(0) { piece =>
-          piece.color.fold(0, 8) + roleToInt(piece.role)
+          piece.color.fold(0, 128) + roleToInt(piece.role)
         }
-      ByteArray(groupedPos map { case (p1, p2) =>
-        ((posInt(p1) << 4) + posInt(p2)).toByte
-      })
+      ByteArray(Pos.all.map(posInt(_).toByte).toArray)
     }
 
     def read(ba: ByteArray, variant: Variant): PieceMap = {
@@ -224,11 +218,10 @@ object BinaryFormat {
         Array(int >> 4, int & 0x0f)
       }
       def intPiece(int: Int): Option[Piece] =
-        intToRole(int & 7, variant) map { role =>
-          Piece(Color.fromWhite((int & 8) == 0), role)
+        intToRole(int & 127, variant) map { role =>
+          Piece(Color.fromWhite((int & 128) == 0), role)
         }
-      val pieceInts = ba.value flatMap splitInts
-      (Pos.all zip pieceInts).view
+      (Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
         }
@@ -248,6 +241,7 @@ object BinaryFormat {
         case 5 => Some(Bishop)
         // Legacy from when we used to have an 'Antiking' piece
         case 7 if variant.antichess => Some(King)
+        case 8 if variant.linesOfAction => Some(LOAChecker)
         case _                      => None
       }
     private def roleToInt(role: Role): Int =
@@ -258,6 +252,7 @@ object BinaryFormat {
         case Rook   => 3
         case Knight => 4
         case Bishop => 5
+        case LOAChecker => 8
       }
   }
 

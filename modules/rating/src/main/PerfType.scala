@@ -167,6 +167,15 @@ object PerfType {
         iconChar = '-'
       )
 
+  case object LinesOfAction
+      extends PerfType(
+        21,
+        key = "linesOfAction",
+        name = chess.variant.LinesOfAction.name,
+        title = "Lines Of Action game",
+        iconChar = '.'
+      )
+
   val all: List[PerfType] = List(
     UltraBullet,
     Bullet,

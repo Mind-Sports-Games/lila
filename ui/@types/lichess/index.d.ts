@@ -282,7 +282,8 @@ declare type VariantKey =
   | 'atomic'
   | 'horde'
   | 'racingKings'
-  | 'crazyhouse';
+  | 'crazyhouse'
+  | 'linesOfAction';
 
 declare type Speed = 'bullet' | 'blitz' | 'classical' | 'correspondence' | 'unlimited';
 
@@ -299,7 +300,8 @@ declare type Perf =
   | 'atomic'
   | 'horde'
   | 'racingKings'
-  | 'crazyhouse';
+  | 'crazyhouse'
+  | 'linesOfAction';
 
 declare type Color = 'white' | 'black';
 

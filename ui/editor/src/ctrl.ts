@@ -141,6 +141,8 @@ export default class EditorCtrl {
         return this.makeUrl('/analysis/kingOfTheHill/', legalFen);
       case 'racingkings':
         return this.makeUrl('/analysis/racingKings/', legalFen);
+      case 'linesofaction':
+        return this.makeUrl('/analysis/linesOfAction/', legalFen);
       case 'antichess':
       case 'atomic':
       case 'horde':
