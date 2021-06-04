@@ -11,7 +11,7 @@ import lila.relay.RelayRoundForm.Data
 import lila.relay.{ RelayRound, RelayTour }
 
 object roundForm {
-
+/*
   import trans.broadcast._
 
   def create(form: Form[Data], tour: RelayTour)(implicit ctx: Context) =
@@ -102,5 +102,5 @@ object roundForm {
         form3.submit(trans.apply())
       )
     )
-  }
+  }*/
 }
