@@ -228,12 +228,12 @@ object layout {
           !robots option raw("""<meta content="noindex, nofollow" name="robots">"""),
           noTranslate,
           openGraph.map(_.frags),
-          link(
+          /*link(
             href := routes.Blog.atom,
             tpe := "application/atom+xml",
             rel := "alternate",
             st.title := trans.blog.txt()
-          ),
+          ),*/
           ctx.currentBg == "transp" option ctx.pref.bgImgOrDefault map { img =>
             raw(
               s"""<style id="bg-data">body.transp::before{background-image:url("${escapeHtmlRaw(img)
