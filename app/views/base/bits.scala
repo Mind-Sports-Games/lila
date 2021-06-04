@@ -43,10 +43,10 @@ z-index: 99;
 
   val connectLinks =
     div(cls := "connect-links")(
-      a(href := "https://twitter.com/lichess", targetBlank, noFollow)("Twitter"),
-      a(href := "https://discord.gg/hy5jqSs", targetBlank, noFollow)("Discord"),
-      a(href := "https://www.youtube.com/channel/UCr6RfQga70yMM9-nuzAYTsA", targetBlank, noFollow)("YouTube"),
-      a(href := "https://www.twitch.tv/lichessdotorg", targetBlank, noFollow)("Twitch")
+      a(href := "https://twitter.com/TODO", targetBlank, noFollow)("Twitter"),
+      //a(href := "https://discord.gg/hy5jqSs", targetBlank, noFollow)("Discord"),
+      a(href := "https://www.youtube.com/TODO", targetBlank, noFollow)("YouTube"),
+      a(href := "https://www.twitch.tv/TODO", targetBlank, noFollow)("Twitch")
     )
 
   def fenAnalysisLink(fen: FEN)(implicit lang: Lang) =
