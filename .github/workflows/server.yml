@@ -76,7 +76,7 @@ jobs:
         if: github.ref == 'refs/heads/deploy-test' && github.event_name == 'push'
         uses: garygrossgarten/github-action-ssh@release
         with:
-          command: /opt/lila/lila/install.sh /tmp/lila-3.0.tar.xz
+          command: /opt/lila/upgrade.sh lila /tmp/lila-3.0.tar.xz
           host: ${{ secrets.PS_MAIN_HOST }}
           username: ${{ secrets.PS_MAIN_USERNAME }}
           privateKey: ${{ secrets.MSO_CI_SSH_KEY }}
