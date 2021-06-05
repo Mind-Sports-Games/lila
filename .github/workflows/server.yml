@@ -58,11 +58,11 @@ jobs:
       - run: cd target/universal/stage && tar -cvpJf ../../../lila-3.0.tar.xz . && cd -
         env:
           XZ_OPT: '-0'
-      - uses: actions/upload-artifact@v1
-        if: github.ref == 'refs/heads/deploy-test' && github.event_name == 'push'
-        with:
-          name: lila-server
-          path: lila-3.0.tar.xz
+      # - uses: actions/upload-artifact@v1
+      #   if: github.ref == 'refs/heads/deploy-test' && github.event_name == 'push'
+      #   with:
+      #     name: lila-server
+      #     path: lila-3.0.tar.xz
       - name: Copy file to server
         if: github.ref == 'refs/heads/deploy-test' && github.event_name == 'push'
         uses: appleboy/scp-action@master
