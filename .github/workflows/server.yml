@@ -79,8 +79,8 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: "lila-3.0.tar.xz"
-          target: "/tmp/lila-3.0.tar.xz"
+          source: 'lila-3.0.tar.xz'
+          target: '/tmp/lila-3.0.tar.xz'
       - name: Upgrade application
         uses: garygrossgarten/github-action-ssh@release
         with:
