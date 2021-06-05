@@ -71,7 +71,7 @@ jobs:
           username: ${{ secrets.PS_MAIN_USERNAME }}
           key: ${{ secrets.MSO_CI_SSH_KEY }}
           source: 'lila-3.0.tar.xz'
-          target: '/tmp/lila-3.0.tar.xz'
+          target: '/tmp/'
       - name: Upgrade application
         if: github.ref == 'refs/heads/deploy-test' && github.event_name == 'push'
         uses: garygrossgarten/github-action-ssh@release
