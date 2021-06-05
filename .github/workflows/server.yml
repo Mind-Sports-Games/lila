@@ -62,3 +62,29 @@ jobs:
         with:
           name: lila-server
           path: lila-3.0.tar.xz
+  deploy:
+    runs-on: ubuntu-latest
+    needs: openjdk14
+    if: github.ref == 'refs/heads/deploy-test' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Retrieve artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: lila-server
+          path: lila-3.0.tar.xz
+      - name: Copy file to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "lila-3.0.tar.xz"
+          target: "/tmp/lila-3.0.tar.xz"
+      - name: Upgrade application
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: /opt/lila/lila/install.sh /tmp/lila-3.0.tar.xz
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.SSH_KEY }}
