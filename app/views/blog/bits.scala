@@ -9,7 +9,7 @@ import lila.common.String.html.richText
 import controllers.routes
 
 object bits {
-
+/*
   private[blog] def menu(year: Option[Int], hasActive: Boolean = true) =
     st.nav(cls := "page-menu__menu subnav")(
       a(cls := (year.isEmpty && hasActive).option("active"), href := routes.Blog.index())("Latest"),
@@ -51,4 +51,5 @@ object bits {
     )
 
   private[blog] def csp(implicit ctx: Context) = defaultCsp.withPrismic(isGranted(_.Prismic)).some
+*/
 }

@@ -54,7 +54,7 @@ object topnav {
             a(href := routes.Coordinate.home)(trans.coordinates.coordinates())
           ),
           a(href := routes.Study.allDefault(1))(trans.studyMenu()),
-          ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
+          //ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
           canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.lichessClasses())
         )
       ),
@@ -65,7 +65,7 @@ object topnav {
           a(href := routes.Tv.games)(trans.currentGames()),
           ctx.noKid option a(href := routes.Streamer.index())(trans.streamersMenu()),
           //a(href := routes.RelayTour.index())(trans.broadcast.broadcasts()),
-          ctx.noBot option a(href := routes.Video.index)(trans.videoLibrary())
+          //ctx.noBot option a(href := routes.Video.index)(trans.videoLibrary())
         )
       ),
       st.section(

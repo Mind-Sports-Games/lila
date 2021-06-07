@@ -72,13 +72,13 @@ GET   /player/autocomplete             controllers.User.autocomplete
 GET   /dasher                          controllers.Dasher.get
 
 # Blog
-GET   /blog                            controllers.Blog.index(page: Int ?= 1)
-GET   /blog/all                        controllers.Blog.all
-GET   /blog/:year                      controllers.Blog.year(year: Int)
-GET   /blog/discuss/:id                controllers.Blog.discuss(id: String)
-GET   /blog/:id/:slug                  controllers.Blog.show(id: String, slug: String, ref: Option[String] ?= None)
-GET   /blog.atom                       controllers.Blog.atom
-GET   /blog.txt                        controllers.Blog.sitemapTxt
+# GET   /blog                            controllers.Blog.index(page: Int ?= 1)
+# GET   /blog/all                        controllers.Blog.all
+# GET   /blog/:year                      controllers.Blog.year(year: Int)
+# GET   /blog/discuss/:id                controllers.Blog.discuss(id: String)
+# GET   /blog/:id/:slug                  controllers.Blog.show(id: String, slug: String, ref: Option[String] ?= None)
+# GET   /blog.atom                       controllers.Blog.atom
+# GET   /blog.txt                        controllers.Blog.sitemapTxt
 
 # Training - Coordinate
 GET   /training/coordinate             controllers.Coordinate.home
@@ -403,10 +403,10 @@ POST  /challenge/rematch-of/$id<\w{8}> controllers.Challenge.rematchOf(id: Strin
 GET /notify                            controllers.Notify.recent(page: Int ?= 1)
 
 # Video
-GET   /video                           controllers.Video.index
-GET   /video/tags                      controllers.Video.tags
-GET   /video/author/:author            controllers.Video.author(author: String)
-GET   /video/:id                       controllers.Video.show(id: String)
+#GET   /video                           controllers.Video.index
+#GET   /video/tags                      controllers.Video.tags
+#GET   /video/author/:author            controllers.Video.author(author: String)
+#GET   /video/:id                       controllers.Video.show(id: String)
 
 # I18n
 POST  /translation/select              controllers.I18n.select
@@ -513,17 +513,17 @@ POST  /inbox/:username                 controllers.Msg.apiPost(username: String)
 POST /inbox/:username/delete           controllers.Msg.convoDelete(username: String)
 
 # Coach
-GET   /coach                           controllers.Coach.all(page: Int ?= 1)
-GET   /coach/edit                      controllers.Coach.edit
-POST  /coach/edit                      controllers.Coach.editApply
-GET   /coach/picture/edit              controllers.Coach.picture
-POST  /coach/picture/upload            controllers.Coach.pictureApply
-POST  /coach/picture/delete            controllers.Coach.pictureDelete
-POST  /coach/approve-review/:id        controllers.Coach.approveReview(id: String)
-POST  /coach/mod-review/:id            controllers.Coach.modReview(id: String)
-GET   /coach/:username                 controllers.Coach.show(username: String)
-POST  /coach/:username/review          controllers.Coach.review(username: String)
-GET   /coach/:lang/:order              controllers.Coach.search(lang: String, order: String, page: Int ?= 1)
+# GET   /coach                           controllers.Coach.all(page: Int ?= 1)
+# GET   /coach/edit                      controllers.Coach.edit
+# POST  /coach/edit                      controllers.Coach.editApply
+# GET   /coach/picture/edit              controllers.Coach.picture
+# POST  /coach/picture/upload            controllers.Coach.pictureApply
+# POST  /coach/picture/delete            controllers.Coach.pictureDelete
+# POST  /coach/approve-review/:id        controllers.Coach.approveReview(id: String)
+# POST  /coach/mod-review/:id            controllers.Coach.modReview(id: String)
+# GET   /coach/:username                 controllers.Coach.show(username: String)
+# POST  /coach/:username/review          controllers.Coach.review(username: String)
+# GET   /coach/:lang/:order              controllers.Coach.search(lang: String, order: String, page: Int ?= 1)
 
 # Clas
 GET   /class                           controllers.Clas.index
@@ -779,7 +779,7 @@ POST  /dgt/config/token                controllers.DgtCtrl.generateToken
 # Accessibility
 POST  /toggle-blind-mode               controllers.Main.toggleBlindMode
 
-GET   /prismic-preview                 controllers.Blog.preview(token: String)
+#GET   /prismic-preview                 controllers.Blog.preview(token: String)
 POST  /jslog/$id<\w{12}>               controllers.Main.jslog(id: String)
 POST  /jsmon/:event                    controllers.Main.jsmon(event: String)
 

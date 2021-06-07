@@ -99,9 +99,9 @@ object features {
               a(href := routes.Search.index(1))("Advanced search"),
               " through Lichess 3 billion games"
             ),
-            tr(unlimited)(
+            /*tr(unlimited)(
               a(href := routes.Video.index)("Chess video library")
-            ),
+            ),*/
             tr(check)(
               "Forum, teams, messaging, friends, challenges"
             ),

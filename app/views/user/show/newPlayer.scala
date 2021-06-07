@@ -42,8 +42,8 @@ object newPlayer {
         li(
           "Learn from ",
           a(href := routes.Study.allDefault(1))("studies"),
-          " and ",
-          a(href := routes.Video.index)("videos")
+          /*" and ",
+          a(href := routes.Video.index)("videos")*/
         ),
         li(a(href := routes.Pref.form("game-display"))("Configure Lichess to your liking")),
         li("Explore the site and have fun :)")

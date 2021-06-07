@@ -9,7 +9,7 @@ import lila.i18n.LangList
 import controllers.routes
 
 object widget {
-
+/*
   import trans.coach._
 
   def titleName(c: lila.coach.Coach.WithUser) =
@@ -113,5 +113,5 @@ object widget {
         )
       )
     )
-  }
+  }*/
 }
