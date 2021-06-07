@@ -223,8 +223,8 @@ export default class Setup {
         case '9':
           key = 'racingKings';
           break;
-        case '100':
-          key = 'linesofaction';
+        case '11':
+          key = 'linesOfAction';
           break;
       }
       const $selected = $ratings
