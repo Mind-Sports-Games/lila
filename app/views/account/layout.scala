@@ -34,9 +34,9 @@ object layout {
           a(activeCls("editProfile"), href := routes.Account.profile)(
             trans.editProfile()
           ),
-          isGranted(_.Coach) option a(activeCls("coach"), href := routes.Coach.edit)(
+          /*isGranted(_.Coach) option a(activeCls("coach"), href := routes.Coach.edit)(
             trans.coach.lichessCoach()
-          ),
+          ),*/
           div(cls := "sep"),
           a(activeCls("password"), href := routes.Account.passwd)(
             trans.changePassword()
