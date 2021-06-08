@@ -236,7 +236,7 @@
   </plurals>
   <string name="exportGames">Eksportear partijen</string>
   <string name="ratingRange">Ratingberik</string>
-  <string name="thisAccountViolatedTos">Dit akkount hat de regels fan de Lichess Tsjinstbetingsten oertrêden</string>
+  <string name="thisAccountViolatedTos">Dit akkount hat de regels fan de Playstrategy Tsjinstbetingsten oertrêden</string>
   <string name="openingExplorerAndTablebase">Openingsblêder &amp; tablebase</string>
   <string name="takeback">Set werom</string>
   <string name="proposeATakeback">Stel in weromset foar</string>
@@ -373,8 +373,8 @@ kompjûteranalyze, partijpetear en dielbere URL te krijen.</string>
   <string name="thankYou">Tankewol!</string>
   <string name="socialMediaLinks">Keppelingen nei sosjale media</string>
   <string name="inlineNotation">Ynboude notaasje</string>
-  <string name="watchLichessTV">Sjoch Lichess TV</string>
-  <string name="previouslyOnLichessTV">Earder op Lichess TV</string>
+  <string name="watchPlaystrategyTV">Sjoch Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Earder op Playstrategy TV</string>
   <string name="onlinePlayers">Online spilers</string>
   <string name="activeToday">Hjoed aktyf</string>
   <string name="activePlayers">Aktive spilers</string>
@@ -464,7 +464,7 @@ kompjûteranalyze, partijpetear en dielbere URL te krijen.</string>
   <string name="clock">Klok</string>
   <string name="unauthorizedError">Tagong wegere.</string>
   <string name="noInternetConnection">Gjin ynternetferbining. Do kinst noch wol \'offline\' spylje fanút it menu.</string>
-  <string name="connectedToLichess">Do bist no ferbûn mei lichess.org</string>
+  <string name="connectedToPlaystrategy">Do bist no ferbûn mei playstrategy.org</string>
   <string name="signedOut">Do bist ôfmeld</string>
   <string name="loginSuccessful">Do bist oanmeld</string>
   <string name="playOnTheBoardOffline">Oan it boerd</string>
@@ -477,7 +477,7 @@ kompjûteranalyze, partijpetear en dielbere URL te krijen.</string>
   <string name="tournamentDoesNotExist">Dizze toernoai bestiet net.</string>
   <string name="kidMode">Bern mode</string>
   <string name="playChessEverywhere">Oeral skaken spyljen</string>
-  <string name="asFreeAsLichess">As fergees as lichess</string>
+  <string name="asFreeAsPlaystrategy">As fergees as playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Boud út de leafde foar skaken, net jild</string>
   <string name="zeroAdvertisement">Gjin advertinsjes</string>
   <string name="phoneAndTablet">Telefoan en tablet</string>
@@ -503,7 +503,7 @@ kompjûteranalyze, partijpetear en dielbere URL te krijen.</string>
   <string name="usernameSuffixInvalid">Oan de ein fan de brûkersnamme moat in letter of in sifer komme.</string>
   <string name="usernameCharsInvalid">De brûkersnamme kin allinne mar bestean út letter, sifers, ûnderstrekingsteken en keppelteken.</string>
   <string name="usernameUnacceptable">Dizze brûkersnamme kin der net op troch.</string>
-  <string name="directlySupportLichess">Lichess daliks stypje</string>
+  <string name="directlySupportPlaystrategy">Playstrategy daliks stypje</string>
   <string name="playChessInStyle">Skaak yn styl</string>
   <string name="chessBasics">Wêr\'t it by skaken om giet</string>
   <string name="invalidPgn">Unjildige PGN</string>

@@ -307,7 +307,7 @@
     <item quantity="many">Додати %s секунд</item>
     <item quantity="other">Додати %s секунд</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Цей обліковий запис порушив умови використання Lichess</string>
+  <string name="thisAccountViolatedTos">Цей обліковий запис порушив умови використання Playstrategy</string>
   <string name="openingExplorerAndTablebase">Провідник дебютів &amp; ендшпілів</string>
   <string name="takeback">Повернення ходу</string>
   <string name="proposeATakeback">Запропонувати повернути хід</string>
@@ -502,8 +502,8 @@
   <string name="thankYou">Дякуємо!</string>
   <string name="socialMediaLinks">Посилання на соціальні мережі</string>
   <string name="inlineNotation">Вбудована нотація</string>
-  <string name="watchLichessTV">Дивитись Lichess TV</string>
-  <string name="previouslyOnLichessTV">Раніше на Lichess TV</string>
+  <string name="watchPlaystrategyTV">Дивитись Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Раніше на Playstrategy TV</string>
   <string name="onlinePlayers">Гравці онлайн</string>
   <string name="activeToday">Активні сьогодні</string>
   <string name="activePlayers">Активні гравці</string>
@@ -614,7 +614,7 @@
   <string name="clock">Годинник</string>
   <string name="unauthorizedError">Доступ не надано.</string>
   <string name="noInternetConnection">Немає зв\'язку з Інтернетом. Ви все ще можете грати оффлайн через меню.</string>
-  <string name="connectedToLichess">Ви з\'єднані з lichess.org</string>
+  <string name="connectedToPlaystrategy">Ви з\'єднані з playstrategy.org</string>
   <string name="signedOut">Ви вийшли.</string>
   <string name="loginSuccessful">Ви увійшли</string>
   <string name="playOnTheBoardOffline">Вдвох за дошкою</string>
@@ -682,7 +682,7 @@
   <string name="simulClockHint">Налаштування годинника Фішера. Чим більше учасників, тим більше часу Вам знадобиться.</string>
   <string name="simulAddExtraTime">Ви можете додати собі час, щоб упоратися з сеансом.</string>
   <string name="simulHostExtraTime">Додатковий час організатора</string>
-  <string name="lichessTournaments">Турніри Lichess</string>
+  <string name="playstrategyTournaments">Турніри Playstrategy</string>
   <string name="tournamentFAQ">ЧаПи про турнір Арена</string>
   <string name="tournamentOfficial">Офіційний</string>
   <string name="timeBeforeTournamentStarts">Час до початку турніру</string>
@@ -719,8 +719,8 @@
   <string name="weHaveSentYouAnEmailTo">Ми надіслали повідомлення на адресу %s. Перейдіть за посиланням у повідомленні для скидання паролю.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Реєструючись, Ви даєте згоду дотримуватись наших %s.</string>
   <string name="readAboutOur">Читайте про наш %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Мережева затримка між Вами та Lichess</string>
-  <string name="timeToProcessAMoveOnLichessServer">Час обробки ходу на сервері Lichess</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Мережева затримка між Вами та Playstrategy</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Час обробки ходу на сервері Playstrategy</string>
   <string name="downloadAnnotated">Завантажити з коментарями</string>
   <string name="downloadRaw">Завантажити без коментарів</string>
   <string name="downloadImported">Завантажити імпортоване</string>
@@ -736,7 +736,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Ви вже маєте зареєстровану поштову адресу: %s</string>
   <string name="kidMode">Дитячий режим</string>
   <string name="kidModeExplanation">Це заради безпеки. У дитячому режимі все спілкування на сайті вимкнено. Увімкніть цю функцію для Ваших дітей та учнів, щоб захистити їх від інших користувачів Інтернету.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">В дитячому режимі логотип Lichess замінюється на %s, щоб Ви знали, що Ваші діти в безпеці.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">В дитячому режимі логотип Playstrategy замінюється на %s, щоб Ви знали, що Ваші діти в безпеці.</string>
   <string name="enableKidMode">Увімкнути дитячий режим</string>
   <string name="disableKidMode">Вимкнути дитячий режим</string>
   <string name="security">Безпека</string>
@@ -744,7 +744,7 @@
   <string name="alternativelyYouCanX">Крім того, Ви можете %s.</string>
   <string name="revokeAllSessions">завершити усі сеанси</string>
   <string name="playChessEverywhere">Грайте в шахи будь-де</string>
-  <string name="asFreeAsLichess">Безкоштовний, як і Lichess</string>
+  <string name="asFreeAsPlaystrategy">Безкоштовний, як і Playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Створений з любов\'ю до шахів, не до грошей</string>
   <string name="everybodyGetsAllFeaturesForFree">Усі можливості безкоштовні для всіх</string>
   <string name="zeroAdvertisement">Без реклами</string>
@@ -786,7 +786,7 @@
   <string name="usernameSuffixInvalid">Ім\'я користувача має закінчуватися літерою або цифрою.</string>
   <string name="usernameCharsInvalid">Ім\'я користувача має містити тільки літери, цифри, символи підкреслення і тире.</string>
   <string name="usernameUnacceptable">Неприпустиме ім\'я користувача.</string>
-  <string name="directlySupportLichess">Підтримка Lichess</string>
+  <string name="directlySupportPlaystrategy">Підтримка Playstrategy</string>
   <string name="playChessInStyle">Грайте в шахи стильно</string>
   <string name="chessBasics">Шахові основи</string>
   <string name="coaches">Тренери</string>
@@ -872,14 +872,14 @@
   <string name="tryToWin">Грайте завжди на перемогу (чи принаймні на нічию).</string>
   <string name="resignLostGames">Здавайтеся в програних іграх (не чекайте кінця таймера).</string>
   <string name="temporaryInconvenience">Ми вибачаємося за тимчасові незручності,</string>
-  <string name="wishYouGreatGames">і бажаємо чудових ігор на lichess.org.</string>
+  <string name="wishYouGreatGames">і бажаємо чудових ігор на playstrategy.org.</string>
   <string name="thankYouForReading">Дякуємо, що прочитали!</string>
   <string name="lifetimeScore">Рахунок за весь час</string>
   <string name="currentMatchScore">Поточний рахунок матчу</string>
   <string name="agreementAssistance">Я погоджуюся, що не буду отримувати допомогу під час моїх ігор (від шахового комп\'ютера, книги, бази даних або іншої особи).</string>
   <string name="agreementNice">Я погоджуюся, що я завжди буду ставитись чемно до інших гравців.</string>
   <string name="agreementAccount">Я погоджуюся, що я не буду створювати більше одного облікового запису.</string>
-  <string name="agreementPolicy">Я погоджуюся, що я буду слідувати усім правилам Lichess.</string>
+  <string name="agreementPolicy">Я погоджуюся, що я буду слідувати усім правилам Playstrategy.</string>
   <string name="searchOrStartNewDiscussion">Шукати або розпочати бесіду</string>
   <string name="edit">Змінити</string>
   <string name="rapid">Швидкі</string>

@@ -96,7 +96,7 @@ final class Env(
         case lila.hub.actorApi.fishnet.AutoAnalyse(gameId) =>
           analyser(
             gameId,
-            Work.Sender(userId = lila.user.User.lichessId, ip = none, mod = false, system = true)
+            Work.Sender(userId = lila.user.User.playstrategyId, ip = none, mod = false, system = true)
           ).unit
         case req: lila.hub.actorApi.fishnet.StudyChapterRequest => analyser.study(req).unit
       }

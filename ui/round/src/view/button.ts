@@ -424,4 +424,4 @@ export function watcherFollowUp(ctrl: RoundController): VNode | null {
   return content.find(x => !!x) ? h('div.follow-up', content) : null;
 }
 
-const onSuggestionHook: Hooks = util.onInsert(el => lichess.pubsub.emit('round.suggestion', el.textContent));
+const onSuggestionHook: Hooks = util.onInsert(el => playstrategy.pubsub.emit('round.suggestion', el.textContent));

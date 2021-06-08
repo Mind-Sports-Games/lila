@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="lichessClasses">शिकवणी</string>
-  <string name="teachClassesOfChessStudents">Lichess Class साधनॆचा वापर करुन विद्यार्थ्यांना शिकवा.</string>
+  <string name="playstrategyClasses">शिकवणी</string>
+  <string name="teachClassesOfChessStudents">Playstrategy Class साधनॆचा वापर करुन विद्यार्थ्यांना शिकवा.</string>
   <string name="features">वैशिष्ट्ये</string>
   <string name="teachersX">शिक्षक: %s</string>
   <string name="newClass">नविन शिकवणी</string>
@@ -19,7 +19,7 @@
   <string name="generateANewPassword">या विद्यार्थी साठी नवीन पासवर्ड बनवा</string>
   <string name="realName">खरे नाव</string>
   <string name="addStudent">विद्यार्थी जोडा</string>
-  <string name="lichessUsername">लीचेस वापरकर्तानाव</string>
+  <string name="playstrategyUsername">लीचेस वापरकर्तानाव</string>
   <string name="generateANewUsername">नविन वापरकर्तानाव</string>
   <string name="teachers">शिक्षक</string>
   <plurals name="nbTeachers">

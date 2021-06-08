@@ -71,7 +71,7 @@ final private class TvBroadcast(
       )
       clients.foreach { client =>
         client.queue offer {
-          if (client.fromLichess) msg
+          if (client.fromPlaystrategy) msg
           else feat.socketMsg
         }
       }
@@ -110,8 +110,8 @@ object TvBroadcast {
     def socketMsg   = Socket.makeMessage("featured", dataWithFen)
   }
 
-  case class Connect(fromLichess: Boolean)
-  case class Client(queue: Queue, fromLichess: Boolean)
+  case class Connect(fromPlaystrategy: Boolean)
+  case class Client(queue: Queue, fromPlaystrategy: Boolean)
 
   case class Add(c: Client)
   case class Remove(c: Client)

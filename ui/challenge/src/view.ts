@@ -18,7 +18,7 @@ function renderContent(ctrl: Ctrl): VNode[] {
 }
 
 function userPowertips(vnode: VNode) {
-  lichess.powertip.manualUserIn(vnode.elm);
+  playstrategy.powertip.manualUserIn(vnode.elm);
 }
 
 function allChallenges(ctrl: Ctrl, d: ChallengeData, nb: number): VNode {

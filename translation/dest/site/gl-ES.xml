@@ -273,7 +273,7 @@
     <item quantity="one">Dar %s segundos</item>
     <item quantity="other">Dar %s segundos</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Esta conta violou os Termos de Servizo de Lichess</string>
+  <string name="thisAccountViolatedTos">Esta conta violou os Termos de Servizo de Playstrategy</string>
   <string name="openingExplorerAndTablebase">Explorador de aperturas e base de datos de finais</string>
   <string name="takeback">Rectificar xogada</string>
   <string name="proposeATakeback">Propoñer cambio de xogada</string>
@@ -446,8 +446,8 @@ unha análise por ordenador, un chat de xogo e unha URL para compartir.</string>
   <string name="thankYou">Grazas!</string>
   <string name="socialMediaLinks">Enlaces ás redes sociais</string>
   <string name="inlineNotation">Notación compacta</string>
-  <string name="watchLichessTV">Mirar Lichess TV</string>
-  <string name="previouslyOnLichessTV">Previamente en Lichess TV</string>
+  <string name="watchPlaystrategyTV">Mirar Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Previamente en Playstrategy TV</string>
   <string name="onlinePlayers">Xogadores en liña</string>
   <string name="activeToday">Activos hoxe</string>
   <string name="activePlayers">Xogadores activos</string>
@@ -555,7 +555,7 @@ unha análise por ordenador, un chat de xogo e unha URL para compartir.</string>
   <string name="clock">Reloxo</string>
   <string name="unauthorizedError">Acceso non autorizado.</string>
   <string name="noInternetConnection">Sen conexión a Internet. Aínda podes xogar offline dende o menú.</string>
-  <string name="connectedToLichess">Estás conectado a lichess.org</string>
+  <string name="connectedToPlaystrategy">Estás conectado a playstrategy.org</string>
   <string name="signedOut">Finalizaches a túa sesión.</string>
   <string name="loginSuccessful">Iniciaches sesión</string>
   <string name="playOnTheBoardOffline">No taboleiro</string>
@@ -622,7 +622,7 @@ unha análise por ordenador, un chat de xogo e unha URL para compartir.</string>
   <string name="simulClockHint">Modo Fischer de reloxo. Cantos máis xogadores, máis tempo necesitas.</string>
   <string name="simulAddExtraTime">Podes engadir tempo extra ó teu reloxo para axudarte coa simultánea.</string>
   <string name="simulHostExtraTime">Tempo extra para o simultaneador</string>
-  <string name="lichessTournaments">Torneos de Lichess</string>
+  <string name="playstrategyTournaments">Torneos de Playstrategy</string>
   <string name="tournamentFAQ">Preguntas frecuentes sobre torneos</string>
   <string name="tournamentOfficial">Oficial</string>
   <string name="timeBeforeTournamentStarts">Tempo antes de que o torneo comece</string>
@@ -657,8 +657,8 @@ unha análise por ordenador, un chat de xogo e unha URL para compartir.</string>
   <string name="weHaveSentYouAnEmailTo">Enviámosche un correo a %s. Segue a ligazón no correo para restaurar o teu contrasinal.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Ó rexistrarte, aceptas os nosos %s.</string>
   <string name="readAboutOur">Le acerca a nosa %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Retardo da rede entre ti e máis lichess</string>
-  <string name="timeToProcessAMoveOnLichessServer">Tempo para procesar un movimiento no servidor de lichess</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Retardo da rede entre ti e máis playstrategy</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Tempo para procesar un movimiento no servidor de playstrategy</string>
   <string name="downloadAnnotated">Descarga con notación</string>
   <string name="downloadRaw">Descarga sen notación</string>
   <string name="downloadImported">Descargar importadas</string>
@@ -674,7 +674,7 @@ unha análise por ordenador, un chat de xogo e unha URL para compartir.</string>
   <string name="youHaveAlreadyRegisteredTheEmail">Xa rexistraches o correo: %s</string>
   <string name="kidMode">Modo infantil</string>
   <string name="kidModeExplanation">Por seguridade, no modo infantil desactívanse tódalas comunicacións. Activa isto para protexer aos teus nenos ou alumnos de outros usuarios de Internet.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">En modo infantil, o logo de lichess ten unha icona de %s, indicando que os nenos están seguros.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">En modo infantil, o logo de playstrategy ten unha icona de %s, indicando que os nenos están seguros.</string>
   <string name="enableKidMode">Activar modo infantil</string>
   <string name="disableKidMode">Desactivar modo infantil</string>
   <string name="security">Seguridade</string>
@@ -682,7 +682,7 @@ unha análise por ordenador, un chat de xogo e unha URL para compartir.</string>
   <string name="alternativelyYouCanX">Alternativamente podes %s.</string>
   <string name="revokeAllSessions">pechar todas as sesións</string>
   <string name="playChessEverywhere">Xoga ó xadrez en todas partes</string>
-  <string name="asFreeAsLichess">Tan libre coma lichess</string>
+  <string name="asFreeAsPlaystrategy">Tan libre coma playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Construído por amor ó xadrez, non ó diñeiro</string>
   <string name="everybodyGetsAllFeaturesForFree">Todos obteñen todas as funcións gratis</string>
   <string name="zeroAdvertisement">Publicidade cero</string>
@@ -722,7 +722,7 @@ unha análise por ordenador, un chat de xogo e unha URL para compartir.</string>
   <string name="usernameSuffixInvalid">O nome de usuarui debe rematar cunha letra ou cun número.</string>
   <string name="usernameCharsInvalid">O nome de usuario só pode conter letras, números, trazos baixos e guións.</string>
   <string name="usernameUnacceptable">Este nome de usuario non é aceptable.</string>
-  <string name="directlySupportLichess">Apoiar directamente a Lichess</string>
+  <string name="directlySupportPlaystrategy">Apoiar directamente a Playstrategy</string>
   <string name="playChessInStyle">Xogar ao xadrez con estilo</string>
   <string name="chessBasics">Fundamentos de xadrez</string>
   <string name="coaches">Entrenadores</string>
@@ -802,14 +802,14 @@ unha análise por ordenador, un chat de xogo e unha URL para compartir.</string>
   <string name="tryToWin">Intenta gañar (ou polo menos empatar) todas as partidas que xogues.</string>
   <string name="resignLostGames">Abandona partidas perdidas (non deixes que remate o tempo).</string>
   <string name="temporaryInconvenience">Pedimos desculpas polas molestias</string>
-  <string name="wishYouGreatGames">e desexámosche grandes partidas en lichess.org.</string>
+  <string name="wishYouGreatGames">e desexámosche grandes partidas en playstrategy.org.</string>
   <string name="thankYouForReading">Grazas por tomar o tempo para ler isto!</string>
   <string name="lifetimeScore">Puntuación histórica</string>
   <string name="currentMatchScore">Resultados deste enfrontamento</string>
   <string name="agreementAssistance">Comprométome a non recibir axuda externa durante as miñas partidas (dun computador, un libro, unha base de datos ou de outra persoa).</string>
   <string name="agreementNice">Comprométome a respectar sempre aos outros xogadores.</string>
   <string name="agreementAccount">Comprométome a non crear múltiples contas.</string>
-  <string name="agreementPolicy">Comprométome a seguir as normas de Lichess.</string>
+  <string name="agreementPolicy">Comprométome a seguir as normas de Playstrategy.</string>
   <string name="searchOrStartNewDiscussion">Busca ou comeza unha nova conversa</string>
   <string name="edit">Editar</string>
   <string name="rapid">Rápida</string>

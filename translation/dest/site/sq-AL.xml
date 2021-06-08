@@ -273,7 +273,7 @@
     <item quantity="one">Dhuro %s sekonda</item>
     <item quantity="other">Dhuro %s sekonda</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Kjo llogari ka shkelur Kushtet e Shërbimit të Lichess</string>
+  <string name="thisAccountViolatedTos">Kjo llogari ka shkelur Kushtet e Shërbimit të Playstrategy</string>
   <string name="openingExplorerAndTablebase">Eksploruesi i hapjeve &amp; tabela e fundlojës</string>
   <string name="takeback">Anulo levizje</string>
   <string name="proposeATakeback">Propozo marrje mbrapsht</string>
@@ -445,8 +445,8 @@
   <string name="thankYou">Faleminderit!</string>
   <string name="socialMediaLinks">Lidhjet me llogaritë e mediat sociale</string>
   <string name="inlineNotation">Shenimet ne rresht</string>
-  <string name="watchLichessTV">Shiko Lichess TV</string>
-  <string name="previouslyOnLichessTV">Herën e fundit në Lichess TV</string>
+  <string name="watchPlaystrategyTV">Shiko Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Herën e fundit në Playstrategy TV</string>
   <string name="onlinePlayers">Lojtarët në linjë</string>
   <string name="activeToday">Aktiv sot</string>
   <string name="activePlayers">Lojëtarët aktivë</string>
@@ -554,7 +554,7 @@
   <string name="clock">Koha</string>
   <string name="unauthorizedError">Hyrje e paautorizuar.</string>
   <string name="noInternetConnection">Nuk ka lidhje interneti. Gjithsesi, ju mund të luani të shkëputur nga interneti nëpërmjet menusë.</string>
-  <string name="connectedToLichess">Tani jeni të lidhur me lichess.org</string>
+  <string name="connectedToPlaystrategy">Tani jeni të lidhur me playstrategy.org</string>
   <string name="signedOut">Ju keni dalë nga faqja.</string>
   <string name="loginSuccessful">Hyrje me sukses</string>
   <string name="playOnTheBoardOffline">Luaj i shkëputur, në ekran.</string>
@@ -621,7 +621,7 @@
   <string name="simulClockHint">Koha Fisher. Kundër sa më shumë lojtarëve luani, aq më shumë kohë mund t\'ju nevojitet.</string>
   <string name="simulAddExtraTime">Ju mund të shtoni kohë shtesë për t\'i bërë ballë simultanes.</string>
   <string name="simulHostExtraTime">Kohë shtesë për pritësin</string>
-  <string name="lichessTournaments">Turnetë në Lichess</string>
+  <string name="playstrategyTournaments">Turnetë në Playstrategy</string>
   <string name="tournamentFAQ">Pyetjet e turneve</string>
   <string name="tournamentOfficial">Zyrtar</string>
   <string name="timeBeforeTournamentStarts">Koha deri sa të fillojë turneu</string>
@@ -656,8 +656,8 @@
   <string name="weHaveSentYouAnEmailTo">Kemi dërguar një e-letër te %s. Klikoni lidhjen brenda në e-letër për të rivendosur fjalëkalimin tuaj.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Duke u regjistruar, ju pranoni të jeni të lidhur me %s.</string>
   <string name="readAboutOur">Informohuni rreth %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Vonesë rrjeti ndërmjet juve dhe lichess.</string>
-  <string name="timeToProcessAMoveOnLichessServer">Koha për të përpunuar një lëvizje në serverin e lichess</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Vonesë rrjeti ndërmjet juve dhe playstrategy.</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Koha për të përpunuar një lëvizje në serverin e playstrategy</string>
   <string name="downloadAnnotated">Shkarko bashkë me shënimet.</string>
   <string name="downloadRaw">Shkarko pa shënimet.</string>
   <string name="downloadImported">Shkarko importin</string>
@@ -673,7 +673,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Ju e keni regjistruar tashmë postën elektronike: %s</string>
   <string name="kidMode">Formati për fëmijë</string>
   <string name="kidModeExplanation">Kjo eshte per sigurine. Ne modalitetin per femije, te gjitha komunikimet ne faqe jane te ndaluara. Aktivizoje ket per femijet dhe studentet e shkolles, ti mbrosh ata nga perdoruesit e tjere te internetit.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">Ne modalitetin per femije, logoja e lichess merr nje ikone %s , qe ta dini se femijet tuaj jane te sigurte.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">Ne modalitetin per femije, logoja e playstrategy merr nje ikone %s , qe ta dini se femijet tuaj jane te sigurte.</string>
   <string name="enableKidMode">Aktivizo modalitetin per femije</string>
   <string name="disableKidMode">Çaktivizo modalitetin per femije</string>
   <string name="security">Siguria</string>
@@ -681,7 +681,7 @@
   <string name="alternativelyYouCanX">Ose mund te %s.</string>
   <string name="revokeAllSessions">terhiq te gjitha seksionet</string>
   <string name="playChessEverywhere">Luaj shah kudo</string>
-  <string name="asFreeAsLichess">Pa pagesë si vetë lichess</string>
+  <string name="asFreeAsPlaystrategy">Pa pagesë si vetë playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Ndërtuar nga dashuria për shahun, jo për parane</string>
   <string name="everybodyGetsAllFeaturesForFree">Gjithkush merr të gjitha karakteristikat pa pagesë</string>
   <string name="zeroAdvertisement">Zero reklama</string>
@@ -721,7 +721,7 @@
   <string name="usernameSuffixInvalid">Username duhet të përfundojë me një letër ose një numër.</string>
   <string name="usernameCharsInvalid">Username duhet të përmbajë vetëm letra, numra, nënvizime dhe hyfe.</string>
   <string name="usernameUnacceptable">Emri i perdoruesit nuk eshte i pranueshem.</string>
-  <string name="directlySupportLichess">Mbeshtet Lichess ne menyre te drejtperdrejte</string>
+  <string name="directlySupportPlaystrategy">Mbeshtet Playstrategy ne menyre te drejtperdrejte</string>
   <string name="playChessInStyle">Luaj shah ne stil</string>
   <string name="chessBasics">Bazat e shahut</string>
   <string name="coaches">Trajnerë</string>
@@ -801,14 +801,14 @@
   <string name="tryToWin">Mundohu të fitosh (ose të paktën të barazishësh) çdo lojë që luash.</string>
   <string name="resignLostGames">Dorezoni lojrat e humbura (mos lejoni qe ora te perpiqet).</string>
   <string name="temporaryInconvenience">Na vjen keq për bezdisjen e përkohshme,</string>
-  <string name="wishYouGreatGames">edhe të urojmë lojëra të shkëlqyera në lichess.org.</string>
+  <string name="wishYouGreatGames">edhe të urojmë lojëra të shkëlqyera në playstrategy.org.</string>
   <string name="thankYouForReading">Faleminderit që lexove!</string>
   <string name="lifetimeScore">Rezultati i jetës</string>
   <string name="currentMatchScore">Rezultati aktual i ndeshjes</string>
   <string name="agreementAssistance">Jam dakord që nuk do të marr asnjëherë ndihmë gjatë lojërave të mia (nga një kompjuter shahu, libër, baza e të dhënave ose një person tjetër).</string>
   <string name="agreementNice">Jam dakord që gjithmonë do të jem me respekt ndaj lojtarëve të tjerë.</string>
   <string name="agreementAccount">Jam dakord që nuk do krijoj shumë llogari.</string>
-  <string name="agreementPolicy">Jam dakord që do të ndjek të gjitha politikat e Lichess-it.</string>
+  <string name="agreementPolicy">Jam dakord që do të ndjek të gjitha politikat e Playstrategy-it.</string>
   <string name="searchOrStartNewDiscussion">Kërkoni ose filloni muhabet e re</string>
   <string name="edit">Ndrysho</string>
   <string name="rapid">Rapid</string>
@@ -843,12 +843,12 @@
   <string name="congratsYouWon">Urime, ju fituat!</string>
   <string name="gameVsX">Loja vs %1$s</string>
   <string name="resVsX">%1$s vs %2$s</string>
-  <string name="youJustBecamePatron">Ju sapo u bëtë një Patron i lichess.</string>
+  <string name="youJustBecamePatron">Ju sapo u bëtë një Patron i playstrategy.</string>
   <string name="patronAccountExpired">Llogaria e Patron skadoi</string>
   <string name="pleaseReconsiderRenewIt">Ju lutemi merrni parasysh rinovimin e saj!</string>
   <string name="someoneReviewedYourCoachProfile">Dikush vleresoi profilin tuaj të trajnerit.</string>
   <string name="newPendingReview">Në pritje të shqyrtimit</string>
-  <string name="lostAgainstTOSViolator">Ti ke humbur nga dikush që shkeli rregullat e Lichess</string>
+  <string name="lostAgainstTOSViolator">Ti ke humbur nga dikush që shkeli rregullat e Playstrategy</string>
   <string name="refundXpointsTimeControlY">Kompensim: %1$s pikë %2$s.</string>
   <string name="timeAlmostUp">Koha gati mbaroi!</string>
 </resources>

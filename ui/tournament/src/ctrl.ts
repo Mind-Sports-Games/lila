@@ -29,13 +29,13 @@ export default class TournamentController {
   joinWithTeamSelector = false;
   redraw: () => void;
 
-  private lastStorage = lichess.storage.make('last-redirect');
+  private lastStorage = playstrategy.storage.make('last-redirect');
 
   constructor(opts: TournamentOpts, redraw: () => void) {
     this.opts = opts;
     this.data = opts.data;
     this.redraw = redraw;
-    this.trans = lichess.trans(opts.i18n);
+    this.trans = playstrategy.trans(opts.i18n);
     this.socket = makeSocket(opts.socketSend, this);
     this.page = this.data.standing.page;
     this.focusOnMe = tour.isIn(this);
@@ -55,7 +55,7 @@ export default class TournamentController {
 
   reload = (data: TournamentData): void => {
     // we joined a private tournament! Reload the page to load the chat
-    if (!this.data.me && data.me && this.data['private']) lichess.reload();
+    if (!this.data.me && data.me && this.data['private']) playstrategy.reload();
     this.data = { ...this.data, ...data };
     this.data.me = data.me; // to account for removal on withdraw
     if (data.playerInfo && data.playerInfo.player.id === this.playerInfo.id) this.playerInfo.data = data.playerInfo;
@@ -85,7 +85,7 @@ export default class TournamentController {
     setTimeout(() => {
       if (this.lastStorage.get() !== gameId) {
         this.lastStorage.set(gameId);
-        lichess.redirect('/' + gameId);
+        playstrategy.redirect('/' + gameId);
       }
     }, delay);
   };

@@ -3,10 +3,10 @@
   <string name="activity">Aktivita</string>
   <string name="hostedALiveStream">Hostoval živý stream</string>
   <plurals name="supportedNbMonths">
-    <item quantity="one">Podporuje lichess.org %1$s měsíc jako %2$s</item>
-    <item quantity="few">Podporuje lichess.org %1$s měsíce jako %2$s</item>
-    <item quantity="many">Podporuje lichess.org %1$s měsíců jako %2$s</item>
-    <item quantity="other">Podporuje lichess.org %1$s měsíců jako %2$s</item>
+    <item quantity="one">Podporuje playstrategy.org %1$s měsíc jako %2$s</item>
+    <item quantity="few">Podporuje playstrategy.org %1$s měsíce jako %2$s</item>
+    <item quantity="many">Podporuje playstrategy.org %1$s měsíců jako %2$s</item>
+    <item quantity="other">Podporuje playstrategy.org %1$s měsíců jako %2$s</item>
   </plurals>
   <plurals name="practicedNbPositions">
     <item quantity="one">Procvičena %1$s pozice v %2$s</item>
@@ -99,7 +99,7 @@
     <item quantity="other">Účast v %s švýcarských turnajích</item>
   </plurals>
   <string name="rankedInSwissTournament" comment="rankedInSwissTournament&#10;&#10;%1$s is the numerical rank, e.g. #2 if you came second.&#10;&#10;%2$s is the name of the tournament e.g. Carlsen Arena">%1$s. místo v turnaji %2$s</string>
-  <string name="signedUp">Vytvořen účet na lichess</string>
+  <string name="signedUp">Vytvořen účet na playstrategy</string>
   <plurals name="joinedNbTeams">
     <item quantity="one">Přidal se k %s týmu</item>
     <item quantity="few">Přidal se k %s týmům</item>

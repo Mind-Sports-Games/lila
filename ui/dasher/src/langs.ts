@@ -50,11 +50,11 @@ export function view(ctrl: LangsCtrl): VNode {
       'a.help.text',
       {
         attrs: {
-          href: 'https://crowdin.com/project/lichess',
+          href: 'https://crowdin.com/project/playstrategy',
           'data-icon': '',
         },
       },
-      'Help translate Lichess'
+      'Help translate Playstrategy'
     ),
   ]);
 }

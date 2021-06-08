@@ -47,7 +47,7 @@ export function ctrl(
           body: xhr.form({ set: t }),
           method: 'post',
         })
-        .catch(() => lichess.announce({ msg: 'Failed to save piece set  preference' }));
+        .catch(() => playstrategy.announce({ msg: 'Failed to save piece set  preference' }));
       redraw();
     },
     open,
@@ -82,7 +82,7 @@ function pieceView(current: Piece, set: (t: Piece) => void, is3d: boolean) {
       },
       [
         h('piece', {
-          attrs: { style: `background-image:url(${lichess.assetUrl(pieceImage(t, is3d))})` },
+          attrs: { style: `background-image:url(${playstrategy.assetUrl(pieceImage(t, is3d))})` },
         }),
       ]
     );

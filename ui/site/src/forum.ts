@@ -1,6 +1,6 @@
 import * as xhr from 'common/xhr';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   $('.forum')
     .on('click', 'a.delete', function (this: HTMLAnchorElement) {
       xhr.text(this.href, { method: 'post' });
@@ -31,7 +31,7 @@ lichess.load.then(() => {
       topicId = $(this).attr('data-topic');
 
     if (topicId)
-      lichess.loadScript('vendor/textcomplete.min.js').then(function () {
+      playstrategy.loadScript('vendor/textcomplete.min.js').then(function () {
         const searchCandidates = function (term, candidateUsers) {
           return candidateUsers.filter(function (user) {
             return user.toLowerCase().startsWith(term.toLowerCase());
@@ -74,7 +74,7 @@ lichess.load.then(() => {
           ],
           {
             placement: 'top',
-            appendTo: '#lichess_forum',
+            appendTo: '#playstrategy_forum',
           }
         );
       });
@@ -92,7 +92,7 @@ lichess.load.then(() => {
           $rels.removeClass('loading');
         },
         _ => {
-          lichess.announce({ msg: 'Failed to send forum post reaction' });
+          playstrategy.announce({ msg: 'Failed to send forum post reaction' });
         }
       );
     }

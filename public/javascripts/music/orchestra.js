@@ -1,8 +1,8 @@
-function lichessOrchestra() {
+function playstrategyOrchestra() {
   const load = (instrument, index, filename) =>
-    lichess.sound.loadOggOrMp3(
+    playstrategy.sound.loadOggOrMp3(
       `orchestra.${instrument}.${index}`,
-      `${lichess.sound.baseUrl}/instrument/${instrument}/${filename}`
+      `${playstrategy.sound.baseUrl}/instrument/${instrument}/${filename}`
     );
 
   const volumes = {
@@ -31,7 +31,7 @@ function lichessOrchestra() {
     if (instrument === 'swells') pitch = Math.floor(pitch / 8);
     if (currentNotes < noteOverlap) {
       currentNotes++;
-      lichess.sound.play(`orchestra.${instrument}.${pitch}`, volumes[instrument]);
+      playstrategy.sound.play(`orchestra.${instrument}.${pitch}`, volumes[instrument]);
       setTimeout(() => {
         currentNotes--;
       }, noteTimeout);

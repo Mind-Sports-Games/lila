@@ -37,7 +37,7 @@ final class SelfReport(
               .log("cheat")
               .branch("jslog")
               .info(
-                s"$ip https://lichess.org/$fullId ${user.fold("anon")(_.id)} $name"
+                s"$ip https://playstrategy.org/$fullId ${user.fold("anon")(_.id)} $name"
               )
             user.filter(u => onceEvery(u.id)) foreach { u =>
               slackApi.selfReport(

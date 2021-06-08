@@ -1,7 +1,7 @@
 import modal from 'common/modal';
 
 export function app(input: HTMLInputElement) {
-  lichess.userComplete().then(uac => {
+  playstrategy.userComplete().then(uac => {
     uac({
       input,
       friend: true,
@@ -35,10 +35,10 @@ function command(q: string) {
   else if (is('tv')) location.href = '/tv';
   else if (is('play challenge match') && parts[1]) location.href = '/?user=' + parts[1] + '#friend';
   else if (is('light dark transp'))
-    lichess
+    playstrategy
       .loadModule('dasher')
       .then(() =>
-        window.LichessDasher(document.createElement('div'), {
+        window.PlaystrategyDasher(document.createElement('div'), {
           playing: $('body').hasClass('playing'),
         })
       )
@@ -53,14 +53,14 @@ function commandHelp(aliases: string, args: string, desc: string) {
     '<div class="command"><div>' +
     aliases
       .split(' ')
-      .map(a => `<p>${a} ${lichess.escapeHtml(args)}</p>`)
+      .map(a => `<p>${a} ${playstrategy.escapeHtml(args)}</p>`)
       .join('') +
     `</div> <span>${desc}<span></div>`
   );
 }
 
 function help() {
-  lichess.loadCssPath('clinput.help');
+  playstrategy.loadCssPath('clinput.help');
   modal(
     $(
       '<h3>Commands</h3>' +

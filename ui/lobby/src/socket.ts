@@ -39,7 +39,7 @@ export default class LobbySocket {
       },
     };
 
-    lichess.idleTimer(
+    playstrategy.idleTimer(
       3 * 60 * 1000,
       () => send('idle', true),
       () => {

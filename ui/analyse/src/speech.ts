@@ -1,17 +1,17 @@
 export function setup() {
-  lichess.pubsub.on('speech.enabled', onSpeechChange);
-  onSpeechChange(lichess.sound.speech());
+  playstrategy.pubsub.on('speech.enabled', onSpeechChange);
+  onSpeechChange(playstrategy.sound.speech());
 }
 
 function onSpeechChange(enabled: boolean) {
-  if (!window.LichessSpeech && enabled) lichess.loadModule('speech');
-  else if (window.LichessSpeech && !enabled) window.LichessSpeech = undefined;
+  if (!window.PlaystrategySpeech && enabled) playstrategy.loadModule('speech');
+  else if (window.PlaystrategySpeech && !enabled) window.PlaystrategySpeech = undefined;
 }
 
 export function node(n: Tree.Node) {
   withSpeech(s => s.step(n, true));
 }
 
-function withSpeech(f: (speech: LichessSpeech) => void) {
-  if (window.LichessSpeech) f(window.LichessSpeech);
+function withSpeech(f: (speech: PlaystrategySpeech) => void) {
+  if (window.PlaystrategySpeech) f(window.PlaystrategySpeech);
 }

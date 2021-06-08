@@ -29,7 +29,7 @@ final class Env(
   lazy val discord: DiscordApi = wire[DiscordApi]
 
   if (mode == Mode.Prod) {
-    slack.publishInfo("Lichess has started!")
+    slack.publishInfo("Playstrategy has started!")
     Lilakka.shutdown(shutdown, _.PhaseBeforeServiceUnbind, "Tell slack")(slack.stop _)
   }
 

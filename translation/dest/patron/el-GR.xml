@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">Κάντε δωρεά</string>
-  <string name="lichessPatron">Υποστηρικτής του Lichess</string>
+  <string name="playstrategyPatron">Υποστηρικτής του Playstrategy</string>
   <string name="freeAccount">Δωρεάν λογαριασμός</string>
-  <string name="becomePatron">Υποστηρίξτε το Lichess</string>
-  <string name="xBecamePatron">%s έγινε Υποστηρικτής του Lichess</string>
+  <string name="becomePatron">Υποστηρίξτε το Playstrategy</string>
+  <string name="xBecamePatron">%s έγινε Υποστηρικτής του Playstrategy</string>
   <string name="newPatrons">Νέοι Υποστηρικτές</string>
   <string name="freeChess">Δωρεάν σκάκι για όλους, για πάντα!</string>
   <string name="noAdsNoSubs">Χωρίς διαφημίσεις, χωρίς συνδρομές, αλλά με ανοιχτό κώδικα και πάθος.</string>
@@ -13,10 +13,10 @@
   <string name="patronUntil">Έχετε έναν λογαριασμό Υποστηρικτή μέχρι %s.</string>
   <string name="ifNotRenewed">Εάν δεν ανανεώσετε τη συνδρομή σας, δε θα έχετε τα φτερά Υποστηρικτή πλέον.</string>
   <string name="weAreNonProfit">Είμαστε μια μη κερδοσκοπική οργάνωση που πιστεύει ότι όλοι πρέπει να έχουν πρόσβαση σε μια δωρεάν, παγκόσμιας κλάσης σκακιστική πλατφόρμα.</string>
-  <string name="weRelyOnSupport">Βασιζόμαστε στην υποστήριξη από ανθρώπους σαν εσάς για να το πραγματοποιήσουμε. Αν νιώθετε ευχαρίστηση να χρησιμοποιείτε το Lichess, παρακαλώ σκεφτείτε να μας υποστηρίξετε με δωρεά και να γίνεται Υποστηρικτής!</string>
+  <string name="weRelyOnSupport">Βασιζόμαστε στην υποστήριξη από ανθρώπους σαν εσάς για να το πραγματοποιήσουμε. Αν νιώθετε ευχαρίστηση να χρησιμοποιείτε το Playstrategy, παρακαλώ σκεφτείτε να μας υποστηρίξετε με δωρεά και να γίνεται Υποστηρικτής!</string>
   <string name="lifetime">Για πάντα</string>
-  <string name="payLifetimeOnce">Πληρώστε %s μια φορά. Γίνετε Υποστηρικτής του Lichess για πάντα!</string>
-  <string name="lifetimePatron">Υποστηρικτής του Lichess για πάντα</string>
+  <string name="payLifetimeOnce">Πληρώστε %s μια φορά. Γίνετε Υποστηρικτής του Playstrategy για πάντα!</string>
+  <string name="lifetimePatron">Υποστηρικτής του Playstrategy για πάντα</string>
   <string name="makeExtraDonation">Θέλετε να κάνετε μια επιπλέον δωρεά;</string>
   <string name="monthly">Μηνιαία</string>
   <string name="recurringBilling">Επαναλαμβανόμενη χρέωση, ανανέωση των φτερών Υποστηρικτή κάθε μήνα.</string>
@@ -27,29 +27,29 @@
   <string name="withCreditCard">Πιστωτική κάρτα</string>
   <string name="withPaypal">PayPal</string>
   <string name="weAreSmallTeam">Είμαστε μια μικρή ομάδα, επομένως η υποστήριξή σας κάνει μεγάλη διαφορά!</string>
-  <string name="celebratedPatrons">Οι διάσημοι Υποστηρικτές που έκαναν το Lichess πραγματικότητα</string>
+  <string name="celebratedPatrons">Οι διάσημοι Υποστηρικτές που έκαναν το Playstrategy πραγματικότητα</string>
   <string name="whereMoneyGoes">Που πηγαίνουν τα χρήματα;</string>
   <string name="serversAndDeveloper">Καταρχήν, σε δυνατούς διακομιστές.
-Έπειτα πληρώνουμε έναν προγραμματιστή πλήρους απασχόλησης: %s, τον ιδρυτή του Lichess.</string>
+Έπειτα πληρώνουμε έναν προγραμματιστή πλήρους απασχόλησης: %s, τον ιδρυτή του Playstrategy.</string>
   <string name="costBreakdown">Δείτε τα αναλυτικά έξοδα</string>
-  <string name="officialNonProfit">Είναι το Lichess επίσημα μια μη κερδοσκοπική οργάνωση;</string>
+  <string name="officialNonProfit">Είναι το Playstrategy επίσημα μια μη κερδοσκοπική οργάνωση;</string>
   <string name="actOfCreation">Ναι, εδώ είναι η πράξη δημιουργίας (στα γαλλικά)</string>
   <string name="changeMonthlySupport">Μπορώ να αλλάξω/ακυρώσω την μηνιαία υποστήριξη μου;</string>
   <string name="changeOrContact">Ναι, οποιαδήποτε στιγμή, από αυτή τη σελίδα.
 Ή μπορείτε %s.</string>
-  <string name="contactSupport">να επικοινωνήσετε με την εξυπηρέτηση του Lichess</string>
+  <string name="contactSupport">να επικοινωνήσετε με την εξυπηρέτηση του Playstrategy</string>
   <string name="otherMethods">Υπάρχουν άλλοι τρόποι δωρεάς;</string>
   <string name="bankTransfers">Επίσης δεχόμαστε τραπεζικές μεταφορές</string>
   <string name="bitcoin">Και εδώ είναι η διεύθυνση bitcoin μας: %s</string>
   <string name="patronFeatures">Υπάρχουν κάποιες δυνατότητες μόνο για Υποστηρικτές;</string>
-  <string name="noPatronFeatures">Όχι, επειδή το Lichess είναι δωρεάν για πάντα και για όλους. Αυτό είναι μία υπόσχεση.
+  <string name="noPatronFeatures">Όχι, επειδή το Playstrategy είναι δωρεάν για πάντα και για όλους. Αυτό είναι μία υπόσχεση.
 Όμως, οι Υποστηρικτές μπορούν να καυχώνται για το υπέροχο εικονίδιο στο προφίλ τους.</string>
   <string name="featuresComparison">Δείτε την αναλυτική σύγκριση δυνατοτήτων</string>
   <plurals name="patronForMonths">
-    <item quantity="one">Υποστηρικτής του Lichess για ένα μήνα</item>
-    <item quantity="other">Υποστηρικτής του Lichess για %s μήνες</item>
+    <item quantity="one">Υποστηρικτής του Playstrategy για ένα μήνα</item>
+    <item quantity="other">Υποστηρικτής του Playstrategy για %s μήνες</item>
   </plurals>
-  <string name="youSupportWith">Υποστηρίζετε το lichess.org με %s μηνιαίως.</string>
+  <string name="youSupportWith">Υποστηρίζετε το playstrategy.org με %s μηνιαίως.</string>
   <string name="tyvm">Ευχαριστούμε πολύ για την βοήθεια!</string>
   <string name="currentStatus">Τρέχουσα κατάσταση</string>
   <string name="nextPayment">Επόμενη πληρωμή</string>
@@ -59,18 +59,18 @@
   <string name="changeMonthlyAmount">Αλλαγή του μηνιαίου ποσού (%s)</string>
   <string name="cancelSupport">διακοπή της υποστήριξής σας</string>
   <string name="xOrY">%1$s ή %2$s</string>
-  <string name="decideHowMuch">Αποφασίστε πόσο αξίζει το Lichess για εσάς:</string>
+  <string name="decideHowMuch">Αποφασίστε πόσο αξίζει το Playstrategy για εσάς:</string>
   <string name="stopPayments">Αφαίρεση της πιστωτικής κάρτας και παύση πληρωμών:</string>
-  <string name="noLongerSupport">Διακοπή υποστήριξης του Lichess</string>
+  <string name="noLongerSupport">Διακοπή υποστήριξης του Playstrategy</string>
   <string name="paymentHistory">Ιστορικό πληρωμών</string>
   <string name="paid">Πληρώθηκε</string>
-  <string name="viewOthers">Προβολή άλλων Υποστηρικτών Lichess</string>
+  <string name="viewOthers">Προβολή άλλων Υποστηρικτών Playstrategy</string>
   <string name="date">Ημερομηνία</string>
   <string name="amount">Ποσό</string>
   <string name="transactionCompleted">Η συναλλαγή σας ολοκληρώθηκε, και μια απόδειξη για τη δωρεά σας έχει αποσταλεί στην διεύθυνση email σας.</string>
   <string name="permanentPatron">Πλέον έχετε έναν μόνιμο λογαριασμό Υποστηρικτή.</string>
   <string name="checkOutProfile">Δείτε τη σελίδα του προφίλ σας!</string>
-  <string name="nowLifetime">Είστε πλέον ένας Υποστηρικτής του Lichess για πάντα!</string>
-  <string name="nowOneMonth">Είστε ένας υποστηρικτής του Lichess για αυτόν τον μήνα!</string>
+  <string name="nowLifetime">Είστε πλέον ένας Υποστηρικτής του Playstrategy για πάντα!</string>
+  <string name="nowOneMonth">Είστε ένας υποστηρικτής του Playstrategy για αυτόν τον μήνα!</string>
   <string name="downgradeNextMonth">Σε ένα μήνα, ΔΕ θα χρεωθείτε ξανά, και ο λογαριασμός σας θα υποβαθμιστεί σε έναν κοινό λογαριασμό.</string>
 </resources>

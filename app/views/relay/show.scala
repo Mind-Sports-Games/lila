@@ -25,7 +25,7 @@ object show {
       moreJs = frag(
         analyseTag,
         analyseNvuiTag,
-        embedJsUnsafe(s"""lichess.relay=${safeJsonValue(
+        embedJsUnsafe(s"""playstrategy.relay=${safeJsonValue(
           Json.obj(
             "relay"    -> data.relay,
             "study"    -> data.study.add("admin" -> isGranted(_.StudyAdmin)),

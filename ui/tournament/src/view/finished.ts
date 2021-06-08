@@ -10,10 +10,10 @@ import teamInfo from './teamInfo';
 import { numberRow } from './util';
 
 function confetti(data: TournamentData): VNode | undefined {
-  if (data.me && data.isRecentlyFinished && lichess.once('tournament.end.canvas.' + data.id))
+  if (data.me && data.isRecentlyFinished && playstrategy.once('tournament.end.canvas.' + data.id))
     return h('canvas#confetti', {
       hook: {
-        insert: _ => lichess.loadScript('javascripts/confetti.js'),
+        insert: _ => playstrategy.loadScript('javascripts/confetti.js'),
       },
     });
 }
@@ -91,7 +91,7 @@ function stats(data: TournamentData, trans: Trans): VNode {
         {
           attrs: {
             'data-icon': '',
-            href: 'https://lichess.org/api#tag/Arena-tournaments',
+            href: 'https://playstrategy.org/api#tag/Arena-tournaments',
           },
         },
         'Arena API documentation'

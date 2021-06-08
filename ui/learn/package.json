@@ -2,12 +2,12 @@
   "name": "learn",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org chess performance statistics",
+  "description": "playstrategy.org chess performance statistics",
   "type": "module",
   "module": "src/main.js",
   "keywords": [
     "chess",
-    "lichess",
+    "playstrategy",
     "learn"
   ],
   "author": "ornicar",

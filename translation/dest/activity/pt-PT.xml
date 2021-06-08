@@ -3,8 +3,8 @@
   <string name="activity">Atividade</string>
   <string name="hostedALiveStream">Criou uma livestream</string>
   <plurals name="supportedNbMonths">
-    <item quantity="one">Apoiou o lichess.org durante %1$s mês como %2$s</item>
-    <item quantity="other">Apoiou o lichess.org durante %1$s meses como %2$s</item>
+    <item quantity="one">Apoiou o playstrategy.org durante %1$s mês como %2$s</item>
+    <item quantity="other">Apoiou o playstrategy.org durante %1$s meses como %2$s</item>
   </plurals>
   <plurals name="practicedNbPositions">
     <item quantity="one">Praticou %1$s posição em %2$s</item>
@@ -67,7 +67,7 @@
     <item quantity="other">Competiu em %s torneios suíços</item>
   </plurals>
   <string name="rankedInSwissTournament" comment="rankedInSwissTournament&#10;&#10;%1$s is the numerical rank, e.g. #2 if you came second.&#10;&#10;%2$s is the name of the tournament e.g. Carlsen Arena">Classificado #%1$s em %2$s</string>
-  <string name="signedUp">Registou-se no lichess.org</string>
+  <string name="signedUp">Registou-se no playstrategy.org</string>
   <plurals name="joinedNbTeams">
     <item quantity="one">Entrou em %s equipa</item>
     <item quantity="other">Entrou em %s equipas</item>

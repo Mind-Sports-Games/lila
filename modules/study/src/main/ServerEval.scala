@@ -27,7 +27,7 @@ object ServerEval {
         !eval.done && onceEvery(chapter.id.value)
       } ?? {
         val unlimitedFu =
-          fuccess(userId == User.lichessId) >>| userRepo
+          fuccess(userId == User.playstrategyId) >>| userRepo
             .byId(userId)
             .map(_.exists(Granter(_.Relay)))
         unlimitedFu flatMap { unlimited =>
@@ -77,7 +77,7 @@ object ServerEval {
                     } >> {
                       import BSONHandlers._
                       import Node.{ BsonFields => F }
-                      ((info.eval.score.isDefined && node.score.isEmpty) || (advOpt.isDefined && !node.comments.hasLichessComment)) ??
+                      ((info.eval.score.isDefined && node.score.isEmpty) || (advOpt.isDefined && !node.comments.hasPlaystrategyComment)) ??
                         chapterRepo
                           .setNodeValues(
                             chapter,
@@ -86,7 +86,7 @@ object ServerEval {
                               F.score -> info.eval.score
                                 .ifTrue {
                                   node.score.isEmpty ||
-                                  advOpt.isDefined && node.comments.findBy(Comment.Author.Lichess).isEmpty
+                                  advOpt.isDefined && node.comments.findBy(Comment.Author.Playstrategy).isEmpty
                                 }
                                 .flatMap(EvalScoreBSONHandler.writeOpt),
                               F.comments -> advOpt
@@ -94,7 +94,7 @@ object ServerEval {
                                   node.comments + Comment(
                                     Comment.Id.make,
                                     Comment.Text(adv.makeComment(withEval = false, withBestMove = true)),
-                                    Comment.Author.Lichess
+                                    Comment.Author.Playstrategy
                                   )
                                 }
                                 .flatMap(CommentsBSONHandler.writeOpt),

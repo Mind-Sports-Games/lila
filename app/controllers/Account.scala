@@ -451,7 +451,7 @@ final class Account(
               env.api.personalDataExport(user)
             ) { source =>
               Ok.chunked(source.map(_ + "\n"))
-                .pipe(asAttachmentStream(s"lichess_${user.username}.txt"))
+                .pipe(asAttachmentStream(s"playstrategy_${user.username}.txt"))
             }
           else Ok(html.account.bits.data(user))
         }

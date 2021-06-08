@@ -35,7 +35,7 @@ export class WebWorker extends AbstractWorker<WebWorkerOpts> {
   private worker: Worker;
 
   boot(): Promise<Protocol> {
-    this.worker = new Worker(lichess.assetUrl(this.opts.url, { sameDomain: true }));
+    this.worker = new Worker(playstrategy.assetUrl(this.opts.url, { sameDomain: true }));
     const protocol = new Protocol(this.send.bind(this), this.protocolOpts);
     this.worker.addEventListener(
       'message',
@@ -75,7 +75,7 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
     const progress = this.opts.downloadProgress;
     const cache = this.opts.cache;
     const wasmPath = this.opts.baseUrl + 'stockfish.wasm';
-    ThreadedWasmWorker.protocols[this.opts.module] ||= lichess
+    ThreadedWasmWorker.protocols[this.opts.module] ||= playstrategy
       .loadScript(this.opts.baseUrl + 'stockfish.js', { version })
       .then(
         _ =>
@@ -89,7 +89,7 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
               }
             }
             const req = new XMLHttpRequest();
-            req.open('GET', lichess.assetUrl(wasmPath, { version }), true);
+            req.open('GET', playstrategy.assetUrl(wasmPath, { version }), true);
             req.responseType = 'arraybuffer';
             req.onerror = event => reject(event);
             req.onprogress = event => progress(event.loaded);
@@ -107,7 +107,7 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
         return window[this.opts.module]({
           wasmBinary,
           locateFile: (path: string) =>
-            lichess.assetUrl(this.opts.baseUrl + path, { version, sameDomain: path.endsWith('.worker.js') }),
+            playstrategy.assetUrl(this.opts.baseUrl + path, { version, sameDomain: path.endsWith('.worker.js') }),
           wasmMemory: this.opts.wasmMemory,
         });
       })

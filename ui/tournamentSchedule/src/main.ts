@@ -8,13 +8,13 @@ const patch = init([classModule, attributesModule]);
 dragscroll; // required to include the dependency :( :( :(
 
 export default function (env: any) {
-  lichess.StrongSocket.defaultParams.flag = 'tournament';
+  playstrategy.StrongSocket.defaultParams.flag = 'tournament';
 
   const element = document.querySelector('.tour-chart') as HTMLElement;
 
   const ctrl = {
     data: () => env.data,
-    trans: lichess.trans(env.i18n),
+    trans: playstrategy.trans(env.i18n),
   };
 
   let vnode: VNode;
@@ -26,7 +26,7 @@ export default function (env: any) {
 
   setInterval(redraw, 3700);
 
-  lichess.pubsub.on('socket.in.reload', d => {
+  playstrategy.pubsub.on('socket.in.reload', d => {
     env.data = {
       created: update(env.data.created, d.created),
       started: update(env.data.started, d.started),

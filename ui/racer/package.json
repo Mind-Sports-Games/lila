@@ -2,10 +2,10 @@
   "name": "racer",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org puzzle racer",
+  "description": "playstrategy.org puzzle racer",
   "keywords": [
     "chess",
-    "lichess",
+    "playstrategy",
     "puzzle",
     "racer"
   ],
@@ -13,7 +13,7 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@build/rollupProject": "2.0.0",
-    "@types/lichess": "2.0.0"
+    "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
     "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git",

@@ -17,7 +17,7 @@ export default function (ctrl: SwissCtrl) {
     {
       hook: {
         postpatch() {
-          lichess.miniGame.initAll();
+          playstrategy.miniGame.initAll();
         },
       },
     },
@@ -25,7 +25,7 @@ export default function (ctrl: SwissCtrl) {
       h('aside.swiss__side', {
         hook: onInsert(el => {
           $(el).replaceWith(ctrl.opts.$side);
-          ctrl.opts.chat && lichess.makeChat(ctrl.opts.chat);
+          ctrl.opts.chat && playstrategy.makeChat(ctrl.opts.chat);
         }),
       }),
       h('div.swiss__underchat', {
@@ -37,7 +37,7 @@ export default function (ctrl: SwissCtrl) {
       h('div.swiss__main', [h('div.box.swiss__main-' + d.status, content), boards.many(d.boards)]),
       ctrl.opts.chat
         ? h('div.chat__members.none', {
-            hook: onInsert(lichess.watchers),
+            hook: onInsert(playstrategy.watchers),
           })
         : null,
     ]
@@ -109,7 +109,7 @@ function nextRound(ctrl: SwissCtrl): VNode | undefined {
           value: ctrl.data.nextRound?.at || '',
         },
         hook: onInsert((el: HTMLInputElement) =>
-          window['LichessFlatpickr'](el, {
+          window['PlaystrategyFlatpickr'](el, {
             minDate: 'today',
             maxDate: new Date(Date.now() + 1000 * 3600 * 24 * 31),
             dateFormat: 'Z',
@@ -214,10 +214,10 @@ function joinTheGame(ctrl: SwissCtrl) {
 }
 
 function confetti(data: SwissData): VNode | undefined {
-  return data.me && data.isRecentlyFinished && lichess.once('tournament.end.canvas.' + data.id)
+  return data.me && data.isRecentlyFinished && playstrategy.once('tournament.end.canvas.' + data.id)
     ? h('canvas#confetti', {
         hook: {
-          insert: _ => lichess.loadScript('javascripts/confetti.js'),
+          insert: _ => playstrategy.loadScript('javascripts/confetti.js'),
         },
       })
     : undefined;
@@ -300,7 +300,7 @@ function stats(ctrl: SwissCtrl): VNode | undefined {
             {
               attrs: {
                 'data-icon': '',
-                href: 'https://lichess.org/api#tag/Swiss-tournaments',
+                href: 'https://playstrategy.org/api#tag/Swiss-tournaments',
               },
             },
             'Swiss API documentation'

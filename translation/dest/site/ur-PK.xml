@@ -444,8 +444,8 @@
   <string name="thankYou">آپ کا شکریہ!</string>
   <string name="socialMediaLinks">سوشل میڈیا کے لنکس</string>
   <string name="inlineNotation">ان لائن نوٹیشن</string>
-  <string name="watchLichessTV">Lichess نشریات</string>
-  <string name="previouslyOnLichessTV">Lichess گذشتہ نشریات</string>
+  <string name="watchPlaystrategyTV">Playstrategy نشریات</string>
+  <string name="previouslyOnPlaystrategyTV">Playstrategy گذشتہ نشریات</string>
   <string name="onlinePlayers">آن لائن کھلاڑی</string>
   <string name="activeToday">آج سب سے فعال</string>
   <string name="activePlayers">فعال کھلاڑی</string>
@@ -548,7 +548,7 @@
   <string name="clock">دورانیہ</string>
   <string name="unauthorizedError">داخلہ ممنوع ہے</string>
   <string name="noInternetConnection">انٹرنیٹ سے رابطہ نہیں- آپ پھربھی فہرست سے بغیر رابطے کے کھیل شروع کر سکتے ہیں</string>
-  <string name="connectedToLichess">آپ اب lichess.org سے منسلک ہیں</string>
+  <string name="connectedToPlaystrategy">آپ اب playstrategy.org سے منسلک ہیں</string>
   <string name="signedOut">آپکو خارج کردیا گیا ہے</string>
   <string name="loginSuccessful">آپ داخل ہیں</string>
   <string name="playOnTheBoardOffline">حقیقی بساط پر</string>
@@ -614,7 +614,7 @@
   <string name="simulClockHint">فشر کا نظام وقت۔ جتنے زیادہ حریف منتخب کریں گے اتنا زیادہ وقت درکار ہو گا۔</string>
   <string name="simulAddExtraTime">اپنے لیے اضافی وقت منتخب کر سکتے ہیں-</string>
   <string name="simulHostExtraTime">میزبان کیلیے اضافی دورانیہ</string>
-  <string name="lichessTournaments">مسابقہ جات</string>
+  <string name="playstrategyTournaments">مسابقہ جات</string>
   <string name="tournamentFAQ">مسابقے سے متعلق عمومی سوال و جواب</string>
   <string name="tournamentOfficial">رسمی</string>
   <string name="timeBeforeTournamentStarts">مسابقہ شروع ہونے میں باقی وقت</string>
@@ -648,8 +648,8 @@
   <string name="ifYouDoNotSeeTheEmailCheckOtherPlaces">ہم نے آپ کو ای میل بھیجا ہے. ای میل مے دیےگئے لنک پی کلک کر کے اکاؤنٹ اکتیواتے کریں</string>
   <string name="weHaveSentYouAnEmailTo">ہم نے %s کو ای میل بھیج دی ہے۔ لنک پر کلک کر کے اپنا پاس ورڈ تبدیل کر لیں.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">رجسٹریشن کرکے، آپ ہماری %s پر پابندی پر اتفاق کرتے ہیں.</string>
-  <string name="networkLagBetweenYouAndLichess">آپ اور لی چیس کے درمیان نیٹ ورک لیگ</string>
-  <string name="timeToProcessAMoveOnLichessServer">لی چیس سرور پر چال پراسس کرنے کا وقت</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">آپ اور لی چیس کے درمیان نیٹ ورک لیگ</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">لی چیس سرور پر چال پراسس کرنے کا وقت</string>
   <string name="downloadAnnotated">وضاحت شدہ PGN ڈاون لوڈ کریں</string>
   <string name="downloadRaw">خالی PGN ڈاون لوڈ کریں</string>
   <string name="downloadImported">برامد شدہ PGN ڈاون لوڈ کریں</string>
@@ -665,7 +665,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">آپ موجودہ ای میل :%s پہلے ہی رساٹر کر چکے ہیں</string>
   <string name="kidMode">بچوں کے لئے خاص موڈ</string>
   <string name="kidModeExplanation">یہ حفاظت کے بارے میں ہے۔ کڈز موڈ میں ، تمام سائٹ مواصلات غیر فعال ہیں۔ اس کو آن کر کے اپنے بچوں اور سکول کے طلبا کو انٹرنیٹ صارفین سے محفوظ رکھیں.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">کڈز موڈ میں لی چیس لوگو پر %s آئیکن آجاتا ہے، تا کہ آپ کو پتہ ہو کہ آپ کے بچے محفوظ ہیں.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">کڈز موڈ میں لی چیس لوگو پر %s آئیکن آجاتا ہے، تا کہ آپ کو پتہ ہو کہ آپ کے بچے محفوظ ہیں.</string>
   <string name="enableKidMode">کڈز موڈ آن کریں</string>
   <string name="disableKidMode">کڈز موڈ آف کریں</string>
   <string name="security">سیکورٹی</string>
@@ -673,7 +673,7 @@
   <string name="alternativelyYouCanX">اس کے بجائے آپ %s کر سکتے ہیں.</string>
   <string name="revokeAllSessions">تمام سیشنز کالعدم قرار دے دیں</string>
   <string name="playChessEverywhere">شطرنج کھلیں ہر جگا</string>
-  <string name="asFreeAsLichess">لی چیس کی طرح مفت</string>
+  <string name="asFreeAsPlaystrategy">لی چیس کی طرح مفت</string>
   <string name="builtForTheLoveOfChessNotMoney">شطرنج سے محبت کے لئے بنا ،پیسوں کی لئے نہی</string>
   <string name="everybodyGetsAllFeaturesForFree">تمام لوگوں کو ساری خصوصیات مفت ملیں گی</string>
   <string name="zeroAdvertisement">اشتہارات سے مبرا</string>
@@ -713,7 +713,7 @@
   <string name="usernameSuffixInvalid">نام کا اختتام کسے حرف یا نمبر سے ہونا چاہیے.</string>
   <string name="usernameCharsInvalid">نام میں صرف حروف، نمبر، انڈر سکور اورہائفنز کا استعمال ہو سکتا ہے.</string>
   <string name="usernameUnacceptable">یہ نام قابل استعمال نہیں.</string>
-  <string name="directlySupportLichess">لی چیس کی براہ راست مدد کریں</string>
+  <string name="directlySupportPlaystrategy">لی چیس کی براہ راست مدد کریں</string>
   <string name="playChessInStyle">شطرنج کھیلیں منفرد انداز میں</string>
   <string name="chessBasics">شطرنج کی بنیادی باتیں</string>
   <string name="coaches">کوچز</string>
@@ -793,7 +793,7 @@
   <string name="tryToWin">ہر بازی کو جیتنے(یا کم از کم برابر کرنے) کی کوشش کریں.</string>
   <string name="resignLostGames">ہاری ہوئی بازیوں سے استعفی دے دیں (وقت کو ختم نہ ہونے دیں).</string>
   <string name="temporaryInconvenience">ہم عارضی تکلیف کے لیے معذرت خواہ ہیں</string>
-  <string name="wishYouGreatGames">اور امید کرتے ہیں کہ آپ lichess.org پرعمدہ بازیوں سے لطف اندوز ہوں گے.</string>
+  <string name="wishYouGreatGames">اور امید کرتے ہیں کہ آپ playstrategy.org پرعمدہ بازیوں سے لطف اندوز ہوں گے.</string>
   <string name="thankYouForReading">پڑھنے کا شکریہ!</string>
   <string name="lifetimeScore">زندگی بھر کا سکور</string>
   <string name="currentMatchScore">اس میچ کا سکور</string>

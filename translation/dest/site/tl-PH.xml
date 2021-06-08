@@ -274,7 +274,7 @@
     <item quantity="one">Magbigay ng %s segundo</item>
     <item quantity="other">Magbigay ng %s mga segundo</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Ang account na ito ay lumabag sa Mga Palatuntunan ng Lichess</string>
+  <string name="thisAccountViolatedTos">Ang account na ito ay lumabag sa Mga Palatuntunan ng Playstrategy</string>
   <string name="openingExplorerAndTablebase">Bubukas tagalakbay &amp; base ng talahanayan</string>
   <string name="takeback">Kunin muli</string>
   <string name="proposeATakeback">Magmungkahi ng pagkuha muli</string>
@@ -446,8 +446,8 @@
   <string name="thankYou">Salamat!</string>
   <string name="socialMediaLinks">Mga link ng social media</string>
   <string name="inlineNotation">Nakalinyang notasyon</string>
-  <string name="watchLichessTV">Tumingin sa Lichess TV</string>
-  <string name="previouslyOnLichessTV">Ang Nakaraan sa Lichess TV</string>
+  <string name="watchPlaystrategyTV">Tumingin sa Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Ang Nakaraan sa Playstrategy TV</string>
   <string name="onlinePlayers">Mga online na manlalaro</string>
   <string name="activeToday">Aktibo ngayon</string>
   <string name="activePlayers">Aktibong manlalaro</string>
@@ -555,7 +555,7 @@
   <string name="clock">Orasan</string>
   <string name="unauthorizedError">Ang pagbukas ay hindi pinapayagan.</string>
   <string name="noInternetConnection">Walang koneksyon ng internet. Pwede ka parin maglaro ng offline galing sa menu.</string>
-  <string name="connectedToLichess">Konectado sa lichess.org</string>
+  <string name="connectedToPlaystrategy">Konectado sa playstrategy.org</string>
   <string name="signedOut">Ikaw ay nasign-out</string>
   <string name="loginSuccessful">Ikaw ay nasign-in ngayon</string>
   <string name="playOnTheBoardOffline">Sa ibabaw ng board</string>
@@ -622,7 +622,7 @@
   <string name="simulClockHint">Fischer na Orasan ng pagaayos. Mas maraming manlalaro na iyong nilaro, mas maraming oras ang iyong maaring kailanganin.</string>
   <string name="simulAddExtraTime">Maaring magdadag ng sobrang oras sa iyong orasan upang tumulong na makaya ang simul.</string>
   <string name="simulHostExtraTime">Maghost ng sobrang oras sa orasan</string>
-  <string name="lichessTournaments">Mga Paligsahan ng Lichess</string>
+  <string name="playstrategyTournaments">Mga Paligsahan ng Playstrategy</string>
   <string name="tournamentFAQ">Lugar ng paligsahan na FAQ</string>
   <string name="tournamentOfficial">Opisyal</string>
   <string name="timeBeforeTournamentStarts">Oras bago magsimula ang paligsahan</string>
@@ -657,8 +657,8 @@
   <string name="weHaveSentYouAnEmailTo">Kami ay nagpadala ng email kay %s. I-click ang link sa email upang ibalik ang iyong password.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Sa pagrerehistro, ikaw ay pumayag na madikit sa aming %s.</string>
   <string name="readAboutOur">Basahin ang aming %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Network lag sa pagitan mo at ng lichess</string>
-  <string name="timeToProcessAMoveOnLichessServer">Oras upang maproseso ang isang galaw sa server ng lichess</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Network lag sa pagitan mo at ng playstrategy</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Oras upang maproseso ang isang galaw sa server ng playstrategy</string>
   <string name="downloadAnnotated">I-download ang na-annotate</string>
   <string name="downloadRaw">I-download ang raw</string>
   <string name="downloadImported">Naluwas na mga nadownload</string>
@@ -674,7 +674,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Ikaw ay nakarehistro na sa email: %s</string>
   <string name="kidMode">Batang mode</string>
   <string name="kidModeExplanation">Ito ay tungkol sa kaligtasan. Sa batang mode, lahat ng site pangkomunikasyon ay hindi pinagana. Paganahin ito para sa iyong mga bata at mga studyante, upang maprotektahan sa ibang gumagamit ng internet.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">Sa batang mode, ang logo ng lichess ay nakakuha ng %s icon, dapat malaman na ligtas ang iyong bata.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">Sa batang mode, ang logo ng playstrategy ay nakakuha ng %s icon, dapat malaman na ligtas ang iyong bata.</string>
   <string name="enableKidMode">Paganahin ang Batang mode</string>
   <string name="disableKidMode">Huwag paganahin ang batang mode</string>
   <string name="security">Seguridad</string>
@@ -682,7 +682,7 @@
   <string name="alternativelyYouCanX">Altenatibong pwede mong %s.</string>
   <string name="revokeAllSessions">bawiin ang lahat ng sesyon</string>
   <string name="playChessEverywhere">Maglaro ng chess kahit saan</string>
-  <string name="asFreeAsLichess">Kasinglibre ng lichess</string>
+  <string name="asFreeAsPlaystrategy">Kasinglibre ng playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Ginawa para sa pag-ibig sa chess, hindi sa pera</string>
   <string name="everybodyGetsAllFeaturesForFree">Ang lahat ay nakakuha ng lahat ng tampok ng libre</string>
   <string name="zeroAdvertisement">Walang advertisement</string>
@@ -722,7 +722,7 @@
   <string name="usernameSuffixInvalid">Kailangang tapusin ang iyong pangalan gamit ang kahit anong letra o numero.</string>
   <string name="usernameCharsInvalid">Maaari lang maglaman ang iyong pangalan ng mga letra, numero, salungguhit, at gitling.</string>
   <string name="usernameUnacceptable">Ang username na ito ay hindi matatanggap.</string>
-  <string name="directlySupportLichess">Direktang sumusuporta sa Lichess</string>
+  <string name="directlySupportPlaystrategy">Direktang sumusuporta sa Playstrategy</string>
   <string name="playChessInStyle">Maglaro ng chess na may istilo</string>
   <string name="chessBasics">Mga pangunahing kaalaman ng Chess</string>
   <string name="coaches">Mga Tagapagsanay</string>
@@ -802,14 +802,14 @@
   <string name="tryToWin">Subukan mong maipanalo (o maitabla man lamang) ang bawat larong nilalaro mo.</string>
   <string name="resignLostGames">Magbitiw sa mga talong laro (huwag hayaang maubos ang oras).</string>
   <string name="temporaryInconvenience">Humihingi kami ng paumanhin sa pansamantalang abala,</string>
-  <string name="wishYouGreatGames">at hiling ko para sa iyo na magkaroon ka ng mga dakilang laro sa lichess.org.</string>
+  <string name="wishYouGreatGames">at hiling ko para sa iyo na magkaroon ka ng mga dakilang laro sa playstrategy.org.</string>
   <string name="thankYouForReading">Salamat sa pagbasa!</string>
   <string name="lifetimeScore">Panghabambuhay na iskor</string>
   <string name="currentMatchScore">Kasalukuyang iskor ng labanan</string>
   <string name="agreementAssistance">Sumasang-ayon ako na hindi ako kailanman tatanggap ng ayuda sa panahon ng aking mga laro (mula sa isang kompyuter ng ahedres, aklat, database o sa ibang tao).</string>
   <string name="agreementNice">Sumasang-ayon ako na lagi akong magiging magalang sa ibang mga manlalaro.</string>
   <string name="agreementAccount">Sumasang-ayon ako na hindi ako lilikha ng maraming mga account.</string>
-  <string name="agreementPolicy">Sumasang-ayon ako na susundin ko ang lahat ng polisiya ng Lichess.</string>
+  <string name="agreementPolicy">Sumasang-ayon ako na susundin ko ang lahat ng polisiya ng Playstrategy.</string>
   <string name="searchOrStartNewDiscussion">Mag-search o mag-start ng bagong pag-uusap</string>
   <string name="edit">I-edit</string>
   <string name="rapid">Mabilisan</string>
@@ -844,12 +844,12 @@
   <string name="congratsYouWon">Tagumpay!</string>
   <string name="gameVsX">Laro laban kay %1$s</string>
   <string name="resVsX">%1$s vs %2$s</string>
-  <string name="youJustBecamePatron">Ikaw ay isang Lichess Patron na.</string>
+  <string name="youJustBecamePatron">Ikaw ay isang Playstrategy Patron na.</string>
   <string name="patronAccountExpired">Expired na ang Patron account</string>
   <string name="pleaseReconsiderRenewIt">Isaalang-alang niyo pong mag-renew!</string>
   <string name="someoneReviewedYourCoachProfile">Merong tao na nag-review ng coach profile mo.</string>
   <string name="newPendingReview">Bagong pending na review</string>
-  <string name="lostAgainstTOSViolator">Katatalo mo lang sa isang tao na lumabag sa Lichess TOS</string>
+  <string name="lostAgainstTOSViolator">Katatalo mo lang sa isang tao na lumabag sa Playstrategy TOS</string>
   <string name="refundXpointsTimeControlY">Refund: %1$s %2$s  na rating points.</string>
   <string name="timeAlmostUp">Yung oras mo ay malapit na matapos!</string>
 </resources>

@@ -38,7 +38,7 @@ export default class StormCtrl {
     this.race = this.data.race;
     this.pref = opts.pref;
     this.redraw = () => redraw(this.data);
-    this.trans = lichess.trans(opts.i18n);
+    this.trans = playstrategy.trans(opts.i18n);
     this.run = {
       pov: puzzlePov(this.data.puzzles[0]),
       moves: 0,
@@ -57,7 +57,7 @@ export default class StormCtrl {
     this.countdown = new Countdown(this.run.clock, this.resetGround, () => setTimeout(this.redraw));
     this.promotion = makePromotion(this.withGround, this.cgOpts, this.redraw);
     this.serverUpdate(opts.data);
-    lichess.socket = new lichess.StrongSocket(`/racer/${this.race.id}`, false, {
+    playstrategy.socket = new playstrategy.StrongSocket(`/racer/${this.race.id}`, false, {
       events: {
         racerState: (data: UpdatableData) => {
           this.serverUpdate(data);
@@ -66,7 +66,7 @@ export default class StormCtrl {
         },
       },
     });
-    lichess.socket.sign(this.sign);
+    playstrategy.socket.sign(this.sign);
     setInterval(this.redraw, 1000);
     // this.simulate();
   }
@@ -111,7 +111,7 @@ export default class StormCtrl {
     this.resetGround();
     this.redraw();
     sound.end();
-    lichess.pubsub.emit('ply', 0); // restore resize handle
+    playstrategy.pubsub.emit('ply', 0); // restore resize handle
     this.redrawSlow();
   };
 
@@ -174,7 +174,7 @@ export default class StormCtrl {
       this.redrawSlow();
     }
     this.resetGround();
-    lichess.pubsub.emit('ply', this.run.moves);
+    playstrategy.pubsub.emit('ply', this.run.moves);
   };
 
   private redrawQuick = () => setTimeout(this.redraw, 100);
@@ -203,5 +203,5 @@ export default class StormCtrl {
     return g && f(g);
   };
 
-  private socketSend = (tpe: string, data?: any) => lichess.socket.send(tpe, data, { sign: this.sign });
+  private socketSend = (tpe: string, data?: any) => playstrategy.socket.send(tpe, data, { sign: this.sign });
 }

@@ -1,5 +1,5 @@
-Contact: mailto:contact@lichess.org
-Encryption: https://lichess.org/.well-known/gpg.asc
+Contact: mailto:contact@playstrategy.org
+Encryption: https://playstrategy.org/.well-known/gpg.asc
 Preferred-Languages: en
-Canonical: https://lichess.org/.well-known/security.txt
-Policy: https://lichess.org/contact#help-security
+Canonical: https://playstrategy.org/.well-known/security.txt
+Policy: https://playstrategy.org/contact#help-security

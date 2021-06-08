@@ -60,7 +60,7 @@ export default function (publicKey: string) {
     const $form = $checkout.find('form.paypal_checkout.' + freq);
     $form.find('input.amount').val('' + amount);
     ($form[0] as HTMLFormElement).submit();
-    $checkout.find('.service').html(lichess.spinnerHtml);
+    $checkout.find('.service').html(playstrategy.spinnerHtml);
   });
 
   const stripe = window.Stripe(publicKey);
@@ -74,7 +74,7 @@ export default function (publicKey: string) {
       amount =
         freq == 'lifetime' ? lifetime.cents : parseInt($checkout.find('group.amount input:checked').data('amount'));
     if (amount < min || amount > max) return;
-    $checkout.find('.service').html(lichess.spinnerHtml);
+    $checkout.find('.service').html(playstrategy.spinnerHtml);
 
     xhr
       .json('/patron/stripe-checkout', {

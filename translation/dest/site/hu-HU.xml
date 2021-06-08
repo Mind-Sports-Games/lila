@@ -286,7 +286,7 @@
     <item quantity="one">Adj %s másodpercet</item>
     <item quantity="other">Adj %s másodpercet</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Ez a fiók megsértette a Lichess Felhasználási Feltételeit</string>
+  <string name="thisAccountViolatedTos">Ez a fiók megsértette a Playstrategy Felhasználási Feltételeit</string>
   <string name="openingExplorerAndTablebase">Megnyitás- és állásböngésző</string>
   <string name="takeback">Visszalépés</string>
   <string name="proposeATakeback">Visszalépés kérése</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Köszönjük!</string>
   <string name="socialMediaLinks">Közösségi média</string>
   <string name="inlineNotation">Megjegyzések beszúrása</string>
-  <string name="watchLichessTV">Lichess TV</string>
-  <string name="previouslyOnLichessTV">A Lichess TV korábbi műsorai</string>
+  <string name="watchPlaystrategyTV">Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">A Playstrategy TV korábbi műsorai</string>
   <string name="onlinePlayers">Online játékosok</string>
   <string name="activeToday">Ma aktívak</string>
   <string name="activePlayers">Aktív játékosok</string>
@@ -567,7 +567,7 @@
   <string name="clock">Óra</string>
   <string name="unauthorizedError">Hozzáférés megtagadva.</string>
   <string name="noInternetConnection">Nincs internetkapcsolat. Offline módban tudsz játszani.</string>
-  <string name="connectedToLichess">Csatlakoztál a lichess.org-hoz</string>
+  <string name="connectedToPlaystrategy">Csatlakoztál a playstrategy.org-hoz</string>
   <string name="signedOut">Kijelentkeztél</string>
   <string name="loginSuccessful">Bejelentkeztél</string>
   <string name="playOnTheBoardOffline">Játék élőben</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Fisher óra beállítás. Minél több játékossal játszol, annál több időre lesz szükség</string>
   <string name="simulAddExtraTime">Plusz időt adhatsz az órához, hogy a szimultán könnyebb legyen.</string>
   <string name="simulHostExtraTime">Időbónusz</string>
-  <string name="lichessTournaments">Lichess versenyek</string>
+  <string name="playstrategyTournaments">Playstrategy versenyek</string>
   <string name="tournamentFAQ">Aréna verseny GYIK</string>
   <string name="tournamentOfficial">Hivatalos</string>
   <string name="timeBeforeTournamentStarts">Kezdés ennyi perc múlva</string>
@@ -669,8 +669,8 @@
   <string name="weHaveSentYouAnEmailTo">Küldtünk egy üzenetet a %s email címre. A jelszavad megváltoztatásához kattints az üzenetben lévő linkre.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">A regisztrációval elfogadod a %s-t</string>
   <string name="readAboutOur">Itt olvashatók az %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Hálózati késleltetés a számítógéped és a Lichess között</string>
-  <string name="timeToProcessAMoveOnLichessServer">Az az idő, amíg a lichess szerver egy lépést feldolgoz</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Hálózati késleltetés a számítógéped és a Playstrategy között</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Az az idő, amíg a playstrategy szerver egy lépést feldolgoz</string>
   <string name="downloadAnnotated">Letöltés elemzéssel</string>
   <string name="downloadRaw">Letöltés elemzés nélkül</string>
   <string name="downloadImported">Importált PGN letöltése</string>
@@ -687,7 +687,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Már regisztrált ezzel az email címmel: %s</string>
   <string name="kidMode">Gyereküzemmód</string>
   <string name="kidModeExplanation">A Gyereküzemmód a biztonságról szól. A mód bekapcsolásával az összes kommunikáció megszűnik a többi játékossal, így megvédheted a gyermekeid vagy a diákjaid a többi felhasználó elől.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">Gyereküzemmódban a Lichess logón megjelenik egy %s ikon, így tudhatod, hogy gyermekeid biztonságos felületen játszanak.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">Gyereküzemmódban a Playstrategy logón megjelenik egy %s ikon, így tudhatod, hogy gyermekeid biztonságos felületen játszanak.</string>
   <string name="enableKidMode">Gyereküzemmód bekapcsolása</string>
   <string name="disableKidMode">Gyereküzemmód kikapcsolása</string>
   <string name="security">Biztonság</string>
@@ -695,7 +695,7 @@
   <string name="alternativelyYouCanX">Ha úgy gondolod %s.</string>
   <string name="revokeAllSessions">eltávolíthatod az összes eszközt</string>
   <string name="playChessEverywhere">Sakkozz bárhol!</string>
-  <string name="asFreeAsLichess">Olyannyira ingyenes mint a Lichess</string>
+  <string name="asFreeAsPlaystrategy">Olyannyira ingyenes mint a Playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">A sakk szeretetéért építettük, nem a pénzért</string>
   <string name="everybodyGetsAllFeaturesForFree">Az összes funkció ingyenes, mindenki számára</string>
   <string name="zeroAdvertisement">Nincsenek hirdetések</string>
@@ -735,7 +735,7 @@
   <string name="usernameSuffixInvalid">A felhasználói névnek betűvel vagy számmal kell végződnie.</string>
   <string name="usernameCharsInvalid">A felhasználói névben nem szerepelhet más mint betűk, számok, aláhúzás- és kötőjel.</string>
   <string name="usernameUnacceptable">A felhasználói név nem megfelelő.</string>
-  <string name="directlySupportLichess">Támogasd a Lichesst</string>
+  <string name="directlySupportPlaystrategy">Támogasd a Playstrategyt</string>
   <string name="playChessInStyle">Sakkozz stílusosan</string>
   <string name="chessBasics">A sakk alapjai</string>
   <string name="coaches">Oktatók</string>
@@ -815,14 +815,14 @@
   <string name="tryToWin">Minden játszmát próbálj megnyerni, vagy legalább döntetlent kihozni.</string>
   <string name="resignLostGames">Az elveszett játszmákat add fel (ne hagyd lejárni az időt).</string>
   <string name="temporaryInconvenience">Elnézést kérünk az átmeneti kellemetlenségért</string>
-  <string name="wishYouGreatGames">és további sok jó játékot kívánunk a lichess.org-on.</string>
+  <string name="wishYouGreatGames">és további sok jó játékot kívánunk a playstrategy.org-on.</string>
   <string name="thankYouForReading">Köszönjük, hogy elolvastad!</string>
   <string name="lifetimeScore">Mindenkori pontszám</string>
   <string name="currentMatchScore">Jelenlegi pontszám</string>
   <string name="agreementAssistance">Elfogadom, hogy játék közben soha semmilyen segítséget (sakkprogram, könyv, adatbázis vagy másik személy) nem használok fel.</string>
   <string name="agreementNice">Elfogadom, hogy tisztelettudó leszek a többi játékossal szemben.</string>
   <string name="agreementAccount">Elfogadom, hogy nem készítek egynél több fiókot.</string>
-  <string name="agreementPolicy">Elfogadom, hogy követni fogom a Lichess szabályait.</string>
+  <string name="agreementPolicy">Elfogadom, hogy követni fogom a Playstrategy szabályait.</string>
   <string name="searchOrStartNewDiscussion">Keresés, vagy új beszélgetés indítása</string>
   <string name="edit">Szerkeszt</string>
   <string name="rapid">Rapid</string>
@@ -857,12 +857,12 @@
   <string name="congratsYouWon">Gratulálunk, nyertél!</string>
   <string name="gameVsX">Játszma %1$s ellen</string>
   <string name="resVsX">%1$s %2$s ellen</string>
-  <string name="youJustBecamePatron">Éppen Lichess Patronná váltál.</string>
+  <string name="youJustBecamePatron">Éppen Playstrategy Patronná váltál.</string>
   <string name="patronAccountExpired">Lejárt a Patron előfizetés</string>
   <string name="pleaseReconsiderRenewIt">Kérjük vedd fontolóra a megújítását!</string>
   <string name="someoneReviewedYourCoachProfile">Valaki értékelte az oktatói profilod.</string>
   <string name="newPendingReview">Új függőben lévő értékelés</string>
-  <string name="lostAgainstTOSViolator">Vesztettél valaki ellen, aki megszegte a Lichess szabályait</string>
+  <string name="lostAgainstTOSViolator">Vesztettél valaki ellen, aki megszegte a Playstrategy szabályait</string>
   <string name="refundXpointsTimeControlY">Visszatérítve: %1$s %2$s értékpont.</string>
   <string name="timeAlmostUp">Hamarosan lejár az idő!</string>
   <string name="clickToRevealEmailAddress">[Kattints az email cím megtekintéséhez]</string>

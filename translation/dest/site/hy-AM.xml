@@ -254,7 +254,7 @@
     <item quantity="one">Տալ %s վայրկան</item>
     <item quantity="other">Տալ %s վայրկան</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Այս օգտատերը խախտել է Lichess-ի օգտագործման պայմանները</string>
+  <string name="thisAccountViolatedTos">Այս օգտատերը խախտել է Playstrategy-ի օգտագործման պայմանները</string>
   <string name="takeback">Քայլը հետ վերցնել</string>
   <string name="proposeATakeback">Քայլը հետ վերցնելու առաջարկ անել</string>
   <string name="takebackPropositionSent">Քայլը հետ վերցնելու առաջարկն ուղարկված է</string>
@@ -370,8 +370,8 @@
   <string name="biography">Կենսագրություն</string>
   <string name="country">Երկիր</string>
   <string name="thankYou">Շնորհակալությո՛ւն։</string>
-  <string name="watchLichessTV">Դիտել Lichess TV</string>
-  <string name="previouslyOnLichessTV">Նախորդները Lichess TV-ով</string>
+  <string name="watchPlaystrategyTV">Դիտել Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Նախորդները Playstrategy TV-ով</string>
   <string name="onlinePlayers">Online խաղացողներ</string>
   <string name="activeToday">Ակտիվ այսօր</string>
   <string name="activePlayers">Ակտիվ խաղացողներ</string>
@@ -457,7 +457,7 @@
   <string name="clock">ժամացույց</string>
   <string name="unauthorizedError">Մուտքն արգելված է։</string>
   <string name="noInternetConnection">Չկա ինտերնետ կապ : Դուք կարող եք խաղալ օֆլայն</string>
-  <string name="connectedToLichess">Դուք նորից միացաք lichess.org կայքին</string>
+  <string name="connectedToPlaystrategy">Դուք նորից միացաք playstrategy.org կայքին</string>
   <string name="signedOut">Դուք հաջողությամբ դուրս եկաք ձեր էջից</string>
   <string name="loginSuccessful">Դուք հաջողությամբ մուտք գործեցիք ձեր էջ</string>
   <string name="playOfflineComputer">Համակարգիչ</string>
@@ -491,7 +491,7 @@
   <string name="termsOfService">Ծառայությունների մատուցման պայմաններ</string>
   <string name="host">Ընդունող</string>
   <string name="create">Ստեղծել</string>
-  <string name="lichessTournaments">Lichess մրցաշարեր</string>
+  <string name="playstrategyTournaments">Playstrategy մրցաշարեր</string>
   <string name="tournamentOfficial">Պաշտոնական</string>
   <string name="averageCentipawnLoss">Միջինուն հարյուրերորդական զինվորի կորուստ</string>
   <string name="keyGoToStartOrEnd">գնալ սկիզբ/վերջ</string>
@@ -541,7 +541,7 @@
   <string name="tryToWin">Փորձեք հաղթել (կամ գոնե ոչ-ոքի խաղալ) յուրաքանչյուր խաղ։</string>
   <string name="resignLostGames">Հանձնվե՛ք պարտված խաղերում (մի\' թողեք ժամանակը սպառվի)։</string>
   <string name="temporaryInconvenience">Մենք հայցում ենք Ձեր ներողամտությունը անհարմարության համար,</string>
-  <string name="wishYouGreatGames">և մաղթում հաճելի հաղեր lichess.org-ում։</string>
+  <string name="wishYouGreatGames">և մաղթում հաճելի հաղեր playstrategy.org-ում։</string>
   <string name="thankYouForReading">Շնորհակալություն կարդալու համար:</string>
   <string name="edit">Խմբագրել</string>
   <string name="rapid">Արագ</string>

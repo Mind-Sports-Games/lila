@@ -15,8 +15,8 @@ export default function (root: AnalyseCtrl, studyData: StudyData, data: StudyPra
     analysisUrl = prop(''),
     autoNext = storedProp('practice-auto-next', true);
 
-  lichess.sound.loadOggOrMp3('practiceSuccess', `${lichess.sound.baseUrl}/other/energy3`);
-  lichess.sound.loadOggOrMp3('practiceFailure', `${lichess.sound.baseUrl}/other/failure2`);
+  playstrategy.sound.loadOggOrMp3('practiceSuccess', `${playstrategy.sound.baseUrl}/other/energy3`);
+  playstrategy.sound.loadOggOrMp3('practiceFailure', `${playstrategy.sound.baseUrl}/other/failure2`);
 
   function onLoad() {
     root.showAutoShapes = readOnlyProp(true);
@@ -59,7 +59,7 @@ export default function (root: AnalyseCtrl, studyData: StudyData, data: StudyPra
 
   function onVictory(): void {
     saveNbMoves();
-    lichess.sound.play('practiceSuccess');
+    playstrategy.sound.play('practiceSuccess');
     if (studyData.chapter.practice && autoNext()) setTimeout(goToNext, 1000);
   }
 
@@ -79,7 +79,7 @@ export default function (root: AnalyseCtrl, studyData: StudyData, data: StudyPra
 
   function onFailure(): void {
     root.node.fail = true;
-    lichess.sound.play('practiceFailure');
+    playstrategy.sound.play('practiceFailure');
   }
 
   return {

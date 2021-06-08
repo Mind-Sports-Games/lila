@@ -11,7 +11,7 @@ function onPowertipPreRender(id: string, preload?: (url: string) => void) {
     xhr.text(url + '/mini').then(html => {
       const el = document.getElementById(id) as HTMLElement;
       el.innerHTML = html;
-      lichess.contentLoaded(el);
+      playstrategy.contentLoaded(el);
     });
   };
 }

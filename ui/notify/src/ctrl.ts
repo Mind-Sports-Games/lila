@@ -9,7 +9,7 @@ export default function makeCtrl(opts: NotifyOpts, redraw: Redraw): Ctrl {
     initiating = true,
     scrolling = false;
 
-  const readAllStorage = lichess.storage.make('notify-read-all');
+  const readAllStorage = playstrategy.storage.make('notify-read-all');
 
   readAllStorage.listen(_ => {
     if (data) {
@@ -38,16 +38,16 @@ export default function makeCtrl(opts: NotifyOpts, redraw: Redraw): Ctrl {
     const notif = data.pager.currentPageResults.find(n => !n.read);
     if (!notif) return;
     opts.pulse();
-    if (!lichess.quietMode || notif.content.user.id == 'lichess') lichess.sound.play('newPM');
-    const text = asText(notif, lichess.trans(data.i18n));
-    const pushSubsribed = parseInt(lichess.storage.get('push-subscribed') || '0', 10) + 86400000 >= Date.now(); // 24h
+    if (!playstrategy.quietMode || notif.content.user.id == 'playstrategy') playstrategy.sound.play('newPM');
+    const text = asText(notif, playstrategy.trans(data.i18n));
+    const pushSubsribed = parseInt(playstrategy.storage.get('push-subscribed') || '0', 10) + 86400000 >= Date.now(); // 24h
     if (!pushSubsribed && text) notify(text);
   }
 
   const loadPage = (page: number) =>
     xhr.json(xhr.url('/notify', { page: page || 1 })).then(
       d => update(d, false),
-      _ => lichess.announce({ msg: 'Failed to load notifications' })
+      _ => playstrategy.announce({ msg: 'Failed to load notifications' })
     );
 
   function nextPage() {

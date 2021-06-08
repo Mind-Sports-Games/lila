@@ -98,7 +98,7 @@ final class Env(
                   if (game.hasClock)
                     api.autoMark(
                       lila.report.SuspectId(userId),
-                      lila.report.ModId.lichess,
+                      lila.report.ModId.playstrategy,
                       s"Cheat detected during game, ${count} times"
                     )
                   else reportApi.autoCheatDetectedReport(userId, count)
@@ -112,7 +112,7 @@ final class Env(
     "garbageCollect" -> {
       case lila.hub.actorApi.security.GCImmediateSb(userId) =>
         reportApi getSuspect userId orFail s"No such suspect $userId" foreach { sus =>
-          reportApi.getLichessMod foreach { mod =>
+          reportApi.getPlaystrategyMod foreach { mod =>
             api.setTroll(mod, sus, value = true)
           }
         }
@@ -125,11 +125,11 @@ final class Env(
       publicChat.deleteAll(userId).unit
     },
     "autoWarning" -> { case lila.hub.actorApi.mod.AutoWarning(userId, subject) =>
-      logApi.modMessage(User.lichessId, userId, subject).unit
+      logApi.modMessage(User.playstrategyId, userId, subject).unit
     },
     "selfReportMark" -> { case lila.hub.actorApi.mod.SelfReportMark(suspectId, name) =>
       api
-        .autoMark(lila.report.SuspectId(suspectId), lila.report.ModId.lichess, s"Self report: ${name}")
+        .autoMark(lila.report.SuspectId(suspectId), lila.report.ModId.playstrategy, s"Self report: ${name}")
         .unit
     },
     "chatTimeout" -> { case lila.hub.actorApi.mod.ChatTimeout(mod, user, reason, text) =>

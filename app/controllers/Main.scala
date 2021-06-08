@@ -139,7 +139,7 @@ Allow: /
       JsonOk {
         Json.obj(
           "name"             -> env.net.domain.value,
-          "short_name"       -> "Lichess",
+          "short_name"       -> "Playstrategy",
           "start_url"        -> "/",
           "display"          -> "standalone",
           "background_color" -> "#161512",
@@ -147,7 +147,7 @@ Allow: /
           "description"      -> "The (really) free, no-ads, open source chess server.",
           "icons" -> List(32, 64, 128, 192, 256, 512, 1024).map { size =>
             Json.obj(
-              "src"   -> s"//${env.net.assetDomain.value}/assets/logo/lichess-favicon-$size.png",
+              "src"   -> s"//${env.net.assetDomain.value}/assets/logo/playstrategy-favicon-$size.png",
               "sizes" -> s"${size}x$size",
               "type"  -> "image/png"
             )
@@ -159,7 +159,7 @@ Allow: /
             ),
             Json.obj(
               "platform" -> "itunes",
-              "url"      -> "https://itunes.apple.com/us/app/lichess-free-online-chess/id968371784"
+              "url"      -> "https://itunes.apple.com/us/app/playstrategy-free-online-chess/id968371784"
             )
           )
         )

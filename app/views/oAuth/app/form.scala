@@ -17,7 +17,7 @@ object form {
         h1(title),
         postForm(cls := "form3", action := routes.OAuthApp.create)(
           div(cls := "form-group")(
-            "Want to build something that integrates with and extends Lichess? Register a new OAuth App to get started developing on the Lichess API."
+            "Want to build something that integrates with and extends Playstrategy? Register a new OAuth App to get started developing on the Playstrategy API."
           ),
           inner(form)
         )
@@ -42,8 +42,8 @@ object form {
         postForm(cls := "form3", action := routes.OAuthApp.update(app.clientId.value))(
           div(cls := "form-group")(
             "Here's a ",
-            a(href := "https://github.com/lichess-org/api/tree/master/example/oauth-authorization-code")(
-              "Lichess OAuth app example"
+            a(href := "https://github.com/playstrategy-org/api/tree/master/example/oauth-authorization-code")(
+              "Playstrategy OAuth app example"
             ),
             ", and the ",
             a(href := routes.Api.index)("API documentation"),

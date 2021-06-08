@@ -21,7 +21,7 @@ export function tourStandingCtrl(players: TourPlayer[], team: Team | undefined, 
         'div',
         {
           hook: onInsert(_ => {
-            lichess.loadCssPath('round.tour-standing');
+            playstrategy.loadCssPath('round.tour-standing');
           }),
         },
         [

@@ -15,7 +15,7 @@ object passwd {
       active = "password",
       evenMoreJs = frag(
         embedJsUnsafeLoadThen("""
-          lichess.loadModule('passwordComplexity').then(() =>
+          playstrategy.loadModule('passwordComplexity').then(() =>
             passwordComplexity.addPasswordChangeListener('form3-newPasswd1')
           )""")
       )

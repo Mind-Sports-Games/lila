@@ -1,7 +1,7 @@
 import * as xhr from 'common/xhr';
-import LichessChat from 'chat';
+import PlaystrategyChat from 'chat';
 
-window.LichessChat = LichessChat;
+window.PlaystrategyChat = PlaystrategyChat;
 
 interface TeamOpts {
   id: string;
@@ -10,9 +10,9 @@ interface TeamOpts {
 }
 
 export default function (opts: TeamOpts) {
-  lichess.socket = new lichess.StrongSocket('/team/' + opts.id, opts.socketVersion);
+  playstrategy.socket = new playstrategy.StrongSocket('/team/' + opts.id, opts.socketVersion);
 
-  if (opts.chat) lichess.makeChat(opts.chat);
+  if (opts.chat) playstrategy.makeChat(opts.chat);
 
   $('#team-subscribe').on('change', function (this: HTMLInputElement) {
     $(this)

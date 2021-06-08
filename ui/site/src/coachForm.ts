@@ -4,7 +4,7 @@ import { notNull } from 'common';
 import spinnerHtml from './component/spinner';
 import Tagify from '@yaireo/tagify';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   const $editor = $('.coach-edit');
 
   const todo = (function () {
@@ -14,7 +14,7 @@ lichess.load.then(() => {
 
     const must = [
       {
-        html: '<a href="/account/profile">Complete your lichess profile</a>',
+        html: '<a href="/account/profile">Complete your playstrategy profile</a>',
         check() {
           return $el.data('profile');
         },

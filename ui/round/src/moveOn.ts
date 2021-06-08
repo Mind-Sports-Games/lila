@@ -3,7 +3,7 @@ import * as xhr from './xhr';
 import RoundController from './ctrl';
 
 export default class MoveOn {
-  private storage = lichess.storage.makeBoolean(this.key);
+  private storage = playstrategy.storage.makeBoolean(this.key);
 
   constructor(private ctrl: RoundController, private key: string) {}
 

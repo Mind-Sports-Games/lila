@@ -60,12 +60,12 @@ final class TournamentForm {
       hasChat = tour.hasChat.some
     )
 
-  private val blockList = List("lichess", "liсhess")
+  private val blockList = List("playstrategy", "liсhess")
 
   private def nameType(user: User) = eventName(2, 30).verifying(
     Constraint[String] { (t: String) =>
       if (blockList.exists(t.toLowerCase.contains) && !user.isVerified && !user.isAdmin)
-        validation.Invalid(validation.ValidationError("Must not contain \"lichess\""))
+        validation.Invalid(validation.ValidationError("Must not contain \"playstrategy\""))
       else validation.Valid
     }
   )

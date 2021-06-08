@@ -143,7 +143,7 @@
   <string name="interestingMove">Интересный ход</string>
   <string name="dubiousMove">Сомнительный ход</string>
   <string name="onlyMove" comment="onlyMove&#10;The only possible move. This is a label that can be placed in a study of a past game. It may not technically be the only move, but the only feasible one.">Единственный ход</string>
-  <string name="zugzwang" comment="zugzwang&#10;What zugzwang is: https://lichess.org/practice/intermediate-tactics/zugzwang/9cKgYrHb/ybYJ9gNa&#10;&#10;This specific string is a label that can be applied to a position in a study, to indicate one side is in zugzwang.">Цугцванг</string>
+  <string name="zugzwang" comment="zugzwang&#10;What zugzwang is: https://playstrategy.org/practice/intermediate-tactics/zugzwang/9cKgYrHb/ybYJ9gNa&#10;&#10;This specific string is a label that can be applied to a position in a study, to indicate one side is in zugzwang.">Цугцванг</string>
   <string name="equalPosition">Равная позиция</string>
   <string name="unclearPosition">Неясная позиция</string>
   <string name="whiteIsSlightlyBetter">У белых немного лучше</string>

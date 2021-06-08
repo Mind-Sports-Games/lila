@@ -48,10 +48,10 @@ export default function makeRenderers(trans: Trans): Renderers {
     titledTourney: {
       html: n =>
         generic(n, '/tournament/' + n.content.id, 'g', [
-          h('span', [h('strong', 'Lichess Titled Arena'), drawTime(n)]),
+          h('span', [h('strong', 'Playstrategy Titled Arena'), drawTime(n)]),
           h('span', n.content.text),
         ]),
-      text: _ => 'Lichess Titled Arena',
+      text: _ => 'Playstrategy Titled Arena',
     },
     reportedBanned: {
       html: n =>
@@ -176,7 +176,7 @@ function drawTime(n: Notification) {
         datetime: n.date,
       },
     },
-    lichess.timeago(date)
+    playstrategy.timeago(date)
   );
 }
 

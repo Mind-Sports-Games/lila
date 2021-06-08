@@ -22,7 +22,7 @@ db.report
       },
       {
         $set: {
-          processedBy: 'lichess-sweep',
+          processedBy: 'playstrategy-sweep',
         },
       },
       {

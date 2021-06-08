@@ -266,7 +266,7 @@
   <plurals name="giveNbSeconds">
     <item quantity="other">給對方加%s秒</item>
   </plurals>
-  <string name="thisAccountViolatedTos">此帳號違反了Lichess的使用規定</string>
+  <string name="thisAccountViolatedTos">此帳號違反了Playstrategy的使用規定</string>
   <string name="openingExplorerAndTablebase">開局瀏覽器 &amp; 總局資料庫</string>
   <string name="takeback">悔棋</string>
   <string name="proposeATakeback">請求悔棋</string>
@@ -427,8 +427,8 @@
   <string name="thankYou">謝謝！</string>
   <string name="socialMediaLinks">官方社群連結</string>
   <string name="inlineNotation">棋譜集中顯示</string>
-  <string name="watchLichessTV">觀看Lichess TV</string>
-  <string name="previouslyOnLichessTV">過去的Lichess TV直播</string>
+  <string name="watchPlaystrategyTV">觀看Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">過去的Playstrategy TV直播</string>
   <string name="onlinePlayers">在線棋手</string>
   <string name="activeToday">本日活躍棋手</string>
   <string name="activePlayers">活躍棋手</string>
@@ -531,7 +531,7 @@
   <string name="clock">鐘</string>
   <string name="unauthorizedError">无权访问。</string>
   <string name="noInternetConnection">无网络。您仍然可以从菜单栏离线对弈。</string>
-  <string name="connectedToLichess">您已接入lichess.org</string>
+  <string name="connectedToPlaystrategy">您已接入playstrategy.org</string>
   <string name="signedOut">登出成功</string>
   <string name="loginSuccessful">登出成功</string>
   <string name="playOnTheBoardOffline">面對面</string>
@@ -565,7 +565,7 @@
   </plurals>
   <string name="tpTimeSpentPlaying">花在下棋上的时间：%s</string>
   <string name="watchGames">觀看對局直播</string>
-  <string name="tpTimeSpentOnTV">花在Lichess TV觀看直播的時間：%s</string>
+  <string name="tpTimeSpentOnTV">花在Playstrategy TV觀看直播的時間：%s</string>
   <string name="watch">觀看</string>
   <string name="videoLibrary">影片庫</string>
   <string name="streamersMenu">實況主</string>
@@ -597,7 +597,7 @@
   <string name="simulClockHint">菲舍爾時鐘設定。棋手越多，您需要的時間可能就越多。</string>
   <string name="simulAddExtraTime">您可以給您的時鍾多加點時間以幫助您應對車輪戰。</string>
   <string name="simulHostExtraTime">主持人的额外时间</string>
-  <string name="lichessTournaments">Lichess比赛</string>
+  <string name="playstrategyTournaments">Playstrategy比赛</string>
   <string name="tournamentFAQ">比赛常见问题</string>
   <string name="tournamentOfficial">官方</string>
   <string name="timeBeforeTournamentStarts">比赛准备时间</string>
@@ -631,8 +631,8 @@
   <string name="weHaveSentYouAnEmailTo">我們發送了一封郵件到 %s。點擊郵件中的連結來重置您的密碼。</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">您一登记，我们就假设您同意尊重我们的使用规则（%s）。</string>
   <string name="readAboutOur">閱讀我們的%s</string>
-  <string name="networkLagBetweenYouAndLichess">您和 lichess 之間的網絡時滯</string>
-  <string name="timeToProcessAMoveOnLichessServer">lichess 伺服器上處理走棋的時間</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">您和 playstrategy 之間的網絡時滯</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">playstrategy 伺服器上處理走棋的時間</string>
   <string name="downloadAnnotated">下载带笔记的记录</string>
   <string name="downloadRaw">下载无笔记的记录</string>
   <string name="downloadImported">下载已导入棋局</string>
@@ -645,10 +645,10 @@
   <string name="withNobody">不分享</string>
   <string name="withFriends">與好友分享</string>
   <string name="withEverybody">與所有人分享</string>
-  <string name="youHaveAlreadyRegisteredTheEmail">您已經用過 %s 來註冊 Lichess 賬戶</string>
+  <string name="youHaveAlreadyRegisteredTheEmail">您已經用過 %s 來註冊 Playstrategy 賬戶</string>
   <string name="kidMode">兒童模式</string>
   <string name="kidModeExplanation">考量安全，在兒童模式中，網站上全部的文字交流將會被關閉。開啟此模式來保護你的孩子及學生不被網路上的人傷害。</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">在兒童模式下，Lichess的標誌會有一個%s圖示，讓你知道你的孩子是安全的。</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">在兒童模式下，Playstrategy的標誌會有一個%s圖示，讓你知道你的孩子是安全的。</string>
   <string name="enableKidMode">啟用兒童模式</string>
   <string name="disableKidMode">停用兒童模式</string>
   <string name="security">資訊安全相關設定</string>
@@ -656,7 +656,7 @@
   <string name="alternativelyYouCanX">或者，您可以%s</string>
   <string name="revokeAllSessions">登出所有裝置</string>
   <string name="playChessEverywhere">随处下棋！</string>
-  <string name="asFreeAsLichess">完全又永遠的免費。</string>
+  <string name="asFreeAsPlaystrategy">完全又永遠的免費。</string>
   <string name="builtForTheLoveOfChessNotMoney">不是為了錢，是為了國際象棋所創建。</string>
   <string name="everybodyGetsAllFeaturesForFree">每個人都能免費使用所有功能</string>
   <string name="zeroAdvertisement">沒有廣告</string>
@@ -695,7 +695,7 @@
   <string name="usernameSuffixInvalid">使用者名稱的結尾必須為字母或數字</string>
   <string name="usernameCharsInvalid">使用者名稱只能包含字母、 數字、 底線和短劃線。</string>
   <string name="usernameUnacceptable">此使用者名稱不可用</string>
-  <string name="directlySupportLichess">直接支持Lichess</string>
+  <string name="directlySupportPlaystrategy">直接支持Playstrategy</string>
   <string name="playChessInStyle">下棋也要穿得好看</string>
   <string name="chessBasics">基本知識</string>
   <string name="coaches">教練</string>
@@ -772,14 +772,14 @@
   <string name="tryToWin">試著在每個棋局裡獲勝(或至少平手)</string>
   <string name="resignLostGames">棄權(不要讓時間耗盡)</string>
   <string name="temporaryInconvenience">對於給您帶來的不便，我們深表歉意</string>
-  <string name="wishYouGreatGames">並祝您在lichess.org上玩得開心。</string>
+  <string name="wishYouGreatGames">並祝您在playstrategy.org上玩得開心。</string>
   <string name="thankYouForReading">感謝您的閱讀!</string>
   <string name="lifetimeScore">帳戶總分</string>
   <string name="currentMatchScore">最近的對局分數</string>
   <string name="agreementAssistance">我同意我不會在比賽期間使用支援(從書籍、電腦運算、資料庫等等)</string>
   <string name="agreementNice">我會一直尊重其他的玩家</string>
   <string name="agreementAccount">我同意我不會創造許多副帳</string>
-  <string name="agreementPolicy">我同意我將會遵守Lichess的規則</string>
+  <string name="agreementPolicy">我同意我將會遵守Playstrategy的規則</string>
   <string name="searchOrStartNewDiscussion">尋找或開始聊天</string>
   <string name="edit">編輯</string>
   <string name="rapid">快速模式</string>
@@ -812,7 +812,7 @@
   <string name="youHaveJoinedTeamX">您已加入 \"%1$s\"。</string>
   <string name="congratsYouWon">恭喜，您贏了！</string>
   <string name="resVsX">%1$s vs %2$s</string>
-  <string name="youJustBecamePatron">您成為了 Lichess 贊助者。</string>
+  <string name="youJustBecamePatron">您成為了 Playstrategy 贊助者。</string>
   <string name="patronAccountExpired">您的贊助者帳號已過期</string>
   <string name="refundXpointsTimeControlY">退回 %1$s %2$s 等級分。</string>
   <string name="timeAlmostUp">時間快到了！</string>

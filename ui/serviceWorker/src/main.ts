@@ -9,8 +9,8 @@ self.addEventListener('push', event => {
   const data = event.data!.json();
   return event.waitUntil(
     self.registration.showNotification(data.title, {
-      badge: assetUrl('logo/lichess-mono-128.png'),
-      icon: assetUrl('logo/lichess-favicon-192.png'),
+      badge: assetUrl('logo/playstrategy-mono-128.png'),
+      icon: assetUrl('logo/playstrategy-favicon-192.png'),
       body: data.body,
       tag: data.tag,
       data: data.payload,

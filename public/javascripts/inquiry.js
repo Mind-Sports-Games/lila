@@ -1,5 +1,5 @@
 $(function () {
-  const noteStore = lichess.storage.make('inquiry-note');
+  const noteStore = playstrategy.storage.make('inquiry-note');
   const noteTextArea = $('#inquiry .notes').find('textarea')[0];
 
   $('#inquiry .notes').on('mouseenter', () => {
@@ -16,7 +16,7 @@ $(function () {
     $('body').toggleClass('no-inquiry');
   });
 
-  const nextStore = lichess.storage.makeBoolean('inquiry-auto-next');
+  const nextStore = playstrategy.storage.makeBoolean('inquiry-auto-next');
 
   if (!nextStore.get()) {
     $('#inquiry .switcher input').prop('checked', false);
@@ -34,7 +34,7 @@ $(function () {
     $(this).html(
       $(this)
         .html()
-        .replaceAll(/(?:https:\/\/)?lichess\.org\/([\w\/]+)/g, '<a href="/$1">lichess.org/$1</a>')
+        .replaceAll(/(?:https:\/\/)?playstrategy\.org\/([\w\/]+)/g, '<a href="/$1">playstrategy.org/$1</a>')
     );
   });
 });

@@ -3,7 +3,7 @@ import * as xhr from 'common/xhr';
 import TournamentController from './ctrl';
 
 // when the tournament no longer exists
-const onFail = () => lichess.reload();
+const onFail = () => playstrategy.reload();
 
 export const join = throttle(1000, (ctrl: TournamentController, password?: string, team?: string) =>
   xhr
@@ -18,7 +18,7 @@ export const join = throttle(1000, (ctrl: TournamentController, password?: strin
     .then(res => {
       if (!res.ok)
         res.text().then(t => {
-          if (t.startsWith('<!DOCTYPE html>')) lichess.reload();
+          if (t.startsWith('<!DOCTYPE html>')) playstrategy.reload();
           else alert(t);
         });
     })

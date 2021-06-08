@@ -103,7 +103,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
   return modal({
     class: 'keyboard-help',
     onInsert(el: HTMLElement) {
-      lichess.loadCssPath('analyse.keyboard');
+      playstrategy.loadCssPath('analyse.keyboard');
       xhr.text(xhr.url('/analysis/help', { study: !!ctrl.study })).then(html => {
         el.querySelector('.scrollable')!.innerHTML = html;
       });

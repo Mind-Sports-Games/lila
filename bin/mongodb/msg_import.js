@@ -22,7 +22,15 @@ if (!db.m_thread_sorted.count()) {
       $or: [
         {
           creatorId: {
-            $nin: ['lichess', 'lichess-qa', 'lichess-blog', 'lichess-team', 'mirlife', 'lichess4545', 'whatnext'],
+            $nin: [
+              'playstrategy',
+              'playstrategy-qa',
+              'lichess-blog',
+              'playstrategy-team',
+              'mirlife',
+              'playstrategy4545',
+              'whatnext',
+            ],
           },
         },
         {
@@ -49,7 +57,7 @@ db.m_thread_sorted
 
     o.threads.forEach(t => {
       t.posts.forEach(p => {
-        if (o.creatorId == 'lichess' && isOld(p.createdAt)) return;
+        if (o.creatorId == 'playstrategy' && isOld(p.createdAt)) return;
         msgs.push({
           _id: p.id,
           tid: threadId,

@@ -48,7 +48,7 @@ export interface DasherOpts {
 }
 
 export function makeCtrl(opts: DasherOpts, data: DasherData, redraw: Redraw): DasherCtrl {
-  const trans = lichess.trans(data.i18n);
+  const trans = playstrategy.trans(data.i18n);
 
   const mode: Prop<Mode> = prop(defaultMode as Mode);
 
@@ -71,7 +71,7 @@ export function makeCtrl(opts: DasherOpts, data: DasherData, redraw: Redraw): Da
     piece: pieceCtrl(data.piece, trans, () => (data.board.is3d ? 'd3' : 'd2'), redraw, setMode),
   };
 
-  lichess.pubsub.on('top.toggle.user_tag', () => setMode(defaultMode));
+  playstrategy.pubsub.on('top.toggle.user_tag', () => setMode(defaultMode));
 
   return {
     mode,

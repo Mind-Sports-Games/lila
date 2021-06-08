@@ -1,11 +1,11 @@
 function toBlurArray(player) {
   return player.blurs && player.blurs.bits ? player.blurs.bits.split('') : [];
 }
-lichess.advantageChart = function (data, trans, el) {
-  lichess.loadScript('javascripts/chart/common.js').then(function () {
-    lichess.loadScript('javascripts/chart/division.js').then(function () {
-      lichess.chartCommon('highchart').then(function () {
-        lichess.advantageChart.update = function (d) {
+playstrategy.advantageChart = function (data, trans, el) {
+  playstrategy.loadScript('javascripts/chart/common.js').then(function () {
+    playstrategy.loadScript('javascripts/chart/division.js').then(function () {
+      playstrategy.chartCommon('highchart').then(function () {
+        playstrategy.advantageChart.update = function (d) {
           el.highcharts && el.highcharts.series[0].setData(makeSerieData(d));
         };
 
@@ -76,8 +76,8 @@ lichess.advantageChart = function (data, trans, el) {
               animation: false,
             },
             area: {
-              fillColor: Highcharts.theme.lichess.area.white,
-              negativeFillColor: Highcharts.theme.lichess.area.black,
+              fillColor: Highcharts.theme.playstrategy.area.white,
+              negativeFillColor: Highcharts.theme.playstrategy.area.black,
               threshold: 0,
               lineWidth: 1,
               color: '#d85000',
@@ -92,7 +92,7 @@ lichess.advantageChart = function (data, trans, el) {
                 click: function (event) {
                   if (event.point) {
                     event.point.select();
-                    lichess.pubsub.emit('analysis.chart.click', event.point.x);
+                    playstrategy.pubsub.emit('analysis.chart.click', event.point.x);
                   }
                 },
               },
@@ -130,7 +130,7 @@ lichess.advantageChart = function (data, trans, el) {
             labels: disabled,
             lineWidth: 0,
             tickWidth: 0,
-            plotLines: lichess.divisionLines(data.game.division, trans),
+            plotLines: playstrategy.divisionLines(data.game.division, trans),
           },
           yAxis: {
             title: noText,
@@ -143,14 +143,14 @@ lichess.advantageChart = function (data, trans, el) {
             gridLineWidth: 0,
             plotLines: [
               {
-                color: Highcharts.theme.lichess.text.weak,
+                color: Highcharts.theme.playstrategy.text.weak,
                 width: 1,
                 value: 0,
               },
             ],
           },
         });
-        lichess.pubsub.emit('analysis.change.trigger');
+        playstrategy.pubsub.emit('analysis.change.trigger');
       });
     });
   });

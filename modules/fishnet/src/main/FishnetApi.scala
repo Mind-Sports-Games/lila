@@ -44,7 +44,7 @@ final class FishnetApi(
 
   def acquire(client: Client, slow: Boolean): Fu[Option[JsonApi.Work]] =
     (client.skill match {
-      case Skill.Move                 => fufail(s"Can't acquire a move directly on lichess! $client")
+      case Skill.Move                 => fufail(s"Can't acquire a move directly on playstrategy! $client")
       case Skill.Analysis | Skill.All => acquireAnalysis(client, slow)
     }).monSuccess(_.fishnet.acquire)
       .recover { case e: Exception =>
@@ -64,7 +64,7 @@ final class FishnetApi(
         )
         .sort(
           $doc(
-            "sender.system" -> 1, // user requests first, then lichess auto analysis
+            "sender.system" -> 1, // user requests first, then playstrategy auto analysis
             "createdAt"     -> 1 // oldest requests first
           )
         )

@@ -286,7 +286,7 @@
     <item quantity="one">Anna %s sekuntia</item>
     <item quantity="other">Anna %s sekuntia</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Tämä käyttäjätunnus rikkoi Lichessin käyttöehtoja</string>
+  <string name="thisAccountViolatedTos">Tämä käyttäjätunnus rikkoi Playstrategyin käyttöehtoja</string>
   <string name="openingExplorerAndTablebase">Avaus- ja loppupelitietokanta</string>
   <string name="takeback">Peruuta siirto</string>
   <string name="proposeATakeback">Ehdota siirron peruutusta</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Kiitos!</string>
   <string name="socialMediaLinks">Sosiaalisen median linkit</string>
   <string name="inlineNotation">Rivinsisäinen kommentointi</string>
-  <string name="watchLichessTV">Katso Lichess TV:tä</string>
-  <string name="previouslyOnLichessTV">Viimeksi Lichess TV:ssä</string>
+  <string name="watchPlaystrategyTV">Katso Playstrategy TV:tä</string>
+  <string name="previouslyOnPlaystrategyTV">Viimeksi Playstrategy TV:ssä</string>
   <string name="onlinePlayers">Paikalla olevat pelaajat</string>
   <string name="activeToday">Aktiivisena tänään</string>
   <string name="activePlayers">Aktiiviset pelaajat</string>
@@ -567,7 +567,7 @@
   <string name="clock">Kello</string>
   <string name="unauthorizedError">Pääsy evätty.</string>
   <string name="noInternetConnection">Ei Internet-yhteyttä. Voit silti pelata offline-tilassa.</string>
-  <string name="connectedToLichess">Nyt olet yhteydessä lichess.org:iin</string>
+  <string name="connectedToPlaystrategy">Nyt olet yhteydessä playstrategy.org:iin</string>
   <string name="signedOut">Olet kirjautunut ulos</string>
   <string name="loginSuccessful">Olet nyt kirjautuneena sisään</string>
   <string name="playOnTheBoardOffline">Pelaa offline-tilassa kaveria vastaan</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Fischer-kellon asetukset. Mitä enemmän pelaajia on, sitä enemmän aikaa saatat tarvita.</string>
   <string name="simulAddExtraTime">Voit lisätä aikaa kelloosi selviytyäksesi simultaanista.</string>
   <string name="simulHostExtraTime">Isännän ylimääräinen aika</string>
-  <string name="lichessTournaments">Lichessin turnaukset</string>
+  <string name="playstrategyTournaments">Playstrategyin turnaukset</string>
   <string name="tournamentFAQ">Areenaturnausten UKK</string>
   <string name="tournamentOfficial">Virallinen</string>
   <string name="timeBeforeTournamentStarts">Aika ennen turnauksen alkua</string>
@@ -667,10 +667,10 @@
   <string name="weHaveSentYouAnEmailClickTheLink">Olemme lähettäneet sinulle sähköpostiviestin. Klikkaa viestissä olevaa linkkiä aktivoidaksesi käyttäjätunnuksesi.</string>
   <string name="ifYouDoNotSeeTheEmailCheckOtherPlaces">Jos et näe viestiä, tarkista muut paikat joihin se voi olla joutunut (kuten roskaposti- ja spämmikansiot).</string>
   <string name="weHaveSentYouAnEmailTo">Olemme lähettäneet sähköpostiviestin osoitteeseen %s. Klikkaa viestissä olevaa linkkiä nollataksesi salasanasi.</string>
-  <string name="byRegisteringYouAgreeToBeBoundByOur">Rekisteröitymällä hyväksyt Lichessin %s ja sitoudut noudattamaan niitä.</string>
+  <string name="byRegisteringYouAgreeToBeBoundByOur">Rekisteröitymällä hyväksyt Playstrategyin %s ja sitoudut noudattamaan niitä.</string>
   <string name="readAboutOur">Lue lisää %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Verkkoviive sinun ja lichessin välillä</string>
-  <string name="timeToProcessAMoveOnLichessServer">Palvelimen siirtojen käsittelyyn vaatima aika</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Verkkoviive sinun ja playstrategyin välillä</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Palvelimen siirtojen käsittelyyn vaatima aika</string>
   <string name="downloadAnnotated">Lataa kommenttien kanssa</string>
   <string name="downloadRaw">Lataa ilman kommentteja</string>
   <string name="downloadImported">Imuroi tuotu PGN</string>
@@ -687,7 +687,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Olet jo rekisteröinyt sähköpostiosoitteen: %s</string>
   <string name="kidMode">Lapsitila</string>
   <string name="kidModeExplanation">Turvallisuusasia. Lapsitilassa kaikki kommunikointi sivustolla on pois käytöstä. Käytä tätä suojaamaan lasta tai koululaista muilta internetin käyttäjiltä.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">Lapsitilassa Lichessin logoon liitetään %s-ikoni, jotta tiedät lapsesi olevan turvassa.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">Lapsitilassa Playstrategyin logoon liitetään %s-ikoni, jotta tiedät lapsesi olevan turvassa.</string>
   <string name="enableKidMode">Lapsitila käyttöön</string>
   <string name="disableKidMode">Lapsitila käytöstä</string>
   <string name="security">Turvallisuus</string>
@@ -695,7 +695,7 @@
   <string name="alternativelyYouCanX">Tai voit %s.</string>
   <string name="revokeAllSessions">katkaista kaikki sessiot</string>
   <string name="playChessEverywhere">Pelaa shakkia kaikkialla</string>
-  <string name="asFreeAsLichess">Yhtä ilmainen ja vapaa kuin lichess</string>
+  <string name="asFreeAsPlaystrategy">Yhtä ilmainen ja vapaa kuin playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Rakennettu rakkaudesta shakkiin, ei rahan</string>
   <string name="everybodyGetsAllFeaturesForFree">Jokainen saa kaikki ominaisuudet ilmaiseksi</string>
   <string name="zeroAdvertisement">Ei mainoksia</string>
@@ -735,7 +735,7 @@
   <string name="usernameSuffixInvalid">Käyttäjänimen täytyy loppua kirjaimeen tai numeroon.</string>
   <string name="usernameCharsInvalid">Käyttäjänimi voi sisältää vain kirjaimia, numeroita, alaviivoja ja väliviivoja.</string>
   <string name="usernameUnacceptable">Käyttäjänimi ei kelpaa.</string>
-  <string name="directlySupportLichess">Lahjoita Lichessille</string>
+  <string name="directlySupportPlaystrategy">Lahjoita Playstrategyille</string>
   <string name="playChessInStyle">Tyylikästä shakinpeluuta</string>
   <string name="chessBasics">Shakin perusteet</string>
   <string name="coaches">Valmentajat</string>
@@ -815,14 +815,14 @@
   <string name="tryToWin">Yritä voittaa (tai edes pelata tasan) jokainen pelisi.</string>
   <string name="resignLostGames">Luovuta hävityt pelit (äläkä anna ajan kulua loppuun).</string>
   <string name="temporaryInconvenience">Pahoittelemme tilapäistä harmia,</string>
-  <string name="wishYouGreatGames">ja toivotamme hyviä pelejä lichess.org -sivustolla.</string>
+  <string name="wishYouGreatGames">ja toivotamme hyviä pelejä playstrategy.org -sivustolla.</string>
   <string name="thankYouForReading">Kiitos, että luit tämän!</string>
   <string name="lifetimeScore">Kaikkien aikojen yhteistilanne</string>
   <string name="currentMatchScore">Nykyisen ottelun tilanne</string>
   <string name="agreementAssistance">Vakuutan etten ota vastaan ulkopuolista apua pelieni aikana (shakkitietokoneilta, kirjoilta, tietokannoilta enkä muilta ihmisiltä).</string>
   <string name="agreementNice">Vakuutan että käyttäydyn aina muita pelaajia kunnioittaen.</string>
   <string name="agreementAccount">Vakuutan, etten luo useita käyttäjätunnuksia.</string>
-  <string name="agreementPolicy">Vakuutan että noudatan Lichessin sääntöjä.</string>
+  <string name="agreementPolicy">Vakuutan että noudatan Playstrategyin sääntöjä.</string>
   <string name="searchOrStartNewDiscussion">Etsi tai aloita uusi keskustelu</string>
   <string name="edit">Muokkaa</string>
   <string name="rapid">Nopea</string>
@@ -857,10 +857,10 @@
   <string name="congratsYouWon">Onnittelut, sinä voitit!</string>
   <string name="gameVsX">Peli käyttäjää %1$s vastaan</string>
   <string name="resVsX">%1$s vastaan %2$s</string>
-  <string name="youJustBecamePatron">Olet nyt Lichessin tukija.</string>
+  <string name="youJustBecamePatron">Olet nyt Playstrategyin tukija.</string>
   <string name="patronAccountExpired">Tukijatili on vanhentunut</string>
   <string name="pleaseReconsiderRenewIt">Harkitsethan sen uusimista!</string>
-  <string name="lostAgainstTOSViolator">Olet hävinnyt Lichessin käyttöehtoja rikkoneelle henkilölle</string>
+  <string name="lostAgainstTOSViolator">Olet hävinnyt Playstrategyin käyttöehtoja rikkoneelle henkilölle</string>
   <string name="refundXpointsTimeControlY">Hyvitys: %1$s %2$s vahvuuslukupistettä.</string>
   <string name="timeAlmostUp">Aika on melkein lopussa!</string>
   <string name="clickToRevealEmailAddress">[Paljasta sähköpostiosoite napsauttamalla tätä]</string>

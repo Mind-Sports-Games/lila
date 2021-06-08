@@ -29,14 +29,14 @@ import * as moveView from '../moveView';
 import { bind } from '../util';
 import throttle from 'common/throttle';
 
-export const throttled = (sound: string) => throttle(100, () => lichess.sound.play(sound));
+export const throttled = (sound: string) => throttle(100, () => playstrategy.sound.play(sound));
 
 const selectSound = throttled('select');
 const wrapSound = throttled('wrapAround');
 const borderSound = throttled('outOfBound');
 const errorSound = throttled('error');
 
-lichess.AnalyseNVUI = function (redraw: Redraw) {
+playstrategy.AnalyseNVUI = function (redraw: Redraw) {
   const notify = new Notify(redraw),
     moveStyle = styleSetting(),
     pieceStyle = pieceSetting(),
@@ -45,7 +45,7 @@ lichess.AnalyseNVUI = function (redraw: Redraw) {
     boardStyle = boardSetting(),
     analysisInProgress = prop(false);
 
-  lichess.pubsub.on('analysis.server.progress', (data: AnalyseData) => {
+  playstrategy.pubsub.on('analysis.server.progress', (data: AnalyseData) => {
     if (data.analysis && !data.analysis.partial) notify.set('Server-side analysis complete');
   });
 
@@ -329,7 +329,7 @@ function renderComments(node: Tree.Node, style: Style): string {
 }
 
 function renderComment(comment: Tree.Comment, style: Style): string {
-  return comment.by === 'lichess'
+  return comment.by === 'playstrategy'
     ? comment.text.replace(/Best move was (.+)\./, (_, san) => 'Best move was ' + renderSan(san, undefined, style))
     : comment.text;
 }

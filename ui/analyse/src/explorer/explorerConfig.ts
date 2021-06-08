@@ -11,7 +11,7 @@ const allRatings = [1600, 1800, 2000, 2200, 2500];
 export function controller(game: Game, onClose: () => void, trans: Trans, redraw: () => void): ExplorerConfigCtrl {
   const variant = game.variant.key === 'fromPosition' ? 'standard' : game.variant.key;
 
-  const available: ExplorerDb[] = ['lichess'];
+  const available: ExplorerDb[] = ['playstrategy'];
   if (variant === 'standard') available.unshift('masters');
 
   const data: ExplorerConfigData = {

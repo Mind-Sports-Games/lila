@@ -286,7 +286,7 @@
     <item quantity="one">%s saniye ver</item>
     <item quantity="other">%s saniye ver</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Bu hesap Lichess Kullanım Şartları\'nı ihlâl etti</string>
+  <string name="thisAccountViolatedTos">Bu hesap Playstrategy Kullanım Şartları\'nı ihlâl etti</string>
   <string name="openingExplorerAndTablebase">Açılış kâşifi &amp; oyunsonu analizi</string>
   <string name="takeback">Hamleni geri al</string>
   <string name="proposeATakeback">Hamleyi geri almayı teklif et</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Teşekkürler!</string>
   <string name="socialMediaLinks">Sosyal medya bağlantıları</string>
   <string name="inlineNotation">Notasyonu aynı satırda göster</string>
-  <string name="watchLichessTV">Lichess TV\'ye göz at</string>
-  <string name="previouslyOnLichessTV">Lichess TV\'de bunlar da vardı;</string>
+  <string name="watchPlaystrategyTV">Playstrategy TV\'ye göz at</string>
+  <string name="previouslyOnPlaystrategyTV">Playstrategy TV\'de bunlar da vardı;</string>
   <string name="onlinePlayers">Çevrimiçi oyuncular</string>
   <string name="activeToday">Bugün aktif</string>
   <string name="activePlayers">Aktif oyuncular</string>
@@ -567,7 +567,7 @@
   <string name="clock">Saat</string>
   <string name="unauthorizedError">Yetkisiz erişim.</string>
   <string name="noInternetConnection">İnternet bağlantısı yok. Hâlâ menüden çevrimdışı oynayabilirsiniz.</string>
-  <string name="connectedToLichess">Şimdi lichess.org\'a bağlandınız</string>
+  <string name="connectedToPlaystrategy">Şimdi playstrategy.org\'a bağlandınız</string>
   <string name="signedOut">Zaten başarıyla çıkış yapmışsınız.</string>
   <string name="loginSuccessful">Giriş başarılı</string>
   <string name="playOnTheBoardOffline">Tahta üzerinde çevrimdışı oyna</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Fischer Saati formatı. Ne kadar fazla oyuncu ile yüzleşirseniz, o kadar fazla zamana ihtiyaç duyabilirsiniz.</string>
   <string name="simulAddExtraTime">Eş zamanlı gösteride süreyi idare edebilmek için kendi saatinize fazladan zaman ekleyebilirsiniz.</string>
   <string name="simulHostExtraTime">Ev sahibinin fazladan süresi</string>
-  <string name="lichessTournaments">Lichess turnuvaları</string>
+  <string name="playstrategyTournaments">Playstrategy turnuvaları</string>
   <string name="tournamentFAQ">Arena turnuvaları SSS</string>
   <string name="tournamentOfficial">Resmî</string>
   <string name="timeBeforeTournamentStarts">Turnuvanın başlama süresi</string>
@@ -669,8 +669,8 @@
   <string name="weHaveSentYouAnEmailTo">%s adresine e-posta yolladık. Şifrenizi tekrar ayarlamak için e-postadaki linke tıklayın.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Kaydolarak, %s \'ı kabul etmiş sayılırsınız.</string>
   <string name="readAboutOur">%s hakkında bilgi edinin.</string>
-  <string name="networkLagBetweenYouAndLichess">Siz ve lichess.org arasındaki gecikme (ping)</string>
-  <string name="timeToProcessAMoveOnLichessServer">lichess.org üzerindeki hamle süreniz (ms)</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Siz ve playstrategy.org arasındaki gecikme (ping)</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">playstrategy.org üzerindeki hamle süreniz (ms)</string>
   <string name="downloadAnnotated">Açıklamalarıyla beraber indirin</string>
   <string name="downloadRaw">Açıklamasız indirin.</string>
   <string name="downloadImported">İçeri aktarılmış oyunu indir</string>
@@ -686,7 +686,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Zaten kaydedilmiş e-posta adresiniz var: %s</string>
   <string name="kidMode">Çocuk modu</string>
   <string name="kidModeExplanation">Bu mod çocuğunuzun güvenliği ile ilgilidir. Tüm site bağlantıları devre dışı bırakılır. Eğer çocuklarınızı veya okul öğrencilerinizi diğer internet kullanıcılarına karşı korumak istiyorsanız, bu modu etkinleştirin.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">Çocuk modunda, lichess.org logosu yerine %s belirir, bilin ki çocuğunuz güvendedir :)</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">Çocuk modunda, playstrategy.org logosu yerine %s belirir, bilin ki çocuğunuz güvendedir :)</string>
   <string name="enableKidMode">Çocuk modunu aktifleştir</string>
   <string name="disableKidMode">Çocuk modunu devre dışı bırak</string>
   <string name="security">Güvenlik</string>
@@ -694,7 +694,7 @@
   <string name="alternativelyYouCanX">Ayrıca %s de yapabilirsiniz.</string>
   <string name="revokeAllSessions">tüm oturumları kaldır</string>
   <string name="playChessEverywhere">Her yerde satranç oyna</string>
-  <string name="asFreeAsLichess">lichess kadar özgür</string>
+  <string name="asFreeAsPlaystrategy">playstrategy kadar özgür</string>
   <string name="builtForTheLoveOfChessNotMoney">Para için değil satranç sevgisi için geliştirilmiştir</string>
   <string name="everybodyGetsAllFeaturesForFree">Bütün özellikler ücretsizdir</string>
   <string name="zeroAdvertisement">Sıfır reklam</string>
@@ -734,7 +734,7 @@
   <string name="usernameSuffixInvalid">Kullanıcı adınız bir harf veya sayı ile bitmelidir.</string>
   <string name="usernameCharsInvalid">Kullanıcı adı yalnızca harf, sayı, alt çizgi ve çizgi içerebilir.</string>
   <string name="usernameUnacceptable">Bu kullanıcı adı uygun değil.</string>
-  <string name="directlySupportLichess">Lichess\'i destekleyin</string>
+  <string name="directlySupportPlaystrategy">Playstrategy\'i destekleyin</string>
   <string name="playChessInStyle">Satrancı tarz ile oynayın</string>
   <string name="chessBasics">Satrancın temel prensipleri</string>
   <string name="coaches">Eğitmenler</string>
@@ -814,14 +814,14 @@
   <string name="tryToWin">Oynadığınız her oyunu kazanmaya çalışın (ya da en azından berabere kalmayı deneyin).</string>
   <string name="resignLostGames">Kaybettiğiniz oyunlardan çekilin (sürenin dolmasını beklemeyin).</string>
   <string name="temporaryInconvenience">Verdiğimiz geçici rahatsızlıktan dolayı özür dileriz,</string>
-  <string name="wishYouGreatGames">ve lichess.org\'da harika oyunlar dileriz.</string>
+  <string name="wishYouGreatGames">ve playstrategy.org\'da harika oyunlar dileriz.</string>
   <string name="thankYouForReading">Okuduğunuz için teşekkür ederiz!</string>
   <string name="lifetimeScore">Toplam skor</string>
   <string name="currentMatchScore">Mevcut maç skoru</string>
   <string name="agreementAssistance">Maçlar esnasında hiçbir zaman dışarıdan yardım almayacağım (bilgisayardan, kitaptan, veri tabanından veya başka bir insandan).</string>
   <string name="agreementNice">Diğer oyunculara karşı her zaman iyi bir tutum içinde olacağım.</string>
   <string name="agreementAccount">Birden fazla hesap açmayacağım.</string>
-  <string name="agreementPolicy">Lichess kurallarını takip edeceğim.</string>
+  <string name="agreementPolicy">Playstrategy kurallarını takip edeceğim.</string>
   <string name="searchOrStartNewDiscussion">Tartışma ara veya yenisini başlat</string>
   <string name="edit">Düzenle</string>
   <string name="rapid">Rapid</string>
@@ -856,12 +856,12 @@
   <string name="congratsYouWon">Tebrikler, kazandınız!</string>
   <string name="gameVsX">%1$s ile oyun</string>
   <string name="resVsX">%1$s ile %2$s kapışması</string>
-  <string name="youJustBecamePatron">Artık bir Lichess Destekçisisiniz.</string>
+  <string name="youJustBecamePatron">Artık bir Playstrategy Destekçisisiniz.</string>
   <string name="patronAccountExpired">Kullanıcı hesabının süresi doldu</string>
   <string name="pleaseReconsiderRenewIt">Lütfen yenilemeyi düşünün!</string>
   <string name="someoneReviewedYourCoachProfile">Birisi antrenör profilinizi inceledi.</string>
   <string name="newPendingReview">Yeni bekleyen inceleme</string>
-  <string name="lostAgainstTOSViolator">Lichess Kulanım Şartları\'nı ihlal eden birine kaybettiniz</string>
+  <string name="lostAgainstTOSViolator">Playstrategy Kulanım Şartları\'nı ihlal eden birine kaybettiniz</string>
   <string name="refundXpointsTimeControlY">%1$s %2$s puanı iade edildi.</string>
   <string name="timeAlmostUp">Zaman neredeyse doldu!</string>
   <string name="clickToRevealEmailAddress">[E-posta adresini göstermek için tıklayın]</string>

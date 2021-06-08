@@ -20,7 +20,7 @@ export default function (ctrl: SimulCtrl) {
       h('aside.simul__side', {
         hook: util.onInsert(el => {
           $(el).replaceWith(ctrl.opts.$side);
-          ctrl.opts.chat && lichess.makeChat(ctrl.opts.chat);
+          ctrl.opts.chat && playstrategy.makeChat(ctrl.opts.chat);
         }),
       }),
       h(
@@ -28,14 +28,14 @@ export default function (ctrl: SimulCtrl) {
         {
           hook: {
             postpatch() {
-              lichess.miniGame.initAll();
+              playstrategy.miniGame.initAll();
             },
           },
         },
         handler(ctrl)
       ),
       h('div.chat__members.none', {
-        hook: util.onInsert(lichess.watchers),
+        hook: util.onInsert(playstrategy.watchers),
       }),
     ]
   );

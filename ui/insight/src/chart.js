@@ -249,6 +249,6 @@ module.exports = function (ctrl) {
         makeChart(el, ctrl.vm.answer);
       },
     }),
-    ctrl.vm.loading ? m.trust(lichess.spinnerHtml) : null,
+    ctrl.vm.loading ? m.trust(playstrategy.spinnerHtml) : null,
   ];
 };

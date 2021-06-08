@@ -3,8 +3,8 @@
   <string name="activity">Activity</string>
   <string name="hostedALiveStream">Hosted a live stream</string>
   <plurals name="supportedNbMonths">
-    <item quantity="one">Supported lichess.org for %1$s month as a %2$s</item>
-    <item quantity="other">Supported lichess.org for %1$s months as a %2$s</item>
+    <item quantity="one">Supported playstrategy.org for %1$s month as a %2$s</item>
+    <item quantity="other">Supported playstrategy.org for %1$s months as a %2$s</item>
   </plurals>
   <plurals name="practicedNbPositions">
     <item quantity="one">Practiced %1$s position on %2$s</item>
@@ -67,7 +67,7 @@
     <item quantity="other">Competed in %s swiss tournaments</item>
   </plurals>
   <string name="rankedInSwissTournament" comment="rankedInSwissTournament&#10;&#10;%1$s is the numerical rank, e.g. #2 if you came second.&#10;&#10;%2$s is the name of the tournament e.g. Carlsen Arena">Ranked #%1$s in %2$s</string>
-  <string name="signedUp">Signed up to lichess.org</string>
+  <string name="signedUp">Signed up to playstrategy.org</string>
   <plurals name="joinedNbTeams">
     <item quantity="one">Joined %s team</item>
     <item quantity="other">Joined %s teams</item>

@@ -66,7 +66,7 @@ export function make(cfg: ForecastData, data: AnalyseData, redraw: () => void): 
     loading(true);
     redraw();
     history.replaceState(null, '', '#last');
-    lichess.reload();
+    playstrategy.reload();
   }
 
   function isCandidate(fc: ForecastStep[]): boolean {

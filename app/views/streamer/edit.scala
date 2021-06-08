@@ -19,7 +19,7 @@ object edit extends Context.ToLang {
   )(implicit ctx: Context) = {
 
     views.html.base.layout(
-      title = s"${s.user.titleUsername} ${lichessStreamer.txt()}",
+      title = s"${s.user.titleUsername} ${playstrategyStreamer.txt()}",
       moreCss = cssTag("streamer.form")
     ) {
       main(cls := "page-menu")(

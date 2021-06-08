@@ -277,7 +277,7 @@ function getElPvMoves(e: MouseEvent): (string | null)[] {
 }
 
 function checkHover(el: HTMLElement, instance: CevalCtrl): void {
-  lichess.requestIdleCallback(
+  playstrategy.requestIdleCallback(
     () => instance.setHovering(getElFen(el), $(el).find('div.pv:hover').attr('data-uci') || undefined),
     500
   );

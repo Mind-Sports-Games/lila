@@ -34,7 +34,7 @@ object contact {
     frag(
       ul(
         li(
-          a(href := routes.ForumCateg.show("lichess-feedback"))(reportBugInForum())
+          a(href := routes.ForumCateg.show("playstrategy-feedback"))(reportBugInForum())
         ),
         li(
           a(href := "https://github.com/ornicar/lila/issues")(reportWebsiteIssue())
@@ -92,11 +92,11 @@ object contact {
               "dns",
               "\"This site can’t be reached\"",
               frag(
-                p("If you can't reach Lichess, and your browser says something like:"),
+                p("If you can't reach Playstrategy, and your browser says something like:"),
                 ul(
                   li("This site can't be reached."),
-                  li(strong("lichess.org"), "’s server IP address could not be found."),
-                  li("We can’t connect to the server at lichess.org.")
+                  li(strong("playstrategy.org"), "’s server IP address could not be found."),
+                  li("We can’t connect to the server at playstrategy.org.")
                 ),
                 p("Then you have a ", strong("DNS issue"), "."),
                 p(
@@ -221,8 +221,8 @@ object contact {
               frag(
                 p("Please report security issues to ", contactEmailLink),
                 p(
-                  "Like all contributions to Lichess, security reviews and pentesting are appreciated. ",
-                  "Note that Lichess is built by volunteers and we currently do not have a bug bounty program."
+                  "Like all contributions to Playstrategy, security reviews and pentesting are appreciated. ",
+                  "Note that Playstrategy is built by volunteers and we currently do not have a bug bounty program."
                 ),
                 p(
                   "Vulnerabilities are relevant even when they are not directly exploitable, ",
@@ -293,7 +293,7 @@ object contact {
               "monetize",
               monetizing(),
               frag(
-                p("We are not interested in any way of monetizing Lichess."),
+                p("We are not interested in any way of monetizing Playstrategy."),
                 p(
                   "We will never display any kind of ads, we won't track our players, and we won't sell or buy traffic or users."
                 ),
@@ -307,7 +307,7 @@ object contact {
             ),
             Leaf(
               "buy",
-              buyingLichess(),
+              buyingPlaystrategy(),
               p("We are not selling, to anyone, for any price. Ever.")
             ),
             Leaf(
@@ -323,7 +323,7 @@ object contact {
               "gdpr",
               "GDPR",
               frag(
-                p("If you are a European citizen, you may request the deletion of your Lichess account."),
+                p("If you are a European citizen, you may request the deletion of your Playstrategy account."),
                 p(
                   "First, ",
                   a(href := routes.Account.close)("close your account"),
@@ -358,7 +358,7 @@ object contact {
       contentCls = "page box box-pad"
     )(
       frag(
-        h1(contactLichess()),
+        h1(contactPlaystrategy()),
         div(cls := "nav-tree")(renderNode(menu, none))
       )
     )

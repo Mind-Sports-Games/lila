@@ -28,13 +28,13 @@ object faq {
       moreCss = cssTag("faq")
     ) {
       div(cls := "faq small-page box box-pad")(
-        h1(cls := "lichess_title")(frequentlyAskedQuestions()),
-        h2("Lichess"),
+        h1(cls := "playstrategy_title")(frequentlyAskedQuestions()),
+        h2("Playstrategy"),
         question(
           "name",
-          whyIsLichessCalledLichess.txt(),
+          whyIsPlaystrategyCalledPlaystrategy.txt(),
           p(
-            lichessCombinationLiveLightLibrePronounced(em(leechess())),
+            playstrategyCombinationLiveLightLibrePronounced(em(leechess())),
             " ",
             a(href := "https://www.youtube.com/watch?v=KRpPqcrdE-o")(hearItPronouncedBySpecialist())
           ),
@@ -50,8 +50,8 @@ object faq {
         ),
         question(
           "contributing",
-          howCanIContributeToLichess.txt(),
-          p(lichessPoweredByDonationsAndVolunteers()),
+          howCanIContributeToPlaystrategy.txt(),
+          p(playstrategyPoweredByDonationsAndVolunteers()),
           p(
             findMoreAndSeeHowHelp(
               a(href := routes.Plan.index)(beingAPatron()),
@@ -61,13 +61,13 @@ object faq {
           )
         ),
         question(
-          "sites_based_on_Lichess",
-          areThereWebsitesBasedOnLichess.txt(),
+          "sites_based_on_Playstrategy",
+          areThereWebsitesBasedOnPlaystrategy.txt(),
           p(
-            yesLichessInspiredOtherOpenSourceWebsites(
+            yesPlaystrategyInspiredOtherOpenSourceWebsites(
               a(href := "/source")(trans.sourceCode()),
               a(href := "/api")("API"),
-              a(href := "https://database.lichess.org")(trans.database())
+              a(href := "https://database.playstrategy.org")(trans.database())
             )
           ),
           ul(
@@ -124,7 +124,7 @@ object faq {
           "variants",
           whatVariantsCanIplay.txt(),
           p(
-            lichessSupportChessAnd(
+            playstrategySupportChessAnd(
               a(href := routes.Page.variantHome)(eightVariants())
             )
           )
@@ -140,7 +140,7 @@ object faq {
           "timeout",
           insufficientMaterial.txt(),
           p(
-            lichessFollowFIDErules(a(href := fideHandbookUrl)(fideHandbookX("§6.9")))
+            playstrategyFollowFIDErules(a(href := fideHandbookUrl)(fideHandbookX("§6.9")))
           )
         ),
         question(
@@ -150,7 +150,7 @@ object faq {
             explainingEnPassant(
               a(href := "https://en.wikipedia.org/wiki/En_passant")(goodIntroduction()),
               a(href := fideHandbookUrl)(fideHandbookX("§3.7")),
-              a(href := s"${routes.Learn.index}#/15")(lichessTraining())
+              a(href := s"${routes.Learn.index}#/15")(playstrategyTraining())
             )
           )
         ),
@@ -179,9 +179,9 @@ object faq {
         h2(accounts()),
         question(
           "titles",
-          titlesAvailableOnLichess.txt(),
+          titlesAvailableOnPlaystrategy.txt(),
           p(
-            lichessRecognizeAllOTBtitles(
+            playstrategyRecognizeAllOTBtitles(
               a(href := "https://github.com/ornicar/lila/wiki/Handling-title-verification-requests")(
                 asWellAsManyNMtitles()
               )
@@ -200,7 +200,7 @@ object faq {
           p(
             showYourTitle(
               a(href := routes.Main.verifyTitle)(verificationForm()),
-              a(href := "#lm")("Lichess master (LM)")
+              a(href := "#lm")("Playstrategy master (LM)")
             )
           )
         ),
@@ -230,30 +230,30 @@ object faq {
           h4("The way of Berserk"),
           p(
             ownerUniqueTrophies(
-              a(href := "https://lichess.org/@/hiimgosu")("hiimgosu")
+              a(href := "https://playstrategy.org/@/hiimgosu")("hiimgosu")
             )
           ),
           p(
             wayOfBerserkExplanation(
-              a(href := "https://lichess.org/tournament/cDyjj1nL")(aHourlyBulletTournament())
+              a(href := "https://playstrategy.org/tournament/cDyjj1nL")(aHourlyBulletTournament())
             )
           ),
           h4("The Golden Zee"),
           p(
             ownerUniqueTrophies(
-              a(href := "https://lichess.org/@/ZugAddict")("ZugAddict")
+              a(href := "https://playstrategy.org/@/ZugAddict")("ZugAddict")
             )
           ),
           p(
             goldenZeeExplanation()
           )
         ),
-        h2(lichessRatings()),
+        h2(playstrategyRatings()),
         question(
           "ratings",
-          whichRatingSystemUsedByLichess.txt(),
+          whichRatingSystemUsedByPlaystrategy.txt(),
           p(
-            ratingSystemUsedByLichess()
+            ratingSystemUsedByPlaystrategy()
           ),
           p(
             a(href := routes.Page.loneBookmark("rating-systems"))("More about rating systems")
@@ -333,7 +333,7 @@ object faq {
           enableDisableNotificationPopUps.txt(),
           p(img(src := assetUrl("images/connection-info.png"), alt := viewSiteInformationPopUp.txt())),
           p(
-            lichessCanOptionnalySendPopUps()
+            playstrategyCanOptionnalySendPopUps()
           )
         )
       )

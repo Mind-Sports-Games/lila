@@ -167,7 +167,7 @@ module.exports = function (env, domElement) {
     }
   }.bind(this);
 
-  // this.trans = lichess.trans(env.i18n);
+  // this.trans = playstrategy.trans(env.i18n);
 
   askQuestion();
 };

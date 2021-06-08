@@ -27,7 +27,7 @@ export default function (ctrl: AnalyseCtrl): VNode | undefined {
                     },
                   },
                 },
-                lichess.timeago(round.startsAt)
+                playstrategy.timeago(round.startsAt)
               )
             : null,
         ]),

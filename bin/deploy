@@ -62,7 +62,7 @@ SERVER_BUILD_URL = "https://api.github.com/repos/ornicar/lila/actions/workflows/
 ARTIFACT_DIR = "/home/lichess-artifacts"
 
 
-def curl_cli(command, *, url="https://lichess.org/cli"):
+def curl_cli(command, *, url="https://playstrategy.org/cli"):
     return f"curl -X POST --data {shlex.quote(command)} {shlex.quote(url)} -H @.lila-cli"
 
 

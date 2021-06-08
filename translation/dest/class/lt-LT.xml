@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="lichessClasses">Klasės</string>
-  <string name="teachClassesOfChessStudents">Mokykite šachmatų mokinių klases su Lichess klasių įrankių paketu.</string>
+  <string name="playstrategyClasses">Klasės</string>
+  <string name="teachClassesOfChessStudents">Mokykite šachmatų mokinių klases su Playstrategy klasių įrankių paketu.</string>
   <string name="features">Funkcijos</string>
   <string name="quicklyGenerateSafeUsernames">Greitai mokiniams sugeneruokite saugius vartotojų vardus ir slaptažodžius</string>
   <string name="trackStudentProgress">Sekite mokinių progresą partijose ir galvosūkiuose</string>
   <string name="messageAllStudents">Praneškite visiems mokiniams apie naują pamokų medžiagą</string>
   <string name="freeForAllForever">100% nemokamas visiems ir visada, jokių reklamų ar sekimo įskiepių</string>
-  <string name="applyToBeLichessTeacher">Tapkite Lichess mokytoju</string>
+  <string name="applyToBePlaystrategyTeacher">Tapkite Playstrategy mokytoju</string>
   <string name="noClassesYet">Dar nėra klasių.</string>
   <string name="teachersX">Mokytojai: %s</string>
   <string name="newClass">Nauja klasė</string>
@@ -23,7 +23,7 @@
   <string name="classDescription">Klasės aprašymas</string>
   <string name="visibleByBothStudentsAndTeachers">Matoma ir klasės mokytojams ir klasės mokiniams</string>
   <string name="teachersOfTheClass">Klasės mokytojai</string>
-  <string name="addLichessUsernames">Pridėkite Lichess vartotojų vardus norėdami pakviesti kaip mokytojus. Vienas vardas per eilutę.</string>
+  <string name="addPlaystrategyUsernames">Pridėkite Playstrategy vartotojų vardus norėdami pakviesti kaip mokytojus. Vienas vardas per eilutę.</string>
   <string name="resetPassword">Atstatyti slaptažodį</string>
   <string name="makeSureToCopy">Dabar būtinai nusikopijuokite ar nusirašykite slaptažodį. Daugiau jo nerodysime!</string>
   <string name="passwordX">Slaptažodis: %s</string>
@@ -32,21 +32,21 @@
   <string name="realName">Tikras vardas</string>
   <string name="privateWillNeverBeShown">Privatu. Nebus rodoma už klasės ribų. Padeda prisiminti, koks tai mokinys.</string>
   <string name="addStudent">Pridėti mokinį</string>
-  <string name="lichessProfileXCreatedForY">Lichess profilis %1$s sukurtas %2$s.</string>
+  <string name="playstrategyProfileXCreatedForY">Playstrategy profilis %1$s sukurtas %2$s.</string>
   <string name="studentCredentials">Mokinys: %1$s
 Vartotojo vardas: %2$s
 Slaptažodis: %3$s</string>
-  <string name="inviteALichessAccount">Pakviesti Lichess vartotoją</string>
-  <string name="inviteDesc1">Jei mokinys jau turi Lichess paskyrą, galite jį pakviesti į klasę.</string>
-  <string name="inviteDesc2">Jie gaus žinutę su prisijungimo nuoroda per Lichess.</string>
+  <string name="inviteAPlaystrategyAccount">Pakviesti Playstrategy vartotoją</string>
+  <string name="inviteDesc1">Jei mokinys jau turi Playstrategy paskyrą, galite jį pakviesti į klasę.</string>
+  <string name="inviteDesc2">Jie gaus žinutę su prisijungimo nuoroda per Playstrategy.</string>
   <string name="inviteDesc3">Svarbu: pakvieskite tik mokinius, kuriuos pažįstate, ir kurie nori dalyvauti jūsų klasėje.</string>
   <string name="inviteDesc4">Niekada nesiųskite pakvietimų atsitiktiniams žaidėjams.</string>
-  <string name="createANewLichessAccount">Kurti naują Lichess paskyrą</string>
-  <string name="createDesc1">Jei mokinys dar neturi Lichess paskyros, galite jam tokią sukurti čia.</string>
+  <string name="createANewPlaystrategyAccount">Kurti naują Playstrategy paskyrą</string>
+  <string name="createDesc1">Jei mokinys dar neturi Playstrategy paskyros, galite jam tokią sukurti čia.</string>
   <string name="createDesc2">El. pašto adresas nereikalingas. Bus sugeneruotas slaptažodis, kurį turėsite perduoti mokiniui. Šiuo slaptažodžiu jis galės prisijungti.</string>
   <string name="createDesc3">Svarbu: mokinys negali turėti kelių paskyrų.</string>
   <string name="createDesc4">Jei jis jau turi paskyrą, naudokite pakvietimo formą.</string>
-  <string name="lichessUsername">Lichess vartotojo vardas</string>
+  <string name="playstrategyUsername">Playstrategy vartotojo vardas</string>
   <string name="generateANewUsername">Sugeneruoti naują vartotojo vardą</string>
   <string name="welcomeToClass">Sveiki atvykę į klasę: %s
 Štai nuoroda patekti į klasę.</string>

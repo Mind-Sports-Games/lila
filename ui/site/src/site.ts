@@ -3,7 +3,7 @@ import * as miniGame from './component/mini-game';
 import * as timeago from './component/timeago';
 import * as xhr from 'common/xhr';
 import announce from './component/announce';
-import exportLichessGlobals from './site.lichess.globals';
+import exportPlaystrategyGlobals from './site.playstrategy.globals';
 import info from './component/info';
 import loadClockWidget from './component/clock-widget';
 import moduleLaunchers from './component/module-launchers';
@@ -18,12 +18,12 @@ import { reload } from './component/reload';
 import { requestIdleCallback } from './component/functions';
 import { userComplete } from './component/assets';
 
-exportLichessGlobals();
-lichess.info = info;
+exportPlaystrategyGlobals();
+playstrategy.info = info;
 
 loadClockWidget();
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   moduleLaunchers();
 
   requestAnimationFrame(() => {
@@ -79,7 +79,7 @@ lichess.load.then(() => {
     powertip.watchMouse();
 
     setTimeout(() => {
-      if (!lichess.socket) lichess.socket = new StrongSocket('/socket/v5', false);
+      if (!playstrategy.socket) playstrategy.socket = new StrongSocket('/socket/v5', false);
     }, 300);
 
     topBar();
@@ -158,8 +158,8 @@ lichess.load.then(() => {
 
     // socket default receive handlers
     pubsub.on('socket.in.redirect', (d: RedirectTo) => {
-      lichess.unload.expected = true;
-      lichess.redirect(d);
+      playstrategy.unload.expected = true;
+      playstrategy.redirect(d);
     });
     pubsub.on('socket.in.fen', e =>
       document.querySelectorAll('.mini-game-' + e.id).forEach((el: HTMLElement) => miniGame.update(el, e))

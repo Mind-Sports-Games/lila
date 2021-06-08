@@ -246,7 +246,7 @@ final class TeamApi(
           case JsSuccess(users, _) =>
             users
               .map(_.value.toLowerCase.trim)
-              .filter(User.lichessId !=)
+              .filter(User.playstrategyId !=)
               .toSet take 30
           case _ => Set.empty[User.ID]
         }

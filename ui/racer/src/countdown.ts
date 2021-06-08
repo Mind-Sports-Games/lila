@@ -5,7 +5,7 @@ export class Countdown {
   played = new Set<number>();
 
   public constructor(readonly clock: Clock, readonly resetGround: () => void, readonly redraw: Redraw) {
-    for (let i = 10; i >= 0; i--) lichess.sound.loadStandard(`countDown${i}`);
+    for (let i = 10; i >= 0; i--) playstrategy.sound.loadStandard(`countDown${i}`);
   }
 
   start = (startsAt: Date, aloud: boolean): void => {
@@ -27,7 +27,7 @@ export class Countdown {
   private playOnce = (i: number) => {
     if (!this.played.has(i)) {
       this.played.add(i);
-      lichess.sound.play(`countDown${i}`);
+      playstrategy.sound.play(`countDown${i}`);
     }
   };
 }

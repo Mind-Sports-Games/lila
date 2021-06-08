@@ -8,7 +8,7 @@ const kill = () => {
   $('#announce').remove();
 };
 
-const announce = (d: LichessAnnouncement) => {
+const announce = (d: PlaystrategyAnnouncement) => {
   kill();
   if (d.msg) {
     $('body')
@@ -22,7 +22,7 @@ const announce = (d: LichessAnnouncement) => {
       .find('#announce .close')
       .on('click', kill);
     timeout = setTimeout(kill, d.date ? new Date(d.date).getTime() - Date.now() : 5000);
-    if (d.date) lichess.contentLoaded();
+    if (d.date) playstrategy.contentLoaded();
   }
 };
 

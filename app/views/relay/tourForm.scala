@@ -64,7 +64,7 @@ object tourForm {
     if (isGranted(_.Relay))
       form3.checkbox(
         form("official"),
-        raw("Official Lichess broadcast"),
+        raw("Official Playstrategy broadcast"),
         help = raw("Feature on /broadcast - for admins only").some
       )
     else form3.hidden(form("official"))

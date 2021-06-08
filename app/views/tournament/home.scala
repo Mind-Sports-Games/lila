@@ -25,7 +25,7 @@ object home {
       moreJs = frag(
         infiniteScrollTag,
         jsModule("tournament.schedule"),
-        embedJsUnsafeLoadThen(s"""LichessTournamentSchedule(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""PlaystrategyTournamentSchedule(${safeJsonValue(
           Json.obj(
             "data" -> json,
             "i18n" -> bits.jsI18n
@@ -68,7 +68,7 @@ object home {
             br,
             a(href := routes.Tournament.help("arena".some))(trans.tournamentFAQ())
           ),
-          h2(trans.lichessTournaments()),
+          h2(trans.playstrategyTournaments()),
           div(cls := "scheduled")(
             scheduled.map { tour =>
               tour.schedule.filter(s => s.freq != lila.tournament.Schedule.Freq.Hourly) map { s =>

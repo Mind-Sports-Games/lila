@@ -208,7 +208,7 @@ function renderMainlineCommentsOf(ctx: Ctx, node: Tree.Node, conceal: Conceal, w
   const colorClass = withColor ? (node.ply % 2 === 0 ? '.black ' : '.white ') : '';
 
   return node.comments!.map(comment => {
-    if (comment.by === 'lichess' && !ctx.showComputer) return;
+    if (comment.by === 'playstrategy' && !ctx.showComputer) return;
     let sel = 'comment' + colorClass;
     if (comment.text.startsWith('Inaccuracy.')) sel += '.inaccuracy';
     else if (comment.text.startsWith('Mistake.')) sel += '.mistake';

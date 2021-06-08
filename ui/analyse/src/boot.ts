@@ -2,7 +2,7 @@ import { AnalyseOpts } from './interfaces';
 import { start } from './main';
 
 export default function (cfg: AnalyseOpts) {
-  lichess.socket = new lichess.StrongSocket(cfg.data.url.socket, cfg.data.player.version, {
+  playstrategy.socket = new playstrategy.StrongSocket(cfg.data.url.socket, cfg.data.player.version, {
     params: {
       userTv: cfg.data.userTv && cfg.data.userTv.id,
     },
@@ -12,6 +12,6 @@ export default function (cfg: AnalyseOpts) {
   });
   cfg.$side = $('.analyse__side').clone();
   cfg.$underboard = $('.analyse__underboard').clone();
-  cfg.socketSend = lichess.socket.send;
+  cfg.socketSend = playstrategy.socket.send;
   const analyse = start(cfg);
 }

@@ -44,7 +44,7 @@ case class RacerRace(
 
   def finished = finishesAt.exists(_.isBeforeNow)
 
-  def isLobby = owner == RacerPlayer.lichess
+  def isLobby = owner == RacerPlayer.playstrategy
 }
 
 object RacerRace {

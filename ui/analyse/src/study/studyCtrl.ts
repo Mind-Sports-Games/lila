@@ -222,9 +222,9 @@ export default function (
     const canContribute = members.canContribute();
     // unwrite if member lost privileges
     vm.mode.write = vm.mode.write && canContribute;
-    lichess.pubsub.emit('chat.writeable', data.features.chat);
-    lichess.pubsub.emit('chat.permissions', { local: canContribute });
-    lichess.pubsub.emit('palantir.toggle', data.features.chat && !!members.myMember());
+    playstrategy.pubsub.emit('chat.writeable', data.features.chat);
+    playstrategy.pubsub.emit('chat.permissions', { local: canContribute });
+    playstrategy.pubsub.emit('palantir.toggle', data.features.chat && !!members.myMember());
     const computer: boolean = !isGamebookPlay() && !!(data.chapter.features.computer || data.chapter.practice);
     if (!computer) ctrl.getCeval().enabled(false);
     ctrl.getCeval().allowed(computer);
@@ -300,7 +300,7 @@ export default function (
     vm.loading = true;
     return xhr
       .reload(practice ? 'practice/load' : 'study', data.id, vm.mode.sticky ? undefined : vm.chapterId)
-      .then(onReload, lichess.reload);
+      .then(onReload, playstrategy.reload);
   });
 
   const onSetPath = throttle(300, (path: Tree.Path) => {
@@ -381,7 +381,7 @@ export default function (
         return xhrReload();
       }
       data.position.path = position.path;
-      if (who && who.s === lichess.sri) return;
+      if (who && who.s === playstrategy.sri) return;
       ctrl.userJump(position.path);
       redraw();
     },
@@ -397,7 +397,7 @@ export default function (
         if (sticky && !vm.mode.sticky) redraw();
         return;
       }
-      if (sticky && who && who.s === lichess.sri) {
+      if (sticky && who && who.s === playstrategy.sri) {
         data.position.path = position.path + node.id;
         return;
       }
@@ -419,7 +419,7 @@ export default function (
       setMemberActive(who);
       if (wrongChapter(d)) return;
       // deleter already has it done
-      if (who && who.s === lichess.sri) return;
+      if (who && who.s === playstrategy.sri) return;
       if (!ctrl.tree.pathExists(d.p.path)) return xhrReload();
       ctrl.tree.deleteNodeAt(position.path);
       if (vm.mode.sticky) ctrl.jump(ctrl.path);
@@ -430,7 +430,7 @@ export default function (
         who = d.w;
       setMemberActive(who);
       if (wrongChapter(d)) return;
-      if (who && who.s === lichess.sri) return;
+      if (who && who.s === playstrategy.sri) return;
       if (!ctrl.tree.pathExists(d.p.path)) return xhrReload();
       ctrl.tree.promoteAt(position.path, d.toMainline);
       if (vm.mode.sticky) ctrl.jump(ctrl.path);
@@ -450,7 +450,7 @@ export default function (
     },
     descChapter(d) {
       setMemberActive(d.w);
-      if (d.w && d.w.s === lichess.sri) return;
+      if (d.w && d.w.s === playstrategy.sri) return;
       if (data.chapter.id === d.chapterId) {
         data.chapter.description = d.desc;
         chapterDesc.set(d.desc);
@@ -459,7 +459,7 @@ export default function (
     },
     descStudy(d) {
       setMemberActive(d.w);
-      if (d.w && d.w.s === lichess.sri) return;
+      if (d.w && d.w.s === playstrategy.sri) return;
       data.description = d.desc;
       studyDesc.set(d.desc);
       redraw();
@@ -473,7 +473,7 @@ export default function (
       setMemberActive(d.w);
       if (d.s && !vm.mode.sticky) vm.behind++;
       if (d.s) data.position = d.p;
-      else if (d.w && d.w.s === lichess.sri) {
+      else if (d.w && d.w.s === playstrategy.sri) {
         vm.mode.write = true;
         vm.chapterId = d.p.chapterId;
       }
@@ -497,7 +497,7 @@ export default function (
         who = d.w;
       setMemberActive(who);
       if (d.p.chapterId !== vm.chapterId) return;
-      if (who && who.s === lichess.sri) return;
+      if (who && who.s === playstrategy.sri) return;
       ctrl.tree.setShapes(d.s, ctrl.path);
       if (ctrl.path === position.path) ctrl.withCg(cg => cg.setShapes(d.s));
       redraw();
@@ -558,7 +558,7 @@ export default function (
     },
     liking(d) {
       data.likes = d.l.likes;
-      if (d.w && d.w.s === lichess.sri) data.liked = d.l.me;
+      if (d.w && d.w.s === playstrategy.sri) data.liked = d.l.me;
       redraw();
     },
     error(msg: string) {

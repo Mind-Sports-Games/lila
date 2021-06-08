@@ -22,7 +22,7 @@ object show {
       moreCss = cssTag("puzzle"),
       moreJs = frag(
         jsModule("puzzle"),
-        embedJsUnsafeLoadThen(s"""LichessPuzzle(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""PlaystrategyPuzzle(${safeJsonValue(
           Json
             .obj(
               "data" -> data,
@@ -45,7 +45,7 @@ object show {
           description =
             if (isStreak) trans.puzzle.streakDescription.txt()
             else
-              s"Lichess tactic trainer: ${puzzle.color
+              s"Playstrategy tactic trainer: ${puzzle.color
                 .fold(
                   trans.puzzle.findTheBestMoveForWhite,
                   trans.puzzle.findTheBestMoveForBlack

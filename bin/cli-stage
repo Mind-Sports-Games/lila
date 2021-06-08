@@ -3,4 +3,4 @@
 COMMAND=$*
 PASSWORD=$LILA_CLI_PASSWORD
 
-curl -d "password=$PASSWORD&command=$COMMAND" https://lichess.dev/cli
+curl -d "password=$PASSWORD&command=$COMMAND" https://playstrategy.dev/cli

@@ -2,7 +2,7 @@ import * as xhr from 'common/xhr';
 import once from './component/once';
 import { hopscotch } from './component/assets';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   $('.user-show .note-zone-toggle').each(function (this: HTMLElement) {
     $(this).on('click', () => $('.user-show .note-zone').toggle().find('textarea')[0]?.focus());
     if (location.search.includes('note')) $(this).trigger('click');
@@ -46,7 +46,7 @@ lichess.load.then(() => {
       browseTo = (path: string) =>
         xhr.text(path).then(html => {
           $content.html(html);
-          lichess.contentLoaded($content[0]);
+          playstrategy.contentLoaded($content[0]);
           history.replaceState({}, '', path);
           window.InfiniteScroll('.infinite-scroll');
         });

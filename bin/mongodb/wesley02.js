@@ -5,7 +5,7 @@ db.tournament2.insert({
     increment: NumberInt(0),
   },
   createdAt: new Date(),
-  createdBy: 'lichess',
+  createdBy: 'playstrategy',
   minutes: NumberInt(60),
   name: 'GM Wesley So Arena',
   nbPlayers: NumberInt(0),

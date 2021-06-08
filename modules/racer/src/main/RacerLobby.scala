@@ -23,14 +23,14 @@ final class RacerLobby(api: RacerApi)(implicit ec: ExecutionContext, system: akk
       name = "racer.lobby"
     )
 
-  private val fallbackRace = RacerRace.make(RacerPlayer.lichess, Nil, 10)
+  private val fallbackRace = RacerRace.make(RacerPlayer.playstrategy, Nil, 10)
 
-  private var currentId: Fu[RacerRace.Id] = api.create(RacerPlayer.lichess, 10)
+  private var currentId: Fu[RacerRace.Id] = api.create(RacerPlayer.playstrategy, 10)
 
   private def currentRace: Fu[RacerRace] = currentId.map(api.get) dmap { _ | fallbackRace }
 
   private def makeNewRace(countdownSeconds: Int): Fu[RacerRace.Id] = {
-    currentId = api.create(RacerPlayer.lichess, countdownSeconds)
+    currentId = api.create(RacerPlayer.playstrategy, countdownSeconds)
     currentId
   }
 }

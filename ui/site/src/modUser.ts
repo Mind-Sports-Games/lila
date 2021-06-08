@@ -4,7 +4,7 @@ import extendTablesortNumber from './component/tablesort-number';
 import spinnerHtml from './component/spinner';
 import tablesort from 'tablesort';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   const $toggle = $('.mod-zone-toggle'),
     $zone = $('.mod-zone-full');
   let nbOthers = 100;
@@ -60,7 +60,7 @@ lichess.load.then(() => {
   const getLocationHash = (a: HTMLAnchorElement) => a.href.replace(/.+(#\w+)$/, '$1');
 
   function userMod($inZone: Cash) {
-    lichess.contentLoaded($inZone[0]);
+    playstrategy.contentLoaded($inZone[0]);
 
     const makeReady = (selector: string, f: (el: HTMLElement, i: number) => void, cls = 'ready') => {
       $inZone.find(selector + `:not(.${cls})`).each(function (this: HTMLElement, i: number) {

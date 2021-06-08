@@ -25,7 +25,7 @@ export interface SoundCtrl {
 export function ctrl(raw: string[], trans: Trans, redraw: Redraw, close: Close): SoundCtrl {
   const list: Sound[] = raw.map(s => s.split(' '));
 
-  const api = lichess.sound;
+  const api = playstrategy.sound;
 
   const postSet = (set: string) =>
     xhr
@@ -33,7 +33,7 @@ export function ctrl(raw: string[], trans: Trans, redraw: Redraw, close: Close):
         body: xhr.form({ set }),
         method: 'post',
       })
-      .catch(() => lichess.announce({ msg: 'Failed to save sound preference' }));
+      .catch(() => playstrategy.announce({ msg: 'Failed to save sound preference' }));
 
   return {
     makeList() {
@@ -43,7 +43,7 @@ export function ctrl(raw: string[], trans: Trans, redraw: Redraw, close: Close):
     api,
     set(k: Key) {
       api.speech(k == 'speech');
-      lichess.pubsub.emit('speech.enabled', api.speech());
+      playstrategy.pubsub.emit('speech.enabled', api.speech());
       if (api.speech()) {
         api.changeSet('standard');
         postSet('standard');

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">Ақшалай жәрдем</string>
-  <string name="lichessPatron">Личес Қамқоршысы</string>
+  <string name="playstrategyPatron">Личес Қамқоршысы</string>
   <string name="freeAccount">Тегін аккаунт</string>
   <string name="becomePatron">Лическе Қамқоршы болу</string>
   <string name="xBecamePatron">%s Лическе Қамқоршы болды</string>

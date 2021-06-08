@@ -33,7 +33,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   const ground = prop<CgApi | undefined>(undefined) as Prop<CgApi>;
   const threatMode = prop(false);
   const streak = opts.data.streak ? new PuzzleStreak(opts.data) : undefined;
-  const streakFailStorage = lichess.storage.make('puzzle.streak.fail');
+  const streakFailStorage = playstrategy.storage.make('puzzle.streak.fail');
   if (streak) {
     opts.data = {
       ...opts.data,
@@ -47,10 +47,10 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   vm.showComputer = () => vm.mode === 'view';
   vm.showAutoShapes = () => true;
 
-  const throttleSound = (name: string) => throttle(100, () => lichess.sound.play(name));
+  const throttleSound = (name: string) => throttle(100, () => playstrategy.sound.play(name));
   const loadSound = (file: string, volume?: number, delay?: number) => {
-    setTimeout(() => lichess.sound.loadOggOrMp3(file, `${lichess.sound.baseUrl}/${file}`), delay || 1000);
-    return () => lichess.sound.play(file, volume);
+    setTimeout(() => playstrategy.sound.loadOggOrMp3(file, `${playstrategy.sound.baseUrl}/${file}`), delay || 1000);
+    return () => playstrategy.sound.play(file, volume);
   };
   const sound = {
     move: throttleSound('move'),
@@ -272,7 +272,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     vm.resultSent = true;
     session.complete(data.puzzle.id, win);
     return xhr.complete(data.puzzle.id, data.theme.key, win, data.replay, streak).then((res: PuzzleResult) => {
-      if (res?.replayComplete && data.replay) return lichess.redirect(`/training/dashboard/${data.replay.days}`);
+      if (res?.replayComplete && data.replay) return playstrategy.redirect(`/training/dashboard/${data.replay.days}`);
       if (res?.next.user && data.user) {
         data.user.rating = res.next.user.rating;
         data.user.provisional = res.next.user.provisional;
@@ -399,7 +399,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     promotion.cancel();
     vm.justPlayed = undefined;
     vm.autoScrollRequested = true;
-    lichess.pubsub.emit('ply', vm.node.ply);
+    playstrategy.pubsub.emit('ply', vm.node.ply);
   }
 
   function userJump(path: Tree.Path): void {
@@ -487,18 +487,18 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   // If the page loads while being hidden (like when changing settings),
   // chessground is not displayed, and the first move is not fully applied.
   // Make sure chessground is fully shown when the page goes back to being visible.
-  document.addEventListener('visibilitychange', () => lichess.requestIdleCallback(() => jump(vm.path), 500));
+  document.addEventListener('visibilitychange', () => playstrategy.requestIdleCallback(() => jump(vm.path), 500));
 
   speech.setup();
 
-  lichess.pubsub.on('zen', () => {
+  playstrategy.pubsub.on('zen', () => {
     const zen = !$('body').hasClass('zen');
     $('body').toggleClass('zen', zen);
     window.dispatchEvent(new Event('resize'));
     xhr.setZen(zen);
   });
   $('body').addClass('playing'); // for zen
-  $('#zentog').on('click', () => lichess.pubsub.emit('zen'));
+  $('#zentog').on('click', () => playstrategy.pubsub.emit('zen'));
 
   return {
     vm,
@@ -518,7 +518,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     getCeval,
     pref: opts.pref,
     difficulty: opts.difficulty,
-    trans: lichess.trans(opts.i18n),
+    trans: playstrategy.trans(opts.i18n),
     autoNext,
     autoNexting: () => vm.lastFeedback == 'win' && autoNext(),
     outcome,

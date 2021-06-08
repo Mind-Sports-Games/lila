@@ -26,7 +26,7 @@ object bits {
     )
 
   lazy val stage = a(
-    href := "https://lichess.org",
+    href := "https://playstrategy.org",
     style := """
 background: #7f1010;
 color: #fff;
@@ -38,15 +38,15 @@ border-top-right-radius: 3px;
 z-index: 99;
 """
   )(
-    "This is an empty Lichess preview website, go to lichess.org instead"
+    "This is an empty Playstrategy preview website, go to playstrategy.org instead"
   )
 
   val connectLinks =
     div(cls := "connect-links")(
-      a(href := "https://twitter.com/lichess", targetBlank, noFollow)("Twitter"),
+      a(href := "https://twitter.com/playstrategy", targetBlank, noFollow)("Twitter"),
       a(href := "https://discord.gg/hy5jqSs", targetBlank, noFollow)("Discord"),
       a(href := "https://www.youtube.com/channel/UCr6RfQga70yMM9-nuzAYTsA", targetBlank, noFollow)("YouTube"),
-      a(href := "https://www.twitch.tv/lichessdotorg", targetBlank, noFollow)("Twitch")
+      a(href := "https://www.twitch.tv/playstrategydotorg", targetBlank, noFollow)("Twitch")
     )
 
   def fenAnalysisLink(fen: FEN)(implicit lang: Lang) =
