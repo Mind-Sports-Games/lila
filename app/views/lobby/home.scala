@@ -194,7 +194,7 @@ object home {
           a(href := routes.Page.tos)(trans.termsOfService()),
           a(href := "/privacy")(trans.privacy()),
           a(href := "/source")(trans.sourceCode()),
-          a(href := "/ads")("Ads"),
+          //a(href := "/ads")("Ads"),
           views.html.base.bits.connectLinks
         )
       )

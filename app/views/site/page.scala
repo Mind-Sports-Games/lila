@@ -225,8 +225,8 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           a(activeCls("database"), href := "https://database.playstrategy.org")(trans.database(), external),
           a(activeCls("api"), href := routes.Api.index)("API", external),
           sep,
-          a(activeCls("lag"), href := routes.Main.lag)(trans.lag.isPlaystrategyLagging()),
-          a(activeCls("ads"), href := "/ads")("Block ads")
+          a(activeCls("lag"), href := routes.Main.lag)(trans.lag.isPlaystrategyLagging())
+          //a(activeCls("ads"), href := "/ads")("Block ads")
         ),
         div(cls := s"page-menu__content $contentCls")(body)
       )
