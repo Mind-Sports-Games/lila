@@ -11,9 +11,13 @@ import view from './view/main';
 
 export default function (opts: TournamentOpts) {
   $('body').data('tournament-id', opts.data.id);
-  playstrategy.socket = new playstrategy.StrongSocket(`/tournament/${opts.data.id}/socket/v5`, opts.data.socketVersion, {
-    receive: (t: string, d: any) => ctrl.socket.receive(t, d),
-  });
+  playstrategy.socket = new playstrategy.StrongSocket(
+    `/tournament/${opts.data.id}/socket/v5`,
+    opts.data.socketVersion,
+    {
+      receive: (t: string, d: any) => ctrl.socket.receive(t, d),
+    }
+  );
   opts.socketSend = playstrategy.socket.send;
   opts.element = document.querySelector('main.tour') as HTMLElement;
   opts.classes = opts.element.getAttribute('class');

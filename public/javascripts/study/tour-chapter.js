@@ -47,7 +47,9 @@ playstrategy.studyTourChapter = function (study) {
       {
         title: 'Load an existing playstrategy game',
         text:
-          'Paste a playstrategy game URL<br>' + '(like playstrategy.org/7fHIU0XI)<br>' + 'to load the game moves in the chapter.',
+          'Paste a playstrategy game URL<br>' +
+          '(like playstrategy.org/7fHIU0XI)<br>' +
+          'to load the game moves in the chapter.',
         attachTo: '.study__modal .tabs-horiz .game top',
         when: onTab('game'),
       },

@@ -22,7 +22,15 @@ if (!db.m_thread_sorted.count()) {
       $or: [
         {
           creatorId: {
-            $nin: ['playstrategy', 'playstrategy-qa', 'lichess-blog', 'playstrategy-team', 'mirlife', 'playstrategy4545', 'whatnext'],
+            $nin: [
+                'playstrategy',
+                'playstrategy-qa',
+                'lichess-blog',
+                'playstrategy-team',
+                'mirlife',
+                'playstrategy4545',
+                'whatnext'
+            ],
           },
         },
         {

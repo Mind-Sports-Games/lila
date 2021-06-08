@@ -131,7 +131,9 @@ function suggestBgSwitch() {
   const getDasher = (): Promise<any> => {
     dasher =
       dasher ||
-      playstrategy.loadModule('dasher').then(() => window.PlaystrategyDasher(document.createElement('div'), { playing: false }));
+      playstrategy
+        .loadModule('dasher')
+        .then(() => window.PlaystrategyDasher(document.createElement('div'), { playing: false }));
     return dasher;
   };
 

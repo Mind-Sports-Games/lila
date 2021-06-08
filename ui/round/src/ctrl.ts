@@ -510,7 +510,13 @@ export default class RoundController {
     if (!d.player.spectator && d.game.turns > 1) {
       const key = o.winner ? (d.player.color === o.winner ? 'victory' : 'defeat') : 'draw';
       playstrategy.sound.play(key);
-      if (key != 'victory' && d.game.turns > 6 && !d.tournament && !d.swiss && playstrategy.storage.get('courtesy') == '1')
+      if (
+        key != 'victory' &&
+        d.game.turns > 6 &&
+        !d.tournament &&
+        !d.swiss &&
+        playstrategy.storage.get('courtesy') == '1'
+      )
         this.opts.chat?.instance?.then(c => c.post('Good game, well played'));
     }
     if (d.crazyhouse) crazyEndHook();

@@ -115,7 +115,9 @@ export function render(ctrl: KeyboardMove) {
         autocomplete: false,
       },
       hook: onInsert(input =>
-        playstrategy.loadModule('round.keyboardMove').then(() => ctrl.registerHandler(playstrategy.keyboardMove({ input, ctrl })))
+        playstrategy
+          .loadModule('round.keyboardMove')
+          .then(() => ctrl.registerHandler(playstrategy.keyboardMove({ input, ctrl })))
       ),
     }),
     ctrl.hasFocus()

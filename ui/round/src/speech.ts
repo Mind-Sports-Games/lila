@@ -26,4 +26,5 @@ export const userJump = (ctrl: RoundController, ply: Ply) => withSpeech(s => s.s
 
 export const step = (step: Step) => withSpeech(s => s.step(step, false));
 
-const withSpeech = (f: (speech: PlaystrategySpeech) => void) => window.PlaystrategySpeech && f(window.PlaystrategySpeech);
+const withSpeech = (f: (speech: PlaystrategySpeech) => void) =>
+  window.PlaystrategySpeech && f(window.PlaystrategySpeech);
