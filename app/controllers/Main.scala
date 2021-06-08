@@ -70,6 +70,7 @@ final class Main(
       }
     }
 
+  /*
   def mobile =
     Open { implicit ctx =>
       pageHit
@@ -77,6 +78,7 @@ final class Main(
         html.mobile(doc, resolver)
       }
     }
+  */
 
   def dailyPuzzleSlackApp =
     Open { implicit ctx =>
