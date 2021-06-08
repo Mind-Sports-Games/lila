@@ -105,3 +105,7 @@ export const spinner = () =>
       ]),
     ]
   );
+
+export function uciDisplayVariant(key: VariantKey) {
+  return ['linesOfAction'].includes(key);
+}
