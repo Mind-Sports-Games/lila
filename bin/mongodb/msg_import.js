@@ -23,13 +23,13 @@ if (!db.m_thread_sorted.count()) {
         {
           creatorId: {
             $nin: [
-                'playstrategy',
-                'playstrategy-qa',
-                'lichess-blog',
-                'playstrategy-team',
-                'mirlife',
-                'playstrategy4545',
-                'whatnext'
+              'playstrategy',
+              'playstrategy-qa',
+              'lichess-blog',
+              'playstrategy-team',
+              'mirlife',
+              'playstrategy4545',
+              'whatnext',
             ],
           },
         },
