@@ -41,5 +41,5 @@ export function uciDisplayVariant(key: VariantKey) {
 }
 
 export function variantStyle(key: VariantKey) {
-  return uciDisplayVariant(key) ? 'uci' : 'san'
+  return uciDisplayVariant(key) ? 'uci' : 'san';
 }

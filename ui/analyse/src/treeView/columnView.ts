@@ -143,11 +143,7 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
       attrs: { p: path },
       class: classes,
     },
-    moveView.renderMove(
-      ctx,
-      node,
-      variantStyle(ctx.ctrl.data.game.variant.key)
-    )
+    moveView.renderMove(ctx, node, variantStyle(ctx.ctrl.data.game.variant.key))
   );
 }
 
