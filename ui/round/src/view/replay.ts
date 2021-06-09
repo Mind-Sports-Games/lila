@@ -9,7 +9,7 @@ import viewStatus from 'game/view/status';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes, RoundData } from '../interfaces';
-import uciDisplayVariant from 'chess';
+import { uciDisplayVariant } from 'chess';
 
 const scrollMax = 99999,
   moveTag = 'u8t',
