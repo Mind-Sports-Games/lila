@@ -1,4 +1,4 @@
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   $('.event .countdown').each(function () {
     var $el = $(this);
     var seconds = parseInt($(this).data('seconds')) - 1;
@@ -19,7 +19,7 @@ lichess.load.then(() => {
           $el.find('.seconds').text(Math.floor((distance % minute) / second));
       } else {
         clearInterval(interval);
-        lichess.reload();
+        playstrategy.reload();
       }
     };
     var interval = setInterval(redraw, second);

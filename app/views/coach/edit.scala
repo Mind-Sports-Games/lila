@@ -12,7 +12,7 @@ import lila.common.String.html.{ richText, safeJsonValue }
 import controllers.routes
 
 object edit {
-
+/*
   private val dataTab   = attr("data-tab")
   private val dataValue = attr("data-value")
 
@@ -152,8 +152,8 @@ object edit {
             div(cls := "panel contents")(
               form3.group(
                 form("profile.publicStudies"),
-                raw("Featured public Lichess studies"),
-                help = raw("Up to 6 Lichess study URLs, one per line").some
+                raw("Featured public Playstrategy studies"),
+                help = raw("Up to 6 Playstrategy study URLs, one per line").some
               )(form3.textarea(_)()),
               form3.group(form("profile.youtubeChannel"), raw("URL of your Youtube channel"))(form3.input(_)),
               form3.group(
@@ -193,5 +193,5 @@ object edit {
         )
       )
     )
-  }
+  }*/
 }

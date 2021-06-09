@@ -72,7 +72,7 @@ function toCeval(e: Tree.ServerEval): Tree.ClientEval {
 export function make(opts: EvalCacheOpts): EvalCache {
   const fetchedByFen: Dictionary<CachedEval> = {};
   const upgradable = prop(false);
-  lichess.pubsub.on('socket.in.crowd', d => upgradable(d.nb > 2));
+  playstrategy.pubsub.on('socket.in.crowd', d => upgradable(d.nb > 2));
   return {
     onCeval: throttle(500, function () {
       const node = opts.getNode(),

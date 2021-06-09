@@ -12,8 +12,8 @@ object atom {
   def apply(
       pager: Paginator[io.prismic.Document],
       baseUrl: BaseUrl
-  )(implicit prismic: lila.blog.BlogApi.Context) =
-    frag(
+  )(implicit prismic: lila.blog.BlogApi.Context) = ()
+    /*frag(
       raw("""<?xml version="1.0" encoding="UTF-8"?>"""),
       raw(
         """<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">"""
@@ -55,5 +55,5 @@ object atom {
         )
       },
       raw("</feed>")
-    )
+    )*/
 }

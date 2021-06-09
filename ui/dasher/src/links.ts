@@ -77,7 +77,7 @@ export default function (ctrl: DasherCtrl): VNode {
               'data-icon': 'K',
               title: 'Keyboard: z',
             },
-            hook: bind('click', () => lichess.pubsub.emit('zen')),
+            hook: bind('click', () => playstrategy.pubsub.emit('zen')),
           },
           noarg('zenMode')
         ),

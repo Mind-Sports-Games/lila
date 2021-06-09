@@ -11,7 +11,7 @@ export default class Setup {
     ai: FormStore;
   };
 
-  constructor(readonly makeStorage: (name: string) => LichessStorage, readonly root: LobbyController) {
+  constructor(readonly makeStorage: (name: string) => PlaystrategyStorage, readonly root: LobbyController) {
     this.stores = {
       hook: makeStore(makeStorage('lobby.setup.hook')),
       friend: makeStore(makeStorage('lobby.setup.friend')),
@@ -257,7 +257,7 @@ export default class Setup {
           this.root.enterPool(poolMember);
         } else {
           this.root.setTab($timeModeSelect.val() === '1' ? 'real_time' : 'seeks');
-          xhr.text($form.attr('action')!.replace(/sri-placeholder/, lichess.sri), {
+          xhr.text($form.attr('action')!.replace(/sri-placeholder/, playstrategy.sri), {
             method: 'post',
             body: (() => {
               const data = new FormData($form[0] as HTMLFormElement);
@@ -278,7 +278,7 @@ export default class Setup {
     } else
       $form.one('submit', () => {
         $submits.hide();
-        $form.find('.color-submits').append(lichess.spinnerHtml);
+        $form.find('.color-submits').append(playstrategy.spinnerHtml);
       });
     if (this.root.opts.blindMode) {
       $variantSelect[0]!.focus();
@@ -397,7 +397,7 @@ export default class Setup {
               this.href = this.href.replace(/editor\/.+$/, 'editor/' + fen);
             });
             $submits.removeClass('nope');
-            lichess.contentLoaded();
+            playstrategy.contentLoaded();
           },
           _ => {
             $fenInput.addClass('failure');

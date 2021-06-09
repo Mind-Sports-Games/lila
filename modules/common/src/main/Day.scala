@@ -2,7 +2,7 @@ package lila.common
 
 import org.joda.time.{ DateTime, Days }
 
-// number of days since lichess
+// number of days since playstrategy
 case class Day(value: Int) extends AnyVal {
 
   def toDate = Day.genesis.plusDays(value).withTimeAtStartOfDay

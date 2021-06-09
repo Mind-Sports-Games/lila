@@ -1,12 +1,12 @@
 /// <reference types="highcharts" />
 
-interface Lichess {
+interface Playstrategy {
   load: Promise<void>; // window.onload promise
   info: any;
   requestIdleCallback(f: () => void, timeout?: number): void;
   sri: string;
-  storage: LichessStorageHelper;
-  tempStorage: LichessStorageHelper;
+  storage: PlaystrategyStorageHelper;
+  tempStorage: PlaystrategyStorageHelper;
   once(key: string, mod?: 'always'): boolean;
   powertip: any;
   widget: any;
@@ -31,7 +31,7 @@ interface Lichess {
   redirect(o: RedirectTo): void;
   reload(): void;
   escapeHtml(str: string): string;
-  announce(d: LichessAnnouncement): void;
+  announce(d: PlaystrategyAnnouncement): void;
   studyTour(study: Study): void;
   studyTourChapter(study: Study): void;
 
@@ -117,7 +117,7 @@ interface SoundI {
   baseUrl: string;
 }
 
-interface LichessSpeech {
+interface PlaystrategySpeech {
   say(t: string, cut: boolean): void;
   step(s: { san?: San }, cut: boolean): void;
 }
@@ -164,41 +164,41 @@ interface Pubsub {
   emit(msg: string, ...args: any[]): void;
 }
 
-interface LichessStorageHelper {
-  make(k: string): LichessStorage;
-  makeBoolean(k: string): LichessBooleanStorage;
+interface PlaystrategyStorageHelper {
+  make(k: string): PlaystrategyStorage;
+  makeBoolean(k: string): PlaystrategyBooleanStorage;
   get(k: string): string | null;
   set(k: string, v: string): void;
   fire(k: string, v?: string): void;
   remove(k: string): void;
 }
 
-interface LichessStorage {
+interface PlaystrategyStorage {
   get(): string | null;
   set(v: any): void;
   remove(): void;
-  listen(f: (e: LichessStorageEvent) => void): void;
+  listen(f: (e: PlaystrategyStorageEvent) => void): void;
   fire(v?: string): void;
 }
 
-interface LichessBooleanStorage {
+interface PlaystrategyBooleanStorage {
   get(): boolean;
   set(v: boolean): void;
   toggle(): void;
 }
 
-interface LichessStorageEvent {
+interface PlaystrategyStorageEvent {
   sri: string;
   nonce: number;
   value?: string;
 }
 
-interface LichessAnnouncement {
+interface PlaystrategyAnnouncement {
   msg?: string;
   date?: string;
 }
 
-interface LichessEditor {
+interface PlaystrategyEditor {
   getFen(): string;
   setOrientation(o: Color): void;
 }
@@ -232,19 +232,19 @@ declare namespace Editor {
 }
 
 interface Window {
-  lichess: Lichess;
+  playstrategy: Playstrategy;
 
   moment: any;
   Mousetrap: any;
   Chessground: any;
   Highcharts: Highcharts.Static;
   InfiniteScroll(selector: string): void;
-  lichessReplayMusic: () => {
+  playstrategyReplayMusic: () => {
     jump(node: Tree.Node): void;
   };
   hopscotch: any;
-  LichessSpeech?: LichessSpeech;
-  LichessEditor?(element: HTMLElement, config: Editor.Config): LichessEditor;
+  PlaystrategySpeech?: PlaystrategySpeech;
+  PlaystrategyEditor?(element: HTMLElement, config: Editor.Config): PlaystrategyEditor;
   palantir?: {
     palantir(opts: PalantirOpts): Palantir;
   };
@@ -526,4 +526,4 @@ interface Dictionary<T> {
 
 type SocketHandlers = Dictionary<(d: any) => void>;
 
-declare const lichess: Lichess;
+declare const playstrategy: Playstrategy;

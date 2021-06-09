@@ -2,12 +2,12 @@
   "name": "lobby",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org lobby",
+  "description": "playstrategy.org lobby",
   "type": "module",
   "module": "src/main.js",
   "keywords": [
     "chess",
-    "lichess",
+    "playstrategy",
     "lobby",
     "seek"
   ],
@@ -15,7 +15,7 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@build/rollupProject": "2.0.0",
-    "@types/lichess": "2.0.0"
+    "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",

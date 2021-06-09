@@ -26,7 +26,7 @@ object userAnalysis {
       moreJs = frag(
         analyseTag,
         analyseNvuiTag,
-        embedJsUnsafe(s"""lichess.userAnalysis=${safeJsonValue(
+        embedJsUnsafe(s"""playstrategy.userAnalysis=${safeJsonValue(
           Json.obj(
             "data" -> data,
             "i18n" -> userAnalysisI18n(withForecast = withForecast),

@@ -13,7 +13,7 @@ function timer(pov: NowPlaying) {
         },
       },
     },
-    lichess.timeago(date)
+    playstrategy.timeago(date)
   );
 }
 
@@ -34,7 +34,7 @@ export default function (ctrl: LobbyController) {
             },
             hook: {
               insert(vnode) {
-                lichess.miniBoard.init(vnode.elm as HTMLElement);
+                playstrategy.miniBoard.init(vnode.elm as HTMLElement);
               },
             },
           }),

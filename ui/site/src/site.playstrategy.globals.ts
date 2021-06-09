@@ -29,7 +29,7 @@ import { format as timeago } from './component/timeago';
 import watchers from './component/watchers';
 
 export default function () {
-  const l = window.lichess;
+  const l = window.playstrategy;
   l.StrongSocket = StrongSocket;
   l.requestIdleCallback = requestIdleCallback;
   l.sri = sri;

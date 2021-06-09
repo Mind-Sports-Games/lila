@@ -17,12 +17,12 @@ object home {
     views.html.base.layout(
       title = "",
       fullTitle = Some {
-        s"lichess.${if (netConfig.isProd) "org" else "dev"} • ${trans.freeOnlineChess.txt()}"
+        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • ${trans.freeOnlineChess.txt()}"
       },
       moreJs = frag(
         jsModule("lobby"),
         embedJsUnsafeLoadThen(
-          s"""LichessLobby(${safeJsonValue(
+          s"""PlaystrategyLobby(${safeJsonValue(
             Json.obj(
               "data" -> data,
               "playban" -> playban.map { pb =>
@@ -40,8 +40,8 @@ object home {
       chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          image = assetUrl("logo/lichess-tile-wide.png").some,
-          twitterImage = assetUrl("logo/lichess-tile.png").some,
+          image = assetUrl("logo/playstrategy-tile-wide.png").some,
+          twitterImage = assetUrl("logo/playstrategy-tile.png").some,
           title = "The best free, adless Chess server",
           url = netBaseUrl,
           description = trans.siteDescription.txt()
@@ -143,11 +143,11 @@ object home {
             div(cls := "about-side")(
               ctx.blind option h2("About"),
               trans.xIsAFreeYLibreOpenSourceChessServer(
-                "Lichess",
+                "Playstrategy",
                 a(cls := "blue", href := routes.Plan.features)(trans.really.txt())
               ),
               " ",
-              a(href := "/about")(trans.aboutX("Lichess"), "...")
+              a(href := "/about")(trans.aboutX("Playstrategy"), "...")
             )
         ),
         featured map { g =>
@@ -168,7 +168,7 @@ object home {
             views.html.forum.post recent forumRecent
           )
         ),
-        bits.lastPosts(lastPost),
+        //bits.lastPosts(lastPost),
         div(cls := "lobby__support")(
           a(href := routes.Plan.index)(
             iconTag(patronIconChar),
@@ -177,7 +177,7 @@ object home {
               span(trans.patron.becomePatron())
             )
           ),
-          a(href := "https://shop.spreadshirt.com/lichess-org")(
+          a(href := "https://shop.spreadshirt.com/playstrategy-org")(
             iconTag(""),
             span(cls := "lobby__support__text")(
               strong("Swag Store"),
@@ -187,14 +187,14 @@ object home {
         ),
         div(cls := "lobby__about")(
           ctx.blind option h2("About"),
-          a(href := "/about")(trans.aboutX("Lichess")),
+          a(href := "/about")(trans.aboutX("Playstrategy")),
           a(href := "/faq")(trans.faq.faqAbbreviation()),
           a(href := "/contact")(trans.contact.contact()),
-          a(href := "/mobile")(trans.mobileApp()),
+          //a(href := "/mobile")(trans.mobileApp()),
           a(href := routes.Page.tos)(trans.termsOfService()),
           a(href := "/privacy")(trans.privacy()),
           a(href := "/source")(trans.sourceCode()),
-          a(href := "/ads")("Ads"),
+          //a(href := "/ads")("Ads"),
           views.html.base.bits.connectLinks
         )
       )

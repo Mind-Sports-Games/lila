@@ -24,7 +24,7 @@ final class ExplorerImporter(
           case Some(pgn) =>
             gameImporter(
               ImportData(pgn, none),
-              user = "lichess".some,
+              user = "playstrategy".some,
               forceId = id.some
             ) map some
         }

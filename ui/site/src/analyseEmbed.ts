@@ -1,11 +1,11 @@
-import exportLichessGlobals from './site.lichess.globals';
+import exportPlaystrategyGlobals from './site.playstrategy.globals';
 
-exportLichessGlobals();
+exportPlaystrategyGlobals();
 
 export default function (opts: any) {
   document.body.classList.toggle('supports-max-content', !!window.chrome);
 
-  window.LichessAnalyse.start({
+  window.PlaystrategyAnalyse.start({
     ...opts,
     socketSend: () => {},
   });

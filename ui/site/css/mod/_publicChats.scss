@@ -24,7 +24,7 @@
     overflow-y: auto !important;
   }
 
-  .line:not(.lichess) {
+  .line:not(.playstrategy) {
     cursor: pointer;
     &:hover {
       background: fade-out($c-accent, 0.8);

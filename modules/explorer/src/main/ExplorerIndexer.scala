@@ -28,7 +28,7 @@ final private class ExplorerIndexer(
   private val datePattern         = "yyyy-MM-dd"
   private val dateFormatter       = DateTimeFormat forPattern datePattern
   private val pgnDateFormat       = DateTimeFormat forPattern "yyyy.MM.dd"
-  private val internalEndPointUrl = s"$internalEndpoint/import/lichess"
+  private val internalEndPointUrl = s"$internalEndpoint/import/playstrategy"
 
   private def parseDate(str: String): Option[DateTime] =
     Try(dateFormatter parseDateTime str).toOption
@@ -149,7 +149,7 @@ final private class ExplorerIndexer(
           List(Tag(_.FEN, fen))
         }
         val otherTags = List(
-          Tag("LichessID", game.id),
+          Tag("PlaystrategyID", game.id),
           Tag(_.Variant, game.variant.name),
           Tag.timeControl(game.clock.map(_.config)),
           Tag(_.White, username(chess.White)),

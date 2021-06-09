@@ -20,7 +20,7 @@ object show {
       moreJs = frag(
         analyseTag,
         analyseNvuiTag,
-        embedJsUnsafe(s"""lichess.practice=${safeJsonValue(
+        embedJsUnsafe(s"""playstrategy.practice=${safeJsonValue(
           Json.obj(
             "practice" -> data.practice,
             "study"    -> data.study,

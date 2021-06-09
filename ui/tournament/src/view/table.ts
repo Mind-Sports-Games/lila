@@ -40,7 +40,7 @@ function featured(game: FeaturedGame): VNode {
         'data-state': `${game.fen},${game.orientation},${game.lastMove}`,
         'data-live': game.id,
       },
-      hook: onInsert(lichess.powertip.manualUserIn),
+      hook: onInsert(playstrategy.powertip.manualUserIn),
     },
     [
       featuredPlayer(game, opposite(game.orientation)),
@@ -79,7 +79,7 @@ function renderDuel(battle?: TeamBattle, duelTeams?: DuelTeams) {
     );
 }
 
-const initMiniGame = (node: VNode) => lichess.miniGame.initAll(node.elm as HTMLElement);
+const initMiniGame = (node: VNode) => playstrategy.miniGame.initAll(node.elm as HTMLElement);
 
 export default function (ctrl: TournamentController): VNode {
   return h(

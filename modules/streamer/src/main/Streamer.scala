@@ -68,7 +68,7 @@ object Streamer {
       granted: Boolean,     // a mod approved
       ignored: Boolean,     // further requests are ignored
       tier: Int,            // homepage featuring tier
-      chatEnabled: Boolean, // embed chat inside lichess
+      chatEnabled: Boolean, // embed chat inside playstrategy
       lastGrantedAt: Option[DateTime]
   )
   case class PicturePath(value: String) extends AnyVal with StringValue

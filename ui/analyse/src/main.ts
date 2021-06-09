@@ -1,6 +1,6 @@
 import { attributesModule, classModule, init } from 'snabbdom';
 import boot from './boot';
-import LichessChat from 'chat';
+import PlaystrategyChat from 'chat';
 // eslint-disable-next-line no-duplicate-imports
 import makeCtrl from './ctrl';
 import menuHover from 'common/menuHover';
@@ -12,9 +12,9 @@ export const patch = init([classModule, attributesModule]);
 
 export function start(opts: AnalyseOpts): AnalyseApi {
   opts.element = document.querySelector('main.analyse') as HTMLElement;
-  opts.trans = lichess.trans(opts.i18n);
+  opts.trans = playstrategy.trans(opts.i18n);
 
-  const ctrl = (lichess.analysis = new makeCtrl(opts, redraw));
+  const ctrl = (playstrategy.analysis = new makeCtrl(opts, redraw));
 
   const blueprint = view(ctrl);
   opts.element.innerHTML = '';
@@ -37,7 +37,7 @@ export function start(opts: AnalyseOpts): AnalyseApi {
 
 export { boot };
 
-// that's for the rest of lichess to access chessground
+// that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;
-window.LichessChat = LichessChat;
+window.PlaystrategyChat = PlaystrategyChat;

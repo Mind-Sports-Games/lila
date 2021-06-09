@@ -1,4 +1,4 @@
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   const form = document.querySelector('.search__form') as HTMLFormElement,
     $form = $(form),
     $usernames = $form.find('.usernames input'),
@@ -69,7 +69,7 @@ lichess.load.then(() => {
       this.href = this.href + '&' + serialized;
     });
   updatePagerLink();
-  lichess.pubsub.on('content-loaded', updatePagerLink);
+  playstrategy.pubsub.on('content-loaded', updatePagerLink);
 
   $form.on('submit', () => {
     $form

@@ -1,7 +1,7 @@
 import { defined } from './common';
 
 const jsonHeader = {
-  Accept: 'application/vnd.lichess.v5+json',
+  Accept: 'application/vnd.playstrategy.v5+json',
 };
 
 export const defaultInit: RequestInit = {

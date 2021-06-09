@@ -1,8 +1,8 @@
 import * as xhr from 'common/xhr';
 
-lichess.load.then(() => {
-  const arrowSnapStore = lichess.storage.make('arrow.snap');
-  const courtesyStore = lichess.storage.make('courtesy');
+playstrategy.load.then(() => {
+  const arrowSnapStore = playstrategy.storage.make('arrow.snap');
+  const courtesyStore = playstrategy.storage.make('courtesy');
 
   $('.security table form').on('submit', function (this: HTMLFormElement) {
     xhr.text(this.action, { method: 'post' });
@@ -24,7 +24,7 @@ lichess.load.then(() => {
       }
       xhr.formToXhr(form).then(() => {
         showSaved();
-        lichess.storage.fire('reload-round-tabs');
+        playstrategy.storage.fire('reload-round-tabs');
       });
     });
   });

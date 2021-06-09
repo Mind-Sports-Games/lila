@@ -45,7 +45,7 @@ final class RemoteSocket(
     promise.future map readRes
   }
 
-  val onlineUserIds: AtomicReference[Set[String]] = new AtomicReference(Set("lichess"))
+  val onlineUserIds: AtomicReference[Set[String]] = new AtomicReference(Set("playstrategy"))
 
   val baseHandler: Handler = {
     case In.ConnectUser(userId) =>
@@ -74,7 +74,7 @@ final class RemoteSocket(
     case In.Ping(id) => send(Out.pong(id))
     case In.WsBoot =>
       logger.warn("Remote socket boot")
-      onlineUserIds set Set("lichess")
+      onlineUserIds set Set("playstrategy")
   }
 
   Bus.subscribeFun(

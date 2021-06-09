@@ -1,8 +1,8 @@
-function lichessReplayMusic() {
+function playstrategyReplayMusic() {
   var orchestra;
 
-  lichess.loadScript('javascripts/music/orchestra.js').then(function () {
-    orchestra = lichessOrchestra();
+  playstrategy.loadScript('javascripts/music/orchestra.js').then(function () {
+    orchestra = playstrategyOrchestra();
   });
 
   var isPawn = function (san) {

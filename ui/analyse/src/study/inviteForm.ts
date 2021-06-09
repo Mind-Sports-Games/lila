@@ -59,7 +59,7 @@ export function view(ctrl: ReturnType<typeof makeCtrl>): VNode {
         h('input', {
           attrs: { placeholder: ctrl.trans.noarg('searchByUsername') },
           hook: onInsert<HTMLInputElement>(input =>
-            lichess.userComplete().then(uac => {
+            playstrategy.userComplete().then(uac => {
               uac({
                 input,
                 tag: 'span',

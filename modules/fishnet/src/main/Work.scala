@@ -62,7 +62,7 @@ object Work {
   ) {
 
     override def toString =
-      if (system) lila.user.User.lichessId
+      if (system) lila.user.User.playstrategyId
       else userId
   }
 

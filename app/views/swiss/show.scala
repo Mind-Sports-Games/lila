@@ -32,7 +32,7 @@ object show {
       moreJs = frag(
         jsModule("swiss"),
         hasScheduleInput option jsModule("flatpickr"),
-        embedJsUnsafeLoadThen(s"""LichessSwiss.start(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""PlaystrategySwiss.start(${safeJsonValue(
           Json
             .obj(
               "data"   -> data,

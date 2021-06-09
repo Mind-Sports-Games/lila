@@ -346,7 +346,7 @@
     <item quantity="many">Tabhair %s shoicind</item>
     <item quantity="other">Tabhair %s shoicind</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Sháraigh an cuntas Téarmaí Seirbhíse Lichess</string>
+  <string name="thisAccountViolatedTos">Sháraigh an cuntas Téarmaí Seirbhíse Playstrategy</string>
   <string name="openingExplorerAndTablebase">Ag oscailt taiscéalaí &amp; bunachar deiridh an chluiche</string>
   <string name="takeback">Aisthógáil</string>
   <string name="proposeATakeback">Aisthógáil a mholadh</string>
@@ -552,8 +552,8 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="thankYou">Go raibh maith agat!</string>
   <string name="socialMediaLinks">Naisc chuig na meáin shóisialta</string>
   <string name="inlineNotation">Nodaireacht inlíne</string>
-  <string name="watchLichessTV">Féach ar Lichess TV</string>
-  <string name="previouslyOnLichessTV">Roimhe seo ar Lichess TV</string>
+  <string name="watchPlaystrategyTV">Féach ar Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Roimhe seo ar Playstrategy TV</string>
   <string name="onlinePlayers">Imreoirí ar líne</string>
   <string name="activeToday">Gníomhach inniu</string>
   <string name="activePlayers">Imreoirí gníomhacha</string>
@@ -670,7 +670,7 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="clock">Clog</string>
   <string name="unauthorizedError">Rochtain neamhcheadaithe.</string>
   <string name="noInternetConnection">Gan aon cheangal idirlín. Is féidir fós imirt as líne ón roghchlár.</string>
-  <string name="connectedToLichess">Tá tú ceangailte anois le lichess.org</string>
+  <string name="connectedToPlaystrategy">Tá tú ceangailte anois le playstrategy.org</string>
   <string name="signedOut">Tá tú logáilte amach</string>
   <string name="loginSuccessful">Tá tú logáilte isteach anois</string>
   <string name="playOnTheBoardOffline">Ar an gclár</string>
@@ -740,7 +740,7 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="simulClockHint">Suiteáil Clog Fischer. Braitheann an méid ama a theastaíonn uait ar an méid céile comhraic atá agat.</string>
   <string name="simulAddExtraTime">Féadfaidh tú am breise a chur le do chlog chun cabhrú leat déileáil leis an gcluiche comhuaineach.</string>
   <string name="simulHostExtraTime">Am breise an óstaigh</string>
-  <string name="lichessTournaments">Comórtais Lichess</string>
+  <string name="playstrategyTournaments">Comórtais Playstrategy</string>
   <string name="tournamentFAQ">Ceisteanna Coitianta Comórtais Airéine</string>
   <string name="tournamentOfficial">Oifigiúil</string>
   <string name="timeBeforeTournamentStarts">Am fágtha sula dtosnaíonn an comórtas</string>
@@ -778,8 +778,8 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="weHaveSentYouAnEmailTo">Tá ríomhphost seolta againn chuig %s. Cliceáil ar an nasc sa ríomhphost chun do phasfhocal a athshocrú.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Trí chlárú, aontaíonn tú leis na %s.</string>
   <string name="readAboutOur">Léigh faoinár %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Moill gréasáin idir tú féin agus Lichess</string>
-  <string name="timeToProcessAMoveOnLichessServer">Am le beart a phróiseáil ar fhreastalaí Lichess</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Moill gréasáin idir tú féin agus Playstrategy</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Am le beart a phróiseáil ar fhreastalaí Playstrategy</string>
   <string name="downloadAnnotated">Íoslódáil leagan anótáilte</string>
   <string name="downloadRaw">Ioslódáil sonraí loma</string>
   <string name="downloadImported">Ioslódáil sonraí iompórtáilte</string>
@@ -796,7 +796,7 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="youHaveAlreadyRegisteredTheEmail">Chláraigh tú an ríomhphost: %s cheana féin</string>
   <string name="kidMode">Mód páistí</string>
   <string name="kidModeExplanation">Baineann sé seo le sábháilteacht. I mód na bpáistí, tá gach cumarsáid múchta. Úsáid seo do pháistí agus daltaí scoile, chun iad a chosaint ó úsáideoirí idirlín eile.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">I mód na bpáistí, faigheann an lógó Lichess íocón %s, ionas go mbeidh a fhios agat go bhfuil do pháistí sábháilte.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">I mód na bpáistí, faigheann an lógó Playstrategy íocón %s, ionas go mbeidh a fhios agat go bhfuil do pháistí sábháilte.</string>
   <string name="enableKidMode">Cuir mód na bpáistí ar siúl</string>
   <string name="disableKidMode">Múch mód na bpáistí</string>
   <string name="security">Slándáil</string>
@@ -804,7 +804,7 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="alternativelyYouCanX">Mar rogha eile is féidir leat %s.</string>
   <string name="revokeAllSessions">cealaigh gach seisiún</string>
   <string name="playChessEverywhere">Imir ficheall i ngach áit</string>
-  <string name="asFreeAsLichess">Chomh saor le Lichess</string>
+  <string name="asFreeAsPlaystrategy">Chomh saor le Playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Cruthaithe mar gheall ar ghrá don fhicheall, ní d\'airgead</string>
   <string name="everybodyGetsAllFeaturesForFree">Faigheann gach duine gach gné saor in aisce</string>
   <string name="zeroAdvertisement">Gan fógraíocht</string>
@@ -847,7 +847,7 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="usernameSuffixInvalid">Caithfidh an t-ainm úsáideora críochnú le litir nó uimhir.</string>
   <string name="usernameCharsInvalid">Ní mór nach mbeadh ach litreacha, uimhreacha, fo-línte agus fleiscíní san ainm úsáideora. Ní cheadaítear fostríoca agus fleiscíní leanúnacha.</string>
   <string name="usernameUnacceptable">Níl an t-ainm úsáideora seo inghlactha.</string>
-  <string name="directlySupportLichess">Tabhair tacaíocht do Lichess</string>
+  <string name="directlySupportPlaystrategy">Tabhair tacaíocht do Playstrategy</string>
   <string name="playChessInStyle">Imir ficheall go stuama</string>
   <string name="chessBasics">Bunghnéithe fichille</string>
   <string name="coaches">Cóitseálaithe</string>
@@ -936,14 +936,14 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="tryToWin">Déan iarracht gach cluiche a imríonn tú a bhuachaint (nó comhscór a fháil ar a laghad).</string>
   <string name="resignLostGames">Éirigh as cluichí caillte (ná lig don clog rith amach).</string>
   <string name="temporaryInconvenience">Gabhaimid leithscéal as an míchaoithiúlacht shealadach,</string>
-  <string name="wishYouGreatGames">agus guímid cluichí iontacha ort ar lichess.org.</string>
+  <string name="wishYouGreatGames">agus guímid cluichí iontacha ort ar playstrategy.org.</string>
   <string name="thankYouForReading">Go raibh maith agat as léamh!</string>
   <string name="lifetimeScore">Scór saoil</string>
   <string name="currentMatchScore">Scór reatha an chluiche</string>
   <string name="agreementAssistance">Aontaím nach nglacfaidh mé le cabhair ar bith i rith mo chluichí (ó ríomhaire fichille, ó leabhar, ó bhunachar sonraí nó ó dhuine eile).</string>
   <string name="agreementNice">Aontaím go mbeidh meas agam i gcónaí ar fhicheallaithe eile.</string>
   <string name="agreementAccount">Aontaím nach gcruthóidh mé scata cuntas.</string>
-  <string name="agreementPolicy">Aontaím go leanfaidh mé gach polasaí Lichess.</string>
+  <string name="agreementPolicy">Aontaím go leanfaidh mé gach polasaí Playstrategy.</string>
   <string name="searchOrStartNewDiscussion">Cuardaigh nó cuir tús le comhrá nua</string>
   <string name="edit">Athraigh</string>
   <string name="rapid">Mear</string>
@@ -978,12 +978,12 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="congratsYouWon">Comhghairdeas, bhuaigh tú!</string>
   <string name="gameVsX">Cluiche in aghaidh %1$s</string>
   <string name="resVsX">%1$s in aghaidh %2$s</string>
-  <string name="youJustBecamePatron">D\'éirigh tú díreach mar Phátrún lichess.</string>
+  <string name="youJustBecamePatron">D\'éirigh tú díreach mar Phátrún playstrategy.</string>
   <string name="patronAccountExpired">Cuntas Pátrún imithe as feidhm</string>
   <string name="pleaseReconsiderRenewIt">Smaoinigh ar é a athnuachan!</string>
   <string name="someoneReviewedYourCoachProfile">Rinne duine éigin athbhreithniú ar do phróifíl cóitseálaí.</string>
   <string name="newPendingReview">Athbhreithniú nua ar feitheamh</string>
-  <string name="lostAgainstTOSViolator">Chaill tú i gcoinne duine a sháraigh téarmaí seirbhíse Lichess</string>
+  <string name="lostAgainstTOSViolator">Chaill tú i gcoinne duine a sháraigh téarmaí seirbhíse Playstrategy</string>
   <string name="refundXpointsTimeControlY">Athchistiú: %1$s %2$s pointí rátála.</string>
   <string name="timeAlmostUp">Tá an t-am beagnach suas!</string>
   <string name="clickToRevealEmailAddress">[Cliceáil chun seoladh ríomhphoist a nochtadh]</string>

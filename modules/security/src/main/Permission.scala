@@ -70,11 +70,11 @@ object Permission {
   case object ApiHog                extends Permission("API_HOG", "API hog")
   case object ApiChallengeAdmin     extends Permission("API_CHALLENGE_ADMIN", "API Challenge admin")
 
-  case object LichessTeam
+  case object PlaystrategyTeam
       extends Permission(
         "LICHESS_TEAM",
         List(Prismic),
-        "Lichess team"
+        "Playstrategy team"
       )
 
   case object TimeoutMod
@@ -92,7 +92,7 @@ object Permission {
       extends Permission(
         "HUNTER",
         List(
-          LichessTeam,
+          PlaystrategyTeam,
           ViewBlurs,
           MarkEngine,
           MarkBooster,
@@ -116,7 +116,7 @@ object Permission {
       extends Permission(
         "SHUSHER",
         List(
-          LichessTeam,
+          PlaystrategyTeam,
           TimeoutMod,
           ViewPrivateComms,
           Shadowban,
@@ -247,7 +247,7 @@ object Permission {
       Verified
     ),
     "Package" -> List(
-      LichessTeam,
+      PlaystrategyTeam,
       TimeoutMod,
       Hunter,
       Shusher,

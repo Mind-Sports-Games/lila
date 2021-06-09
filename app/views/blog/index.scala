@@ -10,12 +10,12 @@ import controllers.routes
 
 object index {
 
+/*
   def apply(
       pager: Paginator[io.prismic.Document]
   )(implicit ctx: Context, prismic: lila.blog.BlogApi.Context) = {
 
     val primaryPost = (pager.currentPage == 1).??(pager.currentPageResults.headOption)
-
     views.html.base.layout(
       title = "Blog",
       moreCss = cssTag("blog"),
@@ -26,7 +26,7 @@ object index {
         bits.menu(none),
         div(cls := "blog index page-menu__content page-small box")(
           div(cls := "box__top")(
-            h1("Lichess Official Blog"),
+            h1("Playstrategy Official Blog"),
             a(cls := "atom", href := routes.Blog.atom, dataIcon := "3")
           ),
           primaryPost map { post =>
@@ -92,5 +92,5 @@ object index {
           )
         )
       )
-    )
+    )*/
 }

@@ -23,7 +23,7 @@ object mobile {
               div(cls := "apk")(
                 raw(~apkDoc.getHtml("doc.content", resolver))
               ),
-              h2(trans.asFreeAsLichess()),
+              h2(trans.asFreeAsPlaystrategy()),
               ul(cls := "block")(
                 li(trans.builtForTheLoveOfChessNotMoney()),
                 li(trans.everybodyGetsAllFeaturesForFree()),
@@ -40,7 +40,7 @@ object mobile {
                 li(trans.puzzles()),
                 li(trans.gameAnalysis()),
                 li(trans.boardEditor()),
-                li("Lichess TV"),
+                li("Playstrategy TV"),
                 li(trans.followAndChallengeFriends()),
                 li(trans.availableInNbLanguages.pluralSame(80))
               )
@@ -51,7 +51,7 @@ object mobile {
                 width := "268",
                 height := "513",
                 src := assetUrl("images/mobile/nexus5-playing.png"),
-                alt := "Lichess mobile on nexus 5"
+                alt := "Playstrategy mobile on nexus 5"
               ),
               img(
                 cls := "qrcode",
@@ -69,7 +69,7 @@ object mobile {
   lazy val appleStoreButton = raw(
     """
 <a class="store"
-  href="https://itunes.apple.com/us/app/lichess-free-online-chess/id968371784">
+  href="https://itunes.apple.com/us/app/playstrategy-free-online-chess/id968371784">
   <img alt="Download on the Apple App Store"
   width="172"
   height="50"

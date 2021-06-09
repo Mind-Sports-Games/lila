@@ -8,6 +8,7 @@ import lila.app.ui.ScalatagsTemplate._
 import controllers.routes
 
 object picture {
+  /*
 
   def apply(c: lila.coach.Coach.WithUser, error: Option[String] = None)(implicit ctx: Context) =
     views.html.account.layout(
@@ -42,4 +43,5 @@ object picture {
         )
       )
     }
+    */
 }

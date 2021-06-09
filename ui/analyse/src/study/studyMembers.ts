@@ -99,7 +99,7 @@ export function ctrl(opts: Opts): StudyMemberCtrl {
     if (opts.tab() === 'members') opts.redraw();
   }
 
-  lichess.pubsub.on('socket.in.crowd', d => {
+  playstrategy.pubsub.on('socket.in.crowd', d => {
     const names: string[] = d.users || [];
     inviteForm.spectators(names);
     spectatorIds = names.map(titleNameToId);
@@ -117,7 +117,7 @@ export function ctrl(opts: Opts): StudyMemberCtrl {
       const wasContrib = myMember() && canContribute();
       dict(members);
       if (wasViewer && canContribute()) {
-        if (lichess.once('study-tour')) opts.startTour();
+        if (playstrategy.once('study-tour')) opts.startTour();
         opts.onBecomingContributor();
         opts.notif.set({
           text: opts.trans.noarg('youAreNowAContributor'),
@@ -278,7 +278,7 @@ export function view(ctrl: StudyCtrl): VNode {
   return h(
     'div.study__members',
     {
-      hook: onInsert(() => lichess.pubsub.emit('chat.resize')),
+      hook: onInsert(() => playstrategy.pubsub.emit('chat.resize')),
     },
     [
       ...ordered

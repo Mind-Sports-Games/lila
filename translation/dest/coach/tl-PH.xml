@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="lichessCoaches">Mga Lichess coach</string>
-  <string name="lichessCoach">Lichess coach</string>
+  <string name="playstrategyCoaches">Mga Playstrategy coach</string>
+  <string name="playstrategyCoach">Playstrategy coach</string>
   <string name="areYouCoach">Isa ka bang magaling na chess coach na may%s?</string>
-  <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://lichess.org/help/master">NM o FIDE title</string>
+  <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">NM o FIDE title</string>
   <string name="confirmTitle">Kumpirmahin ang iyong title dito at aming susuriin ang iyong aplikasyon.</string>
-  <string name="sendApplication" comment="sendApplication&#10;&#10;%s is the lichess email adress">Magpadala ng email sa amin %s at aming susuriin ang iyong aplikasyon.</string>
+  <string name="sendApplication" comment="sendApplication&#10;&#10;%s is the playstrategy email adress">Magpadala ng email sa amin %s at aming susuriin ang iyong aplikasyon.</string>
   <string name="location">Lokasyon</string>
   <string name="languages">Mga Wika</string>
   <string name="rating">Marka</string>
@@ -14,7 +14,7 @@
   <string name="accepting">Tumatanggap ng estudyante</string>
   <string name="notAccepting">Hindi tumatanggap ng estudyante sa ngayon</string>
   <string name="xCoachesStudents">%snagtuturo ng mga estudyante</string>
-  <string name="viewXProfile">Tingnan%s Lichess profile</string>
+  <string name="viewXProfile">Tingnan%s Playstrategy profile</string>
   <string name="sendPM">Magpadala ng pribadong mensahe</string>
   <string name="aboutMe">Tungkol sa akin</string>
   <string name="playingExperience">Karanasan sa paglalaro</string>

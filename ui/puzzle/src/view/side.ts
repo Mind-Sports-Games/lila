@@ -245,7 +245,7 @@ export function config(ctrl: Controller): MaybeVNode {
     h(
       'a.puzzle__side__config__zen',
       {
-        hook: bind('click', () => lichess.pubsub.emit('zen')),
+        hook: bind('click', () => playstrategy.pubsub.emit('zen')),
         attrs: {
           title: 'Keyboard: z',
         },

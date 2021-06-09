@@ -41,14 +41,14 @@ final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
       categId = categ.slug,
       slug = slug + "-forum",
       name = name + " forum",
-      userId = User.lichessId,
+      userId = User.playstrategyId,
       troll = false,
       hidden = false
     )
     val post = Post.make(
       topicId = topic.id,
       author = none,
-      userId = User.lichessId,
+      userId = User.playstrategyId,
       text =
         "Welcome to the %s forum!\nOnly members of the team can post here, but everybody can read." format name,
       number = 1,

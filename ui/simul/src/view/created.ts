@@ -84,7 +84,7 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
         {
           hook: {
             postpatch(_old, vnode) {
-              lichess.powertip.manualUserIn(vnode.elm as HTMLElement);
+              playstrategy.powertip.manualUserIn(vnode.elm as HTMLElement);
             },
           },
         },

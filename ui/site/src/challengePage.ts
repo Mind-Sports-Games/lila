@@ -11,13 +11,13 @@ export default function (opts: ChallengeOpts) {
   const selector = '.challenge-page';
   let accepting: boolean;
 
-  lichess.socket = new lichess.StrongSocket(opts.socketUrl, opts.data.socketVersion, {
+  playstrategy.socket = new playstrategy.StrongSocket(opts.socketUrl, opts.data.socketVersion, {
     events: {
       reload() {
         xhr.text(opts.xhrUrl).then(html => {
           $(selector).replaceWith($(html).find(selector));
           init();
-          lichess.contentLoaded($(selector)[0]);
+          playstrategy.contentLoaded($(selector)[0]);
         });
       },
     },
@@ -45,7 +45,7 @@ export default function (opts: ChallengeOpts) {
       .find('input.friend-autocomplete')
       .each(function (this: HTMLInputElement) {
         const input = this;
-        lichess.userComplete().then(uac =>
+        playstrategy.userComplete().then(uac =>
           uac({
             input: input,
             friend: true,
@@ -61,7 +61,7 @@ export default function (opts: ChallengeOpts) {
 
   function pingNow() {
     if (document.getElementById('ping-challenge')) {
-      lichess.socket.send('ping');
+      playstrategy.socket.send('ping');
       setTimeout(pingNow, 9000);
     }
   }

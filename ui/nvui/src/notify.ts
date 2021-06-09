@@ -14,7 +14,7 @@ export class Notify {
     // make sure it's different from previous, so it gets read again
     if (this.notification && this.notification.text == msg) msg += ' ';
     this.notification = { text: msg, date: new Date() };
-    lichess.requestIdleCallback(this.redraw, 500);
+    playstrategy.requestIdleCallback(this.redraw, 500);
   };
 
   currentText = () =>

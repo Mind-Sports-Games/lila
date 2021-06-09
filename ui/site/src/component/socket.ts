@@ -45,7 +45,7 @@ interface Settings {
 
 // versioned events, acks, retries, resync
 export default class StrongSocket {
-  pubsub = lichess.pubsub;
+  pubsub = playstrategy.pubsub;
   settings: Settings;
   options: Options;
   version: number | false;
@@ -59,7 +59,7 @@ export default class StrongSocket {
   tryOtherUrl = false;
   autoReconnect = true;
   nbConnects = 0;
-  storage: LichessStorage = makeStorage.make('surl15');
+  storage: PlaystrategyStorage = makeStorage.make('surl15');
   private _sign?: string;
 
   static defaultOptions: Options = {

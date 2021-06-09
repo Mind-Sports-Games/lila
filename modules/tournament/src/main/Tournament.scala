@@ -133,7 +133,7 @@ case class Tournament(
       )
     }
 
-  def nonLichessCreatedBy = (createdBy != User.lichessId) option createdBy
+  def nonPlaystrategyCreatedBy = (createdBy != User.playstrategyId) option createdBy
 
   def ratingVariant = if (variant.fromPosition) chess.variant.Standard else variant
 
@@ -205,7 +205,7 @@ object Tournament {
       status = Status.Created,
       clock = Schedule clockFor sched,
       minutes = minutes,
-      createdBy = User.lichessId,
+      createdBy = User.playstrategyId,
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = sched.variant,
@@ -216,7 +216,7 @@ object Tournament {
       startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60)
     )
 
-  def tournamentUrl(tourId: String): String = s"https://lichess.org/tournament/$tourId"
+  def tournamentUrl(tourId: String): String = s"https://playstrategy.org/tournament/$tourId"
 
   def makeId = ThreadLocalRandom nextString 8
 

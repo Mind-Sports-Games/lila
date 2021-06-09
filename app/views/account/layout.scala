@@ -34,9 +34,9 @@ object layout {
           a(activeCls("editProfile"), href := routes.Account.profile)(
             trans.editProfile()
           ),
-          isGranted(_.Coach) option a(activeCls("coach"), href := routes.Coach.edit)(
-            trans.coach.lichessCoach()
-          ),
+          /*isGranted(_.Coach) option a(activeCls("coach"), href := routes.Coach.edit)(
+            trans.coach.playstrategyCoach()
+          ),*/
           div(cls := "sep"),
           a(activeCls("password"), href := routes.Account.passwd)(
             trans.changePassword()
@@ -54,7 +54,7 @@ object layout {
             trans.security()
           ),
           div(cls := "sep"),
-          a(href := routes.Plan.index)(trans.patron.lichessPatron()),
+          a(href := routes.Plan.index)(trans.patron.playstrategyPatron()),
           div(cls := "sep"),
           a(activeCls("oauth.token"), href := routes.OAuthToken.index)(
             "API Access tokens"

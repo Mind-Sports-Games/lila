@@ -1,7 +1,7 @@
 import { init, VNode, classModule, attributesModule } from 'snabbdom';
 import { SimulOpts } from './interfaces';
 import SimulCtrl from './ctrl';
-import LichessChat from 'chat';
+import PlaystrategyChat from 'chat';
 
 const patch = init([classModule, attributesModule]);
 
@@ -10,10 +10,10 @@ import view from './view/main';
 export function start(opts: SimulOpts) {
   const element = document.querySelector('main.simul') as HTMLElement;
 
-  lichess.socket = new lichess.StrongSocket(`/simul/${opts.data.id}/socket/v4`, opts.socketVersion, {
+  playstrategy.socket = new playstrategy.StrongSocket(`/simul/${opts.data.id}/socket/v4`, opts.socketVersion, {
     receive: (t: string, d: any) => ctrl.socket.receive(t, d),
   });
-  opts.socketSend = lichess.socket.send;
+  opts.socketSend = playstrategy.socket.send;
   opts.element = element;
   opts.$side = $('.simul__side').clone();
 
@@ -32,5 +32,5 @@ export function start(opts: SimulOpts) {
   redraw();
 }
 
-// that's for the rest of lichess to access the chat
-window.LichessChat = LichessChat;
+// that's for the rest of playstrategy to access the chat
+window.PlaystrategyChat = PlaystrategyChat;

@@ -2,13 +2,13 @@
   "name": "chess",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org chess utils",
+  "description": "playstrategy.org chess utils",
   "type": "module",
   "module": "dist/main.js",
   "types": "dist/main.d.ts",
   "keywords": [
     "chess",
-    "lichess"
+    "playstrategy"
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
@@ -18,7 +18,7 @@
     "prod": "yarn run compile"
   },
   "devDependencies": {
-    "@types/lichess": "2.0.0",
+    "@types/playstrategy": "2.0.0",
     "typescript": "^4.1.3"
   }
 }

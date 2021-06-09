@@ -9,7 +9,7 @@ import lila.i18n.LangList
 import controllers.routes
 
 object widget {
-
+/*
   import trans.coach._
 
   def titleName(c: lila.coach.Coach.WithUser) =
@@ -28,7 +28,7 @@ object widget {
           height := size,
           cls := "picture",
           src := dbImageUrl(path.value),
-          alt := s"${c.user.titleUsername} Lichess coach picture"
+          alt := s"${c.user.titleUsername} Playstrategy coach picture"
         )
       }
       .getOrElse {
@@ -37,7 +37,7 @@ object widget {
           height := size,
           cls := "default picture",
           src := assetUrl("images/placeholder.png"),
-          alt := "Default Lichess coach picture"
+          alt := "Default Playstrategy coach picture"
         )
       }
 
@@ -113,5 +113,5 @@ object widget {
         )
       )
     )
-  }
+  }*/
 }

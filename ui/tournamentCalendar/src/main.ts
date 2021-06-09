@@ -18,7 +18,7 @@ export function app(element: HTMLElement, env: any) {
 
   const ctrl: Ctrl = {
     data: env.data,
-    trans: lichess.trans(env.i18n),
+    trans: playstrategy.trans(env.i18n),
   };
 
   let vnode: VNode;

@@ -39,7 +39,7 @@ interface Group {
   index: number;
 }
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   const domain = window.location.host,
     studyRegex = new RegExp(domain + '/study/(?:embed/)?(\\w{8})/(\\w{8})(#\\d+)?\\b'),
     gameRegex = new RegExp(domain + '/(?:embed/)?(\\w{8})(?:(?:/(white|black))|\\w{4}|)(#\\d+)?\\b'),

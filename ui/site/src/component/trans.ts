@@ -26,7 +26,7 @@ export default function (i18n: I18nDict) {
     return str ? format(str, args) : key;
   };
   trans.plural = function (key: I18nKey, count: number) {
-    const pluralKey = `${key}:${lichess.quantity(count)}`;
+    const pluralKey = `${key}:${playstrategy.quantity(count)}`;
     const str = i18n[pluralKey] || i18n[key];
     return str ? format(str, Array.prototype.slice.call(arguments, 1)) : key;
   };
@@ -37,7 +37,7 @@ export default function (i18n: I18nDict) {
     return str ? list(str, args) : [key];
   };
   trans.vdomPlural = <T>(key: I18nKey, count: number, ...args: T[]) => {
-    const pluralKey = `${key}:${lichess.quantity(count)}`;
+    const pluralKey = `${key}:${playstrategy.quantity(count)}`;
     const str = i18n[pluralKey] || i18n[key];
     return str ? list(str, args) : [key];
   };

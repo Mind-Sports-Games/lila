@@ -67,7 +67,7 @@ final class GameApiV2(
   def filename(game: Game, format: Format): Fu[String] =
     gameLightUsers(game) map { case (wu, bu) =>
       fileR.replaceAllIn(
-        "lichess_pgn_%s_%s_vs_%s.%s.%s".format(
+        "playstrategy_pgn_%s_%s_vs_%s.%s.%s".format(
           Tag.UTCDate.format.print(game.createdAt),
           pgnDump.dumper.player(game.whitePlayer, wu),
           pgnDump.dumper.player(game.blackPlayer, bu),
@@ -83,7 +83,7 @@ final class GameApiV2(
 
   def filename(tour: Tournament, format: String): String =
     fileR.replaceAllIn(
-      "lichess_tournament_%s_%s_%s.%s".format(
+      "playstrategy_tournament_%s_%s_%s.%s".format(
         Tag.UTCDate.format.print(tour.startsAt),
         tour.id,
         lila.common.String.slugify(tour.name),
@@ -97,7 +97,7 @@ final class GameApiV2(
 
   def filename(swiss: lila.swiss.Swiss, format: String): String =
     fileR.replaceAllIn(
-      "lichess_swiss_%s_%s_%s.%s".format(
+      "playstrategy_swiss_%s_%s_%s.%s".format(
         Tag.UTCDate.format.print(swiss.startsAt),
         swiss.id,
         lila.common.String.slugify(swiss.name),

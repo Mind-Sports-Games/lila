@@ -536,7 +536,7 @@ You received this because you are subscribed to messages of the team $url."""
                 .addEffect { nb =>
                   lila.mon.msg.teamBulk(team.id).record(nb).unit
                 }
-              funit // we don't wait for the stream to complete, it would make lichess time out
+              funit // we don't wait for the stream to complete, it would make playstrategy time out
             }(funit)
           }
       )

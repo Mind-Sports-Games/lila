@@ -6,7 +6,7 @@ import { Chessground } from 'chessground';
 
 const patch = init([classModule, attributesModule, propsModule, eventListenersModule]);
 
-export default function LichessEditor(element: HTMLElement, config: Editor.Config): LichessEditor {
+export default function PlaystrategyEditor(element: HTMLElement, config: Editor.Config): PlaystrategyEditor {
   const ctrl = new EditorCtrl(config, redraw);
   element.innerHTML = '';
   const inner = document.createElement('div');
@@ -25,6 +25,6 @@ export default function LichessEditor(element: HTMLElement, config: Editor.Confi
   };
 }
 
-// that's for the rest of lichess to access chessground
+// that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;

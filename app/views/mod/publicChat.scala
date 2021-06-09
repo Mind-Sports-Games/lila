@@ -67,7 +67,7 @@ object publicChat {
           div(
             cls := List(
               "line"    -> true,
-              "lichess" -> line.isLichess
+              "playstrategy" -> line.isPlaystrategy
             )
           )(
             userIdLink(line.author.toLowerCase.some, withOnline = false, withTitle = false),

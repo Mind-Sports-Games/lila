@@ -18,10 +18,10 @@ object clas {
         cssTag("page"),
         cssTag("clas")
       ),
-      title = trans.clas.lichessClasses.txt()
+      title = trans.clas.playstrategyClasses.txt()
     ) {
       main(cls := "page-small box box-pad page clas-home")(
-        h1(trans.clas.lichessClasses()),
+        h1(trans.clas.playstrategyClasses()),
         div(cls := "clas-home__doc body")(
           p(trans.clas.teachClassesOfChessStudents()),
           h2(trans.clas.features()),
@@ -34,17 +34,17 @@ object clas {
         ),
         div(cls := "clas-home__onboard")(
           postForm(action := routes.Clas.becomeTeacher)(
-            submitButton(cls := "button button-fat")(trans.clas.applyToBeLichessTeacher())
+            submitButton(cls := "button button-fat")(trans.clas.applyToBePlaystrategyTeacher())
           )
         )
       )
     }
 
   def teacherIndex(classes: List[Clas])(implicit ctx: Context) =
-    bits.layout(trans.clas.lichessClasses.txt(), Right("classes"))(
+    bits.layout(trans.clas.playstrategyClasses.txt(), Right("classes"))(
       cls := "clas-index",
       div(cls := "box__top")(
-        h1(trans.clas.lichessClasses()),
+        h1(trans.clas.playstrategyClasses()),
         a(
           href := routes.Clas.form,
           cls := "new button button-empty",
@@ -59,9 +59,9 @@ object clas {
     )
 
   def studentIndex(classes: List[Clas])(implicit ctx: Context) =
-    bits.layout(trans.clas.lichessClasses.txt(), Right("classes"))(
+    bits.layout(trans.clas.playstrategyClasses.txt(), Right("classes"))(
       cls := "clas-index",
-      div(cls := "box__top")(h1(trans.clas.lichessClasses())),
+      div(cls := "box__top")(h1(trans.clas.playstrategyClasses())),
       renderClasses(classes)
     )
 
@@ -148,7 +148,7 @@ object clas {
           form3.group(
             form("teachers"),
             trans.clas.teachersOfTheClass(),
-            help = trans.clas.addLichessUsernames().some
+            help = trans.clas.addPlaystrategyUsernames().some
           )(form3.textarea(_)(rows := 4))
       },
       form3.actions(

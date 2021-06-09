@@ -1,5 +1,5 @@
-var sender = 'lichess';
-var threadName = 'Lichess meetup in London, November 24th';
+var sender = 'playstrategy';
+var threadName = 'Playstrategy meetup in London, November 24th';
 
 var sent = 0;
 
@@ -52,7 +52,7 @@ db.user4
       ],
       creatorId: sender,
       invitedId: user._id,
-      visibleByUserIds: ['lichess', user._id],
+      visibleByUserIds: ['playstrategy', user._id],
       mod: true,
     });
     sent++;

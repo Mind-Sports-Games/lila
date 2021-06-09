@@ -29,7 +29,7 @@ object insight {
         jsModule("insight"),
         jsTag("insight-refresh.js"),
         embedJsUnsafeLoadThen(
-          s"""lichess.insight=LichessInsight(document.getElementById('insight'), ${safeJsonValue(
+          s"""playstrategy.insight=PlaystrategyInsight(document.getElementById('insight'), ${safeJsonValue(
             Json.obj(
               "ui"              -> ui,
               "initialQuestion" -> question,

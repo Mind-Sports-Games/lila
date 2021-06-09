@@ -2,7 +2,7 @@
   "name": "challenge",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org challenge ui",
+  "description": "playstrategy.org challenge ui",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@build/rollupProject": "2.0.0",
-    "@types/lichess": "2.0.0"
+    "@types/playstrategy": "2.0.0"
   },
   "scripts": {
     "dev": "rollup --config",

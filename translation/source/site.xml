@@ -287,7 +287,7 @@
     <item quantity="one">Give %s second</item>
     <item quantity="other">Give %s seconds</item>
   </plurals>
-  <string name="thisAccountViolatedTos">This account violated the Lichess Terms of Service</string>
+  <string name="thisAccountViolatedTos">This account violated the Playstrategy Terms of Service</string>
   <string name="openingExplorerAndTablebase">Opening explorer &amp; tablebase</string>
   <string name="takeback">Takeback</string>
   <string name="proposeATakeback">Propose a takeback</string>
@@ -460,8 +460,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="thankYou">Thank you!</string>
   <string name="socialMediaLinks">Social media links</string>
   <string name="inlineNotation">Inline notation</string>
-  <string name="watchLichessTV">Watch Lichess TV</string>
-  <string name="previouslyOnLichessTV">Previously on Lichess TV</string>
+  <string name="watchPlaystrategyTV">Watch Playstrategy TV</string>
+  <string name="previouslyOnPlaystrategyTV">Previously on Playstrategy TV</string>
   <string name="onlinePlayers">Online players</string>
   <string name="activeToday">Active today</string>
   <string name="activePlayers">Active players</string>
@@ -569,7 +569,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="clock">Clock</string>
   <string name="unauthorizedError">Access is unauthorised.</string>
   <string name="noInternetConnection">No internet connection. You can still play offline from the menu.</string>
-  <string name="connectedToLichess">You are now connected to lichess.org</string>
+  <string name="connectedToPlaystrategy">You are now connected to playstrategy.org</string>
   <string name="signedOut">You have been signed out</string>
   <string name="loginSuccessful">You are now signed in</string>
   <string name="playOnTheBoardOffline">Over the board</string>
@@ -636,7 +636,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="simulClockHint">Fischer Clock setup. The more players you take on, the more time you may need.</string>
   <string name="simulAddExtraTime">You may add extra time to your clock to help you cope with the simul.</string>
   <string name="simulHostExtraTime">Host extra clock time</string>
-  <string name="lichessTournaments">Lichess tournaments</string>
+  <string name="playstrategyTournaments">Playstrategy tournaments</string>
   <string name="tournamentFAQ">Arena tournament FAQ</string>
   <string name="tournamentOfficial">Official</string>
   <string name="timeBeforeTournamentStarts">Time before tournament starts</string>
@@ -671,8 +671,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="weHaveSentYouAnEmailTo">We've sent an email to %s. Click the link in the email to reset your password.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">By registering, you agree to the %s.</string>
   <string name="readAboutOur">Read about our %s.</string>
-  <string name="networkLagBetweenYouAndLichess">Network lag between you and Lichess</string>
-  <string name="timeToProcessAMoveOnLichessServer">Time to process a move on Lichess's server</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Network lag between you and Playstrategy</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Time to process a move on Playstrategy's server</string>
   <string name="downloadAnnotated">Download annotated</string>
   <string name="downloadRaw">Download raw</string>
   <string name="downloadImported">Download imported</string>
@@ -689,7 +689,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="youHaveAlreadyRegisteredTheEmail">You have already registered the email: %s</string>
   <string name="kidMode">Kid mode</string>
   <string name="kidModeExplanation">This is about safety. In kid mode, all site communications are disabled. Enable this for your children and school students, to protect them from other internet users.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">In kid mode, the Lichess logo gets a %s icon, so you know your kids are safe.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">In kid mode, the Playstrategy logo gets a %s icon, so you know your kids are safe.</string>
   <string name="enableKidMode">Enable Kid mode</string>
   <string name="disableKidMode">Disable Kid mode</string>
   <string name="security">Security</string>
@@ -697,7 +697,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="alternativelyYouCanX">Alternatively you can %s.</string>
   <string name="revokeAllSessions">revoke all sessions</string>
   <string name="playChessEverywhere">Play chess everywhere</string>
-  <string name="asFreeAsLichess">As free as Lichess</string>
+  <string name="asFreeAsPlaystrategy">As free as Playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Built for the love of chess, not money</string>
   <string name="everybodyGetsAllFeaturesForFree">Everybody gets all features for free</string>
   <string name="zeroAdvertisement">Zero advertisement</string>
@@ -737,7 +737,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="usernameSuffixInvalid">The username must end with a letter or a number.</string>
   <string name="usernameCharsInvalid">The username must only contain letters, numbers, underscores, and hyphens. Consecutive underscores and hyphens are not allowed.</string>
   <string name="usernameUnacceptable">This username is not acceptable.</string>
-  <string name="directlySupportLichess">Directly support Lichess</string>
+  <string name="directlySupportPlaystrategy">Directly support Playstrategy</string>
   <string name="playChessInStyle">Play chess in style</string>
   <string name="chessBasics">Chess basics</string>
   <string name="coaches">Coaches</string>
@@ -817,14 +817,14 @@ computer analysis, game chat and shareable URL.</string>
   <string name="tryToWin">Try to win (or at least draw) every game you play.</string>
   <string name="resignLostGames">Resign lost games (don't let the clock run down).</string>
   <string name="temporaryInconvenience">We apologise for the temporary inconvenience,</string>
-  <string name="wishYouGreatGames">and wish you great games on lichess.org.</string>
+  <string name="wishYouGreatGames">and wish you great games on playstrategy.org.</string>
   <string name="thankYouForReading">Thank you for reading!</string>
   <string name="lifetimeScore">Lifetime score</string>
   <string name="currentMatchScore">Current match score</string>
   <string name="agreementAssistance">I agree that I will at no time receive assistance during my games (from a chess computer, book, database or another person).</string>
   <string name="agreementNice">I agree that I will always be respectful to other players.</string>
   <string name="agreementAccount">I agree that I will not create multiple accounts.</string>
-  <string name="agreementPolicy">I agree that I will follow all Lichess policies.</string>
+  <string name="agreementPolicy">I agree that I will follow all Playstrategy policies.</string>
   <string name="searchOrStartNewDiscussion">Search or start new conversation</string>
   <string name="edit">Edit</string>
   <string name="rapid">Rapid</string>
@@ -859,12 +859,12 @@ computer analysis, game chat and shareable URL.</string>
   <string name="congratsYouWon">Congratulations, you won!</string>
   <string name="gameVsX">Game vs %1$s</string>
   <string name="resVsX">%1$s vs %2$s</string>
-  <string name="youJustBecamePatron">You just became a lichess Patron.</string>
+  <string name="youJustBecamePatron">You just became a playstrategy Patron.</string>
   <string name="patronAccountExpired">Patron account expired</string>
   <string name="pleaseReconsiderRenewIt">Please consider renewing it!</string>
   <string name="someoneReviewedYourCoachProfile">Someone reviewed your coach profile.</string>
   <string name="newPendingReview">New pending review</string>
-  <string name="lostAgainstTOSViolator">You lost to someone who violated the Lichess TOS</string>
+  <string name="lostAgainstTOSViolator">You lost to someone who violated the Playstrategy TOS</string>
   <string name="refundXpointsTimeControlY">Refund: %1$s %2$s rating points.</string>
   <string name="timeAlmostUp">Time is almost up!</string>
   <string name="clickToRevealEmailAddress">[Click to reveal email address]</string>

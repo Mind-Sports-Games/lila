@@ -26,7 +26,7 @@ object bits {
     )
 
   lazy val stage = a(
-    href := "https://lichess.org",
+    href := "https://playstrategy.org",
     style := """
 background: #7f1010;
 color: #fff;
@@ -38,7 +38,7 @@ border-top-right-radius: 3px;
 z-index: 99;
 """
   )(
-    "This is an empty Lichess preview website, go to lichess.org instead"
+    "This is an empty Playstrategy preview website, go to playstrategy.org instead"
   )
 
   val connectLinks =

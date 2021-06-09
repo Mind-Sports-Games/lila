@@ -10,7 +10,7 @@ object lag {
 
   def apply()(implicit ctx: Context) =
     page.layout(
-      title = "Is Lichess lagging?",
+      title = "Is Playstrategy lagging?",
       active = "lag",
       moreCss = cssTag("lag"),
       moreJs = frag(
@@ -21,7 +21,7 @@ object lag {
     ) {
       div(cls := "box box-pad lag")(
         h1(
-          isLichessLagging(),
+          isPlaystrategyLagging(),
           span(cls := "answer short")(
             span(cls := "waiting")(measurementInProgressThreeDot()),
             span(cls := "nope-nope none")(noAndYourNetworkIsGood()),
@@ -34,17 +34,17 @@ object lag {
         ),
         div(cls := "sections")(
           st.section(cls := "server")(
-            h2(lichessServerLatency()),
+            h2(playstrategyServerLatency()),
             div(cls := "meter"),
             p(
-              lichessServerLatencyExplanation()
+              playstrategyServerLatencyExplanation()
             )
           ),
           st.section(cls := "network")(
-            h2(networkBetweenLichessAndYou()),
+            h2(networkBetweenPlaystrategyAndYou()),
             div(cls := "meter"),
             p(
-              networkBetweenLichessAndYouExplanation()
+              networkBetweenPlaystrategyAndYouExplanation()
             )
           )
         ),

@@ -82,12 +82,12 @@ object otherTrophies {
           )(raw(iconChar))
         }
       },
-      info.isCoach option
+      /*info.isCoach option
         a(
           href := routes.Coach.show(info.user.username),
           cls := "trophy award icon3d coach",
-          ariaTitle(trans.coach.lichessCoach.txt())
-        )(":"),
+          ariaTitle(trans.coach.playstrategyCoach.txt())
+        )(":"),*/
       (info.isStreamer && ctx.noKid) option {
         val streaming = isStreaming(info.user.id)
         views.html.streamer.bits.redirectLink(info.user.username, streaming.some)(
@@ -95,7 +95,7 @@ object otherTrophies {
             "trophy award icon3d streamer" -> true,
             "streaming"                    -> streaming
           ),
-          ariaTitle(if (streaming) "Live now!" else "Lichess Streamer")
+          ariaTitle(if (streaming) "Live now!" else "Playstrategy Streamer")
         )("")
       }
     )

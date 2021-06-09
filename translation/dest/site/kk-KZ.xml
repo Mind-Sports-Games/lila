@@ -445,8 +445,8 @@
   <string name="thankYou">Рахмет!</string>
   <string name="socialMediaLinks">Әлеуметтік медиа</string>
   <string name="inlineNotation">Бір жолды хаттама</string>
-  <string name="watchLichessTV">Личес TВ-ны көру</string>
-  <string name="previouslyOnLichessTV">Личес ТВ-да өткені</string>
+  <string name="watchPlaystrategyTV">Личес TВ-ны көру</string>
+  <string name="previouslyOnPlaystrategyTV">Личес ТВ-да өткені</string>
   <string name="onlinePlayers">Қосулы ойыншылар</string>
   <string name="activeToday">Бүгінгі белсенділер</string>
   <string name="activePlayers">Белсенділер</string>
@@ -551,7 +551,7 @@
   <string name="clock">Сағат-құрал</string>
   <string name="unauthorizedError">Кіру рұқсаты жоқ.</string>
   <string name="noInternetConnection">Интернетпен байланыс жоқ. Сіз әлі де мәзірден таңдап, оффлайн ойнай аласыз.</string>
-  <string name="connectedToLichess">Личес-ке енді қосылдыңыз</string>
+  <string name="connectedToPlaystrategy">Личес-ке енді қосылдыңыз</string>
   <string name="signedOut">Сіз шықтыңыз</string>
   <string name="loginSuccessful">Сіз кірдіңіз</string>
   <string name="playOnTheBoardOffline">Тақтаны жаю</string>
@@ -618,7 +618,7 @@
   <string name="simulClockHint">Фишер Сағатын баптау. Қарсыластарыңыз көп болса, уақыт та көп қажет.</string>
   <string name="simulAddExtraTime">Көпшілікке қарсы ойынды жеңілдету үшін өзіңізге қосымша уақыт қоса аласыз.</string>
   <string name="simulHostExtraTime">Бас ойыншыға қосымша уақыт</string>
-  <string name="lichessTournaments">Личес жарыстары</string>
+  <string name="playstrategyTournaments">Личес жарыстары</string>
   <string name="tournamentFAQ">Алаң жарысының ЖҚС</string>
   <string name="tournamentOfficial">Ресми</string>
   <string name="timeBeforeTournamentStarts">Жарыс басталуына қалған уақыт</string>
@@ -653,8 +653,8 @@
   <string name="weHaveSentYouAnEmailTo">Біз хатты %s-ға жібердік. Құпиясөзді арылту үшін хаттағы сілтемеге басыңыз.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Сіздің тіркелуіңіз – %s-н мойындайтыныңыздың белгісі.</string>
   <string name="readAboutOur">Біздің %s туралы оқыңыз.</string>
-  <string name="networkLagBetweenYouAndLichess">Личес пен сіздің араңыздағы кідіріс</string>
-  <string name="timeToProcessAMoveOnLichessServer">Личес сервері жүрісті өңдеуге жұмсайтын уақыт</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">Личес пен сіздің араңыздағы кідіріс</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">Личес сервері жүрісті өңдеуге жұмсайтын уақыт</string>
   <string name="downloadAnnotated">Жазбасы барды алу</string>
   <string name="downloadRaw">Қарасын алу</string>
   <string name="downloadImported">Жүктеп салынғанды алу</string>
@@ -670,7 +670,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">%s деген поштаны сіз өткенде тіркегенсіз</string>
   <string name="kidMode">Балалық нұсқа</string>
   <string name="kidModeExplanation">Бұл қауіпсіздік үшін жасалынды. Балалық нұсқада бүкіл әңгімелесу жолдары жабылған. Балалар мен мектеп оқушыларын басқа интернет қолданушыларынан қорғау мақсатында осы нұсқаны іске қосыңыз.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">Балалық нұсқа кезінде Личес таңбасына %s белгісі қосылады, осылайша балаларыңыз қауіптен алшақ екенін біліп отырасыз.</string>
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">Балалық нұсқа кезінде Личес таңбасына %s белгісі қосылады, осылайша балаларыңыз қауіптен алшақ екенін біліп отырасыз.</string>
   <string name="enableKidMode">Балалық нұсқаны іске қосу</string>
   <string name="disableKidMode">Балалық нұсқаны сөндіру</string>
   <string name="security">Қауіпсіздік</string>
@@ -678,7 +678,7 @@
   <string name="alternativelyYouCanX">Сонымен қатар, сіз %s-ға дәрмендісіз.</string>
   <string name="revokeAllSessions">бәрін ажырату</string>
   <string name="playChessEverywhere">Шахматты кез-келген жерде ойнаңыз</string>
-  <string name="asFreeAsLichess">Личес-тей тегін</string>
+  <string name="asFreeAsPlaystrategy">Личес-тей тегін</string>
   <string name="builtForTheLoveOfChessNotMoney">Ақша қуып емес, шахматты қызыққаннан жасап отырмыз</string>
   <string name="everybodyGetsAllFeaturesForFree">Барлық құралдары бүкіл адам үшін тегін</string>
   <string name="zeroAdvertisement">Еш жарнамасыз</string>
@@ -718,7 +718,7 @@
   <string name="usernameSuffixInvalid">Атыңыз әріп не санмен аяқталуы керек.</string>
   <string name="usernameCharsInvalid">Атты тек қана әріптер, сандар, төменгі сызықтар мен сызықтардан құрастыруға рұқсат.</string>
   <string name="usernameUnacceptable">Бұл атты қолдануға болмайды.</string>
-  <string name="directlySupportLichess">Личесті тікелей қолдау</string>
+  <string name="directlySupportPlaystrategy">Личесті тікелей қолдау</string>
   <string name="playChessInStyle">Сәнді бола ойнаңыз</string>
   <string name="chessBasics">Шахмат әліппесі</string>
   <string name="coaches">Бапкерлер</string>

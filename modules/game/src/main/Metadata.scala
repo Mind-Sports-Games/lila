@@ -36,7 +36,7 @@ case class GameDrawOffers(white: Set[Int], black: Set[Int]) {
 
   def isEmpty = this == GameDrawOffers.empty
 
-  // lichess allows to offer draw on either turn,
+  // playstrategy allows to offer draw on either turn,
   // normalize to pretend it was done on the opponent turn.
   def normalize(color: Color): Set[Int] = color.fold(white, black) map {
     case ply if (ply % 2 == 0) == color.white => ply + 1

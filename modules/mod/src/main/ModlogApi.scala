@@ -73,7 +73,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
   def selfCloseAccount(user: User.ID, openReports: List[Report]) =
     add {
       Modlog(
-        ModId.lichess.value,
+        ModId.playstrategy.value,
         user.some,
         Modlog.selfCloseAccount,
         details = openReports.map(r => s"${r.reason.name} report").mkString(", ").some.filter(_.nonEmpty)
@@ -205,7 +205,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
 
   def cheatDetected(user: User.ID, gameId: String) =
     add {
-      Modlog("lichess", user.some, Modlog.cheatDetected, details = s"game $gameId".some)
+      Modlog("playstrategy", user.some, Modlog.cheatDetected, details = s"game $gameId".some)
     }
 
   def cli(by: User.ID, command: String) =

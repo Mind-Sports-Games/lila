@@ -17,7 +17,7 @@ final class IpTrust(proxyApi: Ip2Proxy, geoApi: GeoIP, torApi: Tor, firewallApi:
   def isSuspicious(ipData: UserLogins.IPData): Fu[Boolean] =
     isSuspicious(ipData.ip.value)
 
-  /* lichess blacklist of proxies that ip2proxy doesn't know about */
+  /* playstrategy blacklist of proxies that ip2proxy doesn't know about */
   private def isUndetectedProxy(location: Location): Boolean =
     location.shortCountry == "Iran" ||
       location.shortCountry == "United Arab Emirates" || (location match {

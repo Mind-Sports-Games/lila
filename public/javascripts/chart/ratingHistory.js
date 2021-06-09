@@ -1,4 +1,4 @@
-lichess.ratingHistoryChart = function (data, singlePerfName) {
+playstrategy.ratingHistoryChart = function (data, singlePerfName) {
   var oneDay = 86400000;
   function smoothDates(data) {
     if (!data.length) return [];
@@ -28,8 +28,8 @@ lichess.ratingHistoryChart = function (data, singlePerfName) {
   var indexFilter = function (_, i) {
     return !singlePerfName || i === singlePerfIndex;
   };
-  lichess.loadScript('javascripts/chart/common.js').then(function () {
-    lichess.chartCommon('highstock').then(function () {
+  playstrategy.loadScript('javascripts/chart/common.js').then(function () {
+    playstrategy.chartCommon('highstock').then(function () {
       // support: Fx when user bio overflows
       var disabled = {
         enabled: false,

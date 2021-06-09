@@ -28,7 +28,7 @@ export default class StormCtrl {
     this.data = opts.data;
     this.pref = opts.pref;
     this.redraw = () => redraw(this.data);
-    this.trans = lichess.trans(opts.i18n);
+    this.trans = playstrategy.trans(opts.i18n);
     this.run = {
       pov: puzzlePov(this.data.puzzles[0]),
       moves: 0,
@@ -131,7 +131,7 @@ export default class StormCtrl {
       this.redrawSlow();
     }
     this.withGround(g => g.set(makeCgOpts(this.run, !this.run.endAt)));
-    lichess.pubsub.emit('ply', this.run.moves);
+    playstrategy.pubsub.emit('ply', this.run.moves);
   };
 
   private redrawQuick = () => setTimeout(this.redraw, 100);
@@ -182,7 +182,7 @@ export default class StormCtrl {
   };
 
   private checkDupTab = () => {
-    const dupTabMsg = lichess.storage.make('storm.tab');
+    const dupTabMsg = playstrategy.storage.make('storm.tab');
     dupTabMsg.fire(this.data.puzzles[0].id);
     dupTabMsg.listen(ev => {
       if (!this.run.clock.startAt && ev.value == this.data.puzzles[0].id) {

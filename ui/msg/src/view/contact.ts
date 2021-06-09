@@ -50,6 +50,6 @@ function renderDate(msg: LastMsg): VNode {
         datetime: msg.date.getTime(),
       },
     },
-    lichess.timeago(msg.date)
+    playstrategy.timeago(msg.date)
   );
 }

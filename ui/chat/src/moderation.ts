@@ -44,7 +44,7 @@ export function moderationCtrl(opts: ModerationOpts): ModerationCtrl {
     close,
     timeout(reason: ModerationReason, text: string) {
       data &&
-        lichess.pubsub.emit('socket.send', 'timeout', {
+        playstrategy.pubsub.emit('socket.send', 'timeout', {
           userId: data.id,
           reason: reason.key,
           text,
@@ -139,7 +139,7 @@ export function moderationView(ctrl?: ModerationCtrl): VNode[] | undefined {
             {
               hook: {
                 insert() {
-                  lichess.contentLoaded();
+                  playstrategy.contentLoaded();
                 },
               },
             },

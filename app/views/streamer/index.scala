@@ -19,7 +19,7 @@ object index {
       requests: Boolean
   )(implicit ctx: Context) = {
 
-    val title = if (requests) "Streamer approval requests" else lichessStreamers.txt()
+    val title = if (requests) "Streamer approval requests" else playstrategyStreamers.txt()
 
     def widget(s: lila.streamer.Streamer.WithUser, stream: Option[lila.streamer.Stream]) =
       frag(

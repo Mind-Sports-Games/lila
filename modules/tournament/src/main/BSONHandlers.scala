@@ -9,7 +9,7 @@ import reactivemongo.api.bson._
 import lila.db.BSON
 import lila.db.dsl._
 import lila.rating.PerfType
-import lila.user.User.lichessId
+import lila.user.User.playstrategyId
 
 object BSONHandlers {
 
@@ -90,7 +90,7 @@ object BSONHandlers {
         } yield Schedule(freq, speed, variant, position, startsAt, conditions),
         nbPlayers = r int "nbPlayers",
         createdAt = r date "createdAt",
-        createdBy = r strO "createdBy" getOrElse lichessId,
+        createdBy = r strO "createdBy" getOrElse playstrategyId,
         startsAt = startsAt,
         winnerId = r strO "winner",
         featuredId = r strO "featured",
@@ -117,7 +117,7 @@ object BSONHandlers {
         "schedule"    -> o.schedule,
         "nbPlayers"   -> o.nbPlayers,
         "createdAt"   -> w.date(o.createdAt),
-        "createdBy"   -> o.nonLichessCreatedBy,
+        "createdBy"   -> o.nonPlaystrategyCreatedBy,
         "startsAt"    -> w.date(o.startsAt),
         "winner"      -> o.winnerId,
         "featured"    -> o.featuredId,

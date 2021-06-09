@@ -2,12 +2,12 @@
   "name": "insight",
   "version": "2.0.0",
   "private": true,
-  "description": "lichess.org chess insights",
+  "description": "playstrategy.org chess insights",
   "type": "module",
   "module": "src/main.js",
   "keywords": [
     "chess",
-    "lichess",
+    "playstrategy",
     "insight",
     "analysis"
   ],

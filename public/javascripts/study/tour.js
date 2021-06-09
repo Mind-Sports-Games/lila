@@ -1,15 +1,15 @@
 function loadShepherd(f) {
   if (typeof Shepherd === 'undefined' || Shepherd.activeTour === null) {
     var theme = 'shepherd-theme-' + ($('body').hasClass('dark') ? 'default' : 'dark');
-    lichess.loadCss('vendor/shepherd/dist/css/' + theme + '.css');
-    lichess.loadScript('vendor/shepherd/dist/js/tether.js', { noVersion: true }).then(function () {
-      lichess.loadScript('vendor/shepherd/dist/js/shepherd.min.js', { noVersion: true }).then(function () {
+    playstrategy.loadCss('vendor/shepherd/dist/css/' + theme + '.css');
+    playstrategy.loadScript('vendor/shepherd/dist/js/tether.js', { noVersion: true }).then(function () {
+      playstrategy.loadScript('vendor/shepherd/dist/js/shepherd.min.js', { noVersion: true }).then(function () {
         f(theme);
       });
     });
   }
 }
-lichess.studyTour = function (study) {
+playstrategy.studyTour = function (study) {
   loadShepherd(function (theme) {
     var onTab = function (tab) {
       return {
@@ -27,7 +27,7 @@ lichess.studyTour = function (study) {
     });
     [
       {
-        title: 'Welcome to Lichess Study!',
+        title: 'Welcome to Playstrategy Study!',
         text:
           'This is a shared analysis board.<br><br>' +
           'Use it to analyse and annotate games,<br>' +

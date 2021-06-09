@@ -140,8 +140,8 @@ object form {
       )(form3.textarea(_)(rows := 10)),
       ctx.me.exists(_.canBeFeatured) option form3.checkbox(
         form("featured"),
-        frag("Feature on lichess.org/simul"),
-        help = frag("Show your simul to everyone on lichess.org/simul. Disable for private simuls.").some
+        frag("Feature on playstrategy.org/simul"),
+        help = frag("Show your simul to everyone on playstrategy.org/simul. Disable for private simuls.").some
       )
     )
   }

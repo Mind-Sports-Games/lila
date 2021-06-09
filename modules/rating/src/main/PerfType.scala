@@ -192,7 +192,8 @@ object PerfType {
     Atomic,
     Horde,
     RacingKings,
-    Puzzle
+    Puzzle,
+    LinesOfAction
   )
   val byKey = all map { p =>
     (p.key, p)
@@ -226,7 +227,8 @@ object PerfType {
     Antichess,
     Atomic,
     Horde,
-    RacingKings
+    RacingKings,
+    LinesOfAction
   )
   val leaderboardable: List[PerfType] = List(
     Bullet,
@@ -241,10 +243,11 @@ object PerfType {
     Antichess,
     Atomic,
     Horde,
-    RacingKings
+    RacingKings,
+    LinesOfAction
   )
   val variants: List[PerfType] =
-    List(Crazyhouse, Chess960, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings)
+    List(Crazyhouse, Chess960, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings, LinesOfAction)
   val standard: List[PerfType] = List(Bullet, Blitz, Rapid, Classical, Correspondence)
 
   def variantOf(pt: PerfType): chess.variant.Variant =
@@ -257,6 +260,7 @@ object PerfType {
       case Atomic        => chess.variant.Atomic
       case Horde         => chess.variant.Horde
       case RacingKings   => chess.variant.RacingKings
+      case LinesOfAction => chess.variant.LinesOfAction
       case _             => chess.variant.Standard
     }
 
@@ -272,6 +276,7 @@ object PerfType {
       case chess.variant.Atomic        => Atomic.some
       case chess.variant.Horde         => Horde.some
       case chess.variant.RacingKings   => RacingKings.some
+      case chess.variant.LinesOfAction => LinesOfAction.some
     }
 
   def standardBySpeed(speed: Speed): PerfType = speed match {

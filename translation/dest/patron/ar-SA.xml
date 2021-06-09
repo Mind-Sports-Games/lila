@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">تبرع</string>
-  <string name="lichessPatron">راعي Lichess</string>
+  <string name="playstrategyPatron">راعي Playstrategy</string>
   <string name="freeAccount">حساب مجاني</string>
-  <string name="becomePatron">كنّ راعياً في Lichess</string>
-  <string name="xBecamePatron">%s اصبح راعياً ل Lichess</string>
+  <string name="becomePatron">كنّ راعياً في Playstrategy</string>
+  <string name="xBecamePatron">%s اصبح راعياً ل Playstrategy</string>
   <string name="newPatrons">رعاة جدد</string>
   <string name="freeChess">شطرنج مجاني للجميع، للأبد!</string>
   <string name="noAdsNoSubs">لا اعلانات، لا اشتراكات، ولكن مفتوح المصدر و شغف.</string>
@@ -13,10 +13,10 @@
   <string name="patronUntil">لديك حساب راعي حتى %s.</string>
   <string name="ifNotRenewed">اذا لم تجدد، سيتم تخفيضك لحساب مجاني.</string>
   <string name="weAreNonProfit">نحن رابطة غير ربحية لأننا نؤمن ان الجميع يجب أن يكون لديه وصول مجاني لمنصة شطرنج من الطراز العالمي.</string>
-  <string name="weRelyOnSupport">نحن نعتمد على دعم من أُناس مثلك لجعل هذا ممكناً، اذا استمتعت على Lichess، يرجى النظر في دعمنا وأن تصبح راعي!</string>
+  <string name="weRelyOnSupport">نحن نعتمد على دعم من أُناس مثلك لجعل هذا ممكناً، اذا استمتعت على Playstrategy، يرجى النظر في دعمنا وأن تصبح راعي!</string>
   <string name="lifetime">مدى الحياة</string>
-  <string name="payLifetimeOnce">ادفع %s مره، وكنّ راعي Lichess للأبد!</string>
-  <string name="lifetimePatron">راعي Lichess مدة الحياة</string>
+  <string name="payLifetimeOnce">ادفع %s مره، وكنّ راعي Playstrategy للأبد!</string>
+  <string name="lifetimePatron">راعي Playstrategy مدة الحياة</string>
   <string name="makeExtraDonation">تقديم تبرع اضافي؟</string>
   <string name="monthly">شهرياً</string>
   <string name="onetime">مرة واحدة</string>
@@ -28,15 +28,15 @@
   <string name="weAreSmallTeam">نحن فريق صغير، لذلك دعمك يشكل فارقاً كبيراً!</string>
   <string name="whereMoneyGoes">أين يذهب المال؟</string>
   <string name="serversAndDeveloper">أولاً وقبل كل شيء، خوادم قوية.
-ثم ندفع لمطور دائم : %s ، مؤسس Lichess
+ثم ندفع لمطور دائم : %s ، مؤسس Playstrategy
 .</string>
   <string name="costBreakdown">انظر للتكاليف مفصلة.</string>
-  <string name="officialNonProfit">هل Lichess رسمياً غير ربحي؟</string>
+  <string name="officialNonProfit">هل Playstrategy رسمياً غير ربحي؟</string>
   <string name="actOfCreation">نعم، إليك عملية الإنشاء (باللغة الفرنسية)</string>
   <string name="changeMonthlySupport">هل يمكنني تغيير/الغاء دعمي الشهري؟</string>
   <string name="changeOrContact">نعم، في أي وقت، من هذه الصفحة.
 أو يمكنك %s.</string>
-  <string name="contactSupport">التواصل مع فريق الدعم في Lichess</string>
+  <string name="contactSupport">التواصل مع فريق الدعم في Playstrategy</string>
   <string name="otherMethods">طرق أخرى للتبرع؟</string>
   <string name="bankTransfers">نقبل ايضاً التحويلات المصرفية</string>
   <string name="bitcoin">وهنا عنوان البيتكوين الخاص بنا: %s</string>
@@ -44,7 +44,7 @@
   <string name="noPatronFeatures">لا، لأن ليشيس مجاني، وإلى الأبد، ولكل شخص. هذا وعد.
 ومع ذلك، يحصل الداعمون على أيقونة جديدة رائعة.</string>
   <string name="featuresComparison">راجع مقارنة الميزات المفصلة</string>
-  <string name="youSupportWith">انت تدعم lichess.org ب%s شهرياً.</string>
+  <string name="youSupportWith">انت تدعم playstrategy.org ب%s شهرياً.</string>
   <string name="tyvm">شكرا جزيلاً على مساعدتك. أنت رائع!</string>
   <string name="currentStatus">الوضع الحالي</string>
   <string name="nextPayment">الدفعة القادمة</string>
@@ -54,14 +54,14 @@
   <string name="changeMonthlyAmount">تغيير المبلغ الشهري (%s)</string>
   <string name="cancelSupport">إلغاء دعمك</string>
   <string name="xOrY">%1$s أو %2$s</string>
-  <string name="decideHowMuch">قرر ماذا يعني Lichess بالنسبة لك:</string>
+  <string name="decideHowMuch">قرر ماذا يعني Playstrategy بالنسبة لك:</string>
   <string name="stopPayments">سحب بطاقة الائتمان الخاصة بك وإيقاف الدفع:</string>
-  <string name="noLongerSupport">التوقف عن دعم Lichess</string>
+  <string name="noLongerSupport">التوقف عن دعم Playstrategy</string>
   <string name="paymentHistory">سجل الدفع</string>
   <string name="paid">تم الدفع</string>
   <string name="viewOthers">مشاهدة رعاة آخرين</string>
   <string name="checkOutProfile">تحقق من الصفحة الشخصية الخاصة بك!</string>
   <string name="nowLifetime">أنت الآن راع لليتشس مدى الحياة!</string>
   <string name="nowOneMonth">أنت الآن راعي ليتشس لمدة شهر واحد!</string>
-  <string name="downgradeNextMonth">في شهر واحد، لن يتم تحميل رسوم مرة أخرى، وحساب Lichess الخاص بك سيصبح حساب عادي.</string>
+  <string name="downgradeNextMonth">في شهر واحد، لن يتم تحميل رسوم مرة أخرى، وحساب Playstrategy الخاص بك سيصبح حساب عادي.</string>
 </resources>

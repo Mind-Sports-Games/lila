@@ -52,7 +52,7 @@ function image(d): VNode | undefined {
   const s = d.spotlight;
   if (s && s.iconImg)
     return h('img.img', {
-      attrs: { src: lichess.assetUrl('images/' + s.iconImg) },
+      attrs: { src: playstrategy.assetUrl('images/' + s.iconImg) },
     });
   return h('i.img', {
     attrs: dataIcon((s && s.iconFont) || 'g'),

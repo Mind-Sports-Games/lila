@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">Донирај</string>
-  <string name="lichessPatron">Личес Патрон</string>
+  <string name="playstrategyPatron">Личес Патрон</string>
   <string name="freeAccount">Бесплатан налог</string>
   <string name="becomePatron">Постани Личес Патрон</string>
   <string name="xBecamePatron">%s је постао Личес Патрон</string>
@@ -40,7 +40,7 @@
   <string name="bankTransfers">Такође прихватамо банковне трансфере</string>
   <string name="bitcoin">А ево и наше биткоин адресе: %s</string>
   <string name="patronFeatures">Да ли су неке могућности дозвољене само Патронима?</string>
-  <string name="noPatronFeatures">Не, јер је Lichess потпуно бесплатан, заувек и за све. То је обећање.
+  <string name="noPatronFeatures">Не, јер је Playstrategy потпуно бесплатан, заувек и за све. То је обећање.
 Ипак, Патрони добијају права да се хвале својом новом кул иконом на профилу.</string>
   <string name="featuresComparison">Погледај детаљно поређење могућности</string>
   <plurals name="patronForMonths">
@@ -48,7 +48,7 @@
     <item quantity="few">Личес Патрон %s месеца</item>
     <item quantity="other">Личес Патрон %s месеци</item>
   </plurals>
-  <string name="youSupportWith">Ти подржаваш lichess.org са %s месечно.</string>
+  <string name="youSupportWith">Ти подржаваш playstrategy.org са %s месечно.</string>
   <string name="currentStatus">Тренутни статус</string>
   <string name="nextPayment">Следећа уплата</string>
   <string name="makeAdditionalDonation">Направи додатну донацију сада</string>

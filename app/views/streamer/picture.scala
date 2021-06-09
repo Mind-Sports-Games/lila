@@ -15,7 +15,7 @@ object picture {
       title = xStreamerPicture.txt(s.user.username),
       moreJs = embedJsUnsafeLoadThen("""
 $('.streamer-picture form.upload input[type=file]').on('change', function() {
-  $('.picture_wrap').html(lichess.spinnerHtml);
+  $('.picture_wrap').html(playstrategy.spinnerHtml);
   $(this).parents('form')[0].submit();
 })"""),
       moreCss = cssTag("streamer.form")

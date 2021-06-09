@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="lichessStreamers">লিছেসস স্ত্রেয়ামের</string>
-  <string name="lichessStreamer">লিছেসস স্ত্রেয়ামের</string>
+  <string name="playstrategyStreamers">লিছেসস স্ত্রেয়ামের</string>
+  <string name="playstrategyStreamer">লিছেসস স্ত্রেয়ামের</string>
   <string name="live">লাইভ!</string>
   <string name="offline">আই সময় উপস্তি নেই</string>
   <string name="currentlyStreaming">আখন দেখুন: %s</string>

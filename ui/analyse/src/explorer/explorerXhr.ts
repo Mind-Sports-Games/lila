@@ -7,18 +7,18 @@ interface OpeningXhrOpts {
   rootFen: Fen;
   play: string[];
   fen: Fen;
-  variant?: VariantKey; // only lichess
-  speeds?: ExplorerSpeed[]; // only lichess
-  ratings?: number[]; // only lichess
+  variant?: VariantKey; // only playstrategy
+  speeds?: ExplorerSpeed[]; // only playstrategy
+  ratings?: number[]; // only playstrategy
   withGames?: boolean;
 }
 
 export function opening(opts: OpeningXhrOpts): Promise<OpeningData> {
-  const url = new URL(opts.db === 'lichess' ? '/lichess' : '/master', opts.endpoint);
+  const url = new URL(opts.db === 'playstrategy' ? '/playstrategy' : '/master', opts.endpoint);
   const params = url.searchParams;
   params.set('fen', opts.rootFen);
   params.set('play', opts.play.join(','));
-  if (opts.db === 'lichess') {
+  if (opts.db === 'playstrategy') {
     params.set('variant', opts.variant || 'standard');
     if (opts.speeds) for (const speed of opts.speeds) params.append('speeds[]', speed);
     if (opts.ratings) for (const rating of opts.ratings) params.append('ratings[]', rating.toString());

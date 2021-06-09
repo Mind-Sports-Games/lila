@@ -28,7 +28,7 @@ export interface StudyChapterNewFormCtrl {
     open: boolean;
     initial: Prop<boolean>;
     tab: StoredProp<string>;
-    editor: LichessEditor | null;
+    editor: PlaystrategyEditor | null;
     editorFen: Prop<Fen | null>;
     isDefaultName: boolean;
   };
@@ -212,7 +212,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                   hook: {
                     insert(vnode) {
                       Promise.all([
-                        lichess.loadModule('editor'),
+                        playstrategy.loadModule('editor'),
                         xhr.json(xhr.url('/editor.json', { fen: ctrl.root.node.fen })),
                       ]).then(([_, data]) => {
                         data.embed = true;
@@ -221,7 +221,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                           orientation: currentChapter.setup.orientation,
                           onChange: ctrl.vm.editorFen,
                         };
-                        ctrl.vm.editor = window.LichessEditor!(vnode.elm as HTMLElement, data);
+                        ctrl.vm.editor = window.PlaystrategyEditor!(vnode.elm as HTMLElement, data);
                         ctrl.vm.editorFen(ctrl.vm.editor.getFen());
                       });
                     },
@@ -240,7 +240,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                   {
                     attrs: { for: 'chapter-game' },
                   },
-                  trans('loadAGameFromXOrY', 'lichess.org', 'chessgames.com')
+                  trans('loadAGameFromXOrY', 'playstrategy.org', 'chessgames.com')
                 ),
                 h('textarea#chapter-game.form-control', {
                   attrs: { placeholder: noarg('urlOfTheGame') },

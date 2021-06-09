@@ -93,9 +93,9 @@ object Mailer {
   object txt {
 
     def serviceNote(implicit lang: Lang): String = s"""
-${trans.common_note("https://lichess.org").render}
+${trans.common_note("https://playstrategy.org").render}
 
-${trans.common_contact("https://lichess.org/contact").render}"""
+${trans.common_contact("https://playstrategy.org/contact").render}"""
   }
 
   object html {
@@ -110,8 +110,8 @@ ${trans.common_contact("https://lichess.org/contact").render}"""
       div(itemprop := "potentialAction", itemscope, itemtype := "http://schema.org/ViewAction")
     def metaName(cont: String) = meta(itemprop := "name", content := cont)
     val publisher              = div(itemprop := "publisher", itemscope, itemtype := "http://schema.org/Organization")
-    val noteContact = a(itemprop := "url", href := "https://lichess.org/contact")(
-      span(itemprop := "name")("lichess.org/contact")
+    val noteContact = a(itemprop := "url", href := "https://playstrategy.org/contact")(
+      span(itemprop := "name")("playstrategy.org/contact")
     )
 
     def serviceNote(implicit lang: Lang) =
@@ -122,7 +122,7 @@ ${trans.common_contact("https://lichess.org/contact").render}"""
           trans.common_contact(noteContact),
           " ",
           lila.i18n.I18nKeys.readAboutOur(
-            a(href := "https://lichess.org/privacy")(
+            a(href := "https://playstrategy.org/privacy")(
               lila.i18n.I18nKeys.privacyPolicy()
             )
           )
@@ -137,8 +137,8 @@ ${trans.common_contact("https://lichess.org/contact").render}"""
 
     val noteLink = a(
       itemprop := "url",
-      href := "https://lichess.org/"
-    )(span(itemprop := "name")("lichess.org"))
+      href := "https://playstrategy.org/"
+    )(span(itemprop := "name")("playstrategy.org"))
 
     def url(u: String)(implicit lang: Lang) =
       frag(

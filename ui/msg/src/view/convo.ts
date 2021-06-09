@@ -29,7 +29,7 @@ export default function renderConvo(ctrl: MsgCtrl, convo: Convo): VNode {
                 offline: !user.online,
               },
             },
-            [h('i.line' + (user.id == 'lichess' ? '.moderator' : user.patron ? '.patron' : '')), ...userName(user)]
+            [h('i.line' + (user.id == 'playstrategy' ? '.moderator' : user.patron ? '.patron' : '')), ...userName(user)]
           ),
         ]),
         h('div.msg-app__convo__head__actions', renderActions(ctrl, convo)),

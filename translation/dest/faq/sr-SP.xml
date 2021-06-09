@@ -2,17 +2,17 @@
 <resources>
   <string name="faqAbbreviation">Често постављана питања</string>
   <string name="frequentlyAskedQuestions">Често Постављана Питања</string>
-  <string name="whyIsLichessCalledLichess">Зашто се Личес зове Личес?</string>
-  <string name="lichessCombinationLiveLightLibrePronounced">Личес је комбинација речи live/light/libre и chess. Изговара се %1$s.</string>
+  <string name="whyIsPlaystrategyCalledPlaystrategy">Зашто се Личес зове Личес?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">Личес је комбинација речи live/light/libre и chess. Изговара се %1$s.</string>
   <string name="leechess">ли-чес</string>
   <string name="hearItPronouncedBySpecialist">Послушај како то стручњак изговара.</string>
-  <string name="howCanIContributeToLichess">Како могу допринети Личесу?</string>
-  <string name="lichessPoweredByDonationsAndVolunteers">Личес покрећу донације наших патрона, као и труд нашег тима волонтера.</string>
+  <string name="howCanIContributeToPlaystrategy">Како могу допринети Личесу?</string>
+  <string name="playstrategyPoweredByDonationsAndVolunteers">Личес покрећу донације наших патрона, као и труд нашег тима волонтера.</string>
   <string name="findMoreAndSeeHowHelp">Можеш сазнати више о %1$s (укључујући и %2$s). Ако желиш помоћи Личесу волонтирајући своје време и вештине, постоје разни %3$s.</string>
   <string name="beingAPatron">бивању Патрона</string>
   <string name="breakdownOfOurCosts">поделу трошкова</string>
   <string name="otherWaysToHelp">други начини да помогнеш</string>
-  <string name="areThereWebsitesBasedOnLichess">Постоје ли други сајтови засновани на Личесу?</string>
+  <string name="areThereWebsitesBasedOnPlaystrategy">Постоје ли други сајтови засновани на Личесу?</string>
   <string name="fairPlay">Фер плеј</string>
   <string name="ratingRefundExplanation">Један минут након што је играч означен, узима се њихових последњих 40 партија у последња 3 дана. Ако си ти био један од њихових противника у тим партијама, и изгубио си рејтинг (због пораза или ремија), то добијаш свој рејтинг назад. Повраћај рејтинга је ограничен твојим максималним рејтингом и прогресом рејтинга након те партије.
   (На пример, ако ти се рејтинг драстично повећао након тих партија, ти ћеш можда добити смањен повраћај или га нећеш уопште добити). Повраћај никада неће прећи 150 поена.</string>
@@ -28,10 +28,10 @@
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$ss = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$ss = %2$s</string>
   <string name="whatVariantsCanIplay">Које варијанте могу играни на Личесу?</string>
-  <string name="lichessSupportChessAnd">Личес подржава стандарни шах и %1$s.</string>
+  <string name="playstrategySupportChessAnd">Личес подржава стандарни шах и %1$s.</string>
   <string name="eightVariants">8 варијанти шаха</string>
   <string name="insufficientMaterial">Губљење на време, реми и недовољно материјала</string>
-  <string name="lichessFollowFIDErules">У случају да играчу истекне време, тај играч најчешће губи партију. Ипак, игра се завршава ремијем ако је позиција таква да противник не може да матира играчевог краља ниједном серијум легалних потеза (%1$s).
+  <string name="playstrategyFollowFIDErules">У случају да играчу истекне време, тај играч најчешће губи партију. Ипак, игра се завршава ремијем ако је позиција таква да противник не може да матира играчевог краља ниједном серијум легалних потеза (%1$s).
 
 У ретким случајевима, ово може бити тешко за одлучити аутоматски (форсиране линије, тврђаве). Ми смо аутоматски на страни играча којем није истекло време.
 
@@ -47,7 +47,7 @@
 Погледај %3$s о овом потезу како би га даље провежбао.</string>
   <string name="goodIntroduction">добар увод</string>
   <string name="officialRulesPDF">званична правила (ПДФ)</string>
-  <string name="lichessTraining">Личес тренинг</string>
+  <string name="playstrategyTraining">Личес тренинг</string>
   <string name="threefoldRepetition">Троструко понављање</string>
   <string name="threefoldRepetitionExplanation">Ако се иста позиција појави три пута, играчи могу прогласити реми %1$s. Личес прихвата званична FIDE правилам као што је опсано у Article 9.2 (d) %2$s.</string>
   <string name="threefoldRepetitionLowerCase">троструким понављањем</string>
@@ -58,7 +58,7 @@
   <string name="threeFoldHasToBeClaimed">Играч треба најпре да укаже на понављање. Ово можеш урадити притиском на дугме које се појави, или тако што понудиш реми пре играња свог последњег понављајућег потеза. Небитно је да ли противник одбија понуду ремија јер се реми троструког понављања свеједно проглашава. Такође можеш %1$s Личес да аутоматски проглашава понављања за тебе. Такође, петострука понављања увек аутоматски забршавају партију.</string>
   <string name="configure">подесити</string>
   <string name="accounts">Налози</string>
-  <string name="titlesAvailableOnLichess">Које све титуле постоје на Личесу?</string>
+  <string name="titlesAvailableOnPlaystrategy">Које све титуле постоје на Личесу?</string>
   <string name="canIbecomeLM">Могу ли добити Личес Мастер (ЛМ) титулу?</string>
   <string name="noUpperCaseDot">Не.</string>
   <string name="lMtitleComesToYouDoNotRequestIt">Ова титула је незванична и постоји само на Личесу.
@@ -72,9 +72,9 @@
   <string name="canIChangeMyUsername">Могу ли променити своје корисничко име?</string>
   <string name="uniqueTrophies">Уникатни трофеји</string>
   <string name="ownerUniqueTrophies">Овај трофеј је уникатан у историји Личеса, нико осим %1$s га неће имати.</string>
-  <string name="lichessRatings">Личес рејтинзи</string>
-  <string name="whichRatingSystemUsedByLichess">Који рејтинг систем користи Личес?</string>
-  <string name="ratingSystemUsedByLichess">Рејтинзи се рачунају помоћо Глико-2 рејтинг методе коју је осмислио Марк Гликман. Ово је врло популарна метода и користи се у значајном броју шаховских организација (ФИДЕ је знаменит супротан пример јер и даље користе застарели Ело рејтинг систем).
+  <string name="playstrategyRatings">Личес рејтинзи</string>
+  <string name="whichRatingSystemUsedByPlaystrategy">Који рејтинг систем користи Личес?</string>
+  <string name="ratingSystemUsedByPlaystrategy">Рејтинзи се рачунају помоћо Глико-2 рејтинг методе коју је осмислио Марк Гликман. Ово је врло популарна метода и користи се у значајном броју шаховских организација (ФИДЕ је знаменит супротан пример јер и даље користе застарели Ело рејтинг систем).
 
 У суштини, Глико рејтинг користи \"интервале поузданости\" када рачуна и преставља твој рејтинг. Када тек почнеш користити сајт, твој рејтинг започиње на 1500 ± 700. Тбој рејтинг је 1500, а 700 представља твој интервал поузданости.
 
@@ -102,9 +102,9 @@
   <string name="howToHideRatingWhilePlaying">Како сакрити рејтинге током игре?</string>
   <string name="howToThreeDots">Како...</string>
   <string name="enableDisableNotificationPopUps">Укључити или искључити поп-ап обавештења?</string>
-  <string name="lichessCanOptionnalySendPopUps">Личес може да шаље поп-ап обавештења, на пример када је твој потез у партији или када примиш приватну поруку.
+  <string name="playstrategyCanOptionnalySendPopUps">Личес може да шаље поп-ап обавештења, на пример када је твој потез у партији или када примиш приватну поруку.
 
-Притисни икону катанца поред lichess.org адресе у URL бару свог претраживача.
+Притисни икону катанца поред playstrategy.org адресе у URL бару свог претраживача.
 
 Онда изабери да ли желиш примати или блокирати обавештења од Личеса.</string>
 </resources>

@@ -49,7 +49,7 @@ object player {
       moreJs = frag(
         roundNvuiTag,
         roundTag,
-        embedJsUnsafeLoadThen(s"""LichessRound.boot(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""PlaystrategyRound.boot(${safeJsonValue(
           Json
             .obj(
               "data"   -> data,

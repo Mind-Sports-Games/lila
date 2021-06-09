@@ -22,7 +22,7 @@ object HTTPRequest {
   def isProgrammatic(req: RequestHeader) =
     !isSynchronousHttp(req) || isFishnet(req) || isApi(req) || req.headers
       .get(HeaderNames.ACCEPT)
-      .exists(_ startsWith "application/vnd.lichess.v")
+      .exists(_ startsWith "application/vnd.playstrategy.v")
 
   private val appOrigins = Set(
     "capacitor://localhost", // ios
@@ -100,7 +100,7 @@ object HTTPRequest {
   def actionName(req: RequestHeader): String =
     req.attrs.get(Router.Attrs.ActionName).getOrElse("NoHandler")
 
-  private val ApiVersionHeaderPattern = """application/vnd\.lichess\.v(\d++)\+json""".r
+  private val ApiVersionHeaderPattern = """application/vnd\.playstrategy\.v(\d++)\+json""".r
 
   def apiVersion(req: RequestHeader): Option[ApiVersion] = {
     req.headers.get(HeaderNames.ACCEPT) flatMap {

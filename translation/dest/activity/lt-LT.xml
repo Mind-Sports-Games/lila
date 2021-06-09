@@ -3,10 +3,10 @@
   <string name="activity">Veikla</string>
   <string name="hostedALiveStream">Organizavo transliaciją</string>
   <plurals name="supportedNbMonths">
-    <item quantity="one">Remia lichess.org %1$s mėn. kaip „%2$s“</item>
-    <item quantity="few">Remia lichess.org %1$s mėn. kaip „%2$s“</item>
-    <item quantity="many">Remia lichess.org %1$s mėn. kaip „%2$s“</item>
-    <item quantity="other">Remia lichess.org %1$s mėn. kaip „%2$s“</item>
+    <item quantity="one">Remia playstrategy.org %1$s mėn. kaip „%2$s“</item>
+    <item quantity="few">Remia playstrategy.org %1$s mėn. kaip „%2$s“</item>
+    <item quantity="many">Remia playstrategy.org %1$s mėn. kaip „%2$s“</item>
+    <item quantity="other">Remia playstrategy.org %1$s mėn. kaip „%2$s“</item>
   </plurals>
   <plurals name="practicedNbPositions">
     <item quantity="one">Praktikavosi %1$s poziciją per „%2$s“</item>
@@ -99,7 +99,7 @@
     <item quantity="other">Dalyvavo %s šveicariškų turnyrų</item>
   </plurals>
   <string name="rankedInSwissTournament" comment="rankedInSwissTournament&#10;&#10;%1$s is the numerical rank, e.g. #2 if you came second.&#10;&#10;%2$s is the name of the tournament e.g. Carlsen Arena">Reitinguotas #%1$s iš %2$s</string>
-  <string name="signedUp">Užsiregistravo „Lichess“</string>
+  <string name="signedUp">Užsiregistravo „Playstrategy“</string>
   <plurals name="joinedNbTeams">
     <item quantity="one">Prisijungė prie %s komandos</item>
     <item quantity="few">Prisijungė prie %s komandų</item>

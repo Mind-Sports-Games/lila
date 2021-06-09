@@ -103,7 +103,7 @@ final class Game(
             .GlobalConcurrencyLimitPerIpAndUserOption(req, me)(env.api.gameApiV2.exportByUser(config)) {
               source =>
                 Ok.chunked(source)
-                  .pipe(asAttachmentStream(s"lichess_${user.username}_$date.${format.toString.toLowerCase}"))
+                  .pipe(asAttachmentStream(s"playstrategy_${user.username}_$date.${format.toString.toLowerCase}"))
                   .as(gameContentType(config))
             }
             .fuccess

@@ -18,7 +18,7 @@ export function ctrl(trans: Trans, redraw: Redraw): PingCtrl {
     server: undefined,
   };
 
-  const hub = lichess.pubsub;
+  const hub = playstrategy.pubsub;
 
   hub.emit('socket.send', 'moveLat', true);
   hub.on('socket.lag', lag => {
@@ -52,14 +52,14 @@ export function view(ctrl: PingCtrl): VNode {
     h(
       'span.ping',
       {
-        attrs: { title: 'PING: ' + ctrl.trans.noarg('networkLagBetweenYouAndLichess') },
+        attrs: { title: 'PING: ' + ctrl.trans.noarg('networkLagBetweenYouAndPlaystrategy') },
       },
       [h('em', 'PING'), h('strong', defined(d.ping) ? '' + d.ping : '?'), h('em', 'ms')]
     ),
     h(
       'span.server',
       {
-        attrs: { title: 'SERVER: ' + ctrl.trans.noarg('timeToProcessAMoveOnLichessServer') },
+        attrs: { title: 'SERVER: ' + ctrl.trans.noarg('timeToProcessAMoveOnPlaystrategyServer') },
       },
       [h('em', 'SERVER'), h('strong', defined(d.server) ? showMillis(d.server) : ['?']), h('em', 'ms')]
     ),

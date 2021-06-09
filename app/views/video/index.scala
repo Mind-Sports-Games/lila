@@ -8,7 +8,7 @@ import lila.common.paginator.Paginator
 import controllers.routes
 
 object index {
-
+/*
   def apply(videos: Paginator[lila.video.VideoView], count: Long, control: lila.video.UserControl)(implicit
       ctx: Context
   ) = {
@@ -61,4 +61,5 @@ object index {
       )
     )
   }
+  */
 }

@@ -19,7 +19,7 @@ interface SubmitOpts {
 }
 type Submit = (v: string, submitOpts: SubmitOpts) => void;
 
-lichess.keyboardMove = function (opts: Opts) {
+playstrategy.keyboardMove = function (opts: Opts) {
   if (opts.input.classList.contains('ready')) return;
   opts.input.classList.add('ready');
   let legalSans: SanToUci | null = null;
@@ -63,11 +63,11 @@ lichess.keyboardMove = function (opts: Opts) {
         clear();
       }
     } else if (submitOpts.yourMove && v.length > 1) {
-      setTimeout(() => lichess.sound.play('error'), 500);
+      setTimeout(() => playstrategy.sound.play('error'), 500);
       opts.input.value = '';
     } else {
       const wrong = v.length && legalSans && !sanCandidates(v, legalSans).length;
-      if (wrong && !opts.input.classList.contains('wrong')) lichess.sound.play('error');
+      if (wrong && !opts.input.classList.contains('wrong')) playstrategy.sound.play('error');
       opts.input.classList.toggle('wrong', !!wrong);
     }
   };
@@ -90,7 +90,7 @@ function makeBindings(opts: any, submit: Submit, clear: () => void) {
   /* keypress doesn't cut it here;
    * at the time it fires, the last typed char
    * is not available yet. Reported by:
-   * https://lichess.org/forum/lichess-feedback/keyboard-input-changed-today-maybe-a-bug
+   * https://playstrategy.org/forum/playstrategy-feedback/keyboard-input-changed-today-maybe-a-bug
    */
   opts.input.addEventListener('keyup', (e: KeyboardEvent) => {
     if (!e.isTrusted) return;
@@ -162,7 +162,7 @@ function readClocks(clockCtrl: any | undefined) {
       simplePlural(date.getUTCSeconds(), 'second');
     return `${color}: ${msg}`;
   });
-  lichess.sound.say(msgs.join('. '));
+  playstrategy.sound.say(msgs.join('. '));
 }
 
 function simplePlural(nb: number, word: string) {

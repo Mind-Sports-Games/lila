@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="lichessCoaches">مدربوا الموقع</string>
-  <string name="lichessCoach">مدرب</string>
+  <string name="playstrategyCoaches">مدربوا الموقع</string>
+  <string name="playstrategyCoach">مدرب</string>
   <string name="areYouCoach">هل أنت مدرب شطرنج رائع و %s؟</string>
   <string name="location">الموقع</string>
   <string name="languages">اللغات</string>

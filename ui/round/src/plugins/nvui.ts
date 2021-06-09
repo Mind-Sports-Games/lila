@@ -41,7 +41,7 @@ const wrapSound = throttled('wrapAround');
 const borderSound = throttled('outOfBound');
 const errorSound = throttled('error');
 
-lichess.RoundNVUI = function (redraw: Redraw) {
+playstrategy.RoundNVUI = function (redraw: Redraw) {
   const notify = new Notify(redraw),
     moveStyle = styleSetting(),
     prefixStyle = prefixSetting(),
@@ -49,10 +49,10 @@ lichess.RoundNVUI = function (redraw: Redraw) {
     positionStyle = positionSetting(),
     boardStyle = boardSetting();
 
-  lichess.pubsub.on('socket.in.message', line => {
-    if (line.u === 'lichess') notify.set(line.t);
+  playstrategy.pubsub.on('socket.in.message', line => {
+    if (line.u === 'playstrategy') notify.set(line.t);
   });
-  lichess.pubsub.on('round.suggestion', notify.set);
+  playstrategy.pubsub.on('round.suggestion', notify.set);
 
   return {
     render(ctrl: RoundController): VNode {

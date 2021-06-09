@@ -9,7 +9,7 @@ import lila.app.ui.ScalatagsTemplate._
 import controllers.routes
 
 object show {
-
+/*
   def apply(
       video: lila.video.Video,
       similar: Seq[lila.video.VideoView],
@@ -33,7 +33,7 @@ object show {
           iframe(
             id := "ytplayer",
             tpe := "text/html",
-            src := s"https://www.youtube.com/embed/${video.id}?autoplay=1&origin=https://lichess.org&start=${video.startTime}",
+            src := s"https://www.youtube.com/embed/${video.id}?autoplay=1&origin=https://playstrategy.org&start=${video.startTime}",
             st.frameborder := "0",
             frame.allowfullscreen
           )
@@ -65,4 +65,5 @@ object show {
         )
       )
     }
+  */
 }

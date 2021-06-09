@@ -95,7 +95,7 @@ export function podium(ctrl: TournamentController) {
 }
 
 function preloadUserTips(el: HTMLElement) {
-  lichess.powertip.manualUserIn(el);
+  playstrategy.powertip.manualUserIn(el);
 }
 
 export function controls(ctrl: TournamentController, pag): VNode {

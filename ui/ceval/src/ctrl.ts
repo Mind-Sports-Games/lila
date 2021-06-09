@@ -40,8 +40,8 @@ function median(values: number[]): number {
 }
 
 function enabledAfterDisable() {
-  const enabledAfter = lichess.tempStorage.get('ceval.enabled-after');
-  const disable = lichess.storage.get('ceval.disable');
+  const enabledAfter = playstrategy.tempStorage.get('ceval.enabled-after');
+  const disable = playstrategy.storage.get('ceval.disable');
   return !disable || enabledAfter === disable;
 }
 
@@ -157,7 +157,7 @@ export default function (opts: CevalOpts): CevalCtrl {
     if (ev.fen !== lastEmitFen && enabledAfterDisable()) {
       // amnesty while auto disable not processed
       lastEmitFen = ev.fen;
-      lichess.storage.fire('ceval.fen', ev.fen);
+      playstrategy.storage.fire('ceval.fen', ev.fen);
     }
   });
 
@@ -218,8 +218,8 @@ export default function (opts: CevalOpts): CevalCtrl {
     }
 
     // Notify all other tabs to disable ceval.
-    lichess.storage.fire('ceval.disable');
-    lichess.tempStorage.set('ceval.enabled-after', lichess.storage.get('ceval.disable')!);
+    playstrategy.storage.fire('ceval.disable');
+    playstrategy.tempStorage.set('ceval.enabled-after', playstrategy.storage.get('ceval.disable')!);
 
     if (!worker) {
       if (technology == 'nnue')
@@ -307,11 +307,11 @@ export default function (opts: CevalOpts): CevalCtrl {
       if (!opts.possible || !allowed()) return;
       stop();
       if (!enabled() && !document.hidden) {
-        const disable = lichess.storage.get('ceval.disable');
-        if (disable) lichess.tempStorage.set('ceval.enabled-after', disable);
+        const disable = playstrategy.storage.get('ceval.disable');
+        if (disable) playstrategy.tempStorage.set('ceval.enabled-after', disable);
         enabled(true);
       } else {
-        lichess.tempStorage.set('ceval.enabled-after', '');
+        playstrategy.tempStorage.set('ceval.enabled-after', '');
         enabled(false);
       }
     },

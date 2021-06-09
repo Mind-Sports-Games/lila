@@ -95,13 +95,13 @@ final private[forum] class TopicApi(
       slug = slug,
       name = name,
       troll = false,
-      userId = User.lichessId,
+      userId = User.playstrategyId,
       hidden = false
     )
     val post = Post.make(
       topicId = topic.id,
       author = none,
-      userId = User.lichessId,
+      userId = User.playstrategyId,
       troll = false,
       hidden = false,
       text = s"Comments on $url",

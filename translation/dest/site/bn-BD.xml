@@ -446,8 +446,8 @@
   <string name="thankYou">ধন্যবাদ</string>
   <string name="socialMediaLinks">সোশ্যাল মিডিয়ার লিঙ্ক</string>
   <string name="inlineNotation">রেখা চিহ্ন</string>
-  <string name="watchLichessTV">Lichess TV দেখুন</string>
-  <string name="previouslyOnLichessTV">এর আগে Lichess TV- তে যা হয়েছে</string>
+  <string name="watchPlaystrategyTV">Playstrategy TV দেখুন</string>
+  <string name="previouslyOnPlaystrategyTV">এর আগে Playstrategy TV- তে যা হয়েছে</string>
   <string name="onlinePlayers">যে সমস্ত  খেলোয়ার অনলাইন আছে</string>
   <string name="activeToday">যারা আজকে সক্রিয় রয়েছে</string>
   <string name="activePlayers">সক্রিয় খেলোয়াড়গণ</string>
@@ -554,7 +554,7 @@
   <string name="clock">ঘড়ি</string>
   <string name="unauthorizedError">অধিগমন অননুমোদিত করা হয়েছে.</string>
   <string name="noInternetConnection">ইন্টারনেট সংযোগ নেই. অবশ্যই আপনি ইন্টারনেট সংযোগ ছাড়া মেনু থেকে খেলতে পারবেন.</string>
-  <string name="connectedToLichess">এখন আপনি সংযুক্ত হয়েছেন lichess.org</string>
+  <string name="connectedToPlaystrategy">এখন আপনি সংযুক্ত হয়েছেন playstrategy.org</string>
   <string name="signedOut">আপনি সাইন আউট হয়েছেন</string>
   <string name="loginSuccessful">আপনি এখন সাইন ইন হয়েছেন</string>
   <string name="playOnTheBoardOffline">বোর্ডের উপরে</string>
@@ -621,7 +621,7 @@
   <string name="simulClockHint">ফিশার ঘড়ি বিন্যাস. একবারে অনেক খেলোয়াড় নিলে, হয়তো আপনার অনেক সময় প্রয়োজন হবে.</string>
   <string name="simulAddExtraTime">আপনি হয়তো অতিরিক্ত সময় যোগ করে আপনার ঘড়ি সিমুলের সাথে মোকাবেলা করতে পারবেন.</string>
   <string name="simulHostExtraTime">অতিরিক্ত ঘড়ির সময়ের স্বাগতিক</string>
-  <string name="lichessTournaments">দাবা ক্রীড়া-প্রতিযোগিতা</string>
+  <string name="playstrategyTournaments">দাবা ক্রীড়া-প্রতিযোগিতা</string>
   <string name="tournamentFAQ">কর্মক্ষেত্র প্রতিযোগিতার প্রশ্নবলী</string>
   <string name="tournamentOfficial">সরকারী</string>
   <string name="timeBeforeTournamentStarts">সময়ের পূর্বে প্রতিযোগিতা শুরু</string>
@@ -656,8 +656,8 @@
   <string name="weHaveSentYouAnEmailTo">আমরা একটি ই-মেইল পাঠিয়েছি %s. ই-মেইলে দেওয়া লিংকে ক্লিক করুন পাসওয়ার্ড পরিবর্তন করতে.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">নিবন্ধন করে, আপনি সম্মত হন আমাদের দ্বারা আবদ্ধ হতে %s.</string>
   <string name="readAboutOur">আমাদের %s সম্পর্কে পড়ুন.</string>
-  <string name="networkLagBetweenYouAndLichess">আপনার এবং লিচেস এর মধ্যে নেটওয়ার্ক ব্যবধান</string>
-  <string name="timeToProcessAMoveOnLichessServer">লিচেস সার্ভারে স্থানান্তর প্রক্রিয়া করার সময়</string>
+  <string name="networkLagBetweenYouAndPlaystrategy">আপনার এবং লিচেস এর মধ্যে নেটওয়ার্ক ব্যবধান</string>
+  <string name="timeToProcessAMoveOnPlaystrategyServer">লিচেস সার্ভারে স্থানান্তর প্রক্রিয়া করার সময়</string>
   <string name="downloadAnnotated">টীকাযুক্ত ডাউনলোড করুন</string>
   <string name="downloadRaw">কাঁচা ডাউনলোড করুন</string>
   <string name="downloadImported">আগমিত ডাউনলোড করুন</string>
@@ -673,7 +673,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">আপনি ইতিমধ্যে এই ই-মেইলে নিবন্ধন করেছেন: %s</string>
   <string name="kidMode">বাচ্চা ধরন</string>
   <string name="kidModeExplanation">এটা হয় নিরাপত্তা সম্পর্কে. বাচ্চা ধরনের মধ্যে সব সাইটের যোগাযোগ নিষ্ক্রিয় করা হয়েছে. আপনার বাচ্চা এবং বিদ্যালয়ের ছাত্রদের, অন্য ইন্টারনেট ব্যবহারকারীদের থেকে রক্ষা করতে এটা সক্রিয় করুন.</string>
-  <string name="inKidModeTheLichessLogoGetsIconX">বাচ্চা ধরনের মধ্যে, লিচেস লোগো পায় একটি %s প্রতীক,
+  <string name="inKidModeThePlaystrategyLogoGetsIconX">বাচ্চা ধরনের মধ্যে, লিচেস লোগো পায় একটি %s প্রতীক,
 তাই আপনি জানতে পারবেন আপনার বাচ্চা নিরাপদ.</string>
   <string name="enableKidMode">বাচ্চা ধরন সক্রিয় করুন</string>
   <string name="disableKidMode">বাচ্চা ধরন নিষ্ক্রিয় করুন</string>
@@ -682,7 +682,7 @@
   <string name="alternativelyYouCanX">অন্যভাবে আপনি পারেন %s.</string>
   <string name="revokeAllSessions">সকল সেশন বাতিল করুন</string>
   <string name="playChessEverywhere">দাবা খেলুন সব জায়গায়</string>
-  <string name="asFreeAsLichess">যেমন লিচাস মুক্ত হিসাবে</string>
+  <string name="asFreeAsPlaystrategy">যেমন লিচাস মুক্ত হিসাবে</string>
   <string name="builtForTheLoveOfChessNotMoney">দাবার ভালবাসার জন্য তৈরি, টাকা না</string>
   <string name="everybodyGetsAllFeaturesForFree">সকলেই পাবে বিনামূল্যে সব বৈশিষ্ট্য</string>
   <string name="zeroAdvertisement">শূন্য বিজ্ঞাপন</string>
@@ -722,7 +722,7 @@
   <string name="usernameSuffixInvalid">ইউজারনেম অবশ্যই কোন অক্ষর বা সংখ্যা দ্বারা শেষ হতে হবে।</string>
   <string name="usernameCharsInvalid">ইউজারনেমে শুধুমাত্র অক্ষর, নাম্বার, আন্ডারস্কোর এবং হাইফেন থাকতে পারবে।</string>
   <string name="usernameUnacceptable">এই ব্যবহারকারী নামটি গ্রহণযোগ্য নয়.</string>
-  <string name="directlySupportLichess">সরাসরি লিচাস সমার্থন</string>
+  <string name="directlySupportPlaystrategy">সরাসরি লিচাস সমার্থন</string>
   <string name="playChessInStyle">দাবা খেলুন শৈলিতে</string>
   <string name="chessBasics">দাবা মূলসূত্র</string>
   <string name="coaches">প্রশিক্ষক</string>
@@ -802,7 +802,7 @@
   <string name="tryToWin">জেতার চেষ্টা করুন (অথবা ড্র) যেসব গেম খেলছেন.</string>
   <string name="resignLostGames">হেরে জাওা খেলা তি রেসিগ্ন করুন।( সময় সেশ হওার অপ্পেখা করবেন না)।.</string>
   <string name="temporaryInconvenience">অস্থায়ীভাবে এই অসুবিধার জন্য আমরা ক্ষমা প্রার্থনা করছি,</string>
-  <string name="wishYouGreatGames">এবং lichess.org এ আপনার দুর্দান্ত গেমের শুভেচ্ছা.</string>
+  <string name="wishYouGreatGames">এবং playstrategy.org এ আপনার দুর্দান্ত গেমের শুভেচ্ছা.</string>
   <string name="thankYouForReading">পড়ার জন্য ধন্যবাদ!</string>
   <string name="lifetimeScore">সারাজীবনের স্কোর</string>
   <string name="currentMatchScore">বর্তমান ম্যাচের স্কোর</string>

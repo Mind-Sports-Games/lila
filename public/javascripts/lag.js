@@ -1,4 +1,4 @@
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   Highcharts.makeFont = function (size) {
     return size + "px 'Noto Sans', 'Lucida Grande', 'Lucida Sans Unicode', Verdana, Arial, Helvetica, sans-serif";
   };
@@ -15,7 +15,7 @@ lichess.load.then(() => {
     };
     return {
       light: light,
-      lichess: {
+      playstrategy: {
         text: text,
         line: line,
       },
@@ -239,9 +239,9 @@ lichess.load.then(() => {
       .removeClass('none');
   };
 
-  lichess.StrongSocket.firstConnect.then(() => lichess.socket.send('moveLat', true));
+  playstrategy.StrongSocket.firstConnect.then(() => playstrategy.socket.send('moveLat', true));
 
-  lichess.pubsub.on('socket.in.mlat', d => {
+  playstrategy.pubsub.on('socket.in.mlat', d => {
     const v = parseInt(d);
     charts.server.series[0].points[0].update(v);
     values.server = v;
@@ -249,7 +249,7 @@ lichess.load.then(() => {
   });
 
   setInterval(function () {
-    const v = Math.round(lichess.socket.averageLag);
+    const v = Math.round(playstrategy.socket.averageLag);
     charts.network.series[0].points[0].update(v);
     values.network = v;
     updateAnswer();

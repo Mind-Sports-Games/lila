@@ -1,7 +1,7 @@
 import { init, classModule, attributesModule } from 'snabbdom';
 import { Chessground } from 'chessground';
 import { TournamentOpts } from './interfaces';
-import LichessChat from 'chat';
+import PlaystrategyChat from 'chat';
 
 const patch = init([classModule, attributesModule]);
 
@@ -11,10 +11,14 @@ import view from './view/main';
 
 export default function (opts: TournamentOpts) {
   $('body').data('tournament-id', opts.data.id);
-  lichess.socket = new lichess.StrongSocket(`/tournament/${opts.data.id}/socket/v5`, opts.data.socketVersion, {
-    receive: (t: string, d: any) => ctrl.socket.receive(t, d),
-  });
-  opts.socketSend = lichess.socket.send;
+  playstrategy.socket = new playstrategy.StrongSocket(
+    `/tournament/${opts.data.id}/socket/v5`,
+    opts.data.socketVersion,
+    {
+      receive: (t: string, d: any) => ctrl.socket.receive(t, d),
+    }
+  );
+  opts.socketSend = playstrategy.socket.send;
   opts.element = document.querySelector('main.tour') as HTMLElement;
   opts.classes = opts.element.getAttribute('class');
   opts.$side = $('.tour__side').clone();
@@ -31,7 +35,7 @@ export default function (opts: TournamentOpts) {
   }
 }
 
-// that's for the rest of lichess to access chessground
+// that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;
-window.LichessChat = LichessChat;
+window.PlaystrategyChat = PlaystrategyChat;

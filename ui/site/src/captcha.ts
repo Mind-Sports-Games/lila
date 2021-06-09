@@ -1,7 +1,7 @@
 import * as xhr from 'common/xhr';
 import * as domData from 'common/data';
 
-lichess.load.then(() => {
+playstrategy.load.then(() => {
   setTimeout(() => {
     $('div.captcha').each(function (this: HTMLElement) {
       const $captcha = $(this),

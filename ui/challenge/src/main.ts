@@ -6,7 +6,7 @@ import { ChallengeOpts, ChallengeData, Ctrl } from './interfaces';
 
 const patch = init([classModule, attributesModule]);
 
-export default function LichessChallenge(element: Element, opts: ChallengeOpts) {
+export default function PlaystrategyChallenge(element: Element, opts: ChallengeOpts) {
   let vnode: VNode, ctrl: Ctrl;
 
   function redraw() {
@@ -23,7 +23,7 @@ export default function LichessChallenge(element: Element, opts: ChallengeOpts) 
   }
 
   if (opts.data) update(opts.data);
-  else json('/challenge').then(update, _ => lichess.announce({ msg: 'Failed to load challenges' }));
+  else json('/challenge').then(update, _ => playstrategy.announce({ msg: 'Failed to load challenges' }));
 
   return {
     update,

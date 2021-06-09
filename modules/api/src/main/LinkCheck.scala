@@ -18,8 +18,8 @@ import lila.user.User
 import lila.study.Study
 import lila.study.StudyRepo
 
-/* Determine if a link to a lichess resource
- * can be posted from another lichess resource.
+/* Determine if a link to a playstrategy resource
+ * can be posted from another playstrategy resource.
  * Owners of a resource can post any link on it (but not to it).
  * Links to a team resource can be posted from another resource of the same team.
  * Links to official resources can be posted from anywhere.

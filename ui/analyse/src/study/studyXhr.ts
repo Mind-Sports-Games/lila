@@ -20,7 +20,7 @@ export const practiceComplete = (chapterId: string, nbMoves: number) =>
   });
 
 export const importPgn = (studyId: string, data: any) =>
-  xhr.json(`/study/${studyId}/import-pgn?sri=${lichess.sri}`, {
+  xhr.json(`/study/${studyId}/import-pgn?sri=${playstrategy.sri}`, {
     method: 'POST',
     body: xhr.form(data),
   });
