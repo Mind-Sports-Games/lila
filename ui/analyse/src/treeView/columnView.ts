@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { isEmpty } from 'common';
-import { fixCrazySan } from 'chess';
+import { fixCrazySan, variantStyle } from 'chess';
 import { path as treePath, ops as treeOps } from 'tree';
 import * as moveView from '../moveView';
 import { authorText as commentAuthorText } from '../study/studyComments';
@@ -143,7 +143,11 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
       attrs: { p: path },
       class: classes,
     },
-    moveView.renderMove(ctx, node)
+    moveView.renderMove(
+      ctx,
+      node,
+      variantStyle(ctx.ctrl.data.game.variant.key)
+    )
   );
 }
 

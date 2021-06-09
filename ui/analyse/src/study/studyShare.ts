@@ -2,6 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { bind, baseUrl } from '../util';
 import { prop, Prop } from 'common';
 import { renderIndexAndMove } from '../moveView';
+import { variantStyle } from 'chess';
 import { StudyData, StudyChapterMeta } from './interfaces';
 import RelayCtrl from './relay/relayCtrl';
 
@@ -15,6 +16,7 @@ export interface StudyShareCtrl {
   cloneable: boolean;
   redraw: () => void;
   trans: Trans;
+  variantKey: VariantKey;
 }
 
 function fromPly(ctrl: StudyShareCtrl): VNode {
@@ -23,7 +25,8 @@ function fromPly(ctrl: StudyShareCtrl): VNode {
       withDots: true,
       showEval: false,
     },
-    ctrl.currentNode()
+    ctrl.currentNode(),
+    variantStyle(ctrl.variantKey)
   );
   return h(
     'div.ply-wrap',
@@ -66,6 +69,7 @@ export function ctrl(
     cloneable: data.features.cloneable,
     redraw,
     trans,
+    variantKey: data.chapter.setup.variant.key,
   };
 }
 

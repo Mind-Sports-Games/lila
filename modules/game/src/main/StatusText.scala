@@ -24,6 +24,7 @@ object StatusText {
           case chess.variant.KingOfTheHill => s"${winner(win)} brings the king in the center."
           case chess.variant.ThreeCheck    => s"${winner(win)} gives the third check."
           case chess.variant.RacingKings   => s"${winner(win)} wins the race."
+          case chess.variant.LinesOfAction => s"${winner(win)} connects all of their pieces."
           case _                           => "Game ends by variant rule."
         }
       case _ => ""

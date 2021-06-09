@@ -9,6 +9,7 @@ import viewStatus from 'game/view/status';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes, RoundData } from '../interfaces';
+import uciDisplayVariant from 'chess';
 
 const scrollMax = 99999,
   moveTag = 'u8t',
@@ -102,7 +103,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
 
 function renderMoves(ctrl: RoundController): MaybeVNodes {
   const steps = ctrl.data.steps,
-    uciVariant = util.uciDisplayVariant(ctrl.data.game.variant.key),
+    uciVariant = uciDisplayVariant(ctrl.data.game.variant.key),
     firstPly = round.firstPly(ctrl.data),
     lastPly = round.lastPly(ctrl.data),
     drawPlies = new Set(ctrl.data.game.drawOffers || []);

@@ -35,3 +35,11 @@ export const altCastles = {
   e8a8: 'e8c8',
   e8h8: 'e8g8',
 };
+
+export function uciDisplayVariant(key: VariantKey) {
+  return ['linesOfAction'].includes(key);
+}
+
+export function variantStyle(key: VariantKey) {
+  return uciDisplayVariant(key) ? 'uci' : 'san'
+}
