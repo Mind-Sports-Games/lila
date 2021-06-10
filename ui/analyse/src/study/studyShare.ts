@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { bind, baseUrl } from '../util';
 import { prop, Prop } from 'common';
 import { renderIndexAndMove } from '../moveView';
-import { variantStyle } from 'chess';
+import { notationStyle } from 'chess';
 import { StudyData, StudyChapterMeta } from './interfaces';
 import RelayCtrl from './relay/relayCtrl';
 
@@ -26,7 +26,7 @@ function fromPly(ctrl: StudyShareCtrl): VNode {
       showEval: false,
     },
     ctrl.currentNode(),
-    variantStyle(ctrl.variantKey)
+    notationStyle(ctrl.variantKey)
   );
   return h(
     'div.ply-wrap',
