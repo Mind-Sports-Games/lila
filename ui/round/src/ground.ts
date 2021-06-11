@@ -105,9 +105,11 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
   }
 }
 
-export function boardOrientation(data: RoundData, flip: boolean): Color {
+export function boardOrientation(data: RoundData, flip: boolean): cg.Orientation {
   if (data.game.variant.key === 'racingKings') return flip ? 'black' : 'white';
-  else return flip ? data.opponent.color : data.player.color;
+  if (data.game.variant.key === 'linesOfAction') {
+    return data.player.color === 'black' ? (flip ? 'left' : 'right') : data.player.color;
+  } else return flip ? data.opponent.color : data.player.color;
 }
 
 export function render(ctrl: RoundController) {
