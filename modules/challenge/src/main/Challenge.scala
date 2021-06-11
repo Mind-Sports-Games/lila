@@ -241,7 +241,7 @@ object Challenge {
         else if (variant == Chess960) initialFen filter { fen =>
           Chess960.positionNumber(fen).isDefined
         }
-        else !variant.standardInitialPosition option variant.initialFen.pp("challengeinitfen"),
+        else !variant.standardInitialPosition option variant.initialFen,
       timeControl = timeControl,
       mode = finalMode,
       colorChoice = colorChoice,

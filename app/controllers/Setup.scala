@@ -102,7 +102,7 @@ final class Setup(
                     } getOrElse TimeControl.Unlimited
                     val challenge = lila.challenge.Challenge.make(
                       variant = config.variant,
-                      initialFen = config.fen.pp("setupfen"),
+                      initialFen = config.fen,
                       timeControl = timeControl,
                       mode = config.mode,
                       color = config.color.name,

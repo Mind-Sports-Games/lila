@@ -46,7 +46,7 @@ final class Export(env: Env) extends LilaController(env) {
   def gameThumbnail(id: String) =
     Open { implicit ctx =>
       ExportImageRateLimitGlobal("-", msg = HTTPRequest.ipAddress(ctx.req).value) {
-        OptionFuResult(env.game.gameRepo game id.pp("gameThumbnail")) { game =>
+        OptionFuResult(env.game.gameRepo game id) { game =>
           env.game.gifExport.gameThumbnail(game) map
             stream("image/gif") map
             gameImageCacheSeconds(game)
