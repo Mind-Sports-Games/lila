@@ -29,6 +29,7 @@ export interface RetroCtrl {
   close(): void;
   node(): Tree.Node;
   redraw: Redraw;
+  variantKey: VariantKey;
 }
 
 interface NodeWithPath {
@@ -241,5 +242,6 @@ export function make(root: AnalyseCtrl, color: Color): RetroCtrl {
     noarg: root.trans.noarg,
     node: () => root.node,
     redraw,
+    variantKey: root.data.game.variant.key,
   };
 }

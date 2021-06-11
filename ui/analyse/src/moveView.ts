@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { fixCrazySan } from 'chess';
+import { fixCrazySan, NotationStyle } from 'chess';
 import { defined } from 'common';
 import { view as cevalView, renderEval as normalizeEval } from 'ceval';
 
@@ -30,9 +30,9 @@ export function renderIndex(ply: Ply, withDots?: boolean): VNode {
   return h('index', renderIndexText(ply, withDots));
 }
 
-export function renderMove(ctx: Ctx, node: Tree.Node): VNode[] {
+export function renderMove(ctx: Ctx, node: Tree.Node, style: NotationStyle): VNode[] {
   const ev = cevalView.getBestEval({ client: node.ceval, server: node.eval });
-  const nodes = [h('san', fixCrazySan(node.san!))];
+  const nodes = [style === 'uci' ? h('uci', node.uci!) : h('san', fixCrazySan(node.san!))];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => nodes.push(renderGlyph(g)));
   if (node.shapes) nodes.push(h('shapes'));
   if (ev && ctx.showEval) {
@@ -42,7 +42,7 @@ export function renderMove(ctx: Ctx, node: Tree.Node): VNode[] {
   return nodes;
 }
 
-export function renderIndexAndMove(ctx: Ctx, node: Tree.Node): VNode[] | undefined {
+export function renderIndexAndMove(ctx: Ctx, node: Tree.Node, style: NotationStyle): VNode[] | undefined {
   if (!node.san) return; // initial position
-  return [renderIndex(node.ply, ctx.withDots), ...renderMove(ctx, node)];
+  return [renderIndex(node.ply, ctx.withDots), ...renderMove(ctx, node, style)];
 }

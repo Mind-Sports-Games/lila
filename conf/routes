@@ -729,7 +729,7 @@ POST  /event/manager                   controllers.Event.create
 # Misc
 GET   /captcha/$id<\w{8}>              controllers.Main.captchaCheck(id: String)
 GET   /developers                      controllers.Main.webmasters
-GET   /mobile                          controllers.Main.mobile
+#GET   /mobile                          controllers.Main.mobile
 GET   /lag                             controllers.Main.lag
 GET   /get-fishnet                     controllers.Main.getFishnet
 GET   /costs                           controllers.Main.costs
@@ -751,7 +751,8 @@ POST  /push/subscribe                  controllers.Push.webSubscribe
 
 # Pages
 GET   /terms-of-service                controllers.Page.tos
-GET   /$bookmark<privacy|thanks|about|ads|changelog> controllers.Page.menuBookmark(bookmark: String)
+#GET   /$bookmark<privacy|thanks|about|ads|changelog> controllers.Page.menuBookmark(bookmark: String)
+GET   /$bookmark<privacy|thanks|about|changelog> controllers.Page.menuBookmark(bookmark: String)
 GET   /contact                         controllers.Main.contact
 GET   /faq                             controllers.Main.faq
 GET   /source                          controllers.Page.source

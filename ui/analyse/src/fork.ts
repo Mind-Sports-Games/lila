@@ -1,5 +1,6 @@
 import { h } from 'snabbdom';
 import { renderIndexAndMove } from './moveView';
+import { notationStyle } from 'chess';
 import { defined } from 'common';
 import { ConcealOf } from './interfaces';
 import { onInsert } from './util';
@@ -94,7 +95,8 @@ export function view(root: AnalyseCtrl, concealOf?: ConcealOf) {
               showEval: root.showComputer(),
               showGlyphs: root.showComputer(),
             },
-            node
+            node,
+            notationStyle(root.data.game.variant.key)
           )!
         );
       return undefined;

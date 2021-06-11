@@ -42,9 +42,7 @@ object contact {
         li(
           a(href := "https://github.com/veloce/lichobile/issues")(reportMobileIssue())
         ),
-        li(
-          a(href := "https://discord.gg/hy5jqSs")(reportBugInDiscord())
-        )
+        //li(a(href := "https://discord.gg/hy5jqSs")(reportBugInDiscord()))
       ),
       p(howToReportBug())
     )
@@ -297,12 +295,12 @@ object contact {
                 p(
                   "We will never display any kind of ads, we won't track our players, and we won't sell or buy traffic or users."
                 ),
-                p("Please do not email us about marketing, tracking, or advertising."),
-                br,
+                p("Please do not email us about marketing, tracking, or advertising.")
+                /*br,
                 p(
                   "We encourage everyone to ",
                   a(href := "/ads")("block all ads and trackers.")
-                )
+                )*/
               )
             ),
             Leaf(

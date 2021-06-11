@@ -70,6 +70,7 @@ final class Main(
       }
     }
 
+  /*
   def mobile =
     Open { implicit ctx =>
       pageHit
@@ -77,6 +78,7 @@ final class Main(
         html.mobile(doc, resolver)
       }
     }
+  */
 
   def dailyPuzzleSlackApp =
     Open { implicit ctx =>
@@ -229,7 +231,7 @@ Allow: /
           case 110  => s"$faq#name"
           case 29   => s"$faq#titles"
           case 4811 => s"$faq#lm"
-          case 216  => routes.Main.mobile.url
+          //case 216  => routes.Main.mobile.url
           case 340  => s"$faq#trophies"
           case 6    => s"$faq#ratings"
           case 207  => s"$faq#hide-ratings"

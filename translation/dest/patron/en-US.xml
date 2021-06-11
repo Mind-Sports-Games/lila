@@ -6,12 +6,14 @@
   <string name="becomePatron">Become a Playstrategy Patron</string>
   <string name="xBecamePatron">%s became a Playstrategy Patron</string>
   <string name="newPatrons">New Patrons</string>
+  <string name="freeGames">Free games for everyone!</string>
   <string name="freeChess">Free chess for everyone, forever!</string>
-  <string name="noAdsNoSubs">No ads, no subscriptions; but open-source and passion.</string>
+  <string name="noAdsNoSubs">No ads, no subscriptions.</string>
   <string name="thankYou">Thank you for your donation!</string>
   <string name="youHaveLifetime">You have a Lifetime Patron account. That\'s pretty awesome!</string>
   <string name="patronUntil">You have a Patron account until %s.</string>
   <string name="ifNotRenewed">If not renewed, you will then be downgraded to free.</string>
+  <string name="weAreFree">We believe everyone should have access to a world-class mind sports games platform powered by Artificial Intelligence in order to both train players and ensure fair play.</string>
   <string name="weAreNonProfit">We are a non‑profit association because we believe everyone should have access to a free, world-class chess platform.</string>
   <string name="weRelyOnSupport">We rely on support from people like you to make it possible. If you enjoy using Playstrategy, please consider supporting us by donating and becoming a Patron!</string>
   <string name="lifetime">Lifetime</string>
@@ -29,8 +31,7 @@
   <string name="weAreSmallTeam">We are a small team, so your support makes a huge difference!</string>
   <string name="celebratedPatrons">The celebrated Patrons who make Playstrategy possible</string>
   <string name="whereMoneyGoes">Where does the money go?</string>
-  <string name="serversAndDeveloper">First of all, powerful servers.
-Then we pay a full-time developer: %s, the founder of Playstrategy.</string>
+  <string name="serversAndDeveloper">There are lots of costs for running a platform like this, primarily server fees and developer salaries, so we can have new games and new features.</string>
   <string name="costBreakdown">See the detailed cost breakdown</string>
   <string name="officialNonProfit">Is Playstrategy an official non-profit?</string>
   <string name="actOfCreation">Yes, here\'s the act of creation (in French)</string>
@@ -44,11 +45,16 @@ Or you can %s.</string>
   <string name="patronFeatures">Are some features reserved to Patrons?</string>
   <string name="noPatronFeatures">No, because Playstrategy is entirely free, forever, and for everyone. That\'s a promise.
 However, Patrons get bragging rights with a cool new profile icon.</string>
+  <string name="patronPerks">No, because Playstrategy is entirely free, and for everyone.
+However, Patrons get bragging rights with a cool new profile icon.</string>
   <string name="featuresComparison">See the detailed features comparison</string>
   <plurals name="patronForMonths">
     <item quantity="one">Playstrategy Patron for one month</item>
     <item quantity="other">Playstrategy Patron for %s months</item>
   </plurals>
+  <string name="watkinsAddress">playstrategy.org is a division within Watkins Media Limited, a UK company:
+Company Registration Number: 9171151
+Company Registration Address: Shepperton House Unit 11, 89 Shepperton Road, London, England, N1 3DF</string>
   <string name="youSupportWith">You support playstrategy.org with %s per month.</string>
   <string name="tyvm">Thank you very much for your help. You rock!</string>
   <string name="currentStatus">Current status</string>

@@ -67,7 +67,7 @@ object index {
           } getOrElse div(cls := "banner moto")(
             iconTag(patronIconChar),
             div(
-              h1(freeChess()),
+              h1(freeGames()),
               p(noAdsNoSubs())
             ),
             iconTag(patronIconChar)
@@ -75,7 +75,7 @@ object index {
           div(cls := "box__pad")(
             div(cls := "wrapper")(
               div(cls := "text")(
-                p(weAreNonProfit()),
+                p(weAreFree()),
                 p(weRelyOnSupport())
               ),
               div(cls := "content")(
@@ -233,6 +233,7 @@ object index {
             p(id := "error")(),
             p(cls := "small_team")(weAreSmallTeam()),
             faq,
+            p(cls := "watkins_address")(watkinsAddress()),
             div(cls := "best_patrons")(
               h2(celebratedPatrons()),
               div(cls := "list")(
@@ -251,42 +252,18 @@ object index {
     div(cls := "faq")(
       dl(
         dt(whereMoneyGoes()),
-        dd(
-          serversAndDeveloper(userIdLink("thibault".some)),
-          br,
-          a(href := routes.Main.costs, targetBlank)(costBreakdown()),
-          "."
-        ),
-        dt(officialNonProfit()),
-        dd(
-          a(
-            href := "https://www.journal-officiel.gouv.fr/associations/detail-annonce/associations_b/20160025/818"
-          )(actOfCreation()),
-          "."
-        )
+        dd(serversAndDeveloper())
       ),
       dl(
         dt(changeMonthlySupport()),
         dd(
           changeOrContact(a(href := routes.Main.contact, targetBlank)(contactSupport()))
-        ),
-        dt(otherMethods()),
-        dd(
-          "Playstrategy is registered with Benevity.",
-          br,
-          a(href := assetUrl("doc/iban_LICHESS_ORG_00022031601.pdf"), targetBlank)(bankTransfers()),
-          ".",
-          br,
-          bitcoin(code("15ZA4bBki3uu3yR2ENC2WYa9baVGUZ8Cf8")),
-          ".",
-          br,
-          "Please note that only the donation form above will grant the Patron status."
         )
       ),
       dl(
         dt(patronFeatures()),
         dd(
-          noPatronFeatures(),
+          patronPerks(),
           br,
           a(href := routes.Plan.features, targetBlank)(featuresComparison()),
           "."

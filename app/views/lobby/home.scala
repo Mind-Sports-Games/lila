@@ -190,11 +190,11 @@ object home {
           a(href := "/about")(trans.aboutX("Playstrategy")),
           a(href := "/faq")(trans.faq.faqAbbreviation()),
           a(href := "/contact")(trans.contact.contact()),
-          a(href := "/mobile")(trans.mobileApp()),
+          //a(href := "/mobile")(trans.mobileApp()),
           a(href := routes.Page.tos)(trans.termsOfService()),
           a(href := "/privacy")(trans.privacy()),
           a(href := "/source")(trans.sourceCode()),
-          a(href := "/ads")("Ads"),
+          //a(href := "/ads")("Ads"),
           views.html.base.bits.connectLinks
         )
       )
