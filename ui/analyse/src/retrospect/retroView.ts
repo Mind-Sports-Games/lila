@@ -1,4 +1,5 @@
 import { renderIndexAndMove } from '../moveView';
+import { notationStyle } from 'chess';
 import { RetroCtrl } from './retroCtrl';
 import AnalyseCtrl from '../ctrl';
 import { bind, dataIcon, spinner } from '../util';
@@ -67,7 +68,8 @@ const feedback = {
                     showGlyphs: true,
                     showEval: false,
                   },
-                  ctrl.current()!.fault.node
+                  ctrl.current()!.fault.node,
+                  notationStyle(ctrl.variantKey)
                 )!
               )
             )
@@ -138,7 +140,8 @@ const feedback = {
                       withDots: true,
                       showEval: false,
                     },
-                    ctrl.current()!.solution.node
+                    ctrl.current()!.solution.node,
+                    notationStyle(ctrl.variantKey)
                   )!
                 )
               )
