@@ -42,6 +42,6 @@ export function variantUsesUCINotation(key: VariantKey) {
   return ['linesOfAction'].includes(key);
 }
 
-export function notationStyle(key: VariantKey) {
+export function notationStyle(key: VariantKey): NotationStyle {
   return variantUsesUCINotation(key) ? 'uci' : 'san';
 }
