@@ -52,7 +52,7 @@ jobs:
           timeZone: 8
           format: 'YYYYMMDD-HHmmss'
       - uses: jakejarvis/s3-sync-action@master
-        if: github.ref == 'refs/heads/assets-autodeploy' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         with:
           args: --acl public-read --follow-symlinks --delete
         env:
@@ -63,7 +63,7 @@ jobs:
           SOURCE_DIR: 'public'
           DEST_DIR: 'assets-${{ steps.time.outputs.time }}'
       - uses: jakejarvis/s3-sync-action@master
-        if: github.ref == 'refs/heads/assets-autodeploy' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         with:
           args: --acl public-read --follow-symlinks --delete
         env:
@@ -74,13 +74,13 @@ jobs:
           SOURCE_DIR: 'public'
           DEST_DIR: 'assets'
       - run: mkdir assets && mv public assets/ && cp LICENSE COPYING.md README.md assets/ && git log -n 1 --pretty=oneline > assets/commit.txt
-        if: github.ref == 'refs/heads/assets-autodeploy' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
       - run: cd assets && tar -cvpJf ../assets.tar.xz . && cd -
-        if: github.ref == 'refs/heads/assets-autodeploy' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         env:
           XZ_OPT: '-0'
       - uses: actions/upload-artifact@v1
-        if: github.ref == 'refs/heads/assets-autodeploy' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         with:
           name: lila-assets
           path: assets.tar.xz
