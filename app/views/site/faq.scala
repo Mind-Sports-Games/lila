@@ -32,21 +32,21 @@ object faq {
         h2("PlayStrategy"),
         question(
           "what",
-          whatIsPlaystrategy.txt(),
+          whatIsPlayStrategy.txt(),
           playstrategyAboutSummary(
             a(href := "/about")("PlayStrategy"),
           )
         ),
         question(
           "donating",
-          canIDonateToPlaystrategy.txt(),
+          canIDonateToPlayStrategy.txt(),
           playstrategyFundedByDonations(
             a(href := "/patron")("patron"),
           )
         ),
         question(
           "origins",
-          areThereWebsitesBasedOnPlaystrategy.txt(),
+          areThereWebsitesBasedOnPlayStrategy.txt(),
           playstrategyIsForkedFromLichess(
             a(href := "https://lichess.org")("lichess.org")
           )
