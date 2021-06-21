@@ -1,3 +1,5 @@
+const noCevalVariants = ['linesOfAction'];
+
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {
   return !b || a.depth > b.depth || (a.depth === b.depth && a.nodes > b.nodes);
 }
@@ -13,4 +15,8 @@ export function sanIrreversible(variant: VariantKey, san: string): boolean {
   if (san.includes('x')) return true; // capture
   if (san.toLowerCase() === san) return true; // pawn move
   return variant === 'threeCheck' && san.includes('+');
+}
+
+export function allowCevalForVariant(variant: VariantKey) {
+  return noCevalVariants.indexOf(variant) == -1;
 }
