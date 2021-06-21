@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="isPlaystrategyLagging">Onko Playstrategy hidastunut?</string>
+  <string name="isPlayStrategyLagging">Onko PlayStrategy hidastunut?</string>
   <string name="measurementInProgressThreeDot">Tehdään mittauksia...</string>
   <string name="noAndYourNetworkIsGood">Ei ole, ja sinun yhteytesi on kunnossa.</string>
-  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is Playstrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Ei ole. Sinun yhteytesi on hidas.</string>
+  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is PlayStrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Ei ole. Sinun yhteytesi on hidas.</string>
   <string name="yesItWillBeFixedSoon">On. Se korjataan mitä pikimmiten!</string>
   <string name="andNowTheLongAnswerLagComposedOfTwoValues">Ja nyt seuraa pitkä vastaus! Pelin viive koostuu kahdesta toisistaan riippumattomasta arvosta (matalampi on parempi):</string>
-  <string name="playstrategyServerLatency">Playstrategyin palvelinviive</string>
-  <string name="playstrategyServerLatencyExplanation">Aika, joka kuluu siirron käsittelemiseen palvelimella. Se on kaikille sama ja riippuu palvelinten kuormituksesta. Se on sitä korkeampi, mitä enemmän on pelaajia, mutta Playstrategyin kehittäjät tekevät parhaansa pitääkseen sen alhaisena. Vain hyvin harvoin se ylittää 10 ms.</string>
-  <string name="networkBetweenPlaystrategyAndYou">Playstrategyin ja sinun välinen vasteaika</string>
-  <string name="networkBetweenPlaystrategyAndYouExplanation">Aika, joka kuluu siirron lähettämiseen sinun laitteeltasi Playstrategyin palvelimelle ja siihen vastauksen saamiseen. Se riippuu sinun etäisyydestäsi Playstrategyiin (Ranskaan) ja internet-yhteytesi laadusta. Playstrategyin kehittäjät eivät voi korjata lähiverkkoasi eivätkä saada valoa kulkemaan nopeammin.</string>
+  <string name="playstrategyServerLatency">PlayStrategyin palvelinviive</string>
+  <string name="playstrategyServerLatencyExplanation">Aika, joka kuluu siirron käsittelemiseen palvelimella. Se on kaikille sama ja riippuu palvelinten kuormituksesta. Se on sitä korkeampi, mitä enemmän on pelaajia, mutta PlayStrategyin kehittäjät tekevät parhaansa pitääkseen sen alhaisena. Vain hyvin harvoin se ylittää 10 ms.</string>
+  <string name="networkBetweenPlayStrategyAndYou">PlayStrategyin ja sinun välinen vasteaika</string>
+  <string name="networkBetweenPlayStrategyAndYouExplanation">Aika, joka kuluu siirron lähettämiseen sinun laitteeltasi PlayStrategyin palvelimelle ja siihen vastauksen saamiseen. Se riippuu sinun etäisyydestäsi PlayStrategyiin (Ranskaan) ja internet-yhteytesi laadusta. PlayStrategyin kehittäjät eivät voi korjata lähiverkkoasi eivätkä saada valoa kulkemaan nopeammin.</string>
   <string name="youCanFindTheseValuesAtAnyTimeByClickingOnYourUsername">Voit tarkistaa molemmat arvot milloin tahansa napsauttamalla yläpalkissa käyttäjänimeäsi.</string>
   <string name="lagCompensation">Viiveen hyvitys</string>
-  <string name="lagCompensationExplanation">Playstrategyissä verkkoviive hyvitetään. Tämä kattaa sekä jatkuvan viiveen että ajoittaiset viivepiikit. Käytössä on aikakontrolliin ja aiemmin hyvitettyyn viiveeseen perustuvia rajoja ja heuristiikkaa, joiden ansiosta lopputuloksen pitäisi tuntua molemmille pelaajille järkevältä. Näin ollen vastustajaasi korkeampi verkkoviive ei tarkoita, että antaisit hänelle tasoitusta!</string>
+  <string name="lagCompensationExplanation">PlayStrategyissä verkkoviive hyvitetään. Tämä kattaa sekä jatkuvan viiveen että ajoittaiset viivepiikit. Käytössä on aikakontrolliin ja aiemmin hyvitettyyn viiveeseen perustuvia rajoja ja heuristiikkaa, joiden ansiosta lopputuloksen pitäisi tuntua molemmille pelaajille järkevältä. Näin ollen vastustajaasi korkeampi verkkoviive ei tarkoita, että antaisit hänelle tasoitusta!</string>
 </resources>

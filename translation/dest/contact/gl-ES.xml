@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="contact">Contacto</string>
-  <string name="contactPlaystrategy">Contactar con Playstrategy</string>
+  <string name="contactPlayStrategy">Contactar con PlayStrategy</string>
   <string name="iCantLogIn">Non podo iniciar sesión</string>
   <string name="forgotPassword">Esquecín o meu contrasinal</string>
   <string name="forgotUsername">Esquecín o meu nome de usuario</string>

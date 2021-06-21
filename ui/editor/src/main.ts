@@ -6,7 +6,7 @@ import { Chessground } from 'chessground';
 
 const patch = init([classModule, attributesModule, propsModule, eventListenersModule]);
 
-export default function PlaystrategyEditor(element: HTMLElement, config: Editor.Config): PlaystrategyEditor {
+export default function PlayStrategyEditor(element: HTMLElement, config: Editor.Config): PlayStrategyEditor {
   const ctrl = new EditorCtrl(config, redraw);
   element.innerHTML = '';
   const inner = document.createElement('div');

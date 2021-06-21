@@ -416,8 +416,8 @@
   <string name="thankYou">Баярлалаа!</string>
   <string name="socialMediaLinks">Сошиал холбоосууд</string>
   <string name="inlineNotation">Мөрийн тэмдэглэгээ</string>
-  <string name="watchPlaystrategyTV">Личессийн суваг үзэх</string>
-  <string name="previouslyOnPlaystrategyTV">Өмнөхөн цацагдсан өргийн бичлэгүүд</string>
+  <string name="watchPlayStrategyTV">Личессийн суваг үзэх</string>
+  <string name="previouslyOnPlayStrategyTV">Өмнөхөн цацагдсан өргийн бичлэгүүд</string>
   <string name="onlinePlayers">Сүлжээнд байгаа гишүүд</string>
   <string name="activeToday">Өнөөдөр хамгийн их идэвхтэй байсан гишүүдийн жагсаалт</string>
   <string name="activePlayers">Идэвхтэй гишүүд</string>
@@ -519,7 +519,7 @@
   <string name="clock">Цаг</string>
   <string name="unauthorizedError">Та нэвтрэх эрхгүй байна.</string>
   <string name="noInternetConnection">Та интернэт холболтгүй байна. Хэдий тийм ч та интернетийн орчингүй горимоор шатар тоглох боломжтой.</string>
-  <string name="connectedToPlaystrategy">Та playstrategy.org хуудаст холбогдлоо</string>
+  <string name="connectedToPlayStrategy">Та playstrategy.org хуудаст холбогдлоо</string>
   <string name="signedOut">Та бүртгэлээсээ гарсан байна</string>
   <string name="loginSuccessful">Та бүртгэгдэн орлоо</string>
   <string name="playOnTheBoardOffline">Нүүр тулсан өрөг</string>
@@ -615,8 +615,8 @@
   <string name="ifYouDoNotSeeTheEmailCheckOtherPlaces">Хэрэв бидний зурвас үндсэн шуудангийн хайрцаг дотор тань олдохгүй байвал та бусад хайрцгуудаа ( junk, spam, social гэх мэт) шалгана уу.</string>
   <string name="weHaveSentYouAnEmailTo">Бид %s хаяг руу зурвас илгээлээ. Зурвас доторх холбоос дээр дарж нэвтрэх үгээ шинэчилнэ үү.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Та энэ хуудсанд бүртгэл үүсгэснээр манай %sийг бүрэн дагаж мөрдөхөө хүлээн зөвшөөрч байна.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Таны ба манай сүлжээний хоорон дахь хоцрогдол</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Личеиссийн серверт нүүдлийг боловсруулах хугацаа</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Таны ба манай сүлжээний хоорон дахь хоцрогдол</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Личеиссийн серверт нүүдлийг боловсруулах хугацаа</string>
   <string name="downloadAnnotated">Өргийг тэмдэглэлийн хамт татаж авах</string>
   <string name="downloadRaw">Өргийг текст хэлбэрээр татаж авах</string>
   <string name="downloadImported">Импортолж оруулсан өргийг татаж авах</string>
@@ -632,7 +632,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Та дараахь цахим шуудангийн хаягаар бүртгэлтэй байна: %s</string>
   <string name="kidMode">Хүүхдийн горим</string>
   <string name="kidModeExplanation">Хамгаалалтын тухай. Хүүхдийн горимд сайтын бүх харилцааны хэсгүүд хаагдана. Бага насны болон сургуулын хүүхдүүдэд энэ горимийг идэвжүүлж интернэтийг зохисгүй хэрэглэгсдээс хамгаалана уу.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Хүүхдийн горимд сайтын лого %s болж танд мэдэгдэх болно.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Хүүхдийн горимд сайтын лого %s болж танд мэдэгдэх болно.</string>
   <string name="enableKidMode">Хүүхдэд ээлтэй хувилбар руу шилжүүл</string>
   <string name="disableKidMode">Хүүхдэд ээлтэй хувилбараас гарах</string>
   <string name="security">Хамгаалалт</string>
@@ -640,7 +640,7 @@
   <string name="alternativelyYouCanX">Эсвэл та %s.</string>
   <string name="revokeAllSessions">бүх хандалтыг хүчингүй болгох</string>
   <string name="playChessEverywhere">Хаа газар шатар тоглоцгооё</string>
-  <string name="asFreeAsPlaystrategy">Ямар ч үнэ төлбөргүй</string>
+  <string name="asFreeAsPlayStrategy">Ямар ч үнэ төлбөргүй</string>
   <string name="builtForTheLoveOfChessNotMoney">Мөнгөний төлөө биш шатарт хайртайдаа бүтээлээ</string>
   <string name="everybodyGetsAllFeaturesForFree">Бүх функциуд үнэгүй</string>
   <string name="zeroAdvertisement">Ганц ч зар сурталчилгаагүй</string>
@@ -680,7 +680,7 @@
   <string name="usernameSuffixInvalid">Хэрэглэгчийн нэр нь үсэг эсвэл тоогоор дуусах ёстой.</string>
   <string name="usernameCharsInvalid">Хэрэглэгчийн нэр нь зөвхөн үсэг, тоо, доогуур зураас, болон зураас агуулсан байх ёстой.</string>
   <string name="usernameUnacceptable">Ийм нэртэй хэрэглэгч үүсгэж болохгүй.</string>
-  <string name="directlySupportPlaystrategy">Личессд дэмжлэг үзүүлэх</string>
+  <string name="directlySupportPlayStrategy">Личессд дэмжлэг үзүүлэх</string>
   <string name="playChessInStyle">Загварлаг тоглоцгооё</string>
   <string name="chessBasics">Суурь мэдлэг</string>
   <string name="coaches">Шатрын багш</string>

@@ -2,20 +2,20 @@
 <resources>
   <string name="faqAbbreviation">Жиі қойылатын сұрақтар</string>
   <string name="frequentlyAskedQuestions">Жиі қойылатын сұрақтар</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Личес неге Личес деп аталады?</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Личес неге Личес деп аталады?</string>
   <string name="playstrategyCombinationLiveLightLibrePronounced">Личес деген live/light/libre деген сөз бен chess сөзінің қосындысы. Ол %1$s деп оқылады.</string>
   <string name="leechess">ли-чес</string>
   <string name="hearItPronouncedBySpecialist">Маманның айтуын тыңдаңыз.</string>
   <string name="whyLiveLightLibre">\"Live\" дегеннің мағынасы – ойындарды шын уақытта 24/7 ойнап, көруге болады; \"light\" пен \"libre\" деген сөздер Личестің түбір коды ашық, онымен қатар басқа веб-сайттардағыдай жекешелендіру сияқты қоқыстан еркін екендігін білдіреді.</string>
   <string name="whyIsLilaCalledLila">Личестің түбір коды – %1$s сөзі, li[chess in sca]la-дан құралады. %2$s програмдау тілінде Личестің негізгі бөлігі жазылған.</string>
-  <string name="howCanIContributeToPlaystrategy">Лическе қалайша жәрдем көрсетсем болады?</string>
+  <string name="howCanIContributeToPlayStrategy">Лическе қалайша жәрдем көрсетсем болады?</string>
   <string name="playstrategyPoweredByDonationsAndVolunteers">Личестің тірегі – ақшалай жәрдем берушілер мен еріктілер тобы.</string>
   <string name="findMoreAndSeeHowHelp">%1$s туралы көбірек білуіңізге болады (%2$s қоса). Егер Лическе ерікті ретінде уақыт пен қабілетіңізбен көмек көрсетем десеңіз, %3$s бар.</string>
   <string name="beingAPatron">жәрдем беруші болу</string>
   <string name="breakdownOfOurCosts">біздің шығындар тізімі</string>
   <string name="otherWaysToHelp">көмектесудің басқа жолдары</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">Личес негізінде жасалған веб-сайттар бар ма?</string>
-  <string name="yesPlaystrategyInspiredOtherOpenSourceWebsites">Иә. Личесте біздің %1$s, %2$s не %3$s қолданатын коды ашық басқа да сайттар бар.</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">Личес негізінде жасалған веб-сайттар бар ма?</string>
+  <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">Иә. Личесте біздің %1$s, %2$s не %3$s қолданатын коды ашық басқа да сайттар бар.</string>
   <string name="fairPlay">Адал ойын</string>
   <string name="whenAmIEligibleRatinRefund">Қандай жағдайда читер келтірген рейтинг шығынын өтеуге құқығым бар?</string>
   <string name="ratingRefundExplanation">Ойыншы читер деп белгіленген соң, бір минут ішінде оның кейінгі 3 күнде болған 40 ойны алынады. Егер олардың арасында сізбен ойнаған ойны болса, сіздің рейтингіңіз кемісе (жеңіліс не тепе-теңдік салдарынан), сонымен қатар рейтингіңіз болжамалы емес болса, сіз рейтинг шығынын өтеп аласыз. Өтеудің деңгейі сіздің ең жоғары рейтинг пен ойыннан кейінгі рейтинг өзгерісіне қарай анықталады.
@@ -71,7 +71,7 @@
   <string name="threeFoldHasToBeClaimed">Қайталануды ойыншылардың бірі жариялау керек. Ол үшін сәйкес батырмаға басыңыз немесе тепе-теңдікті соңғы қайталану болар алдында сұраңыз, сонда қарсыласыңыз келіспесе де, ойын үш реттік қайталану негізінде тепе-теңдікпен тоқталады. Сонымен қатар, Личес %1$s қайталануды автоматты түрде жариялауды қоса аласыз. Одан бөлек, бес реттік қайталану болып қалса, ол ешбір шартсыз ойынды тоқтады.</string>
   <string name="configure">баптауында</string>
   <string name="accounts">Аккаунт</string>
-  <string name="titlesAvailableOnPlaystrategy">Личесте қандай атақтар бар?</string>
+  <string name="titlesAvailableOnPlayStrategy">Личесте қандай атақтар бар?</string>
   <string name="playstrategyRecognizeAllOTBtitles">Личес ойыншының шынайы шахмат ойындар нәтижесінде алған бүкіл FIDE атақтарын, онымен қатар, %1$s мойындайды. FIDE атақтардың тізімі:</string>
   <string name="showYourTitle">Егер де ресми атағыңыз болса, растайтын құжаттың суреті мен осы құжатты ұстап тұрған өзіңіздің фотоңызды қосып, %1$s толтырыңыз, сонда бұл атағыңыз аккаунтта көрсетілетін болады.
 
@@ -97,8 +97,8 @@
   <string name="aHourlyBulletTournament">әрсағаттық Буллит жарысы</string>
   <string name="goldenZeeExplanation">ZugAddict стрим жүргізе 2 сағат бойы 8-нші деңгейдегі Жасанды зият жүйесімен 1+0 қалыпта сәтсіз ойнады. Thibault оған стрим кезінде сәтті ойнасаң, ерекше олжа аласың деп уәде айтты. Бір сағаттан соң, ол Стокфиштің тас талқанын шығарып, уәдеге сай олжасын алған еді.</string>
   <string name="playstrategyRatings">Личес рейтингтері</string>
-  <string name="whichRatingSystemUsedByPlaystrategy">Личес қандай рейтинг жүйесін қолданады?</string>
-  <string name="ratingSystemUsedByPlaystrategy">Личес рейтингті Mark Glickman жасаған Glicko-2 тәсілімен есептейді. Бұл өте танымал тәсіл, оны көптеген шахмат ұйымдары қолданады (FIDE көз түсер қарсы мысал, ол әлі де Elo рейтинг жүйесін қолданады).
+  <string name="whichRatingSystemUsedByPlayStrategy">Личес қандай рейтинг жүйесін қолданады?</string>
+  <string name="ratingSystemUsedByPlayStrategy">Личес рейтингті Mark Glickman жасаған Glicko-2 тәсілімен есептейді. Бұл өте танымал тәсіл, оны көптеген шахмат ұйымдары қолданады (FIDE көз түсер қарсы мысал, ол әлі де Elo рейтинг жүйесін қолданады).
 
 Негізінде, Glicko сіздің рейтингіңізді есептеу кезінде \"сенімді аралықты\" қолданады. Сайтта алғаш рет ойнай бастағаныңызда, сіздің рейтингіңіз 1500 ± 700-ден басталады. 1500 – сіздің рейтингіңіз, 700 - сенімді аралық.
 

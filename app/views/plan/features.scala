@@ -19,7 +19,7 @@ object features {
         .OpenGraph(
           title = title,
           url = s"$netBaseUrl${routes.Plan.features.url}",
-          description = "All of Playstrategy features are free for all and forever. We do it for the chess!"
+          description = "All of PlayStrategy features are free for all and forever. We do it for the chess!"
         )
         .some
     ) {
@@ -97,7 +97,7 @@ object features {
             ),
             tr(unlimited)(
               a(href := routes.Search.index(1))("Advanced search"),
-              " through Playstrategy 3 billion games"
+              " through PlayStrategy 3 billion games"
             ),
             /*tr(unlimited)(
               a(href := routes.Video.index)("Chess video library")
@@ -155,11 +155,11 @@ object features {
               strong("All features to come, forever")
             )
           ),
-          header(h1("Support Playstrategy")),
+          header(h1("Support PlayStrategy")),
           tbody(cls := "support")(
             st.tr(
               th(
-                "Contribute to Playstrategy and",
+                "Contribute to PlayStrategy and",
                 br,
                 "get a cool looking Patron icon"
               ),
@@ -176,14 +176,14 @@ object features {
         p(cls := "explanation")(
           strong("Yes, both accounts have the same features!"),
           br,
-          "That is because Playstrategy is built for the love of chess.",
+          "That is because PlayStrategy is built for the love of chess.",
           br,
           "We believe every chess player deserves the best, and so:",
           br,
           br,
           strong("all features are free for everybody, forever!"),
           br,
-          "If you love Playstrategy, ",
+          "If you love PlayStrategy, ",
           a(cls := "button", href := routes.Plan.index)("Support us with a Patron account!")
         )
       )
@@ -204,5 +204,5 @@ object features {
 
   private def tr(value: Frag)(text: Frag*) = st.tr(th(text), all(value))
 
-  private val title = "Playstrategy features"
+  private val title = "PlayStrategy features"
 }

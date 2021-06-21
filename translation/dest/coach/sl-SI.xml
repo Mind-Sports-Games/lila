@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Playstrategy trenerji</string>
-  <string name="playstrategyCoach">Playstrategy trener</string>
+  <string name="playstrategyCoaches">PlayStrategy trenerji</string>
+  <string name="playstrategyCoach">PlayStrategy trener</string>
   <string name="areYouCoach">Ali ste dober šahovski trener z %s?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">NM ali FIDE naziv</string>
   <string name="confirmTitle">Potrdite vaš naziv tukaj in pregledali bomo vašo prijavo.</string>
@@ -14,7 +14,7 @@
   <string name="accepting">Sprejemanje študentov</string>
   <string name="notAccepting">Trenutno ne sprejemamo študentov</string>
   <string name="xCoachesStudents">%s trenira šahovske študente</string>
-  <string name="viewXProfile">Ogled Playstrategy profila %s</string>
+  <string name="viewXProfile">Ogled PlayStrategy profila %s</string>
   <string name="sendPM">Pošlji zasebno sporočilo</string>
   <string name="aboutMe">O meni</string>
   <string name="playingExperience">Šahovske izkušnje</string>

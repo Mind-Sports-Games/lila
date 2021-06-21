@@ -1,6 +1,6 @@
 import { attributesModule, classModule, init } from 'snabbdom';
 import boot from './boot';
-import PlaystrategyChat from 'chat';
+import PlayStrategyChat from 'chat';
 // eslint-disable-next-line no-duplicate-imports
 import makeCtrl from './ctrl';
 import menuHover from 'common/menuHover';
@@ -40,4 +40,4 @@ export { boot };
 // that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;
-window.PlaystrategyChat = PlaystrategyChat;
+window.PlayStrategyChat = PlayStrategyChat;

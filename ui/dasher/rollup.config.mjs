@@ -2,7 +2,7 @@ import rollupProject from '@build/rollupProject';
 
 export default rollupProject({
   main: {
-    name: 'PlaystrategyDasher',
+    name: 'PlayStrategyDasher',
     input: 'src/main.ts',
     output: 'dasher',
   },

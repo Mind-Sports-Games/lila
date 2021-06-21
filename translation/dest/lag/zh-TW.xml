@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="isPlaystrategyLagging">Playstrategy伺服器Lag了嗎?</string>
+  <string name="isPlayStrategyLagging">PlayStrategy伺服器Lag了嗎?</string>
   <string name="measurementInProgressThreeDot">正在檢查連線</string>
   <string name="noAndYourNetworkIsGood">沒有，而且您的網路是正常的</string>
-  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is Playstrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">沒有，但是您的網路不穩</string>
+  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is PlayStrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">沒有，但是您的網路不穩</string>
   <string name="yesItWillBeFixedSoon">是的，我會盡快被修復!</string>
   <string name="andNowTheLongAnswerLagComposedOfTwoValues">棋局因為以下條件而lag(這些數字越小越好):</string>
-  <string name="playstrategyServerLatency">Playstrategy 伺服器延遲數據</string>
+  <string name="playstrategyServerLatency">PlayStrategy 伺服器延遲數據</string>
   <string name="playstrategyServerLatencyExplanation">每個人在服務器上處理移動所花費的時間都一樣，取決於服務器負載。玩家越多，伺服器的負擔就越高。
 但是我們的開發者會盡力將其保持在較低水平，它很少超過10ms的延遲</string>
-  <string name="networkBetweenPlaystrategyAndYou">在您和Playstrategy之間的網路延遲數據</string>
-  <string name="networkBetweenPlaystrategyAndYouExplanation">從您的電腦向Playstrategy服務器發送移動信息並得到回復所花費的時間取決於您到Playstrategy (法國)的距離以及網路連接的質量。
-Playstrategy開發人員無法修復您的wifi或使網速變快。</string>
+  <string name="networkBetweenPlayStrategyAndYou">在您和PlayStrategy之間的網路延遲數據</string>
+  <string name="networkBetweenPlayStrategyAndYouExplanation">從您的電腦向PlayStrategy服務器發送移動信息並得到回復所花費的時間取決於您到PlayStrategy (法國)的距離以及網路連接的質量。
+PlayStrategy開發人員無法修復您的wifi或使網速變快。</string>
   <string name="youCanFindTheseValuesAtAnyTimeByClickingOnYourUsername">您可以在任何時間找到延遲數據，只要在您的使用者名稱上點一下</string>
   <string name="lagCompensation">延遲補償</string>
   <string name="lagCompensationExplanation">我們彌補了網路延遲，這包括持續的延遲和偶爾的延遲尖峰。

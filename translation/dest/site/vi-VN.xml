@@ -256,7 +256,7 @@
   <plurals name="giveNbSeconds">
     <item quantity="other">Cho thêm %s giây</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Tài khoản này đã vi phạm điều khoản dịch vụ của Playstrategy</string>
+  <string name="thisAccountViolatedTos">Tài khoản này đã vi phạm điều khoản dịch vụ của PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Sách khai cuộc &amp; bảng dữ liệu</string>
   <string name="takeback">Đi lại</string>
   <string name="proposeATakeback">Đề nghị lùi một nước</string>
@@ -417,8 +417,8 @@
   <string name="thankYou">Cám ơn!</string>
   <string name="socialMediaLinks">Kênh mạng xã hội</string>
   <string name="inlineNotation">Ký hiệu bên trong bàn cờ</string>
-  <string name="watchPlaystrategyTV">Xem ti vi Playstrategy</string>
-  <string name="previouslyOnPlaystrategyTV">Kênh trước</string>
+  <string name="watchPlayStrategyTV">Xem ti vi PlayStrategy</string>
+  <string name="previouslyOnPlayStrategyTV">Kênh trước</string>
   <string name="onlinePlayers">Các kỳ thủ có mặt</string>
   <string name="activeToday">Hoạt động trong ngày</string>
   <string name="activePlayers">Các kỳ thủ tích cực</string>
@@ -520,7 +520,7 @@
   <string name="clock">Đồng hồ</string>
   <string name="unauthorizedError">Không được quyền truy cập</string>
   <string name="noInternetConnection">Không có kết nối mạng. Bạn vẫn có thể chơi ngoại tuyến từ menu.</string>
-  <string name="connectedToPlaystrategy">Bây giờ bạn đã kết nối với playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Bây giờ bạn đã kết nối với playstrategy.org</string>
   <string name="signedOut">Bạn đã đăng xuất.</string>
   <string name="loginSuccessful">Đăng nhập thành công</string>
   <string name="playOnTheBoardOffline">Chơi ngoại tuyến, trên bàn cờ.</string>
@@ -554,7 +554,7 @@
   </plurals>
   <string name="tpTimeSpentPlaying">Thời gian đã chơi: %s</string>
   <string name="watchGames">Xem các ván đấu</string>
-  <string name="tpTimeSpentOnTV">Thời gian xem Playstrategy TV: %s</string>
+  <string name="tpTimeSpentOnTV">Thời gian xem PlayStrategy TV: %s</string>
   <string name="watch">Xem</string>
   <string name="videoLibrary">Thư viện video</string>
   <string name="streamersMenu">Các streamer</string>
@@ -586,7 +586,7 @@
   <string name="simulClockHint">Thiết lập Đồng hồ Fischer. Bạn càng chơi với nhiều người thì càng có thể cần nhiều thời gian.</string>
   <string name="simulAddExtraTime">Bạn có thể thêm thời gian cho đồng hồ của bạn để đấu cờ đồng loạt dễ hơn.</string>
   <string name="simulHostExtraTime">Thời gian thêm cho người chủ trì</string>
-  <string name="playstrategyTournaments">Các giải đấu Playstrategy</string>
+  <string name="playstrategyTournaments">Các giải đấu PlayStrategy</string>
   <string name="tournamentFAQ">Các câu hỏi thường gặp về đấu trường giải đấu</string>
   <string name="tournamentOfficial">Chính thức</string>
   <string name="timeBeforeTournamentStarts">Thời gian trước khi giải đấu bắt đầu</string>
@@ -620,8 +620,8 @@
   <string name="weHaveSentYouAnEmailTo">Chúng tôi đã gửi một email đến %s. Nhấp vào liên kết trong email để đặt lại mật khẩu của bạn.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Bằng cách đăng ký, bạn đồng ý tuân thủ %s của chúng tôi.</string>
   <string name="readAboutOur">Đọc về %s của chúng tôi.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Hệ số lag giữa bạn và Playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Thời gian để tiến hành một nước đi trên máy chủ Playstrategy</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Hệ số lag giữa bạn và PlayStrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Thời gian để tiến hành một nước đi trên máy chủ PlayStrategy</string>
   <string name="downloadAnnotated">Tải kèm chú thích</string>
   <string name="downloadRaw">Tải bản thô</string>
   <string name="downloadImported">Tải tệp đã được nhập</string>
@@ -637,7 +637,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Bạn đã đăng ký với email: %s</string>
   <string name="kidMode">Chế độ trẻ em</string>
   <string name="kidModeExplanation">Điều này là để an toàn. Trong chế độ trẻ em, tất cả mọi giao tiếp trên trang web đều bị cấm. Kích hoạt điều này cho con của bạn và học sinh để bảo vệ chúng từ những người dùng internet khác.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Trong chế độ trẻ em, biểu tượng playstrategy có một icon %s, từ đó bạn biết con bạn được an toàn.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Trong chế độ trẻ em, biểu tượng playstrategy có một icon %s, từ đó bạn biết con bạn được an toàn.</string>
   <string name="enableKidMode">Kích hoạt chế độ trẻ em</string>
   <string name="disableKidMode">Tắt chế độ trẻ em</string>
   <string name="security">Bảo mật</string>
@@ -645,7 +645,7 @@
   <string name="alternativelyYouCanX">Ngoài ra, bạn có thể %s.</string>
   <string name="revokeAllSessions">xóa toàn bộ phiên đăng nhập</string>
   <string name="playChessEverywhere">Chơi cờ ở bất cứ đâu</string>
-  <string name="asFreeAsPlaystrategy">Miễn phí như playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Miễn phí như playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Xây dựng trên nền tảng tình yêu dành cho cờ vua, không phải vì tiền bạc</string>
   <string name="everybodyGetsAllFeaturesForFree">Mọi người có tất cả các ứng dụng miễn phí</string>
   <string name="zeroAdvertisement">Không quảng cáo</string>
@@ -684,7 +684,7 @@
   <string name="usernameSuffixInvalid">Username phải kết thúc bằng một chữ hay số.</string>
   <string name="usernameCharsInvalid">Username chỉ được chứa ký tự, số, dấu gạch chân và dấu gạch dưới.</string>
   <string name="usernameUnacceptable">Username này không được chấp nhận.</string>
-  <string name="directlySupportPlaystrategy">Ủng hộ trực tiếp Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Ủng hộ trực tiếp PlayStrategy</string>
   <string name="playChessInStyle">Chơi cờ phong cách</string>
   <string name="chessBasics">Cờ cơ bản</string>
   <string name="coaches">Huấn luyện viên</string>
@@ -768,7 +768,7 @@
   <string name="agreementAssistance">Tôi đồng ý rằng, tôi sẽ không nhận sự trợ giúp trong lúc chơi (từ máy tính, sách, các cơ sở dữ liệu, hoặc từ người khác).</string>
   <string name="agreementNice">Tôi đồng ý rằng, tôi luôn luôn tôn trọng người chơi khác.</string>
   <string name="agreementAccount">Tôi đồng ý rằng, tôi sẽ không tạo nhiều tài khoản.</string>
-  <string name="agreementPolicy">Tôi đồng ý rằng, tôi sẽ luôn tuân thủ các chính sách của Playstrategy.</string>
+  <string name="agreementPolicy">Tôi đồng ý rằng, tôi sẽ luôn tuân thủ các chính sách của PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Tìm hoặc bắt đầu một cuộc trò chuyện</string>
   <string name="edit">Chỉnh sửa</string>
   <string name="rapid">Cờ nhanh</string>

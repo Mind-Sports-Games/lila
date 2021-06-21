@@ -87,13 +87,13 @@ final class ModApi(
   }
 
   def autoTroll(sus: Suspect, note: String): Funit =
-    reportApi.getPlaystrategyMod flatMap { mod =>
+    reportApi.getPlayStrategyMod flatMap { mod =>
       setTroll(mod, sus, true) >>
         noteApi.playstrategyWrite(sus.user, note)
     }
 
   def garbageCollect(sus: Suspect): Funit =
-    reportApi.getPlaystrategyMod flatMap { mod =>
+    reportApi.getPlayStrategyMod flatMap { mod =>
       setAlt(mod, sus, v = true) >>
         setTroll(mod, sus, value = false) >>
         logApi.garbageCollect(mod, sus)

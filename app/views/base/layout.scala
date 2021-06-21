@@ -15,7 +15,7 @@ object layout {
   object bits {
     val doctype                      = raw("<!DOCTYPE html>")
     def htmlTag(implicit lang: Lang) = html(st.lang := lang.code)
-    val topComment                   = raw("""<!-- Playstrategy is open source! See https://playstrategy.org/source -->""")
+    val topComment                   = raw("""<!-- PlayStrategy is open source! See https://playstrategy.org/source -->""")
     val charset                      = raw("""<meta charset="utf-8">""")
     val viewport = raw(
       """<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">"""

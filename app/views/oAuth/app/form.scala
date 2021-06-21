@@ -17,7 +17,7 @@ object form {
         h1(title),
         postForm(cls := "form3", action := routes.OAuthApp.create)(
           div(cls := "form-group")(
-            "Want to build something that integrates with and extends Playstrategy? Register a new OAuth App to get started developing on the Playstrategy API."
+            "Want to build something that integrates with and extends PlayStrategy? Register a new OAuth App to get started developing on the PlayStrategy API."
           ),
           inner(form)
         )
@@ -43,7 +43,7 @@ object form {
           div(cls := "form-group")(
             "Here's a ",
             a(href := "https://github.com/playstrategy-org/api/tree/master/example/oauth-authorization-code")(
-              "Playstrategy OAuth app example"
+              "PlayStrategy OAuth app example"
             ),
             ", and the ",
             a(href := routes.Api.index)("API documentation"),

@@ -59,7 +59,7 @@ export default class StrongSocket {
   tryOtherUrl = false;
   autoReconnect = true;
   nbConnects = 0;
-  storage: PlaystrategyStorage = makeStorage.make('surl15');
+  storage: PlayStrategyStorage = makeStorage.make('surl15');
   private _sign?: string;
 
   static defaultOptions: Options = {

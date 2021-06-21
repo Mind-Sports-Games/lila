@@ -1,6 +1,6 @@
 /// <reference types="../../types/info" />
 
-console.info('Playstrategy is open source! https://playstrategy.org/source');
+console.info('PlayStrategy is open source! https://playstrategy.org/source');
 
 const info = __info__;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Mga Playstrategy coach</string>
-  <string name="playstrategyCoach">Playstrategy coach</string>
+  <string name="playstrategyCoaches">Mga PlayStrategy coach</string>
+  <string name="playstrategyCoach">PlayStrategy coach</string>
   <string name="areYouCoach">Isa ka bang magaling na chess coach na may%s?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">NM o FIDE title</string>
   <string name="confirmTitle">Kumpirmahin ang iyong title dito at aming susuriin ang iyong aplikasyon.</string>
@@ -14,7 +14,7 @@
   <string name="accepting">Tumatanggap ng estudyante</string>
   <string name="notAccepting">Hindi tumatanggap ng estudyante sa ngayon</string>
   <string name="xCoachesStudents">%snagtuturo ng mga estudyante</string>
-  <string name="viewXProfile">Tingnan%s Playstrategy profile</string>
+  <string name="viewXProfile">Tingnan%s PlayStrategy profile</string>
   <string name="sendPM">Magpadala ng pribadong mensahe</string>
   <string name="aboutMe">Tungkol sa akin</string>
   <string name="playingExperience">Karanasan sa paglalaro</string>

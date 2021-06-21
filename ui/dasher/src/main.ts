@@ -6,7 +6,7 @@ import { init, VNode, classModule, attributesModule } from 'snabbdom';
 
 const patch = init([classModule, attributesModule]);
 
-export default function PlaystrategyDasher(element: Element, opts: DasherOpts) {
+export default function PlayStrategyDasher(element: Element, opts: DasherOpts) {
   let vnode: VNode, ctrl: DasherCtrl;
 
   const redraw: Redraw = () => {

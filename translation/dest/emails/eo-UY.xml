@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Konfirmu vian konton ĉe playstrategy.org, %s</string>
-  <string name="emailConfirm_click">Alklaku la ligilon por ebligi vian konton ĉe Playstrategy:</string>
-  <string name="emailConfirm_ignore">Se vi ne registris konton ĉe Playstrategy, vi povas ignori ĉi tiun mesaĝon.</string>
+  <string name="emailConfirm_click">Alklaku la ligilon por ebligi vian konton ĉe PlayStrategy:</string>
+  <string name="emailConfirm_ignore">Se vi ne registris konton ĉe PlayStrategy, vi povas ignori ĉi tiun mesaĝon.</string>
   <string name="passwordReset_subject">Restarigu vian pasvorton de playstrategy.org, %s</string>
   <string name="passwordReset_intro">Ni ricevis peton por restarigi la pasvorton por via konto.</string>
   <string name="passwordReset_clickOrIgnore">Se vi faris ĉi tiun peton, alklaku la suban ligilon. Se ne, vi povas ignori ĉi tiun retmesaĝon.</string>
@@ -15,7 +15,7 @@
 Jen via profilo: %1$s. Vi povas redakti ĝin %2$s.
 
 Amuziĝu, kaj espereble viaj pecoj ĉiam trovos siajn vojojn al la reĝo de via kontraŭulo!</string>
-  <string name="logInToPlaystrategy">Ensalutu al playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Ensalutu al playstrategy.org, %s</string>
   <string name="common_orPaste">(Alklakante ne funkcias? Provu pasti ĝin en vian retumilon!)</string>
   <string name="common_note">Ĉi tiu estas serva retpoŝto rilate al via uzo de %s.</string>
   <string name="common_contact">Por kontakti nin, bonvolu uzi %s.</string>

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Playstrategy-strøymarar</string>
-  <string name="playstrategyStreamer">Playstrategy-strøymar</string>
+  <string name="playstrategyStreamers">PlayStrategy-strøymarar</string>
+  <string name="playstrategyStreamer">PlayStrategy-strøymar</string>
   <string name="live">DIREKTESENDING!</string>
   <string name="offline">FRÅKOPLA</string>
   <string name="currentlyStreaming">Sender no: %s</string>
   <string name="lastStream">Siste sending %s</string>
-  <string name="becomeStreamer">Bli en Playstrategy-strøymar</string>
+  <string name="becomeStreamer">Bli en PlayStrategy-strøymar</string>
   <string name="doYouHaveStream">Har du ein kanal på Twitch eller YouTube?</string>
   <string name="hereWeGo">Lat oss starte opp!</string>
   <string name="allStreamers">Alle sendingar</string>
@@ -15,27 +15,27 @@
   <string name="downloadKit">Last ned sendingspakka</string>
   <string name="xIsStreaming">%s direktesender video</string>
   <string name="rules">Regler for videosendingar</string>
-  <string name="rule1">Du må sette inn \"playstrategy.org\" i tittelen på straumen når du sender på Playstrategy.</string>
-  <string name="rule2">Fjern \"playstrategy. org\" frå tittelen på straumen når du sender stoff som ikkje er frå Playstrategy.</string>
-  <string name="rule3">Playstrategy oppdagar sendinga di automatisk og gir deg følgande fordelar:</string>
+  <string name="rule1">Du må sette inn \"playstrategy.org\" i tittelen på straumen når du sender på PlayStrategy.</string>
+  <string name="rule2">Fjern \"playstrategy. org\" frå tittelen på straumen når du sender stoff som ikkje er frå PlayStrategy.</string>
+  <string name="rule3">PlayStrategy oppdagar sendinga di automatisk og gir deg følgande fordelar:</string>
   <string name="perks">Fordelar ved å inkludere \"playstrategy. org\" i tittelen på straumen</string>
-  <string name="perk1">Få eit flammande mikrofon-ikon på Playstrategy-profilen din.</string>
+  <string name="perk1">Få eit flammande mikrofon-ikon på PlayStrategy-profilen din.</string>
   <string name="perk2">Bli flytta til toppen av lista over strøymarar.</string>
-  <string name="perk3">Send ei melding til følgarane dine på Playstrategy.</string>
-  <string name="perk4">Vis straumen din i parti, turneringar og studiar på Playstrategy.</string>
+  <string name="perk3">Send ei melding til følgarane dine på PlayStrategy.</string>
+  <string name="perk4">Vis straumen din i parti, turneringar og studiar på PlayStrategy.</string>
   <string name="approved">Straumen din er godkjent.</string>
   <string name="pendingReview">Strømmen din blir no vurdert av moderatorane.</string>
   <string name="pleaseFillIn">Ver venleg og fyll inn informasjon om straumen din og last opp eit bilete.</string>
-  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Når du er klar til å bli lista som en Playstrategy-strøymar, %s</string>
-  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a Playstrategy streamer, request a moderator review&quot;">be om ei omdøming frå ein moderator</string>
+  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Når du er klar til å bli lista som en PlayStrategy-strøymar, %s</string>
+  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a PlayStrategy streamer, request a moderator review&quot;">be om ei omdøming frå ein moderator</string>
   <string name="anotherLanguage">Pass på at du har sett på rett språkmerke (%s) i hakeparantesar i starten av strøymingstittelen dersom du sender på eit anna språk enn engelsk.
 Start til dømes strøymetittelen med \"[NN]\" om du strøymer på nynorsk eller \"[NB]\" om du strøymer på bokmål, osb.
-Bruk denne språk-taggen i strømmetittelen din på Twitch eller YouTube, ikke i Playstrategy-innstillingene dine.
+Bruk denne språk-taggen i strømmetittelen din på Twitch eller YouTube, ikke i PlayStrategy-innstillingene dine.
 Om du strøymer på engelsk treng du ikkje merke språket.</string>
   <string name="twitchUsername">Brukarnamnet ditt eller URLen din på Twitch</string>
   <string name="optionalOrEmpty">Valfri. Kan vera tom</string>
   <string name="youtubeChannel">YouTube-kanal-ID eller URL</string>
-  <string name="streamerName">Strøymarnamn på Playstrategy</string>
+  <string name="streamerName">Strøymarnamn på PlayStrategy</string>
   <plurals name="keepItShort">
     <item quantity="one">Maksimum %s teikn</item>
     <item quantity="other">Maksimum %s teikn</item>
@@ -53,6 +53,6 @@ Om du strøymer på engelsk treng du ikkje merke språket.</string>
   <string name="installBlocker">Installer ein skadevareblokkerar!</string>
   <string name="beSafe">Vern deg mot reklame og sporsamlarar
 som infiserar Twitch og YouTube.
-Playstrategy tilå uBlock Origin
+PlayStrategy tilå uBlock Origin
 som er fritt tilgjengeleg og open-kjeldekode.</string>
 </resources>

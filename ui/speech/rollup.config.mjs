@@ -2,7 +2,7 @@ import rollupProject from '@build/rollupProject';
 
 export default rollupProject({
   main: {
-    name: 'PlaystrategySpeech',
+    name: 'PlayStrategySpeech',
     input: 'src/main.ts',
     output: 'speech',
   },

@@ -15,7 +15,7 @@
 Сіздің куәлік парақшаңыз осында: %1$s. Оны өзгерту үшін осында кіріңіз: %2$s.
 
 Ойынды пайдаға жаратып, шахмат тастарыңыздың жолы әрқашан ашық болсын!</string>
-  <string name="logInToPlaystrategy">%s, playstrategy.org аккаунтына кіріңіз</string>
+  <string name="logInToPlayStrategy">%s, playstrategy.org аккаунтына кіріңіз</string>
   <string name="common_orPaste">(Басылмай жатыр ма? Браузердің жолағына көшіріп көріңіз!)</string>
   <string name="common_note">Осы қызметтік хат сіздің %s сайтын пайдалануыңызға қатысты.</string>
   <string name="common_contact">Бізбен байланысу үшін - %s.</string>

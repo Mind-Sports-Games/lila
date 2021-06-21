@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Vahvista playstrategy.org -tunnuksesi %s</string>
-  <string name="emailConfirm_click">Vahvista Playstrategy-tunnuksesi klikkaamalla linkkiä:</string>
-  <string name="emailConfirm_ignore">Jos et rekisteröitynyt Playstrategyiin, voit jättää tämän viestin huomiotta.</string>
+  <string name="emailConfirm_click">Vahvista PlayStrategy-tunnuksesi klikkaamalla linkkiä:</string>
+  <string name="emailConfirm_ignore">Jos et rekisteröitynyt PlayStrategyiin, voit jättää tämän viestin huomiotta.</string>
   <string name="passwordReset_subject">Nollaa playstrategy.org-salasanasi %s</string>
   <string name="passwordReset_intro">Olemme saaneet pyynnön nollata tunnuksesi salasana.</string>
   <string name="passwordReset_clickOrIgnore">Jos pyyntö tuli sinulta, klikkaa alla olevaa linkkiä. Jos ei, voit jättää tämän viestin huomiotta.</string>
@@ -15,7 +15,7 @@
 Tässä on profiilisivusi: %1$s. Voit muokata sitä täällä: %2$s.
 
 Pidä hauskaa. Löytäköön nappulasi aina tien vastustajan kuninkaan luo!</string>
-  <string name="logInToPlaystrategy">Kirjaudu playstrategy.orgiin, %s</string>
+  <string name="logInToPlayStrategy">Kirjaudu playstrategy.orgiin, %s</string>
   <string name="common_orPaste">(Eikö klikkaaminen onnistunut? Kokeile liittää osoite selaimeesi!)</string>
   <string name="common_note">Tämä sähköposti liittyy sivuston %s käyttöön.</string>
   <string name="common_contact">Meihin saa yhteyden täältä: %s.</string>

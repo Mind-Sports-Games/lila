@@ -266,7 +266,7 @@
   <plurals name="giveNbSeconds">
     <item quantity="other">%s секунд бирү</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Бу аккаунт Playstrategyның Куллану Шартларын бозды</string>
+  <string name="thisAccountViolatedTos">Бу аккаунт PlayStrategyның Куллану Шартларын бозды</string>
   <string name="openingExplorerAndTablebase">Дебютлар һәм эндшпилләр базасы</string>
   <string name="takeback">Кире алырга</string>
   <string name="proposeATakeback">Йөрүне кире алырга сорарга</string>
@@ -427,8 +427,8 @@
   <string name="thankYou">Рәхмәт!</string>
   <string name="socialMediaLinks">Социаль медиа сылтамалары</string>
   <string name="inlineNotation">Кертелгән билгеләнеш</string>
-  <string name="watchPlaystrategyTV">Кара Личес ТВ</string>
-  <string name="previouslyOnPlaystrategyTV">Алданлырак Личес ТВда</string>
+  <string name="watchPlayStrategyTV">Кара Личес ТВ</string>
+  <string name="previouslyOnPlayStrategyTV">Алданлырак Личес ТВда</string>
   <string name="onlinePlayers">Юрдә уйнаучылар</string>
   <string name="activeToday">Актив бүген</string>
   <string name="activePlayers">Актив уйнаучылар</string>
@@ -533,7 +533,7 @@
   <string name="clock">Сәгать</string>
   <string name="unauthorizedError">Рөхсәт авторизациясез.</string>
   <string name="noInternetConnection">Интернетка тоташу юк. Сез һаманда челтәрсез уйный аласыз сайламышта.</string>
-  <string name="connectedToPlaystrategy">Сез хәзер тоташкан playstrategy.org ка</string>
+  <string name="connectedToPlayStrategy">Сез хәзер тоташкан playstrategy.org ка</string>
   <string name="signedOut">Сез чыгарылдыгыз</string>
   <string name="loginSuccessful">Сез керелгәнсез</string>
   <string name="playOnTheBoardOffline">Такта өстендә</string>
@@ -633,8 +633,8 @@
   <string name="weHaveSentYouAnEmailTo">Безнең %s җибәрдек. Серсүзне яңадан урнаштыру өчен электрон почтадагы сылтамага басыгыз.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Теркәлү белән сез %s белән ризалашасыз.</string>
   <string name="readAboutOur">Безнең %s турында укыгыз.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Челтәр сезнең белән Playstrategy арасында артта калды</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Playstrategy серверында хәрәкәтне эшкәртү вакыты</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Челтәр сезнең белән PlayStrategy арасында артта калды</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">PlayStrategy серверында хәрәкәтне эшкәртү вакыты</string>
   <string name="downloadAnnotated">Өзешлене йөкләү</string>
   <string name="downloadRaw">Чималны иңдер</string>
   <string name="downloadImported">Импортны йөкләү</string>
@@ -650,7 +650,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Сезнең хәзер теркәлгән почтагыз бар: %s</string>
   <string name="kidMode">Сабыйлар осулы</string>
   <string name="kidModeExplanation">Бу куркынычсызлык турында. Балалар режимында барлык сайт элемтәләре дә сүндерелгән. Моны балаларыгыз һәм мәктәп укучылары өчен рөхсәт итегез, аларны бүтән интернет кулланучылардан саклагыз.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Балалар усулында Playstrategy тамгасы %s иконасын ала, шуңа күрә сез балаларыгызның куркынычсыз булуын беләсез.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Балалар усулында PlayStrategy тамгасы %s иконасын ала, шуңа күрә сез балаларыгызның куркынычсыз булуын беләсез.</string>
   <string name="enableKidMode">Балалар осулын куй</string>
   <string name="disableKidMode">Сабый осулын кирегә куй</string>
   <string name="security">Хәвефсезлек</string>
@@ -658,7 +658,7 @@
   <string name="alternativelyYouCanX">Альтернатив рәвештә сез %s эшли аласыз.</string>
   <string name="revokeAllSessions">һәр сессиядан чыгу</string>
   <string name="playChessEverywhere">Уйна шаһмат бөтен җирдә</string>
-  <string name="asFreeAsPlaystrategy">Личесс кебек азат</string>
+  <string name="asFreeAsPlayStrategy">Личесс кебек азат</string>
   <string name="builtForTheLoveOfChessNotMoney">Төздек шаһмат яратучылары өчен, акча түгел</string>
   <string name="everybodyGetsAllFeaturesForFree">Һәркайсы алы барлык әйберләрен азат</string>
   <string name="zeroAdvertisement">Сәрмая юк</string>
@@ -697,7 +697,7 @@
   <string name="usernameSuffixInvalid">Кулланучынәмә хәреф яки сан белән тәмамланырга тиеш.</string>
   <string name="usernameCharsInvalid">Кулланучынәма фәкать харефләр, саннар, астсызыклар вә урта сызыклар гыйбәрәт булыш кирәк. Китмә-киткән астсызыклар вә урта сызыкларга юк куймайды.</string>
   <string name="usernameUnacceptable">Бу кулланучынәма макбул түгел.</string>
-  <string name="directlySupportPlaystrategy">Тугрыдан-тугры үзләштереш Playstrategy ны</string>
+  <string name="directlySupportPlayStrategy">Тугрыдан-тугры үзләштереш PlayStrategy ны</string>
   <string name="playChessInStyle">Уйна шаһмат стиль белән</string>
   <string name="chessBasics">Шаһмат нигезләре</string>
   <string name="coaches">Тренерлар</string>
@@ -781,7 +781,7 @@
   <string name="agreementAssistance">Минем уеннар вакытында теләсә кайсы вакытта ярдәм алуыма ризалашам (шахмат компьютерыннан, китаптан, мәгълүмат базасыннан яки бүтән кешедән).</string>
   <string name="agreementNice">Мин башка уенчыларга һәрвакыт хөрмәт күрсәтермен дип килешәм.</string>
   <string name="agreementAccount">Мин берничә хисап ясамыйм дип килешәм.</string>
-  <string name="agreementPolicy">Мин барлык Playstrategy сәясәтен үтәрмен дип килешәм.</string>
+  <string name="agreementPolicy">Мин барлык PlayStrategy сәясәтен үтәрмен дип килешәм.</string>
   <string name="searchOrStartNewDiscussion">Яңа сөйләшүне эзләү яки башлау</string>
   <string name="edit">Үзгәртү</string>
   <string name="rapid">Тиз</string>
@@ -816,12 +816,12 @@
   <string name="congratsYouWon">Тәбриклийбез, сез җиңдегез!</string>
   <string name="gameVsX">%1$s каршы уен</string>
   <string name="resVsX">%1$s vs %2$s</string>
-  <string name="youJustBecamePatron">Сез бары тик Playstrategy иганәче булдыгыз.</string>
+  <string name="youJustBecamePatron">Сез бары тик PlayStrategy иганәче булдыгыз.</string>
   <string name="patronAccountExpired">Иганәче хисабы бетте</string>
   <string name="pleaseReconsiderRenewIt">Зинһар, аны яңартырга уйлагыз!</string>
   <string name="someoneReviewedYourCoachProfile">Кемдер сезнең мөдәрәс профилегезне карады.</string>
   <string name="newPendingReview">Яңа күреп чыгыш көтелмәктә</string>
-  <string name="lostAgainstTOSViolator">Сез Playstrategy TOS кагыйдәләрене бозган кешегә оттырдыгыз</string>
+  <string name="lostAgainstTOSViolator">Сез PlayStrategy TOS кагыйдәләрене бозган кешегә оттырдыгыз</string>
   <string name="refundXpointsTimeControlY">Кире кайтару %1$s %2$s рейтинг накате.</string>
   <string name="timeAlmostUp">Вакыт тугады диярлек!</string>
 </resources>

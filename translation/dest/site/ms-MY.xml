@@ -256,7 +256,7 @@
   <plurals name="giveNbSeconds">
     <item quantity="other">Beri %s saat</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Akaun ini melanggar Syarat Perkhidmatan Playstrategy</string>
+  <string name="thisAccountViolatedTos">Akaun ini melanggar Syarat Perkhidmatan PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Peneroka opening&amp; senarai jadual</string>
   <string name="takeback">Ambil semula</string>
   <string name="proposeATakeback">Mencadang ambil semula</string>
@@ -453,7 +453,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Anda telah mendaftarkan emel ini: %s</string>
   <string name="kidMode">Mod kanak-kanak</string>
   <string name="kidModeExplanation">Hal ini adalah untuk keselamatan. Dalam mod kanak-kanak, semua komunikasi ditutup. Pasang tetapan ini untuk kanak-kanak dan pelajar sekolah untuk melindungi mereka daripada pengguna siber yang lain.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Dalam mod kanak-kanak, logo Playstrategy akan mendapat %s icon, jadi anda tahu kanak-kanak anda selamat.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Dalam mod kanak-kanak, logo PlayStrategy akan mendapat %s icon, jadi anda tahu kanak-kanak anda selamat.</string>
   <string name="enableKidMode">Pasang mod kanak-kanak</string>
   <string name="disableKidMode">Lumpuhkan mod kanak-kanak</string>
   <string name="security">Keselamatan</string>
@@ -461,7 +461,7 @@
   <string name="alternativelyYouCanX">Secara alternatif, anda boleh %s.</string>
   <string name="revokeAllSessions">batalkan semua sesi</string>
   <string name="playChessEverywhere">Main catur dimana-mana</string>
-  <string name="asFreeAsPlaystrategy">Percuma seperti Playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Percuma seperti PlayStrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Dibina untuk semangat catur bukan duit</string>
   <string name="everybodyGetsAllFeaturesForFree">Semua orang boleh menggunakan semua ciri-ciri percuma</string>
   <string name="zeroAdvertisement">Sifar iklan</string>

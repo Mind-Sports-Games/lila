@@ -270,7 +270,7 @@
     <item quantity="one">Додај %s секунди</item>
     <item quantity="other">Додај %s секунди</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Оваа корисничка сметка ги прекрши корисничките услови на Playstrategy</string>
+  <string name="thisAccountViolatedTos">Оваа корисничка сметка ги прекрши корисничките услови на PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Отворање на пребарувач и табела</string>
   <string name="takeback">Повлечете го потегот</string>
   <string name="proposeATakeback">Предложете повлекување на потегот</string>
@@ -443,8 +443,8 @@
   <string name="thankYou">Благодарам!</string>
   <string name="socialMediaLinks">Врски на друштвени мрежи</string>
   <string name="inlineNotation">Подредена нотација</string>
-  <string name="watchPlaystrategyTV">Гледај Личес ТВ</string>
-  <string name="previouslyOnPlaystrategyTV">Предходно на Личес ТВ</string>
+  <string name="watchPlayStrategyTV">Гледај Личес ТВ</string>
+  <string name="previouslyOnPlayStrategyTV">Предходно на Личес ТВ</string>
   <string name="onlinePlayers">Вклучени играчи (играчи на линија )</string>
   <string name="activeToday">Активни денес</string>
   <string name="activePlayers">Активни играчи</string>
@@ -546,7 +546,7 @@
   <string name="clock">Часовник</string>
   <string name="unauthorizedError">Пристапот е неовластен.</string>
   <string name="noInternetConnection">Нема интернет конекција. Сеуште мошите да играте од менито.</string>
-  <string name="connectedToPlaystrategy">Сега сте поврзани на playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Сега сте поврзани на playstrategy.org</string>
   <string name="signedOut">Одјавени сте</string>
   <string name="loginSuccessful">Сега сте најавени</string>
   <string name="playOnTheBoardOffline">Игра за двајца</string>
@@ -612,7 +612,7 @@
   <string name="simulClockHint">Поставување на Фишерскиот часовник. Што повеќе противници, толку повеќе време ти треба.</string>
   <string name="simulAddExtraTime">Можеш да додадеш додатно време на часовникот, за да ти помогне со симултаната партија.</string>
   <string name="simulHostExtraTime">Додатно време за домаќинот</string>
-  <string name="playstrategyTournaments">Playstrategy турнири</string>
+  <string name="playstrategyTournaments">PlayStrategy турнири</string>
   <string name="tournamentFAQ">ЧПП за арена турнирите</string>
   <string name="tournamentOfficial">Официјални</string>
   <string name="timeBeforeTournamentStarts">Време до почетокот на турнирот</string>
@@ -646,8 +646,8 @@
   <string name="ifYouDoNotSeeTheEmailCheckOtherPlaces">Ако не можеш да го најдеш е-писмото, провери во папките како „ѓубре“, „спам“, „социјални“ итн.</string>
   <string name="weHaveSentYouAnEmailTo">Пративме е-пошта на %s. Кликни на врската во пораката за обнова на лозинката.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Со регистрацијата, се согласуваш со нашите %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Мрежно задоцнување меѓу Вас и Playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Време за процесирање потег на сервер на playstrategy</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Мрежно задоцнување меѓу Вас и PlayStrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Време за процесирање потег на сервер на playstrategy</string>
   <string name="downloadAnnotated">Симни со коментари</string>
   <string name="downloadRaw">Превземи без белешки</string>
   <string name="downloadImported">Превземи го доставеното</string>
@@ -663,7 +663,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Веќе сте регистрирано со е-маилот: %s</string>
   <string name="kidMode">Детска заштита</string>
   <string name="kidModeExplanation">Ова е заради безбедност. Во детска заштита, сите комуникации се оневозможени. Вклучете го овој начин за вашите деца, да ги заштитите од останатите интернет корисници.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Во детскиот режим, на Playstrategy логото е додадено „%s“, за да знаете дека вашите деца се безбедни.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Во детскиот режим, на PlayStrategy логото е додадено „%s“, за да знаете дека вашите деца се безбедни.</string>
   <string name="enableKidMode">Вклучи го детскиот режим</string>
   <string name="disableKidMode">Исклучи го детскиот режим</string>
   <string name="security">Безбедност</string>
@@ -671,7 +671,7 @@
   <string name="alternativelyYouCanX">Исто така можете да ги %s.</string>
   <string name="revokeAllSessions">избришете сите сесии</string>
   <string name="playChessEverywhere">Играј шах секаде</string>
-  <string name="asFreeAsPlaystrategy">Бесплатно како playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Бесплатно како playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Направено од љубовта кон шахот, а не за пари</string>
   <string name="everybodyGetsAllFeaturesForFree">Секој ги добива сите функции бесплатно</string>
   <string name="zeroAdvertisement">Без реклами</string>
@@ -711,7 +711,7 @@
   <string name="usernameSuffixInvalid">Корисничкото име мора да завршува со буква или бројка.</string>
   <string name="usernameCharsInvalid">Корисничкото име може да содржи само букви, бројки, долни и средни црти.</string>
   <string name="usernameUnacceptable">Корисничкото име е неприфатливо.</string>
-  <string name="directlySupportPlaystrategy">Директно помогни на Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Директно помогни на PlayStrategy</string>
   <string name="playChessInStyle">Играј шах со стил</string>
   <string name="chessBasics">Основи на шахот</string>
   <string name="coaches">Тренери</string>
@@ -798,7 +798,7 @@
   <string name="agreementAssistance">Се согласувам дека никогаш нема да добивам помош за моите игри (од компјутер, игра, база на податоци или личност).</string>
   <string name="agreementNice">Се согласувам дека секогаш ќе ги почитувам останатите играчи.</string>
   <string name="agreementAccount">Се согласувам дека нема да создавам повеќе профили.</string>
-  <string name="agreementPolicy">Се согласувам дека ќе ги следам сите правила на Playstrategy.</string>
+  <string name="agreementPolicy">Се согласувам дека ќе ги следам сите правила на PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Пребарај или започни нов разговор</string>
   <string name="edit">Уреди</string>
   <string name="rapid">Рапид</string>

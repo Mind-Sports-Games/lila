@@ -3,7 +3,7 @@ import * as miniGame from './component/mini-game';
 import * as timeago from './component/timeago';
 import * as xhr from 'common/xhr';
 import announce from './component/announce';
-import exportPlaystrategyGlobals from './site.playstrategy.globals';
+import exportPlayStrategyGlobals from './site.playstrategy.globals';
 import info from './component/info';
 import loadClockWidget from './component/clock-widget';
 import moduleLaunchers from './component/module-launchers';
@@ -18,7 +18,7 @@ import { reload } from './component/reload';
 import { requestIdleCallback } from './component/functions';
 import { userComplete } from './component/assets';
 
-exportPlaystrategyGlobals();
+exportPlayStrategyGlobals();
 playstrategy.info = info;
 
 loadClockWidget();

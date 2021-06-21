@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Staðfestu playstrategy.org reikninginn þinn, %s</string>
-  <string name="emailConfirm_click">Ýttu á slóðina til að virkja Playstrategy reikninginn þinn:</string>
-  <string name="emailConfirm_ignore">Ef þú skráðir þig ekki á Playstrategy þá geturðu hunsað þessi skilaboð.</string>
+  <string name="emailConfirm_click">Ýttu á slóðina til að virkja PlayStrategy reikninginn þinn:</string>
+  <string name="emailConfirm_ignore">Ef þú skráðir þig ekki á PlayStrategy þá geturðu hunsað þessi skilaboð.</string>
   <string name="passwordReset_subject">Endursettu playstrategy.org lykilorðið þitt, %s</string>
   <string name="passwordReset_intro">Við fengum beiðni um að endursetja lykilorðið fyrir reikninginn þinn.</string>
   <string name="passwordReset_clickOrIgnore">Ef þú sendir inn þessa beiðni, ýttu þá á slóðina hér fyrir neðan. Ef ekki, þá getur þú hunsað þennan tölvupóst.</string>
@@ -15,7 +15,7 @@
 Hér er slóðin á prófílinn þinn: %1$s. Þú getur gert hann persónulegann á %2$s.
 
 Góða skemmtun og megi menn þínir ávallt finna leiðina að kóngi andstæðingsins!</string>
-  <string name="logInToPlaystrategy">Innskráðu þig á playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Innskráðu þig á playstrategy.org, %s</string>
   <string name="common_orPaste">(Virkar ekki að ýta á slóðina? Prófaðu að afrita slóðina og líma hana í vafrann þinn!)</string>
   <string name="common_note">Þetta er upplýsingapóstur um notkun þína á %s.</string>
   <string name="common_contact">Vinsamlega notaðu %s til að hafa samband við okkur.</string>

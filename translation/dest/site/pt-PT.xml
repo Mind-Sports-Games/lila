@@ -285,7 +285,7 @@
     <item quantity="one">Dar %s segundo</item>
     <item quantity="other">Dar %s segundos</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Esta conta violou os termos de serviço do Playstrategy</string>
+  <string name="thisAccountViolatedTos">Esta conta violou os termos de serviço do PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Explorador de aberturas &amp; tabelas de finais</string>
   <string name="takeback">Voltar uma jogada atrás</string>
   <string name="proposeATakeback">Propor voltar uma jogada atrás</string>
@@ -458,8 +458,8 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="thankYou">Obrigado!</string>
   <string name="socialMediaLinks">Links das redes sociais</string>
   <string name="inlineNotation">Anotações em linha</string>
-  <string name="watchPlaystrategyTV">Assistir à TV Playstrategy</string>
-  <string name="previouslyOnPlaystrategyTV">Anteriormente na TV Playstrategy</string>
+  <string name="watchPlayStrategyTV">Assistir à TV PlayStrategy</string>
+  <string name="previouslyOnPlayStrategyTV">Anteriormente na TV PlayStrategy</string>
   <string name="onlinePlayers">Jogadores online</string>
   <string name="activeToday">Ativos hoje</string>
   <string name="activePlayers">Jogadores ativos</string>
@@ -567,7 +567,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="clock">Relógio</string>
   <string name="unauthorizedError">Acesso negado</string>
   <string name="noInternetConnection">Sem conexão à internet. Ainda podes jogar offline a partir do menu.</string>
-  <string name="connectedToPlaystrategy">Agora estás conectado ao playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Agora estás conectado ao playstrategy.org</string>
   <string name="signedOut">Terminaste sessão</string>
   <string name="loginSuccessful">Iniciaste sessão</string>
   <string name="playOnTheBoardOffline">Contra um amigo</string>
@@ -634,7 +634,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="simulClockHint">Configuração de incrementos no relógio. Quanto mais jogadores admitires, mais tempo poderás necessitar.</string>
   <string name="simulAddExtraTime">Podes acrescentar tempo adicional ao teu relógio, para te ajudar a lidar com a simultânea.</string>
   <string name="simulHostExtraTime">Tempo adicional do anfitrião</string>
-  <string name="playstrategyTournaments">Torneios do Playstrategy</string>
+  <string name="playstrategyTournaments">Torneios do PlayStrategy</string>
   <string name="tournamentFAQ">Perguntas frequentes sobre torneios em arena</string>
   <string name="tournamentOfficial">Oficial</string>
   <string name="timeBeforeTournamentStarts">Contagem decrescente para o início do torneio</string>
@@ -669,8 +669,8 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="weHaveSentYouAnEmailTo">Enviámos-te um e-mail para %s. Clica no link nesse e-mail para redefinires a tua palavra-passe.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Ao criares uma conta, concordas comprometeres-te com os nossos %s.</string>
   <string name="readAboutOur">Lê sobre a nossa %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Atraso na rede entre ti e o Playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Tempo para processar um movimento no servidor do Playstrategy</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Atraso na rede entre ti e o PlayStrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Tempo para processar um movimento no servidor do PlayStrategy</string>
   <string name="downloadAnnotated">Descarregar a anotação</string>
   <string name="downloadRaw">Descarregar o texto</string>
   <string name="downloadImported">Descarregar a partida importada</string>
@@ -686,7 +686,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="youHaveAlreadyRegisteredTheEmail">Já registaste o e-mail: %s</string>
   <string name="kidMode">Modo infantil</string>
   <string name="kidModeExplanation">Iso é sobre segurança. No modo infantil, todas as comunicações do site ficam desactivadas. Activa esta opção para os teus filhos ou alunos, para protegê-los de outros utilizadores da internet.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">No modo criança, o logótipo do Playstrategy fica com um ícone %s para que saibas que as tuas crianças estão seguras.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">No modo criança, o logótipo do PlayStrategy fica com um ícone %s para que saibas que as tuas crianças estão seguras.</string>
   <string name="enableKidMode">Ativar o modo infantil</string>
   <string name="disableKidMode">Desativar o modo infantil</string>
   <string name="security">Segurança</string>
@@ -694,7 +694,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="alternativelyYouCanX">Alternativamente, podes %s.</string>
   <string name="revokeAllSessions">desativar todas as sessões</string>
   <string name="playChessEverywhere">Joga xadrez em qualquer lugar</string>
-  <string name="asFreeAsPlaystrategy">Tão gratuito quanto o Playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Tão gratuito quanto o PlayStrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Desenvolvido pelo amor ao xadrez, não pelo dinheiro</string>
   <string name="everybodyGetsAllFeaturesForFree">Todos têm todos os recursos gratuitamente</string>
   <string name="zeroAdvertisement">Zero anúncios</string>
@@ -734,7 +734,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="usernameSuffixInvalid">O nome do utilizador tem de acabar com uma letra ou número.</string>
   <string name="usernameCharsInvalid">O nome do utilizador só pode conter letras, números, underscores ou hífenes.</string>
   <string name="usernameUnacceptable">Este nome de utilizador não é aceitável.</string>
-  <string name="directlySupportPlaystrategy">Apoiar o Playstrategy diretamente</string>
+  <string name="directlySupportPlayStrategy">Apoiar o PlayStrategy diretamente</string>
   <string name="playChessInStyle">Jogar xadrez com estilo</string>
   <string name="chessBasics">O básico do xadrez</string>
   <string name="coaches">Treinadores</string>
@@ -821,7 +821,7 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="agreementAssistance">Concordo que nunca recorrerei a assistência durante as minhas partidas (de um computador de xadrez, livro, base de dados ou outra pessoa).</string>
   <string name="agreementNice">Concordo que serei sempre repeitoso para os outros jogadores.</string>
   <string name="agreementAccount">Concordo que não criarei várias contas.</string>
-  <string name="agreementPolicy">Concordo que seguirei todas as políticas do Playstrategy.</string>
+  <string name="agreementPolicy">Concordo que seguirei todas as políticas do PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Pesquisa ou começa uma nova conversa</string>
   <string name="edit">Editar</string>
   <string name="rapid">Semi-rápidas</string>
@@ -856,12 +856,12 @@ análise de computador, sala de chat do jogo e link de partilha.</string>
   <string name="congratsYouWon">Parabéns! Ganhaste!</string>
   <string name="gameVsX">Jogo vs %1$s</string>
   <string name="resVsX">%1$s vs %2$s</string>
-  <string name="youJustBecamePatron">Acabaste de te tornar num patrono do Playstrategy.</string>
+  <string name="youJustBecamePatron">Acabaste de te tornar num patrono do PlayStrategy.</string>
   <string name="patronAccountExpired">A conta de Patron expirou</string>
   <string name="pleaseReconsiderRenewIt">Por favor, considera renová-la!</string>
   <string name="someoneReviewedYourCoachProfile">Alguém avaliou o teu perfil de treinador.</string>
   <string name="newPendingReview">Nova revisão pendente</string>
-  <string name="lostAgainstTOSViolator">Perdes-te contra alguém que violou as regras do Playstrategy</string>
+  <string name="lostAgainstTOSViolator">Perdes-te contra alguém que violou as regras do PlayStrategy</string>
   <string name="refundXpointsTimeControlY">Devolução: %1$s %2$s pontos de Elo.</string>
   <string name="timeAlmostUp">O tempo está quase a terminar!</string>
 </resources>

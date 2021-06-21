@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyClasses">Playstrategy-klasser</string>
-  <string name="teachClassesOfChessStudents">Undervis klasser av sjakkelever med Playstrategy\' undervisningsverktøy.</string>
+  <string name="playstrategyClasses">PlayStrategy-klasser</string>
+  <string name="teachClassesOfChessStudents">Undervis klasser av sjakkelever med PlayStrategy\' undervisningsverktøy.</string>
   <string name="features">Funksjoner</string>
   <string name="quicklyGenerateSafeUsernames">Generer raskt sikre brukernavn og adgangskoder til elever</string>
   <string name="trackStudentProgress">Følg elevenes utvikling i partier og sjakknøtter</string>
   <string name="messageAllStudents">Gi alle elever beskjed om nytt undervisningsmateriale</string>
   <string name="freeForAllForever">100% gratis for alle, for alltid, uten reklame eller sporing</string>
-  <string name="applyToBePlaystrategyTeacher">Søk om å bli Playstrategy-lærer</string>
+  <string name="applyToBePlayStrategyTeacher">Søk om å bli PlayStrategy-lærer</string>
   <string name="noClassesYet">Foreløpig ingen klasser.</string>
   <string name="teachersX">Lærere: %s</string>
   <string name="newClass">Ny klasse</string>
@@ -23,7 +23,7 @@
   <string name="classDescription">Beskrivelse av klassen</string>
   <string name="visibleByBothStudentsAndTeachers">Synlig for klassens lærere og elever</string>
   <string name="teachersOfTheClass">Klassens lærere</string>
-  <string name="addPlaystrategyUsernames">Inviter lærere ved å legge inn brukernavnene deres. Ett brukernavn per linje.</string>
+  <string name="addPlayStrategyUsernames">Inviter lærere ved å legge inn brukernavnene deres. Ett brukernavn per linje.</string>
   <string name="resetPassword">Tilbakestill passord</string>
   <string name="makeSureToCopy">Sørg for å kopiere eller skrive ned den nye adgangskoden med en gang. Du får ingen mulighet til å se den igjen!</string>
   <string name="passwordX">Passord: %s</string>
@@ -32,21 +32,21 @@
   <string name="realName">Virkelig navn</string>
   <string name="privateWillNeverBeShown">Privat. Vil aldri bli vist utenfor klassen. Hjelper deg med å huske hvem eleven er.</string>
   <string name="addStudent">Legg til elev</string>
-  <string name="playstrategyProfileXCreatedForY">Playstrategy-profil %1$s opprettet til %2$s.</string>
+  <string name="playstrategyProfileXCreatedForY">PlayStrategy-profil %1$s opprettet til %2$s.</string>
   <string name="studentCredentials">Elev:  %1$s
 Brukernavn: %2$s
 Passord: %3$s</string>
-  <string name="inviteAPlaystrategyAccount">Inviter en Playstrategy-konto</string>
-  <string name="inviteDesc1">Elever som allerede har en Playstrategy-konto kan inviteres til klassen.</string>
-  <string name="inviteDesc2">De vil få en melding på Playstrategy med en lenke de kan bruke for å melde seg på klassen.</string>
+  <string name="inviteAPlayStrategyAccount">Inviter en PlayStrategy-konto</string>
+  <string name="inviteDesc1">Elever som allerede har en PlayStrategy-konto kan inviteres til klassen.</string>
+  <string name="inviteDesc2">De vil få en melding på PlayStrategy med en lenke de kan bruke for å melde seg på klassen.</string>
   <string name="inviteDesc3">Viktig: Invitér bare elever du kjenner og som aktivt ønsker å delta i klassen.</string>
   <string name="inviteDesc4">Send aldri uoppfordrede invitasjoner til tilfeldige spillere.</string>
-  <string name="createANewPlaystrategyAccount">Opprett en ny Playstrategy-konto</string>
-  <string name="createDesc1">Du kan her opprette Playstrategy-kontoer for elever som ikke allerede har en slik.</string>
+  <string name="createANewPlayStrategyAccount">Opprett en ny PlayStrategy-konto</string>
+  <string name="createDesc1">Du kan her opprette PlayStrategy-kontoer for elever som ikke allerede har en slik.</string>
   <string name="createDesc2">Det er ikke påkrevet med e-post-adresse. Et passord blir generert og det må du gi videre til eleven.</string>
   <string name="createDesc3">Viktig: en elev kan ikke ha flere konti.</string>
   <string name="createDesc4">Bruk invitasjonsskjemaet dersom de allerede har en brukerkonto.</string>
-  <string name="playstrategyUsername">Playstrategy-brukernavn</string>
+  <string name="playstrategyUsername">PlayStrategy-brukernavn</string>
   <string name="generateANewUsername">Generer et nytt brukernavn</string>
   <string name="welcomeToClass">Velkommen til klassen din: %s.
 Her er lenken som gir tilgang til klassen.</string>

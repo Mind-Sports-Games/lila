@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Bevestig jou playstrategy.org rekening, %s</string>
-  <string name="emailConfirm_click">Klik die skakel om jou Playstrategy rekening te aktiveer:</string>
-  <string name="emailConfirm_ignore">Indien jy nie met Playstrategy geregistreer het nie, kan jy hierdie boodskap met \'n geruste hart ignoreer.</string>
+  <string name="emailConfirm_click">Klik die skakel om jou PlayStrategy rekening te aktiveer:</string>
+  <string name="emailConfirm_ignore">Indien jy nie met PlayStrategy geregistreer het nie, kan jy hierdie boodskap met \'n geruste hart ignoreer.</string>
   <string name="passwordReset_subject">Herstel jou playstrategy.org wagwoord, %s</string>
   <string name="passwordReset_intro">Ons het \'n versoek ontvang om die wagwoord vir jou rekening te herstel.</string>
   <string name="passwordReset_clickOrIgnore">Indien jy hierdie versoek gemaak het, klik die onderstaande skakel. Indien nie, kan jy hierdie e-pos ignoreer.</string>
@@ -15,7 +15,7 @@
 Hier is jou profielblad: %1$s. Jy kan dit verpersoonlik op %2$s.
 
 Geniet dit, mag jou stukke altyd hulle weg na die opponent se koning vind!</string>
-  <string name="logInToPlaystrategy">Teken in op playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Teken in op playstrategy.org, %s</string>
   <string name="common_orPaste">(Werk dit nie om te klik nie? Probeer dit na die webblaaier oorkopieer!)</string>
   <string name="common_note">Dit is \'n diens e-pos in verband met jou gebruik van %s.</string>
   <string name="common_contact">Om ons te kontak, gebruik asseblief %s.</string>

@@ -17,5 +17,5 @@ function startAnalyse(cfg) {
     receive: (t: string, d: any) => analyse.socketReceive(t, d),
   });
   cfg.socketSend = li.socket.send;
-  const analyse = window.PlaystrategyAnalyse.start(cfg);
+  const analyse = window.PlayStrategyAnalyse.start(cfg);
 }

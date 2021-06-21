@@ -326,7 +326,7 @@
     <item quantity="many">Přidat %s sekund</item>
     <item quantity="other">Přidat %s sekund</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Tento účet porušil podmínky služeb Playstrategy</string>
+  <string name="thisAccountViolatedTos">Tento účet porušil podmínky služeb PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Knihovna zahájení / tablebase koncovek</string>
   <string name="takeback">Vrátit tah</string>
   <string name="proposeATakeback">Navrhnout vrácení tahu</string>
@@ -520,8 +520,8 @@
   <string name="thankYou">Děkujeme!</string>
   <string name="socialMediaLinks">Odkazy na sociální sítě</string>
   <string name="inlineNotation">Notace v řádcích</string>
-  <string name="watchPlaystrategyTV">Sledujte Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Dříve na Playstrategy TV</string>
+  <string name="watchPlayStrategyTV">Sledujte PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Dříve na PlayStrategy TV</string>
   <string name="onlinePlayers">Hráči online</string>
   <string name="activeToday">Aktivní dnes</string>
   <string name="activePlayers">Aktivní hráči</string>
@@ -635,7 +635,7 @@
   <string name="clock">Čas</string>
   <string name="unauthorizedError">Přístup není autorizovaný.</string>
   <string name="noInternetConnection">Bez internetového připojení. Je možné hrát offline z menu.</string>
-  <string name="connectedToPlaystrategy">Nyní jste připojeni do playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Nyní jste připojeni do playstrategy.org</string>
   <string name="signedOut">Byli jste odhlášeni.</string>
   <string name="loginSuccessful">Přihlášení úspěšné</string>
   <string name="playOnTheBoardOffline">Na stole</string>
@@ -704,7 +704,7 @@
   <string name="simulClockHint">Nastavení Fisherových hodin. Čím víc hráčů přijmete, tím víc času budete potřebovat.</string>
   <string name="simulAddExtraTime">Můžete si přidat více času, abyste  tu simultánku lépe zvládli.</string>
   <string name="simulHostExtraTime">Hostův bonusový čas</string>
-  <string name="playstrategyTournaments">Playstrategy turnaje</string>
+  <string name="playstrategyTournaments">PlayStrategy turnaje</string>
   <string name="tournamentFAQ">Arena turnaj - často kladené otázky</string>
   <string name="tournamentOfficial">oficiální</string>
   <string name="timeBeforeTournamentStarts">Čas do začátku turnaje</string>
@@ -741,8 +741,8 @@
   <string name="weHaveSentYouAnEmailTo">Zaslali jsme vám email na %s. Klikněte na odkaz v emailu pro přenastavení vašeho hesla.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Registrací berete na vědomí naše %s.</string>
   <string name="readAboutOur">Přečtěte si naše %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Síťové zpoždění mezi vámi a playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Čas na zpracování tahu na playstrategy serveru.</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Síťové zpoždění mezi vámi a playstrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Čas na zpracování tahu na playstrategy serveru.</string>
   <string name="downloadAnnotated">Stáhnout s poznámkami</string>
   <string name="downloadRaw">Stáhnout jako text</string>
   <string name="downloadImported">Stáhnout importované</string>
@@ -758,7 +758,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Již máte zaregistrován email: %s</string>
   <string name="kidMode">Dětský režim</string>
   <string name="kidModeExplanation">To je pro bezpečnost. V dětském režimu je jakákoli komunikace zablokována. Zapněte to pro děti a studenty, pro ochranu před ostatními na Internetu.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Když je zapnutý dětský režim, tak se u loga Playstrategy objeví ikona %s. Podle toho poznáte, že je Vaše dítě v bezpečí.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Když je zapnutý dětský režim, tak se u loga PlayStrategy objeví ikona %s. Podle toho poznáte, že je Vaše dítě v bezpečí.</string>
   <string name="enableKidMode">Povolit dětský režim</string>
   <string name="disableKidMode">Vypnout dětský režim</string>
   <string name="security">Zabezpečení</string>
@@ -766,7 +766,7 @@
   <string name="alternativelyYouCanX">Nebo můžete %s.</string>
   <string name="revokeAllSessions">odebrat všechny relace</string>
   <string name="playChessEverywhere">Hrajte šachy kdekoliv</string>
-  <string name="asFreeAsPlaystrategy">Svobodný jako playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Svobodný jako playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Vytvořeno z lásky k šachům, ne pro peníze</string>
   <string name="everybodyGetsAllFeaturesForFree">Každý dostane všechny možnosti zdarma</string>
   <string name="zeroAdvertisement">Bez reklam</string>
@@ -808,7 +808,7 @@
   <string name="usernameSuffixInvalid">Uživatelské jméno musí končit písmenem nebo číslem.</string>
   <string name="usernameCharsInvalid">Uživatelské jméno musí obsahovat pouze písmena, číslice, podtržítka a pomlčky.</string>
   <string name="usernameUnacceptable">Toto uživatelské jméno není přijatelné.</string>
-  <string name="directlySupportPlaystrategy">Podpořte Playstrategy přímo</string>
+  <string name="directlySupportPlayStrategy">Podpořte PlayStrategy přímo</string>
   <string name="playChessInStyle">Hrajte šachy stylově</string>
   <string name="chessBasics">Základy šachu</string>
   <string name="coaches">Trenéři</string>
@@ -901,7 +901,7 @@
   <string name="agreementAssistance">Přísahám, že nikdy nevyužiji jiné pomoci při mých hrách (počítače, knihy, databáze nebo jiné osoby).</string>
   <string name="agreementNice">Přísahám, že budu vždy respektovat ostatní hráče.</string>
   <string name="agreementAccount">Přísahám, že nikdy nebudu vytvářet více účtů.</string>
-  <string name="agreementPolicy">Souhlasím, že se budu řídit všemi pravidly Playstrategyu.</string>
+  <string name="agreementPolicy">Souhlasím, že se budu řídit všemi pravidly PlayStrategyu.</string>
   <string name="searchOrStartNewDiscussion">Začněte nebo vyhledejte konverzaci</string>
   <string name="edit">Upravit</string>
   <string name="rapid">Rapid</string>
@@ -936,12 +936,12 @@
   <string name="congratsYouWon">Gratulujeme, zvítězili jste!</string>
   <string name="gameVsX">Partie proti %1$s</string>
   <string name="resVsX">%1$s vs. %2$s</string>
-  <string name="youJustBecamePatron">Právě jste se stal patronem (podporovatelem) Playstrategy.</string>
+  <string name="youJustBecamePatron">Právě jste se stal patronem (podporovatelem) PlayStrategy.</string>
   <string name="patronAccountExpired">Platnost účtu Patrona vypršela</string>
   <string name="pleaseReconsiderRenewIt">Zvažte prosím jeho obnovení!</string>
   <string name="someoneReviewedYourCoachProfile">Někdo přidal recenzi na váš profil trenéra.</string>
   <string name="newPendingReview">Nový, čeká na kontrolu</string>
-  <string name="lostAgainstTOSViolator">Prohráli jste proti hráči, jež porušil Podmínky použití Playstrategy</string>
+  <string name="lostAgainstTOSViolator">Prohráli jste proti hráči, jež porušil Podmínky použití PlayStrategy</string>
   <string name="refundXpointsTimeControlY">Vráceno %1$s %2$s ratingových bodů.</string>
   <string name="timeAlmostUp">Čas vám běží!</string>
   <string name="clickToRevealEmailAddress">[Klikněte pro zobrazení e-mailové adresy]</string>

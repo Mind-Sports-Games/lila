@@ -18,7 +18,7 @@ object index {
       title = s"${learnChess.txt()} - ${byPlaying.txt()}",
       moreJs = frag(
         jsModule("learn"),
-        embedJsUnsafeLoadThen(s"""PlaystrategyLearn(document.getElementById('learn-app'), ${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""PlayStrategyLearn(document.getElementById('learn-app'), ${safeJsonValue(
           Json.obj(
             "data" -> data,
             "i18n" -> i18nJsObject(i18nKeys)
@@ -182,7 +182,7 @@ object index {
       whatNext,
       youKnowHowToPlayChess,
       register,
-      getAFreePlaystrategyAccount,
+      getAFreePlayStrategyAccount,
       practice,
       learnCommonChessPositions,
       puzzles,

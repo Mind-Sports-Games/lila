@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Playstrategy streameri</string>
-  <string name="playstrategyStreamer">Playstrategy streamer</string>
+  <string name="playstrategyStreamers">PlayStrategy streameri</string>
+  <string name="playstrategyStreamer">PlayStrategy streamer</string>
   <string name="live">NAŽIVO!</string>
   <string name="offline">OFFLINE</string>
   <string name="currentlyStreaming">Práve streamujú: %s</string>
   <string name="lastStream">Posledný stream %s</string>
-  <string name="becomeStreamer">Staňte sa Playstrategy streamerom</string>
+  <string name="becomeStreamer">Staňte sa PlayStrategy streamerom</string>
   <string name="doYouHaveStream">Máte Twitch alebo YouTube kanál?</string>
   <string name="hereWeGo">Ideme na to!</string>
   <string name="allStreamers">Všetci streameri</string>
@@ -15,27 +15,27 @@
   <string name="downloadKit">Stiahnite si streamerskú súpravu</string>
   <string name="xIsStreaming">%s streamuje</string>
   <string name="rules">Pravidlá streamovania</string>
-  <string name="rule1">Zahrňte kľúčové slovo \"playstrategy.org\" v názve Vášho streamu a požite kategóriu \"Šach\" keď streamujete na Playstrategyi.</string>
-  <string name="rule2">Odstráňte kľúčové slovo keď nestreamujete z Playstrategyu.</string>
-  <string name="rule3">Playstrategy automaticky rozozná tvoj stream a poskytne ti nasledujúce výhody:</string>
+  <string name="rule1">Zahrňte kľúčové slovo \"playstrategy.org\" v názve Vášho streamu a požite kategóriu \"Šach\" keď streamujete na PlayStrategyi.</string>
+  <string name="rule2">Odstráňte kľúčové slovo keď nestreamujete z PlayStrategyu.</string>
+  <string name="rule3">PlayStrategy automaticky rozozná tvoj stream a poskytne ti nasledujúce výhody:</string>
   <string name="perks">Benefity streamovania s kľúčovým slovom</string>
-  <string name="perk1">Dostanete ohnivú streamerskú ikonku na Váš Playstrategy profil.</string>
+  <string name="perk1">Dostanete ohnivú streamerskú ikonku na Váš PlayStrategy profil.</string>
   <string name="perk2">Dostanete sa na vrchol zoznamu streamerov.</string>
-  <string name="perk3">Upozorníte svojich Playstrategy sledovateľov.</string>
+  <string name="perk3">Upozorníte svojich PlayStrategy sledovateľov.</string>
   <string name="perk4">Váš stream bude ukázaný vo vašich hrách, turnajoch a štúdiách.</string>
   <string name="approved">Váš stream je schválený.</string>
   <string name="pendingReview">Váš stream je preskúmavaný moderátormi.</string>
   <string name="pleaseFillIn">Prosím vyplňte Vaše streamerské informácie a nahrajte obrázok.</string>
-  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Keď budete pripravený byť uvedený ako Playstrategy streamer, %s</string>
-  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a Playstrategy streamer, request a moderator review&quot;">požiadať o preskúmanie moderátorom</string>
+  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Keď budete pripravený byť uvedený ako PlayStrategy streamer, %s</string>
+  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a PlayStrategy streamer, request a moderator review&quot;">požiadať o preskúmanie moderátorom</string>
   <string name="anotherLanguage">Ak je Váš stream v inom jazyku ako angličtine, zahrňte správne označenie jazyka (%s) v hranatých zátvorkách na začiatok Vášho názvu streamu.
 Napríklad, môžete zahrnúť \"[RU]\" pre Ruštinu, \"[TR]\" pre Turečtinu, \"[FR]\" pre Francúzštinu, atď.
-Zahrňte to do názvu streamu na Twitchi alebo Youtube, nie do nastavení streamu na Playstrategyi. 
+Zahrňte to do názvu streamu na Twitchi alebo Youtube, nie do nastavení streamu na PlayStrategyi. 
 Ak je Váš stream v Angličtine, netreba zahrnúť označenie.</string>
   <string name="twitchUsername">Vaše Twitch používateľské meno alebo link</string>
   <string name="optionalOrEmpty">Voliteľné. Vynechajte, ak nemáte žiadne</string>
   <string name="youtubeChannel">ID Vášho YouTube kanálu alebo link</string>
-  <string name="streamerName">Vaše streamerské meno na Playstrategyi</string>
+  <string name="streamerName">Vaše streamerské meno na PlayStrategyi</string>
   <string name="visibility">Viditeľnosť na streamerskej stránke</string>
   <string name="whenApproved">Ak budete schválený moderátormi</string>
   <string name="headline">Titulok</string>
@@ -49,6 +49,6 @@ Ak je Váš stream v Angličtine, netreba zahrnúť označenie.</string>
   <string name="installBlocker">Nainštalujte si bloker malwareov!</string>
   <string name="beSafe">Chráňte sa pred reklamami a trackermi
 zamorujucich Twitch a YouTube.
-Playstrategy odporúča uBlock Origin
+PlayStrategy odporúča uBlock Origin
 ktorý je bezplatný a otvorený.</string>
 </resources>

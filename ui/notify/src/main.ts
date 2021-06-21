@@ -5,7 +5,7 @@ import { NotifyOpts } from './interfaces';
 
 const patch = init([classModule, attributesModule]);
 
-export default function PlaystrategyNotify(element: Element, opts: NotifyOpts) {
+export default function PlayStrategyNotify(element: Element, opts: NotifyOpts) {
   const ctrl = makeCtrl(opts, redraw);
   let vnode = patch(element, view(ctrl));
 

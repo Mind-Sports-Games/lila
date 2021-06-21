@@ -325,7 +325,7 @@
     <item quantity="many">Даць %s секунд</item>
     <item quantity="other">Даць %s секунд</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Гэты ўліковы запіс парушыў Умовы выкарыстання Playstrategy</string>
+  <string name="thisAccountViolatedTos">Гэты ўліковы запіс парушыў Умовы выкарыстання PlayStrategy</string>
   <string name="openingExplorerAndTablebase">База дэбютаў і эндшпіляў</string>
   <string name="takeback">Скасаваць ход</string>
   <string name="proposeATakeback">Прапанаваць скасаваць ход</string>
@@ -519,8 +519,8 @@
   <string name="thankYou">Дзякуй!</string>
   <string name="socialMediaLinks">Спасылкі на сацсеткі</string>
   <string name="inlineNotation">Убудаваная натацыя</string>
-  <string name="watchPlaystrategyTV">Глядзець Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Раней на Playstrategy TV</string>
+  <string name="watchPlayStrategyTV">Глядзець PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Раней на PlayStrategy TV</string>
   <string name="onlinePlayers">Гульцы анлайн</string>
   <string name="activeToday">Гулялі сёння</string>
   <string name="activePlayers">Актыўныя гульцы</string>
@@ -632,7 +632,7 @@
   <string name="clock">Гадзіньнік</string>
   <string name="unauthorizedError">Няма доступу.</string>
   <string name="noInternetConnection">Няма злучэньня зь сецівам. Ты ўсё яшчэ можаш згуляць у афлайн мэню.</string>
-  <string name="connectedToPlaystrategy">Ты цяпер падлучаны да playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Ты цяпер падлучаны да playstrategy.org</string>
   <string name="signedOut">Ты выйшаў з свайго акаўту</string>
   <string name="loginSuccessful">Ты ўвайшоў у свой акаўнт</string>
   <string name="playOnTheBoardOffline">Ля дошкі</string>
@@ -701,7 +701,7 @@
   <string name="simulClockHint">Налады гадзінніку Фішэра. Чым больш у вас супернікаў, тым больш часу вам можа спатрэбіцца.</string>
   <string name="simulAddExtraTime">Вы можаце ўзяць сабе дадатковы час на роздумы.</string>
   <string name="simulHostExtraTime">Дадатковы час для арганізатара</string>
-  <string name="playstrategyTournaments">Турніры Playstrategy</string>
+  <string name="playstrategyTournaments">Турніры PlayStrategy</string>
   <string name="tournamentFAQ">FAQ турніру</string>
   <string name="tournamentOfficial">Афіцыйны</string>
   <string name="timeBeforeTournamentStarts">Турнір пачнецца праз</string>
@@ -713,7 +713,7 @@
   <string name="keyEnterOrExitVariation">увайсці/выйсці з варыянту</string>
   <string name="newTournament">Новы турнір</string>
   <string name="tournamentHomeTitle">Шахматны турнір</string>
-  <string name="tournamentHomeDescription">Гуляйце ў хуткія шахматы на турніры! Абірайце любы з афіцыйных турніраў Playstrategy ці стварыце ўласны. «Куля», бліц, класічны рэжым, шахматы Фішэра, «цар гары», тры шахі і яшчэ бясконцае мноства варыянтаў. Весяліцеся!</string>
+  <string name="tournamentHomeDescription">Гуляйце ў хуткія шахматы на турніры! Абірайце любы з афіцыйных турніраў PlayStrategy ці стварыце ўласны. «Куля», бліц, класічны рэжым, шахматы Фішэра, «цар гары», тры шахі і яшчэ бясконцае мноства варыянтаў. Весяліцеся!</string>
   <string name="tournamentNotFound">Турнір не знойдзены</string>
   <string name="tournamentDoesNotExist">Гэты турнір не існуе.</string>
   <string name="tournamentMayHaveBeenCanceled">Магчыма, ён быў скасаваны, калі ўсе гульцы выйшлі да пачатку.</string>
@@ -737,8 +737,8 @@
   <string name="ifYouDoNotSeeTheEmailCheckOtherPlaces">Калі вы не бачыце ліст, праверце, магчыма, ён трапіў у тэчку для спаму.</string>
   <string name="weHaveSentYouAnEmailTo">Мы адправілі ліст на ваш адрас %s. Пстрыкніце спасылку ў ім, каб скінуць ваш пароль.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Звярніце ўвагу: рэгіструючыся, вы прымаеце нашыя %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Затрымка сеткі паміж вамі і Playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Час апрацоўкі ходу на серверы</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Затрымка сеткі паміж вамі і PlayStrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Час апрацоўкі ходу на серверы</string>
   <string name="downloadAnnotated">Спампаваць з анатацыямі</string>
   <string name="downloadRaw">Спампаваць без анатацый</string>
   <string name="downloadImported">Спампаваць у арыгінальным выглядзе</string>
@@ -754,7 +754,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Вы ўжо рэгістравалі гэты адрас: %s</string>
   <string name="kidMode">Дзіцячы рэжым</string>
   <string name="kidModeExplanation">Гэта для бяспекі. У дзіцячым рэжыме адключаны ўсе камунікацыі на сайце. Уключыце гэта для вашых дзяцей і школьнікаў, каб абараніць іх ад іншых карыстачоў Інтэрнэту.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">У дзіцячым рэжыме лагатып playstrategy атрымвае значок у выглядзе %s, так што вы ведаеце, што вашы дзеці знаходзяцца ў бяспецы.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">У дзіцячым рэжыме лагатып playstrategy атрымвае значок у выглядзе %s, так што вы ведаеце, што вашы дзеці знаходзяцца ў бяспецы.</string>
   <string name="enableKidMode">Уключыць дзіцячы рэжым</string>
   <string name="disableKidMode">Адключыць дзіцячы рэжым</string>
   <string name="security">Бяспека</string>
@@ -762,7 +762,7 @@
   <string name="alternativelyYouCanX">У якасці альтэрнатывы вы можаце %s.</string>
   <string name="revokeAllSessions">скасаваць усе сесіі</string>
   <string name="playChessEverywhere">Гуляйце ў шахматы дзе заўгодна</string>
-  <string name="asFreeAsPlaystrategy">Бясплатна, як і Playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Бясплатна, як і PlayStrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Створана дзеля шахматаў, а не дзеля грошай</string>
   <string name="everybodyGetsAllFeaturesForFree">Кожны бясплатна атрымлівае ўсе магчымасці</string>
   <string name="zeroAdvertisement">Без рэкламы</string>
@@ -804,7 +804,7 @@
   <string name="usernameSuffixInvalid">Імя карыстальніка павінна сканчацца на лічбу або літару.</string>
   <string name="usernameCharsInvalid">Імя карыстальніка можа ўтрымліваць толькі літары, лічбы, ніжнія падкрэсліванні і злучок.</string>
   <string name="usernameUnacceptable">Недапушчальнае імя карыстальніка.</string>
-  <string name="directlySupportPlaystrategy">Падтрымайце Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Падтрымайце PlayStrategy</string>
   <string name="playChessInStyle">Гуляйце стылёва!</string>
   <string name="chessBasics">Асновы шахмат</string>
   <string name="coaches">Трэнеры</string>
@@ -897,7 +897,7 @@
   <string name="agreementAssistance">Я згаджаюся, што я ніколі не скарыстаюся старонняй дапамогай у сваіх гульнях (ад шахматных праграм, кніг, баз даных або іншых гульцоў).</string>
   <string name="agreementNice">Я згаджаюся, што я заўсёды адносіцца з павагай да другіх гульцоў.</string>
   <string name="agreementAccount">Я згаджаюся, што я не буду ствараць некалькі ўліковых запісаў.</string>
-  <string name="agreementPolicy">Я згаджаюся, што я буду прытрымлівацца ўсіх правіл Playstrategy.</string>
+  <string name="agreementPolicy">Я згаджаюся, што я буду прытрымлівацца ўсіх правіл PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Знайсці размову або пачаць новую</string>
   <string name="edit">Змяніць</string>
   <string name="rapid">Рапід</string>
