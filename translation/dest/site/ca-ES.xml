@@ -285,7 +285,7 @@
     <item quantity="one">Dóna %s segons</item>
     <item quantity="other">Dóna %s segons</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Aquest compte ha violat els Termes de Servei de Playstrategy</string>
+  <string name="thisAccountViolatedTos">Aquest compte ha violat els Termes de Servei de PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Explorador d\'obertures &amp; taula de moviments</string>
   <string name="takeback">Desfés la jugada</string>
   <string name="proposeATakeback">Proposa desfer la jugada</string>
@@ -457,8 +457,8 @@
   <string name="thankYou">Gràcies!</string>
   <string name="socialMediaLinks">Enllaços a xarxes social</string>
   <string name="inlineNotation">Notació Lineal</string>
-  <string name="watchPlaystrategyTV">Mira Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Prèviament a Playstrategy TV</string>
+  <string name="watchPlayStrategyTV">Mira PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Prèviament a PlayStrategy TV</string>
   <string name="onlinePlayers">Jugadors connectats</string>
   <string name="activeToday">Actius avui</string>
   <string name="activePlayers">Jugadors actius</string>
@@ -566,7 +566,7 @@
   <string name="clock">Rellotge</string>
   <string name="unauthorizedError">Accés no autoritzat.</string>
   <string name="noInternetConnection">Sense connexió a internet. Pots seguir jugar offline des del menú.</string>
-  <string name="connectedToPlaystrategy">Ara estàs connectat a playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Ara estàs connectat a playstrategy.org</string>
   <string name="signedOut">Has tancat la sessió</string>
   <string name="loginSuccessful">Ara ja estàs registrat</string>
   <string name="playOnTheBoardOffline">Juga offline, sobre el tauler</string>
@@ -633,7 +633,7 @@
   <string name="simulClockHint">Sistema de Rellotge Fischer. Com més oponents tinguis, més temps et pot caldre.</string>
   <string name="simulAddExtraTime">Pots afegir temps extra al rellotge per ajudar-te amb les simultànies.</string>
   <string name="simulHostExtraTime">Temps extra per a l\'amfitrió</string>
-  <string name="playstrategyTournaments">Tornejos de Playstrategy</string>
+  <string name="playstrategyTournaments">Tornejos de PlayStrategy</string>
   <string name="tournamentFAQ">Torneig Arena: Preguntes Més Freqüents</string>
   <string name="tournamentOfficial">Oficial</string>
   <string name="timeBeforeTournamentStarts">Temps per a què comenci el torneig</string>
@@ -668,8 +668,8 @@
   <string name="weHaveSentYouAnEmailTo">Hem enviat un correu electrònic a %s. Clica a l\'enllaç per renovar la teva contrasenya.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">En registrar-te,dones la teva conformitat a estar legalment obligats per el nostre %s.</string>
   <string name="readAboutOur">Llegeix sobre la nostre %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Retard de la xarxa entre tu i playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Temps per processar un moviment al servidor playstrategy</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Retard de la xarxa entre tu i playstrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Temps per processar un moviment al servidor playstrategy</string>
   <string name="downloadAnnotated">Descàrrega anotada</string>
   <string name="downloadRaw">Descàrrega prima</string>
   <string name="downloadImported">Descàrrega importada</string>
@@ -685,7 +685,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Ja heu registrat el correu electrònic: %s</string>
   <string name="kidMode">Mode infantil</string>
   <string name="kidModeExplanation">Es tracta de seguretat. En el mode nen, totes les comunicacions de la pàgina estan inhabilitades. Permeta açò per als seus nens o alumnes, per protegir-los d\'altres usuaris d\'internet.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">En el mode nen, el logo de playstrategy té una icona de %s, per què sàpigues que els teus nens estan segurs.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">En el mode nen, el logo de playstrategy té una icona de %s, per què sàpigues que els teus nens estan segurs.</string>
   <string name="enableKidMode">Activar el mode de nen</string>
   <string name="disableKidMode">Desactivar el mode de nen</string>
   <string name="security">Seguretat</string>
@@ -693,7 +693,7 @@
   <string name="alternativelyYouCanX">Alternativament pots %s.</string>
   <string name="revokeAllSessions">tancar totes les sessions</string>
   <string name="playChessEverywhere">Jugueu a escacs a qualsevol lloc</string>
-  <string name="asFreeAsPlaystrategy">Tan lliure com playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Tan lliure com playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Fet per amor als escacs, no per diners</string>
   <string name="everybodyGetsAllFeaturesForFree">Tothom accedeix gratuïtament a totes les funcions</string>
   <string name="zeroAdvertisement">Cap anunci</string>
@@ -733,7 +733,7 @@
   <string name="usernameSuffixInvalid">El nom d\'usuari ha d\'acabar amb una lletra o dígit.</string>
   <string name="usernameCharsInvalid">Els noms d\'usuari només poden contenir lletres, números, guions i guions baixos.</string>
   <string name="usernameUnacceptable">Aquest nom d\'usuari no és acceptable.</string>
-  <string name="directlySupportPlaystrategy">Suporta directament a Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Suporta directament a PlayStrategy</string>
   <string name="playChessInStyle">Juga a escacs amb estil</string>
   <string name="chessBasics">Fonaments d\'escacs</string>
   <string name="coaches">Entrenador</string>
@@ -820,7 +820,7 @@
   <string name="agreementAssistance">Estic d’acord que mai rebré assistència durant les meves partides (ni d’ordinadors, llibres, base de dades o d’una altra persona).</string>
   <string name="agreementNice">Estic d’acord que sempre seré respectuós amb els altres jugadors.</string>
   <string name="agreementAccount">Estic d’acord que no crearé múltiples comptes.</string>
-  <string name="agreementPolicy">Estic d’acord que seguiré totes les polítiques de Playstrategy.</string>
+  <string name="agreementPolicy">Estic d’acord que seguiré totes les polítiques de PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Cerca o inicia una nova discusió</string>
   <string name="edit">Edita</string>
   <string name="rapid">Ràpides</string>
@@ -854,12 +854,12 @@
   <string name="congratsYouWon">Felicitats, has guanyat!</string>
   <string name="gameVsX">Partida vs %1$s</string>
   <string name="resVsX">%1$s vs %2$s</string>
-  <string name="youJustBecamePatron">T\'has fet Patró a Playstrategy.</string>
+  <string name="youJustBecamePatron">T\'has fet Patró a PlayStrategy.</string>
   <string name="patronAccountExpired">El compte Patró ha expirat</string>
   <string name="pleaseReconsiderRenewIt">Si us plau, valora renovar-lo!</string>
   <string name="someoneReviewedYourCoachProfile">Algú ha ressenyat el teu perfil d\'entrenador.</string>
   <string name="newPendingReview">Nova ressenya pendent</string>
-  <string name="lostAgainstTOSViolator">Has perdut contra algú que ha violat les CDS de Playstrategy</string>
+  <string name="lostAgainstTOSViolator">Has perdut contra algú que ha violat les CDS de PlayStrategy</string>
   <string name="refundXpointsTimeControlY">Reemborsament: %1$s %2$s punts.</string>
   <string name="timeAlmostUp">El temps quasi s\'ha exhaurit!</string>
 </resources>

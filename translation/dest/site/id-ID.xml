@@ -256,7 +256,7 @@
   <plurals name="giveNbSeconds">
     <item quantity="other">Berikan %s detik</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Akun ini melanggar Ketentuan Layanan Playstrategy</string>
+  <string name="thisAccountViolatedTos">Akun ini melanggar Ketentuan Layanan PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Penjelajah pembukaan &amp; tablebase</string>
   <string name="takeback">Langkah Batal</string>
   <string name="proposeATakeback">Ajukan langkah batal</string>
@@ -417,8 +417,8 @@
   <string name="thankYou">Terima Kasih!</string>
   <string name="socialMediaLinks">Tautan sosial media</string>
   <string name="inlineNotation">Notasi inline</string>
-  <string name="watchPlaystrategyTV">Nonton Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Sebelumnya di Playstrategy TV</string>
+  <string name="watchPlayStrategyTV">Nonton PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Sebelumnya di PlayStrategy TV</string>
   <string name="onlinePlayers">Pemain online</string>
   <string name="activeToday">Aktif hari ini</string>
   <string name="activePlayers">Pemain aktif</string>
@@ -523,7 +523,7 @@
   <string name="clock">Jam</string>
   <string name="unauthorizedError">Akses tidak sah.</string>
   <string name="noInternetConnection">Tak ada koneksi internet. Anda masih bisa bermain offline dari menu.</string>
-  <string name="connectedToPlaystrategy">Anda telah terhubung ke playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Anda telah terhubung ke playstrategy.org</string>
   <string name="signedOut">Anda baru saja keluar</string>
   <string name="loginSuccessful">Anda sudah masuk</string>
   <string name="playOnTheBoardOffline">Di atas papan</string>
@@ -589,7 +589,7 @@
   <string name="simulClockHint">Aturan Jam Fischer: Semakin banyak peserta yang ikut, semakin banyak waktu diperlukan.</string>
   <string name="simulAddExtraTime">Anda bisa menambah waktu pada jam anda untuk membantu simultan anda</string>
   <string name="simulHostExtraTime">Penyedia waktu tambahan</string>
-  <string name="playstrategyTournaments">Turnamen Playstrategy</string>
+  <string name="playstrategyTournaments">Turnamen PlayStrategy</string>
   <string name="tournamentFAQ">Arena Turnamen FAQ</string>
   <string name="tournamentOfficial">Resmi</string>
   <string name="timeBeforeTournamentStarts">Waktu sebelum turnamen dimulai</string>
@@ -623,8 +623,8 @@
   <string name="weHaveSentYouAnEmailTo">Kami telah mengirim surel kepada %s. Klik tautan di dalam surel untuk mengubah kata sandi anda.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Dengan mendaftar, anda setuju untuk terikat dengan %s kita.</string>
   <string name="readAboutOur">Baca tentang %s kami.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Hambatan jaringan antara anda dan playstrategy.</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Waktu untuk memproses suatu langkah dalam server playstrategy</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Hambatan jaringan antara anda dan playstrategy.</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Waktu untuk memproses suatu langkah dalam server playstrategy</string>
   <string name="downloadAnnotated">Unduh versi anotasi</string>
   <string name="downloadRaw">Unduh mentah</string>
   <string name="downloadImported">Unduh permainan yang telah dimasukkan</string>
@@ -640,7 +640,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Anda sudah mendaftarkan sebuah email: %s</string>
   <string name="kidMode">Mode anak</string>
   <string name="kidModeExplanation">Ini adalah tentang keselamatan. Dalam modus anak, semua situs komunikasi dinonaktifkan. Mengaktifkan ini untuk anak-anak Anda dan sekolah siswa, untuk melindungi mereka dari pengguna internet yang lain.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Dalam modus anak, playstrategy logo mendapat ikon %s, sehingga Anda tahu anak-anak Anda aman.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Dalam modus anak, playstrategy logo mendapat ikon %s, sehingga Anda tahu anak-anak Anda aman.</string>
   <string name="enableKidMode">Mengaktifkan mode anak</string>
   <string name="disableKidMode">Menonaktifkan modus anak</string>
   <string name="security">Keamanan</string>
@@ -648,7 +648,7 @@
   <string name="alternativelyYouCanX">Atau Anda dapat %s.</string>
   <string name="revokeAllSessions">mencabut semua sesi</string>
   <string name="playChessEverywhere">Bermain catur dimanapun</string>
-  <string name="asFreeAsPlaystrategy">Gratis seperti playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Gratis seperti playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Dibuat atas dasar cinta terhadap catur, bukan uang</string>
   <string name="everybodyGetsAllFeaturesForFree">Semua pengguna mendapatkan seluruh fitur dengan gratis</string>
   <string name="zeroAdvertisement">Tanpa iklan</string>
@@ -687,7 +687,7 @@
   <string name="usernameSuffixInvalid">Nama pengguna harus berakhiran dengan huruf atau angka.</string>
   <string name="usernameCharsInvalid">Nama pengguna hanya boleh mengandung huruf, garisbawah, dan tanda hubung.</string>
   <string name="usernameUnacceptable">Nama pengguna ini tidak dapat diterima.</string>
-  <string name="directlySupportPlaystrategy">Mendukung Playstrategy secara langsung</string>
+  <string name="directlySupportPlayStrategy">Mendukung PlayStrategy secara langsung</string>
   <string name="playChessInStyle">Bermain catur dengan gaya</string>
   <string name="chessBasics">Dasar-dasar permainan catur</string>
   <string name="coaches">Pelatih</string>
@@ -771,7 +771,7 @@
   <string name="agreementAssistance">Saya menyetujui bahwa saya tidak akan pernah menerima bantuan selama pertandingan (dari komputer catur, buku, database ataupun orang lain).</string>
   <string name="agreementNice">Saya menyetujui bahwa saya akan selalu bersikap baik kepada pemain lain.</string>
   <string name="agreementAccount">Saya menyetujui bahwa saya tidak akan pernah membuat banyak akun.</string>
-  <string name="agreementPolicy">Saya menyetujui bahwa saya akan mengikuti semua kebijakan yang ada di Playstrategy.</string>
+  <string name="agreementPolicy">Saya menyetujui bahwa saya akan mengikuti semua kebijakan yang ada di PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Cari atau mulai diskusi baru</string>
   <string name="edit">Ubah</string>
   <string name="rapid">Cepat</string>
@@ -811,7 +811,7 @@
   <string name="pleaseReconsiderRenewIt">Silakan pertimbangkan untuk memperbaharuinya!</string>
   <string name="someoneReviewedYourCoachProfile">Seseorang meninjau profil pelatih Anda.</string>
   <string name="newPendingReview">Tinjauan baru tertunda</string>
-  <string name="lostAgainstTOSViolator">Anda kalah dari seseorang yang melanggar TOS Playstrategy</string>
+  <string name="lostAgainstTOSViolator">Anda kalah dari seseorang yang melanggar TOS PlayStrategy</string>
   <string name="refundXpointsTimeControlY">Pengembalian dana: %1$s %2$s poin rating.</string>
   <string name="timeAlmostUp">Waktu hampir habis!</string>
 </resources>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">Donasi</string>
-  <string name="playstrategyPatron">Penyokong Playstrategy</string>
+  <string name="playstrategyPatron">Penyokong PlayStrategy</string>
   <string name="freeAccount">Akun gratis</string>
-  <string name="becomePatron">Menjadi Penyokong Playstrategy</string>
-  <string name="xBecamePatron">%s menjadi Penyokong Playstrategy</string>
+  <string name="becomePatron">Menjadi Penyokong PlayStrategy</string>
+  <string name="xBecamePatron">%s menjadi Penyokong PlayStrategy</string>
   <string name="newPatrons">Penyokong baru</string>
   <string name="freeChess">Catur gratis untuk semuanya, selamanya!</string>
   <string name="noAdsNoSubs">Tanpa iklan, tanpa berlangganan; tapi sumber-terbuka dan hasrat.</string>
@@ -13,10 +13,10 @@
   <string name="patronUntil">Anda memiliki akun Penyokong hingga %s.</string>
   <string name="ifNotRenewed">Jika tidak diperpanjang, Anda akan diturunkan menjadi gratis.</string>
   <string name="weAreNonProfit">Kami adalah bukanlah asosiasi mencari keuntungan karena kami percaya setiap orang harus memiliki akses ke platform catur kelas dunia yang gratis.</string>
-  <string name="weRelyOnSupport">Kami mengandalkan dukungan dari orang-orang seperti Anda jika memungkinkan. Jika Anda menikmati menggunakan Playstrategy, silakan pertimbangkan mendukung kami dengan menyumbang dan menjadi Penyokong!</string>
+  <string name="weRelyOnSupport">Kami mengandalkan dukungan dari orang-orang seperti Anda jika memungkinkan. Jika Anda menikmati menggunakan PlayStrategy, silakan pertimbangkan mendukung kami dengan menyumbang dan menjadi Penyokong!</string>
   <string name="lifetime">Sepanjang waktu</string>
-  <string name="payLifetimeOnce">Bayar %s satu kali. Jadilah Penyokong Playstrategy selamanya!</string>
-  <string name="lifetimePatron">Penyokong Playstrategy Seumur Hidup</string>
+  <string name="payLifetimeOnce">Bayar %s satu kali. Jadilah Penyokong PlayStrategy selamanya!</string>
+  <string name="lifetimePatron">Penyokong PlayStrategy Seumur Hidup</string>
   <string name="makeExtraDonation">Beri donasi ekstra?</string>
   <string name="monthly">Bulanan</string>
   <string name="recurringBilling">Penagihan berulang, memperbarui Sayap Patron Anda setiap bulan.</string>
@@ -27,25 +27,25 @@
   <string name="withCreditCard">Kartu Kredit</string>
   <string name="withPaypal">Paypal</string>
   <string name="weAreSmallTeam">Kami adalah tim kecil, jadi dukungan Anda membuat perubahan besar!</string>
-  <string name="celebratedPatrons">Sorakan Penyokong yang membuat Playstrategy menjadi ada</string>
+  <string name="celebratedPatrons">Sorakan Penyokong yang membuat PlayStrategy menjadi ada</string>
   <string name="whereMoneyGoes">Kemana uang itu pergi?</string>
   <string name="serversAndDeveloper">Pertama-tama, server yang kuat.
-Lalu kami membayar pengembang dengan penuh-waktu: %s, pendiri Playstrategy.</string>
+Lalu kami membayar pengembang dengan penuh-waktu: %s, pendiri PlayStrategy.</string>
   <string name="costBreakdown">Lihat rincian biaya</string>
-  <string name="officialNonProfit">Apakah Playstrategy resmi nirlaba?</string>
+  <string name="officialNonProfit">Apakah PlayStrategy resmi nirlaba?</string>
   <string name="actOfCreation">Ya, ini adalah tindakan penciptaan (dalam bahasa Prancis)</string>
   <string name="changeMonthlySupport">Bisakah saya mengubah/membatalkan dukungan bulanan saya?</string>
   <string name="changeOrContact">Ya, kapan saja, dari halaman ini. Atau Anda bisa %s.</string>
-  <string name="contactSupport">kontak dukungan Playstrategy</string>
+  <string name="contactSupport">kontak dukungan PlayStrategy</string>
   <string name="otherMethods">Metode donasi lainnya?</string>
   <string name="bankTransfers">Kami juga menerima transfer bank</string>
   <string name="bitcoin">Dan ini alamat bitcoin kami: %s</string>
   <string name="patronFeatures">Apakah beberapa fitur disediakan untuk para Penyokong?</string>
-  <string name="noPatronFeatures">Tidak, karena Playstrategy sepenuhnya gratis, selamanya, dan untuk semua orang. Itu janji.
+  <string name="noPatronFeatures">Tidak, karena PlayStrategy sepenuhnya gratis, selamanya, dan untuk semua orang. Itu janji.
 Namun, Penyokong mendapatkan hak dengan ikon profil baru yang keren.</string>
   <string name="featuresComparison">Lihat perbandingan fitur terperinci</string>
   <plurals name="patronForMonths">
-    <item quantity="other">Menyokong Playstrategy untuk %s bulan</item>
+    <item quantity="other">Menyokong PlayStrategy untuk %s bulan</item>
   </plurals>
   <string name="youSupportWith">Anda mendukung playstrategy.org dengan %s perbulan.</string>
   <string name="tyvm">Terimakasih banyak atas bantuan Anda. Mantap!</string>
@@ -57,18 +57,18 @@ Namun, Penyokong mendapatkan hak dengan ikon profil baru yang keren.</string>
   <string name="changeMonthlyAmount">Ubah jumlah bulanan (%s)</string>
   <string name="cancelSupport">batal dukungan Anda</string>
   <string name="xOrY">%1$s atau %2$s</string>
-  <string name="decideHowMuch">Putuskan apa yang layak bagi Playstrategy berguna bagi Anda:</string>
+  <string name="decideHowMuch">Putuskan apa yang layak bagi PlayStrategy berguna bagi Anda:</string>
   <string name="stopPayments">Tarik kartu kredit Anda dan hentikan pembayaran:</string>
-  <string name="noLongerSupport">Tidak lagi mendukung Playstrategy</string>
+  <string name="noLongerSupport">Tidak lagi mendukung PlayStrategy</string>
   <string name="paymentHistory">Riwayat pembayaran</string>
   <string name="paid">Dibayar</string>
-  <string name="viewOthers">Lihat Penyokong Playstrategy lainnya</string>
+  <string name="viewOthers">Lihat Penyokong PlayStrategy lainnya</string>
   <string name="date">Tanggal</string>
   <string name="amount">Jumlah</string>
   <string name="transactionCompleted">Transaksi Anda telah selesai, dan tanda terima untuk donasi Anda telah diemailkan kepada Anda.</string>
   <string name="permanentPatron">Anda sekarang memiliki akun Penyokong permanen.</string>
   <string name="checkOutProfile">Cek di halaman profil Anda!</string>
   <string name="nowLifetime">Anda sekarang adalah penyokong playstrategy seumur hidup!</string>
-  <string name="nowOneMonth">Sekarang Anda menjadi Penyokong Playstrategy selama satu bulan!</string>
+  <string name="nowOneMonth">Sekarang Anda menjadi Penyokong PlayStrategy selama satu bulan!</string>
   <string name="downgradeNextMonth">Dalam satu bulan, Anda TIDAK akan ditagih lagi, dan akun playstrategy anda akan kembali menjadi akun biasa.</string>
 </resources>

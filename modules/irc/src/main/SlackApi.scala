@@ -274,7 +274,7 @@ final class SlackApi(
       SlackMessage(
         username = "deployment",
         icon = "playstrategy",
-        text = "Playstrategy is being updated! Brace for impact.",
+        text = "PlayStrategy is being updated! Brace for impact.",
         channel = rooms.general
       )
     )

@@ -27,7 +27,7 @@ playstrategy.studyTour = function (study) {
     });
     [
       {
-        title: 'Welcome to Playstrategy Study!',
+        title: 'Welcome to PlayStrategy Study!',
         text:
           'This is a shared analysis board.<br><br>' +
           'Use it to analyse and annotate games,<br>' +

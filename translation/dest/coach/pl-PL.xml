@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Trenerzy Playstrategy</string>
-  <string name="playstrategyCoach">Trener Playstrategy</string>
+  <string name="playstrategyCoaches">Trenerzy PlayStrategy</string>
+  <string name="playstrategyCoach">Trener PlayStrategy</string>
   <string name="areYouCoach">Czy jesteś trenerem szachowym posiadającym %s?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">Tytuł NM lub FIDE</string>
   <string name="confirmTitle">Potwierdź swój tytuł tutaj, a my rozpatrzymy Twój wniosek.</string>
@@ -14,7 +14,7 @@
   <string name="accepting">Przyjmuje uczniów</string>
   <string name="notAccepting">Nie przyjmuje uczniów w tej chwili</string>
   <string name="xCoachesStudents">%s trenuje uczniów w szachach</string>
-  <string name="viewXProfile">Zobacz profil Playstrategy %s</string>
+  <string name="viewXProfile">Zobacz profil PlayStrategy %s</string>
   <string name="sendPM">Wyślij prywatną wiadomość</string>
   <string name="aboutMe">O mnie</string>
   <string name="playingExperience">Osiągnięcia w grze w szachy</string>

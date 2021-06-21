@@ -286,7 +286,7 @@
     <item quantity="one">%s saniyə ver</item>
     <item quantity="other">%s saniyə ver</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Bu hesab Playstrategy İstifadə Şərtlərini pozmuşdur</string>
+  <string name="thisAccountViolatedTos">Bu hesab PlayStrategy İstifadə Şərtlərini pozmuşdur</string>
   <string name="openingExplorerAndTablebase">Debüt &amp; endşpil bazası</string>
   <string name="takeback">Dala qaytarma</string>
   <string name="proposeATakeback">Dala qaytarma təklif et</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Təşəkkürlər!</string>
   <string name="socialMediaLinks">Sosial media linkləri</string>
   <string name="inlineNotation">Sətirarası notasiya</string>
-  <string name="watchPlaystrategyTV">Playstrategy TV izlə</string>
-  <string name="previouslyOnPlaystrategyTV">Daha öncə Playstrategy TV-də</string>
+  <string name="watchPlayStrategyTV">PlayStrategy TV izlə</string>
+  <string name="previouslyOnPlayStrategyTV">Daha öncə PlayStrategy TV-də</string>
   <string name="onlinePlayers">Onlayn oyunçular</string>
   <string name="activeToday">Bu gün aktiv olanlar</string>
   <string name="activePlayers">Aktiv oyunçular</string>
@@ -567,7 +567,7 @@
   <string name="clock">Saat</string>
   <string name="unauthorizedError">Girişə icazə verilmədi.</string>
   <string name="noInternetConnection">İnternet bağlantısı yoxdur. Siz yenə də menyudan oflayn oynaya bilərsiniz.</string>
-  <string name="connectedToPlaystrategy">İndi playstrategy.org saytına qoşuldunuz</string>
+  <string name="connectedToPlayStrategy">İndi playstrategy.org saytına qoşuldunuz</string>
   <string name="signedOut">Hesabdan çıxış etdiniz</string>
   <string name="loginSuccessful">Hesaba daxil oldunuz</string>
   <string name="playOnTheBoardOffline">Lövhə üzərində</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Fişer Saatını quraşdırma. Daha çox oyunçu götürsəniz, daha çox vaxta ehtiyacınız ola bilər.</string>
   <string name="simulAddExtraTime">Sinxron seansla başa çıxmaq üçün öz saatınıza əlavə vaxtlar artıra bilərsiniz.</string>
   <string name="simulHostExtraTime">Ev sahibinin əlavə vaxtı</string>
-  <string name="playstrategyTournaments">Playstrategy turnirləri</string>
+  <string name="playstrategyTournaments">PlayStrategy turnirləri</string>
   <string name="tournamentFAQ">Arena turnirinin TSS-i</string>
   <string name="tournamentOfficial">Rəsmi</string>
   <string name="timeBeforeTournamentStarts">Turnir başlamasına qalan vaxt</string>
@@ -669,8 +669,8 @@
   <string name="weHaveSentYouAnEmailTo">Biz %s ünvanına e-poçt göndərdik. Şifrəni yeniləmək üçün e-poçtunuzdakı linkə klikləyin.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Qeydiyyatdan keçməklə siz, bizim %s ilə razılaşırsınız.</string>
   <string name="readAboutOur">%s haqqında oxuyun.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Siz və playstrategy arasında şəbəkə gecikməsi</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Playstrategy serverində gedişi emal etmə zamanı</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Siz və playstrategy arasında şəbəkə gecikməsi</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">PlayStrategy serverində gedişi emal etmə zamanı</string>
   <string name="downloadAnnotated">Annotasiyanı endir.</string>
   <string name="downloadRaw">Annotasiyasız endir</string>
   <string name="downloadImported">Daxil edilmiş oyunu endir</string>
@@ -686,7 +686,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Sən e-poçtu artıq qeydiyyatdan keçirmisən: %s</string>
   <string name="kidMode">Uşaq rejimi</string>
   <string name="kidModeExplanation">Bu təhlükəsizliklə bağlıdır. Uşaq rejimində bütün sayt əlaqələri deaktivdir. Uşaqlarınız və məktəb şagirdləriniz üçün, onları digər internet istifadəçilərindən qorumaq üçün bunu aktiv edin.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Uşaq rejimində, Playstrategy loqosu %s işarəsini alır, beləliklə uşaqlarınızın təhlükəsiz olduğunu bilirsiniz.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Uşaq rejimində, PlayStrategy loqosu %s işarəsini alır, beləliklə uşaqlarınızın təhlükəsiz olduğunu bilirsiniz.</string>
   <string name="enableKidMode">Uşaq rejimini aktivləşdir</string>
   <string name="disableKidMode">Uşaq rejimini deaktiv et</string>
   <string name="security">Təhlükəsizlik</string>
@@ -694,7 +694,7 @@
   <string name="alternativelyYouCanX">Həmçinin %s də edə bilərsiniz.</string>
   <string name="revokeAllSessions">bütün sessiyaları ləğv et</string>
   <string name="playChessEverywhere">Şahmatı hər yerdə oyna</string>
-  <string name="asFreeAsPlaystrategy">Playstrategy kimi azad</string>
+  <string name="asFreeAsPlayStrategy">PlayStrategy kimi azad</string>
   <string name="builtForTheLoveOfChessNotMoney">Pula görə deyil, şahmat sevgisinə görə yaradılmışdır</string>
   <string name="everybodyGetsAllFeaturesForFree">Hər kəs bütün özəllikləri pulsuz əldə edir</string>
   <string name="zeroAdvertisement">Sıfır reklam</string>
@@ -734,7 +734,7 @@
   <string name="usernameSuffixInvalid">İstifadəçi adı hərf və ya rəqəmlə bitməlidir.</string>
   <string name="usernameCharsInvalid">İstifadəçi adı yalnız hərflər, rəqəmlər, alt xətlər və tirelərdən ibarət olmalıdır. Ardıcıl alt xətlər və tire işarələrinə icazə verilmir.</string>
   <string name="usernameUnacceptable">Bu istifadəçi adı qəbuledilməzdir.</string>
-  <string name="directlySupportPlaystrategy">Playstrategyi dəstəkləyin</string>
+  <string name="directlySupportPlayStrategy">PlayStrategyi dəstəkləyin</string>
   <string name="playChessInStyle">Şahmatı tərz ilə oyna</string>
   <string name="chessBasics">Şahmatın təməl prinsipləri</string>
   <string name="coaches">Məşqçilər</string>
@@ -821,7 +821,7 @@
   <string name="agreementAssistance">Razıyam ki, heç vaxt oyunlarım zamanı (şahmat kompüterindən, kitabdan, məlumat bazasından və ya başqa bir şəxsdən) kömək almayacağam.</string>
   <string name="agreementNice">Həmişə digər oyunçulara hörmətlə yanaşacağımla razıyam.</string>
   <string name="agreementAccount">Çox hesab yaratmayacağımla razıyam.</string>
-  <string name="agreementPolicy">Bütün Playstrategy qaydalarına riayət edəcəyimlə razıyam.</string>
+  <string name="agreementPolicy">Bütün PlayStrategy qaydalarına riayət edəcəyimlə razıyam.</string>
   <string name="searchOrStartNewDiscussion">Axtarış edin və ya yeni söhbətə başlayın</string>
   <string name="edit">Redaktə et</string>
   <string name="rapid">Rapid</string>
@@ -856,7 +856,7 @@
   <string name="congratsYouWon">Təbriklər, siz qalib gəldiniz!</string>
   <string name="gameVsX">%1$s-ya qarşı oyun</string>
   <string name="resVsX">%1$s vs %2$s</string>
-  <string name="youJustBecamePatron">Playstrategy patronları siyahısına siz də qoşuldunuz.</string>
+  <string name="youJustBecamePatron">PlayStrategy patronları siyahısına siz də qoşuldunuz.</string>
   <string name="patronAccountExpired">Patron hesabınızın müddəti bitmişdir</string>
   <string name="pleaseReconsiderRenewIt">Zəhmət olmasa, bunu yeniləyin!</string>
   <string name="someoneReviewedYourCoachProfile">Kimsə məşqçi profilinə baxdı.</string>

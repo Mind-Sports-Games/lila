@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Playstrategy コーチ</string>
-  <string name="playstrategyCoach">Playstrategy コーチ</string>
+  <string name="playstrategyCoaches">PlayStrategy コーチ</string>
+  <string name="playstrategyCoach">PlayStrategy コーチ</string>
   <string name="areYouCoach">あなたは %s タイトルを持つ優秀なチェスコーチですか？</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">NM または FIDE</string>
   <string name="confirmTitle">タイトルをこちらで証明してくだされば申請を審査します。</string>
@@ -14,7 +14,7 @@
   <string name="accepting">生徒を募集中です</string>
   <string name="notAccepting">現在、生徒を募集していません</string>
   <string name="xCoachesStudents">%s が生徒を指導します</string>
-  <string name="viewXProfile">%s の Playstrategy プロフィールを見る</string>
+  <string name="viewXProfile">%s の PlayStrategy プロフィールを見る</string>
   <string name="sendPM">プライベートメッセージを送る</string>
   <string name="aboutMe">プロフィール</string>
   <string name="playingExperience">競技歴</string>

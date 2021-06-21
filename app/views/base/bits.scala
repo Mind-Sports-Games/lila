@@ -38,7 +38,7 @@ border-top-right-radius: 3px;
 z-index: 99;
 """
   )(
-    "This is an empty Playstrategy preview website, go to playstrategy.org instead"
+    "This is an empty PlayStrategy preview website, go to playstrategy.org instead"
   )
 
   val connectLinks =

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="playstrategyClasses">Класи</string>
-  <string name="teachClassesOfChessStudents">Викладайте шахи учням за допомогою інструменту Playstrategy Уроки.</string>
+  <string name="teachClassesOfChessStudents">Викладайте шахи учням за допомогою інструменту PlayStrategy Уроки.</string>
   <string name="features">Можливості</string>
   <string name="quicklyGenerateSafeUsernames">Швидко створюйте безпечні імена користувачів та паролі для учнів</string>
   <string name="trackStudentProgress">Відстежуйте прогрес учнів у іграх та задачах</string>
   <string name="messageAllStudents">Повідомляйте усіх учнів про нові навчальні матеріали</string>
   <string name="freeForAllForever">Безкоштовно на 100% для всіх, назавжди, без реклам та стеження</string>
-  <string name="applyToBePlaystrategyTeacher">Подати заявку, щоб стати Playstrategy Викладачем</string>
+  <string name="applyToBePlayStrategyTeacher">Подати заявку, щоб стати PlayStrategy Викладачем</string>
   <string name="noClassesYet">Ще немає уроків.</string>
   <string name="teachersX">Викладачі: %s</string>
   <string name="newClass">Новий урок</string>
@@ -23,7 +23,7 @@
   <string name="classDescription">Опис класу</string>
   <string name="visibleByBothStudentsAndTeachers">Видимий як вчителям, так і учнями класу</string>
   <string name="teachersOfTheClass">Вчителі класу</string>
-  <string name="addPlaystrategyUsernames">Додайте імена користувачів, які запрошують їх в якості вчителя. По одному у рядку.</string>
+  <string name="addPlayStrategyUsernames">Додайте імена користувачів, які запрошують їх в якості вчителя. По одному у рядку.</string>
   <string name="resetPassword">Скинути пароль</string>
   <string name="makeSureToCopy">Переконайтеся, що ви скопіювали або записали пароль. Ви не зможете побачити його знову!</string>
   <string name="passwordX">Пароль: %s</string>
@@ -32,21 +32,21 @@
   <string name="realName">Справжнє ім\'я</string>
   <string name="privateWillNeverBeShown">Приватний. Ніколи не буде показуватися за межами класу. Допомагає згадати, хто цей учень.</string>
   <string name="addStudent">Додати учня</string>
-  <string name="playstrategyProfileXCreatedForY">Профіль Playstrategy %1$s створений для %2$s.</string>
+  <string name="playstrategyProfileXCreatedForY">Профіль PlayStrategy %1$s створений для %2$s.</string>
   <string name="studentCredentials">Учень:  %1$s
 Ім\'я користувача: %2$s
 Пароль: %3$s</string>
-  <string name="inviteAPlaystrategyAccount">Запросити акаунт Playstrategy</string>
-  <string name="inviteDesc1">Якщо у учня вже є обліковий запис Playstrategy, Ви можете запросити його до класу.</string>
-  <string name="inviteDesc2">Вони отримають повідомлення на Playstrategy з посиланням, щоб приєднатися до класу.</string>
+  <string name="inviteAPlayStrategyAccount">Запросити акаунт PlayStrategy</string>
+  <string name="inviteDesc1">Якщо у учня вже є обліковий запис PlayStrategy, Ви можете запросити його до класу.</string>
+  <string name="inviteDesc2">Вони отримають повідомлення на PlayStrategy з посиланням, щоб приєднатися до класу.</string>
   <string name="inviteDesc3">Важливо: запрошуйте лише учнів, яких Ви знаєте і які активно хочуть приєднатися до класу.</string>
   <string name="inviteDesc4">Ніколи не надсилайте небажані запрошення довільним гравцям.</string>
-  <string name="createANewPlaystrategyAccount">Створити обліковий запис Playstrategy</string>
-  <string name="createDesc1">Якщо учень ще не має облікового запису Playstrategy, його можна створити тут.</string>
+  <string name="createANewPlayStrategyAccount">Створити обліковий запис PlayStrategy</string>
+  <string name="createDesc1">Якщо учень ще не має облікового запису PlayStrategy, його можна створити тут.</string>
   <string name="createDesc2">Не потрібна електронна адреса. Пароль буде згенерований і Вам треба надіслати його учневі, щоб він міг увійти в систему.</string>
   <string name="createDesc3">Важливо: учень не повинен мати кілька облікових записів.</string>
   <string name="createDesc4">Якщо у них вже є такий, натомість використовуйте форму запрошення.</string>
-  <string name="playstrategyUsername">Ім\'я користувача Playstrategy</string>
+  <string name="playstrategyUsername">Ім\'я користувача PlayStrategy</string>
   <string name="generateANewUsername">Створити нове ім\'я користувача</string>
   <string name="welcomeToClass">Ласкаво просимо до Вашого класу: %s.
 Ось посилання для доступу до класу.</string>

@@ -209,8 +209,8 @@
   <string name="biography">Eachdraidh-beatha</string>
   <string name="country">Dùthaich</string>
   <string name="thankYou">Mòran taing!</string>
-  <string name="watchPlaystrategyTV">Coimhead air tbh Playstrategy</string>
-  <string name="previouslyOnPlaystrategyTV">Air tbh Playstrategy roimhe</string>
+  <string name="watchPlayStrategyTV">Coimhead air tbh PlayStrategy</string>
+  <string name="previouslyOnPlayStrategyTV">Air tbh PlayStrategy roimhe</string>
   <string name="onlinePlayers">Cluicheadairean air loidhne</string>
   <string name="activeToday">Gnìomhach an-diugh</string>
   <string name="activePlayers">Cluicheadairean gnìomhach</string>
@@ -282,7 +282,7 @@
   <string name="computer">Coimpiutair</string>
   <string name="side">Taobh</string>
   <string name="clock">Uaireadair</string>
-  <string name="connectedToPlaystrategy">Tha thu ceangailte ri playstrategy.org a-nis</string>
+  <string name="connectedToPlayStrategy">Tha thu ceangailte ri playstrategy.org a-nis</string>
   <string name="signedOut">Chaidh do chlàradh a-mach</string>
   <string name="loginSuccessful">Chaidh do chlàradh a-steach</string>
   <string name="playOfflineComputer">Coimpiutair</string>
@@ -315,7 +315,7 @@
   <string name="sourceCode">Bun-tùs</string>
   <string name="host">Òstair</string>
   <string name="create">Cruthaich</string>
-  <string name="playstrategyTournaments">Féillean-chluich Playstrategy</string>
+  <string name="playstrategyTournaments">Féillean-chluich PlayStrategy</string>
   <string name="tournamentOfficial">Oifigeil</string>
   <string name="timeBeforeTournamentStarts">Ùine mus tòisich an fhéill-chluich</string>
   <string name="keyboardShortcuts">Ath-ghoiridean a\' mheur-chlàir</string>
@@ -330,5 +330,5 @@
   <string name="byRegisteringYouAgreeToBeBoundByOur">Nuair a chlàraicheas tu, aontaichidh tu gum bi thu fo bhuaidh %s.</string>
   <string name="kidMode">Modh cloinne</string>
   <string name="playChessEverywhere">Cluich tàileasg àite sam bith</string>
-  <string name="asFreeAsPlaystrategy">Ch saor \'s a tha playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Ch saor \'s a tha playstrategy</string>
 </resources>

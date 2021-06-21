@@ -2,20 +2,20 @@
 <resources>
   <string name="faqAbbreviation">שאלות נפוצות</string>
   <string name="frequentlyAskedQuestions">שאלות נפוצות</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">למה ליצ\'ס נקרא ליצ\'ס?</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">למה ליצ\'ס נקרא ליצ\'ס?</string>
   <string name="playstrategyCombinationLiveLightLibrePronounced">ליצ\'ס הוא שילוב של חי/אור/ליברה ושחמט. זה מבוטא %1$s.</string>
   <string name="leechess">לי-צ\'ס</string>
   <string name="hearItPronouncedBySpecialist">שמע אותו מבוטא על ידי מומחה.</string>
   <string name="whyLiveLightLibre">בשידור חי, מכיוון שמשחקים משוחקים ונצפים בזמן אמת 24/7; קל וחומר על כך שליצ\'ס היא קוד פתוח ובלתי פוסק על ידי זבל קנייני שמצוי באתרים אחרים.</string>
   <string name="whyIsLilaCalledLila">באופן דומה, קוד המקור של ליצ\'ס, %1$s מהווה li[chess in sca]la, שכן הרוב של ליצ\'ס כתוב ב%2$s, שפת תכנות אינטואיטיבית.</string>
-  <string name="howCanIContributeToPlaystrategy">כיצד אוכל לתרום לליצ\'ס?</string>
+  <string name="howCanIContributeToPlayStrategy">כיצד אוכל לתרום לליצ\'ס?</string>
   <string name="playstrategyPoweredByDonationsAndVolunteers">ליצ\'ס מופעל על ידי תרומות מצד תומכים ומאמצי צוות מתנדבים.</string>
   <string name="findMoreAndSeeHowHelp">תוכל למצוא עוד על %1$s (בנוסף ל%2$s). אם אתה מעוניין לעזור לליצ\'ס ע\"י נידוב זמנך וכישוריך, ישנן הרבה %3$s.</string>
   <string name="beingAPatron">להיות תומך</string>
   <string name="breakdownOfOurCosts">פירוט העלויות שלנו</string>
   <string name="otherWaysToHelp">דרכים אחרות לעזור</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">האם ישנם אתרים המבוססים על ליצ\'ס?</string>
-  <string name="yesPlaystrategyInspiredOtherOpenSourceWebsites">כן. ליצ\'ס אכן עורר השראה לאתרי קוד פתוח אחרים המשתמשים באתר שלנו %1$s, %2$s, או %3$s.</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">האם ישנם אתרים המבוססים על ליצ\'ס?</string>
+  <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">כן. ליצ\'ס אכן עורר השראה לאתרי קוד פתוח אחרים המשתמשים באתר שלנו %1$s, %2$s, או %3$s.</string>
   <string name="fairPlay">שחק הגון</string>
   <string name="whenAmIEligibleRatinRefund">מתי אני זכאי להחזר הדירוג האוטומטי מהפסד לרמאים?</string>
   <string name="ratingRefundExplanation">דקה לאחר סימון שחקן, 40 המשחקים האחרונים שדורגו ב -3 הימים האחרונים נלקחים. אם אתה היריב שלהם במשחקים ההם, איבדת דירוג (בגלל הפסד או תיקו), והדירוג שלך לא היה זמני, תקבל החזר דירוג. ההחזר מושבת על סמך דירוג השיא שלך והתקדמות הדירוג שלך לאחר המשחק.

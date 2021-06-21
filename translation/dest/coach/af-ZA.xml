@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Playstrategy afrigters</string>
-  <string name="playstrategyCoach">Playstrategy afrigter</string>
+  <string name="playstrategyCoaches">PlayStrategy afrigters</string>
+  <string name="playstrategyCoach">PlayStrategy afrigter</string>
   <string name="areYouCoach">Is jy \'n uitstekende skaak afrigter met \'n %s?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">NM of FIDE titel</string>
   <string name="confirmTitle">Bevestig jou titel hier en ons sal jou aansoek hersien.</string>
@@ -14,7 +14,7 @@
   <string name="accepting">Aanvaar studente</string>
   <string name="notAccepting">Aanvaar nie tans studente nie</string>
   <string name="xCoachesStudents">%s rig skaak studente af</string>
-  <string name="viewXProfile">Sien %s se Playstrategy profiel</string>
+  <string name="viewXProfile">Sien %s se PlayStrategy profiel</string>
   <string name="sendPM">Stuur \'n privaat boodskap</string>
   <string name="aboutMe">Wie is ek?</string>
   <string name="playingExperience">Speel ervaring</string>

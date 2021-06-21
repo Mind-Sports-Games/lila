@@ -286,7 +286,7 @@
     <item quantity="one">Dem Gegner %s Sekunde geben</item>
     <item quantity="other">Dem Gegner %s Sekunden geben</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Dieses Konto hat gegen die Playstrategy-Nutzungsbedingungen verstoßen</string>
+  <string name="thisAccountViolatedTos">Dieses Konto hat gegen die PlayStrategy-Nutzungsbedingungen verstoßen</string>
   <string name="openingExplorerAndTablebase">Eröffnungsbuch &amp; Tablebase</string>
   <string name="takeback">Zugrücknahme</string>
   <string name="proposeATakeback">Zugrücknahme vorschlagen</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Vielen Dank!</string>
   <string name="socialMediaLinks">Social-Media-Links</string>
   <string name="inlineNotation">Inline-Notation</string>
-  <string name="watchPlaystrategyTV">Playstrategy-TV anschauen</string>
-  <string name="previouslyOnPlaystrategyTV">Zuletzt auf Playstrategy TV</string>
+  <string name="watchPlayStrategyTV">PlayStrategy-TV anschauen</string>
+  <string name="previouslyOnPlayStrategyTV">Zuletzt auf PlayStrategy TV</string>
   <string name="onlinePlayers">Spieler online</string>
   <string name="activeToday">Heute aktiv</string>
   <string name="activePlayers">Aktive Spieler</string>
@@ -567,7 +567,7 @@
   <string name="clock">Uhr</string>
   <string name="unauthorizedError">Zugriff verweigert.</string>
   <string name="noInternetConnection">Keine Internet Verbindung. Offline Spielen möglich.</string>
-  <string name="connectedToPlaystrategy">Verbindung hergestellt</string>
+  <string name="connectedToPlayStrategy">Verbindung hergestellt</string>
   <string name="signedOut">Erfolgreich ausgeloggt</string>
   <string name="loginSuccessful">Du bist jetzt eingeloggt</string>
   <string name="playOnTheBoardOffline">Spiele offline gegen Mensch</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Fischer Bedenkzeit. Je mehr Gegner du hast, desto mehr Zeit wirst du benötigen.</string>
   <string name="simulAddExtraTime">Du kannst dir selbst zusätzliche Zeit hinzufügen, um mit dem Simultan zurechtzukommen.</string>
   <string name="simulHostExtraTime">Extra Bedenkzeit des Ausrichters</string>
-  <string name="playstrategyTournaments">Playstrategy Turniere</string>
+  <string name="playstrategyTournaments">PlayStrategy Turniere</string>
   <string name="tournamentFAQ">Arena FAQ</string>
   <string name="tournamentOfficial">Offiziell</string>
   <string name="timeBeforeTournamentStarts">Zeit bis zum Start des Turniers</string>
@@ -669,8 +669,8 @@
   <string name="weHaveSentYouAnEmailTo">Wir haben dir eine Email an %s gesendet. Klicke auf den Link in der E-Mail, um dein Passwort zurück zu setzen.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Durch die Anmeldung wird den %s zugestimmt.</string>
   <string name="readAboutOur">Lies unsere %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Netzwerkverzögerung zwischen dir und Playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Zeit, um einen Zug auf dem Playstrategy-Server zu verarbeiten</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Netzwerkverzögerung zwischen dir und PlayStrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Zeit, um einen Zug auf dem PlayStrategy-Server zu verarbeiten</string>
   <string name="downloadAnnotated">Download kommentiert</string>
   <string name="downloadRaw">Download unkommentiert</string>
   <string name="downloadImported">Importiertes Spiel herunterladen</string>
@@ -687,7 +687,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Du hast die folgende Emailadresse schon registriert: %s</string>
   <string name="kidMode">Kindermodus</string>
   <string name="kidModeExplanation">Dies ist eine Sicherheitseinstellung. Im Kindermodus sind alle Kommunikationsmöglichkeiten deaktiviert. Aktiviere diese Option, um Kinder und Schüler vor anderen Internetbenutzern zu schützen.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Im Kindermodus erhält das Playstrategy-Logo ein %s-Icon, an dem erkennen kannst, dass deine Kinder geschützt sind.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Im Kindermodus erhält das PlayStrategy-Logo ein %s-Icon, an dem erkennen kannst, dass deine Kinder geschützt sind.</string>
   <string name="enableKidMode">Kindermodus aktivieren</string>
   <string name="disableKidMode">Kindermodus deaktivieren</string>
   <string name="security">Sicherheit</string>
@@ -695,7 +695,7 @@
   <string name="alternativelyYouCanX">Alternativ kannst du %s.</string>
   <string name="revokeAllSessions">alle Sitzungen beenden</string>
   <string name="playChessEverywhere">Spiele Schach überall</string>
-  <string name="asFreeAsPlaystrategy">Frei wie Playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Frei wie PlayStrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Aus Liebe zum Schach</string>
   <string name="everybodyGetsAllFeaturesForFree">Jeder erhält alle Funktionen völlig kostenlos</string>
   <string name="zeroAdvertisement">Keine Werbung</string>
@@ -735,7 +735,7 @@
   <string name="usernameSuffixInvalid">Der Benutzername muss mit einem Buchstaben oder einer Zahl enden.</string>
   <string name="usernameCharsInvalid">Der Benutzername darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche beinhalten.</string>
   <string name="usernameUnacceptable">Dieser Benutzername ist nicht akzeptabel.</string>
-  <string name="directlySupportPlaystrategy">Playstrategy direkt unterstützen</string>
+  <string name="directlySupportPlayStrategy">PlayStrategy direkt unterstützen</string>
   <string name="playChessInStyle">Schachspielen mit Style</string>
   <string name="chessBasics">Grundlagen</string>
   <string name="coaches">Trainer</string>
@@ -822,7 +822,7 @@
   <string name="agreementAssistance">Ich stimme zu, dass ich zu keiner Zeit während meiner Partien Hilfe in Anspruch nehmen werde (durch einen Schachcomputer, Buch, Datenbank oder eine andere Person).</string>
   <string name="agreementNice">Ich stimme zu, dass ich anderen Spielern immer respektvoll gegenübertreten werde.</string>
   <string name="agreementAccount">Ich stimme zu, dass ich nicht mehrere Konten erstellen werde.</string>
-  <string name="agreementPolicy">Ich stimme zu, dass ich allen Playstrategy-Richtlinien folgen werde.</string>
+  <string name="agreementPolicy">Ich stimme zu, dass ich allen PlayStrategy-Richtlinien folgen werde.</string>
   <string name="searchOrStartNewDiscussion">Suche oder beginne eine neue Konversation</string>
   <string name="edit">Bearbeiten</string>
   <string name="rapid">Schnellschach</string>
@@ -857,12 +857,12 @@
   <string name="congratsYouWon">Herzlichen Glückwunsch, du hast gewonnen!</string>
   <string name="gameVsX">Partie gegen %1$s</string>
   <string name="resVsX">%1$s gegen %2$s</string>
-  <string name="youJustBecamePatron">Du wurdest nun ein Playstrategy-Patron.</string>
+  <string name="youJustBecamePatron">Du wurdest nun ein PlayStrategy-Patron.</string>
   <string name="patronAccountExpired">Patron-Status abgelaufen</string>
   <string name="pleaseReconsiderRenewIt">Bitte überlege, ob du es erneuern willst!</string>
   <string name="someoneReviewedYourCoachProfile">Jemand hat dein Trainerprofil überprüft.</string>
   <string name="newPendingReview">Neue, ausstehende Rezension</string>
-  <string name="lostAgainstTOSViolator">Du hast gegen jemanden verloren, der gegen die Playstrategy-Nutzungsbedingungen verstoßen hat</string>
+  <string name="lostAgainstTOSViolator">Du hast gegen jemanden verloren, der gegen die PlayStrategy-Nutzungsbedingungen verstoßen hat</string>
   <string name="refundXpointsTimeControlY">Rückerstattung: %1$s %2$s Wertungspunkte.</string>
   <string name="timeAlmostUp">Die Zeit ist fast abgelaufen!</string>
   <string name="clickToRevealEmailAddress">[Klicke, um die E-Mail-Adresse anzuzeigen]</string>

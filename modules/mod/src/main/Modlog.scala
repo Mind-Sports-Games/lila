@@ -12,10 +12,10 @@ case class Modlog(
     date: DateTime = DateTime.now
 ) {
 
-  def isPlaystrategy = mod == lila.user.User.playstrategyId
+  def isPlayStrategy = mod == lila.user.User.playstrategyId
 
   def notable      = action != Modlog.terminateTournament
-  def notableSlack = notable && !isPlaystrategy
+  def notableSlack = notable && !isPlayStrategy
 
   def gameId = details.ifTrue(action == Modlog.cheatDetected).??(_.split(' ').lift(1))
 

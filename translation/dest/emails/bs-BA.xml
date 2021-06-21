@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Potvrdite Vaš račun na playstrategy.org, %s</string>
-  <string name="emailConfirm_click">Kliknite link da aktivirate Vaš Playstrategy račun:</string>
-  <string name="emailConfirm_ignore">Ako se niste registrovali na Playstrategy-u možete slobodno ignorisati ovu poruku.</string>
+  <string name="emailConfirm_click">Kliknite link da aktivirate Vaš PlayStrategy račun:</string>
+  <string name="emailConfirm_ignore">Ako se niste registrovali na PlayStrategy-u možete slobodno ignorisati ovu poruku.</string>
   <string name="passwordReset_subject">Resetirajte Vašu playstrategy.org lozinku, %s</string>
   <string name="passwordReset_intro">Primili smo zahtjev za resetovanje lozinke Vašeg računa.</string>
   <string name="passwordReset_clickOrIgnore">Ako ste Vi podnijeli ovaj zahtjev, kliknite na link ispod. Ako niste, možete ignorisati ovu poruku.</string>
@@ -15,7 +15,7 @@
 Ovo je Vaš profil: %1$s. Možete ga mijenjati na %2$s.
 
 Uživajte, i neka Vaše figure uvijek pronađu put do protivničkog kralja!</string>
-  <string name="logInToPlaystrategy">Prijavite se na playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Prijavite se na playstrategy.org, %s</string>
   <string name="common_orPaste">(Klikanje na link ne radi? Probajte zalijepiti link u Vaš pretraživač!)</string>
   <string name="common_note">Ovo je servisna poruka povezana sa Vašim korištenjem stranice %s.</string>
   <string name="common_contact">Da bi ste nas kontaktirali, molimo Vas da koristite %s.</string>

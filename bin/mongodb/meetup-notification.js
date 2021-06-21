@@ -1,5 +1,5 @@
 var sender = 'playstrategy';
-var threadName = 'Playstrategy meetup in London, November 24th';
+var threadName = 'PlayStrategy meetup in London, November 24th';
 
 var sent = 0;
 

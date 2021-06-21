@@ -2,7 +2,7 @@ import rollupProject from '@build/rollupProject';
 
 export default rollupProject({
   main: {
-    name: 'PlaystrategySimul',
+    name: 'PlayStrategySimul',
     input: 'src/main.ts',
     output: 'simul',
   },

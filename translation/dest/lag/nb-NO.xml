@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="isPlaystrategyLagging">Lagger Playstrategy?</string>
+  <string name="isPlayStrategyLagging">Lagger PlayStrategy?</string>
   <string name="measurementInProgressThreeDot">Målinger pågår...</string>
   <string name="noAndYourNetworkIsGood">Nei. Og nettverket ditt er bra.</string>
-  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is Playstrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Nei. Og nettverket ditt er dårlig.</string>
+  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is PlayStrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Nei. Og nettverket ditt er dårlig.</string>
   <string name="yesItWillBeFixedSoon">Ja. Det vil bli fikset snart!</string>
   <string name="andNowTheLongAnswerLagComposedOfTwoValues">Og nå, det lange svaret! Spillforsinkelse er sammensatt av to uavhengige verdier (lavere er bedre):</string>
-  <string name="playstrategyServerLatency">Latens for Playstrategy-serveren</string>
-  <string name="playstrategyServerLatencyExplanation">Tiden det tar å behandle et trekk på serveren. Den er den samme for alle og avhenger bare av serverbelastningen. Jo flere spillere, dess høyere blir den, men Playstrategy-utviklerne gjør sitt ytterste for å holde den nede. Den overstiger sjelden 10 ms.</string>
-  <string name="networkBetweenPlaystrategyAndYou">Nettverket mellom Playstrategy og deg</string>
-  <string name="networkBetweenPlaystrategyAndYouExplanation">Tiden det tar å sende et trekk fra datamaskinen din til Playstrategy-serveren og få svaret tilbake. Den er spesifikk for din avstand til Playstrategy (Frankrike) og for kvaliteten på din internettforbindelse. Playstrategy-utviklerne kan ikke fikse wifien din eller øke lysets hastighet.</string>
+  <string name="playstrategyServerLatency">Latens for PlayStrategy-serveren</string>
+  <string name="playstrategyServerLatencyExplanation">Tiden det tar å behandle et trekk på serveren. Den er den samme for alle og avhenger bare av serverbelastningen. Jo flere spillere, dess høyere blir den, men PlayStrategy-utviklerne gjør sitt ytterste for å holde den nede. Den overstiger sjelden 10 ms.</string>
+  <string name="networkBetweenPlayStrategyAndYou">Nettverket mellom PlayStrategy og deg</string>
+  <string name="networkBetweenPlayStrategyAndYouExplanation">Tiden det tar å sende et trekk fra datamaskinen din til PlayStrategy-serveren og få svaret tilbake. Den er spesifikk for din avstand til PlayStrategy (Frankrike) og for kvaliteten på din internettforbindelse. PlayStrategy-utviklerne kan ikke fikse wifien din eller øke lysets hastighet.</string>
   <string name="youCanFindTheseValuesAtAnyTimeByClickingOnYourUsername">Du kan finne begge disse verdiene når som helst ved å klikke på brukernavnet ditt øverst på siden.</string>
   <string name="lagCompensation">Kompensasjon for forsinkelse</string>
-  <string name="lagCompensationExplanation">Playstrategy kompenserer for nettverksforsinkelse. Dette omfatter vedvarende forsinkelser og tilfeldige topper. Det fins grenser og heuristikk basert på tidskontrollen og oppnådd kompensasjon slik at resultatet blir rimelig for begge spillerne. Dermed er det ikke et handikap å ha høyere nettverksforsinkelse enn motspilleren din!</string>
+  <string name="lagCompensationExplanation">PlayStrategy kompenserer for nettverksforsinkelse. Dette omfatter vedvarende forsinkelser og tilfeldige topper. Det fins grenser og heuristikk basert på tidskontrollen og oppnådd kompensasjon slik at resultatet blir rimelig for begge spillerne. Dermed er det ikke et handikap å ha høyere nettverksforsinkelse enn motspilleren din!</string>
 </resources>

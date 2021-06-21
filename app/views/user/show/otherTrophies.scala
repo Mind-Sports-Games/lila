@@ -95,7 +95,7 @@ object otherTrophies {
             "trophy award icon3d streamer" -> true,
             "streaming"                    -> streaming
           ),
-          ariaTitle(if (streaming) "Live now!" else "Playstrategy Streamer")
+          ariaTitle(if (streaming) "Live now!" else "PlayStrategy Streamer")
         )("")
       }
     )

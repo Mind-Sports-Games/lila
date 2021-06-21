@@ -1,11 +1,11 @@
-import exportPlaystrategyGlobals from './site.playstrategy.globals';
+import exportPlayStrategyGlobals from './site.playstrategy.globals';
 
-exportPlaystrategyGlobals();
+exportPlayStrategyGlobals();
 
 export default function (opts: any) {
   document.body.classList.toggle('supports-max-content', !!window.chrome);
 
-  window.PlaystrategyAnalyse.start({
+  window.PlayStrategyAnalyse.start({
     ...opts,
     socketSend: () => {},
   });

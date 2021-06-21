@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Presentadores de Playstrategy</string>
-  <string name="playstrategyStreamer">Presentador de Playstrategy</string>
+  <string name="playstrategyStreamers">Presentadores de PlayStrategy</string>
+  <string name="playstrategyStreamer">Presentador de PlayStrategy</string>
   <string name="live">¡EN DIRECTO!</string>
   <string name="offline">DESCONECTADO</string>
   <string name="currentlyStreaming">Transmitiendo ahora: %s</string>
   <string name="lastStream">Última transmisión %s</string>
-  <string name="becomeStreamer">Conviértete en un presentador de Playstrategy</string>
+  <string name="becomeStreamer">Conviértete en un presentador de PlayStrategy</string>
   <string name="doYouHaveStream">¿Tienes un canal de Twitch o YouTube?</string>
   <string name="hereWeGo">¡Allá vamos!</string>
   <string name="allStreamers">Todos los presentadores</string>
@@ -15,27 +15,27 @@
   <string name="downloadKit">Descargar kit de presentador</string>
   <string name="xIsStreaming">%s está transmitiendo</string>
   <string name="rules">Reglas de transmisión</string>
-  <string name="rule1">Incluye la palabra clave \"playstrategy.org\" en el título de tu transmisión y usa la categoría \"Chess\" cuando transmitas en Playstrategy.</string>
-  <string name="rule2">Elimina la palabra clave cuando transmitas contenido que no esté relacionado a Playstrategy.</string>
-  <string name="rule3">Playstrategy detectará tu transmisión automáticamente y habilitará los siguientes beneficios:</string>
+  <string name="rule1">Incluye la palabra clave \"playstrategy.org\" en el título de tu transmisión y usa la categoría \"Chess\" cuando transmitas en PlayStrategy.</string>
+  <string name="rule2">Elimina la palabra clave cuando transmitas contenido que no esté relacionado a PlayStrategy.</string>
+  <string name="rule3">PlayStrategy detectará tu transmisión automáticamente y habilitará los siguientes beneficios:</string>
   <string name="perks">Beneficios de transmitir con la palabra clave</string>
-  <string name="perk1">Obtén un llameante icono de presentador en tu perfil de Playstrategy.</string>
+  <string name="perk1">Obtén un llameante icono de presentador en tu perfil de PlayStrategy.</string>
   <string name="perk2">Sube a la cima de la lista de presentadores.</string>
-  <string name="perk3">Notifica a tus seguidores de Playstrategy.</string>
+  <string name="perk3">Notifica a tus seguidores de PlayStrategy.</string>
   <string name="perk4">Muestra tu transmisión en tus juegos, torneos y estudios.</string>
   <string name="approved">Tu transmisión está aprobada.</string>
   <string name="pendingReview">Tu transmisión está siendo revisada por los moderadores.</string>
   <string name="pleaseFillIn">Por favor, rellena la información como presentador y sube una foto.</string>
-  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Cuando estés preparado para ser listado como un presentador de Playstrategy, %s</string>
-  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a Playstrategy streamer, request a moderator review&quot;">solicitar una revisión de moderador</string>
+  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Cuando estés preparado para ser listado como un presentador de PlayStrategy, %s</string>
+  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a PlayStrategy streamer, request a moderator review&quot;">solicitar una revisión de moderador</string>
   <string name="anotherLanguage">Si tu transmisión está en otro idioma que el inglés, incluye la etiqueta de idioma correcta (%s), encerrada entre corchetes, al comienzo del título de tu transmisión.
 Por ejemplo, incluye \"[ES]\" para español, \"[FR]\" para francés, \"[PT]\" para portugués, etc.
-Colócala en el título de la transmisión en la página de Twitch o YouTube, no en la configuración de la transmisión de Playstrategy.
+Colócala en el título de la transmisión en la página de Twitch o YouTube, no en la configuración de la transmisión de PlayStrategy.
 Si tu transmisión está en inglés, no hay necesidad de incluir una etiqueta de idioma.</string>
   <string name="twitchUsername">Tu nombre de usuario o URL de Twitch</string>
   <string name="optionalOrEmpty">Opcional. Déjalo vacío si no hay ninguno</string>
   <string name="youtubeChannel">El ID o URL de tu canal de YouTube</string>
-  <string name="streamerName">Tu nombre de presentador en Playstrategy</string>
+  <string name="streamerName">Tu nombre de presentador en PlayStrategy</string>
   <plurals name="keepItShort">
     <item quantity="one">Se breve: máximo %s carácter</item>
     <item quantity="other">Se breve: máximo %s caracteres</item>
@@ -53,6 +53,6 @@ Si tu transmisión está en inglés, no hay necesidad de incluir una etiqueta de
   <string name="installBlocker">¡Instala un bloqueador de malware!</string>
   <string name="beSafe">Mantente a salvo de los anuncios y rastreadores
 que infestan Twitch y YouTube.
-Playstrategy recomienda uBlock Origin
+PlayStrategy recomienda uBlock Origin
 que es gratis y de código abierto.</string>
 </resources>

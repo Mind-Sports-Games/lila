@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="contact">各種連絡先</string>
-  <string name="contactPlaystrategy">Playstrategy に連絡する</string>
+  <string name="contactPlayStrategy">PlayStrategy に連絡する</string>
   <string name="whatCanWeHelpYouWith">何かお困りですか？</string>
   <string name="visitThisPage">こちらのページでトラブルを解決</string>
   <string name="iCantLogIn">ログインができない</string>
@@ -30,14 +30,14 @@
   <string name="toReportAPlayerUseForm">プレイヤーの通報には通報用フォームを使ってください</string>
   <string name="youCanAlsoReachReportPage">その人のプロフィールページの通報ボタン（右上 %s）からもできます。</string>
   <string name="doNotReportInForum">他のプレイヤーをフォーラムに通報しないでください。</string>
-  <string name="doNotSendReportEmails">通報の際は Playstrategy にメールを送らないでください。</string>
+  <string name="doNotSendReportEmails">通報の際は PlayStrategy にメールを送らないでください。</string>
   <string name="doNotMessageModerators">モデレーターにダイレクトメッセージを送らないでください。</string>
   <string name="onlyReports">プレイヤーの通報は通報用フォームを通じてのみ有効です。</string>
   <string name="wantReportBug">バグを知らせたい</string>
-  <string name="reportBugInForum">Playstrategy フォーラムの「フィードバック」掲示板で</string>
-  <string name="reportWebsiteIssue">GitHub で、Playstrategy ウェブサイトの話題として</string>
-  <string name="reportMobileIssue">GitHub で、Playstrategy モバイルアプリの話題として</string>
-  <string name="reportBugInDiscord">Playstrategy の discord サーバで</string>
+  <string name="reportBugInForum">PlayStrategy フォーラムの「フィードバック」掲示板で</string>
+  <string name="reportWebsiteIssue">GitHub で、PlayStrategy ウェブサイトの話題として</string>
+  <string name="reportMobileIssue">GitHub で、PlayStrategy モバイルアプリの話題として</string>
+  <string name="reportBugInDiscord">PlayStrategy の discord サーバで</string>
   <string name="howToReportBug">バグの内容、あるべき正しい動作、バグの再現方法をお知らせください。</string>
   <string name="illegalPawnCapture">ポーンを変な風に取られた</string>
   <string name="calledEnPassant">それは「アンパッサン」というルールです。</string>
@@ -63,13 +63,13 @@
   <string name="doNotDeny">その場合、不正行為を否定しないでください。新しいアカウントを作りたいなら何をしたかを認め、それは自分の落ち度だったと認めてください。</string>
   <string name="otherRestriction">その他の制限</string>
   <string name="collaboration">提携、法律、商業化等について</string>
-  <string name="monetizing">Playstrategy の収益化</string>
-  <string name="buyingPlaystrategy">Playstrategy の買収</string>
-  <string name="authorizationToUse">Playstrategy 利用の許可</string>
-  <string name="welcomeToUse">Playstrategy はさまざまな活動（商業的活動を含む）に利用することができます。</string>
-  <string name="videosAndBooks">Playstrategy を配信動画の中に使う、スクリーンショットを書籍の中に使うなどです。</string>
+  <string name="monetizing">PlayStrategy の収益化</string>
+  <string name="buyingPlayStrategy">PlayStrategy の買収</string>
+  <string name="authorizationToUse">PlayStrategy 利用の許可</string>
+  <string name="welcomeToUse">PlayStrategy はさまざまな活動（商業的活動を含む）に利用することができます。</string>
+  <string name="videosAndBooks">PlayStrategy を配信動画の中に使う、スクリーンショットを書籍の中に使うなどです。</string>
   <string name="creditAppreciated">クレジットを入れてくださるとうれしいですが義務ではありません。</string>
   <string name="noneOfTheAbove">その他</string>
   <string name="sendEmailAt">%s までメールを送ってください。</string>
-  <string name="explainYourRequest">用件を明確に、詳しく説明してください。Playstrategy でのユーザー名と、当方の対応に役立ちそうな情報ならなんでも書いてください。</string>
+  <string name="explainYourRequest">用件を明確に、詳しく説明してください。PlayStrategy でのユーザー名と、当方の対応に役立ちそうな情報ならなんでも書いてください。</string>
 </resources>

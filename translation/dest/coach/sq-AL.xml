@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Trajnerat e Playstrategy</string>
-  <string name="playstrategyCoach">Trajnier Playstrategyi</string>
+  <string name="playstrategyCoaches">Trajnerat e PlayStrategy</string>
+  <string name="playstrategyCoach">Trajnier PlayStrategyi</string>
   <string name="areYouCoach">A jeni nje trajner i mire me %s?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">Mjeshter KOMBETAR ose titull FIDE</string>
   <string name="confirmTitle">Konfirmoni titullin tuaj ketu dhe ne do t\'ju shofim aplikimin.</string>
@@ -14,7 +14,7 @@
   <string name="accepting">Pranon student</string>
   <string name="notAccepting">Nuk pranon studente per momentin</string>
   <string name="xCoachesStudents">%s trajnon studente shahu</string>
-  <string name="viewXProfile">Shif %s profilin e Playstrategyit</string>
+  <string name="viewXProfile">Shif %s profilin e PlayStrategyit</string>
   <string name="sendPM">Dergo nje mesazh privat</string>
   <string name="aboutMe">Rreth meje</string>
   <string name="playingExperience">Eksperienca e lojerave</string>

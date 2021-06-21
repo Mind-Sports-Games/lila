@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">%s, підтвердіть Ваш обліковий запис на playstrategy.org</string>
-  <string name="emailConfirm_click">Натисніть на посилання для активації облікового запису Playstrategy:</string>
-  <string name="emailConfirm_ignore">Якщо Ви не реєструвалися на Playstrategy, ви можете просто проігнорувати це повідомлення.</string>
+  <string name="emailConfirm_click">Натисніть на посилання для активації облікового запису PlayStrategy:</string>
+  <string name="emailConfirm_ignore">Якщо Ви не реєструвалися на PlayStrategy, ви можете просто проігнорувати це повідомлення.</string>
   <string name="passwordReset_subject">%s, скидання вашого паролю playstrategy.org</string>
   <string name="passwordReset_intro">Ми отримали запит на скидання пароля для вашого облікового запису.</string>
   <string name="passwordReset_clickOrIgnore">Якщо запит виконано вами, натисніть на посилання нижче. Якщо ні, проігноруйте цей лист.</string>
@@ -15,7 +15,7 @@
 Ось посилання на Ваш профіль: %1$s. Ви можете налаштувати його тут %2$s.
 
 Отримуйте задоволення, і хай Ваші фігури знайдуть шлях до короля суперника!</string>
-  <string name="logInToPlaystrategy">Увійдіть до playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Увійдіть до playstrategy.org, %s</string>
   <string name="common_orPaste">(Клік по посиланню не працює? Спробуйте вставити його в адресний рядок!)</string>
   <string name="common_note">Це службовий лист, пов\'язаний із використанням %s.</string>
   <string name="common_contact">Щоб зв\'язатися з нами, будь ласка, використовуйте %s.</string>

@@ -52,14 +52,14 @@ export function view(ctrl: PingCtrl): VNode {
     h(
       'span.ping',
       {
-        attrs: { title: 'PING: ' + ctrl.trans.noarg('networkLagBetweenYouAndPlaystrategy') },
+        attrs: { title: 'PING: ' + ctrl.trans.noarg('networkLagBetweenYouAndPlayStrategy') },
       },
       [h('em', 'PING'), h('strong', defined(d.ping) ? '' + d.ping : '?'), h('em', 'ms')]
     ),
     h(
       'span.server',
       {
-        attrs: { title: 'SERVER: ' + ctrl.trans.noarg('timeToProcessAMoveOnPlaystrategyServer') },
+        attrs: { title: 'SERVER: ' + ctrl.trans.noarg('timeToProcessAMoveOnPlayStrategyServer') },
       },
       [h('em', 'SERVER'), h('strong', defined(d.server) ? showMillis(d.server) : ['?']), h('em', 'ms')]
     ),

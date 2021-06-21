@@ -29,10 +29,10 @@ object faq {
     ) {
       div(cls := "faq small-page box box-pad")(
         h1(cls := "playstrategy_title")(frequentlyAskedQuestions()),
-        h2("Playstrategy"),
+        h2("PlayStrategy"),
         question(
           "name",
-          whyIsPlaystrategyCalledPlaystrategy.txt(),
+          whyIsPlayStrategyCalledPlayStrategy.txt(),
           p(
             playstrategyCombinationLiveLightLibrePronounced(em(leechess())),
             " ",
@@ -50,7 +50,7 @@ object faq {
         ),
         question(
           "contributing",
-          howCanIContributeToPlaystrategy.txt(),
+          howCanIContributeToPlayStrategy.txt(),
           p(playstrategyPoweredByDonationsAndVolunteers()),
           p(
             findMoreAndSeeHowHelp(
@@ -61,10 +61,10 @@ object faq {
           )
         ),
         question(
-          "sites_based_on_Playstrategy",
-          areThereWebsitesBasedOnPlaystrategy.txt(),
+          "sites_based_on_PlayStrategy",
+          areThereWebsitesBasedOnPlayStrategy.txt(),
           p(
-            yesPlaystrategyInspiredOtherOpenSourceWebsites(
+            yesPlayStrategyInspiredOtherOpenSourceWebsites(
               a(href := "/source")(trans.sourceCode()),
               a(href := "/api")("API"),
               a(href := "https://database.playstrategy.org")(trans.database())
@@ -179,7 +179,7 @@ object faq {
         h2(accounts()),
         question(
           "titles",
-          titlesAvailableOnPlaystrategy.txt(),
+          titlesAvailableOnPlayStrategy.txt(),
           p(
             playstrategyRecognizeAllOTBtitles(
               a(href := "https://github.com/ornicar/lila/wiki/Handling-title-verification-requests")(
@@ -200,7 +200,7 @@ object faq {
           p(
             showYourTitle(
               a(href := routes.Main.verifyTitle)(verificationForm()),
-              a(href := "#lm")("Playstrategy master (LM)")
+              a(href := "#lm")("PlayStrategy master (LM)")
             )
           )
         ),
@@ -251,9 +251,9 @@ object faq {
         h2(playstrategyRatings()),
         question(
           "ratings",
-          whichRatingSystemUsedByPlaystrategy.txt(),
+          whichRatingSystemUsedByPlayStrategy.txt(),
           p(
-            ratingSystemUsedByPlaystrategy()
+            ratingSystemUsedByPlayStrategy()
           ),
           p(
             a(href := routes.Page.loneBookmark("rating-systems"))("More about rating systems")

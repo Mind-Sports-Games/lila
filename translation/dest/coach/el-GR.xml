@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Προπονητές του Playstrategy</string>
-  <string name="playstrategyCoach">Προπονητής του Playstrategy</string>
+  <string name="playstrategyCoaches">Προπονητές του PlayStrategy</string>
+  <string name="playstrategyCoach">Προπονητής του PlayStrategy</string>
   <string name="areYouCoach">Είστε ενας εξαιρετικός προπονητές σκακιού που κατέχει %s;</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">έναν NM ή FIDE τίτλο</string>
   <string name="confirmTitle">Επιβεβαιώστε εδώ τον τίτλο σας και θα εξετάσουμε την αίτησή σας.</string>

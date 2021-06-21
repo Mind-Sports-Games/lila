@@ -28,7 +28,7 @@ object bits {
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-eval' https://cdn.jsdelivr.net blob:; child-src blob:; connect-src https://raw.githubusercontent.com; img-src data: https://playstrategy.org https://assets.playstrategy.org;">
-    <title>Playstrategy.org API reference</title>
+    <title>PlayStrategy.org API reference</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>body { margin: 0; padding: 0; }</style>
   </head>

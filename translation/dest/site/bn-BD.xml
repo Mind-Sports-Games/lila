@@ -446,8 +446,8 @@
   <string name="thankYou">ধন্যবাদ</string>
   <string name="socialMediaLinks">সোশ্যাল মিডিয়ার লিঙ্ক</string>
   <string name="inlineNotation">রেখা চিহ্ন</string>
-  <string name="watchPlaystrategyTV">Playstrategy TV দেখুন</string>
-  <string name="previouslyOnPlaystrategyTV">এর আগে Playstrategy TV- তে যা হয়েছে</string>
+  <string name="watchPlayStrategyTV">PlayStrategy TV দেখুন</string>
+  <string name="previouslyOnPlayStrategyTV">এর আগে PlayStrategy TV- তে যা হয়েছে</string>
   <string name="onlinePlayers">যে সমস্ত  খেলোয়ার অনলাইন আছে</string>
   <string name="activeToday">যারা আজকে সক্রিয় রয়েছে</string>
   <string name="activePlayers">সক্রিয় খেলোয়াড়গণ</string>
@@ -554,7 +554,7 @@
   <string name="clock">ঘড়ি</string>
   <string name="unauthorizedError">অধিগমন অননুমোদিত করা হয়েছে.</string>
   <string name="noInternetConnection">ইন্টারনেট সংযোগ নেই. অবশ্যই আপনি ইন্টারনেট সংযোগ ছাড়া মেনু থেকে খেলতে পারবেন.</string>
-  <string name="connectedToPlaystrategy">এখন আপনি সংযুক্ত হয়েছেন playstrategy.org</string>
+  <string name="connectedToPlayStrategy">এখন আপনি সংযুক্ত হয়েছেন playstrategy.org</string>
   <string name="signedOut">আপনি সাইন আউট হয়েছেন</string>
   <string name="loginSuccessful">আপনি এখন সাইন ইন হয়েছেন</string>
   <string name="playOnTheBoardOffline">বোর্ডের উপরে</string>
@@ -656,8 +656,8 @@
   <string name="weHaveSentYouAnEmailTo">আমরা একটি ই-মেইল পাঠিয়েছি %s. ই-মেইলে দেওয়া লিংকে ক্লিক করুন পাসওয়ার্ড পরিবর্তন করতে.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">নিবন্ধন করে, আপনি সম্মত হন আমাদের দ্বারা আবদ্ধ হতে %s.</string>
   <string name="readAboutOur">আমাদের %s সম্পর্কে পড়ুন.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">আপনার এবং লিচেস এর মধ্যে নেটওয়ার্ক ব্যবধান</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">লিচেস সার্ভারে স্থানান্তর প্রক্রিয়া করার সময়</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">আপনার এবং লিচেস এর মধ্যে নেটওয়ার্ক ব্যবধান</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">লিচেস সার্ভারে স্থানান্তর প্রক্রিয়া করার সময়</string>
   <string name="downloadAnnotated">টীকাযুক্ত ডাউনলোড করুন</string>
   <string name="downloadRaw">কাঁচা ডাউনলোড করুন</string>
   <string name="downloadImported">আগমিত ডাউনলোড করুন</string>
@@ -673,7 +673,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">আপনি ইতিমধ্যে এই ই-মেইলে নিবন্ধন করেছেন: %s</string>
   <string name="kidMode">বাচ্চা ধরন</string>
   <string name="kidModeExplanation">এটা হয় নিরাপত্তা সম্পর্কে. বাচ্চা ধরনের মধ্যে সব সাইটের যোগাযোগ নিষ্ক্রিয় করা হয়েছে. আপনার বাচ্চা এবং বিদ্যালয়ের ছাত্রদের, অন্য ইন্টারনেট ব্যবহারকারীদের থেকে রক্ষা করতে এটা সক্রিয় করুন.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">বাচ্চা ধরনের মধ্যে, লিচেস লোগো পায় একটি %s প্রতীক,
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">বাচ্চা ধরনের মধ্যে, লিচেস লোগো পায় একটি %s প্রতীক,
 তাই আপনি জানতে পারবেন আপনার বাচ্চা নিরাপদ.</string>
   <string name="enableKidMode">বাচ্চা ধরন সক্রিয় করুন</string>
   <string name="disableKidMode">বাচ্চা ধরন নিষ্ক্রিয় করুন</string>
@@ -682,7 +682,7 @@
   <string name="alternativelyYouCanX">অন্যভাবে আপনি পারেন %s.</string>
   <string name="revokeAllSessions">সকল সেশন বাতিল করুন</string>
   <string name="playChessEverywhere">দাবা খেলুন সব জায়গায়</string>
-  <string name="asFreeAsPlaystrategy">যেমন লিচাস মুক্ত হিসাবে</string>
+  <string name="asFreeAsPlayStrategy">যেমন লিচাস মুক্ত হিসাবে</string>
   <string name="builtForTheLoveOfChessNotMoney">দাবার ভালবাসার জন্য তৈরি, টাকা না</string>
   <string name="everybodyGetsAllFeaturesForFree">সকলেই পাবে বিনামূল্যে সব বৈশিষ্ট্য</string>
   <string name="zeroAdvertisement">শূন্য বিজ্ঞাপন</string>
@@ -722,7 +722,7 @@
   <string name="usernameSuffixInvalid">ইউজারনেম অবশ্যই কোন অক্ষর বা সংখ্যা দ্বারা শেষ হতে হবে।</string>
   <string name="usernameCharsInvalid">ইউজারনেমে শুধুমাত্র অক্ষর, নাম্বার, আন্ডারস্কোর এবং হাইফেন থাকতে পারবে।</string>
   <string name="usernameUnacceptable">এই ব্যবহারকারী নামটি গ্রহণযোগ্য নয়.</string>
-  <string name="directlySupportPlaystrategy">সরাসরি লিচাস সমার্থন</string>
+  <string name="directlySupportPlayStrategy">সরাসরি লিচাস সমার্থন</string>
   <string name="playChessInStyle">দাবা খেলুন শৈলিতে</string>
   <string name="chessBasics">দাবা মূলসূত্র</string>
   <string name="coaches">প্রশিক্ষক</string>

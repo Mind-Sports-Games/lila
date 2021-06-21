@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">Dirua eman</string>
-  <string name="playstrategyPatron">Playstrategy babeslea</string>
+  <string name="playstrategyPatron">PlayStrategy babeslea</string>
   <string name="freeAccount">Doako kontua</string>
-  <string name="becomePatron">Playstrategy Babesle bihurtu</string>
-  <string name="xBecamePatron">%s Playstrategy Babesle bihurtu da</string>
+  <string name="becomePatron">PlayStrategy Babesle bihurtu</string>
+  <string name="xBecamePatron">%s PlayStrategy Babesle bihurtu da</string>
   <string name="newPatrons">Babesle berriak</string>
   <string name="freeChess">Doako xakea, guztiontzat, betiko!</string>
   <string name="noAdsNoSubs">Ez dago iragarkirik, ez kuotarik baina bai software librea, ordea.</string>
@@ -13,10 +13,10 @@
   <string name="patronUntil">Babesle kontua duzu egun honetara arte %s.</string>
   <string name="ifNotRenewed">Ez baduzu berritzen, doako kontua izatera pasatuko zara.</string>
   <string name="weAreNonProfit">Irabazi asmorik gabeko elkartea gara, edonork xakean jokatzeko mundu-mailako plataforma baterako sarbidea izan beharko lukeela uste dugulako.</string>
-  <string name="weRelyOnSupport">Hau posible egiteko zu bezalako jendearen babesletza behar dugu. Playstrategy gustuko baduzu, gure Babesle izan zaitezke!</string>
+  <string name="weRelyOnSupport">Hau posible egiteko zu bezalako jendearen babesletza behar dugu. PlayStrategy gustuko baduzu, gure Babesle izan zaitezke!</string>
   <string name="lifetime">Bizi guztirako</string>
-  <string name="payLifetimeOnce">Ordaindu %s behin. Izan Playstrategy Babesle betiko!</string>
-  <string name="lifetimePatron">Bizi guztirako Playstrategy Babeslea</string>
+  <string name="payLifetimeOnce">Ordaindu %s behin. Izan PlayStrategy Babesle betiko!</string>
+  <string name="lifetimePatron">Bizi guztirako PlayStrategy Babeslea</string>
   <string name="makeExtraDonation">Dohaintza gehigarri bat egin?</string>
   <string name="monthly">Hilero</string>
   <string name="recurringBilling">Hileroko ordainketa, hilero berritu zure Babesle hegoak.</string>
@@ -27,28 +27,28 @@
   <string name="withCreditCard">Kreditu txartela</string>
   <string name="withPaypal">PayPal</string>
   <string name="weAreSmallTeam">Talde txikia gara, gure babesak asko lagunduko digu!</string>
-  <string name="celebratedPatrons">Hauek dira Playstrategy posible egiten duten Babesleak</string>
+  <string name="celebratedPatrons">Hauek dira PlayStrategy posible egiten duten Babesleak</string>
   <string name="whereMoneyGoes">Nora doa dirua?</string>
   <string name="serversAndDeveloper">Lehenengo, zerbitzari indartsuak.
-Ondoren garatzaile baten soldata ordaintzen dugu: %s, Playstrategyen sortzailea.</string>
+Ondoren garatzaile baten soldata ordaintzen dugu: %s, PlayStrategyen sortzailea.</string>
   <string name="costBreakdown">Ikusi kostuen banaketa</string>
-  <string name="officialNonProfit">Benetan da Playstrategy irabazi asmorik gabekoa?</string>
+  <string name="officialNonProfit">Benetan da PlayStrategy irabazi asmorik gabekoa?</string>
   <string name="actOfCreation">Bai, hemen dago eratze-akta (frantsesez)</string>
   <string name="changeMonthlySupport">Aldatu/Ezeztatu dezaket nire hileroko babesa?</string>
   <string name="changeOrContact">Bai, edonoiz, orrialde honetatik.
 Edo %s.</string>
-  <string name="contactSupport">jarri kontaktuan Playstrategyen arreta zerbitzuarekin</string>
+  <string name="contactSupport">jarri kontaktuan PlayStrategyen arreta zerbitzuarekin</string>
   <string name="otherMethods">Dirua emateko beste aukera batzuk?</string>
   <string name="bankTransfers">Banku-transferentziak ere onartzen ditugu</string>
   <string name="bitcoin">Hauxe da gure bitcoin helbidea: %s</string>
   <string name="patronFeatures">Badago zerbait Babesleentzat bakarrik gordeta?</string>
-  <string name="noPatronFeatures">Ez, Playstrategy osoa doakoa delako, betiko eta guztiontzat. Hori hitz ematen dugu. Hala ere, Babesleek beren profilaren orrialdean ikono berri bat jasotzen dute.</string>
+  <string name="noPatronFeatures">Ez, PlayStrategy osoa doakoa delako, betiko eta guztiontzat. Hori hitz ematen dugu. Hala ere, Babesleek beren profilaren orrialdean ikono berri bat jasotzen dute.</string>
   <string name="featuresComparison">Ikusi ezaugarrien alderaketa</string>
   <plurals name="patronForMonths">
-    <item quantity="one">Playstrategy Babeslea hilabeterako</item>
-    <item quantity="other">Playstrategy Babeslea %s hilabeterako</item>
+    <item quantity="one">PlayStrategy Babeslea hilabeterako</item>
+    <item quantity="other">PlayStrategy Babeslea %s hilabeterako</item>
   </plurals>
-  <string name="youSupportWith">Playstrategy.org babesten duzu %s-rekin hilabeterako.</string>
+  <string name="youSupportWith">PlayStrategy.org babesten duzu %s-rekin hilabeterako.</string>
   <string name="tyvm">Eskerrik asko zure laguntzagatik. Biba zu!</string>
   <string name="currentStatus">Uneko egoera</string>
   <string name="nextPayment">Hurrengo ordainketa</string>
@@ -58,18 +58,18 @@ Edo %s.</string>
   <string name="changeMonthlyAmount">Hileroko kopurua aldatu (%s)</string>
   <string name="cancelSupport">zure babesa ezeztatu</string>
   <string name="xOrY">%1$s edo %2$s</string>
-  <string name="decideHowMuch">Erabaki zenbat balio duen Playstrategyek zuretzat:</string>
+  <string name="decideHowMuch">Erabaki zenbat balio duen PlayStrategyek zuretzat:</string>
   <string name="stopPayments">Kendu zure kreditu txartela eta ordainketa egiteari utzi:</string>
-  <string name="noLongerSupport">Playstrategy gehiago ez babestu</string>
+  <string name="noLongerSupport">PlayStrategy gehiago ez babestu</string>
   <string name="paymentHistory">Ordainketen historikoa</string>
   <string name="paid">Ordainduta</string>
-  <string name="viewOthers">Beste Playstrategy Babesle batzuk ikusi</string>
+  <string name="viewOthers">Beste PlayStrategy Babesle batzuk ikusi</string>
   <string name="date">Data</string>
   <string name="amount">Kopurua</string>
   <string name="transactionCompleted">Zure ordainketa ondo osatu da eta ordainketa-agiria epostaz bidali dizugu.</string>
   <string name="permanentPatron">Orain bizi guztirako Babesle kontua duzu.</string>
   <string name="checkOutProfile">Ikusi zure profilaren orrialdea!</string>
-  <string name="nowLifetime">Orain Bizi guztirako Playstrategy Babeslea zara!</string>
-  <string name="nowOneMonth">Orain hilabeterako Playstrategy Babeslea zara!</string>
+  <string name="nowLifetime">Orain Bizi guztirako PlayStrategy Babeslea zara!</string>
+  <string name="nowOneMonth">Orain hilabeterako PlayStrategy Babeslea zara!</string>
   <string name="downgradeNextMonth">Hilabetean EZ dizugu berriz kobratuko eta zure kontua ohiko izatera pasatuko da.</string>
 </resources>

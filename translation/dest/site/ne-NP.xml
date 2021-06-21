@@ -442,8 +442,8 @@
   <string name="thankYou">धन्यवाद!</string>
   <string name="socialMediaLinks">सामाजिक सञ्जाल लिङ्क</string>
   <string name="inlineNotation">पङ्तिमा नोटेशन</string>
-  <string name="watchPlaystrategyTV">लीचेस टिभी हेरौं</string>
-  <string name="previouslyOnPlaystrategyTV">लीचेस टिभीमा यसअघि</string>
+  <string name="watchPlayStrategyTV">लीचेस टिभी हेरौं</string>
+  <string name="previouslyOnPlayStrategyTV">लीचेस टिभीमा यसअघि</string>
   <string name="onlinePlayers">अनलाइन खेलाडीहरु</string>
   <string name="activeToday">आज कृयाशील</string>
   <string name="activePlayers">कृयाशील खेलाडीहरु</string>
@@ -545,7 +545,7 @@
   <string name="clock">घडी</string>
   <string name="unauthorizedError">प्रवेश निषेध गरिएको छ।</string>
   <string name="noInternetConnection">इंटरनेट कनेक्शन छैन। तर अझै पनि तपाईं अफलाइन खेल खेल्न सक्नुहुन्छ।</string>
-  <string name="connectedToPlaystrategy">अब तपाइ playstrategy.org मा जोडिइनु भएको छ</string>
+  <string name="connectedToPlayStrategy">अब तपाइ playstrategy.org मा जोडिइनु भएको छ</string>
   <string name="signedOut">तपाइलाई साइन आउट गरिएको छ</string>
   <string name="loginSuccessful">तपाइ अब साइन इन हुनुभएको छ</string>
   <string name="playOnTheBoardOffline">वास्तविक बोर्डमा</string>
@@ -645,8 +645,8 @@
   <string name="ifYouDoNotSeeTheEmailCheckOtherPlaces">यदि तपाइले इमेल देख्नु भएन भने जंक लगायत अन्य स्थानहरूमा खोज्नुहोस्।</string>
   <string name="weHaveSentYouAnEmailTo">हामीले %s मा एउटा ईमेल पठाएका छौ। आफ्नो पासवर्ड रीसेट गर्नको लागि ईमेलमा भएको लिंकमा क्लिक गर्नुहोस्।</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">दर्ता गरेर तपाइ हाम्रो %s बाट बाधिनुहुनेछ।</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">तपाइ र लीचेस बीचको नेटवर्क ढिलाई</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">लीचेसको सर्भरमा कुनै चाल कार्यवाही गर्न लाग्ने समय</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">तपाइ र लीचेस बीचको नेटवर्क ढिलाई</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">लीचेसको सर्भरमा कुनै चाल कार्यवाही गर्न लाग्ने समय</string>
   <string name="downloadAnnotated">टिप्पणी सहित डाउनलाेड गर्नुहोस्</string>
   <string name="downloadRaw">टिप्पणी बिना डाउनलोड गर्नुहोस्</string>
   <string name="downloadImported">आयातित खेल डाउनलोड गर्नुहोस्</string>
@@ -662,7 +662,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">यो इमेल दर्ता गरिसक्नुभएको छ: %s</string>
   <string name="kidMode">बाल मोड</string>
   <string name="kidModeExplanation">यो सुरक्षा के बारे हो। बाल मोडमा, साइटभरी संचार बन्द हुन्छ। यो बालबालिकालाई अरु इन्टरनेट प्रयोगकर्ताहरुबाट बचाउन हो।</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">बाल मोडमा लीचेसको लोगोले %s चिन्ह पाउनेछन् र तपाइ ढुक्क हुन सक्नुहुन्छ।</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">बाल मोडमा लीचेसको लोगोले %s चिन्ह पाउनेछन् र तपाइ ढुक्क हुन सक्नुहुन्छ।</string>
   <string name="enableKidMode">बाल मोड लागु गरौं</string>
   <string name="disableKidMode">बाल मोड बन्द गरौं</string>
   <string name="security">सुरक्षा</string>
@@ -670,7 +670,7 @@
   <string name="alternativelyYouCanX">वैकल्पिक रूपमा तपाइ %s गर्न सक्नुहुनेछ।</string>
   <string name="revokeAllSessions">सबै सत्र रद्द गर्नुहोस्</string>
   <string name="playChessEverywhere">सबै ठाउँमा बुद्धिचाल खेलौं</string>
-  <string name="asFreeAsPlaystrategy">लीचेस जस्तै सित्तैमा</string>
+  <string name="asFreeAsPlayStrategy">लीचेस जस्तै सित्तैमा</string>
   <string name="builtForTheLoveOfChessNotMoney">पैसाको लागि होइन, बुद्धिचाल प्रतिको मायाको लागि बनाइएको</string>
   <string name="everybodyGetsAllFeaturesForFree">सबैले सबै सुबिधा सित्तैमा पाउनेछन्</string>
   <string name="zeroAdvertisement">शुन्य विज्ञापन</string>
@@ -710,7 +710,7 @@
   <string name="usernameSuffixInvalid">युजर नेम अक्षर वा अंकमा अन्त्य हुनुपर्छ।</string>
   <string name="usernameCharsInvalid">युजर नेममा अक्षर, अंक, अण्डरस्कोर, र हाइफन मात्र प्रयोग गर्न सकिने छ।</string>
   <string name="usernameUnacceptable">यो युजर नेम स्वीकार्य छैन।</string>
-  <string name="directlySupportPlaystrategy">लीचेसलाई सिधै समर्थन गरौं</string>
+  <string name="directlySupportPlayStrategy">लीचेसलाई सिधै समर्थन गरौं</string>
   <string name="playChessInStyle">गज्जब सँग बुद्धिचाल खेलौं</string>
   <string name="chessBasics">आधारभूत बुद्धिचाल</string>
   <string name="coaches">प्रशिक्षकहरु</string>

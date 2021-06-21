@@ -2,33 +2,33 @@
 <resources>
   <string name="faqAbbreviation">АрФар</string>
   <string name="frequentlyAskedQuestions">Арæх Фарстатæ</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Playstrategy-æн йæ ном цæмæн у \"Playstrategy\"?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">\"Playstrategy\" у \"live/light/libre\" æмæ \"chess\" — удæгас, рог æмæ сæрибар шахмæттæ. Дзурын хъæуы афтæ: %1$s.</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">PlayStrategy-æн йæ ном цæмæн у \"PlayStrategy\"?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">\"PlayStrategy\" у \"live/light/libre\" æмæ \"chess\" — удæгас, рог æмæ сæрибар шахмæттæ. Дзурын хъæуы афтæ: %1$s.</string>
   <string name="leechess">личец</string>
   <string name="hearItPronouncedBySpecialist">Байхъус специалист æй куыд дзуры.</string>
-  <string name="whyLiveLightLibre">Удæгас уый тыххæй, æмæ ды хъазыс æмæ кæсыс хъазтытæ реалон рæстæджы цыфæнды афоны; рог æмæ сæрибар уымæн, æмæ Playstrategy æргом æмæ быронæй сыгъдæг у, иннæ æргъыл сайтытæм нæ кæсгæйæ.</string>
-  <string name="whyIsLilaCalledLila">Уый дæр хауы Playstrategy-ы райдайæн кодмæ, %1$s-мæ, кæй нысан кæны li[chess in sca]la, уымæн æмæ Playstrategy у фыст %2$s-йæ, æнцонæмбарон программон æвзагæй.</string>
-  <string name="howCanIContributeToPlaystrategy">Куыд баххуыс кæнон Playstrategy-æн?</string>
-  <string name="playstrategyPoweredByDonationsAndVolunteers">Playstrategy цæры хъазджыты снывондытæй æмæ волонтёрты куыстæй.</string>
-  <string name="findMoreAndSeeHowHelp">Дæ бон у базонын %1$s, уый (æмæ %2$s дæр). Кæд дæ фæнды баххуысын Playstrategy-æн дæ рæстæгæй æмæ арæхстытæй, уæд дзы ис %3$s.</string>
+  <string name="whyLiveLightLibre">Удæгас уый тыххæй, æмæ ды хъазыс æмæ кæсыс хъазтытæ реалон рæстæджы цыфæнды афоны; рог æмæ сæрибар уымæн, æмæ PlayStrategy æргом æмæ быронæй сыгъдæг у, иннæ æргъыл сайтытæм нæ кæсгæйæ.</string>
+  <string name="whyIsLilaCalledLila">Уый дæр хауы PlayStrategy-ы райдайæн кодмæ, %1$s-мæ, кæй нысан кæны li[chess in sca]la, уымæн æмæ PlayStrategy у фыст %2$s-йæ, æнцонæмбарон программон æвзагæй.</string>
+  <string name="howCanIContributeToPlayStrategy">Куыд баххуыс кæнон PlayStrategy-æн?</string>
+  <string name="playstrategyPoweredByDonationsAndVolunteers">PlayStrategy цæры хъазджыты снывондытæй æмæ волонтёрты куыстæй.</string>
+  <string name="findMoreAndSeeHowHelp">Дæ бон у базонын %1$s, уый (æмæ %2$s дæр). Кæд дæ фæнды баххуысын PlayStrategy-æн дæ рæстæгæй æмæ арæхстытæй, уæд дзы ис %3$s.</string>
   <string name="beingAPatron">аххуысгæнæгæй куыд суын</string>
   <string name="breakdownOfOurCosts">нæ хардзыты хыгъдлæвæрд</string>
   <string name="otherWaysToHelp">æндæр амалтæ баххуыс кæнын</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">Ис дзы æндæр Playstrategy-вебсайтытæ?</string>
-  <string name="yesPlaystrategyInspiredOtherOpenSourceWebsites">О, Playstrategy ныфс радта æндæр æргом сайтытæм, кæй пайда кæнынц нæ %1$s, %2$s æмæ %3$s.</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">Ис дзы æндæр PlayStrategy-вебсайтытæ?</string>
+  <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">О, PlayStrategy ныфс радта æндæр æргом сайтытæм, кæй пайда кæнынц нæ %1$s, %2$s æмæ %3$s.</string>
   <string name="fairPlay">Рæстаг Хъазт</string>
   <string name="whenAmIEligibleRatinRefund">Сайæгой мæ кæд рамбулдзæн, уæд мын мæ рейтинг фæстæмæ ратдзыстут?</string>
   <string name="gameplay">Хъазты арæзт</string>
   <string name="howBulletBlitzEtcDecided">Нæмыг, блиц æмæ æндæр сахаты цæстдардтæ куыд рабæрæг конд ысты?</string>
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$s с = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$s с = %2$s</string>
-  <string name="whatVariantsCanIplay">Цавæр варианттæ мæ бон у хъазын Playstrategy-ы?</string>
-  <string name="playstrategySupportChessAnd">Playstrategy-мæ ис классикон шахмæттæ æмæ %1$s.</string>
-  <string name="canIbecomeLM">Ис дзы гæнæн мын раттын Playstrategy Мастеры (LM) хуындад?</string>
+  <string name="whatVariantsCanIplay">Цавæр варианттæ мæ бон у хъазын PlayStrategy-ы?</string>
+  <string name="playstrategySupportChessAnd">PlayStrategy-мæ ис классикон шахмæттæ æмæ %1$s.</string>
+  <string name="canIbecomeLM">Ис дзы гæнæн мын раттын PlayStrategy Мастеры (LM) хуындад?</string>
   <string name="noUpperCaseDot">Нæй.</string>
-  <string name="lMtitleComesToYouDoNotRequestIt">Уый у каджын хуындад, æнæофициалон, æмæ æрмæст вæййы Playstrategy-ы.
+  <string name="lMtitleComesToYouDoNotRequestIt">Уый у каджын хуындад, æнæофициалон, æмæ æрмæст вæййы PlayStrategy-ы.
 
-Мах æй стæмхатт хорзæхæй дæттæм тынг нысаниуæгджын хъазæгтæм, Playstrategy-ы раз сгуыхтдзинæдтæ кæм ис, ахæмтæ; мах сæ нæхæдæг æвзарæм. Ма ссар LM хуындад, уый йæхæдæг дæ ссардзæн. Аккаг куы дæ, уæд дæумæ æрцæудзæн уац, цæмæй дæ хуындад райсай, кæннод йын \"нæ\" зæгъай.
+Мах æй стæмхатт хорзæхæй дæттæм тынг нысаниуæгджын хъазæгтæм, PlayStrategy-ы раз сгуыхтдзинæдтæ кæм ис, ахæмтæ; мах сæ нæхæдæг æвзарæм. Ма ссар LM хуындад, уый йæхæдæг дæ ссардзæн. Аккаг куы дæ, уæд дæумæ æрцæудзæн уац, цæмæй дæ хуындад райсай, кæннод йын \"нæ\" зæгъай.
 
 LM хуындады райстыл ма кур.</string>
   <string name="whatUsernameCanIchoose">Цы хуызæн ис мын гæнæн мæ пайдакæнæджы ном скæнын?</string>
@@ -37,6 +37,6 @@ LM хуындады райстыл ма кур.</string>
   <string name="canIChangeMyUsername">Ис дзы мæ бон пайдакæнæджы ном баивын?</string>
   <string name="usernamesCannotBeChanged">Нæ, пайдакæнæджы номæн баивын нæй, уымæн ис техникон æмæ практикон аххостæ. Пайдакæнæджы нæмттæ фыст ысты æгæр бирæ бынæтты: бæрæггæнæнты æвæрæнты, экспорты, логты æмæ адæмы зæрдæты. Дæ бон у баивын символты регистр, фæлæ æрмæст иу хатт.</string>
   <string name="uniqueTrophies">Уникалон лæвартæ</string>
-  <string name="ownerUniqueTrophies">Уыцы лæвар у уникалон Playstrategy-ы историйы, %1$s-æй уæлдай никæмæн уыдзæн ахæм.</string>
+  <string name="ownerUniqueTrophies">Уыцы лæвар у уникалон PlayStrategy-ы историйы, %1$s-æй уæлдай никæмæн уыдзæн ахæм.</string>
   <string name="howToThreeDots">Базон, куыд...</string>
 </resources>

@@ -61,7 +61,7 @@ final private class ExplorerGame(
     Comment(
       id = Comment.Id.make,
       text = Comment.Text(s"${gameTitle(game)}, ${gameUrl(game)}"),
-      by = Comment.Author.Playstrategy
+      by = Comment.Author.PlayStrategy
     )
 
   private def gameUrl(game: Game) = s"${net.baseUrl}/${game.id}"

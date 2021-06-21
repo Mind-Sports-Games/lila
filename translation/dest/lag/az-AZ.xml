@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="isPlaystrategyLagging">Playstrategydə gecikmə var?</string>
+  <string name="isPlayStrategyLagging">PlayStrategydə gecikmə var?</string>
   <string name="measurementInProgressThreeDot">Ölçmələr davam edir...</string>
   <string name="noAndYourNetworkIsGood">Xeyr. Şəbəkəniz yaxşıdır.</string>
-  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is Playstrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Xeyr. Şəbəkəniz zəifdir.</string>
+  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is PlayStrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Xeyr. Şəbəkəniz zəifdir.</string>
   <string name="yesItWillBeFixedSoon">Bəli. Tezliklə düzəldiləcək!</string>
   <string name="andNowTheLongAnswerLagComposedOfTwoValues">Və uzun cavab! Oyun gecikməsi 2 əlaqəsiz dəyərdən ibarətdir (daha aşağı daha yaxşıdır):</string>
-  <string name="playstrategyServerLatency">Playstrategy server gecikməsi</string>
-  <string name="playstrategyServerLatencyExplanation">Serverdə bir gedişi emal etmək üçün keçən vaxt. Bu hamı üçün eynidir və yalnız server yüklənməsindən asılıdır. Daha çox oyunçu olarsa gecikmə daha yüksək olur. Ancaq Playstrategy mühəndis proqramçıları gecikməni aşağı salmaq üçün əllərindən gələni edirlər. Nadir hallarda 10 ms-dan çox olur.</string>
-  <string name="networkBetweenPlaystrategyAndYou">Playstrategy və Sizin aranızdakı şəbəkə</string>
-  <string name="networkBetweenPlaystrategyAndYouExplanation">Kompüterinizdən bir gedişi Playstrategy serverinə göndərmək və cavabı geri almaq üçün keçən vaxt. Bu, Playstrategy (Fransa) ilə aranızdakı məsafədən və internet bağlantınızın keyfiyyətindən asılıdır. Playstrategy mühəndis proqramçıları wifi və ya internet sürətinizi düzəldə bilməz.</string>
+  <string name="playstrategyServerLatency">PlayStrategy server gecikməsi</string>
+  <string name="playstrategyServerLatencyExplanation">Serverdə bir gedişi emal etmək üçün keçən vaxt. Bu hamı üçün eynidir və yalnız server yüklənməsindən asılıdır. Daha çox oyunçu olarsa gecikmə daha yüksək olur. Ancaq PlayStrategy mühəndis proqramçıları gecikməni aşağı salmaq üçün əllərindən gələni edirlər. Nadir hallarda 10 ms-dan çox olur.</string>
+  <string name="networkBetweenPlayStrategyAndYou">PlayStrategy və Sizin aranızdakı şəbəkə</string>
+  <string name="networkBetweenPlayStrategyAndYouExplanation">Kompüterinizdən bir gedişi PlayStrategy serverinə göndərmək və cavabı geri almaq üçün keçən vaxt. Bu, PlayStrategy (Fransa) ilə aranızdakı məsafədən və internet bağlantınızın keyfiyyətindən asılıdır. PlayStrategy mühəndis proqramçıları wifi və ya internet sürətinizi düzəldə bilməz.</string>
   <string name="youCanFindTheseValuesAtAnyTimeByClickingOnYourUsername">Üst sətirdəki istifadəçi adınıza klikləyərək istənilən vaxt bu dəyərləri tapa bilərsiniz.</string>
   <string name="lagCompensation">Gecikmə kompensasiyası</string>
-  <string name="lagCompensationExplanation">Playstrategy şəbəkə gecikməsini kompensasiya edir. Bu, davamlı və ara sıra yaranan gecikmələri ehtiva edir. Vaxt nəzarəti və kompensasiya edilmiş gecikməyə əsaslanan məhdudiyyətlər və evristika mövcuddur ki, nəticə də hər iki oyunçu üçün insaflı olsun. Nəticədə rəqibinizdən daha yüksək şəbəkə gecikməsinə sahib olmaq bir üstünlük deyil!</string>
+  <string name="lagCompensationExplanation">PlayStrategy şəbəkə gecikməsini kompensasiya edir. Bu, davamlı və ara sıra yaranan gecikmələri ehtiva edir. Vaxt nəzarəti və kompensasiya edilmiş gecikməyə əsaslanan məhdudiyyətlər və evristika mövcuddur ki, nəticə də hər iki oyunçu üçün insaflı olsun. Nəticədə rəqibinizdən daha yüksək şəbəkə gecikməsinə sahib olmaq bir üstünlük deyil!</string>
 </resources>

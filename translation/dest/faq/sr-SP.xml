@@ -2,17 +2,17 @@
 <resources>
   <string name="faqAbbreviation">Често постављана питања</string>
   <string name="frequentlyAskedQuestions">Често Постављана Питања</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Зашто се Личес зове Личес?</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Зашто се Личес зове Личес?</string>
   <string name="playstrategyCombinationLiveLightLibrePronounced">Личес је комбинација речи live/light/libre и chess. Изговара се %1$s.</string>
   <string name="leechess">ли-чес</string>
   <string name="hearItPronouncedBySpecialist">Послушај како то стручњак изговара.</string>
-  <string name="howCanIContributeToPlaystrategy">Како могу допринети Личесу?</string>
+  <string name="howCanIContributeToPlayStrategy">Како могу допринети Личесу?</string>
   <string name="playstrategyPoweredByDonationsAndVolunteers">Личес покрећу донације наших патрона, као и труд нашег тима волонтера.</string>
   <string name="findMoreAndSeeHowHelp">Можеш сазнати више о %1$s (укључујући и %2$s). Ако желиш помоћи Личесу волонтирајући своје време и вештине, постоје разни %3$s.</string>
   <string name="beingAPatron">бивању Патрона</string>
   <string name="breakdownOfOurCosts">поделу трошкова</string>
   <string name="otherWaysToHelp">други начини да помогнеш</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">Постоје ли други сајтови засновани на Личесу?</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">Постоје ли други сајтови засновани на Личесу?</string>
   <string name="fairPlay">Фер плеј</string>
   <string name="ratingRefundExplanation">Један минут након што је играч означен, узима се њихових последњих 40 партија у последња 3 дана. Ако си ти био један од њихових противника у тим партијама, и изгубио си рејтинг (због пораза или ремија), то добијаш свој рејтинг назад. Повраћај рејтинга је ограничен твојим максималним рејтингом и прогресом рејтинга након те партије.
   (На пример, ако ти се рејтинг драстично повећао након тих партија, ти ћеш можда добити смањен повраћај или га нећеш уопште добити). Повраћај никада неће прећи 150 поена.</string>
@@ -58,7 +58,7 @@
   <string name="threeFoldHasToBeClaimed">Играч треба најпре да укаже на понављање. Ово можеш урадити притиском на дугме које се појави, или тако што понудиш реми пре играња свог последњег понављајућег потеза. Небитно је да ли противник одбија понуду ремија јер се реми троструког понављања свеједно проглашава. Такође можеш %1$s Личес да аутоматски проглашава понављања за тебе. Такође, петострука понављања увек аутоматски забршавају партију.</string>
   <string name="configure">подесити</string>
   <string name="accounts">Налози</string>
-  <string name="titlesAvailableOnPlaystrategy">Које све титуле постоје на Личесу?</string>
+  <string name="titlesAvailableOnPlayStrategy">Које све титуле постоје на Личесу?</string>
   <string name="canIbecomeLM">Могу ли добити Личес Мастер (ЛМ) титулу?</string>
   <string name="noUpperCaseDot">Не.</string>
   <string name="lMtitleComesToYouDoNotRequestIt">Ова титула је незванична и постоји само на Личесу.
@@ -73,8 +73,8 @@
   <string name="uniqueTrophies">Уникатни трофеји</string>
   <string name="ownerUniqueTrophies">Овај трофеј је уникатан у историји Личеса, нико осим %1$s га неће имати.</string>
   <string name="playstrategyRatings">Личес рејтинзи</string>
-  <string name="whichRatingSystemUsedByPlaystrategy">Који рејтинг систем користи Личес?</string>
-  <string name="ratingSystemUsedByPlaystrategy">Рејтинзи се рачунају помоћо Глико-2 рејтинг методе коју је осмислио Марк Гликман. Ово је врло популарна метода и користи се у значајном броју шаховских организација (ФИДЕ је знаменит супротан пример јер и даље користе застарели Ело рејтинг систем).
+  <string name="whichRatingSystemUsedByPlayStrategy">Који рејтинг систем користи Личес?</string>
+  <string name="ratingSystemUsedByPlayStrategy">Рејтинзи се рачунају помоћо Глико-2 рејтинг методе коју је осмислио Марк Гликман. Ово је врло популарна метода и користи се у значајном броју шаховских организација (ФИДЕ је знаменит супротан пример јер и даље користе застарели Ело рејтинг систем).
 
 У суштини, Глико рејтинг користи \"интервале поузданости\" када рачуна и преставља твој рејтинг. Када тек почнеш користити сајт, твој рејтинг започиње на 1500 ± 700. Тбој рејтинг је 1500, а 700 представља твој интервал поузданости.
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">Paremti</string>
-  <string name="playstrategyPatron">Playstrategy Rėmėjas</string>
+  <string name="playstrategyPatron">PlayStrategy Rėmėjas</string>
   <string name="freeAccount">Nemokama paskyra</string>
-  <string name="becomePatron">Tapkite Playstrategy Rėmėju</string>
-  <string name="xBecamePatron">%s tapo Playstrategy Rėmėju</string>
+  <string name="becomePatron">Tapkite PlayStrategy Rėmėju</string>
+  <string name="xBecamePatron">%s tapo PlayStrategy Rėmėju</string>
   <string name="newPatrons">Nauji Rėmėjai</string>
   <string name="freeChess">Nemokami šachmatai visiems, visada!</string>
   <string name="noAdsNoSubs">Jokių reklamų, prenumeratų - tik atviras kodas ir aistra.</string>
@@ -13,10 +13,10 @@
   <string name="patronUntil">Jūs turite Rėmėjo paskyrą iki %s.</string>
   <string name="ifNotRenewed">Jei ji nebus atnaujinta, būsite grąžintas į nemokamą paskyrą.</string>
   <string name="weAreNonProfit">Mes esame nepelno asocijacija, nes tikime, kad visi turėtų turėti prieigą prie nemokamos, pasaulinės klasės šachmatų platformos.</string>
-  <string name="weRelyOnSupport">Norėdami tai pasiekti, mes remiamės tokių žmonių kaip jūs parama. Jei jums patinka Playstrategy, pamąstykite apie paramą mums ir tapkite Rėmėju!</string>
+  <string name="weRelyOnSupport">Norėdami tai pasiekti, mes remiamės tokių žmonių kaip jūs parama. Jei jums patinka PlayStrategy, pamąstykite apie paramą mums ir tapkite Rėmėju!</string>
   <string name="lifetime">Gyvenimui</string>
-  <string name="payLifetimeOnce">Mokėkite %s vieną kartą. Tapkite Playstrategy Rėmėju visam laikui!</string>
-  <string name="lifetimePatron">Playstrategy Rėmėjas gyvenimui</string>
+  <string name="payLifetimeOnce">Mokėkite %s vieną kartą. Tapkite PlayStrategy Rėmėju visam laikui!</string>
+  <string name="lifetimePatron">PlayStrategy Rėmėjas gyvenimui</string>
   <string name="makeExtraDonation">Suteikti dar paramos?</string>
   <string name="monthly">Kas mėnesį</string>
   <string name="recurringBilling">Pasikartojantis mokėjimas, atnaujinantis jūsų Rėmėjo sparnus kiekvieną mėnesį.</string>
@@ -27,29 +27,29 @@
   <string name="withCreditCard">Banko kortele</string>
   <string name="withPaypal">PayPal</string>
   <string name="weAreSmallTeam">Mes esame maža komanda, todėl jūsų pagalba mums labai svarbi!</string>
-  <string name="celebratedPatrons">Mūsų gerbiami Rėmėjai, kurie leidžia gyvuoti Playstrategy</string>
+  <string name="celebratedPatrons">Mūsų gerbiami Rėmėjai, kurie leidžia gyvuoti PlayStrategy</string>
   <string name="whereMoneyGoes">Kur eina pinigai?</string>
   <string name="serversAndDeveloper">Visų pirma - galingiems serveriams.
-Po to sumokame pilno etato programuotojui ir Playstrategy įkūrėjui: %s.</string>
+Po to sumokame pilno etato programuotojui ir PlayStrategy įkūrėjui: %s.</string>
   <string name="costBreakdown">Peržiūrėti detalų išrašą</string>
-  <string name="officialNonProfit">Ar Playstrategy oficialiai nepelno kompanija?</string>
+  <string name="officialNonProfit">Ar PlayStrategy oficialiai nepelno kompanija?</string>
   <string name="actOfCreation">Taip, štai sukūrimo aktas (prancūzų kalba)</string>
   <string name="changeMonthlySupport">Ar galiu pakeisti/atšaukti savo mėnesinę paramą?</string>
   <string name="changeOrContact">Taip, bet kuriuo laiku iš šio puslapio.
 Arba galite %s.</string>
-  <string name="contactSupport">susisiekti su Playstrategy pagalba</string>
+  <string name="contactSupport">susisiekti su PlayStrategy pagalba</string>
   <string name="otherMethods">Kiti būdai paremti?</string>
   <string name="bankTransfers">Mes taip pat priimame banko pervedimus</string>
   <string name="bitcoin">Štai mūsų Bitcoin adresas: %s</string>
   <string name="patronFeatures">Ar yra funkcijų, kurios prieinamos tik Rėmėjams?</string>
-  <string name="noPatronFeatures">Ne, kadangi Playstrategy visiškai ir visada nemokamas ir visiems. Tai yra mūsų pažadas.
+  <string name="noPatronFeatures">Ne, kadangi PlayStrategy visiškai ir visada nemokamas ir visiems. Tai yra mūsų pažadas.
 Tačiau Rėmėjai gauna pagyrų teises ir šaunią naują profilio piktogramą.</string>
   <string name="featuresComparison">Peržiūrėkite detalų funkcijų palyginimą</string>
   <plurals name="patronForMonths">
-    <item quantity="one">Playstrategy Rėmėjas vieną mėnesį</item>
-    <item quantity="few">Playstrategy Rėmėjas %s mėnesius</item>
-    <item quantity="many">Playstrategy Rėmėjas %s mėnesio</item>
-    <item quantity="other">Playstrategy rėmėjas %s mėnesių</item>
+    <item quantity="one">PlayStrategy Rėmėjas vieną mėnesį</item>
+    <item quantity="few">PlayStrategy Rėmėjas %s mėnesius</item>
+    <item quantity="many">PlayStrategy Rėmėjas %s mėnesio</item>
+    <item quantity="other">PlayStrategy rėmėjas %s mėnesių</item>
   </plurals>
   <string name="youSupportWith">Jūs remiate playstrategy.org %s per mėnesį.</string>
   <string name="tyvm">Dekojame už pagalbą. Jūs šauniausias!</string>
@@ -61,18 +61,18 @@ Tačiau Rėmėjai gauna pagyrų teises ir šaunią naują profilio piktogramą.<
   <string name="changeMonthlyAmount">Pakeisti mėnesinį kiekį (%s)</string>
   <string name="cancelSupport">atšaukti savo pagalbą</string>
   <string name="xOrY">%1$s arba %2$s</string>
-  <string name="decideHowMuch">Nuspręskite, kiek jums vertas Playstrategy:</string>
+  <string name="decideHowMuch">Nuspręskite, kiek jums vertas PlayStrategy:</string>
   <string name="stopPayments">Pašalinti savo kortelę ir sustabdyti mokėjimus:</string>
-  <string name="noLongerSupport">Daugiau neberemti Playstrategy</string>
+  <string name="noLongerSupport">Daugiau neberemti PlayStrategy</string>
   <string name="paymentHistory">Mokėjimų istorija</string>
   <string name="paid">Mokėta</string>
-  <string name="viewOthers">Peržiūrėti kitus Playstrategy rėmėjus</string>
+  <string name="viewOthers">Peržiūrėti kitus PlayStrategy rėmėjus</string>
   <string name="date">Data</string>
   <string name="amount">Suma</string>
   <string name="transactionCompleted">Jūsų pervedimas buvo atliktas, dovanos sąskaita jums buvo išsiųsta el. paštu.</string>
   <string name="permanentPatron">Dabar visam laikui turite rėmėjo paskyrą.</string>
   <string name="checkOutProfile">Patikrinkite savo profilio puslapį!</string>
-  <string name="nowLifetime">Jūs esate Playstrategy rėmėjas visam gyvenimui!</string>
-  <string name="nowOneMonth">Jūs esate Playstrategy rėmėjas vienam mėnesiui!</string>
-  <string name="downgradeNextMonth">Po mėnesio pinigai nebus nuskaityti dar kartą ir jūsų Playstrategy paskyra atsistatys į įprastą.</string>
+  <string name="nowLifetime">Jūs esate PlayStrategy rėmėjas visam gyvenimui!</string>
+  <string name="nowOneMonth">Jūs esate PlayStrategy rėmėjas vienam mėnesiui!</string>
+  <string name="downgradeNextMonth">Po mėnesio pinigai nebus nuskaityti dar kartą ir jūsų PlayStrategy paskyra atsistatys į įprastą.</string>
 </resources>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="playstrategyClasses">Klassid</string>
-  <string name="teachClassesOfChessStudents">Õpeta klassitäit maleõpilasi Playstrategyi Klassid tööriistaga.</string>
+  <string name="teachClassesOfChessStudents">Õpeta klassitäit maleõpilasi PlayStrategyi Klassid tööriistaga.</string>
   <string name="features">Funktsioonid</string>
   <string name="quicklyGenerateSafeUsernames">Loo kiiresti turvalised kasutajanimed ja salasõnad oma õpilastele</string>
   <string name="trackStudentProgress">Jälgi õpilaste edenemist mängudes ja ülesannetes</string>
   <string name="messageAllStudents">Teavita kõiki õpilasi uuest materjalist klassis</string>
   <string name="freeForAllForever">100% kõigile tasuta, igavesti, reklaamivaba ja jälitamiseta</string>
-  <string name="applyToBePlaystrategyTeacher">Kandideeri Playstrategyi õpetajaks</string>
+  <string name="applyToBePlayStrategyTeacher">Kandideeri PlayStrategyi õpetajaks</string>
   <string name="noClassesYet">Hetkel pole ühtegi klassi.</string>
   <string name="teachersX">Õpetajad: %s</string>
   <string name="newClass">Uus klass</string>
@@ -23,7 +23,7 @@
   <string name="classDescription">Klassi kirjeldus</string>
   <string name="visibleByBothStudentsAndTeachers">Nähtav õpetajatele kui ka selle klassi õpilastele</string>
   <string name="teachersOfTheClass">Klassi õpetajad</string>
-  <string name="addPlaystrategyUsernames">Lisa Playstrategyi kasutajanimed, et neid kutsuda õpetajaks. Ainult üks rea kohta.</string>
+  <string name="addPlayStrategyUsernames">Lisa PlayStrategyi kasutajanimed, et neid kutsuda õpetajaks. Ainult üks rea kohta.</string>
   <string name="resetPassword">Uus parool</string>
   <string name="makeSureToCopy">Kopeeri või kirjuta oma parool kuhugi ülesse. Seda ei saa uuesti vaadata!</string>
   <string name="passwordX">Parool: %s</string>
@@ -32,21 +32,21 @@
   <string name="realName">Päris nimi</string>
   <string name="privateWillNeverBeShown">Privaatne. Pole nähtav väljaspool klassi. Aitab jätta meelde kes see õpilane on.</string>
   <string name="addStudent">Lisa õpilane</string>
-  <string name="playstrategyProfileXCreatedForY">Playstrategyi profiil %1$s on tehtud %2$s jaoks.</string>
+  <string name="playstrategyProfileXCreatedForY">PlayStrategyi profiil %1$s on tehtud %2$s jaoks.</string>
   <string name="studentCredentials">Õpilane: %1$s
 Kasutajanimi: %2$s
 Parool: %3$s</string>
-  <string name="inviteAPlaystrategyAccount">Kutsu Playstrategyi kasutaja</string>
-  <string name="inviteDesc1">Kui õpilasel on juba Playstrategyi kasutaja siis sa saad neid kutsuda klassi.</string>
-  <string name="inviteDesc2">Nad saavad Playstrategyis kirja, kus on link klassi juurde.</string>
+  <string name="inviteAPlayStrategyAccount">Kutsu PlayStrategyi kasutaja</string>
+  <string name="inviteDesc1">Kui õpilasel on juba PlayStrategyi kasutaja siis sa saad neid kutsuda klassi.</string>
+  <string name="inviteDesc2">Nad saavad PlayStrategyis kirja, kus on link klassi juurde.</string>
   <string name="inviteDesc3">Tähtis: ainult kutsu õpilasi keda sa tunned ja kes tahavad ühineda klassiga.</string>
   <string name="inviteDesc4">Ära saada soovimatuid kutseid suvalistele mängijatele.</string>
-  <string name="createANewPlaystrategyAccount">Loo uus Playstrategyi konto</string>
-  <string name="createDesc1">Kui õpilasel pole veel Playstrategyi kasutajat siis saad selle neile teha.</string>
+  <string name="createANewPlayStrategyAccount">Loo uus PlayStrategyi konto</string>
+  <string name="createDesc1">Kui õpilasel pole veel PlayStrategyi kasutajat siis saad selle neile teha.</string>
   <string name="createDesc2">Emaili pole vaja. Parool luuakse ja sa pead selle edastama õpilasele, et nad saaks sisse logida.</string>
   <string name="createDesc3">Tähtis: õpilasel ei tohi olla mitu kasutajat.</string>
   <string name="createDesc4">Kui neil juba on kasutaja, siis kasuta vormi nende kutsumiseks.</string>
-  <string name="playstrategyUsername">Playstrategyi kasutajanimi</string>
+  <string name="playstrategyUsername">PlayStrategyi kasutajanimi</string>
   <string name="generateANewUsername">Loo uus kasutajanimi</string>
   <string name="welcomeToClass">Tere tulemast sinu klassi: %s.
 Siin on link klassi sisenemiseks.</string>
