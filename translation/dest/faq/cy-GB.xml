@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Pam mae Playstrategy yn cael ei alw\'n Playstrategy?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">Mae Playstrategy yn gyfuniad o \"live/light/libre\" a \"chess\". Mae\'n cael ei ddatganu fel %1$s.</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Pam mae PlayStrategy yn cael ei alw\'n PlayStrategy?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">Mae PlayStrategy yn gyfuniad o \"live/light/libre\" a \"chess\". Mae\'n cael ei ddatganu fel %1$s.</string>
   <string name="leechess">lee-chess</string>
   <string name="hearItPronouncedBySpecialist">Clywed fe\'n cael ei ddweud gan arbenigwr.</string>
   <string name="positions">safleoedd</string>
@@ -9,6 +9,6 @@
   <string name="accounts">Cyfrifau</string>
   <string name="noUpperCaseDot">Na.</string>
   <string name="guidelines">canllawiau</string>
-  <string name="playstrategyRatings">Gradd Playstrategy</string>
+  <string name="playstrategyRatings">Gradd PlayStrategy</string>
   <string name="howToThreeDots">Sut i...</string>
 </resources>

@@ -21,7 +21,7 @@ object editor {
         jsModule("editor"),
         embedJsUnsafeLoadThen(
           s"""const data=${safeJsonValue(bits.jsData(sit, fen))};data.positions=$positionsJson;
-PlaystrategyEditor(document.getElementById('board-editor'), data);"""
+PlayStrategyEditor(document.getElementById('board-editor'), data);"""
         )
       ),
       moreCss = cssTag("editor"),

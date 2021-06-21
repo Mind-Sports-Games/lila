@@ -20,6 +20,6 @@ package round {
 
   sealed trait OnTv
 
-  case class OnPlaystrategyTv(channel: String, flip: Boolean) extends OnTv
+  case class OnPlayStrategyTv(channel: String, flip: Boolean) extends OnTv
   case class OnUserTv(userId: String)                    extends OnTv
 }

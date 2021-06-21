@@ -254,7 +254,7 @@
   </plurals>
   <string name="exportGames">Allforio</string>
   <string name="ratingRange">Graddfa rhwng</string>
-  <string name="thisAccountViolatedTos">Mae\'r defnyddiwr y cyfrif yma wedi torri termau defnyddio Playstrategy</string>
+  <string name="thisAccountViolatedTos">Mae\'r defnyddiwr y cyfrif yma wedi torri termau defnyddio PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Porwr agoriadau &amp; bas tabl diweddglo</string>
   <string name="takeback">Cymryd yn ôl</string>
   <string name="proposeATakeback">Awgrymu cymryd yn ôl</string>
@@ -390,8 +390,8 @@
   <string name="thankYou">Diolch yn fawr!</string>
   <string name="socialMediaLinks">Dolenni cyfryngau cymdeithasol</string>
   <string name="inlineNotation">Nodiant mewnlin</string>
-  <string name="watchPlaystrategyTV">Gwylio ar playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Ar Playstrategy TV yn barod</string>
+  <string name="watchPlayStrategyTV">Gwylio ar playstrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Ar PlayStrategy TV yn barod</string>
   <string name="onlinePlayers">Chwarewyr ar-lein</string>
   <string name="activeToday">Gweithredol heddiw</string>
   <string name="activePlayers">Chwaraewyr gweithredol</string>
@@ -484,7 +484,7 @@
   <string name="clock">Cloc</string>
   <string name="unauthorizedError">Dim mynediad.</string>
   <string name="noInternetConnection">Dim cysylltiad i\'r rhyngrwyd. Gellwch chwarae all-lein o\'r ddewislen.</string>
-  <string name="connectedToPlaystrategy">Rydych â chysylltiad â playstrategy.org rwan</string>
+  <string name="connectedToPlayStrategy">Rydych â chysylltiad â playstrategy.org rwan</string>
   <string name="signedOut">Allgofnodioch</string>
   <string name="loginSuccessful">Mewngofnodioch</string>
   <string name="playOnTheBoardOffline">Dros y bwrdd</string>
@@ -585,8 +585,8 @@
   <string name="weHaveSentYouAnEmailTo">Anfonwyd neges e-bost at %s. Cliciwch ar y dolen yn y neges i ailosod eich cyfrinair.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Gan gofrestru, ydych yn cytuno ar ein %s.</string>
   <string name="readAboutOur">Darllenwch am ein %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Oediad rhwng playstrategy a chi</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Amser sydd angen i brosesu symudiad ar weinydd playstrategy</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Oediad rhwng playstrategy a chi</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Amser sydd angen i brosesu symudiad ar weinydd playstrategy</string>
   <string name="downloadAnnotated">Llwytho i lawr gan sylwadau</string>
   <string name="downloadRaw">Llwytho i lawr heb sylwadau</string>
   <string name="downloadImported">Lwytho i lawr gêm wedi\'i mewnforio</string>
@@ -602,7 +602,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Cyfeiriad wedi\'i cofrestru yn barod: %s</string>
   <string name="kidMode">Dull plentyn</string>
   <string name="kidModeExplanation">Mewn modd plant, fydd cyfathrebu wedi ei analluogi. Defnyddiwch y modd yma ar gyfer plant a disgyblion ysgol i\'w hamddiffyn rhag defnyddwyr eraill o\'r rhyngrwyd.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Pan mewn modd plant, fydd eicon %s ar logo playstrategy, fel y byddwch yn gwybod fod eich plant yn saff.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Pan mewn modd plant, fydd eicon %s ar logo playstrategy, fel y byddwch yn gwybod fod eich plant yn saff.</string>
   <string name="enableKidMode">Galluogi modd plant</string>
   <string name="disableKidMode">Analluogi modd plant</string>
   <string name="security">Diogelwch</string>
@@ -610,7 +610,7 @@
   <string name="alternativelyYouCanX">Fel arall gallwch %s.</string>
   <string name="revokeAllSessions">dirymu pob sesiwn</string>
   <string name="playChessEverywhere">Chwarae gwyddbwyll ym mhobman</string>
-  <string name="asFreeAsPlaystrategy">Yn ddi-dâl fel playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Yn ddi-dâl fel playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Wedi\'i wneud am gariad gwyddbwyll, nid arian</string>
   <string name="everybodyGetsAllFeaturesForFree">Caiff pawb popeth am ddim</string>
   <string name="zeroAdvertisement">Dim hysbyseb</string>
@@ -646,8 +646,8 @@
   <string name="usernameSuffixInvalid">Rhaid i\'r enw defnyddiwr orffen efo rhif neu lythyren.</string>
   <string name="usernameCharsInvalid">Gall enw\'r defnyddiwr dim ond cynnwys llythrennu, rhifau, tanlinellai, a chysylltnodau. Ni chaniatáu cael tanlinellai neu gysylltnodau dilynol.</string>
   <string name="usernameUnacceptable">Nid yw enw defnyddiwr hwn yn dderbyniol.</string>
-  <string name="directlySupportPlaystrategy">Cefnogwch Playstrategy yn uniongyrchol</string>
-  <string name="playChessInStyle">Edrychwch yn swanc efo Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Cefnogwch PlayStrategy yn uniongyrchol</string>
+  <string name="playChessInStyle">Edrychwch yn swanc efo PlayStrategy</string>
   <string name="chessBasics">Hanfodion gwyddbwyll</string>
   <string name="coaches">Hyfforddwyr</string>
   <string name="invalidPgn">PGN anilys</string>
@@ -707,7 +707,7 @@
   <string name="agreementAssistance">Rwy\'n cytuno byddai\'n byth cael unrhyw cymorth yn ystod chwarae gem (wrth gyfrifiadur gwyddbwyll, llyfr, cronfa ddata neu berson arall).</string>
   <string name="agreementNice">Rwy\'n cytuno byddai\'n wastad yn barchus i chwaraewyr eraill.</string>
   <string name="agreementAccount">Rwy\'n cytuno byddai ddim creu cyfrifau lluosol.</string>
-  <string name="agreementPolicy">Rwy\'n cytuno byddai’n dilyn pob polisi Playstrategy.</string>
+  <string name="agreementPolicy">Rwy\'n cytuno byddai’n dilyn pob polisi PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Edrych am neu ddechrau sgwrs newydd</string>
   <string name="edit">Addasu</string>
   <string name="rapid">Chwim</string>

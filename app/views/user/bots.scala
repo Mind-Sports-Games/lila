@@ -37,7 +37,7 @@ object bots {
                     cls := "bots__about",
                     href := "https://lichess.org/blog/WvDNticAAMu_mHKP/welcome-lichess-bots"
                   )(
-                    "About Playstrategy Bots"
+                    "About PlayStrategy Bots"
                   )
                 ),
                 botTable(all)

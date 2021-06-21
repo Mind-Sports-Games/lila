@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Potvrďte svoj účet na playstrategy.org, %s</string>
-  <string name="emailConfirm_click">Kliknite na tento odkaz pre potvrdenie vášho Playstrategy účtu:</string>
-  <string name="emailConfirm_ignore">Ak ste sa nezaregistrovali na Playstrategy, ignorujte tento e-mail.</string>
+  <string name="emailConfirm_click">Kliknite na tento odkaz pre potvrdenie vášho PlayStrategy účtu:</string>
+  <string name="emailConfirm_ignore">Ak ste sa nezaregistrovali na PlayStrategy, ignorujte tento e-mail.</string>
   <string name="passwordReset_subject">Obnovte si vaše playstrategy.org heslo, %s</string>
   <string name="passwordReset_intro">Obdržali sme žiadosť na obnovenie hesla k Vášmu účtu.</string>
   <string name="passwordReset_clickOrIgnore">Ak ste vytvorili túto požiadavku, kliknite na odkaz nižšie. Ak nie, môžete ignorovať tento email.</string>
@@ -15,7 +15,7 @@
 Tu nájdete stránku s Vašim profilom: %1$s. Prispôsobiť si ho môžete na %2$s.
 
 Prajeme Vám veľa zábavy a nech si Vaše figúrky vždy nájdu cestu k súperovmu kráľovi!</string>
-  <string name="logInToPlaystrategy">Prihláste sa do playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Prihláste sa do playstrategy.org, %s</string>
   <string name="common_orPaste">(Odkaz nefunguje? Skúste ho skopírovať do vášho prehliadača!)</string>
   <string name="common_note">Toto je automatický e-mail súvisiaci s Vašim využívaním %s.</string>
   <string name="common_contact">Ak si nás želáte kontaktovať, použite prosím %s.</string>

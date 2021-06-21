@@ -259,7 +259,7 @@ object home {
       i("?"),
       p(
         strong("What about other tournament systems?"),
-        "We don't plan to add more tournament systems to Playstrategy at the moment."
+        "We don't plan to add more tournament systems to PlayStrategy at the moment."
       )
     )
   )

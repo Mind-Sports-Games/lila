@@ -286,7 +286,7 @@
     <item quantity="one">Segundo %s eman</item>
     <item quantity="other">%s segundo eman</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Kontu honek Playstrategyen Erabilera Baldintzak urratu egin ditu</string>
+  <string name="thisAccountViolatedTos">Kontu honek PlayStrategyen Erabilera Baldintzak urratu egin ditu</string>
   <string name="openingExplorerAndTablebase">Hasiera arakatzailea &amp; finalen datu-basea</string>
   <string name="takeback">Jokaldia atzera egin</string>
   <string name="proposeATakeback">Jokaldia atzera egiteko eskatu</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Eskerrik asko!</string>
   <string name="socialMediaLinks">Sare sozialen loturak</string>
   <string name="inlineNotation">Lerroarteko oharrak</string>
-  <string name="watchPlaystrategyTV">Playstrategy TV Ikusi</string>
-  <string name="previouslyOnPlaystrategyTV">Aurreko Playstrategy TV saioak</string>
+  <string name="watchPlayStrategyTV">PlayStrategy TV Ikusi</string>
+  <string name="previouslyOnPlayStrategyTV">Aurreko PlayStrategy TV saioak</string>
   <string name="onlinePlayers">Konektatutako jokalariak</string>
   <string name="activeToday">Gaurko aktiboak</string>
   <string name="activePlayers">Jokalari aktiboak</string>
@@ -567,7 +567,7 @@
   <string name="clock">Erlojua</string>
   <string name="unauthorizedError">Ez baimendutako sarbidea</string>
   <string name="noInternetConnection">Ez dago internet konexiorik. Offine ere jokatu dezakezu.</string>
-  <string name="connectedToPlaystrategy">Playstrategy.org-era konektatuta</string>
+  <string name="connectedToPlayStrategy">PlayStrategy.org-era konektatuta</string>
   <string name="signedOut">Deskonektatuta</string>
   <string name="loginSuccessful">Konektatuta</string>
   <string name="playOnTheBoardOffline">Taulan</string>
@@ -612,7 +612,7 @@
   <string name="aboutX">%s-i buruz</string>
   <string name="xIsAFreeYLibreOpenSourceChessServer">%1$s doako (%2$s), libre, iragarki-gabeko eta kode irekiko xake zerbitzaria da.</string>
   <string name="really">benetan</string>
-  <string name="contribute">Playstrategyi lagundu</string>
+  <string name="contribute">PlayStrategyi lagundu</string>
   <string name="termsOfService">ToS</string>
   <string name="sourceCode">Iturburu kodea</string>
   <string name="simultaneousExhibitions">Aldibereko partidak</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Fischer erloju doikuntza. Zenbat eta jokalari gehiagoren aurka jokatua,  are denbora gehiago behar izango duzu</string>
   <string name="simulAddExtraTime">Aldibereko partidetan aritu ahal izateko, agian  denbora gehiago gehitu beharko diozu zure erlojuari</string>
   <string name="simulHostExtraTime">Denbora gehitu erlojuan</string>
-  <string name="playstrategyTournaments">Playstrategy txapelketak</string>
+  <string name="playstrategyTournaments">PlayStrategy txapelketak</string>
   <string name="tournamentFAQ">Arena txapelketaren ohiko galderak</string>
   <string name="tournamentOfficial">Ofiziala</string>
   <string name="timeBeforeTournamentStarts">Txapelketa hasteko denbora</string>
@@ -669,8 +669,8 @@
   <string name="weHaveSentYouAnEmailTo">Mezu bat bidali dugu %s helbidera. Egizu klik mezuan zure pasahitza berrizteko.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Izena ematean, gure %s onartzen dituzu.</string>
   <string name="readAboutOur">Irakurri gure %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Sarearen atzerapena Playstrategyen eta zure artean</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Playstrategy zerbitzariak jokaldi bat egiteko denbora</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Sarearen atzerapena PlayStrategyen eta zure artean</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">PlayStrategy zerbitzariak jokaldi bat egiteko denbora</string>
   <string name="downloadAnnotated">Oharrekin jaitsi</string>
   <string name="downloadRaw">Oharrik gabe jaitsi</string>
   <string name="downloadImported">Igo zen moduan jaitsi</string>
@@ -687,7 +687,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Email hau erregistratu duzu dagoeneko: %s</string>
   <string name="kidMode">Haurren modua</string>
   <string name="kidModeExplanation">Hau segurtasunari buruzkoa da. Haurren moduan, webguneko komunikazio guztiak desaktibatuta daude. Aktibatu zure haur eta ikasleei beste Internet erabiltzaileengandik babesteko.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Haurren moduan, playstrategy logoak %s ikonoa du, haurrak seguru daudela jakin dezazun.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Haurren moduan, playstrategy logoak %s ikonoa du, haurrak seguru daudela jakin dezazun.</string>
   <string name="enableKidMode">Haurren modua aktibatu</string>
   <string name="disableKidMode">Haurren modua desaktibatu</string>
   <string name="security">Segurtasuna</string>
@@ -695,7 +695,7 @@
   <string name="alternativelyYouCanX">Gainera %s ditzakezu.</string>
   <string name="revokeAllSessions">sesio guztiak itxi</string>
   <string name="playChessEverywhere">Jokatu xakean, nonnahi</string>
-  <string name="asFreeAsPlaystrategy">Debalde, playstrategy bezala</string>
+  <string name="asFreeAsPlayStrategy">Debalde, playstrategy bezala</string>
   <string name="builtForTheLoveOfChessNotMoney">Xakea maite dugulako sortuta, ez diruagatik.</string>
   <string name="everybodyGetsAllFeaturesForFree">Ezaugarri guztiak eskuragarri, dohain.</string>
   <string name="zeroAdvertisement">Publizitaterik gabe</string>
@@ -735,7 +735,7 @@
   <string name="usernameSuffixInvalid">Erabiltzaile izena hizki edo zenbaki batekin bukatu behar da.</string>
   <string name="usernameCharsInvalid">Erabiltzaile izenak hizkiak, zenbakiak, azpiko marrak eta gidoiak bakarrik izan ditzake.</string>
   <string name="usernameUnacceptable">Erabiltzaile hori ezin da erabili.</string>
-  <string name="directlySupportPlaystrategy">Playstrategy zuzenean lagundu</string>
+  <string name="directlySupportPlayStrategy">PlayStrategy zuzenean lagundu</string>
   <string name="playChessInStyle">Xakean estiloarekin jokatu</string>
   <string name="chessBasics">Oinarrizko xakea</string>
   <string name="coaches">Entrenatzaileak</string>
@@ -822,7 +822,7 @@
   <string name="agreementAssistance">Nire partidetan ez dut inoiz laguntzarik jasoko (ordenagailuak, liburua, datu-base bat edo beste pertsona bat).</string>
   <string name="agreementNice">Atsegina izango naiz beste jokalariekin.</string>
   <string name="agreementAccount">Ez dut erabiltzaile bat baino gehiago sortuko.</string>
-  <string name="agreementPolicy">Playstrategyek ezarritako politikak beteko ditut.</string>
+  <string name="agreementPolicy">PlayStrategyek ezarritako politikak beteko ditut.</string>
   <string name="searchOrStartNewDiscussion">Hizketaldia bilatu edo berria hasi</string>
   <string name="edit">Aldatu</string>
   <string name="rapid">Aktiboa</string>
@@ -857,12 +857,12 @@
   <string name="congratsYouWon">Zorionak, irabazi egin duzu!</string>
   <string name="gameVsX">%1$s jokalarien aurkako partida</string>
   <string name="resVsX">%1$s vs. %2$s</string>
-  <string name="youJustBecamePatron">Playstrategy babesle bihurtu zara.</string>
+  <string name="youJustBecamePatron">PlayStrategy babesle bihurtu zara.</string>
   <string name="patronAccountExpired">Babesle kontua iraungi egin da</string>
   <string name="pleaseReconsiderRenewIt">Berritzea aztertu ezazu!</string>
   <string name="someoneReviewedYourCoachProfile">Entrenatzaile profila norbaitek errebisatu du.</string>
   <string name="newPendingReview">Berrikusketa berri egiteke</string>
-  <string name="lostAgainstTOSViolator">Playstrategyen Erabilpen Baldintzak urratu dituen baten aurka galdu duzu</string>
+  <string name="lostAgainstTOSViolator">PlayStrategyen Erabilpen Baldintzak urratu dituen baten aurka galdu duzu</string>
   <string name="refundXpointsTimeControlY">Itzulketa: %1$s %2$s puntu.</string>
   <string name="timeAlmostUp">Denbora ia agortu da!</string>
   <string name="clickToRevealEmailAddress">[Egin klik eposta helbidea erakusteko]</string>

@@ -58,8 +58,8 @@ function whatNext(ctrl) {
     m('p', ctrl.trans.noarg('youKnowHowToPlayChess')),
     m('div.categ_stages', [
       userId
-        ? makeStage('/@/' + userId, 'beams-aura', 'register', 'getAFreePlaystrategyAccount', true)
-        : makeStage('/signup', 'beams-aura', 'register', 'getAFreePlaystrategyAccount'),
+        ? makeStage('/@/' + userId, 'beams-aura', 'register', 'getAFreePlayStrategyAccount', true)
+        : makeStage('/signup', 'beams-aura', 'register', 'getAFreePlayStrategyAccount'),
       makeStage('/practice', 'robot-golem', 'practice', 'learnCommonChessPositions'),
       makeStage('/training', 'bullseye', 'puzzles', 'exerciseYourTacticalSkills'),
       makeStage('/video', 'tied-scroll', 'videos', 'watchInstructiveChessVideos'),

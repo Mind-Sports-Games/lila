@@ -40,7 +40,7 @@
   <string name="bankTransfers">Такође прихватамо банковне трансфере</string>
   <string name="bitcoin">А ево и наше биткоин адресе: %s</string>
   <string name="patronFeatures">Да ли су неке могућности дозвољене само Патронима?</string>
-  <string name="noPatronFeatures">Не, јер је Playstrategy потпуно бесплатан, заувек и за све. То је обећање.
+  <string name="noPatronFeatures">Не, јер је PlayStrategy потпуно бесплатан, заувек и за све. То је обећање.
 Ипак, Патрони добијају права да се хвале својом новом кул иконом на профилу.</string>
   <string name="featuresComparison">Погледај детаљно поређење могућности</string>
   <plurals name="patronForMonths">

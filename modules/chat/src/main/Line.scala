@@ -33,7 +33,7 @@ case class UserLine(
 
   def isVisible = !troll && !deleted
 
-  def isPlaystrategy = userId == User.playstrategyId
+  def isPlayStrategy = userId == User.playstrategyId
 }
 case class PlayerLine(
     color: Color,

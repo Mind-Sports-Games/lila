@@ -61,7 +61,7 @@ object topnav {
       st.section(
         linkTitle(routes.Tv.index.path, trans.watch()),
         div(role := "group")(
-          a(href := routes.Tv.index)("Playstrategy TV"),
+          a(href := routes.Tv.index)("PlayStrategy TV"),
           a(href := routes.Tv.games)(trans.currentGames()),
           ctx.noKid option a(href := routes.Streamer.index())(trans.streamersMenu()),
           //a(href := routes.RelayTour.index())(trans.broadcast.broadcasts()),

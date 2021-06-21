@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Playstrategy emiteri</string>
-  <string name="playstrategyStreamer">Playstrategy emiter</string>
+  <string name="playstrategyStreamers">PlayStrategy emiteri</string>
+  <string name="playstrategyStreamer">PlayStrategy emiter</string>
   <string name="live">UŽIVO!</string>
   <string name="offline">NIJE NA MREŽI</string>
   <string name="currentlyStreaming">Trenutno prenosi: %s</string>
   <string name="lastStream">Posljednji prijenos uživo %s</string>
-  <string name="becomeStreamer">Postanite Playstrategy emiter</string>
+  <string name="becomeStreamer">Postanite PlayStrategy emiter</string>
   <string name="doYouHaveStream">Imate li Twitch ili YouTube korisnički račun?</string>
   <string name="hereWeGo">Idemo!</string>
   <string name="allStreamers">Svi emiteri</string>
@@ -15,27 +15,27 @@
   <string name="downloadKit">Preuzmite paket alata za emitere</string>
   <string name="xIsStreaming">%s prenosi</string>
   <string name="rules">Pravila emitiranja</string>
-  <string name="rule1">Uključite ključnu riječ \"playstrategy.org\" u naslov i koristite kategoriju \"šah\" kada emitirate na Playstrategy-u.</string>
-  <string name="rule2">Uklonite ključnu riječ kada emitirate sadržaj koji nije vezan za Playstrategy.</string>
-  <string name="rule3">Playstrategy će automatski otkriti Vaše emitiranje i omogućiti sljedeće prednosti:</string>
+  <string name="rule1">Uključite ključnu riječ \"playstrategy.org\" u naslov i koristite kategoriju \"šah\" kada emitirate na PlayStrategy-u.</string>
+  <string name="rule2">Uklonite ključnu riječ kada emitirate sadržaj koji nije vezan za PlayStrategy.</string>
+  <string name="rule3">PlayStrategy će automatski otkriti Vaše emitiranje i omogućiti sljedeće prednosti:</string>
   <string name="perks">Prednosti emitiranja sa ključnom riječi</string>
-  <string name="perk1">Dobiti ćete vatrenu ikonicu emitera na svom Playstrategy profilu.</string>
+  <string name="perk1">Dobiti ćete vatrenu ikonicu emitera na svom PlayStrategy profilu.</string>
   <string name="perk2">Probiti ćete se na vrh liste emitera.</string>
-  <string name="perk3">Obavjestite svoje Playstrategy pratioce.</string>
+  <string name="perk3">Obavjestite svoje PlayStrategy pratioce.</string>
   <string name="perk4">Pokažite svoj kanal za emitiranje u svojim igrama, turnirima i studijama.</string>
   <string name="approved">Vaš kanal za emitiranje je odobren.</string>
   <string name="pendingReview">Moderatori pregledavaju Vaš kanal za emitiranje.</string>
   <string name="pleaseFillIn">Molimo Vas da popunite Vaše informacije o emiteru i da stavite Vašu sliku.</string>
-  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Kada budete spremni da budete izlistani kao Playstrategy emiter, %s</string>
-  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a Playstrategy streamer, request a moderator review&quot;">zatražite pregled moderatora</string>
+  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Kada budete spremni da budete izlistani kao PlayStrategy emiter, %s</string>
+  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a PlayStrategy streamer, request a moderator review&quot;">zatražite pregled moderatora</string>
   <string name="anotherLanguage">Ako Vaše emitiranje nije na engleskom nego na nekom drugom jeziku, na početku naslova Vašeg emitiranja uključite ispravnu oznaku jezika (%s), zatvorenu u kvadratne zagrade.
 Na primjer, navedite \"[RU]\" za ruski, \"[TR]\" za turski, \"[FR]\" za francuski, itd.
-Stavite ovu oznaku jezika na Twitch ili YouTube stranicu, a ne u postavkama za Playstrategy emiterski kanal.
+Stavite ovu oznaku jezika na Twitch ili YouTube stranicu, a ne u postavkama za PlayStrategy emiterski kanal.
 Ako je Vaše emitiranje na engleskom jeziku, onda nema potrebe da dodate oznaku za jezik.</string>
   <string name="twitchUsername">Vaše Twitch korisničko ime ili poveznica</string>
   <string name="optionalOrEmpty">Neobavezno. Ostavite prazno ako ga nemate</string>
   <string name="youtubeChannel">ID Vašeg YouTube kanala ili poveznica</string>
-  <string name="streamerName">Ime Vašeg Playstrategy kanala emitiranja</string>
+  <string name="streamerName">Ime Vašeg PlayStrategy kanala emitiranja</string>
   <plurals name="keepItShort">
     <item quantity="one">Neka bude kratko: najviše %s slovo</item>
     <item quantity="few">Neka bude kratko: najviše %s slova</item>
@@ -54,6 +54,6 @@ Ako je Vaše emitiranje na engleskom jeziku, onda nema potrebe da dodate oznaku 
   <string name="installBlocker">Instalirajte zaštitu protiv zlonamjernog softvera!</string>
   <string name="beSafe">Zaštitite se od oglasa i tragača
 koji su preplavili Twitch i YouTube.
-Playstrategy preporučuje uBlock Origin
+PlayStrategy preporučuje uBlock Origin
 besplatni alat otvorenog koda.</string>
 </resources>

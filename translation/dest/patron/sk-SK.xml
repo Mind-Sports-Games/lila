@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">Prispieť</string>
-  <string name="playstrategyPatron">Playstrategy Patrón</string>
+  <string name="playstrategyPatron">PlayStrategy Patrón</string>
   <string name="freeAccount">Účet zdarma</string>
-  <string name="becomePatron">Staňte sa Playstrategy Patrónom</string>
-  <string name="xBecamePatron">%s sa stal Playstrategy Patronom</string>
+  <string name="becomePatron">Staňte sa PlayStrategy Patrónom</string>
+  <string name="xBecamePatron">%s sa stal PlayStrategy Patronom</string>
   <string name="newPatrons">Noví Patróni</string>
   <string name="freeChess">Šach zdarma pre všetkých, navždy!</string>
   <string name="noAdsNoSubs">Bez reklám, bez predplatného; ale open-source a vášeň.</string>
@@ -13,10 +13,10 @@
   <string name="patronUntil">Máš Patrón účet do %s.</string>
   <string name="ifNotRenewed">Ak nebude obnovená, potom sa zníži jej úroveň na bezplatnú verziu.</string>
   <string name="weAreNonProfit">Sme neziskové združenie, pretože veríme, že každý by mal mať prístup k bezplatnej šachovej platforme svetového formátu.</string>
-  <string name="weRelyOnSupport">Pri umožňovaní sa spoliehame na podporu od ľudí ako ste vy. Ak radi používate Playstrategy, prosím zvážte našu podporu darovaním a že sa stanete Patronom!</string>
+  <string name="weRelyOnSupport">Pri umožňovaní sa spoliehame na podporu od ľudí ako ste vy. Ak radi používate PlayStrategy, prosím zvážte našu podporu darovaním a že sa stanete Patronom!</string>
   <string name="lifetime">Doživotne</string>
-  <string name="payLifetimeOnce">Zaplať %s raz. Buď Patrónom Playstrategyu navždy!</string>
-  <string name="lifetimePatron">Doživotný Playstrategy Patrón</string>
+  <string name="payLifetimeOnce">Zaplať %s raz. Buď Patrónom PlayStrategyu navždy!</string>
+  <string name="lifetimePatron">Doživotný PlayStrategy Patrón</string>
   <string name="makeExtraDonation">Poskytnúť ďalší príspevok?</string>
   <string name="monthly">Mesačne</string>
   <string name="recurringBilling">Opakujúca sa platba, obnovujúca Vaše Patrónske krídla každý mesiac.</string>
@@ -27,28 +27,28 @@
   <string name="withCreditCard">Kreditná karta</string>
   <string name="withPaypal">PayPal</string>
   <string name="weAreSmallTeam">Sme malý tím, čiže Vaša podpora robí obrovský rozdiel!</string>
-  <string name="celebratedPatrons">Slávni Patróni, ktorí robia Playstrategy možným</string>
+  <string name="celebratedPatrons">Slávni Patróni, ktorí robia PlayStrategy možným</string>
   <string name="whereMoneyGoes">Kam idú peniaze?</string>
   <string name="serversAndDeveloper">V prvom rade výkonné servery.
-Potom zaplatíme vývojárovi na plný úväzok: %s, zakladateľovi spoločnosti Playstrategy.</string>
+Potom zaplatíme vývojárovi na plný úväzok: %s, zakladateľovi spoločnosti PlayStrategy.</string>
   <string name="costBreakdown">Pozrite si podrobný rozpis nákladov</string>
-  <string name="officialNonProfit">Je Playstrategy oficiálna nezisková organizácia?</string>
+  <string name="officialNonProfit">Je PlayStrategy oficiálna nezisková organizácia?</string>
   <string name="changeMonthlySupport">Môžem zmeniť / zrušiť svoju mesačnú podporu?</string>
   <string name="changeOrContact">Áno, kedykoľvek z tejto stránky.
 Alebo môžete %s.</string>
-  <string name="contactSupport">kontaktovať podporu Playstrategy</string>
+  <string name="contactSupport">kontaktovať podporu PlayStrategy</string>
   <string name="otherMethods">Iné spôsoby podpory?</string>
   <string name="bankTransfers">Prijímame aj bankové prevody</string>
   <string name="bitcoin">A tu je naša bitcoinová adresa: %s</string>
   <string name="patronFeatures">Sú niektoré funkcie vyhradené pre patrónov?</string>
-  <string name="noPatronFeatures">Nie, pretože Playstrategy je úplne zadarmo, navždy a pre všetkých. To je prísľub.
+  <string name="noPatronFeatures">Nie, pretože PlayStrategy je úplne zadarmo, navždy a pre všetkých. To je prísľub.
 Patróni však majú vychvaľovacie práva so skvelou novou ikonou profilu.</string>
   <string name="featuresComparison">Pozrite si podrobné porovnanie funkcií</string>
   <plurals name="patronForMonths">
-    <item quantity="one">Playstrategy Patron na jeden mesiac</item>
-    <item quantity="few">Playstrategy Patron na %s mesiacov</item>
-    <item quantity="many">Playstrategy Patron na %s mesiacov</item>
-    <item quantity="other">Playstrategy Patron na %s mesiacov</item>
+    <item quantity="one">PlayStrategy Patron na jeden mesiac</item>
+    <item quantity="few">PlayStrategy Patron na %s mesiacov</item>
+    <item quantity="many">PlayStrategy Patron na %s mesiacov</item>
+    <item quantity="other">PlayStrategy Patron na %s mesiacov</item>
   </plurals>
   <string name="youSupportWith">Podporujete web playstrategy.org %s s za mesiac.</string>
   <string name="tyvm">Veľmi pekne ti ďakujem za tvoju pomoc. Ide ti to!</string>
@@ -60,18 +60,18 @@ Patróni však majú vychvaľovacie práva so skvelou novou ikonou profilu.</str
   <string name="changeMonthlyAmount">Zmeniť mesačnú sumu (%s)</string>
   <string name="cancelSupport">zrušiť svoju podporu</string>
   <string name="xOrY">%1$s alebo %2$s</string>
-  <string name="decideHowMuch">Rozhodnite sa, čo pre vás Playstrategy znamená:</string>
+  <string name="decideHowMuch">Rozhodnite sa, čo pre vás PlayStrategy znamená:</string>
   <string name="stopPayments">Vyberte svoju kreditnú kartu a zastavte platby:</string>
-  <string name="noLongerSupport">Nepodporovať Playstrategy</string>
+  <string name="noLongerSupport">Nepodporovať PlayStrategy</string>
   <string name="paymentHistory">História platieb</string>
   <string name="paid">Zaplatené</string>
-  <string name="viewOthers">Zobraziť iných Playstrategy Patronov</string>
+  <string name="viewOthers">Zobraziť iných PlayStrategy Patronov</string>
   <string name="date">Dátum</string>
   <string name="amount">Suma</string>
   <string name="transactionCompleted">Vaša transakcia bola dokončená a potvrdenie o dare vám bolo zaslané e-mailom.</string>
   <string name="permanentPatron">Teraz máte permanentný Patron účet.</string>
   <string name="checkOutProfile">Pozrite sa na svoju profilovú stránku!</string>
-  <string name="nowLifetime">Odteraz ste doživotný Playstrategy Patron!</string>
-  <string name="nowOneMonth">Odteraz ste Playstrategy Patron na jeden mesiac!</string>
-  <string name="downgradeNextMonth">Za jeden mesiac, vám NEBUDE zaúčtovaný poplatok znova, a váš Playstrategy účet sa obnoví na bežný účet.</string>
+  <string name="nowLifetime">Odteraz ste doživotný PlayStrategy Patron!</string>
+  <string name="nowOneMonth">Odteraz ste PlayStrategy Patron na jeden mesiac!</string>
+  <string name="downgradeNextMonth">Za jeden mesiac, vám NEBUDE zaúčtovaný poplatok znova, a váš PlayStrategy účet sa obnoví na bežný účet.</string>
 </resources>

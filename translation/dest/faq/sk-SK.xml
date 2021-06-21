@@ -2,20 +2,20 @@
 <resources>
   <string name="faqAbbreviation">Často kladené otázky</string>
   <string name="frequentlyAskedQuestions">Často Kladené Otázky</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Prečo sa Playstrategy volá Playstrategy?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">Playstrategy je kombinácia slov live/light/libre a chess. Vyslovuje sa %1$s.</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Prečo sa PlayStrategy volá PlayStrategy?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">PlayStrategy je kombinácia slov live/light/libre a chess. Vyslovuje sa %1$s.</string>
   <string name="leechess">ličes</string>
   <string name="hearItPronouncedBySpecialist">Vypočujte si to vyslovené špecialistom.</string>
-  <string name="whyLiveLightLibre">Live (naživo), lebo partie sa hrajú a sledujú v reálnom čase 24/7; light (ľahký) a libre (bezplatný) vďaka faktu že Playstrategy je open-source a nezaťažený odpadom, ktorý trápi ostatné stránky.</string>
-  <string name="whyIsLilaCalledLila">Podobne, zdrojový kód pre Playstrategy, %1$s, znamená li[chess in sca]la, pretože väčšina stránky Playstrategy je napísaná v %2$s, intuitívnom programovacom jazyku.</string>
-  <string name="howCanIContributeToPlaystrategy">Ako môžem prispieť stránke Playstrategy?</string>
-  <string name="playstrategyPoweredByDonationsAndVolunteers">Playstrategy je poháňaný darmi od patrónov a úsilím tímu dobrovoľníkov.</string>
-  <string name="findMoreAndSeeHowHelp">Viac informácii o %1$s (vrátane %2$s). Ak chcete pomôcť stránke Playstrategy, tým že ponúknete váš čas a zručnosti, existuje veľa %3$s.</string>
+  <string name="whyLiveLightLibre">Live (naživo), lebo partie sa hrajú a sledujú v reálnom čase 24/7; light (ľahký) a libre (bezplatný) vďaka faktu že PlayStrategy je open-source a nezaťažený odpadom, ktorý trápi ostatné stránky.</string>
+  <string name="whyIsLilaCalledLila">Podobne, zdrojový kód pre PlayStrategy, %1$s, znamená li[chess in sca]la, pretože väčšina stránky PlayStrategy je napísaná v %2$s, intuitívnom programovacom jazyku.</string>
+  <string name="howCanIContributeToPlayStrategy">Ako môžem prispieť stránke PlayStrategy?</string>
+  <string name="playstrategyPoweredByDonationsAndVolunteers">PlayStrategy je poháňaný darmi od patrónov a úsilím tímu dobrovoľníkov.</string>
+  <string name="findMoreAndSeeHowHelp">Viac informácii o %1$s (vrátane %2$s). Ak chcete pomôcť stránke PlayStrategy, tým že ponúknete váš čas a zručnosti, existuje veľa %3$s.</string>
   <string name="beingAPatron">byť patrónom</string>
   <string name="breakdownOfOurCosts">rozpis našich nákladov</string>
   <string name="otherWaysToHelp">iné možnosti ako pomôcť</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">Sú nejaké webstránky založené na Playstrategyi?</string>
-  <string name="yesPlaystrategyInspiredOtherOpenSourceWebsites">Áno. Playstrategy vskutku inšpiroval iné open-source stránky, ktoré používajú náš %1$s, %2$s, alebo %3$s.</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">Sú nejaké webstránky založené na PlayStrategyi?</string>
+  <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">Áno. PlayStrategy vskutku inšpiroval iné open-source stránky, ktoré používajú náš %1$s, %2$s, alebo %3$s.</string>
   <string name="fairPlay">Fair Play</string>
   <string name="whenAmIEligibleRatinRefund">Kedy mám právo na automatické vrátenie ratingu od podvodníkov?</string>
   <string name="ratingRefundExplanation">Jednu minútu po označení hráča sa zoberie jeho 40 hodnotených hier počas posledných troch dní. Ak ste v týchto hrách ich oponentom, stratili ste hodnotenie (kvôli prehre alebo remíze) a vaše hodnotenie nebolo predbežné, upraví sa váš rating. Úprava ratingu je obmedzená na základe vášho maximálneho hodnotenia a pokroku v hodnotení po skončení hry.
@@ -25,16 +25,16 @@
   <string name="howCanIBecomeModerator">Ako sa môžem stať moderátorom?</string>
   <string name="youCannotApply">Není možné podať prihlášku pre pozíciu moderátora. Ak si všimneme niekoho o kom si myslíme, že by bol dobrým moderátorom, sami ho kontaktujeme.</string>
   <string name="isCorrespondenceDifferent">Je korešpondenčný šach odlišný od normálneho šachu?</string>
-  <string name="youCanUseOpeningBookNoEngine">Pokiaľ ide o Playstrategy, hlavný rozdiel v pravidlách pre korešpondenčný šach spočíva v tom, že je povolená opening book. Používanie enginov je stále zakázané a bude mať za následok označenie pomoc s enginom. Aj keď ICCF umožňuje použitie enginu v korešpondencii, Playstrategy nie.</string>
+  <string name="youCanUseOpeningBookNoEngine">Pokiaľ ide o PlayStrategy, hlavný rozdiel v pravidlách pre korešpondenčný šach spočíva v tom, že je povolená opening book. Používanie enginov je stále zakázané a bude mať za následok označenie pomoc s enginom. Aj keď ICCF umožňuje použitie enginu v korešpondencii, PlayStrategy nie.</string>
   <string name="gameplay">Hrateľnosť</string>
   <string name="howBulletBlitzEtcDecided">Ako sa rozhoduje o Bullete, Blitzi a iných časových kontrolách?</string>
-  <string name="basedOnGameDuration">Časové kontroly na Playstrategyi sú založené na odhadovanom trvaní partie = %1$s 
+  <string name="basedOnGameDuration">Časové kontroly na PlayStrategyi sú založené na odhadovanom trvaní partie = %1$s 
 Napríklad, odhadované trvanie 5+3 partie je 5 × 60 + 40 × 3 = 420 sekúnd.</string>
   <string name="durationFormula">(počiatočný čas na hodinách) + 40 × (prídavok na hodinách)</string>
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$ss = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$ss = %2$s</string>
-  <string name="whatVariantsCanIplay">Aké varianty môžem hrať na Playstrategyi?</string>
-  <string name="playstrategySupportChessAnd">Playstrategy podporuje štandardný šach a %1$s.</string>
+  <string name="whatVariantsCanIplay">Aké varianty môžem hrať na PlayStrategyi?</string>
+  <string name="playstrategySupportChessAnd">PlayStrategy podporuje štandardný šach a %1$s.</string>
   <string name="eightVariants">8 šachových variant</string>
   <string name="whatIsACPL">Čo je priemerná strata stotiny pešiaka (ACPL)?</string>
   <string name="acplExplanation">Centipawn je merná jednotka použitá v šachu na vyjadrenie výhody. Centipawn sa rovná 1/100 pešiaka. Preto 100 centipawnov = 1 pešiak. Tieto hodnoty v hre nehrajú žiadnu formálnu úlohu, sú však užitočné pre hráčov a sú nevyhnutné v počítačových šachoch na hodnotenie pozícií.
@@ -43,7 +43,7 @@ Hlavný ťah počítača stratí nula centipawnov, ale menšie pohyby povedú k 
 
 Táto hodnota môže byť použitá ako indikátor kvality hry. Čím menej centipawnov človek stratí na ťah, tým je hra silnejšia.
 
-Počítačovú analýzu na serveri Playstrategy poskytuje server Stockfish.</string>
+Počítačovú analýzu na serveri PlayStrategy poskytuje server Stockfish.</string>
   <string name="insufficientMaterial">Prehra na čas, remíza a nedostatočný materiál</string>
   <string name="playstrategyFollowFIDErules">V prípade, že jednému hráčovi dôjde čas, tento hráč obvykle prehrá. Hra je však remízovaná, ak je pozícia taká, že súper nemôže dať mat hráčovmu kráľovi žiadnou možnou sériou legálnych ťahov (%1$s).
 
@@ -61,33 +61,33 @@ Je to opísané v časti 3.7(d) z %2$s:
 Pozrite sa na %3$s na tomto ťahu, aby ste si s ním trochu zacvičili.</string>
   <string name="goodIntroduction">dobrý úvod</string>
   <string name="officialRulesPDF">oficiálne pravidlá (PDF)</string>
-  <string name="playstrategyTraining">Playstrategy tréning</string>
+  <string name="playstrategyTraining">PlayStrategy tréning</string>
   <string name="threefoldRepetition">Trojnásobné opakovanie</string>
-  <string name="threefoldRepetitionExplanation">Ak sa pozícia objaví trikrát, hráči môžu reklamovať remízu %1$s. Playstrategy uplatňuje oficiálne pravidlá FIDE, ako je opísané v článku 9.2 (d) %2$s.</string>
+  <string name="threefoldRepetitionExplanation">Ak sa pozícia objaví trikrát, hráči môžu reklamovať remízu %1$s. PlayStrategy uplatňuje oficiálne pravidlá FIDE, ako je opísané v článku 9.2 (d) %2$s.</string>
   <string name="threefoldRepetitionLowerCase">trojnásobným opakovaním pozície</string>
   <string name="notRepeatedMoves">Neopakovali sme ťahy. Prečo bola partia napriek tomu ukončená remízou opakovaním ťahov?</string>
   <string name="repeatedPositionsThatMatters">Trojnásobné opakovanie ťahov sa týka opakovania %1$s, nie ťahov. Opakovanie sa nemusí vyskytnúť hneď po sebe.</string>
   <string name="positions">pozície</string>
   <string name="weRepeatedthreeTimesPosButNoDraw">Zopakovali sme pozíciu trikrát. Prečo nebola partia vyhlásená za remízu?</string>
-  <string name="threeFoldHasToBeClaimed">Opakovanie musí požadovať jeden z hráčov. Môžete tak urobiť stlačením zobrazeného tlačidla, alebo ponúknutím remízy pred posledným opakujúcim sa ťahom. Nezáleží na tom, či váš súper odmietne ponuku remízy, trojnásobná opakovaná remíza bude rovnako uplatnená. Môžete tiež %1$s Playstrategy požiadať o automatické opakovania. Päťnásobné opakovanie navyše vždy okamžite ukončí hru.</string>
+  <string name="threeFoldHasToBeClaimed">Opakovanie musí požadovať jeden z hráčov. Môžete tak urobiť stlačením zobrazeného tlačidla, alebo ponúknutím remízy pred posledným opakujúcim sa ťahom. Nezáleží na tom, či váš súper odmietne ponuku remízy, trojnásobná opakovaná remíza bude rovnako uplatnená. Môžete tiež %1$s PlayStrategy požiadať o automatické opakovania. Päťnásobné opakovanie navyše vždy okamžite ukončí hru.</string>
   <string name="configure">konfigurovať</string>
   <string name="accounts">Účty</string>
-  <string name="titlesAvailableOnPlaystrategy">Aké tituly sú na Playstrategyi?</string>
-  <string name="playstrategyRecognizeAllOTBtitles">Playstrategy rozpoznáva všetky tituly FIDE získané z hrania OTB (za šachovnicou), ako aj %1$s.. Tu je zoznam titulov FIDE:</string>
+  <string name="titlesAvailableOnPlayStrategy">Aké tituly sú na PlayStrategyi?</string>
+  <string name="playstrategyRecognizeAllOTBtitles">PlayStrategy rozpoznáva všetky tituly FIDE získané z hrania OTB (za šachovnicou), ako aj %1$s.. Tu je zoznam titulov FIDE:</string>
   <string name="showYourTitle">337 / 5000
 Výsledky prekladov
 Ak máte titul OTB, môžete požiadať o jeho zobrazenie vo svojom účte vyplnením %1$ss vrátane jasného obrázka identifikačného dokumentu / karty a selfie, v ktorej držíte dokument / kartu.
 
-Overenie ako hráč s titulom na Playstrategy dáva prístup k hre na udalostiach s názvom Arena.
+Overenie ako hráč s titulom na PlayStrategy dáva prístup k hre na udalostiach s názvom Arena.
 
 Konečne je tu čestný %2$s titul.</string>
   <string name="asWellAsManyNMtitles">veľa národných majstrovských titulov</string>
   <string name="verificationForm">overovací formulár</string>
-  <string name="canIbecomeLM">Môžem získať Playstrategy majster (LM) titul?</string>
+  <string name="canIbecomeLM">Môžem získať PlayStrategy majster (LM) titul?</string>
   <string name="noUpperCaseDot">Nie.</string>
-  <string name="lMtitleComesToYouDoNotRequestIt">Tento čestný titul je neoficiálny a existuje iba pre Playstrategy.
+  <string name="lMtitleComesToYouDoNotRequestIt">Tento čestný titul je neoficiálny a existuje iba pre PlayStrategy.
 
-Zriedka ju podľa nášho uváženia udelíme vysoko pozoruhodným hráčom, ktorí sú dobrými členmi Playstrategy. Nezískate titul LM, titul LM sa dostane k vám. Ak sa kvalifikujete, dostanete od nás správu týkajúcu sa tejto informácie a možnosti prijať alebo odmietnuť.
+Zriedka ju podľa nášho uváženia udelíme vysoko pozoruhodným hráčom, ktorí sú dobrými členmi PlayStrategy. Nezískate titul LM, titul LM sa dostane k vám. Ak sa kvalifikujete, dostanete od nás správu týkajúcu sa tejto informácie a možnosti prijať alebo odmietnuť.
 
 Nepýtajte si titul LM.</string>
   <string name="whatUsernameCanIchoose">Aké môže vyť moje používateľské meno?</string>
@@ -96,13 +96,13 @@ Nepýtajte si titul LM.</string>
   <string name="canIChangeMyUsername">Môžem si zmeniť svoje užívateľské meno?</string>
   <string name="usernamesCannotBeChanged">Nie, užívateľské mená sa nemôžu meniť kvôli technickým a praktickým dôvodom. Užívateľské mená sú zhmotnené na príliš mnohých miestach: databázy, exporty, logy, a ľudské mysle. Môžete nastaviť veľkosť písmen jeden raz.</string>
   <string name="uniqueTrophies">Unikátne trofeje</string>
-  <string name="ownerUniqueTrophies">Táto trofej je unikátna v histórii Playstrategyu, nikto iný okrem %1$s ju nebude nikdy mať.</string>
+  <string name="ownerUniqueTrophies">Táto trofej je unikátna v histórii PlayStrategyu, nikto iný okrem %1$s ju nebude nikdy mať.</string>
   <string name="wayOfBerserkExplanation">Aby ju dostal, hiimgosu sa vyzval, že bude besniť a vyhrá 100%% partií v %s.</string>
   <string name="aHourlyBulletTournament">hodinový Bullet turnaj</string>
   <string name="goldenZeeExplanation">ZugAddict streamoval a posledné 2 hodiny sa snažil poraziť A.I. úroveň 8 v hre 1 + 0, bez úspechu. Thibault mu povedal, že ak to úspešne zvládne v prúde, získa jedinečnú trofej. O hodinu neskôr rozbil Stockfisha a sľub bol splnený.</string>
-  <string name="playstrategyRatings">Playstrategy ratingy</string>
-  <string name="whichRatingSystemUsedByPlaystrategy">Aký ratingový systém používa Playstrategy?</string>
-  <string name="ratingSystemUsedByPlaystrategy">Ratingy sa počítajú pomocou hodnotiacej metódy Glicko-2 vyvinutej Markom Glickmanom. Toto je veľmi populárna metóda hodnotenia a používa ju veľké množstvo šachových organizácií (FIDE je pozoruhodný protiklad, pretože stále používa datovaný systém hodnotenia Elo).
+  <string name="playstrategyRatings">PlayStrategy ratingy</string>
+  <string name="whichRatingSystemUsedByPlayStrategy">Aký ratingový systém používa PlayStrategy?</string>
+  <string name="ratingSystemUsedByPlayStrategy">Ratingy sa počítajú pomocou hodnotiacej metódy Glicko-2 vyvinutej Markom Glickmanom. Toto je veľmi populárna metóda hodnotenia a používa ju veľké množstvo šachových organizácií (FIDE je pozoruhodný protiklad, pretože stále používa datovaný systém hodnotenia Elo).
 
 Hodnotenia Glicko zásadne používajú pri výpočte a reprezentácii vášho hodnotenia „intervaly spoľahlivosti“. Pri prvom použití stránky sa vaše hodnotenie začína na 1 500 ± 700. 1 500 predstavuje vaše hodnotenie a 700 predstavuje interval spoľahlivosti.
 
@@ -131,13 +131,13 @@ Najlepšie je považovať rating za „relatívne“ čísla (na rozdiel od „a
   <string name="enableZenMode">Povoľte Zen-mód v %1$s, alebo stlačením %2$s počas hry.</string>
   <string name="displayPreferences">predvoľby zobrazenia</string>
   <string name="connexionLostCanIGetMyRatingBack">Prehral som hru kvôli lagu/odpojeniu. Môžem dostať ratingové body naspäť?</string>
-  <string name="weCannotDoThatEvenIfItIsServerSideButThatsRare">Bohužiaľ nemôžeme vrátiť späť hodnotiace body za hry stratené v dôsledku oneskorenia alebo odpojenia bez ohľadu na to, či bol problém u vás, alebo u nás. To posledné je však veľmi zriedkavé. Upozorňujeme tiež, že keď sa Playstrategy reštartuje a vy kvôli tomu stratíte včas, hru prerušíme, aby sme zabránili nespravodlivej strate.</string>
+  <string name="weCannotDoThatEvenIfItIsServerSideButThatsRare">Bohužiaľ nemôžeme vrátiť späť hodnotiace body za hry stratené v dôsledku oneskorenia alebo odpojenia bez ohľadu na to, či bol problém u vás, alebo u nás. To posledné je však veľmi zriedkavé. Upozorňujeme tiež, že keď sa PlayStrategy reštartuje a vy kvôli tomu stratíte včas, hru prerušíme, aby sme zabránili nespravodlivej strate.</string>
   <string name="howToThreeDots">Ako...</string>
   <string name="enableDisableNotificationPopUps">Povoliť alebo zakázať vyskakovacie okná s upozorneniami?</string>
   <string name="viewSiteInformationPopUp">Zobraziť vyskakovacie okno s informáciami o webe</string>
-  <string name="playstrategyCanOptionnalySendPopUps">Playstrategy môže voliteľne posielať vyskakovacie oznámenia, napríklad keď ste na rade, alebo keď ste dostali súkromnú správu.
+  <string name="playstrategyCanOptionnalySendPopUps">PlayStrategy môže voliteľne posielať vyskakovacie oznámenia, napríklad keď ste na rade, alebo keď ste dostali súkromnú správu.
 
 Kliknite na ikonu zámku vedľa adresy playstrategy.org v paneli URL vášho prehliadača.
 
-Potom vyberte, či chcete povoliť alebo blokovať upozornenia od Playstrategy.</string>
+Potom vyberte, či chcete povoliť alebo blokovať upozornenia od PlayStrategy.</string>
 </resources>

@@ -3,8 +3,8 @@
   <string name="activity">Aktiivsus</string>
   <string name="hostedALiveStream">Tegi otseülekannet</string>
   <plurals name="supportedNbMonths">
-    <item quantity="one">Toeta Playstrategy.org\'i %1$s kuu %2$s</item>
-    <item quantity="other">Toeta Playstrategy.org\'i %1$s kuud %2$s</item>
+    <item quantity="one">Toeta PlayStrategy.org\'i %1$s kuu %2$s</item>
+    <item quantity="other">Toeta PlayStrategy.org\'i %1$s kuud %2$s</item>
   </plurals>
   <plurals name="practicedNbPositions">
     <item quantity="one">Harjutas %1$s seisu teemas %2$s</item>

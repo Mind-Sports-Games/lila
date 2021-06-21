@@ -1,6 +1,6 @@
 import { attributesModule, classModule, init } from 'snabbdom';
 import boot from './boot';
-import PlaystrategyChat from 'chat';
+import PlayStrategyChat from 'chat';
 import menuHover from 'common/menuHover';
 import MoveOn from './moveOn';
 import RoundController from './ctrl';
@@ -42,7 +42,7 @@ export function app(opts: RoundOpts): RoundApi {
 
 export { boot };
 
-window.PlaystrategyChat = PlaystrategyChat;
+window.PlayStrategyChat = PlayStrategyChat;
 // that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;

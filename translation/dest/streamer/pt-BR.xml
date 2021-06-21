@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Streamers do Playstrategy</string>
-  <string name="playstrategyStreamer">Streamer do Playstrategy</string>
+  <string name="playstrategyStreamers">Streamers do PlayStrategy</string>
+  <string name="playstrategyStreamer">Streamer do PlayStrategy</string>
   <string name="live">AO VIVO!</string>
   <string name="offline">FORA DO AR</string>
   <string name="currentlyStreaming">Atualmente transmitindo: %s</string>
   <string name="lastStream">Última transmissão %s</string>
-  <string name="becomeStreamer">Torne-se um streamer do Playstrategy</string>
+  <string name="becomeStreamer">Torne-se um streamer do PlayStrategy</string>
   <string name="doYouHaveStream">Você tem uma stream na Twitch ou no YouTube?</string>
   <string name="hereWeGo">Lá vamos nós!</string>
   <string name="allStreamers">Todos os streamers</string>
@@ -15,27 +15,27 @@
   <string name="downloadKit">Baixar o kit de streamer</string>
   <string name="xIsStreaming">%s está transmitindo</string>
   <string name="rules">Regras de transmissão</string>
-  <string name="rule1">Inclua \"playstrategy.org\" no título da sua transmissão quando for transmitir no Playstrategy.</string>
-  <string name="rule2">O remova quando for transmitir coisas não relacionadas ao Playstrategy.</string>
-  <string name="rule3">O Playstrategy automaticamente detectará a sua transmissão e te garantirá as seguintes melhorias:</string>
+  <string name="rule1">Inclua \"playstrategy.org\" no título da sua transmissão quando for transmitir no PlayStrategy.</string>
+  <string name="rule2">O remova quando for transmitir coisas não relacionadas ao PlayStrategy.</string>
+  <string name="rule3">O PlayStrategy automaticamente detectará a sua transmissão e te garantirá as seguintes melhorias:</string>
   <string name="perks">Benefícios de se transmitir com o teclado</string>
-  <string name="perk1">Obtenha um ícone de streamer em chamas no seu perfil do Playstrategy.</string>
+  <string name="perk1">Obtenha um ícone de streamer em chamas no seu perfil do PlayStrategy.</string>
   <string name="perk2">Suba ao topo da lista de streamers.</string>
-  <string name="perk3">Notifique seus seguidores no Playstrategy.</string>
+  <string name="perk3">Notifique seus seguidores no PlayStrategy.</string>
   <string name="perk4">Exiba a sua transmissão em suas partidas, torneios e estudos.</string>
   <string name="approved">A sua transmissão está aprovada.</string>
   <string name="pendingReview">A sua transmissão está sendo revisada por moderadores.</string>
   <string name="pleaseFillIn">Por favor, preencha os seus dados de streamer e defina uma foto.</string>
-  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Quando você estiver pronto para ser listado como um streamer do Playstrategy, %s</string>
-  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a Playstrategy streamer, request a moderator review&quot;">peça a revisão de um moderador</string>
+  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Quando você estiver pronto para ser listado como um streamer do PlayStrategy, %s</string>
+  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a PlayStrategy streamer, request a moderator review&quot;">peça a revisão de um moderador</string>
   <string name="anotherLanguage">Se a sua transmissão for em alguma linguagem que não seja Inglês, inclua uma etiqueta de linguagem (%s) apropriada, entre colchetes, ao início do título da sua transmissão.
 Por exemplo: use \"[PT]\" para Português, \"[TR]\" para Turco, \"[FR]\" para Francês, etc.
-A coloque no título da sua transmissão na Twitch ou no YouTube, não nas configurações de transmissão do Playstrategy.
+A coloque no título da sua transmissão na Twitch ou no YouTube, não nas configurações de transmissão do PlayStrategy.
 Se a sua transmissão for em Inglês, não há a necessidade de incluir uma etiqueta de linguagem.</string>
   <string name="twitchUsername">Seu nome de usuário ou URL da Twitch</string>
   <string name="optionalOrEmpty">Opcional. Deixe vazio se não houver</string>
   <string name="youtubeChannel">O ID ou URL do seu canal no YouTube</string>
-  <string name="streamerName">Seu nome de streamer no Playstrategy</string>
+  <string name="streamerName">Seu nome de streamer no PlayStrategy</string>
   <plurals name="keepItShort">
     <item quantity="one">Sumarize: máximo de %s caractere</item>
     <item quantity="other">Sumarize: máximo de %s caracteres</item>
@@ -52,5 +52,5 @@ Se a sua transmissão for em Inglês, não há a necessidade de incluir uma etiq
   <string name="maxSize">Tamanho máximo: %s</string>
   <string name="installBlocker">Instale um antivírus!</string>
   <string name="beSafe">Livre-se dos anúncios e trackers que infestam a Twitch e o YouTube.
-O Playstrategy recomenda uBlock Origin, que é grátis e de código aberto.</string>
+O PlayStrategy recomenda uBlock Origin, que é grátis e de código aberto.</string>
 </resources>

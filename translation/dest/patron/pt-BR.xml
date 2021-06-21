@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">Doação</string>
-  <string name="playstrategyPatron">Patrono Playstrategy</string>
+  <string name="playstrategyPatron">Patrono PlayStrategy</string>
   <string name="freeAccount">Conta gratuita</string>
-  <string name="becomePatron">Seja um Patrono Playstrategy</string>
-  <string name="xBecamePatron">%s se tornou um Patrono Playstrategy</string>
+  <string name="becomePatron">Seja um Patrono PlayStrategy</string>
+  <string name="xBecamePatron">%s se tornou um Patrono PlayStrategy</string>
   <string name="newPatrons">Novos Patronos</string>
   <string name="freeChess">Xadrez de graça para todos, para sempre!</string>
   <string name="noAdsNoSubs">Sem anúncios, sem assinaturas; mas com código aberto e paixão.</string>
@@ -13,10 +13,10 @@
   <string name="patronUntil">Você tem uma conta de Patrono até %s.</string>
   <string name="ifNotRenewed">Se não for renovado, você será rebaixado para uma versão gratuita.</string>
   <string name="weAreNonProfit">Somos uma associação sem fins lucrativos porque acreditamos que todos devem ter acesso a uma plataforma de xadrez gratuita e de nível mundial.</string>
-  <string name="weRelyOnSupport">Contamos com o apoio de pessoas como você para tornar isso possível. Se você gosta de usar o Playstrategy, considere apoiar-nos doando e se tornando um Patrono!</string>
+  <string name="weRelyOnSupport">Contamos com o apoio de pessoas como você para tornar isso possível. Se você gosta de usar o PlayStrategy, considere apoiar-nos doando e se tornando um Patrono!</string>
   <string name="lifetime">Vitalício</string>
-  <string name="payLifetimeOnce">Pague %s uma vez. Seja um Patrono Playstrategy para sempre!</string>
-  <string name="lifetimePatron">Patrono vitalício do Playstrategy</string>
+  <string name="payLifetimeOnce">Pague %s uma vez. Seja um Patrono PlayStrategy para sempre!</string>
+  <string name="lifetimePatron">Patrono vitalício do PlayStrategy</string>
   <string name="makeExtraDonation">Fazer uma doação extra?</string>
   <string name="monthly">Mensalmente</string>
   <string name="recurringBilling">Faturamento recorrente, renovando suas asas de Patrono todo mês.</string>
@@ -27,27 +27,27 @@
   <string name="withCreditCard">Cartão de Crédito</string>
   <string name="withPaypal">PayPal</string>
   <string name="weAreSmallTeam">Somos uma equipe pequena, então o seu apoio faz uma grande diferença!</string>
-  <string name="celebratedPatrons">Os famosos Patronos que tornam o Playstrategy possível</string>
+  <string name="celebratedPatrons">Os famosos Patronos que tornam o PlayStrategy possível</string>
   <string name="whereMoneyGoes">Para onde vai o dinheiro?</string>
   <string name="serversAndDeveloper">Primeiro de tudo, servidores poderosos.
-Em seguida, pagamos um desenvolvedor em tempo integral: %s, o fundador do Playstrategy.</string>
+Em seguida, pagamos um desenvolvedor em tempo integral: %s, o fundador do PlayStrategy.</string>
   <string name="costBreakdown">Veja a análise detalhada do custo</string>
-  <string name="officialNonProfit">O Playstrategy é uma organização sem fins lucrativos?</string>
+  <string name="officialNonProfit">O PlayStrategy é uma organização sem fins lucrativos?</string>
   <string name="actOfCreation">Sim, aqui está o ato de criação (em francês)</string>
   <string name="changeMonthlySupport">Posso mudar/cancelar meu suporte mensal?</string>
   <string name="changeOrContact">Sim, a qualquer momento, a partir desta página.
 Ou você pode %s.</string>
-  <string name="contactSupport">entrar em contato com o suporte do Playstrategy</string>
+  <string name="contactSupport">entrar em contato com o suporte do PlayStrategy</string>
   <string name="otherMethods">Outros métodos de doação?</string>
   <string name="bankTransfers">Também aceitamos transferências bancárias</string>
   <string name="bitcoin">E aqui está nosso endereço bitcoin: %s</string>
   <string name="patronFeatures">Alguns recursos são exclusivos para Patronos?</string>
-  <string name="noPatronFeatures">Não, porque o Playstrategy é totalmente gratuito, para sempre e para todos. É uma promessa.
+  <string name="noPatronFeatures">Não, porque o PlayStrategy é totalmente gratuito, para sempre e para todos. É uma promessa.
 No entanto, Patronos têm direito de se gabar com um novo ícone legal de perfil.</string>
   <string name="featuresComparison">Veja a comparação detalhada de recursos</string>
   <plurals name="patronForMonths">
-    <item quantity="one">Patrono Playstrategy por um mês</item>
-    <item quantity="other">Patrono Playstrategy por %s meses</item>
+    <item quantity="one">Patrono PlayStrategy por um mês</item>
+    <item quantity="other">Patrono PlayStrategy por %s meses</item>
   </plurals>
   <string name="youSupportWith">Você apoia o playstrategy.org com %s por mês.</string>
   <string name="tyvm">Muito obrigado pelo seu apoio. Você é demais!</string>
@@ -59,18 +59,18 @@ No entanto, Patronos têm direito de se gabar com um novo ícone legal de perfil
   <string name="changeMonthlyAmount">Alterar o valor mensal (%s)</string>
   <string name="cancelSupport">cancelar seu apoio</string>
   <string name="xOrY">%1$s ou %2$s</string>
-  <string name="decideHowMuch">Decida quanto Playstrategy vale para você:</string>
+  <string name="decideHowMuch">Decida quanto PlayStrategy vale para você:</string>
   <string name="stopPayments">Retire seu cartão de crédito e interrompa os pagamentos:</string>
-  <string name="noLongerSupport">Deixar de apoiar o Playstrategy</string>
+  <string name="noLongerSupport">Deixar de apoiar o PlayStrategy</string>
   <string name="paymentHistory">Histórico de pagamentos</string>
   <string name="paid">Pago</string>
-  <string name="viewOthers">Ver outros Patronos do Playstrategy</string>
+  <string name="viewOthers">Ver outros Patronos do PlayStrategy</string>
   <string name="date">Data</string>
   <string name="amount">Quantia</string>
   <string name="transactionCompleted">Sua transação foi concluída e um recibo de sua doação foi enviado por e-mail para você.</string>
   <string name="permanentPatron">Agora você tem uma conta de Patrono permanente.</string>
   <string name="checkOutProfile">Confira sua página de perfil!</string>
-  <string name="nowLifetime">Você agora é um Patrono Playstrategy vitalício!</string>
-  <string name="nowOneMonth">Você agora é Patrono do Playstrategy por um mês!</string>
-  <string name="downgradeNextMonth">Em um mês, você NÃO será cobrado novamente, e sua conta Playstrategy será rebaixada para a versão gratuita.</string>
+  <string name="nowLifetime">Você agora é um Patrono PlayStrategy vitalício!</string>
+  <string name="nowOneMonth">Você agora é Patrono do PlayStrategy por um mês!</string>
+  <string name="downgradeNextMonth">Em um mês, você NÃO será cobrado novamente, e sua conta PlayStrategy será rebaixada para a versão gratuita.</string>
 </resources>

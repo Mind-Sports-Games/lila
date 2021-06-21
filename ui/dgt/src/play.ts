@@ -51,10 +51,10 @@ export default function (token: string) {
     console.error('Invalid JSON Object for Speech Keywords. Using English default. ' + Error(error).message);
   }
 
-  //Playstrategy Integration with Board API
+  //PlayStrategy Integration with Board API
 
   /**
-   * GLOBAL VARIABLES - Playstrategy Connectivity
+   * GLOBAL VARIABLES - PlayStrategy Connectivity
    */
   const time = new Date(); //A Global time object
   let currentGameId = ''; //Track which is the current Game, in case there are several open games
@@ -90,7 +90,7 @@ export default function (token: string) {
   /**
    * Global Variables for DGT Board Connection (JACM)
    */
-  let localBoard: Chess = startingPosition(); //Board with valid moves played on Playstrategy and DGT Board. May be half move behind Playstrategy or half move in advance
+  let localBoard: Chess = startingPosition(); //Board with valid moves played on PlayStrategy and DGT Board. May be half move behind PlayStrategy or half move in advance
   let DGTgameId = ''; //Used to track if DGT board was setup already with the playstrategy currentGameId
   let boards = Array<{ serialnr: string; state: string }>(); //An array to store all the board recognized by DGT LiveChess
   let liveChessConnection: WebSocket; //Connection Object to LiveChess through websocket
@@ -944,17 +944,17 @@ export default function (token: string) {
                 //Play the move on local board to keep it in sync
                 localBoard.play(moveObject);
               } else if (compareMoves(lastMove.move, moveObject)) {
-                //This is a valid adjustment - Just making the move from Playstrategy
+                //This is a valid adjustment - Just making the move from PlayStrategy
                 if (verbose) console.info('onmessage - Valid Adjustment: ' + SANMove);
-                //no need to send anything to Playstrategy moveObject required
+                //no need to send anything to PlayStrategy moveObject required
                 //lastSanMove will be updated once this move comes back from playstrategy
                 //Play the move on local board to keep it in sync
                 localBoard.play(moveObject);
               } else {
-                //Invalid Adjustment. Move was legal but does not match last move received from Playstrategy
+                //Invalid Adjustment. Move was legal but does not match last move received from PlayStrategy
                 console.error('onmessage - Invalid Adjustment was made');
                 if (compareMoves(lastMove.move, moveObject)) {
-                  console.error('onmessage - Played move has not been received by Playstrategy.');
+                  console.error('onmessage - Played move has not been received by PlayStrategy.');
                 } else {
                   console.error('onmessage - Expected:' + lastMove.move + ' by ' + lastMove.player);
                   console.error('onmessage - Detected:' + makeUci(moveObject) + ' by ' + localBoard.turn);
@@ -1021,9 +1021,9 @@ export default function (token: string) {
   }
 
   /**
-   * Synchronizes the position on Playstrategy with the position on the board
+   * Synchronizes the position on PlayStrategy with the position on the board
    * If the position does not match, no moves will be received from LiveChess
-   * @param chess - The chessops Chess object with the position on Playstrategy
+   * @param chess - The chessops Chess object with the position on PlayStrategy
    */
   async function sendBoardToLiveChess(chess: Chess) {
     const fen = makeFen(chess.toSetup());
@@ -1243,7 +1243,7 @@ export default function (token: string) {
     console.log('  ;::|   _.=`\\                   ░ ░       ░  ░  ░   ░  ░      ░        ░      ');
     console.log('  `;:|.=` _.=`\\                  ░                                             ');
     console.log("    '|_.=`   __\\                                                               ");
-    console.log('    `\\_..==`` /                 Playstrategy.org - DGT Electronic Board Connector   ');
+    console.log('    `\\_..==`` /                 PlayStrategy.org - DGT Electronic Board Connector   ');
     console.log("     .'.___.-'.                Developed by Andres Cavallin and Juan Cavallin  ");
     console.log('    /          \\                                  v1.0.7                       ');
     console.log("jgs('--......--')                                                             ");

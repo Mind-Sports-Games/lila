@@ -23,7 +23,7 @@ object mobile {
               div(cls := "apk")(
                 raw(~apkDoc.getHtml("doc.content", resolver))
               ),
-              h2(trans.asFreeAsPlaystrategy()),
+              h2(trans.asFreeAsPlayStrategy()),
               ul(cls := "block")(
                 li(trans.builtForTheLoveOfChessNotMoney()),
                 li(trans.everybodyGetsAllFeaturesForFree()),
@@ -40,7 +40,7 @@ object mobile {
                 li(trans.puzzles()),
                 li(trans.gameAnalysis()),
                 li(trans.boardEditor()),
-                li("Playstrategy TV"),
+                li("PlayStrategy TV"),
                 li(trans.followAndChallengeFriends()),
                 li(trans.availableInNbLanguages.pluralSame(80))
               )
@@ -51,7 +51,7 @@ object mobile {
                 width := "268",
                 height := "513",
                 src := assetUrl("images/mobile/nexus5-playing.png"),
-                alt := "Playstrategy mobile on nexus 5"
+                alt := "PlayStrategy mobile on nexus 5"
               ),
               img(
                 cls := "qrcode",

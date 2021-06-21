@@ -254,7 +254,7 @@
   <plurals name="giveNbSeconds">
     <item quantity="other">dunda %s snidu</item>
   </plurals>
-  <string name="thisAccountViolatedTos">lo se jaspu be ti cu zerjonse la .litces. zo\'e la\'o ly. Playstrategy Terms of Service ly.</string>
+  <string name="thisAccountViolatedTos">lo se jaspu be ti cu zerjonse la .litces. zo\'e la\'o ly. PlayStrategy Terms of Service ly.</string>
   <string name="openingExplorerAndTablebase">ge cfari kelka\'u sispe\'i gi ci\'erkei fanmo selcmi</string>
   <string name="takeback">kelka\'u xruti</string>
   <string name="proposeATakeback">kelka\'u xruti stidi</string>
@@ -399,8 +399,8 @@
   <string name="country">lo gugde</string>
   <string name="thankYou">ki\'e</string>
   <string name="socialMediaLinks">.urli lo kibro jikca predatni pesai do</string>
-  <string name="watchPlaystrategyTV">mencti la\'o gy. Playstrategy TV .gy</string>
-  <string name="previouslyOnPlaystrategyTV">lo purci nunkei pe lo la .litces. se tivni</string>
+  <string name="watchPlayStrategyTV">mencti la\'o gy. PlayStrategy TV .gy</string>
+  <string name="previouslyOnPlayStrategyTV">lo purci nunkei pe lo la .litces. se tivni</string>
   <string name="onlinePlayers">lo cabna jvikei</string>
   <string name="activeToday">keicfu ca lo cabdei</string>
   <string name="activePlayers">keicfu</string>
@@ -493,7 +493,7 @@
   <string name="clock">junla</string>
   <string name="unauthorizedError">jonse tolcru</string>
   <string name="noInternetConnection">ka\'e nai kibro jorne .i ku\'i kakne lo ka kelci se cau kei do\'e lo cuxna uidje</string>
-  <string name="connectedToPlaystrategy">do ca jorne la\'o zoi. playstrategy.org .zoi</string>
+  <string name="connectedToPlayStrategy">do ca jorne la\'o zoi. playstrategy.org .zoi</string>
   <string name="signedOut">do co\'u pilno lo jaspu</string>
   <string name="loginSuccessful">do co\'a pilno lo jaspu</string>
   <string name="playOnTheBoardOffline">pilno lo pa fonxa</string>
@@ -586,12 +586,12 @@
   <string name="youHaveAlreadyRegisteredTheEmail">mo\'u cmiveigau la\'o .ebu %s .ebu noi kibytermri</string>
   <string name="kidMode">lo tadji pe le\'e verba</string>
   <string name="kidModeExplanation">srana lonu tolckape .i ca lonu pilno lo tadji pe le\'e verba cu na zifre roloro nu samta\'a .i ka\'e bandu ga lo verba gi lo ve ckule .i</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">ca lonu pilno lo tadji pe le\'e verba kukuku lo sinxa be la litces. cu se barna zoi ky. %s .ky. ja\'e lonu do krilacri ly. lonu le verba cu snura .i</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">ca lonu pilno lo tadji pe le\'e verba kukuku lo sinxa be la litces. cu se barna zoi ky. %s .ky. ja\'e lonu do krilacri ly. lonu le verba cu snura .i</string>
   <string name="enableKidMode">pilno lo tadji pe le\'e verba</string>
   <string name="disableKidMode">sisti loza\'i pilno lo tadji pe le\'e verba</string>
   <string name="security">kamnu\'a</string>
   <string name="playChessEverywhere">fe\'e ro roi ku jvikei lo caxmati</string>
-  <string name="asFreeAsPlaystrategy">nonseldi\'a du\'i la .litces.</string>
+  <string name="asFreeAsPlayStrategy">nonseldi\'a du\'i la .litces.</string>
   <string name="builtForTheLoveOfChessNotMoney">finti fi lo nunpa\'i be fi lo\'i caxmati .enai lo jdini</string>
   <string name="everybodyGetsAllFeaturesForFree">ro prenu cu te sabji ro tcila fi\'o nonseldi\'a</string>
   <string name="zeroAdvertisement">no gubnoi</string>
@@ -630,7 +630,7 @@
   <string name="usernameSuffixInvalid">sarcu fa lo nu lo japcme cu se fanmo lo vlale\'u .a lo nacle\'u</string>
   <string name="usernameCharsInvalid">roloro pagbu be roloro japcme poi e\'akne cu gaga latmo lerfu gi nacle\'u giga nitlijbu\'i gi me la\'o ly. hyphen ly.</string>
   <string name="usernameUnacceptable">ti noi japcme cu se tolzau</string>
-  <string name="directlySupportPlaystrategy">sarji la .litces.</string>
+  <string name="directlySupportPlayStrategy">sarji la .litces.</string>
   <string name="playChessInStyle">selja\'i kelci lo caxmati</string>
   <string name="chessBasics">lo jicmu be lo caxmati</string>
   <string name="coaches">lo te\'ictu</string>

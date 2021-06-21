@@ -87,7 +87,7 @@ object CrudForm {
   }
 
   val imageChoices = List(
-    ""                    -> "Playstrategy",
+    ""                    -> "PlayStrategy",
     "offerspill.logo.png" -> "Offerspill"
   )
   val imageDefault = ""

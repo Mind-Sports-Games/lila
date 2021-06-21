@@ -23,7 +23,7 @@ object show {
       title = sim.fullName,
       moreJs = frag(
         jsModule("simul"),
-        embedJsUnsafeLoadThen(s"""PlaystrategySimul.start(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""PlayStrategySimul.start(${safeJsonValue(
           Json.obj(
             "data"          -> data,
             "i18n"          -> bits.jsI18n(),

@@ -29,12 +29,12 @@ object faq {
     ) {
       div(cls := "faq small-page box box-pad")(
         h1(cls := "playstrategy_title")(frequentlyAskedQuestions()),
-        h2("Playstrategy"),
+        h2("PlayStrategy"),
         question(
           "what",
           whatIsPlaystrategy.txt(),
           playstrategyAboutSummary(
-            a(href := "/about")("Playstrategy"),
+            a(href := "/about")("PlayStrategy"),
           )
         ),
         question(
@@ -159,9 +159,9 @@ object faq {
         h2(playstrategyRatings()),
         question(
           "ratings",
-          whichRatingSystemUsedByPlaystrategy.txt(),
+          whichRatingSystemUsedByPlayStrategy.txt(),
           p(
-            ratingSystemUsedByPlaystrategy()
+            ratingSystemUsedByPlayStrategy()
           )
         ),
         question(

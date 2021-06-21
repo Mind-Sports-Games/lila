@@ -2,10 +2,10 @@
 <resources>
   <string name="faqAbbreviation">MMT</string>
   <string name="frequentlyAskedQuestions">Mga Madalas na Itinatanong</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Bakit tinawag na Playstrategy ang Playstrategy?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">Ang Playstrategy ay isang pinaghalong live/light/libre at ahedres. Ibinibigkas ito ng%1$s.</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Bakit tinawag na PlayStrategy ang PlayStrategy?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">Ang PlayStrategy ay isang pinaghalong live/light/libre at ahedres. Ibinibigkas ito ng%1$s.</string>
   <string name="hearItPronouncedBySpecialist">Pakinggan itong ibinigkas ng isang espesyalista.</string>
   <string name="whyLiveLightLibre">Live, dahil ang mga laro ay linalaro at pinapanood ng totoong oras 24/7, at libre para sa katotohanang ang playstrategy ay bukas-mapagkukunan at hindi nababalutan ng pagmamay-ari ng basura na nagpapahamak sa iba pang mga website.</string>
-  <string name="howCanIContributeToPlaystrategy">Paano ako makakapag-ambag sa Playstrategy?</string>
-  <string name="playstrategyPoweredByDonationsAndVolunteers">Ang Playstrategy ay napapagana ng mga donasyon galing sa mga patron at mga pagsisikap ng isang grupo ng mga volunteers.</string>
+  <string name="howCanIContributeToPlayStrategy">Paano ako makakapag-ambag sa PlayStrategy?</string>
+  <string name="playstrategyPoweredByDonationsAndVolunteers">Ang PlayStrategy ay napapagana ng mga donasyon galing sa mga patron at mga pagsisikap ng isang grupo ng mga volunteers.</string>
 </resources>

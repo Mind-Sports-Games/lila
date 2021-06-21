@@ -273,7 +273,7 @@
     <item quantity="one">Dona %s secundas</item>
     <item quantity="other">Dona %s secundas</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Iste conto ha violate le Terminos de servicio de Playstrategy</string>
+  <string name="thisAccountViolatedTos">Iste conto ha violate le Terminos de servicio de PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Explorator de initio de joco e tabula de finales</string>
   <string name="takeback">Retornar</string>
   <string name="proposeATakeback">Proponer un retorno del ultime movimento</string>
@@ -445,8 +445,8 @@
   <string name="thankYou">Gratias!</string>
   <string name="socialMediaLinks">Ligamines de medios social</string>
   <string name="inlineNotation">Notation in lineas</string>
-  <string name="watchPlaystrategyTV">Spectar Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Previemente in Playstrategy TV</string>
+  <string name="watchPlayStrategyTV">Spectar PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Previemente in PlayStrategy TV</string>
   <string name="onlinePlayers">Jocatores in linea</string>
   <string name="activeToday">Active hodie</string>
   <string name="activePlayers">Jocatores active</string>
@@ -554,7 +554,7 @@
   <string name="clock">Horologio</string>
   <string name="unauthorizedError">Le accesso non es autorisate.</string>
   <string name="noInternetConnection">Sin connexion de Internet. Tu ancora pote jocar disconnectite a partir del menu.</string>
-  <string name="connectedToPlaystrategy">Tu es ora connectite a playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Tu es ora connectite a playstrategy.org</string>
   <string name="signedOut">Tu ha claudite le session</string>
   <string name="loginSuccessful">Tu ha aperite un session</string>
   <string name="playOnTheBoardOffline">Partita local</string>
@@ -589,7 +589,7 @@
   </plurals>
   <string name="tpTimeSpentPlaying">Tempore jocante: %s</string>
   <string name="watchGames">Spectar jocos</string>
-  <string name="tpTimeSpentOnTV">Tempore spectante Playstrategy TV: %s</string>
+  <string name="tpTimeSpentOnTV">Tempore spectante PlayStrategy TV: %s</string>
   <string name="watch">Spectar</string>
   <string name="videoLibrary">Videotheca</string>
   <string name="streamersMenu">Streamers</string>
@@ -621,7 +621,7 @@
   <string name="simulClockHint">Configuration de Horologio Fischer. Quanto plus jocatores tu accepta, tanto plus tempore tu pote requirer.</string>
   <string name="simulAddExtraTime">Tu pote adder tempore additional a tu horologio pro adjutar a arrangiar te con le exhibition simultanee.</string>
   <string name="simulHostExtraTime">Tempore additional al hospite</string>
-  <string name="playstrategyTournaments">Torneos official de Playstrategy</string>
+  <string name="playstrategyTournaments">Torneos official de PlayStrategy</string>
   <string name="tournamentFAQ">Questiones frequente sur le torneos Arena</string>
   <string name="tournamentOfficial">Official</string>
   <string name="timeBeforeTournamentStarts">Tempore ante le initio del torneo</string>
@@ -656,8 +656,8 @@
   <string name="weHaveSentYouAnEmailTo">Nos ha inviate un message de e-posta a %s. Clicca sur le ligamine in le message pro restaurar tu contrasigno.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Per registrar, tu accepta nostre %s.</string>
   <string name="readAboutOur">Lege nostre %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Retardo in le rete inter te e Playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Tempore pro processar un movimento sur le servitor de Playstrategy</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Retardo in le rete inter te e PlayStrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Tempore pro processar un movimento sur le servitor de PlayStrategy</string>
   <string name="downloadAnnotated">Discargar joco annotate</string>
   <string name="downloadRaw">Discargar in formato crude</string>
   <string name="downloadImported">Discargar joco importate</string>
@@ -673,7 +673,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Tu jam ha registrate le e-posta: %s</string>
   <string name="kidMode">Modo infantil</string>
   <string name="kidModeExplanation">Isto concerne la securitate. In le modo infantil, tote le communicationes del sito es disactivate. Activa isto pro tu infantes e alumnos scholar, pro proteger los de altere usatores.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">In le modo infantil, le logo de Playstrategy ha un icone %s, pro que tu sape que tu infantes es secur.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">In le modo infantil, le logo de PlayStrategy ha un icone %s, pro que tu sape que tu infantes es secur.</string>
   <string name="enableKidMode">Activar modo infantil</string>
   <string name="disableKidMode">Disactivar modo infantil</string>
   <string name="security">Securitate</string>
@@ -681,7 +681,7 @@
   <string name="alternativelyYouCanX">Alternativemente tu pote %s.</string>
   <string name="revokeAllSessions">revocar tote sessiones</string>
   <string name="playChessEverywhere">Joca chacos ubique!</string>
-  <string name="asFreeAsPlaystrategy">Tanto gratis como Playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Tanto gratis como PlayStrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Disveloppate pro le amor al chacos, e non pro le moneta</string>
   <string name="everybodyGetsAllFeaturesForFree">Totes recipe gratuitemente tote le functionalitates</string>
   <string name="zeroAdvertisement">Sin annuncios</string>
@@ -721,7 +721,7 @@
   <string name="usernameSuffixInvalid">Le nomine de usator debe finir con un littera o un numero.</string>
   <string name="usernameCharsInvalid">Le nomine de usator debe continer solmente litteras, numeros, sublineas ( _ ) e lineettas ( - ).</string>
   <string name="usernameUnacceptable">Iste nomine de usator non es acceptabile.</string>
-  <string name="directlySupportPlaystrategy">Appoia directemente Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Appoia directemente PlayStrategy</string>
   <string name="playChessInStyle">Joca chacos con stilo</string>
   <string name="chessBasics">Fundamentos</string>
   <string name="coaches">Tutores</string>
@@ -796,7 +796,7 @@
   <string name="agreementAssistance">Io accepta que in ulle occasion io non recipera assistentia durante mi partitas (ab un computator de chacos, base de datos o altere persona).</string>
   <string name="agreementNice">Io accepta que io sempre essera respectuose a altere jocatores.</string>
   <string name="agreementAccount">Io accepta que io non creara multiple contos.</string>
-  <string name="agreementPolicy">Io accepta que io sequera tote le politicas de Playstrategy.</string>
+  <string name="agreementPolicy">Io accepta que io sequera tote le politicas de PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Cerca o initia un nove conversation</string>
   <string name="edit">Modificar</string>
   <string name="rapid">Rapide</string>

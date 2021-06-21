@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Playstrategy-valmentajat</string>
-  <string name="playstrategyCoach">Playstrategy-valmentaja</string>
+  <string name="playstrategyCoaches">PlayStrategy-valmentajat</string>
+  <string name="playstrategyCoach">PlayStrategy-valmentaja</string>
   <string name="areYouCoach">Oletko hyvä shakkivalmentaja, jolla on %s?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">kansallinen tai FIDE-arvonimi</string>
   <string name="confirmTitle">Vahvista tittelisi tästä niin tarkastamme hakemuksesi.</string>
@@ -14,7 +14,7 @@
   <string name="accepting">Hyväksyn oppilaita</string>
   <string name="notAccepting">En ota oppilaita tällä hetkellä</string>
   <string name="xCoachesStudents">%s valmentaa shakkioppilaita</string>
-  <string name="viewXProfile">Katsele %s:n Playstrategy-profiilia</string>
+  <string name="viewXProfile">Katsele %s:n PlayStrategy-profiilia</string>
   <string name="sendPM">Lähetä yksityisviesti</string>
   <string name="aboutMe">Tietoa minusta</string>
   <string name="playingExperience">Pelikokemus</string>

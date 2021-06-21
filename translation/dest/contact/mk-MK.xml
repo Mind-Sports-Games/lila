@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="contact">Контакт</string>
-  <string name="contactPlaystrategy">Контактирајте ја Playstrategy</string>
+  <string name="contactPlayStrategy">Контактирајте ја PlayStrategy</string>
   <string name="whatCanWeHelpYouWith">Како можеме да ви помогнеме?</string>
   <string name="visitThisPage">Посетете ја странава за да го решите проблемот</string>
   <string name="iCantLogIn">Не можам да се пријавам</string>
@@ -12,8 +12,8 @@
   <string name="lost2FA">Немам пристап до моите двофакторски кодови за доказ на автентичност</string>
   <string name="doPasswordReset">Обновете ја лозинката за да го поништите секундарниот фактор</string>
   <string name="accountSupport">Ми треба поддршка за корисничката сметка</string>
-  <string name="wantTitle">Сакам мојата титула да е прикажана на Playstrategy</string>
-  <string name="visitTitleConfirmation">За да ја прикажете титулата на вашиот Playstrategy профил, и да учествувате на „Арена со Титули“, посетете ја страната за потврда на титули</string>
+  <string name="wantTitle">Сакам мојата титула да е прикажана на PlayStrategy</string>
+  <string name="visitTitleConfirmation">За да ја прикажете титулата на вашиот PlayStrategy профил, и да учествувате на „Арена со Титули“, посетете ја страната за потврда на титули</string>
   <string name="wantCloseAccount">Сакам да си ја затворам сметката</string>
   <string name="closeYourAccount">Можете да си ја затворите на оваа страна</string>
   <string name="doNotAskByEmail">Не барајте од нас да ви ја затвориме сметката по е-пошта - тоа нема да го направиме.</string>
@@ -33,10 +33,10 @@
   <string name="doNotMessageModerators">Не праќај директни пораки до модераторите.</string>
   <string name="onlyReports">Пријавувањето играчи само преку формуларот е многу ефикасно.</string>
   <string name="wantReportBug">Сакам да пријавам грешка</string>
-  <string name="reportBugInForum">Во Playstrategy Feedback, форумот за сугестии</string>
-  <string name="reportWebsiteIssue">Како проблем на Playstrategy веб страната на GitHub</string>
-  <string name="reportMobileIssue">Како проблем на Playstrategy мобилната апликација на GitHub</string>
-  <string name="reportBugInDiscord">На Playstrategy Discord серверот</string>
+  <string name="reportBugInForum">Во PlayStrategy Feedback, форумот за сугестии</string>
+  <string name="reportWebsiteIssue">Како проблем на PlayStrategy веб страната на GitHub</string>
+  <string name="reportMobileIssue">Како проблем на PlayStrategy мобилната апликација на GitHub</string>
+  <string name="reportBugInDiscord">На PlayStrategy Discord серверот</string>
   <string name="howToReportBug">Ве молиме опишете како изгледа грешката, што всушност очекувавте да се случи, и кои чекори треба да ги направиме за да ја добиеме грешката.</string>
   <string name="illegalPawnCapture">Недозволено земање со пешакот</string>
   <string name="calledEnPassant">Се вика „Ан Пасан“ и е едно од правилата во шахот.</string>
@@ -62,13 +62,13 @@
   <string name="doNotDeny">Не одрекувајте дека сте мамеле. За да ви биде дозволено да создадете нова сметка, признајте што сте направиле, и покажете дека разбирате како сте згрешиле.</string>
   <string name="otherRestriction">Некое друго ограничување</string>
   <string name="collaboration">Соработка - правна и комерцијална</string>
-  <string name="monetizing">Монетизација на Playstrategy</string>
-  <string name="buyingPlaystrategy">Купување на Playstrategy</string>
-  <string name="authorizationToUse">Дозвола за користење на Playstrategy</string>
-  <string name="welcomeToUse">Дозволено е користење на Playstrategy за вашите активности, дури и ако се комерцијални.</string>
-  <string name="videosAndBooks">Можете да го прикажувате во вашите видеа, а можете и да користите слики од Playstrategy во вашите книги.</string>
+  <string name="monetizing">Монетизација на PlayStrategy</string>
+  <string name="buyingPlayStrategy">Купување на PlayStrategy</string>
+  <string name="authorizationToUse">Дозвола за користење на PlayStrategy</string>
+  <string name="welcomeToUse">Дозволено е користење на PlayStrategy за вашите активности, дури и ако се комерцијални.</string>
+  <string name="videosAndBooks">Можете да го прикажувате во вашите видеа, а можете и да користите слики од PlayStrategy во вашите книги.</string>
   <string name="creditAppreciated">Цениме кога ни го припишувате трудот, но тоа не е задолжително.</string>
   <string name="noneOfTheAbove">Ништо од наведеното</string>
   <string name="sendEmailAt">Пратете ни е-пошта на %s.</string>
-  <string name="explainYourRequest">Ве молиме објаснете го вашето барање јасно и прецизно. Наведете го вашето корисничко име на Playstrategy, како и сите информации кои би ни помогнале да ви помогнеме.</string>
+  <string name="explainYourRequest">Ве молиме објаснете го вашето барање јасно и прецизно. Наведете го вашето корисничко име на PlayStrategy, како и сите информации кои би ни помогнале да ви помогнеме.</string>
 </resources>

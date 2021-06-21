@@ -2,7 +2,7 @@
 <resources>
   <string name="playstrategyClasses">ชั้นเรียน</string>
   <string name="trackStudentProgress">ติดตามความก้าวหน้าของนักเรียนจากเกมและปริศนา</string>
-  <string name="createANewPlaystrategyAccount">สร้างบัญชี Playstrategy ใหม่</string>
+  <string name="createANewPlayStrategyAccount">สร้างบัญชี PlayStrategy ใหม่</string>
   <string name="winrate">อัตราชนะ</string>
   <string name="nothingHere">ยังไม่มีอะไรที่นี่</string>
 </resources>

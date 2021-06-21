@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyClasses">Playstrategy Sınıfları</string>
-  <string name="teachClassesOfChessStudents">Satranç öğrencilerine Playstrategy Sınıflar araç setiyle ders verin.</string>
+  <string name="playstrategyClasses">PlayStrategy Sınıfları</string>
+  <string name="teachClassesOfChessStudents">Satranç öğrencilerine PlayStrategy Sınıflar araç setiyle ders verin.</string>
   <string name="features">Özellikler</string>
   <string name="quicklyGenerateSafeUsernames">Öğrenciler için hızlıca güvenli kullanıcı adları ve şifreleri oluşturun</string>
   <string name="trackStudentProgress">Oyunlar ve bulmacalardaki öğrenci ilerlemesini takip edin</string>
   <string name="messageAllStudents">Yeni ders materyali hakkında tüm öğrencilere mesaj atın</string>
   <string name="freeForAllForever">Herkes için, her zaman, reklamsız ve takipçisiz, %100 ücretsiz</string>
-  <string name="applyToBePlaystrategyTeacher">Playstrategy Eğitmeni olmak için başvurun</string>
+  <string name="applyToBePlayStrategyTeacher">PlayStrategy Eğitmeni olmak için başvurun</string>
   <string name="noClassesYet">Henüz bir sınıf yok.</string>
   <string name="teachersX">Eğitmenler: %s</string>
   <string name="newClass">Yeni sınıf</string>
@@ -23,7 +23,7 @@
   <string name="classDescription">Sınıf açıklaması</string>
   <string name="visibleByBothStudentsAndTeachers">Hem antrenörler hem de sınıfın öğrencileri tarafından görülebilir</string>
   <string name="teachersOfTheClass">Sınıf antrenörleri</string>
-  <string name="addPlaystrategyUsernames">Oyuncuların Playstrategy kullanıcı adlarını ekleyerek onları antrenör olarak davet edin. Her satırda bir isim olmalı.</string>
+  <string name="addPlayStrategyUsernames">Oyuncuların PlayStrategy kullanıcı adlarını ekleyerek onları antrenör olarak davet edin. Her satırda bir isim olmalı.</string>
   <string name="resetPassword">Şifreyi sıfırla</string>
   <string name="makeSureToCopy">Parolayı kopyaladığınızdan veya bir yere yazdığınızdan emin olun. Bir daha parolayı göremeyeceksiniz!</string>
   <string name="passwordX">Şifre: %s</string>
@@ -32,21 +32,21 @@
   <string name="realName">Gerçek isim</string>
   <string name="privateWillNeverBeShown">Özel. Yalnızca sınıftakiler görebilir. Öğrencinin kim olduğunu hatırlamanıza yardımcı olur.</string>
   <string name="addStudent">Öğrenci ekleyin</string>
-  <string name="playstrategyProfileXCreatedForY">%2$s için Playstrategy profili %1$s oluşturuldu.</string>
+  <string name="playstrategyProfileXCreatedForY">%2$s için PlayStrategy profili %1$s oluşturuldu.</string>
   <string name="studentCredentials">Öğrenci: %1$s
 Kullanıcı adı: %2$s
 Şifre: %3$s</string>
-  <string name="inviteAPlaystrategyAccount">Bir Playstrategy hesabını davet edin</string>
-  <string name="inviteDesc1">Öğrencinin hâlihazırda bir Playstrategy hesabı varsa sınıfa davet edebilirsiniz.</string>
-  <string name="inviteDesc2">Playstrategy üzerinden göndereceğimiz mesajdaki bağlantıyı kullanarak sınıfa katılabilirler.</string>
+  <string name="inviteAPlayStrategyAccount">Bir PlayStrategy hesabını davet edin</string>
+  <string name="inviteDesc1">Öğrencinin hâlihazırda bir PlayStrategy hesabı varsa sınıfa davet edebilirsiniz.</string>
+  <string name="inviteDesc2">PlayStrategy üzerinden göndereceğimiz mesajdaki bağlantıyı kullanarak sınıfa katılabilirler.</string>
   <string name="inviteDesc3">Önemli: Sadece tanıdığınız ve sınıfa etkin bir şekilde katılmak isteyen öğrencileri davet edin.</string>
   <string name="inviteDesc4">Asla rastgele oyunculara istenmeyen davetler göndermeyin.</string>
-  <string name="createANewPlaystrategyAccount">Yeni bir Playstrategy hesabı oluşturun</string>
-  <string name="createDesc1">Öğrencinin Playstrategy hesabı yoksa buradan yeni bir hesap açabilirsiniz.</string>
+  <string name="createANewPlayStrategyAccount">Yeni bir PlayStrategy hesabı oluşturun</string>
+  <string name="createDesc1">Öğrencinin PlayStrategy hesabı yoksa buradan yeni bir hesap açabilirsiniz.</string>
   <string name="createDesc2">E-posta adresine gerek yoktur. Size vereceğimiz şifreyi öğrenciye iletirseniz hesabına giriş yapabilir.</string>
   <string name="createDesc3">Önemli: Öğrencilerin birden fazla hesabı olmamalı.</string>
   <string name="createDesc4">Hâlihazırda hesabı olan öğrenciler için davet formunu kullanın.</string>
-  <string name="playstrategyUsername">Playstrategy kullanıcı adı</string>
+  <string name="playstrategyUsername">PlayStrategy kullanıcı adı</string>
   <string name="generateANewUsername">Yeni bir kullanıcı adı oluşturun</string>
   <string name="welcomeToClass">Sınıfınıza hoşgeldiniz: %s
 Sınıfa erişim linki burada.</string>

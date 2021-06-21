@@ -2,20 +2,20 @@
 <resources>
   <string name="faqAbbreviation">ЕБС</string>
   <string name="frequentlyAskedQuestions">Еш бирелә торган сораулар</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Ни өчен Playstrategy, Playstrategy дип атала?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">Playstrategy - яши/яктылык/китапханә һәм шаһматның берләшүе. Бу %1$s дип әйтелә.</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Ни өчен PlayStrategy, PlayStrategy дип атала?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">PlayStrategy - яши/яктылык/китапханә һәм шаһматның берләшүе. Бу %1$s дип әйтелә.</string>
   <string name="leechess">ли-чес</string>
   <string name="hearItPronouncedBySpecialist">Аны белгеч игълан иткәнне ишетегез.</string>
-  <string name="whyLiveLightLibre">Яши, чөнки уеннар чын вакытта 24 сәгать уйныйлар һәм карыйлар; Playstrategy ачык чыганаклы булуы һәм бүтән вебсайтларны җәберләүче милек кирәксезлеге өчен җиңел.</string>
-  <string name="whyIsLilaCalledLila">Шулай ук, Playstrategy өчен чыганак коды,%1$s, li[chess scа]la дигәнне аңлата, чөнки Playstrategyның күпчелек өлеше интуитив программалаштыру теле %2$s белән язылган.</string>
-  <string name="howCanIContributeToPlaystrategy">Playstrategyка ничек ярдәм итә алам?</string>
-  <string name="playstrategyPoweredByDonationsAndVolunteers">Playstrategy иганәчеләрнең иганәләре һәм өмәчеләр төркеме көче белән эшләнә.</string>
-  <string name="findMoreAndSeeHowHelp">Сез %1$s турында күбрәк белә аласыз (шул исәптән %2$s). Әгәр дә сез вакытыгызны һәм осталыгыгызны волонтер итеп Playstrategyка булышырга телисез икән, бик күп %3$s бар.</string>
+  <string name="whyLiveLightLibre">Яши, чөнки уеннар чын вакытта 24 сәгать уйныйлар һәм карыйлар; PlayStrategy ачык чыганаклы булуы һәм бүтән вебсайтларны җәберләүче милек кирәксезлеге өчен җиңел.</string>
+  <string name="whyIsLilaCalledLila">Шулай ук, PlayStrategy өчен чыганак коды,%1$s, li[chess scа]la дигәнне аңлата, чөнки PlayStrategyның күпчелек өлеше интуитив программалаштыру теле %2$s белән язылган.</string>
+  <string name="howCanIContributeToPlayStrategy">PlayStrategyка ничек ярдәм итә алам?</string>
+  <string name="playstrategyPoweredByDonationsAndVolunteers">PlayStrategy иганәчеләрнең иганәләре һәм өмәчеләр төркеме көче белән эшләнә.</string>
+  <string name="findMoreAndSeeHowHelp">Сез %1$s турында күбрәк белә аласыз (шул исәптән %2$s). Әгәр дә сез вакытыгызны һәм осталыгыгызны волонтер итеп PlayStrategyка булышырга телисез икән, бик күп %3$s бар.</string>
   <string name="beingAPatron">иганәче булу</string>
   <string name="breakdownOfOurCosts">чыгымнарыбызны бүлү</string>
   <string name="otherWaysToHelp">ярдәм итүнең башка ысуллары</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">Playstrategyка нигезләнгән вебсайтлар бармы?</string>
-  <string name="yesPlaystrategyInspiredOtherOpenSourceWebsites">Әйе. Playstrategy чыннан да безнең %1$s, %2$s, яки %3$s кулланган бүтән ачык чыганак сайтларын рухландырды.</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">PlayStrategyка нигезләнгән вебсайтлар бармы?</string>
+  <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">Әйе. PlayStrategy чыннан да безнең %1$s, %2$s, яки %3$s кулланган бүтән ачык чыганак сайтларын рухландырды.</string>
   <string name="fairPlay">Гадел уен</string>
   <string name="whenAmIEligibleRatinRefund">Кайчан мин алдакчылардан автоматик рейтингны кире кайтарырга хокуклы?</string>
   <string name="ratingRefundExplanation">Уенчы билгеләнгәннән соң бер минуттан соңгы 3 көн эчендә аларның иң соңгы 40 уены алынды. Әгәр дә сез бу уеннарда көндәш булсагыз, сез рейтингны югалттыгыз (оттыру яки җирәбә аркасында), һәм сезнең рейтинг вакытлыча булмаган, сез рейтингны кире кайтарасыз. Кире кайтару сезнең иң югары рейтингыгызга һәм уеннан соң сезнең рейтингыгызга нигезләнеп ясала.
@@ -25,35 +25,35 @@
   <string name="howCanIBecomeModerator">Ничек мин модератор була алам?</string>
   <string name="youCannotApply">Модератор булу өчен гариза бирү мөмкин түгел. Әгәр дә без модератор буларак яхшы булыр дип уйлаган кешене күрсәк, без алар белән турыдан-туры элемтәгә керербез.</string>
   <string name="isCorrespondenceDifferent">Хат алышу гадәти шахматтан аерылып торамы?</string>
-  <string name="youCanUseOpeningBookNoEngine">Playstrategyта, корреспонденция шахмат кагыйдәләренең төп аермасы - ачылган китап рөхсәт ителә. Двигательләр куллану әле дә тыелган һәм двигатель ярдәме өчен флагка китереләчәк. ICCF двигательне корреспонденциядә кулланырга рөхсәт итсә дә, Playstrategy рөхсәт итми.</string>
+  <string name="youCanUseOpeningBookNoEngine">PlayStrategyта, корреспонденция шахмат кагыйдәләренең төп аермасы - ачылган китап рөхсәт ителә. Двигательләр куллану әле дә тыелган һәм двигатель ярдәме өчен флагка китереләчәк. ICCF двигательне корреспонденциядә кулланырга рөхсәт итсә дә, PlayStrategy рөхсәт итми.</string>
   <string name="gameplay">Уенуйнамак</string>
   <string name="howBulletBlitzEtcDecided">Мәрми, Яшендәй һәм башка вакытны башкару ничек хәл ителә?</string>
-  <string name="basedOnGameDuration">Playstrategy вакытны башкару белән уенның фаразланган вакытына нигезләнә =%1$s
+  <string name="basedOnGameDuration">PlayStrategy вакытны башкару белән уенның фаразланган вакытына нигезләнә =%1$s
 Мәсәлән, 5 + 3 уенның смета озынлыгы 5 × 60 + 40 × 3 = 420 секунд.</string>
   <string name="durationFormula">(сәгатьнең башлангыч вакыты) + 40 × (сәгать арту)</string>
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$s с = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$s с = %2$s</string>
-  <string name="whatVariantsCanIplay">Ни вариантлар Мин уйный алам Playstrategy та?</string>
-  <string name="playstrategySupportChessAnd">Playstrategy гадәти шаһматны һәм %1$s ярдәм итә.</string>
+  <string name="whatVariantsCanIplay">Ни вариантлар Мин уйный алам PlayStrategy та?</string>
+  <string name="playstrategySupportChessAnd">PlayStrategy гадәти шаһматны һәм %1$s ярдәм итә.</string>
   <string name="eightVariants">8 шаһмат варианты</string>
   <string name="whatIsACPL">Ни ул уртача урнашу-матерьялы җиңүлүше (ACPL)?</string>
   <string name="fideHandbookX">FIDE кулланмасы %s</string>
   <string name="discoveringEnPassant">Ни өчен җәяүлене инде узган җәяүлене тотып ала? (бик вакытлы)</string>
   <string name="goodIntroduction">якшы кереш сүз</string>
   <string name="officialRulesPDF">төпләнгән кагыйдәләр (PDF)</string>
-  <string name="playstrategyTraining">Playstrategy күнегүе</string>
+  <string name="playstrategyTraining">PlayStrategy күнегүе</string>
   <string name="threefoldRepetition">Өч тапкыр кабатлау</string>
-  <string name="threefoldRepetitionExplanation">Әгәр дә позиция өч тапкыр килеп чыкса, уенчылар %1$s белән җирәбә таләп итә ала. Playstrategy рәсми FIDE кагыйдәләрен тормышка ашыра, %2$s ның 9.2 (d) статьясында күрсәтелгәнчә.</string>
+  <string name="threefoldRepetitionExplanation">Әгәр дә позиция өч тапкыр килеп чыкса, уенчылар %1$s белән җирәбә таләп итә ала. PlayStrategy рәсми FIDE кагыйдәләрен тормышка ашыра, %2$s ның 9.2 (d) статьясында күрсәтелгәнчә.</string>
   <string name="threefoldRepetitionLowerCase">өч тапкыр кабатлау</string>
   <string name="repeatedPositionsThatMatters">Өч тапкыр кабатлау %1$s, хәрәкәт түгел. Кабатлау эзлекле булырга тиеш түгел.</string>
   <string name="positions">позициясе</string>
   <string name="weRepeatedthreeTimesPosButNoDraw">Без позицияне өч вакытка такрарладык. Ни өчен уен уртак нәтиҗәдә тугел?</string>
   <string name="configure">конфигурацияләү</string>
   <string name="accounts">Хисап</string>
-  <string name="titlesAvailableOnPlaystrategy">Playstrategyда нинди исемнәр бар?</string>
+  <string name="titlesAvailableOnPlayStrategy">PlayStrategyда нинди исемнәр бар?</string>
   <string name="asWellAsManyNMtitles">күп милли мастер титуллары</string>
   <string name="verificationForm">тикшерү формасы</string>
-  <string name="canIbecomeLM">Playstrategy Мастеры (LM) исемен ала аласызмы?</string>
+  <string name="canIbecomeLM">PlayStrategy Мастеры (LM) исемен ала аласызмы?</string>
   <string name="noUpperCaseDot">Юк.</string>
   <string name="whatUsernameCanIchoose">Минем Кулланучынәмә нинди булырга мөмкин?</string>
   <string name="guidelines">күрсәтмәләр</string>
@@ -61,7 +61,7 @@
   <string name="uniqueTrophies">Фәридәи казанышлар</string>
   <string name="wayOfBerserkExplanation">Аны алу өчен, hiimgosu үзен яманга һәм %s уеннарда 100%% җиңү өчен көрәште.</string>
   <string name="aHourlyBulletTournament">cәгатьләп Марми бәйгесе</string>
-  <string name="playstrategyRatings">Playstrategy рейтингы</string>
+  <string name="playstrategyRatings">PlayStrategy рейтингы</string>
   <string name="ratingDeviationMorethanOneHundredTen">Анык кылып әйткәндә, бу Glicko-2 огышлыгы 110 дан катлы икәнлеге аңлатыладыр. Огышлыгы бу низамның рейтингында булган ышаныч дәрәҗәсе. Огышканча кече булса рейтингы шулчаклы тотрыклы буладыр.</string>
   <string name="ratingLeaderboards">рейтинглы рәһбәрләр тактасы</string>
   <string name="havePlayedMoreThanThirtyGamesInThatRating">бирелгән рейтингта ким дигәндә 30 бәяләнү уены уйнадылар,</string>
@@ -72,9 +72,9 @@
   <string name="displayPreferences">өстенлекләрне күрсәтү</string>
   <string name="howToThreeDots">Кандай...</string>
   <string name="viewSiteInformationPopUp">Сайт хакында мәгълүматны күрү</string>
-  <string name="playstrategyCanOptionnalySendPopUps">Playstrategy ихтияры рәвешендә кинәт чыгыш хәбәрнәмаларны ябырылыш мөмкин, мәсәлән, сезнең нәүбәтеңез булганда яки сез шәхси хәбәр алганыңызга.
+  <string name="playstrategyCanOptionnalySendPopUps">PlayStrategy ихтияры рәвешендә кинәт чыгыш хәбәрнәмаларны ябырылыш мөмкин, мәсәлән, сезнең нәүбәтеңез булганда яки сез шәхси хәбәр алганыңызга.
 
 Браузерыгызның URL сызыгында playstrategy.org адресы янындагы йозак иконасына басыгыз.
 
-Аннары Playstrategy хәбәрләрне рөхсәт итәргәме, ябаргамы-юкмы икәнен сайлагыз.</string>
+Аннары PlayStrategy хәбәрләрне рөхсәт итәргәме, ябаргамы-юкмы икәнен сайлагыз.</string>
 </resources>

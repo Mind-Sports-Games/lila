@@ -66,12 +66,12 @@ object TreeBuilder {
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
             comments = Node.Comments {
               drawOfferPlies(g.turns)
-                .option(makePlaystrategyComment(s"${!Color.fromPly(g.turns)} offers draw"))
+                .option(makePlayStrategyComment(s"${!Color.fromPly(g.turns)} offers draw"))
                 .toList :::
                 advice
                   .map(_.makeComment(withEval = false, withBestMove = true))
                   .toList
-                  .map(makePlaystrategyComment)
+                  .map(makePlayStrategyComment)
             }
           )
           advices.get(g.turns + 1).flatMap { adv =>
@@ -90,11 +90,11 @@ object TreeBuilder {
     }
   }
 
-  private def makePlaystrategyComment(text: String) =
+  private def makePlayStrategyComment(text: String) =
     Node.Comment(
       Node.Comment.Id.make,
       Node.Comment.Text(text),
-      Node.Comment.Author.Playstrategy
+      Node.Comment.Author.PlayStrategy
     )
 
   private def withAnalysisChild(

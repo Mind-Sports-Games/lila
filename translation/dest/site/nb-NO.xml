@@ -286,7 +286,7 @@
     <item quantity="one">Gi %s sekund</item>
     <item quantity="other">Gi %s sekunder</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Denne kontoen brøt vilkårene for å bruke Playstrategy</string>
+  <string name="thisAccountViolatedTos">Denne kontoen brøt vilkårene for å bruke PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Åpningsutforsker &amp; tabellbase</string>
   <string name="takeback">Angre</string>
   <string name="proposeATakeback">Foreslå å angre</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Takk!</string>
   <string name="socialMediaLinks">Linker til sosiale media</string>
   <string name="inlineNotation">Innebygd notasjon</string>
-  <string name="watchPlaystrategyTV">Se på Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Tidligere på Playstrategy TV</string>
+  <string name="watchPlayStrategyTV">Se på PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Tidligere på PlayStrategy TV</string>
   <string name="onlinePlayers">Påloggede spillere</string>
   <string name="activeToday">Aktive i dag</string>
   <string name="activePlayers">Aktive spillere</string>
@@ -567,7 +567,7 @@
   <string name="clock">Klokke</string>
   <string name="unauthorizedError">Uautorisert tilgang.</string>
   <string name="noInternetConnection">Ingen internettilkobling. Du kan fremdeles spille frakoblet fra menyen.</string>
-  <string name="connectedToPlaystrategy">Du er nå tilkoblet playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Du er nå tilkoblet playstrategy.org</string>
   <string name="signedOut">Du har blitt logget ut.</string>
   <string name="loginSuccessful">Du er nå pålogget</string>
   <string name="playOnTheBoardOffline">Over brettet</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Fischeroppsett. Desto flere spillere som spiller mot deg, jo mer tid vil du antageligvis trenge.</string>
   <string name="simulAddExtraTime">Du kan legge til ekstra tid på klokken din for å håndtere simultanen.</string>
   <string name="simulHostExtraTime">Ekstra tid for simultanoppviseren</string>
-  <string name="playstrategyTournaments">Playstrategyturneringer</string>
+  <string name="playstrategyTournaments">PlayStrategyturneringer</string>
   <string name="tournamentFAQ">Arenaturneringsspørsmål</string>
   <string name="tournamentOfficial">Offisiell</string>
   <string name="timeBeforeTournamentStarts">Tid før turnering starter</string>
@@ -669,8 +669,8 @@
   <string name="weHaveSentYouAnEmailTo">Vi har sendt en e-post til %s. Klikk på linken i e-posten for å tilbakestille passordet ditt.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Ved å registrere deg godtar du våre %s.</string>
   <string name="readAboutOur">Les %s vår.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Nettverksforsinkelsen mellom deg og playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Tiden det tar å behandle et trekk på playstrategy-serveren</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Nettverksforsinkelsen mellom deg og playstrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Tiden det tar å behandle et trekk på playstrategy-serveren</string>
   <string name="downloadAnnotated">Last ned kommentert</string>
   <string name="downloadRaw">Last ned rådata</string>
   <string name="downloadImported">Last ned importen</string>
@@ -686,7 +686,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Du har allerede registrert e-postadressen: %s</string>
   <string name="kidMode">Barnemodus</string>
   <string name="kidModeExplanation">Dette handler om sikkerhet. I barnemodus blir all kommunikasjon skrudd av. Bruk dette for å skjerme barn og skole-elever mot brukere på Internett.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">I barnemodus får playstrategy-logoen et %s symbol, så du vet at barna dine er trygge.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">I barnemodus får playstrategy-logoen et %s symbol, så du vet at barna dine er trygge.</string>
   <string name="enableKidMode">Skru på barnemodus</string>
   <string name="disableKidMode">Skru av barnemodus</string>
   <string name="security">Sikkerhet</string>
@@ -694,7 +694,7 @@
   <string name="alternativelyYouCanX">Ellers kan du %s.</string>
   <string name="revokeAllSessions">lukke alle økter</string>
   <string name="playChessEverywhere">Spill sjakk overalt</string>
-  <string name="asFreeAsPlaystrategy">Like gratis som playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Like gratis som playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Bygget for kjærlighet til sjakk, ikke penger</string>
   <string name="everybodyGetsAllFeaturesForFree">Alle får alle funksjoner gratis</string>
   <string name="zeroAdvertisement">Ingen reklame</string>
@@ -734,7 +734,7 @@
   <string name="usernameSuffixInvalid">Det siste tegnet i brukernavnet må være en bokstav eller et tall.</string>
   <string name="usernameCharsInvalid">Brukernavnet kan bare bestå av bokstaver, tall, understrekingstegn og bindestreker. Det er ikke lov med flere understrekingstegn eller bindestreker på rad.</string>
   <string name="usernameUnacceptable">Dette brukernavnet er ikke akseptabelt.</string>
-  <string name="directlySupportPlaystrategy">Støtt Playstrategy direkte</string>
+  <string name="directlySupportPlayStrategy">Støtt PlayStrategy direkte</string>
   <string name="playChessInStyle">Spill sjakk med stil</string>
   <string name="chessBasics">Grunnleggende sjakk</string>
   <string name="coaches">Trenere</string>
@@ -821,7 +821,7 @@
   <string name="agreementAssistance">Jeg lover at jeg aldri vil motta hjelp under partiene mine, hverken fra maskiner, bøker, databaser eller andre personer.</string>
   <string name="agreementNice">Jeg lover å alltid være høflig mot andre spillere.</string>
   <string name="agreementAccount">Jeg lover å ikke opprette flere brukerkonti.</string>
-  <string name="agreementPolicy">Jeg lover å respektere alle Playstrategy\' retningslinjer.</string>
+  <string name="agreementPolicy">Jeg lover å respektere alle PlayStrategy\' retningslinjer.</string>
   <string name="searchOrStartNewDiscussion">Søk eller start en ny diskusjon</string>
   <string name="edit">Rediger</string>
   <string name="rapid">Hurtigsjakk</string>

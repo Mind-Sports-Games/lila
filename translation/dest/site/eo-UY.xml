@@ -273,7 +273,7 @@
     <item quantity="one">Doni %s sekundojn</item>
     <item quantity="other">Doni %s sekundojn</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Ĉi tiu konto malobservis la Kondiĉojn de Servo de Playstrategy</string>
+  <string name="thisAccountViolatedTos">Ĉi tiu konto malobservis la Kondiĉojn de Servo de PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Esplorilo de malfermoj &amp; tablobazo</string>
   <string name="takeback">Repreno</string>
   <string name="proposeATakeback">Proponi reprenon</string>
@@ -445,8 +445,8 @@
   <string name="thankYou">Dankon!</string>
   <string name="socialMediaLinks">Ligiloj al sociaj retejoj</string>
   <string name="inlineNotation">Enlineaj markoj</string>
-  <string name="watchPlaystrategyTV">Spekti Playstrategy-TV</string>
-  <string name="previouslyOnPlaystrategyTV">Antaŭe ĉe Playstrategy-TV</string>
+  <string name="watchPlayStrategyTV">Spekti PlayStrategy-TV</string>
+  <string name="previouslyOnPlayStrategyTV">Antaŭe ĉe PlayStrategy-TV</string>
   <string name="onlinePlayers">Konektitaj ludantoj</string>
   <string name="activeToday">Aktivaj hodiaŭ</string>
   <string name="activePlayers">Aktivaj ludantoj</string>
@@ -552,7 +552,7 @@
   <string name="clock">Horloĝo</string>
   <string name="unauthorizedError">Aliro estas malpermesata.</string>
   <string name="noInternetConnection">Neniu interreta konekto. Vi ja povas ludi malkonektite de la menuo.</string>
-  <string name="connectedToPlaystrategy">Vi nun estas konektita al playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Vi nun estas konektita al playstrategy.org</string>
   <string name="signedOut">Vi elsalutis</string>
   <string name="loginSuccessful">Vi ĵus ensalutis</string>
   <string name="playOnTheBoardOffline">Ludi fizike kun aliulo</string>
@@ -618,7 +618,7 @@
   <string name="simulClockHint">Ŝakhorloĝo. Ju pli da ludantoj kiujn vi defios, des pli da tempo kiun vi eble bezonos.</string>
   <string name="simulAddExtraTime">Vi povas aldoni plian tempon al via ŝakhorloĝo por helpi vian ludadon.</string>
   <string name="simulHostExtraTime">Plia tempo por la gastiganto</string>
-  <string name="playstrategyTournaments">Turniroj de Playstrategy</string>
+  <string name="playstrategyTournaments">Turniroj de PlayStrategy</string>
   <string name="tournamentFAQ">Oftaj demandoj pri la turnira areno</string>
   <string name="tournamentOfficial">Oficiala</string>
   <string name="timeBeforeTournamentStarts">Tempo ĝis la turniro komenciĝas</string>
@@ -653,8 +653,8 @@
   <string name="weHaveSentYouAnEmailTo">Ni sendis retmesaĝon al %s. Klaku la ligilon en la poŝto por rekomencigi vian pasvorton.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">De registranta , vi konsentas al esti ligita de nia %s.</string>
   <string name="readAboutOur">Legu pri nia %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Reto lag inter vi kaj Playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Tempo por prilabori moviĝon sur Playstrategy servilo</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Reto lag inter vi kaj PlayStrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Tempo por prilabori moviĝon sur PlayStrategy servilo</string>
   <string name="downloadAnnotated">Elŝutu prinotitan</string>
   <string name="downloadRaw">Elŝutu krudaj</string>
   <string name="downloadImported">Elŝutu importitan</string>
@@ -670,7 +670,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Vi jam registris la retadreso: %s</string>
   <string name="kidMode">Infano reĝimo</string>
   <string name="kidModeExplanation">Ĉi tio temas pri sekureco. En infana modo, ĉiuj retejaj komunikadoj estas malebligitaj. Aktivigu ĉi tiun por viaj infanoj kaj lernejaj studentoj, por protekti ilin de aliaj retaj uzantoj.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">En infana modo, la playstrategy-emblemo ekhavas %s-emblemon, por ke vi sciu ke viaj infanoj sekuras.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">En infana modo, la playstrategy-emblemo ekhavas %s-emblemon, por ke vi sciu ke viaj infanoj sekuras.</string>
   <string name="enableKidMode">Aktivigi infanan modon</string>
   <string name="disableKidMode">Malaktivigi infanan modon</string>
   <string name="security">Sekureco</string>
@@ -678,7 +678,7 @@
   <string name="alternativelyYouCanX">Alternative vi povas %s.</string>
   <string name="revokeAllSessions">revoki ĉiujn sesiojn</string>
   <string name="playChessEverywhere">Ludi ŝakon ĉie</string>
-  <string name="asFreeAsPlaystrategy">Tiom libera kiom playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Tiom libera kiom playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Konstruita por la amo de ŝako , ne mono</string>
   <string name="everybodyGetsAllFeaturesForFree">Ĉiuj ricevas ĉiujn trajtojn senpage</string>
   <string name="zeroAdvertisement">Nulo anonco</string>
@@ -718,7 +718,7 @@
   <string name="usernameSuffixInvalid">La salutnomo devas finanta kun letero aux numero.</string>
   <string name="usernameCharsInvalid">La uzantnomo devas enhavi nur literojn, nombrojn, substrekojn, kaj streketojn.</string>
   <string name="usernameUnacceptable">Ĉi tiu uzantnomo estas malakceptata.</string>
-  <string name="directlySupportPlaystrategy">Rekte subteni Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Rekte subteni PlayStrategy</string>
   <string name="playChessInStyle">Ludu ŝakon elegante</string>
   <string name="chessBasics">Ŝaka aboco</string>
   <string name="coaches">Trejnistoj</string>
@@ -805,7 +805,7 @@
   <string name="agreementAssistance">Mi konsentas, ke mi neniam ricevos helpon dum miaj ludoj (de komputila programo, libro, datumbazo aŭ alia persono).</string>
   <string name="agreementNice">Mi konsentas, ke mi ĉiam estos respektema al aliaj ludantoj.</string>
   <string name="agreementAccount">Mi konsentas, ke mi ne kreos plurajn kontojn.</string>
-  <string name="agreementPolicy">Mi konsentas sekvi ĉiujn politikojn de Playstrategy.</string>
+  <string name="agreementPolicy">Mi konsentas sekvi ĉiujn politikojn de PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Serĉi aŭ komenci novan konversacion</string>
   <string name="edit">Redakti</string>
   <string name="rapid">Rapida</string>
@@ -834,6 +834,6 @@
   <string name="congratsYouWon">Gratulon, vi venkis!</string>
   <string name="gameVsX">Ludo kontraŭ %1$s</string>
   <string name="resVsX">%1$s kontraŭ %2$s</string>
-  <string name="youJustBecamePatron">Vi ĵus iĝis Playstrategy patrono.</string>
+  <string name="youJustBecamePatron">Vi ĵus iĝis PlayStrategy patrono.</string>
   <string name="timeAlmostUp">La tempo preskaŭ finiĝis!</string>
 </resources>

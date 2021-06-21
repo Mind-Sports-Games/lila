@@ -286,7 +286,7 @@
     <item quantity="one">Дай %s sec</item>
     <item quantity="other">Дай %s sec</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Този профил е нарушил Условията за Ползване на Playstrategy</string>
+  <string name="thisAccountViolatedTos">Този профил е нарушил Условията за Ползване на PlayStrategy</string>
   <string name="openingExplorerAndTablebase">&amp; - Изследовател на дебютите</string>
   <string name="takeback">Върни ход</string>
   <string name="proposeATakeback">Предложи връщане на ход</string>
@@ -459,8 +459,8 @@
   <string name="thankYou">Благодаря!</string>
   <string name="socialMediaLinks">Връзки към социални медии</string>
   <string name="inlineNotation">Вградена нотация</string>
-  <string name="watchPlaystrategyTV">Гледай Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Приключили игри</string>
+  <string name="watchPlayStrategyTV">Гледай PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Приключили игри</string>
   <string name="onlinePlayers">Свързани играчи</string>
   <string name="activeToday">Активни днес</string>
   <string name="activePlayers">Активни играчи</string>
@@ -568,7 +568,7 @@
   <string name="clock">Часовник</string>
   <string name="unauthorizedError">Достъпът е неупълномощен.</string>
   <string name="noInternetConnection">Няма интернет връзка. Можете да играете офлайн от менюто.</string>
-  <string name="connectedToPlaystrategy">Вие сте свързани с playstrategy</string>
+  <string name="connectedToPlayStrategy">Вие сте свързани с playstrategy</string>
   <string name="signedOut">Вие се отписахте</string>
   <string name="loginSuccessful">Вие сте вписан</string>
   <string name="playOnTheBoardOffline">Играй на дъската</string>
@@ -635,7 +635,7 @@
   <string name="simulClockHint">Fischer-засичане на времето. Колкото повече играчи приемеш, толкова повече време ти е нужно.</string>
   <string name="simulAddExtraTime">Можеш да си прибавиш време, за да се справиш с предизвикателството.</string>
   <string name="simulHostExtraTime">Допълнително време</string>
-  <string name="playstrategyTournaments">Playstrategy състезания</string>
+  <string name="playstrategyTournaments">PlayStrategy състезания</string>
   <string name="tournamentFAQ">ЧЗВ относно състезанието</string>
   <string name="tournamentOfficial">Официален</string>
   <string name="timeBeforeTournamentStarts">Време до началото на турнира</string>
@@ -670,8 +670,8 @@
   <string name="weHaveSentYouAnEmailTo">Изпратихме писмо на %s. Натиснете върху връзката в писмото, за да промените паролата на вашата регистрация.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Със записването си, се съгласявате да спазвате нашите %s.</string>
   <string name="readAboutOur">Прочетете за нашата %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Мрежово забавяне между вас и playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Времето, което отнема на playstrategy сървъра, за да обработи един ход</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Мрежово забавяне между вас и playstrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Времето, което отнема на playstrategy сървъра, за да обработи един ход</string>
   <string name="downloadAnnotated">Свали анотирана</string>
   <string name="downloadRaw">Свали необработена</string>
   <string name="downloadImported">Свали добавена</string>
@@ -687,7 +687,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Вече сте записали ел. поща: %s</string>
   <string name="kidMode">Детски режим</string>
   <string name="kidModeExplanation">В името на безопасността. В детския режим цялата комуникация в сайта е изключена. Включете детския режим, за да защитите вашите деца и ученици от другите потребители.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">В детския режим логото на Playstrategy става %s, за да сте сигурни в безопасността на своите деца.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">В детския режим логото на PlayStrategy става %s, за да сте сигурни в безопасността на своите деца.</string>
   <string name="enableKidMode">Включване на детски режим</string>
   <string name="disableKidMode">Изключване на детски режим</string>
   <string name="security">Сигурност</string>
@@ -695,7 +695,7 @@
   <string name="alternativelyYouCanX">Като алтернатива можете да %s.</string>
   <string name="revokeAllSessions">отмени всички сесии</string>
   <string name="playChessEverywhere">Играй шах навсякъде</string>
-  <string name="asFreeAsPlaystrategy">Така безплатно, както playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Така безплатно, както playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Създадено с любов към шаха, а не към парите</string>
   <string name="everybodyGetsAllFeaturesForFree">Всеки взима всички възможности безплатно</string>
   <string name="zeroAdvertisement">Без реклами</string>
@@ -735,7 +735,7 @@
   <string name="usernameSuffixInvalid">Потребителското име трябва да завършва с буква или число.</string>
   <string name="usernameCharsInvalid">Потребителското име трябва да съдържа само букви, цифри, долни черти и тирета.</string>
   <string name="usernameUnacceptable">Това потребителско име не е приемливо.</string>
-  <string name="directlySupportPlaystrategy">Подкрепи директно Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Подкрепи директно PlayStrategy</string>
   <string name="playChessInStyle">Играй шах в стил</string>
   <string name="chessBasics">Основи на шаха</string>
   <string name="coaches">Треньори</string>
@@ -822,7 +822,7 @@
   <string name="agreementAssistance">Съгласявам се, че никога няма да получавам помощ по време на игра (от компютър, книга, база данни или друг човек).</string>
   <string name="agreementNice">Съгласявам се, че винаги ще уважавам другите играчи.</string>
   <string name="agreementAccount">Съгласявам се, че няма да си правя няколко акаунта.</string>
-  <string name="agreementPolicy">Съгласявам се, че ше спазвам всички правила на Playstrategy.</string>
+  <string name="agreementPolicy">Съгласявам се, че ше спазвам всички правила на PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Търси или започни нов разговор</string>
   <string name="edit">Промени</string>
   <string name="rapid">Скоростен</string>
@@ -857,12 +857,12 @@
   <string name="congratsYouWon">Поздравления, спечелихте!</string>
   <string name="gameVsX">Партия срещу %1$s</string>
   <string name="resVsX">%1$s срещу %2$s</string>
-  <string name="youJustBecamePatron">Станахте Playstrategy Дарител.</string>
+  <string name="youJustBecamePatron">Станахте PlayStrategy Дарител.</string>
   <string name="patronAccountExpired">Дарителският Ви статус изтече</string>
   <string name="pleaseReconsiderRenewIt">Моля подновете подкрепата си!</string>
   <string name="someoneReviewedYourCoachProfile">Някой прегледа Вашия треньорски профил.</string>
   <string name="newPendingReview">В очакване на преглед</string>
-  <string name="lostAgainstTOSViolator">Изгубили сте партия срещу някой който е нарушил правилата за ползване на Playstrategy</string>
+  <string name="lostAgainstTOSViolator">Изгубили сте партия срещу някой който е нарушил правилата за ползване на PlayStrategy</string>
   <string name="refundXpointsTimeControlY">Възстановяване: %1$s %2$s точки.</string>
   <string name="timeAlmostUp">Времето почти изтече!</string>
   <string name="clickToRevealEmailAddress">[Щракнете, за да видите имейл адреса]</string>

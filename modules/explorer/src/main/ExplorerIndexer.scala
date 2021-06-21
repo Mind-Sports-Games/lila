@@ -149,7 +149,7 @@ final private class ExplorerIndexer(
           List(Tag(_.FEN, fen))
         }
         val otherTags = List(
-          Tag("PlaystrategyID", game.id),
+          Tag("PlayStrategyID", game.id),
           Tag(_.Variant, game.variant.name),
           Tag.timeControl(game.clock.map(_.config)),
           Tag(_.White, username(chess.White)),

@@ -28,7 +28,7 @@ export interface StudyChapterNewFormCtrl {
     open: boolean;
     initial: Prop<boolean>;
     tab: StoredProp<string>;
-    editor: PlaystrategyEditor | null;
+    editor: PlayStrategyEditor | null;
     editorFen: Prop<Fen | null>;
     isDefaultName: boolean;
   };
@@ -221,7 +221,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                           orientation: currentChapter.setup.orientation,
                           onChange: ctrl.vm.editorFen,
                         };
-                        ctrl.vm.editor = window.PlaystrategyEditor!(vnode.elm as HTMLElement, data);
+                        ctrl.vm.editor = window.PlayStrategyEditor!(vnode.elm as HTMLElement, data);
                         ctrl.vm.editorFen(ctrl.vm.editor.getFen());
                       });
                     },
