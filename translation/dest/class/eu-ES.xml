@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyClasses">Playstrategy klaseak</string>
-  <string name="teachClassesOfChessStudents">Irakatsi xakean ikasleei Playstrategy Klaseak tresnak erabiliz.</string>
+  <string name="playstrategyClasses">PlayStrategy klaseak</string>
+  <string name="teachClassesOfChessStudents">Irakatsi xakean ikasleei PlayStrategy Klaseak tresnak erabiliz.</string>
   <string name="features">Ezaugarriak</string>
   <string name="quicklyGenerateSafeUsernames">Ikasleentzat erabiltzaile-izen eta pasahitz seguruak sortu</string>
   <string name="trackStudentProgress">Ikasleen aurrerapenaren berri izan partida eta ariketetan</string>
   <string name="messageAllStudents">Ikasle guztien material berriaren inguruko informazioa bidali</string>
   <string name="freeForAllForever">%100 doan guztientzat, betiko eta iragarkirik gabe</string>
-  <string name="applyToBePlaystrategyTeacher">Playstrategy Irakasle izatea eskatu</string>
+  <string name="applyToBePlayStrategyTeacher">PlayStrategy Irakasle izatea eskatu</string>
   <string name="noClassesYet">Ez duzu klaserik.</string>
   <string name="teachersX">Irakasleak: %s</string>
   <string name="newClass">Klase berria</string>
@@ -23,7 +23,7 @@
   <string name="classDescription">Klasearen deskribapena</string>
   <string name="visibleByBothStudentsAndTeachers">Irakasle eta ikasleek ikusi dezakete</string>
   <string name="teachersOfTheClass">Klasearen irakasleak</string>
-  <string name="addPlaystrategyUsernames">Gehitu Playstrategy erabiltzaile-izenak irakasle gisa gonbidatzeko. Bat lerro bakoitzean.</string>
+  <string name="addPlayStrategyUsernames">Gehitu PlayStrategy erabiltzaile-izenak irakasle gisa gonbidatzeko. Bat lerro bakoitzean.</string>
   <string name="resetPassword">Pasahitza berrezarri</string>
   <string name="makeSureToCopy">Kopiatu eta gorde pasahitza. Ez duzu berriz ikusiko-eta!</string>
   <string name="passwordX">Pasahitza: %s</string>
@@ -32,21 +32,21 @@
   <string name="realName">Benetako izena</string>
   <string name="privateWillNeverBeShown">Pribatua. Ez da klasetik kanpora inoiz erakutsiko. Ikaslea zein den gogorarazten laguntzen du.</string>
   <string name="addStudent">Ikaslea gehitu</string>
-  <string name="playstrategyProfileXCreatedForY">%1$s Playstrategy profila %2$s erabiltzailearentzat sortu da.</string>
+  <string name="playstrategyProfileXCreatedForY">%1$s PlayStrategy profila %2$s erabiltzailearentzat sortu da.</string>
   <string name="studentCredentials">Ikaslea: %1$s
 Erabiltzaile-izena: %2$s
 Pasahitza: %3$s</string>
-  <string name="inviteAPlaystrategyAccount">Playstrategy kontu bat gonbidatu</string>
-  <string name="inviteDesc1">Ikasleak Playstrategy kontu bat badu, klasera gonbidatu dezakezu.</string>
-  <string name="inviteDesc2">Mezu bat jasoko dute Playstrategyen klasera sartzeko loturarekin.</string>
+  <string name="inviteAPlayStrategyAccount">PlayStrategy kontu bat gonbidatu</string>
+  <string name="inviteDesc1">Ikasleak PlayStrategy kontu bat badu, klasera gonbidatu dezakezu.</string>
+  <string name="inviteDesc2">Mezu bat jasoko dute PlayStrategyen klasera sartzeko loturarekin.</string>
   <string name="inviteDesc3">Garrantzitsua: ezagutzen dituzu ikasleak eta klasera sartu nahi dutenak bakarrik gonbidatu.</string>
   <string name="inviteDesc4">Sekula ez bidali eskatu gabeko gonbidapenak edozein jokalariri.</string>
-  <string name="createANewPlaystrategyAccount">Playstrategy kontu berri bat sortu</string>
-  <string name="createDesc1">Ikasleak ez badu Playstrategy kontu bat, hemendik sortu diezaiokezu.</string>
+  <string name="createANewPlayStrategyAccount">PlayStrategy kontu berri bat sortu</string>
+  <string name="createDesc1">Ikasleak ez badu PlayStrategy kontu bat, hemendik sortu diezaiokezu.</string>
   <string name="createDesc2">Ez dugu eposta helbiderik behar. Pasahitz bat sortuko da eta ikasleari eman beharko dozu.</string>
   <string name="createDesc3">Garrantzitsua: ikasle batek ezin du kontu bat baino gehiago eduki.</string>
   <string name="createDesc4">Jada bat badu, erabili gonbidatzeko formularioa horretarako.</string>
-  <string name="playstrategyUsername">Playstrategy erabiltzaile-izena</string>
+  <string name="playstrategyUsername">PlayStrategy erabiltzaile-izena</string>
   <string name="generateANewUsername">Erabiltzaile-izen berria sortu</string>
   <string name="welcomeToClass">Ongi etorri zure klasera: %s.
 Hemen dago bertara sartzeko lotura.</string>

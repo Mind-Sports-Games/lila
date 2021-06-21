@@ -35,7 +35,7 @@ object kid {
           ),
         br,
         br,
-        p(trans.inKidModeThePlaystrategyLogoGetsIconX(span(cls := "kiddo", title := trans.kidMode.txt())(":)")))
+        p(trans.inKidModeThePlayStrategyLogoGetsIconX(span(cls := "kiddo", title := trans.kidMode.txt())(":)")))
       )
     }
 }

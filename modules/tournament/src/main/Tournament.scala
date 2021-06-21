@@ -133,7 +133,7 @@ case class Tournament(
       )
     }
 
-  def nonPlaystrategyCreatedBy = (createdBy != User.playstrategyId) option createdBy
+  def nonPlayStrategyCreatedBy = (createdBy != User.playstrategyId) option createdBy
 
   def ratingVariant = if (variant.fromPosition) chess.variant.Standard else variant
 

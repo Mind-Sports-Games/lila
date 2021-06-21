@@ -2,7 +2,7 @@ import { init, VNode, classModule, attributesModule } from 'snabbdom';
 import { Chessground } from 'chessground';
 import { SwissOpts } from './interfaces';
 import SwissCtrl from './ctrl';
-import PlaystrategyChat from 'chat';
+import PlayStrategyChat from 'chat';
 
 const patch = init([classModule, attributesModule]);
 
@@ -37,4 +37,4 @@ export function start(opts: SwissOpts) {
 // that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;
-window.PlaystrategyChat = PlaystrategyChat;
+window.PlayStrategyChat = PlayStrategyChat;

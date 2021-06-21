@@ -99,7 +99,7 @@ final class Env(
 
   system.scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
     lila.mon.bus.classifiers.update(lila.common.Bus.size)
-    // ensure the Playstrategy user is online
+    // ensure the PlayStrategy user is online
     socketEnv.remoteSocket.onlineUserIds.getAndUpdate(_ + User.playstrategyId)
     userEnv.repo.setSeenAt(User.playstrategyId)
   }

@@ -14,9 +14,9 @@ object dgt {
 
   def index(implicit ctx: Context) =
     layout("index")(
-      h1("Playstrategy <3 DGT"),
+      h1("PlayStrategy <3 DGT"),
       p(
-        "This page allows you to connect your DGT board to Playstrategy, and to use it for playing games."
+        "This page allows you to connect your DGT board to PlayStrategy, and to use it for playing games."
       ),
       br,
       br,
@@ -48,7 +48,7 @@ object dgt {
         br,
         p(
           "The play page needs to remain open on your browser. ",
-          "It does not need to be visible, you can minimize it or set it side to side with the Playstrategy game page, ",
+          "It does not need to be visible, you can minimize it or set it side to side with the PlayStrategy game page, ",
           "but don't close it or the board will stop working. "
         ),
         p(
@@ -69,7 +69,7 @@ object dgt {
     )
 
   def play(token: AccessToken)(implicit ctx: Context) =
-    layout("play", embedJsUnsafeLoadThen(s"""PlaystrategyDgt.playPage("${token.id.value}")"""))(
+    layout("play", embedJsUnsafeLoadThen(s"""PlayStrategyDgt.playPage("${token.id.value}")"""))(
       div(id := "dgt-play-zone")(pre(id := "dgt-play-zone-log")),
       div(cls := "dgt__play__help")(
         h2(iconTag("", "If a move is not detected")),
@@ -78,19 +78,19 @@ object dgt {
           "Revert your move. Play again. "
         ),
         p(
-          "As a last resort, setup the board identically as Playstrategy, then ",
+          "As a last resort, setup the board identically as PlayStrategy, then ",
           a(href := routes.DgtCtrl.play)("Reload this page")
         )
       )
     )
 
   def config(token: Option[lila.oauth.AccessToken])(implicit ctx: Context) =
-    layout("config", embedJsUnsafeLoadThen("PlaystrategyDgt.configPage()"))(
+    layout("config", embedJsUnsafeLoadThen("PlayStrategyDgt.configPage()"))(
       div(cls := "account")(
         h1("DGT - configure"),
         form(action := routes.DgtCtrl.generateToken, method := "post")(
           st.section(
-            h2("Playstrategy connectivity"),
+            h2("PlayStrategy connectivity"),
             if (token.isDefined)
               p(cls := "text", dataIcon := "E")(
                 "You have an OAuth token suitable for DGT play.",
@@ -159,7 +159,7 @@ object dgt {
                 List(("san", "SAN (Nf6)"), ("uci", "UCI (g8f6)"))
               ),
               st.small(cls := "form-help")(
-                """San is the standard on Playstrategy like "Nf6". UCI is common on engines like "g8f6""""
+                """San is the standard on PlayStrategy like "Nf6". UCI is common on engines like "g8f6""""
               )
             ),
             "dgt-speech-keywords" pipe { name =>

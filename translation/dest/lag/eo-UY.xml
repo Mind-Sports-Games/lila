@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="isPlaystrategyLagging">Ĉu Playstrategy havas prokrastojn?</string>
+  <string name="isPlayStrategyLagging">Ĉu PlayStrategy havas prokrastojn?</string>
   <string name="measurementInProgressThreeDot">Mezuroj en progreso...</string>
   <string name="noAndYourNetworkIsGood">Ne. Kaj via retkonekto estas bona.</string>
-  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is Playstrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Ne. Kaj via retkonekto estas malbona.</string>
+  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is PlayStrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Ne. Kaj via retkonekto estas malbona.</string>
   <string name="yesItWillBeFixedSoon">Jes. Ĝi estos baldaŭ riparita!</string>
   <string name="andNowTheLongAnswerLagComposedOfTwoValues">Kaj nun, la longa respondo! Prokrasto de ludo estas kunmetita de du senrilataj valoroj (pli malalta estas pli bona):</string>
-  <string name="playstrategyServerLatency">Servila respondotempo de Playstrategy</string>
-  <string name="networkBetweenPlaystrategyAndYou">Retkonekto inter Playstrategy kaj vi</string>
+  <string name="playstrategyServerLatency">Servila respondotempo de PlayStrategy</string>
+  <string name="networkBetweenPlayStrategyAndYou">Retkonekto inter PlayStrategy kaj vi</string>
   <string name="lagCompensation">Prokrasta kompenso</string>
 </resources>

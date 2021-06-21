@@ -39,7 +39,7 @@ object bits extends Context.ToLang {
           height := size,
           cls := "picture",
           src := dbImageUrl(path.value),
-          alt := s"${u.titleUsername} Playstrategy streamer picture"
+          alt := s"${u.titleUsername} PlayStrategy streamer picture"
         )
       case _ =>
         img(
@@ -47,7 +47,7 @@ object bits extends Context.ToLang {
           height := size,
           cls := "default picture",
           src := assetUrl("images/placeholder.png"),
-          alt := "Default Playstrategy streamer picture"
+          alt := "Default PlayStrategy streamer picture"
         )
     }
 

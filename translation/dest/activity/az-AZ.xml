@@ -3,8 +3,8 @@
   <string name="activity">Aktivlik</string>
   <string name="hostedALiveStream">Canlı yayım etdi</string>
   <plurals name="supportedNbMonths">
-    <item quantity="one">Playstrategy.org\'u %1$s aylığına %2$s olaraq dəstəklədi</item>
-    <item quantity="other">Playstrategy.org\'u %1$s aylığına %2$s olaraq dəstəklədi</item>
+    <item quantity="one">PlayStrategy.org\'u %1$s aylığına %2$s olaraq dəstəklədi</item>
+    <item quantity="other">PlayStrategy.org\'u %1$s aylığına %2$s olaraq dəstəklədi</item>
   </plurals>
   <plurals name="practicedNbPositions">
     <item quantity="one">%2$s mövzusunda %1$s pozisiya məşq etdi</item>

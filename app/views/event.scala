@@ -181,7 +181,7 @@ object event {
         ),
         form3.group(
           form("hostedBy"),
-          raw("Hosted by Playstrategy user"),
+          raw("Hosted by PlayStrategy user"),
           help = raw("Username that must not be featured while the event is ongoing").some,
           half = true
         ) { f =>

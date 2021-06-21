@@ -203,7 +203,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
           Swiss.ChatFor.NONE    -> "No chat",
           Swiss.ChatFor.LEADERS -> "Only team leaders",
           Swiss.ChatFor.MEMBERS -> "Only team members",
-          Swiss.ChatFor.ALL     -> "All Playstrategy players"
+          Swiss.ChatFor.ALL     -> "All PlayStrategy players"
         )
       )
     }

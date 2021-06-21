@@ -519,8 +519,8 @@
   <string name="thankYou">תודה רבה!</string>
   <string name="socialMediaLinks">קישורי רשתות חברתיות</string>
   <string name="inlineNotation">תיאור מהלכים בשורה</string>
-  <string name="watchPlaystrategyTV">צפה בטלוויזיה של ליצ\'ס TV</string>
-  <string name="previouslyOnPlaystrategyTV">לאחרונה בטלוויזיה של ליצ\'ס</string>
+  <string name="watchPlayStrategyTV">צפה בטלוויזיה של ליצ\'ס TV</string>
+  <string name="previouslyOnPlayStrategyTV">לאחרונה בטלוויזיה של ליצ\'ס</string>
   <string name="onlinePlayers">שחקנים מחוברים</string>
   <string name="activeToday">הכי פעילים היום</string>
   <string name="activePlayers">הכי פעילים</string>
@@ -637,7 +637,7 @@
   <string name="clock">שעון</string>
   <string name="unauthorizedError">גישה לא מורשה</string>
   <string name="noInternetConnection">אין חיבור לאינטרנט. ניתן עדיין לשחק דרך התפריט.</string>
-  <string name="connectedToPlaystrategy">התחברת ל-playstrategy.org</string>
+  <string name="connectedToPlayStrategy">התחברת ל-playstrategy.org</string>
   <string name="signedOut">יצאת</string>
   <string name="loginSuccessful">נכנסת</string>
   <string name="playOnTheBoardOffline">מעל הלוח</string>
@@ -743,8 +743,8 @@
   <string name="weHaveSentYouAnEmailTo">שלחנו אימייל ל%s. לחץ על הלינק באימייל על מנת לאפס את הסיסמא</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">.%s על ידי הרשמה, אתה מסכים ל</string>
   <string name="readAboutOur">קרא את ה%s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">עיכוב רשת בינך לבין ליצ\'ס</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">זמן לעיבוד מהלך בשרת ליצ\'ס</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">עיכוב רשת בינך לבין ליצ\'ס</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">זמן לעיבוד מהלך בשרת ליצ\'ס</string>
   <string name="downloadAnnotated">להוריד עם פרשנויות</string>
   <string name="downloadRaw">להוריד בלי פרשנויות</string>
   <string name="downloadImported">להוריד את המקור</string>
@@ -760,7 +760,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">אתה כבר נרשמת עם הדוא\"ל: %s</string>
   <string name="kidMode">הגדרות ילדים</string>
   <string name="kidModeExplanation">זהו נושא בטיחותי, במצב ילדים, כל אמצעי התקשורת באתר מבוטלים. הפעל אופציה זו עבור ילדייך ותלמידי בית ספר, זאת על מנת להגן עליהם מפני משתמשים אחרים.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">במצב ילדים הסמל של ליצ\'אס מקבל אייקון %s, כדי שתדע שילדייך מוגנים.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">במצב ילדים הסמל של ליצ\'אס מקבל אייקון %s, כדי שתדע שילדייך מוגנים.</string>
   <string name="enableKidMode">הפעל מצב ילדים</string>
   <string name="disableKidMode">בטל מצב ילדים</string>
   <string name="security">אבטחה</string>
@@ -768,7 +768,7 @@
   <string name="alternativelyYouCanX">לחלופין, ניתן לעשות %s.</string>
   <string name="revokeAllSessions">בטל כל הפעלות</string>
   <string name="playChessEverywhere">שחק בשחמט בכל מקום</string>
-  <string name="asFreeAsPlaystrategy">חופשי כמו ליצ\'ס</string>
+  <string name="asFreeAsPlayStrategy">חופשי כמו ליצ\'ס</string>
   <string name="builtForTheLoveOfChessNotMoney">נבנה בשביל אהבת משחק השחמט, לא כדי להרוויח כסף</string>
   <string name="everybodyGetsAllFeaturesForFree">כולם מקבלים את כל התוכן בחינם</string>
   <string name="zeroAdvertisement">אפס פרסומות</string>
@@ -810,7 +810,7 @@
   <string name="usernameSuffixInvalid">שם המשתמש חייב להסתיים באות או מספר.</string>
   <string name="usernameCharsInvalid">שם המשתמש חייב להכיל רק אותיות, מספרים, מקפים תחתונים ומקפים.</string>
   <string name="usernameUnacceptable">שם המשתמש הזה לא מקובל.</string>
-  <string name="directlySupportPlaystrategy">תמוך ישירות ב-Playstrategy</string>
+  <string name="directlySupportPlayStrategy">תמוך ישירות ב-PlayStrategy</string>
   <string name="playChessInStyle">שחק שחמט בסגנון</string>
   <string name="chessBasics">יסודות השחמט</string>
   <string name="coaches">מאמנים</string>
@@ -903,7 +903,7 @@
   <string name="agreementAssistance">אני מסכים שאף פעם לא אקבל עזרה תוך כדי משחק (ממנוע שח ממוחשב, ספר, מסד-נתונים, או אדם אחר).</string>
   <string name="agreementNice">אני מסכים שתמיד אהיה אדיב כלפי השחקנים האחרים.</string>
   <string name="agreementAccount">אני מסכים שלא אצור יותר מחשבון אחד.</string>
-  <string name="agreementPolicy">אני מסכים לעקוב אחרי כל תנאי השירות של Playstrategy.</string>
+  <string name="agreementPolicy">אני מסכים לעקוב אחרי כל תנאי השירות של PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">חפש את התחל שיחה חדשה</string>
   <string name="edit">ערוך</string>
   <string name="rapid">רפיד</string>

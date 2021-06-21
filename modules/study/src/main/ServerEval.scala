@@ -77,7 +77,7 @@ object ServerEval {
                     } >> {
                       import BSONHandlers._
                       import Node.{ BsonFields => F }
-                      ((info.eval.score.isDefined && node.score.isEmpty) || (advOpt.isDefined && !node.comments.hasPlaystrategyComment)) ??
+                      ((info.eval.score.isDefined && node.score.isEmpty) || (advOpt.isDefined && !node.comments.hasPlayStrategyComment)) ??
                         chapterRepo
                           .setNodeValues(
                             chapter,
@@ -86,7 +86,7 @@ object ServerEval {
                               F.score -> info.eval.score
                                 .ifTrue {
                                   node.score.isEmpty ||
-                                  advOpt.isDefined && node.comments.findBy(Comment.Author.Playstrategy).isEmpty
+                                  advOpt.isDefined && node.comments.findBy(Comment.Author.PlayStrategy).isEmpty
                                 }
                                 .flatMap(EvalScoreBSONHandler.writeOpt),
                               F.comments -> advOpt
@@ -94,7 +94,7 @@ object ServerEval {
                                   node.comments + Comment(
                                     Comment.Id.make,
                                     Comment.Text(adv.makeComment(withEval = false, withBestMove = true)),
-                                    Comment.Author.Playstrategy
+                                    Comment.Author.PlayStrategy
                                   )
                                 }
                                 .flatMap(CommentsBSONHandler.writeOpt),

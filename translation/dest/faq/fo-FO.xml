@@ -2,33 +2,33 @@
 <resources>
   <string name="faqAbbreviation">FAQ</string>
   <string name="frequentlyAskedQuestions">Spurningar, ið ofta verða settir</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Hví eitur tað Playstrategy?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">Playstrategy er ein samanseting av live/light/libre og chess. Tað verður úttalað %1$s.</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Hví eitur tað PlayStrategy?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">PlayStrategy er ein samanseting av live/light/libre og chess. Tað verður úttalað %1$s.</string>
   <string name="leechess">lee-chess</string>
   <string name="hearItPronouncedBySpecialist">Hoyr, hvussu tað verður úttalað av einum serfrøðingi.</string>
-  <string name="whyLiveLightLibre">Live (beinleiðis), tí at talv verða telvað, og til ber at hyggja at teimum beinleiðis, 24/7; light og libre, tí at Playstrategy er open-source og ikki tyngt av einstaklingaognarviðurskiftum og øðrum skrambli, ið plágar aðrar heimasíður.</string>
-  <string name="whyIsLilaCalledLila">Á sama hátt er tað við keldukotuni fyri Playstrategy, %1$s, ið stendur fyri li[chess in sca]la. Meginparturin av Playstrategy er skrivaður í %2$s, ið er eitt hugskygt forritanarmál.</string>
-  <string name="howCanIContributeToPlaystrategy">Hvussu kann eg stuðla Playstrategy?</string>
-  <string name="playstrategyPoweredByDonationsAndVolunteers">Playstrategy verður rikið við peningagávum frá stuðlum og sjálvbodnum arbeiði.</string>
-  <string name="findMoreAndSeeHowHelp">Tú kanst fáa meira kunning um %1$s (eisini um %2$s). Hevur tú hug at hjálpa Playstrategy við at bjóða tína tíð og tínar førleikar fram, eru nógvir %3$s.</string>
+  <string name="whyLiveLightLibre">Live (beinleiðis), tí at talv verða telvað, og til ber at hyggja at teimum beinleiðis, 24/7; light og libre, tí at PlayStrategy er open-source og ikki tyngt av einstaklingaognarviðurskiftum og øðrum skrambli, ið plágar aðrar heimasíður.</string>
+  <string name="whyIsLilaCalledLila">Á sama hátt er tað við keldukotuni fyri PlayStrategy, %1$s, ið stendur fyri li[chess in sca]la. Meginparturin av PlayStrategy er skrivaður í %2$s, ið er eitt hugskygt forritanarmál.</string>
+  <string name="howCanIContributeToPlayStrategy">Hvussu kann eg stuðla PlayStrategy?</string>
+  <string name="playstrategyPoweredByDonationsAndVolunteers">PlayStrategy verður rikið við peningagávum frá stuðlum og sjálvbodnum arbeiði.</string>
+  <string name="findMoreAndSeeHowHelp">Tú kanst fáa meira kunning um %1$s (eisini um %2$s). Hevur tú hug at hjálpa PlayStrategy við at bjóða tína tíð og tínar førleikar fram, eru nógvir %3$s.</string>
   <string name="beingAPatron">at vera stuðul</string>
   <string name="breakdownOfOurCosts">sundurgreining av okkara útreiðslum</string>
   <string name="otherWaysToHelp">aðrir mátar at hjálpa</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">Eru heimasíður, ið eru grundaðar á Playstrategy?</string>
-  <string name="yesPlaystrategyInspiredOtherOpenSourceWebsites">Ja. Playstrategy hevur veitt øðrum heimasíðum við opnum keldukotum, sum nýta okkara %1$s, %2$s, ella %3$s íblástur.</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">Eru heimasíður, ið eru grundaðar á PlayStrategy?</string>
+  <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">Ja. PlayStrategy hevur veitt øðrum heimasíðum við opnum keldukotum, sum nýta okkara %1$s, %2$s, ella %3$s íblástur.</string>
   <string name="fairPlay">Rættvís telving</string>
   <string name="preventLeavingGameWithoutResigning">Hvat verður gjørt við telvarar, ið fara frá einum talvi uttan at geva upp?</string>
   <string name="howCanIBecomeModerator">Hvussu kann eg gerast fyriskipari?</string>
   <string name="youCannotApply">Tað er ikki møguligt at søkja um at gerast fyriskipari. Síggja vit onkran, vit halda hevði hóskað væl sum fyriskipari, seta vit okkum í samband við hann ella hana beinleiðis.</string>
   <string name="isCorrespondenceDifferent">Er brævtalv øðrvísi enn vanligt talv?</string>
-  <string name="youCanUseOpeningBookNoEngine">Á Playstrategy er høvuðsmunurin á reglunum í brævtalvi, at eitt sonevnt bókabyrjanartalv er loyvt. At nýta hjálp frá telduni er tó enn bannað, og førir við sær, at viðkomandi telvari verður meldaður fyri at fáa hjálp frá telduni. Hóast ICCF loyvir hjálp frá telduni í brævtalvi, loyvir Playstrategy tí ikki.</string>
+  <string name="youCanUseOpeningBookNoEngine">Á PlayStrategy er høvuðsmunurin á reglunum í brævtalvi, at eitt sonevnt bókabyrjanartalv er loyvt. At nýta hjálp frá telduni er tó enn bannað, og førir við sær, at viðkomandi telvari verður meldaður fyri at fáa hjálp frá telduni. Hóast ICCF loyvir hjálp frá telduni í brævtalvi, loyvir PlayStrategy tí ikki.</string>
   <string name="gameplay">Leikgongd</string>
   <string name="howBulletBlitzEtcDecided">Hvussu verður avgjørt, hvørjar tíðarásetingar eru fyri Bullet, Snar og onnur sløg av talvum?</string>
   <string name="durationFormula">(byrjanartíð á klokkuni) + 40 × (tíð løgd afturat)</string>
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$ss = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$ss = %2$s</string>
-  <string name="whatVariantsCanIplay">Hvørji avbrigdi kann eg telva á Playstrategy?</string>
-  <string name="playstrategySupportChessAnd">Á Playstrategy ber til at telva vanlig talv og %1$s.</string>
+  <string name="whatVariantsCanIplay">Hvørji avbrigdi kann eg telva á PlayStrategy?</string>
+  <string name="playstrategySupportChessAnd">Á PlayStrategy ber til at telva vanlig talv og %1$s.</string>
   <string name="eightVariants">8 talvavbrigdi</string>
   <string name="whatIsACPL">Hvat er centifinnutapið (ACPL) í miðal?</string>
   <string name="insufficientMaterial">At tapa upp á tíð, telva javnt og at hava ov fá talvfólk</string>
@@ -36,32 +36,32 @@
   <string name="discoveringEnPassant">Hví kann ein finna taka eina aðra finnu, tá ið hon longu er farin framvið? (en passant)</string>
   <string name="goodIntroduction">góð innførsla</string>
   <string name="officialRulesPDF">almennar reglur (pdf)</string>
-  <string name="playstrategyTraining">Playstrategy venjing</string>
+  <string name="playstrategyTraining">PlayStrategy venjing</string>
   <string name="threefoldRepetition">Endurtøka tríggjar ferðir</string>
-  <string name="threefoldRepetitionExplanation">Kemur sama støða fyri tríggjar ferðir, kunnu leikarar krevja remis við %1$s. Playstrategy nýtir almennu FIDE-reglurnar, ið verða lýstar í grein 9.2 (d) í %2$s.</string>
+  <string name="threefoldRepetitionExplanation">Kemur sama støða fyri tríggjar ferðir, kunnu leikarar krevja remis við %1$s. PlayStrategy nýtir almennu FIDE-reglurnar, ið verða lýstar í grein 9.2 (d) í %2$s.</string>
   <string name="threefoldRepetitionLowerCase">endurtøka tríggjar ferðir</string>
   <string name="notRepeatedMoves">Vit endurtóku ikki leikir. Hví endaði talvið kortini við javnleiki, orsakað av endurtøku?</string>
   <string name="repeatedPositionsThatMatters">Trífalda endurtøkan snýr seg um endurtiknar %1$s, ikki leikir. Endurtøkurnar nýtast ikki at henda beint aftaná hvørja aðra.</string>
   <string name="positions">støður</string>
   <string name="weRepeatedthreeTimesPosButNoDraw">Vit endurtóku eina støðu tríggjar ferðir. Hví endaði talvið ikki við remis?</string>
-  <string name="threeFoldHasToBeClaimed">Einum av telvarunum nýtist at krevja endurtøkuregluna. Tú fært gjørt tað við at klikkja á knøttin, ið er vístur, ella við at bjóða remis áðrenn tín endaliga endurtøkuleik. Tað ger ongan mun, um mótleikarin avvísur tilboðið um remis; remis við trífaldari endurtøku verður kravt kortini. Tú kanst eisini %1$s Playstrategy at krevja remis sjálvvirkið fyri teg. Harumframt endar eitt talv altíð alt fyri eitt, um endurtøka kemur fyri fimm ferðir.</string>
+  <string name="threeFoldHasToBeClaimed">Einum av telvarunum nýtist at krevja endurtøkuregluna. Tú fært gjørt tað við at klikkja á knøttin, ið er vístur, ella við at bjóða remis áðrenn tín endaliga endurtøkuleik. Tað ger ongan mun, um mótleikarin avvísur tilboðið um remis; remis við trífaldari endurtøku verður kravt kortini. Tú kanst eisini %1$s PlayStrategy at krevja remis sjálvvirkið fyri teg. Harumframt endar eitt talv altíð alt fyri eitt, um endurtøka kemur fyri fimm ferðir.</string>
   <string name="configure">stilla</string>
   <string name="accounts">Kontur</string>
-  <string name="titlesAvailableOnPlaystrategy">Hvørji heiti eru á Playstrategy?</string>
-  <string name="playstrategyRecognizeAllOTBtitles">Playstrategy viðurkennir øll FIDE heiti ognað OTB (telvað á veruligum talvborðum), eins og %1$s. Her er ein listi yvir FIDE-heiti:</string>
+  <string name="titlesAvailableOnPlayStrategy">Hvørji heiti eru á PlayStrategy?</string>
+  <string name="playstrategyRecognizeAllOTBtitles">PlayStrategy viðurkennir øll FIDE heiti ognað OTB (telvað á veruligum talvborðum), eins og %1$s. Her er ein listi yvir FIDE-heiti:</string>
   <string name="showYourTitle">Hevur tú eitt OTB-heiti, kanst tú søkja um at fáa tað víst á kontu tínari við at útfylla %1$s, leggja eina klára mynd av skjalinum við, og eina sjálvsmynd (selfie), har tú heldur í skjalinum ella kortinum.
 
-At fáa staðfest á Playstrategy, at tú ert telvari við einum vunnum heiti, gevur tær atgongd til Titled Arena-tiltøk.
+At fáa staðfest á PlayStrategy, at tú ert telvari við einum vunnum heiti, gevur tær atgongd til Titled Arena-tiltøk.
 
 At enda er ærisheitið: %2$s.</string>
   <string name="asWellAsManyNMtitles">nógv landsumfevnandi meistaraheiti</string>
   <string name="verificationForm">váttanaroyðublað</string>
-  <string name="canIbecomeLM">Kann eg fáa Playstrategymeistaraheitið (LM)?</string>
+  <string name="canIbecomeLM">Kann eg fáa PlayStrategymeistaraheitið (LM)?</string>
   <string name="noUpperCaseDot">Nei.</string>
   <string name="whatUsernameCanIchoose">Hvat kann brúkaranavn mítt vera?</string>
   <string name="usernamesNotOffensive">Sum heild eiga brúkaranøvn ikki at vera stoytandi og eiga ikki at lýsa fyri onkrari ávísari vøru ella virki. Við brúkaranavninum eigur tú ei heldur at látast at vera onkur annar, enn tú ert. Tú kanst lesa meir um hetta: %1$s.</string>
   <string name="canIChangeMyUsername">Kann eg broyta brúkaranavn mítt?</string>
   <string name="usernamesCannotBeChanged">Nei, av tøkniligum og verkligum ávum, ber ikki til at broyta brúkaranøvn. Brúkaranøvn koma fyri ov nógv støð: í dátugrunnum, útflutningum, skráum, og í huganum á fólki. Til ber at broyta, um navnið verður skrivað við stórum ella smáum stavum eina ferð.</string>
-  <string name="playstrategyRatings">Playstrategy styrkitøl</string>
-  <string name="whichRatingSystemUsedByPlaystrategy">Hvørja styrkitalaskipan nýtir Playstrategy?</string>
+  <string name="playstrategyRatings">PlayStrategy styrkitøl</string>
+  <string name="whichRatingSystemUsedByPlayStrategy">Hvørja styrkitalaskipan nýtir PlayStrategy?</string>
 </resources>

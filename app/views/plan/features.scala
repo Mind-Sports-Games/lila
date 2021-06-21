@@ -19,13 +19,14 @@ object features {
         .OpenGraph(
           title = title,
           url = s"$netBaseUrl${routes.Plan.features.url}",
-          description = "All of Playstrategy features are free for all and forever. We do it for the chess!"
+          description = "All of PlayStrategy features are free for all. We do it for the games!"
         )
         .some
     ) {
       main(cls := "box box-pad features")(
         table(
-          header(h1(dataIcon := "")("Website")),
+          //header(h1(dataIcon := "")("Website")),
+          header(h1("Website")),
           tbody(
             tr(unlimited)(
               "Play and create ",
@@ -36,20 +37,24 @@ object features {
               a(href := routes.Simul.home)("simultaneous exhibitions")
             ),
             tr(unlimited)(
-              "Correspondence chess with conditional premoves"
+              "Bullet, Blitz, Rapid, Classical and Correspondence games"
             ),
             tr(check)(
               "Standard chess and ",
               a(href := routes.Page.variantHome)("8 chess variants (Crazyhouse, Chess960, Horde, ...)")
             ),
+            tr(unlimited)(
+              "Lines Of Action"
+            ),
             tr(custom("35 per day"))(
-              "Deep Stockfish 13+ server analysis"
+              "Deep Stockfish 13+ server analysis on chess games"
             ),
             tr(unlimited)(
-              "Instant local Stockfish 13+ analysis"
+              "Instant local Stockfish 13+ analysis on chess games"
             ),
-            tr(unlimited)(
-              a(href := "https://lichess.org/blog/WN-gLzAAAKlI89Xn/thousands-of-stockfish-analysers")(
+            /*tr(unlimited)(
+              a(href := "https://lichess.org/blog/WN-gLzAAAKlI89Xn/thousands-of-stockfish-analysers"
+(
                 "Cloud engine analysis"
               )
             ),
@@ -67,29 +72,28 @@ object features {
               a(href := "https://lichess.org/blog/VmZbaigAABACtXQC/chess-insights")(
                 "Chess insights (detailed analysis of your play)"
               )
-            ),
+            ),*/
             tr(check)(
               a(href := routes.Learn.index)("All chess basics lessons")
             ),
             tr(unlimited)(
-              a(href := routes.Puzzle.home)("Tactical puzzles from user games")
+              a(href := routes.Puzzle.home)("Chess Tactics Puzzles")
             ),
             tr(unlimited)(
-              a(href := routes.Puzzle.streak)("Puzzle Streak")
+              a(href := routes.Puzzle.streak)("Chess Puzzle Streak")
             ),
             tr(unlimited)(
-              a(href := routes.Storm.home)("Puzzle Storm")
+              a(href := routes.Storm.home)("Chess Puzzle Storm")
             ),
             tr(unlimited)(
-              a(href := routes.Racer.home)("Puzzle Racer")
+              a(href := routes.Racer.home)("Chess Puzzle Racer")
             ),
             tr(unlimited)(
-              a(href := s"${routes.UserAnalysis.index}#explorer")("Opening explorer"),
-              " (280 million games!)"
+              a(href := s"${routes.UserAnalysis.index}#explorer")("Chess Opening Explorer"),
             ),
             tr(unlimited)(
               a(href := s"${routes.UserAnalysis.parseArg("QN4n1/6r1/3k4/8/b2K4/8/8/8_b_-_-")}#explorer")(
-                "7-piece endgame tablebase"
+                "7-piece chess endgame tablebase"
               )
             ),
             tr(check)(
@@ -97,7 +101,7 @@ object features {
             ),
             tr(unlimited)(
               a(href := routes.Search.index(1))("Advanced search"),
-              " through Playstrategy 3 billion games"
+              " through PlayStrategy games library"
             ),
             /*tr(unlimited)(
               a(href := routes.Video.index)("Chess video library")
@@ -106,8 +110,9 @@ object features {
               "Forum, teams, messaging, friends, challenges"
             ),
             tr(check)(
-              "Available in ",
-              a(href := "https://crowdin.com/project/playstrategy")("80+ languages")
+              /*"Available in ",
+              a(href := "https://crowdin.com/project/playstrategy")("80+ languages")*/
+              "Available in 80+ languages"
             ),
             tr(check)(
               "Light/dark theme, custom boards, pieces and background"
@@ -119,16 +124,13 @@ object features {
               strong("No tracking")
             ),
             tr(check)(
-              strong("All features to come, forever")
+              strong("New features to come!")
             )
           ),
-          header(h1(dataIcon := "")("Mobile")),
+        /*header(h1(dataIcon := "")("Mobile")),
           tbody(
             tr(unlimited)(
               "Online and offline games, with 8 variants"
-            ),
-            tr(unlimited)(
-              "Bullet, Blitz, Rapid, Classical and Correspondence chess"
             ),
             tr(unlimited)(
               a(href := routes.Tournament.home)("Arena tournaments")
@@ -154,12 +156,12 @@ object features {
             tr(check)(
               strong("All features to come, forever")
             )
-          ),
-          header(h1("Support Playstrategy")),
+          ),*/
+          header(h1("Support PlayStrategy")),
           tbody(cls := "support")(
             st.tr(
               th(
-                "Contribute to Playstrategy and",
+                "Contribute to PlayStrategy and",
                 br,
                 "get a cool looking Patron icon"
               ),
@@ -176,14 +178,14 @@ object features {
         p(cls := "explanation")(
           strong("Yes, both accounts have the same features!"),
           br,
-          "That is because Playstrategy is built for the love of chess.",
+          "That is because PlayStrategy is built for the love of games.",
           br,
-          "We believe every chess player deserves the best, and so:",
+          "We believe every mind sports games player deserves the best, and so:",
           br,
           br,
-          strong("all features are free for everybody, forever!"),
+          strong("All features are free for everybody!"),
           br,
-          "If you love Playstrategy, ",
+          "If you love PlayStrategy, ",
           a(cls := "button", href := routes.Plan.index)("Support us with a Patron account!")
         )
       )
@@ -204,5 +206,5 @@ object features {
 
   private def tr(value: Frag)(text: Frag*) = st.tr(th(text), all(value))
 
-  private val title = "Playstrategy features"
+  private val title = "PlayStrategy features"
 }

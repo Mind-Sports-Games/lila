@@ -4,7 +4,7 @@ import modal from 'common/modal';
 import { LobbyOpts } from './interfaces';
 import { numberFormat } from 'common/number';
 
-export default function PlaystrategyLobby(opts: LobbyOpts) {
+export default function PlayStrategyLobby(opts: LobbyOpts) {
   opts.element = document.querySelector('.lobby__app') as HTMLElement;
   opts.pools = [
     // mirrors modules/pool/src/main/PoolList.scala
@@ -133,7 +133,7 @@ function suggestBgSwitch() {
       dasher ||
       playstrategy
         .loadModule('dasher')
-        .then(() => window.PlaystrategyDasher(document.createElement('div'), { playing: false }));
+        .then(() => window.PlayStrategyDasher(document.createElement('div'), { playing: false }));
     return dasher;
   };
 

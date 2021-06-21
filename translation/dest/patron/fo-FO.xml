@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="donate">Stuðla</string>
-  <string name="playstrategyPatron">Playstrategy stuðul</string>
+  <string name="playstrategyPatron">PlayStrategy stuðul</string>
   <string name="freeAccount">Ókeypis konta</string>
-  <string name="becomePatron">Tekna teg sum Playstrategy stuðul</string>
-  <string name="xBecamePatron">%s gjørdist Playstrategy stuðul</string>
+  <string name="becomePatron">Tekna teg sum PlayStrategy stuðul</string>
+  <string name="xBecamePatron">%s gjørdist PlayStrategy stuðul</string>
   <string name="newPatrons">Nýggir stuðlar</string>
   <string name="freeChess">Ókeypis telving fyri øll, altíð!</string>
   <string name="noAdsNoSubs">Ongar lýsingar, eingi hald; men opnar keldukotur og gløðandi áhugi.</string>
@@ -13,10 +13,10 @@
   <string name="patronUntil">Tú hevur eina stuðulskontu til %s.</string>
   <string name="ifNotRenewed">Um kontan ikki verður endurnýggjað, verður hon lækkað til eina ókeypis kontu.</string>
   <string name="weAreNonProfit">Vit eru ein felagsskapur, sum ikki miðar eftir vinningi, tí vit halda, at øll eiga at hava atgongd til ein ókeypis telvingarpall í heimsflokki.</string>
-  <string name="weRelyOnSupport">Vit eru bundin at stuðli frá fólki sum tær, skal hetta vera møguligt. Dámar tær at nýta Playstrategy, umhugsa so vinaliga at stuðla okkum við eini peningagávu og við at gerast Playstrategy stuðul!</string>
+  <string name="weRelyOnSupport">Vit eru bundin at stuðli frá fólki sum tær, skal hetta vera møguligt. Dámar tær at nýta PlayStrategy, umhugsa so vinaliga at stuðla okkum við eini peningagávu og við at gerast PlayStrategy stuðul!</string>
   <string name="lifetime">Lívstíð</string>
-  <string name="payLifetimeOnce">Rinda %s eina ferð. Verð Playstrategy-stuðul um ævir!</string>
-  <string name="lifetimePatron">Lívstíðar Playstrategy stuðulsfólk</string>
+  <string name="payLifetimeOnce">Rinda %s eina ferð. Verð PlayStrategy-stuðul um ævir!</string>
+  <string name="lifetimePatron">Lívstíðar PlayStrategy stuðulsfólk</string>
   <string name="makeExtraDonation">Vilt tú lata eina eyka gávu?</string>
   <string name="monthly">Mánaðarligt</string>
   <string name="recurringBilling">Afturvendandi rokning. Endurnýggja vælvildarveingir tínar hvønn mánað.</string>
@@ -27,24 +27,24 @@
   <string name="withCreditCard">Keypskort</string>
   <string name="withPaypal">PayPal</string>
   <string name="weAreSmallTeam">Vit eru eitt lítið lið, so tín stuðul ger stóran mun!</string>
-  <string name="celebratedPatrons">Virðismettu stuðlarnir, ið gera, at Playstrategy er møguligt</string>
+  <string name="celebratedPatrons">Virðismettu stuðlarnir, ið gera, at PlayStrategy er møguligt</string>
   <string name="whereMoneyGoes">Hvagar fer peningurin?</string>
-  <string name="serversAndDeveloper">Fyrst av øllum til sterkar ambætarar. Síðani lata vit einum fulltíðarmennara løn: %s, stovnarin av Playstrategy.</string>
+  <string name="serversAndDeveloper">Fyrst av øllum til sterkar ambætarar. Síðani lata vit einum fulltíðarmennara løn: %s, stovnarin av PlayStrategy.</string>
   <string name="costBreakdown">Nágreinaðar útreiðslur</string>
-  <string name="officialNonProfit">Er Playstrategy alment ein felagsskapur, ið ikki miðar eftir vinningi?</string>
+  <string name="officialNonProfit">Er PlayStrategy alment ein felagsskapur, ið ikki miðar eftir vinningi?</string>
   <string name="actOfCreation">Ja, her er stovnsskipanin (á fronskum)</string>
   <string name="changeMonthlySupport">Kann eg broyta/steðga mín mánaðarliga stuðul?</string>
   <string name="changeOrContact">Ja, nær tað skal vera, á hesari síðuni. Ella kanst tú %s.</string>
-  <string name="contactSupport">seta teg í samband við Playstrategy stuðul</string>
+  <string name="contactSupport">seta teg í samband við PlayStrategy stuðul</string>
   <string name="otherMethods">Eru aðrir hættir at stuðla?</string>
   <string name="bankTransfers">Vit taka eisini ímóti bankaflytingum</string>
   <string name="bitcoin">Og her er bitcoin-bústaður okkara: %s</string>
   <string name="patronFeatures">Eru tænastur, ið serliga eru ætlaðar stuðlum?</string>
-  <string name="noPatronFeatures">Nei, tí Playstrategy er fullkomiliga ókeypis og fyri øll. Tað er eitt lyfti. Hinvegin hava stuðlar rætt til at reypa sær við eini nýggjari, kulari ímynd á vangamynd teirra.</string>
+  <string name="noPatronFeatures">Nei, tí PlayStrategy er fullkomiliga ókeypis og fyri øll. Tað er eitt lyfti. Hinvegin hava stuðlar rætt til at reypa sær við eini nýggjari, kulari ímynd á vangamynd teirra.</string>
   <string name="featuresComparison">Síggj nágreiniligar sammetingar av eginleikum</string>
   <plurals name="patronForMonths">
-    <item quantity="one">Playstrategy stuðulsfólk í ein mánað</item>
-    <item quantity="other">Playstrategy stuðulsfólk í %s mánaðir</item>
+    <item quantity="one">PlayStrategy stuðulsfólk í ein mánað</item>
+    <item quantity="other">PlayStrategy stuðulsfólk í %s mánaðir</item>
   </plurals>
   <string name="youSupportWith">Tú stuðlar playstrategy.org við %s um mánaðin.</string>
   <string name="tyvm">Stóra tøkk fyri hjálpina. Tú rokkar!</string>
@@ -56,18 +56,18 @@
   <string name="changeMonthlyAmount">Broyt mánaðarligu upphæddina (%s)</string>
   <string name="cancelSupport">strika stuðul tín</string>
   <string name="xOrY">%1$s ella %2$s</string>
-  <string name="decideHowMuch">Ger av, hvussu nógv Playstrategy er vert fyri teg:</string>
+  <string name="decideHowMuch">Ger av, hvussu nógv PlayStrategy er vert fyri teg:</string>
   <string name="stopPayments">Tak keypskortið aftur og steðga gjaldingum:</string>
-  <string name="noLongerSupport">Stuðla ikki Playstrategy longur</string>
+  <string name="noLongerSupport">Stuðla ikki PlayStrategy longur</string>
   <string name="paymentHistory">Gjaldssøga</string>
   <string name="paid">Goldið</string>
-  <string name="viewOthers">Síggj aðrar Playstrategy-stuðlar</string>
+  <string name="viewOthers">Síggj aðrar PlayStrategy-stuðlar</string>
   <string name="date">Dagur</string>
   <string name="amount">Upphædd</string>
   <string name="transactionCompleted">Flytingin er fullførd, og ein kvittan fyri stuðulin er send við telduposti til tín.</string>
   <string name="permanentPatron">Tú hevur nú eina varandi stuðulskontu.</string>
   <string name="checkOutProfile">Hygg at vangamynd tínari!</string>
-  <string name="nowLifetime">Tú ert nú ein lívstíðar Playstrategy-stuðul!</string>
-  <string name="nowOneMonth">Tú ert nú Playstrategy-stuðul í ein mánað!</string>
-  <string name="downgradeNextMonth">Um ein mánað, verður tú IKKI kravd/ur eftir peningi aftur, og Playstrategy-konta tín verður lækkað til eina vanliga kontu.</string>
+  <string name="nowLifetime">Tú ert nú ein lívstíðar PlayStrategy-stuðul!</string>
+  <string name="nowOneMonth">Tú ert nú PlayStrategy-stuðul í ein mánað!</string>
+  <string name="downgradeNextMonth">Um ein mánað, verður tú IKKI kravd/ur eftir peningi aftur, og PlayStrategy-konta tín verður lækkað til eina vanliga kontu.</string>
 </resources>

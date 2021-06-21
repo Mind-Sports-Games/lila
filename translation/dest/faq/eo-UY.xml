@@ -2,32 +2,32 @@
 <resources>
   <string name="faqAbbreviation">Plej Oftaj Demandoj</string>
   <string name="frequentlyAskedQuestions">Plej Oftaj Demandoj</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Kial Playstrategy nomiĝas tiel?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">Playstrategy estas kombino de realtempe/malpeza/libera (angle: live/light/libre) kaj ŝako (angle: chess). Ĝi estas prononcita %1$s.</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Kial PlayStrategy nomiĝas tiel?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">PlayStrategy estas kombino de realtempe/malpeza/libera (angle: live/light/libre) kaj ŝako (angle: chess). Ĝi estas prononcita %1$s.</string>
   <string name="leechess">li-ĉes</string>
   <string name="hearItPronouncedBySpecialist">Aŭskultu ĝin prononcita de fakulo.</string>
-  <string name="whyLiveLightLibre">Realtempe, ĉar ludoj estas ludataj kaj spektataj plentempe 24/7; malpeza kaj libera pro la fakto, ke Playstrategy estas malferma-kodo kaj sen proprietaj rubaĵoj, kiuj multas en aliaj retejoj.</string>
-  <string name="howCanIContributeToPlaystrategy">Kiel mi povas kontribui kun Playstrategy?</string>
-  <string name="playstrategyPoweredByDonationsAndVolunteers">Playstrategy ekzistas danke al donacoj de patronoj kaj klopodoj de volontula teamo.</string>
-  <string name="findMoreAndSeeHowHelp">Vi povas ekscii pli pri %1$s (inkluzive de %2$s). Se vi volas helpi Playstrategy volontulante vian tempon kaj kapablojn, ekzistas multaj %3$s.</string>
+  <string name="whyLiveLightLibre">Realtempe, ĉar ludoj estas ludataj kaj spektataj plentempe 24/7; malpeza kaj libera pro la fakto, ke PlayStrategy estas malferma-kodo kaj sen proprietaj rubaĵoj, kiuj multas en aliaj retejoj.</string>
+  <string name="howCanIContributeToPlayStrategy">Kiel mi povas kontribui kun PlayStrategy?</string>
+  <string name="playstrategyPoweredByDonationsAndVolunteers">PlayStrategy ekzistas danke al donacoj de patronoj kaj klopodoj de volontula teamo.</string>
+  <string name="findMoreAndSeeHowHelp">Vi povas ekscii pli pri %1$s (inkluzive de %2$s). Se vi volas helpi PlayStrategy volontulante vian tempon kaj kapablojn, ekzistas multaj %3$s.</string>
   <string name="beingAPatron">esti patrono</string>
   <string name="breakdownOfOurCosts">detaligo de niaj elspezoj</string>
   <string name="otherWaysToHelp">aliaj formoj por helpi</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">Ĉu estas retejoj bazitaj sur Playstrategy?</string>
-  <string name="yesPlaystrategyInspiredOtherOpenSourceWebsites">Jes. Playstrategy efektive inspiris aliajn malfermkodajn retejojn, kiuj uzas niajn %1$s, %2$s aŭ %3$s.</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">Ĉu estas retejoj bazitaj sur PlayStrategy?</string>
+  <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">Jes. PlayStrategy efektive inspiris aliajn malfermkodajn retejojn, kiuj uzas niajn %1$s, %2$s aŭ %3$s.</string>
   <string name="isCorrespondenceDifferent">Ĉu koresponda ŝako diferencas de normala ŝako?</string>
-  <string name="basedOnGameDuration">Playstrategy tempokontroloj baziĝas sur laŭtaksa daŭro de ludo = %1$s
+  <string name="basedOnGameDuration">PlayStrategy tempokontroloj baziĝas sur laŭtaksa daŭro de ludo = %1$s
 Ekzemple, la laŭtaksa daŭro de ludo 5+3 estas 5 × 60 + 40 × 3 = 420 sekundoj.</string>
   <string name="durationFormula">(horloĝa komenca horo) + 40 × (horloĝa pliigo)</string>
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$ss = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$ss = %2$s</string>
-  <string name="whatVariantsCanIplay">Kiujn ŝakvariantojn mi povas ludi en Playstrategy?</string>
-  <string name="playstrategySupportChessAnd">Playstrategy subtenas norman ŝakon kaj %1$s.</string>
+  <string name="whatVariantsCanIplay">Kiujn ŝakvariantojn mi povas ludi en PlayStrategy?</string>
+  <string name="playstrategySupportChessAnd">PlayStrategy subtenas norman ŝakon kaj %1$s.</string>
   <string name="eightVariants">8 ŝakvariantojn</string>
   <string name="insufficientMaterial">Perdi pro tempo, egaleco kaj nesufiĉa materialo</string>
   <string name="goodIntroduction">bona enkonduko</string>
   <string name="officialRulesPDF">oficialaj reguloj (PDF)</string>
-  <string name="playstrategyTraining">trejniĝo en Playstrategy</string>
+  <string name="playstrategyTraining">trejniĝo en PlayStrategy</string>
   <string name="threefoldRepetition">Triobla ripeto</string>
   <string name="threefoldRepetitionLowerCase">triobla ripeto</string>
   <string name="positions">pozicioj</string>
@@ -35,7 +35,7 @@ Ekzemple, la laŭtaksa daŭro de ludo 5+3 estas 5 × 60 + 40 × 3 = 420 sekundoj
   <string name="accounts">Kontoj</string>
   <string name="noUpperCaseDot">Ne.</string>
   <string name="guidelines">gvidlinioj</string>
-  <string name="playstrategyRatings">Playstrategy rangoj</string>
+  <string name="playstrategyRatings">PlayStrategy rangoj</string>
   <string name="similarOpponents">kontraŭuloj kun simila forteco</string>
   <string name="inOrderToAppearsYouMust">Por alveni al %1$s vi devus:</string>
   <string name="beInTopTen">esti en la supraj 10 en ĉi tiu rango.</string>

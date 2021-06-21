@@ -49,14 +49,14 @@ object index {
         div(cls := "oauth-made box")(
           h1(id := "made")("My OAuth Apps"),
           p(cls := "box__pad")(
-            "Want to build something that integrates with and extends Playstrategy? ",
+            "Want to build something that integrates with and extends PlayStrategy? ",
             a(href := routes.OAuthApp.create)("Register a new OAuth App"),
-            " to get started developing with the Playstrategy API.",
+            " to get started developing with the PlayStrategy API.",
             br,
             br,
             "Here's a ",
             a(href := "https://github.com/playstrategy-org/api/tree/master/example/oauth-authorization-code")(
-              "Playstrategy OAuth app example"
+              "PlayStrategy OAuth app example"
             ),
             ", and the ",
             a(href := routes.Api.index)("API documentation"),

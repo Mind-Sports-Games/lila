@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="isPlaystrategyLagging">Playstrategy està tardant el respondre?</string>
+  <string name="isPlayStrategyLagging">PlayStrategy està tardant el respondre?</string>
   <string name="measurementInProgressThreeDot">Mesurant latència...</string>
   <string name="noAndYourNetworkIsGood">No, i la teva connexió és bona.</string>
-  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is Playstrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">No. I la teva connexió és dolenta.</string>
+  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is PlayStrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">No. I la teva connexió és dolenta.</string>
   <string name="yesItWillBeFixedSoon">Sí. S\'arreglarà aviat!</string>
   <string name="andNowTheLongAnswerLagComposedOfTwoValues">I ara, la resposta completa! La latència de la partida depèn de dos valors independents (com més baixos, millor):</string>
-  <string name="playstrategyServerLatency">Latència del servidor Playstrategy</string>
-  <string name="playstrategyServerLatencyExplanation">El temps que es tarda en processar un moviment en el servidor. És el mateix per a tots els jugadors i només depèn de la càrrega del servidor. Com més jugadors hi hagi en un moment determinat més augmenta, però els desenvolupadors de Playstrategy fan tot el possible per a mantenir-lo baix. Poques vegades excedeix els 10ms.</string>
-  <string name="networkBetweenPlaystrategyAndYou">Connexió entre Playstrategy i tu</string>
-  <string name="networkBetweenPlaystrategyAndYouExplanation">El temps que es tarda en enviar un moviment des del teu ordinador al servidor de Playstrategy i obtenir una resposta. Depèn de la distancia que estiguis de Playstrategy (França) i de la qualitat de la teva connexió a Internet. Els desenvolupadors de Playstrategy no poden arreglar-te el wifi o fer que la llum vagi més ràpid.</string>
+  <string name="playstrategyServerLatency">Latència del servidor PlayStrategy</string>
+  <string name="playstrategyServerLatencyExplanation">El temps que es tarda en processar un moviment en el servidor. És el mateix per a tots els jugadors i només depèn de la càrrega del servidor. Com més jugadors hi hagi en un moment determinat més augmenta, però els desenvolupadors de PlayStrategy fan tot el possible per a mantenir-lo baix. Poques vegades excedeix els 10ms.</string>
+  <string name="networkBetweenPlayStrategyAndYou">Connexió entre PlayStrategy i tu</string>
+  <string name="networkBetweenPlayStrategyAndYouExplanation">El temps que es tarda en enviar un moviment des del teu ordinador al servidor de PlayStrategy i obtenir una resposta. Depèn de la distancia que estiguis de PlayStrategy (França) i de la qualitat de la teva connexió a Internet. Els desenvolupadors de PlayStrategy no poden arreglar-te el wifi o fer que la llum vagi més ràpid.</string>
   <string name="youCanFindTheseValuesAtAnyTimeByClickingOnYourUsername">Pots consultar ambdós valors en qualsevol moment, fent clic al teu nom d\'usuari a la barra superior.</string>
   <string name="lagCompensation">Compensació per retard</string>
-  <string name="lagCompensationExplanation">Playstrategy compensa el retard en la xarxa. Això inclou el retard sostingut i els ocasionals pics de retard. Hi ha límits i heurístiques basades en el control de temps i en el retard compensat fins ara, llavors el resultat hauria de sentir-se raonable per ambdós jugadors. Com a resultat, tenir un major retard en la connexió que l\'oponent no és una desavantatge!</string>
+  <string name="lagCompensationExplanation">PlayStrategy compensa el retard en la xarxa. Això inclou el retard sostingut i els ocasionals pics de retard. Hi ha límits i heurístiques basades en el control de temps i en el retard compensat fins ara, llavors el resultat hauria de sentir-se raonable per ambdós jugadors. Com a resultat, tenir un major retard en la connexió que l\'oponent no és una desavantatge!</string>
 </resources>

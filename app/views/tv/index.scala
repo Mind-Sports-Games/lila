@@ -26,7 +26,7 @@ object index {
       moreJs = frag(
         roundTag,
         embedJsUnsafeLoadThen(
-          s"""PlaystrategyRound.boot(${safeJsonValue(
+          s"""PlayStrategyRound.boot(${safeJsonValue(
             Json.obj(
               "data" -> data,
               "i18n" -> views.html.round.jsI18n(pov.game)
@@ -40,7 +40,7 @@ object index {
         .OpenGraph(
           title = s"Watch the best ${channel.name.toLowerCase} games of playstrategy.org",
           description =
-            s"Sit back, relax, and watch the best ${channel.name.toLowerCase} Playstrategy players compete on Playstrategy TV",
+            s"Sit back, relax, and watch the best ${channel.name.toLowerCase} PlayStrategy players compete on PlayStrategy TV",
           url = s"$netBaseUrl${routes.Tv.onChannel(channel.key)}"
         )
         .some,
@@ -55,7 +55,7 @@ object index {
         div(cls := "round__underboard")(
           views.html.round.bits.crosstable(cross, pov.game),
           div(cls := "tv-history")(
-            h2(trans.previouslyOnPlaystrategyTV()),
+            h2(trans.previouslyOnPlayStrategyTV()),
             div(cls := "now-playing")(
               history map { views.html.game.mini(_) }
             )

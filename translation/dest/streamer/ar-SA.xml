@@ -19,22 +19,22 @@
   <string name="rule2">قم بنزع الكلمة المفتاحية عندما تبث أمور غير متعلقة بليشيس.</string>
   <string name="rule3">سيقوم ليشيس بالتعرف على بثك بصورة آلية ويمنحه الإمتيازات التالية:</string>
   <string name="perks">فوائد البث باستعمال الكلمة المفتاحية</string>
-  <string name="perk1">احصل على أيقونة بث مشتعلة على ملفك الشخصي \"Playstrategy\".</string>
+  <string name="perk1">احصل على أيقونة بث مشتعلة على ملفك الشخصي \"PlayStrategy\".</string>
   <string name="perk2">احجز مكانك مباشرة في أعلى القائمة الخاصة بالستريمرز.</string>
-  <string name="perk3">أعلِم متابعيك على Playstrategy.</string>
+  <string name="perk3">أعلِم متابعيك على PlayStrategy.</string>
   <string name="perk4">أظهر البث الخاص بك في المباريات والبطولات التي تلعبها إضافة إلى الدراسات.</string>
   <string name="approved">لقد تمت الموافقة على البث الخاص بك.</string>
   <string name="pendingReview">تتم حاليا مراجعة البث الخاص بك من قبل المشرفين.</string>
   <string name="pleaseFillIn">الرجاء ملء معلومات البث الخاصة بك، و قم برفع صورة.</string>
-  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">عندما تكون جاهزاً لتصبح ستريمر Playstrategy ، %s</string>
-  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a Playstrategy streamer, request a moderator review&quot;">أطلب مراجعة مشرف</string>
+  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">عندما تكون جاهزاً لتصبح ستريمر PlayStrategy ، %s</string>
+  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a PlayStrategy streamer, request a moderator review&quot;">أطلب مراجعة مشرف</string>
   <string name="anotherLanguage">إذا كنت تقوم بالبث بلغة غير الإنجليزية، قم بإدراج الوسم المناسب (%s) بين معقّفين وهذا في بداية عنوان البث الخاص بك.
 على سبيل المثال، تستطيع إدراج \"[AR]\" من أجل اللغة العربية، و \"[FR]\" من أجل الفرنسية، و \"[TR]\" من أجل التركية، إذا كان البث باللغة الإنجليزية فلا حاجة إلى إضافة الوسم.
-لا تقم بوضع الوسم في إعدادات بث Playstrategy الخاصة بك، بل قم بوضعه في عنوان البث الخاص باليوتيوب أو تويتش.</string>
+لا تقم بوضع الوسم في إعدادات بث PlayStrategy الخاصة بك، بل قم بوضعه في عنوان البث الخاص باليوتيوب أو تويتش.</string>
   <string name="twitchUsername">اسم مستخدم تويتش أو عنوان URL الخاص بك</string>
   <string name="optionalOrEmpty">اختياري. اتركه فارغاً إذا لم يكن هناك</string>
   <string name="youtubeChannel">معرف قناة اليوتيوب أو عنوان URL الخاص بك</string>
-  <string name="streamerName">اسم البث الخاص بك على Playstrategy</string>
+  <string name="streamerName">اسم البث الخاص بك على PlayStrategy</string>
   <plurals name="keepItShort">
     <item quantity="zero">ابقه قصيرًا: %s حرف أقصى</item>
     <item quantity="one">ابقه قصيرًا: حرف واحد كحد أقصى</item>
@@ -56,6 +56,6 @@
   <string name="installBlocker">قم بتثبيت مضاد البرمجيات الخبيثة!</string>
   <string name="beSafe">ابقى آمناً من الإعلانات والمتعقبين
 بينما تنشر على تويتش ويوتيوب.
-يوصي موقع Playstrategy باستخدام إضافة uBlock Origin
+يوصي موقع PlayStrategy باستخدام إضافة uBlock Origin
 المجانية والمفتوحة المصدر.</string>
 </resources>

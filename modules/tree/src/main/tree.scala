@@ -144,7 +144,7 @@ object Node {
     object Author {
       case class User(id: String, titleName: String) extends Author
       case class External(name: String)              extends Author
-      case object Playstrategy                            extends Author
+      case object PlayStrategy                            extends Author
       case object Unknown                            extends Author
     }
     def sanitize(text: String) =
@@ -177,7 +177,7 @@ object Node {
 
     def filterEmpty = Comments(value.filter(_.text.value.nonEmpty))
 
-    def hasPlaystrategyComment = value.exists(_.by == Comment.Author.Playstrategy)
+    def hasPlayStrategyComment = value.exists(_.by == Comment.Author.PlayStrategy)
   }
   object Comments {
     val empty = Comments(Nil)
@@ -244,7 +244,7 @@ object Node {
   implicit val commentAuthorWrites: Writes[Comment.Author] = Writes[Comment.Author] {
     case Comment.Author.User(id, name) => Json.obj("id" -> id, "name" -> name)
     case Comment.Author.External(name) => JsString(s"${name.trim}")
-    case Comment.Author.Playstrategy        => JsString("playstrategy")
+    case Comment.Author.PlayStrategy        => JsString("playstrategy")
     case Comment.Author.Unknown        => JsNull
   }
   implicit val commentWriter  = Json.writes[Node.Comment]

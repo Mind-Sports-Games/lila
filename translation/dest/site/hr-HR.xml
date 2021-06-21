@@ -290,7 +290,7 @@
     <item quantity="few">Dodaj protivniku %s sekunde</item>
     <item quantity="other">Dodaj protivniku %s sekundi</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Korisnički račun je prekršio Playstrategy Uvjete Pružanja Usluge</string>
+  <string name="thisAccountViolatedTos">Korisnički račun je prekršio PlayStrategy Uvjete Pružanja Usluge</string>
   <string name="openingExplorerAndTablebase">Pretraživač otvaranja &amp; baza pozicija u završnici</string>
   <string name="takeback">Vrati potez</string>
   <string name="proposeATakeback">Predloži vraćanje poteza</string>
@@ -474,8 +474,8 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="thankYou">Hvala!</string>
   <string name="socialMediaLinks">Linkovi društvenih mreža</string>
   <string name="inlineNotation">Kompaktnija notacija</string>
-  <string name="watchPlaystrategyTV">Gledaj Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Prethodno na Playstrategy TV-u</string>
+  <string name="watchPlayStrategyTV">Gledaj PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Prethodno na PlayStrategy TV-u</string>
   <string name="onlinePlayers">Online igrači</string>
   <string name="activeToday">Danas aktivni</string>
   <string name="activePlayers">Aktivni igrači</string>
@@ -583,7 +583,7 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="clock">Sat</string>
   <string name="unauthorizedError">Pristup neodobren.</string>
   <string name="noInternetConnection">Nedostupna internetska veza. Možeš i dalje igrati bez internetske veze preko izbornika.</string>
-  <string name="connectedToPlaystrategy">Spojen/a si na playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Spojen/a si na playstrategy.org</string>
   <string name="signedOut">Odjavljen/a si</string>
   <string name="loginSuccessful">Prijavljen/a si</string>
   <string name="playOnTheBoardOffline">Igraj bez mreže, preko uređaja</string>
@@ -651,7 +651,7 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="simulClockHint">Fischer podešavanje sata. Što više igrača primiš, više vremena bit će ti potrebno.</string>
   <string name="simulAddExtraTime">Možeš dodati dodatno vrijeme na svoj sat da ti pomogne savladati simultanku.</string>
   <string name="simulHostExtraTime">Dodatno vrijeme domaćina</string>
-  <string name="playstrategyTournaments">Playstrategy turniri</string>
+  <string name="playstrategyTournaments">PlayStrategy turniri</string>
   <string name="tournamentFAQ">Najčešće postavljana pitanja o Arena turnirima</string>
   <string name="tournamentOfficial">Službeno</string>
   <string name="timeBeforeTournamentStarts">Vrijeme prije nego turnir započne</string>
@@ -687,8 +687,8 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="weHaveSentYouAnEmailTo">Poslali smo email na %s. Klikni link u emailu da resetiraš lozinku.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Registracijom prihvaćaš %s</string>
   <string name="readAboutOur">Pročitajte naša %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Mrežno kašnjenje između tebe i playstrategy-a</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Vrijeme obrade poteza na playstrategy serveru</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Mrežno kašnjenje između tebe i playstrategy-a</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Vrijeme obrade poteza na playstrategy serveru</string>
   <string name="downloadAnnotated">Preuzmi s bilješkama</string>
   <string name="downloadRaw">Preuzmi bez bilješki</string>
   <string name="downloadImported">Preuzmi uvezeno</string>
@@ -704,7 +704,7 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="youHaveAlreadyRegisteredTheEmail">Već si se registrirao/la ovim emailom: %s</string>
   <string name="kidMode">Dječji način</string>
   <string name="kidModeExplanation">Ovdje se radi se o sigurnosti. U dječjem načinu, sve komunikacije na stranici su onemogućene. Omogući ovo za svoju djecu i učenike, da ih zaštitiš od drugih internet korisnika.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">U dječjem načinu, logo playstrategy-a dobiva %s ikonu, tako da znaš da su tvoja djeca sigurna.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">U dječjem načinu, logo playstrategy-a dobiva %s ikonu, tako da znaš da su tvoja djeca sigurna.</string>
   <string name="enableKidMode">Omogući dječji način</string>
   <string name="disableKidMode">Onemogući dječji način</string>
   <string name="security">Sigurnost</string>
@@ -712,7 +712,7 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="alternativelyYouCanX">Alternativno, možeš %s.</string>
   <string name="revokeAllSessions">opozvati sve sesije</string>
   <string name="playChessEverywhere">Igraj šah svugdje</string>
-  <string name="asFreeAsPlaystrategy">Besplatno kao i playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Besplatno kao i playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Napravljeno iz ljubavi prema šahu, ne novcu</string>
   <string name="everybodyGetsAllFeaturesForFree">Svi dobivaju sve usluge besplatno</string>
   <string name="zeroAdvertisement">Bez reklama</string>
@@ -753,7 +753,7 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="usernameSuffixInvalid">Korisničko ime mora završiti sa slovom ili brojem.</string>
   <string name="usernameCharsInvalid">Korisničko ime može sadržavati samo slova, brojeve, podvlake i crtice.</string>
   <string name="usernameUnacceptable">Ovo korisničko ime nije prihvatljivo.</string>
-  <string name="directlySupportPlaystrategy">Direktno podrži Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Direktno podrži PlayStrategy</string>
   <string name="playChessInStyle">Igraj šah u stilu</string>
   <string name="chessBasics">Šahovske osnove</string>
   <string name="coaches">Treneri</string>
@@ -843,7 +843,7 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="agreementAssistance">Slažem se da ni u jednom trenutku neću primati pomoć za vrijeme svojih igara (od šahovskog računala, knjige, baze podataka ili neke druge osobe).</string>
   <string name="agreementNice">Slažem se da ću uvijek biti uljudan prema drugim igračima.</string>
   <string name="agreementAccount">Slažem se da neću stvoriti više računa.</string>
-  <string name="agreementPolicy">Slažem se da ću slijediti sve politike Playstrategya.</string>
+  <string name="agreementPolicy">Slažem se da ću slijediti sve politike PlayStrategya.</string>
   <string name="searchOrStartNewDiscussion">Traži ili započni novi razgovor</string>
   <string name="edit">Uredi</string>
   <string name="rapid">Rapid</string>

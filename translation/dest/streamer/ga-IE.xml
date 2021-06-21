@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Sruthaithe Playstrategy</string>
-  <string name="playstrategyStreamer">Sruthú Playstrategy</string>
+  <string name="playstrategyStreamers">Sruthaithe PlayStrategy</string>
+  <string name="playstrategyStreamer">Sruthú PlayStrategy</string>
   <string name="live">BEO!</string>
   <string name="offline">AS LÍNE</string>
   <string name="currentlyStreaming">Ag sruthú faoi láthair: %s</string>
   <string name="lastStream">Sruth deireanach %s</string>
-  <string name="becomeStreamer">Bí i do shruthú Playstrategy</string>
+  <string name="becomeStreamer">Bí i do shruthú PlayStrategy</string>
   <string name="doYouHaveStream">An bhfuil cuntas Twitch nó YouTube agat?</string>
   <string name="hereWeGo">Réidh téigh!</string>
   <string name="allStreamers">Sruthaithe uile</string>
@@ -15,27 +15,27 @@
   <string name="downloadKit">Íoslódáil trealamh sruthú</string>
   <string name="xIsStreaming">%s ag sruthlú</string>
   <string name="rules">Rialacha sruthlú</string>
-  <string name="rule1">Cuir an eochairfhocal \"playstrategy.org\" san áireamh i do theideal srutha agus bain úsáid as an gcatagóir \"Ficheall\" nuair a dhéanann tú sruth ar Playstrategy.</string>
-  <string name="rule2">Bain an eochair-fhocal nuair atá tú ag sruthlú stuif neamh-Playstrategy.</string>
-  <string name="rule3">Braithfidh Playstrategy do shruth go huathoibríoch agus ligfidh sé na buntáistí seo a leanas:</string>
+  <string name="rule1">Cuir an eochairfhocal \"playstrategy.org\" san áireamh i do theideal srutha agus bain úsáid as an gcatagóir \"Ficheall\" nuair a dhéanann tú sruth ar PlayStrategy.</string>
+  <string name="rule2">Bain an eochair-fhocal nuair atá tú ag sruthlú stuif neamh-PlayStrategy.</string>
+  <string name="rule3">Braithfidh PlayStrategy do shruth go huathoibríoch agus ligfidh sé na buntáistí seo a leanas:</string>
   <string name="perks">Buntáistí a bhaineann le sruthú leis an eochairfhocal</string>
-  <string name="perk1">Faigh deilbhín sraoilleán lasrach ar do phróifíl Playstrategy.</string>
+  <string name="perk1">Faigh deilbhín sraoilleán lasrach ar do phróifíl PlayStrategy.</string>
   <string name="perk2">Teigh suas go barr an liosta sruthlaithe.</string>
-  <string name="perk3">Cuir in iúl do do leanúna Playstrategy.</string>
+  <string name="perk3">Cuir in iúl do do leanúna PlayStrategy.</string>
   <string name="perk4">Taispeáin do shruth i do chluichí, comórtais agus staidéir.</string>
   <string name="approved">Tá do shruthlú ceadaithe.</string>
   <string name="pendingReview">Tá modhnóirí ag athbhreithniú ar do shruth.</string>
   <string name="pleaseFillIn">Líon isteach d’eolais sruthaithe le do thoil, agus uaslódáil pictiúr.</string>
-  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Nuair atá tú réidh le liostáil mar sruthú Playstrategy, %s</string>
-  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a Playstrategy streamer, request a moderator review&quot;">iarr ar athbhreithniú modhnóra</string>
+  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Nuair atá tú réidh le liostáil mar sruthú PlayStrategy, %s</string>
+  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a PlayStrategy streamer, request a moderator review&quot;">iarr ar athbhreithniú modhnóra</string>
   <string name="anotherLanguage">Má tá do shruth i dteanga seachas Béarla, cuir an chlib teanga cheart (%s) leis, idir lúibíní cearnacha, ag tús do theidil srutha.
 Mar shamplaí, \"[RU]\" don Rúisis, \"[TR]\" don Tuircis, \"[FR]\" don Fhraincis, srl.
-Cuir é seo i dteideal an tsrutháin ar leathanach Twitch nó YouTube, ní i socruithe an tsrutha Playstrategy.
+Cuir é seo i dteideal an tsrutháin ar leathanach Twitch nó YouTube, ní i socruithe an tsrutha PlayStrategy.
 Má tá do shruth i mBéarla, ní gá clib teanga a áireamh.</string>
   <string name="twitchUsername">D\'ainm úsáideora nó URL Twitch</string>
   <string name="optionalOrEmpty">Roghnach. Fág folamh mura bhfuil ceann ann</string>
   <string name="youtubeChannel">Do ID cainéal nó URL YouTube</string>
-  <string name="streamerName">D\'ainm sruthú ar Playstrategy</string>
+  <string name="streamerName">D\'ainm sruthú ar PlayStrategy</string>
   <plurals name="keepItShort">
     <item quantity="one">Coinnigh gearr é: %s carachtar uas</item>
     <item quantity="two">Coinnigh gearr é: %s charachtar uas</item>
@@ -56,6 +56,6 @@ Má tá do shruth i mBéarla, ní gá clib teanga a áireamh.</string>
   <string name="installBlocker">Suiteáil bogearraí mailíseacha cosanta!</string>
   <string name="beSafe">Bí sábháilte ó fhógraí agus ó rianaithe ag líonadh
 Twitch agus YouTube.
-Molann Playstrategy uBlock Origin
+Molann PlayStrategy uBlock Origin
 atá saor in aisce agus foinse oscailte.</string>
 </resources>

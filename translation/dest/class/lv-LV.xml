@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyClasses">Playstrategy klases</string>
-  <string name="teachClassesOfChessStudents">Apmāciet šaha skolēnu grupas ar Playstrategy Klašu rīkiem.</string>
+  <string name="playstrategyClasses">PlayStrategy klases</string>
+  <string name="teachClassesOfChessStudents">Apmāciet šaha skolēnu grupas ar PlayStrategy Klašu rīkiem.</string>
   <string name="features">Iespējas</string>
   <string name="quicklyGenerateSafeUsernames">Ātri radīt drošus lietotājvārdus un paroles skolēniem</string>
   <string name="trackStudentProgress">Sekojiet skolēnu progresam spēlēs un puzlēs</string>
   <string name="messageAllStudents">Sūtiet ziņas par nodarbību materiālu visiem skolēniem</string>
   <string name="freeForAllForever">100% bezmaksas visiem un vienmēr, bez reklāmām un izsekotājiem</string>
-  <string name="applyToBePlaystrategyTeacher">Pieteikties par Playstrategy Skolotāju</string>
+  <string name="applyToBePlayStrategyTeacher">Pieteikties par PlayStrategy Skolotāju</string>
   <string name="noClassesYet">Vēl nav grupu.</string>
   <string name="teachersX">Skolotāji: %s</string>
   <string name="newClass">Jauna klase</string>
@@ -23,7 +23,7 @@
   <string name="classDescription">Klases apraksts</string>
   <string name="visibleByBothStudentsAndTeachers">Redzams gan grupas skolēniem, gan skolotājiem</string>
   <string name="teachersOfTheClass">Klases skolotāji</string>
-  <string name="addPlaystrategyUsernames">Pievienojiet Playstrategy lietotājvārdus, lai tos ielūgtu kā skolotājus. Katru savā rindiņā.</string>
+  <string name="addPlayStrategyUsernames">Pievienojiet PlayStrategy lietotājvārdus, lai tos ielūgtu kā skolotājus. Katru savā rindiņā.</string>
   <string name="resetPassword">Atiestatīt paroli</string>
   <string name="makeSureToCopy">Nokopējiet vai pierakstiet paroli tagad. Nevarēsiet to atkārtoti skatīt!</string>
   <string name="passwordX">Parole: %s</string>
@@ -32,21 +32,21 @@
   <string name="realName">Īstais vārds</string>
   <string name="privateWillNeverBeShown">Privāts. Nekad netiks rādīts ārpus grupas. Palīdz atcerēties, kurš šis skolēns ir.</string>
   <string name="addStudent">Pievienot skolēnu</string>
-  <string name="playstrategyProfileXCreatedForY">Playstrategy konts %1$s izveidots skolēnam %2$s.</string>
+  <string name="playstrategyProfileXCreatedForY">PlayStrategy konts %1$s izveidots skolēnam %2$s.</string>
   <string name="studentCredentials">Skolēns: %1$s
 Lietotājvārds: %2$s
 Parole: %3$s</string>
-  <string name="inviteAPlaystrategyAccount">Ielūgt Playstrategy kontu</string>
-  <string name="inviteDesc1">Ja skolēnam jau ir Playstrategy konts, varat viņu ielūgt grupā.</string>
-  <string name="inviteDesc2">Viņš vai viņa saņems ziņu Playstrategy ar saiti, lai pievienotos grupai.</string>
+  <string name="inviteAPlayStrategyAccount">Ielūgt PlayStrategy kontu</string>
+  <string name="inviteDesc1">Ja skolēnam jau ir PlayStrategy konts, varat viņu ielūgt grupā.</string>
+  <string name="inviteDesc2">Viņš vai viņa saņems ziņu PlayStrategy ar saiti, lai pievienotos grupai.</string>
   <string name="inviteDesc3">Svarīgi: ielūdziet tikai skolēnus, kurus pazīstat un kuri vēlas pievienoties grupai.</string>
   <string name="inviteDesc4">Nekad neielūdziet nejaušus spēlētājus, kas to nevēlas.</string>
-  <string name="createANewPlaystrategyAccount">Izveidot Playstrategy kontu</string>
-  <string name="createDesc1">Ja skolēnam vēl nav Playstrategy konta, varat viņam vai viņai to izveidot šeit.</string>
+  <string name="createANewPlayStrategyAccount">Izveidot PlayStrategy kontu</string>
+  <string name="createDesc1">Ja skolēnam vēl nav PlayStrategy konta, varat viņam vai viņai to izveidot šeit.</string>
   <string name="createDesc2">E-pasta adrese nav nepieciešama. Tiks izveidota parole, kura jums būs jānodod skolēnam, lai viņš vai viņa var ierakstīties.</string>
   <string name="createDesc3">Svarīgi: skolēnam nedrīkst būt vairāki konti.</string>
   <string name="createDesc4">Ja skolēnam jau ir konts, aizpildiet ielūguma veidlapu.</string>
-  <string name="playstrategyUsername">Playstrategy lietotājvārds</string>
+  <string name="playstrategyUsername">PlayStrategy lietotājvārds</string>
   <string name="generateANewUsername">Radīt jaunu lietotājvārdu</string>
   <string name="welcomeToClass">Laipni lūgti savā klasē: %s.
 Lūk saite, lai piekļūtu kasei.</string>

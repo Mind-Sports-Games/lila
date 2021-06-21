@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Playstrategy treenerid</string>
-  <string name="playstrategyCoach">Playstrategy treener</string>
+  <string name="playstrategyCoaches">PlayStrategy treenerid</string>
+  <string name="playstrategyCoach">PlayStrategy treener</string>
   <string name="areYouCoach">Kas sa oled hea maletreener kellel on %s?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">NM või FIDE tiitel</string>
   <string name="confirmTitle">Kinnita oma tiitel siin ja me vaatame taotluse üle.</string>
@@ -13,7 +13,7 @@
   <string name="accepting">Võtan vastu õpilasi</string>
   <string name="notAccepting">Ei võta tudengeid hetkel</string>
   <string name="xCoachesStudents">%s treenib maleõpilasi</string>
-  <string name="viewXProfile">Vaata %s Playstrategy profiil</string>
+  <string name="viewXProfile">Vaata %s PlayStrategy profiil</string>
   <string name="sendPM">Saada privaatsõnum</string>
   <string name="aboutMe">Minust</string>
   <string name="playingExperience">Mängukogemus</string>

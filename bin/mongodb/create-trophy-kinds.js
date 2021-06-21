@@ -58,7 +58,7 @@ db.trophyKind.insert({
 });
 db.trophyKind.insert({
   _id: 'developer',
-  name: 'Playstrategy developer',
+  name: 'PlayStrategy developer',
   icon: '\ue000',
   url: 'https://github.com/ornicar/lila/graphs/contributors',
   klass: 'icon3d',
@@ -67,7 +67,7 @@ db.trophyKind.insert({
 });
 db.trophyKind.insert({
   _id: 'moderator',
-  name: 'Playstrategy moderator',
+  name: 'PlayStrategy moderator',
   icon: '\ue002',
   url: '//playstrategy.org/report',
   klass: 'icon3d',

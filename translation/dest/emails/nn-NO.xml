@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Stadfest playstrategy.org-kontoen din, %s</string>
-  <string name="emailConfirm_click">Trykk på lenkja for å aktivere Playstrategy-kontoen:</string>
-  <string name="emailConfirm_ignore">Om du ikkje har registrert deg på Playstrategy, kan du trygt sjå bort frå denne meldinga.</string>
+  <string name="emailConfirm_click">Trykk på lenkja for å aktivere PlayStrategy-kontoen:</string>
+  <string name="emailConfirm_ignore">Om du ikkje har registrert deg på PlayStrategy, kan du trygt sjå bort frå denne meldinga.</string>
   <string name="passwordReset_subject">Attendestill playstrategy.org-passordet ditt, %s</string>
   <string name="passwordReset_intro">Me har mottatt ein førespurnad om å attendestilla passordet for kontoen din.</string>
   <string name="passwordReset_clickOrIgnore">Klikk på lenka nedanfor om det er du som står bak denne førespurnaden. Sjå bort frå denne e-posten om det ikkje var du.</string>
@@ -15,7 +15,7 @@
 Her finn du profilsida di: %1$s. Du kan tilpasse den på %2$s.
 
 Ha det kjekt, og må brikkene dine alltid finne vegen til motspelarens konge!</string>
-  <string name="logInToPlaystrategy">Logg inn på playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Logg inn på playstrategy.org, %s</string>
   <string name="common_orPaste">(Fungerar det ikkje å klikke? Prøv å lime den inn i nettlesaren!)</string>
   <string name="common_note">Dette er ein service-e-post i samband med bruken din av %s.</string>
   <string name="common_contact">Bruk %s om du vil ta kontakt med oss.</string>

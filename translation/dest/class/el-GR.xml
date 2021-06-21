@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyClasses">Τάξεις Playstrategy</string>
-  <string name="teachClassesOfChessStudents">Διδασκαλία μαθητών με την σουίτα εργαλείων των τάξεων που προσφέρει το Playstrategy.</string>
+  <string name="playstrategyClasses">Τάξεις PlayStrategy</string>
+  <string name="teachClassesOfChessStudents">Διδασκαλία μαθητών με την σουίτα εργαλείων των τάξεων που προσφέρει το PlayStrategy.</string>
   <string name="features">Δυνατότητες</string>
   <string name="quicklyGenerateSafeUsernames">Γρήγορη δημιουργία χρηστών και κωδικών για μαθητές</string>
   <string name="trackStudentProgress">Παρακολούθηση προόδου μαθητών σε παρτίδες και γρίφους</string>
   <string name="messageAllStudents">Αποστολή μηνύματος σε όλους τους μαθητές σχετικά με νέο υλικό τάξης</string>
   <string name="freeForAllForever">100% χωρίς χρέωση για όλους, για πάντα, χωρίς διαφημίσεις ή ιχνηλάτηση</string>
-  <string name="applyToBePlaystrategyTeacher">Ζητήστε να γίνετε δάσκαλος στο Playstrategy</string>
+  <string name="applyToBePlayStrategyTeacher">Ζητήστε να γίνετε δάσκαλος στο PlayStrategy</string>
   <string name="noClassesYet">Δεν υπάρχουν τάξεις ακόμη.</string>
   <string name="teachersX">Δάσκαλοι: %s</string>
   <string name="newClass">Νέα τάξη</string>
@@ -23,7 +23,7 @@
   <string name="classDescription">Περιγραφή τάξης</string>
   <string name="visibleByBothStudentsAndTeachers">Ορατό από δασκάλους και μαθητές της τάξης</string>
   <string name="teachersOfTheClass">Δάσκαλοι τάξης</string>
-  <string name="addPlaystrategyUsernames">Προσθήκη χρηστών Playstrategy για πρόσκλησή τους ως δάσκαλοι. Ένας σε κάθε γραμμή.</string>
+  <string name="addPlayStrategyUsernames">Προσθήκη χρηστών PlayStrategy για πρόσκλησή τους ως δάσκαλοι. Ένας σε κάθε γραμμή.</string>
   <string name="resetPassword">Επαναφορά κωδικού πρόσβασης</string>
   <string name="makeSureToCopy">Βεβαιωθείτε ότι αντιγράψατε ή σημειώσατε τον κωδικό. Δεν θα μπορέσετε να τον δείτε ξανά!</string>
   <string name="passwordX">Κωδικός: %s</string>
@@ -32,21 +32,21 @@
   <string name="realName">Αληθινό όνομα</string>
   <string name="privateWillNeverBeShown">Ιδιωτικό. Δεν εμφανίζεται εκτός τάξης. Έτσι αναγνωρίζετε ευκολότερα τον μαθητή.</string>
   <string name="addStudent">Προσθήκη μαθητή</string>
-  <string name="playstrategyProfileXCreatedForY">Δημιουργήθηκε το Playstrategy προφίλ %1$s για %2$s.</string>
+  <string name="playstrategyProfileXCreatedForY">Δημιουργήθηκε το PlayStrategy προφίλ %1$s για %2$s.</string>
   <string name="studentCredentials">Μαθητής: %1$s
 Χρήστης: %2$s
 Κωδικός: %3$s</string>
-  <string name="inviteAPlaystrategyAccount">Πρόσκληση λογαριασμού Playstrategy</string>
-  <string name="inviteDesc1">Εάν ο μαθητής έχει ήδη λογαριασμό στο Playstrategy, μπορείτε να τον προσκαλέσετε στην τάξη.</string>
-  <string name="inviteDesc2">Θα λάβουν μήνυμα στο Playstrategy με σύνδεσμο για συμμετοχή στη τάξη.</string>
+  <string name="inviteAPlayStrategyAccount">Πρόσκληση λογαριασμού PlayStrategy</string>
+  <string name="inviteDesc1">Εάν ο μαθητής έχει ήδη λογαριασμό στο PlayStrategy, μπορείτε να τον προσκαλέσετε στην τάξη.</string>
+  <string name="inviteDesc2">Θα λάβουν μήνυμα στο PlayStrategy με σύνδεσμο για συμμετοχή στη τάξη.</string>
   <string name="inviteDesc3">Σημαντικό: προσκαλέστε μόνο μαθητές που γνωρίζετε, και που θέλουν να συμμετέχουν ενεργά στη τάξη.</string>
   <string name="inviteDesc4">Μην στέλνετε ανεπιθύμητες προσκλήσεις σε τυχαίους παίκτες.</string>
-  <string name="createANewPlaystrategyAccount">Δημιουργία νέου λογαριασμού Playstrategy</string>
-  <string name="createDesc1">Εάν ο μαθητής δεν έχει λογαριασμό Playstrategy, μπορείτε να δημιουργήσετε έναν για αυτόν εδώ.</string>
+  <string name="createANewPlayStrategyAccount">Δημιουργία νέου λογαριασμού PlayStrategy</string>
+  <string name="createDesc1">Εάν ο μαθητής δεν έχει λογαριασμό PlayStrategy, μπορείτε να δημιουργήσετε έναν για αυτόν εδώ.</string>
   <string name="createDesc2">Δεν χρειάζεται email. Θα δημιουργηθεί ένας κωδικός, για να τον αποστείλετε στο μαθητή, ώστε να μπορεί να συνδεθεί.</string>
   <string name="createDesc3">Σημαντικό: ο μαθητής δεν πρέπει να έχει πολλαπλούς λογαριασμούς.</string>
   <string name="createDesc4">Εάν έχουν ήδη έναν, χρησιμοποιήστε την φόρμα πρόσκλησης.</string>
-  <string name="playstrategyUsername">Όνομα χρήστη Playstrategy</string>
+  <string name="playstrategyUsername">Όνομα χρήστη PlayStrategy</string>
   <string name="generateANewUsername">Δημιουργία νέου ονόματος χρήστη</string>
   <string name="welcomeToClass">Καλώς ήρθατε στην τάξη σας: %s.
 Πατήστε στον σύνδεσμο για να αποκτήσετε πρόσβαση.</string>

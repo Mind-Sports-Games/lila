@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Pelatih Playstrategy</string>
-  <string name="playstrategyCoach">Pelatih Playstrategy</string>
+  <string name="playstrategyCoaches">Pelatih PlayStrategy</string>
+  <string name="playstrategyCoach">Pelatih PlayStrategy</string>
   <string name="areYouCoach">Apakah Anda seorang pelatih catur yang hebat dengan %s?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">Gelar NM atau FIDE</string>
   <string name="confirmTitle">Konfirmasikan gelar Anda di sini dan kami akan meninjau aplikasi Anda.</string>
@@ -14,7 +14,7 @@
   <string name="accepting">Penerimaan murid</string>
   <string name="notAccepting">Tidak menerima murid saat ini</string>
   <string name="xCoachesStudents">%s pelatih murid pecatur</string>
-  <string name="viewXProfile">Lihat %s profil Playstrategy</string>
+  <string name="viewXProfile">Lihat %s profil PlayStrategy</string>
   <string name="sendPM">Kirim pesan pribadi</string>
   <string name="aboutMe">Tentang saya</string>
   <string name="playingExperience">Pengalaman bermain</string>

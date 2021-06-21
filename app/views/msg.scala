@@ -15,7 +15,7 @@ object msg {
       moreJs = frag(
         jsModule("msg"),
         embedJsUnsafeLoadThen(
-          s"""PlaystrategyMsg(${safeJsonValue(
+          s"""PlayStrategyMsg(${safeJsonValue(
             Json.obj(
               "data" -> json,
               "i18n" -> jsI18n
@@ -23,7 +23,7 @@ object msg {
           )})"""
         )
       ),
-      title = "Playstrategy Inbox"
+      title = "PlayStrategy Inbox"
     ) {
       main(cls := "box msg-app")
     }

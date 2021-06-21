@@ -20,7 +20,7 @@ final class AutomaticEmail(
 
   val regards = """Regards,
 
-The Playstrategy team"""
+The PlayStrategy team"""
 
   def welcome(user: User, email: EmailAddress)(implicit lang: Lang): Funit = {
     lila.mon.email.send.welcome.increment()
@@ -48,7 +48,7 @@ ${Mailer.txt.serviceNote}
       body = alsoSendAsPrivateMessage(user) { implicit lang =>
         s"""Hello,
 
-Thank you for confirming your $title title on Playstrategy.
+Thank you for confirming your $title title on PlayStrategy.
 It is now visible on your profile page: $baseUrl/@/${user.username}.
 
 $regards
@@ -76,7 +76,7 @@ ${Mailer.txt.serviceNote}
     val body = alsoSendAsPrivateMessage(user) { implicit lang =>
       s"""Hello,
 
-It is our pleasure to welcome you as a Playstrategy coach.
+It is our pleasure to welcome you as a PlayStrategy coach.
 Your coach profile awaits you on $baseUrl/coach/edit.
 
 $regards
@@ -148,7 +148,7 @@ $regards
     val body =
       s"""Hello,
 
-Following your request, the Playstrategy account "${user.username} will be fully erased in 24h from now.
+Following your request, the PlayStrategy account "${user.username} will be fully erased in 24h from now.
 
 $regards
 """

@@ -441,8 +441,8 @@
   <string name="thankYou">ممنون!</string>
   <string name="socialMediaLinks">لینک های رسانه های اجتماعی</string>
   <string name="inlineNotation">نمایش اطلاعات درون خطها</string>
-  <string name="watchPlaystrategyTV">تلویزیون لیچس را ببین</string>
-  <string name="previouslyOnPlaystrategyTV">بازی قبلی در لیچس</string>
+  <string name="watchPlayStrategyTV">تلویزیون لیچس را ببین</string>
+  <string name="previouslyOnPlayStrategyTV">بازی قبلی در لیچس</string>
   <string name="onlinePlayers">بازکنان آنلاین</string>
   <string name="activeToday">فعالیت امروز</string>
   <string name="activePlayers">بازیکنان فعال</string>
@@ -547,7 +547,7 @@
   <string name="clock">ساعت</string>
   <string name="unauthorizedError">دسترسی مقدور نیست</string>
   <string name="noInternetConnection">ارتباط اینترنتی قطع است. همچنان می‌توانید از طریق منو به صورت آفلاین بازی کنید.</string>
-  <string name="connectedToPlaystrategy">اکنون به playstrategy.org وصل شده‌اید.</string>
+  <string name="connectedToPlayStrategy">اکنون به playstrategy.org وصل شده‌اید.</string>
   <string name="signedOut">شما بیرون رفتید</string>
   <string name="loginSuccessful">شما وارد شدید</string>
   <string name="playOnTheBoardOffline">آفلاین روی تخته بازی کنید</string>
@@ -648,8 +648,8 @@
   <string name="weHaveSentYouAnEmailTo">ایمیل ارسال شد.بر روی لینک داخل ایمیل کلیک کنید تا پسورد شما ریست شود %s  به آدرس</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">ما پایبند خواهید بود %s با کلیک بر روی نام نویسی شما به</string>
   <string name="readAboutOur">درباره %s ما بخوانید.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">تاخیر شبکه بین شما و لیچس</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">زمان سپری شده برای پردازش یک حرکت</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">تاخیر شبکه بین شما و لیچس</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">زمان سپری شده برای پردازش یک حرکت</string>
   <string name="downloadAnnotated">دانلود محتوا</string>
   <string name="downloadRaw">دانلود خام</string>
   <string name="downloadImported">دانلود جایگذاری شده</string>
@@ -665,7 +665,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">این ایمیل %s قبلا برای نام نویسی استفاده شده است</string>
   <string name="kidMode">حالت کودکان</string>
   <string name="kidModeExplanation">این گزینه،امنیتی است.با فعال کردن حالت ((کودکانه))،همه ی ارتباطات(چت کردن و...)غیر فعال می شوند.با فعال کردن این گزینه،کودکان خود را محافطت کنید.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">در حالت کودکانه،به نماد لیچس،یک %s اضافه می شود تا شما از فعال بودن آن مطلع شوید.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">در حالت کودکانه،به نماد لیچس،یک %s اضافه می شود تا شما از فعال بودن آن مطلع شوید.</string>
   <string name="enableKidMode">فعال کردن حالت کودکانه</string>
   <string name="disableKidMode">غیر فعال کردن حالت کودکانه</string>
   <string name="security">امنیت</string>
@@ -673,7 +673,7 @@
   <string name="alternativelyYouCanX">همچنین شما می توانید %s.</string>
   <string name="revokeAllSessions">باطل کردن تمامی موارد</string>
   <string name="playChessEverywhere">همه جا شطرنج بازی کنید</string>
-  <string name="asFreeAsPlaystrategy">رایگان به مانند لیچس</string>
+  <string name="asFreeAsPlayStrategy">رایگان به مانند لیچس</string>
   <string name="builtForTheLoveOfChessNotMoney">ساخته شده با عشق به شطرنج نه پول</string>
   <string name="everybodyGetsAllFeaturesForFree">همگی از مزایا بصورت رایگان استفاده می کنند</string>
   <string name="zeroAdvertisement">بدون تبلیغات</string>
@@ -713,7 +713,7 @@
   <string name="usernameSuffixInvalid">نام کاربری باید با حرف یا شماره خاتمه یابد.</string>
   <string name="usernameCharsInvalid">نام کاربری فقط می تواند شامل حروف،اعداد،خط فاصله یا زیر خط(under line) باشد.</string>
   <string name="usernameUnacceptable">این نام کاربری قابل قبول نیست.</string>
-  <string name="directlySupportPlaystrategy">مستقیما لیچس را حمایت کنید.</string>
+  <string name="directlySupportPlayStrategy">مستقیما لیچس را حمایت کنید.</string>
   <string name="playChessInStyle">استایل شطرنج باز داشته باشید!</string>
   <string name="chessBasics">اصول شطرنج</string>
   <string name="coaches">مربی ها</string>
