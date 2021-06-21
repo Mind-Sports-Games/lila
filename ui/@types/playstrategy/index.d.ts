@@ -219,7 +219,7 @@ declare namespace Editor {
   }
 
   export interface Options {
-    orientation?: Color;
+    orientation?: Orientation;
     onChange?: (fen: string) => void;
     inlineCastling?: boolean;
   }
