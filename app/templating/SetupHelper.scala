@@ -152,7 +152,6 @@ trait SetupHelper { self: I18nHelper =>
       variantTupleId(chess.variant.Atomic) :+
       variantTupleId(chess.variant.Horde) :+
       variantTupleId(chess.variant.RacingKings) :+
-      variantTupleId(chess.variant.LinesOfAction) :+
       variantTupleId(chess.variant.FromPosition)
 
   def translatedVariantChoicesWithVariantsAndFen(implicit lang: Lang) =
