@@ -31,81 +31,41 @@ object faq {
         h1(cls := "playstrategy_title")(frequentlyAskedQuestions()),
         h2("PlayStrategy"),
         question(
-          "name",
-          whyIsPlayStrategyCalledPlayStrategy.txt(),
-          p(
-            playstrategyCombinationLiveLightLibrePronounced(em(leechess())),
-            " ",
-            a(href := "https://www.youtube.com/watch?v=KRpPqcrdE-o")(hearItPronouncedBySpecialist())
-          ),
-          p(
-            whyLiveLightLibre()
-          ),
-          p(
-            whyIsLilaCalledLila(
-              a(href := "https://github.com/ornicar/lila")("lila"),
-              a(href := "https://www.scala-lang.org/")("Scala")
-            )
+          "what",
+          whatIsPlayStrategy.txt(),
+          playstrategyAboutSummary(
+            a(href := "/about")("PlayStrategy"),
           )
         ),
         question(
-          "contributing",
-          howCanIContributeToPlayStrategy.txt(),
-          p(playstrategyPoweredByDonationsAndVolunteers()),
-          p(
-            findMoreAndSeeHowHelp(
-              a(href := routes.Plan.index)(beingAPatron()),
-              a(href := routes.Main.costs)(breakdownOfOurCosts()),
-              a(href := routes.Page.help)(otherWaysToHelp())
-            )
+          "donating",
+          canIDonateToPlayStrategy.txt(),
+          playstrategyFundedByDonations(
+            a(href := "/patron")("patron"),
           )
         ),
         question(
-          "sites_based_on_PlayStrategy",
+          "origins",
           areThereWebsitesBasedOnPlayStrategy.txt(),
-          p(
-            yesPlayStrategyInspiredOtherOpenSourceWebsites(
-              a(href := "/source")(trans.sourceCode()),
-              a(href := "/api")("API"),
-              a(href := "https://database.playstrategy.org")(trans.database())
-            )
-          ),
-          ul(
-            li(a(href := "https://blitztactics.com/about")("Blitz Tactics")),
-            li(a(href := "https://tailuge.github.io/chess-o-tron/html/blunder-bomb.html")("Blunder Bomb")),
-            li(a(href := "https://lidraughts.org")("lidraughts.org"))
-          )
-        ),
-        h2(fairPlay()),
-        question(
-          "rating-refund",
-          whenAmIEligibleRatinRefund.txt(),
-          p(
-            ratingRefundExplanation()
-          )
-        ),
-        question(
-          "leaving",
-          preventLeavingGameWithoutResigning.txt(),
-          p(
-            leavingGameWithoutResigningExplanation()
-          )
-        ),
-        question(
-          "mod-application",
-          howCanIBecomeModerator.txt(),
-          p(
-            youCannotApply()
-          )
-        ),
-        question(
-          "correspondence",
-          isCorrespondenceDifferent.txt(),
-          p(
-            youCanUseOpeningBookNoEngine()
+          playstrategyIsForkedFromLichess(
+            a(href := "https://lichess.org")("lichess.org")
           )
         ),
         h2(gameplay()),
+        question(
+          "games",
+          whatGamesCanIplay.txt(),
+          playstrategyGamesList.txt()
+        ),
+        question(
+          "variants",
+          whatVariantsCanIplay.txt(),
+          p(
+            playstrategySupportChessAnd(
+              a(href := routes.Page.variantHome)(eightVariants())
+            )
+          )
+        ),
         question(
           "time-controls",
           howBulletBlitzEtcDecided.txt(),
@@ -121,19 +81,10 @@ object faq {
           )
         ),
         question(
-          "variants",
-          whatVariantsCanIplay.txt(),
+          "correspondence",
+          isCorrespondenceDifferent.txt(),
           p(
-            playstrategySupportChessAnd(
-              a(href := routes.Page.variantHome)(eightVariants())
-            )
-          )
-        ),
-        question(
-          "acpl",
-          whatIsACPL.txt(),
-          p(
-            acplExplanation()
+            youCanUseOpeningBookNoEngine()
           )
         ),
         question(
@@ -141,17 +92,6 @@ object faq {
           insufficientMaterial.txt(),
           p(
             playstrategyFollowFIDErules(a(href := fideHandbookUrl)(fideHandbookX("§6.9")))
-          )
-        ),
-        question(
-          "en-passant",
-          discoveringEnPassant.txt(),
-          p(
-            explainingEnPassant(
-              a(href := "https://en.wikipedia.org/wiki/En_passant")(goodIntroduction()),
-              a(href := fideHandbookUrl)(fideHandbookX("§3.7")),
-              a(href := s"${routes.Learn.index}#/15")(playstrategyTraining())
-            )
           )
         ),
         question(
@@ -176,77 +116,45 @@ object faq {
             )
           )
         ),
-        h2(accounts()),
         question(
-          "titles",
-          titlesAvailableOnPlayStrategy.txt(),
+          "acpl",
+          whatIsACPL.txt(),
           p(
-            playstrategyRecognizeAllOTBtitles(
-              a(href := "https://github.com/ornicar/lila/wiki/Handling-title-verification-requests")(
-                asWellAsManyNMtitles()
-              )
-            )
-          ),
-          ul(
-            li("Grandmaster (GM)"),
-            li("International Master (IM)"),
-            li("FIDE Master (FM)"),
-            li("Candidate Master (CM)"),
-            li("Woman Grandmaster (WGM)"),
-            li("Woman International Master (WIM)"),
-            li("Woman FIDE Master (WFM)"),
-            li("Woman Candidate Master (WCM)")
-          ),
+            acplExplanation()
+          )
+        ),
+        h2(fairPlay()),
+        question(
+          "rating-refund",
+          whenAmIEligibleRatinRefund.txt(),
           p(
-            showYourTitle(
-              a(href := routes.Main.verifyTitle)(verificationForm()),
-              a(href := "#lm")("PlayStrategy master (LM)")
-            )
+            ratingRefundExplanation()
           )
         ),
         question(
-          "lm",
-          canIbecomeLM.txt(),
-          p(strong(noUpperCaseDot())),
-          p(lMtitleComesToYouDoNotRequestIt())
+          "leaving",
+          preventLeavingGameWithoutResigning.txt(),
+          p(
+            leavingGameWithoutResigningExplanation()
+          )
         ),
+        question(
+          "mod-application",
+          howCanIBecomeModerator.txt(),
+          p(
+            youCannotApply()
+          )
+        ),
+        h2(accounts()),
         question(
           "usernames",
           whatUsernameCanIchoose.txt(),
-          p(
-            usernamesNotOffensive(
-              a(href := "https://github.com/ornicar/lila/wiki/Username-policy")(guidelines())
-            )
-          )
+          p(usernamesNotOffensive.txt())
         ),
         question(
           "change-username",
           canIChangeMyUsername.txt(),
           p(usernamesCannotBeChanged.txt())
-        ),
-        question(
-          "trophies",
-          uniqueTrophies.txt(),
-          h4("The way of Berserk"),
-          p(
-            ownerUniqueTrophies(
-              a(href := "https://playstrategy.org/@/hiimgosu")("hiimgosu")
-            )
-          ),
-          p(
-            wayOfBerserkExplanation(
-              a(href := "https://playstrategy.org/tournament/cDyjj1nL")(aHourlyBulletTournament())
-            )
-          ),
-          h4("The Golden Zee"),
-          p(
-            ownerUniqueTrophies(
-              a(href := "https://playstrategy.org/@/ZugAddict")("ZugAddict")
-            )
-          ),
-          p(
-            goldenZeeExplanation()
-          )
         ),
         h2(playstrategyRatings()),
         question(
@@ -254,9 +162,6 @@ object faq {
           whichRatingSystemUsedByPlayStrategy.txt(),
           p(
             ratingSystemUsedByPlayStrategy()
-          ),
-          p(
-            a(href := routes.Page.loneBookmark("rating-systems"))("More about rating systems")
           )
         ),
         question(
@@ -305,9 +210,6 @@ object faq {
           whyAreRatingHigher.txt(),
           p(
             whyAreRatingHigherExplanation()
-          ),
-          p(
-            a(href := routes.Page.loneBookmark("rating-systems"))("More about rating systems")
           )
         ),
         question(
