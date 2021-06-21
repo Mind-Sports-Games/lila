@@ -101,9 +101,9 @@ object Report {
   ) {
     def simplifiedText = text.linesIterator.filterNot(_ startsWith "[AUTOREPORT]") mkString "\n"
 
-    def byHuman = !byPlaystrategy && by != ReporterId.irwin
+    def byHuman = !byPlayStrategy && by != ReporterId.irwin
 
-    def byPlaystrategy = by == ReporterId.playstrategy
+    def byPlayStrategy = by == ReporterId.playstrategy
   }
 
   case class Inquiry(mod: User.ID, seenAt: DateTime)

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Playstrategy streamerrak</string>
-  <string name="playstrategyStreamer">Playstrategy streamerra</string>
+  <string name="playstrategyStreamers">PlayStrategy streamerrak</string>
+  <string name="playstrategyStreamer">PlayStrategy streamerra</string>
   <string name="live">ZUZENEAN!</string>
   <string name="offline">OFFLINE</string>
   <string name="currentlyStreaming">Orain zuzenean ematen: %s</string>
   <string name="lastStream">Azken emanaldia %s</string>
-  <string name="becomeStreamer">Playstrategy streamer bihurtu</string>
+  <string name="becomeStreamer">PlayStrategy streamer bihurtu</string>
   <string name="doYouHaveStream">Twitch edo YouTube kanala duzu?</string>
   <string name="hereWeGo">Aurrera!</string>
   <string name="allStreamers">Streamer guztiak</string>
@@ -15,27 +15,27 @@
   <string name="downloadKit">Streamer kita deskargatu</string>
   <string name="xIsStreaming">%s zuzenean ematen ari da</string>
   <string name="rules">Zuzenekoetarako arauak</string>
-  <string name="rule1">Gehitu playstrategy.org hitz gakoa zure emanaldiaren izenburuan Playstrategyen emanaldia egiten ari zarenean.</string>
-  <string name="rule2">Ezabatu hitz-gakoa Playstrategyekoa ez den zerbait ematen ari zarenean.</string>
-  <string name="rule3">Playstrategyek zure emanaldia automatikoki detektatuko du eta zera aktibatuko du:</string>
+  <string name="rule1">Gehitu playstrategy.org hitz gakoa zure emanaldiaren izenburuan PlayStrategyen emanaldia egiten ari zarenean.</string>
+  <string name="rule2">Ezabatu hitz-gakoa PlayStrategyekoa ez den zerbait ematen ari zarenean.</string>
+  <string name="rule3">PlayStrategyek zure emanaldia automatikoki detektatuko du eta zera aktibatuko du:</string>
   <string name="perks">Hitz gakoarekin emanaldia egitearen onurak</string>
-  <string name="perk1">Zure Playstrategy profilean ikono bat.</string>
+  <string name="perk1">Zure PlayStrategy profilean ikono bat.</string>
   <string name="perk2">Streamerren zerrendan gorago agertuko zara.</string>
-  <string name="perk3">Zure Playstrategy jarraitzaileei jakinarazpena bidaliko diegu.</string>
+  <string name="perk3">Zure PlayStrategy jarraitzaileei jakinarazpena bidaliko diegu.</string>
   <string name="perk4">Zure emanaldia zure partida, txapelketa eta azterlanetan agertuko da.</string>
   <string name="approved">Zure emanaldia onartu egin da.</string>
   <string name="pendingReview">Zure emanaldia moderatzaileak ikuskatzeko zain dago.</string>
   <string name="pleaseFillIn">Bete zure informazioa eta kargatu irudia.</string>
-  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Playstrategy streamer gisa zerrendatzeko prest zaudenean, %s</string>
-  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a Playstrategy streamer, request a moderator review&quot;">moderatzaileek ikuskatzea eskatu</string>
+  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">PlayStrategy streamer gisa zerrendatzeko prest zaudenean, %s</string>
+  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a PlayStrategy streamer, request a moderator review&quot;">moderatzaileek ikuskatzea eskatu</string>
   <string name="anotherLanguage">Ingelesa ez den hizkuntza baten egiten baduzu emanaldia, gehitu hizkuntzaren etiketa (%s) kortxete artean zure emanaldiaren izenburuan.
 Adibidez, gehitu \"[EU]\" euskararentzat \"[ES]\" gaztelaniarentzat edo \"[FR]\" frantsesarentzat.
-Gehitu zure emanaldiaren izenburuan Twich edo YouTube orrialdean, ez Playstrategyeko ezarpenetan. 
+Gehitu zure emanaldiaren izenburuan Twich edo YouTube orrialdean, ez PlayStrategyeko ezarpenetan. 
 Zure emanaldia ingelesez bada, ez duzu zertan hizkuntza etiketa gehitu.</string>
   <string name="twitchUsername">Zure Twitch erabiltzeaile-izena edo URLa</string>
   <string name="optionalOrEmpty">Hautazkoa. Utzi hutsik ez baduzu</string>
   <string name="youtubeChannel">Zure YouTube kanalaren IDa edo URL</string>
-  <string name="streamerName">Zure streamer izena Playstrategyen</string>
+  <string name="streamerName">Zure streamer izena PlayStrategyen</string>
   <plurals name="keepItShort">
     <item quantity="one">Laburra izan dadila: gehienez karaktere %s</item>
     <item quantity="other">Laburra izan dadila: gehienez %s karaktere</item>
@@ -53,6 +53,6 @@ Zure emanaldia ingelesez bada, ez duzu zertan hizkuntza etiketa gehitu.</string>
   <string name="installBlocker">Malware blokeatzailea instalatu!</string>
   <string name="beSafe">Twitch eta YouTuben dauden
 iragarki eta trackerrengandik babestu.
-Playstrategyek uBlock Origin erabiltzea
+PlayStrategyek uBlock Origin erabiltzea
 gomendatzen dizu, doakoa eta librea da.</string>
 </resources>

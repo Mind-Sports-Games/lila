@@ -2,7 +2,7 @@ import rollupProject from '@build/rollupProject';
 
 export default rollupProject({
   main: {
-    name: 'PlaystrategyEditor',
+    name: 'PlayStrategyEditor',
     input: 'src/main.ts',
     output: 'editor',
   },

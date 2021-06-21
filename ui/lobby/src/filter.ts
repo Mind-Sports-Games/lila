@@ -17,7 +17,7 @@ export default class Filter {
   data: FilterData | null;
   open = false;
 
-  constructor(storage: PlaystrategyStorage, readonly root: LobbyController) {
+  constructor(storage: PlayStrategyStorage, readonly root: LobbyController) {
     this.store = makeStore(storage);
     this.set(this.store.get());
   }

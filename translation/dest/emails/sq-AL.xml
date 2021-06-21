@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Konfirmo llogarinë tuaj në playstrategy.org, %s</string>
-  <string name="emailConfirm_click">Klikoni link për të aktivizuar accountin tuaj në Playstrategy:</string>
-  <string name="emailConfirm_ignore">Nëse nuk jeni regjistruar me Playstrategy ju mund të injoroni këtë mesazh.</string>
+  <string name="emailConfirm_click">Klikoni link për të aktivizuar accountin tuaj në PlayStrategy:</string>
+  <string name="emailConfirm_ignore">Nëse nuk jeni regjistruar me PlayStrategy ju mund të injoroni këtë mesazh.</string>
   <string name="passwordReset_subject">Rivendosni password-in tuaj në playstrategy.org. %s</string>
   <string name="passwordReset_intro">Ne morëm një kërkesë për të rivendosur passwordin për accountin tuaj.</string>
   <string name="passwordReset_clickOrIgnore">Nëse e keni bërë këtë kërkesë, klikoni linkun më poshtë. Nëse jo, mund ta injoroni këtë email.</string>
@@ -15,7 +15,7 @@
 Këtu është faqja e profilit tënd: %1$s. Ju mund ta personalizoni atë në %2$s.
 
 Have fun, dhe mund të copa tuaj gjithmonë të gjejnë rrugën e tyre për të mbretit kundërshtarin tuaj!</string>
-  <string name="logInToPlaystrategy">Lidhem më playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Lidhem më playstrategy.org, %s</string>
   <string name="common_orPaste">(Duke klikuar të mos punosh, provo ta copypasta në browserin tënd!)</string>
   <string name="common_note">Kjo është një serivce email në lidhje me përdorimin tuaj në %s.</string>
   <string name="common_contact">Për të na kontaktuar, ju lutem përdorni %s.</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="contact">Kontakt</string>
-  <string name="contactPlaystrategy">Skontaktuj się z Playstrategy</string>
+  <string name="contactPlayStrategy">Skontaktuj się z PlayStrategy</string>
   <string name="whatCanWeHelpYouWith">W czym możemy Ci pomóc?</string>
   <string name="visitThisPage">Odwiedź tę stronę, aby rozwiązać problem</string>
   <string name="iCantLogIn">Nie mogę się zalogować</string>
@@ -12,8 +12,8 @@
   <string name="lost2FA">Utraciłem dostęp do moich kodów uwierzytelniania dwuskładnikowego</string>
   <string name="doPasswordReset">Zresetuj hasło, aby usunąć drugi składnik uwierzytelniania</string>
   <string name="accountSupport">Potrzebuję wsparcia dla konta</string>
-  <string name="wantTitle">Chcę, aby mój tytuł był wyświetlany na Playstrategy</string>
-  <string name="visitTitleConfirmation">Aby pokazać swój tytuł na profilu Playstrategy i wziąć udział w turniejach dla graczy z tytułami, odwiedź stronę potwierdzenia tytułu</string>
+  <string name="wantTitle">Chcę, aby mój tytuł był wyświetlany na PlayStrategy</string>
+  <string name="visitTitleConfirmation">Aby pokazać swój tytuł na profilu PlayStrategy i wziąć udział w turniejach dla graczy z tytułami, odwiedź stronę potwierdzenia tytułu</string>
   <string name="wantCloseAccount">Chcę zamknąć moje konto</string>
   <string name="closeYourAccount">Możesz zamknąć swoje konto na tej stronie</string>
   <string name="doNotAskByEmail">Nie proś nas o zamknięcie konta przez e-mail, nie zrobimy tego.</string>
@@ -34,10 +34,10 @@
   <string name="doNotMessageModerators">Nie wysyłaj bezpośrednich wiadomości do moderatorów.</string>
   <string name="onlyReports">Skuteczne są tylko zgłoszenia za pomocą formularza.</string>
   <string name="wantReportBug">Chcę zgłosić błąd</string>
-  <string name="reportBugInForum">Na forum opinii Playstrategy</string>
-  <string name="reportWebsiteIssue">Jako problem ze stroną Playstrategy na GitHub</string>
-  <string name="reportMobileIssue">Jako problem z aplikacją mobilną Playstrategy na GitHub</string>
-  <string name="reportBugInDiscord">Na serwerze discord Playstrategy</string>
+  <string name="reportBugInForum">Na forum opinii PlayStrategy</string>
+  <string name="reportWebsiteIssue">Jako problem ze stroną PlayStrategy na GitHub</string>
+  <string name="reportMobileIssue">Jako problem z aplikacją mobilną PlayStrategy na GitHub</string>
+  <string name="reportBugInDiscord">Na serwerze discord PlayStrategy</string>
   <string name="howToReportBug">Opisz proszę jak wygląda błąd, czego się spodziewałeś zamiast tego i kroki do odtworzenia błędu.</string>
   <string name="illegalPawnCapture">Nielegalne bicie piona</string>
   <string name="calledEnPassant">To „bicie w przelocie” i jest jedną z zasad szachów.</string>
@@ -63,13 +63,13 @@
   <string name="doNotDeny">Nie zaprzeczaj oszustwu. Jeśli chcesz mieć prawo do utworzenia nowego konta, wystarczy przyznać się do tego co zrobiłeś oraz pokazać, że rozumiesz, że to był błąd.</string>
   <string name="otherRestriction">Inne ograniczenia</string>
   <string name="collaboration">Współpraca, nota prawna, reklama</string>
-  <string name="monetizing">Monetyzacja Playstrategy</string>
-  <string name="buyingPlaystrategy">Kupno Playstrategy</string>
-  <string name="authorizationToUse">Autoryzacja używania Playstrategy</string>
-  <string name="welcomeToUse">Zachęcamy do korzystania z Playstrategy w swojej działalności, nawet komercyjnej.</string>
-  <string name="videosAndBooks">Możesz pokazać to w swoich filmach i możesz prezentować zrzuty ekranu Playstrategy w swoich książkach.</string>
+  <string name="monetizing">Monetyzacja PlayStrategy</string>
+  <string name="buyingPlayStrategy">Kupno PlayStrategy</string>
+  <string name="authorizationToUse">Autoryzacja używania PlayStrategy</string>
+  <string name="welcomeToUse">Zachęcamy do korzystania z PlayStrategy w swojej działalności, nawet komercyjnej.</string>
+  <string name="videosAndBooks">Możesz pokazać to w swoich filmach i możesz prezentować zrzuty ekranu PlayStrategy w swoich książkach.</string>
   <string name="creditAppreciated">Wpłaty są mile widziane, ale nie są wymagane.</string>
   <string name="noneOfTheAbove">Żadne z powyższych</string>
   <string name="sendEmailAt">Wyślij nam e-mail na %s.</string>
-  <string name="explainYourRequest">Prosimy o jasne i dokładne wyjaśnienie Twojego wniosku. Podaj swoją nazwę użytkownika Playstrategy oraz wszelkie informacje, które pomogą nam pomóc Tobie.</string>
+  <string name="explainYourRequest">Prosimy o jasne i dokładne wyjaśnienie Twojego wniosku. Podaj swoją nazwę użytkownika PlayStrategy oraz wszelkie informacje, które pomogą nam pomóc Tobie.</string>
 </resources>

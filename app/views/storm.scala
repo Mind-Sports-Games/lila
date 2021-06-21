@@ -20,7 +20,7 @@ object storm {
       moreJs = frag(
         jsModule("storm"),
         embedJsUnsafeLoadThen(
-          s"""PlaystrategyStorm.start(${safeJsonValue(
+          s"""PlayStrategyStorm.start(${safeJsonValue(
             Json.obj(
               "data" -> data,
               "pref" -> pref,

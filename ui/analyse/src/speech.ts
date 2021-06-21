@@ -4,14 +4,14 @@ export function setup() {
 }
 
 function onSpeechChange(enabled: boolean) {
-  if (!window.PlaystrategySpeech && enabled) playstrategy.loadModule('speech');
-  else if (window.PlaystrategySpeech && !enabled) window.PlaystrategySpeech = undefined;
+  if (!window.PlayStrategySpeech && enabled) playstrategy.loadModule('speech');
+  else if (window.PlayStrategySpeech && !enabled) window.PlayStrategySpeech = undefined;
 }
 
 export function node(n: Tree.Node) {
   withSpeech(s => s.step(n, true));
 }
 
-function withSpeech(f: (speech: PlaystrategySpeech) => void) {
-  if (window.PlaystrategySpeech) f(window.PlaystrategySpeech);
+function withSpeech(f: (speech: PlayStrategySpeech) => void) {
+  if (window.PlayStrategySpeech) f(window.PlayStrategySpeech);
 }

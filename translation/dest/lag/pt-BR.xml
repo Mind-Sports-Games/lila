@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="isPlaystrategyLagging">O Playstrategy está com atraso?</string>
+  <string name="isPlayStrategyLagging">O PlayStrategy está com atraso?</string>
   <string name="measurementInProgressThreeDot">Medições em andamento...</string>
   <string name="noAndYourNetworkIsGood">Não. E a sua rede é boa.</string>
-  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is Playstrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Não. E a sua rede está ruim.</string>
+  <string name="noAndYourNetworkIsBad" comment="noAndYourNetworkIsBad&#10;&#10;The system checks the network lag and replies in response to the question &quot;Is PlayStrategy lagging?&quot;&#10;In this case, it's the user's network connection that is making the game lag.">Não. E a sua rede está ruim.</string>
   <string name="yesItWillBeFixedSoon">Sim. Será corrigido em breve!</string>
   <string name="andNowTheLongAnswerLagComposedOfTwoValues">E agora, a resposta longa. O atraso de jogo é composto por dois valores não relacionados (quanto mais baixos melhor):</string>
-  <string name="playstrategyServerLatency">Latência do servidor do Playstrategy</string>
-  <string name="playstrategyServerLatencyExplanation">É o tempo que leva para processar um movimento no servidor. É o mesmo para todos, e só depende da carga do servidor. Quanto mais jogadores, mais alto fica, mas os desenvolvedores do Playstrategy dão o seu melhor para o manter baixo. Raramente excede 10 ms.</string>
-  <string name="networkBetweenPlaystrategyAndYou">Rede entre Playstrategy e você</string>
-  <string name="networkBetweenPlaystrategyAndYouExplanation">É o tempo que leva para enviar um movimento do seu computador para o servidor do Playstrategy e obter a resposta de volta. Depende da sua distância ao Playstrategy (França) e da qualidade da sua conexão à Internet. Os desenvolvedores do Playstrategy não podem consertar o teu WiFi nem fazer a luz andar mais rápido.</string>
+  <string name="playstrategyServerLatency">Latência do servidor do PlayStrategy</string>
+  <string name="playstrategyServerLatencyExplanation">É o tempo que leva para processar um movimento no servidor. É o mesmo para todos, e só depende da carga do servidor. Quanto mais jogadores, mais alto fica, mas os desenvolvedores do PlayStrategy dão o seu melhor para o manter baixo. Raramente excede 10 ms.</string>
+  <string name="networkBetweenPlayStrategyAndYou">Rede entre PlayStrategy e você</string>
+  <string name="networkBetweenPlayStrategyAndYouExplanation">É o tempo que leva para enviar um movimento do seu computador para o servidor do PlayStrategy e obter a resposta de volta. Depende da sua distância ao PlayStrategy (França) e da qualidade da sua conexão à Internet. Os desenvolvedores do PlayStrategy não podem consertar o teu WiFi nem fazer a luz andar mais rápido.</string>
   <string name="youCanFindTheseValuesAtAnyTimeByClickingOnYourUsername">Você pode encontrar ambos os valores a qualquer momento, clicando em seu nome de usuário na barra superior.</string>
   <string name="lagCompensation">Compensação do atraso</string>
-  <string name="lagCompensationExplanation">O Playstrategy compensa os atrasos da rede. Isto inclui atrasos constantes e ocasionais. Existem limites e heurística baseados no controle de tempo e no atraso compensado até o momento, para que o resultado seja razoável para ambos os jogadores. Assim, ter mais atraso de rede do que seu oponente não é uma desvantagem!</string>
+  <string name="lagCompensationExplanation">O PlayStrategy compensa os atrasos da rede. Isto inclui atrasos constantes e ocasionais. Existem limites e heurística baseados no controle de tempo e no atraso compensado até o momento, para que o resultado seja razoável para ambos os jogadores. Assim, ter mais atraso de rede do que seu oponente não é uma desvantagem!</string>
 </resources>

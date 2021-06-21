@@ -2,8 +2,8 @@
 <resources>
   <string name="faqAbbreviation">KKK</string>
   <string name="frequentlyAskedQuestions">Korduma kippuvad küsimused</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Miks Playstrategyi nimi on Playstrategy?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">Playstrategy on sõnade live/light/libre ja chess kombinatsioon. Seda hääldatakse %1$s.</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Miks PlayStrategyi nimi on PlayStrategy?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">PlayStrategy on sõnade live/light/libre ja chess kombinatsioon. Seda hääldatakse %1$s.</string>
   <string name="leechess">li-tšes</string>
   <string name="hearItPronouncedBySpecialist">Kuula kuidas asjatundja seda hääldab.</string>
   <string name="fairPlay">Aus mäng</string>
@@ -16,7 +16,7 @@
   <string name="threefoldRepetitionLowerCase">kolmekordne kordus</string>
   <string name="canIChangeMyUsername">Kas ma saan muuta oma kasutajanime?</string>
   <string name="usernamesCannotBeChanged">Ei, kasutajanime ei või muuta praktilistel ja tehnoloogilistel põhjustel. Kasutajanimed kajastuvad liiga mitmes kohas: andmebaasid, ekspordid, logid ja inimeste meeltes. Võimalik on muuta tähtede suurust ühe korra.</string>
-  <string name="playstrategyRatings">Playstrategy reitingud</string>
-  <string name="whichRatingSystemUsedByPlaystrategy">Millist reitingsüsteemi Playstrategy kasutab?</string>
+  <string name="playstrategyRatings">PlayStrategy reitingud</string>
+  <string name="whichRatingSystemUsedByPlayStrategy">Millist reitingsüsteemi PlayStrategy kasutab?</string>
   <string name="ratingLeaderboards">reitingu edetabel</string>
 </resources>

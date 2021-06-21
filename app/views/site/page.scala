@@ -105,7 +105,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           h1("HTTP API"),
           p(
             raw(
-              """Playstrategy exposes a RESTish HTTP/JSON API that you are welcome to use. Read the <a href="/api" class="blue">HTTP API documentation</a>."""
+              """PlayStrategy exposes a RESTish HTTP/JSON API that you are welcome to use. Read the <a href="/api" class="blue">HTTP API documentation</a>."""
             )
           )
         ),
@@ -113,7 +113,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
         div(cls := "box box-pad developers body") {
           val args = """style="width: 400px; height: 444px;" allowtransparency="true" frameborder="0""""
           frag(
-            h1(id := "embed-tv")("Embed Playstrategy TV in your site"),
+            h1(id := "embed-tv")("Embed PlayStrategy TV in your site"),
             div(cls := "center")(raw(s"""<iframe src="/tv/frame?theme=brown&bg=dark" $args></iframe>""")),
             p("Add the following HTML to your site:"),
             p(cls := "copy-zone")(
@@ -225,7 +225,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           a(activeCls("database"), href := "https://database.playstrategy.org")(trans.database(), external),
           a(activeCls("api"), href := routes.Api.index)("API", external),
           sep,
-          a(activeCls("lag"), href := routes.Main.lag)(trans.lag.isPlaystrategyLagging())
+          a(activeCls("lag"), href := routes.Main.lag)(trans.lag.isPlayStrategyLagging())
           //a(activeCls("ads"), href := "/ads")("Block ads")
         ),
         div(cls := s"page-menu__content $contentCls")(body)

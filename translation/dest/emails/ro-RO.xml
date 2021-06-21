@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Confirmați-vă contul playstrategy.org, %s</string>
-  <string name="emailConfirm_click">Dați clic pe link pentru a activa contul Playstrategy:</string>
-  <string name="emailConfirm_ignore">Dacă nu v-ați înregistrat la Playstrategy, puteți ignora liniștit acest mesaj.</string>
+  <string name="emailConfirm_click">Dați clic pe link pentru a activa contul PlayStrategy:</string>
+  <string name="emailConfirm_ignore">Dacă nu v-ați înregistrat la PlayStrategy, puteți ignora liniștit acest mesaj.</string>
   <string name="passwordReset_subject">Resetați-vă parola pe playstrategy.org, %s</string>
   <string name="passwordReset_intro">Am primit o cerere de resetare a parolei pentru contul dvs.</string>
   <string name="passwordReset_clickOrIgnore">Dacă dvs. ați realizat cererea, dați clic pe adresa de mai jos. Dacă nu, puteți ignora acest email.</string>
@@ -15,7 +15,7 @@
 Aici este pagina ta de profil: %1$s. O poți personaliza pe %2$s.
 
 Distracție plăcută și fie ca piesele tale să își găsească mereu calea la regele adversarului tău!</string>
-  <string name="logInToPlaystrategy">Conectează-te pe playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Conectează-te pe playstrategy.org, %s</string>
   <string name="common_orPaste">(Nu merge să dai click? Încercă să-l pui în browser!)</string>
   <string name="common_note">Acesta e un email legat de folosirea dumneavoastră a %s.</string>
   <string name="common_contact">Pentru a ne contacta, vă rugăm să utilizați %s.</string>

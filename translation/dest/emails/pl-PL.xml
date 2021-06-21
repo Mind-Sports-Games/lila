@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Potwierdź swoje konto na playstrategy.org, %s</string>
-  <string name="emailConfirm_click">Użyj poniższego odnośnika, aby aktywować swoje konto Playstrategy:</string>
-  <string name="emailConfirm_ignore">Jeśli nie rejestrowałeś się na Playstrategy, możesz bezpiecznie zignorować tą wiadomość.</string>
+  <string name="emailConfirm_click">Użyj poniższego odnośnika, aby aktywować swoje konto PlayStrategy:</string>
+  <string name="emailConfirm_ignore">Jeśli nie rejestrowałeś się na PlayStrategy, możesz bezpiecznie zignorować tą wiadomość.</string>
   <string name="passwordReset_subject">%s, zresetuj swoje hasło na playstrategy.org</string>
   <string name="passwordReset_intro">Otrzymaliśmy prośbę o zmianę hasła do Twojego konta.</string>
   <string name="passwordReset_clickOrIgnore">Jeśli Ty ją wysłałeś, użyj poniższego odnośnika. W przeciwnym razie możesz zignorować ten e-mail.</string>
@@ -15,7 +15,7 @@
 Oto Twoja strona profilowa: %1$s. Możesz ją spersonalizować na %2$s.
 
 Baw się dobrze i niech Twoje figury zawsze znajdą drogę do króla przeciwnika!</string>
-  <string name="logInToPlaystrategy">Zaloguj się do playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Zaloguj się do playstrategy.org, %s</string>
   <string name="common_orPaste">(Odnośnik jest nieaktywny? Spróbuj wkleić go do paska adresu przeglądarki)</string>
   <string name="common_note">To jest e-mail serwisowy związany z Twoim kontem %s.</string>
   <string name="common_contact">Możesz skontaktować się z nami pisząc na adres %s.</string>

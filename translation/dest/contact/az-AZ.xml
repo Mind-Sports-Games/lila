@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="contact">Əlaqə</string>
-  <string name="contactPlaystrategy">Playstrategy ilə əlaqə</string>
+  <string name="contactPlayStrategy">PlayStrategy ilə əlaqə</string>
   <string name="whatCanWeHelpYouWith">Sizə nədə kömək edə bilərik?</string>
   <string name="visitThisPage">Problemi həll etmək üçün bu səhifəyə keçin</string>
   <string name="iCantLogIn">Daxil ola bilmirəm</string>
@@ -12,8 +12,8 @@
   <string name="lost2FA">İki mərhələli təsdiqləmə kodlarımı itirdim</string>
   <string name="doPasswordReset">İkinci doğrulamanı silmək üçün şifrənizi sıfırlayın</string>
   <string name="accountSupport">Hesabımla əlaqədar köməyə ehtiyacım var</string>
-  <string name="wantTitle">Titulumun Playstrategydə göstərilməsini istəyirəm</string>
-  <string name="visitTitleConfirmation">Playstrategy profilinizdə titulunuzu göstərmək və Titullu Arenada iştirak etmək üçün titul təsdiq səhifəsini ziyarət edin</string>
+  <string name="wantTitle">Titulumun PlayStrategydə göstərilməsini istəyirəm</string>
+  <string name="visitTitleConfirmation">PlayStrategy profilinizdə titulunuzu göstərmək və Titullu Arenada iştirak etmək üçün titul təsdiq səhifəsini ziyarət edin</string>
   <string name="wantCloseAccount">Hesabımı bağlamaq istəyirəm</string>
   <string name="closeYourAccount">Bu səhifədəki hesabınızı bağlaya bilərsiniz</string>
   <string name="doNotAskByEmail">Bizdən bir hesabı bağlamağımızı e-poçtlə istəməyin, bunu etməyəcəyik.</string>
@@ -34,10 +34,10 @@
   <string name="doNotMessageModerators">Moderatorlara birbaşa mesaj göndərməyin.</string>
   <string name="onlyReports">Yalnız şikayət formu ilə oyunçuları şikayət etmək təsirli olur.</string>
   <string name="wantReportBug">Bir səhv barədə məlumat vermək istəyirəm</string>
-  <string name="reportBugInForum">Forumun Playstrategy Rəy bölməsində</string>
-  <string name="reportWebsiteIssue">Playstrategy sayt problemləri GitHubda</string>
-  <string name="reportMobileIssue">Playstrategy mobil tətbiqi problemləri GitHubda</string>
-  <string name="reportBugInDiscord">Playstrategyin Discord serverində</string>
+  <string name="reportBugInForum">Forumun PlayStrategy Rəy bölməsində</string>
+  <string name="reportWebsiteIssue">PlayStrategy sayt problemləri GitHubda</string>
+  <string name="reportMobileIssue">PlayStrategy mobil tətbiqi problemləri GitHubda</string>
+  <string name="reportBugInDiscord">PlayStrategyin Discord serverində</string>
   <string name="howToReportBug">Lütfən, xətanın necə göründüyünü, bunun əvəzində nə olacağını gözlədiyinizi və xətanı yaradan addımları təsvir edin.</string>
   <string name="illegalPawnCapture">Səhv piyada vurma hərəkəti</string>
   <string name="calledEnPassant">Buna \"keçiddə götürmə\" deyirlər və bu şahmatın qaydalarından biridir.</string>
@@ -63,13 +63,13 @@
   <string name="doNotDeny">Hiylə etdiyinizi inkar etməyin. Yeni bir hesab yaratmağınıza icazə verilməsini istəyirsinizsə, nə etdiyinizi etiraf edin və bunun səhv olduğunu başa düşdüyünüzü göstərin.</string>
   <string name="otherRestriction">Digər məhdudiyyət</string>
   <string name="collaboration">Əməkdaşlıq, hüquqi, kommersiya</string>
-  <string name="monetizing">Playstrategydən pul qazanmaq</string>
-  <string name="buyingPlaystrategy">Playstrategyi almaq</string>
-  <string name="authorizationToUse">Playstrategy istifadə icazəsi</string>
-  <string name="welcomeToUse">Biznes məqsədilə olsa belə fəaliyyətiniz üçün Playstrategy istifadə edə bilərsiniz.</string>
-  <string name="videosAndBooks">Bunu videolarınızda göstərə və kitablarınıza Playstrategy ekran görüntülərini çap edə bilərsiniz.</string>
+  <string name="monetizing">PlayStrategydən pul qazanmaq</string>
+  <string name="buyingPlayStrategy">PlayStrategyi almaq</string>
+  <string name="authorizationToUse">PlayStrategy istifadə icazəsi</string>
+  <string name="welcomeToUse">Biznes məqsədilə olsa belə fəaliyyətiniz üçün PlayStrategy istifadə edə bilərsiniz.</string>
+  <string name="videosAndBooks">Bunu videolarınızda göstərə və kitablarınıza PlayStrategy ekran görüntülərini çap edə bilərsiniz.</string>
   <string name="creditAppreciated">Tərif qiymətləndirilir, lakin tələb olunmur.</string>
   <string name="noneOfTheAbove">Yuxarıdakıların heç biri</string>
   <string name="sendEmailAt">Bizə %s vasitəsilə bir e-poçt göndərin.</string>
-  <string name="explainYourRequest">Lütfən tələbinizi aydın və hərtərəfli izah edin. Playstrategy istifadəçi adınızı və sizə kömək etməyimizə yarayacaq məlumatları bildirin.</string>
+  <string name="explainYourRequest">Lütfən tələbinizi aydın və hərtərəfli izah edin. PlayStrategy istifadəçi adınızı və sizə kömək etməyimizə yarayacaq məlumatları bildirin.</string>
 </resources>

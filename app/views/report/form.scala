@@ -27,7 +27,7 @@ object form {
         )(
           div(cls := "form-group")(
             a(href := routes.Page.loneBookmark("report-faq"), dataIcon := "", cls := "text")(
-              "Read more about Playstrategy reports"
+              "Read more about PlayStrategy reports"
             )
           ),
           form3.globalError(form),

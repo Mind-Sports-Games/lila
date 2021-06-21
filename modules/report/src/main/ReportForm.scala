@@ -30,7 +30,7 @@ final private[report] class ReportForm(
           }
         )
         .verifying(
-          "Don't report Playstrategy. Use playstrategy.org/contact instead.",
+          "Don't report PlayStrategy. Use playstrategy.org/contact instead.",
           u => !User.isOfficial(u)
         ),
       "reason" -> text.verifying("error.required", Reason.keys contains _),

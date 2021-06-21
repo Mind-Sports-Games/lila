@@ -43,7 +43,7 @@ final class Tv(
       val flip    = getBool("flip")
       val natural = Pov naturalOrientation game
       val pov     = if (flip) !natural else natural
-      val onTv    = lila.round.OnPlaystrategyTv(channel.key, flip)
+      val onTv    = lila.round.OnPlayStrategyTv(channel.key, flip)
       negotiate(
         html = env.tournament.api.gameView.watcher(pov.game) flatMap { tour =>
           env.api.roundApi.watcher(pov, tour, lila.api.Mobile.Api.currentVersion, tv = onTv.some) zip

@@ -19,7 +19,7 @@ case class RelayGame(
 
   def isEmpty = tags.value.isEmpty && root.children.nodes.isEmpty
 
-  lazy val looksLikePlaystrategy = tags(_.Site) exists { site =>
+  lazy val looksLikePlayStrategy = tags(_.Site) exists { site =>
     RelayGame.playstrategyDomains exists { domain =>
       site startsWith s"https://$domain/"
     }

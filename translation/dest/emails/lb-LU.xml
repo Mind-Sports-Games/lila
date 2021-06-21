@@ -2,7 +2,7 @@
 <resources>
   <string name="emailConfirm_subject">Bestäteg däi playstrategy.org-Kont,%s</string>
   <string name="emailConfirm_click">Klick op de Link, fir däi Kont z\'aktivéieren:</string>
-  <string name="emailConfirm_ignore">Wann s du dech net bei Playstrategy ugemellt hues, kanns de dëse Message ignoréieren.</string>
+  <string name="emailConfirm_ignore">Wann s du dech net bei PlayStrategy ugemellt hues, kanns de dëse Message ignoréieren.</string>
   <string name="passwordReset_subject">Setz däi playstrategy.org-Passwuert zréck, %s</string>
   <string name="passwordReset_intro">Mir hunn eng Ufro kritt, fir däi Passwuert zréckzesetzen.</string>
   <string name="passwordReset_clickOrIgnore">Wann s du déi Ufro gemaach hues, dréck op de Link ënnen. Wann net, kanns de dëse Mail ignoréieren.</string>
@@ -15,7 +15,7 @@
 Hei ass deng Profilsäit: %1$s. Du kanns se hei personaliséieren: %2$s.
 
 Vill Spaass an Erfolleg!</string>
-  <string name="logInToPlaystrategy">Logg dech op playstrategy.org an, %s</string>
+  <string name="logInToPlayStrategy">Logg dech op playstrategy.org an, %s</string>
   <string name="common_orPaste">(Klicke funktionnéiert net? Probéier de Link an däi Browser ze kopéieren!)</string>
   <string name="common_note">Dëst ass e Service-Mail a Bezuch op däi Kont bei %s.</string>
   <string name="common_contact">Fir Kontakt mat eis opzehuelen, besich %s.</string>

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Ser Playstrategy</string>
-  <string name="playstrategyStreamer">Seren Playstrategy</string>
+  <string name="playstrategyStreamers">Ser PlayStrategy</string>
+  <string name="playstrategyStreamer">Seren PlayStrategy</string>
   <string name="live">Yn fyw!</string>
   <string name="offline">Ddim arlein</string>
   <string name="currentlyStreaming">Yn ffrydio %s</string>
   <string name="lastStream">Ffrwd diwethaf %s</string>
-  <string name="becomeStreamer">Dewch yn seren ffrydio Playstrategy</string>
+  <string name="becomeStreamer">Dewch yn seren ffrydio PlayStrategy</string>
   <string name="doYouHaveStream">Oes ganddoch chi ffrwd Twitch neu YouTube?</string>
   <string name="hereWeGo">Ffwrdd a ni!</string>
   <string name="allStreamers">Pob ffrydiwr</string>

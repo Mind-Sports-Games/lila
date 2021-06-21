@@ -1,6 +1,6 @@
 import sri from './sri';
 
-const builder = (storage: Storage): PlaystrategyStorageHelper => {
+const builder = (storage: Storage): PlayStrategyStorageHelper => {
   const api = {
     get: (k: string) => storage.getItem(k),
     set: (k: string, v: string): void => storage.setItem(k, v),
@@ -19,10 +19,10 @@ const builder = (storage: Storage): PlaystrategyStorageHelper => {
       set: (v: any) => api.set(k, v),
       fire: (v?: string) => api.fire(k, v),
       remove: () => api.remove(k),
-      listen: (f: (e: PlaystrategyStorageEvent) => void) =>
+      listen: (f: (e: PlayStrategyStorageEvent) => void) =>
         window.addEventListener('storage', e => {
           if (e.key !== k || e.storageArea !== storage || e.newValue === null) return;
-          let parsed: PlaystrategyStorageEvent | null;
+          let parsed: PlayStrategyStorageEvent | null;
           try {
             parsed = JSON.parse(e.newValue);
           } catch (_) {
