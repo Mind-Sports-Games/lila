@@ -194,6 +194,12 @@ Allow: /
       Ok(html.site.contact()).fuccess
     }
 
+  def about =
+    Open { implicit ctx =>
+      pageHit
+      Ok(html.site.about()).fuccess
+    }
+
   def faq =
     Open { implicit ctx =>
       pageHit
