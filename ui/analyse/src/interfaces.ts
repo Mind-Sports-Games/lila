@@ -31,7 +31,7 @@ export interface AnalyseData {
   game: Game;
   player: Player;
   opponent: Player;
-  orientation: Color;
+  orientation: Orientation;
   spectator?: boolean; // for compat with GameData, for game functions
   takebackable: boolean;
   moretimeable: boolean;
