@@ -11,23 +11,49 @@ import lila.game.Pov
 
 object bits {
 
+  sealed abstract class Orientation extends Product
+
+  object Orientation {
+    final case object White extends Orientation
+    final case object Black extends Orientation
+    final case object Left extends Orientation
+    final case object Right extends Orientation
+  }
+
+  def colorToOrientation(c: chess.Color): Orientation =
+    c match {
+        case chess.White => Orientation.White
+        case chess.Black => Orientation.Black
+    }
+
   private val dataState = attr("data-state")
 
-  private def miniOrientation(pov: Pov): chess.Color =
-    if (pov.game.variant == chess.variant.RacingKings) chess.White else pov.player.color
+  private def miniOrientation(pov: Pov): Orientation =
+    pov.game.variant match {
+      case chess.variant.RacingKings => Orientation.White
+      case chess.variant.LinesOfAction => pov.player.color match {
+          case chess.White => Orientation.White
+          case chess.Black => Orientation.Right
+        }
+      case _ => colorToOrientation(pov.player.color)
+    }
 
   def mini(pov: Pov): Tag => Tag =
-    mini(
+    miniWithOrientation(
       FEN(Forsyth.boardAndColor(pov.game.situation)),
       miniOrientation(pov),
       ~pov.game.lastMoveKeys
     ) _
 
-  def mini(fen: chess.format.FEN, color: chess.Color = chess.White, lastMove: String = "")(tag: Tag): Tag =
+  def miniWithOrientation(fen: chess.format.FEN, orientation: Orientation = Orientation.White, lastMove: String = "")(tag: Tag): Tag =
     tag(
       cls := "mini-board mini-board--init cg-wrap is2d",
-      dataState := s"${fen.value},${color.name},$lastMove"
+      dataState := s"${fen.value},${orientation.toString().toLowerCase()},$lastMove"
     )(cgWrapContent)
+
+  def mini(fen: chess.format.FEN, color: chess.Color = chess.White, lastMove: String = "")(tag: Tag): Tag =
+    miniWithOrientation(fen, colorToOrientation(color), lastMove)(tag)
+
 
   def miniSpan(fen: chess.format.FEN, color: chess.Color = chess.White, lastMove: String = "") =
     mini(fen, color, lastMove)(span)
