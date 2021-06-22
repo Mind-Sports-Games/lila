@@ -35,7 +35,7 @@ object topnav {
           )
         )
       ),
-      ctx.noBot option st.section(
+      /*ctx.noBot option st.section(
         linkTitle(routes.Puzzle.home.path, trans.puzzles()),
         div(role := "group")(
           a(href := routes.Puzzle.home)(trans.puzzles()),
@@ -44,13 +44,14 @@ object topnav {
           a(href := routes.Storm.home)("Puzzle Storm"),
           a(href := routes.Racer.home)("Puzzle Racer")
         )
-      ),
+      ),*/
       st.section(
-        linkTitle(routes.Practice.index.path, trans.learnMenu()),
+        //linkTitle(routes.Practice.index.path, trans.learnMenu()),
+        linkTitle(routes.Study.allDefault(1).path, trans.learnMenu()),
         div(role := "group")(
           ctx.noBot option frag(
-            a(href := routes.Learn.index)(trans.chessBasics()),
-            a(href := routes.Practice.index)(trans.practice()),
+            //a(href := routes.Learn.index)(trans.chessBasics()),
+            //a(href := routes.Practice.index)(trans.practice()),
             a(href := routes.Coordinate.home)(trans.coordinates.coordinates())
           ),
           a(href := routes.Study.allDefault(1))(trans.studyMenu()),
