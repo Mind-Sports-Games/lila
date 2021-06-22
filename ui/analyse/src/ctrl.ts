@@ -1,5 +1,5 @@
 import * as cg from 'chessground/types';
-import { oppositeOrientation, oppositeOrientationLOA } from 'chessground/util';
+import { oppositeOrientation, oppositeOrientationForLOA, orientationForLOA } from 'chessground/util';
 import * as chessUtil from 'chess';
 import * as game from 'game';
 import * as keyboard from './keyboard';
@@ -235,10 +235,11 @@ export default class AnalyseCtrl {
   bottomIsWhite = () => this.bottomColor() === 'white';
 
   getOrientation(): Orientation {
-    const o = this.data.orientation;
     if (this.data.game.variant.key === 'linesOfAction') {
-      return this.flipped ? oppositeOrientationLOA(o) : o;
+      const c = this.data.player.color;
+      return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
     } else {
+      const o = this.data.orientation;
       return this.flipped ? oppositeOrientation(o) : o;
     }
   }
