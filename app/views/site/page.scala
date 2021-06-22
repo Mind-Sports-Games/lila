@@ -101,7 +101,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
       contentCls = "page"
     )(
       frag(
-        /*div(cls := "box box-pad developers body")(
+        div(cls := "box box-pad developers body")(
           h1("HTTP API"),
           p(
             raw(
@@ -109,7 +109,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
             )
           )
         ),
-        br,*/
+        br,
         div(cls := "box box-pad developers body") {
           val args = """style="width: 400px; height: 444px;" allowtransparency="true" frameborder="0""""
           frag(
@@ -218,10 +218,10 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           sep,
           a(activeCls("source"), href := routes.Page.source)(trans.sourceCode()),
           a(activeCls("help"), href := routes.Page.help)(trans.contribute()),
-          a(activeCls("changelog"), href := routes.Page.menuBookmark("changelog"))("Changelog"),
+          //a(activeCls("changelog"), href := routes.Page.menuBookmark("changelog"))("Changelog"),
           a(activeCls("thanks"), href := "/thanks")(trans.thankYou()),
           sep,
-          a(activeCls("webmasters"), href := routes.Main.webmasters)(trans.webmasters()),
+          //a(activeCls("webmasters"), href := routes.Main.webmasters)(trans.webmasters()),
           //a(activeCls("database"), href := "https://database.playstrategy.org")(trans.database(), external),
           //a(activeCls("api"), href := routes.Api.index)("API", external),
           sep,
