@@ -109,7 +109,7 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
 export function boardOrientation(data: RoundData, flip: boolean): cg.Orientation {
   if (data.game.variant.key === 'racingKings') return flip ? 'black' : 'white';
   if (data.game.variant.key === 'linesOfAction') {
-    return flip ? oppositeOrientationForLOA(data.player.color) : orientationForLOA(data.opponent.color);
+    return flip ? oppositeOrientationForLOA(data.player.color) : orientationForLOA(data.player.color);
   } else return flip ? data.opponent.color : data.player.color;
 }
 
