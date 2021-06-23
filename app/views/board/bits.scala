@@ -28,20 +28,22 @@ object bits {
 
   private val dataState = attr("data-state")
 
-  private def miniOrientation(pov: Pov): Orientation =
-    pov.game.variant match {
+  private def boardOrientation(variant: chess.variant.Variant, c: chess.Color): Orientation =
+    variant match {
       case chess.variant.RacingKings => Orientation.White
-      case chess.variant.LinesOfAction => pov.player.color match {
+      case chess.variant.LinesOfAction => c match {
           case chess.White => Orientation.White
           case chess.Black => Orientation.Right
         }
-      case _ => colorToOrientation(pov.player.color)
+      case _ => colorToOrientation(c)
     }
+
+  private def boardOrientation(pov: Pov): Orientation = boardOrientation(pov.game.variant, pov.color)
 
   def mini(pov: Pov): Tag => Tag =
     miniWithOrientation(
       FEN(Forsyth.boardAndColor(pov.game.situation)),
-      miniOrientation(pov),
+      boardOrientation(pov),
       ~pov.game.lastMoveKeys
     ) _
 
@@ -52,7 +54,10 @@ object bits {
     )(cgWrapContent)
 
   def mini(fen: chess.format.FEN, color: chess.Color = chess.White, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, colorToOrientation(color), lastMove)(tag)
+    miniWithOrientation(fen, colorToOrientation(color).pp("colorToOrientation"), lastMove)(tag)
+
+  def miniForVariant(fen: chess.format.FEN, variant: chess.variant.Variant, color: chess.Color = chess.White, lastMove: String = "")(tag: Tag): Tag =
+    miniWithOrientation(fen, boardOrientation(variant, color), lastMove)(tag)
 
 
   def miniSpan(fen: chess.format.FEN, color: chess.Color = chess.White, lastMove: String = "") =
