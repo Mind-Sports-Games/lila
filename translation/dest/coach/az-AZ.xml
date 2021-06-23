@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Playstrategy məşqçiləri</string>
-  <string name="playstrategyCoach">Playstrategy məşqçisi</string>
+  <string name="playstrategyCoaches">PlayStrategy məşqçiləri</string>
+  <string name="playstrategyCoach">PlayStrategy məşqçisi</string>
   <string name="areYouCoach">%s sahibi istedadlı şahmat məşqçisisiniz?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">NM və ya FIDE titulu</string>
   <string name="confirmTitle">Titulunuzu buradan təsdiqləyin və müraciətinizi nəzərdən keçirək.</string>
@@ -14,7 +14,7 @@
   <string name="accepting">Tələbə qəbul edir</string>
   <string name="notAccepting">Hal-hazırda tələbə qəbul etmir</string>
   <string name="xCoachesStudents">%s, şahmat tələbələrinə məşqçilik edir</string>
-  <string name="viewXProfile">%s müəllimin Playstrategy profilinə bax</string>
+  <string name="viewXProfile">%s müəllimin PlayStrategy profilinə bax</string>
   <string name="sendPM">Özəl bir mesaj göndər</string>
   <string name="aboutMe">Haqqımda</string>
   <string name="playingExperience">Oyun təcrübəsi</string>

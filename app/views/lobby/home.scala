@@ -22,7 +22,7 @@ object home {
       moreJs = frag(
         jsModule("lobby"),
         embedJsUnsafeLoadThen(
-          s"""PlaystrategyLobby(${safeJsonValue(
+          s"""PlayStrategyLobby(${safeJsonValue(
             Json.obj(
               "data" -> data,
               "playban" -> playban.map { pb =>
@@ -143,11 +143,11 @@ object home {
             div(cls := "about-side")(
               ctx.blind option h2("About"),
               trans.xIsAFreeYLibreOpenSourceChessServer(
-                "Playstrategy",
+                "PlayStrategy",
                 a(cls := "blue", href := routes.Plan.features)(trans.really.txt())
               ),
               " ",
-              a(href := "/about")(trans.aboutX("Playstrategy"), "...")
+              a(href := "/about")(trans.aboutX("PlayStrategy"), "...")
             )
         ),
         featured map { g =>
@@ -187,7 +187,7 @@ object home {
         ),
         div(cls := "lobby__about")(
           ctx.blind option h2("About"),
-          a(href := "/about")(trans.aboutX("Playstrategy")),
+          a(href := "/about")(trans.aboutX("PlayStrategy")),
           a(href := "/faq")(trans.faq.faqAbbreviation()),
           a(href := "/contact")(trans.contact.contact()),
           //a(href := "/mobile")(trans.mobileApp()),

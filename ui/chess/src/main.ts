@@ -8,6 +8,8 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
+export type NotationStyle = 'uci' | 'san';
+
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
   const dests = new Map();
@@ -35,3 +37,11 @@ export const altCastles = {
   e8a8: 'e8c8',
   e8h8: 'e8g8',
 };
+
+export function variantUsesUCINotation(key: VariantKey) {
+  return ['linesOfAction'].includes(key);
+}
+
+export function notationStyle(key: VariantKey): NotationStyle {
+  return variantUsesUCINotation(key) ? 'uci' : 'san';
+}

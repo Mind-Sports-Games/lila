@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Cadarnhau eich cyfrif playstrategy.org, %s</string>
-  <string name="emailConfirm_click">Cliciwch ar y ddolen i alluogi eich cyfrif Playstrategy:</string>
-  <string name="emailConfirm_ignore">Os nad ydych chi wedi cofrestru gyda Playstrategy gallech chi anwybyddu\'r neges hon.</string>
+  <string name="emailConfirm_click">Cliciwch ar y ddolen i alluogi eich cyfrif PlayStrategy:</string>
+  <string name="emailConfirm_ignore">Os nad ydych chi wedi cofrestru gyda PlayStrategy gallech chi anwybyddu\'r neges hon.</string>
   <string name="passwordReset_subject">Ailosod eich cyfrinair playstrategy.org, %s</string>
   <string name="passwordReset_intro">Rydym wedi cael cais i ailosod y cyfrinair ar gyfer eich cyfrif.</string>
   <string name="passwordReset_clickOrIgnore">Os ydych chi wedi gwneud y cais hwn, cliciwch y ddolen isod. Os nad ydych, gallwch anwybyddu\'r e-bost hwn.</string>
@@ -15,7 +15,7 @@
 Dyma eich tudalen proffil: %1$s. Gallwch chi ei bersonoli ar %2$s.
 
 Mwynhewch. Dymunwn bydd eich darnau yn canfod brenin y gwrthwynebydd!</string>
-  <string name="logInToPlaystrategy">Mewngofnodi i playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Mewngofnodi i playstrategy.org, %s</string>
   <string name="common_orPaste">(Clicio yn methu? Ceisiwch ludo\'r ddolen i mewn i\'ch porwr!)</string>
   <string name="common_note">Mae\'r e-bost gwasanaeth hwn yn gysylltiedig â\'ch defnydd o %s.</string>
   <string name="common_contact">I gysylltu gyda ni, defnyddiwch %s.</string>

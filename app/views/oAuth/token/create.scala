@@ -18,7 +18,7 @@ object create {
         h1(title),
         postForm(cls := "form3", action := routes.OAuthToken.create)(
           div(cls := "form-group")(
-            "Personal access tokens function like ordinary Playstrategy OAuth access tokens. ",
+            "Personal access tokens function like ordinary PlayStrategy OAuth access tokens. ",
             "They can be used to authenticate to the API over Basic Authentication."
           ),
           form3.group(

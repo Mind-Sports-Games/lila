@@ -2,5 +2,5 @@
 <resources>
   <string name="emailConfirm_subject">%s, зинһар, playstrategy.org иҫәп яҙмағыҙҙы раҫлағыҙ</string>
   <string name="welcome_subject">playstrategy.org-ҡа рәхим итегеҙ, %s</string>
-  <string name="logInToPlaystrategy">playstrategy.org-ҡа кереү, %s</string>
+  <string name="logInToPlayStrategy">playstrategy.org-ҡа кереү, %s</string>
 </resources>

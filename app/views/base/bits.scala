@@ -38,15 +38,15 @@ border-top-right-radius: 3px;
 z-index: 99;
 """
   )(
-    "This is an empty Playstrategy preview website, go to playstrategy.org instead"
+    "This is an empty PlayStrategy preview website, go to playstrategy.org instead"
   )
 
   val connectLinks =
     div(cls := "connect-links")(
-      a(href := "https://twitter.com/playstrategy", targetBlank, noFollow)("Twitter"),
-      a(href := "https://discord.gg/hy5jqSs", targetBlank, noFollow)("Discord"),
-      a(href := "https://www.youtube.com/channel/UCr6RfQga70yMM9-nuzAYTsA", targetBlank, noFollow)("YouTube"),
-      a(href := "https://www.twitch.tv/playstrategydotorg", targetBlank, noFollow)("Twitch")
+      a(href := "https://twitter.com/mindsportsolymp", targetBlank, noFollow)("Twitter"),
+      //a(href := "", targetBlank, noFollow)("Discord"),
+      a(href := "https://www.youtube.com/user/mindsportsolympiad", targetBlank, noFollow)("YouTube"),
+      a(href := "https://www.twitch.tv/mindsportsolympiad", targetBlank, noFollow)("Twitch")
     )
 
   def fenAnalysisLink(fen: FEN)(implicit lang: Lang) =

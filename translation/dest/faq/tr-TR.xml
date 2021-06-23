@@ -2,22 +2,22 @@
 <resources>
   <string name="faqAbbreviation">SSS</string>
   <string name="frequentlyAskedQuestions">Sıkça Sorulan Sorular</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Playstrategy\'in adı neden Playstrategy?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">Playstrategy, \"live/light/libre\" kelimeleri ile satranç anlamına gelen \"chess\" kelimesinin birleşimiyle oluşturulmuştur.
+  <string name="whyIsPlayStrategyCalledPlayStrategy">PlayStrategy\'in adı neden PlayStrategy?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">PlayStrategy, \"live/light/libre\" kelimeleri ile satranç anlamına gelen \"chess\" kelimesinin birleşimiyle oluşturulmuştur.
 
 %1$s  diye okunur.</string>
   <string name="leechess">lii-çes</string>
   <string name="hearItPronouncedBySpecialist">Telaffuzunu bir uzmandan dinleyin.</string>
-  <string name="whyLiveLightLibre">Playstrategy, oyunlar 7/24 gerçek zamanlı olarak oynanıp izlendiği için canlı (live); diğer sitelerde veba gibi hüküm süren para kazanma hırsından yoksun ve açık kaynak kodlu olduğu için hafif (light) ve bedavadır (libre).</string>
-  <string name="whyIsLilaCalledLila">Benzer şekilde, Playstrategy\'in kaynak kodu %1$s, \'li[chess in sca]la\' ifadesinin kısaltılmış hâlidir. Zira Playstrategy\'in büyük bir bölümü sezgisel bir programlama dili olan %2$s ile yazılmıştır.</string>
-  <string name="howCanIContributeToPlaystrategy">Playstrategy\'e nasıl katkıda bulunabilirim?</string>
-  <string name="playstrategyPoweredByDonationsAndVolunteers">Playstrategy, sizlerin bağışları ve gönüllülerden oluşan bir ekibin gayretleriyle ayakta kalmaktadır.</string>
-  <string name="findMoreAndSeeHowHelp">%1$s olmakla ilgili daha fazla bilgi edinebilirsiniz (isterseniz %2$s de inceleyebilirsiniz). Playstrategy\'e zamanınızı ve becerilerinizi bahşederek destek olmanın da %3$s var.</string>
+  <string name="whyLiveLightLibre">PlayStrategy, oyunlar 7/24 gerçek zamanlı olarak oynanıp izlendiği için canlı (live); diğer sitelerde veba gibi hüküm süren para kazanma hırsından yoksun ve açık kaynak kodlu olduğu için hafif (light) ve bedavadır (libre).</string>
+  <string name="whyIsLilaCalledLila">Benzer şekilde, PlayStrategy\'in kaynak kodu %1$s, \'li[chess in sca]la\' ifadesinin kısaltılmış hâlidir. Zira PlayStrategy\'in büyük bir bölümü sezgisel bir programlama dili olan %2$s ile yazılmıştır.</string>
+  <string name="howCanIContributeToPlayStrategy">PlayStrategy\'e nasıl katkıda bulunabilirim?</string>
+  <string name="playstrategyPoweredByDonationsAndVolunteers">PlayStrategy, sizlerin bağışları ve gönüllülerden oluşan bir ekibin gayretleriyle ayakta kalmaktadır.</string>
+  <string name="findMoreAndSeeHowHelp">%1$s olmakla ilgili daha fazla bilgi edinebilirsiniz (isterseniz %2$s de inceleyebilirsiniz). PlayStrategy\'e zamanınızı ve becerilerinizi bahşederek destek olmanın da %3$s var.</string>
   <string name="beingAPatron">Destekçi</string>
   <string name="breakdownOfOurCosts">site giderleri dökümünü</string>
   <string name="otherWaysToHelp">birçok yolu</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">Playstrategy kaynak kodunu kullanan siteler var mı?</string>
-  <string name="yesPlaystrategyInspiredOtherOpenSourceWebsites">Evet. Playstrategy %1$s, %2$s ve %3$s paylaşımında bulunarak farklı açık kaynak kodlu sitelere ilham kaynağı olmuştur.</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">PlayStrategy kaynak kodunu kullanan siteler var mı?</string>
+  <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">Evet. PlayStrategy %1$s, %2$s ve %3$s paylaşımında bulunarak farklı açık kaynak kodlu sitelere ilham kaynağı olmuştur.</string>
   <string name="fairPlay">Adil Oyun</string>
   <string name="whenAmIEligibleRatinRefund">Hileye karşı kaybettiğim puanlarımı ne zaman geri alacağım?</string>
   <string name="ratingRefundExplanation">Bir oyuncu işaretlendikten bir dakika sonra, son 3 gün içinde oynadığı 40 puanlı oyun geri alınır. Bu oyunlarda eğer rakibi iseniz, puan kaybettiyseniz (bir kayıp veya beraberlik nedeniyle) ve puanınız geçici değilse, puan geri ödemesi alırsınız. Geri ödeme, en yüksek puanınıza ve oyundan sonraki puan ilerlemenize göre sınırlanır.
@@ -27,7 +27,7 @@
   <string name="howCanIBecomeModerator">Nasıl moderatör olabilirim?</string>
   <string name="youCannotApply">Moderatör olmak için başvuru yapmak mümkün değildir. Moderatör olarak iyi olacağını düşündüğümüz birini görürsek, onlarla doğrudan iletişime geçeceğiz.</string>
   <string name="isCorrespondenceDifferent">Yazışmalı oyun normal satrançtan farklı mıdır?</string>
-  <string name="youCanUseOpeningBookNoEngine">Playstrategy\'te, yazışma satrancı kurallarındaki temel fark, bir açılış kitabına izin verilmesidir. Motorların kullanımı hala yasaktır ve motor yardımı alırsanız hesabınız işaretlenecektir. ICCF yazışmalarda motor kullanımına izin verse de, Playstrategy buna izin vermez.</string>
+  <string name="youCanUseOpeningBookNoEngine">PlayStrategy\'te, yazışma satrancı kurallarındaki temel fark, bir açılış kitabına izin verilmesidir. Motorların kullanımı hala yasaktır ve motor yardımı alırsanız hesabınız işaretlenecektir. ICCF yazışmalarda motor kullanımına izin verse de, PlayStrategy buna izin vermez.</string>
   <string name="gameplay">Oynanış</string>
   <string name="howBulletBlitzEtcDecided">Bullet, blitz ve diğer zaman kontrolleri neye göre karar veriliyor?</string>
   <string name="basedOnGameDuration">Zaman kontrolleri oyunun süresine bağlı olarak değişiyor = %1$s
@@ -35,8 +35,8 @@
   <string name="durationFormula">(zaman) + 40 x (arttırma)</string>
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$ss = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$ss = %2$s</string>
-  <string name="whatVariantsCanIplay">Playstrategy\'te hangi varyantları oynayabilirim?</string>
-  <string name="playstrategySupportChessAnd">Playstrategy standart satranç ve %1$s\'nı destekler.</string>
+  <string name="whatVariantsCanIplay">PlayStrategy\'te hangi varyantları oynayabilirim?</string>
+  <string name="playstrategySupportChessAnd">PlayStrategy standart satranç ve %1$s\'nı destekler.</string>
   <string name="eightVariants">8 satranç varyantı</string>
   <string name="whatIsACPL">Ortalama santipiyon kaybı (OSK) nedir?</string>
   <string name="acplExplanation">Santipiyon, satrançta avantajın temsili olarak kullanılan ölçü birimidir. Bir santipiyon, bir piyonun 1 / 100\'üne eşittir. Bu nedenle 100 santipiyon = 1 piyon. Bu değerler oyunda resmi bir rol oynamaz, ancak oyuncular için yararlıdır ve bilgisayar satrancında pozisyonları değerlendirmek için gereklidir.
@@ -45,7 +45,7 @@ En iyi bilgisayar hareketi sıfır santipiyon kaybettirir, ancak daha az hamle s
 
 Bu değer, oyun kalitesinin bir göstergesi olarak kullanılabilir. Hareket başına ne kadar az santipiyon kaybederse, oyun o kadar güçlü olur.
 
-Playstrategy üzerindeki bilgisayar analizi Stockfish tarafından desteklenmektedir.</string>
+PlayStrategy üzerindeki bilgisayar analizi Stockfish tarafından desteklenmektedir.</string>
   <string name="insufficientMaterial">Zaman kaybı, beraberlik ve yetersiz taş</string>
   <string name="playstrategyFollowFIDErules">Bir oyuncunun zaman tükenmesi durumunda, bu oyuncu genellikle oyunu kaybedecektir. Ancak, oyun, rakip oyuncunun şahını olası herhangi bir yasal hamleler dizisi (%1$s) mat edebiliyor ise maç sonucu değişebilir.
 
@@ -66,31 +66,31 @@ Dosya: Sık Sorulan Sorular (SSS) sayfası</string>
 Biraz pratik yapmak için bu hamle için olan %3$s\'ye bakın.</string>
   <string name="goodIntroduction">iyi giriş</string>
   <string name="officialRulesPDF">resmi kurallar (PDF)</string>
-  <string name="playstrategyTraining">Playstrategy egzersizi</string>
+  <string name="playstrategyTraining">PlayStrategy egzersizi</string>
   <string name="threefoldRepetition">Üç kez hamle tekrarı</string>
-  <string name="threefoldRepetitionExplanation">Bir pozisyon üç kez gerçekleşirse, oyuncular %1$s ile beraberlik talebinde bulunabilirler. Playstrategy, %2$s\'nin 9.2 (d) maddesinde açıklandığı gibi resmi FIDE kurallarını uygular.</string>
+  <string name="threefoldRepetitionExplanation">Bir pozisyon üç kez gerçekleşirse, oyuncular %1$s ile beraberlik talebinde bulunabilirler. PlayStrategy, %2$s\'nin 9.2 (d) maddesinde açıklandığı gibi resmi FIDE kurallarını uygular.</string>
   <string name="threefoldRepetitionLowerCase">üç kez hamle tekrarı</string>
   <string name="notRepeatedMoves">Biz hamle tekrarı yapmadık. Oyun neden hamle tekrarından berabere bitti?</string>
   <string name="repeatedPositionsThatMatters">Üç kez hamle tekrarı %1$s ile ilgilidir, hamle ile değil. Tekrarlama ardışık olarak gerçekleşmek zorunda değildir.</string>
   <string name="positions">pozisyonlar</string>
   <string name="weRepeatedthreeTimesPosButNoDraw">Üç kere aynı pozisyonu tekrarladık. Neden oyun berabere bitmedi?</string>
-  <string name="threeFoldHasToBeClaimed">Hamle tekrarı oyunculardan biri tarafından kabul edilmesi gerekiyor. Gösterilen düğmeye basarak veya son yinelenen hareketinizden önce bir beraberlik sunarak bunu yapabilirsiniz. Ayrıca %1$s Playstrategy otomatik olarak sizin için hamle tekrarı talep edebilirsiniz. Ek olarak, beş kez hamle tekrarı her zaman oyunu hemen bitirir.</string>
+  <string name="threeFoldHasToBeClaimed">Hamle tekrarı oyunculardan biri tarafından kabul edilmesi gerekiyor. Gösterilen düğmeye basarak veya son yinelenen hareketinizden önce bir beraberlik sunarak bunu yapabilirsiniz. Ayrıca %1$s PlayStrategy otomatik olarak sizin için hamle tekrarı talep edebilirsiniz. Ek olarak, beş kez hamle tekrarı her zaman oyunu hemen bitirir.</string>
   <string name="configure">yapılandır</string>
   <string name="accounts">Hesaplar</string>
-  <string name="titlesAvailableOnPlaystrategy">Playstrategy\'te hangi unvanlar var?</string>
-  <string name="playstrategyRecognizeAllOTBtitles">Playstrategy, OTB (over the board) oyunundan elde edilen tüm FIDE başlıklarını ve %1$s\'yi tanır. işte FIDE başlıklarının bir listesi:</string>
+  <string name="titlesAvailableOnPlayStrategy">PlayStrategy\'te hangi unvanlar var?</string>
+  <string name="playstrategyRecognizeAllOTBtitles">PlayStrategy, OTB (over the board) oyunundan elde edilen tüm FIDE başlıklarını ve %1$s\'yi tanır. işte FIDE başlıklarının bir listesi:</string>
   <string name="showYourTitle">Eğer bir OTB unvanınız varsa, %1$s\'yi tamamlayarak bunu hesabınızda göstermeniz için başvuruda bulunabilirsiniz; bunu, tanımlayıcı bir belge/kartın net bir görüntüsü ve belgeyi/kartı elinde tutan bir fotoğraf da dahil olmak üzere gerçekleştirebilirsiniz.
 
-Playstrategy\'te Unvanlı bir oyuncu olarak doğrulanmak Unvanlı Arena olaylarda oynamak için erişim sağlar.
+PlayStrategy\'te Unvanlı bir oyuncu olarak doğrulanmak Unvanlı Arena olaylarda oynamak için erişim sağlar.
 
 Bir de Onursal bir %2$s Unvanı var.</string>
   <string name="asWellAsManyNMtitles">birçok ulusal usta unvanı</string>
   <string name="verificationForm">doğrulama formu</string>
-  <string name="canIbecomeLM">Playstrategy ustası (LM) ünvanını alabilir miyim?</string>
+  <string name="canIbecomeLM">PlayStrategy ustası (LM) ünvanını alabilir miyim?</string>
   <string name="noUpperCaseDot">Hayır.</string>
-  <string name="lMtitleComesToYouDoNotRequestIt">Bu onursal unvan resmi değil ve sadece Playstrategy üzerinde var.
+  <string name="lMtitleComesToYouDoNotRequestIt">Bu onursal unvan resmi değil ve sadece PlayStrategy üzerinde var.
 
-Biz nadiren takdiri hak eden iyi Playstrategy kullanıcılarına bu unvanı veriyoruz. LM unvanı alamazsın, LM unvanı sana gelir. Eğer hak kazanırsanız, bizden bir mesaj alacaksınız ve kabul etme veya reddetme seçimine sahip olacaksınız.
+Biz nadiren takdiri hak eden iyi PlayStrategy kullanıcılarına bu unvanı veriyoruz. LM unvanı alamazsın, LM unvanı sana gelir. Eğer hak kazanırsanız, bizden bir mesaj alacaksınız ve kabul etme veya reddetme seçimine sahip olacaksınız.
 
 LM unvanı için sorma.</string>
   <string name="whatUsernameCanIchoose">Kullanıcı adım ne olmalı?</string>
@@ -99,13 +99,13 @@ LM unvanı için sorma.</string>
   <string name="canIChangeMyUsername">Kullanıcı adımı değiştirebilir miyim?</string>
   <string name="usernamesCannotBeChanged">Hayır, kullanıcı adları teknik ve pratik sebeplerden ötürü değiştirilemez. Veri tabanları, dışa aktarmalar, log dosyaları ve insanların hafızası dahil olmak üzere kullanıcı adları birçok yerde kullanılıyor. Yalnızca bir kereyle sınırlı olmak üzere kullanıcı adındaki büyük ve küçük harflerde oynama yapabilirsiniz.</string>
   <string name="uniqueTrophies">Benzersiz kupalar</string>
-  <string name="ownerUniqueTrophies">Bu kupa Playstrategy tarihinde benzersizdir ve %1$s dışında kimse bu kupaya sahip olamaz.</string>
+  <string name="ownerUniqueTrophies">Bu kupa PlayStrategy tarihinde benzersizdir ve %1$s dışında kimse bu kupaya sahip olamaz.</string>
   <string name="wayOfBerserkExplanation">Bunu almak için, hiimgosu kendini berserk ile test etti ve %s oyunlarının 100%%\'ünü kazandı.</string>
   <string name="aHourlyBulletTournament">bir saatlik Kurşun turnuvası</string>
   <string name="goldenZeeExplanation">ZugAddict canlı yayın açmıştı ve son 2 saat boyunca A.I. level 8\'i 1+0 oyununda başarılı bir şekilde yenmeye çalışıyordu. Thibault, canlı yayında başarılı bir şekilde bunu gerçekleştirirse, ona benzersiz bir kupa alacağını söyledi. Bir saat sonra, Stockfish\'i yendi ve söz onurlandırıldı.</string>
-  <string name="playstrategyRatings">Playstrategy derecelendirmeleri</string>
-  <string name="whichRatingSystemUsedByPlaystrategy">Playstrategy hangi derecelendirme sistemini kullanıyor?</string>
-  <string name="ratingSystemUsedByPlaystrategy">Puanlar Mark Glickman tarafından geliştirilen Glicko-2 değerlendirme yöntemi kullanılarak hesaplanır. Bu çok popüler bir derecelendirme yöntemidir ve önemli sayıda satranç organizasyonu tarafından kullanılır (FIDE, hala tarihi Elo derecelendirme sistemini kullandığı için bu kayda değer bir karşı örnektir).
+  <string name="playstrategyRatings">PlayStrategy derecelendirmeleri</string>
+  <string name="whichRatingSystemUsedByPlayStrategy">PlayStrategy hangi derecelendirme sistemini kullanıyor?</string>
+  <string name="ratingSystemUsedByPlayStrategy">Puanlar Mark Glickman tarafından geliştirilen Glicko-2 değerlendirme yöntemi kullanılarak hesaplanır. Bu çok popüler bir derecelendirme yöntemidir ve önemli sayıda satranç organizasyonu tarafından kullanılır (FIDE, hala tarihi Elo derecelendirme sistemini kullandığı için bu kayda değer bir karşı örnektir).
 
 Temel olarak, glicko derecelendirmeleri, derecelendirmenizi hesaplarken ve temsil ederken \"güven aralıkları\" kullanır. Siteyi ilk kullanmaya başladığınızda, puanınız 1500 ± 700\'de başlar. 1500 puanınızı temsil eder ve 700 güven aralığını temsil eder.
 
@@ -134,11 +134,11 @@ Derecelendirmeleri \"göreceli\" rakamlar olarak düşünmek en iyisidir (\"mutl
   <string name="enableZenMode">%1$s\'de veya Oyun sırasında %2$s tuşlarına basarak Zen modunu etkinleştirin.</string>
   <string name="displayPreferences">görüntüleme tercihleri</string>
   <string name="connexionLostCanIGetMyRatingBack">Gecikme / bağlantı kopması nedeniyle oyunu kaybettim. Puanlarımı geri alabilir miyim?</string>
-  <string name="weCannotDoThatEvenIfItIsServerSideButThatsRare">Maalesef, gecikme ya da bağlantı kopması nedeniyle yaşanan puan kayıplarını sorunun sizde mi bizde mi olduğuna bakmaksızın geri veremeyiz. İkincisi çok nadirdir. Ayrıca Playstrategy yeniden başladığında ve bu nedenle zamandan kaybettiğinizde, haksız bir kaybı önlemek için oyunu iptal ettiğimizi unutmayın.</string>
+  <string name="weCannotDoThatEvenIfItIsServerSideButThatsRare">Maalesef, gecikme ya da bağlantı kopması nedeniyle yaşanan puan kayıplarını sorunun sizde mi bizde mi olduğuna bakmaksızın geri veremeyiz. İkincisi çok nadirdir. Ayrıca PlayStrategy yeniden başladığında ve bu nedenle zamandan kaybettiğinizde, haksız bir kaybı önlemek için oyunu iptal ettiğimizi unutmayın.</string>
   <string name="howToThreeDots">Nasıl...</string>
   <string name="enableDisableNotificationPopUps">Bildirimler etkinleştirilsin mi, devre dışı mı bırakılsın?</string>
   <string name="viewSiteInformationPopUp">Site bilgilerini görüntüle</string>
-  <string name="playstrategyCanOptionnalySendPopUps">Playstrategy isteğe bağlı olarak oyun bildirimleri gönderebilir, örneğin hamle sırası sizdeyken veya özel bir mesaj aldığınızda.
+  <string name="playstrategyCanOptionnalySendPopUps">PlayStrategy isteğe bağlı olarak oyun bildirimleri gönderebilir, örneğin hamle sırası sizdeyken veya özel bir mesaj aldığınızda.
  playstrategy.org sitesinde tarayıcınızdaki sol üst köşede yer alan kilit ikonuna tıklayın.
-Sonra Playstrategy bildirimlerine izin ver veya engelle seçeneğine tıklayın.</string>
+Sonra PlayStrategy bildirimlerine izin ver veya engelle seçeneğine tıklayın.</string>
 </resources>

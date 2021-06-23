@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyCoaches">Playstrategy þjálfarar</string>
-  <string name="playstrategyCoach">Playstrategy Þjálfari</string>
+  <string name="playstrategyCoaches">PlayStrategy þjálfarar</string>
+  <string name="playstrategyCoach">PlayStrategy Þjálfari</string>
   <string name="areYouCoach">Ertu frábær þjálfari með %s?</string>
   <string name="nmOrFideTitle" comment="nmOrFideTitle&#10;&#10;Part of sentence &quot;Are you a great chess coach with a NM or FIDE title?&quot;&#10;&#10;The text links to our title verification page: https://playstrategy.org/help/master">NM eða FIDE titil</string>
   <string name="location">Staðsetning</string>

@@ -51,7 +51,7 @@ final class JsonView(
       initialFen: Option[FEN],
       withFlags: WithFlags,
       nvui: Boolean
-  ): Fu[JsObject] = {
+  ): Fu[JsObject] =
     getSocketStatus(pov.game) zip
       (pov.opponent.userId ?? userRepo.byId) zip
       takebacker.isAllowedIn(pov.game) zip
@@ -124,7 +124,6 @@ final class JsonView(
             )
           })
       }
-  }
 
   private def commonWatcherJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
@@ -194,7 +193,7 @@ final class JsonView(
             "evalPut" -> JsBoolean(me.??(evalCache.shouldPut))
           )
           .add("evalPut" -> me.??(evalCache.shouldPut))
-          .add("tv" -> tv.collect { case OnPlaystrategyTv(channel, flip) =>
+          .add("tv" -> tv.collect { case OnPlayStrategyTv(channel, flip) =>
             Json.obj("channel" -> channel, "flip" -> flip)
           })
           .add("userTv" -> tv.collect { case OnUserTv(userId) =>

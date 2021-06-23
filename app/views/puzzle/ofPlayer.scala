@@ -30,7 +30,7 @@ object ofPlayer {
               name := "name",
               value := query,
               cls := "form-control user-autocomplete",
-              placeholder := "Playstrategy username",
+              placeholder := "PlayStrategy username",
               autocomplete := "off",
               dataTag := "span",
               autofocus
@@ -42,7 +42,7 @@ object ofPlayer {
               case (Some(u), Some(pager)) =>
                 if (pager.nbResults == 0 && ctx.is(u))
                   p(
-                    "You have no puzzles in the database, but Playstrategy still loves you very much.",
+                    "You have no puzzles in the database, but PlayStrategy still loves you very much.",
                     br,
                     "Play rapid and classical games to increase your chances of having a puzzle of yours added!"
                   )

@@ -42,9 +42,7 @@ object contact {
         li(
           a(href := "https://github.com/veloce/lichobile/issues")(reportMobileIssue())
         ),
-        li(
-          a(href := "https://discord.gg/hy5jqSs")(reportBugInDiscord())
-        )
+        //li(a(href := "https://discord.gg/hy5jqSs")(reportBugInDiscord()))
       ),
       p(howToReportBug())
     )
@@ -92,7 +90,7 @@ object contact {
               "dns",
               "\"This site can’t be reached\"",
               frag(
-                p("If you can't reach Playstrategy, and your browser says something like:"),
+                p("If you can't reach PlayStrategy, and your browser says something like:"),
                 ul(
                   li("This site can't be reached."),
                   li(strong("playstrategy.org"), "’s server IP address could not be found."),
@@ -221,8 +219,8 @@ object contact {
               frag(
                 p("Please report security issues to ", contactEmailLink),
                 p(
-                  "Like all contributions to Playstrategy, security reviews and pentesting are appreciated. ",
-                  "Note that Playstrategy is built by volunteers and we currently do not have a bug bounty program."
+                  "Like all contributions to PlayStrategy, security reviews and pentesting are appreciated. ",
+                  "Note that PlayStrategy is built by volunteers and we currently do not have a bug bounty program."
                 ),
                 p(
                   "Vulnerabilities are relevant even when they are not directly exploitable, ",
@@ -293,7 +291,7 @@ object contact {
               "monetize",
               monetizing(),
               frag(
-                p("We are not interested in any way of monetizing Playstrategy."),
+                p("We are not interested in any way of monetizing PlayStrategy."),
                 p(
                   "We will never display any kind of ads, we won't track our players, and we won't sell or buy traffic or users."
                 ),
@@ -307,7 +305,7 @@ object contact {
             ),
             Leaf(
               "buy",
-              buyingPlaystrategy(),
+              buyingPlayStrategy(),
               p("We are not selling, to anyone, for any price. Ever.")
             ),
             Leaf(
@@ -323,7 +321,7 @@ object contact {
               "gdpr",
               "GDPR",
               frag(
-                p("If you are a European citizen, you may request the deletion of your Playstrategy account."),
+                p("If you are a European citizen, you may request the deletion of your PlayStrategy account."),
                 p(
                   "First, ",
                   a(href := routes.Account.close)("close your account"),
@@ -358,7 +356,7 @@ object contact {
       contentCls = "page box box-pad"
     )(
       frag(
-        h1(contactPlaystrategy()),
+        h1(contactPlayStrategy()),
         div(cls := "nav-tree")(renderNode(menu, none))
       )
     )

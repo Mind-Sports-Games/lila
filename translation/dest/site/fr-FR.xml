@@ -286,7 +286,7 @@
     <item quantity="one">Rajouter %s seconde</item>
     <item quantity="other">Rajouter %s secondes</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Ce compte a enfreint les conditions d\'utilisation de Playstrategy</string>
+  <string name="thisAccountViolatedTos">Ce compte a enfreint les conditions d\'utilisation de PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Arbre d\'ouvertures &amp; tables de finales</string>
   <string name="takeback">Annuler le coup</string>
   <string name="proposeATakeback">Proposer l\'annulation du coup</string>
@@ -458,8 +458,8 @@
   <string name="thankYou">Merci !</string>
   <string name="socialMediaLinks">Liens des réseaux sociaux</string>
   <string name="inlineNotation">Notation en ligne</string>
-  <string name="watchPlaystrategyTV">Regarder Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Précédemment sur Playstrategy TV</string>
+  <string name="watchPlayStrategyTV">Regarder PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Précédemment sur PlayStrategy TV</string>
   <string name="onlinePlayers">Joueurs en ligne</string>
   <string name="activeToday">Actifs aujourd\'hui</string>
   <string name="activePlayers">Joueurs actifs</string>
@@ -567,7 +567,7 @@
   <string name="clock">Pendule</string>
   <string name="unauthorizedError">Accès non autorisé.</string>
   <string name="noInternetConnection">Pas de connexion à Internet. Vous pouvez cependant jouer hors ligne à partir du menu.</string>
-  <string name="connectedToPlaystrategy">Vous êtes maintenant connecté à playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Vous êtes maintenant connecté à playstrategy.org</string>
   <string name="signedOut">Vous avez été déconnecté</string>
   <string name="loginSuccessful">Vous êtes connecté</string>
   <string name="playOnTheBoardOffline">Jouer hors ligne, avec un ami</string>
@@ -634,7 +634,7 @@
   <string name="simulClockHint">Configuration de la cadence Fischer. Plus il y a d\'adversaires, plus vous pourriez avoir besoin de temps.</string>
   <string name="simulAddExtraTime">Vous pouvez ajouter du temps supplémentaire à votre pendule pour gérer la simultanée.</string>
   <string name="simulHostExtraTime">Temps supplémentaire de l\'hôte</string>
-  <string name="playstrategyTournaments">Tournois Playstrategy</string>
+  <string name="playstrategyTournaments">Tournois PlayStrategy</string>
   <string name="tournamentFAQ">FAQ des tournois</string>
   <string name="tournamentOfficial">Officiel</string>
   <string name="timeBeforeTournamentStarts">Temps restant avant le début du tournoi</string>
@@ -669,8 +669,8 @@
   <string name="weHaveSentYouAnEmailTo">Nous avons envoyé un email à %s. Cliquez le lien qui s\'y trouve pour réinitialiser votre mot de passe.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">En vous inscrivant, vous acceptez d\'être lié à nos %s.</string>
   <string name="readAboutOur">En savoir plus sur notre %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Latence du réseau entre vous et playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Temps nécessaire au traitement d\'un coup sur le serveur playstrategy</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Latence du réseau entre vous et playstrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Temps nécessaire au traitement d\'un coup sur le serveur playstrategy</string>
   <string name="downloadAnnotated">Télécharger le PGN annoté</string>
   <string name="downloadRaw">Télécharger le PGN brut</string>
   <string name="downloadImported">Télécharger le PGN importé</string>
@@ -687,7 +687,7 @@
   <string name="youHaveAlreadyRegisteredTheEmail">Cet email est déjà associé à un compte existant : %s</string>
   <string name="kidMode">Mode enfants</string>
   <string name="kidModeExplanation">Cela concerne la sécurité. Dans le mode enfants, toutes les communications du site sont désactivées. Activez ce mode pour vos enfants et pour les écoliers, afin de les protéger des autres utilisateurs.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">Dans le mode enfants, l\'icône %s se rajoute au logo playstrategy pour que vous sachiez que les enfants sont en sécurité.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">Dans le mode enfants, l\'icône %s se rajoute au logo playstrategy pour que vous sachiez que les enfants sont en sécurité.</string>
   <string name="enableKidMode">Activer le mode enfants</string>
   <string name="disableKidMode">Désactiver le mode enfants</string>
   <string name="security">Sécurité</string>
@@ -695,11 +695,11 @@
   <string name="alternativelyYouCanX">Vous pouvez également %s.</string>
   <string name="revokeAllSessions">supprimer toutes les sessions</string>
   <string name="playChessEverywhere">Jouez aux échecs partout</string>
-  <string name="asFreeAsPlaystrategy">Aussi gratuit que playstrategy</string>
+  <string name="asFreeAsPlayStrategy">Aussi gratuit que playstrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Construit pour l\'amour du jeu d\'échecs, pas pour l\'argent</string>
   <string name="everybodyGetsAllFeaturesForFree">Toutes les fonctionnalités sont gratuites pour tout le monde</string>
   <string name="zeroAdvertisement">Aucune publicité</string>
-  <string name="fullFeatured">Tout Playstrategy, et encore plus</string>
+  <string name="fullFeatured">Tout PlayStrategy, et encore plus</string>
   <string name="phoneAndTablet">Smartphones et tablettes</string>
   <string name="bulletBlitzClassical">Partie éclair, Rapide, Semi-Rapide</string>
   <string name="correspondenceChess">Échecs par correspondance</string>
@@ -735,7 +735,7 @@
   <string name="usernameSuffixInvalid">Le nom d’utilisateur doit se terminer par une lettre ou un chiffre.</string>
   <string name="usernameCharsInvalid">Le nom d\'utilisateur doit contenir uniquement des lettres, des chiffres, des tirets.</string>
   <string name="usernameUnacceptable">Nom d\'utilisateur refusé.</string>
-  <string name="directlySupportPlaystrategy">Financer Playstrategy</string>
+  <string name="directlySupportPlayStrategy">Financer PlayStrategy</string>
   <string name="playChessInStyle">Jouez aux échecs avec classe</string>
   <string name="chessBasics">Bases des échecs</string>
   <string name="coaches">Entraîneurs</string>
@@ -822,7 +822,7 @@
   <string name="agreementAssistance">Je m\'engage à ne jamais recevoir d\'aide pendant mes parties (ni d\'un programme d\'échecs, ni d\'un livre, ni d\'une base de données, ni d\'autrui).</string>
   <string name="agreementNice">Je m\'engage à toujours être agréable envers les autres.</string>
   <string name="agreementAccount">Je m\'engage à ne pas créer de comptes multiples.</string>
-  <string name="agreementPolicy">Je m\'engage à respecter toutes les règles de Playstrategy.</string>
+  <string name="agreementPolicy">Je m\'engage à respecter toutes les règles de PlayStrategy.</string>
   <string name="searchOrStartNewDiscussion">Rechercher ou démarrer une nouvelle conversation</string>
   <string name="edit">Éditer</string>
   <string name="rapid">Rapide</string>
@@ -857,12 +857,12 @@
   <string name="congratsYouWon">Bravo, vous avez gagné !</string>
   <string name="gameVsX">Partie contre %1$s</string>
   <string name="resVsX">%1$s contre %2$s</string>
-  <string name="youJustBecamePatron">Vous êtes devenu un mécène de Playstrategy.</string>
+  <string name="youJustBecamePatron">Vous êtes devenu un mécène de PlayStrategy.</string>
   <string name="patronAccountExpired">Statut de mécène expiré</string>
   <string name="pleaseReconsiderRenewIt">Songez à le renouveler !</string>
   <string name="someoneReviewedYourCoachProfile">Quelqu\'un a examiné votre profil de coach.</string>
   <string name="newPendingReview">Nouvelle évaluation en attente</string>
-  <string name="lostAgainstTOSViolator">Vous avez perdu contre quelqu\'un qui a violé les règles de Playstrategy.</string>
+  <string name="lostAgainstTOSViolator">Vous avez perdu contre quelqu\'un qui a violé les règles de PlayStrategy.</string>
   <string name="refundXpointsTimeControlY">Remboursement : %1$s point(s) de cote – %2$s.</string>
   <string name="timeAlmostUp">Vous n\'avez presque plus de temps!</string>
   <string name="clickToRevealEmailAddress">[Cliquer pour révéler l\'adresse courriel]</string>

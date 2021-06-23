@@ -10,7 +10,7 @@ object bits {
 
   def howToUse(implicit ctx: Context) =
     a(dataIcon := "", cls := "text", href := routes.Page.loneBookmark("broadcasts"))(
-      "How to use Playstrategy Broadcasts"
+      "How to use PlayStrategy Broadcasts"
     )
 
   def jsI18n(implicit ctx: Context) =

@@ -2,20 +2,20 @@
 <resources>
   <string name="faqAbbreviation">FAQ</string>
   <string name="frequentlyAskedQuestions">Domande frequenti</string>
-  <string name="whyIsPlaystrategyCalledPlaystrategy">Perché Playstrategy si chiama Playstrategy?</string>
-  <string name="playstrategyCombinationLiveLightLibrePronounced">Playstrategy è una combinazione di live/light/libre e scacchi. Si pronuncia %1$s.</string>
+  <string name="whyIsPlayStrategyCalledPlayStrategy">Perché PlayStrategy si chiama PlayStrategy?</string>
+  <string name="playstrategyCombinationLiveLightLibrePronounced">PlayStrategy è una combinazione di live/light/libre e scacchi. Si pronuncia %1$s.</string>
   <string name="leechess">lìcess</string>
   <string name="hearItPronouncedBySpecialist">Sentilo pronunciare da uno specialista.</string>
-  <string name="whyLiveLightLibre">Live, perché le partite sono giocate e guardate in tempo reale 24/7; light e libre poiché Playstrategy è completamente open-source e non appesantito dalla spazzatura proprietaria che affligge altri siti web.</string>
-  <string name="whyIsLilaCalledLila">Allo stesso modo, il codice sorgente di Playstrategy, %1$s, prende il nome dalla contrazione di \"Li[chess fatto in sca]la\" poiché che la maggior parte di Playstrategy è scritta in %2$s, un linguaggio di programmazione intuitivo.</string>
-  <string name="howCanIContributeToPlaystrategy">Come posso contribuire a Playstrategy?</string>
-  <string name="playstrategyPoweredByDonationsAndVolunteers">Playstrategy è sostenuto dalle donazioni dei mecenati e dagli sforzi di un gruppo di volontari.</string>
-  <string name="findMoreAndSeeHowHelp">Puoi saperne di più sull\' %1$s (incluso un %2$s). Se vuoi aiutare Playstrategy impegnando il tuo tempo e abilità, ci sono molti %3$s.</string>
+  <string name="whyLiveLightLibre">Live, perché le partite sono giocate e guardate in tempo reale 24/7; light e libre poiché PlayStrategy è completamente open-source e non appesantito dalla spazzatura proprietaria che affligge altri siti web.</string>
+  <string name="whyIsLilaCalledLila">Allo stesso modo, il codice sorgente di PlayStrategy, %1$s, prende il nome dalla contrazione di \"Li[chess fatto in sca]la\" poiché che la maggior parte di PlayStrategy è scritta in %2$s, un linguaggio di programmazione intuitivo.</string>
+  <string name="howCanIContributeToPlayStrategy">Come posso contribuire a PlayStrategy?</string>
+  <string name="playstrategyPoweredByDonationsAndVolunteers">PlayStrategy è sostenuto dalle donazioni dei mecenati e dagli sforzi di un gruppo di volontari.</string>
+  <string name="findMoreAndSeeHowHelp">Puoi saperne di più sull\' %1$s (incluso un %2$s). Se vuoi aiutare PlayStrategy impegnando il tuo tempo e abilità, ci sono molti %3$s.</string>
   <string name="beingAPatron">essere un mecenate</string>
   <string name="breakdownOfOurCosts">dettaglio dei nostri costi</string>
   <string name="otherWaysToHelp">altri modi per aiutare</string>
-  <string name="areThereWebsitesBasedOnPlaystrategy">Ci sono siti web basati su Playstrategy?</string>
-  <string name="yesPlaystrategyInspiredOtherOpenSourceWebsites">Sì. Playstrategy ha ispirato altri siti open-source che usano il nostro %1$s, le nostre %2$s e il nostro %3$s.</string>
+  <string name="areThereWebsitesBasedOnPlayStrategy">Ci sono siti web basati su PlayStrategy?</string>
+  <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">Sì. PlayStrategy ha ispirato altri siti open-source che usano il nostro %1$s, le nostre %2$s e il nostro %3$s.</string>
   <string name="fairPlay">Fair Play</string>
   <string name="whenAmIEligibleRatinRefund">Quando posso beneficiare del rimborso automatico del punteggio perso contro chi imbroglia?</string>
   <string name="ratingRefundExplanation">Un minuto dopo aver individuato un giocatore che imbroglia, vengono considerate le ultime 40 partite classificate negli ultimi 3 giorni. Se sei il loro avversario in una di quelle partite, hai perso punteggio (a causa di una sconfitta o un pareggio) e il tuo punteggio non era provvisorio, otterrai un rimborso del punteggio. Il rimborso è limitato in base al punteggio massimo e al progresso del tuo punteggio dopo la partita.
@@ -25,16 +25,16 @@
   <string name="howCanIBecomeModerator">Come posso diventare un moderatore?</string>
   <string name="youCannotApply">Non è possibile fare domanda per diventare un moderatore. Se vediamo qualcuno che pensiamo possa essere un moderatore, li contatteremo direttamente.</string>
   <string name="isCorrespondenceDifferent">La partite per corrispondenza sono diverse dagli scacchi normali?</string>
-  <string name="youCanUseOpeningBookNoEngine">Su Playstrategy, la principale differenza nelle regole per gli scacchi per corrispondenza è che è consentito un libro di apertura. L\'uso dei motori scacchistici è ancora proibito e comporterà la loro segnalazione per l\'utilizzo del computer. Sebbene ICCF consenta l\'uso dei motori scacchistici nel gioco per corrispondenza, Playstrategy no.</string>
+  <string name="youCanUseOpeningBookNoEngine">Su PlayStrategy, la principale differenza nelle regole per gli scacchi per corrispondenza è che è consentito un libro di apertura. L\'uso dei motori scacchistici è ancora proibito e comporterà la loro segnalazione per l\'utilizzo del computer. Sebbene ICCF consenta l\'uso dei motori scacchistici nel gioco per corrispondenza, PlayStrategy no.</string>
   <string name="gameplay">Dinamica di gioco</string>
   <string name="howBulletBlitzEtcDecided">Come vengono decisi Bullet, Blitz e altre cadenze di gioco?</string>
-  <string name="basedOnGameDuration">Le cadenze di gioco Playstrategy si basano sulla durata stimata della partita = %1$s
+  <string name="basedOnGameDuration">Le cadenze di gioco PlayStrategy si basano sulla durata stimata della partita = %1$s
 Ad esempio, la durata stimata di una partita 5+3 è 5 × 60 + 40 × 3 = 420 secondi.</string>
   <string name="durationFormula">(tempo iniziale dell\'orologio) + 40 × (incremento dell\'orologio)</string>
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$s = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$s = %2$s</string>
-  <string name="whatVariantsCanIplay">Quali varianti posso giocare su Playstrategy?</string>
-  <string name="playstrategySupportChessAnd">Playstrategy supporta gli scacchi standard e %1$s.</string>
+  <string name="whatVariantsCanIplay">Quali varianti posso giocare su PlayStrategy?</string>
+  <string name="playstrategySupportChessAnd">PlayStrategy supporta gli scacchi standard e %1$s.</string>
   <string name="eightVariants">8 varianti di scacchi</string>
   <string name="whatIsACPL">Cosa sono i \"centesimi di pedone persi in media\" (ACPL)?</string>
   <string name="acplExplanation">Il centesimo di pedone è l\'unità di misura utilizzata negli scacchi come rappresentazione del vantaggio. Un centesimo di pedone equivale a 1/100 di un pedone. Pertanto 100 centesimi di pedone = 1 pedone. Questi valori non svolgono alcun ruolo formale nel gioco ma sono utili ai giocatori, ed essenziali negli scacchi per i computer, per la valutazione delle posizioni.
@@ -43,7 +43,7 @@ La mossa migliore del computer perderà zero centesimi di pedoni, ma mosse minor
 
 Questo valore può essere utilizzato come indicatore della qualità del gioco. Meno centesimi di pedone si perde per mossa, più forte è il gioco.
 
-L\'analisi del computer su Playstrategy è fornita da Stockfish.</string>
+L\'analisi del computer su PlayStrategy è fornita da Stockfish.</string>
   <string name="insufficientMaterial">Perdere per il tempo, pareggiare e materiale insufficiente</string>
   <string name="playstrategyFollowFIDErules">Nel caso in cui un giocatore finisca il tempo, quel giocatore di solito perde la partita. Tuttavia, la partita è patta se la posizione è tale che l\'avversario non possa dare scacco matto al re del giocatore tramite qualunque serie possibile di mosse legali (%1$s).
 
@@ -61,31 +61,31 @@ Nota che può essere possibile dare scacco matto con un solo cavallo o alfiere s
 Vedi l\'%3$s su questa mossa per fare un po\' di pratica con essa.</string>
   <string name="goodIntroduction">buona introduzione</string>
   <string name="officialRulesPDF">regole ufficiali (PDF)</string>
-  <string name="playstrategyTraining">Allenamento Playstrategy</string>
+  <string name="playstrategyTraining">Allenamento PlayStrategy</string>
   <string name="threefoldRepetition">Triplice ripetizione</string>
-  <string name="threefoldRepetitionExplanation">Se una posizione avviene tre volte, i giocatori possono chiamare una patta da %1$s. Playstrategy implementa le regole ufficiali della FIDE, come descritto nell\'articolo 9.2 (d) del %2$s.</string>
+  <string name="threefoldRepetitionExplanation">Se una posizione avviene tre volte, i giocatori possono chiamare una patta da %1$s. PlayStrategy implementa le regole ufficiali della FIDE, come descritto nell\'articolo 9.2 (d) del %2$s.</string>
   <string name="threefoldRepetitionLowerCase">triplice ripetizione</string>
   <string name="notRepeatedMoves">Non abbiamo ripetuto le mosse. Perché la partita è stata comunque dichiarata patta per ripetizione?</string>
   <string name="repeatedPositionsThatMatters">La triplice ripetizione riguarda la %1$s, non le mosse. La ripetizione non deve necessariamente avvenire consecutivamente.</string>
   <string name="positions">posizioni</string>
   <string name="weRepeatedthreeTimesPosButNoDraw">Abbiamo ripetuto una posizione tre volte. Perché la partita non è stata dichiarata patta?</string>
-  <string name="threeFoldHasToBeClaimed">La ripetizione deve essere rivendicata da uno dei giocatori. Puoi farlo premendo il pulsante che appare, o offrendo una patta prima di ripetere la tua mossa finale. Puoi anche %1$s Playstrategy per reclamare automaticamente le tre ripetizioni. Inoltre, le cinque ripetizioni terminano sempre il gioco.</string>
+  <string name="threeFoldHasToBeClaimed">La ripetizione deve essere rivendicata da uno dei giocatori. Puoi farlo premendo il pulsante che appare, o offrendo una patta prima di ripetere la tua mossa finale. Puoi anche %1$s PlayStrategy per reclamare automaticamente le tre ripetizioni. Inoltre, le cinque ripetizioni terminano sempre il gioco.</string>
   <string name="configure">configurare</string>
   <string name="accounts">Utenti</string>
-  <string name="titlesAvailableOnPlaystrategy">Quali titoli ci sono su Playstrategy?</string>
-  <string name="playstrategyRecognizeAllOTBtitles">Playstrategy riconosce tutti i titoli scacchistici FIDE ottenuti OTB (over the board, ossia tornei disputati nei circoli di scacchi), così come %1$s. Ecco una lista dei titoli FIDE:</string>
+  <string name="titlesAvailableOnPlayStrategy">Quali titoli ci sono su PlayStrategy?</string>
+  <string name="playstrategyRecognizeAllOTBtitles">PlayStrategy riconosce tutti i titoli scacchistici FIDE ottenuti OTB (over the board, ossia tornei disputati nei circoli di scacchi), così come %1$s. Ecco una lista dei titoli FIDE:</string>
   <string name="showYourTitle">Se disponi di un titolo FIDE ufficiale puoi richiedere che questo venga visualizzato sul tuo account completando il %1$s. Dovrai includere una chiara immagine di un documento identificativo e un selfie di te stesso mentre tieni in vista il documento.
 
-Qualificando te stesso come giocatore titolato su Playstrategy potrai parteciapre negli eventi appositamente dedicati quali \"Arena per titolati\".
+Qualificando te stesso come giocatore titolato su PlayStrategy potrai parteciapre negli eventi appositamente dedicati quali \"Arena per titolati\".
 
 Infine esiste un titolo onorario %2$s.</string>
   <string name="asWellAsManyNMtitles">molti titoli di Maestro Nazionale</string>
   <string name="verificationForm">modulo di verifica</string>
-  <string name="canIbecomeLM">Posso ottenere il titolo di Playstrategy Master (LM)?</string>
+  <string name="canIbecomeLM">Posso ottenere il titolo di PlayStrategy Master (LM)?</string>
   <string name="noUpperCaseDot">No!</string>
-  <string name="lMtitleComesToYouDoNotRequestIt">Questo è un titolo onorifico, non è un titolo ufficiale ed esiste solo su Playstrategy.
+  <string name="lMtitleComesToYouDoNotRequestIt">Questo è un titolo onorifico, non è un titolo ufficiale ed esiste solo su PlayStrategy.
 
-Saltuariamente lo conferiamo, a nostra discrezione, a giocatori distinti che sono membri illustri di Playstrategy. Il titolo di LM non si può ottenere, il titolo di LM viene riconosciuto. Qualora ti venga riconosciuto, riceverai da noi un messaggio e la possibilità di accettarlo o rifiutarlo.
+Saltuariamente lo conferiamo, a nostra discrezione, a giocatori distinti che sono membri illustri di PlayStrategy. Il titolo di LM non si può ottenere, il titolo di LM viene riconosciuto. Qualora ti venga riconosciuto, riceverai da noi un messaggio e la possibilità di accettarlo o rifiutarlo.
 
 Non chiedere il titolo di LM.</string>
   <string name="whatUsernameCanIchoose">Quale può essere il mio nome utente?</string>
@@ -94,13 +94,13 @@ Non chiedere il titolo di LM.</string>
   <string name="canIChangeMyUsername">Posso cambiare il mio nome utente?</string>
   <string name="usernamesCannotBeChanged">No, i nomi utenti non possono essere modificati per ragioni tecniche e pratiche. I nomi utente compaiono in troppi posti: database, esportazioni, log, e nella testa delle persone. Puoi solo cambiare le maiuscole una volta sola.</string>
   <string name="uniqueTrophies">Trofei unici</string>
-  <string name="ownerUniqueTrophies">Questo trofeo è unico nella storia di Playstrategy, nessun altro tranne %1$s lo potrà mai avere.</string>
+  <string name="ownerUniqueTrophies">Questo trofeo è unico nella storia di PlayStrategy, nessun altro tranne %1$s lo potrà mai avere.</string>
   <string name="wayOfBerserkExplanation">Per ottenerlo hiimgosu si è superato nel vincere il 100%% delle partite di un %s in berserk.</string>
   <string name="aHourlyBulletTournament">un torneo Bullet orario</string>
   <string name="goldenZeeExplanation">ZugAddict, durante uno streaming, ha cercato per 2 ore di sconfiggere l\'A.I. livello 8 in partite 1+0 senza riuscirci. Thibault gli ha detto che se, durante lo streaming, fosse riuscito a sconfiggere l\'A.I., avrebbe ottenuto un trofeo personalizzato. ZugAddict, un\'ora dopo, ha distrutto Stockfish e dunque la promessa è stata mantenuta.</string>
-  <string name="playstrategyRatings">Punteggio di Playstrategy</string>
-  <string name="whichRatingSystemUsedByPlaystrategy">Quale sistema di punteggio utilizza Playstrategy?</string>
-  <string name="ratingSystemUsedByPlaystrategy">I punteggi sono calcolati utilizzando il metodo di valutazione Glicko-2 sviluppato da Mark Glickman. Si tratta di un sistema di valutazione molto popolare, è infatti utilizzato da un grande numero di organizzazioni scacchistiche (FIDE, tuttavia, è una notevole eccezione poiché utilizza ancora il datato sistema di valutazione Elo).
+  <string name="playstrategyRatings">Punteggio di PlayStrategy</string>
+  <string name="whichRatingSystemUsedByPlayStrategy">Quale sistema di punteggio utilizza PlayStrategy?</string>
+  <string name="ratingSystemUsedByPlayStrategy">I punteggi sono calcolati utilizzando il metodo di valutazione Glicko-2 sviluppato da Mark Glickman. Si tratta di un sistema di valutazione molto popolare, è infatti utilizzato da un grande numero di organizzazioni scacchistiche (FIDE, tuttavia, è una notevole eccezione poiché utilizza ancora il datato sistema di valutazione Elo).
 
 In sostanza, le valutazioni Glicko utilizzano \"intervalli di fiducia\" per il calcolo e la rappresentazione del tuo punteggio. Quando inizi a giocare sul sito la tua valutazione parte da 1500 ± 700. I 1500 rappresentano il tuo punteggio e i 700 rappresentano l\'intervallo di fiducia.
 
@@ -129,13 +129,13 @@ Un altro aspetto di rilievo è che, allo scorrere del tempo senza aver giocate p
   <string name="enableZenMode">Abilita la modalità Zen %1$s, o clicca sulla lettera %2$s durante una partita.</string>
   <string name="displayPreferences">mostra preferenze</string>
   <string name="connexionLostCanIGetMyRatingBack">Ho perso una partita a causa di lag/disconnessione. Posso recuperare i punti persi?</string>
-  <string name="weCannotDoThatEvenIfItIsServerSideButThatsRare">Sfortunatamente non possiamo restituire punteggio per le partite perse a causa di ritardi o disconnessioni indipendentemente dal fatto che il problema dipenda da te o da Playstrategy. Peraltro, molto raramente riscontriamo problematiche in capo nostro. Inoltre, qualora il problema dipenda da un riavvio di Playstrategy e causi una sconfitta per tempo scaduto, annulliamo la partita per evitare una sconfitta iniqua.</string>
+  <string name="weCannotDoThatEvenIfItIsServerSideButThatsRare">Sfortunatamente non possiamo restituire punteggio per le partite perse a causa di ritardi o disconnessioni indipendentemente dal fatto che il problema dipenda da te o da PlayStrategy. Peraltro, molto raramente riscontriamo problematiche in capo nostro. Inoltre, qualora il problema dipenda da un riavvio di PlayStrategy e causi una sconfitta per tempo scaduto, annulliamo la partita per evitare una sconfitta iniqua.</string>
   <string name="howToThreeDots">Come fare per...</string>
   <string name="enableDisableNotificationPopUps">Attivare o disattivare i popup delle notifiche?</string>
   <string name="viewSiteInformationPopUp">Visualizza il popup delle informazioni del sito</string>
-  <string name="playstrategyCanOptionnalySendPopUps">Playstrategy può opzionalmente inviare notifiche popup, ad esempio quando è il tuo turno o hai ricevuto un messaggio privato.
+  <string name="playstrategyCanOptionnalySendPopUps">PlayStrategy può opzionalmente inviare notifiche popup, ad esempio quando è il tuo turno o hai ricevuto un messaggio privato.
 
 Clicca sull\'icona a forma di lucchetto accanto a playstrategy.org nella barra degli indirizzi URL del tuo browser.
 
-Quindi seleziona se consentire o bloccare le notifiche da Playstrategy.</string>
+Quindi seleziona se consentire o bloccare le notifiche da PlayStrategy.</string>
 </resources>

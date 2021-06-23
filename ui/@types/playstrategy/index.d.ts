@@ -1,12 +1,12 @@
 /// <reference types="highcharts" />
 
-interface Playstrategy {
+interface PlayStrategy {
   load: Promise<void>; // window.onload promise
   info: any;
   requestIdleCallback(f: () => void, timeout?: number): void;
   sri: string;
-  storage: PlaystrategyStorageHelper;
-  tempStorage: PlaystrategyStorageHelper;
+  storage: PlayStrategyStorageHelper;
+  tempStorage: PlayStrategyStorageHelper;
   once(key: string, mod?: 'always'): boolean;
   powertip: any;
   widget: any;
@@ -31,7 +31,7 @@ interface Playstrategy {
   redirect(o: RedirectTo): void;
   reload(): void;
   escapeHtml(str: string): string;
-  announce(d: PlaystrategyAnnouncement): void;
+  announce(d: PlayStrategyAnnouncement): void;
   studyTour(study: Study): void;
   studyTourChapter(study: Study): void;
 
@@ -118,7 +118,7 @@ interface SoundI {
   baseUrl: string;
 }
 
-interface PlaystrategySpeech {
+interface PlayStrategySpeech {
   say(t: string, cut: boolean): void;
   step(s: { san?: San }, cut: boolean): void;
 }
@@ -165,41 +165,41 @@ interface Pubsub {
   emit(msg: string, ...args: any[]): void;
 }
 
-interface PlaystrategyStorageHelper {
-  make(k: string): PlaystrategyStorage;
-  makeBoolean(k: string): PlaystrategyBooleanStorage;
+interface PlayStrategyStorageHelper {
+  make(k: string): PlayStrategyStorage;
+  makeBoolean(k: string): PlayStrategyBooleanStorage;
   get(k: string): string | null;
   set(k: string, v: string): void;
   fire(k: string, v?: string): void;
   remove(k: string): void;
 }
 
-interface PlaystrategyStorage {
+interface PlayStrategyStorage {
   get(): string | null;
   set(v: any): void;
   remove(): void;
-  listen(f: (e: PlaystrategyStorageEvent) => void): void;
+  listen(f: (e: PlayStrategyStorageEvent) => void): void;
   fire(v?: string): void;
 }
 
-interface PlaystrategyBooleanStorage {
+interface PlayStrategyBooleanStorage {
   get(): boolean;
   set(v: boolean): void;
   toggle(): void;
 }
 
-interface PlaystrategyStorageEvent {
+interface PlayStrategyStorageEvent {
   sri: string;
   nonce: number;
   value?: string;
 }
 
-interface PlaystrategyAnnouncement {
+interface PlayStrategyAnnouncement {
   msg?: string;
   date?: string;
 }
 
-interface PlaystrategyEditor {
+interface PlayStrategyEditor {
   getFen(): string;
   setOrientation(o: Color): void;
 }
@@ -233,7 +233,7 @@ declare namespace Editor {
 }
 
 interface Window {
-  playstrategy: Playstrategy;
+  playstrategy: PlayStrategy;
 
   moment: any;
   Mousetrap: any;
@@ -244,8 +244,8 @@ interface Window {
     jump(node: Tree.Node): void;
   };
   hopscotch: any;
-  PlaystrategySpeech?: PlaystrategySpeech;
-  PlaystrategyEditor?(element: HTMLElement, config: Editor.Config): PlaystrategyEditor;
+  PlayStrategySpeech?: PlayStrategySpeech;
+  PlayStrategyEditor?(element: HTMLElement, config: Editor.Config): PlayStrategyEditor;
   palantir?: {
     palantir(opts: PalantirOpts): Palantir;
   };
@@ -528,4 +528,4 @@ interface Dictionary<T> {
 
 type SocketHandlers = Dictionary<(d: any) => void>;
 
-declare const playstrategy: Playstrategy;
+declare const playstrategy: PlayStrategy;

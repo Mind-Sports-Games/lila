@@ -4,8 +4,8 @@ export function setup(): void {
 }
 
 function onSpeechChange(enabled: boolean): void {
-  if (!window.PlaystrategySpeech && enabled) playstrategy.loadModule('speech');
-  else if (window.PlaystrategySpeech && !enabled) window.PlaystrategySpeech = undefined;
+  if (!window.PlayStrategySpeech && enabled) playstrategy.loadModule('speech');
+  else if (window.PlayStrategySpeech && !enabled) window.PlayStrategySpeech = undefined;
 }
 
 export function node(n: Tree.Node, cut: boolean): void {
@@ -16,6 +16,6 @@ export function success(): void {
   withSpeech(s => s.say('Success!', false));
 }
 
-function withSpeech(f: (speech: PlaystrategySpeech) => void): void {
-  if (window.PlaystrategySpeech) f(window.PlaystrategySpeech);
+function withSpeech(f: (speech: PlayStrategySpeech) => void): void {
+  if (window.PlayStrategySpeech) f(window.PlayStrategySpeech);
 }

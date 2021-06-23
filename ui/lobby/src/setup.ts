@@ -11,7 +11,7 @@ export default class Setup {
     ai: FormStore;
   };
 
-  constructor(readonly makeStorage: (name: string) => PlaystrategyStorage, readonly root: LobbyController) {
+  constructor(readonly makeStorage: (name: string) => PlayStrategyStorage, readonly root: LobbyController) {
     this.stores = {
       hook: makeStore(makeStorage('lobby.setup.hook')),
       friend: makeStore(makeStorage('lobby.setup.friend')),
@@ -223,8 +223,8 @@ export default class Setup {
         case '9':
           key = 'racingKings';
           break;
-        case '100':
-          key = 'linesofaction';
+        case '11':
+          key = 'linesOfAction';
           break;
       }
       const $selected = $ratings

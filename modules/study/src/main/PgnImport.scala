@@ -86,7 +86,7 @@ object PgnImport {
     import lila.tree.Node.Comment
     import end._
     val text = s"$resultText $statusText"
-    Comment(Comment.Id.make, Comment.Text(text), Comment.Author.Playstrategy)
+    Comment(Comment.Id.make, Comment.Text(text), Comment.Author.PlayStrategy)
   }
 
   private def makeVariations(sans: List[San], game: chess.Game, annotator: Option[Comment.Author]) =
@@ -109,7 +109,7 @@ object PgnImport {
             (str.trim match {
               case "" => comments
               case com =>
-                comments + Comment(Comment.Id.make, Comment.Text(com), annotator | Comment.Author.Playstrategy)
+                comments + Comment(Comment.Id.make, Comment.Text(com), annotator | Comment.Author.PlayStrategy)
             })
           )
       }

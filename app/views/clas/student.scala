@@ -135,7 +135,7 @@ object student {
       (nbStudents <= lila.clas.Clas.maxStudents) option frag(
         div(cls := "student-add__choice")(
           div(cls := "info")(
-            h2(trans.clas.inviteAPlaystrategyAccount()),
+            h2(trans.clas.inviteAPlayStrategyAccount()),
             p(trans.clas.inviteDesc1()),
             p(trans.clas.inviteDesc2()),
             p(
@@ -159,7 +159,7 @@ object student {
         div(cls := "student-add__or")("~ or ~"),
         div(cls := "student-add__choice")(
           div(cls := "info")(
-            h2(trans.clas.createANewPlaystrategyAccount()),
+            h2(trans.clas.createANewPlayStrategyAccount()),
             p(trans.clas.createDesc1()),
             p(trans.clas.createDesc2()),
             p(strong(trans.clas.createDesc3()), br, trans.clas.createDesc4())
@@ -181,12 +181,12 @@ object student {
         div(cls := "student-add__or")("~ or ~"),
         div(cls := "student-add__choice")(
           div(cls := "info")(
-            h2("Create multiple Playstrategy accounts at once"),
+            h2("Create multiple PlayStrategy accounts at once"),
             "You can also ",
             a(href := routes.Clas.studentManyForm(clas.id.value))(
               "use this form"
             ),
-            " to create multiple Playstrategy accounts from a list of student names."
+            " to create multiple PlayStrategy accounts from a list of student names."
           )
         )
       )
@@ -201,7 +201,7 @@ object student {
   )(implicit ctx: Context) =
     bits.layout(trans.clas.addStudent.txt(), Left(clas withStudents students))(
       cls := "box-pad student-add-many",
-      h1("Create multiple Playstrategy accounts at once"),
+      h1("Create multiple PlayStrategy accounts at once"),
       maxStudentsWarning(clas),
       created.nonEmpty option frag(
         flashMessage(cls := "student-add-many__created")(
@@ -213,8 +213,8 @@ object student {
             thead(
               tr(
                 th("Real name"),
-                th("Playstrategy username"),
-                th("Playstrategy password")
+                th("PlayStrategy username"),
+                th("PlayStrategy password")
               )
             ),
             tbody(

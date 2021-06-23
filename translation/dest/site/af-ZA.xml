@@ -273,7 +273,7 @@
     <item quantity="one">Gee %s sekonde</item>
     <item quantity="other">Gee %s sekondes</item>
   </plurals>
-  <string name="thisAccountViolatedTos">Hierdie rekening oortree die diensvoorwaardes van Playstrategy</string>
+  <string name="thisAccountViolatedTos">Hierdie rekening oortree die diensvoorwaardes van PlayStrategy</string>
   <string name="openingExplorerAndTablebase">Opening ontdekker &amp; tafelbasis</string>
   <string name="takeback">Terug-vat</string>
   <string name="proposeATakeback">Stel terug-vat voor</string>
@@ -446,8 +446,8 @@ rekenaar analise, kletskamer en deelbare URL te kry.</string>
   <string name="thankYou">Dankie!</string>
   <string name="socialMediaLinks">Sosiale media skakels</string>
   <string name="inlineNotation">Binnelyn notasie</string>
-  <string name="watchPlaystrategyTV">Kyk Playstrategy TV</string>
-  <string name="previouslyOnPlaystrategyTV">Voorigekeer op Playstrategy TV</string>
+  <string name="watchPlayStrategyTV">Kyk PlayStrategy TV</string>
+  <string name="previouslyOnPlayStrategyTV">Voorigekeer op PlayStrategy TV</string>
   <string name="onlinePlayers">Aanlyn spelers</string>
   <string name="activeToday">Aktief vandag</string>
   <string name="activePlayers">Aktiewe spelers</string>
@@ -552,7 +552,7 @@ rekenaar analise, kletskamer en deelbare URL te kry.</string>
   <string name="clock">Klok</string>
   <string name="unauthorizedError">Toegang is verbode.</string>
   <string name="noInternetConnection">Geen internet koppeling. Jy kan steeds vanlyn speel van die kieslys.</string>
-  <string name="connectedToPlaystrategy">Jy is nou verbind aan playstrategy.org</string>
+  <string name="connectedToPlayStrategy">Jy is nou verbind aan playstrategy.org</string>
   <string name="signedOut">Jy is uitgeteken</string>
   <string name="loginSuccessful">Jy is nou ingeteken</string>
   <string name="playOnTheBoardOffline">Oor die bord</string>
@@ -618,7 +618,7 @@ rekenaar analise, kletskamer en deelbare URL te kry.</string>
   <string name="simulClockHint">Fischer Klok stelling. Hoe meer spelers wat jy aanvat, hoe meer tyd kan jy benodig.</string>
   <string name="simulAddExtraTime">Jy kan ekstra tyd by jou klok sit om jou te help om die simul te hanteer.</string>
   <string name="simulHostExtraTime">Gasheer ekstra kloktyd</string>
-  <string name="playstrategyTournaments">Playstrategy toernooie</string>
+  <string name="playstrategyTournaments">PlayStrategy toernooie</string>
   <string name="tournamentFAQ">Arena toernooi Vrae</string>
   <string name="tournamentOfficial">Amptelik</string>
   <string name="timeBeforeTournamentStarts">Tydsduur tot aanvang van toernooi</string>
@@ -653,8 +653,8 @@ rekenaar analise, kletskamer en deelbare URL te kry.</string>
   <string name="weHaveSentYouAnEmailTo">Ons het \'n e-pos na %s gestuur. Klik die skakel in die e-pos om die wagwoord te herstel.</string>
   <string name="byRegisteringYouAgreeToBeBoundByOur">Deur te regisreer, stem jy in om aan ons %s gebonde te wees.</string>
   <string name="readAboutOur">Lees oor ons %s.</string>
-  <string name="networkLagBetweenYouAndPlaystrategy">Netwerk lag tussen jou en Playstrategy</string>
-  <string name="timeToProcessAMoveOnPlaystrategyServer">Tyd om ’n skuif op Playstrategy se bediener te verwerk</string>
+  <string name="networkLagBetweenYouAndPlayStrategy">Netwerk lag tussen jou en PlayStrategy</string>
+  <string name="timeToProcessAMoveOnPlayStrategyServer">Tyd om ’n skuif op PlayStrategy se bediener te verwerk</string>
   <string name="downloadAnnotated">Laai geannoteerde af</string>
   <string name="downloadRaw">Laai rou af</string>
   <string name="downloadImported">Aflaai ingevoer</string>
@@ -670,7 +670,7 @@ rekenaar analise, kletskamer en deelbare URL te kry.</string>
   <string name="youHaveAlreadyRegisteredTheEmail">Jy het reeds die e-pos geregistreer:%s</string>
   <string name="kidMode">Kinder mode</string>
   <string name="kidModeExplanation">Hierdie gaan oor veiligheid. In kindermodus, alle webwerf kommunikasie word afgeskakel. Skakel dit aan vir jou kinders en skoliere, om hulle te beskerm teen ander internet gebruikers.</string>
-  <string name="inKidModeThePlaystrategyLogoGetsIconX">In kindermodus kry die Playstrategy handelsmerk \'n %s ikoon, sodat jy weet jou kinders is veilig.</string>
+  <string name="inKidModeThePlayStrategyLogoGetsIconX">In kindermodus kry die PlayStrategy handelsmerk \'n %s ikoon, sodat jy weet jou kinders is veilig.</string>
   <string name="enableKidMode">Skakel kindermodus aan</string>
   <string name="disableKidMode">Skakel kindermodus aan</string>
   <string name="security">Sekuriteit</string>
@@ -678,7 +678,7 @@ rekenaar analise, kletskamer en deelbare URL te kry.</string>
   <string name="alternativelyYouCanX">Andersins kan jy %s.</string>
   <string name="revokeAllSessions">alle sessies herroep</string>
   <string name="playChessEverywhere">Speel skaak oral</string>
-  <string name="asFreeAsPlaystrategy">So gratis soos Playstrategy</string>
+  <string name="asFreeAsPlayStrategy">So gratis soos PlayStrategy</string>
   <string name="builtForTheLoveOfChessNotMoney">Gebou as gevolg van die liefde vir skaak, nie geld nie</string>
   <string name="everybodyGetsAllFeaturesForFree">Almal kry al die funksies gratis</string>
   <string name="zeroAdvertisement">Niks advertensies</string>
@@ -718,7 +718,7 @@ rekenaar analise, kletskamer en deelbare URL te kry.</string>
   <string name="usernameSuffixInvalid">Die gebruikersnaam moet met \'n letter of nommer eindig.</string>
   <string name="usernameCharsInvalid">Die gebruikersnaam mag net letters, nommers, onderstrepings en koppeltekens bevat.</string>
   <string name="usernameUnacceptable">Hierdie gebruikersnaam is nie aanvaarbaar nie.</string>
-  <string name="directlySupportPlaystrategy">Ondersteun Playstrategy direk</string>
+  <string name="directlySupportPlayStrategy">Ondersteun PlayStrategy direk</string>
   <string name="playChessInStyle">Speel skaak in styl</string>
   <string name="chessBasics">Grondbeginsels</string>
   <string name="coaches">Afrigters</string>
@@ -804,8 +804,8 @@ rekenaar analise, kletskamer en deelbare URL te kry.</string>
   <string name="currentMatchScore">Huidige reeks puntetelling</string>
   <string name="agreementAssistance">Ek stem in om nooit enige hulp te ontvang tydens my spelle nie (vanaf \'n skaakrekenaar, boek, databasis of ander persoon).</string>
   <string name="agreementNice">Ek stem in om altyd respek aan ander spelers te betoon.</string>
-  <string name="agreementAccount">Ek stem in om nie verskeie Playstrategy rekeninge oop te maak nie.</string>
-  <string name="agreementPolicy">Ek stem in om al Playstrategy se beleide na te volg.</string>
+  <string name="agreementAccount">Ek stem in om nie verskeie PlayStrategy rekeninge oop te maak nie.</string>
+  <string name="agreementPolicy">Ek stem in om al PlayStrategy se beleide na te volg.</string>
   <string name="searchOrStartNewDiscussion">Soek of begin \'n nuwe gesprek</string>
   <string name="edit">Pas aan</string>
   <string name="rapid">Rapid</string>

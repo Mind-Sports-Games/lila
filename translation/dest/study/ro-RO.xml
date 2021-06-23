@@ -147,7 +147,7 @@
   <string name="whiteIsWinning">Albul câștigă</string>
   <string name="blackIsWinning">Negrul câștigă</string>
   <string name="novelty" comment="novelty&#10;&#10;A move in the opening that has not been played before.&#10;https://en.wikipedia.org/wiki/Glossary_of_chess#theoretical_novelty">Noutate</string>
-  <string name="attack" comment="attack&#10;A label that can be applied to a position in a Playstrategy study. Noun.">Atac</string>
+  <string name="attack" comment="attack&#10;A label that can be applied to a position in a PlayStrategy study. Noun.">Atac</string>
   <string name="nextChapter">Capitolul următor</string>
   <string name="prevChapter">Capitolul precedent</string>
 </resources>

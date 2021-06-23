@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Сфидар кæн дæ playstrategy.org аккаунт, %s</string>
-  <string name="emailConfirm_click">Дæ Playstrategy аккаунт цæмæй скусын кæнай, æрæлхъив дæнцæгыл:</string>
-  <string name="emailConfirm_ignore">Дæхи Playstrategy-ы кæд регистраци нæ кодтай, уæд ацы фыстæг ницæмæ дар.</string>
+  <string name="emailConfirm_click">Дæ PlayStrategy аккаунт цæмæй скусын кæнай, æрæлхъив дæнцæгыл:</string>
+  <string name="emailConfirm_ignore">Дæхи PlayStrategy-ы кæд регистраци нæ кодтай, уæд ацы фыстæг ницæмæ дар.</string>
   <string name="passwordReset_subject">Раппар дæ playstrategy.org пароль, %s</string>
   <string name="passwordReset_intro">Мах райстам бафæрст дæ аккаунты паролы раппæрыныл.</string>
   <string name="passwordReset_clickOrIgnore">Ды кæд уыцы бафæрст скодтай, уæд æрæлхъив уыцы дæнцæгыл. Кæд нæ, уæд ницæмæ дар уыцы фыстаг.</string>
@@ -15,7 +15,7 @@
 Мæнæ ам ис дæ профилы фарс: %1$s. Сфæлындын æй дæ бон у %2$s.
 
 Хъæлдзаг у, æмæ дæ фигурæтæ ныхмæлæууæджы къаролмæ цæмæй сæ фæндаг æдзухдæр ссарой!</string>
-  <string name="logInToPlaystrategy">Бацу playstrategy.org-мæ, %s</string>
+  <string name="logInToPlayStrategy">Бацу playstrategy.org-мæ, %s</string>
   <string name="common_orPaste">(Æлхъивын нæ кусы? Бафæлвар æй дæ браузермæ бавæрын!)</string>
   <string name="common_note">Уый у сервисы фыстæг, дæ %s спайдакæнынмæ баст кæй у, ахæм.</string>
   <string name="common_contact">Махимæ цæмæй хи сбæттын, %s пайда кæн.</string>

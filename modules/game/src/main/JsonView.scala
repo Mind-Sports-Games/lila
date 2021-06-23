@@ -11,7 +11,7 @@ final class JsonView(rematches: Rematches) {
 
   import JsonView._
 
-  def apply(game: Game, initialFen: Option[FEN]) = {
+  def apply(game: Game, initialFen: Option[FEN]) =
     Json
       .obj(
         "id"            -> game.id,
@@ -37,7 +37,6 @@ final class JsonView(rematches: Rematches) {
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedPlies))
-  }
 }
 
 object JsonView {

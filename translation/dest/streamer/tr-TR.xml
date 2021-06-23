@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Playstrategy yayıncıları</string>
-  <string name="playstrategyStreamer">Playstrategy yayıncısı</string>
+  <string name="playstrategyStreamers">PlayStrategy yayıncıları</string>
+  <string name="playstrategyStreamer">PlayStrategy yayıncısı</string>
   <string name="live">CANLI!</string>
   <string name="offline">ÇEVRİMDIŞI</string>
   <string name="currentlyStreaming">Canlı yayında: %s</string>
   <string name="lastStream">Son yayın: %s</string>
-  <string name="becomeStreamer">Playstrategy yayıncısı ol</string>
+  <string name="becomeStreamer">PlayStrategy yayıncısı ol</string>
   <string name="doYouHaveStream">Twitch veya YouTube yayınınız mı var?</string>
   <string name="hereWeGo">Başlayalım!</string>
   <string name="allStreamers">Bütün yayıncılar</string>
@@ -15,31 +15,31 @@
   <string name="downloadKit">Yayıncı ekipmanlarını indir</string>
   <string name="xIsStreaming">%s canlı yayında</string>
   <string name="rules">Yayın kuralları</string>
-  <string name="rule1">Playstrategy üzerinden yayın yaparken, yayın başlığınıza \"playstrategy.org\" anahtar kelimesini ekleyin.</string>
-  <string name="rule2">Playstrategy ile ilgisi olmayan bir yayın yaparken bu anahtar kelimeyi silin.</string>
-  <string name="rule3">Playstrategy, yayınınızı otomatik olarak bulacak ve size şu avantajları sağlayacaktır:</string>
+  <string name="rule1">PlayStrategy üzerinden yayın yaparken, yayın başlığınıza \"playstrategy.org\" anahtar kelimesini ekleyin.</string>
+  <string name="rule2">PlayStrategy ile ilgisi olmayan bir yayın yaparken bu anahtar kelimeyi silin.</string>
+  <string name="rule3">PlayStrategy, yayınınızı otomatik olarak bulacak ve size şu avantajları sağlayacaktır:</string>
   <string name="perks">Anahtar kelime ile yayın yapmanın avantajları</string>
-  <string name="perk1">Playstrategy profilinizde, yayına başladığınız zaman yanan bir yayıncı simgesine sahip olursunuz.</string>
+  <string name="perk1">PlayStrategy profilinizde, yayına başladığınız zaman yanan bir yayıncı simgesine sahip olursunuz.</string>
   <string name="perk2">Yayıncılar listesinde en üst sırada görünürsünüz.</string>
-  <string name="perk3">Playstrategy takipçilerinizi haberdar edersiniz.</string>
+  <string name="perk3">PlayStrategy takipçilerinizi haberdar edersiniz.</string>
   <string name="perk4">Maç, turnuva ve çalışmalarınızda yayınınızı gösterebilirsiniz.</string>
   <string name="approved">Yayın başvurunuz onaylandı.</string>
   <string name="pendingReview">Yayın başvurunuz moderatörler tarafından gözden geçiriliyor.</string>
   <string name="pleaseFillIn">Lütfen yayıncı bilgilerini doldurun ve bir fotoğraf yükleyin.</string>
-  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">Playstrategy yayıncısı olarak listelenmeye hazırsanız, %s</string>
-  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a Playstrategy streamer, request a moderator review&quot;">moderatör incelemesi talep edin</string>
+  <string name="whenReady" comment="whenReady&#10;&#10;%s is &quot;request a moderator review&quot;">PlayStrategy yayıncısı olarak listelenmeye hazırsanız, %s</string>
+  <string name="requestReview" comment="requestReview&#10;&#10;Used in the sense of: &quot;When you are ready to be listed as a PlayStrategy streamer, request a moderator review&quot;">moderatör incelemesi talep edin</string>
   <string name="anotherLanguage">Canlı yayınınız İngilizceden farklı bir dilde olabilir.
 Bu durumda yayın başlığınızın en başına, uygun olan dil etiketini (%s) köşeli parantez içine alarak ekleyin.
 
 Örneğin; Türkçe için \"[TR]\", Rusça için \"[RU]\" ve Fransızca için \"[FR]\" vb.
 
-Yayın başlığınıza dil etiketini Twitch ve YouTube sayfanız üzerinden ekleyin, Playstrategy yayın ayarlarından değil.
+Yayın başlığınıza dil etiketini Twitch ve YouTube sayfanız üzerinden ekleyin, PlayStrategy yayın ayarlarından değil.
 
 Yayınınız İngilizce dilinde olacaksa dil etiketi eklemenize gerek yoktur.</string>
   <string name="twitchUsername">Twitch kullanıcı adınız veya kanal bağlantınız</string>
   <string name="optionalOrEmpty">İsteğe bağlı. Yoksa boş bırakın</string>
   <string name="youtubeChannel">YouTube kanal kimliğiniz veya kanal bağlantınız</string>
-  <string name="streamerName">Playstrategy üzerindeki yayıncı isminiz</string>
+  <string name="streamerName">PlayStrategy üzerindeki yayıncı isminiz</string>
   <plurals name="keepItShort">
     <item quantity="one">Kısa tutun: En fazla %s karakter</item>
     <item quantity="other">Kısa tutun: En fazla %s karakter</item>

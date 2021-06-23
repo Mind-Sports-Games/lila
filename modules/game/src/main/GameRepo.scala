@@ -395,7 +395,6 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         .option(Forsyth >> g2.chess)
         .filterNot(_.initial)
     }
-    println("fen: "+fen)
     val checkInHours =
       if (g2.isPgnImport) none
       else if (g2.hasClock) 1.some

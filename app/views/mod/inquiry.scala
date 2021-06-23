@@ -248,7 +248,7 @@ object inquiry {
   private def boostOpponents(report: Report): Option[NonEmptyList[User.ID]] =
     (report.reason == Reason.Boost) ?? {
       report.atoms.toList
-        .withFilter(_.byPlaystrategy)
+        .withFilter(_.byPlayStrategy)
         .flatMap(_.text.linesIterator)
         .collect {
           case farmWithRegex(userId)     => List(userId)

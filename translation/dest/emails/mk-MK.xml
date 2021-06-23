@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">Потврдете ја вашата playstrategy.org корисничка сметка %s</string>
-  <string name="emailConfirm_click">Кликнете на врската за да ја активирате вашата Playstrategy сметка:</string>
-  <string name="emailConfirm_ignore">Ако не сте се регистрирале на Playstrategy тогаш можете безбедно да ја игнорирате оваа порака.</string>
+  <string name="emailConfirm_click">Кликнете на врската за да ја активирате вашата PlayStrategy сметка:</string>
+  <string name="emailConfirm_ignore">Ако не сте се регистрирале на PlayStrategy тогаш можете безбедно да ја игнорирате оваа порака.</string>
   <string name="passwordReset_subject">Обновете ја вашата playstrategy.org лозинка, %s</string>
   <string name="passwordReset_intro">Добивме барање да ја обновиме лозинката на вашиот акаунт.</string>
   <string name="passwordReset_clickOrIgnore">Ако вие го испративте ова барање, кликнете на врската подолу. Ако не, тогаш можете да ја игнорирате оваа порака.</string>
@@ -15,7 +15,7 @@
 Ова е вашиот профил: %1$s. Персонализирајте го тука: %2$s. 
 
 Забавувајте се, и нека вашите фигури вечно го наоѓаат патот до противничкиот крал!</string>
-  <string name="logInToPlaystrategy">Најави се на playstrategy.org, %s</string>
+  <string name="logInToPlayStrategy">Најави се на playstrategy.org, %s</string>
   <string name="common_orPaste">(Кликањето не функционира? Пробајте да ја ископирате врската во вашиот пребарувач!)</string>
   <string name="common_note">Ова е сервисна порака, поврзана со Вашето користење на %s.</string>
   <string name="common_contact">За контакт, ве молиме одете на %s.</string>

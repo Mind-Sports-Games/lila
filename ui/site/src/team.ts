@@ -1,7 +1,7 @@
 import * as xhr from 'common/xhr';
-import PlaystrategyChat from 'chat';
+import PlayStrategyChat from 'chat';
 
-window.PlaystrategyChat = PlaystrategyChat;
+window.PlayStrategyChat = PlayStrategyChat;
 
 interface TeamOpts {
   id: string;

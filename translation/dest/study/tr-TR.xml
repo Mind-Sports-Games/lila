@@ -147,9 +147,9 @@
   <string name="novelty" comment="novelty&#10;&#10;A move in the opening that has not been played before.&#10;https://en.wikipedia.org/wiki/Glossary_of_chess#theoretical_novelty">Farklı bir açılış</string>
   <string name="development" comment="development&#10;Used in studies - shows that the player made a developing move (e.g. pushing pawns to open their bishops in the opening).">Gelişim hamlesi</string>
   <string name="initiative">Girişim</string>
-  <string name="attack" comment="attack&#10;A label that can be applied to a position in a Playstrategy study. Noun.">Saldırı</string>
-  <string name="counterplay" comment="counterplay&#10;A label that can be applied to a position in a Playstrategy study. Noun.&#10;&#10;Generally describes a defending player who is under attack, and makes an attacking move elsewhere.">Karşı saldırı</string>
-  <string name="timeTrouble" comment="timeTrouble&#10;A label that can be applied to a position in a Playstrategy study. Noun. Indicates that a player had little time to think and make this move (clock was running low).">Vakit sıkıntısı</string>
+  <string name="attack" comment="attack&#10;A label that can be applied to a position in a PlayStrategy study. Noun.">Saldırı</string>
+  <string name="counterplay" comment="counterplay&#10;A label that can be applied to a position in a PlayStrategy study. Noun.&#10;&#10;Generally describes a defending player who is under attack, and makes an attacking move elsewhere.">Karşı saldırı</string>
+  <string name="timeTrouble" comment="timeTrouble&#10;A label that can be applied to a position in a PlayStrategy study. Noun. Indicates that a player had little time to think and make this move (clock was running low).">Vakit sıkıntısı</string>
   <string name="nextChapter">Sonraki bölüm</string>
   <string name="prevChapter">Önceki bölüm</string>
 </resources>

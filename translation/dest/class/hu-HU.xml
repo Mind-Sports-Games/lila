@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="playstrategyClasses">Órák</string>
-  <string name="teachClassesOfChessStudents">Tanítson sakk diákok osztályait a Playstrategy osztályok eszközkészlettel.</string>
+  <string name="teachClassesOfChessStudents">Tanítson sakk diákok osztályait a PlayStrategy osztályok eszközkészlettel.</string>
   <string name="features">Jellemzők</string>
   <string name="quicklyGenerateSafeUsernames">Gyorsan előállíthat biztonságos felhasználóneveket és jelszavakat a hallgatók számára</string>
   <string name="trackStudentProgress">Kövesse nyomon a tanulók fejlődését a játékokban és a rejtvényekben</string>
   <string name="messageAllStudents">Üzenjen minden hallgatót az új tananyagról</string>
   <string name="freeForAllForever">100% ingyenes mindenkinek, örökre, hirdetés és nyomkövető nélkül</string>
-  <string name="applyToBePlaystrategyTeacher">Jelentkezzen Playstrategy tanárnak</string>
+  <string name="applyToBePlayStrategyTeacher">Jelentkezzen PlayStrategy tanárnak</string>
   <string name="noClassesYet">Még nincs osztály.</string>
   <string name="teachersX">Tanárok: %s</string>
   <string name="newClass">Új osztály</string>
@@ -23,7 +23,7 @@
   <string name="classDescription">Osztályleírás</string>
   <string name="visibleByBothStudentsAndTeachers">Látható mind a tanárok, mind az osztály tanulói számára</string>
   <string name="teachersOfTheClass">Az osztály tanárai</string>
-  <string name="addPlaystrategyUsernames">Adja hozzá a Playstrategy felhasználónéveket, hogy meghívja őket tanároknak. Soronként egy.</string>
+  <string name="addPlayStrategyUsernames">Adja hozzá a PlayStrategy felhasználónéveket, hogy meghívja őket tanároknak. Soronként egy.</string>
   <string name="resetPassword">Jelszó visszaállítása</string>
   <string name="makeSureToCopy">Most mindenképpen másolja vagy írja le a jelszót. Nem láthatja újra!</string>
   <string name="passwordX">Jelszó: %s</string>
@@ -36,17 +36,17 @@
   <string name="studentCredentials">Diák: %1$s
 Felhasználónév: %2$s
 Jelszó: %3$s</string>
-  <string name="inviteAPlaystrategyAccount">Hívjon meg egy Playstrategy-fiókot</string>
-  <string name="inviteDesc1">Ha a hallgatónak már van Playstrategy-fiókja, meghívhatja őket az órára.</string>
-  <string name="inviteDesc2">Üzenetet kapnak a Playstrategy oldalon a linkkel, hogy csatlakozzanak az osztályhoz.</string>
+  <string name="inviteAPlayStrategyAccount">Hívjon meg egy PlayStrategy-fiókot</string>
+  <string name="inviteDesc1">Ha a hallgatónak már van PlayStrategy-fiókja, meghívhatja őket az órára.</string>
+  <string name="inviteDesc2">Üzenetet kapnak a PlayStrategy oldalon a linkkel, hogy csatlakozzanak az osztályhoz.</string>
   <string name="inviteDesc3">Fontos: csak azokat a tanulókat hívja meg, akiket ismer, és akik aktívan szeretnének csatlakozni az osztályhoz.</string>
   <string name="inviteDesc4">Soha ne küldjön kéretlen meghívókat tetszőleges játékosoknak.</string>
-  <string name="createANewPlaystrategyAccount">Hozzon létre egy új Playstrategy-fiókot</string>
-  <string name="createDesc1">Ha a hallgatónak még nincs Playstrategy-fiókja, itt létrehozhat egyet a számára.</string>
+  <string name="createANewPlayStrategyAccount">Hozzon létre egy új PlayStrategy-fiókot</string>
+  <string name="createDesc1">Ha a hallgatónak még nincs PlayStrategy-fiókja, itt létrehozhat egyet a számára.</string>
   <string name="createDesc2">Nincs szükség e-mail címre. Létrejön egy jelszó, amelyet el kell küldenie a hallgatónak, hogy bejelentkezhessenek.</string>
   <string name="createDesc3">Fontos: egy hallgatónak nem lehet több fiókja.</string>
   <string name="createDesc4">Ha már van ilyen, akkor használja a meghívó űrlapot.</string>
-  <string name="playstrategyUsername">Playstrategy felhasználónév</string>
+  <string name="playstrategyUsername">PlayStrategy felhasználónév</string>
   <string name="generateANewUsername">Új felhasználónevet generál</string>
   <string name="welcomeToClass">Üdvözöljük osztályában: %s.
 Itt található a link az osztály eléréséhez.</string>

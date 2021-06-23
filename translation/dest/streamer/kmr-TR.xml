@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="playstrategyStreamers">Weşangerên Playstrategyê</string>
-  <string name="playstrategyStreamer">Weşangerê Playstrategyê</string>
+  <string name="playstrategyStreamers">Weşangerên PlayStrategyê</string>
+  <string name="playstrategyStreamer">Weşangerê PlayStrategyê</string>
   <string name="live">ZINDÎ!</string>
   <string name="offline">DERHÊL</string>
   <string name="currentlyStreaming">Weşanên niha: %s</string>
   <string name="lastStream">Weşana çûyî %s</string>
-  <string name="becomeStreamer">Bibe weşangerke Playstrategyê</string>
+  <string name="becomeStreamer">Bibe weşangerke PlayStrategyê</string>
   <string name="doYouHaveStream">Hesabê te yê Twitch an jî Youtube heye?</string>
   <string name="hereWeGo">Destpêk!</string>
   <string name="allStreamers">Hemû weşanger</string>

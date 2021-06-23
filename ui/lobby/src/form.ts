@@ -21,7 +21,7 @@ export const toFormObject = (lines: FormLines): FormObject =>
     return i > 0 ? { ...o, [fk]: [...(o[fk] || []), lines[k]] } : { ...o, [fk]: lines[k] };
   }, {});
 
-export const makeStore = (storage: PlaystrategyStorage): FormStore => ({
+export const makeStore = (storage: PlayStrategyStorage): FormStore => ({
   get: () => JSON.parse(storage.get() || 'null') as FormLines,
   set: lines => storage.set(JSON.stringify(lines)),
 });

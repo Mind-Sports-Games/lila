@@ -149,7 +149,7 @@ object bits {
         postForm(action := routes.Auth.loginWithTokenPost(token, referrer))(
           form3.actions(
             a(href := routes.Lobby.home)(trans.cancel()),
-            submitButton(cls := "button")(s"${user.username} is my Playstrategy username, log me in")
+            submitButton(cls := "button")(s"${user.username} is my PlayStrategy username, log me in")
           )
         )
       )
@@ -194,8 +194,8 @@ body { margin-top: 45px; }
     ) {
       main(cls := "page-small box box-pad")(
         h1(cls := "text", dataIcon := "2")("Ooops"),
-        p("Sorry, you can't signup to Playstrategy through Tor!"),
-        p("You can play, train and use almost all Playstrategy features as an anonymous user.")
+        p("Sorry, you can't signup to PlayStrategy through Tor!"),
+        p("You can play, train and use almost all PlayStrategy features as an anonymous user.")
       )
     }
 

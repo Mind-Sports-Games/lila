@@ -10,7 +10,7 @@ object MsgPreset {
     name = "Warning: possible sandbagging",
     text =
       """You have lost a couple games after a few moves. Please note that you MUST try to win every rated game.
-Losing rated games on purpose is called "sandbagging", and is not allowed on Playstrategy.
+Losing rated games on purpose is called "sandbagging", and is not allowed on PlayStrategy.
 
 Thank you for your understanding."""
   )
@@ -32,7 +32,7 @@ This can be very annoying for your opponents. If this behavior continues to happ
   def maxFollow(username: Username, max: Int) =
     MsgPreset(
       name = "Follow limit reached!",
-      text = s"""Sorry, you can't follow more than $max players on Playstrategy.
+      text = s"""Sorry, you can't follow more than $max players on PlayStrategy.
 To follow new players, you must first unfollow some on https://playstrategy.org/@/$username/following.
 
 Thank you for your understanding."""

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="emailConfirm_subject">დაადასტურეთ თქვენი playstrategy.org პროფილი, %s</string>
-  <string name="emailConfirm_click">დააკლიკეთ ლინკს, რათა გაააქტიუროთ თქვენი Playstrategy პროფილი:</string>
-  <string name="emailConfirm_ignore">თუ Playstrategy-ზე თქვენ არ დარეგისტრირებულხართ, შეგიძლიათ ამ შეტყობინებას ყურადღება არ მიაქციოთ.</string>
+  <string name="emailConfirm_click">დააკლიკეთ ლინკს, რათა გაააქტიუროთ თქვენი PlayStrategy პროფილი:</string>
+  <string name="emailConfirm_ignore">თუ PlayStrategy-ზე თქვენ არ დარეგისტრირებულხართ, შეგიძლიათ ამ შეტყობინებას ყურადღება არ მიაქციოთ.</string>
   <string name="passwordReset_subject">შეცვალეთ თქვენი playstrategy.org პაროლი, %s</string>
   <string name="passwordReset_intro">ჩვენ მივიღეთ თქვენი პროფილისათვის პაროლის ცვლილების მოთხოვნა.</string>
   <string name="passwordReset_clickOrIgnore">თუ ეს მოთხოვნა თქვენ გეკუთვნით, მაშინ დააკლიკეთ ბმულს. თუ არა - ამ წერილს ყურადღებას ნუ მიაქცევთ.</string>

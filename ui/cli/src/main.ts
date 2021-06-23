@@ -38,7 +38,7 @@ function command(q: string) {
     playstrategy
       .loadModule('dasher')
       .then(() =>
-        window.PlaystrategyDasher(document.createElement('div'), {
+        window.PlayStrategyDasher(document.createElement('div'), {
           playing: $('body').hasClass('playing'),
         })
       )
