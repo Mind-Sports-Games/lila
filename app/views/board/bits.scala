@@ -54,7 +54,7 @@ object bits {
     )(cgWrapContent)
 
   def mini(fen: chess.format.FEN, color: chess.Color = chess.White, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, colorToOrientation(color).pp("colorToOrientation"), lastMove)(tag)
+    miniWithOrientation(fen, colorToOrientation(color), lastMove)(tag)
 
   def miniForVariant(fen: chess.format.FEN, variant: chess.variant.Variant, color: chess.Color = chess.White, lastMove: String = "")(tag: Tag): Tag =
     miniWithOrientation(fen, boardOrientation(variant, color), lastMove)(tag)
