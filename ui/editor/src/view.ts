@@ -84,7 +84,6 @@ const allVariants: Array<[Rules, string]> = [
   ['kingofthehill', 'King of the Hill'],
   ['racingkings', 'Racing Kings'],
   ['3check', 'Three-check'],
-  ['linesofaction', 'Lines Of Action'],
 ];
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {
@@ -359,7 +358,7 @@ let lastTouchMovePos: NumberPair | undefined;
 function sparePieces(ctrl: EditorCtrl, color: Color, _orientation: Orientation, position: 'top' | 'bottom'): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
 
-  const pieces = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn', 'loachecker'].map(function (role) {
+  const pieces = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn'].map(function (role) {
     return [color, role];
   });
 
