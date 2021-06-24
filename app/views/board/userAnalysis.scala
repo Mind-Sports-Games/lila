@@ -14,6 +14,8 @@ import controllers.routes
 
 object userAnalysis {
 
+  def noAnalysisVariants = List(chess.variant.FromPosition, chess.variant.LinesOfAction)
+
   def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.analysis.txt(),
@@ -53,7 +55,7 @@ object userAnalysis {
           views.html.base.bits.mselect(
             "analyse-variant",
             span(cls := "text", dataIcon := iconByVariant(pov.game.variant))(pov.game.variant.name),
-            chess.variant.Variant.all.filter(chess.variant.FromPosition.!=).map { v =>
+            chess.variant.Variant.all.filterNot(noAnalysisVariants.contains(_)).map { v =>
               a(
                 dataIcon := iconByVariant(v),
                 cls := (pov.game.variant == v).option("current"),
