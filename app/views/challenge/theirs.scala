@@ -40,7 +40,7 @@ object theirs {
               ),
               bits.details(c),
               c.notableInitialFen.map { fen =>
-                div(cls := "board-preview", views.html.board.bits.mini(fen, !c.finalColor)(div))
+                div(cls := "board-preview", views.html.board.bits.miniForVariant(fen, c.variant, !c.finalColor)(div))
               },
               if (color.map(Challenge.ColorChoice.apply).has(c.colorChoice))
                 badTag(

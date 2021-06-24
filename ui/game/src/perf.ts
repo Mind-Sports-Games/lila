@@ -12,6 +12,6 @@ export const perf = {
     antichess: '@',
     atomic: '>',
     horde: '_',
-    linesOfAction: '+',
+    linesOfAction: '',
   },
 };

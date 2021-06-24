@@ -156,7 +156,9 @@ export default class EditorCtrl {
   }
 
   bottomColor(): Color {
-    return this.chessground ? this.chessground.state.orientation : this.options.orientation || 'white';
+    const orientation = this.chessground ? this.chessground.state.orientation : this.options.orientation;
+    if (orientation === 'white' || orientation == 'black') return orientation;
+    else return 'black'; // TODO: this needs to be fixed for games other than LinesOfAction
   }
 
   setCastlingToggle(id: CastlingToggle, value: boolean): void {

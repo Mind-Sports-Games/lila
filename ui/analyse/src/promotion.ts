@@ -59,7 +59,13 @@ export function cancel(ctrl: AnalyseCtrl): void {
   }
 }
 
-function renderPromotion(ctrl: AnalyseCtrl, dest: Key, pieces: string[], color: Color, orientation: Color): MaybeVNode {
+function renderPromotion(
+  ctrl: AnalyseCtrl,
+  dest: Key,
+  pieces: string[],
+  color: Color,
+  orientation: Orientation
+): MaybeVNode {
   if (!promoting) return;
 
   let left = (7 - util.key2pos(dest)[0]) * 12.5;

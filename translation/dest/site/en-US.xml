@@ -738,6 +738,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="usernameUnacceptable">This username is not acceptable.</string>
   <string name="directlySupportPlayStrategy">Directly support PlayStrategy</string>
   <string name="playChessInStyle">Play chess in style</string>
+  <string name="playInStyle">Play in style</string>
   <string name="chessBasics">Chess basics</string>
   <string name="coaches">Coaches</string>
   <string name="invalidPgn">Invalid PGN</string>

@@ -113,6 +113,7 @@ interface SoundI {
   changeSet(s: string): void;
   say(text: any, cut?: boolean, force?: boolean): boolean;
   sayOrPlay(name: string, text: string): void;
+  preloadBoardSounds(): void;
   soundSet: string;
   baseUrl: string;
 }
@@ -218,7 +219,7 @@ declare namespace Editor {
   }
 
   export interface Options {
-    orientation?: Color;
+    orientation?: Orientation;
     onChange?: (fen: string) => void;
     inlineCastling?: boolean;
   }
@@ -304,6 +305,7 @@ declare type Perf =
   | 'linesOfAction';
 
 declare type Color = 'white' | 'black';
+declare type Orientation = 'white' | 'black' | 'left' | 'right';
 
 declare type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
 declare type Ranks = '1' | '2' | '3' | '4' | '5' | '5' | '6' | '7' | '8';

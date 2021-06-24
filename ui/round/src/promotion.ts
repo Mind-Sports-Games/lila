@@ -110,7 +110,7 @@ function renderPromotion(
   dest: cg.Key,
   roles: cg.Role[],
   color: Color,
-  orientation: Color
+  orientation: cg.Orientation
 ): MaybeVNode {
   let left = (7 - key2pos(dest)[0]) * 12.5;
   if (orientation === 'white') left = 87.5 - left;

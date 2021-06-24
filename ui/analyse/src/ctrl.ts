@@ -1,4 +1,5 @@
 import * as cg from 'chessground/types';
+import { oppositeOrientation, oppositeOrientationForLOA, orientationForLOA } from 'chessground/util';
 import * as chessUtil from 'chess';
 import * as game from 'game';
 import * as keyboard from './keyboard';
@@ -214,7 +215,7 @@ export default class AnalyseCtrl {
   flip = () => {
     this.flipped = !this.flipped;
     this.chessground.set({
-      orientation: this.bottomColor(),
+      orientation: this.getOrientation(),
     });
     if (this.retro && this.data.game.variant.key !== 'racingKings') {
       this.retro = makeRetro(this, this.bottomColor());
@@ -228,14 +229,21 @@ export default class AnalyseCtrl {
   }
 
   bottomColor(): Color {
-    return this.flipped ? opposite(this.data.orientation) : this.data.orientation;
+    return this.flipped ? opposite(this.data.player.color) : this.data.player.color;
   }
 
   bottomIsWhite = () => this.bottomColor() === 'white';
 
-  getOrientation(): Color {
-    // required by ui/ceval
-    return this.bottomColor();
+  getOrientation(): Orientation {
+    if (this.data.game.variant.key === 'linesOfAction') {
+      const c = this.data.player.color;
+      return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
+    } else if (this.data.game.variant.key === 'racingKings') {
+      return 'white';
+    } else {
+      const o = this.data.orientation;
+      return this.flipped ? oppositeOrientation(o) : o;
+    }
   }
   getNode(): Tree.Node {
     // required by ui/ceval
