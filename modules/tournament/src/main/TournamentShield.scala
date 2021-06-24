@@ -217,6 +217,12 @@ object TournamentShield {
           iconChar = ''
         )
 
+    case object LinesOfAction
+        extends Category(
+          of = Right(chess.variant.LinesOfAction),
+          iconChar = ''
+        )
+
     val all: List[Category] = List(
       Bullet,
       SuperBlitz,
@@ -232,7 +238,8 @@ object TournamentShield {
       Antichess,
       Atomic,
       Horde,
-      RacingKings
+      RacingKings,
+      LinesOfAction
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

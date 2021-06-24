@@ -49,7 +49,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     fen: opts.fen,
     check: opts.check,
     lastMove: opts.lastMove,
-    orientation: ctrl.bottomColor(),
+    orientation: ctrl.getOrientation(),
     coordinates: pref.coords !== Prefs.Coords.Hidden && !ctrl.embed,
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,

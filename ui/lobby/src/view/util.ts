@@ -44,5 +44,5 @@ export const perfIcons = {
   Chess960: "'",
   Correspondence: ';',
   'King of the Hill': '(',
-  'Lines Of Action': '+',
+  'Lines Of Action': '',
 };

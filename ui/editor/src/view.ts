@@ -355,7 +355,7 @@ function selectedToClass(s: Selected): string {
 
 let lastTouchMovePos: NumberPair | undefined;
 
-function sparePieces(ctrl: EditorCtrl, color: Color, _orientation: Color, position: 'top' | 'bottom'): VNode {
+function sparePieces(ctrl: EditorCtrl, color: Color, _orientation: Orientation, position: 'top' | 'bottom'): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
 
   const pieces = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn'].map(function (role) {

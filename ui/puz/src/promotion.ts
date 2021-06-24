@@ -65,7 +65,7 @@ export default function (
     }
   }
 
-  function renderPromotion(dest: Key, pieces: Role[], color: Color, orientation: Color): MaybeVNode {
+  function renderPromotion(dest: Key, pieces: Role[], color: Color, orientation: Orientation): MaybeVNode {
     if (!promoting) return;
 
     let left = (7 - cgUtil.key2pos(dest)[0]) * 12.5;
