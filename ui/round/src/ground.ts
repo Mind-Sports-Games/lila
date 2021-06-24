@@ -1,6 +1,7 @@
 import { h } from 'snabbdom';
 import { Chessground } from 'chessground';
 import * as cg from 'chessground/types';
+import { oppositeOrientationForLOA, orientationForLOA } from 'chessground/util';
 import { Api as CgApi } from 'chessground/api';
 import { Config } from 'chessground/config';
 import changeColorHandle from 'common/coordsColor';
@@ -105,9 +106,11 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
   }
 }
 
-export function boardOrientation(data: RoundData, flip: boolean): Color {
+export function boardOrientation(data: RoundData, flip: boolean): cg.Orientation {
   if (data.game.variant.key === 'racingKings') return flip ? 'black' : 'white';
-  else return flip ? data.opponent.color : data.player.color;
+  if (data.game.variant.key === 'linesOfAction') {
+    return flip ? oppositeOrientationForLOA(data.player.color) : orientationForLOA(data.player.color);
+  } else return flip ? data.opponent.color : data.player.color;
 }
 
 export function render(ctrl: RoundController) {
