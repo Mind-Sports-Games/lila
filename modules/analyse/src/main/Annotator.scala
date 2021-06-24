@@ -3,6 +3,7 @@ package lila.analyse
 import chess.format.pgn.{ Glyphs, Move, Pgn, Tag, Turn }
 import chess.opening._
 import chess.{ Color, Status }
+import chess.variant.Variant
 
 import lila.game.GameDrawOffers
 import lila.game.Game
@@ -10,7 +11,7 @@ import lila.game.Game
 final class Annotator(netDomain: lila.common.config.NetDomain) {
 
   def apply(p: Pgn, game: Game, analysis: Option[Analysis]): Pgn =
-    annotateStatus(game.winnerColor, game.status) {
+    annotateStatus(game.winnerColor, game.status, game.variant) {
       annotateOpening(game.opening) {
         annotateTurns(
           annotateDrawOffers(p, game.drawOffers),
@@ -21,8 +22,8 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       )
     }
 
-  private def annotateStatus(winner: Option[Color], status: Status)(p: Pgn) =
-    lila.game.StatusText(status, winner, chess.variant.Standard) match {
+  private def annotateStatus(winner: Option[Color], status: Status, variant: Variant)(p: Pgn) =
+    lila.game.StatusText(status, winner, variant) match {
       case ""   => p
       case text => p.updateLastPly(_.copy(result = text.some))
     }
