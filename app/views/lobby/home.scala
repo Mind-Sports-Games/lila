@@ -177,11 +177,11 @@ object home {
               span(trans.patron.becomePatron())
             )
           ),
-          a(href := "https://shop.spreadshirt.com/playstrategy-org")(
+          a(href := "https://shop.msoworld.com/wp/shop/")(
             iconTag(""),
             span(cls := "lobby__support__text")(
               strong("Swag Store"),
-              span(trans.playChessInStyle())
+              span(trans.playInStyle())
             )
           )
         ),
