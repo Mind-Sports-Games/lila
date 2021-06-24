@@ -238,6 +238,8 @@ export default class AnalyseCtrl {
     if (this.data.game.variant.key === 'linesOfAction') {
       const c = this.data.player.color;
       return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
+    } else if (this.data.game.variant.key === 'racingKings') {
+      return 'white';
     } else {
       const o = this.data.orientation;
       return this.flipped ? oppositeOrientation(o) : o;
