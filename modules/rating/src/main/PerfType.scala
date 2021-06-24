@@ -173,7 +173,7 @@ object PerfType {
         key = "linesOfAction",
         name = chess.variant.LinesOfAction.name,
         title = "Lines Of Action game",
-        iconChar = '.'
+        iconChar = ''
       )
 
   val all: List[PerfType] = List(
