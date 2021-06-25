@@ -90,7 +90,7 @@ object index {
   <input type="hidden" name="custom" value="${~ctx.userId}">
   <input type="hidden" name="amount" class="amount" value="">
   <input type="hidden" name="cmd" value="_xclick">
-  <input type="hidden" name="business" value="Q3H72BENTXL4G">
+  <input type="hidden" name="business" value="F4YEG6EMBR3MU">
   <input type="hidden" name="item_name" value="playstrategy.org one-time">
   <input type="hidden" name="button_subtype" value="services">
   <input type="hidden" name="no_note" value="1">
@@ -105,7 +105,7 @@ object index {
   <input type="hidden" name="custom" value="${~ctx.userId}">
   <input type="hidden" name="a3" class="amount" value="">
   <input type="hidden" name="cmd" value="_xclick-subscriptions">
-  <input type="hidden" name="business" value="Q3H72BENTXL4G">
+  <input type="hidden" name="business" value="F4YEG6EMBR3MU">
   <input type="hidden" name="item_name" value="playstrategy.org monthly">
   <input type="hidden" name="no_note" value="1">
   <input type="hidden" name="no_shipping" value="1">
@@ -122,7 +122,7 @@ object index {
   <input type="hidden" name="custom" value="${~ctx.userId}">
   <input type="hidden" name="amount" class="amount" value="">
   <input type="hidden" name="cmd" value="_xclick">
-  <input type="hidden" name="business" value="Q3H72BENTXL4G">
+  <input type="hidden" name="business" value="F4YEG6EMBR3MU">
   <input type="hidden" name="item_name" value="playstrategy.org lifetime">
   <input type="hidden" name="button_subtype" value="services">
   <input type="hidden" name="no_note" value="1">
