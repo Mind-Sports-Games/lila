@@ -21,7 +21,7 @@ object variant {
     )(
       h1(cls := "text", dataIcon := perfType.iconChar)(variant.name),
       h2(cls := "headline")(variant.title),
-      div(cls := "body")(raw(~doc.getHtml("variant.content", resolver)))
+      div(cls := "body")(raw(~doc.getHtml("pages.content", resolver)))
     )
 
   def home(
@@ -29,11 +29,11 @@ object variant {
       resolver: io.prismic.DocumentLinkResolver
   )(implicit ctx: Context) =
     layout(
-      title = "PlayStrategy variants",
+      title = "PlayStrategy Games",
       klass = "variants"
     )(
-      h1("PlayStrategy variants"),
-      div(cls := "body box__pad")(raw(~doc.getHtml("doc.content", resolver))),
+      h1("PlayStrategy Games"),
+      div(cls := "body box__pad")(raw(~doc.getHtml("pages.content", resolver))),
       div(cls := "variants")(
         lila.rating.PerfType.variants map { pt =>
           val variant = lila.rating.PerfType variantOf pt

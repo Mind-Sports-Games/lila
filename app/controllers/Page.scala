@@ -56,7 +56,7 @@ final class Page(
       (for {
         variant  <- chess.variant.Variant.byKey get key
         perfType <- lila.rating.PerfType byVariant variant
-      } yield OptionOk(prismicC getVariant variant) { case (doc, resolver) =>
+      } yield OptionOk(prismicC getBookmark key) { case (doc, resolver) =>
         views.html.site.variant.show(doc, resolver, variant, perfType)
       }) | notFound
     }

@@ -100,7 +100,7 @@ $piece-files: (
 
 @each $name, $flips in $piece-files {
   @each $color in 'White', 'Black' {
-    @each $type in 'Pawn', 'Bishop', 'Knight', 'Rook', 'Queen', 'King' {
+    @each $type in 'Pawn', 'Bishop', 'Knight', 'Rook', 'Queen', 'King', 'LOAChecker' {
       .#{$name} .#{to-lower-case($type)}.#{to-lower-case($color)} {
         background-image: img-url('staunton/piece/#{$name}/#{$color}-#{$type}.png');
       }
