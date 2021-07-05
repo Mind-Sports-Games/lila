@@ -1,6 +1,6 @@
 package lila.tournament
 
-import chess.format.FEN
+import strategygames.chess.format.FEN
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.i18n.Lang
@@ -278,19 +278,19 @@ final class JsonView(
     Json
       .obj(
         "id"          -> game.id,
-        "fen"         -> chess.format.Forsyth.boardAndColor(game.situation),
+        "fen"         -> strategygames.chess.format.Forsyth.boardAndColor(game.situation),
         "orientation" -> game.naturalOrientation.name,
         "color"       -> game.naturalOrientation.name, // app BC https://github.com/ornicar/lila/issues/7195
         "lastMove"    -> ~game.lastMoveKeys,
-        "white"       -> ofPlayer(featured.white, game player chess.White),
-        "black"       -> ofPlayer(featured.black, game player chess.Black)
+        "white"       -> ofPlayer(featured.white, game player strategygames.chess.White),
+        "black"       -> ofPlayer(featured.black, game player strategygames.chess.Black)
       )
       .add(
         // not named `clock` to avoid conflict with lichobile
         "c" -> game.clock.ifTrue(game.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(chess.White).roundSeconds,
-            "black" -> c.remainingTime(chess.Black).roundSeconds
+            "white" -> c.remainingTime(strategygames.White(strategygames.GameLib.Chess())).roundSeconds,
+            "black" -> c.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).roundSeconds
           )
         }
       )
@@ -529,7 +529,7 @@ object JsonView {
       "speed" -> s.speed.key
     )
 
-  implicit val clockWrites: OWrites[chess.Clock.Config] = OWrites { clock =>
+  implicit val clockWrites: OWrites[strategygames.Clock.Config] = OWrites { clock =>
     Json.obj(
       "limit"     -> clock.limitSeconds,
       "increment" -> clock.incrementSeconds

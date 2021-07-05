@@ -1,6 +1,6 @@
 package lila.mod
 
-import chess.{ Black, Color, White }
+import strategygames.chess.{ Black, Color, White }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import reactivemongo.api.ReadPreference
@@ -208,8 +208,8 @@ final class AssessApi(
       val x = noFastCoefVariation(game player c)
       x.filter(_ < 0.45f) orElse x.filter(_ < 0.5f).ifTrue(ThreadLocalRandom.nextBoolean())
     }
-    lazy val whiteSuspCoefVariation = suspCoefVariation(chess.White)
-    lazy val blackSuspCoefVariation = suspCoefVariation(chess.Black)
+    lazy val whiteSuspCoefVariation = suspCoefVariation(strategygames.chess.White)
+    lazy val blackSuspCoefVariation = suspCoefVariation(strategygames.chess.Black)
 
     def isUpset = ~(for {
       winner <- game.winner
@@ -220,7 +220,7 @@ final class AssessApi(
 
     val shouldAnalyse: Fu[Option[AutoAnalysis.Reason]] =
       if (!game.analysable) fuccess(none)
-      else if (game.speed >= chess.Speed.Blitz && (white.hasTitle || black.hasTitle))
+      else if (game.speed >= strategygames.Speed.Blitz && (white.hasTitle || black.hasTitle))
         fuccess(TitledPlayer.some)
       else if (!game.source.exists(assessableSources.contains)) fuccess(none)
       // give up on correspondence games
@@ -243,7 +243,7 @@ final class AssessApi(
         gameRepo.holdAlert game game map { holdAlerts =>
           if (Player.HoldAlert suspicious holdAlerts) HoldAlert.some
           // don't analyse most of other bullet games
-          else if (game.speed == chess.Speed.Bullet && randomPercent(70)) none
+          else if (game.speed == strategygames.Speed.Bullet && randomPercent(70)) none
           // someone blurs a lot
           else if (game.players exists manyBlurs) Blurs.some
           // the winner shows a great rating progress

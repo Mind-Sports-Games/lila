@@ -33,8 +33,8 @@ final class LobbyApi(
       .obj(
         "fullId"   -> pov.fullId,
         "gameId"   -> pov.gameId,
-        "fen"      -> chess.format.Forsyth.exportBoard(pov.game.board),
-        "color"    -> (if (pov.game.variant.racingKings) chess.White else pov.color).name,
+        "fen"      -> strategygames.chess.format.Forsyth.exportBoard(pov.game.board),
+        "color"    -> (if (pov.game.variant.racingKings) strategygames.chess.White else pov.color).name,
         "lastMove" -> ~pov.game.lastMoveKeys,
         "variant" -> Json.obj(
           "key"  -> pov.game.variant.key,

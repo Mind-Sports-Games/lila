@@ -120,7 +120,7 @@ private object bits {
           div(cls := "time_choice range")(
             trans.minutesPerSide(),
             ": ",
-            span(chess.Clock.Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0).limitString),
+            span(strategygames.Clock.Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0).limitString),
             renderDissociatedRange(form("time"))
           ),
           div(cls := "increment_choice range")(

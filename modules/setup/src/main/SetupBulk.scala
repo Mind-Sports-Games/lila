@@ -1,8 +1,8 @@
 package lila.setup
 
 import akka.stream.scaladsl._
-import chess.variant.Variant
-import chess.{ Clock, Mode }
+import strategygames.chess.variant.Variant
+import strategygames.{ Clock, Mode }
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._

@@ -1,8 +1,9 @@
 package lila.round
 
 import actorApi.SocketStatus
-import chess.format.{ FEN, Forsyth }
-import chess.{ Clock, Color }
+import strategygames.chess.format.{ FEN, Forsyth }
+import strategygames.chess.{ Color }
+import strategygames.{ Clock }
 import play.api.libs.json._
 import scala.math
 
@@ -27,7 +28,7 @@ final class JsonView(
   import JsonView._
 
   private def checkCount(game: Game, color: Color) =
-    (game.variant == chess.variant.ThreeCheck) option game.history.checkCount(color)
+    (game.variant == strategygames.chess.variant.ThreeCheck) option game.history.checkCount(color)
 
   private def commonPlayerJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
@@ -83,7 +84,7 @@ final class JsonView(
                 "coords"            -> pref.coords,
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
-                "autoQueen" -> (if (pov.game.variant == chess.variant.Antichess) Pref.AutoQueen.NEVER
+                "autoQueen" -> (if (pov.game.variant == strategygames.chess.variant.Antichess) Pref.AutoQueen.NEVER
                                 else pref.autoQueen),
                 "clockTenths" -> pref.clockTenths,
                 "moveEvent"   -> pref.moveEvent
@@ -206,10 +207,10 @@ final class JsonView(
       pov: Pov,
       pref: Pref,
       initialFen: Option[FEN],
-      orientation: chess.Color,
+      orientation: strategygames.chess.Color,
       owner: Boolean,
       me: Option[User],
-      division: Option[chess.Division] = none
+      division: Option[strategygames.chess.Division] = none
   ) = {
     import pov._
     val fen = Forsyth >> game.chess
@@ -220,7 +221,7 @@ final class JsonView(
             "id"         -> gameId,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
-            "initialFen" -> (initialFen | chess.format.Forsyth.initial),
+            "initialFen" -> (initialFen | strategygames.chess.format.Forsyth.initial),
             "fen"        -> fen,
             "turns"      -> game.turns,
             "player"     -> game.turnColor.name,

@@ -1,8 +1,8 @@
 package lila.simul
 
 import cats.implicits._
-import chess.format.FEN
-import chess.StartingPosition
+import strategygames.chess.format.FEN
+import strategygames.chess.StartingPosition
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -62,7 +62,7 @@ object SimulForm {
       clockTime = clockTimeDefault,
       clockIncrement = clockIncrementDefault,
       clockExtra = clockExtraDefault,
-      variants = List(chess.variant.Standard.id),
+      variants = List(strategygames.chess.variant.Standard.id),
       position = none,
       color = colorDefault,
       text = "",
@@ -96,15 +96,15 @@ object SimulForm {
         "variants" -> list {
           number.verifying(
             Set(
-              chess.variant.Standard.id,
-              chess.variant.Chess960.id,
-              chess.variant.KingOfTheHill.id,
-              chess.variant.ThreeCheck.id,
-              chess.variant.Antichess.id,
-              chess.variant.Atomic.id,
-              chess.variant.Horde.id,
-              chess.variant.RacingKings.id,
-              chess.variant.Crazyhouse.id
+              strategygames.chess.variant.Standard.id,
+              strategygames.chess.variant.Chess960.id,
+              strategygames.chess.variant.KingOfTheHill.id,
+              strategygames.chess.variant.ThreeCheck.id,
+              strategygames.chess.variant.Antichess.id,
+              strategygames.chess.variant.Atomic.id,
+              strategygames.chess.variant.Horde.id,
+              strategygames.chess.variant.RacingKings.id,
+              strategygames.chess.variant.Crazyhouse.id
             ) contains _
           )
         }.verifying("At least one variant", _.nonEmpty),
@@ -140,11 +140,11 @@ object SimulForm {
   ) {
     def clock =
       SimulClock(
-        config = chess.Clock.Config(clockTime * 60, clockIncrement),
+        config = strategygames.Clock.Config(clockTime * 60, clockIncrement),
         hostExtraTime = clockExtra * 60
       )
 
-    def actualVariants = variants.flatMap { chess.variant.Variant(_) }
+    def actualVariants = variants.flatMap { strategygames.chess.variant.Variant(_) }
 
     def realPosition = position.filterNot(_.initial)
   }

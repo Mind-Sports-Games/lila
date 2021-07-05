@@ -1,6 +1,6 @@
 package views.html.game
 
-import chess.format.Forsyth
+import strategygames.chess.format.Forsyth
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -73,8 +73,11 @@ object mini {
       }
     )
 
-  private def renderClock(clock: chess.Clock, color: chess.Color) = {
-    val s = clock.remainingTime(color).roundSeconds
+  private def renderClock(clock: strategygames.Clock, color: strategygames.chess.Color) = {
+    val s = clock.remainingTime(color match {
+      case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
+      case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
+    }).roundSeconds
     span(
       cls := s"mini-game__clock mini-game__clock--${color.name}",
       dataTime := s

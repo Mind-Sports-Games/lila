@@ -1,6 +1,6 @@
 package lila.study
 
-import chess.Centis
+import strategygames.Centis
 
 case class MoveOpts(
     write: Boolean,

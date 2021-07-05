@@ -3,8 +3,8 @@ package lila.evalCache
 import play.api.libs.json.{ JsObject, JsString }
 
 import scala.concurrent.duration._
-import chess.format.FEN
-import chess.variant.Variant
+import strategygames.chess.format.FEN
+import strategygames.chess.variant.Variant
 import lila.socket.Socket
 import lila.memo.ExpireCallbackMemo
 

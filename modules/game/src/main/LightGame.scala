@@ -1,6 +1,7 @@
 package lila.game
 
-import chess.{ Color, Status }
+import strategygames.chess.{ Color }
+import strategygames.{ Status }
 
 import lila.user.User
 

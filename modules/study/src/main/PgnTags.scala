@@ -2,7 +2,7 @@ package lila.study
 
 import scala.util.chaining._
 
-import chess.format.pgn.{ Tag, TagType, Tags }
+import strategygames.chess.format.pgn.{ Tag, TagType, Tags }
 
 object PgnTags {
 

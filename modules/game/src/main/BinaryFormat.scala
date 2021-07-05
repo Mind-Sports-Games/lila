@@ -1,8 +1,9 @@
 package lila.game
 
-import chess._
-import chess.format.Uci
-import chess.variant.Variant
+import strategygames.{ Centis, Clock, ClockPlayer, Timestamp }
+import strategygames.chess._
+import strategygames.chess.format.Uci
+import strategygames.chess.variant.Variant
 import org.joda.time.DateTime
 import org.lichess.compression.clock.{ Encoder => ClockEncoder }
 import scala.util.Try
@@ -86,7 +87,7 @@ object BinaryFormat {
 
   case class clock(start: Timestamp) {
 
-    def legacyElapsed(clock: Clock, color: Color) =
+    def legacyElapsed(clock: Clock, color: strategygames.Color) =
       clock.limit - clock.players(color).remaining
 
     def computeRemaining(config: Clock.Config, legacyElapsed: Centis) =
@@ -94,12 +95,12 @@ object BinaryFormat {
 
     def write(clock: Clock): ByteArray = {
       Array(writeClockLimit(clock.limitSeconds), clock.incrementSeconds.toByte) ++
-        writeSignedInt24(legacyElapsed(clock, White).centis) ++
-        writeSignedInt24(legacyElapsed(clock, Black).centis) ++
+        writeSignedInt24(legacyElapsed(clock, strategygames.White(strategygames.GameLib.Chess())).centis) ++
+        writeSignedInt24(legacyElapsed(clock, strategygames.Black(strategygames.GameLib.Chess())).centis) ++
         clock.timer.fold(Array.empty[Byte])(writeTimer)
     }
 
-    def read(ba: ByteArray, whiteBerserk: Boolean, blackBerserk: Boolean): Color => Clock =
+    def read(ba: ByteArray, whiteBerserk: Boolean, blackBerserk: Boolean): strategygames.Color => Clock =
       color => {
         val ia = ba.value map toInt
 
@@ -119,7 +120,7 @@ object BinaryFormat {
             Clock(
               config = config,
               color = color,
-              players = Color.Map(
+              players = strategygames.Color.Map(
                 ClockPlayer
                   .withConfig(config)
                   .copy(berserk = whiteBerserk)
@@ -229,7 +230,7 @@ object BinaryFormat {
     }
 
     // cache standard start position
-    val standard = write(Board.init(chess.variant.Standard).pieces)
+    val standard = write(Board.init(strategygames.chess.variant.Standard).pieces)
 
     private def intToRole(int: Int, variant: Variant): Option[Role] =
       int match {

@@ -1,7 +1,7 @@
 package lila.tournament
 
-import chess.StartingPosition
-import chess.format.FEN
+import strategygames.chess.StartingPosition
+import strategygames.chess.format.FEN
 
 object Thematic {
 

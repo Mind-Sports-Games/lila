@@ -3,8 +3,9 @@ package lila.insight
 import scala.util.chaining._
 import cats.data.NonEmptyList
 
-import chess.format.FEN
-import chess.{ Board, Centis, Role, Stats }
+import strategygames.chess.format.FEN
+import strategygames.chess.{ Board, Role }
+import strategygames.{ Centis, Stats }
 import lila.analyse.{ Accuracy, Advice }
 import lila.game.{ Game, Pov }
 
@@ -20,7 +21,7 @@ final private class PovToEntry(
       provisional: Boolean,
       initialFen: Option[FEN],
       analysis: Option[lila.analyse.Analysis],
-      division: chess.Division,
+      division: strategygames.chess.Division,
       moveAccuracy: Option[List[Int]],
       boards: NonEmptyList[Board],
       movetimes: NonEmptyList[Centis],
@@ -47,7 +48,7 @@ final private class PovToEntry(
           (game.metadata.analysed ?? analysisRepo.byId(game.id)) map { case (fen, an) =>
             for {
               boards <-
-                chess.Replay
+                strategygames.chess.Replay
                   .boards(
                     moveStrs = game.pgnMoves,
                     initialFen = fen,
@@ -61,7 +62,7 @@ final private class PovToEntry(
               provisional = provisional,
               initialFen = fen,
               analysis = an,
-              division = chess.Divider(boards.toList),
+              division = strategygames.chess.Divider(boards.toList),
               moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
               boards = boards,
               movetimes = movetimes,
@@ -76,12 +77,12 @@ final private class PovToEntry(
 
   private def pgnMoveToRole(pgn: String): Role =
     pgn.head match {
-      case 'N'       => chess.Knight
-      case 'B'       => chess.Bishop
-      case 'R'       => chess.Rook
-      case 'Q'       => chess.Queen
-      case 'K' | 'O' => chess.King
-      case _         => chess.Pawn
+      case 'N'       => strategygames.chess.Knight
+      case 'B'       => strategygames.chess.Bishop
+      case 'R'       => strategygames.chess.Rook
+      case 'Q'       => strategygames.chess.Queen
+      case 'K' | 'O' => strategygames.chess.King
+      case _         => strategygames.chess.Pawn
     }
 
   private def makeMoves(from: RichPov): List[InsightMove] = {
@@ -165,8 +166,8 @@ final private class PovToEntry(
     QueenTrade {
       from.division.end.fold(from.boards.last.some)(from.boards.toList.lift) match {
         case Some(board) =>
-          chess.Color.all.forall { color =>
-            !board.hasPiece(chess.Piece(color, chess.Queen))
+          strategygames.chess.Color.all.forall { color =>
+            !board.hasPiece(strategygames.chess.Piece(color, strategygames.chess.Queen))
           }
         case _ =>
           logger.warn(s"https://playstrategy.org/${from.pov.gameId} missing endgame board")
@@ -190,7 +191,7 @@ final private class PovToEntry(
       perf = perfType,
       eco =
         if (game.playable || game.turns < 4 || game.fromPosition || game.variant.exotic) none
-        else chess.opening.Ecopening fromGame game.pgnMoves.toList,
+        else strategygames.chess.opening.Ecopening fromGame game.pgnMoves.toList,
       myCastling = Castling.fromMoves(game pgnMoves pov.color),
       opponentRating = opRating,
       opponentStrength = RelativeStrength(opRating - myRating),

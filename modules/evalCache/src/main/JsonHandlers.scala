@@ -1,7 +1,7 @@
 package lila.evalCache
 
 import cats.implicits._
-import chess.format.{ FEN, Uci }
+import strategygames.chess.format.{ FEN, Uci }
 import play.api.libs.json._
 
 import lila.common.Json._
@@ -40,7 +40,7 @@ object JsonHandlers {
       depth  <- d int "depth"
       pvObjs <- d objs "pvs"
       pvs    <- pvObjs.map(parsePv).sequence.flatMap(_.toNel)
-      variant = chess.variant.Variant orDefault ~d.str("variant")
+      variant = strategygames.chess.variant.Variant orDefault ~d.str("variant")
     } yield Input.Candidate(
       variant,
       fen,

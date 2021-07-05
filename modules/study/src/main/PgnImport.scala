@@ -1,9 +1,9 @@
 package lila.study
 
 import cats.data.Validated
-import chess.Centis
-import chess.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
-import chess.format.{ Forsyth, Uci, UciCharPair }
+import strategygames.Centis
+import strategygames.chess.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
+import strategygames.chess.format.{ Forsyth, Uci, UciCharPair }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
@@ -13,14 +13,14 @@ object PgnImport {
 
   case class Result(
       root: Node.Root,
-      variant: chess.variant.Variant,
+      variant: strategygames.chess.variant.Variant,
       tags: Tags,
       end: Option[End]
   )
 
   case class End(
-      status: chess.Status,
-      winner: Option[chess.Color],
+      status: strategygames.Status,
+      winner: Option[strategygames.chess.Color],
       resultText: String,
       statusText: String
   )
@@ -53,7 +53,7 @@ object PgnImport {
               End(
                 status = status,
                 winner = game.winnerColor,
-                resultText = chess.Color.showResult(game.winnerColor),
+                resultText = strategygames.chess.Color.showResult(game.winnerColor),
                 statusText = lila.game.StatusText(status, game.winnerColor, game.variant)
               )
             }
@@ -89,7 +89,7 @@ object PgnImport {
     Comment(Comment.Id.make, Comment.Text(text), Comment.Author.PlayStrategy)
   }
 
-  private def makeVariations(sans: List[San], game: chess.Game, annotator: Option[Comment.Author]) =
+  private def makeVariations(sans: List[San], game: strategygames.chess.Game, annotator: Option[Comment.Author]) =
     sans.headOption.?? {
       _.metas.variations.flatMap { variation =>
         makeNode(game, variation.value, annotator)
@@ -115,7 +115,7 @@ object PgnImport {
       }
     }
 
-  private def makeNode(prev: chess.Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
+  private def makeNode(prev: strategygames.chess.Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
     try {
       sans match {
         case Nil => none

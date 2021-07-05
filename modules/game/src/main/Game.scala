@@ -1,10 +1,11 @@
 package lila.game
 
-import chess.Color.{ Black, White }
-import chess.format.{ FEN, Uci }
-import chess.opening.{ FullOpening, FullOpeningDB }
-import chess.variant.{ FromPosition, Standard, Variant }
-import chess.{ Castles, Centis, CheckCount, Clock, Color, Mode, MoveOrDrop, Speed, Status, Game => ChessGame }
+import strategygames.chess.Color.{ Black, White }
+import strategygames.chess.format.{ FEN, Uci }
+import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
+import strategygames.chess.variant.{ FromPosition, Standard, Variant }
+import strategygames.chess.{ Castles, CheckCount, Color, MoveOrDrop, Game => ChessGame }
+import strategygames.{ Centis, Clock, Mode, Speed, Status }
 import org.joda.time.DateTime
 
 import lila.common.Sequence
@@ -114,7 +115,10 @@ case class Game(
   def moveTimes(color: Color): Option[List[Centis]] = {
     for {
       clk <- clock
-      inc = clk.incrementOf(color)
+      inc = clk.incrementOf(color match {
+        case(White) => strategygames.White(strategygames.GameLib.Chess())
+        case(Black) => strategygames.Black(strategygames.GameLib.Chess())
+      })
       history <- clockHistory
       clocks = history(color)
     } yield Centis(0) :: {
@@ -348,7 +352,12 @@ case class Game(
 
   def moretimeable(color: Color) =
     playable && nonMandatory && {
-      clock.??(_ moretimeable color) || correspondenceClock.??(_ moretimeable color)
+      clock.??(_.moretimeable(
+        color match {
+          case(White) => strategygames.White(strategygames.GameLib.Chess())
+          case(Black) => strategygames.Black(strategygames.GameLib.Chess())
+        })
+      ) || correspondenceClock.??(_ moretimeable color)
     }
 
   def abortable = status == Status.Started && playedTurns < 2 && nonMandatory
@@ -357,7 +366,10 @@ case class Game(
 
   def goBerserk(color: Color): Option[Progress] =
     clock.ifTrue(berserkable && !player(color).berserk).map { c =>
-      val newClock = c goBerserk color
+      val newClock = c.goBerserk(color match {
+        case(White) => strategygames.White(strategygames.GameLib.Chess())
+        case(Black) => strategygames.Black(strategygames.GameLib.Chess())
+      })
       Progress(
         this,
         copy(
@@ -457,7 +469,13 @@ case class Game(
   private def outoftimeClock(withGrace: Boolean): Boolean =
     clock ?? { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
-        c.outOfTime(turnColor, withGrace) || {
+        c.outOfTime(
+          turnColor match {
+            case(White) => strategygames.White(strategygames.GameLib.Chess())
+            case(Black) => strategygames.Black(strategygames.GameLib.Chess())
+          }, 
+          withGrace
+        ) || {
           !c.isRunning && c.players.exists(_.elapsed.centis > 0)
         }
       }
@@ -643,40 +661,40 @@ object Game {
   val maxPlies = 600 // unlimited can cause StackOverflowError
 
   val analysableVariants: Set[Variant] = Set(
-    chess.variant.Standard,
-    chess.variant.Crazyhouse,
-    chess.variant.Chess960,
-    chess.variant.KingOfTheHill,
-    chess.variant.ThreeCheck,
-    chess.variant.Antichess,
-    chess.variant.FromPosition,
-    chess.variant.Horde,
-    chess.variant.Atomic,
-    chess.variant.RacingKings
+    strategygames.chess.variant.Standard,
+    strategygames.chess.variant.Crazyhouse,
+    strategygames.chess.variant.Chess960,
+    strategygames.chess.variant.KingOfTheHill,
+    strategygames.chess.variant.ThreeCheck,
+    strategygames.chess.variant.Antichess,
+    strategygames.chess.variant.FromPosition,
+    strategygames.chess.variant.Horde,
+    strategygames.chess.variant.Atomic,
+    strategygames.chess.variant.RacingKings
   )
 
   val unanalysableVariants: Set[Variant] = Variant.all.toSet -- analysableVariants
 
   val variantsWhereWhiteIsBetter: Set[Variant] = Set(
-    chess.variant.ThreeCheck,
-    chess.variant.Atomic,
-    chess.variant.Horde,
-    chess.variant.RacingKings,
-    chess.variant.Antichess
+    strategygames.chess.variant.ThreeCheck,
+    strategygames.chess.variant.Atomic,
+    strategygames.chess.variant.Horde,
+    strategygames.chess.variant.RacingKings,
+    strategygames.chess.variant.Antichess
   )
 
   val blindModeVariants: Set[Variant] = Set(
-    chess.variant.Standard,
-    chess.variant.Chess960,
-    chess.variant.KingOfTheHill,
-    chess.variant.ThreeCheck,
-    chess.variant.FromPosition
+    strategygames.chess.variant.Standard,
+    strategygames.chess.variant.Chess960,
+    strategygames.chess.variant.KingOfTheHill,
+    strategygames.chess.variant.ThreeCheck,
+    strategygames.chess.variant.FromPosition
   )
 
   val hordeWhitePawnsSince = new DateTime(2015, 4, 11, 10, 0)
 
   def isOldHorde(game: Game) =
-    game.variant == chess.variant.Horde &&
+    game.variant == strategygames.chess.variant.Horde &&
       game.createdAt.isBefore(Game.hordeWhitePawnsSince)
 
   def allowRated(variant: Variant, clock: Option[Clock.Config]) =
@@ -713,7 +731,7 @@ object Game {
     }
 
   def isBoardCompatible(clock: Clock.Config): Boolean =
-    chess.Speed(clock) >= Speed.Rapid
+    strategygames.Speed(clock) >= Speed.Rapid
 
   def isBotCompatible(game: Game): Boolean = {
     game.hasAi || game.fromFriend || game.fromApi
@@ -838,7 +856,12 @@ case class ClockHistory(
     color.fold(copy(white = f(white)), copy(black = f(black)))
 
   def record(color: Color, clock: Clock): ClockHistory =
-    update(color, _ :+ clock.remainingTime(color))
+    update(color, _ :+ clock.remainingTime(
+      color match {
+        case(White) => strategygames.White(strategygames.GameLib.Chess())
+        case(Black) => strategygames.Black(strategygames.GameLib.Chess())
+      }
+    ))
 
   def reset(color: Color) = update(color, _ => Vector.empty)
 

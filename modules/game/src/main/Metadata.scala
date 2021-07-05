@@ -2,7 +2,7 @@ package lila.game
 
 import java.security.MessageDigest
 import lila.db.ByteArray
-import chess.Color
+import strategygames.chess.Color
 
 private[game] case class Metadata(
     source: Option[Source],
@@ -42,7 +42,7 @@ case class GameDrawOffers(white: Set[Int], black: Set[Int]) {
     case ply if (ply % 2 == 0) == color.white => ply + 1
     case ply => ply
   }
-  def normalizedPlies: Set[Int] = normalize(chess.White) ++ normalize(chess.Black)
+  def normalizedPlies: Set[Int] = normalize(strategygames.chess.White) ++ normalize(strategygames.chess.Black)
 }
 
 object GameDrawOffers {

@@ -38,7 +38,7 @@ final class Prismic(
       none
     }
 
-  def getVariant(variant: chess.variant.Variant) =
+  def getVariant(variant: strategygames.chess.variant.Variant) =
     prismicApi flatMap { api =>
       api
         .forms("variant")

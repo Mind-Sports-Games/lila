@@ -5,9 +5,9 @@ import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 
-import chess.variant.Variant
+import strategygames.chess.variant.Variant
 import lila.common.Form._
-import chess.format.FEN
+import strategygames.chess.format.FEN
 
 object CrudForm {
 
@@ -43,7 +43,7 @@ object CrudForm {
     clockTime = clockTimeDefault,
     clockIncrement = clockIncrementDefault,
     minutes = minuteDefault,
-    variant = chess.variant.Standard.id,
+    variant = strategygames.chess.variant.Standard.id,
     position = none,
     date = DateTime.now plusDays 7,
     image = "",

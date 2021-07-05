@@ -1,6 +1,6 @@
 package lila.user
 
-import chess.Speed
+import strategygames.Speed
 import org.joda.time.DateTime
 
 import lila.common.Heapsort.implicits._
@@ -237,18 +237,18 @@ case object Perfs {
     )
   }
 
-  def variantLens(variant: chess.variant.Variant): Option[Perfs => Perf] =
+  def variantLens(variant: strategygames.chess.variant.Variant): Option[Perfs => Perf] =
     variant match {
-      case chess.variant.Standard      => Some(_.standard)
-      case chess.variant.Chess960      => Some(_.chess960)
-      case chess.variant.KingOfTheHill => Some(_.kingOfTheHill)
-      case chess.variant.ThreeCheck    => Some(_.threeCheck)
-      case chess.variant.Antichess     => Some(_.antichess)
-      case chess.variant.Atomic        => Some(_.atomic)
-      case chess.variant.Horde         => Some(_.horde)
-      case chess.variant.RacingKings   => Some(_.racingKings)
-      case chess.variant.Crazyhouse    => Some(_.crazyhouse)
-      case chess.variant.LinesOfAction => Some(_.linesOfAction)
+      case strategygames.chess.variant.Standard      => Some(_.standard)
+      case strategygames.chess.variant.Chess960      => Some(_.chess960)
+      case strategygames.chess.variant.KingOfTheHill => Some(_.kingOfTheHill)
+      case strategygames.chess.variant.ThreeCheck    => Some(_.threeCheck)
+      case strategygames.chess.variant.Antichess     => Some(_.antichess)
+      case strategygames.chess.variant.Atomic        => Some(_.atomic)
+      case strategygames.chess.variant.Horde         => Some(_.horde)
+      case strategygames.chess.variant.RacingKings   => Some(_.racingKings)
+      case strategygames.chess.variant.Crazyhouse    => Some(_.crazyhouse)
+      case strategygames.chess.variant.LinesOfAction => Some(_.linesOfAction)
       case _                           => none
     }
 

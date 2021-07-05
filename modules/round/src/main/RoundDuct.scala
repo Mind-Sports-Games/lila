@@ -1,7 +1,8 @@
 package lila.round
 
 import actorApi._, round._
-import chess.{ Black, Centis, Color, White }
+import strategygames.chess.{ Black, Color, White }
+import strategygames.{ Centis }
 import org.joda.time.DateTime
 import ornicar.scalalib.Zero
 import play.api.libs.json._
@@ -388,8 +389,17 @@ final private[round] class RoundDuct(
             g.clock.fold(Progress(g)) { clock =>
               g.withClock {
                 clock
-                  .giveTime(g.turnColor, Centis(2000))
-                  .giveTime(!g.turnColor, Centis(1000))
+                  .giveTime(
+                    g.turnColor match {
+                      case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
+                      case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
+                    },
+                    Centis(2000)
+                  )
+                  .giveTime(!(g.turnColor match {
+                    case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
+                    case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
+                  }), Centis(1000))
               }
             }
           }
@@ -445,7 +455,12 @@ final private[round] class RoundDuct(
               getPlayer(c).showMillisToGone foreach {
                 _ ?? { millis =>
                   if (millis <= 0) notifyGone(c, gone = true)
-                  else g.clock.exists(_.remainingTime(c).millis > millis + 3000) ?? notifyGoneIn(c, millis)
+                  else g.clock.exists(_.remainingTime(
+                    c match {
+                      case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
+                      case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
+                    }
+                  ).millis > millis + 3000) ?? notifyGoneIn(c, millis)
                 }
               }
             }
@@ -465,7 +480,10 @@ final private[round] class RoundDuct(
       for {
         user  <- pov.player.userId
         clock <- pov.game.clock
-        lag   <- clock.lag(pov.color).lagMean
+        lag   <- clock.lag(pov.color match {
+          case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
+          case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
+        }).lagMean
       } UserLagCache.put(user, lag)
     }
 

@@ -1,6 +1,6 @@
 package lila.lobby
 
-import chess.{ Mode, Speed }
+import strategygames.{ Mode, Speed }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.i18n.Lang
@@ -25,7 +25,7 @@ case class Seek(
 
   val realColor = Color orDefault color
 
-  val realVariant = chess.variant.Variant orDefault variant
+  val realVariant = strategygames.chess.variant.Variant orDefault variant
 
   val realMode = Mode orDefault mode
 
@@ -61,7 +61,7 @@ case class Seek(
         ),
         "mode"  -> realMode.id,
         "days"  -> daysPerTurn,
-        "color" -> chess.Color.fromName(color).??(_.name),
+        "color" -> strategygames.chess.Color.fromName(color).??(_.name),
         "perf" -> Json.obj(
           "icon" -> perfType.map(_.iconChar.toString),
           "name" -> perfType.map(_.trans)
@@ -77,7 +77,7 @@ object Seek {
   val idSize = 8
 
   def make(
-      variant: chess.variant.Variant,
+      variant: strategygames.chess.variant.Variant,
       daysPerTurn: Option[Int],
       mode: Mode,
       color: String,

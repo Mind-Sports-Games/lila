@@ -1,7 +1,8 @@
 package lila.setup
 
-import chess.format.FEN
-import chess.variant.Variant
+import strategygames.chess.format.FEN
+import strategygames.chess.variant.Variant
+import strategygames.Centis
 import play.api.data._
 import play.api.data.Forms._
 
@@ -16,7 +17,7 @@ object SetupForm {
 
   def aiFilled(fen: Option[FEN]): Form[AiConfig] =
     ai fill fen.foldLeft(AiConfig.default) { case (config, f) =>
-      config.copy(fen = f.some, variant = chess.variant.FromPosition)
+      config.copy(fen = f.some, variant = strategygames.chess.variant.FromPosition)
     }
 
   lazy val ai = Form(
@@ -36,7 +37,7 @@ object SetupForm {
 
   def friendFilled(fen: Option[FEN])(implicit ctx: UserContext): Form[FriendConfig] =
     friend(ctx) fill fen.foldLeft(FriendConfig.default) { case (config, f) =>
-      config.copy(fen = f.some, variant = chess.variant.FromPosition)
+      config.copy(fen = f.some, variant = strategygames.chess.variant.FromPosition)
     }
 
   def friend(ctx: UserContext) =
@@ -90,7 +91,7 @@ object SetupForm {
         time = t,
         increment = i,
         days = 1,
-        mode = chess.Mode(~r),
+        mode = strategygames.Mode(~r),
         color = lila.lobby.Color.orDefault(c),
         ratingRange = g.fold(RatingRange.default)(RatingRange.orDefault)
       )
@@ -108,8 +109,8 @@ object SetupForm {
       mapping(
         "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
         "increment" -> increment
-      )(chess.Clock.Config.apply)(chess.Clock.Config.unapply)
-        .verifying("Invalid clock", c => c.estimateTotalTime > chess.Centis(0))
+      )(strategygames.Clock.Config.apply)(strategygames.Clock.Config.unapply)
+        .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
 
     lazy val clock = "clock" -> optional(clockMapping)
 

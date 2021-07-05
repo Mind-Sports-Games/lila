@@ -64,7 +64,7 @@ object PoolApi {
   }
 
   case class Pairing(game: Game, whiteSri: Sri, blackSri: Sri) {
-    def sri(color: chess.Color) = color.fold(whiteSri, blackSri)
+    def sri(color: strategygames.chess.Color) = color.fold(whiteSri, blackSri)
   }
   case class Pairings(pairings: List[Pairing])
 }

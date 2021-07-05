@@ -1,9 +1,9 @@
 package lila.simul
 
-import chess.Color
-import chess.format.FEN
-import chess.variant.Variant
-import chess.{ Speed }
+import strategygames.chess.Color
+import strategygames.chess.format.FEN
+import strategygames.chess.variant.Variant
+import strategygames.{ Speed }
 import org.joda.time.DateTime
 
 import lila.rating.PerfType
@@ -127,9 +127,9 @@ case class Simul(
 
   def playingPairings = pairings filterNot (_.finished)
 
-  def hostColor: Option[Color] = color flatMap chess.Color.fromName
+  def hostColor: Option[Color] = color flatMap strategygames.chess.Color.fromName
 
-  def setPairingHostColor(gameId: String, hostColor: chess.Color) =
+  def setPairingHostColor(gameId: String, hostColor: strategygames.chess.Color) =
     updatePairing(gameId, _.copy(hostColor = hostColor))
 
   private def Created(s: => Simul): Simul = if (isCreated) s else this
@@ -176,7 +176,7 @@ object Simul {
       hostGameId = none,
       createdAt = DateTime.now,
       estimatedStartAt = estimatedStartAt,
-      variants = if (position.isDefined) List(chess.variant.Standard) else variants,
+      variants = if (position.isDefined) List(strategygames.chess.variant.Standard) else variants,
       position = position,
       applicants = Nil,
       pairings = Nil,

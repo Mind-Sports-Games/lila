@@ -1,7 +1,8 @@
 package lila.round
 
-import chess.format.{ Forsyth, Uci }
-import chess.{ Centis, MoveMetrics, MoveOrDrop, Status }
+import strategygames.chess.format.{ Forsyth, Uci }
+import strategygames.chess.{ MoveOrDrop }
+import strategygames.{ Centis, MoveMetrics, Status }
 
 import actorApi.round.{ DrawNo, ForecastPlay, HumanPlay, TakebackNo, TooManyPlies }
 import lila.game.actorApi.MoveGameEvent
@@ -135,7 +136,13 @@ final private class Player(
           ncg -> (Right(drop): MoveOrDrop)
         }
     }).map {
-      case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnColor, withGrace = false)) => Flagged
+      case (ncg, _) if ncg.clock.exists(_.outOfTime(
+        game.turnColor match {
+            case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
+            case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
+        },
+        withGrace = false
+      )) => Flagged
       case (newChessGame, moveOrDrop) =>
         MoveApplied(
           game.update(newChessGame, moveOrDrop, blur),

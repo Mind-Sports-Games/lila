@@ -1,6 +1,6 @@
 package lila.lobby
 
-import chess.{ Clock, Mode, Speed }
+import strategygames.{ Clock, Mode, Speed }
 import org.joda.time.DateTime
 import play.api.i18n.Lang
 import play.api.libs.json._
@@ -27,7 +27,7 @@ case class Hook(
 
   val realColor = Color orDefault color
 
-  val realVariant = chess.variant.Variant orDefault variant
+  val realVariant = strategygames.chess.variant.Variant orDefault variant
 
   val realMode = Mode orDefault mode
 
@@ -75,7 +75,7 @@ case class Hook(
       .add("rating" -> rating)
       .add("variant" -> realVariant.exotic.option(realVariant.key))
       .add("ra" -> realMode.rated.option(1))
-      .add("c" -> chess.Color.fromName(color).map(_.name))
+      .add("c" -> strategygames.chess.Color.fromName(color).map(_.name))
       .add("perf" -> perfType.map(_.trans))
 
   def randomColor = color == "random"
@@ -84,7 +84,7 @@ case class Hook(
     realMode.rated && realVariant.standard && randomColor &&
       lila.pool.PoolList.clockStringSet.contains(clock.show)
 
-  def compatibleWithPool(poolClock: chess.Clock.Config) =
+  def compatibleWithPool(poolClock: strategygames.Clock.Config) =
     compatibleWithPools && clock == poolClock
 
   def toPool =
@@ -110,7 +110,7 @@ object Hook {
 
   def make(
       sri: Sri,
-      variant: chess.variant.Variant,
+      variant: strategygames.chess.variant.Variant,
       clock: Clock.Config,
       mode: Mode,
       color: String,

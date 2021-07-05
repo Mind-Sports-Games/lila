@@ -331,8 +331,8 @@ final class Api(
       get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
         JsonOptionOk(
           env.evalCache.api.getEvalJson(
-            chess.variant.Variant orDefault ~get("variant", req),
-            chess.format.FEN(fen),
+            strategygames.chess.variant.Variant orDefault ~get("variant", req),
+            strategygames.chess.format.FEN(fen),
             getInt("multiPv", req) | 1
           )
         )

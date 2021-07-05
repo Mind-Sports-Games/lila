@@ -1,6 +1,7 @@
 package lila.playban
 
-import chess.{ Color, Speed }
+import strategygames.chess.{ Color }
+import strategygames.{ Speed }
 import scala.math.{ log10, sqrt }
 
 import lila.game.Game
@@ -28,7 +29,7 @@ object RageSit {
   def imbalanceInc(game: Game, loser: Color) =
     Inc {
       {
-        import chess.variant._
+        import strategygames.chess.variant._
         (game.chess.board.materialImbalance, game.variant) match {
           case (_, Crazyhouse | Horde | Antichess) => 0
           case (a, _) if a >= 4                    => 1

@@ -1,8 +1,9 @@
 package lila.round
 
-import chess.format.Forsyth
-import chess.variant._
-import chess.{ Game => ChessGame, Board, Color => ChessColor, Castles, Clock, Situation, History }
+import strategygames.chess.format.Forsyth
+import strategygames.chess.variant._
+import strategygames.chess.{ Game => ChessGame, Board, Color => ChessColor, Castles, Situation, History }
+import strategygames.{ Clock }
 import ChessColor.{ Black, White }
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
@@ -118,17 +119,17 @@ final private class Rematcher(
         chess = ChessGame(
           situation = Situation(
             board = board,
-            color = situation.fold[chess.Color](White)(_.situation.color)
+            color = situation.fold[strategygames.chess.Color](White)(_.situation.color)
           ),
           clock = pov.game.clock map { c =>
-            Clock(c.config)
+            Clock(strategygames.GameLib.Chess(), c.config)
           },
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)
         ),
         whitePlayer = returnPlayer(pov.game, White, users),
         blackPlayer = returnPlayer(pov.game, Black, users),
-        mode = if (users.exists(_.lame)) chess.Mode.Casual else pov.game.mode,
+        mode = if (users.exists(_.lame)) strategygames.Mode.Casual else pov.game.mode,
         source = pov.game.source | Source.Lobby,
         daysPerTurn = pov.game.daysPerTurn,
         pgnImport = None
@@ -163,6 +164,6 @@ final private class Rematcher(
 private object Rematcher {
 
   case class Offers(white: Boolean, black: Boolean) {
-    def apply(color: chess.Color) = color.fold(white, black)
+    def apply(color: strategygames.chess.Color) = color.fold(white, black)
   }
 }

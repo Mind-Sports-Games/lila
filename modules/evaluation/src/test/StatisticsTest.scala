@@ -2,7 +2,7 @@ package lila.evaluation
 
 import org.specs2.mutable._
 
-import chess.Centis
+import strategygames.Centis
 import Statistics._
 
 class StatisticsTest extends Specification {

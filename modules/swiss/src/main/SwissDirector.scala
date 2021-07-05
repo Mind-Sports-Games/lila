@@ -1,6 +1,6 @@
 package lila.swiss
 
-import chess.{ Black, Color, White }
+import strategygames.chess.{ Black, Color, White }
 import org.joda.time.DateTime
 import scala.util.chaining._
 
@@ -83,23 +83,23 @@ final private class SwissDirector(
   ): Game =
     Game
       .make(
-        chess = chess.Game(
+        chess = strategygames.chess.Game(
           variantOption = Some {
             if (swiss.settings.position.isEmpty) swiss.variant
-            else chess.variant.FromPosition
+            else strategygames.chess.variant.FromPosition
           },
           fen = swiss.settings.position
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
           g.copy(
-            clock = swiss.clock.toClock.some,
+            clock = swiss.clock.toClock(strategygames.GameLib.Chess()).some,
             turns = turns,
             startedAtTurn = turns
           )
         },
         whitePlayer = makePlayer(White, players get pairing.white err s"Missing pairing white $pairing"),
         blackPlayer = makePlayer(Black, players get pairing.black err s"Missing pairing black $pairing"),
-        mode = chess.Mode(swiss.settings.rated),
+        mode = strategygames.Mode(swiss.settings.rated),
         source = lila.game.Source.Swiss,
         pgnImport = None
       )

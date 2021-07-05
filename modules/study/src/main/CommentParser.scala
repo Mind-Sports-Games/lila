@@ -1,7 +1,7 @@
 package lila.study
 
-import chess.Centis
-import chess.Pos
+import strategygames.Centis
+import strategygames.chess.Pos
 import lila.common.Maths
 import lila.tree.Node.{ Shape, Shapes }
 

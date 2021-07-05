@@ -2,7 +2,8 @@ package lila.challenge
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
-import chess.{ Situation, Speed }
+import strategygames.chess.{ Situation }
+import strategygames.{ Speed }
 import org.joda.time.DateTime
 import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
@@ -102,9 +103,9 @@ final class ChallengeBulkApi(
       .map { case (id, white, black) =>
         val game = Game
           .make(
-            chess = chess.Game(situation = Situation(bulk.variant), clock = bulk.clock.toClock.some),
-            whitePlayer = Player.make(chess.White, white.some, _(perfType)),
-            blackPlayer = Player.make(chess.Black, black.some, _(perfType)),
+            chess = strategygames.chess.Game(situation = Situation(bulk.variant), clock = bulk.clock.toClock(strategygames.GameLib.Chess()).some),
+            whitePlayer = Player.make(strategygames.chess.White, white.some, _(perfType)),
+            blackPlayer = Player.make(strategygames.chess.Black, black.some, _(perfType)),
             mode = bulk.mode,
             source = lila.game.Source.Api,
             pgnImport = None

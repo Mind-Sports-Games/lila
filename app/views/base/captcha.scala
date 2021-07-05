@@ -30,8 +30,8 @@ object captcha {
         )(
           div(cls := "challenge")(
             views.html.board.bits.mini(
-              chess.format.FEN(captcha.fenBoard),
-              chess.Color.fromWhite(captcha.white)
+              strategygames.chess.format.FEN(captcha.fenBoard),
+              strategygames.chess.Color.fromWhite(captcha.white)
             ) {
               div(
                 dataMoves := safeJsonValue(Json.toJson(captcha.moves)),

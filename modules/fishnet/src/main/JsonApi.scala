@@ -1,7 +1,7 @@
 package lila.fishnet
 
-import chess.format.{ FEN, Uci }
-import chess.variant.Variant
+import strategygames.chess.format.{ FEN, Uci }
+import strategygames.chess.variant.Variant
 import org.joda.time.DateTime
 import play.api.libs.json._
 

@@ -1,11 +1,11 @@
 package lila.tree
 
-import chess.Centis
-import chess.format.pgn.{ Glyph, Glyphs }
-import chess.format.{ FEN, Uci, UciCharPair }
-import chess.opening.FullOpening
-import chess.Pos
-import chess.variant.Crazyhouse
+import strategygames.Centis
+import strategygames.chess.format.pgn.{ Glyph, Glyphs }
+import strategygames.chess.format.{ FEN, Uci, UciCharPair }
+import strategygames.chess.opening.FullOpening
+import strategygames.chess.Pos
+import strategygames.chess.variant.Crazyhouse
 import play.api.libs.json._
 
 import lila.common.Json._
@@ -36,7 +36,7 @@ sealed trait Node {
   def moveOption: Option[Uci.WithSan]
 
   // who's color plays next
-  def color = chess.Color.fromPly(ply)
+  def color = strategygames.chess.Color.fromPly(ply)
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
@@ -204,11 +204,11 @@ object Node {
       }
     )
   }
-  implicit private val crazyhouseDataWriter: OWrites[chess.variant.Crazyhouse.Data] = OWrites { v =>
+  implicit private val crazyhouseDataWriter: OWrites[strategygames.chess.variant.Crazyhouse.Data] = OWrites { v =>
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 
-  implicit val openingWriter: OWrites[chess.opening.FullOpening] = OWrites { o =>
+  implicit val openingWriter: OWrites[strategygames.chess.opening.FullOpening] = OWrites { o =>
     Json.obj(
       "eco"  -> o.eco,
       "name" -> o.name

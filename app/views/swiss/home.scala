@@ -199,7 +199,7 @@ object home {
       i("?"),
       p(
         strong("Why is it restricted to teams?"),
-        "Swiss tournaments were not designed for online chess. They demand punctuality, dedication and patience from players.",
+        "Swiss tournaments were not designed for online strategygames.chess. They demand punctuality, dedication and patience from players.",
         br,
         "We think these conditions are more likely to be met within a team than in global tournaments."
       )

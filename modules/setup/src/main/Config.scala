@@ -1,8 +1,9 @@
 package lila.setup
 
-import chess.{ Game => ChessGame, Situation, Clock, Speed }
-import chess.variant.{ FromPosition, Variant }
-import chess.format.FEN
+import strategygames.chess.{ Game => ChessGame, Situation }
+import strategygames.{ Clock, Speed }
+import strategygames.chess.variant.{ FromPosition, Variant }
+import strategygames.chess.format.FEN
 
 import lila.game.Game
 import lila.lobby.Color
@@ -32,7 +33,7 @@ private[setup] trait Config {
   lazy val creatorColor = color.resolve
 
   def makeGame(v: Variant): ChessGame =
-    ChessGame(situation = Situation(v), clock = makeClock.map(_.toClock))
+    ChessGame(situation = Situation(v), clock = makeClock.map(_.toClock(strategygames.GameLib.Chess())))
 
   def makeGame: ChessGame = makeGame(variant)
 
@@ -55,7 +56,7 @@ private[setup] trait Config {
 
 trait Positional { self: Config =>
 
-  import chess.format.Forsyth, Forsyth.SituationPlus
+  import strategygames.chess.format.Forsyth, Forsyth.SituationPlus
 
   def fen: Option[FEN]
 
@@ -77,9 +78,9 @@ trait Positional { self: Config =>
           situation = s,
           turns = sit.turns,
           startedAtTurn = sit.turns,
-          clock = makeClock.map(_.toClock)
+          clock = makeClock.map(_.toClock(strategygames.GameLib.Chess()))
         )
-        if (Forsyth.>>(game).initial) makeGame(chess.variant.Standard) -> none
+        if (Forsyth.>>(game).initial) makeGame(strategygames.chess.variant.Standard) -> none
         else game                                                      -> baseState
     }
     val game = builder(chessGame)
@@ -102,30 +103,30 @@ trait Positional { self: Config =>
 object Config extends BaseConfig
 
 trait BaseConfig {
-  val variants       = List(chess.variant.Standard.id, chess.variant.Chess960.id)
-  val variantDefault = chess.variant.Standard
+  val variants       = List(strategygames.chess.variant.Standard.id, strategygames.chess.variant.Chess960.id)
+  val variantDefault = strategygames.chess.variant.Standard
 
   val variantsWithFen = variants :+ FromPosition.id
   val aiVariants = variants :+
-    chess.variant.Crazyhouse.id :+
-    chess.variant.KingOfTheHill.id :+
-    chess.variant.ThreeCheck.id :+
-    chess.variant.Antichess.id :+
-    chess.variant.Atomic.id :+
-    chess.variant.Horde.id :+
-    chess.variant.RacingKings.id :+
+    strategygames.chess.variant.Crazyhouse.id :+
+    strategygames.chess.variant.KingOfTheHill.id :+
+    strategygames.chess.variant.ThreeCheck.id :+
+    strategygames.chess.variant.Antichess.id :+
+    strategygames.chess.variant.Atomic.id :+
+    strategygames.chess.variant.Horde.id :+
+    strategygames.chess.variant.RacingKings.id :+
     //chess.variant.LinesOfAction.id :+
-    chess.variant.FromPosition.id
+    strategygames.chess.variant.FromPosition.id
   val variantsWithVariants =
     variants :+
-      chess.variant.Crazyhouse.id :+
-      chess.variant.KingOfTheHill.id :+
-      chess.variant.ThreeCheck.id :+
-      chess.variant.Antichess.id :+
-      chess.variant.Atomic.id :+
-      chess.variant.Horde.id :+
-      chess.variant.RacingKings.id :+
-      chess.variant.LinesOfAction.id
+      strategygames.chess.variant.Crazyhouse.id :+
+      strategygames.chess.variant.KingOfTheHill.id :+
+      strategygames.chess.variant.ThreeCheck.id :+
+      strategygames.chess.variant.Antichess.id :+
+      strategygames.chess.variant.Atomic.id :+
+      strategygames.chess.variant.Horde.id :+
+      strategygames.chess.variant.RacingKings.id :+
+      strategygames.chess.variant.LinesOfAction.id
   val variantsWithFenAndVariants =
     variantsWithVariants :+ FromPosition.id
 

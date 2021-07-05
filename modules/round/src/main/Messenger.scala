@@ -39,7 +39,7 @@ final class Messenger(api: ChatApi) {
         api.userChat.write(Chat.Id(gameId.value), userId, text, publicSource = none, _.Round)
     }
 
-  def owner(game: Game, anonColor: chess.Color, text: String): Funit =
+  def owner(game: Game, anonColor: strategygames.chess.Color, text: String): Funit =
     (game.fromFriend || presets.contains(text)) ??
       api.playerChat.write(Chat.Id(game.id), anonColor, text, _.Round)
 

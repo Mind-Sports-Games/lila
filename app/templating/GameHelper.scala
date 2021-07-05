@@ -1,7 +1,8 @@
 package lila.app
 package templating
 
-import chess.{ Status => S, Color, Black, White, Clock, Mode }
+import strategygames.chess.{ Color, Black, White }
+import strategygames.{ Status => S, Clock, Mode }
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -25,7 +26,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     )
 
   def titleGame(g: Game) = {
-    val speed   = chess.Speed(g.clock.map(_.config)).name
+    val speed   = strategygames.Speed(g.clock.map(_.config)).name
     val variant = g.variant.exotic ?? s" ${g.variant.name}"
     s"$speed$variant Chess • ${playerText(g.whitePlayer)} vs ${playerText(g.blackPlayer)}"
   }
@@ -37,15 +38,15 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     val speedAndClock =
       if (game.imported) "imported"
       else
-        game.clock.fold(chess.Speed.Correspondence.name) { c =>
-          s"${chess.Speed(c.config).name} (${c.config.show})"
+        game.clock.fold(strategygames.Speed.Correspondence.name) { c =>
+          s"${strategygames.Speed(c.config).name} (${c.config.show})"
         }
     val mode = game.mode.name
     val variant =
-      if (game.variant == chess.variant.FromPosition) "position setup chess"
+      if (game.variant == strategygames.chess.variant.FromPosition) "position setup chess"
       else if (game.variant.exotic) game.variant.name
       else "chess"
-    import chess.Status._
+    import strategygames.Status._
     val result = (game.winner, game.loser, game.status) match {
       case (Some(w), _, Mate)                               => s"${playerText(w)} won by checkmate"
       case (_, Some(l), Resign | Timeout | Cheat | NoStart) => s"${playerText(l)} resigned"
@@ -55,14 +56,14 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (_, _, Aborted)                                  => "Game has been aborted"
       case (_, _, VariantEnd) =>
         game.variant match {
-          case chess.variant.KingOfTheHill => "King in the center"
-          case chess.variant.ThreeCheck    => "Three checks"
-          case chess.variant.Antichess     => "Lose all your pieces to win"
-          case chess.variant.Atomic        => "Explode or mate your opponent's king to win"
-          case chess.variant.Horde         => "Destroy the horde to win"
-          case chess.variant.RacingKings   => "Race to the eighth rank to win"
-          case chess.variant.Crazyhouse    => "Drop captured pieces on the board"
-          case chess.variant.LinesOfAction => "Lines of Action"
+          case strategygames.chess.variant.KingOfTheHill => "King in the center"
+          case strategygames.chess.variant.ThreeCheck    => "Three checks"
+          case strategygames.chess.variant.Antichess     => "Lose all your pieces to win"
+          case strategygames.chess.variant.Atomic        => "Explode or mate your opponent's king to win"
+          case strategygames.chess.variant.Horde         => "Destroy the horde to win"
+          case strategygames.chess.variant.RacingKings   => "Race to the eighth rank to win"
+          case strategygames.chess.variant.Crazyhouse    => "Drop captured pieces on the board"
+          case strategygames.chess.variant.LinesOfAction => "Lines of Action"
           case _                           => "Variant ending"
         }
       case _ => "Game is still being played"
@@ -71,14 +72,14 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     s"$p1 plays $p2 in a $mode $speedAndClock game of $variant. $result after $moves. Click to replay, analyse, and discuss the game!"
   }
 
-  def variantName(variant: chess.variant.Variant)(implicit lang: Lang) =
+  def variantName(variant: strategygames.chess.variant.Variant)(implicit lang: Lang) =
     variant match {
-      case chess.variant.Standard     => trans.standard.txt()
-      case chess.variant.FromPosition => trans.fromPosition.txt()
+      case strategygames.chess.variant.Standard     => trans.standard.txt()
+      case strategygames.chess.variant.FromPosition => trans.fromPosition.txt()
       case v                          => v.name
     }
 
-  def variantNameNoCtx(variant: chess.variant.Variant) = variantName(variant)(defaultLang)
+  def variantNameNoCtx(variant: strategygames.chess.variant.Variant) = variantName(variant)(defaultLang)
 
   def shortClockName(clock: Option[Clock.Config])(implicit lang: Lang): Frag =
     clock.fold[Frag](trans.unlimited())(shortClockName)
@@ -198,10 +199,10 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Cheat => trans.cheatDetected.txt()
       case S.VariantEnd =>
         game.variant match {
-          case chess.variant.KingOfTheHill => trans.kingInTheCenter.txt()
-          case chess.variant.ThreeCheck    => trans.threeChecks.txt()
-          case chess.variant.RacingKings   => trans.raceFinished.txt()
-          case chess.variant.LinesOfAction => trans.checkersConnected.txt()
+          case strategygames.chess.variant.KingOfTheHill => trans.kingInTheCenter.txt()
+          case strategygames.chess.variant.ThreeCheck    => trans.threeChecks.txt()
+          case strategygames.chess.variant.RacingKings   => trans.raceFinished.txt()
+          case strategygames.chess.variant.LinesOfAction => trans.checkersConnected.txt()
           case _                           => trans.variantEnding.txt()
         }
       case _ => ""
@@ -219,12 +220,12 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
 
   // whiteUsername 1-0 blackUsername
   def gameSummary(whiteUserId: String, blackUserId: String, finished: Boolean, result: Option[Boolean]) = {
-    val res = if (finished) chess.Color.showResult(result map Color.fromWhite) else "*"
+    val res = if (finished) strategygames.chess.Color.showResult(result map Color.fromWhite) else "*"
     s"${usernameOrId(whiteUserId)} $res ${usernameOrId(blackUserId)}"
   }
 
   def gameResult(game: Game) =
-    if (game.finished) chess.Color.showResult(game.winnerColor)
+    if (game.finished) strategygames.chess.Color.showResult(game.winnerColor)
     else "*"
 
   def gameLink(
@@ -244,8 +245,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
   def gameLink(pov: Pov)(implicit ctx: Context): String = gameLink(pov.game, pov.color)
 
   def challengeTitle(c: lila.challenge.Challenge)(implicit lang: Lang) = {
-    val speed = c.clock.map(_.config).fold(chess.Speed.Correspondence.name) { clock =>
-      s"${chess.Speed(clock).name} (${clock.show})"
+    val speed = c.clock.map(_.config).fold(strategygames.Speed.Correspondence.name) { clock =>
+      s"${strategygames.Speed(clock).name} (${clock.show})"
     }
     val variant = c.variant.exotic ?? s" ${c.variant.name}"
     val challenger = c.challengerUser.fold(trans.anonymous.txt()) { reg =>
@@ -263,7 +264,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
   def challengeOpenGraph(c: lila.challenge.Challenge)(implicit lang: Lang) =
     lila.app.ui.OpenGraph(
       title = challengeTitle(c),
-      url = s"$netBaseUrl${routes.Round.watcher(c.id, chess.White.name).url}",
+      url = s"$netBaseUrl${routes.Round.watcher(c.id, strategygames.chess.White.name).url}",
       description = "Join the challenge or watch the game here."
     )
 }

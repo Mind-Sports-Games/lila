@@ -1,9 +1,9 @@
 package lila.socket
 
 import cats.data.Validated
-import chess.format.{ FEN, Uci, UciCharPair }
-import chess.opening._
-import chess.variant.Variant
+import strategygames.chess.format.{ FEN, Uci, UciCharPair }
+import strategygames.chess.opening._
+import strategygames.chess.variant.Variant
 import play.api.libs.json._
 
 import lila.tree.Branch
@@ -16,21 +16,21 @@ trait AnaAny {
 }
 
 case class AnaMove(
-    orig: chess.Pos,
-    dest: chess.Pos,
+    orig: strategygames.chess.Pos,
+    dest: strategygames.chess.Pos,
     variant: Variant,
     fen: FEN,
     path: String,
     chapterId: Option[String],
-    promotion: Option[chess.PromotableRole]
+    promotion: Option[strategygames.chess.PromotableRole]
 ) extends AnaAny {
 
   def branch: Validated[String, Branch] =
-    chess.Game(variant.some, fen.some)(orig, dest, promotion) flatMap { case (game, move) =>
+    strategygames.chess.Game(variant.some, fen.some)(orig, dest, promotion) flatMap { case (game, move) =>
       game.pgnMoves.lastOption toValid "Moved but no last move!" map { san =>
         val uci     = Uci(move)
         val movable = game.situation playable false
-        val fen     = chess.format.Forsyth >> game
+        val fen     = strategygames.chess.format.Forsyth >> game
         Branch(
           id = UciCharPair(uci),
           ply = game.turns,
@@ -53,17 +53,17 @@ object AnaMove {
   def parse(o: JsObject) =
     for {
       d    <- o obj "d"
-      orig <- d str "orig" flatMap chess.Pos.fromKey
-      dest <- d str "dest" flatMap chess.Pos.fromKey
+      orig <- d str "orig" flatMap strategygames.chess.Pos.fromKey
+      dest <- d str "dest" flatMap strategygames.chess.Pos.fromKey
       fen  <- d str "fen" map FEN.apply
       path <- d str "path"
     } yield AnaMove(
       orig = orig,
       dest = dest,
-      variant = chess.variant.Variant orDefault ~d.str("variant"),
+      variant = strategygames.chess.variant.Variant orDefault ~d.str("variant"),
       fen = fen,
       path = path,
       chapterId = d str "ch",
-      promotion = d str "promotion" flatMap chess.Role.promotable
+      promotion = d str "promotion" flatMap strategygames.chess.Role.promotable
     )
 }

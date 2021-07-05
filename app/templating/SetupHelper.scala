@@ -1,8 +1,8 @@
 package lila.app
 package templating
 
-import chess.{ Mode, Speed }
-import chess.variant.Variant
+import strategygames.{ Mode, Speed }
+import strategygames.chess.variant.Variant
 import play.api.i18n.Lang
 
 import lila.i18n.{ I18nKeys => trans }
@@ -116,7 +116,7 @@ trait SetupHelper { self: I18nHelper =>
 
   def translatedVariantChoices(encode: Variant => String)(implicit lang: Lang): List[SelectChoice] =
     List(
-      (encode(chess.variant.Standard), trans.standard.txt(), chess.variant.Standard.title.some)
+      (encode(strategygames.chess.variant.Standard), trans.standard.txt(), strategygames.chess.variant.Standard.title.some)
     )
 
   def translatedVariantChoicesWithVariants(implicit lang: Lang): List[SelectChoice] =
@@ -126,37 +126,37 @@ trait SetupHelper { self: I18nHelper =>
       encode: Variant => String
   )(implicit lang: Lang): List[SelectChoice] =
     translatedVariantChoices(encode) ::: List(
-      chess.variant.Crazyhouse,
-      chess.variant.Chess960,
-      chess.variant.KingOfTheHill,
-      chess.variant.ThreeCheck,
-      chess.variant.Antichess,
-      chess.variant.Atomic,
-      chess.variant.Horde,
-      chess.variant.RacingKings,
-      chess.variant.LinesOfAction
+      strategygames.chess.variant.Crazyhouse,
+      strategygames.chess.variant.Chess960,
+      strategygames.chess.variant.KingOfTheHill,
+      strategygames.chess.variant.ThreeCheck,
+      strategygames.chess.variant.Antichess,
+      strategygames.chess.variant.Atomic,
+      strategygames.chess.variant.Horde,
+      strategygames.chess.variant.RacingKings,
+      strategygames.chess.variant.LinesOfAction
     ).map(variantTuple(encode))
 
   def translatedVariantChoicesWithFen(implicit lang: Lang) =
     translatedVariantChoices :+
-      variantTupleId(chess.variant.Chess960) :+
-      variantTupleId(chess.variant.FromPosition)
+      variantTupleId(strategygames.chess.variant.Chess960) :+
+      variantTupleId(strategygames.chess.variant.FromPosition)
 
   def translatedAiVariantChoices(implicit lang: Lang) =
     translatedVariantChoices :+
-      variantTupleId(chess.variant.Crazyhouse) :+
-      variantTupleId(chess.variant.Chess960) :+
-      variantTupleId(chess.variant.KingOfTheHill) :+
-      variantTupleId(chess.variant.ThreeCheck) :+
-      variantTupleId(chess.variant.Antichess) :+
-      variantTupleId(chess.variant.Atomic) :+
-      variantTupleId(chess.variant.Horde) :+
-      variantTupleId(chess.variant.RacingKings) :+
-      variantTupleId(chess.variant.FromPosition)
+      variantTupleId(strategygames.chess.variant.Crazyhouse) :+
+      variantTupleId(strategygames.chess.variant.Chess960) :+
+      variantTupleId(strategygames.chess.variant.KingOfTheHill) :+
+      variantTupleId(strategygames.chess.variant.ThreeCheck) :+
+      variantTupleId(strategygames.chess.variant.Antichess) :+
+      variantTupleId(strategygames.chess.variant.Atomic) :+
+      variantTupleId(strategygames.chess.variant.Horde) :+
+      variantTupleId(strategygames.chess.variant.RacingKings) :+
+      variantTupleId(strategygames.chess.variant.FromPosition)
 
   def translatedVariantChoicesWithVariantsAndFen(implicit lang: Lang) =
     translatedVariantChoicesWithVariants :+
-      variantTupleId(chess.variant.FromPosition)
+      variantTupleId(strategygames.chess.variant.FromPosition)
 
   def translatedSpeedChoices(implicit lang: Lang) =
     Speed.limited map { s =>

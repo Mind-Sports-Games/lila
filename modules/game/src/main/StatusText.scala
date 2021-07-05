@@ -1,7 +1,8 @@
 package lila.game
 
-import chess.variant.Variant
-import chess.{ Color, Status }
+import strategygames.chess.variant.Variant
+import strategygames.chess.{ Color }
+import strategygames.{ Status }
 
 object StatusText {
 
@@ -21,10 +22,10 @@ object StatusText {
       case Cheat                    => "Cheat detected."
       case VariantEnd =>
         variant match {
-          case chess.variant.KingOfTheHill => s"${winner(win)} brings the king in the center."
-          case chess.variant.ThreeCheck    => s"${winner(win)} gives the third check."
-          case chess.variant.RacingKings   => s"${winner(win)} wins the race."
-          case chess.variant.LinesOfAction => s"${winner(win)} connects all of their pieces."
+          case strategygames.chess.variant.KingOfTheHill => s"${winner(win)} brings the king in the center."
+          case strategygames.chess.variant.ThreeCheck    => s"${winner(win)} gives the third check."
+          case strategygames.chess.variant.RacingKings   => s"${winner(win)} wins the race."
+          case strategygames.chess.variant.LinesOfAction => s"${winner(win)} connects all of their pieces."
           case _                           => "Game ends by variant rule."
         }
       case _ => ""

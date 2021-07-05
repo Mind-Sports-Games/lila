@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import chess.format.Uci
+import strategygames.chess.format.Uci
 import io.lettuce.core._
 import io.lettuce.core.pubsub._
 import scala.concurrent.Future

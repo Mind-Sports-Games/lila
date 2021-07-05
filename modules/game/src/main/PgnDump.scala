@@ -1,9 +1,10 @@
 package lila.game
 
-import chess.format.Forsyth
-import chess.format.pgn.{ ParsedPgn, Parser, Pgn, Tag, TagType, Tags }
-import chess.format.{ FEN, pgn => chessPgn }
-import chess.{ Centis, Color }
+import strategygames.chess.format.Forsyth
+import strategygames.chess.format.pgn.{ ParsedPgn, Parser, Pgn, Tag, TagType, Tags }
+import strategygames.chess.format.{ FEN, pgn => chessPgn }
+import strategygames.chess.{ Color }
+import strategygames.{ Centis }
 
 import lila.common.config.BaseUrl
 import lila.common.LightUser
@@ -54,8 +55,8 @@ final class PgnDump(
   def player(p: Player, u: Option[LightUser]) =
     p.aiLevel.fold(u.fold(p.name | lila.user.User.anonymous)(_.name))("playstrategy AI level " + _)
 
-  private val customStartPosition: Set[chess.variant.Variant] =
-    Set(chess.variant.Chess960, chess.variant.FromPosition, chess.variant.Horde, chess.variant.RacingKings)
+  private val customStartPosition: Set[strategygames.chess.variant.Variant] =
+    Set(strategygames.chess.variant.Chess960, strategygames.chess.variant.FromPosition, strategygames.chess.variant.Horde, strategygames.chess.variant.RacingKings)
 
   private def eventOf(game: Game) = {
     val perf = game.perfType.fold("Standard")(_.trans(lila.i18n.defaultLang))
@@ -120,7 +121,7 @@ final class PgnDump(
           withOpening option Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
           Tag(
             _.Termination, {
-              import chess.Status._
+              import strategygames.Status._
               game.status match {
                 case Created | Started                             => "Unterminated"
                 case Aborted | NoStart                             => "Abandoned"

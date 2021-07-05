@@ -1,8 +1,8 @@
 package lila.setup
 
-import chess.Clock
-import chess.format.FEN
-import chess.variant.{ FromPosition, Variant }
+import strategygames.Clock
+import strategygames.chess.format.FEN
+import strategygames.chess.variant.{ FromPosition, Variant }
 
 import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.Color
@@ -31,7 +31,7 @@ final case class ApiAiConfig(
   def game(user: Option[User]) =
     fenGame { chessGame =>
       val perfPicker = lila.game.PerfPicker.mainOrDefault(
-        chess.Speed(chessGame.clock.map(_.config)),
+        strategygames.Speed(chessGame.clock.map(_.config)),
         chessGame.situation.board.variant,
         makeDaysPerTurn
       )
@@ -39,14 +39,14 @@ final case class ApiAiConfig(
         .make(
           chess = chessGame,
           whitePlayer = creatorColor.fold(
-            Player.make(chess.White, user, perfPicker),
-            Player.make(chess.White, level.some)
+            Player.make(strategygames.chess.White, user, perfPicker),
+            Player.make(strategygames.chess.White, level.some)
           ),
           blackPlayer = creatorColor.fold(
-            Player.make(chess.Black, level.some),
-            Player.make(chess.Black, user, perfPicker)
+            Player.make(strategygames.chess.Black, level.some),
+            Player.make(strategygames.chess.Black, user, perfPicker)
           ),
-          mode = chess.Mode.Casual,
+          mode = strategygames.Mode.Casual,
           source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
@@ -74,7 +74,7 @@ object ApiAiConfig extends BaseConfig {
       pos: Option[String]
   ) =
     new ApiAiConfig(
-      variant = chess.variant.Variant.orDefault(~v),
+      variant = strategygames.chess.variant.Variant.orDefault(~v),
       clock = cl,
       daysO = d,
       color = Color.orDefault(~c),

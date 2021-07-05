@@ -2,18 +2,9 @@ package lila.game
 
 import play.api.libs.json._
 
-import chess.variant.Crazyhouse
-import chess.{
-  Centis,
-  PromotableRole,
-  Pos,
-  Color,
-  Situation,
-  Move => ChessMove,
-  Drop => ChessDrop,
-  Clock => ChessClock,
-  Status
-}
+import strategygames.chess.variant.Crazyhouse
+import strategygames.chess.{ PromotableRole, Pos, Color, Situation, Move => ChessMove, Drop => ChessDrop }
+import strategygames.{ Centis, Clock => ChessClock, Status }
 import JsonView._
 import lila.chat.{ PlayerLine, UserLine }
 import lila.common.ApiVersion
@@ -111,8 +102,8 @@ object Event {
       Move(
         orig = move.orig,
         dest = move.dest,
-        san = chess.format.pgn.Dumper(move),
-        fen = chess.format.Forsyth.exportBoard(situation.board),
+        san = strategygames.chess.format.pgn.Dumper(move),
+        fen = strategygames.chess.format.Forsyth.exportBoard(situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         promotion = move.promotion.map { Promotion(_, move.dest) },
@@ -131,7 +122,7 @@ object Event {
   }
 
   case class Drop(
-      role: chess.Role,
+      role: strategygames.chess.Role,
       pos: Pos,
       san: String,
       fen: String,
@@ -165,8 +156,8 @@ object Event {
       Drop(
         role = drop.piece.role,
         pos = drop.pos,
-        san = chess.format.pgn.Dumper(drop),
-        fen = chess.format.Forsyth.exportBoard(situation.board),
+        san = strategygames.chess.format.pgn.Dumper(drop),
+        fen = strategygames.chess.format.Forsyth.exportBoard(situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         state = state,
@@ -280,8 +271,8 @@ object Event {
         )
         .add("clock" -> game.clock.map { c =>
           Json.obj(
-            "wc" -> c.remainingTime(Color.White).centis,
-            "bc" -> c.remainingTime(Color.Black).centis
+            "wc" -> c.remainingTime(strategygames.White(strategygames.GameLib.Chess())).centis,
+            "bc" -> c.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).centis
           )
         })
         .add("ratingDiff" -> ratingDiff.map { rds =>
@@ -345,8 +336,8 @@ object Event {
   object Clock {
     def apply(clock: ChessClock): Clock =
       Clock(
-        clock remainingTime Color.White,
-        clock remainingTime Color.Black,
+        clock remainingTime strategygames.White(strategygames.GameLib.Chess()),
+        clock remainingTime strategygames.Black(strategygames.GameLib.Chess()),
         clock lagCompEstimate clock.color
       )
   }

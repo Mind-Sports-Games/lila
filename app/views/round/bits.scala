@@ -1,7 +1,7 @@
 package views.html
 package round
 
-import chess.variant.{ Crazyhouse, Variant }
+import strategygames.chess.variant.{ Crazyhouse, Variant }
 import controllers.routes
 import scala.util.chaining._
 
@@ -121,7 +121,7 @@ object bits {
   )(implicit ctx: Context) =
     views.html.game.side(
       pov,
-      (data \ "game" \ "initialFen").asOpt[String].map(chess.format.FEN.apply),
+      (data \ "game" \ "initialFen").asOpt[String].map(strategygames.chess.format.FEN.apply),
       tour,
       simul = simul,
       userTv = userTv,

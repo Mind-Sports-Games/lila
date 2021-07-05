@@ -8,8 +8,8 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import chess.format.FEN
-import chess.variant.Variant
+import strategygames.chess.format.FEN
+import strategygames.chess.variant.Variant
 import io.lemonlabs.uri.AbsoluteUrl
 
 trait Handlers {
@@ -120,11 +120,11 @@ trait Handlers {
   implicit val normalizedEmailAddressHandler =
     isoHandler[NormalizedEmailAddress, String](normalizedEmailAddressIso)
 
-  implicit val colorBoolHandler = BSONBooleanHandler.as[chess.Color](chess.Color.fromWhite, _.white)
+  implicit val colorBoolHandler = BSONBooleanHandler.as[strategygames.chess.Color](strategygames.chess.Color.fromWhite, _.white)
 
   implicit val FENHandler: BSONHandler[FEN] = stringAnyValHandler[FEN](_.value, FEN.apply)
 
-  implicit val modeHandler = BSONBooleanHandler.as[chess.Mode](chess.Mode.apply, _.rated)
+  implicit val modeHandler = BSONBooleanHandler.as[strategygames.Mode](strategygames.Mode.apply, _.rated)
 
   val variantByKeyHandler: BSONHandler[Variant] = quickHandler[Variant](
     {
@@ -134,12 +134,12 @@ trait Handlers {
     v => BSONString(v.key)
   )
 
-  val clockConfigHandler = tryHandler[chess.Clock.Config](
+  val clockConfigHandler = tryHandler[strategygames.Clock.Config](
     { case doc: BSONDocument =>
       for {
         limit <- doc.getAsTry[Int]("limit")
         inc   <- doc.getAsTry[Int]("increment")
-      } yield chess.Clock.Config(limit, inc)
+      } yield strategygames.Clock.Config(limit, inc)
     },
     c =>
       BSONDocument(

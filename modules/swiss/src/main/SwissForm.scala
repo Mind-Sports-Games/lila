@@ -1,8 +1,8 @@
 package lila.swiss
 
-import chess.Clock.{ Config => ClockConfig }
-import chess.format.FEN
-import chess.variant.Variant
+import strategygames.Clock.{ Config => ClockConfig }
+import strategygames.chess.format.FEN
+import strategygames.chess.variant.Variant
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -91,7 +91,7 @@ object SwissForm {
 
   val clockLimitChoices = options(
     clockLimits,
-    l => s"${chess.Clock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
+    l => s"${strategygames.Clock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
   )
 
   val roundIntervals: Seq[Int] =
@@ -157,8 +157,8 @@ object SwissForm {
     def realRoundInterval = {
       (roundInterval | Swiss.RoundInterval.auto) match {
         case Swiss.RoundInterval.auto =>
-          import chess.Speed._
-          chess.Speed(clock) match {
+          import strategygames.Speed._
+          strategygames.Speed(clock) match {
             case UltraBullet                               => 5
             case Bullet                                    => 10
             case Blitz if clock.estimateTotalSeconds < 300 => 20

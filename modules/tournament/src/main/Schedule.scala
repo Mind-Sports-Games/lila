@@ -1,7 +1,7 @@
 package lila.tournament
 
-import chess.format.FEN
-import chess.variant.Variant
+import strategygames.chess.format.FEN
+import strategygames.chess.variant.Variant
 import org.joda.time.DateTime
 import play.api.i18n.Lang
 
@@ -222,7 +222,7 @@ object Schedule {
         case (HyperBullet, UltraBullet) | (UltraBullet, HyperBullet) => true
         case _                                                       => false
       }
-    def fromClock(clock: chess.Clock.Config) = {
+    def fromClock(clock: strategygames.Clock.Config) = {
       val time = clock.estimateTotalSeconds
       if (time < 30) UltraBullet
       else if (time < 60) HyperBullet
@@ -252,7 +252,7 @@ object Schedule {
 
   private[tournament] def durationFor(s: Schedule): Int = {
     import Freq._, Speed._
-    import chess.variant._
+    import strategygames.chess.variant._
 
     (s.freq, s.variant, s.speed) match {
 
@@ -311,7 +311,7 @@ object Schedule {
   private def zhInc(s: Schedule)       = s.at.getHourOfDay % 2 == 0
 
   private def zhEliteTc(s: Schedule) = {
-    val TC = chess.Clock.Config
+    val TC = strategygames.Clock.Config
     s.at.getDayOfMonth / 7 match {
       case 0 => TC(3 * 60, 0)
       case 1 => TC(1 * 60, 1)
@@ -323,9 +323,9 @@ object Schedule {
 
   private[tournament] def clockFor(s: Schedule) = {
     import Freq._, Speed._
-    import chess.variant._
+    import strategygames.chess.variant._
 
-    val TC = chess.Clock.Config
+    val TC = strategygames.Clock.Config
 
     (s.freq, s.variant, s.speed) match {
       // Special cases.
@@ -368,7 +368,7 @@ object Schedule {
       }
 
       val minRating = (s.freq, s.variant) match {
-        case (Weekend, chess.variant.Crazyhouse) => 2100
+        case (Weekend, strategygames.chess.variant.Crazyhouse) => 2100
         case (Weekend, _)                        => 2200
         case _                                   => 0
       }

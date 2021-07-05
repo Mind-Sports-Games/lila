@@ -1,8 +1,9 @@
 package lila.challenge
 
-import chess.format.FEN
-import chess.variant.{ Chess960, FromPosition, Horde, RacingKings, Variant, LinesOfAction }
-import chess.{ Color, Mode, Speed }
+import strategygames.chess.format.FEN
+import strategygames.chess.variant.{ Chess960, FromPosition, Horde, RacingKings, Variant, LinesOfAction }
+import strategygames.chess.{ Color }
+import strategygames.{ Mode, Speed }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
@@ -18,7 +19,7 @@ case class Challenge(
     timeControl: Challenge.TimeControl,
     mode: Mode,
     colorChoice: Challenge.ColorChoice,
-    finalColor: chess.Color,
+    finalColor: strategygames.chess.Color,
     challenger: Challenge.Challenger,
     destUser: Option[Challenge.Challenger.Registered],
     rematchOf: Option[Game.ID],
@@ -165,7 +166,7 @@ object Challenge {
   object TimeControl {
     case object Unlimited                extends TimeControl
     case class Correspondence(days: Int) extends TimeControl
-    case class Clock(config: chess.Clock.Config) extends TimeControl {
+    case class Clock(config: strategygames.Clock.Config) extends TimeControl {
       // All durations are expressed in seconds
       def limit     = config.limit
       def increment = config.increment
@@ -198,7 +199,7 @@ object Challenge {
         }
       )
       .orElse {
-        (variant == FromPosition) option perfTypeOf(chess.variant.Standard, timeControl)
+        (variant == FromPosition) option perfTypeOf(strategygames.chess.variant.Standard, timeControl)
       }
       .|(PerfType.Correspondence)
 
@@ -209,7 +210,7 @@ object Challenge {
   def toRegistered(variant: Variant, timeControl: TimeControl)(u: User) =
     Challenger.Registered(u.id, Rating(u.perfs(perfTypeOf(variant, timeControl))))
 
-  def randomColor = chess.Color.fromWhite(lila.common.ThreadLocalRandom.nextBoolean())
+  def randomColor = strategygames.chess.Color.fromWhite(lila.common.ThreadLocalRandom.nextBoolean())
 
   def make(
       variant: Variant,
@@ -223,8 +224,8 @@ object Challenge {
       name: Option[String] = None
   ): Challenge = {
     val (colorChoice, finalColor) = color match {
-      case "white" => ColorChoice.White  -> chess.White
-      case "black" => ColorChoice.Black  -> chess.Black
+      case "white" => ColorChoice.White  -> strategygames.chess.White
+      case "black" => ColorChoice.Black  -> strategygames.chess.Black
       case _       => ColorChoice.Random -> randomColor
     }
     val finalMode = timeControl match {

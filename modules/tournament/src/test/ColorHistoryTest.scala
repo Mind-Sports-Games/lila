@@ -5,8 +5,8 @@ object ColorHistoryTest {
   def apply(s: String): ColorHistory = {
     s.foldLeft(ColorHistory(0, 0)) { (acc, c) =>
       c match {
-        case 'W' => acc.inc(chess.White)
-        case 'B' => acc.inc(chess.Black)
+        case 'W' => acc.inc(strategygames.chess.White)
+        case 'B' => acc.inc(strategygames.chess.Black)
       }
     }
   }

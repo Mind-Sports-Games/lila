@@ -1,7 +1,7 @@
 package lila.tournament
 
 import akka.actor._
-import chess.StartingPosition
+import strategygames.chess.StartingPosition
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants._
 import scala.util.chaining._
@@ -14,7 +14,7 @@ final private class TournamentScheduler(
   import Schedule.Freq._
   import Schedule.Speed._
   import Schedule.Plan
-  import chess.variant._
+  import strategygames.chess.variant._
 
   implicit def ec = context.dispatcher
 
@@ -386,7 +386,7 @@ Thank you all, you rock!"""
                 List(
                   Schedule(Hourly, speed, Standard, none, finalDate, conditions).plan,
                   Schedule(Hourly, speed, Standard, none, finalDate plusMinutes 30, conditions)
-                    .plan(_.copy(clock = chess.Clock.Config(60, 1)))
+                    .plan(_.copy(clock = strategygames.Clock.Config(60, 1)))
                 )
               else
                 List(

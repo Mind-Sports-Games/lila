@@ -181,9 +181,9 @@ final class JsonView(
     )
 
     private def makeBranch(puzzle: Puzzle): Option[tree.Branch] = {
-      import chess.format._
-      val init = chess.Game(none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
-      val (_, branchList) = puzzle.line.tail.foldLeft[(chess.Game, List[tree.Branch])]((init, Nil)) {
+      import strategygames.chess.format._
+      val init = strategygames.chess.Game(none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
+      val (_, branchList) = puzzle.line.tail.foldLeft[(strategygames.chess.Game, List[tree.Branch])]((init, Nil)) {
         case ((prev, branches), uci) =>
           val (game, move) =
             prev(uci.orig, uci.dest, uci.promotion)
@@ -192,7 +192,7 @@ final class JsonView(
             id = UciCharPair(move.toUci),
             ply = game.turns,
             move = Uci.WithSan(move.toUci, game.pgnMoves.last),
-            fen = chess.format.Forsyth >> game,
+            fen = strategygames.chess.format.Forsyth >> game,
             check = game.situation.check,
             crazyData = none
           )

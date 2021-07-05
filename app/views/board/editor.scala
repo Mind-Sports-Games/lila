@@ -1,6 +1,6 @@
 package views.html.board
 
-import chess.format.FEN
+import strategygames.chess.format.FEN
 import controllers.routes
 
 import lila.api.Context
@@ -11,7 +11,7 @@ import lila.common.String.html.safeJsonValue
 object editor {
 
   def apply(
-      sit: chess.Situation,
+      sit: strategygames.chess.Situation,
       fen: FEN,
       positionsJson: String
   )(implicit ctx: Context) =

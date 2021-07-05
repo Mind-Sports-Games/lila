@@ -71,14 +71,14 @@ final private class GameStarter(
   ) =
     Game(
       id = id,
-      chess = chess.Game(
-        situation = chess.Situation(chess.variant.Standard),
-        clock = pool.clock.toClock.some
+      chess = strategygames.chess.Game(
+        situation = strategygames.chess.Situation(strategygames.chess.variant.Standard),
+        clock = pool.clock.toClock(strategygames.GameLib.Chess()).some
       ),
-      whitePlayer = Player.make(chess.White, whiteUser),
-      blackPlayer = Player.make(chess.Black, blackUser),
-      mode = chess.Mode.Rated,
-      status = chess.Status.Created,
+      whitePlayer = Player.make(strategygames.chess.White, whiteUser),
+      blackPlayer = Player.make(strategygames.chess.Black, blackUser),
+      mode = strategygames.Mode.Rated,
+      status = strategygames.Status.Created,
       daysPerTurn = none,
       metadata = Game.metadata(lila.game.Source.Pool)
     )

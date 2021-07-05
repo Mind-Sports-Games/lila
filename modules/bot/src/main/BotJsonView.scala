@@ -45,7 +45,7 @@ final class BotJsonView(
 
   def gameState(wf: Game.WithInitialFen): Fu[JsObject] = {
     import wf._
-    chess.format.UciDump(game.pgnMoves, fen, game.variant).toFuture map { uciMoves =>
+    strategygames.chess.format.UciDump(game.pgnMoves, fen, game.variant).toFuture map { uciMoves =>
       Json
         .obj(
           "type"   -> "gameState",
@@ -85,11 +85,14 @@ final class BotJsonView(
 
   private def millisOf(pov: Pov): Int =
     pov.game.clock
-      .map(_.remainingTime(pov.color).millis.toInt)
+      .map(_.remainingTime(pov.color match {
+        case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
+        case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
+      }).millis.toInt)
       .orElse(pov.game.correspondenceClock.map(_.remainingTime(pov.color).toInt * 1000))
       .getOrElse(Int.MaxValue)
 
-  implicit private val clockConfigWriter: OWrites[chess.Clock.Config] = OWrites { c =>
+  implicit private val clockConfigWriter: OWrites[strategygames.Clock.Config] = OWrites { c =>
     Json.obj(
       "initial"   -> c.limit.millis,
       "increment" -> c.increment.millis

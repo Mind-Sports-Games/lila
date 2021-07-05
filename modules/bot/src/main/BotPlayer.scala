@@ -1,6 +1,6 @@
 package lila.bot
 
-import chess.format.Uci
+import strategygames.chess.format.Uci
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 

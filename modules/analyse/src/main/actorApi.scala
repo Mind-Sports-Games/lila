@@ -7,8 +7,8 @@ case class AnalysisReady(game: Game, analysis: Analysis)
 
 case class AnalysisProgress(
     game: Game,
-    variant: chess.variant.Variant,
-    initialFen: chess.format.FEN,
+    variant: strategygames.chess.variant.Variant,
+    initialFen: strategygames.chess.format.FEN,
     analysis: Analysis
 )
 

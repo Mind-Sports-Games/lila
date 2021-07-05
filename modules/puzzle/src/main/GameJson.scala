@@ -1,7 +1,7 @@
 package lila.puzzle
 
-import chess.format.Forsyth
-import chess.format.UciCharPair
+import strategygames.chess.format.Forsyth
+import strategygames.chess.format.UciCharPair
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -99,7 +99,7 @@ final private class GameJson(
           val pgnMoves = game.pgnMoves.take(plies + 1)
           for {
             pgnMove <- pgnMoves.lastOption
-            situation <- chess.Replay
+            situation <- strategygames.chess.Replay
               .situations(pgnMoves, None, game.variant)
               .valueOr { err =>
                 sys.error(s"GameJson.generateBc ${game.id} $err")

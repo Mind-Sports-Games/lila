@@ -1,7 +1,7 @@
 package lila.common
 
-import chess.format.FEN
-import chess.format.Forsyth
+import strategygames.chess.format.FEN
+import strategygames.chess.format.Forsyth
 import io.lemonlabs.uri._
 import org.joda.time.{ DateTime, DateTimeZone }
 import play.api.data.format.Formats._

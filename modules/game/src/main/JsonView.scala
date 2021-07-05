@@ -2,9 +2,10 @@ package lila.game
 
 import play.api.libs.json._
 
-import chess.format.{ FEN, Forsyth }
-import chess.variant.Crazyhouse
-import chess.{ Clock, Color }
+import strategygames.chess.format.{ FEN, Forsyth }
+import strategygames.chess.variant.Crazyhouse
+import strategygames.chess.{ Color }
+import strategygames.{ Clock }
 import lila.common.Json.jodaWrites
 
 final class JsonView(rematches: Rematches) {
@@ -19,7 +20,7 @@ final class JsonView(rematches: Rematches) {
         "speed"         -> game.speed.key,
         "perf"          -> PerfPicker.key(game),
         "rated"         -> game.rated,
-        "initialFen"    -> (initialFen | chess.format.Forsyth.initial),
+        "initialFen"    -> (initialFen | strategygames.chess.format.Forsyth.initial),
         "fen"           -> (Forsyth >> game.chess),
         "player"        -> game.turnColor,
         "turns"         -> game.turns,
@@ -41,7 +42,7 @@ final class JsonView(rematches: Rematches) {
 
 object JsonView {
 
-  implicit val statusWrites: OWrites[chess.Status] = OWrites { s =>
+  implicit val statusWrites: OWrites[strategygames.Status] = OWrites { s =>
     Json.obj(
       "id"   -> s.id,
       "name" -> s.name
@@ -86,7 +87,7 @@ object JsonView {
     )
   }
 
-  implicit val crazyhouseDataWriter: OWrites[chess.variant.Crazyhouse.Data] = OWrites { v =>
+  implicit val crazyhouseDataWriter: OWrites[strategygames.chess.variant.Crazyhouse.Data] = OWrites { v =>
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 
@@ -97,7 +98,7 @@ object JsonView {
     )
   }
 
-  implicit val variantWriter: OWrites[chess.variant.Variant] = OWrites { v =>
+  implicit val variantWriter: OWrites[strategygames.chess.variant.Variant] = OWrites { v =>
     Json.obj(
       "key"   -> v.key,
       "name"  -> v.name,
@@ -110,8 +111,8 @@ object JsonView {
       "running"   -> c.isRunning,
       "initial"   -> c.limitSeconds,
       "increment" -> c.incrementSeconds,
-      "white"     -> c.remainingTime(Color.White).toSeconds,
-      "black"     -> c.remainingTime(Color.Black).toSeconds,
+      "white"     -> c.remainingTime(strategygames.White(strategygames.GameLib.Chess())).toSeconds,
+      "black"     -> c.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).toSeconds,
       "emerg"     -> c.config.emergSeconds
     )
   }
@@ -125,7 +126,7 @@ object JsonView {
     )
   }
 
-  implicit val openingWriter: OWrites[chess.opening.FullOpening.AtPly] = OWrites { o =>
+  implicit val openingWriter: OWrites[strategygames.chess.opening.FullOpening.AtPly] = OWrites { o =>
     Json.obj(
       "eco"  -> o.opening.eco,
       "name" -> o.opening.name,
@@ -133,7 +134,7 @@ object JsonView {
     )
   }
 
-  implicit val divisionWriter: OWrites[chess.Division] = OWrites { o =>
+  implicit val divisionWriter: OWrites[strategygames.chess.Division] = OWrites { o =>
     Json.obj(
       "middle" -> o.middle,
       "end"    -> o.end

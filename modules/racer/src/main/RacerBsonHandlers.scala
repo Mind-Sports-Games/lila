@@ -1,7 +1,7 @@
 package lila.racer
 
-import chess.format.FEN
-import chess.format.Uci
+import strategygames.chess.format.FEN
+import strategygames.chess.format.Uci
 import reactivemongo.api.bson._
 
 import lila.db.dsl._

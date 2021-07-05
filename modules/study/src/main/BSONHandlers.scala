@@ -1,9 +1,10 @@
 package lila.study
 
-import chess.format.pgn.{ Glyph, Glyphs, Tag, Tags }
-import chess.format.{ FEN, Uci, UciCharPair }
-import chess.variant.{ Crazyhouse, Variant }
-import chess.{ Centis, Color, Pos, PromotableRole, Role }
+import strategygames.chess.format.pgn.{ Glyph, Glyphs, Tag, Tags }
+import strategygames.chess.format.{ FEN, Uci, UciCharPair }
+import strategygames.chess.variant.{ Crazyhouse, Variant }
+import strategygames.chess.{ Color, Pos, PromotableRole, Role }
+import strategygames.{ Centis }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.Success
@@ -113,7 +114,7 @@ object BSONHandlers {
   implicit private def CrazyDataBSONHandler: BSON[Crazyhouse.Data] =
     new BSON[Crazyhouse.Data] {
       private def writePocket(p: Crazyhouse.Pocket) = p.roles.map(_.forsyth).mkString
-      private def readPocket(p: String)             = Crazyhouse.Pocket(p.view.flatMap(chess.Role.forsyth).toList)
+      private def readPocket(p: String)             = Crazyhouse.Pocket(p.view.flatMap(strategygames.chess.Role.forsyth).toList)
       def reads(r: Reader) =
         Crazyhouse.Data(
           promoted = r.getsD[Pos]("o").toSet,

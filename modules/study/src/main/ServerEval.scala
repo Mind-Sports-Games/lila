@@ -1,7 +1,7 @@
 package lila.study
 
-import chess.format.pgn.Glyphs
-import chess.format.{ Forsyth, Uci, UciCharPair }
+import strategygames.chess.format.pgn.Glyphs
+import strategygames.chess.format.{ Forsyth, Uci, UciCharPair }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -37,14 +37,14 @@ object ServerEval {
               chapterId = chapter.id.value,
               initialFen = chapter.root.fen.some,
               variant = chapter.setup.variant,
-              moves = chess.format
+              moves = strategygames.chess.format
                 .UciDump(
                   moves = chapter.root.mainline.map(_.move.san),
                   initialFen = chapter.root.fen.some,
                   variant = chapter.setup.variant
                 )
                 .toOption
-                .map(_.flatMap(chess.format.Uci.apply)) | List.empty,
+                .map(_.flatMap(strategygames.chess.format.Uci.apply)) | List.empty,
               userId = userId,
               unlimited = unlimited
             )
@@ -133,8 +133,8 @@ object ServerEval {
         initialFen = chapter.root.fen.some
       )
 
-    private def analysisLine(root: RootOrNode, variant: chess.variant.Variant, info: Info): Option[Node] =
-      chess.Replay.gameMoveWhileValid(info.variation take 20, root.fen, variant) match {
+    private def analysisLine(root: RootOrNode, variant: strategygames.chess.variant.Variant, info: Info): Option[Node] =
+      strategygames.chess.Replay.gameMoveWhileValid(info.variation take 20, root.fen, variant) match {
         case (_, games, error) =>
           error foreach { logger.info(_) }
           games.reverse match {
@@ -147,7 +147,7 @@ object ServerEval {
           }
       }
 
-    private def makeBranch(g: chess.Game, m: Uci.WithSan) =
+    private def makeBranch(g: strategygames.chess.Game, m: Uci.WithSan) =
       Node(
         id = UciCharPair(m.uci),
         ply = g.turns,
@@ -161,11 +161,11 @@ object ServerEval {
       )
   }
 
-  case class Progress(chapterId: Chapter.Id, tree: T.Root, analysis: JsObject, division: chess.Division)
+  case class Progress(chapterId: Chapter.Id, tree: T.Root, analysis: JsObject, division: strategygames.chess.Division)
 
   def toJson(chapter: Chapter, analysis: Analysis) =
     lila.analyse.JsonView.bothPlayers(
-      lila.analyse.Accuracy.PovLike(chess.White, chapter.root.color, chapter.root.ply),
+      lila.analyse.Accuracy.PovLike(strategygames.chess.White, chapter.root.color, chapter.root.ply),
       analysis
     )
 }

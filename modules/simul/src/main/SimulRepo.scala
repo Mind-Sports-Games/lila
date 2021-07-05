@@ -3,8 +3,8 @@ package lila.simul
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 
-import chess.Status
-import chess.variant.Variant
+import strategygames.Status
+import strategygames.chess.variant.Variant
 import lila.db.BSON
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.dsl._
@@ -21,7 +21,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     { case BSONInteger(v) => Variant(v) toTry s"No such variant: $v" },
     x => BSONInteger(x.id)
   )
-  import chess.Clock.Config
+  import strategygames.Clock.Config
   implicit private val clockHandler         = Macros.handler[Config]
   implicit private val ClockBSONHandler     = Macros.handler[SimulClock]
   implicit private val PlayerBSONHandler    = Macros.handler[SimulPlayer]
@@ -33,7 +33,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
         gameId = r str "gameId",
         status = r.get[Status]("status"),
         wins = r boolO "wins",
-        hostColor = r.strO("hostColor").flatMap(chess.Color.fromName) | chess.White
+        hostColor = r.strO("hostColor").flatMap(strategygames.chess.Color.fromName) | strategygames.chess.White
       )
     def writes(w: BSON.Writer, o: SimulPairing) =
       $doc(

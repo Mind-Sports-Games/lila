@@ -1,18 +1,18 @@
 package lila.setup
 
-import chess.format.{ FEN, Forsyth }
-import chess.variant.Chess960
-import chess.variant.FromPosition
-import chess.{ Clock, Speed }
+import strategygames.chess.format.{ FEN, Forsyth }
+import strategygames.chess.variant.Chess960
+import strategygames.chess.variant.FromPosition
+import strategygames.{ Clock, Speed }
 
 import lila.game.PerfPicker
 import lila.lobby.Color
 import lila.rating.PerfType
-import chess.variant.Variant
+import strategygames.chess.variant.Variant
 import lila.common.Template
 
 final case class ApiConfig(
-    variant: chess.variant.Variant,
+    variant: strategygames.chess.variant.Variant,
     clock: Option[Clock.Config],
     days: Option[Int],
     rated: Boolean,
@@ -22,7 +22,7 @@ final case class ApiConfig(
     message: Option[Template]
 ) {
 
-  def perfType: Option[PerfType] = PerfPicker.perfType(chess.Speed(clock), variant, days)
+  def perfType: Option[PerfType] = PerfPicker.perfType(strategygames.Speed(clock), variant, days)
 
   def validFen = ApiConfig.validFen(variant, position)
 
@@ -33,7 +33,7 @@ final case class ApiConfig(
 
   def validRated = mode.casual || clock.isDefined || variant.standard
 
-  def mode = chess.Mode(rated)
+  def mode = strategygames.Mode(rated)
 
   def autoVariant =
     if (variant.standard && position.exists(!_.initial)) copy(variant = FromPosition)
@@ -55,7 +55,7 @@ object ApiConfig extends BaseHumanConfig {
       msg: Option[String]
   ) =
     new ApiConfig(
-      variant = chess.variant.Variant.orDefault(~v),
+      variant = strategygames.chess.variant.Variant.orDefault(~v),
       clock = cl,
       days = d,
       rated = r,

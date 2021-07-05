@@ -1,7 +1,7 @@
 package controllers
 
-import chess.format.FEN
-import chess.White
+import strategygames.chess.format.FEN
+import strategygames.chess.White
 import play.api.mvc._
 import views._
 
@@ -94,7 +94,7 @@ final class Analyse(
     Action.async { implicit req =>
       env.game.gameRepo.gameWithInitialFen(gameId) flatMap {
         case Some((game, initialFen)) =>
-          val pov = Pov(game, chess.Color.fromName(color) | White)
+          val pov = Pov(game, strategygames.chess.Color.fromName(color) | White)
           env.api.roundApi.embed(
             pov,
             lila.api.Mobile.Api.currentVersion,
@@ -111,7 +111,7 @@ final class Analyse(
     get("fen").map(FEN.clean).fold(or) { atFen =>
       val url = routes.Round.watcher(pov.gameId, pov.color.name)
       fuccess {
-        chess.Replay
+        strategygames.chess.Replay
           .plyAtFen(pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
           .fold(
             err => {

@@ -3,9 +3,9 @@ package lila.fishnet
 import cats.data.Validated
 import cats.data.Validated.valid
 import cats.implicits._
-import chess.format.pgn.Dumper
-import chess.format.Uci
-import chess.{ Drop, Move, Replay, Situation }
+import strategygames.chess.format.pgn.Dumper
+import strategygames.chess.format.Uci
+import strategygames.chess.{ Drop, Move, Replay, Situation }
 
 import lila.analyse.{ Analysis, Info, PgnMove }
 import lila.base.LilaException

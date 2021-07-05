@@ -1,11 +1,11 @@
 package lila.game
 
-import chess._
-import chess.Pos._
+import strategygames.chess._
+import strategygames.chess.Pos._
 import org.specs2.mutable._
 
 import lila.db.ByteArray
-import chess.variant._
+import strategygames.chess.variant._
 
 class BinaryPieceTest extends Specification {
 

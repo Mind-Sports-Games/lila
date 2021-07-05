@@ -1,6 +1,6 @@
 package lila.importer
 
-import chess.format.FEN
+import strategygames.chess.format.FEN
 
 import lila.game.{ Game, GameRepo }
 import cats.data.Validated

@@ -1,6 +1,6 @@
 package lila.api
 
-import chess.format.FEN
+import strategygames.chess.format.FEN
 import org.joda.time.DateTime
 import play.api.libs.json._
 import reactivemongo.api.bson._
@@ -47,7 +47,7 @@ final private[api] class GameApi(
             else
               $doc(
                 G.playerUids -> user.id,
-                G.status $gte chess.Status.Mate.id,
+                G.status $gte strategygames.Status.Mate.id,
                 G.analysed -> analysed.map[BSONValue] {
                   case true => BSONBoolean(true)
                   case _    => $doc("$exists" -> false)
@@ -105,7 +105,7 @@ final private[api] class GameApi(
             if (~playing) lila.game.Query.nowPlayingVs(users._1.id, users._2.id)
             else
               lila.game.Query.opponents(users._1, users._2) ++ $doc(
-                G.status $gte chess.Status.Mate.id,
+                G.status $gte strategygames.Status.Mate.id,
                 G.analysed -> analysed.map[BSONValue] {
                   case true => BSONBoolean(true)
                   case _    => $doc("$exists" -> false)
@@ -150,7 +150,7 @@ final private[api] class GameApi(
           if (~playing) lila.game.Query.nowPlayingVs(userIds)
           else
             lila.game.Query.opponents(userIds) ++ $doc(
-              G.status $gte chess.Status.Mate.id,
+              G.status $gte strategygames.Status.Mate.id,
               G.analysed -> analysed.map[BSONValue] {
                 case true => BSONBoolean(true)
                 case _    => $doc("$exists" -> false)
@@ -236,14 +236,14 @@ final private[api] class GameApi(
         "moves"    -> withFlags.moves.option(g.pgnMoves mkString " "),
         "opening"  -> withFlags.opening.??(g.opening),
         "fens" -> (withFlags.fens && g.finished) ?? {
-          chess.Replay
+          strategygames.chess.Replay
             .boards(
               moveStrs = g.pgnMoves,
               initialFen = initialFen,
               variant = g.variant
             )
             .toOption map { boards =>
-            JsArray(boards map chess.format.Forsyth.exportBoard map JsString.apply)
+            JsArray(boards map strategygames.chess.format.Forsyth.exportBoard map JsString.apply)
           }
         },
         "winner" -> g.winnerColor.map(_.name),

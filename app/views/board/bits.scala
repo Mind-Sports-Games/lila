@@ -1,6 +1,6 @@
 package views.html.board
 
-import chess.format.{ FEN, Forsyth }
+import strategygames.chess.format.{ FEN, Forsyth }
 import controllers.routes
 import play.api.libs.json.Json
 
@@ -20,20 +20,20 @@ object bits {
     final case object Right extends Orientation
   }
 
-  def colorToOrientation(c: chess.Color): Orientation =
+  def colorToOrientation(c: strategygames.chess.Color): Orientation =
     c match {
-        case chess.White => Orientation.White
-        case chess.Black => Orientation.Black
+        case strategygames.chess.White => Orientation.White
+        case strategygames.chess.Black => Orientation.Black
     }
 
   private val dataState = attr("data-state")
 
-  private def boardOrientation(variant: chess.variant.Variant, c: chess.Color): Orientation =
+  private def boardOrientation(variant: strategygames.chess.variant.Variant, c: strategygames.chess.Color): Orientation =
     variant match {
-      case chess.variant.RacingKings => Orientation.White
-      case chess.variant.LinesOfAction => c match {
-          case chess.White => Orientation.White
-          case chess.Black => Orientation.Right
+      case strategygames.chess.variant.RacingKings => Orientation.White
+      case strategygames.chess.variant.LinesOfAction => c match {
+          case strategygames.chess.White => Orientation.White
+          case strategygames.chess.Black => Orientation.Right
         }
       case _ => colorToOrientation(c)
     }
@@ -47,24 +47,24 @@ object bits {
       ~pov.game.lastMoveKeys
     ) _
 
-  def miniWithOrientation(fen: chess.format.FEN, orientation: Orientation = Orientation.White, lastMove: String = "")(tag: Tag): Tag =
+  def miniWithOrientation(fen: strategygames.chess.format.FEN, orientation: Orientation = Orientation.White, lastMove: String = "")(tag: Tag): Tag =
     tag(
       cls := "mini-board mini-board--init cg-wrap is2d",
       dataState := s"${fen.value},${orientation.toString().toLowerCase()},$lastMove"
     )(cgWrapContent)
 
-  def mini(fen: chess.format.FEN, color: chess.Color = chess.White, lastMove: String = "")(tag: Tag): Tag =
+  def mini(fen: strategygames.chess.format.FEN, color: strategygames.chess.Color = strategygames.chess.White, lastMove: String = "")(tag: Tag): Tag =
     miniWithOrientation(fen, colorToOrientation(color), lastMove)(tag)
 
-  def miniForVariant(fen: chess.format.FEN, variant: chess.variant.Variant, color: chess.Color = chess.White, lastMove: String = "")(tag: Tag): Tag =
+  def miniForVariant(fen: strategygames.chess.format.FEN, variant: strategygames.chess.variant.Variant, color: strategygames.chess.Color = strategygames.chess.White, lastMove: String = "")(tag: Tag): Tag =
     miniWithOrientation(fen, boardOrientation(variant, color), lastMove)(tag)
 
 
-  def miniSpan(fen: chess.format.FEN, color: chess.Color = chess.White, lastMove: String = "") =
+  def miniSpan(fen: strategygames.chess.format.FEN, color: strategygames.chess.Color = strategygames.chess.White, lastMove: String = "") =
     mini(fen, color, lastMove)(span)
 
   def jsData(
-      sit: chess.Situation,
+      sit: strategygames.chess.Situation,
       fen: FEN
   )(implicit ctx: Context) =
     Json.obj(
@@ -72,10 +72,10 @@ object bits {
       "baseUrl" -> s"$netBaseUrl${routes.Editor.load("")}",
       "color"   -> sit.color.letter.toString,
       "castles" -> Json.obj(
-        "K" -> (sit canCastle chess.White on chess.KingSide),
-        "Q" -> (sit canCastle chess.White on chess.QueenSide),
-        "k" -> (sit canCastle chess.Black on chess.KingSide),
-        "q" -> (sit canCastle chess.Black on chess.QueenSide)
+        "K" -> (sit canCastle strategygames.chess.White on strategygames.chess.KingSide),
+        "Q" -> (sit canCastle strategygames.chess.White on strategygames.chess.QueenSide),
+        "k" -> (sit canCastle strategygames.chess.Black on strategygames.chess.KingSide),
+        "q" -> (sit canCastle strategygames.chess.Black on strategygames.chess.QueenSide)
       ),
       "animation" -> Json.obj("duration" -> ctx.pref.animationMillis),
       "is3d"      -> ctx.pref.is3d,

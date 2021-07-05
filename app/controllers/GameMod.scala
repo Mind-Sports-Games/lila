@@ -36,7 +36,7 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
   private def fetchGames(user: lila.user.User, filter: Filter) = {
     val select = toDbSelect(filter) ++ lila.game.Query.finished
     filter.speed
-      .flatMap(k => chess.Speed.all.find(_.key == k))
+      .flatMap(k => strategygames.Speed.all.find(_.key == k))
       .fold(env.game.gameRepo.recentPovsByUserFromSecondary(user, nbGames, select)) { speed =>
         import akka.stream.scaladsl._
         env.game.gameRepo

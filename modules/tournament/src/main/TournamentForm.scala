@@ -1,8 +1,9 @@
 package lila.tournament
 
 import cats.implicits._
-import chess.format.FEN
-import chess.{ Mode, StartingPosition }
+import strategygames.chess.format.FEN
+import strategygames.chess.{ StartingPosition }
+import strategygames.{ Mode }
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -26,7 +27,7 @@ final class TournamentForm {
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
       startDate = none,
-      variant = chess.variant.Standard.id.toString.some,
+      variant = strategygames.chess.variant.Standard.id.toString.some,
       position = None,
       password = None,
       mode = none,
@@ -103,14 +104,14 @@ final class TournamentForm {
 
 object TournamentForm {
 
-  import chess.variant._
+  import strategygames.chess.variant._
 
   val clockTimes: Seq[Double] = Seq(0d, 1 / 4d, 1 / 2d, 3 / 4d, 1d, 3 / 2d) ++ {
     (2 to 7 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   }.map(_.toDouble)
   val clockTimeDefault = 2d
   private def formatLimit(l: Double) =
-    chess.Clock.Config(l * 60 toInt, 0).limitString + {
+    strategygames.Clock.Config(l * 60 toInt, 0).limitString + {
       if (l <= 1) " minute" else " minutes"
     }
   val clockTimeChoices = optionsDouble(clockTimes, formatLimit)
@@ -178,11 +179,11 @@ private[tournament] case class TournamentSetup(
     if (realPosition.isDefined) Mode.Casual
     else Mode(rated.orElse(mode.map(Mode.Rated.id ===)) | true)
 
-  def realVariant = variant.flatMap(TournamentForm.guessVariant) | chess.variant.Standard
+  def realVariant = variant.flatMap(TournamentForm.guessVariant) | strategygames.chess.variant.Standard
 
   def realPosition = position ifTrue realVariant.standard
 
-  def clockConfig = chess.Clock.Config((clockTime * 60).toInt, clockIncrement)
+  def clockConfig = strategygames.Clock.Config((clockTime * 60).toInt, clockIncrement)
 
   def validRatedVariant =
     realMode == Mode.Casual ||

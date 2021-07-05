@@ -1,9 +1,9 @@
 package lila.tournament
 
-import chess.Clock.{ Config => ClockConfig }
-import chess.format.FEN
-import chess.Mode
-import chess.variant.Variant
+import strategygames.Clock.{ Config => ClockConfig }
+import strategygames.chess.format.FEN
+import strategygames.Mode
+import strategygames.chess.variant.Variant
 import reactivemongo.api.bson._
 
 import lila.db.BSON
@@ -73,7 +73,7 @@ object BSONHandlers {
         id = r str "_id",
         name = r str "name",
         status = r.get[Status]("status"),
-        clock = r.get[chess.Clock.Config]("clock"),
+        clock = r.get[strategygames.Clock.Config]("clock"),
         minutes = r int "minutes",
         variant = variant,
         position = position,
@@ -165,7 +165,7 @@ object BSONHandlers {
       Pairing(
         id = r str "_id",
         tourId = r str "tid",
-        status = chess.Status(r int "s") err "tournament pairing status",
+        status = strategygames.Status(r int "s") err "tournament pairing status",
         user1 = user1,
         user2 = user2,
         winner = r boolO "w" map {

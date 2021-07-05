@@ -1,6 +1,6 @@
 package lila.study
 
-import chess.format.FEN
+import strategygames.chess.format.FEN
 import play.api.data._
 import play.api.data.Forms._
 
@@ -30,7 +30,7 @@ object StudyForm {
         asStr: Option[String] = None
     ) {
 
-      def orientation = orientationStr.flatMap(chess.Color.fromName) | chess.White
+      def orientation = orientationStr.flatMap(strategygames.chess.Color.fromName) | strategygames.chess.White
 
       def as: As =
         asStr match {
@@ -90,7 +90,7 @@ object StudyForm {
             pgn = onePgn.some,
             orientation =
               if (pgns.sizeIs > 1) "auto"
-              else (orientationStr.flatMap(chess.Color.fromName) | chess.White).name,
+              else (orientationStr.flatMap(strategygames.chess.Color.fromName) | strategygames.chess.White).name,
             mode = mode,
             initial = initial && index == 0
           )

@@ -1,10 +1,11 @@
 package lila.round
 
-import chess.{ Centis, Color }
-import chess.format.pgn.Glyphs
-import chess.format.{ FEN, Forsyth, Uci, UciCharPair }
-import chess.opening._
-import chess.variant.Variant
+import strategygames.chess.{ Color }
+import strategygames.{ Centis }
+import strategygames.chess.format.pgn.Glyphs
+import strategygames.chess.format.{ FEN, Forsyth, Uci, UciCharPair }
+import strategygames.chess.opening._
+import strategygames.chess.variant.Variant
 import JsonView.WithFlags
 import lila.analyse.{ Advice, Analysis, Info }
 import lila.tree._
@@ -29,7 +30,7 @@ object TreeBuilder {
   ): Root = {
     val withClocks: Option[Vector[Centis]] = withFlags.clocks ?? game.bothClockStates
     val drawOfferPlies                     = game.drawOffers.normalizedPlies
-    chess.Replay.gameMoveWhileValid(game.pgnMoves, initialFen, game.variant) match {
+    strategygames.chess.Replay.gameMoveWhileValid(game.pgnMoves, initialFen, game.variant) match {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val openingOf: OpeningOf =
@@ -49,7 +50,7 @@ object TreeBuilder {
           crazyData = init.situation.board.crazyData,
           eval = infos lift 0 map makeEval
         )
-        def makeBranch(index: Int, g: chess.Game, m: Uci.WithSan) = {
+        def makeBranch(index: Int, g: strategygames.chess.Game, m: Uci.WithSan) = {
           val fen    = Forsyth >> g
           val info   = infos lift (index - 1)
           val advice = advices get g.turns
@@ -104,7 +105,7 @@ object TreeBuilder {
       fromFen: FEN,
       openingOf: OpeningOf
   )(info: Info): Branch = {
-    def makeBranch(g: chess.Game, m: Uci.WithSan) = {
+    def makeBranch(g: strategygames.chess.Game, m: Uci.WithSan) = {
       val fen = Forsyth >> g
       Branch(
         id = UciCharPair(m.uci),
@@ -117,7 +118,7 @@ object TreeBuilder {
         eval = none
       )
     }
-    chess.Replay.gameMoveWhileValid(info.variation take 20, fromFen, variant) match {
+    strategygames.chess.Replay.gameMoveWhileValid(info.variation take 20, fromFen, variant) match {
       case (_, games, error) =>
         error foreach logChessError(id)
         games.reverse match {

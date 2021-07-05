@@ -2,7 +2,7 @@ package lila.round
 
 import akka.actor._
 import akka.stream.scaladsl._
-import chess.format.Forsyth
+import strategygames.chess.format.Forsyth
 import play.api.libs.json._
 
 import lila.common.Bus
@@ -85,8 +85,8 @@ final private class TvBroadcast(
             "fen" -> s"$fen ${game.turnColor.letter}",
             "lm"  -> move
           )
-          .add("wc" -> game.clock.map(_.remainingTime(chess.White).roundSeconds))
-          .add("bc" -> game.clock.map(_.remainingTime(chess.Black).roundSeconds))
+          .add("wc" -> game.clock.map(_.remainingTime(strategygames.White(strategygames.GameLib.Chess())).roundSeconds))
+          .add("bc" -> game.clock.map(_.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).roundSeconds))
       )
       clients.foreach(_.queue offer msg)
       featured foreach { f =>

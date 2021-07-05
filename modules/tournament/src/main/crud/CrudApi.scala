@@ -69,11 +69,11 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
     Tournament.make(
       by = Left(User.playstrategyId),
       name = none,
-      clock = chess.Clock.Config(0, 0),
+      clock = strategygames.Clock.Config(0, 0),
       minutes = 0,
-      variant = chess.variant.Standard,
+      variant = strategygames.chess.variant.Standard,
       position = none,
-      mode = chess.Mode.Rated,
+      mode = strategygames.Mode.Rated,
       password = None,
       waitMinutes = 0,
       startDate = none,
@@ -86,7 +86,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
 
   private def updateTour(tour: Tournament, data: CrudForm.Data) = {
     import data._
-    val clock = chess.Clock.Config((clockTime * 60).toInt, clockIncrement)
+    val clock = strategygames.Clock.Config((clockTime * 60).toInt, clockIncrement)
     tour.copy(
       name = name,
       clock = clock,

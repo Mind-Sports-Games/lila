@@ -1,8 +1,8 @@
 package lila.study
 
-import chess.format.pgn._
-import chess.format.{ FEN, Uci, UciCharPair }
-import chess.variant
+import strategygames.chess.format.pgn._
+import strategygames.chess.format.{ FEN, Uci, UciCharPair }
+import strategygames.chess.variant
 import Node._
 import org.specs2.mutable._
 

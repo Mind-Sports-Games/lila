@@ -1,6 +1,6 @@
 package lila.tournament
 
-import chess.{ Black, Color, White }
+import strategygames.chess.{ Black, Color, White }
 import scala.util.chaining._
 
 import lila.game.{ Game, Player => GamePlayer, GameRepo, Source }
@@ -21,13 +21,13 @@ final class AutoPairing(
   ): Fu[Game] = {
     val player1 = playersMap get pairing.user1 err s"Missing pairing player1 $pairing"
     val player2 = playersMap get pairing.user2 err s"Missing pairing player2 $pairing"
-    val clock   = tour.clock.toClock
+    val clock   = tour.clock.toClock(strategygames.GameLib.Chess())
     val game = Game
       .make(
-        chess = chess.Game(
+        chess = strategygames.chess.Game(
           variantOption = Some {
             if (tour.position.isEmpty) tour.variant
-            else chess.variant.FromPosition
+            else strategygames.chess.variant.FromPosition
           },
           fen = tour.position
         ) pipe { g =>

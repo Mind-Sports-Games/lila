@@ -1,7 +1,7 @@
 package lila.explorer
 
 import akka.stream.scaladsl._
-import chess.format.pgn.Tag
+import strategygames.chess.format.pgn.Tag
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.ws.DefaultBodyWritables._
@@ -100,7 +100,7 @@ final private class ExplorerIndexer(
     game.finished &&
       game.rated &&
       game.turns >= 10 &&
-      game.variant != chess.variant.FromPosition &&
+      game.variant != strategygames.chess.variant.FromPosition &&
       !Game.isOldHorde(game)
 
   private def stableRating(player: Player) = player.rating ifFalse player.provisional
@@ -141,7 +141,7 @@ final private class ExplorerIndexer(
       if valid(game)
     } yield gameRepo initialFen game flatMap { initialFen =>
       userRepo.usernamesByIds(game.userIds) map { usernames =>
-        def username(color: chess.Color) =
+        def username(color: strategygames.chess.Color) =
           game.player(color).userId flatMap { id =>
             usernames.find(_.toLowerCase == id)
           } orElse game.player(color).userId getOrElse "?"
@@ -152,8 +152,8 @@ final private class ExplorerIndexer(
           Tag("PlayStrategyID", game.id),
           Tag(_.Variant, game.variant.name),
           Tag.timeControl(game.clock.map(_.config)),
-          Tag(_.White, username(chess.White)),
-          Tag(_.Black, username(chess.Black)),
+          Tag(_.White, username(strategygames.chess.White)),
+          Tag(_.Black, username(strategygames.chess.Black)),
           Tag(_.WhiteElo, whiteRating),
           Tag(_.BlackElo, blackRating),
           Tag(_.Result, PgnDump.result(game)),

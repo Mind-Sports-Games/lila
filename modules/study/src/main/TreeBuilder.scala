@@ -1,18 +1,18 @@
 package lila.study
 
-import chess.opening._
-import chess.variant.Variant
+import strategygames.chess.opening._
+import strategygames.chess.variant.Variant
 import lila.tree
 
 object TreeBuilder {
 
-  private val initialStandardDests = chess.Game(chess.variant.Standard).situation.destinations
+  private val initialStandardDests = strategygames.chess.Game(strategygames.chess.variant.Standard).situation.destinations
 
   def apply(root: Node.Root, variant: Variant): tree.Root = {
     val dests =
       if (variant.standard && root.fen.initial) initialStandardDests
       else {
-        val sit = chess.Game(variant.some, root.fen.some).situation
+        val sit = strategygames.chess.Game(variant.some, root.fen.some).situation
         sit.playable(false) ?? sit.destinations
       }
     makeRoot(root, variant).copy(dests = dests.some)

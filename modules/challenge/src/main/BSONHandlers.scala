@@ -2,7 +2,7 @@ package lila.challenge
 
 import reactivemongo.api.bson._
 
-import chess.variant.Variant
+import strategygames.chess.variant.Variant
 import lila.db.BSON
 import lila.db.BSON.{ Reader, Writer }
 import lila.db.dsl._
@@ -28,13 +28,13 @@ private object BSONHandlers {
     import cats.implicits._
     def reads(r: Reader) =
       (r.intO("l"), r.intO("i")) mapN { (limit, inc) =>
-        TimeControl.Clock(chess.Clock.Config(limit, inc))
+        TimeControl.Clock(strategygames.Clock.Config(limit, inc))
       } orElse {
         r intO "d" map TimeControl.Correspondence.apply
       } getOrElse TimeControl.Unlimited
     def writes(w: Writer, t: TimeControl) =
       t match {
-        case TimeControl.Clock(chess.Clock.Config(l, i)) => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.Clock.Config(l, i)) => $doc("l" -> l, "i" -> i)
         case TimeControl.Correspondence(d)               => $doc("d" -> d)
         case TimeControl.Unlimited                       => $empty
       }

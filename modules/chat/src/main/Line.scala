@@ -1,6 +1,6 @@
 package lila.chat
 
-import chess.Color
+import strategygames.chess.Color
 
 import lila.user.{ Title, User }
 

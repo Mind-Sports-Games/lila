@@ -1,6 +1,6 @@
 package lila.round
 
-import chess.Color
+import strategygames.chess.Color
 
 import lila.game.{ Event, Game, Pov, Progress }
 import lila.pref.{ Pref, PrefApi }
@@ -33,7 +33,13 @@ final private class Moretimer(
     game.clock.fold(Progress(game)) { clock =>
       val centis = duration.toCentis
       val newClock = colors.foldLeft(clock) { case (c, color) =>
-        c.giveTime(color, centis)
+        c.giveTime(
+          color match {
+            case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
+            case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
+          },
+          centis
+        )
       }
       colors.foreach { c =>
         messenger.volatile(game, s"$c + ${duration.toSeconds} seconds")

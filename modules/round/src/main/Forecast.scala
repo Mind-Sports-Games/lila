@@ -3,8 +3,8 @@ package lila.round
 import org.joda.time.DateTime
 import play.api.libs.json._
 
-import chess.format.Uci
-import chess.Move
+import strategygames.chess.format.Uci
+import strategygames.chess.Move
 import lila.common.Json.jodaWrites
 import lila.game.Game
 

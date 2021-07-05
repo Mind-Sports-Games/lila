@@ -1,18 +1,8 @@
 package lila.game
 
-import chess.variant.{ Crazyhouse, Variant }
-import chess.{
-  CheckCount,
-  Color,
-  Clock,
-  White,
-  Black,
-  Status,
-  Mode,
-  UnmovedRooks,
-  History => ChessHistory,
-  Game => ChessGame
-}
+import strategygames.chess.variant.{ Crazyhouse, Variant }
+import strategygames.chess.{ CheckCount, Color, White, Black, UnmovedRooks, History => ChessHistory, Game => ChessGame }
+import strategygames.{ Clock, Status, Mode }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
@@ -46,14 +36,14 @@ object BSONHandlers {
       Crazyhouse.Data(
         pockets = {
           val (white, black) = {
-            r.str("p").view.flatMap(chess.Piece.fromChar).to(List)
-          }.partition(_ is chess.White)
+            r.str("p").view.flatMap(strategygames.chess.Piece.fromChar).to(List)
+          }.partition(_ is strategygames.chess.White)
           Pockets(
             white = Pocket(white.map(_.role)),
             black = Pocket(black.map(_.role))
           )
         },
-        promoted = r.str("t").view.flatMap(chess.Pos.piotr).to(Set)
+        promoted = r.str("t").view.flatMap(strategygames.chess.Pos.piotr).to(Set)
       )
 
     def writes(w: BSON.Writer, o: Crazyhouse.Data) =
@@ -97,7 +87,7 @@ object BSONHandlers {
       val createdAt     = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
-      val gameVariant = Variant(r intD F.variant) | chess.variant.Standard
+      val gameVariant = Variant(r intD F.variant) | strategygames.chess.variant.Standard
 
       val decoded = r.bytesO(F.huffmanPgn).map { PgnStorage.Huffman.decode(_, playedPlies) } | {
         val clm      = r.get[CastleLastMove](F.castleLastMove)
@@ -105,7 +95,7 @@ object BSONHandlers {
         PgnStorage.Decoded(
           pgnMoves = pgnMoves,
           pieces = BinaryFormat.piece.read(r bytes F.binaryPieces, gameVariant),
-          positionHashes = r.getO[chess.PositionHash](F.positionHashes) | Array.empty,
+          positionHashes = r.getO[strategygames.chess.PositionHash](F.positionHashes) | Array.empty,
           unmovedRooks = r.getO[UnmovedRooks](F.unmovedRooks) | UnmovedRooks.default,
           lastMove = clm.lastMove,
           castles = clm.castles,
@@ -115,8 +105,8 @@ object BSONHandlers {
         )
       }
       val chessGame = ChessGame(
-        situation = chess.Situation(
-          chess.Board(
+        situation = strategygames.chess.Situation(
+          strategygames.chess.Board(
             pieces = decoded.pieces,
             history = ChessHistory(
               lastMove = decoded.lastMove,
@@ -135,9 +125,12 @@ object BSONHandlers {
           color = turnColor
         ),
         pgnMoves = decoded.pgnMoves,
-        clock = r.getO[Color => Clock](F.clock) {
+        clock = r.getO[strategygames.Color => Clock](F.clock) {
           clockBSONReader(createdAt, light.whitePlayer.berserk, light.blackPlayer.berserk)
-        } map (_(turnColor)),
+        } map (_(turnColor match {
+          case(White) => strategygames.White(strategygames.GameLib.Chess())
+          case(Black) => strategygames.Black(strategygames.GameLib.Chess())
+        })),
         turns = plies,
         startedAtTurn = startedAtTurn
       )
@@ -280,8 +273,8 @@ object BSONHandlers {
     } yield BinaryFormat.clockHistory.writeSide(clk.limit, times, flagged has color)
 
   private[game] def clockBSONReader(since: DateTime, whiteBerserk: Boolean, blackBerserk: Boolean) =
-    new BSONReader[Color => Clock] {
-      def readTry(bson: BSONValue): Try[Color => Clock] =
+    new BSONReader[strategygames.Color => Clock] {
+      def readTry(bson: BSONValue): Try[strategygames.Color => Clock] =
         bson match {
           case bin: BSONBinary =>
             ByteArrayBSONHandler readTry bin map { cl =>

@@ -21,7 +21,7 @@ object bits {
 
   def sides(
       pov: Pov,
-      initialFen: Option[chess.format.FEN],
+      initialFen: Option[strategygames.chess.format.FEN],
       tour: Option[lila.tournament.TourAndTeamVs],
       cross: Option[lila.game.Crosstable.WithMatchup],
       simul: Option[lila.simul.Simul],
@@ -36,15 +36,15 @@ object bits {
     )
 
   def variantLink(
-      variant: chess.variant.Variant,
+      variant: strategygames.chess.variant.Variant,
       name: String,
-      initialFen: Option[chess.format.FEN] = None
+      initialFen: Option[strategygames.chess.format.FEN] = None
   ) =
     a(
       cls := "variant-link",
       href := (variant match {
-        case chess.variant.Standard => "https://en.wikipedia.org/wiki/Chess"
-        case chess.variant.FromPosition =>
+        case strategygames.chess.variant.Standard => "https://en.wikipedia.org/wiki/Chess"
+        case strategygames.chess.variant.FromPosition =>
           s"""${routes.Editor.index}?fen=${initialFen.??(_.value.replace(' ', '_'))}"""
         case v => routes.Page.variant(v.key).url
       }),

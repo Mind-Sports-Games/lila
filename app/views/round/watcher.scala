@@ -63,7 +63,7 @@ object watcher {
     )
   }
 
-  def crawler(pov: Pov, initialFen: Option[chess.format.FEN], pgn: chess.format.pgn.Pgn)(implicit
+  def crawler(pov: Pov, initialFen: Option[strategygames.chess.format.FEN], pgn: strategygames.chess.format.pgn.Pgn)(implicit
       ctx: Context
   ) =
     bits.layout(

@@ -109,7 +109,7 @@ object TournamentShield {
       )
   }
 
-  private type SpeedOrVariant = Either[Schedule.Speed, chess.variant.Variant]
+  private type SpeedOrVariant = Either[Schedule.Speed, strategygames.chess.variant.Variant]
 
   sealed abstract class Category(
       val of: SpeedOrVariant,
@@ -171,55 +171,55 @@ object TournamentShield {
 
     case object Chess960
         extends Category(
-          of = Right(chess.variant.Chess960),
+          of = Right(strategygames.chess.variant.Chess960),
           iconChar = '\''
         )
 
     case object KingOfTheHill
         extends Category(
-          of = Right(chess.variant.KingOfTheHill),
+          of = Right(strategygames.chess.variant.KingOfTheHill),
           iconChar = '('
         )
 
     case object Antichess
         extends Category(
-          of = Right(chess.variant.Antichess),
+          of = Right(strategygames.chess.variant.Antichess),
           iconChar = '@'
         )
 
     case object Atomic
         extends Category(
-          of = Right(chess.variant.Atomic),
+          of = Right(strategygames.chess.variant.Atomic),
           iconChar = '>'
         )
 
     case object ThreeCheck
         extends Category(
-          of = Right(chess.variant.ThreeCheck),
+          of = Right(strategygames.chess.variant.ThreeCheck),
           iconChar = '.'
         )
 
     case object Horde
         extends Category(
-          of = Right(chess.variant.Horde),
+          of = Right(strategygames.chess.variant.Horde),
           iconChar = '_'
         )
 
     case object RacingKings
         extends Category(
-          of = Right(chess.variant.RacingKings),
+          of = Right(strategygames.chess.variant.RacingKings),
           iconChar = ''
         )
 
     case object Crazyhouse
         extends Category(
-          of = Right(chess.variant.Crazyhouse),
+          of = Right(strategygames.chess.variant.Crazyhouse),
           iconChar = ''
         )
 
     case object LinesOfAction
         extends Category(
-          of = Right(chess.variant.LinesOfAction),
+          of = Right(strategygames.chess.variant.LinesOfAction),
           iconChar = ''
         )
 

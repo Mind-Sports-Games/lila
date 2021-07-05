@@ -1,7 +1,7 @@
 package lila.evalCache
 
-import chess.format.{ FEN, Forsyth, Uci }
-import chess.variant.Variant
+import strategygames.chess.format.{ FEN, Forsyth, Uci }
+import strategygames.chess.variant.Variant
 import org.joda.time.DateTime
 import cats.data.NonEmptyList
 
@@ -117,7 +117,7 @@ object EvalCacheEntry {
         c != '/' && c != '-' && c != 'w'
       }
       val str = variant match {
-        case chess.variant.ThreeCheck => base + ~fen.value.split(' ').lift(6)
+        case strategygames.chess.variant.ThreeCheck => base + ~fen.value.split(' ').lift(6)
         case _                        => base
       }
       new SmallFen(str)

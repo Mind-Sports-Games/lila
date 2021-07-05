@@ -28,7 +28,7 @@ private object bits {
         }
 
       def colors(hide: Boolean) =
-        chess.Color.all.map { color =>
+        strategygames.chess.Color.all.map { color =>
           tr(cls := List(s"${color.name}User user-row" -> true, "none" -> hide))(
             th(label(`for` := form3.id(form("players")(color.name)))(color.fold(trans.white, trans.black)())),
             td(cls := "single")(

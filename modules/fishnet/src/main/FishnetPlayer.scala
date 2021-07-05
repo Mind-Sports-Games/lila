@@ -2,7 +2,8 @@ package lila.fishnet
 
 import scala.concurrent.duration._
 
-import chess.{ Black, Clock, White }
+import strategygames.chess.{ Black, White }
+import strategygames.{ Clock }
 
 import lila.common.Future
 import lila.game.{ Game, GameRepo, UciMemo }
@@ -28,7 +29,7 @@ final class FishnetPlayer(
     }
 
   private val delayFactor  = 0.011f
-  private val defaultClock = Clock(300, 0)
+  private val defaultClock = Clock(strategygames.GameLib.Chess(), 300, 0)
 
   private def delayFor(g: Game): Option[FiniteDuration] =
     if (!g.bothPlayersHaveMoved) 2.seconds.some
@@ -38,7 +39,12 @@ final class FishnetPlayer(
         clock     = g.clock | defaultClock
         totalTime = clock.estimateTotalTime.centis
         if totalTime > 20 * 100
-        delay = (clock.remainingTime(pov.color).centis atMost totalTime) * delayFactor
+        delay = (clock.remainingTime(
+          pov.color match {
+            case(White) => strategygames.White(strategygames.GameLib.Chess())
+            case(Black) => strategygames.Black(strategygames.GameLib.Chess())
+          }
+        ).centis atMost totalTime) * delayFactor
         accel = 1 - ((g.turns - 20) atLeast 0 atMost 100) / 150f
         sleep = (delay * accel) atMost 500
         if sleep > 25
@@ -65,8 +71,8 @@ final class FishnetPlayer(
               else level,
             clock = game.clock.map { clk =>
               Work.Clock(
-                wtime = clk.remainingTime(White).centis,
-                btime = clk.remainingTime(Black).centis,
+                wtime = clk.remainingTime(strategygames.White(strategygames.GameLib.Chess())).centis,
+                btime = clk.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).centis,
                 inc = clk.incrementSeconds
               )
             }

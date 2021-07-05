@@ -1,12 +1,12 @@
 package lila.study
 
-import chess.format.pgn.Tags
-import chess.format.{ FEN, Forsyth }
-import chess.variant.{ Crazyhouse, Variant }
+import strategygames.chess.format.pgn.Tags
+import strategygames.chess.format.{ FEN, Forsyth }
+import strategygames.chess.variant.{ Crazyhouse, Variant }
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
 import lila.user.User
-import chess.Color
+import strategygames.chess.Color
 
 final private class ChapterMaker(
     net: lila.common.config.NetConfig,

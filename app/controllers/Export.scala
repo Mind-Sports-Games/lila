@@ -2,7 +2,7 @@ package controllers
 
 import akka.stream.scaladsl._
 import akka.util.ByteString
-import chess.Color
+import strategygames.chess.Color
 import play.api.mvc.Result
 import scala.concurrent.duration._
 

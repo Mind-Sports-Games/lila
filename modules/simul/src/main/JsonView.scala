@@ -12,7 +12,7 @@ final class JsonView(
     proxyRepo: lila.round.GameProxyRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  implicit private val colorWriter: Writes[chess.Color] = Writes { c =>
+  implicit private val colorWriter: Writes[strategygames.chess.Color] = Writes { c =>
     JsString(c.name)
   }
 
@@ -86,14 +86,14 @@ final class JsonView(
       },
       "name"       -> simul.name,
       "fullName"   -> simul.fullName,
-      "variants"   -> simul.variants.map(variantJson(chess.Speed(simul.clock.config.some))),
+      "variants"   -> simul.variants.map(variantJson(strategygames.Speed(simul.clock.config.some))),
       "isCreated"  -> simul.isCreated,
       "isRunning"  -> simul.isRunning,
       "isFinished" -> simul.isFinished,
       "text"       -> simul.text
     )
 
-  private def variantJson(speed: chess.Speed)(v: chess.variant.Variant) =
+  private def variantJson(speed: strategygames.Speed)(v: strategygames.chess.variant.Variant) =
     Json.obj(
       "key"  -> v.key,
       "icon" -> lila.game.PerfPicker.perfType(speed, v, none).map(_.iconChar.toString),
@@ -127,15 +127,15 @@ final class JsonView(
       .obj(
         "id"       -> g.id,
         "status"   -> g.status.id,
-        "fen"      -> (chess.format.Forsyth boardAndColor g.situation),
+        "fen"      -> (strategygames.chess.format.Forsyth boardAndColor g.situation),
         "lastMove" -> ~g.lastMoveKeys,
         "orient"   -> g.playerByUserId(hostId).map(_.color)
       )
       .add(
         "clock" -> g.clock.ifTrue(g.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(chess.White).roundSeconds,
-            "black" -> c.remainingTime(chess.Black).roundSeconds
+            "white" -> c.remainingTime(strategygames.White(strategygames.GameLib.Chess())).roundSeconds,
+            "black" -> c.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).roundSeconds
           )
         }
       )

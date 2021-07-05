@@ -284,7 +284,7 @@ object SwissJson {
     Json
       .obj(
         "id"          -> b.game.id,
-        "fen"         -> chess.format.Forsyth.boardAndColor(b.game.situation),
+        "fen"         -> strategygames.chess.format.Forsyth.boardAndColor(b.game.situation),
         "lastMove"    -> ~b.game.lastMoveKeys,
         "orientation" -> b.game.naturalOrientation.name,
         "white"       -> boardPlayerJson(b.board.white),
@@ -293,8 +293,8 @@ object SwissJson {
       .add(
         "clock" -> b.game.clock.ifTrue(b.game.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(chess.White).roundSeconds,
-            "black" -> c.remainingTime(chess.Black).roundSeconds
+            "white" -> c.remainingTime(strategygames.White(strategygames.GameLib.Chess())).roundSeconds,
+            "black" -> c.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).roundSeconds
           )
         }
       )
@@ -320,7 +320,7 @@ object SwissJson {
     JsNumber(t.value.toInt)
   }
 
-  implicit private val clockWrites: OWrites[chess.Clock.Config] = OWrites { clock =>
+  implicit private val clockWrites: OWrites[strategygames.Clock.Config] = OWrites { clock =>
     Json.obj(
       "limit"     -> clock.limitSeconds,
       "increment" -> clock.incrementSeconds

@@ -1,7 +1,7 @@
 package lila.swiss
 
-import chess.Color
-import chess.format.FEN
+import strategygames.chess.Color
+import strategygames.chess.format.FEN
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 

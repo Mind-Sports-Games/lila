@@ -1,7 +1,7 @@
 package lila.fishnet
 
-import chess.Replay
-import chess.format.pgn.Reader
+import strategygames.chess.Replay
+import strategygames.chess.format.pgn.Reader
 import org.specs2.mutable._
 
 import lila.analyse.{ Analysis, Info }
@@ -214,7 +214,7 @@ final class UciToPgnTest extends Specification {
 
       val pgn =
         "d4 d5 f3 e6 f4 g6 g3 Bg7 Nf3 Nf6 e3 O-O Bh3 Nc6 g4 h6 g5 hxg5 Nxg5 Ne4 Bxe6 fxe6 Nxe6 Bxe6 Rg1 Qh4+ Ke2 Qxh2+ Kd3 Nb4#"
-      val rep = Replay(pgn.split(' ').toList, None, chess.variant.Standard).map(evenIncomplete).toOption.get
+      val rep = Replay(pgn.split(' ').toList, None, strategygames.chess.variant.Standard).map(evenIncomplete).toOption.get
       UciToPgn(rep, uciAnalysis) match {
         case (_, errs) => errs must beEmpty
       }
@@ -286,7 +286,7 @@ final class UciToPgnTest extends Specification {
         "Kh4",
         "Qxg5#"
       )
-      val rep         = Replay(pgn, None, chess.variant.KingOfTheHill).map(evenIncomplete).toOption.get
+      val rep         = Replay(pgn, None, strategygames.chess.variant.KingOfTheHill).map(evenIncomplete).toOption.get
       val uciAnalysis = Analysis("g5hX8efz", None, Nil, 0, now, None)
       UciToPgn(rep, uciAnalysis) match {
         case (_, errs) => errs must beEmpty

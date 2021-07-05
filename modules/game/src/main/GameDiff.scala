@@ -1,11 +1,12 @@
 package lila.game
 
-import chess.{ Black, CheckCount, Clock, Color, White }
+import strategygames.chess.{ Black, CheckCount, Color, White }
+import strategygames.{ Clock }
 import Game.BSONFields._
 import reactivemongo.api.bson._
 import scala.util.Try
 
-import chess.Centis
+import strategygames.Centis
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.ByteArray
 import lila.db.ByteArray.ByteArrayBSONHandler
@@ -81,7 +82,7 @@ object GameDiff {
         dOpt(
           crazyData,
           _.board.crazyData,
-          (o: Option[chess.variant.Crazyhouse.Data]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
+          (o: Option[strategygames.chess.variant.Crazyhouse.Data]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
         )
     }
     d(turns, _.turns, w.int)

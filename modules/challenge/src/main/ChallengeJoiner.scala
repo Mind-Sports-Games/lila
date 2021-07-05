@@ -1,8 +1,9 @@
 package lila.challenge
 
-import chess.format.Forsyth
-import chess.format.Forsyth.SituationPlus
-import chess.{ Color, Mode, Situation }
+import strategygames.chess.format.Forsyth
+import strategygames.chess.format.Forsyth.SituationPlus
+import strategygames.chess.{ Color, Situation }
+import strategygames.{ Mode }
 import scala.util.chaining._
 
 import lila.game.{ Game, Player, Pov, Source }
@@ -34,30 +35,30 @@ private object ChallengeJoiner {
       destUser: Option[User],
       color: Option[Color]
   ): Game = {
-    def makeChess(variant: chess.variant.Variant): chess.Game =
-      chess.Game(situation = Situation(variant), clock = c.clock.map(_.config.toClock))
+    def makeChess(variant: strategygames.chess.variant.Variant): strategygames.chess.Game =
+      strategygames.chess.Game(situation = Situation(variant), clock = c.clock.map(_.config.toClock(strategygames.GameLib.Chess())))
 
     val baseState = c.initialFen.ifTrue(c.variant.fromPosition || c.variant.chess960) flatMap {
       Forsyth.<<<@(c.variant, _)
     }
     val (chessGame, state) = baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
       case sp @ SituationPlus(sit, _) =>
-        val game = chess.Game(
+        val game = strategygames.chess.Game(
           situation = sit,
           turns = sp.turns,
           startedAtTurn = sp.turns,
-          clock = c.clock.map(_.config.toClock)
+          clock = c.clock.map(_.config.toClock(strategygames.GameLib.Chess()))
         )
         if (c.variant.fromPosition && Forsyth.>>(game).initial)
-          makeChess(chess.variant.Standard) -> none
+          makeChess(strategygames.chess.variant.Standard) -> none
         else game                           -> baseState
     }
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game
       .make(
         chess = chessGame,
-        whitePlayer = Player.make(chess.White, c.finalColor.fold(origUser, destUser), perfPicker),
-        blackPlayer = Player.make(chess.Black, c.finalColor.fold(destUser, origUser), perfPicker),
+        whitePlayer = Player.make(strategygames.chess.White, c.finalColor.fold(origUser, destUser), perfPicker),
+        blackPlayer = Player.make(strategygames.chess.Black, c.finalColor.fold(destUser, origUser), perfPicker),
         mode = if (chessGame.board.variant.fromPosition) Mode.Casual else c.mode,
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,

@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import chess.format.Forsyth
+import strategygames.chess.format.Forsyth
 import JsonApi.Request.Evaluation
 
 final private class FishnetEvalCache(
@@ -34,7 +34,7 @@ final private class FishnetEvalCache(
     }
 
   private def rawEvals(game: Work.Game): Fu[List[(Int, lila.evalCache.EvalCacheEntry.Eval)]] =
-    chess.Replay
+    strategygames.chess.Replay
       .situationsFromUci(
         game.uciList.take(maxPlies - 1),
         game.initialFen,

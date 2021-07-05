@@ -1,6 +1,7 @@
 package lila.simul
 
-import chess.{ Centis, Clock, Color }
+import strategygames.chess.{ Color }
+import strategygames.{ Centis, Clock }
 
 // All durations are expressed in seconds
 case class SimulClock(
@@ -9,7 +10,11 @@ case class SimulClock(
 ) {
 
   def chessClockOf(hostColor: Color) =
-    config.toClock.giveTime(hostColor, Centis.ofSeconds(hostExtraTime))
+    config.toClock(strategygames.GameLib.Chess()).giveTime(
+      hostColor match {
+        case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
+        case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
+      }, Centis.ofSeconds(hostExtraTime))
 
   def hostExtraMinutes = hostExtraTime / 60
 }

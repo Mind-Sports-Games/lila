@@ -2,8 +2,9 @@ package lila.game
 
 import akka.stream.scaladsl._
 import akka.util.ByteString
-import chess.format.{ FEN, Forsyth, Uci }
-import chess.{ Centis, Color, Replay, Situation, Game => ChessGame }
+import strategygames.chess.format.{ FEN, Forsyth, Uci }
+import strategygames.chess.{ Color, Replay, Situation, Game => ChessGame }
+import strategygames.{ Centis }
 import play.api.libs.json._
 import play.api.libs.ws.JsonBodyWritables._
 import play.api.libs.ws.StandaloneWSClient

@@ -5,8 +5,8 @@ import play.api.libs.json._
 import reactivemongo.api.bson._
 import scalatags.Text.all._
 
-import chess.opening.EcopeningDB
-import chess.{ Color, Role }
+import strategygames.chess.opening.EcopeningDB
+import strategygames.chess.{ Color, Role }
 import lila.db.dsl._
 import lila.rating.PerfType
 
@@ -95,7 +95,7 @@ object Dimension {
       )
 
   case object Opening
-      extends Dimension[chess.opening.Ecopening](
+      extends Dimension[strategygames.chess.opening.Ecopening](
         "opening",
         "Opening",
         F.eco,
@@ -211,10 +211,10 @@ object Dimension {
       case Phase                   => lila.insight.Phase.all
       case Result                  => lila.insight.Result.all
       case Termination             => lila.insight.Termination.all
-      case Color                   => chess.Color.all
+      case Color                   => strategygames.chess.Color.all
       case Opening                 => EcopeningDB.all
       case OpponentStrength        => RelativeStrength.all
-      case PieceRole               => chess.Role.all.reverse
+      case PieceRole               => strategygames.chess.Role.all.reverse
       case MovetimeRange           => lila.insight.MovetimeRange.all
       case CplRange                => lila.insight.CplRange.all
       case MyCastling | OpCastling => lila.insight.Castling.all
@@ -232,10 +232,10 @@ object Dimension {
       case Phase                   => key.toIntOption flatMap lila.insight.Phase.byId.get
       case Result                  => key.toIntOption flatMap lila.insight.Result.byId.get
       case Termination             => key.toIntOption flatMap lila.insight.Termination.byId.get
-      case Color                   => chess.Color.fromName(key)
+      case Color                   => strategygames.chess.Color.fromName(key)
       case Opening                 => EcopeningDB.allByEco get key
       case OpponentStrength        => key.toIntOption flatMap RelativeStrength.byId.get
-      case PieceRole               => chess.Role.all.find(_.name == key)
+      case PieceRole               => strategygames.chess.Role.all.find(_.name == key)
       case MovetimeRange           => key.toIntOption flatMap lila.insight.MovetimeRange.byId.get
       case CplRange                => key.toIntOption flatMap lila.insight.CplRange.byId.get
       case MyCastling | OpCastling => key.toIntOption flatMap lila.insight.Castling.byId.get

@@ -1,9 +1,10 @@
 package lila.importer
 
 import cats.data.Validated
-import chess.format.pgn.{ ParsedPgn, Parser, Reader, Tag, TagType, Tags }
-import chess.format.{ FEN, Forsyth }
-import chess.{ Color, Mode, Replay, Status }
+import strategygames.chess.format.pgn.{ ParsedPgn, Parser, Reader, Tag, TagType, Tags }
+import strategygames.chess.format.{ FEN, Forsyth }
+import strategygames.chess.{ Color, Replay }
+import strategygames.{ Mode, Status }
 import play.api.data._
 import play.api.data.Forms._
 import scala.util.chaining._
@@ -65,14 +66,14 @@ case class ImportData(pgn: String, analyse: Option[String]) {
         val fromPosition = initBoard.nonEmpty && !parsed.tags.fen.exists(_.initial)
         val variant = {
           parsed.tags.variant | {
-            if (fromPosition) chess.variant.FromPosition
-            else chess.variant.Standard
+            if (fromPosition) strategygames.chess.variant.FromPosition
+            else strategygames.chess.variant.Standard
           }
         } match {
-          case chess.variant.Chess960 if !Chess960.isStartPosition(setup.board) =>
-            chess.variant.FromPosition
-          case chess.variant.FromPosition if parsed.tags.fen.isEmpty => chess.variant.Standard
-          case chess.variant.Standard if fromPosition                => chess.variant.FromPosition
+          case strategygames.chess.variant.Chess960 if !Chess960.isStartPosition(setup.board) =>
+            strategygames.chess.variant.FromPosition
+          case strategygames.chess.variant.FromPosition if parsed.tags.fen.isEmpty => strategygames.chess.variant.Standard
+          case strategygames.chess.variant.Standard if fromPosition                => strategygames.chess.variant.FromPosition
           case v                                                     => v
         }
         val game = state.copy(situation = state.situation withVariant variant)
@@ -95,12 +96,12 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           .make(
             chess = game,
             whitePlayer = Player.makeImported(
-              chess.White,
+              strategygames.chess.White,
               parsed.tags(_.White),
               parsed.tags(_.WhiteElo).flatMap(_.toIntOption)
             ),
             blackPlayer = Player.makeImported(
-              chess.Black,
+              strategygames.chess.Black,
               parsed.tags(_.Black),
               parsed.tags(_.BlackElo).flatMap(_.toIntOption)
             ),
