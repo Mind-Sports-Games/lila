@@ -1,8 +1,9 @@
 package lila.game
 
 import strategygames.{ Centis, Clock, ClockPlayer, Timestamp }
-import strategygames.chess._
-import strategygames.chess.format.Uci
+import strategygames.chess.{ Black, Board, Castles, Color, Piece, PieceMap, Pos, Rank, UnmovedRooks, White }
+import strategygames.chess.{ Role, Pawn, King, Queen, Rook, Knight, Bishop, LOAChecker }
+import strategygames.chess.format
 import strategygames.chess.variant.Variant
 import org.joda.time.DateTime
 import org.lichess.compression.clock.{ Encoder => ClockEncoder }
@@ -199,7 +200,7 @@ object BinaryFormat {
           orig <- Pos.at((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
           dest <- Pos.at((b2 & 63) >> 3, b2 & 7)
           if orig != Pos.A1 || dest != Pos.A1
-        } yield Uci.Move(orig, dest)
+        } yield format.Uci.Move(orig, dest)
       )
   }
 

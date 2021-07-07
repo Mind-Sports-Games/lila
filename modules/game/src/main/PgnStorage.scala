@@ -1,7 +1,8 @@
 package lila.game
 
-import strategygames.chess._
-import strategygames.chess.format.Uci
+import strategygames.chess.format
+import strategygames.chess.{ Castles, Color, Piece, PieceMap, Pos, PositionHash, UnmovedRooks }
+import strategygames.chess.{ Role, Pawn, King, Queen, Rook, Knight, Bishop }
 
 import lila.db.ByteArray
 
@@ -46,7 +47,7 @@ private object PgnStorage {
           }.toMap,
           positionHashes = decoded.positionHashes,
           unmovedRooks = UnmovedRooks(unmovedRooks),
-          lastMove = Option(decoded.lastUci) flatMap Uci.apply,
+          lastMove = Option(decoded.lastUci) flatMap format.Uci.apply,
           castles = Castles(
             whiteKingSide = unmovedRooks(Pos.H1),
             whiteQueenSide = unmovedRooks(Pos.A1),
@@ -76,7 +77,7 @@ private object PgnStorage {
       pieces: PieceMap,
       positionHashes: PositionHash, // irrelevant after game ends
       unmovedRooks: UnmovedRooks,   // irrelevant after game ends
-      lastMove: Option[Uci],
+      lastMove: Option[format.Uci],
       castles: Castles,  // irrelevant after game ends
       halfMoveClock: Int // irrelevant after game ends
   )
