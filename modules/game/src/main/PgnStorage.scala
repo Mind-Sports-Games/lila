@@ -1,8 +1,7 @@
 package lila.game
 
 import strategygames.chess.format
-import strategygames.chess.{ Castles, Color, Piece, PieceMap, Pos, PositionHash, UnmovedRooks }
-import strategygames.chess.{ Role, Pawn, King, Queen, Rook, Knight, Bishop }
+import strategygames.chess.{ Castles, Color, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks }
 
 import lila.db.ByteArray
 
@@ -60,14 +59,13 @@ private object PgnStorage {
 
     private def chessPos(sq: Integer): Option[Pos] = Pos(sq)
     private def chessRole(role: JavaRole): Role =
-      role match {
-        case JavaRole.PAWN   => Pawn
-        case JavaRole.KNIGHT => Knight
-        case JavaRole.BISHOP => Bishop
-        case JavaRole.ROOK   => Rook
-        case JavaRole.QUEEN  => Queen
-        case JavaRole.KING   => King
-      }
+      Role.pgnMoveToRole(
+        role.symbol.headOption match {
+          case Some(c) => c
+          case None => 'P'//JavaRole.PAWN.symbol is ""
+        }
+      )
+
     private def chessPiece(piece: JavaPiece): Piece =
       Piece(Color.fromWhite(piece.white), chessRole(piece.role))
   }
