@@ -75,15 +75,7 @@ final private class PovToEntry(
           }
       }
 
-  private def pgnMoveToRole(pgn: String): Role =
-    pgn.head match {
-      case 'N'       => strategygames.chess.Knight
-      case 'B'       => strategygames.chess.Bishop
-      case 'R'       => strategygames.chess.Rook
-      case 'Q'       => strategygames.chess.Queen
-      case 'K' | 'O' => strategygames.chess.King
-      case _         => strategygames.chess.Pawn
-    }
+  private def pgnMoveToRole(pgn: String): Role = Role.pgnMoveToRole(pgn.head)
 
   private def makeMoves(from: RichPov): List[InsightMove] = {
     val cpDiffs = ~from.moveAccuracy toVector
