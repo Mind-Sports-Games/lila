@@ -1,8 +1,7 @@
 package lila.game
 
 import strategygames.{ Centis, Clock, ClockPlayer, Timestamp }
-import strategygames.chess.{ Black, Board, Castles, Color, Piece, PieceMap, Pos, Rank, UnmovedRooks, White }
-import strategygames.chess.{ Role, Pawn, King, Queen, Rook, Knight, Bishop, LOAChecker }
+import strategygames.chess.{ Black, Board, Castles, Color, Piece, PieceMap, Pos, Rank, Role, UnmovedRooks, White }
 import strategygames.chess.format
 import strategygames.chess.variant.Variant
 import org.joda.time.DateTime
@@ -233,29 +232,10 @@ object BinaryFormat {
     // cache standard start position
     val standard = write(Board.init(strategygames.chess.variant.Standard).pieces)
 
-    private def intToRole(int: Int, variant: Variant): Option[Role] =
-      int match {
-        case 6 => Some(Pawn)
-        case 1 => Some(King)
-        case 2 => Some(Queen)
-        case 3 => Some(Rook)
-        case 4 => Some(Knight)
-        case 5 => Some(Bishop)
-        // Legacy from when we used to have an 'Antiking' piece
-        case 7 if variant.antichess => Some(King)
-        case 8 if variant.linesOfAction => Some(LOAChecker)
-        case _                      => None
-      }
-    private def roleToInt(role: Role): Int =
-      role match {
-        case Pawn   => 6
-        case King   => 1
-        case Queen  => 2
-        case Rook   => 3
-        case Knight => 4
-        case Bishop => 5
-        case LOAChecker => 8
-      }
+    private def intToRole(int: Int, variant: Variant): Option[Role] = Role.binaryInt(int)
+
+    private def roleToInt(role: Role): Int = role.binaryInt
+
   }
 
   object unmovedRooks {
