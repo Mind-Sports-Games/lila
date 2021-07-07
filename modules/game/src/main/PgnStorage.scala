@@ -58,13 +58,7 @@ private object PgnStorage {
       }
 
     private def chessPos(sq: Integer): Option[Pos] = Pos(sq)
-    private def chessRole(role: JavaRole): Role =
-      Role.pgnMoveToRole(
-        role.symbol.headOption match {
-          case Some(c) => c
-          case None => 'P'//JavaRole.PAWN.symbol is ""
-        }
-      )
+    private def chessRole(role: JavaRole): Role = Role.javaSymbolToRole(role.symbol)
 
     private def chessPiece(piece: JavaPiece): Piece =
       Piece(Color.fromWhite(piece.white), chessRole(piece.role))
