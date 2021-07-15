@@ -1,7 +1,7 @@
 package lila.explorer
 
 import akka.stream.scaladsl._
-import strategygames.chess.format.pgn.Tag
+import strategygames.format.pgn.Tag
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.ws.DefaultBodyWritables._

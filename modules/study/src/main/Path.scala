@@ -1,6 +1,6 @@
 package lila.study
 
-import strategygames.chess.format.UciCharPair
+import strategygames.format.UciCharPair
 
 case class Path(ids: Vector[UciCharPair]) extends AnyVal {
 

@@ -4,6 +4,7 @@ import actorApi.Who
 import cats.data.Validated
 import strategygames.Centis
 import strategygames.chess.format.pgn.{ Glyph, Glyphs }
+import strategygames.format.pgn.{ Tags }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -396,7 +397,7 @@ final private class StudySocket(
         "ply" -> ply.map(_.value)
       )
     )
-  def setTags(chapterId: Chapter.Id, tags: strategygames.chess.format.pgn.Tags, who: Who) =
+  def setTags(chapterId: Chapter.Id, tags: Tags, who: Who) =
     version(
       "setTags",
       Json.obj(

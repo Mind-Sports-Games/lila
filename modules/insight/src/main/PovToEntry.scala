@@ -21,7 +21,7 @@ final private class PovToEntry(
       provisional: Boolean,
       initialFen: Option[FEN],
       analysis: Option[lila.analyse.Analysis],
-      division: strategygames.chess.Division,
+      division: strategygames.Division,
       moveAccuracy: Option[List[Int]],
       boards: NonEmptyList[Board],
       movetimes: NonEmptyList[Centis],

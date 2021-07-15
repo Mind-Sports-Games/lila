@@ -1,6 +1,7 @@
 package lila.study
 
-import strategygames.chess.format.pgn.{ Glyph, Tags }
+import strategygames.chess.format.pgn.{ Glyph }
+import strategygames.format.pgn.{ Tags }
 import strategygames.chess.variant.Variant
 import strategygames.chess.{ Color }
 import strategygames.{ Centis }
@@ -75,11 +76,18 @@ case class Chapter(
       createdAt = DateTime.now
     )
 
+  private def tagsResultColor = tags.resultColor match {
+    case Some(Some(strategygames.Color.Chess(color))) => Some(Some(color))
+    case Some(None) => Some(None)
+    case None => None
+    case _ => sys.error("Not implemented for draughts yet")
+  }
+
   def metadata = Chapter.Metadata(
     _id = _id,
     name = name,
     setup = setup,
-    resultColor = tags.resultColor.isDefined option tags.resultColor,
+    resultColor = tagsResultColor.isDefined option tagsResultColor,
     hasRelayPath = relay.exists(!_.path.isEmpty)
   )
 

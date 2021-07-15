@@ -3,7 +3,8 @@ package lila.game
 import akka.actor._
 import akka.pattern.pipe
 import cats.data.NonEmptyList
-import strategygames.chess.format.pgn.{ Sans, Tags }
+import strategygames.format.pgn.Tags
+import strategygames.chess.format.pgn.Sans
 import strategygames.chess.format.{ pgn, Forsyth }
 import strategygames.chess.{ Game => ChessGame }
 import scala.util.Success

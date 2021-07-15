@@ -2,7 +2,7 @@ package lila.relay
 
 import org.joda.time.DateTime
 
-import strategygames.chess.format.pgn.{ Tag, Tags }
+import strategygames.format.pgn.{ Tag, Tags }
 import lila.socket.Socket.Sri
 import lila.study._
 

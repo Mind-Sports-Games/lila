@@ -1,7 +1,7 @@
 package lila.study
 
 import akka.stream.scaladsl._
-import strategygames.chess.format.pgn.Tags
+import strategygames.format.pgn.Tags
 import strategygames.Centis
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.bson._

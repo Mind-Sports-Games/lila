@@ -1,6 +1,7 @@
 package lila.analyse
 
-import strategygames.chess.format.pgn.{ Glyphs, Move, Pgn, Tag, Turn }
+import strategygames.chess.format.pgn.{ Glyphs, Move, Pgn, Turn }
+import strategygames.format.pgn.{ Tag }
 import strategygames.chess.opening._
 import strategygames.chess.{ Color }
 import strategygames.{ Status }

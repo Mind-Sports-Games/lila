@@ -1,6 +1,7 @@
 package lila.study
 
 import strategygames.chess.format.{ FEN, Uci }
+import strategygames.format.pgn.{ Tag, Tags }
 import strategygames.chess.Pos
 import play.api.libs.json._
 import scala.util.chaining._
@@ -179,10 +180,10 @@ object JsonView {
   implicit private val variantWrites = OWrites[strategygames.chess.variant.Variant] { v =>
     Json.obj("key" -> v.key, "name" -> v.name)
   }
-  implicit val pgnTagWrites: Writes[strategygames.chess.format.pgn.Tag] = Writes[strategygames.chess.format.pgn.Tag] { t =>
+  implicit val pgnTagWrites: Writes[Tag] = Writes[Tag] { t =>
     Json.arr(t.name.toString, t.value)
   }
-  implicit val pgnTagsWrites = Writes[strategygames.chess.format.pgn.Tags] { tags =>
+  implicit val pgnTagsWrites = Writes[Tags] { tags =>
     JsArray(tags.value map pgnTagWrites.writes)
   }
   implicit private val chapterSetupWrites = Json.writes[Chapter.Setup]

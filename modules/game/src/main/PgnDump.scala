@@ -1,10 +1,11 @@
 package lila.game
 
 import strategygames.chess.format.Forsyth
-import strategygames.chess.format.pgn.{ ParsedPgn, Parser, Pgn, Tag, TagType, Tags }
+import strategygames.chess.format.pgn.{ ParsedPgn, Parser, Pgn }
 import strategygames.chess.format.{ FEN, pgn => chessPgn }
 import strategygames.chess.{ Color }
 import strategygames.{ Centis }
+import strategygames.format.pgn.{ Tag, TagType, Tags }
 
 import lila.common.config.BaseUrl
 import lila.common.LightUser
@@ -30,7 +31,11 @@ final class PgnDump(
       else fuccess(Tags(Nil))
     tagsFuture map { ts =>
       val turns = flags.moves ?? {
-        val fenSituation = ts.fen flatMap Forsyth.<<<
+        val fenSituation = ts.fen match {
+          case Some(strategygames.format.FEN.Chess(fen)) => Forsyth.<<<(fen)
+          case None => None
+          case _ => sys.error("Not implemented for draughts yet")
+        }
         makeTurns(
           flags keepDelayIf game.playable applyDelay {
             if (fenSituation.exists(_.situation.color.black)) ".." +: game.pgnMoves

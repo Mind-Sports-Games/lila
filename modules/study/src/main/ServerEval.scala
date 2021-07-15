@@ -1,7 +1,8 @@
 package lila.study
 
 import strategygames.chess.format.pgn.Glyphs
-import strategygames.chess.format.{ Forsyth, Uci, UciCharPair }
+import strategygames.chess.format.{ Forsyth, Uci }
+import strategygames.format.{ UciCharPair }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -149,7 +150,7 @@ object ServerEval {
 
     private def makeBranch(g: strategygames.chess.Game, m: Uci.WithSan) =
       Node(
-        id = UciCharPair(m.uci),
+        id = strategygames.chess.format.UciCharPair(m.uci),
         ply = g.turns,
         move = m,
         fen = Forsyth >> g,
@@ -161,7 +162,7 @@ object ServerEval {
       )
   }
 
-  case class Progress(chapterId: Chapter.Id, tree: T.Root, analysis: JsObject, division: strategygames.chess.Division)
+  case class Progress(chapterId: Chapter.Id, tree: T.Root, analysis: JsObject, division: strategygames.Division)
 
   def toJson(chapter: Chapter, analysis: Analysis) =
     lila.analyse.JsonView.bothPlayers(

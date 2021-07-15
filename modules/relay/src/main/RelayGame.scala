@@ -1,6 +1,6 @@
 package lila.relay
 
-import strategygames.chess.format.pgn.Tags
+import strategygames.format.pgn.Tags
 import lila.study.{ Chapter, Node, PgnImport }
 
 case class RelayGame(

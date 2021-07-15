@@ -2,15 +2,16 @@ package lila.game
 
 import cats.data.Validated
 import strategygames.chess.format.{ FEN, pgn => chessPgn }
+import strategygames.format.pgn.{ Tag, Tags }
 import org.joda.time.DateTime
 
 object Rewind {
 
   private def createTags(fen: Option[FEN], game: Game) = {
-    val variantTag = Some(chessPgn.Tag(_.Variant, game.variant.name))
-    val fenTag     = fen.map(f => chessPgn.Tag(_.FEN, f.value))
+    val variantTag = Some(Tag(_.Variant, game.variant.name))
+    val fenTag     = fen.map(f => Tag(_.FEN, f.value))
 
-    chessPgn.Tags(List(variantTag, fenTag).flatten)
+    Tags(List(variantTag, fenTag).flatten)
   }
 
   def apply(game: Game, initialFen: Option[FEN]): Validated[String, Progress] =

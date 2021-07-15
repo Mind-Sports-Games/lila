@@ -3,7 +3,7 @@ package lila.game
 import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 
-import strategygames.chess.Division
+import strategygames.Division
 import strategygames.chess.variant.Variant
 import strategygames.chess.format.FEN
 

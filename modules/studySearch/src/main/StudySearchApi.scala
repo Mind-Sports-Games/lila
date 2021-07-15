@@ -2,7 +2,7 @@ package lila.studySearch
 
 import akka.actor._
 import akka.stream.scaladsl._
-import strategygames.chess.format.pgn.Tag
+import strategygames.format.pgn.{ Tag, TagType }
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json._
@@ -66,7 +66,7 @@ final class StudySearchApi(
       Fields.public -> s.study.isPublic
     )
 
-  private val relevantPgnTags: Set[strategygames.chess.format.pgn.TagType] = Set(
+  private val relevantPgnTags: Set[TagType] = Set(
     Tag.Variant,
     Tag.Event,
     Tag.Round,

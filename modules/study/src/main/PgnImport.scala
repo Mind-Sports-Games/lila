@@ -2,8 +2,10 @@ package lila.study
 
 import cats.data.Validated
 import strategygames.Centis
-import strategygames.chess.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
-import strategygames.chess.format.{ Forsyth, Uci, UciCharPair }
+import strategygames.chess.format.pgn.{ Dumper, Glyphs, ParsedPgn, San }
+import strategygames.format.pgn.{ Tags }
+import strategygames.chess.format.{ Forsyth, Uci }
+import strategygames.format.{ UciCharPair }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
@@ -129,7 +131,7 @@ object PgnImport {
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(
-                    id = UciCharPair(uci),
+                    id = strategygames.chess.format.UciCharPair(uci),
                     ply = game.turns,
                     move = Uci.WithSan(uci, sanStr),
                     fen = Forsyth >> game,

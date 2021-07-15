@@ -2,7 +2,7 @@ package lila.study
 
 import BSONHandlers._
 import strategygames.chess.Color
-import strategygames.chess.format.pgn.Tags
+import strategygames.format.pgn.Tags
 import strategygames.chess.format.{ FEN, Uci }
 import com.github.blemale.scaffeine.AsyncLoadingCache
 import JsonView._

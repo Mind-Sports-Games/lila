@@ -1,6 +1,6 @@
 package lila.study
 
-import strategygames.chess.format.pgn.Tags
+import strategygames.format.pgn.Tags
 import strategygames.chess.format.{ FEN, Forsyth }
 import strategygames.chess.variant.{ Crazyhouse, Variant }
 import lila.chat.{ Chat, ChatApi }

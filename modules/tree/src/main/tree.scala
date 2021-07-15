@@ -2,7 +2,8 @@ package lila.tree
 
 import strategygames.Centis
 import strategygames.chess.format.pgn.{ Glyph, Glyphs }
-import strategygames.chess.format.{ FEN, Uci, UciCharPair }
+import strategygames.format.UciCharPair
+import strategygames.chess.format.{ FEN, Uci }
 import strategygames.chess.opening.FullOpening
 import strategygames.chess.Pos
 import strategygames.chess.variant.Crazyhouse

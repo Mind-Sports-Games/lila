@@ -1,7 +1,8 @@
 package lila.study
 
 import akka.stream.scaladsl._
-import strategygames.chess.format.pgn.{ Glyphs, Initial, Pgn, Tag, Tags }
+import strategygames.chess.format.pgn.{ Glyphs, Initial, Pgn }
+import strategygames.format.pgn.{ Tag, Tags }
 import strategygames.chess.format.{ pgn => chessPgn }
 import org.joda.time.format.DateTimeFormat
 

@@ -210,7 +210,7 @@ final class JsonView(
       orientation: strategygames.chess.Color,
       owner: Boolean,
       me: Option[User],
-      division: Option[strategygames.chess.Division] = none
+      division: Option[strategygames.Division] = none
   ) = {
     import pov._
     val fen = Forsyth >> game.chess

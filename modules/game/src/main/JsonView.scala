@@ -134,7 +134,7 @@ object JsonView {
     )
   }
 
-  implicit val divisionWriter: OWrites[strategygames.chess.Division] = OWrites { o =>
+  implicit val divisionWriter: OWrites[strategygames.Division] = OWrites { o =>
     Json.obj(
       "middle" -> o.middle,
       "end"    -> o.end

@@ -125,7 +125,7 @@ object Phase {
   val byId = all map { p =>
     (p.id, p)
   } toMap
-  def of(div: strategygames.chess.Division, ply: Int): Phase =
+  def of(div: strategygames.Division, ply: Int): Phase =
     div.middle.fold[Phase](Opening) {
       case m if m > ply => Opening
       case _ =>
