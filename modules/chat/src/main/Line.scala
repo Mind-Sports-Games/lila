@@ -1,6 +1,6 @@
 package lila.chat
 
-import strategygames.chess.Color
+import strategygames.Color
 
 import lila.user.{ Title, User }
 
@@ -88,7 +88,7 @@ object Line {
 
   def strToLine(str: String): Option[Line] =
     strToUserLine(str) orElse {
-      str.headOption flatMap Color.apply map { color =>
+      str.headOption flatMap {c => Color.apply(strategygames.GameLib.Chess(), c)} map { color =>
         PlayerLine(color, str drop 2)
       }
     }
