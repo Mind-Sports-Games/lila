@@ -1,9 +1,8 @@
 package lila.round
 
 import actorApi.SocketStatus
-import strategygames.chess.format.{ FEN, Forsyth }
-import strategygames.chess.{ Color }
-import strategygames.{ Clock }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.{ Clock, Color }
 import play.api.libs.json._
 import scala.math
 
@@ -207,13 +206,13 @@ final class JsonView(
       pov: Pov,
       pref: Pref,
       initialFen: Option[FEN],
-      orientation: strategygames.chess.Color,
+      orientation: Color,
       owner: Boolean,
       me: Option[User],
       division: Option[strategygames.Division] = none
   ) = {
     import pov._
-    val fen = Forsyth >> game.chess
+    val fen = Forsyth.>>(strategygames.GameLib.Chess(), game.chess)
     Json
       .obj(
         "game" -> Json
@@ -221,7 +220,7 @@ final class JsonView(
             "id"         -> gameId,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
-            "initialFen" -> (initialFen | strategygames.chess.format.Forsyth.initial),
+            "initialFen" -> (initialFen | Forsyth.initial(strategygames.GameLib.Chess())),
             "fen"        -> fen,
             "turns"      -> game.turns,
             "player"     -> game.turnColor.name,

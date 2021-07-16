@@ -1,7 +1,6 @@
 package lila.round
 
-import strategygames.chess.{ Color }
-import strategygames.{ Speed }
+import strategygames.{ Black, Color, Speed, White }
 import org.goochjs.glicko2._
 
 import lila.game.{ Game, GameRepo, PerfPicker, RatingDiffs }
@@ -120,8 +119,8 @@ final class PerfsUpdater(
 
   private def updateRatings(white: Rating, black: Rating, game: Game): Unit = {
     val result = game.winnerColor match {
-      case Some(strategygames.chess.White) => Glicko.Result.Win
-      case Some(strategygames.chess.Black) => Glicko.Result.Loss
+      case Some(White(strategygames.GameLib.Chess())) => Glicko.Result.Win
+      case Some(Black(strategygames.GameLib.Chess())) => Glicko.Result.Loss
       case None              => Glicko.Result.Draw
     }
     val results = new RatingPeriodResults()

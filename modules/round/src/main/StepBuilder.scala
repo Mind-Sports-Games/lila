@@ -1,8 +1,8 @@
 package lila.round
 
-import strategygames.chess.format.FEN
-import strategygames.chess.format.Forsyth
-import strategygames.chess.variant.Variant
+import strategygames.Replay
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.variant.Variant
 import play.api.libs.json._
 
 import lila.socket.Step
@@ -17,7 +17,7 @@ object StepBuilder {
       variant: Variant,
       initialFen: FEN
   ): JsArray = {
-    strategygames.chess.Replay.gameMoveWhileValid(pgnMoves, initialFen, variant) match {
+    Replay.gameMoveWhileValid(strategygames.GameLib.Chess(), pgnMoves, initialFen, variant) match {
       case (init, games, error) =>
         error foreach logChessError(id)
         JsArray {

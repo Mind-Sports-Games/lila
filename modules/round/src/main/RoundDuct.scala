@@ -1,7 +1,7 @@
 package lila.round
 
 import actorApi._, round._
-import strategygames.chess.{ Black, Color, White }
+import strategygames.{ Black, Color, White }
 import strategygames.{ Centis }
 import org.joda.time.DateTime
 import ornicar.scalalib.Zero
@@ -104,8 +104,8 @@ final private[round] class RoundDuct(
       botConnections = Math.max(0, botConnections + (if (v) 1 else -1))
   }
 
-  private val whitePlayer = new Player(White)
-  private val blackPlayer = new Player(Black)
+  private val whitePlayer = new Player(White(strategygames.GameLib.Chess()))
+  private val blackPlayer = new Player(Black(strategygames.GameLib.Chess()))
 
   def getGame: Fu[Option[Game]]          = proxy.game
   def updateGame(f: Game => Game): Funit = proxy update f
@@ -114,8 +114,8 @@ final private[round] class RoundDuct(
 
     case SetGameInfo(game, (whiteGoneWeight, blackGoneWeight)) =>
       fuccess {
-        whitePlayer.userId = game.player(White).userId
-        blackPlayer.userId = game.player(Black).userId
+        whitePlayer.userId = game.player(White(strategygames.GameLib.Chess())).userId
+        blackPlayer.userId = game.player(Black(strategygames.GameLib.Chess())).userId
         mightBeSimul = game.isSimul
         whitePlayer.goneWeight = whiteGoneWeight
         blackPlayer.goneWeight = blackGoneWeight
@@ -389,17 +389,8 @@ final private[round] class RoundDuct(
             g.clock.fold(Progress(g)) { clock =>
               g.withClock {
                 clock
-                  .giveTime(
-                    g.turnColor match {
-                      case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-                      case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-                    },
-                    Centis(2000)
-                  )
-                  .giveTime(!(g.turnColor match {
-                    case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-                    case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-                  }), Centis(1000))
+                  .giveTime(g.turnColor, Centis(2000))
+                  .giveTime(!g.turnColor, Centis(1000))
               }
             }
           }
@@ -410,7 +401,7 @@ final private[round] class RoundDuct(
       handle { game =>
         game.playable ?? {
           messenger.system(game, "PlayStrategy has been updated! Sorry for the inconvenience.")
-          val progress = moretimer.give(game, Color.all, 20 seconds)
+          val progress = moretimer.give(game, Color.all(strategygames.GameLib.Chess()), 20 seconds)
           proxy save progress inject progress.events
         }
       }
@@ -450,17 +441,12 @@ final private[round] class RoundDuct(
     case Tick =>
       proxy.withGameOptionSync { g =>
         (g.forceResignable && g.bothPlayersHaveMoved) ?? fuccess {
-          Color.all.foreach { c =>
+          Color.all(strategygames.GameLib.Chess()).foreach { c =>
             if (!getPlayer(c).isOnline && getPlayer(!c).isOnline) {
               getPlayer(c).showMillisToGone foreach {
                 _ ?? { millis =>
                   if (millis <= 0) notifyGone(c, gone = true)
-                  else g.clock.exists(_.remainingTime(
-                    c match {
-                      case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-                      case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-                    }
-                  ).millis > millis + 3000) ?? notifyGoneIn(c, millis)
+                  else g.clock.exists(_.remainingTime(c).millis > millis + 3000) ?? notifyGoneIn(c, millis)
                 }
               }
             }
@@ -480,10 +466,7 @@ final private[round] class RoundDuct(
       for {
         user  <- pov.player.userId
         clock <- pov.game.clock
-        lag   <- clock.lag(pov.color match {
-          case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-          case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-        }).lagMean
+        lag   <- clock.lag(pov.color).lagMean
       } UserLagCache.put(user, lag)
     }
 

@@ -3,8 +3,8 @@ package lila.round
 import org.joda.time.DateTime
 import play.api.libs.json._
 
-import strategygames.chess.format.Uci
-import strategygames.chess.Move
+import strategygames.format.Uci
+import strategygames.Move
 import lila.common.Json.jodaWrites
 import lila.game.Game
 
@@ -53,7 +53,7 @@ object Forecast {
     def is(move: Move)     = move.toUci.uci == uci
     def is(move: Uci.Move) = move.uci == uci
 
-    def uciMove = Uci.Move(uci)
+    def uciMove = Uci.Move(strategygames.GameLib.Chess(), uci)
   }
 
   implicit val forecastStepJsonFormat = Json.format[Step]

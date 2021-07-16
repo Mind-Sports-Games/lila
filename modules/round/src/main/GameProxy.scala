@@ -4,7 +4,7 @@ import akka.actor.{ Cancellable, Scheduler }
 import scala.concurrent.duration._
 import scala.util.Success
 
-import strategygames.chess.Color
+import strategygames.Color
 import lila.game.{ Game, GameRepo, Pov, Progress }
 
 // NOT thread safe

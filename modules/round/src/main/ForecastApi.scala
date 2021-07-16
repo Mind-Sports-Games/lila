@@ -7,7 +7,8 @@ import lila.db.dsl._
 import org.joda.time.DateTime
 import scala.concurrent.Promise
 
-import strategygames.chess.format.Uci
+import strategygames.{ Color, Move }
+import strategygames.format.Uci
 import Forecast.Step
 import lila.game.Game.PlayerId
 import lila.game.{ Game, Pov }
@@ -46,7 +47,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
   ): Funit =
     if (!pov.isMyTurn) funit
     else
-      Uci.Move(uciMove).fold[Funit](fufail(s"Invalid move $uciMove on $pov")) { uci =>
+      Uci.Move(strategygames.GameLib.Chess(), uciMove).fold[Funit](fufail(s"Invalid move $uciMove on $pov")) { uci =>
         val promise = Promise[Unit]()
         tellRound(
           pov.gameId,
@@ -76,7 +77,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
         else fuccess(fc.some)
     }
 
-  def nextMove(g: Game, last: strategygames.chess.Move): Fu[Option[Uci.Move]] =
+  def nextMove(g: Game, last: Move): Fu[Option[Uci.Move]] =
     g.forecastable ?? {
       loadForPlay(Pov player g) flatMap {
         case None => fuccess(none)
@@ -92,7 +93,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
 
   private def firstStep(steps: Forecast.Steps) = steps.headOption.flatMap(_.headOption)
 
-  def clearGame(g: Game) = coll.delete.one($inIds(strategygames.chess.Color.all.map(g.fullIdOf))).void
+  def clearGame(g: Game) = coll.delete.one($inIds(Color.all(strategygames.GameLib.Chess()).map(g.fullIdOf))).void
 
   def clearPov(pov: Pov) = coll.delete.one($id(pov.fullId)).void
 }

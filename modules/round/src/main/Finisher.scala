@@ -1,7 +1,6 @@
 package lila.round
 
-import strategygames.chess.{ Color }
-import strategygames.{ DecayingStats, Status }
+import strategygames.{ Color, DecayingStats, Status }
 
 import lila.common.{ Bus, Uptime }
 import lila.game.actorApi.{ AbortedBy, FinishGame }
@@ -110,7 +109,7 @@ final private class Finisher(
   )(implicit proxy: GameProxy): Fu[Events] = {
     val status = makeStatus(Status)
     val prog   = game.finish(status, winnerC)
-    if (game.nonAi && game.isCorrespondence) Color.all foreach notifier.gameEnd(prog.game)
+    if (game.nonAi && game.isCorrespondence) Color.all(strategygames.GameLib.Chess()) foreach notifier.gameEnd(prog.game)
     lila.mon.game
       .finish(
         variant = game.variant.key,

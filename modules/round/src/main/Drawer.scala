@@ -25,12 +25,7 @@ final private[round] class Drawer(
           pov.player.userId ?? prefApi.getPref map { pref =>
             pref.autoThreefold == Pref.AutoThreefold.ALWAYS || {
               pref.autoThreefold == Pref.AutoThreefold.TIME &&
-              game.clock ?? { _.remainingTime(
-                pov.color match {
-                  case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-                  case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-                }
-              ) < Centis.ofSeconds(30) }
+              game.clock ?? { _.remainingTime(pov.color) < Centis.ofSeconds(30) }
             } || pov.player.userId.exists(isBotSync)
           } map (_ option pov)
       }

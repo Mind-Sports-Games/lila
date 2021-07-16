@@ -2,7 +2,7 @@ package lila.round
 
 import akka.actor._
 import akka.stream.scaladsl._
-import strategygames.chess.format.Forsyth
+import strategygames.format.Forsyth
 import play.api.libs.json._
 
 import lila.common.Bus
@@ -67,7 +67,7 @@ final private class TvBroadcast(
               .add("rating" -> p.rating)
           }
         ),
-        fen = Forsyth exportBoard pov.game.chess.board
+        fen = Forsyth.exportBoard(strategygames.GameLib.Chess(), pov.game.chess.board)
       )
       clients.foreach { client =>
         client.queue offer {

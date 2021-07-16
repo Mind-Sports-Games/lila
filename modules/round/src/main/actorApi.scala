@@ -4,9 +4,8 @@ package actorApi
 import scala.concurrent.Promise
 import scala.concurrent.duration._
 
-import strategygames.chess.format.Uci
-import strategygames.chess.{ Color }
-import strategygames.{ MoveMetrics }
+import strategygames.format.Uci
+import strategygames.{ Color, Move, MoveMetrics }
 
 import lila.common.IpAddress
 import lila.game.Game.PlayerId
@@ -23,7 +22,7 @@ case class SocketStatus(
 ) {
   def onGame(color: Color)     = color.fold(whiteOnGame, blackOnGame)
   def isGone(color: Color)     = color.fold(whiteIsGone, blackIsGone)
-  def colorsOnGame: Set[Color] = Color.all.filter(onGame).toSet
+  def colorsOnGame: Set[Color] = Color.all(strategygames.GameLib.Chess()).filter(onGame).toSet
 }
 case class RoomCrowd(white: Boolean, black: Boolean)
 case class BotConnected(color: Color, v: Boolean)
@@ -55,7 +54,7 @@ package round {
   case object QuietFlag
   case class ClientFlag(color: Color, fromPlayerId: Option[PlayerId])
   case object Abandon
-  case class ForecastPlay(lastMove: strategygames.chess.Move)
+  case class ForecastPlay(lastMove: Move)
   case class Cheat(color: Color)
   case class HoldAlert(playerId: PlayerId, mean: Int, sd: Int, ip: IpAddress)
   case class GoBerserk(color: Color, promise: Promise[Boolean])

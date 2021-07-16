@@ -1,10 +1,8 @@
 package lila.round
 
-import strategygames.chess.format.Forsyth
+import strategygames.format.Forsyth
 import strategygames.chess.variant._
-import strategygames.chess.{ Game => ChessGame, Board, Color => ChessColor, Castles, Situation, History }
-import strategygames.{ Clock }
-import ChessColor.{ Black, White }
+import strategygames.{ Black, Clock, Color, Game => ChessGame, Board, Castles, Situation, History, White }
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
 import scala.concurrent.duration._
@@ -100,7 +98,7 @@ final private class Rematcher(
   private def returnGame(pov: Pov): Fu[Game] =
     for {
       initialFen <- gameRepo initialFen pov.game
-      situation = initialFen flatMap Forsyth.<<<
+      situation = initialFen.flatMap{fen => Forsyth.<<<(strategygames.GameLib.Chess(), fen)}
       pieces = pov.game.variant match {
         case Chess960 =>
           if (chess960 get pov.gameId) Chess960.pieces
@@ -109,17 +107,17 @@ final private class Rematcher(
         case variant      => variant.pieces
       }
       users <- userRepo byIds pov.game.userIds
-      board = Board(pieces, variant = pov.game.variant).withHistory(
-        History(
+      board = Board.Chess(strategygames.chess.Board(pieces, variant = pov.game.variant).withHistory(
+        History.Chess(strategygames.chess.History(
           lastMove = situation.flatMap(_.situation.board.history.lastMove),
           castles = situation.fold(Castles.init)(_.situation.board.history.castles)
-        )
-      )
+        ))
+      ))
       game <- Game.make(
         chess = ChessGame(
-          situation = Situation(
+          situation = Situation.Chess(
             board = board,
-            color = situation.fold[strategygames.chess.Color](White)(_.situation.color)
+            color = situation.fold[Color](White(strategygames.GameLib.Chess()))(_.situation.color)
           ),
           clock = pov.game.clock map { c =>
             Clock(strategygames.GameLib.Chess(), c.config)
@@ -127,8 +125,8 @@ final private class Rematcher(
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)
         ),
-        whitePlayer = returnPlayer(pov.game, White, users),
-        blackPlayer = returnPlayer(pov.game, Black, users),
+        whitePlayer = returnPlayer(pov.game, White(strategygames.GameLib.Chess()), users),
+        blackPlayer = returnPlayer(pov.game, Black(strategygames.GameLib.Chess()), users),
         mode = if (users.exists(_.lame)) strategygames.Mode.Casual else pov.game.mode,
         source = pov.game.source | Source.Lobby,
         daysPerTurn = pov.game.daysPerTurn,
@@ -136,7 +134,7 @@ final private class Rematcher(
       ) withUniqueId idGenerator
     } yield game
 
-  private def returnPlayer(game: Game, color: ChessColor, users: List[User]): lila.game.Player =
+  private def returnPlayer(game: Game, color: Color, users: List[User]): lila.game.Player =
     game.opponent(color).aiLevel match {
       case Some(ai) => lila.game.Player.make(color, ai.some)
       case None =>
@@ -150,11 +148,11 @@ final private class Rematcher(
     }
 
   private def redirectEvents(game: Game): Events = {
-    val whiteId = game fullIdOf White
-    val blackId = game fullIdOf Black
+    val whiteId = game fullIdOf White(strategygames.GameLib.Chess())
+    val blackId = game fullIdOf Black(strategygames.GameLib.Chess())
     List(
-      Event.RedirectOwner(White, blackId, AnonCookie.json(game pov Black)),
-      Event.RedirectOwner(Black, whiteId, AnonCookie.json(game pov White)),
+      Event.RedirectOwner(White(strategygames.GameLib.Chess()), blackId, AnonCookie.json(game pov Black(strategygames.GameLib.Chess()))),
+      Event.RedirectOwner(Black(strategygames.GameLib.Chess()), whiteId, AnonCookie.json(game pov White(strategygames.GameLib.Chess()))),
       // tell spectators about the rematch
       Event.RematchTaken(game.id)
     )
@@ -164,6 +162,6 @@ final private class Rematcher(
 private object Rematcher {
 
   case class Offers(white: Boolean, black: Boolean) {
-    def apply(color: strategygames.chess.Color) = color.fold(white, black)
+    def apply(color: Color) = color.fold(white, black)
   }
 }

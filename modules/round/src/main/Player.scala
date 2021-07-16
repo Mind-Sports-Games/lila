@@ -1,8 +1,7 @@
 package lila.round
 
-import strategygames.chess.format.{ Forsyth, Uci }
-import strategygames.chess.{ MoveOrDrop }
-import strategygames.{ Centis, MoveMetrics, Status }
+import strategygames.format.{ Forsyth, Uci }
+import strategygames.{ Centis, MoveMetrics, MoveOrDrop, Status }
 
 import actorApi.round.{ DrawNo, ForecastPlay, HumanPlay, TakebackNo, TooManyPlies }
 import lila.game.actorApi.MoveGameEvent
@@ -127,7 +126,7 @@ final private class Player(
       metrics: MoveMetrics
   ): Validated[String, MoveResult] =
     (uci match {
-      case Uci.Move(orig, dest, prom) =>
+      case Uci.Move(strategygames.GameLib.Chess(), orig, dest, prom) =>
         game.chess(orig, dest, prom, metrics) map { case (ncg, move) =>
           ncg -> (Left(move): MoveOrDrop)
         }
@@ -136,13 +135,7 @@ final private class Player(
           ncg -> (Right(drop): MoveOrDrop)
         }
     }).map {
-      case (ncg, _) if ncg.clock.exists(_.outOfTime(
-        game.turnColor match {
-            case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-            case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-        },
-        withGrace = false
-      )) => Flagged
+      case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnColor, withGrace = false)) => Flagged
       case (newChessGame, moveOrDrop) =>
         MoveApplied(
           game.update(newChessGame, moveOrDrop, blur),
@@ -155,7 +148,7 @@ final private class Player(
     val color = moveOrDrop.fold(_.color, _.color)
     val moveEvent = MoveEvent(
       gameId = game.id,
-      fen = Forsyth exportBoard game.board,
+      fen = Forsyth.exportBoard(strategygames.GameLib.Chess(), game.board),
       move = moveOrDrop.fold(_.toUci.keys, _.toUci.uci)
     )
 

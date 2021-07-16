@@ -3,9 +3,8 @@ package lila.round
 import actorApi._
 import actorApi.round._
 import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
-import strategygames.chess.format.Uci
-import strategygames.chess.{ Black, Color, White }
-import strategygames.{ Centis, MoveMetrics, Speed }
+import strategygames.format.Uci
+import strategygames.{ Black, Centis, Color, MoveMetrics, Speed, White }
 import play.api.libs.json._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
@@ -323,8 +322,8 @@ object RoundSocket {
         else s.toIntOption map Centis.apply
 
       private def readColor(s: String) =
-        if (s == "w") Some(White)
-        else if (s == "b") Some(Black)
+        if (s == "w") Some(White(strategygames.GameLib.Chess()))
+        else if (s == "b") Some(Black(strategygames.GameLib.Chess()))
         else None
     }
 
