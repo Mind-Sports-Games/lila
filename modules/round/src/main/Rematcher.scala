@@ -107,12 +107,12 @@ final private class Rematcher(
         case variant      => variant.pieces
       }
       users <- userRepo byIds pov.game.userIds
-      board = Board.Chess(strategygames.chess.Board(pieces, variant = pov.game.variant).withHistory(
-        History.Chess(strategygames.chess.History(
+      board = strategygames.chess.Board(pieces, variant = pov.game.variant).withHistory(
+        strategygames.chess.History(
           lastMove = situation.flatMap(_.situation.board.history.lastMove),
           castles = situation.fold(Castles.init)(_.situation.board.history.castles)
-        ))
-      ))
+        )
+      )
       game <- Game.make(
         chess = ChessGame(
           situation = Situation.Chess(

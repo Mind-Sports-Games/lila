@@ -40,7 +40,7 @@ object TreeBuilder {
         val openingOf: OpeningOf =
           if (withFlags.opening && Variant.openingSensibleVariants(game.variant)) FullOpeningDB.findByFen
           else _ => None
-        val fen                 = Forsyth >> init
+        val fen                 = Forsyth.>>(strategygames.GameLib.Chess(), init)
         val infos: Vector[Info] = analysis.??(_.infos.toVector)
         val advices: Map[Ply, Advice] = analysis.??(_.advices.view.map { a =>
           a.ply -> a
