@@ -1,11 +1,9 @@
 package lila.game
 
-import strategygames.chess.Color.{ Black, White }
-import strategygames.chess.format.{ FEN, Uci }
+import strategygames.format.{ FEN, Uci }
 import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.variant.{ FromPosition, Standard, Variant }
-import strategygames.chess.{ Castles, CheckCount, Color, MoveOrDrop, Game => ChessGame }
-import strategygames.{ Centis, Clock, Mode, Speed, Status }
+import strategygames.{ Black, Castles, Centis, CheckCount, Clock, Color, Game => ChessGame, Mode, MoveOrDrop, Speed, Status, White }
 import org.joda.time.DateTime
 
 import lila.common.Sequence
@@ -115,10 +113,7 @@ case class Game(
   def moveTimes(color: Color): Option[List[Centis]] = {
     for {
       clk <- clock
-      inc = clk.incrementOf(color match {
-        case(White) => strategygames.White(strategygames.GameLib.Chess())
-        case(Black) => strategygames.Black(strategygames.GameLib.Chess())
-      })
+      inc = clk.incrementOf(color)
       history <- clockHistory
       clocks = history(color)
     } yield Centis(0) :: {
@@ -352,12 +347,7 @@ case class Game(
 
   def moretimeable(color: Color) =
     playable && nonMandatory && {
-      clock.??(_.moretimeable(
-        color match {
-          case(White) => strategygames.White(strategygames.GameLib.Chess())
-          case(Black) => strategygames.Black(strategygames.GameLib.Chess())
-        })
-      ) || correspondenceClock.??(_ moretimeable color)
+      clock.??(_ moretimeable color) || correspondenceClock.??(_ moretimeable color)
     }
 
   def abortable = status == Status.Started && playedTurns < 2 && nonMandatory
@@ -366,10 +356,7 @@ case class Game(
 
   def goBerserk(color: Color): Option[Progress] =
     clock.ifTrue(berserkable && !player(color).berserk).map { c =>
-      val newClock = c.goBerserk(color match {
-        case(White) => strategygames.White(strategygames.GameLib.Chess())
-        case(Black) => strategygames.Black(strategygames.GameLib.Chess())
-      })
+      val newClock = c goBerserk color
       Progress(
         this,
         copy(
@@ -469,13 +456,7 @@ case class Game(
   private def outoftimeClock(withGrace: Boolean): Boolean =
     clock ?? { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
-        c.outOfTime(
-          turnColor match {
-            case(White) => strategygames.White(strategygames.GameLib.Chess())
-            case(Black) => strategygames.Black(strategygames.GameLib.Chess())
-          }, 
-          withGrace
-        ) || {
+        c.outOfTime(turnColor, withGrace) || {
           !c.isRunning && c.players.exists(_.elapsed.centis > 0)
         }
       }
@@ -731,7 +712,7 @@ object Game {
     }
 
   def isBoardCompatible(clock: Clock.Config): Boolean =
-    strategygames.Speed(clock) >= Speed.Rapid
+    Speed(clock) >= Speed.Rapid
 
   def isBotCompatible(game: Game): Boolean = {
     game.hasAi || game.fromFriend || game.fromApi
@@ -856,12 +837,7 @@ case class ClockHistory(
     color.fold(copy(white = f(white)), copy(black = f(black)))
 
   def record(color: Color, clock: Clock): ClockHistory =
-    update(color, _ :+ clock.remainingTime(
-      color match {
-        case(White) => strategygames.White(strategygames.GameLib.Chess())
-        case(Black) => strategygames.Black(strategygames.GameLib.Chess())
-      }
-    ))
+    update(color, _ :+ clock.remainingTime(color))
 
   def reset(color: Color) = update(color, _ => Vector.empty)
 

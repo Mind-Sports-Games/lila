@@ -1,7 +1,7 @@
 package lila.game
 
 import cats.implicits._
-import strategygames.chess.Color
+import strategygames.{ Color, White }
 import scala.util.chaining._
 
 import lila.user.User
@@ -211,7 +211,7 @@ object Player {
               )
 
     def writes(w: BSON.Writer, o: Builder) =
-      o(strategygames.chess.White)("0000")(none)(none) pipe { p =>
+      o(White(strategygames.GameLib.Chess()))("0000")(none)(none) pipe { p =>
         BSONDocument(
           aiLevel           -> p.aiLevel,
           isOfferingDraw    -> w.boolO(p.isOfferingDraw),

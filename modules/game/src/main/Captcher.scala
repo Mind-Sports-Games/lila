@@ -5,8 +5,9 @@ import akka.pattern.pipe
 import cats.data.NonEmptyList
 import strategygames.format.pgn.Tags
 import strategygames.chess.format.pgn.Sans
-import strategygames.chess.format.{ pgn, Forsyth }
-import strategygames.chess.{ Game => ChessGame }
+import strategygames.chess.format.pgn
+import strategygames.format.Forsyth
+import strategygames.{ Game => ChessGame }
 import scala.util.Success
 
 import lila.common.Captcha

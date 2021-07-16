@@ -1,8 +1,7 @@
 package lila.game
 
-import strategygames.chess.variant.Variant
-import strategygames.chess.{ Color }
-import strategygames.{ Status }
+import strategygames.variant.Variant
+import strategygames.{ Color, Status }
 
 object StatusText {
 

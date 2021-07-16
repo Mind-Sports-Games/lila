@@ -1,7 +1,7 @@
 package lila.game
 
 import cats.data.Validated
-import strategygames.chess.format.{ FEN, pgn => chessPgn }
+import strategygames.format.{ FEN, pgn => chessPgn }
 import strategygames.format.pgn.{ Tag, Tags }
 import org.joda.time.DateTime
 
@@ -24,16 +24,9 @@ object Rewind {
       .flatMap(_.valid) map { replay =>
       val rewindedGame = replay.state
       val color        = game.turnColor
-      //val strategygamesColor = 
       val newClock = game.clock.map(_.takeback) map { clk =>
         game.clockHistory.flatMap(_.last(color)).fold(clk) { t =>
-          clk.setRemainingTime(
-            color match {
-              case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-              case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-            },
-            t
-          )
+          clk.setRemainingTime(color, t)
         }
       }
       def rewindPlayer(player: Player) = player.copy(proposeTakebackAt = 0)

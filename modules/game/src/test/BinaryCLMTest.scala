@@ -1,7 +1,7 @@
 package lila.game
 
-import strategygames.chess._
-import strategygames.chess.format.Uci
+import strategygames._
+import strategygames.format.Uci
 import org.specs2.mutable._
 
 import lila.db.ByteArray
@@ -20,10 +20,10 @@ class BinaryCLMTest extends Specification {
       write(clmt) must_== {
         "11110000" :: _0_ :: Nil
       }
-      write(clmt.copy(castles = clmt.castles without White)) must_== {
+      write(clmt.copy(castles = clmt.castles without White(strategygames.GameLib.Chess())) must_== {
         "00110000" :: _0_ :: Nil
       }
-      write(clmt.copy(castles = clmt.castles.without(Black, QueenSide))) must_== {
+      write(clmt.copy(castles = clmt.castles.without(Black(strategygames.GameLib.Chess())), QueenSide))) must_== {
         "11100000" :: _0_ :: Nil
       }
       write(clmt.copy(lastMove = Uci("a1a2"))) must_== {
@@ -39,10 +39,10 @@ class BinaryCLMTest extends Specification {
         clmt
       }
       read("00110000" :: _0_ :: List.fill(3)(_0_)) must_== {
-        clmt.copy(castles = clmt.castles without White)
+        clmt.copy(castles = clmt.castles without White(strategygames.GameLib.Chess()))
       }
       read("11100000" :: _0_ :: List.fill(3)(_0_)) must_== {
-        clmt.copy(castles = clmt.castles.without(Black, QueenSide))
+        clmt.copy(castles = clmt.castles.without(Black(strategygames.GameLib.Chess()), QueenSide))
       }
       read("00000000" :: "00000001" :: List.fill(3)(_0_)) must_== {
         clmt.copy(castles = Castles.none, lastMove = Uci("a1a2"))

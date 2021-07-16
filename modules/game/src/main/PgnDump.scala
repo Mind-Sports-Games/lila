@@ -1,11 +1,10 @@
 package lila.game
 
-import strategygames.chess.format.Forsyth
 import strategygames.chess.format.pgn.{ ParsedPgn, Parser, Pgn }
-import strategygames.chess.format.{ FEN, pgn => chessPgn }
-import strategygames.chess.{ Color }
-import strategygames.{ Centis }
 import strategygames.format.pgn.{ Tag, TagType, Tags }
+import strategygames.format.{ FEN, Forsyth, pgn => chessPgn }
+import strategygames.{ Centis, Color, Status }
+import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
 import lila.common.LightUser
@@ -32,7 +31,7 @@ final class PgnDump(
     tagsFuture map { ts =>
       val turns = flags.moves ?? {
         val fenSituation = ts.fen match {
-          case Some(strategygames.format.FEN.Chess(fen)) => Forsyth.<<<(fen)
+          case Some(FEN.Chess(fen)) => Forsyth.<<<(fen)
           case None => None
           case _ => sys.error("Not implemented for draughts yet")
         }
@@ -60,7 +59,7 @@ final class PgnDump(
   def player(p: Player, u: Option[LightUser]) =
     p.aiLevel.fold(u.fold(p.name | lila.user.User.anonymous)(_.name))("playstrategy AI level " + _)
 
-  private val customStartPosition: Set[strategygames.chess.variant.Variant] =
+  private val customStartPosition: Set[Variant] =
     Set(strategygames.chess.variant.Chess960, strategygames.chess.variant.FromPosition, strategygames.chess.variant.Horde, strategygames.chess.variant.RacingKings)
 
   private def eventOf(game: Game) = {
@@ -126,7 +125,7 @@ final class PgnDump(
           withOpening option Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
           Tag(
             _.Termination, {
-              import strategygames.Status._
+              import Status._
               game.status match {
                 case Created | Started                             => "Unterminated"
                 case Aborted | NoStart                             => "Abandoned"

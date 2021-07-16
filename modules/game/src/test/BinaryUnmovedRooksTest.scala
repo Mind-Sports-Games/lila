@@ -1,7 +1,7 @@
 package lila.game
 
-import strategygames.chess._
-import strategygames.chess.Pos._
+import strategygames._
+import strategygames.Pos._
 import org.specs2.mutable._
 
 import lila.db.ByteArray

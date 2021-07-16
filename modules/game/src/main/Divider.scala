@@ -3,9 +3,9 @@ package lila.game
 import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 
-import strategygames.Division
-import strategygames.chess.variant.Variant
-import strategygames.chess.format.FEN
+import strategygames.{ Divider, Division, Replay }
+import strategygames.variant.Variant
+import strategygames.format.FEN
 
 final class Divider {
 
@@ -22,13 +22,13 @@ final class Divider {
       cache.get(
         id,
         _ =>
-          strategygames.chess.Replay
+          Replay
             .boards(
               moveStrs = pgnMoves,
               initialFen = initialFen,
               variant = variant
             )
             .toOption
-            .fold(Division.empty)(strategygames.chess.Divider.apply)
+            .fold(Division.empty)(Divider.apply)
       )
 }

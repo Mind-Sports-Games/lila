@@ -1,8 +1,7 @@
 package lila.game
 
-import strategygames.chess.format.{ FEN, Forsyth }
-import strategygames.chess.{ Color }
-import strategygames.{ Status }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.{ Black, Color, Mode, Status, White }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.commands.WriteResult
@@ -290,12 +289,12 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   object holdAlert {
     private val holdAlertSelector = $or(
-      holdAlertField(strategygames.chess.White) $exists true,
-      holdAlertField(strategygames.chess.Black) $exists true
+      holdAlertField(White(strategygames.GameLib.Chess())) $exists true,
+      holdAlertField(Black(strategygames.GameLib.Chess())) $exists true
     )
     private val holdAlertProjection = $doc(
-      holdAlertField(strategygames.chess.White) -> true,
-      holdAlertField(strategygames.chess.Black) -> true
+      holdAlertField(White(strategygames.GameLib.Chess())) -> true,
+      holdAlertField(Black(strategygames.GameLib.Chess())) -> true
     )
     private def holdAlertOf(doc: Bdoc, color: Color): Option[Player.HoldAlert] =
       doc.child(color.fold("p0", "p1")).flatMap(_.getAsOpt[Player.HoldAlert](Player.BSONFields.holdAlert))
@@ -306,7 +305,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         holdAlertProjection
       ) map {
         _.fold(Player.HoldAlert.emptyMap) { doc =>
-          Color.Map(white = holdAlertOf(doc, strategygames.chess.White), black = holdAlertOf(doc, strategygames.chess.Black))
+          Color.Map(white = holdAlertOf(doc, White(strategygames.GameLib.Chess())), black = holdAlertOf(doc, Black(strategygames.GameLib.Chess())))
         }
       }
 
@@ -384,10 +383,10 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .skip(ThreadLocalRandom nextInt distribution)
       .one[Game]
 
-  def insertDenormalized(g: Game, initialFen: Option[strategygames.chess.format.FEN] = None): Funit = {
+  def insertDenormalized(g: Game, initialFen: Option[FEN] = None): Funit = {
     val g2 =
       if (g.rated && (g.userIds.distinct.size != 2 || !Game.allowRated(g.variant, g.clock.map(_.config))))
-        g.copy(mode = strategygames.Mode.Casual)
+        g.copy(mode = Mode.Casual)
       else g
     val userIds = g2.userIds.distinct
     // TODO: why does the initialFen get generated here?

@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.chess.Color
+import strategygames.Color
 import lila.user.User
 
 case class Pov(game: Game, color: Color) {
@@ -29,12 +29,7 @@ case class Pov(game: Game, color: Color) {
   lazy val isMyTurn = game.started && game.playable && game.turnColor == color
 
   lazy val remainingSeconds: Option[Int] =
-    game.clock.map(c => c.remainingTime(
-      color match {
-        case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-        case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-      }
-    ).roundSeconds).orElse {
+    game.clock.map(c => c.remainingTime(color).roundSeconds).orElse {
       game.playableCorrespondenceClock.map(_.remainingTime(color).toInt)
     }
 

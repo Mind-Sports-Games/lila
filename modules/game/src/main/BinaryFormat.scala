@@ -1,9 +1,9 @@
 package lila.game
 
-import strategygames.{ Centis, Clock, ClockPlayer, Timestamp }
-import strategygames.chess.{ Black, Board, Castles, Color, Piece, PieceMap, Pos, Rank, Role, UnmovedRooks, White }
-import strategygames.chess.format
-import strategygames.chess.variant.Variant
+import strategygames.{ Black, Board, Castles, Centis, Clock, ClockPlayer, Color, Piece, PieceMap, Pos, Rank, Role, Timestamp, UnmovedRooks, White }
+import strategygames.format
+import strategygames.variant.Variant
+import strategygames.chess.variant.Standard
 import org.joda.time.DateTime
 import org.lichess.compression.clock.{ Encoder => ClockEncoder }
 import scala.util.Try
@@ -87,7 +87,7 @@ object BinaryFormat {
 
   case class clock(start: Timestamp) {
 
-    def legacyElapsed(clock: Clock, color: strategygames.Color) =
+    def legacyElapsed(clock: Clock, color: Color) =
       clock.limit - clock.players(color).remaining
 
     def computeRemaining(config: Clock.Config, legacyElapsed: Centis) =
@@ -95,12 +95,12 @@ object BinaryFormat {
 
     def write(clock: Clock): ByteArray = {
       Array(writeClockLimit(clock.limitSeconds), clock.incrementSeconds.toByte) ++
-        writeSignedInt24(legacyElapsed(clock, strategygames.White(strategygames.GameLib.Chess())).centis) ++
-        writeSignedInt24(legacyElapsed(clock, strategygames.Black(strategygames.GameLib.Chess())).centis) ++
+        writeSignedInt24(legacyElapsed(clock, White(strategygames.GameLib.Chess())).centis) ++
+        writeSignedInt24(legacyElapsed(clock, Black(strategygames.GameLib.Chess())).centis) ++
         clock.timer.fold(Array.empty[Byte])(writeTimer)
     }
 
-    def read(ba: ByteArray, whiteBerserk: Boolean, blackBerserk: Boolean): strategygames.Color => Clock =
+    def read(ba: ByteArray, whiteBerserk: Boolean, blackBerserk: Boolean): Color => Clock =
       color => {
         val ia = ba.value map toInt
 
@@ -120,7 +120,7 @@ object BinaryFormat {
             Clock(
               config = config,
               color = color,
-              players = strategygames.Color.Map(
+              players = Color.Map(
                 ClockPlayer
                   .withConfig(config)
                   .copy(berserk = whiteBerserk)
@@ -230,7 +230,7 @@ object BinaryFormat {
     }
 
     // cache standard start position
-    val standard = write(Board.init(strategygames.chess.variant.Standard).pieces)
+    val standard = write(Board.init(Standard).pieces)
 
     private def intToRole(int: Int, variant: Variant): Option[Role] = Role.binaryInt(int)
 
