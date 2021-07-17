@@ -69,7 +69,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     }
 
   def pov(gameId: ID, color: String): Fu[Option[Pov]] =
-    Color.fromName(color) ?? (pov(gameId, _))
+    Color.fromName(strategygames.GameLib.Chess(), color) ?? (pov(gameId, _))
 
   def pov(playerRef: PlayerRef): Fu[Option[Pov]] =
     game(playerRef.gameId) dmap { _ flatMap { _ playerIdPov playerRef.playerId } }
@@ -392,7 +392,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     // TODO: why does the initialFen get generated here?
     val fen: Option[FEN] = initialFen orElse {
       (!g2.variant.standardInitialPosition)
-        .option(Forsyth >> g2.chess)
+        .option(Forsyth.>>(strategygames.GameLib.Chess(), g2.chess))
         .filterNot(_.initial)
     }
     val checkInHours =
@@ -434,7 +434,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def initialFen(game: Game): Fu[Option[FEN]] =
     if (game.imported || !game.variant.standardInitialPosition) initialFen(game.id) dmap {
-      case None if game.variant == strategygames.chess.variant.Chess960 => Forsyth.initial.some
+      case None if game.variant == strategygames.chess.variant.Chess960 => Forsyth.initial(strategygames.GameLib.Chess()).some
       case fen                                            => fen
     }
     else fuccess(none)

@@ -21,7 +21,7 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
     cache.put(game.id, current :+ uciMove)
   }
   def add(game: Game, move: MoveOrDrop): Unit =
-    add(game, UciDump.move(game.variant)(move))
+    add(game, UciDump.move(strategygames.GameLib.Chess(), game.variant)(move))
 
   def set(game: Game, uciMoves: Seq[String]) =
     cache.put(game.id, uciMoves.toVector)
@@ -42,6 +42,6 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
   private def compute(game: Game, max: Int): Fu[UciVector] =
     for {
       fen      <- gameRepo initialFen game
-      uciMoves <- UciDump(game.pgnMoves take max, fen, game.variant).toFuture
+      uciMoves <- UciDump(strategygames.GameLib.Chess(), game.pgnMoves take max, fen, game.variant).toFuture
     } yield uciMoves.toVector
 }

@@ -220,7 +220,10 @@ object BinaryFormat {
       }
       def intPiece(int: Int): Option[Piece] =
         intToRole(int & 127, variant) map { role =>
-          Piece(Color.fromWhite((int & 128) == 0), role)
+          Piece.Chess(strategygames.chess.Piece(
+            Color.fromWhite(strategygames.GameLib.Chess(), (int & 128) == 0),
+            role
+          ))
         }
       (Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
@@ -230,9 +233,10 @@ object BinaryFormat {
     }
 
     // cache standard start position
-    val standard = write(Board.init(Standard).pieces)
+    val standard = write(Board.init(strategygames.GameLib.Chess(), Standard).pieces)
 
-    private def intToRole(int: Int, variant: Variant): Option[Role] = Role.binaryInt(int)
+    private def intToRole(int: Int, variant: Variant): Option[Role] =
+      Role.binaryInt(strategygames.GameLib.Chess(), int)
 
     private def roleToInt(role: Role): Int = role.binaryInt
 

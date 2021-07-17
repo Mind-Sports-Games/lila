@@ -112,6 +112,7 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
         case _        => Nil
       }
 
-    private def fen(game: ChessGame): String = Forsyth exportBoard game.board
+    private def fen(game: ChessGame): String =
+      Forsyth.exportBoard(strategygames.GameLib.Chess(), game.board)
   }
 }

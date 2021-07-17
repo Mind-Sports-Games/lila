@@ -1,6 +1,7 @@
 package lila.game
 
-import strategygames.{ CheckCount, Color, Clock, White, Black, UnmovedRooks, History => ChessHistory, Game => ChessGame, Status, Mode, Piece, Pos, PositionHash, Situation, Board }
+import strategygames.{ Color, Clock, White, Black, History, Game, Status, Mode, Piece, Pos, PositionHash, Situation, Board }
+import strategygames.chess.{ CheckCount, UnmovedRooks }
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Standard, Crazyhouse }
 import org.joda.time.DateTime
@@ -36,7 +37,7 @@ object BSONHandlers {
       Crazyhouse.Data(
         pockets = {
           val (white, black) = {
-            r.str("p").view.flatMap(Piece.fromChar).to(List)
+            r.str("p").view.flatMap(c => Piece.fromChar(strategygames.GameLib.Chess())).to(List)
           }.partition(_ is White(strategygames.GameLib.Chess()))
           Pockets(
             white = Pocket(white.map(_.role)),
@@ -83,7 +84,7 @@ object BSONHandlers {
       val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn = r intD F.startedAtTurn
       val plies         = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnColor     = Color.fromPly(plies)
+      val turnColor     = Color.fromPly(strategygames.GameLib.Chess(), plies)
       val createdAt     = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
@@ -104,11 +105,11 @@ object BSONHandlers {
           ) atLeast 0
         )
       }
-      val chessGame = ChessGame(
-        situation = Situation(
-          Board(
+      val chessGame = Game.Chess(strategygames.chess.Game(
+        situation = Situation.Chess(strategygames.chess.Situation(
+          Board.Chess(strategygames.chess.Board(
             pieces = decoded.pieces,
-            history = ChessHistory(
+            history = History.Chess(strategygames.chess.History(
               lastMove = decoded.lastMove,
               castles = decoded.castles,
               halfMoveClock = decoded.halfMoveClock,
@@ -118,19 +119,19 @@ object BSONHandlers {
                 val counts = r.intsD(F.checkCount)
                 CheckCount(~counts.headOption, ~counts.lastOption)
               } else Game.emptyCheckCount
-            ),
+              )),
             variant = gameVariant,
             crazyData = gameVariant.crazyhouse option r.get[Crazyhouse.Data](F.crazyData)
-          ),
+          )),
           color = turnColor
-        ),
+        )),
         pgnMoves = decoded.pgnMoves,
         clock = r.getO[Color => Clock](F.clock) {
           clockBSONReader(createdAt, light.whitePlayer.berserk, light.blackPlayer.berserk)
         } map (_(turnColor)),
         turns = plies,
         startedAtTurn = startedAtTurn
-      )
+      ))
 
       val whiteClockHistory = r bytesO F.whiteClockHistory
       val blackClockHistory = r bytesO F.blackClockHistory
@@ -241,7 +242,7 @@ object BSONHandlers {
 
     def readsWithPlayerIds(r: BSON.Reader, playerIds: String): LightGame = {
       val (whiteId, blackId)   = playerIds splitAt 4
-      val winC                 = r boolO F.winnerColor map Color.fromWhite
+      val winC                 = r boolO F.winnerColor map(white => Color.fromWhite(strategygames.GameLib.Chess(), white))
       val uids                 = ~r.getO[List[lila.user.User.ID]](F.playerUids)
       val (whiteUid, blackUid) = (uids.headOption.filter(_.nonEmpty), uids.lift(1).filter(_.nonEmpty))
       def makePlayer(field: String, color: Color, id: Player.ID, uid: Player.UserId): Player = {

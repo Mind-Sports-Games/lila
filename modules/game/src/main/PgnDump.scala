@@ -31,7 +31,7 @@ final class PgnDump(
     tagsFuture map { ts =>
       val turns = flags.moves ?? {
         val fenSituation = ts.fen match {
-          case Some(FEN.Chess(fen)) => Forsyth.<<<(fen)
+          case Some(FEN.Chess(strategygames.chess.FEN(fen))) => Forsyth.<<<(strategygames.GameLib.Chess(), fen)
           case None => None
           case _ => sys.error("Not implemented for draughts yet")
         }
@@ -138,7 +138,7 @@ final class PgnDump(
           ).some
         ).flatten ::: customStartPosition(game.variant).??(
           List(
-            Tag(_.FEN, (initialFen | Forsyth.initial).value),
+            Tag(_.FEN, (initialFen | Forsyth.initial(strategygames.GameLib.Chess())).value),
             Tag("SetUp", "1")
           )
         )
