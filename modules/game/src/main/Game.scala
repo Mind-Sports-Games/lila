@@ -3,7 +3,8 @@ package lila.game
 import strategygames.format.{ FEN, Uci }
 import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.variant.{ FromPosition, Standard, Variant }
-import strategygames.{ Black, Castles, Centis, CheckCount, Clock, Color, Game => ChessGame, Mode, MoveOrDrop, Speed, Status, White }
+import strategygames.chess.{ Castles, CheckCount, Game => ChessGame, MoveOrDrop }
+import strategygames.{ Black, Centis, Clock, Color, Mode, Speed, Status, White }
 import org.joda.time.DateTime
 
 import lila.common.Sequence

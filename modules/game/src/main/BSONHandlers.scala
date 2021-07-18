@@ -37,7 +37,7 @@ object BSONHandlers {
       Crazyhouse.Data(
         pockets = {
           val (white, black) = {
-            r.str("p").view.flatMap(c => Piece.fromChar(strategygames.GameLib.Chess())).to(List)
+            r.str("p").view.flatMap(c => Piece.fromChar(strategygames.GameLib.Chess(), c)).to(List)
           }.partition(_ is White(strategygames.GameLib.Chess()))
           Pockets(
             white = Pocket(white.map(_.role)),
