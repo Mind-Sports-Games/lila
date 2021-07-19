@@ -676,7 +676,7 @@ object Game {
     strategygames.chess.variant.RacingKings
   ).map(Variant.Chess)
 
-  val unanalysableVariants: Set[Variant] = 
+  val unanalysableVariants: Set[Variant] =
     ChessVariant.all.map(Variant.Chess).toSet -- analysableVariants
 
   val variantsWhereWhiteIsBetter: Set[Variant] = Set(
