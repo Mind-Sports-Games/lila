@@ -1,6 +1,6 @@
 package lila.simul
 
-import strategygames.chess.Color
+import strategygames.Color
 import strategygames.chess.format.FEN
 import strategygames.chess.variant.Variant
 import strategygames.{ Speed }
@@ -127,9 +127,9 @@ case class Simul(
 
   def playingPairings = pairings filterNot (_.finished)
 
-  def hostColor: Option[Color] = color flatMap strategygames.chess.Color.fromName
+  def hostColor: Option[Color] = color flatMap strategygames.Color.fromName
 
-  def setPairingHostColor(gameId: String, hostColor: strategygames.chess.Color) =
+  def setPairingHostColor(gameId: String, hostColor: strategygames.Color) =
     updatePairing(gameId, _.copy(hostColor = hostColor))
 
   private def Created(s: => Simul): Simul = if (isCreated) s else this

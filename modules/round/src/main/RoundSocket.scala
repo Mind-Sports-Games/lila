@@ -322,8 +322,8 @@ object RoundSocket {
         else s.toIntOption map Centis.apply
 
       private def readColor(s: String) =
-        if (s == "w") Some(White(strategygames.GameLib.Chess()))
-        else if (s == "b") Some(Black(strategygames.GameLib.Chess()))
+        if (s == "w") Some(White)
+        else if (s == "b") Some(Black)
         else None
     }
 

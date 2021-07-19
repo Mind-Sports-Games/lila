@@ -22,7 +22,7 @@ object TeamBattle {
 
   def init(teamId: TeamID) = TeamBattle(Set(teamId), 5)
 
-  case class TeamVs(teams: strategygames.chess.Color.Map[TeamID])
+  case class TeamVs(teams: strategygames.Color.Map[TeamID])
 
   class RankedTeam(
       val rank: Int,

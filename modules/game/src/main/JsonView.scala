@@ -112,8 +112,8 @@ object JsonView {
       "running"   -> c.isRunning,
       "initial"   -> c.limitSeconds,
       "increment" -> c.incrementSeconds,
-      "white"     -> c.remainingTime(White(strategygames.GameLib.Chess())).toSeconds,
-      "black"     -> c.remainingTime(Black(strategygames.GameLib.Chess())).toSeconds,
+      "white"     -> c.remainingTime(White).toSeconds,
+      "black"     -> c.remainingTime(Black).toSeconds,
       "emerg"     -> c.config.emergSeconds
     )
   }

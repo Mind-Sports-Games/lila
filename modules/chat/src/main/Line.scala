@@ -88,7 +88,7 @@ object Line {
 
   def strToLine(str: String): Option[Line] =
     strToUserLine(str) orElse {
-      str.headOption flatMap {c => Color.apply(strategygames.GameLib.Chess(), c)} map { color =>
+      str.headOption flatMap Color.apply map { color =>
         PlayerLine(color, str drop 2)
       }
     }

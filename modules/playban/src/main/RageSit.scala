@@ -1,7 +1,6 @@
 package lila.playban
 
-import strategygames.chess.{ Color }
-import strategygames.{ Speed }
+import strategygames.{ Color, Speed }
 import scala.math.{ log10, sqrt }
 
 import lila.game.Game

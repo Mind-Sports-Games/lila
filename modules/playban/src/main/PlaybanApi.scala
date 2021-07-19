@@ -3,8 +3,7 @@ package lila.playban
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 
-import strategygames.chess.{ Color }
-import strategygames.{ Centis, Status }
+import strategygames.{ Centis, Color, Status }
 import lila.common.{ Bus, Iso, Uptime }
 import lila.db.dsl._
 import lila.game.{ Game, Player, Pov, Source }
@@ -129,10 +128,7 @@ final class PlaybanApi(
           game.clock
             .filter {
               _.remainingTime(
-                loser.color match {
-                  case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-                  case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-                }
+                loser.color
               ) < Centis(1000) &&
               game.turnOf(loser) &&
               Status.Resign.is(status)

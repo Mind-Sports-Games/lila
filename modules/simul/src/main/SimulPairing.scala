@@ -7,7 +7,7 @@ final case class SimulPairing(
     gameId: String,
     status: strategygames.Status,
     wins: Option[Boolean],
-    hostColor: strategygames.chess.Color
+    hostColor: strategygames.Color
 ) {
 
   def finished = status >= strategygames.Status.Aborted
@@ -36,6 +36,6 @@ private[simul] object SimulPairing {
       gameId = IdGenerator.uncheckedGame,
       status = strategygames.Status.Created,
       wins = none,
-      hostColor = strategygames.chess.White
+      hostColor = White
     )
 }

@@ -1,7 +1,8 @@
 package lila.app
 package templating
 
-import strategygames.chess.{ Board, Color, Pos }
+import strategygames.chess.{ Board, Pos }
+import strategygames.Color
 import lila.api.Context
 
 import lila.app.ui.ScalatagsTemplate._

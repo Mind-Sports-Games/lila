@@ -1,6 +1,6 @@
 package lila.mod
 
-import strategygames.chess.{ Black, Color, White }
+import strategygames.{ Black, Color, White }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import reactivemongo.api.ReadPreference
@@ -208,8 +208,8 @@ final class AssessApi(
       val x = noFastCoefVariation(game player c)
       x.filter(_ < 0.45f) orElse x.filter(_ < 0.5f).ifTrue(ThreadLocalRandom.nextBoolean())
     }
-    lazy val whiteSuspCoefVariation = suspCoefVariation(strategygames.chess.White)
-    lazy val blackSuspCoefVariation = suspCoefVariation(strategygames.chess.Black)
+    lazy val whiteSuspCoefVariation = suspCoefVariation(White)
+    lazy val blackSuspCoefVariation = suspCoefVariation(Black)
 
     def isUpset = ~(for {
       winner <- game.winner

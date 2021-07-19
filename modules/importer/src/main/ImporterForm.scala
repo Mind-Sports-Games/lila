@@ -4,8 +4,8 @@ import cats.data.Validated
 import strategygames.chess.format.pgn.{ ParsedPgn, Parser, Reader }
 import strategygames.format.pgn.{ Tag, TagType, Tags }
 import strategygames.chess.format.{ FEN, Forsyth }
-import strategygames.chess.{ Color, Replay }
-import strategygames.{ Mode, Status }
+import strategygames.chess.{ Replay }
+import strategygames.{ Color, Mode, Status }
 import play.api.data._
 import play.api.data.Forms._
 import scala.util.chaining._
@@ -108,12 +108,12 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           .make(
             chess = game,
             whitePlayer = Player.makeImported(
-              strategygames.chess.White,
+              White,
               parsed.tags(_.White),
               parsed.tags(_.WhiteElo).flatMap(_.toIntOption)
             ),
             blackPlayer = Player.makeImported(
-              strategygames.chess.Black,
+              Black,
               parsed.tags(_.Black),
               parsed.tags(_.BlackElo).flatMap(_.toIntOption)
             ),

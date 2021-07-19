@@ -41,10 +41,10 @@ class BinaryClockTest extends Specification {
           clock
         }
         read(bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(8)(_0_)) must_== {
-          clock.giveTime(White(strategygames.GameLib.Chess()), Centis(3))
+          clock.giveTime(White, Centis(3))
         }
         read(bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(8)(_0_)) must_== {
-          clock.giveTime(White(strategygames.GameLib.Chess()), Centis(-3))
+          clock.giveTime(White, Centis(-3))
         }
       }
       "without timer bytes" in {
@@ -52,10 +52,10 @@ class BinaryClockTest extends Specification {
           clock
         }
         read(bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(4)(_0_)) must_== {
-          clock.giveTime(White(strategygames.GameLib.Chess()), Centis(3))
+          clock.giveTime(White, Centis(3))
         }
         read(bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(4)(_0_)) must_== {
-          clock.giveTime(White(strategygames.GameLib.Chess()), Centis(-3))
+          clock.giveTime(White, Centis(-3))
         }
       }
     }
@@ -64,10 +64,10 @@ class BinaryClockTest extends Specification {
       "without berserk" in {
         isomorphism(clock) must_== clock
 
-        val c2 = clock.giveTime(White(strategygames.GameLib.Chess()), Centis.ofSeconds(15))
+        val c2 = clock.giveTime(White, Centis.ofSeconds(15))
         isomorphism(c2) must_== c2
 
-        val c3 = clock.giveTime(Black(strategygames.GameLib.Chess()), Centis.ofSeconds(5))
+        val c3 = clock.giveTime(Black, Centis.ofSeconds(5))
         isomorphism(c3) must_== c3
 
         val c4 = clock.start

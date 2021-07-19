@@ -447,7 +447,7 @@ final class TournamentApi(
             } | player.performance
           )
         } >>- finishing.flatMap(_.whitePlayer.userId).foreach { whiteUserId =>
-          colorHistoryApi.inc(player.id, strategygames.chess.Color.fromWhite(player is whiteUserId))
+          colorHistoryApi.inc(player.id, strategygames.Color.fromWhite(player is whiteUserId))
         }
       }
     }

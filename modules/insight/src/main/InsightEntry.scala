@@ -1,7 +1,8 @@
 package lila.insight
 
 import strategygames.chess.opening.Ecopening
-import strategygames.chess.{ Color, Role }
+import strategygames.chess.{ Role }
+import strategygames.{ Color }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, Pov }

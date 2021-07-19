@@ -24,7 +24,7 @@ sealed trait RootOrNode {
   def addChild(node: Node): RootOrNode
   def fullMoveNumber = 1 + ply / 2
   def mainline: Vector[Node]
-  def color = strategygames.chess.Color.fromPly(ply)
+  def color = strategygames.Color.fromPly(ply)
   def moveOption: Option[Uci.WithSan]
 }
 

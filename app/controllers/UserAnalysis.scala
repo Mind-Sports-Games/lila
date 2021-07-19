@@ -3,7 +3,8 @@ package controllers
 import strategygames.chess.format.Forsyth.SituationPlus
 import strategygames.chess.format.{ FEN, Forsyth }
 import strategygames.chess.variant.{ FromPosition, Standard, Variant }
-import strategygames.chess.{ Black, Situation, White }
+import strategygames.{ Black, Color, White }
+import strategygames.chess.Situation
 import play.api.libs.json.Json
 import play.api.mvc._
 import scala.concurrent.duration._
@@ -42,7 +43,7 @@ final class UserAnalysis(
         .filter(_.trim.nonEmpty)
         .orElse(get("fen")) map FEN.clean
       val pov         = makePov(decodedFen, variant)
-      val orientation = get("color").flatMap(strategygames.chess.Color.fromName) | pov.color
+      val orientation = get("color").flatMap(Color.fromName) | pov.color
       env.api.roundApi
         .userAnalysisJson(pov, ctx.pref, decodedFen, orientation, owner = false, me = ctx.me) map { data =>
         EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov)))
@@ -78,7 +79,7 @@ final class UserAnalysis(
     Open { implicit ctx =>
       OptionFuResult(env.game.gameRepo game id) { g =>
         env.round.proxyRepo upgradeIfPresent g flatMap { game =>
-          val pov = Pov(game, strategygames.chess.Color.fromName(color) | White)
+          val pov = Pov(game, Color.fromName(color) | White)
           negotiate(
             html =
               if (game.replayable) Redirect(routes.Round.watcher(game.id, color)).fuccess
@@ -143,7 +144,7 @@ final class UserAnalysis(
               .fold(
                 err => BadRequest(jsonError(err)).as(JSON).fuccess,
                 { case (game, fen) =>
-                  val pov = Pov(game, strategygames.chess.White)
+                  val pov = Pov(game, White)
                   env.api.roundApi.userAnalysisJson(
                     pov,
                     ctx.pref,

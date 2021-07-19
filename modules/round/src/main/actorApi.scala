@@ -22,7 +22,7 @@ case class SocketStatus(
 ) {
   def onGame(color: Color)     = color.fold(whiteOnGame, blackOnGame)
   def isGone(color: Color)     = color.fold(whiteIsGone, blackIsGone)
-  def colorsOnGame: Set[Color] = Color.all(strategygames.GameLib.Chess()).filter(onGame).toSet
+  def colorsOnGame: Set[Color] = Color.all.filter(onGame).toSet
 }
 case class RoomCrowd(white: Boolean, black: Boolean)
 case class BotConnected(color: Color, v: Boolean)

@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.chess.Color
+import strategygames.Color
 import strategygames.chess.format.FEN
 import reactivemongo.api.bson._
 import scala.concurrent.duration._

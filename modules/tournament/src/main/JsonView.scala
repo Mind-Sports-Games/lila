@@ -282,15 +282,15 @@ final class JsonView(
         "orientation" -> game.naturalOrientation.name,
         "color"       -> game.naturalOrientation.name, // app BC https://github.com/ornicar/lila/issues/7195
         "lastMove"    -> ~game.lastMoveKeys,
-        "white"       -> ofPlayer(featured.white, game player strategygames.chess.White),
-        "black"       -> ofPlayer(featured.black, game player strategygames.chess.Black)
+        "white"       -> ofPlayer(featured.white, game player White),
+        "black"       -> ofPlayer(featured.black, game player Black)
       )
       .add(
         // not named `clock` to avoid conflict with lichobile
         "c" -> game.clock.ifTrue(game.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(strategygames.White(strategygames.GameLib.Chess())).roundSeconds,
-            "black" -> c.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).roundSeconds
+            "white" -> c.remainingTime(strategygames.White).roundSeconds,
+            "black" -> c.remainingTime(strategygames.Black).roundSeconds
           )
         }
       )

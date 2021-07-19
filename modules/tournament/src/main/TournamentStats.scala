@@ -3,7 +3,7 @@ package lila.tournament
 import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
 
-import strategygames.chess.Color
+import strategygames.Color
 import lila.db.dsl._
 
 final class TournamentStatsApi(

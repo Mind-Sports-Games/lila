@@ -1,7 +1,7 @@
 package lila.game
 
-import strategygames.{ Centis, Clock, ClockPlayer, Color, GameLib, Timestamp }
-import strategygames.chess.{ Black, Board, Castles, Piece, PieceMap, Pos, Rank, Role, UnmovedRooks, White }
+import strategygames.{ Black, Centis, Clock, ClockPlayer, Color, GameLib, Timestamp, White }
+import strategygames.chess.{ Board, Castles, Piece, PieceMap, Pos, Rank, Role, UnmovedRooks }
 import strategygames.chess
 import strategygames.format
 import strategygames.chess.variant.Variant
@@ -224,7 +224,7 @@ object BinaryFormat {
       def intPiece(int: Int): Option[chess.Piece] =
         intToRoleChess(int & 127, variant) map { role =>
           chess.Piece(
-            chess.Color.fromWhite((int & 128) == 0),
+            Color.fromWhite((int & 128) == 0),
             role
           )
         }

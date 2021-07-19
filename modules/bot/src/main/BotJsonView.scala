@@ -85,10 +85,7 @@ final class BotJsonView(
 
   private def millisOf(pov: Pov): Int =
     pov.game.clock
-      .map(_.remainingTime(pov.color match {
-        case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-        case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-      }).millis.toInt)
+      .map(_.remainingTime(pov.color).millis.toInt)
       .orElse(pov.game.correspondenceClock.map(_.remainingTime(pov.color).toInt * 1000))
       .getOrElse(Int.MaxValue)
 

@@ -1,6 +1,6 @@
 package lila.tv
 
-import strategygames.chess.Color
+import strategygames.Color
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 

@@ -6,7 +6,7 @@ import strategygames.chess.variant.{ Crazyhouse, Variant }
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
 import lila.user.User
-import strategygames.chess.Color
+import strategygames.Color
 
 final private class ChapterMaker(
     net: lila.common.config.NetConfig,

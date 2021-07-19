@@ -2,6 +2,7 @@ package lila.puzzle
 
 import cats.data.NonEmptyList
 import strategygames.chess.format.{ FEN, Forsyth, Uci }
+import strategygames.Color
 
 import lila.rating.Glicko
 
@@ -28,7 +29,7 @@ case class Puzzle(
     } yield Forsyth >> sit2
   } err s"Can't apply puzzle $id first move"
 
-  def color = fen.color.fold[strategygames.chess.Color](strategygames.chess.White)(!_)
+  def color = fen.color.fold[Color](White)(!_)
 }
 
 object Puzzle {

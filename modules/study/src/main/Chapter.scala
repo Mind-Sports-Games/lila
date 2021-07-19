@@ -3,8 +3,7 @@ package lila.study
 import strategygames.chess.format.pgn.{ Glyph }
 import strategygames.format.pgn.{ Tags }
 import strategygames.chess.variant.Variant
-import strategygames.chess.{ Color }
-import strategygames.{ Centis }
+import strategygames.{ Centis, Color }
 import org.joda.time.DateTime
 
 import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
@@ -167,7 +166,7 @@ object Chapter {
 
     def looksOngoing = resultColor.exists(_.isEmpty) && hasRelayPath
 
-    def resultStr: Option[String] = resultColor.map(_.fold("*")(strategygames.chess.Color.showResult).replace("1/2", "½"))
+    def resultStr: Option[String] = resultColor.map(_.fold("*")(strategygames.Color.showResult).replace("1/2", "½"))
   }
 
   case class IdName(id: Id, name: Name)

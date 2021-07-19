@@ -293,8 +293,8 @@ object SwissJson {
       .add(
         "clock" -> b.game.clock.ifTrue(b.game.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(strategygames.White(strategygames.GameLib.Chess())).roundSeconds,
-            "black" -> c.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).roundSeconds
+            "white" -> c.remainingTime(strategygames.White).roundSeconds,
+            "black" -> c.remainingTime(strategygames.Black).roundSeconds
           )
         }
       )

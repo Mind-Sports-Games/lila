@@ -1,6 +1,6 @@
 package lila.notify
 
-import strategygames.chess.Color
+import strategygames.Color
 import lila.db.BSON.{ Reader, Writer }
 import lila.db.dsl._
 import lila.db.{ dsl, BSON }

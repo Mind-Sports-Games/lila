@@ -170,7 +170,7 @@ final class GameApiV2(
                       playerTeams.get(
                         pairing.user2
                       )
-                    ) mapN strategygames.chess.Color.Map.apply[String]
+                    ) mapN strategygames.Color.Map.apply[String]
                   )
                 }
               }
@@ -184,15 +184,15 @@ final class GameApiV2(
             config.format match {
               case Format.PGN => pgnDump.formatter(config.flags)(game, fen, analysis, teams, none)
               case Format.JSON =>
-                def addBerserk(color: strategygames.chess.Color)(json: JsObject) =
+                def addBerserk(color: strategygames.Color)(json: JsObject) =
                   if (pairing berserkOf color)
                     json deepMerge Json.obj(
                       "players" -> Json.obj(color.name -> Json.obj("berserk" -> true))
                     )
                   else json
                 toJson(game, fen, analysis, config.flags, teams) dmap
-                  addBerserk(strategygames.chess.White) dmap
-                  addBerserk(strategygames.chess.Black) dmap { json =>
+                  addBerserk(White) dmap
+                  addBerserk(Black) dmap { json =>
                     s"${Json.stringify(json)}\n"
                   }
             }
@@ -355,7 +355,7 @@ object GameApiV2 {
       perfType: Set[lila.rating.PerfType],
       analysed: Option[Boolean] = None,
       ongoing: Boolean = false,
-      color: Option[strategygames.chess.Color],
+      color: Option[strategygames.Color],
       flags: WithFlags,
       perSecond: MaxPerSecond,
       playerFile: Option[String]

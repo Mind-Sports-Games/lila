@@ -177,7 +177,7 @@ final private[api] class RoundApi(
       pov: Pov,
       pref: Pref,
       initialFen: Option[FEN],
-      orientation: strategygames.chess.Color,
+      orientation: strategygames.Color,
       owner: Boolean,
       me: Option[User]
   ) =
@@ -193,7 +193,7 @@ final private[api] class RoundApi(
       pov: Pov,
       pref: Pref,
       initialFen: Option[FEN],
-      orientation: strategygames.chess.Color,
+      orientation: strategygames.Color,
       me: Option[User]
   ) =
     withTree(pov, analysis = none, initialFen, WithFlags(opening = true))(

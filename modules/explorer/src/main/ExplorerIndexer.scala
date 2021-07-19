@@ -141,7 +141,7 @@ final private class ExplorerIndexer(
       if valid(game)
     } yield gameRepo initialFen game flatMap { initialFen =>
       userRepo.usernamesByIds(game.userIds) map { usernames =>
-        def username(color: strategygames.chess.Color) =
+        def username(color: strategygames.Color) =
           game.player(color).userId flatMap { id =>
             usernames.find(_.toLowerCase == id)
           } orElse game.player(color).userId getOrElse "?"
@@ -152,8 +152,8 @@ final private class ExplorerIndexer(
           Tag("PlayStrategyID", game.id),
           Tag(_.Variant, game.variant.name),
           Tag.timeControl(game.clock.map(_.config)),
-          Tag(_.White, username(strategygames.chess.White)),
-          Tag(_.Black, username(strategygames.chess.Black)),
+          Tag(_.White, username(White)),
+          Tag(_.Black, username(Black)),
           Tag(_.WhiteElo, whiteRating),
           Tag(_.BlackElo, blackRating),
           Tag(_.Result, PgnDump.result(game)),

@@ -2,8 +2,7 @@ package lila.challenge
 
 import strategygames.chess.format.FEN
 import strategygames.chess.variant.{ Chess960, FromPosition, Horde, RacingKings, Variant, LinesOfAction }
-import strategygames.chess.{ Color }
-import strategygames.{ Mode, Speed }
+import strategygames.{ Color, Mode, Speed }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
@@ -19,7 +18,7 @@ case class Challenge(
     timeControl: Challenge.TimeControl,
     mode: Mode,
     colorChoice: Challenge.ColorChoice,
-    finalColor: strategygames.chess.Color,
+    finalColor: Color,
     challenger: Challenge.Challenger,
     destUser: Option[Challenge.Challenger.Registered],
     rematchOf: Option[Game.ID],
@@ -210,7 +209,7 @@ object Challenge {
   def toRegistered(variant: Variant, timeControl: TimeControl)(u: User) =
     Challenger.Registered(u.id, Rating(u.perfs(perfTypeOf(variant, timeControl))))
 
-  def randomColor = strategygames.chess.Color.fromWhite(lila.common.ThreadLocalRandom.nextBoolean())
+  def randomColor = Color.fromWhite(lila.common.ThreadLocalRandom.nextBoolean())
 
   def make(
       variant: Variant,
@@ -224,8 +223,8 @@ object Challenge {
       name: Option[String] = None
   ): Challenge = {
     val (colorChoice, finalColor) = color match {
-      case "white" => ColorChoice.White  -> strategygames.chess.White
-      case "black" => ColorChoice.Black  -> strategygames.chess.Black
+      case "white" => ColorChoice.White  -> White
+      case "black" => ColorChoice.Black  -> Black
       case _       => ColorChoice.Random -> randomColor
     }
     val finalMode = timeControl match {

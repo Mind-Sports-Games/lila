@@ -1,6 +1,6 @@
 package lila.mod
 
-import strategygames.chess.Color
+import strategygames.Color
 import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 

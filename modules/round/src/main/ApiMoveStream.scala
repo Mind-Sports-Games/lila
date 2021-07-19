@@ -83,7 +83,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
       game.turnColor,
       lastMoveUci,
       game.clock.map { clk =>
-        (clk.remainingTime(strategygames.White(strategygames.GameLib.Chess())), clk.remainingTime(strategygames.Black(strategygames.GameLib.Chess())))
+        (clk.remainingTime(strategygames.White), clk.remainingTime(strategygames.Black))
       }
     )
 

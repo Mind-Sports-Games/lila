@@ -75,8 +75,8 @@ final private class GameStarter(
         situation = strategygames.chess.Situation(strategygames.chess.variant.Standard),
         clock = pool.clock.toClock(strategygames.GameLib.Chess()).some
       ),
-      whitePlayer = Player.make(strategygames.chess.White, whiteUser),
-      blackPlayer = Player.make(strategygames.chess.Black, blackUser),
+      whitePlayer = Player.make(White, whiteUser),
+      blackPlayer = Player.make(Black, blackUser),
       mode = strategygames.Mode.Rated,
       status = strategygames.Status.Created,
       daysPerTurn = none,

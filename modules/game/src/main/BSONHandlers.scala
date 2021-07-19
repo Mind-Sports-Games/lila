@@ -84,7 +84,7 @@ object BSONHandlers {
       val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn = r intD F.startedAtTurn
       val plies         = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnColor     = chess.Color.fromPly(plies)
+      val turnColor     = Color.fromPly(plies)
       val createdAt     = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
@@ -209,8 +209,8 @@ object BSONHandlers {
         }),
         F.daysPerTurn       -> o.daysPerTurn,
         F.moveTimes         -> o.binaryMoveTimes,
-        F.whiteClockHistory -> clockHistory(White(chessLib), o.clockHistory, o.chess.clock, o.flagged.map(Color.Chess)),
-        F.blackClockHistory -> clockHistory(Black(chessLib), o.clockHistory, o.chess.clock, o.flagged.map(Color.Chess)),
+        F.whiteClockHistory -> clockHistory(White, o.clockHistory, o.chess.clock, o.flagged),
+        F.blackClockHistory -> clockHistory(Black, o.clockHistory, o.chess.clock, o.flagged),
         F.rated             -> w.boolO(o.mode.rated),
         F.variant           -> o.board.variant.exotic.option(w int o.board.variant.id),
         F.bookmarks         -> w.intO(o.bookmarks),
@@ -259,7 +259,7 @@ object BSONHandlers {
 
     def readsWithPlayerIds(r: BSON.Reader, playerIds: String): LightGame = {
       val (whiteId, blackId)   = playerIds splitAt 4
-      val winC                 = r boolO F.winnerColor map(white => Color.fromWhite(strategygames.GameLib.Chess(), white))
+      val winC                 = r boolO F.winnerColor map(Color.fromWhite)
       val uids                 = ~r.getO[List[lila.user.User.ID]](F.playerUids)
       val (whiteUid, blackUid) = (uids.headOption.filter(_.nonEmpty), uids.lift(1).filter(_.nonEmpty))
       def makePlayer(field: String, color: Color, id: Player.ID, uid: Player.UserId): Player = {
@@ -268,8 +268,8 @@ object BSONHandlers {
       }
       LightGame(
         id = r str F.id,
-        whitePlayer = makePlayer(F.whitePlayer, White(chessLib), whiteId, whiteUid),
-        blackPlayer = makePlayer(F.blackPlayer, Black(chessLib), blackId, blackUid),
+        whitePlayer = makePlayer(F.whitePlayer, White, whiteId, whiteUid),
+        blackPlayer = makePlayer(F.blackPlayer, Black, blackId, blackUid),
         status = r.get[Status](F.status)
       )
     }

@@ -1,8 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.chess.{ Color, Black, White }
-import strategygames.{ Status => S, Clock, Mode }
+import strategygames.{ Status => S, Clock, Mode, Color, Black, White }
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -220,12 +219,12 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
 
   // whiteUsername 1-0 blackUsername
   def gameSummary(whiteUserId: String, blackUserId: String, finished: Boolean, result: Option[Boolean]) = {
-    val res = if (finished) strategygames.chess.Color.showResult(result map Color.fromWhite) else "*"
+    val res = if (finished) Color.showResult(result map Color.fromWhite) else "*"
     s"${usernameOrId(whiteUserId)} $res ${usernameOrId(blackUserId)}"
   }
 
   def gameResult(game: Game) =
-    if (game.finished) strategygames.chess.Color.showResult(game.winnerColor)
+    if (game.finished) strategygames.Color.showResult(game.winnerColor)
     else "*"
 
   def gameLink(
@@ -264,7 +263,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
   def challengeOpenGraph(c: lila.challenge.Challenge)(implicit lang: Lang) =
     lila.app.ui.OpenGraph(
       title = challengeTitle(c),
-      url = s"$netBaseUrl${routes.Round.watcher(c.id, strategygames.chess.White.name).url}",
+      url = s"$netBaseUrl${routes.Round.watcher(c.id, White.name).url}",
       description = "Join the challenge or watch the game here."
     )
 }

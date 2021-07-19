@@ -30,7 +30,7 @@ object StudyForm {
         asStr: Option[String] = None
     ) {
 
-      def orientation = orientationStr.flatMap(strategygames.chess.Color.fromName) | strategygames.chess.White
+      def orientation = orientationStr.flatMap(strategygames.Color.fromName) | White
 
       def as: As =
         asStr match {
@@ -90,7 +90,7 @@ object StudyForm {
             pgn = onePgn.some,
             orientation =
               if (pgns.sizeIs > 1) "auto"
-              else (orientationStr.flatMap(strategygames.chess.Color.fromName) | strategygames.chess.White).name,
+              else (orientationStr.flatMap(strategygames.Color.fromName) | White).name,
             mode = mode,
             initial = initial && index == 0
           )

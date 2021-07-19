@@ -75,7 +75,7 @@ case class Hook(
       .add("rating" -> rating)
       .add("variant" -> realVariant.exotic.option(realVariant.key))
       .add("ra" -> realMode.rated.option(1))
-      .add("c" -> strategygames.chess.Color.fromName(color).map(_.name))
+      .add("c" -> strategygames.Color.fromName(color).map(_.name))
       .add("perf" -> perfType.map(_.trans))
 
   def randomColor = color == "random"

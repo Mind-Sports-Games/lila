@@ -56,12 +56,12 @@ final private class Biter(
       creatorUser: Option[User],
       joinerUser: Option[User],
       color: Color
-  ): Fu[strategygames.chess.Color] =
+  ): Fu[strategygames.Color] =
     color match {
       case Color.Random =>
-        userRepo.firstGetsWhite(creatorUser.map(_.id), joinerUser.map(_.id)) map strategygames.chess.Color.fromWhite
-      case Color.White => fuccess(strategygames.chess.White)
-      case Color.Black => fuccess(strategygames.chess.Black)
+        userRepo.firstGetsWhite(creatorUser.map(_.id), joinerUser.map(_.id)) map strategygames.Color.fromWhite
+      case Color.White => fuccess(White)
+      case Color.Black => fuccess(Black)
     }
 
   private def makeGame(hook: Hook, whiteUser: Option[User], blackUser: Option[User]) = {
@@ -73,8 +73,8 @@ final private class Biter(
           situation = Situation(hook.realVariant),
           clock = clock.some
         ),
-        whitePlayer = Player.make(strategygames.chess.White, whiteUser, perfPicker),
-        blackPlayer = Player.make(strategygames.chess.Black, blackUser, perfPicker),
+        whitePlayer = Player.make(White, whiteUser, perfPicker),
+        blackPlayer = Player.make(Black, blackUser, perfPicker),
         mode = hook.realMode,
         source = lila.game.Source.Lobby,
         pgnImport = None
@@ -90,8 +90,8 @@ final private class Biter(
           situation = Situation(seek.realVariant),
           clock = none
         ),
-        whitePlayer = Player.make(strategygames.chess.White, whiteUser, perfPicker),
-        blackPlayer = Player.make(strategygames.chess.Black, blackUser, perfPicker),
+        whitePlayer = Player.make(White, whiteUser, perfPicker),
+        blackPlayer = Player.make(Black, blackUser, perfPicker),
         mode = seek.realMode,
         source = lila.game.Source.Lobby,
         daysPerTurn = seek.daysPerTurn,

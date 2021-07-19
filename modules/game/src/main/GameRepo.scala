@@ -69,7 +69,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     }
 
   def pov(gameId: ID, color: String): Fu[Option[Pov]] =
-    Color.fromName(strategygames.GameLib.Chess(), color) ?? (pov(gameId, _))
+    Color.fromName(color) ?? (pov(gameId, _))
 
   def pov(playerRef: PlayerRef): Fu[Option[Pov]] =
     game(playerRef.gameId) dmap { _ flatMap { _ playerIdPov playerRef.playerId } }
@@ -289,12 +289,12 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   object holdAlert {
     private val holdAlertSelector = $or(
-      holdAlertField(White(strategygames.GameLib.Chess())) $exists true,
-      holdAlertField(Black(strategygames.GameLib.Chess())) $exists true
+      holdAlertField(White) $exists true,
+      holdAlertField(Black) $exists true
     )
     private val holdAlertProjection = $doc(
-      holdAlertField(White(strategygames.GameLib.Chess())) -> true,
-      holdAlertField(Black(strategygames.GameLib.Chess())) -> true
+      holdAlertField(White) -> true,
+      holdAlertField(Black) -> true
     )
     private def holdAlertOf(doc: Bdoc, color: Color): Option[Player.HoldAlert] =
       doc.child(color.fold("p0", "p1")).flatMap(_.getAsOpt[Player.HoldAlert](Player.BSONFields.holdAlert))
@@ -305,7 +305,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         holdAlertProjection
       ) map {
         _.fold(Player.HoldAlert.emptyMap) { doc =>
-          Color.Map(white = holdAlertOf(doc, White(strategygames.GameLib.Chess())), black = holdAlertOf(doc, Black(strategygames.GameLib.Chess())))
+          Color.Map(white = holdAlertOf(doc, White), black = holdAlertOf(doc, Black))
         }
       }
 

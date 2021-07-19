@@ -1,7 +1,7 @@
 package lila.analyse
 
 import cats.implicits._
-import strategygames.chess.Color
+import strategygames.Color
 import strategygames.chess.format.Uci
 
 import lila.tree.Eval

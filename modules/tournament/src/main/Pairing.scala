@@ -1,6 +1,6 @@
 package lila.tournament
 
-import strategygames.chess.Color
+import strategygames.Color
 import lila.game.Game
 import lila.user.User
 

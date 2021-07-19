@@ -6,7 +6,8 @@ import reactivemongo.api.bson._
 import scalatags.Text.all._
 
 import strategygames.chess.opening.EcopeningDB
-import strategygames.chess.{ Color, Role }
+import strategygames.chess.{ Role }
+import strategygames.{ Color }
 import lila.db.dsl._
 import lila.rating.PerfType
 
@@ -211,7 +212,7 @@ object Dimension {
       case Phase                   => lila.insight.Phase.all
       case Result                  => lila.insight.Result.all
       case Termination             => lila.insight.Termination.all
-      case Color                   => strategygames.chess.Color.all
+      case Color                   => strategygames.Color.all
       case Opening                 => EcopeningDB.all
       case OpponentStrength        => RelativeStrength.all
       case PieceRole               => strategygames.chess.Role.all.reverse
@@ -232,7 +233,7 @@ object Dimension {
       case Phase                   => key.toIntOption flatMap lila.insight.Phase.byId.get
       case Result                  => key.toIntOption flatMap lila.insight.Result.byId.get
       case Termination             => key.toIntOption flatMap lila.insight.Termination.byId.get
-      case Color                   => strategygames.chess.Color.fromName(key)
+      case Color                   => strategygames.Color.fromName(key)
       case Opening                 => EcopeningDB.allByEco get key
       case OpponentStrength        => key.toIntOption flatMap RelativeStrength.byId.get
       case PieceRole               => strategygames.chess.Role.all.find(_.name == key)

@@ -12,7 +12,7 @@ final class JsonView(
     proxyRepo: lila.round.GameProxyRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  implicit private val colorWriter: Writes[strategygames.chess.Color] = Writes { c =>
+  implicit private val colorWriter: Writes[strategygames.Color] = Writes { c =>
     JsString(c.name)
   }
 
@@ -134,8 +134,8 @@ final class JsonView(
       .add(
         "clock" -> g.clock.ifTrue(g.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(strategygames.White(strategygames.GameLib.Chess())).roundSeconds,
-            "black" -> c.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).roundSeconds
+            "white" -> c.remainingTime(strategygames.White).roundSeconds,
+            "black" -> c.remainingTime(strategygames.Black).roundSeconds
           )
         }
       )

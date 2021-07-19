@@ -277,14 +277,14 @@ object Event {
         )
         .add("clock" -> game.clock.map { c =>
           Json.obj(
-            "wc" -> c.remainingTime(White(strategygames.GameLib.Chess())).centis,
-            "bc" -> c.remainingTime(Black(strategygames.GameLib.Chess())).centis
+            "wc" -> c.remainingTime(White).centis,
+            "bc" -> c.remainingTime(Black).centis
           )
         })
         .add("ratingDiff" -> ratingDiff.map { rds =>
           Json.obj(
-            chess.Color.White.name -> rds.white,
-            chess.Color.Black.name -> rds.black
+            Color.White.name -> rds.white,
+            Color.Black.name -> rds.black
           )
         })
         .add("boosted" -> game.boosted)
@@ -342,8 +342,8 @@ object Event {
   object Clock {
     def apply(clock: chess.Clock): Clock =
       Clock(
-        clock remainingTime White(strategygames.GameLib.Chess()),
-        clock remainingTime Black(strategygames.GameLib.Chess()),
+        clock remainingTime White,
+        clock remainingTime Black,
         clock lagCompEstimate clock.color
       )
   }

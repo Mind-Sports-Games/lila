@@ -73,11 +73,8 @@ object mini {
       }
     )
 
-  private def renderClock(clock: strategygames.Clock, color: strategygames.chess.Color) = {
-    val s = clock.remainingTime(color match {
-      case(strategygames.chess.White) => strategygames.White(strategygames.GameLib.Chess())
-      case(strategygames.chess.Black) => strategygames.Black(strategygames.GameLib.Chess())
-    }).roundSeconds
+  private def renderClock(clock: strategygames.Clock, color: strategygames.Color) = {
+    val s = clock.remainingTime(color).roundSeconds
     span(
       cls := s"mini-game__clock mini-game__clock--${color.name}",
       dataTime := s

@@ -22,7 +22,7 @@ object PgnImport {
 
   case class End(
       status: strategygames.Status,
-      winner: Option[strategygames.chess.Color],
+      winner: Option[strategygames.Color],
       resultText: String,
       statusText: String
   )
@@ -55,7 +55,7 @@ object PgnImport {
               End(
                 status = status,
                 winner = game.winnerColor,
-                resultText = strategygames.chess.Color.showResult(game.winnerColor),
+                resultText = strategygames.Color.showResult(game.winnerColor),
                 statusText = lila.game.StatusText(status, game.winnerColor, game.variant)
               )
             }

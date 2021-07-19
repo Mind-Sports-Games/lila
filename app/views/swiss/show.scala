@@ -99,8 +99,8 @@ object show {
               tr(cls := "paginated")(
                 td(a(href := routes.Round.watcher(p.gameId, "white"), cls := "glpt")(s"#${p.gameId}")),
                 td(userIdLink(p.white.some)),
-                td(p strResultOf strategygames.chess.White),
-                td(p strResultOf strategygames.chess.Black),
+                td(p strResultOf White),
+                td(p strResultOf Black),
                 td(userIdLink(p.black.some))
               )
             },

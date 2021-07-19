@@ -2,8 +2,8 @@ package lila.challenge
 
 import strategygames.chess.format.Forsyth
 import strategygames.chess.format.Forsyth.SituationPlus
-import strategygames.chess.{ Color, Situation }
-import strategygames.{ Mode }
+import strategygames.chess.{ Situation }
+import strategygames.{ Color, Mode }
 import scala.util.chaining._
 
 import lila.game.{ Game, Player, Pov, Source }
@@ -57,8 +57,8 @@ private object ChallengeJoiner {
     Game
       .make(
         chess = chessGame,
-        whitePlayer = Player.make(strategygames.chess.White, c.finalColor.fold(origUser, destUser), perfPicker),
-        blackPlayer = Player.make(strategygames.chess.Black, c.finalColor.fold(destUser, origUser), perfPicker),
+        whitePlayer = Player.make(White, c.finalColor.fold(origUser, destUser), perfPicker),
+        blackPlayer = Player.make(Black, c.finalColor.fold(destUser, origUser), perfPicker),
         mode = if (chessGame.board.variant.fromPosition) Mode.Casual else c.mode,
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,

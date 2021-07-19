@@ -117,7 +117,7 @@ final private class Rematcher(
         chess = ChessGame(
           situation = Situation.Chess(
             board = board,
-            color = situation.fold[Color](White(strategygames.GameLib.Chess()))(_.situation.color)
+            color = situation.fold[Color](White)(_.situation.color)
           ),
           clock = pov.game.clock map { c =>
             Clock(strategygames.GameLib.Chess(), c.config)
@@ -125,8 +125,8 @@ final private class Rematcher(
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)
         ),
-        whitePlayer = returnPlayer(pov.game, White(strategygames.GameLib.Chess()), users),
-        blackPlayer = returnPlayer(pov.game, Black(strategygames.GameLib.Chess()), users),
+        whitePlayer = returnPlayer(pov.game, White, users),
+        blackPlayer = returnPlayer(pov.game, Black, users),
         mode = if (users.exists(_.lame)) strategygames.Mode.Casual else pov.game.mode,
         source = pov.game.source | Source.Lobby,
         daysPerTurn = pov.game.daysPerTurn,
@@ -148,11 +148,11 @@ final private class Rematcher(
     }
 
   private def redirectEvents(game: Game): Events = {
-    val whiteId = game fullIdOf White(strategygames.GameLib.Chess())
-    val blackId = game fullIdOf Black(strategygames.GameLib.Chess())
+    val whiteId = game fullIdOf White
+    val blackId = game fullIdOf Black
     List(
-      Event.RedirectOwner(White(strategygames.GameLib.Chess()), blackId, AnonCookie.json(game pov Black(strategygames.GameLib.Chess()))),
-      Event.RedirectOwner(Black(strategygames.GameLib.Chess()), whiteId, AnonCookie.json(game pov White(strategygames.GameLib.Chess()))),
+      Event.RedirectOwner(White, blackId, AnonCookie.json(game pov Black)),
+      Event.RedirectOwner(Black, whiteId, AnonCookie.json(game pov White)),
       // tell spectators about the rematch
       Event.RematchTaken(game.id)
     )

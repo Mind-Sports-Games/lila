@@ -158,7 +158,7 @@ final private class PovToEntry(
     QueenTrade {
       from.division.end.fold(from.boards.last.some)(from.boards.toList.lift) match {
         case Some(board) =>
-          strategygames.chess.Color.all.forall { color =>
+          strategygames.Color.all.forall { color =>
             !board.hasPiece(strategygames.chess.Piece(color, strategygames.chess.Queen))
           }
         case _ =>

@@ -119,8 +119,8 @@ final class PerfsUpdater(
 
   private def updateRatings(white: Rating, black: Rating, game: Game): Unit = {
     val result = game.winnerColor match {
-      case Some(White(strategygames.GameLib.Chess())) => Glicko.Result.Win
-      case Some(Black(strategygames.GameLib.Chess())) => Glicko.Result.Loss
+      case Some(White) => Glicko.Result.Win
+      case Some(Black) => Glicko.Result.Loss
       case None              => Glicko.Result.Draw
     }
     val results = new RatingPeriodResults()

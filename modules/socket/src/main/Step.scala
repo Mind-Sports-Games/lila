@@ -17,7 +17,7 @@ case class Step(
 ) {
 
   // who's color plays next
-  def color = strategygames.chess.Color.fromPly(ply)
+  def color = strategygames.Color.fromPly(ply)
 
   def toJson = Step.stepJsonWriter writes this
 }

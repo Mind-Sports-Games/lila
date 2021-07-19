@@ -85,8 +85,8 @@ case class Game(
   def opponent(c: Color): Player = player(!c)
 
   lazy val naturalOrientation = variant match {
-    case Variant.Chess(v) if v.racingKings => White(chessLib)
-    case _                                 => Color.fromWhite(chessLib, whitePlayer before blackPlayer)
+    case Variant.Chess(v) if v.racingKings => White
+    case _                                 => Color.fromWhite(whitePlayer before blackPlayer)
   }
 
   def turnColor = chess.player
@@ -551,7 +551,7 @@ case class Game(
   def onePlayerHasMoved    = playedTurns > 0
   def bothPlayersHaveMoved = playedTurns > 1
 
-  def startColor = Color.fromPly(strategygames.GameLib.Chess(), chess.startedAtTurn)
+  def startColor = Color.fromPly(chess.startedAtTurn)
 
   def playerMoves(color: Color): Int =
     if (color == startColor) (playedTurns + 1) / 2

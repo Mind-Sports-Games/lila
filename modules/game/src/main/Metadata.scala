@@ -42,7 +42,7 @@ case class GameDrawOffers(white: Set[Int], black: Set[Int]) {
     case ply if (ply % 2 == 0) == color.white => ply + 1
     case ply => ply
   }
-  def normalizedPlies: Set[Int] = normalize(White(strategygames.GameLib.Chess())) ++ normalize(Black(strategygames.GameLib.Chess()))
+  def normalizedPlies: Set[Int] = normalize(White) ++ normalize(Black)
 }
 
 object GameDrawOffers {

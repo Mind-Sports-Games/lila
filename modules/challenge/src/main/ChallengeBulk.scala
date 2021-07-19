@@ -104,8 +104,8 @@ final class ChallengeBulkApi(
         val game = Game
           .make(
             chess = strategygames.chess.Game(situation = Situation(bulk.variant), clock = bulk.clock.toClock(strategygames.GameLib.Chess()).some),
-            whitePlayer = Player.make(strategygames.chess.White, white.some, _(perfType)),
-            blackPlayer = Player.make(strategygames.chess.Black, black.some, _(perfType)),
+            whitePlayer = Player.make(White, white.some, _(perfType)),
+            blackPlayer = Player.make(Black, black.some, _(perfType)),
             mode = bulk.mode,
             source = lila.game.Source.Api,
             pgnImport = None

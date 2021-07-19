@@ -71,7 +71,7 @@ object TreeBuilder {
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
             comments = Node.Comments {
               drawOfferPlies(g.turns)
-                .option(makePlayStrategyComment(s"${!Color.fromPly(strategygames.GameLib.Chess(), g.turns)} offers draw"))
+                .option(makePlayStrategyComment(s"${!Color.fromPly(g.turns)} offers draw"))
                 .toList :::
                 advice
                   .map(_.makeComment(withEval = false, withBestMove = true))

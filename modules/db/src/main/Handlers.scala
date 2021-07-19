@@ -8,6 +8,7 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
+import strategygames.Color
 import strategygames.chess.format.FEN
 import strategygames.chess.variant.Variant
 import io.lemonlabs.uri.AbsoluteUrl
@@ -120,7 +121,7 @@ trait Handlers {
   implicit val normalizedEmailAddressHandler =
     isoHandler[NormalizedEmailAddress, String](normalizedEmailAddressIso)
 
-  implicit val colorBoolHandler = BSONBooleanHandler.as[strategygames.chess.Color](strategygames.chess.Color.fromWhite, _.white)
+  implicit val colorBoolHandler = BSONBooleanHandler.as[Color](Color.fromWhite, _.white)
 
   implicit val FENHandler: BSONHandler[FEN] = stringAnyValHandler[FEN](_.value, FEN.apply)
 

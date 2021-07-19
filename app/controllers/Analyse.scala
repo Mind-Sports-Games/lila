@@ -1,7 +1,7 @@
 package controllers
 
 import strategygames.chess.format.FEN
-import strategygames.chess.White
+import strategygames.White
 import play.api.mvc._
 import views._
 
@@ -94,7 +94,7 @@ final class Analyse(
     Action.async { implicit req =>
       env.game.gameRepo.gameWithInitialFen(gameId) flatMap {
         case Some((game, initialFen)) =>
-          val pov = Pov(game, strategygames.chess.Color.fromName(color) | White)
+          val pov = Pov(game, Color.fromName(color) | White)
           env.api.roundApi.embed(
             pov,
             lila.api.Mobile.Api.currentVersion,

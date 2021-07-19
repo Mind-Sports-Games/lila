@@ -1,6 +1,6 @@
 package lila.analyse
 
-import strategygames.chess.Color
+import strategygames.Color
 
 import org.joda.time.DateTime
 import lila.user.User

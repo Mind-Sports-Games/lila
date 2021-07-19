@@ -85,8 +85,8 @@ final private class TvBroadcast(
             "fen" -> s"$fen ${game.turnColor.letter}",
             "lm"  -> move
           )
-          .add("wc" -> game.clock.map(_.remainingTime(strategygames.White(strategygames.GameLib.Chess())).roundSeconds))
-          .add("bc" -> game.clock.map(_.remainingTime(strategygames.Black(strategygames.GameLib.Chess())).roundSeconds))
+          .add("wc" -> game.clock.map(_.remainingTime(strategygames.White).roundSeconds))
+          .add("bc" -> game.clock.map(_.remainingTime(strategygames.Black).roundSeconds))
       )
       clients.foreach(_.queue offer msg)
       featured foreach { f =>

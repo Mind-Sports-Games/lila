@@ -2,6 +2,8 @@ package lila.evaluation
 
 import reactivemongo.api.bson._
 
+import strategygames.Color
+
 import lila.db.BSON
 import lila.db.dsl._
 
@@ -43,7 +45,7 @@ object EvaluationBsonHandlers {
       _id = r str "_id",
       gameId = r str "gameId",
       userId = r str "userId",
-      color = strategygames.chess.Color.fromWhite(r bool "white"),
+      color = Color.fromWhite(r bool "white"),
       assessment = r.get[GameAssessment]("assessment"),
       date = r date "date",
       basics = PlayerAssessment.Basics(

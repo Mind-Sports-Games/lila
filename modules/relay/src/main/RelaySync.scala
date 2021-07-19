@@ -172,7 +172,7 @@ final private class RelaySync(
         setup = Chapter.Setup(
           none,
           game.variant,
-          strategygames.chess.Color.White
+          strategygames.Color.White
         ),
         root = game.root,
         tags = game.tags,

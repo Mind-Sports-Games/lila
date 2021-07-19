@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.chess.{ Black, Color, White }
+import strategygames.{ Black, Color, White }
 import org.joda.time.DateTime
 import scala.util.chaining._
 

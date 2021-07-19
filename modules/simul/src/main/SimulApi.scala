@@ -233,12 +233,12 @@ final class SimulApi(
 
   private def makeGame(simul: Simul, host: User)(
       pairingAndNumber: (SimulPairing, Int)
-  ): Fu[(Game, strategygames.chess.Color)] =
+  ): Fu[(Game, strategygames.Color)] =
     pairingAndNumber match {
       case (pairing, number) =>
         for {
           user <- userRepo byId pairing.player.user orFail s"No user with id ${pairing.player.user}"
-          hostColor = simul.hostColor | strategygames.chess.Color.fromWhite(number % 2 == 0)
+          hostColor = simul.hostColor | strategygames.Color.fromWhite(number % 2 == 0)
           whiteUser = hostColor.fold(host, user)
           blackUser = hostColor.fold(user, host)
           clock     = simul.clock.chessClockOf(hostColor)
@@ -254,8 +254,8 @@ final class SimulApi(
                 fen = simul.position
               )
               .copy(clock = clock.start.some),
-            whitePlayer = lila.game.Player.make(strategygames.chess.White, whiteUser.some, perfPicker),
-            blackPlayer = lila.game.Player.make(strategygames.chess.Black, blackUser.some, perfPicker),
+            whitePlayer = lila.game.Player.make(White, whiteUser.some, perfPicker),
+            blackPlayer = lila.game.Player.make(Black, blackUser.some, perfPicker),
             mode = strategygames.Mode.Casual,
             source = lila.game.Source.Simul,
             pgnImport = None

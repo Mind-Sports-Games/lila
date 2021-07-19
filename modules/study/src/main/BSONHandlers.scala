@@ -5,8 +5,8 @@ import strategygames.format.pgn.{ Tag, Tags }
 import strategygames.chess.format.{ FEN, Uci }
 import strategygames.format.{ UciCharPair }
 import strategygames.chess.variant.{ Crazyhouse, Variant }
-import strategygames.chess.{ Color, Pos, PromotableRole, Role }
-import strategygames.{ Centis }
+import strategygames.chess.{ Pos, PromotableRole, Role }
+import strategygames.{ Centis, Color }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.Success

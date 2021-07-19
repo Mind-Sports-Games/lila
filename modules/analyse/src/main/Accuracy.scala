@@ -15,8 +15,8 @@ object Accuracy {
   }
 
   case class PovLike(
-      color: strategygames.chess.Color,
-      startColor: strategygames.chess.Color,
+      color: strategygames.Color,
+      startColor: strategygames.Color,
       startedAtTurn: Int
   )
 

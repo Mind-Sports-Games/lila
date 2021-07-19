@@ -1,6 +1,6 @@
 package lila.tournament
 
-import strategygames.chess.Color
+import strategygames.Color
 import scala.concurrent.duration._
 
 import lila.memo.CacheApi
