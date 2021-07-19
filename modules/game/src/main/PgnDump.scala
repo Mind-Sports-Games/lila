@@ -2,7 +2,8 @@ package lila.game
 
 import strategygames.chess.format.pgn.{ ParsedPgn, Parser, Pgn }
 import strategygames.format.pgn.{ Tag, TagType, Tags }
-import strategygames.format.{ FEN, Forsyth, pgn => chessPgn }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.chess.format.{ pgn => chessPgn }
 import strategygames.{ Centis, Color, Status }
 import strategygames.variant.Variant
 
@@ -30,11 +31,7 @@ final class PgnDump(
       else fuccess(Tags(Nil))
     tagsFuture map { ts =>
       val turns = flags.moves ?? {
-        val fenSituation = ts.fen match {
-          case Some(FEN.Chess(strategygames.chess.FEN(fen))) => Forsyth.<<<(strategygames.GameLib.Chess(), fen)
-          case None => None
-          case _ => sys.error("Not implemented for draughts yet")
-        }
+        val fenSituation = ts.fen.flatMap{fen => Forsyth.<<<(strategygames.GameLib.Chess(), fen)}
         makeTurns(
           flags keepDelayIf game.playable applyDelay {
             if (fenSituation.exists(_.situation.color.black)) ".." +: game.pgnMoves
@@ -60,7 +57,7 @@ final class PgnDump(
     p.aiLevel.fold(u.fold(p.name | lila.user.User.anonymous)(_.name))("playstrategy AI level " + _)
 
   private val customStartPosition: Set[Variant] =
-    Set(strategygames.chess.variant.Chess960, strategygames.chess.variant.FromPosition, strategygames.chess.variant.Horde, strategygames.chess.variant.RacingKings)
+    Set(strategygames.chess.variant.Chess960, strategygames.chess.variant.FromPosition, strategygames.chess.variant.Horde, strategygames.chess.variant.RacingKings).map(Variant.Chess)
 
   private def eventOf(game: Game) = {
     val perf = game.perfType.fold("Standard")(_.trans(lila.i18n.defaultLang))

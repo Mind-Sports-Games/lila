@@ -21,11 +21,15 @@ object StatusText {
       case Cheat                    => "Cheat detected."
       case VariantEnd =>
         variant match {
-          case strategygames.chess.variant.KingOfTheHill => s"${winner(win)} brings the king in the center."
-          case strategygames.chess.variant.ThreeCheck    => s"${winner(win)} gives the third check."
-          case strategygames.chess.variant.RacingKings   => s"${winner(win)} wins the race."
-          case strategygames.chess.variant.LinesOfAction => s"${winner(win)} connects all of their pieces."
-          case _                           => "Game ends by variant rule."
+          case Variant.Chess(strategygames.chess.variant.KingOfTheHill)
+            => s"${winner(win)} brings the king in the center."
+          case Variant.Chess(strategygames.chess.variant.ThreeCheck)
+            => s"${winner(win)} gives the third check."
+          case Variant.Chess(strategygames.chess.variant.RacingKings)
+            => s"${winner(win)} wins the race."
+          case Variant.Chess(strategygames.chess.variant.LinesOfAction)
+            => s"${winner(win)} connects all of their pieces."
+          case _ => "Game ends by variant rule."
         }
       case _ => ""
     }

@@ -2,7 +2,7 @@ package lila.game
 
 import java.security.MessageDigest
 import lila.db.ByteArray
-import strategygames.Color
+import strategygames.{ Black, Color, White }
 
 private[game] case class Metadata(
     source: Option[Source],

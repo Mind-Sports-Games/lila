@@ -1,11 +1,10 @@
 package lila.game
 
-import strategygames.{ Black, Centis, Clock, ClockPlayer, Color, GameLib, Timestamp, White }
-import strategygames.chess.{ Board, Castles, Piece, PieceMap, Pos, Rank, Role, UnmovedRooks }
+import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLib, Piece, PieceMap, Role, Timestamp, White }
+import strategygames.chess.{ Castles, Pos, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.format
-import strategygames.chess.variant.Variant
-import strategygames.chess.variant.Standard
+import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.lichess.compression.clock.{ Encoder => ClockEncoder }
 import scala.util.Try
@@ -236,7 +235,7 @@ object BinaryFormat {
     }
 
     // cache standard start position
-    val standard = write(Board.init(Standard).pieces)
+    def standard(lib: GameLib) = write(Board.init(lib, Variant.libStandard(lib)).pieces)
 
     private def intToRoleChess(int: Int, variant: chess.variant.Variant): Option[chess.Role] =
       chess.Role.binaryInt( int)

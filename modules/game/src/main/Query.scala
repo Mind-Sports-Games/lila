@@ -110,7 +110,7 @@ object Query {
   def variant(v: Variant) =
     $doc(F.variant -> (if (v.standard) $exists(false) else $int(v.id)))
 
-  lazy val variantStandard = variant(Standard)
+  lazy val variantStandard = variant(Variant.Chess(Standard))
 
   lazy val notHordeOrSincePawnsAreWhite: Bdoc = $or(
     F.variant $ne Horde.id,

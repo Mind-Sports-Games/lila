@@ -14,7 +14,7 @@ import lila.db.BSON
 import lila.db.dsl._
 
 object BSONHandlers {
-  var chessLib = strategygames.GameLib.Chess()
+  val chessLib = strategygames.GameLib.Chess()
 
   import lila.db.ByteArray.ByteArrayBSONHandler
 
@@ -141,7 +141,7 @@ object BSONHandlers {
         id = light.id,
         whitePlayer = light.whitePlayer,
         blackPlayer = light.blackPlayer,
-        chess = chessGame,
+        chess = Game.Chess(chessGame),
         loadClockHistory = clk =>
           for {
             bw <- whiteClockHistory

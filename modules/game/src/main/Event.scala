@@ -160,10 +160,10 @@ object Event {
         crazyData: Option[Crazyhouse.Data]
     ): Drop =
       Drop(
-        role = drop.piece.role,
-        pos = drop.pos,
+        role = Role.ChessRole(drop.piece.role),
+        pos = Pos.Chess(drop.pos),
         san = Dumper(drop),
-        fen = Forsyth.exportBoard(situation.board),
+        fen = Forsyth.exportBoard(chessLib, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         state = state,
@@ -340,7 +340,7 @@ object Event {
         .add("lag" -> nextLagComp.collect { case Centis(c) if c > 1 => c })
   }
   object Clock {
-    def apply(clock: chess.Clock): Clock =
+    def apply(clock: strategygames.Clock): Clock =
       Clock(
         clock remainingTime White,
         clock remainingTime Black,

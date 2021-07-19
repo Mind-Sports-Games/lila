@@ -1,6 +1,7 @@
 package lila.game
 
-import strategygames.{ Black, Centis, CheckCount, Clock, Color, White }
+import strategygames.{ Black, Centis, Clock, Color, White }
+import strategygames.chess.CheckCount
 import Game.BSONFields._
 import reactivemongo.api.bson._
 import scala.util.Try

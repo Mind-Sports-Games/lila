@@ -407,8 +407,8 @@ case class Game(
       this,
       copy(
         status = status,
-        whitePlayer = whitePlayer.finish(winner contains White(chessLib)),
-        blackPlayer = blackPlayer.finish(winner contains Black(chessLib)),
+        whitePlayer = whitePlayer.finish(winner contains White),
+        blackPlayer = blackPlayer.finish(winner contains Black),
         chess = chess.copy(clock = newClock),
         loadClockHistory = clk =>
           clockHistory map { history =>
@@ -444,7 +444,7 @@ case class Game(
       !Game.isOldHorde(this)
 
   def ratingVariant =
-    if (isTournament && variant.fromPosition) Standard
+    if (isTournament && variant.fromPosition) Variant.libStandard(chessLib)
     else variant
 
   def fromPosition = variant.fromPosition || source.??(Source.Position ==)
@@ -630,8 +630,8 @@ case class Game(
 
   def pov(c: Color)                                 = Pov(this, c)
   def playerIdPov(playerId: Player.ID): Option[Pov] = player(playerId) map { Pov(this, _) }
-  def whitePov                                      = pov(White(chessLib))
-  def blackPov                                      = pov(Black(chessLib))
+  def whitePov                                      = pov(White)
+  def blackPov                                      = pov(Black)
   def playerPov(p: Player)                          = pov(p.color)
   def loserPov                                      = loser map playerPov
 
