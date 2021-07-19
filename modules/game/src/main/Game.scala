@@ -1,10 +1,11 @@
 package lila.game
 
 import strategygames.format.{ FEN, Uci }
+import strategygames.chess
 import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.variant.{ FromPosition, Standard, Variant }
 import strategygames.chess.{ Castles, CheckCount, Game => ChessGame, MoveOrDrop }
-import strategygames.{ Black, Centis, Clock, Color, Mode, Speed, Status, White }
+import strategygames.{ Black, Centis, Clock, Color, GameLib, Mode, Speed, Status, White }
 import org.joda.time.DateTime
 
 import lila.common.Sequence
@@ -28,6 +29,8 @@ case class Game(
     movedAt: DateTime = DateTime.now,
     metadata: Metadata
 ) {
+  val chessLib = GameLib.Chess() 
+
   lazy val clockHistory = chess.clock flatMap loadClockHistory
 
   def situation = chess.situation
@@ -66,7 +69,7 @@ case class Game(
   def opponent(c: Color): Player = player(!c)
 
   lazy val naturalOrientation =
-    if (variant.racingKings) White else Color.fromWhite(strategygames.GameLib.Chess(), whitePlayer before blackPlayer)
+    if (variant.racingKings) White(chessLib) else Color.fromWhite(chessLib, whitePlayer before blackPlayer)
 
   def turnColor = chess.player
 
@@ -201,7 +204,7 @@ case class Game(
       color = game.situation.color,
       turns = game.turns,
       status = (status != updated.status) option updated.status,
-      winner = game.situation.winner,
+      winner = game.situation.winner.map(Color.Chess),
       whiteOffersDraw = whitePlayer.isOfferingDraw,
       blackOffersDraw = blackPlayer.isOfferingDraw
     )
@@ -228,8 +231,8 @@ case class Game(
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
-      case strategygames.chess.Uci.Drop(target, _) => s"$target$target"
-      case m: Uci.Move         => m.keys
+      case strategygames.chess.format.Uci.Drop(target, _) => s"$target$target"
+      case m: strategygames.chess.format.Uci.Move         => m.keys
     }
 
   def updatePlayer(color: Color, f: Player => Player) =
@@ -386,8 +389,8 @@ case class Game(
       this,
       copy(
         status = status,
-        whitePlayer = whitePlayer.finish(winner contains White),
-        blackPlayer = blackPlayer.finish(winner contains Black),
+        whitePlayer = whitePlayer.finish(winner contains White(chessLib)),
+        blackPlayer = blackPlayer.finish(winner contains Black(chessLib)),
         chess = chess.copy(clock = newClock),
         loadClockHistory = clk =>
           clockHistory map { history =>
@@ -609,8 +612,8 @@ case class Game(
 
   def pov(c: Color)                                 = Pov(this, c)
   def playerIdPov(playerId: Player.ID): Option[Pov] = player(playerId) map { Pov(this, _) }
-  def whitePov                                      = pov(White)
-  def blackPov                                      = pov(Black)
+  def whitePov                                      = pov(White(chessLib))
+  def blackPov                                      = pov(Black(chessLib))
   def playerPov(p: Player)                          = pov(p.color)
   def loserPov                                      = loser map playerPov
 
@@ -787,6 +790,7 @@ object Game {
     val blackClockHistory = "cb"
     val rated             = "ra"
     val analysed          = "an"
+    val lib               = "l"
     val variant           = "v"
     val crazyData         = "chd"
     val bookmarks         = "bm"
@@ -807,7 +811,7 @@ object Game {
   }
 }
 
-case class CastleLastMove(castles: Castles, lastMove: Option[Uci])
+case class CastleLastMove(castles: Castles, lastMove: Option[chess.format.Uci])
 
 object CastleLastMove {
 

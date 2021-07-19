@@ -1,8 +1,10 @@
 package lila.game
 
-import strategygames.{ Black, Board, Castles, Centis, Clock, ClockPlayer, Color, Piece, PieceMap, Pos, Rank, Role, Timestamp, UnmovedRooks, White }
+import strategygames.{ Centis, Clock, ClockPlayer, Color, GameLib, Timestamp }
+import strategygames.chess.{ Black, Board, Castles, Piece, PieceMap, Pos, Rank, Role, UnmovedRooks, White }
+import strategygames.chess
 import strategygames.format
-import strategygames.variant.Variant
+import strategygames.chess.variant.Variant
 import strategygames.chess.variant.Standard
 import org.joda.time.DateTime
 import org.lichess.compression.clock.{ Encoder => ClockEncoder }
@@ -11,19 +13,20 @@ import scala.util.Try
 import lila.db.ByteArray
 
 object BinaryFormat {
+  val chessLib = GameLib.Chess()
 
   object pgn {
 
     def write(moves: PgnMoves): ByteArray =
       ByteArray {
-        format.pgn.Binary.writeMoves(moves).get
+        chess.format.pgn.Binary.writeMoves(moves).get
       }
 
     def read(ba: ByteArray): PgnMoves =
-      format.pgn.Binary.readMoves(ba.value.toList).get.toVector
+      chess.format.pgn.Binary.readMoves(ba.value.toList).get.toVector
 
     def read(ba: ByteArray, nb: Int): PgnMoves =
-      format.pgn.Binary.readMoves(ba.value.toList, nb).get.toVector
+      chess.format.pgn.Binary.readMoves(ba.value.toList, nb).get.toVector
   }
 
   object clockHistory {
@@ -95,8 +98,8 @@ object BinaryFormat {
 
     def write(clock: Clock): ByteArray = {
       Array(writeClockLimit(clock.limitSeconds), clock.incrementSeconds.toByte) ++
-        writeSignedInt24(legacyElapsed(clock, White(strategygames.GameLib.Chess())).centis) ++
-        writeSignedInt24(legacyElapsed(clock, Black(strategygames.GameLib.Chess())).centis) ++
+        writeSignedInt24(legacyElapsed(clock, White).centis) ++
+        writeSignedInt24(legacyElapsed(clock, Black).centis) ++
         clock.timer.fold(Array.empty[Byte])(writeTimer)
     }
 
@@ -199,7 +202,7 @@ object BinaryFormat {
           orig <- Pos.at((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
           dest <- Pos.at((b2 & 63) >> 3, b2 & 7)
           if orig != Pos.A1 || dest != Pos.A1
-        } yield format.Uci.Move(orig, dest)
+        } yield chess.format.Uci.Move(orig, dest)
       )
   }
 
@@ -213,19 +216,19 @@ object BinaryFormat {
       ByteArray(Pos.all.map(posInt(_).toByte).toArray)
     }
 
-    def read(ba: ByteArray, variant: Variant): PieceMap = {
+    def readChess(ba: ByteArray, variant: chess.variant.Variant): PieceMap = {
       def splitInts(b: Byte) = {
         val int = b.toInt
         Array(int >> 4, int & 0x0f)
       }
-      def intPiece(int: Int): Option[Piece] =
-        intToRole(int & 127, variant) map { role =>
-          Piece.Chess(strategygames.chess.Piece(
-            Color.fromWhite(strategygames.GameLib.Chess(), (int & 128) == 0),
+      def intPiece(int: Int): Option[chess.Piece] =
+        intToRoleChess(int & 127, variant) map { role =>
+          chess.Piece(
+            chess.Color.fromWhite((int & 128) == 0),
             role
-          ))
+          )
         }
-      (Pos.all zip ba.value).view
+      (chess.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
         }
@@ -233,10 +236,10 @@ object BinaryFormat {
     }
 
     // cache standard start position
-    val standard = write(Board.init(strategygames.GameLib.Chess(), Standard).pieces)
+    val standard = write(Board.init(Standard).pieces)
 
-    private def intToRole(int: Int, variant: Variant): Option[Role] =
-      Role.binaryInt(strategygames.GameLib.Chess(), int)
+    private def intToRoleChess(int: Int, variant: chess.variant.Variant): Option[chess.Role] =
+      chess.Role.binaryInt( int)
 
     private def roleToInt(role: Role): Int = role.binaryInt
 

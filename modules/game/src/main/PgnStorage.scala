@@ -1,8 +1,8 @@
 package lila.game
 
-import strategygames.format
-import strategygames.{ Color, Piece, PieceMap, Pos, PositionHash, Role }
-import strategygames.chess.{ Castles, UnmovedRooks }
+import strategygames.chess
+import strategygames.chess.format
+import strategygames.chess.{ Castles, Color, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks  }
 
 import lila.db.ByteArray
 
@@ -60,10 +60,10 @@ private object PgnStorage {
 
     private def chessPos(sq: Integer): Option[Pos] = Pos(sq)
     private def chessRole(role: JavaRole): Role =
-      Role.javaSymbolToRole(strategygames.GameLib.Chess(), role.symbol)
+      Role.javaSymbolToRole(role.symbol)
 
     private def chessPiece(piece: JavaPiece): Piece =
-      Piece.Chess(strategygames.GameLib.Chess(), (Color.fromWhite(strategygames.GameLib.Chess(), piece.white), chessRole(piece.role)))
+      Piece(Color.fromWhite(piece.white), chessRole(piece.role))
   }
 
   case class Decoded(

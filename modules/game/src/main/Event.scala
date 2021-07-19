@@ -3,7 +3,8 @@ package lila.game
 import play.api.libs.json._
 
 import strategygames.chess.variant.Crazyhouse
-import strategygames.{ PromotableRole, Pos, Color, Situation, Move => ChessMove, Drop => ChessDrop, Centis, Clock => ChessClock, Status, Role, White, Black }
+import strategygames.{ Centis, Color, GameLib, PromotableRole, Pos, Situation, Status, Role, White, Black }
+import strategygames.chess
 import strategygames.format.Forsyth
 import strategygames.chess.format.pgn.Dumper
 import JsonView._
@@ -21,6 +22,7 @@ sealed trait Event {
 }
 
 object Event {
+  val chessLib = GameLib.Chess()
 
   sealed trait Empty extends Event {
     def data = JsNull
@@ -94,17 +96,17 @@ object Event {
   }
   object Move {
     def apply(
-        move: ChessMove,
+        move: chess.Move,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
         crazyData: Option[Crazyhouse.Data]
     ): Move =
       Move(
-        orig = move.orig,
-        dest = move.dest,
+        orig = Pos.Chess(move.orig),
+        dest = Pos.Chess(move.dest),
         san = Dumper(move),
-        fen = Forsyth.exportBoard(situation.board),
+        fen = Forsyth.exportBoard(chessLib, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         promotion = move.promotion.map { Promotion(_, move.dest) },
@@ -148,7 +150,7 @@ object Event {
   }
   object Drop {
     def apply(
-        drop: ChessDrop,
+        drop: chess.Drop,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
@@ -278,8 +280,8 @@ object Event {
         })
         .add("ratingDiff" -> ratingDiff.map { rds =>
           Json.obj(
-            Color.White.name -> rds.white,
-            Color.Black.name -> rds.black
+            chess.Color.White.name -> rds.white,
+            chess.Color.Black.name -> rds.black
           )
         })
         .add("boosted" -> game.boosted)
@@ -335,7 +337,7 @@ object Event {
         .add("lag" -> nextLagComp.collect { case Centis(c) if c > 1 => c })
   }
   object Clock {
-    def apply(clock: ChessClock): Clock =
+    def apply(clock: chess.Clock): Clock =
       Clock(
         clock remainingTime White(strategygames.GameLib.Chess()),
         clock remainingTime Black(strategygames.GameLib.Chess()),
