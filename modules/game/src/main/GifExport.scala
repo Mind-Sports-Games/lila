@@ -134,7 +134,7 @@ final class GifExport(
   private def frame(situation: Situation, uci: Option[Uci], delay: Option[Centis]) =
     Json
       .obj(
-        "fen"      -> (Forsyth.>>(strategygames.GameLib.Chess(), situation)),
+        "fen"      -> (Forsyth.>>(strategygames.GameLib.Chess(), situation).value),
         "lastMove" -> uci.map(_.uci)
       )
       .add("check", situation.checkSquare.map(_.key))

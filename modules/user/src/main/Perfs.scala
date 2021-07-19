@@ -1,6 +1,7 @@
 package lila.user
 
 import strategygames.Speed
+import strategygames.variant.Variant
 import org.joda.time.DateTime
 
 import lila.common.Heapsort.implicits._
@@ -237,18 +238,18 @@ case object Perfs {
     )
   }
 
-  def variantLens(variant: strategygames.chess.variant.Variant): Option[Perfs => Perf] =
+  def variantLens(variant: Variant): Option[Perfs => Perf] =
     variant match {
-      case strategygames.chess.variant.Standard      => Some(_.standard)
-      case strategygames.chess.variant.Chess960      => Some(_.chess960)
-      case strategygames.chess.variant.KingOfTheHill => Some(_.kingOfTheHill)
-      case strategygames.chess.variant.ThreeCheck    => Some(_.threeCheck)
-      case strategygames.chess.variant.Antichess     => Some(_.antichess)
-      case strategygames.chess.variant.Atomic        => Some(_.atomic)
-      case strategygames.chess.variant.Horde         => Some(_.horde)
-      case strategygames.chess.variant.RacingKings   => Some(_.racingKings)
-      case strategygames.chess.variant.Crazyhouse    => Some(_.crazyhouse)
-      case strategygames.chess.variant.LinesOfAction => Some(_.linesOfAction)
+      case Variant.Chess(strategygames.chess.variant.Standard)      => Some(_.standard)
+      case Variant.Chess(strategygames.chess.variant.Chess960)      => Some(_.chess960)
+      case Variant.Chess(strategygames.chess.variant.KingOfTheHill) => Some(_.kingOfTheHill)
+      case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => Some(_.threeCheck)
+      case Variant.Chess(strategygames.chess.variant.Antichess)     => Some(_.antichess)
+      case Variant.Chess(strategygames.chess.variant.Atomic)        => Some(_.atomic)
+      case Variant.Chess(strategygames.chess.variant.Horde)         => Some(_.horde)
+      case Variant.Chess(strategygames.chess.variant.RacingKings)   => Some(_.racingKings)
+      case Variant.Chess(strategygames.chess.variant.Crazyhouse)    => Some(_.crazyhouse)
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction) => Some(_.linesOfAction)
       case _                           => none
     }
 
