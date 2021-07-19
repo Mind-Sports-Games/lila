@@ -3,7 +3,7 @@ package lila.game
 import play.api.libs.json._
 
 import strategygames.chess.variant.Crazyhouse
-import strategygames.{ Centis, Color, GameLib, PromotableRole, Pos, Situation, Status, Role, White, Black }
+import strategygames.{ Centis, Color, GameLib, Move => StratMove, PromotableRole, Pos, Situation, Status, Role, White, Black }
 import strategygames.chess
 import strategygames.format.Forsyth
 import strategygames.chess.format.pgn.Dumper
@@ -96,22 +96,25 @@ object Event {
   }
   object Move {
     def apply(
-        move: chess.Move,
+        move: StratMove,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
         crazyData: Option[Crazyhouse.Data]
     ): Move =
       Move(
-        orig = Pos.Chess(move.orig),
-        dest = Pos.Chess(move.dest),
-        san = Dumper(move),
+        orig = move.orig,
+        dest = move.dest,
+        san = move match { // TODO: DRAUGHTS this needs to change for draughts
+          case StratMove.Chess(move) => Dumper(move)
+          case _ => ""
+        },
         fen = Forsyth.exportBoard(chessLib, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         promotion = move.promotion.map { Promotion(_, move.dest) },
         enpassant = (move.capture ifTrue move.enpassant).map {
-          Event.Enpassant(_, !move.color)
+          (capture: List[Pos]) => Event.Enpassant(capture(0), !move.color)
         },
         castle = move.castle.map { case (king, rook) =>
           Castling(king, rook, move.color)

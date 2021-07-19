@@ -3,9 +3,25 @@ package lila.game
 import strategygames.format.{ FEN, Uci }
 import strategygames.chess
 import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
-import strategygames.chess.variant.{ FromPosition, Standard, Variant }
-import strategygames.chess.{ Castles, CheckCount, Game => ChessGame, MoveOrDrop }
-import strategygames.{ Black, Centis, Clock, Color, GameLib, Mode, Speed, Status, White }
+import strategygames.chess.variant.{ FromPosition, Standard, Variant => ChessVariant }
+import strategygames.chess.{ Castles, CheckCount }
+import strategygames.chess.format.{ Uci => ChessUci }
+import strategygames.{
+  Black,
+  Centis,
+  Clock,
+  Color,
+  Game => StratGame,
+  GameLib,
+  Mode,
+  Move,
+  MoveOrDrop,
+  Speed,
+  Status,
+  White
+}
+import strategygames.format.Uci
+import strategygames.variant.Variant
 import org.joda.time.DateTime
 
 import lila.common.Sequence
@@ -18,7 +34,7 @@ case class Game(
     id: Game.ID,
     whitePlayer: Player,
     blackPlayer: Player,
-    chess: ChessGame,
+    chess: StratGame,
     loadClockHistory: Clock => Option[ClockHistory] = _ => Game.someEmptyClockHistory,
     status: Status,
     daysPerTurn: Option[Int],
@@ -29,7 +45,7 @@ case class Game(
     movedAt: DateTime = DateTime.now,
     metadata: Metadata
 ) {
-  val chessLib = GameLib.Chess() 
+  val chessLib = GameLib.Chess()
 
   lazy val clockHistory = chess.clock flatMap loadClockHistory
 
@@ -68,8 +84,10 @@ case class Game(
 
   def opponent(c: Color): Player = player(!c)
 
-  lazy val naturalOrientation =
-    if (variant.racingKings) White(chessLib) else Color.fromWhite(chessLib, whitePlayer before blackPlayer)
+  lazy val naturalOrientation = variant match {
+    case Variant.Chess(v) if v.racingKings => White(chessLib)
+    case _                                 => Color.fromWhite(chessLib, whitePlayer before blackPlayer)
+  }
 
   def turnColor = chess.player
 
@@ -165,7 +183,7 @@ case class Game(
 
   // apply a move
   def update(
-      game: ChessGame, // new chess position
+      game: StratGame, // new chess position
       moveOrDrop: MoveOrDrop,
       blur: Boolean = false
   ): Progress = {
@@ -204,7 +222,7 @@ case class Game(
       color = game.situation.color,
       turns = game.turns,
       status = (status != updated.status) option updated.status,
-      winner = game.situation.winner.map(Color.Chess),
+      winner = game.situation.winner,
       whiteOffersDraw = whitePlayer.isOfferingDraw,
       blackOffersDraw = blackPlayer.isOfferingDraw
     )
@@ -231,8 +249,8 @@ case class Game(
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
-      case strategygames.chess.format.Uci.Drop(target, _) => s"$target$target"
-      case m: strategygames.chess.format.Uci.Move         => m.keys
+      case Uci.Chess(ChessUci.Drop(target, _)) => s"$target$target"
+      case m: Uci.Move                         => m.keys
     }
 
   def updatePlayer(color: Color, f: Player => Player) =
@@ -603,7 +621,7 @@ case class Game(
     )
 
   lazy val opening: Option[FullOpening.AtPly] =
-    if (fromPosition || !Variant.openingSensibleVariants(variant)) none
+    if (fromPosition || !Variant.openingSensibleVariants(chessLib)(variant)) none
     else FullOpeningDB search pgnMoves
 
   def synthetic = id == Game.syntheticId
@@ -656,9 +674,10 @@ object Game {
     strategygames.chess.variant.Horde,
     strategygames.chess.variant.Atomic,
     strategygames.chess.variant.RacingKings
-  )
+  ).map(Variant.Chess)
 
-  val unanalysableVariants: Set[Variant] = Variant.all.toSet -- analysableVariants
+  val unanalysableVariants: Set[Variant] = 
+    ChessVariant.all.map(Variant.Chess).toSet -- analysableVariants
 
   val variantsWhereWhiteIsBetter: Set[Variant] = Set(
     strategygames.chess.variant.ThreeCheck,
@@ -666,7 +685,7 @@ object Game {
     strategygames.chess.variant.Horde,
     strategygames.chess.variant.RacingKings,
     strategygames.chess.variant.Antichess
-  )
+  ).map(Variant.Chess)
 
   val blindModeVariants: Set[Variant] = Set(
     strategygames.chess.variant.Standard,
@@ -674,7 +693,7 @@ object Game {
     strategygames.chess.variant.KingOfTheHill,
     strategygames.chess.variant.ThreeCheck,
     strategygames.chess.variant.FromPosition
-  )
+  ).map(Variant.Chess)
 
   val hordeWhitePawnsSince = new DateTime(2015, 4, 11, 10, 0)
 
@@ -729,7 +748,7 @@ object Game {
   private[game] val someEmptyClockHistory = Some(ClockHistory())
 
   def make(
-      chess: ChessGame,
+      chess: StratGame,
       whitePlayer: Player,
       blackPlayer: Player,
       mode: Mode,
