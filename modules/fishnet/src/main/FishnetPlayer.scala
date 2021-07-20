@@ -28,7 +28,7 @@ final class FishnetPlayer(
     }
 
   private val delayFactor  = 0.011f
-  private val defaultClock = Clock(strategygames.GameLib.Chess(), 300, 0)
+  private val defaultClock = Clock(300, 0)
 
   private def delayFor(g: Game): Option[FiniteDuration] =
     if (!g.bothPlayersHaveMoved) 2.seconds.some
@@ -55,9 +55,9 @@ final class FishnetPlayer(
             _id = Work.makeId,
             game = Work.Game(
               id = game.id,
-              initialFen = initialFen,
+              initialFen = initialFen.flatMap(_.chessFen),
               studyId = none,
-              variant = game.variant,
+              variant = game.variant.chessVariant,
               moves = moves mkString " "
             ),
             level =

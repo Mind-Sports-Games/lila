@@ -102,9 +102,9 @@ final class Analyser(
       makeWork(
         game = Work.Game(
           id = game.id,
-          initialFen = initialFen,
+          initialFen = initialFen.flatMap(_.chessFen),
           studyId = none,
-          variant = game.variant,
+          variant = game.variant.chessVariant,
           moves = moves take maxPlies mkString " "
         ),
         startPly = game.chess.startedAtTurn,

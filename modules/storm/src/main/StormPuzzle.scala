@@ -1,6 +1,7 @@
 package lila.storm
 
 import cats.data.NonEmptyList
+import strategygames.Color.White
 import strategygames.chess.format.{ FEN, Forsyth, Uci }
 
 import lila.puzzle.Puzzle
