@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Black, Centis, Clock, Color, White }
+import strategygames.{ Black, Board, Centis, Clock, Color, History, White }
 import strategygames.chess.CheckCount
 import Game.BSONFields._
 import reactivemongo.api.bson._
@@ -66,7 +66,10 @@ object GameDiff {
     else {
       val f = PgnStorage.OldBin
       dTry(oldPgn, _.pgnMoves, writeBytes compose f.encode)
-      dTry(binaryPieces, _.board.pieces, writeBytes compose BinaryFormat.piece.write)
+      dTry(binaryPieces, _.board match {
+        case Board.Chess(b) => b.pieces
+        case _ => sys.error("Wrong board type")
+      }, writeBytes compose BinaryFormat.piece.writeChess)
       d(positionHashes, _.history.positionHashes, w.bytes)
       dTry(unmovedRooks, _.history.unmovedRooks, writeBytes compose BinaryFormat.unmovedRooks.write)
       dTry(castleLastMove, makeCastleLastMove, CastleLastMove.castleLastMoveBSONHandler.writeTry)
@@ -116,7 +119,10 @@ object GameDiff {
 
   private def makeCastleLastMove(g: Game) =
     CastleLastMove(
-      lastMove = g.history.lastMove,
+      lastMove = g.history match {
+        case History.Chess(h) => h.lastMove
+        case _ => sys.error("Wrong history type")
+      },
       castles = g.history.castles
     )
 }

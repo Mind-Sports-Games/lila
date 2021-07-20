@@ -1,6 +1,7 @@
 package lila.game
 
 import cats.data.Validated
+import strategygames.{ Game => StratGame }
 import strategygames.format.FEN
 import strategygames.chess.format.{ pgn => chessPgn }
 import strategygames.format.pgn.{ Tag, Tags }
@@ -34,7 +35,7 @@ object Rewind {
       val newGame = game.copy(
         whitePlayer = rewindPlayer(game.whitePlayer),
         blackPlayer = rewindPlayer(game.blackPlayer),
-        chess = rewindedGame.copy(clock = newClock),
+        chess = StratGame.Chess(rewindedGame.copy(clock = newClock)),
         binaryMoveTimes = game.binaryMoveTimes.map { binary =>
           val moveTimes = BinaryFormat.moveTime.read(binary, game.playedTurns)
           BinaryFormat.moveTime.write(moveTimes.dropRight(1))

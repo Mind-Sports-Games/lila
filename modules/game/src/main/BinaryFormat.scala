@@ -1,7 +1,7 @@
 package lila.game
 
-import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLib, Piece, PieceMap, Role, Timestamp, White }
-import strategygames.chess.{ Castles, Pos, Rank, UnmovedRooks }
+import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLib, Piece, PieceMap, Pos, Role, Timestamp, White }
+import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.format
 import strategygames.variant.Variant
@@ -173,6 +173,7 @@ object BinaryFormat {
     def apply(start: DateTime) = new clock(Timestamp(start.getMillis))
   }
 
+  // This class is chess only for the time being.
   object castleLastMove {
 
     def write(clmt: CastleLastMove): ByteArray = {
@@ -182,9 +183,9 @@ object BinaryFormat {
         case (acc, (true, p))  => acc + (1 << (3 - p))
       }
 
-      def posInt(pos: Pos): Int = (pos.file.index << 3) + pos.rank.index
+      def posInt(pos: Pos): Int = pos.toInt
       val lastMoveInt = clmt.lastMove.map(_.origDest).fold(0) { case (o, d) =>
-        (posInt(o) << 6) + posInt(d)
+        (posInt(Pos.Chess(o)) << 6) + posInt(Pos.Chess(d))
       }
       Array((castleInt << 4) + (lastMoveInt >> 8) toByte, lastMoveInt.toByte)
     }
@@ -198,24 +199,24 @@ object BinaryFormat {
       CastleLastMove(
         castles = Castles(b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
         lastMove = for {
-          orig <- Pos.at((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
-          dest <- Pos.at((b2 & 63) >> 3, b2 & 7)
-          if orig != Pos.A1 || dest != Pos.A1
+          orig <- chess.Pos.at((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
+          dest <- chess.Pos.at((b2 & 63) >> 3, b2 & 7)
+          if orig != chess.Pos.A1 || dest != chess.Pos.A1
         } yield chess.format.Uci.Move(orig, dest)
       )
   }
 
   object piece {
 
-    def write(pieces: PieceMap): ByteArray = {
-      def posInt(pos: Pos): Int =
+    def writeChess(pieces: chess.PieceMap): ByteArray = {
+      def posInt(pos: chess.Pos): Int =
         (pieces get pos).fold(0) { piece =>
           piece.color.fold(0, 128) + roleToInt(piece.role)
         }
-      ByteArray(Pos.all.map(posInt(_).toByte).toArray)
+      ByteArray(chess.Pos.all.map(posInt(_).toByte).toArray)
     }
 
-    def readChess(ba: ByteArray, variant: chess.variant.Variant): PieceMap = {
+    def readChess(ba: ByteArray, variant: chess.variant.Variant): chess.PieceMap = {
       def splitInts(b: Byte) = {
         val int = b.toInt
         Array(int >> 4, int & 0x0f)
@@ -235,12 +236,16 @@ object BinaryFormat {
     }
 
     // cache standard start position
-    def standard(lib: GameLib) = write(Board.init(lib, Variant.libStandard(lib)).pieces)
+    def standard(lib: GameLib) = lib match {
+      case GameLib.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
+      case GameLib.Draughts() => sys.error("Needs implementation for draughts")
+    }
 
     private def intToRoleChess(int: Int, variant: chess.variant.Variant): Option[chess.Role] =
       chess.Role.binaryInt( int)
 
     private def roleToInt(role: Role): Int = role.binaryInt
+    private def roleToInt(role: chess.Role): Int = role.binaryInt
 
   }
 
@@ -265,19 +270,19 @@ object BinaryFormat {
 
     private val arrIndexes = 0 to 1
     private val bitIndexes = 0 to 7
-    private val whiteStd   = Set(Pos.A1, Pos.H1)
-    private val blackStd   = Set(Pos.A8, Pos.H8)
+    private val whiteStd   = Set(chess.Pos.A1, chess.Pos.H1)
+    private val blackStd   = Set(chess.Pos.A8, chess.Pos.H8)
 
     def read(ba: ByteArray) =
       UnmovedRooks {
-        var set = Set.empty[Pos]
+        var set = Set.empty[chess.Pos]
         arrIndexes.foreach { i =>
           val int = ba.value(i).toInt
           if (int != 0) {
             if (int == -127) set = if (i == 0) whiteStd else set ++ blackStd
             else
               bitIndexes.foreach { j =>
-                if (bitAt(int, j) == 1) set = set + Pos.at(7 - j, 7 * i).get
+                if (bitAt(int, j) == 1) set = set + chess.Pos.at(7 - j, 7 * i).get
               }
           }
         }

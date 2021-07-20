@@ -251,6 +251,7 @@ case class Game(
     history.lastMove map {
       case Uci.Chess(ChessUci.Drop(target, _)) => s"$target$target"
       case m: Uci.Move                         => m.keys
+      case _ => sys.error("Type Error")
     }
 
   def updatePlayer(color: Color, f: Player => Player) =

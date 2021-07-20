@@ -110,8 +110,9 @@ final class GifExport(
       game.variant
     ) match {
       case (init, games, _) =>
-        val steps = (init, None) :: (games map { case (g, Uci.ChessWithSan(strategygames.chess.format.Uci.WithSan(uci, _))) =>
-          (g, Uci.Chess(uci).some)
+        val steps = (init, None) :: (games map {
+          case (g, Uci.ChessWithSan(strategygames.chess.format.Uci.WithSan(uci, _))) => (g, Uci.Chess(uci).some)
+          case _ => sys.error("Need to implement draughts version") // TODO: DRAUGHTS - implement this.
         })
         framesRec(
           steps.zip(scaleMoveTimes(~game.moveTimes).map(_.some).padTo(steps.length, None)),

@@ -141,7 +141,7 @@ object BSONHandlers {
         id = light.id,
         whitePlayer = light.whitePlayer,
         blackPlayer = light.blackPlayer,
-        chess = Game.Chess(chessGame),
+        chess = StratGame.Chess(chessGame),
         loadClockHistory = clk =>
           for {
             bw <- whiteClockHistory
@@ -229,14 +229,20 @@ object BSONHandlers {
           val f = PgnStorage.OldBin
           $doc(
             F.oldPgn         -> f.encode(o.pgnMoves take Game.maxPlies),
-            F.binaryPieces   -> BinaryFormat.piece.write(o.board.pieces),
+            F.binaryPieces   -> BinaryFormat.piece.writeChess(o.board match {
+              case Board.Chess(board) => board.pieces
+              case _ => sys.error("invalid board")
+            }),
             F.positionHashes -> o.history.positionHashes,
             F.unmovedRooks   -> o.history.unmovedRooks,
             F.castleLastMove -> CastleLastMove.castleLastMoveBSONHandler
               .writeTry(
                 CastleLastMove(
                   castles = o.history.castles,
-                  lastMove = o.history.lastMove
+                  lastMove = o.history match {
+                    case History.Chess(h) => h.lastMove
+                    case _ => sys.error("Invalid history")
+                  }
                 )
               )
               .toOption,
