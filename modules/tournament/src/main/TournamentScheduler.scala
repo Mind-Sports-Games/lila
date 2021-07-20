@@ -81,15 +81,15 @@ final private class TournamentScheduler(
     List(
       List( // legendary tournaments!
         at(birthday.withYear(today.getYear), 12) map orNextYear map { date =>
-          val yo = date.getYear - 2010
+          val yo = date.getYear - 2021
           Schedule(Unique, Rapid, Standard, none, date) plan {
             _.copy(
               name = s"${date.getYear} PlayStrategy Anniversary",
               minutes = 12 * 60,
               spotlight = Spotlight(
-                headline = s"$yo years of free chess!",
+                headline = s"$yo years of free strategy games!",
                 description = s"""
-We've had $yo great chess years together!
+We've had $yo great years together!
 
 Thank you all, you rock!"""
               ).some

@@ -210,6 +210,8 @@ object Schedule {
     case object Blitz       extends Speed(40)
     case object Rapid       extends Speed(50)
     case object Classical   extends Speed(60)
+    case object Blitz32     extends Speed(70)
+    case object Blitz35     extends Speed(80)
     val all: List[Speed] =
       List(UltraBullet, HyperBullet, Bullet, HippoBullet, SuperBlitz, Blitz, Rapid, Classical)
     val mostPopular: List[Speed] = List(Bullet, Blitz, Rapid, Classical)
@@ -234,11 +236,11 @@ object Schedule {
     }
     def toPerfType(speed: Speed) =
       speed match {
-        case UltraBullet                        => PerfType.UltraBullet
-        case HyperBullet | Bullet | HippoBullet => PerfType.Bullet
-        case SuperBlitz | Blitz                 => PerfType.Blitz
-        case Rapid                              => PerfType.Rapid
-        case Classical                          => PerfType.Classical
+        case UltraBullet                            => PerfType.UltraBullet
+        case HyperBullet | Bullet | HippoBullet     => PerfType.Bullet
+        case SuperBlitz | Blitz | Blitz32 | Blitz35 => PerfType.Blitz
+        case Rapid                                  => PerfType.Rapid
+        case Classical                              => PerfType.Classical
       }
   }
 
@@ -256,46 +258,46 @@ object Schedule {
 
     (s.freq, s.variant, s.speed) match {
 
-      case (Hourly, _, UltraBullet | HyperBullet | Bullet) => 27
-      case (Hourly, _, HippoBullet | SuperBlitz | Blitz)   => 57
-      case (Hourly, _, Rapid) if s.hasMaxRating            => 57
-      case (Hourly, _, Rapid | Classical)                  => 117
+      case (Hourly, _, UltraBullet | HyperBullet | Bullet)                   => 27
+      case (Hourly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz35) => 57
+      case (Hourly, _, Rapid) if s.hasMaxRating                              => 57
+      case (Hourly, _, Rapid | Classical)                                    => 117
 
-      case (Daily | Eastern, Standard, SuperBlitz) => 90
-      case (Daily | Eastern, Standard, Blitz)      => 120
-      case (Daily | Eastern, _, Blitz)             => 90
-      case (Daily | Eastern, _, Rapid | Classical) => 150
-      case (Daily | Eastern, _, _)                 => 60
+      case (Daily | Eastern, Standard, SuperBlitz)                => 90
+      case (Daily | Eastern, Standard, Blitz | Blitz32 | Blitz35) => 120
+      case (Daily | Eastern, _, Blitz | Blitz32 | Blitz35)        => 90
+      case (Daily | Eastern, _, Rapid | Classical)                => 150
+      case (Daily | Eastern, _, _)                                => 60
 
-      case (Weekly, _, UltraBullet | HyperBullet | Bullet) => 60 * 2
-      case (Weekly, _, HippoBullet | SuperBlitz | Blitz)   => 60 * 3
-      case (Weekly, _, Rapid)                              => 60 * 4
-      case (Weekly, _, Classical)                          => 60 * 5
+      case (Weekly, _, UltraBullet | HyperBullet | Bullet)                   => 60 * 2
+      case (Weekly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz35) => 60 * 3
+      case (Weekly, _, Rapid)                                                => 60 * 4
+      case (Weekly, _, Classical)                                            => 60 * 5
 
       case (Weekend, Crazyhouse, _)                         => 60 * 2
       case (Weekend, _, UltraBullet | HyperBullet | Bullet) => 90
       case (Weekend, _, HippoBullet | SuperBlitz)           => 60 * 2
-      case (Weekend, _, Blitz)                              => 60 * 3
+      case (Weekend, _, Blitz | Blitz32 | Blitz35)          => 60 * 3
       case (Weekend, _, Rapid)                              => 60 * 4
       case (Weekend, _, Classical)                          => 60 * 5
 
-      case (Monthly, _, UltraBullet)              => 60 * 2
-      case (Monthly, _, HyperBullet | Bullet)     => 60 * 3
-      case (Monthly, _, HippoBullet | SuperBlitz) => 60 * 3 + 30
-      case (Monthly, _, Blitz)                    => 60 * 4
-      case (Monthly, _, Rapid)                    => 60 * 5
-      case (Monthly, _, Classical)                => 60 * 6
+      case (Monthly, _, UltraBullet)               => 60 * 2
+      case (Monthly, _, HyperBullet | Bullet)      => 60 * 3
+      case (Monthly, _, HippoBullet | SuperBlitz)  => 60 * 3 + 30
+      case (Monthly, _, Blitz | Blitz32 | Blitz35) => 60 * 4
+      case (Monthly, _, Rapid)                     => 60 * 5
+      case (Monthly, _, Classical)                 => 60 * 6
 
-      case (Shield, _, UltraBullet)              => 60 * 3
-      case (Shield, _, HyperBullet | Bullet)     => 60 * 4
-      case (Shield, _, HippoBullet | SuperBlitz) => 60 * 5
-      case (Shield, _, Blitz)                    => 60 * 6
-      case (Shield, _, Rapid)                    => 60 * 8
-      case (Shield, _, Classical)                => 60 * 10
+      case (Shield, _, UltraBullet)               => 60 * 3
+      case (Shield, _, HyperBullet | Bullet)      => 60 * 4
+      case (Shield, _, HippoBullet | SuperBlitz)  => 60 * 5
+      case (Shield, _, Blitz | Blitz32 | Blitz35) => 60 * 6
+      case (Shield, _, Rapid)                     => 60 * 8
+      case (Shield, _, Classical)                 => 60 * 10
 
       case (Yearly, _, UltraBullet | HyperBullet | Bullet) => 60 * 4
       case (Yearly, _, HippoBullet | SuperBlitz)           => 60 * 5
-      case (Yearly, _, Blitz)                              => 60 * 6
+      case (Yearly, _, Blitz | Blitz32 | Blitz35)          => 60 * 6
       case (Yearly, _, Rapid)                              => 60 * 8
       case (Yearly, _, Classical)                          => 60 * 10
 
@@ -342,6 +344,8 @@ object Schedule {
       case (_, _, HippoBullet) => TC(2 * 60, 0)
       case (_, _, SuperBlitz)  => TC(3 * 60, 0)
       case (_, _, Blitz)       => TC(5 * 60, 0)
+      case (_, _, Blitz32)     => TC(3 * 60, 2)
+      case (_, _, Blitz35)     => TC(3 * 60, 5)
       case (_, _, Rapid)       => TC(10 * 60, 0)
       case (_, _, Classical)   => TC(20 * 60, 10)
     }
