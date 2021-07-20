@@ -4,7 +4,7 @@ import strategygames.chess.format.pgn.{ Glyphs, Move, Pgn, Turn }
 import strategygames.format.pgn.{ Tag }
 import strategygames.chess.opening._
 import strategygames.{ Color, Status }
-import strategygames.chess.variant.Variant
+import strategygames.variant.Variant
 
 import lila.game.GameDrawOffers
 import lila.game.Game

@@ -2,7 +2,7 @@ package lila.puzzle
 
 import cats.data.NonEmptyList
 import strategygames.chess.format.{ FEN, Forsyth, Uci }
-import strategygames.Color
+import strategygames.{ Color, GameLib }
 
 import lila.rating.Glicko
 
@@ -16,6 +16,8 @@ case class Puzzle(
     vote: Float, // denormalized ratio of voteUp/voteDown
     themes: Set[PuzzleTheme.Key]
 ) {
+  val chessLib = GameLib.Chess()
+
   // ply after "initial move" when we start solving
   def initialPly: Int =
     fen.fullMove ?? { fm =>
@@ -29,7 +31,7 @@ case class Puzzle(
     } yield Forsyth >> sit2
   } err s"Can't apply puzzle $id first move"
 
-  def color = fen.color.fold[Color](White)(!_)
+  def color = fen.color.fold[Color](Color.White)(!_)
 }
 
 object Puzzle {

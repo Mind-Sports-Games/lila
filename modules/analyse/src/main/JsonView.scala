@@ -5,6 +5,8 @@ import play.api.libs.json._
 import lila.game.Game
 import lila.tree.Eval.JsonHandlers._
 
+import strategygames.Color.{ Black, White }
+
 object JsonView {
 
   def moves(analysis: Analysis, withGlyph: Boolean = true) =

@@ -5,6 +5,9 @@ import lila.game.actorApi.InsertGame
 import lila.game.{ Game, GameRepo }
 import lila.hub.actorApi.map.TellIfExists
 
+import strategygames.variant.Variant
+import strategygames.format.FEN
+
 final class Analyser(
     gameRepo: GameRepo,
     analysisRepo: AnalysisRepo
@@ -46,8 +49,15 @@ final class Analyser(
                 actorApi.AnalysisProgress(
                   analysis = analysis,
                   game = game,
-                  variant = game.variant,
-                  initialFen = initialFen | game.variant.initialFen
+                  variant = game.variant match {
+                    case Variant.Chess(variant) => variant
+                    case _=> sys.error("Analysis Progress not implemented for other types of games")
+                  },
+                  initialFen = (initialFen, game.variant.initialFen) match {
+                    case (Some(FEN.Chess(fen)), _) => fen
+                    case (_, FEN.Chess(fen)) => fen
+                    case _ => sys.error("Unknown FEN type")
+                  }
                 )
               ),
               "roundSocket"

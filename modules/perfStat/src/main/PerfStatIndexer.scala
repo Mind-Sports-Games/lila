@@ -1,5 +1,6 @@
 package lila.perfStat
 
+import strategygames.variant.Variant
 import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
@@ -25,7 +26,7 @@ final class PerfStatIndexer(
           Query.user(user.id) ++
             Query.finished ++
             Query.turnsGt(2) ++
-            Query.variant(PerfType variantOf perfType),
+            Query.variant(Variant.Chess(PerfType variantOf perfType)),
           Query.sortChronological,
           readPreference = ReadPreference.secondaryPreferred
         )
