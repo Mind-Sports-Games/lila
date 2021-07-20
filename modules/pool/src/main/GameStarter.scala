@@ -2,6 +2,10 @@ package lila.pool
 
 import scala.concurrent.duration._
 
+import strategygames.{ Game => StratGame }
+import strategygames.Color.{ Black, White }
+import strategygames.chess
+
 import lila.game.{ Game, GameRepo, IdGenerator, Player }
 import lila.rating.Perf
 import lila.user.{ User, UserRepo }
@@ -71,9 +75,11 @@ final private class GameStarter(
   ) =
     Game(
       id = id,
-      chess = strategygames.chess.Game(
-        situation = strategygames.chess.Situation(strategygames.chess.variant.Standard),
-        clock = pool.clock.toClock(strategygames.GameLib.Chess()).some
+      chess = StratGame.Chess(
+        chess.Game(
+          situation = chess.Situation(chess.variant.Standard),
+          clock = pool.clock.toClock.some
+        )
       ),
       whitePlayer = Player.make(White, whiteUser),
       blackPlayer = Player.make(Black, blackUser),
