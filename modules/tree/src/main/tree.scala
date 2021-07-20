@@ -2,10 +2,9 @@ package lila.tree
 
 import strategygames.Centis
 import strategygames.chess.format.pgn.{ Glyph, Glyphs }
-import strategygames.format.UciCharPair
-import strategygames.chess.format.{ FEN, Uci }
+import strategygames.format.{ FEN, UciCharPair, Uci }
 import strategygames.chess.opening.FullOpening
-import strategygames.chess.Pos
+import strategygames.Pos
 import strategygames.chess.variant.Crazyhouse
 import play.api.libs.json._
 
@@ -274,7 +273,7 @@ object Node {
         Json
           .obj(
             "ply" -> ply,
-            "fen" -> fen
+            "fen" -> fen.value
           )
           .add("id", idOption.map(_.toString))
           .add("uci", moveOption.map(_.uci.uci))

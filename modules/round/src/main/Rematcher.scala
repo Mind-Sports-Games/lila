@@ -2,6 +2,7 @@ package lila.round
 
 import strategygames.format.Forsyth
 import strategygames.chess.variant._
+import strategygames.variant.Variant
 import strategygames.{ Black, Clock, Color, Game => ChessGame, Board, Castles, Situation, History, White }
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
@@ -76,7 +77,7 @@ final private class Rematcher(
           nextGame <- returnGame(pov) map (_.start)
           _ = offers invalidate pov.game.id
           _ = rematches.cache.put(pov.gameId, nextGame.id)
-          _ = if (pov.game.variant == Chess960 && !chess960.get(pov.gameId)) chess960.put(nextGame.id)
+          _ = if (pov.game.variant == Variant.Chess(Chess960) && !chess960.get(pov.gameId)) chess960.put(nextGame.id)
           _ <- gameRepo insertDenormalized nextGame
         } yield {
           messenger.system(pov.game, trans.rematchOfferAccepted.txt())
@@ -100,11 +101,13 @@ final private class Rematcher(
       initialFen <- gameRepo initialFen pov.game
       situation = initialFen.flatMap{fen => Forsyth.<<<(strategygames.GameLib.Chess(), fen)}
       pieces = pov.game.variant match {
-        case Chess960 =>
+        case Variant.Chess(Chess960) =>
           if (chess960 get pov.gameId) Chess960.pieces
           else situation.fold(Chess960.pieces)(_.situation.board.pieces)
-        case FromPosition => situation.fold(Standard.pieces)(_.situation.board.pieces)
-        case variant      => variant.pieces
+        case Variant.libFromPosition(strategygames.GameLib.Chess()) =>
+          situation.fold(Standard.pieces)(_.situation.board.pieces)
+        case variant =>
+          variant.pieces
       }
       users <- userRepo byIds pov.game.userIds
       board = strategygames.chess.Board(pieces, variant = pov.game.variant).withHistory(

@@ -1,6 +1,8 @@
 package lila.round
 
 import strategygames.{ Black, Color, Speed, White }
+import strategygames.variant.Variant
+import strategygames.chess.variant._
 import org.goochjs.glicko2._
 
 import lila.game.{ Game, GameRepo, PerfPicker, RatingDiffs }
@@ -27,25 +29,25 @@ final class PerfsUpdater(
             val ratingsW = mkRatings(white.perfs)
             val ratingsB = mkRatings(black.perfs)
             game.ratingVariant match {
-              case strategygames.chess.variant.Chess960 =>
+              case Variant.Chess(Chess960) =>
                 updateRatings(ratingsW.chess960, ratingsB.chess960, game)
-              case strategygames.chess.variant.KingOfTheHill =>
+              case Variant.Chess(KingOfTheHill) =>
                 updateRatings(ratingsW.kingOfTheHill, ratingsB.kingOfTheHill, game)
-              case strategygames.chess.variant.ThreeCheck =>
+              case Variant.Chess(ThreeCheck) =>
                 updateRatings(ratingsW.threeCheck, ratingsB.threeCheck, game)
-              case strategygames.chess.variant.Antichess =>
+              case Variant.Chess(Antichess) =>
                 updateRatings(ratingsW.antichess, ratingsB.antichess, game)
-              case strategygames.chess.variant.Atomic =>
+              case Variant.Chess(Atomic) =>
                 updateRatings(ratingsW.atomic, ratingsB.atomic, game)
-              case strategygames.chess.variant.Horde =>
+              case Variant.Chess(Horde) =>
                 updateRatings(ratingsW.horde, ratingsB.horde, game)
-              case strategygames.chess.variant.RacingKings =>
+              case Variant.Chess(RacingKings) =>
                 updateRatings(ratingsW.racingKings, ratingsB.racingKings, game)
-              case strategygames.chess.variant.Crazyhouse =>
+              case Variant.Chess(Crazyhouse) =>
                 updateRatings(ratingsW.crazyhouse, ratingsB.crazyhouse, game)
-              case strategygames.chess.variant.LinesOfAction =>
+              case Variant.Chess(LinesOfAction) =>
                 updateRatings(ratingsW.linesOfAction, ratingsB.linesOfAction, game)
-              case strategygames.chess.variant.Standard =>
+              case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
                     updateRatings(ratingsW.bullet, ratingsB.bullet, game)

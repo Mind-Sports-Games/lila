@@ -49,7 +49,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
                     black <- clocks.lift(index - clockOffset)
                   } yield (white, black)
                   queue offer toJson(
-                    Forsyth exportBoard s.board,
+                    Forsyth.exportBoard(strategygames.GameLib.Chess(), s.board),
                     s.color,
                     s.board.history.lastMove.map(_.uci),
                     clk

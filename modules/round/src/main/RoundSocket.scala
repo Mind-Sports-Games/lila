@@ -5,6 +5,7 @@ import actorApi.round._
 import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
 import strategygames.format.Uci
 import strategygames.{ Black, Centis, Color, MoveMetrics, Speed, White }
+import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
@@ -230,7 +231,7 @@ object RoundSocket {
     } / {
       import strategygames.chess.variant._
       (pov.game.chess.board.materialImbalance, pov.game.variant) match {
-        case (_, Antichess | Crazyhouse | Horde)                                   => 1
+        case (_, Variant.Chess(Antichess) | Variant.Chess(Crazyhouse) | Variant.Chess(Horde)) => 1
         case (i, _) if (pov.color.white && i <= -4) || (pov.color.black && i >= 4) => 3
         case _                                                                     => 1
       }

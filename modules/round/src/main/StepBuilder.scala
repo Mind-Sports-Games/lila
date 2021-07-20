@@ -24,7 +24,7 @@ object StepBuilder {
           val initStep = Step(
             ply = init.turns,
             move = none,
-            fen = Forsyth >> init,
+            fen = Forsyth.>>(strategygames.GameLib.Chess(), init),
             check = init.situation.check,
             dests = None,
             drops = None,
@@ -34,7 +34,7 @@ object StepBuilder {
             Step(
               ply = g.turns,
               move = Step.Move(m.uci, m.san).some,
-              fen = Forsyth >> g,
+              fen = Forsyth.>>(strategygames.GameLib.Chess(), g),
               check = g.situation.check,
               dests = None,
               drops = None,

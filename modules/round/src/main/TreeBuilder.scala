@@ -55,7 +55,7 @@ object TreeBuilder {
           eval = infos lift 0 map makeEval
         )
         def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
-          val fen    = Forsyth >> g
+          val fen    = Forsyth.>>(strategygames.GameLib.Chess(), g)
           val info   = infos lift (index - 1)
           val advice = advices get g.turns
           val branch = Branch(
@@ -81,7 +81,7 @@ object TreeBuilder {
           )
           advices.get(g.turns + 1).flatMap { adv =>
             games.lift(index - 1).map { case (fromGame, _) =>
-              withAnalysisChild(game.id, branch, game.variant, Forsyth >> fromGame, openingOf)(adv.info)
+              withAnalysisChild(game.id, branch, game.variant, Forsyth.>>(strategygames.GameLib.Chess(), fromGame), openingOf)(adv.info)
             }
           } getOrElse branch
         }
@@ -110,7 +110,7 @@ object TreeBuilder {
       openingOf: OpeningOf
   )(info: Info): Branch = {
     def makeBranch(g: Game, m: Uci.WithSan) = {
-      val fen = Forsyth >> g
+      val fen = Forsyth.>>(strategygames.GameLib.Chess(), g)
       Branch(
         id = UciCharPair(m.uci),
         ply = g.turns,

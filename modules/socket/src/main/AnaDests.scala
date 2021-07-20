@@ -2,9 +2,10 @@ package lila.socket
 
 import play.api.libs.json._
 
-import strategygames.chess.format.FEN
+import strategygames.format.FEN
 import strategygames.chess.opening._
-import strategygames.chess.variant.Variant
+import strategygames.variant.Variant
+import strategygames.{ Game, GameLib }
 import lila.tree.Node.{ destString, openingWriter }
 
 case class AnaDests(
@@ -19,12 +20,15 @@ case class AnaDests(
   val dests: String =
     if (isInitial) AnaDests.initialDests
     else {
-      val sit = strategygames.chess.Game(variant.some, fen.some).situation
+      val sit = Game(GameLib.Chess(), variant.some, fen.some).situation
       sit.playable(false) ?? destString(sit.destinations)
     }
 
-  lazy val opening = Variant.openingSensibleVariants(variant) ?? {
-    FullOpeningDB findByFen fen
+  lazy val opening = Variant.openingSensibleVariants(GameLib.Chess())(variant) ?? {
+    fen match {
+      case FEN.Chess(fen) => FullOpeningDB findByFen fen
+      case _ => sys.error("Invalid fen lib")
+    }
   }
 
   def json =
@@ -44,8 +48,13 @@ object AnaDests {
   def parse(o: JsObject) =
     for {
       d <- o obj "d"
-      variant = strategygames.chess.variant.Variant orDefault ~d.str("variant")
+      variant = Variant.orDefault(GameLib.Chess(), ~d.str("variant"))
       fen  <- d str "fen"
       path <- d str "path"
-    } yield AnaDests(variant = variant, fen = FEN(fen), path = path, chapterId = d str "ch")
+    } yield AnaDests(
+      variant = variant,
+      fen = FEN.Chess(strategygames.chess.format.FEN.apply(fen)),
+      path = path,
+      chapterId = d str "ch"
+    )
 }

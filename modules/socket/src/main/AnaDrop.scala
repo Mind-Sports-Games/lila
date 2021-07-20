@@ -1,16 +1,18 @@
 package lila.socket
 
 import cats.data.Validated
-import strategygames.chess.format.{ FEN, Uci, UciCharPair }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.chess.format.{ Uci, UciCharPair }
 import strategygames.chess.opening._
-import strategygames.chess.variant.Variant
+import strategygames.{ Game, GameLib, Pos, Role }
+import strategygames.variant.Variant
 import play.api.libs.json.JsObject
 
 import lila.tree.Branch
 
 case class AnaDrop(
-    role: strategygames.chess.Role,
-    pos: strategygames.chess.Pos,
+    role: Role,
+    pos: Pos,
     variant: Variant,
     fen: FEN,
     path: String,
@@ -18,26 +20,35 @@ case class AnaDrop(
 ) extends AnaAny {
 
   def branch: Validated[String, Branch] =
-    strategygames.chess.Game(variant.some, fen.some).drop(role, pos) flatMap { case (game, drop) =>
-      game.pgnMoves.lastOption toValid "Dropped but no last move!" map { san =>
-        val uci     = Uci(drop)
-        val movable = !game.situation.end
-        val fen     = strategygames.chess.format.Forsyth >> game
-        Branch(
-          id = UciCharPair(uci),
-          ply = game.turns,
-          move = Uci.WithSan(uci, san),
-          fen = fen,
-          check = game.situation.check,
-          dests = Some(movable ?? game.situation.destinations),
-          opening = Variant.openingSensibleVariants(variant) ?? {
-            FullOpeningDB findByFen fen
-          },
-          drops = if (movable) game.situation.drops else Some(Nil),
-          crazyData = game.situation.board.crazyData
-        )
-      }
+    (Game(GameLib.Chess(), variant.some, fen.some), role, pos) match {
+      case (Game.Chess(game), Role.ChessRole(role), Pos.Chess(pos))
+        => game.drop(role, pos) flatMap {
+          case (game, drop)
+            => game.pgnMoves.lastOption toValid "Dropped but no last move!" map { san =>
+              val uci     = Uci(drop)
+              val movable = !game.situation.end
+              val fen     = Forsyth.>>(GameLib.Chess(), Game.Chess(game))
+              Branch(
+                id = UciCharPair(uci),
+                ply = game.turns,
+                move = strategygames.format.Uci.ChessWithSan(Uci.WithSan(uci, san)),
+                fen = fen,
+                check = game.situation.check,
+                dests = Some(movable ?? Game.Chess(game).situation.destinations),
+                opening = Variant.openingSensibleVariants(GameLib.Chess())(variant) ?? {
+                  fen match {
+                    case FEN.Chess(fen) => FullOpeningDB findByFen fen
+                    case _ => sys.error("Invalid fen lib")
+                  }
+                },
+                drops = if (movable) Game.Chess(game).situation.drops else Some(Nil),
+                crazyData = game.situation.board.crazyData
+              )
+            }
+        }
+      case _ => sys.error("Drop not implemented for games except chess")
     }
+
 }
 
 object AnaDrop {
@@ -45,10 +56,10 @@ object AnaDrop {
   def parse(o: JsObject) =
     for {
       d    <- o obj "d"
-      role <- d str "role" flatMap strategygames.chess.Role.allByName.get
-      pos  <- d str "pos" flatMap strategygames.chess.Pos.fromKey
-      variant = strategygames.chess.variant.Variant orDefault ~d.str("variant")
-      fen  <- d str "fen" map FEN.apply
+      role <- d str "role" flatMap Role.allByName(GameLib.Chess()).get
+      pos  <- d str "pos" flatMap {pos => Pos.fromKey(GameLib.Chess(), pos)}
+      variant = Variant.orDefault(GameLib.Chess(), ~d.str("variant"))
+      fen  <- d str "fen" map {fen => FEN.apply(GameLib.Chess(), fen)}
       path <- d str "path"
     } yield AnaDrop(
       role = role,
