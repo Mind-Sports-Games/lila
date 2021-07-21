@@ -75,7 +75,7 @@ final private class TournamentScheduler(
 
     val farFuture = today plusMonths 7
 
-    val birthday = new DateTime(2010, 6, 20, 12, 0, 0)
+    val birthday = new DateTime(2021, 7, 29, 12, 0, 0)
 
     val fss = List(nextFriday, nextSaturday, nextSunday)
     val mwfs = List(nextMonday, nextWednesday, nextFriday, nextSunday)

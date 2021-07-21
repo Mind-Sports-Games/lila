@@ -18,7 +18,7 @@ case class Schedule(
 
   // Simpler naming for now.
   def name(full: Boolean = true)(implicit lang: Lang): String = {
-    s"${variant.name} Mind Sports Olympiad Prep"
+    s"${variant.name} Mind Sports Olympiad Warm-up"
     /*
     import Schedule.Freq._
     import Schedule.Speed._
