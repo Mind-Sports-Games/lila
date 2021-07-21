@@ -200,22 +200,23 @@ object Schedule {
     def byId(id: Int)       = all.find(_.id == id)
   }
 
-  sealed abstract class Speed(val id: Int, val name: String) {
+  sealed abstract class Speed(val id: Int) {
+    val name = toString
     val key  = lila.common.String lcfirst name
   }
   object Speed {
-    case object UltraBullet extends Speed(5, "UltraBullet")
-    case object HyperBullet extends Speed(10, "HyperBullet")
-    case object Bullet      extends Speed(20, "Bullet")
-    case object HippoBullet extends Speed(25, "HippoBullet")
-    case object SuperBlitz  extends Speed(30, "SuperBlitz")
-    case object Blitz       extends Speed(40, "Blitz")
-    case object Rapid       extends Speed(50, "Rapid")
-    case object Classical   extends Speed(60, "Classical")
-    case object Blitz32     extends Speed(70, "3+2 Blitz")
-    case object Blitz51     extends Speed(80, "5+1 Blitz")
+    case object UltraBullet extends Speed(5)
+    case object HyperBullet extends Speed(10)
+    case object Bullet      extends Speed(20)
+    case object HippoBullet extends Speed(25)
+    case object SuperBlitz  extends Speed(30)
+    case object Blitz       extends Speed(40)
+    case object Rapid       extends Speed(50)
+    case object Classical   extends Speed(60)
+    case object Blitz32     extends Speed(70)
+    case object Blitz51     extends Speed(80)
     val all: List[Speed] =
-      List(UltraBullet, HyperBullet, Bullet, HippoBullet, SuperBlitz, Blitz, Rapid, Classical)
+      List(UltraBullet, HyperBullet, Bullet, HippoBullet, SuperBlitz, Blitz, Blitz32, Blitz51, Rapid, Classical)
     val mostPopular: List[Speed] = List(Bullet, Blitz, Rapid, Classical)
     def apply(key: String)       = all.find(_.key == key) orElse all.find(_.key.toLowerCase == key.toLowerCase)
     def byId(id: Int)            = all find (_.id == id)
