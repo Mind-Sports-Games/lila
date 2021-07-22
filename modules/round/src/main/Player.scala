@@ -1,7 +1,7 @@
 package lila.round
 
 import strategygames.format.{ Forsyth, Uci }
-import strategygames.{ Centis, MoveMetrics, MoveOrDrop, Status }
+import strategygames.{ Centis, GameLib, MoveMetrics, MoveOrDrop, Pos, Role, Status }
 
 import actorApi.round.{ DrawNo, ForecastPlay, HumanPlay, TakebackNo, TooManyPlies }
 import lila.game.actorApi.MoveGameEvent
@@ -126,8 +126,8 @@ final private class Player(
       metrics: MoveMetrics
   ): Validated[String, MoveResult] =
     (uci match {
-      case Uci.Move(strategygames.GameLib.Chess(), orig, dest, prom) =>
-        game.chess(orig, dest, prom, metrics) map { case (ncg, move) =>
+      case Uci.ChessMove(uci) =>
+        game.chess(Pos.Chess(uci.orig), Pos.Chess(uci.dest), uci.promotion.map(Role.ChessPromotableRole), metrics) map { case (ncg, move) =>
           ncg -> (Left(move): MoveOrDrop)
         }
       case Uci.Drop(role, pos) =>
@@ -148,7 +148,7 @@ final private class Player(
     val color = moveOrDrop.fold(_.color, _.color)
     val moveEvent = MoveEvent(
       gameId = game.id,
-      fen = Forsyth.exportBoard(strategygames.GameLib.Chess(), game.board),
+      fen = Forsyth.exportBoard(GameLib.Chess(), game.board),
       move = moveOrDrop.fold(_.toUci.keys, _.toUci.uci)
     )
 

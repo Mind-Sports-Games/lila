@@ -3,6 +3,8 @@ package lila.puzzle
 import play.api.i18n.Lang
 import play.api.libs.json._
 
+import strategygames.{ Game, GameLib }
+
 import lila.common.Json._
 import lila.game.GameRepo
 import lila.rating.Perf
@@ -169,7 +171,7 @@ final class JsonView(
       "realId"     -> puzzle.id,
       "rating"     -> puzzle.glicko.intRating,
       "attempts"   -> puzzle.plays,
-      "fen"        -> puzzle.fen,
+      "fen"        -> puzzle.fen.value,
       "color"      -> puzzle.color.name,
       "initialPly" -> (puzzle.initialPly + 1),
       "gameId"     -> puzzle.gameId,
@@ -181,18 +183,18 @@ final class JsonView(
     )
 
     private def makeBranch(puzzle: Puzzle): Option[tree.Branch] = {
-      import strategygames.chess.format._
-      val init = strategygames.chess.Game(none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
-      val (_, branchList) = puzzle.line.tail.foldLeft[(strategygames.chess.Game, List[tree.Branch])]((init, Nil)) {
+      import strategygames.format._
+      val init = Game(GameLib.Chess(), none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
+      val (_, branchList) = puzzle.line.tail.foldLeft[(Game, List[tree.Branch])]((init, Nil)) {
         case ((prev, branches), uci) =>
           val (game, move) =
             prev(uci.orig, uci.dest, uci.promotion)
               .fold(err => sys error s"puzzle ${puzzle.id} $err", identity)
           val branch = tree.Branch(
-            id = UciCharPair(move.toUci),
+            id = UciCharPair(GameLib.Chess(), move.toUci),
             ply = game.turns,
-            move = Uci.WithSan(move.toUci, game.pgnMoves.last),
-            fen = strategygames.chess.format.Forsyth >> game,
+            move = Uci.WithSan(GameLib.Chess(), move.toUci, game.pgnMoves.last),
+            fen = Forsyth.>>(GameLib.Chess(), game),
             check = game.situation.check,
             crazyData = none
           )

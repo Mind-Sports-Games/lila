@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Color, Centis, Game, Replay }
+import strategygames.{ Color, Centis, Game, GameLib, Replay }
 import strategygames.chess.format.pgn.Glyphs
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.chess.opening._
@@ -38,9 +38,9 @@ object TreeBuilder {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val openingOf: OpeningOf =
-          if (withFlags.opening && Variant.openingSensibleVariants(game.variant)) FullOpeningDB.findByFen
+          if (withFlags.opening && Variant.openingSensibleVariants(GameLib.Chess())(game.variant)) FullOpeningDB.findByFen
           else _ => None
-        val fen                 = Forsyth.>>(strategygames.GameLib.Chess(), init)
+        val fen                 = Forsyth.>>(GameLib.Chess(), init)
         val infos: Vector[Info] = analysis.??(_.infos.toVector)
         val advices: Map[Ply, Advice] = analysis.??(_.advices.view.map { a =>
           a.ply -> a
@@ -59,7 +59,7 @@ object TreeBuilder {
           val info   = infos lift (index - 1)
           val advice = advices get g.turns
           val branch = Branch(
-            id = UciCharPair(m.uci),
+            id = UciCharPair(GameLib.Chess(), m.uci),
             ply = g.turns,
             move = m,
             fen = fen,
@@ -112,7 +112,7 @@ object TreeBuilder {
     def makeBranch(g: Game, m: Uci.WithSan) = {
       val fen = Forsyth.>>(strategygames.GameLib.Chess(), g)
       Branch(
-        id = UciCharPair(m.uci),
+        id = UciCharPair(GameLib.Chess(), m.uci),
         ply = g.turns,
         move = m,
         fen = fen,

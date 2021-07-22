@@ -25,7 +25,6 @@ final private class Takebacker(
           {
             if (
               pov.opponent.proposeTakebackAt == pov.game.turns && color == Color.fromPly(
-                strategygames.GameLib.Chess(),
                 pov.opponent.proposeTakebackAt
               )
             ) single(game)

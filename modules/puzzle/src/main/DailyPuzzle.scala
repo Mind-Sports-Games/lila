@@ -102,5 +102,5 @@ object DailyPuzzle {
 
   case class WithHtml(puzzle: Puzzle, html: String)
 
-  case class Render(puzzle: Puzzle, fen: strategygames.chess.format.FEN, lastMove: String)
+  case class Render(puzzle: Puzzle, fen: strategygames.format.FEN, lastMove: String)
 }

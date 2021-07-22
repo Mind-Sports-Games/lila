@@ -4,8 +4,9 @@ import actorApi._
 import actorApi.round._
 import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
 import strategygames.format.Uci
-import strategygames.{ Black, Centis, Color, MoveMetrics, Speed, White }
+import strategygames.{ Black, Centis, Color, GameLib, MoveMetrics, Speed, White }
 import strategygames.variant.Variant
+import strategygames.chess.variant.{ Antichess, Crazyhouse, Horde }
 import play.api.libs.json._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
@@ -229,7 +230,6 @@ object RoundSocket {
         case _               => 1
       }
     } / {
-      import strategygames.chess.variant._
       (pov.game.chess.board.materialImbalance, pov.game.variant) match {
         case (_, Variant.Chess(Antichess) | Variant.Chess(Crazyhouse) | Variant.Chess(Horde)) => 1
         case (i, _) if (pov.color.white && i <= -4) || (pov.color.black && i >= 4) => 3
@@ -278,7 +278,7 @@ object RoundSocket {
             }
           case "r/move" =>
             raw.get(5) { case Array(fullId, uciS, blurS, lagS, mtS) =>
-              Uci(uciS) map { uci =>
+              Uci(GameLib.Chess(), uciS) map { uci =>
                 PlayerMove(FullId(fullId), uci, P.In.boolean(blurS), MoveMetrics(centis(lagS), centis(mtS)))
               }
             }

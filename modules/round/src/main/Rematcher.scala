@@ -3,7 +3,8 @@ package lila.round
 import strategygames.format.Forsyth
 import strategygames.chess.variant._
 import strategygames.variant.Variant
-import strategygames.{ Black, Clock, Color, Game => ChessGame, Board, Castles, Situation, History, White }
+import strategygames.{ Black, Clock, Color, Game => ChessGame, GameLib, Board, Situation, History, White, Mode, Piece, Pos }
+import strategygames.chess.Castles
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
 import scala.concurrent.duration._
@@ -99,19 +100,23 @@ final private class Rematcher(
   private def returnGame(pov: Pov): Fu[Game] =
     for {
       initialFen <- gameRepo initialFen pov.game
-      situation = initialFen.flatMap{fen => Forsyth.<<<(strategygames.GameLib.Chess(), fen)}
+      situation = initialFen.flatMap{fen => Forsyth.<<<(GameLib.Chess(), fen)}
       pieces = pov.game.variant match {
         case Variant.Chess(Chess960) =>
-          if (chess960 get pov.gameId) Chess960.pieces
-          else situation.fold(Chess960.pieces)(_.situation.board.pieces)
-        case Variant.libFromPosition(strategygames.GameLib.Chess()) =>
-          situation.fold(Standard.pieces)(_.situation.board.pieces)
+          if (chess960 get pov.gameId) Chess960.pieces.map{
+            case(pos, piece) => (Pos.Chess(pos), Piece.Chess(piece))
+          }
+          else situation.fold(
+            Chess960.pieces
+          )(_.situation.board.pieces)
+        case Variant.Chess(FromPosition) =>
+          situation.fold(Variant.libStandard(GameLib.Chess()).pieces)(_.situation.board.pieces)
         case variant =>
           variant.pieces
       }
       users <- userRepo byIds pov.game.userIds
-      board = strategygames.chess.Board(pieces, variant = pov.game.variant).withHistory(
-        strategygames.chess.History(
+      board = chess.Board(pieces, variant = pov.game.variant).withHistory(
+        chess.History(
           lastMove = situation.flatMap(_.situation.board.history.lastMove),
           castles = situation.fold(Castles.init)(_.situation.board.history.castles)
         )
@@ -123,14 +128,14 @@ final private class Rematcher(
             color = situation.fold[Color](White)(_.situation.color)
           ),
           clock = pov.game.clock map { c =>
-            Clock(strategygames.GameLib.Chess(), c.config)
+            Clock(GameLib.Chess(), c.config)
           },
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)
         ),
         whitePlayer = returnPlayer(pov.game, White, users),
         blackPlayer = returnPlayer(pov.game, Black, users),
-        mode = if (users.exists(_.lame)) strategygames.Mode.Casual else pov.game.mode,
+        mode = if (users.exists(_.lame)) Mode.Casual else pov.game.mode,
         source = pov.game.source | Source.Lobby,
         daysPerTurn = pov.game.daysPerTurn,
         pgnImport = None
