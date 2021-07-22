@@ -115,20 +115,22 @@ final private class Rematcher(
           variant.pieces
       }
       users <- userRepo byIds pov.game.userIds
-      board = chess.Board(pieces, variant = pov.game.variant).withHistory(
-        chess.History(
+      board = Board(GameLib.Chess(), pieces, variant = pov.game.variant).withHistory(
+        History(
+          GameLib.Chess(),
           lastMove = situation.flatMap(_.situation.board.history.lastMove),
           castles = situation.fold(Castles.init)(_.situation.board.history.castles)
         )
       )
       game <- Game.make(
         chess = ChessGame(
-          situation = Situation.Chess(
+          situation = Situation(
+            GameLib.Chess(),
             board = board,
             color = situation.fold[Color](White)(_.situation.color)
           ),
           clock = pov.game.clock map { c =>
-            Clock(GameLib.Chess(), c.config)
+            Clock(c.config)
           },
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)
