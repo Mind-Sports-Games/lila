@@ -49,15 +49,8 @@ final class Analyser(
                 actorApi.AnalysisProgress(
                   analysis = analysis,
                   game = game,
-                  variant = game.variant match {
-                    case Variant.Chess(variant) => variant
-                    case _=> sys.error("Analysis Progress not implemented for other types of games")
-                  },
-                  initialFen = (initialFen, game.variant.initialFen) match {
-                    case (Some(FEN.Chess(fen)), _) => fen
-                    case (_, FEN.Chess(fen)) => fen
-                    case _ => sys.error("Unknown FEN type")
-                  }
+                  variant = game.variant,
+                  initialFen = initialFen | game.variant.initialFen
                 )
               ),
               "roundSocket"

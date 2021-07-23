@@ -3,9 +3,10 @@ package lila.fishnet
 import cats.data.Validated
 import cats.data.Validated.valid
 import cats.implicits._
-import strategygames.chess.format.pgn.Dumper
-import strategygames.chess.format.Uci
-import strategygames.chess.{ Drop, Move, Replay, Situation }
+import strategygames.format.pgn.Dumper
+import strategygames.format.Uci
+import strategygames.chess.Drop
+import strategygames.{ GameLib, Move, Replay, Situation }
 
 import lila.analyse.{ Analysis, Info, PgnMove }
 import lila.base.LilaException
@@ -31,21 +32,24 @@ private object UciToPgn {
       for {
         situation <-
           if (ply == replay.setup.startedAtTurn + 1) valid(replay.setup.situation)
-          else replay moveAtPly ply map (_.fold(_.situationBefore, _.situationBefore)) toValid "No move found"
-        ucis <- variation.map(Uci.apply).sequence toValid "Invalid UCI moves " + variation
+          else replay moveAtPly ply map (_.fold(_.situationBefore, drop => Situation.Chess(drop.situationBefore))) toValid "No move found"
+        ucis <- variation.map(v => Uci.apply(GameLib.Chess(), v)).sequence toValid "Invalid UCI moves " + variation
         moves <-
           ucis.foldLeft[Validated[String, (Situation, List[Either[Move, Drop]])]](valid(situation -> Nil)) {
             case (Validated.Valid((sit, moves)), uci: Uci.Move) =>
               sit.move(uci.orig, uci.dest, uci.promotion).leftMap(e => s"ply $ply $e") map { move =>
                 move.situationAfter -> (Left(move) :: moves)
               }
-            case (Validated.Valid((sit, moves)), uci: Uci.Drop) =>
+            case (Validated.Valid((Situation.Chess(sit), moves)), uci: strategygames.chess.format.Uci.Drop) =>
               sit.drop(uci.role, uci.pos).leftMap(e => s"ply $ply $e") map { drop =>
-                drop.situationAfter -> (Right(drop) :: moves)
+                Situation.Chess(drop.situationAfter) -> (Right(drop) :: moves)
               }
             case (failure, _) => failure
           }
-      } yield moves._2.reverse map (_.fold(Dumper.apply, Dumper.apply))
+      } yield moves._2.reverse map (_.fold(
+        move => Dumper.apply(GameLib.Chess(), move),
+        drop => strategygames.chess.format.pgn.Dumper.apply(drop)
+      ))
 
     onlyMeaningfulVariations.foldLeft[WithErrors[List[Info]]]((Nil, Nil)) {
       case ((infos, errs), info) if info.variation.isEmpty => (info :: infos, errs)

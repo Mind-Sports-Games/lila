@@ -1,7 +1,8 @@
 package lila.fishnet
 
-import strategygames.chess.format.{ FEN, Uci }
-import strategygames.chess.variant.Variant
+import strategygames.format.{ FEN, Uci }
+import strategygames.variant.Variant
+import strategygames.GameLib
 import org.joda.time.DateTime
 import play.api.libs.json._
 
@@ -115,7 +116,7 @@ object JsonApi {
 
   case class Game(
       game_id: String,
-      position: FEN,
+      position: String,//FEN
       variant: Variant,
       moves: String
   )
@@ -123,7 +124,10 @@ object JsonApi {
   def fromGame(g: W.Game) =
     Game(
       game_id = if (g.studyId.isDefined) "" else g.id,
-      position = g.initialFen | g.variant.initialFen,
+      position = g.initialFen match {
+        case Some(initialFen) => initialFen
+        case None => g.variant.initialFen.value
+      },
       variant = g.variant,
       moves = g.moves
     )
@@ -158,7 +162,7 @@ object JsonApi {
     implicit val AcquireReads       = Json.reads[Request.Acquire]
     implicit val ScoreReads         = Json.reads[Request.Evaluation.Score]
     implicit val uciListReads = Reads.of[String] map { str =>
-      ~Uci.readList(str)
+      ~Uci.readList(GameLib.Chess(), str)
     }
 
     implicit val EvaluationReads: Reads[Request.Evaluation] = (

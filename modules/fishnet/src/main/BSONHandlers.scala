@@ -3,7 +3,8 @@ package lila.fishnet
 import lila.db.dsl._
 import reactivemongo.api.bson._
 
-import strategygames.chess.variant.Variant
+import strategygames.GameLib
+import strategygames.variant.Variant
 
 private object BSONHandlers {
 
@@ -23,7 +24,7 @@ private object BSONHandlers {
   implicit val ClientBSONHandler = Macros.handler[Client]
 
   implicit val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(v) toTry s"Invalid variant $v" },
+    { case BSONInteger(v) => Variant(GameLib.Chess(), v) toTry s"Invalid variant $v" },
     x => BSONInteger(x.id)
   )
 

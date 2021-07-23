@@ -4,7 +4,9 @@ import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
 import cats.data.NonEmptyList
 
-import strategygames.chess.format.Uci
+import strategygames.format.Uci
+import strategygames.variant.Variant
+import strategygames.GameLib
 import lila.db.dsl._
 import lila.tree.Eval._
 
@@ -27,7 +29,7 @@ private object BSONHandlers {
         }
     private def movesWrite(moves: Moves): String = Uci writeListPiotr moves.value.toList
     private def movesRead(str: String): Option[Moves] =
-      Uci readListPiotr str flatMap (_.toNel) map Moves.apply
+      Uci.readListPiotr(GameLib.Chess(), str) flatMap (_.toNel) map Moves.apply
     private val scoreSeparator = ':'
     private val pvSeparator    = '/'
     private val pvSeparatorStr = pvSeparator.toString
@@ -61,11 +63,11 @@ private object BSONHandlers {
   implicit val EntryIdHandler = tryHandler[Id](
     { case BSONString(value) =>
       value split ':' match {
-        case Array(fen) => Success(Id(strategygames.chess.variant.Standard, SmallFen raw fen))
+        case Array(fen) => Success(Id(Variant.libStandard(GameLib.Chess()), SmallFen raw fen))
         case Array(variantId, fen) =>
           Success(
             Id(
-              variantId.toIntOption flatMap strategygames.chess.variant.Variant.apply err s"Invalid evalcache variant $variantId",
+              variantId.toIntOption flatMap {id => Variant.apply(GameLib.Chess(), id)} err s"Invalid evalcache variant $variantId",
               SmallFen raw fen
             )
           )

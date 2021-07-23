@@ -3,7 +3,7 @@ package lila.round
 import strategygames.format.Forsyth
 import strategygames.chess.variant._
 import strategygames.variant.Variant
-import strategygames.{ Black, Clock, Color, Game => ChessGame, GameLib, Board, Situation, History, White, Mode, Piece, Pos }
+import strategygames.{ Black, Clock, Color, Game => ChessGame, GameLib, Board, Situation, History, White, Mode, Piece, PieceMap, Pos }
 import strategygames.chess.Castles
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
@@ -97,20 +97,25 @@ final private class Rematcher(
     List(Event.RematchOffer(by = pov.color.some))
   }
 
-  private def returnGame(pov: Pov): Fu[Game] =
+  private def chessPieceMap(pieces: strategygames.chess.PieceMap): PieceMap =
+    pieces.map{
+      case(pos, piece) => (Pos.Chess(pos), Piece.Chess(piece))
+    }
+
+  private def returnGame(pov: Pov): Fu[Game] = {
     for {
       initialFen <- gameRepo initialFen pov.game
       situation = initialFen.flatMap{fen => Forsyth.<<<(GameLib.Chess(), fen)}
-      pieces = pov.game.variant match {
+      pieces: PieceMap = pov.game.variant match {
         case Variant.Chess(Chess960) =>
-          if (chess960 get pov.gameId) Chess960.pieces.map{
-            case(pos, piece) => (Pos.Chess(pos), Piece.Chess(piece))
-          }
+          if (chess960 get pov.gameId) chessPieceMap(Chess960.pieces)
           else situation.fold(
-            Chess960.pieces
+            chessPieceMap(Chess960.pieces)
           )(_.situation.board.pieces)
         case Variant.Chess(FromPosition) =>
-          situation.fold(Variant.libStandard(GameLib.Chess()).pieces)(_.situation.board.pieces)
+          situation.fold(
+            Variant.libStandard(GameLib.Chess()).pieces
+          )(_.situation.board.pieces)
         case variant =>
           variant.pieces
       }
@@ -124,6 +129,7 @@ final private class Rematcher(
       )
       game <- Game.make(
         chess = ChessGame(
+          GameLib.Chess(),
           situation = Situation(
             GameLib.Chess(),
             board = board,
@@ -143,6 +149,7 @@ final private class Rematcher(
         pgnImport = None
       ) withUniqueId idGenerator
     } yield game
+  }
 
   private def returnPlayer(game: Game, color: Color, users: List[User]): lila.game.Player =
     game.opponent(color).aiLevel match {

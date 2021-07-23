@@ -1,7 +1,8 @@
 package lila.evalCache
 
-import strategygames.chess.format.{ FEN, Forsyth, Uci }
-import strategygames.chess.variant.Variant
+import strategygames.format.{ FEN, Forsyth, Uci }
+import strategygames.variant.Variant
+import strategygames.GameLib
 import org.joda.time.DateTime
 import cats.data.NonEmptyList
 
@@ -117,13 +118,14 @@ object EvalCacheEntry {
         c != '/' && c != '-' && c != 'w'
       }
       val str = variant match {
-        case strategygames.chess.variant.ThreeCheck => base + ~fen.value.split(' ').lift(6)
-        case _                        => base
+        case Variant.Chess(strategygames.chess.variant.ThreeCheck)
+          => base + ~fen.value.split(' ').lift(6)
+        case _                         => base
       }
       new SmallFen(str)
     }
     def validate(variant: Variant, fen: FEN): Option[SmallFen] =
-      Forsyth.<<@(variant, fen).exists(_ playable false) option make(variant, fen)
+      Forsyth.<<@(GameLib.Chess(), variant, fen).exists(_ playable false) option make(variant, fen)
   }
 
   case class Id(variant: Variant, smallFen: SmallFen)
@@ -133,8 +135,8 @@ object EvalCacheEntry {
   object Input {
     case class Candidate(variant: Variant, fen: String, eval: Eval) {
       def input =
-        SmallFen.validate(variant, FEN(fen)) ifTrue eval.looksValid map { smallFen =>
-          Input(Id(variant, smallFen), FEN(fen), eval.truncatePvs)
+        SmallFen.validate(variant, FEN.apply(GameLib.Chess(), fen)) ifTrue eval.looksValid map { smallFen =>
+          Input(Id(variant, smallFen), FEN.apply(GameLib.Chess(), fen), eval.truncatePvs)
         }
     }
   }

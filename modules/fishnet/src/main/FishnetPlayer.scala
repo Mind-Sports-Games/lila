@@ -55,9 +55,9 @@ final class FishnetPlayer(
             _id = Work.makeId,
             game = Work.Game(
               id = game.id,
-              initialFen = initialFen.flatMap(_.chessFen),
+              initialFen = initialFen.map(_.value),
               studyId = none,
-              variant = game.variant.chessVariant,
+              variant = game.variant,
               moves = moves mkString " "
             ),
             level =
@@ -65,8 +65,8 @@ final class FishnetPlayer(
               else level,
             clock = game.clock.map { clk =>
               Work.Clock(
-                wtime = clk.remainingTime(strategygames.White).centis,
-                btime = clk.remainingTime(strategygames.Black).centis,
+                wtime = clk.remainingTime(White).centis,
+                btime = clk.remainingTime(Black).centis,
                 inc = clk.incrementSeconds
               )
             }

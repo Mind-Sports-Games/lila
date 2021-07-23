@@ -21,6 +21,12 @@ object TreeBuilder {
       best = info.best
     )
 
+  def chessOpeningOf(fen: FEN): Option[FullOpening] =
+    fen match {
+      case FEN.Chess(fen) => FullOpeningDB.findByFen(fen)
+      case _ => sys.error("Not implemented for anything other than chess")
+    }
+
   def apply(
       game: lila.game.Game,
       analysis: Option[Analysis],
@@ -38,7 +44,7 @@ object TreeBuilder {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val openingOf: OpeningOf =
-          if (withFlags.opening && Variant.openingSensibleVariants(GameLib.Chess())(game.variant)) FullOpeningDB.findByFen
+          if (withFlags.opening && Variant.openingSensibleVariants(GameLib.Chess())(game.variant)) chessOpeningOf
           else _ => None
         val fen                 = Forsyth.>>(GameLib.Chess(), init)
         val infos: Vector[Info] = analysis.??(_.infos.toVector)
