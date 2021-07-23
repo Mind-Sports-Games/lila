@@ -77,9 +77,9 @@ final private class TournamentScheduler(
 
     val birthday = new DateTime(2021, 7, 29, 12, 0, 0)
 
-    val fss = List(nextFriday, nextSaturday, nextSunday)
+    val fss  = List(nextFriday, nextSaturday, nextSunday)
     val mwfs = List(nextMonday, nextWednesday, nextFriday, nextSunday)
-    val tts = List(nextTuesday, nextThursday, nextSaturday)
+    val tts  = List(nextTuesday, nextThursday, nextSaturday)
 
     def schedule10(hour: Int, v: Variant)(day: DateTime) =
       at(day, hour) map { date =>
