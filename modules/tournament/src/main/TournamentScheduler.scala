@@ -77,9 +77,9 @@ final private class TournamentScheduler(
 
     val birthday = new DateTime(2021, 7, 29, 12, 0, 0)
 
-    val fss = List(nextFriday, nextSaturday, nextSunday)
+    val fss  = List(nextFriday, nextSaturday, nextSunday)
     val mwfs = List(nextMonday, nextWednesday, nextFriday, nextSunday)
-    val tts = List(nextTuesday, nextThursday, nextSaturday)
+    val tts  = List(nextTuesday, nextThursday, nextSaturday)
 
     def schedule10(hour: Int, v: Variant)(day: DateTime) =
       at(day, hour) map { date =>
@@ -99,24 +99,25 @@ final private class TournamentScheduler(
     // all dates UTC
     List(
       mwfs.flatMap(schedule32(16, KingOfTheHill)), // MWFS KoTH @ 17:00 UK
-      mwfs.flatMap(schedule32(17, Antichess)), // MWFS Anti @ 18:00 UK
-      mwfs.flatMap(schedule32(18, Standard)), // MWFS Chess @ 19:00 UK
+      mwfs.flatMap(schedule32(17, Antichess)),     // MWFS Anti @ 18:00 UK
+      mwfs.flatMap(schedule32(18, Standard)),      // MWFS Chess @ 19:00 UK
       mwfs.flatMap(schedule51(19, LinesOfAction)), // MWFS LOA @ 20:00 UK
-      mwfs.flatMap(schedule32(20, Horde)), // MWFS Horde @ 21:00 UK
-      mwfs.flatMap(schedule32(21, RacingKings)), // MWFS Racing Kings @ 22:00 UK
-      tts.flatMap(schedule32(16, Atomic)), // TTF Atomic @ 17:00 UK
-      tts.flatMap(schedule32(17, ThreeCheck)), // TTF 3+ @ 18:00 UK
-      tts.flatMap(schedule32(18, Crazyhouse)), // TTF ZH @ 19:00 UK
-      tts.flatMap(schedule32(19, Chess960)), // TTF 960 @ 20:00 UK
-      tts.flatMap(schedule32(20, LinesOfAction)), // TTF LOA @ 21:00 UK
-      tts.flatMap(schedule10(21, Standard)), // TTF Bullet @ 22:00 UK
-      fss.flatMap(schedule32(9, RacingKings)), // FSS Racing Kings @ 10:00 UK
-      fss.flatMap(schedule51(10, LinesOfAction)), // FSS LOA @ 11:00 UK
-      fss.flatMap(schedule32(11, Standard)), // FSS Chess @ 12:00 UK
-      fss.flatMap(schedule32(12, Crazyhouse)), // FSS ZH @ 13:00 UK
-      fss.flatMap(schedule51(13, LinesOfAction)), // FSS LOA @ 14:00 UK
-      fss.flatMap(schedule32(14, Standard)), // FSS Chess @ 15:00 UK
-      fss.flatMap(schedule32(15, Chess960)), // FSS 960 @ 16:00 UK
+      mwfs.flatMap(schedule32(20, Horde)),         // MWFS Horde @ 21:00 UK
+      mwfs.flatMap(schedule32(21, RacingKings)),   // MWFS Racing Kings @ 22:00 UK
+      tts.flatMap(schedule32(16, Atomic)),         // TTF Atomic @ 17:00 UK
+      tts.flatMap(schedule32(17, ThreeCheck)),     // TTF 3+ @ 18:00 UK
+      tts.flatMap(schedule32(18, Crazyhouse)),     // TTF ZH @ 19:00 UK
+      tts.flatMap(schedule32(19, Chess960)),       // TTF 960 @ 20:00 UK
+      tts.flatMap(schedule32(20, LinesOfAction)),  // TTF LOA @ 21:00 UK
+      tts.flatMap(schedule10(21, Standard)),       // TTF Bullet @ 22:00 UK
+      fss.flatMap(schedule32(9, RacingKings)),     // FSS Racing Kings @ 10:00 UK
+      fss.flatMap(schedule51(10, LinesOfAction)),  // FSS LOA @ 11:00 UK
+      fss.flatMap(schedule32(11, Standard)),       // FSS Chess @ 12:00 UK
+      fss.flatMap(schedule32(12, Crazyhouse)),     // FSS ZH @ 13:00 UK
+      fss.flatMap(schedule51(13, LinesOfAction)),  // FSS LOA @ 14:00 UK
+      fss.flatMap(schedule32(14, Standard)),       // FSS Chess @ 15:00 UK
+      fss.flatMap(schedule32(15, Chess960))        // FSS 960 @ 16:00 UK
+
       /*List( // legendary tournaments!
         at(birthday.withYear(today.getYear), 12) map orNextYear map { date =>
           val yo = date.getYear - 2021
@@ -525,15 +526,14 @@ Thank you all, you rock!"""
   private def overlaps(t: Tournament, ts: List[Tournament]): Boolean =
     t.schedule exists { s =>
       ts exists { t2 =>
-        t.variant == t2.variant && (t2.schedule ?? {
-          // prevent daily && weekly on the same day
-          case s2 if s.freq.isDailyOrBetter && s2.freq.isDailyOrBetter && s.sameSpeed(s2) => s sameDay s2
-          case s2 =>
-            (
-              t.variant.exotic ||  // overlapping exotic variant
-                s.hasMaxRating ||  // overlapping same rating limit
-                s.similarSpeed(s2) // overlapping similar
-            ) && s.similarConditions(s2) && t.overlaps(t2)
+        t.variant == t2.variant && t2.schedule.fold(false)({ s2 =>
+          // prevent daily && weekly on the same day - we don't care about this.
+          // case s2 if s.freq.isDailyOrBetter && s2.freq.isDailyOrBetter && s.sameSpeed(s2) => s sameDay s2
+          (
+            t.variant.exotic ||  // overlapping exotic variant
+              s.hasMaxRating ||  // overlapping same rating limit
+              s.similarSpeed(s2) // overlapping similar
+          ) && s.similarConditions(s2) && t.overlaps(t2)
         })
       }
     }
