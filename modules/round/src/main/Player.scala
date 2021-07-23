@@ -1,7 +1,8 @@
 package lila.round
 
 import strategygames.format.{ Forsyth, Uci }
-import strategygames.{ Centis, GameLib, MoveMetrics, MoveOrDrop, Pos, Role, Status }
+import strategygames.{ Centis, GameLib, Game => StratGame, MoveMetrics, MoveOrDrop, Pos, Role, Status }
+import strategygames.chess
 
 import actorApi.round.{ DrawNo, ForecastPlay, HumanPlay, TakebackNo, TooManyPlies }
 import lila.game.actorApi.MoveGameEvent
@@ -130,10 +131,14 @@ final private class Player(
         game.chess(Pos.Chess(uci.orig), Pos.Chess(uci.dest), uci.promotion.map(Role.ChessPromotableRole), metrics) map { case (ncg, move) =>
           ncg -> (Left(move): MoveOrDrop)
         }
-      case Uci.Drop(role, pos) =>
-        game.chess.drop(role, pos, metrics) map { case (ncg, drop) =>
-          ncg -> (Right(drop): MoveOrDrop)
+      case Uci.ChessDrop(uci) =>
+        game.chess match {
+          case StratGame.Chess(chess) => chess.drop(uci.role, uci.pos, metrics) map { case (ncg, drop) =>
+            StratGame.Chess(ncg) -> (Right(drop): MoveOrDrop)
+          }
+          case _ => sys.error("A drop was paired up with a non-chess game")
         }
+      case _ => sys.error("Other games not yet implemented")
     }).map {
       case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnColor, withGrace = false)) => Flagged
       case (newChessGame, moveOrDrop) =>
