@@ -1,6 +1,7 @@
 package lila.explorer
 
 import akka.stream.scaladsl._
+import strategygames.Color.{ Black, White }
 import strategygames.format.pgn.Tag
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -12,6 +13,7 @@ import lila.common.LilaStream
 import lila.db.dsl._
 import lila.game.{ Game, GameRepo, PgnDump, Player, Query }
 import lila.user.{ User, UserRepo }
+
 
 final private class ExplorerIndexer(
     gameRepo: GameRepo,
