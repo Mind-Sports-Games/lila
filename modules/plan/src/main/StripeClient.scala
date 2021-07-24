@@ -49,7 +49,8 @@ final private class StripeClient(
     postOne[StripeCustomer](
       "customers",
       "email"       -> data.email,
-      "description" -> user.username
+      "description" -> user.username,
+      "expand[]" -> "subscriptions"
     )
 
   def createAnonCustomer(plan: StripePlan, data: Checkout): Fu[StripeCustomer] =
@@ -57,11 +58,15 @@ final private class StripeClient(
       "customers",
       "plan"        -> plan.id,
       "email"       -> data.email,
-      "description" -> "Anonymous"
+      "description" -> "Anonymous",
+      "expand[]" -> "subscriptions"
     )
 
   def getCustomer(id: CustomerId): Fu[Option[StripeCustomer]] =
-    getOne[StripeCustomer](s"customers/${id.value}")
+    getOne[StripeCustomer](
+      s"customers/${id.value}",
+      "expand[]" -> "subscriptions"
+    )
 
   def updateSubscription(
       sub: StripeSubscription,
