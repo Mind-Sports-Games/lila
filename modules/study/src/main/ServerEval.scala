@@ -1,8 +1,9 @@
 package lila.study
 
 import strategygames.format.pgn.Glyphs
-import strategygames.chess.format.{ Forsyth, Uci }
-import strategygames.format.{ UciCharPair }
+import strategygames.format.{ Forsyth, Uci, UciDump }
+import strategygames.variant.Variant
+import strategygames.{ Division, Game, GameLib, Replay, White }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -38,14 +39,14 @@ object ServerEval {
               chapterId = chapter.id.value,
               initialFen = chapter.root.fen.some,
               variant = chapter.setup.variant,
-              moves = strategygames.chess.format
-                .UciDump(
+              moves =
+                UciDump(
                   moves = chapter.root.mainline.map(_.move.san),
                   initialFen = chapter.root.fen.some,
                   variant = chapter.setup.variant
                 )
                 .toOption
-                .map(_.flatMap(strategygames.chess.format.Uci.apply)) | List.empty,
+                .map(_.flatMap(Uci.apply)) | List.empty,
               userId = userId,
               unlimited = unlimited
             )
@@ -134,8 +135,8 @@ object ServerEval {
         initialFen = chapter.root.fen.some
       )
 
-    private def analysisLine(root: RootOrNode, variant: strategygames.chess.variant.Variant, info: Info): Option[Node] =
-      strategygames.chess.Replay.gameMoveWhileValid(info.variation take 20, root.fen, variant) match {
+    private def analysisLine(root: RootOrNode, variant: Variant, info: Info): Option[Node] =
+      Replay.gameMoveWhileValid(info.variation take 20, root.fen, variant) match {
         case (_, games, error) =>
           error foreach { logger.info(_) }
           games.reverse match {
@@ -148,12 +149,12 @@ object ServerEval {
           }
       }
 
-    private def makeBranch(g: strategygames.chess.Game, m: Uci.WithSan) =
+    private def makeBranch(g: Game, m: Uci.WithSan) =
       Node(
-        id = strategygames.chess.format.UciCharPair(m.uci),
+        id = UciCharPair(m.uci),
         ply = g.turns,
         move = m,
-        fen = Forsyth >> g,
+        fen = Forsyth.>>(GameLib.Chess(), g),
         check = g.situation.check,
         crazyData = g.situation.board.crazyData,
         clock = none,
@@ -162,7 +163,7 @@ object ServerEval {
       )
   }
 
-  case class Progress(chapterId: Chapter.Id, tree: T.Root, analysis: JsObject, division: strategygames.Division)
+  case class Progress(chapterId: Chapter.Id, tree: T.Root, analysis: JsObject, division: Division)
 
   def toJson(chapter: Chapter, analysis: Analysis) =
     lila.analyse.JsonView.bothPlayers(

@@ -9,7 +9,7 @@ case class SimulClock(
 ) {
 
   def chessClockOf(hostColor: Color) =
-    config.toClock(strategygames.GameLib.Chess()).giveTime(hostColor, Centis.ofSeconds(hostExtraTime))
+    config.toClock.giveTime(hostColor, Centis.ofSeconds(hostExtraTime))
 
   def hostExtraMinutes = hostExtraTime / 60
 }

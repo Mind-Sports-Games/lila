@@ -5,6 +5,8 @@ import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
 import strategygames.variant.Variant
+import strategygames.GameLib
+
 import lila.db.dsl._
 import lila.user.User
 import lila.memo.CacheApi._

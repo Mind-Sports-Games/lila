@@ -123,7 +123,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   def setGamebook(gamebook: lila.tree.Node.Gamebook) =
     setNodeValue(Node.BsonFields.gamebook, gamebook.nonEmpty option gamebook) _
 
-  def setGlyphs(glyphs: strategygames.chess.format.pgn.Glyphs) = setNodeValue(Node.BsonFields.glyphs, glyphs.nonEmpty) _
+  def setGlyphs(glyphs: strategygames.format.pgn.Glyphs) = setNodeValue(Node.BsonFields.glyphs, glyphs.nonEmpty) _
 
   def setClock(clock: Option[Centis]) = setNodeValue(Node.BsonFields.clock, clock) _
 

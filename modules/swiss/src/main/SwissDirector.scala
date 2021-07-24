@@ -92,7 +92,7 @@ final private class SwissDirector(
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
           g.copy(
-            clock = swiss.clock.toClock(strategygames.GameLib.Chess()).some,
+            clock = swiss.clock.toClock.some,
             turns = turns,
             startedAtTurn = turns
           )

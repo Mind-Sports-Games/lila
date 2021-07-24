@@ -1,8 +1,9 @@
 package lila.swiss
 
 import strategygames.Clock.{ Config => ClockConfig }
-import strategygames.chess.format.FEN
-import strategygames.chess.variant.Variant
+import strategygames.format.FEN
+import strategygames.variant.Variant
+import strategygames.GameLib
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -25,7 +26,7 @@ final class SwissForm(implicit mode: Mode) {
         )(ClockConfig.apply)(ClockConfig.unapply)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt"          -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "variant"           -> optional(nonEmptyText.verifying(v => Variant(v).isDefined)),
+        "variant"           -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
         "rated"             -> optional(boolean),
         "nbRounds"          -> number(min = minRounds, max = 100),
         "description"       -> optional(cleanNonEmptyText),
@@ -46,7 +47,7 @@ final class SwissForm(implicit mode: Mode) {
       startsAt = Some(DateTime.now plusSeconds {
         if (mode == Mode.Prod) 60 * 10 else 20
       }),
-      variant = Variant.default.key.some,
+      variant = Variant.default(GameLib.Chess()).key.some,
       rated = true.some,
       nbRounds = 7,
       description = none,
@@ -151,7 +152,7 @@ object SwissForm {
       conditions: SwissCondition.DataForm.AllSetup,
       forbiddenPairings: Option[String]
   ) {
-    def realVariant  = variant flatMap Variant.apply getOrElse Variant.default
+    def realVariant  = variant flatMap {v => Variant.apply(GameLib.Chess(), v)} getOrElse Variant.default(GameLib.Chess())
     def realStartsAt = startsAt | DateTime.now.plusMinutes(10)
     def realChatFor  = chatFor | Swiss.ChatFor.default
     def realRoundInterval = {

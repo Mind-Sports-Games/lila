@@ -15,14 +15,14 @@ object Color {
 
   object White extends Color("white") {
 
-    def resolve = White
+    def resolve = strategygames.White
 
     def unary_! = Black
   }
 
   object Black extends Color("black") {
 
-    def resolve = Black
+    def resolve = strategygames.Black
 
     def unary_! = White
   }

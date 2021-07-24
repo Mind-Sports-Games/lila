@@ -4,6 +4,7 @@ import actorApi.Who
 import cats.data.Validated
 import strategygames.Centis
 import strategygames.format.pgn.{ Glyph, Glyphs, Tags }
+import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -274,7 +275,7 @@ final private class StudySocket(
   def addNode(
       pos: Position.Ref,
       node: Node,
-      variant: strategygames.chess.variant.Variant,
+      variant: Variant,
       sticky: Boolean,
       relay: Option[Chapter.Relay],
       who: Who

@@ -1,8 +1,9 @@
 package lila.study
 
 import strategygames.format.pgn.Tags
-import strategygames.chess.format.{ FEN, Forsyth }
-import strategygames.chess.variant.{ Crazyhouse, Variant }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.variant.Variant
+import strategygames.GameLib
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
 import lila.user.User
@@ -77,12 +78,12 @@ final private class ChapterMaker(
     }
 
   private def fromFenOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Chapter = {
-    val variant = data.variant.flatMap(Variant.apply) | Variant.default
-    (data.fen.filterNot(_.initial).flatMap { Forsyth.<<<@(variant, _) } match {
+    val variant = data.variant.flatMap(v => Variant.apply(GameLib.Chess(), v)) | Variant.default(GameLib.Chess())
+    (data.fen.filterNot(_.initial).flatMap { Forsyth.<<<@(GameLib.Chess(), variant, _) } match {
       case Some(sit) =>
         Node.Root(
           ply = sit.turns,
-          fen = Forsyth >> sit,
+          fen = Forsyth.>>(GameLib.Chess(), sit),
           check = sit.situation.check,
           clock = none,
           crazyData = sit.situation.board.crazyData,
@@ -94,7 +95,7 @@ final private class ChapterMaker(
           fen = variant.initialFen,
           check = false,
           clock = none,
-          crazyData = variant.crazyhouse option Crazyhouse.Data.init,
+          crazyData = variant.crazyhouse option strategygames.chess.variant.Crazyhouse.Data.init,
           children = Node.emptyChildren
         ) -> false
     }) match {

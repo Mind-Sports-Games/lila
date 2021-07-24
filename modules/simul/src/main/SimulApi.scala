@@ -1,7 +1,8 @@
 package lila.simul
 
 import akka.actor._
-import strategygames.chess.variant.Variant
+import strategygames.variant.Variant
+import strategygames.GameLib
 import play.api.libs.json.Json
 import scala.concurrent.duration._
 
@@ -245,17 +246,16 @@ final class SimulApi(
           perfPicker =
             lila.game.PerfPicker.mainOrDefault(strategygames.Speed(clock.config), pairing.player.variant, none)
           game1 = Game.make(
-            chess = strategygames.chess
-              .Game(
+            chess = strategygames.Game(
                 variantOption = Some {
                   if (simul.position.isEmpty) pairing.player.variant
-                  else strategygames.chess.variant.FromPosition
+                  else Variant.libFromPosition(GameLib.Chess())
                 },
                 fen = simul.position
               )
               .copy(clock = clock.start.some),
-            whitePlayer = lila.game.Player.make(White, whiteUser.some, perfPicker),
-            blackPlayer = lila.game.Player.make(Black, blackUser.some, perfPicker),
+            whitePlayer = lila.game.Player.make(strategygames.White, whiteUser.some, perfPicker),
+            blackPlayer = lila.game.Player.make(strategygames.Black, blackUser.some, perfPicker),
             mode = strategygames.Mode.Casual,
             source = lila.game.Source.Simul,
             pgnImport = None

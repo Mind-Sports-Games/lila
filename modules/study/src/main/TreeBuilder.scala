@@ -1,18 +1,20 @@
 package lila.study
 
 import strategygames.chess.opening._
-import strategygames.chess.variant.Variant
+import strategygames.format.FEN
+import strategygames.variant.Variant
+import strategygames.{ Game, GameLib }
 import lila.tree
 
 object TreeBuilder {
 
-  private val initialStandardDests = strategygames.chess.Game(strategygames.chess.variant.Standard).situation.destinations
+  private val initialStandardDests = Game(Variant.libStandard(GameLib.Chess())).situation.destinations
 
   def apply(root: Node.Root, variant: Variant): tree.Root = {
     val dests =
       if (variant.standard && root.fen.initial) initialStandardDests
       else {
-        val sit = strategygames.chess.Game(variant.some, root.fen.some).situation
+        val sit = Game(GameLib.Chess(), variant.some, root.fen.some).situation
         sit.playable(false) ?? sit.destinations
       }
     makeRoot(root, variant).copy(dests = dests.some)
@@ -33,7 +35,10 @@ object TreeBuilder {
       crazyData = node.crazyData,
       eval = node.score.map(_.eval),
       children = toBranches(node.children, variant),
-      opening = Variant.openingSensibleVariants(variant) ?? FullOpeningDB.findByFen(node.fen),
+      opening = Variant.openingSensibleVariants(GameLib.Chess())(variant) ?? (node.fen match {
+        case FEN.Chess(fen) => FullOpeningDB findByFen fen
+        case _ => sys.error("Invalid fen lib")
+      }),
       forceVariation = node.forceVariation
     )
 
@@ -50,7 +55,10 @@ object TreeBuilder {
       crazyData = root.crazyData,
       eval = root.score.map(_.eval),
       children = toBranches(root.children, variant),
-      opening = Variant.openingSensibleVariants(variant) ?? FullOpeningDB.findByFen(root.fen)
+      opening = Variant.openingSensibleVariants(GameLib.Chess())(variant) ?? (root.fen match {
+        case FEN.Chess(fen) => FullOpeningDB findByFen fen
+        case _ => sys.error("Invalid fen lib")
+      }),
     )
 
   private def toBranches(children: Node.Children, variant: Variant): List[tree.Branch] =

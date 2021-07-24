@@ -1,8 +1,8 @@
 package lila.study
 
-import strategygames.chess.format.{ FEN, Uci }
+import strategygames.format.{ FEN, Uci }
 import strategygames.format.pgn.{ Tag, Tags }
-import strategygames.chess.Pos
+import strategygames.Pos
 import play.api.libs.json._
 import scala.util.chaining._
 

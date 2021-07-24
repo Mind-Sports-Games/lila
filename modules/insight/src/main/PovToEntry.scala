@@ -3,8 +3,8 @@ package lila.insight
 import scala.util.chaining._
 import cats.data.NonEmptyList
 
-import strategygames.chess.format.FEN
-import strategygames.chess.{ Board, Role }
+import strategygames.format.FEN
+import strategygames.{ Board, Color, Divider, Division, GameLib, Piece, Replay, Role }
 import strategygames.{ Centis, Stats }
 import lila.analyse.{ Accuracy, Advice }
 import lila.game.{ Game, Pov }
@@ -21,7 +21,7 @@ final private class PovToEntry(
       provisional: Boolean,
       initialFen: Option[FEN],
       analysis: Option[lila.analyse.Analysis],
-      division: strategygames.Division,
+      division: Division,
       moveAccuracy: Option[List[Int]],
       boards: NonEmptyList[Board],
       movetimes: NonEmptyList[Centis],
@@ -48,8 +48,9 @@ final private class PovToEntry(
           (game.metadata.analysed ?? analysisRepo.byId(game.id)) map { case (fen, an) =>
             for {
               boards <-
-                strategygames.chess.Replay
+                Replay
                   .boards(
+                    GameLib.Chess(),
                     moveStrs = game.pgnMoves,
                     initialFen = fen,
                     variant = game.variant
@@ -62,7 +63,7 @@ final private class PovToEntry(
               provisional = provisional,
               initialFen = fen,
               analysis = an,
-              division = strategygames.chess.Divider(boards.toList),
+              division = Divider(boards.toList),
               moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
               boards = boards,
               movetimes = movetimes,
@@ -158,8 +159,8 @@ final private class PovToEntry(
     QueenTrade {
       from.division.end.fold(from.boards.last.some)(from.boards.toList.lift) match {
         case Some(board) =>
-          strategygames.Color.all.forall { color =>
-            !board.hasPiece(strategygames.chess.Piece(color, strategygames.chess.Queen))
+          Color.all.forall { color =>
+            !board.hasPiece(Piece(color, Role.ChessRole(strategygames.chess.Role.Queen)))
           }
         case _ =>
           logger.warn(s"https://playstrategy.org/${from.pov.gameId} missing endgame board")
