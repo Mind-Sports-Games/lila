@@ -70,7 +70,8 @@ final private class Biter(
     Game
       .make(
         chess = StratGame(
-          situation = Situation(hook.realVariant),
+          lib = hook.realVariant.gameLib,
+          situation = Situation(hook.realVariant.gameLib, hook.realVariant),
           clock = clock.some
         ),
         whitePlayer = Player.make(strategygames.White, whiteUser, perfPicker),
@@ -87,7 +88,8 @@ final private class Biter(
     Game
       .make(
         chess = StratGame(
-          situation = Situation(seek.realVariant),
+          lib = seek.realVariant.gameLib,
+          situation = Situation(seek.realVariant.gameLib, seek.realVariant),
           clock = none
         ),
         whitePlayer = Player.make(strategygames.White, whiteUser, perfPicker),

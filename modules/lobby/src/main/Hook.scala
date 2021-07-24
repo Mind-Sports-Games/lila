@@ -1,6 +1,7 @@
 package lila.lobby
 
-import strategygames.{ Clock, Mode, Speed }
+import strategygames.{ Clock, GameLib, Mode, Speed }
+import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.i18n.Lang
 import play.api.libs.json._
@@ -15,6 +16,7 @@ case class Hook(
     id: String,
     sri: Sri,            // owner socket sri
     sid: Option[String], // owner cookie (used to prevent multiple hooks)
+    lib: GameLib,
     variant: Int,
     clock: Clock.Config,
     mode: Int,
@@ -27,7 +29,7 @@ case class Hook(
 
   val realColor = Color orDefault color
 
-  val realVariant = strategygames.chess.variant.Variant orDefault variant
+  val realVariant = Variant.orDefault(lib, variant)
 
   val realMode = Mode orDefault mode
 
@@ -36,6 +38,7 @@ case class Hook(
   def compatibleWith(h: Hook) =
     isAuth == h.isAuth &&
       mode == h.mode &&
+      lib == h.lib &&
       variant == h.variant &&
       clock == h.clock &&
       (realColor compatibleWith h.realColor) &&
@@ -110,7 +113,7 @@ object Hook {
 
   def make(
       sri: Sri,
-      variant: strategygames.chess.variant.Variant,
+      variant: strategygames.variant.Variant,
       clock: Clock.Config,
       mode: Mode,
       color: String,
@@ -123,6 +126,7 @@ object Hook {
     new Hook(
       id = lila.common.ThreadLocalRandom nextString idSize,
       sri = sri,
+      lib = variant.gameLib,
       variant = variant.id,
       clock = clock,
       mode = mode.id,

@@ -1,6 +1,6 @@
 package lila.lobby
 
-import strategygames.{ Mode, Speed }
+import strategygames.{ GameLib, Mode, Speed }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.i18n.Lang
@@ -12,6 +12,7 @@ import lila.user.User
 // correspondence chess, persistent
 case class Seek(
     _id: String,
+    gameLib: GameLib,
     variant: Int,
     daysPerTurn: Option[Int],
     mode: Int,
@@ -25,7 +26,7 @@ case class Seek(
 
   val realColor = Color orDefault color
 
-  val realVariant = strategygames.chess.variant.Variant orDefault variant
+  val realVariant = strategygames.variant.Variant.orDefault(gameLib, variant)
 
   val realMode = Mode orDefault mode
 
@@ -77,7 +78,7 @@ object Seek {
   val idSize = 8
 
   def make(
-      variant: strategygames.chess.variant.Variant,
+      variant: strategygames.variant.Variant,
       daysPerTurn: Option[Int],
       mode: Mode,
       color: String,
@@ -87,6 +88,7 @@ object Seek {
   ): Seek =
     new Seek(
       _id = lila.common.ThreadLocalRandom nextString idSize,
+      gameLib = variant.gameLib,
       variant = variant.id,
       daysPerTurn = daysPerTurn,
       mode = mode.id,
@@ -99,6 +101,7 @@ object Seek {
   def renew(seek: Seek) =
     new Seek(
       _id = lila.common.ThreadLocalRandom nextString idSize,
+      gameLib = seek.gameLib,
       variant = seek.variant,
       daysPerTurn = seek.daysPerTurn,
       mode = seek.mode,
@@ -114,6 +117,13 @@ object Seek {
     BSONIntegerHandler.as[LobbyPerf](
       b => LobbyPerf(b.abs, b < 0),
       x => x.rating * (if (x.provisional) -1 else 1)
+    )
+
+  // TODO: this should probably go somewhere else.
+  implicit val gameLibBSONHandler =
+    BSONIntegerHandler.as[GameLib](
+      b => GameLib(b.abs),
+      lib => lib.id
     )
   implicit private[lobby] val lobbyUserBSONHandler = Macros.handler[LobbyUser]
   implicit private[lobby] val seekBSONHandler      = Macros.handler[Seek]
