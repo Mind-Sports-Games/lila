@@ -5,7 +5,7 @@ import strategygames.chess.format.pgn.{ ParsedPgn, Parser, Reader }
 import strategygames.format.pgn.{ Tag, TagType, Tags }
 import strategygames.chess.format.{ FEN, Forsyth }
 import strategygames.chess.{ Replay }
-import strategygames.{ Color, Mode, Status }
+import strategygames.{ Color, Game => StratGame, Mode, Status }
 import play.api.data._
 import play.api.data.Forms._
 import scala.util.chaining._
@@ -106,14 +106,14 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
         val dbGame = Game
           .make(
-            chess = game,
+            chess = StratGame.wrap(game),
             whitePlayer = Player.makeImported(
-              White,
+              Color.White,
               parsed.tags(_.White),
               parsed.tags(_.WhiteElo).flatMap(_.toIntOption)
             ),
             blackPlayer = Player.makeImported(
-              Black,
+              Color.Black,
               parsed.tags(_.Black),
               parsed.tags(_.BlackElo).flatMap(_.toIntOption)
             ),
@@ -129,7 +129,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             case None =>
               parsed.tags.resultColor
                 .map {
-                  case Some(strategygames.Color.Chess(color)) => TagResult(status, color.some)
+                  case Some(color) => TagResult(status, color.some)
                   case None if status == Status.Outoftime => TagResult(status, none)
                   case None                               => TagResult(Status.Draw, none)
                   case _ => sys.error("Not implemented for draughts yet")
