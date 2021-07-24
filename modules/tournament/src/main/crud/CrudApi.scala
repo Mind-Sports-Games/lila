@@ -11,6 +11,9 @@ import lila.db.dsl._
 import lila.db.paginator.Adapter
 import lila.user.User
 
+import strategygames.{ Clock, Mode }
+import strategygames.variant.Variant
+
 final class CrudApi(tournamentRepo: TournamentRepo) {
 
   def list = tournamentRepo uniques 50
@@ -69,11 +72,11 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
     Tournament.make(
       by = Left(User.playstrategyId),
       name = none,
-      clock = strategygames.Clock.Config(0, 0),
+      clock = Clock.Config(0, 0),
       minutes = 0,
-      variant = strategygames.chess.variant.Standard,
+      variant = Variant.libStandard(GameLib.Chess()),
       position = none,
-      mode = strategygames.Mode.Rated,
+      mode = Mode.Rated,
       password = None,
       waitMinutes = 0,
       startDate = none,
@@ -86,7 +89,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
 
   private def updateTour(tour: Tournament, data: CrudForm.Data) = {
     import data._
-    val clock = strategygames.Clock.Config((clockTime * 60).toInt, clockIncrement)
+    val clock = Clock.Config((clockTime * 60).toInt, clockIncrement)
     tour.copy(
       name = name,
       clock = clock,
