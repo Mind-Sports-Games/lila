@@ -1,7 +1,7 @@
 package lila.rating
 
-import strategygames.Centis
-import strategygames.Speed
+import strategygames.{ Centis, Speed }
+import strategygames.variant.Variant
 import play.api.i18n.Lang
 
 import lila.i18n.I18nKeys
@@ -81,7 +81,7 @@ object PerfType {
       extends PerfType(
         5,
         key = "standard",
-        name = strategygames.chess.variant.Standard.name,
+        name = Variant.Chess(strategygames.chess.variant.Standard).name,
         title = "Standard rules of chess",
         iconChar = '8'
       )
@@ -90,7 +90,7 @@ object PerfType {
       extends PerfType(
         11,
         key = "chess960",
-        name = strategygames.chess.variant.Chess960.name,
+        name = Variant.Chess(strategygames.chess.variant.Chess960).name,
         title = "Chess960 variant",
         iconChar = '\''
       )
@@ -99,7 +99,7 @@ object PerfType {
       extends PerfType(
         12,
         key = "kingOfTheHill",
-        name = strategygames.chess.variant.KingOfTheHill.name,
+        name = Variant.Chess(strategygames.chess.variant.KingOfTheHill).name,
         title = "King of the Hill variant",
         iconChar = '('
       )
@@ -108,7 +108,7 @@ object PerfType {
       extends PerfType(
         13,
         key = "antichess",
-        name = strategygames.chess.variant.Antichess.name,
+        name = Variant.Chess(strategygames.chess.variant.Antichess).name,
         title = "Antichess variant",
         iconChar = '@'
       )
@@ -117,7 +117,7 @@ object PerfType {
       extends PerfType(
         14,
         key = "atomic",
-        name = strategygames.chess.variant.Atomic.name,
+        name = Variant.Chess(strategygames.chess.variant.Atomic).name,
         title = "Atomic variant",
         iconChar = '>'
       )
@@ -126,7 +126,7 @@ object PerfType {
       extends PerfType(
         15,
         key = "threeCheck",
-        name = strategygames.chess.variant.ThreeCheck.name,
+        name = Variant.Chess(strategygames.chess.variant.ThreeCheck).name,
         title = "Three-check variant",
         iconChar = '.'
       )
@@ -135,7 +135,7 @@ object PerfType {
       extends PerfType(
         16,
         key = "horde",
-        name = strategygames.chess.variant.Horde.name,
+        name = Variant.Chess(strategygames.chess.variant.Horde).name,
         title = "Horde variant",
         iconChar = '_'
       )
@@ -144,7 +144,7 @@ object PerfType {
       extends PerfType(
         17,
         key = "racingKings",
-        name = strategygames.chess.variant.RacingKings.name,
+        name = Variant.Chess(strategygames.chess.variant.RacingKings).name,
         title = "Racing kings variant",
         iconChar = ''
       )
@@ -153,7 +153,7 @@ object PerfType {
       extends PerfType(
         18,
         key = "crazyhouse",
-        name = strategygames.chess.variant.Crazyhouse.name,
+        name = Variant.Chess(strategygames.chess.variant.Crazyhouse).name,
         title = "Crazyhouse variant",
         iconChar = ''
       )
@@ -171,7 +171,7 @@ object PerfType {
       extends PerfType(
         21,
         key = "linesOfAction",
-        name = strategygames.chess.variant.LinesOfAction.name,
+        name = Variant.Chess(strategygames.chess.variant.LinesOfAction).name,
         title = "Lines Of Action game",
         iconChar = ''
       )
@@ -250,33 +250,33 @@ object PerfType {
     List(Crazyhouse, Chess960, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings, LinesOfAction)
   val standard: List[PerfType] = List(Bullet, Blitz, Rapid, Classical, Correspondence)
 
-  def variantOf(pt: PerfType): strategygames.chess.variant.Variant =
+  def variantOf(pt: PerfType): Variant =
     pt match {
-      case Crazyhouse    => strategygames.chess.variant.Crazyhouse
-      case Chess960      => strategygames.chess.variant.Chess960
-      case KingOfTheHill => strategygames.chess.variant.KingOfTheHill
-      case ThreeCheck    => strategygames.chess.variant.ThreeCheck
-      case Antichess     => strategygames.chess.variant.Antichess
-      case Atomic        => strategygames.chess.variant.Atomic
-      case Horde         => strategygames.chess.variant.Horde
-      case RacingKings   => strategygames.chess.variant.RacingKings
-      case LinesOfAction => strategygames.chess.variant.LinesOfAction
-      case _             => strategygames.chess.variant.Standard
+      case Crazyhouse    => Variant.Chess(strategygames.chess.variant.Crazyhouse)
+      case Chess960      => Variant.Chess(strategygames.chess.variant.Chess960)
+      case KingOfTheHill => Variant.Chess(strategygames.chess.variant.KingOfTheHill)
+      case ThreeCheck    => Variant.Chess(strategygames.chess.variant.ThreeCheck)
+      case Antichess     => Variant.Chess(strategygames.chess.variant.Antichess)
+      case Atomic        => Variant.Chess(strategygames.chess.variant.Atomic)
+      case Horde         => Variant.Chess(strategygames.chess.variant.Horde)
+      case RacingKings   => Variant.Chess(strategygames.chess.variant.RacingKings)
+      case LinesOfAction => Variant.Chess(strategygames.chess.variant.LinesOfAction)
+      case _             => Variant.Chess(strategygames.chess.variant.Standard)
     }
 
-  def byVariant(variant: strategygames.chess.variant.Variant): Option[PerfType] =
+  def byVariant(variant: Variant): Option[PerfType] =
     variant match {
-      case strategygames.chess.variant.Standard      => none
-      case strategygames.chess.variant.FromPosition  => none
-      case strategygames.chess.variant.Crazyhouse    => Crazyhouse.some
-      case strategygames.chess.variant.Chess960      => Chess960.some
-      case strategygames.chess.variant.KingOfTheHill => KingOfTheHill.some
-      case strategygames.chess.variant.ThreeCheck    => ThreeCheck.some
-      case strategygames.chess.variant.Antichess     => Antichess.some
-      case strategygames.chess.variant.Atomic        => Atomic.some
-      case strategygames.chess.variant.Horde         => Horde.some
-      case strategygames.chess.variant.RacingKings   => RacingKings.some
-      case strategygames.chess.variant.LinesOfAction => LinesOfAction.some
+      case Variant.Chess(strategygames.chess.variant.Standard)      => none
+      case Variant.Chess(strategygames.chess.variant.FromPosition)  => none
+      case Variant.Chess(strategygames.chess.variant.Crazyhouse)    => Crazyhouse.some
+      case Variant.Chess(strategygames.chess.variant.Chess960)      => Chess960.some
+      case Variant.Chess(strategygames.chess.variant.KingOfTheHill) => KingOfTheHill.some
+      case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => ThreeCheck.some
+      case Variant.Chess(strategygames.chess.variant.Antichess)     => Antichess.some
+      case Variant.Chess(strategygames.chess.variant.Atomic)        => Atomic.some
+      case Variant.Chess(strategygames.chess.variant.Horde)         => Horde.some
+      case Variant.Chess(strategygames.chess.variant.RacingKings)   => RacingKings.some
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction) => LinesOfAction.some
     }
 
   def standardBySpeed(speed: Speed): PerfType = speed match {
@@ -288,7 +288,7 @@ object PerfType {
     case Speed.Correspondence => Correspondence
   }
 
-  def apply(variant: strategygames.chess.variant.Variant, speed: Speed): PerfType =
+  def apply(variant: Variant, speed: Speed): PerfType =
     byVariant(variant) getOrElse standardBySpeed(speed)
 
   lazy val totalTimeRoughEstimation: Map[PerfType, Centis] = nonPuzzle.view
@@ -305,7 +305,7 @@ object PerfType {
     }
     .to(Map)
 
-  def iconByVariant(variant: strategygames.chess.variant.Variant): Char =
+  def iconByVariant(variant: Variant): Char =
     byVariant(variant).fold('C')(_.iconChar)
 
   def trans(pt: PerfType)(implicit lang: Lang): String =

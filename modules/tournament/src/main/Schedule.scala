@@ -337,10 +337,10 @@ object Schedule {
 
     (s.freq, s.variant, s.speed) match {
       // Special cases.
-      case (Weekend, Crazyhouse, Blitz)                 => zhEliteTc(s)
-      case (Hourly, Crazyhouse, SuperBlitz) if zhInc(s) => TC(3 * 60, 1)
-      case (Hourly, Crazyhouse, Blitz) if zhInc(s)      => TC(4 * 60, 2)
-      case (Hourly, Standard, Blitz) if standardInc(s)  => TC(3 * 60, 2)
+      case (Weekend, strategygames.variant.Variant.Chess(Crazyhouse), Blitz)                 => zhEliteTc(s)
+      case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), SuperBlitz) if zhInc(s) => TC(3 * 60, 1)
+      case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), Blitz) if zhInc(s)      => TC(4 * 60, 2)
+      case (Hourly, strategygames.variant.Variant.Chess(Standard), Blitz) if standardInc(s)  => TC(3 * 60, 2)
 
       case (Shield, variant, Blitz) if variant.exotic => TC(3 * 60, 2)
 

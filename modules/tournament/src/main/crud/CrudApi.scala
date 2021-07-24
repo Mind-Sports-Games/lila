@@ -11,7 +11,7 @@ import lila.db.dsl._
 import lila.db.paginator.Adapter
 import lila.user.User
 
-import strategygames.{ Clock, Mode }
+import strategygames.{ Clock, GameLib, Mode }
 import strategygames.variant.Variant
 
 final class CrudApi(tournamentRepo: TournamentRepo) {
