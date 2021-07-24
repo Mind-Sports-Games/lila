@@ -8,6 +8,8 @@ import lila.db.dsl._
 import lila.user.User
 import lila.memo.CacheApi._
 
+import strategygames.variant.Variant
+
 final class TournamentShieldApi(
     tournamentRepo: TournamentRepo,
     cacheApi: lila.memo.CacheApi
@@ -109,7 +111,7 @@ object TournamentShield {
       )
   }
 
-  private type SpeedOrVariant = Either[Schedule.Speed, strategygames.chess.variant.Variant]
+  private type SpeedOrVariant = Either[Schedule.Speed, Variant]
 
   sealed abstract class Category(
       val of: SpeedOrVariant,
@@ -171,55 +173,55 @@ object TournamentShield {
 
     case object Chess960
         extends Category(
-          of = Right(strategygames.chess.variant.Chess960),
+          of = Right(Variant.Chess(strategygames.chess.variant.Chess960)),
           iconChar = '\''
         )
 
     case object KingOfTheHill
         extends Category(
-          of = Right(strategygames.chess.variant.KingOfTheHill),
+          of = Right(Variant.Chess(strategygames.chess.variant.KingOfTheHill)),
           iconChar = '('
         )
 
     case object Antichess
         extends Category(
-          of = Right(strategygames.chess.variant.Antichess),
+          of = Right(Variant.Chess(strategygames.chess.variant.Antichess)),
           iconChar = '@'
         )
 
     case object Atomic
         extends Category(
-          of = Right(strategygames.chess.variant.Atomic),
+          of = Right(Variant.Chess(strategygames.chess.variant.Atomic)),
           iconChar = '>'
         )
 
     case object ThreeCheck
         extends Category(
-          of = Right(strategygames.chess.variant.ThreeCheck),
+          of = Right(Variant.Chess(strategygames.chess.variant.ThreeCheck)),
           iconChar = '.'
         )
 
     case object Horde
         extends Category(
-          of = Right(strategygames.chess.variant.Horde),
+          of = Right(Variant.Chess(strategygames.chess.variant.Horde)),
           iconChar = '_'
         )
 
     case object RacingKings
         extends Category(
-          of = Right(strategygames.chess.variant.RacingKings),
+          of = Right(Variant.Chess(strategygames.chess.variant.RacingKings)),
           iconChar = ''
         )
 
     case object Crazyhouse
         extends Category(
-          of = Right(strategygames.chess.variant.Crazyhouse),
+          of = Right(Variant.Chess(strategygames.chess.variant.Crazyhouse)),
           iconChar = ''
         )
 
     case object LinesOfAction
         extends Category(
-          of = Right(strategygames.chess.variant.LinesOfAction),
+          of = Right(Variant.Chess(strategygames.chess.variant.LinesOfAction)),
           iconChar = ''
         )
 

@@ -1,9 +1,9 @@
 package lila.tournament
 
 import cats.implicits._
-import strategygames.chess.format.FEN
+import strategygames.format.FEN
 import strategygames.chess.{ StartingPosition }
-import strategygames.{ Mode }
+import strategygames.{ Clock, GameLib, Mode }
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -27,7 +27,7 @@ final class TournamentForm {
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
       startDate = none,
-      variant = strategygames.chess.variant.Standard.id.toString.some,
+      variant = strategygames.variant.Variant.libStandard(GameLib.Chess()).id.toString.some,
       position = None,
       password = None,
       mode = none,
@@ -111,7 +111,7 @@ object TournamentForm {
   }.map(_.toDouble)
   val clockTimeDefault = 2d
   private def formatLimit(l: Double) =
-    strategygames.Clock.Config(l * 60 toInt, 0).limitString + {
+    Clock.Config(l * 60 toInt, 0).limitString + {
       if (l <= 1) " minute" else " minutes"
     }
   val clockTimeChoices = optionsDouble(clockTimes, formatLimit)
@@ -136,8 +136,9 @@ object TournamentForm {
 
   val validVariants =
     List(Standard, Chess960, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings, Crazyhouse)
+      .map(strategygames.variant.Variant.Chess)
 
-  def guessVariant(from: String): Option[Variant] =
+  def guessVariant(from: String): Option[strategygames.variant.Variant] =
     validVariants.find { v =>
       v.key == from || from.toIntOption.exists(v.id ==)
     }
@@ -179,11 +180,11 @@ private[tournament] case class TournamentSetup(
     if (realPosition.isDefined) Mode.Casual
     else Mode(rated.orElse(mode.map(Mode.Rated.id ===)) | true)
 
-  def realVariant = variant.flatMap(TournamentForm.guessVariant) | strategygames.chess.variant.Standard
+  def realVariant = variant.flatMap(TournamentForm.guessVariant) | strategygames.variant.Variant.libStandard(GameLib.Chess())
 
   def realPosition = position ifTrue realVariant.standard
 
-  def clockConfig = strategygames.Clock.Config((clockTime * 60).toInt, clockIncrement)
+  def clockConfig = Clock.Config((clockTime * 60).toInt, clockIncrement)
 
   def validRatedVariant =
     realMode == Mode.Casual ||

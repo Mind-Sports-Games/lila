@@ -1,7 +1,8 @@
 package lila.tournament
 
-import strategygames.chess.format.FEN
-import strategygames.chess.variant.Variant
+import strategygames.format.FEN
+import strategygames.variant.Variant
+import strategygames.Clock
 import org.joda.time.DateTime
 import play.api.i18n.Lang
 
@@ -227,7 +228,7 @@ object Schedule {
         case (HyperBullet, UltraBullet) | (UltraBullet, HyperBullet) => true
         case _                                                       => false
       }
-    def fromClock(clock: strategygames.Clock.Config) = {
+    def fromClock(clock: Clock.Config) = {
       val time = clock.estimateTotalSeconds
       if (time < 30) UltraBullet
       else if (time < 60) HyperBullet
@@ -318,7 +319,7 @@ object Schedule {
   private def zhInc(s: Schedule)       = s.at.getHourOfDay % 2 == 0
 
   private def zhEliteTc(s: Schedule) = {
-    val TC = strategygames.Clock.Config
+    val TC = Clock.Config
     s.at.getDayOfMonth / 7 match {
       case 0 => TC(3 * 60, 0)
       case 1 => TC(1 * 60, 1)
@@ -332,7 +333,7 @@ object Schedule {
     import Freq._, Speed._
     import strategygames.chess.variant._
 
-    val TC = strategygames.Clock.Config
+    val TC = Clock.Config
 
     (s.freq, s.variant, s.speed) match {
       // Special cases.

@@ -1,5 +1,8 @@
 package lila.swiss
 
+import strategygames.format.{ Forsyth }
+import strategygames.{ Black, White, GameLib }
+
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.i18n.Lang
@@ -284,7 +287,7 @@ object SwissJson {
     Json
       .obj(
         "id"          -> b.game.id,
-        "fen"         -> strategygames.chess.format.Forsyth.boardAndColor(b.game.situation),
+        "fen"         -> Forsyth.boardAndColor(GameLib.Chess(), b.game.situation).value,
         "lastMove"    -> ~b.game.lastMoveKeys,
         "orientation" -> b.game.naturalOrientation.name,
         "white"       -> boardPlayerJson(b.board.white),
@@ -293,8 +296,8 @@ object SwissJson {
       .add(
         "clock" -> b.game.clock.ifTrue(b.game.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(strategygames.White).roundSeconds,
-            "black" -> c.remainingTime(strategygames.Black).roundSeconds
+            "white" -> c.remainingTime(White).roundSeconds,
+            "black" -> c.remainingTime(Black).roundSeconds
           )
         }
       )
