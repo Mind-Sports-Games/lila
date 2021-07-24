@@ -324,7 +324,7 @@ object Node {
 
   object Root {
 
-    def default(variant: strategygames.chess.variant.Variant) =
+    def default(variant: Variant) =
       Root(
         ply = 0,
         fen = variant.initialFen,

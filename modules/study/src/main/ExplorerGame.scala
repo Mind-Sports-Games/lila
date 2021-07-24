@@ -2,7 +2,7 @@ package lila.study
 
 import scala.util.chaining._
 
-import strategygames.chess.format.FEN
+import strategygames.format.FEN
 import strategygames.chess.format.pgn.Parser
 import lila.game.{ Game, Namer }
 import lila.tree.Node.Comment

@@ -1,11 +1,10 @@
 package lila.study
 
 import strategygames.format.pgn.{ Glyph, Glyphs, Tag, Tags }
-import strategygames.chess.format.{ FEN, Uci }
-import strategygames.format.{ UciCharPair }
-import strategygames.chess.variant.{ Crazyhouse, Variant }
-import strategygames.chess.{ Pos, PromotableRole, Role }
-import strategygames.{ Centis, Color }
+import strategygames.format.{ FEN, Uci, UciCharPair }
+import strategygames.variant.Variant
+import strategygames.chess.variant.Crazyhouse
+import strategygames.{ Centis, Color, GameLib, Pos, PromotableRole, Role }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.Success
@@ -256,7 +255,7 @@ object BSONHandlers {
 
   implicit val PathBSONHandler = BSONStringHandler.as[Path](Path.apply, _.toString)
   implicit val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(v) toTry s"No such variant: $v" },
+    { case BSONInteger(v) => Variant(GameLib.Chess(), v) toTry s"No such variant: $v" },
     x => BSONInteger(x.id)
   )
 

@@ -1,8 +1,8 @@
 package lila.study
 
 import strategygames.format.pgn.{ Glyph, Tags }
-import strategygames.chess.variant.Variant
-import strategygames.{ Centis, Color }
+import strategygames.variant.Variant
+import strategygames.{ Centis, Color, GameLib }
 import org.joda.time.DateTime
 
 import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
@@ -61,7 +61,7 @@ case class Chapter(
     updateRoot(_.forceVariationAt(force, path))
 
   def opening: Option[FullOpening] =
-    if (!Variant.openingSensibleVariants(setup.variant)) none
+    if (!Variant.openingSensibleVariants(GameLib.Chess(), setup.variant)) none
     else FullOpeningDB searchInFens root.mainline.map(_.fen)
 
   def isEmptyInitial = order == 1 && root.children.nodes.isEmpty
