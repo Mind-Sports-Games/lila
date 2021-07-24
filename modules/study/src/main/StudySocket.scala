@@ -3,8 +3,7 @@ package lila.study
 import actorApi.Who
 import cats.data.Validated
 import strategygames.Centis
-import strategygames.chess.format.pgn.{ Glyph, Glyphs }
-import strategygames.format.pgn.{ Tags }
+import strategygames.format.pgn.{ Glyph, Glyphs, Tags }
 import play.api.libs.json._
 import scala.concurrent.duration._
 

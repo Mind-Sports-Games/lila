@@ -1,7 +1,7 @@
 package lila.round
 
 import strategygames.{ Color, Centis, Game, GameLib, Replay }
-import strategygames.chess.format.pgn.Glyphs
+import strategygames.format.pgn.Glyphs
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.chess.opening._
 import strategygames.variant.Variant

@@ -1,7 +1,6 @@
 package lila.study
 
-import strategygames.chess.format.pgn.{ Glyph }
-import strategygames.format.pgn.{ Tags }
+import strategygames.format.pgn.{ Glyph, Tags }
 import strategygames.chess.variant.Variant
 import strategygames.{ Centis, Color }
 import org.joda.time.DateTime

@@ -1,7 +1,6 @@
 package lila.study
 
-import strategygames.chess.format.pgn.{ Glyph, Glyphs }
-import strategygames.format.pgn.{ Tag, Tags }
+import strategygames.format.pgn.{ Glyph, Glyphs, Tag, Tags }
 import strategygames.chess.format.{ FEN, Uci }
 import strategygames.format.{ UciCharPair }
 import strategygames.chess.variant.{ Crazyhouse, Variant }

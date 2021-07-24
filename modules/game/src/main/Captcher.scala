@@ -3,8 +3,7 @@ package lila.game
 import akka.actor._
 import akka.pattern.pipe
 import cats.data.NonEmptyList
-import strategygames.format.pgn.Tags
-import strategygames.chess.format.pgn.Sans
+import strategygames.format.pgn.{ Sans, Tags }
 import strategygames.chess.format.pgn
 import strategygames.format.Forsyth
 import strategygames.{ Game => StratGame }

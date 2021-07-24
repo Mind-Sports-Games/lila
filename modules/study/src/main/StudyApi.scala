@@ -3,8 +3,7 @@ package lila.study
 import actorApi.Who
 import akka.stream.scaladsl._
 import strategygames.Centis
-import strategygames.chess.format.pgn.{ Glyph }
-import strategygames.format.pgn.{ Tags }
+import strategygames.format.pgn.{ Glyph, Tags }
 import scala.concurrent.duration._
 
 import lila.chat.{ Chat, ChatApi }

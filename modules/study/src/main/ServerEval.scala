@@ -1,6 +1,6 @@
 package lila.study
 
-import strategygames.chess.format.pgn.Glyphs
+import strategygames.format.pgn.Glyphs
 import strategygames.chess.format.{ Forsyth, Uci }
 import strategygames.format.{ UciCharPair }
 import play.api.libs.json._

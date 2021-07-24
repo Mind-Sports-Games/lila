@@ -1,6 +1,6 @@
 package lila.analyse
 
-import strategygames.chess.format.pgn.Glyph
+import strategygames.format.pgn.Glyph
 import lila.tree.Eval._
 import scala.util.chaining._
 

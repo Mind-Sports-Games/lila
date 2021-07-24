@@ -3,7 +3,7 @@ package lila.tournament
 import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.chess.format.FEN
 import strategygames.Mode
-import strategygames.chess.variant.Variant
+import strategygames.variant.Variant
 import reactivemongo.api.bson._
 
 import lila.db.BSON
