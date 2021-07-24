@@ -177,7 +177,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
         div(cls := "box box-pad developers body") {
           val args = """style="width: 600px; height: 397px;" frameborder="0""""
           frag(
-            h1("Embed a chess game in your site"),
+            h1("Embed a game in your site"),
             raw(s"""<iframe src="/embed/MPJcy1JW?bg=auto&theme=auto" $args></iframe>"""),
             p(
               raw("""On a game analysis page, click the <em>"FEN &amp; PGN"</em> tab at the bottom, then """),
@@ -214,16 +214,16 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           a(activeCls("contact"), href := routes.Main.contact)(trans.contact.contact()),
           a(activeCls("tos"), href := routes.Page.tos)(trans.termsOfService()),
           a(activeCls("privacy"), href := "/privacy")(trans.privacy()),
-          a(activeCls("master"), href := routes.Page.master)("Title verification"),
+          //a(activeCls("master"), href := routes.Page.master)("Title verification"),
           sep,
           a(activeCls("source"), href := routes.Page.source)(trans.sourceCode()),
           a(activeCls("help"), href := routes.Page.help)(trans.contribute()),
-          a(activeCls("changelog"), href := routes.Page.menuBookmark("changelog"))("Changelog"),
+          //a(activeCls("changelog"), href := routes.Page.menuBookmark("changelog"))("Changelog"),
           a(activeCls("thanks"), href := "/thanks")(trans.thankYou()),
           sep,
-          a(activeCls("webmasters"), href := routes.Main.webmasters)(trans.webmasters()),
-          a(activeCls("database"), href := "https://database.playstrategy.org")(trans.database(), external),
-          a(activeCls("api"), href := routes.Api.index)("API", external),
+          //a(activeCls("webmasters"), href := routes.Main.webmasters)(trans.webmasters()),
+          //a(activeCls("database"), href := "https://database.playstrategy.org")(trans.database(), external),
+          //a(activeCls("api"), href := routes.Api.index)("API", external),
           sep,
           a(activeCls("lag"), href := routes.Main.lag)(trans.lag.isPlayStrategyLagging())
           //a(activeCls("ads"), href := "/ads")("Block ads")
