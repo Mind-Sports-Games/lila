@@ -8,7 +8,7 @@ import lila.tree
 
 object TreeBuilder {
 
-  private val initialStandardDests = Game(Variant.libStandard(GameLib.Chess())).situation.destinations
+  private val initialStandardDests = Game(GameLib.Chess(), Variant.libStandard(GameLib.Chess())).situation.destinations
 
   def apply(root: Node.Root, variant: Variant): tree.Root = {
     val dests =

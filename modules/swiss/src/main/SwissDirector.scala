@@ -1,6 +1,7 @@
 package lila.swiss
 
-import strategygames.{ Black, Color, White }
+import strategygames.{ Black, Color, White, GameLib }
+import strategygames.variant.Variant
 import org.joda.time.DateTime
 import scala.util.chaining._
 
@@ -83,10 +84,11 @@ final private class SwissDirector(
   ): Game =
     Game
       .make(
-        chess = strategygames.chess.Game(
+        chess = strategygames.Game(
+          GameLib.Chess(),
           variantOption = Some {
             if (swiss.settings.position.isEmpty) swiss.variant
-            else strategygames.chess.variant.FromPosition
+            else Variant.libFromPosition(GameLib.Chess())
           },
           fen = swiss.settings.position
         ) pipe { g =>

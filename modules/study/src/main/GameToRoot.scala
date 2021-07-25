@@ -1,6 +1,6 @@
 package lila.study
 
-import strategygames.chess.format.FEN
+import strategygames.format.FEN
 import lila.game.Game
 import lila.round.JsonView.WithFlags
 
