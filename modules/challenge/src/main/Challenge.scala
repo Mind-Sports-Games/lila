@@ -3,7 +3,7 @@ package lila.challenge
 import strategygames.Color.{ Black, White }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Chess960, FromPosition, Horde, RacingKings, LinesOfAction }
+import strategygames.chess.variant.{ Chess960, Horde, RacingKings, LinesOfAction }
 import strategygames.{ Color, Mode, Speed }
 import org.joda.time.DateTime
 
@@ -92,7 +92,7 @@ case class Challenge(
   def notableInitialFen: Option[FEN] =
     variant match {
       case Variant.Chess(variant) => variant match {
-        case FromPosition | Horde | RacingKings | Chess960 | LinesOfAction => initialFen
+        case Variant.libFromPosition(GameLib.Chess()) | Horde | RacingKings | Chess960 | LinesOfAction => initialFen
         case _                                             => none
       }
       case _                                             => none
@@ -203,7 +203,7 @@ object Challenge {
         }
       )
       .orElse {
-        (variant == FromPosition) option perfTypeOf(Variant.wrap(strategygames.chess.variant.Standard), timeControl)
+        (variant == Variant.libFromPosition(GameLib.Chess())) option perfTypeOf(Variant.wrap(Variant.libStandard(GameLib.Chess())), timeControl)
       }
       .|(PerfType.Correspondence)
 

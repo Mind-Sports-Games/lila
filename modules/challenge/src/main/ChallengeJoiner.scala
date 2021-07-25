@@ -1,8 +1,7 @@
 package lila.challenge
 
 import strategygames.Situation
-import strategygames.{ Color, GameLib, Mode }
-import strategygames.Color.{ Black, White }
+import strategygames.{ Black, Color, GameLib, Mode, Situation, White }
 import strategygames.format.Forsyth
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.variant.Variant
@@ -38,7 +37,7 @@ private object ChallengeJoiner {
       destUser: Option[User],
       color: Option[Color]
   ): Game = {
-    def makeChess(variant: strategygames.variant.Variant): strategygames.Game =
+    def makeChess(variant: Variant): strategygames.Game =
       strategygames.Game(lib, situation = Situation(lib, variant), clock = c.clock.map(_.config.toClock))
 
     val baseState = c.initialFen.ifTrue(c.variant.fromPosition || c.variant.chess960) flatMap {
@@ -54,7 +53,7 @@ private object ChallengeJoiner {
           clock = c.clock.map(_.config.toClock)
         )
         if (c.variant.fromPosition && Forsyth.>>(lib, game).initial)
-          makeChess(Variant.wrap(strategygames.chess.variant.Standard)) -> none
+          makeChess(Variant.wrap(Variant.libStandard(GameLib.Chess()))) -> none
         else game                           -> baseState
     }
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)

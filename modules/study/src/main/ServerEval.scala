@@ -1,7 +1,7 @@
 package lila.study
 
 import strategygames.format.pgn.Glyphs
-import strategygames.format.{ Forsyth, Uci, UciDump }
+import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
 import strategygames.variant.Variant
 import strategygames.{ Division, Game, GameLib, Replay, White }
 import play.api.libs.json._

@@ -61,7 +61,7 @@ case class Chapter(
     updateRoot(_.forceVariationAt(force, path))
 
   def opening: Option[FullOpening] =
-    if (!Variant.openingSensibleVariants(GameLib.Chess(), setup.variant)) none
+    if (!Variant.openingSensibleVariants(GameLib.Chess())(setup.variant)) none
     else FullOpeningDB searchInFens root.mainline.map(_.fen)
 
   def isEmptyInitial = order == 1 && root.children.nodes.isEmpty
@@ -75,7 +75,7 @@ case class Chapter(
     )
 
   private def tagsResultColor = tags.resultColor match {
-    case Some(Some(strategygames.Color.Chess(color))) => Some(Some(color))
+    case Some(Some(strategygames.Color(color))) => Some(Some(color))
     case Some(None) => Some(None)
     case None => None
     case _ => sys.error("Not implemented for draughts yet")

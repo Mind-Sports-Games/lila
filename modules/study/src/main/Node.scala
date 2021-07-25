@@ -3,6 +3,7 @@ package lila.study
 import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.{ UciCharPair }
+import strategygames.variant.Variant
 import strategygames.chess.variant.Crazyhouse
 
 import strategygames.Centis

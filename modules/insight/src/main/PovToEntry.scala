@@ -63,7 +63,7 @@ final private class PovToEntry(
               provisional = provisional,
               initialFen = fen,
               analysis = an,
-              division = Divider(boards.toList),
+              division = Divider(GameLib.Chess(), boards.toList),
               moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
               boards = boards,
               movetimes = movetimes,
@@ -76,7 +76,7 @@ final private class PovToEntry(
           }
       }
 
-  private def pgnMoveToRole(pgn: String): Role = Role.pgnMoveToRole(pgn.head)
+  private def pgnMoveToRole(pgn: String): Role = Role.pgnMoveToRole(GameLib.Chess(), pgn.head)
 
   private def makeMoves(from: RichPov): List[InsightMove] = {
     val cpDiffs = ~from.moveAccuracy toVector
@@ -160,7 +160,7 @@ final private class PovToEntry(
       from.division.end.fold(from.boards.last.some)(from.boards.toList.lift) match {
         case Some(board) =>
           Color.all.forall { color =>
-            !board.hasPiece(Piece(color, Role.ChessRole(strategygames.chess.Role.Queen)))
+            !board.hasPiece(Piece(GameLib.Chess(), color, Role.ChessRole(strategygames.chess.Queen)))
           }
         case _ =>
           logger.warn(s"https://playstrategy.org/${from.pov.gameId} missing endgame board")

@@ -31,7 +31,7 @@ object BSONHandlers {
     implicitly[BSONHandler[List[StudyTopic]]].as[StudyTopics](StudyTopics.apply, _.value)
 
   implicit private val PosBSONHandler = tryHandler[Pos](
-    { case BSONString(v) => Pos.fromKey(v) toTry s"No such pos: $v" },
+    { case BSONString(v) => Pos.fromKey(GameLib.Chess(), v) toTry s"No such pos: $v" },
     x => BSONString(x.key)
   )
 
@@ -50,17 +50,17 @@ object BSONHandlers {
   }
 
   implicit val PromotableRoleHandler = tryHandler[PromotableRole](
-    { case BSONString(v) => v.headOption flatMap Role.allPromotableByForsyth.get toTry s"No such role: $v" },
+    { case BSONString(v) => v.headOption flatMap Role.allPromotableByForsyth(GameLib.Chess()).get toTry s"No such role: $v" },
     x => BSONString(x.forsyth.toString)
   )
 
   implicit val RoleHandler = tryHandler[Role](
-    { case BSONString(v) => v.headOption flatMap Role.allByForsyth.get toTry s"No such role: $v" },
+    { case BSONString(v) => v.headOption flatMap Role.allByForsyth(GameLib.Chess()).get toTry s"No such role: $v" },
     x => BSONString(x.forsyth.toString)
   )
 
   implicit val UciHandler = tryHandler[Uci](
-    { case BSONString(v) => Uci(v) toTry s"Bad UCI: $v" },
+    { case BSONString(v) => Uci(GameLib.Chess(), v) toTry s"Bad UCI: $v" },
     x => BSONString(x.uci)
   )
 
@@ -117,7 +117,7 @@ object BSONHandlers {
       private def readPocket(p: String)             = Crazyhouse.Pocket(p.view.flatMap(strategygames.chess.Role.forsyth).toList)
       def reads(r: Reader) =
         Crazyhouse.Data(
-          promoted = r.getsD[Pos]("o").toSet,
+          promoted = r.getsD[strategygames.chess.Pos]("o").toSet,
           pockets = Crazyhouse.Pockets(
             white = readPocket(r.strD("w")),
             black = readPocket(r.strD("b"))
@@ -177,7 +177,7 @@ object BSONHandlers {
     } yield Node(
       id,
       ply,
-      WithSan(uci, san),
+      WithSan(GameLib.Chess(), uci, san),
       fen,
       check,
       shapes,

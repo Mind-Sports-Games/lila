@@ -7,6 +7,9 @@ import lila.i18n.{ I18nKeys => trans }
 import lila.socket.Socket.SocketVersion
 import lila.socket.UserLagCache
 
+import strategygames.GameLib
+import strategygames.variant.Variant
+
 final class JsonView(
     baseUrl: lila.common.config.BaseUrl,
     getLightUser: lila.common.LightUser.GetterSync,
@@ -86,7 +89,7 @@ final class JsonView(
       .add("declineReason" -> c.declineReason.map(_.trans.txt()))
 
   private def iconChar(c: Challenge) =
-    if (c.variant == strategygames.chess.variant.FromPosition) '*'
+    if (c.variant == Variant.libFromPosition(GameLib.Chess())) '*'
     else c.perfType.iconChar
 
   private val i18nKeys = List(
