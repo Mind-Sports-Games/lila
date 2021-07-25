@@ -66,7 +66,7 @@ object BSONHandlers {
       val variant = r.intO("variant").fold[Variant](Variant.default(GameLib.Chess()))(v => Variant.orDefault(GameLib.Chess(), v))
       val position: Option[FEN] =
         r.getO[FEN]("fen").filterNot(_.initial) orElse
-          r.strO("eco").flatMap(Thematic.byEco).map(_.fen) // for BC
+          r.strO("eco").flatMap(Thematic.byEco).map(f => FEN.wrap(f.fen)) // for BC
       val startsAt   = r date "startsAt"
       val conditions = r.getO[Condition.All]("conditions") getOrElse Condition.All.empty
       Tournament(

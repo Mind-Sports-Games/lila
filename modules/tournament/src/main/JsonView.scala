@@ -279,7 +279,7 @@ final class JsonView(
     Json
       .obj(
         "id"          -> game.id,
-        "fen"         -> Forsyth.boardAndColor(GameLib.Chess(), game.situation).value,
+        "fen"         -> Forsyth.boardAndColor(GameLib.Chess(), game.situation),
         "orientation" -> game.naturalOrientation.name,
         "color"       -> game.naturalOrientation.name, // app BC https://github.com/ornicar/lila/issues/7195
         "lastMove"    -> ~game.lastMoveKeys,
