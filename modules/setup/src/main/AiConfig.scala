@@ -1,12 +1,15 @@
 package lila.setup
 
-import strategygames.chess.format.FEN
+import strategygames.Color.{ Black, White }
+import strategygames.{ Game => StratGame, GameLib }
+import strategygames.format.FEN
+import strategygames.variant.Variant
 import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.Color
 import lila.user.User
 
 case class AiConfig(
-    variant: strategygames.chess.variant.Variant,
+    variant: strategygames.variant.Variant,
     timeMode: TimeMode,
     time: Double,
     increment: Int,
@@ -54,20 +57,22 @@ case class AiConfig(
 
 object AiConfig extends BaseConfig {
 
+  val lib = GameLib.Chess()
+
   def from(v: Int, tm: Int, t: Double, i: Int, d: Int, level: Int, c: String, fen: Option[String]) =
     new AiConfig(
-      variant = strategygames.chess.variant.Variant(v) err "Invalid game variant " + v,
+      variant = Variant.wrap(strategygames.chess.variant.Variant(v) err "Invalid game variant " + v),
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
       increment = i,
       days = d,
       level = level,
       color = Color(c) err "Invalid color " + c,
-      fen = fen map FEN.apply
+      fen = fen.map(f => FEN.apply(lib, f))
     )
 
   val default = AiConfig(
-    variant = variantDefault,
+    variant = Variant.wrap(variantDefault),
     timeMode = TimeMode.Unlimited,
     time = 5d,
     increment = 8,
@@ -89,7 +94,7 @@ object AiConfig extends BaseConfig {
 
     def reads(r: BSON.Reader): AiConfig =
       AiConfig(
-        variant = strategygames.chess.variant.Variant orDefault (r int "v"),
+        variant = strategygames.variant.Variant.orDefault(GameLib(r intD "l"), r int "v"),
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",
         increment = r int "i",

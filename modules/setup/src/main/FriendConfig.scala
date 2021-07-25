@@ -1,13 +1,14 @@
 package lila.setup
 
-import strategygames.Mode
-import strategygames.chess.format.FEN
+import strategygames.{ GameLib, Mode }
+import strategygames.variant.Variant
+import strategygames.format.FEN
 import lila.lobby.Color
 import lila.rating.PerfType
 import lila.game.PerfPicker
 
 case class FriendConfig(
-    variant: strategygames.chess.variant.Variant,
+    variant: strategygames.variant.Variant,
     timeMode: TimeMode,
     time: Double,
     increment: Int,
@@ -29,20 +30,22 @@ case class FriendConfig(
 
 object FriendConfig extends BaseHumanConfig {
 
+  val lib = GameLib.Chess()
+
   def from(v: Int, tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String]) =
     new FriendConfig(
-      variant = strategygames.chess.variant.Variant(v) err "Invalid game variant " + v,
+      variant = Variant.wrap(strategygames.chess.variant.Variant(v) err "Invalid game variant " + v),
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
       increment = i,
       days = d,
       mode = m.fold(Mode.default)(Mode.orDefault),
       color = Color(c) err "Invalid color " + c,
-      fen = fen map FEN.apply
+      fen = fen.map(f => FEN.apply(lib, f))
     )
 
   val default = FriendConfig(
-    variant = variantDefault,
+    variant = Variant.wrap(variantDefault),
     timeMode = TimeMode.Unlimited,
     time = 5d,
     increment = 8,
@@ -58,7 +61,7 @@ object FriendConfig extends BaseHumanConfig {
 
     def reads(r: BSON.Reader): FriendConfig =
       FriendConfig(
-        variant = strategygames.chess.variant.Variant orDefault (r int "v"),
+        variant = strategygames.variant.Variant.orDefault(GameLib(r intD "l"), r int "v"),
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",
         increment = r int "i",
@@ -70,6 +73,7 @@ object FriendConfig extends BaseHumanConfig {
 
     def writes(w: BSON.Writer, o: FriendConfig) =
       $doc(
+        "l"  -> o.variant.gameLib.id,
         "v"  -> o.variant.id,
         "tm" -> o.timeMode.id,
         "t"  -> o.time,

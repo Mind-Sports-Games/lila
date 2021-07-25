@@ -5,6 +5,8 @@ import play.api.libs.json._
 import lila.common.LightUser
 import lila.game.{ Game, GameRepo }
 import lila.user.User
+import strategygames.GameLib
+import strategygames.variant.{ Variant => StratVariant }
 
 final class JsonView(
     gameRepo: GameRepo,
@@ -96,7 +98,7 @@ final class JsonView(
   private def variantJson(speed: strategygames.Speed)(v: strategygames.chess.variant.Variant) =
     Json.obj(
       "key"  -> v.key,
-      "icon" -> lila.game.PerfPicker.perfType(speed, v, none).map(_.iconChar.toString),
+      "icon" -> lila.game.PerfPicker.perfType(speed, StratVariant.wrap(v), none).map(_.iconChar.toString),
       "name" -> v.name
     )
 
@@ -127,7 +129,7 @@ final class JsonView(
       .obj(
         "id"       -> g.id,
         "status"   -> g.status.id,
-        "fen"      -> (strategygames.chess.format.Forsyth boardAndColor g.situation),
+        "fen"      -> (strategygames.format.Forsyth.boardAndColor(GameLib.Chess(), g.situation)),
         "lastMove" -> ~g.lastMoveKeys,
         "orient"   -> g.playerByUserId(hostId).map(_.color)
       )

@@ -1,8 +1,11 @@
 package lila.setup
 
 import strategygames.Clock
-import strategygames.chess.format.FEN
-import strategygames.chess.variant.{ FromPosition, Variant }
+import strategygames.Color.{ Black, White }
+import strategygames.{ Game => StratGame, GameLib }
+import strategygames.variant.Variant
+import strategygames.format.FEN
+import strategygames.chess.variant.{ FromPosition }
 
 import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.Color
@@ -57,13 +60,14 @@ final case class ApiAiConfig(
   def pov(user: Option[User]) = Pov(game(user), creatorColor)
 
   def autoVariant =
-    if (variant.standard && fen.exists(!_.initial)) copy(variant = FromPosition)
+    if (variant.standard && fen.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
     else this
 }
 
 object ApiAiConfig extends BaseConfig {
 
   // lazy val clockLimitSeconds: Set[Int] = Set(0, 15, 30, 45, 60, 90) ++ (2 to 180).view.map(60 *).toSet
+  val lib = GameLib.Chess()
 
   def from(
       l: Int,
@@ -74,11 +78,11 @@ object ApiAiConfig extends BaseConfig {
       pos: Option[String]
   ) =
     new ApiAiConfig(
-      variant = strategygames.chess.variant.Variant.orDefault(~v),
+      variant = Variant.wrap(strategygames.chess.variant.Variant.orDefault(~v)),
       clock = cl,
       daysO = d,
       color = Color.orDefault(~c),
       level = l,
-      fen = pos map FEN.apply
+      fen = pos.map(f => FEN.apply(lib, f))
     ).autoVariant
 }

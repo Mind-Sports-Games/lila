@@ -9,6 +9,7 @@ import scala.util.{ Failure, Success, Try }
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
 import strategygames.Color
+import strategygames.format.{ FEN => StratFEN }
 import strategygames.chess.format.FEN
 import strategygames.chess.variant.Variant
 import io.lemonlabs.uri.AbsoluteUrl
@@ -124,6 +125,8 @@ trait Handlers {
   implicit val colorBoolHandler = BSONBooleanHandler.as[Color](Color.fromWhite, _.white)
 
   implicit val FENHandler: BSONHandler[FEN] = stringAnyValHandler[FEN](_.value, FEN.apply)
+  // TODO: DRAUGHTS - probably something we need to fix for draughts
+  implicit val StratFENHandler: BSONHandler[StratFEN] = stringAnyValHandler[StratFEN](_.value, f => StratFEN.wrap(FEN(f)))
 
   implicit val modeHandler = BSONBooleanHandler.as[strategygames.Mode](strategygames.Mode.apply, _.rated)
 

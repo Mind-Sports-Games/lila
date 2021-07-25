@@ -1,6 +1,8 @@
 package lila.setup
 
-import strategygames.chess.format.{ FEN, Forsyth }
+import strategygames.GameLib
+import strategygames.variant.{ Variant => StratVariant }
+import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.variant.Chess960
 import strategygames.chess.variant.FromPosition
 import strategygames.{ Clock, Speed }
@@ -22,7 +24,7 @@ final case class ApiConfig(
     message: Option[Template]
 ) {
 
-  def perfType: Option[PerfType] = PerfPicker.perfType(strategygames.Speed(clock), variant, days)
+  def perfType: Option[PerfType] = PerfPicker.perfType(strategygames.Speed(clock), StratVariant.wrap(variant), days)
 
   def validFen = ApiConfig.validFen(variant, position)
 
@@ -43,6 +45,7 @@ final case class ApiConfig(
 object ApiConfig extends BaseHumanConfig {
 
   lazy val clockLimitSeconds: Set[Int] = Set(0, 15, 30, 45, 60, 90) ++ (2 to 180).view.map(60 *).toSet
+  val lib = GameLib.Chess()
 
   def from(
       v: Option[String],
@@ -60,16 +63,17 @@ object ApiConfig extends BaseHumanConfig {
       days = d,
       rated = r,
       color = Color.orDefault(~c),
-      position = pos map FEN.apply,
+      position = pos.map(f => FEN.apply(lib, f)),
       acceptByToken = tok,
       message = msg map Template
     ).autoVariant
 
   def validFen(variant: Variant, fen: Option[FEN]) =
-    if (variant.chess960) fen.forall(f => Chess960.positionNumber(f).isDefined)
+    // TODO: This .get is unsafe
+    if (variant.chess960) fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
     else if (variant.fromPosition)
       fen exists { f =>
-        (Forsyth <<< f).exists(_.situation playable false)
+        (Forsyth.<<<(lib, f)).exists(_.situation playable false)
       }
     else true
 }

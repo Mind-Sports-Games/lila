@@ -1,9 +1,10 @@
 package lila.setup
 
-import strategygames.chess.{ Game => ChessGame, Situation }
-import strategygames.{ Clock, Speed }
-import strategygames.chess.variant.{ FromPosition, Variant }
-import strategygames.chess.format.FEN
+import strategygames.{ Clock, Game => StratGame, GameLib, Situation, Speed }
+import strategygames.variant.Variant
+import strategygames.format.FEN
+import strategygames.chess.{ Game => ChessGame }
+import strategygames.chess.variant.{ FromPosition }
 
 import lila.game.Game
 import lila.lobby.Color
@@ -32,10 +33,10 @@ private[setup] trait Config {
 
   lazy val creatorColor = color.resolve
 
-  def makeGame(v: Variant): ChessGame =
-    ChessGame(situation = Situation(v), clock = makeClock.map(_.toClock(strategygames.GameLib.Chess())))
+  def makeGame(v: Variant): StratGame =
+    StratGame(v.gameLib, situation = Situation(v.gameLib, v), clock = makeClock.map(_.toClock))
 
-  def makeGame: ChessGame = makeGame(variant)
+  def makeGame: StratGame = makeGame(variant)
 
   def validClock = !hasClock || clockHasTime
 
@@ -56,7 +57,10 @@ private[setup] trait Config {
 
 trait Positional { self: Config =>
 
-  import strategygames.chess.format.Forsyth, Forsyth.SituationPlus
+  import strategygames.format.Forsyth;
+  import strategygames.format.Forsyth.SituationPlus
+
+  val lib = GameLib.Chess()
 
   def fen: Option[FEN]
 
@@ -64,33 +68,34 @@ trait Positional { self: Config =>
 
   lazy val validFen = variant != FromPosition || {
     fen exists { f =>
-      (Forsyth <<< f).exists(_.situation playable strictFen)
+      (Forsyth.<<<(lib, f)).exists(_.situation playable strictFen)
     }
   }
 
-  def fenGame(builder: ChessGame => Game): Game = {
+  def fenGame(builder: StratGame => Game): Game = {
     val baseState = fen ifTrue (variant.fromPosition) flatMap {
-      Forsyth.<<<@(FromPosition, _)
+      Forsyth.<<<@(lib, Variant.wrap(FromPosition), _)
     }
     val (chessGame, state) = baseState.fold(makeGame -> none[SituationPlus]) {
       case sit @ SituationPlus(s, _) =>
-        val game = ChessGame(
+        val game = StratGame(
+          s.gameLib,
           situation = s,
           turns = sit.turns,
           startedAtTurn = sit.turns,
-          clock = makeClock.map(_.toClock(strategygames.GameLib.Chess()))
+          clock = makeClock.map(_.toClock)
         )
-        if (Forsyth.>>(game).initial) makeGame(strategygames.chess.variant.Standard) -> none
+        if (Forsyth.>>(lib, game).initial) makeGame(Variant.wrap(strategygames.chess.variant.Standard)) -> none
         else game                                                      -> baseState
     }
     val game = builder(chessGame)
-    state.fold(game) { case sit @ SituationPlus(Situation(board, _), _) =>
+    state.fold(game) { case sit @ SituationPlus(s, _) =>
       game.copy(
         chess = game.chess.copy(
           situation = game.situation.copy(
             board = game.board.copy(
-              history = board.history,
-              variant = FromPosition
+              history = s.board.history,
+              variant = Variant.wrap(FromPosition)
             )
           ),
           turns = sit.turns
@@ -103,8 +108,10 @@ trait Positional { self: Config =>
 object Config extends BaseConfig
 
 trait BaseConfig {
+  val gameLibs       = List(strategygames.GameLib.Chess().id, strategygames.GameLib.Draughts().id)
   val variants       = List(strategygames.chess.variant.Standard.id, strategygames.chess.variant.Chess960.id)
   val variantDefault = strategygames.chess.variant.Standard
+  val variantDefaultStrat = Variant.Chess(strategygames.chess.variant.Standard)
 
   val variantsWithFen = variants :+ FromPosition.id
   val aiVariants = variants :+

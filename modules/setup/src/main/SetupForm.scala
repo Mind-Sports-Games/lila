@@ -1,7 +1,8 @@
 package lila.setup
 
-import strategygames.chess.format.FEN
-import strategygames.chess.variant.Variant
+import strategygames.format.FEN
+import strategygames.GameLib
+import strategygames.variant.Variant
 import strategygames.Centis
 import play.api.data._
 import play.api.data.Forms._
@@ -17,7 +18,7 @@ object SetupForm {
 
   def aiFilled(fen: Option[FEN]): Form[AiConfig] =
     ai fill fen.foldLeft(AiConfig.default) { case (config, f) =>
-      config.copy(fen = f.some, variant = strategygames.chess.variant.FromPosition)
+      config.copy(fen = f.some, variant = Variant.wrap(strategygames.chess.variant.FromPosition))
     }
 
   lazy val ai = Form(
@@ -37,7 +38,7 @@ object SetupForm {
 
   def friendFilled(fen: Option[FEN])(implicit ctx: UserContext): Form[FriendConfig] =
     friend(ctx) fill fen.foldLeft(FriendConfig.default) { case (config, f) =>
-      config.copy(fen = f.some, variant = strategygames.chess.variant.FromPosition)
+      config.copy(fen = f.some, variant = Variant.wrap(strategygames.chess.variant.FromPosition))
     }
 
   def friend(ctx: UserContext) =
@@ -63,6 +64,7 @@ object SetupForm {
   def hook(implicit ctx: UserContext) =
     Form(
       mapping(
+        "lib"         -> gameLibs,
         "variant"     -> variantWithVariants,
         "timeMode"    -> timeMode,
         "time"        -> time,
@@ -86,7 +88,7 @@ object SetupForm {
       "ratingRange" -> optional(ratingRange)
     )((t, i, v, r, c, g) =>
       HookConfig(
-        variant = v.flatMap(Variant.apply) | Variant.default,
+        variant = v.flatMap(v => Variant.apply(GameLib.Chess(), v)) | Variant.default(GameLib.Chess()),
         timeMode = TimeMode.RealTime,
         time = t,
         increment = i,
@@ -115,7 +117,7 @@ object SetupForm {
     lazy val clock = "clock" -> optional(clockMapping)
 
     lazy val variant =
-      "variant" -> optional(text.verifying(Variant.byKey.contains _))
+      "variant" -> optional(text.verifying(Variant.byKey(GameLib.Chess()).contains _))
 
     lazy val message = optional(
       nonEmptyText.verifying(
