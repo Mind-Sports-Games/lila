@@ -1,7 +1,8 @@
 package lila.simul
 
 import cats.implicits._
-import strategygames.chess.format.FEN
+import strategygames.format.FEN
+import strategygames.variant.Variant
 import strategygames.chess.StartingPosition
 import org.joda.time.DateTime
 import play.api.data._
@@ -144,7 +145,7 @@ object SimulForm {
         hostExtraTime = clockExtra * 60
       )
 
-    def actualVariants = variants.flatMap { strategygames.chess.variant.Variant(_) }
+    def actualVariants = variants.flatMap { id => strategygames.chess.variant.Variant(id).map(Variant.wrap) }
 
     def realPosition = position.filterNot(_.initial)
   }

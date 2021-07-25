@@ -95,10 +95,10 @@ final class JsonView(
       "text"       -> simul.text
     )
 
-  private def variantJson(speed: strategygames.Speed)(v: strategygames.chess.variant.Variant) =
+  private def variantJson(speed: strategygames.Speed)(v: strategygames.variant.Variant) =
     Json.obj(
       "key"  -> v.key,
-      "icon" -> lila.game.PerfPicker.perfType(speed, StratVariant.wrap(v), none).map(_.iconChar.toString),
+      "icon" -> lila.game.PerfPicker.perfType(speed, v, none).map(_.iconChar.toString),
       "name" -> v.name
     )
 

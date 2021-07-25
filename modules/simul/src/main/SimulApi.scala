@@ -88,7 +88,7 @@ final class SimulApi(
       if (simul.nbAccepted >= Game.maxPlayingRealtime) simul
       else {
         timeline ! (Propagate(SimulJoin(user.id, simul.id, simul.fullName)) toFollowersOf user.id)
-        Variant(variantKey).filter(simul.variants.contains).fold(simul) { variant =>
+        Variant(GameLib.Chess(), variantKey).filter(simul.variants.contains).fold(simul) { variant =>
           simul addApplicant SimulApplicant.make(
             SimulPlayer.make(
               user,
@@ -247,7 +247,8 @@ final class SimulApi(
             lila.game.PerfPicker.mainOrDefault(strategygames.Speed(clock.config), pairing.player.variant, none)
           game1 = Game.make(
             chess = strategygames.Game(
-                variantOption = Some {
+                GameLib.Chess(),
+                variant = Some {
                   if (simul.position.isEmpty) pairing.player.variant
                   else Variant.libFromPosition(GameLib.Chess())
                 },

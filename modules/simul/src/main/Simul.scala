@@ -1,8 +1,8 @@
 package lila.simul
 
 import strategygames.Color
-import strategygames.chess.format.FEN
-import strategygames.chess.variant.Variant
+import strategygames.format.FEN
+import strategygames.variant.Variant
 import strategygames.{ Speed }
 import org.joda.time.DateTime
 
@@ -176,7 +176,7 @@ object Simul {
       hostGameId = none,
       createdAt = DateTime.now,
       estimatedStartAt = estimatedStartAt,
-      variants = if (position.isDefined) List(strategygames.chess.variant.Standard) else variants,
+      variants = if (position.isDefined) List(Variant.wrap(strategygames.chess.variant.Standard)) else variants,
       position = position,
       applicants = Nil,
       pairings = Nil,

@@ -3,14 +3,17 @@ package lila.simul
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 
+import strategygames.GameLib
+import strategygames.Color.{ Black, White }
 import strategygames.Status
-import strategygames.chess.variant.Variant
+import strategygames.variant.Variant
 import lila.db.BSON
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.dsl._
 import lila.user.User
 
 final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+  val lib = GameLib.Chess()
 
   implicit private val SimulStatusBSONHandler = tryHandler[SimulStatus](
     { case BSONInteger(v) => SimulStatus(v) toTry s"No such simul status: $v" },
@@ -18,7 +21,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
   )
   implicit private val ChessStatusBSONHandler = lila.game.BSONHandlers.StatusBSONHandler
   implicit private val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(v) toTry s"No such variant: $v" },
+    { case BSONInteger(v) => Variant(lib, v) toTry s"No such variant: $v" },
     x => BSONInteger(x.id)
   )
   import strategygames.Clock.Config
