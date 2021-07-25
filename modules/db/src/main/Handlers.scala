@@ -8,8 +8,9 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import strategygames.Color
+import strategygames.{ Color, GameLib }
 import strategygames.format.{ FEN => StratFEN }
+import strategygames.variant.{ Variant => StratVariant }
 import strategygames.chess.format.FEN
 import strategygames.chess.variant.Variant
 import io.lemonlabs.uri.AbsoluteUrl

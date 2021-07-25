@@ -1,9 +1,11 @@
 package lila.challenge
 
-import strategygames.chess.format.Forsyth
-import strategygames.chess.format.Forsyth.SituationPlus
-import strategygames.chess.{ Situation }
-import strategygames.{ Color, Mode }
+import strategygames.Situation
+import strategygames.{ Color, GameLib, Mode }
+import strategygames.Color.{ Black, White }
+import strategygames.format.Forsyth
+import strategygames.format.Forsyth.SituationPlus
+import strategygames.variant.Variant
 import scala.util.chaining._
 
 import lila.game.{ Game, Player, Pov, Source }
@@ -28,6 +30,7 @@ final private class ChallengeJoiner(
 }
 
 private object ChallengeJoiner {
+  val lib = GameLib.Chess()
 
   def createGame(
       c: Challenge,
@@ -35,22 +38,23 @@ private object ChallengeJoiner {
       destUser: Option[User],
       color: Option[Color]
   ): Game = {
-    def makeChess(variant: strategygames.chess.variant.Variant): strategygames.chess.Game =
-      strategygames.chess.Game(situation = Situation(variant), clock = c.clock.map(_.config.toClock(strategygames.GameLib.Chess())))
+    def makeChess(variant: strategygames.variant.Variant): strategygames.Game =
+      strategygames.Game(lib, situation = Situation(lib, variant), clock = c.clock.map(_.config.toClock))
 
     val baseState = c.initialFen.ifTrue(c.variant.fromPosition || c.variant.chess960) flatMap {
-      Forsyth.<<<@(c.variant, _)
+      Forsyth.<<<@(lib, c.variant, _)
     }
     val (chessGame, state) = baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
       case sp @ SituationPlus(sit, _) =>
-        val game = strategygames.chess.Game(
+        val game = strategygames.Game(
+          lib = lib,
           situation = sit,
           turns = sp.turns,
           startedAtTurn = sp.turns,
-          clock = c.clock.map(_.config.toClock(strategygames.GameLib.Chess()))
+          clock = c.clock.map(_.config.toClock)
         )
-        if (c.variant.fromPosition && Forsyth.>>(game).initial)
-          makeChess(strategygames.chess.variant.Standard) -> none
+        if (c.variant.fromPosition && Forsyth.>>(lib, game).initial)
+          makeChess(Variant.wrap(strategygames.chess.variant.Standard)) -> none
         else game                           -> baseState
     }
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
@@ -66,11 +70,11 @@ private object ChallengeJoiner {
       )
       .withId(c.id)
       .pipe { g =>
-        state.fold(g) { case sit @ SituationPlus(Situation(board, _), _) =>
+        state.fold(g) { case sit @ SituationPlus(s, _) =>
           g.copy(
             chess = g.chess.copy(
               situation = g.situation.copy(
-                board = g.board.copy(history = board.history)
+                board = g.board.copy(history = s.board.history)
               ),
               turns = sit.turns
             )

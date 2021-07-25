@@ -2,7 +2,8 @@ package lila.challenge
 
 import reactivemongo.api.bson._
 
-import strategygames.chess.variant.Variant
+import strategygames.GameLib
+import strategygames.variant.Variant
 import lila.db.BSON
 import lila.db.BSON.{ Reader, Writer }
 import lila.db.dsl._
@@ -40,7 +41,7 @@ private object BSONHandlers {
       }
   }
   implicit val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(v) toTry s"No such variant: $v" },
+    { case BSONInteger(v) => Variant(GameLib.Chess(), v) toTry s"No such variant: $v" },
     x => BSONInteger(x.id)
   )
   implicit val StatusBSONHandler = tryHandler[Status](

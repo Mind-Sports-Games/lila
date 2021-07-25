@@ -1,13 +1,14 @@
 package lila.setup
 
 import akka.stream.scaladsl._
-import strategygames.chess.variant.Variant
-import strategygames.{ Clock, Mode }
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.json.Json
 import scala.concurrent.duration._
+
+import strategygames.{ Clock, GameLib, Mode }
+import strategygames.variant.Variant
 
 import lila.game.Game
 import lila.game.IdGenerator
@@ -66,7 +67,7 @@ object SetupBulk {
       ) =>
         BulkFormData(
           tokens,
-          Variant orDefault ~variant,
+          Variant.orDefault(GameLib.Chess(), ~variant),
           clock,
           rated,
           pairTs.map { new DateTime(_) },

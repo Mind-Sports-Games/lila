@@ -2,11 +2,12 @@ package lila.challenge
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
-import strategygames.chess.{ Situation }
-import strategygames.{ Speed }
 import org.joda.time.DateTime
 import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
+
+import strategygames.{ GameLib, Situation, Speed }
+import strategygames.Color.{ Black, White }
 
 import lila.common.Bus
 import lila.common.LilaStream
@@ -92,6 +93,7 @@ final class ChallengeBulkApi(
   }
 
   private def makePairings(bulk: ScheduledBulk): Funit = {
+    val lib = GameLib.Chess()
     val perfType = PerfType(bulk.variant, Speed(bulk.clock))
     Source(bulk.games)
       .mapAsyncUnordered(8) { game =>
@@ -103,7 +105,7 @@ final class ChallengeBulkApi(
       .map { case (id, white, black) =>
         val game = Game
           .make(
-            chess = strategygames.chess.Game(situation = Situation(bulk.variant), clock = bulk.clock.toClock(strategygames.GameLib.Chess()).some),
+            chess = strategygames.Game(lib, situation = Situation(lib, bulk.variant), clock = bulk.clock.toClock.some),
             whitePlayer = Player.make(White, white.some, _(perfType)),
             blackPlayer = Player.make(Black, black.some, _(perfType)),
             mode = bulk.mode,
