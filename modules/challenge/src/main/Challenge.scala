@@ -1,10 +1,9 @@
 package lila.challenge
 
-import strategygames.Color.{ Black, White }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Chess960, Horde, RacingKings, LinesOfAction }
-import strategygames.{ Color, Mode, Speed }
+import strategygames.chess.variant.{ Chess960, FromPosition, Horde, RacingKings, LinesOfAction }
+import strategygames.{ Black, Color, GameLib, Mode, Speed, White }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
@@ -92,7 +91,7 @@ case class Challenge(
   def notableInitialFen: Option[FEN] =
     variant match {
       case Variant.Chess(variant) => variant match {
-        case Variant.libFromPosition(GameLib.Chess()) | Horde | RacingKings | Chess960 | LinesOfAction => initialFen
+        case FromPosition | Horde | RacingKings | Chess960 | LinesOfAction => initialFen
         case _                                             => none
       }
       case _                                             => none
@@ -203,7 +202,7 @@ object Challenge {
         }
       )
       .orElse {
-        (variant == Variant.libFromPosition(GameLib.Chess())) option perfTypeOf(Variant.wrap(Variant.libStandard(GameLib.Chess())), timeControl)
+        (variant == Variant.libFromPosition(GameLib.Chess())) option perfTypeOf(Variant.libStandard(GameLib.Chess()), timeControl)
       }
       .|(PerfType.Correspondence)
 
@@ -242,8 +241,8 @@ object Challenge {
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (variant == FromPosition) initialFen
-        else if (variant == Chess960) initialFen filter { fen =>
+        if (variant == Variant.libFromPosition(GameLib.Chess())) initialFen
+        else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
           fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
         }
         else !variant.standardInitialPosition option variant.initialFen,

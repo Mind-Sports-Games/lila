@@ -2,10 +2,11 @@ package lila.study
 
 import cats.data.Validated
 import strategygames.Centis
-import strategygames.chess.format.pgn.{ Dumper, ParsedPgn }
-import strategygames.format.pgn.{ Glyphs, San, Tags }
-import strategygames.chess.format.{ Forsyth, Uci }
-import strategygames.format.{ UciCharPair }
+import strategygames.chess.format.pgn.{ ParsedPgn }
+import strategygames.format.pgn.{ Dumper, Glyphs, San, Tags }
+import strategygames.format.{ Forsyth, Uci, UciCharPair }
+import strategygames.variant.Variant
+import strategygames.{ Color, Game, GameLib, Status }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
@@ -15,14 +16,14 @@ object PgnImport {
 
   case class Result(
       root: Node.Root,
-      variant: strategygames.chess.variant.Variant,
+      variant: Variant,
       tags: Tags,
       end: Option[End]
   )
 
   case class End(
-      status: strategygames.Status,
-      winner: Option[strategygames.Color],
+      status: Status,
+      winner: Option[Color],
       resultText: String,
       statusText: String
   )
@@ -55,7 +56,7 @@ object PgnImport {
               End(
                 status = status,
                 winner = game.winnerColor,
-                resultText = strategygames.Color.showResult(game.winnerColor),
+                resultText = Color.showResult(game.winnerColor),
                 statusText = lila.game.StatusText(status, game.winnerColor, game.variant)
               )
             }
@@ -91,7 +92,7 @@ object PgnImport {
     Comment(Comment.Id.make, Comment.Text(text), Comment.Author.PlayStrategy)
   }
 
-  private def makeVariations(sans: List[San], game: strategygames.chess.Game, annotator: Option[Comment.Author]) =
+  private def makeVariations(sans: List[San], game: Game, annotator: Option[Comment.Author]) =
     sans.headOption.?? {
       _.metas.variations.flatMap { variation =>
         makeNode(game, variation.value, annotator)
@@ -117,7 +118,7 @@ object PgnImport {
       }
     }
 
-  private def makeNode(prev: strategygames.chess.Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
+  private def makeNode(prev: Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
     try {
       sans match {
         case Nil => none
@@ -131,10 +132,10 @@ object PgnImport {
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(
-                    id = strategygames.chess.format.UciCharPair(uci),
+                    id = UciCharPair(GameLib.Chess(), uci),
                     ply = game.turns,
-                    move = Uci.WithSan(uci, sanStr),
-                    fen = Forsyth >> game,
+                    move = Uci.WithSan(GameLib.Chess(), uci, sanStr),
+                    fen = Forsyth.>>(GameLib.Chess(), game),
                     check = game.situation.check,
                     shapes = shapes,
                     comments = comments,

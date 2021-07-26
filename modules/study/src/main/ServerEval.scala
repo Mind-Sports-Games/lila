@@ -136,7 +136,7 @@ object ServerEval {
       )
 
     private def analysisLine(root: RootOrNode, variant: Variant, info: Info): Option[Node] =
-      Replay.gameMoveWhileValid(info.variation take 20, root.fen, variant) match {
+      Replay.gameMoveWhileValid(GameLib.Chess(), info.variation take 20, root.fen, variant) match {
         case (_, games, error) =>
           error foreach { logger.info(_) }
           games.reverse match {
@@ -151,7 +151,7 @@ object ServerEval {
 
     private def makeBranch(g: Game, m: Uci.WithSan) =
       Node(
-        id = UciCharPair(m.uci),
+        id = UciCharPair(GameLib.Chess(), m.uci),
         ply = g.turns,
         move = m,
         fen = Forsyth.>>(GameLib.Chess(), g),
