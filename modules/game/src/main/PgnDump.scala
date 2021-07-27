@@ -1,7 +1,7 @@
 package lila.game
 
-import strategygames.chess.format.pgn.{ ParsedPgn, Parser, Pgn }
-import strategygames.format.pgn.{ Tag, TagType, Tags }
+import strategygames.chess.format.pgn.{ Parser, Pgn }
+import strategygames.format.pgn.{ ParsedPgn, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ pgn => chessPgn }
 import strategygames.{ Centis, Color, Status }

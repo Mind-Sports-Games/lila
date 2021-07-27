@@ -2,8 +2,7 @@ package lila.study
 
 import cats.data.Validated
 import strategygames.Centis
-import strategygames.chess.format.pgn.{ ParsedPgn }
-import strategygames.format.pgn.{ Dumper, Glyphs, San, Tags }
+import strategygames.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
 import strategygames.{ Color, Game, GameLib, Status }
