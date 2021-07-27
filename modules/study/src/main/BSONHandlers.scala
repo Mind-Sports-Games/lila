@@ -5,6 +5,7 @@ import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.variant.Variant
 import strategygames.chess.variant.Crazyhouse
 import strategygames.{ Centis, Color, GameLib, Pos, PromotableRole, Role }
+import strategygames.chess.{ Pos => ChessPos }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.Success
@@ -32,6 +33,11 @@ object BSONHandlers {
 
   implicit private val PosBSONHandler = tryHandler[Pos](
     { case BSONString(v) => Pos.fromKey(GameLib.Chess(), v) toTry s"No such pos: $v" },
+    x => BSONString(x.key)
+  )
+
+  implicit private val ChessPosBSONHandler = tryHandler[ChessPos](
+    { case BSONString(v) => ChessPos.fromKey(v) toTry s"No such pos: $v" },
     x => BSONString(x.key)
   )
 
