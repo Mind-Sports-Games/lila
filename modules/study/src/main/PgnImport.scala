@@ -37,7 +37,7 @@ object PgnImport {
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.turns,
-              fen = initialFen.map(FEN.Chess).getOrElse(game.variant.initialFen),
+              fen = initialFen.getOrElse(game.variant.initialFen),
               check = replay.setup.situation.check,
               shapes = shapes,
               comments = comments,
@@ -45,9 +45,9 @@ object PgnImport {
               clock = parsedPgn.tags.clockConfig.map(_.limit),
               crazyData = replay.setup.situation.board.crazyData,
               children = Node.Children {
-                val variations = makeVariations(parsedPgn.sans.value, strategygames.Game.wrap(replay.setup), annotator)
+                val variations = makeVariations(parsedPgn.sans.value, replay.setup, annotator)
                 makeNode(
-                  prev = strategygames.Game.wrap(replay.setup),
+                  prev = replay.setup,
                   sans = parsedPgn.sans.value,
                   annotator = annotator
                 ).fold(variations)(_ :: variations).toVector
@@ -127,9 +127,9 @@ object PgnImport {
           san(prev.situation).fold(
             _ => none, // illegal move; stop here.
             moveOrDrop => {
-              val game   = moveOrDrop.fold(prev.apply, prev.apply)
-              val uci    = moveOrDrop.fold(_.toUci, _.toUci)
-              val sanStr = moveOrDrop.fold(Dumper.apply, Dumper.apply)
+              val game   = prev.apply(moveOrDrop)
+              val uci    = moveOrDrop.fold(_.toUci, d => Uci.wrap(d.toUci))
+              val sanStr = moveOrDrop.fold(m => Dumper.apply(lib, m), d => Dumper.apply(lib, d))
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(

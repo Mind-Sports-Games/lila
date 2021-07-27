@@ -2,8 +2,9 @@ package lila.study
 
 import actorApi.Who
 import cats.data.Validated
-import strategygames.Centis
+import strategygames.{ Centis, GameLib }
 import strategygames.format.pgn.{ Glyph, Glyphs, Tags }
+import strategygames.format.FEN
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.concurrent.duration._
@@ -445,6 +446,7 @@ object StudySocket {
             (__ \ "ch").read[Chapter.Id]
         )(AtPosition.apply _)
         case class SetRole(userId: String, role: String)
+        implicit val FenReader: Reads[FEN]                               = Reads.of[String].map(s => FEN.apply(GameLib.Chess(), s))
         implicit val SetRoleReader: Reads[SetRole]                       = Json.reads[SetRole]
         implicit val ChapterDataReader: Reads[ChapterMaker.Data]         = Json.reads[ChapterMaker.Data]
         implicit val ChapterEditDataReader: Reads[ChapterMaker.EditData] = Json.reads[ChapterMaker.EditData]
