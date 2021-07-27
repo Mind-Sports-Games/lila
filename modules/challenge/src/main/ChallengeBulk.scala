@@ -33,12 +33,12 @@ final class ChallengeBulkApi(
     mode: play.api.Mode
 ) {
 
-  implicit private val gameHandler    = Macros.handler[ScheduledGame]
-  implicit private val variantHandler = variantByKeyHandler
+  implicit private val gameHandler         = Macros.handler[ScheduledGame]
+  implicit private val variantHandler      = variantByKeyHandler
   implicit private val stratVariantHandler = stratVariantByKeyHandler
-  implicit private val clockHandler   = clockConfigHandler
-  implicit private val messageHandler = stringAnyValHandler[Template](_.value, Template.apply)
-  implicit private val bulkHandler    = Macros.handler[ScheduledBulk]
+  implicit private val clockHandler        = clockConfigHandler
+  implicit private val messageHandler      = stringAnyValHandler[Template](_.value, Template.apply)
+  implicit private val bulkHandler         = Macros.handler[ScheduledBulk]
 
   private val coll = colls.bulk
 
@@ -94,7 +94,7 @@ final class ChallengeBulkApi(
   }
 
   private def makePairings(bulk: ScheduledBulk): Funit = {
-    val lib = GameLib.Chess()
+    val lib      = GameLib.Chess()
     val perfType = PerfType(bulk.variant, Speed(bulk.clock))
     Source(bulk.games)
       .mapAsyncUnordered(8) { game =>
@@ -106,7 +106,8 @@ final class ChallengeBulkApi(
       .map { case (id, white, black) =>
         val game = Game
           .make(
-            chess = strategygames.Game(lib, situation = Situation(lib, bulk.variant), clock = bulk.clock.toClock.some),
+            chess = strategygames
+              .Game(lib, situation = Situation(lib, bulk.variant), clock = bulk.clock.toClock.some),
             whitePlayer = Player.make(White, white.some, _(perfType)),
             blackPlayer = Player.make(Black, black.some, _(perfType)),
             mode = bulk.mode,
