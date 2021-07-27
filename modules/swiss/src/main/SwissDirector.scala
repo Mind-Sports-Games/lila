@@ -86,7 +86,7 @@ final private class SwissDirector(
       .make(
         chess = strategygames.Game(
           GameLib.Chess(),
-          variantOption = Some {
+          variant = Some {
             if (swiss.settings.position.isEmpty) swiss.variant
             else Variant.libFromPosition(GameLib.Chess())
           },
