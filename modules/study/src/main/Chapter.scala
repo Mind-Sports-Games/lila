@@ -80,7 +80,7 @@ case class Chapter(
     )
 
   private def tagsResultColor = tags.resultColor match {
-    case Some(Some(strategygames.Color(color))) => Some(Some(color))
+    case Some(Some(color)) => Some(Some(color))
     case Some(None) => Some(None)
     case None => None
     case _ => sys.error("Not implemented for draughts yet")

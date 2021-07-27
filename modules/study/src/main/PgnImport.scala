@@ -4,7 +4,7 @@ import cats.data.Validated
 import strategygames.Centis
 import strategygames.chess.format.pgn.{ ParsedPgn }
 import strategygames.format.pgn.{ Dumper, Glyphs, San, Tags }
-import strategygames.format.{ Forsyth, Uci, UciCharPair }
+import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
 import strategygames.{ Color, Game, GameLib, Status }
 
@@ -36,7 +36,7 @@ object PgnImport {
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.turns,
-              fen = initialFen | game.variant.initialFen,
+              fen = initialFen.map(FEN.Chess).getOrElse(game.variant.initialFen),
               check = replay.setup.situation.check,
               shapes = shapes,
               comments = comments,
@@ -44,9 +44,9 @@ object PgnImport {
               clock = parsedPgn.tags.clockConfig.map(_.limit),
               crazyData = replay.setup.situation.board.crazyData,
               children = Node.Children {
-                val variations = makeVariations(parsedPgn.sans.value, replay.setup, annotator)
+                val variations = makeVariations(parsedPgn.sans.value, strategygames.Game.wrap(replay.setup), annotator)
                 makeNode(
-                  prev = replay.setup,
+                  prev = strategygames.Game.wrap(replay.setup),
                   sans = parsedPgn.sans.value,
                   annotator = annotator
                 ).fold(variations)(_ :: variations).toVector
@@ -126,7 +126,7 @@ object PgnImport {
           san(prev.situation).fold(
             _ => none, // illegal move; stop here.
             moveOrDrop => {
-              val game   = moveOrDrop.fold(prev.apply, prev.applyDrop)
+              val game   = moveOrDrop.fold(prev.apply, prev.apply)
               val uci    = moveOrDrop.fold(_.toUci, _.toUci)
               val sanStr = moveOrDrop.fold(Dumper.apply, Dumper.apply)
               parseComments(san.metas.comments, annotator) match {
