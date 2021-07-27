@@ -126,9 +126,15 @@ object PgnImport {
           san(prev.situation).fold(
             _ => none, // illegal move; stop here.
             moveOrDrop => {
-              val game   = moveOrDrop.fold(prev.apply, prev.applyDrop)
+              val game   = moveOrDrop.fold(prev.apply, drop => prev match {
+                case Game.Chess(game) => Game.Chess(game.applyDrop(drop))
+                case _ => sys.error("Drop not implemented for any lib except Chess")
+              })
               val uci    = moveOrDrop.fold(_.toUci, _.toUci)
-              val sanStr = moveOrDrop.fold(Dumper.apply, Dumper.apply)
+              val sanStr = moveOrDrop.fold(
+                s => Dumper.apply(GameLib.Chess(), s),
+                s => strategygames.chess.format.pgn.Dumper.apply(s)
+              )
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(

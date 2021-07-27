@@ -41,12 +41,13 @@ object ServerEval {
               variant = chapter.setup.variant,
               moves =
                 UciDump(
+                  lib = GameLib.Chess(),
                   moves = chapter.root.mainline.map(_.move.san),
                   initialFen = chapter.root.fen.some,
                   variant = chapter.setup.variant
                 )
                 .toOption
-                .map(_.flatMap(Uci.apply)) | List.empty,
+                .map(_.flatMap(u => Uci.apply(GameLib.Chess(), u))) | List.empty,
               userId = userId,
               unlimited = unlimited
             )
