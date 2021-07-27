@@ -139,6 +139,14 @@ trait Handlers {
     v => BSONString(v.key)
   )
 
+  val stratVariantByKeyHandler: BSONHandler[StratVariant] = quickHandler[StratVariant](
+    {
+      case BSONString(v) => StratVariant orDefault(GameLib.Chess(), v)
+      case _             => StratVariant.default(GameLib.Chess())
+    },
+    v => BSONString(v.key)
+  )
+
   val clockConfigHandler = tryHandler[strategygames.Clock.Config](
     { case doc: BSONDocument =>
       for {

@@ -35,6 +35,7 @@ final class ChallengeBulkApi(
 
   implicit private val gameHandler    = Macros.handler[ScheduledGame]
   implicit private val variantHandler = variantByKeyHandler
+  implicit private val stratVariantHandler = stratVariantByKeyHandler
   implicit private val clockHandler   = clockConfigHandler
   implicit private val messageHandler = stringAnyValHandler[Template](_.value, Template.apply)
   implicit private val bulkHandler    = Macros.handler[ScheduledBulk]

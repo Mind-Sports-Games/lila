@@ -12,6 +12,7 @@ import lila.user.User
 object BsonHandlers {
 
   implicit val variantHandler       = variantByKeyHandler
+  implicit val stratVariantHandler  = stratVariantByKeyHandler
   implicit val clockHandler         = clockConfigHandler
   implicit val swissPointsHandler   = intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
   implicit val swissTieBreakHandler = doubleAnyValHandler[Swiss.TieBreak](_.value, Swiss.TieBreak.apply)
