@@ -14,6 +14,8 @@ import lila.tree.Node.{ Comment, Comments, Shapes }
 
 object PgnImport {
 
+  def lib = GameLib.Chess()
+
   case class Result(
       root: Node.Root,
       variant: Variant,
