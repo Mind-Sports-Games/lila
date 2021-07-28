@@ -4,6 +4,7 @@ package html.tournament
 import controllers.routes
 
 import strategygames.variant.Variant
+import strategygames.format.FEN
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -106,7 +107,7 @@ object side {
           p(
             a(targetBlank, href := pos.url)(strong(pos.eco), " ", pos.name),
             separator,
-            views.html.base.bits.fenAnalysisLink(pos.fen)
+            views.html.base.bits.fenAnalysisLink(FEN.Chess(pos.fen))
           )
         } orElse tour.position.map { fen =>
           p(

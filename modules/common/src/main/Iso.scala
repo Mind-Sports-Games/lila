@@ -2,6 +2,7 @@ package lila.common
 
 import strategygames.Centis
 import strategygames.chess.format.FEN
+import strategygames.format.{ FEN => StratFEN }
 import play.api.i18n.Lang
 
 trait Iso[A, B] {
@@ -65,4 +66,7 @@ object Iso {
   implicit val langIso = string[Lang](Lang.apply, _.toString)
 
   implicit val fenIso = string[FEN](FEN.apply, _.value)
+  implicit val stratFenIso = string[StratFEN](f => StratFEN.wrap(FEN(f)), _.value)
+  //implicit val StratFENHandler: BSONHandler[StratFEN] = stringAnyValHandler[StratFEN](_.value, f => StratFEN.wrap(FEN(f)))
+
 }

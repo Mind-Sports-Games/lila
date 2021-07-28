@@ -4,12 +4,14 @@ package html.swiss
 import controllers.routes
 
 import strategygames.variant.Variant
+import strategygames.format.FEN
 
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.markdownLinksOrRichText
 import lila.swiss.{ Swiss, SwissCondition }
+import lila.common.Form
 
 object side {
 
@@ -61,7 +63,7 @@ object side {
           div(
             a(targetBlank, href := pos.url)(strong(pos.eco), " ", pos.name),
             " • ",
-            views.html.base.bits.fenAnalysisLink(pos.fen)
+            views.html.base.bits.fenAnalysisLink(FEN.Chess(pos.fen))
           )
         } orElse s.settings.position.map { fen =>
           div(

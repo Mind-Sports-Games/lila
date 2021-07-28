@@ -3,6 +3,7 @@ package lila.common
 import org.joda.time.DateTime
 import play.api.libs.json.{ Json => PlayJson, _ }
 import strategygames.chess.format.FEN
+import strategygames.format.{ FEN => StratFEN }
 import strategygames.Centis
 
 object Json {
@@ -43,4 +44,6 @@ object Json {
   }
 
   implicit val fenFormat: Format[FEN] = stringIsoFormat[FEN](Iso.fenIso)
+  implicit val stratFenFormat: Format[StratFEN] = stringIsoFormat[StratFEN](Iso.stratFenIso)
+
 }
