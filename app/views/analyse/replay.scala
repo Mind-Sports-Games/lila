@@ -2,6 +2,7 @@ package views.html.analyse
 
 import bits.dataPanel
 import strategygames.chess.variant.Crazyhouse
+import strategygames.format.FEN
 import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.Json
@@ -21,7 +22,7 @@ object replay {
   def apply(
       pov: Pov,
       data: play.api.libs.json.JsObject,
-      initialFen: Option[strategygames.chess.format.FEN],
+      initialFen: Option[FEN],
       pgn: String,
       analysis: Option[lila.analyse.Analysis],
       analysisStarted: Boolean,

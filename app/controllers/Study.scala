@@ -592,7 +592,7 @@ final class Study(
     }
 
   def glyphs(lang: String) = Action {
-    import strategygames.chess.format.pgn.Glyph
+    import strategygames.format.pgn.Glyph
     import lila.tree.Node.glyphWriter
     import lila.i18n.{ I18nKeys => trans }
 

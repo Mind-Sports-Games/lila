@@ -1,10 +1,9 @@
 package controllers
 
-import strategygames.chess.format.Forsyth.SituationPlus
-import strategygames.chess.format.{ FEN, Forsyth }
-import strategygames.chess.variant.{ FromPosition, Standard, Variant }
-import strategygames.{ Black, Color, White }
-import strategygames.chess.Situation
+import strategygames.format.Forsyth.SituationPlus
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.variant.Variant
+import strategygames.{ Black, Color, GameLib, Mode, Situation, White }
 import play.api.libs.json.Json
 import play.api.mvc._
 import scala.concurrent.duration._
@@ -22,18 +21,18 @@ final class UserAnalysis(
 ) extends LilaController(env)
     with TheftPrevention {
 
-  def index = load("", Standard)
+  def index = load("", Variant.libStandard(GameLib.Chess()))
 
   def parseArg(arg: String) =
     arg.split("/", 2) match {
-      case Array(key) => load("", Variant orDefault key)
+      case Array(key) => load("", Variant.orDefault(GameLib.Chess(), key))
       case Array(key, fen) =>
-        Variant.byKey get key match {
+        Variant.byKey(GameLib.Chess()) get key match {
           case Some(variant)                              => load(fen, variant)
-          case _ if FEN.clean(fen) == Standard.initialFen => load(arg, Standard)
-          case _                                          => load(arg, FromPosition)
+          case _ if FEN.clean(GameLib.Chess(), fen) == Variant.libStandard(GameLib.Chess()).initialFen => load(arg, Variant.libStandard(GameLib.Chess()))
+          case _                                          => load(arg, Variant.libFromPosition(GameLib.Chess()))
         }
-      case _ => load("", Standard)
+      case _ => load("", Variant.libStandard(GameLib.Chess()))
     }
 
   def load(urlFen: String, variant: Variant) =
@@ -41,7 +40,7 @@ final class UserAnalysis(
       val decodedFen: Option[FEN] = lila.common.String
         .decodeUriPath(urlFen)
         .filter(_.trim.nonEmpty)
-        .orElse(get("fen")) map FEN.clean
+        .orElse(get("fen")) map(s => FEN.clean(GameLib.Chess(), s))
       val pov         = makePov(decodedFen, variant)
       val orientation = get("color").flatMap(Color.fromName) | pov.color
       env.api.roundApi
@@ -53,21 +52,22 @@ final class UserAnalysis(
   private[controllers] def makePov(fen: Option[FEN], variant: Variant): Pov =
     makePov {
       fen.filter(_.value.nonEmpty).flatMap {
-        Forsyth.<<<@(variant, _)
-      } | SituationPlus(Situation(variant), 1)
+        Forsyth.<<<@(GameLib.Chess(), variant, _)
+      } | SituationPlus(Situation(GameLib.Chess(), variant), 1)
     }
 
   private[controllers] def makePov(from: SituationPlus): Pov =
     Pov(
       lila.game.Game
         .make(
-          chess = strategygames.chess.Game(
+          chess = strategygames.Game(
+            lib = GameLib.Chess(),
             situation = from.situation,
             turns = from.turns
           ),
           whitePlayer = lila.game.Player.make(White, none),
           blackPlayer = lila.game.Player.make(Black, none),
-          mode = strategygames.Mode.Casual,
+          mode = Mode.Casual,
           source = lila.game.Source.Api,
           pgnImport = None
         )

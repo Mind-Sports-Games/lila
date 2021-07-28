@@ -3,6 +3,8 @@ package round
 
 import play.api.libs.json.{ JsObject, Json }
 
+import strategygames.format.FEN
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -63,7 +65,7 @@ object watcher {
     )
   }
 
-  def crawler(pov: Pov, initialFen: Option[strategygames.chess.format.FEN], pgn: strategygames.chess.format.pgn.Pgn)(implicit
+  def crawler(pov: Pov, initialFen: Option[FEN], pgn: strategygames.chess.format.pgn.Pgn)(implicit
       ctx: Context
   ) =
     bits.layout(

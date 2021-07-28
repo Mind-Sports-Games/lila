@@ -5,6 +5,9 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.game.{ Game, Pov }
 
+import strategygames.format.FEN
+import strategygames.variant.Variant
+
 import controllers.routes
 
 object bits {
@@ -21,7 +24,7 @@ object bits {
 
   def sides(
       pov: Pov,
-      initialFen: Option[strategygames.chess.format.FEN],
+      initialFen: Option[FEN],
       tour: Option[lila.tournament.TourAndTeamVs],
       cross: Option[lila.game.Crosstable.WithMatchup],
       simul: Option[lila.simul.Simul],
@@ -36,15 +39,15 @@ object bits {
     )
 
   def variantLink(
-      variant: strategygames.chess.variant.Variant,
+      variant: Variant,
       name: String,
-      initialFen: Option[strategygames.chess.format.FEN] = None
+      initialFen: Option[FEN] = None
   ) =
     a(
       cls := "variant-link",
       href := (variant match {
-        case strategygames.chess.variant.Standard => "https://en.wikipedia.org/wiki/Chess"
-        case strategygames.chess.variant.FromPosition =>
+        case Variant.Chess(strategygames.chess.variant.Standard) => "https://en.wikipedia.org/wiki/Chess"
+        case Variant.Chess(strategygames.chess.variant.FromPosition) =>
           s"""${routes.Editor.index}?fen=${initialFen.??(_.value.replace(' ', '_'))}"""
         case v => routes.Page.variant(v.key).url
       }),

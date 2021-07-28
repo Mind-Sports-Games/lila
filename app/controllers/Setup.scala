@@ -5,7 +5,9 @@ import play.api.libs.json.Json
 import play.api.mvc.Results
 import scala.concurrent.duration._
 
-import strategygames.chess.format.FEN
+import strategygames.format.FEN
+import strategygames.GameLib
+
 import lila.api.{ BodyContext, Context }
 import lila.app._
 import lila.common.{ HTTPRequest, IpAddress }
@@ -36,11 +38,11 @@ final class Setup(
   def aiForm =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        fuccess(forms aiFilled get("fen").map(FEN.clean)) map { form =>
+        fuccess(forms aiFilled get("fen").map(s => FEN.clean(GameLib.Chess(), s))) map { form =>
           html.setup.forms.ai(
             form,
             env.fishnet.aiPerfApi.intRatings,
-            form("fen").value map FEN.clean flatMap ValidFen(getBool("strict"))
+            form("fen").value map(s => FEN.clean(GameLib.Chess(), s)) flatMap ValidFen(getBool("strict"))
           )
         }
       } else Redirect(s"${routes.Lobby.home}#ai").fuccess
@@ -54,8 +56,8 @@ final class Setup(
   def friendForm(userId: Option[String]) =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req)
-        fuccess(forms friendFilled get("fen").map(FEN.clean)) flatMap { form =>
-          val validFen = form("fen").value map FEN.clean flatMap ValidFen(strict = false)
+        fuccess(forms friendFilled get("fen").map(s => FEN.clean(GameLib.Chess(), s))) flatMap { form =>
+          val validFen = form("fen").value map(s => FEN.clean(GameLib.Chess(), s)) flatMap ValidFen(strict = false)
           userId ?? env.user.repo.named flatMap {
             case None => Ok(html.setup.forms.friend(form, none, none, validFen)).fuccess
             case Some(user) =>
@@ -245,7 +247,7 @@ final class Setup(
 
   def validateFen =
     Open { implicit ctx =>
-      get("fen") map FEN.clean flatMap ValidFen(getBool("strict")) match {
+      get("fen") map(s => FEN.clean(GameLib.Chess(), s)) flatMap ValidFen(getBool("strict")) match {
         case None    => BadRequest.fuccess
         case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.color)).fuccess
       }

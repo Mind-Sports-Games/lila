@@ -1,5 +1,7 @@
 package views.html.analyse
 
+import strategygames.format.FEN
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -9,7 +11,7 @@ object replayBot {
 
   def apply(
       pov: Pov,
-      initialFen: Option[strategygames.chess.format.FEN],
+      initialFen: Option[FEN],
       pgn: String,
       simul: Option[lila.simul.Simul],
       cross: Option[lila.game.Crosstable.WithMatchup]

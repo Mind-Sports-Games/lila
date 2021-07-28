@@ -1,5 +1,9 @@
 package controllers
 
+import strategygames.variant.Variant
+import strategygames.format.FEN
+import strategygames.GameLib
+
 import akka.stream.scaladsl._
 import play.api.libs.json._
 import play.api.mvc._
@@ -331,8 +335,8 @@ final class Api(
       get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
         JsonOptionOk(
           env.evalCache.api.getEvalJson(
-            strategygames.chess.variant.Variant orDefault ~get("variant", req),
-            strategygames.chess.format.FEN(fen),
+            Variant.orDefault(GameLib.Chess(), ~get("variant", req)),
+            FEN(GameLib.Chess(), fen),
             getInt("multiPv", req) | 1
           )
         )

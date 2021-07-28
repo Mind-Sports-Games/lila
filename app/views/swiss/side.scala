@@ -3,6 +3,8 @@ package html.swiss
 
 import controllers.routes
 
+import strategygames.variant.Variant
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -31,7 +33,7 @@ object side {
               if (s.variant.exotic) {
                 views.html.game.bits.variantLink(
                   s.variant,
-                  if (s.variant == strategygames.chess.variant.KingOfTheHill) s.variant.shortName
+                  if (s.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) s.variant.shortName
                   else s.variant.name
                 )
               } else s.perfType.trans,

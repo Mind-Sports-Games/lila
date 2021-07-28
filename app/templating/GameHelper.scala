@@ -1,7 +1,8 @@
 package lila.app
 package templating
 
-import strategygames.{ Status => S, Clock, Mode, Color, Black, White }
+import strategygames.{ Status => S, Clock, Mode, Color, Black, White, GameLib }
+import strategygames.variant.Variant
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -42,7 +43,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         }
     val mode = game.mode.name
     val variant =
-      if (game.variant == strategygames.chess.variant.FromPosition) "position setup chess"
+      if (game.variant == Variant.libFromPosition(GameLib.Chess())) "position setup chess"
       else if (game.variant.exotic) game.variant.name
       else "chess"
     import strategygames.Status._
@@ -55,14 +56,14 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (_, _, Aborted)                                  => "Game has been aborted"
       case (_, _, VariantEnd) =>
         game.variant match {
-          case strategygames.chess.variant.KingOfTheHill => "King in the center"
-          case strategygames.chess.variant.ThreeCheck    => "Three checks"
-          case strategygames.chess.variant.Antichess     => "Lose all your pieces to win"
-          case strategygames.chess.variant.Atomic        => "Explode or mate your opponent's king to win"
-          case strategygames.chess.variant.Horde         => "Destroy the horde to win"
-          case strategygames.chess.variant.RacingKings   => "Race to the eighth rank to win"
-          case strategygames.chess.variant.Crazyhouse    => "Drop captured pieces on the board"
-          case strategygames.chess.variant.LinesOfAction => "Lines of Action"
+          case Variant.Chess(strategygames.chess.variant.KingOfTheHill) => "King in the center"
+          case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => "Three checks"
+          case Variant.Chess(strategygames.chess.variant.Antichess)     => "Lose all your pieces to win"
+          case Variant.Chess(strategygames.chess.variant.Atomic)        => "Explode or mate your opponent's king to win"
+          case Variant.Chess(strategygames.chess.variant.Horde)         => "Destroy the horde to win"
+          case Variant.Chess(strategygames.chess.variant.RacingKings)   => "Race to the eighth rank to win"
+          case Variant.Chess(strategygames.chess.variant.Crazyhouse)    => "Drop captured pieces on the board"
+          case Variant.Chess(strategygames.chess.variant.LinesOfAction) => "Lines of Action"
           case _                           => "Variant ending"
         }
       case _ => "Game is still being played"
@@ -71,14 +72,14 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     s"$p1 plays $p2 in a $mode $speedAndClock game of $variant. $result after $moves. Click to replay, analyse, and discuss the game!"
   }
 
-  def variantName(variant: strategygames.chess.variant.Variant)(implicit lang: Lang) =
+  def variantName(variant: Variant)(implicit lang: Lang) =
     variant match {
-      case strategygames.chess.variant.Standard     => trans.standard.txt()
-      case strategygames.chess.variant.FromPosition => trans.fromPosition.txt()
+      case Variant.Chess(strategygames.chess.variant.Standard)     => trans.standard.txt()
+      case Variant.Chess(strategygames.chess.variant.FromPosition) => trans.fromPosition.txt()
       case v                          => v.name
     }
 
-  def variantNameNoCtx(variant: strategygames.chess.variant.Variant) = variantName(variant)(defaultLang)
+  def variantNameNoCtx(variant: Variant) = variantName(variant)(defaultLang)
 
   def shortClockName(clock: Option[Clock.Config])(implicit lang: Lang): Frag =
     clock.fold[Frag](trans.unlimited())(shortClockName)
@@ -198,10 +199,10 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Cheat => trans.cheatDetected.txt()
       case S.VariantEnd =>
         game.variant match {
-          case strategygames.chess.variant.KingOfTheHill => trans.kingInTheCenter.txt()
-          case strategygames.chess.variant.ThreeCheck    => trans.threeChecks.txt()
-          case strategygames.chess.variant.RacingKings   => trans.raceFinished.txt()
-          case strategygames.chess.variant.LinesOfAction => trans.checkersConnected.txt()
+          case Variant.Chess(strategygames.chess.variant.KingOfTheHill) => trans.kingInTheCenter.txt()
+          case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => trans.threeChecks.txt()
+          case Variant.Chess(strategygames.chess.variant.RacingKings)   => trans.raceFinished.txt()
+          case Variant.Chess(strategygames.chess.variant.LinesOfAction) => trans.checkersConnected.txt()
           case _                           => trans.variantEnding.txt()
         }
       case _ => ""

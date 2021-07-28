@@ -1,7 +1,11 @@
 package views.html
 package round
 
-import strategygames.chess.variant.{ Crazyhouse, Variant }
+import strategygames.chess.variant.Crazyhouse
+import strategygames.variant.Variant
+import strategygames.format.FEN
+import strategygames.GameLib
+
 import controllers.routes
 import scala.util.chaining._
 
@@ -27,7 +31,7 @@ object bits {
       openGraph = openGraph,
       moreJs = moreJs,
       moreCss = frag(
-        cssTag { if (variant == Crazyhouse) "round.zh" else "round" },
+        cssTag { if (variant == Variant.Chess(Crazyhouse)) "round.zh" else "round" },
         ctx.blind option cssTag("round.nvui"),
         moreCss
       ),
@@ -121,7 +125,7 @@ object bits {
   )(implicit ctx: Context) =
     views.html.game.side(
       pov,
-      (data \ "game" \ "initialFen").asOpt[String].map(strategygames.chess.format.FEN.apply),
+      (data \ "game" \ "initialFen").asOpt[String].map(s => FEN.apply(GameLib.Chess(), s)),
       tour,
       simul = simul,
       userTv = userTv,

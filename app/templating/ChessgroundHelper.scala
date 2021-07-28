@@ -1,8 +1,9 @@
 package lila.app
 package templating
 
-import strategygames.chess.{ Board, Pos }
-import strategygames.Color
+//TODO: Muddled Pos here, chess specific stuff in here with ranks/files
+import strategygames.chess.Pos
+import strategygames.{Board, Color }
 import lila.api.Context
 
 import lila.app.ui.ScalatagsTemplate._
@@ -30,7 +31,7 @@ trait ChessgroundHelper {
             val pieces =
               if (ctx.pref.isBlindfold) ""
               else
-                board.pieces.map { case (pos, piece) =>
+                board.pieces.map { case (strategygames.Pos.Chess(pos), piece) =>
                   val klass = s"${piece.color.name} ${piece.role.name}"
                   s"""<piece class="$klass" style="top:${top(pos)}%;left:${left(pos)}%"></piece>"""
                 } mkString ""
@@ -44,8 +45,8 @@ trait ChessgroundHelper {
     chessground(
       board = pov.game.board,
       orient = pov.color,
-      lastMove = pov.game.history.lastMove.map(_.origDest) ?? { case (orig, dest) =>
-        List(orig, dest)
+      lastMove = pov.game.history.lastMove.map(_.origDest) ?? {
+        case (strategygames.Pos.Chess(orig), strategygames.Pos.Chess(dest)) => List(orig, dest)
       }
     )
 

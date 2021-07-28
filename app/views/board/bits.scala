@@ -1,7 +1,9 @@
 package views.html.board
 
-import strategygames.chess.format.{ FEN, Forsyth }
-import strategygames.Color
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.{ Color, Black, White, GameLib }
+import strategygames.variant.Variant
+import strategygames.Situation
 
 import controllers.routes
 import play.api.libs.json.Json
@@ -30,10 +32,10 @@ object bits {
 
   private val dataState = attr("data-state")
 
-  private def boardOrientation(variant: strategygames.chess.variant.Variant, c: Color): Orientation =
+  private def boardOrientation(variant: Variant, c: Color): Orientation =
     variant match {
-      case strategygames.chess.variant.RacingKings => Orientation.White
-      case strategygames.chess.variant.LinesOfAction => c match {
+      case Variant.Chess(strategygames.chess.variant.RacingKings)   => Orientation.White
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction) => c match {
           case White => Orientation.White
           case Black => Orientation.Right
         }
@@ -44,29 +46,35 @@ object bits {
 
   def mini(pov: Pov): Tag => Tag =
     miniWithOrientation(
-      FEN(Forsyth.boardAndColor(pov.game.situation)),
+      FEN(GameLib.Chess(), Forsyth.boardAndColor(GameLib.Chess(), pov.game.situation)),
       boardOrientation(pov),
       ~pov.game.lastMoveKeys
     ) _
 
-  def miniWithOrientation(fen: strategygames.chess.format.FEN, orientation: Orientation = Orientation.White, lastMove: String = "")(tag: Tag): Tag =
+  def miniWithOrientation(fen: FEN, orientation: Orientation = Orientation.White, lastMove: String = "")(tag: Tag): Tag =
     tag(
       cls := "mini-board mini-board--init cg-wrap is2d",
       dataState := s"${fen.value},${orientation.toString().toLowerCase()},$lastMove"
     )(cgWrapContent)
 
-  def mini(fen: strategygames.chess.format.FEN, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
+  def mini(fen: FEN, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
     miniWithOrientation(fen, colorToOrientation(color), lastMove)(tag)
 
-  def miniForVariant(fen: strategygames.chess.format.FEN, variant: strategygames.chess.variant.Variant, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
+  def miniForVariant(fen: FEN, variant: Variant, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
     miniWithOrientation(fen, boardOrientation(variant, color), lastMove)(tag)
 
 
-  def miniSpan(fen: strategygames.chess.format.FEN, color: Color = White, lastMove: String = "") =
+  def miniSpan(fen: FEN, color: Color = White, lastMove: String = "") =
     mini(fen, color, lastMove)(span)
 
+  private def sitCanCastle(sit: Situation, color: Color, side: strategygames.chess.Side): Boolean =
+    sit match {
+      case Situation.Chess(sit) => sit canCastle color on side 
+      case _ => false
+    }
+
   def jsData(
-      sit: strategygames.chess.Situation,
+      sit: Situation,
       fen: FEN
   )(implicit ctx: Context) =
     Json.obj(
@@ -74,10 +82,10 @@ object bits {
       "baseUrl" -> s"$netBaseUrl${routes.Editor.load("")}",
       "color"   -> sit.color.letter.toString,
       "castles" -> Json.obj(
-        "K" -> (sit canCastle White on strategygames.chess.KingSide),
-        "Q" -> (sit canCastle White on strategygames.chess.QueenSide),
-        "k" -> (sit canCastle Black on strategygames.chess.KingSide),
-        "q" -> (sit canCastle Black on strategygames.chess.QueenSide)
+        "K" -> sitCanCastle(sit, White, strategygames.chess.KingSide),
+        "Q" -> sitCanCastle(sit, White, strategygames.chess.QueenSide),
+        "k" -> sitCanCastle(sit, Black, strategygames.chess.KingSide),
+        "q" -> sitCanCastle(sit, Black, strategygames.chess.QueenSide)
       ),
       "animation" -> Json.obj("duration" -> ctx.pref.animationMillis),
       "is3d"      -> ctx.pref.is3d,

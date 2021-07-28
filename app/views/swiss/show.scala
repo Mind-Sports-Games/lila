@@ -1,6 +1,8 @@
 package views.html
 package swiss
 
+import strategygames.{ Black, White }
+
 import controllers.routes
 import play.api.libs.json.Json
 

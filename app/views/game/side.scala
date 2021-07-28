@@ -1,6 +1,9 @@
 package views.html
 package game
 
+import strategygames.format.FEN
+import strategygames.variant.Variant
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -15,7 +18,7 @@ object side {
 
   def apply(
       pov: lila.game.Pov,
-      initialFen: Option[strategygames.chess.format.FEN],
+      initialFen: Option[FEN],
       tour: Option[lila.tournament.TourAndTeamVs],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
@@ -28,7 +31,7 @@ object side {
 
   def meta(
       pov: lila.game.Pov,
-      initialFen: Option[strategygames.chess.format.FEN],
+      initialFen: Option[FEN],
       tour: Option[lila.tournament.TourAndTeamVs],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
@@ -50,7 +53,7 @@ object side {
                       if (game.variant.exotic)
                         bits.variantLink(
                           game.variant,
-                          (if (game.variant == strategygames.chess.variant.KingOfTheHill) game.variant.shortName
+                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) game.variant.shortName
                            else game.variant.name).toUpperCase,
                           initialFen = initialFen
                         )
@@ -66,7 +69,7 @@ object side {
                       if (game.variant.exotic)
                         bits.variantLink(
                           game.variant,
-                          (if (game.variant == strategygames.chess.variant.KingOfTheHill) game.variant.shortName
+                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) game.variant.shortName
                            else game.variant.name).toUpperCase,
                           initialFen = initialFen
                         )
@@ -118,7 +121,10 @@ object side {
         initialFen
           .ifTrue(game.variant.chess960)
           .flatMap {
-            strategygames.chess.variant.Chess960.positionNumber
+            fen => fen match {
+              case FEN.Chess(fen) => strategygames.chess.variant.Chess960.positionNumber(fen)
+              case _ => sys.error("Mismatched fen gamelib")
+            }
           }
           .map { number =>
             st.section(
