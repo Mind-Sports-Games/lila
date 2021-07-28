@@ -1,5 +1,8 @@
 package lila.api
 
+import strategygames.{ GameLib, White }
+import strategygames.format.Forsyth
+
 import play.api.libs.json.{ JsArray, JsObject, Json }
 
 import lila.game.Pov
@@ -33,7 +36,7 @@ final class LobbyApi(
       .obj(
         "fullId"   -> pov.fullId,
         "gameId"   -> pov.gameId,
-        "fen"      -> strategygames.chess.format.Forsyth.exportBoard(pov.game.board),
+        "fen"      -> Forsyth.exportBoard(GameLib.Chess(), pov.game.board),
         "color"    -> (if (pov.game.variant.racingKings) White else pov.color).name,
         "lastMove" -> ~pov.game.lastMoveKeys,
         "variant" -> Json.obj(

@@ -3,7 +3,9 @@ package lila.api
 import play.api.i18n.Lang
 import play.api.libs.json._
 
-import strategygames.chess.format.Forsyth
+import strategygames.format.Forsyth
+import strategygames.GameLib
+
 import lila.common.Json.jodaWrites
 import lila.common.LightUser
 import lila.common.paginator.Paginator
@@ -56,7 +58,7 @@ final class UserGameApi(
             .add("rating" -> p.rating)
             .add("ratingDiff" -> p.ratingDiff)
         }),
-        "fen"       -> Forsyth.exportBoard(g.board),
+        "fen"       -> Forsyth.exportBoard(GameLib.Chess(), g.board),
         "winner"    -> g.winnerColor.map(_.name),
         "bookmarks" -> g.bookmarks
       )

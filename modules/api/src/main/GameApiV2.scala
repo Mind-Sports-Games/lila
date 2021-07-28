@@ -1,8 +1,9 @@
 package lila.api
 
 import akka.stream.scaladsl._
-import strategygames.chess.format.FEN
+import strategygames.format.FEN
 import strategygames.format.pgn.Tag
+import strategygames.{ Black, White }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import scala.concurrent.duration._

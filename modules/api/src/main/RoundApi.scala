@@ -1,6 +1,6 @@
 package lila.api
 
-import strategygames.chess.format.FEN
+import strategygames.format.FEN
 import play.api.i18n.Lang
 import play.api.libs.json._
 

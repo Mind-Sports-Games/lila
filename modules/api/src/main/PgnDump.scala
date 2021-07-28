@@ -1,6 +1,6 @@
 package lila.api
 
-import strategygames.chess.format.FEN
+import strategygames.format.FEN
 import strategygames.chess.format.pgn.Pgn
 import lila.analyse.{ Analysis, Annotator }
 import lila.game.Game
