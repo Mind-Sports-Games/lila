@@ -18,7 +18,7 @@ function poolUrl(clock: ClockData, blocking?: game.PlayerUser) {
 function analysisButton(ctrl: RoundController): VNode | null {
   const d = ctrl.data,
     url = gameRoute(d, analysisBoardOrientation(d)) + '#' + ctrl.ply;
-  return game.replayable(d)
+  return game.replayable(d) && util.allowAnalysisForVariant(ctrl.data.game.variant.key)
     ? h(
         'a.fbt',
         {
