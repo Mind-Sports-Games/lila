@@ -10,11 +10,11 @@ import strategygames.{ Clock, Speed }
 import lila.game.PerfPicker
 import lila.lobby.Color
 import lila.rating.PerfType
-import strategygames.chess.variant.Variant
+import strategygames.variant.Variant
 import lila.common.Template
 
 final case class ApiConfig(
-    variant: strategygames.chess.variant.Variant,
+    variant: strategygames.variant.Variant,
     clock: Option[Clock.Config],
     days: Option[Int],
     rated: Boolean,
@@ -24,7 +24,7 @@ final case class ApiConfig(
     message: Option[Template]
 ) {
 
-  def perfType: Option[PerfType] = PerfPicker.perfType(strategygames.Speed(clock), StratVariant.wrap(variant), days)
+  def perfType: Option[PerfType] = PerfPicker.perfType(strategygames.Speed(clock), variant, days)
 
   def validFen = ApiConfig.validFen(variant, position)
 
@@ -38,7 +38,7 @@ final case class ApiConfig(
   def mode = strategygames.Mode(rated)
 
   def autoVariant =
-    if (variant.standard && position.exists(!_.initial)) copy(variant = FromPosition)
+    if (variant.standard && position.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
     else this
 }
 
@@ -58,7 +58,7 @@ object ApiConfig extends BaseHumanConfig {
       msg: Option[String]
   ) =
     new ApiConfig(
-      variant = strategygames.chess.variant.Variant.orDefault(~v),
+      variant = strategygames.variant.Variant.orDefault(GameLib.Chess(), ~v),
       clock = cl,
       days = d,
       rated = r,

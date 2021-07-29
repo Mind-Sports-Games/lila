@@ -34,6 +34,7 @@ trait ChessgroundHelper {
                 board.pieces.map { case (strategygames.Pos.Chess(pos), piece) =>
                   val klass = s"${piece.color.name} ${piece.role.name}"
                   s"""<piece class="$klass" style="top:${top(pos)}%;left:${left(pos)}%"></piece>"""
+                  case (strategygames.Pos.Draughts(_), _) => sys.error("Draughts not supported yet")
                 } mkString ""
             s"$highlights$pieces"
           }
@@ -47,6 +48,8 @@ trait ChessgroundHelper {
       orient = pov.color,
       lastMove = pov.game.history.lastMove.map(_.origDest) ?? {
         case (strategygames.Pos.Chess(orig), strategygames.Pos.Chess(dest)) => List(orig, dest)
+        case (strategygames.Pos.Draughts(_), strategygames.Pos.Draughts(_)) => sys.error("Draughts not supported yet")
+        case _ => sys.error("Unsupported games.")
       }
     )
 
