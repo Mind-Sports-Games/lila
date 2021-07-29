@@ -23,13 +23,13 @@
       background: fade-out($c-bg-box, 0.2);
     }
     @else {
-      $logo-color: "dadada";
+      $logo-url: "../logo/playstrategy-light.svg";
 
       @if $theme-dark {
-        $logo-color: "383633";
+        $logo-url: "../logo/playstrategy.svg";
       }
 
-      background: $c-bg-box img-url('../logo/playstrategy.svg');
+      background: $c-bg-box img-url($logo-url);
     }
 
     background-size: 100% 100%;
