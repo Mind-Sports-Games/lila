@@ -256,7 +256,7 @@ object Schedule {
   }
 
   // They're all hourly for now
-  private[tournament] def durationFor(s: Schedule): Int = 57
+  private[tournament] def durationFor(s: Schedule): Int = 30
   /*{
     import Freq._, Speed._
     import chess.variant._
