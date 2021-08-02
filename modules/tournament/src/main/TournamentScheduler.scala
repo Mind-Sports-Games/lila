@@ -96,8 +96,36 @@ final private class TournamentScheduler(
         Schedule(Weekly, Blitz51, v, none, date).plan
       }
 
+    def scheduleUnique(hour: Int, speed: Schedule.Speed, variant: Variant)(day: DateTime) =
+      at(day, hour) map { date =>
+        Schedule(Unique, speed, variant, none, date).plan
+      }
+
     // all dates UTC
     List(
+      //Pre MSO schedule
+      scheduleUnique(13, Blitz32, LinesOfAction)(new DateTime(2021, 8, 3, 0, 0)),
+      scheduleUnique(20, Blitz32, Standard     )(new DateTime(2021, 8, 3, 0, 0)),
+      scheduleUnique(13, Blitz32, RacingKings  )(new DateTime(2021, 8, 4, 0, 0)),
+      scheduleUnique(20, Blitz32, Crazyhouse   )(new DateTime(2021, 8, 4, 0, 0)),
+      scheduleUnique(13, Blitz32, Horde        )(new DateTime(2021, 8, 5, 0, 0)),
+      scheduleUnique(20, Blitz32, ThreeCheck   )(new DateTime(2021, 8, 5, 0, 0)),
+      scheduleUnique(13, Blitz32, Antichess    )(new DateTime(2021, 8, 6, 0, 0)),
+      scheduleUnique(20, Blitz32, Chess960     )(new DateTime(2021, 8, 6, 0, 0)),
+      scheduleUnique(13, Blitz32, Standard     )(new DateTime(2021, 8, 7, 0, 0)),
+      scheduleUnique(20, Blitz32, LinesOfAction)(new DateTime(2021, 8, 7, 0, 0)),
+      scheduleUnique(13, Blitz32, Crazyhouse   )(new DateTime(2021, 8, 8, 0, 0)),
+      scheduleUnique(20, Blitz32, Chess960     )(new DateTime(2021, 8, 8, 0, 0)),
+      scheduleUnique(13, Blitz32, KingOfTheHill)(new DateTime(2021, 8, 9, 0, 0)),
+      scheduleUnique(20, Blitz32, Atomic       )(new DateTime(2021, 8, 9, 0, 0)),
+      scheduleUnique(13, Blitz32, RacingKings  )(new DateTime(2021, 8,10, 0, 0)),
+      scheduleUnique(20, Blitz32, ThreeCheck   )(new DateTime(2021, 8,10, 0, 0)),
+      scheduleUnique(13, Blitz32, LinesOfAction)(new DateTime(2021, 8,11, 0, 0)),
+      scheduleUnique(20, Blitz32, Chess960     )(new DateTime(2021, 8,11, 0, 0)),
+      scheduleUnique(13, Blitz32, Standard     )(new DateTime(2021, 8,12, 0, 0)),
+      scheduleUnique(20, Blitz32, Crazyhouse   )(new DateTime(2021, 8,12, 0, 0))
+
+      /*//Pre UKGE schedule
       mwfs.flatMap(schedule32(16, KingOfTheHill)), // MWFS KoTH @ 17:00 UK
       mwfs.flatMap(schedule32(17, Antichess)),     // MWFS Anti @ 18:00 UK
       mwfs.flatMap(schedule32(18, Standard)),      // MWFS Chess @ 19:00 UK
@@ -117,6 +145,7 @@ final private class TournamentScheduler(
       fss.flatMap(schedule51(13, LinesOfAction)),  // FSS LOA @ 14:00 UK
       fss.flatMap(schedule32(14, Standard)),       // FSS Chess @ 15:00 UK
       fss.flatMap(schedule32(15, Chess960))        // FSS 960 @ 16:00 UK
+      */
 
       /*List( // legendary tournaments!
         at(birthday.withYear(today.getYear), 12) map orNextYear map { date =>
