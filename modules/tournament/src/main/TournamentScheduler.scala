@@ -96,34 +96,45 @@ final private class TournamentScheduler(
         Schedule(Weekly, Blitz51, v, none, date).plan
       }
 
-    def scheduleUnique(hour: Int, speed: Schedule.Speed, variant: Variant)(day: DateTime) =
+    def scheduleUnique(hour: Int, speed: Schedule.Speed, variant: Variant, duration: Int)(day: DateTime) =
       at(day, hour) map { date =>
-        Schedule(Unique, speed, variant, none, date).plan
+        Schedule(Unique, speed, variant, none, date, Some(duration)).plan
       }
 
     // all dates UTC
     List(
       //Pre MSO schedule
-      scheduleUnique(13, Blitz32, LinesOfAction)(new DateTime(2021, 8, 3, 0, 0)),
-      scheduleUnique(20, Blitz32, Standard     )(new DateTime(2021, 8, 3, 0, 0)),
-      scheduleUnique(13, Blitz32, RacingKings  )(new DateTime(2021, 8, 4, 0, 0)),
-      scheduleUnique(20, Blitz32, Crazyhouse   )(new DateTime(2021, 8, 4, 0, 0)),
-      scheduleUnique(13, Blitz32, Horde        )(new DateTime(2021, 8, 5, 0, 0)),
-      scheduleUnique(20, Blitz32, ThreeCheck   )(new DateTime(2021, 8, 5, 0, 0)),
-      scheduleUnique(13, Blitz32, Antichess    )(new DateTime(2021, 8, 6, 0, 0)),
-      scheduleUnique(20, Blitz32, Chess960     )(new DateTime(2021, 8, 6, 0, 0)),
-      scheduleUnique(13, Blitz32, Standard     )(new DateTime(2021, 8, 7, 0, 0)),
-      scheduleUnique(20, Blitz32, LinesOfAction)(new DateTime(2021, 8, 7, 0, 0)),
-      scheduleUnique(13, Blitz32, Crazyhouse   )(new DateTime(2021, 8, 8, 0, 0)),
-      scheduleUnique(20, Blitz32, Chess960     )(new DateTime(2021, 8, 8, 0, 0)),
-      scheduleUnique(13, Blitz32, KingOfTheHill)(new DateTime(2021, 8, 9, 0, 0)),
-      scheduleUnique(20, Blitz32, Atomic       )(new DateTime(2021, 8, 9, 0, 0)),
-      scheduleUnique(13, Blitz32, RacingKings  )(new DateTime(2021, 8,10, 0, 0)),
-      scheduleUnique(20, Blitz32, ThreeCheck   )(new DateTime(2021, 8,10, 0, 0)),
-      scheduleUnique(13, Blitz32, LinesOfAction)(new DateTime(2021, 8,11, 0, 0)),
-      scheduleUnique(20, Blitz32, Chess960     )(new DateTime(2021, 8,11, 0, 0)),
-      scheduleUnique(13, Blitz32, Standard     )(new DateTime(2021, 8,12, 0, 0)),
-      scheduleUnique(20, Blitz32, Crazyhouse   )(new DateTime(2021, 8,12, 0, 0))
+      scheduleUnique(13, Blitz32, Horde        ,  30)(new DateTime(2021, 8,  3, 0, 0)),
+      scheduleUnique(20, Blitz32, Standard     ,  30)(new DateTime(2021, 8,  3, 0, 0)),
+      scheduleUnique(13, Blitz32, LinesOfAction,  30)(new DateTime(2021, 8,  4, 0, 0)),
+      scheduleUnique(20, Blitz32, Crazyhouse   ,  30)(new DateTime(2021, 8,  4, 0, 0)),
+      scheduleUnique(13, Blitz32, RacingKings  ,  30)(new DateTime(2021, 8,  5, 0, 0)),
+      scheduleUnique(20, Blitz32, ThreeCheck   ,  30)(new DateTime(2021, 8,  5, 0, 0)),
+      scheduleUnique(13, Blitz32, Antichess    ,  30)(new DateTime(2021, 8,  6, 0, 0)),
+      scheduleUnique(20, Blitz32, Chess960     ,  30)(new DateTime(2021, 8,  6, 0, 0)),
+      scheduleUnique(13, Blitz32, Standard     ,  30)(new DateTime(2021, 8,  7, 0, 0)),
+      scheduleUnique(20, Blitz32, LinesOfAction,  30)(new DateTime(2021, 8,  7, 0, 0)),
+      scheduleUnique(13, Blitz32, Crazyhouse   ,  30)(new DateTime(2021, 8,  8, 0, 0)),
+      scheduleUnique(20, Blitz32, Chess960     ,  30)(new DateTime(2021, 8,  8, 0, 0)),
+      scheduleUnique(13, Blitz32, KingOfTheHill,  30)(new DateTime(2021, 8,  9, 0, 0)),
+      scheduleUnique(20, Blitz32, Atomic       ,  30)(new DateTime(2021, 8,  9, 0, 0)),
+      scheduleUnique(13, Blitz32, RacingKings  ,  30)(new DateTime(2021, 8, 10, 0, 0)),
+      scheduleUnique(20, Blitz32, ThreeCheck   ,  30)(new DateTime(2021, 8, 10, 0, 0)),
+      scheduleUnique(13, Blitz32, LinesOfAction,  30)(new DateTime(2021, 8, 11, 0, 0)),
+      scheduleUnique(20, Blitz32, Chess960     ,  30)(new DateTime(2021, 8, 11, 0, 0)),
+      scheduleUnique(13, Blitz32, Standard     ,  30)(new DateTime(2021, 8, 12, 0, 0)),
+      scheduleUnique(20, Blitz32, Crazyhouse   ,  30)(new DateTime(2021, 8, 12, 0, 0)),
+
+      //MSO arena schedule
+      scheduleUnique(19, Blitz32, Standard     , 180)(new DateTime(2021, 8, 15, 0, 0)),
+      scheduleUnique(19, Blitz32, KingOfTheHill, 120)(new DateTime(2021, 8, 18, 0, 0)),
+      scheduleUnique(19, Blitz35, Horde        , 120)(new DateTime(2021, 8, 22, 0, 0)),
+      scheduleUnique(19, Blitz32, RacingKings  ,  60)(new DateTime(2021, 8, 25, 0, 0)),
+      scheduleUnique(19, Blitz32, Crazyhouse   , 120)(new DateTime(2021, 8, 26, 0, 0)),
+      scheduleUnique(19, Blitz32, Atomic       , 120)(new DateTime(2021, 8, 27, 0, 0)),
+      scheduleUnique(19, Blitz32, Antichess    , 120)(new DateTime(2021, 8, 29, 0, 0)),
+      scheduleUnique(19, Bullet,  Standard     ,  60)(new DateTime(2021, 8, 30, 0, 0))
+
 
       /*//Pre UKGE schedule
       mwfs.flatMap(schedule32(16, KingOfTheHill)), // MWFS KoTH @ 17:00 UK
