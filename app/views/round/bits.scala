@@ -31,12 +31,7 @@ object bits {
       openGraph = openGraph,
       moreJs = moreJs,
       moreCss = frag(
-        cssTag {
-          variant match {
-            case Variant.Chess(Crazyhouse) => "round.zh"
-            case _                         => "round"
-          }
-        },
+        cssTag { if (variant == Variant.Chess(Crazyhouse)) "round.zh" else "round" },
         ctx.blind option cssTag("round.nvui"),
         moreCss
       ),
