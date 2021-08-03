@@ -43,6 +43,12 @@ private object bits {
         variants.filter { case (id, _, _) =>
           ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
         }
+      ),
+      // TODO: this will need to change for draughts
+      input(
+        name := s"lib",
+        tpe := "hidden",
+        value := 0
       )
     )
 
