@@ -1,6 +1,7 @@
 package views.html.analyse
 
 import bits.dataPanel
+import strategygames.variant.Variant
 import strategygames.chess.variant.Crazyhouse
 import strategygames.format.FEN
 import controllers.routes
@@ -86,7 +87,7 @@ object replay {
       title = titleOf(pov),
       moreCss = frag(
         cssTag("analyse.round"),
-        pov.game.variant == Crazyhouse option cssTag("analyse.zh"),
+        pov.game.variant == Variant.Chess(Crazyhouse) option cssTag("analyse.zh"),
         ctx.blind option cssTag("round.nvui")
       ),
       moreJs = frag(
