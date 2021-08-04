@@ -7,6 +7,8 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
+import strategygames.GameLib
+
 private object bits {
 
   val prefix = "sf_"
@@ -35,20 +37,23 @@ private object bits {
     )
   }
 
-  def renderVariant(form: Form[_], variants: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "variant label_select")(
-      renderLabel(form("variant"), trans.variant()),
+  def renderGameLib(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "gameLib label_select")(
+      renderLabel(form("gameLib"), "Game Family"),
       renderSelect(
-        form("variant"),
+        form("gameLib"),
+        libs
+      )
+    )
+
+  def renderVariant(form: Form[_], variants: List[SelectChoice], lib: GameLib)(implicit ctx: Context) =
+    div(cls := s"${lib.name.toLowerCase()}Variant label_select", if (lib != GameLib.Chess()) style := "display:none")(
+      renderLabel(form(s"${lib.name.toLowerCase()}Variant"), trans.variant()),
+      renderSelect(
+        form(s"${lib.name.toLowerCase()}Variant"),
         variants.filter { case (id, _, _) =>
           ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
         }
-      ),
-      // TODO: this will need to change for draughts
-      input(
-        name := s"lib",
-        tpe := "hidden",
-        value := 0
       )
     )
 

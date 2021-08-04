@@ -45,10 +45,11 @@ final case class ApiConfig(
 object ApiConfig extends BaseHumanConfig {
 
   lazy val clockLimitSeconds: Set[Int] = Set(0, 15, 30, 45, 60, 90) ++ (2 to 180).view.map(60 *).toSet
-  val lib = GameLib.Chess()
 
   def from(
-      v: Option[String],
+      l: Int,
+      cv: Option[String],
+      dv: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       r: Boolean,
@@ -58,12 +59,15 @@ object ApiConfig extends BaseHumanConfig {
       msg: Option[String]
   ) =
     new ApiConfig(
-      variant = strategygames.variant.Variant.orDefault(GameLib.Chess(), ~v),
+      variant = strategygames.variant.Variant.orDefault(GameLib(l), l match {
+        case 0 => ~cv
+        case 1 => ~dv
+      }),
       clock = cl,
       days = d,
       rated = r,
       color = Color.orDefault(~c),
-      position = pos.map(f => FEN.apply(lib, f)),
+      position = pos.map(f => FEN.apply(GameLib(l), f)),
       acceptByToken = tok,
       message = msg map Template
     ).autoVariant
@@ -73,7 +77,7 @@ object ApiConfig extends BaseHumanConfig {
     if (variant.chess960) fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
     else if (variant.fromPosition)
       fen exists { f =>
-        (Forsyth.<<<(lib, f)).exists(_.situation playable false)
+        (Forsyth.<<<(GameLib.Chess(), f)).exists(_.situation playable false)
       }
     else true
 }

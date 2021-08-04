@@ -38,7 +38,7 @@ final class Setup(
   def aiForm =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        fuccess(forms aiFilled get("fen").map(s => FEN.clean(GameLib.Chess(), s))) map { form =>
+        fuccess(forms aiFilled(GameLib.Chess(), get("fen").map(s => FEN.clean(GameLib.Chess(), s)))) map { form =>
           html.setup.forms.ai(
             form,
             env.fishnet.aiPerfApi.intRatings,
@@ -56,7 +56,7 @@ final class Setup(
   def friendForm(userId: Option[String]) =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req)
-        fuccess(forms friendFilled get("fen").map(s => FEN.clean(GameLib.Chess(), s))) flatMap { form =>
+        fuccess(forms friendFilled(GameLib.Chess(), get("fen").map(s => FEN.clean(GameLib.Chess(), s)))) flatMap { form =>
           val validFen = form("fen").value map(s => FEN.clean(GameLib.Chess(), s)) flatMap ValidFen(strict = false)
           userId ?? env.user.repo.named flatMap {
             case None => Ok(html.setup.forms.friend(form, none, none, validFen)).fuccess
