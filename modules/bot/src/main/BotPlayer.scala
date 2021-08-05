@@ -1,6 +1,5 @@
 package lila.bot
 
-import strategygames.GameLib
 import strategygames.format.Uci
 import scala.concurrent.duration._
 import scala.concurrent.Promise
@@ -27,7 +26,7 @@ final class BotPlayer(
 
   def apply(pov: Pov, me: User, uciStr: String, offeringDraw: Option[Boolean]): Funit =
     lila.common.Future.delay((pov.game.hasAi ?? 500) millis) {
-      Uci(GameLib.Chess(), uciStr).fold(clientError[Unit](s"Invalid UCI: $uciStr")) { uci =>
+      Uci(pov.game.variant.gameLib, uciStr).fold(clientError[Unit](s"Invalid UCI: $uciStr")) { uci =>
         lila.mon.bot.moves(me.username).increment()
         if (!pov.isMyTurn) clientError("Not your turn, or game already over")
         else {

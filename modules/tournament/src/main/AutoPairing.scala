@@ -29,7 +29,7 @@ final class AutoPairing(
           GameLib.Chess(),
           Some {
             if (tour.position.isEmpty) tour.variant
-            else Variant.libFromPosition(GameLib.Chess())
+            else Variant.libFromPosition(tour.variant.gameLib)
           },
           tour.position
         ) pipe { g =>

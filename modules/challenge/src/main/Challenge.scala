@@ -3,7 +3,7 @@ package lila.challenge
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Chess960, FromPosition, Horde, RacingKings, LinesOfAction }
-import strategygames.{ Black, Color, GameLib, Mode, Speed, White }
+import strategygames.{ Black, Color, Mode, Speed, White }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
@@ -202,7 +202,7 @@ object Challenge {
         }
       )
       .orElse {
-        (variant == Variant.libFromPosition(GameLib.Chess())) option perfTypeOf(Variant.libStandard(GameLib.Chess()), timeControl)
+        (variant == Variant.libFromPosition(variant.gameLib)) option perfTypeOf(Variant.libStandard(variant.gameLib), timeControl)
       }
       .|(PerfType.Correspondence)
 
@@ -241,7 +241,7 @@ object Challenge {
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (variant == Variant.libFromPosition(GameLib.Chess())) initialFen
+        if (variant == Variant.libFromPosition(variant.gameLib)) initialFen
         else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
           fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
         }

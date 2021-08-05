@@ -3,7 +3,7 @@ package lila.fishnet
 import org.joda.time.DateTime
 
 import strategygames.format.{ FEN, Uci }
-import strategygames.{ GameLib, Replay }
+import strategygames.Replay
 import JsonApi.Request.Evaluation
 import lila.analyse.{ Analysis, Info }
 import lila.tree.Eval
@@ -29,9 +29,9 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       val cached = if (isPartial) cachedFull - 0 else cachedFull
       def debug  = s"${work.game.variant.key} analysis for ${work.game.id} by ${client.fullId}"
       Replay(
-        GameLib.Chess(),
+        work.game.variant.gameLib,
         work.game.uciList,
-        work.game.initialFen.map(fen => FEN(GameLib.Chess(), fen)),
+        work.game.initialFen.map(fen => FEN(work.game.variant.gameLib, fen)),
         work.game.variant
       )
         .fold(

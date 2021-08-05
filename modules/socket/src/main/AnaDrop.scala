@@ -20,14 +20,14 @@ case class AnaDrop(
 ) extends AnaAny {
 
   def branch: Validated[String, Branch] =
-    (Game(GameLib.Chess(), variant.some, fen.some), role, pos) match {
+    (Game(variant.gameLib, variant.some, fen.some), role, pos) match {
       case (Game.Chess(game), Role.ChessRole(role), Pos.Chess(pos))
         => game.drop(role, pos) flatMap {
           case (game, drop)
             => game.pgnMoves.lastOption toValid "Dropped but no last move!" map { san =>
               val uci     = Uci(drop)
               val movable = !game.situation.end
-              val fen     = Forsyth.>>(GameLib.Chess(), Game.Chess(game))
+              val fen     = Forsyth.>>(variant.gameLib, Game.Chess(game))
               Branch(
                 id = UciCharPair(uci),
                 ply = game.turns,
@@ -35,7 +35,7 @@ case class AnaDrop(
                 fen = fen,
                 check = game.situation.check,
                 dests = Some(movable ?? Game.Chess(game).situation.destinations),
-                opening = Variant.openingSensibleVariants(GameLib.Chess())(variant) ?? {
+                opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? {
                   fen match {
                     case FEN.Chess(fen) => FullOpeningDB findByFen fen
                     case _ => sys.error("Invalid fen lib")

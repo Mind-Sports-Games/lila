@@ -191,10 +191,10 @@ final class JsonView(
             prev(uci.orig, uci.dest, uci.promotion)
               .fold(err => sys error s"puzzle ${puzzle.id} $err", identity)
           val branch = tree.Branch(
-            id = UciCharPair(GameLib.Chess(), move.toUci),
+            id = UciCharPair(game.situation.board.variant.gameLib, move.toUci),
             ply = game.turns,
-            move = Uci.WithSan(GameLib.Chess(), move.toUci, game.pgnMoves.last),
-            fen = Forsyth.>>(GameLib.Chess(), game),
+            move = Uci.WithSan(game.situation.board.variant.gameLib, move.toUci, game.pgnMoves.last),
+            fen = Forsyth.>>(game.situation.board.variant.gameLib, game),
             check = game.situation.check,
             crazyData = none
           )

@@ -77,7 +77,7 @@ object ApiConfig extends BaseHumanConfig {
     if (variant.chess960) fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
     else if (variant.fromPosition)
       fen exists { f =>
-        (Forsyth.<<<(GameLib.Chess(), f)).exists(_.situation playable false)
+        (Forsyth.<<<(variant.gameLib, f)).exists(_.situation playable false)
       }
     else true
 }

@@ -3,7 +3,7 @@ package lila.round
 import strategygames.format.Forsyth
 import strategygames.chess.variant._
 import strategygames.variant.Variant
-import strategygames.{ Black, Clock, Color, Game => ChessGame, GameLib, Board, Situation, History, White, Mode, Piece, PieceMap, Pos }
+import strategygames.{ Black, Clock, Color, Game => ChessGame, Board, Situation, History, White, Mode, Piece, PieceMap, Pos }
 import strategygames.chess.Castles
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
@@ -105,7 +105,7 @@ final private class Rematcher(
   private def returnGame(pov: Pov): Fu[Game] = {
     for {
       initialFen <- gameRepo initialFen pov.game
-      situation = initialFen.flatMap{fen => Forsyth.<<<(GameLib.Chess(), fen)}
+      situation = initialFen.flatMap{fen => Forsyth.<<<(pov.game.variant.gameLib, fen)}
       pieces: PieceMap = pov.game.variant match {
         case Variant.Chess(Chess960) =>
           if (chess960 get pov.gameId) chessPieceMap(Chess960.pieces)
@@ -114,24 +114,24 @@ final private class Rematcher(
           )(_.situation.board.pieces)
         case Variant.Chess(FromPosition) =>
           situation.fold(
-            Variant.libStandard(GameLib.Chess()).pieces
+            Variant.libStandard(pov.game.variant.gameLib).pieces
           )(_.situation.board.pieces)
         case variant =>
           variant.pieces
       }
       users <- userRepo byIds pov.game.userIds
-      board = Board(GameLib.Chess(), pieces, variant = pov.game.variant).withHistory(
+      board = Board(pov.game.variant.gameLib, pieces, variant = pov.game.variant).withHistory(
         History(
-          GameLib.Chess(),
+          pov.game.variant.gameLib,
           lastMove = situation.flatMap(_.situation.board.history.lastMove),
           castles = situation.fold(Castles.init)(_.situation.board.history.castles)
         )
       )
       game <- Game.make(
         chess = ChessGame(
-          GameLib.Chess(),
+          pov.game.variant.gameLib,
           situation = Situation(
-            GameLib.Chess(),
+            pov.game.variant.gameLib,
             board = board,
             color = situation.fold[Color](White)(_.situation.color)
           ),

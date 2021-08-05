@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.{ Glyph, Tags }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ Centis, Color, GameLib }
+import strategygames.{ Centis, Color }
 import org.joda.time.DateTime
 
 import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
@@ -63,7 +63,7 @@ case class Chapter(
     updateRoot(_.forceVariationAt(force, path))
 
   def opening: Option[FullOpening] =
-    if (!Variant.openingSensibleVariants(GameLib.Chess())(setup.variant)) none
+    if (!Variant.openingSensibleVariants(setup.variant.gameLib)(setup.variant)) none
     else FullOpeningDB searchInFens root.mainline.map(_.fen match {
       case FEN.Chess(fen) => fen
       case _ => sys.error("Not implemented for anything other than chess")

@@ -2,7 +2,7 @@ package lila.game
 
 import strategygames.chess
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Black, Color, GameLib, Mode, Status, White }
+import strategygames.{ Black, Color, Mode, Status, White }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.commands.WriteResult
@@ -393,7 +393,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     // TODO: why does the initialFen get generated here?
     val fen: Option[FEN] = initialFen orElse {
       (!g2.variant.standardInitialPosition)
-        .option(Forsyth.>>(strategygames.GameLib.Chess(), g2.chess))
+        .option(Forsyth.>>(g2.variant.gameLib, g2.chess))
         .filterNot(_.initial)
     }
     val checkInHours =
@@ -437,7 +437,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def initialFen(game: Game): Fu[Option[FEN]] =
     if (game.imported || !game.variant.standardInitialPosition) initialFen(game.id) dmap {
-      case None if game.variant == strategygames.chess.variant.Chess960 => Forsyth.initial(strategygames.GameLib.Chess()).some
+      case None if game.variant == strategygames.chess.variant.Chess960 => Forsyth.initial(game.variant.gameLib).some
       case fen                                            => fen
     }
     else fuccess(none)

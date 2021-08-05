@@ -12,7 +12,6 @@ import scala.util.Try
 import lila.db.ByteArray
 
 object BinaryFormat {
-  val chessLib = GameLib.Chess()
 
   object pgn {
 

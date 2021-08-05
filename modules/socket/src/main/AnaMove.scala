@@ -27,19 +27,19 @@ case class AnaMove(
 ) extends AnaAny {
 
   def branch: Validated[String, Branch] =
-    Game(GameLib.Chess(), variant.some, fen.some)(orig, dest, promotion) flatMap { case (game, move) =>
+    Game(variant.gameLib, variant.some, fen.some)(orig, dest, promotion) flatMap { case (game, move) =>
       game.pgnMoves.lastOption toValid "Moved but no last move!" map { san =>
-        val uci     = Uci(GameLib.Chess(), move)
+        val uci     = Uci(variant.gameLib, move)
         val movable = game.situation playable false
-        val fen     = Forsyth.>>(GameLib.Chess(), game)
+        val fen     = Forsyth.>>(variant.gameLib, game)
         Branch(
-          id = UciCharPair(GameLib.Chess(), uci),
+          id = UciCharPair(variant.gameLib, uci),
           ply = game.turns,
-          move = Uci.WithSan(GameLib.Chess(), uci, san),
+          move = Uci.WithSan(variant.gameLib, uci, san),
           fen = fen,
           check = game.situation.check,
           dests = Some(movable ?? game.situation.destinations),
-          opening = (game.turns <= 30 && Variant.openingSensibleVariants(GameLib.Chess())(variant)) ?? {
+          opening = (game.turns <= 30 && Variant.openingSensibleVariants(variant.gameLib)(variant)) ?? {
             fen match {
               case FEN.Chess(fen) => FullOpeningDB findByFen fen
               case _ => sys.error("Invalid fen lib")

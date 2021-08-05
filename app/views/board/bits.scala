@@ -1,7 +1,7 @@
 package views.html.board
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Color, Black, White, GameLib }
+import strategygames.{ Color, Black, White }
 import strategygames.variant.Variant
 import strategygames.Situation
 
@@ -46,7 +46,7 @@ object bits {
 
   def mini(pov: Pov): Tag => Tag =
     miniWithOrientation(
-      FEN(GameLib.Chess(), Forsyth.boardAndColor(GameLib.Chess(), pov.game.situation)),
+      FEN(pov.game.variant.gameLib, Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)),
       boardOrientation(pov),
       ~pov.game.lastMoveKeys
     ) _

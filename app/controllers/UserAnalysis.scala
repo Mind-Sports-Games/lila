@@ -40,7 +40,7 @@ final class UserAnalysis(
       val decodedFen: Option[FEN] = lila.common.String
         .decodeUriPath(urlFen)
         .filter(_.trim.nonEmpty)
-        .orElse(get("fen")) map(s => FEN.clean(GameLib.Chess(), s))
+        .orElse(get("fen")) map(s => FEN.clean(variant.gameLib, s))
       val pov         = makePov(decodedFen, variant)
       val orientation = get("color").flatMap(Color.fromName) | pov.color
       env.api.roundApi
@@ -52,8 +52,8 @@ final class UserAnalysis(
   private[controllers] def makePov(fen: Option[FEN], variant: Variant): Pov =
     makePov {
       fen.filter(_.value.nonEmpty).flatMap {
-        Forsyth.<<<@(GameLib.Chess(), variant, _)
-      } | SituationPlus(Situation(GameLib.Chess(), variant), 1)
+        Forsyth.<<<@(variant.gameLib, variant, _)
+      } | SituationPlus(Situation(variant.gameLib, variant), 1)
     }
 
   private[controllers] def makePov(from: SituationPlus): Pov =
@@ -61,7 +61,7 @@ final class UserAnalysis(
       lila.game.Game
         .make(
           chess = strategygames.Game(
-            lib = GameLib.Chess(),
+            lib = from.situation.board.variant.gameLib,
             situation = from.situation,
             turns = from.turns
           ),

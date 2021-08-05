@@ -17,14 +17,14 @@ object StepBuilder {
       variant: Variant,
       initialFen: FEN
   ): JsArray = {
-    Replay.gameMoveWhileValid(strategygames.GameLib.Chess(), pgnMoves, initialFen, variant) match {
+    Replay.gameMoveWhileValid(variant.gameLib, pgnMoves, initialFen, variant) match {
       case (init, games, error) =>
         error foreach logChessError(id)
         JsArray {
           val initStep = Step(
             ply = init.turns,
             move = none,
-            fen = Forsyth.>>(strategygames.GameLib.Chess(), init),
+            fen = Forsyth.>>(variant.gameLib, init),
             check = init.situation.check,
             dests = None,
             drops = None,
@@ -34,7 +34,7 @@ object StepBuilder {
             Step(
               ply = g.turns,
               move = Step.Move(m.uci, m.san).some,
-              fen = Forsyth.>>(strategygames.GameLib.Chess(), g),
+              fen = Forsyth.>>(g.situation.board.variant.gameLib, g),
               check = g.situation.check,
               dests = None,
               drops = None,

@@ -50,7 +50,7 @@ final private class PovToEntry(
               boards <-
                 Replay
                   .boards(
-                    GameLib.Chess(),
+                    game.variant.gameLib,
                     moveStrs = game.pgnMoves,
                     initialFen = fen,
                     variant = game.variant
@@ -63,7 +63,7 @@ final private class PovToEntry(
               provisional = provisional,
               initialFen = fen,
               analysis = an,
-              division = Divider(GameLib.Chess(), boards.toList),
+              division = Divider(pov.game.variant.gameLib, boards.toList),
               moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
               boards = boards,
               movetimes = movetimes,

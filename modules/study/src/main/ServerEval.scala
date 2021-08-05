@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, GameLib, Replay, White }
+import strategygames.{ Division, Game, Replay, White }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -41,13 +41,13 @@ object ServerEval {
               variant = chapter.setup.variant,
               moves =
                 UciDump(
-                  lib = GameLib.Chess(),
+                  lib = chapter.setup.variant.gameLib,
                   moves = chapter.root.mainline.map(_.move.san),
                   initialFen = chapter.root.fen.some,
                   variant = chapter.setup.variant
                 )
                 .toOption
-                .map(_.flatMap(m => Uci.apply(GameLib.Chess(), m))) | List.empty,
+                .map(_.flatMap(m => Uci.apply(chapter.setup.variant.gameLib, m))) | List.empty,
               userId = userId,
               unlimited = unlimited
             )
@@ -137,7 +137,7 @@ object ServerEval {
       )
 
     private def analysisLine(root: RootOrNode, variant: Variant, info: Info): Option[Node] =
-      Replay.gameMoveWhileValid(GameLib.Chess(), info.variation take 20, root.fen, variant) match {
+      Replay.gameMoveWhileValid(variant.gameLib, info.variation take 20, root.fen, variant) match {
         case (_, games, error) =>
           error foreach { logger.info(_) }
           games.reverse match {
@@ -152,10 +152,10 @@ object ServerEval {
 
     private def makeBranch(g: Game, m: Uci.WithSan) =
       Node(
-        id = UciCharPair(GameLib.Chess(), m.uci),
+        id = UciCharPair(g.situation.board.variant.gameLib, m.uci),
         ply = g.turns,
         move = m,
-        fen = Forsyth.>>(GameLib.Chess(), g),
+        fen = Forsyth.>>(g.situation.board.variant.gameLib, g),
         check = g.situation.check,
         crazyData = g.situation.board.crazyData,
         clock = none,

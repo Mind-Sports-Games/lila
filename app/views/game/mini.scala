@@ -1,7 +1,6 @@
 package views.html.game
 
 import strategygames.format.Forsyth
-import strategygames.GameLib
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -55,7 +54,7 @@ object mini {
   }
 
   def renderState(pov: Pov) =
-    dataState := s"${Forsyth.boardAndColor(GameLib.Chess(), pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
+    dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
     span(cls := "mini-game__player")(

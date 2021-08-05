@@ -6,7 +6,6 @@ import play.api.i18n.Lang
 import lila.common.LightUser
 
 import strategygames.format.Forsyth
-import strategygames.GameLib
 
 case class Chart(
     question: JsonQuestion,
@@ -57,7 +56,7 @@ object Chart {
       povs.map { pov =>
         Json.obj(
           "id"       -> pov.gameId,
-          "fen"      -> (Forsyth.exportBoard(GameLib.Chess(), pov.game.board)),
+          "fen"      -> (Forsyth.exportBoard(pov.game.variant.gameLib, pov.game.board)),
           "color"    -> pov.player.color.name,
           "lastMove" -> ~pov.game.lastMoveKeys,
           "user1"    -> gameUserJson(pov.player),
