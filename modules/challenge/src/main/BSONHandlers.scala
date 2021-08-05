@@ -9,6 +9,8 @@ import lila.db.BSON.{ Reader, Writer }
 import lila.db.dsl._
 import scala.util.Success
 
+import cats.implicits._
+
 private object BSONHandlers {
 
   import Challenge._
@@ -26,7 +28,6 @@ private object BSONHandlers {
     }
   )
   implicit val TimeControlBSONHandler = new BSON[TimeControl] {
-    import cats.implicits._
     def reads(r: Reader) =
       (r.intO("l"), r.intO("i")) mapN { (limit, inc) =>
         TimeControl.Clock(strategygames.Clock.Config(limit, inc))
@@ -40,10 +41,15 @@ private object BSONHandlers {
         case TimeControl.Unlimited                       => $empty
       }
   }
-  implicit val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(GameLib.Chess(), v) toTry s"No such variant: $v" },
-    x => BSONInteger(x.id)
-  )
+
+  implicit val VariantBSONHandler = new BSON[Variant] {
+    def reads(r: Reader) = Variant(GameLib(r.intD("gl")), r.int("v")) match {
+      case Some(v) => v
+      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelib: ${r.intD("gl")}")
+    }
+    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLib.id, "v" -> v.id)
+  }
+
   implicit val StatusBSONHandler = tryHandler[Status](
     { case BSONInteger(v) => Status(v) toTry s"No such status: $v" },
     x => BSONInteger(x.id)

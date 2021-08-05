@@ -212,6 +212,7 @@ object BSONHandlers {
         F.whiteClockHistory -> clockHistory(White, o.clockHistory, o.chess.clock, o.flagged),
         F.blackClockHistory -> clockHistory(Black, o.clockHistory, o.chess.clock, o.flagged),
         F.rated             -> w.boolO(o.mode.rated),
+        F.lib               -> o.board.variant.gameLib.id,
         F.variant           -> o.board.variant.exotic.option(w int o.board.variant.id),
         F.bookmarks         -> w.intO(o.bookmarks),
         F.createdAt         -> w.date(o.createdAt),

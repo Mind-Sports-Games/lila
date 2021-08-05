@@ -260,10 +260,14 @@ object BSONHandlers {
   }
 
   implicit val PathBSONHandler = BSONStringHandler.as[Path](Path.apply, _.toString)
-  implicit val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(GameLib.Chess(), v) toTry s"No such variant: $v" },
-    x => BSONInteger(x.id)
-  )
+
+  implicit val VariantBSONHandler = new BSON[Variant] {
+    def reads(r: Reader) = Variant(GameLib(r.intD("gl")), r.int("v")) match {
+      case Some(v) => v
+      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelib: ${r.intD("gl")}")
+    }
+    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLib.id, "v" -> v.id)
+  }
 
   implicit val PgnTagBSONHandler = tryHandler[Tag](
     { case BSONString(v) =>

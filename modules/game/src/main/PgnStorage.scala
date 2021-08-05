@@ -2,7 +2,7 @@ package lila.game
 
 import strategygames.chess
 import strategygames.chess.format
-import strategygames.chess.{ Castles, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks  }
+import strategygames.chess.{ Castles, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks }
 import strategygames.Color
 
 import lila.db.ByteArray

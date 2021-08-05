@@ -8,6 +8,7 @@ import strategygames.Color.{ Black, White }
 import strategygames.Status
 import strategygames.variant.Variant
 import lila.db.BSON
+import lila.db.BSON.{ Reader, Writer }
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.dsl._
 import lila.user.User
@@ -20,10 +21,15 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     x => BSONInteger(x.id)
   )
   implicit private val ChessStatusBSONHandler = lila.game.BSONHandlers.StatusBSONHandler
-  implicit private val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(lib, v) toTry s"No such variant: $v" },
-    x => BSONInteger(x.id)
-  )
+
+  implicit val VariantBSONHandler = new BSON[Variant] {
+    def reads(r: Reader) = Variant(GameLib(r.intD("gl")), r.int("v")) match {
+      case Some(v) => v
+      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelib: ${r.intD("gl")}")
+    }
+    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLib.id, "v" -> v.id)
+  }
+
   import strategygames.Clock.Config
   implicit private val clockHandler         = Macros.handler[Config]
   implicit private val ClockBSONHandler     = Macros.handler[SimulClock]
