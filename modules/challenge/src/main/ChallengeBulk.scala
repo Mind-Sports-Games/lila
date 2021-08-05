@@ -94,7 +94,6 @@ final class ChallengeBulkApi(
   }
 
   private def makePairings(bulk: ScheduledBulk): Funit = {
-    val lib      = GameLib.Chess()
     val perfType = PerfType(bulk.variant, Speed(bulk.clock))
     Source(bulk.games)
       .mapAsyncUnordered(8) { game =>
@@ -107,7 +106,11 @@ final class ChallengeBulkApi(
         val game = Game
           .make(
             chess = strategygames
-              .Game(lib, situation = Situation(lib, bulk.variant), clock = bulk.clock.toClock.some),
+              .Game(
+                bulk.variant.gameLib,
+                situation = Situation(bulk.variant.gameLib, bulk.variant),
+                clock = bulk.clock.toClock.some
+              ),
             whitePlayer = Player.make(White, white.some, _(perfType)),
             blackPlayer = Player.make(Black, black.some, _(perfType)),
             mode = bulk.mode,

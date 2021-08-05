@@ -1,7 +1,7 @@
 package lila.game
 
 import cats.data.Validated
-import strategygames.{ Game => StratGame, GameLib }
+import strategygames.{ Game => StratGame }
 import strategygames.format.{ FEN }
 import strategygames.format.pgn.{ Reader, Sans, Tag, Tags }
 import org.joda.time.DateTime
@@ -18,7 +18,7 @@ object Rewind {
   def apply(game: Game, initialFen: Option[FEN]): Validated[String, Progress] =
     Reader
       .movesWithSans(
-        GameLib.Chess(),
+        game.variant.gameLib,
         moveStrs = game.pgnMoves,
         op = sans => Sans(sans.value.dropRight(1)),
         tags = createTags(initialFen, game)

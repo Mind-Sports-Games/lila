@@ -125,7 +125,7 @@ object EvalCacheEntry {
       new SmallFen(str)
     }
     def validate(variant: Variant, fen: FEN): Option[SmallFen] =
-      Forsyth.<<@(GameLib.Chess(), variant, fen).exists(_ playable false) option make(variant, fen)
+      Forsyth.<<@(variant.gameLib, variant, fen).exists(_ playable false) option make(variant, fen)
   }
 
   case class Id(variant: Variant, smallFen: SmallFen)
@@ -135,8 +135,8 @@ object EvalCacheEntry {
   object Input {
     case class Candidate(variant: Variant, fen: String, eval: Eval) {
       def input =
-        SmallFen.validate(variant, FEN.apply(GameLib.Chess(), fen)) ifTrue eval.looksValid map { smallFen =>
-          Input(Id(variant, smallFen), FEN.apply(GameLib.Chess(), fen), eval.truncatePvs)
+        SmallFen.validate(variant, FEN.apply(variant.gameLib, fen)) ifTrue eval.looksValid map { smallFen =>
+          Input(Id(variant, smallFen), FEN.apply(variant.gameLib, fen), eval.truncatePvs)
         }
     }
   }

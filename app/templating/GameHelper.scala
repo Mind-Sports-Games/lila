@@ -28,7 +28,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
   def titleGame(g: Game) = {
     val speed   = strategygames.Speed(g.clock.map(_.config)).name
     val variant = g.variant.exotic ?? s" ${g.variant.name}"
-    s"$speed$variant Chess • ${playerText(g.whitePlayer)} vs ${playerText(g.blackPlayer)}"
+    s"$speed$variant ${g.variant.gameLib.name} • ${playerText(g.whitePlayer)} vs ${playerText(g.blackPlayer)}"
   }
 
   def describePov(pov: Pov) = {
@@ -43,9 +43,9 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         }
     val mode = game.mode.name
     val variant =
-      if (game.variant == Variant.libFromPosition(GameLib.Chess())) "position setup chess"
+      if (game.variant == Variant.libFromPosition(game.variant.gameLib)) s"position setup ${game.variant.gameLib.name}"
       else if (game.variant.exotic) game.variant.name
-      else "chess"
+      else game.variant.gameLib.name.toLowerCase()
     import strategygames.Status._
     val result = (game.winner, game.loser, game.status) match {
       case (Some(w), _, Mate)                               => s"${playerText(w)} won by checkmate"

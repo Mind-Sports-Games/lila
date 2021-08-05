@@ -27,20 +27,23 @@ final case class OpenConfig(
 
 object OpenConfig {
 
-  val lib = GameLib.Chess()
-
   def from(
       n: Option[String],
-      v: Option[String],
+      l: Int,
+      cv: Option[String],
+      dv: Option[String],
       cl: Option[Clock.Config],
       rated: Boolean,
       pos: Option[String]
   ) =
     new OpenConfig(
       name = n.map(_.trim).filter(_.nonEmpty),
-      variant = Variant.orDefault(GameLib.Chess(), ~v),
+      variant = Variant.orDefault(GameLib(l), l match {
+        case 0 => ~cv
+        case 1 => ~dv
+      }),
       clock = cl,
       rated = rated,
-      position = pos.map(f => FEN.apply(lib, f))
+      position = pos.map(f => FEN.apply(GameLib(l), f))
     ).autoVariant
 }

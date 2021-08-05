@@ -153,7 +153,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     form3.group(form("variant"), trans.variant(), half = true)(
       form3.select(
         _,
-        translatedVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
+        translatedChessVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
         disabled = disabledAfterStart
       )
     )

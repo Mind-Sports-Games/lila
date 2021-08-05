@@ -1,7 +1,7 @@
 package controllers
 
 import strategygames.format.FEN
-import strategygames.{ Color, GameLib, Replay, White }
+import strategygames.{ Color, Replay, White }
 import play.api.mvc._
 import views._
 
@@ -108,11 +108,11 @@ final class Analyse(
     }
 
   private def RedirectAtFen(pov: Pov, initialFen: Option[FEN])(or: => Fu[Result])(implicit ctx: Context) =
-    get("fen").map(s => FEN.clean(GameLib.Chess(), s)).fold(or) { atFen =>
+    get("fen").map(s => FEN.clean(pov.game.variant.gameLib, s)).fold(or) { atFen =>
       val url = routes.Round.watcher(pov.gameId, pov.color.name)
       fuccess {
         Replay
-          .plyAtFen(GameLib.Chess(), pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
+          .plyAtFen(pov.game.variant.gameLib, pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
           .fold(
             err => {
               lila.log("analyse").info(s"RedirectAtFen: ${pov.gameId} $atFen $err")

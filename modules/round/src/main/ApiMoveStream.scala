@@ -42,14 +42,14 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
                 times <- game.bothClockStates
               } yield Vector(clk.config.initTime, clk.config.initTime) ++ times)
               val clockOffset = game.startColor.fold(0, 1)
-              Replay.situations(strategygames.GameLib.Chess(), game.pgnMoves, initialFen, game.variant) foreach {
+              Replay.situations(game.variant.gameLib, game.pgnMoves, initialFen, game.variant) foreach {
                 _.zipWithIndex foreach { case (s, index) =>
                   val clk = for {
                     white <- clocks.lift(index + 1 - clockOffset)
                     black <- clocks.lift(index - clockOffset)
                   } yield (white, black)
                   queue offer toJson(
-                    Forsyth.exportBoard(strategygames.GameLib.Chess(), s.board),
+                    Forsyth.exportBoard(s.board.variant.gameLib, s.board),
                     s.color,
                     s.board.history.lastMove.map(_.uci),
                     clk

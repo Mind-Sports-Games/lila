@@ -28,7 +28,6 @@ final private class ChallengeJoiner(
 }
 
 private object ChallengeJoiner {
-  val lib = GameLib.Chess()
 
   def createGame(
       c: Challenge,
@@ -37,22 +36,22 @@ private object ChallengeJoiner {
       color: Option[Color]
   ): Game = {
     def makeChess(variant: Variant): strategygames.Game =
-      strategygames.Game(lib, situation = Situation(lib, variant), clock = c.clock.map(_.config.toClock))
+      strategygames.Game(variant.gameLib, situation = Situation(variant.gameLib, variant), clock = c.clock.map(_.config.toClock))
 
     val baseState = c.initialFen.ifTrue(c.variant.fromPosition || c.variant.chess960) flatMap {
-      Forsyth.<<<@(lib, c.variant, _)
+      Forsyth.<<<@(c.variant.gameLib, c.variant, _)
     }
     val (chessGame, state) = baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
       case sp @ SituationPlus(sit, _) =>
         val game = strategygames.Game(
-          lib = lib,
+          lib = c.variant.gameLib,
           situation = sit,
           turns = sp.turns,
           startedAtTurn = sp.turns,
           clock = c.clock.map(_.config.toClock)
         )
-        if (c.variant.fromPosition && Forsyth.>>(lib, game).initial)
-          makeChess(Variant.libStandard(GameLib.Chess())) -> none
+        if (c.variant.fromPosition && Forsyth.>>(c.variant.gameLib, game).initial)
+          makeChess(Variant.libStandard(c.variant.gameLib)) -> none
         else game                           -> baseState
     }
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)

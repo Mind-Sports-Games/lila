@@ -45,7 +45,6 @@ case class Game(
     movedAt: DateTime = DateTime.now,
     metadata: Metadata
 ) {
-  val chessLib = GameLib.Chess()
 
   lazy val clockHistory = chess.clock flatMap loadClockHistory
 
@@ -445,7 +444,7 @@ case class Game(
       !Game.isOldHorde(this)
 
   def ratingVariant =
-    if (isTournament && variant.fromPosition) Variant.libStandard(chessLib)
+    if (isTournament && variant.fromPosition) Variant.libStandard(variant.gameLib)
     else variant
 
   def fromPosition = variant.fromPosition || source.??(Source.Position ==)
@@ -622,7 +621,7 @@ case class Game(
     )
 
   lazy val opening: Option[FullOpening.AtPly] =
-    if (fromPosition || !Variant.openingSensibleVariants(chessLib)(variant)) none
+    if (fromPosition || !Variant.openingSensibleVariants(variant.gameLib)(variant)) none
     else FullOpeningDB search pgnMoves
 
   def synthetic = id == Game.syntheticId

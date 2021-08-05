@@ -20,11 +20,11 @@ case class AnaDests(
   val dests: String =
     if (isInitial) AnaDests.initialDests
     else {
-      val sit = Game(GameLib.Chess(), variant.some, fen.some).situation
+      val sit = Game(variant.gameLib, variant.some, fen.some).situation
       sit.playable(false) ?? destString(sit.destinations)
     }
 
-  lazy val opening = Variant.openingSensibleVariants(GameLib.Chess())(variant) ?? {
+  lazy val opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? {
     fen match {
       case FEN.Chess(fen) => FullOpeningDB findByFen fen
       case _ => sys.error("Invalid fen lib")

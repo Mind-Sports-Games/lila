@@ -5,7 +5,6 @@ import play.api.libs.json._
 import lila.common.LightUser
 import lila.game.{ Game, GameRepo }
 import lila.user.User
-import strategygames.GameLib
 import strategygames.variant.{ Variant => StratVariant }
 
 final class JsonView(
@@ -129,7 +128,10 @@ final class JsonView(
       .obj(
         "id"       -> g.id,
         "status"   -> g.status.id,
-        "fen"      -> (strategygames.format.Forsyth.boardAndColor(GameLib.Chess(), g.situation)),
+        "fen"      -> (strategygames.format.Forsyth.boardAndColor(
+          g.situation.board.variant.gameLib,
+          g.situation
+        )),
         "lastMove" -> ~g.lastMoveKeys,
         "orient"   -> g.playerByUserId(hostId).map(_.color)
       )

@@ -4,7 +4,6 @@ import strategygames.{ Clock, Game => StratGame, GameLib, Situation, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.{ Game => ChessGame }
-import strategygames.chess.variant.{ FromPosition }
 
 import lila.game.Game
 import lila.lobby.Color
@@ -66,7 +65,7 @@ trait Positional { self: Config =>
 
   def strictFen: Boolean
 
-  lazy val validFen = variant != FromPosition || {
+  lazy val validFen = variant != strategygames.chess.variant.FromPosition || {
     fen exists { f =>
       (Forsyth.<<<(lib, f)).exists(_.situation playable strictFen)
     }
@@ -74,7 +73,7 @@ trait Positional { self: Config =>
 
   def fenGame(builder: StratGame => Game): Game = {
     val baseState = fen ifTrue (variant.fromPosition) flatMap {
-      Forsyth.<<<@(lib, Variant.wrap(FromPosition), _)
+      Forsyth.<<<@(lib, Variant.wrap(strategygames.chess.variant.FromPosition), _)
     }
     val (chessGame, state) = baseState.fold(makeGame -> none[SituationPlus]) {
       case sit @ SituationPlus(s, _) =>
@@ -95,7 +94,7 @@ trait Positional { self: Config =>
           situation = game.situation.copy(
             board = game.board.copy(
               history = s.board.history,
-              variant = Variant.wrap(FromPosition)
+              variant = Variant.wrap(strategygames.chess.variant.FromPosition)
             )
           ),
           turns = sit.turns
@@ -108,13 +107,18 @@ trait Positional { self: Config =>
 object Config extends BaseConfig
 
 trait BaseConfig {
-  val gameLibs       = List(strategygames.GameLib.Chess().id, strategygames.GameLib.Draughts().id)
-  val variants       = List(strategygames.chess.variant.Standard.id, strategygames.chess.variant.Chess960.id)
-  val variantDefault = strategygames.chess.variant.Standard
-  val variantDefaultStrat = Variant.Chess(strategygames.chess.variant.Standard)
+  val gameLibs       = List(GameLib.Chess().id, GameLib.Draughts().id)
+  val chessVariants  = List(strategygames.chess.variant.Standard.id, strategygames.chess.variant.Chess960.id)
+  val draughtsVariants = List(strategygames.draughts.variant.Standard.id)
 
-  val variantsWithFen = variants :+ FromPosition.id
-  val aiVariants = variants :+
+  val chessVariantDefault    = strategygames.chess.variant.Standard
+  val draughtsVariantDefault = strategygames.chess.variant.Standard
+  val variantDefaultStrat    = Variant.Chess(strategygames.chess.variant.Standard)
+
+  val chessVariantsWithFen    = chessVariants :+ strategygames.chess.variant.FromPosition.id
+  val draughtsVariantsWithFen = draughtsVariants :+ strategygames.draughts.variant.FromPosition.id
+
+  val chessAIVariants = chessVariants :+
     strategygames.chess.variant.Crazyhouse.id :+
     strategygames.chess.variant.KingOfTheHill.id :+
     strategygames.chess.variant.ThreeCheck.id :+
@@ -124,8 +128,8 @@ trait BaseConfig {
     strategygames.chess.variant.RacingKings.id :+
     //chess.variant.LinesOfAction.id :+
     strategygames.chess.variant.FromPosition.id
-  val variantsWithVariants =
-    variants :+
+  val chessVariantsWithVariants =
+    chessVariants :+
       strategygames.chess.variant.Crazyhouse.id :+
       strategygames.chess.variant.KingOfTheHill.id :+
       strategygames.chess.variant.ThreeCheck.id :+
@@ -134,8 +138,29 @@ trait BaseConfig {
       strategygames.chess.variant.Horde.id :+
       strategygames.chess.variant.RacingKings.id :+
       strategygames.chess.variant.LinesOfAction.id
-  val variantsWithFenAndVariants =
-    variantsWithVariants :+ FromPosition.id
+  val chessVariantsWithFenAndVariants =
+    chessVariantsWithVariants :+
+      strategygames.chess.variant.FromPosition.id
+
+  val draughtsAIVariants = draughtsVariants :+
+    strategygames.draughts.variant.Frisian.id :+
+    strategygames.draughts.variant.Frysk.id :+
+    strategygames.draughts.variant.Antidraughts.id :+
+    strategygames.draughts.variant.Breakthrough.id :+
+    strategygames.draughts.variant.FromPosition.id
+  val draughtsVariantsWithVariants =
+    draughtsVariants :+
+      strategygames.draughts.variant.Frisian.id :+
+      strategygames.draughts.variant.Frysk.id :+
+      strategygames.draughts.variant.Antidraughts.id :+
+      strategygames.draughts.variant.Breakthrough.id :+
+      strategygames.draughts.variant.Russian.id :+
+      strategygames.draughts.variant.Brazilian.id
+  val draughtsVariantsWithFenAndVariants =
+    draughtsVariantsWithVariants :+
+      strategygames.draughts.variant.Russian.id :+
+      strategygames.draughts.variant.Brazilian.id :+
+      strategygames.draughts.variant.FromPosition.id
 
   val speeds = Speed.all.map(_.id)
 

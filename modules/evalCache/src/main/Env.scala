@@ -51,7 +51,7 @@ final class Env(
     new lila.common.Cli {
       def process = { case "eval-cache" :: "drop" :: variantKey :: fenParts =>
         Variant(GameLib.Chess(), variantKey).fold(fufail[String]("Invalid variant")) { variant =>
-          api.drop(variant, FEN(GameLib.Chess(), fenParts mkString " ")) inject "done!"
+          api.drop(variant, FEN(variant.gameLib, fenParts mkString " ")) inject "done!"
         }
       }
     }

@@ -45,7 +45,7 @@ case class HookConfig(
     )
 
   def >> =
-    (variant.gameLib.id, variant.id, timeMode.id, time, increment, days, mode.id.some, ratingRange.toString.some, color.name).some
+    (variant.gameLib.id, variant.id, variant.id, timeMode.id, time, increment, days, mode.id.some, ratingRange.toString.some, color.name).some
 
   def withTimeModeString(tc: Option[String]) =
     tc match {
@@ -108,9 +108,13 @@ case class HookConfig(
 
 object HookConfig extends BaseHumanConfig {
 
-  def from(l: Int, v: Int, tm: Int, t: Double, i: Int, d: Int, m: Option[Int], e: Option[String], c: String) = {
+  def from(l: Int, cv: Int, dv: Int, tm: Int, t: Double, i: Int, d: Int, m: Option[Int], e: Option[String], c: String) = {
     val realMode = m.fold(Mode.default)(Mode.orDefault)
     val gameLib = GameLib(l)
+    val v = gameLib match {
+      case GameLib.Chess()    => cv
+      case GameLib.Draughts() => dv
+    }
     new HookConfig(
       variant = strategygames.variant.Variant(gameLib, v) err s"Invalid game variant $v",
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",

@@ -36,7 +36,7 @@ object TreeBuilder {
     val withClocks: Option[Vector[Centis]] = withFlags.clocks ?? game.bothClockStates
     val drawOfferPlies                     = game.drawOffers.normalizedPlies
     Replay.gameMoveWhileValid(
-      strategygames.GameLib.Chess(),
+      game.variant.gameLib,
       game.pgnMoves,
       initialFen,
       game.variant
@@ -44,9 +44,9 @@ object TreeBuilder {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val openingOf: OpeningOf =
-          if (withFlags.opening && Variant.openingSensibleVariants(GameLib.Chess())(game.variant)) chessOpeningOf
+          if (withFlags.opening && Variant.openingSensibleVariants(game.variant.gameLib)(game.variant)) chessOpeningOf
           else _ => None
-        val fen                 = Forsyth.>>(GameLib.Chess(), init)
+        val fen                 = Forsyth.>>(game.variant.gameLib, init)
         val infos: Vector[Info] = analysis.??(_.infos.toVector)
         val advices: Map[Ply, Advice] = analysis.??(_.advices.view.map { a =>
           a.ply -> a
@@ -61,11 +61,11 @@ object TreeBuilder {
           eval = infos lift 0 map makeEval
         )
         def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
-          val fen    = Forsyth.>>(strategygames.GameLib.Chess(), g)
+          val fen    = Forsyth.>>(g.situation.board.variant.gameLib, g)
           val info   = infos lift (index - 1)
           val advice = advices get g.turns
           val branch = Branch(
-            id = UciCharPair(GameLib.Chess(), m.uci),
+            id = UciCharPair(g.situation.board.variant.gameLib, m.uci),
             ply = g.turns,
             move = m,
             fen = fen,
@@ -87,7 +87,7 @@ object TreeBuilder {
           )
           advices.get(g.turns + 1).flatMap { adv =>
             games.lift(index - 1).map { case (fromGame, _) =>
-              withAnalysisChild(game.id, branch, game.variant, Forsyth.>>(strategygames.GameLib.Chess(), fromGame), openingOf)(adv.info)
+              withAnalysisChild(game.id, branch, game.variant, Forsyth.>>(game.variant.gameLib, fromGame), openingOf)(adv.info)
             }
           } getOrElse branch
         }
@@ -116,9 +116,9 @@ object TreeBuilder {
       openingOf: OpeningOf
   )(info: Info): Branch = {
     def makeBranch(g: Game, m: Uci.WithSan) = {
-      val fen = Forsyth.>>(strategygames.GameLib.Chess(), g)
+      val fen = Forsyth.>>(variant.gameLib, g)
       Branch(
-        id = UciCharPair(GameLib.Chess(), m.uci),
+        id = UciCharPair(variant.gameLib, m.uci),
         ply = g.turns,
         move = m,
         fen = fen,
@@ -129,7 +129,7 @@ object TreeBuilder {
       )
     }
     Replay.gameMoveWhileValid(
-      strategygames.GameLib.Chess(),
+      variant.gameLib,
       info.variation take 20,
       fromFen,
       variant

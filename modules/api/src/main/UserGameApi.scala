@@ -58,7 +58,7 @@ final class UserGameApi(
             .add("rating" -> p.rating)
             .add("ratingDiff" -> p.ratingDiff)
         }),
-        "fen"       -> Forsyth.exportBoard(GameLib.Chess(), g.board),
+        "fen"       -> Forsyth.exportBoard(g.variant.gameLib, g.board),
         "winner"    -> g.winnerColor.map(_.name),
         "bookmarks" -> g.bookmarks
       )

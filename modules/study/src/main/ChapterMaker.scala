@@ -79,11 +79,11 @@ final private class ChapterMaker(
 
   private def fromFenOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Chapter = {
     val variant = data.variant.flatMap(v => Variant.apply(GameLib.Chess(), v)) | Variant.default(GameLib.Chess())
-    (data.fen.filterNot(_.initial).flatMap { Forsyth.<<<@(GameLib.Chess(), variant, _) } match {
+    (data.fen.filterNot(_.initial).flatMap { Forsyth.<<<@(variant.gameLib, variant, _) } match {
       case Some(sit) =>
         Node.Root(
           ply = sit.turns,
-          fen = Forsyth.>>(GameLib.Chess(), sit),
+          fen = Forsyth.>>(sit.situation.board.variant.gameLib, sit),
           check = sit.situation.check,
           clock = none,
           crazyData = sit.situation.board.crazyData,

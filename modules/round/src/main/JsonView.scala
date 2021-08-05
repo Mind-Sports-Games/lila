@@ -212,7 +212,7 @@ final class JsonView(
       division: Option[strategygames.Division] = none
   ) = {
     import pov._
-    val fen = Forsyth.>>(strategygames.GameLib.Chess(), game.chess)
+    val fen = Forsyth.>>(game.variant.gameLib, game.chess)
     Json
       .obj(
         "game" -> Json
@@ -220,7 +220,7 @@ final class JsonView(
             "id"         -> gameId,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
-            "initialFen" -> (initialFen | Forsyth.initial(strategygames.GameLib.Chess())),
+            "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLib)),
             "fen"        -> fen,
             "turns"      -> game.turns,
             "player"     -> game.turnColor.name,

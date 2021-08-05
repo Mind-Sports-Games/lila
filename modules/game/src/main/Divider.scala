@@ -17,7 +17,7 @@ final class Divider {
     apply(game.id, game.pgnMoves, game.variant, initialFen)
 
   def apply(id: Game.ID, pgnMoves: => PgnMoves, variant: Variant, initialFen: Option[FEN]) =
-    if (!Variant.divisionSensibleVariants(strategygames.GameLib.Chess())(variant))
+    if (!Variant.divisionSensibleVariants(variant.gameLib)(variant))
       Division.empty
     else
       cache.get(
@@ -25,12 +25,12 @@ final class Divider {
         _ =>
           Replay
             .boards(
-              lib = strategygames.GameLib.Chess(),
+              lib = variant.gameLib,
               moveStrs = pgnMoves,
               initialFen = initialFen,
               variant = variant
             )
             .toOption
-            .fold(Division.empty)(b => Divider.apply(strategygames.GameLib.Chess(), b))
+            .fold(Division.empty)(b => Divider.apply(variant.gameLib, b))
       )
 }

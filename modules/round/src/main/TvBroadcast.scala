@@ -67,7 +67,7 @@ final private class TvBroadcast(
               .add("rating" -> p.rating)
           }
         ),
-        fen = Forsyth.exportBoard(strategygames.GameLib.Chess(), pov.game.chess.board)
+        fen = Forsyth.exportBoard(pov.game.variant.gameLib, pov.game.chess.board)
       )
       clients.foreach { client =>
         client.queue offer {

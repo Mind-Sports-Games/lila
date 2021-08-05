@@ -37,16 +37,16 @@ final private class FishnetEvalCache(
   private def rawEvals(game: Work.Game): Fu[List[(Int, lila.evalCache.EvalCacheEntry.Eval)]] =
     Replay
       .situationsFromUci(
-        GameLib.Chess(),
+        game.variant.gameLib,
         game.uciList.take(maxPlies - 1),
-        game.initialFen.map(fen => FEN(GameLib.Chess(), fen)),
+        game.initialFen.map(fen => FEN(game.variant.gameLib, fen)),
         game.variant
       )
       .fold(
         _ => fuccess(Nil),
         _.zipWithIndex
           .map { case (sit, index) =>
-            evalCacheApi.getSinglePvEval(game.variant, Forsyth.>>(GameLib.Chess(), sit)) dmap2 { index -> _ }
+            evalCacheApi.getSinglePvEval(game.variant, Forsyth.>>(game.variant.gameLib, sit)) dmap2 { index -> _ }
           }
           .sequenceFu
           .map(_.flatten)

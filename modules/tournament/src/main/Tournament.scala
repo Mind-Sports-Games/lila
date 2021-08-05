@@ -2,7 +2,7 @@ package lila.tournament
 
 import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
-import strategygames.{ GameLib, Mode, Speed }
+import strategygames.{ Mode, Speed }
 import strategygames.variant.Variant
 import org.joda.time.{ DateTime, Duration, Interval }
 import play.api.i18n.Lang
@@ -136,7 +136,7 @@ case class Tournament(
 
   def nonPlayStrategyCreatedBy = (createdBy != User.playstrategyId) option createdBy
 
-  def ratingVariant = if (variant.fromPosition) Variant.libStandard(GameLib.Chess()) else variant
+  def ratingVariant = if (variant.fromPosition) Variant.libStandard(variant.gameLib) else variant
 
   def startingPosition = position flatMap Thematic.byFen
 

@@ -50,7 +50,6 @@ case class ImportData(pgn: String, analyse: Option[String]) {
   private type TagPicker = Tag.type => TagType
 
   private val maxPlies = 600
-  val lib = GameLib.Chess()
 
   private def evenIncomplete(result: Reader.Result): Replay =
     result match {
@@ -74,7 +73,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           case Board.Chess(board) => board
           case _ => sys.error("Importer doesn't support draughts yet")
         }
-        val initBoard    = parsed.tags.fen.map(fen => Forsyth.<<(lib, fen).map(_.board))
+        val initBoard    = parsed.tags.fen.map(fen => Forsyth.<<(GameLib.Chess(), fen).map(_.board))
         val fromPosition = initBoard.nonEmpty && !parsed.tags.fen.exists(_.initial)
         val variant = StratVariant.wrap({
           val chessVariant = parsed.tags.variant match {
@@ -95,8 +94,8 @@ case class ImportData(pgn: String, analyse: Option[String]) {
         })
         val game = state.copy(situation = state.situation withVariant variant)
         val initialFen = parsed.tags.fen
-          .flatMap(fen => Forsyth.<<<@(lib, variant, fen))
-          .map(situation => Forsyth.>>(lib, situation))
+          .flatMap(fen => Forsyth.<<<@(GameLib.Chess(), variant, fen))
+          .map(situation => Forsyth.>>(GameLib.Chess(), situation))
 
         val status = parsed.tags(_.Termination).map(_.toLowerCase) match {
           case Some("normal") | None                   => Status.Resign

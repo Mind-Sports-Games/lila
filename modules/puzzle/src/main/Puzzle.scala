@@ -16,7 +16,6 @@ case class Puzzle(
     vote: Float, // denormalized ratio of voteUp/voteDown
     themes: Set[PuzzleTheme.Key]
 ) {
-  val chessLib = GameLib.Chess()
 
   // ply after "initial move" when we start solving
   def initialPly: Int =

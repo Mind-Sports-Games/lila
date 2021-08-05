@@ -35,7 +35,7 @@ final class Editor(env: Env) extends LilaController(env) {
         Ok(
           html.board.editor(
             sit = situation,
-            fen = Forsyth.>>(GameLib.Chess(), situation),
+            fen = Forsyth.>>(situation.board.variant.gameLib, situation),
             positionsJson
           )
         )
@@ -49,7 +49,7 @@ final class Editor(env: Env) extends LilaController(env) {
         JsonOk(
           html.board.bits.jsData(
             sit = situation,
-            fen = Forsyth.>>(GameLib.Chess(), situation)
+            fen = Forsyth.>>(situation.board.variant.gameLib, situation)
           )
         )
       }
@@ -68,7 +68,7 @@ final class Editor(env: Env) extends LilaController(env) {
       OptionResult(env.game.gameRepo game id) { game =>
         Redirect {
           if (game.playable) routes.Round.watcher(game.id, game.variant.startColor.name)
-          else routes.Editor.load(get("fen") | (Forsyth.>>(GameLib.Chess(), game.chess)).value)
+          else routes.Editor.load(get("fen") | (Forsyth.>>(game.variant.gameLib, game.chess)).value)
         }
       }
     }

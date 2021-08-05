@@ -67,22 +67,26 @@ final case class ApiAiConfig(
 object ApiAiConfig extends BaseConfig {
 
   // lazy val clockLimitSeconds: Set[Int] = Set(0, 15, 30, 45, 60, 90) ++ (2 to 180).view.map(60 *).toSet
-  val lib = GameLib.Chess()
 
   def from(
       l: Int,
-      v: Option[String],
+      lib: Int,
+      cv: Option[String],
+      dv: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       c: Option[String],
       pos: Option[String]
   ) =
     new ApiAiConfig(
-      variant = Variant.wrap(strategygames.chess.variant.Variant.orDefault(~v)),
+      variant = Variant.wrap(lib match {
+        case 0 => strategygames.chess.variant.Variant.orDefault(~cv)
+        case 1 => strategygames.chess.variant.Variant.orDefault(~dv)
+      }),
       clock = cl,
       daysO = d,
       color = Color.orDefault(~c),
       level = l,
-      fen = pos.map(f => FEN.apply(lib, f))
+      fen = pos.map(f => FEN.apply(GameLib(lib), f))
     ).autoVariant
 }
