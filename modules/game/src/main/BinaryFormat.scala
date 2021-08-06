@@ -252,7 +252,7 @@ object BinaryFormat {
       })
     }
 
-    def writeDraughts(board: draughts.Board) = writeDraughts(board.pieces, board.variant)
+    def writeDraughts(board: draughts.Board): ByteArray = writeDraughts(board.pieces, board.variant)
 
     def readDraughts(ba: ByteArray, variant: draughts.variant.Variant): draughts.PieceMap = {
       def splitInts(b: Byte) = {

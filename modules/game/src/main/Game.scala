@@ -770,7 +770,7 @@ object Game {
         metadata = metadata(source).copy(pgnImport = pgnImport),
         createdAt = createdAt,
         movedAt = createdAt,
-        pdnStorage = if (chess.variant.gameLib == GameLib.Draughts()) PdnStorage.OldBin else None
+        pdnStorage = if (chess.situation.board.variant.gameLib == GameLib.Draughts()) Some(PdnStorage.OldBin) else None
       )
     )
   }
@@ -832,6 +832,7 @@ object Game {
     val perfType          = "pt" // only set on student games for aggregation
     val drawOffers        = "do"
     //draughts
+    val simulPairing      = "sp"
     val timeOutUntil      = "to"
     val microMatch        = "mm"
     val drawLimit         = "dl"

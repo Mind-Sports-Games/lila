@@ -2,6 +2,7 @@ package lila.game
 
 import java.security.MessageDigest
 import lila.db.ByteArray
+import org.joda.time.DateTime
 import strategygames.{ Black, Color, White }
 
 private[game] case class Metadata(

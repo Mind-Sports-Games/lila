@@ -180,9 +180,9 @@ object BSONHandlers {
       val plies = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
       val playedPlies = plies - startedAtTurn
 
-      val decoded = r.bytesO(F.huffmanPdn).map { PdnStorage.Huffman.decode(_, playedPlies) } | {
+      val decoded = r.bytesO(F.huffmanPgn).map { PdnStorage.Huffman.decode(_, playedPlies) } | {
         PdnStorage.Decoded(
-          pdnMoves = PdnStorage.OldBin.decode(r bytesD F.oldPdn, playedPlies),
+          pdnMoves = PdnStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies),
           pieces = BinaryFormat.piece.readDraughts(r bytes F.binaryPieces, gameVariant),
           positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
           lastMove = r strO F.historyLastMove flatMap draughts.format.Uci.apply,
@@ -237,7 +237,7 @@ object BSONHandlers {
           bw <- whiteClockHistory
           bb <- blackClockHistory
           history <- BinaryFormat.clockHistory.read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(decodedSituation.color))
-          _ = lila.mon.game.loadClockHistory()
+          _ = lila.mon.game.loadClockHistory.increment()
         } yield history,
         pdnStorage = decoded.format,
         status = light.status,
@@ -249,7 +249,7 @@ object BSONHandlers {
         movedAt = r.dateD(F.movedAt, createdAt),
         metadata = Metadata(
           source = r intO F.source flatMap Source.apply,
-          pdnImport = r.getO[PdnImport](F.pdnImport)(PdnImport.pdnImportBSONHandler),
+          pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
           tournamentId = r strO F.tournamentId,
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
@@ -257,7 +257,7 @@ object BSONHandlers {
           timeOutUntil = r dateO F.timeOutUntil,
           microMatch = r strO F.microMatch,
           drawLimit = r intO F.drawLimit,
-          analysed = r boolD F.analysed
+          analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)//should be empty for draughts
         )
       )
@@ -327,7 +327,7 @@ object BSONHandlers {
               F.kingMoves -> o.history.kingMoves.nonEmpty.option(o.history.kingMoves)
             )
             case Some(PdnStorage.Huffman) => $doc(
-              F.huffmanPdn -> PdnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies)
+              F.huffmanPgn -> PdnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies)
             )
             case _ => sys.error("invalid draughts storage")
           }
