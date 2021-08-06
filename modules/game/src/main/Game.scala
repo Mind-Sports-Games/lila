@@ -43,7 +43,8 @@ case class Game(
     bookmarks: Int = 0,
     createdAt: DateTime = DateTime.now,
     movedAt: DateTime = DateTime.now,
-    metadata: Metadata
+    metadata: Metadata,
+    pdnStorage: Option[PdnStorage] = None
 ) {
 
   lazy val clockHistory = chess.clock flatMap loadClockHistory
@@ -768,7 +769,8 @@ object Game {
         mode = mode,
         metadata = metadata(source).copy(pgnImport = pgnImport),
         createdAt = createdAt,
-        movedAt = createdAt
+        movedAt = createdAt,
+        pdnStorage = if (chess.variant.gameLib == GameLib.Draughts()) PdnStorage.OldBin else None
       )
     )
   }

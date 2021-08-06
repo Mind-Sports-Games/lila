@@ -3,6 +3,7 @@ package lila.game
 import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLib, Piece, PieceMap, Pos, Role, Timestamp, White }
 import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
+import strategygames.draughts
 import strategygames.format
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -234,17 +235,55 @@ object BinaryFormat {
         .to(Map)
     }
 
+    private val groupedPos: Map[draughts.Board.BoardSize, Array[(draughts.PosMotion, draughts.PosMotion)]] = draughts.Board.BoardSize.all.map { size =>
+      size -> getGroupedPos(size)
+    }.to(Map)
+
+    private def getGroupedPos(size: draughts.Board.BoardSize) = size.pos.all grouped 2 collect {
+      case List(p1, p2) => (p1, p2)
+    } toArray
+
+    def writeDraughts(pieces: draughts.PieceMap, variant: draughts.variant.Variant): ByteArray = {
+      def posInt(pos: draughts.Pos): Int = (pieces get pos).fold(0) { piece =>
+        piece.color.fold(0, 8) + roleToInt(piece.role)
+      }
+      ByteArray(groupedPos(variant.boardSize) map {
+        case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
+      })
+    }
+
+    def writeDraughts(board: draughts.Board) = writeDraughts(board.pieces, board.variant)
+
+    def readDraughts(ba: ByteArray, variant: draughts.variant.Variant): draughts.PieceMap = {
+      def splitInts(b: Byte) = {
+        val int = b.toInt
+        Array(int >> 4, int & 0x0F)
+      }
+      def intPiece(int: Int): Option[draughts.Piece] =
+        intToRoleDraughts(int & 7, variant) map { role => draughts.Piece(Color((int & 8) == 0), role) }
+      val pieceInts = ba.value flatMap splitInts
+      (variant.boardSize.pos.all zip pieceInts).flatMap {
+        case (pos, int) => intPiece(int) map (pos -> _)
+      }.to(Map)
+    }
+
     // cache standard start position
     def standard(lib: GameLib) = lib match {
       case GameLib.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
-      case GameLib.Draughts() => sys.error("Needs implementation for draughts")
+      case GameLib.Draughts() => writeDraughts(
+        draughts.Board.init(draughts.variant.Standard).pieces,
+        draughts.variant.Standard
+      )
     }
 
     private def intToRoleChess(int: Int, variant: chess.variant.Variant): Option[chess.Role] =
-      chess.Role.binaryInt( int)
+      chess.Role.binaryInt(int)
+    private def intToRoleDraughts(int: Int, variant: draughts.variant.Variant): Option[draughts.Role] =
+      draughts.Role.binaryInt(int)
 
     private def roleToInt(role: Role): Int = role.binaryInt
     private def roleToInt(role: chess.Role): Int = role.binaryInt
+    private def roleToInt(role: draughts.Role): Int = role.binaryInt
 
   }
 

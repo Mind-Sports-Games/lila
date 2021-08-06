@@ -1,11 +1,11 @@
 package lila.game
 
-import strategygames.{ Color, Clock, White, Black, Game => StratGame, History, Status, Mode, Piece, Pos, PositionHash, Situation, Board }
+import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameLib, History, Status, Mode, Piece, Pos, PositionHash, Situation, Board }
 import strategygames.chess
 import strategygames.draughts
-import strategygames.chess.variant.{ Variant => ChessVariant }
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Standard, Crazyhouse }
+import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard, Crazyhouse }
+import strategygames.draughts.variant.{ Variant => DraughtsVariant, Standard => DraughtsStandard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
@@ -88,7 +88,7 @@ object BSONHandlers {
       val createdAt     = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
-      val gameVariant = chess.variant.Variant(r intD F.variant) | Standard
+      val gameVariant = ChessVariant(r intD F.variant) | ChessStandard
 
       val decoded = r.bytesO(F.huffmanPgn).map { PgnStorage.Huffman.decode(_, playedPlies) } | {
         val clm      = r.get[CastleLastMove](F.castleLastMove)
@@ -106,11 +106,11 @@ object BSONHandlers {
         )
       }
 
-      val chessGame = strategygames.chess.Game(
-        situation = strategygames.chess.Situation(
-          strategygames.chess.Board(
+      val chessGame = chess.Game(
+        situation = chess.Situation(
+          chess.Board(
             pieces = decoded.pieces,
-            history = strategygames.chess.History(
+            history = chess.History(
               lastMove = decoded.lastMove,
               castles = decoded.castles,
               halfMoveClock = decoded.halfMoveClock,
@@ -171,7 +171,96 @@ object BSONHandlers {
     }
 
     def readDraughtsGame(r: BSON.Reader): Game = {
-      sys.error("Draughts not yet implemented")
+
+      //lila.mon.game.fetch()
+
+      val light = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val gameVariant = DraughtsVariant(r intD F.variant) | DraughtsStandard
+      val startedAtTurn = r intD F.startedAtTurn
+      val plies = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
+      val playedPlies = plies - startedAtTurn
+
+      val decoded = r.bytesO(F.huffmanPdn).map { PdnStorage.Huffman.decode(_, playedPlies) } | {
+        PdnStorage.Decoded(
+          pdnMoves = PdnStorage.OldBin.decode(r bytesD F.oldPdn, playedPlies),
+          pieces = BinaryFormat.piece.read(r bytes F.binaryPieces, gameVariant),
+          positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+          lastMove = r strO F.historyLastMove flatMap draughts.format.Uci.apply,
+          format = PdnStorage.OldBin
+        )
+      }
+
+      val decodedBoard = draughts.Board(
+        pieces = decoded.pieces,
+        history = draughts.DraughtsHistory(
+          lastMove = decoded.lastMove,
+          positionHashes = decoded.positionHashes,
+          kingMoves = if (gameVariant.frisianVariant || gameVariant.russian || gameVariant.brazilian) {
+            val counts = r.intsD(F.kingMoves)
+            KingMoves(~counts.headOption, ~counts.tailOption.flatMap(_.headOption), if (counts.length > 2) gameVariant.boardSize.pos.posAt(counts(2)) else none, if (counts.length > 3) gameVariant.boardSize.pos.posAt(counts(3)) else none)
+          } else KingMoves(0, 0),
+          variant = gameVariant
+        ),
+        variant = gameVariant
+      )
+
+      val midCapture = decoded.pdnMoves.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
+      val currentPly = if (midCapture) plies - 1 else plies
+      val turnColor = Color.fromPly(currentPly)
+
+      val decodedSituation = draughts.Situation(
+        board = decodedBoard,
+        color = turnColor
+      )
+
+      val createdAt = r date F.createdAt
+
+      val draughtsGame = draughts.DraughtsGame(
+        situation = decodedSituation,
+        pdnMoves = decoded.pdnMoves,
+        clock = r.getO[Color => Clock](F.clock) {
+          clockBSONReader(createdAt, light.whitePlayer.berserk, light.blackPlayer.berserk)
+        } map (_(decodedSituation.color)),
+        turns = currentPly,
+        startedAtTurn = startedAtTurn
+      )
+
+      val whiteClockHistory = r bytesO F.whiteClockHistory
+      val blackClockHistory = r bytesO F.blackClockHistory
+
+      Game(
+        id = light.id,
+        whitePlayer = light.whitePlayer,
+        blackPlayer = light.blackPlayer,
+        chess = StratGame.Draughts(draughtsGame),
+        loadClockHistory = clk => for {
+          bw <- whiteClockHistory
+          bb <- blackClockHistory
+          history <- BinaryFormat.clockHistory.read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(decodedSituation.color))
+          _ = lila.mon.game.loadClockHistory()
+        } yield history,
+        pdnStorage = decoded.format,
+        status = light.status,
+        daysPerTurn = r intO F.daysPerTurn,
+        binaryMoveTimes = r bytesO F.moveTimes,
+        mode = Mode(r boolD F.rated),
+        bookmarks = r intD F.bookmarks,
+        createdAt = createdAt,
+        movedAt = r.dateD(F.movedAt, createdAt),
+        metadata = Metadata(
+          source = r intO F.source flatMap Source.apply,
+          pdnImport = r.getO[PdnImport](F.pdnImport)(PdnImport.pdnImportBSONHandler),
+          tournamentId = r strO F.tournamentId,
+          swissId = r strO F.swissId,
+          simulId = r strO F.simulId,
+          simulPairing = r intO F.simulPairing,
+          timeOutUntil = r dateO F.timeOutUntil,
+          microMatch = r strO F.microMatch,
+          drawLimit = r intO F.drawLimit,
+          analysed = r boolD F.analysed
+          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)//should be empty for draughts
+        )
+      )
     }
 
     def reads(r: BSON.Reader): Game = {
@@ -224,32 +313,52 @@ object BSONHandlers {
         F.simulId           -> o.metadata.simulId,
         F.analysed          -> w.boolO(o.metadata.analysed)
       ) ++ {
-        if (o.variant.standard)
-          $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies))
-        else {
-          val f = PgnStorage.OldBin
-          $doc(
-            F.oldPgn         -> f.encode(o.pgnMoves take Game.maxPlies),
-            F.binaryPieces   -> BinaryFormat.piece.writeChess(o.board match {
-              case Board.Chess(board) => board.pieces
-              case _ => sys.error("invalid board")
-            }),
-            F.positionHashes -> o.history.positionHashes,
-            F.unmovedRooks   -> o.history.unmovedRooks,
-            F.castleLastMove -> CastleLastMove.castleLastMoveBSONHandler
-              .writeTry(
-                CastleLastMove(
-                  castles = o.history.castles,
-                  lastMove = o.history match {
-                    case History.Chess(h) => h.lastMove
-                    case _ => sys.error("Invalid history")
-                  }
+        if (o.board.variant.gameLib == GameLib.Draughts()){
+          o.pdnStorage match {
+            case Some(PdnStorage.OldBin) => $doc(
+              F.oldPgn -> PdnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
+              F.binaryPieces -> BinaryFormat.piece.writeDraughts(o.board match {
+                case Board.Draughts(board) => board
+                case _ => sys.error("invalid draughts board")
+              }),
+              F.positionHashes -> o.history.positionHashes,
+              F.historyLastMove -> o.history.lastMove.map(_.uci),
+              // since variants are always OldBin
+              F.kingMoves -> o.history.kingMoves.nonEmpty.option(o.history.kingMoves)
+            )
+            case Some(PdnStorage.Huffman) => $doc(
+              F.huffmanPdn -> PdnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies)
+            )
+            case _ => sys.error("invalid draughts storage")
+          }
+        } else {//chess or fail
+          if (o.variant.standard)
+            $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies))
+          else {
+            val f = PgnStorage.OldBin
+            $doc(
+              F.oldPgn         -> f.encode(o.pgnMoves take Game.maxPlies),
+              F.binaryPieces   -> BinaryFormat.piece.writeChess(o.board match {
+                case Board.Chess(board) => board.pieces
+                case _ => sys.error("invalid chess board")
+              }),
+              F.positionHashes -> o.history.positionHashes,
+              F.unmovedRooks   -> o.history.unmovedRooks,
+              F.castleLastMove -> CastleLastMove.castleLastMoveBSONHandler
+                .writeTry(
+                  CastleLastMove(
+                    castles = o.history.castles,
+                    lastMove = o.history match {
+                      case History.Chess(h) => h.lastMove
+                      case _ => sys.error("Invalid history")
+                    }
+                  )
                 )
-              )
-              .toOption,
-            F.checkCount -> o.history.checkCount.nonEmpty.option(o.history.checkCount),
-            F.crazyData  -> o.board.crazyData
-          )
+                .toOption,
+              F.checkCount -> o.history.checkCount.nonEmpty.option(o.history.checkCount),
+              F.crazyData  -> o.board.crazyData
+            )
+          }
         }
       }
   }
