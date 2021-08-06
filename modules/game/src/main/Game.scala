@@ -804,6 +804,8 @@ object Game {
     val positionHashes    = "ph"
     val checkCount        = "cc"
     val castleLastMove    = "cl"
+    val kingMoves         = "km"
+    val historyLastMove   = "hlm"
     val unmovedRooks      = "ur"
     val daysPerTurn       = "cd"
     val moveTimes         = "mt"
@@ -829,6 +831,10 @@ object Game {
     val checkAt           = "ck"
     val perfType          = "pt" // only set on student games for aggregation
     val drawOffers        = "do"
+    //draughts
+    val timeOutUntil      = "to"
+    val microMatch        = "mm"
+    val drawLimit         = "dl"
   }
 }
 

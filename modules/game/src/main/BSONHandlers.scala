@@ -183,7 +183,7 @@ object BSONHandlers {
       val decoded = r.bytesO(F.huffmanPdn).map { PdnStorage.Huffman.decode(_, playedPlies) } | {
         PdnStorage.Decoded(
           pdnMoves = PdnStorage.OldBin.decode(r bytesD F.oldPdn, playedPlies),
-          pieces = BinaryFormat.piece.read(r bytes F.binaryPieces, gameVariant),
+          pieces = BinaryFormat.piece.readDraughts(r bytes F.binaryPieces, gameVariant),
           positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
           lastMove = r strO F.historyLastMove flatMap draughts.format.Uci.apply,
           format = PdnStorage.OldBin
@@ -197,8 +197,8 @@ object BSONHandlers {
           positionHashes = decoded.positionHashes,
           kingMoves = if (gameVariant.frisianVariant || gameVariant.russian || gameVariant.brazilian) {
             val counts = r.intsD(F.kingMoves)
-            KingMoves(~counts.headOption, ~counts.tailOption.flatMap(_.headOption), if (counts.length > 2) gameVariant.boardSize.pos.posAt(counts(2)) else none, if (counts.length > 3) gameVariant.boardSize.pos.posAt(counts(3)) else none)
-          } else KingMoves(0, 0),
+            draughts.KingMoves(~counts.headOption, ~counts.tailOption.flatMap(_.headOption), if (counts.length > 2) gameVariant.boardSize.pos.posAt(counts(2)) else none, if (counts.length > 3) gameVariant.boardSize.pos.posAt(counts(3)) else none)
+          } else draughts.KingMoves(0, 0),
           variant = gameVariant
         ),
         variant = gameVariant
