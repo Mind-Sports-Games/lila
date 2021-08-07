@@ -3,6 +3,7 @@ package lila.game
 import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameLib, History, Status, Mode, Piece, Pos, PositionHash, Situation, Board }
 import strategygames.chess
 import strategygames.draughts
+import strategygames.format.Uci
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard, Crazyhouse }
 import strategygames.draughts.variant.{ Variant => DraughtsVariant, Standard => DraughtsStandard }
@@ -74,6 +75,10 @@ object BSONHandlers {
 
   import Player.playerBSONHandler
   private val emptyPlayerBuilder = playerBSONHandler.read($empty)
+
+  private[game] implicit val kingMovesWriter = new BSONWriter[draughts.KingMoves] {
+    def writeTry(km: draughts.KingMoves) = Try{BSONArray(km.white, km.black, km.whiteKing.fold(0)(_.fieldNumber), km.blackKing.fold(0)(_.fieldNumber))}
+  }
 
   implicit val gameBSONHandler: BSON[Game] = new BSON[Game] {
 
@@ -185,7 +190,8 @@ object BSONHandlers {
           pdnMoves = PdnStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies),
           pieces = BinaryFormat.piece.readDraughts(r bytes F.binaryPieces, gameVariant),
           positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
-          lastMove = r strO F.historyLastMove flatMap draughts.format.Uci.apply,
+          lastMove = r strO F.historyLastMove flatMap(draughts.format.Uci.apply),
+          //lastMove = r strO F.historyLastMove flatMap(uci => Uci.wrap(draughts.format.Uci(uci))),
           format = PdnStorage.OldBin
         )
       }
@@ -197,7 +203,12 @@ object BSONHandlers {
           positionHashes = decoded.positionHashes,
           kingMoves = if (gameVariant.frisianVariant || gameVariant.russian || gameVariant.brazilian) {
             val counts = r.intsD(F.kingMoves)
-            draughts.KingMoves(~counts.headOption, ~counts.tailOption.flatMap(_.headOption), if (counts.length > 2) gameVariant.boardSize.pos.posAt(counts(2)) else none, if (counts.length > 3) gameVariant.boardSize.pos.posAt(counts(3)) else none)
+            draughts.KingMoves(
+              ~counts.headOption,
+              ~counts.tail.headOption,
+              if (counts.length > 2) gameVariant.boardSize.pos.posAt(counts(2)) else none,
+              if (counts.length > 3) gameVariant.boardSize.pos.posAt(counts(3)) else none
+          )
           } else draughts.KingMoves(0, 0),
           variant = gameVariant
         ),
@@ -239,7 +250,7 @@ object BSONHandlers {
           history <- BinaryFormat.clockHistory.read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(decodedSituation.color))
           _ = lila.mon.game.loadClockHistory.increment()
         } yield history,
-        pdnStorage = decoded.format,
+        pdnStorage = Some(decoded.format),
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
         binaryMoveTimes = r bytesO F.moveTimes,

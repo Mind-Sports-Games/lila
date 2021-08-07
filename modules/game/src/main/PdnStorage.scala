@@ -3,6 +3,7 @@ package lila.game
 import strategygames.{ format => stratFormat, GameLib }
 import strategygames.draughts
 import strategygames.draughts.{ format, PieceMap }
+import strategygames.draughts.format.Uci
 import strategygames.draughts.{ Piece, Pos, PositionHash, Role }
 import strategygames.Color
 import strategygames.draughts.variant.{ Standard, Variant }
@@ -51,7 +52,7 @@ private object PdnStorage {
             draughtsPos(k).map(_ -> draughtsPiece(v))
           }.toMap,
           positionHashes = decoded.positionHashes,
-          lastMove = Option(decoded.lastUci) flatMap (uci => stratFormat.Uci(GameLib.Draughts(), uci)),
+          lastMove = Option(decoded.lastUci) flatMap (Uci.apply),
           format = Huffman
         )
       }
@@ -72,7 +73,7 @@ private object PdnStorage {
       pdnMoves: PgnMoves,
       pieces: PieceMap,
       positionHashes: PositionHash, // irrelevant after game ends
-      lastMove: Option[stratFormat.Uci],
+      lastMove: Option[Uci], // Draughts UCI
       format: PdnStorage
   )
 
