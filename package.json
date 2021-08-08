@@ -46,6 +46,9 @@
     "ui/cli",
     "ui/common",
     "ui/dasher",
+    "ui/draughts",
+    "ui/draughtsground",
+    "ui/draughtsround",
     "ui/editor",
     "ui/game",
     "ui/nvui",
@@ -71,6 +74,7 @@
     "ui/storm",
     "ui/racer",
     "ui/@build/rollupProject",
+    "ui/@build/plugin-node-resolve",
     "ui/@types/playstrategy",
     "ui/@types/cash"
   ]
