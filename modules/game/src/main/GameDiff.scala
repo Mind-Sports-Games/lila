@@ -1,7 +1,8 @@
 package lila.game
 
-import strategygames.{ Black, Board, Centis, Clock, Color, History, White }
+import strategygames.{ Black, Board, Centis, Clock, Color, GameLib, History, White }
 import strategygames.chess.CheckCount
+import strategygames.draughts.KingMoves
 import Game.BSONFields._
 import reactivemongo.api.bson._
 import scala.util.Try
@@ -49,6 +50,9 @@ object GameDiff {
     def dTry[A](name: String, getter: Game => A, toBson: A => Try[BSONValue]): Unit =
       d[A](name, getter, a => toBson(a).get)
 
+    def dOptTry[A](name: String, getter: Game => A, toBson: A => Option[Try[BSONValue]]): Unit =
+      dOpt[A](name, getter, a => toBson(a).map(_.get))
+
     def getClockHistory(color: Color)(g: Game): Option[ClockHistorySide] =
       for {
         clk     <- g.clock
@@ -62,31 +66,62 @@ object GameDiff {
         ByteArrayBSONHandler.writeOpt(BinaryFormat.clockHistory.writeSide(x, y, z))
       }
 
-    if (a.variant.standard) dTry(huffmanPgn, _.pgnMoves, writeBytes compose PgnStorage.Huffman.encode)
-    else {
-      val f = PgnStorage.OldBin
-      dTry(oldPgn, _.pgnMoves, writeBytes compose f.encode)
-      dTry(binaryPieces, _.board match {
-        case Board.Chess(b) => b.pieces
-        case _ => sys.error("Wrong board type")
-      }, writeBytes compose BinaryFormat.piece.writeChess)
-      d(positionHashes, _.history.positionHashes, w.bytes)
-      dTry(unmovedRooks, _.history.unmovedRooks, writeBytes compose BinaryFormat.unmovedRooks.write)
-      dTry(castleLastMove, makeCastleLastMove, CastleLastMove.castleLastMoveBSONHandler.writeTry)
-      // since variants are always OldBin
-      if (a.variant.threeCheck)
-        dOpt(
-          checkCount,
-          _.history.checkCount,
-          (o: CheckCount) => o.nonEmpty ?? { BSONHandlers.checkCountWriter writeOpt o }
-        )
-      if (a.variant.crazyhouse)
-        dOpt(
-          crazyData,
-          _.board.crazyData,
-          (o: Option[strategygames.chess.variant.Crazyhouse.Data]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
-        )
+    if (a.variant.gameLib == GameLib.Draughts()){
+      a.pdnStorage match {
+        case Some(PdnStorage.OldBin) => {
+          dTry(oldPgn, _.pgnMoves, writeBytes compose PdnStorage.OldBin.encode)
+          dTry(binaryPieces, _.board match {
+            case Board.Draughts(b) => b.pieces
+            case _ => sys.error("Wrong board type")
+          }, writeBytes compose {
+            m: strategygames.draughts.PieceMap => BinaryFormat.piece.writeDraughts(
+              m,
+              a.variant match {
+                case strategygames.variant.Variant.Draughts(v) => v
+                case _ => sys.error("Wrong variant type")
+              }
+            )
+          })
+          d(positionHashes, _.history.positionHashes, w.bytes)
+          d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+          // since variants are always OldBin
+          if (a.variant.frisianVariant || a.variant.russian || a.variant.brazilian)
+            dOptTry(kingMoves, _.history.kingMoves, (o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o })
+        }
+        case Some(PdnStorage.Huffman) => {
+          dTry(huffmanPgn, _.pgnMoves, writeBytes compose PdnStorage.Huffman.encode)
+        }
+        case _ => sys.error("invalid draughts storage")
+      }
+    } else {
+      if (a.variant.standard)
+        dTry(huffmanPgn, _.pgnMoves, writeBytes compose PgnStorage.Huffman.encode)
+      else {
+        val f = PgnStorage.OldBin
+        dTry(oldPgn, _.pgnMoves, writeBytes compose f.encode)
+        dTry(binaryPieces, _.board match {
+          case Board.Chess(b) => b.pieces
+          case _ => sys.error("Wrong board type")
+        }, writeBytes compose BinaryFormat.piece.writeChess)
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        dTry(unmovedRooks, _.history.unmovedRooks, writeBytes compose BinaryFormat.unmovedRooks.write)
+        dTry(castleLastMove, makeCastleLastMove, CastleLastMove.castleLastMoveBSONHandler.writeTry)
+        // since variants are always OldBin
+        if (a.variant.threeCheck)
+          dOpt(
+            checkCount,
+            _.history.checkCount,
+            (o: CheckCount) => o.nonEmpty ?? { BSONHandlers.checkCountWriter writeOpt o }
+          )
+        if (a.variant.crazyhouse)
+          dOpt(
+            crazyData,
+            _.board.crazyData,
+            (o: Option[strategygames.chess.variant.Crazyhouse.Data]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
+          )
+      }
     }
+
     d(turns, _.turns, w.int)
     dOpt(moveTimes, _.binaryMoveTimes, (o: Option[ByteArray]) => o flatMap ByteArrayBSONHandler.writeOpt)
     dOpt(whiteClockHistory, getClockHistory(White), clockHistoryToBytes)
