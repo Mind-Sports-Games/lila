@@ -3,7 +3,7 @@ package lila.game
 import play.api.libs.json._
 
 import strategygames.chess.variant.Crazyhouse
-import strategygames.{ Centis, Color, GameLib, Move => StratMove, PromotableRole, Pos, Situation, Status, Role, White, Black }
+import strategygames.{ Board, Centis, Color, GameLib, Move => StratMove, PromotableRole, Pos, Situation, Status, Role, White, Black }
 import strategygames.chess
 import strategygames.format.Forsyth
 import strategygames.chess.format.pgn.Dumper
@@ -22,7 +22,6 @@ sealed trait Event {
 }
 
 object Event {
-  val chessLib = GameLib.Chess()
 
   sealed trait Empty extends Event {
     def data = JsNull
@@ -42,13 +41,15 @@ object Event {
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
         possibleDrops: Option[List[Pos]],
-        crazyData: Option[Crazyhouse.Data]
+        crazyData: Option[Crazyhouse.Data],
+        captLen: Option[Int] = None
     )(extra: JsObject) = {
       extra ++ Json
         .obj(
           "fen"   -> fen,
           "ply"   -> state.turns,
-          "dests" -> PossibleMoves.oldJson(possibleMoves)
+          "dests" -> PossibleMoves.oldJson(possibleMoves),
+          "captLen" -> ~captLen
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -78,11 +79,12 @@ object Event {
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       possibleDrops: Option[List[Pos]],
-      crazyData: Option[Crazyhouse.Data]
+      crazyData: Option[Crazyhouse.Data],
+      captLen: Option[Int]
   ) extends Event {
     def typ = "move"
     def data =
-      MoveOrDrop.data(fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
+      MoveOrDrop.data(fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData, captLen) {
         Json
           .obj(
             "uci" -> s"${orig.key}${dest.key}",
@@ -105,11 +107,19 @@ object Event {
       Move(
         orig = move.orig,
         dest = move.dest,
-        san = move match { // TODO: DRAUGHTS this needs to change for draughts
-          case StratMove.Chess(move) => Dumper(move)
-          case _ => ""
+        san = move match {
+          case StratMove.Chess(move)    => Dumper(move)
+          case StratMove.Draughts(move) => strategygames.draughts.format.pdn.Dumper(move)
         },
-        fen = Forsyth.exportBoard(chessLib, situation.board),
+        fen = if (situation.board.variant.gameLib == GameLib.Draughts() && situation.board.variant.frisianVariant)
+            situation.board match {
+              case Board.Draughts(board)
+                => Forsyth.exportBoard(GameLib.Draughts(), situation.board) + ":" + 
+                  strategygames.draughts.format.Forsyth.exportKingMoves(board)
+              case _ => sys.error("mismatched board lib types")
+            }
+          else
+            Forsyth.exportBoard(situation.board.variant.gameLib, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         promotion = move.promotion.map { Promotion(_, move.dest) },
@@ -123,7 +133,15 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        crazyData = crazyData
+        crazyData = crazyData,
+        captLen = (situation, move.dest) match {
+          case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
+            if (situation.ghosts > 0)
+              situation.captureLengthFrom(moveDest)
+            else
+              situation.allMovesCaptureLength.some
+          case _ => None
+        }
       )
   }
 
@@ -163,7 +181,7 @@ object Event {
         role = Role.ChessRole(drop.piece.role),
         pos = Pos.Chess(drop.pos),
         san = Dumper(drop),
-        fen = Forsyth.exportBoard(chessLib, situation.board),
+        fen = Forsyth.exportBoard(GameLib.Chess(), situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         state = state,
@@ -369,6 +387,16 @@ object Event {
         "white" -> white,
         "black" -> black
       )
+  }
+
+  case class KingMoves(white: Int, black: Int, whiteKing: Option[Pos], blackKing: Option[Pos]) extends Event {
+    def typ = "kingMoves"
+    def data = Json.obj(
+      "white" -> white,
+      "black" -> black,
+      "whiteKing" -> whiteKing.map(_.toString),
+      "blackKing" -> blackKing.map(_.toString)
+    )
   }
 
   case class State(

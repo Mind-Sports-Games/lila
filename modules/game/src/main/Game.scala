@@ -16,6 +16,7 @@ import strategygames.{
   Mode,
   Move,
   MoveOrDrop,
+  Pos,
   Speed,
   Status,
   White
@@ -236,12 +237,20 @@ case class Game(
       Event.Drop(_, game.situation, state, clockEvent, updated.board.crazyData)
     ) :: {
       // abstraction leak, I know.
-      (updated.board.variant.threeCheck && game.situation.check) ?? List(
-        Event.CheckCount(
-          white = updated.history.checkCount.white,
-          black = updated.history.checkCount.black
+      if (updated.board.variant.gameLib == GameLib.Draughts())
+        (updated.board.variant.frisianVariant || updated.board.variant.russian || updated.board.variant.brazilian) ?? List(Event.KingMoves(
+          white = updated.history.kingMoves.white,
+          black = updated.history.kingMoves.black,
+          whiteKing = updated.history.kingMoves.whiteKing.map(Pos.Draughts),
+          blackKing = updated.history.kingMoves.blackKing.map(Pos.Draughts)
+        ))
+      else//chess
+        (updated.board.variant.threeCheck && game.situation.check) ?? List(
+          Event.CheckCount(
+            white = updated.history.checkCount.white,
+            black = updated.history.checkCount.black
+          )
         )
-      )
     }
 
     Progress(this, updated, events)
@@ -529,6 +538,7 @@ case class Game(
           case _           => 35
         }
       if (variant.chess960) base * 5 / 4
+      if (isTournament && (variant.russian || variant.brazilian) && metadata.simulPairing.isDefined) base + 10
       else base
     }
 
@@ -755,7 +765,9 @@ object Game {
       mode: Mode,
       source: Source,
       pgnImport: Option[PgnImport],
-      daysPerTurn: Option[Int] = None
+      daysPerTurn: Option[Int] = None,
+      drawLimit: Option[Int] = None,
+      microMatch: Option[String] = None
   ): NewGame = {
     val createdAt = DateTime.now
     NewGame(
@@ -767,7 +779,7 @@ object Game {
         status = Status.Created,
         daysPerTurn = daysPerTurn,
         mode = mode,
-        metadata = metadata(source).copy(pgnImport = pgnImport),
+        metadata = metadata(source).copy(pgnImport = pgnImport, drawLimit = drawLimit, microMatch = microMatch),
         createdAt = createdAt,
         movedAt = createdAt,
         pdnStorage = if (chess.situation.board.variant.gameLib == GameLib.Draughts()) Some(PdnStorage.OldBin) else None
