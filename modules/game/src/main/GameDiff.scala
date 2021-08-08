@@ -2,6 +2,7 @@ package lila.game
 
 import strategygames.{ Black, Board, Centis, Clock, Color, GameLib, History, White }
 import strategygames.chess.CheckCount
+import strategygames.chess.variant.Crazyhouse
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
 import reactivemongo.api.bson._
@@ -86,7 +87,11 @@ object GameDiff {
           d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
           // since variants are always OldBin
           if (a.variant.frisianVariant || a.variant.russian || a.variant.brazilian)
-            dOptTry(kingMoves, _.history.kingMoves, (o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o })
+            dOptTry(
+              kingMoves,
+              _.history.kingMoves,
+              (o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o }
+            )
         }
         case Some(PdnStorage.Huffman) => {
           dTry(huffmanPgn, _.pgnMoves, writeBytes compose PdnStorage.Huffman.encode)
@@ -117,7 +122,7 @@ object GameDiff {
           dOpt(
             crazyData,
             _.board.crazyData,
-            (o: Option[strategygames.chess.variant.Crazyhouse.Data]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
+            (o: Option[Crazyhouse.Data]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
           )
       }
     }
