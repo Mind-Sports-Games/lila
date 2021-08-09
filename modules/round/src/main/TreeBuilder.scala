@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Color, Centis, Game, GameLib, Replay }
+import strategygames.{ Color, Centis, Game, GameLib, Pos, Replay, Situation }
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
@@ -21,7 +21,7 @@ object TreeBuilder {
       best = info.best
     )
 
-  def chessOpeningOf(fen: FEN): Option[FullOpening] =
+  def fullOpeningOf(fen: FEN): Option[FullOpening] =
     fen match {
       case FEN.Chess(fen)    => FullOpeningDB.findByFen(GameLib.Chess(), FEN.Chess(fen))
       case FEN.Draughts(fen) => FullOpeningDB.findByFen(GameLib.Draughts(), FEN.Draughts(fen))
@@ -44,7 +44,7 @@ object TreeBuilder {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val openingOf: OpeningOf =
-          if (withFlags.opening && Variant.openingSensibleVariants(game.variant.gameLib)(game.variant)) chessOpeningOf
+          if (withFlags.opening && Variant.openingSensibleVariants(game.variant.gameLib)(game.variant)) fullOpeningOf
           else _ => None
         val fen                 = Forsyth.>>(game.variant.gameLib, init)
         val infos: Vector[Info] = analysis.??(_.infos.toVector)
@@ -55,6 +55,10 @@ object TreeBuilder {
           ply = init.turns,
           fen = fen,
           check = init.situation.check,
+          captureLength = init.situation match {
+            case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
+            case _ => None
+          },
           opening = openingOf(fen),
           clock = withClocks.flatMap(_.headOption),
           crazyData = init.situation.board.crazyData,
@@ -69,6 +73,12 @@ object TreeBuilder {
             ply = g.turns,
             move = m,
             fen = fen,
+            captureLength = (g.situation, m.uci.origDest._2) match {
+              case (Situation.Draughts(situation), Pos.Draughts(pos)) =>
+                if (situation.ghosts > 0) situation.captureLengthFrom(pos)
+                else situation.allMovesCaptureLength.some
+              case _ => None
+            },
             check = g.situation.check,
             opening = openingOf(fen),
             clock = withClocks flatMap (_ lift (g.turns - init.turns - 1)),

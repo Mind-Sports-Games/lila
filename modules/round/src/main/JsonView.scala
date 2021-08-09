@@ -2,13 +2,14 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, Color }
+import strategygames.{ Clock, Color, Pos, Situation }
+import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.math
 
 import lila.common.ApiVersion
 import lila.game.JsonView._
-import lila.game.{ Pov, Game, Player => GamePlayer }
+import lila.game.{ Event, Pov, Game, Player => GamePlayer }
 import lila.pref.Pref
 import lila.user.{ User, UserRepo }
 
@@ -81,6 +82,7 @@ final class JsonView(
               "socket" -> s"/play/$fullId/v$apiVersion",
               "round"  -> s"/$fullId"
             ),
+            "captureLength" -> captureLength(pov),
             "pref" -> Json
               .obj(
                 "animationDuration" -> animationMillis(pov, pref),
@@ -176,6 +178,7 @@ final class JsonView(
             "opponent" -> commonWatcherJson(game, opponent, opponentUser, withFlags).add(
               "onGame" -> (opponent.isAi || socket.onGame(opponent.color))
             ),
+            "captureLength" -> captureLength(pov),
             "orientation" -> pov.color.name,
             "url" -> Json.obj(
               "socket" -> s"/watch/$gameId/${color.name}/v$apiVersion",
@@ -268,14 +271,61 @@ final class JsonView(
     clockWriter.writes(clock) + ("moretime" -> JsNumber(actorApi.round.Moretime.defaultDuration.toSeconds))
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =
-    (pov.game playableBy pov.player) option
-      lila.game.Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+    (pov.game.situation, pov.game.variant) match {
+      case (Situation.Chess(_), Variant.Chess(_)) => (pov.game playableBy pov.player) option
+        Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Draughts(situation), Variant.Draughts(variant))
+        => (pov.game playableBy pov.player) option {
+          if (situation.ghosts > 0) {
+            val move = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+            val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
+            destPos match {
+              case Some(dest) =>
+                Event.PossibleMoves.json(
+                  Map(Pos.Draughts(dest) -> situation.destinationsFrom(dest).map(Pos.Draughts)),
+                  apiVersion
+                )
+              case _ =>
+                Event.PossibleMoves.json(
+                  situation.allDestinations.map{
+                    case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts))
+                  },
+                  apiVersion
+                )
+            }
+          } else {
+            Event.PossibleMoves.json(
+              situation.allDestinations.map{
+                case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts))
+              },
+              apiVersion
+            )
+          }
+        }
+      case _ => sys.error("Mismatch of types for possibleMoves")
+    }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
     (pov.game playableBy pov.player) ?? {
       pov.game.situation.drops map { drops =>
         JsString(drops.map(_.key).mkString)
       }
+    }
+
+  //draughts
+  private def captureLength(pov: Pov): Int =
+    (pov.game.situation, pov.game.variant) match {
+      case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
+        if (situation.ghosts > 0) {
+          val move = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+          val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
+          destPos match {
+            case Some(dest) => ~situation.captureLengthFrom(dest)
+            case _ => situation.allMovesCaptureLength
+          }
+        } else
+          situation.allMovesCaptureLength
+      case _ => 0
     }
 
   private def animationMillis(pov: Pov, pref: Pref) =
