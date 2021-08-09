@@ -8,21 +8,19 @@ import * as ground from './ground';
 import notify from 'common/notification';
 import { make as makeSocket, RoundSocket } from './socket';
 import * as title from './title';
-import * as promotion from './promotion';
 import * as blur from './blur';
 import * as speech from './speech';
-import * as cg from 'chessground/types';
-import { Config as CgConfig } from 'chessground/config';
-import { Api as CgApi } from 'chessground/api';
+import * as cg from 'draughtsground/types';
+import { Config as CgConfig } from 'draughtsground/config';
+import { Api as DgApi } from 'draughtsground/api';
+import { countGhosts } from 'draughtsground/fen';
 import { ClockController } from './clock/clockCtrl';
 import { CorresClockController, ctrl as makeCorresClock } from './corresClock/corresClockCtrl';
 import MoveOn from './moveOn';
 import TransientMove from './transientMove';
-import * as atomic from './atomic';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
-import { valid as crazyValid, init as crazyInit, onEnd as crazyEndHook } from './crazy/crazyCtrl';
 import { ctrl as makeKeyboardMove, KeyboardMove } from './keyboardMove';
 import * as renderUser from './view/user';
 import * as cevalSub from './cevalSub';
@@ -52,7 +50,7 @@ type Timeout = number;
 export default class RoundController {
   data: RoundData;
   socket: RoundSocket;
-  chessground: CgApi;
+  draughtsground: DgApi;
   clock?: ClockController;
   corresClock?: CorresClockController;
   trans: Trans;
@@ -60,6 +58,10 @@ export default class RoundController {
   keyboardMove?: KeyboardMove;
   moveOn: MoveOn;
 
+  /**
+   * We make a strict disctiontion between this.data.game.turns as the game state, determining turn color etc, and this.ply, determining the game view only
+   * Rewrite what variable is used and/or updated where necessary, so that we can safely add "virtual plies" to this.ply
+   */
   ply: number;
   firstSeconds = true;
   flip = false;
@@ -78,13 +80,13 @@ export default class RoundController {
   justDropped?: cg.Role;
   justCaptured?: cg.Piece;
   shouldSendMoveTime = false;
-  preDrop?: cg.Role;
   lastDrawOfferAtPly?: Ply;
   nvui?: NvuiPlugin;
   sign: string = Math.random().toString(36);
   private music?: any;
 
   constructor(readonly opts: RoundOpts, readonly redraw: Redraw) {
+    opts.data.steps = round.mergeSteps(opts.data.steps, this.isAlgebraic(opts.data) ? 1 : 0);
     round.massage(opts.data);
 
     const d = (this.data = opts.data);
@@ -161,65 +163,31 @@ export default class RoundController {
 
   private onUserMove = (orig: cg.Key, dest: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.keyboardMove || !this.keyboardMove.usedSan) ab.move(this, meta);
-    if (!promotion.start(this, orig, dest, meta)) this.sendMove(orig, dest, undefined, meta);
+    this.sendMove(orig, dest, undefined, meta);
   };
 
-  private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
-    if (!this.replaying() && crazyValid(this.data, role, key)) {
-      this.sendNewPiece(role, key, !!meta.predrop);
-    } else this.jump(this.ply);
-  };
-
-  private onMove = (orig: cg.Key, dest: cg.Key, captured?: cg.Piece) => {
-    if (captured || this.enpassant(orig, dest)) {
-      if (this.data.game.variant.key === 'atomic') {
-        sound.explode();
-        atomic.capture(this, dest);
-      } else sound.capture();
-    } else sound.move();
-  };
-
-  private onPremove = (orig: cg.Key, dest: cg.Key, meta: cg.MoveMetadata) => {
-    promotion.start(this, orig, dest, meta);
-  };
-
-  private onCancelPremove = () => {
-    promotion.cancelPrePromotion(this);
-  };
-
-  private onPredrop = (role: cg.Role | undefined, _?: Key) => {
-    this.preDrop = role;
-    this.redraw();
+  private onMove = (_orig: cg.Key, _dest: cg.Key, captured?: cg.Piece) => {
+    if (captured) sound.capture();
+    else sound.move();
   };
 
   private isSimulHost = () => {
     return this.data.simul && this.data.simul.hostId === this.opts.userId;
   };
 
-  private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
-    if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'pawn') return false;
-    const pos = (dest[0] + orig[1]) as cg.Key;
-    this.chessground.setPieces(new Map([[pos, undefined]]));
-    return true;
-  };
-
   lastPly = () => round.lastPly(this.data);
 
   makeCgHooks = () => ({
     onUserMove: this.onUserMove,
-    onUserNewPiece: this.onUserNewPiece,
     onMove: this.onMove,
     onNewPiece: sound.move,
-    onPremove: this.onPremove,
-    onCancelPremove: this.onCancelPremove,
-    onPredrop: this.onPredrop,
   });
 
   replaying = (): boolean => this.ply !== this.lastPly();
 
   userJump = (ply: Ply): void => {
     this.cancelMove();
-    this.chessground.selectSquare(null);
+    this.draughtsground.selectSquare(null);
     if (ply != this.ply && this.jump(ply)) speech.userJump(this, this.ply);
     else this.redraw();
   };
@@ -228,28 +196,28 @@ export default class RoundController {
 
   jump = (ply: Ply): boolean => {
     ply = Math.max(round.firstPly(this.data), Math.min(this.lastPly(), ply));
-    const isForwardStep = ply === this.ply + 1;
+    const plyDiff = Math.abs(ply - this.ply);
     this.ply = ply;
     this.justDropped = undefined;
-    this.preDrop = undefined;
     const s = this.stepAt(ply),
+      ghosts = countGhosts(s.fen),
       config: CgConfig = {
         fen: s.fen,
         lastMove: util.uci2move(s.uci),
-        check: !!s.check,
-        turnColor: this.ply % 2 === 0 ? 'white' : 'black',
+        turnColor: (this.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'white' : 'black',
       };
-    if (this.replaying()) this.chessground.stop();
-    else
+    if (this.replaying()) this.draughtsground.stop();
+    else {
       config.movable = {
         color: this.isPlaying() ? this.data.player.color : undefined,
         dests: util.parsePossibleMoves(this.data.possibleMoves),
       };
-    this.chessground.set(config);
-    if (s.san && isForwardStep) {
+      config.captureLength = this.data.captureLength;
+    }
+    this.draughtsground.set(config, plyDiff > 1);
+    if (s.san && plyDiff !== 0) {
       if (s.san.includes('x')) sound.capture();
       else sound.move();
-      if (/[+#]/.test(s.san)) sound.check();
     }
     this.autoScroll();
     if (this.keyboardMove) this.keyboardMove.update(s);
@@ -266,6 +234,14 @@ export default class RoundController {
     );
   };
 
+  isAlgebraic = (d: RoundData): boolean => {
+    return d.pref.coordSystem === 1; //&& d.game.variant.board.key === '64'; // TODO: this will need to be solved before larger boards work?
+  };
+
+  coordSystem = (): number => {
+    return this.isAlgebraic(this.data) ? 1 : 0;
+  };
+
   isLate = () => this.replaying() && status.playing(this.data);
 
   playerAt = (position: Position) =>
@@ -273,12 +249,13 @@ export default class RoundController {
 
   flipNow = () => {
     this.flip = !this.nvui && !this.flip;
-    this.chessground.set({
+    this.draughtsground.set({
       orientation: ground.boardOrientation(this.data, this.flip),
     });
     this.redraw();
   };
 
+  //Whos turn / game over in window title
   setTitle = () => title.set(this);
 
   actualSendMove = (tpe: string, data: any, meta: MoveMetadata = {}) => {
@@ -302,7 +279,7 @@ export default class RoundController {
 
     this.justDropped = meta.justDropped;
     this.justCaptured = meta.justCaptured;
-    this.preDrop = undefined;
+    this.transientMove.register();
     this.redraw();
   };
 
@@ -310,7 +287,8 @@ export default class RoundController {
     const move: SocketMove = {
       u: orig + dest,
     };
-    if (prom) move.u += prom === 'knight' ? 'n' : prom[0];
+    //if (prom) move.u += prom === 'knight' ? 'n' : prom[0];
+    if (prom) move.u += '';
     if (blur.get()) move.b = 1;
     this.resign(false);
     if (this.data.pref.submitMove && !meta.premove) {
@@ -320,24 +298,6 @@ export default class RoundController {
       this.actualSendMove('move', move, {
         justCaptured: meta.captured,
         premove: meta.premove,
-      });
-    }
-  };
-
-  sendNewPiece = (role: cg.Role, key: cg.Key, isPredrop: boolean): void => {
-    const drop: SocketDrop = {
-      role: role,
-      pos: key,
-    };
-    if (blur.get()) drop.b = 1;
-    this.resign(false);
-    if (this.data.pref.submitMove && !isPredrop) {
-      this.dropToSubmit = drop;
-      this.redraw();
-    } else {
-      this.actualSendMove('drop', drop, {
-        justDropped: role,
-        premove: isPredrop,
       });
     }
   };
@@ -365,7 +325,8 @@ export default class RoundController {
 
   apiMove = (o: ApiMove): true => {
     const d = this.data,
-      playing = this.isPlaying();
+      playing = this.isPlaying(),
+      ghosts = countGhosts(o.fen);
 
     d.game.turns = o.ply;
     d.game.player = o.ply % 2 === 0 ? 'white' : 'black';
@@ -376,53 +337,49 @@ export default class RoundController {
     this.playerByColor('white').offeringDraw = o.wDraw;
     this.playerByColor('black').offeringDraw = o.bDraw;
     d.possibleMoves = activeColor ? o.dests : undefined;
-    d.possibleDrops = activeColor ? o.drops : undefined;
-    d.crazyhouse = o.crazyhouse;
+    d.captureLength = o.captLen;
+
     this.setTitle();
     if (!this.replaying()) {
-      this.ply++;
+      //Show next ply if we're following the head of the line (not replaying)
+      this.ply = d.game.turns + (ghosts > 0 ? 1 : 0);
+
       if (o.role)
-        this.chessground.newPiece(
+        this.draughtsground.newPiece(
           {
             role: o.role,
             color: playedColor,
           },
-          o.uci.substr(2, 2) as cg.Key
+          o.uci.substr(o.uci.length - 2, 2) as cg.Key
         );
       else {
-        // This block needs to be idempotent, even for castling moves in
-        // Chess960.
-        const keys = util.uci2move(o.uci)!,
-          pieces = this.chessground.state.pieces;
-        if (
-          !o.castle ||
-          (pieces.get(o.castle.king[0])?.role === 'king' && pieces.get(o.castle.rook[0])?.role === 'rook')
-        ) {
-          this.chessground.move(keys[0], keys[1]);
-        }
+        const keys = util.uci2move(o.uci);
+        this.draughtsground.move(keys![0], keys![1], ghosts === 0);
       }
-      if (o.promotion) ground.promote(this.chessground, o.promotion.key, o.promotion.pieceClass);
-      this.chessground.set({
+      this.draughtsground.set({
         turnColor: d.game.player,
         movable: {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves) : new Map(),
         },
-        check: !!o.check,
+        captureLength: d.captureLength,
       });
       if (o.check) sound.check();
       blur.onMove();
       playstrategy.pubsub.emit('ply', this.ply);
     }
     d.game.threefold = !!o.threefold;
-    const step = {
-      ply: this.lastPly() + 1,
-      fen: o.fen,
-      san: o.san,
-      uci: o.uci,
-      check: o.check,
-      crazy: o.crazyhouse,
-    };
-    d.steps.push(step);
+
+    const step = round.addStep(
+      d.steps,
+      {
+        ply: d.game.turns,
+        fen: o.fen,
+        san: o.san,
+        uci: o.uci,
+      },
+      this.coordSystem()
+    );
+
     this.justDropped = undefined;
     this.justCaptured = undefined;
     game.setOnGame(d, playedColor, true);
@@ -448,10 +405,9 @@ export default class RoundController {
       // atrocious hack to prevent race condition
       // with explosions and premoves
       // https://github.com/ornicar/lila/issues/343
-      const premoveDelay = d.game.variant.key === 'atomic' ? 100 : 1;
+      const premoveDelay = 1;
       setTimeout(() => {
-        if (!this.chessground.playPremove() && !this.playPredrop()) {
-          promotion.cancel(this);
+        if (!this.draughtsground.playPremove()) {
           this.showYourMoveNotification();
         }
       }, premoveDelay);
@@ -460,23 +416,17 @@ export default class RoundController {
     this.onChange();
     if (this.keyboardMove) this.keyboardMove.update(step, playedColor != d.player.color);
     if (this.music) this.music.jump(o);
-    speech.step(step);
+    speech.step(o, this.isAlgebraic(this.data));
     return true; // prevents default socket pubsub
-  };
-
-  private playPredrop = () => {
-    return this.chessground.playPredrop(drop => {
-      return crazyValid(this.data, drop.role, drop.key);
-    });
   };
 
   private clearJust() {
     this.justDropped = undefined;
     this.justCaptured = undefined;
-    this.preDrop = undefined;
   }
 
   reload = (d: RoundData): void => {
+    d.steps = round.mergeSteps(d.steps, this.coordSystem());
     if (d.steps.length !== this.data.steps.length) this.ply = d.steps[d.steps.length - 1].ply;
     round.massage(d);
     this.data = d;
@@ -501,7 +451,7 @@ export default class RoundController {
     d.game.status = o.status;
     d.game.boosted = o.boosted;
     this.userJump(this.lastPly());
-    this.chessground.stop();
+    this.draughtsground.stop();
     if (o.ratingDiff) {
       d.player.ratingDiff = o.ratingDiff[d.player.color];
       d.opponent.ratingDiff = o.ratingDiff[d.opponent.color];
@@ -518,7 +468,6 @@ export default class RoundController {
       )
         this.opts.chat?.instance?.then(c => c.post('Good game, well played'));
     }
-    if (d.crazyhouse) crazyEndHook();
     this.clearJust();
     this.setTitle();
     this.moveOn.next();
@@ -587,8 +536,7 @@ export default class RoundController {
 
   takebackYes = () => {
     this.socket.sendLoading('takeback-yes');
-    this.chessground.cancelPremove();
-    promotion.cancel(this);
+    this.draughtsground.cancelPremove();
   };
 
   resign = (v: boolean, immediately?: boolean): void => {
@@ -706,8 +654,8 @@ export default class RoundController {
     this.socket.sendLoading('draw-yes', null);
   };
 
-  setChessground = (cg: CgApi) => {
-    this.chessground = cg;
+  setDraughtsground = (dg: DgApi) => {
+    this.draughtsground = dg;
     if (this.data.pref.keyboardMove) {
       this.keyboardMove = makeKeyboardMove(this, this.stepAt(this.ply), this.redraw);
       requestAnimationFrame(() => this.redraw());
@@ -729,8 +677,6 @@ export default class RoundController {
         title.init();
         this.setTitle();
 
-        if (d.crazyhouse) crazyInit(this);
-
         window.addEventListener('beforeunload', e => {
           const d = this.data;
           if (
@@ -751,7 +697,7 @@ export default class RoundController {
         if (!this.nvui && d.pref.submitMove) {
           window.Mousetrap.bind('esc', () => {
             this.submitMove(false);
-            this.chessground.cancelMove();
+            this.draughtsground.cancelMove();
           }).bind('return', () => this.submitMove(true));
         }
         cevalSub.subscribe(this);

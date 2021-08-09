@@ -16,9 +16,9 @@ ls -l node_modules node_modules/@* ui/node_modules ui/*/node_modules | grep /yar
 
 mkdir -p public/compiled
 
-apps1="common"
-apps2="chess ceval game tree chat nvui puz"
-apps3="site swiss msg chat cli challenge notify learn insight editor puzzle round analyse lobby tournament tournamentSchedule tournamentCalendar simul dasher speech palantir serviceWorker dgt storm racer"
+apps1="draughtsground common"
+apps2="chess ceval draughts game tree chat nvui puz"
+apps3="site swiss msg chat cli challenge notify learn insight editor puzzle round draughtsround analyse lobby tournament tournamentSchedule tournamentCalendar simul dasher speech palantir serviceWorker dgt storm racer"
 site_plugins="tvEmbed puzzleEmbed analyseEmbed user modUser clas coordinate captcha expandText team forum account coachShow coachForm challengePage checkout login passwordComplexity tourForm teamBattleForm gameSearch userComplete infiniteScroll flatpickr teamAdmin appeal modGames publicChats contact"
 round_plugins="nvui keyboardMove"
 analyse_plugins="nvui studyTopicForm"
@@ -76,6 +76,7 @@ else
     for app in $apps1 $apps2 $apps3; do (build $app); done
     for plugin in $site_plugins; do (build_plugin site $plugin); done
     for plugin in $round_plugins; do (build_plugin round $plugin); done
+    for plugin in $round_plugins; do (build_plugin draughtsround $plugin); done
     for plugin in $analyse_plugins; do (build_plugin analyse $plugin); done
     for plugin in $puzzle_plugins; do (build_plugin puzzle $plugin); done
   fi
