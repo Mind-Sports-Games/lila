@@ -53,6 +53,7 @@ object Pov {
   def naturalOrientation(game: Game) = apply(game, game.naturalOrientation)
 
   def player(game: Game) = apply(game, game.player)
+  def opponent(game: Game) = apply(game, game.opponent(game.player))
 
   def apply(game: Game, player: Player) = new Pov(game, player.color)
 

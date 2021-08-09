@@ -91,6 +91,19 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
       }
     }
 
+  def moveOpponent(g: Game, last: Move): Fu[Option[Uci.Move]] = g.forecastable ?? {
+    loadForPlay(Pov opponent g) flatMap {
+      case None =>
+        fuccess(none)
+      case Some(fc) => fc.moveOpponent(g, last) match {
+        case Some((newFc, uciMove)) if newFc.steps.nonEmpty =>
+          coll.update.one($id(fc._id), newFc) inject uciMove.some
+        case Some((_, uciMove)) => clearPov(Pov player g) inject uciMove.some
+        case _                  => clearPov(Pov player g) inject none
+      }
+    }
+  }
+
   private def firstStep(steps: Forecast.Steps) = steps.headOption.flatMap(_.headOption)
 
   def clearGame(g: Game) = coll.delete.one($inIds(Color.all.map(g.fullIdOf))).void

@@ -29,6 +29,9 @@ final class JsonView(
   private def checkCount(game: Game, color: Color) =
     (game.variant == strategygames.chess.variant.ThreeCheck) option game.history.checkCount(color)
 
+  private def kingMoves(game: Game, color: Color) =
+    (game.variant.frisianVariant) option game.history.kingMoves(color)
+
   private def commonPlayerJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
       .obj("color" -> p.color.name)
@@ -40,6 +43,7 @@ final class JsonView(
       .add("offeringDraw" -> p.isOfferingDraw)
       .add("proposingTakeback" -> p.isProposingTakeback)
       .add("checks" -> checkCount(g, p.color))
+      .add("kingMoves" -> kingMoves(g, p.color))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
 
@@ -137,6 +141,7 @@ final class JsonView(
       .add("ratingDiff" -> p.ratingDiff)
       .add("provisional" -> p.provisional)
       .add("checks" -> checkCount(g, p.color))
+      .add("kingMoves" -> kingMoves(g, p.color))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
 

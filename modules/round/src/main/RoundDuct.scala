@@ -1,8 +1,7 @@
 package lila.round
 
 import actorApi._, round._
-import strategygames.{ Black, Color, White }
-import strategygames.{ Centis }
+import strategygames.{ Black, Centis, Color, Move, White }
 import org.joda.time.DateTime
 import ornicar.scalalib.Zero
 import play.api.libs.json._
@@ -374,7 +373,14 @@ final private[round] class RoundDuct(
 
     case ForecastPlay(lastMove) =>
       handle { game =>
-        forecastApi.nextMove(game, lastMove) map { mOpt =>
+        val nextMove = lastMove match {
+          case Move.Draughts(lastMove) => lastMove.situationBefore.captureLengthFrom(lastMove.orig) match {
+            case Some(captLen) if captLen > 1 => forecastApi.moveOpponent(game, Move.Draughts(lastMove)) >> forecastApi.nextMove(game, Move.Draughts(lastMove))
+            case _ => forecastApi.nextMove(game, Move.Draughts(lastMove))
+          }
+          case _ => forecastApi.nextMove(game, lastMove)
+        }
+        nextMove map { mOpt =>
           mOpt foreach { move =>
             this ! HumanPlay(PlayerId(game.player.id), move, blur = false)
           }
