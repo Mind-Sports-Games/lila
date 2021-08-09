@@ -6,7 +6,7 @@ import strategygames.variant.Variant
 import strategygames.{ Centis, Color }
 import org.joda.time.DateTime
 
-import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
+import strategygames.opening.{ FullOpening, FullOpeningDB }
 import lila.tree.Node.{ Comment, Gamebook, Shapes }
 import lila.user.User
 import lila.common.Form
@@ -64,10 +64,7 @@ case class Chapter(
 
   def opening: Option[FullOpening] =
     if (!Variant.openingSensibleVariants(setup.variant.gameLib)(setup.variant)) none
-    else FullOpeningDB searchInFens root.mainline.map(_.fen match {
-      case FEN.Chess(fen) => fen
-      case _ => sys.error("Not implemented for anything other than chess")
-    })
+    else FullOpeningDB.searchInFens(setup.variant.gameLib, root.mainline.map(_.fen))
 
   def isEmptyInitial = order == 1 && root.children.nodes.isEmpty
 

@@ -1,6 +1,6 @@
 package lila.study
 
-import strategygames.chess.opening._
+import strategygames.opening.FullOpeningDB
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ Game, GameLib }
@@ -36,10 +36,9 @@ object TreeBuilder {
       crazyData = node.crazyData,
       eval = node.score.map(_.eval),
       children = toBranches(node.children, variant),
-      opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? (node.fen match {
-        case FEN.Chess(fen) => FullOpeningDB findByFen fen
-        case _ => sys.error("Invalid fen lib")
-      }),
+      opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? (
+        FullOpeningDB.findByFen(variant.gameLib, node.fen)
+      ),
       forceVariation = node.forceVariation
     )
 
@@ -56,10 +55,9 @@ object TreeBuilder {
       crazyData = root.crazyData,
       eval = root.score.map(_.eval),
       children = toBranches(root.children, variant),
-      opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? (root.fen match {
-        case FEN.Chess(fen) => FullOpeningDB findByFen fen
-        case _ => sys.error("Invalid fen lib")
-      }),
+      opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? (
+        FullOpeningDB.findByFen(variant.gameLib, root.fen)
+      ),
     )
 
   private def toBranches(children: Node.Children, variant: Variant): List[tree.Branch] =

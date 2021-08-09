@@ -3,7 +3,7 @@ package lila.round
 import strategygames.{ Color, Centis, Game, GameLib, Replay }
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
-import strategygames.chess.opening._
+import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.variant.Variant
 import JsonView.WithFlags
 import lila.analyse.{ Advice, Analysis, Info }
@@ -23,8 +23,8 @@ object TreeBuilder {
 
   def chessOpeningOf(fen: FEN): Option[FullOpening] =
     fen match {
-      case FEN.Chess(fen) => FullOpeningDB.findByFen(fen)
-      case _ => sys.error("Not implemented for anything other than chess")
+      case FEN.Chess(fen)    => FullOpeningDB.findByFen(GameLib.Chess(), FEN.Chess(fen))
+      case FEN.Draughts(fen) => FullOpeningDB.findByFen(GameLib.Draughts(), FEN.Draughts(fen))
     }
 
   def apply(

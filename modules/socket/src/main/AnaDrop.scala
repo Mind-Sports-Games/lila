@@ -3,7 +3,7 @@ package lila.socket
 import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ Uci, UciCharPair }
-import strategygames.chess.opening._
+import strategygames.opening.FullOpeningDB
 import strategygames.{ Game, GameLib, Pos, Role }
 import strategygames.variant.Variant
 import play.api.libs.json.JsObject
@@ -35,12 +35,7 @@ case class AnaDrop(
                 fen = fen,
                 check = game.situation.check,
                 dests = Some(movable ?? Game.Chess(game).situation.destinations),
-                opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? {
-                  fen match {
-                    case FEN.Chess(fen) => FullOpeningDB findByFen fen
-                    case _ => sys.error("Invalid fen lib")
-                  }
-                },
+                opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? FullOpeningDB.findByFen(variant.gameLib, fen),
                 drops = if (movable) Game.Chess(game).situation.drops else Some(Nil),
                 crazyData = game.situation.board.crazyData
               )

@@ -3,7 +3,7 @@ package lila.tree
 import strategygames.Centis
 import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, UciCharPair, Uci }
-import strategygames.chess.opening.FullOpening
+import strategygames.opening.FullOpening
 import strategygames.Pos
 import strategygames.chess.variant.Crazyhouse
 import play.api.libs.json._
@@ -16,6 +16,8 @@ sealed trait Node {
   def check: Boolean
   // None when not computed yet
   def dests: Option[Map[Pos, List[Pos]]]
+  def destsUci: Option[List[String]]
+  def captureLength: Option[Int]
   def drops: Option[List[Pos]]
   def eval: Option[Eval]
   def shapes: Node.Shapes
@@ -48,6 +50,8 @@ case class Root(
     check: Boolean,
     // None when not computed yet
     dests: Option[Map[Pos, List[Pos]]] = None,
+    destsUci: Option[List[String]] = None,
+    captureLength: Option[Int] = None,
     drops: Option[List[Pos]] = None,
     eval: Option[Eval] = None,
     shapes: Node.Shapes = Node.Shapes(Nil),
@@ -78,6 +82,8 @@ case class Branch(
     check: Boolean,
     // None when not computed yet
     dests: Option[Map[Pos, List[Pos]]] = None,
+    destsUci: Option[List[String]] = None,
+    captureLength: Option[Int] = None,
     drops: Option[List[Pos]] = None,
     eval: Option[Eval] = None,
     shapes: Node.Shapes = Node.Shapes(Nil),
@@ -208,7 +214,7 @@ object Node {
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 
-  implicit val openingWriter: OWrites[strategygames.chess.opening.FullOpening] = OWrites { o =>
+  implicit val openingWriter: OWrites[FullOpening] = OWrites { o =>
     Json.obj(
       "eco"  -> o.eco,
       "name" -> o.name
@@ -285,7 +291,14 @@ object Node {
           .add("glyphs", glyphs.nonEmpty)
           .add("shapes", if (shapes.list.nonEmpty) Some(shapes.list) else None)
           .add("opening", opening)
-          .add("dests", dests)
+          .add("dests", dests.map { dst =>
+            captureLength match {
+              case Some(capts) => "#" + capts.toString + " " + destString(dst)
+              case _ => destString(dst)
+            }
+          })
+          .add("destsUci", destsUci)
+          .add("captLen", captureLength)
           .add(
             "drops",
             drops.map { drops =>

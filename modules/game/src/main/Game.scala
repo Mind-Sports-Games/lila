@@ -2,7 +2,7 @@ package lila.game
 
 import strategygames.format.{ FEN, Uci }
 import strategygames.chess
-import strategygames.chess.opening.{ FullOpening, FullOpeningDB }
+import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.variant.{ FromPosition, Standard, Variant => ChessVariant }
 import strategygames.chess.{ Castles, CheckCount }
 import strategygames.chess.format.{ Uci => ChessUci }
@@ -633,7 +633,7 @@ case class Game(
 
   lazy val opening: Option[FullOpening.AtPly] =
     if (fromPosition || !Variant.openingSensibleVariants(variant.gameLib)(variant)) none
-    else FullOpeningDB search pgnMoves
+    else FullOpeningDB.search(variant.gameLib, pgnMoves)
 
   def synthetic = id == Game.syntheticId
 

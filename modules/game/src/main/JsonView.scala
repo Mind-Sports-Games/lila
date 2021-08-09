@@ -4,7 +4,7 @@ import play.api.libs.json._
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.variant.Crazyhouse
-import strategygames.chess.opening.FullOpening
+import strategygames.opening.FullOpening
 import strategygames.{ Black, Clock, Color, Division, Status, White }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites

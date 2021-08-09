@@ -2,9 +2,9 @@ package lila.socket
 
 import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
-import strategygames.chess.opening._
 import strategygames.variant.Variant
-import strategygames.{ Game, GameLib, Pos, PromotableRole, Role }
+import strategygames.opening.FullOpeningDB
+import strategygames.{ Game, GameLib, Move, Pos, PromotableRole, Role, Situation }
 import play.api.libs.json._
 
 import lila.tree.Branch
@@ -23,27 +23,77 @@ case class AnaMove(
     fen: FEN,
     path: String,
     chapterId: Option[String],
-    promotion: Option[PromotableRole]
+    promotion: Option[PromotableRole],
+    uci: Option[String],
+    fullCapture: Option[Boolean] = None
 ) extends AnaAny {
 
+  private lazy val lib = variant.gameLib
+  //draughts
+  private lazy val fullCaptureFields =
+    uci.flatMap(m => Uci.Move.apply(lib, m)).flatMap(_.capture)
+
+  private lazy val newGame = Game(lib, variant.some, fen.some)(
+    orig = orig,
+    dest = dest,
+    promotion = promotion,
+    finalSquare = fullCaptureFields.isDefined,
+    captures = fullCaptureFields,
+    partialCaptures = ~fullCapture
+  )
+
   def branch: Validated[String, Branch] =
-    Game(variant.gameLib, variant.some, fen.some)(orig, dest, promotion) flatMap { case (game, move) =>
+    newGame flatMap { case (game, move) =>
       game.pgnMoves.lastOption toValid "Moved but no last move!" map { san =>
-        val uci     = Uci(variant.gameLib, move)
-        val movable = game.situation playable false
-        val fen     = Forsyth.>>(variant.gameLib, game)
+        val uci     = Uci(lib, move, lib match {
+          case GameLib.Draughts() => fullCaptureFields.isDefined
+          case _                  => false
+        })
+        val sit     = game.situation
+        val movable = sit playable false
+        val fen     = Forsyth.>>(lib, game)
+        val captLen = (sit, dest) match {
+          case (Situation.Draughts(sit), Pos.Draughts(dest)) =>
+            if (sit.ghosts > 0) sit.captureLengthFrom(dest)
+            else sit.allMovesCaptureLength.some
+          case _ => None
+        }
+        val validMoves: Map[strategygames.draughts.Pos, List[strategygames.draughts.Move]] =
+          (sit, dest) match {
+            case (Situation.Draughts(sit), Pos.Draughts(dest)) => AnaDests.validMoves(
+              Situation.Draughts(sit),
+              sit.ghosts > 0 option dest,
+              ~fullCapture
+            )
+            case _ => Map.empty[strategygames.draughts.Pos, List[strategygames.draughts.Move]]
+          }
+        val truncatedMoves =
+          (~fullCapture && ~captLen > 1) option AnaDests.truncateMoves(validMoves)
         Branch(
-          id = UciCharPair(variant.gameLib, uci),
+          id = UciCharPair(lib, uci),
           ply = game.turns,
-          move = Uci.WithSan(variant.gameLib, uci, san),
+          move = Uci.WithSan(lib, uci, san),
           fen = fen,
           check = game.situation.check,
-          dests = Some(movable ?? game.situation.destinations),
-          opening = (game.turns <= 30 && Variant.openingSensibleVariants(variant.gameLib)(variant)) ?? {
-            fen match {
-              case FEN.Chess(fen) => FullOpeningDB findByFen fen
-              case _ => sys.error("Invalid fen lib")
+          dests = variant match {
+            case Variant.Chess(_)          => Some(movable ?? game.situation.destinations)
+            case Variant.Draughts(variant) => {
+              val truncatedDests = truncatedMoves.map { _ mapValues { _ flatMap (
+                uci => variant.boardSize.pos.posAt(uci.takeRight(2))
+              ) } }
+              val draughtsDests: Map[strategygames.Pos,List[strategygames.Pos]] =
+                truncatedDests.getOrElse(validMoves.view.mapValues{ _ map (_.dest) })
+                  .to(Map).map{case(p, m) => (Pos.Draughts(p), m.map(Pos.Draughts))}
+              movable option draughtsDests
             }
+          },
+          destsUci = lib match {
+            case GameLib.Chess()    => None
+            case GameLib.Draughts() => movable ?? truncatedMoves.map(_.values.toList.flatten)
+          },
+          captureLength = movable ?? captLen,
+          opening = (game.turns <= 30 && Variant.openingSensibleVariants(lib)(variant)) ?? {
+            FullOpeningDB.findByFen(lib, fen)
           },
           drops = if (movable) game.situation.drops else Some(Nil),
           crazyData = game.situation.board.crazyData
@@ -57,17 +107,20 @@ object AnaMove {
   def parse(o: JsObject) =
     for {
       d    <- o obj "d"
-      orig <- d str "orig" flatMap {pos => Pos.fromKey(GameLib.Chess(), pos)}
-      dest <- d str "dest" flatMap {pos => Pos.fromKey(GameLib.Chess(), pos)}
-      fen  <- d str "fen" map {fen => FEN.apply(GameLib.Chess(), fen)}
+      lib  <- d int "lib"
+      orig <- d str "orig" flatMap {pos => Pos.fromKey(GameLib(lib), pos)}
+      dest <- d str "dest" flatMap {pos => Pos.fromKey(GameLib(lib), pos)}
+      fen  <- d str "fen" map {fen => FEN.apply(GameLib(lib), fen)}
       path <- d str "path"
     } yield AnaMove(
       orig = orig,
       dest = dest,
-      variant = Variant.orDefault(GameLib.Chess(), ~d.str("variant")),
+      variant = Variant.orDefault(GameLib(lib), ~d.str("variant")),
       fen = fen,
       path = path,
       chapterId = d str "ch",
-      promotion = d str "promotion" flatMap {p => Role.promotable(GameLib.Chess(), p)}
+      promotion = d str "promotion" flatMap {p => Role.promotable(GameLib.Chess(), p)},
+      uci = d str "uci",
+      fullCapture = d boolean "fullCapture"
     )
 }
