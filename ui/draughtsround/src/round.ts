@@ -1,6 +1,25 @@
 import { RoundData, Step } from './interfaces';
-import { countGhosts } from 'draughtsground/fen'
-import { san2alg } from 'draughts'
+import { countGhosts } from 'draughtsground/fen';
+import { san2alg } from 'draughts';
+
+export const firstPly = (d: RoundData): number => d.steps[0].ply;
+
+export const lastPly = (d: RoundData): number => lastStep(d).ply;
+
+export const lastStep = (d: RoundData): Step => d.steps[d.steps.length - 1];
+
+export const plyStep = (d: RoundData, ply: number): Step => d.steps[ply - firstPly(d)];
+
+export const massage = (d: RoundData): void => {
+  if (d.clock) {
+    d.clock.showTenths = d.pref.clockTenths;
+    d.clock.showBar = d.pref.clockBar;
+  }
+
+  if (d.correspondence) d.correspondence.showBar = d.pref.clockBar;
+
+  if (d.expiration) d.expiration.movedAt = Date.now() - d.expiration.idleMillis;
+};
 
 export function mergeSteps(steps: Step[], coordSystem: number): Step[] {
   const mergedSteps: Step[] = new Array<Step>();
@@ -17,13 +36,11 @@ export function mergeSteps(steps: Step[], coordSystem: number): Step[] {
     } else {
       const originalStep = steps[i];
       for (let m = 0; m < step.captLen - 1 && i + 1 < steps.length; m++) {
-        if (m === 0)
-          originalStep.uci = originalStep.uci.substr(0, 4);
+        if (m === 0) originalStep.uci = originalStep.uci.substr(0, 4);
         i++;
         mergeStep(originalStep, steps[i]);
       }
-      if (countGhosts(originalStep.fen) > 0)
-        originalStep.ply++;
+      if (countGhosts(originalStep.fen) > 0) originalStep.ply++;
       mergedSteps.push(addNotation(originalStep, coordSystem));
     }
   }
@@ -38,45 +55,16 @@ function addNotation(step: Step, coordSystem: number): Step {
 }
 
 function mergeStep(originalStep: Step, mergeStep: Step) {
-  originalStep.ply = mergeStep.ply
+  originalStep.ply = mergeStep.ply;
   originalStep.fen = mergeStep.fen;
-  originalStep.san = originalStep.san.slice(0, originalStep.san.indexOf('x') + 1) + mergeStep.san.substr(mergeStep.san.indexOf('x') + 1);
+  originalStep.san =
+    originalStep.san.slice(0, originalStep.san.indexOf('x') + 1) + mergeStep.san.substr(mergeStep.san.indexOf('x') + 1);
   originalStep.uci = originalStep.uci + mergeStep.uci.substr(2, 2);
 }
 
 export function addStep(steps: Step[], newStep: Step, coordSystem: number): Step {
-  if (steps.length == 0 || countGhosts(steps[steps.length - 1].fen) === 0)
-    steps.push(newStep);
-  else
-    mergeStep(steps[steps.length - 1], newStep);
-  if (countGhosts(steps[steps.length - 1].fen) > 0)
-    steps[steps.length - 1].ply++;
+  if (steps.length == 0 || countGhosts(steps[steps.length - 1].fen) === 0) steps.push(newStep);
+  else mergeStep(steps[steps.length - 1], newStep);
+  if (countGhosts(steps[steps.length - 1].fen) > 0) steps[steps.length - 1].ply++;
   return addNotation(steps[steps.length - 1], coordSystem);
 }
-
-export function firstPly(d: RoundData): number {
-  return d.steps[0].ply;
-}
-
-export function lastPly(d: RoundData): number {
-  return d.steps[d.steps.length - 1].ply;
-}
-
-export function plyStep(d: RoundData, ply: number): Step {
-  let index = ply - firstPly(d);
-  //while (index + 1 < d.steps.length && d.steps[index + 1].ply == d.steps[index].ply)
-  //    index++;
-  return d.steps[index];
-}
-
-export function massage(d: RoundData): void {
-
-  if (d.clock) {
-    d.clock.showTenths = d.pref.clockTenths;
-    d.clock.showBar = d.pref.clockBar;
-  }
-
-  if (d.correspondence) d.correspondence.showBar = d.pref.clockBar;
-
-  if (d.expiration) d.expiration.movedAt = Date.now() - d.expiration.idleMillis;
-};

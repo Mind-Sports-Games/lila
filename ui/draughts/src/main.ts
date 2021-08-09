@@ -1,14 +1,15 @@
 import piotr from './piotr';
+import * as cg from 'draughtsground/types';
 import { san2alg as san2algMap } from 'draughtsground/util';
 
 export const initialFen: Fen =
   'W:W31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50:B1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20:H0:F1';
 
-export function decomposeUci(uci: Uci): Key[] {
-  const ucis: Key[] = [];
+export function decomposeUci(uci: Uci): cg.Key[] {
+  const ucis: cg.Key[] = [];
   if (uci.length > 1) {
     for (let i = 0; i < uci.length; i += 2) {
-      ucis.push(uci.substr(i, 2) as Key);
+      ucis.push(uci.substr(i, 2) as cg.Key);
     }
   }
   return ucis;

@@ -24,7 +24,8 @@ export const status = (ctrl: RoundController) => {
 
 export const userJump = (ctrl: RoundController, ply: Ply) => withSpeech(s => s.step(ctrl.stepAt(ply), true));
 
-export const step = (step: Step, algebraic: boolean) => withSpeech(s => s.step(step, false, undefined, algebraic));
+export const step = (step: Step, _algebraic: boolean) =>
+  withSpeech(s => s.step(step, false) /*, undefined, algebraic)*/); // TODO: this will likely need to be fixed before speech with draughts will work
 
 const withSpeech = (f: (speech: PlayStrategySpeech) => void) =>
   window.PlayStrategySpeech && f(window.PlayStrategySpeech);

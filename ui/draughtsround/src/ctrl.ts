@@ -1,3 +1,6 @@
+/// <reference types="../types/ab" />
+
+import * as ab from 'ab';
 import * as round from './round';
 import * as game from 'game';
 import * as status from 'game/status';
@@ -14,15 +17,28 @@ import { countGhosts } from 'draughtsground/fen';
 import { ClockController } from './clock/clockCtrl';
 import { CorresClockController, ctrl as makeCorresClock } from './corresClock/corresClockCtrl';
 import MoveOn from './moveOn';
-import sound = require('./sound');
-import util = require('./util');
-import xhr = require('./xhr');
+import TransientMove from './transientMove';
+import * as sound from './sound';
+import * as util from './util';
+import * as xhr from './xhr';
 import { ctrl as makeKeyboardMove, KeyboardMove } from './keyboardMove';
-import renderUser = require('./view/user');
-import cevalSub = require('./cevalSub');
+import * as renderUser from './view/user';
+import * as cevalSub from './cevalSub';
 import * as keyboard from './keyboard';
-import { decSimulToMove } from './simulStanding';
-import { RoundOpts, RoundData, ApiMove, ApiEnd, Redraw, SocketMove, SocketDrop, SocketOpts, MoveMetadata, Position, NvuiPlugin } from './interfaces';
+
+import {
+  RoundOpts,
+  RoundData,
+  ApiMove,
+  ApiEnd,
+  Redraw,
+  SocketMove,
+  SocketDrop,
+  SocketOpts,
+  MoveMetadata,
+  Position,
+  NvuiPlugin,
+} from './interfaces';
 
 interface GoneBerserk {
   white?: boolean;
@@ -31,10 +47,7 @@ interface GoneBerserk {
 
 type Timeout = number;
 
-const li = window.lidraughts;
-
 export default class RoundController {
-
   data: RoundData;
   socket: RoundSocket;
   draughtsground: DgApi;
@@ -50,51 +63,53 @@ export default class RoundController {
    * Rewrite what variable is used and/or updated where necessary, so that we can safely add "virtual plies" to this.ply
    */
   ply: number;
-  firstSeconds: boolean = true;
-  flip: boolean = false;
-  loading: boolean = false;
+  firstSeconds = true;
+  flip = false;
+  loading = false;
   loadingTimeout: number;
-  redirecting: boolean = false;
+  redirecting = false;
+  transientMove: TransientMove;
   moveToSubmit?: SocketMove;
   dropToSubmit?: SocketDrop;
   goneBerserk: GoneBerserk = {};
   resignConfirm?: Timeout = undefined;
   drawConfirm?: Timeout = undefined;
-  timeOutConfirm?: boolean = false;
   // will be replaced by view layer
-  autoScroll: () => void = $.noop;
-  challengeRematched: boolean = false;
+  autoScroll: () => void = () => {};
+  challengeRematched = false;
   justDropped?: cg.Role;
   justCaptured?: cg.Piece;
-  shouldSendMoveTime: boolean = false;
+  shouldSendMoveTime = false;
   lastDrawOfferAtPly?: Ply;
   nvui?: NvuiPlugin;
-
+  sign: string = Math.random().toString(36);
   private music?: any;
 
   constructor(readonly opts: RoundOpts, readonly redraw: Redraw) {
-
     opts.data.steps = round.mergeSteps(opts.data.steps, this.isAlgebraic(opts.data) ? 1 : 0);
     round.massage(opts.data);
 
-    const d = this.data = opts.data;
+    const d = (this.data = opts.data);
 
     this.ply = round.lastPly(d);
-
     this.goneBerserk[d.player.color] = d.player.berserk;
     this.goneBerserk[d.opponent.color] = d.opponent.berserk;
 
-    setTimeout(() => { this.firstSeconds = false; this.redraw(); }, 3000);
+    setTimeout(() => {
+      this.firstSeconds = false;
+      this.redraw();
+    }, 3000);
 
     this.socket = makeSocket(opts.socketSend, this);
 
-    if (li.RoundNVUI) this.nvui = li.RoundNVUI(redraw) as NvuiPlugin;
+    if (playstrategy.RoundNVUI) this.nvui = playstrategy.RoundNVUI(redraw) as NvuiPlugin;
 
-    if (d.clock) this.clock = new ClockController(d, {
-      onFlag: () => { this.socket.outoftime(); this.redraw(); },
-      soundColor: (d.simul || d.player.spectator || !d.pref.clockSound) ? undefined : d.player.color,
-      nvui: !!this.nvui
-    });
+    if (d.clock)
+      this.clock = new ClockController(d, {
+        onFlag: this.socket.outoftime,
+        soundColor: d.simul || d.player.spectator || !d.pref.clockSound ? undefined : d.player.color,
+        nvui: !!this.nvui,
+      });
     else {
       this.makeCorrespondenceClock();
       setInterval(this.corresClockTick, 1000);
@@ -102,59 +117,53 @@ export default class RoundController {
 
     this.setQuietMode();
 
-    this.moveOn = new MoveOn(this, 'lidraughts.move_on');
+    this.moveOn = new MoveOn(this, 'move-on');
+    this.transientMove = new TransientMove(this.socket);
 
-    this.trans = li.trans(opts.i18n);
+    this.trans = playstrategy.trans(opts.i18n);
     this.noarg = this.trans.noarg;
-
-    if (this.data.simul && this.data.simul.timeOutUntil) {
-      const curMillis = (new Date).getTime();
-      if (this.data.simul.timeOutUntil > curMillis)
-        setTimeout(this.redraw, this.data.simul.timeOutUntil - curMillis);
-    }
 
     setTimeout(this.delayedInit, 200);
 
     setTimeout(this.showExpiration, 350);
 
-    if (!document.referrer || document.referrer.indexOf('/service-worker.js') === -1)
-      setTimeout(this.showYourMoveNotification, 500);
+    if (!document.referrer?.includes('/serviceWorker.')) setTimeout(this.showYourMoveNotification, 500);
 
     // at the end:
-    li.pubsub.on('jump', ply => { this.jump(parseInt(ply)); this.redraw(); });
+    playstrategy.pubsub.on('jump', ply => {
+      this.jump(parseInt(ply));
+      this.redraw();
+    });
 
-    li.pubsub.on('sound_set', set => {
+    playstrategy.pubsub.on('sound_set', set => {
       if (!this.music && set === 'music')
-        li.loadScript('javascripts/music/play.js').then(() => {
-            this.music = li.playMusic();
+        playstrategy.loadScript('javascripts/music/play.js').then(() => {
+          this.music = playstrategy.playMusic();
         });
       if (this.music && set !== 'music') this.music = undefined;
     });
 
-    li.pubsub.on('zen', () => {
+    playstrategy.pubsub.on('zen', () => {
       if (this.isPlaying()) {
         const zen = !$('body').hasClass('zen');
         $('body').toggleClass('zen', zen);
-        li.dispatchEvent(window, 'resize');
-        $.post('/pref/zen', { zen: zen ? 1 : 0 });
+        window.dispatchEvent(new Event('resize'));
+        xhr.setZen(zen);
       }
     });
 
-    if (li.ab && this.isPlaying()) li.ab.init(this);
+    if (this.isPlaying()) ab.init(this);
   }
 
   private showExpiration = () => {
     if (!this.data.expiration) return;
     this.redraw();
     setTimeout(this.showExpiration, 250);
-  }
+  };
 
   private onUserMove = (orig: cg.Key, dest: cg.Key, meta: cg.MoveMetadata) => {
-    if (li.ab && (!this.keyboardMove || !this.keyboardMove.usedSan)) li.ab.move(this, meta);
+    if (!this.keyboardMove || !this.keyboardMove.usedSan) ab.move(this, meta);
     this.sendMove(orig, dest, undefined, meta);
-    // clear active timeout when host plays a move
-    if (this.data.simul && this.data.simul.timeOutUntil && this.canTimeOut() && (new Date).getTime() < this.data.simul.timeOutUntil)
-      this.moveOn.timeOutGame(0);
   };
 
   private onMove = (_orig: cg.Key, _dest: cg.Key, captured?: cg.Piece) => {
@@ -166,13 +175,15 @@ export default class RoundController {
     return this.data.simul && this.data.simul.hostId === this.opts.userId;
   };
 
+  lastPly = () => round.lastPly(this.data);
+
   makeCgHooks = () => ({
     onUserMove: this.onUserMove,
     onMove: this.onMove,
     onNewPiece: sound.move,
   });
 
-  replaying = (): boolean => this.ply !== round.lastPly(this.data);
+  replaying = (): boolean => this.ply !== this.lastPly();
 
   userJump = (ply: Ply): void => {
     this.cancelMove();
@@ -184,7 +195,7 @@ export default class RoundController {
   isPlaying = () => game.isPlayerPlaying(this.data);
 
   jump = (ply: Ply): boolean => {
-    ply = Math.max(round.firstPly(this.data), Math.min(round.lastPly(this.data), ply));
+    ply = Math.max(round.firstPly(this.data), Math.min(this.lastPly(), ply));
     const plyDiff = Math.abs(ply - this.ply);
     this.ply = ply;
     this.justDropped = undefined;
@@ -193,14 +204,14 @@ export default class RoundController {
       config: CgConfig = {
         fen: s.fen,
         lastMove: util.uci2move(s.uci),
-        turnColor: (this.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'white' : 'black'
+        turnColor: (this.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'white' : 'black',
       };
     if (this.replaying()) this.draughtsground.stop();
     else {
       config.movable = {
-          color: this.isPlaying() ? this.data.player.color : undefined,
-          dests: util.parsePossibleMoves(this.data.possibleMoves)
-      }
+        color: this.isPlaying() ? this.data.player.color : undefined,
+        dests: util.parsePossibleMoves(this.data.possibleMoves),
+      };
       config.captureLength = this.data.captureLength;
     }
     this.draughtsground.set(config, plyDiff > 1);
@@ -210,21 +221,23 @@ export default class RoundController {
     }
     this.autoScroll();
     if (this.keyboardMove) this.keyboardMove.update(s);
-    li.pubsub.emit('ply', ply);
+    playstrategy.pubsub.emit('ply', ply);
     return true;
   };
 
   replayEnabledByPref = (): boolean => {
     const d = this.data;
-    return d.pref.replay === 2 || (
-      d.pref.replay === 1 && (d.game.speed === 'classical' || d.game.speed === 'unlimited' || d.game.speed === 'correspondence')
+    return (
+      d.pref.replay === Prefs.Replay.Always ||
+      (d.pref.replay === Prefs.Replay.OnlySlowGames &&
+        (d.game.speed === 'classical' || d.game.speed === 'unlimited' || d.game.speed === 'correspondence'))
     );
   };
 
   isAlgebraic = (d: RoundData): boolean => {
-    return d.pref.coordSystem === 1 && d.game.variant.board.key === '64';
+    return d.pref.coordSystem === 1; //&& d.game.variant.board.key === '64'; // TODO: this will need to be solved before larger boards work?
   };
-  
+
   coordSystem = (): number => {
     return this.isAlgebraic(this.data) ? 1 : 0;
   };
@@ -237,7 +250,7 @@ export default class RoundController {
   flipNow = () => {
     this.flip = !this.nvui && !this.flip;
     this.draughtsground.set({
-      orientation: ground.boardOrientation(this.data, this.flip)
+      orientation: ground.boardOrientation(this.data, this.flip),
     });
     this.redraw();
   };
@@ -245,12 +258,13 @@ export default class RoundController {
   //Whos turn / game over in window title
   setTitle = () => title.set(this);
 
-  actualSendMove = (type: string, action: any, meta: MoveMetadata = {}) => {
+  actualSendMove = (tpe: string, data: any, meta: MoveMetadata = {}) => {
     const socketOpts: SocketOpts = {
-      ackable: true
+      sign: this.sign,
+      ackable: true,
     };
     if (this.clock) {
-      socketOpts.withLag = !this.shouldSendMoveTime || !this.clock.isRunning;
+      socketOpts.withLag = !this.shouldSendMoveTime || !this.clock.isRunning();
       if (meta.premove && this.shouldSendMoveTime) {
         this.clock.hardStopClock();
         socketOpts.millis = 0;
@@ -258,26 +272,23 @@ export default class RoundController {
         const moveMillis = this.clock.stopClock();
         if (moveMillis !== undefined && this.shouldSendMoveTime) {
           socketOpts.millis = moveMillis;
-          if (socketOpts.millis < 3) {
-            // instant move, no premove? might be fishy
-            $.post('/jslog/' + this.data.game.id + this.data.player.id + '?n=instamove:' + Math.round(socketOpts.millis));
-          }
         }
       }
     }
-    this.socket.send(type, action, socketOpts);
+    this.socket.send(tpe, data, socketOpts);
 
     this.justDropped = meta.justDropped;
     this.justCaptured = meta.justCaptured;
+    this.transientMove.register();
     this.redraw();
-  }
+  };
 
   sendMove = (orig: cg.Key, dest: cg.Key, prom: cg.Role | undefined, meta: cg.MoveMetadata) => {
     const move: SocketMove = {
-        u: orig + dest
+      u: orig + dest,
     };
-    //if (prom) move.u += (prom === 'knight' ? 'n' : prom[0]);
-    if (prom) move.u += "";
+    //if (prom) move.u += prom === 'knight' ? 'n' : prom[0];
+    if (prom) move.u += '';
     if (blur.get()) move.b = 1;
     this.resign(false);
     if (this.data.pref.submitMove && !meta.premove) {
@@ -286,64 +297,61 @@ export default class RoundController {
     } else {
       this.actualSendMove('move', move, {
         justCaptured: meta.captured,
-        premove: meta.premove
-      })
+        premove: meta.premove,
+      });
     }
   };
 
   showYourMoveNotification = () => {
     const d = this.data;
-    if (game.isPlayerTurn(d)) notify(() => {
-      let txt = this.trans('yourTurn'),
-          opponent = renderUser.userTxt(this, d.opponent);
-      if (this.ply < 1) txt = opponent + '\njoined the game.\n' + txt;
-      else {
-        let move = d.steps[d.steps.length - 1].san,
-            turn = Math.floor((this.ply - 1) / 2) + 1;
-        move = turn + (this.ply % 2 === 1 ? '.' : '...') + ' ' + move;
-        txt = opponent + '\nplayed ' + move + '.\n' + txt;
-      }
-      return txt;
-    });
-    else if (this.isPlaying() && this.ply < 1) notify(() => {
-      return renderUser.userTxt(this, d.opponent) + '\njoined the game.';
-    });
+    if (game.isPlayerTurn(d))
+      notify(() => {
+        let txt = this.noarg('yourTurn');
+        const opponent = renderUser.userTxt(this, d.opponent);
+        if (this.ply < 1) txt = `${opponent}\njoined the game.\n${txt}`;
+        else {
+          let move = d.steps[d.steps.length - 1].san;
+          const turn = Math.floor((this.ply - 1) / 2) + 1;
+          move = `${turn}${this.ply % 2 === 1 ? '.' : '...'} ${move}`;
+          txt = `${opponent}\nplayed ${move}.\n${txt}`;
+        }
+        return txt;
+      });
+    else if (this.isPlaying() && this.ply < 1)
+      notify(() => renderUser.userTxt(this, d.opponent) + '\njoined the game.');
   };
 
-  playerByColor = (c: Color) =>
-    this.data[c === this.data.player.color ? 'player' : 'opponent'];
+  playerByColor = (c: Color) => this.data[c === this.data.player.color ? 'player' : 'opponent'];
 
-  apiMove = (o: ApiMove): void => {
+  apiMove = (o: ApiMove): true => {
     const d = this.data,
       playing = this.isPlaying(),
       ghosts = countGhosts(o.fen);
 
     d.game.turns = o.ply;
     d.game.player = o.ply % 2 === 0 ? 'white' : 'black';
-
     const playedColor = o.ply % 2 === 0 ? 'black' : 'white',
       activeColor = d.player.color === d.game.player;
-
     if (o.status) d.game.status = o.status;
     if (o.winner) d.game.winner = o.winner;
-
     this.playerByColor('white').offeringDraw = o.wDraw;
     this.playerByColor('black').offeringDraw = o.bDraw;
-
     d.possibleMoves = activeColor ? o.dests : undefined;
     d.captureLength = o.captLen;
 
     this.setTitle();
-
     if (!this.replaying()) {
-
       //Show next ply if we're following the head of the line (not replaying)
       this.ply = d.game.turns + (ghosts > 0 ? 1 : 0);
 
-      if (o.role) this.draughtsground.newPiece({
-        role: o.role,
-        color: playedColor
-      }, o.uci.substr(o.uci.length - 2, 2) as cg.Key);
+      if (o.role)
+        this.draughtsground.newPiece(
+          {
+            role: o.role,
+            color: playedColor,
+          },
+          o.uci.substr(o.uci.length - 2, 2) as cg.Key
+        );
       else {
         const keys = util.uci2move(o.uci);
         this.draughtsground.move(keys![0], keys![1], ghosts === 0);
@@ -351,35 +359,37 @@ export default class RoundController {
       this.draughtsground.set({
         turnColor: d.game.player,
         movable: {
-          dests: playing ? util.parsePossibleMoves(d.possibleMoves) : {}
+          dests: playing ? util.parsePossibleMoves(d.possibleMoves) : new Map(),
         },
-        captureLength: d.captureLength
+        captureLength: d.captureLength,
       });
       if (o.check) sound.check();
       blur.onMove();
-      li.pubsub.emit('ply', this.ply);
+      playstrategy.pubsub.emit('ply', this.ply);
     }
     d.game.threefold = !!o.threefold;
 
-    const step = round.addStep(d.steps, {
-      ply: d.game.turns,
-      fen: o.fen,
-      san: o.san,
-      uci: o.uci
-    }, this.coordSystem());
+    const step = round.addStep(
+      d.steps,
+      {
+        ply: d.game.turns,
+        fen: o.fen,
+        san: o.san,
+        uci: o.uci,
+      },
+      this.coordSystem()
+    );
 
     this.justDropped = undefined;
     this.justCaptured = undefined;
     game.setOnGame(d, playedColor, true);
     this.data.forecastCount = undefined;
     if (o.clock) {
-      const oc = o.clock;
       this.shouldSendMoveTime = true;
-      const delay = (playing && activeColor) ? 0 : (oc.lag || 1);
+      const oc = o.clock,
+        delay = playing && activeColor ? 0 : oc.lag || 1;
       if (this.clock) this.clock.setClock(d, oc.white, oc.black, delay);
-      else if (this.corresClock) this.corresClock.update(
-        oc.white,
-        oc.black);
+      else if (this.corresClock) this.corresClock.update(oc.white, oc.black);
     }
     if (this.data.expiration) {
       if (this.data.steps.length > 2) this.data.expiration = undefined;
@@ -387,13 +397,12 @@ export default class RoundController {
     }
     this.redraw();
     if (playing && playedColor == d.player.color) {
+      this.transientMove.clear();
       this.moveOn.next();
       cevalSub.publish(d, o);
-      if (this.data.simul && !this.redirecting)
-        decSimulToMove(this.trans);
     }
     if (!this.replaying() && playedColor != d.player.color) {
-      // TODO: atrocious hack to prevent race condition
+      // atrocious hack to prevent race condition
       // with explosions and premoves
       // https://github.com/ornicar/lila/issues/343
       const premoveDelay = 1;
@@ -408,6 +417,7 @@ export default class RoundController {
     if (this.keyboardMove) this.keyboardMove.update(step, playedColor != d.player.color);
     if (this.music) this.music.jump(o);
     speech.step(o, this.isAlgebraic(this.data));
+    return true; // prevents default socket pubsub
   };
 
   private clearJust() {
@@ -440,75 +450,87 @@ export default class RoundController {
     d.game.winner = o.winner;
     d.game.status = o.status;
     d.game.boosted = o.boosted;
-    this.userJump(round.lastPly(d));
+    this.userJump(this.lastPly());
     this.draughtsground.stop();
     if (o.ratingDiff) {
       d.player.ratingDiff = o.ratingDiff[d.player.color];
       d.opponent.ratingDiff = o.ratingDiff[d.opponent.color];
     }
-    if (!d.player.spectator && d.game.turns > 1)
-      li.sound[o.winner ? (d.player.color === o.winner ? 'victory' : 'defeat') : 'draw']();
+    if (!d.player.spectator && d.game.turns > 1) {
+      const key = o.winner ? (d.player.color === o.winner ? 'victory' : 'defeat') : 'draw';
+      playstrategy.sound.play(key);
+      if (
+        key != 'victory' &&
+        d.game.turns > 6 &&
+        !d.tournament &&
+        !d.swiss &&
+        playstrategy.storage.get('courtesy') == '1'
+      )
+        this.opts.chat?.instance?.then(c => c.post('Good game, well played'));
+    }
     this.clearJust();
     this.setTitle();
     this.moveOn.next();
     this.setQuietMode();
     this.setLoading(false);
-    if (this.clock && o.clock) this.clock.setClock(d, o.clock.wc * .01, o.clock.bc * .01);
+    if (this.clock && o.clock) this.clock.setClock(d, o.clock.wc * 0.01, o.clock.bc * 0.01);
     this.redraw();
     this.autoScroll();
     this.onChange();
-    if (d.tv) setTimeout(li.reload, 10000);
+    if (d.tv) setTimeout(playstrategy.reload, 10000);
     speech.status(this);
   };
 
   challengeRematch = (): void => {
     this.challengeRematched = true;
-    xhr.challengeRematch(this.data.game.id).then(() => {
-      li.challengeApp.open();
-      if (li.once('rematch-challenge')) setTimeout(() => {
-        li.hopscotch(function () {
-          window.hopscotch.configure({
-            i18n: { doneBtn: 'OK, got it' }
-          }).startTour({
-            id: "rematch-challenge",
-            showPrevButton: true,
-            steps: [{
-              title: "Challenged to a rematch",
-              content: 'Your opponent is offline, but they can accept this challenge later!',
-              target: "#challenge-app",
-              placement: "bottom"
-            }]
-          });
-        });
-      }, 1000);
-    }, _ => {
-      this.challengeRematched = false;
-    });
+    xhr.challengeRematch(this.data.game.id).then(
+      () => {
+        playstrategy.pubsub.emit('challenge-app.open');
+        if (playstrategy.once('rematch-challenge'))
+          setTimeout(() => {
+            playstrategy.hopscotch(function () {
+              window.hopscotch
+                .configure({
+                  i18n: { doneBtn: 'OK, got it' },
+                })
+                .startTour({
+                  id: 'rematch-challenge',
+                  showPrevButton: true,
+                  steps: [
+                    {
+                      title: 'Challenged to a rematch',
+                      content: 'Your opponent is offline, but they can accept this challenge later!',
+                      target: '#challenge-app',
+                      placement: 'bottom',
+                    },
+                  ],
+                });
+            });
+          }, 1000);
+      },
+      _ => {
+        this.challengeRematched = false;
+      }
+    );
   };
 
   private makeCorrespondenceClock = (): void => {
     if (this.data.correspondence && !this.corresClock)
-      this.corresClock = makeCorresClock(
-        this,
-        this.data.correspondence,
-        this.socket.outoftime
-      );
+      this.corresClock = makeCorresClock(this, this.data.correspondence, this.socket.outoftime);
   };
 
   private corresClockTick = (): void => {
-    if (this.corresClock && game.playable(this.data))
-      this.corresClock.tick(this.data.game.player);
+    if (this.corresClock && game.playable(this.data)) this.corresClock.tick(this.data.game.player);
   };
 
   private setQuietMode = () => {
-    const was = li.quietMode;
+    const was = playstrategy.quietMode;
     const is = this.isPlaying();
     if (was !== is) {
-      li.quietMode = is;
+      playstrategy.quietMode = is;
       $('body')
         .toggleClass('playing', is)
-        .toggleClass('no-select',
-        is && this.clock && this.clock.millisOf(this.data.player.color) <= 3e5);
+        .toggleClass('no-select', is && this.clock && this.clock.millisOf(this.data.player.color) <= 3e5);
     }
   };
 
@@ -517,9 +539,9 @@ export default class RoundController {
     this.draughtsground.cancelPremove();
   };
 
-  resign = (v: boolean): void => {
+  resign = (v: boolean, immediately?: boolean): void => {
     if (v) {
-      if (this.resignConfirm || !this.data.pref.confirmResign) {
+      if (this.resignConfirm || !this.data.pref.confirmResign || immediately) {
         this.socket.sendLoading('resign');
         clearTimeout(this.resignConfirm);
       } else {
@@ -531,21 +553,22 @@ export default class RoundController {
       this.resignConfirm = undefined;
       this.redraw();
     }
-  }
+  };
 
   goBerserk = () => {
     this.socket.berserk();
-    li.sound.berserk();
+    playstrategy.sound.play('berserk');
   };
 
   setBerserk = (color: Color): void => {
     if (this.goneBerserk[color]) return;
     this.goneBerserk[color] = true;
-    if (color !== this.data.player.color) li.sound.berserk();
+    if (color !== this.data.player.color) playstrategy.sound.play('berserk');
     this.redraw();
+    $('<i data-icon="`">').appendTo($(`.game__meta .player.${color} .user-link`));
   };
 
-  setLoading = (v: boolean, duration: number = 1500) => {
+  setLoading = (v: boolean, duration = 1500) => {
     clearTimeout(this.loadingTimeout);
     if (v) {
       this.loading = true;
@@ -562,6 +585,7 @@ export default class RoundController {
 
   setRedirecting = () => {
     this.redirecting = true;
+    playstrategy.unload.expected = true;
     setTimeout(() => {
       this.redirecting = false;
       this.redraw();
@@ -574,7 +598,7 @@ export default class RoundController {
     if (v && toSubmit) {
       if (this.moveToSubmit) this.actualSendMove('move', this.moveToSubmit);
       else this.actualSendMove('drop', this.dropToSubmit);
-      li.sound.confirmation();
+      playstrategy.sound.play('confirmation');
     } else this.jump(this.ply);
     this.cancelMove();
     if (toSubmit) this.setLoading(true, 300);
@@ -589,18 +613,24 @@ export default class RoundController {
     if (this.opts.onChange) setTimeout(() => this.opts.onChange(this.data), 150);
   };
 
-  forceResignable = (): boolean => {
-    const d = this.data;
-    return !d.opponent.ai &&
-      game.isForceResignable(d) &&
-      !!d.clock &&
-      d.opponent.isGone &&
-      !game.isPlayerTurn(d) &&
-      game.resignable(d);
-  }
+  private goneTick?: number;
+  setGone = (gone: number | boolean) => {
+    game.setGone(this.data, this.data.opponent.color, gone);
+    clearTimeout(this.goneTick);
+    if (Number(gone) > 1)
+      this.goneTick = setTimeout(() => {
+        const g = Number(this.opponentGone());
+        if (g > 1) this.setGone(g - 1);
+      }, 1000);
+    this.redraw();
+  };
 
-  canOfferDraw = (): boolean =>
-    game.drawable(this.data) && (this.lastDrawOfferAtPly || -99) < (this.ply - 20);
+  opponentGone = (): number | boolean => {
+    const d = this.data;
+    return d.opponent.gone !== false && !game.isPlayerTurn(d) && game.resignable(d) && d.opponent.gone;
+  };
+
+  canOfferDraw = (): boolean => game.drawable(this.data) && (this.lastDrawOfferAtPly || -99) < this.ply - 20;
 
   offerDraw = (v: boolean): void => {
     if (this.canOfferDraw()) {
@@ -609,9 +639,10 @@ export default class RoundController {
         clearTimeout(this.drawConfirm);
         this.drawConfirm = undefined;
       } else if (v) {
-        if (this.data.pref.confirmResign) this.drawConfirm = setTimeout(() => {
-          this.offerDraw(false);
-        }, 3000);
+        if (this.data.pref.confirmResign)
+          this.drawConfirm = setTimeout(() => {
+            this.offerDraw(false);
+          }, 3000);
         else this.doOfferDraw();
       }
     }
@@ -620,17 +651,14 @@ export default class RoundController {
 
   private doOfferDraw = () => {
     this.lastDrawOfferAtPly = this.ply;
-    this.socket.sendLoading('draw-yes', null)
+    this.socket.sendLoading('draw-yes', null);
   };
-
-  canTimeOut = () =>
-    this.isSimulHost() && this.isPlaying()
 
   setDraughtsground = (dg: DgApi) => {
     this.draughtsground = dg;
-    if (this.data.pref.keyboardMove && !window.lidraughts.hasTouchEvents) {
+    if (this.data.pref.keyboardMove) {
       this.keyboardMove = makeKeyboardMove(this, this.stepAt(this.ply), this.redraw);
-      li.raf(this.redraw);
+      requestAnimationFrame(() => this.redraw());
     }
   };
 
@@ -639,24 +667,27 @@ export default class RoundController {
   private delayedInit = () => {
     const d = this.data;
     if (this.isPlaying() && game.nbMoves(d, d.player.color) === 0 && !this.isSimulHost()) {
-      li.sound.genericNotify();
+      playstrategy.sound.play('genericNotify');
     }
-    li.requestIdleCallback(() => {
+    playstrategy.requestIdleCallback(() => {
       const d = this.data;
       if (this.isPlaying()) {
-        if (!d.simul || d.simul.isUnique) blur.init(d.steps.length > 2);
+        if (!d.simul) blur.init(d.steps.length > 2);
 
         title.init();
         this.setTitle();
 
         window.addEventListener('beforeunload', e => {
           const d = this.data;
-          if (li.hasToReload ||
+          if (
+            playstrategy.unload.expected ||
             this.nvui ||
             !game.playable(d) ||
             !d.clock ||
             d.opponent.ai ||
-            this.isSimulHost()) return;
+            this.isSimulHost()
+          )
+            return;
           this.socket.send('bye2');
           const msg = 'There is a game in progress!';
           (e || window.event).returnValue = msg;
@@ -667,8 +698,7 @@ export default class RoundController {
           window.Mousetrap.bind('esc', () => {
             this.submitMove(false);
             this.draughtsground.cancelMove();
-          });
-          window.Mousetrap.bind('return', () => this.submitMove(true));
+          }).bind('return', () => this.submitMove(true));
         }
         cevalSub.subscribe(this);
       }
@@ -678,7 +708,6 @@ export default class RoundController {
       speech.setup(this);
 
       this.onChange();
-    });
+    }, 800);
   };
-
 }

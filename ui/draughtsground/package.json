@@ -3,8 +3,8 @@
   "version": "7.6.0",
   "description": "lidraughts.org Draughts UI",
   "type": "commonjs",
-  "main": "dist/draughtsground.js",
-  "types": "dist/index.d.ts",
+  "main": "draughtsground.js",
+  "types": "draughtsground.d.ts",
   "directories": {},
   "dependencies": {},
   "devDependencies": {

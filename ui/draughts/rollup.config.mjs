@@ -3,11 +3,10 @@ import typescript from 'rollup-plugin-typescript2';
 export default {
   input: 'src/main.ts',
   output: {
-    dir: 'dist',
+    file: 'main.js',
   },
   plugins: [
     typescript({
-      useTsconfigDeclarationDir: true,
       tsconfig: './tsconfig.json',
     }),
   ],

@@ -83,25 +83,23 @@ function getToMove(): number | undefined {
   const elm = $('.simul-tomove .tomove-count');
   if (elm && elm.text()) {
     const curToMove = Number(elm.text());
-    if (!isNaN(curToMove))
-      return curToMove;
+    if (!isNaN(curToMove)) return curToMove;
   }
   return;
 }
 
 function setToMove(toMove: number, trans: Trans) {
-  $('.simul-tomove .tomove-count').text(toMove);
+  $('.simul-tomove .tomove-count').text(toMove.toString());
   $('.simul-tomove .simul-tomove-count').text(trans.plural('nbGames', toMove));
 }
 
 export function incSimulToMove(trans: Trans) {
   const curToMove = getToMove();
-  if (curToMove !== undefined)
-    setToMove(curToMove + 1, trans);
+  if (curToMove !== undefined) setToMove(curToMove + 1, trans);
 }
 
 export function decSimulToMove(trans: Trans) {
   const curToMove = getToMove();
-  if (curToMove && curToMove > 0)
-    setToMove(curToMove - 1, trans);
+  if (curToMove && curToMove > 0) setToMove(curToMove - 1, trans);
 }
+

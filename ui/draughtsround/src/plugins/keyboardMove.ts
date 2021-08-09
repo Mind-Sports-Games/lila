@@ -1,4 +1,4 @@
-import sanWriter from './sanWriter';
+simport { sanWriter, SanToUci } from './sanWriter';
 import { DecodedDests } from '../interfaces';
 
 const keyRegex = /^\d{1,2}$/;
@@ -21,13 +21,17 @@ type Submit = (v: string, submitOpts: SubmitOpts) => void;
 playstrategy.keyboardMove = function (opts: Opts) {
   if (opts.input.classList.contains('ready')) return;
   opts.input.classList.add('ready');
-  let sans: any = null;
-  const submit: Submit = function(v: string, submitOpts: SubmitOpts) {
-    const foundUci = v.length >= 3 && sans && sanToUci(v, sans);
+  let legalSans: SanToUci | null = null;
+
+  const isKey = (v: string): v is Key => !!v.match(keyRegex);
+
+  const submit: Submit = function (v: string, submitOpts: SubmitOpts) {
+    if (!submitOpts.isTrusted) return;
+    const foundUci = v.length >= 3 && legalSans && sanToUci(v, legalSans);
     if (foundUci) {
       opts.ctrl.san(foundUci.slice(0, 2), foundUci.slice(2));
       clear();
-    } else if (sans && v.match(keyRegex)) {
+    } else if (legalSans && isKey(v)) {
       if (submitOpts.force) {
         opts.ctrl.select(v.length === 1 ? ('0' + v) : v);
         clear();
@@ -38,13 +42,12 @@ playstrategy.keyboardMove = function (opts: Opts) {
         clear();
       }
     } else if (submitOpts.yourMove && v.length > 1) {
-      setTimeout(window.lidraughts.sound.error, 500);
+      setTimeout(() => playstrategy.sound.play('error'), 500);
       opts.input.value = '';
-    }
-    else {
-      const wrong = v.length && sans && !sanCandidates(v, sans).length;
-      if (wrong && !opts.input.classList.contains('wrong')) window.lidraughts.sound.error();
-      opts.input.classList.toggle('wrong', wrong);
+    } else {
+      const wrong = v.length && legalSans && !sanCandidates(v, legalSans).length;
+      if (wrong && !opts.input.classList.contains('wrong')) playstrategy.sound.play('error');
+      opts.input.classList.toggle('wrong', !!wrong);
     }
   };
   const clear = () => {
@@ -53,8 +56,11 @@ playstrategy.keyboardMove = function (opts: Opts) {
   };
   makeBindings(opts, submit, clear);
   return function(fen: string, dests: DecodedDests, captLen?: number) {
-    sans = dests && Object.keys(dests).length ? sanWriter(fen, destsToUcis(dests), captLen) : null;
-    submit(opts.input.value, {});
+    legalSans = dests && Object.keys(dests).length ? sanWriter(fen, destsToUcis(dests), captLen) : null;
+    submit(opts.input.value, {
+      isTrusted: true
+      // TODO: unsure if yourMove is needed here or not.s
+    });
   };
 };
 

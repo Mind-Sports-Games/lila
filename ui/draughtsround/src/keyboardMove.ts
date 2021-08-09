@@ -1,15 +1,15 @@
-import { h } from 'snabbdom'
+import { h } from 'snabbdom';
 import * as cg from 'draughtsground/types';
 import { Step, Redraw } from './interfaces';
 import RoundController from './ctrl';
 import { ClockController } from './clock/clockCtrl';
-import { onInsert } from './util'
+import { onInsert } from './util';
 
 export type KeyboardMoveHandler = (fen: Fen, dests?: cg.Dests, captLen?: number, yourMove?: boolean) => void;
 
 export interface KeyboardMove {
   update(step: Step, yourMove?: boolean): void;
-  registerHandler(h: KeyboardMoveHandler): void
+  registerHandler(h: KeyboardMoveHandler): void;
   hasFocus(): boolean;
   setFocus(v: boolean): void;
   san(orig: cg.Key, dest: cg.Key): void;
@@ -20,19 +20,20 @@ export interface KeyboardMove {
   jump(delta: number): void;
   justSelected(): boolean;
   clock(): ClockController | undefined;
+  resign(v: boolean, immediately?: boolean): void;
 }
 
 export function ctrl(root: RoundController, step: Step, redraw: Redraw): KeyboardMove {
   let focus = false;
   let handler: KeyboardMoveHandler | undefined;
   let preHandlerBuffer = step.fen;
-  let lastSelect = Date.now();  
+  let lastSelect = performance.now();
   const dgState = root.draughtsground.state;
-  const select = function(key: cg.Key): void {
+  const select = (key: cg.Key): void => {
     if (dgState.selected === key) root.draughtsground.cancelMove();
     else {
       root.draughtsground.selectSquare(key, true);
-      lastSelect = Date.now();
+      lastSelect = performance.now();
     }
   };
   let usedSan = false;
@@ -67,9 +68,10 @@ export function ctrl(root: RoundController, step: Step, redraw: Redraw): Keyboar
       redraw();
     },
     justSelected() {
-      return Date.now() - lastSelect < 500;
+      return performance.now() - lastSelect < 500;
     },
-    clock: () => root.clock
+    clock: () => root.clock,
+    resign: root.resign,
   };
 }
 
@@ -78,19 +80,16 @@ export function render(ctrl: KeyboardMove) {
     h('input', {
       attrs: {
         spellcheck: false,
-        autocomplete: false
+        autocomplete: false,
       },
-      hook: onInsert(el => {
-        window.lidraughts.loadScript('compiled/lidraughts.round.keyboardMove.min.js').then(() => {
-          ctrl.registerHandler(window.lidraughts.keyboardMove({
-            input: el,
-            ctrl
-          }));
-        });
-      })
+      hook: onInsert(input =>
+        playstrategy
+          .loadModule('round.keyboardMove') // TODO: this is likely the wrong name.
+          .then(() => ctrl.registerHandler(playstrategy.keyboardMove({ input, ctrl })))
+      ),
     }),
-    ctrl.hasFocus() ?
-    h('em', 'Enter moves (14x3, 5-10) or squares (1403, 0510), or type / to focus chat') :
-    h('strong', 'Press <enter> to focus')
+    ctrl.hasFocus()
+      ? h('em', 'Enter moves (14x3, 5-10) or squares (1403, 0510), or type / to focus chat')
+      : h('strong', 'Press <enter> to focus'),
   ]);
 }

@@ -41,16 +41,14 @@ export type EncodedDests =
   | {
       [key: string]: string;
     };
-export interface DecodedDests {
-  [key: string]: cg.Key[];
-}
+export type DecodedDests = cg.Dests;
 
 export interface RoundData extends GameData {
   clock?: ClockData;
   pref: Pref;
   steps: Step[];
   possibleMoves?: EncodedDests;
-  captureLength?: number
+  captureLength?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
   correspondence: CorresClockData;
@@ -111,7 +109,7 @@ export interface Step {
   fen: Fen;
   san: San;
   uci: Uci;
-  alg?: string
+  alg?: string;
   captLen?: number;
 }
 
@@ -164,6 +162,7 @@ export interface Pref {
   clockTenths: Prefs.ShowClockTenths;
   confirmResign: boolean;
   coords: Prefs.Coords;
+  coordSystem: 0 | 1;
   destination: boolean;
   enablePremove: boolean;
   highlight: boolean;
@@ -171,6 +170,7 @@ export interface Pref {
   keyboardMove: boolean;
   moveEvent: Prefs.MoveEvent;
   replay: Prefs.Replay;
+  draughtsResult: boolean;
   rookCastle: boolean;
   showCaptured: boolean;
   showKingMoves: boolean;
@@ -185,3 +185,11 @@ export interface MoveMetadata {
 }
 
 export type Position = 'top' | 'bottom';
+
+export interface MaterialDiffSide {
+  [role: string]: number;
+}
+export interface MaterialDiff {
+  white: MaterialDiffSide;
+  black: MaterialDiffSide;
+}

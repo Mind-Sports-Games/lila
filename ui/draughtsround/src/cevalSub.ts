@@ -1,8 +1,8 @@
-import { plyStep, lastPly } from './round';
+import { lastStep } from './round';
 import RoundController from './ctrl';
 import { ApiMove, RoundData } from './interfaces';
+import * as xhr from 'common/xhr';
 
-const li = window.lidraughts;
 let found = false;
 
 function truncateFen(fen: string) {
@@ -23,14 +23,16 @@ export function subscribe(ctrl: RoundController): void {
   // bots can cheat alright
   if (ctrl.data.player.user?.title == 'BOT') return;
 
-  li.storage.make('ceval.fen').listen(ev => {
-    const v = ev.newValue;
-    if (!v) return;
-    else if (v.startsWith('start:')) return li.storage.set('round.ongoing', v);
-    const d = ctrl.data;
-    if (!found && ctrl.ply > Math.max(14, lastPly(d) - 20) && ctrl.isPlaying() &&
-      truncateFen(plyStep(d, ctrl.ply).fen) === truncateFen(v)) {
-      $.post('/jslog/' + d.game.id + d.player.id + '?n=ceval');
+  // Notify tabs to disable ceval. Unless this game is loaded directly on a
+  // position being analysed, there is plenty of time (7 moves, in most cases)
+  // for this to take effect.
+  playstrategy.storage.fire('ceval.disable');
+
+  playstrategy.storage.make('ceval.fen').listen(e => {
+    const d = ctrl.data,
+      step = lastStep(ctrl.data);
+    if (!found && step.ply > 14 && ctrl.isPlaying() && e.value && truncateFen(step.fen) == truncateFen(e.value)) {
+      xhr.text(`/jslog/${d.game.id}${d.player.id}?n=ceval`, { method: 'post' });
       found = true;
     }
   });

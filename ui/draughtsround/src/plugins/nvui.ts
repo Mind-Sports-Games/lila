@@ -1,6 +1,5 @@
-import { h } from 'snabbdom'
-import { VNode } from 'snabbdom/vnode'
-import sanWriter from './sanWriter';
+import { h, VNode } from 'snabbdom';
+import { sanWriter, SanToUci } from './sanWriter';
 import RoundController from '../ctrl';
 import { renderClock } from '../clock/clockView';
 import { renderTableWatch, renderTablePlay, renderTableEnd } from '../view/table';
@@ -12,131 +11,292 @@ import { plyStep } from '../round';
 import { onInsert } from '../util';
 import { Step, DecodedDests, Position, Redraw } from '../interfaces';
 import * as game from 'game';
-import { Style, renderSan, renderPieces, renderBoard, styleSetting } from 'nvui/draughts';
+import {
+  renderSan,
+  renderPieces,
+  renderBoard,
+  styleSetting,
+  pieceSetting,
+  prefixSetting,
+  positionSetting,
+  boardSetting,
+  boardCommandsHandler,
+  possibleMovesHandler,
+  lastCapturedCommandHandler,
+  selectionHandler,
+  arrowKeyHandler,
+  positionJumpHandler,
+  pieceJumpingHandler,
+  castlingFlavours,
+  supportedVariant,
+  Style,
+} from 'nvui/draughts';
+// TODO: probably the entirety of nvui/chess
+//       needs a full port to nvui/draughts. :(
 import { renderSetting } from 'nvui/setting';
 import { Notify } from 'nvui/notify';
 import { commands } from 'nvui/command';
+import { throttled } from '../sound';
+
+const selectSound = throttled('select');
+const wrapSound = throttled('wrapAround');
+const borderSound = throttled('outOfBound');
+const errorSound = throttled('error');
 
 type Sans = {
   [key: string]: Uci;
 }
 
-window.lidraughts.RoundNVUI = function(redraw: Redraw) {
-
+playstrategy.RoundNVUI = function (redraw: Redraw) {
   const notify = new Notify(redraw),
-    moveStyle = styleSetting();
+    moveStyle = styleSetting(),
+    prefixStyle = prefixSetting(),
+    pieceStyle = pieceSetting(),
+    positionStyle = positionSetting(),
+    boardStyle = boardSetting();
 
-  window.lidraughts.pubsub.on('socket.in.message', line => {
-    if (line.u === 'lidraughts') notify.set(line.t);
+  playstrategy.pubsub.on('socket.in.message', line => {
+    if (line.u === 'playstrategy') notify.set(line.t);
   });
-  window.lidraughts.pubsub.on('round.suggestion', notify.set);
+  playstrategy.pubsub.on('round.suggestion', notify.set);
 
   return {
     render(ctrl: RoundController): VNode {
-      const d = ctrl.data, step = plyStep(d, ctrl.ply), style = moveStyle.get();
-      if (!ctrl.draughtsground) ctrl.setDraughtsground(Draughtsground(document.createElement("div"), {
-        ...makeCgConfig(ctrl),
-        animation: { enabled: false },
-        drawable: { enabled: false },
-        coordinates: 0
-      }));
-      return h('div.nvui', [
-        h('h1', 'Textual representation'),
-        h('h2', 'Game info'),
-        ...(['white', 'black'].map((color: Color) => h('p', [
-          color + ' player: ',
-          renderPlayer(ctrl, ctrl.playerByColor(color))
-        ]))),
-        h('p', `${d.game.rated ? 'Rated' : 'Casual'} ${d.game.perf}`),
-        d.clock ? h('p', `Clock: ${d.clock.initial / 60} + ${d.clock.increment}`) : null,
-        h('h2', 'Moves'),
-        h('p.moves', {
-          attrs: {
-            role : 'log',
-            'aria-live': 'off'
-          }
-        }, renderMoves(d.steps.slice(1), style)),
-        h('h2', 'Pieces'),
-        h('div.pieces', renderPieces(ctrl.draughtsground.state.pieces)),
-        h('h2', 'Game status'),
-        h('div.status', {
-          attrs: {
-            role : 'status',
-            'aria-live' : 'assertive',
-            'aria-atomic' : true
-          }
-        }, [ctrl.data.game.status.name === 'started' ? 'Playing' : renderResult(ctrl)]),
-        h('h2', 'Last move'),
-        h('p.lastMove', {
-          attrs: {
-            'aria-live' : 'assertive',
-            'aria-atomic' : true
-          }
-        }, renderSan(step.san, style)),
-        ...(ctrl.isPlaying() ? [
-          h('h2', 'Move form'),
-          h('form', {
-            hook: onInsert(el => {
-              const $form = $(el as HTMLFormElement),
-                $input = $form.find('.move').val('').focus();
-              $form.submit(onSubmit(ctrl, notify.set, $input));
-            })
-          }, [
-            h('label', [
-              d.player.color === d.game.player ? 'Your move' : 'Waiting',
-              h('input.move.mousetrap', {
-                attrs: {
-                  name: 'move',
-                  'type': 'text',
-                  autocomplete: 'off',
-                  autofocus: true
-                }
-              })
-            ])
-          ])
-        ]: []),
-        h('h2', 'Your clock'),
-        h('div.botc', anyClock(ctrl, 'bottom')),
-        h('h2', 'Opponent clock'),
-        h('div.topc', anyClock(ctrl, 'top')),
-        notify.render(),
-        h('h2', 'Actions'),
-        ...(ctrl.data.player.spectator ? renderTableWatch(ctrl) : (
-          game.playable(ctrl.data) ? renderTablePlay(ctrl) : renderTableEnd(ctrl)
-        )),
-        h('h2', 'Board'),
-        h('pre.board', renderBoard(ctrl.draughtsground.state.pieces, ctrl.draughtsground.state.boardSize, ctrl.data.player.color)),
-        h('h2', 'Settings'),
-        h('label', [
-          'Move notation',
-          renderSetting(moveStyle, ctrl.redraw)
-        ]),
-        h('h2', 'Commands'),
-        h('p', [
-          'Type these commands in the move input.', h('br'),
-          '/c: Read clocks.', h('br'),
-          '/l: Read last move.', h('br'),
-          commands.piece.help, h('br'),
-          commands.scan.help, h('br'),
-          '/abort: Abort game.', h('br'),
-          '/resign: Resign game.', h('br'),
-          '/draw: Offer or accept draw.', h('br'),
-          '/takeback: Offer or accept take back.', h('br')
-        ])
-      ]);
-    }
+      const d = ctrl.data,
+        step = plyStep(d, ctrl.ply),
+        style = moveStyle.get(),
+        variantNope = !supportedVariant(d.game.variant.key) && 'Sorry, this variant is not supported in blind mode.';
+      if (!ctrl.draughtsground) {
+        ctrl.setDraughtsground(
+          Draughtsground(document.createElement('div'), {
+            ...makeCgConfig(ctrl),
+            animation: { enabled: false },
+            drawable: { enabled: false },
+            coordinates: false,
+          })
+        );
+        if (variantNope) setTimeout(() => notify.set(variantNope), 3000);
+      }
+      return h(
+        'div.nvui',
+        {
+          hook: onInsert(_ => setTimeout(() => notify.set(gameText(ctrl)), 2000)),
+        },
+        [
+          h('h1', gameText(ctrl)),
+          h('h2', 'Game info'),
+          ...['white', 'black'].map((color: Color) =>
+            h('p', [color + ' player: ', playerHtml(ctrl, ctrl.playerByColor(color))])
+          ),
+          h('p', `${d.game.rated ? 'Rated' : 'Casual'} ${d.game.perf}`),
+          d.clock ? h('p', `Clock: ${d.clock.initial / 60} + ${d.clock.increment}`) : null,
+          h('h2', 'Moves'),
+          h(
+            'p.moves',
+            {
+              attrs: {
+                role: 'log',
+                'aria-live': 'off',
+              },
+            },
+            renderMoves(d.steps.slice(1), style)
+          ),
+          h('h2', 'Pieces'),
+          h('div.pieces', renderPieces(ctrl.draughtsground.state.pieces, style)),
+          h('h2', 'Game status'),
+          h(
+            'div.status',
+            {
+              attrs: {
+                role: 'status',
+                'aria-live': 'assertive',
+                'aria-atomic': true,
+              },
+            },
+            [ctrl.data.game.status.name === 'started' ? 'Playing' : renderResult(ctrl)]
+          ),
+          h('h2', 'Last move'),
+          h(
+            'p.lastMove',
+            {
+              attrs: {
+                'aria-live': 'assertive',
+                'aria-atomic': true,
+              },
+            },
+            renderSan(step.san, step.uci, style)
+          ),
+          ...(ctrl.isPlaying()
+            ? [
+                h('h2', 'Move form'),
+                h(
+                  'form',
+                  {
+                    hook: onInsert(el => {
+                      const $form = $(el as HTMLFormElement),
+                        $input = $form.find('.move').val('');
+                      $input[0]!.focus();
+                      $form.on('submit', onSubmit(ctrl, notify.set, moveStyle.get, $input));
+                    }),
+                  },
+                  [
+                    h('label', [
+                      d.player.color === d.game.player ? 'Your move' : 'Waiting',
+                      h('input.move.mousetrap', {
+                        attrs: {
+                          name: 'move',
+                          type: 'text',
+                          autocomplete: 'off',
+                          autofocus: true,
+                          disabled: !!variantNope,
+                          title: variantNope,
+                        },
+                      }),
+                    ]),
+                  ]
+                ),
+              ]
+            : []),
+          h('h2', 'Your clock'),
+          h('div.botc', anyClock(ctrl, 'bottom')),
+          h('h2', 'Opponent clock'),
+          h('div.topc', anyClock(ctrl, 'top')),
+          notify.render(),
+          h('h2', 'Actions'),
+          ...(ctrl.data.player.spectator
+            ? renderTableWatch(ctrl)
+            : game.playable(ctrl.data)
+            ? renderTablePlay(ctrl)
+            : renderTableEnd(ctrl)),
+          h('h2', 'Board'),
+          h(
+            'div.board',
+            {
+              hook: onInsert(el => {
+                const $board = $(el as HTMLElement);
+                $board.on('keypress', boardCommandsHandler());
+                $board.on('keypress', () => console.log(ctrl));
+                // NOTE: This is the only line different from analysis board listener setup
+                $board.on(
+                  'keypress',
+                  lastCapturedCommandHandler(
+                    () => ctrl.data.steps.map(step => step.fen),
+                    pieceStyle.get(),
+                    prefixStyle.get()
+                  )
+                );
+                const $buttons = $board.find('button');
+                $buttons.on('click', selectionHandler(ctrl.data.opponent.color, selectSound));
+                $buttons.on('keydown', arrowKeyHandler(ctrl.data.player.color, borderSound));
+                $buttons.on(
+                  'keypress',
+                  possibleMovesHandler(
+                    ctrl.data.player.color,
+                    ctrl.draughtsground.getFen,
+                    () => ctrl.draughtssground.state.pieces
+                  )
+                );
+                $buttons.on('keypress', positionJumpHandler());
+                $buttons.on('keypress', pieceJumpingHandler(wrapSound, errorSound));
+              }),
+            },
+            renderBoard(
+              ctrl.draughtsground.state.pieces,
+              ctrl.data.player.color,
+              pieceStyle.get(),
+              prefixStyle.get(),
+              positionStyle.get(),
+              boardStyle.get()
+            )
+          ),
+          h(
+            'div.boardstatus',
+            {
+              attrs: {
+                'aria-live': 'polite',
+                'aria-atomic': true,
+              },
+            },
+            ''
+          ),
+          // h('p', takes(ctrl.data.steps.map(data => data.fen))),
+          h('h2', 'Settings'),
+          h('label', ['Move notation', renderSetting(moveStyle, ctrl.redraw)]),
+          h('h3', 'Board Settings'),
+          h('label', ['Piece style', renderSetting(pieceStyle, ctrl.redraw)]),
+          h('label', ['Piece prefix style', renderSetting(prefixStyle, ctrl.redraw)]),
+          h('label', ['Show position', renderSetting(positionStyle, ctrl.redraw)]),
+          h('label', ['Board layout', renderSetting(boardStyle, ctrl.redraw)]),
+          h('h2', 'Commands'),
+          h('p', [
+            'Type these commands in the move input.',
+            h('br'),
+            'c: Read clocks.',
+            h('br'),
+            'l: Read last move.',
+            h('br'),
+            'o: Read name and rating of the opponent.',
+            h('br'),
+            commands.piece.help,
+            h('br'),
+            commands.scan.help,
+            h('br'),
+            'abort: Abort game.',
+            h('br'),
+            'resign: Resign game.',
+            h('br'),
+            'draw: Offer or accept draw.',
+            h('br'),
+            'takeback: Offer or accept take back.',
+            h('br'),
+          ]),
+          h('h2', 'Board Mode commands'),
+          h('p', [
+            'Use these commands when focused on the board itself.',
+            h('br'),
+            'o: announce current position.',
+            h('br'),
+            "c: announce last move's captured piece.",
+            h('br'),
+            'l: announce last move.',
+            h('br'),
+            't: announce clocks.',
+            h('br'),
+            'm: announce possible moves for the selected piece.',
+            h('br'),
+            'shift+m: announce possible moves for the selected pieces which capture..',
+            h('br'),
+            'arrow keys: move left, right, up or down.',
+            h('br'),
+            'kqrbnp/KQRBNP: move forward/backward to a piece.',
+            h('br'),
+            '1-8: move to rank 1-8.',
+            h('br'),
+            'Shift+1-8: move to file a-h.',
+            h('br'),
+          ]),
+          h('h2', 'Promotion'),
+          h('p', [
+            'Standard PGN notation selects the piece to promote to. Example: a8=n promotes to a knight.',
+            h('br'),
+            'Omission results in promotion to queen',
+          ]),
+        ]
+      );
+    },
   };
-}
+};
 
-function onSubmit(ctrl: RoundController, notify: (txt: string) => void, $input: JQuery) {
-  return function() {
-    const input = $input.val();
-    if (input[0] === '/') onCommand(ctrl, notify, input.slice(1));
+function onSubmit(ctrl: RoundController, notify: (txt: string) => void, style: () => Style, $input: Cash) {
+  return () => {
+    const input = $input.val().trim();
+    if (isShortCommand(input)) input = '/' + input;
+    if (input[0] === '/') onCommand(ctrl, notify, input.slice(1), style());
     else {
       const d = ctrl.data,
         legalUcis = destsToUcis(ctrl.draughtsground.state.movable.dests!),
-        sans: Sans = sanWriter(plyStep(d, ctrl.ply).fen, legalUcis, ctrl.draughtsground.state.movable.captLen) as Sans,
-        uci = sanToUci(input, sans) || input;
+        legalSans: SansToUci = sanWriter(plyStep(d, ctrl.ply).fen, legalUcis, ctrl.draughtsground.state.movable.captLen) as SanToUci,
+      let uci = sanToUci(input, legalSans) || input;s
       if (legalUcis.includes(uci.toLowerCase())) ctrl.socket.send("move", {
         from: uci.substr(0, 2),
         to: uci.substr(2, 2)
@@ -148,13 +308,21 @@ function onSubmit(ctrl: RoundController, notify: (txt: string) => void, $input: 
   };
 }
 
-function onCommand(ctrl: RoundController, notify: (txt: string) => void, c: string) {
-  if (c == 'c' || c == 'clock') notify($('.nvui .botc').text() + ', ' + $('.nvui .topc').text());
-  else if (c == 'l' || c == 'last') notify($('.lastMove').text());
-  else if (c == 'abort') $('.nvui button.abort').click();
-  else if (c == 'resign') $('.nvui button.resign-confirm').click();
-  else if (c == 'draw') $('.nvui button.draw-yes').click();
-  else if (c == 'takeback') $('.nvui button.takeback-yes').click();
+const shortCommands = ['c', 'clock', 'l', 'last', 'abort', 'resign', 'draw', 'takeback', 'p', 's', 'o', 'opponent'];
+
+function isShortCommand(input: string): boolean {
+  return shortCommands.includes(input.split(' ')[0].toLowerCase());
+}
+
+function onCommand(ctrl: RoundController, notify: (txt: string) => void, c: string, style: Style) {
+  const lowered = c.toLowerCase();
+  if (lowered == 'c' || lowered == 'clock') notify($('.nvui .botc').text() + ', ' + $('.nvui .topc').text());
+  else if (lowered == 'l' || lowered == 'last') notify($('.lastMove').text());
+  else if (lowered == 'abort') $('.nvui button.abort').trigger('click');
+  else if (lowered == 'resign') $('.nvui button.resign-confirm').trigger('click');
+  else if (lowered == 'draw') $('.nvui button.draw-yes').trigger('click');
+  else if (lowered == 'takeback') $('.nvui button.takeback-yes').trigger('click');
+  else if (lowered == 'o' || lowered == 'opponent') notify(playerText(ctrl, ctrl.data.opponent));
   else {
     const pieces = ctrl.draughtsground.state.pieces,
       boardSize = ctrl.draughtsground.state.boardSize;
@@ -167,10 +335,13 @@ function onCommand(ctrl: RoundController, notify: (txt: string) => void, c: stri
 }
 
 function anyClock(ctrl: RoundController, position: Position) {
-  const d = ctrl.data, player = ctrl.playerAt(position);
-  return (ctrl.clock && renderClock(ctrl, player, position)) || (
-    d.correspondence && renderCorresClock(ctrl.corresClock!, ctrl.trans, player.color, position, d.game.player)
-  ) || undefined;
+  const d = ctrl.data,
+    player = ctrl.playerAt(position);
+  return (
+    (ctrl.clock && renderClock(ctrl, player, position)) ||
+    (d.correspondence && renderCorresClock(ctrl.corresClock!, ctrl.trans, player.color, position, d.game.player)) ||
+    undefined
+  );
 }
 
 function destsToUcis(dests: DecodedDests) {
@@ -195,8 +366,8 @@ function sanToUci(san: string, sans: Sans): string | undefined {
 function renderMoves(steps: Step[], style: Style) {
   const res: Array<string | VNode> = [];
   steps.forEach(s => {
-    if (s.ply & 1) res.push((Math.ceil(s.ply / 2)) + ' ');
-    res.push(renderSan(s.san, style) + ', ');
+    if (s.ply & 1) res.push(Math.ceil(s.ply / 2) + ' ');
+    res.push(renderSan(s.san, s.uci, style) + ', ');
     if (s.ply % 2 === 0) res.push(h('br'));
   });
   return res;

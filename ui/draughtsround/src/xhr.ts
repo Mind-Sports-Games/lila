@@ -13,14 +13,6 @@ export const challengeRematch = (gameId: string): Promise<unknown> =>
     method: 'post',
   });
 
-export function timeOutGame(ctrl: RoundController, simulId: string, seconds: number) {
-  return $.ajax({
-    method: 'POST',
-    url: '/timeout/' + simulId + '/' + ctrl.data.game.id + '/' + seconds,
-    headers
-  });
-}
-
 export const setZen = throttle(1000, zen =>
   xhr.text('/pref/zen', {
     method: 'post',
