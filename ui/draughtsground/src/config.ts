@@ -1,8 +1,8 @@
-import { State } from './state'
-import { setSelected, boardFields } from './board'
-import { readKingMoves, read as fenRead } from './fen'
-import { DrawShape, DrawBrush } from './draw'
-import * as cg from './types'
+import { State } from './state';
+import { setSelected, boardFields } from './board';
+import { readKingMoves, read as fenRead } from './fen';
+import { DrawShape, DrawBrush } from './draw';
+import * as cg from './types';
 
 export interface Config {
   fen?: cg.FEN; // draughts position in Forsyth notation
@@ -31,7 +31,7 @@ export interface Config {
     free?: boolean; // all moves are valid - board editor
     color?: cg.Color | 'both'; // color that can move. white | black | both | undefined
     dests?: {
-      [key: string]: cg.Key[]
+      [key: string]: cg.Key[];
     }; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     showDests?: boolean; // whether to add the move-dest class on squares
     captureUci?: Array<string>; // possible multicaptures, when played by clicking to the final square (or first ambiguity)
@@ -49,15 +49,15 @@ export interface Config {
     dests?: cg.Key[]; // premove destinations for the current selection
     events?: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
-      unset?: () => void;  // called after the premove has been unset
-    }
+      unset?: () => void; // called after the premove has been unset
+    };
   };
   predroppable?: {
     enabled?: boolean; // allow predrops for color that can not move
     events?: {
       set?: (role: cg.Role, key: cg.Key) => void; // called after the predrop has been set
       unset?: () => void; // called after the predrop has been unset
-    }
+    };
   };
   draggable?: {
     enabled?: boolean; // allow moves & premoves to use drag'n drop
@@ -69,7 +69,7 @@ export interface Config {
   };
   selectable?: {
     // disable to enforce dragging over click-click move
-    enabled?: boolean
+    enabled?: boolean;
   };
   events?: {
     change?: () => void; // called after the situation changes on the board
@@ -90,24 +90,22 @@ export interface Config {
     brushes?: DrawBrush[];
     pieces?: {
       baseUrl?: string;
-    }
-  }
+    };
+  };
 }
 
 export function configure(state: State, config: Config) {
-
   // don't merge destinations. Just override.
   if (config.movable && config.movable.dests) state.movable.dests = undefined;
   if (config.movable && config.movable.captureUci) state.movable.captureUci = undefined;
 
-  merge(state, config);  
+  merge(state, config);
 
   if (config.fen) {
-
     // if a fen was provided, replace the pieces
     state.pieces = fenRead(config.fen, boardFields(state));
     state.drawable.shapes = [];
-    
+
     // show kingmoves for frisian variants
     if (state.highlight && state.highlight.kingMoves) {
       const kingMoves = readKingMoves(config.fen);
@@ -128,40 +126,34 @@ export function configure(state: State, config: Config) {
     state.animateFrom = undefined;
   }
 
-  if (config.captureLength !== undefined)
-    state.movable.captLen = config.captureLength;
+  if (config.captureLength !== undefined) state.movable.captLen = config.captureLength;
 
   // fix move/premove dests
-  if (state.selected)
-    setSelected(state, state.selected);
+  if (state.selected) setSelected(state, state.selected);
 
   // no need for such short animations
   if (!state.animation.duration || state.animation.duration < 100) state.animation.enabled = false;
-
-};
+}
 
 export function setKingMoves(state: State, kingMoves: cg.KingMoves) {
   const fields = boardFields(state);
   for (let f = 1; f <= fields; f++) {
     const key = (f < 10 ? '0' + f.toString() : f.toString()) as cg.Key,
-      piece = state.pieces[key];
-    if (piece && piece.kingMoves)
-      piece.kingMoves = undefined;
+      piece = state.pieces.get(key);
+    if (piece && piece.kingMoves) piece.kingMoves = undefined;
   }
   doSetKingMoves(state, kingMoves);
 }
 
 function doSetKingMoves(state: State, kingMoves: cg.KingMoves) {
   if (kingMoves.white.count > 0 && kingMoves.white.key) {
-    const piece = state.pieces[kingMoves.white.key];
-    if (piece && piece.role === 'king' && piece.color === 'white')
-      piece.kingMoves = kingMoves.white.count;
+    const piece = state.pieces.get(kingMoves.white.key);
+    if (piece && piece.role === 'king' && piece.color === 'white') piece.kingMoves = kingMoves.white.count;
   }
 
   if (kingMoves.black.count > 0 && kingMoves.black.key) {
-    const piece = state.pieces[kingMoves.black.key];
-    if (piece && piece.role === 'king' && piece.color === 'black')
-      piece.kingMoves = kingMoves.black.count;
+    const piece = state.pieces.get(kingMoves.black.key);
+    if (piece && piece.role === 'king' && piece.color === 'black') piece.kingMoves = kingMoves.black.count;
   }
 }
 

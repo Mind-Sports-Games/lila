@@ -1,15 +1,17 @@
-import * as cg from './types'
-import { allKeys, algebraicKeys } from './util'
+import * as cg from './types';
+import { allKeys, algebraicKeys } from './util';
 
-export const initial: cg.FEN = 'W31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50:B1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20';
+export const initial: cg.FEN =
+  'W31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50:B1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20';
 
 export function read(fen: cg.FEN, fields?: number): cg.Pieces {
-  const pieces: cg.Pieces = {};
+  const pieces: cg.Pieces = new Map();
   if (!fen) return pieces;
   if (fen === 'start') fen = initial;
   for (let fenPart of fen.split(':')) {
     if (fenPart.length <= 1) continue;
-    let first = fenPart.slice(0, 1), clr: cg.Color;
+    let first = fenPart.slice(0, 1),
+      clr: cg.Color;
     if (first === 'W') clr = 'white';
     else if (first === 'B') clr = 'black';
     else continue;
@@ -41,10 +43,10 @@ export function read(fen: cg.FEN, fields?: number): cg.Pieces {
         fieldNumber = algebraicKeys.indexOf(fieldStr) + 1;
       }
       if (fieldNumber && (!fields || fieldNumber <= fields)) {
-        pieces[fieldStr as cg.Key] = {
+        pieces.set(fieldStr as cg.Key, {
           color: clr,
-          role
-        };
+          role,
+        });
       }
     }
   }
@@ -53,28 +55,24 @@ export function read(fen: cg.FEN, fields?: number): cg.Pieces {
 
 export function write(pieces: cg.Pieces, fields?: number, algebraic?: boolean): cg.FEN {
   const max = fields || 50;
-  let fenW = 'W', fenB = 'B';
+  let fenW = 'W',
+    fenB = 'B';
   for (let f = 1; f <= max; f++) {
-    const key = allKeys[f - 1], piece = pieces[key];
+    const key = allKeys[f - 1],
+      piece = pieces.get(key);
     if (!piece) continue;
     if (piece.color === 'white') {
       if (fenW.length > 1) fenW += ',';
-      if (piece.role === 'king')
-        fenW += 'K';
-      else if (piece.role === 'ghostman')
-        fenW += 'G';
-      else if (piece.role === 'ghostking')
-        fenW += 'P';
+      if (piece.role === 'king') fenW += 'K';
+      else if (piece.role === 'ghostman') fenW += 'G';
+      else if (piece.role === 'ghostking') fenW += 'P';
       if (algebraic) fenW += algebraicKeys[f - 1];
       else fenW += f.toString();
     } else {
       if (fenB.length > 1) fenB += ',';
-      if (piece.role === 'king')
-        fenB += 'K';
-      else if (piece.role === 'ghostman')
-        fenB += 'G';
-      else if (piece.role === 'ghostking')
-        fenB += 'P';
+      if (piece.role === 'king') fenB += 'K';
+      else if (piece.role === 'ghostman') fenB += 'G';
+      else if (piece.role === 'ghostking') fenB += 'P';
       if (algebraic) fenB += algebraicKeys[f - 1];
       else fenB += f.toString();
     }
@@ -86,13 +84,16 @@ export function toggleCoordinates(fen: cg.FEN, algebraic: boolean, fields?: numb
   if (!fen) return fen;
   if (fen === 'start') fen = initial;
   const extraParts = [];
-  let prefix = '', fenW = 'W', fenB = 'B';
+  let prefix = '',
+    fenW = 'W',
+    fenB = 'B';
   for (let fenPart of fen.split(':')) {
-    let first = fenPart.slice(0, 1), clr: boolean;
+    let first = fenPart.slice(0, 1),
+      clr: boolean;
     if (first === 'W') clr = true;
     else if (first === 'B') clr = false;
     else {
-      extraParts.push(fenPart)
+      extraParts.push(fenPart);
       continue;
     }
     if (fenPart.length === 1) {
@@ -102,7 +103,8 @@ export function toggleCoordinates(fen: cg.FEN, algebraic: boolean, fields?: numb
     const fenPieces = fenPart.slice(1).split(',');
     for (let fenPiece of fenPieces) {
       if (!fenPiece) continue;
-      let fieldStr, role = fenPiece.slice(0, 1);
+      let fieldStr,
+        role = fenPiece.slice(0, 1);
       switch (role) {
         case 'K':
         case 'G':
@@ -143,8 +145,8 @@ export function toggleCoordinates(fen: cg.FEN, algebraic: boolean, fields?: numb
       }
     }
   }
-  const partsOut = prefix ? [prefix, fenW, fenB] : [fenW, fenB]
-  return partsOut.concat(extraParts).join(':')
+  const partsOut = prefix ? [prefix, fenW, fenB] : [fenW, fenB];
+  return partsOut.concat(extraParts).join(':');
 }
 
 export function countGhosts(fen: cg.FEN): number {
@@ -158,8 +160,7 @@ export function countGhosts(fen: cg.FEN): number {
       const fenPieces = fenPart.slice(1).split(',');
       for (let fenPiece of fenPieces) {
         first = fenPiece.slice(0, 1);
-        if (first === 'G' || first === 'P')
-          ghosts++;
+        if (first === 'G' || first === 'P') ghosts++;
       }
     }
   }
@@ -172,23 +173,22 @@ export function readKingMoves(fen: cg.FEN): cg.KingMoves | undefined {
 
   const fenParts = fen.split(':'),
     kingMoves = fenParts.length ? fenParts[fenParts.length - 1] : '';
-  if (kingMoves.indexOf('+') !== 0)
-    return undefined;
+  if (kingMoves.indexOf('+') !== 0) return undefined;
 
-  const playerMoves = kingMoves.split('+').filter(function (e) { return e.length != 0; });
-  if (playerMoves.length !== 2)
-    return undefined;
+  const playerMoves = kingMoves.split('+').filter(function (e) {
+    return e.length != 0;
+  });
+  if (playerMoves.length !== 2) return undefined;
 
   const whiteMoves = parseInt(playerMoves[1].slice(0, 1)),
     blackMoves = parseInt(playerMoves[0].slice(0, 1)),
-    result: cg.KingMoves = { 
+    result: cg.KingMoves = {
       white: { count: whiteMoves },
-      black: { count: blackMoves }
+      black: { count: blackMoves },
     };
-  if (whiteMoves > 0)
-    result.white.key = playerMoves[1].slice(1) as cg.Key;
-  if (blackMoves > 0)
-    result.black.key = playerMoves[0].slice(1) as cg.Key;
+  if (whiteMoves > 0) result.white.key = playerMoves[1].slice(1) as cg.Key;
+  if (blackMoves > 0) result.black.key = playerMoves[0].slice(1) as cg.Key;
 
   return result;
 }
+
