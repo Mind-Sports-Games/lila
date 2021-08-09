@@ -1,7 +1,7 @@
 package lila.round
 
-import strategygames.Replay
-import strategygames.format.{ FEN, Forsyth }
+import strategygames.{ Replay, Situation }
+import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.variant.Variant
 import play.api.libs.json._
 
@@ -28,7 +28,11 @@ object StepBuilder {
             check = init.situation.check,
             dests = None,
             drops = None,
-            crazyData = init.situation.board.crazyData
+            crazyData = init.situation.board.crazyData,
+            captLen = init.situation match {
+              case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
+              case _ => None
+            }
           )
           val moveSteps = games.map { case (g, m) =>
             Step(
@@ -38,7 +42,15 @@ object StepBuilder {
               check = g.situation.check,
               dests = None,
               drops = None,
-              crazyData = g.situation.board.crazyData
+              crazyData = g.situation.board.crazyData,
+              captLen = (g.situation, m) match {
+                case (Situation.Draughts(situation), Uci.DraughtsWithSan(m)) =>
+                  if (situation.ghosts > 0) 
+                    situation.captureLengthFrom(m.uci.origDest._2)
+                  else
+                    situation.allMovesCaptureLength.some
+                case _ => None
+              }
             )
           }
           (initStep :: moveSteps).map(_.toJson)

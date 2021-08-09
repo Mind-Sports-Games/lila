@@ -13,7 +13,8 @@ case class Step(
     // None when not computed yet
     dests: Option[Map[Pos, List[Pos]]],
     drops: Option[List[Pos]],
-    crazyData: Option[Crazyhouse.Data]
+    crazyData: Option[Crazyhouse.Data],
+    captLen: Option[Int]
 ) {
 
   // who's color plays next
@@ -51,7 +52,8 @@ object Step {
         "ply" -> ply,
         "uci" -> move.map(_.uciString),
         "san" -> move.map(_.san),
-        "fen" -> fen.value
+        "fen" -> fen.value,
+        "captLen" -> ~captLen
       )
       .add("check", check)
       .add(
