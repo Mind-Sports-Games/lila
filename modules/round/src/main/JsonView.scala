@@ -226,6 +226,7 @@ final class JsonView(
         "game" -> Json
           .obj(
             "id"         -> gameId,
+            "lib"        -> game.variant.gameLib.id,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
             "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLib)),
