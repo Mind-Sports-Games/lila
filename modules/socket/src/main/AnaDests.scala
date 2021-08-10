@@ -19,7 +19,7 @@ case class AnaDests(
     fullCapture: Option[Boolean] = None
 ) {
 
-  def isInitial = variant.standard && fen.initial && path == ""
+  def isInitial = (variant.standard || variant.draughtsStandard ) && fen.initial && path == ""
 
   private lazy val sit = Game(variant.gameLib, variant.some, fen.some).situation
 
