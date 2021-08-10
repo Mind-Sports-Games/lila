@@ -382,7 +382,7 @@ case class Game(
       clock.??(_ moretimeable color) || correspondenceClock.??(_ moretimeable color)
     }
 
-  def abortable = status == Status.Started && playedTurns < 2 && nonMandatory
+  def abortable = status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory && !metadata.microMatchGameNr.contains(2)
 
   def berserkable = clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
 

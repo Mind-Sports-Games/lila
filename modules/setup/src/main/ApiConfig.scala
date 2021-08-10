@@ -21,7 +21,8 @@ final case class ApiConfig(
     color: Color,
     position: Option[FEN] = None,
     acceptByToken: Option[String] = None,
-    message: Option[Template]
+    message: Option[Template],
+    microMatch: Boolean
 ) {
 
   def perfType: Option[PerfType] = PerfPicker.perfType(strategygames.Speed(clock), variant, days)
@@ -56,7 +57,8 @@ object ApiConfig extends BaseHumanConfig {
       c: Option[String],
       pos: Option[String],
       tok: Option[String],
-      msg: Option[String]
+      msg: Option[String],
+      mm: Option[Boolean]
   ) =
     new ApiConfig(
       variant = strategygames.variant.Variant.orDefault(GameLib(l), l match {
@@ -69,7 +71,8 @@ object ApiConfig extends BaseHumanConfig {
       color = Color.orDefault(~c),
       position = pos.map(f => FEN.apply(GameLib(l), f)),
       acceptByToken = tok,
-      message = msg map Template
+      message = msg map Template,
+      microMatch = ~mm
     ).autoVariant
 
   def validFen(variant: Variant, fen: Option[FEN]) =

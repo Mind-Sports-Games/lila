@@ -47,7 +47,8 @@ final class ChallengeMaker(
         color = (!pov.color).name,
         challenger = Challenge.toRegistered(pov.game.variant, timeControl)(challenger),
         destUser = dest.some,
-        rematchOf = pov.gameId.some
+        rematchOf = pov.gameId.some,
+        microMatch = pov.game.metadata.microMatchGameNr.contains(2)
       )
     }
 }

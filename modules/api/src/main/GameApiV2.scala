@@ -282,6 +282,7 @@ final class GameApiV2(
       .obj(
         "id"         -> g.id,
         "rated"      -> g.rated,
+        "lib"        -> g.variant.gameLib.id,
         "variant"    -> g.variant.key,
         "speed"      -> g.speed.key,
         "perf"       -> PerfPicker.key(g),
@@ -303,6 +304,7 @@ final class GameApiV2(
         })
       )
       .add("initialFen" -> initialFen)
+      .add("microMatch" -> g.metadata.microMatchGameId)
       .add("winner" -> g.winnerColor.map(_.name))
       .add("opening" -> g.opening.ifTrue(withFlags.opening))
       .add("moves" -> withFlags.moves.option {

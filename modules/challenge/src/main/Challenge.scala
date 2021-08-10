@@ -28,7 +28,8 @@ case class Challenge(
     expiresAt: DateTime,
     open: Option[Boolean] = None,
     name: Option[String] = None,
-    declineReason: Option[Challenge.DeclineReason] = None
+    declineReason: Option[Challenge.DeclineReason] = None,
+    microMatch: Option[Boolean] = None
 ) {
 
   import Challenge._
@@ -92,12 +93,14 @@ case class Challenge(
     variant match {
       case Variant.Chess(variant) => variant match {
         case FromPosition | Horde | RacingKings | Chess960 | LinesOfAction => initialFen
-        case _                                             => none
+        case _ => none
       }
-      case _                                             => none
+      case _ => none
     }
 
   def isOpen = ~open
+
+  def isMicroMatch = ~microMatch
 
   lazy val perfType = perfTypeOf(variant, timeControl)
 
@@ -224,7 +227,8 @@ object Challenge {
       challenger: Challenger,
       destUser: Option[User],
       rematchOf: Option[Game.ID],
-      name: Option[String] = None
+      name: Option[String] = None,
+      microMatch: Boolean = false
   ): Challenge = {
     val (colorChoice, finalColor) = color match {
       case "white" => ColorChoice.White  -> White
@@ -257,7 +261,18 @@ object Challenge {
       seenAt = !isOpen option DateTime.now,
       expiresAt = if (isOpen) DateTime.now.plusDays(1) else inTwoWeeks,
       open = isOpen option true,
-      name = name
+      name = name,
+      microMatch = microMatch option true
     )
+    //TODO microMatch: is this needed?
+    /*) |> { challenge =>
+      if (microMatch && !challenge.customStartingPosition)
+        challenge.copy(microMatch = none)
+      else challenge
+    } |> { challenge =>
+      if (challenge.mode.rated && !challenge.isMicroMatch && challenge.customStartingPosition)
+        challenge.copy(mode = Mode.Casual)
+      else challenge
+    }*/
   }
 }

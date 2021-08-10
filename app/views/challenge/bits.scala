@@ -27,7 +27,7 @@ object bits {
       )})""")
     )
 
-  def details(c: Challenge)(implicit ctx: Context) =
+  def details(c: Challenge)(implicit ctx: Context) = frag(
     div(cls := "details")(
       div(cls := "variant", dataIcon := (if (c.initialFen.isDefined) '*' else c.perfType.iconChar))(
         div(
@@ -45,5 +45,11 @@ object bits {
         )
       ),
       div(cls := "mode")(modeName(c.mode))
+    ),
+    c.isMicroMatch option div(cls := "micro-match")(
+      trans.microMatchChallenge(), " ",
+      trans.microMatchExplanation()
     )
+  )    
+
 }

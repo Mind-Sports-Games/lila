@@ -60,6 +60,7 @@ final class JsonView(
         "status"     -> c.status.name,
         "challenger" -> c.challengerUser,
         "destUser"   -> c.destUser,
+        "lib"        -> c.variant.gameLib.id,
         "variant"    -> c.variant,
         "rated"      -> c.mode.rated,
         "speed"      -> c.speed.key,
@@ -87,6 +88,7 @@ final class JsonView(
       .add("direction" -> direction.map(_.name))
       .add("initialFen" -> c.initialFen)
       .add("declineReason" -> c.declineReason.map(_.trans.txt()))
+      .add("microMatch" -> c.microMatch)
 
   private def iconChar(c: Challenge) =
     if (c.variant == Variant.libFromPosition(c.variant.gameLib)) '*'
@@ -99,6 +101,7 @@ final class JsonView(
     trans.accept,
     trans.decline,
     trans.viewInFullSize,
-    trans.cancel
+    trans.cancel,
+    trans.microMatch
   ).map(_.key)
 }

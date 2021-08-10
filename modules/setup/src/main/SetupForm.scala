@@ -61,7 +61,8 @@ object SetupForm {
         "days"            -> days,
         "mode"            -> mode(withRated = ctx.isAuth),
         "color"           -> color,
-        "fen"             -> fenField
+        "fen"             -> fenField,
+        "microMatch"      -> boolean
       )(FriendConfig.from)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Invalid speed", _.validSpeed(ctx.me.exists(_.isBot)))
@@ -161,7 +162,8 @@ object SetupForm {
         "color"         -> optional(color),
         "fen"           -> fenField,
         "acceptByToken" -> optional(nonEmptyText),
-        "message"       -> message
+        "message"       -> message,
+        "microMatch"    -> optional(boolean)
       )(ApiConfig.from)(_ => none)
         .verifying("invalidFen", _.validFen)
         .verifying("can't be rated", _.validRated)

@@ -118,6 +118,7 @@ final class PgnDump(
           teams.map { t => Tag("BlackTeam", t.black) },
           Tag(_.Variant, game.variant.name.capitalize).some,
           Tag.timeControl(game.clock.map(_.config)).some,
+          game.metadata.microMatchGameId.map(gameId => Tag(_.MicroMatch, gameId)),
           Tag(_.ECO, game.opening.fold("?")(_.opening.eco)).some,
           withOpening option Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
           Tag(

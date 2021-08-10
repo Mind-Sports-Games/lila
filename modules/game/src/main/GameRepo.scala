@@ -1,5 +1,7 @@
 package lila.game
 
+import scala.language.existentials
+
 import strategygames.chess
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.{ Black, Color, Mode, Status, White }
@@ -263,6 +265,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .one[Game]
 
   def setTv(id: ID) = coll.updateFieldUnchecked($id(id), F.tvAt, DateTime.now)
+
+  def setMicroMatch(id: ID, microMatch: String) =
+    coll.updateField($id(id), F.microMatch, microMatch)
 
   def setAnalysed(id: ID): Unit   = coll.updateFieldUnchecked($id(id), F.analysed, true)
   def setUnanalysed(id: ID): Unit = coll.updateFieldUnchecked($id(id), F.analysed, false)

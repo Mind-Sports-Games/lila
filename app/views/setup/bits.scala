@@ -104,6 +104,18 @@ private object bits {
   def renderLabel(field: Field, content: Frag) =
     label(`for` := s"$prefix${field.id}")(content)
 
+  def renderCheckbox(field: Field, labelContent: Frag) = div(
+    span(cls := "form-check-input")(
+      form3.cmnToggle(s"$prefix${field.id}", field.name, field.value.has("true"))
+    ),
+    renderLabel(field, labelContent)
+  )
+
+  def renderMicroMatch(form: Form[_])(implicit ctx: Context) =
+    div(cls := "micro_match", title := trans.microMatchExplanation.txt())(
+      renderCheckbox(form("microMatch"), trans.microMatch())
+    )
+
   def renderTimeMode(form: Form[_], allowAnon: Boolean)(implicit ctx: Context) =
     div(cls := "time_mode_config optional_config")(
       div(

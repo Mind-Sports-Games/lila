@@ -19,6 +19,12 @@
   <string name="white">White</string>
   <string name="black">Black</string>
   <string name="randomColor">Random side</string>
+  <string name="microMatch">Micro-match</string>
+  <string name="microMatchChallenge">This challenge is a micro-match!</string>
+  <string name="microMatchExplanation">A rematch with colors reversed will be played immediately after this game.</string>
+  <string name="microMatchRematchStarted">Started second game of micro-match</string>
+  <string name="microMatchRematchAwaiting">Awaiting second game of micro-match</string>
+  <string name="microMatchGameX">Micro-match game %s</string>
   <string name="createAGame">Create a game</string>
   <string name="whiteIsVictorious">White is victorious</string>
   <string name="blackIsVictorious">Black is victorious</string>
@@ -142,6 +148,7 @@
     <item quantity="other">%s players</item>
   </plurals>
   <string name="currentGames">Current games</string>
+  <string name="gameNumberX">Game %s</string>
   <plurals name="nbGames">
     <item quantity="one">%s game</item>
     <item quantity="other">%s games</item>

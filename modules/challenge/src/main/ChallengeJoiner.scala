@@ -54,6 +54,9 @@ private object ChallengeJoiner {
           makeChess(Variant.libStandard(c.variant.gameLib)) -> none
         else game                           -> baseState
     }
+    //TODO: microMatch consider customStartingPosition
+    //val microMatch = c.isMicroMatch && c.customStartingPosition option "micromatch"
+    val microMatch = c.isMicroMatch option "micromatch"
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game
       .make(
@@ -63,7 +66,8 @@ private object ChallengeJoiner {
         mode = if (chessGame.board.variant.fromPosition) Mode.Casual else c.mode,
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,
-        pgnImport = None
+        pgnImport = None,
+        microMatch = microMatch
       )
       .withId(c.id)
       .pipe { g =>

@@ -8,20 +8,21 @@ import lila.rating.PerfType
 import lila.game.PerfPicker
 
 case class FriendConfig(
-    variant: strategygames.variant.Variant,
+    variant: Variant,
     timeMode: TimeMode,
     time: Double,
     increment: Int,
     days: Int,
     mode: Mode,
     color: Color,
-    fen: Option[FEN] = None
+    fen: Option[FEN] = None,
+    microMatch: Boolean = false
 ) extends HumanConfig
     with Positional {
 
   val strictFen = false
 
-  def >> = (variant.gameLib.id, variant.id, variant.id, timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value)).some
+  def >> = (variant.gameLib.id, variant.id, variant.id, timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value), microMatch).some
 
   def isPersistent = timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
 
@@ -30,7 +31,7 @@ case class FriendConfig(
 
 object FriendConfig extends BaseHumanConfig {
 
-  def from(l: Int, cv: Int, dv: Int, tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String]) =
+  def from(l: Int, cv: Int, dv: Int, tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String], mm: Boolean) =
     new FriendConfig(
       variant = l match {
         case 0 => Variant.wrap(
@@ -46,7 +47,8 @@ object FriendConfig extends BaseHumanConfig {
       days = d,
       mode = m.fold(Mode.default)(Mode.orDefault),
       color = Color(c) err "Invalid color " + c,
-      fen = fen.map(f => FEN.apply(GameLib(l), f))
+      fen = fen.map(f => FEN.apply(GameLib(l), f)),
+      microMatch = mm
     )
 
   def default(l: Int) = FriendConfig(
@@ -76,7 +78,8 @@ object FriendConfig extends BaseHumanConfig {
         days = r int "d",
         mode = Mode orDefault (r int "m"),
         color = Color.White,
-        fen = r.getO[FEN]("f") filter (_.value.nonEmpty)
+        fen = r.getO[FEN]("f") filter (_.value.nonEmpty),
+        microMatch = ~r.boolO("mm")
       )
 
     def writes(w: BSON.Writer, o: FriendConfig) =
@@ -88,7 +91,8 @@ object FriendConfig extends BaseHumanConfig {
         "i"  -> o.increment,
         "d"  -> o.days,
         "m"  -> o.mode.id,
-        "f"  -> o.fen
+        "f"  -> o.fen,
+        "mm" -> o.microMatch
       )
   }
 }

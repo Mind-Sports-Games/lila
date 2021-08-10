@@ -66,6 +66,8 @@ final private class Rematcher(
     fuccess(List(Event.RematchOffer(by = none)))
   }
 
+  def microMatch(pov: Pov): Fu[Events] = rematchJoin(pov)
+
   private def rematchExists(pov: Pov)(nextId: Game.ID): Fu[Events] =
     gameRepo game nextId flatMap {
       _.fold(rematchJoin(pov))(g => fuccess(redirectEvents(g)))
@@ -81,7 +83,9 @@ final private class Rematcher(
           _ = if (pov.game.variant == Variant.Chess(Chess960) && !chess960.get(pov.gameId)) chess960.put(nextGame.id)
           _ <- gameRepo insertDenormalized nextGame
         } yield {
-          messenger.system(pov.game, trans.rematchOfferAccepted.txt())
+          if (nextGame.metadata.microMatchGameNr.contains(2))
+            messenger.system(pov.game, trans.microMatchRematchStarted.txt())
+          else messenger.system(pov.game, trans.rematchOfferAccepted.txt())
           onStart(nextGame.id)
           redirectEvents(nextGame)
         }
@@ -101,6 +105,10 @@ final private class Rematcher(
     pieces.map{
       case(pos, piece) => (Pos.Chess(pos), Piece.Chess(piece))
     }
+
+  private def nextMicroMatch(g: Game) =
+    if (!g.aborted && g.metadata.microMatch.contains("micromatch")) s"1:${g.id}".some
+    else g.metadata.microMatch.isDefined option "micromatch"
 
   private def returnGame(pov: Pov): Fu[Game] = {
     for {
@@ -146,7 +154,8 @@ final private class Rematcher(
         mode = if (users.exists(_.lame)) Mode.Casual else pov.game.mode,
         source = pov.game.source | Source.Lobby,
         daysPerTurn = pov.game.daysPerTurn,
-        pgnImport = None
+        pgnImport = None,
+        microMatch = nextMicroMatch(pov.game)
       ) withUniqueId idGenerator
     } yield game
   }

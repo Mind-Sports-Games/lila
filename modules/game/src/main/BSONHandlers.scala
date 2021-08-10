@@ -322,6 +322,8 @@ object BSONHandlers {
         F.tournamentId      -> o.metadata.tournamentId,
         F.swissId           -> o.metadata.swissId,
         F.simulId           -> o.metadata.simulId,
+        F.microMatch        -> o.metadata.microMatch,
+        F.drawLimit         -> o.metadata.drawLimit,
         F.analysed          -> w.boolO(o.metadata.analysed)
       ) ++ {
         if (o.board.variant.gameLib == GameLib.Draughts()){

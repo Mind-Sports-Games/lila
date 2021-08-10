@@ -17,6 +17,7 @@ final class JsonView(rematches: Rematches) {
     Json
       .obj(
         "id"            -> game.id,
+        "lib"           -> game.variant.gameLib.id,
         "variant"       -> game.variant,
         "speed"         -> game.speed.key,
         "perf"          -> PerfPicker.key(game),
@@ -39,6 +40,10 @@ final class JsonView(rematches: Rematches) {
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedPlies))
+      .add("microMatch" -> game.metadata.microMatchGameNr.map { index =>
+        Json.obj("index" -> index)
+          .add("gameId" -> game.metadata.microMatchGameId.filter("*" !=))
+      })
 }
 
 object JsonView {

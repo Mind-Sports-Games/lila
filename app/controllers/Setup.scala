@@ -114,7 +114,8 @@ final class Setup(
                         case _               => Challenger.Open
                       },
                       destUser = destUser,
-                      rematchOf = none
+                      rematchOf = none,
+                      microMatch = config.microMatch
                     )
                     (env.challenge.api create challenge) flatMap {
                       case true =>

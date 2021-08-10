@@ -345,7 +345,8 @@ final class Challenge(
         color = config.color.name,
         challenger = ChallengeModel.toRegistered(config.variant, timeControl)(orig),
         destUser = dest,
-        rematchOf = none
+        rematchOf = none,
+        microMatch = config.microMatch
       )
   }
 
