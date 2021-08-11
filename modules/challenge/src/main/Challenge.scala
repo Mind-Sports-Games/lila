@@ -3,7 +3,7 @@ package lila.challenge
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Chess960, FromPosition, Horde, RacingKings, LinesOfAction }
-import strategygames.{ Black, Color, Mode, Speed, White }
+import strategygames.{ Black, Color, GameLib, Mode, Speed, White }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
@@ -95,8 +95,16 @@ case class Challenge(
         case FromPosition | Horde | RacingKings | Chess960 | LinesOfAction => initialFen
         case _ => none
       }
+      case Variant.Draughts(_) => customStartingPosition ?? initialFen
       case _ => none
     }
+
+  def customStartingPosition: Boolean =
+    variant.draughtsFromPosition ||
+      (draughtsFromPositionVariants(variant) &&
+        initialFen.isDefined &&
+        !initialFen.exists(_.value == variant.initialFen.value)
+      )
 
   def isOpen = ~open
 
@@ -218,8 +226,16 @@ object Challenge {
 
   def randomColor = Color.fromWhite(lila.common.ThreadLocalRandom.nextBoolean())
 
+  // NOTE: Only variants with standardInitialPosition = false!
+  private val draughtsFromPositionVariants: Set[Variant] = Set(
+    strategygames.draughts.variant.FromPosition,
+    strategygames.draughts.variant.Russian,
+    strategygames.draughts.variant.Brazilian
+  ).map(Variant.Draughts)
+
   def make(
       variant: Variant,
+      fenVariant: Option[Variant],
       initialFen: Option[FEN],
       timeControl: TimeControl,
       mode: Mode,
@@ -235,9 +251,27 @@ object Challenge {
       case "black" => ColorChoice.Black  -> Black
       case _       => ColorChoice.Random -> randomColor
     }
+    val finalVariant = fenVariant match {
+      case Some(v) if draughtsFromPositionVariants(variant) =>
+        if (variant.draughtsFromPosition && v.draughtsStandard)
+          Variant.libFromPosition(GameLib.Draughts())
+        else v
+      case _ => variant
+    }
+    //val finalInitialFen = finalVariant match {
+    //  case Variant.Draughts(v) =>
+    //    draughtsFromPositionVariants(v) ?? {
+    //      initialFen.flatMap(fen => Forsyth.<<@(finalVariant.gameLib, finalVariant, fen.value))
+    //        .map(sit => FEN(Forsyth.>>(finalVariant.gameLib, sit.withoutGhosts)))
+    //    } match {
+    //      case fen @ Some(_) => fen
+    //      case _ => !finalVariant.standardInitialPosition option FEN(finalVariant.initialFen)
+    //    }
+    //}
     val finalMode = timeControl match {
-      case TimeControl.Clock(clock) if !lila.game.Game.allowRated(variant, clock.some) => Mode.Casual
-      case _                                                                           => mode
+      case TimeControl.Clock(clock) if !lila.game.Game.allowRated(variant, clock.some)
+        => Mode.Casual
+      case _ => mode
     }
     val isOpen = challenger == Challenge.Challenger.Open
     new Challenge(

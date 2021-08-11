@@ -339,6 +339,8 @@ final class Challenge(
     lila.challenge.Challenge
       .make(
         variant = config.variant,
+        //TODO: draughts: need to have two variants stored in the config?
+        fenVariant = config.variant.some,
         initialFen = config.position,
         timeControl = timeControl,
         mode = config.mode,
@@ -398,6 +400,8 @@ final class Challenge(
               val challenge = lila.challenge.Challenge
                 .make(
                   variant = config.variant,
+                  //TODO: draughts: need to have two variants stored in the config?
+                  fenVariant = config.variant.some,
                   initialFen = config.position,
                   timeControl =
                     config.clock.fold[TimeControl](TimeControl.Unlimited)(TimeControl.Clock.apply),

@@ -104,6 +104,8 @@ final class Setup(
                     } getOrElse TimeControl.Unlimited
                     val challenge = lila.challenge.Challenge.make(
                       variant = config.variant,
+                      //TODO: draughts: need to have two variants stored in the config?
+                      fenVariant = config.variant.some,
                       initialFen = config.fen,
                       timeControl = timeControl,
                       mode = config.mode,

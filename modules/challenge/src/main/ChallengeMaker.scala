@@ -41,6 +41,7 @@ final class ChallengeMaker(
       }
       Challenge.make(
         variant = pov.game.variant,
+        fenVariant = pov.game.variant.some,
         initialFen = initialFen,
         timeControl = timeControl,
         mode = pov.game.mode,
