@@ -13,7 +13,11 @@ private object Validator {
           in.id.variant.gameLib,
           pv.moves.value.toList,
           in.fen.some,
-          in.id.variant
+          in.id.variant,
+          in.id.variant.gameLib match {
+            case GameLib.Draughts() => true
+            case _ => false
+          }
         )
         .fold(err => Error(err).some, _ => none)
       case (error, _) => error

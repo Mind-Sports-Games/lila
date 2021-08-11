@@ -1,7 +1,7 @@
 package lila.api
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Replay, Status }
+import strategygames.{ GameLib, Replay, Status }
 
 import org.joda.time.DateTime
 import play.api.libs.json._
@@ -243,7 +243,11 @@ final private[api] class GameApi(
               lib = g.variant.gameLib,
               moveStrs = g.pgnMoves,
               initialFen = initialFen,
-              variant = g.variant
+              variant = g.variant,
+              finalSquare = g.variant.gameLib match {
+                case GameLib.Draughts() => true
+                case _ => false
+              }
             )
             .toOption map { boards =>
               JsArray(boards.map{b => Forsyth.exportBoard(b.variant.gameLib, b)} map JsString.apply)

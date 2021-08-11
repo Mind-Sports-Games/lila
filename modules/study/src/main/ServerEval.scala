@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, Replay, White }
+import strategygames.{ Division, Game, GameLib, Replay, White }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -44,7 +44,11 @@ object ServerEval {
                   lib = chapter.setup.variant.gameLib,
                   moves = chapter.root.mainline.map(_.move.san),
                   initialFen = chapter.root.fen.some,
-                  variant = chapter.setup.variant
+                  variant = chapter.setup.variant,
+                  finalSquare = chapter.setup.variant.gameLib match {
+                    case GameLib.Draughts() => true
+                    case _ => false
+                  }
                 )
                 .toOption
                 .map(_.flatMap(m => Uci.apply(chapter.setup.variant.gameLib, m))) | List.empty,

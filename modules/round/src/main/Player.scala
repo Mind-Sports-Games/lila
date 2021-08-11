@@ -26,13 +26,13 @@ final private class Player(
       pov: Pov
   )(implicit proxy: GameProxy): Fu[Events] =
     play match {
-      case HumanPlay(_, uci, blur, lag, _) =>
+      case HumanPlay(_, uci, blur, lag, _, finalSquare) =>
         pov match {
           case Pov(game, _) if game.turns > Game.maxPlies =>
             round ! TooManyPlies
             fuccess(Nil)
           case Pov(game, color) if game playableBy color =>
-            applyUci(game, uci, blur, lag)
+            applyUci(game, uci, blur, lag, finalSquare)
               .leftMap(e => s"$pov $e")
               .fold(errs => fufail(ClientError(errs)), fuccess)
               .flatMap {
@@ -124,21 +124,38 @@ final private class Player(
       game: Game,
       uci: Uci,
       blur: Boolean,
-      metrics: MoveMetrics
+      metrics: MoveMetrics,
+      finalSquare: Boolean = false
   ): Validated[String, MoveResult] =
     (uci match {
       case Uci.ChessMove(uci) =>
-        game.chess(Pos.Chess(uci.orig), Pos.Chess(uci.dest), uci.promotion.map(Role.ChessPromotableRole), metrics) map { case (ncg, move) =>
+        game.chess(
+          Pos.Chess(uci.orig),
+          Pos.Chess(uci.dest),
+          uci.promotion.map(Role.ChessPromotableRole),
+          metrics
+        ) map { case (ncg, move) =>
+          ncg -> (Left(move): MoveOrDrop)
+        }
+      case Uci.DraughtsMove(uci) =>
+        game.chess(
+          Pos.Draughts(uci.orig),
+          Pos.Draughts(uci.dest),
+          uci.promotion.map(Role.DraughtsPromotableRole),
+          metrics,
+          finalSquare
+        ) map { case (ncg, move) =>
           ncg -> (Left(move): MoveOrDrop)
         }
       case Uci.ChessDrop(uci) =>
         game.chess match {
-          case StratGame.Chess(chess) => chess.drop(uci.role, uci.pos, metrics) map { case (ncg, drop) =>
-            StratGame.Chess(ncg) -> (Right(drop): MoveOrDrop)
-          }
+          case StratGame.Chess(chess) =>
+            chess.drop(uci.role, uci.pos, metrics) map { case (ncg, drop) =>
+              StratGame.Chess(ncg) -> (Right(drop): MoveOrDrop)
+            }
           case _ => sys.error("A drop was paired up with a non-chess game")
         }
-      case _ => sys.error("Other games not yet implemented")
+      case _ => sys.error(s"Could not apply move: $uci")
     }).map {
       case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnColor, withGrace = false)) => Flagged
       case (newChessGame, moveOrDrop) =>
