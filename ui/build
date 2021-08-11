@@ -69,6 +69,7 @@ else
     parallel --gnu $P_OPTS build ::: $apps3
     parallel --gnu $P_OPTS build_plugin site ::: $site_plugins
     parallel --gnu $P_OPTS build_plugin round ::: $round_plugins
+    parallel --gnu $P_OPTS build_plugin draughtsround ::: $round_plugins
     parallel --gnu $P_OPTS build_plugin analyse ::: $analyse_plugins
     parallel --gnu $P_OPTS build_plugin puzzle ::: $puzzle_plugins
   else # sequential execution
