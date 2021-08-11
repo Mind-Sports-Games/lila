@@ -1,4 +1,4 @@
-simport { sanWriter, SanToUci } from './sanWriter';
+import { sanWriter, SanToUci } from './sanWriter';
 import { DecodedDests } from '../interfaces';
 
 const keyRegex = /^\d{1,2}$/;
@@ -6,7 +6,7 @@ const keyRegex = /^\d{1,2}$/;
 type Sans = {
   [key: string]: Uci;
 }
-s
+
 interface Opts {
   input: HTMLInputElement;
   ctrl: KeyboardMove;
