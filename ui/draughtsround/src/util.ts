@@ -55,8 +55,7 @@ export function getMaterialDiff(pieces: cg.Pieces): cg.MaterialDiff {
     white: { king: 0, man: 0 },
     black: { king: 0, man: 0 },
   };
-  for (let k in pieces) {
-    const p = pieces[k]!;
+  for (const p of pieces.values()) {
     if (p.role != 'ghostman' && p.role != 'ghostking') {
       const them = diff[opposite(p.color)];
       if (them[p.role] > 0) them[p.role]--;

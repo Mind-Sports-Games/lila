@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { sanWriter, SanToUci } from './sanWriter';
+import sanWriter, { SanToUci } from './sanWriter';
 import RoundController from '../ctrl';
 import { renderClock } from '../clock/clockView';
 import { renderTableWatch, renderTablePlay, renderTableEnd } from '../view/table';
@@ -13,7 +13,7 @@ import { Step, DecodedDests, Position, Redraw } from '../interfaces';
 import * as game from 'game';
 import {
   renderSan,
-  renderPieces,
+  //renderPieces,
   renderBoard,
   styleSetting,
   pieceSetting,
@@ -27,10 +27,9 @@ import {
   arrowKeyHandler,
   positionJumpHandler,
   pieceJumpingHandler,
-  castlingFlavours,
   supportedVariant,
   Style,
-} from 'nvui/draughts';
+} from 'nvui/chess';
 // TODO: probably the entirety of nvui/chess
 //       needs a full port to nvui/draughts. :(
 import { renderSetting } from 'nvui/setting';
@@ -45,7 +44,38 @@ const errorSound = throttled('error');
 
 type Sans = {
   [key: string]: Uci;
-}
+};
+
+// TODO: these are placeholder functions which will compile but are not semantically correctly
+/*function userHtml(ctrl: RoundController, player: game.Player) {
+  const d = ctrl.data,
+    user = player.user,
+    perf = user ? user.perfs[d.game.perf] : null,
+    rating = player.rating ? player.rating : perf && perf.rating,
+    rd = player.ratingDiff,
+    ratingDiff = rd ? (rd > 0 ? '+' + rd : rd < 0 ? '−' + -rd : '') : '';
+  return user
+    ? h('span', [
+        h(
+          'a',
+          {
+            attrs: { href: '/@/' + user.username },
+          },
+          user.title
+            ? `${user.title.endsWith('-64') ? user.title.slice(0, user.title.length - 3) : user.title} ${user.username}`
+            : user.username
+        ),
+        rating ? ` ${rating}` : ``,
+        ' ' + ratingDiff,
+      ])
+    : 'Anonymous';
+}*/
+//const _renderPlayer = (ctrl: RoundController, player: game.Player) => {
+//return player.ai ? ctrl.trans('aiNameLevelAiLevel', 'Scan', player.ai) : userHtml(ctrl, player);
+//};
+const gameText = (_ctrl: RoundController) => '';
+const playerHtml = (_ctrl: RoundController, _player: game.Player) => '';
+const playerText = (_ctrl: RoundController, _player: game.Player | undefined) => '';
 
 playstrategy.RoundNVUI = function (redraw: Redraw) {
   const notify = new Notify(redraw),
@@ -72,7 +102,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
             ...makeCgConfig(ctrl),
             animation: { enabled: false },
             drawable: { enabled: false },
-            coordinates: false,
+            coordinates: undefined,
           })
         );
         if (variantNope) setTimeout(() => notify.set(variantNope), 3000);
@@ -102,7 +132,8 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
             renderMoves(d.steps.slice(1), style)
           ),
           h('h2', 'Pieces'),
-          h('div.pieces', renderPieces(ctrl.draughtsground.state.pieces, style)),
+          // TODO: removed to get this to compile
+          //h('div.pieces', renderPieces(ctrl.draughtsground.state.pieces, style)),
           h('h2', 'Game status'),
           h(
             'div.status',
@@ -193,7 +224,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                   possibleMovesHandler(
                     ctrl.data.player.color,
                     ctrl.draughtsground.getFen,
-                    () => ctrl.draughtssground.state.pieces
+                    () => new Map() //ctrl.draughtsground.state.pieces // TODO: this isn't working
                   )
                 );
                 $buttons.on('keypress', positionJumpHandler());
@@ -201,7 +232,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
               }),
             },
             renderBoard(
-              ctrl.draughtsground.state.pieces,
+              new Map(), //ctrl.draughtsground.state.pieces, // TODO: this isn't working
               ctrl.data.player.color,
               pieceStyle.get(),
               prefixStyle.get(),
@@ -289,18 +320,27 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
 
 function onSubmit(ctrl: RoundController, notify: (txt: string) => void, style: () => Style, $input: Cash) {
   return () => {
-    const input = $input.val().trim();
+    let input = ($input.val() as string).trim();
     if (isShortCommand(input)) input = '/' + input;
     if (input[0] === '/') onCommand(ctrl, notify, input.slice(1), style());
     else {
       const d = ctrl.data,
         legalUcis = destsToUcis(ctrl.draughtsground.state.movable.dests!),
-        legalSans: SansToUci = sanWriter(plyStep(d, ctrl.ply).fen, legalUcis, ctrl.draughtsground.state.movable.captLen) as SanToUci,
-      let uci = sanToUci(input, legalSans) || input;s
-      if (legalUcis.includes(uci.toLowerCase())) ctrl.socket.send("move", {
-        from: uci.substr(0, 2),
-        to: uci.substr(2, 2)
-      }, { ackable: true });
+        legalSans: SanToUci = sanWriter(
+          plyStep(d, ctrl.ply).fen,
+          legalUcis,
+          ctrl.draughtsground.state.movable.captLen
+        ) as SanToUci;
+      let uci = sanToUci(input, legalSans) || input;
+      if (legalUcis.includes(uci.toLowerCase()))
+        ctrl.socket.send(
+          'move',
+          {
+            from: uci.substr(0, 2),
+            to: uci.substr(2, 2),
+          },
+          { ackable: true }
+        );
       else notify(d.player.color === d.game.player ? `Invalid move: ${input}` : 'Not your turn');
     }
     $input.val('');
@@ -314,7 +354,7 @@ function isShortCommand(input: string): boolean {
   return shortCommands.includes(input.split(' ')[0].toLowerCase());
 }
 
-function onCommand(ctrl: RoundController, notify: (txt: string) => void, c: string, style: Style) {
+function onCommand(ctrl: RoundController, notify: (txt: string) => void, c: string, _style: Style) {
   const lowered = c.toLowerCase();
   if (lowered == 'c' || lowered == 'clock') notify($('.nvui .botc').text() + ', ' + $('.nvui .topc').text());
   else if (lowered == 'l' || lowered == 'last') notify($('.lastMove').text());
@@ -324,13 +364,14 @@ function onCommand(ctrl: RoundController, notify: (txt: string) => void, c: stri
   else if (lowered == 'takeback') $('.nvui button.takeback-yes').trigger('click');
   else if (lowered == 'o' || lowered == 'opponent') notify(playerText(ctrl, ctrl.data.opponent));
   else {
-    const pieces = ctrl.draughtsground.state.pieces,
-      boardSize = ctrl.draughtsground.state.boardSize;
-    notify(
-      commands.piece.apply(c, pieces) ||
-      commands.scan.apply(c, pieces, boardSize, ctrl.data.player.color !== 'white') ||
-      `Invalid command: ${c}`
-    );
+    //const pieces = ctrl.draughtsground.state.pieces,
+    //boardSize = ctrl.draughtsground.state.boardSize;
+    // TODO: This was just commented out for compiling. :(
+    //notify(
+    //commands.piece.apply(c, pieces, style) ||
+    //commands.scan.apply(c, pieces, boardSize, ctrl.data.player.color !== 'white') ||
+    //`Invalid command: ${c}`
+    //);
   }
 }
 
@@ -346,11 +387,12 @@ function anyClock(ctrl: RoundController, position: Position) {
 
 function destsToUcis(dests: DecodedDests) {
   const ucis: string[] = [];
-  Object.keys(dests).forEach(function(orig) {
-    dests[orig].forEach(function(dest) {
-      ucis.push(orig + dest);
-    });
-  });
+  for (const [orig, d] of dests) {
+    if (d)
+      d.forEach(function (dest) {
+        ucis.push(orig + dest);
+      });
+  }
   return ucis;
 }
 
@@ -358,9 +400,9 @@ function sanToUci(san: string, sans: Sans): string | undefined {
   if (san in sans) return sans[san];
   if (san.length === 4 && Object.keys(sans).find(key => sans[key] === san)) return san;
   let lowered = san.toLowerCase().replace('x0', 'x').replace('-0', '-');
-  if (lowered.slice(0, 1) === '0') lowered = lowered.slice(1)
+  if (lowered.slice(0, 1) === '0') lowered = lowered.slice(1);
   if (lowered in sans) return sans[lowered];
-  return undefined
+  return undefined;
 }
 
 function renderMoves(steps: Step[], style: Style) {
@@ -371,24 +413,4 @@ function renderMoves(steps: Step[], style: Style) {
     if (s.ply % 2 === 0) res.push(h('br'));
   });
   return res;
-}
-
-function renderPlayer(ctrl: RoundController, player: game.Player) {
-  return player.ai ? ctrl.trans('aiNameLevelAiLevel', 'Scan', player.ai) : userHtml(ctrl, player);
-}
-
-function userHtml(ctrl: RoundController, player: game.Player) {
-  const d = ctrl.data,
-    user = player.user,
-    perf = user ? user.perfs[d.game.perf] : null,
-    rating = player.rating ? player.rating : (perf && perf.rating),
-    rd = player.ratingDiff,
-    ratingDiff = rd ? (rd > 0 ? '+' + rd : ( rd < 0 ? '−' + (-rd) : '')) : '';
-  return user ? h('span', [
-    h('a', {
-      attrs: { href: '/@/' + user.username }
-    }, user.title ? `${user.title.endsWith('-64') ? user.title.slice(0, user.title.length - 3) : user.title} ${user.username}` : user.username),
-    rating ? ` ${rating}` : ``,
-    ' ' + ratingDiff,
-  ]) : 'Anonymous';
 }

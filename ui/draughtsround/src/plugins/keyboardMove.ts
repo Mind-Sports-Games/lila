@@ -1,11 +1,13 @@
-import { sanWriter, SanToUci } from './sanWriter';
+import sanWriter, { SanToUci } from './sanWriter';
 import { DecodedDests } from '../interfaces';
+import { KeyboardMove } from '../keyboardMove';
+import { Key } from 'draughtsground/types';
 
 const keyRegex = /^\d{1,2}$/;
 
 type Sans = {
   [key: string]: Uci;
-}
+};
 
 interface Opts {
   input: HTMLInputElement;
@@ -29,11 +31,11 @@ playstrategy.keyboardMove = function (opts: Opts) {
     if (!submitOpts.isTrusted) return;
     const foundUci = v.length >= 3 && legalSans && sanToUci(v, legalSans);
     if (foundUci) {
-      opts.ctrl.san(foundUci.slice(0, 2), foundUci.slice(2));
+      opts.ctrl.san(foundUci.slice(0, 2) as Key, foundUci.slice(2) as Key);
       clear();
     } else if (legalSans && isKey(v)) {
       if (submitOpts.force) {
-        opts.ctrl.select(v.length === 1 ? ('0' + v) : v);
+        opts.ctrl.select((v.length === 1 ? '0' + v : v) as Key);
         clear();
       } else opts.input.classList.remove('wrong');
     } else if (v.length > 0 && 'clock'.startsWith(v.toLowerCase())) {
@@ -55,10 +57,10 @@ playstrategy.keyboardMove = function (opts: Opts) {
     opts.input.classList.remove('wrong');
   };
   makeBindings(opts, submit, clear);
-  return function(fen: string, dests: DecodedDests, captLen?: number) {
+  return function (fen: string, dests: DecodedDests, captLen?: number) {
     legalSans = dests && Object.keys(dests).length ? sanWriter(fen, destsToUcis(dests), captLen) : null;
     submit(opts.input.value, {
-      isTrusted: true
+      isTrusted: true,
       // TODO: unsure if yourMove is needed here or not.s
     });
   };
@@ -102,25 +104,29 @@ function sanToUci(san: string, sans: Sans): string | undefined {
   if (san in sans) return sans[san];
   if (san.length === 4 && Object.keys(sans).find(key => sans[key] === san)) return san;
   let lowered = san.toLowerCase().replace('x0', 'x').replace('-0', '-');
-  if (lowered.startsWith('0')) lowered = lowered.slice(1)
+  if (lowered.startsWith('0')) lowered = lowered.slice(1);
   if (lowered in sans) return sans[lowered];
-  return undefined
+  return undefined;
 }
 
 function sanCandidates(san: string, sans: Sans) {
   const lowered = san.toLowerCase();
   let cleanLowered = lowered.replace('x0', 'x').replace('-0', '-');
-  if (cleanLowered.startsWith('0')) cleanLowered = cleanLowered.slice(1)
-  var filterKeys = Object.keys(sans).filter(function(s) {
+  if (cleanLowered.startsWith('0')) cleanLowered = cleanLowered.slice(1);
+  var filterKeys = Object.keys(sans).filter(function (s) {
     const sLowered = s.toLowerCase();
     return sLowered.startsWith(lowered) || sLowered.startsWith(cleanLowered);
   });
-  return filterKeys.length ? filterKeys : Object.keys(sans).map(key => sans[key]).filter(function(s) {
-    return s.startsWith(lowered);
-  });
+  return filterKeys.length
+    ? filterKeys
+    : Object.keys(sans)
+        .map(key => sans[key])
+        .filter(function (s) {
+          return s.startsWith(lowered);
+        });
 }
 
-function destsToUcis(dests: Dests): Uci[] {
+function destsToUcis(dests: DecodedDests): Uci[] {
   const ucis: string[] = [];
   for (const [orig, d] of dests) {
     d.forEach(function (dest) {
