@@ -34,6 +34,7 @@ object Event {
   object MoveOrDrop {
 
     def data(
+        lib: GameLib,
         fen: String,
         check: Boolean,
         threefold: Boolean,
@@ -49,7 +50,8 @@ object Event {
           "fen"   -> fen,
           "ply"   -> state.turns,
           "dests" -> PossibleMoves.oldJson(possibleMoves),
-          "captLen" -> ~captLen
+          "captLen" -> ~captLen,
+          "lib"     -> lib.id
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -66,6 +68,7 @@ object Event {
   }
 
   case class Move(
+      lib: GameLib,
       orig: Pos,
       dest: Pos,
       san: String,
@@ -84,7 +87,18 @@ object Event {
   ) extends Event {
     def typ = "move"
     def data =
-      MoveOrDrop.data(fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData, captLen) {
+      MoveOrDrop.data(
+        lib,
+        fen,
+        check,
+        threefold,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        crazyData,
+        captLen
+      ) {
         Json
           .obj(
             "uci" -> s"${orig.key}${dest.key}",
@@ -105,6 +119,7 @@ object Event {
         crazyData: Option[Crazyhouse.Data]
     ): Move =
       Move(
+        lib = situation.board.variant.gameLib,
         orig = move.orig,
         dest = move.dest,
         san = move match {
@@ -160,7 +175,7 @@ object Event {
   ) extends Event {
     def typ = "drop"
     def data =
-      MoveOrDrop.data(fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
+      MoveOrDrop.data(GameLib.Chess(), fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
         Json.obj(
           "role" -> role.name,
           "uci"  -> s"${role.pgn}@${pos.key}",
@@ -256,11 +271,20 @@ object Event {
   }
 
   case class Promotion(role: PromotableRole, pos: Pos) extends Event {
+    private val lib = pos match {
+      case Pos.Chess(_)    => GameLib.Chess().id
+      case Pos.Draughts(_) => GameLib.Draughts().id
+    }
     def typ = "promotion"
     def data =
       Json.obj(
+        //"lib"        -> pos match {
+        //  case Pos.Chess(_)    => GameLib.Chess().id
+        //  case Pos.Draughts(_) => GameLib.Draughts().id
+        //},
         "key"        -> pos.key,
-        "pieceClass" -> role.toString.toLowerCase
+        "pieceClass" -> role.toString.toLowerCase,
+        "lib"        -> lib
       )
   }
 
