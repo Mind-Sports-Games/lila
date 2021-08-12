@@ -2,6 +2,9 @@
   "include": ["src/*.ts"],
   "exclude": [],
   "compilerOptions": {
+    "declaration": true,
+    "outDir": ".",
+    "types": [],
     "noEmitOnError": false,
     "strict": true,
     "noUnusedLocals": true,

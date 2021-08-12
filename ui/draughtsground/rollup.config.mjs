@@ -6,12 +6,12 @@ export default {
   input: 'src/index.js',
   output: [
     {
-      file: 'dist/draughtsground.js',
+      file: 'draughtsground.js',
       format: 'iife',
       name: 'Draughtsground',
     },
     {
-      file: 'dist/draughtsground.min.js',
+      file: 'draughtsground.min.js',
       format: 'iife',
       name: 'Draughtsground',
       plugins: [
@@ -22,7 +22,7 @@ export default {
     },
   ],
   plugins: [
-    typescript(),
+    typescript({tsconfig: "./tsconfig.json"}),
     commonjs({
       extensions: ['.js', '.ts'],
     }),
