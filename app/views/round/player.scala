@@ -3,6 +3,8 @@ package round
 
 import play.api.libs.json.Json
 
+import strategygames.GameLib
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -43,13 +45,18 @@ object player {
         )
     }
 
+    val roundVar = pov.game.variant.gameLib match {
+      case GameLib.Chess() => "PlayStrategyRound"
+      case GameLib.Draughts() => "PlayStrategyDraughtsRound"
+    }
+
     bits.layout(
       variant = pov.game.variant,
       title = s"${trans.play.txt()} ${if (ctx.pref.isZen) "ZEN" else playerText(pov.opponent)}",
       moreJs = frag(
         roundNvuiTag,
         roundTag(pov.game.variant.gameLib),
-        embedJsUnsafeLoadThen(s"""PlayStrategyRound.boot(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""{roundVar}.boot(${safeJsonValue(
           Json
             .obj(
               "data"   -> data,
