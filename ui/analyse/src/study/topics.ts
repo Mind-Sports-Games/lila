@@ -81,7 +81,7 @@ export function formView(ctrl: TopicsCtrl, userId?: string): VNode {
           h(
             'textarea',
             {
-              hook: onInsert(elm => setupTagify(elm, userId)),
+              hook: onInsert(elm => setupTagify(elm as HTMLTextAreaElement, userId)),
             },
             ctrl.getTopics().join(', ').replace(/[<>]/g, '')
           ),
@@ -98,7 +98,7 @@ export function formView(ctrl: TopicsCtrl, userId?: string): VNode {
   });
 }
 
-function setupTagify(elm: HTMLElement, userId?: string) {
+function setupTagify(elm: HTMLInputElement | HTMLTextAreaElement, userId?: string) {
   playstrategy.loadCssPath('tagify');
   playstrategy.loadScript('vendor/tagify/tagify.min.js').then(() => {
     tagify = new window.Tagify(elm, {
