@@ -4,24 +4,20 @@
   "description": "lidraughts.org Draughts UI",
   "type": "commonjs",
   "main": "draughtsground.js",
-  "types": "draughtsground.d.ts",
+  "typings": "draughtsground.d.ts",
   "directories": {},
   "dependencies": {},
   "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "rollup-plugin-typescript2": "^0.30.0",
-    "@rollup/plugin-node-resolve": "^8",
+    "@rollup/plugin-commonjs": "^17",
+    "@rollup/plugin-typescript": "^8.1.0",
     "@typescript-eslint/eslint-plugin": "^4",
     "@typescript-eslint/parser": "^4",
-    "draughts": "2.0.0",
     "eslint": "^7",
     "prettier": "^2",
     "rollup": "^2",
     "rollup-plugin-terser": "^7",
     "tslib": "^2",
-    "typescript": "^4",
-    "fancy-log": "^1",
-    "tsify": "^4"
+    "typescript": "^4"
   },
   "scripts": {
     "prepare": "npm run compile",
@@ -31,9 +27,7 @@
     "check-format": "prettier --check .",
     "dist": "rollup --config",
     "dev": "rollup --config",
-    "prod": "rollup --config --config-prod",
-    "plugin-dev": "rollup --config --config-plugin",
-    "plugin-prod": "rollup --config --config-prod --config-plugin"
+    "prod": "rollup --config --config-prod"
   },
   "files": [
     "/*.js",

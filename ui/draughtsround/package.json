@@ -23,7 +23,7 @@
     "@build/rollupProject": "2.0.0",
     "@rollup/plugin-commonjs": "^17",
     "@rollup/plugin-node-resolve": "^8",
-    "@rollup/plugin-typescript": "^8",
+    "@rollup/plugin-typescript": "^8.1.0",
     "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
