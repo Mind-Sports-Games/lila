@@ -2,16 +2,13 @@
   "include": ["src/*.ts"],
   "exclude": [],
   "compilerOptions": {
-    "outDir": ".",
-    "declaration": true,
-    "declarationDir": ".",
     "noEmitOnError": false,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
-    "module": "esnext",
+    "module": "commonjs",
     "target": "ES2017",
     "lib": ["DOM", "ES2017"]
   }
