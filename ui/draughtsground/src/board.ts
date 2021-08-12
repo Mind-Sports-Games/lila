@@ -3,6 +3,8 @@ import { pos2key, key2pos, opposite, containsX, allKeys } from './util';
 import premove from './premove';
 import * as cg from './types';
 
+export type Uci = string;
+
 export function decomposeUci(uci: Uci): cg.Key[] {
   const ucis: cg.Key[] = [];
   if (uci.length > 1) {
