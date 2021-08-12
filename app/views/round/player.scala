@@ -3,8 +3,6 @@ package round
 
 import play.api.libs.json.Json
 
-import strategygames.GameLib
-
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -23,6 +21,8 @@ object player {
       chatOption: Option[lila.chat.Chat.GameOrEvent],
       bookmarked: Boolean
   )(implicit ctx: Context) = {
+
+    val gameLib = pov.game.variant.gameLib
 
     val chatJson = chatOption.map(_.either).map {
       case Left(c) =>
@@ -45,18 +45,13 @@ object player {
         )
     }
 
-    val roundVar = pov.game.variant.gameLib match {
-      case GameLib.Chess() => "PlayStrategyRound"
-      case GameLib.Draughts() => "PlayStrategyDraughtsRound"
-    }
-
     bits.layout(
       variant = pov.game.variant,
       title = s"${trans.play.txt()} ${if (ctx.pref.isZen) "ZEN" else playerText(pov.opponent)}",
       moreJs = frag(
         roundNvuiTag,
-        roundTag(pov.game.variant.gameLib),
-        embedJsUnsafeLoadThen(s"""{roundVar}.boot(${safeJsonValue(
+        roundTag(gameLib),
+        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLib)}.boot(${safeJsonValue(
           Json
             .obj(
               "data"   -> data,

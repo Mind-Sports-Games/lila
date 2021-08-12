@@ -154,9 +154,9 @@ object layout {
       nonce
     )
 
-  private def loadScripts(moreJs: Frag, chessground: Boolean)(implicit ctx: Context) =
+  private def loadScripts(moreJs: Frag, ground: Boolean, gameLibId: Int)(implicit ctx: Context) =
     frag(
-      chessground option chessgroundTag,
+      if (gameLibId == 1) ground option draughtsgroundTag else ground option chessgroundTag,
       ctx.requiresFingerprint option fingerprintTag,
       ctx.nonce map playstrategyJsObject,
       if (netConfig.minifiedAssets)
@@ -295,7 +295,8 @@ object layout {
             )
           ),
           a(id := "reconnecting", cls := "link text", dataIcon := "B")(trans.reconnecting()),
-          loadScripts(moreJs, chessground)
+          loadScripts(moreJs, chessground, 0),//chessground
+          loadScripts(moreJs, chessground, 1)//draughtsground
         )
       )
     )

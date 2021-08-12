@@ -54,6 +54,10 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
     case GameLib.Draughts() => jsModule("draughtsround")
     case _                  => jsModule("round")
   }
+  def roundPlayStrategyTag(lib: GameLib) = lib match {
+    case GameLib.Draughts() => "PlayStrategyDraughtsRound"
+    case _                  => "PlayStrategyRound"
+  }
   def roundNvuiTag(implicit ctx: Context) = ctx.blind option jsModule("round.nvui")
 
   def analyseTag                            = jsModule("analysisBoard")
@@ -62,6 +66,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   def captchaTag          = jsModule("captcha")
   def infiniteScrollTag   = jsModule("infiniteScroll")
   def chessgroundTag      = jsAt("javascripts/vendor/chessground.min.js")
+  def draughtsgroundTag   = jsAt("javascripts/vendor/draughtsground.min.js")
   def cashTag             = jsAt("javascripts/vendor/cash.min.js")
   def fingerprintTag      = jsAt("javascripts/fipr.js")
   def tagifyTag           = jsAt("vendor/tagify/tagify.min.js")

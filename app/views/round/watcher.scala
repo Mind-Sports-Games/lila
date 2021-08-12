@@ -24,6 +24,8 @@ object watcher {
       bookmarked: Boolean
   )(implicit ctx: Context) = {
 
+    val gameLib = pov.game.variant.gameLib
+
     val chatJson = chatOption map { c =>
       chat.json(
         c.chat,
@@ -41,8 +43,8 @@ object watcher {
       title = s"${gameVsText(pov.game, withRatings = true)} • spectator",
       moreJs = frag(
         roundNvuiTag,
-        roundTag(pov.game.variant.gameLib),
-        embedJsUnsafeLoadThen(s"""PlayStrategyRound.boot(${safeJsonValue(
+        roundTag(gameLib),
+        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLib)}.boot(${safeJsonValue(
           Json.obj(
             "data" -> data,
             "i18n" -> jsI18n(pov.game),
