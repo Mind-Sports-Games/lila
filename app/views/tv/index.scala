@@ -24,7 +24,7 @@ object index {
       variant = pov.game.variant,
       title = s"${channel.name} TV: ${playerText(pov.player)} vs ${playerText(pov.opponent)}",
       moreJs = frag(
-        roundTag,
+        roundTag(pov.game.variant.gameLib),
         embedJsUnsafeLoadThen(
           s"""PlayStrategyRound.boot(${safeJsonValue(
             Json.obj(

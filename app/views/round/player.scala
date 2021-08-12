@@ -48,7 +48,7 @@ object player {
       title = s"${trans.play.txt()} ${if (ctx.pref.isZen) "ZEN" else playerText(pov.opponent)}",
       moreJs = frag(
         roundNvuiTag,
-        roundTag,
+        roundTag(pov.game.variant.gameLib),
         embedJsUnsafeLoadThen(s"""PlayStrategyRound.boot(${safeJsonValue(
           Json
             .obj(

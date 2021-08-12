@@ -7,6 +7,8 @@ import lila.api.Context
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.{ AssetVersion, ContentSecurityPolicy, Nonce }
 
+import strategygames.GameLib
+
 trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   private lazy val netDomain      = env.net.domain
@@ -48,7 +50,10 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   def depsTag = jsAt("compiled/deps.min.js")
 
-  def roundTag                            = jsModule("round")
+  def roundTag(lib: GameLib) = lib match {
+    case GameLib.Draughts() => jsModule("draughtsround")
+    case _                  => jsModule("round")
+  }
   def roundNvuiTag(implicit ctx: Context) = ctx.blind option jsModule("round.nvui")
 
   def analyseTag                            = jsModule("analysisBoard")

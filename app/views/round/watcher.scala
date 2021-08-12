@@ -41,7 +41,7 @@ object watcher {
       title = s"${gameVsText(pov.game, withRatings = true)} • spectator",
       moreJs = frag(
         roundNvuiTag,
-        roundTag,
+        roundTag(pov.game.variant.gameLib),
         embedJsUnsafeLoadThen(s"""PlayStrategyRound.boot(${safeJsonValue(
           Json.obj(
             "data" -> data,
