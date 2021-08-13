@@ -140,6 +140,7 @@ export default class Setup {
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
+      $microMatch = $form.find('.micro_match'),
       $timeInput = $form.find('.time_choice [name=time]'),
       $incrementInput = $form.find('.increment_choice [name=increment]'),
       $daysInput = $form.find('.days_choice [name=days]'),
@@ -465,6 +466,21 @@ export default class Setup {
         if (isFen) {
           $casual.trigger('click');
           requestAnimationFrame(() => document.body.dispatchEvent(new Event('chessground.resize')));
+        }
+        showRating();
+        toggleButtons();
+      })
+      .trigger('change');
+
+    $draughtsVariantSelect
+      .on('change', function (this: HTMLElement) {
+        const isFen = $(this).val() == '3';
+        $fenPosition.toggle(isFen);
+        $microMatch.toggle(isFen);
+        $modeChoicesWrap.toggle(!isFen);
+        if (isFen) {
+          $casual.trigger('click');
+          requestAnimationFrame(() => document.body.dispatchEvent(new Event('draughtsground.resize')));
         }
         showRating();
         toggleButtons();

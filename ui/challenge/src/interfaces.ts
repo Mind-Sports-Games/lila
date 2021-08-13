@@ -55,6 +55,7 @@ export interface Challenge {
     name: string;
   };
   declined?: boolean;
+  microMatch?: boolean;
 }
 
 export type Reasons = {
