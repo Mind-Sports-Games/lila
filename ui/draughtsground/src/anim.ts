@@ -336,7 +336,7 @@ function animate<A>(
   noCaptSequences: boolean = false
 ): A {
   // clone state before mutating it
-  const prevPieces: cg.Pieces = { ...state.pieces };
+  const prevPieces: cg.Pieces = new Map(state.pieces);
 
   const result = mutation(state);
   const plan = computePlan(prevPieces, state, fadeOnly, noCaptSequences);
