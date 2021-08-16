@@ -179,7 +179,7 @@ export function defaults(): Partial<State> {
         paleGrey: { key: 'pgr', color: '#4a4a4a', opacity: 0.35, lineWidth: 15 },
       },
       pieces: {
-        baseUrl: 'https://lidraughts.org/assets/piece/wide/',
+        baseUrl: 'https://playstrategy.org/assets/piece/wide/',
       },
       prevSvgHash: '',
     },
