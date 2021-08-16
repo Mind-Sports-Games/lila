@@ -12,8 +12,8 @@ export function read(fen: cg.FEN, fields?: number): cg.Pieces {
     if (fenPart.length <= 1) continue;
     let first = fenPart.slice(0, 1),
       clr: cg.Color;
-    if (first === 'W') clr = 'white';
-    else if (first === 'B') clr = 'black';
+    if (first.toUpperCase() === 'W') clr = 'white';
+    else if (first.toUpperCase() === 'B') clr = 'black';
     else continue;
     const fenPieces = fenPart.slice(1).split(',');
     for (let fenPiece of fenPieces) {
