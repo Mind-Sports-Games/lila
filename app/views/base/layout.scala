@@ -254,6 +254,7 @@ object layout {
             "blind-mode"                                                                                                                                   -> ctx.blind,
             "kid"                                                                                                                                          -> ctx.kid,
             "mobile"                                                                                                                                       -> ctx.isMobileBrowser,
+            "coords-out"                                                                                                                                   -> (ctx.pref.coords == lila.pref.Pref.Coords.OUTSIDE),
             "playing fixed-scroll"                                                                                                                         -> playing
           ),
           dataDev := (!netConfig.minifiedAssets).option("true"),
