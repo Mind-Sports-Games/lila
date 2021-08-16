@@ -134,9 +134,9 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     goneIn: ctrl.setGone,
     kingMoves(e) {
       if (ctrl.data.pref.showKingMoves) {
-        ctrl.draughtsground.setKingMoves({ 
+        ctrl.draughtsground.setKingMoves({
           white: { count: e.white, key: e.whiteKing },
-          black: { count: e.black, key: e.blackKing }
+          black: { count: e.black, key: e.blackKing },
         });
         ctrl.redraw();
       }
@@ -168,15 +168,20 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
 
   playstrategy.pubsub.on('ab.rep', n => send('rep', { n }));
 
+  let draughtsSend = (t: string, d?: any, o: any = {}, noRetry = false) => {
+    if (d !== undefined) d.lib = 1; // Add in the draughts lib to the data.
+    return send(t, d, o, noRetry);
+  };
+
   return {
-    send,
+    send: draughtsSend,
     handlers,
-    moreTime: throttle(300, () => send('moretime')),
-    outoftime: backoff(500, 1.1, () => send('flag', ctrl.data.game.player)),
-    berserk: throttle(200, () => send('berserk', null, { ackable: true })),
+    moreTime: throttle(300, () => draughtsSend('moretime')),
+    outoftime: backoff(500, 1.1, () => draughtsSend('flag', ctrl.data.game.player)),
+    berserk: throttle(200, () => draughtsSend('berserk', null, { ackable: true })),
     sendLoading(typ: string, data?: any) {
       ctrl.setLoading(true);
-      send(typ, data);
+      draughtsSend(typ, data);
     },
     receive(typ: string, data: any): boolean {
       if (handlers[typ]) {
