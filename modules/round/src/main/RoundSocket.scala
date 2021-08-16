@@ -277,8 +277,8 @@ object RoundSocket {
               } yield PlayerDo(FullId(fullId), tpe)
             }
           case "r/move" =>
-            raw.get(5) { case Array(fullId, uciS, blurS, lagS, mtS) =>
-              Uci(GameLib.Chess(), uciS) map { uci =>
+            raw.get(6) { case Array(fullId, libS, uciS, blurS, lagS, mtS) =>
+              Uci(GameLib(libS.toInt), uciS) map { uci =>
                 PlayerMove(FullId(fullId), uci, P.In.boolean(blurS), MoveMetrics(centis(lagS), centis(mtS)))
               }
             }
