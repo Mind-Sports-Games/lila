@@ -17,6 +17,7 @@ export function makeConfig(ctrl: RoundController): Config {
     step = plyStep(data, ctrl.ply),
     playing = ctrl.isPlaying(),
     ghosts = countGhosts(step.fen);
+
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -29,7 +30,7 @@ export function makeConfig(ctrl: RoundController): Config {
     addPieceZIndex: ctrl.data.pref.is3d,
     highlight: {
       lastMove: data.pref.highlight,
-      kingMoves: data.pref.showKingMoves, //  && (data.game.variant.key === 'frisian' || data.game.variant.key === 'frysk'), TODO: will need to be fixed as well
+      kingMoves: data.pref.showKingMoves && (data.game.variant.key === 'frisian' || data.game.variant.key === 'frysk'),
     },
     events: {
       move: hooks.onMove,

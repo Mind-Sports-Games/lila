@@ -38,10 +38,10 @@ export const altCastles = {
   e8h8: 'e8g8',
 };
 
-export function variantUsesUCINotation(key: VariantKey) {
+export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
   return ['linesOfAction'].includes(key);
 }
 
-export function notationStyle(key: VariantKey): NotationStyle {
+export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
   return variantUsesUCINotation(key) ? 'uci' : 'san';
 }

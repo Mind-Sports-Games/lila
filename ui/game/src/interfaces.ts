@@ -2,35 +2,28 @@
 //       allows for the base one to be defined and then only the
 //       differences after that, until then, keep all of them up
 //       to date.
-export interface GameData {
+export interface BaseGameData {
+  game: Game | DraughtsGame;
+  player: Player;
+  opponent: Player;
+  spectator?: boolean;
+  tournament?: Tournament;
+  simul?: Simul;
+  swiss?: Swiss;
+  takebackable: boolean;
+  moretimeable: boolean;
+  clock?: Clock;
+  correspondence?: CorrespondenceClock;
+}
+export interface GameData extends BaseGameData {
   game: Game;
-  player: Player;
-  opponent: Player;
-  spectator?: boolean;
-  tournament?: Tournament;
-  simul?: Simul;
-  swiss?: Swiss;
-  takebackable: boolean;
-  moretimeable: boolean;
-  clock?: Clock;
-  correspondence?: CorrespondenceClock;
 }
 
-export interface DraughtsGameData {
+export interface DraughtsGameData extends BaseGameData {
   game: DraughtsGame;
-  player: Player;
-  opponent: Player;
-  spectator?: boolean;
-  tournament?: Tournament;
-  simul?: Simul;
-  swiss?: Swiss;
-  takebackable: boolean;
-  moretimeable: boolean;
-  clock?: Clock;
-  correspondence?: CorrespondenceClock;
 }
 
-export interface Game {
+export interface BaseGame {
   id: string;
   status: Status;
   player: Color;
@@ -38,40 +31,26 @@ export interface Game {
   startedAtTurn?: number;
   source: Source;
   speed: Speed;
+  variant: Variant | DraughtsVariant;
+  winner?: Color;
+  drawOffers?: number[];
+  moveCentis?: number[];
+  initialFen?: string;
+  importedBy?: string;
+  threefold?: boolean;
+  boosted?: boolean;
+  rematch?: string;
+  microMatch?: MicroMatch;
+  rated?: boolean;
+  perf: string;
+}
+
+export interface Game extends BaseGame {
   variant: Variant;
-  winner?: Color;
-  drawOffers?: number[];
-  moveCentis?: number[];
-  initialFen?: string;
-  importedBy?: string;
-  threefold?: boolean;
-  boosted?: boolean;
-  rematch?: string;
-  microMatch?: MicroMatch;
-  rated?: boolean;
-  perf: string;
 }
 
-export interface DraughtsGame {
-  id: string;
-  status: Status;
-  player: Color;
-  turns: number;
-  startedAtTurn?: number;
-  source: Source;
-  speed: Speed;
+export interface DraughtsGame extends BaseGame {
   variant: DraughtsVariant;
-  winner?: Color;
-  drawOffers?: number[];
-  moveCentis?: number[];
-  initialFen?: string;
-  importedBy?: string;
-  threefold?: boolean;
-  boosted?: boolean;
-  rematch?: string;
-  microMatch?: MicroMatch;
-  rated?: boolean;
-  perf: string;
 }
 
 export interface MicroMatch {
@@ -197,7 +176,7 @@ export interface Perf {
 }
 
 export interface Ctrl {
-  data: GameData;
+  data: BaseGameData;
   trans: Trans;
 }
 
