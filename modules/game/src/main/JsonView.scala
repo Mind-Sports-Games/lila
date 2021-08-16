@@ -105,10 +105,28 @@ object JsonView {
   }
 
   implicit val variantWriter: OWrites[Variant] = OWrites { v =>
+    v match {
+      case v: Variant.Chess =>
+        Json.obj(
+          "key"   -> v.key,
+          "name"  -> v.name,
+          "short" -> v.shortName
+        )
+      case Variant.Draughts(draughtsVariant) =>
+        Json.obj(
+          "key"   -> v.key,
+          "name"  -> v.name,
+          "short" -> v.shortName,
+          "gameType" -> v.gameType,
+          "board" -> draughtsVariant.boardSize
+        )
+    }
+  }
+
+  implicit val boardSizeWriter: Writes[strategygames.draughts.Board.BoardSize] = Writes[strategygames.draughts.Board.BoardSize] { b =>
     Json.obj(
-      "key"   -> v.key,
-      "name"  -> v.name,
-      "short" -> v.shortName
+      "key" -> b.key,
+      "size" -> b.sizes
     )
   }
 
