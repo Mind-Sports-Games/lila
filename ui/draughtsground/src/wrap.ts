@@ -89,7 +89,7 @@ function renderFieldnumbers(element: HTMLElement, s: State, bounds: ClientRect) 
   const asWhite = s.orientation !== 'black',
     count = boardFields(s);
   for (let f = 1; f <= count; f++) {
-    const field = createEl('fieldnumber', 'black') as FieldNumber, 
+    const field = createEl('fieldnumber', 'black') as FieldNumber,
       san = f.toString(),
       k = allKeys[f - 1];
     field.textContent = s.coordSystem === 1 ? san2alg[san] : san;
