@@ -191,4 +191,3 @@ export function readKingMoves(fen: cg.FEN): cg.KingMoves | undefined {
 
   return result;
 }
-

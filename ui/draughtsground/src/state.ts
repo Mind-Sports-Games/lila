@@ -1,8 +1,8 @@
-import * as fen from './fen'
-import { AnimCurrent } from './anim'
-import { DragCurrent } from './drag'
-import { Drawable } from './draw'
-import { timer } from './util'
+import * as fen from './fen';
+import { AnimCurrent } from './anim';
+import { DragCurrent } from './drag';
+import { Drawable } from './draw';
+import { timer } from './util';
 import * as cg from './types';
 
 export interface State {
@@ -35,7 +35,7 @@ export interface State {
     color?: cg.Color | 'both'; // color that can move. white | black | both
     dests?: cg.Dests; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     captLen?: number;
-    captureUci?: Array<string>
+    captureUci?: Array<string>;
     variant?: string; // game variant, to determine motion rules
     showDests: boolean; // whether to add the move-dest class on squares
     events: {
@@ -51,19 +51,20 @@ export interface State {
     current?: cg.KeyPair; // keys of the current saved premove ["e2" "e4"]
     events: {
       set?: (orig: cg.Key, dest: cg.Key, metadata?: cg.SetPremoveMetadata) => void; // called after the premove has been set
-      unset?: () => void;  // called after the premove has been unset
-    }
+      unset?: () => void; // called after the premove has been unset
+    };
   };
   predroppable: {
     enabled: boolean; // allow predrops for color that can not move
-    current?: { // current saved predrop {role: 'knight'; key: 'e4'}
+    current?: {
+      // current saved predrop {role: 'knight'; key: 'e4'}
       role: cg.Role;
-      key: cg.Key
+      key: cg.Key;
     };
     events: {
       set?: (role: cg.Role, key: cg.Key) => void; // called after the predrop has been set
       unset?: () => void; // called after the predrop has been unset
-    }
+    };
   };
   draggable: {
     enabled: boolean; // allow moves & premoves to use drag'n drop
@@ -80,13 +81,13 @@ export interface State {
   };
   selectable: {
     // disable to enforce dragging over click-click move
-    enabled: boolean
+    enabled: boolean;
   };
   stats: {
     // was last piece dragged or clicked?
     // needs default to false for touch
-    dragged: boolean,
-    ctrlKey?: boolean
+    dragged: boolean;
+    ctrlKey?: boolean;
   };
   events: {
     change?: () => void; // called after the situation changes on the board
@@ -94,14 +95,14 @@ export interface State {
     // capturedPiece is undefined or like {color: 'white'; 'role': 'king'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
-    select?: (key: cg.Key) => void // called when a square is selected
+    select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
   };
   items?: (pos: cg.Pos, key: cg.Key) => any | undefined; // items on the board { render: key -> vdom }
-  drawable: Drawable,
+  drawable: Drawable;
   exploding?: cg.Exploding;
-  dom: cg.Dom,
-  hold: cg.Timer
+  dom: cg.Dom;
+  hold: cg.Timer;
 }
 
 export function defaults(): Partial<State> {
@@ -118,26 +119,26 @@ export function defaults(): Partial<State> {
     pieceKey: false,
     highlight: {
       lastMove: true,
-      kingMoves: true
+      kingMoves: true,
     },
     animation: {
       enabled: true,
-      duration: 200
+      duration: 200,
     },
     movable: {
       free: true,
       color: 'both',
       showDests: true,
-      events: {}
+      events: {},
     },
     premovable: {
       enabled: true,
       showDests: true,
-      events: {}
+      events: {},
     },
     predroppable: {
       enabled: false,
-      events: {}
+      events: {},
     },
     draggable: {
       enabled: true,
@@ -145,18 +146,18 @@ export function defaults(): Partial<State> {
       autoDistance: true,
       centerPiece: true,
       showGhost: true,
-      deleteOnDropOff: false
+      deleteOnDropOff: false,
     },
     dropmode: {
-      active: false
+      active: false,
     },
     selectable: {
-      enabled: true
+      enabled: true,
     },
     stats: {
       // on touchscreen, default to "tap-tap" moves
       // instead of drag
-      dragged: !('ontouchstart' in window)
+      dragged: !('ontouchstart' in window),
     },
     events: {},
     drawable: {
@@ -175,13 +176,13 @@ export function defaults(): Partial<State> {
         paleBlue3: { key: 'pb3', color: '#003088', opacity: 0.3, lineWidth: 15 },
         paleGreen: { key: 'pg', color: '#15781B', opacity: 0.4, lineWidth: 15 },
         paleRed: { key: 'pr', color: '#882020', opacity: 0.4, lineWidth: 15 },
-        paleGrey: { key: 'pgr', color: '#4a4a4a', opacity: 0.35, lineWidth: 15 }
+        paleGrey: { key: 'pgr', color: '#4a4a4a', opacity: 0.35, lineWidth: 15 },
       },
       pieces: {
-        baseUrl: 'https://lidraughts.org/assets/piece/wide/'
+        baseUrl: 'https://lidraughts.org/assets/piece/wide/',
       },
-      prevSvgHash: ''
+      prevSvgHash: '',
     },
-    hold: timer()
+    hold: timer(),
   };
 }

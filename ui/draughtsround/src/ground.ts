@@ -20,7 +20,7 @@ export function makeConfig(ctrl: RoundController): Config {
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
-    boardSize: [8, 8], // data.game.variant.board.size, TODO: This will need to be fixed eventually
+    boardSize: data.game.variant.board.size,
     turnColor: (step.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'white' : 'black',
     lastMove: util.uci2move(step.uci),
     captureLength: data.captureLength,
@@ -57,7 +57,10 @@ export function makeConfig(ctrl: RoundController): Config {
       enabled: data.pref.enablePremove,
       showDests: data.pref.destination,
       castle: false,
-      variant: data.game.variant.key,
+      //events: {
+      //set: hooks.onPremove,
+      //unset: hooks.onCancelPremove,
+      //},
     },
     predroppable: {
       enabled: false,

@@ -181,6 +181,8 @@ export default class RoundController {
     onUserMove: this.onUserMove,
     onMove: this.onMove,
     onNewPiece: sound.move,
+    // onPremove: this.onPremove,
+    // onCancelPremove: this.onCancelPremove,
   });
 
   replaying = (): boolean => this.ply !== this.lastPly();
@@ -255,7 +257,6 @@ export default class RoundController {
     this.redraw();
   };
 
-  //Whos turn / game over in window title
   setTitle = () => title.set(this);
 
   actualSendMove = (tpe: string, data: any, meta: MoveMetadata = {}) => {
@@ -589,6 +590,7 @@ export default class RoundController {
     setTimeout(() => {
       this.redirecting = false;
       this.redraw();
+      this.transientMove.register();
     }, 2500);
     this.redraw();
   };

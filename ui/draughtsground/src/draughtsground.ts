@@ -1,15 +1,14 @@
-import { Api, start } from './api'
-import { Config, configure } from './config'
-import { State, defaults } from './state'
+import { Api, start } from './api';
+import { Config, configure } from './config';
+import { State, defaults } from './state';
 
 import renderWrap from './wrap';
-import * as events from './events'
+import * as events from './events';
 import { render, updateBounds } from './render';
 import * as svg from './svg';
 import * as util from './util';
 
 export function Draughtsground(element: HTMLElement, config?: Config): Api {
-
   const state = defaults() as State;
 
   configure(state, config || {});
@@ -36,7 +35,7 @@ export function Draughtsground(element: HTMLElement, config?: Config): Api {
       redraw: debounceRedraw(redrawNow),
       redrawNow,
       unbind: prevUnbind,
-      relative
+      relative,
     };
     state.drawable.prevSvgHash = '';
     redrawNow(false);
@@ -47,7 +46,7 @@ export function Draughtsground(element: HTMLElement, config?: Config): Api {
   redrawAll();
 
   return start(state, redrawAll);
-};
+}
 
 function debounceRedraw(redrawNow: (skipSvg?: boolean) => void): () => void {
   let redrawing = false;

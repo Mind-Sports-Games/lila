@@ -1,5 +1,5 @@
 import { VNode } from 'snabbdom';
-import { GameData, Status } from 'game';
+import { DraughtsGameData, Status } from 'game';
 import { ClockData, Seconds, Centis } from './clock/clockCtrl';
 import { CorresClockData } from './corresClock/corresClockCtrl';
 import RoundController from './ctrl';
@@ -43,7 +43,7 @@ export type EncodedDests =
     };
 export type DecodedDests = cg.Dests;
 
-export interface RoundData extends GameData {
+export interface RoundData extends DraughtsGameData {
   clock?: ClockData;
   pref: Pref;
   steps: Step[];

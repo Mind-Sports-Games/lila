@@ -1,5 +1,23 @@
+// TODO: these interfaces should be written in a way that
+//       allows for the base one to be defined and then only the
+//       differences after that, until then, keep all of them up
+//       to date.
 export interface GameData {
   game: Game;
+  player: Player;
+  opponent: Player;
+  spectator?: boolean;
+  tournament?: Tournament;
+  simul?: Simul;
+  swiss?: Swiss;
+  takebackable: boolean;
+  moretimeable: boolean;
+  clock?: Clock;
+  correspondence?: CorrespondenceClock;
+}
+
+export interface DraughtsGameData {
+  game: DraughtsGame;
   player: Player;
   opponent: Player;
   spectator?: boolean;
@@ -21,6 +39,28 @@ export interface Game {
   source: Source;
   speed: Speed;
   variant: Variant;
+  winner?: Color;
+  drawOffers?: number[];
+  moveCentis?: number[];
+  initialFen?: string;
+  importedBy?: string;
+  threefold?: boolean;
+  boosted?: boolean;
+  rematch?: string;
+  microMatch?: MicroMatch;
+  rated?: boolean;
+  perf: string;
+}
+
+export interface DraughtsGame {
+  id: string;
+  status: Status;
+  player: Color;
+  turns: number;
+  startedAtTurn?: number;
+  source: Source;
+  speed: Speed;
+  variant: DraughtsVariant;
   winner?: Color;
   drawOffers?: number[];
   moveCentis?: number[];
