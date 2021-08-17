@@ -1,6 +1,7 @@
 package lila.api
 
-import strategygames.{ White }
+import strategygames.White
+import strategygames.variant.Variant
 import strategygames.format.Forsyth
 
 import play.api.libs.json.{ JsArray, JsObject, Json }
@@ -31,6 +32,14 @@ final class LobbyApi(
         }
       }
 
+  def boardSize(variant: Variant) = variant match {
+    case Variant.Draughts(v) => Some(Json.obj(
+      "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+      "key" -> v.boardSize.key,
+    ))
+    case _ => None
+  }
+
   def nowPlaying(pov: Pov) =
     Json
       .obj(
@@ -40,8 +49,13 @@ final class LobbyApi(
         "color"    -> (if (pov.game.variant.racingKings) White else pov.color).name,
         "lastMove" -> ~pov.game.lastMoveKeys,
         "variant" -> Json.obj(
+          "gameLib" -> Json.obj(
+            "id" -> pov.game.variant.gameLib.id,
+            "name" -> pov.game.variant.gameLib.name,
+          ),
           "key"  -> pov.game.variant.key,
-          "name" -> pov.game.variant.name
+          "name" -> pov.game.variant.name,
+          "boardSize" -> boardSize(pov.game.variant),
         ),
         "speed"    -> pov.game.speed.key,
         "perf"     -> lila.game.PerfPicker.key(pov.game),
