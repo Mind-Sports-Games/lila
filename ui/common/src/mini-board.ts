@@ -6,24 +6,46 @@ export const init = (node: HTMLElement): void => {
 };
 
 export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?: string): void => {
-  if (!window.Chessground) setTimeout(() => init(node), 500);
+  if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 500);
   else {
-    domData.set(
-      node,
-      'chessground',
-      window.Chessground(node, {
-        orientation,
-        coordinates: false,
-        viewOnly: !node.getAttribute('data-playable'),
-        resizable: false,
-        fen,
-        lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
-        drawable: {
-          enabled: false,
-          visible: false,
-        },
-      })
-    );
+    const $el = $(node);
+    if ($el.hasClass('draughts')) {
+      $el.removeClass('mini-board--init');
+      const [fen, board, orientation, lm] = $el.data('state').split('|');
+      $el.data(
+        'draughtsground',
+        window.Draughtsground(node, {
+          coordinates: 0,
+          boardSize: board ? board.split('x').map((s: string) => parseInt(s)) : [10, 10],
+          viewOnly: !node.getAttribute('data-playable'),
+          resizable: false,
+          fen,
+          orientation,
+          lastMove: lm && [lm.slice(-4, -2), lm.slice(-2)],
+          drawable: {
+            enabled: false,
+            visible: false,
+          },
+        })
+      );
+    } else {
+      domData.set(
+        node,
+        'chessground',
+        window.Chessground(node, {
+          orientation,
+          coordinates: false,
+          viewOnly: !node.getAttribute('data-playable'),
+          resizable: false,
+          fen,
+          lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          drawable: {
+            enabled: false,
+            visible: false,
+          },
+        })
+      );
+    }
   }
 };
 

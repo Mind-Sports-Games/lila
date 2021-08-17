@@ -3,7 +3,8 @@ package views.html.board
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.{ Color, Black, White }
 import strategygames.variant.Variant
-import strategygames.Situation
+import strategygames.{ GameLib, Situation }
+import strategygames.draughts.Board
 
 import controllers.routes
 import play.api.libs.json.Json
@@ -44,24 +45,48 @@ object bits {
 
   private def boardOrientation(pov: Pov): Orientation = boardOrientation(pov.game.variant, pov.color)
 
+  private def boardSize(pov: Pov): Option[Board.BoardSize] = pov.game.variant match {
+    case Variant.Draughts(v) => Some(v.boardSize)
+    case _ => None
+  }
   def mini(pov: Pov): Tag => Tag =
     miniWithOrientation(
       FEN(pov.game.variant.gameLib, Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)),
       boardOrientation(pov),
-      ~pov.game.lastMoveKeys
+      ~pov.game.lastMoveKeys,
+      boardSize(pov)
     ) _
 
-  def miniWithOrientation(fen: FEN, orientation: Orientation = Orientation.White, lastMove: String = "")(tag: Tag): Tag =
+  def miniWithOrientation(
+    fen: FEN,
+    orientation: Orientation = Orientation.White,
+    lastMove: String = "",
+    boardSizeOpt: Option[Board.BoardSize]
+  )(tag: Tag): Tag = {
+    // TODO: this is an excellent candidate for refactoring.
+    val libName = fen match {
+      case FEN.Chess(_) => GameLib.Chess().name
+      case FEN.Draughts(_) => GameLib.Draughts().name
+    }
+    val orient = orientation.toString().toLowerCase()
+    val boardSize = boardSizeOpt.getOrElse(Board.D100)
+    val data = if (libName == "Draughts") {
+      s"${fen.value}|${boardSize.width}x${boardSize.height}|${orient}|$lastMove"
+    } else {
+      s"${fen.value},${orient},$lastMove"
+    }
+    val extra = if (libName == "Draughts") s"is${boardSize.key}" else ""
     tag(
-      cls := "mini-board mini-board--init cg-wrap is2d",
-      dataState := s"${fen.value},${orientation.toString().toLowerCase()},$lastMove"
+      cls := s"mini-board mini-board--init cg-wrap is2d ${libName.toLowerCase()} ${extra}",
+      dataState := data
     )(cgWrapContent)
+  }
 
   def mini(fen: FEN, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, colorToOrientation(color), lastMove)(tag)
+    miniWithOrientation(fen, colorToOrientation(color), lastMove, None)(tag)
 
   def miniForVariant(fen: FEN, variant: Variant, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, boardOrientation(variant, color), lastMove)(tag)
+    miniWithOrientation(fen, boardOrientation(variant, color), lastMove, None)(tag)
 
 
   def miniSpan(fen: FEN, color: Color = White, lastMove: String = "") =
@@ -69,7 +94,7 @@ object bits {
 
   private def sitCanCastle(sit: Situation, color: Color, side: strategygames.chess.Side): Boolean =
     sit match {
-      case Situation.Chess(sit) => sit canCastle color on side 
+      case Situation.Chess(sit) => sit canCastle color on side
       case _ => false
     }
 
