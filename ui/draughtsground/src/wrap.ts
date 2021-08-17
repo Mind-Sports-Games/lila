@@ -43,7 +43,8 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 
   if (s.coordinates) {
     if (s.coordinates === 2) {
-      if (s.coordSystem === 1) {
+      if (s.boardSize[0] === 8 && s.boardSize[1] === 8) {
+        // TODO: restore this once we have a prefernce. s.coordSystem === 1) {
         container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'black' ? ' black' : '')));
         container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'black' ? ' black' : '')));
       } else if (s.orientation === 'black') {
