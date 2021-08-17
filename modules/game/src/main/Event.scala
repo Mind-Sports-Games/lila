@@ -146,7 +146,17 @@ object Event {
         },
         state = state,
         clock = clock,
-        possibleMoves = situation.destinations,
+        possibleMoves = (situation, move.dest) match {
+          case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
+            if (situation.ghosts > 0)
+              Map(Pos.Draughts(moveDest) ->
+                situation.destinationsFrom(moveDest).map(Pos.Draughts)
+              )
+            else situation.allDestinations.map{
+              case(from, to) => (Pos.Draughts(from), to.map(Pos.Draughts))
+            }
+          case _ => situation.destinations
+        },
         possibleDrops = situation.drops,
         crazyData = crazyData,
         captLen = (situation, move.dest) match {
