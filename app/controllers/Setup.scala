@@ -35,15 +35,13 @@ final class Setup(
     log = false
   )
 
-  private def gameLib(libS: Option[String]): GameLib = libS match {
-    case Some(libS) => GameLib(libS.toInt)
-    case None       => sys.error("No lib provided in setup")
-  }
+  // Defaults to chess if it's not provided, otherwise will take the version provided from the request.
+  private def gameLib(libId: Option[Int]): GameLib = GameLib(libId.getOrElse(0))
 
   def aiForm =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        val lib = gameLib(get("lib"))
+        val lib = gameLib(getInt("lib"))
         fuccess(forms aiFilled(lib, get("fen").map(s => FEN.clean(lib, s)))) map { form =>
           html.setup.forms.ai(
             form,
@@ -62,7 +60,7 @@ final class Setup(
   def friendForm(userId: Option[String]) =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        val lib = gameLib(get("lib"))
+        val lib = gameLib(getInt("lib"))
         fuccess(forms friendFilled(lib, get("fen").map(s => FEN.clean(lib, s)))) flatMap { form =>
           val validFen = form("fen").value map(s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
           userId ?? env.user.repo.named flatMap {
@@ -257,7 +255,7 @@ final class Setup(
 
   def validateFen =
     Open { implicit ctx =>
-      get("fen") map(s => FEN.clean(gameLib(get("lib")), s)) flatMap ValidFen(getBool("strict")) match {
+      get("fen") map(s => FEN.clean(gameLib(getInt("lib")), s)) flatMap ValidFen(getBool("strict")) match {
         case None    => BadRequest.fuccess
         case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.color)).fuccess
       }
