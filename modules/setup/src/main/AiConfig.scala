@@ -10,6 +10,7 @@ import lila.user.User
 
 case class AiConfig(
     variant: strategygames.variant.Variant,
+    fenVariant: Option[Variant],
     timeMode: TimeMode,
     time: Double,
     increment: Int,
@@ -67,6 +68,7 @@ object AiConfig extends BaseConfig {
           strategygames.draughts.variant.Variant(dv) err "Invalid game variant " + dv
         )
       },
+      fenVariant = none,
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
       increment = i,
@@ -81,6 +83,7 @@ object AiConfig extends BaseConfig {
       case 0 => chessVariantDefault
       case 1 => draughtsVariantDefault
     }),
+    fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,
     increment = 8,
@@ -103,6 +106,7 @@ object AiConfig extends BaseConfig {
     def reads(r: BSON.Reader): AiConfig =
       AiConfig(
         variant = strategygames.variant.Variant.orDefault(GameLib(r intD "l"), r int "v"),
+        fenVariant = none,
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",
         increment = r int "i",

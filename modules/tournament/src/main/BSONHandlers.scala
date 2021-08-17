@@ -63,7 +63,10 @@ object BSONHandlers {
 
   implicit val tournamentHandler = new BSON[Tournament] {
     def reads(r: BSON.Reader) = {
-      val variant = r.intO("variant").fold[Variant](Variant.default(GameLib.Chess()))(v => Variant.orDefault(GameLib.Chess(), v))
+      val lib = GameLib(r.int("lib"))
+      val variant = r.intO("variant").fold[Variant](Variant.default(lib))(
+        v => Variant.orDefault(lib, v)
+      )
       val position: Option[FEN] =
         r.getO[FEN]("fen").filterNot(_.initial) orElse
           r.strO("eco").flatMap(Thematic.byEco).map(f => FEN.wrap(f.fen)) // for BC
@@ -106,6 +109,7 @@ object BSONHandlers {
         "status"      -> o.status,
         "clock"       -> o.clock,
         "minutes"     -> o.minutes,
+        "lib"         -> o.variant.gameLib.id,
         "variant"     -> o.variant.some.filterNot(_.standard).map(_.id),
         "fen"         -> o.position.map(_.value),
         "mode"        -> o.mode.some.filterNot(_.rated).map(_.id),

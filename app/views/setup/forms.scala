@@ -64,7 +64,7 @@ object forms {
     layout("ai", trans.playWithTheMachine(), routes.Setup.ai) {
       frag(
         renderGameLib(form, translatedGameLibChoices),
-        renderVariant(form, translatedChessAiVariantChoices, GameLib.Draughts()),
+        renderVariant(form, translatedChessAiVariantChoices, GameLib.Chess()),
         renderVariant(form, translatedDraughtsAiVariantChoices, GameLib.Draughts()),
         fenInput(form("fen"), strict = true, validFen),
         renderTimeMode(form, allowAnon = true),

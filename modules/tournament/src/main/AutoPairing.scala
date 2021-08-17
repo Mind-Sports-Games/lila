@@ -26,7 +26,7 @@ final class AutoPairing(
     val game = Game
       .make(
         chess = StratGame(
-          GameLib.Chess(),
+          tour.variant.gameLib,
           Some {
             if (tour.position.isEmpty) tour.variant
             else Variant.libFromPosition(tour.variant.gameLib)

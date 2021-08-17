@@ -15,7 +15,6 @@ import lila.db.BSON
 import lila.db.dsl._
 
 object BSONHandlers {
-  val chessLib = strategygames.GameLib.Chess()
 
   import lila.db.ByteArray.ByteArrayBSONHandler
 
@@ -203,12 +202,14 @@ object BSONHandlers {
           positionHashes = decoded.positionHashes,
           kingMoves = if (gameVariant.frisianVariant || gameVariant.russian || gameVariant.brazilian) {
             val counts = r.intsD(F.kingMoves)
-            draughts.KingMoves(
-              ~counts.headOption,
-              ~counts.tail.headOption,
-              if (counts.length > 2) gameVariant.boardSize.pos.posAt(counts(2)) else none,
-              if (counts.length > 3) gameVariant.boardSize.pos.posAt(counts(3)) else none
-          )
+            if (counts.length > 0){
+              draughts.KingMoves(
+                ~counts.headOption,
+                ~counts.tail.headOption,
+                if (counts.length > 2) gameVariant.boardSize.pos.posAt(counts(2)) else none,
+                if (counts.length > 3) gameVariant.boardSize.pos.posAt(counts(3)) else none
+              )
+            } else draughts.KingMoves(0, 0)
           } else draughts.KingMoves(0, 0),
           variant = gameVariant
         ),

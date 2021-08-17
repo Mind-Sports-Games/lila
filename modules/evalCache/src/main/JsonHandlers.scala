@@ -42,7 +42,10 @@ object JsonHandlers {
       depth  <- d int "depth"
       pvObjs <- d objs "pvs"
       pvs    <- pvObjs.map(parsePv).sequence.flatMap(_.toNel)
-      variant = Variant.orDefault(GameLib.Chess(), ~d.str("variant"))
+      variant = Variant.orDefault(GameLib(d int "lib" match {
+        case Some(lib) => lib
+        case None      => sys.error("lib must be provided for readPutData")
+      }), ~d.str("variant"))
     } yield Input.Candidate(
       variant,
       fen,
@@ -63,7 +66,10 @@ object JsonHandlers {
           .split(' ')
           .take(EvalCacheEntry.MAX_PV_SIZE)
           .foldLeft(List.empty[Uci].some) {
-            case (Some(ucis), str) => Uci(GameLib.Chess(), str) map (_ :: ucis)
+            case (Some(ucis), str) => Uci(GameLib(d int "lib" match {
+              case Some(lib) => lib
+              case None      => sys.error("lib must be provided for parsePv")
+            }), str) map (_ :: ucis)
             case _                 => None
           }
           .flatMap(_.reverse.toNel) map Moves.apply

@@ -9,9 +9,8 @@ case class ValidFen(fen: FEN, situation: strategygames.Situation) {
 }
 
 object ValidFen {
-  val lib = GameLib.Chess()
 
-  def apply(strict: Boolean)(fen: FEN): Option[ValidFen] =
+  def apply(strict: Boolean)(lib: GameLib, fen: FEN): Option[ValidFen] =
     for {
       parsed <- strategygames.format.Forsyth.<<<(lib, fen)
       if parsed.situation playable strict

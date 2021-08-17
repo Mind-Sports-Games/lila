@@ -59,21 +59,37 @@ trait Positional { self: Config =>
   import strategygames.format.Forsyth;
   import strategygames.format.Forsyth.SituationPlus
 
-  val lib = GameLib.Chess()
-
   def fen: Option[FEN]
+  def fenVariant: Option[Variant]
 
   def strictFen: Boolean
 
-  lazy val validFen = variant != strategygames.chess.variant.FromPosition || {
-    fen exists { f =>
-      (Forsyth.<<<(lib, f)).exists(_.situation playable strictFen)
+  lazy val validFen = variant.gameLib match {
+    case GameLib.Chess() => variant != strategygames.chess.variant.FromPosition || {
+      fen exists { f =>
+        (Forsyth.<<<(variant.gameLib, f)).exists(_.situation playable strictFen)
+      }
+    }
+    case GameLib.Draughts() => !(variant.fromPosition && Config.draughtsFromPositionVariants.contains((fenVariant | Variant.libStandard(GameLib.Draughts())).id)) || {
+        fen ?? {
+          f => ~Forsyth.<<<@(variant.gameLib, fenVariant | Variant.libStandard(GameLib.Draughts()), f)
+            .map(_.situation playable strictFen)
+        }
+      }
+  }
+
+  lazy val validKingCount = variant.gameLib match {
+    case GameLib.Chess() => false
+    case GameLib.Draughts() => !(variant.fromPosition && Config.draughtsFromPositionVariants.contains((fenVariant | Variant.libStandard(GameLib.Draughts())).id)) || {
+      fen ?? { f => strategygames.draughts.format.Forsyth.countKings(
+        strategygames.draughts.format.FEN(f.value)
+      ) <= 30 }
     }
   }
 
   def fenGame(builder: StratGame => Game): Game = {
     val baseState = fen ifTrue (variant.fromPosition) flatMap {
-      Forsyth.<<<@(lib, Variant.wrap(strategygames.chess.variant.FromPosition), _)
+      Forsyth.<<<@(variant.gameLib, Variant.libFromPosition(variant.gameLib), _)
     }
     val (chessGame, state) = baseState.fold(makeGame -> none[SituationPlus]) {
       case sit @ SituationPlus(s, _) =>
@@ -84,8 +100,9 @@ trait Positional { self: Config =>
           startedAtTurn = sit.turns,
           clock = makeClock.map(_.toClock)
         )
-        if (Forsyth.>>(lib, game).initial) makeGame(Variant.wrap(strategygames.chess.variant.Standard)) -> none
-        else game                                                      -> baseState
+        if (Forsyth.>>(s.gameLib, game).initial)
+          makeGame(Variant.libStandard(s.gameLib)) -> none
+        else game                                  -> baseState
     }
     val game = builder(chessGame)
     state.fold(game) { case sit @ SituationPlus(s, _) =>
@@ -94,7 +111,7 @@ trait Positional { self: Config =>
           situation = game.situation.copy(
             board = game.board.copy(
               history = s.board.history,
-              variant = Variant.wrap(strategygames.chess.variant.FromPosition)
+              variant = Variant.libFromPosition(s.board.variant.gameLib)
             )
           ),
           turns = sit.turns
@@ -148,6 +165,9 @@ trait BaseConfig {
     strategygames.draughts.variant.Antidraughts.id :+
     strategygames.draughts.variant.Breakthrough.id :+
     strategygames.draughts.variant.FromPosition.id
+  val draughtsFromPositionVariants = draughtsVariants :+
+    strategygames.draughts.variant.Russian.id :+
+    strategygames.draughts.variant.Brazilian.id
   val draughtsVariantsWithVariants =
     draughtsVariants :+
       strategygames.draughts.variant.Frisian.id :+

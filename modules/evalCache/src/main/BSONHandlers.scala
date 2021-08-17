@@ -29,7 +29,7 @@ private object BSONHandlers {
         }
     private def movesWrite(moves: Moves): String = Uci writeListPiotr moves.value.toList
     private def movesRead(str: String): Option[Moves] =
-      Uci.readListPiotr(GameLib.Chess(), str) flatMap (_.toNel) map Moves.apply
+      Uci.readListPiotr(str) flatMap (_.toNel) map Moves.apply
     private val scoreSeparator = ':'
     private val pvSeparator    = '/'
     private val pvSeparatorStr = pvSeparator.toString
@@ -63,11 +63,14 @@ private object BSONHandlers {
   implicit val EntryIdHandler = tryHandler[Id](
     { case BSONString(value) =>
       value split ':' match {
-        case Array(fen) => Success(Id(Variant.libStandard(GameLib.Chess()), SmallFen raw fen))
-        case Array(variantId, fen) =>
+        case Array(lib, fen) =>
+          Success(Id(Variant.libStandard(GameLib(lib.toInt)), SmallFen raw fen))
+        case Array(lib, variantId, fen) =>
           Success(
             Id(
-              variantId.toIntOption flatMap {id => Variant.apply(GameLib.Chess(), id)} err s"Invalid evalcache variant $variantId",
+              variantId.toIntOption flatMap {
+                id => Variant.apply(GameLib(lib.toInt), id)
+              } err s"Invalid evalcache variant $variantId",
               SmallFen raw fen
             )
           )
@@ -76,8 +79,9 @@ private object BSONHandlers {
     },
     x =>
       BSONString {
-        if (x.variant.standard || x.variant.fromPosition) x.smallFen.value
-        else s"${x.variant.id}:${x.smallFen.value}"
+        if (x.variant.standardVariant || x.variant == Variant.libFromPosition(GameLib.Chess()) || x.variant == Variant.libFromPosition(GameLib.Draughts()))
+          s"${x.variant.gameLib.id}:${x.smallFen.value}"
+        else s"${x.variant.gameLib.id}:${x.variant.id}:${x.smallFen.value}"
       }
   )
 

@@ -100,6 +100,12 @@ object EvalCacheEntry {
   case class Moves(value: NonEmptyList[Uci]) extends AnyVal {
 
     def truncate = copy(value = NonEmptyList(value.head, value.tail.take(MAX_PV_SIZE - 1)))
+
+    def gameLib: GameLib = value.head match {
+      case Uci.ChessMove(_)    => GameLib.Chess()
+      case Uci.ChessDrop(_)    => GameLib.Chess()
+      case Uci.DraughtsMove(_) => GameLib.Draughts()
+    }
   }
 
   case class Trust(value: Double) extends AnyVal {

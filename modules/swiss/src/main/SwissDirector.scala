@@ -85,10 +85,10 @@ final private class SwissDirector(
     Game
       .make(
         chess = strategygames.Game(
-          GameLib.Chess(),
+          swiss.variant.gameLib,
           variant = Some {
             if (swiss.settings.position.isEmpty) swiss.variant
-            else Variant.libFromPosition(GameLib.Chess())
+            else Variant.libFromPosition(swiss.variant.gameLib)
           },
           fen = swiss.settings.position
         ) pipe { g =>

@@ -20,6 +20,7 @@ private object Mappings {
   val draughtsVariant                   = number.verifying(Config.draughtsVariants contains _)
   val draughtsVariantWithFen            = number.verifying(Config.draughtsVariantsWithFen contains _)
   val draughtsAIVariants                = number.verifying(Config.draughtsAIVariants contains _)
+  val draughtsFromPositionVariants      = number.verifying(Config.draughtsFromPositionVariants contains _)
   val draughtsVariantWithVariants       = number.verifying(Config.draughtsVariantsWithVariants contains _)
   val draughtsVariantWithFenAndVariants = number.verifying(Config.draughtsVariantsWithFenAndVariants contains _)
 

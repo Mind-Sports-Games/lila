@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 
 import strategygames.format.Uci
-import strategygames.Move
+import strategygames.{ GameLib, Move }
 import lila.common.Json.jodaWrites
 import lila.game.Game
 
@@ -60,6 +60,7 @@ object Forecast {
   def maxPlies(steps: Steps): Int = steps.foldLeft(0)(_ max _.size)
 
   case class Step(
+      lib: Int,
       ply: Int,
       uci: String,
       san: String,
@@ -70,7 +71,7 @@ object Forecast {
     def is(move: Move)     = move.toUci.uci == uci
     def is(move: Uci.Move) = move.uci == uci
 
-    def uciMove = Uci.Move(strategygames.GameLib.Chess(), uci)
+    def uciMove = Uci.Move(GameLib(lib), uci)
   }
 
   implicit val forecastStepJsonFormat = Json.format[Step]

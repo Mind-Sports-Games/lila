@@ -125,7 +125,7 @@ object bits {
   )(implicit ctx: Context) =
     views.html.game.side(
       pov,
-      (data \ "game" \ "initialFen").asOpt[String].map(s => FEN.apply(GameLib.Chess(), s)),
+      (data \ "game" \ "initialFen").asOpt[String].map(s => FEN.apply(pov.game.board.variant.gameLib, s)),
       tour,
       simul = simul,
       userTv = userTv,

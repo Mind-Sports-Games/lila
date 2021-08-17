@@ -27,8 +27,9 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   private def forTeamSelect(id: TeamID)        = $doc("forTeams" -> id)
   private def forTeamsSelect(ids: Seq[TeamID]) = $doc("forTeams" $in ids)
   private def sinceSelect(date: DateTime)      = $doc("startsAt" $gt date)
+  private def libSelect(lib: GameLib)          = $doc("lib" -> lib.id)
   private def variantSelect(variant: Variant) =
-    if (variant.standard) $doc("variant" $exists false)
+    if (variant.standardVariant) $doc("variant" $exists false)
     else $doc("variant" -> variant.id)
   private val nonEmptySelect           = $doc("nbPlayers" $ne 0)
   private[tournament] val selectUnique = $doc("schedule.freq" -> "unique")
@@ -339,10 +340,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
         .reverse
     }
 
-  def lastFinishedScheduledByFreq(freq: Schedule.Freq, since: DateTime): Fu[List[Tournament]] =
+  def lastFinishedScheduledByFreq(freq: Schedule.Freq, since: DateTime, lib: GameLib): Fu[List[Tournament]] =
     coll
       .find(
-        finishedSelect ++ sinceSelect(since) ++ variantSelect(Variant.libStandard(GameLib.Chess())) ++ $doc(
+        finishedSelect ++ sinceSelect(since) ++ libSelect(lib) ++ variantSelect(Variant.libStandard(lib)) ++ $doc(
           "schedule.freq" -> freq.name,
           "schedule.speed" $in Schedule.Speed.mostPopular.map(_.key)
         )
@@ -351,10 +352,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list(Schedule.Speed.mostPopular.size)
 
-  def lastFinishedDaily(variant: Variant): Fu[Option[Tournament]] =
+  def lastFinishedDaily(lib: GameLib, variant: Variant): Fu[Option[Tournament]] =
     coll
       .find(
-        finishedSelect ++ sinceSelect(DateTime.now minusDays 1) ++ variantSelect(variant) ++
+        finishedSelect ++ sinceSelect(DateTime.now minusDays 1) ++ libSelect(lib) ++ variantSelect(variant) ++
           $doc("schedule.freq" -> Schedule.Freq.Daily.name)
       )
       .sort($sort desc "startsAt")

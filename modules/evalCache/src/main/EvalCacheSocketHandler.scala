@@ -21,8 +21,14 @@ final private class EvalCacheSocketHandler(
       push: JsObject => Unit
   ): Unit =
     for {
-      fen <- d str "fen" map{fen => FEN.apply(GameLib.Chess(), fen)}
-      variant = Variant.orDefault(GameLib.Chess(), ~d.str("variant"))
+      fen <- d str "fen" map{fen => FEN.apply(GameLib(d int "lib" match {
+        case Some(lib) => lib
+        case None      => sys.error("lib must be provided for eval cache")
+      }), fen)}
+      variant = Variant.orDefault(GameLib(d int "lib" match {
+        case Some(lib) => lib
+        case None      => sys.error("lib must be provided for eval cache")
+      }), ~d.str("variant"))
       multiPv = (d int "mpv") | 1
       path <- d str "path"
     } {

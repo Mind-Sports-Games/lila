@@ -119,7 +119,7 @@ object AnaMove {
       fen = fen,
       path = path,
       chapterId = d str "ch",
-      promotion = d str "promotion" flatMap {p => Role.promotable(GameLib.Chess(), p)},
+      promotion = d str "promotion" flatMap {p => Role.promotable(GameLib(lib), p)},
       uci = d str "uci",
       fullCapture = d boolean "fullCapture"
     )

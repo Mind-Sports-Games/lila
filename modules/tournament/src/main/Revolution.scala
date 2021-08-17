@@ -42,7 +42,12 @@ final class RevolutionApi(
             for {
               doc     <- docOpt
               winner  <- doc.getAsOpt[User.ID]("winner")
-              variant <- doc.int("variant") flatMap {v => Variant.apply(GameLib.Chess(), v)}
+              variant <- doc.int("variant") flatMap {
+                v => Variant.apply(GameLib(doc.int("lib") match {
+                  case Some(lib) => lib
+                  case None => sys.error("tournament cache needs a lib")
+                }), v)
+              }
               id      <- doc.getAsOpt[Tournament.ID]("_id")
             } yield Award(
               owner = winner,

@@ -55,6 +55,7 @@ object SetupForm {
         "gameLib"         -> gameLibs,
         "chessVariant"    -> chessVariantWithFenAndVariants,
         "draughtsVariant" -> draughtsVariantWithFenAndVariants,
+        "fenVariant"      -> optional(draughtsFromPositionVariants),
         "timeMode"        -> timeMode,
         "time"            -> time,
         "increment"       -> increment,

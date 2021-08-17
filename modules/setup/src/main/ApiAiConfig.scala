@@ -13,6 +13,7 @@ import lila.user.User
 
 final case class ApiAiConfig(
     variant: Variant,
+    fenVariant: Option[Variant],
     clock: Option[Clock.Config],
     daysO: Option[Int],
     color: Color,
@@ -83,6 +84,7 @@ object ApiAiConfig extends BaseConfig {
         case 0 => strategygames.chess.variant.Variant.orDefault(~cv)
         case 1 => strategygames.chess.variant.Variant.orDefault(~dv)
       }),
+      fenVariant = none,
       clock = cl,
       daysO = d,
       color = Color.orDefault(~c),

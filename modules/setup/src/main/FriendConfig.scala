@@ -9,6 +9,7 @@ import lila.game.PerfPicker
 
 case class FriendConfig(
     variant: Variant,
+    fenVariant: Option[Variant],
     timeMode: TimeMode,
     time: Double,
     increment: Int,
@@ -22,7 +23,7 @@ case class FriendConfig(
 
   val strictFen = false
 
-  def >> = (variant.gameLib.id, variant.id, variant.id, timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value), microMatch).some
+  def >> = (variant.gameLib.id, variant.id, variant.id, fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value), microMatch).some
 
   def isPersistent = timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
 
@@ -31,7 +32,7 @@ case class FriendConfig(
 
 object FriendConfig extends BaseHumanConfig {
 
-  def from(l: Int, cv: Int, dv: Int, tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String], mm: Boolean) =
+  def from(l: Int, cv: Int, dv: Int, v2: Option[Int], tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String], mm: Boolean) =
     new FriendConfig(
       variant = l match {
         case 0 => Variant.wrap(
@@ -40,6 +41,10 @@ object FriendConfig extends BaseHumanConfig {
         case 1 => Variant.wrap(
           strategygames.draughts.variant.Variant(dv) err "Invalid game variant " + dv
         )
+      },
+      fenVariant = l match {
+        case 0 => none
+        case 1 => v2.flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
       },
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
@@ -56,6 +61,7 @@ object FriendConfig extends BaseHumanConfig {
       case 0 => chessVariantDefault
       case 1 => draughtsVariantDefault
     }),
+    fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,
     increment = 8,
@@ -71,7 +77,11 @@ object FriendConfig extends BaseHumanConfig {
 
     def reads(r: BSON.Reader): FriendConfig =
       FriendConfig(
-        variant = strategygames.variant.Variant.orDefault(GameLib(r intD "l"), r int "v"),
+        variant = Variant.orDefault(GameLib(r intD "l"), r int "v"),
+        fenVariant = r intD "l" match {
+          case 0 => none
+          case 1 => (r intO "v2").flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
+        },
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",
         increment = r int "i",
@@ -86,6 +96,7 @@ object FriendConfig extends BaseHumanConfig {
       $doc(
         "l"  -> o.variant.gameLib.id,
         "v"  -> o.variant.id,
+        "v2" -> o.fenVariant.map(_.id),
         "tm" -> o.timeMode.id,
         "t"  -> o.time,
         "i"  -> o.increment,

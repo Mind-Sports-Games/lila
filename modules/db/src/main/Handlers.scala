@@ -126,8 +126,20 @@ trait Handlers {
   implicit val colorBoolHandler = BSONBooleanHandler.as[Color](Color.fromWhite, _.white)
 
   implicit val FENHandler: BSONHandler[FEN] = stringAnyValHandler[FEN](_.value, FEN.apply)
-  // TODO: DRAUGHTS - probably something we need to fix for draughts
-  implicit val StratFENHandler: BSONHandler[StratFEN] = stringAnyValHandler[StratFEN](_.value, f => StratFEN.wrap(FEN(f)))
+
+  implicit val StratFENHandler: BSONHandler[StratFEN] = quickHandler[StratFEN](
+    {
+      case BSONString(f) => f.split("~") match {
+        case Array(lib, f) => StratFEN(GameLib(lib.toInt), f)
+        case _ => sys.error("lib not encoded into fen handler")
+      }
+      case _ => sys.error("fen not encoded in handler")
+    },
+    f => f match {
+      case StratFEN.Chess(f)    => BSONString(s"0~${f.value}")
+      case StratFEN.Draughts(f) => BSONString(s"1~${f.value}")
+    }
+  )
 
   implicit val modeHandler = BSONBooleanHandler.as[strategygames.Mode](strategygames.Mode.apply, _.rated)
 
@@ -141,10 +153,14 @@ trait Handlers {
 
   val stratVariantByKeyHandler: BSONHandler[StratVariant] = quickHandler[StratVariant](
     {
-      case BSONString(v) => StratVariant orDefault(GameLib.Chess(), v)
-      case _             => StratVariant.default(GameLib.Chess())
+      case BSONString(v) => v.split(":") match {
+        case Array(lib, v) => StratVariant orDefault(GameLib(lib.toInt), v)
+        case _ => sys.error("lib not encoded into variant handler")
+      }
+      case _ => sys.error("variant not encoded in handler. Previously this defaulted to standard chess")
+      //case _ => StratVariant.default(GameLib.Chess())
     },
-    v => BSONString(v.key)
+    v => BSONString(s"{v.gameLib.id}:{v.key}")
   )
 
   val clockConfigHandler = tryHandler[strategygames.Clock.Config](

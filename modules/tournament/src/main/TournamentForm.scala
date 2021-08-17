@@ -4,6 +4,7 @@ import cats.implicits._
 import strategygames.format.FEN
 import strategygames.chess.{ StartingPosition }
 import strategygames.{ Clock, GameLib, Mode }
+import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -27,7 +28,7 @@ final class TournamentForm {
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
       startDate = none,
-      variant = strategygames.variant.Variant.libStandard(GameLib.Chess()).id.toString.some,
+      variant = Variant.libStandard(GameLib.Chess()).id.toString.some,
       position = None,
       password = None,
       mode = none,
@@ -180,7 +181,7 @@ private[tournament] case class TournamentSetup(
     if (realPosition.isDefined) Mode.Casual
     else Mode(rated.orElse(mode.map(Mode.Rated.id ===)) | true)
 
-  def realVariant = variant.flatMap(TournamentForm.guessVariant) | strategygames.variant.Variant.libStandard(GameLib.Chess())
+  def realVariant = variant.flatMap(TournamentForm.guessVariant) | Variant.libStandard(GameLib.Chess())
 
   def realPosition = position ifTrue realVariant.standard
 

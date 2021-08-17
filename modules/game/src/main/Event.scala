@@ -278,10 +278,6 @@ object Event {
     def typ = "promotion"
     def data =
       Json.obj(
-        //"lib"        -> pos match {
-        //  case Pos.Chess(_)    => GameLib.Chess().id
-        //  case Pos.Draughts(_) => GameLib.Draughts().id
-        //},
         "key"        -> pos.key,
         "pieceClass" -> role.toString.toLowerCase,
         "lib"        -> lib

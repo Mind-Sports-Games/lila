@@ -31,7 +31,7 @@ final class PgnDump(
       else fuccess(Tags(Nil))
     tagsFuture map { ts =>
       val turns = flags.moves ?? {
-        val fenSituation = ts.fen.flatMap{fen => Forsyth.<<<(strategygames.GameLib.Chess(), fen)}
+        val fenSituation = ts.fen.flatMap{fen => Forsyth.<<<(game.variant.gameLib, fen)}
         makeTurns(
           flags keepDelayIf game.playable applyDelay {
             if (fenSituation.exists(_.situation.color.black)) ".." +: game.pgnMoves
@@ -136,7 +136,7 @@ final class PgnDump(
           ).some
         ).flatten ::: customStartPosition(game.variant).??(
           List(
-            Tag(_.FEN, (initialFen | Forsyth.initial(strategygames.GameLib.Chess())).value),
+            Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLib)).value),
             Tag("SetUp", "1")
           )
         )
