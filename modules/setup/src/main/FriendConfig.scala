@@ -57,10 +57,10 @@ object FriendConfig extends BaseHumanConfig {
     )
 
   def default(l: Int) = FriendConfig(
-    variant = Variant.wrap(l match {
-      case 0 => chessVariantDefault
-      case 1 => draughtsVariantDefault
-    }),
+    variant = l match {
+      case 0 => Variant.Chess(chessVariantDefault)
+      case 1 => Variant.Draughts(draughtsVariantDefault)
+    },
     fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,

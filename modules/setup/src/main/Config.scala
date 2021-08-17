@@ -129,7 +129,7 @@ trait BaseConfig {
   val draughtsVariants = List(strategygames.draughts.variant.Standard.id)
 
   val chessVariantDefault    = strategygames.chess.variant.Standard
-  val draughtsVariantDefault = strategygames.chess.variant.Standard
+  val draughtsVariantDefault = strategygames.draughts.variant.Standard
   val variantDefaultStrat    = Variant.Chess(strategygames.chess.variant.Standard)
 
   val chessVariantsWithFen    = chessVariants :+ strategygames.chess.variant.FromPosition.id

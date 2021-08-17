@@ -49,6 +49,7 @@ final class TournamentForm {
       minutes = tour.minutes,
       waitMinutes = none,
       startDate = tour.startsAt.some,
+      lib = tour.variant.gameLib.id,
       variant = tour.variant.id.toString.some,
       position = tour.position,
       mode = none,
@@ -84,6 +85,7 @@ final class TournamentForm {
         },
         "waitMinutes"      -> optional(numberIn(waitMinuteChoices)),
         "startDate"        -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
+        "lib"              -> number(min = 0, max = 1),
         "variant"          -> optional(text.verifying(v => guessVariant(v).isDefined)),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
@@ -104,8 +106,6 @@ final class TournamentForm {
 }
 
 object TournamentForm {
-
-  import strategygames.chess.variant._
 
   val clockTimes: Seq[Double] = Seq(0d, 1 / 4d, 1 / 2d, 3 / 4d, 1d, 3 / 2d) ++ {
     (2 to 7 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
@@ -136,10 +136,28 @@ object TournamentForm {
   val positionDefault = StartingPosition.initial.fen
 
   val validVariants =
-    List(Standard, Chess960, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings, Crazyhouse)
-      .map(strategygames.variant.Variant.Chess)
+    List(
+      strategygames.chess.variant.Standard,
+      strategygames.chess.variant.Chess960,
+      strategygames.chess.variant.KingOfTheHill,
+      strategygames.chess.variant.ThreeCheck,
+      strategygames.chess.variant.Antichess,
+      strategygames.chess.variant.Atomic,
+      strategygames.chess.variant.Horde,
+      strategygames.chess.variant.RacingKings,
+      strategygames.chess.variant.Crazyhouse
+    ).map(Variant.Chess) :::
+    List(
+      strategygames.draughts.variant.Standard,
+      strategygames.draughts.variant.Frisian,
+      strategygames.draughts.variant.Frysk,
+      strategygames.draughts.variant.Antidraughts,
+      strategygames.draughts.variant.Breakthrough,
+      strategygames.draughts.variant.Russian,
+      strategygames.draughts.variant.Brazilian
+    ).map(Variant.Draughts)
 
-  def guessVariant(from: String): Option[strategygames.variant.Variant] =
+  def guessVariant(from: String): Option[Variant] =
     validVariants.find { v =>
       v.key == from || from.toIntOption.exists(v.id ==)
     }
@@ -162,6 +180,7 @@ private[tournament] case class TournamentSetup(
     minutes: Int,
     waitMinutes: Option[Int],
     startDate: Option[DateTime],
+    lib: Int = 0,
     variant: Option[String],
     position: Option[FEN],
     mode: Option[Int], // deprecated, use rated
@@ -181,7 +200,9 @@ private[tournament] case class TournamentSetup(
     if (realPosition.isDefined) Mode.Casual
     else Mode(rated.orElse(mode.map(Mode.Rated.id ===)) | true)
 
-  def realVariant = variant.flatMap(TournamentForm.guessVariant) | Variant.libStandard(GameLib.Chess())
+  def gameLib = GameLib(lib)
+
+  def realVariant = variant.flatMap(TournamentForm.guessVariant) | Variant.libStandard(gameLib)
 
   def realPosition = position ifTrue realVariant.standard
 

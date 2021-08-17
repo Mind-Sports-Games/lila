@@ -330,18 +330,24 @@ final class Api(
       scoped = req => u => gamesByUsers(if (u.id == "playstrategy4545") 900 else 500)(req)
     )
 
+  private def gameLib(libS: Option[String]): GameLib = libS match {
+    case Some(libS) => GameLib(libS.toInt)
+    case None       => sys.error("No lib provided in cloudEval")
+  }
+
   def cloudEval =
-    Action.async { req =>
+    Action.async { req => {
+      val lib = gameLib(get("lib", req))
       get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
         JsonOptionOk(
           env.evalCache.api.getEvalJson(
-            Variant.orDefault(GameLib.Chess(), ~get("variant", req)),
-            FEN(GameLib.Chess(), fen),
+            Variant.orDefault(lib, ~get("variant", req)),
+            FEN(lib, fen),
             getInt("multiPv", req) | 1
           )
         )
       }
-    }
+    }}
 
   private def gamesByUsers(max: Int)(req: Request[String]) =
     GlobalConcurrencyLimitPerIP(HTTPRequest ipAddress req)(

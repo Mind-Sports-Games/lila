@@ -35,14 +35,20 @@ final class Setup(
     log = false
   )
 
+  private def gameLib(libS: Option[String]): GameLib = libS match {
+    case Some(libS) => GameLib(libS.toInt)
+    case None       => sys.error("No lib provided in setup")
+  }
+
   def aiForm =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        fuccess(forms aiFilled(GameLib.Chess(), get("fen").map(s => FEN.clean(GameLib.Chess(), s)))) map { form =>
+        val lib = gameLib(get("lib"))
+        fuccess(forms aiFilled(lib, get("fen").map(s => FEN.clean(lib, s)))) map { form =>
           html.setup.forms.ai(
             form,
             env.fishnet.aiPerfApi.intRatings,
-            form("fen").value map(s => FEN.clean(GameLib.Chess(), s)) flatMap ValidFen(getBool("strict"))
+            form("fen").value map(s => FEN.clean(lib, s)) flatMap ValidFen(getBool("strict"))
           )
         }
       } else Redirect(s"${routes.Lobby.home}#ai").fuccess
@@ -55,9 +61,10 @@ final class Setup(
 
   def friendForm(userId: Option[String]) =
     Open { implicit ctx =>
-      if (HTTPRequest isXhr ctx.req)
-        fuccess(forms friendFilled(GameLib.Chess(), get("fen").map(s => FEN.clean(GameLib.Chess(), s)))) flatMap { form =>
-          val validFen = form("fen").value map(s => FEN.clean(GameLib.Chess(), s)) flatMap ValidFen(strict = false)
+      if (HTTPRequest isXhr ctx.req) {
+        val lib = gameLib(get("lib"))
+        fuccess(forms friendFilled(lib, get("fen").map(s => FEN.clean(lib, s)))) flatMap { form =>
+          val validFen = form("fen").value map(s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
           userId ?? env.user.repo.named flatMap {
             case None => Ok(html.setup.forms.friend(form, none, none, validFen)).fuccess
             case Some(user) =>
@@ -67,7 +74,7 @@ final class Setup(
               }
           }
         }
-      else
+      } else
         fuccess {
           Redirect(s"${routes.Lobby.home}#friend")
         }
@@ -250,7 +257,7 @@ final class Setup(
 
   def validateFen =
     Open { implicit ctx =>
-      get("fen") map(s => FEN.clean(GameLib.Chess(), s)) flatMap ValidFen(getBool("strict")) match {
+      get("fen") map(s => FEN.clean(gameLib(get("lib")), s)) flatMap ValidFen(getBool("strict")) match {
         case None    => BadRequest.fuccess
         case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.color)).fuccess
       }

@@ -26,6 +26,7 @@ final class SwissForm(implicit mode: Mode) {
         )(ClockConfig.apply)(ClockConfig.unapply)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt"          -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
+        "lib"               -> number(min = 0, max = 1),
         "variant"           -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
         "rated"             -> optional(boolean),
         "nbRounds"          -> number(min = minRounds, max = 100),
@@ -64,6 +65,7 @@ final class SwissForm(implicit mode: Mode) {
       name = s.name.some,
       clock = s.clock,
       startsAt = s.startsAt.some,
+      lib = s.variant.gameLib.id,
       variant = s.variant.key.some,
       rated = s.settings.rated.some,
       nbRounds = s.settings.nbRounds,
@@ -141,6 +143,7 @@ object SwissForm {
       name: Option[String],
       clock: ClockConfig,
       startsAt: Option[DateTime],
+      lib: Int = 0,
       variant: Option[String],
       rated: Option[Boolean],
       nbRounds: Int,
@@ -152,7 +155,8 @@ object SwissForm {
       conditions: SwissCondition.DataForm.AllSetup,
       forbiddenPairings: Option[String]
   ) {
-    def realVariant  = variant flatMap {v => Variant.apply(GameLib.Chess(), v)} getOrElse Variant.default(GameLib.Chess())
+    def gameLib = GameLib(lib)
+    def realVariant  = variant flatMap {v => Variant.apply(gameLib, v)} getOrElse Variant.default(gameLib)
     def realStartsAt = startsAt | DateTime.now.plusMinutes(10)
     def realChatFor  = chatFor | Swiss.ChatFor.default
     def realRoundInterval = {
