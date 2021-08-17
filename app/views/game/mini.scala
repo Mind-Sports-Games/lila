@@ -1,6 +1,7 @@
 package views.html.game
 
 import strategygames.format.Forsyth
+import strategygames.variant.Variant
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -54,7 +55,14 @@ object mini {
   }
 
   def renderState(pov: Pov) =
-    dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
+    pov.game.variant match {
+      case Variant.Chess(_) => 
+        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
+      case Variant.Draughts(v) => {
+        val boardSize = v.boardSize
+        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)}|${boardSize.width}x${boardSize.height}|${pov.color.name}|${~pov.game.lastMoveKeys}"
+      }
+    }
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
     span(cls := "mini-game__player")(

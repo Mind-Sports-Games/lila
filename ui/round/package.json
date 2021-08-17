@@ -18,6 +18,7 @@
   "dependencies": {
     "ab": "https://github.com/lichess-org/ab-stub",
     "chat": "2.0.0",
+    "draughtsground": "^7.6",
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
     "common": "2.0.0",
     "game": "2.0.0",

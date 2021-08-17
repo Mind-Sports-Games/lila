@@ -9,8 +9,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 500);
   else {
     const $el = $(node);
+    $el.removeClass('mini-board--init');
     if ($el.hasClass('draughts')) {
-      $el.removeClass('mini-board--init');
       const [fen, board, orientation, lm] = $el.data('state').split('|');
       $el.data(
         'draughtsground',

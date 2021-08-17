@@ -5,6 +5,7 @@ import menuHover from 'common/menuHover';
 import MoveOn from './moveOn';
 import RoundController from './ctrl';
 import { Draughtsground } from 'draughtsground';
+import { Chessground } from 'chessground';
 import { main as view } from './view/main';
 import { RoundOpts, Redraw } from './interfaces';
 
@@ -52,3 +53,4 @@ window.PlayStrategyChat = PlayStrategyChat;
 // that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Draughtsground = Draughtsground;
+window.Chessground = Chessground; // We need both for the "ongoing games" underneath the curren one.
