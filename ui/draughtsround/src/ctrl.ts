@@ -237,7 +237,7 @@ export default class RoundController {
   };
 
   isAlgebraic = (d: RoundData): boolean => {
-    return d.pref.coordSystem === 1; //&& d.game.variant.board.key === '64'; // TODO: this will need to be solved before larger boards work?
+    return d.pref.coordSystem === 1 && d.game.variant.board.key === '64';
   };
 
   coordSystem = (): number => {

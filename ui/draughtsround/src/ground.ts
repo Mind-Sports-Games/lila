@@ -17,6 +17,7 @@ export function makeConfig(ctrl: RoundController): Config {
     step = plyStep(data, ctrl.ply),
     playing = ctrl.isPlaying(),
     ghosts = countGhosts(step.fen);
+
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -24,12 +25,12 @@ export function makeConfig(ctrl: RoundController): Config {
     turnColor: (step.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'white' : 'black',
     lastMove: util.uci2move(step.uci),
     captureLength: data.captureLength,
-    coordinates: data.pref.coords,
+    coordinates: data.pref.coords, // TODO: When we get these as prefs we need to be able to change this.
     coordSystem: ctrl.coordSystem(),
     addPieceZIndex: ctrl.data.pref.is3d,
     highlight: {
       lastMove: data.pref.highlight,
-      kingMoves: data.pref.showKingMoves, //  && (data.game.variant.key === 'frisian' || data.game.variant.key === 'frysk'), TODO: will need to be fixed as well
+      kingMoves: data.pref.showKingMoves && (data.game.variant.key === 'frisian' || data.game.variant.key === 'frysk'),
     },
     events: {
       move: hooks.onMove,

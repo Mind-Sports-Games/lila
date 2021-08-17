@@ -286,6 +286,17 @@ declare type VariantKey =
   | 'crazyhouse'
   | 'linesOfAction';
 
+declare type DraughtsVariantKey =
+  | 'standard'
+  | 'antidraughts'
+  | 'breakthrough'
+  | 'russian'
+  | 'brazilian'
+  | 'fromPosition'
+  | 'frisian'
+  | 'frysk'
+  | 'atomic';
+
 declare type Speed = 'bullet' | 'blitz' | 'classical' | 'correspondence' | 'unlimited';
 
 declare type Perf =
@@ -327,7 +338,7 @@ interface Variant {
 }
 
 interface DraughtsVariant {
-  key: VariantKey;
+  key: DraughtsVariantKey;
   name: string;
   short: string;
   title?: string;

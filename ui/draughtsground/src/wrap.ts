@@ -1,12 +1,11 @@
-import { State } from './state'
-import { colors, translateAway, translateAbs, posToTranslateAbs, key2pos, createEl, allKeys, san2alg } from './util'
-import { ranksRev as allRanks, files as allFiles } from './util'
-import { createElement as createSVG } from './svg'
-import { boardFields } from './board'
-import { Elements, FieldNumber } from './types'
+import { State } from './state';
+import { colors, translateAway, translateAbs, posToTranslateAbs, key2pos, createEl, allKeys, san2alg } from './util';
+import { ranksRev as allRanks, files as allFiles } from './util';
+import { createElement as createSVG } from './svg';
+import { boardFields } from './board';
+import { Elements, FieldNumber } from './types';
 
 export default function wrap(element: HTMLElement, s: State, relative: boolean): Elements {
-
   // .cg-wrap (element passed to Draughtsground)
   //   cg-helper (10.0%)
   //     cg-container (1000%)
@@ -23,7 +22,7 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
   // add that class yourself to the element before calling draughtsground
   // for a slight performance improvement! (avoids recomputing style)
   element.classList.add('cg-wrap');
-  
+
   colors.forEach(c => element.classList.toggle('orientation-' + c, s.orientation === c));
   element.classList.toggle('manipulable', !s.viewOnly);
 
@@ -48,7 +47,8 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
         container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'black' ? ' black' : '')));
         container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'black' ? ' black' : '')));
       } else if (s.orientation === 'black') {
-        const filesBlack: number[] = [], ranksBlack: number[] = [],
+        const filesBlack: number[] = [],
+          ranksBlack: number[] = [],
           rankBase = s.boardSize[0] / 2,
           fileSteps = s.boardSize[1] / 2;
         for (let i = 1; i <= rankBase; i++) filesBlack.push(i);
@@ -56,9 +56,10 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
         container.appendChild(renderCoords(ranksBlack, 'ranks is100 black'));
         container.appendChild(renderCoords(filesBlack, 'files is100 black'));
       } else {
-        const files: number[] = [], ranks: number[] = [],
+        const files: number[] = [],
+          ranks: number[] = [],
           rankBase = s.boardSize[0] / 2,
-          fields = s.boardSize[0] * s.boardSize[1] / 2,
+          fields = (s.boardSize[0] * s.boardSize[1]) / 2,
           fileSteps = s.boardSize[1] / 2;
         for (let i = fields - rankBase + 1; i <= fields; i++) files.push(i);
         for (let i = 0; i < fileSteps; i++) ranks.push(rankBase + s.boardSize[0] * i);
@@ -81,7 +82,7 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
     board,
     container,
     ghost,
-    svg
+    svg,
   };
 }
 
@@ -89,7 +90,7 @@ function renderFieldnumbers(element: HTMLElement, s: State, bounds: ClientRect) 
   const asWhite = s.orientation !== 'black',
     count = boardFields(s);
   for (let f = 1; f <= count; f++) {
-    const field = createEl('fieldnumber', 'black') as FieldNumber, 
+    const field = createEl('fieldnumber', 'black') as FieldNumber,
       san = f.toString(),
       k = allKeys[f - 1];
     field.textContent = s.coordSystem === 1 ? san2alg[san] : san;

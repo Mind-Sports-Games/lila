@@ -53,7 +53,7 @@ export function main(ctrl: RoundController): VNode {
   return ctrl.nvui
     ? ctrl.nvui.render(ctrl)
     : h(
-        'div.round__app.variant-' + d.game.variant.key + '.is' + '64', // ctrl.data.game.variant.board.key, TODO: will need to be fixed for larger board sizes
+        'div.round__app.variant-' + d.game.variant.key + '.is' + ctrl.data.game.variant.board.key,
         {
           class: { 'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit) },
         },
