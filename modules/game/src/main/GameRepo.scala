@@ -407,7 +407,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       else if (g2.hasAi) (Game.aiAbandonedHours + 1).some
       else (24 * 10).some
     val bson = (gameBSONHandler write g2) ++ $doc(
-      F.initialFen  -> fen.map(_.value),
+      F.initialFen  -> fen,
       F.checkAt     -> checkInHours.map(DateTime.now.plusHours),
       F.playingUids -> (g2.started && userIds.nonEmpty).option(userIds)
     )
@@ -435,8 +435,6 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def setImportCreatedAt(g: Game) =
     coll.update.one($id(g.id), $set("pgni.ca" -> g.createdAt)).void
 
-  // TODO: I'm certainly not happy about making this use the chess.FEN
-  //       but I'm also not sure how to properly use FEN here. :/
   def initialFen(gameId: ID): Fu[Option[FEN]] =
     coll.primitiveOne[FEN]($id(gameId), F.initialFen)
 
