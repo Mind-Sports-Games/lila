@@ -131,7 +131,8 @@ trait Handlers {
     {
       case BSONString(f) => f.split("~") match {
         case Array(lib, f) => StratFEN(GameLib(lib.toInt), f)
-        case _ => sys.error("lib not encoded into fen handler")
+        case Array(f) => StratFEN(GameLib.Chess(), f)
+        case _ => sys.error("error decoding fen in handler")
       }
       case _ => sys.error("fen not encoded in handler")
     },
