@@ -63,7 +63,7 @@ object BSONHandlers {
 
   implicit val tournamentHandler = new BSON[Tournament] {
     def reads(r: BSON.Reader) = {
-      val lib = GameLib(r.int("lib"))
+      val lib = GameLib(r.intD("lib"))
       val variant = r.intO("variant").fold[Variant](Variant.default(lib))(
         v => Variant.orDefault(lib, v)
       )
