@@ -67,6 +67,9 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
         container.appendChild(renderCoords(ranks, 'ranks is100'));
         container.appendChild(renderCoords(files, 'files is100'));
       }
+    } else if (s.boardSize[0] === 8 && s.boardSize[1] === 8) {
+      container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'black' ? ' black' : '')));
+      container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'black' ? ' black' : '')));
     } else if (!relative && s.coordinates === 1) {
       renderFieldnumbers(board, s, board.getBoundingClientRect());
     }
