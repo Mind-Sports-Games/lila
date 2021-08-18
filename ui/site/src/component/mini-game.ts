@@ -13,10 +13,8 @@ export const init = (node: HTMLElement) => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 200);
   else {
     const $el = $(node);
-    console.log($el);
     $el.removeClass('mini-board--init');
     if ($el.hasClass('draughts')) {
-      console.log('DRAUGHTS!');
       const [fen, board, orientation, lm] = $el.data('state').split('|'),
         config = {
           coordinates: 0,
