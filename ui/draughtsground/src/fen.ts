@@ -90,8 +90,8 @@ export function toggleCoordinates(fen: cg.FEN, algebraic: boolean, fields?: numb
   for (let fenPart of fen.split(':')) {
     let first = fenPart.slice(0, 1),
       clr: boolean;
-    if (first === 'W') clr = true;
-    else if (first === 'B') clr = false;
+    if (first.toUpperCase() === 'W') clr = true;
+    else if (first.toUpperCase() === 'B') clr = false;
     else {
       extraParts.push(fenPart);
       continue;
