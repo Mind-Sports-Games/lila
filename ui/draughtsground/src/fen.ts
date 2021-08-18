@@ -156,11 +156,11 @@ export function countGhosts(fen: cg.FEN): number {
   for (let fenPart of fen.split(':')) {
     if (fenPart.length <= 1) continue;
     let first = fenPart.slice(0, 1);
-    if (first === 'W' || first === 'B') {
+    if (first.toUpperCase() === 'W' || first.toUpperCase() === 'B') {
       const fenPieces = fenPart.slice(1).split(',');
       for (let fenPiece of fenPieces) {
         first = fenPiece.slice(0, 1);
-        if (first === 'G' || first === 'P') ghosts++;
+        if (first.toUpperCase() === 'G' || first.toUpperCase() === 'P') ghosts++;
       }
     }
   }
