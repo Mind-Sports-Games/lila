@@ -1,5 +1,6 @@
 @import 'board-2d';
 @import 'coords';
+@import 'material';
 
 cg-board {
   @extend %box-shadow, %abs-100;

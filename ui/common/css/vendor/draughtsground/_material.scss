@@ -2,7 +2,7 @@
   align-self: center;
   display: none;
   height: 40px;
-  @include breakpoint($mq-col2) {
+  @include breakpoint(min-width 800px) {
     display: flex;
     align-items: center;
     line-height: 0;

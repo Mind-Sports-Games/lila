@@ -15,7 +15,7 @@ function renderMaterial(material: MaterialDiffSide, score: number, position: Pos
   for (role in material) {
     if (material[role] > 0) {
       const content: VNode[] = [];
-      for (i = 0; i < material[role]; i++) content.push(h('mpiece.' + role));
+      for (i = 0; i < material[role]; i++) content.push(h('mpiece.d' + role));
       children.push(h('div', content));
     }
   }
