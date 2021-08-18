@@ -45,8 +45,8 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
     if (s.coordinates === 2) {
       if (s.boardSize[0] === 8 && s.boardSize[1] === 8) {
         // TODO: restore this once we have a prefernce. s.coordSystem === 1) {
-        container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'black' ? ' black' : '')));
-        container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'black' ? ' black' : '')));
+        container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'black' ? ' black' : ' white')));
+        container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'black' ? ' black' : ' white')));
       } else if (s.orientation === 'black') {
         const filesBlack: number[] = [],
           ranksBlack: number[] = [],
@@ -68,8 +68,8 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
         container.appendChild(renderCoords(files, 'files is100'));
       }
     } else if (s.boardSize[0] === 8 && s.boardSize[1] === 8) {
-      container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'black' ? ' black' : '')));
-      container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'black' ? ' black' : '')));
+      container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'black' ? ' black' : ' white')));
+      container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'black' ? ' black' : ' white')));
     } else if (!relative && s.coordinates === 1) {
       renderFieldnumbers(board, s, board.getBoundingClientRect());
     }
