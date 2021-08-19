@@ -235,13 +235,24 @@ final private[api] class GameApi(
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.color)))
         }),
         "analysis" -> analysisOption.ifTrue(withFlags.analysis).map(analysisJson.moves(_)),
-        "moves"    -> withFlags.moves.option(g.pgnMoves mkString " "),
+        "moves"    -> withFlags.moves.option((g.variant, initialFen) match {
+          case (Variant.Draughts(variant), FEN.Draughts(initialFen)) =>
+            strategygames.draughts.Replay.unambiguousPdnMoves(
+              pdnMoves = g.pdnMovesConcat(true, true),
+              initialFen = initialFen,
+              variant = variant
+            ).toOption map { moves => moves mkString " " }
+          case _ => g.pgnMoves mkString " "
+        }),
         "opening"  -> withFlags.opening.??(g.opening),
         "fens" -> (withFlags.fens && g.finished) ?? {
           Replay
             .boards(
               lib = g.variant.gameLib,
-              moveStrs = g.pgnMoves,
+              moveStrs = g.variant.gameLib match {
+                case GameLib.Draughts() => g.pdnMovesConcat(true, true)
+                case _ => g.pgnMoves
+              },
               initialFen = initialFen,
               variant = g.variant,
               finalSquare = g.variant.gameLib match {

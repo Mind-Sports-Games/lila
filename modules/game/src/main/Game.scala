@@ -175,8 +175,18 @@ case class Game(
 
   def bothClockStates: Option[Vector[Centis]] = clockHistory.map(_ bothClockStates startColor)
 
+  def pdnMovesConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
+    chess match {
+      case StratGame.Draughts(game) => game.pdnMovesConcat(fullCaptures, dropGhosts)
+      case _ => sys.error("Cant call pdnMovesConcat for a gamelib other than draughts")
+    }
+
   def pgnMoves(color: Color): PgnMoves = {
     val pivot = if (color == startColor) 0 else 1
+    val pgnMoves = variant.gameLib match {
+      case GameLib.Draughts() => pdnMovesConcat()
+      case _ => chess.pgnMoves
+    }
     pgnMoves.zipWithIndex.collect {
       case (e, i) if (i % 2) == pivot => e
     }
