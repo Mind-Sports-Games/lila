@@ -274,7 +274,7 @@ object Challenge {
       case _ => mode
     }
     val isOpen = challenger == Challenge.Challenger.Open
-    new Challenge(
+    var challenge = new Challenge(
       _id = randomId,
       status = Status.Created,
       variant = variant,
@@ -299,14 +299,10 @@ object Challenge {
       microMatch = microMatch option true
     )
     //TODO microMatch: is this needed?
-    /*) |> { challenge =>
-      if (microMatch && !challenge.customStartingPosition)
-        challenge.copy(microMatch = none)
-      else challenge
-    } |> { challenge =>
-      if (challenge.mode.rated && !challenge.isMicroMatch && challenge.customStartingPosition)
-        challenge.copy(mode = Mode.Casual)
-      else challenge
-    }*/
+    if (microMatch && !challenge.customStartingPosition)
+      challenge = challenge.copy(microMatch = none)
+    if (challenge.mode.rated && !challenge.isMicroMatch && challenge.customStartingPosition)
+      challenge = challenge.copy(mode = Mode.Casual)
+    challenge
   }
 }

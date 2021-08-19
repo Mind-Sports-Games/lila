@@ -49,7 +49,7 @@ final private class Rematcher(
     pov match {
       case Pov(game, color) if game.playerCouldRematch =>
         if (isOffering(!pov) || game.opponent(color).isAi)
-          rematches.of(game.id).fold(rematchJoin(pov))(rematchExists(pov))
+          rematches.of(game.id).fold(rematchJoin(pov.game))(rematchExists(pov))
         else if (!declined.get(pov.flip.fullId) && rateLimit(pov.fullId)(true)(false))
           fuccess(rematchCreate(pov))
         else fuccess(List(Event.RematchOffer(by = none)))
@@ -66,26 +66,26 @@ final private class Rematcher(
     fuccess(List(Event.RematchOffer(by = none)))
   }
 
-  def microMatch(pov: Pov): Fu[Events] = rematchJoin(pov)
+  def microMatch(game: Game): Fu[Events] = rematchJoin(game)
 
   private def rematchExists(pov: Pov)(nextId: Game.ID): Fu[Events] =
     gameRepo game nextId flatMap {
-      _.fold(rematchJoin(pov))(g => fuccess(redirectEvents(g)))
+      _.fold(rematchJoin(pov.game))(g => fuccess(redirectEvents(g)))
     }
 
-  private def rematchJoin(pov: Pov): Fu[Events] =
-    rematches.of(pov.gameId) match {
+  private def rematchJoin(game: Game): Fu[Events] =
+    rematches.of(game.id) match {
       case None =>
         for {
-          nextGame <- returnGame(pov) map (_.start)
-          _ = offers invalidate pov.game.id
-          _ = rematches.cache.put(pov.gameId, nextGame.id)
-          _ = if (pov.game.variant == Variant.Chess(Chess960) && !chess960.get(pov.gameId)) chess960.put(nextGame.id)
+          nextGame <- returnGame(game) map (_.start)
+          _ = offers invalidate game.id
+          _ = rematches.cache.put(game.id, nextGame.id)
+          _ = if (game.variant == Variant.Chess(Chess960) && !chess960.get(game.id)) chess960.put(nextGame.id)
           _ <- gameRepo insertDenormalized nextGame
         } yield {
           if (nextGame.metadata.microMatchGameNr.contains(2))
-            messenger.system(pov.game, trans.microMatchRematchStarted.txt())
-          else messenger.system(pov.game, trans.rematchOfferAccepted.txt())
+            messenger.system(game, trans.microMatchRematchStarted.txt())
+          else messenger.system(game, trans.rematchOfferAccepted.txt())
           onStart(nextGame.id)
           redirectEvents(nextGame)
         }
@@ -110,52 +110,52 @@ final private class Rematcher(
     if (!g.aborted && g.metadata.microMatch.contains("micromatch")) s"1:${g.id}".some
     else g.metadata.microMatch.isDefined option "micromatch"
 
-  private def returnGame(pov: Pov): Fu[Game] = {
+  private def returnGame(game: Game): Fu[Game] = {
     for {
-      initialFen <- gameRepo initialFen pov.game
-      situation = initialFen.flatMap{fen => Forsyth.<<<(pov.game.variant.gameLib, fen)}
-      pieces: PieceMap = pov.game.variant match {
+      initialFen <- gameRepo initialFen game
+      situation = initialFen.flatMap{fen => Forsyth.<<<(game.variant.gameLib, fen)}
+      pieces: PieceMap = game.variant match {
         case Variant.Chess(Chess960) =>
-          if (chess960 get pov.gameId) chessPieceMap(Chess960.pieces)
+          if (chess960 get game.id) chessPieceMap(Chess960.pieces)
           else situation.fold(
             chessPieceMap(Chess960.pieces)
           )(_.situation.board.pieces)
         case Variant.Chess(FromPosition) =>
           situation.fold(
-            Variant.libStandard(pov.game.variant.gameLib).pieces
+            Variant.libStandard(game.variant.gameLib).pieces
           )(_.situation.board.pieces)
         case variant =>
           variant.pieces
       }
-      users <- userRepo byIds pov.game.userIds
-      board = Board(pov.game.variant.gameLib, pieces, variant = pov.game.variant).withHistory(
+      users <- userRepo byIds game.userIds
+      board = Board(game.variant.gameLib, pieces, variant = game.variant).withHistory(
         History(
-          pov.game.variant.gameLib,
+          game.variant.gameLib,
           lastMove = situation.flatMap(_.situation.board.history.lastMove),
           castles = situation.fold(Castles.init)(_.situation.board.history.castles)
         )
       )
       game <- Game.make(
         chess = ChessGame(
-          pov.game.variant.gameLib,
+          game.variant.gameLib,
           situation = Situation(
-            pov.game.variant.gameLib,
+            game.variant.gameLib,
             board = board,
             color = situation.fold[Color](White)(_.situation.color)
           ),
-          clock = pov.game.clock map { c =>
+          clock = game.clock map { c =>
             Clock(c.config)
           },
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)
         ),
-        whitePlayer = returnPlayer(pov.game, White, users),
-        blackPlayer = returnPlayer(pov.game, Black, users),
-        mode = if (users.exists(_.lame)) Mode.Casual else pov.game.mode,
-        source = pov.game.source | Source.Lobby,
-        daysPerTurn = pov.game.daysPerTurn,
+        whitePlayer = returnPlayer(game, White, users),
+        blackPlayer = returnPlayer(game, Black, users),
+        mode = if (users.exists(_.lame)) Mode.Casual else game.mode,
+        source = game.source | Source.Lobby,
+        daysPerTurn = game.daysPerTurn,
         pgnImport = None,
-        microMatch = nextMicroMatch(pov.game)
+        microMatch = nextMicroMatch(game)
       ) withUniqueId idGenerator
     } yield game
   }

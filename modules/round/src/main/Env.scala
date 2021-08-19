@@ -100,12 +100,12 @@ final class Env(
     "gameStartId" -> { case Game.Id(gameId) =>
       onStart(gameId)
     },
-    //"finishGame" -> {
-    //  case lila.game.actorApi.FinishGame(game, _, _) if !game.aborted && game.metadata.needsMicroRematch =>
-    //    scheduler.scheduleOnce(2 seconds) {
-    //      tellRound(game.id, MicroRematch)
-    //    }
-    //},
+    "finishGame" -> {
+      case lila.game.actorApi.FinishGame(game, _, _) if !game.aborted && game.metadata.needsMicroRematch =>
+        scheduler.scheduleOnce(2 seconds) {
+          tellRound(game.id, MicroRematch)
+        }.unit
+    },
     "selfReport" -> { case RoundSocket.Protocol.In.SelfReport(fullId, ip, userId, name) =>
       selfReport(userId, ip, fullId, name).unit
     },

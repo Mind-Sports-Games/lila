@@ -349,13 +349,14 @@ final private[round] class RoundDuct(
     case RematchNo(playerId)  => handle(PlayerId(playerId))(rematcher.no)
 
     //TODO: microMatch: This almost certainly doesnt work as wanted (port issues) 
-    case MicroRematch(playerId) => handle(PlayerId(playerId)) { pov =>
-      rematcher.microMatch(pov) map { events =>
+    case MicroRematch => handle { game =>
+      rematcher.microMatch(game) map { events =>
         events.foreach {
           case Event.RematchTaken(gameId) =>
             val microMatch = s"2:$gameId"
-            gameRepo.setMicroMatch(pov.game.id, microMatch).void// >>-
-              //pov.game.copy(metadata = (pov.game.metadata.copy(microMatch = microMatch.some)))
+            gameRepo.setMicroMatch(game.id, microMatch).void andThen {
+              case _ => updateGame(game => game.copy(metadata = (game.metadata.copy(microMatch = microMatch.some))))
+            }
           case _ =>
         }
         events
