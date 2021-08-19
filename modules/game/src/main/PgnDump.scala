@@ -62,13 +62,9 @@ final class PgnDump(
                   case _ => sys.error("invalid draughts fen in pgnDump")
                 },
                 variant = variant
-              ).fold(
-                  err => {
-                    logger.warn(s"Could not unambiguate moves of ${game.id}: $err")
-                    shortenMoves(pdnMovesFull)
-                  },
-                  moves => moves
-                )
+              //TODO: draughts, this used to be a Valid[List[String]] type
+              //and now we have lost the error. Perhaps we need to reconsider this
+              ).fold(shortenMoves(pdnMovesFull))(moves => moves)
               val moves = flags keepDelayIf game.playable applyDelay pdnMoves
               val moves2 =
                 if (algebraic) san2alg(moves, variant.boardSize.pos)
@@ -233,8 +229,7 @@ final class PgnDump(
                     fen
                   )
                 else fen.some
-              }.fold("?")(f => strategygames.draughts.format.Forsyth.shorten(f.value))
-              .map(FEN.Draughts)
+              }.fold("?")(f => strategygames.draughts.format.Forsyth.shorten(f).value)
             )
           )
           case _ => List(

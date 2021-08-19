@@ -2,6 +2,7 @@ package lila.api
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.{ GameLib, Replay, Status }
+import strategygames.variant.Variant
 
 import org.joda.time.DateTime
 import play.api.libs.json._
@@ -235,13 +236,20 @@ final private[api] class GameApi(
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.color)))
         }),
         "analysis" -> analysisOption.ifTrue(withFlags.analysis).map(analysisJson.moves(_)),
-        "moves"    -> withFlags.moves.option((g.variant, initialFen) match {
-          case (Variant.Draughts(variant), FEN.Draughts(initialFen)) =>
+        "moves"    -> withFlags.moves.option(g.variant match {
+          case Variant.Draughts(variant) =>
             strategygames.draughts.Replay.unambiguousPdnMoves(
               pdnMoves = g.pdnMovesConcat(true, true),
-              initialFen = initialFen,
+              initialFen = initialFen match {
+                case Some(FEN.Draughts(fen)) => Some(fen)
+                case None => None
+                case _ => sys.error("fen type mismatch in GameApi")
+              },
               variant = variant
-            ).toOption map { moves => moves mkString " " }
+            ) match { 
+              case Some(moves) => moves mkString " "
+              case None => ""
+            }
           case _ => g.pgnMoves mkString " "
         }),
         "opening"  -> withFlags.opening.??(g.opening),
