@@ -113,7 +113,7 @@ object forms {
         renderVariant(form, translatedDraughtsVariantChoicesWithVariantsAndFen, GameLib.Draughts()),
         fenInput(form("fen"), strict = false, validFen),
         renderTimeMode(form, allowAnon = true),
-        //renderMicroMatch(form),
+        renderMicroMatch(form),
         ctx.isAuth option div(cls := "mode_choice buttons")(
           renderRadios(form("mode"), translatedModeChoices)
         ),
