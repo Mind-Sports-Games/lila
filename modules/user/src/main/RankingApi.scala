@@ -100,6 +100,12 @@ final class RankingApi(
       racingKings   <- topPerf(PerfType.RacingKings.id, nb)
       crazyhouse    <- topPerf(PerfType.Crazyhouse.id, nb)
       linesOfAction <- topPerf(PerfType.LinesOfAction.id, nb)
+      frisian       <- topPerf(PerfType.Frisian.id, nb)
+      frysk         <- topPerf(PerfType.Frysk.id, nb)
+      antidraughts  <- topPerf(PerfType.Antidraughts.id, nb)
+      breakthrough  <- topPerf(PerfType.Breakthrough.id, nb)
+      russian       <- topPerf(PerfType.Russian.id, nb)
+      brazilian     <- topPerf(PerfType.Brazilian.id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -114,7 +120,13 @@ final class RankingApi(
       atomic = atomic,
       horde = horde,
       racingKings = racingKings,
-      linesOfAction = linesOfAction
+      linesOfAction = linesOfAction,
+      frisian = frisian,
+      frysk = frysk,
+      antidraughts = antidraughts,
+      breakthrough = breakthrough,
+      russian = russian,
+      brazilian = brazilian
     )
 
   object weeklyStableRanking {

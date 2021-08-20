@@ -176,6 +176,69 @@ object PerfType {
         iconChar = ''
       )
 
+  case object DraughtsStandard
+      extends PerfType(
+        105,
+        key = "draughtsstandard",
+        name = Variant.Draughts(strategygames.draughts.variant.Standard).name,
+        title = "Standard rules of international draughts",
+        iconChar = 'K'
+      )
+
+  case object Frisian
+      extends PerfType(
+        111,
+        key = "frisian",
+        name = Variant.Draughts(strategygames.draughts.variant.Frisian).name,
+        title = "Frisian variant",
+        iconChar = 'K'
+      )
+
+  case object Frysk
+      extends PerfType(
+        116,
+        key = "frysk",
+        name = Variant.Draughts(strategygames.draughts.variant.Frysk).name,
+        title = "Frysk! variant",
+        iconChar = 'K'
+      )
+
+  case object Antidraughts
+      extends PerfType(
+        113,
+        key = "antidraughts",
+        name = Variant.Draughts(strategygames.draughts.variant.Antidraughts).name,
+        title = "Antidraughts variant",
+        iconChar = 'K'
+      )
+
+  case object Breakthrough
+      extends PerfType(
+        117,
+        key = "breakthrough",
+        name = Variant.Draughts(strategygames.draughts.variant.Breakthrough).name,
+        title = "Breakthrough variant",
+        iconChar = 'K'
+      )
+
+  case object Russian
+      extends PerfType(
+        122,
+        key = "russian",
+        name = Variant.Draughts(strategygames.draughts.variant.Russian).name,
+        title = "Russian draughts",
+        iconChar = 'K'
+      )
+
+  case object Brazilian
+      extends PerfType(
+        123,
+        key = "brazilian",
+        name = Variant.Draughts(strategygames.draughts.variant.Brazilian).name,
+        title = "Brazilian draughts",
+        iconChar = 'K'
+      )
+
   val all: List[PerfType] = List(
     UltraBullet,
     Bullet,
@@ -193,7 +256,14 @@ object PerfType {
     Horde,
     RacingKings,
     Puzzle,
-    LinesOfAction
+    LinesOfAction,
+    DraughtsStandard,
+    Frisian,
+    Frysk,
+    Antidraughts,
+    Breakthrough,
+    Russian,
+    Brazilian
   )
   val byKey = all map { p =>
     (p.key, p)
@@ -228,7 +298,14 @@ object PerfType {
     Atomic,
     Horde,
     RacingKings,
-    LinesOfAction
+    LinesOfAction,
+    DraughtsStandard,
+    Frisian,
+    Frysk,
+    Antidraughts,
+    Breakthrough,
+    Russian,
+    Brazilian
   )
   val leaderboardable: List[PerfType] = List(
     Bullet,
@@ -244,10 +321,33 @@ object PerfType {
     Atomic,
     Horde,
     RacingKings,
-    LinesOfAction
+    LinesOfAction,
+    DraughtsStandard,
+    Frisian,
+    Frysk,
+    Antidraughts,
+    Breakthrough,
+    Russian,
+    Brazilian
   )
   val variants: List[PerfType] =
-    List(Crazyhouse, Chess960, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings, LinesOfAction)
+    List(
+      Crazyhouse,
+      Chess960,
+      KingOfTheHill,
+      ThreeCheck,
+      Antichess,
+      Atomic,
+      Horde,
+      RacingKings,
+      LinesOfAction,
+      Frisian,
+      Frysk,
+      Antidraughts,
+      Breakthrough,
+      Russian,
+      Brazilian
+    )
   val standard: List[PerfType] = List(Bullet, Blitz, Rapid, Classical, Correspondence)
 
   def variantOf(pt: PerfType): Variant =
@@ -261,6 +361,13 @@ object PerfType {
       case Horde         => Variant.Chess(strategygames.chess.variant.Horde)
       case RacingKings   => Variant.Chess(strategygames.chess.variant.RacingKings)
       case LinesOfAction => Variant.Chess(strategygames.chess.variant.LinesOfAction)
+      case DraughtsStandard => Variant.Draughts(strategygames.draughts.variant.Standard)
+      case Frisian          => Variant.Draughts(strategygames.draughts.variant.Frisian)
+      case Frysk            => Variant.Draughts(strategygames.draughts.variant.Frysk)
+      case Antidraughts     => Variant.Draughts(strategygames.draughts.variant.Antidraughts)
+      case Breakthrough     => Variant.Draughts(strategygames.draughts.variant.Breakthrough)
+      case Russian          => Variant.Draughts(strategygames.draughts.variant.Russian)
+      case Brazilian        => Variant.Draughts(strategygames.draughts.variant.Brazilian)
       case _             => Variant.Chess(strategygames.chess.variant.Standard)
     }
 
@@ -277,6 +384,13 @@ object PerfType {
       case Variant.Chess(strategygames.chess.variant.Horde)         => Horde.some
       case Variant.Chess(strategygames.chess.variant.RacingKings)   => RacingKings.some
       case Variant.Chess(strategygames.chess.variant.LinesOfAction) => LinesOfAction.some
+      case Variant.Draughts(strategygames.draughts.variant.Standard) => DraughtsStandard.some
+      case Variant.Draughts(strategygames.draughts.variant.Frisian)      => Frisian.some
+      case Variant.Draughts(strategygames.draughts.variant.Frysk)        => Frysk.some
+      case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => Antidraughts.some
+      case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => Breakthrough.some
+      case Variant.Draughts(strategygames.draughts.variant.Russian)      => Russian.some
+      case Variant.Draughts(strategygames.draughts.variant.Brazilian)    => Brazilian.some
     }
 
   def standardBySpeed(speed: Speed): PerfType = speed match {

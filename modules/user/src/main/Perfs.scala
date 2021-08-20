@@ -19,6 +19,13 @@ case class Perfs(
     racingKings: Perf,
     crazyhouse: Perf,
     linesOfAction: Perf,
+    draughtsstandard: Perf,
+    frisian: Perf,
+    frysk: Perf,
+    antidraughts: Perf,
+    breakthrough: Perf,
+    russian: Perf,
+    brazilian: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -43,6 +50,13 @@ case class Perfs(
       "racingKings"    -> racingKings,
       "crazyhouse"     -> crazyhouse,
       "linesOfAction"  -> linesOfAction,
+      "draughtsstandard" -> draughtsstandard,
+      "frisian"          -> frisian,
+      "frysk"            -> frysk,
+      "antidraughts"     -> antidraughts,
+      "breakthrough"     -> breakthrough,
+      "russian"          -> russian,
+      "brazilian"        -> brazilian,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -121,6 +135,12 @@ case class Perfs(
     "racingKings"    -> racingKings,
     "crazyhouse"     -> crazyhouse,
     "linesOfAction"  -> linesOfAction,
+    "frisian"        -> frisian,
+    "frysk"          -> frysk,
+    "antidraughts"   -> antidraughts,
+    "breakthrough"   -> breakthrough,
+    "russian"        -> russian,
+    "brazilian"      -> brazilian,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
     "blitz"          -> blitz,
@@ -139,6 +159,7 @@ case class Perfs(
   def apply(perfType: PerfType): Perf =
     perfType match {
       case PerfType.Standard       => standard
+      case PerfType.DraughtsStandard => draughtsstandard
       case PerfType.UltraBullet    => ultraBullet
       case PerfType.Bullet         => bullet
       case PerfType.Blitz          => blitz
@@ -154,6 +175,12 @@ case class Perfs(
       case PerfType.RacingKings    => racingKings
       case PerfType.Crazyhouse     => crazyhouse
       case PerfType.LinesOfAction  => linesOfAction
+      case PerfType.Frisian        => frisian
+      case PerfType.Frysk          => frysk
+      case PerfType.Antidraughts   => antidraughts
+      case PerfType.Breakthrough   => breakthrough
+      case PerfType.Russian        => russian
+      case PerfType.Brazilian      => brazilian
       case PerfType.Puzzle         => puzzle
     }
 
@@ -218,6 +245,13 @@ case object Perfs {
       p,
       p,
       p,
+      p,
+      p,
+      p,
+      p,
+      p,
+      p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -250,6 +284,13 @@ case object Perfs {
       case Variant.Chess(strategygames.chess.variant.RacingKings)   => Some(_.racingKings)
       case Variant.Chess(strategygames.chess.variant.Crazyhouse)    => Some(_.crazyhouse)
       case Variant.Chess(strategygames.chess.variant.LinesOfAction) => Some(_.linesOfAction)
+      case Variant.Draughts(strategygames.draughts.variant.Standard) => Some(_.draughtsstandard)
+      case Variant.Draughts(strategygames.draughts.variant.Frisian)      => Some(_.frisian)
+      case Variant.Draughts(strategygames.draughts.variant.Frysk)        => Some(_.frysk)
+      case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => Some(_.antidraughts)
+      case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => Some(_.breakthrough)
+      case Variant.Draughts(strategygames.draughts.variant.Russian)      => Some(_.russian)
+      case Variant.Draughts(strategygames.draughts.variant.Brazilian)    => Some(_.brazilian)
       case _                           => none
     }
 
@@ -280,6 +321,13 @@ case object Perfs {
         racingKings = perf("racingKings"),
         crazyhouse = perf("crazyhouse"),
         linesOfAction = perf("linesOfAction"),
+        draughtsstandard = perf("draughtsstandard"),
+        frisian = perf("frisian"),
+        frysk = perf("frysk"),
+        antidraughts = perf("antidraughts"),
+        breakthrough = perf("breakthrough"),
+        russian = perf("russian"),
+        brazilian = perf("brazilian"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -307,6 +355,13 @@ case object Perfs {
         "racingKings"    -> notNew(o.racingKings),
         "crazyhouse"     -> notNew(o.crazyhouse),
         "linesOfAction"  -> notNew(o.linesOfAction),
+        "standard"       -> notNew(o.standard),
+        "frisian"        -> notNew(o.frisian),
+        "frysk"          -> notNew(o.frysk),
+        "antidraughts"   -> notNew(o.antidraughts),
+        "breakthrough"   -> notNew(o.breakthrough),
+        "russian"        -> notNew(o.russian),
+        "brazilian"      -> notNew(o.brazilian),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
         "blitz"          -> notNew(o.blitz),
@@ -334,8 +389,14 @@ case object Perfs {
       atomic: List[User.LightPerf],
       horde: List[User.LightPerf],
       racingKings: List[User.LightPerf],
-      linesOfAction: List[User.LightPerf]
+      linesOfAction: List[User.LightPerf],
+      frisian: List[User.LightPerf],
+      frysk: List[User.LightPerf],
+      antidraughts: List[User.LightPerf],
+      breakthrough: List[User.LightPerf],
+      russian: List[User.LightPerf],
+      brazilian: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
 }

@@ -161,7 +161,7 @@ trait Handlers {
       case _ => sys.error("variant not encoded in handler. Previously this defaulted to standard chess")
       //case _ => StratVariant.default(GameLib.Chess())
     },
-    v => BSONString(s"{v.gameLib.id}:{v.key}")
+    v => BSONString(s"${v.gameLib.id}:${v.key}")
   )
 
   val clockConfigHandler = tryHandler[strategygames.Clock.Config](

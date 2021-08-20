@@ -26,8 +26,9 @@ final class SwissForm(implicit mode: Mode) {
         )(ClockConfig.apply)(ClockConfig.unapply)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt"          -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "lib"               -> number(min = 0, max = 1),
-        "variant"           -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
+        "gameLib"           -> number(min = 0, max = 1),
+        "chessVariant"      -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
+        "draughtsVariant"   -> optional(nonEmptyText.verifying(v => Variant(GameLib.Draughts(), v).isDefined)),
         "rated"             -> optional(boolean),
         "nbRounds"          -> number(min = minRounds, max = 100),
         "description"       -> optional(cleanNonEmptyText),
@@ -48,7 +49,9 @@ final class SwissForm(implicit mode: Mode) {
       startsAt = Some(DateTime.now plusSeconds {
         if (mode == Mode.Prod) 60 * 10 else 20
       }),
-      variant = Variant.default(GameLib.Chess()).key.some,
+      gameLib = 0,
+      chessVariant = Variant.default(GameLib.Chess()).key.some,
+      draughtsVariant = Variant.default(GameLib.Draughts()).key.some,
       rated = true.some,
       nbRounds = 7,
       description = none,
@@ -65,8 +68,9 @@ final class SwissForm(implicit mode: Mode) {
       name = s.name.some,
       clock = s.clock,
       startsAt = s.startsAt.some,
-      lib = s.variant.gameLib.id,
-      variant = s.variant.key.some,
+      gameLib = s.variant.gameLib.id,
+      chessVariant = s.variant.key.some,
+      draughtsVariant = s.variant.key.some,
       rated = s.settings.rated.some,
       nbRounds = s.settings.nbRounds,
       description = s.settings.description,
@@ -143,8 +147,9 @@ object SwissForm {
       name: Option[String],
       clock: ClockConfig,
       startsAt: Option[DateTime],
-      lib: Int = 0,
-      variant: Option[String],
+      gameLib: Int,
+      chessVariant: Option[String],
+      draughtsVariant: Option[String],
       rated: Option[Boolean],
       nbRounds: Int,
       description: Option[String],
@@ -155,8 +160,12 @@ object SwissForm {
       conditions: SwissCondition.DataForm.AllSetup,
       forbiddenPairings: Option[String]
   ) {
-    def gameLib = GameLib(lib)
-    def realVariant  = variant flatMap {v => Variant.apply(gameLib, v)} getOrElse Variant.default(gameLib)
+    def realGameLib = GameLib(gameLib)
+    def realVariant = (realGameLib match {
+      case GameLib.Chess()    => chessVariant
+      case GameLib.Draughts() => draughtsVariant
+      case _ => sys.error("Invalid lib in Swiss data")
+    }) flatMap {v => Variant.apply(realGameLib, v)} getOrElse Variant.default(realGameLib)
     def realStartsAt = startsAt | DateTime.now.plusMinutes(10)
     def realChatFor  = chatFor | Swiss.ChatFor.default
     def realRoundInterval = {
