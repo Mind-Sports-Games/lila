@@ -9,7 +9,6 @@ import viewStatus from 'game/view/status';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes, RoundData } from '../interfaces';
-import { variantUsesUCINotation } from 'chess';
 
 const scrollMax = 99999,
   moveTag = 'u8t',
@@ -50,7 +49,7 @@ const renderDrawOffer = () =>
     '½?'
   );
 
-function renderMove(step: Step, uciVariant: boolean, curPly: number, orEmpty: boolean, drawOffers: Set<number>) {
+function renderMove(step: Step, curPly: number, orEmpty: boolean, drawOffers: Set<number>) {
   return step
     ? h(
         moveTag,
@@ -59,10 +58,7 @@ function renderMove(step: Step, uciVariant: boolean, curPly: number, orEmpty: bo
             a1t: step.ply === curPly,
           },
         },
-        [
-          uciVariant ? step.uci : step.san[0] === 'P' ? step.san.slice(1) : step.san,
-          drawOffers.has(step.ply) ? renderDrawOffer() : undefined,
-        ]
+        [step.alg || step.san, drawOffers.has(step.ply) ? renderDrawOffer() : undefined]
       )
     : orEmpty
     ? h(moveTag, '…')
@@ -103,7 +99,6 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
 
 function renderMoves(ctrl: RoundController): MaybeVNodes {
   const steps = ctrl.data.steps,
-    uciVariant = variantUsesUCINotation(ctrl.data.game.variant.key),
     firstPly = round.firstPly(ctrl.data),
     lastPly = round.lastPly(ctrl.data),
     drawPlies = new Set(ctrl.data.game.drawOffers || []);
@@ -121,8 +116,8 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     curPly = ctrl.ply;
   for (let i = 0; i < pairs.length; i++) {
     els.push(h(indexTag, i + 1 + ''));
-    els.push(renderMove(pairs[i][0], uciVariant, curPly, true, drawPlies));
-    els.push(renderMove(pairs[i][1], uciVariant, curPly, false, drawPlies));
+    els.push(renderMove(pairs[i][0], curPly, true, drawPlies));
+    els.push(renderMove(pairs[i][1], curPly, false, drawPlies));
   }
   els.push(renderResult(ctrl));
 
