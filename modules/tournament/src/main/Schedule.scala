@@ -14,6 +14,7 @@ case class Schedule(
     variant: Variant,
     position: Option[FEN],
     at: DateTime,
+    duration: Option[Int] = None,
     conditions: Condition.All = Condition.All.empty
 ) {
 
@@ -215,9 +216,10 @@ object Schedule {
     case object Rapid       extends Speed(50)
     case object Classical   extends Speed(60)
     case object Blitz32     extends Speed(70)
+    case object Blitz35     extends Speed(75)
     case object Blitz51     extends Speed(80)
     val all: List[Speed] =
-      List(UltraBullet, HyperBullet, Bullet, HippoBullet, SuperBlitz, Blitz, Blitz32, Blitz51, Rapid, Classical)
+      List(UltraBullet, HyperBullet, Bullet, HippoBullet, SuperBlitz, Blitz, Blitz32, Blitz35, Blitz51, Rapid, Classical)
     val mostPopular: List[Speed] = List(Bullet, Blitz, Rapid, Classical)
     def apply(key: String)       = all.find(_.key == key) orElse all.find(_.key.toLowerCase == key.toLowerCase)
     def byId(id: Int)            = all find (_.id == id)
@@ -240,11 +242,11 @@ object Schedule {
     }
     def toPerfType(speed: Speed) =
       speed match {
-        case UltraBullet                            => PerfType.UltraBullet
-        case HyperBullet | Bullet | HippoBullet     => PerfType.Bullet
-        case SuperBlitz | Blitz | Blitz32 | Blitz51 => PerfType.Blitz
-        case Rapid                                  => PerfType.Rapid
-        case Classical                              => PerfType.Classical
+        case UltraBullet                                      => PerfType.UltraBullet
+        case HyperBullet | Bullet | HippoBullet               => PerfType.Bullet
+        case SuperBlitz | Blitz | Blitz32 | Blitz35 | Blitz51 => PerfType.Blitz
+        case Rapid                                            => PerfType.Rapid
+        case Classical                                        => PerfType.Classical
       }
   }
 
@@ -256,8 +258,12 @@ object Schedule {
     case object Winter extends Season
   }
 
-  // They're all hourly for now
-  private[tournament] def durationFor(s: Schedule): Int = 57
+  private val defaultDuration: Int = 57
+
+  private[tournament] def durationFor(s: Schedule): Int = s.duration match {
+    case Some(duration) => duration
+    case None           => defaultDuration
+  }
   /*{
     import Freq._, Speed._
     import strategygames.chess.variant._
@@ -351,6 +357,7 @@ object Schedule {
       case (_, _, SuperBlitz)  => TC(3 * 60, 0)
       case (_, _, Blitz)       => TC(5 * 60, 0)
       case (_, _, Blitz32)     => TC(3 * 60, 2)
+      case (_, _, Blitz35)     => TC(3 * 60, 5)
       case (_, _, Blitz51)     => TC(5 * 60, 1)
       case (_, _, Rapid)       => TC(10 * 60, 0)
       case (_, _, Classical)   => TC(20 * 60, 10)

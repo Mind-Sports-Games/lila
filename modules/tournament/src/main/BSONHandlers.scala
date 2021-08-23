@@ -90,7 +90,7 @@ object BSONHandlers {
           doc   <- r.getO[Bdoc]("schedule")
           freq  <- doc.getAsOpt[Schedule.Freq]("freq")
           speed <- doc.getAsOpt[Schedule.Speed]("speed")
-        } yield Schedule(freq, speed, variant, position, startsAt, conditions),
+        } yield Schedule(freq, speed, variant, position, startsAt, None, conditions),
         nbPlayers = r int "nbPlayers",
         createdAt = r date "createdAt",
         createdBy = r strO "createdBy" getOrElse playstrategyId,

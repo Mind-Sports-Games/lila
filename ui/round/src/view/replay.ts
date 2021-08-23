@@ -131,7 +131,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
 
 export function analysisButton(ctrl: RoundController): VNode | undefined {
   const forecastCount = ctrl.data.forecastCount;
-  return game.userAnalysable(ctrl.data)
+  return game.userAnalysable(ctrl.data) && util.allowAnalysisForVariant(ctrl.data.game.variant.key)
     ? h(
         'a.fbt.analysis',
         {
