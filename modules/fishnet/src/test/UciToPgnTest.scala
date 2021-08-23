@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import strategygames.Replay
+import strategygames.chess.Replay
 import strategygames.chess.format.pgn.Reader
 import org.specs2.mutable._
 

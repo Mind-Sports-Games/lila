@@ -1,6 +1,6 @@
 package lila.challenge
 
-import strategygames.variant.Variant
+import strategygames.chess.variant.Variant
 import strategygames.format.FEN
 import strategygames.{ Clock, GameLib, Mode }
 import org.specs2.mutable._
