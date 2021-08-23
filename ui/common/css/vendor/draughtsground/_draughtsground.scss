@@ -35,7 +35,13 @@ square {
     background-color: rgba(155, 199, 0, 0.41);
   }
   &.check {
-    background: radial-gradient(ellipse at center, rgba(255, 0, 0, 1) 0%, rgba(231, 0, 0, 1) 25%, rgba(169, 0, 0, 0) 89%, rgba(158, 0, 0, 0) 100%);
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 0, 0, 1) 0%,
+      rgba(231, 0, 0, 1) 25%,
+      rgba(169, 0, 0, 0) 89%,
+      rgba(158, 0, 0, 0) 100%
+    );
   }
   &.selected {
     background-color: rgba(20, 85, 30, 0.5);
@@ -76,13 +82,17 @@ piece {
     opacity: 0.3;
   }
   &.black {
-    &.king1, &.king2, &.king3 {
+    &.king1,
+    &.king2,
+    &.king3 {
       text-align: center;
       color: white;
     }
   }
   &.white {
-    &.king1, &.king2, &.king3 {
+    &.king1,
+    &.king2,
+    &.king3 {
       text-align: center;
       color: black;
     }

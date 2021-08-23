@@ -1,9 +1,11 @@
 @import 'coords-colors';
 
-coords, fieldnumber {
-
+coords,
+fieldnumber {
   /* handle hidden coords */
-  .coords-no & { display: none }
+  .coords-no & {
+    display: none;
+  }
 
   /* handle inner coords */
   position: absolute;
@@ -15,7 +17,8 @@ coords, fieldnumber {
   font-weight: bold;
 }
 
-.is100, .i64 {
+.is100,
+.i64 {
   coords {
     display: flex;
 

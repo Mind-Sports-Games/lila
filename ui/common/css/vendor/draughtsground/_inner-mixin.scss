@@ -8,7 +8,7 @@
     &.ranks {
       top: 1px;
       right: 0; // a negative value creates empty space on the right side in mobile browsers
-      width: .8em;
+      width: 0.8em;
       & coord {
         transform: none;
       }
