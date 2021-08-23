@@ -26,8 +26,8 @@
     "format": "prettier --write .",
     "check-format": "prettier --check .",
     "dist": "rollup --config",
-    "dev": "tsc --outDir . --sourceMap --declaration",
-    "prod": "tsc --outDir . --sourceMap --declaration"
+    "dev": "yarn run dist && tsc --outDir . --sourceMap --declaration",
+    "prod": "yarn run dist && tsc --outDir . --sourceMap --declaration"
   },
   "files": [
     "/*.js",
