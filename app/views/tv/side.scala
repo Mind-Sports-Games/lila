@@ -1,5 +1,7 @@
 package views.html.tv
 
+import strategygames.variant.Variant
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -57,7 +59,7 @@ object side {
               if (game.variant.exotic)
                 views.html.game.bits.variantLink(
                   game.variant,
-                  (if (game.variant == chess.variant.KingOfTheHill) game.variant.shortName
+                  (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) game.variant.shortName
                    else game.variant.name).toUpperCase
                 )
               else

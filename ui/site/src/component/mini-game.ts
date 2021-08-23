@@ -10,33 +10,62 @@ interface UpdateData {
 const fenColor = (fen: string) => (fen.indexOf(' b') > 0 ? 'black' : 'white');
 
 export const init = (node: HTMLElement) => {
-  if (!window.Chessground) setTimeout(() => init(node), 200);
+  if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 200);
   else {
-    const [fen, orientation, lm] = node.getAttribute('data-state')!.split(','),
-      config = {
-        coordinates: false,
-        viewOnly: true,
-        resizable: false,
-        fen,
-        orientation,
-        lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
-        drawable: {
-          enabled: false,
-          visible: false,
+    const $el = $(node);
+    $el.removeClass('mini-board--init');
+    if ($el.hasClass('draughts')) {
+      const [fen, board, orientation, lm] = $el.data('state').split('|'),
+        config = {
+          coordinates: 0,
+          boardSize: board ? board.split('x').map((s: string) => parseInt(s)) : [10, 10],
+          viewOnly: !node.getAttribute('data-playable'),
+          resizable: false,
+          fen,
+          orientation,
+          lastMove: lm && [lm.slice(-4, -2), lm.slice(-2)],
+          drawable: {
+            enabled: false,
+            visible: false,
+          },
         },
-      },
-      $el = $(node).removeClass('mini-game--init'),
-      $cg = $el.find('.cg-wrap'),
-      turnColor = fenColor(fen);
-    domData.set($cg[0] as HTMLElement, 'chessground', window.Chessground($cg[0], config));
-    ['white', 'black'].forEach(color =>
-      $el.find('.mini-game__clock--' + color).each(function (this: HTMLElement) {
-        $(this).clock({
-          time: parseInt(this.getAttribute('data-time')!),
-          pause: color != turnColor,
-        });
-      })
-    );
+        $cg = $el.find('.cg-wrap'),
+        turnColor = fenColor(fen);
+      domData.set($cg[0] as HTMLElement, 'draughtsground', window.Draughtsground($cg[0], config));
+      ['white', 'black'].forEach(color =>
+        $el.find('.mini-game__clock--' + color).each(function (this: HTMLElement) {
+          $(this).clock({
+            time: parseInt(this.getAttribute('data-time')!),
+            pause: color != turnColor,
+          });
+        })
+      );
+    } else {
+      const [fen, orientation, lm] = node.getAttribute('data-state')!.split(','),
+        config = {
+          coordinates: false,
+          viewOnly: true,
+          resizable: false,
+          fen,
+          orientation,
+          lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          drawable: {
+            enabled: false,
+            visible: false,
+          },
+        },
+        $cg = $el.find('.cg-wrap'),
+        turnColor = fenColor(fen);
+      domData.set($cg[0] as HTMLElement, 'chessground', window.Chessground($cg[0], config));
+      ['white', 'black'].forEach(color =>
+        $el.find('.mini-game__clock--' + color).each(function (this: HTMLElement) {
+          $(this).clock({
+            time: parseInt(this.getAttribute('data-time')!),
+            pause: color != turnColor,
+          });
+        })
+      );
+    }
   }
   return node.getAttribute('data-live');
 };

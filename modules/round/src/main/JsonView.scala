@@ -1,14 +1,15 @@
 package lila.round
 
 import actorApi.SocketStatus
-import chess.format.{ FEN, Forsyth }
-import chess.{ Clock, Color }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.{ Clock, Color, Pos, Situation }
+import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.math
 
 import lila.common.ApiVersion
 import lila.game.JsonView._
-import lila.game.{ Pov, Game, Player => GamePlayer }
+import lila.game.{ Event, Pov, Game, Player => GamePlayer }
 import lila.pref.Pref
 import lila.user.{ User, UserRepo }
 
@@ -27,7 +28,10 @@ final class JsonView(
   import JsonView._
 
   private def checkCount(game: Game, color: Color) =
-    (game.variant == chess.variant.ThreeCheck) option game.history.checkCount(color)
+    (game.variant == strategygames.chess.variant.ThreeCheck) option game.history.checkCount(color)
+
+  private def kingMoves(game: Game, color: Color) =
+    (game.variant.frisianVariant) option game.history.kingMoves(color)
 
   private def commonPlayerJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
@@ -40,6 +44,7 @@ final class JsonView(
       .add("offeringDraw" -> p.isOfferingDraw)
       .add("proposingTakeback" -> p.isProposingTakeback)
       .add("checks" -> checkCount(g, p.color))
+      .add("kingMoves" -> kingMoves(g, p.color))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
 
@@ -77,13 +82,14 @@ final class JsonView(
               "socket" -> s"/play/$fullId/v$apiVersion",
               "round"  -> s"/$fullId"
             ),
+            "captureLength" -> captureLength(pov),
             "pref" -> Json
               .obj(
                 "animationDuration" -> animationMillis(pov, pref),
                 "coords"            -> pref.coords,
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
-                "autoQueen" -> (if (pov.game.variant == chess.variant.Antichess) Pref.AutoQueen.NEVER
+                "autoQueen" -> (if (pov.game.variant == strategygames.chess.variant.Antichess) Pref.AutoQueen.NEVER
                                 else pref.autoQueen),
                 "clockTenths" -> pref.clockTenths,
                 "moveEvent"   -> pref.moveEvent
@@ -137,6 +143,7 @@ final class JsonView(
       .add("ratingDiff" -> p.ratingDiff)
       .add("provisional" -> p.provisional)
       .add("checks" -> checkCount(g, p.color))
+      .add("kingMoves" -> kingMoves(g, p.color))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
 
@@ -171,6 +178,7 @@ final class JsonView(
             "opponent" -> commonWatcherJson(game, opponent, opponentUser, withFlags).add(
               "onGame" -> (opponent.isAi || socket.onGame(opponent.color))
             ),
+            "captureLength" -> captureLength(pov),
             "orientation" -> pov.color.name,
             "url" -> Json.obj(
               "socket" -> s"/watch/$gameId/${color.name}/v$apiVersion",
@@ -206,21 +214,22 @@ final class JsonView(
       pov: Pov,
       pref: Pref,
       initialFen: Option[FEN],
-      orientation: chess.Color,
+      orientation: Color,
       owner: Boolean,
       me: Option[User],
-      division: Option[chess.Division] = none
+      division: Option[strategygames.Division] = none
   ) = {
     import pov._
-    val fen = Forsyth >> game.chess
+    val fen = Forsyth.>>(game.variant.gameLib, game.chess)
     Json
       .obj(
         "game" -> Json
           .obj(
             "id"         -> gameId,
+            "lib"        -> game.variant.gameLib.id,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
-            "initialFen" -> (initialFen | chess.format.Forsyth.initial),
+            "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLib)),
             "fen"        -> fen,
             "turns"      -> game.turns,
             "player"     -> game.turnColor.name,
@@ -263,14 +272,61 @@ final class JsonView(
     clockWriter.writes(clock) + ("moretime" -> JsNumber(actorApi.round.Moretime.defaultDuration.toSeconds))
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =
-    (pov.game playableBy pov.player) option
-      lila.game.Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+    (pov.game.situation, pov.game.variant) match {
+      case (Situation.Chess(_), Variant.Chess(_)) => (pov.game playableBy pov.player) option
+        Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Draughts(situation), Variant.Draughts(variant))
+        => (pov.game playableBy pov.player) option {
+          if (situation.ghosts > 0) {
+            val move = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+            val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
+            destPos match {
+              case Some(dest) =>
+                Event.PossibleMoves.json(
+                  Map(Pos.Draughts(dest) -> situation.destinationsFrom(dest).map(Pos.Draughts)),
+                  apiVersion
+                )
+              case _ =>
+                Event.PossibleMoves.json(
+                  situation.allDestinations.map{
+                    case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts))
+                  },
+                  apiVersion
+                )
+            }
+          } else {
+            Event.PossibleMoves.json(
+              situation.allDestinations.map{
+                case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts))
+              },
+              apiVersion
+            )
+          }
+        }
+      case _ => sys.error("Mismatch of types for possibleMoves")
+    }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
     (pov.game playableBy pov.player) ?? {
       pov.game.situation.drops map { drops =>
         JsString(drops.map(_.key).mkString)
       }
+    }
+
+  //draughts
+  private def captureLength(pov: Pov): Int =
+    (pov.game.situation, pov.game.variant) match {
+      case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
+        if (situation.ghosts > 0) {
+          val move = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+          val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
+          destPos match {
+            case Some(dest) => ~situation.captureLengthFrom(dest)
+            case _ => situation.allMovesCaptureLength
+          }
+        } else
+          situation.allMovesCaptureLength
+      case _ => 0
     }
 
   private def animationMillis(pov: Pov, pref: Pref) =

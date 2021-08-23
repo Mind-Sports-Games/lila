@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
+    "draughtsground": "^7.6",
     "common": "2.0.0",
     "snabbdom": "^3.0.1"
   },

@@ -2,10 +2,12 @@ package lila.challenge
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl._
-import chess.{ Situation, Speed }
 import org.joda.time.DateTime
 import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
+
+import strategygames.{ GameLib, Situation, Speed }
+import strategygames.Color.{ Black, White }
 
 import lila.common.Bus
 import lila.common.LilaStream
@@ -31,11 +33,12 @@ final class ChallengeBulkApi(
     mode: play.api.Mode
 ) {
 
-  implicit private val gameHandler    = Macros.handler[ScheduledGame]
-  implicit private val variantHandler = variantByKeyHandler
-  implicit private val clockHandler   = clockConfigHandler
-  implicit private val messageHandler = stringAnyValHandler[Template](_.value, Template.apply)
-  implicit private val bulkHandler    = Macros.handler[ScheduledBulk]
+  implicit private val gameHandler         = Macros.handler[ScheduledGame]
+  implicit private val variantHandler      = variantByKeyHandler
+  implicit private val stratVariantHandler = stratVariantByKeyHandler
+  implicit private val clockHandler        = clockConfigHandler
+  implicit private val messageHandler      = stringAnyValHandler[Template](_.value, Template.apply)
+  implicit private val bulkHandler         = Macros.handler[ScheduledBulk]
 
   private val coll = colls.bulk
 
@@ -102,9 +105,14 @@ final class ChallengeBulkApi(
       .map { case (id, white, black) =>
         val game = Game
           .make(
-            chess = chess.Game(situation = Situation(bulk.variant), clock = bulk.clock.toClock.some),
-            whitePlayer = Player.make(chess.White, white.some, _(perfType)),
-            blackPlayer = Player.make(chess.Black, black.some, _(perfType)),
+            chess = strategygames
+              .Game(
+                bulk.variant.gameLib,
+                situation = Situation(bulk.variant.gameLib, bulk.variant),
+                clock = bulk.clock.toClock.some
+              ),
+            whitePlayer = Player.make(White, white.some, _(perfType)),
+            blackPlayer = Player.make(Black, black.some, _(perfType)),
             mode = bulk.mode,
             source = lila.game.Source.Api,
             pgnImport = None

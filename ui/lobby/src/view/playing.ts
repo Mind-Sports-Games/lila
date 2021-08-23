@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import LobbyController from '../ctrl';
-import { NowPlaying } from '../interfaces';
+import { NowPlaying, Variant, VariantBoardSize } from '../interfaces';
 
 function timer(pov: NowPlaying) {
   const date = Date.now() + pov.secondsLeft! * 1000;
@@ -17,6 +17,14 @@ function timer(pov: NowPlaying) {
   );
 }
 
+const boardSize = (boardSize?: VariantBoardSize) =>
+  boardSize === undefined ? '' : `${boardSize.size[0]}x${boardSize.size[1]}`;
+
+const boardClasses = (variant: Variant) =>
+  `${variant.gameLib.name.toLowerCase()}${
+    variant.gameLib.id === 1 && variant.boardSize !== undefined ? `.is${variant.boardSize.key}` : ''
+  }`;
+
 export default function (ctrl: LobbyController) {
   return h(
     'div.now-playing',
@@ -28,10 +36,16 @@ export default function (ctrl: LobbyController) {
           attrs: { href: '/' + pov.fullId },
         },
         [
-          h('span.mini-board.cg-wrap.is2d', {
-            attrs: {
-              'data-state': `${pov.fen},${pov.color},${pov.lastMove}`,
-            },
+          h(`span.mini-board.cg-wrap.is2d.${boardClasses(pov.variant)}`, {
+            attrs:
+              pov.variant.gameLib.id === 1
+                ? {
+                    // Draughts
+                    'data-state': `${pov.fen}|${boardSize(pov.variant.boardSize)}|${pov.color}|${pov.lastMove}`,
+                  }
+                : {
+                    'data-state': `${pov.fen},${pov.color},${pov.lastMove}`,
+                  },
             hook: {
               insert(vnode) {
                 playstrategy.miniBoard.init(vnode.elm as HTMLElement);

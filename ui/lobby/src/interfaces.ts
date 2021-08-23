@@ -35,16 +35,30 @@ export interface LobbyData extends Untyped {
   nowPlaying: NowPlaying[];
 }
 
+export interface VariantBoardSize {
+  size: BoardSize;
+  key: string;
+}
+
+export interface GameLib {
+  id: number;
+  name: string;
+}
+
+export interface Variant {
+  gameLib: GameLib;
+  key: string;
+  name: string;
+  boardSize?: VariantBoardSize;
+}
+
 export interface NowPlaying {
   fullId: string;
   gameId: string;
   fen: Fen;
   color: Color;
   lastMove: string;
-  variant: {
-    key: string;
-    name: string;
-  };
+  variant: Variant;
   speed: string;
   perf: string;
   rated: boolean;

@@ -1,6 +1,9 @@
 package views.html
 package game
 
+import strategygames.format.FEN
+import strategygames.variant.Variant
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -15,7 +18,7 @@ object side {
 
   def apply(
       pov: lila.game.Pov,
-      initialFen: Option[chess.format.FEN],
+      initialFen: Option[FEN],
       tour: Option[lila.tournament.TourAndTeamVs],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
@@ -28,7 +31,7 @@ object side {
 
   def meta(
       pov: lila.game.Pov,
-      initialFen: Option[chess.format.FEN],
+      initialFen: Option[FEN],
       tour: Option[lila.tournament.TourAndTeamVs],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
@@ -50,7 +53,7 @@ object side {
                       if (game.variant.exotic)
                         bits.variantLink(
                           game.variant,
-                          (if (game.variant == chess.variant.KingOfTheHill) game.variant.shortName
+                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) game.variant.shortName
                            else game.variant.name).toUpperCase,
                           initialFen = initialFen
                         )
@@ -66,7 +69,7 @@ object side {
                       if (game.variant.exotic)
                         bits.variantLink(
                           game.variant,
-                          (if (game.variant == chess.variant.KingOfTheHill) game.variant.shortName
+                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) game.variant.shortName
                            else game.variant.name).toUpperCase,
                           initialFen = initialFen
                         )
@@ -118,7 +121,10 @@ object side {
         initialFen
           .ifTrue(game.variant.chess960)
           .flatMap {
-            chess.variant.Chess960.positionNumber
+            fen => fen match {
+              case FEN.Chess(fen) => strategygames.chess.variant.Chess960.positionNumber(fen)
+              case _ => sys.error("Mismatched fen gamelib")
+            }
           }
           .map { number =>
             st.section(
@@ -145,6 +151,21 @@ object side {
         } orElse simul.map { sim =>
           st.section(cls := "game__simul-link")(
             a(href := routes.Simul.show(sim.id))(sim.fullName)
+          )
+        },
+        game.metadata.microMatch map { m =>
+          st.section(cls := "game__micro-match")(
+            if (m.startsWith("1:") && m.length == 10) frag(
+              trans.microMatch(), ": ",
+              a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.color).name))(trans.gameNumberX(1)), " ",
+              span(cls := "current")(trans.gameNumberX(2))
+            )
+            else if (m.startsWith("2:") && m.length == 10) frag(
+              trans.microMatch(), ": ",
+              span(cls := "current")(trans.gameNumberX(1)), " ",
+              a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.color).name))(trans.gameNumberX(2))
+            )
+            else trans.microMatchGameX(1)
           )
         }
       )

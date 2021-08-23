@@ -1,11 +1,11 @@
 package lila.tree
 
-import chess.Centis
-import chess.format.pgn.{ Glyph, Glyphs }
-import chess.format.{ FEN, Uci, UciCharPair }
-import chess.opening.FullOpening
-import chess.Pos
-import chess.variant.Crazyhouse
+import strategygames.Centis
+import strategygames.format.pgn.{ Glyph, Glyphs }
+import strategygames.format.{ FEN, UciCharPair, Uci }
+import strategygames.opening.FullOpening
+import strategygames.Pos
+import strategygames.chess.variant.Crazyhouse
 import play.api.libs.json._
 
 import lila.common.Json._
@@ -16,6 +16,8 @@ sealed trait Node {
   def check: Boolean
   // None when not computed yet
   def dests: Option[Map[Pos, List[Pos]]]
+  def destsUci: Option[List[String]]
+  def captureLength: Option[Int]
   def drops: Option[List[Pos]]
   def eval: Option[Eval]
   def shapes: Node.Shapes
@@ -36,7 +38,7 @@ sealed trait Node {
   def moveOption: Option[Uci.WithSan]
 
   // who's color plays next
-  def color = chess.Color.fromPly(ply)
+  def color = strategygames.Color.fromPly(ply)
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
@@ -48,6 +50,8 @@ case class Root(
     check: Boolean,
     // None when not computed yet
     dests: Option[Map[Pos, List[Pos]]] = None,
+    destsUci: Option[List[String]] = None,
+    captureLength: Option[Int] = None,
     drops: Option[List[Pos]] = None,
     eval: Option[Eval] = None,
     shapes: Node.Shapes = Node.Shapes(Nil),
@@ -78,6 +82,8 @@ case class Branch(
     check: Boolean,
     // None when not computed yet
     dests: Option[Map[Pos, List[Pos]]] = None,
+    destsUci: Option[List[String]] = None,
+    captureLength: Option[Int] = None,
     drops: Option[List[Pos]] = None,
     eval: Option[Eval] = None,
     shapes: Node.Shapes = Node.Shapes(Nil),
@@ -204,11 +210,11 @@ object Node {
       }
     )
   }
-  implicit private val crazyhouseDataWriter: OWrites[chess.variant.Crazyhouse.Data] = OWrites { v =>
+  implicit private val crazyhouseDataWriter: OWrites[strategygames.chess.variant.Crazyhouse.Data] = OWrites { v =>
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 
-  implicit val openingWriter: OWrites[chess.opening.FullOpening] = OWrites { o =>
+  implicit val openingWriter: OWrites[FullOpening] = OWrites { o =>
     Json.obj(
       "eco"  -> o.eco,
       "name" -> o.name
@@ -273,7 +279,7 @@ object Node {
         Json
           .obj(
             "ply" -> ply,
-            "fen" -> fen
+            "fen" -> fen.value
           )
           .add("id", idOption.map(_.toString))
           .add("uci", moveOption.map(_.uci.uci))
@@ -285,7 +291,14 @@ object Node {
           .add("glyphs", glyphs.nonEmpty)
           .add("shapes", if (shapes.list.nonEmpty) Some(shapes.list) else None)
           .add("opening", opening)
-          .add("dests", dests)
+          .add("dests", dests.map { dst =>
+            captureLength match {
+              case Some(capts) => "#" + capts.toString + " " + destString(dst)
+              case _ => destString(dst)
+            }
+          })
+          .add("destsUci", destsUci)
+          .add("captLen", captureLength)
           .add(
             "drops",
             drops.map { drops =>

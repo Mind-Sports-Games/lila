@@ -7,6 +7,8 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
+import strategygames.GameLib
+
 private object bits {
 
   val prefix = "sf_"
@@ -35,11 +37,20 @@ private object bits {
     )
   }
 
-  def renderVariant(form: Form[_], variants: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "variant label_select")(
-      renderLabel(form("variant"), trans.variant()),
+  def renderGameLib(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "gameLib label_select")(
+      renderLabel(form("gameLib"), "Game Family"),
       renderSelect(
-        form("variant"),
+        form("gameLib"),
+        libs
+      )
+    )
+
+  def renderVariant(form: Form[_], variants: List[SelectChoice], lib: GameLib)(implicit ctx: Context) =
+    div(cls := s"${lib.name.toLowerCase()}Variant label_select", if (lib != GameLib.Chess()) style := "display:none")(
+      renderLabel(form(s"${lib.name.toLowerCase()}Variant"), trans.variant()),
+      renderSelect(
+        form(s"${lib.name.toLowerCase()}Variant"),
         variants.filter { case (id, _, _) =>
           ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
         }
@@ -93,6 +104,18 @@ private object bits {
   def renderLabel(field: Field, content: Frag) =
     label(`for` := s"$prefix${field.id}")(content)
 
+  def renderCheckbox(field: Field, labelContent: Frag) = div(
+    span(cls := "form-check-input")(
+      form3.cmnToggle(s"$prefix${field.id}", field.name, field.value.has("true"))
+    ),
+    renderLabel(field, labelContent)
+  )
+
+  def renderMicroMatch(form: Form[_])(implicit ctx: Context) =
+    div(cls := "micro_match", title := trans.microMatchExplanation.txt())(
+      renderCheckbox(form("microMatch"), trans.microMatch())
+    )
+
   def renderTimeMode(form: Form[_], allowAnon: Boolean)(implicit ctx: Context) =
     div(cls := "time_mode_config optional_config")(
       div(
@@ -120,7 +143,7 @@ private object bits {
           div(cls := "time_choice range")(
             trans.minutesPerSide(),
             ": ",
-            span(chess.Clock.Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0).limitString),
+            span(strategygames.Clock.Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0).limitString),
             renderDissociatedRange(form("time"))
           ),
           div(cls := "increment_choice range")(

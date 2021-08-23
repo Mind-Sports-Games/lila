@@ -1,7 +1,9 @@
 package lila.study
 
-import chess.format.pgn.Glyphs
-import chess.format.{ Forsyth, Uci, UciCharPair }
+import strategygames.format.pgn.Glyphs
+import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
+import strategygames.variant.Variant
+import strategygames.{ Division, Game, GameLib, Replay, White }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -37,14 +39,19 @@ object ServerEval {
               chapterId = chapter.id.value,
               initialFen = chapter.root.fen.some,
               variant = chapter.setup.variant,
-              moves = chess.format
-                .UciDump(
+              moves =
+                UciDump(
+                  lib = chapter.setup.variant.gameLib,
                   moves = chapter.root.mainline.map(_.move.san),
                   initialFen = chapter.root.fen.some,
-                  variant = chapter.setup.variant
+                  variant = chapter.setup.variant,
+                  finalSquare = chapter.setup.variant.gameLib match {
+                    case GameLib.Draughts() => true
+                    case _ => false
+                  }
                 )
                 .toOption
-                .map(_.flatMap(chess.format.Uci.apply)) | List.empty,
+                .map(_.flatMap(m => Uci.apply(chapter.setup.variant.gameLib, m))) | List.empty,
               userId = userId,
               unlimited = unlimited
             )
@@ -133,8 +140,8 @@ object ServerEval {
         initialFen = chapter.root.fen.some
       )
 
-    private def analysisLine(root: RootOrNode, variant: chess.variant.Variant, info: Info): Option[Node] =
-      chess.Replay.gameMoveWhileValid(info.variation take 20, root.fen, variant) match {
+    private def analysisLine(root: RootOrNode, variant: Variant, info: Info): Option[Node] =
+      Replay.gameMoveWhileValid(variant.gameLib, info.variation take 20, root.fen, variant) match {
         case (_, games, error) =>
           error foreach { logger.info(_) }
           games.reverse match {
@@ -147,12 +154,12 @@ object ServerEval {
           }
       }
 
-    private def makeBranch(g: chess.Game, m: Uci.WithSan) =
+    private def makeBranch(g: Game, m: Uci.WithSan) =
       Node(
-        id = UciCharPair(m.uci),
+        id = UciCharPair(g.situation.board.variant.gameLib, m.uci),
         ply = g.turns,
         move = m,
-        fen = Forsyth >> g,
+        fen = Forsyth.>>(g.situation.board.variant.gameLib, g),
         check = g.situation.check,
         crazyData = g.situation.board.crazyData,
         clock = none,
@@ -161,11 +168,11 @@ object ServerEval {
       )
   }
 
-  case class Progress(chapterId: Chapter.Id, tree: T.Root, analysis: JsObject, division: chess.Division)
+  case class Progress(chapterId: Chapter.Id, tree: T.Root, analysis: JsObject, division: Division)
 
   def toJson(chapter: Chapter, analysis: Analysis) =
     lila.analyse.JsonView.bothPlayers(
-      lila.analyse.Accuracy.PovLike(chess.White, chapter.root.color, chapter.root.ply),
+      lila.analyse.Accuracy.PovLike(White, chapter.root.color, chapter.root.ply),
       analysis
     )
 }

@@ -2,8 +2,8 @@ package lila.insight
 
 import reactivemongo.api.bson._
 
-import chess.opening.{ Ecopening, EcopeningDB }
-import chess.{ Color, Role }
+import strategygames.chess.opening.{ Ecopening, EcopeningDB }
+import strategygames.{ Color, GameLib, Role }
 import lila.db.BSON
 import lila.db.dsl._
 import lila.rating.BSONHandlers.perfTypeIdHandler
@@ -29,8 +29,17 @@ private object BSONHandlers {
     e => BSONInteger(e.id)
   )
   implicit val RoleBSONHandler = tryHandler[Role](
-    { case BSONString(v) => Role.allByForsyth get v.head toTry s"Invalid role $v" },
-    e => BSONString(e.forsyth.toString)
+    { case BSONString(r) => r.split(":") match {
+      case Array(lib, r) =>
+        Role.allByForsyth(GameLib(lib.toInt)) get r.head toTry s"Invalid role $r"
+      case _ => sys.error("role not correctly encoded")  
+    }},
+    e => e match {
+      case Role.ChessRole(r)              => BSONString(s"0:${r.forsyth.toString}")
+      case Role.ChessPromotableRole(r)    => BSONString(s"0:${r.forsyth.toString}")
+      case Role.DraughtsRole(r)           => BSONString(s"1:${r.forsyth.toString}")
+      case Role.DraughtsPromotableRole(r) => BSONString(s"1:${r.forsyth.toString}")
+    }
   )
   implicit val TerminationBSONHandler = tryHandler[Termination](
     { case BSONInteger(v) => Termination.byId get v toTry s"Invalid termination $v" },

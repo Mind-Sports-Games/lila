@@ -1,7 +1,11 @@
 package views.html
 package round
 
-import chess.variant.{ Crazyhouse, Variant }
+import strategygames.chess.variant.Crazyhouse
+import strategygames.variant.Variant
+import strategygames.format.FEN
+import strategygames.GameLib
+
 import controllers.routes
 import scala.util.chaining._
 
@@ -27,7 +31,7 @@ object bits {
       openGraph = openGraph,
       moreJs = moreJs,
       moreCss = frag(
-        cssTag { if (variant == Crazyhouse) "round.zh" else "round" },
+        cssTag { if (variant == Variant.Chess(Crazyhouse)) "round.zh" else "round" },
         ctx.blind option cssTag("round.nvui"),
         moreCss
       ),
@@ -65,6 +69,15 @@ object bits {
       )
     )
 
+  // TODO: this is duplicated between here and app/views/board/bits.scala.
+  private def boardExtra(variant: Variant): String = {
+    val lib = variant.gameLib.name.toLowerCase()
+    variant match {
+      case Variant.Draughts(v) => s"${variant.key} ${lib} is${v.boardSize.key}"
+      case _ => s"${variant.key} ${lib}"
+    }
+  }
+
   def others(playing: List[Pov], simul: Option[lila.simul.Simul])(implicit ctx: Context) =
     frag(
       h3(
@@ -93,7 +106,7 @@ object bits {
           (myTurn ++ otherTurn.take(6 - myTurn.size)) take 9 map { pov =>
             a(href := routes.Round.player(pov.fullId), cls := pov.isMyTurn.option("my_turn"))(
               span(
-                cls := s"mini-game mini-game--init ${pov.game.variant.key} is2d",
+                cls := s"mini-game mini-game--init ${boardExtra(pov.game.variant)} is2d",
                 views.html.game.mini.renderState(pov)
               )(views.html.game.mini.cgWrap),
               span(cls := "meta")(
@@ -121,7 +134,7 @@ object bits {
   )(implicit ctx: Context) =
     views.html.game.side(
       pov,
-      (data \ "game" \ "initialFen").asOpt[String].map(chess.format.FEN.apply),
+      (data \ "game" \ "initialFen").asOpt[String].map(s => FEN.apply(pov.game.board.variant.gameLib, s)),
       tour,
       simul = simul,
       userTv = userTv,

@@ -5,7 +5,7 @@ import reactivemongo.api.ReadPreference
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 
-import chess.Speed
+import strategygames.Speed
 import lila.db.dsl._
 import lila.game.Game
 import lila.rating.{ Perf, PerfType }

@@ -1,6 +1,7 @@
 package lila.tournament
 
-import chess.format.FEN
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.{ Black, White, Clock }
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.i18n.Lang
@@ -115,6 +116,7 @@ final class JsonView(
             "minutes"   -> tour.minutes,
             "perf"      -> full.option(tour.perfType),
             "clock"     -> full.option(tour.clock),
+            "lib"       -> full.option(tour.variant.gameLib.id),
             "variant"   -> full.option(tour.variant.key)
           )
           .add("spotlight" -> tour.spotlight)
@@ -278,19 +280,19 @@ final class JsonView(
     Json
       .obj(
         "id"          -> game.id,
-        "fen"         -> chess.format.Forsyth.boardAndColor(game.situation),
+        "fen"         -> Forsyth.boardAndColor(game.variant.gameLib, game.situation),
         "orientation" -> game.naturalOrientation.name,
         "color"       -> game.naturalOrientation.name, // app BC https://github.com/ornicar/lila/issues/7195
         "lastMove"    -> ~game.lastMoveKeys,
-        "white"       -> ofPlayer(featured.white, game player chess.White),
-        "black"       -> ofPlayer(featured.black, game player chess.Black)
+        "white"       -> ofPlayer(featured.white, game player White),
+        "black"       -> ofPlayer(featured.black, game player Black)
       )
       .add(
         // not named `clock` to avoid conflict with lichobile
         "c" -> game.clock.ifTrue(game.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(chess.White).roundSeconds,
-            "black" -> c.remainingTime(chess.Black).roundSeconds
+            "white" -> c.remainingTime(White).roundSeconds,
+            "black" -> c.remainingTime(Black).roundSeconds
           )
         }
       )
@@ -529,7 +531,7 @@ object JsonView {
       "speed" -> s.speed.key
     )
 
-  implicit val clockWrites: OWrites[chess.Clock.Config] = OWrites { clock =>
+  implicit val clockWrites: OWrites[Clock.Config] = OWrites { clock =>
     Json.obj(
       "limit"     -> clock.limitSeconds,
       "increment" -> clock.incrementSeconds
@@ -544,13 +546,13 @@ object JsonView {
             "eco"      -> pos.eco,
             "name"     -> pos.name,
             "wikiPath" -> pos.wikiPath,
-            "fen"      -> pos.fen
+            "fen"      -> pos.fen.value
           )
       case None =>
         Json
           .obj(
             "name" -> "Custom position",
-            "fen"  -> fen
+            "fen"  -> fen.value
           )
     }
 

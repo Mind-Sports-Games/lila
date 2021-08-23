@@ -2,18 +2,11 @@ package lila.game
 
 import play.api.libs.json._
 
-import chess.variant.Crazyhouse
-import chess.{
-  Centis,
-  PromotableRole,
-  Pos,
-  Color,
-  Situation,
-  Move => ChessMove,
-  Drop => ChessDrop,
-  Clock => ChessClock,
-  Status
-}
+import strategygames.chess.variant.Crazyhouse
+import strategygames.{ Board, Centis, Color, GameLib, Move => StratMove, PromotableRole, Pos, Situation, Status, Role, White, Black }
+import strategygames.chess
+import strategygames.format.Forsyth
+import strategygames.chess.format.pgn.Dumper
 import JsonView._
 import lila.chat.{ PlayerLine, UserLine }
 import lila.common.ApiVersion
@@ -41,6 +34,7 @@ object Event {
   object MoveOrDrop {
 
     def data(
+        lib: GameLib,
         fen: String,
         check: Boolean,
         threefold: Boolean,
@@ -48,13 +42,16 @@ object Event {
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
         possibleDrops: Option[List[Pos]],
-        crazyData: Option[Crazyhouse.Data]
+        crazyData: Option[Crazyhouse.Data],
+        captLen: Option[Int] = None
     )(extra: JsObject) = {
       extra ++ Json
         .obj(
           "fen"   -> fen,
           "ply"   -> state.turns,
-          "dests" -> PossibleMoves.oldJson(possibleMoves)
+          "dests" -> PossibleMoves.oldJson(possibleMoves),
+          "captLen" -> ~captLen,
+          "lib"     -> lib.id
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -71,6 +68,7 @@ object Event {
   }
 
   case class Move(
+      lib: GameLib,
       orig: Pos,
       dest: Pos,
       san: String,
@@ -84,11 +82,23 @@ object Event {
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       possibleDrops: Option[List[Pos]],
-      crazyData: Option[Crazyhouse.Data]
+      crazyData: Option[Crazyhouse.Data],
+      captLen: Option[Int]
   ) extends Event {
     def typ = "move"
     def data =
-      MoveOrDrop.data(fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
+      MoveOrDrop.data(
+        lib,
+        fen,
+        check,
+        threefold,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        crazyData,
+        captLen
+      ) {
         Json
           .obj(
             "uci" -> s"${orig.key}${dest.key}",
@@ -102,36 +112,66 @@ object Event {
   }
   object Move {
     def apply(
-        move: ChessMove,
+        move: StratMove,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
         crazyData: Option[Crazyhouse.Data]
     ): Move =
       Move(
+        lib = situation.board.variant.gameLib,
         orig = move.orig,
         dest = move.dest,
-        san = chess.format.pgn.Dumper(move),
-        fen = chess.format.Forsyth.exportBoard(situation.board),
+        san = move match {
+          case StratMove.Chess(move)    => Dumper(move)
+          case StratMove.Draughts(move) => strategygames.draughts.format.pdn.Dumper(move)
+        },
+        fen = if (situation.board.variant.gameLib == GameLib.Draughts() && situation.board.variant.frisianVariant)
+            situation.board match {
+              case Board.Draughts(board)
+                => Forsyth.exportBoard(GameLib.Draughts(), situation.board) + ":" + 
+                  strategygames.draughts.format.Forsyth.exportKingMoves(board)
+              case _ => sys.error("mismatched board lib types")
+            }
+          else
+            Forsyth.exportBoard(situation.board.variant.gameLib, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         promotion = move.promotion.map { Promotion(_, move.dest) },
         enpassant = (move.capture ifTrue move.enpassant).map {
-          Event.Enpassant(_, !move.color)
+          (capture: List[Pos]) => Event.Enpassant(capture(0), !move.color)
         },
         castle = move.castle.map { case (king, rook) =>
           Castling(king, rook, move.color)
         },
         state = state,
         clock = clock,
-        possibleMoves = situation.destinations,
+        possibleMoves = (situation, move.dest) match {
+          case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
+            if (situation.ghosts > 0)
+              Map(Pos.Draughts(moveDest) ->
+                situation.destinationsFrom(moveDest).map(Pos.Draughts)
+              )
+            else situation.allDestinations.map{
+              case(from, to) => (Pos.Draughts(from), to.map(Pos.Draughts))
+            }
+          case _ => situation.destinations
+        },
         possibleDrops = situation.drops,
-        crazyData = crazyData
+        crazyData = crazyData,
+        captLen = (situation, move.dest) match {
+          case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
+            if (situation.ghosts > 0)
+              situation.captureLengthFrom(moveDest)
+            else
+              situation.allMovesCaptureLength.some
+          case _ => None
+        }
       )
   }
 
   case class Drop(
-      role: chess.Role,
+      role: Role,
       pos: Pos,
       san: String,
       fen: String,
@@ -145,7 +185,7 @@ object Event {
   ) extends Event {
     def typ = "drop"
     def data =
-      MoveOrDrop.data(fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
+      MoveOrDrop.data(GameLib.Chess(), fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
         Json.obj(
           "role" -> role.name,
           "uci"  -> s"${role.pgn}@${pos.key}",
@@ -156,17 +196,17 @@ object Event {
   }
   object Drop {
     def apply(
-        drop: ChessDrop,
+        drop: chess.Drop,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
         crazyData: Option[Crazyhouse.Data]
     ): Drop =
       Drop(
-        role = drop.piece.role,
-        pos = drop.pos,
-        san = chess.format.pgn.Dumper(drop),
-        fen = chess.format.Forsyth.exportBoard(situation.board),
+        role = Role.ChessRole(drop.piece.role),
+        pos = Pos.Chess(drop.pos),
+        san = Dumper(drop),
+        fen = Forsyth.exportBoard(GameLib.Chess(), situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         state = state,
@@ -241,11 +281,16 @@ object Event {
   }
 
   case class Promotion(role: PromotableRole, pos: Pos) extends Event {
+    private val lib = pos match {
+      case Pos.Chess(_)    => GameLib.Chess().id
+      case Pos.Draughts(_) => GameLib.Draughts().id
+    }
     def typ = "promotion"
     def data =
       Json.obj(
         "key"        -> pos.key,
-        "pieceClass" -> role.toString.toLowerCase
+        "pieceClass" -> role.toString.toLowerCase,
+        "lib"        -> lib
       )
   }
 
@@ -280,8 +325,8 @@ object Event {
         )
         .add("clock" -> game.clock.map { c =>
           Json.obj(
-            "wc" -> c.remainingTime(Color.White).centis,
-            "bc" -> c.remainingTime(Color.Black).centis
+            "wc" -> c.remainingTime(White).centis,
+            "bc" -> c.remainingTime(Black).centis
           )
         })
         .add("ratingDiff" -> ratingDiff.map { rds =>
@@ -343,10 +388,10 @@ object Event {
         .add("lag" -> nextLagComp.collect { case Centis(c) if c > 1 => c })
   }
   object Clock {
-    def apply(clock: ChessClock): Clock =
+    def apply(clock: strategygames.Clock): Clock =
       Clock(
-        clock remainingTime Color.White,
-        clock remainingTime Color.Black,
+        clock remainingTime White,
+        clock remainingTime Black,
         clock lagCompEstimate clock.color
       )
   }
@@ -372,6 +417,16 @@ object Event {
         "white" -> white,
         "black" -> black
       )
+  }
+
+  case class KingMoves(white: Int, black: Int, whiteKing: Option[Pos], blackKing: Option[Pos]) extends Event {
+    def typ = "kingMoves"
+    def data = Json.obj(
+      "white" -> white,
+      "black" -> black,
+      "whiteKing" -> whiteKing.map(_.toString),
+      "blackKing" -> blackKing.map(_.toString)
+    )
   }
 
   case class State(

@@ -1,7 +1,7 @@
 package controllers
 
-import chess.format.FEN
-import chess.White
+import strategygames.format.FEN
+import strategygames.{ Color, Replay, White }
 import play.api.mvc._
 import views._
 
@@ -94,7 +94,7 @@ final class Analyse(
     Action.async { implicit req =>
       env.game.gameRepo.gameWithInitialFen(gameId) flatMap {
         case Some((game, initialFen)) =>
-          val pov = Pov(game, chess.Color.fromName(color) | White)
+          val pov = Pov(game, Color.fromName(color) | White)
           env.api.roundApi.embed(
             pov,
             lila.api.Mobile.Api.currentVersion,
@@ -108,11 +108,11 @@ final class Analyse(
     }
 
   private def RedirectAtFen(pov: Pov, initialFen: Option[FEN])(or: => Fu[Result])(implicit ctx: Context) =
-    get("fen").map(FEN.clean).fold(or) { atFen =>
+    get("fen").map(s => FEN.clean(pov.game.variant.gameLib, s)).fold(or) { atFen =>
       val url = routes.Round.watcher(pov.gameId, pov.color.name)
       fuccess {
-        chess.Replay
-          .plyAtFen(pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
+        Replay
+          .plyAtFen(pov.game.variant.gameLib, pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
           .fold(
             err => {
               lila.log("analyse").info(s"RedirectAtFen: ${pov.gameId} $atFen $err")

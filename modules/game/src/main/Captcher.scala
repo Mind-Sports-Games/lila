@@ -3,9 +3,10 @@ package lila.game
 import akka.actor._
 import akka.pattern.pipe
 import cats.data.NonEmptyList
-import chess.format.pgn.{ Sans, Tags }
-import chess.format.{ pgn, Forsyth }
-import chess.{ Game => ChessGame }
+import strategygames.format.pgn.{ Sans, Tags }
+import strategygames.chess.format.pgn
+import strategygames.format.Forsyth
+import strategygames.{ Game => StratGame }
 import scala.util.Success
 
 import lila.common.Captcha
@@ -74,6 +75,7 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
         _ flatMap { makeCaptcha(game, _) }
       }
 
+    // Captchas can remain as chess games IMO
     private def makeCaptcha(game: Game, moves: PgnMoves): Option[Captcha] =
       for {
         rewinded  <- rewind(moves)
@@ -83,7 +85,7 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
         }
       } yield Captcha(game.id, fen(rewinded), rewinded.player.white, solutions, moves = moves)
 
-    private def solve(game: ChessGame): Option[Captcha.Solutions] =
+    private def solve(game: StratGame): Option[Captcha.Solutions] =
       game.situation.moves.view
         .flatMap { case (_, moves) =>
           moves filter { move =>
@@ -94,14 +96,17 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
         s"${move.orig} ${move.dest}"
       } toNel
 
-    private def rewind(moves: PgnMoves): Option[ChessGame] =
+    private def rewind(moves: PgnMoves): Option[StratGame] =
       pgn.Reader
         .movesWithSans(
           moves,
           sans => Sans(safeInit(sans.value)),
           tags = Tags.empty
         )
-        .flatMap(_.valid) map (_.state) toOption
+        .flatMap(_.valid)
+        .map(_.state)
+        .toOption
+        .map(StratGame.Chess)
 
     private def safeInit[A](list: List[A]): List[A] =
       list match {
@@ -110,6 +115,7 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
         case _        => Nil
       }
 
-    private def fen(game: ChessGame): String = Forsyth exportBoard game.board
+    private def fen(game: StratGame): String =
+      Forsyth.exportBoard(game.board.variant.gameLib, game.board)
   }
 }

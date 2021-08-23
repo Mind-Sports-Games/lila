@@ -1,5 +1,6 @@
 package lila.perfStat
 
+import strategygames.variant.Variant
 import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 

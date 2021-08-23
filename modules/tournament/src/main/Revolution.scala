@@ -4,7 +4,9 @@ import org.joda.time.DateTime
 import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
-import chess.variant.Variant
+import strategygames.variant.Variant
+import strategygames.GameLib
+
 import lila.db.dsl._
 import lila.user.User
 import lila.memo.CacheApi._
@@ -40,7 +42,12 @@ final class RevolutionApi(
             for {
               doc     <- docOpt
               winner  <- doc.getAsOpt[User.ID]("winner")
-              variant <- doc.int("variant") flatMap Variant.apply
+              variant <- doc.int("variant") flatMap {
+                v => Variant.apply(GameLib(doc.int("lib") match {
+                  case Some(lib) => lib
+                  case None => sys.error("tournament cache needs a lib")
+                }), v)
+              }
               id      <- doc.getAsOpt[Tournament.ID]("_id")
             } yield Award(
               owner = winner,

@@ -1,7 +1,9 @@
 package lila.study
 
-import chess.format.{ FEN, Uci }
-import chess.Pos
+import strategygames.format.{ FEN, Uci }
+import strategygames.format.pgn.{ Tag, Tags }
+import strategygames.variant.Variant
+import strategygames.{ GameLib, Pos }
 import play.api.libs.json._
 import scala.util.chaining._
 
@@ -131,12 +133,12 @@ object JsonView {
     JsString(u.uci)
   }
   implicit private val posReader: Reads[Pos] = Reads[Pos] { v =>
-    (v.asOpt[String] flatMap Pos.fromKey).fold[JsResult[Pos]](JsError(Nil))(JsSuccess(_))
+    (v.asOpt[String] flatMap {p => Pos.fromKey(GameLib.Chess(), p)}).fold[JsResult[Pos]](JsError(Nil))(JsSuccess(_))
   }
   implicit private[study] val pathWrites: Writes[Path] = Writes[Path] { p =>
     JsString(p.toString)
   }
-  implicit private[study] val colorWriter: Writes[chess.Color] = Writes[chess.Color] { c =>
+  implicit private[study] val colorWriter: Writes[strategygames.Color] = Writes[strategygames.Color] { c =>
     JsString(c.name)
   }
   implicit private[study] val fenWriter: Writes[FEN] = Writes[FEN] { f =>
@@ -176,13 +178,13 @@ object JsonView {
     JsNumber(p.value)
   }
 
-  implicit private val variantWrites = OWrites[chess.variant.Variant] { v =>
+  implicit private val variantWrites = OWrites[Variant] { v =>
     Json.obj("key" -> v.key, "name" -> v.name)
   }
-  implicit val pgnTagWrites: Writes[chess.format.pgn.Tag] = Writes[chess.format.pgn.Tag] { t =>
+  implicit val pgnTagWrites: Writes[Tag] = Writes[Tag] { t =>
     Json.arr(t.name.toString, t.value)
   }
-  implicit val pgnTagsWrites = Writes[chess.format.pgn.Tags] { tags =>
+  implicit val pgnTagsWrites = Writes[Tags] { tags =>
     JsArray(tags.value map pgnTagWrites.writes)
   }
   implicit private val chapterSetupWrites = Json.writes[Chapter.Setup]

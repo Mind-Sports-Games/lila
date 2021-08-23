@@ -1,7 +1,7 @@
 package views.html
 package base
 
-import chess.format.FEN
+import strategygames.format.FEN
 import controllers.routes
 import play.api.i18n.Lang
 import play.api.mvc.Call

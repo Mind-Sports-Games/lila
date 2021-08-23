@@ -1,5 +1,7 @@
 package views.html.simul
 
+import strategygames.format.FEN
+
 import controllers.routes
 import play.api.libs.json.Json
 
@@ -76,7 +78,7 @@ object show {
                   br,
                   a(targetBlank, href := pos.url)(strong(pos.eco), " ", pos.name),
                   " • ",
-                  views.html.base.bits.fenAnalysisLink(pos.fen)
+                  views.html.base.bits.fenAnalysisLink(FEN.Chess(pos.fen))
                 )
               } orElse sim.position.map { fen =>
                 frag(

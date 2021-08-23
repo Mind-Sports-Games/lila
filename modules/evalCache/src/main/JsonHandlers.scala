@@ -1,7 +1,9 @@
 package lila.evalCache
 
 import cats.implicits._
-import chess.format.{ FEN, Uci }
+import strategygames.format.{ FEN, Uci }
+import strategygames.variant.Variant
+import strategygames.GameLib
 import play.api.libs.json._
 
 import lila.common.Json._
@@ -16,7 +18,7 @@ object JsonHandlers {
 
   def writeEval(e: Eval, fen: FEN) =
     Json.obj(
-      "fen"    -> fen,
+      "fen"    -> fen.value,
       "knodes" -> e.knodes,
       "depth"  -> e.depth,
       "pvs"    -> e.pvs.toList.map(writePv)
@@ -40,7 +42,10 @@ object JsonHandlers {
       depth  <- d int "depth"
       pvObjs <- d objs "pvs"
       pvs    <- pvObjs.map(parsePv).sequence.flatMap(_.toNel)
-      variant = chess.variant.Variant orDefault ~d.str("variant")
+      variant = Variant.orDefault(GameLib(d int "lib" match {
+        case Some(lib) => lib
+        case None      => sys.error("lib must be provided for readPutData")
+      }), ~d.str("variant"))
     } yield Input.Candidate(
       variant,
       fen,
@@ -61,7 +66,10 @@ object JsonHandlers {
           .split(' ')
           .take(EvalCacheEntry.MAX_PV_SIZE)
           .foldLeft(List.empty[Uci].some) {
-            case (Some(ucis), str) => Uci(str) map (_ :: ucis)
+            case (Some(ucis), str) => Uci(GameLib(d int "lib" match {
+              case Some(lib) => lib
+              case None      => sys.error("lib must be provided for parsePv")
+            }), str) map (_ :: ucis)
             case _                 => None
           }
           .flatMap(_.reverse.toNel) map Moves.apply

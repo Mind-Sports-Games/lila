@@ -2,15 +2,15 @@ package lila.round
 
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl._
-import chess.Color
-import chess.format.Forsyth
+import strategygames.Color
+import strategygames.format.Forsyth
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext
 
 import lila.common.Bus
 import lila.game.actorApi.MoveGameEvent
 import lila.game.{ Game, GameRepo }
-import chess.{ Centis, Replay }
+import strategygames.{ Centis, Replay }
 import lila.game.actorApi.FinishGame
 
 final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(implicit
@@ -42,14 +42,14 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
                 times <- game.bothClockStates
               } yield Vector(clk.config.initTime, clk.config.initTime) ++ times)
               val clockOffset = game.startColor.fold(0, 1)
-              Replay.situations(game.pgnMoves, initialFen, game.variant) foreach {
+              Replay.situations(game.variant.gameLib, game.pgnMoves, initialFen, game.variant) foreach {
                 _.zipWithIndex foreach { case (s, index) =>
                   val clk = for {
                     white <- clocks.lift(index + 1 - clockOffset)
                     black <- clocks.lift(index - clockOffset)
                   } yield (white, black)
                   queue offer toJson(
-                    Forsyth exportBoard s.board,
+                    Forsyth.exportBoard(s.board.variant.gameLib, s.board),
                     s.color,
                     s.board.history.lastMove.map(_.uci),
                     clk
@@ -83,7 +83,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
       game.turnColor,
       lastMoveUci,
       game.clock.map { clk =>
-        (clk.remainingTime(chess.White), clk.remainingTime(chess.Black))
+        (clk.remainingTime(strategygames.White), clk.remainingTime(strategygames.Black))
       }
     )
 

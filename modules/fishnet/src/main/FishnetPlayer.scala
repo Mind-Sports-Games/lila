@@ -2,7 +2,7 @@ package lila.fishnet
 
 import scala.concurrent.duration._
 
-import chess.{ Black, Clock, White }
+import strategygames.{ Black, Clock, White }
 
 import lila.common.Future
 import lila.game.{ Game, GameRepo, UciMemo }
@@ -55,7 +55,7 @@ final class FishnetPlayer(
             _id = Work.makeId,
             game = Work.Game(
               id = game.id,
-              initialFen = initialFen,
+              initialFen = initialFen.map(_.value),
               studyId = none,
               variant = game.variant,
               moves = moves mkString " "

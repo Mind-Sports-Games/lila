@@ -2,11 +2,14 @@ package lila.challenge
 
 import reactivemongo.api.bson._
 
-import chess.variant.Variant
+import strategygames.GameLib
+import strategygames.variant.Variant
 import lila.db.BSON
 import lila.db.BSON.{ Reader, Writer }
 import lila.db.dsl._
 import scala.util.Success
+
+import cats.implicits._
 
 private object BSONHandlers {
 
@@ -25,24 +28,28 @@ private object BSONHandlers {
     }
   )
   implicit val TimeControlBSONHandler = new BSON[TimeControl] {
-    import cats.implicits._
     def reads(r: Reader) =
       (r.intO("l"), r.intO("i")) mapN { (limit, inc) =>
-        TimeControl.Clock(chess.Clock.Config(limit, inc))
+        TimeControl.Clock(strategygames.Clock.Config(limit, inc))
       } orElse {
         r intO "d" map TimeControl.Correspondence.apply
       } getOrElse TimeControl.Unlimited
     def writes(w: Writer, t: TimeControl) =
       t match {
-        case TimeControl.Clock(chess.Clock.Config(l, i)) => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.Clock.Config(l, i)) => $doc("l" -> l, "i" -> i)
         case TimeControl.Correspondence(d)               => $doc("d" -> d)
         case TimeControl.Unlimited                       => $empty
       }
   }
-  implicit val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(v) toTry s"No such variant: $v" },
-    x => BSONInteger(x.id)
-  )
+
+  implicit val VariantBSONHandler = new BSON[Variant] {
+    def reads(r: Reader) = Variant(GameLib(r.intD("gl")), r.int("v")) match {
+      case Some(v) => v
+      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelib: ${r.intD("gl")}")
+    }
+    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLib.id, "v" -> v.id)
+  }
+
   implicit val StatusBSONHandler = tryHandler[Status](
     { case BSONInteger(v) => Status(v) toTry s"No such status: $v" },
     x => BSONInteger(x.id)

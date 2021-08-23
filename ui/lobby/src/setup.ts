@@ -134,10 +134,13 @@ export default class Setup {
       $modeChoices = $modeChoicesWrap.find('input'),
       $casual = $modeChoices.eq(0),
       $rated = $modeChoices.eq(1),
-      $variantSelect = $form.find('#sf_variant'),
+      $gameLibSelect = $form.find('#sf_gameLib'),
+      $chessVariantSelect = $form.find('#sf_chessVariant'),
+      $draughtsVariantSelect = $form.find('#sf_draughtsVariant'),
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
+      $microMatch = $form.find('.micro_match'),
       $timeInput = $form.find('.time_choice [name=time]'),
       $incrementInput = $form.find('.increment_choice [name=increment]'),
       $daysInput = $form.find('.days_choice [name=days]'),
@@ -146,7 +149,17 @@ export default class Setup {
       randomColorVariants = $form.data('random-color-variants').split(','),
       $submits = $form.find('.color-submits__button'),
       toggleButtons = () => {
-        const variantId = $variantSelect.val(),
+        randomColorVariants;
+        const gameLibId = $gameLibSelect.val(),
+          variantId = () => {
+            switch (gameLibId) {
+              case '0':
+                return $chessVariantSelect.val();
+              case '1':
+                return $draughtsVariantSelect.val();
+            }
+            return $chessVariantSelect.val();
+          },
           timeMode = $timeModeSelect.val(),
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
@@ -154,7 +167,7 @@ export default class Setup {
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
-            (variantId != '1' && (timeMode != '1' || (limit < 0.5 && inc == 0) || (limit == 0 && inc < 2)));
+            (variantId() != '1' && (timeMode != '1' || (limit < 0.5 && inc == 0) || (limit == 0 && inc < 2)));
         if (cantBeRated && rated) {
           $casual.trigger('click');
           return toggleButtons();
@@ -162,10 +175,10 @@ export default class Setup {
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
         const timeOk = timeMode != '1' || limit > 0 || inc > 0,
           ratedOk = typ != 'hook' || !rated || timeMode != '0',
-          aiOk = typ != 'ai' || variantId != '3' || limit >= 1;
+          aiOk = typ != 'ai' || variantId() != '3' || limit >= 1;
         if (timeOk && ratedOk && aiOk) {
           $submits.toggleClass('nope', false);
-          $submits.filter(':not(.random)').toggle(!rated || !randomColorVariants.includes(variantId));
+          $submits.filter(':not(.random)').toggle(!rated || !randomColorVariants.includes(variantId()));
         } else $submits.toggleClass('nope', true);
       },
       save = function () {
@@ -187,44 +200,75 @@ export default class Setup {
     const showRating = () => {
       const timeMode = $timeModeSelect.val();
       let key = 'correspondence';
-      switch ($variantSelect.val()) {
-        case '1':
-        case '3':
-          if (timeMode == '1') {
-            const time = parseFloat($timeInput.val() as string) * 60 + parseFloat($incrementInput.val() as string) * 40;
-            if (time < 30) key = 'ultraBullet';
-            else if (time < 180) key = 'bullet';
-            else if (time < 480) key = 'blitz';
-            else if (time < 1500) key = 'rapid';
-            else key = 'classical';
+      switch ($gameLibSelect.val()) {
+        case '0':
+          switch ($chessVariantSelect.val()) {
+            case '1':
+            case '3':
+              if (timeMode == '1') {
+                const time =
+                  parseFloat($timeInput.val() as string) * 60 + parseFloat($incrementInput.val() as string) * 40;
+                if (time < 30) key = 'ultraBullet';
+                else if (time < 180) key = 'bullet';
+                else if (time < 480) key = 'blitz';
+                else if (time < 1500) key = 'rapid';
+                else key = 'classical';
+              }
+              break;
+            case '10':
+              key = 'crazyhouse';
+              break;
+            case '2':
+              key = 'chess960';
+              break;
+            case '4':
+              key = 'kingOfTheHill';
+              break;
+            case '5':
+              key = 'threeCheck';
+              break;
+            case '6':
+              key = 'antichess';
+              break;
+            case '7':
+              key = 'atomic';
+              break;
+            case '8':
+              key = 'horde';
+              break;
+            case '9':
+              key = 'racingKings';
+              break;
+            case '11':
+              key = 'linesOfAction';
+              break;
+            default:
+              key = 'standard';
+              break;
           }
           break;
-        case '10':
-          key = 'crazyhouse';
-          break;
-        case '2':
-          key = 'chess960';
-          break;
-        case '4':
-          key = 'kingOfTheHill';
-          break;
-        case '5':
-          key = 'threeCheck';
-          break;
-        case '6':
-          key = 'antichess';
-          break;
-        case '7':
-          key = 'atomic';
-          break;
-        case '8':
-          key = 'horde';
-          break;
-        case '9':
-          key = 'racingKings';
-          break;
-        case '11':
-          key = 'linesOfAction';
+        case '1':
+          switch ($draughtsVariantSelect.val()) {
+            case '1':
+            case '10':
+              key = 'frisian';
+              break;
+            case '8':
+              key = 'frysk';
+              break;
+            case '6':
+              key = 'antidraughts';
+              break;
+            case '9':
+              key = 'breakthrough';
+              break;
+            case '11':
+              key = 'russian';
+              break;
+            case '12':
+              key = 'brazilian';
+              break;
+          }
           break;
       }
       const $selected = $ratings
@@ -281,7 +325,8 @@ export default class Setup {
         $form.find('.color-submits').append(playstrategy.spinnerHtml);
       });
     if (this.root.opts.blindMode) {
-      $variantSelect[0]!.focus();
+      $chessVariantSelect[0]!.focus();
+      $draughtsVariantSelect[0]!.focus();
       $timeInput.add($incrementInput).on('change', () => {
         toggleButtons();
         showRating();
@@ -409,8 +454,26 @@ export default class Setup {
     }, 200);
     $fenInput.on('keyup', validateFen);
 
-    if (forceFromPosition) $variantSelect.val('3');
-    $variantSelect
+    if (forceFromPosition) {
+      switch ($gameLibSelect.val()) {
+        case '0':
+          $chessVariantSelect.val('3');
+          break;
+        case '1':
+          $draughtsVariantSelect.val('3');
+          break;
+      }
+    }
+
+    $gameLibSelect
+      .on('change', function (this: HTMLElement) {
+        const gameLib = $(this).val();
+        $form.find('.chessVariant').toggle(gameLib == '0');
+        $form.find('.draughtsVariant').toggle(gameLib == '1');
+      })
+      .trigger('change');
+
+    $chessVariantSelect
       .on('change', function (this: HTMLElement) {
         const isFen = $(this).val() == '3';
         $fenPosition.toggle(isFen);
@@ -418,6 +481,21 @@ export default class Setup {
         if (isFen) {
           $casual.trigger('click');
           requestAnimationFrame(() => document.body.dispatchEvent(new Event('chessground.resize')));
+        }
+        showRating();
+        toggleButtons();
+      })
+      .trigger('change');
+
+    $draughtsVariantSelect
+      .on('change', function (this: HTMLElement) {
+        const isFen = $(this).val() == '3';
+        $fenPosition.toggle(isFen);
+        $microMatch.toggle(isFen);
+        $modeChoicesWrap.toggle(!isFen);
+        if (isFen) {
+          $casual.trigger('click');
+          requestAnimationFrame(() => document.body.dispatchEvent(new Event('draughtsground.resize')));
         }
         showRating();
         toggleButtons();

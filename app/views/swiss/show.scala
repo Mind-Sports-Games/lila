@@ -1,6 +1,8 @@
 package views.html
 package swiss
 
+import strategygames.{ Black, White }
+
 import controllers.routes
 import play.api.libs.json.Json
 
@@ -99,8 +101,8 @@ object show {
               tr(cls := "paginated")(
                 td(a(href := routes.Round.watcher(p.gameId, "white"), cls := "glpt")(s"#${p.gameId}")),
                 td(userIdLink(p.white.some)),
-                td(p strResultOf chess.White),
-                td(p strResultOf chess.Black),
+                td(p strResultOf White),
+                td(p strResultOf Black),
                 td(userIdLink(p.black.some))
               )
             },

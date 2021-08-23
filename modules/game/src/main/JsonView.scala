@@ -2,9 +2,11 @@ package lila.game
 
 import play.api.libs.json._
 
-import chess.format.{ FEN, Forsyth }
-import chess.variant.Crazyhouse
-import chess.{ Clock, Color }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.chess.variant.Crazyhouse
+import strategygames.opening.FullOpening
+import strategygames.{ Black, Clock, Color, Division, Status, White }
+import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
 
 final class JsonView(rematches: Rematches) {
@@ -15,12 +17,13 @@ final class JsonView(rematches: Rematches) {
     Json
       .obj(
         "id"            -> game.id,
+        "lib"           -> game.variant.gameLib.id,
         "variant"       -> game.variant,
         "speed"         -> game.speed.key,
         "perf"          -> PerfPicker.key(game),
         "rated"         -> game.rated,
-        "initialFen"    -> (initialFen | chess.format.Forsyth.initial),
-        "fen"           -> (Forsyth >> game.chess),
+        "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLib)),
+        "fen"           -> (Forsyth.>>(game.variant.gameLib, game.chess)),
         "player"        -> game.turnColor,
         "turns"         -> game.turns,
         "startedAtTurn" -> game.chess.startedAtTurn,
@@ -37,11 +40,15 @@ final class JsonView(rematches: Rematches) {
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedPlies))
+      .add("microMatch" -> game.metadata.microMatchGameNr.map { index =>
+        Json.obj("index" -> index)
+          .add("gameId" -> game.metadata.microMatchGameId.filter("*" !=))
+      })
 }
 
 object JsonView {
 
-  implicit val statusWrites: OWrites[chess.Status] = OWrites { s =>
+  implicit val statusWrites: OWrites[Status] = OWrites { s =>
     Json.obj(
       "id"   -> s.id,
       "name" -> s.name
@@ -86,7 +93,7 @@ object JsonView {
     )
   }
 
-  implicit val crazyhouseDataWriter: OWrites[chess.variant.Crazyhouse.Data] = OWrites { v =>
+  implicit val crazyhouseDataWriter: OWrites[Crazyhouse.Data] = OWrites { v =>
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 
@@ -97,11 +104,29 @@ object JsonView {
     )
   }
 
-  implicit val variantWriter: OWrites[chess.variant.Variant] = OWrites { v =>
+  implicit val variantWriter: OWrites[Variant] = OWrites { v =>
+    v match {
+      case v: Variant.Chess =>
+        Json.obj(
+          "key"   -> v.key,
+          "name"  -> v.name,
+          "short" -> v.shortName
+        )
+      case Variant.Draughts(draughtsVariant) =>
+        Json.obj(
+          "key"   -> v.key,
+          "name"  -> v.name,
+          "short" -> v.shortName,
+          "gameType" -> v.gameType,
+          "board" -> draughtsVariant.boardSize
+        )
+    }
+  }
+
+  implicit val boardSizeWriter: Writes[strategygames.draughts.Board.BoardSize] = Writes[strategygames.draughts.Board.BoardSize] { b =>
     Json.obj(
-      "key"   -> v.key,
-      "name"  -> v.name,
-      "short" -> v.shortName
+      "key" -> b.key,
+      "size" -> b.sizes
     )
   }
 
@@ -110,8 +135,8 @@ object JsonView {
       "running"   -> c.isRunning,
       "initial"   -> c.limitSeconds,
       "increment" -> c.incrementSeconds,
-      "white"     -> c.remainingTime(Color.White).toSeconds,
-      "black"     -> c.remainingTime(Color.Black).toSeconds,
+      "white"     -> c.remainingTime(White).toSeconds,
+      "black"     -> c.remainingTime(Black).toSeconds,
       "emerg"     -> c.config.emergSeconds
     )
   }
@@ -125,7 +150,7 @@ object JsonView {
     )
   }
 
-  implicit val openingWriter: OWrites[chess.opening.FullOpening.AtPly] = OWrites { o =>
+  implicit val openingWriter: OWrites[FullOpening.AtPly] = OWrites { o =>
     Json.obj(
       "eco"  -> o.opening.eco,
       "name" -> o.opening.name,
@@ -133,7 +158,7 @@ object JsonView {
     )
   }
 
-  implicit val divisionWriter: OWrites[chess.Division] = OWrites { o =>
+  implicit val divisionWriter: OWrites[Division] = OWrites { o =>
     Json.obj(
       "middle" -> o.middle,
       "end"    -> o.end

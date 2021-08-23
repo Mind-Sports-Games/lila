@@ -1,13 +1,15 @@
 package lila.study
 
-import chess.format.pgn.{ Glyph, Tags }
-import chess.variant.Variant
-import chess.{ Centis, Color }
+import strategygames.format.pgn.{ Glyph, Tags }
+import strategygames.format.FEN
+import strategygames.variant.Variant
+import strategygames.{ Centis, Color }
 import org.joda.time.DateTime
 
-import chess.opening.{ FullOpening, FullOpeningDB }
+import strategygames.opening.{ FullOpening, FullOpeningDB }
 import lila.tree.Node.{ Comment, Gamebook, Shapes }
 import lila.user.User
+import lila.common.Form
 
 case class Chapter(
     _id: Chapter.Id,
@@ -61,8 +63,8 @@ case class Chapter(
     updateRoot(_.forceVariationAt(force, path))
 
   def opening: Option[FullOpening] =
-    if (!Variant.openingSensibleVariants(setup.variant)) none
-    else FullOpeningDB searchInFens root.mainline.map(_.fen)
+    if (!Variant.openingSensibleVariants(setup.variant.gameLib)(setup.variant)) none
+    else FullOpeningDB.searchInFens(setup.variant.gameLib, root.mainline.map(_.fen))
 
   def isEmptyInitial = order == 1 && root.children.nodes.isEmpty
 
@@ -74,11 +76,18 @@ case class Chapter(
       createdAt = DateTime.now
     )
 
+  private def tagsResultColor = tags.resultColor match {
+    case Some(Some(color)) => Some(Some(color))
+    case Some(None) => Some(None)
+    case None => None
+    case _ => sys.error("Not implemented for draughts yet")
+  }
+
   def metadata = Chapter.Metadata(
     _id = _id,
     name = name,
     setup = setup,
-    resultColor = tags.resultColor.isDefined option tags.resultColor,
+    resultColor = tagsResultColor.isDefined option tagsResultColor,
     hasRelayPath = relay.exists(!_.path.isEmpty)
   )
 
@@ -158,7 +167,7 @@ object Chapter {
 
     def looksOngoing = resultColor.exists(_.isEmpty) && hasRelayPath
 
-    def resultStr: Option[String] = resultColor.map(_.fold("*")(chess.Color.showResult).replace("1/2", "½"))
+    def resultStr: Option[String] = resultColor.map(_.fold("*")(c => strategygames.Color.showResult(c)).replace("1/2", "½"))
   }
 
   case class IdName(id: Id, name: Name)

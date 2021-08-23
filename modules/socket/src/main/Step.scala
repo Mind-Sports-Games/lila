@@ -1,8 +1,8 @@
 package lila.socket
 
-import chess.format.{ FEN, Uci }
-import chess.Pos
-import chess.variant.Crazyhouse
+import strategygames.format.{ FEN, Uci }
+import strategygames.{ Color, Pos }
+import strategygames.chess.variant.Crazyhouse
 import play.api.libs.json._
 
 case class Step(
@@ -13,11 +13,12 @@ case class Step(
     // None when not computed yet
     dests: Option[Map[Pos, List[Pos]]],
     drops: Option[List[Pos]],
-    crazyData: Option[Crazyhouse.Data]
+    crazyData: Option[Crazyhouse.Data],
+    captLen: Option[Int]
 ) {
 
   // who's color plays next
-  def color = chess.Color.fromPly(ply)
+  def color = Color.fromPly(ply)
 
   def toJson = Step.stepJsonWriter writes this
 }
@@ -39,7 +40,7 @@ object Step {
       }
     )
   }
-  implicit private val crazyhouseDataWriter: OWrites[chess.variant.Crazyhouse.Data] = OWrites { v =>
+  implicit private val crazyhouseDataWriter: OWrites[Crazyhouse.Data] = OWrites { v =>
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 
@@ -51,7 +52,8 @@ object Step {
         "ply" -> ply,
         "uci" -> move.map(_.uciString),
         "san" -> move.map(_.san),
-        "fen" -> fen
+        "fen" -> fen.value,
+        "captLen" -> ~captLen
       )
       .add("check", check)
       .add(

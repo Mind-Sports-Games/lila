@@ -5,9 +5,10 @@ import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 
-import chess.variant.Variant
+import strategygames.variant.Variant
 import lila.common.Form._
-import chess.format.FEN
+import strategygames.format.FEN
+import strategygames.GameLib
 
 object CrudForm {
 
@@ -23,7 +24,7 @@ object CrudForm {
       "clockTime"      -> numberInDouble(clockTimeChoices),
       "clockIncrement" -> numberIn(clockIncrementChoices),
       "minutes"        -> number(min = 20, max = 1440),
-      "variant"        -> number.verifying(Variant exists _),
+      "variant"        -> number.verifying(num => Variant.exists(GameLib.Chess(), num)),
       "position"       -> optional(lila.common.Form.fen.playableStrict),
       "date"           -> utcDate,
       "image"          -> stringIn(imageChoices),
@@ -43,7 +44,7 @@ object CrudForm {
     clockTime = clockTimeDefault,
     clockIncrement = clockIncrementDefault,
     minutes = minuteDefault,
-    variant = chess.variant.Standard.id,
+    variant = Variant.libStandard(GameLib.Chess()).id,
     position = none,
     date = DateTime.now plusDays 7,
     image = "",
@@ -75,7 +76,7 @@ object CrudForm {
       hasChat: Boolean
   ) {
 
-    def realVariant = Variant orDefault variant
+    def realVariant = Variant.orDefault(GameLib.Chess(), variant)
 
     def realPosition = position ifTrue realVariant.standard
 

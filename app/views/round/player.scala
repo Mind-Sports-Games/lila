@@ -22,6 +22,8 @@ object player {
       bookmarked: Boolean
   )(implicit ctx: Context) = {
 
+    val gameLib = pov.game.variant.gameLib
+
     val chatJson = chatOption.map(_.either).map {
       case Left(c) =>
         chat.restrictedJson(
@@ -48,8 +50,8 @@ object player {
       title = s"${trans.play.txt()} ${if (ctx.pref.isZen) "ZEN" else playerText(pov.opponent)}",
       moreJs = frag(
         roundNvuiTag,
-        roundTag,
-        embedJsUnsafeLoadThen(s"""PlayStrategyRound.boot(${safeJsonValue(
+        roundTag(gameLib),
+        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLib)}.boot(${safeJsonValue(
           Json
             .obj(
               "data"   -> data,

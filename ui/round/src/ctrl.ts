@@ -303,7 +303,6 @@ export default class RoundController {
     this.justDropped = meta.justDropped;
     this.justCaptured = meta.justCaptured;
     this.preDrop = undefined;
-    this.transientMove.register();
     this.redraw();
   };
 

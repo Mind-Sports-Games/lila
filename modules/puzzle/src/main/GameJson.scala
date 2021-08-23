@@ -1,7 +1,8 @@
 package lila.puzzle
 
-import chess.format.Forsyth
-import chess.format.UciCharPair
+import strategygames.GameLib
+import strategygames.format.Forsyth
+import strategygames.format.UciCharPair
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -13,6 +14,8 @@ final private class GameJson(
     cacheApi: lila.memo.CacheApi,
     lightUserApi: lila.user.LightUserApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
+
+  val chessLib = GameLib.Chess()
 
   def apply(gameId: Game.ID, plies: Int, bc: Boolean): Fu[JsObject] =
     (if (bc) bcCache else cache) get writeKey(gameId, plies)
@@ -99,18 +102,18 @@ final private class GameJson(
           val pgnMoves = game.pgnMoves.take(plies + 1)
           for {
             pgnMove <- pgnMoves.lastOption
-            situation <- chess.Replay
-              .situations(pgnMoves, None, game.variant)
+            situation <- strategygames.Replay
+              .situations(chessLib, pgnMoves, None, game.variant)
               .valueOr { err =>
                 sys.error(s"GameJson.generateBc ${game.id} $err")
               }
               .lastOption
             uciMove <- situation.board.history.lastMove
           } yield Json.obj(
-            "fen" -> Forsyth.>>(situation).value,
+            "fen" -> Forsyth.>>(chessLib, situation).value,
             "ply" -> (plies + 1),
             "san" -> pgnMove,
-            "id"  -> UciCharPair(uciMove).toString,
+            "id"  -> UciCharPair(chessLib, uciMove).toString,
             "uci" -> uciMove.uci
           )
         }

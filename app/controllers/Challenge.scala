@@ -65,7 +65,7 @@ final class Challenge(
           }
           else
             (c.challengerUserId ?? env.user.repo.named) map { user =>
-              Ok(html.challenge.theirs(c, json, user, get("color") flatMap chess.Color.fromName))
+              Ok(html.challenge.theirs(c, json, user, get("color") flatMap strategygames.Color.fromName))
             },
         api = _ => Ok(json).fuccess
       ) flatMap withChallengeAnonCookie(mine && c.challengerIsAnon, c, owner = true)
@@ -84,7 +84,7 @@ final class Challenge(
   def accept(id: String, color: Option[String]) =
     Open { implicit ctx =>
       OptionFuResult(api byId id) { c =>
-        val cc = color flatMap chess.Color.fromName
+        val cc = color flatMap strategygames.Color.fromName
         isForMe(c) ?? api
           .accept(c, ctx.me, HTTPRequest sid ctx.req, cc)
           .flatMap {
@@ -339,13 +339,16 @@ final class Challenge(
     lila.challenge.Challenge
       .make(
         variant = config.variant,
+        //TODO: draughts: need to have two variants stored in the config?
+        fenVariant = config.variant.some,
         initialFen = config.position,
         timeControl = timeControl,
         mode = config.mode,
         color = config.color.name,
         challenger = ChallengeModel.toRegistered(config.variant, timeControl)(orig),
         destUser = dest,
-        rematchOf = none
+        rematchOf = none,
+        microMatch = config.microMatch
       )
   }
 
@@ -397,10 +400,12 @@ final class Challenge(
               val challenge = lila.challenge.Challenge
                 .make(
                   variant = config.variant,
+                  //TODO: draughts: need to have two variants stored in the config?
+                  fenVariant = config.variant.some,
                   initialFen = config.position,
                   timeControl =
                     config.clock.fold[TimeControl](TimeControl.Unlimited)(TimeControl.Clock.apply),
-                  mode = chess.Mode(config.rated),
+                  mode = strategygames.Mode(config.rated),
                   color = "random",
                   challenger = Challenger.Open,
                   destUser = none,

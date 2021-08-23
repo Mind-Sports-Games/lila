@@ -1,7 +1,7 @@
 package lila.hub
 package actorApi
 
-import chess.format.Uci
+import strategygames.format.Uci
 import org.joda.time.DateTime
 import play.api.libs.json._
 import scala.concurrent.Promise
@@ -202,7 +202,7 @@ package timeline {
 }
 
 package tv {
-  case class TvSelect(gameId: String, speed: chess.Speed, data: JsObject)
+  case class TvSelect(gameId: String, speed: strategygames.Speed, data: JsObject)
 }
 
 package notify {
@@ -225,8 +225,8 @@ package fishnet {
   case class StudyChapterRequest(
       studyId: String,
       chapterId: String,
-      initialFen: Option[chess.format.FEN],
-      variant: chess.variant.Variant,
+      initialFen: Option[strategygames.format.FEN],
+      variant: strategygames.variant.Variant,
       moves: List[Uci],
       userId: String,
       unlimited: Boolean
@@ -261,7 +261,7 @@ package round {
       opponentUserId: String
   )
   case class Berserk(gameId: String, userId: String)
-  case class IsOnGame(color: chess.Color, promise: Promise[Boolean])
+  case class IsOnGame(color: strategygames.Color, promise: Promise[Boolean])
   case class TourStandingOld(data: JsArray)
   case class TourStanding(tourId: String, data: JsArray)
   case class FishnetPlay(uci: Uci, ply: Int)
@@ -273,6 +273,7 @@ package round {
   case class Abort(playerId: String)
   case class Resign(playerId: String)
   case class Mlat(micros: Int)
+  case object MicroRematch
 }
 
 package evaluation {

@@ -1,9 +1,9 @@
 package lila.tournament
 
-import chess.Clock.{ Config => ClockConfig }
-import chess.format.FEN
-import chess.Mode
-import chess.variant.Variant
+import strategygames.Clock.{ Config => ClockConfig }
+import strategygames.format.FEN
+import strategygames.variant.Variant
+import strategygames.{ GameLib, Mode }
 import reactivemongo.api.bson._
 
 import lila.db.BSON
@@ -63,17 +63,20 @@ object BSONHandlers {
 
   implicit val tournamentHandler = new BSON[Tournament] {
     def reads(r: BSON.Reader) = {
-      val variant = r.intO("variant").fold[Variant](Variant.default)(Variant.orDefault)
+      val lib = GameLib(r.intD("lib"))
+      val variant = r.intO("variant").fold[Variant](Variant.default(lib))(
+        v => Variant.orDefault(lib, v)
+      )
       val position: Option[FEN] =
         r.getO[FEN]("fen").filterNot(_.initial) orElse
-          r.strO("eco").flatMap(Thematic.byEco).map(_.fen) // for BC
+          r.strO("eco").flatMap(Thematic.byEco).map(f => FEN.wrap(f.fen)) // for BC
       val startsAt   = r date "startsAt"
       val conditions = r.getO[Condition.All]("conditions") getOrElse Condition.All.empty
       Tournament(
         id = r str "_id",
         name = r str "name",
         status = r.get[Status]("status"),
-        clock = r.get[chess.Clock.Config]("clock"),
+        clock = r.get[strategygames.Clock.Config]("clock"),
         minutes = r int "minutes",
         variant = variant,
         position = position,
@@ -106,6 +109,7 @@ object BSONHandlers {
         "status"      -> o.status,
         "clock"       -> o.clock,
         "minutes"     -> o.minutes,
+        "lib"         -> o.variant.gameLib.id,
         "variant"     -> o.variant.some.filterNot(_.standard).map(_.id),
         "fen"         -> o.position.map(_.value),
         "mode"        -> o.mode.some.filterNot(_.rated).map(_.id),
@@ -165,7 +169,7 @@ object BSONHandlers {
       Pairing(
         id = r str "_id",
         tourId = r str "tid",
-        status = chess.Status(r int "s") err "tournament pairing status",
+        status = strategygames.Status(r int "s") err "tournament pairing status",
         user1 = user1,
         user2 = user2,
         winner = r boolO "w" map {

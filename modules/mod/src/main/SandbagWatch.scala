@@ -1,6 +1,6 @@
 package lila.mod
 
-import chess.Color
+import strategygames.Color
 import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 
@@ -75,7 +75,7 @@ final private class SandbagWatch(
 
   private def isSandbag(game: Game): Boolean =
     game.playedTurns <= {
-      if (game.variant == chess.variant.Atomic) 3
+      if (game.variant == strategygames.chess.variant.Atomic) 3
       else 8
     } && game.winner ?? (~_.ratingDiff > 0)
 }

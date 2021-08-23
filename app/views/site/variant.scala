@@ -6,12 +6,14 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
+import strategygames.variant.Variant
+
 object variant {
 
   def show(
       doc: io.prismic.Document,
       resolver: io.prismic.DocumentLinkResolver,
-      variant: chess.variant.Variant,
+      variant: Variant,
       perfType: lila.rating.PerfType
   )(implicit ctx: Context) =
     layout(

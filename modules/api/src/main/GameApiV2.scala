@@ -1,8 +1,9 @@
 package lila.api
 
 import akka.stream.scaladsl._
-import chess.format.FEN
-import chess.format.pgn.Tag
+import strategygames.format.FEN
+import strategygames.format.pgn.Tag
+import strategygames.{ Black, White }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import scala.concurrent.duration._
@@ -170,7 +171,7 @@ final class GameApiV2(
                       playerTeams.get(
                         pairing.user2
                       )
-                    ) mapN chess.Color.Map.apply[String]
+                    ) mapN strategygames.Color.Map.apply[String]
                   )
                 }
               }
@@ -184,15 +185,15 @@ final class GameApiV2(
             config.format match {
               case Format.PGN => pgnDump.formatter(config.flags)(game, fen, analysis, teams, none)
               case Format.JSON =>
-                def addBerserk(color: chess.Color)(json: JsObject) =
+                def addBerserk(color: strategygames.Color)(json: JsObject) =
                   if (pairing berserkOf color)
                     json deepMerge Json.obj(
                       "players" -> Json.obj(color.name -> Json.obj("berserk" -> true))
                     )
                   else json
                 toJson(game, fen, analysis, config.flags, teams) dmap
-                  addBerserk(chess.White) dmap
-                  addBerserk(chess.Black) dmap { json =>
+                  addBerserk(White) dmap
+                  addBerserk(Black) dmap { json =>
                     s"${Json.stringify(json)}\n"
                   }
             }
@@ -281,6 +282,7 @@ final class GameApiV2(
       .obj(
         "id"         -> g.id,
         "rated"      -> g.rated,
+        "lib"        -> g.variant.gameLib.id,
         "variant"    -> g.variant.key,
         "speed"      -> g.speed.key,
         "perf"       -> PerfPicker.key(g),
@@ -302,6 +304,7 @@ final class GameApiV2(
         })
       )
       .add("initialFen" -> initialFen)
+      .add("microMatch" -> g.metadata.microMatchGameId)
       .add("winner" -> g.winnerColor.map(_.name))
       .add("opening" -> g.opening.ifTrue(withFlags.opening))
       .add("moves" -> withFlags.moves.option {
@@ -355,7 +358,7 @@ object GameApiV2 {
       perfType: Set[lila.rating.PerfType],
       analysed: Option[Boolean] = None,
       ongoing: Boolean = false,
-      color: Option[chess.Color],
+      color: Option[strategygames.Color],
       flags: WithFlags,
       perSecond: MaxPerSecond,
       playerFile: Option[String]

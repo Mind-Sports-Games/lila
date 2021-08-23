@@ -1,7 +1,8 @@
 package lila.evalCache
 
-import chess.format.{ FEN, Forsyth, Uci }
-import chess.variant.Variant
+import strategygames.format.{ FEN, Forsyth, Uci }
+import strategygames.variant.Variant
+import strategygames.GameLib
 import org.joda.time.DateTime
 import cats.data.NonEmptyList
 
@@ -99,6 +100,12 @@ object EvalCacheEntry {
   case class Moves(value: NonEmptyList[Uci]) extends AnyVal {
 
     def truncate = copy(value = NonEmptyList(value.head, value.tail.take(MAX_PV_SIZE - 1)))
+
+    def gameLib: GameLib = value.head match {
+      case Uci.ChessMove(_)    => GameLib.Chess()
+      case Uci.ChessDrop(_)    => GameLib.Chess()
+      case Uci.DraughtsMove(_) => GameLib.Draughts()
+    }
   }
 
   case class Trust(value: Double) extends AnyVal {
@@ -117,13 +124,14 @@ object EvalCacheEntry {
         c != '/' && c != '-' && c != 'w'
       }
       val str = variant match {
-        case chess.variant.ThreeCheck => base + ~fen.value.split(' ').lift(6)
-        case _                        => base
+        case Variant.Chess(strategygames.chess.variant.ThreeCheck)
+          => base + ~fen.value.split(' ').lift(6)
+        case _                         => base
       }
       new SmallFen(str)
     }
     def validate(variant: Variant, fen: FEN): Option[SmallFen] =
-      Forsyth.<<@(variant, fen).exists(_ playable false) option make(variant, fen)
+      Forsyth.<<@(variant.gameLib, variant, fen).exists(_ playable false) option make(variant, fen)
   }
 
   case class Id(variant: Variant, smallFen: SmallFen)
@@ -133,8 +141,8 @@ object EvalCacheEntry {
   object Input {
     case class Candidate(variant: Variant, fen: String, eval: Eval) {
       def input =
-        SmallFen.validate(variant, FEN(fen)) ifTrue eval.looksValid map { smallFen =>
-          Input(Id(variant, smallFen), FEN(fen), eval.truncatePvs)
+        SmallFen.validate(variant, FEN.apply(variant.gameLib, fen)) ifTrue eval.looksValid map { smallFen =>
+          Input(Id(variant, smallFen), FEN.apply(variant.gameLib, fen), eval.truncatePvs)
         }
     }
   }

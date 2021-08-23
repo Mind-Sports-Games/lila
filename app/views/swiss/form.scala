@@ -24,7 +24,8 @@ object form {
           h1("New Swiss tournament"),
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
-            form3.split(fields.rated, fields.variant),
+            form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
+            form3.split(fields.rated),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -59,7 +60,7 @@ object form {
           h1("Edit ", swiss.name),
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
-            form3.split(fields.rated, fields.variant),
+            form3.split(fields.rated, fields.chessVariant),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -149,12 +150,28 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
-  def variant =
-    form3.group(form("variant"), trans.variant(), half = true)(
+  def gameLib =
+    form3.group(form("gameLib"), "Game Family", half = true)(
       form3.select(
         _,
-        translatedVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
+        translatedGameLibChoices(_.id.toString).map(x => x._1 -> x._2),
         disabled = disabledAfterStart
+      )
+    )
+  def chessVariant =
+    form3.group(form("chessVariant"), trans.variant(), klass="chessVariant", half = true)(
+      form3.select(
+        _,
+        translatedChessVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
+        disabled = disabledAfterStart
+      )
+    )
+  def draughtsVariant =
+    form3.group(form("draughtsVariant"), trans.variant(), klass="draughtsVariant", half = true, displayed = false)(
+      form3.select(
+        _,
+        translatedDraughtsVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
+        disabled = disabledAfterStart,
       )
     )
   def clock =

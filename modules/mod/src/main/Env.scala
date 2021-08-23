@@ -90,7 +90,7 @@ final class Env(
           sandbagWatch(game)
           assessApi.onGameReady(game, whiteUser, blackUser)
         }
-        if (game.status == chess.Status.Cheat)
+        if (game.status == strategygames.Status.Cheat)
           game.loserUserId foreach { userId =>
             logApi.cheatDetected(userId, game.id) >>
               logApi.countRecentCheatDetected(userId) flatMap { count =>

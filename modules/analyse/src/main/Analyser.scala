@@ -5,6 +5,9 @@ import lila.game.actorApi.InsertGame
 import lila.game.{ Game, GameRepo }
 import lila.hub.actorApi.map.TellIfExists
 
+import strategygames.variant.Variant
+import strategygames.format.FEN
+
 final class Analyser(
     gameRepo: GameRepo,
     analysisRepo: AnalysisRepo

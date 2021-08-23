@@ -1,6 +1,6 @@
 package lila.round
 
-import chess.Centis
+import strategygames.Centis
 
 import lila.common.Bus
 import lila.game.{ Event, Game, Pov, Progress }

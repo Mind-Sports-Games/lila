@@ -1,6 +1,6 @@
 package lila.setup
 
-import chess.Mode
+import strategygames.Mode
 
 private[setup] trait HumanConfig extends Config {
 

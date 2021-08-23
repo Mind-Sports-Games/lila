@@ -1,7 +1,8 @@
 package lila.tournament
 
-import chess.format.FEN
-import chess.variant.Variant
+import strategygames.format.FEN
+import strategygames.variant.Variant
+import strategygames.Clock
 import org.joda.time.DateTime
 import play.api.i18n.Lang
 
@@ -229,7 +230,7 @@ object Schedule {
         case (HyperBullet, UltraBullet) | (UltraBullet, HyperBullet) => true
         case _                                                       => false
       }
-    def fromClock(clock: chess.Clock.Config) = {
+    def fromClock(clock: Clock.Config) = {
       val time = clock.estimateTotalSeconds
       if (time < 30) UltraBullet
       else if (time < 60) HyperBullet
@@ -265,7 +266,7 @@ object Schedule {
   }
   /*{
     import Freq._, Speed._
-    import chess.variant._
+    import strategygames.chess.variant._
 
     (s.freq, s.variant, s.speed) match {
 
@@ -324,7 +325,7 @@ object Schedule {
   private def zhInc(s: Schedule)       = s.at.getHourOfDay % 2 == 0
 
   private def zhEliteTc(s: Schedule) = {
-    val TC = chess.Clock.Config
+    val TC = Clock.Config
     s.at.getDayOfMonth / 7 match {
       case 0 => TC(3 * 60, 0)
       case 1 => TC(1 * 60, 1)
@@ -336,16 +337,16 @@ object Schedule {
 
   private[tournament] def clockFor(s: Schedule) = {
     import Freq._, Speed._
-    import chess.variant._
+    import strategygames.chess.variant._
 
-    val TC = chess.Clock.Config
+    val TC = Clock.Config
 
     (s.freq, s.variant, s.speed) match {
       // Special cases.
-      case (Weekend, Crazyhouse, Blitz)                 => zhEliteTc(s)
-      case (Hourly, Crazyhouse, SuperBlitz) if zhInc(s) => TC(3 * 60, 1)
-      case (Hourly, Crazyhouse, Blitz) if zhInc(s)      => TC(4 * 60, 2)
-      case (Hourly, Standard, Blitz) if standardInc(s)  => TC(3 * 60, 2)
+      case (Weekend, strategygames.variant.Variant.Chess(Crazyhouse), Blitz)                 => zhEliteTc(s)
+      case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), SuperBlitz) if zhInc(s) => TC(3 * 60, 1)
+      case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), Blitz) if zhInc(s)      => TC(4 * 60, 2)
+      case (Hourly, strategygames.variant.Variant.Chess(Standard), Blitz) if standardInc(s)  => TC(3 * 60, 2)
 
       case (Shield, variant, Blitz) if variant.exotic => TC(3 * 60, 2)
 
@@ -386,7 +387,7 @@ object Schedule {
 
      // No min rating for the same reason.
       val minRating = 0/*(s.freq, s.variant) match {
-        case (Weekend, chess.variant.Crazyhouse) => 2100
+        case (Weekend, strategygames.chess.variant.Crazyhouse) => 2100
         case (Weekend, _)                        => 2200
         case _                                   => 0
       }*/

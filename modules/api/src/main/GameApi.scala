@@ -1,6 +1,9 @@
 package lila.api
 
-import chess.format.FEN
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.{ GameLib, Replay, Status }
+import strategygames.variant.Variant
+
 import org.joda.time.DateTime
 import play.api.libs.json._
 import reactivemongo.api.bson._
@@ -47,7 +50,7 @@ final private[api] class GameApi(
             else
               $doc(
                 G.playerUids -> user.id,
-                G.status $gte chess.Status.Mate.id,
+                G.status $gte Status.Mate.id,
                 G.analysed -> analysed.map[BSONValue] {
                   case true => BSONBoolean(true)
                   case _    => $doc("$exists" -> false)
@@ -105,7 +108,7 @@ final private[api] class GameApi(
             if (~playing) lila.game.Query.nowPlayingVs(users._1.id, users._2.id)
             else
               lila.game.Query.opponents(users._1, users._2) ++ $doc(
-                G.status $gte chess.Status.Mate.id,
+                G.status $gte Status.Mate.id,
                 G.analysed -> analysed.map[BSONValue] {
                   case true => BSONBoolean(true)
                   case _    => $doc("$exists" -> false)
@@ -150,7 +153,7 @@ final private[api] class GameApi(
           if (~playing) lila.game.Query.nowPlayingVs(userIds)
           else
             lila.game.Query.opponents(userIds) ++ $doc(
-              G.status $gte chess.Status.Mate.id,
+              G.status $gte Status.Mate.id,
               G.analysed -> analysed.map[BSONValue] {
                 case true => BSONBoolean(true)
                 case _    => $doc("$exists" -> false)
@@ -233,17 +236,40 @@ final private[api] class GameApi(
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.color)))
         }),
         "analysis" -> analysisOption.ifTrue(withFlags.analysis).map(analysisJson.moves(_)),
-        "moves"    -> withFlags.moves.option(g.pgnMoves mkString " "),
+        "moves"    -> withFlags.moves.option(g.variant match {
+          case Variant.Draughts(variant) =>
+            strategygames.draughts.Replay.unambiguousPdnMoves(
+              pdnMoves = g.pdnMovesConcat(true, true),
+              initialFen = initialFen match {
+                case Some(FEN.Draughts(fen)) => Some(fen)
+                case None => None
+                case _ => sys.error("fen type mismatch in GameApi")
+              },
+              variant = variant
+            ) match { 
+              case Some(moves) => moves mkString " "
+              case None => ""
+            }
+          case _ => g.pgnMoves mkString " "
+        }),
         "opening"  -> withFlags.opening.??(g.opening),
         "fens" -> (withFlags.fens && g.finished) ?? {
-          chess.Replay
+          Replay
             .boards(
-              moveStrs = g.pgnMoves,
+              lib = g.variant.gameLib,
+              moveStrs = g.variant.gameLib match {
+                case GameLib.Draughts() => g.pdnMovesConcat(true, true)
+                case _ => g.pgnMoves
+              },
               initialFen = initialFen,
-              variant = g.variant
+              variant = g.variant,
+              finalSquare = g.variant.gameLib match {
+                case GameLib.Draughts() => true
+                case _ => false
+              }
             )
             .toOption map { boards =>
-            JsArray(boards map chess.format.Forsyth.exportBoard map JsString.apply)
+              JsArray(boards.map{b => Forsyth.exportBoard(b.variant.gameLib, b)} map JsString.apply)
           }
         },
         "winner" -> g.winnerColor.map(_.name),

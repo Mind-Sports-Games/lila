@@ -1,12 +1,16 @@
 package lila.setup
 
-import chess.format.FEN
+import strategygames.Color.{ Black, White }
+import strategygames.{ Game => StratGame, GameLib }
+import strategygames.format.FEN
+import strategygames.variant.Variant
 import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.Color
 import lila.user.User
 
 case class AiConfig(
-    variant: chess.variant.Variant,
+    variant: strategygames.variant.Variant,
+    fenVariant: Option[Variant],
     timeMode: TimeMode,
     time: Double,
     increment: Int,
@@ -19,12 +23,12 @@ case class AiConfig(
 
   val strictFen = true
 
-  def >> = (variant.id, timeMode.id, time, increment, days, level, color.name, fen.map(_.value)).some
+  def >> = (variant.gameLib.id, variant.id, variant.id, timeMode.id, time, increment, days, level, color.name, fen.map(_.value)).some
 
   def game(user: Option[User]) =
     fenGame { chessGame =>
       val perfPicker = lila.game.PerfPicker.mainOrDefault(
-        chess.Speed(chessGame.clock.map(_.config)),
+        strategygames.Speed(chessGame.clock.map(_.config)),
         chessGame.situation.board.variant,
         makeDaysPerTurn
       )
@@ -32,14 +36,14 @@ case class AiConfig(
         .make(
           chess = chessGame,
           whitePlayer = creatorColor.fold(
-            Player.make(chess.White, user, perfPicker),
-            Player.make(chess.White, level.some)
+            Player.make(White, user, perfPicker),
+            Player.make(White, level.some)
           ),
           blackPlayer = creatorColor.fold(
-            Player.make(chess.Black, level.some),
-            Player.make(chess.Black, user, perfPicker)
+            Player.make(Black, level.some),
+            Player.make(Black, user, perfPicker)
           ),
-          mode = chess.Mode.Casual,
+          mode = strategygames.Mode.Casual,
           source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
@@ -49,25 +53,37 @@ case class AiConfig(
 
   def pov(user: Option[User]) = Pov(game(user), creatorColor)
 
-  def timeControlFromPosition = variant != chess.variant.FromPosition || time >= 1
+  def timeControlFromPosition = variant != strategygames.chess.variant.FromPosition || time >= 1
 }
 
 object AiConfig extends BaseConfig {
 
-  def from(v: Int, tm: Int, t: Double, i: Int, d: Int, level: Int, c: String, fen: Option[String]) =
+  def from(l: Int, cv: Int, dv: Int, tm: Int, t: Double, i: Int, d: Int, level: Int, c: String, fen: Option[String]) =
     new AiConfig(
-      variant = chess.variant.Variant(v) err "Invalid game variant " + v,
+      variant = l match {
+        case 0 => Variant.wrap(
+          strategygames.chess.variant.Variant(cv) err "Invalid game variant " + cv
+        )
+        case 1 => Variant.wrap(
+          strategygames.draughts.variant.Variant(dv) err "Invalid game variant " + dv
+        )
+      },
+      fenVariant = none,
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
       increment = i,
       days = d,
       level = level,
       color = Color(c) err "Invalid color " + c,
-      fen = fen map FEN.apply
+      fen = fen.map(f => FEN.apply(GameLib(l), f))
     )
 
-  val default = AiConfig(
-    variant = variantDefault,
+  def default(l: Int) = AiConfig(
+    variant = l match {
+      case 0 => Variant.Chess(chessVariantDefault)
+      case 1 => Variant.Draughts(draughtsVariantDefault)
+    },
+    fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,
     increment = 8,
@@ -89,7 +105,8 @@ object AiConfig extends BaseConfig {
 
     def reads(r: BSON.Reader): AiConfig =
       AiConfig(
-        variant = chess.variant.Variant orDefault (r int "v"),
+        variant = strategygames.variant.Variant.orDefault(GameLib(r intD "l"), r int "v"),
+        fenVariant = none,
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",
         increment = r int "i",

@@ -1,7 +1,8 @@
 package lila.storm
 
 import cats.data.NonEmptyList
-import chess.format.{ FEN, Forsyth, Uci }
+import strategygames.Color.White
+import strategygames.chess.format.{ FEN, Forsyth, Uci }
 
 import lila.puzzle.Puzzle
 
@@ -24,5 +25,5 @@ case class StormPuzzle(
     } yield Forsyth >> sit2
   } err s"Can't apply puzzle $id first move"
 
-  def color = fen.color.fold[chess.Color](chess.White)(!_)
+  def color = fen.color.fold[strategygames.Color](White)(!_)
 }

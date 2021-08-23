@@ -1,9 +1,10 @@
 package lila.round
 
-import chess.format.Forsyth
-import chess.variant._
-import chess.{ Game => ChessGame, Board, Color => ChessColor, Castles, Clock, Situation, History }
-import ChessColor.{ Black, White }
+import strategygames.format.Forsyth
+import strategygames.chess.variant._
+import strategygames.variant.Variant
+import strategygames.{ Black, Clock, Color, Game => ChessGame, Board, Situation, History, White, Mode, Piece, PieceMap, Pos }
+import strategygames.chess.Castles
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
 import scala.concurrent.duration._
@@ -48,7 +49,7 @@ final private class Rematcher(
     pov match {
       case Pov(game, color) if game.playerCouldRematch =>
         if (isOffering(!pov) || game.opponent(color).isAi)
-          rematches.of(game.id).fold(rematchJoin(pov))(rematchExists(pov))
+          rematches.of(game.id).fold(rematchJoin(pov.game))(rematchExists(pov))
         else if (!declined.get(pov.flip.fullId) && rateLimit(pov.fullId)(true)(false))
           fuccess(rematchCreate(pov))
         else fuccess(List(Event.RematchOffer(by = none)))
@@ -65,22 +66,26 @@ final private class Rematcher(
     fuccess(List(Event.RematchOffer(by = none)))
   }
 
+  def microMatch(game: Game): Fu[Events] = rematchJoin(game)
+
   private def rematchExists(pov: Pov)(nextId: Game.ID): Fu[Events] =
     gameRepo game nextId flatMap {
-      _.fold(rematchJoin(pov))(g => fuccess(redirectEvents(g)))
+      _.fold(rematchJoin(pov.game))(g => fuccess(redirectEvents(g)))
     }
 
-  private def rematchJoin(pov: Pov): Fu[Events] =
-    rematches.of(pov.gameId) match {
+  private def rematchJoin(game: Game): Fu[Events] =
+    rematches.of(game.id) match {
       case None =>
         for {
-          nextGame <- returnGame(pov) map (_.start)
-          _ = offers invalidate pov.game.id
-          _ = rematches.cache.put(pov.gameId, nextGame.id)
-          _ = if (pov.game.variant == Chess960 && !chess960.get(pov.gameId)) chess960.put(nextGame.id)
+          nextGame <- returnGame(game) map (_.start)
+          _ = offers invalidate game.id
+          _ = rematches.cache.put(game.id, nextGame.id)
+          _ = if (game.variant == Variant.Chess(Chess960) && !chess960.get(game.id)) chess960.put(nextGame.id)
           _ <- gameRepo insertDenormalized nextGame
         } yield {
-          messenger.system(pov.game, trans.rematchOfferAccepted.txt())
+          if (nextGame.metadata.microMatchGameNr.contains(2))
+            messenger.system(game, trans.microMatchRematchStarted.txt())
+          else messenger.system(game, trans.rematchOfferAccepted.txt())
           onStart(nextGame.id)
           redirectEvents(nextGame)
         }
@@ -96,46 +101,66 @@ final private class Rematcher(
     List(Event.RematchOffer(by = pov.color.some))
   }
 
-  private def returnGame(pov: Pov): Fu[Game] =
+  private def chessPieceMap(pieces: strategygames.chess.PieceMap): PieceMap =
+    pieces.map{
+      case(pos, piece) => (Pos.Chess(pos), Piece.Chess(piece))
+    }
+
+  private def nextMicroMatch(g: Game) =
+    if (!g.aborted && g.metadata.microMatch.contains("micromatch")) s"1:${g.id}".some
+    else g.metadata.microMatch.isDefined option "micromatch"
+
+  private def returnGame(game: Game): Fu[Game] = {
     for {
-      initialFen <- gameRepo initialFen pov.game
-      situation = initialFen flatMap Forsyth.<<<
-      pieces = pov.game.variant match {
-        case Chess960 =>
-          if (chess960 get pov.gameId) Chess960.pieces
-          else situation.fold(Chess960.pieces)(_.situation.board.pieces)
-        case FromPosition => situation.fold(Standard.pieces)(_.situation.board.pieces)
-        case variant      => variant.pieces
+      initialFen <- gameRepo initialFen game
+      situation = initialFen.flatMap{fen => Forsyth.<<<(game.variant.gameLib, fen)}
+      pieces: PieceMap = game.variant match {
+        case Variant.Chess(Chess960) =>
+          if (chess960 get game.id) chessPieceMap(Chess960.pieces)
+          else situation.fold(
+            chessPieceMap(Chess960.pieces)
+          )(_.situation.board.pieces)
+        case Variant.Chess(FromPosition) =>
+          situation.fold(
+            Variant.libStandard(game.variant.gameLib).pieces
+          )(_.situation.board.pieces)
+        case variant =>
+          variant.pieces
       }
-      users <- userRepo byIds pov.game.userIds
-      board = Board(pieces, variant = pov.game.variant).withHistory(
+      users <- userRepo byIds game.userIds
+      board = Board(game.variant.gameLib, pieces, variant = game.variant).withHistory(
         History(
+          game.variant.gameLib,
           lastMove = situation.flatMap(_.situation.board.history.lastMove),
           castles = situation.fold(Castles.init)(_.situation.board.history.castles)
         )
       )
       game <- Game.make(
         chess = ChessGame(
+          game.variant.gameLib,
           situation = Situation(
+            game.variant.gameLib,
             board = board,
-            color = situation.fold[chess.Color](White)(_.situation.color)
+            color = situation.fold[Color](White)(_.situation.color)
           ),
-          clock = pov.game.clock map { c =>
+          clock = game.clock map { c =>
             Clock(c.config)
           },
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)
         ),
-        whitePlayer = returnPlayer(pov.game, White, users),
-        blackPlayer = returnPlayer(pov.game, Black, users),
-        mode = if (users.exists(_.lame)) chess.Mode.Casual else pov.game.mode,
-        source = pov.game.source | Source.Lobby,
-        daysPerTurn = pov.game.daysPerTurn,
-        pgnImport = None
+        whitePlayer = returnPlayer(game, White, users),
+        blackPlayer = returnPlayer(game, Black, users),
+        mode = if (users.exists(_.lame)) Mode.Casual else game.mode,
+        source = game.source | Source.Lobby,
+        daysPerTurn = game.daysPerTurn,
+        pgnImport = None,
+        microMatch = nextMicroMatch(game)
       ) withUniqueId idGenerator
     } yield game
+  }
 
-  private def returnPlayer(game: Game, color: ChessColor, users: List[User]): lila.game.Player =
+  private def returnPlayer(game: Game, color: Color, users: List[User]): lila.game.Player =
     game.opponent(color).aiLevel match {
       case Some(ai) => lila.game.Player.make(color, ai.some)
       case None =>
@@ -163,6 +188,6 @@ final private class Rematcher(
 private object Rematcher {
 
   case class Offers(white: Boolean, black: Boolean) {
-    def apply(color: chess.Color) = color.fold(white, black)
+    def apply(color: Color) = color.fold(white, black)
   }
 }

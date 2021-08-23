@@ -1,7 +1,9 @@
 package views.html.analyse
 
 import bits.dataPanel
-import chess.variant.Crazyhouse
+import strategygames.variant.Variant
+import strategygames.chess.variant.Crazyhouse
+import strategygames.format.FEN
 import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.Json
@@ -16,12 +18,12 @@ object replay {
 
   private[analyse] def titleOf(pov: Pov)(implicit lang: Lang) =
     s"${playerText(pov.game.whitePlayer)} vs ${playerText(pov.game.blackPlayer)}: ${pov.game.opening
-      .fold(trans.analysis.txt())(_.opening.ecoName)}"
+      .fold(trans.analysis.txt())(_.opening.toString())}"
 
   def apply(
       pov: Pov,
       data: play.api.libs.json.JsObject,
-      initialFen: Option[chess.format.FEN],
+      initialFen: Option[FEN],
       pgn: String,
       analysis: Option[lila.analyse.Analysis],
       analysisStarted: Boolean,
@@ -85,7 +87,7 @@ object replay {
       title = titleOf(pov),
       moreCss = frag(
         cssTag("analyse.round"),
-        pov.game.variant == Crazyhouse option cssTag("analyse.zh"),
+        pov.game.variant == Variant.Chess(Crazyhouse) option cssTag("analyse.zh"),
         ctx.blind option cssTag("round.nvui")
       ),
       moreJs = frag(

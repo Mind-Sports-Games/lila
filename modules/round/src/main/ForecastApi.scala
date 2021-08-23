@@ -7,7 +7,8 @@ import lila.db.dsl._
 import org.joda.time.DateTime
 import scala.concurrent.Promise
 
-import chess.format.Uci
+import strategygames.{ Color, Move }
+import strategygames.format.Uci
 import Forecast.Step
 import lila.game.Game.PlayerId
 import lila.game.{ Game, Pov }
@@ -46,7 +47,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
   ): Funit =
     if (!pov.isMyTurn) funit
     else
-      Uci.Move(uciMove).fold[Funit](fufail(s"Invalid move $uciMove on $pov")) { uci =>
+      Uci.Move(pov.game.variant.gameLib, uciMove).fold[Funit](fufail(s"Invalid move $uciMove on $pov")) { uci =>
         val promise = Promise[Unit]()
         tellRound(
           pov.gameId,
@@ -76,7 +77,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
         else fuccess(fc.some)
     }
 
-  def nextMove(g: Game, last: chess.Move): Fu[Option[Uci.Move]] =
+  def nextMove(g: Game, last: Move): Fu[Option[Uci.Move]] =
     g.forecastable ?? {
       loadForPlay(Pov player g) flatMap {
         case None => fuccess(none)
@@ -90,9 +91,22 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
       }
     }
 
+  def moveOpponent(g: Game, last: Move): Fu[Option[Uci.Move]] = g.forecastable ?? {
+    loadForPlay(Pov opponent g) flatMap {
+      case None =>
+        fuccess(none)
+      case Some(fc) => fc.moveOpponent(g, last) match {
+        case Some((newFc, uciMove)) if newFc.steps.nonEmpty =>
+          coll.update.one($id(fc._id), newFc) inject uciMove.some
+        case Some((_, uciMove)) => clearPov(Pov player g) inject uciMove.some
+        case _                  => clearPov(Pov player g) inject none
+      }
+    }
+  }
+
   private def firstStep(steps: Forecast.Steps) = steps.headOption.flatMap(_.headOption)
 
-  def clearGame(g: Game) = coll.delete.one($inIds(chess.Color.all.map(g.fullIdOf))).void
+  def clearGame(g: Game) = coll.delete.one($inIds(Color.all.map(g.fullIdOf))).void
 
   def clearPov(pov: Pov) = coll.delete.one($id(pov.fullId)).void
 }

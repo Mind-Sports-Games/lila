@@ -1,6 +1,7 @@
 package lila.tournament
 
-import chess.variant.Variant
+import strategygames.variant.Variant
+import strategygames.{ Clock, GameLib }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.ReadPreference
@@ -26,8 +27,9 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   private def forTeamSelect(id: TeamID)        = $doc("forTeams" -> id)
   private def forTeamsSelect(ids: Seq[TeamID]) = $doc("forTeams" $in ids)
   private def sinceSelect(date: DateTime)      = $doc("startsAt" $gt date)
+  private def libSelect(lib: GameLib)          = $doc("lib" -> lib.id)
   private def variantSelect(variant: Variant) =
-    if (variant.standard) $doc("variant" $exists false)
+    if (variant.standardVariant) $doc("variant" $exists false)
     else $doc("variant" -> variant.id)
   private val nonEmptySelect           = $doc("nbPlayers" $ne 0)
   private[tournament] val selectUnique = $doc("schedule.freq" -> "unique")
@@ -149,8 +151,8 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   def isUnfinished(tourId: Tournament.ID): Fu[Boolean] =
     coll.exists($id(tourId) ++ unfinishedSelect)
 
-  def clockById(id: Tournament.ID): Fu[Option[chess.Clock.Config]] =
-    coll.primitiveOne[chess.Clock.Config]($id(id), "clock")
+  def clockById(id: Tournament.ID): Fu[Option[Clock.Config]] =
+    coll.primitiveOne[Clock.Config]($id(id), "clock")
 
   def byTeamCursor(teamId: TeamID) =
     coll
@@ -338,10 +340,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
         .reverse
     }
 
-  def lastFinishedScheduledByFreq(freq: Schedule.Freq, since: DateTime): Fu[List[Tournament]] =
+  def lastFinishedScheduledByFreq(freq: Schedule.Freq, since: DateTime, lib: GameLib): Fu[List[Tournament]] =
     coll
       .find(
-        finishedSelect ++ sinceSelect(since) ++ variantSelect(chess.variant.Standard) ++ $doc(
+        finishedSelect ++ sinceSelect(since) ++ libSelect(lib) ++ variantSelect(Variant.libStandard(lib)) ++ $doc(
           "schedule.freq" -> freq.name,
           "schedule.speed" $in Schedule.Speed.mostPopular.map(_.key)
         )
@@ -350,10 +352,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list(Schedule.Speed.mostPopular.size)
 
-  def lastFinishedDaily(variant: Variant): Fu[Option[Tournament]] =
+  def lastFinishedDaily(lib: GameLib, variant: Variant): Fu[Option[Tournament]] =
     coll
       .find(
-        finishedSelect ++ sinceSelect(DateTime.now minusDays 1) ++ variantSelect(variant) ++
+        finishedSelect ++ sinceSelect(DateTime.now minusDays 1) ++ libSelect(lib) ++ variantSelect(variant) ++
           $doc("schedule.freq" -> Schedule.Freq.Daily.name)
       )
       .sort($sort desc "startsAt")

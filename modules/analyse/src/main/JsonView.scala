@@ -5,6 +5,8 @@ import play.api.libs.json._
 import lila.game.Game
 import lila.tree.Eval.JsonHandlers._
 
+import strategygames.Color.{ Black, White }
+
 object JsonView {
 
   def moves(analysis: Analysis, withGlyph: Boolean = true) =
@@ -54,8 +56,8 @@ object JsonView {
   def bothPlayers(pov: Accuracy.PovLike, analysis: Analysis) =
     Json.obj(
       "id"    -> analysis.id,
-      "white" -> player(pov.copy(color = chess.White))(analysis),
-      "black" -> player(pov.copy(color = chess.Black))(analysis)
+      "white" -> player(pov.copy(color = White))(analysis),
+      "black" -> player(pov.copy(color = Black))(analysis)
     )
 
   def mobile(game: Game, analysis: Analysis) =
