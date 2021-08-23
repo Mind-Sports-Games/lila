@@ -965,9 +965,10 @@ chessground@^7.12.0:
   resolved "https://registry.yarnpkg.com/chessground/-/chessground-7.12.0.tgz#92d9726afc9d019c04ded83997c6ba2e6f8f93ff"
   integrity sha512-MQG7c4Hsy1dCkMFFv4LTaRauVSmWF8/dukion1qLCh5pIcKyoa5onbmbglAdDXOYhBbAZVf1F289wy0DeDEBJQ==
 
-"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#loa":
-  version "7.11.1"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#a76d6f0ce16e1b457605f05620a1d79ad64c0d43"
+"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git":
+  version "7.11.1-pstrat1"
+  uid f33aadd4ca362d0a3d817c97cd619d63b0beecd6
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#f33aadd4ca362d0a3d817c97cd619d63b0beecd6"
 
 chessops@^0.9.0:
   version "0.9.0"
@@ -976,9 +977,10 @@ chessops@^0.9.0:
   dependencies:
     "@badrap/result" "^0.2.8"
 
-"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#loa":
-  version "0.8.1"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#3de65211dd60477ca2f2dfa57112b4f807d9611f"
+"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git":
+  version "0.8.1-pstrat1"
+  uid e5d419e5093ff61094bab304c9abf88c230919a2
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#e5d419e5093ff61094bab304c9abf88c230919a2"
   dependencies:
     "@badrap/result" "^0.2.8"
 
@@ -2550,10 +2552,10 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
-highcharts@=4.2.5:
-  version "4.2.5"
-  resolved "https://registry.yarnpkg.com/highcharts/-/highcharts-4.2.5.tgz#f18bbda5ca326fdff7d816c94814fe8509cec969"
-  integrity sha1-8Yu9pcoyb9/32BbJSBT+hQnOyWk=
+highcharts@=9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/highcharts/-/highcharts-9.0.0.tgz#2e5d382481f71c50ac7f086e7bdead394fab71d4"
+  integrity sha512-MJCtidFytGSQvsV3OEM+vFTLpjUcp7jmFpLn8h3oL4WKp0gxUOQg6Nw00sqMWGdiadst0gOZO4804zynTcYjZQ==
 
 homedir-polyfill@^1.0.1:
   version "1.0.3"
