@@ -6,7 +6,8 @@ import * as xhr from 'common/xhr';
 let found = false;
 
 function truncateFen(fen: string) {
-  const fenParts = fen.split(':'), truncatedParts: string[] = [];
+  const fenParts = fen.split(':'),
+    truncatedParts: string[] = [];
   for (let i = 0; i < Math.min(3, fenParts.length); i++) {
     if (fenParts[i].length > 1 && 'WB'.indexOf(fenParts[i].slice(0, 1)) !== -1) {
       truncatedParts.push(fenParts[i]);

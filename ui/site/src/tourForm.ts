@@ -5,25 +5,22 @@ playstrategy.load.then(() => {
     $chessVariant = $('#form3-chessVariant'),
     $draughtsVariant = $('#form3-draughtsVariant'),
     showPositionChess = () =>
-      $('.form3 .position').toggleClass('none', !['1', 'standard'].includes(
-        $chessVariant.val() as string
-      )),
+      $('.form3 .position').toggleClass('none', !['1', 'standard'].includes($chessVariant.val() as string)),
     showPositionDraughts = () =>
-      $('.form3 .position').toggleClass('none', !['1', 'standard'].includes(
-        $draughtsVariant.val() as string
-      ));
+      $('.form3 .position').toggleClass('none', !['1', 'standard'].includes($draughtsVariant.val() as string));
 
   $chessVariant.on('change', showPositionChess);
   $draughtsVariant.on('change', showPositionDraughts);
   showPositionChess();
 
-  $gameLib.on('change', function (this: HTMLElement) {
-    console.log("here2");
-    const gameLib = $(this).val();
-    $('.form3 .chessVariant').toggle(gameLib == '0');
-    $('.form3 .draughtsVariant').toggle(gameLib == '1');
-  })
-  .trigger('change');
+  $gameLib
+    .on('change', function (this: HTMLElement) {
+      console.log('here2');
+      const gameLib = $(this).val();
+      $('.form3 .chessVariant').toggle(gameLib == '0');
+      $('.form3 .draughtsVariant').toggle(gameLib == '1');
+    })
+    .trigger('change');
 
   $('form .conditions a.show').on('click', function (this: HTMLAnchorElement) {
     $(this).remove();

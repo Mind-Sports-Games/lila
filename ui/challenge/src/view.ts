@@ -37,11 +37,7 @@ function allChallenges(ctrl: Ctrl, d: ChallengeData, nb: number): VNode {
 
 function challenge(ctrl: Ctrl, dir: ChallengeDirection) {
   return (c: Challenge) => {
-    const descItems = [
-      ctrl.trans()(c.rated ? 'rated' : 'casual'),
-      timeControl(c.timeControl),
-      c.variant.name
-    ];
+    const descItems = [ctrl.trans()(c.rated ? 'rated' : 'casual'), timeControl(c.timeControl), c.variant.name];
     if (c.microMatch) descItems.push(ctrl.trans()('microMatch'));
     const descStr = descItems.join(' • ');
     return h(
@@ -54,7 +50,7 @@ function challenge(ctrl: Ctrl, dir: ChallengeDirection) {
       [
         h('div.content', [
           h('span.head', renderUser(dir === 'in' ? c.challenger : c.destUser)),
-          h('span.desc', { attrs: { title: descStr } }, descStr)
+          h('span.desc', { attrs: { title: descStr } }, descStr),
         ]),
         h('i', {
           attrs: { 'data-icon': c.perf.icon },
