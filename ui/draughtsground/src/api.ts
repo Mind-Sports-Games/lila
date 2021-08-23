@@ -24,7 +24,7 @@ export interface Api {
   toggleOrientation(): void;
 
   // perform a move programmatically
-  move(orig: cg.Key, dest: cg.Key, finishCapture?: Boolean): void;
+  move(orig: cg.Key, dest: cg.Key, finishCapture?: boolean): void;
 
   // add and/or remove arbitrary pieces on the board
   setPieces(pieces: cg.PiecesDiff): void;
@@ -87,7 +87,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
   }
 
   return {
-    set(config, noCaptSequences: boolean = false) {
+    set(config, noCaptSequences = false) {
       if (config.orientation && config.orientation !== state.orientation) toggleOrientation();
       if (config.fen) {
         anim(state => configure(state, config), state, false, noCaptSequences);
@@ -113,7 +113,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
       }
     },
 
-    move(orig, dest, finishCapture?: Boolean) {
+    move(orig, dest, finishCapture?: boolean) {
       anim(state => board.baseMove(state, orig, dest, finishCapture), state);
     },
 

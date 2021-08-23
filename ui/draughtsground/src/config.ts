@@ -112,7 +112,7 @@ export function configure(state: State, config: Config) {
   }
 
   // apply config values that could be undefined yet meaningful
-  if (config.hasOwnProperty('lastMove') && !config.lastMove) {
+  if (Object.prototype.hasOwnProperty.call(config, 'lastMove') && !config.lastMove) {
     state.lastMove = undefined;
     state.animateFrom = undefined;
   }
@@ -156,7 +156,7 @@ function doSetKingMoves(state: State, kingMoves: cg.KingMoves) {
 }
 
 function merge(base: any, extend: any) {
-  for (let key in extend) {
+  for (const key in extend) {
     if (isObject(base[key]) && isObject(extend[key])) merge(base[key], extend[key]);
     else base[key] = extend[key];
   }

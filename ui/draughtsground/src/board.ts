@@ -106,14 +106,14 @@ export function calcCaptKey(
   else return calcCaptKey(pieces, boardSize, startX + xStep, startY + yStep, destX, destY);
 }
 
-function inArray(arr: string[], predicate: Function) {
-  for (let s of arr) {
+function inArray(arr: string[], predicate: (s: string) => boolean) {
+  for (const s of arr) {
     if (predicate(s)) return s;
   }
   return undefined;
 }
 
-export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture?: Boolean): cg.Piece | boolean {
+export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture?: boolean): cg.Piece | boolean {
   const origPiece = state.pieces.get(orig);
   if (orig === dest || !origPiece) {
     // remove any remaining ghost pieces if capture sequence is done
@@ -427,8 +427,8 @@ export function playPremove(state: State): boolean {
 }
 
 export function playPredrop(state: State, validate: (drop: cg.Drop) => boolean): boolean {
-  let drop = state.predroppable.current,
-    success = false;
+  const drop = state.predroppable.current;
+  let success = false;
   if (!drop) return false;
   if (validate(drop)) {
     const piece = {

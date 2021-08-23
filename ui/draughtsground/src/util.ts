@@ -246,7 +246,7 @@ export const createEl = (tagName: string, className?: string) => {
 };
 
 export function isObjectEmpty(o: any): boolean {
-  for (let _ in o) return false;
+  for (const _ in o) return false;
   return true;
 }
 
@@ -519,4 +519,3 @@ export const movesHorizontal64: number[][] = [
   [30, 32],
   [31, -1],
 ];
-

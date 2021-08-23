@@ -331,7 +331,7 @@ function onSubmit(ctrl: RoundController, notify: (txt: string) => void, style: (
           legalUcis,
           ctrl.draughtsground.state.movable.captLen
         ) as SanToUci;
-      let uci = sanToUci(input, legalSans) || input;
+      const uci = sanToUci(input, legalSans) || input;
       if (legalUcis.includes(uci.toLowerCase()))
         ctrl.socket.send(
           'move',

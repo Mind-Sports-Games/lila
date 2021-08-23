@@ -108,7 +108,7 @@ export function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
   const asWhite = board.whitePov(s),
     bounds = s.dom.bounds(),
     radiusSq = Math.pow(bounds.width / 10, 2);
-  for (let key in s.pieces) {
+  for (const key in s.pieces) {
     const squareBounds = computeSquareBounds(key as cg.Key, s.boardSize, asWhite, bounds),
       center: cg.NumberPair = [squareBounds.left + squareBounds.width / 2, squareBounds.top + squareBounds.height / 2];
     if (util.distanceSq(center, pos) <= radiusSq) return true;

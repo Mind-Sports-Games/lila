@@ -66,7 +66,7 @@ export function updateSimulStanding(s: SimulStanding, trans: Trans, draughtsResu
   // update distance to target
   const $targets = $('.round__now-playing .simul-targets');
   if ($targets) {
-    var req = '';
+    let req = '';
     if (s.rw === 10000) {
       req += '<span class="win">' + trans('succeeded') + '</span>';
     } else if (s.rw === -10000) {
@@ -102,4 +102,3 @@ export function decSimulToMove(trans: Trans) {
   const curToMove = getToMove();
   if (curToMove && curToMove > 0) setToMove(curToMove - 1, trans);
 }
-

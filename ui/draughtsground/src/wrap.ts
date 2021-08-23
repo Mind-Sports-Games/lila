@@ -1,6 +1,16 @@
 import { State } from './state';
-import { colors, translateAway, translateAbs, posToTranslateAbs, key2pos, createEl, allKeys, san2alg } from './util';
-import { ranksRev as allRanks, files as allFiles } from './util';
+import {
+  colors,
+  translateAway,
+  translateAbs,
+  posToTranslateAbs,
+  key2pos,
+  createEl,
+  allKeys,
+  san2alg,
+  ranksRev as allRanks,
+  files as allFiles,
+} from './util';
 import { createElement as createSVG } from './svg';
 import { boardFields } from './board';
 import { Elements, FieldNumber } from './types';
@@ -108,7 +118,7 @@ function renderFieldnumbers(element: HTMLElement, s: State, bounds: ClientRect) 
 function renderCoords(elems: any[], className: string): HTMLElement {
   const el = createEl('coords', className);
   let f: HTMLElement;
-  for (let i in elems) {
+  for (const i in elems) {
     f = createEl('coord');
     f.textContent = elems[i];
     el.appendChild(f);

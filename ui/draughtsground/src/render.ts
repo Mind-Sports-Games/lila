@@ -89,7 +89,7 @@ export function render(s: State): void {
           pos[1] += anim[3];
           if (curAnim && curAnim.plan.nextPlan) {
             const atK = curAnim.plan.nextPlan.anims.get(k);
-            if (!!atK) {
+            if (atK) {
               pos[0] += atK[2];
               pos[1] += atK[3];
             }
@@ -179,7 +179,7 @@ export function render(s: State): void {
           shift = anim[4];
           if (curAnim && curAnim.plan.nextPlan) {
             const atK = curAnim.plan.nextPlan.anims.get(k);
-            if (!!atK) {
+            if (atK) {
               pos[0] += atK[2];
               pos[1] += atK[3];
             }

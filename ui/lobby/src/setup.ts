@@ -148,12 +148,15 @@ export default class Setup {
       $ratings = $modal.find('.ratings > div'),
       randomColorVariants = $form.data('random-color-variants').split(','),
       $submits = $form.find('.color-submits__button'),
-      toggleButtons = () => {randomColorVariants
+      toggleButtons = () => {
+        randomColorVariants;
         const gameLibId = $gameLibSelect.val(),
           variantId = () => {
             switch (gameLibId) {
-              case '0': return $chessVariantSelect.val();
-              case '1': return $draughtsVariantSelect.val();
+              case '0':
+                return $chessVariantSelect.val();
+              case '1':
+                return $draughtsVariantSelect.val();
             }
             return $chessVariantSelect.val();
           },
@@ -198,67 +201,75 @@ export default class Setup {
       const timeMode = $timeModeSelect.val();
       let key = 'correspondence';
       switch ($gameLibSelect.val()) {
-        case '0': switch ($chessVariantSelect.val()) {
-          case '1':
-          case '3':
-            if (timeMode == '1') {
-              const time = parseFloat($timeInput.val() as string) * 60 + parseFloat($incrementInput.val() as string) * 40;
-              if (time < 30) key = 'ultraBullet';
-              else if (time < 180) key = 'bullet';
-              else if (time < 480) key = 'blitz';
-              else if (time < 1500) key = 'rapid';
-              else key = 'classical';
-            }
-            break;
-          case '10':
-            key = 'crazyhouse';
-            break;
-          case '2':
-            key = 'chess960';
-            break;
-          case '4':
-            key = 'kingOfTheHill';
-            break;
-          case '5':
-            key = 'threeCheck';
-            break;
-          case '6':
-            key = 'antichess';
-            break;
-          case '7':
-            key = 'atomic';
-            break;
-          case '8':
-            key = 'horde';
-            break;
-          case '9':
-            key = 'racingKings';
-            break;
-          case '11':
-            key = 'linesOfAction';
-            break;
-        }
-        case '1': switch ($draughtsVariantSelect.val()) {
-          case '1':
-          case '10':
-            key = 'frisian';
-            break;
-          case '8':
-            key = 'frysk';
-            break;
-          case '6':
-            key = 'antidraughts';
-            break;
-          case '9':
-            key = 'breakthrough';
-            break;
-          case '11':
-            key = 'russian';
-            break;
-          case '12':
-            key = 'brazilian';
-            break;
-        }
+        case '0':
+          switch ($chessVariantSelect.val()) {
+            case '1':
+            case '3':
+              if (timeMode == '1') {
+                const time =
+                  parseFloat($timeInput.val() as string) * 60 + parseFloat($incrementInput.val() as string) * 40;
+                if (time < 30) key = 'ultraBullet';
+                else if (time < 180) key = 'bullet';
+                else if (time < 480) key = 'blitz';
+                else if (time < 1500) key = 'rapid';
+                else key = 'classical';
+              }
+              break;
+            case '10':
+              key = 'crazyhouse';
+              break;
+            case '2':
+              key = 'chess960';
+              break;
+            case '4':
+              key = 'kingOfTheHill';
+              break;
+            case '5':
+              key = 'threeCheck';
+              break;
+            case '6':
+              key = 'antichess';
+              break;
+            case '7':
+              key = 'atomic';
+              break;
+            case '8':
+              key = 'horde';
+              break;
+            case '9':
+              key = 'racingKings';
+              break;
+            case '11':
+              key = 'linesOfAction';
+              break;
+            default:
+              key = 'standard';
+              break;
+          }
+          break;
+        case '1':
+          switch ($draughtsVariantSelect.val()) {
+            case '1':
+            case '10':
+              key = 'frisian';
+              break;
+            case '8':
+              key = 'frysk';
+              break;
+            case '6':
+              key = 'antidraughts';
+              break;
+            case '9':
+              key = 'breakthrough';
+              break;
+            case '11':
+              key = 'russian';
+              break;
+            case '12':
+              key = 'brazilian';
+              break;
+          }
+          break;
       }
       const $selected = $ratings
         .hide()
@@ -443,10 +454,14 @@ export default class Setup {
     }, 200);
     $fenInput.on('keyup', validateFen);
 
-    if (forceFromPosition){
+    if (forceFromPosition) {
       switch ($gameLibSelect.val()) {
-        case '0': $chessVariantSelect.val('3');
-        case '1': $draughtsVariantSelect.val('3');
+        case '0':
+          $chessVariantSelect.val('3');
+          break;
+        case '1':
+          $draughtsVariantSelect.val('3');
+          break;
       }
     }
 

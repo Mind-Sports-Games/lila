@@ -113,7 +113,7 @@ function sanCandidates(san: string, sans: Sans) {
   const lowered = san.toLowerCase();
   let cleanLowered = lowered.replace('x0', 'x').replace('-0', '-');
   if (cleanLowered.startsWith('0')) cleanLowered = cleanLowered.slice(1);
-  var filterKeys = Object.keys(sans).filter(function (s) {
+  const filterKeys = Object.keys(sans).filter(function (s) {
     const sLowered = s.toLowerCase();
     return sLowered.startsWith(lowered) || sLowered.startsWith(cleanLowered);
   });

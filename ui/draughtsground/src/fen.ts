@@ -8,15 +8,15 @@ export function read(fen: cg.FEN, fields?: number): cg.Pieces {
   const pieces: cg.Pieces = new Map();
   if (!fen) return pieces;
   if (fen === 'start') fen = initial;
-  for (let fenPart of fen.split(':')) {
+  for (const fenPart of fen.split(':')) {
     if (fenPart.length <= 1) continue;
-    let first = fenPart.slice(0, 1),
-      clr: cg.Color;
+    const first = fenPart.slice(0, 1);
+    let clr: cg.Color;
     if (first.toUpperCase() === 'W') clr = 'white';
     else if (first.toUpperCase() === 'B') clr = 'black';
     else continue;
     const fenPieces = fenPart.slice(1).split(',');
-    for (let fenPiece of fenPieces) {
+    for (const fenPiece of fenPieces) {
       if (!fenPiece) continue;
       let fieldStr, role: cg.Role;
       switch (fenPiece.slice(0, 1)) {
@@ -87,9 +87,9 @@ export function toggleCoordinates(fen: cg.FEN, algebraic: boolean, fields?: numb
   let prefix = '',
     fenW = 'W',
     fenB = 'B';
-  for (let fenPart of fen.split(':')) {
-    let first = fenPart.slice(0, 1),
-      clr: boolean;
+  for (const fenPart of fen.split(':')) {
+    const first = fenPart.slice(0, 1);
+    let clr: boolean;
     if (first.toUpperCase() === 'W') clr = true;
     else if (first.toUpperCase() === 'B') clr = false;
     else {
@@ -101,7 +101,7 @@ export function toggleCoordinates(fen: cg.FEN, algebraic: boolean, fields?: numb
       continue;
     }
     const fenPieces = fenPart.slice(1).split(',');
-    for (let fenPiece of fenPieces) {
+    for (const fenPiece of fenPieces) {
       if (!fenPiece) continue;
       let fieldStr,
         role = fenPiece.slice(0, 1);
@@ -153,12 +153,12 @@ export function countGhosts(fen: cg.FEN): number {
   if (!fen) return 0;
   if (fen === 'start') fen = initial;
   let ghosts = 0;
-  for (let fenPart of fen.split(':')) {
+  for (const fenPart of fen.split(':')) {
     if (fenPart.length <= 1) continue;
     let first = fenPart.slice(0, 1);
     if (first.toUpperCase() === 'W' || first.toUpperCase() === 'B') {
       const fenPieces = fenPart.slice(1).split(',');
-      for (let fenPiece of fenPieces) {
+      for (const fenPiece of fenPieces) {
         first = fenPiece.slice(0, 1);
         if (first.toUpperCase() === 'G' || first.toUpperCase() === 'P') ghosts++;
       }

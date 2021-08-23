@@ -41,12 +41,7 @@ interface SamePieces {
   [key: string]: boolean;
 }
 
-export function anim<A>(
-  mutation: Mutation<A>,
-  state: State,
-  fadeOnly: boolean = false,
-  noCaptSequences: boolean = false
-): A {
+export function anim<A>(mutation: Mutation<A>, state: State, fadeOnly = false, noCaptSequences = false): A {
   return state.animation.enabled ? animate(mutation, state, fadeOnly, noCaptSequences) : render(mutation, state);
 }
 
@@ -97,15 +92,10 @@ function isPromotablePos(color: cg.Color, pos: cg.Pos, boardSize: cg.BoardSize):
   return (color === 'white' && pos[1] === 1) || (color === 'black' && pos[1] === boardSize[1]);
 }
 
-function computePlan(
-  prevPieces: cg.Pieces,
-  current: State,
-  fadeOnly: boolean = false,
-  noCaptSequences: boolean = false
-): AnimPlan {
-  let missingsW: AnimPiece[] = [],
-    missingsB: AnimPiece[] = [],
-    newsW: AnimPiece[] = [],
+function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, noCaptSequences = false): AnimPlan {
+  const missingsW: AnimPiece[] = [],
+    missingsB: AnimPiece[] = [];
+  let newsW: AnimPiece[] = [],
     newsB: AnimPiece[] = [];
   const prePieces: AnimPieces = new Map(),
     samePieces: SamePieces = {},
@@ -114,7 +104,7 @@ function computePlan(
   let curP: cg.Piece | undefined,
     preP: AnimPiece | undefined,
     i: any,
-    prevGhosts: number = 0;
+    prevGhosts = 0;
   for (const [i, p] of prevPieces) {
     prePieces.set(i, makePiece(i, bs, p));
     if (p.role === 'ghostman' || p.role === 'ghostking') prevGhosts++;
@@ -178,7 +168,7 @@ function computePlan(
     }
   }
 
-  let missings: AnimPiece[] = missingsW.concat(missingsB),
+  const missings: AnimPiece[] = missingsW.concat(missingsB),
     news: AnimPiece[] = newsW.concat(newsB);
 
   if (news.length && missings.length && !fadeOnly) {
@@ -229,7 +219,7 @@ function computePlan(
           let captKey = calcCaptKey(prevPieces, bs, preP.pos[0], preP.pos[1], lastPos[0], lastPos[1]);
           if (captKey) {
             const piece = prevPieces.get(captKey);
-            if (!!piece) {
+            if (piece) {
               captKeys.push(captKey);
               prevPieces.set(captKey, ghostPiece(piece));
             }
@@ -320,7 +310,8 @@ function step(state: State, now: DOMHighResTimeStamp): void {
   if (state.animation.current !== undefined) {
     if (rest > 0.999) rest = 0.999;
     const ease = easing(rest);
-    for (const [_, cfg] of cur.plan.anims) {
+    for (const animVec of cur.plan.anims) {
+      const cfg = animVec[1];
       cfg[2] = cfg[0] * ease;
       cfg[3] = cfg[1] * ease;
     }
@@ -329,12 +320,7 @@ function step(state: State, now: DOMHighResTimeStamp): void {
   } else state.dom.redrawNow();
 }
 
-function animate<A>(
-  mutation: Mutation<A>,
-  state: State,
-  fadeOnly: boolean = false,
-  noCaptSequences: boolean = false
-): A {
+function animate<A>(mutation: Mutation<A>, state: State, fadeOnly = false, noCaptSequences = false): A {
   // clone state before mutating it
   const prevPieces: cg.Pieces = new Map(state.pieces);
 

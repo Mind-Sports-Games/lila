@@ -11,7 +11,7 @@ import {
 
 export default function premove(pieces: cg.Pieces, boardSize: cg.BoardSize, key: cg.Key, variant?: string): cg.Key[] {
   const piece = pieces.get(key),
-    field: number = Number(key);
+    field = Number(key);
 
   if (piece === undefined || isNaN(field)) return new Array<cg.Key>();
 
