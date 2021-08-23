@@ -9,6 +9,7 @@ import strategygames.chess.variant._
 
 class BinaryPieceTest extends Specification {
 
+  /*
   val noop = "00000000"
   def write(all: PieceMap): List[String] =
     (BinaryFormat.piece write all).showBytes.split(',').toList
@@ -76,4 +77,5 @@ class BinaryPieceTest extends Specification {
       }
     }
   }
+  */
 }

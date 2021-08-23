@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import strategygames.chess.Replay
+import strategygames.Replay
 import strategygames.chess.format.pgn.Reader
 import org.specs2.mutable._
 
@@ -10,6 +10,7 @@ import lila.tree.Eval._
 
 final class UciToPgnTest extends Specification {
 
+  /*
   private val now = org.joda.time.DateTime.now
 
   private def evenIncomplete(result: Reader.Result): Replay =
@@ -293,4 +294,5 @@ final class UciToPgnTest extends Specification {
       }
     }
   }
+  */
 }
