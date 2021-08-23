@@ -84,8 +84,8 @@ jobs:
         if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.PS_DEV_HOST }}
-          username: ${{ secrets.PS_HOST_USERNAME }}
+          host: ${{ secrets.PSD_MAIN_HOST }}
+          username: ${{ secrets.PSD_MAIN_USERNAME }}
           key: ${{ secrets.MSO_CI_SSH_KEY }}
           source: 'lila-3.0.tar.xz'
           target: '/tmp/'
@@ -94,6 +94,6 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: /opt/lila/upgrade.sh lila /tmp/lila-3.0.tar.xz
-          host: ${{ secrets.PS_DEV_HOST }}
-          username: ${{ secrets.PS_DEV_USERNAME }}
+          host: ${{ secrets.PSD_MAIN_HOST }}
+          username: ${{ secrets.PSD_MAIN_USERNAME }}
           privateKey: ${{ secrets.MSO_CI_SSH_KEY }}
