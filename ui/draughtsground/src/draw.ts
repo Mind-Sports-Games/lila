@@ -1,7 +1,7 @@
-import { State } from './state'
-import { unselect, cancelMove, getKeyAtDomPos, whitePov } from './board'
-import { eventPosition, isRightButton } from './util'
-import * as cg from './types'
+import { State } from './state';
+import { unselect, cancelMove, getKeyAtDomPos, whitePov } from './board';
+import { eventPosition, isRightButton } from './util';
+import * as cg from './types';
 
 export interface DrawShape {
   orig: cg.Key;
@@ -21,7 +21,7 @@ export interface DrawBrush {
   key: string;
   color: string;
   opacity: number;
-  lineWidth: number
+  lineWidth: number;
 }
 
 export interface DrawBrushes {
@@ -43,9 +43,9 @@ export interface Drawable {
   brushes: DrawBrushes;
   // drawable SVG pieces; used for crazyhouse drop
   pieces: {
-    baseUrl: string
-  },
-  prevSvgHash: string
+    baseUrl: string;
+  };
+  prevSvgHash: string;
 }
 
 export interface DrawCurrent {
@@ -72,7 +72,7 @@ export function start(state: State, e: cg.MouchEvent): void {
   state.drawable.current = {
     orig,
     pos,
-    brush: eventBrush(e)
+    brush: eventBrush(e),
   };
   processDraw(state);
 }

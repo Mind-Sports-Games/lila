@@ -1,15 +1,14 @@
-import { State } from './state'
-import * as drag from './drag'
-import * as draw from './draw'
-import { drop } from './drop'
-import { isRightButton } from './util'
-import * as cg from './types'
+import { State } from './state';
+import * as drag from './drag';
+import * as draw from './draw';
+import { drop } from './drop';
+import { isRightButton } from './util';
+import * as cg from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
 
 export function bindBoard(s: State, boundsUpdated: () => void): void {
-
   const boardEl = s.dom.elements.board;
 
   if (!s.dom.relative && s.resizable && 'ResizeObserver' in window) {
@@ -32,7 +31,6 @@ export function bindBoard(s: State, boundsUpdated: () => void): void {
 
 // returns the unbind function
 export function bindDocument(s: State, boundsUpdated: () => void): cg.Unbind {
-
   const unbinds: cg.Unbind[] = [];
 
   // Old versions of Edge and Safari do not support ResizeObserver. Send
@@ -42,7 +40,6 @@ export function bindDocument(s: State, boundsUpdated: () => void): cg.Unbind {
   }
 
   if (!s.viewOnly) {
-
     const onmove: MouchBind = dragOrDraw(s, drag.move, draw.move);
     const onend: MouchBind = dragOrDraw(s, drag.end, draw.end);
 
@@ -66,8 +63,9 @@ function startDragOrDraw(s: State): MouchBind {
   return e => {
     if (s.draggable.current) drag.cancel(s);
     else if (s.drawable.current) draw.cancel(s);
-    else if (e.shiftKey || isRightButton(e)) { if (s.drawable.enabled) draw.start(s, e); }
-    else if (!s.viewOnly) {
+    else if (e.shiftKey || isRightButton(e)) {
+      if (s.drawable.enabled) draw.start(s, e);
+    } else if (!s.viewOnly) {
       if (s.dropmode.active) drop(s, e);
       else drag.start(s, e);
     }
@@ -76,7 +74,8 @@ function startDragOrDraw(s: State): MouchBind {
 
 function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind): MouchBind {
   return e => {
-    if (e.shiftKey || isRightButton(e)) { if (s.drawable.enabled) withDraw(s, e); }
-    else if (!s.viewOnly) withDrag(s, e);
+    if (e.shiftKey || isRightButton(e)) {
+      if (s.drawable.enabled) withDraw(s, e);
+    } else if (!s.viewOnly) withDrag(s, e);
   };
 }
