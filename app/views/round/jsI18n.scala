@@ -88,6 +88,7 @@ object jsI18n {
     trans.blackTimeOut,
     trans.whiteIsVictorious,
     trans.blackIsVictorious,
+    trans.promotion,
     trans.withdraw,
     trans.rematch,
     trans.rematchOfferSent,

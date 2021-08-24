@@ -16,19 +16,14 @@ object SetupForm {
 
   val filter = Form(single("local" -> text))
 
-  def aiFilled(lib: GameLib, fen: Option[FEN]): Form[AiConfig] =
-    ai fill fen.foldLeft(AiConfig.default(lib.id)) { case (config, f) =>
-      config.copy(fen = f.some, variant = lib match {
-        case GameLib.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
-        case GameLib.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
-      })
+  def aiFilled(fen: Option[FEN]): Form[AiConfig] =
+    ai fill fen.foldLeft(AiConfig.default) { case (config, f) =>
+      config.copy(fen = f.some, variant = Variant.wrap(strategygames.chess.variant.FromPosition))
     }
 
   lazy val ai = Form(
     mapping(
-      "gameLib"         -> gameLibs,
       "chessVariant"    -> chessAIVariants,
-      "draughtsVariant" -> draughtsAIVariants,
       "timeMode"        -> timeMode,
       "time"            -> time,
       "increment"       -> increment,
