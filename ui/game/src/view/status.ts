@@ -9,7 +9,13 @@ export default function status(ctrl: Ctrl): string {
     case 'aborted':
       return noarg('gameAborted');
     case 'mate':
-      return noarg('checkmate');
+      switch (d.game.variant.lib) {
+        case 0:
+          return noarg('checkmate');
+        case 1:
+          return '';
+      }
+      return '';
     case 'resign':
       return noarg(d.game.winner == 'white' ? 'blackResigned' : 'whiteResigned');
     case 'stalemate':
@@ -40,6 +46,8 @@ export default function status(ctrl: Ctrl): string {
           return noarg('threeChecks');
         case 'linesOfAction':
           return noarg('checkersConnected');
+        case 'breakthrough':
+          return noarg('promotion');
       }
       return noarg('variantEnding');
     case 'unknownFinish':

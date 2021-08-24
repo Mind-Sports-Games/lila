@@ -110,7 +110,8 @@ object JsonView {
         Json.obj(
           "key"   -> v.key,
           "name"  -> v.name,
-          "short" -> v.shortName
+          "short" -> v.shortName,
+          "lib"   -> v.gameLib.id
         )
       case Variant.Draughts(draughtsVariant) =>
         Json.obj(
@@ -118,7 +119,8 @@ object JsonView {
           "name"  -> v.name,
           "short" -> v.shortName,
           "gameType" -> v.gameType,
-          "board" -> draughtsVariant.boardSize
+          "board" -> draughtsVariant.boardSize,
+          "lib"   -> v.gameLib.id
         )
     }
   }

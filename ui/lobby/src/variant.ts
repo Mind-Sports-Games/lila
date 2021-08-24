@@ -13,6 +13,14 @@ const variantConfirms = {
     'This is a Crazyhouse game!\n\nEvery time a piece is captured, the capturing player gets a piece of the same type and of their color in their pocket.',
   linesOfAction:
     "This is Lines Of Action, a separate game from chess. The aim of the game is to connect all of one's pieces, with movement variable on the number of pieces in a line.",
+  frisian:
+    "This is a Frisian draughts game!\n\nPieces can also capture horizontally and vertically.",
+  frysk:
+    "This is a Frysk! game!\n\nFrisian draughts starting with 5 pieces each.",
+  antidraughts:
+    "This is an Antidraughts game!\n\nThe game can be won by losing all your pieces, or running out of moves.",
+  breakthrough:
+    "This is a Breakthrough game!\n\nThe first player who makes a king wins."
 };
 
 function storageKey(key) {
