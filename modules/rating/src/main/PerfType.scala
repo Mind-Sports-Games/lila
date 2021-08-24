@@ -176,10 +176,10 @@ object PerfType {
         iconChar = ''
       )
 
-  case object DraughtsStandard
+  case object International
       extends PerfType(
         105,
-        key = "draughtsstandard",
+        key = "international",
         name = Variant.Draughts(strategygames.draughts.variant.Standard).name,
         title = "Standard rules of international draughts",
         iconChar = 'K'
@@ -257,7 +257,7 @@ object PerfType {
     RacingKings,
     Puzzle,
     LinesOfAction,
-    DraughtsStandard,
+    International,
     Frisian,
     Frysk,
     Antidraughts,
@@ -299,7 +299,7 @@ object PerfType {
     Horde,
     RacingKings,
     LinesOfAction,
-    DraughtsStandard,
+    International,
     Frisian,
     Frysk,
     Antidraughts,
@@ -322,7 +322,7 @@ object PerfType {
     Horde,
     RacingKings,
     LinesOfAction,
-    DraughtsStandard,
+    International,
     Frisian,
     Frysk,
     Antidraughts,
@@ -361,7 +361,7 @@ object PerfType {
       case Horde         => Variant.Chess(strategygames.chess.variant.Horde)
       case RacingKings   => Variant.Chess(strategygames.chess.variant.RacingKings)
       case LinesOfAction => Variant.Chess(strategygames.chess.variant.LinesOfAction)
-      case DraughtsStandard => Variant.Draughts(strategygames.draughts.variant.Standard)
+      case International => Variant.Draughts(strategygames.draughts.variant.Standard)
       case Frisian          => Variant.Draughts(strategygames.draughts.variant.Frisian)
       case Frysk            => Variant.Draughts(strategygames.draughts.variant.Frysk)
       case Antidraughts     => Variant.Draughts(strategygames.draughts.variant.Antidraughts)
@@ -384,7 +384,7 @@ object PerfType {
       case Variant.Chess(strategygames.chess.variant.Horde)         => Horde.some
       case Variant.Chess(strategygames.chess.variant.RacingKings)   => RacingKings.some
       case Variant.Chess(strategygames.chess.variant.LinesOfAction) => LinesOfAction.some
-      case Variant.Draughts(strategygames.draughts.variant.Standard) => DraughtsStandard.some
+      case Variant.Draughts(strategygames.draughts.variant.Standard) => International.some
       case Variant.Draughts(strategygames.draughts.variant.Frisian)      => Frisian.some
       case Variant.Draughts(strategygames.draughts.variant.Frysk)        => Frysk.some
       case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => Antidraughts.some

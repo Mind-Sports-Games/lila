@@ -19,7 +19,7 @@ case class Perfs(
     racingKings: Perf,
     crazyhouse: Perf,
     linesOfAction: Perf,
-    draughtsstandard: Perf,
+    international: Perf,
     frisian: Perf,
     frysk: Perf,
     antidraughts: Perf,
@@ -50,13 +50,13 @@ case class Perfs(
       "racingKings"    -> racingKings,
       "crazyhouse"     -> crazyhouse,
       "linesOfAction"  -> linesOfAction,
-      "draughtsstandard" -> draughtsstandard,
-      "frisian"          -> frisian,
-      "frysk"            -> frysk,
-      "antidraughts"     -> antidraughts,
-      "breakthrough"     -> breakthrough,
-      "russian"          -> russian,
-      "brazilian"        -> brazilian,
+      "international"  -> international,
+      "frisian"        -> frisian,
+      "frysk"          -> frysk,
+      "antidraughts"   -> antidraughts,
+      "breakthrough"   -> breakthrough,
+      "russian"        -> russian,
+      "brazilian"      -> brazilian,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -137,6 +137,7 @@ case class Perfs(
     "linesOfAction"  -> linesOfAction,
     "frisian"        -> frisian,
     "frysk"          -> frysk,
+    "international"  -> international,
     "antidraughts"   -> antidraughts,
     "breakthrough"   -> breakthrough,
     "russian"        -> russian,
@@ -159,7 +160,7 @@ case class Perfs(
   def apply(perfType: PerfType): Perf =
     perfType match {
       case PerfType.Standard       => standard
-      case PerfType.DraughtsStandard => draughtsstandard
+      case PerfType.International  => international
       case PerfType.UltraBullet    => ultraBullet
       case PerfType.Bullet         => bullet
       case PerfType.Blitz          => blitz
@@ -284,7 +285,7 @@ case object Perfs {
       case Variant.Chess(strategygames.chess.variant.RacingKings)   => Some(_.racingKings)
       case Variant.Chess(strategygames.chess.variant.Crazyhouse)    => Some(_.crazyhouse)
       case Variant.Chess(strategygames.chess.variant.LinesOfAction) => Some(_.linesOfAction)
-      case Variant.Draughts(strategygames.draughts.variant.Standard) => Some(_.draughtsstandard)
+      case Variant.Draughts(strategygames.draughts.variant.Standard)     => Some(_.international)
       case Variant.Draughts(strategygames.draughts.variant.Frisian)      => Some(_.frisian)
       case Variant.Draughts(strategygames.draughts.variant.Frysk)        => Some(_.frysk)
       case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => Some(_.antidraughts)
@@ -321,7 +322,7 @@ case object Perfs {
         racingKings = perf("racingKings"),
         crazyhouse = perf("crazyhouse"),
         linesOfAction = perf("linesOfAction"),
-        draughtsstandard = perf("draughtsstandard"),
+        international = perf("international"),
         frisian = perf("frisian"),
         frysk = perf("frysk"),
         antidraughts = perf("antidraughts"),
@@ -355,7 +356,7 @@ case object Perfs {
         "racingKings"    -> notNew(o.racingKings),
         "crazyhouse"     -> notNew(o.crazyhouse),
         "linesOfAction"  -> notNew(o.linesOfAction),
-        "standard"       -> notNew(o.standard),
+        "international"  -> notNew(o.international),
         "frisian"        -> notNew(o.frisian),
         "frysk"          -> notNew(o.frysk),
         "antidraughts"   -> notNew(o.antidraughts),
@@ -390,6 +391,7 @@ case object Perfs {
       horde: List[User.LightPerf],
       racingKings: List[User.LightPerf],
       linesOfAction: List[User.LightPerf],
+      international: List[User.LightPerf],
       frisian: List[User.LightPerf],
       frysk: List[User.LightPerf],
       antidraughts: List[User.LightPerf],
@@ -398,5 +400,5 @@ case object Perfs {
       brazilian: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
 }

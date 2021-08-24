@@ -287,7 +287,7 @@ declare type VariantKey =
   | 'linesOfAction';
 
 declare type DraughtsVariantKey =
-  | 'standarddraughts'
+  | 'international'
   | 'antidraughts'
   | 'breakthrough'
   | 'russian'
@@ -313,7 +313,7 @@ declare type Perf =
   | 'racingKings'
   | 'crazyhouse'
   | 'linesOfAction'
-  | 'standarddraughts'
+  | 'international'
   | 'antidraughts'
   | 'breakthrough'
   | 'russian'
