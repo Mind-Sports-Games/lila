@@ -13,7 +13,7 @@ export function top(boards: Board[]): VNode {
 
 const renderBoard = (board: Board): VNode =>
   h(
-    `div.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d`,
+    `div.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLib}`,
     {
       key: board.id,
       attrs: {

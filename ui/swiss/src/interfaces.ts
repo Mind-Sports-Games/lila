@@ -107,6 +107,7 @@ export interface Player extends BasePlayer {
 
 export interface Board {
   id: string;
+  gameLib: string;
   fen: string;
   lastMove?: string;
   orientation: Color;
