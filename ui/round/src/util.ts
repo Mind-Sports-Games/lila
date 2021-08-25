@@ -105,3 +105,9 @@ export const spinner = () =>
       ]),
     ]
   );
+
+const noAnalysisVariants = ['linesOfAction'];
+
+export function allowAnalysisForVariant(variant: VariantKey) {
+  return noAnalysisVariants.indexOf(variant) == -1;
+}

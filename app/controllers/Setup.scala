@@ -41,12 +41,11 @@ final class Setup(
   def aiForm =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        val lib = gameLib(getInt("lib"))
-        fuccess(forms aiFilled(lib, get("fen").map(s => FEN.clean(lib, s)))) map { form =>
+        fuccess(forms aiFilled(get("fen").map(s => FEN.clean(GameLib.Chess(), s)))) map { form =>
           html.setup.forms.ai(
             form,
             env.fishnet.aiPerfApi.intRatings,
-            form("fen").value map(s => FEN.clean(lib, s)) flatMap ValidFen(getBool("strict"))
+            form("fen").value map(s => FEN.clean(GameLib.Chess(), s)) flatMap ValidFen(getBool("strict"))
           )
         }
       } else Redirect(s"${routes.Lobby.home}#ai").fuccess

@@ -74,7 +74,7 @@ object widgets {
                   gameEndStatus(g),
                   g.winner.map { winner =>
                     frag(
-                      ", ",
+                      (gameEndStatus(g) != "").option(", "),
                       winner.color.fold(trans.whiteIsVictorious(), trans.blackIsVictorious())
                     )
                   }

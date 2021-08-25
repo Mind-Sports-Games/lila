@@ -100,6 +100,7 @@ final class RankingApi(
       racingKings   <- topPerf(PerfType.RacingKings.id, nb)
       crazyhouse    <- topPerf(PerfType.Crazyhouse.id, nb)
       linesOfAction <- topPerf(PerfType.LinesOfAction.id, nb)
+      international <- topPerf(PerfType.International.id, nb)
       frisian       <- topPerf(PerfType.Frisian.id, nb)
       frysk         <- topPerf(PerfType.Frysk.id, nb)
       antidraughts  <- topPerf(PerfType.Antidraughts.id, nb)
@@ -121,6 +122,7 @@ final class RankingApi(
       horde = horde,
       racingKings = racingKings,
       linesOfAction = linesOfAction,
+      international = international,
       frisian = frisian,
       frysk = frysk,
       antidraughts = antidraughts,

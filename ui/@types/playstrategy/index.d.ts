@@ -287,15 +287,14 @@ declare type VariantKey =
   | 'linesOfAction';
 
 declare type DraughtsVariantKey =
-  | 'standard'
+  | 'international'
   | 'antidraughts'
   | 'breakthrough'
   | 'russian'
   | 'brazilian'
-  | 'fromPosition'
+  | 'fromPositionDraughts'
   | 'frisian'
-  | 'frysk'
-  | 'atomic';
+  | 'frysk';
 
 declare type Speed = 'bullet' | 'blitz' | 'classical' | 'correspondence' | 'unlimited';
 
@@ -313,7 +312,15 @@ declare type Perf =
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
-  | 'linesOfAction';
+  | 'linesOfAction'
+  | 'international'
+  | 'antidraughts'
+  | 'breakthrough'
+  | 'russian'
+  | 'brazilian'
+  | 'fromPositionDraughts'
+  | 'frisian'
+  | 'frysk';
 
 declare type Color = 'white' | 'black';
 declare type Orientation = 'white' | 'black' | 'left' | 'right';
@@ -335,6 +342,7 @@ interface Variant {
   name: string;
   short: string;
   title?: string;
+  lib: number;
 }
 
 interface DraughtsVariant {
@@ -343,6 +351,7 @@ interface DraughtsVariant {
   short: string;
   title?: string;
   board: BoardData;
+  lib: number;
 }
 
 declare type BoardSize = [number, number];

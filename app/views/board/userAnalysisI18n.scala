@@ -42,6 +42,7 @@ object userAnalysisI18n {
     trans.playingRightNow,
     trans.whiteIsVictorious,
     trans.blackIsVictorious,
+    trans.promotion,
     trans.cheatDetected,
     trans.kingInTheCenter,
     trans.threeChecks,
