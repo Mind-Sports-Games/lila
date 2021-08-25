@@ -45,4 +45,11 @@ export const perfIcons = {
   Correspondence: ';',
   'King of the Hill': '(',
   'Lines Of Action': '',
+  International: 'K',
+  Frisian: 'K',
+  Frysk: 'K',
+  Antidraughts: 'K',
+  Breakthrough: 'K',
+  Russian: 'K',
+  Brazilian: 'K',
 };
