@@ -80,9 +80,15 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   const $el = $(node),
     lm = data.lm,
     lastMove = lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
-    cg = domData.get(node.querySelector('.cg-wrap')!, 'chessground');
+    cg = domData.get(node.querySelector('.cg-wrap')!, 'chessground'),
+    dg = domData.get(node.querySelector('.cg-wrap')!, 'draughtsground');
   if (cg)
     cg.set({
+      fen: data.fen,
+      lastMove,
+    });
+  if (dg)
+    dg.set({
       fen: data.fen,
       lastMove,
     });
