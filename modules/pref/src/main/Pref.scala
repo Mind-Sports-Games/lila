@@ -1,5 +1,7 @@
 package lila.pref
 
+import strategygames.variant.Variant
+
 case class Pref(
     _id: String, // user id
     bg: Int,
@@ -26,6 +28,8 @@ case class Pref(
     destination: Boolean,
     coords: Int,
     replay: Int,
+    gameResult: Int,
+    coordSystem: Int,
     challenge: Int,
     message: Int,
     studyInvite: Int,
@@ -103,6 +107,15 @@ case class Pref(
   def bgImgOrDefault = bgImg | Pref.defaultBgImg
 
   def pieceNotationIsLetter = pieceNotation == PieceNotation.LETTER
+
+  def draughtsResult = gameResult == Pref.DraughtsGameResult.DRAUGHTS
+
+  def isAlgebraic(v: Variant) = v match {
+    case Variant.Draughts(v) => canAlgebraic && v.boardSize.pos.hasAlgebraic
+    case _ => false
+  }
+
+  def canAlgebraic = coordSystem == Pref.DraughtsCoordSystem.ALGEBRAIC
 
   def isZen = zen == Zen.YES
 
@@ -333,6 +346,26 @@ object Pref {
     )
   }
 
+  object DraughtsGameResult {
+    val STANDARD = 0
+    val DRAUGHTS = 1
+
+    val choices = Seq(
+      STANDARD -> "1-0 • ½-½ • 0-1",
+      DRAUGHTS -> "2-0 • 1-1 • 0-2"
+    )
+  }
+
+  object DraughtsCoordSystem {
+    val FIELDNUMBERS = 0
+    val ALGEBRAIC = 1
+
+    val choices = Seq(
+      FIELDNUMBERS -> "Fieldnumbers",
+      ALGEBRAIC -> "Algebraic"
+    )
+  }
+
   object ClockTenths {
     val NEVER   = 0
     val LOWTIME = 1
@@ -426,6 +459,8 @@ object Pref {
     destination = true,
     coords = Coords.INSIDE,
     replay = Replay.ALWAYS,
+    gameResult = DraughtsGameResult.DRAUGHTS,
+    coordSystem = DraughtsCoordSystem.ALGEBRAIC,
     clockTenths = ClockTenths.LOWTIME,
     challenge = Challenge.ALWAYS,
     message = Message.ALWAYS,

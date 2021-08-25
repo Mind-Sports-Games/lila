@@ -3,6 +3,8 @@ package round
 
 import play.api.libs.json.{ JsObject, Json }
 
+import strategygames.format.FEN
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -22,6 +24,8 @@ object watcher {
       bookmarked: Boolean
   )(implicit ctx: Context) = {
 
+    val gameLib = pov.game.variant.gameLib
+
     val chatJson = chatOption map { c =>
       chat.json(
         c.chat,
@@ -39,8 +43,8 @@ object watcher {
       title = s"${gameVsText(pov.game, withRatings = true)} • spectator",
       moreJs = frag(
         roundNvuiTag,
-        roundTag,
-        embedJsUnsafeLoadThen(s"""PlayStrategyRound.boot(${safeJsonValue(
+        roundTag(gameLib),
+        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLib)}.boot(${safeJsonValue(
           Json.obj(
             "data" -> data,
             "i18n" -> jsI18n(pov.game),
@@ -63,7 +67,7 @@ object watcher {
     )
   }
 
-  def crawler(pov: Pov, initialFen: Option[chess.format.FEN], pgn: chess.format.pgn.Pgn)(implicit
+  def crawler(pov: Pov, initialFen: Option[FEN], pgn: strategygames.chess.format.pgn.Pgn)(implicit
       ctx: Context
   ) =
     bits.layout(

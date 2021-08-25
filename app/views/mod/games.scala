@@ -40,7 +40,7 @@ object games {
               form3.input(filterForm("opponents"))(placeholder := "Opponents"),
               form3.select(
                 filterForm("speed"),
-                chess.Speed.all.map { s =>
+                strategygames.Speed.all.map { s =>
                   s.key -> s.name
                 },
                 "Time control".some

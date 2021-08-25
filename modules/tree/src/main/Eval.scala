@@ -1,6 +1,6 @@
 package lila.tree
 
-import chess.format.Uci
+import strategygames.format.Uci
 
 case class Eval(
     cp: Option[Eval.Cp],

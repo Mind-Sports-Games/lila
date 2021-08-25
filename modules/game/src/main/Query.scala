@@ -1,6 +1,8 @@
 package lila.game
 
-import chess.Status
+import strategygames.Status
+import strategygames.variant.Variant
+import strategygames.chess.variant.{ Standard, FromPosition, Horde }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 
@@ -105,13 +107,13 @@ object Query {
 
   def checkableOld = F.checkAt $lt DateTime.now.minusHours(1)
 
-  def variant(v: chess.variant.Variant) =
+  def variant(v: Variant) =
     $doc(F.variant -> (if (v.standard) $exists(false) else $int(v.id)))
 
-  lazy val variantStandard = variant(chess.variant.Standard)
+  lazy val variantStandard = variant(Variant.Chess(Standard))
 
   lazy val notHordeOrSincePawnsAreWhite: Bdoc = $or(
-    F.variant $ne chess.variant.Horde.id,
+    F.variant $ne Horde.id,
     sinceHordePawnsAreWhite
   )
 
@@ -119,7 +121,7 @@ object Query {
     createdSince(Game.hordeWhitePawnsSince)
 
   val notFromPosition: Bdoc =
-    F.variant $ne chess.variant.FromPosition.id
+    F.variant $ne FromPosition.id
 
   def createdSince(d: DateTime): Bdoc =
     F.createdAt $gt d

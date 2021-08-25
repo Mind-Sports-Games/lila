@@ -1,7 +1,7 @@
 package lila.round
 
 import actorApi._, round._
-import chess.{ Black, Centis, Color, White }
+import strategygames.{ Black, Centis, Color, Move, White }
 import org.joda.time.DateTime
 import ornicar.scalalib.Zero
 import play.api.libs.json._
@@ -17,6 +17,7 @@ import lila.hub.actorApi.round.{
   FishnetPlay,
   FishnetStart,
   IsOnGame,
+  MicroRematch,
   RematchNo,
   RematchYes,
   Resign
@@ -347,6 +348,21 @@ final private[round] class RoundDuct(
     case RematchYes(playerId) => handle(PlayerId(playerId))(rematcher.yes)
     case RematchNo(playerId)  => handle(PlayerId(playerId))(rematcher.no)
 
+    //TODO: microMatch: This almost certainly doesnt work as wanted (port issues) 
+    case MicroRematch => handle { game =>
+      rematcher.microMatch(game) map { events =>
+        events.foreach {
+          case Event.RematchTaken(gameId) =>
+            val microMatch = s"2:$gameId"
+            gameRepo.setMicroMatch(game.id, microMatch).void andThen {
+              case _ => updateGame(game => game.copy(metadata = (game.metadata.copy(microMatch = microMatch.some))))
+            }
+          case _ =>
+        }
+        events
+      }
+    }
+
     case TakebackYes(playerId) =>
       handle(playerId) { pov =>
         takebacker.yes(~takebackSituation)(pov) map { case (events, situation) =>
@@ -373,7 +389,14 @@ final private[round] class RoundDuct(
 
     case ForecastPlay(lastMove) =>
       handle { game =>
-        forecastApi.nextMove(game, lastMove) map { mOpt =>
+        val nextMove = lastMove match {
+          case Move.Draughts(lastMove) => lastMove.situationBefore.captureLengthFrom(lastMove.orig) match {
+            case Some(captLen) if captLen > 1 => forecastApi.moveOpponent(game, Move.Draughts(lastMove)) >> forecastApi.nextMove(game, Move.Draughts(lastMove))
+            case _ => forecastApi.nextMove(game, Move.Draughts(lastMove))
+          }
+          case _ => forecastApi.nextMove(game, lastMove)
+        }
+        nextMove map { mOpt =>
           mOpt foreach { move =>
             this ! HumanPlay(PlayerId(game.player.id), move, blur = false)
           }

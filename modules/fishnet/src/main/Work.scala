@@ -2,8 +2,9 @@ package lila.fishnet
 
 import org.joda.time.DateTime
 
-import chess.format.{ FEN, Uci }
-import chess.variant.Variant
+import strategygames.format.{ FEN, Uci }
+import strategygames.variant.Variant
+import strategygames.GameLib
 import lila.common.IpAddress
 
 sealed trait Work {
@@ -45,13 +46,13 @@ object Work {
 
   private[fishnet] case class Game(
       id: String, // can be a study chapter ID, if studyId is set
-      initialFen: Option[FEN],
+      initialFen: Option[String],//FEN
       studyId: Option[String],
       variant: Variant,
       moves: String
   ) {
 
-    def uciList: List[Uci] = ~(Uci readList moves)
+    def uciList: List[Uci] = ~(Uci.readList(GameLib.Chess(), moves))
   }
 
   case class Sender(

@@ -1,6 +1,6 @@
 package lila.evaluation
 
-import chess.{ Color, Speed }
+import strategygames.{ Color, Speed }
 import org.joda.time.DateTime
 
 import lila.analyse.{ Accuracy, Analysis }

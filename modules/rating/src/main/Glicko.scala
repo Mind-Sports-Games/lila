@@ -4,6 +4,8 @@ import org.goochjs.glicko2._
 import org.joda.time.DateTime
 import reactivemongo.api.bson.BSONDocument
 
+import strategygames.variant.Variant
+
 import lila.db.BSON
 
 case class Glicko(
@@ -19,7 +21,7 @@ case class Glicko(
   def intervalMax = (rating + deviation * 2).toInt
   def interval    = intervalMin -> intervalMax
 
-  def rankable(variant: chess.variant.Variant) =
+  def rankable(variant: Variant) =
     deviation <= {
       if (variant.standard) Glicko.standardRankableDeviation
       else Glicko.variantRankableDeviation

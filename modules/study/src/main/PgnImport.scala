@@ -1,9 +1,11 @@
 package lila.study
 
 import cats.data.Validated
-import chess.Centis
-import chess.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
-import chess.format.{ Forsyth, Uci, UciCharPair }
+import strategygames.Centis
+import strategygames.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
+import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
+import strategygames.variant.Variant
+import strategygames.{ Color, Game, GameLib, Status }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
@@ -11,16 +13,18 @@ import lila.tree.Node.{ Comment, Comments, Shapes }
 
 object PgnImport {
 
+  def lib = GameLib.Chess()
+
   case class Result(
       root: Node.Root,
-      variant: chess.variant.Variant,
+      variant: Variant,
       tags: Tags,
       end: Option[End]
   )
 
   case class End(
-      status: chess.Status,
-      winner: Option[chess.Color],
+      status: Status,
+      winner: Option[Color],
       resultText: String,
       statusText: String
   )
@@ -33,7 +37,7 @@ object PgnImport {
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.turns,
-              fen = initialFen | game.variant.initialFen,
+              fen = initialFen.getOrElse(game.variant.initialFen),
               check = replay.setup.situation.check,
               shapes = shapes,
               comments = comments,
@@ -53,7 +57,7 @@ object PgnImport {
               End(
                 status = status,
                 winner = game.winnerColor,
-                resultText = chess.Color.showResult(game.winnerColor),
+                resultText = Color.showResult(game.winnerColor),
                 statusText = lila.game.StatusText(status, game.winnerColor, game.variant)
               )
             }
@@ -89,7 +93,7 @@ object PgnImport {
     Comment(Comment.Id.make, Comment.Text(text), Comment.Author.PlayStrategy)
   }
 
-  private def makeVariations(sans: List[San], game: chess.Game, annotator: Option[Comment.Author]) =
+  private def makeVariations(sans: List[San], game: Game, annotator: Option[Comment.Author]) =
     sans.headOption.?? {
       _.metas.variations.flatMap { variation =>
         makeNode(game, variation.value, annotator)
@@ -115,7 +119,7 @@ object PgnImport {
       }
     }
 
-  private def makeNode(prev: chess.Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
+  private def makeNode(prev: Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
     try {
       sans match {
         case Nil => none
@@ -123,16 +127,16 @@ object PgnImport {
           san(prev.situation).fold(
             _ => none, // illegal move; stop here.
             moveOrDrop => {
-              val game   = moveOrDrop.fold(prev.apply, prev.applyDrop)
-              val uci    = moveOrDrop.fold(_.toUci, _.toUci)
-              val sanStr = moveOrDrop.fold(Dumper.apply, Dumper.apply)
+              val game   = prev.apply(moveOrDrop)
+              val uci    = moveOrDrop.fold(_.toUci, d => Uci.wrap(d.toUci))
+              val sanStr = moveOrDrop.fold(m => Dumper.apply(lib, m), d => Dumper.apply(lib, d))
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(
-                    id = UciCharPair(uci),
+                    id = UciCharPair(GameLib.Chess(), uci),
                     ply = game.turns,
-                    move = Uci.WithSan(uci, sanStr),
-                    fen = Forsyth >> game,
+                    move = Uci.WithSan(GameLib.Chess(), uci, sanStr),
+                    fen = Forsyth.>>(GameLib.Chess(), game),
                     check = game.situation.check,
                     shapes = shapes,
                     comments = comments,

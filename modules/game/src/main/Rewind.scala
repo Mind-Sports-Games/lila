@@ -1,28 +1,31 @@
 package lila.game
 
 import cats.data.Validated
-import chess.format.{ FEN, pgn => chessPgn }
+import strategygames.{ Game => StratGame }
+import strategygames.format.{ FEN }
+import strategygames.format.pgn.{ Reader, Sans, Tag, Tags }
 import org.joda.time.DateTime
 
 object Rewind {
 
   private def createTags(fen: Option[FEN], game: Game) = {
-    val variantTag = Some(chessPgn.Tag(_.Variant, game.variant.name))
-    val fenTag     = fen.map(f => chessPgn.Tag(_.FEN, f.value))
+    val variantTag = Some(Tag(_.Variant, game.variant.name))
+    val fenTag     = fen.map(f => Tag(_.FEN, f.value))
 
-    chessPgn.Tags(List(variantTag, fenTag).flatten)
+    Tags(List(variantTag, fenTag).flatten)
   }
 
   def apply(game: Game, initialFen: Option[FEN]): Validated[String, Progress] =
-    chessPgn.Reader
+    Reader
       .movesWithSans(
+        game.variant.gameLib,
         moveStrs = game.pgnMoves,
-        op = sans => chessPgn.Sans(sans.value.dropRight(1)),
+        op = sans => Sans(sans.value.dropRight(1)),
         tags = createTags(initialFen, game)
       )
       .flatMap(_.valid) map { replay =>
-      val rewindedGame = replay.state
       val color        = game.turnColor
+      val rewindedGame = replay.state
       val newClock = game.clock.map(_.takeback) map { clk =>
         game.clockHistory.flatMap(_.last(color)).fold(clk) { t =>
           clk.setRemainingTime(color, t)

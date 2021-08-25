@@ -286,6 +286,16 @@ declare type VariantKey =
   | 'crazyhouse'
   | 'linesOfAction';
 
+declare type DraughtsVariantKey =
+  | 'international'
+  | 'antidraughts'
+  | 'breakthrough'
+  | 'russian'
+  | 'brazilian'
+  | 'fromPositionDraughts'
+  | 'frisian'
+  | 'frysk';
+
 declare type Speed = 'bullet' | 'blitz' | 'classical' | 'correspondence' | 'unlimited';
 
 declare type Perf =
@@ -302,7 +312,15 @@ declare type Perf =
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
-  | 'linesOfAction';
+  | 'linesOfAction'
+  | 'international'
+  | 'antidraughts'
+  | 'breakthrough'
+  | 'russian'
+  | 'brazilian'
+  | 'fromPositionDraughts'
+  | 'frisian'
+  | 'frysk';
 
 declare type Color = 'white' | 'black';
 declare type Orientation = 'white' | 'black' | 'left' | 'right';
@@ -315,11 +333,31 @@ declare type San = string;
 declare type Fen = string;
 declare type Ply = number;
 
+// TODO: these interfaces should be written in a way that
+//       allows for the base one to be defined and then only the
+//       differences after that, until then, keep all of them up
+//       to date.
 interface Variant {
   key: VariantKey;
   name: string;
   short: string;
   title?: string;
+  lib: number;
+}
+
+interface DraughtsVariant {
+  key: DraughtsVariantKey;
+  name: string;
+  short: string;
+  title?: string;
+  board: BoardData;
+  lib: number;
+}
+
+declare type BoardSize = [number, number];
+interface BoardData {
+  key: string;
+  size: BoardSize;
 }
 
 interface Paginator<A> {

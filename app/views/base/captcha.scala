@@ -4,6 +4,9 @@ import controllers.routes
 import play.api.libs.json.Json
 import scala.language.reflectiveCalls
 
+import strategygames.{ Color, GameLib }
+import strategygames.format.FEN
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -30,8 +33,8 @@ object captcha {
         )(
           div(cls := "challenge")(
             views.html.board.bits.mini(
-              chess.format.FEN(captcha.fenBoard),
-              chess.Color.fromWhite(captcha.white)
+              FEN(GameLib.Chess(), captcha.fenBoard),
+              Color.fromWhite(captcha.white)
             ) {
               div(
                 dataMoves := safeJsonValue(Json.toJson(captcha.moves)),

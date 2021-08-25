@@ -1,7 +1,10 @@
 package lila.game
 
-import chess.format.{ FEN, Forsyth }
-import chess.{ Color, Status }
+import scala.language.existentials
+
+import strategygames.chess
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.{ Black, Color, Mode, Status, White }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.commands.WriteResult
@@ -263,6 +266,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def setTv(id: ID) = coll.updateFieldUnchecked($id(id), F.tvAt, DateTime.now)
 
+  def setMicroMatch(id: ID, microMatch: String) =
+    coll.updateField($id(id), F.microMatch, microMatch)
+
   def setAnalysed(id: ID): Unit   = coll.updateFieldUnchecked($id(id), F.analysed, true)
   def setUnanalysed(id: ID): Unit = coll.updateFieldUnchecked($id(id), F.analysed, false)
 
@@ -289,12 +295,12 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   object holdAlert {
     private val holdAlertSelector = $or(
-      holdAlertField(chess.White) $exists true,
-      holdAlertField(chess.Black) $exists true
+      holdAlertField(White) $exists true,
+      holdAlertField(Black) $exists true
     )
     private val holdAlertProjection = $doc(
-      holdAlertField(chess.White) -> true,
-      holdAlertField(chess.Black) -> true
+      holdAlertField(White) -> true,
+      holdAlertField(Black) -> true
     )
     private def holdAlertOf(doc: Bdoc, color: Color): Option[Player.HoldAlert] =
       doc.child(color.fold("p0", "p1")).flatMap(_.getAsOpt[Player.HoldAlert](Player.BSONFields.holdAlert))
@@ -305,7 +311,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         holdAlertProjection
       ) map {
         _.fold(Player.HoldAlert.emptyMap) { doc =>
-          Color.Map(white = holdAlertOf(doc, chess.White), black = holdAlertOf(doc, chess.Black))
+          Color.Map(white = holdAlertOf(doc, White), black = holdAlertOf(doc, Black))
         }
       }
 
@@ -383,16 +389,16 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .skip(ThreadLocalRandom nextInt distribution)
       .one[Game]
 
-  def insertDenormalized(g: Game, initialFen: Option[chess.format.FEN] = None): Funit = {
+  def insertDenormalized(g: Game, initialFen: Option[FEN] = None): Funit = {
     val g2 =
       if (g.rated && (g.userIds.distinct.size != 2 || !Game.allowRated(g.variant, g.clock.map(_.config))))
-        g.copy(mode = chess.Mode.Casual)
+        g.copy(mode = Mode.Casual)
       else g
     val userIds = g2.userIds.distinct
     // TODO: why does the initialFen get generated here?
     val fen: Option[FEN] = initialFen orElse {
       (!g2.variant.standardInitialPosition)
-        .option(Forsyth >> g2.chess)
+        .option(Forsyth.>>(g2.variant.gameLib, g2.chess))
         .filterNot(_.initial)
     }
     val checkInHours =
@@ -434,7 +440,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def initialFen(game: Game): Fu[Option[FEN]] =
     if (game.imported || !game.variant.standardInitialPosition) initialFen(game.id) dmap {
-      case None if game.variant == chess.variant.Chess960 => Forsyth.initial.some
+      case None if game.variant == strategygames.chess.variant.Chess960 => Forsyth.initial(game.variant.gameLib).some
       case fen                                            => fen
     }
     else fuccess(none)

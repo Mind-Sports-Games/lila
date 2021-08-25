@@ -1,10 +1,12 @@
 package lila.study
 
-import chess.format.pgn.{ Glyph, Glyphs }
-import chess.format.{ FEN, Uci, UciCharPair }
-import chess.variant.Crazyhouse
+import strategygames.format.pgn.{ Glyph, Glyphs }
+import strategygames.format.{ FEN, Uci }
+import strategygames.format.{ UciCharPair }
+import strategygames.variant.Variant
+import strategygames.chess.variant.Crazyhouse
 
-import chess.Centis
+import strategygames.Centis
 import lila.tree.Eval.Score
 import lila.tree.Node.{ Comment, Comments, Gamebook, Shapes }
 
@@ -23,7 +25,7 @@ sealed trait RootOrNode {
   def addChild(node: Node): RootOrNode
   def fullMoveNumber = 1 + ply / 2
   def mainline: Vector[Node]
-  def color = chess.Color.fromPly(ply)
+  def color = strategygames.Color.fromPly(ply)
   def moveOption: Option[Uci.WithSan]
 }
 
@@ -323,7 +325,7 @@ object Node {
 
   object Root {
 
-    def default(variant: chess.variant.Variant) =
+    def default(variant: Variant) =
       Root(
         ply = 0,
         fen = variant.initialFen,

@@ -1,6 +1,6 @@
 package lila.importer
 
-import chess.format.FEN
+import strategygames.format.FEN
 
 import lila.game.{ Game, GameRepo }
 import cats.data.Validated
@@ -15,7 +15,7 @@ final class Importer(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execution
     gameExists {
       (data preprocess user).toFuture flatMap { case Preprocessed(g, _, initialFen, _) =>
         val game = forceId.fold(g.sloppy)(g.withId)
-        gameRepo.insertDenormalized(game, initialFen = initialFen) >> {
+        gameRepo.insertDenormalized(game, initialFen) >> {
           game.pgnImport.flatMap(_.user).isDefined ?? gameRepo.setImportCreatedAt(game)
         } >> {
           gameRepo.finish(

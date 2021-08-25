@@ -119,7 +119,7 @@ final class TournamentApi(
       conditions = data.conditions
         .convert(tour.perfType, leaderTeams.view.map(_.pair).toMap)
         .copy(teamMember = old.conditions.teamMember), // can't change that
-      mode = if (tour.position.isDefined) chess.Mode.Casual else tour.mode
+      mode = if (tour.position.isDefined) strategygames.Mode.Casual else tour.mode
     )
 
   def teamBattleUpdate(
@@ -447,7 +447,7 @@ final class TournamentApi(
             } | player.performance
           )
         } >>- finishing.flatMap(_.whitePlayer.userId).foreach { whiteUserId =>
-          colorHistoryApi.inc(player.id, chess.Color.fromWhite(player is whiteUserId))
+          colorHistoryApi.inc(player.id, strategygames.Color.fromWhite(player is whiteUserId))
         }
       }
     }
@@ -460,7 +460,7 @@ final class TournamentApi(
     } yield opponentRating + 500 * multiplier
 
   private def withdrawNonMover(game: Game): Unit =
-    if (game.status == chess.Status.NoStart) for {
+    if (game.status == strategygames.Status.NoStart) for {
       tourId <- game.tournamentId
       player <- game.playerWhoDidNotMove
       userId <- player.userId

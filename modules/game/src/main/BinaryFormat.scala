@@ -1,8 +1,11 @@
 package lila.game
 
-import chess._
-import chess.format.Uci
-import chess.variant.Variant
+import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLib, Piece, PieceMap, Pos, Role, Timestamp, White }
+import strategygames.chess.{ Castles, Rank, UnmovedRooks }
+import strategygames.chess
+import strategygames.draughts
+import strategygames.format
+import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.lichess.compression.clock.{ Encoder => ClockEncoder }
 import scala.util.Try
@@ -15,14 +18,14 @@ object BinaryFormat {
 
     def write(moves: PgnMoves): ByteArray =
       ByteArray {
-        format.pgn.Binary.writeMoves(moves).get
+        chess.format.pgn.Binary.writeMoves(moves).get
       }
 
     def read(ba: ByteArray): PgnMoves =
-      format.pgn.Binary.readMoves(ba.value.toList).get.toVector
+      chess.format.pgn.Binary.readMoves(ba.value.toList).get.toVector
 
     def read(ba: ByteArray, nb: Int): PgnMoves =
-      format.pgn.Binary.readMoves(ba.value.toList, nb).get.toVector
+      chess.format.pgn.Binary.readMoves(ba.value.toList, nb).get.toVector
   }
 
   object clockHistory {
@@ -170,6 +173,7 @@ object BinaryFormat {
     def apply(start: DateTime) = new clock(Timestamp(start.getMillis))
   }
 
+  // This class is chess only for the time being.
   object castleLastMove {
 
     def write(clmt: CastleLastMove): ByteArray = {
@@ -179,9 +183,9 @@ object BinaryFormat {
         case (acc, (true, p))  => acc + (1 << (3 - p))
       }
 
-      def posInt(pos: Pos): Int = (pos.file.index << 3) + pos.rank.index
+      def posInt(pos: Pos): Int = pos.toInt
       val lastMoveInt = clmt.lastMove.map(_.origDest).fold(0) { case (o, d) =>
-        (posInt(o) << 6) + posInt(d)
+        (posInt(Pos.Chess(o)) << 6) + posInt(Pos.Chess(d))
       }
       Array((castleInt << 4) + (lastMoveInt >> 8) toByte, lastMoveInt.toByte)
     }
@@ -195,65 +199,92 @@ object BinaryFormat {
       CastleLastMove(
         castles = Castles(b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
         lastMove = for {
-          orig <- Pos.at((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
-          dest <- Pos.at((b2 & 63) >> 3, b2 & 7)
-          if orig != Pos.A1 || dest != Pos.A1
-        } yield Uci.Move(orig, dest)
+          orig <- chess.Pos.at((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
+          dest <- chess.Pos.at((b2 & 63) >> 3, b2 & 7)
+          if orig != chess.Pos.A1 || dest != chess.Pos.A1
+        } yield chess.format.Uci.Move(orig, dest)
       )
   }
 
   object piece {
 
-    def write(pieces: PieceMap): ByteArray = {
-      def posInt(pos: Pos): Int =
+    def writeChess(pieces: chess.PieceMap): ByteArray = {
+      def posInt(pos: chess.Pos): Int =
         (pieces get pos).fold(0) { piece =>
           piece.color.fold(0, 128) + roleToInt(piece.role)
         }
-      ByteArray(Pos.all.map(posInt(_).toByte).toArray)
+      ByteArray(chess.Pos.all.map(posInt(_).toByte).toArray)
     }
 
-    def read(ba: ByteArray, variant: Variant): PieceMap = {
+    def readChess(ba: ByteArray, variant: chess.variant.Variant): chess.PieceMap = {
       def splitInts(b: Byte) = {
         val int = b.toInt
         Array(int >> 4, int & 0x0f)
       }
-      def intPiece(int: Int): Option[Piece] =
-        intToRole(int & 127, variant) map { role =>
-          Piece(Color.fromWhite((int & 128) == 0), role)
+      def intPiece(int: Int): Option[chess.Piece] =
+        intToRoleChess(int & 127, variant) map { role =>
+          chess.Piece(
+            Color.fromWhite((int & 128) == 0),
+            role
+          )
         }
-      (Pos.all zip ba.value).view
+      (chess.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
         }
         .to(Map)
     }
 
-    // cache standard start position
-    val standard = write(Board.init(chess.variant.Standard).pieces)
+    private val groupedPos: Map[draughts.Board.BoardSize, Array[(draughts.PosMotion, draughts.PosMotion)]] = draughts.Board.BoardSize.all.map { size =>
+      size -> getGroupedPos(size)
+    }.to(Map)
 
-    private def intToRole(int: Int, variant: Variant): Option[Role] =
-      int match {
-        case 6 => Some(Pawn)
-        case 1 => Some(King)
-        case 2 => Some(Queen)
-        case 3 => Some(Rook)
-        case 4 => Some(Knight)
-        case 5 => Some(Bishop)
-        // Legacy from when we used to have an 'Antiking' piece
-        case 7 if variant.antichess => Some(King)
-        case 8 if variant.linesOfAction => Some(LOAChecker)
-        case _                      => None
+    private def getGroupedPos(size: draughts.Board.BoardSize) = size.pos.all grouped 2 collect {
+      case List(p1, p2) => (p1, p2)
+    } toArray
+
+    def writeDraughts(pieces: draughts.PieceMap, variant: draughts.variant.Variant): ByteArray = {
+      def posInt(pos: draughts.Pos): Int = (pieces get pos).fold(0) { piece =>
+        piece.color.fold(0, 8) + roleToInt(piece.role)
       }
-    private def roleToInt(role: Role): Int =
-      role match {
-        case Pawn   => 6
-        case King   => 1
-        case Queen  => 2
-        case Rook   => 3
-        case Knight => 4
-        case Bishop => 5
-        case LOAChecker => 8
+      ByteArray(groupedPos(variant.boardSize) map {
+        case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
+      })
+    }
+
+    def writeDraughts(board: draughts.Board): ByteArray = writeDraughts(board.pieces, board.variant)
+
+    def readDraughts(ba: ByteArray, variant: draughts.variant.Variant): draughts.PieceMap = {
+      def splitInts(b: Byte) = {
+        val int = b.toInt
+        Array(int >> 4, int & 0x0F)
       }
+      def intPiece(int: Int): Option[draughts.Piece] =
+        intToRoleDraughts(int & 7, variant) map { role => draughts.Piece(Color((int & 8) == 0), role) }
+      val pieceInts = ba.value flatMap splitInts
+      (variant.boardSize.pos.all zip pieceInts).flatMap {
+        case (pos, int) => intPiece(int) map (pos -> _)
+      }.to(Map)
+    }
+
+    // cache standard start position
+    def standard(lib: GameLib) = lib match {
+      case GameLib.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
+      case GameLib.Draughts() => writeDraughts(
+        draughts.Board.init(draughts.variant.Standard).pieces,
+        draughts.variant.Standard
+      )
+    }
+
+    private def intToRoleChess(int: Int, variant: chess.variant.Variant): Option[chess.Role] =
+      chess.Role.binaryInt(int)
+    private def intToRoleDraughts(int: Int, variant: draughts.variant.Variant): Option[draughts.Role] =
+      draughts.Role.binaryInt(int)
+
+    private def roleToInt(role: Role): Int = role.binaryInt
+    private def roleToInt(role: chess.Role): Int = role.binaryInt
+    private def roleToInt(role: draughts.Role): Int = role.binaryInt
+
   }
 
   object unmovedRooks {
@@ -277,19 +308,19 @@ object BinaryFormat {
 
     private val arrIndexes = 0 to 1
     private val bitIndexes = 0 to 7
-    private val whiteStd   = Set(Pos.A1, Pos.H1)
-    private val blackStd   = Set(Pos.A8, Pos.H8)
+    private val whiteStd   = Set(chess.Pos.A1, chess.Pos.H1)
+    private val blackStd   = Set(chess.Pos.A8, chess.Pos.H8)
 
     def read(ba: ByteArray) =
       UnmovedRooks {
-        var set = Set.empty[Pos]
+        var set = Set.empty[chess.Pos]
         arrIndexes.foreach { i =>
           val int = ba.value(i).toInt
           if (int != 0) {
             if (int == -127) set = if (i == 0) whiteStd else set ++ blackStd
             else
               bitIndexes.foreach { j =>
-                if (bitAt(int, j) == 1) set = set + Pos.at(7 - j, 7 * i).get
+                if (bitAt(int, j) == 1) set = set + chess.Pos.at(7 - j, 7 * i).get
               }
           }
         }

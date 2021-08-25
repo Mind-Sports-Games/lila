@@ -7,6 +7,8 @@ import lila.common.Json.jodaWrites
 import lila.game.JsonView._
 import lila.game.{ Game, GameRepo, Pov }
 
+import strategygames.GameLib
+
 final class BotJsonView(
     lightUserApi: lila.user.LightUserApi,
     gameRepo: GameRepo,
@@ -45,7 +47,7 @@ final class BotJsonView(
 
   def gameState(wf: Game.WithInitialFen): Fu[JsObject] = {
     import wf._
-    chess.format.UciDump(game.pgnMoves, fen, game.variant).toFuture map { uciMoves =>
+    strategygames.format.UciDump(game.variant.gameLib, game.pgnMoves, fen, game.variant).toFuture map { uciMoves =>
       Json
         .obj(
           "type"   -> "gameState",
@@ -89,7 +91,7 @@ final class BotJsonView(
       .orElse(pov.game.correspondenceClock.map(_.remainingTime(pov.color).toInt * 1000))
       .getOrElse(Int.MaxValue)
 
-  implicit private val clockConfigWriter: OWrites[chess.Clock.Config] = OWrites { c =>
+  implicit private val clockConfigWriter: OWrites[strategygames.Clock.Config] = OWrites { c =>
     Json.obj(
       "initial"   -> c.limit.millis,
       "increment" -> c.increment.millis

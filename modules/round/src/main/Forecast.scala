@@ -3,8 +3,8 @@ package lila.round
 import org.joda.time.DateTime
 import play.api.libs.json._
 
-import chess.format.Uci
-import chess.Move
+import strategygames.format.Uci
+import strategygames.{ GameLib, Move }
 import lila.common.Json.jodaWrites
 import lila.game.Game
 
@@ -34,6 +34,23 @@ case class Forecast(
       case (None, fst :: snd :: _) if g.turns == fst.ply && fst.is(last) => snd.uciMove
       case (move, _)                                                     => move
     }
+
+  def moveOpponent(g: Game, lastMove: Move): Option[(Forecast, Uci.Move)] =
+    nextMoveOpponent(g, lastMove) map { move =>
+      copy(
+        steps = steps.collect {
+          case (fst :: snd :: rest) if rest.nonEmpty && g.turns == fst.ply && fst.is(lastMove.toShortUci) && snd.is(move) => snd :: rest
+        },
+        date = DateTime.now
+      ) -> lastMove.toShortUci
+    }
+
+  private def nextMoveOpponent(g: Game, last: Move) =
+    steps.foldLeft(none[Uci.Move]) {
+      case (None, fst :: snd :: _) if g.turns == fst.ply && fst.is(last.toShortUci) => snd.uciMove
+      case (move, _) => move
+    }
+
 }
 
 object Forecast {
@@ -43,6 +60,7 @@ object Forecast {
   def maxPlies(steps: Steps): Int = steps.foldLeft(0)(_ max _.size)
 
   case class Step(
+      lib: Int,
       ply: Int,
       uci: String,
       san: String,
@@ -53,7 +71,7 @@ object Forecast {
     def is(move: Move)     = move.toUci.uci == uci
     def is(move: Uci.Move) = move.uci == uci
 
-    def uciMove = Uci.Move(uci)
+    def uciMove = Uci.Move(GameLib(lib), uci)
   }
 
   implicit val forecastStepJsonFormat = Json.format[Step]

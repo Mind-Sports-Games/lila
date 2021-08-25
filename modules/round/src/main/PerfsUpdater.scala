@@ -1,6 +1,8 @@
 package lila.round
 
-import chess.{ Color, Speed }
+import strategygames.{ Black, Color, Speed, White }
+import strategygames.variant.Variant
+import strategygames.chess.variant._
 import org.goochjs.glicko2._
 
 import lila.game.{ Game, GameRepo, PerfPicker, RatingDiffs }
@@ -27,25 +29,25 @@ final class PerfsUpdater(
             val ratingsW = mkRatings(white.perfs)
             val ratingsB = mkRatings(black.perfs)
             game.ratingVariant match {
-              case chess.variant.Chess960 =>
+              case Variant.Chess(Chess960) =>
                 updateRatings(ratingsW.chess960, ratingsB.chess960, game)
-              case chess.variant.KingOfTheHill =>
+              case Variant.Chess(KingOfTheHill) =>
                 updateRatings(ratingsW.kingOfTheHill, ratingsB.kingOfTheHill, game)
-              case chess.variant.ThreeCheck =>
+              case Variant.Chess(ThreeCheck) =>
                 updateRatings(ratingsW.threeCheck, ratingsB.threeCheck, game)
-              case chess.variant.Antichess =>
+              case Variant.Chess(Antichess) =>
                 updateRatings(ratingsW.antichess, ratingsB.antichess, game)
-              case chess.variant.Atomic =>
+              case Variant.Chess(Atomic) =>
                 updateRatings(ratingsW.atomic, ratingsB.atomic, game)
-              case chess.variant.Horde =>
+              case Variant.Chess(Horde) =>
                 updateRatings(ratingsW.horde, ratingsB.horde, game)
-              case chess.variant.RacingKings =>
+              case Variant.Chess(RacingKings) =>
                 updateRatings(ratingsW.racingKings, ratingsB.racingKings, game)
-              case chess.variant.Crazyhouse =>
+              case Variant.Chess(Crazyhouse) =>
                 updateRatings(ratingsW.crazyhouse, ratingsB.crazyhouse, game)
-              case chess.variant.LinesOfAction =>
+              case Variant.Chess(LinesOfAction) =>
                 updateRatings(ratingsW.linesOfAction, ratingsB.linesOfAction, game)
-              case chess.variant.Standard =>
+              case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
                     updateRatings(ratingsW.bullet, ratingsB.bullet, game)
@@ -119,8 +121,8 @@ final class PerfsUpdater(
 
   private def updateRatings(white: Rating, black: Rating, game: Game): Unit = {
     val result = game.winnerColor match {
-      case Some(chess.White) => Glicko.Result.Win
-      case Some(chess.Black) => Glicko.Result.Loss
+      case Some(White) => Glicko.Result.Win
+      case Some(Black) => Glicko.Result.Loss
       case None              => Glicko.Result.Draw
     }
     val results = new RatingPeriodResults()

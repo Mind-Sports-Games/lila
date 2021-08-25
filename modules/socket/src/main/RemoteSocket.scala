@@ -1,7 +1,7 @@
 package lila.socket
 
 import akka.actor.{ ActorSystem, CoordinatedShutdown }
-import chess.{ Centis, Color }
+import strategygames.{ Centis, Color }
 import io.lettuce.core._
 import io.lettuce.core.pubsub.{ StatefulRedisPubSubConnection => PubSub }
 import java.util.concurrent.atomic.AtomicReference

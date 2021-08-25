@@ -1,6 +1,8 @@
 package views
 package html.puzzle
 
+import strategygames.format.FEN
+
 import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.{ JsString, Json }
@@ -14,7 +16,7 @@ object bits {
 
   private val dataLastmove = attr("data-lastmove")
 
-  def daily(p: lila.puzzle.Puzzle, fen: chess.format.FEN, lastMove: String) =
+  def daily(p: lila.puzzle.Puzzle, fen: FEN, lastMove: String) =
     views.html.board.bits.mini(fen, p.color, lastMove)(span)
 
   def jsI18n(streak: Boolean)(implicit lang: Lang) =

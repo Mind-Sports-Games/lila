@@ -105,8 +105,15 @@ export interface Player extends BasePlayer {
   sheet: (PairingBase | Outcome)[];
 }
 
+export interface BoardSize {
+  size: number[];
+  key: string;
+}
+
 export interface Board {
   id: string;
+  gameLib: string;
+  boardSize?: BoardSize;
   fen: string;
   lastMove?: string;
   orientation: Color;

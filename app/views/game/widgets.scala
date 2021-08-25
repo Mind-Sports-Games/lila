@@ -41,7 +41,7 @@ object widgets {
                   frag(
                     showClock(g),
                     separator,
-                    g.perfType.fold(chess.variant.FromPosition.name)(_.trans),
+                    g.perfType.fold(strategygames.chess.variant.FromPosition.name)(_.trans),
                     separator,
                     if (g.rated) trans.rated.txt() else trans.casual.txt()
                   )
@@ -55,7 +55,10 @@ object widgets {
                 } orElse
                 g.swissId.map { swissId =>
                   frag(separator, views.html.swiss.bits.link(lila.swiss.Swiss.Id(swissId)))
-                }
+                },
+              g.metadata.microMatchGameNr map { gameNr =>
+                frag(separator, trans.microMatchGameX(gameNr))
+              }
             )
           ),
           div(cls := "versus")(
@@ -71,7 +74,7 @@ object widgets {
                   gameEndStatus(g),
                   g.winner.map { winner =>
                     frag(
-                      ", ",
+                      (gameEndStatus(g) != "").option(", "),
                       winner.color.fold(trans.whiteIsVictorious(), trans.blackIsVictorious())
                     )
                   }
@@ -83,7 +86,7 @@ object widgets {
             val pgnMoves = g.pgnMoves take 20
             div(cls := "opening")(
               (!g.fromPosition ?? g.opening) map { opening =>
-                strong(opening.opening.ecoName)
+                strong(opening.opening.toString())
               },
               div(cls := "pgn")(
                 pgnMoves.take(6).grouped(2).zipWithIndex map {

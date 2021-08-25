@@ -1,8 +1,8 @@
 package lila.analyse
 
 import cats.implicits._
-import chess.Color
-import chess.format.Uci
+import strategygames.{ Color, GameLib }
+import strategygames.format.Uci
 
 import lila.tree.Eval
 
@@ -75,7 +75,7 @@ object Info {
       case Array(cp, ma)     => Info(ply, Eval(strCp(cp), strMate(ma), None)).some
       case Array(cp, ma, va) => Info(ply, Eval(strCp(cp), strMate(ma), None), va.split(' ').toList).some
       case Array(cp, ma, va, be) =>
-        Info(ply, Eval(strCp(cp), strMate(ma), Uci.Move piotr be), va.split(' ').toList).some
+        Info(ply, Eval(strCp(cp), strMate(ma), Uci.Move.piotr(GameLib.Chess(), be)), va.split(' ').toList).some
       case _ => none
     }
 

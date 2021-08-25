@@ -1,6 +1,6 @@
 package lila.game
 
-import chess.Color
+import strategygames.Color
 import java.security.SecureRandom
 import ornicar.scalalib.Random
 

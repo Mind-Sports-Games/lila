@@ -8,8 +8,11 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import chess.format.FEN
-import chess.variant.Variant
+import strategygames.{ Color, GameLib }
+import strategygames.format.{ FEN => StratFEN }
+import strategygames.variant.{ Variant => StratVariant }
+import strategygames.chess.format.FEN
+import strategygames.chess.variant.Variant
 import io.lemonlabs.uri.AbsoluteUrl
 
 trait Handlers {
@@ -120,11 +123,26 @@ trait Handlers {
   implicit val normalizedEmailAddressHandler =
     isoHandler[NormalizedEmailAddress, String](normalizedEmailAddressIso)
 
-  implicit val colorBoolHandler = BSONBooleanHandler.as[chess.Color](chess.Color.fromWhite, _.white)
+  implicit val colorBoolHandler = BSONBooleanHandler.as[Color](Color.fromWhite, _.white)
 
   implicit val FENHandler: BSONHandler[FEN] = stringAnyValHandler[FEN](_.value, FEN.apply)
 
-  implicit val modeHandler = BSONBooleanHandler.as[chess.Mode](chess.Mode.apply, _.rated)
+  implicit val StratFENHandler: BSONHandler[StratFEN] = quickHandler[StratFEN](
+    {
+      case BSONString(f) => f.split("~") match {
+        case Array(lib, f) => StratFEN(GameLib(lib.toInt), f)
+        case Array(f) => StratFEN(GameLib.Chess(), f)
+        case _ => sys.error("error decoding fen in handler")
+      }
+      case _ => sys.error("fen not encoded in handler")
+    },
+    f => f match {
+      case StratFEN.Chess(f)    => BSONString(s"0~${f.value}")
+      case StratFEN.Draughts(f) => BSONString(s"1~${f.value}")
+    }
+  )
+
+  implicit val modeHandler = BSONBooleanHandler.as[strategygames.Mode](strategygames.Mode.apply, _.rated)
 
   val variantByKeyHandler: BSONHandler[Variant] = quickHandler[Variant](
     {
@@ -134,12 +152,24 @@ trait Handlers {
     v => BSONString(v.key)
   )
 
-  val clockConfigHandler = tryHandler[chess.Clock.Config](
+  val stratVariantByKeyHandler: BSONHandler[StratVariant] = quickHandler[StratVariant](
+    {
+      case BSONString(v) => v.split(":") match {
+        case Array(lib, v) => StratVariant orDefault(GameLib(lib.toInt), v)
+        case _ => sys.error("lib not encoded into variant handler")
+      }
+      case _ => sys.error("variant not encoded in handler. Previously this defaulted to standard chess")
+      //case _ => StratVariant.default(GameLib.Chess())
+    },
+    v => BSONString(s"${v.gameLib.id}:${v.key}")
+  )
+
+  val clockConfigHandler = tryHandler[strategygames.Clock.Config](
     { case doc: BSONDocument =>
       for {
         limit <- doc.getAsTry[Int]("limit")
         inc   <- doc.getAsTry[Int]("increment")
-      } yield chess.Clock.Config(limit, inc)
+      } yield strategygames.Clock.Config(limit, inc)
     },
     c =>
       BSONDocument(

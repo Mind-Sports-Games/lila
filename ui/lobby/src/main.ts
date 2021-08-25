@@ -1,5 +1,6 @@
 import { init, classModule, attributesModule } from 'snabbdom';
 import { Chessground } from 'chessground';
+import { Draughtsground } from 'draughtsground';
 import { LobbyOpts, Tab } from './interfaces';
 
 export const patch = init([classModule, attributesModule]);
@@ -37,3 +38,4 @@ export default function main(opts: LobbyOpts) {
 // that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;
+window.Draughtsground = Draughtsground;

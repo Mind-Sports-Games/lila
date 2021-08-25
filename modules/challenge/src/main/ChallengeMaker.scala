@@ -41,13 +41,15 @@ final class ChallengeMaker(
       }
       Challenge.make(
         variant = pov.game.variant,
+        fenVariant = pov.game.variant.some,
         initialFen = initialFen,
         timeControl = timeControl,
         mode = pov.game.mode,
         color = (!pov.color).name,
         challenger = Challenge.toRegistered(pov.game.variant, timeControl)(challenger),
         destUser = dest.some,
-        rematchOf = pov.gameId.some
+        rematchOf = pov.gameId.some,
+        microMatch = pov.game.metadata.microMatchGameNr.contains(2)
       )
     }
 }

@@ -1,7 +1,7 @@
 package lila.swiss
 
-import chess.Color
-import chess.format.FEN
+import strategygames.Color
+import strategygames.format.FEN
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 
@@ -12,6 +12,7 @@ import lila.user.User
 object BsonHandlers {
 
   implicit val variantHandler       = variantByKeyHandler
+  implicit val stratVariantHandler  = stratVariantByKeyHandler
   implicit val clockHandler         = clockConfigHandler
   implicit val swissPointsHandler   = intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
   implicit val swissTieBreakHandler = doubleAnyValHandler[Swiss.TieBreak](_.value, Swiss.TieBreak.apply)

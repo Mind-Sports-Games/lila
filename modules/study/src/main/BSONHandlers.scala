@@ -1,9 +1,11 @@
 package lila.study
 
-import chess.format.pgn.{ Glyph, Glyphs, Tag, Tags }
-import chess.format.{ FEN, Uci, UciCharPair }
-import chess.variant.{ Crazyhouse, Variant }
-import chess.{ Centis, Color, Pos, PromotableRole, Role }
+import strategygames.format.pgn.{ Glyph, Glyphs, Tag, Tags }
+import strategygames.format.{ FEN, Uci, UciCharPair }
+import strategygames.variant.Variant
+import strategygames.chess.variant.Crazyhouse
+import strategygames.{ Centis, Color, GameLib, Pos, PromotableRole, Role }
+import strategygames.chess.{ Pos => ChessPos }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.Success
@@ -30,7 +32,12 @@ object BSONHandlers {
     implicitly[BSONHandler[List[StudyTopic]]].as[StudyTopics](StudyTopics.apply, _.value)
 
   implicit private val PosBSONHandler = tryHandler[Pos](
-    { case BSONString(v) => Pos.fromKey(v) toTry s"No such pos: $v" },
+    { case BSONString(v) => Pos.fromKey(GameLib.Chess(), v) toTry s"No such pos: $v" },
+    x => BSONString(x.key)
+  )
+
+  implicit private val ChessPosBSONHandler = tryHandler[ChessPos](
+    { case BSONString(v) => ChessPos.fromKey(v) toTry s"No such pos: $v" },
     x => BSONString(x.key)
   )
 
@@ -49,17 +56,17 @@ object BSONHandlers {
   }
 
   implicit val PromotableRoleHandler = tryHandler[PromotableRole](
-    { case BSONString(v) => v.headOption flatMap Role.allPromotableByForsyth.get toTry s"No such role: $v" },
+    { case BSONString(v) => v.headOption flatMap Role.allPromotableByForsyth(GameLib.Chess()).get toTry s"No such role: $v" },
     x => BSONString(x.forsyth.toString)
   )
 
   implicit val RoleHandler = tryHandler[Role](
-    { case BSONString(v) => v.headOption flatMap Role.allByForsyth.get toTry s"No such role: $v" },
+    { case BSONString(v) => v.headOption flatMap Role.allByForsyth(GameLib.Chess()).get toTry s"No such role: $v" },
     x => BSONString(x.forsyth.toString)
   )
 
   implicit val UciHandler = tryHandler[Uci](
-    { case BSONString(v) => Uci(v) toTry s"Bad UCI: $v" },
+    { case BSONString(v) => Uci(GameLib.Chess(), v) toTry s"Bad UCI: $v" },
     x => BSONString(x.uci)
   )
 
@@ -113,10 +120,10 @@ object BSONHandlers {
   implicit private def CrazyDataBSONHandler: BSON[Crazyhouse.Data] =
     new BSON[Crazyhouse.Data] {
       private def writePocket(p: Crazyhouse.Pocket) = p.roles.map(_.forsyth).mkString
-      private def readPocket(p: String)             = Crazyhouse.Pocket(p.view.flatMap(chess.Role.forsyth).toList)
+      private def readPocket(p: String)             = Crazyhouse.Pocket(p.view.flatMap(strategygames.chess.Role.forsyth).toList)
       def reads(r: Reader) =
         Crazyhouse.Data(
-          promoted = r.getsD[Pos]("o").toSet,
+          promoted = r.getsD[strategygames.chess.Pos]("o").toSet,
           pockets = Crazyhouse.Pockets(
             white = readPocket(r.strD("w")),
             black = readPocket(r.strD("b"))
@@ -176,7 +183,7 @@ object BSONHandlers {
     } yield Node(
       id,
       ply,
-      WithSan(uci, san),
+      WithSan(GameLib.Chess(), uci, san),
       fen,
       check,
       shapes,
@@ -253,10 +260,14 @@ object BSONHandlers {
   }
 
   implicit val PathBSONHandler = BSONStringHandler.as[Path](Path.apply, _.toString)
-  implicit val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(v) toTry s"No such variant: $v" },
-    x => BSONInteger(x.id)
-  )
+
+  implicit val VariantBSONHandler = new BSON[Variant] {
+    def reads(r: Reader) = Variant(GameLib(r.intD("gl")), r.int("v")) match {
+      case Some(v) => v
+      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelib: ${r.intD("gl")}")
+    }
+    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLib.id, "v" -> v.id)
+  }
 
   implicit val PgnTagBSONHandler = tryHandler[Tag](
     { case BSONString(v) =>

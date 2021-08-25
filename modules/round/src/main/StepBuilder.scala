@@ -1,8 +1,8 @@
 package lila.round
 
-import chess.format.FEN
-import chess.format.Forsyth
-import chess.variant.Variant
+import strategygames.{ Replay, Situation }
+import strategygames.format.{ FEN, Forsyth, Uci }
+import strategygames.variant.Variant
 import play.api.libs.json._
 
 import lila.socket.Step
@@ -17,28 +17,40 @@ object StepBuilder {
       variant: Variant,
       initialFen: FEN
   ): JsArray = {
-    chess.Replay.gameMoveWhileValid(pgnMoves, initialFen, variant) match {
+    Replay.gameMoveWhileValid(variant.gameLib, pgnMoves, initialFen, variant) match {
       case (init, games, error) =>
         error foreach logChessError(id)
         JsArray {
           val initStep = Step(
             ply = init.turns,
             move = none,
-            fen = Forsyth >> init,
+            fen = Forsyth.>>(variant.gameLib, init),
             check = init.situation.check,
             dests = None,
             drops = None,
-            crazyData = init.situation.board.crazyData
+            crazyData = init.situation.board.crazyData,
+            captLen = init.situation match {
+              case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
+              case _ => None
+            }
           )
           val moveSteps = games.map { case (g, m) =>
             Step(
               ply = g.turns,
               move = Step.Move(m.uci, m.san).some,
-              fen = Forsyth >> g,
+              fen = Forsyth.>>(g.situation.board.variant.gameLib, g),
               check = g.situation.check,
               dests = None,
               drops = None,
-              crazyData = g.situation.board.crazyData
+              crazyData = g.situation.board.crazyData,
+              captLen = (g.situation, m) match {
+                case (Situation.Draughts(situation), Uci.DraughtsWithSan(m)) =>
+                  if (situation.ghosts > 0) 
+                    situation.captureLengthFrom(m.uci.origDest._2)
+                  else
+                    situation.allMovesCaptureLength.some
+                case _ => None
+              }
             )
           }
           (initStep :: moveSteps).map(_.toJson)

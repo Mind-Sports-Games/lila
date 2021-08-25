@@ -1,8 +1,9 @@
 package lila.challenge
 
-import chess.format.Forsyth
-import chess.format.Forsyth.SituationPlus
-import chess.{ Color, Mode, Situation }
+import strategygames.{ Black, Color, GameLib, Mode, Situation, White }
+import strategygames.format.Forsyth
+import strategygames.format.Forsyth.SituationPlus
+import strategygames.variant.Variant
 import scala.util.chaining._
 
 import lila.game.{ Game, Player, Pov, Source }
@@ -34,42 +35,45 @@ private object ChallengeJoiner {
       destUser: Option[User],
       color: Option[Color]
   ): Game = {
-    def makeChess(variant: chess.variant.Variant): chess.Game =
-      chess.Game(situation = Situation(variant), clock = c.clock.map(_.config.toClock))
+    def makeChess(variant: Variant): strategygames.Game =
+      strategygames.Game(variant.gameLib, situation = Situation(variant.gameLib, variant), clock = c.clock.map(_.config.toClock))
 
     val baseState = c.initialFen.ifTrue(c.variant.fromPosition || c.variant.chess960) flatMap {
-      Forsyth.<<<@(c.variant, _)
+      Forsyth.<<<@(c.variant.gameLib, c.variant, _)
     }
     val (chessGame, state) = baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
       case sp @ SituationPlus(sit, _) =>
-        val game = chess.Game(
+        val game = strategygames.Game(
+          lib = c.variant.gameLib,
           situation = sit,
           turns = sp.turns,
           startedAtTurn = sp.turns,
           clock = c.clock.map(_.config.toClock)
         )
-        if (c.variant.fromPosition && Forsyth.>>(game).initial)
-          makeChess(chess.variant.Standard) -> none
+        if (c.variant.fromPosition && Forsyth.>>(c.variant.gameLib, game).initial)
+          makeChess(Variant.libStandard(c.variant.gameLib)) -> none
         else game                           -> baseState
     }
+    val microMatch = c.isMicroMatch && c.customStartingPosition option "micromatch"
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game
       .make(
         chess = chessGame,
-        whitePlayer = Player.make(chess.White, c.finalColor.fold(origUser, destUser), perfPicker),
-        blackPlayer = Player.make(chess.Black, c.finalColor.fold(destUser, origUser), perfPicker),
+        whitePlayer = Player.make(White, c.finalColor.fold(origUser, destUser), perfPicker),
+        blackPlayer = Player.make(Black, c.finalColor.fold(destUser, origUser), perfPicker),
         mode = if (chessGame.board.variant.fromPosition) Mode.Casual else c.mode,
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,
-        pgnImport = None
+        pgnImport = None,
+        microMatch = microMatch
       )
       .withId(c.id)
       .pipe { g =>
-        state.fold(g) { case sit @ SituationPlus(Situation(board, _), _) =>
+        state.fold(g) { case sit @ SituationPlus(s, _) =>
           g.copy(
             chess = g.chess.copy(
               situation = g.situation.copy(
-                board = g.board.copy(history = board.history)
+                board = g.board.copy(history = s.board.history)
               ),
               turns = sit.turns
             )

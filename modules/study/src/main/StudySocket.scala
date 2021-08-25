@@ -2,8 +2,10 @@ package lila.study
 
 import actorApi.Who
 import cats.data.Validated
-import chess.Centis
-import chess.format.pgn.{ Glyph, Glyphs }
+import strategygames.{ Centis, GameLib }
+import strategygames.format.pgn.{ Glyph, Glyphs, Tags }
+import strategygames.format.FEN
+import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -274,7 +276,7 @@ final private class StudySocket(
   def addNode(
       pos: Position.Ref,
       node: Node,
-      variant: chess.variant.Variant,
+      variant: Variant,
       sticky: Boolean,
       relay: Option[Chapter.Relay],
       who: Who
@@ -396,7 +398,7 @@ final private class StudySocket(
         "ply" -> ply.map(_.value)
       )
     )
-  def setTags(chapterId: Chapter.Id, tags: chess.format.pgn.Tags, who: Who) =
+  def setTags(chapterId: Chapter.Id, tags: Tags, who: Who) =
     version(
       "setTags",
       Json.obj(
@@ -444,6 +446,7 @@ object StudySocket {
             (__ \ "ch").read[Chapter.Id]
         )(AtPosition.apply _)
         case class SetRole(userId: String, role: String)
+        implicit val FenReader: Reads[FEN]                               = Reads.of[String].map(s => FEN.apply(GameLib.Chess(), s))
         implicit val SetRoleReader: Reads[SetRole]                       = Json.reads[SetRole]
         implicit val ChapterDataReader: Reads[ChapterMaker.Data]         = Json.reads[ChapterMaker.Data]
         implicit val ChapterEditDataReader: Reads[ChapterMaker.EditData] = Json.reads[ChapterMaker.EditData]

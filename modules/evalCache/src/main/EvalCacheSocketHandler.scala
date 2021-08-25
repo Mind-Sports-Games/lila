@@ -1,9 +1,11 @@
 package lila.evalCache
 
-import chess.variant.Variant
+import strategygames.variant.Variant
+import strategygames.format.FEN
+import strategygames.GameLib
+
 import play.api.libs.json._
 
-import chess.format.FEN
 import lila.socket._
 import lila.user.User
 
@@ -19,8 +21,14 @@ final private class EvalCacheSocketHandler(
       push: JsObject => Unit
   ): Unit =
     for {
-      fen <- d str "fen" map FEN.apply
-      variant = Variant orDefault ~d.str("variant")
+      fen <- d str "fen" map{fen => FEN.apply(GameLib(d int "lib" match {
+        case Some(lib) => lib
+        case None      => sys.error("lib must be provided for eval cache")
+      }), fen)}
+      variant = Variant.orDefault(GameLib(d int "lib" match {
+        case Some(lib) => lib
+        case None      => sys.error("lib must be provided for eval cache")
+      }), ~d.str("variant"))
       multiPv = (d int "mpv") | 1
       path <- d str "path"
     } {

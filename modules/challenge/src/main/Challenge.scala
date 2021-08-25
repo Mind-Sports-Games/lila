@@ -1,8 +1,9 @@
 package lila.challenge
 
-import chess.format.FEN
-import chess.variant.{ Chess960, FromPosition, Horde, RacingKings, Variant, LinesOfAction }
-import chess.{ Color, Mode, Speed }
+import strategygames.format.FEN
+import strategygames.variant.Variant
+import strategygames.chess.variant.{ Chess960, FromPosition, Horde, RacingKings, LinesOfAction }
+import strategygames.{ Black, Color, GameLib, Mode, Speed, White }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
@@ -18,7 +19,7 @@ case class Challenge(
     timeControl: Challenge.TimeControl,
     mode: Mode,
     colorChoice: Challenge.ColorChoice,
-    finalColor: chess.Color,
+    finalColor: Color,
     challenger: Challenge.Challenger,
     destUser: Option[Challenge.Challenger.Registered],
     rematchOf: Option[Game.ID],
@@ -27,7 +28,8 @@ case class Challenge(
     expiresAt: DateTime,
     open: Option[Boolean] = None,
     name: Option[String] = None,
-    declineReason: Option[Challenge.DeclineReason] = None
+    declineReason: Option[Challenge.DeclineReason] = None,
+    microMatch: Option[Boolean] = None
 ) {
 
   import Challenge._
@@ -89,11 +91,24 @@ case class Challenge(
 
   def notableInitialFen: Option[FEN] =
     variant match {
-      case FromPosition | Horde | RacingKings | Chess960 | LinesOfAction => initialFen
-      case _                                             => none
+      case Variant.Chess(variant) => variant match {
+        case FromPosition | Horde | RacingKings | Chess960 | LinesOfAction => initialFen
+        case _ => none
+      }
+      case Variant.Draughts(_) => customStartingPosition ?? initialFen
+      case _ => none
     }
 
+  def customStartingPosition: Boolean =
+    variant.draughtsFromPosition ||
+      (draughtsFromPositionVariants(variant) &&
+        initialFen.isDefined &&
+        !initialFen.exists(_.value == variant.initialFen.value)
+      )
+
   def isOpen = ~open
+
+  def isMicroMatch = ~microMatch
 
   lazy val perfType = perfTypeOf(variant, timeControl)
 
@@ -165,7 +180,7 @@ object Challenge {
   object TimeControl {
     case object Unlimited                extends TimeControl
     case class Correspondence(days: Int) extends TimeControl
-    case class Clock(config: chess.Clock.Config) extends TimeControl {
+    case class Clock(config: strategygames.Clock.Config) extends TimeControl {
       // All durations are expressed in seconds
       def limit     = config.limit
       def increment = config.increment
@@ -198,7 +213,7 @@ object Challenge {
         }
       )
       .orElse {
-        (variant == FromPosition) option perfTypeOf(chess.variant.Standard, timeControl)
+        (variant == Variant.libFromPosition(variant.gameLib)) option perfTypeOf(Variant.libStandard(variant.gameLib), timeControl)
       }
       .|(PerfType.Correspondence)
 
@@ -209,10 +224,18 @@ object Challenge {
   def toRegistered(variant: Variant, timeControl: TimeControl)(u: User) =
     Challenger.Registered(u.id, Rating(u.perfs(perfTypeOf(variant, timeControl))))
 
-  def randomColor = chess.Color.fromWhite(lila.common.ThreadLocalRandom.nextBoolean())
+  def randomColor = Color.fromWhite(lila.common.ThreadLocalRandom.nextBoolean())
+
+  // NOTE: Only variants with standardInitialPosition = false!
+  private val draughtsFromPositionVariants: Set[Variant] = Set(
+    strategygames.draughts.variant.FromPosition,
+    strategygames.draughts.variant.Russian,
+    strategygames.draughts.variant.Brazilian
+  ).map(Variant.Draughts)
 
   def make(
       variant: Variant,
+      fenVariant: Option[Variant],
       initialFen: Option[FEN],
       timeControl: TimeControl,
       mode: Mode,
@@ -220,26 +243,45 @@ object Challenge {
       challenger: Challenger,
       destUser: Option[User],
       rematchOf: Option[Game.ID],
-      name: Option[String] = None
+      name: Option[String] = None,
+      microMatch: Boolean = false
   ): Challenge = {
     val (colorChoice, finalColor) = color match {
-      case "white" => ColorChoice.White  -> chess.White
-      case "black" => ColorChoice.Black  -> chess.Black
+      case "white" => ColorChoice.White  -> White
+      case "black" => ColorChoice.Black  -> Black
       case _       => ColorChoice.Random -> randomColor
     }
+    val finalVariant = fenVariant match {
+      case Some(v) if draughtsFromPositionVariants(variant) =>
+        if (variant.draughtsFromPosition && v.draughtsStandard)
+          Variant.libFromPosition(GameLib.Draughts())
+        else v
+      case _ => variant
+    }
+    //val finalInitialFen = finalVariant match {
+    //  case Variant.Draughts(v) =>
+    //    draughtsFromPositionVariants(v) ?? {
+    //      initialFen.flatMap(fen => Forsyth.<<@(finalVariant.gameLib, finalVariant, fen.value))
+    //        .map(sit => FEN(Forsyth.>>(finalVariant.gameLib, sit.withoutGhosts)))
+    //    } match {
+    //      case fen @ Some(_) => fen
+    //      case _ => !finalVariant.standardInitialPosition option FEN(finalVariant.initialFen)
+    //    }
+    //}
     val finalMode = timeControl match {
-      case TimeControl.Clock(clock) if !lila.game.Game.allowRated(variant, clock.some) => Mode.Casual
-      case _                                                                           => mode
+      case TimeControl.Clock(clock) if !lila.game.Game.allowRated(variant, clock.some)
+        => Mode.Casual
+      case _ => mode
     }
     val isOpen = challenger == Challenge.Challenger.Open
-    new Challenge(
+    var challenge = new Challenge(
       _id = randomId,
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (variant == FromPosition) initialFen
-        else if (variant == Chess960) initialFen filter { fen =>
-          Chess960.positionNumber(fen).isDefined
+        if (variant == Variant.libFromPosition(variant.gameLib)) initialFen
+        else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
+          fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
         }
         else !variant.standardInitialPosition option variant.initialFen,
       timeControl = timeControl,
@@ -253,7 +295,14 @@ object Challenge {
       seenAt = !isOpen option DateTime.now,
       expiresAt = if (isOpen) DateTime.now.plusDays(1) else inTwoWeeks,
       open = isOpen option true,
-      name = name
+      name = name,
+      microMatch = microMatch option true
     )
+    //TODO microMatch: is this needed?
+    if (microMatch && !challenge.customStartingPosition)
+      challenge = challenge.copy(microMatch = none)
+    if (challenge.mode.rated && !challenge.isMicroMatch && challenge.customStartingPosition)
+      challenge = challenge.copy(mode = Mode.Casual)
+    challenge
   }
 }

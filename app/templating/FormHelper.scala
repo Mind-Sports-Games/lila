@@ -60,7 +60,8 @@ trait FormHelper { self: I18nHelper =>
         labelContent: Frag,
         klass: String = "",
         half: Boolean = false,
-        help: Option[Frag] = None
+        help: Option[Frag] = None,
+        displayed: Boolean = true
     )(content: Field => Frag)(implicit ctx: Context): Tag =
       div(
         cls := List(
@@ -68,7 +69,8 @@ trait FormHelper { self: I18nHelper =>
           "is-invalid" -> field.hasErrors,
           "form-half"  -> half,
           klass        -> klass.nonEmpty
-        )
+        ),
+        display := displayStyle(displayed)
       )(
         groupLabel(field)(labelContent),
         content(field),
@@ -127,17 +129,21 @@ trait FormHelper { self: I18nHelper =>
         label(`for` := fieldId)
       )
 
+    private def displayStyle(displayed: Boolean): String = if (displayed) "block" else "none"
+
     def select(
         field: Field,
         options: Iterable[(Any, String)],
         default: Option[String] = None,
-        disabled: Boolean = false
+        disabled: Boolean = false,
+        displayed: Boolean = true
     ): Frag =
       frag(
         st.select(
           st.id := id(field),
           name := field.name,
-          cls := "form-control"
+          cls := "form-control",
+          display := displayStyle(displayed)
         )(disabled option (st.disabled := true))(validationModifiers(field))(
           default map { option(value := "")(_) },
           options.toSeq map { case (value, name) =>

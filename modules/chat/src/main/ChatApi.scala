@@ -1,6 +1,6 @@
 package lila.chat
 
-import chess.Color
+import strategygames.Color
 import reactivemongo.api.ReadPreference
 import scala.concurrent.duration._
 

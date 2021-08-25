@@ -1,5 +1,10 @@
 package lila.swiss
 
+import strategygames.format.{ Forsyth }
+import strategygames.{ Black, White }
+import strategygames.variant.Variant
+import strategygames.draughts.Board.BoardSize
+
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.i18n.Lang
@@ -280,11 +285,21 @@ object SwissJson {
         "absent" -> i.player.absent
       )
 
+  private[swiss] def boardSizeJson(v: Variant) = v match {
+    case Variant.Draughts(v) =>
+      Some(Json.obj(
+        "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+        "key" -> v.boardSize.key
+      ))
+    case _ => None
+  }
+
   private[swiss] def boardJson(b: SwissBoard.WithGame) =
     Json
       .obj(
         "id"          -> b.game.id,
-        "fen"         -> chess.format.Forsyth.boardAndColor(b.game.situation),
+        "gameLib"     -> b.game.variant.gameLib.name.toLowerCase(),
+        "fen"         -> Forsyth.boardAndColor(b.game.variant.gameLib, b.game.situation),
         "lastMove"    -> ~b.game.lastMoveKeys,
         "orientation" -> b.game.naturalOrientation.name,
         "white"       -> boardPlayerJson(b.board.white),
@@ -293,12 +308,13 @@ object SwissJson {
       .add(
         "clock" -> b.game.clock.ifTrue(b.game.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(chess.White).roundSeconds,
-            "black" -> c.remainingTime(chess.Black).roundSeconds
+            "white" -> c.remainingTime(White).roundSeconds,
+            "black" -> c.remainingTime(Black).roundSeconds
           )
         }
       )
       .add("winner" -> b.game.winnerColor.map(_.name))
+      .add("boardSize" -> boardSizeJson(b.game.variant))
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(
@@ -320,7 +336,7 @@ object SwissJson {
     JsNumber(t.value.toInt)
   }
 
-  implicit private val clockWrites: OWrites[chess.Clock.Config] = OWrites { clock =>
+  implicit private val clockWrites: OWrites[strategygames.Clock.Config] = OWrites { clock =>
     Json.obj(
       "limit"     -> clock.limitSeconds,
       "increment" -> clock.incrementSeconds

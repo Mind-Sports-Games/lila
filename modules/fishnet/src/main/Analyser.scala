@@ -73,7 +73,7 @@ final class Analyser(
               val work = makeWork(
                 game = Work.Game(
                   id = chapterId,
-                  initialFen = initialFen,
+                  initialFen = initialFen.map(_.value),
                   studyId = studyId.some,
                   variant = variant,
                   moves = moves take maxPlies map (_.uci) mkString " "
@@ -102,7 +102,7 @@ final class Analyser(
       makeWork(
         game = Work.Game(
           id = game.id,
-          initialFen = initialFen,
+          initialFen = initialFen.map(_.value),
           studyId = none,
           variant = game.variant,
           moves = moves take maxPlies mkString " "

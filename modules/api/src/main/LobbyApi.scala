@@ -1,5 +1,9 @@
 package lila.api
 
+import strategygames.White
+import strategygames.variant.Variant
+import strategygames.format.Forsyth
+
 import play.api.libs.json.{ JsArray, JsObject, Json }
 
 import lila.game.Pov
@@ -28,17 +32,30 @@ final class LobbyApi(
         }
       }
 
+  def boardSize(variant: Variant) = variant match {
+    case Variant.Draughts(v) => Some(Json.obj(
+      "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+      "key" -> v.boardSize.key,
+    ))
+    case _ => None
+  }
+
   def nowPlaying(pov: Pov) =
     Json
       .obj(
         "fullId"   -> pov.fullId,
         "gameId"   -> pov.gameId,
-        "fen"      -> chess.format.Forsyth.exportBoard(pov.game.board),
-        "color"    -> (if (pov.game.variant.racingKings) chess.White else pov.color).name,
+        "fen"      -> Forsyth.exportBoard(pov.game.variant.gameLib, pov.game.board),
+        "color"    -> (if (pov.game.variant.racingKings) White else pov.color).name,
         "lastMove" -> ~pov.game.lastMoveKeys,
         "variant" -> Json.obj(
+          "gameLib" -> Json.obj(
+            "id" -> pov.game.variant.gameLib.id,
+            "name" -> pov.game.variant.gameLib.name,
+          ),
           "key"  -> pov.game.variant.key,
-          "name" -> pov.game.variant.name
+          "name" -> pov.game.variant.name,
+          "boardSize" -> boardSize(pov.game.variant),
         ),
         "speed"    -> pov.game.speed.key,
         "perf"     -> lila.game.PerfPicker.key(pov.game),

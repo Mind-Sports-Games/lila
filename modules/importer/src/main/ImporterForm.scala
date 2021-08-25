@@ -1,9 +1,12 @@
 package lila.importer
 
 import cats.data.Validated
-import chess.format.pgn.{ ParsedPgn, Parser, Reader, Tag, TagType, Tags }
-import chess.format.{ FEN, Forsyth }
-import chess.{ Color, Mode, Replay, Status }
+// TODO: For post mso tournament, get Parser refactored so we can parse draughts games.
+import strategygames.chess.format.pgn.{ Parser }
+import strategygames.format.pgn.{ ParsedPgn, Reader, Tag, TagType, Tags }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.variant.{ Variant => StratVariant }
+import strategygames.{ Board, Color, Game => StratGame, GameLib, Mode, Replay, Status }
 import play.api.data._
 import play.api.data.Forms._
 import scala.util.chaining._
@@ -50,35 +53,49 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
   private def evenIncomplete(result: Reader.Result): Replay =
     result match {
-      case Reader.Result.Complete(replay)      => replay
-      case Reader.Result.Incomplete(replay, _) => replay
+      case Reader.Result.ChessComplete(replay)         => Replay.Chess(replay)
+      case Reader.Result.ChessIncomplete(replay, _)    => Replay.Chess(replay)
+      case Reader.Result.DraughtsComplete(replay)      => Replay.Draughts(replay)
+      case Reader.Result.DraughtsIncomplete(replay, _) => Replay.Draughts(replay)
     }
 
   def preprocess(user: Option[String]): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>
     Parser.full(pgn) flatMap { parsed =>
       Reader.fullWithSans(
+        GameLib.Chess(),
         pgn,
         sans => sans.copy(value = sans.value take maxPlies),
         Tags.empty
-      ) map evenIncomplete map { case replay @ Replay(setup, _, state) =>
-        val initBoard    = parsed.tags.fen flatMap Forsyth.<< map (_.board)
+      ) map evenIncomplete map { case replay: Replay =>
+        val setup = replay.setup
+        val state = replay.state
+        val board = setup.board match {
+          case Board.Chess(board) => board
+          case _ => sys.error("Importer doesn't support draughts yet")
+        }
+        val initBoard    = parsed.tags.fen.map(fen => Forsyth.<<(GameLib.Chess(), fen).map(_.board))
         val fromPosition = initBoard.nonEmpty && !parsed.tags.fen.exists(_.initial)
-        val variant = {
-          parsed.tags.variant | {
-            if (fromPosition) chess.variant.FromPosition
-            else chess.variant.Standard
+        val variant = StratVariant.wrap({
+          val chessVariant = parsed.tags.variant match {
+            case Some(strategygames.variant.Variant.Chess(variant)) => Some(variant)
+            case None => None
+            case _ => sys.error("Not implemented for draughts yet")
+          }
+          chessVariant | {
+            if (fromPosition) strategygames.chess.variant.FromPosition
+            else strategygames.chess.variant.Standard
           }
         } match {
-          case chess.variant.Chess960 if !Chess960.isStartPosition(setup.board) =>
-            chess.variant.FromPosition
-          case chess.variant.FromPosition if parsed.tags.fen.isEmpty => chess.variant.Standard
-          case chess.variant.Standard if fromPosition                => chess.variant.FromPosition
+          case strategygames.chess.variant.Chess960 if !Chess960.isStartPosition(board) =>
+            strategygames.chess.variant.FromPosition
+          case strategygames.chess.variant.FromPosition if parsed.tags.fen.isEmpty => strategygames.chess.variant.Standard
+          case strategygames.chess.variant.Standard if fromPosition                => strategygames.chess.variant.FromPosition
           case v                                                     => v
-        }
+        })
         val game = state.copy(situation = state.situation withVariant variant)
-        val initialFen = parsed.tags.fen flatMap {
-          Forsyth.<<<@(variant, _)
-        } map Forsyth.>>
+        val initialFen = parsed.tags.fen
+          .flatMap(fen => Forsyth.<<<@(GameLib.Chess(), variant, fen))
+          .map(situation => Forsyth.>>(GameLib.Chess(), situation))
 
         val status = parsed.tags(_.Termination).map(_.toLowerCase) match {
           case Some("normal") | None                   => Status.Resign
@@ -95,12 +112,12 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           .make(
             chess = game,
             whitePlayer = Player.makeImported(
-              chess.White,
+              Color.White,
               parsed.tags(_.White),
               parsed.tags(_.WhiteElo).flatMap(_.toIntOption)
             ),
             blackPlayer = Player.makeImported(
-              chess.Black,
+              Color.Black,
               parsed.tags(_.Black),
               parsed.tags(_.BlackElo).flatMap(_.toIntOption)
             ),
@@ -116,9 +133,10 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             case None =>
               parsed.tags.resultColor
                 .map {
-                  case Some(color)                        => TagResult(status, color.some)
+                  case Some(color) => TagResult(status, color.some)
                   case None if status == Status.Outoftime => TagResult(status, none)
                   case None                               => TagResult(Status.Draw, none)
+                  case _ => sys.error("Not implemented for draughts yet")
                 }
                 .filter(_.status > Status.Started)
                 .fold(dbGame) { res =>
@@ -127,7 +145,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           }
         }
 
-        Preprocessed(NewGame(dbGame), replay.copy(state = game), initialFen, parsed)
+        Preprocessed(NewGame(dbGame), replay.copy(state=game), initialFen, parsed)
       }
     }
   }

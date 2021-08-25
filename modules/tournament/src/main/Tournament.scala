@@ -1,8 +1,9 @@
 package lila.tournament
 
-import chess.Clock.{ Config => ClockConfig }
-import chess.format.FEN
-import chess.{ Mode, Speed }
+import strategygames.Clock.{ Config => ClockConfig }
+import strategygames.format.FEN
+import strategygames.{ Mode, Speed }
+import strategygames.variant.Variant
 import org.joda.time.{ DateTime, Duration, Interval }
 import play.api.i18n.Lang
 import scala.util.chaining._
@@ -19,7 +20,7 @@ case class Tournament(
     status: Status,
     clock: ClockConfig,
     minutes: Int,
-    variant: chess.variant.Variant,
+    variant: Variant,
     position: Option[FEN],
     mode: Mode,
     password: Option[String] = None,
@@ -135,7 +136,7 @@ case class Tournament(
 
   def nonPlayStrategyCreatedBy = (createdBy != User.playstrategyId) option createdBy
 
-  def ratingVariant = if (variant.fromPosition) chess.variant.Standard else variant
+  def ratingVariant = if (variant.fromPosition) Variant.libStandard(variant.gameLib) else variant
 
   def startingPosition = position flatMap Thematic.byFen
 
@@ -157,7 +158,7 @@ object Tournament {
       name: Option[String],
       clock: ClockConfig,
       minutes: Int,
-      variant: chess.variant.Variant,
+      variant: Variant,
       position: Option[FEN],
       mode: Mode,
       password: Option[String],

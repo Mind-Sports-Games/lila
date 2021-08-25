@@ -2,8 +2,8 @@ package lila.game
 
 import akka.stream.scaladsl._
 import akka.util.ByteString
-import chess.format.{ FEN, Forsyth, Uci }
-import chess.{ Centis, Color, Replay, Situation, Game => ChessGame }
+import strategygames.format.{ FEN, Forsyth, Uci }
+import strategygames.{ Centis, Color, Replay, Situation, Game => ChessGame }
 import play.api.libs.json._
 import play.api.libs.ws.JsonBodyWritables._
 import play.api.libs.ws.StandaloneWSClient
@@ -46,7 +46,7 @@ final class GifExport(
 
   def gameThumbnail(game: Game): Fu[Source[ByteString, _]] = {
     val query = List(
-      "fen"         -> (Forsyth >> game.chess).value,
+      "fen"         -> (Forsyth.>>(game.variant.gameLib, game.chess)).value,
       "white"       -> Namer.playerTextBlocking(game.whitePlayer, withRating = true)(lightUserApi.sync),
       "black"       -> Namer.playerTextBlocking(game.blackPlayer, withRating = true)(lightUserApi.sync),
       "orientation" -> game.naturalOrientation.name
@@ -104,13 +104,15 @@ final class GifExport(
 
   private def frames(game: Game, initialFen: Option[FEN]) = {
     Replay.gameMoveWhileValid(
+      game.variant.gameLib,
       game.pgnMoves,
       initialFen | game.variant.initialFen,
       game.variant
     ) match {
       case (init, games, _) =>
-        val steps = (init, None) :: (games map { case (g, Uci.WithSan(uci, _)) =>
-          (g, uci.some)
+        val steps = (init, None) :: (games map {
+          case (g, Uci.ChessWithSan(strategygames.chess.format.Uci.WithSan(uci, _))) => (g, Uci.wrap(uci).some)
+          case _ => sys.error("Need to implement draughts version") // TODO: DRAUGHTS - implement this.
         })
         framesRec(
           steps.zip(scaleMoveTimes(~game.moveTimes).map(_.some).padTo(steps.length, None)),
@@ -133,7 +135,7 @@ final class GifExport(
   private def frame(situation: Situation, uci: Option[Uci], delay: Option[Centis]) =
     Json
       .obj(
-        "fen"      -> (Forsyth >> situation),
+        "fen"      -> (Forsyth.>>(situation.board.variant.gameLib, situation).value),
         "lastMove" -> uci.map(_.uci)
       )
       .add("check", situation.checkSquare.map(_.key))

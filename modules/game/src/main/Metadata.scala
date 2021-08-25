@@ -2,7 +2,8 @@ package lila.game
 
 import java.security.MessageDigest
 import lila.db.ByteArray
-import chess.Color
+import org.joda.time.DateTime
+import strategygames.{ Black, Color, White }
 
 private[game] case class Metadata(
     source: Option[Source],
@@ -11,8 +12,26 @@ private[game] case class Metadata(
     swissId: Option[String],
     simulId: Option[String],
     analysed: Boolean,
-    drawOffers: GameDrawOffers
+    drawOffers: GameDrawOffers,
+    //draughts options
+    simulPairing: Option[Int] = None,
+    timeOutUntil: Option[DateTime] = None,
+    drawLimit: Option[Int] = None,
+    microMatch: Option[String] = None,
 ) {
+
+  def needsMicroRematch = microMatch.contains("micromatch")
+
+  def microMatchGameNr = microMatch ?? { mm =>
+    if (mm == "micromatch" || mm.startsWith("2:")) 1.some
+    else if (mm.startsWith("1:")) 2.some
+    else none
+    }
+
+  def microMatchGameId = microMatch.map { mm =>
+    if (mm.startsWith("2:") || mm.startsWith("1:")) mm.drop(2)
+    else "*"
+  }
 
   def pgnDate = pgnImport flatMap (_.date)
 
@@ -42,7 +61,7 @@ case class GameDrawOffers(white: Set[Int], black: Set[Int]) {
     case ply if (ply % 2 == 0) == color.white => ply + 1
     case ply => ply
   }
-  def normalizedPlies: Set[Int] = normalize(chess.White) ++ normalize(chess.Black)
+  def normalizedPlies: Set[Int] = normalize(White) ++ normalize(Black)
 }
 
 object GameDrawOffers {

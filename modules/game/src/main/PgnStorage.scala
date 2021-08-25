@@ -1,7 +1,9 @@
 package lila.game
 
-import chess._
-import chess.format.Uci
+import strategygames.chess
+import strategygames.chess.format
+import strategygames.chess.{ Castles, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks }
+import strategygames.Color
 
 import lila.db.ByteArray
 
@@ -46,7 +48,7 @@ private object PgnStorage {
           }.toMap,
           positionHashes = decoded.positionHashes,
           unmovedRooks = UnmovedRooks(unmovedRooks),
-          lastMove = Option(decoded.lastUci) flatMap Uci.apply,
+          lastMove = Option(decoded.lastUci) flatMap format.Uci.apply,
           castles = Castles(
             whiteKingSide = unmovedRooks(Pos.H1),
             whiteQueenSide = unmovedRooks(Pos.A1),
@@ -59,14 +61,8 @@ private object PgnStorage {
 
     private def chessPos(sq: Integer): Option[Pos] = Pos(sq)
     private def chessRole(role: JavaRole): Role =
-      role match {
-        case JavaRole.PAWN   => Pawn
-        case JavaRole.KNIGHT => Knight
-        case JavaRole.BISHOP => Bishop
-        case JavaRole.ROOK   => Rook
-        case JavaRole.QUEEN  => Queen
-        case JavaRole.KING   => King
-      }
+      Role.javaSymbolToRole(role.symbol)
+
     private def chessPiece(piece: JavaPiece): Piece =
       Piece(Color.fromWhite(piece.white), chessRole(piece.role))
   }
@@ -76,7 +72,7 @@ private object PgnStorage {
       pieces: PieceMap,
       positionHashes: PositionHash, // irrelevant after game ends
       unmovedRooks: UnmovedRooks,   // irrelevant after game ends
-      lastMove: Option[Uci],
+      lastMove: Option[format.Uci],
       castles: Castles,  // irrelevant after game ends
       halfMoveClock: Int // irrelevant after game ends
   )

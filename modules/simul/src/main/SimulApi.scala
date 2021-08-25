@@ -1,7 +1,8 @@
 package lila.simul
 
 import akka.actor._
-import chess.variant.Variant
+import strategygames.variant.Variant
+import strategygames.GameLib
 import play.api.libs.json.Json
 import scala.concurrent.duration._
 
@@ -87,13 +88,13 @@ final class SimulApi(
       if (simul.nbAccepted >= Game.maxPlayingRealtime) simul
       else {
         timeline ! (Propagate(SimulJoin(user.id, simul.id, simul.fullName)) toFollowersOf user.id)
-        Variant(variantKey).filter(simul.variants.contains).fold(simul) { variant =>
+        Variant(GameLib.Chess(), variantKey).filter(simul.variants.contains).fold(simul) { variant =>
           simul addApplicant SimulApplicant.make(
             SimulPlayer.make(
               user,
               variant,
               PerfPicker.mainOrDefault(
-                speed = chess.Speed(simul.clock.config.some),
+                speed = strategygames.Speed(simul.clock.config.some),
                 variant = variant,
                 daysPerTurn = none
               )(user.perfs)
@@ -233,30 +234,30 @@ final class SimulApi(
 
   private def makeGame(simul: Simul, host: User)(
       pairingAndNumber: (SimulPairing, Int)
-  ): Fu[(Game, chess.Color)] =
+  ): Fu[(Game, strategygames.Color)] =
     pairingAndNumber match {
       case (pairing, number) =>
         for {
           user <- userRepo byId pairing.player.user orFail s"No user with id ${pairing.player.user}"
-          hostColor = simul.hostColor | chess.Color.fromWhite(number % 2 == 0)
+          hostColor = simul.hostColor | strategygames.Color.fromWhite(number % 2 == 0)
           whiteUser = hostColor.fold(host, user)
           blackUser = hostColor.fold(user, host)
           clock     = simul.clock.chessClockOf(hostColor)
           perfPicker =
-            lila.game.PerfPicker.mainOrDefault(chess.Speed(clock.config), pairing.player.variant, none)
+            lila.game.PerfPicker.mainOrDefault(strategygames.Speed(clock.config), pairing.player.variant, none)
           game1 = Game.make(
-            chess = chess
-              .Game(
-                variantOption = Some {
+            chess = strategygames.Game(
+                GameLib.Chess(),
+                variant = Some {
                   if (simul.position.isEmpty) pairing.player.variant
-                  else chess.variant.FromPosition
+                  else Variant.libFromPosition(GameLib.Chess())
                 },
                 fen = simul.position
               )
               .copy(clock = clock.start.some),
-            whitePlayer = lila.game.Player.make(chess.White, whiteUser.some, perfPicker),
-            blackPlayer = lila.game.Player.make(chess.Black, blackUser.some, perfPicker),
-            mode = chess.Mode.Casual,
+            whitePlayer = lila.game.Player.make(strategygames.White, whiteUser.some, perfPicker),
+            blackPlayer = lila.game.Player.make(strategygames.Black, blackUser.some, perfPicker),
+            mode = strategygames.Mode.Casual,
             source = lila.game.Source.Simul,
             pgnImport = None
           )

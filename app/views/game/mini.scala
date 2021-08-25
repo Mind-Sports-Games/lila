@@ -1,6 +1,7 @@
 package views.html.game
 
-import chess.format.Forsyth
+import strategygames.format.Forsyth
+import strategygames.variant.Variant
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -17,6 +18,18 @@ object mini {
   private val dataTime  = attr("data-time")
   val cgWrap            = span(cls := "cg-wrap")(cgWrapContent)
 
+  def extraClasses(variant: Variant) = {
+    val gameLib = variant.gameLib.name.toLowerCase()
+    variant match {
+      case Variant.Chess(_) => 
+        s"${gameLib}"
+      case Variant.Draughts(v) => {
+        val boardSize = v.boardSize
+        s"${gameLib} is${boardSize.key}"
+      }
+    }
+  }
+
   def apply(
       pov: Pov,
       ownerLink: Boolean = false,
@@ -26,9 +39,10 @@ object mini {
     val game   = pov.game
     val isLive = game.isBeingPlayed
     val tag    = if (withLink) a else span
+    val extra  = extraClasses(game.variant)
     tag(
       href := withLink.option(gameLink(game, pov.color, ownerLink, tv)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init ${game.variant.key} is2d",
+      cls := s"mini-game mini-game-${game.id} mini-game--init ${extra} is2d",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(
@@ -41,9 +55,10 @@ object mini {
   def noCtx(pov: Pov, tv: Boolean = false): Tag = {
     val game   = pov.game
     val isLive = game.isBeingPlayed
+    val extra  = extraClasses(game.variant)
     a(
       href := (if (tv) routes.Tv.index else routes.Round.watcher(pov.gameId, pov.color.name)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive ?? "mini-game--live"} ${game.variant.key}",
+      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive ?? "mini-game--live"} ${extra}",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(
@@ -54,7 +69,14 @@ object mini {
   }
 
   def renderState(pov: Pov) =
-    dataState := s"${Forsyth boardAndColor pov.game.situation},${pov.color.name},${~pov.game.lastMoveKeys}"
+    pov.game.variant match {
+      case Variant.Chess(_) => 
+        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
+      case Variant.Draughts(v) => {
+        val boardSize = v.boardSize
+        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)}|${boardSize.width}x${boardSize.height}|${pov.color.name}|${~pov.game.lastMoveKeys}"
+      }
+    }
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
     span(cls := "mini-game__player")(
@@ -73,7 +95,7 @@ object mini {
       }
     )
 
-  private def renderClock(clock: chess.Clock, color: chess.Color) = {
+  private def renderClock(clock: strategygames.Clock, color: strategygames.Color) = {
     val s = clock.remainingTime(color).roundSeconds
     span(
       cls := s"mini-game__clock mini-game__clock--${color.name}",

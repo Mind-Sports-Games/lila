@@ -1,6 +1,6 @@
 package lila.game
 
-import chess.Color
+import strategygames.Color
 
 // times are expressed in seconds
 case class CorrespondenceClock(

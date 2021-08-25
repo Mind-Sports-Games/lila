@@ -9,6 +9,8 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 import scala.util.Try
 
+import strategygames.Centis
+
 import LilaTypes._
 
 final class PimpedOption[A](private val self: Option[A]) extends AnyVal {
@@ -86,7 +88,7 @@ final class PimpedEither[A, B](private val v: Either[A, B]) extends AnyVal {
 final class PimpedFiniteDuration(private val d: FiniteDuration) extends AnyVal {
 
   def toCentis =
-    chess.Centis {
+    Centis {
       // divide by Double, then round, to avoid rounding issues with just `/10`!
       math.round {
         if (d.unit eq MILLISECONDS) d.length / 10d

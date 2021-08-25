@@ -13,5 +13,13 @@ export const perf = {
     atomic: '>',
     horde: '_',
     linesOfAction: '',
+    international: 'K',
+    antidraughts: 'K',
+    breakthrough: 'K',
+    russian: 'K',
+    brazilian: 'K',
+    fromPositionDraughts: 'K',
+    frisian: 'K',
+    frysk: 'K',
   },
 };

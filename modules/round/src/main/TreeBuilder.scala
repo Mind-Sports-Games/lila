@@ -1,10 +1,10 @@
 package lila.round
 
-import chess.{ Centis, Color }
-import chess.format.pgn.Glyphs
-import chess.format.{ FEN, Forsyth, Uci, UciCharPair }
-import chess.opening._
-import chess.variant.Variant
+import strategygames.{ Color, Centis, Game, GameLib, Pos, Replay, Situation }
+import strategygames.format.pgn.Glyphs
+import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
+import strategygames.opening.{ FullOpening, FullOpeningDB }
+import strategygames.variant.Variant
 import JsonView.WithFlags
 import lila.analyse.{ Advice, Analysis, Info }
 import lila.tree._
@@ -21,6 +21,12 @@ object TreeBuilder {
       best = info.best
     )
 
+  def fullOpeningOf(fen: FEN): Option[FullOpening] =
+    fen match {
+      case FEN.Chess(fen)    => FullOpeningDB.findByFen(GameLib.Chess(), FEN.Chess(fen))
+      case FEN.Draughts(fen) => FullOpeningDB.findByFen(GameLib.Draughts(), FEN.Draughts(fen))
+    }
+
   def apply(
       game: lila.game.Game,
       analysis: Option[Analysis],
@@ -29,13 +35,18 @@ object TreeBuilder {
   ): Root = {
     val withClocks: Option[Vector[Centis]] = withFlags.clocks ?? game.bothClockStates
     val drawOfferPlies                     = game.drawOffers.normalizedPlies
-    chess.Replay.gameMoveWhileValid(game.pgnMoves, initialFen, game.variant) match {
+    Replay.gameMoveWhileValid(
+      game.variant.gameLib,
+      game.pgnMoves,
+      initialFen,
+      game.variant
+    ) match {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val openingOf: OpeningOf =
-          if (withFlags.opening && Variant.openingSensibleVariants(game.variant)) FullOpeningDB.findByFen
+          if (withFlags.opening && Variant.openingSensibleVariants(game.variant.gameLib)(game.variant)) fullOpeningOf
           else _ => None
-        val fen                 = Forsyth >> init
+        val fen                 = Forsyth.>>(game.variant.gameLib, init)
         val infos: Vector[Info] = analysis.??(_.infos.toVector)
         val advices: Map[Ply, Advice] = analysis.??(_.advices.view.map { a =>
           a.ply -> a
@@ -44,20 +55,30 @@ object TreeBuilder {
           ply = init.turns,
           fen = fen,
           check = init.situation.check,
+          captureLength = init.situation match {
+            case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
+            case _ => None
+          },
           opening = openingOf(fen),
           clock = withClocks.flatMap(_.headOption),
           crazyData = init.situation.board.crazyData,
           eval = infos lift 0 map makeEval
         )
-        def makeBranch(index: Int, g: chess.Game, m: Uci.WithSan) = {
-          val fen    = Forsyth >> g
+        def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
+          val fen    = Forsyth.>>(g.situation.board.variant.gameLib, g)
           val info   = infos lift (index - 1)
           val advice = advices get g.turns
           val branch = Branch(
-            id = UciCharPair(m.uci),
+            id = UciCharPair(g.situation.board.variant.gameLib, m.uci),
             ply = g.turns,
             move = m,
             fen = fen,
+            captureLength = (g.situation, m.uci.origDest._2) match {
+              case (Situation.Draughts(situation), Pos.Draughts(pos)) =>
+                if (situation.ghosts > 0) situation.captureLengthFrom(pos)
+                else situation.allMovesCaptureLength.some
+              case _ => None
+            },
             check = g.situation.check,
             opening = openingOf(fen),
             clock = withClocks flatMap (_ lift (g.turns - init.turns - 1)),
@@ -76,7 +97,7 @@ object TreeBuilder {
           )
           advices.get(g.turns + 1).flatMap { adv =>
             games.lift(index - 1).map { case (fromGame, _) =>
-              withAnalysisChild(game.id, branch, game.variant, Forsyth >> fromGame, openingOf)(adv.info)
+              withAnalysisChild(game.id, branch, game.variant, Forsyth.>>(game.variant.gameLib, fromGame), openingOf)(adv.info)
             }
           } getOrElse branch
         }
@@ -104,10 +125,10 @@ object TreeBuilder {
       fromFen: FEN,
       openingOf: OpeningOf
   )(info: Info): Branch = {
-    def makeBranch(g: chess.Game, m: Uci.WithSan) = {
-      val fen = Forsyth >> g
+    def makeBranch(g: Game, m: Uci.WithSan) = {
+      val fen = Forsyth.>>(variant.gameLib, g)
       Branch(
-        id = UciCharPair(m.uci),
+        id = UciCharPair(variant.gameLib, m.uci),
         ply = g.turns,
         move = m,
         fen = fen,
@@ -117,7 +138,12 @@ object TreeBuilder {
         eval = none
       )
     }
-    chess.Replay.gameMoveWhileValid(info.variation take 20, fromFen, variant) match {
+    Replay.gameMoveWhileValid(
+      variant.gameLib,
+      info.variation take 20,
+      fromFen,
+      variant
+    ) match {
       case (_, games, error) =>
         error foreach logChessError(id)
         games.reverse match {

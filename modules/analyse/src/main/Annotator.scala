@@ -1,9 +1,10 @@
 package lila.analyse
 
-import chess.format.pgn.{ Glyphs, Move, Pgn, Tag, Turn }
-import chess.opening._
-import chess.{ Color, Status }
-import chess.variant.Variant
+import strategygames.chess.format.pgn.{ Move, Pgn, Turn }
+import strategygames.format.pgn.{ Glyphs, Tag }
+import strategygames.opening.FullOpening
+import strategygames.{ Color, Status }
+import strategygames.variant.Variant
 
 import lila.game.GameDrawOffers
 import lila.game.Game
@@ -30,7 +31,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
 
   private def annotateOpening(opening: Option[FullOpening.AtPly])(p: Pgn) =
     opening.fold(p) { o =>
-      p.updatePly(o.ply, _.copy(opening = o.opening.ecoName.some))
+      p.updatePly(o.ply, _.copy(opening = o.opening.toString().some))
     }
 
   private def annotateTurns(p: Pgn, advices: List[Advice]): Pgn =

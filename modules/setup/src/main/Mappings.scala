@@ -3,31 +3,52 @@ package lila.setup
 import play.api.data.Forms._
 import play.api.data.format.Formats._
 
-import chess.Mode
-import chess.{ variant => V }
+import strategygames.Mode
 import lila.rating.RatingRange
 import lila.lobby.Color
 
 private object Mappings {
 
-  val variant                   = number.verifying(Config.variants contains _)
-  val variantWithFen            = number.verifying(Config.variantsWithFen contains _)
-  val aiVariants                = number.verifying(Config.aiVariants contains _)
-  val variantWithVariants       = number.verifying(Config.variantsWithVariants contains _)
-  val variantWithFenAndVariants = number.verifying(Config.variantsWithFenAndVariants contains _)
-  val boardApiVariants = Set(
-    V.Standard.key,
-    V.Chess960.key,
-    V.Crazyhouse.key,
-    V.KingOfTheHill.key,
-    V.ThreeCheck.key,
-    V.Antichess.key,
-    V.Atomic.key,
-    V.Horde.key,
-    V.RacingKings.key,
-    V.LinesOfAction.key
+  val gameLibs                  = number.verifying(Config.gameLibs contains _)
+
+  val chessVariant                   = number.verifying(Config.chessVariants contains _)
+  val chessVariantWithFen            = number.verifying(Config.chessVariantsWithFen contains _)
+  val chessAIVariants                = number.verifying(Config.chessAIVariants contains _)
+  val chessVariantWithVariants       = number.verifying(Config.chessVariantsWithVariants contains _)
+  val chessVariantWithFenAndVariants = number.verifying(Config.chessVariantsWithFenAndVariants contains _)
+
+  val draughtsVariant                   = number.verifying(Config.draughtsVariants contains _)
+  val draughtsVariantWithFen            = number.verifying(Config.draughtsVariantsWithFen contains _)
+  val draughtsAIVariants                = number.verifying(Config.draughtsAIVariants contains _)
+  val draughtsFromPositionVariants      = number.verifying(Config.draughtsFromPositionVariants contains _)
+  val draughtsVariantWithVariants       = number.verifying(Config.draughtsVariantsWithVariants contains _)
+  val draughtsVariantWithFenAndVariants = number.verifying(Config.draughtsVariantsWithFenAndVariants contains _)
+
+  val chessBoardApiVariants = Set(
+    strategygames.chess.variant.Standard.key,
+    strategygames.chess.variant.Chess960.key,
+    strategygames.chess.variant.Crazyhouse.key,
+    strategygames.chess.variant.KingOfTheHill.key,
+    strategygames.chess.variant.ThreeCheck.key,
+    strategygames.chess.variant.Antichess.key,
+    strategygames.chess.variant.Atomic.key,
+    strategygames.chess.variant.Horde.key,
+    strategygames.chess.variant.RacingKings.key,
+    strategygames.chess.variant.LinesOfAction.key
   )
-  val boardApiVariantKeys      = text.verifying(boardApiVariants contains _)
+  val chessBoardApiVariantKeys = text.verifying(chessBoardApiVariants contains _)
+
+  val draughtsBoardApiVariants = Set(
+    strategygames.draughts.variant.Standard.key,
+    strategygames.draughts.variant.Frisian.key,
+    strategygames.draughts.variant.Frysk.key,
+    strategygames.draughts.variant.Antidraughts.key,
+    strategygames.draughts.variant.Breakthrough.key,
+    strategygames.draughts.variant.Russian.key,
+    strategygames.draughts.variant.Brazilian.key
+  )
+  val draughtsBoardApiVariantKeys = text.verifying(draughtsBoardApiVariants contains _)
+
   val time                     = of[Double].verifying(HookConfig validateTime _)
   val increment                = number.verifying(HookConfig validateIncrement _)
   val days                     = number(min = 1, max = 14)

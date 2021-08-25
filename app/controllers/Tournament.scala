@@ -6,6 +6,8 @@ import scala.annotation.nowarn
 import scala.concurrent.duration._
 import views._
 
+import strategygames.variant.Variant
+
 import lila.api.Context
 import lila.app._
 import lila.chat.Chat
@@ -82,7 +84,7 @@ final class Tournament(
         (!tour.isPrivate || json.fold(true)(jsonHasMe) || ctx.userId.has(tour.createdBy) || isGranted(
           _.ChatTimeout
         )) && // private tournament that I joined or has ChatTimeout
-        env.chat.panic.allowed(u, tighter = tour.variant == chess.variant.Antichess)
+        env.chat.panic.allowed(u, tighter = tour.variant == Variant.Chess(strategygames.chess.variant.Antichess))
       }
 
   private def jsonHasMe(js: JsObject): Boolean = (js \ "me").toOption.isDefined

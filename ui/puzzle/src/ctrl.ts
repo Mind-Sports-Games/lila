@@ -306,6 +306,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
         short: 'Std',
         name: 'Standard',
         key: 'standard',
+        lib: 0,
       },
       standardMaterial: true,
       possible: true,

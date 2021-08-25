@@ -3,25 +3,34 @@ package lila.simul
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 
-import chess.Status
-import chess.variant.Variant
+import strategygames.GameLib
+import strategygames.Color.{ Black, White }
+import strategygames.Status
+import strategygames.variant.Variant
 import lila.db.BSON
+import lila.db.BSON.{ Reader, Writer }
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.dsl._
 import lila.user.User
 
 final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+  val lib = GameLib.Chess()
 
   implicit private val SimulStatusBSONHandler = tryHandler[SimulStatus](
     { case BSONInteger(v) => SimulStatus(v) toTry s"No such simul status: $v" },
     x => BSONInteger(x.id)
   )
   implicit private val ChessStatusBSONHandler = lila.game.BSONHandlers.StatusBSONHandler
-  implicit private val VariantBSONHandler = tryHandler[Variant](
-    { case BSONInteger(v) => Variant(v) toTry s"No such variant: $v" },
-    x => BSONInteger(x.id)
-  )
-  import chess.Clock.Config
+
+  implicit val VariantBSONHandler = new BSON[Variant] {
+    def reads(r: Reader) = Variant(GameLib(r.intD("gl")), r.int("v")) match {
+      case Some(v) => v
+      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelib: ${r.intD("gl")}")
+    }
+    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLib.id, "v" -> v.id)
+  }
+
+  import strategygames.Clock.Config
   implicit private val clockHandler         = Macros.handler[Config]
   implicit private val ClockBSONHandler     = Macros.handler[SimulClock]
   implicit private val PlayerBSONHandler    = Macros.handler[SimulPlayer]
@@ -33,7 +42,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
         gameId = r str "gameId",
         status = r.get[Status]("status"),
         wins = r boolO "wins",
-        hostColor = r.strO("hostColor").flatMap(chess.Color.fromName) | chess.White
+        hostColor = r.strO("hostColor").flatMap(strategygames.Color.fromName) | White
       )
     def writes(w: BSON.Writer, o: SimulPairing) =
       $doc(

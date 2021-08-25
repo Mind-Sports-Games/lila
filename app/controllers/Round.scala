@@ -1,5 +1,9 @@
 package controllers
 
+import strategygames.{ Color, GameLib }
+import strategygames.variant.Variant
+import strategygames.format.Forsyth
+
 import play.api.libs.json._
 import play.api.mvc._
 import scala.concurrent.duration._
@@ -150,7 +154,7 @@ final class Round(
     }
 
   private def proxyPov(gameId: String, color: String): Fu[Option[Pov]] =
-    chess.Color.fromName(color) ?? {
+    Color.fromName(color) ?? {
       env.round.proxyRepo.pov(gameId, _)
     }
 
@@ -159,13 +163,13 @@ final class Round(
   ): Fu[Result] =
     playablePovForReq(pov.game) match {
       case Some(player) if userTv.isEmpty => renderPlayer(pov withColor player.color)
-      case _ if pov.game.variant == chess.variant.RacingKings && pov.color.black =>
+      case _ if pov.game.variant == Variant.Chess(strategygames.chess.variant.RacingKings) && pov.color.black =>
         if (userTv.isDefined) watch(!pov, userTv)
         else Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startColor.name)).fuccess
       case _ =>
         negotiate(
           html = {
-            if (pov.game.replayable) analyseC.replay(pov, userTv = userTv)
+            if (pov.game.replayable && pov.game.variant.gameLib.id == 0) analyseC.replay(pov, userTv = userTv)
             else if (HTTPRequest.isHuman(ctx.req))
               env.tournament.api.gameView.watcher(pov.game) zip
                 (pov.game.simulId ?? env.simul.repo.find) zip
@@ -317,7 +321,7 @@ final class Round(
         Redirect(
           "%s?fen=%s#%s".format(
             routes.Lobby.home,
-            get("fen") | (chess.format.Forsyth >> game.chess).value,
+            get("fen") | (Forsyth.>>(game.variant.gameLib, game.chess)).value,
             mode
           )
         )
@@ -341,7 +345,7 @@ final class Round(
   def mini(gameId: String, color: String) =
     Open { implicit ctx =>
       OptionOk(
-        chess.Color.fromName(color).??(env.round.proxyRepo.povIfPresent(gameId, _)) orElse env.game.gameRepo
+        Color.fromName(color).??(env.round.proxyRepo.povIfPresent(gameId, _)) orElse env.game.gameRepo
           .pov(gameId, color)
       )(html.game.mini(_))
     }

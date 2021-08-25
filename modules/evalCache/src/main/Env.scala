@@ -1,6 +1,8 @@
 package lila.evalCache
 
-import chess.variant.Variant
+import strategygames.variant.Variant
+import strategygames.format.FEN
+import strategygames.GameLib
 import com.softwaremill.macwire._
 import play.api.Configuration
 
@@ -48,8 +50,8 @@ final class Env(
   def cli =
     new lila.common.Cli {
       def process = { case "eval-cache" :: "drop" :: variantKey :: fenParts =>
-        Variant(variantKey).fold(fufail[String]("Invalid variant")) { variant =>
-          api.drop(variant, chess.format.FEN(fenParts mkString " ")) inject "done!"
+        Variant(GameLib.Chess(), variantKey).fold(fufail[String]("Invalid variant")) { variant =>
+          api.drop(variant, FEN(variant.gameLib, fenParts mkString " ")) inject "done!"
         }
       }
     }

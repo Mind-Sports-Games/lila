@@ -1,8 +1,11 @@
 package lila.setup
 
-import chess.Clock
-import chess.format.FEN
-import chess.variant.{ FromPosition, Variant }
+import strategygames.Clock
+import strategygames.Color.{ Black, White }
+import strategygames.{ Game => StratGame, GameLib }
+import strategygames.variant.Variant
+import strategygames.format.FEN
+import strategygames.chess.variant.{ FromPosition }
 
 import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.Color
@@ -10,6 +13,7 @@ import lila.user.User
 
 final case class ApiAiConfig(
     variant: Variant,
+    fenVariant: Option[Variant],
     clock: Option[Clock.Config],
     daysO: Option[Int],
     color: Color,
@@ -31,7 +35,7 @@ final case class ApiAiConfig(
   def game(user: Option[User]) =
     fenGame { chessGame =>
       val perfPicker = lila.game.PerfPicker.mainOrDefault(
-        chess.Speed(chessGame.clock.map(_.config)),
+        strategygames.Speed(chessGame.clock.map(_.config)),
         chessGame.situation.board.variant,
         makeDaysPerTurn
       )
@@ -39,14 +43,14 @@ final case class ApiAiConfig(
         .make(
           chess = chessGame,
           whitePlayer = creatorColor.fold(
-            Player.make(chess.White, user, perfPicker),
-            Player.make(chess.White, level.some)
+            Player.make(White, user, perfPicker),
+            Player.make(White, level.some)
           ),
           blackPlayer = creatorColor.fold(
-            Player.make(chess.Black, level.some),
-            Player.make(chess.Black, user, perfPicker)
+            Player.make(Black, level.some),
+            Player.make(Black, user, perfPicker)
           ),
-          mode = chess.Mode.Casual,
+          mode = strategygames.Mode.Casual,
           source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
@@ -57,7 +61,7 @@ final case class ApiAiConfig(
   def pov(user: Option[User]) = Pov(game(user), creatorColor)
 
   def autoVariant =
-    if (variant.standard && fen.exists(!_.initial)) copy(variant = FromPosition)
+    if (variant.standard && fen.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
     else this
 }
 
@@ -67,18 +71,24 @@ object ApiAiConfig extends BaseConfig {
 
   def from(
       l: Int,
-      v: Option[String],
+      lib: Int,
+      cv: Option[String],
+      dv: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       c: Option[String],
       pos: Option[String]
   ) =
     new ApiAiConfig(
-      variant = chess.variant.Variant.orDefault(~v),
+      variant = Variant.wrap(lib match {
+        case 0 => strategygames.chess.variant.Variant.orDefault(~cv)
+        case 1 => strategygames.chess.variant.Variant.orDefault(~dv)
+      }),
+      fenVariant = none,
       clock = cl,
       daysO = d,
       color = Color.orDefault(~c),
       level = l,
-      fen = pos map FEN.apply
+      fen = pos.map(f => FEN.apply(GameLib(lib), f))
     ).autoVariant
 }

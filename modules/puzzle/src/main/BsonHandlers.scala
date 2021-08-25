@@ -1,6 +1,6 @@
 package lila.puzzle
 
-import chess.format.{ FEN, Uci }
+import strategygames.format.{ FEN, Uci }
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
 
@@ -8,6 +8,8 @@ import lila.db.BSON
 import lila.db.dsl._
 import lila.game.Game
 import lila.rating.Glicko
+
+import strategygames.GameLib
 
 object BsonHandlers {
 
@@ -19,9 +21,11 @@ object BsonHandlers {
     def readDocument(r: BSONDocument) = for {
       id      <- r.getAsTry[Puzzle.Id](id)
       gameId  <- r.getAsTry[Game.ID](gameId)
-      fen     <- r.getAsTry[FEN](fen)
+      fen     <- r.getAsTry[String](fen)
       lineStr <- r.getAsTry[String](line)
-      line    <- lineStr.split(' ').toList.flatMap(Uci.Move.apply).toNel.toTry("Empty move list?!")
+      line    <- lineStr.split(' ').toList
+        .flatMap{line => Uci.Move.apply(GameLib.Chess(), line)}
+        .toNel.toTry("Empty move list?!")
       glicko  <- r.getAsTry[Glicko](glicko)
       plays   <- r.getAsTry[Int](plays)
       vote    <- r.getAsTry[Float](vote)
@@ -29,7 +33,7 @@ object BsonHandlers {
     } yield Puzzle(
       id = id,
       gameId = gameId,
-      fen = fen,
+      fen = FEN.apply(GameLib.Chess(), fen),
       line = line,
       glicko = glicko,
       plays = plays,

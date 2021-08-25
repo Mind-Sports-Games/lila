@@ -1,6 +1,6 @@
 package lila.game
 
-import chess.{ Centis, Clock, White }
+import strategygames.{ Black, Centis, Clock, White }
 import org.specs2.mutable._
 import scala.util.chaining._
 
@@ -67,7 +67,7 @@ class BinaryClockTest extends Specification {
         val c2 = clock.giveTime(White, Centis.ofSeconds(15))
         isomorphism(c2) must_== c2
 
-        val c3 = clock.giveTime(chess.Black, Centis.ofSeconds(5))
+        val c3 = clock.giveTime(Black, Centis.ofSeconds(5))
         isomorphism(c3) must_== c3
 
         val c4 = clock.start

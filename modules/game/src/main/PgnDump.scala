@@ -1,12 +1,15 @@
 package lila.game
 
-import chess.format.Forsyth
-import chess.format.pgn.{ ParsedPgn, Parser, Pgn, Tag, TagType, Tags }
-import chess.format.{ FEN, pgn => chessPgn }
-import chess.{ Centis, Color }
+import strategygames.chess.format.pgn.{ Parser, Pgn }
+import strategygames.format.pgn.{ ParsedPgn, Tag, TagType, Tags }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.chess.format.{ pgn => chessPgn }
+import strategygames.{ Centis, Color, GameLib, Status }
+import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
 import lila.common.LightUser
+import lila.common.Form
 
 final class PgnDump(
     baseUrl: BaseUrl,
@@ -15,25 +18,64 @@ final class PgnDump(
 
   import PgnDump._
 
+  //TODO: For draughts PgnDump to work as it does in lidraughts
+  //the extra flag fields commented out below need to be set
   def apply(
       game: Game,
       initialFen: Option[FEN],
       flags: WithFlags,
-      teams: Option[Color.Map[String]] = None
+      teams: Option[Color.Map[String]] = None,
+      hideRatings: Boolean = false
   ): Fu[Pgn] = {
     val imported = game.pgnImport.flatMap { pgni =>
       Parser.full(pgni.pgn).toOption
     }
+    val algebraic = game.variant match {
+      case Variant.Draughts(variant) => variant.boardSize.pos.hasAlgebraic// && flags.algebraic
+      case _ => false
+    }
     val tagsFuture =
-      if (flags.tags) tags(game, initialFen, imported, withOpening = flags.opening, teams = teams)
+      if (flags.tags) tags(
+        game,
+        initialFen,
+        imported,
+        withOpening = flags.opening,
+        //draughtsResult = flags.draughtsResult, //Need to set this elsewhere in lila
+        algebraic = algebraic,
+        //withProfileName = flags.profileName, //Need to set this elsewhere in lila
+        withRatings = !hideRatings,
+        teams = teams
+      )
       else fuccess(Tags(Nil))
     tagsFuture map { ts =>
       val turns = flags.moves ?? {
-        val fenSituation = ts.fen flatMap Forsyth.<<<
+        val fenSituation = ts.fen.flatMap{fen => Forsyth.<<<(game.variant.gameLib, fen)}
         makeTurns(
-          flags keepDelayIf game.playable applyDelay {
-            if (fenSituation.exists(_.situation.color.black)) ".." +: game.pgnMoves
-            else game.pgnMoves
+          game.variant match {
+            case Variant.Draughts(variant) => {
+              val pdnMovesFull = game.pdnMovesConcat(true, true)
+              val pdnMoves = strategygames.draughts.Replay.unambiguousPdnMoves(
+                pdnMoves = pdnMovesFull,
+                initialFen = ts.fen match {
+                  case Some(FEN.Draughts(fen)) => Some(fen)
+                  case None => None
+                  case _ => sys.error("invalid draughts fen in pgnDump")
+                },
+                variant = variant
+              //TODO: draughts, this used to be a Valid[List[String]] type
+              //and now we have lost the error. Perhaps we need to reconsider this
+              ).fold(shortenMoves(pdnMovesFull))(moves => moves)
+              val moves = flags keepDelayIf game.playable applyDelay pdnMoves
+              val moves2 =
+                if (algebraic) san2alg(moves, variant.boardSize.pos)
+                else moves
+              if (fenSituation.exists(_.situation.color.black)) ".." +: moves2
+              else moves2
+            }
+            case _ => flags keepDelayIf game.playable applyDelay {
+              if (fenSituation.exists(_.situation.color.black)) ".." +: game.pgnMoves
+              else game.pgnMoves
+            }
           },
           fenSituation.map(_.fullMoveNumber) | 1,
           flags.clocks ?? ~game.bothClockStates,
@@ -44,7 +86,43 @@ final class PgnDump(
     }
   }
 
+  private def shortenMoves(moves: Seq[String]) = moves map { move =>
+    val x1 = move.indexOf("x")
+    if (x1 == -1) move
+    else {
+      val x2 = move.lastIndexOf("x")
+      if (x2 == x1 || x2 == -1) move
+      else move.slice(0, x1) + move.slice(x2, move.length)
+    }
+  }
+
+  private def san2alg(moves: Seq[String], boardPos: strategygames.draughts.BoardPos) =
+    moves map { move =>
+      val capture = move.contains('x')
+      val fields = if (capture) move.split("x") else move.split("-")
+      val algebraicFields = fields.flatMap { boardPos.algebraic(_) }
+      val sep = if (capture) "x" else "-"
+      algebraicFields mkString sep
+    }
+
   private def gameUrl(id: String) = s"$baseUrl/$id"
+
+  //TODO figure out how this works for Draughts to replicate lidraughts functionality
+  /*private def namedLightUser(userId: String) =
+    lila.user.UserRepo.byId(userId) map {
+      _ ?? { u =>
+        LightUser(
+          id = u.id,
+          name = u.profile.flatMap(_.nonEmptyRealName).fold(u.username)(n => s"$n (${u.username})"),
+          title = u.title.map(_.value),
+          isPatron = u.plan.active
+        ).some
+      }
+    }
+
+  private def gameLightUsers(game: Game, withProfileName: Boolean): Fu[(Option[LightUser], Option[LightUser])] =
+    (game.whitePlayer.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async}) zip (game.blackPlayer.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async})
+*/
 
   private def gameLightUsers(game: Game): Fu[(Option[LightUser], Option[LightUser])] =
     (game.whitePlayer.userId ?? lightUserApi.async) zip (game.blackPlayer.userId ?? lightUserApi.async)
@@ -54,8 +132,8 @@ final class PgnDump(
   def player(p: Player, u: Option[LightUser]) =
     p.aiLevel.fold(u.fold(p.name | lila.user.User.anonymous)(_.name))("playstrategy AI level " + _)
 
-  private val customStartPosition: Set[chess.variant.Variant] =
-    Set(chess.variant.Chess960, chess.variant.FromPosition, chess.variant.Horde, chess.variant.RacingKings)
+  private val customStartPosition: Set[Variant] =
+    Set(strategygames.chess.variant.Chess960, strategygames.chess.variant.FromPosition, strategygames.chess.variant.Horde, strategygames.chess.variant.RacingKings).map(Variant.Chess)
 
   private def eventOf(game: Game) = {
     val perf = game.perfType.fold("Standard")(_.trans(lila.i18n.defaultLang))
@@ -78,7 +156,11 @@ final class PgnDump(
       initialFen: Option[FEN],
       imported: Option[ParsedPgn],
       withOpening: Boolean,
-      teams: Option[Color.Map[String]] = None
+      teams: Option[Color.Map[String]] = None,
+      draughtsResult: Boolean = false,
+      algebraic: Boolean = false,
+      withProfileName: Boolean = false,
+      withRatings: Boolean = true
   ): Fu[Tags] =
     gameLightUsers(game) map { case (wu, bu) =>
       Tags {
@@ -93,7 +175,7 @@ final class PgnDump(
           imported.flatMap(_.tags(_.Round)).map(Tag(_.Round, _)),
           Tag(_.White, player(game.whitePlayer, wu)).some,
           Tag(_.Black, player(game.blackPlayer, bu)).some,
-          Tag(_.Result, result(game)).some,
+          Tag(_.Result, result(game, draughtsResult)).some,
           importedDate.isEmpty option Tag(
             _.UTCDate,
             imported.flatMap(_.tags(_.UTCDate)) | Tag.UTCDate.format.print(game.createdAt)
@@ -102,10 +184,10 @@ final class PgnDump(
             _.UTCTime,
             imported.flatMap(_.tags(_.UTCTime)) | Tag.UTCTime.format.print(game.createdAt)
           ),
-          Tag(_.WhiteElo, rating(game.whitePlayer)).some,
-          Tag(_.BlackElo, rating(game.blackPlayer)).some,
-          ratingDiffTag(game.whitePlayer, _.WhiteRatingDiff),
-          ratingDiffTag(game.blackPlayer, _.BlackRatingDiff),
+          withRatings option Tag(_.WhiteElo, rating(game.whitePlayer)),
+          withRatings option Tag(_.BlackElo, rating(game.blackPlayer)),
+          withRatings ?? ratingDiffTag(game.whitePlayer, _.WhiteRatingDiff),
+          withRatings ?? ratingDiffTag(game.blackPlayer, _.BlackRatingDiff),
           wu.flatMap(_.title).map { t =>
             Tag(_.WhiteTitle, t)
           },
@@ -116,11 +198,12 @@ final class PgnDump(
           teams.map { t => Tag("BlackTeam", t.black) },
           Tag(_.Variant, game.variant.name.capitalize).some,
           Tag.timeControl(game.clock.map(_.config)).some,
+          game.metadata.microMatchGameId.map(gameId => Tag(_.MicroMatch, gameId)),
           Tag(_.ECO, game.opening.fold("?")(_.opening.eco)).some,
           withOpening option Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
           Tag(
             _.Termination, {
-              import chess.Status._
+              import Status._
               game.status match {
                 case Created | Started                             => "Unterminated"
                 case Aborted | NoStart                             => "Abandoned"
@@ -131,12 +214,29 @@ final class PgnDump(
               }
             }
           ).some
-        ).flatten ::: customStartPosition(game.variant).??(
-          List(
-            Tag(_.FEN, (initialFen | Forsyth.initial).value),
+        ).flatten ::: customStartPosition(game.variant).??(game.variant match {
+          case Variant.Draughts(variant) => List(
+            Tag(
+              _.FEN,
+              (initialFen match {
+                case Some(FEN.Draughts(fen)) => Some(fen)
+                case None => None
+                case _ => sys.error("invalid draughts fen in pgnDump tags")
+              }).flatMap { fen =>
+                if (algebraic)
+                  strategygames.draughts.format.Forsyth.toAlgebraic(
+                    variant,
+                    fen
+                  )
+                else fen.some
+              }.fold("?")(f => strategygames.draughts.format.Forsyth.shorten(f).value)
+            )
+          )
+          case _ => List(
+            Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLib)).value),
             Tag("SetUp", "1")
           )
-        )
+        })
       }
     }
 
@@ -188,7 +288,7 @@ object PgnDump {
     def keepDelayIf(cond: Boolean) = copy(delayMoves = delayMoves && cond)
   }
 
-  def result(game: Game) =
-    if (game.finished) Color.showResult(game.winnerColor)
+  def result(game: Game, draughtsResult: Boolean) =
+    if (game.finished) Color.showResult(game.winnerColor, draughtsResult)
     else "*"
 }

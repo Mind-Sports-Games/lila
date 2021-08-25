@@ -1,28 +1,31 @@
 package lila.setup
 
-import chess.format.{ FEN, Forsyth }
-import chess.variant.Chess960
-import chess.variant.FromPosition
-import chess.{ Clock, Speed }
+import strategygames.GameLib
+import strategygames.variant.{ Variant => StratVariant }
+import strategygames.format.{ FEN, Forsyth }
+import strategygames.chess.variant.Chess960
+import strategygames.chess.variant.FromPosition
+import strategygames.{ Clock, Speed }
 
 import lila.game.PerfPicker
 import lila.lobby.Color
 import lila.rating.PerfType
-import chess.variant.Variant
+import strategygames.variant.Variant
 import lila.common.Template
 
 final case class ApiConfig(
-    variant: chess.variant.Variant,
+    variant: strategygames.variant.Variant,
     clock: Option[Clock.Config],
     days: Option[Int],
     rated: Boolean,
     color: Color,
     position: Option[FEN] = None,
     acceptByToken: Option[String] = None,
-    message: Option[Template]
+    message: Option[Template],
+    microMatch: Boolean
 ) {
 
-  def perfType: Option[PerfType] = PerfPicker.perfType(chess.Speed(clock), variant, days)
+  def perfType: Option[PerfType] = PerfPicker.perfType(strategygames.Speed(clock), variant, days)
 
   def validFen = ApiConfig.validFen(variant, position)
 
@@ -33,10 +36,10 @@ final case class ApiConfig(
 
   def validRated = mode.casual || clock.isDefined || variant.standard
 
-  def mode = chess.Mode(rated)
+  def mode = strategygames.Mode(rated)
 
   def autoVariant =
-    if (variant.standard && position.exists(!_.initial)) copy(variant = FromPosition)
+    if (variant.standard && position.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
     else this
 }
 
@@ -45,31 +48,39 @@ object ApiConfig extends BaseHumanConfig {
   lazy val clockLimitSeconds: Set[Int] = Set(0, 15, 30, 45, 60, 90) ++ (2 to 180).view.map(60 *).toSet
 
   def from(
-      v: Option[String],
+      l: Int,
+      cv: Option[String],
+      dv: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       r: Boolean,
       c: Option[String],
       pos: Option[String],
       tok: Option[String],
-      msg: Option[String]
+      msg: Option[String],
+      mm: Option[Boolean]
   ) =
     new ApiConfig(
-      variant = chess.variant.Variant.orDefault(~v),
+      variant = strategygames.variant.Variant.orDefault(GameLib(l), l match {
+        case 0 => ~cv
+        case 1 => ~dv
+      }),
       clock = cl,
       days = d,
       rated = r,
       color = Color.orDefault(~c),
-      position = pos map FEN.apply,
+      position = pos.map(f => FEN.apply(GameLib(l), f)),
       acceptByToken = tok,
-      message = msg map Template
+      message = msg map Template,
+      microMatch = ~mm
     ).autoVariant
 
   def validFen(variant: Variant, fen: Option[FEN]) =
-    if (variant.chess960) fen.forall(f => Chess960.positionNumber(f).isDefined)
+    // TODO: This .get is unsafe
+    if (variant.chess960) fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
     else if (variant.fromPosition)
       fen exists { f =>
-        (Forsyth <<< f).exists(_.situation playable false)
+        (Forsyth.<<<(variant.gameLib, f)).exists(_.situation playable false)
       }
     else true
 }

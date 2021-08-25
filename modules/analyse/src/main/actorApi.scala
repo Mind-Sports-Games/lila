@@ -3,12 +3,15 @@ package actorApi
 
 import lila.game.Game
 
+import strategygames.variant.Variant
+import strategygames.format.FEN
+
 case class AnalysisReady(game: Game, analysis: Analysis)
 
 case class AnalysisProgress(
     game: Game,
-    variant: chess.variant.Variant,
-    initialFen: chess.format.FEN,
+    variant: Variant,
+    initialFen: FEN,
     analysis: Analysis
 )
 

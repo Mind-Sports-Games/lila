@@ -4,8 +4,8 @@ package actorApi
 import scala.concurrent.Promise
 import scala.concurrent.duration._
 
-import chess.format.Uci
-import chess.{ Color, MoveMetrics }
+import strategygames.format.Uci
+import strategygames.{ Color, Move, MoveMetrics }
 
 import lila.common.IpAddress
 import lila.game.Game.PlayerId
@@ -34,7 +34,8 @@ package round {
       uci: Uci,
       blur: Boolean,
       moveMetrics: MoveMetrics = MoveMetrics(),
-      promise: Option[Promise[Unit]] = None
+      promise: Option[Promise[Unit]] = None,
+      finalSquare: Boolean = false
   )
 
   case class PlayResult(events: Events, fen: String, lastMove: Option[String])
@@ -54,7 +55,7 @@ package round {
   case object QuietFlag
   case class ClientFlag(color: Color, fromPlayerId: Option[PlayerId])
   case object Abandon
-  case class ForecastPlay(lastMove: chess.Move)
+  case class ForecastPlay(lastMove: Move)
   case class Cheat(color: Color)
   case class HoldAlert(playerId: PlayerId, mean: Int, sd: Int, ip: IpAddress)
   case class GoBerserk(color: Color, promise: Promise[Boolean])

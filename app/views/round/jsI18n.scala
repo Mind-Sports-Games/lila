@@ -18,6 +18,8 @@ object jsI18n {
         g.isTournament ?? tournamentTranslations
       } ++ {
         g.isSwiss ?? swissTranslations
+      } ++ {
+        g.metadata.microMatch.isDefined ?? microMatchTranslations
       }
     }
 
@@ -45,6 +47,10 @@ object jsI18n {
   private val swissTranslations = Vector(
     trans.backToTournament,
     trans.viewTournament
+  ).map(_.key)
+
+  private val microMatchTranslations = Vector(
+    trans.microMatchRematchAwaiting
   ).map(_.key)
 
   private val baseTranslations = Vector(
@@ -82,6 +88,7 @@ object jsI18n {
     trans.blackTimeOut,
     trans.whiteIsVictorious,
     trans.blackIsVictorious,
+    trans.promotion,
     trans.withdraw,
     trans.rematch,
     trans.rematchOfferSent,

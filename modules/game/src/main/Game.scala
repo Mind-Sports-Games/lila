@@ -1,10 +1,28 @@
 package lila.game
 
-import chess.Color.{ Black, White }
-import chess.format.{ FEN, Uci }
-import chess.opening.{ FullOpening, FullOpeningDB }
-import chess.variant.{ FromPosition, Standard, Variant }
-import chess.{ Castles, Centis, CheckCount, Clock, Color, Mode, MoveOrDrop, Speed, Status, Game => ChessGame }
+import strategygames.format.{ FEN, Uci }
+import strategygames.chess
+import strategygames.opening.{ FullOpening, FullOpeningDB }
+import strategygames.chess.variant.{ FromPosition, Standard, Variant => ChessVariant }
+import strategygames.chess.{ Castles, CheckCount }
+import strategygames.chess.format.{ Uci => ChessUci }
+import strategygames.{
+  Black,
+  Centis,
+  Clock,
+  Color,
+  Game => StratGame,
+  GameLib,
+  Mode,
+  Move,
+  MoveOrDrop,
+  Pos,
+  Speed,
+  Status,
+  White
+}
+import strategygames.format.Uci
+import strategygames.variant.Variant
 import org.joda.time.DateTime
 
 import lila.common.Sequence
@@ -17,7 +35,7 @@ case class Game(
     id: Game.ID,
     whitePlayer: Player,
     blackPlayer: Player,
-    chess: ChessGame,
+    chess: StratGame,
     loadClockHistory: Clock => Option[ClockHistory] = _ => Game.someEmptyClockHistory,
     status: Status,
     daysPerTurn: Option[Int],
@@ -26,8 +44,10 @@ case class Game(
     bookmarks: Int = 0,
     createdAt: DateTime = DateTime.now,
     movedAt: DateTime = DateTime.now,
-    metadata: Metadata
+    metadata: Metadata,
+    pdnStorage: Option[PdnStorage] = None
 ) {
+
   lazy val clockHistory = chess.clock flatMap loadClockHistory
 
   def situation = chess.situation
@@ -65,8 +85,10 @@ case class Game(
 
   def opponent(c: Color): Player = player(!c)
 
-  lazy val naturalOrientation =
-    if (variant.racingKings) White else Color.fromWhite(whitePlayer before blackPlayer)
+  lazy val naturalOrientation = variant match {
+    case Variant.Chess(v) if v.racingKings => White
+    case _                                 => Color.fromWhite(whitePlayer before blackPlayer)
+  }
 
   def turnColor = chess.player
 
@@ -153,8 +175,18 @@ case class Game(
 
   def bothClockStates: Option[Vector[Centis]] = clockHistory.map(_ bothClockStates startColor)
 
+  def pdnMovesConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
+    chess match {
+      case StratGame.Draughts(game) => game.pdnMovesConcat(fullCaptures, dropGhosts)
+      case _ => sys.error("Cant call pdnMovesConcat for a gamelib other than draughts")
+    }
+
   def pgnMoves(color: Color): PgnMoves = {
     val pivot = if (color == startColor) 0 else 1
+    val pgnMoves = variant.gameLib match {
+      case GameLib.Draughts() => pdnMovesConcat()
+      case _ => chess.pgnMoves
+    }
     pgnMoves.zipWithIndex.collect {
       case (e, i) if (i % 2) == pivot => e
     }
@@ -162,7 +194,7 @@ case class Game(
 
   // apply a move
   def update(
-      game: ChessGame, // new chess position
+      game: StratGame, // new chess position
       moveOrDrop: MoveOrDrop,
       blur: Boolean = false
   ): Progress = {
@@ -215,12 +247,20 @@ case class Game(
       Event.Drop(_, game.situation, state, clockEvent, updated.board.crazyData)
     ) :: {
       // abstraction leak, I know.
-      (updated.board.variant.threeCheck && game.situation.check) ?? List(
-        Event.CheckCount(
-          white = updated.history.checkCount.white,
-          black = updated.history.checkCount.black
+      if (updated.board.variant.gameLib == GameLib.Draughts())
+        (updated.board.variant.frisianVariant || updated.board.variant.russian || updated.board.variant.brazilian) ?? List(Event.KingMoves(
+          white = updated.history.kingMoves.white,
+          black = updated.history.kingMoves.black,
+          whiteKing = updated.history.kingMoves.whiteKing.map(Pos.Draughts),
+          blackKing = updated.history.kingMoves.blackKing.map(Pos.Draughts)
+        ))
+      else//chess
+        (updated.board.variant.threeCheck && game.situation.check) ?? List(
+          Event.CheckCount(
+            white = updated.history.checkCount.white,
+            black = updated.history.checkCount.black
+          )
         )
-      )
     }
 
     Progress(this, updated, events)
@@ -228,8 +268,9 @@ case class Game(
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
-      case Uci.Drop(target, _) => s"$target$target"
-      case m: Uci.Move         => m.keys
+      case Uci.ChessDrop(ChessUci.Drop(target, _)) => s"$target$target"
+      case m: Uci.Move                         => m.keys
+      case _ => sys.error("Type Error")
     }
 
   def updatePlayer(color: Color, f: Player => Player) =
@@ -351,7 +392,7 @@ case class Game(
       clock.??(_ moretimeable color) || correspondenceClock.??(_ moretimeable color)
     }
 
-  def abortable = status == Status.Started && playedTurns < 2 && nonMandatory
+  def abortable = status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory && !metadata.microMatchGameNr.contains(2)
 
   def berserkable = clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
 
@@ -423,7 +464,7 @@ case class Game(
       !Game.isOldHorde(this)
 
   def ratingVariant =
-    if (isTournament && variant.fromPosition) Standard
+    if (isTournament && variant.fromPosition) Variant.libStandard(variant.gameLib)
     else variant
 
   def fromPosition = variant.fromPosition || source.??(Source.Position ==)
@@ -507,6 +548,7 @@ case class Game(
           case _           => 35
         }
       if (variant.chess960) base * 5 / 4
+      if (isTournament && (variant.russian || variant.brazilian) && metadata.simulPairing.isDefined) base + 10
       else base
     }
 
@@ -600,8 +642,8 @@ case class Game(
     )
 
   lazy val opening: Option[FullOpening.AtPly] =
-    if (fromPosition || !Variant.openingSensibleVariants(variant)) none
-    else FullOpeningDB search pgnMoves
+    if (fromPosition || !Variant.openingSensibleVariants(variant.gameLib)(variant)) none
+    else FullOpeningDB.search(variant.gameLib, pgnMoves)
 
   def synthetic = id == Game.syntheticId
 
@@ -643,40 +685,41 @@ object Game {
   val maxPlies = 600 // unlimited can cause StackOverflowError
 
   val analysableVariants: Set[Variant] = Set(
-    chess.variant.Standard,
-    chess.variant.Crazyhouse,
-    chess.variant.Chess960,
-    chess.variant.KingOfTheHill,
-    chess.variant.ThreeCheck,
-    chess.variant.Antichess,
-    chess.variant.FromPosition,
-    chess.variant.Horde,
-    chess.variant.Atomic,
-    chess.variant.RacingKings
-  )
+    strategygames.chess.variant.Standard,
+    strategygames.chess.variant.Crazyhouse,
+    strategygames.chess.variant.Chess960,
+    strategygames.chess.variant.KingOfTheHill,
+    strategygames.chess.variant.ThreeCheck,
+    strategygames.chess.variant.Antichess,
+    strategygames.chess.variant.FromPosition,
+    strategygames.chess.variant.Horde,
+    strategygames.chess.variant.Atomic,
+    strategygames.chess.variant.RacingKings
+  ).map(Variant.Chess)
 
-  val unanalysableVariants: Set[Variant] = Variant.all.toSet -- analysableVariants
+  val unanalysableVariants: Set[Variant] =
+    ChessVariant.all.map(Variant.Chess).toSet -- analysableVariants
 
   val variantsWhereWhiteIsBetter: Set[Variant] = Set(
-    chess.variant.ThreeCheck,
-    chess.variant.Atomic,
-    chess.variant.Horde,
-    chess.variant.RacingKings,
-    chess.variant.Antichess
-  )
+    strategygames.chess.variant.ThreeCheck,
+    strategygames.chess.variant.Atomic,
+    strategygames.chess.variant.Horde,
+    strategygames.chess.variant.RacingKings,
+    strategygames.chess.variant.Antichess
+  ).map(Variant.Chess)
 
   val blindModeVariants: Set[Variant] = Set(
-    chess.variant.Standard,
-    chess.variant.Chess960,
-    chess.variant.KingOfTheHill,
-    chess.variant.ThreeCheck,
-    chess.variant.FromPosition
-  )
+    strategygames.chess.variant.Standard,
+    strategygames.chess.variant.Chess960,
+    strategygames.chess.variant.KingOfTheHill,
+    strategygames.chess.variant.ThreeCheck,
+    strategygames.chess.variant.FromPosition
+  ).map(Variant.Chess)
 
   val hordeWhitePawnsSince = new DateTime(2015, 4, 11, 10, 0)
 
   def isOldHorde(game: Game) =
-    game.variant == chess.variant.Horde &&
+    game.variant == strategygames.chess.variant.Horde &&
       game.createdAt.isBefore(Game.hordeWhitePawnsSince)
 
   def allowRated(variant: Variant, clock: Option[Clock.Config]) =
@@ -713,7 +756,7 @@ object Game {
     }
 
   def isBoardCompatible(clock: Clock.Config): Boolean =
-    chess.Speed(clock) >= Speed.Rapid
+    Speed(clock) >= Speed.Rapid
 
   def isBotCompatible(game: Game): Boolean = {
     game.hasAi || game.fromFriend || game.fromApi
@@ -726,13 +769,15 @@ object Game {
   private[game] val someEmptyClockHistory = Some(ClockHistory())
 
   def make(
-      chess: ChessGame,
+      chess: StratGame,
       whitePlayer: Player,
       blackPlayer: Player,
       mode: Mode,
       source: Source,
       pgnImport: Option[PgnImport],
-      daysPerTurn: Option[Int] = None
+      daysPerTurn: Option[Int] = None,
+      drawLimit: Option[Int] = None,
+      microMatch: Option[String] = None
   ): NewGame = {
     val createdAt = DateTime.now
     NewGame(
@@ -744,9 +789,10 @@ object Game {
         status = Status.Created,
         daysPerTurn = daysPerTurn,
         mode = mode,
-        metadata = metadata(source).copy(pgnImport = pgnImport),
+        metadata = metadata(source).copy(pgnImport = pgnImport, drawLimit = drawLimit, microMatch = microMatch),
         createdAt = createdAt,
-        movedAt = createdAt
+        movedAt = createdAt,
+        pdnStorage = if (chess.situation.board.variant.gameLib == GameLib.Draughts()) Some(PdnStorage.OldBin) else None
       )
     )
   }
@@ -780,6 +826,8 @@ object Game {
     val positionHashes    = "ph"
     val checkCount        = "cc"
     val castleLastMove    = "cl"
+    val kingMoves         = "km"
+    val historyLastMove   = "hlm"
     val unmovedRooks      = "ur"
     val daysPerTurn       = "cd"
     val moveTimes         = "mt"
@@ -787,6 +835,7 @@ object Game {
     val blackClockHistory = "cb"
     val rated             = "ra"
     val analysed          = "an"
+    val lib               = "l"
     val variant           = "v"
     val crazyData         = "chd"
     val bookmarks         = "bm"
@@ -804,10 +853,15 @@ object Game {
     val checkAt           = "ck"
     val perfType          = "pt" // only set on student games for aggregation
     val drawOffers        = "do"
+    //draughts
+    val simulPairing      = "sp"
+    val timeOutUntil      = "to"
+    val microMatch        = "mm"
+    val drawLimit         = "dl"
   }
 }
 
-case class CastleLastMove(castles: Castles, lastMove: Option[Uci])
+case class CastleLastMove(castles: Castles, lastMove: Option[chess.format.Uci])
 
 object CastleLastMove {
 

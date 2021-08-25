@@ -3,8 +3,10 @@ package lila.round
 import actorApi._
 import actorApi.round._
 import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
-import chess.format.Uci
-import chess.{ Black, Centis, Color, MoveMetrics, Speed, White }
+import strategygames.format.Uci
+import strategygames.{ Black, Centis, Color, GameLib, MoveMetrics, Speed, White }
+import strategygames.variant.Variant
+import strategygames.chess.variant.{ Antichess, Crazyhouse, Horde }
 import play.api.libs.json._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
@@ -228,9 +230,8 @@ object RoundSocket {
         case _               => 1
       }
     } / {
-      import chess.variant._
       (pov.game.chess.board.materialImbalance, pov.game.variant) match {
-        case (_, Antichess | Crazyhouse | Horde)                                   => 1
+        case (_, Variant.Chess(Antichess) | Variant.Chess(Crazyhouse) | Variant.Chess(Horde)) => 1
         case (i, _) if (pov.color.white && i <= -4) || (pov.color.black && i >= 4) => 3
         case _                                                                     => 1
       }
@@ -276,8 +277,8 @@ object RoundSocket {
               } yield PlayerDo(FullId(fullId), tpe)
             }
           case "r/move" =>
-            raw.get(5) { case Array(fullId, uciS, blurS, lagS, mtS) =>
-              Uci(uciS) map { uci =>
+            raw.get(6) { case Array(fullId, libS, uciS, blurS, lagS, mtS) =>
+              Uci(GameLib(libS.toInt), uciS) map { uci =>
                 PlayerMove(FullId(fullId), uci, P.In.boolean(blurS), MoveMetrics(centis(lagS), centis(mtS)))
               }
             }
@@ -349,7 +350,7 @@ object RoundSocket {
         s"r/ver $roomId $version $flags ${e.typ} ${e.data}"
       }
 
-      def tvSelect(gameId: Game.ID, speed: chess.Speed, data: JsObject) =
+      def tvSelect(gameId: Game.ID, speed: strategygames.Speed, data: JsObject) =
         s"tv/select $gameId ${speed.id} ${Json stringify data}"
 
       def botConnected(gameId: Game.ID, color: Color, v: Boolean) =

@@ -154,9 +154,10 @@ object layout {
       nonce
     )
 
-  private def loadScripts(moreJs: Frag, chessground: Boolean)(implicit ctx: Context) =
+  private def loadScripts(moreJs: Frag, ground: Boolean)(implicit ctx: Context) =
     frag(
-      chessground option chessgroundTag,
+      ground option chessgroundTag,
+      ground option draughtsgroundTag,
       ctx.requiresFingerprint option fingerprintTag,
       ctx.nonce map playstrategyJsObject,
       if (netConfig.minifiedAssets)
@@ -253,6 +254,7 @@ object layout {
             "blind-mode"                                                                                                                                   -> ctx.blind,
             "kid"                                                                                                                                          -> ctx.kid,
             "mobile"                                                                                                                                       -> ctx.isMobileBrowser,
+            "coords-out"                                                                                                                                   -> (ctx.pref.coords == lila.pref.Pref.Coords.OUTSIDE),
             "playing fixed-scroll"                                                                                                                         -> playing
           ),
           dataDev := (!netConfig.minifiedAssets).option("true"),
@@ -295,7 +297,7 @@ object layout {
             )
           ),
           a(id := "reconnecting", cls := "link text", dataIcon := "B")(trans.reconnecting()),
-          loadScripts(moreJs, chessground)
+          loadScripts(moreJs, chessground) //chessground / draughtsground
         )
       )
     )
