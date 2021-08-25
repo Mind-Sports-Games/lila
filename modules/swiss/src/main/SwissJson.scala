@@ -2,6 +2,8 @@ package lila.swiss
 
 import strategygames.format.{ Forsyth }
 import strategygames.{ Black, White }
+import strategygames.variant.Variant
+import strategygames.draughts.Board.BoardSize
 
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -283,10 +285,20 @@ object SwissJson {
         "absent" -> i.player.absent
       )
 
+  private[swiss] def boardSizeJson(v: Variant) = v match {
+    case Variant.Draughts(v) =>
+      Some(Json.obj(
+        "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+        "key" -> v.boardSize.key
+      ))
+    case _ => None
+  }
+
   private[swiss] def boardJson(b: SwissBoard.WithGame) =
     Json
       .obj(
         "id"          -> b.game.id,
+        "gameLib"     -> b.game.variant.gameLib.name.toLowerCase(),
         "fen"         -> Forsyth.boardAndColor(b.game.variant.gameLib, b.game.situation),
         "lastMove"    -> ~b.game.lastMoveKeys,
         "orientation" -> b.game.naturalOrientation.name,
@@ -302,6 +314,7 @@ object SwissJson {
         }
       )
       .add("winner" -> b.game.winnerColor.map(_.name))
+      .add("boardSize" -> boardSizeJson(b.game.variant))
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(

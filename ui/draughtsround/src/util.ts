@@ -100,6 +100,6 @@ const noAnalysisVariants = [
   'frysk'
 ];
 
-export function allowAnalysisForVariant(variant: VariantKey) {
+export function allowAnalysisForVariant(variant: DraughtsVariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;
 }
