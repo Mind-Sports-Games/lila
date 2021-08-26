@@ -2,6 +2,7 @@ package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.{ Black, White, Clock }
+import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.i18n.Lang
@@ -264,6 +265,15 @@ final class JsonView(
       }
   }
 
+  private[tournament] def boardSizeJson(v: Variant) = v match {
+    case Variant.Draughts(v) =>
+      Some(Json.obj(
+        "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+        "key" -> v.boardSize.key
+      ))
+    case _ => None
+  }
+
   private def featuredJson(featured: FeaturedGame) = {
     val game = featured.game
     def ofPlayer(rp: RankedPlayer, p: lila.game.Player) = {
@@ -280,6 +290,7 @@ final class JsonView(
     Json
       .obj(
         "id"          -> game.id,
+        "gameLib"     -> game.variant.gameLib.name.toLowerCase(),
         "fen"         -> Forsyth.boardAndColor(game.variant.gameLib, game.situation),
         "orientation" -> game.naturalOrientation.name,
         "color"       -> game.naturalOrientation.name, // app BC https://github.com/ornicar/lila/issues/7195
@@ -297,6 +308,7 @@ final class JsonView(
         }
       )
       .add("winner" -> game.winnerColor.map(_.name))
+      .add("boardSize" -> boardSizeJson(game.variant))
   }
 
   private def myInfoJson(u: Option[User], delay: Option[Pause.Delay])(i: MyInfo) =

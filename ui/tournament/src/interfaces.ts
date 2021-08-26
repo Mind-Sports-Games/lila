@@ -27,9 +27,16 @@ export interface TournamentData extends Untyped {
   featured?: FeaturedGame;
 }
 
+export interface BoardSize {
+  size: number[];
+  key: string;
+}
+
 export interface FeaturedGame {
   id: string;
   fen: Fen;
+  gameLib: string;
+  boardSize?: BoardSize;
   orientation: Color;
   lastMove: string;
   white: FeaturedPlayer;
