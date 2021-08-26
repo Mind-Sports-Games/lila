@@ -60,7 +60,8 @@ object form {
           h1("Edit ", swiss.name),
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
-            form3.split(fields.rated, fields.chessVariant),
+            form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
+            form3.split(fields.rated),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
