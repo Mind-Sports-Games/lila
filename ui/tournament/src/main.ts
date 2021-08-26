@@ -1,4 +1,5 @@
 import { init, classModule, attributesModule } from 'snabbdom';
+import { Draughtsground } from 'draughtsground';
 import { Chessground } from 'chessground';
 import { TournamentOpts } from './interfaces';
 import PlayStrategyChat from 'chat';
@@ -38,4 +39,5 @@ export default function (opts: TournamentOpts) {
 // that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;
+window.Draughtsground = Draughtsground;
 window.PlayStrategyChat = PlayStrategyChat;

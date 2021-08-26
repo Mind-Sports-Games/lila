@@ -5,6 +5,16 @@ import { Duel, DuelPlayer, DuelTeams, TeamBattle, FeaturedGame } from '../interf
 import { teamName } from './battle';
 import TournamentController from '../ctrl';
 
+const renderGameClasses = (game: FeaturedGame): string =>
+  game.gameLib === 'draughts' && !!game.boardSize
+    ? `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLib}.is${game.boardSize.key}`
+    : `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLib}`;
+
+const renderGameState = (game: FeaturedGame): string =>
+  game.gameLib === 'draughts' && !!game.boardSize
+    ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orientation}|${game.lastMove}`
+    : `${game.fen},${game.orientation},${game.lastMove}`;
+
 function featuredPlayer(game: FeaturedGame, color: Color) {
   const player = game[color];
   const clock = game.c || game.clock; // temporary BC, remove me
@@ -34,10 +44,10 @@ function featuredPlayer(game: FeaturedGame, color: Color) {
 
 function featured(game: FeaturedGame): VNode {
   return h(
-    `div.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d`,
+    `div${renderGameClasses(game)}`,
     {
       attrs: {
-        'data-state': `${game.fen},${game.orientation},${game.lastMove}`,
+        'data-state': renderGameState(game),
         'data-live': game.id,
       },
       hook: onInsert(playstrategy.powertip.manualUserIn),
