@@ -63,7 +63,8 @@ object form {
           h1("Edit ", tour.name()),
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
             form3.split(fields.name, tour.isCreated option fields.startDate),
-            form3.split(fields.rated, fields.chessVariant),
+            form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
+            form3.split(fields.rated),
             fields.clock,
             form3.split(
               if (TournamentForm.minutes contains tour.minutes) form3.split(fields.minutes)
