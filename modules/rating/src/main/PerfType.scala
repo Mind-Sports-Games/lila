@@ -341,6 +341,7 @@ object PerfType {
       Horde,
       RacingKings,
       LinesOfAction,
+      International,
       Frisian,
       Frysk,
       Antidraughts,
