@@ -7,7 +7,7 @@ const noCevalVariants = [
   'brazilian',
   'fromPositionDraughts',
   'frisian',
-  'frysk'
+  'frysk',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {
