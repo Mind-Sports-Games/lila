@@ -27,7 +27,8 @@ object form {
           ),
           postForm(cls := "form3", action := routes.Tournament.create)(
             fields.name,
-            form3.split(fields.rated, fields.variant),
+            form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
+            form3.split(fields.rated),
             fields.clock,
             form3.split(fields.minutes, fields.waitMinutes),
             form3.split(fields.description(true), fields.startPosition),
@@ -62,7 +63,8 @@ object form {
           h1("Edit ", tour.name()),
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
             form3.split(fields.name, tour.isCreated option fields.startDate),
-            form3.split(fields.rated, fields.variant),
+            form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
+            form3.split(fields.rated),
             fields.clock,
             form3.split(
               if (TournamentForm.minutes contains tour.minutes) form3.split(fields.minutes)
@@ -232,12 +234,28 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
-  def variant =
-    form3.group(form("variant"), trans.variant(), half = true)(
+  def gameLib =
+    form3.group(form("gameLib"), "Game Family", half = true)(
       form3.select(
         _,
-        translatedChessVariantChoicesWithVariants.map(x => x._1 -> x._2),
+        translatedGameLibChoices(_.id.toString).map(x => x._1 -> x._2),
         disabled = disabledAfterStart
+      )
+    )
+  def chessVariant =
+    form3.group(form("chessVariant"), trans.variant(), klass="chessVariant", half = true)(
+      form3.select(
+        _,
+        translatedChessVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
+        disabled = disabledAfterStart
+      )
+    )
+  def draughtsVariant =
+    form3.group(form("draughtsVariant"), trans.variant(), klass="draughtsVariant", half = true, displayed = false)(
+      form3.select(
+        _,
+        translatedDraughtsVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
+        disabled = disabledAfterStart,
       )
     )
   def startPosition =

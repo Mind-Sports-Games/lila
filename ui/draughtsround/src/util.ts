@@ -97,7 +97,7 @@ const noAnalysisVariants = [
   'brazilian',
   'fromPositionDraughts',
   'frisian',
-  'frysk'
+  'frysk',
 ];
 
 export function allowAnalysisForVariant(variant: DraughtsVariantKey) {

@@ -23,7 +23,7 @@ const renderBoardState = (board: Board): string =>
 
 const renderBoard = (board: Board): VNode =>
   h(
-    `div.${renderBoardClasses(board)}`,
+    `div${renderBoardClasses(board)}`,
     {
       key: board.id,
       attrs: {
