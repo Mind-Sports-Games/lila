@@ -62,7 +62,14 @@ object list {
               userTopPerf(leaderboards.kingOfTheHill, PerfType.KingOfTheHill),
               userTopPerf(leaderboards.horde, PerfType.Horde),
               userTopPerf(leaderboards.racingKings, PerfType.RacingKings),
-              userTopPerf(leaderboards.linesOfAction, PerfType.LinesOfAction)
+              userTopPerf(leaderboards.linesOfAction, PerfType.LinesOfAction),
+              userTopPerf(leaderboards.international, PerfType.International),
+              userTopPerf(leaderboards.frisian, PerfType.Frisian),
+              userTopPerf(leaderboards.antidraughts, PerfType.Antidraughts),
+              userTopPerf(leaderboards.breakthrough, PerfType.Breakthrough),
+              userTopPerf(leaderboards.frysk, PerfType.Frysk),
+              userTopPerf(leaderboards.russian, PerfType.Russian),
+              userTopPerf(leaderboards.brazilian, PerfType.Brazilian)
             )
           )
         )

@@ -47,6 +47,20 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.crazyhouse, ratingsB.crazyhouse, game)
               case Variant.Chess(LinesOfAction) =>
                 updateRatings(ratingsW.linesOfAction, ratingsB.linesOfAction, game)
+              case Variant.Draughts(strategygames.draughts.variant.Standard) =>
+                updateRatings(ratingsW.international, ratingsB.international, game)
+              case Variant.Draughts(strategygames.draughts.variant.Frisian) =>
+                updateRatings(ratingsW.frisian, ratingsB.frisian, game)
+              case Variant.Draughts(strategygames.draughts.variant.Frysk) =>
+                updateRatings(ratingsW.frysk, ratingsB.frysk, game)
+              case Variant.Draughts(strategygames.draughts.variant.Antidraughts) =>
+                updateRatings(ratingsW.antidraughts, ratingsB.antidraughts, game)
+              case Variant.Draughts(strategygames.draughts.variant.Breakthrough) =>
+                updateRatings(ratingsW.breakthrough, ratingsB.breakthrough, game)
+              case Variant.Draughts(strategygames.draughts.variant.Russian) =>
+                updateRatings(ratingsW.russian, ratingsB.russian, game)
+              case Variant.Draughts(strategygames.draughts.variant.Brazilian) =>
+                updateRatings(ratingsW.brazilian, ratingsB.brazilian, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -92,6 +106,13 @@ final class PerfsUpdater(
       racingKings: Rating,
       crazyhouse: Rating,
       linesOfAction: Rating,
+      international: Rating,
+      frisian: Rating,
+      frysk: Rating,
+      antidraughts: Rating,
+      breakthrough: Rating,
+      russian: Rating,
+      brazilian: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -111,6 +132,13 @@ final class PerfsUpdater(
       racingKings = perfs.racingKings.toRating,
       crazyhouse = perfs.crazyhouse.toRating,
       linesOfAction = perfs.linesOfAction.toRating,
+      international = perfs.international.toRating,
+      frisian = perfs.frisian.toRating,
+      frysk = perfs.frysk.toRating,
+      antidraughts = perfs.antidraughts.toRating,
+      breakthrough = perfs.breakthrough.toRating,
+      russian = perfs.russian.toRating,
+      brazilian = perfs.brazilian.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -163,6 +191,13 @@ final class PerfsUpdater(
           racingKings = addRatingIf(game.ratingVariant.racingKings, perfs.racingKings, ratings.racingKings),
           crazyhouse = addRatingIf(game.ratingVariant.crazyhouse, perfs.crazyhouse, ratings.crazyhouse),
           linesOfAction = addRatingIf(game.ratingVariant.linesOfAction, perfs.linesOfAction, ratings.linesOfAction),
+          international = addRatingIf(game.ratingVariant.draughtsStandard, perfs.international, ratings.international),
+          frisian = addRatingIf(game.ratingVariant.frisian, perfs.frisian, ratings.frisian),
+          frysk = addRatingIf(game.ratingVariant.frysk, perfs.frysk, ratings.frysk),
+          antidraughts = addRatingIf(game.ratingVariant.antidraughts, perfs.antidraughts, ratings.antidraughts),
+          breakthrough = addRatingIf(game.ratingVariant.breakthrough, perfs.breakthrough, ratings.breakthrough),
+          russian = addRatingIf(game.ratingVariant.russian, perfs.russian, ratings.russian),
+          brazilian = addRatingIf(game.ratingVariant.brazilian, perfs.brazilian, ratings.brazilian),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -183,6 +218,13 @@ final class PerfsUpdater(
           racingKings = r(PT.RacingKings, perfs.racingKings, perfs1.racingKings),
           crazyhouse = r(PT.Crazyhouse, perfs.crazyhouse, perfs1.crazyhouse),
           linesOfAction = r(PT.LinesOfAction, perfs.linesOfAction, perfs1.linesOfAction),
+          international = r(PT.International, perfs.international, perfs1.international),
+          frisian = r(PT.Frisian, perfs.frisian, perfs1.frisian),
+          frysk = r(PT.Frysk, perfs.frysk, perfs1.frysk),
+          antidraughts = r(PT.Antidraughts, perfs.antidraughts, perfs1.antidraughts),
+          breakthrough = r(PT.Breakthrough, perfs.breakthrough, perfs1.breakthrough),
+          russian = r(PT.Russian, perfs.russian, perfs1.russian),
+          brazilian = r(PT.Brazilian, perfs.brazilian, perfs1.brazilian),
           bullet = r(PT.Bullet, perfs.bullet, perfs1.bullet),
           blitz = r(PT.Blitz, perfs.blitz, perfs1.blitz),
           rapid = r(PT.Rapid, perfs.rapid, perfs1.rapid),

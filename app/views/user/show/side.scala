@@ -80,6 +80,13 @@ object side {
         showNonEmptyPerf(u.perfs.horde, PerfType.Horde),
         showNonEmptyPerf(u.perfs.racingKings, PerfType.RacingKings),
         showNonEmptyPerf(u.perfs.linesOfAction, PerfType.LinesOfAction),
+        showPerf(u.perfs.international, PerfType.International),
+        showNonEmptyPerf(u.perfs.frisian, PerfType.Frisian),
+        showNonEmptyPerf(u.perfs.frysk, PerfType.Frysk),
+        showNonEmptyPerf(u.perfs.antidraughts, PerfType.Antidraughts),
+        showNonEmptyPerf(u.perfs.breakthrough, PerfType.Breakthrough),
+        showPerf(u.perfs.russian, PerfType.Russian),
+        showPerf(u.perfs.brazilian, PerfType.Brazilian),
         u.noBot option frag(
           hr,
           showPerf(u.perfs.puzzle, PerfType.Puzzle),

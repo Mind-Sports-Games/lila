@@ -29,6 +29,8 @@ object StatusText {
             => s"${winner(win)} wins the race."
           case Variant.Chess(strategygames.chess.variant.LinesOfAction)
             => s"${winner(win)} connects all of their pieces."
+          case Variant.Draughts(strategygames.draughts.variant.Breakthrough)
+            => s"${winner(win)} has a promotion first."
           case _ => "Game ends by variant rule."
         }
       case _ => ""

@@ -31,7 +31,14 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     PerfType.Atomic,
     PerfType.Horde,
     PerfType.Crazyhouse,
-    PerfType.LinesOfAction
+    PerfType.LinesOfAction,
+    PerfType.International,
+    PerfType.Brazilian,
+    PerfType.Russian,
+    PerfType.Frisian,
+    PerfType.Frysk,
+    PerfType.Antidraughts,
+    PerfType.Breakthrough
   )
 
   def showPerfRating(rating: Int, name: String, nb: Int, provisional: Boolean, clueless: Boolean, icon: Char)(
