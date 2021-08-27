@@ -349,7 +349,7 @@ final private[round] class RoundDuct(
     case RematchYes(playerId) => handle(PlayerId(playerId))(rematcher.yes)
     case RematchNo(playerId)  => handle(PlayerId(playerId))(rematcher.no)
 
-    //TODO: microMatch: This almost certainly doesnt work as wanted (port issues) 
+    //TODO: microMatch: This almost certainly doesnt work as wanted (port issues)
     case MicroRematch => handle { game =>
       rematcher.microMatch(game) map { events =>
         events.foreach {
