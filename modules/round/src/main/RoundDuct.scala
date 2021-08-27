@@ -562,6 +562,7 @@ final private[round] class RoundDuct(
       e.printStackTrace(new PrintWriter(sw))
       logger.warn(s"$name: ${e.getMessage} with stack trace: ${sw.toString}")
       lila.mon.round.error.other.increment().unit
+      Thread.dumpStack()
   }
 
   def roomId = RoomId(gameId)
