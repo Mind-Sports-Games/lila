@@ -15,6 +15,13 @@ case class History(
     racingKings: RatingsMap,
     crazyhouse: RatingsMap,
     linesOfAction: RatingsMap,
+    international: RatingsMap,
+    frisian: RatingsMap,
+    frysk: RatingsMap,
+    antidraughts: RatingsMap,
+    breakthrough: RatingsMap,
+    russian: RatingsMap,
+    brazilian: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -41,6 +48,13 @@ case class History(
       case PerfType.RacingKings    => racingKings
       case PerfType.Crazyhouse     => crazyhouse
       case PerfType.LinesOfAction  => linesOfAction
+      case PerfType.International  => international
+      case PerfType.Frisian        => frisian
+      case PerfType.Frysk          => frysk
+      case PerfType.Antidraughts   => antidraughts
+      case PerfType.Breakthrough   => breakthrough
+      case PerfType.Russian        => russian
+      case PerfType.Brazilian      => brazilian
       case PerfType.Puzzle         => puzzle
       case PerfType.UltraBullet    => ultraBullet
       case x                       => sys error s"No history for perf $x"
@@ -79,6 +93,13 @@ object History {
           racingKings = ratingsMap("racingKings"),
           crazyhouse = ratingsMap("crazyhouse"),
           linesOfAction = ratingsMap("linesOfAction"),
+          international = ratingsMap("international"),
+          frisian = ratingsMap("frisian"),
+          frysk = ratingsMap("frysk"),
+          antidraughts = ratingsMap("antidraughts"),
+          breakthrough = ratingsMap("breakthrough"),
+          russian = ratingsMap("russian"),
+          brazilian = ratingsMap("brazilian"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),

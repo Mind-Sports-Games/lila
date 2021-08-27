@@ -8,6 +8,7 @@ import play.api.libs.json._
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 import scala.util.chaining._
+import java.io.{ PrintWriter, StringWriter }
 
 import lila.game.Game.{ FullId, PlayerId }
 import lila.game.{ Game, GameRepo, Pov, Event, Progress, Player => GamePlayer }
@@ -348,7 +349,7 @@ final private[round] class RoundDuct(
     case RematchYes(playerId) => handle(PlayerId(playerId))(rematcher.yes)
     case RematchNo(playerId)  => handle(PlayerId(playerId))(rematcher.no)
 
-    //TODO: microMatch: This almost certainly doesnt work as wanted (port issues) 
+    //TODO: microMatch: This almost certainly doesnt work as wanted (port issues)
     case MicroRematch => handle { game =>
       rematcher.microMatch(game) map { events =>
         events.foreach {
@@ -557,8 +558,11 @@ final private[round] class RoundDuct(
       logger.info(s"Round fishnet error $name: ${e.getMessage}")
       lila.mon.round.error.fishnet.increment().unit
     case e: Exception =>
-      logger.warn(s"$name: ${e.getMessage}")
+      val sw = new StringWriter
+      e.printStackTrace(new PrintWriter(sw))
+      logger.warn(s"$name: ${e.getMessage} with stack trace: ${sw.toString}")
       lila.mon.round.error.other.increment().unit
+      Thread.dumpStack()
   }
 
   def roomId = RoomId(gameId)

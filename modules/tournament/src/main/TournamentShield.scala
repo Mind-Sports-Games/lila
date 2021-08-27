@@ -225,6 +225,48 @@ object TournamentShield {
           iconChar = ''
         )
 
+    case object International
+        extends Category(
+          of = Right(Variant.Draughts(strategygames.draughts.variant.Standard)),
+          iconChar = 'K'
+        )
+
+    case object Frisian
+        extends Category(
+          of = Right(Variant.Draughts(strategygames.draughts.variant.Frisian)),
+          iconChar = 'K'
+        )
+
+    case object Frysk
+        extends Category(
+          of = Right(Variant.Draughts(strategygames.draughts.variant.Frysk)),
+          iconChar = 'K'
+        )
+
+    case object Antidraughts
+        extends Category(
+          of = Right(Variant.Draughts(strategygames.draughts.variant.Antidraughts)),
+          iconChar = 'K'
+        )
+
+    case object Breakthrough
+        extends Category(
+          of = Right(Variant.Draughts(strategygames.draughts.variant.Breakthrough)),
+          iconChar = 'K'
+        )
+
+    case object Russian
+        extends Category(
+          of = Right(Variant.Draughts(strategygames.draughts.variant.Russian)),
+          iconChar = 'K'
+        )
+
+    case object Brazilian
+        extends Category(
+          of = Right(Variant.Draughts(strategygames.draughts.variant.Brazilian)),
+          iconChar = 'K'
+        )
+
     val all: List[Category] = List(
       Bullet,
       SuperBlitz,
@@ -241,7 +283,14 @@ object TournamentShield {
       Atomic,
       Horde,
       RacingKings,
-      LinesOfAction
+      LinesOfAction,
+      International,
+      Frisian,
+      Frysk,
+      Antidraughts,
+      Breakthrough,
+      Russian,
+      Brazilian
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)
@@ -254,7 +303,7 @@ object TournamentShield {
       iconFont = "5".some,
       headline = s"Battle for the $name Shield",
       description =
-        s"""This [Shield trophy](https://lichess.org/blog/Wh36WiQAAMMApuRb/introducing-shield-tournaments) is unique.
+        s"""This [Shield trophy] is unique.
 The winner keeps it for one month,
 then must defend it during the next $name Shield tournament!""",
       homepageHours = 6.some
