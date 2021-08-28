@@ -293,7 +293,14 @@ final class User(
                   "atomic"        -> leaderboards.atomic,
                   "horde"         -> leaderboards.horde,
                   "racingKings"   -> leaderboards.racingKings,
-                  "linesOfAction" -> leaderboards.linesOfAction
+                  "linesOfAction" -> leaderboards.linesOfAction,
+                  "international" -> leaderboards.international,
+                  "frisian"       -> leaderboards.frisian,
+                  "frysk"         -> leaderboards.frysk,
+                  "antidraughts"  -> leaderboards.antidraughts,
+                  "breakthrough"  -> leaderboards.breakthrough,
+                  "russian"       -> leaderboards.russian,
+                  "brazilian"     -> leaderboards.brazilian
                 )
               )
             }
