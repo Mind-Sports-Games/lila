@@ -99,6 +99,7 @@ object BsonHandlers {
       Swiss.Settings(
         nbRounds = r.get[Int]("n"),
         rated = r.boolO("r") | true,
+        microMatch = r.boolO("m") | false,
         description = r.strO("d"),
         position = r.getO[FEN]("f"),
         chatFor = r.intO("c") | Swiss.ChatFor.default,
@@ -111,6 +112,7 @@ object BsonHandlers {
       $doc(
         "n"  -> s.nbRounds,
         "r"  -> (!s.rated).option(false),
+        "m"  -> s.microMatch.pp("WUT"),
         "d"  -> s.description,
         "f"  -> s.position,
         "c"  -> (s.chatFor != Swiss.ChatFor.default).option(s.chatFor),

@@ -25,7 +25,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
-            form3.split(fields.rated),
+            form3.split(fields.rated, fields.microMatch),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -61,7 +61,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
-            form3.split(fields.rated),
+            form3.split(fields.rated, fields.microMatch),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -150,6 +150,14 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         help = raw("Games are rated<br>and impact players ratings").some
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
+    )
+  def microMatch =
+    frag(
+      form3.checkbox(
+        form("microMatch"),
+        trans.microMatch(),
+        help = raw("Players play 2 games per round<br>one with white and one with black").some
+      ),
     )
   def gameLib =
     form3.group(form("gameLib"), "Game Family", half = true)(

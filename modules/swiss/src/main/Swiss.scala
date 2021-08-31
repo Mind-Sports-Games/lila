@@ -101,6 +101,7 @@ object Swiss {
   case class Settings(
       nbRounds: Int,
       rated: Boolean,
+      microMatch: Boolean,
       description: Option[String] = None,
       position: Option[FEN],
       chatFor: ChatFor = ChatFor.default,

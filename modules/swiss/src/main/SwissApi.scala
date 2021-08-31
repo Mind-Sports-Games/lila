@@ -74,6 +74,7 @@ final class SwissApi(
       settings = Swiss.Settings(
         nbRounds = data.nbRounds,
         rated = data.realPosition.isEmpty && data.isRated,
+        microMatch = data.isMicroMatch,
         description = data.description,
         position = data.realPosition,
         chatFor = data.realChatFor,
@@ -104,6 +105,7 @@ final class SwissApi(
           settings = old.settings.copy(
             nbRounds = data.nbRounds,
             rated = position.isEmpty && (data.rated | old.settings.rated),
+            microMatch = data.microMatch | old.settings.microMatch,
             description = data.description orElse old.settings.description,
             position = position,
             chatFor = data.chatFor | old.settings.chatFor,
