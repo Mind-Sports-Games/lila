@@ -88,3 +88,18 @@ export function spinner() {
     ]
   );
 }
+
+const noAnalysisVariants = [
+  'international',
+  'antidraughts',
+  'breakthrough',
+  'russian',
+  'brazilian',
+  'fromPositionDraughts',
+  'frisian',
+  'frysk',
+];
+
+export function allowAnalysisForVariant(variant: DraughtsVariantKey) {
+  return noAnalysisVariants.indexOf(variant) == -1;
+}

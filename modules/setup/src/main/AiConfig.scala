@@ -23,7 +23,7 @@ case class AiConfig(
 
   val strictFen = true
 
-  def >> = (variant.gameLib.id, variant.id, variant.id, timeMode.id, time, increment, days, level, color.name, fen.map(_.value)).some
+  def >> = (variant.id, timeMode.id, time, increment, days, level, color.name, fen.map(_.value)).some
 
   def game(user: Option[User]) =
     fenGame { chessGame =>
@@ -58,16 +58,9 @@ case class AiConfig(
 
 object AiConfig extends BaseConfig {
 
-  def from(l: Int, cv: Int, dv: Int, tm: Int, t: Double, i: Int, d: Int, level: Int, c: String, fen: Option[String]) =
+  def from(cv: Int, tm: Int, t: Double, i: Int, d: Int, level: Int, c: String, fen: Option[String]) =
     new AiConfig(
-      variant = l match {
-        case 0 => Variant.wrap(
-          strategygames.chess.variant.Variant(cv) err "Invalid game variant " + cv
-        )
-        case 1 => Variant.wrap(
-          strategygames.draughts.variant.Variant(dv) err "Invalid game variant " + dv
-        )
-      },
+      variant = Variant.Chess(strategygames.chess.variant.Variant(cv) err "Invalid game variant " + cv),
       fenVariant = none,
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
@@ -75,14 +68,11 @@ object AiConfig extends BaseConfig {
       days = d,
       level = level,
       color = Color(c) err "Invalid color " + c,
-      fen = fen.map(f => FEN.apply(GameLib(l), f))
+      fen = fen.map(f => FEN.apply(GameLib.Chess(), f))
     )
 
-  def default(l: Int) = AiConfig(
-    variant = l match {
-      case 0 => Variant.Chess(chessVariantDefault)
-      case 1 => Variant.Draughts(draughtsVariantDefault)
-    },
+  def default = AiConfig(
+    variant = Variant.Chess(chessVariantDefault),
     fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,

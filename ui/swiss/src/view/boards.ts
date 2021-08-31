@@ -11,13 +11,23 @@ export function top(boards: Board[]): VNode {
   return h('div.swiss__board__top.swiss__table', boards.slice(0, 1).map(renderBoard));
 }
 
+const renderBoardClasses = (board: Board): string =>
+  board.gameLib === 'draughts' && !!board.boardSize
+    ? `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLib}.is${board.boardSize.key}`
+    : `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLib}`;
+
+const renderBoardState = (board: Board): string =>
+  board.gameLib === 'draughts' && !!board.boardSize
+    ? `${board.fen}|${board.boardSize.size[0]}x${board.boardSize.size[1]}|${board.orientation}|${board.lastMove}`
+    : `${board.fen},${board.orientation},${board.lastMove}`;
+
 const renderBoard = (board: Board): VNode =>
   h(
-    `div.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d`,
+    `div${renderBoardClasses(board)}`,
     {
       key: board.id,
       attrs: {
-        'data-state': `${board.fen},${board.orientation},${board.lastMove}`,
+        'data-state': renderBoardState(board),
         'data-live': board.id,
       },
       hook: {

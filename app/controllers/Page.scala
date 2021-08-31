@@ -44,7 +44,7 @@ final class Page(
           views.html.site.variant.home(doc, resolver)
         },
         api = _ =>
-          Ok(JsArray(Variant.all(GameLib.Chess()).map { v =>
+          Ok(JsArray((Variant.all(GameLib.Chess()) ::: Variant.all(GameLib.Draughts())).map { v =>
             Json.obj(
               "id"   -> v.id,
               "key"  -> v.key,
@@ -57,7 +57,10 @@ final class Page(
   def variant(key: String) =
     Open { implicit ctx =>
       (for {
-        variant  <- Variant.byKey(GameLib.Chess()) get key
+        //TODO push this function into strategygames
+        variant  <- (Variant.all(GameLib.Chess()) ::: Variant.all(GameLib.Draughts())).map{
+          v => (v.key, v)
+        }.toMap get key
         perfType <- lila.rating.PerfType byVariant variant
       } yield OptionOk(prismicC getBookmark key) { case (doc, resolver) =>
         views.html.site.variant.show(doc, resolver, variant, perfType)

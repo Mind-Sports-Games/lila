@@ -156,6 +156,7 @@ trait Handlers {
     {
       case BSONString(v) => v.split(":") match {
         case Array(lib, v) => StratVariant orDefault(GameLib(lib.toInt), v)
+        case Array(v)      => StratVariant orDefault(GameLib.Chess(), v)
         case _ => sys.error("lib not encoded into variant handler")
       }
       case _ => sys.error("variant not encoded in handler. Previously this defaulted to standard chess")

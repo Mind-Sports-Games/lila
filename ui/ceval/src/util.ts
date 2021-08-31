@@ -1,4 +1,14 @@
-const noCevalVariants = ['linesOfAction'];
+const noCevalVariants = [
+  'linesOfAction',
+  'international',
+  'antidraughts',
+  'breakthrough',
+  'russian',
+  'brazilian',
+  'fromPositionDraughts',
+  'frisian',
+  'frysk',
+];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {
   return !b || a.depth > b.depth || (a.depth === b.depth && a.nodes > b.nodes);

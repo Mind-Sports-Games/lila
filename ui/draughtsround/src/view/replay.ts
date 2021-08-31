@@ -70,13 +70,13 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
   if (status.finished(ctrl.data))
     switch (ctrl.data.game.winner) {
       case 'white':
-        result = '1-0';
+        result = ctrl.data.pref.draughtsResult ? '2-0' : '1-0';
         break;
       case 'black':
-        result = '0-1';
+        result = ctrl.data.pref.draughtsResult ? '0-2' : '0-1';
         break;
       default:
-        result = '½-½';
+        result = ctrl.data.pref.draughtsResult ? '1-1' : '½-½';
     }
   if (result || status.aborted(ctrl.data)) {
     const winner = ctrl.data.game.winner;
@@ -90,7 +90,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [viewStatus(ctrl), winner ? ' • ' + ctrl.noarg(winner + 'IsVictorious') : '']
+        [viewStatus(ctrl), winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.noarg(winner + 'IsVictorious') : '']
       ),
     ]);
   }
@@ -126,7 +126,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
 
 export function analysisButton(ctrl: RoundController): VNode | undefined {
   const forecastCount = ctrl.data.forecastCount;
-  return game.userAnalysable(ctrl.data)
+  return game.userAnalysable(ctrl.data) && util.allowAnalysisForVariant(ctrl.data.game.variant.key)
     ? h(
         'a.fbt.analysis',
         {

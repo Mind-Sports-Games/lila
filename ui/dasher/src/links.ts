@@ -86,7 +86,7 @@ export default function (ctrl: DasherCtrl): VNode {
 
   return h('div', [
     userLinks(),
-    h('div.subs', [langs, sound, background, board, theme, piece, zenToggle]),
+    h('div.subs', [langs, sound, background, theme, piece, zenToggle]),
     pingView(ctrl.ping),
   ]);
 }
