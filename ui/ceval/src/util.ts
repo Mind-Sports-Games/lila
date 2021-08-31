@@ -5,6 +5,7 @@ const noCevalVariants = [
   'breakthrough',
   'russian',
   'brazilian',
+  'pool',
   'fromPositionDraughts',
   'frisian',
   'frysk',

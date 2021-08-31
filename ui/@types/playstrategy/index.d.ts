@@ -319,6 +319,7 @@ declare type Perf =
   | 'breakthrough'
   | 'russian'
   | 'brazilian'
+  | 'pool'
   | 'fromPositionDraughts'
   | 'frisian'
   | 'frysk';

@@ -52,4 +52,5 @@ export const perfIcons = {
   Breakthrough: 'K',
   Russian: 'K',
   Brazilian: 'K',
+  Pool: 'K',
 };

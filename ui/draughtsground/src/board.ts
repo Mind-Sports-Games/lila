@@ -148,7 +148,7 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture
     finalDest = captureUci ? key2pos(captureUci.slice(captureUci.length - 2) as cg.Key, bs) : destPos,
     variant = (state.movable && state.movable.variant) || (state.premovable && state.premovable.variant),
     promotable =
-      (variant === 'russian' || !state.movable.captLen || state.movable.captLen <= captured) &&
+      (variant === 'russian' || variant === 'pool' || !state.movable.captLen || state.movable.captLen <= captured) &&
       origPiece.role === 'man' &&
       ((origPiece.color === 'white' && finalDest[1] === 1) ||
         (origPiece.color === 'black' && finalDest[1] === state.boardSize[1]));

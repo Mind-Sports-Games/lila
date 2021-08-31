@@ -300,7 +300,8 @@ final class User(
                   "antidraughts"  -> leaderboards.antidraughts,
                   "breakthrough"  -> leaderboards.breakthrough,
                   "russian"       -> leaderboards.russian,
-                  "brazilian"     -> leaderboards.brazilian
+                  "brazilian"     -> leaderboards.brazilian,
+                  "pool"          -> leaderboards.pool
                 )
               )
             }
