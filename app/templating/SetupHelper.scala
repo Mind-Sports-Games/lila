@@ -183,8 +183,9 @@ trait SetupHelper { self: I18nHelper =>
       encode: Variant => String
   )(implicit lang: Lang): List[SelectChoice] =
     translatedDraughtsVariantChoices(encode) ::: List(
-      Variant.Draughts(strategygames.draughts.variant.Brazilian),
       Variant.Draughts(strategygames.draughts.variant.Russian),
+      Variant.Draughts(strategygames.draughts.variant.Brazilian),
+      Variant.Draughts(strategygames.draughts.variant.Pool),
       Variant.Draughts(strategygames.draughts.variant.Frisian),
       Variant.Draughts(strategygames.draughts.variant.Frysk),
       Variant.Draughts(strategygames.draughts.variant.Antidraughts),
@@ -197,8 +198,9 @@ trait SetupHelper { self: I18nHelper =>
 
   def translatedDraughtsAiVariantChoices(implicit lang: Lang) =
     translatedDraughtsVariantChoices :+
-      variantTupleId(Variant.Draughts(strategygames.draughts.variant.Brazilian)) :+
       variantTupleId(Variant.Draughts(strategygames.draughts.variant.Russian)) :+
+      variantTupleId(Variant.Draughts(strategygames.draughts.variant.Brazilian)) :+
+      variantTupleId(Variant.Draughts(strategygames.draughts.variant.Pool)) :+
       variantTupleId(Variant.Draughts(strategygames.draughts.variant.Frisian)) :+
       variantTupleId(Variant.Draughts(strategygames.draughts.variant.Frysk)) :+
       variantTupleId(Variant.Draughts(strategygames.draughts.variant.Antidraughts)) :+

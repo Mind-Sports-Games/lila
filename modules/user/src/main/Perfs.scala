@@ -26,6 +26,7 @@ case class Perfs(
     breakthrough: Perf,
     russian: Perf,
     brazilian: Perf,
+    pool: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -57,6 +58,7 @@ case class Perfs(
       "breakthrough"   -> breakthrough,
       "russian"        -> russian,
       "brazilian"      -> brazilian,
+      "pool"           -> pool,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -142,6 +144,7 @@ case class Perfs(
     "breakthrough"   -> breakthrough,
     "russian"        -> russian,
     "brazilian"      -> brazilian,
+    "pool"           -> pool,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
     "blitz"          -> blitz,
@@ -182,6 +185,7 @@ case class Perfs(
       case PerfType.Breakthrough   => breakthrough
       case PerfType.Russian        => russian
       case PerfType.Brazilian      => brazilian
+      case PerfType.Pool           => pool
       case PerfType.Puzzle         => puzzle
     }
 
@@ -292,6 +296,7 @@ case object Perfs {
       case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => Some(_.breakthrough)
       case Variant.Draughts(strategygames.draughts.variant.Russian)      => Some(_.russian)
       case Variant.Draughts(strategygames.draughts.variant.Brazilian)    => Some(_.brazilian)
+      case Variant.Draughts(strategygames.draughts.variant.Pool)         => Some(_.pool)
       case _                           => none
     }
 
@@ -329,6 +334,7 @@ case object Perfs {
         breakthrough = perf("breakthrough"),
         russian = perf("russian"),
         brazilian = perf("brazilian"),
+        pool = perf("pool"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -363,6 +369,7 @@ case object Perfs {
         "breakthrough"   -> notNew(o.breakthrough),
         "russian"        -> notNew(o.russian),
         "brazilian"      -> notNew(o.brazilian),
+        "pool"           -> notNew(o.pool),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
         "blitz"          -> notNew(o.blitz),
@@ -397,7 +404,8 @@ case object Perfs {
       antidraughts: List[User.LightPerf],
       breakthrough: List[User.LightPerf],
       russian: List[User.LightPerf],
-      brazilian: List[User.LightPerf]
+      brazilian: List[User.LightPerf],
+      pool: List[User.LightPerf]
   )
 
   val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
