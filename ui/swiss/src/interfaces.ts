@@ -30,6 +30,8 @@ export interface SwissData {
   nbRounds: number;
   nbPlayers: number;
   nbOngoing: number;
+  isMicroMatch: boolean;
+  microMatchGameId?: string;
   status: Status;
   standing: Standing;
   boards: Board[];
@@ -119,6 +121,8 @@ export interface Board {
   orientation: Color;
   white: BoardPlayer;
   black: BoardPlayer;
+  isMicroMatch: boolean;
+  microMatchGameId?: string;
   clock?: {
     white: number;
     black: number;

@@ -40,7 +40,9 @@ final private class SwissDirector(
                 round = swiss.round,
                 white = w,
                 black = b,
-                status = Left(SwissPairing.Ongoing)
+                status = Left(SwissPairing.Ongoing),
+                isMicroMatch = swiss.settings.isMicroMatch,
+                None
               )
             }
             _ <-

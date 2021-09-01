@@ -74,7 +74,7 @@ final class SwissForm(implicit mode: Mode) {
       chessVariant = s.variant.key.some,
       draughtsVariant = s.variant.key.some,
       rated = s.settings.rated.some,
-      microMatch = s.settings.microMatch.some,
+      microMatch = s.settings.isMicroMatch.some,
       nbRounds = s.settings.nbRounds,
       description = s.settings.description,
       position = s.settings.position,

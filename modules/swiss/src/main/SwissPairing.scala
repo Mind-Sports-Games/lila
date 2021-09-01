@@ -10,7 +10,9 @@ case class SwissPairing(
     round: SwissRound.Number,
     white: User.ID,
     black: User.ID,
-    status: SwissPairing.Status
+    status: SwissPairing.Status,
+    isMicroMatch: Boolean,
+    microMatchGameId: Option[Game.ID]
 ) {
   def apply(c: Color)             = c.fold(white, black)
   def gameId                      = id
@@ -25,6 +27,22 @@ case class SwissPairing(
   def blackWins                   = status == Right(Some(Color.Black))
   def isDraw                      = status == Right(None)
   def strResultOf(color: Color)   = status.fold(_ => "*", _.fold("1/2")(c => if (c == color) "1" else "0"))
+}
+
+case class SwissPairingGameIds(id: Game.ID, isMicroMatch: Boolean, microMatchGameId: Option[Game.ID])
+case class SwissPairingGames(
+    swissId: Swiss.Id,
+    game: Game,
+    isMicroMatch: Boolean,
+    microMatchGame: Option[Game]
+) {
+  def finishedOrAborted =
+    game.finishedOrAborted && (!isMicroMatch || microMatchGame.fold(false)(_.finishedOrAborted))
+  def outoftime = if (game.outoftime(true)) List(game) else List() ++ microMatchGame.filter(_.outoftime(true))
+  // TODO: properly update this value
+  def winnerColor = if (!isMicroMatch) game.winnerColor else game.winnerColor
+  def playersWhoDidNotMove = List() ++ game.playerWhoDidNotMove ++ microMatchGame.flatMap(_.playerWhoDidNotMove)
+  def createdAt = microMatchGame.fold(game.createdAt)(_.createdAt)
 }
 
 object SwissPairing {
@@ -48,12 +66,14 @@ object SwissPairing {
   case class View(pairing: SwissPairing, player: SwissPlayer.WithUser)
 
   object Fields {
-    val id      = "_id"
-    val swissId = "s"
-    val round   = "r"
-    val gameId  = "g"
-    val players = "p"
-    val status  = "t"
+    val id               = "_id"
+    val swissId          = "s"
+    val round            = "r"
+    val gameId           = "g"
+    val players          = "p"
+    val status           = "t"
+    val isMicroMatch     = "mm"
+    val microMatchGameId = "mmid"
   }
   def fields[A](f: Fields.type => A): A = f(Fields)
 
