@@ -86,14 +86,18 @@ final class SwissJson(
                 colls.pairing
                   .find(
                     $doc(f.swissId -> swiss.id, f.players -> player.userId, f.status -> SwissPairing.ongoing),
-                    $doc(f.id -> true).some
+                    $doc(
+                      f.id               -> true,
+                      f.isMicroMatch     -> true,
+                      f.microMatchGameId -> true
+                    ).some
                   )
-                  .one[Bdoc]
-                  .dmap { _.flatMap(_.getAsOpt[Game.ID](f.id)) }
+                  .one[SwissPairingGameIds]
+                  .map(_.pp("Game IDS"))
               }
-              .flatMap { gameId =>
+              .flatMap { gameIds =>
                 rankingApi(swiss).dmap(_ get player.userId) map2 { rank =>
-                  MyInfo(rank, gameId, me, player)
+                  MyInfo(rank, gameIds, me, player)
                 }
               }
           }
@@ -263,9 +267,9 @@ object SwissJson {
   private def pairingJson(player: SwissPlayer, pairing: SwissPairing) =
     Json
       .obj(
-        "g" -> pairing.gameId,
-        "m" -> pairing.isMicroMatch,
-        "mmid" -> pairing.microMatchGameId,
+        "g"    -> pairing.gameId,
+        "m"    -> pairing.isMicroMatch,
+        "mmid" -> pairing.microMatchGameId
       )
       .add("o" -> pairing.isOngoing)
       .add("w" -> pairing.resultFor(player.userId))
@@ -281,11 +285,13 @@ object SwissJson {
   private def myInfoJson(i: MyInfo) =
     Json
       .obj(
-        "rank"   -> i.rank,
-        "gameId" -> i.gameId,
-        "id"     -> i.user.id,
-        "name"   -> i.user.username,
-        "absent" -> i.player.absent
+        "rank"             -> i.rank,
+        "gameId"           -> i.gameIds.map(_.id),
+        "isMicroMatch"     -> i.gameIds.map(_.isMicroMatch),
+        "microMatchGameId" -> i.gameIds.flatMap(_.microMatchGameId),
+        "id"               -> i.user.id,
+        "name"             -> i.user.username,
+        "absent"           -> i.player.absent
       )
 
   private[swiss] def boardSizeJson(v: Variant) = v match {

@@ -304,6 +304,11 @@ export function backToTournament(ctrl: RoundController): VNode | undefined {
 
 export function backToSwiss(ctrl: RoundController): VNode | undefined {
   const d = ctrl.data;
+  if (d.swiss?.isMicroMatch) {
+    ctrl.setRedirecting();
+    location.href = '/swiss/' + d.swiss.id;
+    return undefined;
+  }
   return d.swiss?.running
     ? h('div.follow-up', [
         h(

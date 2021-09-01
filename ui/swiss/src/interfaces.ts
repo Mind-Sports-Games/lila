@@ -63,6 +63,8 @@ export interface MyInfo {
   rank: number;
   absent: boolean;
   gameId?: string;
+  isMicroMatch: boolean;
+  microMatchGameId?: string;
 }
 
 export interface PairingBase {
