@@ -49,7 +49,7 @@ case class SwissPairingGames(
       microMatchGame.flatMap(g2 =>
         (game.winnerColor, g2.winnerColor) match {
           // Same player winning both games is a win for that player
-          case (Some(color1), Some(color2)) if (color1 == color2) => Some(color1)
+          case (Some(color1), Some(color2)) if (color1 != color2) => Some(color1)
           // The first game was decisive, second game a draw, so first game winner color is the winner
           case (Some(color1), None)         => Some(color1)
           // The second game was decisive, first game a draw, so second game winner's opposite color is the winner
