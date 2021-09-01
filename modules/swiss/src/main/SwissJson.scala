@@ -93,7 +93,6 @@ final class SwissJson(
                     ).some
                   )
                   .one[SwissPairingGameIds]
-                  .map(_.pp("Game IDS"))
               }
               .flatMap { gameIds =>
                 rankingApi(swiss).dmap(_ get player.userId) map2 { rank =>
