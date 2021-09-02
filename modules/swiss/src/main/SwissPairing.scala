@@ -39,7 +39,6 @@ case class SwissPairingGames(
   def finishedOrAborted =
     game.finishedOrAborted && (!isMicroMatch || microMatchGame.fold(false)(_.finishedOrAborted))
   def outoftime = if (game.outoftime(true)) List(game) else List() ++ microMatchGame.filter(_.outoftime(true))
-  // TODO: properly test this function.
   def winnerColor =
     // Single games are easy.
     if (!isMicroMatch) game.winnerColor
