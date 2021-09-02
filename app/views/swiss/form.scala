@@ -25,7 +25,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
-            form3.split(fields.rated, fields.microMatch),
+            form3.split(fields.rated, fields.microMatch, fields.drawTables),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -61,7 +61,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
-            form3.split(fields.rated, fields.microMatch),
+            form3.split(fields.rated, fields.microMatch, fields.drawTables),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -213,6 +213,16 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       half = true,
       help = views.html.tournament.form.positionInputHelp.some
     )(form3.input(_))
+  def drawTables =
+    frag(
+      form3.checkbox(
+        form("drawTables"),
+        "Use Draw Tables",
+        klass = "drawTables",
+        help = raw("Each round of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant.").some,
+        displayed = false
+      ),
+    )
   def startsAt =
     form3.group(
       form("startsAt"),
