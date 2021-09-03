@@ -169,7 +169,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
   playstrategy.pubsub.on('ab.rep', n => send('rep', { n }));
 
   const draughtsSend = (t: string, d?: any, o: any = {}, noRetry = false) => {
-    if (d !== undefined) d.lib = 1; // Add in the draughts lib to the data.
+    if (typeof d === 'object' && d !== null) d.lib = 1; // Add in the draughts lib to the data.
     return send(t, d, o, noRetry);
   };
 
