@@ -239,6 +239,15 @@ object PerfType {
         iconChar = 'K'
       )
 
+  case object Pool
+      extends PerfType(
+        124,
+        key = "pool",
+        name = Variant.Draughts(strategygames.draughts.variant.Pool).name,
+        title = "Pool draughts",
+        iconChar = 'K'
+      )
+
   val all: List[PerfType] = List(
     UltraBullet,
     Bullet,
@@ -263,7 +272,8 @@ object PerfType {
     Antidraughts,
     Breakthrough,
     Russian,
-    Brazilian
+    Brazilian,
+    Pool
   )
   val byKey = all map { p =>
     (p.key, p)
@@ -305,7 +315,8 @@ object PerfType {
     Antidraughts,
     Breakthrough,
     Russian,
-    Brazilian
+    Brazilian,
+    Pool
   )
   val leaderboardable: List[PerfType] = List(
     Bullet,
@@ -328,7 +339,8 @@ object PerfType {
     Antidraughts,
     Breakthrough,
     Russian,
-    Brazilian
+    Brazilian,
+    Pool
   )
   val variants: List[PerfType] =
     List(
@@ -347,7 +359,8 @@ object PerfType {
       Antidraughts,
       Breakthrough,
       Russian,
-      Brazilian
+      Brazilian,
+      Pool
     )
   val standard: List[PerfType] = List(Bullet, Blitz, Rapid, Classical, Correspondence)
 
@@ -369,6 +382,7 @@ object PerfType {
       case Breakthrough     => Variant.Draughts(strategygames.draughts.variant.Breakthrough)
       case Russian          => Variant.Draughts(strategygames.draughts.variant.Russian)
       case Brazilian        => Variant.Draughts(strategygames.draughts.variant.Brazilian)
+      case Pool             => Variant.Draughts(strategygames.draughts.variant.Pool)
       case _             => Variant.Chess(strategygames.chess.variant.Standard)
     }
 
@@ -392,6 +406,7 @@ object PerfType {
       case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => Breakthrough.some
       case Variant.Draughts(strategygames.draughts.variant.Russian)      => Russian.some
       case Variant.Draughts(strategygames.draughts.variant.Brazilian)    => Brazilian.some
+      case Variant.Draughts(strategygames.draughts.variant.Pool)         => Pool.some
     }
 
   def standardBySpeed(speed: Speed): PerfType = speed match {

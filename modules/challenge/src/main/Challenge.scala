@@ -230,7 +230,8 @@ object Challenge {
   private val draughtsFromPositionVariants: Set[Variant] = Set(
     strategygames.draughts.variant.FromPosition,
     strategygames.draughts.variant.Russian,
-    strategygames.draughts.variant.Brazilian
+    strategygames.draughts.variant.Brazilian,
+    strategygames.draughts.variant.Pool
   ).map(Variant.Draughts)
 
   def make(

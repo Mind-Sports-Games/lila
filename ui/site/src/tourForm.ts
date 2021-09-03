@@ -15,10 +15,10 @@ playstrategy.load.then(() => {
 
   $gameLib
     .on('change', function (this: HTMLElement) {
-      console.log('here2');
       const gameLib = $(this).val();
       $('.form3 .chessVariant').toggle(gameLib == '0');
       $('.form3 .draughtsVariant').toggle(gameLib == '1');
+      $('.form3 .drawTables').toggle(gameLib == '1');
     })
     .trigger('change');
 

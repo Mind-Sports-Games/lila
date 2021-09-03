@@ -95,6 +95,7 @@ const noAnalysisVariants = [
   'breakthrough',
   'russian',
   'brazilian',
+  'pool',
   'fromPositionDraughts',
   'frisian',
   'frysk',

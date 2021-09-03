@@ -303,10 +303,6 @@ function onSubmit(ctrl: RoundController, notify: (txt: string) => void, style: (
         uci = input.slice(0, -1);
         promotion = input.slice(-1).toLowerCase();
       }
-      console.log(uci);
-      console.log(uci.slice(0, -1));
-      console.log(promotion);
-      console.log(legalSans);
 
       if (legalUcis.includes(uci.toLowerCase()))
         ctrl.socket.send(

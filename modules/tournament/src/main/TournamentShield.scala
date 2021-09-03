@@ -267,6 +267,12 @@ object TournamentShield {
           iconChar = 'K'
         )
 
+    case object Pool
+        extends Category(
+          of = Right(Variant.Draughts(strategygames.draughts.variant.Pool)),
+          iconChar = 'K'
+        )
+
     val all: List[Category] = List(
       Bullet,
       SuperBlitz,
@@ -290,7 +296,8 @@ object TournamentShield {
       Antidraughts,
       Breakthrough,
       Russian,
-      Brazilian
+      Brazilian,
+      Pool
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

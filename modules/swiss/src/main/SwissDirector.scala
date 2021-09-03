@@ -40,7 +40,9 @@ final private class SwissDirector(
                 round = swiss.round,
                 white = w,
                 black = b,
-                status = Left(SwissPairing.Ongoing)
+                status = Left(SwissPairing.Ongoing),
+                isMicroMatch = swiss.settings.isMicroMatch,
+                None
               )
             }
             _ <-
@@ -79,7 +81,7 @@ final private class SwissDirector(
       }
       .monSuccess(_.swiss.startRound)
 
-  private def makeGame(swiss: Swiss, players: Map[User.ID, SwissPlayer])(
+  private[swiss] def makeGame(swiss: Swiss, players: Map[User.ID, SwissPlayer], rematch: Boolean = false)(
       pairing: SwissPairing
   ): Game =
     Game
@@ -99,13 +101,13 @@ final private class SwissDirector(
             startedAtTurn = turns
           )
         },
-        whitePlayer = makePlayer(White, players get pairing.white err s"Missing pairing white $pairing"),
-        blackPlayer = makePlayer(Black, players get pairing.black err s"Missing pairing black $pairing"),
+        whitePlayer = makePlayer(White, players.get(if(rematch) pairing.black else pairing.white) err s"Missing pairing white $pairing"),
+        blackPlayer = makePlayer(Black, players.get(if(rematch) pairing.white else pairing.black) err s"Missing pairing black $pairing"),
         mode = strategygames.Mode(swiss.settings.rated),
         source = lila.game.Source.Swiss,
         pgnImport = None
       )
-      .withId(pairing.gameId)
+      .withId(if (rematch) pairing.microMatchGameId.getOrElse(pairing.gameId) else pairing.id)
       .withSwissId(swiss.id.value)
       .start
 

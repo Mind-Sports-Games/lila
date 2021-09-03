@@ -90,15 +90,19 @@ trait FormHelper { self: I18nHelper =>
     def checkbox(
         field: Field,
         labelContent: Frag,
+        klass: String = "",
         half: Boolean = false,
         help: Option[Frag] = None,
-        disabled: Boolean = false
+        disabled: Boolean = false,
+        displayed: Boolean = true
     ): Frag =
       div(
         cls := List(
           "form-check form-group" -> true,
-          "form-half"             -> half
-        )
+          "form-half"             -> half,
+          klass                   -> klass.nonEmpty
+        ),
+        display := displayStyle(displayed)
       )(
         div(
           span(cls := "form-check-input")(

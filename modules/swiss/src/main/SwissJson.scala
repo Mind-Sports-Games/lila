@@ -86,14 +86,17 @@ final class SwissJson(
                 colls.pairing
                   .find(
                     $doc(f.swissId -> swiss.id, f.players -> player.userId, f.status -> SwissPairing.ongoing),
-                    $doc(f.id -> true).some
+                    $doc(
+                      f.id               -> true,
+                      f.isMicroMatch     -> true,
+                      f.microMatchGameId -> true
+                    ).some
                   )
-                  .one[Bdoc]
-                  .dmap { _.flatMap(_.getAsOpt[Game.ID](f.id)) }
+                  .one[SwissPairingGameIds]
               }
-              .flatMap { gameId =>
+              .flatMap { gameIds =>
                 rankingApi(swiss).dmap(_ get player.userId) map2 { rank =>
-                  MyInfo(rank, gameId, me, player)
+                  MyInfo(rank, gameIds, me, player)
                 }
               }
           }
@@ -169,16 +172,17 @@ object SwissJson {
   private def swissJsonBase(swiss: Swiss) =
     Json
       .obj(
-        "id"        -> swiss.id.value,
-        "createdBy" -> swiss.createdBy,
-        "startsAt"  -> formatDate(swiss.startsAt),
-        "name"      -> swiss.name,
-        "clock"     -> swiss.clock,
-        "variant"   -> swiss.variant.key,
-        "round"     -> swiss.round,
-        "nbRounds"  -> swiss.actualNbRounds,
-        "nbPlayers" -> swiss.nbPlayers,
-        "nbOngoing" -> swiss.nbOngoing,
+        "id"           -> swiss.id.value,
+        "createdBy"    -> swiss.createdBy,
+        "startsAt"     -> formatDate(swiss.startsAt),
+        "name"         -> swiss.name,
+        "clock"        -> swiss.clock,
+        "variant"      -> swiss.variant.key,
+        "round"        -> swiss.round,
+        "nbRounds"     -> swiss.actualNbRounds,
+        "nbPlayers"    -> swiss.nbPlayers,
+        "nbOngoing"    -> swiss.nbOngoing,
+        "isMicroMatch" -> swiss.settings.isMicroMatch,
         "status" -> {
           if (swiss.isStarted) "started"
           else if (swiss.isFinished) "finished"
@@ -256,13 +260,17 @@ object SwissJson {
     val status =
       if (pairing.isOngoing) "o"
       else pairing.resultFor(player.userId).fold("d") { r => if (r) "w" else "l" }
-    s"${pairing.gameId}$status"
+    val microMatch = if (pairing.isMicroMatch) "m" else ""
+    val microMatchId = pairing.microMatchGameId.fold("")(g => s":${g}")
+    s"${pairing.gameId}$status$microMatch$microMatchId"
   }
 
   private def pairingJson(player: SwissPlayer, pairing: SwissPairing) =
     Json
       .obj(
-        "g" -> pairing.gameId
+        "g"    -> pairing.gameId,
+        "m"    -> pairing.isMicroMatch,
+        "mmid" -> pairing.microMatchGameId
       )
       .add("o" -> pairing.isOngoing)
       .add("w" -> pairing.resultFor(player.userId))
@@ -278,19 +286,23 @@ object SwissJson {
   private def myInfoJson(i: MyInfo) =
     Json
       .obj(
-        "rank"   -> i.rank,
-        "gameId" -> i.gameId,
-        "id"     -> i.user.id,
-        "name"   -> i.user.username,
-        "absent" -> i.player.absent
+        "rank"             -> i.rank,
+        "gameId"           -> i.gameIds.map(_.id),
+        "isMicroMatch"     -> i.gameIds.map(_.isMicroMatch),
+        "microMatchGameId" -> i.gameIds.flatMap(_.microMatchGameId),
+        "id"               -> i.user.id,
+        "name"             -> i.user.username,
+        "absent"           -> i.player.absent
       )
 
   private[swiss] def boardSizeJson(v: Variant) = v match {
     case Variant.Draughts(v) =>
-      Some(Json.obj(
-        "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
-        "key" -> v.boardSize.key
-      ))
+      Some(
+        Json.obj(
+          "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+          "key"  -> v.boardSize.key
+        )
+      )
     case _ => None
   }
 
@@ -315,6 +327,8 @@ object SwissJson {
       )
       .add("winner" -> b.game.winnerColor.map(_.name))
       .add("boardSize" -> boardSizeJson(b.game.variant))
+      .add("isMicroMatch" -> b.board.isMicroMatch)
+      .add("microMatchGameId" -> b.board.microMatchGameId)
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(

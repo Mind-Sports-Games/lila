@@ -30,6 +30,8 @@ export interface SwissData {
   nbRounds: number;
   nbPlayers: number;
   nbOngoing: number;
+  isMicroMatch: boolean;
+  microMatchGameId?: string;
   status: Status;
   standing: Standing;
   boards: Board[];
@@ -61,12 +63,16 @@ export interface MyInfo {
   rank: number;
   absent: boolean;
   gameId?: string;
+  isMicroMatch: boolean;
+  microMatchGameId?: string;
 }
 
 export interface PairingBase {
   g: string; // game
   o?: boolean; // ongoing
   w?: boolean; // won
+  m: boolean; // isMicroMatch
+  mmid?: string; // isMicroMatch
 }
 
 export interface Pairing extends PairingBase {
@@ -119,6 +125,8 @@ export interface Board {
   orientation: Color;
   white: BoardPlayer;
   black: BoardPlayer;
+  isMicroMatch: boolean;
+  microMatchGameId?: string;
   clock?: {
     white: number;
     black: number;

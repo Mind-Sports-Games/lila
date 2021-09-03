@@ -167,7 +167,8 @@ trait BaseConfig {
     strategygames.draughts.variant.FromPosition.id
   val draughtsFromPositionVariants = draughtsVariants :+
     strategygames.draughts.variant.Russian.id :+
-    strategygames.draughts.variant.Brazilian.id
+    strategygames.draughts.variant.Brazilian.id :+
+    strategygames.draughts.variant.Pool.id
   val draughtsVariantsWithVariants =
     draughtsVariants :+
       strategygames.draughts.variant.Frisian.id :+
@@ -175,11 +176,13 @@ trait BaseConfig {
       strategygames.draughts.variant.Antidraughts.id :+
       strategygames.draughts.variant.Breakthrough.id :+
       strategygames.draughts.variant.Russian.id :+
-      strategygames.draughts.variant.Brazilian.id
+      strategygames.draughts.variant.Brazilian.id :+
+      strategygames.draughts.variant.Pool.id
   val draughtsVariantsWithFenAndVariants =
     draughtsVariantsWithVariants :+
       strategygames.draughts.variant.Russian.id :+
       strategygames.draughts.variant.Brazilian.id :+
+      strategygames.draughts.variant.Pool.id :+
       strategygames.draughts.variant.FromPosition.id
 
   val speeds = Speed.all.map(_.id)

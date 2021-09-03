@@ -61,6 +61,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.russian, ratingsB.russian, game)
               case Variant.Draughts(strategygames.draughts.variant.Brazilian) =>
                 updateRatings(ratingsW.brazilian, ratingsB.brazilian, game)
+              case Variant.Draughts(strategygames.draughts.variant.Pool) =>
+                updateRatings(ratingsW.pool, ratingsB.pool, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -113,6 +115,7 @@ final class PerfsUpdater(
       breakthrough: Rating,
       russian: Rating,
       brazilian: Rating,
+      pool: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -139,6 +142,7 @@ final class PerfsUpdater(
       breakthrough = perfs.breakthrough.toRating,
       russian = perfs.russian.toRating,
       brazilian = perfs.brazilian.toRating,
+      pool = perfs.pool.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -198,6 +202,7 @@ final class PerfsUpdater(
           breakthrough = addRatingIf(game.ratingVariant.breakthrough, perfs.breakthrough, ratings.breakthrough),
           russian = addRatingIf(game.ratingVariant.russian, perfs.russian, ratings.russian),
           brazilian = addRatingIf(game.ratingVariant.brazilian, perfs.brazilian, ratings.brazilian),
+          pool = addRatingIf(game.ratingVariant.pool, perfs.pool, ratings.pool),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -225,6 +230,7 @@ final class PerfsUpdater(
           breakthrough = r(PT.Breakthrough, perfs.breakthrough, perfs1.breakthrough),
           russian = r(PT.Russian, perfs.russian, perfs1.russian),
           brazilian = r(PT.Brazilian, perfs.brazilian, perfs1.brazilian),
+          pool = r(PT.Pool, perfs.pool, perfs1.pool),
           bullet = r(PT.Bullet, perfs.bullet, perfs1.bullet),
           blitz = r(PT.Blitz, perfs.blitz, perfs1.blitz),
           rapid = r(PT.Rapid, perfs.rapid, perfs1.rapid),

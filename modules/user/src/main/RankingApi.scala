@@ -107,6 +107,7 @@ final class RankingApi(
       breakthrough  <- topPerf(PerfType.Breakthrough.id, nb)
       russian       <- topPerf(PerfType.Russian.id, nb)
       brazilian     <- topPerf(PerfType.Brazilian.id, nb)
+      pool          <- topPerf(PerfType.Pool.id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -128,7 +129,8 @@ final class RankingApi(
       antidraughts = antidraughts,
       breakthrough = breakthrough,
       russian = russian,
-      brazilian = brazilian
+      brazilian = brazilian,
+      pool = pool
     )
 
   object weeklyStableRanking {
