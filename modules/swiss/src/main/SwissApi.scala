@@ -399,7 +399,8 @@ final class SwissApi(
           swissId,
           g,
           ids.isMicroMatch,
-          ids.microMatchGameId.flatMap(gamesById.get)
+          ids.microMatchGameId.flatMap(gamesById.get),
+          ids.openingFEN
         )
       )
 
