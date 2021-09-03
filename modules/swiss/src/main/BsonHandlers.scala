@@ -1,6 +1,7 @@
 package lila.swiss
 
 import strategygames.Color
+import strategygames.GameLib
 import strategygames.format.FEN
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
@@ -82,7 +83,9 @@ object BsonHandlers {
             // TODO: long term we may want to skip storing both of these fields
             //       in the case that it's not a micromatch to save on storage
             isMicroMatch = r.get[Boolean](isMicroMatch),
-            microMatchGameId = r.getO[String](microMatchGameId)
+            microMatchGameId = r.getO[String](microMatchGameId),
+            //TODO allow this to work for chess too?
+            openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLib.Draughts(), fen))
           )
         case _ => sys error "Invalid swiss pairing users"
       }
@@ -96,7 +99,8 @@ object BsonHandlers {
         // TODO: long term we may want to skip storing both of these fields
         //       in the case that it's not a micromatch to save on storage
         isMicroMatch     -> o.isMicroMatch,
-        microMatchGameId -> o.microMatchGameId
+        microMatchGameId -> o.microMatchGameId,
+        openingFEN       -> o.openingFEN.map(_.value)
       )
   }
   implicit val pairingGamesHandler = new BSON[SwissPairingGameIds] {
@@ -105,13 +109,16 @@ object BsonHandlers {
       SwissPairingGameIds(
         id = r str id,
         isMicroMatch = r.get[Boolean](isMicroMatch),
-        microMatchGameId = r.getO[String](microMatchGameId)
+        microMatchGameId = r.getO[String](microMatchGameId),
+        //TODO allow this to work for chess too?
+        openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLib.Draughts(), fen))
       )
     def writes(w: BSON.Writer, o: SwissPairingGameIds) =
       $doc(
         id               -> o.id,
         isMicroMatch     -> o.isMicroMatch,
-        microMatchGameId -> o.microMatchGameId
+        microMatchGameId -> o.microMatchGameId,
+        openingFEN       -> o.openingFEN.map(_.value)
       )
   }
 
@@ -124,6 +131,7 @@ object BsonHandlers {
         rated = r.boolO("r") | true,
         isMicroMatch = r.boolO("m") | false,
         description = r.strO("d"),
+        useDrawTables = r.boolO("dt") | false,
         position = r.getO[FEN]("f"),
         chatFor = r.intO("c") | Swiss.ChatFor.default,
         roundInterval = (r.intO("i") | 60).seconds,
@@ -137,6 +145,7 @@ object BsonHandlers {
         "r"  -> (!s.rated).option(false),
         "m"  -> s.isMicroMatch,
         "d"  -> s.description,
+        "dt" -> s.useDrawTables,
         "f"  -> s.position,
         "c"  -> (s.chatFor != Swiss.ChatFor.default).option(s.chatFor),
         "i"  -> s.roundInterval.toSeconds.toInt,

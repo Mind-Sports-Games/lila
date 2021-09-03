@@ -261,8 +261,9 @@ object SwissJson {
       if (pairing.isOngoing) "o"
       else pairing.resultFor(player.userId).fold("d") { r => if (r) "w" else "l" }
     val microMatch = if (pairing.isMicroMatch) "m" else ""
-    val microMatchId = pairing.microMatchGameId.fold("")(g => s":${g}")
-    s"${pairing.gameId}$status$microMatch$microMatchId"
+    val microMatchId = pairing.microMatchGameId.fold("")(g => s"_${g}")
+    val openingFEN = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
+    s"${pairing.gameId}$status$microMatch$microMatchId$openingFEN"
   }
 
   private def pairingJson(player: SwissPlayer, pairing: SwissPairing) =
@@ -270,7 +271,8 @@ object SwissJson {
       .obj(
         "g"    -> pairing.gameId,
         "m"    -> pairing.isMicroMatch,
-        "mmid" -> pairing.microMatchGameId
+        "mmid" -> pairing.microMatchGameId,
+        "of"   -> pairing.openingFEN.map(_.value)
       )
       .add("o" -> pairing.isOngoing)
       .add("w" -> pairing.resultFor(player.userId))

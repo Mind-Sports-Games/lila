@@ -2,8 +2,10 @@ package lila.swiss
 
 import strategygames.{ Black, Color, White, GameLib }
 import strategygames.variant.Variant
+import strategygames.format.FEN
 import org.joda.time.DateTime
 import scala.util.chaining._
+import scala.util.Random
 
 import lila.db.dsl._
 import lila.game.Game
@@ -28,6 +30,14 @@ final private class SwissDirector(
         if (pendingPairings.isEmpty) fuccess(none) // terminate
         else {
           val swiss = from.startRound
+          val drawTableList: List[FEN] = if (swiss.settings.useDrawTables) swiss.variant match {
+            case Variant.Draughts(variant) =>
+              strategygames.draughts.OpeningTable.tablesForVariant(variant).map(FEN.Draughts)
+            case _ => List()
+          }
+          else List()
+          val openingFEN = if (drawTableList.isEmpty) swiss.settings.position
+          else drawTableList(Random.nextInt(drawTableList.size)).some
           for {
             players <- SwissPlayer.fields { f =>
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
@@ -42,7 +52,8 @@ final private class SwissDirector(
                 black = b,
                 status = Left(SwissPairing.Ongoing),
                 isMicroMatch = swiss.settings.isMicroMatch,
-                None
+                None,
+                openingFEN
               )
             }
             _ <-
@@ -92,7 +103,7 @@ final private class SwissDirector(
             if (swiss.settings.position.isEmpty) swiss.variant
             else Variant.libFromPosition(swiss.variant.gameLib)
           },
-          fen = swiss.settings.position
+          fen = pairing.openingFEN
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
           g.copy(

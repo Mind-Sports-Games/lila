@@ -1,6 +1,7 @@
 package lila.swiss
 
 import strategygames.Color
+import strategygames.format.FEN
 import lila.game.Game
 import lila.user.User
 
@@ -12,7 +13,8 @@ case class SwissPairing(
     black: User.ID,
     status: SwissPairing.Status,
     isMicroMatch: Boolean,
-    microMatchGameId: Option[Game.ID]
+    microMatchGameId: Option[Game.ID],
+    openingFEN: Option[FEN]
 ) {
   def apply(c: Color)             = c.fold(white, black)
   def gameId                      = id
@@ -29,12 +31,19 @@ case class SwissPairing(
   def strResultOf(color: Color)   = status.fold(_ => "*", _.fold("1/2")(c => if (c == color) "1" else "0"))
 }
 
-case class SwissPairingGameIds(id: Game.ID, isMicroMatch: Boolean, microMatchGameId: Option[Game.ID])
+case class SwissPairingGameIds(
+  id: Game.ID,
+  isMicroMatch: Boolean,
+  microMatchGameId: Option[Game.ID],
+  openingFEN: Option[FEN]
+)
+
 case class SwissPairingGames(
     swissId: Swiss.Id,
     game: Game,
     isMicroMatch: Boolean,
-    microMatchGame: Option[Game]
+    microMatchGame: Option[Game],
+    openingFEN: Option[FEN]
 ) {
   def finishedOrAborted =
     game.finishedOrAborted && (!isMicroMatch || microMatchGame.fold(false)(_.finishedOrAborted))
@@ -64,7 +73,7 @@ case class SwissPairingGames(
 object SwissPairing {
 
   implicit def toSwissPairingGameIds(swissPairing: SwissPairing): SwissPairingGameIds =
-    SwissPairingGameIds(swissPairing.id, swissPairing.isMicroMatch, swissPairing.microMatchGameId)
+    SwissPairingGameIds(swissPairing.id, swissPairing.isMicroMatch, swissPairing.microMatchGameId, swissPairing.openingFEN)
 
   sealed trait Ongoing
   case object Ongoing extends Ongoing
@@ -93,6 +102,7 @@ object SwissPairing {
     val status           = "t"
     val isMicroMatch     = "mm"
     val microMatchGameId = "mmid"
+    val openingFEN       = "of"
   }
   def fields[A](f: Fields.type => A): A = f(Fields)
 
