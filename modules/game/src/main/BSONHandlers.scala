@@ -200,7 +200,7 @@ object BSONHandlers {
         history = draughts.DraughtsHistory(
           lastMove = decoded.lastMove,
           positionHashes = decoded.positionHashes,
-          kingMoves = if (gameVariant.frisianVariant || gameVariant.russian || gameVariant.brazilian) {
+          kingMoves = if (gameVariant.frisianVariant || gameVariant.draughts64Variant) {
             val counts = r.intsD(F.kingMoves)
             if (counts.length > 0){
               draughts.KingMoves(

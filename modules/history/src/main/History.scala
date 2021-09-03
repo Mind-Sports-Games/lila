@@ -22,6 +22,7 @@ case class History(
     breakthrough: RatingsMap,
     russian: RatingsMap,
     brazilian: RatingsMap,
+    pool: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -55,6 +56,7 @@ case class History(
       case PerfType.Breakthrough   => breakthrough
       case PerfType.Russian        => russian
       case PerfType.Brazilian      => brazilian
+      case PerfType.Pool           => pool
       case PerfType.Puzzle         => puzzle
       case PerfType.UltraBullet    => ultraBullet
       case x                       => sys error s"No history for perf $x"
@@ -100,6 +102,7 @@ object History {
           breakthrough = ratingsMap("breakthrough"),
           russian = ratingsMap("russian"),
           brazilian = ratingsMap("brazilian"),
+          pool = ratingsMap("pool"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),

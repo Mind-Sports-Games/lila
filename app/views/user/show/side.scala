@@ -86,7 +86,7 @@ object side {
         showNonEmptyPerf(u.perfs.antidraughts, PerfType.Antidraughts),
         showNonEmptyPerf(u.perfs.breakthrough, PerfType.Breakthrough),
         showPerf(u.perfs.russian, PerfType.Russian),
-        showPerf(u.perfs.brazilian, PerfType.Brazilian),
+        showPerf(u.perfs.pool, PerfType.Pool),
         u.noBot option frag(
           hr,
           showPerf(u.perfs.puzzle, PerfType.Puzzle),

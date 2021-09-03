@@ -18,6 +18,7 @@ export const perf = {
     breakthrough: 'K',
     russian: 'K',
     brazilian: 'K',
+    pool: 'K',
     fromPositionDraughts: 'K',
     frisian: 'K',
     frysk: 'K',

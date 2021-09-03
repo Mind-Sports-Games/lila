@@ -292,6 +292,7 @@ declare type DraughtsVariantKey =
   | 'breakthrough'
   | 'russian'
   | 'brazilian'
+  | 'pool'
   | 'fromPositionDraughts'
   | 'frisian'
   | 'frysk';
@@ -318,6 +319,7 @@ declare type Perf =
   | 'breakthrough'
   | 'russian'
   | 'brazilian'
+  | 'pool'
   | 'fromPositionDraughts'
   | 'frisian'
   | 'frysk';
