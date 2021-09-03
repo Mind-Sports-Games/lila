@@ -8,7 +8,10 @@ import lila.game.Game
 private case class SwissBoard(
     gameId: Game.ID,
     white: SwissBoard.Player,
-    black: SwissBoard.Player
+    black: SwissBoard.Player,
+    // TODO: This interface seems ugly, but I guess it's fine.
+    isMicroMatch: Boolean,
+    microMatchGameId: Option[Game.ID],
 )
 
 private object SwissBoard {
@@ -69,7 +72,9 @@ final private class SwissBoardApi(
                   } yield SwissBoard(
                     pairing.gameId,
                     white = SwissBoard.Player(u1, r1, p1.rating),
-                    black = SwissBoard.Player(u2, r2, p2.rating)
+                    black = SwissBoard.Player(u2, r2, p2.rating),
+                    isMicroMatch = pairing.isMicroMatch,
+                    microMatchGameId = pairing.microMatchGameId
                   )
                 }
             )

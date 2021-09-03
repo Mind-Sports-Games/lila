@@ -8,7 +8,7 @@ object SwissRound {
   case class Number(value: Int) extends AnyVal with IntValue
 }
 
-case class MyInfo(rank: Int, gameId: Option[Game.ID], user: User, player: SwissPlayer) {
+case class MyInfo(rank: Int, gameIds: Option[SwissPairingGameIds], user: User, player: SwissPlayer) {
   def page = (rank + 9) / 10
 }
 

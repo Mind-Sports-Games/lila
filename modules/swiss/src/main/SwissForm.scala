@@ -30,6 +30,7 @@ final class SwissForm(implicit mode: Mode) {
         "chessVariant"      -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
         "draughtsVariant"   -> optional(nonEmptyText.verifying(v => Variant(GameLib.Draughts(), v).isDefined)),
         "rated"             -> optional(boolean),
+        "microMatch"        -> optional(boolean),
         "nbRounds"          -> number(min = minRounds, max = 100),
         "description"       -> optional(cleanNonEmptyText),
         "position"          -> optional(lila.common.Form.fen.playableStrict),
@@ -53,6 +54,7 @@ final class SwissForm(implicit mode: Mode) {
       chessVariant = Variant.default(GameLib.Chess()).key.some,
       draughtsVariant = Variant.default(GameLib.Draughts()).key.some,
       rated = true.some,
+      microMatch = false.some,
       nbRounds = 7,
       description = none,
       position = none,
@@ -72,6 +74,7 @@ final class SwissForm(implicit mode: Mode) {
       chessVariant = s.variant.key.some,
       draughtsVariant = s.variant.key.some,
       rated = s.settings.rated.some,
+      microMatch = s.settings.isMicroMatch.some,
       nbRounds = s.settings.nbRounds,
       description = s.settings.description,
       position = s.settings.position,
@@ -151,6 +154,7 @@ object SwissForm {
       chessVariant: Option[String],
       draughtsVariant: Option[String],
       rated: Option[Boolean],
+      microMatch: Option[Boolean],
       nbRounds: Int,
       description: Option[String],
       position: Option[FEN],
@@ -186,6 +190,7 @@ object SwissForm {
     def realPosition = position ifTrue realVariant.standard
 
     def isRated = rated | true
+    def isMicroMatch = microMatch | false
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
