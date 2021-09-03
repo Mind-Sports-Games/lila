@@ -79,6 +79,7 @@ final class SwissApi(
         rated = data.realPosition.isEmpty && data.isRated,
         isMicroMatch = data.isMicroMatch,
         description = data.description,
+        useDrawTables = data.useDrawTables,
         position = data.realPosition,
         chatFor = data.realChatFor,
         roundInterval = data.realRoundInterval,
@@ -113,6 +114,7 @@ final class SwissApi(
             rated = position.isEmpty && (data.rated | old.settings.rated),
             isMicroMatch = data.isMicroMatch | old.settings.isMicroMatch,
             description = data.description orElse old.settings.description,
+            useDrawTables = data.useDrawTables | old.settings.useDrawTables,
             position = position,
             chatFor = data.chatFor | old.settings.chatFor,
             roundInterval =
