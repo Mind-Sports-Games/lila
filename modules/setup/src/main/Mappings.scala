@@ -45,7 +45,8 @@ private object Mappings {
     strategygames.draughts.variant.Antidraughts.key,
     strategygames.draughts.variant.Breakthrough.key,
     strategygames.draughts.variant.Russian.key,
-    strategygames.draughts.variant.Brazilian.key
+    strategygames.draughts.variant.Brazilian.key,
+    strategygames.draughts.variant.Pool.key,
   )
   val draughtsBoardApiVariantKeys = text.verifying(draughtsBoardApiVariants contains _)
 

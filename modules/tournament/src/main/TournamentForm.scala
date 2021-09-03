@@ -158,7 +158,8 @@ object TournamentForm {
       strategygames.draughts.variant.Antidraughts,
       strategygames.draughts.variant.Breakthrough,
       strategygames.draughts.variant.Russian,
-      strategygames.draughts.variant.Brazilian
+      strategygames.draughts.variant.Brazilian,
+      strategygames.draughts.variant.Pool
     ).map(Variant.Draughts)
 
   def guessVariant(from: String): Option[Variant] =

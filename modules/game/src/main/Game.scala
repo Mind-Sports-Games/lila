@@ -248,7 +248,7 @@ case class Game(
     ) :: {
       // abstraction leak, I know.
       if (updated.board.variant.gameLib == GameLib.Draughts())
-        (updated.board.variant.frisianVariant || updated.board.variant.russian || updated.board.variant.brazilian) ?? List(Event.KingMoves(
+        (updated.board.variant.frisianVariant || updated.board.variant.draughts64Variant) ?? List(Event.KingMoves(
           white = updated.history.kingMoves.white,
           black = updated.history.kingMoves.black,
           whiteKing = updated.history.kingMoves.whiteKing.map(Pos.Draughts),
@@ -548,7 +548,7 @@ case class Game(
           case _           => 35
         }
       if (variant.chess960) base * 5 / 4
-      if (isTournament && (variant.russian || variant.brazilian) && metadata.simulPairing.isDefined) base + 10
+      if (isTournament && (variant.draughts64Variant) && metadata.simulPairing.isDefined) base + 10
       else base
     }
 
