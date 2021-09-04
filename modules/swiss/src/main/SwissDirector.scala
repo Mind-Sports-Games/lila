@@ -2,8 +2,10 @@ package lila.swiss
 
 import strategygames.{ Black, Color, White, GameLib }
 import strategygames.variant.Variant
+import strategygames.format.FEN
 import org.joda.time.DateTime
 import scala.util.chaining._
+import scala.util.Random
 
 import lila.db.dsl._
 import lila.game.Game
@@ -28,6 +30,14 @@ final private class SwissDirector(
         if (pendingPairings.isEmpty) fuccess(none) // terminate
         else {
           val swiss = from.startRound
+          val drawTableList: List[FEN] = if (swiss.settings.useDrawTables) swiss.variant match {
+            case Variant.Draughts(variant) =>
+              strategygames.draughts.OpeningTable.tablesForVariant(variant).map(FEN.Draughts)
+            case _ => List()
+          }
+          else List()
+          val openingFEN = if (drawTableList.isEmpty) swiss.settings.position
+          else drawTableList(Random.nextInt(drawTableList.size)).some
           for {
             players <- SwissPlayer.fields { f =>
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
@@ -40,7 +50,10 @@ final private class SwissDirector(
                 round = swiss.round,
                 white = w,
                 black = b,
-                status = Left(SwissPairing.Ongoing)
+                status = Left(SwissPairing.Ongoing),
+                isMicroMatch = swiss.settings.isMicroMatch,
+                None,
+                openingFEN
               )
             }
             _ <-
@@ -79,7 +92,7 @@ final private class SwissDirector(
       }
       .monSuccess(_.swiss.startRound)
 
-  private def makeGame(swiss: Swiss, players: Map[User.ID, SwissPlayer])(
+  private[swiss] def makeGame(swiss: Swiss, players: Map[User.ID, SwissPlayer], rematch: Boolean = false)(
       pairing: SwissPairing
   ): Game =
     Game
@@ -90,7 +103,7 @@ final private class SwissDirector(
             if (swiss.settings.position.isEmpty) swiss.variant
             else Variant.libFromPosition(swiss.variant.gameLib)
           },
-          fen = swiss.settings.position
+          fen = pairing.openingFEN
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
           g.copy(
@@ -99,13 +112,13 @@ final private class SwissDirector(
             startedAtTurn = turns
           )
         },
-        whitePlayer = makePlayer(White, players get pairing.white err s"Missing pairing white $pairing"),
-        blackPlayer = makePlayer(Black, players get pairing.black err s"Missing pairing black $pairing"),
+        whitePlayer = makePlayer(White, players.get(if(rematch) pairing.black else pairing.white) err s"Missing pairing white $pairing"),
+        blackPlayer = makePlayer(Black, players.get(if(rematch) pairing.white else pairing.black) err s"Missing pairing black $pairing"),
         mode = strategygames.Mode(swiss.settings.rated),
         source = lila.game.Source.Swiss,
         pgnImport = None
       )
-      .withId(pairing.gameId)
+      .withId(if (rematch) pairing.microMatchGameId.getOrElse(pairing.gameId) else pairing.id)
       .withSwissId(swiss.id.value)
       .start
 

@@ -32,6 +32,8 @@ object side {
             p(
               s.clock.show,
               separator,
+              if (s.settings.isMicroMatch) "x2", // TODO: we should have a better way of displaying this.
+              separator,
               if (s.variant.exotic) {
                 views.html.game.bits.variantLink(
                   s.variant,

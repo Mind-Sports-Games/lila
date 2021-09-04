@@ -30,8 +30,10 @@ final class SwissForm(implicit mode: Mode) {
         "chessVariant"      -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
         "draughtsVariant"   -> optional(nonEmptyText.verifying(v => Variant(GameLib.Draughts(), v).isDefined)),
         "rated"             -> optional(boolean),
+        "microMatch"        -> optional(boolean),
         "nbRounds"          -> number(min = minRounds, max = 100),
         "description"       -> optional(cleanNonEmptyText),
+        "drawTables"        -> optional(boolean),
         "position"          -> optional(lila.common.Form.fen.playableStrict),
         "chatFor"           -> optional(numberIn(chatForChoices.map(_._1))),
         "roundInterval"     -> optional(numberIn(roundIntervals)),
@@ -53,8 +55,10 @@ final class SwissForm(implicit mode: Mode) {
       chessVariant = Variant.default(GameLib.Chess()).key.some,
       draughtsVariant = Variant.default(GameLib.Draughts()).key.some,
       rated = true.some,
+      microMatch = false.some,
       nbRounds = 7,
       description = none,
+      drawTables = false.some,
       position = none,
       chatFor = Swiss.ChatFor.default.some,
       roundInterval = Swiss.RoundInterval.auto.some,
@@ -72,8 +76,10 @@ final class SwissForm(implicit mode: Mode) {
       chessVariant = s.variant.key.some,
       draughtsVariant = s.variant.key.some,
       rated = s.settings.rated.some,
+      microMatch = s.settings.isMicroMatch.some,
       nbRounds = s.settings.nbRounds,
       description = s.settings.description,
+      drawTables = s.settings.useDrawTables.some,
       position = s.settings.position,
       chatFor = s.settings.chatFor.some,
       roundInterval = s.settings.roundInterval.toSeconds.toInt.some,
@@ -151,8 +157,10 @@ object SwissForm {
       chessVariant: Option[String],
       draughtsVariant: Option[String],
       rated: Option[Boolean],
+      microMatch: Option[Boolean],
       nbRounds: Int,
       description: Option[String],
+      drawTables: Option[Boolean],
       position: Option[FEN],
       chatFor: Option[Int],
       roundInterval: Option[Int],
@@ -183,9 +191,11 @@ object SwissForm {
         case i => i
       }
     }.seconds
+    def useDrawTables = drawTables | false
     def realPosition = position ifTrue realVariant.standard
 
     def isRated = rated | true
+    def isMicroMatch = microMatch | false
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
