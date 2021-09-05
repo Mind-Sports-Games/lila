@@ -69,7 +69,8 @@ object list {
               userTopPerf(leaderboards.breakthrough, PerfType.Breakthrough),
               userTopPerf(leaderboards.frysk, PerfType.Frysk),
               userTopPerf(leaderboards.russian, PerfType.Russian),
-              userTopPerf(leaderboards.brazilian, PerfType.Brazilian)
+              userTopPerf(leaderboards.brazilian, PerfType.Brazilian),
+              userTopPerf(leaderboards.pool, PerfType.Pool)
             )
           )
         )
