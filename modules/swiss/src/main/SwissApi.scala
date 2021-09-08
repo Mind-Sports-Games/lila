@@ -668,7 +668,7 @@ final class SwissApi(
       .map {
         _.flatMap { doc =>
           for {
-            swissId        <- doc.pp("doc").getAsOpt[Swiss.Id]("_id")
+            swissId        <- doc.getAsOpt[Swiss.Id]("_id")
             pairingGameIds <- doc.getAsOpt[List[SwissPairingGameIds]]("ids")
           } yield swissId -> pairingGameIds
         }
