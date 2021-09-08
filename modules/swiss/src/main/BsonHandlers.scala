@@ -82,7 +82,7 @@ object BsonHandlers {
             status = r.getO[SwissPairing.Status](status) | Right(none),
             // TODO: long term we may want to skip storing both of these fields
             //       in the case that it's not a micromatch to save on storage
-            isMicroMatch = r.get[Boolean](isMicroMatch),
+            isMicroMatch = r.getD[Boolean](isMicroMatch),
             microMatchGameId = r.getO[String](microMatchGameId),
             //TODO allow this to work for chess too?
             openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLib.Draughts(), fen))
