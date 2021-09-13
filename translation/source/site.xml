@@ -176,6 +176,7 @@
   <string name="minutesPerSide">Minutes per side</string>
   <string name="variant">Variant</string>
   <string name="variants">Variants</string>
+  <string name="rulesVariants">Rules &amp; Variants</string>
   <string name="timeControl">Time control</string>
   <string name="realTime">Real time</string>
   <string name="correspondence">Correspondence</string>
