@@ -278,7 +278,7 @@ export default class Setup {
               key = 'linesOfAction';
               break;
           }
-        break;
+          break;
       }
       const $selected = $ratings
         .hide()
