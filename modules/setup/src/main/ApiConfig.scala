@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.GameLib
+import strategygames.DisplayLib
 import strategygames.variant.{ Variant => StratVariant }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.variant.Chess960
@@ -51,6 +51,7 @@ object ApiConfig extends BaseHumanConfig {
       l: Int,
       cv: Option[String],
       dv: Option[String],
+      lv: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       r: Boolean,
@@ -61,15 +62,16 @@ object ApiConfig extends BaseHumanConfig {
       mm: Option[Boolean]
   ) =
     new ApiConfig(
-      variant = strategygames.variant.Variant.orDefault(GameLib(l), l match {
+      variant = strategygames.variant.Variant.orDefault(DisplayLib(l).codeLib, l match {
         case 0 => ~cv
         case 1 => ~dv
+        case 2 => ~lv
       }),
       clock = cl,
       days = d,
       rated = r,
       color = Color.orDefault(~c),
-      position = pos.map(f => FEN.apply(GameLib(l), f)),
+      position = pos.map(f => FEN.apply(DisplayLib(l).codeLib, f)),
       acceptByToken = tok,
       message = msg map Template,
       microMatch = ~mm

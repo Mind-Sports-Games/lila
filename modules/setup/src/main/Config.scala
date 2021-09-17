@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ Clock, Game => StratGame, GameLib, Situation, Speed }
+import strategygames.{ Clock, Game => StratGame, DisplayLib, GameLib, Situation, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.{ Game => ChessGame }
@@ -65,6 +65,7 @@ trait Positional { self: Config =>
   def strictFen: Boolean
 
   lazy val validFen = variant.gameLib match {
+    //TODO: LOA defaults here, perhaps want to add LOA fromPosition
     case GameLib.Chess() => variant != strategygames.chess.variant.FromPosition || {
       fen exists { f =>
         (Forsyth.<<<(variant.gameLib, f)).exists(_.situation playable strictFen)
@@ -79,12 +80,12 @@ trait Positional { self: Config =>
   }
 
   lazy val validKingCount = variant.gameLib match {
-    case GameLib.Chess() => false
     case GameLib.Draughts() => !(variant.fromPosition && Config.draughtsFromPositionVariants.contains((fenVariant | Variant.libStandard(GameLib.Draughts())).id)) || {
       fen ?? { f => strategygames.draughts.format.Forsyth.countKings(
         strategygames.draughts.format.FEN(f.value)
       ) <= 30 }
     }
+    case _ => false
   }
 
   def fenGame(builder: StratGame => Game): Game = {
@@ -124,16 +125,20 @@ trait Positional { self: Config =>
 object Config extends BaseConfig
 
 trait BaseConfig {
-  val gameLibs       = List(GameLib.Chess().id, GameLib.Draughts().id)
+  //TODO: Push this into strategygames?
+  val displayLibs    = List(DisplayLib.Chess().id, DisplayLib.Draughts().id, DisplayLib.LinesOfAction().id)
   val chessVariants  = List(strategygames.chess.variant.Standard.id, strategygames.chess.variant.Chess960.id)
   val draughtsVariants = List(strategygames.draughts.variant.Standard.id)
+  val loaVariants      = List(strategygames.chess.variant.LinesOfAction.id)
 
   val chessVariantDefault    = strategygames.chess.variant.Standard
   val draughtsVariantDefault = strategygames.draughts.variant.Standard
+  val loaVariantDefault      = strategygames.chess.variant.LinesOfAction
   val variantDefaultStrat    = Variant.Chess(strategygames.chess.variant.Standard)
 
   val chessVariantsWithFen    = chessVariants :+ strategygames.chess.variant.FromPosition.id
   val draughtsVariantsWithFen = draughtsVariants :+ strategygames.draughts.variant.FromPosition.id
+  val loaVariantsWithFen      = loaVariants
 
   val chessAIVariants = chessVariants :+
     strategygames.chess.variant.Crazyhouse.id :+
@@ -143,7 +148,6 @@ trait BaseConfig {
     strategygames.chess.variant.Atomic.id :+
     strategygames.chess.variant.Horde.id :+
     strategygames.chess.variant.RacingKings.id :+
-    //chess.variant.LinesOfAction.id :+
     strategygames.chess.variant.FromPosition.id
   val chessVariantsWithVariants =
     chessVariants :+
@@ -184,6 +188,11 @@ trait BaseConfig {
       strategygames.draughts.variant.Brazilian.id :+
       strategygames.draughts.variant.Pool.id :+
       strategygames.draughts.variant.FromPosition.id
+
+  val loaAIVariants = loaVariants
+  val loaFromPositionVariants = loaVariants
+  val loaVariantsWithVariants = loaVariants
+  val loaVariantsWithFenAndVariants = loaVariants
 
   val speeds = Speed.all.map(_.id)
 

@@ -9,7 +9,7 @@ import lila.lobby.Color
 
 private object Mappings {
 
-  val gameLibs                  = number.verifying(Config.gameLibs contains _)
+  val displayLibs               = number.verifying(Config.displayLibs contains _)
 
   val chessVariant                   = number.verifying(Config.chessVariants contains _)
   val chessVariantWithFen            = number.verifying(Config.chessVariantsWithFen contains _)
@@ -24,6 +24,12 @@ private object Mappings {
   val draughtsVariantWithVariants       = number.verifying(Config.draughtsVariantsWithVariants contains _)
   val draughtsVariantWithFenAndVariants = number.verifying(Config.draughtsVariantsWithFenAndVariants contains _)
 
+  val loaVariant                   = number.verifying(Config.loaVariants contains _)
+  val loaVariantWithFen            = number.verifying(Config.loaVariantsWithFen contains _)
+  val loaAIVariants                = number.verifying(Config.loaAIVariants contains _)
+  val loaVariantWithVariants       = number.verifying(Config.loaVariantsWithVariants contains _)
+  val loaVariantWithFenAndVariants = number.verifying(Config.loaVariantsWithFenAndVariants contains _)
+
   val chessBoardApiVariants = Set(
     strategygames.chess.variant.Standard.key,
     strategygames.chess.variant.Chess960.key,
@@ -33,8 +39,7 @@ private object Mappings {
     strategygames.chess.variant.Antichess.key,
     strategygames.chess.variant.Atomic.key,
     strategygames.chess.variant.Horde.key,
-    strategygames.chess.variant.RacingKings.key,
-    strategygames.chess.variant.LinesOfAction.key
+    strategygames.chess.variant.RacingKings.key
   )
   val chessBoardApiVariantKeys = text.verifying(chessBoardApiVariants contains _)
 
@@ -49,6 +54,11 @@ private object Mappings {
     strategygames.draughts.variant.Pool.key,
   )
   val draughtsBoardApiVariantKeys = text.verifying(draughtsBoardApiVariants contains _)
+
+  val loaBoardApiVariants = Set(
+    strategygames.chess.variant.LinesOfAction.key
+  )
+  val loaBoardApiVariantKeys = text.verifying(loaBoardApiVariants contains _)
 
   val time                     = of[Double].verifying(HookConfig validateTime _)
   val increment                = number.verifying(HookConfig validateIncrement _)

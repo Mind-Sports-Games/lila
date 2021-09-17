@@ -8,7 +8,7 @@ object Dependencies {
   val scalalib    = "com.github.ornicar"         %% "scalalib"                        % "7.0.2"
   val hasher      = "com.roundeights"            %% "hasher"                          % "1.2.1"
   val jodaTime    = "joda-time"                   % "joda-time"                       % "2.10.10"
-  val chess       = "org.playstrategy"           %% "strategygames"                   % "10.2.1-pstrat11"
+  val chess       = "org.playstrategy"           %% "strategygames"                   % "10.2.1-pstrat12"
   val compression = "org.lichess"                %% "compression"                     % "1.6"
   val maxmind     = "com.sanoma.cda"             %% "maxmind-geoip2-scala"            % "1.3.1-THIB"
   val prismic     = "io.prismic"                 %% "scala-kit"                       % "1.2.19-THIB213"

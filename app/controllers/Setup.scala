@@ -6,7 +6,7 @@ import play.api.mvc.Results
 import scala.concurrent.duration._
 
 import strategygames.format.FEN
-import strategygames.GameLib
+import strategygames.{ DisplayLib, GameLib }
 
 import lila.api.{ BodyContext, Context }
 import lila.app._
@@ -36,7 +36,7 @@ final class Setup(
   )
 
   // Defaults to chess if it's not provided, otherwise will take the version provided from the request.
-  private def gameLib(libId: Option[Int]): GameLib = GameLib(libId.getOrElse(0))
+  private def gameLib(libId: Option[Int]): GameLib = DisplayLib(libId.getOrElse(0)).codeLib
 
   def aiForm =
     Open { implicit ctx =>

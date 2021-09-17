@@ -1,7 +1,7 @@
 package lila.setup
 
 import strategygames.format.FEN
-import strategygames.GameLib
+import strategygames.{ DisplayLib, GameLib }
 import strategygames.variant.Variant
 import strategygames.Centis
 import play.api.data._
@@ -47,9 +47,10 @@ object SetupForm {
   def friend(ctx: UserContext) =
     Form(
       mapping(
-        "gameLib"         -> gameLibs,
+        "displayLib"      -> displayLibs,
         "chessVariant"    -> chessVariantWithFenAndVariants,
         "draughtsVariant" -> draughtsVariantWithFenAndVariants,
+        "loaVariant"      -> loaVariantWithFenAndVariants,
         "fenVariant"      -> optional(draughtsFromPositionVariants),
         "timeMode"        -> timeMode,
         "time"            -> time,
@@ -71,9 +72,10 @@ object SetupForm {
   def hook(implicit ctx: UserContext) =
     Form(
       mapping(
-        "gameLib"         -> gameLibs,
+        "displayLib"      -> displayLibs,
         "chessVariant"    -> chessVariantWithVariants,
         "draughtsVariant" -> draughtsVariantWithVariants,
+        "loaVariant"      -> loaVariantWithVariants,
         "timeMode"        -> timeMode,
         "time"            -> time,
         "increment"       -> increment,
@@ -88,20 +90,22 @@ object SetupForm {
 
   lazy val boardApiHook = Form(
     mapping(
-      "gameLib"         -> gameLibs,
+      "displayLib"      -> displayLibs,
       "chessVariant"    -> optional(chessBoardApiVariantKeys),
       "draughtsVariant" -> optional(draughtsBoardApiVariantKeys),
+      "loaVariant"      -> optional(loaBoardApiVariantKeys),
       "time"            -> time,
       "increment"       -> increment,
       "rated"           -> optional(boolean),
       "color"           -> optional(color),
       "ratingRange"     -> optional(ratingRange)
-    )((l, cv, dv, t, i, r, c, g) =>
+    )((l, cv, dv, lv, t, i, r, c, g) =>
       HookConfig(
         variant = (l match {
           case 0 => cv 
           case 1 => dv
-        }).flatMap(v => Variant.apply(GameLib(l), v)) | Variant.default(GameLib(l)),
+          case 2 => lv
+        }).flatMap(v => Variant.apply(DisplayLib(l).codeLib, v)) | Variant.default(DisplayLib(l).codeLib),
         timeMode = TimeMode.RealTime,
         time = t,
         increment = i,
@@ -135,6 +139,9 @@ object SetupForm {
     lazy val draughtsVariant =
       "draughtsVariant" -> optional(text.verifying(Variant.byKey(GameLib.Draughts()).contains _))
 
+    lazy val loaVariant =
+      "loaVariant" -> optional(text.verifying(Variant.byKey(DisplayLib.LinesOfAction().codeLib).contains _))
+
     lazy val message = optional(
       nonEmptyText.verifying(
         "The message must contain {game}, which will be replaced with the game URL.",
@@ -149,9 +156,10 @@ object SetupForm {
 
     private val challengeMapping =
       mapping(
-        "gameLib"       -> gameLibs,
+        "displayLib"    -> displayLibs,
         chessVariant,
         draughtsVariant,
+        loaVariant,
         clock,
         "days"          -> optional(days),
         "rated"         -> boolean,
@@ -167,9 +175,10 @@ object SetupForm {
     lazy val ai = Form(
       mapping(
         "level"   -> level,
-        "gameLib" -> gameLibs,
+        "displayLib" -> displayLibs,
         chessVariant,
         draughtsVariant,
+        loaVariant,
         clock,
         "days"  -> optional(days),
         "color" -> optional(color),
@@ -180,9 +189,10 @@ object SetupForm {
     lazy val open = Form(
       mapping(
         "name" -> optional(lila.common.Form.cleanNonEmptyText(maxLength = 200)),
-        "gameLib"       -> gameLibs,
+        "displayLib"       -> displayLibs,
         chessVariant,
         draughtsVariant,
+        loaVariant,
         clock,
         "rated" -> boolean,
         "fen"   -> fenField

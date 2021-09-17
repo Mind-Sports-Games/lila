@@ -102,7 +102,11 @@ final class SwissApi(
           name = data.name | old.name,
           clock = if (old.isCreated) data.clock else old.clock,
           variant = if (
-            old.isCreated && ((data.gameLib == 0 && data.chessVariant.isDefined) || (data.gameLib == 1 && data.draughtsVariant.isDefined))
+            old.isCreated && (
+              (data.displayLib == 0 && data.chessVariant.isDefined) ||
+              (data.displayLib == 1 && data.draughtsVariant.isDefined) ||
+              (data.displayLib == 2 && data.loaVariant.isDefined)
+            )
           ) data.realVariant
           else old.variant,
           startsAt = data.startsAt.ifTrue(old.isCreated) | old.startsAt,

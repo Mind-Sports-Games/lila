@@ -23,7 +23,7 @@ case class FriendConfig(
 
   val strictFen = false
 
-  def >> = (variant.gameLib.id, variant.id, variant.id, fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value), microMatch).some
+  def >> = (variant.gameLib.id, variant.id, variant.id, variant.id, fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value), microMatch).some
 
   def isPersistent = timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
 
@@ -32,7 +32,7 @@ case class FriendConfig(
 
 object FriendConfig extends BaseHumanConfig {
 
-  def from(l: Int, cv: Int, dv: Int, v2: Option[Int], tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String], mm: Boolean) =
+  def from(l: Int, cv: Int, dv: Int, lv: Int, v2: Option[Int], tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String], mm: Boolean) =
     new FriendConfig(
       variant = l match {
         case 0 => Variant.wrap(
@@ -41,10 +41,13 @@ object FriendConfig extends BaseHumanConfig {
         case 1 => Variant.wrap(
           strategygames.draughts.variant.Variant(dv) err "Invalid game variant " + dv
         )
+        case 2 => Variant.wrap(
+          strategygames.chess.variant.Variant(lv) err "Invalid game variant " + lv
+        )
       },
       fenVariant = l match {
-        case 0 => none
-        case 1 => v2.flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
+        case 0 | 2 => none
+        case 1     => v2.flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
       },
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
@@ -60,6 +63,7 @@ object FriendConfig extends BaseHumanConfig {
     variant = l match {
       case 0 => Variant.Chess(chessVariantDefault)
       case 1 => Variant.Draughts(draughtsVariantDefault)
+      case 2 => Variant.Chess(loaVariantDefault)
     },
     fenVariant = none,
     timeMode = TimeMode.Unlimited,

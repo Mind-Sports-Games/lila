@@ -88,8 +88,8 @@ case class AnaMove(
             }
           },
           destsUci = lib match {
-            case GameLib.Chess()    => None
             case GameLib.Draughts() => movable ?? truncatedMoves.map(_.values.toList.flatten)
+            case _                  => None
           },
           captureLength = movable ?? captLen,
           opening = (game.turns <= 30 && Variant.openingSensibleVariants(lib)(variant)) ?? {

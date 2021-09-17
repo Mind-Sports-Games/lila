@@ -7,7 +7,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import strategygames.GameLib
+import strategygames.DisplayLib
 
 private object bits {
 
@@ -37,20 +37,20 @@ private object bits {
     )
   }
 
-  def renderGameLib(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "gameLib label_select")(
-      renderLabel(form("gameLib"), "Game Family"),
+  def renderDisplayLib(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "displayLib label_select")(
+      renderLabel(form("displayLib"), "Game Family"),
       renderSelect(
-        form("gameLib"),
+        form("displayLib"),
         libs
       )
     )
 
-  def renderVariant(form: Form[_], variants: List[SelectChoice], lib: GameLib)(implicit ctx: Context) =
-    div(cls := s"${lib.name.toLowerCase()}Variant label_select", if (lib != GameLib.Chess()) style := "display:none")(
-      renderLabel(form(s"${lib.name.toLowerCase()}Variant"), trans.variant()),
+  def renderVariant(form: Form[_], variants: List[SelectChoice], lib: DisplayLib)(implicit ctx: Context) =
+    div(cls := s"${lib.shortName.toLowerCase()}Variant label_select", if (lib != DisplayLib.Chess()) style := "display:none")(
+      renderLabel(form(s"${lib.shortName.toLowerCase()}Variant"), trans.variant()),
       renderSelect(
-        form(s"${lib.name.toLowerCase()}Variant"),
+        form(s"${lib.shortName.toLowerCase()}Variant"),
         variants.filter { case (id, _, _) =>
           ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
         }

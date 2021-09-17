@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.{ GameLib, Mode, Speed }
+import strategygames.{ DisplayLib, Mode, Speed }
 import strategygames.variant.Variant
 import play.api.i18n.Lang
 
@@ -105,20 +105,22 @@ trait SetupHelper { self: I18nHelper =>
     )
 
   private val encodeId = (v: Variant) => v.id.toString
-  private val encodeGameLibId = (lib: GameLib) => lib.id.toString
+  private val encodeDisplayLibId = (lib: DisplayLib) => lib.id.toString
 
   private def variantTupleId = variantTuple(encodeId) _
 
   private def variantTuple(encode: Variant => String)(variant: Variant) =
     (encode(variant), variant.name, variant.title.some)
 
-  def translatedGameLibChoices(implicit lang: Lang): List[SelectChoice] =
-    translatedGameLibChoices(encodeGameLibId)
+  //TODO: Push these lists into strategygames
+  def translatedDisplayLibChoices(implicit lang: Lang): List[SelectChoice] =
+    translatedDisplayLibChoices(encodeDisplayLibId)
 
-  def translatedGameLibChoices(encode: GameLib => String)(implicit lang: Lang): List[SelectChoice] =
+  def translatedDisplayLibChoices(encode: DisplayLib => String)(implicit lang: Lang): List[SelectChoice] =
     List(
-      (encode(GameLib.Chess()), GameLib.Chess().name, GameLib.Chess().name.some),
-      (encode(GameLib.Draughts()), GameLib.Draughts().name, GameLib.Draughts().name.some)
+      (encode(DisplayLib.Chess()), DisplayLib.Chess().name, DisplayLib.Chess().name.some),
+      (encode(DisplayLib.Draughts()), DisplayLib.Draughts().name, DisplayLib.Draughts().name.some),
+      (encode(DisplayLib.LinesOfAction()), DisplayLib.LinesOfAction().name, DisplayLib.LinesOfAction().name.some)
     )
 
   def translatedChessVariantChoices(implicit lang: Lang): List[SelectChoice] =
@@ -144,7 +146,6 @@ trait SetupHelper { self: I18nHelper =>
       Variant.Chess(strategygames.chess.variant.Atomic),
       Variant.Chess(strategygames.chess.variant.Horde),
       Variant.Chess(strategygames.chess.variant.RacingKings),
-      Variant.Chess(strategygames.chess.variant.LinesOfAction)
     ).map(variantTuple(encode))
 
   def translatedChessVariantChoicesWithFen(implicit lang: Lang) =
@@ -210,6 +211,30 @@ trait SetupHelper { self: I18nHelper =>
   def translatedDraughtsVariantChoicesWithVariantsAndFen(implicit lang: Lang) =
     translatedDraughtsVariantChoicesWithVariants :+
       variantTupleId(Variant.Draughts(strategygames.draughts.variant.FromPosition))
+
+  def translatedLOAVariantChoices(implicit lang: Lang): List[SelectChoice] =
+    translatedLOAVariantChoices(encodeId)
+
+  def translatedLOAVariantChoices(encode: Variant => String)(implicit lang: Lang): List[SelectChoice] =
+    List(
+      Variant.Chess(strategygames.chess.variant.LinesOfAction)
+    ).map(variantTuple(encode))
+
+  def translatedLOAVariantChoicesWithVariants(implicit lang: Lang): List[SelectChoice] =
+    translatedLOAVariantChoicesWithVariants(encodeId)
+
+  def translatedLOAVariantChoicesWithVariants(
+      encode: Variant => String
+  )(implicit lang: Lang): List[SelectChoice] =
+    translatedLOAVariantChoices(encode)
+
+  def translatedLOAVariantChoicesWithFen(implicit lang: Lang) =
+    translatedLOAVariantChoices
+
+  def translatedLOAAiVariantChoices(implicit lang: Lang): List[SelectChoice] = List()
+
+  def translatedLOAVariantChoicesWithVariantsAndFen(implicit lang: Lang) =
+    translatedLOAVariantChoicesWithVariants
 
   def translatedSpeedChoices(implicit lang: Lang) =
     Speed.limited map { s =>

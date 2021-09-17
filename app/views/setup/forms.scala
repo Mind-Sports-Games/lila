@@ -9,7 +9,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 
-import strategygames.GameLib
+import strategygames.DisplayLib
 
 object forms {
 
@@ -22,9 +22,10 @@ object forms {
       routes.Setup.hook("sri-placeholder")
     ) {
       frag(
-        renderGameLib(form, translatedGameLibChoices),
-        renderVariant(form, translatedChessVariantChoicesWithVariants, GameLib.Chess()),
-        renderVariant(form, translatedDraughtsVariantChoicesWithVariants, GameLib.Draughts()),
+        renderDisplayLib(form, translatedDisplayLibChoices),
+        renderVariant(form, translatedChessVariantChoicesWithVariants, DisplayLib.Chess()),
+        renderVariant(form, translatedDraughtsVariantChoicesWithVariants, DisplayLib.Draughts()),
+        renderVariant(form, translatedLOAVariantChoicesWithVariants, DisplayLib.LinesOfAction()),
         renderTimeMode(form, allowAnon = false),
         ctx.isAuth option frag(
           div(cls := "mode_choice buttons")(
@@ -63,9 +64,10 @@ object forms {
   ) =
     layout("ai", trans.playWithTheMachine(), routes.Setup.ai) {
       frag(
-        //renderGameLib(form, translatedGameLibChoices),
-        renderVariant(form, translatedChessAiVariantChoices, GameLib.Chess()),
-        //renderVariant(form, translatedDraughtsAiVariantChoices, GameLib.Draughts()),
+        //renderDisplayLib(form, translatedDisplayLibChoices),
+        renderVariant(form, translatedChessAiVariantChoices, DisplayLib.Chess()),
+        //renderVariant(form, translatedDraughtsAiVariantChoices, DisplayLib.Draughts()),
+        //renderVariant(form, translatedLOAAiVariantChoices, DisplayLib.LinesOfAction()),
         fenInput(form("fen"), strict = true, validFen),
         renderTimeMode(form, allowAnon = true),
         if (ctx.blind)
@@ -108,9 +110,10 @@ object forms {
         user.map { u =>
           userLink(u, cssClass = "target".some)
         },
-        renderGameLib(form, translatedGameLibChoices),
-        renderVariant(form, translatedChessVariantChoicesWithVariantsAndFen, GameLib.Chess()),
-        renderVariant(form, translatedDraughtsVariantChoicesWithVariantsAndFen, GameLib.Draughts()),
+        renderDisplayLib(form, translatedDisplayLibChoices),
+        renderVariant(form, translatedChessVariantChoicesWithVariantsAndFen, DisplayLib.Chess()),
+        renderVariant(form, translatedDraughtsVariantChoicesWithVariantsAndFen, DisplayLib.Draughts()),
+        renderVariant(form, translatedLOAVariantChoicesWithVariantsAndFen, DisplayLib.LinesOfAction()),
         fenInput(form("fen"), strict = false, validFen),
         renderTimeMode(form, allowAnon = true),
         renderMicroMatch(form),
