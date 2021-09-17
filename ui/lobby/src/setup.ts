@@ -272,6 +272,7 @@ export default class Setup {
               key = 'pool';
               break;
           }
+          break;
         case '2':
           switch ($loaVariantSelect.val()) {
             case '11':
