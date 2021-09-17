@@ -4,7 +4,6 @@ playstrategy.load.then(() => {
   const $displayLib = $('#form3-displayLib'),
     $chessVariant = $('#form3-chessVariant'),
     $draughtsVariant = $('#form3-draughtsVariant'),
-    $loaVariant = $('#form3-loaVariant'),
     showPositionChess = () =>
       $('.form3 .position').toggleClass('none', !['1', 'standard'].includes($chessVariant.val() as string)),
     showPositionDraughts = () =>
