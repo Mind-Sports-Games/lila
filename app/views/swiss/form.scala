@@ -156,7 +156,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.checkbox(
         form("microMatch"),
         trans.microMatch(),
-        help = raw("Players play 2 games per round<br>one with white and one with black").some
+        help = raw(trans.microMatchDefinition.txt().replace("(","<br>(")).some
       ),
     )
   def gameLib =
