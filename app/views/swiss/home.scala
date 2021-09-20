@@ -57,9 +57,13 @@ object home {
             ),
             td(cls := "infos")(
               span(cls := "rounds")(
+                if (s.settings.isMicroMatch){(title := trans.microMatchDefinition.txt())},
                 s.isStarted option frag(s.round.value, " / "),
                 s.settings.nbRounds,
-                " rounds Swiss"
+                if (s.settings.isMicroMatch){
+                  (" double rounds Swiss")
+                } else " rounds Swiss"
+                //" rounds Swiss"
               ),
               span(cls := "setup")(
                 s.clock.show,
