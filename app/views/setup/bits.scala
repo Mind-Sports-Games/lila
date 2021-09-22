@@ -112,7 +112,7 @@ private object bits {
   )
 
   def renderMicroMatch(form: Form[_])(implicit ctx: Context) =
-    div(cls := "micro_match", title := trans.microMatchExplanation.txt())(
+    div(cls := "micro_match", title := trans.microMatchDefinition.txt())(
       renderCheckbox(form("microMatch"), trans.microMatch())
     )
 

@@ -43,10 +43,13 @@ object side {
               if (s.settings.rated) trans.ratedTournament() else trans.casualTournament()
             ),
             p(
-              span(cls := "swiss__meta__round")(s"${s.round}/${s.settings.nbRounds}"),
-              if (s.settings.isMicroMatch){
-                a(href := s"#")(title := trans.microMatchDefinition.txt())(" double rounds")
-                } else " rounds",
+              span(cls := "swiss__meta__round")(
+                if (s.settings.isMicroMatch){(title := trans.microMatchDefinition.txt())},
+                s"${s.round}/${s.settings.nbRounds}",
+                if (s.settings.isMicroMatch){
+                  " micro-match rounds"
+                  } else " rounds"
+              ),
               separator,
               a(href := routes.Swiss.home)("Swiss"),
               (isGranted(_.ManageTournament) || (ctx.userId.has(s.createdBy) && !s.isFinished)) option frag(

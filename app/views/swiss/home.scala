@@ -61,7 +61,7 @@ object home {
                 s.isStarted option frag(s.round.value, " / "),
                 s.settings.nbRounds,
                 if (s.settings.isMicroMatch){
-                  (" double rounds Swiss")
+                  (" micro-match rounds Swiss")
                 } else " rounds Swiss"
                 //" rounds Swiss"
               ),
