@@ -134,7 +134,7 @@ export default class Setup {
       $modeChoices = $modeChoicesWrap.find('input'),
       $casual = $modeChoices.eq(0),
       $rated = $modeChoices.eq(1),
-      $displayLibSelect = $form.find('#sf_displayLib'),
+      $gameFamilySelect = $form.find('#sf_gameFamily'),
       $chessVariantSelect = $form.find('#sf_chessVariant'),
       $draughtsVariantSelect = $form.find('#sf_draughtsVariant'),
       $loaVariantSelect = $form.find('#sf_loaVariant'),
@@ -151,9 +151,9 @@ export default class Setup {
       $submits = $form.find('.color-submits__button'),
       toggleButtons = () => {
         randomColorVariants;
-        const displayLibId = $displayLibSelect.val(),
+        const gameFamilyId = $gameFamilySelect.val(),
           variantId = () => {
-            switch (displayLibId) {
+            switch (gameFamilyId) {
               case '0':
                 return $chessVariantSelect.val();
               case '1':
@@ -203,7 +203,7 @@ export default class Setup {
     const showRating = () => {
       const timeMode = $timeModeSelect.val();
       let key = 'correspondence';
-      switch ($displayLibSelect.val()) {
+      switch ($gameFamilySelect.val()) {
         case '0':
           switch ($chessVariantSelect.val()) {
             case '1':
@@ -466,7 +466,7 @@ export default class Setup {
     $fenInput.on('keyup', validateFen);
 
     if (forceFromPosition) {
-      switch ($displayLibSelect.val()) {
+      switch ($gameFamilySelect.val()) {
         case '0':
           $chessVariantSelect.val('3');
           break;
@@ -477,12 +477,12 @@ export default class Setup {
       }
     }
 
-    $displayLibSelect
+    $gameFamilySelect
       .on('change', function (this: HTMLElement) {
-        const displayLib = $(this).val();
-        $form.find('.chessVariant').toggle(displayLib == '0');
-        $form.find('.draughtsVariant').toggle(displayLib == '1');
-        $form.find('.loaVariant').toggle(displayLib == '2');
+        const gameFamily = $(this).val();
+        $form.find('.chessVariant').toggle(gameFamily == '0');
+        $form.find('.draughtsVariant').toggle(gameFamily == '1');
+        $form.find('.loaVariant').toggle(gameFamily == '2');
       })
       .trigger('change');
 

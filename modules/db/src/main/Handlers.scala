@@ -8,7 +8,7 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import strategygames.{ Color, GameLib }
+import strategygames.{ Color, GameLogic }
 import strategygames.format.{ FEN => StratFEN }
 import strategygames.variant.{ Variant => StratVariant }
 import strategygames.chess.format.FEN
@@ -130,8 +130,8 @@ trait Handlers {
   implicit val StratFENHandler: BSONHandler[StratFEN] = quickHandler[StratFEN](
     {
       case BSONString(f) => f.split("~") match {
-        case Array(lib, f) => StratFEN(GameLib(lib.toInt), f)
-        case Array(f) => StratFEN(GameLib.Chess(), f)
+        case Array(lib, f) => StratFEN(GameLogic(lib.toInt), f)
+        case Array(f) => StratFEN(GameLogic.Chess(), f)
         case _ => sys.error("error decoding fen in handler")
       }
       case _ => sys.error("fen not encoded in handler")
@@ -155,14 +155,14 @@ trait Handlers {
   val stratVariantByKeyHandler: BSONHandler[StratVariant] = quickHandler[StratVariant](
     {
       case BSONString(v) => v.split(":") match {
-        case Array(lib, v) => StratVariant orDefault(GameLib(lib.toInt), v)
-        case Array(v)      => StratVariant orDefault(GameLib.Chess(), v)
+        case Array(lib, v) => StratVariant orDefault(GameLogic(lib.toInt), v)
+        case Array(v)      => StratVariant orDefault(GameLogic.Chess(), v)
         case _ => sys.error("lib not encoded into variant handler")
       }
       case _ => sys.error("variant not encoded in handler. Previously this defaulted to standard chess")
-      //case _ => StratVariant.default(GameLib.Chess())
+      //case _ => StratVariant.default(GameLogic.Chess())
     },
-    v => BSONString(s"${v.gameLib.id}:${v.key}")
+    v => BSONString(s"${v.gameLogic.id}:${v.key}")
   )
 
   val clockConfigHandler = tryHandler[strategygames.Clock.Config](

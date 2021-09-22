@@ -8,7 +8,7 @@ import play.api.data.Forms._
 import strategygames.variant.Variant
 import lila.common.Form._
 import strategygames.format.FEN
-import strategygames.GameLib
+import strategygames.GameLogic
 
 object CrudForm {
 
@@ -24,7 +24,7 @@ object CrudForm {
       "clockTime"      -> numberInDouble(clockTimeChoices),
       "clockIncrement" -> numberIn(clockIncrementChoices),
       "minutes"        -> number(min = 20, max = 1440),
-      "variant"        -> number.verifying(num => Variant.exists(GameLib.Chess(), num)),
+      "variant"        -> number.verifying(num => Variant.exists(GameLogic.Chess(), num)),
       "position"       -> optional(lila.common.Form.fen.playableStrict),
       "date"           -> utcDate,
       "image"          -> stringIn(imageChoices),
@@ -44,7 +44,7 @@ object CrudForm {
     clockTime = clockTimeDefault,
     clockIncrement = clockIncrementDefault,
     minutes = minuteDefault,
-    variant = Variant.libStandard(GameLib.Chess()).id,
+    variant = Variant.libStandard(GameLogic.Chess()).id,
     position = none,
     date = DateTime.now plusDays 7,
     image = "",
@@ -76,7 +76,7 @@ object CrudForm {
       hasChat: Boolean
   ) {
 
-    def realVariant = Variant.orDefault(GameLib.Chess(), variant)
+    def realVariant = Variant.orDefault(GameLogic.Chess(), variant)
 
     def realPosition = position ifTrue realVariant.standard
 

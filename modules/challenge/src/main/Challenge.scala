@@ -3,7 +3,7 @@ package lila.challenge
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Chess960, FromPosition, Horde, RacingKings, LinesOfAction }
-import strategygames.{ Black, Color, GameLib, Mode, Speed, White }
+import strategygames.{ Black, Color, GameLogic, Mode, Speed, White }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
@@ -213,7 +213,7 @@ object Challenge {
         }
       )
       .orElse {
-        (variant == Variant.libFromPosition(variant.gameLib)) option perfTypeOf(Variant.libStandard(variant.gameLib), timeControl)
+        (variant == Variant.libFromPosition(variant.gameLogic)) option perfTypeOf(Variant.libStandard(variant.gameLogic), timeControl)
       }
       .|(PerfType.Correspondence)
 
@@ -255,15 +255,15 @@ object Challenge {
     val finalVariant = fenVariant match {
       case Some(v) if draughtsFromPositionVariants(variant) =>
         if (variant.draughtsFromPosition && v.draughtsStandard)
-          Variant.libFromPosition(GameLib.Draughts())
+          Variant.libFromPosition(GameLogic.Draughts())
         else v
       case _ => variant
     }
     //val finalInitialFen = finalVariant match {
     //  case Variant.Draughts(v) =>
     //    draughtsFromPositionVariants(v) ?? {
-    //      initialFen.flatMap(fen => Forsyth.<<@(finalVariant.gameLib, finalVariant, fen.value))
-    //        .map(sit => FEN(Forsyth.>>(finalVariant.gameLib, sit.withoutGhosts)))
+    //      initialFen.flatMap(fen => Forsyth.<<@(finalVariant.gameLogic, finalVariant, fen.value))
+    //        .map(sit => FEN(Forsyth.>>(finalVariant.gameLogic, sit.withoutGhosts)))
     //    } match {
     //      case fen @ Some(_) => fen
     //      case _ => !finalVariant.standardInitialPosition option FEN(finalVariant.initialFen)
@@ -280,7 +280,7 @@ object Challenge {
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (variant == Variant.libFromPosition(variant.gameLib)) initialFen
+        if (variant == Variant.libFromPosition(variant.gameLogic)) initialFen
         else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
           fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
         }

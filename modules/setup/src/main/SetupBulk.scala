@@ -7,7 +7,7 @@ import play.api.data.Forms._
 import play.api.libs.json.Json
 import scala.concurrent.duration._
 
-import strategygames.{ Clock, GameLib, Mode }
+import strategygames.{ Clock, GameLogic, Mode }
 import strategygames.variant.Variant
 
 import lila.game.Game
@@ -68,7 +68,7 @@ object SetupBulk {
       ) =>
         BulkFormData(
           tokens,
-          Variant.orDefault(GameLib.Chess(), ~variant),
+          Variant.orDefault(GameLogic.Chess(), ~variant),
           clock,
           rated,
           pairTs.map { new DateTime(_) },

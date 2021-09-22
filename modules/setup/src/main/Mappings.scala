@@ -9,7 +9,7 @@ import lila.lobby.Color
 
 private object Mappings {
 
-  val displayLibs               = number.verifying(Config.displayLibs contains _)
+  val gameFamilys               = number.verifying(Config.gameFamilys contains _)
 
   val chessVariant                   = number.verifying(Config.chessVariants contains _)
   val chessVariantWithFen            = number.verifying(Config.chessVariantsWithFen contains _)

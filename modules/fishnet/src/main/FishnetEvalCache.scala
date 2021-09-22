@@ -1,7 +1,7 @@
 package lila.fishnet
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ GameLib, Replay }
+import strategygames.{ GameLogic, Replay }
 import JsonApi.Request.Evaluation
 
 final private class FishnetEvalCache(
@@ -37,16 +37,16 @@ final private class FishnetEvalCache(
   private def rawEvals(game: Work.Game): Fu[List[(Int, lila.evalCache.EvalCacheEntry.Eval)]] =
     Replay
       .situationsFromUci(
-        game.variant.gameLib,
+        game.variant.gameLogic,
         game.uciList.take(maxPlies - 1),
-        game.initialFen.map(fen => FEN(game.variant.gameLib, fen)),
+        game.initialFen.map(fen => FEN(game.variant.gameLogic, fen)),
         game.variant
       )
       .fold(
         _ => fuccess(Nil),
         _.zipWithIndex
           .map { case (sit, index) =>
-            evalCacheApi.getSinglePvEval(game.variant, Forsyth.>>(game.variant.gameLib, sit)) dmap2 { index -> _ }
+            evalCacheApi.getSinglePvEval(game.variant, Forsyth.>>(game.variant.gameLogic, sit)) dmap2 { index -> _ }
           }
           .sequenceFu
           .map(_.flatten)

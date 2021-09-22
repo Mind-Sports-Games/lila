@@ -35,7 +35,7 @@ export interface BoardSize {
 export interface FeaturedGame {
   id: string;
   fen: Fen;
-  gameLib: string;
+  gameLogic: string;
   boardSize?: BoardSize;
   orientation: Color;
   lastMove: string;

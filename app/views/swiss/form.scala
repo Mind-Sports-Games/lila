@@ -25,7 +25,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(
-              fields.displayLib,
+              fields.gameFamily,
               fields.chessVariant,
               fields.draughtsVariant,
               fields.loaVariant
@@ -66,7 +66,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(
-              fields.displayLib,
+              fields.gameFamily,
               fields.chessVariant,
               fields.draughtsVariant,
               fields.loaVariant
@@ -169,11 +169,11 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         help = raw("Players play 2 games per round<br>one with white and one with black").some
       ),
     )
-  def displayLib =
-    form3.group(form("displayLib"), "Game Family", half = true)(
+  def gameFamily =
+    form3.group(form("gameFamily"), "Game Family", half = true)(
       form3.select(
         _,
-        translatedDisplayLibChoices(_.id.toString).map(x => x._1 -> x._2),
+        translatedGameFamilyChoices(_.id.toString).map(x => x._1 -> x._2),
         disabled = disabledAfterStart
       )
     )

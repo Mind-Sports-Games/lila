@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn._
 import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.GameLib
+import strategygames.GameLogic
 import Node._
 import org.specs2.mutable._
 
@@ -16,10 +16,10 @@ class PgnDumpTest extends Specification {
 
   def node(ply: Int, uci: String, san: String, children: Children = emptyChildren) =
     Node(
-      id = UciCharPair(GameLib.Chess(), Uci(GameLib.Chess(), uci).get),
+      id = UciCharPair(GameLogic.Chess(), Uci(GameLogic.Chess(), uci).get),
       ply = ply,
-      move = Uci.WithSan(GameLib.Chess(), Uci(GameLib.Chess(), uci).get, san),
-      fen = FEN(GameLib.Chess(), "<fen>"),
+      move = Uci.WithSan(GameLogic.Chess(), Uci(GameLogic.Chess(), uci).get, san),
+      fen = FEN(GameLogic.Chess(), "<fen>"),
       check = false,
       clock = None,
       crazyData = None,
@@ -29,7 +29,7 @@ class PgnDumpTest extends Specification {
 
   def children(nodes: Node*) = Children(nodes.toVector)
 
-  val root = Node.Root.default(Variant.libStandard(GameLib.Chess()))
+  val root = Node.Root.default(Variant.libStandard(GameLogic.Chess()))
 
   "toTurns" should {
     "empty" in {

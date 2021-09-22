@@ -6,7 +6,7 @@ import reactivemongo.api.bson._
 import scalatags.Text.all._
 
 import strategygames.chess.opening.EcopeningDB
-import strategygames.{ Color, GameLib, Role }
+import strategygames.{ Color, GameLogic, Role }
 import lila.db.dsl._
 import lila.rating.PerfType
 
@@ -214,7 +214,7 @@ object Dimension {
       case Color                   => strategygames.Color.all
       case Opening                 => EcopeningDB.all
       case OpponentStrength        => RelativeStrength.all
-      case PieceRole               => Role.all(GameLib.Chess()).reverse
+      case PieceRole               => Role.all(GameLogic.Chess()).reverse
       case MovetimeRange           => lila.insight.MovetimeRange.all
       case CplRange                => lila.insight.CplRange.all
       case MyCastling | OpCastling => lila.insight.Castling.all
@@ -235,7 +235,7 @@ object Dimension {
       case Color                   => strategygames.Color.fromName(key)
       case Opening                 => EcopeningDB.allByEco get key
       case OpponentStrength        => key.toIntOption flatMap RelativeStrength.byId.get
-      case PieceRole               => Role.all(GameLib.Chess()).find(_.name == key)
+      case PieceRole               => Role.all(GameLogic.Chess()).find(_.name == key)
       case MovetimeRange           => key.toIntOption flatMap lila.insight.MovetimeRange.byId.get
       case CplRange                => key.toIntOption flatMap lila.insight.CplRange.byId.get
       case MyCastling | OpCastling => key.toIntOption flatMap lila.insight.Castling.byId.get

@@ -1,6 +1,6 @@
 package lila.challenge
 
-import strategygames.{ Black, Color, GameLib, Mode, Situation, White }
+import strategygames.{ Black, Color, GameLogic, Mode, Situation, White }
 import strategygames.format.Forsyth
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.variant.Variant
@@ -36,22 +36,22 @@ private object ChallengeJoiner {
       color: Option[Color]
   ): Game = {
     def makeChess(variant: Variant): strategygames.Game =
-      strategygames.Game(variant.gameLib, situation = Situation(variant.gameLib, variant), clock = c.clock.map(_.config.toClock))
+      strategygames.Game(variant.gameLogic, situation = Situation(variant.gameLogic, variant), clock = c.clock.map(_.config.toClock))
 
     val baseState = c.initialFen.ifTrue(c.variant.fromPosition || c.variant.chess960) flatMap {
-      Forsyth.<<<@(c.variant.gameLib, c.variant, _)
+      Forsyth.<<<@(c.variant.gameLogic, c.variant, _)
     }
     val (chessGame, state) = baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
       case sp @ SituationPlus(sit, _) =>
         val game = strategygames.Game(
-          lib = c.variant.gameLib,
+          lib = c.variant.gameLogic,
           situation = sit,
           turns = sp.turns,
           startedAtTurn = sp.turns,
           clock = c.clock.map(_.config.toClock)
         )
-        if (c.variant.fromPosition && Forsyth.>>(c.variant.gameLib, game).initial)
-          makeChess(Variant.libStandard(c.variant.gameLib)) -> none
+        if (c.variant.fromPosition && Forsyth.>>(c.variant.gameLogic, game).initial)
+          makeChess(Variant.libStandard(c.variant.gameLogic)) -> none
         else game                           -> baseState
     }
     val microMatch = c.isMicroMatch && c.customStartingPosition option "micromatch"

@@ -7,7 +7,7 @@ import play.api.libs.json._
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Board, Game, GameLib, Move, Pos, Situation }
+import strategygames.{ Board, Game, GameLogic, Move, Pos, Situation }
 import lila.tree.Node.{ destString, openingWriter }
 
 case class AnaDests(
@@ -21,7 +21,7 @@ case class AnaDests(
 
   def isInitial = (variant.standard || variant.draughtsStandard ) && fen.initial && path == ""
 
-  private lazy val sit = Game(variant.gameLib, variant.some, fen.some).situation
+  private lazy val sit = Game(variant.gameLogic, variant.some, fen.some).situation
 
   //draughts
   private val orig: Option[strategygames.draughts.Pos] =
@@ -70,8 +70,8 @@ case class AnaDests(
   //draughts
   val destsUci: Option[List[String]] = truncatedMoves.map(_.values.toList.flatten)
 
-  lazy val opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? {
-      FullOpeningDB.findByFen(variant.gameLib, fen)
+  lazy val opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? {
+      FullOpeningDB.findByFen(variant.gameLogic, fen)
   }
 
   def json =
@@ -165,12 +165,12 @@ object AnaDests {
     for {
       d <- o obj "d"
       lib  <- d int "lib"
-      variant = Variant.orDefault(GameLib(lib), ~d.str("variant"))
+      variant = Variant.orDefault(GameLogic(lib), ~d.str("variant"))
       fen  <- d str "fen"
       path <- d str "path"
     } yield AnaDests(
       variant = variant,
-      fen = FEN(GameLib(lib), fen),
+      fen = FEN(GameLogic(lib), fen),
       path = path,
       chapterId = d str "ch",
       fullCapture = d boolean "fullCapture"

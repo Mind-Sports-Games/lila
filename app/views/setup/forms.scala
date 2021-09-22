@@ -9,7 +9,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 
-import strategygames.DisplayLib
+import strategygames.GameFamily
 
 object forms {
 
@@ -22,10 +22,10 @@ object forms {
       routes.Setup.hook("sri-placeholder")
     ) {
       frag(
-        renderDisplayLib(form, translatedDisplayLibChoices),
-        renderVariant(form, translatedChessVariantChoicesWithVariants, DisplayLib.Chess()),
-        renderVariant(form, translatedDraughtsVariantChoicesWithVariants, DisplayLib.Draughts()),
-        renderVariant(form, translatedLOAVariantChoicesWithVariants, DisplayLib.LinesOfAction()),
+        renderGameFamily(form, translatedGameFamilyChoices),
+        renderVariant(form, translatedChessVariantChoicesWithVariants, GameFamily.Chess()),
+        renderVariant(form, translatedDraughtsVariantChoicesWithVariants, GameFamily.Draughts()),
+        renderVariant(form, translatedLOAVariantChoicesWithVariants, GameFamily.LinesOfAction()),
         renderTimeMode(form, allowAnon = false),
         ctx.isAuth option frag(
           div(cls := "mode_choice buttons")(
@@ -64,10 +64,10 @@ object forms {
   ) =
     layout("ai", trans.playWithTheMachine(), routes.Setup.ai) {
       frag(
-        //renderDisplayLib(form, translatedDisplayLibChoices),
-        renderVariant(form, translatedChessAiVariantChoices, DisplayLib.Chess()),
-        //renderVariant(form, translatedDraughtsAiVariantChoices, DisplayLib.Draughts()),
-        //renderVariant(form, translatedLOAAiVariantChoices, DisplayLib.LinesOfAction()),
+        //renderGameFamily(form, translatedGameFamilyChoices),
+        renderVariant(form, translatedChessAiVariantChoices, GameFamily.Chess()),
+        //renderVariant(form, translatedDraughtsAiVariantChoices, GameFamily.Draughts()),
+        //renderVariant(form, translatedLOAAiVariantChoices, GameFamily.LinesOfAction()),
         fenInput(form("fen"), strict = true, validFen),
         renderTimeMode(form, allowAnon = true),
         if (ctx.blind)
@@ -110,10 +110,10 @@ object forms {
         user.map { u =>
           userLink(u, cssClass = "target".some)
         },
-        renderDisplayLib(form, translatedDisplayLibChoices),
-        renderVariant(form, translatedChessVariantChoicesWithVariantsAndFen, DisplayLib.Chess()),
-        renderVariant(form, translatedDraughtsVariantChoicesWithVariantsAndFen, DisplayLib.Draughts()),
-        renderVariant(form, translatedLOAVariantChoicesWithVariantsAndFen, DisplayLib.LinesOfAction()),
+        renderGameFamily(form, translatedGameFamilyChoices),
+        renderVariant(form, translatedChessVariantChoicesWithVariantsAndFen, GameFamily.Chess()),
+        renderVariant(form, translatedDraughtsVariantChoicesWithVariantsAndFen, GameFamily.Draughts()),
+        renderVariant(form, translatedLOAVariantChoicesWithVariantsAndFen, GameFamily.LinesOfAction()),
         fenInput(form("fen"), strict = false, validFen),
         renderTimeMode(form, allowAnon = true),
         renderMicroMatch(form),

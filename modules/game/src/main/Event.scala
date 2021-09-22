@@ -3,7 +3,7 @@ package lila.game
 import play.api.libs.json._
 
 import strategygames.chess.variant.Crazyhouse
-import strategygames.{ Board, Centis, Color, GameLib, Move => StratMove, PromotableRole, Pos, Situation, Status, Role, White, Black }
+import strategygames.{ Board, Centis, Color, GameLogic, Move => StratMove, PromotableRole, Pos, Situation, Status, Role, White, Black }
 import strategygames.chess
 import strategygames.format.Forsyth
 import strategygames.chess.format.pgn.Dumper
@@ -34,7 +34,7 @@ object Event {
   object MoveOrDrop {
 
     def data(
-        lib: GameLib,
+        lib: GameLogic,
         fen: String,
         check: Boolean,
         threefold: Boolean,
@@ -68,7 +68,7 @@ object Event {
   }
 
   case class Move(
-      lib: GameLib,
+      lib: GameLogic,
       orig: Pos,
       dest: Pos,
       san: String,
@@ -119,22 +119,22 @@ object Event {
         crazyData: Option[Crazyhouse.Data]
     ): Move =
       Move(
-        lib = situation.board.variant.gameLib,
+        lib = situation.board.variant.gameLogic,
         orig = move.orig,
         dest = move.dest,
         san = move match {
           case StratMove.Chess(move)    => Dumper(move)
           case StratMove.Draughts(move) => strategygames.draughts.format.pdn.Dumper(move)
         },
-        fen = if (situation.board.variant.gameLib == GameLib.Draughts() && situation.board.variant.frisianVariant)
+        fen = if (situation.board.variant.gameLogic == GameLogic.Draughts() && situation.board.variant.frisianVariant)
             situation.board match {
               case Board.Draughts(board)
-                => Forsyth.exportBoard(GameLib.Draughts(), situation.board) + ":" + 
+                => Forsyth.exportBoard(GameLogic.Draughts(), situation.board) + ":" + 
                   strategygames.draughts.format.Forsyth.exportKingMoves(board)
               case _ => sys.error("mismatched board lib types")
             }
           else
-            Forsyth.exportBoard(situation.board.variant.gameLib, situation.board),
+            Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         promotion = move.promotion.map { Promotion(_, move.dest) },
@@ -185,7 +185,7 @@ object Event {
   ) extends Event {
     def typ = "drop"
     def data =
-      MoveOrDrop.data(GameLib.Chess(), fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
+      MoveOrDrop.data(GameLogic.Chess(), fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
         Json.obj(
           "role" -> role.name,
           "uci"  -> s"${role.pgn}@${pos.key}",
@@ -206,7 +206,7 @@ object Event {
         role = Role.ChessRole(drop.piece.role),
         pos = Pos.Chess(drop.pos),
         san = Dumper(drop),
-        fen = Forsyth.exportBoard(GameLib.Chess(), situation.board),
+        fen = Forsyth.exportBoard(GameLogic.Chess(), situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         state = state,
@@ -282,8 +282,8 @@ object Event {
 
   case class Promotion(role: PromotableRole, pos: Pos) extends Event {
     private val lib = pos match {
-      case Pos.Chess(_)    => GameLib.Chess().id
-      case Pos.Draughts(_) => GameLib.Draughts().id
+      case Pos.Chess(_)    => GameLogic.Chess().id
+      case Pos.Draughts(_) => GameLogic.Draughts().id
     }
     def typ = "promotion"
     def data =

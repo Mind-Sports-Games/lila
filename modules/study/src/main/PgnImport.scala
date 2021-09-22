@@ -5,7 +5,7 @@ import strategygames.Centis
 import strategygames.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Color, Game, GameLib, Status }
+import strategygames.{ Color, Game, GameLogic, Status }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
@@ -13,7 +13,7 @@ import lila.tree.Node.{ Comment, Comments, Shapes }
 
 object PgnImport {
 
-  def lib = GameLib.Chess()
+  def lib = GameLogic.Chess()
 
   case class Result(
       root: Node.Root,
@@ -133,10 +133,10 @@ object PgnImport {
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(
-                    id = UciCharPair(GameLib.Chess(), uci),
+                    id = UciCharPair(GameLogic.Chess(), uci),
                     ply = game.turns,
-                    move = Uci.WithSan(GameLib.Chess(), uci, sanStr),
-                    fen = Forsyth.>>(GameLib.Chess(), game),
+                    move = Uci.WithSan(GameLogic.Chess(), uci, sanStr),
+                    fen = Forsyth.>>(GameLogic.Chess(), game),
                     check = game.situation.check,
                     shapes = shapes,
                     comments = comments,

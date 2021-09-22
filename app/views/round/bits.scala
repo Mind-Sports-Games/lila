@@ -4,7 +4,7 @@ package round
 import strategygames.chess.variant.Crazyhouse
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.GameLib
+import strategygames.GameLogic
 
 import controllers.routes
 import scala.util.chaining._
@@ -71,7 +71,7 @@ object bits {
 
   // TODO: this is duplicated between here and app/views/board/bits.scala.
   private def boardExtra(variant: Variant): String = {
-    val lib = variant.gameLib.name.toLowerCase()
+    val lib = variant.gameLogic.name.toLowerCase()
     variant match {
       case Variant.Draughts(v) => s"${variant.key} ${lib} is${v.boardSize.key}"
       case _ => s"${variant.key} ${lib}"
@@ -134,7 +134,7 @@ object bits {
   )(implicit ctx: Context) =
     views.html.game.side(
       pov,
-      (data \ "game" \ "initialFen").asOpt[String].map(s => FEN.apply(pov.game.board.variant.gameLib, s)),
+      (data \ "game" \ "initialFen").asOpt[String].map(s => FEN.apply(pov.game.board.variant.gameLogic, s)),
       tour,
       simul = simul,
       userTv = userTv,

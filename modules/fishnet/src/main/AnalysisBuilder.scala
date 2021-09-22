@@ -29,9 +29,9 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       val cached = if (isPartial) cachedFull - 0 else cachedFull
       def debug  = s"${work.game.variant.key} analysis for ${work.game.id} by ${client.fullId}"
       Replay(
-        work.game.variant.gameLib,
+        work.game.variant.gameLogic,
         work.game.uciList,
-        work.game.initialFen.map(fen => FEN(work.game.variant.gameLib, fen)),
+        work.game.initialFen.map(fen => FEN(work.game.variant.gameLogic, fen)),
         work.game.variant
       )
         .fold(

@@ -108,11 +108,11 @@ final class Analyse(
     }
 
   private def RedirectAtFen(pov: Pov, initialFen: Option[FEN])(or: => Fu[Result])(implicit ctx: Context) =
-    get("fen").map(s => FEN.clean(pov.game.variant.gameLib, s)).fold(or) { atFen =>
+    get("fen").map(s => FEN.clean(pov.game.variant.gameLogic, s)).fold(or) { atFen =>
       val url = routes.Round.watcher(pov.gameId, pov.color.name)
       fuccess {
         Replay
-          .plyAtFen(pov.game.variant.gameLib, pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
+          .plyAtFen(pov.game.variant.gameLogic, pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
           .fold(
             err => {
               lila.log("analyse").info(s"RedirectAtFen: ${pov.gameId} $atFen $err")

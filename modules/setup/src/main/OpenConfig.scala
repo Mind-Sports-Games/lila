@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ Clock, DisplayLib }
+import strategygames.{ Clock, GameFamily }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.FromPosition
@@ -39,13 +39,13 @@ object OpenConfig {
   ) =
     new OpenConfig(
       name = n.map(_.trim).filter(_.nonEmpty),
-      variant = Variant.orDefault(DisplayLib(l).codeLib, l match {
+      variant = Variant.orDefault(GameFamily(l).codeLib, l match {
         case 0 => ~cv
         case 1 => ~dv
         case 2 => ~lv
       }),
       clock = cl,
       rated = rated,
-      position = pos.map(f => FEN.apply(DisplayLib(l).codeLib, f))
+      position = pos.map(f => FEN.apply(GameFamily(l).codeLib, f))
     ).autoVariant
 }

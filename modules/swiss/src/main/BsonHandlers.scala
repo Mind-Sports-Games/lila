@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.Color
-import strategygames.GameLib
+import strategygames.GameLogic
 import strategygames.format.FEN
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
@@ -85,7 +85,7 @@ object BsonHandlers {
             isMicroMatch = r.getD[Boolean](isMicroMatch),
             microMatchGameId = r.getO[String](microMatchGameId),
             //TODO allow this to work for chess too?
-            openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLib.Draughts(), fen))
+            openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
           )
         case _ => sys error "Invalid swiss pairing users"
       }
@@ -111,7 +111,7 @@ object BsonHandlers {
         isMicroMatch = r.get[Boolean](isMicroMatch),
         microMatchGameId = r.getO[String](microMatchGameId),
         //TODO allow this to work for chess too?
-        openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLib.Draughts(), fen))
+        openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
       )
     def writes(w: BSON.Writer, o: SwissPairingGameIds) =
       $doc(

@@ -2,7 +2,7 @@ package lila.setup
 
 import strategygames.Clock
 import strategygames.Color.{ Black, White }
-import strategygames.{ Game => StratGame, DisplayLib }
+import strategygames.{ Game => StratGame, GameFamily }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition }
@@ -91,6 +91,6 @@ object ApiAiConfig extends BaseConfig {
       daysO = d,
       color = Color.orDefault(~c),
       level = l,
-      fen = pos.map(f => FEN.apply(DisplayLib(lib).codeLib, f))
+      fen = pos.map(f => FEN.apply(GameFamily(lib).codeLib, f))
     ).autoVariant
 }

@@ -3,7 +3,7 @@ package lila.tournament
 import cats.implicits._
 import strategygames.format.FEN
 import strategygames.chess.{ StartingPosition }
-import strategygames.{ Clock, DisplayLib, GameLib, Mode }
+import strategygames.{ Clock, GameFamily, GameLogic, Mode }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.data._
@@ -28,9 +28,9 @@ final class TournamentForm {
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
       startDate = none,
-      displayLib = 0,
-      chessVariant = Variant.libStandard(GameLib.Chess()).id.toString.some,
-      draughtsVariant = Variant.libStandard(GameLib.Draughts()).id.toString.some,
+      gameFamily = 0,
+      chessVariant = Variant.libStandard(GameLogic.Chess()).id.toString.some,
+      draughtsVariant = Variant.libStandard(GameLogic.Draughts()).id.toString.some,
       //TODO: Maybe handle this correctly in strategygames.variant.Variant?
       loaVariant = Variant.Chess(strategygames.chess.variant.LinesOfAction).key.some,
       position = None,
@@ -53,7 +53,7 @@ final class TournamentForm {
       minutes = tour.minutes,
       waitMinutes = none,
       startDate = tour.startsAt.some,
-      displayLib = tour.variant.gameLib.id,
+      gameFamily = tour.variant.gameLogic.id,
       chessVariant = tour.variant.id.toString.some,
       draughtsVariant = tour.variant.id.toString.some,
       loaVariant = tour.variant.id.toString.some,
@@ -91,10 +91,10 @@ final class TournamentForm {
         },
         "waitMinutes"      -> optional(numberIn(waitMinuteChoices)),
         "startDate"        -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "displayLib"       -> number(min = 0, max = 2),
-        "chessVariant"     -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
-        "draughtsVariant"  -> optional(nonEmptyText.verifying(v => Variant(GameLib.Draughts(), v).isDefined)),
-        "loaVariant"       -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
+        "gameFamily"       -> number(min = 0, max = 2),
+        "chessVariant"     -> optional(nonEmptyText.verifying(v => Variant(GameLogic.Chess(), v).isDefined)),
+        "draughtsVariant"  -> optional(nonEmptyText.verifying(v => Variant(GameLogic.Draughts(), v).isDefined)),
+        "loaVariant"       -> optional(nonEmptyText.verifying(v => Variant(GameLogic.Chess(), v).isDefined)),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
         "rated"            -> optional(boolean),
@@ -190,7 +190,7 @@ private[tournament] case class TournamentSetup(
     minutes: Int,
     waitMinutes: Option[Int],
     startDate: Option[DateTime],
-    displayLib: Int,
+    gameFamily: Int,
     chessVariant: Option[String],
     draughtsVariant: Option[String],
     loaVariant: Option[String],
@@ -212,15 +212,15 @@ private[tournament] case class TournamentSetup(
     if (realPosition.isDefined) Mode.Casual
     else Mode(rated.orElse(mode.map(Mode.Rated.id ===)) | true)
 
-  def realDisplayLib = DisplayLib(displayLib)
-  def realVariant = (realDisplayLib match {
-    case DisplayLib.Chess()         => chessVariant
-    case DisplayLib.Draughts()      => draughtsVariant
-    case DisplayLib.LinesOfAction() => loaVariant
+  def realGameFamily = GameFamily(gameFamily)
+  def realVariant = (realGameFamily match {
+    case GameFamily.Chess()         => chessVariant
+    case GameFamily.Draughts()      => draughtsVariant
+    case GameFamily.LinesOfAction() => loaVariant
     case _ => sys.error("Invalid lib in Swiss data")
   }) flatMap {
-    v => Variant.apply(realDisplayLib.codeLib, v)
-  } getOrElse Variant.default(realDisplayLib.codeLib)
+    v => Variant.apply(realGameFamily.codeLib, v)
+  } getOrElse Variant.default(realGameFamily.codeLib)
 
   def realPosition = position ifTrue realVariant.standard
 
@@ -239,9 +239,9 @@ private[tournament] case class TournamentSetup(
   // meant for HTML form updates
   def updateAll(old: Tournament): Tournament = {
     val newVariant = if (old.isCreated && (
-      (displayLib == 0 && chessVariant.isDefined) ||
-      (displayLib == 1 && draughtsVariant.isDefined) ||
-      (displayLib == 2 && loaVariant.isDefined)
+      (gameFamily == 0 && chessVariant.isDefined) ||
+      (gameFamily == 1 && draughtsVariant.isDefined) ||
+      (gameFamily == 2 && loaVariant.isDefined)
     )) realVariant else old.variant
     old
       .copy(

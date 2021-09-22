@@ -4,7 +4,7 @@ import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameLib, Move, Pos, PromotableRole, Role, Situation }
+import strategygames.{ Game, GameLogic, Move, Pos, PromotableRole, Role, Situation }
 import play.api.libs.json._
 
 import lila.tree.Branch
@@ -28,7 +28,7 @@ case class AnaMove(
     fullCapture: Option[Boolean] = None
 ) extends AnaAny {
 
-  private lazy val lib = variant.gameLib
+  private lazy val lib = variant.gameLogic
   //draughts
   private lazy val fullCaptureFields =
     uci.flatMap(m => Uci.Move.apply(lib, m)).flatMap(_.capture)
@@ -46,7 +46,7 @@ case class AnaMove(
     newGame flatMap { case (game, move) =>
       game.pgnMoves.lastOption toValid "Moved but no last move!" map { san =>
         val uci     = Uci(lib, move, lib match {
-          case GameLib.Draughts() => fullCaptureFields.isDefined
+          case GameLogic.Draughts() => fullCaptureFields.isDefined
           case _                  => false
         })
         val sit     = game.situation
@@ -88,7 +88,7 @@ case class AnaMove(
             }
           },
           destsUci = lib match {
-            case GameLib.Draughts() => movable ?? truncatedMoves.map(_.values.toList.flatten)
+            case GameLogic.Draughts() => movable ?? truncatedMoves.map(_.values.toList.flatten)
             case _                  => None
           },
           captureLength = movable ?? captLen,
@@ -108,18 +108,18 @@ object AnaMove {
     for {
       d    <- o obj "d"
       lib  <- d int "lib"
-      orig <- d str "orig" flatMap {pos => Pos.fromKey(GameLib(lib), pos)}
-      dest <- d str "dest" flatMap {pos => Pos.fromKey(GameLib(lib), pos)}
-      fen  <- d str "fen" map {fen => FEN.apply(GameLib(lib), fen)}
+      orig <- d str "orig" flatMap {pos => Pos.fromKey(GameLogic(lib), pos)}
+      dest <- d str "dest" flatMap {pos => Pos.fromKey(GameLogic(lib), pos)}
+      fen  <- d str "fen" map {fen => FEN.apply(GameLogic(lib), fen)}
       path <- d str "path"
     } yield AnaMove(
       orig = orig,
       dest = dest,
-      variant = Variant.orDefault(GameLib(lib), ~d.str("variant")),
+      variant = Variant.orDefault(GameLogic(lib), ~d.str("variant")),
       fen = fen,
       path = path,
       chapterId = d str "ch",
-      promotion = d str "promotion" flatMap {p => Role.promotable(GameLib(lib), p)},
+      promotion = d str "promotion" flatMap {p => Role.promotable(GameLogic(lib), p)},
       uci = d str "uci",
       fullCapture = d boolean "fullCapture"
     )

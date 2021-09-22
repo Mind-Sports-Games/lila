@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ GameLib, Mode }
+import strategygames.{ GameLogic, Mode }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import lila.lobby.Color
@@ -23,7 +23,7 @@ case class FriendConfig(
 
   val strictFen = false
 
-  def >> = (variant.gameLib.id, variant.id, variant.id, variant.id, fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value), microMatch).some
+  def >> = (variant.gameLogic.id, variant.id, variant.id, variant.id, fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value), microMatch).some
 
   def isPersistent = timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
 
@@ -55,7 +55,7 @@ object FriendConfig extends BaseHumanConfig {
       days = d,
       mode = m.fold(Mode.default)(Mode.orDefault),
       color = Color(c) err "Invalid color " + c,
-      fen = fen.map(f => FEN.apply(GameLib(l), f)),
+      fen = fen.map(f => FEN.apply(GameLogic(l), f)),
       microMatch = mm
     )
 
@@ -81,7 +81,7 @@ object FriendConfig extends BaseHumanConfig {
 
     def reads(r: BSON.Reader): FriendConfig =
       FriendConfig(
-        variant = Variant.orDefault(GameLib(r intD "l"), r int "v"),
+        variant = Variant.orDefault(GameLogic(r intD "l"), r int "v"),
         fenVariant = r intD "l" match {
           case 0 => none
           case 1 => (r intO "v2").flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
@@ -98,7 +98,7 @@ object FriendConfig extends BaseHumanConfig {
 
     def writes(w: BSON.Writer, o: FriendConfig) =
       $doc(
-        "l"  -> o.variant.gameLib.id,
+        "l"  -> o.variant.gameLogic.id,
         "v"  -> o.variant.id,
         "v2" -> o.fenVariant.map(_.id),
         "tm" -> o.timeMode.id,

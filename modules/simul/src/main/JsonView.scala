@@ -129,7 +129,7 @@ final class JsonView(
         "id"       -> g.id,
         "status"   -> g.status.id,
         "fen"      -> (strategygames.format.Forsyth.boardAndColor(
-          g.situation.board.variant.gameLib,
+          g.situation.board.variant.gameLogic,
           g.situation
         )),
         "lastMove" -> ~g.lastMoveKeys,

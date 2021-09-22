@@ -1,6 +1,6 @@
 package controllers
 
-import strategygames.{ Color, GameLib }
+import strategygames.{ Color, GameLogic }
 import strategygames.variant.Variant
 import strategygames.format.Forsyth
 
@@ -169,7 +169,7 @@ final class Round(
       case _ =>
         negotiate(
           html = {
-            if (pov.game.replayable && pov.game.variant.gameLib.id == 0) analyseC.replay(pov, userTv = userTv)
+            if (pov.game.replayable && pov.game.variant.gameLogic.id == 0) analyseC.replay(pov, userTv = userTv)
             else if (HTTPRequest.isHuman(ctx.req))
               env.tournament.api.gameView.watcher(pov.game) zip
                 (pov.game.simulId ?? env.simul.repo.find) zip
@@ -321,7 +321,7 @@ final class Round(
         Redirect(
           "%s?fen=%s#%s".format(
             routes.Lobby.home,
-            get("fen") | (Forsyth.>>(game.variant.gameLib, game.chess)).value,
+            get("fen") | (Forsyth.>>(game.variant.gameLogic, game.chess)).value,
             mode
           )
         )

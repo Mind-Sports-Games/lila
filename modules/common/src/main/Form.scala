@@ -2,7 +2,7 @@ package lila.common
 
 import strategygames.format.FEN
 import strategygames.format.Forsyth
-import strategygames.GameLib
+import strategygames.GameLogic
 import io.lemonlabs.uri._
 import org.joda.time.{ DateTime, DateTimeZone }
 import play.api.data.format.Formats._
@@ -162,11 +162,11 @@ object Form {
   }
 
   object fen {
-    implicit private val fenFormat = formatter.stringFormatter[FEN](_.value, fen => FEN.apply(GameLib.Chess(), fen))
+    implicit private val fenFormat = formatter.stringFormatter[FEN](_.value, fen => FEN.apply(GameLogic.Chess(), fen))
     val playableStrict             = playable(strict = true)
     def playable(strict: Boolean) = of[FEN](fenFormat)
-      .transform[FEN](f => FEN(GameLib.Chess(), f.value.trim), identity)
-      .verifying("Invalid position", fen => (Forsyth.<<<(GameLib.Chess(), fen)).exists(_.situation playable strict))
+      .transform[FEN](f => FEN(GameLogic.Chess(), f.value.trim), identity)
+      .verifying("Invalid position", fen => (Forsyth.<<<(GameLogic.Chess(), fen)).exists(_.situation playable strict))
   }
 
   def inTheFuture(m: Mapping[DateTime]) =

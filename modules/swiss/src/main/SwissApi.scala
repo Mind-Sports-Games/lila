@@ -18,7 +18,7 @@ import lila.hub.LightTeam.TeamID
 import lila.round.actorApi.round.QuietFlag
 import lila.user.{ User, UserRepo }
 
-import strategygames.GameLib
+import strategygames.GameLogic
 
 final class SwissApi(
     colls: SwissColls,
@@ -103,9 +103,9 @@ final class SwissApi(
           clock = if (old.isCreated) data.clock else old.clock,
           variant = if (
             old.isCreated && (
-              (data.displayLib == 0 && data.chessVariant.isDefined) ||
-              (data.displayLib == 1 && data.draughtsVariant.isDefined) ||
-              (data.displayLib == 2 && data.loaVariant.isDefined)
+              (data.gameFamily == 0 && data.chessVariant.isDefined) ||
+              (data.gameFamily == 1 && data.draughtsVariant.isDefined) ||
+              (data.gameFamily == 2 && data.loaVariant.isDefined)
             )
           ) data.realVariant
           else old.variant,

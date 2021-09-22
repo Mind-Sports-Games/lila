@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ Black, Color, White, GameLib }
+import strategygames.{ Black, Color, White, GameLogic }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import org.joda.time.DateTime
@@ -98,10 +98,10 @@ final private class SwissDirector(
     Game
       .make(
         chess = strategygames.Game(
-          swiss.variant.gameLib,
+          swiss.variant.gameLogic,
           variant = Some {
             if (swiss.settings.position.isEmpty) swiss.variant
-            else Variant.libFromPosition(swiss.variant.gameLib)
+            else Variant.libFromPosition(swiss.variant.gameLogic)
           },
           fen = pairing.openingFEN
         ) pipe { g =>

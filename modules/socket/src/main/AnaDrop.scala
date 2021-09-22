@@ -4,7 +4,7 @@ import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ Uci, UciCharPair }
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameLib, Pos, Role }
+import strategygames.{ Game, GameLogic, Pos, Role }
 import strategygames.variant.Variant
 import play.api.libs.json.JsObject
 
@@ -20,14 +20,14 @@ case class AnaDrop(
 ) extends AnaAny {
 
   def branch: Validated[String, Branch] =
-    (Game(variant.gameLib, variant.some, fen.some), role, pos) match {
+    (Game(variant.gameLogic, variant.some, fen.some), role, pos) match {
       case (Game.Chess(game), Role.ChessRole(role), Pos.Chess(pos))
         => game.drop(role, pos) flatMap {
           case (game, drop)
             => game.pgnMoves.lastOption toValid "Dropped but no last move!" map { san =>
               val uci     = Uci(drop)
               val movable = !game.situation.end
-              val fen     = Forsyth.>>(variant.gameLib, Game.Chess(game))
+              val fen     = Forsyth.>>(variant.gameLogic, Game.Chess(game))
               Branch(
                 id = UciCharPair(uci),
                 ply = game.turns,
@@ -35,7 +35,7 @@ case class AnaDrop(
                 fen = fen,
                 check = game.situation.check,
                 dests = Some(movable ?? Game.Chess(game).situation.destinations),
-                opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? FullOpeningDB.findByFen(variant.gameLib, fen),
+                opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? FullOpeningDB.findByFen(variant.gameLogic, fen),
                 drops = if (movable) Game.Chess(game).situation.drops else Some(Nil),
                 crazyData = game.situation.board.crazyData
               )
@@ -51,10 +51,10 @@ object AnaDrop {
   def parse(o: JsObject) =
     for {
       d    <- o obj "d"
-      role <- d str "role" flatMap Role.allByName(GameLib.Chess()).get
-      pos  <- d str "pos" flatMap {pos => Pos.fromKey(GameLib.Chess(), pos)}
-      variant = Variant.orDefault(GameLib.Chess(), ~d.str("variant"))
-      fen  <- d str "fen" map {fen => FEN.apply(GameLib.Chess(), fen)}
+      role <- d str "role" flatMap Role.allByName(GameLogic.Chess()).get
+      pos  <- d str "pos" flatMap {pos => Pos.fromKey(GameLogic.Chess(), pos)}
+      variant = Variant.orDefault(GameLogic.Chess(), ~d.str("variant"))
+      fen  <- d str "fen" map {fen => FEN.apply(GameLogic.Chess(), fen)}
       path <- d str "path"
     } yield AnaDrop(
       role = role,

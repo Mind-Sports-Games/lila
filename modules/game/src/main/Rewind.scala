@@ -18,7 +18,7 @@ object Rewind {
   def apply(game: Game, initialFen: Option[FEN]): Validated[String, Progress] =
     Reader
       .movesWithSans(
-        game.variant.gameLib,
+        game.variant.gameLogic,
         moveStrs = game.pgnMoves,
         op = sans => Sans(sans.value.dropRight(1)),
         tags = createTags(initialFen, game)

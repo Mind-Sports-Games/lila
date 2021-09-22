@@ -17,13 +17,13 @@ final class JsonView(rematches: Rematches) {
     Json
       .obj(
         "id"            -> game.id,
-        "lib"           -> game.variant.gameLib.id,
+        "lib"           -> game.variant.gameLogic.id,
         "variant"       -> game.variant,
         "speed"         -> game.speed.key,
         "perf"          -> PerfPicker.key(game),
         "rated"         -> game.rated,
-        "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLib)),
-        "fen"           -> (Forsyth.>>(game.variant.gameLib, game.chess)),
+        "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
+        "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
         "player"        -> game.turnColor,
         "turns"         -> game.turns,
         "startedAtTurn" -> game.chess.startedAtTurn,
@@ -111,7 +111,7 @@ object JsonView {
           "key"   -> v.key,
           "name"  -> v.name,
           "short" -> v.shortName,
-          "lib"   -> v.gameLib.id
+          "lib"   -> v.gameLogic.id
         )
       case Variant.Draughts(draughtsVariant) =>
         Json.obj(
@@ -120,7 +120,7 @@ object JsonView {
           "short" -> v.shortName,
           "gameType" -> v.gameType,
           "board" -> draughtsVariant.boardSize,
-          "lib"   -> v.gameLib.id
+          "lib"   -> v.gameLogic.id
         )
     }
   }

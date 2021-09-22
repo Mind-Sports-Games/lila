@@ -7,7 +7,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import strategygames.DisplayLib
+import strategygames.GameFamily
 
 private object bits {
 
@@ -37,17 +37,17 @@ private object bits {
     )
   }
 
-  def renderDisplayLib(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "displayLib label_select")(
-      renderLabel(form("displayLib"), "Game Family"),
+  def renderGameFamily(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "gameFamily label_select")(
+      renderLabel(form("gameFamily"), "Game Family"),
       renderSelect(
-        form("displayLib"),
+        form("gameFamily"),
         libs
       )
     )
 
-  def renderVariant(form: Form[_], variants: List[SelectChoice], lib: DisplayLib)(implicit ctx: Context) =
-    div(cls := s"${lib.shortName.toLowerCase()}Variant label_select", if (lib != DisplayLib.Chess()) style := "display:none")(
+  def renderVariant(form: Form[_], variants: List[SelectChoice], lib: GameFamily)(implicit ctx: Context) =
+    div(cls := s"${lib.shortName.toLowerCase()}Variant label_select", if (lib != GameFamily.Chess()) style := "display:none")(
       renderLabel(form(s"${lib.shortName.toLowerCase()}Variant"), trans.variant()),
       renderSelect(
         form(s"${lib.shortName.toLowerCase()}Variant"),

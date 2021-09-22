@@ -1,6 +1,6 @@
 package lila.study
 
-import strategygames.{ Centis, GameLib, Pos }
+import strategygames.{ Centis, GameLogic, Pos }
 import lila.common.Maths
 import lila.tree.Node.{ Shape, Shapes }
 
@@ -77,7 +77,7 @@ private[study] object CommentParser {
         val circles = str.split(',').toList.map(_.trim).flatMap { c =>
           for {
             color <- c.headOption
-            pos   <- Pos.fromKey(GameLib.Chess(), c.drop(1))
+            pos   <- Pos.fromKey(GameLogic.Chess(), c.drop(1))
           } yield Shape.Circle(toBrush(color), pos)
         }
         Shapes(circles) -> circlesRemoveRegex.replaceAllIn(comment, "").trim
@@ -90,8 +90,8 @@ private[study] object CommentParser {
         val arrows = str.split(',').toList.flatMap { c =>
           for {
             color <- c.headOption
-            orig  <- Pos.fromKey(GameLib.Chess(), c.slice(1, 3))
-            dest  <- Pos.fromKey(GameLib.Chess(), c.slice(3, 5))
+            orig  <- Pos.fromKey(GameLogic.Chess(), c.slice(1, 3))
+            dest  <- Pos.fromKey(GameLogic.Chess(), c.slice(3, 5))
           } yield Shape.Arrow(toBrush(color), orig, dest)
         }
         Shapes(arrows) -> arrowsRemoveRegex.replaceAllIn(comment, "").trim

@@ -46,7 +46,7 @@ final class GifExport(
 
   def gameThumbnail(game: Game): Fu[Source[ByteString, _]] = {
     val query = List(
-      "fen"         -> (Forsyth.>>(game.variant.gameLib, game.chess)).value,
+      "fen"         -> (Forsyth.>>(game.variant.gameLogic, game.chess)).value,
       "white"       -> Namer.playerTextBlocking(game.whitePlayer, withRating = true)(lightUserApi.sync),
       "black"       -> Namer.playerTextBlocking(game.blackPlayer, withRating = true)(lightUserApi.sync),
       "orientation" -> game.naturalOrientation.name
@@ -104,7 +104,7 @@ final class GifExport(
 
   private def frames(game: Game, initialFen: Option[FEN]) = {
     Replay.gameMoveWhileValid(
-      game.variant.gameLib,
+      game.variant.gameLogic,
       game.pgnMoves,
       initialFen | game.variant.initialFen,
       game.variant
@@ -135,7 +135,7 @@ final class GifExport(
   private def frame(situation: Situation, uci: Option[Uci], delay: Option[Centis]) =
     Json
       .obj(
-        "fen"      -> (Forsyth.>>(situation.board.variant.gameLib, situation).value),
+        "fen"      -> (Forsyth.>>(situation.board.variant.gameLogic, situation).value),
         "lastMove" -> uci.map(_.uci)
       )
       .add("check", situation.checkSquare.map(_.key))

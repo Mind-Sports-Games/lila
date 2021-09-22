@@ -6,12 +6,12 @@ import { teamName } from './battle';
 import TournamentController from '../ctrl';
 
 const renderGameClasses = (game: FeaturedGame): string =>
-  game.gameLib === 'draughts' && !!game.boardSize
-    ? `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLib}.is${game.boardSize.key}`
-    : `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLib}`;
+  game.gameLogic === 'draughts' && !!game.boardSize
+    ? `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLogic}.is${game.boardSize.key}`
+    : `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLogic}`;
 
 const renderGameState = (game: FeaturedGame): string =>
-  game.gameLib === 'draughts' && !!game.boardSize
+  game.gameLogic === 'draughts' && !!game.boardSize
     ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orientation}|${game.lastMove}`
     : `${game.fen},${game.orientation},${game.lastMove}`;
 

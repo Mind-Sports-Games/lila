@@ -6,7 +6,7 @@ import cats.implicits._
 import strategygames.format.pgn.Dumper
 import strategygames.format.Uci
 import strategygames.chess.Drop
-import strategygames.{ GameLib, Move, Replay, Situation }
+import strategygames.{ GameLogic, Move, Replay, Situation }
 
 import lila.analyse.{ Analysis, Info, PgnMove }
 import lila.base.LilaException
@@ -33,7 +33,7 @@ private object UciToPgn {
         situation <-
           if (ply == replay.setup.startedAtTurn + 1) valid(replay.setup.situation)
           else replay moveAtPly ply map (_.fold(_.situationBefore, drop => Situation.Chess(drop.situationBefore))) toValid "No move found"
-        ucis <- variation.map(v => Uci.apply(GameLib.Chess(), v)).sequence toValid "Invalid UCI moves " + variation
+        ucis <- variation.map(v => Uci.apply(GameLogic.Chess(), v)).sequence toValid "Invalid UCI moves " + variation
         moves <-
           ucis.foldLeft[Validated[String, (Situation, List[Either[Move, Drop]])]](valid(situation -> Nil)) {
             case (Validated.Valid((sit, moves)), uci: Uci.Move) =>
@@ -47,7 +47,7 @@ private object UciToPgn {
             case (failure, _) => failure
           }
       } yield moves._2.reverse map (_.fold(
-        move => Dumper.apply(GameLib.Chess(), move),
+        move => Dumper.apply(GameLogic.Chess(), move),
         drop => strategygames.chess.format.pgn.Dumper.apply(drop)
       ))
 

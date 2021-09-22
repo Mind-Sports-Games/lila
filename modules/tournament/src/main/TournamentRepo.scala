@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.variant.Variant
-import strategygames.{ Clock, GameLib }
+import strategygames.{ Clock, GameLogic }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.ReadPreference
@@ -27,7 +27,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   private def forTeamSelect(id: TeamID)        = $doc("forTeams" -> id)
   private def forTeamsSelect(ids: Seq[TeamID]) = $doc("forTeams" $in ids)
   private def sinceSelect(date: DateTime)      = $doc("startsAt" $gt date)
-  private def libSelect(lib: GameLib)          = $doc("lib" -> lib.id)
+  private def libSelect(lib: GameLogic)          = $doc("lib" -> lib.id)
   private def variantSelect(variant: Variant) =
     if (variant.standardVariant) $doc("variant" $exists false)
     else $doc("variant" -> variant.id)
@@ -340,7 +340,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
         .reverse
     }
 
-  def lastFinishedScheduledByFreq(freq: Schedule.Freq, since: DateTime, lib: GameLib): Fu[List[Tournament]] =
+  def lastFinishedScheduledByFreq(freq: Schedule.Freq, since: DateTime, lib: GameLogic): Fu[List[Tournament]] =
     coll
       .find(
         finishedSelect ++ sinceSelect(since) ++ libSelect(lib) ++ variantSelect(Variant.libStandard(lib)) ++ $doc(
@@ -352,7 +352,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list(Schedule.Speed.mostPopular.size)
 
-  def lastFinishedDaily(lib: GameLib, variant: Variant): Fu[Option[Tournament]] =
+  def lastFinishedDaily(lib: GameLogic, variant: Variant): Fu[Option[Tournament]] =
     coll
       .find(
         finishedSelect ++ sinceSelect(DateTime.now minusDays 1) ++ libSelect(lib) ++ variantSelect(variant) ++

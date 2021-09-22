@@ -28,7 +28,7 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.create)(
             fields.name,
             form3.split(
-              fields.displayLib,
+              fields.gameFamily,
               fields.chessVariant,
               fields.draughtsVariant,
               fields.loaVariant
@@ -69,7 +69,7 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
             form3.split(fields.name, tour.isCreated option fields.startDate),
             form3.split(
-              fields.displayLib,
+              fields.gameFamily,
               fields.chessVariant,
               fields.draughtsVariant,
               fields.loaVariant
@@ -244,11 +244,11 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
-  def displayLib =
-    form3.group(form("displayLib"), "Game Family", half = true)(
+  def gameFamily =
+    form3.group(form("gameFamily"), "Game Family", half = true)(
       form3.select(
         _,
-        translatedDisplayLibChoices(_.id.toString).map(x => x._1 -> x._2),
+        translatedGameFamilyChoices(_.id.toString).map(x => x._1 -> x._2),
         disabled = disabledAfterStart
       )
     )

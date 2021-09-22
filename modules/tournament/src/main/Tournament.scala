@@ -136,7 +136,7 @@ case class Tournament(
 
   def nonPlayStrategyCreatedBy = (createdBy != User.playstrategyId) option createdBy
 
-  def ratingVariant = if (variant.fromPosition) Variant.libStandard(variant.gameLib) else variant
+  def ratingVariant = if (variant.fromPosition) Variant.libStandard(variant.gameLogic) else variant
 
   def startingPosition = position flatMap Thematic.byFen
 

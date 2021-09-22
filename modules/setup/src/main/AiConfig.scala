@@ -1,7 +1,7 @@
 package lila.setup
 
 import strategygames.Color.{ Black, White }
-import strategygames.{ Game => StratGame, GameLib }
+import strategygames.{ Game => StratGame, GameLogic }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import lila.game.{ Game, Player, Pov, Source }
@@ -68,7 +68,7 @@ object AiConfig extends BaseConfig {
       days = d,
       level = level,
       color = Color(c) err "Invalid color " + c,
-      fen = fen.map(f => FEN.apply(GameLib.Chess(), f))
+      fen = fen.map(f => FEN.apply(GameLogic.Chess(), f))
     )
 
   def default = AiConfig(
@@ -95,7 +95,7 @@ object AiConfig extends BaseConfig {
 
     def reads(r: BSON.Reader): AiConfig =
       AiConfig(
-        variant = strategygames.variant.Variant.orDefault(GameLib(r intD "l"), r int "v"),
+        variant = strategygames.variant.Variant.orDefault(GameLogic(r intD "l"), r int "v"),
         fenVariant = none,
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",

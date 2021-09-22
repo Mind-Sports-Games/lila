@@ -9,7 +9,7 @@ import lila.db.dsl._
 import lila.game.Game
 import lila.rating.Glicko
 
-import strategygames.GameLib
+import strategygames.GameLogic
 
 object BsonHandlers {
 
@@ -24,7 +24,7 @@ object BsonHandlers {
       fen     <- r.getAsTry[String](fen)
       lineStr <- r.getAsTry[String](line)
       line    <- lineStr.split(' ').toList
-        .flatMap{line => Uci.Move.apply(GameLib.Chess(), line)}
+        .flatMap{line => Uci.Move.apply(GameLogic.Chess(), line)}
         .toNel.toTry("Empty move list?!")
       glicko  <- r.getAsTry[Glicko](glicko)
       plays   <- r.getAsTry[Int](plays)
@@ -33,7 +33,7 @@ object BsonHandlers {
     } yield Puzzle(
       id = id,
       gameId = gameId,
-      fen = FEN.apply(GameLib.Chess(), fen),
+      fen = FEN.apply(GameLogic.Chess(), fen),
       line = line,
       glicko = glicko,
       plays = plays,

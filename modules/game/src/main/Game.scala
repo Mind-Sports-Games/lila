@@ -12,7 +12,7 @@ import strategygames.{
   Clock,
   Color,
   Game => StratGame,
-  GameLib,
+  GameLogic,
   Mode,
   Move,
   MoveOrDrop,
@@ -178,13 +178,13 @@ case class Game(
   def pdnMovesConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
     chess match {
       case StratGame.Draughts(game) => game.pdnMovesConcat(fullCaptures, dropGhosts)
-      case _ => sys.error("Cant call pdnMovesConcat for a gamelib other than draughts")
+      case _ => sys.error("Cant call pdnMovesConcat for a gamelogic other than draughts")
     }
 
   def pgnMoves(color: Color): PgnMoves = {
     val pivot = if (color == startColor) 0 else 1
-    val pgnMoves = variant.gameLib match {
-      case GameLib.Draughts() => pdnMovesConcat()
+    val pgnMoves = variant.gameLogic match {
+      case GameLogic.Draughts() => pdnMovesConcat()
       case _ => chess.pgnMoves
     }
     pgnMoves.zipWithIndex.collect {
@@ -247,7 +247,7 @@ case class Game(
       Event.Drop(_, game.situation, state, clockEvent, updated.board.crazyData)
     ) :: {
       // abstraction leak, I know.
-      if (updated.board.variant.gameLib == GameLib.Draughts())
+      if (updated.board.variant.gameLogic == GameLogic.Draughts())
         (updated.board.variant.frisianVariant || updated.board.variant.draughts64Variant) ?? List(Event.KingMoves(
           white = updated.history.kingMoves.white,
           black = updated.history.kingMoves.black,
@@ -464,7 +464,7 @@ case class Game(
       !Game.isOldHorde(this)
 
   def ratingVariant =
-    if (isTournament && variant.fromPosition) Variant.libStandard(variant.gameLib)
+    if (isTournament && variant.fromPosition) Variant.libStandard(variant.gameLogic)
     else variant
 
   def fromPosition = variant.fromPosition || source.??(Source.Position ==)
@@ -642,8 +642,8 @@ case class Game(
     )
 
   lazy val opening: Option[FullOpening.AtPly] =
-    if (fromPosition || !Variant.openingSensibleVariants(variant.gameLib)(variant)) none
-    else FullOpeningDB.search(variant.gameLib, pgnMoves)
+    if (fromPosition || !Variant.openingSensibleVariants(variant.gameLogic)(variant)) none
+    else FullOpeningDB.search(variant.gameLogic, pgnMoves)
 
   def synthetic = id == Game.syntheticId
 
@@ -792,7 +792,7 @@ object Game {
         metadata = metadata(source).copy(pgnImport = pgnImport, drawLimit = drawLimit, microMatch = microMatch),
         createdAt = createdAt,
         movedAt = createdAt,
-        pdnStorage = if (chess.situation.board.variant.gameLib == GameLib.Draughts()) Some(PdnStorage.OldBin) else None
+        pdnStorage = if (chess.situation.board.variant.gameLogic == GameLogic.Draughts()) Some(PdnStorage.OldBin) else None
       )
     )
   }

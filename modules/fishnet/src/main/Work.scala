@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 
 import strategygames.format.{ FEN, Uci }
 import strategygames.variant.Variant
-import strategygames.GameLib
+import strategygames.GameLogic
 import lila.common.IpAddress
 
 sealed trait Work {
@@ -52,7 +52,7 @@ object Work {
       moves: String
   ) {
 
-    def uciList: List[Uci] = ~(Uci.readList(GameLib.Chess(), moves))
+    def uciList: List[Uci] = ~(Uci.readList(GameLogic.Chess(), moves))
   }
 
   case class Sender(

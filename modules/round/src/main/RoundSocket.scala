@@ -4,7 +4,7 @@ import actorApi._
 import actorApi.round._
 import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
 import strategygames.format.Uci
-import strategygames.{ Black, Centis, Color, GameLib, MoveMetrics, Speed, White }
+import strategygames.{ Black, Centis, Color, GameLogic, MoveMetrics, Speed, White }
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Antichess, Crazyhouse, Horde }
 import play.api.libs.json._
@@ -278,7 +278,7 @@ object RoundSocket {
             }
           case "r/move" =>
             raw.get(6) { case Array(fullId, libS, uciS, blurS, lagS, mtS) =>
-              Uci(GameLib(libS.toInt), uciS) map { uci =>
+              Uci(GameLogic(libS.toInt), uciS) map { uci =>
                 PlayerMove(FullId(fullId), uci, P.In.boolean(blurS), MoveMetrics(centis(lagS), centis(mtS)))
               }
             }

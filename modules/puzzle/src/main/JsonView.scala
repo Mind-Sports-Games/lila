@@ -3,7 +3,7 @@ package lila.puzzle
 import play.api.i18n.Lang
 import play.api.libs.json._
 
-import strategygames.{ Game, GameLib }
+import strategygames.{ Game, GameLogic }
 
 import lila.common.Json._
 import lila.game.GameRepo
@@ -184,17 +184,17 @@ final class JsonView(
 
     private def makeBranch(puzzle: Puzzle): Option[tree.Branch] = {
       import strategygames.format._
-      val init = Game(GameLib.Chess(), none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
+      val init = Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
       val (_, branchList) = puzzle.line.tail.foldLeft[(Game, List[tree.Branch])]((init, Nil)) {
         case ((prev, branches), uci) =>
           val (game, move) =
             prev(uci.orig, uci.dest, uci.promotion)
               .fold(err => sys error s"puzzle ${puzzle.id} $err", identity)
           val branch = tree.Branch(
-            id = UciCharPair(game.situation.board.variant.gameLib, move.toUci),
+            id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
             ply = game.turns,
-            move = Uci.WithSan(game.situation.board.variant.gameLib, move.toUci, game.pgnMoves.last),
-            fen = Forsyth.>>(game.situation.board.variant.gameLib, game),
+            move = Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.pgnMoves.last),
+            fen = Forsyth.>>(game.situation.board.variant.gameLogic, game),
             check = game.situation.check,
             crazyData = none
           )

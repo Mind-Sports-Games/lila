@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.{ DisplayLib, Mode, Speed }
+import strategygames.{ GameFamily, Mode, Speed }
 import strategygames.variant.Variant
 import play.api.i18n.Lang
 
@@ -105,7 +105,7 @@ trait SetupHelper { self: I18nHelper =>
     )
 
   private val encodeId = (v: Variant) => v.id.toString
-  private val encodeDisplayLibId = (lib: DisplayLib) => lib.id.toString
+  private val encodeGameFamilyId = (lib: GameFamily) => lib.id.toString
 
   private def variantTupleId = variantTuple(encodeId) _
 
@@ -113,14 +113,14 @@ trait SetupHelper { self: I18nHelper =>
     (encode(variant), variant.name, variant.title.some)
 
   //TODO: Push these lists into strategygames
-  def translatedDisplayLibChoices(implicit lang: Lang): List[SelectChoice] =
-    translatedDisplayLibChoices(encodeDisplayLibId)
+  def translatedGameFamilyChoices(implicit lang: Lang): List[SelectChoice] =
+    translatedGameFamilyChoices(encodeGameFamilyId)
 
-  def translatedDisplayLibChoices(encode: DisplayLib => String)(implicit lang: Lang): List[SelectChoice] =
+  def translatedGameFamilyChoices(encode: GameFamily => String)(implicit lang: Lang): List[SelectChoice] =
     List(
-      (encode(DisplayLib.Chess()), DisplayLib.Chess().name, DisplayLib.Chess().name.some),
-      (encode(DisplayLib.Draughts()), DisplayLib.Draughts().name, DisplayLib.Draughts().name.some),
-      (encode(DisplayLib.LinesOfAction()), DisplayLib.LinesOfAction().name, DisplayLib.LinesOfAction().name.some)
+      (encode(GameFamily.Chess()), GameFamily.Chess().name, GameFamily.Chess().name.some),
+      (encode(GameFamily.Draughts()), GameFamily.Draughts().name, GameFamily.Draughts().name.some),
+      (encode(GameFamily.LinesOfAction()), GameFamily.LinesOfAction().name, GameFamily.LinesOfAction().name.some)
     )
 
   def translatedChessVariantChoices(implicit lang: Lang): List[SelectChoice] =

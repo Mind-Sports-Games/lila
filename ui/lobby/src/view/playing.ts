@@ -21,8 +21,8 @@ const boardSize = (boardSize?: VariantBoardSize) =>
   boardSize === undefined ? '' : `${boardSize.size[0]}x${boardSize.size[1]}`;
 
 const boardClasses = (variant: Variant) =>
-  `${variant.gameLib.name.toLowerCase()}${
-    variant.gameLib.id === 1 && variant.boardSize !== undefined ? `.is${variant.boardSize.key}` : ''
+  `${variant.gameLogic.name.toLowerCase()}${
+    variant.gameLogic.id === 1 && variant.boardSize !== undefined ? `.is${variant.boardSize.key}` : ''
   }`;
 
 export default function (ctrl: LobbyController) {
@@ -38,7 +38,7 @@ export default function (ctrl: LobbyController) {
         [
           h(`span.mini-board.cg-wrap.is2d.${boardClasses(pov.variant)}`, {
             attrs:
-              pov.variant.gameLib.id === 1
+              pov.variant.gameLogic.id === 1
                 ? {
                     // Draughts
                     'data-state': `${pov.fen}|${boardSize(pov.variant.boardSize)}|${pov.color}|${pov.lastMove}`,
