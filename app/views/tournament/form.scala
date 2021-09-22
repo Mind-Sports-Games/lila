@@ -27,7 +27,12 @@ object form {
           ),
           postForm(cls := "form3", action := routes.Tournament.create)(
             fields.name,
-            form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
+            form3.split(
+              fields.gameFamily,
+              fields.chessVariant,
+              fields.draughtsVariant,
+              fields.loaVariant
+            ),
             form3.split(fields.rated),
             fields.clock,
             form3.split(fields.minutes, fields.waitMinutes),
@@ -63,7 +68,12 @@ object form {
           h1("Edit ", tour.name()),
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
             form3.split(fields.name, tour.isCreated option fields.startDate),
-            form3.split(fields.gameLib, fields.chessVariant, fields.draughtsVariant),
+            form3.split(
+              fields.gameFamily,
+              fields.chessVariant,
+              fields.draughtsVariant,
+              fields.loaVariant
+            ),
             form3.split(fields.rated),
             fields.clock,
             form3.split(
@@ -234,11 +244,11 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
-  def gameLib =
-    form3.group(form("gameLib"), "Game Family", half = true)(
+  def gameFamily =
+    form3.group(form("gameFamily"), "Game Family", half = true)(
       form3.select(
         _,
-        translatedGameLibChoices(_.id.toString).map(x => x._1 -> x._2),
+        translatedGameFamilyChoices(_.id.toString).map(x => x._1 -> x._2),
         disabled = disabledAfterStart
       )
     )
@@ -255,6 +265,14 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       form3.select(
         _,
         translatedDraughtsVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
+        disabled = disabledAfterStart,
+      )
+    )
+  def loaVariant =
+    form3.group(form("loaVariant"), trans.variant(), klass="loaVariant", half = true, displayed = false)(
+      form3.select(
+        _,
+        translatedLOAVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
         disabled = disabledAfterStart,
       )
     )

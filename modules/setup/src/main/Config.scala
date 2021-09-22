@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ Clock, Game => StratGame, GameLib, Situation, Speed }
+import strategygames.{ Clock, Game => StratGame, GameFamily, GameLogic, Situation, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.{ Game => ChessGame }
@@ -33,7 +33,7 @@ private[setup] trait Config {
   lazy val creatorColor = color.resolve
 
   def makeGame(v: Variant): StratGame =
-    StratGame(v.gameLib, situation = Situation(v.gameLib, v), clock = makeClock.map(_.toClock))
+    StratGame(v.gameLogic, situation = Situation(v.gameLogic, v), clock = makeClock.map(_.toClock))
 
   def makeGame: StratGame = makeGame(variant)
 
@@ -64,44 +64,45 @@ trait Positional { self: Config =>
 
   def strictFen: Boolean
 
-  lazy val validFen = variant.gameLib match {
-    case GameLib.Chess() => variant != strategygames.chess.variant.FromPosition || {
+  lazy val validFen = variant.gameLogic match {
+    //TODO: LOA defaults here, perhaps want to add LOA fromPosition
+    case GameLogic.Chess() => variant != strategygames.chess.variant.FromPosition || {
       fen exists { f =>
-        (Forsyth.<<<(variant.gameLib, f)).exists(_.situation playable strictFen)
+        (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)
       }
     }
-    case GameLib.Draughts() => !(variant.fromPosition && Config.draughtsFromPositionVariants.contains((fenVariant | Variant.libStandard(GameLib.Draughts())).id)) || {
+    case GameLogic.Draughts() => !(variant.fromPosition && Config.draughtsFromPositionVariants.contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
         fen ?? {
-          f => ~Forsyth.<<<@(variant.gameLib, fenVariant | Variant.libStandard(GameLib.Draughts()), f)
+          f => ~Forsyth.<<<@(variant.gameLogic, fenVariant | Variant.libStandard(GameLogic.Draughts()), f)
             .map(_.situation playable strictFen)
         }
       }
   }
 
-  lazy val validKingCount = variant.gameLib match {
-    case GameLib.Chess() => false
-    case GameLib.Draughts() => !(variant.fromPosition && Config.draughtsFromPositionVariants.contains((fenVariant | Variant.libStandard(GameLib.Draughts())).id)) || {
+  lazy val validKingCount = variant.gameLogic match {
+    case GameLogic.Draughts() => !(variant.fromPosition && Config.draughtsFromPositionVariants.contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
       fen ?? { f => strategygames.draughts.format.Forsyth.countKings(
         strategygames.draughts.format.FEN(f.value)
       ) <= 30 }
     }
+    case _ => false
   }
 
   def fenGame(builder: StratGame => Game): Game = {
     val baseState = fen ifTrue (variant.fromPosition) flatMap {
-      Forsyth.<<<@(variant.gameLib, Variant.libFromPosition(variant.gameLib), _)
+      Forsyth.<<<@(variant.gameLogic, Variant.libFromPosition(variant.gameLogic), _)
     }
     val (chessGame, state) = baseState.fold(makeGame -> none[SituationPlus]) {
       case sit @ SituationPlus(s, _) =>
         val game = StratGame(
-          s.gameLib,
+          s.gameLogic,
           situation = s,
           turns = sit.turns,
           startedAtTurn = sit.turns,
           clock = makeClock.map(_.toClock)
         )
-        if (Forsyth.>>(s.gameLib, game).initial)
-          makeGame(Variant.libStandard(s.gameLib)) -> none
+        if (Forsyth.>>(s.gameLogic, game).initial)
+          makeGame(Variant.libStandard(s.gameLogic)) -> none
         else game                                  -> baseState
     }
     val game = builder(chessGame)
@@ -111,7 +112,7 @@ trait Positional { self: Config =>
           situation = game.situation.copy(
             board = game.board.copy(
               history = s.board.history,
-              variant = Variant.libFromPosition(s.board.variant.gameLib)
+              variant = Variant.libFromPosition(s.board.variant.gameLogic)
             )
           ),
           turns = sit.turns
@@ -124,16 +125,20 @@ trait Positional { self: Config =>
 object Config extends BaseConfig
 
 trait BaseConfig {
-  val gameLibs       = List(GameLib.Chess().id, GameLib.Draughts().id)
+  //TODO: Push this into strategygames?
+  val gameFamilys    = List(GameFamily.Chess().id, GameFamily.Draughts().id, GameFamily.LinesOfAction().id)
   val chessVariants  = List(strategygames.chess.variant.Standard.id, strategygames.chess.variant.Chess960.id)
   val draughtsVariants = List(strategygames.draughts.variant.Standard.id)
+  val loaVariants      = List(strategygames.chess.variant.LinesOfAction.id)
 
   val chessVariantDefault    = strategygames.chess.variant.Standard
   val draughtsVariantDefault = strategygames.draughts.variant.Standard
+  val loaVariantDefault      = strategygames.chess.variant.LinesOfAction
   val variantDefaultStrat    = Variant.Chess(strategygames.chess.variant.Standard)
 
   val chessVariantsWithFen    = chessVariants :+ strategygames.chess.variant.FromPosition.id
   val draughtsVariantsWithFen = draughtsVariants :+ strategygames.draughts.variant.FromPosition.id
+  val loaVariantsWithFen      = loaVariants
 
   val chessAIVariants = chessVariants :+
     strategygames.chess.variant.Crazyhouse.id :+
@@ -143,7 +148,6 @@ trait BaseConfig {
     strategygames.chess.variant.Atomic.id :+
     strategygames.chess.variant.Horde.id :+
     strategygames.chess.variant.RacingKings.id :+
-    //chess.variant.LinesOfAction.id :+
     strategygames.chess.variant.FromPosition.id
   val chessVariantsWithVariants =
     chessVariants :+
@@ -184,6 +188,11 @@ trait BaseConfig {
       strategygames.draughts.variant.Brazilian.id :+
       strategygames.draughts.variant.Pool.id :+
       strategygames.draughts.variant.FromPosition.id
+
+  val loaAIVariants = loaVariants
+  val loaFromPositionVariants = loaVariants
+  val loaVariantsWithVariants = loaVariants
+  val loaVariantsWithFenAndVariants = loaVariants
 
   val speeds = Speed.all.map(_.id)
 

@@ -1,6 +1,6 @@
 package lila.puzzle
 
-import strategygames.GameLib
+import strategygames.GameLogic
 import strategygames.format.Forsyth
 import strategygames.format.UciCharPair
 import play.api.libs.json._
@@ -15,7 +15,7 @@ final private class GameJson(
     lightUserApi: lila.user.LightUserApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  val chessLib = GameLib.Chess()
+  val chessLib = GameLogic.Chess()
 
   def apply(gameId: Game.ID, plies: Int, bc: Boolean): Fu[JsObject] =
     (if (bc) bcCache else cache) get writeKey(gameId, plies)

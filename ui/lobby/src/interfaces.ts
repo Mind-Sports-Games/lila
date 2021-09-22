@@ -40,13 +40,13 @@ export interface VariantBoardSize {
   key: string;
 }
 
-export interface GameLib {
+export interface GameLogic {
   id: number;
   name: string;
 }
 
 export interface Variant {
-  gameLib: GameLib;
+  gameLogic: GameLogic;
   key: string;
   name: string;
   boardSize?: VariantBoardSize;

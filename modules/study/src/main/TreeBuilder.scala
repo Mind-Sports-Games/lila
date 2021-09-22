@@ -3,19 +3,19 @@ package lila.study
 import strategygames.opening.FullOpeningDB
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ Game, GameLib }
+import strategygames.{ Game, GameLogic }
 import lila.tree
 
 object TreeBuilder {
 
-  private def initialStandardDests(lib: GameLib) =
+  private def initialStandardDests(lib: GameLogic) =
     Game(lib, Variant.libStandard(lib)).situation.destinations
 
   def apply(root: Node.Root, variant: Variant): tree.Root = {
     val dests =
-      if (variant.standard && root.fen.initial) initialStandardDests(variant.gameLib)
+      if (variant.standard && root.fen.initial) initialStandardDests(variant.gameLogic)
       else {
-        val sit = Game(variant.gameLib, variant.some, root.fen.some).situation
+        val sit = Game(variant.gameLogic, variant.some, root.fen.some).situation
         sit.playable(false) ?? sit.destinations
       }
     makeRoot(root, variant).copy(dests = dests.some)
@@ -36,8 +36,8 @@ object TreeBuilder {
       crazyData = node.crazyData,
       eval = node.score.map(_.eval),
       children = toBranches(node.children, variant),
-      opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? (
-        FullOpeningDB.findByFen(variant.gameLib, node.fen)
+      opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? (
+        FullOpeningDB.findByFen(variant.gameLogic, node.fen)
       ),
       forceVariation = node.forceVariation
     )
@@ -55,8 +55,8 @@ object TreeBuilder {
       crazyData = root.crazyData,
       eval = root.score.map(_.eval),
       children = toBranches(root.children, variant),
-      opening = Variant.openingSensibleVariants(variant.gameLib)(variant) ?? (
-        FullOpeningDB.findByFen(variant.gameLib, root.fen)
+      opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? (
+        FullOpeningDB.findByFen(variant.gameLogic, root.fen)
       ),
     )
 

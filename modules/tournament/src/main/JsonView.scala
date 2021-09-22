@@ -117,7 +117,7 @@ final class JsonView(
             "minutes"   -> tour.minutes,
             "perf"      -> full.option(tour.perfType),
             "clock"     -> full.option(tour.clock),
-            "lib"       -> full.option(tour.variant.gameLib.id),
+            "lib"       -> full.option(tour.variant.gameLogic.id),
             "variant"   -> full.option(tour.variant.key)
           )
           .add("spotlight" -> tour.spotlight)
@@ -290,8 +290,8 @@ final class JsonView(
     Json
       .obj(
         "id"          -> game.id,
-        "gameLib"     -> game.variant.gameLib.name.toLowerCase(),
-        "fen"         -> Forsyth.boardAndColor(game.variant.gameLib, game.situation),
+        "gameLogic"     -> game.variant.gameLogic.name.toLowerCase(),
+        "fen"         -> Forsyth.boardAndColor(game.variant.gameLogic, game.situation),
         "orientation" -> game.naturalOrientation.name,
         "color"       -> game.naturalOrientation.name, // app BC https://github.com/ornicar/lila/issues/7195
         "lastMove"    -> ~game.lastMoveKeys,

@@ -2,7 +2,7 @@ package lila.explorer
 
 import akka.stream.scaladsl._
 import strategygames.Color.{ Black, White }
-import strategygames.GameLib
+import strategygames.GameLogic
 import strategygames.format.pgn.Tag
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -159,8 +159,8 @@ final private class ExplorerIndexer(
           Tag(_.Black, username(Black)),
           Tag(_.WhiteElo, whiteRating),
           Tag(_.BlackElo, blackRating),
-          Tag(_.Result, PgnDump.result(game, game.variant.gameLib match {
-            case GameLib.Draughts() => lila.pref.Pref.default.draughtsResult
+          Tag(_.Result, PgnDump.result(game, game.variant.gameLogic match {
+            case GameLogic.Draughts() => lila.pref.Pref.default.draughtsResult
             case _ => false
           })),
           Tag(_.Date, pgnDateFormat.print(game.createdAt))

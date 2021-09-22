@@ -2,7 +2,7 @@ package controllers
 
 import strategygames.variant.Variant
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ GameLib, Situation }
+import strategygames.{ GameLogic, Situation }
 import play.api.libs.json._
 import views._
 
@@ -35,7 +35,7 @@ final class Editor(env: Env) extends LilaController(env) {
         Ok(
           html.board.editor(
             sit = situation,
-            fen = Forsyth.>>(situation.board.variant.gameLib, situation),
+            fen = Forsyth.>>(situation.board.variant.gameLogic, situation),
             positionsJson
           )
         )
@@ -49,7 +49,7 @@ final class Editor(env: Env) extends LilaController(env) {
         JsonOk(
           html.board.bits.jsData(
             sit = situation,
-            fen = Forsyth.>>(situation.board.variant.gameLib, situation)
+            fen = Forsyth.>>(situation.board.variant.gameLogic, situation)
           )
         )
       }
@@ -59,16 +59,16 @@ final class Editor(env: Env) extends LilaController(env) {
     fen
       .map(_.trim)
       .filter(_.nonEmpty)
-      .map(s => FEN.clean(GameLib.Chess(), s))
-      .flatMap(f => Forsyth.<<<(GameLib.Chess(), f))
-      .map(_.situation) | Situation(GameLib.Chess(), Variant.libStandard(GameLib.Chess()))
+      .map(s => FEN.clean(GameLogic.Chess(), s))
+      .flatMap(f => Forsyth.<<<(GameLogic.Chess(), f))
+      .map(_.situation) | Situation(GameLogic.Chess(), Variant.libStandard(GameLogic.Chess()))
 
   def game(id: String) =
     Open { implicit ctx =>
       OptionResult(env.game.gameRepo game id) { game =>
         Redirect {
           if (game.playable) routes.Round.watcher(game.id, game.variant.startColor.name)
-          else routes.Editor.load(get("fen") | (Forsyth.>>(game.variant.gameLib, game.chess)).value)
+          else routes.Editor.load(get("fen") | (Forsyth.>>(game.variant.gameLogic, game.chess)).value)
         }
       }
     }

@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLib, Piece, PieceMap, Pos, Role, Timestamp, White }
+import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLogic, Piece, PieceMap, Pos, Role, Timestamp, White }
 import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.draughts
@@ -268,9 +268,9 @@ object BinaryFormat {
     }
 
     // cache standard start position
-    def standard(lib: GameLib) = lib match {
-      case GameLib.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
-      case GameLib.Draughts() => writeDraughts(
+    def standard(lib: GameLogic) = lib match {
+      case GameLogic.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
+      case GameLogic.Draughts() => writeDraughts(
         draughts.Board.init(draughts.variant.Standard).pieces,
         draughts.variant.Standard
       )

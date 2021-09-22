@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.{ Status => S, Clock, Mode, Color, Black, White, GameLib }
+import strategygames.{ Status => S, Clock, Mode, Color, Black, White, GameLogic }
 import strategygames.variant.Variant
 import controllers.routes
 import play.api.i18n.Lang
@@ -28,7 +28,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
   def titleGame(g: Game) = {
     val speed   = strategygames.Speed(g.clock.map(_.config)).name
     val variant = g.variant.exotic ?? s" ${g.variant.name}"
-    s"$speed$variant ${g.variant.gameLib.name} • ${playerText(g.whitePlayer)} vs ${playerText(g.blackPlayer)}"
+    s"$speed$variant ${g.variant.gameLogic.name} • ${playerText(g.whitePlayer)} vs ${playerText(g.blackPlayer)}"
   }
 
   def describePov(pov: Pov) = {
@@ -43,12 +43,12 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         }
     val mode = game.mode.name
     val variant =
-      if (game.variant == Variant.libFromPosition(game.variant.gameLib)) s"position setup ${game.variant.gameLib.name}"
+      if (game.variant == Variant.libFromPosition(game.variant.gameLogic)) s"position setup ${game.variant.gameLogic.name}"
       else if (game.variant.exotic) game.variant.name
-      else game.variant.gameLib.name.toLowerCase()
+      else game.variant.gameLogic.name.toLowerCase()
     import strategygames.Status._
-    val result = (game.winner, game.loser, game.status, game.variant.gameLib) match {
-      case (Some(w), _, Mate, GameLib.Chess())                 => s"${playerText(w)} won by checkmate"
+    val result = (game.winner, game.loser, game.status, game.variant.gameLogic) match {
+      case (Some(w), _, Mate, GameLogic.Chess())                 => s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate, _)                               => s"${playerText(w)} won"
       case (_, Some(l), Resign | Timeout | Cheat | NoStart, _) => s"${playerText(l)} resigned"
       case (_, Some(l), Outoftime, _)                          => s"${playerText(l)} forfeits by time"
@@ -176,8 +176,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
   def gameEndStatus(game: Game)(implicit lang: Lang): String =
     game.status match {
       case S.Aborted => trans.gameAborted.txt()
-      case S.Mate    => game.variant.gameLib match {
-        case GameLib.Chess() => trans.checkmate.txt()
+      case S.Mate    => game.variant.gameLogic match {
+        case GameLogic.Chess() => trans.checkmate.txt()
         case _               => ""
       }
       case S.Resign =>

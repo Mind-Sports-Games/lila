@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.GameLib
+import strategygames.GameLogic
 import strategygames.format.FEN
 
 case class ValidFen(fen: FEN, situation: strategygames.Situation) {
@@ -12,8 +12,8 @@ object ValidFen {
 
   def apply(strict: Boolean)(fen: FEN): Option[ValidFen] = {
     val lib = fen match {
-      case FEN.Chess(_) => GameLib.Chess()
-      case FEN.Draughts(_) => GameLib.Draughts()
+      case FEN.Chess(_) => GameLogic.Chess()
+      case FEN.Draughts(_) => GameLogic.Draughts()
     }
     for {
       parsed <- strategygames.format.Forsyth.<<<(lib, fen)

@@ -1,7 +1,7 @@
 import flatpickr from 'flatpickr';
 
 playstrategy.load.then(() => {
-  const $gameLib = $('#form3-gameLib'),
+  const $gameFamily = $('#form3-gameFamily'),
     $chessVariant = $('#form3-chessVariant'),
     $draughtsVariant = $('#form3-draughtsVariant'),
     showPositionChess = () =>
@@ -13,12 +13,13 @@ playstrategy.load.then(() => {
   $draughtsVariant.on('change', showPositionDraughts);
   showPositionChess();
 
-  $gameLib
+  $gameFamily
     .on('change', function (this: HTMLElement) {
-      const gameLib = $(this).val();
-      $('.form3 .chessVariant').toggle(gameLib == '0');
-      $('.form3 .draughtsVariant').toggle(gameLib == '1');
-      $('.form3 .drawTables').toggle(gameLib == '1');
+      const gameFamily = $(this).val();
+      $('.form3 .chessVariant').toggle(gameFamily == '0');
+      $('.form3 .draughtsVariant').toggle(gameFamily == '1');
+      $('.form3 .loaVariant').toggle(gameFamily == '2');
+      $('.form3 .drawTables').toggle(gameFamily == '1');
     })
     .trigger('change');
 

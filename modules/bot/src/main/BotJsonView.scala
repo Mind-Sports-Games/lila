@@ -7,7 +7,7 @@ import lila.common.Json.jodaWrites
 import lila.game.JsonView._
 import lila.game.{ Game, GameRepo, Pov }
 
-import strategygames.GameLib
+import strategygames.GameLogic
 
 final class BotJsonView(
     lightUserApi: lila.user.LightUserApi,
@@ -47,7 +47,7 @@ final class BotJsonView(
 
   def gameState(wf: Game.WithInitialFen): Fu[JsObject] = {
     import wf._
-    strategygames.format.UciDump(game.variant.gameLib, game.pgnMoves, fen, game.variant).toFuture map { uciMoves =>
+    strategygames.format.UciDump(game.variant.gameLogic, game.pgnMoves, fen, game.variant).toFuture map { uciMoves =>
       Json
         .obj(
           "type"   -> "gameState",

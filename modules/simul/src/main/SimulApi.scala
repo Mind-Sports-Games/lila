@@ -2,7 +2,7 @@ package lila.simul
 
 import akka.actor._
 import strategygames.variant.Variant
-import strategygames.GameLib
+import strategygames.GameLogic
 import play.api.libs.json.Json
 import scala.concurrent.duration._
 
@@ -88,7 +88,7 @@ final class SimulApi(
       if (simul.nbAccepted >= Game.maxPlayingRealtime) simul
       else {
         timeline ! (Propagate(SimulJoin(user.id, simul.id, simul.fullName)) toFollowersOf user.id)
-        Variant(GameLib.Chess(), variantKey).filter(simul.variants.contains).fold(simul) { variant =>
+        Variant(GameLogic.Chess(), variantKey).filter(simul.variants.contains).fold(simul) { variant =>
           simul addApplicant SimulApplicant.make(
             SimulPlayer.make(
               user,
@@ -247,10 +247,10 @@ final class SimulApi(
             lila.game.PerfPicker.mainOrDefault(strategygames.Speed(clock.config), pairing.player.variant, none)
           game1 = Game.make(
             chess = strategygames.Game(
-                GameLib.Chess(),
+                GameLogic.Chess(),
                 variant = Some {
                   if (simul.position.isEmpty) pairing.player.variant
-                  else Variant.libFromPosition(GameLib.Chess())
+                  else Variant.libFromPosition(GameLogic.Chess())
                 },
                 fen = simul.position
               )

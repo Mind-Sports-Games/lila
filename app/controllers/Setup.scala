@@ -6,7 +6,7 @@ import play.api.mvc.Results
 import scala.concurrent.duration._
 
 import strategygames.format.FEN
-import strategygames.GameLib
+import strategygames.{ GameFamily, GameLogic }
 
 import lila.api.{ BodyContext, Context }
 import lila.app._
@@ -36,16 +36,16 @@ final class Setup(
   )
 
   // Defaults to chess if it's not provided, otherwise will take the version provided from the request.
-  private def gameLib(libId: Option[Int]): GameLib = GameLib(libId.getOrElse(0))
+  private def gameLogic(libId: Option[Int]): GameLogic = GameFamily(libId.getOrElse(0)).codeLib
 
   def aiForm =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        fuccess(forms aiFilled(get("fen").map(s => FEN.clean(GameLib.Chess(), s)))) map { form =>
+        fuccess(forms aiFilled(get("fen").map(s => FEN.clean(GameLogic.Chess(), s)))) map { form =>
           html.setup.forms.ai(
             form,
             env.fishnet.aiPerfApi.intRatings,
-            form("fen").value map(s => FEN.clean(GameLib.Chess(), s)) flatMap ValidFen(getBool("strict"))
+            form("fen").value map(s => FEN.clean(GameLogic.Chess(), s)) flatMap ValidFen(getBool("strict"))
           )
         }
       } else Redirect(s"${routes.Lobby.home}#ai").fuccess
@@ -59,7 +59,7 @@ final class Setup(
   def friendForm(userId: Option[String]) =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        val lib = gameLib(getInt("lib"))
+        val lib = gameLogic(getInt("lib"))
         fuccess(forms friendFilled(lib, get("fen").map(s => FEN.clean(lib, s)))) flatMap { form =>
           val validFen = form("fen").value map(s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
           userId ?? env.user.repo.named flatMap {
@@ -254,7 +254,7 @@ final class Setup(
 
   def validateFen =
     Open { implicit ctx =>
-      get("fen") map(s => FEN.clean(gameLib(getInt("lib")), s)) flatMap ValidFen(getBool("strict")) match {
+      get("fen") map(s => FEN.clean(gameLogic(getInt("lib")), s)) flatMap ValidFen(getBool("strict")) match {
         case None    => BadRequest.fuccess
         case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.color)).fuccess
       }

@@ -6,7 +6,7 @@ import strategygames.chess.format.pgn.{ Parser }
 import strategygames.format.pgn.{ ParsedPgn, Reader, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.{ Variant => StratVariant }
-import strategygames.{ Board, Color, Game => StratGame, GameLib, Mode, Replay, Status }
+import strategygames.{ Board, Color, Game => StratGame, GameLogic, Mode, Replay, Status }
 import play.api.data._
 import play.api.data.Forms._
 import scala.util.chaining._
@@ -62,7 +62,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
   def preprocess(user: Option[String]): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>
     Parser.full(pgn) flatMap { parsed =>
       Reader.fullWithSans(
-        GameLib.Chess(),
+        GameLogic.Chess(),
         pgn,
         sans => sans.copy(value = sans.value take maxPlies),
         Tags.empty
@@ -73,7 +73,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           case Board.Chess(board) => board
           case _ => sys.error("Importer doesn't support draughts yet")
         }
-        val initBoard    = parsed.tags.fen.map(fen => Forsyth.<<(GameLib.Chess(), fen).map(_.board))
+        val initBoard    = parsed.tags.fen.map(fen => Forsyth.<<(GameLogic.Chess(), fen).map(_.board))
         val fromPosition = initBoard.nonEmpty && !parsed.tags.fen.exists(_.initial)
         val variant = StratVariant.wrap({
           val chessVariant = parsed.tags.variant match {
@@ -94,8 +94,8 @@ case class ImportData(pgn: String, analyse: Option[String]) {
         })
         val game = state.copy(situation = state.situation withVariant variant)
         val initialFen = parsed.tags.fen
-          .flatMap(fen => Forsyth.<<<@(GameLib.Chess(), variant, fen))
-          .map(situation => Forsyth.>>(GameLib.Chess(), situation))
+          .flatMap(fen => Forsyth.<<<@(GameLogic.Chess(), variant, fen))
+          .map(situation => Forsyth.>>(GameLogic.Chess(), situation))
 
         val status = parsed.tags(_.Termination).map(_.toLowerCase) match {
           case Some("normal") | None                   => Status.Resign

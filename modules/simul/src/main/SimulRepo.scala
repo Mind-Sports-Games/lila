@@ -3,7 +3,7 @@ package lila.simul
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 
-import strategygames.GameLib
+import strategygames.GameLogic
 import strategygames.Color.{ Black, White }
 import strategygames.Status
 import strategygames.variant.Variant
@@ -14,7 +14,7 @@ import lila.db.dsl._
 import lila.user.User
 
 final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
-  val lib = GameLib.Chess()
+  val lib = GameLogic.Chess()
 
   implicit private val SimulStatusBSONHandler = tryHandler[SimulStatus](
     { case BSONInteger(v) => SimulStatus(v) toTry s"No such simul status: $v" },
@@ -23,11 +23,11 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
   implicit private val ChessStatusBSONHandler = lila.game.BSONHandlers.StatusBSONHandler
 
   implicit val VariantBSONHandler = new BSON[Variant] {
-    def reads(r: Reader) = Variant(GameLib(r.intD("gl")), r.int("v")) match {
+    def reads(r: Reader) = Variant(GameLogic(r.intD("gl")), r.int("v")) match {
       case Some(v) => v
-      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelib: ${r.intD("gl")}")
+      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
     }
-    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLib.id, "v" -> v.id)
+    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLogic.id, "v" -> v.id)
   }
 
   import strategygames.Clock.Config

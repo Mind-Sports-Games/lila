@@ -116,6 +116,6 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
       }
 
     private def fen(game: StratGame): String =
-      Forsyth.exportBoard(game.board.variant.gameLib, game.board)
+      Forsyth.exportBoard(game.board.variant.gameLogic, game.board)
   }
 }

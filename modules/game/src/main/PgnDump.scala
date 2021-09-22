@@ -4,7 +4,7 @@ import strategygames.chess.format.pgn.{ Parser, Pgn }
 import strategygames.format.pgn.{ ParsedPgn, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ pgn => chessPgn }
-import strategygames.{ Centis, Color, GameLib, Status }
+import strategygames.{ Centis, Color, GameLogic, Status }
 import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
@@ -49,7 +49,7 @@ final class PgnDump(
       else fuccess(Tags(Nil))
     tagsFuture map { ts =>
       val turns = flags.moves ?? {
-        val fenSituation = ts.fen.flatMap{fen => Forsyth.<<<(game.variant.gameLib, fen)}
+        val fenSituation = ts.fen.flatMap{fen => Forsyth.<<<(game.variant.gameLogic, fen)}
         makeTurns(
           game.variant match {
             case Variant.Draughts(variant) => {
@@ -233,7 +233,7 @@ final class PgnDump(
             )
           )
           case _ => List(
-            Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLib)).value),
+            Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLogic)).value),
             Tag("SetUp", "1")
           )
         })

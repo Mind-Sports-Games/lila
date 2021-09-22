@@ -170,7 +170,7 @@ final private class Player(
     val color = moveOrDrop.fold(_.color, _.color)
     val moveEvent = MoveEvent(
       gameId = game.id,
-      fen = Forsyth.exportBoard(game.board.variant.gameLib, game.board),
+      fen = Forsyth.exportBoard(game.board.variant.gameLogic, game.board),
       move = moveOrDrop.fold(_.toUci.keys, _.toUci.uci)
     )
 

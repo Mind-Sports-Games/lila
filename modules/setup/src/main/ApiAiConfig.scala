@@ -2,7 +2,7 @@ package lila.setup
 
 import strategygames.Clock
 import strategygames.Color.{ Black, White }
-import strategygames.{ Game => StratGame, GameLib }
+import strategygames.{ Game => StratGame, GameFamily }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition }
@@ -74,21 +74,23 @@ object ApiAiConfig extends BaseConfig {
       lib: Int,
       cv: Option[String],
       dv: Option[String],
+      lv: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       c: Option[String],
       pos: Option[String]
   ) =
     new ApiAiConfig(
-      variant = Variant.wrap(lib match {
-        case 0 => strategygames.chess.variant.Variant.orDefault(~cv)
-        case 1 => strategygames.chess.variant.Variant.orDefault(~dv)
-      }),
+      variant = lib match {
+        case 0 => Variant.Chess(strategygames.chess.variant.Variant.orDefault(~cv))
+        case 1 => Variant.Draughts(strategygames.draughts.variant.Variant.orDefault(~dv))
+        case 2 => Variant.Chess(strategygames.chess.variant.Variant.orDefault(~lv))
+      },
       fenVariant = none,
       clock = cl,
       daysO = d,
       color = Color.orDefault(~c),
       level = l,
-      fen = pos.map(f => FEN.apply(GameLib(lib), f))
+      fen = pos.map(f => FEN.apply(GameFamily(lib).codeLib, f))
     ).autoVariant
 }

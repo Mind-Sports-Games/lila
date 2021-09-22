@@ -4,7 +4,7 @@ import scalatags.Text.all._
 
 import reactivemongo.api.bson._
 
-import strategygames.{ GameLib, Role }
+import strategygames.{ GameLogic, Role }
 
 sealed abstract class Metric(
     val key: String,
@@ -236,7 +236,7 @@ object Metric {
           MetricValue(BSONInteger(r.id), MetricValueName(r.name))
         }
       case PieceRole =>
-        Role.all(GameLib.Chess()).reverse.map { r =>
+        Role.all(GameLogic.Chess()).reverse.map { r =>
           MetricValue(BSONString(r.forsyth.toString), MetricValueName(r.toString))
         }
       case CplBucket =>

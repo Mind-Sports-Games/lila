@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
 
-import strategygames.{ GameLib, Situation, Speed }
+import strategygames.{ GameLogic, Situation, Speed }
 import strategygames.Color.{ Black, White }
 
 import lila.common.Bus
@@ -107,8 +107,8 @@ final class ChallengeBulkApi(
           .make(
             chess = strategygames
               .Game(
-                bulk.variant.gameLib,
-                situation = Situation(bulk.variant.gameLib, bulk.variant),
+                bulk.variant.gameLogic,
+                situation = Situation(bulk.variant.gameLogic, bulk.variant),
                 clock = bulk.clock.toClock.some
               ),
             whitePlayer = Player.make(White, white.some, _(perfType)),

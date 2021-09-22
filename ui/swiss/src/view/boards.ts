@@ -12,12 +12,12 @@ export function top(boards: Board[]): VNode {
 }
 
 const renderBoardClasses = (board: Board): string =>
-  board.gameLib === 'draughts' && !!board.boardSize
-    ? `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLib}.is${board.boardSize.key}`
-    : `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLib}`;
+  board.gameLogic === 'draughts' && !!board.boardSize
+    ? `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLogic}.is${board.boardSize.key}`
+    : `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLogic}`;
 
 const renderBoardState = (board: Board): string =>
-  board.gameLib === 'draughts' && !!board.boardSize
+  board.gameLogic === 'draughts' && !!board.boardSize
     ? `${board.fen}|${board.boardSize.size[0]}x${board.boardSize.size[1]}|${board.orientation}|${board.lastMove}`
     : `${board.fen},${board.orientation},${board.lastMove}`;
 

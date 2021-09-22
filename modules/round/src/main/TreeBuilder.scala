@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Color, Centis, Game, GameLib, Pos, Replay, Situation }
+import strategygames.{ Color, Centis, Game, GameLogic, Pos, Replay, Situation }
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
@@ -23,8 +23,8 @@ object TreeBuilder {
 
   def fullOpeningOf(fen: FEN): Option[FullOpening] =
     fen match {
-      case FEN.Chess(fen)    => FullOpeningDB.findByFen(GameLib.Chess(), FEN.Chess(fen))
-      case FEN.Draughts(fen) => FullOpeningDB.findByFen(GameLib.Draughts(), FEN.Draughts(fen))
+      case FEN.Chess(fen)    => FullOpeningDB.findByFen(GameLogic.Chess(), FEN.Chess(fen))
+      case FEN.Draughts(fen) => FullOpeningDB.findByFen(GameLogic.Draughts(), FEN.Draughts(fen))
     }
 
   def apply(
@@ -36,7 +36,7 @@ object TreeBuilder {
     val withClocks: Option[Vector[Centis]] = withFlags.clocks ?? game.bothClockStates
     val drawOfferPlies                     = game.drawOffers.normalizedPlies
     Replay.gameMoveWhileValid(
-      game.variant.gameLib,
+      game.variant.gameLogic,
       game.pgnMoves,
       initialFen,
       game.variant
@@ -44,9 +44,9 @@ object TreeBuilder {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val openingOf: OpeningOf =
-          if (withFlags.opening && Variant.openingSensibleVariants(game.variant.gameLib)(game.variant)) fullOpeningOf
+          if (withFlags.opening && Variant.openingSensibleVariants(game.variant.gameLogic)(game.variant)) fullOpeningOf
           else _ => None
-        val fen                 = Forsyth.>>(game.variant.gameLib, init)
+        val fen                 = Forsyth.>>(game.variant.gameLogic, init)
         val infos: Vector[Info] = analysis.??(_.infos.toVector)
         val advices: Map[Ply, Advice] = analysis.??(_.advices.view.map { a =>
           a.ply -> a
@@ -65,11 +65,11 @@ object TreeBuilder {
           eval = infos lift 0 map makeEval
         )
         def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
-          val fen    = Forsyth.>>(g.situation.board.variant.gameLib, g)
+          val fen    = Forsyth.>>(g.situation.board.variant.gameLogic, g)
           val info   = infos lift (index - 1)
           val advice = advices get g.turns
           val branch = Branch(
-            id = UciCharPair(g.situation.board.variant.gameLib, m.uci),
+            id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.turns,
             move = m,
             fen = fen,
@@ -97,7 +97,7 @@ object TreeBuilder {
           )
           advices.get(g.turns + 1).flatMap { adv =>
             games.lift(index - 1).map { case (fromGame, _) =>
-              withAnalysisChild(game.id, branch, game.variant, Forsyth.>>(game.variant.gameLib, fromGame), openingOf)(adv.info)
+              withAnalysisChild(game.id, branch, game.variant, Forsyth.>>(game.variant.gameLogic, fromGame), openingOf)(adv.info)
             }
           } getOrElse branch
         }
@@ -126,9 +126,9 @@ object TreeBuilder {
       openingOf: OpeningOf
   )(info: Info): Branch = {
     def makeBranch(g: Game, m: Uci.WithSan) = {
-      val fen = Forsyth.>>(variant.gameLib, g)
+      val fen = Forsyth.>>(variant.gameLogic, g)
       Branch(
-        id = UciCharPair(variant.gameLib, m.uci),
+        id = UciCharPair(variant.gameLogic, m.uci),
         ply = g.turns,
         move = m,
         fen = fen,
@@ -139,7 +139,7 @@ object TreeBuilder {
       )
     }
     Replay.gameMoveWhileValid(
-      variant.gameLib,
+      variant.gameLogic,
       info.variation take 20,
       fromFen,
       variant

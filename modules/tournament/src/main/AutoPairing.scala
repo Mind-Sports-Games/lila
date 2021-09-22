@@ -1,6 +1,6 @@
 package lila.tournament
 
-import strategygames.{ Black, Color, White, Game => StratGame, GameLib }
+import strategygames.{ Black, Color, White, Game => StratGame, GameLogic }
 import strategygames.variant.Variant
 import scala.util.chaining._
 
@@ -26,10 +26,10 @@ final class AutoPairing(
     val game = Game
       .make(
         chess = StratGame(
-          tour.variant.gameLib,
+          tour.variant.gameLogic,
           Some {
             if (tour.position.isEmpty) tour.variant
-            else Variant.libFromPosition(tour.variant.gameLib)
+            else Variant.libFromPosition(tour.variant.gameLogic)
           },
           tour.position
         ) pipe { g =>

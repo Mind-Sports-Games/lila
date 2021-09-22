@@ -2,7 +2,7 @@ package lila.evalCache
 
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ Game, GameLib }
+import strategygames.{ Game, GameLogic }
 import org.joda.time.DateTime
 import play.api.libs.json.JsObject
 import scala.concurrent.duration._
@@ -96,5 +96,5 @@ final class EvalCacheApi(
     }
 
   private def destSize(fen: FEN): Int =
-    Game(GameLib.Chess(), Variant.libStandard(GameLib.Chess()).some, fen.some).situation.destinations.size
+    Game(GameLogic.Chess(), Variant.libStandard(GameLogic.Chess()).some, fen.some).situation.destinations.size
 }

@@ -3,7 +3,7 @@ package views.html.board
 import play.api.libs.json.{ JsObject, Json }
 
 import strategygames.variant.Variant
-import strategygames.GameLib
+import strategygames.GameLogic
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -56,7 +56,7 @@ object userAnalysis {
           views.html.base.bits.mselect(
             "analyse-variant",
             span(cls := "text", dataIcon := iconByVariant(pov.game.variant))(pov.game.variant.name),
-            Variant.all(GameLib.Chess()).filterNot(noAnalysisVariants.contains(_)).map { v =>
+            Variant.all(GameLogic.Chess()).filterNot(noAnalysisVariants.contains(_)).map { v =>
               a(
                 dataIcon := iconByVariant(v),
                 cls := (pov.game.variant == v).option("current"),

@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.pgn.{ Tag, Tags }
 import strategygames.variant.Variant
-import strategygames.{ GameLib, Pos }
+import strategygames.{ GameLogic, Pos }
 import play.api.libs.json._
 import scala.util.chaining._
 
@@ -133,7 +133,7 @@ object JsonView {
     JsString(u.uci)
   }
   implicit private val posReader: Reads[Pos] = Reads[Pos] { v =>
-    (v.asOpt[String] flatMap {p => Pos.fromKey(GameLib.Chess(), p)}).fold[JsResult[Pos]](JsError(Nil))(JsSuccess(_))
+    (v.asOpt[String] flatMap {p => Pos.fromKey(GameLogic.Chess(), p)}).fold[JsResult[Pos]](JsError(Nil))(JsSuccess(_))
   }
   implicit private[study] val pathWrites: Writes[Path] = Writes[Path] { p =>
     JsString(p.toString)

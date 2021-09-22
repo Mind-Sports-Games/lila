@@ -5,7 +5,7 @@ import lila.db.BSON
 import lila.db.BSON.{ Reader, Writer }
 import reactivemongo.api.bson._
 
-import strategygames.GameLib
+import strategygames.GameLogic
 import strategygames.variant.Variant
 
 private object BSONHandlers {
@@ -26,11 +26,11 @@ private object BSONHandlers {
   implicit val ClientBSONHandler = Macros.handler[Client]
 
   implicit val VariantBSONHandler = new BSON[Variant] {
-    def reads(r: Reader) = Variant(GameLib(r.intD("gl")), r.int("v")) match {
+    def reads(r: Reader) = Variant(GameLogic(r.intD("gl")), r.int("v")) match {
       case Some(v) => v
-      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelib: ${r.intD("gl")}")
+      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
     }
-    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLib.id, "v" -> v.id)
+    def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLogic.id, "v" -> v.id)
   }
 
   implicit val WorkIdBSONHandler = stringAnyValHandler[Work.Id](_.value, Work.Id.apply)

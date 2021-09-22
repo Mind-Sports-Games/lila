@@ -2,7 +2,7 @@ package lila.puzzle
 
 import cats.data.NonEmptyList
 import strategygames.format.{ FEN, Forsyth, Uci }
-import strategygames.{ Color, GameLib }
+import strategygames.{ Color, GameLogic }
 
 import lila.rating.Glicko
 
@@ -25,9 +25,9 @@ case class Puzzle(
 
   lazy val fenAfterInitialMove: FEN = {
     for {
-      sit1 <- Forsyth.<<(GameLib.Chess(), fen)
+      sit1 <- Forsyth.<<(GameLogic.Chess(), fen)
       sit2 <- sit1.move(line.head).toOption.map(_.situationAfter)
-    } yield Forsyth.>>(GameLib.Chess(), sit2)
+    } yield Forsyth.>>(GameLogic.Chess(), sit2)
   } err s"Can't apply puzzle $id first move"
 
   def color = fen.color.fold[Color](Color.White)(!_)

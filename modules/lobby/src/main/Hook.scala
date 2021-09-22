@@ -1,6 +1,6 @@
 package lila.lobby
 
-import strategygames.{ Clock, GameLib, Mode, Speed }
+import strategygames.{ Clock, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.i18n.Lang
@@ -16,7 +16,7 @@ case class Hook(
     id: String,
     sri: Sri,            // owner socket sri
     sid: Option[String], // owner cookie (used to prevent multiple hooks)
-    lib: GameLib,
+    lib: GameLogic,
     variant: Int,
     clock: Clock.Config,
     mode: Int,
@@ -126,7 +126,7 @@ object Hook {
     new Hook(
       id = lila.common.ThreadLocalRandom nextString idSize,
       sri = sri,
-      lib = variant.gameLib,
+      lib = variant.gameLogic,
       variant = variant.id,
       clock = clock,
       mode = mode.id,

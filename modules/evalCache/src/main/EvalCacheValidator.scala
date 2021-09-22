@@ -1,6 +1,6 @@
 package lila.evalCache
 
-import strategygames.{ GameLib, Replay }
+import strategygames.{ GameLogic, Replay }
 
 private object Validator {
 
@@ -10,12 +10,12 @@ private object Validator {
     in.eval.pvs.toList.foldLeft(none[Error]) {
       case (None, pv) =>
         Replay.boardsFromUci(
-          in.id.variant.gameLib,
+          in.id.variant.gameLogic,
           pv.moves.value.toList,
           in.fen.some,
           in.id.variant,
-          in.id.variant.gameLib match {
-            case GameLib.Draughts() => true
+          in.id.variant.gameLogic match {
+            case GameLogic.Draughts() => true
             case _ => false
           }
         )

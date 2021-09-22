@@ -45,13 +45,13 @@ final class LobbyApi(
       .obj(
         "fullId"   -> pov.fullId,
         "gameId"   -> pov.gameId,
-        "fen"      -> Forsyth.exportBoard(pov.game.variant.gameLib, pov.game.board),
+        "fen"      -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
         "color"    -> (if (pov.game.variant.racingKings) White else pov.color).name,
         "lastMove" -> ~pov.game.lastMoveKeys,
         "variant" -> Json.obj(
-          "gameLib" -> Json.obj(
-            "id" -> pov.game.variant.gameLib.id,
-            "name" -> pov.game.variant.gameLib.name,
+          "gameLogic" -> Json.obj(
+            "id" -> pov.game.variant.gameLogic.id,
+            "name" -> pov.game.variant.gameLogic.name,
           ),
           "key"  -> pov.game.variant.key,
           "name" -> pov.game.variant.name,

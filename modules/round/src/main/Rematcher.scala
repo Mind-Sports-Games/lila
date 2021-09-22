@@ -113,7 +113,7 @@ final private class Rematcher(
   private def returnGame(game: Game): Fu[Game] = {
     for {
       initialFen <- gameRepo initialFen game
-      situation = initialFen.flatMap{fen => Forsyth.<<<(game.variant.gameLib, fen)}
+      situation = initialFen.flatMap{fen => Forsyth.<<<(game.variant.gameLogic, fen)}
       pieces: PieceMap = game.variant match {
         case Variant.Chess(Chess960) =>
           if (chess960 get game.id) chessPieceMap(Chess960.pieces)
@@ -122,24 +122,24 @@ final private class Rematcher(
           )(_.situation.board.pieces)
         case Variant.Chess(FromPosition) =>
           situation.fold(
-            Variant.libStandard(game.variant.gameLib).pieces
+            Variant.libStandard(game.variant.gameLogic).pieces
           )(_.situation.board.pieces)
         case variant =>
           variant.pieces
       }
       users <- userRepo byIds game.userIds
-      board = Board(game.variant.gameLib, pieces, variant = game.variant).withHistory(
+      board = Board(game.variant.gameLogic, pieces, variant = game.variant).withHistory(
         History(
-          game.variant.gameLib,
+          game.variant.gameLogic,
           lastMove = situation.flatMap(_.situation.board.history.lastMove),
           castles = situation.fold(Castles.init)(_.situation.board.history.castles)
         )
       )
       game <- Game.make(
         chess = ChessGame(
-          game.variant.gameLib,
+          game.variant.gameLogic,
           situation = Situation(
-            game.variant.gameLib,
+            game.variant.gameLogic,
             board = board,
             color = situation.fold[Color](White)(_.situation.color)
           ),

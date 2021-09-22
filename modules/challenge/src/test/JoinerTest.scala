@@ -2,7 +2,7 @@ package lila.challenge
 
 import strategygames.chess.variant.Variant
 import strategygames.format.FEN
-import strategygames.{ Clock, GameLib, Mode }
+import strategygames.{ Clock, GameLogic, Mode }
 import org.specs2.mutable._
 
 import lila.game.Game
@@ -30,7 +30,7 @@ final class JoinerTest extends Specification {
       val position = "r1bqkbnr/ppp2ppp/2npp3/8/8/2NPP3/PPP2PPP/R1BQKBNR w KQkq - 2 4"
       val challenge = Challenge.make(
         variant = FromPosition,
-        initialFen = Some(FEN(GameLib.Chess(), position)),
+        initialFen = Some(FEN(GameLogic.Chess(), position)),
         timeControl = Challenge.TimeControl.Clock(Clock.Config(300, 0)),
         mode = Mode.Casual,
         color = "white",

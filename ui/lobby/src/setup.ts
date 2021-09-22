@@ -134,9 +134,10 @@ export default class Setup {
       $modeChoices = $modeChoicesWrap.find('input'),
       $casual = $modeChoices.eq(0),
       $rated = $modeChoices.eq(1),
-      $gameLibSelect = $form.find('#sf_gameLib'),
+      $gameFamilySelect = $form.find('#sf_gameFamily'),
       $chessVariantSelect = $form.find('#sf_chessVariant'),
       $draughtsVariantSelect = $form.find('#sf_draughtsVariant'),
+      $loaVariantSelect = $form.find('#sf_loaVariant'),
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
@@ -150,13 +151,15 @@ export default class Setup {
       $submits = $form.find('.color-submits__button'),
       toggleButtons = () => {
         randomColorVariants;
-        const gameLibId = $gameLibSelect.val(),
+        const gameFamilyId = $gameFamilySelect.val(),
           variantId = () => {
-            switch (gameLibId) {
+            switch (gameFamilyId) {
               case '0':
                 return $chessVariantSelect.val();
               case '1':
                 return $draughtsVariantSelect.val();
+              case '2':
+                return $loaVariantSelect.val();
             }
             return $chessVariantSelect.val();
           },
@@ -200,7 +203,7 @@ export default class Setup {
     const showRating = () => {
       const timeMode = $timeModeSelect.val();
       let key = 'correspondence';
-      switch ($gameLibSelect.val()) {
+      switch ($gameFamilySelect.val()) {
         case '0':
           switch ($chessVariantSelect.val()) {
             case '1':
@@ -239,9 +242,6 @@ export default class Setup {
             case '9':
               key = 'racingKings';
               break;
-            case '11':
-              key = 'linesOfAction';
-              break;
             default:
               key = 'standard';
               break;
@@ -270,6 +270,13 @@ export default class Setup {
               break;
             case '13':
               key = 'pool';
+              break;
+          }
+          break;
+        case '2':
+          switch ($loaVariantSelect.val()) {
+            case '11':
+              key = 'linesOfAction';
               break;
           }
           break;
@@ -330,6 +337,7 @@ export default class Setup {
     if (this.root.opts.blindMode) {
       $chessVariantSelect[0]!.focus();
       $draughtsVariantSelect[0]!.focus();
+      $loaVariantSelect[0]!.focus();
       $timeInput.add($incrementInput).on('change', () => {
         toggleButtons();
         showRating();
@@ -458,21 +466,23 @@ export default class Setup {
     $fenInput.on('keyup', validateFen);
 
     if (forceFromPosition) {
-      switch ($gameLibSelect.val()) {
+      switch ($gameFamilySelect.val()) {
         case '0':
           $chessVariantSelect.val('3');
           break;
         case '1':
           $draughtsVariantSelect.val('3');
           break;
+        //TODO: Add LOA from position?
       }
     }
 
-    $gameLibSelect
+    $gameFamilySelect
       .on('change', function (this: HTMLElement) {
-        const gameLib = $(this).val();
-        $form.find('.chessVariant').toggle(gameLib == '0');
-        $form.find('.draughtsVariant').toggle(gameLib == '1');
+        const gameFamily = $(this).val();
+        $form.find('.chessVariant').toggle(gameFamily == '0');
+        $form.find('.draughtsVariant').toggle(gameFamily == '1');
+        $form.find('.loaVariant').toggle(gameFamily == '2');
       })
       .trigger('change');
 
@@ -500,6 +510,13 @@ export default class Setup {
           $casual.trigger('click');
           requestAnimationFrame(() => document.body.dispatchEvent(new Event('draughtsground.resize')));
         }
+        showRating();
+        toggleButtons();
+      })
+      .trigger('change');
+
+    $loaVariantSelect
+      .on('change', function (this: HTMLElement) {
         showRating();
         toggleButtons();
       })

@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Black, Board, Centis, Clock, Color, GameLib, History, White }
+import strategygames.{ Black, Board, Centis, Clock, Color, GameLogic, History, White }
 import strategygames.chess.CheckCount
 import strategygames.chess.variant.Crazyhouse
 import strategygames.draughts.KingMoves
@@ -67,7 +67,7 @@ object GameDiff {
         ByteArrayBSONHandler.writeOpt(BinaryFormat.clockHistory.writeSide(x, y, z))
       }
 
-    if (a.variant.gameLib == GameLib.Draughts()){
+    if (a.variant.gameLogic == GameLogic.Draughts()){
       a.pdnStorage match {
         case Some(PdnStorage.OldBin) => {
           dTry(oldPgn, _.pgnMoves, writeBytes compose PdnStorage.OldBin.encode)
