@@ -32,8 +32,6 @@ object side {
             p(
               s.clock.show,
               separator,
-              if (s.settings.isMicroMatch) "x2", // TODO: we should have a better way of displaying this.
-              separator,
               if (s.variant.exotic) {
                 views.html.game.bits.variantLink(
                   s.variant,
@@ -45,8 +43,13 @@ object side {
               if (s.settings.rated) trans.ratedTournament() else trans.casualTournament()
             ),
             p(
-              span(cls := "swiss__meta__round")(s"${s.round}/${s.settings.nbRounds}"),
-              " rounds",
+              span(cls := "swiss__meta__round")(
+                if (s.settings.isMicroMatch){(title := trans.microMatchDefinition.txt())},
+                s"${s.round}/${s.settings.nbRounds}",
+                if (s.settings.isMicroMatch){
+                  " micro-match rounds"
+                  } else " rounds"
+              ),
               separator,
               a(href := routes.Swiss.home)("Swiss"),
               (isGranted(_.ManageTournament) || (ctx.userId.has(s.createdBy) && !s.isFinished)) option frag(
