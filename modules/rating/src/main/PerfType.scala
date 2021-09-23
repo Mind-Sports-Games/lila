@@ -131,6 +131,16 @@ object PerfType {
         iconChar = '.'
       )
 
+  case object FiveCheck
+      extends PerfType(
+        22,
+        key = "fiveCheck",
+        name = Variant.Chess(strategygames.chess.variant.FiveCheck).name,
+        title = "Five-check variant",
+        iconChar = '.'
+      )
+
+
   case object Horde
       extends PerfType(
         16,
