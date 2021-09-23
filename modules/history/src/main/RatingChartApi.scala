@@ -53,6 +53,7 @@ final class RatingChartApi(
                 Chess960,
                 KingOfTheHill,
                 ThreeCheck,
+                FiveCheck,
                 Antichess,
                 Atomic,
                 Horde,

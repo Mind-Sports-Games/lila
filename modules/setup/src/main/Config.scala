@@ -144,6 +144,7 @@ trait BaseConfig {
     strategygames.chess.variant.Crazyhouse.id :+
     strategygames.chess.variant.KingOfTheHill.id :+
     strategygames.chess.variant.ThreeCheck.id :+
+    strategygames.chess.variant.FiveCheck.id :+
     strategygames.chess.variant.Antichess.id :+
     strategygames.chess.variant.Atomic.id :+
     strategygames.chess.variant.Horde.id :+
@@ -154,6 +155,7 @@ trait BaseConfig {
       strategygames.chess.variant.Crazyhouse.id :+
       strategygames.chess.variant.KingOfTheHill.id :+
       strategygames.chess.variant.ThreeCheck.id :+
+      strategygames.chess.variant.FiveCheck.id :+
       strategygames.chess.variant.Antichess.id :+
       strategygames.chess.variant.Atomic.id :+
       strategygames.chess.variant.Horde.id :+

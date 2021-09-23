@@ -59,6 +59,7 @@ object list {
               userTopPerf(leaderboards.antichess, PerfType.Antichess),
               userTopPerf(leaderboards.atomic, PerfType.Atomic),
               userTopPerf(leaderboards.threeCheck, PerfType.ThreeCheck),
+              userTopPerf(leaderboards.fiveCheck, PerfType.FiveCheck),
               userTopPerf(leaderboards.kingOfTheHill, PerfType.KingOfTheHill),
               userTopPerf(leaderboards.horde, PerfType.Horde),
               userTopPerf(leaderboards.racingKings, PerfType.RacingKings),

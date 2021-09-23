@@ -242,6 +242,9 @@ export default class Setup {
             case '9':
               key = 'racingKings';
               break;
+            case '12':
+              key = 'fiveCheck';
+              break;
             default:
               key = 'standard';
               break;

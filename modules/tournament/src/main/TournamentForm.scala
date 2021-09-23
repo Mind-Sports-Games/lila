@@ -149,6 +149,7 @@ object TournamentForm {
       strategygames.chess.variant.Chess960,
       strategygames.chess.variant.KingOfTheHill,
       strategygames.chess.variant.ThreeCheck,
+      strategygames.chess.variant.FiveCheck,
       strategygames.chess.variant.Antichess,
       strategygames.chess.variant.Atomic,
       strategygames.chess.variant.Horde,

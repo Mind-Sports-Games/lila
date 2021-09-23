@@ -120,7 +120,7 @@ export function symbolToFile(char: string) {
 }
 
 export function supportedVariant(key: string) {
-  return ['standard', 'chess960', 'kingOfTheHill', 'threeCheck', 'linesOfAction', 'fromPosition'].includes(key);
+  return ['standard', 'chess960', 'kingOfTheHill', 'threeCheck', 'fiveCheck', 'linesOfAction', 'fromPosition'].includes(key);
 }
 
 export function boardSetting(): Setting<BoardStyle> {

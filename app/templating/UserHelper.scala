@@ -25,6 +25,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     PerfType.KingOfTheHill,
     PerfType.Rapid,
     PerfType.ThreeCheck,
+    PerfType.FiveCheck,
     PerfType.Classical,
     PerfType.Antichess,
     PerfType.Correspondence,

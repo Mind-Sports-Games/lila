@@ -270,6 +270,7 @@ object PerfType {
     Chess960,
     KingOfTheHill,
     ThreeCheck,
+    FiveCheck,
     Antichess,
     Atomic,
     Horde,
@@ -314,6 +315,7 @@ object PerfType {
     Chess960,
     KingOfTheHill,
     ThreeCheck,
+    FiveCheck,
     Antichess,
     Atomic,
     Horde,
@@ -338,6 +340,7 @@ object PerfType {
     Chess960,
     KingOfTheHill,
     ThreeCheck,
+    FiveCheck,
     Antichess,
     Atomic,
     Horde,
@@ -358,6 +361,7 @@ object PerfType {
       Chess960,
       KingOfTheHill,
       ThreeCheck,
+      FiveCheck,
       Antichess,
       Atomic,
       Horde,
@@ -380,6 +384,7 @@ object PerfType {
       case Chess960      => Variant.Chess(strategygames.chess.variant.Chess960)
       case KingOfTheHill => Variant.Chess(strategygames.chess.variant.KingOfTheHill)
       case ThreeCheck    => Variant.Chess(strategygames.chess.variant.ThreeCheck)
+      case FiveCheck     => Variant.Chess(strategygames.chess.variant.FiveCheck)
       case Antichess     => Variant.Chess(strategygames.chess.variant.Antichess)
       case Atomic        => Variant.Chess(strategygames.chess.variant.Atomic)
       case Horde         => Variant.Chess(strategygames.chess.variant.Horde)
@@ -404,6 +409,7 @@ object PerfType {
       case Variant.Chess(strategygames.chess.variant.Chess960)      => Chess960.some
       case Variant.Chess(strategygames.chess.variant.KingOfTheHill) => KingOfTheHill.some
       case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => ThreeCheck.some
+      case Variant.Chess(strategygames.chess.variant.FiveCheck)     => FiveCheck.some
       case Variant.Chess(strategygames.chess.variant.Antichess)     => Antichess.some
       case Variant.Chess(strategygames.chess.variant.Atomic)        => Atomic.some
       case Variant.Chess(strategygames.chess.variant.Horde)         => Horde.some

@@ -36,6 +36,7 @@ private object Mappings {
     strategygames.chess.variant.Crazyhouse.key,
     strategygames.chess.variant.KingOfTheHill.key,
     strategygames.chess.variant.ThreeCheck.key,
+    strategygames.chess.variant.FiveCheck.key,
     strategygames.chess.variant.Antichess.key,
     strategygames.chess.variant.Atomic.key,
     strategygames.chess.variant.Horde.key,

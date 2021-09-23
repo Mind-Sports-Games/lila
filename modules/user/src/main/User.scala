@@ -350,6 +350,7 @@ object User {
     PerfType.Chess960,
     PerfType.KingOfTheHill,
     PerfType.ThreeCheck,
+    PerfType.FiveCheck,
     PerfType.Antichess,
     PerfType.Atomic,
     PerfType.Horde,

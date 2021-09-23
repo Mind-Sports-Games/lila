@@ -35,6 +35,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.kingOfTheHill, ratingsB.kingOfTheHill, game)
               case Variant.Chess(ThreeCheck) =>
                 updateRatings(ratingsW.threeCheck, ratingsB.threeCheck, game)
+              case Variant.Chess(FiveCheck) =>
+                updateRatings(ratingsW.fiveCheck, ratingsB.fiveCheck, game)
               case Variant.Chess(Antichess) =>
                 updateRatings(ratingsW.antichess, ratingsB.antichess, game)
               case Variant.Chess(Atomic) =>
@@ -102,6 +104,7 @@ final class PerfsUpdater(
       chess960: Rating,
       kingOfTheHill: Rating,
       threeCheck: Rating,
+      fiveCheck: Rating,
       antichess: Rating,
       atomic: Rating,
       horde: Rating,
@@ -129,6 +132,7 @@ final class PerfsUpdater(
       chess960 = perfs.chess960.toRating,
       kingOfTheHill = perfs.kingOfTheHill.toRating,
       threeCheck = perfs.threeCheck.toRating,
+      fiveCheck = perfs.fiveCheck.toRating,
       antichess = perfs.antichess.toRating,
       atomic = perfs.atomic.toRating,
       horde = perfs.horde.toRating,
@@ -189,6 +193,7 @@ final class PerfsUpdater(
           kingOfTheHill =
             addRatingIf(game.ratingVariant.kingOfTheHill, perfs.kingOfTheHill, ratings.kingOfTheHill),
           threeCheck = addRatingIf(game.ratingVariant.threeCheck, perfs.threeCheck, ratings.threeCheck),
+          fiveCheck = addRatingIf(game.ratingVariant.fiveCheck, perfs.fiveCheck, ratings.fiveCheck),
           antichess = addRatingIf(game.ratingVariant.antichess, perfs.antichess, ratings.antichess),
           atomic = addRatingIf(game.ratingVariant.atomic, perfs.atomic, ratings.atomic),
           horde = addRatingIf(game.ratingVariant.horde, perfs.horde, ratings.horde),
@@ -217,6 +222,7 @@ final class PerfsUpdater(
           chess960 = r(PT.Chess960, perfs.chess960, perfs1.chess960),
           kingOfTheHill = r(PT.KingOfTheHill, perfs.kingOfTheHill, perfs1.kingOfTheHill),
           threeCheck = r(PT.ThreeCheck, perfs.threeCheck, perfs1.threeCheck),
+          fiveCheck = r(PT.FiveCheck, perfs.fiveCheck, perfs1.fiveCheck),
           antichess = r(PT.Antichess, perfs.antichess, perfs1.antichess),
           atomic = r(PT.Atomic, perfs.atomic, perfs1.atomic),
           horde = r(PT.Horde, perfs.horde, perfs1.horde),

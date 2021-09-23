@@ -101,6 +101,7 @@ object SimulForm {
               strategygames.chess.variant.Chess960.id,
               strategygames.chess.variant.KingOfTheHill.id,
               strategygames.chess.variant.ThreeCheck.id,
+              strategygames.chess.variant.FiveCheck.id,
               strategygames.chess.variant.Antichess.id,
               strategygames.chess.variant.Atomic.id,
               strategygames.chess.variant.Horde.id,

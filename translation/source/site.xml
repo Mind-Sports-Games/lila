@@ -35,6 +35,7 @@
   <string name="cheatDetected">Cheat Detected</string>
   <string name="kingInTheCenter">King in the centre</string>
   <string name="threeChecks">Three checks</string>
+  <string name="fiveChecks">Five checks</string>
   <string name="raceFinished">Race finished</string>
   <string name="checkersConnected">All checkers connected</string>
   <string name="variantEnding">Variant ending</string>

@@ -44,6 +44,8 @@ export default function status(ctrl: Ctrl): string {
           return noarg('kingInTheCenter');
         case 'threeCheck':
           return noarg('threeChecks');
+        case 'fiveCheck':
+          return noarg('fiveChecks');
         case 'linesOfAction':
           return noarg('checkersConnected');
         case 'breakthrough':

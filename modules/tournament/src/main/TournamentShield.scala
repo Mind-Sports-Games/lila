@@ -201,6 +201,12 @@ object TournamentShield {
           iconChar = '.'
         )
 
+    case object FiveCheck
+        extends Category(
+          of = Right(Variant.Chess(strategygames.chess.variant.FiveCheck)),
+          iconChar = '.'
+        )
+
     case object Horde
         extends Category(
           of = Right(Variant.Chess(strategygames.chess.variant.Horde)),
@@ -285,6 +291,7 @@ object TournamentShield {
       Chess960,
       KingOfTheHill,
       ThreeCheck,
+      FiveCheck,
       Antichess,
       Atomic,
       Horde,

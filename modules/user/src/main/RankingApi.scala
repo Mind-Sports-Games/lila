@@ -94,6 +94,7 @@ final class RankingApi(
       chess960      <- topPerf(PerfType.Chess960.id, nb)
       kingOfTheHill <- topPerf(PerfType.KingOfTheHill.id, nb)
       threeCheck    <- topPerf(PerfType.ThreeCheck.id, nb)
+      fiveCheck     <- topPerf(PerfType.FiveCheck.id, nb)
       antichess     <- topPerf(PerfType.Antichess.id, nb)
       atomic        <- topPerf(PerfType.Atomic.id, nb)
       horde         <- topPerf(PerfType.Horde.id, nb)
@@ -118,6 +119,7 @@ final class RankingApi(
       chess960 = chess960,
       kingOfTheHill = kingOfTheHill,
       threeCheck = threeCheck,
+      fiveCheck = fiveCheck,
       antichess = antichess,
       atomic = atomic,
       horde = horde,

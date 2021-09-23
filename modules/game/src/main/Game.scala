@@ -255,7 +255,7 @@ case class Game(
           blackKing = updated.history.kingMoves.blackKing.map(Pos.Draughts)
         ))
       else//chess
-        (updated.board.variant.threeCheck && game.situation.check) ?? List(
+        ((updated.board.variant.threeCheck || updated.board.variant.fiveCheck) && game.situation.check) ?? List(
           Event.CheckCount(
             white = updated.history.checkCount.white,
             black = updated.history.checkCount.black
@@ -690,6 +690,7 @@ object Game {
     strategygames.chess.variant.Chess960,
     strategygames.chess.variant.KingOfTheHill,
     strategygames.chess.variant.ThreeCheck,
+    strategygames.chess.variant.FiveCheck,
     strategygames.chess.variant.Antichess,
     strategygames.chess.variant.FromPosition,
     strategygames.chess.variant.Horde,
@@ -702,6 +703,7 @@ object Game {
 
   val variantsWhereWhiteIsBetter: Set[Variant] = Set(
     strategygames.chess.variant.ThreeCheck,
+    strategygames.chess.variant.FiveCheck,
     strategygames.chess.variant.Atomic,
     strategygames.chess.variant.Horde,
     strategygames.chess.variant.RacingKings,
@@ -713,6 +715,7 @@ object Game {
     strategygames.chess.variant.Chess960,
     strategygames.chess.variant.KingOfTheHill,
     strategygames.chess.variant.ThreeCheck,
+    strategygames.chess.variant.FiveCheck,
     strategygames.chess.variant.FromPosition
   ).map(Variant.Chess)
 
