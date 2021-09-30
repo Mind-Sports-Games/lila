@@ -212,7 +212,7 @@ object Challenge {
       .orElse {
         (variant == Variant.libFromPosition(variant.gameLogic)) option perfTypeOf(Variant.libStandard(variant.gameLogic), timeControl)
       }
-      .|(PerfType.Correspondence)
+      .|(PerfType.orDefaultSpeed("correspondence"))
 
   private val idSize = 8
 

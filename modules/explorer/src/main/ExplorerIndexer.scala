@@ -109,22 +109,24 @@ final private class ExplorerIndexer(
 
   // probability of the game being indexed, between 0 and 1
   private def probability(game: Game, rating: Int) = {
-    import lila.rating.PerfType._
-    game.perfType ?? {
-      case Correspondence                      => 1
-      case Rapid | Classical if rating >= 2000 => 1
-      case Rapid | Classical if rating >= 1800 => 2 / 5f
-      case Rapid | Classical                   => 1 / 8f
-      case Blitz if rating >= 2000             => 1
-      case Blitz if rating >= 1800             => 1 / 4f
-      case Blitz                               => 1 / 15f
-      case Bullet if rating >= 2300            => 1
-      case Bullet if rating >= 2200            => 4 / 5f
-      case Bullet if rating >= 2000            => 1 / 4f
-      case Bullet if rating >= 1800            => 1 / 7f
-      case Bullet                              => 1 / 20f
-      case _ if rating >= 1600                 => 1      // variant games
-      case _                                   => 1 / 2f // noob variant games
+    game.perfType match {
+      case Some(pt) => pt.key match {
+        case "correspondence"                        => 1
+        case "rapid" | "classical" if rating >= 2000 => 1
+        case "rapid" | "classical" if rating >= 1800 => 2 / 5f
+        case "rapid" | "classical"                   => 1 / 8f
+        case "blitz" if rating >= 2000               => 1
+        case "blitz" if rating >= 1800               => 1 / 4f
+        case "blitz"                                 => 1 / 15f
+        case "bullet" if rating >= 2300              => 1
+        case "bullet" if rating >= 2200              => 4 / 5f
+        case "bullet" if rating >= 2000              => 1 / 4f
+        case "bullet" if rating >= 1800              => 1 / 7f
+        case "bullet"                                => 1 / 20f
+        case _ if rating >= 1600                     => 1      // variant games
+        case _                                       => 1 / 2f // noob variant games
+      }
+      case _ => 1 / 2f
     }
   }
 

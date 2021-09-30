@@ -83,8 +83,7 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
     )
 
   private val perfPositions: Map[PerfType, Int] = {
-    import PerfType._
-    List(Bullet, Blitz, Rapid, Classical, UltraBullet) ::: variants
+    PerfType.allSpeed.filter(_.key != "correspondence") ::: PerfType.variants
   }.zipWithIndex.toMap
 
   private def perfJson(p: PerfType)(implicit lang: Lang) =

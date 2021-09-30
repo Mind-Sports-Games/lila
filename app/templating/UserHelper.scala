@@ -18,29 +18,9 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     else if (progress < 0) badTag(cls := "rp")(math.abs(progress)).some
     else none
 
-  val topBarSortedPerfTypes: List[PerfType] = List(
-    PerfType.Bullet,
-    PerfType.Chess960,
-    PerfType.Blitz,
-    PerfType.KingOfTheHill,
-    PerfType.Rapid,
-    PerfType.ThreeCheck,
-    PerfType.Classical,
-    PerfType.Antichess,
-    PerfType.Correspondence,
-    PerfType.Atomic,
-    PerfType.Horde,
-    PerfType.Crazyhouse,
-    PerfType.LinesOfAction,
-    PerfType.International,
-    PerfType.Russian,
-    PerfType.Brazilian,
-    PerfType.Pool,
-    PerfType.Frisian,
-    PerfType.Frysk,
-    PerfType.Antidraughts,
-    PerfType.Breakthrough
-  )
+  val topBarSortedPerfTypes: List[PerfType] =
+    List(PerfType.standard, PerfType.variants)
+      .flatMap(_.zipWithIndex).sortBy(_._2).map(_._1)
 
   def showPerfRating(rating: Int, name: String, nb: Int, provisional: Boolean, clueless: Boolean, icon: Char)(
       implicit lang: Lang
