@@ -36,7 +36,7 @@ final class Setup(
   )
 
   // Defaults to chess if it's not provided, otherwise will take the version provided from the request.
-  private def gameLogic(libId: Option[Int]): GameLogic = GameFamily(libId.getOrElse(0)).codeLib
+  private def gameLogic(libId: Option[Int]): GameLogic = GameFamily(libId.getOrElse(0)).gameLogic
 
   def aiForm =
     Open { implicit ctx =>

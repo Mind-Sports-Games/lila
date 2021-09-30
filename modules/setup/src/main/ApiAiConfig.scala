@@ -71,26 +71,21 @@ object ApiAiConfig extends BaseConfig {
 
   def from(
       l: Int,
-      lib: Int,
-      cv: Option[String],
-      dv: Option[String],
-      lv: Option[String],
+      v: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       c: Option[String],
       pos: Option[String]
-  ) =
+  ) = {
+    val variant = Variant.orDefault(~v)
     new ApiAiConfig(
-      variant = lib match {
-        case 0 => Variant.Chess(strategygames.chess.variant.Variant.orDefault(~cv))
-        case 1 => Variant.Draughts(strategygames.draughts.variant.Variant.orDefault(~dv))
-        case 2 => Variant.Chess(strategygames.chess.variant.Variant.orDefault(~lv))
-      },
+      variant = variant,
       fenVariant = none,
       clock = cl,
       daysO = d,
       color = Color.orDefault(~c),
       level = l,
-      fen = pos.map(f => FEN.apply(GameFamily(lib).codeLib, f))
+      fen = pos.map(f => FEN.apply(variant.gameLogic, f))
     ).autoVariant
+  }
 }

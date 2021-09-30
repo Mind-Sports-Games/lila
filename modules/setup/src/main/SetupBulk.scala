@@ -49,8 +49,7 @@ object SetupBulk {
             tokens.size == tokens.distinct.size
           }
         ),
-      //TODO: need to pass lib through
-      SetupForm.api.chessVariant,
+      SetupForm.api.variant,
       "clock"         -> SetupForm.api.clockMapping,
       "rated"         -> boolean,
       "pairAt"        -> optional(timestampInNearFuture),

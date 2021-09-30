@@ -2,8 +2,8 @@ package lila.challenge
 
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Chess960, FromPosition, Horde, RacingKings, LinesOfAction }
-import strategygames.{ Black, Color, GameLogic, Mode, Speed, White }
+import strategygames.chess.variant.Chess960
+import strategygames.{ Black, Color, GameFamily, GameLogic, Mode, Speed, White }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
@@ -91,17 +91,14 @@ case class Challenge(
 
   def notableInitialFen: Option[FEN] =
     variant match {
-      case Variant.Chess(variant) => variant match {
-        case FromPosition | Horde | RacingKings | Chess960 | LinesOfAction => initialFen
-        case _ => none
-      }
+      case Variant.Chess(variant) => if (variant.standardInitialPosition) none else initialFen
       case Variant.Draughts(_) => customStartingPosition ?? initialFen
       case _ => none
     }
 
   def customStartingPosition: Boolean =
     variant.draughtsFromPosition ||
-      (draughtsFromPositionVariants(variant) &&
+      (draughtsFenVariants(variant) &&
         initialFen.isDefined &&
         !initialFen.exists(_.value == variant.initialFen.value)
       )
@@ -227,12 +224,10 @@ object Challenge {
   def randomColor = Color.fromWhite(lila.common.ThreadLocalRandom.nextBoolean())
 
   // NOTE: Only variants with standardInitialPosition = false!
-  private val draughtsFromPositionVariants: Set[Variant] = Set(
-    strategygames.draughts.variant.FromPosition,
-    strategygames.draughts.variant.Russian,
-    strategygames.draughts.variant.Brazilian,
-    strategygames.draughts.variant.Pool
-  ).map(Variant.Draughts)
+  private val draughtsFenVariants: Set[Variant] =
+    GameFamily.Draughts().variants.filter(
+      v => v.fenVariant || v.fromPositionVariant
+    ).toSet
 
   def make(
       variant: Variant,
@@ -253,7 +248,7 @@ object Challenge {
       case _       => ColorChoice.Random -> randomColor
     }
     val finalVariant = fenVariant match {
-      case Some(v) if draughtsFromPositionVariants(variant) =>
+      case Some(v) if draughtsFenVariants(variant) =>
         if (variant.draughtsFromPosition && v.draughtsStandard)
           Variant.libFromPosition(GameLogic.Draughts())
         else v
@@ -261,7 +256,7 @@ object Challenge {
     }
     //val finalInitialFen = finalVariant match {
     //  case Variant.Draughts(v) =>
-    //    draughtsFromPositionVariants(v) ?? {
+    //    draughtsFenVariants(v) ?? {
     //      initialFen.flatMap(fen => Forsyth.<<@(finalVariant.gameLogic, finalVariant, fen.value))
     //        .map(sit => FEN(Forsyth.>>(finalVariant.gameLogic, sit.withoutGhosts)))
     //    } match {
@@ -299,7 +294,6 @@ object Challenge {
       name = name,
       microMatch = microMatch option true
     )
-    //TODO microMatch: is this needed?
     if (microMatch && !challenge.customStartingPosition)
       challenge = challenge.copy(microMatch = none)
     if (challenge.mode.rated && !challenge.isMicroMatch && challenge.customStartingPosition)

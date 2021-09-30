@@ -24,13 +24,8 @@ object form {
           h1("New Swiss tournament"),
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
-            form3.split(
-              fields.gameFamily,
-              fields.chessVariant,
-              fields.draughtsVariant,
-              fields.loaVariant
-            ),
-            form3.split(fields.rated, fields.microMatch, fields.drawTables),
+            form3.split(fields.rated, fields.variant),
+            form3.split(fields.microMatch, fields.drawTables),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -65,13 +60,8 @@ object form {
           h1("Edit ", swiss.name),
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
-            form3.split(
-              fields.gameFamily,
-              fields.chessVariant,
-              fields.draughtsVariant,
-              fields.loaVariant
-            ),
-            form3.split(fields.rated, fields.microMatch, fields.drawTables),
+            form3.split(fields.rated, fields.variant),
+            form3.split(fields.microMatch, fields.drawTables),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -169,36 +159,12 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         help = raw("Players play 2 games per round<br>one with white and one with black").some
       ),
     )
-  def gameFamily =
-    form3.group(form("gameFamily"), "Game Family", half = true)(
-      form3.select(
+  def variant =
+    form3.group(form("variant"), trans.variant(), klass="variant", half = true)(
+      form3.selectWithOptGroups(
         _,
-        translatedGameFamilyChoices(_.id.toString).map(x => x._1 -> x._2),
+        translatedVariantChoicesWithVariants,
         disabled = disabledAfterStart
-      )
-    )
-  def chessVariant =
-    form3.group(form("chessVariant"), trans.variant(), klass="chessVariant", half = true)(
-      form3.select(
-        _,
-        translatedChessVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
-        disabled = disabledAfterStart
-      )
-    )
-  def draughtsVariant =
-    form3.group(form("draughtsVariant"), trans.variant(), klass="draughtsVariant", half = true, displayed = false)(
-      form3.select(
-        _,
-        translatedDraughtsVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
-        disabled = disabledAfterStart,
-      )
-    )
-  def loaVariant =
-    form3.group(form("loaVariant"), trans.variant(), klass="loaVariant", half = true, displayed = false)(
-      form3.select(
-        _,
-        translatedLOAVariantChoicesWithVariants(_.key).map(x => x._1 -> x._2),
-        disabled = disabledAfterStart,
       )
     )
   def clock =
@@ -237,6 +203,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         form("drawTables"),
         "Use Draw Tables",
         klass = "drawTables",
+        half = true,
         help = raw("Each round of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant.").some,
         displayed = false
       ),

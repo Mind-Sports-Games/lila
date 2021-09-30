@@ -1,27 +1,20 @@
 import flatpickr from 'flatpickr';
 
 playstrategy.load.then(() => {
-  const $gameFamily = $('#form3-gameFamily'),
-    $chessVariant = $('#form3-chessVariant'),
-    $draughtsVariant = $('#form3-draughtsVariant'),
-    showPositionChess = () =>
-      $('.form3 .position').toggleClass('none', !['1', 'standard'].includes($chessVariant.val() as string)),
-    showPositionDraughts = () =>
-      $('.form3 .position').toggleClass('none', !['1', 'standard'].includes($draughtsVariant.val() as string));
+  const $variant = $('#form3-variant'),
+    showPosition = () =>
+      $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string)),
+    showDrawTables = () =>
+      $('.form3 .drawTables').toggle(($variant.val() as string).startsWith("1_"));
 
-  $chessVariant.on('change', showPositionChess);
-  $draughtsVariant.on('change', showPositionDraughts);
-  showPositionChess();
+  $variant.find('optgroup').each((_, optgroup: HTMLElement) => {
+    optgroup.setAttribute("label", optgroup.getAttribute("name") || "");
+  });
 
-  $gameFamily
-    .on('change', function (this: HTMLElement) {
-      const gameFamily = $(this).val();
-      $('.form3 .chessVariant').toggle(gameFamily == '0');
-      $('.form3 .draughtsVariant').toggle(gameFamily == '1');
-      $('.form3 .loaVariant').toggle(gameFamily == '2');
-      $('.form3 .drawTables').toggle(gameFamily == '1');
-    })
-    .trigger('change');
+  $variant.on('change', showPosition);
+  $variant.on('change', showDrawTables);
+  showPosition();
+  showDrawTables();
 
   $('form .conditions a.show').on('click', function (this: HTMLAnchorElement) {
     $(this).remove();
