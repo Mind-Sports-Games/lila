@@ -463,7 +463,7 @@ export default class Setup {
     }
 
     $form.find('optgroup').each((_, optgroup: HTMLElement) => {
-        optgroup.setAttribute("label", optgroup.getAttribute("name") || "");
+      optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
     });
 
     $variantSelect

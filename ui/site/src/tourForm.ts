@@ -2,13 +2,11 @@ import flatpickr from 'flatpickr';
 
 playstrategy.load.then(() => {
   const $variant = $('#form3-variant'),
-    showPosition = () =>
-      $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string)),
-    showDrawTables = () =>
-      $('.form3 .drawTables').toggle(($variant.val() as string).startsWith("1_"));
+    showPosition = () => $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string)),
+    showDrawTables = () => $('.form3 .drawTables').toggle(($variant.val() as string).startsWith('1_'));
 
   $variant.find('optgroup').each((_, optgroup: HTMLElement) => {
-    optgroup.setAttribute("label", optgroup.getAttribute("name") || "");
+    optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
   });
 
   $variant.on('change', showPosition);
