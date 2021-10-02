@@ -2,8 +2,8 @@ package lila.game
 
 import scala.language.existentials
 
-import strategygames.chess
 import strategygames.format.{ FEN, Forsyth }
+import strategygames.variant.Variant
 import strategygames.{ Black, Color, Mode, Status, White }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
@@ -440,7 +440,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def initialFen(game: Game): Fu[Option[FEN]] =
     if (game.imported || !game.variant.standardInitialPosition) initialFen(game.id) dmap {
-      case None if game.variant == strategygames.chess.variant.Chess960 => Forsyth.initial(game.variant.gameLib).some
+      case None if game.variant == Variant.Chess(strategygames.chess.variant.Chess960) => Forsyth.initial(game.variant.gameLib).some
       case fen                                            => fen
     }
     else fuccess(none)
