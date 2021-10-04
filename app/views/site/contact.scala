@@ -37,11 +37,11 @@ object contact {
           a(href := routes.ForumCateg.show("playstrategy-feedback"))(reportBugInForum())
         ),
         li(
-          a(href := "https://github.com/ornicar/lila/issues")(reportWebsiteIssue())
+          a(href := "https://github.com/Mind-Sports-Games/lila/issues")(reportWebsiteIssue())
         ),
-        li(
-          a(href := "https://github.com/veloce/lichobile/issues")(reportMobileIssue())
-        ),
+        // li(
+        //   a(href := "https://github.com/veloce/lichobile/issues")(reportMobileIssue())
+        // ),
         //li(a(href := "https://discord.gg/hy5jqSs")(reportBugInDiscord()))
       ),
       p(howToReportBug())

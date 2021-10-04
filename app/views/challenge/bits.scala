@@ -48,7 +48,7 @@ object bits {
     ),
     c.isMicroMatch option div(cls := "micro-match")(
       trans.microMatchChallenge(), " ",
-      trans.microMatchExplanation()
+      trans.microMatchDefinition()
     )
   )    
 

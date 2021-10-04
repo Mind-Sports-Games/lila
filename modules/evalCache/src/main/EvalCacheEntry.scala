@@ -2,7 +2,7 @@ package lila.evalCache
 
 import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.variant.Variant
-import strategygames.GameLib
+import strategygames.GameLogic
 import org.joda.time.DateTime
 import cats.data.NonEmptyList
 
@@ -101,10 +101,10 @@ object EvalCacheEntry {
 
     def truncate = copy(value = NonEmptyList(value.head, value.tail.take(MAX_PV_SIZE - 1)))
 
-    def gameLib: GameLib = value.head match {
-      case Uci.ChessMove(_)    => GameLib.Chess()
-      case Uci.ChessDrop(_)    => GameLib.Chess()
-      case Uci.DraughtsMove(_) => GameLib.Draughts()
+    def gameLogic: GameLogic = value.head match {
+      case Uci.ChessMove(_)    => GameLogic.Chess()
+      case Uci.ChessDrop(_)    => GameLogic.Chess()
+      case Uci.DraughtsMove(_) => GameLogic.Draughts()
     }
   }
 
@@ -131,7 +131,7 @@ object EvalCacheEntry {
       new SmallFen(str)
     }
     def validate(variant: Variant, fen: FEN): Option[SmallFen] =
-      Forsyth.<<@(variant.gameLib, variant, fen).exists(_ playable false) option make(variant, fen)
+      Forsyth.<<@(variant.gameLogic, variant, fen).exists(_ playable false) option make(variant, fen)
   }
 
   case class Id(variant: Variant, smallFen: SmallFen)
@@ -141,8 +141,8 @@ object EvalCacheEntry {
   object Input {
     case class Candidate(variant: Variant, fen: String, eval: Eval) {
       def input =
-        SmallFen.validate(variant, FEN.apply(variant.gameLib, fen)) ifTrue eval.looksValid map { smallFen =>
-          Input(Id(variant, smallFen), FEN.apply(variant.gameLib, fen), eval.truncatePvs)
+        SmallFen.validate(variant, FEN.apply(variant.gameLogic, fen)) ifTrue eval.looksValid map { smallFen =>
+          Input(Id(variant, smallFen), FEN.apply(variant.gameLogic, fen), eval.truncatePvs)
         }
     }
   }

@@ -3,7 +3,7 @@ package lila.tournament
 import cats.implicits._
 import strategygames.format.FEN
 import strategygames.chess.{ StartingPosition }
-import strategygames.{ Clock, GameLib, Mode }
+import strategygames.{ Clock, GameFamily, GameLogic, Mode }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.data._
@@ -28,9 +28,7 @@ final class TournamentForm {
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
       startDate = none,
-      gameLib = 0,
-      chessVariant = Variant.libStandard(GameLib.Chess()).id.toString.some,
-      draughtsVariant = Variant.libStandard(GameLib.Draughts()).id.toString.some,
+      variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
       position = None,
       password = None,
       mode = none,
@@ -51,9 +49,7 @@ final class TournamentForm {
       minutes = tour.minutes,
       waitMinutes = none,
       startDate = tour.startsAt.some,
-      gameLib = tour.variant.gameLib.id,
-      chessVariant = tour.variant.id.toString.some,
-      draughtsVariant = tour.variant.id.toString.some,
+      variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
       position = tour.position,
       mode = none,
       rated = tour.mode.rated.some,
@@ -88,9 +84,7 @@ final class TournamentForm {
         },
         "waitMinutes"      -> optional(numberIn(waitMinuteChoices)),
         "startDate"        -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "gameLib"          -> number(min = 0, max = 1),
-        "chessVariant"     -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
-        "draughtsVariant"  -> optional(nonEmptyText.verifying(v => Variant(GameLib.Draughts(), v).isDefined)),
+        "variant"           -> optional(nonEmptyText.verifying(v => Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined)),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
         "rated"            -> optional(boolean),
@@ -139,28 +133,7 @@ object TournamentForm {
   }
   val positionDefault = StartingPosition.initial.fen
 
-  val validVariants =
-    List(
-      strategygames.chess.variant.Standard,
-      strategygames.chess.variant.Chess960,
-      strategygames.chess.variant.KingOfTheHill,
-      strategygames.chess.variant.ThreeCheck,
-      strategygames.chess.variant.Antichess,
-      strategygames.chess.variant.Atomic,
-      strategygames.chess.variant.Horde,
-      strategygames.chess.variant.RacingKings,
-      strategygames.chess.variant.Crazyhouse
-    ).map(Variant.Chess) :::
-    List(
-      strategygames.draughts.variant.Standard,
-      strategygames.draughts.variant.Frisian,
-      strategygames.draughts.variant.Frysk,
-      strategygames.draughts.variant.Antidraughts,
-      strategygames.draughts.variant.Breakthrough,
-      strategygames.draughts.variant.Russian,
-      strategygames.draughts.variant.Brazilian,
-      strategygames.draughts.variant.Pool
-    ).map(Variant.Draughts)
+  val validVariants = Variant.all.filter(!_.fromPositionVariant)
 
   def guessVariant(from: String): Option[Variant] =
     validVariants.find { v =>
@@ -185,9 +158,7 @@ private[tournament] case class TournamentSetup(
     minutes: Int,
     waitMinutes: Option[Int],
     startDate: Option[DateTime],
-    gameLib: Int,
-    chessVariant: Option[String],
-    draughtsVariant: Option[String],
+    variant: Option[String],
     position: Option[FEN],
     mode: Option[Int], // deprecated, use rated
     rated: Option[Boolean],
@@ -206,14 +177,16 @@ private[tournament] case class TournamentSetup(
     if (realPosition.isDefined) Mode.Casual
     else Mode(rated.orElse(mode.map(Mode.Rated.id ===)) | true)
 
-  def realGameLib = GameLib(gameLib)
-  def realVariant = (realGameLib match {
-    case GameLib.Chess()    => chessVariant
-    case GameLib.Draughts() => draughtsVariant
-    case _ => sys.error("Invalid lib in Swiss data")
-  }) flatMap {v => Variant.apply(realGameLib, v)} getOrElse Variant.default(realGameLib)
+  def gameLogic = variant match {
+    case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
+    case None    => GameLogic.Chess()
+  }
 
-  def realPosition = position ifTrue realVariant.standard
+  def realVariant = variant flatMap {
+    v => Variant.apply(gameLogic, v.split("_")(1).toInt)
+  } getOrElse Variant.default(gameLogic)
+
+  def realPosition = position ifTrue realVariant.standardVariant
 
   def clockConfig = Clock.Config((clockTime * 60).toInt, clockIncrement)
 
@@ -229,7 +202,7 @@ private[tournament] case class TournamentSetup(
   // update all fields and use default values for missing fields
   // meant for HTML form updates
   def updateAll(old: Tournament): Tournament = {
-    val newVariant = if (old.isCreated && ((gameLib == 0 && chessVariant.isDefined) || (gameLib == 1 && draughtsVariant.isDefined))) realVariant else old.variant
+    val newVariant = if (old.isCreated && variant.isDefined) realVariant else old.variant
     old
       .copy(
         name = name | old.name,
@@ -239,7 +212,7 @@ private[tournament] case class TournamentSetup(
         variant = newVariant,
         startsAt = startDate | old.startsAt,
         password = password,
-        position = newVariant.standard ?? {
+        position = newVariant.standardVariant ?? {
           if (old.isCreated || old.position.isDefined) realPosition
           else old.position
         },
@@ -264,7 +237,7 @@ private[tournament] case class TournamentSetup(
         variant = newVariant,
         startsAt = startDate | old.startsAt,
         password = password.fold(old.password)(_.some.filter(_.nonEmpty)),
-        position = newVariant.standard ?? {
+        position = newVariant.standardVariant ?? {
           if (position.isDefined && (old.isCreated || old.position.isDefined)) realPosition
           else old.position
         },

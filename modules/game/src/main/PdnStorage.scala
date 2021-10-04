@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ format => stratFormat, GameLib }
+import strategygames.{ format => stratFormat, GameLogic }
 import strategygames.draughts
 import strategygames.draughts.{ format, PieceMap }
 import strategygames.draughts.format.Uci

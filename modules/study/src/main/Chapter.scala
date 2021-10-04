@@ -63,8 +63,8 @@ case class Chapter(
     updateRoot(_.forceVariationAt(force, path))
 
   def opening: Option[FullOpening] =
-    if (!Variant.openingSensibleVariants(setup.variant.gameLib)(setup.variant)) none
-    else FullOpeningDB.searchInFens(setup.variant.gameLib, root.mainline.map(_.fen))
+    if (!Variant.openingSensibleVariants(setup.variant.gameLogic)(setup.variant)) none
+    else FullOpeningDB.searchInFens(setup.variant.gameLogic, root.mainline.map(_.fen))
 
   def isEmptyInitial = order == 1 && root.children.nodes.isEmpty
 

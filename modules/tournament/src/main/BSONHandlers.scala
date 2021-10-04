@@ -3,7 +3,7 @@ package lila.tournament
 import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ GameLib, Mode }
+import strategygames.{ GameLogic, Mode }
 import reactivemongo.api.bson._
 
 import lila.db.BSON
@@ -63,7 +63,7 @@ object BSONHandlers {
 
   implicit val tournamentHandler = new BSON[Tournament] {
     def reads(r: BSON.Reader) = {
-      val lib = GameLib(r.intD("lib"))
+      val lib = GameLogic(r.intD("lib"))
       val variant = r.intO("variant").fold[Variant](Variant.default(lib))(
         v => Variant.orDefault(lib, v)
       )
@@ -109,7 +109,7 @@ object BSONHandlers {
         "status"      -> o.status,
         "clock"       -> o.clock,
         "minutes"     -> o.minutes,
-        "lib"         -> o.variant.gameLib.id,
+        "lib"         -> o.variant.gameLogic.id,
         "variant"     -> o.variant.some.filterNot(_.standard).map(_.id),
         "fen"         -> o.position.map(_.value),
         "mode"        -> o.mode.some.filterNot(_.rated).map(_.id),

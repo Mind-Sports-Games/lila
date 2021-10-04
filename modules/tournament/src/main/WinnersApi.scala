@@ -5,7 +5,7 @@ import reactivemongo.api.ReadPreference
 import scala.concurrent.duration._
 
 import strategygames.variant.Variant
-import strategygames.GameLib
+import strategygames.GameLogic
 
 import lila.db.dsl._
 import Schedule.{ Freq, Speed }
@@ -150,7 +150,7 @@ final class WinnersApi(
 
 object WinnersApi {
 
-  val variants = Variant.all(GameLib.Chess()).filter {
+  val variants = Variant.all(GameLogic.Chess()).filter {
     case Variant.Chess(strategygames.chess.variant.Standard) | Variant.Chess(strategygames.chess.variant.FromPosition) => false
     case _                       => true
   }

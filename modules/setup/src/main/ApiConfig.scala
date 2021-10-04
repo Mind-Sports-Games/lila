@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.GameLib
+import strategygames.GameFamily
 import strategygames.variant.{ Variant => StratVariant }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.variant.Chess960
@@ -48,9 +48,7 @@ object ApiConfig extends BaseHumanConfig {
   lazy val clockLimitSeconds: Set[Int] = Set(0, 15, 30, 45, 60, 90) ++ (2 to 180).view.map(60 *).toSet
 
   def from(
-      l: Int,
-      cv: Option[String],
-      dv: Option[String],
+      v: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       r: Boolean,
@@ -59,28 +57,27 @@ object ApiConfig extends BaseHumanConfig {
       tok: Option[String],
       msg: Option[String],
       mm: Option[Boolean]
-  ) =
+  ) = {
+    val variant = strategygames.variant.Variant.orDefault(~v)
     new ApiConfig(
-      variant = strategygames.variant.Variant.orDefault(GameLib(l), l match {
-        case 0 => ~cv
-        case 1 => ~dv
-      }),
+      variant = variant,
       clock = cl,
       days = d,
       rated = r,
       color = Color.orDefault(~c),
-      position = pos.map(f => FEN.apply(GameLib(l), f)),
+      position = pos.map(f => FEN.apply(variant.gameLogic, f)),
       acceptByToken = tok,
       message = msg map Template,
       microMatch = ~mm
     ).autoVariant
+  }
 
   def validFen(variant: Variant, fen: Option[FEN]) =
     // TODO: This .get is unsafe
     if (variant.chess960) fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
     else if (variant.fromPosition)
       fen exists { f =>
-        (Forsyth.<<<(variant.gameLib, f)).exists(_.situation playable false)
+        (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable false)
       }
     else true
 }

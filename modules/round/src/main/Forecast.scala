@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 
 import strategygames.format.Uci
-import strategygames.{ GameLib, Move }
+import strategygames.{ GameLogic, Move }
 import lila.common.Json.jodaWrites
 import lila.game.Game
 
@@ -71,7 +71,7 @@ object Forecast {
     def is(move: Move)     = move.toUci.uci == uci
     def is(move: Uci.Move) = move.uci == uci
 
-    def uciMove = Uci.Move(GameLib(lib), uci)
+    def uciMove = Uci.Move(GameLogic(lib), uci)
   }
 
   implicit val forecastStepJsonFormat = Json.format[Step]

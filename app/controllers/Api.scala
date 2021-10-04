@@ -2,7 +2,7 @@ package controllers
 
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.GameLib
+import strategygames.GameLogic
 
 import akka.stream.scaladsl._
 import play.api.libs.json._
@@ -330,14 +330,14 @@ final class Api(
       scoped = req => u => gamesByUsers(if (u.id == "playstrategy4545") 900 else 500)(req)
     )
 
-  private def gameLib(libS: Option[String]): GameLib = libS match {
-    case Some(libS) => GameLib(libS.toInt)
+  private def gameLogic(libS: Option[String]): GameLogic = libS match {
+    case Some(libS) => GameLogic(libS.toInt)
     case None       => sys.error("No lib provided in cloudEval")
   }
 
   def cloudEval =
     Action.async { req => {
-      val lib = gameLib(get("lib", req))
+      val lib = gameLogic(get("lib", req))
       get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
         JsonOptionOk(
           env.evalCache.api.getEvalJson(

@@ -1,7 +1,7 @@
 package lila.setup
 
 import strategygames.format.FEN
-import strategygames.GameLib
+import strategygames.{ GameFamily, GameLogic }
 import strategygames.variant.Variant
 import strategygames.Centis
 import play.api.data._
@@ -23,42 +23,40 @@ object SetupForm {
 
   lazy val ai = Form(
     mapping(
-      "chessVariant"    -> chessAIVariants,
-      "timeMode"        -> timeMode,
-      "time"            -> time,
-      "increment"       -> increment,
-      "days"            -> days,
-      "level"           -> level,
-      "color"           -> color,
-      "fen"             -> fenField
+      "variant"   -> variant(Config.aiVariants),
+      "timeMode"  -> timeMode,
+      "time"      -> time,
+      "increment" -> increment,
+      "days"      -> days,
+      "level"     -> level,
+      "color"     -> color,
+      "fen"       -> fenField
     )(AiConfig.from)(_.>>)
       .verifying("invalidFen", _.validFen)
       .verifying("Can't play that time control from a position", _.timeControlFromPosition)
   )
 
-  def friendFilled(lib: GameLib, fen: Option[FEN])(implicit ctx: UserContext): Form[FriendConfig] =
+  def friendFilled(lib: GameLogic, fen: Option[FEN])(implicit ctx: UserContext): Form[FriendConfig] =
     friend(ctx) fill fen.foldLeft(FriendConfig.default(lib.id)) { case (config, f) =>
       config.copy(fen = f.some, variant = lib match {
-        case GameLib.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
-        case GameLib.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
+        case GameLogic.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
+        case GameLogic.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
       })
     }
 
   def friend(ctx: UserContext) =
     Form(
       mapping(
-        "gameLib"         -> gameLibs,
-        "chessVariant"    -> chessVariantWithFenAndVariants,
-        "draughtsVariant" -> draughtsVariantWithFenAndVariants,
-        "fenVariant"      -> optional(draughtsFromPositionVariants),
-        "timeMode"        -> timeMode,
-        "time"            -> time,
-        "increment"       -> increment,
-        "days"            -> days,
-        "mode"            -> mode(withRated = ctx.isAuth),
-        "color"           -> color,
-        "fen"             -> fenField,
-        "microMatch"      -> boolean
+        "variant"    -> variant(Config.variantsWithFenAndVariants),
+        "fenVariant" -> optional(draughtsFenVariants),
+        "timeMode"   -> timeMode,
+        "time"       -> time,
+        "increment"  -> increment,
+        "days"       -> days,
+        "mode"       -> mode(withRated = ctx.isAuth),
+        "color"      -> color,
+        "fen"        -> fenField,
+        "microMatch" -> boolean
       )(FriendConfig.from)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Invalid speed", _.validSpeed(ctx.me.exists(_.isBot)))
@@ -71,16 +69,14 @@ object SetupForm {
   def hook(implicit ctx: UserContext) =
     Form(
       mapping(
-        "gameLib"         -> gameLibs,
-        "chessVariant"    -> chessVariantWithVariants,
-        "draughtsVariant" -> draughtsVariantWithVariants,
-        "timeMode"        -> timeMode,
-        "time"            -> time,
-        "increment"       -> increment,
-        "days"            -> days,
-        "mode"            -> mode(ctx.isAuth),
-        "ratingRange"     -> optional(ratingRange),
-        "color"           -> color
+        "variant"     -> variant(Config.variantsWithVariants),
+        "timeMode"    -> timeMode,
+        "time"        -> time,
+        "increment"   -> increment,
+        "days"        -> days,
+        "mode"        -> mode(ctx.isAuth),
+        "ratingRange" -> optional(ratingRange),
+        "color"       -> color
       )(HookConfig.from)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Can't create rated unlimited in lobby", _.noRatedUnlimited)
@@ -88,20 +84,18 @@ object SetupForm {
 
   lazy val boardApiHook = Form(
     mapping(
-      "gameLib"         -> gameLibs,
-      "chessVariant"    -> optional(chessBoardApiVariantKeys),
-      "draughtsVariant" -> optional(draughtsBoardApiVariantKeys),
-      "time"            -> time,
-      "increment"       -> increment,
-      "rated"           -> optional(boolean),
-      "color"           -> optional(color),
-      "ratingRange"     -> optional(ratingRange)
-    )((l, cv, dv, t, i, r, c, g) =>
+      "variant"     -> optional(boardApiVariantKeys),
+      "time"        -> time,
+      "increment"   -> increment,
+      "rated"       -> optional(boolean),
+      "color"       -> optional(color),
+      "ratingRange" -> optional(ratingRange)
+    )((v, t, i, r, c, g) =>
       HookConfig(
-        variant = (l match {
-          case 0 => cv 
-          case 1 => dv
-        }).flatMap(v => Variant.apply(GameLib(l), v)) | Variant.default(GameLib(l)),
+        variant = v match {
+          case Some(v) => Variant.apply(GameFamily(v.split('_')(0).toInt).gameLogic, v.split('_')(1)) | Variant.default(GameFamily(v.split('_')(0).toInt).gameLogic)
+          case None => Variant.default(GameLogic.Chess())
+        },
         timeMode = TimeMode.RealTime,
         time = t,
         increment = i,
@@ -129,11 +123,8 @@ object SetupForm {
 
     lazy val clock = "clock" -> optional(clockMapping)
 
-    lazy val chessVariant =
-      "chessVariant" -> optional(text.verifying(Variant.byKey(GameLib.Chess()).contains _))
-
-    lazy val draughtsVariant =
-      "draughtsVariant" -> optional(text.verifying(Variant.byKey(GameLib.Draughts()).contains _))
+    lazy val variant =
+      "variant" -> optional(text.verifying(Variant.byKey.contains _))
 
     lazy val message = optional(
       nonEmptyText.verifying(
@@ -149,9 +140,7 @@ object SetupForm {
 
     private val challengeMapping =
       mapping(
-        "gameLib"       -> gameLibs,
-        chessVariant,
-        draughtsVariant,
+        variant,
         clock,
         "days"          -> optional(days),
         "rated"         -> boolean,
@@ -166,10 +155,8 @@ object SetupForm {
 
     lazy val ai = Form(
       mapping(
-        "level"   -> level,
-        "gameLib" -> gameLibs,
-        chessVariant,
-        draughtsVariant,
+        "level" -> level,
+        variant,
         clock,
         "days"  -> optional(days),
         "color" -> optional(color),
@@ -180,9 +167,7 @@ object SetupForm {
     lazy val open = Form(
       mapping(
         "name" -> optional(lila.common.Form.cleanNonEmptyText(maxLength = 200)),
-        "gameLib"       -> gameLibs,
-        chessVariant,
-        draughtsVariant,
+        variant,
         clock,
         "rated" -> boolean,
         "fen"   -> fenField

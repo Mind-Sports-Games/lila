@@ -282,7 +282,7 @@ final class GameApiV2(
       .obj(
         "id"         -> g.id,
         "rated"      -> g.rated,
-        "lib"        -> g.variant.gameLib.id,
+        "lib"        -> g.variant.gameLogic.id,
         "variant"    -> g.variant.key,
         "speed"      -> g.speed.key,
         "perf"       -> PerfPicker.key(g),

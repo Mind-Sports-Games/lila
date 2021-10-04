@@ -3,7 +3,7 @@ package lila.insight
 import reactivemongo.api.bson._
 
 import strategygames.chess.opening.{ Ecopening, EcopeningDB }
-import strategygames.{ Color, GameLib, Role }
+import strategygames.{ Color, GameLogic, Role }
 import lila.db.BSON
 import lila.db.dsl._
 import lila.rating.BSONHandlers.perfTypeIdHandler
@@ -31,7 +31,7 @@ private object BSONHandlers {
   implicit val RoleBSONHandler = tryHandler[Role](
     { case BSONString(r) => r.split(":") match {
       case Array(lib, r) =>
-        Role.allByForsyth(GameLib(lib.toInt)) get r.head toTry s"Invalid role $r"
+        Role.allByForsyth(GameLogic(lib.toInt)) get r.head toTry s"Invalid role $r"
       case _ => sys.error("role not correctly encoded")  
     }},
     e => e match {

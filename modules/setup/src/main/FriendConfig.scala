@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ GameLib, Mode }
+import strategygames.{ GameFamily, GameLogic, Mode }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import lila.lobby.Color
@@ -23,7 +23,7 @@ case class FriendConfig(
 
   val strictFen = false
 
-  def >> = (variant.gameLib.id, variant.id, variant.id, fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value), microMatch).some
+  def >> = (s"{$variant.gameFamily.id}_{$variant.id}", fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, color.name, fen.map(_.value), microMatch).some
 
   def isPersistent = timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
 
@@ -32,19 +32,15 @@ case class FriendConfig(
 
 object FriendConfig extends BaseHumanConfig {
 
-  def from(l: Int, cv: Int, dv: Int, v2: Option[Int], tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String], mm: Boolean) =
+  def from(v: String, v2: Option[Int], tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String], mm: Boolean) = {
+    val gameLogic = GameFamily(v.split("_")(0).toInt).gameLogic
+    val variantId = v.split("_")(1).toInt
     new FriendConfig(
-      variant = l match {
-        case 0 => Variant.wrap(
-          strategygames.chess.variant.Variant(cv) err "Invalid game variant " + cv
-        )
-        case 1 => Variant.wrap(
-          strategygames.draughts.variant.Variant(dv) err "Invalid game variant " + dv
-        )
-      },
-      fenVariant = l match {
-        case 0 => none
-        case 1 => v2.flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
+      variant = Variant(gameLogic, variantId) err s"Invalid game variant $v",
+      fenVariant = gameLogic match {
+        case GameLogic.Draughts() =>
+          v2.flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
+        case _ => none
       },
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
@@ -52,15 +48,13 @@ object FriendConfig extends BaseHumanConfig {
       days = d,
       mode = m.fold(Mode.default)(Mode.orDefault),
       color = Color(c) err "Invalid color " + c,
-      fen = fen.map(f => FEN.apply(GameLib(l), f)),
+      fen = fen.map(f => FEN.apply(gameLogic, f)),
       microMatch = mm
     )
+  }
 
   def default(l: Int) = FriendConfig(
-    variant = l match {
-      case 0 => Variant.Chess(chessVariantDefault)
-      case 1 => Variant.Draughts(draughtsVariantDefault)
-    },
+    variant = defaultVariants(l),
     fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,
@@ -77,7 +71,7 @@ object FriendConfig extends BaseHumanConfig {
 
     def reads(r: BSON.Reader): FriendConfig =
       FriendConfig(
-        variant = Variant.orDefault(GameLib(r intD "l"), r int "v"),
+        variant = Variant.orDefault(GameLogic(r intD "l"), r int "v"),
         fenVariant = r intD "l" match {
           case 0 => none
           case 1 => (r intO "v2").flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
@@ -94,7 +88,7 @@ object FriendConfig extends BaseHumanConfig {
 
     def writes(w: BSON.Writer, o: FriendConfig) =
       $doc(
-        "l"  -> o.variant.gameLib.id,
+        "l"  -> o.variant.gameLogic.id,
         "v"  -> o.variant.id,
         "v2" -> o.fenVariant.map(_.id),
         "tm" -> o.timeMode.id,

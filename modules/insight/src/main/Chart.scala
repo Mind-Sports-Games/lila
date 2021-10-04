@@ -56,7 +56,7 @@ object Chart {
       povs.map { pov =>
         Json.obj(
           "id"       -> pov.gameId,
-          "fen"      -> (Forsyth.exportBoard(pov.game.variant.gameLib, pov.game.board)),
+          "fen"      -> (Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board)),
           "color"    -> pov.player.color.name,
           "lastMove" -> ~pov.game.lastMoveKeys,
           "user1"    -> gameUserJson(pov.player),

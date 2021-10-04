@@ -2,7 +2,7 @@ package lila.evalCache
 
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.GameLib
+import strategygames.GameLogic
 
 import play.api.libs.json._
 
@@ -21,11 +21,11 @@ final private class EvalCacheSocketHandler(
       push: JsObject => Unit
   ): Unit =
     for {
-      fen <- d str "fen" map{fen => FEN.apply(GameLib(d int "lib" match {
+      fen <- d str "fen" map{fen => FEN.apply(GameLogic(d int "lib" match {
         case Some(lib) => lib
         case None      => sys.error("lib must be provided for eval cache")
       }), fen)}
-      variant = Variant.orDefault(GameLib(d int "lib" match {
+      variant = Variant.orDefault(GameLogic(d int "lib" match {
         case Some(lib) => lib
         case None      => sys.error("lib must be provided for eval cache")
       }), ~d.str("variant"))

@@ -28,13 +28,11 @@ object RageSit {
   def imbalanceInc(game: Game, loser: Color) =
     Inc {
       {
-        import strategygames.chess.variant._
-        import strategygames.variant.{Variant => StratVariant }
-        (game.chess.board.materialImbalance, game.variant) match {
-          case (_, StratVariant.Chess(Crazyhouse) | StratVariant.Chess(Horde) | StratVariant.Chess(Antichess)) => 0
-          case (a, _) if a >= 4                    => 1
-          case (a, _) if a <= -4                   => -1
-          case _                                   => 0
+        game.chess.board.materialImbalance match {
+          case _ if game.variant.materialImbalanceVariant => 0
+          case a if a >= 4                                => 1
+          case a if a <= -4                               => -1
+          case _                                          => 0
         }
       } * {
         if (loser.white) 1 else -1

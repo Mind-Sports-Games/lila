@@ -19,13 +19,13 @@ object mini {
   val cgWrap            = span(cls := "cg-wrap")(cgWrapContent)
 
   def extraClasses(variant: Variant) = {
-    val gameLib = variant.gameLib.name.toLowerCase()
+    val gameLogic = variant.gameLogic.name.toLowerCase()
     variant match {
       case Variant.Chess(_) => 
-        s"${gameLib}"
+        s"${gameLogic}"
       case Variant.Draughts(v) => {
         val boardSize = v.boardSize
-        s"${gameLib} is${boardSize.key}"
+        s"${gameLogic} is${boardSize.key}"
       }
     }
   }
@@ -71,10 +71,10 @@ object mini {
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Chess(_) => 
-        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
+        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
       case Variant.Draughts(v) => {
         val boardSize = v.boardSize
-        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)}|${boardSize.width}x${boardSize.height}|${pov.color.name}|${~pov.game.lastMoveKeys}"
+        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)}|${boardSize.width}x${boardSize.height}|${pov.color.name}|${~pov.game.lastMoveKeys}"
       }
     }
 

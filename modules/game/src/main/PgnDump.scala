@@ -4,7 +4,7 @@ import strategygames.chess.format.pgn.{ Parser, Pgn }
 import strategygames.format.pgn.{ ParsedPgn, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ pgn => chessPgn }
-import strategygames.{ Centis, Color, GameLib, Status }
+import strategygames.{ Centis, Color, GameLogic, Status }
 import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
@@ -49,7 +49,7 @@ final class PgnDump(
       else fuccess(Tags(Nil))
     tagsFuture map { ts =>
       val turns = flags.moves ?? {
-        val fenSituation = ts.fen.flatMap{fen => Forsyth.<<<(game.variant.gameLib, fen)}
+        val fenSituation = ts.fen.flatMap{fen => Forsyth.<<<(game.variant.gameLogic, fen)}
         makeTurns(
           game.variant match {
             case Variant.Draughts(variant) => {
@@ -133,7 +133,9 @@ final class PgnDump(
     p.aiLevel.fold(u.fold(p.name | lila.user.User.anonymous)(_.name))("playstrategy AI level " + _)
 
   private val customStartPosition: Set[Variant] =
-    Set(strategygames.chess.variant.Chess960, strategygames.chess.variant.FromPosition, strategygames.chess.variant.Horde, strategygames.chess.variant.RacingKings).map(Variant.Chess)
+    strategygames.chess.variant.Variant.all.filter(
+      !_.standardInitialPosition
+    ).map(Variant.Chess).toSet
 
   private def eventOf(game: Game) = {
     val perf = game.perfType.fold("Standard")(_.trans(lila.i18n.defaultLang))
@@ -233,7 +235,7 @@ final class PgnDump(
             )
           )
           case _ => List(
-            Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLib)).value),
+            Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLogic)).value),
             Tag("SetUp", "1")
           )
         })

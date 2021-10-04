@@ -3,7 +3,7 @@ package lila.evalCache
 import cats.implicits._
 import strategygames.format.{ FEN, Uci }
 import strategygames.variant.Variant
-import strategygames.GameLib
+import strategygames.GameLogic
 import play.api.libs.json._
 
 import lila.common.Json._
@@ -42,7 +42,7 @@ object JsonHandlers {
       depth  <- d int "depth"
       pvObjs <- d objs "pvs"
       pvs    <- pvObjs.map(parsePv).sequence.flatMap(_.toNel)
-      variant = Variant.orDefault(GameLib(d int "lib" match {
+      variant = Variant.orDefault(GameLogic(d int "lib" match {
         case Some(lib) => lib
         case None      => sys.error("lib must be provided for readPutData")
       }), ~d.str("variant"))
@@ -66,7 +66,7 @@ object JsonHandlers {
           .split(' ')
           .take(EvalCacheEntry.MAX_PV_SIZE)
           .foldLeft(List.empty[Uci].some) {
-            case (Some(ucis), str) => Uci(GameLib(d int "lib" match {
+            case (Some(ucis), str) => Uci(GameLogic(d int "lib" match {
               case Some(lib) => lib
               case None      => sys.error("lib must be provided for parsePv")
             }), str) map (_ :: ucis)

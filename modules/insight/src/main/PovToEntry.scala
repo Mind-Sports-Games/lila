@@ -4,7 +4,7 @@ import scala.util.chaining._
 import cats.data.NonEmptyList
 
 import strategygames.format.FEN
-import strategygames.{ Board, Color, Divider, Division, GameLib, Piece, Replay, Role }
+import strategygames.{ Board, Color, Divider, Division, GameLogic, Piece, Replay, Role }
 import strategygames.{ Centis, Stats }
 import lila.analyse.{ Accuracy, Advice }
 import lila.game.{ Game, Pov }
@@ -50,7 +50,7 @@ final private class PovToEntry(
               boards <-
                 Replay
                   .boards(
-                    game.variant.gameLib,
+                    game.variant.gameLogic,
                     moveStrs = game.pgnMoves,
                     initialFen = fen,
                     variant = game.variant
@@ -63,7 +63,7 @@ final private class PovToEntry(
               provisional = provisional,
               initialFen = fen,
               analysis = an,
-              division = Divider(pov.game.variant.gameLib, boards.toList),
+              division = Divider(pov.game.variant.gameLogic, boards.toList),
               moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
               boards = boards,
               movetimes = movetimes,
@@ -76,7 +76,7 @@ final private class PovToEntry(
           }
       }
 
-  private def pgnMoveToRole(pgn: String): Role = Role.pgnMoveToRole(GameLib.Chess(), pgn.head)
+  private def pgnMoveToRole(pgn: String): Role = Role.pgnMoveToRole(GameLogic.Chess(), pgn.head)
 
   private def makeMoves(from: RichPov): List[InsightMove] = {
     val cpDiffs = ~from.moveAccuracy toVector
@@ -160,7 +160,7 @@ final private class PovToEntry(
       from.division.end.fold(from.boards.last.some)(from.boards.toList.lift) match {
         case Some(board) =>
           Color.all.forall { color =>
-            !board.hasPiece(Piece(GameLib.Chess(), color, Role.ChessRole(strategygames.chess.Queen)))
+            !board.hasPiece(Piece(GameLogic.Chess(), color, Role.ChessRole(strategygames.chess.Queen)))
           }
         case _ =>
           logger.warn(s"https://playstrategy.org/${from.pov.gameId} missing endgame board")

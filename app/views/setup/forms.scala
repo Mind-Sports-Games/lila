@@ -9,7 +9,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 
-import strategygames.GameLib
+import strategygames.GameFamily
 
 object forms {
 
@@ -22,9 +22,7 @@ object forms {
       routes.Setup.hook("sri-placeholder")
     ) {
       frag(
-        renderGameLib(form, translatedGameLibChoices),
-        renderVariant(form, translatedChessVariantChoicesWithVariants, GameLib.Chess()),
-        renderVariant(form, translatedDraughtsVariantChoicesWithVariants, GameLib.Draughts()),
+        renderVariant(form, translatedVariantChoicesWithVariants),
         renderTimeMode(form, allowAnon = false),
         ctx.isAuth option frag(
           div(cls := "mode_choice buttons")(
@@ -63,9 +61,7 @@ object forms {
   ) =
     layout("ai", trans.playWithTheMachine(), routes.Setup.ai) {
       frag(
-        //renderGameLib(form, translatedGameLibChoices),
-        renderVariant(form, translatedChessAiVariantChoices, GameLib.Chess()),
-        //renderVariant(form, translatedDraughtsAiVariantChoices, GameLib.Draughts()),
+        renderVariant(form, translatedAiVariantChoices),
         fenInput(form("fen"), strict = true, validFen),
         renderTimeMode(form, allowAnon = true),
         if (ctx.blind)
@@ -108,9 +104,7 @@ object forms {
         user.map { u =>
           userLink(u, cssClass = "target".some)
         },
-        renderGameLib(form, translatedGameLibChoices),
-        renderVariant(form, translatedChessVariantChoicesWithVariantsAndFen, GameLib.Chess()),
-        renderVariant(form, translatedDraughtsVariantChoicesWithVariantsAndFen, GameLib.Draughts()),
+        renderVariant(form, translatedVariantChoicesWithVariantsAndFen),
         fenInput(form("fen"), strict = false, validFen),
         renderTimeMode(form, allowAnon = true),
         renderMicroMatch(form),

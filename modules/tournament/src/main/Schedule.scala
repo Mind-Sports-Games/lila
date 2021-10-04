@@ -242,11 +242,12 @@ object Schedule {
     }
     def toPerfType(speed: Speed) =
       speed match {
-        case UltraBullet                                      => PerfType.UltraBullet
-        case HyperBullet | Bullet | HippoBullet               => PerfType.Bullet
-        case SuperBlitz | Blitz | Blitz32 | Blitz35 | Blitz51 => PerfType.Blitz
-        case Rapid                                            => PerfType.Rapid
-        case Classical                                        => PerfType.Classical
+        case UltraBullet                        => PerfType.orDefaultSpeed("ultraBullet")
+        case HyperBullet | Bullet | HippoBullet => PerfType.orDefaultSpeed("bullet")
+        case SuperBlitz | Blitz | Blitz32 | Blitz35 | Blitz51 =>
+          PerfType.orDefaultSpeed("blitz")
+        case Rapid                              => PerfType.orDefaultSpeed("rapid")
+        case Classical                          => PerfType.orDefaultSpeed("classical")
       }
   }
 

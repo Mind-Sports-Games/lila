@@ -7,6 +7,7 @@ import play.api.libs.json.Json
 import controllers.routes
 import lila.app.ui.ScalatagsTemplate._
 import lila.rating.PerfType
+import strategygames.Speed
 import lila.tournament.{ Schedule, Tournament }
 import lila.user.User
 
@@ -49,8 +50,8 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
     private val replacements = List(
       "PlayStrategy "    -> "",
       "Marathon"    -> icon('\\'),
-      "HyperBullet" -> s"H${icon(PerfType.Bullet.iconChar)}",
-      "SuperBlitz"  -> s"S${icon(PerfType.Blitz.iconChar)}"
+      "HyperBullet" -> s"H${icon(Speed.Bullet.perfIcon)}",
+      "SuperBlitz"  -> s"S${icon(Speed.Blitz.perfIcon)}"
     ) ::: PerfType.leaderboardable.filterNot(PerfType.translated.contains).map { pt =>
       pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
     }

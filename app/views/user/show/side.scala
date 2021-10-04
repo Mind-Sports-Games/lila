@@ -21,7 +21,7 @@ object side {
       perf.nonEmpty option showPerf(perf, perfType)
 
     def showPerf(perf: lila.rating.Perf, perfType: PerfType) = {
-      val isPuzzle = perfType == lila.rating.PerfType.Puzzle
+      val isPuzzle = perfType.key == "puzzle"
       a(
         dataIcon := perfType.iconChar,
         title := perfType.desc,
@@ -64,32 +64,33 @@ object side {
 
     div(cls := "side sub-ratings")(
       (!u.lame || ctx.is(u) || isGranted(_.UserModView)) option frag(
-        showNonEmptyPerf(u.perfs.ultraBullet, PerfType.UltraBullet),
-        showPerf(u.perfs.bullet, PerfType.Bullet),
-        showPerf(u.perfs.blitz, PerfType.Blitz),
-        showPerf(u.perfs.rapid, PerfType.Rapid),
-        showPerf(u.perfs.classical, PerfType.Classical),
-        showPerf(u.perfs.correspondence, PerfType.Correspondence),
+        showNonEmptyPerf(u.perfs.ultraBullet, PerfType.orDefaultSpeed("ultraBullet")),
+        showPerf(u.perfs.bullet, PerfType.orDefaultSpeed("bullet")),
+        showPerf(u.perfs.blitz, PerfType.orDefaultSpeed("blitz")),
+        showPerf(u.perfs.rapid, PerfType.orDefaultSpeed("rapid")),
+        showPerf(u.perfs.classical, PerfType.orDefaultSpeed("classical")),
+        showPerf(u.perfs.correspondence, PerfType.orDefaultSpeed("correspondence")),
         u.hasVariantRating option hr,
-        showNonEmptyPerf(u.perfs.crazyhouse, PerfType.Crazyhouse),
-        showNonEmptyPerf(u.perfs.chess960, PerfType.Chess960),
-        showNonEmptyPerf(u.perfs.kingOfTheHill, PerfType.KingOfTheHill),
-        showNonEmptyPerf(u.perfs.threeCheck, PerfType.ThreeCheck),
-        showNonEmptyPerf(u.perfs.antichess, PerfType.Antichess),
-        showNonEmptyPerf(u.perfs.atomic, PerfType.Atomic),
-        showNonEmptyPerf(u.perfs.horde, PerfType.Horde),
-        showNonEmptyPerf(u.perfs.racingKings, PerfType.RacingKings),
-        showNonEmptyPerf(u.perfs.linesOfAction, PerfType.LinesOfAction),
-        showPerf(u.perfs.international, PerfType.International),
-        showNonEmptyPerf(u.perfs.frisian, PerfType.Frisian),
-        showNonEmptyPerf(u.perfs.frysk, PerfType.Frysk),
-        showNonEmptyPerf(u.perfs.antidraughts, PerfType.Antidraughts),
-        showNonEmptyPerf(u.perfs.breakthrough, PerfType.Breakthrough),
-        showPerf(u.perfs.russian, PerfType.Russian),
-        showPerf(u.perfs.pool, PerfType.Pool),
+        showNonEmptyPerf(u.perfs.crazyhouse, PerfType.orDefault("crazyhouse")),
+        showNonEmptyPerf(u.perfs.chess960, PerfType.orDefault("chess960")),
+        showNonEmptyPerf(u.perfs.kingOfTheHill, PerfType.orDefault("kingOfTheHill")),
+        showNonEmptyPerf(u.perfs.threeCheck, PerfType.orDefault("threeCheck")),
+        showNonEmptyPerf(u.perfs.antichess, PerfType.orDefault("antichess")),
+        showNonEmptyPerf(u.perfs.atomic, PerfType.orDefault("atomic")),
+        showNonEmptyPerf(u.perfs.horde, PerfType.orDefault("horde")),
+        showNonEmptyPerf(u.perfs.racingKings, PerfType.orDefault("racingKings")),
+        showNonEmptyPerf(u.perfs.linesOfAction, PerfType.orDefault("linesOfAction")),
+        showNonEmptyPerf(u.perfs.international, PerfType.orDefault("international")),
+        showNonEmptyPerf(u.perfs.frisian, PerfType.orDefault("frisian")),
+        showNonEmptyPerf(u.perfs.frysk, PerfType.orDefault("frysk")),
+        showNonEmptyPerf(u.perfs.antidraughts, PerfType.orDefault("antidraughts")),
+        showNonEmptyPerf(u.perfs.breakthrough, PerfType.orDefault("breakthrough")),
+        showNonEmptyPerf(u.perfs.russian, PerfType.orDefault("russian")),
+        showNonEmptyPerf(u.perfs.brazilian, PerfType.orDefault("russian")),
+        showNonEmptyPerf(u.perfs.pool, PerfType.orDefault("pool")),
         u.noBot option frag(
           hr,
-          showPerf(u.perfs.puzzle, PerfType.Puzzle),
+          showPerf(u.perfs.puzzle, PerfType.orDefault("puzzle")),
           showStorm(u.perfs.storm, u),
           showRacer(u.perfs.racer, u),
           showStreak(u.perfs.streak, u)

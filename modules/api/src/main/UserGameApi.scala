@@ -4,7 +4,7 @@ import play.api.i18n.Lang
 import play.api.libs.json._
 
 import strategygames.format.Forsyth
-import strategygames.GameLib
+import strategygames.GameLogic
 
 import lila.common.Json.jodaWrites
 import lila.common.LightUser
@@ -58,7 +58,7 @@ final class UserGameApi(
             .add("rating" -> p.rating)
             .add("ratingDiff" -> p.ratingDiff)
         }),
-        "fen"       -> Forsyth.exportBoard(g.variant.gameLib, g.board),
+        "fen"       -> Forsyth.exportBoard(g.variant.gameLogic, g.board),
         "winner"    -> g.winnerColor.map(_.name),
         "bookmarks" -> g.bookmarks
       )

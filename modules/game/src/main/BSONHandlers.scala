@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameLib, History, Status, Mode, Piece, Pos, PositionHash, Situation, Board }
+import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameLogic, History, Status, Mode, Piece, Pos, PositionHash, Situation, Board }
 import strategygames.chess
 import strategygames.draughts
 import strategygames.format.Uci
@@ -313,7 +313,7 @@ object BSONHandlers {
         F.whiteClockHistory -> clockHistory(White, o.clockHistory, o.chess.clock, o.flagged),
         F.blackClockHistory -> clockHistory(Black, o.clockHistory, o.chess.clock, o.flagged),
         F.rated             -> w.boolO(o.mode.rated),
-        F.lib               -> o.board.variant.gameLib.id,
+        F.lib               -> o.board.variant.gameLogic.id,
         F.variant           -> o.board.variant.exotic.option(w int o.board.variant.id),
         F.bookmarks         -> w.intO(o.bookmarks),
         F.createdAt         -> w.date(o.createdAt),
@@ -327,7 +327,7 @@ object BSONHandlers {
         F.drawLimit         -> o.metadata.drawLimit,
         F.analysed          -> w.boolO(o.metadata.analysed)
       ) ++ {
-        if (o.board.variant.gameLib == GameLib.Draughts()){
+        if (o.board.variant.gameLogic == GameLogic.Draughts()){
           o.pdnStorage match {
             case Some(PdnStorage.OldBin) => $doc(
               F.oldPgn -> PdnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),

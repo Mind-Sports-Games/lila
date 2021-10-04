@@ -7,7 +7,7 @@ import lila.i18n.{ I18nKeys => trans }
 import lila.socket.Socket.SocketVersion
 import lila.socket.UserLagCache
 
-import strategygames.GameLib
+import strategygames.GameLogic
 import strategygames.variant.Variant
 
 final class JsonView(
@@ -60,7 +60,7 @@ final class JsonView(
         "status"     -> c.status.name,
         "challenger" -> c.challengerUser,
         "destUser"   -> c.destUser,
-        "lib"        -> c.variant.gameLib.id,
+        "lib"        -> c.variant.gameLogic.id,
         "variant"    -> c.variant,
         "rated"      -> c.mode.rated,
         "speed"      -> c.speed.key,
@@ -91,7 +91,7 @@ final class JsonView(
       .add("microMatch" -> c.microMatch)
 
   private def iconChar(c: Challenge) =
-    if (c.variant == Variant.libFromPosition(c.variant.gameLib)) '*'
+    if (c.variant == Variant.libFromPosition(c.variant.gameLogic)) '*'
     else c.perfType.iconChar
 
   private val i18nKeys = List(

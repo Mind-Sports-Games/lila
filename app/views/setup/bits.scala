@@ -7,7 +7,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import strategygames.GameLib
+import strategygames.GameFamily
 
 private object bits {
 
@@ -37,22 +37,27 @@ private object bits {
     )
   }
 
-  def renderGameLib(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "gameLib label_select")(
-      renderLabel(form("gameLib"), "Game Family"),
+  def renderGameFamily(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "gameFamily label_select")(
+      renderLabel(form("gameFamily"), "Game Family"),
       renderSelect(
-        form("gameLib"),
+        form("gameFamily"),
         libs
       )
     )
 
-  def renderVariant(form: Form[_], variants: List[SelectChoice], lib: GameLib)(implicit ctx: Context) =
-    div(cls := s"${lib.name.toLowerCase()}Variant label_select", if (lib != GameLib.Chess()) style := "display:none")(
-      renderLabel(form(s"${lib.name.toLowerCase()}Variant"), trans.variant()),
-      renderSelect(
-        form(s"${lib.name.toLowerCase()}Variant"),
-        variants.filter { case (id, _, _) =>
-          ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
+  def renderVariant(
+      form: Form[_],
+      variants: List[(SelectChoice, List[SelectChoice])]
+  )(implicit ctx: Context) =
+    div(cls := "variant label_select")(
+      renderLabel(form("Variant"), trans.variant()),
+      renderSelectWithOptGroups(
+        form("variant"),
+        variants.map{ case (gf, v) =>
+          (gf, v.filter { case (id, _, _) =>
+            ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
+          })
         }
       )
     )
@@ -63,14 +68,35 @@ private object bits {
       compare: (String, String) => Boolean = (a, b) => a == b
   ) =
     select(id := s"$prefix${field.id}", name := field.name)(
-      options.map { case (value, name, title) =>
-        option(
-          st.value := value,
-          st.title := title,
-          field.value.exists(v => compare(v, value)) option selected
-        )(name)
+      renderOptions(field, options, compare)
+    )
+
+  def renderSelectWithOptGroups(
+      field: Field,
+      options: List[(SelectChoice, Seq[SelectChoice])],
+      compare: (String, String) => Boolean = (a, b) => a == b
+  ) =
+    select(id := s"$prefix${field.id}", name := field.name)(
+      options.map { case((ogValue, ogName, _), opts) =>
+        optgroup(name := ogName)(
+          renderOptions(field, opts, compare, ogValue + '_')
+        )
       }
     )
+
+  private def renderOptions(
+      field: Field,
+      options: Seq[SelectChoice],
+      compare: (String, String) => Boolean = (a, b) => a == b,
+      optValuePrefix: String = ""
+  ) =
+    options.map { case (value, name, title) =>
+      option(
+        st.value := optValuePrefix + value,
+        st.title := title,
+        field.value.exists(v => compare(v, value)) option selected
+      )(name)
+    }
 
   def renderRadios(field: Field, options: Seq[SelectChoice]) =
     st.group(cls := "radio")(
@@ -112,7 +138,7 @@ private object bits {
   )
 
   def renderMicroMatch(form: Form[_])(implicit ctx: Context) =
-    div(cls := "micro_match", title := trans.microMatchExplanation.txt())(
+    div(cls := "micro_match", title := trans.microMatchDefinition.txt())(
       renderCheckbox(form("microMatch"), trans.microMatch())
     )
 

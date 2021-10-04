@@ -3,7 +3,7 @@ package lila.swiss
 import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.GameLib
+import strategygames.{ GameLogic, GameFamily }
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -26,9 +26,7 @@ final class SwissForm(implicit mode: Mode) {
         )(ClockConfig.apply)(ClockConfig.unapply)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt"          -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "gameLib"           -> number(min = 0, max = 1),
-        "chessVariant"      -> optional(nonEmptyText.verifying(v => Variant(GameLib.Chess(), v).isDefined)),
-        "draughtsVariant"   -> optional(nonEmptyText.verifying(v => Variant(GameLib.Draughts(), v).isDefined)),
+        "variant"           -> optional(nonEmptyText.verifying(v => Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined)),
         "rated"             -> optional(boolean),
         "microMatch"        -> optional(boolean),
         "nbRounds"          -> number(min = minRounds, max = 100),
@@ -51,9 +49,7 @@ final class SwissForm(implicit mode: Mode) {
       startsAt = Some(DateTime.now plusSeconds {
         if (mode == Mode.Prod) 60 * 10 else 20
       }),
-      gameLib = 0,
-      chessVariant = Variant.default(GameLib.Chess()).key.some,
-      draughtsVariant = Variant.default(GameLib.Draughts()).key.some,
+      variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
       rated = true.some,
       microMatch = false.some,
       nbRounds = 7,
@@ -72,9 +68,7 @@ final class SwissForm(implicit mode: Mode) {
       name = s.name.some,
       clock = s.clock,
       startsAt = s.startsAt.some,
-      gameLib = s.variant.gameLib.id,
-      chessVariant = s.variant.key.some,
-      draughtsVariant = s.variant.key.some,
+      variant = s"${s.variant.gameFamily.id}_${s.variant.id}".some,
       rated = s.settings.rated.some,
       microMatch = s.settings.isMicroMatch.some,
       nbRounds = s.settings.nbRounds,
@@ -153,9 +147,7 @@ object SwissForm {
       name: Option[String],
       clock: ClockConfig,
       startsAt: Option[DateTime],
-      gameLib: Int,
-      chessVariant: Option[String],
-      draughtsVariant: Option[String],
+      variant: Option[String],
       rated: Option[Boolean],
       microMatch: Option[Boolean],
       nbRounds: Int,
@@ -168,12 +160,13 @@ object SwissForm {
       conditions: SwissCondition.DataForm.AllSetup,
       forbiddenPairings: Option[String]
   ) {
-    def realGameLib = GameLib(gameLib)
-    def realVariant = (realGameLib match {
-      case GameLib.Chess()    => chessVariant
-      case GameLib.Draughts() => draughtsVariant
-      case _ => sys.error("Invalid lib in Swiss data")
-    }) flatMap {v => Variant.apply(realGameLib, v)} getOrElse Variant.default(realGameLib)
+    def gameLogic = variant match {
+      case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
+      case None    => GameLogic.Chess()
+    }
+    def realVariant = variant flatMap {
+      v => Variant.apply(gameLogic, v.split("_")(1).toInt)
+    } getOrElse Variant.default(gameLogic)
     def realStartsAt = startsAt | DateTime.now.plusMinutes(10)
     def realChatFor  = chatFor | Swiss.ChatFor.default
     def realRoundInterval = {
@@ -192,7 +185,7 @@ object SwissForm {
       }
     }.seconds
     def useDrawTables = drawTables | false
-    def realPosition = position ifTrue realVariant.standard
+    def realPosition = position ifTrue realVariant.standardVariant
 
     def isRated = rated | true
     def isMicroMatch = microMatch | false

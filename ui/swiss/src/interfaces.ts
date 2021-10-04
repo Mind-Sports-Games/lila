@@ -118,7 +118,7 @@ export interface BoardSize {
 
 export interface Board {
   id: string;
-  gameLib: string;
+  gameLogic: string;
   boardSize?: BoardSize;
   fen: string;
   lastMove?: string;

@@ -18,7 +18,7 @@ import lila.hub.LightTeam.TeamID
 import lila.round.actorApi.round.QuietFlag
 import lila.user.{ User, UserRepo }
 
-import strategygames.GameLib
+import strategygames.GameLogic
 
 final class SwissApi(
     colls: SwissColls,
@@ -95,16 +95,13 @@ final class SwissApi(
   def update(swiss: Swiss, data: SwissForm.SwissData): Funit =
     Sequencing(swiss.id)(byId) { old =>
       val position =
-        if (old.isCreated || old.settings.position.isDefined) data.realVariant.standard ?? data.realPosition
+        if (old.isCreated || old.settings.position.isDefined) data.realVariant.standardVariant ?? data.realPosition
         else old.settings.position
       val swiss =
         old.copy(
           name = data.name | old.name,
           clock = if (old.isCreated) data.clock else old.clock,
-          variant = if (
-            old.isCreated && ((data.gameLib == 0 && data.chessVariant.isDefined) || (data.gameLib == 1 && data.draughtsVariant.isDefined))
-          ) data.realVariant
-          else old.variant,
+          variant = if (old.isCreated && data.variant.isDefined) data.realVariant else old.variant,
           startsAt = data.startsAt.ifTrue(old.isCreated) | old.startsAt,
           nextRoundAt =
             if (old.isCreated) Some(data.startsAt | old.startsAt)

@@ -3,7 +3,7 @@ package views.html.board
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.{ Color, Black, White }
 import strategygames.variant.Variant
-import strategygames.{ GameLib, Situation }
+import strategygames.{ GameLogic, Situation }
 import strategygames.draughts.Board
 
 import controllers.routes
@@ -51,7 +51,7 @@ object bits {
   }
   def mini(pov: Pov): Tag => Tag =
     miniWithOrientation(
-      FEN(pov.game.variant.gameLib, Forsyth.boardAndColor(pov.game.variant.gameLib, pov.game.situation)),
+      FEN(pov.game.variant.gameLogic, Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)),
       boardOrientation(pov),
       ~pov.game.lastMoveKeys,
       boardSize(pov)
@@ -65,8 +65,8 @@ object bits {
   )(tag: Tag): Tag = {
     // TODO: this is an excellent candidate for refactoring.
     val libName = fen match {
-      case FEN.Chess(_) => GameLib.Chess().name
-      case FEN.Draughts(_) => GameLib.Draughts().name
+      case FEN.Chess(_) => GameLogic.Chess().name
+      case FEN.Draughts(_) => GameLogic.Draughts().name
     }
     val orient = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)

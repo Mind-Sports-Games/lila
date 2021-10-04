@@ -1,13 +1,14 @@
 package lila.setup
 
-import strategygames.{ GameLib, Mode }
+import strategygames.{ GameFamily, GameLogic, Mode }
+import strategygames.variant.Variant
 import lila.lobby.Color
 import lila.lobby.{ Hook, Seek }
 import lila.rating.RatingRange
 import lila.user.User
 
 case class HookConfig(
-    variant: strategygames.variant.Variant,
+    variant: Variant,
     timeMode: TimeMode,
     time: Double,
     increment: Int,
@@ -45,7 +46,7 @@ case class HookConfig(
     )
 
   def >> =
-    (variant.gameLib.id, variant.id, variant.id, timeMode.id, time, increment, days, mode.id.some, ratingRange.toString.some, color.name).some
+    (s"{$variant.gameLogic.id}_{$variant.id}", timeMode.id, time, increment, days, mode.id.some, ratingRange.toString.some, color.name).some
 
   def withTimeModeString(tc: Option[String]) =
     tc match {
@@ -108,15 +109,12 @@ case class HookConfig(
 
 object HookConfig extends BaseHumanConfig {
 
-  def from(l: Int, cv: Int, dv: Int, tm: Int, t: Double, i: Int, d: Int, m: Option[Int], e: Option[String], c: String) = {
+  def from(v: String, tm: Int, t: Double, i: Int, d: Int, m: Option[Int], e: Option[String], c: String) = {
     val realMode = m.fold(Mode.default)(Mode.orDefault)
-    val gameLib = GameLib(l)
-    val v = gameLib match {
-      case GameLib.Chess()    => cv
-      case GameLib.Draughts() => dv
-    }
+    val gameFamily = GameFamily(v.split("_")(0).toInt)
+    val variantId  = v.split("_")(1).toInt
     new HookConfig(
-      variant = strategygames.variant.Variant(gameLib, v) err s"Invalid game variant $v",
+      variant = Variant(gameFamily.gameLogic, variantId) err s"Invalid game variant $v",
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
       increment = i,
@@ -147,7 +145,7 @@ object HookConfig extends BaseHumanConfig {
 
     def reads(r: BSON.Reader): HookConfig =
       HookConfig(
-        variant = strategygames.variant.Variant.orDefault(GameLib(r intD "l"), r int "v"),
+        variant = Variant.orDefault(GameLogic(r intD "l"), r int "v"),
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",
         increment = r int "i",
@@ -159,6 +157,7 @@ object HookConfig extends BaseHumanConfig {
 
     def writes(w: BSON.Writer, o: HookConfig) =
       $doc(
+        "l"  -> o.variant.gameLogic.id,
         "v"  -> o.variant.id,
         "tm" -> o.timeMode.id,
         "t"  -> o.time,
