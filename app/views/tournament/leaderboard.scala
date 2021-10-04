@@ -80,7 +80,7 @@ object leaderboard {
           div(cls := "tournament-leaderboards")(
             eliteWinners,
             freqWinners(winners.hyperbullet, PerfType.orDefaultSpeed("bullet"), "HyperBullet"),
-            freqWinners(winners.bullet, PerfType.orDefaultSpeed("bullet"), "bullet"),
+            freqWinners(winners.bullet, PerfType.orDefaultSpeed("bullet"), "Bullet"),
             freqWinners(winners.superblitz, PerfType.orDefaultSpeed("blitz"), "SuperBlitz"),
             freqWinners(winners.blitz, PerfType.orDefaultSpeed("blitz"), "Blitz"),
             freqWinners(winners.rapid, PerfType.orDefaultSpeed("rapid"), "Rapid"),
