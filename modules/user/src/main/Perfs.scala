@@ -68,6 +68,8 @@ case class Perfs(
       "puzzle"         -> puzzle
     )
 
+  private def fullPerfsMap: Map[String, Perf] = perfs.toMap
+
   def bestPerf: Option[(PerfType, Perf)] = {
     val ps = PerfType.nonPuzzle map { pt =>
       pt -> apply(pt)
@@ -160,7 +162,7 @@ case class Perfs(
 
   def apply(key: String): Option[Perf] = perfsMap get key
 
-  def apply(perfType: PerfType): Perf = perfsMap(perfType.key)
+  def apply(perfType: PerfType): Perf = fullPerfsMap(perfType.key)
 
   def inShort =
     perfs map { case (name, perf) =>
