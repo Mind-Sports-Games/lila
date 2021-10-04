@@ -17,7 +17,7 @@ object activities {
       copy(
         value = value + (pt -> value.get(pt).fold(score)(_ add score))
       )
-    def hasNonCorres = value.exists(_._1 != PerfType.Correspondence)
+    def hasNonCorres = value.exists(_._1.key != "correspondence")
   }
   implicit val GamesZero = Zero.instance(Games(Map.empty))
 

@@ -26,7 +26,6 @@ import org.joda.time.DateTime
 import lila.common.Sequence
 import lila.db.ByteArray
 import lila.rating.PerfType
-import lila.rating.PerfType.Classical
 import lila.user.User
 
 case class Game(
@@ -111,7 +110,10 @@ case class Game(
   def isSimul      = simulId.isDefined
   def isSwiss      = swissId.isDefined
   def isMandatory  = isTournament || isSimul || isSwiss
-  def isClassical  = perfType contains Classical
+  def isClassical  = perfType match {
+    case Some(pt) => pt.key == "classical"
+    case _        => false
+  }
   def nonMandatory = !isMandatory
 
   def hasChat = !isTournament && !isSimul && nonAi

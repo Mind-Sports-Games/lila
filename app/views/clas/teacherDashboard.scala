@@ -25,7 +25,7 @@ object teacherDashboard {
           a(cls := active.active("wall"), href := routes.Clas.wall(c.id.value))("News"),
           a(
             cls := active.active("progress"),
-            href := routes.Clas.progress(c.id.value, PerfType.Blitz.key, 7)
+            href := routes.Clas.progress(c.id.value, "blitz", 7)
           )(trans.clas.progress()),
           a(cls := active.active("edit"), href := routes.Clas.edit(c.id.value))(trans.edit()),
           a(cls := active.active("students"), href := routes.Clas.students(c.id.value))(
@@ -219,14 +219,7 @@ object teacherDashboard {
       div(cls := "progress-perf")(
         label(trans.variant()),
         div(cls := "progress-choices")(
-          List(
-            PerfType.Bullet,
-            PerfType.Blitz,
-            PerfType.Rapid,
-            PerfType.Classical,
-            PerfType.Correspondence,
-            PerfType.Puzzle
-          ).map { pt =>
+          (PerfType.standard ::: PerfType.allPuzzle).map { pt =>
             a(
               cls := progress.map(_.perfType.key.active(pt.key)),
               href := routes.Clas.progress(c.id.value, pt.key, progress.fold(7)(_.days))
