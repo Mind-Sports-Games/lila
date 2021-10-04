@@ -26,10 +26,7 @@ final class SwissForm(implicit mode: Mode) {
         )(ClockConfig.apply)(ClockConfig.unapply)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt"          -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "gameFamily"           -> number(min = 0, max = 2),
-        "chessVariant"      -> optional(nonEmptyText.verifying(v => Variant(GameLogic.Chess(), v).isDefined)),
-        "draughtsVariant"   -> optional(nonEmptyText.verifying(v => Variant(GameLogic.Draughts(), v).isDefined)),
-        "loaVariant"        -> optional(nonEmptyText.verifying(v => Variant(GameLogic.Chess(), v).isDefined)),
+        "variant"           -> optional(nonEmptyText.verifying(v => Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined)),
         "rated"             -> optional(boolean),
         "microMatch"        -> optional(boolean),
         "nbRounds"          -> number(min = minRounds, max = 100),
@@ -52,11 +49,7 @@ final class SwissForm(implicit mode: Mode) {
       startsAt = Some(DateTime.now plusSeconds {
         if (mode == Mode.Prod) 60 * 10 else 20
       }),
-      gameFamily = 0,
-      chessVariant = Variant.default(GameLogic.Chess()).key.some,
-      draughtsVariant = Variant.default(GameLogic.Draughts()).key.some,
-      //TODO: Maybe handle this correctly in strategygames.variant.Variant?
-      loaVariant = Variant.Chess(strategygames.chess.variant.LinesOfAction).key.some,
+      variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
       rated = true.some,
       microMatch = false.some,
       nbRounds = 7,
@@ -75,10 +68,7 @@ final class SwissForm(implicit mode: Mode) {
       name = s.name.some,
       clock = s.clock,
       startsAt = s.startsAt.some,
-      gameFamily = s.variant.gameFamily.id,
-      chessVariant = s.variant.key.some,
-      draughtsVariant = s.variant.key.some,
-      loaVariant = s.variant.key.some,
+      variant = s"${s.variant.gameFamily.id}_${s.variant.id}".some,
       rated = s.settings.rated.some,
       microMatch = s.settings.isMicroMatch.some,
       nbRounds = s.settings.nbRounds,
@@ -157,10 +147,7 @@ object SwissForm {
       name: Option[String],
       clock: ClockConfig,
       startsAt: Option[DateTime],
-      gameFamily: Int,
-      chessVariant: Option[String],
-      draughtsVariant: Option[String],
-      loaVariant: Option[String],
+      variant: Option[String],
       rated: Option[Boolean],
       microMatch: Option[Boolean],
       nbRounds: Int,
@@ -173,15 +160,13 @@ object SwissForm {
       conditions: SwissCondition.DataForm.AllSetup,
       forbiddenPairings: Option[String]
   ) {
-    def realGameFamily = GameFamily(gameFamily)
-    def realVariant = (realGameFamily match {
-      case GameFamily.Chess()         => chessVariant
-      case GameFamily.Draughts()      => draughtsVariant
-      case GameFamily.LinesOfAction() => loaVariant
-      case _ => sys.error("Invalid lib in Swiss data")
-    }) flatMap {
-      v => Variant.apply(realGameFamily.codeLib, v)
-    } getOrElse Variant.default(realGameFamily.codeLib)
+    def gameLogic = variant match {
+      case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
+      case None    => GameLogic.Chess()
+    }
+    def realVariant = variant flatMap {
+      v => Variant.apply(gameLogic, v.split("_")(1).toInt)
+    } getOrElse Variant.default(gameLogic)
     def realStartsAt = startsAt | DateTime.now.plusMinutes(10)
     def realChatFor  = chatFor | Swiss.ChatFor.default
     def realRoundInterval = {
@@ -200,7 +185,7 @@ object SwissForm {
       }
     }.seconds
     def useDrawTables = drawTables | false
-    def realPosition = position ifTrue realVariant.standard
+    def realPosition = position ifTrue realVariant.standardVariant
 
     def isRated = rated | true
     def isMicroMatch = microMatch | false

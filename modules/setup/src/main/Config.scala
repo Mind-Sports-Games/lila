@@ -71,7 +71,7 @@ trait Positional { self: Config =>
         (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)
       }
     }
-    case GameLogic.Draughts() => !(variant.fromPosition && Config.draughtsFromPositionVariants.contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
+    case GameLogic.Draughts() => !(variant.fromPosition && Config.fenVariants(GameFamily.Draughts().id).contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
         fen ?? {
           f => ~Forsyth.<<<@(variant.gameLogic, fenVariant | Variant.libStandard(GameLogic.Draughts()), f)
             .map(_.situation playable strictFen)
@@ -80,7 +80,7 @@ trait Positional { self: Config =>
   }
 
   lazy val validKingCount = variant.gameLogic match {
-    case GameLogic.Draughts() => !(variant.fromPosition && Config.draughtsFromPositionVariants.contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
+    case GameLogic.Draughts() => !(variant.fromPosition && Config.fenVariants(GameFamily.Draughts().id).contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
       fen ?? { f => strategygames.draughts.format.Forsyth.countKings(
         strategygames.draughts.format.FEN(f.value)
       ) <= 30 }
@@ -125,74 +125,44 @@ trait Positional { self: Config =>
 object Config extends BaseConfig
 
 trait BaseConfig {
-  //TODO: Push this into strategygames?
-  val gameFamilys    = List(GameFamily.Chess().id, GameFamily.Draughts().id, GameFamily.LinesOfAction().id)
-  val chessVariants  = List(strategygames.chess.variant.Standard.id, strategygames.chess.variant.Chess960.id)
-  val draughtsVariants = List(strategygames.draughts.variant.Standard.id)
-  val loaVariants      = List(strategygames.chess.variant.LinesOfAction.id)
+  val gameFamilys = GameFamily.all.map(_.id)
 
-  val chessVariantDefault    = strategygames.chess.variant.Standard
-  val draughtsVariantDefault = strategygames.draughts.variant.Standard
-  val loaVariantDefault      = strategygames.chess.variant.LinesOfAction
-  val variantDefaultStrat    = Variant.Chess(strategygames.chess.variant.Standard)
+  val baseVariants = GameFamily.all.map(
+    gf => (gf.id, gf.variants.filter(_.baseVariant).map(_.id))
+  ).toMap
 
-  val chessVariantsWithFen    = chessVariants :+ strategygames.chess.variant.FromPosition.id
-  val draughtsVariantsWithFen = draughtsVariants :+ strategygames.draughts.variant.FromPosition.id
-  val loaVariantsWithFen      = loaVariants
+  val defaultVariants = GameFamily.all.map(gf => (gf.id, gf.defaultVariant)).toMap
 
-  val chessAIVariants = chessVariants :+
-    strategygames.chess.variant.Crazyhouse.id :+
-    strategygames.chess.variant.KingOfTheHill.id :+
-    strategygames.chess.variant.ThreeCheck.id :+
-    strategygames.chess.variant.Antichess.id :+
-    strategygames.chess.variant.Atomic.id :+
-    strategygames.chess.variant.Horde.id :+
-    strategygames.chess.variant.RacingKings.id :+
-    strategygames.chess.variant.FromPosition.id
-  val chessVariantsWithVariants =
-    chessVariants :+
-      strategygames.chess.variant.Crazyhouse.id :+
-      strategygames.chess.variant.KingOfTheHill.id :+
-      strategygames.chess.variant.ThreeCheck.id :+
-      strategygames.chess.variant.Antichess.id :+
-      strategygames.chess.variant.Atomic.id :+
-      strategygames.chess.variant.Horde.id :+
-      strategygames.chess.variant.RacingKings.id :+
-      strategygames.chess.variant.LinesOfAction.id
-  val chessVariantsWithFenAndVariants =
-    chessVariantsWithVariants :+
-      strategygames.chess.variant.FromPosition.id
+  val variantDefaultStrat = Variant.Chess(strategygames.chess.variant.Standard)
 
-  val draughtsAIVariants = draughtsVariants :+
-    strategygames.draughts.variant.Frisian.id :+
-    strategygames.draughts.variant.Frysk.id :+
-    strategygames.draughts.variant.Antidraughts.id :+
-    strategygames.draughts.variant.Breakthrough.id :+
-    strategygames.draughts.variant.FromPosition.id
-  val draughtsFromPositionVariants = draughtsVariants :+
-    strategygames.draughts.variant.Russian.id :+
-    strategygames.draughts.variant.Brazilian.id :+
-    strategygames.draughts.variant.Pool.id
-  val draughtsVariantsWithVariants =
-    draughtsVariants :+
-      strategygames.draughts.variant.Frisian.id :+
-      strategygames.draughts.variant.Frysk.id :+
-      strategygames.draughts.variant.Antidraughts.id :+
-      strategygames.draughts.variant.Breakthrough.id :+
-      strategygames.draughts.variant.Russian.id :+
-      strategygames.draughts.variant.Brazilian.id :+
-      strategygames.draughts.variant.Pool.id
-  val draughtsVariantsWithFenAndVariants =
-    draughtsVariantsWithVariants :+
-      strategygames.draughts.variant.Russian.id :+
-      strategygames.draughts.variant.Brazilian.id :+
-      strategygames.draughts.variant.Pool.id :+
-      strategygames.draughts.variant.FromPosition.id
+  val variantsWithFen = GameFamily.all.map(gf => (gf.id, (
+    gf.variants.filter(_.baseVariant) :::
+    gf.variants.filter(_.fromPositionVariant)
+  ).map(_.id))).toMap
 
-  val loaAIVariants = loaVariants
-  val loaFromPositionVariants = loaVariants
-  val loaVariantsWithVariants = loaVariants
-  val loaVariantsWithFenAndVariants = loaVariants
+  //concat ensures ordering that FromPosition is the last element
+  val aiVariants = GameFamily.all.map(gf => (gf.id, (
+    gf.variants.filter(v => v.aiVariant && !v.fromPositionVariant) :::
+    gf.variants.filter(_.fromPositionVariant)
+  ).map(_.id))).toMap
+
+  val variantsWithVariants = GameFamily.all.map(
+    gf => (gf.id, gf.variants.filter(!_.fromPositionVariant).map(_.id))
+  ).toMap
+
+  //concat ensures ordering that FromPosition is the last element
+  val variantsWithFenAndVariants = GameFamily.all.map(gf => (gf.id, (
+    gf.variants.filter(!_.fromPositionVariant) :::
+    gf.variants.filter(_.fromPositionVariant)
+  ).map(_.id))).toMap
+
+  val fenVariants = GameFamily.all.map(
+    gf => (gf.id, (gf.variants.filter(v => v.baseVariant || v.fenVariant)).map(_.id))
+  ).toMap
+
+  val boardApiVariants = GameFamily.all.map(
+    gf => (gf.id, gf.variants.filter(!_.fromPositionVariant).map(_.key))
+  ).toMap
 
   val speeds = Speed.all.map(_.id)
 

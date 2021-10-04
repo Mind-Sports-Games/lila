@@ -160,6 +160,36 @@ trait FormHelper { self: I18nHelper =>
         disabled option hidden(field)
       )
 
+    type SelectChoice = (String, String, Option[String])
+
+    def selectWithOptGroups(
+        field: Field,
+        options: List[(SelectChoice, Seq[SelectChoice])],
+        default: Option[String] = None,
+        disabled: Boolean = false
+    ): Frag =
+      frag(
+        st.select(
+          st.id := id(field),
+          name := field.name,
+          cls := "form-control"
+        )(disabled option (st.disabled := true))(validationModifiers(field))(
+          default map { option(value := "")(_) },
+          options.map { case((ogValue, ogName, _), opts) =>
+            optgroup(name := ogName)(
+              opts.map { case (value, name, title) =>
+                option(
+                  st.value := s"${ogValue}_${value}",
+                  st.title := title,
+                  field.value.has(s"${ogValue}_${value}") option selected
+                )(name)
+              }
+            )
+          }
+        ),
+        disabled option hidden(field)
+      )
+
     def textarea(
         field: Field,
         klass: String = ""

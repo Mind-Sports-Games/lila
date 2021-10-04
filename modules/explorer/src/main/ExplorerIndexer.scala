@@ -103,8 +103,7 @@ final private class ExplorerIndexer(
     game.finished &&
       game.rated &&
       game.turns >= 10 &&
-      game.variant != strategygames.chess.variant.FromPosition &&
-      !Game.isOldHorde(game)
+      game.variant != strategygames.chess.variant.FromPosition
 
   private def stableRating(player: Player) = player.rating ifFalse player.provisional
 

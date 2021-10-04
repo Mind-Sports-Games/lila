@@ -10,6 +10,8 @@ import lila.hub.LeaderTeam
 import lila.simul.Simul
 import lila.simul.SimulForm
 
+import strategygames.GameFamily
+
 object form {
 
   def create(form: Form[SimulForm.Setup], teams: List[LeaderTeam])(implicit
@@ -81,7 +83,9 @@ object form {
             views.html.setup.filter.renderCheckboxes(
               form,
               "variants",
-              translatedChessVariantChoicesWithVariants,
+              //currently we only offer chess simuls
+              //would need to change simul module to accept non Chess simuls
+              translatedVariantChoicesWithVariantsByGameFamily(GameFamily.Chess()),
               checks = form.value
                 .map(_.variants.map(_.toString))
                 .getOrElse(simul.??(_.variants.map(_.id.toString)))

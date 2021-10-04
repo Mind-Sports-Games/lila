@@ -1,6 +1,7 @@
 package lila.simul
 
 import cats.implicits._
+import strategygames.{ GameFamily, GameLogic }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.StartingPosition
@@ -94,19 +95,12 @@ object SimulForm {
         "clockTime"      -> numberIn(clockTimeChoices),
         "clockIncrement" -> numberIn(clockIncrementChoices),
         "clockExtra"     -> numberIn(clockExtraChoices),
+        //only chess variants (not LOA) that arent FromPosition
         "variants" -> list {
           number.verifying(
-            Set(
-              strategygames.chess.variant.Standard.id,
-              strategygames.chess.variant.Chess960.id,
-              strategygames.chess.variant.KingOfTheHill.id,
-              strategygames.chess.variant.ThreeCheck.id,
-              strategygames.chess.variant.Antichess.id,
-              strategygames.chess.variant.Atomic.id,
-              strategygames.chess.variant.Horde.id,
-              strategygames.chess.variant.RacingKings.id,
-              strategygames.chess.variant.Crazyhouse.id
-            ) contains _
+            Variant.all(GameLogic.Chess()).filter(
+              v => !v.fromPositionVariant && v.gameFamily == GameFamily.Chess()
+            ).map(_.id).toSet contains _
           )
         }.verifying("At least one variant", _.nonEmpty),
         "position" -> optional(lila.common.Form.fen.playableStrict),

@@ -48,10 +48,7 @@ object ApiConfig extends BaseHumanConfig {
   lazy val clockLimitSeconds: Set[Int] = Set(0, 15, 30, 45, 60, 90) ++ (2 to 180).view.map(60 *).toSet
 
   def from(
-      l: Int,
-      cv: Option[String],
-      dv: Option[String],
-      lv: Option[String],
+      v: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       r: Boolean,
@@ -60,22 +57,20 @@ object ApiConfig extends BaseHumanConfig {
       tok: Option[String],
       msg: Option[String],
       mm: Option[Boolean]
-  ) =
+  ) = {
+    val variant = strategygames.variant.Variant.orDefault(~v)
     new ApiConfig(
-      variant = strategygames.variant.Variant.orDefault(GameFamily(l).codeLib, l match {
-        case 0 => ~cv
-        case 1 => ~dv
-        case 2 => ~lv
-      }),
+      variant = variant,
       clock = cl,
       days = d,
       rated = r,
       color = Color.orDefault(~c),
-      position = pos.map(f => FEN.apply(GameFamily(l).codeLib, f)),
+      position = pos.map(f => FEN.apply(variant.gameLogic, f)),
       acceptByToken = tok,
       message = msg map Template,
       microMatch = ~mm
     ).autoVariant
+  }
 
   def validFen(variant: Variant, fen: Option[FEN]) =
     // TODO: This .get is unsafe
