@@ -15,8 +15,8 @@
     "@build/rollupProject": "2.0.0"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#60-integrate-chessgroundx-fairy-stockfish-family",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#60-integrate-chessgroundx",
     "snabbdom": "^3.0.1",
     "common": "2.0.0"
   },

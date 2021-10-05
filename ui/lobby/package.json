@@ -18,7 +18,7 @@
     "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#60-integrate-chessgroundx-fairy-stockfish-family",
     "draughtsground": "^7.6",
     "common": "2.0.0",
     "snabbdom": "^3.0.1"

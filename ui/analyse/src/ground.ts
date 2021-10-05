@@ -24,7 +24,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
 
 export function promote(ground: CgApi, key: Key, role: cg.Role) {
   const piece = ground.state.pieces.get(key);
-  if (piece && piece.role == 'pawn') {
+  if (piece && piece.role == 'p-piece') {
     ground.setPieces(
       new Map([
         [

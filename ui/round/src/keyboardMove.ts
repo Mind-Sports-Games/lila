@@ -28,13 +28,13 @@ export interface KeyboardMove {
 }
 
 const sanToRole: { [key: string]: cg.Role } = {
-  P: 'pawn',
-  N: 'knight',
-  B: 'bishop',
-  R: 'rook',
-  Q: 'queen',
-  K: 'king',
-  L: 'loachecker',
+  P: 'p-piece',
+  N: 'n-piece',
+  B: 'b-piece',
+  R: 'r-piece',
+  Q: 'q-piece',
+  K: 'k-piece',
+  L: 'l-piece',
 };
 
 export function ctrl(root: RoundController, step: Step, redraw: Redraw): KeyboardMove {
@@ -67,7 +67,7 @@ export function ctrl(root: RoundController, step: Step, redraw: Redraw): Keyboar
     },
     promote(orig, dest, piece) {
       const role = sanToRole[piece];
-      if (!role || role == 'pawn') return;
+      if (!role || role == 'p-piece') return;
       root.chessground.cancelMove();
       sendPromotion(root, orig, dest, role, { premove: false });
     },

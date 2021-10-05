@@ -5,7 +5,7 @@ import { onInsert } from '../util';
 import AnalyseCtrl from '../ctrl';
 
 const eventNames = ['mousedown', 'touchstart'];
-const oKeys = ['pawn', 'knight', 'bishop', 'rook', 'queen'];
+const oKeys = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
 
 type Position = 'top' | 'bottom';
 
@@ -14,7 +14,7 @@ export default function (ctrl: AnalyseCtrl, color: Color, position: Position) {
   const pocket = ctrl.node.crazy.pockets[color === 'white' ? 0 : 1];
   const dropped = ctrl.justDropped;
   const captured = ctrl.justCaptured;
-  if (captured) captured.role = captured.promoted ? 'pawn' : captured.role;
+  if (captured) captured.role = captured.promoted ? 'p-piece' : captured.role;
   const activeColor = color === ctrl.turnColor();
   const usable = !ctrl.embed && activeColor;
   return h(

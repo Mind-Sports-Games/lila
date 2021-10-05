@@ -28,7 +28,7 @@ export function start(
   const piece = s.pieces.get(dest);
   if (
     piece &&
-    piece.role == 'pawn' &&
+    piece.role == 'p-piece' &&
     ((dest[1] == '8' && s.turnColor == 'black') || (dest[1] == '1' && s.turnColor == 'white'))
   ) {
     promoting = {
@@ -100,7 +100,7 @@ function renderPromotion(
   );
 }
 
-const roles: Role[] = ['queen', 'knight', 'rook', 'bishop'];
+const roles: Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
 
 export function view(ctrl: AnalyseCtrl): MaybeVNode {
   if (!promoting) return;
@@ -108,7 +108,7 @@ export function view(ctrl: AnalyseCtrl): MaybeVNode {
   return renderPromotion(
     ctrl,
     promoting.dest,
-    ctrl.data.game.variant.key === 'antichess' ? roles.concat('king') : roles,
+    ctrl.data.game.variant.key === 'antichess' ? roles.concat('k-piece') : roles,
     promoting.dest[1] === '8' ? 'white' : 'black',
     ctrl.chessground.state.orientation
   );

@@ -24,7 +24,7 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#60-integrate-chessgroundx",
     "common": "2.0.0",
     "idb-keyval": "^5.0.4",
     "snabbdom": "^3.0.1"
