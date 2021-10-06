@@ -94,7 +94,7 @@ module.exports = {
   promote: function (key, role) {
     var pieces = {};
     var piece = cg.data.pieces[key];
-    if (piece && piece.role === 'pawn') {
+    if (piece && piece.role === 'p-piece') {
       pieces[key] = {
         color: piece.color,
         role: role,

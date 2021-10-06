@@ -3,15 +3,28 @@ import { h, Hooks, VNodeData } from 'snabbdom';
 import { opposite } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 
-const pieceScores = {
-  pawn: 1,
-  knight: 3,
-  bishop: 3,
-  rook: 5,
-  queen: 9,
-  king: 0,
-  loachecker: 0,
-};
+// const pieceScores = {
+//   'p-piece': 1,
+//   'n-piece': 3,
+//   'b-piece': 3,
+//   'r-piece': 5,
+//   'q-piece': 9,
+//   'k-piece': 0,
+//   'l-piece': 0,
+// };
+
+function pieceScores(piece:cg.Role):number{
+  switch(piece){
+    case  'p-piece': return 1
+    case  'n-piece': return 3
+    case  'b-piece': return 3
+    case  'r-piece': return 5
+    case  'q-piece': return 9
+    case  'k-piece': return 0
+    case  'l-piece': return 0
+    default        : return 0
+  }
+}
 
 export const justIcon = (icon: string): VNodeData => ({
   attrs: { 'data-icon': icon },
@@ -52,11 +65,11 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
   return dec;
 }
 
-// {white: {pawn: 3 queen: 1}, black: {bishop: 2}}
+// {white: {'p-piece': 3 'q-piece': 1}, black: {'b-piece': 2}}
 export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
   const diff: MaterialDiff = {
-    white: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0, loachecker: 0 },
-    black: { king: 0, queen: 0, rook: 0, bishop: 0, knight: 0, pawn: 0, loachecker: 0 },
+    white: { 'k-piece': 0, 'q-piece': 0, 'r-piece': 0, 'b-piece': 0, 'n-piece': 0, 'p-piece': 0, 'l-piece': 0 },
+    black: { 'k-piece': 0, 'q-piece': 0, 'r-piece': 0, 'b-piece': 0, 'n-piece': 0, 'p-piece': 0, 'l-piece': 0 },
   };
   for (const p of pieces.values()) {
     const them = diff[opposite(p.color)];
@@ -69,7 +82,7 @@ export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
 export function getScore(pieces: cg.Pieces): number {
   let score = 0;
   for (const p of pieces.values()) {
-    score += pieceScores[p.role] * (p.color === 'white' ? 1 : -1);
+    score += pieceScores(p.role) * (p.color === 'white' ? 1 : -1);
   }
   return score;
 }
