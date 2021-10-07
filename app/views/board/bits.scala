@@ -67,6 +67,7 @@ object bits {
     val libName = fen match {
       case FEN.Chess(_) => GameLogic.Chess().name
       case FEN.Draughts(_) => GameLogic.Draughts().name
+      case FEN.FairySF(_) => GameLogic.FairySF().name
     }
     val orient = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)

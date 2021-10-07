@@ -77,6 +77,10 @@ trait Positional { self: Config =>
             .map(_.situation playable strictFen)
         }
       }
+    case _ =>
+      fen exists { f =>
+        (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)
+      }
   }
 
   lazy val validKingCount = variant.gameLogic match {

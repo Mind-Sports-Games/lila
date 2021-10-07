@@ -5,8 +5,7 @@ import cats.data.Validated.valid
 import cats.implicits._
 import strategygames.format.pgn.Dumper
 import strategygames.format.Uci
-import strategygames.chess.Drop
-import strategygames.{ GameLogic, Move, Replay, Situation }
+import strategygames.{ GameLogic, Drop, Move, Replay, Situation }
 
 import lila.analyse.{ Analysis, Info, PgnMove }
 import lila.base.LilaException
@@ -32,7 +31,7 @@ private object UciToPgn {
       for {
         situation <-
           if (ply == replay.setup.startedAtTurn + 1) valid(replay.setup.situation)
-          else replay moveAtPly ply map (_.fold(_.situationBefore, drop => Situation.Chess(drop.situationBefore))) toValid "No move found"
+          else replay moveAtPly ply map (_.fold(_.situationBefore, _.situationBefore)) toValid "No move found"
         ucis <- variation.map(v => Uci.apply(GameLogic.Chess(), v)).sequence toValid "Invalid UCI moves " + variation
         moves <-
           ucis.foldLeft[Validated[String, (Situation, List[Either[Move, Drop]])]](valid(situation -> Nil)) {
@@ -40,15 +39,15 @@ private object UciToPgn {
               sit.move(uci.orig, uci.dest, uci.promotion).leftMap(e => s"ply $ply $e") map { move =>
                 move.situationAfter -> (Left(move) :: moves)
               }
-            case (Validated.Valid((Situation.Chess(sit), moves)), uci: strategygames.chess.format.Uci.Drop) =>
+            case (Validated.Valid((sit, moves)), uci: Uci.Drop) =>
               sit.drop(uci.role, uci.pos).leftMap(e => s"ply $ply $e") map { drop =>
-                Situation.Chess(drop.situationAfter) -> (Right(drop) :: moves)
+                drop.situationAfter -> (Right(drop) :: moves)
               }
             case (failure, _) => failure
           }
       } yield moves._2.reverse map (_.fold(
         move => Dumper.apply(GameLogic.Chess(), move),
-        drop => strategygames.chess.format.pgn.Dumper.apply(drop)
+        drop => Dumper.apply(GameLogic.Chess(), drop)
       ))
 
     onlyMeaningfulVariations.foldLeft[WithErrors[List[Info]]]((Nil, Nil)) {

@@ -105,6 +105,8 @@ object EvalCacheEntry {
       case Uci.ChessMove(_)    => GameLogic.Chess()
       case Uci.ChessDrop(_)    => GameLogic.Chess()
       case Uci.DraughtsMove(_) => GameLogic.Draughts()
+      case Uci.FairySFMove(_)  => GameLogic.Chess()
+      case Uci.FairySFDrop(_)  => GameLogic.Chess()
     }
   }
 

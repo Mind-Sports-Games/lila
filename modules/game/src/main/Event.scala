@@ -3,10 +3,9 @@ package lila.game
 import play.api.libs.json._
 
 import strategygames.chess.variant.Crazyhouse
-import strategygames.{ Board, Centis, Color, GameLogic, Move => StratMove, PromotableRole, Pos, Situation, Status, Role, White, Black }
+import strategygames.{ Board, Centis, Color, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, Pos, Situation, Status, Role, White, Black }
 import strategygames.chess
 import strategygames.format.Forsyth
-import strategygames.chess.format.pgn.Dumper
 import JsonView._
 import lila.chat.{ PlayerLine, UserLine }
 import lila.common.ApiVersion
@@ -123,8 +122,9 @@ object Event {
         orig = move.orig,
         dest = move.dest,
         san = move match {
-          case StratMove.Chess(move)    => Dumper(move)
+          case StratMove.Chess(move)    => strategygames.chess.format.pgn.Dumper(move)
           case StratMove.Draughts(move) => strategygames.draughts.format.pdn.Dumper(move)
+          case StratMove.FairySF(move)  => strategygames.fairysf.format.pgn.Dumper(move)
         },
         fen = if (situation.board.variant.gameLogic == GameLogic.Draughts() && situation.board.variant.frisianVariant)
             situation.board match {
@@ -171,6 +171,7 @@ object Event {
   }
 
   case class Drop(
+      lib: GameLogic,
       role: Role,
       pos: Pos,
       san: String,
@@ -185,7 +186,17 @@ object Event {
   ) extends Event {
     def typ = "drop"
     def data =
-      MoveOrDrop.data(GameLogic.Chess(), fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
+      MoveOrDrop.data(
+        lib,
+        fen,
+        check,
+        threefold,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        crazyData
+      ) {
         Json.obj(
           "role" -> role.name,
           "uci"  -> s"${role.pgn}@${pos.key}",
@@ -196,17 +207,21 @@ object Event {
   }
   object Drop {
     def apply(
-        drop: chess.Drop,
+        drop: StratDrop,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
         crazyData: Option[Crazyhouse.Data]
     ): Drop =
       Drop(
-        role = Role.ChessRole(drop.piece.role),
-        pos = Pos.Chess(drop.pos),
-        san = Dumper(drop),
-        fen = Forsyth.exportBoard(GameLogic.Chess(), situation.board),
+        lib = situation.board.variant.gameLogic,
+        role = drop.piece.role,
+        pos = drop.pos,
+        san = drop match {
+          case StratDrop.Chess(drop)   => strategygames.chess.format.pgn.Dumper(drop)
+          case StratDrop.FairySF(drop) => strategygames.fairysf.format.pgn.Dumper(drop)
+        },
+        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         state = state,
@@ -284,6 +299,7 @@ object Event {
     private val lib = pos match {
       case Pos.Chess(_)    => GameLogic.Chess().id
       case Pos.Draughts(_) => GameLogic.Draughts().id
+      case Pos.FairySF(_)  => GameLogic.FairySF().id
     }
     def typ = "promotion"
     def data =

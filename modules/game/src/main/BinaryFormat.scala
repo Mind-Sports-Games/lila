@@ -274,6 +274,7 @@ object BinaryFormat {
         draughts.Board.init(draughts.variant.Standard).pieces,
         draughts.variant.Standard
       )
+      case _ => sys.error("Cant write to binary for lib")
     }
 
     private def intToRoleChess(int: Int, variant: chess.variant.Variant): Option[chess.Role] =

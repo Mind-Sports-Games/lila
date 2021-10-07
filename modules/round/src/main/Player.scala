@@ -127,6 +127,7 @@ final private class Player(
       metrics: MoveMetrics,
       finalSquare: Boolean = false
   ): Validated[String, MoveResult] =
+    //TODO push this into strategygames
     (uci match {
       case Uci.ChessMove(uci) =>
         game.chess(
@@ -147,13 +148,30 @@ final private class Player(
         ) map { case (ncg, move) =>
           ncg -> (Left(move): MoveOrDrop)
         }
+      case Uci.FairySFMove(uci) =>
+        game.chess(
+          Pos.FairySF(uci.orig),
+          Pos.FairySF(uci.dest),
+          uci.promotion.map(Role.FairySFPromotableRole),
+          metrics
+        ) map { case (ncg, move) =>
+          ncg -> (Left(move): MoveOrDrop)
+        }
       case Uci.ChessDrop(uci) =>
-        game.chess match {
-          case StratGame.Chess(chess) =>
-            chess.drop(uci.role, uci.pos, metrics) map { case (ncg, drop) =>
-              StratGame.Chess(ncg) -> (Right(drop): MoveOrDrop)
-            }
-          case _ => sys.error("A drop was paired up with a non-chess game")
+        game.chess.drop(
+          Role.ChessRole(uci.role),
+          Pos.Chess(uci.pos),
+          metrics
+        ) map { case (ncg, drop) =>
+          ncg -> (Right(drop): MoveOrDrop)
+        }
+      case Uci.FairySFDrop(uci) =>
+        game.chess.drop(
+          Role.FairySFRole(uci.role),
+          Pos.FairySF(uci.pos),
+          metrics
+        ) map { case (ncg, drop) =>
+          ncg -> (Right(drop): MoveOrDrop)
         }
       case _ => sys.error(s"Could not apply move: $uci")
     }).map {
