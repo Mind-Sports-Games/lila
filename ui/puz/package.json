@@ -14,10 +14,10 @@
     "prod": "yarn run compile"
   },
   "dependencies": {
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#60-integrate-chessgroundx",
-    "snabbdom": "^3.0.1",
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#60-integrate-chessgroundx-fairy-stockfish-family",
-    "common": "2.0.0"
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#60-integrate-chessgroundx",
+    "common": "2.0.0",
+    "snabbdom": "^3.0.1"
   },
   "devDependencies": {
     "@types/cash": "8.0.0",

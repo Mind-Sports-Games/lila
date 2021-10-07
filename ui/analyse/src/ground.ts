@@ -12,6 +12,8 @@ export function render(ctrl: AnalyseCtrl): VNode {
   return h('div.cg-wrap.cgv' + ctrl.cgVersion.js, {
     hook: {
       insert: vnode => {
+        console.log("vnode.elm: ", vnode.elm)
+        console.log("ctrl: ", ctrl)
         ctrl.chessground = Chessground(vnode.elm as HTMLElement, makeConfig(ctrl));
         ctrl.setAutoShapes();
         if (ctrl.node.shapes) ctrl.chessground.setShapes(ctrl.node.shapes as DrawShape[]);
@@ -41,6 +43,7 @@ export function promote(ground: CgApi, key: Key, role: cg.Role) {
 }
 
 export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
+  console.log("making config for analysisCtrl")
   const d = ctrl.data,
     pref = d.pref,
     opts = ctrl.makeCgOpts();
@@ -50,6 +53,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     check: opts.check,
     lastMove: opts.lastMove,
     orientation: ctrl.getOrientation(),
+    myColor: ctrl.data.player.color,
     coordinates: pref.coords !== Prefs.Coords.Hidden && !ctrl.embed,
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,
@@ -90,6 +94,6 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     disableContextMenu: true,
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
-
+  console.log("config is: ", config)
   return config;
 }

@@ -16,9 +16,11 @@ export function makeConfig(ctrl: RoundController): Config {
     hooks = ctrl.makeCgHooks(),
     step = plyStep(data, ctrl.ply),
     playing = ctrl.isPlaying();
+  console.log("myColor: ", data.player.color);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
+    myColor: data.player.color,
     turnColor: step.ply % 2 === 0 ? 'white' : 'black',
     lastMove: util.uci2move(step.uci),
     check: !!step.check,

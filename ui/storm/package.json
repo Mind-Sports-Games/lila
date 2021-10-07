@@ -16,11 +16,11 @@
     "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#60-integrate-chessgroundx",
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#60-integrate-chessgroundx-fairy-stockfish-family",
-    "snabbdom": "^3.0.1",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#60-integrate-chessgroundx",
     "common": "2.0.0",
-    "puz": "2.0.0"
+    "puz": "2.0.0",
+    "snabbdom": "^3.0.1"
   },
   "scripts": {
     "dev": "rollup --config",
