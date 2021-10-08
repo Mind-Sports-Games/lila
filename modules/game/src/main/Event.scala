@@ -2,8 +2,7 @@ package lila.game
 
 import play.api.libs.json._
 
-import strategygames.chess.variant.Crazyhouse
-import strategygames.{ Board, Centis, Color, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, Pos, Situation, Status, Role, White, Black }
+import strategygames.{ Board, Centis, Color, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, White, Black }
 import strategygames.chess
 import strategygames.format.Forsyth
 import JsonView._
@@ -41,7 +40,7 @@ object Event {
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
         possibleDrops: Option[List[Pos]],
-        crazyData: Option[Crazyhouse.Data],
+        crazyData: Option[PocketData],
         captLen: Option[Int] = None
     )(extra: JsObject) = {
       extra ++ Json
@@ -81,7 +80,7 @@ object Event {
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       possibleDrops: Option[List[Pos]],
-      crazyData: Option[Crazyhouse.Data],
+      crazyData: Option[PocketData],
       captLen: Option[Int]
   ) extends Event {
     def typ = "move"
@@ -115,7 +114,7 @@ object Event {
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
-        crazyData: Option[Crazyhouse.Data]
+        crazyData: Option[PocketData]
     ): Move =
       Move(
         lib = situation.board.variant.gameLogic,
@@ -181,7 +180,7 @@ object Event {
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
-      crazyData: Option[Crazyhouse.Data],
+      crazyData: Option[PocketData],
       possibleDrops: Option[List[Pos]]
   ) extends Event {
     def typ = "drop"
@@ -211,7 +210,7 @@ object Event {
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
-        crazyData: Option[Crazyhouse.Data]
+        crazyData: Option[PocketData]
     ): Drop =
       Drop(
         lib = situation.board.variant.gameLogic,

@@ -4,7 +4,7 @@ import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ Uci, UciCharPair }
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameLogic, Pos, Role }
+import strategygames.{ Game, GameLogic, PocketData, Pos, Role }
 import strategygames.variant.Variant
 import play.api.libs.json.JsObject
 
@@ -37,7 +37,7 @@ case class AnaDrop(
                 dests = Some(movable ?? Game.Chess(game).situation.destinations),
                 opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? FullOpeningDB.findByFen(variant.gameLogic, fen),
                 drops = if (movable) Game.Chess(game).situation.drops else Some(Nil),
-                crazyData = game.situation.board.crazyData
+                crazyData = game.situation.board.crazyData.map(PocketData.Chess)
               )
             }
         }

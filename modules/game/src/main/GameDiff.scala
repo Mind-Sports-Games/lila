@@ -1,8 +1,7 @@
 package lila.game
 
-import strategygames.{ Black, Board, Centis, Clock, Color, GameLogic, History, White }
+import strategygames.{ Black, Board, Centis, Clock, Color, GameLogic, History, PocketData, White }
 import strategygames.chess.CheckCount
-import strategygames.chess.variant.Crazyhouse
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
 import reactivemongo.api.bson._
@@ -118,11 +117,11 @@ object GameDiff {
             _.history.checkCount,
             (o: CheckCount) => o.nonEmpty ?? { BSONHandlers.checkCountWriter writeOpt o }
           )
-        if (a.variant.crazyhouse)
+        if (a.variant.dropsVariant)
           dOpt(
             crazyData,
             _.board.crazyData,
-            (o: Option[Crazyhouse.Data]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
+            (o: Option[PocketData]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
           )
       }
     }

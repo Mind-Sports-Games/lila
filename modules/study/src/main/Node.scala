@@ -4,7 +4,7 @@ import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.{ UciCharPair }
 import strategygames.variant.Variant
-import strategygames.chess.variant.Crazyhouse
+import strategygames.PocketData
 
 import strategygames.Centis
 import lila.tree.Eval.Score
@@ -16,7 +16,7 @@ sealed trait RootOrNode {
   val check: Boolean
   val shapes: Shapes
   val clock: Option[Centis]
-  val crazyData: Option[Crazyhouse.Data]
+  val crazyData: Option[PocketData]
   val children: Node.Children
   val comments: Comments
   val gamebook: Option[Gamebook]
@@ -41,7 +41,7 @@ case class Node(
     glyphs: Glyphs = Glyphs.empty,
     score: Option[Score] = None,
     clock: Option[Centis],
-    crazyData: Option[Crazyhouse.Data],
+    crazyData: Option[PocketData],
     children: Node.Children,
     forceVariation: Boolean
 ) extends RootOrNode {
@@ -243,7 +243,7 @@ object Node {
       glyphs: Glyphs = Glyphs.empty,
       score: Option[Score] = None,
       clock: Option[Centis],
-      crazyData: Option[Crazyhouse.Data],
+      crazyData: Option[PocketData],
       children: Children
   ) extends RootOrNode {
 
@@ -331,7 +331,7 @@ object Node {
         fen = variant.initialFen,
         check = false,
         clock = none,
-        crazyData = variant.crazyhouse option Crazyhouse.Data.init,
+        crazyData = variant.dropsVariant option PocketData.init(variant.gameLogic),
         children = emptyChildren
       )
 

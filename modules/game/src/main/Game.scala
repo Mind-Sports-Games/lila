@@ -14,6 +14,7 @@ import strategygames.{
   Mode,
   Move,
   MoveOrDrop,
+  PocketData,
   Pos,
   Speed,
   Status,
@@ -243,8 +244,8 @@ case class Game(
     }
 
     val events = moveOrDrop.fold(
-      Event.Move(_, game.situation, state, clockEvent, updated.board.crazyData),
-      Event.Drop(_, game.situation, state, clockEvent, updated.board.crazyData)
+      Event.Move(_, game.situation, state, clockEvent, updated.board.crazyData.map(PocketData.Chess)),
+      Event.Drop(_, game.situation, state, clockEvent, updated.board.crazyData.map(PocketData.Chess))
     ) :: {
       // abstraction leak, I know.
       if (updated.board.variant.gameLogic == GameLogic.Draughts())

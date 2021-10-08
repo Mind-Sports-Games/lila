@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.GameLogic
+import strategygames.{ GameLogic, PocketData }
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
 import lila.user.User
@@ -95,7 +95,7 @@ final private class ChapterMaker(
           fen = variant.initialFen,
           check = false,
           clock = none,
-          crazyData = variant.crazyhouse option strategygames.chess.variant.Crazyhouse.Data.init,
+          crazyData = variant.dropsVariant option PocketData.init(variant.gameLogic),
           children = Node.emptyChildren
         ) -> false
     }) match {

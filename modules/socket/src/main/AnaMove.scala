@@ -4,7 +4,7 @@ import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameLogic, Move, Pos, PromotableRole, Role, Situation }
+import strategygames.{ Game, GameLogic, Move, PocketData, Pos, PromotableRole, Role, Situation }
 import play.api.libs.json._
 
 import lila.tree.Branch
@@ -96,7 +96,7 @@ case class AnaMove(
             FullOpeningDB.findByFen(lib, fen)
           },
           drops = if (movable) game.situation.drops else Some(Nil),
-          crazyData = game.situation.board.crazyData
+          crazyData = game.situation.board.crazyData.map(PocketData.Chess)
         )
       }
     }

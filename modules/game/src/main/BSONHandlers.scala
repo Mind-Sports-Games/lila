@@ -1,11 +1,11 @@
 package lila.game
 
-import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameLogic, History, Status, Mode, Piece, Pos, PositionHash, Situation, Board }
+import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameLogic, History, Status, Mode, Piece, Pocket, PocketData, Pockets, Pos, PositionHash, Situation, Board, Role }
 import strategygames.chess
 import strategygames.draughts
 import strategygames.format.Uci
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard, Crazyhouse }
+import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard }
 import strategygames.draughts.variant.{ Variant => DraughtsVariant, Standard => DraughtsStandard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
@@ -32,28 +32,26 @@ object BSONHandlers {
     x => ByteArrayBSONHandler.writeTry(BinaryFormat.unmovedRooks write x).get
   )
 
-  implicit private[game] val crazyhouseDataBSONHandler = new BSON[Crazyhouse.Data] {
-
-    import Crazyhouse._
+  implicit private[game] val crazyhouseDataBSONHandler = new BSON[PocketData] {
 
     def reads(r: BSON.Reader) =
-      Crazyhouse.Data(
+      PocketData.Chess(chess.PocketData(
         pockets = {
           val (white, black) = {
             r.str("p").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
-          }.partition(_ is chess.White)
+          }.partition(_ is White)
           Pockets(
-            white = Pocket(white.map(_.role)),
-            black = Pocket(black.map(_.role))
+            white = Pocket(white.map(_.role).map(Role.ChessRole)),
+            black = Pocket(black.map(_.role).map(Role.ChessRole))
           )
         },
         promoted = r.str("t").view.flatMap(chess.Pos.piotr).to(Set)
-      )
+      ))
 
-    def writes(w: BSON.Writer, o: Crazyhouse.Data) =
+    def writes(w: BSON.Writer, o: PocketData) =
       BSONDocument(
         "p" -> {
-          o.pockets.white.roles.map(_.forsythUpper).mkString +
+          o.pockets.white.roles.map(_.forsyth.toUpper).mkString +
             o.pockets.black.roles.map(_.forsyth).mkString
         },
         "t" -> o.promoted.map(_.piotr).mkString
@@ -126,7 +124,11 @@ object BSONHandlers {
               } else Game.emptyCheckCount
               ),
             variant = gameVariant,
-            crazyData = gameVariant.crazyhouse option r.get[Crazyhouse.Data](F.crazyData)
+            crazyData = gameVariant.dropsVariant option (r.get[PocketData](F.crazyData)) match {
+              case Some(PocketData.Chess(pd)) => Some(pd)
+              case None => None
+              case _ => sys.error("non chess pocket data")
+            }
           ),
           color = turnColor
         ),
