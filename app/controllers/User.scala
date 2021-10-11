@@ -301,7 +301,9 @@ final class User(
                   "breakthrough"  -> leaderboards.breakthrough,
                   "russian"       -> leaderboards.russian,
                   "brazilian"     -> leaderboards.brazilian,
-                  "pool"          -> leaderboards.pool
+                  "pool"          -> leaderboards.pool,
+                  "shogi"         -> leaderboards.shogi,
+                  "xiangqi"       -> leaderboards.xiangqi,
                 )
               )
             }

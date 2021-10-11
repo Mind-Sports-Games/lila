@@ -63,6 +63,10 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.brazilian, ratingsB.brazilian, game)
               case Variant.Draughts(strategygames.draughts.variant.Pool) =>
                 updateRatings(ratingsW.pool, ratingsB.pool, game)
+              case Variant.FairySF(strategygames.fairysf.variant.Shogi) =>
+                updateRatings(ratingsW.shogi, ratingsB.shogi, game)
+              case Variant.FairySF(strategygames.fairysf.variant.Xiangqi) =>
+                updateRatings(ratingsW.xiangqi, ratingsB.xiangqi, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -116,6 +120,8 @@ final class PerfsUpdater(
       russian: Rating,
       brazilian: Rating,
       pool: Rating,
+      shogi: Rating,
+      xiangqi: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -143,6 +149,8 @@ final class PerfsUpdater(
       russian = perfs.russian.toRating,
       brazilian = perfs.brazilian.toRating,
       pool = perfs.pool.toRating,
+      shogi = perfs.shogi.toRating,
+      xiangqi = perfs.xiangqi.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -203,6 +211,8 @@ final class PerfsUpdater(
           russian = addRatingIf(game.ratingVariant.russian, perfs.russian, ratings.russian),
           brazilian = addRatingIf(game.ratingVariant.brazilian, perfs.brazilian, ratings.brazilian),
           pool = addRatingIf(game.ratingVariant.pool, perfs.pool, ratings.pool),
+          shogi = addRatingIf(game.ratingVariant.shogi, perfs.shogi, ratings.shogi),
+          xiangqi = addRatingIf(game.ratingVariant.xiangqi, perfs.xiangqi, ratings.xiangqi),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -231,6 +241,8 @@ final class PerfsUpdater(
           russian = r(PT.orDefault("russian"), perfs.russian, perfs1.russian),
           brazilian = r(PT.orDefault("brazilian"), perfs.brazilian, perfs1.brazilian),
           pool = r(PT.orDefault("pool"), perfs.pool, perfs1.pool),
+          shogi = r(PT.orDefault("shogi"), perfs.shogi, perfs1.shogi),
+          xiangqi = r(PT.orDefault("xiangqi"), perfs.xiangqi, perfs1.xiangqi),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

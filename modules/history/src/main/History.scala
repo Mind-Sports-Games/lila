@@ -23,6 +23,8 @@ case class History(
     russian: RatingsMap,
     brazilian: RatingsMap,
     pool: RatingsMap,
+    shogi: RatingsMap,
+    xiangqi: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -57,6 +59,7 @@ case class History(
       case "russian"        => russian
       case "brazilian"      => brazilian
       case "pool"           => pool
+      case "shogi"          => shogi
       case "puzzle"         => puzzle
       case "ultraBullet"    => ultraBullet
       case x                => sys error s"No history for perf $x"
@@ -103,6 +106,8 @@ object History {
           russian = ratingsMap("russian"),
           brazilian = ratingsMap("brazilian"),
           pool = ratingsMap("pool"),
+          shogi = ratingsMap("shogi"),
+          xiangqi = ratingsMap("xiangqi"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),
