@@ -119,15 +119,15 @@ object BSONHandlers {
   implicit private def CrazyDataBSONHandler: BSON[PocketData] =
     new BSON[PocketData] {
       private def writePocket(p: Pocket) = p.roles.map(_.forsyth).mkString
-      private def readPocket(p: String)  = Pocket(p.view.flatMap(Role.forsyth).toList)
+      private def readPocket(p: String)  = Pocket(p.view.flatMap(r => Role.forsyth(GameLogic.Chess(), r)).toList)
       def reads(r: Reader) =
-        PocketData(
+        PocketData.Chess(strategygames.chess.PocketData(
           promoted = r.getsD[strategygames.chess.Pos]("o").toSet,
           pockets = Pockets(
             white = readPocket(r.strD("w")),
             black = readPocket(r.strD("b"))
           )
-        )
+        ))
       def writes(w: Writer, s: PocketData) =
         $doc(
           "o" -> w.listO(s.promoted.toList),
