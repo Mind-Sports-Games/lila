@@ -3,6 +3,7 @@ package lila.game
 import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameLogic, History, Status, Mode, Piece, Pocket, PocketData, Pockets, Pos, PositionHash, Situation, Board, Role }
 import strategygames.chess
 import strategygames.draughts
+import strategygames.fairysf
 import strategygames.format.Uci
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard }
@@ -35,21 +36,43 @@ object BSONHandlers {
   implicit private[game] val crazyhouseDataBSONHandler = new BSON[PocketData] {
 
     def reads(r: BSON.Reader) =
-      PocketData.Chess(chess.PocketData(
-        pockets = {
-          val (white, black) = {
-            r.str("p").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
-          }.partition(_ is White)
-          Pockets(
-            white = Pocket(white.map(_.role).map(Role.ChessRole)),
-            black = Pocket(black.map(_.role).map(Role.ChessRole))
-          )
-        },
-        promoted = r.str("t").view.flatMap(chess.Pos.piotr).to(Set)
-      ))
+      GameLogic(r.intD("l")) match {
+        case GameLogic.Chess() =>
+          PocketData.Chess(chess.PocketData(
+            pockets = {
+              val (white, black) = {
+                r.str("p").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
+              }.partition(_ is White)
+              Pockets(
+                white = Pocket(white.map(_.role).map(Role.ChessRole)),
+                black = Pocket(black.map(_.role).map(Role.ChessRole))
+              )
+            },
+            promoted = r.str("t").view.flatMap(chess.Pos.piotr).to(Set)
+          ))
+        case GameLogic.FairySF() =>
+          PocketData.FairySF(fairysf.PocketData(
+            pockets = {
+              val (white, black) = {
+                r.str("p").view.flatMap(c => fairysf.Piece.fromChar(c)).to(List)
+              }.partition(_ is White)
+              Pockets(
+                white = Pocket(white.map(_.role).map(Role.FairySFRole)),
+                black = Pocket(black.map(_.role).map(Role.FairySFRole))
+              )
+            },
+            promoted = r.str("t").view.flatMap(fairysf.Pos.piotr).to(Set)
+          ))
+        case _ => sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
+      }
 
     def writes(w: BSON.Writer, o: PocketData) =
       BSONDocument(
+        "l" -> (o match {
+          case PocketData.Chess(_)   => 0
+          case PocketData.FairySF(_) => 2
+          case _ => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
+        }),
         "p" -> {
           o.pockets.white.roles.map(_.forsyth.toUpper).mkString +
             o.pockets.black.roles.map(_.forsyth).mkString
