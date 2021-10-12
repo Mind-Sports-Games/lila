@@ -60,6 +60,7 @@ case class History(
       case "brazilian"      => brazilian
       case "pool"           => pool
       case "shogi"          => shogi
+      case "xiangqi"        => xiangqi
       case "puzzle"         => puzzle
       case "ultraBullet"    => ultraBullet
       case x                => sys error s"No history for perf $x"
