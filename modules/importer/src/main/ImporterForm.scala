@@ -6,7 +6,7 @@ import strategygames.chess.format.pgn.{ Parser }
 import strategygames.format.pgn.{ ParsedPgn, Reader, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.{ Variant => StratVariant }
-import strategygames.{ Board, Color, Game => StratGame, GameLogic, Mode, Replay, Status }
+import strategygames.{ Board, Color, GameLogic, Mode, Replay, Status }
 import play.api.data._
 import play.api.data.Forms._
 import scala.util.chaining._

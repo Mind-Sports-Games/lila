@@ -1,7 +1,6 @@
 package lila.game
 
 import cats.data.Validated
-import strategygames.{ Game => StratGame }
 import strategygames.format.{ FEN }
 import strategygames.format.pgn.{ Reader, Sans, Tag, Tags }
 import org.joda.time.DateTime

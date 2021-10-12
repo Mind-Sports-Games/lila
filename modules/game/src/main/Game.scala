@@ -14,13 +14,11 @@ import strategygames.{
   Mode,
   Move,
   MoveOrDrop,
-  PocketData,
   Pos,
   Speed,
   Status,
   White
 }
-import strategygames.format.Uci
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 

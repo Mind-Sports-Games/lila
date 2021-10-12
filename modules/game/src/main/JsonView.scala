@@ -7,7 +7,6 @@ import strategygames.opening.FullOpening
 import strategygames.{ Black, Clock, Color, Division, GameLogic, Pocket, PocketData, Role, Status, White }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
-import strategygames.Role.ChessRole
 
 final class JsonView(rematches: Rematches) {
 
