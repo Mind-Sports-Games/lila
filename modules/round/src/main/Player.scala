@@ -1,7 +1,7 @@
 package lila.round
 
 import strategygames.format.{ Forsyth, Uci }
-import strategygames.{ Centis, Game => StratGame, MoveMetrics, MoveOrDrop, Pos, Role, Status }
+import strategygames.{ Centis, MoveMetrics, MoveOrDrop, Pos, Role, Status }
 import strategygames.chess
 
 import actorApi.round.{ DrawNo, ForecastPlay, HumanPlay, TakebackNo, TooManyPlies }

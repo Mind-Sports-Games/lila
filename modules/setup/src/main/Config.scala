@@ -3,7 +3,6 @@ package lila.setup
 import strategygames.{ Clock, Game => StratGame, GameFamily, GameLogic, Situation, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.chess.{ Game => ChessGame }
 
 import lila.game.Game
 import lila.lobby.Color

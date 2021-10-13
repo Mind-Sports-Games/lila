@@ -4,7 +4,7 @@ import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ Uci, UciCharPair }
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameLogic, PocketData, Pos, Role }
+import strategygames.{ Game, GameLogic, Pos, Role }
 import strategygames.variant.Variant
 import play.api.libs.json.JsObject
 
