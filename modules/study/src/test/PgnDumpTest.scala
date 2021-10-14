@@ -22,7 +22,7 @@ class PgnDumpTest extends Specification {
       fen = FEN(GameLogic.Chess(), "<fen>"),
       check = false,
       clock = None,
-      crazyData = None,
+      pocketData = None,
       children = children,
       forceVariation = false
     )

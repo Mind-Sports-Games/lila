@@ -12,7 +12,7 @@ case class Step(
     // None when not computed yet
     dests: Option[Map[Pos, List[Pos]]],
     drops: Option[List[Pos]],
-    crazyData: Option[PocketData],
+    pocketData: Option[PocketData],
     captLen: Option[Int]
 ) {
 
@@ -76,6 +76,6 @@ object Step {
           JsString(drops.map(_.key).mkString)
         }
       )
-      .add("crazy", crazyData)
+      .add("crazy", pocketData)
   }
 }

@@ -40,7 +40,7 @@ object Event {
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
         possibleDrops: Option[List[Pos]],
-        crazyData: Option[PocketData],
+        pocketData: Option[PocketData],
         captLen: Option[Int] = None
     )(extra: JsObject) = {
       extra ++ Json
@@ -58,7 +58,7 @@ object Event {
         .add("threefold" -> threefold)
         .add("wDraw" -> state.whiteOffersDraw)
         .add("bDraw" -> state.blackOffersDraw)
-        .add("crazyhouse" -> crazyData)
+        .add("crazyhouse" -> pocketData)
         .add("drops" -> possibleDrops.map { squares =>
           JsString(squares.map(_.key).mkString)
         })
@@ -80,7 +80,7 @@ object Event {
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       possibleDrops: Option[List[Pos]],
-      crazyData: Option[PocketData],
+      pocketData: Option[PocketData],
       captLen: Option[Int]
   ) extends Event {
     def typ = "move"
@@ -94,7 +94,7 @@ object Event {
         clock,
         possibleMoves,
         possibleDrops,
-        crazyData,
+        pocketData,
         captLen
       ) {
         Json
@@ -114,7 +114,7 @@ object Event {
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
-        crazyData: Option[PocketData]
+        pocketData: Option[PocketData]
     ): Move =
       Move(
         lib = situation.board.variant.gameLogic,
@@ -157,7 +157,7 @@ object Event {
           case _ => situation.destinations
         },
         possibleDrops = situation.drops,
-        crazyData = crazyData,
+        pocketData = pocketData,
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
             if (situation.ghosts > 0)
@@ -180,7 +180,7 @@ object Event {
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
-      crazyData: Option[PocketData],
+      pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]]
   ) extends Event {
     def typ = "drop"
@@ -194,7 +194,7 @@ object Event {
         clock,
         possibleMoves,
         possibleDrops,
-        crazyData
+        pocketData
       ) {
         Json.obj(
           "role" -> role.name,
@@ -210,7 +210,7 @@ object Event {
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
-        crazyData: Option[PocketData]
+        pocketData: Option[PocketData]
     ): Drop =
       Drop(
         lib = situation.board.variant.gameLogic,
@@ -227,7 +227,7 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        crazyData = crazyData
+        pocketData = pocketData
       )
   }
 

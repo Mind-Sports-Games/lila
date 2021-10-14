@@ -147,7 +147,7 @@ object BSONHandlers {
               } else Game.emptyCheckCount
               ),
             variant = gameVariant,
-            crazyData = gameVariant.dropsVariant option (r.get[PocketData](F.crazyData)) match {
+            pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
               case Some(PocketData.Chess(pd)) => Some(pd)
               case None => None
               case _ => sys.error("non chess pocket data")
@@ -395,7 +395,7 @@ object BSONHandlers {
                 )
                 .toOption,
               F.checkCount -> o.history.checkCount.nonEmpty.option(o.history.checkCount),
-              F.crazyData  -> o.board.crazyData
+              F.pocketData  -> o.board.pocketData
             )
           }
         }

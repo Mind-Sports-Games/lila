@@ -120,7 +120,7 @@ final class JsonView(
           .add("correspondence" -> pov.game.correspondenceClock)
           .add("takebackable" -> takebackable)
           .add("moretimeable" -> moretimeable)
-          .add("crazyhouse" -> pov.game.board.crazyData)
+          .add("crazyhouse" -> pov.game.board.pocketData)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
           .add("expiration" -> pov.game.expirable.option {

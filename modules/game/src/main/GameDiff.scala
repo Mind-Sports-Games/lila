@@ -119,8 +119,8 @@ object GameDiff {
           )
         if (a.variant.dropsVariant)
           dOpt(
-            crazyData,
-            _.board.crazyData,
+            pocketData,
+            _.board.pocketData,
             (o: Option[PocketData]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
           )
       }

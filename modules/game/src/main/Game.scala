@@ -242,8 +242,8 @@ case class Game(
     }
 
     val events = moveOrDrop.fold(
-      Event.Move(_, game.situation, state, clockEvent, updated.board.crazyData),
-      Event.Drop(_, game.situation, state, clockEvent, updated.board.crazyData)
+      Event.Move(_, game.situation, state, clockEvent, updated.board.pocketData),
+      Event.Drop(_, game.situation, state, clockEvent, updated.board.pocketData)
     ) :: {
       // abstraction leak, I know.
       if (updated.board.variant.gameLogic == GameLogic.Draughts())
@@ -814,7 +814,7 @@ object Game {
     val analysed          = "an"
     val lib               = "l"
     val variant           = "v"
-    val crazyData         = "chd"
+    val pocketData         = "chd"
     val bookmarks         = "bm"
     val createdAt         = "ca"
     val movedAt           = "ua" // ua = updatedAt (bc)

@@ -86,7 +86,7 @@ final private class ChapterMaker(
           fen = Forsyth.>>(sit.situation.board.variant.gameLogic, sit),
           check = sit.situation.check,
           clock = none,
-          crazyData = sit.situation.board.crazyData,
+          pocketData = sit.situation.board.pocketData,
           children = Node.emptyChildren
         ) -> true
       case None =>
@@ -95,7 +95,7 @@ final private class ChapterMaker(
           fen = variant.initialFen,
           check = false,
           clock = none,
-          crazyData = variant.dropsVariant option PocketData.init(variant.gameLogic),
+          pocketData = variant.dropsVariant option PocketData.init(variant.gameLogic),
           children = Node.emptyChildren
         ) -> false
     }) match {

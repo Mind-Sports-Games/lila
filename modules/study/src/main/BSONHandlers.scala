@@ -212,7 +212,7 @@ object BSONHandlers {
       glyphs         -> n.glyphs.nonEmpty,
       score          -> n.score,
       clock          -> n.clock,
-      crazy          -> n.crazyData,
+      crazy          -> n.pocketData,
       forceVariation -> w.boolO(n.forceVariation),
       order -> {
         (n.children.nodes.sizeIs > 1) option n.children.nodes.map(_.id)
@@ -236,7 +236,7 @@ object BSONHandlers {
         glyphs = r.getO[Glyphs](glyphs) | Glyphs.empty,
         score = r.getO[Score](score),
         clock = r.getO[Centis](clock),
-        crazyData = r.getO[PocketData](crazy),
+        pocketData = r.getO[PocketData](crazy),
         children = StudyFlatTree.reader.rootChildren(fullReader.doc)
       )
     }
@@ -252,7 +252,7 @@ object BSONHandlers {
           glyphs   -> r.glyphs.nonEmpty,
           score    -> r.score,
           clock    -> r.clock,
-          crazy    -> r.crazyData
+          crazy    -> r.pocketData
         )
       }
     )

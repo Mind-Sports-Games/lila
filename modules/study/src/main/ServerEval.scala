@@ -161,7 +161,7 @@ object ServerEval {
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),
         check = g.situation.check,
-        crazyData = g.situation.board.crazyData,
+        pocketData = g.situation.board.pocketData,
         clock = none,
         children = Node.emptyChildren,
         forceVariation = false

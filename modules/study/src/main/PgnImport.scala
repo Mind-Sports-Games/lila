@@ -43,7 +43,7 @@ object PgnImport {
               comments = comments,
               glyphs = Glyphs.empty,
               clock = parsedPgn.tags.clockConfig.map(_.limit),
-              crazyData = replay.setup.situation.board.crazyData,
+              pocketData = replay.setup.situation.board.pocketData,
               children = Node.Children {
                 val variations = makeVariations(parsedPgn.sans.value, replay.setup, annotator)
                 makeNode(
@@ -141,7 +141,7 @@ object PgnImport {
                     shapes = shapes,
                     comments = comments,
                     glyphs = san.metas.glyphs,
-                    crazyData = game.situation.board.crazyData,
+                    pocketData = game.situation.board.pocketData,
                     clock = clock,
                     children = removeDuplicatedChildrenFirstNode {
                       val variations = makeVariations(rest, game, annotator)
