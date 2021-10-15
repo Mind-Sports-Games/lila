@@ -23,7 +23,7 @@ object filter {
                 renderCheckboxes(
                   form,
                   "variant",
-                  translatedChessVariantChoicesWithVariants(_.key)
+                  translatedAllVariantChoicesWithVariants(_.key)
                 )
               )
             ),

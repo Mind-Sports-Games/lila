@@ -72,8 +72,9 @@ final class ChallengeGranter(
           }
       }
       .map {
-        case None if dest.isBot && perfType.has(PerfType.UltraBullet) => BotUltraBullet.some
-        case res                                                      => res
+        case None if dest.isBot && perfType.has(PerfType.orDefaultSpeed("ultraBullet"))
+          => BotUltraBullet.some
+        case res => res
       }
       .map {
         _.map { ChallengeDenied(dest, _) }

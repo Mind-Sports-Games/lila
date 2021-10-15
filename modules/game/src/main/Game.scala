@@ -1,9 +1,7 @@
 package lila.game
 
 import strategygames.format.{ FEN, Uci }
-import strategygames.chess
 import strategygames.opening.{ FullOpening, FullOpeningDB }
-import strategygames.chess.variant.{ FromPosition, Standard, Variant => ChessVariant }
 import strategygames.chess.{ Castles, CheckCount }
 import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
@@ -28,7 +26,6 @@ import org.joda.time.DateTime
 import lila.common.Sequence
 import lila.db.ByteArray
 import lila.rating.PerfType
-import lila.rating.PerfType.Classical
 import lila.user.User
 
 case class Game(
@@ -113,7 +110,10 @@ case class Game(
   def isSimul      = simulId.isDefined
   def isSwiss      = swissId.isDefined
   def isMandatory  = isTournament || isSimul || isSwiss
-  def isClassical  = perfType contains Classical
+  def isClassical  = perfType match {
+    case Some(pt) => pt.key == "classical"
+    case _        => false
+  }
   def nonMandatory = !isMandatory
 
   def hasChat = !isTournament && !isSimul && nonAi
@@ -376,7 +376,7 @@ case class Game(
     finishedOrAborted &&
       nonMandatory &&
       !boosted && ! {
-        hasAi && variant == FromPosition && clock.exists(_.config.limitSeconds < 60)
+        hasAi && variant.fromPositionVariant && clock.exists(_.config.limitSeconds < 60)
       }
 
   def playerCanProposeTakeback(color: Color) =
@@ -459,9 +459,7 @@ case class Game(
   def replayable = isPgnImport || finished || (aborted && bothPlayersHaveMoved)
 
   def analysable =
-    replayable && playedTurns > 4 &&
-      Game.analysableVariants(variant) &&
-      !Game.isOldHorde(this)
+    replayable && playedTurns > 4 && Game.analysableVariants(variant)
 
   def ratingVariant =
     if (isTournament && variant.fromPosition) Variant.libStandard(variant.gameLogic)
@@ -684,43 +682,23 @@ object Game {
 
   val maxPlies = 600 // unlimited can cause StackOverflowError
 
-  val analysableVariants: Set[Variant] = Set(
-    strategygames.chess.variant.Standard,
-    strategygames.chess.variant.Crazyhouse,
-    strategygames.chess.variant.Chess960,
-    strategygames.chess.variant.KingOfTheHill,
-    strategygames.chess.variant.ThreeCheck,
-    strategygames.chess.variant.Antichess,
-    strategygames.chess.variant.FromPosition,
-    strategygames.chess.variant.Horde,
-    strategygames.chess.variant.Atomic,
-    strategygames.chess.variant.RacingKings
-  ).map(Variant.Chess)
+  val analysableVariants: Set[Variant] = Variant.all.filter(_.aiVariant).toSet
 
-  val unanalysableVariants: Set[Variant] =
-    ChessVariant.all.map(Variant.Chess).toSet -- analysableVariants
+  //not used anywhere
+  //val unanalysableVariants: Set[Variant] =
+  //  Variant.all.toSet -- analysableVariants
 
-  val variantsWhereWhiteIsBetter: Set[Variant] = Set(
-    strategygames.chess.variant.ThreeCheck,
-    strategygames.chess.variant.Atomic,
-    strategygames.chess.variant.Horde,
-    strategygames.chess.variant.RacingKings,
-    strategygames.chess.variant.Antichess
-  ).map(Variant.Chess)
+  val variantsWhereWhiteIsBetter: Set[Variant] =
+    Variant.all.filter(_.whiteIsBetterVariant).toSet
 
-  val blindModeVariants: Set[Variant] = Set(
-    strategygames.chess.variant.Standard,
-    strategygames.chess.variant.Chess960,
-    strategygames.chess.variant.KingOfTheHill,
-    strategygames.chess.variant.ThreeCheck,
-    strategygames.chess.variant.FromPosition
-  ).map(Variant.Chess)
+  val blindModeVariants: Set[Variant] =
+    Variant.all.filter(_.blindModeVariant).toSet
 
-  val hordeWhitePawnsSince = new DateTime(2015, 4, 11, 10, 0)
-
-  def isOldHorde(game: Game) =
-    game.variant == strategygames.chess.variant.Horde &&
-      game.createdAt.isBefore(Game.hordeWhitePawnsSince)
+  //lichess old format
+  //val hordeWhitePawnsSince = new DateTime(2015, 4, 11, 10, 0)
+  //def isOldHorde(game: Game) =
+  //  game.variant == strategygames.chess.variant.Horde &&
+  //    game.createdAt.isBefore(Game.hordeWhitePawnsSince)
 
   def allowRated(variant: Variant, clock: Option[Clock.Config]) =
     variant.standard || {
@@ -861,7 +839,7 @@ object Game {
   }
 }
 
-case class CastleLastMove(castles: Castles, lastMove: Option[chess.format.Uci])
+case class CastleLastMove(castles: Castles, lastMove: Option[ChessUci])
 
 object CastleLastMove {
 

@@ -171,7 +171,7 @@ object Simul {
             variant = variant,
             daysPerTurn = none
           )
-        } ::: List(PerfType.Blitz, PerfType.Rapid, PerfType.Classical)
+        } ::: PerfType.allSpeed.filter(List("blitz", "rapid", "classical") contains _.key)
       },
       hostGameId = none,
       createdAt = DateTime.now,

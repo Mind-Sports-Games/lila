@@ -48,29 +48,14 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       else game.variant.gameLogic.name.toLowerCase()
     import strategygames.Status._
     val result = (game.winner, game.loser, game.status, game.variant.gameLogic) match {
-      case (Some(w), _, Mate, GameLogic.Chess())                 => s"${playerText(w)} won by checkmate"
+      case (Some(w), _, Mate, GameLogic.Chess())               => s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate, _)                               => s"${playerText(w)} won"
       case (_, Some(l), Resign | Timeout | Cheat | NoStart, _) => s"${playerText(l)} resigned"
       case (_, Some(l), Outoftime, _)                          => s"${playerText(l)} forfeits by time"
       case (Some(w), _, UnknownFinish, _)                      => s"${playerText(w)} won"
       case (_, _, Draw | Stalemate | UnknownFinish, _)         => "Game is a draw"
       case (_, _, Aborted, _)                                  => "Game has been aborted"
-      case (_, _, VariantEnd, _) =>
-        game.variant match {
-          case Variant.Chess(strategygames.chess.variant.KingOfTheHill) => "King in the center"
-          case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => "Three checks"
-          case Variant.Chess(strategygames.chess.variant.Antichess)     => "Lose all your pieces to win"
-          case Variant.Chess(strategygames.chess.variant.Atomic)        => "Explode or mate your opponent's king to win"
-          case Variant.Chess(strategygames.chess.variant.Horde)         => "Destroy the horde to win"
-          case Variant.Chess(strategygames.chess.variant.RacingKings)   => "Race to the eighth rank to win"
-          case Variant.Chess(strategygames.chess.variant.Crazyhouse)    => "Drop captured pieces on the board"
-          case Variant.Chess(strategygames.chess.variant.LinesOfAction) => "Connect all your checkers to win"
-          case Variant.Draughts(strategygames.draughts.variant.Frisian) => "Capture horizontally and vertically"
-          case Variant.Draughts(strategygames.draughts.variant.Frysk)   => "Frisian draughts starting with 5 pieces"
-          case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => "Lose all your pieces or run out of moves"
-          case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => "Promote to a king to win"
-          case _ => "Variant ending"
-        }
+      case (_, _, VariantEnd, _)                               => game.variant.title.dropRight(1)
       case _ => "Game is still being played"
     }
     val moves = s"${game.chess.fullMoveNumber} moves"

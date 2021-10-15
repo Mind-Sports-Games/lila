@@ -4,12 +4,14 @@ import scala.concurrent.duration._
 
 import lila.rating.PerfType
 
+import strategygames.{ Clock, Speed }
+
 case class PoolConfig(
-    clock: strategygames.Clock.Config,
+    clock: Clock.Config,
     wave: PoolConfig.Wave
 ) {
 
-  val perfType = PerfType(strategygames.Speed(clock).key) | PerfType.Classical
+  val perfType = PerfType.apply(Speed(clock).key) | PerfType.orDefault(Speed.Classical.key)
 
   val id = PoolConfig clockToId clock
 }
@@ -21,7 +23,7 @@ object PoolConfig {
 
   case class Wave(every: FiniteDuration, players: NbPlayers)
 
-  def clockToId(clock: strategygames.Clock.Config) = Id(clock.show)
+  def clockToId(clock: Clock.Config) = Id(clock.show)
 
   import play.api.libs.json._
   implicit val poolConfigJsonWriter = OWrites[PoolConfig] { p =>

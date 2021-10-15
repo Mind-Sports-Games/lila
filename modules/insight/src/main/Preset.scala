@@ -8,9 +8,10 @@ object Preset {
 
   import lila.insight.{ Dimension => D, Metric => M }
 
-  private val filterBlitzPlus = List(
-    Filter(D.Perf, List(PerfType.Blitz, PerfType.Rapid, PerfType.Classical))
-  )
+  private val filterBlitzPlus = List(Filter(
+    D.Perf,
+    PerfType.allSpeed.filter(List("blitz", "rapid", "classical") contains _.key)
+  ))
 
   val forMod = List(
     Preset(
@@ -54,7 +55,7 @@ object Preset {
         D.PieceRole,
         M.Movetime,
         List(
-          Filter(D.Perf, List(PerfType.Bullet, PerfType.Blitz))
+          Filter(D.Perf, PerfType.allSpeed.filter(List("bullet", "blitz") contains _.key))
         )
       )
     ),
@@ -66,7 +67,7 @@ object Preset {
         List(
           Filter(
             D.Perf,
-            List(PerfType.Bullet, PerfType.Blitz, PerfType.Rapid, PerfType.Classical, PerfType.Correspondence)
+            PerfType.standard
           ),
           Filter(D.Color, List(strategygames.White))
         )

@@ -2,7 +2,7 @@ package lila.game
 
 import strategygames.Status
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Standard, FromPosition, Horde }
+import strategygames.chess.variant.{ Standard, FromPosition }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 
@@ -112,13 +112,13 @@ object Query {
 
   lazy val variantStandard = variant(Variant.Chess(Standard))
 
-  lazy val notHordeOrSincePawnsAreWhite: Bdoc = $or(
-    F.variant $ne Horde.id,
-    sinceHordePawnsAreWhite
-  )
-
-  lazy val sinceHordePawnsAreWhite: Bdoc =
-    createdSince(Game.hordeWhitePawnsSince)
+  //legacy lichess format
+  //lazy val notHordeOrSincePawnsAreWhite: Bdoc = $or(
+  //  F.variant $ne Horde.id,
+  //  sinceHordePawnsAreWhite
+  //)
+  //lazy val sinceHordePawnsAreWhite: Bdoc =
+  //  createdSince(Game.hordeWhitePawnsSince)
 
   val notFromPosition: Bdoc =
     F.variant $ne FromPosition.id

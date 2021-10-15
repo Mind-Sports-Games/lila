@@ -95,20 +95,13 @@ final class SwissApi(
   def update(swiss: Swiss, data: SwissForm.SwissData): Funit =
     Sequencing(swiss.id)(byId) { old =>
       val position =
-        if (old.isCreated || old.settings.position.isDefined) data.realVariant.standard ?? data.realPosition
+        if (old.isCreated || old.settings.position.isDefined) data.realVariant.standardVariant ?? data.realPosition
         else old.settings.position
       val swiss =
         old.copy(
           name = data.name | old.name,
           clock = if (old.isCreated) data.clock else old.clock,
-          variant = if (
-            old.isCreated && (
-              (data.gameFamily == 0 && data.chessVariant.isDefined) ||
-              (data.gameFamily == 1 && data.draughtsVariant.isDefined) ||
-              (data.gameFamily == 2 && data.loaVariant.isDefined)
-            )
-          ) data.realVariant
-          else old.variant,
+          variant = if (old.isCreated && data.variant.isDefined) data.realVariant else old.variant,
           startsAt = data.startsAt.ifTrue(old.isCreated) | old.startsAt,
           nextRoundAt =
             if (old.isCreated) Some(data.startsAt | old.startsAt)
