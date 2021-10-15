@@ -19,8 +19,8 @@
   "dependencies": {
     "ceval": "2.0.0",
     "chart.js": "^2.9",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#60-integrate-chessgroundx-fairy-stockfish-family",
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#60-integrate-chessgroundx",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git",
     "common": "2.0.0",
     "snabbdom": "^3.0.1",
     "tree": "2.0.0"

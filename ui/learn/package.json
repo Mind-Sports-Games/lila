@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "chess.js": "github:ornicar/chess.js#learn",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#60-integrate-chessgroundx-fairy-stockfish-family",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
     "common": "2.0.0",
     "mithril": "github:ornicar/mithril.js#lila-1"
   },

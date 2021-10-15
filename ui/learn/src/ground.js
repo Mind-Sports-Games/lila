@@ -14,6 +14,7 @@ module.exports = {
       lastMove: null,
       selected: null,
       orientation: opts.orientation,
+      myColor: opts.myColor,
       coordinates: true,
       pieceKey: true,
       turnColor: opts.chess.color(),
@@ -46,6 +47,9 @@ module.exports = {
         duration: 200,
       },
       disableContextMenu: true,
+      geometry: opts.geometry,
+      variant: opts.variant,
+      chess960: opts.chess960,
     });
     setTimeout(function () {
       cg.set({

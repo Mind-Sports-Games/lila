@@ -19,6 +19,7 @@ function makeConfig(ctrl: Controller): CgConfig {
   return {
     fen: opts.fen,
     orientation: opts.orientation,
+    myColor: opts.myColor,
     turnColor: opts.turnColor,
     check: opts.check,
     lastMove: opts.lastMove,
@@ -61,5 +62,8 @@ function makeConfig(ctrl: Controller): CgConfig {
       duration: ctrl.pref.animation.duration,
     },
     disableContextMenu: true,
+    geometry: opts.geometry,
+    variant: opts.variant,
+    chess960: opts.chess960,
   };
 }

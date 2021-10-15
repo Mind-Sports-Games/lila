@@ -10,7 +10,7 @@
     "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#60-integrate-chessgroundx"
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git"
   },
   "scripts": {
     "dev": "rollup --config",

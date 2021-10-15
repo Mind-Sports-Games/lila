@@ -13,16 +13,24 @@ import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './i
 //   'l-piece': 0,
 // };
 
-function pieceScores(piece:cg.Role):number{
-  switch(piece){
-    case  'p-piece': return 1
-    case  'n-piece': return 3
-    case  'b-piece': return 3
-    case  'r-piece': return 5
-    case  'q-piece': return 9
-    case  'k-piece': return 0
-    case  'l-piece': return 0
-    default        : return 0
+function pieceScores(piece: cg.Role): number {
+  switch (piece) {
+    case 'p-piece':
+      return 1;
+    case 'n-piece':
+      return 3;
+    case 'b-piece':
+      return 3;
+    case 'r-piece':
+      return 5;
+    case 'q-piece':
+      return 9;
+    case 'k-piece':
+      return 0;
+    case 'l-piece':
+      return 0;
+    default:
+      return 0;
   }
 }
 

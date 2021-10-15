@@ -14,6 +14,7 @@ window.onload = () => {
     fen: fen,
     lastMove: lm ? ([lm[0] + lm[1], lm[2] + lm[3]] as Key[]) : undefined,
     orientation: orientation as 'white' | 'black',
+    myColor: orientation as 'white' | 'black',
   });
 
   const resize = () => {

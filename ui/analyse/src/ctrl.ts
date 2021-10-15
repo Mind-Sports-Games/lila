@@ -285,7 +285,6 @@ export default class AnalyseCtrl {
   });
 
   makeCgOpts(): ChessgroundConfig {
-    console.log("making Cgoptsnfor chessgroundconfig")
     const node = this.node,
       color = this.turnColor(),
       dests = chessUtil.readDests(this.node.dests),

@@ -16,7 +16,6 @@ export function makeConfig(ctrl: RoundController): Config {
     hooks = ctrl.makeCgHooks(),
     step = plyStep(data, ctrl.ply),
     playing = ctrl.isPlaying();
-  console.log("myColor: ", data.player.color);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -83,6 +82,9 @@ export function makeConfig(ctrl: RoundController): Config {
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
     },
     disableContextMenu: true,
+    geometry: cg.Geometry.dim8x8,
+    variant: data.game.variant.key as cg.Variant,
+    chess960: data.game.variant.key === 'chess960',
   };
 }
 

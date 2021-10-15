@@ -44,25 +44,25 @@ const roles: { [letter: string]: string } = {
 };
 //const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k', loachecker: 'l' };
 
-const chessGroundRoleToLetter: { [pieceTypes:string] :string} = {
+const chessGroundRoleToLetter: { [pieceTypes: string]: string } = {
   'k-piece': 'k',
   'q-piece': 'q',
   'r-piece': 'r',
   'b-piece': 'b',
   'n-piece': 'n',
   'p-piece': 'p',
-  'l-piece': 'l'
-}
+  'l-piece': 'l',
+};
 
-const chessGroundRoleToLilaRole: { [pieceTypes:string] :string} = {
+const chessGroundRoleToLilaRole: { [pieceTypes: string]: string } = {
   'k-piece': 'king',
   'q-piece': 'queen',
   'r-piece': 'rook',
   'b-piece': 'bishop',
   'n-piece': 'knight',
   'p-piece': 'pawn',
-  'l-piece': 'loachecker'
-}
+  'l-piece': 'loachecker',
+};
 
 const letterPiece: { [letter: string]: string } = {
   p: 'p',
