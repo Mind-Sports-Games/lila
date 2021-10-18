@@ -18,7 +18,7 @@
   "dependencies": {
     "chat": "2.0.0",
     "draughtsground": "^7.6",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat1",
     "common": "2.0.0",
     "game": "2.0.0",
     "snabbdom": "^3.0.1"
