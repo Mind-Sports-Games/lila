@@ -211,7 +211,7 @@ object BinaryFormat {
     def writeChess(pieces: chess.PieceMap): ByteArray = {
       def posInt(pos: chess.Pos): Int =
         (pieces get pos).fold(0) { piece =>
-          piece.color.fold(0, 128) + roleToInt(piece.role)
+          piece.color.fold(0, 128) + piece.role.binaryInt
         }
       ByteArray(chess.Pos.all.map(posInt(_).toByte).toArray)
     }
@@ -222,11 +222,8 @@ object BinaryFormat {
         Array(int >> 4, int & 0x0f)
       }
       def intPiece(int: Int): Option[chess.Piece] =
-        intToRoleChess(int & 127, variant) map { role =>
-          chess.Piece(
-            Color.fromWhite((int & 128) == 0),
-            role
-          )
+        chess.Role.binaryInt(int & 127) map {
+          role => chess.Piece(Color.fromWhite((int & 128) == 0), role)
         }
       (chess.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
@@ -245,7 +242,7 @@ object BinaryFormat {
 
     def writeDraughts(pieces: draughts.PieceMap, variant: draughts.variant.Variant): ByteArray = {
       def posInt(pos: draughts.Pos): Int = (pieces get pos).fold(0) { piece =>
-        piece.color.fold(0, 8) + roleToInt(piece.role)
+        piece.color.fold(0, 8) + piece.role.binaryInt
       }
       ByteArray(groupedPos(variant.boardSize) map {
         case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
@@ -260,7 +257,9 @@ object BinaryFormat {
         Array(int >> 4, int & 0x0F)
       }
       def intPiece(int: Int): Option[draughts.Piece] =
-        intToRoleDraughts(int & 7, variant) map { role => draughts.Piece(Color((int & 8) == 0), role) }
+        draughts.Role.binaryInt(int & 7) map {
+          role => draughts.Piece(Color((int & 8) == 0), role)
+        }
       val pieceInts = ba.value flatMap splitInts
       (variant.boardSize.pos.all zip pieceInts).flatMap {
         case (pos, int) => intPiece(int) map (pos -> _)
@@ -276,15 +275,6 @@ object BinaryFormat {
       )
       case _ => sys.error("Cant write to binary for lib")
     }
-
-    private def intToRoleChess(int: Int, variant: chess.variant.Variant): Option[chess.Role] =
-      chess.Role.binaryInt(int)
-    private def intToRoleDraughts(int: Int, variant: draughts.variant.Variant): Option[draughts.Role] =
-      draughts.Role.binaryInt(int)
-
-    private def roleToInt(role: Role): Int = role.binaryInt
-    private def roleToInt(role: chess.Role): Int = role.binaryInt
-    private def roleToInt(role: draughts.Role): Int = role.binaryInt
 
   }
 
