@@ -1007,18 +1007,11 @@ chartjs-color@^2.1.0:
   version "0.10.2"
   resolved "https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249"
 
-"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git":
+"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat1":
   version "7.11.1-pstrat1"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#f33aadd4ca362d0a3d817c97cd619d63b0beecd6"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#bf7b5802e20e4d3cd173f34cc66a0a926bd6f5a6"
 
-chessops@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/chessops/-/chessops-0.9.0.tgz#07e00385a7106477685d372e91a593a83c063df2"
-  integrity sha512-yvkZUN0LRLY/2xoslepfldVTgyPqT1QNi7vOlnFDZ2YVQV6XdTJO23+hbHRkkzf8Vb4ihyfFC0JASnVFyiIyow==
-  dependencies:
-    "@badrap/result" "^0.2.8"
-
-"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git":
+"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat1":
   version "0.8.1-pstrat1"
   resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#e5d419e5093ff61094bab304c9abf88c230919a2"
   dependencies:
