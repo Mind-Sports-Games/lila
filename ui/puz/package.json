@@ -14,10 +14,10 @@
     "prod": "yarn run compile"
   },
   "dependencies": {
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git",
-    "snabbdom": "^3.0.1",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git",
-    "common": "2.0.0"
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat1",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat1",
+    "common": "2.0.0",
+    "snabbdom": "^3.0.1"
   },
   "devDependencies": {
     "@types/cash": "8.0.0",
