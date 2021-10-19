@@ -1077,9 +1077,9 @@ chartjs-color@^2.1.0:
   version "0.10.2"
   resolved "https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249"
 
-"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.0":
-  version "7.11.1-pstrat2.4"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#ef90b3e5d0b8279f1edf264a5b5c0541ca6cadc6"
+"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#60-integrate-chessgroundx-fairy-stockfish-family":
+  version "7.11.1-pstrat2.5"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#5fdd04308de487d72d3e5cc515581e50be78f7a3"
 
 "chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat2.0":
   version "0.8.1-pstrat2"

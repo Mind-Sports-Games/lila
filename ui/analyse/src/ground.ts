@@ -89,6 +89,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       duration: pref.animationDuration,
     },
     disableContextMenu: true,
+    dimensions: { width: 8, height: 8 },
     geometry: cg.Geometry.dim8x8,
     variant: ctrl.data.game.variant.key as cg.Variant,
     chess960: ctrl.data.game.variant.key == 'chess960',
