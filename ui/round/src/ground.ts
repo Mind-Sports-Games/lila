@@ -82,6 +82,7 @@ export function makeConfig(ctrl: RoundController): Config {
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
     },
     disableContextMenu: true,
+    dimensions: { width: 8, height: 8 },
     geometry: cg.Geometry.dim8x8,
     variant: data.game.variant.key as cg.Variant,
     chess960: data.game.variant.key === 'chess960',
