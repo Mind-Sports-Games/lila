@@ -1079,7 +1079,7 @@ chartjs-color@^2.1.0:
 
 "chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#60-integrate-chessgroundx-fairy-stockfish-family":
   version "7.11.1-pstrat2.5"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#5fdd04308de487d72d3e5cc515581e50be78f7a3"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#de4d89fb8c2ee45ed9dc57519886cba32276854d"
 
 "chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat2.0":
   version "0.8.1-pstrat2"

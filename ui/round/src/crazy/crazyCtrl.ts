@@ -68,7 +68,6 @@ export function init(ctrl: RoundController) {
         color = ctrl.data.player.color,
         crazyData = ctrl.data.crazyhouse;
       if (!crazyData) return;
-
       const nb = crazyData.pockets[color === 'white' ? 0 : 1][role];
       setDropMode(ctrl.chessground.state, nb > 0 ? { color, role } : undefined);
       activeCursor = `cursor-${color}-${role}`;

@@ -187,7 +187,7 @@ object Event {
     def data =
       MoveOrDrop.data(GameLogic.Chess(), fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
         Json.obj(
-          "role" -> role.name,
+          "role" -> role.groundName,
           "uci"  -> s"${role.pgn}@${pos.key}",
           "san"  -> san
         )
