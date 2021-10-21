@@ -4,6 +4,7 @@ import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLogi
 import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.draughts
+import strategygames.fairysf
 import strategygames.format
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -264,6 +265,30 @@ object BinaryFormat {
       (variant.boardSize.pos.all zip pieceInts).flatMap {
         case (pos, int) => intPiece(int) map (pos -> _)
       }.to(Map)
+    }
+
+    def writeFairySF(pieces: fairysf.PieceMap): ByteArray = {
+      def posInt(pos: fairysf.Pos): Int =
+        (pieces get pos).fold(0) { piece =>
+          piece.color.fold(0, 128) + piece.role.binaryInt
+        }
+      ByteArray(fairysf.Pos.all.map(posInt(_).toByte).toArray)
+    }
+
+    def readFairySF(ba: ByteArray, variant: fairysf.variant.Variant): fairysf.PieceMap = {
+      //def splitInts(b: Byte) = {
+      //  val int = b.toInt
+      //  Array(int >> 4, int & 0x0f)
+      //}
+      def intPiece(int: Int): Option[fairysf.Piece] =
+        fairysf.Role.binaryInt(int & 127) map {
+          role => fairysf.Piece(Color.fromWhite((int & 128) == 0), role)
+        }
+      (fairysf.Pos.all zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(int) map (pos -> _)
+        }
+        .to(Map)
     }
 
     // cache standard start position
