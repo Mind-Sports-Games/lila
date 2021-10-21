@@ -289,7 +289,7 @@ object Event {
     def data =
       Json.obj(
         "key"        -> pos.key,
-        "pieceClass" -> role.toString.toLowerCase,
+        "pieceClass" -> role.groundName,
         "lib"        -> lib
       )
   }
