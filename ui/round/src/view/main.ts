@@ -21,7 +21,7 @@ function renderMaterial(material: MaterialDiffSide, score: number, position: Pos
       children.push(h('div', content));
     }
   }
-  if (checks) for (i = 0; i < checks; i++) children.push(h('div', h('mpiece.king')));
+  if (checks) for (i = 0; i < checks; i++) children.push(h('div', h('mpiece.k-piece')));
   if (score > 0) children.push(h('score', '+' + score));
   return h('div.material.material-' + position, children);
 }
