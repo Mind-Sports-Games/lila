@@ -21,7 +21,7 @@ function renderMaterial(material: MaterialDiffSide, score: number, position: Pos
       children.push(h('div', content));
     }
   }
-  if (checks) for (i = 0; i < checks; i++) children.push(h('div', h('mpiece.king')));
+  if (checks) for (i = 0; i < checks; i++) children.push(h('div', h('mpiece.k-piece')));
   if (score > 0) children.push(h('score', '+' + score));
   return h('div.material.material-' + position, children);
 }
@@ -48,7 +48,7 @@ export function main(ctrl: RoundController): VNode {
   let material: MaterialDiff,
     score = 0;
   if (d.pref.showCaptured) {
-    const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen);
+    const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, { width: 8, height: 8 });
     material = util.getMaterialDiff(pieces);
     score = util.getScore(pieces) * (bottomColor === 'white' ? 1 : -1);
   } else material = emptyMaterialDiff;

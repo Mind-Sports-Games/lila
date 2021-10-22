@@ -34,6 +34,7 @@ playstrategy.load.then(() => {
             color: null,
           },
           orientation: color,
+          myColor: color,
           addPieceZIndex: $('#main-wrap').hasClass('is3d'),
         });
       else if (color !== ground.state.orientation) ground.toggleOrientation();

@@ -5,7 +5,7 @@ import play.api.libs.json._
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.variant.Crazyhouse
 import strategygames.opening.FullOpening
-import strategygames.{ Black, Clock, Color, Division, Status, White }
+import strategygames.{ Black, Clock, Color, Division, Status, White, Role }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
 
@@ -87,7 +87,7 @@ object JsonView {
     JsObject(
       Crazyhouse.storableRoles.flatMap { role =>
         Some(v.roles.count(role ==)).filter(0 <).map { count =>
-          role.name -> JsNumber(count)
+          role.groundName -> JsNumber(count)
         }
       }
     )

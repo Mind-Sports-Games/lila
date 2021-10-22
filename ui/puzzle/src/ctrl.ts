@@ -131,6 +131,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     const config = {
       fen: node.fen,
       orientation: vm.pov,
+      myColor: vm.pov,
       turnColor: color,
       movable: movable,
       premovable: {
@@ -138,6 +139,9 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       },
       check: !!node.check,
       lastMove: uciToLastMove(node.uci),
+      geometry: vm.cgConfig.geometry,
+      variant: vm.cgConfig.variant,
+      chess960: vm.cgConfig.chess960,
     };
     if (node.ply >= vm.initialNode.ply) {
       if (vm.mode !== 'view' && color !== vm.pov && !nextNode) {

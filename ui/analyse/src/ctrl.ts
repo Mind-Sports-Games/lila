@@ -481,7 +481,7 @@ export default class AnalyseCtrl {
     this.justPlayed = orig;
     this.justDropped = undefined;
     const piece = this.chessground.state.pieces.get(dest);
-    const isCapture = capture || (piece && piece.role == 'pawn' && orig[0] != dest[0]);
+    const isCapture = capture || (piece && piece.role == 'p-piece' && orig[0] != dest[0]);
     this.sound[isCapture ? 'capture' : 'move']();
     if (!promotion.start(this, orig, dest, capture, this.sendMove)) this.sendMove(orig, dest, capture);
   };
@@ -628,12 +628,12 @@ export default class AnalyseCtrl {
               const board = setup.board;
               const pieces = board[color];
               const promotedPieces =
-                Math.max(board.queen.intersect(pieces).size() - 1, 0) +
-                Math.max(board.rook.intersect(pieces).size() - 2, 0) +
-                Math.max(board.knight.intersect(pieces).size() - 2, 0) +
-                Math.max(board.bishop.intersect(pieces).intersect(SquareSet.lightSquares()).size() - 1, 0) +
-                Math.max(board.bishop.intersect(pieces).intersect(SquareSet.darkSquares()).size() - 1, 0);
-              return board.pawn.intersect(pieces).size() + promotedPieces <= 8;
+                Math.max(board['q-piece'].intersect(pieces).size() - 1, 0) +
+                Math.max(board['r-piece'].intersect(pieces).size() - 2, 0) +
+                Math.max(board['n-piece'].intersect(pieces).size() - 2, 0) +
+                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.lightSquares()).size() - 1, 0) +
+                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.darkSquares()).size() - 1, 0);
+              return board['p-piece'].intersect(pieces).size() + promotedPieces <= 8;
             }),
           _ => false
         ),

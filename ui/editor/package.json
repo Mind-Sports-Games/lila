@@ -15,8 +15,8 @@
     "@build/rollupProject": "2.0.0"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat1",
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat1",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.6",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat2.0",
     "common": "2.0.0",
     "snabbdom": "^3.0.1"
   },

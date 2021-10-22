@@ -131,7 +131,7 @@ export default class StormCtrl {
   };
 
   playUserMove = (orig: Key, dest: Key, promotion?: Role): void =>
-    this.playUci(`${orig}${dest}${promotion ? (promotion == 'knight' ? 'n' : promotion[0]) : ''}`);
+    this.playUci(`${orig}${dest}${promotion ? (promotion == 'n-piece' ? 'n' : promotion[0]) : ''}`);
 
   playUci = (uci: Uci): void => {
     const now = getNow();
