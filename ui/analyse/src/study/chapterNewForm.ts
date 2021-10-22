@@ -273,9 +273,8 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                         if (!file) return;
                         const reader = new FileReader();
                         reader.onload = function () {
-                          (document.getElementById(
-                            'chapter-pgn'
-                          ) as HTMLTextAreaElement).value = reader.result as string;
+                          (document.getElementById('chapter-pgn') as HTMLTextAreaElement).value =
+                            reader.result as string;
                         };
                         reader.readAsText(file);
                       }),
