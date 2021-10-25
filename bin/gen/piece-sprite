@@ -38,14 +38,22 @@ themes = [
   ['icpieces', 'svg'],
   ['horsey', 'svg']
 ]
+games = [
+  ['shogi','svg'],
+  ['xiangqi','svg']
+]
 types = {
   'svg' => 'svg+xml;base64,',
   'png' => 'png;base64,'
 }
 roles = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece', 'k-piece', 'l-piece']
 colors = ['white', 'black']
+shogi_roles = ['p-piece', 'l-piece', 'n-piece', 'k-piece', 's-piece', 'pp-piece', 'pl-piece', 'pn-piece', 'ps-piece', 'g-piece', 'b-peice', 'r-piece','pr-piece', 'pb-piece']
+shogi_colors = ['0','1']
+xiangqi_roles =['a-piece', 'c-piece', 'e-piece', 'h-piece', 'k-piece', 'p-piece', 'r-piece']
+xiangqi_colors = ['B','R']
 
-# inline SVG
+# inline SVG Chess
 themes.map { |theme|
   name = theme[0]
   ext = theme[1]
@@ -64,7 +72,7 @@ themes.map { |theme|
   File.open(dest_dir + name + '.css', 'w') { |f| f.puts classes.join("\n") }
 }
 
-# external SVG
+# external SVG Chess
 themes.map { |theme|
   name = theme[0]
   ext = theme[1]
@@ -77,3 +85,34 @@ themes.map { |theme|
   }.flatten
   File.open(dest_dir + name + '.external.css', 'w') { |f| f.puts classes.join("\n") }
 }
+
+
+# inline SVG Xiangqi
+name = 'xiangqi'
+ext = 'svg'
+classes = xiangqi_colors.map { |color|
+  xiangqi_roles.map { |role|
+    piece = color[0] + role.upcase[0]
+    file = source_dir + name + '/' + piece + '.' + ext
+    File.open(file, 'r') do|image_file|
+      image = image_file.read
+      base64 = Base64.strict_encode64(image)
+      '.is2d .' + role + '.' + color + ' {' +
+        "background-image:url('data:image/" + types[ext] + base64 + "')}"
+    end
+  }
+}.flatten
+File.open(dest_dir + name + '.css', 'w') { |f| f.puts classes.join("\n") }
+
+
+# external SVG Xiangqi
+name = 'xiangqi'
+ext = 'svg'
+classes = xiangqi_colors.map { |color|
+  xiangqi_roles.map { |role|
+    piece = color[0] + role.upcase[0]
+    '.is2d .' + role + '.' + color + ' {' +
+      "background-image:url('/assets/piece/" + name + "/" + piece + "." + ext + "')}"
+  }
+}.flatten
+File.open(dest_dir + name + '.external.css', 'w') { |f| f.puts classes.join("\n") }
