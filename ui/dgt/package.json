@@ -10,7 +10,7 @@
     "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat1"
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat2.0"
   },
   "scripts": {
     "dev": "rollup --config",

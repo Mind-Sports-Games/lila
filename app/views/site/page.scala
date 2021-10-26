@@ -46,7 +46,7 @@ object page {
       contentCls = "page",
       moreJs = embedJsUnsafeLoadThen(
         """$('#asset-version-date').text(playstrategy.info.date);
-$('#asset-version-commit').attr('href', 'https://github.com/ornicar/lila/commits/' + playstrategy.info.commit).find('pre').text(playstrategy.info.commit);
+$('#asset-version-commit').attr('href', 'https://github.com/Mind-Sports-Games/lila/commits/' + playstrategy.info.commit).find('pre').text(playstrategy.info.commit);
 $('#asset-version-message').text(playstrategy.info.message);"""
       )
     )(
@@ -64,7 +64,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
                 tr(
                   td("Server"),
                   td(date),
-                  td(a(href := s"https://github.com/ornicar/lila/commits/$commit")(pre(commit))),
+                  td(a(href := s"https://github.com/Mind-Sports-Games/lila/commits/$commit")(pre(commit))),
                   td(message)
                 )
             },

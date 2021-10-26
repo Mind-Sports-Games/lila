@@ -12,12 +12,12 @@ module.exports = {
   },
   assetUrl: $('body').data('asset-url') + '/assets/',
   roleToSan: {
-    pawn: 'P',
-    knight: 'N',
-    bishop: 'B',
-    rook: 'R',
-    queen: 'Q',
-    loachecker: 'L',
+    'p-piece': 'P',
+    'n-piece': 'N',
+    'b-piece': 'B',
+    'r-piece': 'R',
+    'q-piece': 'Q',
+    'l-piece': 'L',
   },
   arrow: function (vector, brush) {
     return {
