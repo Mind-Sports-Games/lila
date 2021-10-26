@@ -66,62 +66,84 @@ object GameDiff {
         ByteArrayBSONHandler.writeOpt(BinaryFormat.clockHistory.writeSide(x, y, z))
       }
 
-    if (a.variant.gameLogic == GameLogic.Draughts()){
-      a.pdnStorage match {
-        case Some(PdnStorage.OldBin) => {
-          dTry(oldPgn, _.pgnMoves, writeBytes compose PdnStorage.OldBin.encode)
+    a.variant.gameLogic match {
+      case GameLogic.Draughts() =>
+        a.pdnStorage match {
+          case Some(PdnStorage.OldBin) => {
+            dTry(oldPgn, _.pgnMoves, writeBytes compose PdnStorage.OldBin.encode)
+            dTry(binaryPieces, _.board match {
+              case Board.Draughts(b) => b.pieces
+              case _ => sys.error("Wrong board type")
+            }, writeBytes compose {
+              m: strategygames.draughts.PieceMap => BinaryFormat.piece.writeDraughts(
+                m,
+                a.variant match {
+                  case strategygames.variant.Variant.Draughts(v) => v
+                  case _ => sys.error("Wrong variant type")
+                }
+              )
+            })
+            d(positionHashes, _.history.positionHashes, w.bytes)
+            d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+            // since variants are always OldBin
+            if (a.variant.frisianVariant || a.variant.draughts64Variant)
+              dOptTry(
+                kingMoves,
+                _.history.kingMoves,
+                (o: KingMoves) => o.nonEmpty option {BSONHandlers.kingMovesWriter writeTry o}
+              )
+          }
+          case Some(PdnStorage.Huffman) => {
+            dTry(huffmanPgn, _.pgnMoves, writeBytes compose PdnStorage.Huffman.encode)
+          }
+          case _ => sys.error("invalid draughts storage")
+        }
+      case GameLogic.Chess() =>
+        if (a.variant.standard)
+          dTry(huffmanPgn, _.pgnMoves, writeBytes compose PgnStorage.Huffman.encode)
+        else {
+          dTry(oldPgn, _.pgnMoves, writeBytes compose PgnStorage.OldBin.encode)
           dTry(binaryPieces, _.board match {
-            case Board.Draughts(b) => b.pieces
+            case Board.Chess(b) => b.pieces
             case _ => sys.error("Wrong board type")
-          }, writeBytes compose {
-            m: strategygames.draughts.PieceMap => BinaryFormat.piece.writeDraughts(
-              m,
-              a.variant match {
-                case strategygames.variant.Variant.Draughts(v) => v
-                case _ => sys.error("Wrong variant type")
-              }
-            )
-          })
+          }, writeBytes compose BinaryFormat.piece.writeChess)
           d(positionHashes, _.history.positionHashes, w.bytes)
-          d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+          dTry(
+            unmovedRooks,
+            _.history.unmovedRooks,
+            writeBytes compose BinaryFormat.unmovedRooks.write
+          )
+          dTry(
+            castleLastMove,
+            makeCastleLastMove,
+            CastleLastMove.castleLastMoveBSONHandler.writeTry
+          )
           // since variants are always OldBin
-          if (a.variant.frisianVariant || a.variant.draughts64Variant)
-            dOptTry(
-              kingMoves,
-              _.history.kingMoves,
-              (o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o }
+          if (a.variant.threeCheck)
+            dOpt(
+              checkCount,
+              _.history.checkCount,
+              (o: CheckCount) => o.nonEmpty ?? { BSONHandlers.checkCountWriter writeOpt o }
+            )
+          if (a.variant.dropsVariant)
+            dOpt(
+              pocketData,
+              _.board.pocketData,
+              (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
             )
         }
-        case Some(PdnStorage.Huffman) => {
-          dTry(huffmanPgn, _.pgnMoves, writeBytes compose PdnStorage.Huffman.encode)
-        }
-        case _ => sys.error("invalid draughts storage")
-      }
-    } else {
-      if (a.variant.standard)
-        dTry(huffmanPgn, _.pgnMoves, writeBytes compose PgnStorage.Huffman.encode)
-      else {
-        val f = PgnStorage.OldBin
-        dTry(oldPgn, _.pgnMoves, writeBytes compose f.encode)
+      case GameLogic.FairySF() => {
+        dTry(oldPgn, _.pgnMoves, writeBytes compose PfnStorage.OldBin.encode)
         dTry(binaryPieces, _.board match {
-          case Board.Chess(b) => b.pieces
+          case Board.FairySF(b) => b.pieces
           case _ => sys.error("Wrong board type")
-        }, writeBytes compose BinaryFormat.piece.writeChess)
+        }, writeBytes compose BinaryFormat.piece.writeFairySF)
         d(positionHashes, _.history.positionHashes, w.bytes)
-        dTry(unmovedRooks, _.history.unmovedRooks, writeBytes compose BinaryFormat.unmovedRooks.write)
-        dTry(castleLastMove, makeCastleLastMove, CastleLastMove.castleLastMoveBSONHandler.writeTry)
-        // since variants are always OldBin
-        if (a.variant.threeCheck)
-          dOpt(
-            checkCount,
-            _.history.checkCount,
-            (o: CheckCount) => o.nonEmpty ?? { BSONHandlers.checkCountWriter writeOpt o }
-          )
         if (a.variant.dropsVariant)
           dOpt(
             pocketData,
             _.board.pocketData,
-            (o: Option[PocketData]) => o map BSONHandlers.crazyhouseDataBSONHandler.write
+            (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
           )
       }
     }

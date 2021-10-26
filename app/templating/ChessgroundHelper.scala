@@ -19,14 +19,22 @@ trait ChessgroundHelper {
   private val cgBoard     = tag("cg-board")
   val cgWrapContent       = cgHelper(cgContainer(cgBoard))
 
-  def chessground(board: chess.Board, orient: Color, lastMove: List[chess.Pos] = Nil)(implicit ctx: Context): Frag =
+  def chessground(board: Board, orient: Color, lastMove: List[Pos] = Nil)(implicit ctx: Context): Frag =
     wrap {
       cgBoard {
         raw {
           if (ctx.pref.is3d) ""
           else {
-            def top(p: chess.Pos)  = orient.fold(7 - p.rank.index, p.rank.index) * 12.5
-            def left(p: chess.Pos) = orient.fold(p.file.index, 7 - p.file.index) * 12.5
+            def top(p: Pos) = p match {
+              case Pos.Chess(p)   => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
+              case Pos.FairySF(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
+              case _ => sys.error("Invalid Pos type")
+            }
+            def left(p: Pos) = p match {
+              case Pos.Chess(p)   => orient.fold(p.file.index, 7 - p.file.index) * 12.5
+              case Pos.FairySF(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
+              case _ => sys.error("Invalid Pos type")
+            }
             val highlights = ctx.pref.highlight ?? lastMove.distinct.map { pos =>
               s"""<square class="last-move" style="top:${top(pos)}%;left:${left(pos)}%"></square>"""
             } mkString ""
@@ -69,7 +77,16 @@ trait ChessgroundHelper {
 
   def chessground(pov: Pov)(implicit ctx: Context): Frag =
     (pov.game.board, pov.game.history) match {
-      case (Board.Chess(board), History.Chess(history)) =>
+      case (board: Board.Chess, history: History.Chess) =>
+        chessground(
+          board = board,
+          orient = pov.color,
+          lastMove = history.lastMove.map(_.origDest) ?? {
+            case (orig, dest) => List(orig, dest)
+          }
+        )
+      //is there a better way of duplicating the case for Chess/FairySF?
+      case (board: Board.FairySF, history: History.FairySF) =>
         chessground(
           board = board,
           orient = pov.color,
@@ -87,7 +104,6 @@ trait ChessgroundHelper {
         )
       case _ => sys.error("Mismatched board and history")
     }
-
 
   private def wrap(content: Frag): Frag =
     cgWrap {

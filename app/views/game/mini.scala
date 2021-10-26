@@ -23,10 +23,8 @@ object mini {
     variant match {
       case Variant.Chess(_) => 
         s"${gameLogic}"
-      case Variant.Draughts(v) => {
-        val boardSize = v.boardSize
-        s"${gameLogic} is${boardSize.key}"
-      }
+      case Variant.Draughts(v) =>
+        s"${gameLogic} is${v.boardSize.key}"
     }
   }
 
@@ -70,12 +68,10 @@ object mini {
 
   def renderState(pov: Pov) =
     pov.game.variant match {
-      case Variant.Chess(_) => 
+      case Variant.Chess(_) | Variant.FairySF(_) =>
         dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
-      case Variant.Draughts(v) => {
-        val boardSize = v.boardSize
-        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)}|${boardSize.width}x${boardSize.height}|${pov.color.name}|${~pov.game.lastMoveKeys}"
-      }
+      case Variant.Draughts(v) =>
+        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)}|${v.boardSize.width}x${v.boardSize.height}|${pov.color.name}|${~pov.game.lastMoveKeys}"
     }
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =

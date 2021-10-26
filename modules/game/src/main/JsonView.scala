@@ -82,7 +82,7 @@ object JsonView {
       .writes(ct)
       .add("matchup" -> matchup)
 
-  implicit val crazyhousePocketWriter: OWrites[Pocket] = OWrites { v =>
+  implicit val pocketWriter: OWrites[Pocket] = OWrites { v =>
     JsObject(
       Role.storable(v.roles.headOption match {
         case Some(r) => r match {
@@ -99,7 +99,7 @@ object JsonView {
     )
   }
 
-  implicit val crazyhouseDataWriter: OWrites[PocketData] = OWrites { v =>
+  implicit val pocketDataWriter: OWrites[PocketData] = OWrites { v =>
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 

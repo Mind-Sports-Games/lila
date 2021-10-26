@@ -34,7 +34,7 @@ object BSONHandlers {
     x => ByteArrayBSONHandler.writeTry(BinaryFormat.unmovedRooks write x).get
   )
 
-  implicit private[game] val crazyhouseDataBSONHandler = new BSON[PocketData] {
+  implicit private[game] val pocketDataBSONHandler = new BSON[PocketData] {
 
     def reads(r: BSON.Reader) =
       GameLogic(r.intD("l")) match {

@@ -200,7 +200,7 @@ object Node {
 
   // TODO copied from lila.game
   // put all that shit somewhere else
-  implicit private val crazyhousePocketWriter: OWrites[Pocket] = OWrites { v =>
+  implicit private val pocketWriter: OWrites[Pocket] = OWrites { v =>
     JsObject(
       Role.storable(v.roles.headOption match {
         case Some(r) => r match {
@@ -216,7 +216,7 @@ object Node {
       }
     )
   }
-  implicit private val crazyhouseDataWriter: OWrites[PocketData] = OWrites { v =>
+  implicit private val pocketDataWriter: OWrites[PocketData] = OWrites { v =>
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 
