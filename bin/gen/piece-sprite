@@ -65,7 +65,7 @@ shogi_roles_to_imageprefix = [
     ['pb-piece','UM']
   ]
 shogi_colors = ['0','1']
-xiangqi_roles =['a-piece', 'c-piece', 'e-piece', 'h-piece', 'k-piece', 'p-piece', 'r-piece']
+xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece']
 xiangqi_colors = ['B','R']
 
 # # inline SVG Chess
@@ -107,7 +107,7 @@ name = 'xiangqi'
 ext = 'svg'
 classes = xiangqi_colors.map { |color|
   xiangqi_roles.map { |role|
-    piece = color[0] + role.upcase[0]
+    piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
     file = source_dir + name + '/' + piece + '.' + ext
     File.open(file, 'r') do|image_file|
       image = image_file.read
@@ -125,7 +125,7 @@ name = 'xiangqi'
 ext = 'svg'
 classes = xiangqi_colors.map { |color|
   xiangqi_roles.map { |role|
-    piece = color[0] + role.upcase[0]
+    piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
     '.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
       "background-image:url('/assets/piece/" + name + "/" + piece + "." + ext + "')}"
   }
