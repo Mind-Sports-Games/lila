@@ -17,34 +17,22 @@
     background-size: cover;
     display: inline-block;
 
-    &.p-piece {
-      background-image: url(../piece/mono/P.svg);
+    @each $role, $r in (p-piece: P, n-piece: N, b-piece: B, rpiece: R, q-piece: Q, k-piece: K) {
+      &.#{$role} {
+        background-image: url(../piece/mono/#{$r}.svg);
+      }
     }
 
-    &.b-piece {
-      background-image: url(../piece/mono/B.svg);
-    }
-
-    &.n-piece {
-      background-image: url(../piece/mono/N.svg);
-    }
-
-    &.r-piece {
-      background-image: url(../piece/mono/R.svg);
-    }
-
-    &.q-piece {
-      background-image: url(../piece/mono/Q.svg);
-    }
-
-    &.k-piece {
-      background-image: url(../piece/mono/K.svg);
+    &.l-piece .variant-linesOfAction{
+      background-image: url(../piece/mono/dM.svg);
     }
 
     @if $theme == 'transp' {
       filter: brightness(1.3) drop-shadow(0 1px 1px #000);
     }
   }
+
+  
 
   score {
     font-family: 'Roboto';
