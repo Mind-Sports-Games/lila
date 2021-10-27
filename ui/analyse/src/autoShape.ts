@@ -122,6 +122,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
         shapes = shapes.concat({
           orig: destSquare,
           customSvg: svg,
+          brush: 'paleRed',
         });
       }
     }

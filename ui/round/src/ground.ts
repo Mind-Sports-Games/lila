@@ -19,6 +19,7 @@ export function makeConfig(ctrl: RoundController): Config {
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
+    myColor: data.player.color,
     turnColor: step.ply % 2 === 0 ? 'white' : 'black',
     lastMove: util.uci2move(step.uci),
     check: !!step.check,
@@ -81,6 +82,10 @@ export function makeConfig(ctrl: RoundController): Config {
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
     },
     disableContextMenu: true,
+    dimensions: { width: 8, height: 8 },
+    geometry: cg.Geometry.dim8x8,
+    variant: data.game.variant.key as cg.Variant,
+    chess960: data.game.variant.key === 'chess960',
   };
 }
 
@@ -90,7 +95,7 @@ export function reload(ctrl: RoundController) {
 
 export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
   const piece = ground.state.pieces.get(key);
-  if (piece && piece.role === 'pawn') {
+  if (piece && piece.role === 'p-piece') {
     ground.setPieces(
       new Map([
         [

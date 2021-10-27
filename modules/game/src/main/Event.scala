@@ -197,7 +197,7 @@ object Event {
         pocketData
       ) {
         Json.obj(
-          "role" -> role.name,
+          "role" -> role.groundName,
           "uci"  -> s"${role.pgn}@${pos.key}",
           "san"  -> san
         )
@@ -304,7 +304,7 @@ object Event {
     def data =
       Json.obj(
         "key"        -> pos.key,
-        "pieceClass" -> role.toString.toLowerCase,
+        "pieceClass" -> role.groundName,
         "lib"        -> lib
       )
   }

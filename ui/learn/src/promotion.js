@@ -10,7 +10,7 @@ function start(orig, dest, callback) {
   var piece = ground.pieces()[dest];
   if (
     piece &&
-    piece.role == 'pawn' &&
+    piece.role == 'p-piece' &&
     ((dest[1] == 1 && piece.color == 'black') || (dest[1] == 8 && piece.color == 'white'))
   ) {
     promoting = {
@@ -70,7 +70,7 @@ module.exports = {
 
   view: function (ctrl, stage) {
     if (!promoting) return;
-    var pieces = ['queen', 'knight', 'rook', 'bishop'];
+    var pieces = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
 
     return renderPromotion(
       ctrl,

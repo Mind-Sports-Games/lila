@@ -89,7 +89,7 @@ export default class StormCtrl {
       this.run.clock.start();
       this.run.moves++;
       this.promotion.cancel();
-      const uci = `${orig}${dest}${promotion ? (promotion == 'knight' ? 'n' : promotion[0]) : ''}`;
+      const uci = `${orig}${dest}${promotion ? (promotion == 'n-piece' ? 'n' : promotion[0]) : ''}`;
       const pos = puzzle.position();
       const move = parseUci(uci)!;
       let captureSound = pos.board.occupied.has(move.to);

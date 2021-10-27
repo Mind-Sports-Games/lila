@@ -24,7 +24,7 @@ export function valid(
 ): boolean {
   if (piece.color !== chessground.state.movable.color) return false;
 
-  if (piece.role === 'pawn' && (pos[1] === '1' || pos[1] === '8')) return false;
+  if (piece.role === 'p-piece' && (pos[1] === '1' || pos[1] === '8')) return false;
 
   const drops = readDrops(possibleDrops);
 

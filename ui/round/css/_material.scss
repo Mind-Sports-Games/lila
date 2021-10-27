@@ -17,27 +17,27 @@
     background-size: cover;
     display: inline-block;
 
-    &.pawn {
+    &.p-piece {
       background-image: url(../piece/mono/P.svg);
     }
 
-    &.bishop {
+    &.b-piece {
       background-image: url(../piece/mono/B.svg);
     }
 
-    &.knight {
+    &.n-piece {
       background-image: url(../piece/mono/N.svg);
     }
 
-    &.rook {
+    &.r-piece {
       background-image: url(../piece/mono/R.svg);
     }
 
-    &.queen {
+    &.q-piece {
       background-image: url(../piece/mono/Q.svg);
     }
 
-    &.king {
+    &.k-piece {
       background-image: url(../piece/mono/K.svg);
     }
 

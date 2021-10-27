@@ -18,7 +18,7 @@ export default function (
       const piece = g.state.pieces.get(dest);
       if (
         piece &&
-        piece.role == 'pawn' &&
+        piece.role == 'p-piece' &&
         ((dest[1] == '8' && g.state.turnColor == 'black') || (dest[1] == '1' && g.state.turnColor == 'white'))
       ) {
         promoting = {
@@ -35,7 +35,7 @@ export default function (
 
   function promote(g: CgApi, key: Key, role: Role): void {
     const piece = g.state.pieces.get(key);
-    if (piece && piece.role == 'pawn') {
+    if (piece && piece.role == 'p-piece') {
       g.setPieces(
         new Map([
           [
@@ -105,7 +105,7 @@ export default function (
     cancel,
     view() {
       if (!promoting) return;
-      const pieces: Role[] = ['queen', 'knight', 'rook', 'bishop'];
+      const pieces: Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
       return (
         withGround(g =>
           renderPromotion(promoting.dest, pieces, cgUtil.opposite(g.state.turnColor), g.state.orientation)

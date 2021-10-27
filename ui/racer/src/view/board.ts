@@ -25,6 +25,7 @@ const renderGround = (ctrl: RacerCtrl): VNode =>
                 : {
                     fen: INITIAL_BOARD_FEN,
                     orientation: ctrl.run.pov,
+                    myColor: ctrl.run.pov,
                     movable: { color: ctrl.run.pov },
                   },
               ctrl.pref,

@@ -211,7 +211,7 @@ object Node {
         case None => GameLogic.Chess()
       }).flatMap { role =>
         Some(v.roles.count(role ==)).filter(0 <).map { count =>
-          role.name -> JsNumber(count)
+          role.groundName -> JsNumber(count)
         }
       }
     )

@@ -39,7 +39,7 @@ export function start(
     piece = ctrl.chessground.state.pieces.get(dest),
     premovePiece = ctrl.chessground.state.pieces.get(orig);
   if (
-    ((piece && piece.role === 'pawn' && !premovePiece) || (premovePiece && premovePiece.role === 'pawn')) &&
+    ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
     ((dest[1] === '8' && d.player.color === 'white') || (dest[1] === '1' && d.player.color === 'black'))
   ) {
     if (prePromotionRole && meta && meta.premove) return sendPromotion(ctrl, orig, dest, prePromotionRole, meta);
@@ -50,8 +50,8 @@ export function start(
         (d.pref.autoQueen === Prefs.AutoQueen.OnPremove && premovePiece) ||
         ctrl.keyboardMove?.justSelected())
     ) {
-      if (premovePiece) setPrePromotion(ctrl, dest, 'queen');
-      else sendPromotion(ctrl, orig, dest, 'queen', meta);
+      if (premovePiece) setPrePromotion(ctrl, dest, 'q-piece');
+      else sendPromotion(ctrl, orig, dest, 'q-piece', meta);
       return true;
     }
     promoting = {
@@ -146,7 +146,7 @@ function renderPromotion(
   );
 }
 
-const roles: cg.Role[] = ['queen', 'knight', 'rook', 'bishop'];
+const roles: cg.Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
 
 export function view(ctrl: RoundController): MaybeVNode {
   if (!promoting) return;
@@ -154,7 +154,7 @@ export function view(ctrl: RoundController): MaybeVNode {
   return renderPromotion(
     ctrl,
     promoting.move[1],
-    ctrl.data.game.variant.key === 'antichess' ? roles.concat('king') : roles,
+    ctrl.data.game.variant.key === 'antichess' ? roles.concat('k-piece') : roles,
     ctrl.data.player.color,
     ctrl.chessground.state.orientation
   );
