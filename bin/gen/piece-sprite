@@ -48,43 +48,58 @@ types = {
 }
 roles = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece', 'k-piece', 'l-piece']
 colors = ['white', 'black']
-shogi_roles = ['p-piece', 'l-piece', 'n-piece', 'k-piece', 's-piece', 'pp-piece', 'pl-piece', 'pn-piece', 'ps-piece', 'g-piece', 'b-peice', 'r-piece','pr-piece', 'pb-piece']
+shogi_roles_to_imageprefix = [
+    ['p-piece','FU'],
+    ['l-piece','KY'],
+    ['n-piece','KE'],
+    ['k-piece','OU'], # white 'OU', black 'GY'
+    ['s-piece','GI'],
+    ['pp-piece','TO'],
+    ['pl-piece','NY'],
+    ['pn-piece','NK'],
+    ['ps-piece','NG'],
+    ['g-piece','KI'],
+    ['b-peice','KA'],
+    ['r-piece','HI'],
+    ['pr-piece','RY'],
+    ['pb-piece','UM']
+  ]
 shogi_colors = ['0','1']
 xiangqi_roles =['a-piece', 'c-piece', 'e-piece', 'h-piece', 'k-piece', 'p-piece', 'r-piece']
 xiangqi_colors = ['B','R']
 
-# inline SVG Chess
-themes.map { |theme|
-  name = theme[0]
-  ext = theme[1]
-  classes = colors.map { |color|
-    roles.map { |role|
-      piece = color[0] + (role == 'n-piece' ? 'N' : role == 'l-piece' ? 'P' : role.upcase[0])
-      file = source_dir + name + '/' + piece + '.' + ext
-      File.open(file, 'r') do|image_file|
-        image = image_file.read
-        base64 = Base64.strict_encode64(image)
-        '.is2d .' + role + '.' + color + ' {' +
-          "background-image:url('data:image/" + types[ext] + base64 + "')}"
-      end
-    }
-  }.flatten
-  File.open(dest_dir + name + '.css', 'w') { |f| f.puts classes.join("\n") }
-}
+# # inline SVG Chess
+# themes.map { |theme|
+#   name = theme[0]
+#   ext = theme[1]
+#   classes = colors.map { |color|
+#     roles.map { |role|
+#       piece = color[0] + (role == 'n-piece' ? 'N' : role == 'l-piece' ? 'P' : role.upcase[0])
+#       file = source_dir + name + '/' + piece + '.' + ext
+#       File.open(file, 'r') do|image_file|
+#         image = image_file.read
+#         base64 = Base64.strict_encode64(image)
+#         '.is2d .' + role + '.' + color + ' {' +
+#           "background-image:url('data:image/" + types[ext] + base64 + "')}"
+#       end
+#     }
+#   }.flatten
+#   File.open(dest_dir + name + '.css', 'w') { |f| f.puts classes.join("\n") }
+# }
 
-# external SVG Chess
-themes.map { |theme|
-  name = theme[0]
-  ext = theme[1]
-  classes = colors.map { |color|
-    roles.map { |role|
-      piece = color[0] + (role == 'n-piece' ? 'N' : role == 'l-piece' ? 'P' : role.upcase[0])
-      '.is2d .' + role + '.' + color + ' {' +
-        "background-image:url('/assets/piece/" + name + "/" + piece + "." + ext + "')}"
-    }
-  }.flatten
-  File.open(dest_dir + name + '.external.css', 'w') { |f| f.puts classes.join("\n") }
-}
+# # external SVG Chess
+# themes.map { |theme|
+#   name = theme[0]
+#   ext = theme[1]
+#   classes = colors.map { |color|
+#     roles.map { |role|
+#       piece = color[0] + (role == 'n-piece' ? 'N' : role == 'l-piece' ? 'P' : role.upcase[0])
+#       '.is2d .' + role + '.' + color + ' {' +
+#         "background-image:url('/assets/piece/" + name + "/" + piece + "." + ext + "')}"
+#     }
+#   }.flatten
+#   File.open(dest_dir + name + '.external.css', 'w') { |f| f.puts classes.join("\n") }
+# }
 
 
 # inline SVG Xiangqi
@@ -97,7 +112,7 @@ classes = xiangqi_colors.map { |color|
     File.open(file, 'r') do|image_file|
       image = image_file.read
       base64 = Base64.strict_encode64(image)
-      '.is2d .' + role + '.' + color + ' {' +
+      '.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
         "background-image:url('data:image/" + types[ext] + base64 + "')}"
     end
   }
@@ -111,7 +126,42 @@ ext = 'svg'
 classes = xiangqi_colors.map { |color|
   xiangqi_roles.map { |role|
     piece = color[0] + role.upcase[0]
-    '.is2d .' + role + '.' + color + ' {' +
+    '.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+      "background-image:url('/assets/piece/" + name + "/" + piece + "." + ext + "')}"
+  }
+}.flatten
+File.open(dest_dir + name + '.external.css', 'w') { |f| f.puts classes.join("\n") }
+
+
+# inline SVG Shogi
+name = 'shogi'
+ext = 'svg'
+classes = shogi_colors.map { |color|
+  shogi_roles_to_imageprefix.map { |role_image|
+    role = role_image[0]
+    role_piece_prefix = role_image[1]
+    piece = color[0] + ((color == '1' && role == 'k-piece') ? 'GY' : role_piece_prefix)
+    file = source_dir + name + '/' + piece + '.' + ext
+    File.open(file, 'r') do|image_file|
+      image = image_file.read
+      base64 = Base64.strict_encode64(image)
+      '.is2d .' + role + '.' + (color == '0' ? 'white' : 'black') + ' {' +
+        "background-image:url('data:image/" + types[ext] + base64 + "')}"
+    end
+  }
+}.flatten
+File.open(dest_dir + name + '.css', 'w') { |f| f.puts classes.join("\n") }
+
+
+# external SVG Shogi
+name = 'shogi'
+ext = 'svg'
+classes = shogi_colors.map { |color|
+  shogi_roles_to_imageprefix.map { |role_image|
+    role = role_image[0]
+    role_piece_prefix = role_image[1] 
+    piece = color[0] + ((color == '1' && role == 'k-piece') ? 'GY' : role_piece_prefix)
+    '.is2d .' + role + '.' + (color == '0' ? 'white' : 'black') + ' {' +
       "background-image:url('/assets/piece/" + name + "/" + piece + "." + ext + "')}"
   }
 }.flatten
