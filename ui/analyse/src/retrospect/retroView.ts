@@ -54,7 +54,7 @@ const feedback = {
   find(ctrl: RetroCtrl): VNode[] {
     return [
       h('div.player', [
-        h('div.no-square', h('piece.king.' + ctrl.color)),
+        h('div.no-square', h('piece.k-piece.' + ctrl.color)),
         h('div.instruction', [
           h(
             'strong',
@@ -173,7 +173,7 @@ const feedback = {
     const nothing = !ctrl.completion()[1];
     return [
       h('div.player', [
-        h('div.no-square', h('piece.king.' + ctrl.color)),
+        h('div.no-square', h('piece.k-piece.' + ctrl.color)),
         h('div.instruction', [
           h(
             'em',
