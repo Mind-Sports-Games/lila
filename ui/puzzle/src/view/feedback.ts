@@ -42,7 +42,7 @@ const viewSolution = (ctrl: Controller): VNode =>
 const initial = (ctrl: Controller): VNode =>
   h('div.puzzle__feedback.play', [
     h('div.player', [
-      h('div.no-square', h('piece.king.' + ctrl.vm.pov)),
+      h('div.no-square', h('piece.k-piece.' + ctrl.vm.pov)),
       h('div.instruction', [
         h('strong', ctrl.trans.noarg('yourTurn')),
         h('em', ctrl.trans.noarg(ctrl.vm.pov === 'white' ? 'findTheBestMoveForWhite' : 'findTheBestMoveForBlack')),

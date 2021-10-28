@@ -134,20 +134,20 @@
     font-weight: bold;
   }
 
-  .piece-values .cg-board piece.queen::before {
+  .piece-values .cg-board piece.q-piece::before {
     content: '9';
   }
 
-  .piece-values .cg-board piece.rook::before {
+  .piece-values .cg-board piece.r-piece::before {
     content: '5';
   }
 
-  .piece-values .cg-board piece.bishop::before,
-  .piece-values .cg-board piece.knight::before {
+  .piece-values .cg-board piece.b-piece::before,
+  .piece-values .cg-board piece.n-piece::before {
     content: '3';
   }
 
-  .piece-values .cg-board piece.pawn::before {
+  .piece-values .cg-board piece.p-piece::before {
     content: '1';
   }
 }
