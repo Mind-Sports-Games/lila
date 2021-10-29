@@ -47,7 +47,7 @@ $shogi-variants: ('shogi');
 
 $xiangqi-variants: ('xiangqi');
 
-$game-types: ('chess', 'shogi', 'xiangqi', //this is for the minigame hover display);
+$game-types: ('chess', 'shogi', 'xiangqi'); //this is for the minigame hover display
 
 @each $game in $game-types {
   @each $color, $file in $board-files {
