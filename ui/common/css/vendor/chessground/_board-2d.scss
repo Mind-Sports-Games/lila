@@ -29,21 +29,25 @@ $board-files: (
 );
 
 $chess-variants: (
-  'standard','chess960', 'fromPosition', 'kingOfTheHill', 'threeCheck', 'antichess', 'atomic',
-  'horde', 'racingKings', 'crazyhouse', 'linesOfAction', 'chess',
+  'standard',
+  'chess960',
+  'fromPosition',
+  'kingOfTheHill',
+  'threeCheck',
+  'antichess',
+  'atomic',
+  'horde',
+  'racingKings',
+  'crazyhouse',
+  'linesOfAction',
+  'chess'
 );
 
-$shogi-variants: (
-  'shogi',
-);
+$shogi-variants: ('shogi');
 
-$xiangqi-variants: (
-  'xiangqi',
-);
+$xiangqi-variants: ('xiangqi');
 
-$game-types:(
-  'chess', 'shogi', 'xiangqi', //this is for the minigame hover display
-);
+$game-types: ('chess', 'shogi', 'xiangqi', //this is for the minigame hover display);
 
 @each $game in $game-types {
   @each $color, $file in $board-files {
@@ -76,5 +80,3 @@ $game-types:(
     }
   }
 }
-
-
