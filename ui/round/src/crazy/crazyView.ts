@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import * as round from '../round';
-import { drag, crazyKeys, pieceRoles } from './crazyCtrl';
+import { drag, crazyKeys, pieceRoles, pieceShogiRoles } from './crazyCtrl';
 import * as cg from 'chessground/types';
 import RoundController from '../ctrl';
 import { onInsert } from '../util';
@@ -10,6 +10,7 @@ const eventNames = ['mousedown', 'touchstart'];
 
 export default function pocket(ctrl: RoundController, color: Color, position: Position) {
   const step = round.plyStep(ctrl.data, ctrl.ply);
+  const dropRoles = ctrl.data.game.variant.key == 'crazyhouse' ? pieceRoles : pieceShogiRoles
   if (!step.crazy) return;
   const droppedRole = ctrl.justDropped,
     preDropRole = ctrl.preDrop,
@@ -31,7 +32,7 @@ export default function pocket(ctrl: RoundController, color: Color, position: Po
         )
       ),
     },
-    pieceRoles.map(role => {
+    dropRoles.map(role => {
       let nb = pocket[role] || 0;
       if (activeColor) {
         if (droppedRole === role) nb--;

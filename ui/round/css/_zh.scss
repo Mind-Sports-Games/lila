@@ -81,18 +81,12 @@
 
 $shogi-piece-drops-roles: (
   'p-piece': 'FU',
-  'l-piece',
-  'KY',
-  'n-piece',
-  'KE',
-  's-piece',
-  'GI',
-  'g-piece',
-  'KI',
-  'b-peice',
-  'KA',
-  'r-piece',
-  'HI',
+  'l-piece': 'KY',
+  'n-piece': 'KE',
+  's-piece': 'GI',
+  'g-piece': 'KI',
+  'b-peice': 'KA',
+  'r-piece': 'HI',
 );
 // These images are also referenced in crazyCtrl.ts (for preloading).
 // The other file should be kept in sync.
