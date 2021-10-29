@@ -137,9 +137,9 @@ export function init(ctrl: RoundController) {
 // Images are used in _zh.scss, which should be kept in sync.
 function preloadMouseIcons(data: RoundData) {
   const colorKey = data.player.color[0];
-  const colorNum = data.player.color == 'white' ? '0' : '1'
+  const colorNum = data.player.color == 'white' ? '0' : '1';
   for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/cburnett/${colorKey}${pKey}.svg`));
-  for (const pKey of ['FU','KY','KE','GI','KI','KA','HI']) fetch(playstrategy.assetUrl(`piece/shogi/${colorNum}${pKey}.svg`));
+  for (const pKey of ['FU', 'KY', 'KE', 'GI', 'KI', 'KA', 'HI'])
+    fetch(playstrategy.assetUrl(`piece/shogi/${colorNum}${pKey}.svg`));
   mouseIconsLoaded = true;
 }
-
