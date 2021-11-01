@@ -240,7 +240,7 @@
 .shogi.is2d .pn-piece.white {background-image:url('/assets/piece/shogi/0NK.svg')}
 .shogi.is2d .ps-piece.white {background-image:url('/assets/piece/shogi/0NG.svg')}
 .shogi.is2d .g-piece.white {background-image:url('/assets/piece/shogi/0KI.svg')}
-.shogi.is2d .b-peice.white {background-image:url('/assets/piece/shogi/0KA.svg')}
+.shogi.is2d .b-piece.white {background-image:url('/assets/piece/shogi/0KA.svg')}
 .shogi.is2d .r-piece.white {background-image:url('/assets/piece/shogi/0HI.svg')}
 .shogi.is2d .pr-piece.white {background-image:url('/assets/piece/shogi/0RY.svg')}
 .shogi.is2d .pb-piece.white {background-image:url('/assets/piece/shogi/0UM.svg')}
@@ -254,7 +254,7 @@
 .shogi.is2d .pn-piece.black {background-image:url('/assets/piece/shogi/1NK.svg')}
 .shogi.is2d .ps-piece.black {background-image:url('/assets/piece/shogi/1NG.svg')}
 .shogi.is2d .g-piece.black {background-image:url('/assets/piece/shogi/1KI.svg')}
-.shogi.is2d .b-peice.black {background-image:url('/assets/piece/shogi/1KA.svg')}
+.shogi.is2d .b-piece.black {background-image:url('/assets/piece/shogi/1KA.svg')}
 .shogi.is2d .r-piece.black {background-image:url('/assets/piece/shogi/1HI.svg')}
 .shogi.is2d .pr-piece.black {background-image:url('/assets/piece/shogi/1RY.svg')}
 .shogi.is2d .pb-piece.black {background-image:url('/assets/piece/shogi/1UM.svg')}
@@ -268,7 +268,7 @@
 .is2d .variant-shogi .pn-piece.white {background-image:url('/assets/piece/shogi/0NK.svg')}
 .is2d .variant-shogi .ps-piece.white {background-image:url('/assets/piece/shogi/0NG.svg')}
 .is2d .variant-shogi .g-piece.white {background-image:url('/assets/piece/shogi/0KI.svg')}
-.is2d .variant-shogi .b-peice.white {background-image:url('/assets/piece/shogi/0KA.svg')}
+.is2d .variant-shogi .b-piece.white {background-image:url('/assets/piece/shogi/0KA.svg')}
 .is2d .variant-shogi .r-piece.white {background-image:url('/assets/piece/shogi/0HI.svg')}
 .is2d .variant-shogi .pr-piece.white {background-image:url('/assets/piece/shogi/0RY.svg')}
 .is2d .variant-shogi .pb-piece.white {background-image:url('/assets/piece/shogi/0UM.svg')}
@@ -282,7 +282,7 @@
 .is2d .variant-shogi .pn-piece.black {background-image:url('/assets/piece/shogi/1NK.svg')}
 .is2d .variant-shogi .ps-piece.black {background-image:url('/assets/piece/shogi/1NG.svg')}
 .is2d .variant-shogi .g-piece.black {background-image:url('/assets/piece/shogi/1KI.svg')}
-.is2d .variant-shogi .b-peice.black {background-image:url('/assets/piece/shogi/1KA.svg')}
+.is2d .variant-shogi .b-piece.black {background-image:url('/assets/piece/shogi/1KA.svg')}
 .is2d .variant-shogi .r-piece.black {background-image:url('/assets/piece/shogi/1HI.svg')}
 .is2d .variant-shogi .pr-piece.black {background-image:url('/assets/piece/shogi/1RY.svg')}
 .is2d .variant-shogi .pb-piece.black {background-image:url('/assets/piece/shogi/1UM.svg')}

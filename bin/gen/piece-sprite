@@ -59,7 +59,7 @@ shogi_roles_to_imageprefix = [
     ['pn-piece','NK'],
     ['ps-piece','NG'],
     ['g-piece','KI'],
-    ['b-peice','KA'],
+    ['b-piece','KA'],
     ['r-piece','HI'],
     ['pr-piece','RY'],
     ['pb-piece','UM']
