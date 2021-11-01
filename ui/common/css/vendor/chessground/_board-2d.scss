@@ -47,15 +47,19 @@ $shogi-variants: ('shogi');
 
 $xiangqi-variants: ('xiangqi');
 
-$game-types: ('chess', 'shogi', 'xiangqi'); //this is for the minigame hover display
 
-@each $game in $game-types {
-  @each $color, $file in $board-files {
-    .#{$color} .#{$game}.is2d cg-board {
-      background-image: url(../images/board/#{$file});
-    }
+@each $color, $file in $board-files {
+  .#{$color} .chess.is2d cg-board {
+    background-image: url(../images/board/#{$file});
   }
 }
+
+@each $color, $file in $board-files {
+  .#{$color} .fairy.is2d cg-board {
+    background-image: url(../images/board/svg/shogi.svg);
+  }
+}
+
 
 @each $variant in $chess-variants {
   @each $color, $file in $board-files {

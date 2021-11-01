@@ -15,7 +15,8 @@ export function makeConfig(ctrl: RoundController): Config {
   const data = ctrl.data,
     hooks = ctrl.makeCgHooks(),
     step = plyStep(data, ctrl.ply),
-    playing = ctrl.isPlaying();
+    playing = ctrl.isPlaying(),
+    variant = data.game.variant.key as cg.Variant;
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -82,9 +83,9 @@ export function makeConfig(ctrl: RoundController): Config {
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
     },
     disableContextMenu: true,
-    dimensions: { width: 8, height: 8 },
-    geometry: cg.Geometry.dim8x8,
-    variant: data.game.variant.key as cg.Variant,
+    dimensions: variant == 'shogi' ? { width: 9, height: 9 } : variant == 'xiangqi' ? { width: 9, height: 10 } : { width: 8, height: 8 },
+    geometry: variant == 'shogi' ? cg.Geometry.dim9x9 : variant == 'xiangqi' ? cg.Geometry.dim9x10 : cg.Geometry.dim8x8,
+    variant: variant,
     chess960: data.game.variant.key === 'chess960',
   };
 }

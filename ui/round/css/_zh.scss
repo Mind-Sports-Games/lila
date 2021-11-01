@@ -72,7 +72,7 @@
 // The other file should be kept in sync.
 // chess
 @each $color, $c in ('white': w, 'black': b) {
-  @each $role, $r in (p-piece: P, n-piece: N, b-piece: B, rpiece: R, q-piece: Q) {
+  @each $role, $r in (p-piece: P, n-piece: N, b-piece: B, r-piece: R, q-piece: Q) {
     body.cursor-#{$color}-#{$role} * {
       cursor: url(../piece/cburnett/#{$c}#{$r}.svg) 22 22, auto !important;
     }
@@ -85,7 +85,7 @@ $shogi-piece-drops-roles: (
   'n-piece': 'KE',
   's-piece': 'GI',
   'g-piece': 'KI',
-  'b-peice': 'KA',
+  'b-piece': 'KA',
   'r-piece': 'HI',
 );
 // These images are also referenced in crazyCtrl.ts (for preloading).

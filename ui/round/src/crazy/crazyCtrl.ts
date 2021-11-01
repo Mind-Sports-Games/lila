@@ -6,7 +6,7 @@ import * as cg from 'chessground/types';
 import { RoundData } from '../interfaces';
 
 export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
-export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece','b-piece', 'r-piece'];
+export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 
 
 export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
@@ -90,8 +90,8 @@ export function init(ctrl: RoundController) {
   playstrategy.pubsub.on('ply', () => {
     if (crazyKeys.length > 0) setDrop();
   });
-
-  for (let i = 1; i <= 5; i++) {
+  const numDropPieces = ctrl.data.game.variant.key == "crazyhouse" ? 5 : 7;
+  for (let i = 1; i <= numDropPieces; i++) {
     const iStr = i.toString();
     k.bind(iStr, () => {
       if (!crazyKeys.includes(i)) {

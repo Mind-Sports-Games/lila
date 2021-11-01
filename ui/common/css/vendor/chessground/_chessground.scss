@@ -15,6 +15,32 @@ cg-board {
   }
 }
 
+.variant-shogi square {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.shogi square {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.fairy square {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.variant-xiangqi square {
+  width: calc(100% / 9);
+  height: calc(100% / 10);
+}
+
+.xiangqi square {
+  width: calc(100% / 9);
+  height: calc(100% / 10);
+}
+
+
 square {
   position: absolute;
   width: 12.5%;
@@ -101,6 +127,31 @@ square {
   }
 }
 
+.variant-shogi piece {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.shogi piece {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.fairy square {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.variant-xiangqi piece {
+  width: calc(100% / 9);
+  height: calc(100% / 10);
+}
+
+.xiangqi piece {
+  width: calc(100% / 9);
+  height: calc(100% / 10);
+}
+
 piece {
   position: absolute;
   top: 0;
@@ -131,12 +182,64 @@ piece {
   }
 }
 
+
+.variant-shogi cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 9);
+}
+
+.shogi cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 9);
+}
+
+.fairy cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 9);
+}
+
+.variant-xiangqi cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 10);
+}
+
+.xiangqi cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 10);
+}
+
+
 cg-helper {
   position: absolute;
   width: 12.5%;
   padding-bottom: 12.5%;
   display: table; // hack to round to full pixel size in chrome
   bottom: 0;
+}
+
+.variant-shogi cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 9);
+}
+
+.shogi cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 9);
+}
+
+.fairy cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 9);
+}
+
+.variant-xiangqi cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 10);
+}
+
+.xiangqi cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 10);
 }
 
 cg-container {
@@ -146,6 +249,7 @@ cg-container {
   display: block;
   bottom: 0;
 }
+
 
 cg-container .cg-shapes,
 cg-container .cg-custom-svgs {
