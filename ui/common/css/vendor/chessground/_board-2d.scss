@@ -55,8 +55,26 @@ $xiangqi-variants: ('xiangqi');
 }
 
 @each $color, $file in $board-files {
-  .#{$color} .fairy.is2d cg-board {
+  .#{$color} .variant-shogi.is2d cg-board {
     background-image: url(../images/board/svg/shogi.svg);
+  }
+}
+
+@each $color, $file in $board-files {
+  .#{$color} .shogi .is2d cg-board {
+    background-image: url(../images/board/svg/shogi.svg);
+  }
+}
+
+@each $color, $file in $board-files {
+  .#{$color} .variant-xiangqi.is2d cg-board {
+    background-image: url(../images/board/svg/xiangqi.svg);
+  }
+}
+
+@each $color, $file in $board-files {
+  .#{$color} .xiangqi .is2d cg-board {
+    background-image: url(../images/board/svg/xiangqi.svg);
   }
 }
 

@@ -73,8 +73,8 @@ object bits {
   private def boardExtra(variant: Variant): String = {
     val lib = variant.gameLogic.name.toLowerCase()
     variant match {
-      case Variant.Draughts(v) => s"${variant.key} ${lib} is${v.boardSize.key}"
-      case _ => s"${variant.key} ${lib}"
+      case Variant.Draughts(v) => s"${variant.key} variant-${variant.key} ${lib} is${v.boardSize.key}"
+      case _ => s"${variant.key} variant-${variant.key} ${lib}"
     }
   }
 
