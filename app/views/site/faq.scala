@@ -44,13 +44,6 @@ object faq {
             a(href := "/patron")("patron"),
           )
         ),
-        // question(
-        //   "origins",
-        //   areThereWebsitesBasedOnPlayStrategy.txt(),
-        //   playstrategyIsForkedFromLichess(
-        //     a(href := "https://lichess.org")("lichess.org")
-        //   )
-        // ),
         question(
           "lichess-difference",
           howAreWeDifferentFromLichess.txt(),
