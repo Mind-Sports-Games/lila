@@ -16,6 +16,7 @@ export default function pocket(ctrl: RoundController, color: Color, position: Po
     preDropRole = ctrl.preDrop,
     pocket = step.crazy.pockets[color === 'white' ? 0 : 1],
     usablePos = position === (ctrl.flip ? 'top' : 'bottom'),
+    shogiPlayer = position === 'top' ? 'enemy' : 'ally',
     usable = usablePos && !ctrl.replaying() && ctrl.isPlaying(),
     activeColor = color === ctrl.data.player.color;
   const capturedPiece = ctrl.justCaptured;
@@ -42,7 +43,7 @@ export default function pocket(ctrl: RoundController, color: Color, position: Po
         'div.pocket-c1',
         h(
           'div.pocket-c2',
-          h('piece.' + role + '.' + color, {
+          h('piece.' + role + '.' + color + '.' + shogiPlayer, {
             class: { premove: activeColor && preDropRole === role },
             attrs: {
               'data-role': role,

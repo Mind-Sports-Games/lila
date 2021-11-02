@@ -53,6 +53,7 @@ shogi_roles_to_imageprefix = [
     ['l-piece','KY'],
     ['n-piece','KE'],
     ['k-piece','OU'], # white 'OU', black 'GY'
+    ['k-piece','GY'], # white 'OU', black 'GY'
     ['s-piece','GI'],
     ['pp-piece','TO'],
     ['pl-piece','NY'],
@@ -169,12 +170,13 @@ themes.map { |theme|
     shogi_roles_to_imageprefix.map { |role_image|
       role = role_image[0]
       role_piece_prefix = role_image[1]
-      piece = color[0] + ((color == '1' && role == 'k-piece') ? 'GY' : role_piece_prefix)
+      piece = color[0] + role_piece_prefix
       file = source_dir + 'shogi' + '/' + piece + '.' + ext
+      color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.shogi.is2d .' + role + '.' + (color == '0' ? 'white' : 'black') + ' {' +
+        '.shogi.is2d .' + role + '.' + color_class + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
@@ -184,12 +186,13 @@ themes.map { |theme|
       shogi_roles_to_imageprefix.map { |role_image|
         role = role_image[0]
         role_piece_prefix = role_image[1]
-        piece = color[0] + ((color == '1' && role == 'k-piece') ? 'GY' : role_piece_prefix)
+        piece = color[0] + role_piece_prefix
         file = source_dir + 'shogi' + '/' + piece + '.' + ext
+        color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .'  + role + '.' + (color == '0' ? 'white' : 'black') + ' {' +
+          '.is2d .variant-' + variant + ' .'  + role + '.' + color_class + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -269,8 +272,9 @@ themes.map { |theme|
     shogi_roles_to_imageprefix.map { |role_image|
       role = role_image[0]
       role_piece_prefix = role_image[1] 
-      piece = color[0] + ((color == '1' && role == 'k-piece') ? 'GY' : role_piece_prefix)
-      '.shogi.is2d .' + role + '.' + (color == '0' ? 'white' : 'black') + ' {' +
+      piece = color[0] + role_piece_prefix
+      color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
+      '.shogi.is2d .' + role + '.' + color_class + ' {' +
         "background-image:url('/assets/piece/" + 'shogi' + "/" + piece + "." + ext + "')}"
     }
   }.flatten
@@ -278,9 +282,10 @@ themes.map { |theme|
     shogi_colors.map { |color|
       shogi_roles_to_imageprefix.map { |role_image|
         role = role_image[0]
-        role_piece_prefix = role_image[1] 
-        piece = color[0] + ((color == '1' && role == 'k-piece') ? 'GY' : role_piece_prefix)
-        '.is2d .variant-' + variant + ' .' + role + '.' + (color == '0' ? 'white' : 'black') + ' {' +
+        role_piece_prefix = role_image[1]
+        piece = color[0] + role_piece_prefix
+        color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
+        '.is2d .variant-' + variant + ' .' + role + '.' + color_class + ' {' +
           "background-image:url('/assets/piece/" + 'shogi' + "/" + piece + "." + ext + "')}"
       }
     }
