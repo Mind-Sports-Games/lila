@@ -25,11 +25,6 @@ cg-board {
   height: calc(100% / 9);
 }
 
-.fairy square {
-  width: calc(100% / 9);
-  height: calc(100% / 9);
-}
-
 .variant-xiangqi square {
   width: calc(100% / 9);
   height: calc(100% / 10);
@@ -137,11 +132,6 @@ square {
   height: calc(100% / 9);
 }
 
-.fairy square {
-  width: calc(100% / 9);
-  height: calc(100% / 9);
-}
-
 .variant-xiangqi piece {
   width: calc(100% / 9);
   height: calc(100% / 10);
@@ -193,11 +183,6 @@ piece {
   padding-bottom: calc(100% / 9);
 }
 
-.fairy cg-helper {
-  width: calc(100% / 9);
-  padding-bottom: calc(100% / 9);
-}
-
 .variant-xiangqi cg-helper {
   width: calc(100% / 9);
   padding-bottom: calc(100% / 10);
@@ -227,19 +212,14 @@ cg-helper {
   height: calc(100% * 9);
 }
 
-.fairy cg-container {
-  width: calc(100% * 9);
-  height: calc(100% * 9);
-}
-
 .variant-xiangqi cg-container {
   width: calc(100% * 9);
-  height: calc(100% * 10);
+  height: calc(100% * 11);
 }
 
 .xiangqi cg-container {
   width: calc(100% * 9);
-  height: calc(100% * 10);
+  height: calc(100% * 11);
 }
 
 cg-container {
@@ -278,4 +258,12 @@ cg-container .cg-custom-svgs {
 
 cg-container .cg-custom-svgs svg {
   overflow: visible;
+}
+
+/* 9x10 */
+.variant-xiangqi .cg-wrap {
+  padding-bottom: calc(640 * 100% / 576);
+}
+.xiangqi .cg-wrap {
+  padding-bottom: calc(640 * 100% / 576);
 }
