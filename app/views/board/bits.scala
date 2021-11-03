@@ -85,15 +85,15 @@ object bits {
     )(cgWrapContent)
   }
 
-  def mini(fen: FEN, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, colorToOrientation(color), lastMove, None)(tag)
+  def mini(fen: FEN, color: Color = White, variantKey: String, lastMove: String = "")(tag: Tag): Tag =
+    miniWithOrientation(fen, colorToOrientation(color), lastMove, None, variantKey)(tag)
 
   def miniForVariant(fen: FEN, variant: Variant, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, boardOrientation(variant, color), lastMove, None)(tag)
+    miniWithOrientation(fen, boardOrientation(variant, color), lastMove, None, variant.key)(tag)
 
 
-  def miniSpan(fen: FEN, color: Color = White, lastMove: String = "") =
-    mini(fen, color, lastMove)(span)
+  def miniSpan(fen: FEN, color: Color = White, variantKey: String, lastMove: String = "") =
+    mini(fen, color, variantKey, lastMove)(span)
 
   private def sitCanCastle(sit: Situation, color: Color, side: strategygames.chess.Side): Boolean =
     sit match {

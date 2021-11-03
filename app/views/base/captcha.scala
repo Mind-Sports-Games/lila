@@ -34,7 +34,8 @@ object captcha {
           div(cls := "challenge")(
             views.html.board.bits.mini(
               FEN(GameLogic.Chess(), captcha.fenBoard),
-              Color.fromWhite(captcha.white)
+              Color.fromWhite(captcha.white),
+              variantKey = "standard"
             ) {
               div(
                 dataMoves := safeJsonValue(Json.toJson(captcha.moves)),
