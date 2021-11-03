@@ -471,12 +471,17 @@ export default function (ctrl: EditorCtrl): VNode {
   );
 }
 
-function convertRulesToCGVariant(rule:Rules):String {
-  switch(rule){
-    case 'chess': return 'standard';
-    case 'kingofthehill': return 'kingOfTheHill';
-    case 'racingkings': return 'racingKings';
-    case '3check': return 'threeCheck';
-    default : return rule
+function convertRulesToCGVariant(rule: Rules): string {
+  switch (rule) {
+    case 'chess':
+      return 'standard';
+    case 'kingofthehill':
+      return 'kingOfTheHill';
+    case 'racingkings':
+      return 'racingKings';
+    case '3check':
+      return 'threeCheck';
+    default:
+      return rule;
   }
 }

@@ -8,7 +8,6 @@ import { RoundData } from '../interfaces';
 export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
 export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 
-
 export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (ctrl.replaying() || !ctrl.isPlaying()) return;
@@ -90,7 +89,7 @@ export function init(ctrl: RoundController) {
   playstrategy.pubsub.on('ply', () => {
     if (crazyKeys.length > 0) setDrop();
   });
-  const numDropPieces = ctrl.data.game.variant.key == "crazyhouse" ? 5 : 7;
+  const numDropPieces = ctrl.data.game.variant.key == 'crazyhouse' ? 5 : 7;
   for (let i = 1; i <= numDropPieces; i++) {
     const iStr = i.toString();
     k.bind(iStr, () => {

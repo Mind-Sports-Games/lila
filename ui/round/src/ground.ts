@@ -84,7 +84,8 @@ export function makeConfig(ctrl: RoundController): Config {
     },
     disableContextMenu: true,
     dimensions: data.game.variant.boardSize,
-    geometry: variantKey == 'shogi' ? cg.Geometry.dim9x9 : variantKey == 'xiangqi' ? cg.Geometry.dim9x10 : cg.Geometry.dim8x8,
+    geometry:
+      variantKey == 'shogi' ? cg.Geometry.dim9x9 : variantKey == 'xiangqi' ? cg.Geometry.dim9x10 : cg.Geometry.dim8x8,
     variant: variantKey,
     chess960: data.game.variant.key === 'chess960',
   };

@@ -47,7 +47,6 @@ $shogi-variants: ('shogi');
 
 $xiangqi-variants: ('xiangqi');
 
-
 @each $color, $file in $board-files {
   .#{$color} .chess.is2d cg-board {
     background-image: url(../images/board/#{$file});
@@ -77,7 +76,6 @@ $xiangqi-variants: ('xiangqi');
     background-image: url(../images/board/svg/xiangqi.svg);
   }
 }
-
 
 @each $variant in $chess-variants {
   @each $color, $file in $board-files {

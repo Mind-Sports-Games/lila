@@ -10,7 +10,7 @@ const eventNames = ['mousedown', 'touchstart'];
 
 export default function pocket(ctrl: RoundController, color: Color, position: Position) {
   const step = round.plyStep(ctrl.data, ctrl.ply);
-  const dropRoles = ctrl.data.game.variant.key == 'crazyhouse' ? pieceRoles : pieceShogiRoles
+  const dropRoles = ctrl.data.game.variant.key == 'crazyhouse' ? pieceRoles : pieceShogiRoles;
   if (!step.crazy) return;
   const droppedRole = ctrl.justDropped,
     preDropRole = ctrl.preDrop,

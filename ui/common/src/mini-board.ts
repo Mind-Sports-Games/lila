@@ -44,9 +44,17 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?
             enabled: false,
             visible: false,
           },
-          dimensions: $el.hasClass('variant-shogi') ? {width: 9, height:9} : $el.hasClass('variant-xiangqi') ? {width: 9, height:10} :{width: 8, height:8},
-          geometry: $el.hasClass('variant-shogi') ? cg.Geometry.dim9x9: $el.hasClass('variant-xiangqi') ? cg.Geometry.dim9x10: cg.Geometry.dim8x8,
-          variant: $el.hasClass('variant-shogi') ? 'shogi': $el.hasClass('variant-xiangqi') ? 'xiangqi': 'standard',
+          dimensions: $el.hasClass('variant-shogi')
+            ? { width: 9, height: 9 }
+            : $el.hasClass('variant-xiangqi')
+            ? { width: 9, height: 10 }
+            : { width: 8, height: 8 },
+          geometry: $el.hasClass('variant-shogi')
+            ? cg.Geometry.dim9x9
+            : $el.hasClass('variant-xiangqi')
+            ? cg.Geometry.dim9x10
+            : cg.Geometry.dim8x8,
+          variant: $el.hasClass('variant-shogi') ? 'shogi' : $el.hasClass('variant-xiangqi') ? 'xiangqi' : 'standard',
         })
       );
     }

@@ -15,7 +15,7 @@ cg-board {
   }
 }
 
-.variant-xiangqi.is2d{
+.variant-xiangqi.is2d {
   width: calc(100% * 10 / 11);
   margin-left: calc(50% / 11);
 }
@@ -39,7 +39,6 @@ cg-board {
   width: calc(100% / 9);
   height: calc(100% / 10);
 }
-
 
 square {
   position: absolute;
@@ -179,7 +178,6 @@ piece {
   }
 }
 
-
 .variant-shogi cg-helper {
   width: calc(100% / 9);
   padding-bottom: calc(100% / 9);
@@ -199,7 +197,6 @@ piece {
   width: calc(100% / 9);
   padding-bottom: calc(100% / 10);
 }
-
 
 cg-helper {
   position: absolute;
@@ -236,7 +233,6 @@ cg-container {
   display: block;
   bottom: 0;
 }
-
 
 cg-container .cg-shapes,
 cg-container .cg-custom-svgs {

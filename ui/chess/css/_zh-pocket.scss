@@ -1,10 +1,9 @@
-
-.variant-crazyhouse .pocket-c1{
+.variant-crazyhouse .pocket-c1 {
   flex: 0 0 calc(100% / 5);
   max-width: 10vmin;
 }
 
-.variant-shogi .pocket-c1{
+.variant-shogi .pocket-c1 {
   flex: 0 0 calc(100% / 7);
   max-width: 10vmin;
 }
@@ -13,7 +12,7 @@
   @extend %box-radius;
 
   display: flex;
-  width: 62.5%;  
+  width: 62.5%;
 
   @include breakpoint($mq-col2-uniboard) {
     width: 100%;

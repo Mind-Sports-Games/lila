@@ -311,7 +311,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
         name: 'Standard',
         key: 'standard',
         lib: 0,
-        boardSize: {width:8, height:8},
+        boardSize: { width: 8, height: 8 },
       },
       standardMaterial: true,
       possible: true,
