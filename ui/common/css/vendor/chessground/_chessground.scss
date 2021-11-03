@@ -15,6 +15,11 @@ cg-board {
   }
 }
 
+.variant-xiangqi.is2d{
+  width: calc(100% * 10 / 11);
+  margin-left: calc(50% / 11);
+}
+
 .variant-shogi square {
   width: calc(100% / 9);
   height: calc(100% / 9);
@@ -264,8 +269,5 @@ cg-container .cg-custom-svgs svg {
 
 /* 9x10 */
 .variant-xiangqi .cg-wrap {
-  padding-bottom: calc(640 * 100% / 576);
-}
-.xiangqi .cg-wrap {
   padding-bottom: calc(640 * 100% / 576);
 }
