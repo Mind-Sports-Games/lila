@@ -455,7 +455,7 @@ export default function (ctrl: EditorCtrl): VNode {
   const color = ctrl.bottomColor();
 
   return h(
-    'div.board-editor',
+    'div.board-editor' + '.variant-' + convertRulesToCGVariant(ctrl.rules),
     {
       attrs: {
         style: `cursor: ${makeCursor(ctrl.selected())}`,
@@ -469,4 +469,14 @@ export default function (ctrl: EditorCtrl): VNode {
       inputs(ctrl, state.fen),
     ]
   );
+}
+
+function convertRulesToCGVariant(rule:Rules):String {
+  switch(rule){
+    case 'chess': return 'standard';
+    case 'kingofthehill': return 'kingOfTheHill';
+    case 'racingkings': return 'racingKings';
+    case '3check': return 'threeCheck';
+    default : return rule
+  }
 }
