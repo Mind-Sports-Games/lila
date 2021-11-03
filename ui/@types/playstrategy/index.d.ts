@@ -345,6 +345,7 @@ interface Variant {
   short: string;
   title?: string;
   lib: number;
+  boardSize: BoardDim;
 }
 
 interface DraughtsVariant {
@@ -354,6 +355,11 @@ interface DraughtsVariant {
   title?: string;
   board: BoardData;
   lib: number;
+}
+
+interface BoardDim {
+  width: number;
+  height: number;
 }
 
 declare type BoardSize = [number, number];

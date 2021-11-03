@@ -54,14 +54,16 @@ object bits {
       FEN(pov.game.variant.gameLogic, Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)),
       boardOrientation(pov),
       ~pov.game.lastMoveKeys,
-      boardSize(pov)
+      boardSize(pov),
+      pov.game.variant.key
     ) _
 
   def miniWithOrientation(
     fen: FEN,
     orientation: Orientation = Orientation.White,
     lastMove: String = "",
-    boardSizeOpt: Option[Board.BoardSize]
+    boardSizeOpt: Option[Board.BoardSize],
+    variantKey: String = "standard"
   )(tag: Tag): Tag = {
     // TODO: this is an excellent candidate for refactoring.
     val libName = fen match {
@@ -78,7 +80,7 @@ object bits {
     }
     val extra = if (libName == "Draughts") s"is${boardSize.key}" else ""
     tag(
-      cls := s"mini-board mini-board--init cg-wrap is2d ${libName.toLowerCase()} ${extra}",
+      cls := s"mini-board mini-board--init cg-wrap is2d ${libName.toLowerCase()} variant-${variantKey} ${extra}",
       dataState := data
     )(cgWrapContent)
   }

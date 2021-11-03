@@ -6,6 +6,7 @@ import RoundController from '../ctrl';
 import { h, VNode } from 'snabbdom';
 import { plyStep } from '../round';
 import { Position, MaterialDiff, MaterialDiffSide, CheckCount } from '../interfaces';
+import * as cg from 'chessground/types';
 import { read as fenRead } from 'chessground/fen';
 import { render as keyboardMove } from '../keyboardMove';
 import { render as renderGround } from '../ground';
@@ -44,11 +45,12 @@ export function main(ctrl: RoundController): VNode {
   const d = ctrl.data,
     cgState = ctrl.chessground && ctrl.chessground.state,
     topColor = d[ctrl.flip ? 'player' : 'opponent'].color,
-    bottomColor = d[ctrl.flip ? 'opponent' : 'player'].color;
+    bottomColor = d[ctrl.flip ? 'opponent' : 'player'].color,
+    boardSize = d.game.variant.boardSize;
   let material: MaterialDiff,
     score = 0;
   if (d.pref.showCaptured) {
-    const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, { width: 8, height: 8 });
+    const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
     material = util.getMaterialDiff(pieces);
     score = util.getScore(pieces) * (bottomColor === 'white' ? 1 : -1);
   } else material = emptyMaterialDiff;
