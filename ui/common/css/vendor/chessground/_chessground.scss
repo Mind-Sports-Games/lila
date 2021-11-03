@@ -125,11 +125,13 @@ square {
 .variant-shogi piece {
   width: calc(100% / 9);
   height: calc(100% / 9);
+  margin-top: calc(-1%);
 }
 
 .shogi piece {
   width: calc(100% / 9);
   height: calc(100% / 9);
+  margin-top: calc(-1%);
 }
 
 .variant-xiangqi piece {
