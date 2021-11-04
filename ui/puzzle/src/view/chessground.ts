@@ -62,7 +62,7 @@ function makeConfig(ctrl: Controller): CgConfig {
       duration: ctrl.pref.animation.duration,
     },
     disableContextMenu: true,
-    geometry: opts.geometry,
+    dimensions: opts.dimensions,
     variant: opts.variant,
     chess960: opts.chess960,
   };

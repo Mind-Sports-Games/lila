@@ -1,5 +1,4 @@
 import * as domData from './data';
-import * as cg from 'chessground/types';
 
 export const init = (node: HTMLElement): void => {
   const [fen, orientation, lm] = node.getAttribute('data-state')!.split(',');
@@ -51,11 +50,6 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?
             : $el.hasClass('variant-xiangqi')
             ? { width: 9, height: 10 }
             : { width: 8, height: 8 },
-          geometry: $el.hasClass('variant-shogi')
-            ? cg.Geometry.dim9x9
-            : $el.hasClass('variant-xiangqi')
-            ? cg.Geometry.dim9x10
-            : cg.Geometry.dim8x8,
           variant: $el.hasClass('variant-shogi') ? 'shogi' : $el.hasClass('variant-xiangqi') ? 'xiangqi' : 'standard',
         })
       );

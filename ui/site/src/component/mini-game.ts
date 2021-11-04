@@ -1,5 +1,4 @@
 import * as domData from 'common/data';
-import * as cg from 'chessground/types';
 
 interface UpdateData {
   lm: string;
@@ -60,11 +59,6 @@ export const init = (node: HTMLElement) => {
             : $el.hasClass('variant-xiangqi')
             ? { width: 9, height: 10 }
             : { width: 8, height: 8 },
-          geometry: $el.hasClass('variant-shogi')
-            ? cg.Geometry.dim9x9
-            : $el.hasClass('variant-xiangqi')
-            ? cg.Geometry.dim9x10
-            : cg.Geometry.dim8x8,
           variant: $el.hasClass('variant-shogi') ? 'shogi' : $el.hasClass('variant-xiangqi') ? 'xiangqi' : 'standard',
         },
         $cg = $el.find('.cg-wrap'),

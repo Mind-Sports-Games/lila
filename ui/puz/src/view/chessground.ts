@@ -49,7 +49,7 @@ export function makeConfig(opts: CgConfig, pref: PuzPrefs, userMove: UserMove): 
       enabled: false,
     },
     disableContextMenu: true,
-    geometry: opts.geometry,
+    dimensions: opts.dimensions,
     variant: opts.variant,
     chess960: opts.chess960,
   };

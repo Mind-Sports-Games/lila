@@ -139,7 +139,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       },
       check: !!node.check,
       lastMove: uciToLastMove(node.uci),
-      geometry: vm.cgConfig.geometry,
+      dimensions: vm.cgConfig.dimensions,
       variant: vm.cgConfig.variant,
       chess960: vm.cgConfig.chess960,
     };
