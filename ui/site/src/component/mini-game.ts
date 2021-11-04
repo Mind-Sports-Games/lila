@@ -46,6 +46,7 @@ export const init = (node: HTMLElement) => {
         config = {
           coordinates: false,
           viewOnly: true,
+          myColor: orientation,
           resizable: false,
           fen,
           orientation,

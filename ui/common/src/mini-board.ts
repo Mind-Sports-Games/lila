@@ -30,12 +30,14 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?
         })
       );
     } else {
+      const [_, myColor, __] = $el.data('state').split(',');
       domData.set(
         node,
         'chessground',
         window.Chessground(node, {
           orientation,
           coordinates: false,
+          myColor: myColor,
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
           fen,
