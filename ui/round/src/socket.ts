@@ -164,15 +164,20 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
 
   playstrategy.pubsub.on('ab.rep', n => send('rep', { n }));
 
+  const libSend = (t: string, d?: any, o: any = {}, noRetry = false) => {
+    if (typeof d === 'object' && d !== null) d.lib = ctrl.data.game.variant.lib;
+    return send(t, d, o, noRetry);
+  };
+
   return {
-    send,
+    send: libSend,
     handlers,
-    moreTime: throttle(300, () => send('moretime')),
-    outoftime: backoff(500, 1.1, () => send('flag', ctrl.data.game.player)),
-    berserk: throttle(200, () => send('berserk', null, { ackable: true })),
+    moreTime: throttle(300, () => libSend('moretime')),
+    outoftime: backoff(500, 1.1, () => libSend('flag', ctrl.data.game.player)),
+    berserk: throttle(200, () => libSend('berserk', null, { ackable: true })),
     sendLoading(typ: string, data?: any) {
       ctrl.setLoading(true);
-      send(typ, data);
+      libSend(typ, data);
     },
     receive(typ: string, data: any): boolean {
       if (handlers[typ]) {

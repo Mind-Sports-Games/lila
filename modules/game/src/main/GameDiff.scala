@@ -133,7 +133,10 @@ object GameDiff {
             )
         }
       case GameLogic.FairySF() => {
-        dTry(oldPgn, _.pgnMoves, writeBytes compose PfnStorage.OldBin.encode)
+        dTry(oldPgn, _.board match {
+          case Board.FairySF(b) => b.uciMoves.toVector
+          case _ => sys.error("Wrong board type")
+        }, writeBytes compose PfnStorage.OldBin.encode)
         dTry(binaryPieces, _.board match {
           case Board.FairySF(b) => b.pieces
           case _ => sys.error("Wrong board type")
