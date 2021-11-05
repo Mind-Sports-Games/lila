@@ -1081,9 +1081,9 @@ chartjs-color@^2.1.0:
   version "7.11.1-pstrat2.10"
   resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#5de1e855915cf8506d81aeb134a1e794ede1bb16"
 
-"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat2.0":
-  version "0.8.1-pstrat2"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#5efc3646c10f92ecb4f22fc9838e4c0230c46f89"
+"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#fairysf-wrapper":
+  version "0.8.1-pstrat3.1"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#1e6b7923595ca300d2212bdb0f32cb00df3d63bd"
   dependencies:
     "@badrap/result" "^0.2.8"
 

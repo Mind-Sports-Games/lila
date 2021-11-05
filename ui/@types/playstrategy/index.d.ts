@@ -284,7 +284,9 @@ declare type VariantKey =
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
-  | 'linesOfAction';
+  | 'linesOfAction'
+  | 'shogi'
+  | 'xiangqi';
 
 declare type DraughtsVariantKey =
   | 'international'

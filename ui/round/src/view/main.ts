@@ -51,7 +51,7 @@ export function main(ctrl: RoundController): VNode {
   if (d.pref.showCaptured) {
     const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
     material = util.getMaterialDiff(pieces);
-    score = util.getScore(pieces) * (bottomColor === 'white' ? 1 : -1);
+    score = util.getScore(d.game.variant.key, pieces) * (bottomColor === 'white' ? 1 : -1);
   } else material = emptyMaterialDiff;
 
   const checks: CheckCount =
