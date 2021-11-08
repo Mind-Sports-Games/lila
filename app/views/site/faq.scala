@@ -45,10 +45,11 @@ object faq {
           )
         ),
         question(
-          "origins",
-          areThereWebsitesBasedOnPlayStrategy.txt(),
-          playstrategyIsForkedFromLichess(
-            a(href := "https://lichess.org")("lichess.org")
+          "lichess-difference",
+          howAreWeDifferentFromLichess.txt(),
+          playstrategySupportsDifferentAbstractGames(
+            a(href := "https://lichess.org")("lichess.org"),
+            a(href := "https://mindsportsolympiad.com/")("Mind Sports Olympiad"),
           )
         ),
         h2(gameplay()),
@@ -62,7 +63,7 @@ object faq {
           whatVariantsCanIplay.txt(),
           p(
             playstrategySupportChessAnd(
-              a(href := routes.Page.variantHome)(eightVariants())
+              a(href := routes.Page.variantHome)(variantList())
             )
           )
         ),

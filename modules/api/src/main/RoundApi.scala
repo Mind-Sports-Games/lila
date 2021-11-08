@@ -1,6 +1,6 @@
 package lila.api
 
-import strategygames.format.FEN
+import strategygames.format.{ FEN, Forsyth }
 import play.api.i18n.Lang
 import play.api.libs.json._
 
@@ -204,7 +204,7 @@ final private[api] class RoundApi(
       obj: JsObject
   ) =
     obj + ("treeParts" -> partitionTreeJsonWriter.writes(
-      lila.round.TreeBuilder(pov.game, analysis, initialFen | pov.game.variant.initialFen, withFlags)
+      lila.round.TreeBuilder(pov.game, analysis, initialFen | (Forsyth.>>(pov.game.variant.gameLogic, pov.game.chess)), withFlags)
     ))
 
   private def withSteps(pov: Pov, initialFen: Option[FEN])(obj: JsObject) =
