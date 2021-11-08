@@ -15,9 +15,16 @@ cg-board {
   }
 }
 
+//miniboards
 .variant-xiangqi.is2d {
   width: calc(100% * 10 / 11);
   margin-left: calc(50% / 11);
+}
+
+//main board
+.is2d .variant-xiangqi {
+  width: calc(100% * 10 / 11);
+  margin-right: calc(100% / 11);
 }
 
 .variant-shogi square {
