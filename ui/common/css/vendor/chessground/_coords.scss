@@ -109,6 +109,17 @@ coords {
 
 @import 'coords-colors';
 
+/* negate inner coords for shogi and xiangqi */
+@include breakpoint($mq-col1-uniboard) {
+  .coords-out .variant-shogi coords {
+    display: none;
+  }
+
+  .coords-out .variant-xiangqi coords {
+    display: none;
+  }
+}
+
 /* handle outer coords */
 @include breakpoint($mq-col2-uniboard) {
   .coords-out coords {
