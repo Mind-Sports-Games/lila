@@ -469,7 +469,7 @@ object BSONHandlers {
             }
           case GameLogic.FairySF() =>
             $doc(
-              F.oldPgn         -> PgnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
+              F.oldPgn         -> PfnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
               F.binaryPieces   -> BinaryFormat.piece.writeFairySF(o.board match {
                 case Board.FairySF(board) => board.pieces
                 case _ => sys.error("invalid fairysf board")
