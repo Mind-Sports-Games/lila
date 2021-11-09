@@ -3,8 +3,8 @@ import { h, Hooks, VNodeData } from 'snabbdom';
 import { opposite } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 
-function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: Boolean | undefined): number {
-  switch (variant){
+function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
+  switch (variant) {
     case 'xiangqi':
       switch (piece) {
         case 'p-piece':
@@ -88,8 +88,28 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
 // {white: {'p-piece': 3 'q-piece': 1}, black: {'b-piece': 2}}
 export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
   const diff: MaterialDiff = {
-    white: { 'a-piece': 0, 'b-piece': 0, 'c-piece': 0 ,'k-piece': 0, 'l-piece': 0, 'n-piece': 0, 'p-piece': 0, 'q-piece': 0, 'r-piece': 0 },
-    black: { 'a-piece': 0, 'b-piece': 0, 'c-piece': 0 ,'k-piece': 0, 'l-piece': 0, 'n-piece': 0, 'p-piece': 0, 'q-piece': 0, 'r-piece': 0 },
+    white: {
+      'a-piece': 0,
+      'b-piece': 0,
+      'c-piece': 0,
+      'k-piece': 0,
+      'l-piece': 0,
+      'n-piece': 0,
+      'p-piece': 0,
+      'q-piece': 0,
+      'r-piece': 0,
+    },
+    black: {
+      'a-piece': 0,
+      'b-piece': 0,
+      'c-piece': 0,
+      'k-piece': 0,
+      'l-piece': 0,
+      'n-piece': 0,
+      'p-piece': 0,
+      'q-piece': 0,
+      'r-piece': 0,
+    },
   };
   for (const p of pieces.values()) {
     const them = diff[opposite(p.color)];

@@ -56,10 +56,10 @@ export function main(ctrl: RoundController): VNode {
 
   const checks: CheckCount =
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
-    
+
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if ( d.game.variant.key == 'xiangqi' || d.game.variant.key == 'shogi') {
-    if (!$('body').hasClass('coords-no')){
+  if (d.game.variant.key == 'xiangqi' || d.game.variant.key == 'shogi') {
+    if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
