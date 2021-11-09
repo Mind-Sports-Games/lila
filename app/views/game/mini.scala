@@ -21,10 +21,10 @@ object mini {
   def extraClasses(variant: Variant) = {
     val gameLogic = variant.gameLogic.name.toLowerCase()
     variant match {
-      case Variant.Chess(_) => 
-        s"${gameLogic}"
       case Variant.Draughts(v) =>
         s"${gameLogic} is${v.boardSize.key}"
+      case _ => 
+        s"${gameLogic}"
     }
   }
 

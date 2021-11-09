@@ -54,7 +54,8 @@ function possiblePromotion(
         ((piece && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
           (premovePiece && premovePiece.role !== 'k-piece' && premovePiece.role !== 'g-piece')) &&
         ((['7', '8', '9'].includes(dest[1]) && d.player.color === 'white') ||
-          (['1', '2', '3'].includes(dest[1]) && d.player.color === 'black'))
+          (['1', '2', '3'].includes(dest[1]) && d.player.color === 'black')) &&
+        orig != 'a0' // cant promote from a drop
       );
     default:
       return (
@@ -83,8 +84,13 @@ export function start(
         (d.pref.autoQueen === Prefs.AutoQueen.OnPremove && premovePiece) ||
         ctrl.keyboardMove?.justSelected())
     ) {
-      if (premovePiece) setPrePromotion(ctrl, dest, 'q-piece');
-      else sendPromotion(ctrl, orig, dest, 'q-piece', meta);
+      if (premovePiece) {
+        if (variantKey === 'shogi') {
+          setPrePromotion(ctrl, dest, ('p' + premovePiece.role) as cg.Role);
+        } else {
+          setPrePromotion(ctrl, dest, 'q-piece');
+        }
+      } else sendPromotion(ctrl, orig, dest, 'q-piece', meta);
       return true;
     }
     promoting = {
@@ -145,8 +151,10 @@ function renderPromotion(
   color: Color,
   orientation: cg.Orientation
 ): MaybeVNode {
-  let left = (7 - key2pos(dest)[0]) * 12.5;
-  if (orientation === 'white') left = 87.5 - left;
+  const rows = ctrl.chessground.state.dimensions.height;
+  const columns = ctrl.chessground.state.dimensions.width;
+  let left = (columns - key2pos(dest)[0]) * (100 / columns);
+  if (orientation === 'white') left = 100 - 100 / columns - left;
   const vertical = color === orientation ? 'top' : 'bottom';
 
   return h(
@@ -161,7 +169,21 @@ function renderPromotion(
       }),
     },
     roles.map((serverRole, i) => {
-      const top = (color === orientation ? i : 7 - i) * 12.5;
+      let top = 0;
+      if (color === orientation) {
+        if (color === 'white') {
+          top = (rows - key2pos(dest)[1] + i) * (100 / rows);
+        } else {
+          top = (key2pos(dest)[1] - 1 + i) * (100 / rows);
+        }
+      } else {
+        if (color === 'white') {
+          top = (key2pos(dest)[1] - 1 - i) * (100 / rows);
+        } else {
+          top = (rows - key2pos(dest)[1] - i) * (100 / rows);
+        }
+      }
+
       return h(
         'square',
         {
@@ -173,7 +195,7 @@ function renderPromotion(
             finish(ctrl, serverRole);
           }),
         },
-        [h(`piece.${serverRole}.${color}`)]
+        [h(`piece.${serverRole}.${color}.ally`)]
       );
     })
   );
