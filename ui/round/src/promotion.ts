@@ -209,7 +209,7 @@ export function view(ctrl: RoundController): MaybeVNode {
     varaintKey = ctrl.data.game.variant.key,
     rolesToChoose =
       varaintKey === 'shogi'
-        ? ([piece?.role, 'p' + piece?.role] as cg.Role[])
+        ? (['p' + piece?.role, piece?.role] as cg.Role[])
         : varaintKey === 'antichess'
         ? roles.concat('k-piece')
         : roles;
