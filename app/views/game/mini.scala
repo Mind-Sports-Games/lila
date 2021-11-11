@@ -41,7 +41,7 @@ object mini {
     val variant = game.variant.key
     tag(
       href := withLink.option(gameLink(game, pov.color, ownerLink, tv)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init ${extra} variant-${variant} is2d",
+      cls := s"mini-game mini-game-${game.id} mini-game--init ${extra} ${variant} variant-${variant} is2d",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(
