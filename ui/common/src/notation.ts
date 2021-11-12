@@ -1,12 +1,12 @@
 import { NotationStyle } from 'chess';
 
 interface ExtendedMoveInfo{
-    san: String
-    uci: String;
-    fen: String;
+    san: string
+    uci: string;
+    fen: string;
 }
 
-export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedMoveInfo) => String {
+export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedMoveInfo) => string {
     switch (notation) {
         case 'xs2': return xiangqiNotation;
         case 'usi': return shogiNotation;
@@ -16,10 +16,10 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
 }
 
 
-function shogiNotation(move: ExtendedMoveInfo): String {
+function shogiNotation(move: ExtendedMoveInfo): string {
     return move.uci
 }
 
-function xiangqiNotation(move: ExtendedMoveInfo): String {
+function xiangqiNotation(move: ExtendedMoveInfo): string {
     return move.uci
 }
