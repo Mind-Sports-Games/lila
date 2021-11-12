@@ -8,7 +8,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'xs2';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -42,6 +42,16 @@ export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
   return ['linesOfAction'].includes(key);
 }
 
+export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
+  return ['shogi'].includes(key);
+}
+
+export function variantUsesXS2Notation(key: VariantKey | DraughtsVariantKey) {
+  return ['xiangqi'].includes(key);
+}
+
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
-  return variantUsesUCINotation(key) ? 'uci' : 'san';
+  return variantUsesUCINotation(key) ? 'uci' : 
+         variantUsesUSINotation(key) ? 'usi' :
+         variantUsesXS2Notation(key) ? 'xs2' :'san';
 }
