@@ -53,7 +53,7 @@ const renderDrawOffer = () =>
 
 function renderMove(step: Step, notation: NotationStyle, curPly: number, orEmpty: boolean, drawOffers: Set<number>) {
   const moveText = moveFromNotationStyle(notation)({
-    san: step.san,
+    san: step.san ? step.san : "",
     uci: step.uci,
     fen: step.fen,
   });
