@@ -4,7 +4,7 @@ import scala.util.chaining._
 import cats.data.NonEmptyList
 
 import strategygames.format.FEN
-import strategygames.{ Board, Color, Divider, Division, GameLogic, Piece, Replay, Role }
+import strategygames.{ Board, Color, Divider, Division, GameFamily, GameLogic, Piece, Replay, Role }
 import strategygames.{ Centis, Stats }
 import lila.analyse.{ Accuracy, Advice }
 import lila.game.{ Game, Pov }
@@ -76,7 +76,8 @@ final private class PovToEntry(
           }
       }
 
-  private def pgnMoveToRole(pgn: String): Role = Role.pgnMoveToRole(GameLogic.Chess(), pgn.head)
+  private def pgnMoveToRole(gf: GameFamily, pgn: String): Role =
+    Role.pgnMoveToRole(GameLogic.Chess(), gf, pgn.head)
 
   private def makeMoves(from: RichPov): List[InsightMove] = {
     val cpDiffs = ~from.moveAccuracy toVector
@@ -86,7 +87,7 @@ final private class PovToEntry(
       }
     }
     val movetimes = from.movetimes.toList
-    val roles     = from.pov.game.pgnMoves(from.pov.color) map pgnMoveToRole
+    val roles     = from.pov.game.pgnMoves(from.pov.color).map(pgnMoveToRole(from.pov.game.variant.gameFamily, _))
     val boards = {
       val pivot = if (from.pov.color == from.pov.game.startColor) 0 else 1
       from.boards.toList.zipWithIndex.collect {

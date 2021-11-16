@@ -33,6 +33,7 @@ export interface SocketMove {
 export interface SocketDrop {
   role: cg.Role;
   pos: cg.Key;
+  variant: string;
   b?: 1;
 }
 

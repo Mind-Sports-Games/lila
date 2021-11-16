@@ -119,6 +119,7 @@ object BSONHandlers {
   implicit private def CrazyDataBSONHandler: BSON[PocketData] =
     new BSON[PocketData] {
       private def writePocket(p: Pocket) = p.roles.map(_.forsyth).mkString
+      //will need to be updated for different GameFamilys
       private def readPocket(p: String)  = Pocket(p.view.flatMap(r => Role.forsyth(GameLogic.Chess(), r)).toList)
       def reads(r: Reader) =
         PocketData.Chess(strategygames.chess.PocketData(

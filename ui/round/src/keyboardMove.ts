@@ -63,7 +63,7 @@ export function ctrl(root: RoundController, step: Step, redraw: Redraw): Keyboar
       if (!crazyValid(root.data, role, key)) return;
       root.chessground.cancelMove();
       root.chessground.newPiece({ role, color }, key);
-      root.sendNewPiece(role, key, false);
+      root.sendNewPiece(role, key, root.data.game.variant.key, false);
     },
     promote(orig, dest, piece) {
       const role = sanToRole[piece];

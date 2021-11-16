@@ -281,7 +281,7 @@ object BinaryFormat {
       //  Array(int >> 4, int & 0x0f)
       //}
       def intPiece(int: Int): Option[fairysf.Piece] =
-        fairysf.Role.binaryInt(int & 127) map {
+        fairysf.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map {
           role => fairysf.Piece(Color.fromWhite((int & 128) == 0), role)
         }
       (fairysf.Pos.all zip ba.value).view
