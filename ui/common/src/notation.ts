@@ -7,7 +7,7 @@ interface ExtendedMoveInfo{
     prevFen?: string; //needed for shogi not xiangqi
 }
 
-interface ParseShogiMove{
+interface ParsedMove{
   dest: string;
   orig: string;
 }
@@ -23,6 +23,9 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
     }
 }
 
+/*
+** reads in a fen and outputs a map of board pieces - coordinates/keys are that of a shogi board [file+rank]
+*/
 export function readFen(fen: string, ranks:number, files:number) {
     const parts = fen.split(' '),
         board: Board = {
@@ -56,7 +59,7 @@ export function readFen(fen: string, ranks:number, files:number) {
     return board;
 }
 
-export function parseUci (uci: string, files: number, ranks:number): ParseShogiMove{
+export function parseUci (uci: string, files: number, ranks:number): ParsedMove{
     //account for ranks going up to 10, files are just a letter
     const p1 = uci[2] == '0' ? uci.slice(0, 3) : uci.slice(0, 2);
     const p2 = uci.slice(-1) == '0' ? uci.slice(-3) : uci.slice(-2);
@@ -65,7 +68,6 @@ export function parseUci (uci: string, files: number, ranks:number): ParseShogiM
         dest: parseUCISquareToUSI(p2, files, ranks)!,
     }
 }
-
 
 
 export function parseUCISquareToUSI(str: string, files: number, ranks:number): string | undefined {
@@ -77,48 +79,44 @@ export function parseUCISquareToUSI(str: string, files: number, ranks:number): s
   }
 
 function shogiNotation(move: ExtendedMoveInfo, variant:Variant): string {
-    console.log(move);
     const parsed = parseUci(move.uci, variant.boardSize.width, variant.boardSize.height),
      board = readFen(move.fen, variant.boardSize.height, variant.boardSize.width),
+     prevBoard = readFen(move.prevFen!, variant.boardSize.height, variant.boardSize.width),
      dest = parsed.dest,
-     connector = isCapture(board, move) ? "x" : isDrop(board, move) ? "*" : "-", //move (-), capture(x), drop (*)
+     connector = isCapture(prevBoard, board) ? "x" : isDrop(prevBoard, board) ? "*" : "-",
      role = board.pieces[dest],
      piece = role[0] === '+' ? role[0] + role[1].toUpperCase() : role[0].toUpperCase(),
      origin = '',
-     promotion = promotionSymbol(board, move);
+     promotion = promotionSymbol(prevBoard, board, parsed);
+
+    if (promotion == '+') return `${piece.slice(1)}${origin}${connector}${dest}${promotion}`;
 
     return `${piece}${origin}${connector}${dest}${promotion}`;
 }
 
-function isCapture(board: Board, move: ExtendedMoveInfo): boolean{
-    // number of piece on board decreases by 1 and/or number of pieces in pockets increase by 1
-    console.log("move", move);
-    console.log("board", board);
-    return false
+function isCapture(prevBoard: Board, board: Board): boolean{
+    return Object.keys(prevBoard.pieces).length - Object.keys(board.pieces).length == 1;
 }
 
-function isDrop(board: Board, move: ExtendedMoveInfo): boolean{
-    // num pieces on board increased by 1 and/or number of pieces in pockets decreases by 1
-    console.log("move", move);
-    console.log("board", board);
-    return false
+function isDrop(prevBoard: Board, board: Board): boolean{
+    return Object.keys(prevBoard.pieces).length - Object.keys(board.pieces).length == -1;
 }
 
-function promotionSymbol(board: Board, move: ExtendedMoveInfo): string{
-    // check if piece type and role match possible promotion square, get piece type before move and piece type after
+function promotionSymbol(prevBoard: Board, board: Board, parsed: ParsedMove): string{
     // '+' for promoted, '=' for chose not to promote, '' for normal move
-    console.log("move", move);
-    console.log("board", board);
-    return ''
-}
+    if (isDrop(prevBoard, board)) return ""
 
-function xiangqiRoleToPiece(role: string){
-    switch(role){
-        case 'n':
-        case 'N': return 'H';
-        case 'b':
-        case 'B': return 'E'
-        default: return role.toUpperCase()
+    const prevRole = prevBoard.pieces[parsed.orig]
+    const currentRole = board.pieces[parsed.dest]
+    
+    if (prevRole !== currentRole) return "+"
+    if (prevRole.includes("+")) return ""
+    if ( (currentRole.toLowerCase() !== 'g' && currentRole.toLowerCase() !== 'k') &&
+         ( (board.wMoved && ['1','2','3'].includes(parsed.dest.slice(1))) || 
+           ((!board.wMoved) && ['7','8','9'].includes(parsed.dest.slice(1))) ) ){
+        return "="  
+    }else{
+        return ""
     }
 }
 
@@ -142,7 +140,7 @@ function xiangqiNotation(move: ExtendedMoveInfo, variant:Variant): string {
     if (role === 'p' || role == 'P'){
         const pawnRole = board.wMoved ? 'P' : 'p';
         const addMovedPiece = prevFile !== newFile;
-        const pawnRanks = numFriendlyRolesInColumn(parsed.orig[0], board, variant.boardSize.height, pawnRole, addMovedPiece, prevRank, newRank);
+        const pawnRanks = numFriendlyPawnsInColumn(parsed.orig[0], board, variant.boardSize.height, pawnRole, addMovedPiece, prevRank, newRank);
 
         if (pawnRanks.length == 2){
             const pawnOp = ( (pawnRanks.indexOf(prevRank) == 0 && board.wMoved ) || 
@@ -159,15 +157,25 @@ function xiangqiNotation(move: ExtendedMoveInfo, variant:Variant): string {
     }   
 }
 
-function numFriendlyRolesInColumn(origFile : string, board: Board, numRanks: number, role: string, addMovedPiece : boolean, origPieceRank: number, newPieceRank: number): number[]{
+function xiangqiRoleToPiece(role: string){
+    switch(role){
+        case 'n':
+        case 'N': return 'H';
+        case 'b':
+        case 'B': return 'E'
+        default: return role.toUpperCase()
+    }
+}
+
+function numFriendlyPawnsInColumn(origFile : string, board: Board, numRanks: number, role: string, addMovedPiece : boolean, origPieceRank: number, newPieceRank: number): number[]{
     let pawnRanks: number[] = [];
     const ranks = [...Array(numRanks+1).keys()].slice(1);
     ranks.forEach( r => {
-        if (addMovedPiece && r === origPieceRank) pawnRanks.push(origPieceRank); // add the moved piece in order to avoid sorting
+        if (addMovedPiece && r === origPieceRank) pawnRanks.push(origPieceRank); // add the moved piece in this position to avoid sorting
         const piece = board.pieces[origFile + r.toString()];
         if (piece === role){
             if (!addMovedPiece && r === newPieceRank){
-                pawnRanks.push(origPieceRank) // add moved pawn in original position inorder to acquire its index from prev position
+                pawnRanks.push(origPieceRank) // add moved pawn in original position in order to acquire its index from prev position
             }else{
                 pawnRanks.push(r)      
             }

@@ -125,8 +125,6 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
   }
   for (let i = startAt; i < steps.length; i += 2) pairs.push([steps[i], steps[i + 1]]);
 
-  console.log("steps: ", steps);
-  console.log("pairs: ", pairs);
   const els: MaybeVNodes = [],
     curPly = ctrl.ply;
   for (let i = 0; i < pairs.length; i++) {
