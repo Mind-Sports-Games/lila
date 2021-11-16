@@ -18,6 +18,9 @@
     "dev": "yarn run compile",
     "prod": "yarn run compile"
   },
+  "dependencies": {
+    "chess": "2.0.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
