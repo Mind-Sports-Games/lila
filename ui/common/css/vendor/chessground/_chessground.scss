@@ -15,9 +15,16 @@ cg-board {
   }
 }
 
+//miniboards
 .variant-xiangqi.is2d {
   width: calc(100% * 10 / 11);
   margin-left: calc(50% / 11);
+}
+
+//main board
+.is2d .variant-xiangqi {
+  width: calc(100% * 10 / 11);
+  margin-right: calc(100% / 11);
 }
 
 .variant-shogi square {
@@ -218,12 +225,12 @@ cg-helper {
 
 .variant-xiangqi cg-container {
   width: calc(100% * 9);
-  height: calc(100% * 11);
+  height: calc(101% * 11);
 }
 
 .xiangqi cg-container {
   width: calc(100% * 9);
-  height: calc(100% * 11);
+  height: calc(101% * 11);
 }
 
 cg-container {
@@ -265,5 +272,9 @@ cg-container .cg-custom-svgs svg {
 
 /* 9x10 */
 .variant-xiangqi .cg-wrap {
+  padding-bottom: calc(640 * 100% / 576);
+}
+
+.variant-xiangqi .round__app__board {
   padding-bottom: calc(640 * 100% / 576);
 }

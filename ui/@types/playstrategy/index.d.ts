@@ -284,7 +284,9 @@ declare type VariantKey =
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
-  | 'linesOfAction';
+  | 'linesOfAction'
+  | 'shogi'
+  | 'xiangqi';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -322,7 +324,9 @@ declare type Perf =
   | 'pool'
   | 'fromPositionDraughts'
   | 'frisian'
-  | 'frysk';
+  | 'frysk'
+  | 'shogi'
+  | 'xiangqi';
 
 declare type Color = 'white' | 'black';
 declare type Orientation = 'white' | 'black' | 'left' | 'right';

@@ -65,13 +65,18 @@ export function init(ctrl: RoundController) {
   const setDrop = () => {
     if (activeCursor) document.body.classList.remove(activeCursor);
     if (crazyKeys.length > 0) {
-      const role = pieceRoles[crazyKeys[crazyKeys.length - 1] - 1],
+      const dropRoles = ctrl.data.game.variant.key === 'shogi' ? pieceShogiRoles : pieceRoles,
+        role = dropRoles[crazyKeys[crazyKeys.length - 1] - 1],
         color = ctrl.data.player.color,
         crazyData = ctrl.data.crazyhouse;
       if (!crazyData) return;
       const nb = crazyData.pockets[color === 'white' ? 0 : 1][role];
       setDropMode(ctrl.chessground.state, nb > 0 ? { color, role } : undefined);
-      activeCursor = `cursor-${color}-${role}`;
+      if (ctrl.data.game.variant.key === 'shogi'){
+        activeCursor = `cursor-${role}-shogi`;
+      }else{
+        activeCursor = `cursor-${color}-${role}-chess`;
+      }
       document.body.classList.add(activeCursor);
     } else {
       cancelDropMode(ctrl.chessground.state);

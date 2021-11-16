@@ -3,34 +3,46 @@ import { h, Hooks, VNodeData } from 'snabbdom';
 import { opposite } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 
-// const pieceScores = {
-//   'p-piece': 1,
-//   'n-piece': 3,
-//   'b-piece': 3,
-//   'r-piece': 5,
-//   'q-piece': 9,
-//   'k-piece': 0,
-//   'l-piece': 0,
-// };
-
-function pieceScores(piece: cg.Role): number {
-  switch (piece) {
-    case 'p-piece':
-      return 1;
-    case 'n-piece':
-      return 3;
-    case 'b-piece':
-      return 3;
-    case 'r-piece':
-      return 5;
-    case 'q-piece':
-      return 9;
-    case 'k-piece':
-      return 0;
-    case 'l-piece':
-      return 0;
+function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
+  switch (variant) {
+    case 'xiangqi':
+      switch (piece) {
+        case 'p-piece':
+          return isPromoted ? 2 : 1;
+        case 'a-piece':
+          return 2;
+        case 'b-piece':
+          return 2;
+        case 'n-piece':
+          return 4;
+        case 'c-piece':
+          return 4.5;
+        case 'r-piece':
+          return 9;
+        case 'k-piece':
+          return 0;
+        default:
+          return 0;
+      }
     default:
-      return 0;
+      switch (piece) {
+        case 'p-piece':
+          return 1;
+        case 'n-piece':
+          return 3;
+        case 'b-piece':
+          return 3;
+        case 'r-piece':
+          return 5;
+        case 'q-piece':
+          return 9;
+        case 'k-piece':
+          return 0;
+        case 'l-piece':
+          return 0;
+        default:
+          return 0;
+      }
   }
 }
 
@@ -76,8 +88,28 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
 // {white: {'p-piece': 3 'q-piece': 1}, black: {'b-piece': 2}}
 export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
   const diff: MaterialDiff = {
-    white: { 'k-piece': 0, 'q-piece': 0, 'r-piece': 0, 'b-piece': 0, 'n-piece': 0, 'p-piece': 0, 'l-piece': 0 },
-    black: { 'k-piece': 0, 'q-piece': 0, 'r-piece': 0, 'b-piece': 0, 'n-piece': 0, 'p-piece': 0, 'l-piece': 0 },
+    white: {
+      'a-piece': 0,
+      'b-piece': 0,
+      'c-piece': 0,
+      'k-piece': 0,
+      'l-piece': 0,
+      'n-piece': 0,
+      'p-piece': 0,
+      'q-piece': 0,
+      'r-piece': 0,
+    },
+    black: {
+      'a-piece': 0,
+      'b-piece': 0,
+      'c-piece': 0,
+      'k-piece': 0,
+      'l-piece': 0,
+      'n-piece': 0,
+      'p-piece': 0,
+      'q-piece': 0,
+      'r-piece': 0,
+    },
   };
   for (const p of pieces.values()) {
     const them = diff[opposite(p.color)];
@@ -87,10 +119,10 @@ export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
   return diff;
 }
 
-export function getScore(pieces: cg.Pieces): number {
+export function getScore(variant: VariantKey, pieces: cg.Pieces): number {
   let score = 0;
   for (const p of pieces.values()) {
-    score += pieceScores(p.role) * (p.color === 'white' ? 1 : -1);
+    score += pieceScores(variant, p.role, p.promoted) * (p.color === 'white' ? 1 : -1);
   }
   return score;
 }
@@ -127,7 +159,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction'];
+const noAnalysisVariants = ['linesOfAction', 'shogi', 'xiangqi'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;

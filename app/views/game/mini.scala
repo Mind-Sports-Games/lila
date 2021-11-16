@@ -21,10 +21,10 @@ object mini {
   def extraClasses(variant: Variant) = {
     val gameLogic = variant.gameLogic.name.toLowerCase()
     variant match {
-      case Variant.Chess(_) => 
-        s"${gameLogic}"
       case Variant.Draughts(v) =>
         s"${gameLogic} is${v.boardSize.key}"
+      case _ => 
+        s"${gameLogic}"
     }
   }
 
@@ -41,7 +41,7 @@ object mini {
     val variant = game.variant.key
     tag(
       href := withLink.option(gameLink(game, pov.color, ownerLink, tv)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init ${extra} variant-${variant} is2d",
+      cls := s"mini-game mini-game-${game.id} mini-game--init ${extra} ${variant} variant-${variant} is2d",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(
@@ -55,9 +55,10 @@ object mini {
     val game   = pov.game
     val isLive = game.isBeingPlayed
     val extra  = extraClasses(game.variant)
+    val variant = game.variant.key
     a(
       href := (if (tv) routes.Tv.index else routes.Round.watcher(pov.gameId, pov.color.name)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive ?? "mini-game--live"} ${extra}",
+      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive ?? "mini-game--live"} ${extra} ${variant} variant-${variant}",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(

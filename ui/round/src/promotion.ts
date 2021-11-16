@@ -24,9 +24,45 @@ export function sendPromotion(
   role: cg.Role,
   meta: cg.MoveMetadata
 ): boolean {
-  ground.promote(ctrl.chessground, dest, role);
-  ctrl.sendMove(orig, dest, role, meta);
+  const piece = ctrl.chessground.state.pieces.get(dest);
+  if (ctrl.data.game.variant.key === 'shogi' && piece && piece.role === role) {
+    ctrl.sendMove(orig, dest, undefined, meta); // shogi decision not to promote
+  } else {
+    ground.promote(ctrl.chessground, dest, role);
+    ctrl.sendMove(orig, dest, role, meta);
+  }
   return true;
+}
+
+function possiblePromotion(
+  ctrl: RoundController,
+  orig: cg.Key,
+  dest: cg.Key,
+  variant: VariantKey
+): boolean | undefined {
+  const d = ctrl.data,
+    piece = ctrl.chessground.state.pieces.get(dest),
+    premovePiece = ctrl.chessground.state.pieces.get(orig);
+  switch (variant) {
+    case 'xiangqi':
+      return (
+        ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
+        ((dest[1] === '6' && d.player.color === 'white') || (dest[1] === '5' && d.player.color === 'black'))
+      );
+    case 'shogi':
+      return (
+        ((piece && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
+          (premovePiece && premovePiece.role !== 'k-piece' && premovePiece.role !== 'g-piece')) &&
+        ((['7', '8', '9'].includes(dest[1]) && d.player.color === 'white') ||
+          (['1', '2', '3'].includes(dest[1]) && d.player.color === 'black')) &&
+        orig != 'a0' // cant promote from a drop
+      );
+    default:
+      return (
+        ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
+        ((dest[1] === '8' && d.player.color === 'white') || (dest[1] === '1' && d.player.color === 'black'))
+      );
+  }
 }
 
 export function start(
@@ -36,12 +72,10 @@ export function start(
   meta: cg.MoveMetadata = {} as cg.MoveMetadata
 ): boolean {
   const d = ctrl.data,
-    piece = ctrl.chessground.state.pieces.get(dest),
-    premovePiece = ctrl.chessground.state.pieces.get(orig);
-  if (
-    ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
-    ((dest[1] === '8' && d.player.color === 'white') || (dest[1] === '1' && d.player.color === 'black'))
-  ) {
+    premovePiece = ctrl.chessground.state.pieces.get(orig),
+    variantKey = ctrl.data.game.variant.key;
+  if (possiblePromotion(ctrl, orig, dest, variantKey)) {
+    if (variantKey === 'xiangqi') return sendPromotion(ctrl, orig, dest, 'pp-piece', meta);
     if (prePromotionRole && meta && meta.premove) return sendPromotion(ctrl, orig, dest, prePromotionRole, meta);
     if (
       !meta.ctrlKey &&
@@ -50,8 +84,13 @@ export function start(
         (d.pref.autoQueen === Prefs.AutoQueen.OnPremove && premovePiece) ||
         ctrl.keyboardMove?.justSelected())
     ) {
-      if (premovePiece) setPrePromotion(ctrl, dest, 'q-piece');
-      else sendPromotion(ctrl, orig, dest, 'q-piece', meta);
+      if (premovePiece) {
+        if (variantKey === 'shogi') {
+          setPrePromotion(ctrl, dest, ('p' + premovePiece.role) as cg.Role);
+        } else {
+          setPrePromotion(ctrl, dest, 'q-piece');
+        }
+      } else sendPromotion(ctrl, orig, dest, 'q-piece', meta);
       return true;
     }
     promoting = {
@@ -112,8 +151,10 @@ function renderPromotion(
   color: Color,
   orientation: cg.Orientation
 ): MaybeVNode {
-  let left = (7 - key2pos(dest)[0]) * 12.5;
-  if (orientation === 'white') left = 87.5 - left;
+  const rows = ctrl.chessground.state.dimensions.height;
+  const columns = ctrl.chessground.state.dimensions.width;
+  let left = (columns - key2pos(dest)[0]) * (100 / columns);
+  if (orientation === 'white') left = 100 - 100 / columns - left;
   const vertical = color === orientation ? 'top' : 'bottom';
 
   return h(
@@ -128,7 +169,21 @@ function renderPromotion(
       }),
     },
     roles.map((serverRole, i) => {
-      const top = (color === orientation ? i : 7 - i) * 12.5;
+      let top = 0;
+      if (color === orientation) {
+        if (color === 'white') {
+          top = (rows - key2pos(dest)[1] + i) * (100 / rows);
+        } else {
+          top = (key2pos(dest)[1] - 1 + i) * (100 / rows);
+        }
+      } else {
+        if (color === 'white') {
+          top = (key2pos(dest)[1] - 1 - i) * (100 / rows);
+        } else {
+          top = (rows - key2pos(dest)[1] - i) * (100 / rows);
+        }
+      }
+
       return h(
         'square',
         {
@@ -140,7 +195,7 @@ function renderPromotion(
             finish(ctrl, serverRole);
           }),
         },
-        [h(`piece.${serverRole}.${color}`)]
+        [h(`piece.${serverRole}.${color}.ally`)]
       );
     })
   );
@@ -150,11 +205,18 @@ const roles: cg.Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
 
 export function view(ctrl: RoundController): MaybeVNode {
   if (!promoting) return;
-
+  const piece = ctrl.chessground.state.pieces.get(promoting.move[1]),
+    varaintKey = ctrl.data.game.variant.key,
+    rolesToChoose =
+      varaintKey === 'shogi'
+        ? (['p' + piece?.role, piece?.role] as cg.Role[])
+        : varaintKey === 'antichess'
+        ? roles.concat('k-piece')
+        : roles;
   return renderPromotion(
     ctrl,
     promoting.move[1],
-    ctrl.data.game.variant.key === 'antichess' ? roles.concat('k-piece') : roles,
+    rolesToChoose,
     ctrl.data.player.color,
     ctrl.chessground.state.orientation
   );

@@ -73,7 +73,7 @@
 // chess
 @each $color, $c in ('white': w, 'black': b) {
   @each $role, $r in (p-piece: P, n-piece: N, b-piece: B, r-piece: R, q-piece: Q) {
-    body.cursor-#{$color}-#{$role} * {
+    body.cursor-#{$color}-#{$role}-chess * {
       cursor: url(../piece/cburnett/#{$c}#{$r}.svg) 22 22, auto !important;
     }
   }
@@ -90,11 +90,10 @@ $shogi-piece-drops-roles: (
 );
 // These images are also referenced in crazyCtrl.ts (for preloading).
 // The other file should be kept in sync.
-// shogi
-@each $color, $c in ('white': '0', 'black': '1') {
-  @each $role, $r in $shogi-piece-drops-roles {
-    body.cursor-#{$color}-#{$role} * {
-      cursor: url(../piece/shogi/#{$c}#{$r}.svg) 22 22, auto !important;
-    }
+// shogi - all drops are ally pieces, i.e. white or '0'
+@each $role, $r in $shogi-piece-drops-roles {
+  body.cursor-#{$role}-shogi * {
+    cursor: url(../piece/shogi/0#{$r}.svg) 22 22, auto !important;
   }
 }
+

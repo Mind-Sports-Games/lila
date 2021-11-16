@@ -51,11 +51,18 @@ export function main(ctrl: RoundController): VNode {
   if (d.pref.showCaptured) {
     const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
     material = util.getMaterialDiff(pieces);
-    score = util.getScore(pieces) * (bottomColor === 'white' ? 1 : -1);
+    score = util.getScore(d.game.variant.key, pieces) * (bottomColor === 'white' ? 1 : -1);
   } else material = emptyMaterialDiff;
 
   const checks: CheckCount =
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
+
+  // fix coordinates for non-chess games to display them outside due to not working well displaying on board
+  if (d.game.variant.key == 'xiangqi' || d.game.variant.key == 'shogi') {
+    if (!$('body').hasClass('coords-no')) {
+      $('body').removeClass('coords-in').addClass('coords-out');
+    }
+  }
 
   return ctrl.nvui
     ? ctrl.nvui.render(ctrl)
