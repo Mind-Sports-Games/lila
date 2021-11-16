@@ -1,18 +1,15 @@
 import { NotationStyle } from 'chess';
-//import * as cg from 'chessground/types';
 
 interface ExtendedMoveInfo{
-    san: string
+    san: string;
     uci: string;
     fen: string;
+    prevFen?: string; //needed for shogi not xiangqi
 }
 
 interface ParseShogiMove{
   dest: string;
   orig: string;
-  capture: boolean;
-  drop: boolean;
-  promotion: string;
 }
 
 type Board = { pieces: { [key: string]: string }; wMoved: boolean };
@@ -66,9 +63,6 @@ export function parseUci (uci: string, files: number, ranks:number): ParseShogiM
     return {
         orig: parseUCISquareToUSI(p1, files, ranks)!,
         dest: parseUCISquareToUSI(p2, files, ranks)!,
-        capture: false, //san.includes('x'),
-        drop: false, //san.includes('*'),
-        promotion: '', //san.includes('=') ? '=' : san.includes('+') ? '+' : '',};
     }
 }
 
@@ -83,15 +77,39 @@ export function parseUCISquareToUSI(str: string, files: number, ranks:number): s
   }
 
 function shogiNotation(move: ExtendedMoveInfo, variant:Variant): string {
+    console.log(move);
     const parsed = parseUci(move.uci, variant.boardSize.width, variant.boardSize.height),
      board = readFen(move.fen, variant.boardSize.height, variant.boardSize.width),
      dest = parsed.dest,
-     connector = "-", //move (-), capture(x), drop (*)
+     connector = isCapture(board, move) ? "x" : isDrop(board, move) ? "*" : "-", //move (-), capture(x), drop (*)
      role = board.pieces[dest],
      piece = role[0] === '+' ? role[0] + role[1].toUpperCase() : role[0].toUpperCase(),
-     origin = '';
+     origin = '',
+     promotion = promotionSymbol(board, move);
 
-    return `${piece}${origin}${connector}${dest}${parsed.promotion}`;
+    return `${piece}${origin}${connector}${dest}${promotion}`;
+}
+
+function isCapture(board: Board, move: ExtendedMoveInfo): boolean{
+    // number of piece on board decreases by 1 and/or number of pieces in pockets increase by 1
+    console.log("move", move);
+    console.log("board", board);
+    return false
+}
+
+function isDrop(board: Board, move: ExtendedMoveInfo): boolean{
+    // num pieces on board increased by 1 and/or number of pieces in pockets decreases by 1
+    console.log("move", move);
+    console.log("board", board);
+    return false
+}
+
+function promotionSymbol(board: Board, move: ExtendedMoveInfo): string{
+    // check if piece type and role match possible promotion square, get piece type before move and piece type after
+    // '+' for promoted, '=' for chose not to promote, '' for normal move
+    console.log("move", move);
+    console.log("board", board);
+    return ''
 }
 
 function xiangqiRoleToPiece(role: string){
