@@ -3,7 +3,7 @@ package lila.game
 import strategygames.fairysf
 import strategygames.fairysf.format
 import strategygames.fairysf.{ Piece, PieceMap, Pos, PositionHash, Role }
-import strategygames.Color
+import strategygames.{ Color, GameFamily }
 
 import lila.db.ByteArray
 
@@ -13,10 +13,10 @@ private object PfnStorage {
 
   case object OldBin extends PfnStorage {
 
-    def encode(pgnMoves: PgnMoves) =
+    def encode(gf: GameFamily, pgnMoves: PgnMoves) =
       ByteArray {
         monitor(_.game.pgn.encode("old")) {
-          format.pgn.Binary.writeMoves(pgnMoves).get
+          format.pgn.Binary.writeMoves(gf, pgnMoves).get
         }
       }
 

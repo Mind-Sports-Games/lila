@@ -166,7 +166,7 @@ export default class RoundController {
 
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
-      this.sendNewPiece(role, key, !!meta.predrop);
+      this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
     } else this.jump(this.ply);
   };
 
@@ -324,10 +324,11 @@ export default class RoundController {
     }
   };
 
-  sendNewPiece = (role: cg.Role, key: cg.Key, isPredrop: boolean): void => {
+  sendNewPiece = (role: cg.Role, key: cg.Key, variant: string, isPredrop: boolean): void => {
     const drop: SocketDrop = {
       role: role,
       pos: key,
+      variant: variant
     };
     if (blur.get()) drop.b = 1;
     this.resign(false);

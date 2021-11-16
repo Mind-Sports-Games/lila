@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameLogic, History, Status, Mode, Piece, Pocket, PocketData, Pockets, Pos, PositionHash, Situation, Board, Role }
+import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameFamily, GameLogic, History, Status, Mode, Piece, Pocket, PocketData, Pockets, Pos, PositionHash, Situation, Board, Role }
 import strategygames.chess
 import strategygames.draughts
 import strategygames.fairysf
@@ -55,7 +55,7 @@ object BSONHandlers {
           PocketData.FairySF(fairysf.PocketData(
             pockets = {
               val (white, black) = {
-                r.str("p").view.flatMap(c => fairysf.Piece.fromChar(c)).to(List)
+                r.str("p").view.flatMap(c => fairysf.Piece.fromChar(GameFamily(r.intD("f")), c)).to(List)
               }.partition(_ is White)
               Pockets(
                 white = Pocket(white.map(_.role).map(Role.FairySFRole)),
@@ -73,6 +73,12 @@ object BSONHandlers {
           case PocketData.Chess(_)   => 0
           case PocketData.FairySF(_) => 2
           case _ => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
+        }),
+        "f" -> (o match {
+          case PocketData.Chess(_)   => 0
+          //If we need to distinguish further then
+          //we can look at the role.gameFamily in the pockets
+          case PocketData.FairySF(_) => 3//Shogi
         }),
         "p" -> {
           o.pockets.white.roles.map(_.forsyth.toUpper).mkString +
@@ -469,7 +475,7 @@ object BSONHandlers {
             }
           case GameLogic.FairySF() =>
             $doc(
-              F.oldPgn         -> PfnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
+              F.oldPgn         -> PfnStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
               F.binaryPieces   -> BinaryFormat.piece.writeFairySF(o.board match {
                 case Board.FairySF(board) => board.pieces
                 case _ => sys.error("invalid fairysf board")

@@ -66,6 +66,9 @@ object GameDiff {
         ByteArrayBSONHandler.writeOpt(BinaryFormat.clockHistory.writeSide(x, y, z))
       }
 
+    def pfnStorageWriter(pgnMoves: PgnMoves) =
+      PfnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
+
     a.variant.gameLogic match {
       case GameLogic.Draughts() =>
         a.pdnStorage match {
@@ -136,7 +139,7 @@ object GameDiff {
         dTry(oldPgn, _.board match {
           case Board.FairySF(b) => b.uciMoves.toVector
           case _ => sys.error("Wrong board type")
-        }, writeBytes compose PfnStorage.OldBin.encode)
+        }, writeBytes compose pfnStorageWriter)
         dTry(binaryPieces, _.board match {
           case Board.FairySF(b) => b.pieces
           case _ => sys.error("Wrong board type")
