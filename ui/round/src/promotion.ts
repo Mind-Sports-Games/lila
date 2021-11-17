@@ -65,6 +65,44 @@ function possiblePromotion(
   }
 }
 
+// forced promotion for shogi Knight in last two ranks, and lance or pawn in last rank
+// assumes possible promotion is passed through (therefore no checks for drops etc).
+function forcedShogiPromotion(
+  ctrl: RoundController,
+  orig: cg.Key,
+  dest: cg.Key
+): boolean | undefined {
+  const d = ctrl.data,
+    piece = ctrl.chessground.state.pieces.get(dest),
+    premovePiece = ctrl.chessground.state.pieces.get(orig);
+    return (
+      (
+        ( 
+          (piece && (piece.role === 'l-piece' || piece.role === 'p-piece') && !premovePiece) ||
+          (premovePiece && (premovePiece.role === 'l-piece' || premovePiece.role === 'p-piece')) 
+        ) 
+          &&
+        ( 
+          (dest[1] === '9' && d.player.color === 'white') || 
+          (dest[1] == '1' && d.player.color === 'black') 
+        )
+      ) 
+        ||
+      (
+        ( 
+          (piece && piece.role === 'n-piece' && !premovePiece) || 
+          (premovePiece && premovePiece.role === 'n-piece') 
+        ) 
+          &&
+        ( 
+          (['8', '9'].includes(dest[1]) && d.player.color === 'white') || 
+          (['1', '2'].includes(dest[1]) && d.player.color === 'black') 
+        )
+      )
+    );
+}
+
+
 export function start(
   ctrl: RoundController,
   orig: cg.Key,
@@ -73,9 +111,14 @@ export function start(
 ): boolean {
   const d = ctrl.data,
     premovePiece = ctrl.chessground.state.pieces.get(orig),
+    piece = ctrl.chessground.state.pieces.get(dest),
     variantKey = ctrl.data.game.variant.key;
   if (possiblePromotion(ctrl, orig, dest, variantKey)) {
     if (variantKey === 'xiangqi') return sendPromotion(ctrl, orig, dest, 'pp-piece', meta);
+    if (variantKey === 'shogi' && forcedShogiPromotion(ctrl, orig, dest)){
+      const role = premovePiece ? premovePiece.role : piece!.role;
+      return sendPromotion(ctrl, orig, dest, ('p' + role) as cg.Role, meta);
+    } 
     if (prePromotionRole && meta && meta.premove) return sendPromotion(ctrl, orig, dest, prePromotionRole, meta);
     if (
       !meta.ctrlKey &&
