@@ -72,9 +72,9 @@ export function init(ctrl: RoundController) {
       if (!crazyData) return;
       const nb = crazyData.pockets[color === 'white' ? 0 : 1][role];
       setDropMode(ctrl.chessground.state, nb > 0 ? { color, role } : undefined);
-      if (ctrl.data.game.variant.key === 'shogi'){
+      if (ctrl.data.game.variant.key === 'shogi') {
         activeCursor = `cursor-${role}-shogi`;
-      }else{
+      } else {
         activeCursor = `cursor-${color}-${role}-chess`;
       }
       document.body.classList.add(activeCursor);

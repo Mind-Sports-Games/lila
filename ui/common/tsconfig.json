@@ -5,6 +5,6 @@
   "compilerOptions": {
     "outDir": ".",
     "types": ["jest", "cash"],
-    "esModuleInterop":true
+    "esModuleInterop": true
   }
 }

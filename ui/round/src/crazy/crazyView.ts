@@ -10,7 +10,8 @@ const eventNames = ['mousedown', 'touchstart'];
 
 export default function pocket(ctrl: RoundController, color: Color, position: Position) {
   const step = round.plyStep(ctrl.data, ctrl.ply);
-  const dropRoles = ctrl.data.game.variant.key == 'crazyhouse' ? pieceRoles : pieceShogiRoles;
+  const variantKey = ctrl.data.game.variant.key;
+  const dropRoles = variantKey == 'crazyhouse' ? pieceRoles : pieceShogiRoles;
   if (!step.crazy) return;
   const droppedRole = ctrl.justDropped,
     preDropRole = ctrl.preDrop,
@@ -20,7 +21,13 @@ export default function pocket(ctrl: RoundController, color: Color, position: Po
     usable = usablePos && !ctrl.replaying() && ctrl.isPlaying(),
     activeColor = color === ctrl.data.player.color;
   const capturedPiece = ctrl.justCaptured;
-  const captured = capturedPiece && (capturedPiece['promoted'] ? 'p-piece' : capturedPiece.role);
+  const captured =
+    capturedPiece &&
+    (variantKey === 'shogi' && capturedPiece['promoted']
+      ? (capturedPiece.role.slice(1) as cg.Role)
+      : capturedPiece['promoted']
+      ? 'p-piece'
+      : capturedPiece.role);
   return h(
     'div.pocket.is2d.pocket-' + position,
     {

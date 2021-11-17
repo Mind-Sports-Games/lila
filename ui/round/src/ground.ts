@@ -82,8 +82,13 @@ export function makeConfig(ctrl: RoundController): Config {
       enabled: true,
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
       pieces: {
-        baseUrl: variantKey === 'shogi' ? 'https://playstrategy.org/assets/piece/shogi/' : variantKey === 'xiangqi' ? 'https://playstrategy.org/assets/piece/xiangqi/' : 'https://playstrategy.org/assets/piece/cburnett/' ,
-      }
+        baseUrl:
+          variantKey === 'shogi'
+            ? 'https://playstrategy.org/assets/piece/shogi/'
+            : variantKey === 'xiangqi'
+            ? 'https://playstrategy.org/assets/piece/xiangqi/'
+            : 'https://playstrategy.org/assets/piece/cburnett/',
+      },
     },
     disableContextMenu: true,
     dimensions: data.game.variant.boardSize,
@@ -98,8 +103,10 @@ export function reload(ctrl: RoundController) {
 
 export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
   const piece = ground.state.pieces.get(key);
-  if ((piece && piece.role === 'p-piece' && ground.state.variant !== 'shogi') ||
-     (piece && ground.state.variant == 'shogi' && piece.role !== 'k-piece' && piece.role !== 'g-piece')) {
+  if (
+    (piece && piece.role === 'p-piece' && ground.state.variant !== 'shogi') ||
+    (piece && ground.state.variant == 'shogi' && piece.role !== 'k-piece' && piece.role !== 'g-piece')
+  ) {
     ground.setPieces(
       new Map([
         [

@@ -51,7 +51,15 @@ const renderDrawOffer = () =>
     '½?'
   );
 
-function renderMove(step: Step, notation: NotationStyle, variant: Variant, prevFen: string, curPly: number, orEmpty: boolean, drawOffers: Set<number>) {
+function renderMove(
+  step: Step,
+  notation: NotationStyle,
+  variant: Variant,
+  prevFen: string,
+  curPly: number,
+  orEmpty: boolean,
+  drawOffers: Set<number>
+) {
   return step
     ? h(
         moveTag,
@@ -61,13 +69,7 @@ function renderMove(step: Step, notation: NotationStyle, variant: Variant, prevF
           },
         },
         [
-          moveFromNotationStyle(notation)(
-            {san: step.san,
-             uci: step.uci,
-             fen: step.fen,
-             prevFen: prevFen,
-            }, 
-            variant),
+          moveFromNotationStyle(notation)({ san: step.san, uci: step.uci, fen: step.fen, prevFen: prevFen }, variant),
           drawOffers.has(step.ply) ? renderDrawOffer() : undefined,
         ]
       )
@@ -129,7 +131,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     curPly = ctrl.ply;
   for (let i = 0; i < pairs.length; i++) {
     els.push(h(indexTag, i + 1 + ''));
-    els.push(renderMove(pairs[i][0], notation, variant, steps[i*2].fen, curPly, true, drawPlies));
+    els.push(renderMove(pairs[i][0], notation, variant, steps[i * 2].fen, curPly, true, drawPlies));
     els.push(renderMove(pairs[i][1], notation, variant, pairs[i][0].fen, curPly, false, drawPlies));
   }
   els.push(renderResult(ctrl));

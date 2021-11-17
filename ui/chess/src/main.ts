@@ -51,7 +51,11 @@ export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
 }
 
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
-  return variantUsesUCINotation(key) ? 'uci' : 
-         variantUsesUSINotation(key) ? 'usi' :
-         variantUsesWXFNotation(key) ? 'wxf' :'san';
+  return variantUsesUCINotation(key)
+    ? 'uci'
+    : variantUsesUSINotation(key)
+    ? 'usi'
+    : variantUsesWXFNotation(key)
+    ? 'wxf'
+    : 'san';
 }

@@ -328,7 +328,7 @@ export default class RoundController {
     const drop: SocketDrop = {
       role: role,
       pos: key,
-      variant: variant
+      variant: variant,
     };
     if (blur.get()) drop.b = 1;
     this.resign(false);
