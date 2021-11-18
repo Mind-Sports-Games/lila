@@ -71,6 +71,9 @@ export function makeConfig(ctrl: RoundController): Config {
         },
       },
     },
+    dropmode: {
+      showDropDests: true,
+    },
     draggable: {
       enabled: data.pref.moveEvent !== Prefs.MoveEvent.Click,
       showGhost: data.pref.highlight,
