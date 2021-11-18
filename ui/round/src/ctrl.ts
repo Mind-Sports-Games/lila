@@ -310,7 +310,7 @@ export default class RoundController {
     const move: SocketMove = {
       u: orig + dest,
     };
-    if (prom) move.u += prom === 'n-piece' ? 'n' : prom[0];
+    if (prom) move.u += prom.split('-')[0].slice(-1);
     if (blur.get()) move.b = 1;
     this.resign(false);
     if (this.data.pref.submitMove && !meta.premove) {
