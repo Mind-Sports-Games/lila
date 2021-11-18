@@ -64,10 +64,13 @@ export function main(ctrl: RoundController): VNode {
     }
   }
 
+  //Add piece-letter class for games which dont want Noto Chess (font-famliy)
+  const notationBasic = ['xiangqi', 'shogi'].includes(d.game.variant.key) ? '.piece-letter' : '';
+
   return ctrl.nvui
     ? ctrl.nvui.render(ctrl)
     : h(
-        'div.round__app.variant-' + d.game.variant.key,
+        'div.round__app.variant-' + d.game.variant.key + notationBasic,
         {
           class: { 'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit) },
         },
