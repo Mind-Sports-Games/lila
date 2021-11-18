@@ -411,6 +411,9 @@ export default class RoundController {
         movable: {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves) : new Map(),
         },
+        dropmode: {
+          dropDests: new Map(), // ToDo issue 90 get map from data.possibleDrops when it's not a flat list of dests
+        },
         check: !!o.check,
       });
       if (o.check) sound.check();
