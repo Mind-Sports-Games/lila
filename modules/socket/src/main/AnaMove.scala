@@ -31,7 +31,7 @@ case class AnaMove(
   private lazy val lib = variant.gameLogic
   //draughts
   private lazy val fullCaptureFields =
-    uci.flatMap(m => Uci.Move.apply(lib, m)).flatMap(_.capture)
+    uci.flatMap(m => Uci.Move.apply(lib, variant.gameFamily, m)).flatMap(_.capture)
 
   private lazy val newGame = Game(lib, variant.some, fen.some)(
     orig = orig,
@@ -108,18 +108,20 @@ object AnaMove {
     for {
       d    <- o obj "d"
       lib  <- d int "lib"
-      orig <- d str "orig" flatMap {pos => Pos.fromKey(GameLogic(lib), pos)}
-      dest <- d str "dest" flatMap {pos => Pos.fromKey(GameLogic(lib), pos)}
-      fen  <- d str "fen" map {fen => FEN.apply(GameLogic(lib), fen)}
+      gl   = GameLogic(lib)
+      orig <- d str "orig" flatMap {pos => Pos.fromKey(gl, pos)}
+      dest <- d str "dest" flatMap {pos => Pos.fromKey(gl, pos)}
+      fen  <- d str "fen" map {fen => FEN.apply(gl, fen)}
       path <- d str "path"
+      v    = Variant.orDefault(gl, ~d.str("variant"))
     } yield AnaMove(
       orig = orig,
       dest = dest,
-      variant = Variant.orDefault(GameLogic(lib), ~d.str("variant")),
+      variant = v,
       fen = fen,
       path = path,
       chapterId = d str "ch",
-      promotion = d str "promotion" flatMap {p => Role.promotable(GameLogic(lib), p)},
+      promotion = d str "promotion" flatMap {p => Role.promotable(gl, v.gameFamily, p)},
       uci = d str "uci",
       fullCapture = d boolean "fullCapture"
     )

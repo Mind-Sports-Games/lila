@@ -51,7 +51,11 @@ object ServerEval {
                   }
                 )
                 .toOption
-                .map(_.flatMap(m => Uci.apply(chapter.setup.variant.gameLogic, m))) | List.empty,
+                .map(_.flatMap(m => Uci.apply(
+                  chapter.setup.variant.gameLogic,
+                  chapter.setup.variant.gameFamily,
+                  m
+                ))) | List.empty,
               userId = userId,
               unlimited = unlimited
             )

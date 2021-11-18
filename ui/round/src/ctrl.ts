@@ -161,7 +161,9 @@ export default class RoundController {
 
   private onUserMove = (orig: cg.Key, dest: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.keyboardMove || !this.keyboardMove.usedSan) ab.move(this, meta);
-    if (!promotion.start(this, orig, dest, meta)) this.sendMove(orig, dest, undefined, meta);
+    if (!promotion.start(this, orig, dest, meta)) {
+      this.sendMove(orig, dest, undefined, this.data.game.variant.key, meta);
+    }
   };
 
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
@@ -306,9 +308,10 @@ export default class RoundController {
     this.redraw();
   };
 
-  sendMove = (orig: cg.Key, dest: cg.Key, prom: cg.Role | undefined, meta: cg.MoveMetadata) => {
+  sendMove = (orig: cg.Key, dest: cg.Key, prom: cg.Role | undefined, variant: string, meta: cg.MoveMetadata) => {
     const move: SocketMove = {
       u: orig + dest,
+      variant: variant,
     };
     if (prom) move.u += prom.split('-')[0].slice(-1);
     if (blur.get()) move.b = 1;

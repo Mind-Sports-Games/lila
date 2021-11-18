@@ -26,10 +26,11 @@ export function sendPromotion(
 ): boolean {
   const piece = ctrl.chessground.state.pieces.get(dest);
   if (ctrl.data.game.variant.key === 'shogi' && piece && piece.role === role) {
-    ctrl.sendMove(orig, dest, undefined, meta); // shogi decision not to promote
+    // shogi decision not to promote
+    ctrl.sendMove(orig, dest, undefined, ctrl.data.game.variant.key, meta);
   } else {
     ground.promote(ctrl.chessground, dest, role);
-    ctrl.sendMove(orig, dest, role, meta);
+    ctrl.sendMove(orig, dest, role, ctrl.data.game.variant.key, meta);
   }
   return true;
 }

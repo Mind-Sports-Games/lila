@@ -2,7 +2,7 @@ package lila.game
 
 import play.api.libs.json._
 
-import strategygames.{ Board, Centis, Color, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, White, Black }
+import strategygames.{ Board, Centis, Color, GameFamily, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, White, Black }
 import strategygames.chess
 import strategygames.format.Forsyth
 import JsonView._
@@ -32,7 +32,7 @@ object Event {
   object MoveOrDrop {
 
     def data(
-        lib: GameLogic,
+        gf: GameFamily,
         fen: String,
         check: Boolean,
         threefold: Boolean,
@@ -49,7 +49,7 @@ object Event {
           "ply"   -> state.turns,
           "dests" -> PossibleMoves.oldJson(possibleMoves),
           "captLen" -> ~captLen,
-          "lib"     -> lib.id
+          "gf"      -> gf.id
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -66,7 +66,7 @@ object Event {
   }
 
   case class Move(
-      lib: GameLogic,
+      gf: GameFamily,
       orig: Pos,
       dest: Pos,
       san: String,
@@ -86,7 +86,7 @@ object Event {
     def typ = "move"
     def data =
       MoveOrDrop.data(
-        lib,
+        gf,
         fen,
         check,
         threefold,
@@ -117,7 +117,7 @@ object Event {
         pocketData: Option[PocketData]
     ): Move =
       Move(
-        lib = situation.board.variant.gameLogic,
+        gf = situation.board.variant.gameFamily,
         orig = move.orig,
         dest = move.dest,
         san = move match {
@@ -170,7 +170,7 @@ object Event {
   }
 
   case class Drop(
-      lib: GameLogic,
+      gf: GameFamily,
       role: Role,
       pos: Pos,
       san: String,
@@ -186,7 +186,7 @@ object Event {
     def typ = "drop"
     def data =
       MoveOrDrop.data(
-        lib,
+        gf,
         fen,
         check,
         threefold,
@@ -213,7 +213,7 @@ object Event {
         pocketData: Option[PocketData]
     ): Drop =
       Drop(
-        lib = situation.board.variant.gameLogic,
+        gf = situation.board.variant.gameFamily,
         role = drop.piece.role,
         pos = drop.pos,
         san = drop match {

@@ -28,6 +28,7 @@ export interface SocketOpts {
 
 export interface SocketMove {
   u: Uci;
+  variant: string;
   b?: 1;
 }
 export interface SocketDrop {

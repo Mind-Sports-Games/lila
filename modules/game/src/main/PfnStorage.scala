@@ -26,6 +26,8 @@ private object PfnStorage {
       }
   }
 
+  //is Huffman used/needed anywhere for PfnStorage?
+  //we default to Shogi in here
   case object Huffman extends PfnStorage {
 
     import org.lichess.compression.game.{ Encoder, Piece => JavaPiece, Role => JavaRole }
@@ -48,7 +50,7 @@ private object PfnStorage {
           }.toMap,
           positionHashes = decoded.positionHashes,
           //unmovedRooks = UnmovedRooks(unmovedRooks),
-          lastMove = Option(decoded.lastUci) flatMap format.Uci.apply,
+          lastMove = Option(decoded.lastUci).flatMap(m => format.Uci.apply(GameFamily.Shogi(), m)),
           //castles = Castles(
           //  whiteKingSide = unmovedRooks(Pos.H1),
           //  whiteQueenSide = unmovedRooks(Pos.A1),
