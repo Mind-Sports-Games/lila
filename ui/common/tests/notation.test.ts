@@ -236,6 +236,30 @@ test('moveFromNotationStyle shogi Lance capture and promotion', () => {
   expect(notation).toBe('Lx19+');
 });
 
+//shogi, ambiguous moves - required orig
+
+test('moveFromNotationStyle shogi gold ambiguous', () => {
+  const move = {
+    san: '',
+    uci: 'f1e2',
+    fen: 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B2G2R1/LNSGK1SNL w - 2',
+    prevFen: 'lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b - 1',
+  };
+  const notation = moveFromNotationStyle('usi')(move, shogiVariant);
+  expect(notation).toBe('G49-58');
+});
+
+test('moveFromNotationStyle shogi Knight ambiguous', () => {
+  const move = {
+    san: '',
+    uci: 'f5e7',
+    fen: 'lnsgkgsnl/1r5b1/ppp1+Nppp1/3p4p/3N5/2P3P2/PP1P+pP1PP/1B5R1/L1SGKGS1L w p 14',
+    prevFen: 'lnsgkgsnl/1r5b1/ppp2ppp1/3p4p/3N1N3/2P3P2/PP1P+pP1PP/1B5R1/L1SGKGS1L b p 13',
+  };
+  const notation = moveFromNotationStyle('usi')(move, shogiVariant);
+  expect(notation).toBe('N45-53+');
+});
+
 // xiangqi
 
 test('moveFromNotationStyle xiangqi Pawn move', () => {

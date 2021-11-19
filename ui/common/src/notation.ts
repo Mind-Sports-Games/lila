@@ -86,16 +86,135 @@ function shogiNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const parsed = parseUci(move.uci, variant.boardSize.width, variant.boardSize.height),
     board = readFen(move.fen, variant.boardSize.height, variant.boardSize.width),
     prevBoard = readFen(move.prevFen!, variant.boardSize.height, variant.boardSize.width),
+    prevrole = prevBoard.pieces[parsed.orig],
     dest = parsed.dest,
     connector = isCapture(prevBoard, board) ? 'x' : isDrop(prevBoard, board) ? '*' : '-',
     role = board.pieces[dest],
     piece = role[0] === '+' ? role[0] + role[1].toUpperCase() : role[0].toUpperCase(),
-    origin = '',
+    origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '', //ToDo ideally calculate this from SAN or in Chessops as currently doesn't include illegal moves like piece being pinned or obstruction
     promotion = promotionSymbol(prevBoard, board, parsed);
 
   if (promotion == '+') return `${piece.slice(1)}${origin}${connector}${dest}${promotion}`;
 
   return `${piece}${origin}${connector}${dest}${promotion}`;
+}
+
+function isMoveAmbiguous(board: Board, dest: string, prevRole: string): boolean {
+  const locations: string[] = previousLocationsOfPiece(prevRole, dest);
+  const possibleRoles = locations.map(l => board.pieces[l]).filter(x => x != undefined);
+  return possibleRoles.includes(prevRole);
+}
+
+function previousLocationsOfPiece(role: string, dest: string): string[] {
+  // illegal positions will just return nothing from board.piece[l] therefore dont check
+  // doesn't account for pins or obstruction
+  // dest is file + rank ,each single digit 1-9.
+  const sb: string[] = [];
+  switch (role) {
+    case 'N':
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 2).toString());
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 2).toString());
+      break; // n-piece (white)
+
+    case 'n':
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) - 2).toString());
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) - 2).toString());
+      break; // n-piece (black)
+
+    case 'S':
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) - 1).toString());
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) - 1).toString());
+      break; // s-piece (white)
+
+    case 's':
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) - 1).toString());
+      sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) - 1).toString());
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) - 1).toString());
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 1).toString());
+      break; // s-piece (black)
+
+    case 'b':
+    case 'B':
+      [1, 2, 3, 4, 5, 6, 7, 8].forEach(i => {
+        sb.push((parseInt(dest[0]) + i).toString() + (parseInt(dest[1]) + i).toString());
+        sb.push((parseInt(dest[0]) + i).toString() + (parseInt(dest[1]) - i).toString());
+        sb.push((parseInt(dest[0]) - i).toString() + (parseInt(dest[1]) + i).toString());
+        sb.push((parseInt(dest[0]) - i).toString() + (parseInt(dest[1]) - i).toString());
+      });
+      break; // b-piece
+
+    case 'r':
+    case 'R':
+      [1, 2, 3, 4, 5, 6, 7, 8].forEach(i => {
+        sb.push((parseInt(dest[0]) + i).toString() + (parseInt(dest[1]) + 0).toString());
+        sb.push((parseInt(dest[0]) - i).toString() + (parseInt(dest[1]) + 0).toString());
+        sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) + i).toString());
+        sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) - i).toString());
+      });
+      break; // r-piece
+
+    case '+P':
+    case '+L':
+    case '+N':
+    case '+S':
+    case 'G':
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 0).toString());
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 0).toString());
+      sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) - 1).toString());
+      break; // g-piece (white)
+
+    case '+s':
+    case '+n':
+    case '+l':
+    case '+p':
+    case 'g':
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) - 1).toString());
+      sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) - 1).toString());
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) - 1).toString());
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 0).toString());
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 0).toString());
+      sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) + 1).toString());
+      break; // g-piece (black)
+
+    case '+b':
+    case '+B':
+      [1, 2, 3, 4, 5, 6, 7, 8].forEach(i => {
+        sb.push((parseInt(dest[0]) + i).toString() + (parseInt(dest[1]) + i).toString());
+        sb.push((parseInt(dest[0]) + i).toString() + (parseInt(dest[1]) - i).toString());
+        sb.push((parseInt(dest[0]) - i).toString() + (parseInt(dest[1]) + i).toString());
+        sb.push((parseInt(dest[0]) - i).toString() + (parseInt(dest[1]) - i).toString());
+      });
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 0).toString());
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 0).toString());
+      sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) - 1).toString());
+      break; // pb-piece
+
+    case '+r':
+    case '+R':
+      [1, 2, 3, 4, 5, 6, 7, 8].forEach(i => {
+        sb.push((parseInt(dest[0]) + i).toString() + (parseInt(dest[1]) + 0).toString());
+        sb.push((parseInt(dest[0]) - i).toString() + (parseInt(dest[1]) + 0).toString());
+        sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) + i).toString());
+        sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) - i).toString());
+      });
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 1).toString());
+      sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) - 1).toString());
+      sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) - 1).toString());
+      break; // pr-piece
+
+    default:
+    //nothing k-piece, p-piece, l-piece
+  }
+  return sb;
 }
 
 function isCapture(prevBoard: Board, board: Board): boolean {
