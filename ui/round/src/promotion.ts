@@ -53,7 +53,10 @@ function possiblePromotion(
     case 'shogi':
       return (
         ((piece && !piece.promoted && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
-          (premovePiece && !premovePiece.promoted && premovePiece.role !== 'k-piece' && premovePiece.role !== 'g-piece')) &&
+          (premovePiece &&
+            !premovePiece.promoted &&
+            premovePiece.role !== 'k-piece' &&
+            premovePiece.role !== 'g-piece')) &&
         ((['7', '8', '9'].includes(dest[1]) && d.player.color === 'white') ||
           (['1', '2', '3'].includes(dest[1]) && d.player.color === 'black')) &&
         orig != 'a0' // cant promote from a drop

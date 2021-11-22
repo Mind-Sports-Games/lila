@@ -134,15 +134,15 @@ square {
 }
 
 .variant-shogi piece {
-  width: calc(100% / 9);
+  width: calc(100% / 11);
   height: calc(100% / 9);
-  margin-top: calc(-1%);
+  margin-left: calc(0.5%);
 }
 
 .shogi piece {
-  width: calc(100% / 9);
+  width: calc(100% / 11);
   height: calc(100% / 9);
-  margin-top: calc(-1%);
+  margin-left: calc(0.5%);
 }
 
 .variant-xiangqi piece {
