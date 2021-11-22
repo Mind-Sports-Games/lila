@@ -267,8 +267,8 @@ case class Game(
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
-      case Uci.ChessDrop(ChessUci.Drop(target, _)) => s"$target$target"
-      case m: Uci.Move                         => m.keys
+      case d: Uci.Drop => s"${d.role}${d.role}"
+      case m: Uci.Move => m.keys
       case _ => sys.error("Type Error")
     }
 
