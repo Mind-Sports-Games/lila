@@ -52,8 +52,10 @@ export const justIcon = (icon: string): VNodeData => ({
 
 export const uci2move = (uci: string): cg.Key[] | undefined => {
   if (!uci) return undefined;
-  if (uci[1] === '@') return [uci.slice(2, 4) as cg.Key];
-  return [uci.slice(0, 2), uci.slice(2, 4)] as cg.Key[];
+  const posFromdrop = uci.slice(2).match(/[a-z][1-9]0?/) as cg.Key | null
+  if (uci[1] === '@') return [posFromdrop as cg.Key];
+  const pos = uci.match(/[a-z][1-9]0?/g) as cg.Key[];
+  return [pos[0], pos[1]] as cg.Key[];
 };
 
 export const onInsert = (f: (el: HTMLElement) => void): Hooks => ({
@@ -79,9 +81,10 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
   if (!dests) return dec;
   if (typeof dests == 'string')
     for (const ds of dests.split(' ')) {
-      dec.set(ds.slice(0, 2), ds.slice(2).match(/.{2}/g) as cg.Key[]);
+      const pos = ds.match(/[a-z][1-9]0?/g) as cg.Key[];
+      dec.set(pos[0], pos.slice(1));
     }
-  else for (const k in dests) dec.set(k, dests[k].match(/.{2}/g) as cg.Key[]);
+  else for (const k in dests) dec.set(k, dests[k].match(/[a-z][1-9]0?/g) as cg.Key[]);
   return dec;
 }
 
