@@ -35,6 +35,8 @@ const sanToRole: { [key: string]: cg.Role } = {
   Q: 'q-piece',
   K: 'k-piece',
   L: 'l-piece',
+  G: 'g-piece',
+  S: 's-piece',
 };
 
 export function ctrl(root: RoundController, step: Step, redraw: Redraw): KeyboardMove {
