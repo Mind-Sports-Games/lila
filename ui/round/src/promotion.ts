@@ -46,10 +46,7 @@ function possiblePromotion(
     premovePiece = ctrl.chessground.state.pieces.get(orig);
   switch (variant) {
     case 'xiangqi':
-      return (
-        ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
-        ((dest[1] === '6' && d.player.color === 'white') || (dest[1] === '5' && d.player.color === 'black'))
-      );
+      return false;
     case 'shogi':
       return (
         ((piece && !piece.promoted && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
@@ -96,7 +93,6 @@ export function start(
     piece = ctrl.chessground.state.pieces.get(dest),
     variantKey = ctrl.data.game.variant.key;
   if (possiblePromotion(ctrl, orig, dest, variantKey)) {
-    if (variantKey === 'xiangqi') return sendPromotion(ctrl, orig, dest, 'pp-piece', meta);
     if (variantKey === 'shogi' && forcedShogiPromotion(ctrl, orig, dest)) {
       const role = premovePiece ? premovePiece.role : piece!.role;
       return sendPromotion(ctrl, orig, dest, ('p' + role) as cg.Role, meta);

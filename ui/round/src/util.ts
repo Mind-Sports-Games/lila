@@ -52,9 +52,8 @@ export const justIcon = (icon: string): VNodeData => ({
 
 export const uci2move = (uci: string): cg.Key[] | undefined => {
   if (!uci) return undefined;
-  const posFromdrop = uci.slice(2).match(/[a-z][1-9]0?/) as cg.Key | null
-  if (uci[1] === '@') return [posFromdrop as cg.Key];
   const pos = uci.match(/[a-z][1-9]0?/g) as cg.Key[];
+  if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
   return [pos[0], pos[1]] as cg.Key[];
 };
 

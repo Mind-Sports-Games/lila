@@ -2480,9 +2480,9 @@ chartjs-color@^2.1.0:
   version "0.10.2"
   resolved "https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249"
 
-"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#fix-xiangqi-10-ranks-not-selected":
+"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.13":
   version "7.11.1-pstrat2.13"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#a1c664b053cbf878960c816c4d54ee736b88ec0b"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#d6bd1e17d58ac1ff5a1a3857e7a9b5b8f45c8c34"
 
 "chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.1":
   version "0.8.1-pstrat3.1"
