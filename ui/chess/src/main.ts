@@ -31,6 +31,15 @@ export function readDrops(line?: string | null): Key[] | null {
   return (line.match(/.{2}/g) as Key[]) || [];
 }
 
+export function readDropsByRole(line?: string | null): Map<Role, Key[]> {
+  if (typeof line === 'undefined' || line === null) return new Map();
+  const roledrops = new Map();
+  line
+    .split(' ')
+    .forEach(d => roledrops.set((d[0].toLowerCase() + '-piece') as Role, d.slice(1).match(/.{2}/g) as Key[]));
+  return roledrops;
+}
+
 export const altCastles = {
   e1a1: 'e1c1',
   e1h1: 'e1g1',

@@ -27,6 +27,7 @@ import { ctrl as makeKeyboardMove, KeyboardMove } from './keyboardMove';
 import * as renderUser from './view/user';
 import * as cevalSub from './cevalSub';
 import * as keyboard from './keyboard';
+import * as chessUtil from 'chess';
 
 import {
   RoundOpts,
@@ -382,6 +383,7 @@ export default class RoundController {
     this.playerByColor('black').offeringDraw = o.bDraw;
     d.possibleMoves = activeColor ? o.dests : undefined;
     d.possibleDrops = activeColor ? o.drops : undefined;
+    d.possibleDropsByRole = activeColor ? o.dropsByRole : undefined;
     d.crazyhouse = o.crazyhouse;
     this.setTitle();
     if (!this.replaying()) {
@@ -413,7 +415,7 @@ export default class RoundController {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves) : new Map(),
         },
         dropmode: {
-          dropDests: new Map(), // ToDo issue 90 get map from data.possibleDrops when it's not a flat list of dests
+          dropDests: playing ? chessUtil.readDropsByRole(d.possibleDropsByRole) : new Map(),
         },
         check: !!o.check,
       });

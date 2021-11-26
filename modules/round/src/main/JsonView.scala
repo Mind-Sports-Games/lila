@@ -123,6 +123,7 @@ final class JsonView(
           .add("crazyhouse" -> pov.game.board.pocketData)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
+          .add("possibleDropsByRole" -> possibleDropsByrole(pov))
           .add("expiration" -> pov.game.expirable.option {
             Json.obj(
               "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
@@ -307,6 +308,16 @@ final class JsonView(
         Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
+
+  private def possibleDropsByrole(pov: Pov): Option[JsValue] = 
+   (pov.game.situation, pov.game.variant) match {
+      case (Situation.Chess(_), Variant.Chess(_)) => None
+      case (Situation.FairySF(_), Variant.FairySF(_)) => (pov.game playableBy pov.player) option
+        Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Draughts(_), Variant.Draughts(_)) => None
+      case _ => sys.error("Mismatch of types for possibleDropsByrole")
+    }
+
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
     (pov.game playableBy pov.player) ?? {

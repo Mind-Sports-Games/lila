@@ -4,6 +4,7 @@ import play.api.libs.json._
 
 import strategygames.{ Board, Centis, Color, GameFamily, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, White, Black }
 import strategygames.chess
+import strategygames.variant.Variant
 import strategygames.format.Forsyth
 import JsonView._
 import lila.chat.{ PlayerLine, UserLine }
@@ -40,6 +41,7 @@ object Event {
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
         possibleDrops: Option[List[Pos]],
+        possibleDropsByRole: Option[Map[Role, List[Pos]]],
         pocketData: Option[PocketData],
         captLen: Option[Int] = None
     )(extra: JsObject) = {
@@ -49,7 +51,8 @@ object Event {
           "ply"   -> state.turns,
           "dests" -> PossibleMoves.oldJson(possibleMoves),
           "captLen" -> ~captLen,
-          "gf"      -> gf.id
+          "gf"      -> gf.id,
+          "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty))
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -80,6 +83,7 @@ object Event {
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
       pocketData: Option[PocketData],
       captLen: Option[Int]
   ) extends Event {
@@ -94,6 +98,7 @@ object Event {
         clock,
         possibleMoves,
         possibleDrops,
+        possibleDropsByRole,
         pocketData,
         captLen
       ) {
@@ -157,6 +162,11 @@ object Event {
           case _ => situation.destinations
         },
         possibleDrops = situation.drops,
+        possibleDropsByRole = (situation) match {
+          case (Situation.FairySF(_)) => 
+              situation.dropsByRole
+          case _ => None
+          },
         pocketData = pocketData,
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
@@ -181,7 +191,8 @@ object Event {
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       pocketData: Option[PocketData],
-      possibleDrops: Option[List[Pos]]
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
   ) extends Event {
     def typ = "drop"
     def data =
@@ -194,6 +205,7 @@ object Event {
         clock,
         possibleMoves,
         possibleDrops,
+        possibleDropsByRole,
         pocketData
       ) {
         Json.obj(
@@ -227,8 +239,31 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
+        possibleDropsByRole = (situation) match {
+          case (Situation.FairySF(_)) => 
+              situation.dropsByRole
+          case _ => None
+          },
         pocketData = pocketData
       )
+  }
+
+  object PossibleDropsByRole {
+
+    def json(drops: Map[Role, List[Pos]]) =
+      if (drops.isEmpty) JsNull
+      else {
+        val sb    = new java.lang.StringBuilder(128)
+        var first = true
+        drops foreach { case (orig, dests) =>
+          if (first) first = false
+          else sb append " "
+          sb append orig.forsyth
+          dests foreach { sb append _.key }
+        }
+        JsString(sb.toString)
+      }
+      
   }
 
   object PossibleMoves {
