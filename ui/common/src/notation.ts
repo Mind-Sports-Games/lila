@@ -66,11 +66,10 @@ export function readFen(fen: string, ranks: number, files: number) {
 
 export function parseUci(uci: string, files: number, ranks: number): ParsedMove {
   //account for ranks going up to 10, files are just a letter
-  const p1 = uci[2] == '0' ? uci.slice(0, 3) : uci.slice(0, 2);
-  const p2 = uci.slice(-1) == '0' ? uci.slice(-3) : uci.slice(-2);
+  const reg = (uci.match(/[a-zA-Z][1-9@]0?/g) as string[]);
   return {
-    orig: parseUCISquareToUSI(p1, files, ranks)!,
-    dest: parseUCISquareToUSI(p2, files, ranks)!,
+    orig: parseUCISquareToUSI(reg[0], files, ranks)!,
+    dest: parseUCISquareToUSI(reg[1], files, ranks)!,
   };
 }
 
@@ -88,8 +87,9 @@ function shogiNotation(move: ExtendedMoveInfo, variant: Variant): string {
     prevBoard = readFen(move.prevFen!, variant.boardSize.height, variant.boardSize.width),
     prevrole = prevBoard.pieces[parsed.orig],
     dest = parsed.dest,
-    connector = isCapture(prevBoard, board) ? 'x' : isDrop(prevBoard, board) ? '*' : '-',
-    role = board.pieces[dest],
+    connector = isCapture(prevBoard, board) ? 'x' : isDrop(prevBoard, board) ? '*' : '-';
+  console.log("board.pieces: " , board.pieces , "dest: " , dest)
+  const role = board.pieces[dest],
     piece = role[0] === '+' ? role[0] + role[1].toUpperCase() : role[0].toUpperCase(),
     origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '', //ToDo ideally calculate this from SAN or in Chessops as currently doesn't include illegal moves like piece being pinned or obstruction
     promotion = promotionSymbol(prevBoard, board, parsed);
