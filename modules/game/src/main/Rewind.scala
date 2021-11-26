@@ -27,12 +27,12 @@ object Rewind {
           )
       case GameLogic.FairySF() =>
         Reader
-          .movesWithUcis(
+          .movesWithPgns(
             game.variant.gameLogic,
             moveStrs = game.pgnMoves,
             op = ucis => ucis.dropRight(1),
             tags = createTags(initialFen, game)
-          ).pp("movesWithUcis")
+          )
     }).flatMap(_.valid) map { replay =>
       val color        = game.turnColor
       val rewindedGame = replay.state
