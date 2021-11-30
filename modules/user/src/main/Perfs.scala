@@ -27,6 +27,8 @@ case class Perfs(
     russian: Perf,
     brazilian: Perf,
     pool: Perf,
+    shogi: Perf,
+    xiangqi: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -59,6 +61,8 @@ case class Perfs(
       "russian"        -> russian,
       "brazilian"      -> brazilian,
       "pool"           -> pool,
+      "shogi"          -> shogi,
+      "xiangqi"        -> xiangqi,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -147,6 +151,8 @@ case class Perfs(
     "russian"        -> russian,
     "brazilian"      -> brazilian,
     "pool"           -> pool,
+    "shogi"          -> shogi,
+    "xiangqi"        -> xiangqi,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
     "blitz"          -> blitz,
@@ -233,6 +239,8 @@ case object Perfs {
       p,
       p,
       p,
+      p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -273,6 +281,8 @@ case object Perfs {
       case Variant.Draughts(strategygames.draughts.variant.Russian)      => Some(_.russian)
       case Variant.Draughts(strategygames.draughts.variant.Brazilian)    => Some(_.brazilian)
       case Variant.Draughts(strategygames.draughts.variant.Pool)         => Some(_.pool)
+      case Variant.FairySF(strategygames.fairysf.variant.Shogi)          => Some(_.shogi)
+      case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)        => Some(_.xiangqi)
       case _                           => none
     }
 
@@ -311,6 +321,8 @@ case object Perfs {
         russian = perf("russian"),
         brazilian = perf("brazilian"),
         pool = perf("pool"),
+        shogi = perf("shogi"),
+        xiangqi = perf("xiangqi"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -346,6 +358,8 @@ case object Perfs {
         "russian"        -> notNew(o.russian),
         "brazilian"      -> notNew(o.brazilian),
         "pool"           -> notNew(o.pool),
+        "shogi"          -> notNew(o.shogi),
+        "xiangqi"        -> notNew(o.xiangqi),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
         "blitz"          -> notNew(o.blitz),
@@ -381,8 +395,10 @@ case object Perfs {
       breakthrough: List[User.LightPerf],
       russian: List[User.LightPerf],
       brazilian: List[User.LightPerf],
-      pool: List[User.LightPerf]
+      pool: List[User.LightPerf],
+      shogi: List[User.LightPerf],
+      xiangqi: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
 }

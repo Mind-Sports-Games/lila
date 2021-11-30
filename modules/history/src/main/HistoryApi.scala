@@ -49,6 +49,8 @@ final class HistoryApi(coll: Coll, userRepo: UserRepo, cacheApi: lila.memo.Cache
       game.ratingVariant.russian.option("russian"                           -> perfs.russian),
       game.ratingVariant.brazilian.option("brazilian"                       -> perfs.brazilian),
       game.ratingVariant.pool.option("pool"                                 -> perfs.pool),
+      game.ratingVariant.pool.option("shogi"                                -> perfs.shogi),
+      game.ratingVariant.pool.option("xiangqi"                              -> perfs.xiangqi),
       (isStd && game.speed == Speed.UltraBullet).option("ultraBullet"       -> perfs.ultraBullet),
       (isStd && game.speed == Speed.Bullet).option("bullet"                 -> perfs.bullet),
       (isStd && game.speed == Speed.Blitz).option("blitz"                   -> perfs.blitz),

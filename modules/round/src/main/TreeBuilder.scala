@@ -25,6 +25,7 @@ object TreeBuilder {
     fen match {
       case FEN.Chess(fen)    => FullOpeningDB.findByFen(GameLogic.Chess(), FEN.Chess(fen))
       case FEN.Draughts(fen) => FullOpeningDB.findByFen(GameLogic.Draughts(), FEN.Draughts(fen))
+      case FEN.FairySF(fen)  => FullOpeningDB.findByFen(GameLogic.FairySF(), FEN.FairySF(fen))
     }
 
   def apply(
@@ -61,7 +62,7 @@ object TreeBuilder {
           },
           opening = openingOf(fen),
           clock = withClocks.flatMap(_.headOption),
-          crazyData = init.situation.board.crazyData,
+          pocketData = init.situation.board.pocketData,
           eval = infos lift 0 map makeEval
         )
         def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
@@ -82,7 +83,7 @@ object TreeBuilder {
             check = g.situation.check,
             opening = openingOf(fen),
             clock = withClocks flatMap (_ lift (g.turns - init.turns - 1)),
-            crazyData = g.situation.board.crazyData,
+            pocketData = g.situation.board.pocketData,
             eval = info map makeEval,
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
             comments = Node.Comments {
@@ -134,7 +135,7 @@ object TreeBuilder {
         fen = fen,
         check = g.situation.check,
         opening = openingOf(fen),
-        crazyData = g.situation.board.crazyData,
+        pocketData = g.situation.board.pocketData,
         eval = none
       )
     }

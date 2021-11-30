@@ -109,6 +109,17 @@ coords {
 
 @import 'coords-colors';
 
+/* negate inner coords for shogi and xiangqi */
+@include breakpoint($mq-col1-uniboard) {
+  .coords-out .variant-shogi coords {
+    display: none;
+  }
+
+  .coords-out .variant-xiangqi coords {
+    display: none;
+  }
+}
+
 /* handle outer coords */
 @include breakpoint($mq-col2-uniboard) {
   .coords-out coords {
@@ -125,13 +136,31 @@ coords {
     }
 
     &.files {
-      bottom: -15px;
+      //bottom: -15px; // replaced below based on orientation for xiangqi board
       left: 0;
       text-align: center;
     }
 
     coord {
       color: $c-font-page !important;
+    }
+  }
+
+  .coords-out .orientation-black coords {
+    &.files.black {
+      bottom: -15px;
+    }
+    &.files.white {
+      top: -15px;
+    }
+  }
+
+  .coords-out .orientation-white coords {
+    &.files.black {
+      top: -15px;
+    }
+    &.files.white {
+      bottom: -15px;
     }
   }
 }

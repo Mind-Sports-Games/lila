@@ -4,7 +4,7 @@ import actorApi._
 import actorApi.round._
 import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
 import strategygames.format.Uci
-import strategygames.{ Black, Centis, Color, GameLogic, MoveMetrics, Speed, White }
+import strategygames.{ Black, Centis, Color, GameFamily, MoveMetrics, Speed, White }
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.concurrent.duration._
@@ -276,11 +276,17 @@ object RoundSocket {
               } yield PlayerDo(FullId(fullId), tpe)
             }
           case "r/move" =>
-            raw.get(6) { case Array(fullId, libS, uciS, blurS, lagS, mtS) =>
-              Uci(GameLogic(libS.toInt), uciS) map { uci =>
-                PlayerMove(FullId(fullId), uci, P.In.boolean(blurS), MoveMetrics(centis(lagS), centis(mtS)))
+            raw.get(6) { case Array(fullId, gfS, uciS, blurS, lagS, mtS) => {
+              val gf = GameFamily(gfS.toInt)
+              Uci(gf.gameLogic, gf, uciS) map { uci =>
+                PlayerMove(
+                  FullId(fullId),
+                  uci,
+                  P.In.boolean(blurS),
+                  MoveMetrics(centis(lagS), centis(mtS))
+                )
               }
-            }
+            }}
           case "chat/say" =>
             raw.get(3) { case Array(roomId, author, msg) =>
               PlayerChatSay(Game.Id(roomId), readColor(author).toRight(author), msg).some

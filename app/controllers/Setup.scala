@@ -256,7 +256,7 @@ final class Setup(
     Open { implicit ctx =>
       get("fen") map(s => FEN.clean(gameLogic(getInt("lib")), s)) flatMap ValidFen(getBool("strict")) match {
         case None    => BadRequest.fuccess
-        case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.color)).fuccess
+        case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.color, v.situation.board.variant.key)).fuccess
       }
     }
 

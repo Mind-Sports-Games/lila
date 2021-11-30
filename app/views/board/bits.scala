@@ -54,19 +54,22 @@ object bits {
       FEN(pov.game.variant.gameLogic, Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)),
       boardOrientation(pov),
       ~pov.game.lastMoveKeys,
-      boardSize(pov)
+      boardSize(pov),
+      pov.game.variant.key
     ) _
 
   def miniWithOrientation(
     fen: FEN,
     orientation: Orientation = Orientation.White,
     lastMove: String = "",
-    boardSizeOpt: Option[Board.BoardSize]
+    boardSizeOpt: Option[Board.BoardSize],
+    variantKey: String = "standard"
   )(tag: Tag): Tag = {
     // TODO: this is an excellent candidate for refactoring.
     val libName = fen match {
       case FEN.Chess(_) => GameLogic.Chess().name
       case FEN.Draughts(_) => GameLogic.Draughts().name
+      case FEN.FairySF(_) => GameLogic.FairySF().name
     }
     val orient = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)
@@ -77,20 +80,20 @@ object bits {
     }
     val extra = if (libName == "Draughts") s"is${boardSize.key}" else ""
     tag(
-      cls := s"mini-board mini-board--init cg-wrap is2d ${libName.toLowerCase()} ${extra}",
+      cls := s"mini-board mini-board--init cg-wrap is2d ${libName.toLowerCase()} variant-${variantKey} ${extra}",
       dataState := data
     )(cgWrapContent)
   }
 
-  def mini(fen: FEN, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, colorToOrientation(color), lastMove, None)(tag)
+  def mini(fen: FEN, color: Color = White, variantKey: String, lastMove: String = "")(tag: Tag): Tag =
+    miniWithOrientation(fen, colorToOrientation(color), lastMove, None, variantKey)(tag)
 
   def miniForVariant(fen: FEN, variant: Variant, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, boardOrientation(variant, color), lastMove, None)(tag)
+    miniWithOrientation(fen, boardOrientation(variant, color), lastMove, None, variant.key)(tag)
 
 
-  def miniSpan(fen: FEN, color: Color = White, lastMove: String = "") =
-    mini(fen, color, lastMove)(span)
+  def miniSpan(fen: FEN, color: Color = White, variantKey: String, lastMove: String = "") =
+    mini(fen, color, variantKey, lastMove)(span)
 
   private def sitCanCastle(sit: Situation, color: Color, side: strategygames.chess.Side): Boolean =
     sit match {

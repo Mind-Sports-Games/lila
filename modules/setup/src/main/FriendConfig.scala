@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ GameFamily, GameLogic, Mode }
+import strategygames.{ GameFamily, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import lila.lobby.Color
@@ -27,7 +27,7 @@ case class FriendConfig(
 
   def isPersistent = timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
 
-  def perfType: Option[PerfType] = PerfPicker.perfType(strategygames.Speed(makeClock), variant, makeDaysPerTurn)
+  def perfType: Option[PerfType] = PerfPicker.perfType(Speed(makeClock), variant, makeDaysPerTurn)
 }
 
 object FriendConfig extends BaseHumanConfig {

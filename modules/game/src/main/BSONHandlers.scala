@@ -1,12 +1,14 @@
 package lila.game
 
-import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameLogic, History, Status, Mode, Piece, Pos, PositionHash, Situation, Board }
+import strategygames.{ Color, Clock, White, Black, Game => StratGame, GameFamily, GameLogic, History, Status, Mode, Piece, Pocket, PocketData, Pockets, Pos, PositionHash, Situation, Board, Role }
 import strategygames.chess
 import strategygames.draughts
+import strategygames.fairysf
 import strategygames.format.Uci
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard, Crazyhouse }
+import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard }
 import strategygames.draughts.variant.{ Variant => DraughtsVariant, Standard => DraughtsStandard }
+import strategygames.fairysf.variant.{ Variant => FairySFVariant, Shogi => FairySFStandard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
@@ -32,28 +34,54 @@ object BSONHandlers {
     x => ByteArrayBSONHandler.writeTry(BinaryFormat.unmovedRooks write x).get
   )
 
-  implicit private[game] val crazyhouseDataBSONHandler = new BSON[Crazyhouse.Data] {
-
-    import Crazyhouse._
+  implicit private[game] val pocketDataBSONHandler = new BSON[PocketData] {
 
     def reads(r: BSON.Reader) =
-      Crazyhouse.Data(
-        pockets = {
-          val (white, black) = {
-            r.str("p").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
-          }.partition(_ is chess.White)
-          Pockets(
-            white = Pocket(white.map(_.role)),
-            black = Pocket(black.map(_.role))
-          )
-        },
-        promoted = r.str("t").view.flatMap(chess.Pos.piotr).to(Set)
-      )
+      GameLogic(r.intD("l")) match {
+        case GameLogic.Chess() =>
+          PocketData.Chess(chess.PocketData(
+            pockets = {
+              val (white, black) = {
+                r.str("p").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
+              }.partition(_ is White)
+              Pockets(
+                white = Pocket(white.map(_.role).map(Role.ChessRole)),
+                black = Pocket(black.map(_.role).map(Role.ChessRole))
+              )
+            },
+            promoted = r.str("t").view.flatMap(chess.Pos.piotr).to(Set)
+          ))
+        case GameLogic.FairySF() =>
+          PocketData.FairySF(fairysf.PocketData(
+            pockets = {
+              val (white, black) = {
+                r.str("p").view.flatMap(c => fairysf.Piece.fromChar(GameFamily(r.intD("f")), c)).to(List)
+              }.partition(_ is White)
+              Pockets(
+                white = Pocket(white.map(_.role).map(Role.FairySFRole)),
+                black = Pocket(black.map(_.role).map(Role.FairySFRole))
+              )
+            },
+            promoted = r.str("t").view.flatMap(fairysf.Pos.piotr).to(Set)
+          ))
+        case _ => sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
+      }
 
-    def writes(w: BSON.Writer, o: Crazyhouse.Data) =
+    def writes(w: BSON.Writer, o: PocketData) =
       BSONDocument(
+        "l" -> (o match {
+          case PocketData.Chess(_)   => 0
+          case PocketData.FairySF(_) => 2
+          case _ => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
+        }),
+        "f" -> (o match {
+          case PocketData.Chess(_)   => 0
+          //If we need to distinguish further then
+          //we can look at the role.gameFamily in the pockets
+          case PocketData.FairySF(_) => 3//Shogi
+        }),
         "p" -> {
-          o.pockets.white.roles.map(_.forsythUpper).mkString +
+          o.pockets.white.roles.map(_.forsyth.toUpper).mkString +
             o.pockets.black.roles.map(_.forsyth).mkString
         },
         "t" -> o.promoted.map(_.piotr).mkString
@@ -126,7 +154,11 @@ object BSONHandlers {
               } else Game.emptyCheckCount
               ),
             variant = gameVariant,
-            crazyData = gameVariant.crazyhouse option r.get[Crazyhouse.Data](F.crazyData)
+            pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
+              case Some(PocketData.Chess(pd)) => Some(pd)
+              case None => None
+              case _ => sys.error("non chess pocket data")
+            }
           ),
           color = turnColor
         ),
@@ -275,6 +307,100 @@ object BSONHandlers {
       )
     }
 
+    def readFairySFGame(r: BSON.Reader): Game = {
+      val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val startedAtTurn = r intD F.startedAtTurn
+      val plies         = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
+      val turnColor     = Color.fromPly(plies)
+      val createdAt     = r date F.createdAt
+
+      val playedPlies = plies - startedAtTurn
+      val gameVariant = FairySFVariant(r intD F.variant) | FairySFStandard
+
+      val decoded = r.bytesO(F.huffmanPgn).map { PfnStorage.Huffman.decode(_, playedPlies) } | {
+        //val clm      = r.get[CastleLastMove](F.castleLastMove)
+        val pgnMoves = PfnStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies)
+        PfnStorage.Decoded(
+          pgnMoves = pgnMoves,
+          pieces = BinaryFormat.piece.readFairySF(r bytes F.binaryPieces, gameVariant),
+          positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+          //unmovedRooks = chess.UnmovedRooks.default,
+          lastMove = None,
+          //castles = Castles.none,
+          halfMoveClock = pgnMoves.reverse.indexWhere(san =>
+            san.contains("x") || san.headOption.exists(_.isLower)
+          ) atLeast 0
+        )
+      }
+
+      val fairysfGame = fairysf.Game(
+        situation = fairysf.Situation(
+          fairysf.Board(
+            pieces = decoded.pieces,
+            history = fairysf.History(
+              lastMove = decoded.lastMove,
+              //castles = decoded.castles,
+              halfMoveClock = decoded.halfMoveClock,
+              positionHashes = decoded.positionHashes//,
+              //unmovedRooks = decoded.unmovedRooks,
+              //checkCount = if (gameVariant.threeCheck) {
+              //  val counts = r.intsD(F.checkCount)
+              //  chess.CheckCount(~counts.headOption, ~counts.lastOption)
+              //} else Game.emptyCheckCount
+              ),
+            variant = gameVariant,
+            pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
+              case Some(PocketData.FairySF(pd)) => Some(pd)
+              case None => None
+              case _ => sys.error("non fairysf pocket data")
+            }
+          ),
+          color = turnColor
+        ),
+        pgnMoves = decoded.pgnMoves,
+        clock = r.getO[Color => Clock](F.clock) {
+          clockBSONReader(createdAt, light.whitePlayer.berserk, light.blackPlayer.berserk)
+        } map (_(turnColor)),
+        turns = plies,
+        startedAtTurn = startedAtTurn
+      )
+
+      val whiteClockHistory = r bytesO F.whiteClockHistory
+      val blackClockHistory = r bytesO F.blackClockHistory
+
+      Game(
+        id = light.id,
+        whitePlayer = light.whitePlayer,
+        blackPlayer = light.blackPlayer,
+        chess = StratGame.FairySF(fairysfGame),
+        loadClockHistory = clk =>
+          for {
+            bw <- whiteClockHistory
+            bb <- blackClockHistory
+            history <-
+              BinaryFormat.clockHistory
+                .read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(turnColor))
+            _ = lila.mon.game.loadClockHistory.increment()
+          } yield history,
+        status = light.status,
+        daysPerTurn = r intO F.daysPerTurn,
+        binaryMoveTimes = r bytesO F.moveTimes,
+        mode = Mode(r boolD F.rated),
+        bookmarks = r intD F.bookmarks,
+        createdAt = createdAt,
+        movedAt = r.dateD(F.movedAt, createdAt),
+        metadata = Metadata(
+          source = r intO F.source flatMap Source.apply,
+          pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
+          tournamentId = r strO F.tournamentId,
+          swissId = r strO F.swissId,
+          simulId = r strO F.simulId,
+          analysed = r boolD F.analysed,
+          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
+        )
+      )
+    }
+
     def reads(r: BSON.Reader): Game = {
 
       lila.mon.game.fetch.increment()
@@ -283,6 +409,7 @@ object BSONHandlers {
       libId match {
         case 0 => readChessGame(r)
         case 1 => readDraughtsGame(r)
+        case 2 => readFairySFGame(r)
         case _ => sys.error("Invalid game in the database")
       }
     }
@@ -327,52 +454,62 @@ object BSONHandlers {
         F.drawLimit         -> o.metadata.drawLimit,
         F.analysed          -> w.boolO(o.metadata.analysed)
       ) ++ {
-        if (o.board.variant.gameLogic == GameLogic.Draughts()){
-          o.pdnStorage match {
-            case Some(PdnStorage.OldBin) => $doc(
-              F.oldPgn -> PdnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
-              F.binaryPieces -> BinaryFormat.piece.writeDraughts(o.board match {
-                case Board.Draughts(board) => board
-                case _ => sys.error("invalid draughts board")
-              }),
-              F.positionHashes -> o.history.positionHashes,
-              F.historyLastMove -> o.history.lastMove.map(_.uci),
-              // since variants are always OldBin
-              F.kingMoves -> o.history.kingMoves.nonEmpty.option(o.history.kingMoves)
-            )
-            case Some(PdnStorage.Huffman) => $doc(
-              F.huffmanPgn -> PdnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies)
-            )
-            case _ => sys.error("invalid draughts storage")
-          }
-        } else {//chess or fail
-          if (o.variant.standard)
-            $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies))
-          else {
-            val f = PgnStorage.OldBin
+        o.board.variant.gameLogic match {
+          case GameLogic.Draughts() =>
+            o.pdnStorage match {
+              case Some(PdnStorage.OldBin) => $doc(
+                F.oldPgn -> PdnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
+                F.binaryPieces -> BinaryFormat.piece.writeDraughts(o.board match {
+                  case Board.Draughts(board) => board
+                  case _ => sys.error("invalid draughts board")
+                }),
+                F.positionHashes -> o.history.positionHashes,
+                F.historyLastMove -> o.history.lastMove.map(_.uci),
+                // since variants are always OldBin
+                F.kingMoves -> o.history.kingMoves.nonEmpty.option(o.history.kingMoves)
+              )
+              case Some(PdnStorage.Huffman) => $doc(
+                F.huffmanPgn -> PdnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies)
+              )
+              case _ => sys.error("invalid draughts storage")
+            }
+          case GameLogic.FairySF() =>
             $doc(
-              F.oldPgn         -> f.encode(o.pgnMoves take Game.maxPlies),
-              F.binaryPieces   -> BinaryFormat.piece.writeChess(o.board match {
-                case Board.Chess(board) => board.pieces
-                case _ => sys.error("invalid chess board")
+              F.oldPgn         -> PfnStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.binaryPieces   -> BinaryFormat.piece.writeFairySF(o.board match {
+                case Board.FairySF(board) => board.pieces
+                case _ => sys.error("invalid fairysf board")
               }),
               F.positionHashes -> o.history.positionHashes,
-              F.unmovedRooks   -> o.history.unmovedRooks,
-              F.castleLastMove -> CastleLastMove.castleLastMoveBSONHandler
-                .writeTry(
-                  CastleLastMove(
-                    castles = o.history.castles,
-                    lastMove = o.history match {
-                      case History.Chess(h) => h.lastMove
-                      case _ => sys.error("Invalid history")
-                    }
-                  )
-                )
-                .toOption,
-              F.checkCount -> o.history.checkCount.nonEmpty.option(o.history.checkCount),
-              F.crazyData  -> o.board.crazyData
+              F.pocketData     -> o.board.pocketData
             )
-          }
+          case _ => //chess or fail
+            if (o.variant.standard)
+              $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies))
+            else {
+              $doc(
+                F.oldPgn         -> PgnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
+                F.binaryPieces   -> BinaryFormat.piece.writeChess(o.board match {
+                  case Board.Chess(board) => board.pieces
+                  case _ => sys.error("invalid chess board")
+                }),
+                F.positionHashes -> o.history.positionHashes,
+                F.unmovedRooks   -> o.history.unmovedRooks,
+                F.castleLastMove -> CastleLastMove.castleLastMoveBSONHandler
+                  .writeTry(
+                    CastleLastMove(
+                      castles = o.history.castles,
+                      lastMove = o.history match {
+                        case History.Chess(h) => h.lastMove
+                        case _ => sys.error("Invalid history")
+                      }
+                    )
+                  )
+                  .toOption,
+                F.checkCount -> o.history.checkCount.nonEmpty.option(o.history.checkCount),
+                F.pocketData -> o.board.pocketData
+              )
+            }
         }
       }
   }

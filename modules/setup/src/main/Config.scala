@@ -3,7 +3,6 @@ package lila.setup
 import strategygames.{ Clock, Game => StratGame, GameFamily, GameLogic, Situation, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.chess.{ Game => ChessGame }
 
 import lila.game.Game
 import lila.lobby.Color
@@ -76,6 +75,11 @@ trait Positional { self: Config =>
           f => ~Forsyth.<<<@(variant.gameLogic, fenVariant | Variant.libStandard(GameLogic.Draughts()), f)
             .map(_.situation playable strictFen)
         }
+      }
+    case GameLogic.FairySF() => true//no fromPosition yet
+    case _ =>
+      fen exists { f =>
+        (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)
       }
   }
 

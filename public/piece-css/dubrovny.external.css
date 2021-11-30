@@ -1,14 +1,296 @@
-.is2d .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
-.is2d .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
-.is2d .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
-.is2d .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
-.is2d .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
-.is2d .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
-.is2d .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
-.is2d .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
-.is2d .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
-.is2d .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
-.is2d .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
-.is2d .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
-.is2d .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
-.is2d .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.chess.is2d .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.chess.is2d .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.chess.is2d .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.chess.is2d .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.chess.is2d .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.chess.is2d .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.chess.is2d .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.chess.is2d .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.chess.is2d .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.chess.is2d .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.chess.is2d .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.chess.is2d .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.chess.is2d .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.chess.is2d .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-standard .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-standard .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-standard .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-standard .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-standard .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-standard .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-standard .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-standard .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-standard .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-standard .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-standard .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-standard .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-standard .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-standard .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-chess960 .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-chess960 .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-chess960 .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-chess960 .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-chess960 .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-chess960 .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-chess960 .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-chess960 .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-chess960 .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-chess960 .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-chess960 .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-chess960 .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-chess960 .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-chess960 .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-fromPosition .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-fromPosition .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-fromPosition .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-fromPosition .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-fromPosition .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-fromPosition .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-fromPosition .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-fromPosition .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-fromPosition .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-fromPosition .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-fromPosition .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-fromPosition .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-fromPosition .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-fromPosition .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-kingOfTheHill .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-kingOfTheHill .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-kingOfTheHill .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-kingOfTheHill .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-kingOfTheHill .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-kingOfTheHill .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-kingOfTheHill .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-kingOfTheHill .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-kingOfTheHill .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-kingOfTheHill .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-kingOfTheHill .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-kingOfTheHill .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-kingOfTheHill .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-kingOfTheHill .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-threeCheck .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-threeCheck .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-threeCheck .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-threeCheck .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-threeCheck .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-threeCheck .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-threeCheck .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-threeCheck .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-threeCheck .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-threeCheck .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-threeCheck .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-threeCheck .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-threeCheck .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-threeCheck .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-antichess .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-antichess .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-antichess .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-antichess .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-antichess .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-antichess .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-antichess .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-antichess .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-antichess .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-antichess .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-antichess .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-antichess .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-antichess .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-antichess .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-atomic .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-atomic .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-atomic .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-atomic .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-atomic .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-atomic .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-atomic .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-atomic .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-atomic .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-atomic .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-atomic .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-atomic .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-atomic .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-atomic .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-horde .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-horde .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-horde .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-horde .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-horde .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-horde .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-horde .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-horde .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-horde .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-horde .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-horde .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-horde .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-horde .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-horde .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-racingKings .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-racingKings .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-racingKings .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-racingKings .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-racingKings .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-racingKings .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-racingKings .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-racingKings .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-racingKings .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-racingKings .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-racingKings .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-racingKings .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-racingKings .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-racingKings .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-crazyhouse .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-crazyhouse .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-crazyhouse .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-crazyhouse .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-crazyhouse .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-crazyhouse .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-crazyhouse .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-crazyhouse .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-crazyhouse .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-crazyhouse .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-crazyhouse .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-crazyhouse .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-crazyhouse .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-crazyhouse .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-linesOfAction .p-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-linesOfAction .n-piece.white {background-image:url('/assets/piece/dubrovny/wN.svg')}
+.is2d .variant-linesOfAction .b-piece.white {background-image:url('/assets/piece/dubrovny/wB.svg')}
+.is2d .variant-linesOfAction .r-piece.white {background-image:url('/assets/piece/dubrovny/wR.svg')}
+.is2d .variant-linesOfAction .q-piece.white {background-image:url('/assets/piece/dubrovny/wQ.svg')}
+.is2d .variant-linesOfAction .k-piece.white {background-image:url('/assets/piece/dubrovny/wK.svg')}
+.is2d .variant-linesOfAction .l-piece.white {background-image:url('/assets/piece/dubrovny/wP.svg')}
+.is2d .variant-linesOfAction .p-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.is2d .variant-linesOfAction .n-piece.black {background-image:url('/assets/piece/dubrovny/bN.svg')}
+.is2d .variant-linesOfAction .b-piece.black {background-image:url('/assets/piece/dubrovny/bB.svg')}
+.is2d .variant-linesOfAction .r-piece.black {background-image:url('/assets/piece/dubrovny/bR.svg')}
+.is2d .variant-linesOfAction .q-piece.black {background-image:url('/assets/piece/dubrovny/bQ.svg')}
+.is2d .variant-linesOfAction .k-piece.black {background-image:url('/assets/piece/dubrovny/bK.svg')}
+.is2d .variant-linesOfAction .l-piece.black {background-image:url('/assets/piece/dubrovny/bP.svg')}
+.draughts.is2d .man.w {background-image:url('/assets/piece/draughts/wM.svg')}
+.draughts.is2d .king.w {background-image:url('/assets/piece/draughts/wK.svg')}
+.draughts.is2d .man.b {background-image:url('/assets/piece/draughts/bM.svg')}
+.draughts.is2d .king.b {background-image:url('/assets/piece/draughts/bK.svg')}
+.is2d .variant-international .man.w {background-image:url('/assets/piece/draughts/wM.svg')}
+.is2d .variant-international .king.w {background-image:url('/assets/piece/draughts/wK.svg')}
+.is2d .variant-international .man.b {background-image:url('/assets/piece/draughts/bM.svg')}
+.is2d .variant-international .king.b {background-image:url('/assets/piece/draughts/bK.svg')}
+.is2d .variant-frisian .man.w {background-image:url('/assets/piece/draughts/wM.svg')}
+.is2d .variant-frisian .king.w {background-image:url('/assets/piece/draughts/wK.svg')}
+.is2d .variant-frisian .man.b {background-image:url('/assets/piece/draughts/bM.svg')}
+.is2d .variant-frisian .king.b {background-image:url('/assets/piece/draughts/bK.svg')}
+.is2d .variant-frysk .man.w {background-image:url('/assets/piece/draughts/wM.svg')}
+.is2d .variant-frysk .king.w {background-image:url('/assets/piece/draughts/wK.svg')}
+.is2d .variant-frysk .man.b {background-image:url('/assets/piece/draughts/bM.svg')}
+.is2d .variant-frysk .king.b {background-image:url('/assets/piece/draughts/bK.svg')}
+.is2d .variant-antidraughts .man.w {background-image:url('/assets/piece/draughts/wM.svg')}
+.is2d .variant-antidraughts .king.w {background-image:url('/assets/piece/draughts/wK.svg')}
+.is2d .variant-antidraughts .man.b {background-image:url('/assets/piece/draughts/bM.svg')}
+.is2d .variant-antidraughts .king.b {background-image:url('/assets/piece/draughts/bK.svg')}
+.is2d .variant-breakthrough .man.w {background-image:url('/assets/piece/draughts/wM.svg')}
+.is2d .variant-breakthrough .king.w {background-image:url('/assets/piece/draughts/wK.svg')}
+.is2d .variant-breakthrough .man.b {background-image:url('/assets/piece/draughts/bM.svg')}
+.is2d .variant-breakthrough .king.b {background-image:url('/assets/piece/draughts/bK.svg')}
+.is2d .variant-russian .man.w {background-image:url('/assets/piece/draughts/wM.svg')}
+.is2d .variant-russian .king.w {background-image:url('/assets/piece/draughts/wK.svg')}
+.is2d .variant-russian .man.b {background-image:url('/assets/piece/draughts/bM.svg')}
+.is2d .variant-russian .king.b {background-image:url('/assets/piece/draughts/bK.svg')}
+.is2d .variant-brazilian .man.w {background-image:url('/assets/piece/draughts/wM.svg')}
+.is2d .variant-brazilian .king.w {background-image:url('/assets/piece/draughts/wK.svg')}
+.is2d .variant-brazilian .man.b {background-image:url('/assets/piece/draughts/bM.svg')}
+.is2d .variant-brazilian .king.b {background-image:url('/assets/piece/draughts/bK.svg')}
+.is2d .variant-pool .man.w {background-image:url('/assets/piece/draughts/wM.svg')}
+.is2d .variant-pool .king.w {background-image:url('/assets/piece/draughts/wK.svg')}
+.is2d .variant-pool .man.b {background-image:url('/assets/piece/draughts/bM.svg')}
+.is2d .variant-pool .king.b {background-image:url('/assets/piece/draughts/bK.svg')}
+.xiangqi.is2d .a-piece.black {background-image:url('/assets/piece/xiangqi/BA.svg')}
+.xiangqi.is2d .b-piece.black {background-image:url('/assets/piece/xiangqi/BE.svg')}
+.xiangqi.is2d .c-piece.black {background-image:url('/assets/piece/xiangqi/BC.svg')}
+.xiangqi.is2d .k-piece.black {background-image:url('/assets/piece/xiangqi/BK.svg')}
+.xiangqi.is2d .n-piece.black {background-image:url('/assets/piece/xiangqi/BH.svg')}
+.xiangqi.is2d .p-piece.black {background-image:url('/assets/piece/xiangqi/BP.svg')}
+.xiangqi.is2d .r-piece.black {background-image:url('/assets/piece/xiangqi/BR.svg')}
+.xiangqi.is2d .pp-piece.black {background-image:url('/assets/piece/xiangqi/BP.svg')}
+.xiangqi.is2d .a-piece.white {background-image:url('/assets/piece/xiangqi/RA.svg')}
+.xiangqi.is2d .b-piece.white {background-image:url('/assets/piece/xiangqi/RE.svg')}
+.xiangqi.is2d .c-piece.white {background-image:url('/assets/piece/xiangqi/RC.svg')}
+.xiangqi.is2d .k-piece.white {background-image:url('/assets/piece/xiangqi/RK.svg')}
+.xiangqi.is2d .n-piece.white {background-image:url('/assets/piece/xiangqi/RH.svg')}
+.xiangqi.is2d .p-piece.white {background-image:url('/assets/piece/xiangqi/RP.svg')}
+.xiangqi.is2d .r-piece.white {background-image:url('/assets/piece/xiangqi/RR.svg')}
+.xiangqi.is2d .pp-piece.white {background-image:url('/assets/piece/xiangqi/RP.svg')}
+.is2d .variant-xiangqi .a-piece.black {background-image:url('/assets/piece/xiangqi/BA.svg')}
+.is2d .variant-xiangqi .b-piece.black {background-image:url('/assets/piece/xiangqi/BE.svg')}
+.is2d .variant-xiangqi .c-piece.black {background-image:url('/assets/piece/xiangqi/BC.svg')}
+.is2d .variant-xiangqi .k-piece.black {background-image:url('/assets/piece/xiangqi/BK.svg')}
+.is2d .variant-xiangqi .n-piece.black {background-image:url('/assets/piece/xiangqi/BH.svg')}
+.is2d .variant-xiangqi .p-piece.black {background-image:url('/assets/piece/xiangqi/BP.svg')}
+.is2d .variant-xiangqi .r-piece.black {background-image:url('/assets/piece/xiangqi/BR.svg')}
+.is2d .variant-xiangqi .pp-piece.black {background-image:url('/assets/piece/xiangqi/BP.svg')}
+.is2d .variant-xiangqi .a-piece.white {background-image:url('/assets/piece/xiangqi/RA.svg')}
+.is2d .variant-xiangqi .b-piece.white {background-image:url('/assets/piece/xiangqi/RE.svg')}
+.is2d .variant-xiangqi .c-piece.white {background-image:url('/assets/piece/xiangqi/RC.svg')}
+.is2d .variant-xiangqi .k-piece.white {background-image:url('/assets/piece/xiangqi/RK.svg')}
+.is2d .variant-xiangqi .n-piece.white {background-image:url('/assets/piece/xiangqi/RH.svg')}
+.is2d .variant-xiangqi .p-piece.white {background-image:url('/assets/piece/xiangqi/RP.svg')}
+.is2d .variant-xiangqi .r-piece.white {background-image:url('/assets/piece/xiangqi/RR.svg')}
+.is2d .variant-xiangqi .pp-piece.white {background-image:url('/assets/piece/xiangqi/RP.svg')}
+.shogi.is2d .p-piece.ally {background-image:url('/assets/piece/shogi/0FU.svg')}
+.shogi.is2d .l-piece.ally {background-image:url('/assets/piece/shogi/0KY.svg')}
+.shogi.is2d .n-piece.ally {background-image:url('/assets/piece/shogi/0KE.svg')}
+.shogi.is2d .k-piece.ally.black {background-image:url('/assets/piece/shogi/0OU.svg')}
+.shogi.is2d .k-piece.ally.white {background-image:url('/assets/piece/shogi/0GY.svg')}
+.shogi.is2d .s-piece.ally {background-image:url('/assets/piece/shogi/0GI.svg')}
+.shogi.is2d .pp-piece.ally {background-image:url('/assets/piece/shogi/0TO.svg')}
+.shogi.is2d .pl-piece.ally {background-image:url('/assets/piece/shogi/0NY.svg')}
+.shogi.is2d .pn-piece.ally {background-image:url('/assets/piece/shogi/0NK.svg')}
+.shogi.is2d .ps-piece.ally {background-image:url('/assets/piece/shogi/0NG.svg')}
+.shogi.is2d .g-piece.ally {background-image:url('/assets/piece/shogi/0KI.svg')}
+.shogi.is2d .b-piece.ally {background-image:url('/assets/piece/shogi/0KA.svg')}
+.shogi.is2d .r-piece.ally {background-image:url('/assets/piece/shogi/0HI.svg')}
+.shogi.is2d .pr-piece.ally {background-image:url('/assets/piece/shogi/0RY.svg')}
+.shogi.is2d .pb-piece.ally {background-image:url('/assets/piece/shogi/0UM.svg')}
+.shogi.is2d .p-piece.enemy {background-image:url('/assets/piece/shogi/1FU.svg')}
+.shogi.is2d .l-piece.enemy {background-image:url('/assets/piece/shogi/1KY.svg')}
+.shogi.is2d .n-piece.enemy {background-image:url('/assets/piece/shogi/1KE.svg')}
+.shogi.is2d .k-piece.enemy.black {background-image:url('/assets/piece/shogi/1OU.svg')}
+.shogi.is2d .k-piece.enemy.white {background-image:url('/assets/piece/shogi/1GY.svg')}
+.shogi.is2d .s-piece.enemy {background-image:url('/assets/piece/shogi/1GI.svg')}
+.shogi.is2d .pp-piece.enemy {background-image:url('/assets/piece/shogi/1TO.svg')}
+.shogi.is2d .pl-piece.enemy {background-image:url('/assets/piece/shogi/1NY.svg')}
+.shogi.is2d .pn-piece.enemy {background-image:url('/assets/piece/shogi/1NK.svg')}
+.shogi.is2d .ps-piece.enemy {background-image:url('/assets/piece/shogi/1NG.svg')}
+.shogi.is2d .g-piece.enemy {background-image:url('/assets/piece/shogi/1KI.svg')}
+.shogi.is2d .b-piece.enemy {background-image:url('/assets/piece/shogi/1KA.svg')}
+.shogi.is2d .r-piece.enemy {background-image:url('/assets/piece/shogi/1HI.svg')}
+.shogi.is2d .pr-piece.enemy {background-image:url('/assets/piece/shogi/1RY.svg')}
+.shogi.is2d .pb-piece.enemy {background-image:url('/assets/piece/shogi/1UM.svg')}
+.is2d .variant-shogi .p-piece.ally {background-image:url('/assets/piece/shogi/0FU.svg')}
+.is2d .variant-shogi .l-piece.ally {background-image:url('/assets/piece/shogi/0KY.svg')}
+.is2d .variant-shogi .n-piece.ally {background-image:url('/assets/piece/shogi/0KE.svg')}
+.is2d .variant-shogi .k-piece.ally.black {background-image:url('/assets/piece/shogi/0OU.svg')}
+.is2d .variant-shogi .k-piece.ally.white {background-image:url('/assets/piece/shogi/0GY.svg')}
+.is2d .variant-shogi .s-piece.ally {background-image:url('/assets/piece/shogi/0GI.svg')}
+.is2d .variant-shogi .pp-piece.ally {background-image:url('/assets/piece/shogi/0TO.svg')}
+.is2d .variant-shogi .pl-piece.ally {background-image:url('/assets/piece/shogi/0NY.svg')}
+.is2d .variant-shogi .pn-piece.ally {background-image:url('/assets/piece/shogi/0NK.svg')}
+.is2d .variant-shogi .ps-piece.ally {background-image:url('/assets/piece/shogi/0NG.svg')}
+.is2d .variant-shogi .g-piece.ally {background-image:url('/assets/piece/shogi/0KI.svg')}
+.is2d .variant-shogi .b-piece.ally {background-image:url('/assets/piece/shogi/0KA.svg')}
+.is2d .variant-shogi .r-piece.ally {background-image:url('/assets/piece/shogi/0HI.svg')}
+.is2d .variant-shogi .pr-piece.ally {background-image:url('/assets/piece/shogi/0RY.svg')}
+.is2d .variant-shogi .pb-piece.ally {background-image:url('/assets/piece/shogi/0UM.svg')}
+.is2d .variant-shogi .p-piece.enemy {background-image:url('/assets/piece/shogi/1FU.svg')}
+.is2d .variant-shogi .l-piece.enemy {background-image:url('/assets/piece/shogi/1KY.svg')}
+.is2d .variant-shogi .n-piece.enemy {background-image:url('/assets/piece/shogi/1KE.svg')}
+.is2d .variant-shogi .k-piece.enemy.black {background-image:url('/assets/piece/shogi/1OU.svg')}
+.is2d .variant-shogi .k-piece.enemy.white {background-image:url('/assets/piece/shogi/1GY.svg')}
+.is2d .variant-shogi .s-piece.enemy {background-image:url('/assets/piece/shogi/1GI.svg')}
+.is2d .variant-shogi .pp-piece.enemy {background-image:url('/assets/piece/shogi/1TO.svg')}
+.is2d .variant-shogi .pl-piece.enemy {background-image:url('/assets/piece/shogi/1NY.svg')}
+.is2d .variant-shogi .pn-piece.enemy {background-image:url('/assets/piece/shogi/1NK.svg')}
+.is2d .variant-shogi .ps-piece.enemy {background-image:url('/assets/piece/shogi/1NG.svg')}
+.is2d .variant-shogi .g-piece.enemy {background-image:url('/assets/piece/shogi/1KI.svg')}
+.is2d .variant-shogi .b-piece.enemy {background-image:url('/assets/piece/shogi/1KA.svg')}
+.is2d .variant-shogi .r-piece.enemy {background-image:url('/assets/piece/shogi/1HI.svg')}
+.is2d .variant-shogi .pr-piece.enemy {background-image:url('/assets/piece/shogi/1RY.svg')}
+.is2d .variant-shogi .pb-piece.enemy {background-image:url('/assets/piece/shogi/1UM.svg')}

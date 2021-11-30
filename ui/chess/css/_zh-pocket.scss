@@ -1,3 +1,11 @@
+.variant-crazyhouse .pocket-c1 {
+  flex: 0 0 calc(100% / 5);
+}
+
+.variant-shogi .pocket-c1 {
+  flex: 0 0 calc(100% / 7);
+}
+
 .pocket {
   @extend %box-radius;
 
@@ -8,11 +16,6 @@
     width: 100%;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3) inset;
     background: #888;
-  }
-
-  &-c1 {
-    flex: 0 0 20%;
-    max-width: 10vmin;
   }
 
   &-c2 {

@@ -2,7 +2,7 @@ package lila.fishnet
 
 import strategygames.format.{ FEN, Uci }
 import strategygames.variant.Variant
-import strategygames.GameLogic
+import strategygames.{ GameFamily, GameLogic }
 import org.joda.time.DateTime
 import play.api.libs.json._
 
@@ -162,7 +162,7 @@ object JsonApi {
     implicit val AcquireReads       = Json.reads[Request.Acquire]
     implicit val ScoreReads         = Json.reads[Request.Evaluation.Score]
     implicit val uciListReads = Reads.of[String] map { str =>
-      ~Uci.readList(GameLogic.Chess(), str)
+      ~Uci.readList(GameLogic.Chess(), GameFamily.Chess(), str)
     }
 
     implicit val EvaluationReads: Reads[Request.Evaluation] = (

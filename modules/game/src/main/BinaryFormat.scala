@@ -4,6 +4,7 @@ import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLogi
 import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.draughts
+import strategygames.fairysf
 import strategygames.format
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -211,7 +212,7 @@ object BinaryFormat {
     def writeChess(pieces: chess.PieceMap): ByteArray = {
       def posInt(pos: chess.Pos): Int =
         (pieces get pos).fold(0) { piece =>
-          piece.color.fold(0, 128) + roleToInt(piece.role)
+          piece.color.fold(0, 128) + piece.role.binaryInt
         }
       ByteArray(chess.Pos.all.map(posInt(_).toByte).toArray)
     }
@@ -222,11 +223,8 @@ object BinaryFormat {
         Array(int >> 4, int & 0x0f)
       }
       def intPiece(int: Int): Option[chess.Piece] =
-        intToRoleChess(int & 127, variant) map { role =>
-          chess.Piece(
-            Color.fromWhite((int & 128) == 0),
-            role
-          )
+        chess.Role.binaryInt(int & 127) map {
+          role => chess.Piece(Color.fromWhite((int & 128) == 0), role)
         }
       (chess.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
@@ -245,7 +243,7 @@ object BinaryFormat {
 
     def writeDraughts(pieces: draughts.PieceMap, variant: draughts.variant.Variant): ByteArray = {
       def posInt(pos: draughts.Pos): Int = (pieces get pos).fold(0) { piece =>
-        piece.color.fold(0, 8) + roleToInt(piece.role)
+        piece.color.fold(0, 8) + piece.role.binaryInt
       }
       ByteArray(groupedPos(variant.boardSize) map {
         case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
@@ -260,11 +258,37 @@ object BinaryFormat {
         Array(int >> 4, int & 0x0F)
       }
       def intPiece(int: Int): Option[draughts.Piece] =
-        intToRoleDraughts(int & 7, variant) map { role => draughts.Piece(Color((int & 8) == 0), role) }
+        draughts.Role.binaryInt(int & 7) map {
+          role => draughts.Piece(Color((int & 8) == 0), role)
+        }
       val pieceInts = ba.value flatMap splitInts
       (variant.boardSize.pos.all zip pieceInts).flatMap {
         case (pos, int) => intPiece(int) map (pos -> _)
       }.to(Map)
+    }
+
+    def writeFairySF(pieces: fairysf.PieceMap): ByteArray = {
+      def posInt(pos: fairysf.Pos): Int =
+        (pieces get pos).fold(0) { piece =>
+          piece.color.fold(0, 128) + piece.role.binaryInt
+        }
+      ByteArray(fairysf.Pos.all.map(posInt(_).toByte).toArray)
+    }
+
+    def readFairySF(ba: ByteArray, variant: fairysf.variant.Variant): fairysf.PieceMap = {
+      //def splitInts(b: Byte) = {
+      //  val int = b.toInt
+      //  Array(int >> 4, int & 0x0f)
+      //}
+      def intPiece(int: Int): Option[fairysf.Piece] =
+        fairysf.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map {
+          role => fairysf.Piece(Color.fromWhite((int & 128) == 0), role)
+        }
+      (fairysf.Pos.all zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(int) map (pos -> _)
+        }
+        .to(Map)
     }
 
     // cache standard start position
@@ -274,16 +298,8 @@ object BinaryFormat {
         draughts.Board.init(draughts.variant.Standard).pieces,
         draughts.variant.Standard
       )
+      case _ => sys.error("Cant write to binary for lib")
     }
-
-    private def intToRoleChess(int: Int, variant: chess.variant.Variant): Option[chess.Role] =
-      chess.Role.binaryInt(int)
-    private def intToRoleDraughts(int: Int, variant: draughts.variant.Variant): Option[draughts.Role] =
-      draughts.Role.binaryInt(int)
-
-    private def roleToInt(role: Role): Int = role.binaryInt
-    private def roleToInt(role: chess.Role): Int = role.binaryInt
-    private def roleToInt(role: draughts.Role): Int = role.binaryInt
 
   }
 

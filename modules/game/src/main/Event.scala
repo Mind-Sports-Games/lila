@@ -2,11 +2,10 @@ package lila.game
 
 import play.api.libs.json._
 
-import strategygames.chess.variant.Crazyhouse
-import strategygames.{ Board, Centis, Color, GameLogic, Move => StratMove, PromotableRole, Pos, Situation, Status, Role, White, Black }
+import strategygames.{ Board, Centis, Color, GameFamily, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, White, Black }
 import strategygames.chess
+import strategygames.variant.Variant
 import strategygames.format.Forsyth
-import strategygames.chess.format.pgn.Dumper
 import JsonView._
 import lila.chat.{ PlayerLine, UserLine }
 import lila.common.ApiVersion
@@ -34,7 +33,7 @@ object Event {
   object MoveOrDrop {
 
     def data(
-        lib: GameLogic,
+        gf: GameFamily,
         fen: String,
         check: Boolean,
         threefold: Boolean,
@@ -42,7 +41,8 @@ object Event {
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
         possibleDrops: Option[List[Pos]],
-        crazyData: Option[Crazyhouse.Data],
+        possibleDropsByRole: Option[Map[Role, List[Pos]]],
+        pocketData: Option[PocketData],
         captLen: Option[Int] = None
     )(extra: JsObject) = {
       extra ++ Json
@@ -51,7 +51,8 @@ object Event {
           "ply"   -> state.turns,
           "dests" -> PossibleMoves.oldJson(possibleMoves),
           "captLen" -> ~captLen,
-          "lib"     -> lib.id
+          "gf"      -> gf.id,
+          "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty))
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -60,7 +61,7 @@ object Event {
         .add("threefold" -> threefold)
         .add("wDraw" -> state.whiteOffersDraw)
         .add("bDraw" -> state.blackOffersDraw)
-        .add("crazyhouse" -> crazyData)
+        .add("crazyhouse" -> pocketData)
         .add("drops" -> possibleDrops.map { squares =>
           JsString(squares.map(_.key).mkString)
         })
@@ -68,7 +69,7 @@ object Event {
   }
 
   case class Move(
-      lib: GameLogic,
+      gf: GameFamily,
       orig: Pos,
       dest: Pos,
       san: String,
@@ -82,13 +83,14 @@ object Event {
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       possibleDrops: Option[List[Pos]],
-      crazyData: Option[Crazyhouse.Data],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      pocketData: Option[PocketData],
       captLen: Option[Int]
   ) extends Event {
     def typ = "move"
     def data =
       MoveOrDrop.data(
-        lib,
+        gf,
         fen,
         check,
         threefold,
@@ -96,7 +98,8 @@ object Event {
         clock,
         possibleMoves,
         possibleDrops,
-        crazyData,
+        possibleDropsByRole,
+        pocketData,
         captLen
       ) {
         Json
@@ -116,15 +119,16 @@ object Event {
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
-        crazyData: Option[Crazyhouse.Data]
+        pocketData: Option[PocketData]
     ): Move =
       Move(
-        lib = situation.board.variant.gameLogic,
+        gf = situation.board.variant.gameFamily,
         orig = move.orig,
         dest = move.dest,
         san = move match {
-          case StratMove.Chess(move)    => Dumper(move)
+          case StratMove.Chess(move)    => strategygames.chess.format.pgn.Dumper(move)
           case StratMove.Draughts(move) => strategygames.draughts.format.pdn.Dumper(move)
+          case StratMove.FairySF(move)  => strategygames.fairysf.format.pgn.Dumper(move)
         },
         fen = if (situation.board.variant.gameLogic == GameLogic.Draughts() && situation.board.variant.frisianVariant)
             situation.board match {
@@ -158,7 +162,12 @@ object Event {
           case _ => situation.destinations
         },
         possibleDrops = situation.drops,
-        crazyData = crazyData,
+        possibleDropsByRole = (situation) match {
+          case (Situation.FairySF(_)) => 
+              situation.dropsByRole
+          case _ => None
+          },
+        pocketData = pocketData,
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
             if (situation.ghosts > 0)
@@ -171,6 +180,7 @@ object Event {
   }
 
   case class Drop(
+      gf: GameFamily,
       role: Role,
       pos: Pos,
       san: String,
@@ -180,12 +190,24 @@ object Event {
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
-      crazyData: Option[Crazyhouse.Data],
-      possibleDrops: Option[List[Pos]]
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
   ) extends Event {
     def typ = "drop"
     def data =
-      MoveOrDrop.data(GameLogic.Chess(), fen, check, threefold, state, clock, possibleMoves, possibleDrops, crazyData) {
+      MoveOrDrop.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        pocketData
+      ) {
         Json.obj(
           "role" -> role.groundName,
           "uci"  -> s"${role.pgn}@${pos.key}",
@@ -196,25 +218,52 @@ object Event {
   }
   object Drop {
     def apply(
-        drop: chess.Drop,
+        drop: StratDrop,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
-        crazyData: Option[Crazyhouse.Data]
+        pocketData: Option[PocketData]
     ): Drop =
       Drop(
-        role = Role.ChessRole(drop.piece.role),
-        pos = Pos.Chess(drop.pos),
-        san = Dumper(drop),
-        fen = Forsyth.exportBoard(GameLogic.Chess(), situation.board),
+        gf = situation.board.variant.gameFamily,
+        role = drop.piece.role,
+        pos = drop.pos,
+        san = drop match {
+          case StratDrop.Chess(drop)   => strategygames.chess.format.pgn.Dumper(drop)
+          case StratDrop.FairySF(drop) => strategygames.fairysf.format.pgn.Dumper(drop)
+        },
+        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        crazyData = crazyData
+        possibleDropsByRole = (situation) match {
+          case (Situation.FairySF(_)) => 
+              situation.dropsByRole
+          case _ => None
+          },
+        pocketData = pocketData
       )
+  }
+
+  object PossibleDropsByRole {
+
+    def json(drops: Map[Role, List[Pos]]) =
+      if (drops.isEmpty) JsNull
+      else {
+        val sb    = new java.lang.StringBuilder(128)
+        var first = true
+        drops foreach { case (orig, dests) =>
+          if (first) first = false
+          else sb append " "
+          sb append orig.forsyth
+          dests foreach { sb append _.key }
+        }
+        JsString(sb.toString)
+      }
+      
   }
 
   object PossibleMoves {
@@ -284,6 +333,7 @@ object Event {
     private val lib = pos match {
       case Pos.Chess(_)    => GameLogic.Chess().id
       case Pos.Draughts(_) => GameLogic.Draughts().id
+      case Pos.FairySF(_)  => GameLogic.FairySF().id
     }
     def typ = "promotion"
     def data =

@@ -88,6 +88,8 @@ object side {
         showNonEmptyPerf(u.perfs.russian, PerfType.orDefault("russian")),
         showNonEmptyPerf(u.perfs.brazilian, PerfType.orDefault("russian")),
         showNonEmptyPerf(u.perfs.pool, PerfType.orDefault("pool")),
+        showNonEmptyPerf(u.perfs.shogi, PerfType.orDefault("shogi")),
+        showNonEmptyPerf(u.perfs.xiangqi, PerfType.orDefault("xiangqi")),
         u.noBot option frag(
           hr,
           showPerf(u.perfs.puzzle, PerfType.orDefault("puzzle")),

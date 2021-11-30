@@ -3,9 +3,8 @@ package lila.game
 import play.api.libs.json._
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.chess.variant.Crazyhouse
 import strategygames.opening.FullOpening
-import strategygames.{ Black, Clock, Color, Division, Status, White, Role }
+import strategygames.{ Black, Clock, Color, Division, GameLogic, Pocket, PocketData, Role, Status, White }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
 
@@ -83,9 +82,16 @@ object JsonView {
       .writes(ct)
       .add("matchup" -> matchup)
 
-  implicit val crazyhousePocketWriter: OWrites[Crazyhouse.Pocket] = OWrites { v =>
+  implicit val pocketWriter: OWrites[Pocket] = OWrites { v =>
     JsObject(
-      Crazyhouse.storableRoles.flatMap { role =>
+      Role.storable(v.roles.headOption match {
+        case Some(r) => r match {
+          case Role.ChessRole(_)   => GameLogic.Chess()
+          case Role.FairySFRole(_) => GameLogic.FairySF()
+          case _ => sys.error("Pocket not implemented for GameLogic")
+        }
+        case None => GameLogic.Chess()
+      }).flatMap { role =>
         Some(v.roles.count(role ==)).filter(0 <).map { count =>
           role.groundName -> JsNumber(count)
         }
@@ -93,7 +99,7 @@ object JsonView {
     )
   }
 
-  implicit val crazyhouseDataWriter: OWrites[Crazyhouse.Data] = OWrites { v =>
+  implicit val pocketDataWriter: OWrites[PocketData] = OWrites { v =>
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 
@@ -106,13 +112,6 @@ object JsonView {
 
   implicit val variantWriter: OWrites[Variant] = OWrites { v =>
     v match {
-      case v: Variant.Chess =>
-        Json.obj(
-          "key"   -> v.key,
-          "name"  -> v.name,
-          "short" -> v.shortName,
-          "lib"   -> v.gameLogic.id
-        )
       case Variant.Draughts(draughtsVariant) =>
         Json.obj(
           "key"   -> v.key,
@@ -122,7 +121,33 @@ object JsonView {
           "board" -> draughtsVariant.boardSize,
           "lib"   -> v.gameLogic.id
         )
+      case Variant.FairySF(fairyVariant) =>
+        Json.obj(
+          "key"   -> v.key,
+          "name"  -> v.name,
+          "short" -> v.shortName,
+          "lib"   -> v.gameLogic.id,
+          "boardSize" -> fairyVariant.boardSize
+        )
+      case _ =>
+        Json.obj(
+          "key"   -> v.key,
+          "name"  -> v.name,
+          "short" -> v.shortName,
+          "lib"   -> v.gameLogic.id,
+          "boardSize" -> Json.obj(
+                              "width" -> 8,
+                              "height" -> 8
+                            )
+        )
     }
+  }
+
+  implicit val boardSizeFairyWriter: Writes[strategygames.fairysf.Board.BoardSize] = Writes[strategygames.fairysf.Board.BoardSize] { b =>
+    Json.obj(
+      "width" -> b.width,
+      "height" -> b.height
+    )
   }
 
   implicit val boardSizeWriter: Writes[strategygames.draughts.Board.BoardSize] = Writes[strategygames.draughts.Board.BoardSize] { b =>

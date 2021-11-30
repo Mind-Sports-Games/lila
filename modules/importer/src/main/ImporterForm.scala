@@ -6,7 +6,7 @@ import strategygames.chess.format.pgn.{ Parser }
 import strategygames.format.pgn.{ ParsedPgn, Reader, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.{ Variant => StratVariant }
-import strategygames.{ Board, Color, Game => StratGame, GameLogic, Mode, Replay, Status }
+import strategygames.{ Board, Color, GameLogic, Mode, Replay, Status }
 import play.api.data._
 import play.api.data.Forms._
 import scala.util.chaining._
@@ -57,6 +57,8 @@ case class ImportData(pgn: String, analyse: Option[String]) {
       case Reader.Result.ChessIncomplete(replay, _)    => Replay.Chess(replay)
       case Reader.Result.DraughtsComplete(replay)      => Replay.Draughts(replay)
       case Reader.Result.DraughtsIncomplete(replay, _) => Replay.Draughts(replay)
+      case Reader.Result.FairySFComplete(replay)       => Replay.FairySF(replay)
+      case Reader.Result.FairySFIncomplete(replay, _)  => Replay.FairySF(replay)
     }
 
   def preprocess(user: Option[String]): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>

@@ -41,6 +41,7 @@ object SetupForm {
       config.copy(fen = f.some, variant = lib match {
         case GameLogic.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
         case GameLogic.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
+        case _ => sys.error("No from position variant")
       })
     }
 

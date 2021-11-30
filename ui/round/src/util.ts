@@ -3,34 +3,46 @@ import { h, Hooks, VNodeData } from 'snabbdom';
 import { opposite } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 
-// const pieceScores = {
-//   'p-piece': 1,
-//   'n-piece': 3,
-//   'b-piece': 3,
-//   'r-piece': 5,
-//   'q-piece': 9,
-//   'k-piece': 0,
-//   'l-piece': 0,
-// };
-
-function pieceScores(piece: cg.Role): number {
-  switch (piece) {
-    case 'p-piece':
-      return 1;
-    case 'n-piece':
-      return 3;
-    case 'b-piece':
-      return 3;
-    case 'r-piece':
-      return 5;
-    case 'q-piece':
-      return 9;
-    case 'k-piece':
-      return 0;
-    case 'l-piece':
-      return 0;
+function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
+  switch (variant) {
+    case 'xiangqi':
+      switch (piece) {
+        case 'p-piece':
+          return isPromoted ? 2 : 1;
+        case 'a-piece':
+          return 2;
+        case 'b-piece':
+          return 2;
+        case 'n-piece':
+          return 4;
+        case 'c-piece':
+          return 4.5;
+        case 'r-piece':
+          return 9;
+        case 'k-piece':
+          return 0;
+        default:
+          return 0;
+      }
     default:
-      return 0;
+      switch (piece) {
+        case 'p-piece':
+          return 1;
+        case 'n-piece':
+          return 3;
+        case 'b-piece':
+          return 3;
+        case 'r-piece':
+          return 5;
+        case 'q-piece':
+          return 9;
+        case 'k-piece':
+          return 0;
+        case 'l-piece':
+          return 0;
+        default:
+          return 0;
+      }
   }
 }
 
@@ -40,8 +52,9 @@ export const justIcon = (icon: string): VNodeData => ({
 
 export const uci2move = (uci: string): cg.Key[] | undefined => {
   if (!uci) return undefined;
-  if (uci[1] === '@') return [uci.slice(2, 4) as cg.Key];
-  return [uci.slice(0, 2), uci.slice(2, 4)] as cg.Key[];
+  const pos = uci.match(/[a-z][1-9]0?/g) as cg.Key[];
+  if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
+  return [pos[0], pos[1]] as cg.Key[];
 };
 
 export const onInsert = (f: (el: HTMLElement) => void): Hooks => ({
@@ -67,17 +80,38 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
   if (!dests) return dec;
   if (typeof dests == 'string')
     for (const ds of dests.split(' ')) {
-      dec.set(ds.slice(0, 2), ds.slice(2).match(/.{2}/g) as cg.Key[]);
+      const pos = ds.match(/[a-z][1-9]0?/g) as cg.Key[];
+      dec.set(pos[0], pos.slice(1));
     }
-  else for (const k in dests) dec.set(k, dests[k].match(/.{2}/g) as cg.Key[]);
+  else for (const k in dests) dec.set(k, dests[k].match(/[a-z][1-9]0?/g) as cg.Key[]);
   return dec;
 }
 
 // {white: {'p-piece': 3 'q-piece': 1}, black: {'b-piece': 2}}
 export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
   const diff: MaterialDiff = {
-    white: { 'k-piece': 0, 'q-piece': 0, 'r-piece': 0, 'b-piece': 0, 'n-piece': 0, 'p-piece': 0, 'l-piece': 0 },
-    black: { 'k-piece': 0, 'q-piece': 0, 'r-piece': 0, 'b-piece': 0, 'n-piece': 0, 'p-piece': 0, 'l-piece': 0 },
+    white: {
+      'a-piece': 0,
+      'b-piece': 0,
+      'c-piece': 0,
+      'k-piece': 0,
+      'l-piece': 0,
+      'n-piece': 0,
+      'p-piece': 0,
+      'q-piece': 0,
+      'r-piece': 0,
+    },
+    black: {
+      'a-piece': 0,
+      'b-piece': 0,
+      'c-piece': 0,
+      'k-piece': 0,
+      'l-piece': 0,
+      'n-piece': 0,
+      'p-piece': 0,
+      'q-piece': 0,
+      'r-piece': 0,
+    },
   };
   for (const p of pieces.values()) {
     const them = diff[opposite(p.color)];
@@ -87,10 +121,10 @@ export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
   return diff;
 }
 
-export function getScore(pieces: cg.Pieces): number {
+export function getScore(variant: VariantKey, pieces: cg.Pieces): number {
   let score = 0;
   for (const p of pieces.values()) {
-    score += pieceScores(p.role) * (p.color === 'white' ? 1 : -1);
+    score += pieceScores(variant, p.role, p.promoted) * (p.color === 'white' ? 1 : -1);
   }
   return score;
 }
@@ -127,7 +161,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction'];
+const noAnalysisVariants = ['linesOfAction', 'shogi', 'xiangqi'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;

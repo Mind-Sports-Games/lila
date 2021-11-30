@@ -28,7 +28,7 @@ object StepBuilder {
             check = init.situation.check,
             dests = None,
             drops = None,
-            crazyData = init.situation.board.crazyData,
+            pocketData = init.situation.board.pocketData,
             captLen = init.situation match {
               case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
               case _ => None
@@ -42,7 +42,7 @@ object StepBuilder {
               check = g.situation.check,
               dests = None,
               drops = None,
-              crazyData = g.situation.board.crazyData,
+              pocketData = g.situation.board.pocketData,
               captLen = (g.situation, m) match {
                 case (Situation.Draughts(situation), Uci.DraughtsWithSan(m)) =>
                   if (situation.ghosts > 0) 

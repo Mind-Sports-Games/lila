@@ -3,7 +3,7 @@ package lila.insight
 import reactivemongo.api.bson._
 
 import strategygames.chess.opening.{ Ecopening, EcopeningDB }
-import strategygames.{ Color, GameLogic, Role }
+import strategygames.{ Color, GameFamily, GameLogic, Role }
 import lila.db.BSON
 import lila.db.dsl._
 import lila.rating.BSONHandlers.perfTypeIdHandler
@@ -31,7 +31,12 @@ private object BSONHandlers {
   implicit val RoleBSONHandler = tryHandler[Role](
     { case BSONString(r) => r.split(":") match {
       case Array(lib, r) =>
-        Role.allByForsyth(GameLogic(lib.toInt)) get r.head toTry s"Invalid role $r"
+        //if we add future to strategygames.GameCollection we might need to change this
+        if (lib.toInt >= 2) Role.allByForsyth(
+          GameLogic.FairySF(),
+          GameFamily(lib.toInt)
+        ) get r.head toTry s"Invalid role $r"
+        else Role.allByForsyth(GameLogic(lib.toInt)) get r.head toTry s"Invalid role $r"
       case _ => sys.error("role not correctly encoded")  
     }},
     e => e match {
@@ -39,6 +44,8 @@ private object BSONHandlers {
       case Role.ChessPromotableRole(r)    => BSONString(s"0:${r.forsyth.toString}")
       case Role.DraughtsRole(r)           => BSONString(s"1:${r.forsyth.toString}")
       case Role.DraughtsPromotableRole(r) => BSONString(s"1:${r.forsyth.toString}")
+      case Role.FairySFRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
+      case Role.FairySFPromotableRole(r)  => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
     }
   )
   implicit val TerminationBSONHandler = tryHandler[Termination](

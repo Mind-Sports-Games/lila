@@ -8,7 +8,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -31,6 +31,15 @@ export function readDrops(line?: string | null): Key[] | null {
   return (line.match(/.{2}/g) as Key[]) || [];
 }
 
+export function readDropsByRole(line?: string | null): Map<Role, Key[]> {
+  if (typeof line === 'undefined' || line === null) return new Map();
+  const roledrops = new Map();
+  line
+    .split(' ')
+    .forEach(d => roledrops.set((d[0].toLowerCase() + '-piece') as Role, d.slice(1).match(/.{2}/g) as Key[]));
+  return roledrops;
+}
+
 export const altCastles = {
   e1a1: 'e1c1',
   e1h1: 'e1g1',
@@ -42,6 +51,20 @@ export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
   return ['linesOfAction'].includes(key);
 }
 
+export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
+  return ['shogi'].includes(key);
+}
+
+export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['xiangqi'].includes(key);
+}
+
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
-  return variantUsesUCINotation(key) ? 'uci' : 'san';
+  return variantUsesUCINotation(key)
+    ? 'uci'
+    : variantUsesUSINotation(key)
+    ? 'usi'
+    : variantUsesWXFNotation(key)
+    ? 'wxf'
+    : 'san';
 }
