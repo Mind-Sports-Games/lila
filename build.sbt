@@ -27,6 +27,10 @@ libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
   else Seq.empty
 }
 
+lazy val fairystockfish = Artifact("fairystockfish", "linux-x86_64")
+libraryDependencies += "org.playstrategy"        % "fairystockfish"           % "0.0.1" artifacts(fairystockfish)
+classpathTypes ++= Set("linux-x86_64")
+
 lazy val modules = Seq(
   common, db, rating, user, security, hub, socket,
   msg, notifyModule, i18n, game, bookmark, search,
