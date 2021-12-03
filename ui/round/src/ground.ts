@@ -87,10 +87,10 @@ export function makeConfig(ctrl: RoundController): Config {
       pieces: {
         baseUrl:
           variantKey === 'shogi'
-            ? 'https://playstrategy.org/assets/piece/shogi/'
+            ? 'https://playstrategy.org/assets/piece/shogi/2kanji'
             : variantKey === 'xiangqi'
-            ? 'https://playstrategy.org/assets/piece/xiangqi/'
-            : 'https://playstrategy.org/assets/piece/cburnett/',
+            ? 'https://playstrategy.org/assets/piece/xiangqi/2dhanzi/'
+            : 'https://playstrategy.org/assets/piece/cburnett/chess/',
       },
     },
     disableContextMenu: true,

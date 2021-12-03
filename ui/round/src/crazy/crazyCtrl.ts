@@ -149,8 +149,8 @@ export function init(ctrl: RoundController) {
 function preloadMouseIcons(data: RoundData) {
   const colorKey = data.player.color[0];
   const colorNum = data.player.color == 'white' ? '0' : '1';
-  for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/cburnett/${colorKey}${pKey}.svg`));
+  for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/chess/cburnett/${colorKey}${pKey}.svg`));
   for (const pKey of ['FU', 'KY', 'KE', 'GI', 'KI', 'KA', 'HI'])
-    fetch(playstrategy.assetUrl(`piece/shogi/${colorNum}${pKey}.svg`));
+    fetch(playstrategy.assetUrl(`piece/shogi/2kanji/${colorNum}${pKey}.svg`));
   mouseIconsLoaded = true;
 }

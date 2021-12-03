@@ -130,7 +130,8 @@ playstrategy.load.then(() => {
      * A different SVG must be loaded so a new image can be rasterized */
     if (navigator.userAgent.includes('Edge/'))
       setTimeout(() => {
-        const sprite = document.getElementById('piece-sprite') as HTMLLinkElement;
+        //TODO loop through all piece-sprite objects
+        const sprite = document.getElementById('piece-sprite-chess') as HTMLLinkElement;
         sprite.href = sprite.href.replace('.css', '.external.css');
       }, 1000);
 

@@ -18,7 +18,8 @@ object embed {
           layout.bits.viewport,
           layout.bits.metaCsp(basicCsp withNonce config.nonce),
           st.headTitle(title),
-          layout.bits.pieceSprite(lila.pref.PieceSet.default),
+          //layout.bits.pieceSprite(lila.pref.PieceSet.default),
+          lila.pref.PieceSet.defaults.map(ps => layout.bits.pieceSprite(ps)),
           cssTagWithTheme(cssModule, config.bg)
         ),
         st.body(cls := s"base highlight ${config.board}")(

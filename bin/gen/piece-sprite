@@ -8,7 +8,7 @@ lila_dir = pwd()
 source_dir = lila_dir + '/public/piece/'
 dest_dir = lila_dir + '/public/piece-css/'
 
-themes = [
+chess_themes = [
   ['alpha', 'svg'],
   ['cburnett', 'svg'],
   ['merida', 'svg'],
@@ -38,16 +38,32 @@ themes = [
   ['icpieces', 'svg'],
   ['horsey', 'svg']
 ]
+draughts_themes = [
+  ['wide_crown', 'svg']
+]
+loa_themes = [
+  ['wide_crown', 'svg']
+]
+shogi_themes = [
+  ['2kanji', 'svg'],
+  ['ctw', 'svg']
+]
+xiangqi_themes = [
+  ['2dhanzi', 'svg'],
+  ['ka', 'svg']
+]
 types = {
   'svg' => 'svg+xml;base64,',
   'png' => 'png;base64,'
 }
-roles = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece', 'k-piece', 'l-piece']
+roles = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece', 'k-piece']
 colors = ['white', 'black']
 chess_variants = ['standard','chess960', 'fromPosition', 'kingOfTheHill', 'threeCheck', 'antichess', 'atomic',
-'horde', 'racingKings', 'crazyhouse', 'linesOfAction']
+'horde', 'racingKings', 'crazyhouse']
 draughts_variants = ['international','frisian','frysk','antidraughts','breakthrough','russian','brazilian','pool']
 draughts_roles = ['man','king']
+lines_of_action_variants= ['linesOfAction']
+lines_of_action_roles = ['l-piece']
 shogi_roles_to_imageprefix = [
     ['p-piece','FU'],
     ['l-piece','KY'],
@@ -73,19 +89,13 @@ xiangqi_variants = ['xiangqi']
 
 
 # inline SVG Chess
-themes.map { |theme|
+chess_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
   classes_chess_game = colors.map { |color|
     roles.map { |role|
-      if (name == 'cburnett' && role == 'l-piece') #standard loa piece for default otherwise a pawn image
-        piece = color[0] + (role == 'l-piece' ? 'M' : role.upcase[0])
-        name = 'draughts'
-      else
-        piece = color[0] + (role == 'l-piece' ? 'P' : role.upcase[0])
-        name = theme[0]
-      end
-      file = source_dir + name + '/' + piece + '.' + ext
+      piece = color[0] + role.upcase[0]
+      file = source_dir + 'chess/' + name + '/' + piece + '.' + ext
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
@@ -97,14 +107,8 @@ themes.map { |theme|
   classes_chess_variant = chess_variants.map{ |variant|
     colors.map { |color|
       roles.map { |role|
-        if (name == 'cburnett' && role == 'l-piece') #standard loa piece for default otherwise a pawn image
-          piece = color[0] + (role == 'l-piece' ? 'M' : role.upcase[0])
-          name = 'draughts'
-        else
-          piece = color[0] + (role == 'l-piece' ? 'P' : role.upcase[0])
-          name = theme[0]
-        end
-        file = source_dir + name + '/' + piece + '.' + ext
+        piece = color[0] + role.upcase[0]
+        file = source_dir + 'chess/' + name + '/' + piece + '.' + ext
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
@@ -114,10 +118,42 @@ themes.map { |theme|
       }
     }
   }.flatten
+  File.open(dest_dir + 'chess-' + name + '.css', 'w') { |f| f.puts (classes_chess_game + classes_chess_variant).join("\n") }
+}
+
+# external SVG Chess
+chess_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_chess_game = colors.map { |color|
+    roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      game_class = (role == 'man' || role == 'king') ? 'draughts' : 'chess'
+      '.' + game_class + '.is2d .' + role + '.' + color + ' {' +
+        "background-image:url('/assets/piece/" + "chess/" + name + "/" + piece + "." + ext + "')}"
+    }
+  }.flatten
+  classes_chess_variant = chess_variants.map { |variant|
+    colors.map { |color|
+      roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        game_class = (role == 'man' || role == 'king') ? 'draughts' : 'chess'
+        '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+          "background-image:url('/assets/piece/" + "chess/" + name + "/" + piece + "." + ext + "')}"
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'chess-' + name + '.external.css', 'w') { |f| f.puts (classes_chess_game + classes_chess_variant).join("\n") }
+}
+
+# inline SVG Draughts
+draughts_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
   classes_draughts_game = colors.map { |color|
     draughts_roles.map { |role|
       piece = color[0] + role.upcase[0]
-      file = source_dir + 'draughts' + '/' + piece + '.' + ext
+      file = source_dir + 'draughts/' + name + '/' + piece + '.' + ext
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
@@ -130,7 +166,7 @@ themes.map { |theme|
     colors.map { |color|
       draughts_roles.map { |role|
         piece = color[0] + role.upcase[0]
-        file = source_dir + 'draughts' + '/' + piece + '.' + ext
+        file = source_dir + 'draughts/' + name + '/' + piece + '.' + ext
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
@@ -140,38 +176,95 @@ themes.map { |theme|
       }
     }
   }.flatten
-  classes_xiangqi_game = xiangqi_colors.map { |color|
-    xiangqi_roles.map { |role|
-      piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
-      file = source_dir + 'xiangqi' + '/' + piece + '.' + ext
-      File.open(file, 'r') do|image_file|
-        image = image_file.read
-        base64 = Base64.strict_encode64(image)
-        'xiangqi.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
-          "background-image:url('data:image/" + types[ext] + base64 + "')}"
-      end
+  File.open(dest_dir + 'draughts-' + name + '.css', 'w') { |f| f.puts (classes_draughts_game + classes_draughts_variant).join("\n") }
+}
+# external SVG Draughts
+draughts_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_draughts_game = colors.map { |color|
+    draughts_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      '.draughts.is2d .' + role + '.' + color[0] + ' {' +
+        "background-image:url('/assets/piece/" + 'draughts/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
-  classes_xiangqi_variant = xiangqi_variants.map{ |variant|
-    xiangqi_colors.map { |color|
-      xiangqi_roles.map { |role|
-        piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
-        file = source_dir + 'xiangqi' + '/' + piece + '.' + ext
-        File.open(file, 'r') do|image_file|
-          image = image_file.read
-          base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
-            "background-image:url('data:image/" + types[ext] + base64 + "')}"
-        end
+  classes_draughts_variant =  draughts_variants.map { |variant|
+    colors.map { |color|
+      draughts_roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        '.is2d .variant-' + variant + ' .' + role + '.' + color[0] + ' {' +
+          "background-image:url('/assets/piece/" + 'draughts/' + name + "/" + piece + "." + ext + "')}"
       }
     }
   }.flatten
+  File.open(dest_dir + 'draughts-' + name + '.external.css', 'w') { |f| f.puts (classes_draughts_game + classes_draughts_variant).join("\n") }
+}
+
+# inline SVG loa
+loa_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_loa_game = colors.map { |color|
+      lines_of_action_roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        file = source_dir + 'loa/' + name + '/' + piece + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          '.chess.is2d .' + role + '.' + color + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }.flatten
+    classes_loa_variant = lines_of_action_variants.map{ |variant|
+      colors.map { |color|
+        lines_of_action_roles.map { |role|
+          piece = color[0] + role.upcase[0]
+          file = source_dir + 'loa/' + name + '/' + piece + '.' + ext
+          File.open(file, 'r') do|image_file|
+            image = image_file.read
+            base64 = Base64.strict_encode64(image)
+            '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+              "background-image:url('data:image/" + types[ext] + base64 + "')}"
+          end
+        }
+      }
+    }.flatten
+    File.open(dest_dir + 'loa-' + name + '.css', 'w') { |f| f.puts (classes_loa_game + classes_loa_variant).join("\n") }
+  }
+# external SVG loa
+loa_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_loa_game = colors.map { |color|
+    lines_of_action_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      '.chess.is2d .' + role + '.' + color[0] + ' {' +
+          "background-image:url('/assets/piece/" + 'loa/' + name + "/" + piece + "." + ext + "')}"
+      }
+    }.flatten
+    classes_loa_variant =  lines_of_action_variants.map { |variant|
+      colors.map { |color|
+        draughts_roles.map { |role|
+          piece = color[0] + role.upcase[0]
+          '.is2d .variant-' + variant + ' .' + role + '.' + color[0] + ' {' +
+            "background-image:url('/assets/piece/" + 'loa/' + name + "/" + piece + "." + ext + "')}"
+        }
+      }
+    }.flatten
+    File.open(dest_dir + 'loa-' + name + '.external.css', 'w') { |f| f.puts (classes_loa_game + classes_loa_variant).join("\n") }
+}
+# inline SVG shogi
+shogi_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
   classes_shogi_game = shogi_colors.map { |color|
     shogi_roles_to_imageprefix.map { |role_image|
       role = role_image[0]
       role_piece_prefix = role_image[1]
       piece = color[0] + role_piece_prefix
-      file = source_dir + 'shogi' + '/' + piece + '.' + ext
+      file = source_dir + 'shogi/' + name + '/' + piece + '.' + ext
       color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
       File.open(file, 'r') do|image_file|
         image = image_file.read
@@ -187,7 +280,7 @@ themes.map { |theme|
         role = role_image[0]
         role_piece_prefix = role_image[1]
         piece = color[0] + role_piece_prefix
-        file = source_dir + 'shogi' + '/' + piece + '.' + ext
+        file = source_dir + 'shogi/' + name + '/' + piece + '.' + ext
         color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
         File.open(file, 'r') do|image_file|
           image = image_file.read
@@ -198,76 +291,12 @@ themes.map { |theme|
       }
     }
   }.flatten
-  name = theme[0]
-  File.open(dest_dir + name + '.css', 'w') { |f| f.puts (classes_chess_game + classes_chess_variant + classes_draughts_game + classes_draughts_variant + classes_xiangqi_game + classes_xiangqi_variant + classes_shogi_game + classes_shogi_variant).join("\n") }
+  File.open(dest_dir + 'shogi-' + name + '.css', 'w') { |f| f.puts (classes_shogi_game + classes_shogi_variant).join("\n") }
 }
-
-# external SVG Chess
-themes.map { |theme|
+# external SVG shogi
+shogi_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
-  classes_chess_game = colors.map { |color|
-    roles.map { |role|
-      if (name == 'cburnett' && role == 'l-piece') || role == 'man' || role == 'king' #standard loa piece for default otherwise a pawn image
-        piece = color[0] + (role == 'l-piece' ? 'M' : role.upcase[0])
-        name = 'draughts'
-      else
-        piece = color[0] + (role == 'l-piece' ? 'P' : role.upcase[0])
-        name = theme[0]
-      end
-      game_class = (role == 'man' || role == 'king') ? 'draughts' : 'chess'
-      '.' + game_class + '.is2d .' + role + '.' + color + ' {' +
-        "background-image:url('/assets/piece/" + name + "/" + piece + "." + ext + "')}"
-    }
-  }.flatten
-  classes_chess_variant = chess_variants.map { |variant|
-    colors.map { |color|
-      roles.map { |role|
-        if (name == 'cburnett' && role == 'l-piece') || role == 'man' || role == 'king' #standard loa piece for default otherwise a pawn image
-          piece = color[0] + (role == 'l-piece' ? 'M' : role.upcase[0])
-          name = 'draughts'
-        else
-          piece = color[0] + (role == 'l-piece' ? 'P' : role.upcase[0])
-          name = theme[0]
-        end
-        game_class = (role == 'man' || role == 'king') ? 'draughts' : 'chess'
-        '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
-          "background-image:url('/assets/piece/" + name + "/" + piece + "." + ext + "')}"
-      }
-    }
-  }.flatten
-  classes_draughts_game = colors.map { |color|
-    draughts_roles.map { |role|
-      piece = color[0] + role.upcase[0]
-      '.draughts.is2d .' + role + '.' + color[0] + ' {' +
-        "background-image:url('/assets/piece/" + 'draughts' + "/" + piece + "." + ext + "')}"
-    }
-  }.flatten
-  classes_draughts_variant =  draughts_variants.map { |variant|
-    colors.map { |color|
-      draughts_roles.map { |role|
-        piece = color[0] + role.upcase[0]
-        '.is2d .variant-' + variant + ' .' + role + '.' + color[0] + ' {' +
-          "background-image:url('/assets/piece/" + 'draughts' + "/" + piece + "." + ext + "')}"
-      }
-    }
-  }.flatten
-  classes_xiangqi_game = xiangqi_colors.map { |color|
-    xiangqi_roles.map { |role|
-      piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
-      '.xiangqi.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
-        "background-image:url('/assets/piece/" + 'xiangqi' + "/" + piece + "." + ext + "')}"
-    }
-  }.flatten
-  classes_xiangqi_variant = xiangqi_variants.map { |variant|
-    xiangqi_colors.map { |color|
-      xiangqi_roles.map { |role|
-        piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
-        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
-          "background-image:url('/assets/piece/" + 'xiangqi' + "/" + piece + "." + ext + "')}"
-      }
-    }
-  }.flatten
   classes_shogi_game = shogi_colors.map { |color|
     shogi_roles_to_imageprefix.map { |role_image|
       role = role_image[0]
@@ -275,7 +304,7 @@ themes.map { |theme|
       piece = color[0] + role_piece_prefix
       color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
       '.shogi.is2d .' + role + '.' + color_class + ' {' +
-        "background-image:url('/assets/piece/" + 'shogi' + "/" + piece + "." + ext + "')}"
+        "background-image:url('/assets/piece/" + 'shogi/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
   classes_shogi_variant = shogi_variants.map { |variant|
@@ -286,10 +315,64 @@ themes.map { |theme|
         piece = color[0] + role_piece_prefix
         color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
         '.is2d .variant-' + variant + ' .' + role + '.' + color_class + ' {' +
-          "background-image:url('/assets/piece/" + 'shogi' + "/" + piece + "." + ext + "')}"
+          "background-image:url('/assets/piece/" + 'shogi/' + name + "/" + piece + "." + ext + "')}"
       }
     }
   }.flatten
+  File.open(dest_dir + 'shogi-' + name + '.external.css', 'w') { |f| f.puts (classes_shogi_game + classes_shogi_variant).join("\n") }
+}
+
+# inline SVG xiangqi
+xiangqi_themes.map { |theme|
   name = theme[0]
-  File.open(dest_dir + name + '.external.css', 'w') { |f| f.puts (classes_chess_game + classes_chess_variant + classes_draughts_game + classes_draughts_variant + classes_xiangqi_game + classes_xiangqi_variant + classes_shogi_game + classes_shogi_variant).join("\n") }
+  ext = theme[1]
+  classes_xiangqi_game = xiangqi_colors.map { |color|
+    xiangqi_roles.map { |role|
+      piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
+      file = source_dir + 'xiangqi/' + name + '/' + piece + '.' + ext
+      File.open(file, 'r') do|image_file|
+        image = image_file.read
+        base64 = Base64.strict_encode64(image)
+        'xiangqi.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+      end
+    }
+  }.flatten
+  classes_xiangqi_variant = xiangqi_variants.map{ |variant|
+    xiangqi_colors.map { |color|
+      xiangqi_roles.map { |role|
+        piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
+        file = source_dir + 'xiangqi/' + name + '/' + piece + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'xiangqi-' + name + '.css', 'w') { |f| f.puts (classes_xiangqi_game + classes_xiangqi_variant).join("\n") }
+}
+# external SVG xiangqi
+xiangqi_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_xiangqi_game = xiangqi_colors.map { |color|
+    xiangqi_roles.map { |role|
+      piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
+      '.xiangqi.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+        "background-image:url('/assets/piece/" + 'xiangqi/' + name + "/" + piece + "." + ext + "')}"
+    }
+  }.flatten
+  classes_xiangqi_variant = xiangqi_variants.map { |variant|
+    xiangqi_colors.map { |color|
+      xiangqi_roles.map { |role|
+        piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
+        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+          "background-image:url('/assets/piece/" + 'xiangqi/' + name + "/" + piece + "." + ext + "')}"
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'xiangqi-' + name + '.external.css', 'w') { |f| f.puts (classes_xiangqi_game + classes_xiangqi_variant).join("\n") }
 }
