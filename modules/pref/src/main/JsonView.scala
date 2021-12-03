@@ -11,7 +11,12 @@ object JsonView {
       "bgImg"         -> p.bgImgOrDefault,
       "is3d"          -> p.is3d,
       "theme"         -> p.theme,
-      "pieceSet"      -> p.pieceSet,
+      //"pieceSet"      -> p.pieceSet,
+      "pieceSet"      -> p.pieceSet.map{ p => 
+                              Json.obj( p.gameFamily -> Json.obj(
+                                  "name" -> p.name,
+                                  "gameFamily" -> p.gameFamily, 
+                                  "displayPiece" -> p.displayPiece))},
       "theme3d"       -> p.theme3d,
       "pieceSet3d"    -> p.pieceSet3d,
       "soundSet"      -> p.soundSet,

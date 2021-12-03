@@ -14,7 +14,7 @@ interface PieceDimData {
   list: Piece[];
 }
 
-interface PieceFamilyData {
+interface GameFamilyData {
   chess: PieceDimData;
   draughts?: PieceDimData;
   loa?: PieceDimData;
@@ -23,13 +23,13 @@ interface PieceFamilyData {
 }
 
 export interface PieceData {
-  d2: PieceFamilyData;
-  d3: PieceFamilyData;
+  d2: GameFamilyData;
+  d3: GameFamilyData;
 }
 
 export interface PieceCtrl {
   dimension: () => keyof PieceData;
-  data: () => PieceFamilyData;
+  data: () => GameFamilyData;
   trans: Trans;
   set(t: Piece): void;
   open: Open;
@@ -53,7 +53,7 @@ export function ctrl(
     data: dimensionData,
     set(t: Piece) {
       const d = dimensionData();
-      const dgf = d[t.gameFamily as keyof PieceFamilyData] || d.chess;
+      const dgf = d[t.gameFamily as keyof GameFamilyData] || d.chess;
       dgf.current = t;
       applyPiece(t, dgf.list, dimension() === 'd3');
       xhr
@@ -73,13 +73,13 @@ export function view(ctrl: PieceCtrl): VNode {
   const d = ctrl.data();
   const selectedVariant = document.getElementById('variantForPiece') as HTMLInputElement;
   const sv = selectedVariant ? selectedVariant.value === 'LinesOfAction' ? 'loa' : selectedVariant.value.toLowerCase() : 'chess';
-  const dgf = d[sv as keyof PieceFamilyData] || d.chess;
+  const dgf = d[sv as keyof GameFamilyData] || d.chess;
   // console.log('d ', d);
   // console.log('dgf ', dgf);
 
   return h('div.sub.piece.' + ctrl.dimension(), [
     header(ctrl.trans.noarg('pieceSet'), () => ctrl.open('links')),
-    h('label', { attrs: { for: 'variantForPiece' } }, 'Variant: '),
+    h('label', { attrs: { for: 'variantForPiece' } }, 'Game Family: '),
     h(
       'select',
       { attrs: { id: 'variantForPiece' }, hook: bind('change', () => ctrl.redraw) },

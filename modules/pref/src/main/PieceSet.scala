@@ -2,7 +2,7 @@ package lila.pref
 import strategygames.{ GameFamily }
 
 sealed class PieceSet private[pref] (val name: String, 
-                                     val pieceFamily: String, 
+                                     val gameFamily: String, 
                                      val displayPiece: String) {
 
   override def toString = name

@@ -16,6 +16,7 @@ private object PrefHandlers {
         bgImg = r.strO("bgImg"),
         is3d = r.getD("is3d", Pref.default.is3d),
         theme = r.getD("theme", Pref.default.theme),
+        //pieceSet = r.getD("pieceSet", Pref.default.pieceSet),
         pieceSet = r.getD("pieceSet", Pref.default.pieceSet),
         theme3d = r.getD("theme3d", Pref.default.theme3d),
         pieceSet3d = r.getD("pieceSet3d", Pref.default.pieceSet3d),

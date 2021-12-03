@@ -88,48 +88,48 @@ final class Dasher(env: Env) extends LilaController(env) {
                 "piece" -> Json.obj(
                     "d2" -> Json.obj( 
                       "chess" -> Json.obj(
-                          "current" -> Json.obj("name" -> ctx.currentPieceSet.name,
+                          "current" -> Json.obj("name" -> ctx.currentPieceSet[0].name,
                                                 "gameFamily" -> "chess", 
                                                 "displayPiece" -> "wN"),
                           "list"    -> lila.pref.PieceSet.allOfFamily(GameFamily.Chess()).map( p =>
                                               Json.obj("name" -> p.name,
-                                                      "gameFamily" -> p.pieceFamily,
+                                                      "gameFamily" -> p.gameFamily,
                                                       "displayPiece" -> p.displayPiece 
                                                       ))),
                       "draughts" -> Json.obj(
-                          "current" -> Json.obj("name" -> ctx.currentPieceSet.name,
+                          "current" -> Json.obj("name" -> ctx.currentPieceSet[1].name,
                                                 "gameFamily" -> "draughts",
                                                 "displayPiece" -> "wM" ),
                           "list"    -> lila.pref.PieceSet.allOfFamily(GameFamily.Draughts()).map( p =>
                                               Json.obj("name" -> p.name,
-                                                      "gameFamily" -> p.pieceFamily,
+                                                      "gameFamily" -> p.gameFamily,
                                                       "displayPiece" -> p.displayPiece  
                                                       ))),
                       "loa" -> Json.obj(
-                          "current" -> Json.obj("name" -> ctx.currentPieceSet.name,
+                          "current" -> Json.obj("name" -> ctx.currentPieceSet[2].name,
                                                 "gameFamily" -> "loa",
                                                 "displayPiece" -> "wM" ),
                           "list"    -> lila.pref.PieceSet.allOfFamily(GameFamily.LinesOfAction()).map( p =>
                                               Json.obj("name" -> p.name,
-                                                      "gameFamily" -> p.pieceFamily,
+                                                      "gameFamily" -> p.gameFamily,
                                                       "displayPiece" -> p.displayPiece  
                                                       ))),
                       "xiangqi" -> Json.obj(
-                          "current" -> Json.obj("name" -> ctx.currentPieceSet.name,
+                          "current" -> Json.obj("name" -> ctx.currentPieceSet[3].name,
                                                 "gameFamily" -> "xiangqi",
                                                 "displayPiece" -> "RH" ),
                           "list"    -> lila.pref.PieceSet.allOfFamily(GameFamily.Xiangqi()).map( p =>
                                               Json.obj("name" -> p.name,
-                                                      "gameFamily" -> p.pieceFamily,
+                                                      "gameFamily" -> p.gameFamily,
                                                       "displayPiece" -> p.displayPiece  
                                                       ))),
                       "shogi" -> Json.obj(
-                          "current" -> Json.obj("name" -> ctx.currentPieceSet.name,
+                          "current" -> Json.obj("name" -> ctx.currentPieceSet[4].name,
                                                 "gameFamily" -> "shogi",
                                                 "displayPiece" -> "0KE" ),
                           "list"    -> lila.pref.PieceSet.allOfFamily(GameFamily.Shogi()).map( p =>
                                               Json.obj("name" -> p.name,
-                                                      "gameFamily" -> p.pieceFamily,
+                                                      "gameFamily" -> p.gameFamily,
                                                       "displayPiece" -> p.displayPiece  
                                                       )))
                     ),
