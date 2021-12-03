@@ -333,7 +333,7 @@ xiangqi_themes.map { |theme|
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        'xiangqi.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+        '.xiangqi.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
