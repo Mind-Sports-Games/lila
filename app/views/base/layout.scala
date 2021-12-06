@@ -39,8 +39,8 @@ object layout {
     }
     def pieceSprite(ps: lila.pref.PieceSet): Frag =
       link(
-        id := s"piece-sprite-${ps.gameFamily}",
-        href := assetUrl(s"piece-css/${ps.gameFamily}-${ps.name}.css"),
+        id := s"piece-sprite-${ps.gameFamilyName}",
+        href := assetUrl(s"piece-css/${ps.gameFamilyName}-${ps.name}.css"),
         rel := "stylesheet"
       )
   }

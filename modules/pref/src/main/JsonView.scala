@@ -14,8 +14,7 @@ object JsonView {
       //"pieceSet"      -> p.pieceSet,
       "pieceSet"      -> p.pieceSet.map{ p => Json.obj( 
                                   "name" -> p.name,
-                                  "gameFamily" -> p.gameFamily, 
-                                  "displayPiece" -> p.displayPiece)},
+                                  "gameFamily" -> p.gameFamily)},
       "theme3d"       -> p.theme3d,
       "pieceSet3d"    -> p.pieceSet3d,
       "soundSet"      -> p.soundSet,
