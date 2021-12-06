@@ -45,8 +45,10 @@ object BSON extends Handlers {
       doc.getAsOpt[A](k) getOrElse zero.zero
     def getD[A: BSONReader](k: String, default: => A): A =
       doc.getAsOpt[A](k) getOrElse default
-    def getsD[A: BSONReader](k: String) =
+    def getsD[A: BSONReader](k: String): List[A] =
       doc.getAsOpt[List[A]](k) getOrElse Nil
+    def getsO[A: BSONReader](k: String): Option[List[A]] =
+      doc.getAsOpt[List[A]](k)
 
     def str(k: String)                         = get[String](k)(BSONStringHandler)
     def strO(k: String)                        = getO[String](k)(BSONStringHandler)

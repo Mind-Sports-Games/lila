@@ -9,7 +9,11 @@ sealed class PieceSet private[pref] (val name: String,
 
   def cssClass = name
 
+  def gameFamilyName = PieceSet.gamePieceSet(gameFamily).gameFamilyName
+  
+  def displayPiece = PieceSet.gamePieceSet(gameFamily).displayPiece
 }
+
 
 sealed trait PieceSetObject {
 
@@ -43,6 +47,15 @@ object PieceSet extends PieceSetObject {
                       XiangqiPieceSet.default
                      )                   
 
+  def updatePieceSet(currentPieceSets : List[PieceSet], theme: String) : List[PieceSet] = {
+    val newPieceSet = apply(theme)
+    currentPieceSets.map{ x => 
+                            x.gameFamily match {
+                                case newPieceSet.gameFamily => newPieceSet
+                                case _ => x
+                            } 
+                        }
+  }
   val all = ChessPieceSet.all ::: DraughtsPieceSet.all ::: LinesOfActionPieceSet.all ::: XiangqiPieceSet.all ::: ShogiPieceSet.all
   def allOfFamily(gf: GameFamily) : List[PieceSet] = gf match{
       case GameFamily.Chess() => ChessPieceSet.all
@@ -51,6 +64,14 @@ object PieceSet extends PieceSetObject {
       case GameFamily.Shogi() => ShogiPieceSet.all
       case GameFamily.Xiangqi() => XiangqiPieceSet.all
       case _ => List[PieceSet]()
+  }
+
+  def gamePieceSet(gameFamily:Int): PieceSetObject = gameFamily match {
+      case 1 => DraughtsPieceSet
+      case 2 => LinesOfActionPieceSet
+      case 3 => XiangqiPieceSet
+      case 4 => ShogiPieceSet
+      case _ => ChessPieceSet
   }
 }
 
