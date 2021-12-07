@@ -72,17 +72,6 @@ case class Pref(
         Theme.allByName get value map { t =>
           copy(theme = t.name)
         }
-      // case "pieceSet" =>
-      //   PieceSet.allByName get value.pp("set value") map { p =>
-      //     //copy(pieceSet = p.name)
-      //     val newPieceSet = pieceSet.map{ x => 
-      //                                       x.gameFamily match {
-      //                                          case p.gameFamily =>  p
-      //                                          case _ => x
-      //                                       } 
-      //                                   }
-      //     copy(pieceSet = newPieceSet)
-      //   }
       case "pieceSet" =>
           copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value.pp("set value"))).some
       case "theme3d" =>
