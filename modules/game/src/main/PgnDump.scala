@@ -210,7 +210,7 @@ final class PgnDump(
                 case Created | Started                             => "Unterminated"
                 case Aborted | NoStart                             => "Abandoned"
                 case Timeout | Outoftime                           => "Time forfeit"
-                case Resign | Draw | Stalemate | Mate | VariantEnd => "Normal"
+                case Resign | Draw | Stalemate | Mate | PerpetualCheck | VariantEnd => "Normal"
                 case Cheat                                         => "Rules infraction"
                 case UnknownFinish                                 => "Unknown"
               }

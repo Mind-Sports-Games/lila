@@ -48,14 +48,17 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       else game.variant.gameLogic.name.toLowerCase()
     import strategygames.Status._
     val result = (game.winner, game.loser, game.status, game.variant.gameLogic) match {
-      case (Some(w), _, Mate, GameLogic.Chess())               => s"${playerText(w)} won by checkmate"
-      case (Some(w), _, Mate, _)                               => s"${playerText(w)} won"
-      case (_, Some(l), Resign | Timeout | Cheat | NoStart, _) => s"${playerText(l)} resigned"
-      case (_, Some(l), Outoftime, _)                          => s"${playerText(l)} forfeits by time"
-      case (Some(w), _, UnknownFinish, _)                      => s"${playerText(w)} won"
-      case (_, _, Draw | Stalemate | UnknownFinish, _)         => "Game is a draw"
-      case (_, _, Aborted, _)                                  => "Game has been aborted"
-      case (_, _, VariantEnd, _)                               => game.variant.title.dropRight(1)
+      case (Some(w), _, Mate, GameLogic.Chess() | GameLogic.FairySF()) =>
+        s"${playerText(w)} won by checkmate"
+      case (Some(w), _, Mate | PerpetualCheck, _) =>
+        s"${playerText(w)} won by opponent perpetually checking"
+      case (_, Some(l), Resign | Timeout | Cheat | NoStart, _) =>
+        s"${playerText(l)} resigned"
+      case (_, Some(l), Outoftime, _)                  => s"${playerText(l)} forfeits by time"
+      case (Some(w), _, UnknownFinish, _)              => s"${playerText(w)} won"
+      case (_, _, Draw | Stalemate | UnknownFinish, _) => "Game is a draw"
+      case (_, _, Aborted, _)                          => "Game has been aborted"
+      case (_, _, VariantEnd, _)                       => game.variant.title.dropRight(1)
       case _ => "Game is still being played"
     }
     val moves = s"${game.chess.fullMoveNumber} moves"
@@ -162,9 +165,10 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     game.status match {
       case S.Aborted => trans.gameAborted.txt()
       case S.Mate    => game.variant.gameLogic match {
-        case GameLogic.Chess() => trans.checkmate.txt()
-        case _               => ""
+        case GameLogic.Chess() | GameLogic.FairySF() => trans.checkmate.txt()
+        case _                                       => ""
       }
+      case S.PerpetualCheck => trans.perpetualCheck.txt()
       case S.Resign =>
         game.loser match {
           case Some(p) if p.color.white => trans.whiteResigned.txt()
