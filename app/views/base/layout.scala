@@ -31,11 +31,7 @@ object layout {
         s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
     def pieceSprite(implicit ctx: Context): Frag = {
-      //TODO change ctx to load all the defaults set from user profile/database/cookies
-      // for now jsut use the current default to set it up. 
-      //pieceSprite(ctx.currentPieceSet)
-      ctx.currentPieceSet.map(ps => layout.bits.pieceSprite(ps))
-      //lila.pref.PieceSet.defaults.map(ps => layout.bits.pieceSprite(ps))
+      ctx.currentPieceSet.map(ps => pieceSprite(ps))
     }
     def pieceSprite(ps: lila.pref.PieceSet): Frag =
       link(

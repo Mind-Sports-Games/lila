@@ -17,32 +17,22 @@ object RequestPref {
       queryParam(req, name) orElse req.session.get(name)
     
     def updateSessionWithParam(name: String): Option[List[PieceSet]] = {
-      // req.session.get(name).pp("req") match {
-      //   case Some(ps) =>
-      //       queryParam(req, name).pp("query") match {
-      //           case Some(v) => PieceSet.updatePieceSet(ps, v.pp("update value")).some
-      //           case _ => None
-      //           }
-      //    case _ => None
-      //  }
-
-      req.session.get(name).pp("req") match {
+      //I dont think these prefs are stored in the session data, so its always using default?
+      req.session.get(name) match {
         case Some(_) =>
-            queryParam(req, name).pp("query") match {
+            queryParam(req, name) match {
                 case Some(_) => default.pieceSet.some
+                //case Some(v) => PieceSet.updatePieceSet(ps, v.pp("update value")).some
                 case _ => None
                 }
          case _ => None
        }
-      
     }
 
     default.copy(
       bg = paramOrSession("bg").flatMap(Pref.Bg.fromString.get) | default.bg,
       theme = paramOrSession("theme") | default.theme,
       theme3d = paramOrSession("theme3d") | default.theme3d,
-      //pieceSet = paramOrSession("pieceSet") | default.pieceSet,
-      //pieceSet = default.pieceSet,
       pieceSet = updateSessionWithParam("pieceSet") | default.pieceSet,
       pieceSet3d = paramOrSession("pieceSet3d") | default.pieceSet3d,
       soundSet = paramOrSession("soundSet") | default.soundSet,

@@ -73,7 +73,7 @@ case class Pref(
           copy(theme = t.name)
         }
       case "pieceSet" =>
-          copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value.pp("set value"))).some
+          copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
         Theme3d.allByName get value map { t =>
           copy(theme3d = t.name)
