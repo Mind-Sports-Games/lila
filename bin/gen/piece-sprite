@@ -42,7 +42,7 @@ draughts_themes = [
   ['wide_crown', 'svg']
 ]
 loa_themes = [
-  ['wide_crown', 'svg']
+  ['wide', 'svg']
 ]
 shogi_themes = [
   ['2kanji', 'svg'],

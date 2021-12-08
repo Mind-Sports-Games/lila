@@ -121,7 +121,7 @@ object DraughtsPieceSet extends PieceSetObject {
 }
 
 object LinesOfActionPieceSet extends PieceSetObject {
-  val default = new PieceSet("wide_crown", 2)
+  val default = new PieceSet("wide", 2)
   val displayPiece = "wL"
   val gameFamilyName = "loa"
   val all = List(default)
