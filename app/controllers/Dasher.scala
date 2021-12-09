@@ -94,7 +94,7 @@ final class Dasher(env: Env) extends LilaController(env) {
                                             Json.obj("name" -> p.name,
                                                     "gameFamily" -> p.gameFamilyName,
                                                     "displayPiece" -> p.displayPiece 
-                                                    )))
+                                                    ))).pp("dasher data")
                     },
                     "d3" -> List (Json.obj(
                         "current" -> Json.obj("name" -> ctx.currentPieceSet3d.name,

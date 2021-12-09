@@ -7,6 +7,9 @@ import scala.concurrent.duration._
 import lila.db.dsl._
 import lila.memo.CacheApi._
 import lila.user.User
+import play.api.libs.json._
+import lila.pref.JsonView._
+
 
 final class PrefApi(
     coll: Coll,
@@ -78,6 +81,13 @@ final class PrefApi(
   def setPrefString(user: User, name: String, value: String): Funit =
     getPref(user) map { _.set(name, value) } orFail
       s"Bad pref ${user.id} $name -> $value" flatMap setPref
+
+  def updatePrefPieceSet(user: User, gameFamily: String, value: String): Fu[String] =
+    getPref(user) map { _.set("pieceSet", value) } orFail
+      s"Bad pref ${user.id} pieceSet -> $value" flatMap (pref => {
+            setPref(pref) inject (Json.toJson(pref.pieceSet).toString)
+          })
+      
 
   def setBot(user: User): Funit =
     setPref(

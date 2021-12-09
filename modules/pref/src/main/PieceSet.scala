@@ -1,6 +1,8 @@
 package lila.pref
 import strategygames.{ GameFamily }
 
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 sealed class PieceSet private[pref] (val name: String, 
                                      val gameFamily: Int) {
@@ -28,7 +30,11 @@ sealed trait PieceSetObject {
     c.name -> c
   } toMap
 
-  def apply(name: String) = allByName.getOrElse(name, default)
+  //def apply(name: String) = allByName.getOrElse(name, default)
+  def applyThemeOnly(name: String) = allByName.getOrElse(name, default)
+
+  def apply(name: String, gameFamily: Int = 0) = new PieceSet(name, gameFamily)
+  def unapply(full: PieceSet): Some[(String, Int)] = Some((full.name, full.gameFamily))
 
   def contains(name: String) = allByName contains name
 
@@ -48,7 +54,7 @@ object PieceSet extends PieceSetObject {
                      )                   
 
   def updatePieceSet(currentPieceSets : List[PieceSet], theme: String) : List[PieceSet] = {
-    val newPieceSet = apply(theme)
+    val newPieceSet = applyThemeOnly(theme)
     currentPieceSets.map{ x => 
                             x.gameFamily match {
                                 case newPieceSet.gameFamily => newPieceSet
@@ -56,6 +62,7 @@ object PieceSet extends PieceSetObject {
                             } 
                         }
   }
+
   val all = ChessPieceSet.all ::: DraughtsPieceSet.all ::: LinesOfActionPieceSet.all ::: XiangqiPieceSet.all ::: ShogiPieceSet.all
   def allOfFamily(gf: GameFamily) : List[PieceSet] = gf match{
       case GameFamily.Chess() => ChessPieceSet.all
@@ -69,8 +76,8 @@ object PieceSet extends PieceSetObject {
   def gamePieceSet(gameFamily:Int): PieceSetObject = gameFamily match {
       case 1 => DraughtsPieceSet
       case 2 => LinesOfActionPieceSet
-      case 3 => XiangqiPieceSet
-      case 4 => ShogiPieceSet
+      case 3 => ShogiPieceSet
+      case 4 => XiangqiPieceSet
       case _ => ChessPieceSet
   }
 }
@@ -127,30 +134,29 @@ object LinesOfActionPieceSet extends PieceSetObject {
   val all = List(default)
 }
 
-object XiangqiPieceSet extends PieceSetObject {
-  val default = new PieceSet("2dhanzi", 3)
-  val displayPiece = "RH"
-  val gameFamilyName = "xiangqi"
-  val all = List(
-    default.name,
-    "ka"
-  ) map { name =>
-    new PieceSet(name, 3)
-  }
-}
-
 object ShogiPieceSet extends PieceSetObject {
-  val default = new PieceSet("2kanji", 4)
+  val default = new PieceSet("2kanji", 3)
   val displayPiece = "0KE"
   val gameFamilyName = "shogi"
   val all = List(
     default.name,
     "ctw"
   ) map { name =>
-    new PieceSet(name, 4)
+    new PieceSet(name, 3)
   }
 }
 
+object XiangqiPieceSet extends PieceSetObject {
+  val default = new PieceSet("2dhanzi", 4)
+  val displayPiece = "RH"
+  val gameFamilyName = "xiangqi"
+  val all = List(
+    default.name,
+    "ka"
+  ) map { name =>
+    new PieceSet(name, 4)
+  }
+}
 
 object PieceSet3d extends PieceSetObject {
 

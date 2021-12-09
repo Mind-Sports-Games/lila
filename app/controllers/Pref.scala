@@ -5,6 +5,11 @@ import play.api.mvc._
 import lila.api.Context
 import lila.app._
 import views._
+import lila.pref.PieceSet
+import lila.pref.JsonView._
+import scala.concurrent.{Future}
+
+import play.api.libs.json._
 
 final class Pref(env: Env) extends LilaController(env) {
 
@@ -65,9 +70,18 @@ final class Pref(env: Env) extends LilaController(env) {
       }
     }
 
+  def updatePieceSet(gameFamily: String) =
+    OpenBody { implicit ctx =>
+      implicit val req = ctx.body
+        FormResult(forms.pieceSet) { v =>
+          updatePieceSetForFamily(gameFamily, v, ctx) map { cookie =>
+            Ok(()).withCookies(cookie)
+          }
+        }
+    }
+
   private lazy val setters = Map(
     "theme"      -> (forms.theme      -> save("theme") _),
-    "pieceSet"   -> (forms.pieceSet   -> save("pieceSet") _),
     "theme3d"    -> (forms.theme3d    -> save("theme3d") _),
     "pieceSet3d" -> (forms.pieceSet3d -> save("pieceSet3d") _),
     "soundSet"   -> (forms.soundSet   -> save("soundSet") _),
@@ -76,9 +90,20 @@ final class Pref(env: Env) extends LilaController(env) {
     "is3d"       -> (forms.is3d       -> save("is3d") _),
     "zen"        -> (forms.zen        -> save("zen") _)
   )
+  
+  private def updatePieceSetForFamily(gameFamily: String, value: String, ctx: Context): Fu[Cookie] =
+    ctx.me match {
+      case Some(u) => api.updatePrefPieceSet(u, gameFamily, value).map( j => env.lilaCookie.session("pieceSet", j)(ctx.req))
+      case _ => //get PieceSet pref from session and update the cookie
+          val currentPS = ctx.req.session.get("pieceSet").pp("pieceSet").fold(PieceSet.defaults)(p => Json.parse(p).validate(pieceSetsRead).get)
+          val newPS = PieceSet.updatePieceSet(currentPS, value)
+          val j = Json.toJson(newPS).toString
+          fuccess(env.lilaCookie.session("pieceSet", j)(ctx.req)).pp("lilaCookie")
+    } 
 
+  
   private def save(name: String)(value: String, ctx: Context): Fu[Cookie] =
     ctx.me ?? {
-      api.setPrefString(_, name, value)
-    } inject env.lilaCookie.session(name, value)(ctx.req)
+      api.setPrefString(_, name.pp("name"), value.pp("value"))
+    } inject env.lilaCookie.session(name, value)(ctx.req).pp("lilaCookie")
 }

@@ -66,7 +66,7 @@ export function readFen(fen: string, ranks: number, files: number) {
 
 export function parseUci(uci: string, files: number, ranks: number): ParsedMove {
   //account for ranks going up to 10, files are just a letter
-  const reg = (uci.match(/[a-zA-Z][1-9@]0?/g) as string[]);
+  const reg = uci.match(/[a-zA-Z][1-9@]0?/g) as string[];
   return {
     orig: parseUCISquareToUSI(reg[0], files, ranks)!,
     dest: parseUCISquareToUSI(reg[1], files, ranks)!,
@@ -88,7 +88,6 @@ function shogiNotation(move: ExtendedMoveInfo, variant: Variant): string {
     prevrole = prevBoard.pieces[parsed.orig],
     dest = parsed.dest,
     connector = isCapture(prevBoard, board) ? 'x' : isDrop(prevBoard, board) ? '*' : '-';
-  console.log("board.pieces: " , board.pieces , "dest: " , dest)
   const role = board.pieces[dest],
     piece = role[0] === '+' ? role[0] + role[1].toUpperCase() : role[0].toUpperCase(),
     origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '', //ToDo ideally calculate this from SAN or in Chessops as currently doesn't include illegal moves like piece being pinned or obstruction

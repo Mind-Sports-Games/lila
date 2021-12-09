@@ -51,7 +51,7 @@ case class Pref(
   def id = _id
 
   def realTheme      = Theme(theme)
-  //def realPieceSet   = PieceSet(pieceSet)
+  def realPieceSet   = pieceSet
   def realTheme3d    = Theme3d(theme3d)
   def realPieceSet3d = PieceSet3d(pieceSet3d)
 
@@ -73,7 +73,7 @@ case class Pref(
           copy(theme = t.name)
         }
       case "pieceSet" =>
-          copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
+          copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value.pp("value in set"))).some
       case "theme3d" =>
         Theme3d.allByName get value map { t =>
           copy(theme3d = t.name)

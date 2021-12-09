@@ -49,7 +49,7 @@ export function ctrl(
       dgf.current = t;
       applyPiece(t, dgf.list, dimension() === 'd3');
       xhr
-        .text('/pref/pieceSet' + (dimension() === 'd3' ? '3d' : ''), {
+        .text('/pref/pieceSet' + (dimension() === 'd3' ? '3d' : '') + `/${t.gameFamily}`, {
           body: xhr.form({ set: t.name }),
           method: 'post',
         })
@@ -64,7 +64,11 @@ export function ctrl(
 export function view(ctrl: PieceCtrl): VNode {
   const d = ctrl.data();
   const selectedVariant = document.getElementById('variantForPiece') as HTMLInputElement;
-  const sv = selectedVariant ? selectedVariant.value === 'LinesOfAction' ? 'loa' : selectedVariant.value.toLowerCase() : 'chess';
+  const sv = selectedVariant
+    ? selectedVariant.value === 'LinesOfAction'
+      ? 'loa'
+      : selectedVariant.value.toLowerCase()
+    : 'chess';
   const dgf = d.filter(p => p.current.gameFamily === sv)[0];
 
   return h('div.sub.piece.' + ctrl.dimension(), [
@@ -72,27 +76,27 @@ export function view(ctrl: PieceCtrl): VNode {
     h('label', { attrs: { for: 'variantForPiece' } }, 'Game Family: '),
     h(
       'select',
-      { attrs: { id: 'variantForPiece' }},
+      { attrs: { id: 'variantForPiece' } },
       variants.map(v => variantOption(v))
     ),
     pieceList(d, dgf, ctrl),
   ]);
 }
 
-const variants = ['Chess', 'Draughts', 'LinesOfAction', 'Shogi', 'Xiangqi'];
+const variants = ['Chess', 'Draughts', 'LinesOfAction', 'Xiangqi', 'Shogi'];
 
 function variantOption(v: string) {
   return h('option', { attrs: { title: v } }, v);
 }
 
-function pieceList(d:PieceDimData[], dgf: PieceDimData, ctrl:PieceCtrl):VNode {
-  var allPieceSets = d.map(x => x.list).reduce((a, v) => a.concat(v), []);
-  var currentPieceSets = d.map(x => x.current)
+function pieceList(d: PieceDimData[], dgf: PieceDimData, ctrl: PieceCtrl): VNode {
+  const allPieceSets = d.map(x => x.list).reduce((a, v) => a.concat(v), []);
+  const currentPieceSets = d.map(x => x.current);
   return h(
     'div.list',
-    { attrs: { id: 'pieceListDiv' }},
-    allPieceSets.map(pieceView(currentPieceSets, dgf.list, ctrl.set, ctrl.dimension() == 'd3')),
-  )
+    { attrs: { id: 'pieceListDiv' } },
+    allPieceSets.map(pieceView(currentPieceSets, dgf.list, ctrl.set, ctrl.dimension() == 'd3'))
+  );
 }
 
 function pieceImage(t: Piece, is3d: boolean) {
@@ -103,18 +107,15 @@ function pieceImage(t: Piece, is3d: boolean) {
   return `piece/${t.gameFamily.toLowerCase()}/${t.name}/${t.displayPiece}.svg`;
 }
 
-function isActivePiece(t: Piece, current: Piece[]): boolean{
-  //not sure why current.includes(t) doesn't work for the inital load of page and therefore doesn't highlight active pieces 
-  var found = false
+function isActivePiece(t: Piece, current: Piece[]): boolean {
+  //not sure why current.includes(t) doesn't work for the inital load of page and therefore doesn't highlight active pieces
+  let found = false;
   current.forEach(p => {
-    if (p &&
-        p.name === t.name && 
-        p.gameFamily === t.gameFamily &&
-        p.displayPiece === t.displayPiece){
-       found = true 
+    if (p && p.name === t.name && p.gameFamily === t.gameFamily && p.displayPiece === t.displayPiece) {
+      found = true;
     }
-  })
-  return found
+  });
+  return found;
 }
 
 function pieceView(current: Piece[], displayedPieces: Piece[], set: (t: Piece) => void, is3d: boolean) {
@@ -124,8 +125,7 @@ function pieceView(current: Piece[], displayedPieces: Piece[], set: (t: Piece) =
       {
         attrs: { title: t.name },
         hook: bind('click', () => set(t)),
-        class: { active: isActivePiece(t, current),
-                 hidden: !displayedPieces.includes(t)},
+        class: { active: isActivePiece(t, current), hidden: !displayedPieces.includes(t) },
       },
       [
         h('piece', {

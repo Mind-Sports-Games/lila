@@ -1,6 +1,8 @@
 package lila.pref
 
 import play.api.mvc.RequestHeader
+import play.api.libs.json._
+import lila.pref.JsonView.pieceSetsRead
 
 object RequestPref {
 
@@ -17,17 +19,13 @@ object RequestPref {
       queryParam(req, name) orElse req.session.get(name)
     
     def updateSessionWithParam(name: String): Option[List[PieceSet]] = {
-      //I dont think these prefs are stored in the session data, so its always using default?
-      req.session.get(name) match {
-        case Some(_) =>
-            queryParam(req, name) match {
-                case Some(_) => default.pieceSet.some
-                //case Some(v) => PieceSet.updatePieceSet(ps, v.pp("update value")).some
-                case _ => None
-                }
-         case _ => None
-       }
-    }
+      //Session data is only used for guests it would seem...
+      req.session.pp("session").get(name.pp("pref name")).pp("name value")
+        .map(Json.parse)
+        .flatMap(_.validate(pieceSetsRead).asOpt)
+        .map{ps => queryParam(req, name).pp("query param") 
+                  .fold(ps)(p2 => PieceSet.updatePieceSet(ps, p2.pp("update 2 value")))
+    }}
 
     default.copy(
       bg = paramOrSession("bg").flatMap(Pref.Bg.fromString.get) | default.bg,
