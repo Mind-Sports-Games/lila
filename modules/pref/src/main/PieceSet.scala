@@ -30,10 +30,9 @@ sealed trait PieceSetObject {
     c.name -> c
   } toMap
 
-  //def apply(name: String) = allByName.getOrElse(name, default)
   def applyThemeOnly(name: String) = allByName.getOrElse(name, default)
 
-  def apply(name: String, gameFamily: Int = 0) = new PieceSet(name, gameFamily)
+  def apply(name: String, gameFamily: Int) = new PieceSet(name, gameFamily)
   def unapply(full: PieceSet): Some[(String, Int)] = Some((full.name, full.gameFamily))
 
   def contains(name: String) = allByName contains name

@@ -95,15 +95,14 @@ final class Pref(env: Env) extends LilaController(env) {
     ctx.me match {
       case Some(u) => api.updatePrefPieceSet(u, gameFamily, value).map( j => env.lilaCookie.session("pieceSet", j)(ctx.req))
       case _ => //get PieceSet pref from session and update the cookie
-          val currentPS = ctx.req.session.get("pieceSet").pp("pieceSet").fold(PieceSet.defaults)(p => Json.parse(p).validate(pieceSetsRead).get)
+          val currentPS = ctx.req.session.get("pieceSet").fold(PieceSet.defaults)(p => Json.parse(p).validate(pieceSetsRead).get)
           val newPS = PieceSet.updatePieceSet(currentPS, value)
           val j = Json.toJson(newPS).toString
-          fuccess(env.lilaCookie.session("pieceSet", j)(ctx.req)).pp("lilaCookie")
+          fuccess(env.lilaCookie.session("pieceSet", j)(ctx.req))
     } 
-
   
   private def save(name: String)(value: String, ctx: Context): Fu[Cookie] =
     ctx.me ?? {
-      api.setPrefString(_, name.pp("name"), value.pp("value"))
-    } inject env.lilaCookie.session(name, value)(ctx.req).pp("lilaCookie")
+      api.setPrefString(_, name, value)
+    } inject env.lilaCookie.session(name, value)(ctx.req)
 }

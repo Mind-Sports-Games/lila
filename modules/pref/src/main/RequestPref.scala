@@ -20,11 +20,11 @@ object RequestPref {
     
     def updateSessionWithParam(name: String): Option[List[PieceSet]] = {
       //Session data is only used for guests it would seem...
-      req.session.pp("session").get(name.pp("pref name")).pp("name value")
+      req.session.get(name)
         .map(Json.parse)
         .flatMap(_.validate(pieceSetsRead).asOpt)
-        .map{ps => queryParam(req, name).pp("query param") 
-                  .fold(ps)(p2 => PieceSet.updatePieceSet(ps, p2.pp("update 2 value")))
+        .map{ps => queryParam(req, name)
+                  .fold(ps)(v => PieceSet.updatePieceSet(ps, v))
     }}
 
     default.copy(

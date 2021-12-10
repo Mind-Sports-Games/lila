@@ -73,7 +73,7 @@ case class Pref(
           copy(theme = t.name)
         }
       case "pieceSet" =>
-          copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value.pp("value in set"))).some
+          copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
         Theme3d.allByName get value map { t =>
           copy(theme3d = t.name)
@@ -122,7 +122,7 @@ case class Pref(
   // atob("aHR0cDovL2NoZXNzLWNoZWF0LmNvbS9ob3dfdG9fY2hlYXRfYXRfbGljaGVzcy5odG1s")
   def botCompatible =
     theme == "brown" &&
-      pieceSet == "cburnett" &&
+      pieceSet == PieceSet.defaults &&
       is2d &&
       animation == Animation.NONE &&
       highlight &&
