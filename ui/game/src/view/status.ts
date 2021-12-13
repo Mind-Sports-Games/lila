@@ -14,6 +14,8 @@ export default function status(ctrl: Ctrl): string {
           return noarg('checkmate');
         case 1:
           return '';
+        case 2:
+          return noarg('checkmate');
       }
       return '';
     case 'resign':
@@ -38,6 +40,8 @@ export default function status(ctrl: Ctrl): string {
       return (d.game.winner == 'white' ? 'Black' : 'White') + " didn't move";
     case 'cheat':
       return noarg('cheatDetected');
+    case 'perpetualCheck':
+      return noarg('perpetualCheck');
     case 'variantEnd':
       switch (d.game.variant.key) {
         case 'kingOfTheHill':
