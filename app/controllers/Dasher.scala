@@ -86,23 +86,23 @@ final class Dasher(env: Env) extends LilaController(env) {
                   )
                 ),
                 "piece" -> Json.obj(
-                   "d2" -> GameFamily.all.map{ gf => Json.obj(
-                        "current" -> Json.obj("name" -> ctx.currentPieceSet.name,
+                    "d2" -> GameFamily.all.map{ gf => Json.obj(
+                        "current" -> Json.obj("name" -> ctx.currentPieceSet(gf.id).name,
                                               "gameFamily" -> gf.shortName.toLowerCase(), 
-                                              "displayPiece" -> "wN"),
+                                              "displayPiece" -> ctx.currentPieceSet(gf.id).displayPiece),
                         "list"    -> lila.pref.PieceSet.allOfFamily(gf).map( p =>
                                             Json.obj("name" -> p.name,
-                                                    "gameFamily" -> p.pieceFamily,
+                                                    "gameFamily" -> p.gameFamilyName,
                                                     "displayPiece" -> p.displayPiece 
                                                     )))
                     },
-                    "d3" -> List(Json.obj(
+                    "d3" -> List (Json.obj(
                         "current" -> Json.obj("name" -> ctx.currentPieceSet3d.name,
                                               "gameFamily" -> "chess",
                                                "displayPiece" -> "wN"),
                         "list"    -> lila.pref.PieceSet3d.all.map( p => 
                                             Json.obj("name" -> p.name,
-                                                    "gameFamily" -> "chess",
+                                                    "gameFamily" -> p.gameFamilyName,
                                                     "displayPiece" -> p.displayPiece 
                                                     ))
                       ))

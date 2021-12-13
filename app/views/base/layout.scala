@@ -31,15 +31,12 @@ object layout {
         s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
     def pieceSprite(implicit ctx: Context): Frag = {
-      //TODO change ctx to load all the defaults set from user profile/database
-      // for now jsut use the current default to set it up. 
-      //pieceSprite(ctx.currentPieceSet)
-      lila.pref.PieceSet.defaults.map(ps => layout.bits.pieceSprite(ps))
+      ctx.currentPieceSet.map(ps => pieceSprite(ps))
     }
     def pieceSprite(ps: lila.pref.PieceSet): Frag =
       link(
-        id := s"piece-sprite-${ps.pieceFamily}",
-        href := assetUrl(s"piece-css/${ps.pieceFamily}-${ps.name}.css"),
+        id := s"piece-sprite-${ps.gameFamilyName}",
+        href := assetUrl(s"piece-css/${ps.gameFamilyName}-${ps.name}.css"),
         rel := "stylesheet"
       )
   }

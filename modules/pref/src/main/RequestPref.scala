@@ -1,6 +1,8 @@
 package lila.pref
 
 import play.api.mvc.RequestHeader
+import play.api.libs.json._
+import lila.pref.JsonView.pieceSetsRead
 
 object RequestPref {
 
@@ -15,12 +17,21 @@ object RequestPref {
 
     def paramOrSession(name: String): Option[String] =
       queryParam(req, name) orElse req.session.get(name)
+    
+    def updateSessionWithParam(name: String): Option[List[PieceSet]] = {
+      //Session data is only used for guests it would seem...
+      req.session.get(name)
+        .map(Json.parse)
+        .flatMap(_.validate(pieceSetsRead).asOpt)
+        .map{ps => queryParam(req, name)
+                  .fold(ps)(v => PieceSet.updatePieceSet(ps, v))
+    }}
 
     default.copy(
       bg = paramOrSession("bg").flatMap(Pref.Bg.fromString.get) | default.bg,
       theme = paramOrSession("theme") | default.theme,
       theme3d = paramOrSession("theme3d") | default.theme3d,
-      pieceSet = paramOrSession("pieceSet") | default.pieceSet,
+      pieceSet = updateSessionWithParam("pieceSet") | default.pieceSet,
       pieceSet3d = paramOrSession("pieceSet3d") | default.pieceSet3d,
       soundSet = paramOrSession("soundSet") | default.soundSet,
       bgImg = paramOrSession("bgImg"),
