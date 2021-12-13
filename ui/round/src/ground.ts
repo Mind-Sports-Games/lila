@@ -10,6 +10,7 @@ import * as util from './util';
 import { plyStep } from './round';
 import RoundController from './ctrl';
 import { RoundData } from './interfaces';
+import * as chessUtil from 'chess';
 
 export function makeConfig(ctrl: RoundController): Config {
   const data = ctrl.data,
@@ -73,6 +74,7 @@ export function makeConfig(ctrl: RoundController): Config {
     },
     dropmode: {
       showDropDests: true,
+      dropDests: playing ? chessUtil.readDropsByRole(data.possibleDropsByRole) : new Map(),
     },
     draggable: {
       enabled: data.pref.moveEvent !== Prefs.MoveEvent.Click,
