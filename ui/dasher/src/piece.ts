@@ -83,7 +83,7 @@ export function view(ctrl: PieceCtrl): VNode {
   ]);
 }
 
-const variants = ['Chess', 'Draughts', 'LinesOfAction', 'Xiangqi', 'Shogi'];
+const variants = ['Chess', 'Draughts', 'LinesOfAction', 'Shogi', 'Xiangqi'];
 
 function variantOption(v: string) {
   return h('option', { attrs: { title: v } }, v);

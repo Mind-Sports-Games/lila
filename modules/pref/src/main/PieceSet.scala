@@ -121,16 +121,28 @@ object ChessPieceSet extends PieceSetObject {
 
 object DraughtsPieceSet extends PieceSetObject {
   val default = new PieceSet("wide_crown", 1)
-  val displayPiece = "wM"
+  val displayPiece = "wK"
   val gameFamilyName = "draughts"
-  val all = List(default)
+  val all = List(
+    default.name,
+    "fabirovsky",
+    "check_yb"
+  ) map { name =>
+    new PieceSet(name, 1)
+  }
 }
 
 object LinesOfActionPieceSet extends PieceSetObject {
-  val default = new PieceSet("wide", 2)
+  val default = new PieceSet("fabirovsky_loa", 2)
   val displayPiece = "wL"
   val gameFamilyName = "loa"
-  val all = List(default)
+  val all = List(
+    default.name,
+    "check_yb_loa",
+    "wide"
+  ) map { name =>
+    new PieceSet(name, 2)
+  }
 }
 
 object ShogiPieceSet extends PieceSetObject {

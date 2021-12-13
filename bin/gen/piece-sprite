@@ -39,10 +39,14 @@ chess_themes = [
   ['horsey', 'svg']
 ]
 draughts_themes = [
-  ['wide_crown', 'svg']
+  ['wide_crown', 'svg'],
+  ['fabirovsky','svg'],
+  ['check_yb', 'png']
 ]
 loa_themes = [
-  ['wide', 'svg']
+  ['wide', 'svg'],
+  ['fabirovsky_loa', 'svg'],
+  ['check_yb_loa','png']
 ]
 shogi_themes = [
   ['2kanji', 'svg'],
@@ -185,7 +189,7 @@ draughts_themes.map { |theme|
   classes_draughts_game = colors.map { |color|
     draughts_roles.map { |role|
       piece = color[0] + role.upcase[0]
-      '.draughts.is2d .' + role + '.' + color[0] + ' {' +
+      '.draughts.is2d .' + role + '.' + color + ' {' +
         "background-image:url('/assets/piece/" + 'draughts/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
@@ -193,7 +197,7 @@ draughts_themes.map { |theme|
     colors.map { |color|
       draughts_roles.map { |role|
         piece = color[0] + role.upcase[0]
-        '.is2d .variant-' + variant + ' .' + role + '.' + color[0] + ' {' +
+        '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
           "background-image:url('/assets/piece/" + 'draughts/' + name + "/" + piece + "." + ext + "')}"
       }
     }
@@ -240,15 +244,15 @@ loa_themes.map { |theme|
   classes_loa_game = colors.map { |color|
     lines_of_action_roles.map { |role|
       piece = color[0] + role.upcase[0]
-      '.chess.is2d .' + role + '.' + color[0] + ' {' +
+      '.chess.is2d .' + role + '.' + color + ' {' +
           "background-image:url('/assets/piece/" + 'loa/' + name + "/" + piece + "." + ext + "')}"
       }
     }.flatten
     classes_loa_variant =  lines_of_action_variants.map { |variant|
       colors.map { |color|
-        draughts_roles.map { |role|
+      lines_of_action_roles.map { |role|
           piece = color[0] + role.upcase[0]
-          '.is2d .variant-' + variant + ' .' + role + '.' + color[0] + ' {' +
+          '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
             "background-image:url('/assets/piece/" + 'loa/' + name + "/" + piece + "." + ext + "')}"
         }
       }
