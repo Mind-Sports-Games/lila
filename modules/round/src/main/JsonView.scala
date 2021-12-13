@@ -92,7 +92,9 @@ final class JsonView(
                 "autoQueen" -> (if (pov.game.variant == strategygames.chess.variant.Antichess) Pref.AutoQueen.NEVER
                                 else pref.autoQueen),
                 "clockTenths" -> pref.clockTenths,
-                "moveEvent"   -> pref.moveEvent
+                "moveEvent"   -> pref.moveEvent,
+                "pieceSet" -> pref.pieceSet.map( p => Json.obj( "name" -> p.name,
+                                                                "gameFamily" -> p.gameFamilyName))
               )
               .add("is3d" -> pref.is3d)
               .add("clockBar" -> pref.clockBar)

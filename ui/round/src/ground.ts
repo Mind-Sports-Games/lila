@@ -89,10 +89,16 @@ export function makeConfig(ctrl: RoundController): Config {
       pieces: {
         baseUrl:
           variantKey === 'shogi'
-            ? 'https://playstrategy.org/assets/piece/shogi/2kanji'
+            ? 'https://playstrategy.org/assets/piece/shogi/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
+              '/'
             : variantKey === 'xiangqi'
-            ? 'https://playstrategy.org/assets/piece/xiangqi/2dhanzi/'
-            : 'https://playstrategy.org/assets/piece/cburnett/chess/',
+            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+              '/'
+            : 'https://playstrategy.org/assets/piece/chess/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+              '/',
       },
     },
     disableContextMenu: true,
