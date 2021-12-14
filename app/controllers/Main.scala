@@ -213,7 +213,7 @@ Allow: /
         fuccess {
           Redirect(s"${routes.Lobby.home}#pool/10+0").withCookies(
             env.lilaCookie.withSession { s =>
-              s + ("theme" -> "ic") + ("pieceSet" -> "icpieces")
+              s + ("theme" -> "ic") //+ ("pieceSet" -> "icpieces")
             }
           )
         }

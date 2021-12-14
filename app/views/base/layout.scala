@@ -30,11 +30,13 @@ object layout {
       raw {
         s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
-    def pieceSprite(implicit ctx: Context): Frag = pieceSprite(ctx.currentPieceSet)
+    def pieceSprite(implicit ctx: Context): Frag = {
+      ctx.currentPieceSet.map(ps => pieceSprite(ps))
+    }
     def pieceSprite(ps: lila.pref.PieceSet): Frag =
       link(
-        id := "piece-sprite",
-        href := assetUrl(s"piece-css/$ps.css"),
+        id := s"piece-sprite-${ps.gameFamilyName}",
+        href := assetUrl(s"piece-css/${ps.gameFamilyName}-${ps.name}.css"),
         rel := "stylesheet"
       )
   }

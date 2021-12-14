@@ -10,6 +10,7 @@ import * as util from './util';
 import { plyStep } from './round';
 import RoundController from './ctrl';
 import { RoundData } from './interfaces';
+import * as chessUtil from 'chess';
 
 export function makeConfig(ctrl: RoundController): Config {
   const data = ctrl.data,
@@ -73,6 +74,7 @@ export function makeConfig(ctrl: RoundController): Config {
     },
     dropmode: {
       showDropDests: true,
+      dropDests: playing ? chessUtil.readDropsByRole(data.possibleDropsByRole) : new Map(),
     },
     draggable: {
       enabled: data.pref.moveEvent !== Prefs.MoveEvent.Click,
@@ -87,10 +89,16 @@ export function makeConfig(ctrl: RoundController): Config {
       pieces: {
         baseUrl:
           variantKey === 'shogi'
-            ? 'https://playstrategy.org/assets/piece/shogi/'
+            ? 'https://playstrategy.org/assets/piece/shogi/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
+              '/'
             : variantKey === 'xiangqi'
-            ? 'https://playstrategy.org/assets/piece/xiangqi/'
-            : 'https://playstrategy.org/assets/piece/cburnett/',
+            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+              '/'
+            : 'https://playstrategy.org/assets/piece/chess/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+              '/',
       },
     },
     disableContextMenu: true,
