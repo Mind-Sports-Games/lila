@@ -26,7 +26,7 @@ case class ClasProgress(
       )
     )
 
-  def isPuzzle = perfType == PerfType.Puzzle
+  def isPuzzle = perfType.key == "puzzle"
 }
 
 case class StudentProgress(
@@ -54,7 +54,7 @@ final class ClasProgressApi(
     val userIds = users.map(_.id)
 
     val playStatsFu =
-      if (perfType == PerfType.Puzzle) getPuzzleStats(userIds, days)
+      if (perfType.key == "puzzle") getPuzzleStats(userIds, days)
       else getGameStats(perfType, userIds, days)
 
     val progressesFu = historyApi.progresses(users, perfType, days)

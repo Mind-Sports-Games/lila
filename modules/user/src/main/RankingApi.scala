@@ -86,29 +86,31 @@ final class RankingApi(
 
   private[user] def fetchLeaderboard(nb: Int): Fu[Perfs.Leaderboards] =
     for {
-      ultraBullet   <- topPerf(PerfType.UltraBullet.id, nb)
-      bullet        <- topPerf(PerfType.Bullet.id, nb)
-      blitz         <- topPerf(PerfType.Blitz.id, nb)
-      rapid         <- topPerf(PerfType.Rapid.id, nb)
-      classical     <- topPerf(PerfType.Classical.id, nb)
-      chess960      <- topPerf(PerfType.Chess960.id, nb)
-      kingOfTheHill <- topPerf(PerfType.KingOfTheHill.id, nb)
-      threeCheck    <- topPerf(PerfType.ThreeCheck.id, nb)
-      fiveCheck     <- topPerf(PerfType.FiveCheck.id, nb)
-      antichess     <- topPerf(PerfType.Antichess.id, nb)
-      atomic        <- topPerf(PerfType.Atomic.id, nb)
-      horde         <- topPerf(PerfType.Horde.id, nb)
-      racingKings   <- topPerf(PerfType.RacingKings.id, nb)
-      crazyhouse    <- topPerf(PerfType.Crazyhouse.id, nb)
-      linesOfAction <- topPerf(PerfType.LinesOfAction.id, nb)
-      international <- topPerf(PerfType.International.id, nb)
-      frisian       <- topPerf(PerfType.Frisian.id, nb)
-      frysk         <- topPerf(PerfType.Frysk.id, nb)
-      antidraughts  <- topPerf(PerfType.Antidraughts.id, nb)
-      breakthrough  <- topPerf(PerfType.Breakthrough.id, nb)
-      russian       <- topPerf(PerfType.Russian.id, nb)
-      brazilian     <- topPerf(PerfType.Brazilian.id, nb)
-      pool          <- topPerf(PerfType.Pool.id, nb)
+      ultraBullet   <- topPerf(PerfType.orDefault("ultraBullet").id, nb)
+      bullet        <- topPerf(PerfType.orDefault("bullet").id, nb)
+      blitz         <- topPerf(PerfType.orDefault("blitz").id, nb)
+      rapid         <- topPerf(PerfType.orDefault("rapid").id, nb)
+      classical     <- topPerf(PerfType.orDefault("classical").id, nb)
+      chess960      <- topPerf(PerfType.orDefault("chess960").id, nb)
+      kingOfTheHill <- topPerf(PerfType.orDefault("kingOfTheHill").id, nb)
+      threeCheck    <- topPerf(PerfType.orDefault("threeCheck").id, nb)
+      fiveCheck     <- topPerf(PerfType.orDefault("fiveCheck").id, nb)
+      antichess     <- topPerf(PerfType.orDefault("antichess").id, nb)
+      atomic        <- topPerf(PerfType.orDefault("atomic").id, nb)
+      horde         <- topPerf(PerfType.orDefault("horde").id, nb)
+      racingKings   <- topPerf(PerfType.orDefault("racingKings").id, nb)
+      crazyhouse    <- topPerf(PerfType.orDefault("crazyhouse").id, nb)
+      linesOfAction <- topPerf(PerfType.orDefault("linesOfAction").id, nb)
+      international <- topPerf(PerfType.orDefault("international").id, nb)
+      frisian       <- topPerf(PerfType.orDefault("frisian").id, nb)
+      frysk         <- topPerf(PerfType.orDefault("frysk").id, nb)
+      antidraughts  <- topPerf(PerfType.orDefault("antidraughts").id, nb)
+      breakthrough  <- topPerf(PerfType.orDefault("breakthrough").id, nb)
+      russian       <- topPerf(PerfType.orDefault("russian").id, nb)
+      brazilian     <- topPerf(PerfType.orDefault("brazilian").id, nb)
+      pool          <- topPerf(PerfType.orDefault("pool").id, nb)
+      shogi         <- topPerf(PerfType.orDefault("shogi").id, nb)
+      xiangqi       <- topPerf(PerfType.orDefault("xiangqi").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -132,7 +134,9 @@ final class RankingApi(
       breakthrough = breakthrough,
       russian = russian,
       brazilian = brazilian,
-      pool = pool
+      pool = pool,
+      shogi = shogi,
+      xiangqi = xiangqi
     )
 
   object weeklyStableRanking {

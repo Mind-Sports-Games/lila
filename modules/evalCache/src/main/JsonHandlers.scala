@@ -3,7 +3,7 @@ package lila.evalCache
 import cats.implicits._
 import strategygames.format.{ FEN, Uci }
 import strategygames.variant.Variant
-import strategygames.GameLogic
+import strategygames.{ GameFamily, GameLogic }
 import play.api.libs.json._
 
 import lila.common.Json._
@@ -61,15 +61,17 @@ object JsonHandlers {
   private def parsePv(d: JsObject): Option[Pv] =
     for {
       movesStr <- d str "moves"
+      //TODO: test?
+      gameFamily = GameFamily(d int "gf" match {
+        case Some(gf) => gf
+        case None      => sys.error("gf must be provided for parsePv")
+      })
       moves <-
         movesStr
           .split(' ')
           .take(EvalCacheEntry.MAX_PV_SIZE)
           .foldLeft(List.empty[Uci].some) {
-            case (Some(ucis), str) => Uci(GameLogic(d int "lib" match {
-              case Some(lib) => lib
-              case None      => sys.error("lib must be provided for parsePv")
-            }), str) map (_ :: ucis)
+            case (Some(ucis), str) => Uci(gameFamily.gameLogic, gameFamily, str) map (_ :: ucis)
             case _                 => None
           }
           .flatMap(_.reverse.toNel) map Moves.apply

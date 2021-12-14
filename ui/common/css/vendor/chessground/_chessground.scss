@@ -15,6 +15,38 @@ cg-board {
   }
 }
 
+//miniboards
+.variant-xiangqi.is2d {
+  width: calc(100% * 10 / 11);
+  margin-left: calc(50% / 11);
+}
+
+//main board
+.is2d .variant-xiangqi {
+  width: calc(100% * 10 / 11);
+  margin-right: calc(100% / 11);
+}
+
+.variant-shogi square {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.shogi square {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.variant-xiangqi square {
+  width: calc(100% / 9);
+  height: calc(100% / 10);
+}
+
+.xiangqi square {
+  width: calc(100% / 9);
+  height: calc(100% / 10);
+}
+
 square {
   position: absolute;
   width: 12.5%;
@@ -101,6 +133,30 @@ square {
   }
 }
 
+.variant-shogi piece {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+  background-position: center center;
+  transform: scale(0.9);
+}
+
+.shogi piece {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+  background-position: center center;
+  transform: scale(0.9);
+}
+
+.variant-xiangqi piece {
+  width: calc(100% / 9);
+  height: calc(100% / 10);
+}
+
+.xiangqi piece {
+  width: calc(100% / 9);
+  height: calc(100% / 10);
+}
+
 piece {
   position: absolute;
   top: 0;
@@ -131,12 +187,52 @@ piece {
   }
 }
 
+.variant-shogi cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 9);
+}
+
+.shogi cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 9);
+}
+
+.variant-xiangqi cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 10);
+}
+
+.xiangqi cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 10);
+}
+
 cg-helper {
   position: absolute;
   width: 12.5%;
   padding-bottom: 12.5%;
   display: table; // hack to round to full pixel size in chrome
   bottom: 0;
+}
+
+.variant-shogi cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 9);
+}
+
+.shogi cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 9);
+}
+
+.variant-xiangqi cg-container {
+  width: calc(100% * 9);
+  height: calc(101% * 11);
+}
+
+.xiangqi cg-container {
+  width: calc(100% * 9);
+  height: calc(101% * 11);
 }
 
 cg-container {
@@ -174,4 +270,13 @@ cg-container .cg-custom-svgs {
 
 cg-container .cg-custom-svgs svg {
   overflow: visible;
+}
+
+/* 9x10 */
+.variant-xiangqi .cg-wrap {
+  padding-bottom: calc(640 * 100% / 576);
+}
+
+.variant-xiangqi .round__app__board {
+  padding-bottom: calc(640 * 100% / 576);
 }

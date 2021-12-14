@@ -359,7 +359,7 @@ let lastTouchMovePos: NumberPair | undefined;
 function sparePieces(ctrl: EditorCtrl, color: Color, _orientation: Orientation, position: 'top' | 'bottom'): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
 
-  const pieces = ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn'].map(function (role) {
+  const pieces = ['k-piece', 'q-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
     return [color, role];
   });
 
@@ -456,7 +456,7 @@ export default function (ctrl: EditorCtrl): VNode {
   const color = ctrl.bottomColor();
 
   return h(
-    'div.board-editor',
+    'div.board-editor' + '.variant-' + convertRulesToCGVariant(ctrl.rules),
     {
       attrs: {
         style: `cursor: ${makeCursor(ctrl.selected())}`,
@@ -470,4 +470,19 @@ export default function (ctrl: EditorCtrl): VNode {
       inputs(ctrl, state.fen),
     ]
   );
+}
+
+function convertRulesToCGVariant(rule: Rules): string {
+  switch (rule) {
+    case 'chess':
+      return 'standard';
+    case 'kingofthehill':
+      return 'kingOfTheHill';
+    case 'racingkings':
+      return 'racingKings';
+    case '3check':
+      return 'threeCheck';
+    default:
+      return rule;
+  }
 }

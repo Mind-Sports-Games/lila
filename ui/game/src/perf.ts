@@ -23,5 +23,7 @@ export const perf = {
     fromPositionDraughts: 'K',
     frisian: 'K',
     frysk: 'K',
+    shogi: 's',
+    xiangqi: 't',
   },
 };

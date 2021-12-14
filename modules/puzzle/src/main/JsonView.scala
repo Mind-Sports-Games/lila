@@ -196,7 +196,7 @@ final class JsonView(
             move = Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.pgnMoves.last),
             fen = Forsyth.>>(game.situation.board.variant.gameLogic, game),
             check = game.situation.check,
-            crazyData = none
+            pocketData = none
           )
           (game, branch :: branches)
       }

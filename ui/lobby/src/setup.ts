@@ -134,10 +134,7 @@ export default class Setup {
       $modeChoices = $modeChoicesWrap.find('input'),
       $casual = $modeChoices.eq(0),
       $rated = $modeChoices.eq(1),
-      $gameFamilySelect = $form.find('#sf_gameFamily'),
-      $chessVariantSelect = $form.find('#sf_chessVariant'),
-      $draughtsVariantSelect = $form.find('#sf_draughtsVariant'),
-      $loaVariantSelect = $form.find('#sf_loaVariant'),
+      $variantSelect = $form.find('#sf_variant'),
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
@@ -151,18 +148,7 @@ export default class Setup {
       $submits = $form.find('.color-submits__button'),
       toggleButtons = () => {
         randomColorVariants;
-        const gameFamilyId = $gameFamilySelect.val(),
-          variantId = () => {
-            switch (gameFamilyId) {
-              case '0':
-                return $chessVariantSelect.val();
-              case '1':
-                return $draughtsVariantSelect.val();
-              case '2':
-                return $loaVariantSelect.val();
-            }
-            return $chessVariantSelect.val();
-          },
+        const variantId = ($variantSelect.val() as string).split('_'),
           timeMode = $timeModeSelect.val(),
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
@@ -170,7 +156,7 @@ export default class Setup {
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
-            (variantId() != '1' && (timeMode != '1' || (limit < 0.5 && inc == 0) || (limit == 0 && inc < 2)));
+            (variantId[1] != '1' && (timeMode != '1' || (limit < 0.5 && inc == 0) || (limit == 0 && inc < 2)));
         if (cantBeRated && rated) {
           $casual.trigger('click');
           return toggleButtons();
@@ -178,10 +164,10 @@ export default class Setup {
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
         const timeOk = timeMode != '1' || limit > 0 || inc > 0,
           ratedOk = typ != 'hook' || !rated || timeMode != '0',
-          aiOk = typ != 'ai' || variantId() != '3' || limit >= 1;
+          aiOk = typ != 'ai' || variantId[1] != '3' || limit >= 1;
         if (timeOk && ratedOk && aiOk) {
           $submits.toggleClass('nope', false);
-          $submits.filter(':not(.random)').toggle(!rated || !randomColorVariants.includes(variantId()));
+          $submits.filter(':not(.random)').toggle(!rated || !randomColorVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
       },
       save = function () {
@@ -201,11 +187,12 @@ export default class Setup {
     }
 
     const showRating = () => {
-      const timeMode = $timeModeSelect.val();
+      const variantId = ($variantSelect.val() as string).split('_'),
+        timeMode = $timeModeSelect.val();
       let key = 'correspondence';
-      switch ($gameFamilySelect.val()) {
+      switch (variantId[0]) {
         case '0':
-          switch ($chessVariantSelect.val()) {
+          switch (variantId[1]) {
             case '1':
             case '3':
               if (timeMode == '1') {
@@ -251,7 +238,7 @@ export default class Setup {
           }
           break;
         case '1':
-          switch ($draughtsVariantSelect.val()) {
+          switch (variantId[1]) {
             case '1':
             case '10':
               key = 'frisian';
@@ -277,9 +264,23 @@ export default class Setup {
           }
           break;
         case '2':
-          switch ($loaVariantSelect.val()) {
+          switch (variantId[1]) {
             case '11':
               key = 'linesOfAction';
+              break;
+          }
+          break;
+        case '3':
+          switch (variantId[1]) {
+            case '1':
+              key = 'shogi';
+              break;
+          }
+          break;
+        case '4':
+          switch (variantId[1]) {
+            case '2':
+              key = 'xiangqi';
               break;
           }
           break;
@@ -338,9 +339,7 @@ export default class Setup {
         $form.find('.color-submits').append(playstrategy.spinnerHtml);
       });
     if (this.root.opts.blindMode) {
-      $chessVariantSelect[0]!.focus();
-      $draughtsVariantSelect[0]!.focus();
-      $loaVariantSelect[0]!.focus();
+      $variantSelect[0]!.focus();
       $timeInput.add($incrementInput).on('change', () => {
         toggleButtons();
         showRating();
@@ -469,57 +468,35 @@ export default class Setup {
     $fenInput.on('keyup', validateFen);
 
     if (forceFromPosition) {
-      switch ($gameFamilySelect.val()) {
+      switch (($variantSelect.val() as string).split('_')[0]) {
         case '0':
-          $chessVariantSelect.val('3');
+          $variantSelect.val('0_3');
           break;
         case '1':
-          $draughtsVariantSelect.val('3');
+          $variantSelect.val('1_3');
           break;
         //TODO: Add LOA from position?
       }
     }
 
-    $gameFamilySelect
-      .on('change', function (this: HTMLElement) {
-        const gameFamily = $(this).val();
-        $form.find('.chessVariant').toggle(gameFamily == '0');
-        $form.find('.draughtsVariant').toggle(gameFamily == '1');
-        $form.find('.loaVariant').toggle(gameFamily == '2');
-      })
-      .trigger('change');
+    $form.find('optgroup').each((_, optgroup: HTMLElement) => {
+      optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
+    });
 
-    $chessVariantSelect
+    $variantSelect
       .on('change', function (this: HTMLElement) {
-        const isFen = $(this).val() == '3';
+        const variantId = ($variantSelect.val() as string).split('_'),
+          isFen = variantId[1] == '3';
+        let ground = 'chessground';
+        if (variantId[0] == '1') ground = 'draughtsground';
+        ground += '.resize';
+        $microMatch.toggle(isFen && variantId[0] == '1');
         $fenPosition.toggle(isFen);
         $modeChoicesWrap.toggle(!isFen);
         if (isFen) {
           $casual.trigger('click');
-          requestAnimationFrame(() => document.body.dispatchEvent(new Event('chessground.resize')));
+          requestAnimationFrame(() => document.body.dispatchEvent(new Event(ground)));
         }
-        showRating();
-        toggleButtons();
-      })
-      .trigger('change');
-
-    $draughtsVariantSelect
-      .on('change', function (this: HTMLElement) {
-        const isFen = $(this).val() == '3';
-        $fenPosition.toggle(isFen);
-        $microMatch.toggle(isFen);
-        $modeChoicesWrap.toggle(!isFen);
-        if (isFen) {
-          $casual.trigger('click');
-          requestAnimationFrame(() => document.body.dispatchEvent(new Event('draughtsground.resize')));
-        }
-        showRating();
-        toggleButtons();
-      })
-      .trigger('change');
-
-    $loaVariantSelect
-      .on('change', function (this: HTMLElement) {
         showRating();
         toggleButtons();
       })

@@ -17,8 +17,8 @@
   <string name="beingAPatron">being a patron</string>
   <string name="breakdownOfOurCosts">breakdown of our costs</string>
   <string name="otherWaysToHelp">other ways to help</string>
-  <string name="areThereWebsitesBasedOnPlayStrategy">Are there websites based on PlayStrategy?</string>
-  <string name="playstrategyIsForkedFromLichess">PlayStrategy is forked from the open-source chess website %1$s.</string>
+  <string name="howAreWeDifferentFromLichess">How are we different from Lichess.org?</string>
+  <string name="playstrategySupportsDifferentAbstractGames">PlayStrategy is forked from the open-source chess website %1$s. Our aim is to create a modern platform to play numerous two-player abstract games to support the %2$s.</string>
   <string name="yesPlayStrategyInspiredOtherOpenSourceWebsites">Yes. PlayStrategy has indeed inspired other open-source sites that use our %1$s, %2$s, or %3$s.</string>
   <string name="fairPlay">Fair Play</string>
   <string name="whenAmIEligibleRatinRefund">When am I eligible for the automatic rating refund from cheaters?</string>

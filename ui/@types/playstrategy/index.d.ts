@@ -285,7 +285,9 @@ declare type VariantKey =
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
-  | 'linesOfAction';
+  | 'linesOfAction'
+  | 'shogi'
+  | 'xiangqi';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -324,13 +326,43 @@ declare type Perf =
   | 'pool'
   | 'fromPositionDraughts'
   | 'frisian'
-  | 'frysk';
+  | 'frysk'
+  | 'shogi'
+  | 'xiangqi';
 
 declare type Color = 'white' | 'black';
 declare type Orientation = 'white' | 'black' | 'left' | 'right';
 
-declare type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
-declare type Ranks = '1' | '2' | '3' | '4' | '5' | '5' | '6' | '7' | '8';
+declare type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
+declare type Ranks = '1' | '2' | '3' | '4' | '5' | '5' | '6' | '7' | '8' | '9' | '10';
+declare type Letter =
+  | 'a'
+  | 'b'
+  | 'c'
+  | 'd'
+  | 'e'
+  | 'f'
+  | 'g'
+  | 'h'
+  | 'i'
+  | 'j'
+  | 'k'
+  | 'l'
+  | 'm'
+  | 'n'
+  | 'o'
+  | 'p'
+  | 'q'
+  | 'r'
+  | 's'
+  | 't'
+  | 'u'
+  | 'v'
+  | 'w'
+  | 'x'
+  | 'y'
+  | 'z';
+declare type Role = `${Letter}-piece` | `p${Letter}-piece`;
 declare type Key = 'a0' | `${Files}${Ranks}`;
 declare type Uci = string;
 declare type San = string;
@@ -347,6 +379,7 @@ interface Variant {
   short: string;
   title?: string;
   lib: number;
+  boardSize: BoardDim;
 }
 
 interface DraughtsVariant {
@@ -356,6 +389,11 @@ interface DraughtsVariant {
   title?: string;
   board: BoardData;
   lib: number;
+}
+
+interface BoardDim {
+  width: number;
+  height: number;
 }
 
 declare type BoardSize = [number, number];

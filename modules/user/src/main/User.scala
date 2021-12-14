@@ -8,6 +8,8 @@ import lila.common.{ EmailAddress, LightUser, NormalizedEmailAddress }
 import lila.rating.{ Perf, PerfType }
 import lila.hub.actorApi.user.{ KidId, NonKidId }
 
+import strategygames.GameLogic
+
 case class User(
     id: String,
     username: String,
@@ -97,7 +99,7 @@ case class User(
 
   private def bestOf(perfTypes: List[PerfType], nb: Int) =
     perfTypes.sortBy { pt =>
-      -(perfs(pt).nb * PerfType.totalTimeRoughEstimation.get(pt).??(_.roundSeconds))
+      -(perfs(pt).nb * PerfType.totalTimeRoughEstimation(pt).roundSeconds)
     } take nb
 
   def best8Perfs: List[PerfType] = bestOf(User.firstRow, 4) ::: bestOf(User.secondRow, 4)
@@ -342,18 +344,12 @@ object User {
   implicit val speakerHandler = reactivemongo.api.bson.Macros.handler[Speaker]
   implicit val contactHandler = reactivemongo.api.bson.Macros.handler[Contact]
 
-  private val firstRow: List[PerfType] =
-    List(PerfType.Bullet, PerfType.Blitz, PerfType.Rapid, PerfType.Classical, PerfType.Correspondence)
-  private val secondRow: List[PerfType] = List(
-    PerfType.UltraBullet,
-    PerfType.Crazyhouse,
-    PerfType.Chess960,
-    PerfType.KingOfTheHill,
-    PerfType.ThreeCheck,
-    PerfType.FiveCheck,
-    PerfType.Antichess,
-    PerfType.Atomic,
-    PerfType.Horde,
-    PerfType.RacingKings
-  )
+  private val firstRow: List[PerfType] = PerfType.standard
+
+  private val secondRow: List[PerfType] =
+    PerfType.all.filter(_.key == "ultraBullet") :::
+    PerfType.variants.filter(p => (p.category match {
+      case Left(Right(v)) => v.gameLogic
+      case _              => GameLogic.Chess()
+    }) == GameLogic.Chess())
 }

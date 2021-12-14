@@ -1,7 +1,7 @@
 package lila.fishnet
 
 import strategygames.format.Uci
-import strategygames.GameLogic
+import strategygames.{ GameFamily, GameLogic }
 import io.lettuce.core._
 import io.lettuce.core.pubsub._
 import scala.concurrent.Future
@@ -36,7 +36,7 @@ final class FishnetRedis(
 
         case Array(gameId, plyS, uci) =>
           for {
-            move <- Uci(GameLogic.Chess(), uci)
+            move <- Uci(GameLogic.Chess(), GameFamily.Chess(), uci)
             ply  <- plyS.toIntOption
           } Bus.publish(Tell(gameId, FishnetPlay(move, ply)), "roundSocket")
         case _ =>
@@ -56,7 +56,7 @@ final class FishnetRedis(
       work.level,
       work.clock ?? writeClock,
       work.game.variant.some.filter(_.exotic).??(_.key),
-      work.game.initialFen,
+      work.game.initialFen | "",
       work.game.moves
     ) mkString ";"
 

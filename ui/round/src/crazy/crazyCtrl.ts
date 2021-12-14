@@ -4,8 +4,10 @@ import { setDropMode, cancelDropMode } from 'chessground/drop';
 import RoundController from '../ctrl';
 import * as cg from 'chessground/types';
 import { RoundData } from '../interfaces';
+import * as chessUtil from 'chess';
 
-export const pieceRoles: cg.Role[] = ['pawn', 'knight', 'bishop', 'rook', 'queen'];
+export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
+export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 
 export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
@@ -33,15 +35,19 @@ export function valid(data: RoundData, role: cg.Role, key: cg.Key): boolean {
 
   if (!isPlayerTurn(data)) return false;
 
-  if (role === 'pawn' && (key[1] === '1' || key[1] === '8')) return false;
-
   const dropStr = data.possibleDrops;
-
   if (typeof dropStr === 'undefined' || dropStr === null) return true;
 
-  const drops = dropStr.match(/.{2}/g) || [];
+  if (data.game.variant.key === 'crazyhouse') {
+    if (role === 'p-piece' && (key[1] === '1' || key[1] === '8')) return false;
 
-  return drops.includes(key);
+    const drops = dropStr.match(/.{2}/g) || [];
+    return drops.includes(key);
+  } else {
+    //otherwise shogi and use the newer dropsByRole data
+    const dropsByRole = chessUtil.readDropsByRole(data.possibleDropsByRole);
+    return dropsByRole.get(role)?.includes(key) || false;
+  }
 }
 
 export function onEnd() {
@@ -64,14 +70,18 @@ export function init(ctrl: RoundController) {
   const setDrop = () => {
     if (activeCursor) document.body.classList.remove(activeCursor);
     if (crazyKeys.length > 0) {
-      const role = pieceRoles[crazyKeys[crazyKeys.length - 1] - 1],
+      const dropRoles = ctrl.data.game.variant.key === 'shogi' ? pieceShogiRoles : pieceRoles,
+        role = dropRoles[crazyKeys[crazyKeys.length - 1] - 1],
         color = ctrl.data.player.color,
         crazyData = ctrl.data.crazyhouse;
       if (!crazyData) return;
-
       const nb = crazyData.pockets[color === 'white' ? 0 : 1][role];
       setDropMode(ctrl.chessground.state, nb > 0 ? { color, role } : undefined);
-      activeCursor = `cursor-${color}-${role}`;
+      if (ctrl.data.game.variant.key === 'shogi') {
+        activeCursor = `cursor-${role}-shogi`;
+      } else {
+        activeCursor = `cursor-${color}-${role}-chess`;
+      }
       document.body.classList.add(activeCursor);
     } else {
       cancelDropMode(ctrl.chessground.state);
@@ -89,8 +99,8 @@ export function init(ctrl: RoundController) {
   playstrategy.pubsub.on('ply', () => {
     if (crazyKeys.length > 0) setDrop();
   });
-
-  for (let i = 1; i <= 5; i++) {
+  const numDropPieces = ctrl.data.game.variant.key == 'crazyhouse' ? 5 : 7;
+  for (let i = 1; i <= numDropPieces; i++) {
     const iStr = i.toString();
     k.bind(iStr, () => {
       if (!crazyKeys.includes(i)) {
@@ -138,6 +148,9 @@ export function init(ctrl: RoundController) {
 // Images are used in _zh.scss, which should be kept in sync.
 function preloadMouseIcons(data: RoundData) {
   const colorKey = data.player.color[0];
+  const colorNum = data.player.color == 'white' ? '0' : '1';
   for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/cburnett/${colorKey}${pKey}.svg`));
+  for (const pKey of ['FU', 'KY', 'KE', 'GI', 'KI', 'KA', 'HI'])
+    fetch(playstrategy.assetUrl(`piece/shogi/${colorNum}${pKey}.svg`));
   mouseIconsLoaded = true;
 }

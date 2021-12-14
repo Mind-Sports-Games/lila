@@ -1,7 +1,7 @@
 package lila.game
 
 import cats.data.Validated
-import strategygames.{ Game => StratGame }
+import strategygames.GameLogic
 import strategygames.format.{ FEN }
 import strategygames.format.pgn.{ Reader, Sans, Tag, Tags }
 import org.joda.time.DateTime
@@ -16,14 +16,24 @@ object Rewind {
   }
 
   def apply(game: Game, initialFen: Option[FEN]): Validated[String, Progress] =
-    Reader
-      .movesWithSans(
-        game.variant.gameLogic,
-        moveStrs = game.pgnMoves,
-        op = sans => Sans(sans.value.dropRight(1)),
-        tags = createTags(initialFen, game)
-      )
-      .flatMap(_.valid) map { replay =>
+    (game.variant.gameLogic match {
+      case GameLogic.Chess() | GameLogic.Draughts() =>
+        Reader
+          .movesWithSans(
+            game.variant.gameLogic,
+            moveStrs = game.pgnMoves,
+            op = sans => Sans(sans.value.dropRight(1)),
+            tags = createTags(initialFen, game)
+          )
+      case GameLogic.FairySF() =>
+        Reader
+          .movesWithPgns(
+            game.variant.gameLogic,
+            moveStrs = game.pgnMoves,
+            op = ucis => ucis.dropRight(1),
+            tags = createTags(initialFen, game)
+          )
+    }).flatMap(_.valid) map { replay =>
       val color        = game.turnColor
       val rewindedGame = replay.state
       val newClock = game.clock.map(_.takeback) map { clk =>

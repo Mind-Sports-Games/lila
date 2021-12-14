@@ -1,7 +1,7 @@
 package lila.setup
 
 import strategygames.Color.{ Black, White }
-import strategygames.{ Game => StratGame, GameLogic }
+import strategygames.{ GameFamily, GameLogic, Mode, Speed }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import lila.game.{ Game, Player, Pov, Source }
@@ -9,7 +9,7 @@ import lila.lobby.Color
 import lila.user.User
 
 case class AiConfig(
-    variant: strategygames.variant.Variant,
+    variant: Variant,
     fenVariant: Option[Variant],
     timeMode: TimeMode,
     time: Double,
@@ -23,12 +23,12 @@ case class AiConfig(
 
   val strictFen = true
 
-  def >> = (variant.id, timeMode.id, time, increment, days, level, color.name, fen.map(_.value)).some
+  def >> = (s"{$variant.gameFamily.id}_{$variant.id}", timeMode.id, time, increment, days, level, color.name, fen.map(_.value)).some
 
   def game(user: Option[User]) =
     fenGame { chessGame =>
       val perfPicker = lila.game.PerfPicker.mainOrDefault(
-        strategygames.Speed(chessGame.clock.map(_.config)),
+        Speed(chessGame.clock.map(_.config)),
         chessGame.situation.board.variant,
         makeDaysPerTurn
       )
@@ -43,7 +43,7 @@ case class AiConfig(
             Player.make(Black, level.some),
             Player.make(Black, user, perfPicker)
           ),
-          mode = strategygames.Mode.Casual,
+          mode = Mode.Casual,
           source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
@@ -58,9 +58,11 @@ case class AiConfig(
 
 object AiConfig extends BaseConfig {
 
-  def from(cv: Int, tm: Int, t: Double, i: Int, d: Int, level: Int, c: String, fen: Option[String]) =
+  def from(v: String, tm: Int, t: Double, i: Int, d: Int, level: Int, c: String, fen: Option[String]) = {
+    val gameLogic = GameFamily(v.split("_")(0).toInt).gameLogic
+    val variantId = v.split("_")(1).toInt
     new AiConfig(
-      variant = Variant.Chess(strategygames.chess.variant.Variant(cv) err "Invalid game variant " + cv),
+      variant = Variant(gameLogic, variantId) err s"Invalid game variant $v",
       fenVariant = none,
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
@@ -68,11 +70,12 @@ object AiConfig extends BaseConfig {
       days = d,
       level = level,
       color = Color(c) err "Invalid color " + c,
-      fen = fen.map(f => FEN.apply(GameLogic.Chess(), f))
+      fen = fen.map(f => FEN.apply(gameLogic, f))
     )
+  }
 
   def default = AiConfig(
-    variant = Variant.Chess(chessVariantDefault),
+    variant = defaultVariants(GameLogic.Chess().id),
     fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,
@@ -95,7 +98,7 @@ object AiConfig extends BaseConfig {
 
     def reads(r: BSON.Reader): AiConfig =
       AiConfig(
-        variant = strategygames.variant.Variant.orDefault(GameLogic(r intD "l"), r int "v"),
+        variant = Variant.orDefault(GameLogic(r intD "l"), r int "v"),
         fenVariant = none,
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",

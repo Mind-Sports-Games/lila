@@ -28,8 +28,75 @@ $board-files: (
   'horsey': 'horsey.jpg',
 );
 
+$chess-variants: (
+  'standard',
+  'chess960',
+  'fromPosition',
+  'kingOfTheHill',
+  'threeCheck',
+  'antichess',
+  'atomic',
+  'horde',
+  'racingKings',
+  'crazyhouse',
+  'linesOfAction',
+  'chess'
+);
+
+$shogi-variants: ('shogi');
+
+$xiangqi-variants: ('xiangqi');
+
 @each $color, $file in $board-files {
-  .#{$color} .is2d cg-board {
+  .#{$color} .chess.is2d cg-board {
     background-image: url(../images/board/#{$file});
+  }
+}
+
+@each $color, $file in $board-files {
+  .#{$color} .variant-shogi.is2d cg-board {
+    background-image: url(../images/board/svg/shogi.svg);
+  }
+}
+
+@each $color, $file in $board-files {
+  .#{$color} .shogi .is2d cg-board {
+    background-image: url(../images/board/svg/shogi.svg);
+  }
+}
+
+@each $color, $file in $board-files {
+  .#{$color} .variant-xiangqi.is2d cg-board {
+    background-image: url(../images/board/svg/xiangqi.svg);
+  }
+}
+
+@each $color, $file in $board-files {
+  .#{$color} .xiangqi .is2d cg-board {
+    background-image: url(../images/board/svg/xiangqi.svg);
+  }
+}
+
+@each $variant in $chess-variants {
+  @each $color, $file in $board-files {
+    .#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/#{$file});
+    }
+  }
+}
+
+@each $variant in $shogi-variants {
+  @each $color, $file in $board-files {
+    .#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/svg/shogi.svg);
+    }
+  }
+}
+
+@each $variant in $xiangqi-variants {
+  @each $color, $file in $board-files {
+    .#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/svg/xiangqi.svg);
+    }
   }
 }

@@ -28,6 +28,8 @@ case class Perfs(
     russian: Perf,
     brazilian: Perf,
     pool: Perf,
+    shogi: Perf,
+    xiangqi: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -61,6 +63,8 @@ case class Perfs(
       "russian"        -> russian,
       "brazilian"      -> brazilian,
       "pool"           -> pool,
+      "shogi"          -> shogi,
+      "xiangqi"        -> xiangqi,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -69,6 +73,8 @@ case class Perfs(
       "correspondence" -> correspondence,
       "puzzle"         -> puzzle
     )
+
+  private def fullPerfsMap: Map[String, Perf] = perfs.toMap
 
   def bestPerf: Option[(PerfType, Perf)] = {
     val ps = PerfType.nonPuzzle map { pt =>
@@ -148,6 +154,8 @@ case class Perfs(
     "russian"        -> russian,
     "brazilian"      -> brazilian,
     "pool"           -> pool,
+    "shogi"          -> shogi,
+    "xiangqi"        -> xiangqi,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
     "blitz"          -> blitz,
@@ -163,35 +171,7 @@ case class Perfs(
 
   def apply(key: String): Option[Perf] = perfsMap get key
 
-  def apply(perfType: PerfType): Perf =
-    perfType match {
-      case PerfType.Standard       => standard
-      case PerfType.International  => international
-      case PerfType.UltraBullet    => ultraBullet
-      case PerfType.Bullet         => bullet
-      case PerfType.Blitz          => blitz
-      case PerfType.Rapid          => rapid
-      case PerfType.Classical      => classical
-      case PerfType.Correspondence => correspondence
-      case PerfType.Chess960       => chess960
-      case PerfType.KingOfTheHill  => kingOfTheHill
-      case PerfType.ThreeCheck     => threeCheck
-      case PerfType.FiveCheck      => fiveCheck
-      case PerfType.Antichess      => antichess
-      case PerfType.Atomic         => atomic
-      case PerfType.Horde          => horde
-      case PerfType.RacingKings    => racingKings
-      case PerfType.Crazyhouse     => crazyhouse
-      case PerfType.LinesOfAction  => linesOfAction
-      case PerfType.Frisian        => frisian
-      case PerfType.Frysk          => frysk
-      case PerfType.Antidraughts   => antidraughts
-      case PerfType.Breakthrough   => breakthrough
-      case PerfType.Russian        => russian
-      case PerfType.Brazilian      => brazilian
-      case PerfType.Pool           => pool
-      case PerfType.Puzzle         => puzzle
-    }
+  def apply(perfType: PerfType): Perf = fullPerfsMap(perfType.key)
 
   def inShort =
     perfs map { case (name, perf) =>
@@ -263,6 +243,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -291,19 +272,15 @@ case object Perfs {
       case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => Some(_.threeCheck)
       case Variant.Chess(strategygames.chess.variant.FiveCheck)     => Some(_.fiveCheck)
       case Variant.Chess(strategygames.chess.variant.Antichess)     => Some(_.antichess)
-      case Variant.Chess(strategygames.chess.variant.Atomic)        => Some(_.atomic)
-      case Variant.Chess(strategygames.chess.variant.Horde)         => Some(_.horde)
-      case Variant.Chess(strategygames.chess.variant.RacingKings)   => Some(_.racingKings)
-      case Variant.Chess(strategygames.chess.variant.Crazyhouse)    => Some(_.crazyhouse)
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction) => Some(_.linesOfAction)
       case Variant.Draughts(strategygames.draughts.variant.Standard)     => Some(_.international)
-      case Variant.Draughts(strategygames.draughts.variant.Frisian)      => Some(_.frisian)
       case Variant.Draughts(strategygames.draughts.variant.Frysk)        => Some(_.frysk)
       case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => Some(_.antidraughts)
       case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => Some(_.breakthrough)
       case Variant.Draughts(strategygames.draughts.variant.Russian)      => Some(_.russian)
       case Variant.Draughts(strategygames.draughts.variant.Brazilian)    => Some(_.brazilian)
       case Variant.Draughts(strategygames.draughts.variant.Pool)         => Some(_.pool)
+      case Variant.FairySF(strategygames.fairysf.variant.Shogi)          => Some(_.shogi)
+      case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)        => Some(_.xiangqi)
       case _                           => none
     }
 
@@ -343,6 +320,8 @@ case object Perfs {
         russian = perf("russian"),
         brazilian = perf("brazilian"),
         pool = perf("pool"),
+        shogi = perf("shogi"),
+        xiangqi = perf("xiangqi"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -379,6 +358,8 @@ case object Perfs {
         "russian"        -> notNew(o.russian),
         "brazilian"      -> notNew(o.brazilian),
         "pool"           -> notNew(o.pool),
+        "shogi"          -> notNew(o.shogi),
+        "xiangqi"        -> notNew(o.xiangqi),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
         "blitz"          -> notNew(o.blitz),
@@ -415,8 +396,11 @@ case object Perfs {
       breakthrough: List[User.LightPerf],
       russian: List[User.LightPerf],
       brazilian: List[User.LightPerf],
-      pool: List[User.LightPerf]
+      pool: List[User.LightPerf],
+      shogi: List[User.LightPerf],
+      xiangqi: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+
 }

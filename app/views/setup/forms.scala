@@ -22,10 +22,7 @@ object forms {
       routes.Setup.hook("sri-placeholder")
     ) {
       frag(
-        renderGameFamily(form, translatedGameFamilyChoices),
-        renderVariant(form, translatedChessVariantChoicesWithVariants, GameFamily.Chess()),
-        renderVariant(form, translatedDraughtsVariantChoicesWithVariants, GameFamily.Draughts()),
-        renderVariant(form, translatedLOAVariantChoicesWithVariants, GameFamily.LinesOfAction()),
+        renderVariant(form, translatedVariantChoicesWithVariants),
         renderTimeMode(form, allowAnon = false),
         ctx.isAuth option frag(
           div(cls := "mode_choice buttons")(
@@ -64,10 +61,7 @@ object forms {
   ) =
     layout("ai", trans.playWithTheMachine(), routes.Setup.ai) {
       frag(
-        //renderGameFamily(form, translatedGameFamilyChoices),
-        renderVariant(form, translatedChessAiVariantChoices, GameFamily.Chess()),
-        //renderVariant(form, translatedDraughtsAiVariantChoices, GameFamily.Draughts()),
-        //renderVariant(form, translatedLOAAiVariantChoices, GameFamily.LinesOfAction()),
+        renderVariant(form, translatedAiVariantChoices),
         fenInput(form("fen"), strict = true, validFen),
         renderTimeMode(form, allowAnon = true),
         if (ctx.blind)
@@ -110,10 +104,7 @@ object forms {
         user.map { u =>
           userLink(u, cssClass = "target".some)
         },
-        renderGameFamily(form, translatedGameFamilyChoices),
-        renderVariant(form, translatedChessVariantChoicesWithVariantsAndFen, GameFamily.Chess()),
-        renderVariant(form, translatedDraughtsVariantChoicesWithVariantsAndFen, GameFamily.Draughts()),
-        renderVariant(form, translatedLOAVariantChoicesWithVariantsAndFen, GameFamily.LinesOfAction()),
+        renderVariant(form, translatedVariantChoicesWithVariantsAndFen),
         fenInput(form("fen"), strict = false, validFen),
         renderTimeMode(form, allowAnon = true),
         renderMicroMatch(form),

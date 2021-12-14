@@ -36,7 +36,7 @@ export default function (ctrl: LobbyController) {
           attrs: { href: '/' + pov.fullId },
         },
         [
-          h(`span.mini-board.cg-wrap.is2d.${boardClasses(pov.variant)}`, {
+          h(`span.mini-board.cg-wrap.is2d.${boardClasses(pov.variant)}.variant-${pov.variant.key}`, {
             attrs:
               pov.variant.gameLogic.id === 1
                 ? {

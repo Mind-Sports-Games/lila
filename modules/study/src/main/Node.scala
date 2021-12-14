@@ -4,7 +4,7 @@ import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.{ UciCharPair }
 import strategygames.variant.Variant
-import strategygames.chess.variant.Crazyhouse
+import strategygames.PocketData
 
 import strategygames.Centis
 import lila.tree.Eval.Score
@@ -16,7 +16,7 @@ sealed trait RootOrNode {
   val check: Boolean
   val shapes: Shapes
   val clock: Option[Centis]
-  val crazyData: Option[Crazyhouse.Data]
+  val pocketData: Option[PocketData]
   val children: Node.Children
   val comments: Comments
   val gamebook: Option[Gamebook]
@@ -41,7 +41,7 @@ case class Node(
     glyphs: Glyphs = Glyphs.empty,
     score: Option[Score] = None,
     clock: Option[Centis],
-    crazyData: Option[Crazyhouse.Data],
+    pocketData: Option[PocketData],
     children: Node.Children,
     forceVariation: Boolean
 ) extends RootOrNode {
@@ -95,7 +95,7 @@ case class Node(
       glyphs = glyphs merge n.glyphs,
       score = n.score orElse score,
       clock = n.clock orElse clock,
-      crazyData = n.crazyData orElse crazyData,
+      pocketData = n.pocketData orElse pocketData,
       children = n.children.nodes.foldLeft(children) { case (cs, c) =>
         cs addNode c
       },
@@ -243,7 +243,7 @@ object Node {
       glyphs: Glyphs = Glyphs.empty,
       score: Option[Score] = None,
       clock: Option[Centis],
-      crazyData: Option[Crazyhouse.Data],
+      pocketData: Option[PocketData],
       children: Children
   ) extends RootOrNode {
 
@@ -331,7 +331,7 @@ object Node {
         fen = variant.initialFen,
         check = false,
         clock = none,
-        crazyData = variant.crazyhouse option Crazyhouse.Data.init,
+        pocketData = variant.dropsVariant option PocketData.init(variant.gameLogic),
         children = emptyChildren
       )
 
@@ -341,7 +341,7 @@ object Node {
         fen = b.fen,
         check = b.check,
         clock = b.clock,
-        crazyData = b.crazyData,
+        pocketData = b.pocketData,
         children = Children(b.children.view.map(fromBranch).toVector)
       )
   }
@@ -353,7 +353,7 @@ object Node {
       move = b.move,
       fen = b.fen,
       check = b.check,
-      crazyData = b.crazyData,
+      pocketData = b.pocketData,
       clock = b.clock,
       children = Children(b.children.view.map(fromBranch).toVector),
       forceVariation = false

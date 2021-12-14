@@ -7,6 +7,7 @@ export function makeConfig(opts: CgConfig, pref: PuzPrefs, userMove: UserMove): 
   return {
     fen: opts.fen,
     orientation: opts.orientation,
+    myColor: opts.myColor,
     turnColor: opts.turnColor,
     check: opts.check,
     lastMove: opts.lastMove,
@@ -48,5 +49,8 @@ export function makeConfig(opts: CgConfig, pref: PuzPrefs, userMove: UserMove): 
       enabled: false,
     },
     disableContextMenu: true,
+    dimensions: opts.dimensions,
+    variant: opts.variant,
+    chess960: opts.chess960,
   };
 }

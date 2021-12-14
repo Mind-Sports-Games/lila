@@ -24,6 +24,8 @@ case class History(
     russian: RatingsMap,
     brazilian: RatingsMap,
     pool: RatingsMap,
+    shogi: RatingsMap,
+    xiangqi: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -34,34 +36,36 @@ case class History(
 ) {
 
   def apply(perfType: PerfType): RatingsMap =
-    perfType match {
-      case PerfType.Standard       => standard
-      case PerfType.Bullet         => bullet
-      case PerfType.Blitz          => blitz
-      case PerfType.Rapid          => rapid
-      case PerfType.Classical      => classical
-      case PerfType.Correspondence => correspondence
-      case PerfType.Chess960       => chess960
-      case PerfType.KingOfTheHill  => kingOfTheHill
-      case PerfType.Antichess      => antichess
-      case PerfType.ThreeCheck     => threeCheck
-      case PerfType.FiveCheck      => fiveCheck
-      case PerfType.Atomic         => atomic
-      case PerfType.Horde          => horde
-      case PerfType.RacingKings    => racingKings
-      case PerfType.Crazyhouse     => crazyhouse
-      case PerfType.LinesOfAction  => linesOfAction
-      case PerfType.International  => international
-      case PerfType.Frisian        => frisian
-      case PerfType.Frysk          => frysk
-      case PerfType.Antidraughts   => antidraughts
-      case PerfType.Breakthrough   => breakthrough
-      case PerfType.Russian        => russian
-      case PerfType.Brazilian      => brazilian
-      case PerfType.Pool           => pool
-      case PerfType.Puzzle         => puzzle
-      case PerfType.UltraBullet    => ultraBullet
-      case x                       => sys error s"No history for perf $x"
+    perfType.key match {
+      case "standard"       => standard
+      case "bullet"         => bullet
+      case "blitz"          => blitz
+      case "rapid"          => rapid
+      case "classical"      => classical
+      case "correspondence" => correspondence
+      case "chess960"       => chess960
+      case "kingOfTheHill"  => kingOfTheHill
+      case "antichess"      => antichess
+      case "threeCheck"     => threeCheck
+      case "fiveCheck"      => fiveCheck
+      case "atomic"         => atomic
+      case "horde"          => horde
+      case "racingKings"    => racingKings
+      case "crazyhouse"     => crazyhouse
+      case "linesOfAction"  => linesOfAction
+      case "international"  => international
+      case "frisian"        => frisian
+      case "frysk"          => frysk
+      case "antidraughts"   => antidraughts
+      case "breakthrough"   => breakthrough
+      case "russian"        => russian
+      case "brazilian"      => brazilian
+      case "pool"           => pool
+      case "shogi"          => shogi
+      case "xiangqi"        => xiangqi
+      case "puzzle"         => puzzle
+      case "ultraBullet"    => ultraBullet
+      case x                => sys error s"No history for perf $x"
     }
 }
 
@@ -106,6 +110,8 @@ object History {
           russian = ratingsMap("russian"),
           brazilian = ratingsMap("brazilian"),
           pool = ratingsMap("pool"),
+          shogi = ratingsMap("shogi"),
+          xiangqi = ratingsMap("xiangqi"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),

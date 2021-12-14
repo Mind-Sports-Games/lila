@@ -31,15 +31,3 @@ $pocket-height: 60px;
     grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
-
-@include breakpoint($mq-col1) {
-  .pocket {
-    &-top {
-      margin-bottom: #{-$block-gap};
-    }
-
-    &-bottom {
-      margin-top: #{-$block-gap};
-    }
-  }
-}

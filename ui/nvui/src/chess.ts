@@ -42,7 +42,27 @@ const roles: { [letter: string]: string } = {
   K: 'king',
   L: 'loachecker',
 };
-const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k', loachecker: 'l' };
+//const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k', loachecker: 'l' };
+
+const chessGroundRoleToLetter: { [pieceTypes: string]: string } = {
+  'k-piece': 'k',
+  'q-piece': 'q',
+  'r-piece': 'r',
+  'b-piece': 'b',
+  'n-piece': 'n',
+  'p-piece': 'p',
+  'l-piece': 'l',
+};
+
+const chessGroundRoleToLilaRole: { [pieceTypes: string]: string } = {
+  'k-piece': 'king',
+  'q-piece': 'queen',
+  'r-piece': 'rook',
+  'b-piece': 'bishop',
+  'n-piece': 'knight',
+  'p-piece': 'pawn',
+  'l-piece': 'loachecker',
+};
 
 const letterPiece: { [letter: string]: string } = {
   p: 'p',
@@ -264,7 +284,7 @@ export function renderPieces(pieces: Pieces, style: Style): VNode {
       ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn', 'loachecker'].forEach(role => {
         const keys = [];
         for (const [key, piece] of pieces) {
-          if (piece.color === color && piece.role === role) keys.push(key);
+          if (piece.color === color && chessGroundRoleToLilaRole[piece.role] === role) keys.push(key);
         }
         if (keys.length) lists.push([`${role}${keys.length > 1 ? 's' : ''}`, ...keys]);
       });
@@ -288,17 +308,17 @@ export function renderPieceKeys(pieces: Pieces, p: string, style: Style): string
   const name = `${p === p.toUpperCase() ? 'white' : 'black'} ${roles[p.toUpperCase()]}`;
   const res: Key[] = [];
   for (const [k, piece] of pieces) {
-    if (piece && `${piece.color} ${piece.role}` === name) res.push(k as Key);
+    if (piece && `${piece.color} ${chessGroundRoleToLilaRole[piece.role]}` === name) res.push(k as Key);
   }
   return `${name}: ${res.length ? res.map(k => renderKey(k, style)).join(', ') : 'none'}`;
 }
 
 export function renderPiecesOn(pieces: Pieces, rankOrFile: string, style: Style): string {
   const res: string[] = [];
-  for (const k of allKeys) {
+  for (const k of allKeys()) {
     if (k.includes(rankOrFile)) {
       const piece = pieces.get(k);
-      if (piece) res.push(`${renderKey(k, style)} ${piece.color} ${piece.role}`);
+      if (piece) res.push(`${renderKey(k, style)} ${piece.color} ${chessGroundRoleToLilaRole[piece.role]}`);
     }
   }
   return res.length ? res.join(', ') : 'blank';
@@ -344,7 +364,7 @@ export function renderBoard(
     const piece = pieces.get(key);
     const pieceWrapper = boardStyle === 'table' ? 'td' : 'span';
     if (piece) {
-      const role = letters[piece.role];
+      const role = chessGroundRoleToLetter[piece.role];
       const pieceText = renderPieceStyle(piece.color === 'white' ? role.toUpperCase() : role, pieceStyle);
       const prefix = renderPrefixStyle(piece.color, prefixStyle);
       const text = renderPositionStyle(rank, file, prefix + pieceText);

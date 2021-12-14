@@ -10,6 +10,7 @@ export const makeCgOpts = (run: Run, canMove: boolean): CgConfig => {
   return {
     fen: makeFen(pos.toSetup()),
     orientation: run.pov,
+    myColor: run.pov,
     turnColor: pos.turn,
     movable: {
       color: run.pov,

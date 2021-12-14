@@ -28,11 +28,13 @@ export interface SocketOpts {
 
 export interface SocketMove {
   u: Uci;
+  variant: string;
   b?: 1;
 }
 export interface SocketDrop {
   role: cg.Role;
   pos: cg.Key;
+  variant: string;
   b?: 1;
 }
 
@@ -49,6 +51,7 @@ export interface RoundData extends GameData {
   steps: Step[];
   possibleMoves?: EncodedDests;
   possibleDrops?: string;
+  possibleDropsByRole?: string;
   forecastCount?: number;
   crazyhouse?: CrazyData;
   correspondence: CorresClockData;
@@ -129,6 +132,7 @@ export interface ApiMove extends Step {
   crazyhouse?: CrazyData;
   role?: cg.Role;
   drops?: string;
+  dropsByRole?: string;
   promotion?: {
     key: cg.Key;
     pieceClass: cg.Role;

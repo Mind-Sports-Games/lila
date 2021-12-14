@@ -28,13 +28,15 @@ export interface KeyboardMove {
 }
 
 const sanToRole: { [key: string]: cg.Role } = {
-  P: 'pawn',
-  N: 'knight',
-  B: 'bishop',
-  R: 'rook',
-  Q: 'queen',
-  K: 'king',
-  L: 'loachecker',
+  P: 'p-piece',
+  N: 'n-piece',
+  B: 'b-piece',
+  R: 'r-piece',
+  Q: 'q-piece',
+  K: 'k-piece',
+  L: 'l-piece',
+  G: 'g-piece',
+  S: 's-piece',
 };
 
 export function ctrl(root: RoundController, step: Step, redraw: Redraw): KeyboardMove {
@@ -63,11 +65,11 @@ export function ctrl(root: RoundController, step: Step, redraw: Redraw): Keyboar
       if (!crazyValid(root.data, role, key)) return;
       root.chessground.cancelMove();
       root.chessground.newPiece({ role, color }, key);
-      root.sendNewPiece(role, key, false);
+      root.sendNewPiece(role, key, root.data.game.variant.key, false);
     },
     promote(orig, dest, piece) {
       const role = sanToRole[piece];
-      if (!role || role == 'pawn') return;
+      if (!role || role == 'p-piece') return;
       root.chessground.cancelMove();
       sendPromotion(root, orig, dest, role, { premove: false });
     },

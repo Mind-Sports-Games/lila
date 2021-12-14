@@ -1,8 +1,7 @@
 package lila.socket
 
 import strategygames.format.{ FEN, Uci }
-import strategygames.{ Color, Pos }
-import strategygames.chess.variant.Crazyhouse
+import strategygames.{ Color, GameLogic, Pocket, PocketData, Pos, Role }
 import play.api.libs.json._
 
 case class Step(
@@ -13,7 +12,7 @@ case class Step(
     // None when not computed yet
     dests: Option[Map[Pos, List[Pos]]],
     drops: Option[List[Pos]],
-    crazyData: Option[Crazyhouse.Data],
+    pocketData: Option[PocketData],
     captLen: Option[Int]
 ) {
 
@@ -31,16 +30,23 @@ object Step {
 
   // TODO copied from lila.game
   // put all that shit somewhere else
-  implicit private val crazyhousePocketWriter: OWrites[Crazyhouse.Pocket] = OWrites { v =>
+  implicit private val pocketWriter: OWrites[Pocket] = OWrites { v =>
     JsObject(
-      Crazyhouse.storableRoles.flatMap { role =>
+      Role.storable(v.roles.headOption match {
+        case Some(r) => r match {
+          case Role.ChessRole(_)   => GameLogic.Chess()
+          case Role.FairySFRole(_) => GameLogic.FairySF()
+          case _ => sys.error("Pocket not implemented for GameLogic")
+        }
+        case None => GameLogic.Chess()
+      }).flatMap { role =>
         Some(v.roles.count(role ==)).filter(0 <).map { count =>
-          role.name -> JsNumber(count)
+          role.groundName -> JsNumber(count)
         }
       }
     )
   }
-  implicit private val crazyhouseDataWriter: OWrites[Crazyhouse.Data] = OWrites { v =>
+  implicit private val pocketDataWriter: OWrites[PocketData] = OWrites { v =>
     Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
   }
 
@@ -70,6 +76,6 @@ object Step {
           JsString(drops.map(_.key).mkString)
         }
       )
-      .add("crazy", crazyData)
+      .add("crazy", pocketData)
   }
 }

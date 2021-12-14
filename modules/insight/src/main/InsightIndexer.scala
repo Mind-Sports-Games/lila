@@ -55,8 +55,8 @@ final private class InsightIndexer(
       Query.rated ++
       Query.finished ++
       Query.turnsGt(2) ++
-      Query.notFromPosition ++
-      Query.notHordeOrSincePawnsAreWhite
+      Query.notFromPosition
+      //Query.notHordeOrSincePawnsAreWhite
 
   private val maxGames = 10 * 1000
 

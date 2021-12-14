@@ -24,7 +24,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
 
 export function promote(ground: CgApi, key: Key, role: cg.Role) {
   const piece = ground.state.pieces.get(key);
-  if (piece && piece.role == 'pawn') {
+  if (piece && piece.role == 'p-piece') {
     ground.setPieces(
       new Map([
         [
@@ -43,13 +43,15 @@ export function promote(ground: CgApi, key: Key, role: cg.Role) {
 export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
   const d = ctrl.data,
     pref = d.pref,
-    opts = ctrl.makeCgOpts();
+    opts = ctrl.makeCgOpts(),
+    variantKey = d.game.variant.key as cg.Variant;
   const config = {
     turnColor: opts.turnColor,
     fen: opts.fen,
     check: opts.check,
     lastMove: opts.lastMove,
     orientation: ctrl.getOrientation(),
+    myColor: ctrl.data.player.color,
     coordinates: pref.coords !== Prefs.Coords.Hidden && !ctrl.embed,
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,
@@ -88,8 +90,10 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       duration: pref.animationDuration,
     },
     disableContextMenu: true,
+    dimensions: d.game.variant.boardSize,
+    variant: variantKey,
+    chess960: variantKey == 'chess960',
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
-
   return config;
 }

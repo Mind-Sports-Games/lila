@@ -29,7 +29,7 @@ private object bits {
         a(cls := "board_editor", href := url)(
           span(cls := "preview")(
             validFen.map { vf =>
-              views.html.board.bits.mini(vf.fen, vf.color)(div)
+              views.html.board.bits.mini(vf.fen, vf.color, vf.situation.board.variant.key)(div)
             }
           )
         )
@@ -46,13 +46,18 @@ private object bits {
       )
     )
 
-  def renderVariant(form: Form[_], variants: List[SelectChoice], lib: GameFamily)(implicit ctx: Context) =
-    div(cls := s"${lib.shortName.toLowerCase()}Variant label_select", if (lib != GameFamily.Chess()) style := "display:none")(
-      renderLabel(form(s"${lib.shortName.toLowerCase()}Variant"), trans.variant()),
-      renderSelect(
-        form(s"${lib.shortName.toLowerCase()}Variant"),
-        variants.filter { case (id, _, _) =>
-          ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
+  def renderVariant(
+      form: Form[_],
+      variants: List[(SelectChoice, List[SelectChoice])]
+  )(implicit ctx: Context) =
+    div(cls := "variant label_select")(
+      renderLabel(form("Variant"), trans.variant()),
+      renderSelectWithOptGroups(
+        form("variant"),
+        variants.map{ case (gf, v) =>
+          (gf, v.filter { case (id, _, _) =>
+            ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
+          })
         }
       )
     )
@@ -63,14 +68,35 @@ private object bits {
       compare: (String, String) => Boolean = (a, b) => a == b
   ) =
     select(id := s"$prefix${field.id}", name := field.name)(
-      options.map { case (value, name, title) =>
-        option(
-          st.value := value,
-          st.title := title,
-          field.value.exists(v => compare(v, value)) option selected
-        )(name)
+      renderOptions(field, options, compare)
+    )
+
+  def renderSelectWithOptGroups(
+      field: Field,
+      options: List[(SelectChoice, Seq[SelectChoice])],
+      compare: (String, String) => Boolean = (a, b) => a == b
+  ) =
+    select(id := s"$prefix${field.id}", name := field.name)(
+      options.map { case((ogValue, ogName, _), opts) =>
+        optgroup(name := ogName)(
+          renderOptions(field, opts, compare, ogValue + '_')
+        )
       }
     )
+
+  private def renderOptions(
+      field: Field,
+      options: Seq[SelectChoice],
+      compare: (String, String) => Boolean = (a, b) => a == b,
+      optValuePrefix: String = ""
+  ) =
+    options.map { case (value, name, title) =>
+      option(
+        st.value := optValuePrefix + value,
+        st.title := title,
+        field.value.exists(v => compare(v, value)) option selected
+      )(name)
+    }
 
   def renderRadios(field: Field, options: Seq[SelectChoice]) =
     st.group(cls := "radio")(

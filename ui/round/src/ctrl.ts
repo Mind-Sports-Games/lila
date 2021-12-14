@@ -27,6 +27,7 @@ import { ctrl as makeKeyboardMove, KeyboardMove } from './keyboardMove';
 import * as renderUser from './view/user';
 import * as cevalSub from './cevalSub';
 import * as keyboard from './keyboard';
+import * as chessUtil from 'chess';
 
 import {
   RoundOpts,
@@ -161,12 +162,14 @@ export default class RoundController {
 
   private onUserMove = (orig: cg.Key, dest: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.keyboardMove || !this.keyboardMove.usedSan) ab.move(this, meta);
-    if (!promotion.start(this, orig, dest, meta)) this.sendMove(orig, dest, undefined, meta);
+    if (!promotion.start(this, orig, dest, meta)) {
+      this.sendMove(orig, dest, undefined, this.data.game.variant.key, meta);
+    }
   };
 
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
-      this.sendNewPiece(role, key, !!meta.predrop);
+      this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
     } else this.jump(this.ply);
   };
 
@@ -197,7 +200,8 @@ export default class RoundController {
   };
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
-    if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'pawn') return false;
+    if (['xiangqi', 'shogi'].includes(this.data.game.variant.key)) return false;
+    if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'p-piece') return false;
     const pos = (dest[0] + orig[1]) as cg.Key;
     this.chessground.setPieces(new Map([[pos, undefined]]));
     return true;
@@ -306,11 +310,12 @@ export default class RoundController {
     this.redraw();
   };
 
-  sendMove = (orig: cg.Key, dest: cg.Key, prom: cg.Role | undefined, meta: cg.MoveMetadata) => {
+  sendMove = (orig: cg.Key, dest: cg.Key, prom: cg.Role | undefined, variant: string, meta: cg.MoveMetadata) => {
     const move: SocketMove = {
       u: orig + dest,
+      variant: variant,
     };
-    if (prom) move.u += prom === 'knight' ? 'n' : prom[0];
+    if (prom) move.u += prom.split('-')[0].slice(-1);
     if (blur.get()) move.b = 1;
     this.resign(false);
     if (this.data.pref.submitMove && !meta.premove) {
@@ -324,10 +329,11 @@ export default class RoundController {
     }
   };
 
-  sendNewPiece = (role: cg.Role, key: cg.Key, isPredrop: boolean): void => {
+  sendNewPiece = (role: cg.Role, key: cg.Key, variant: string, isPredrop: boolean): void => {
     const drop: SocketDrop = {
       role: role,
       pos: key,
+      variant: variant,
     };
     if (blur.get()) drop.b = 1;
     this.resign(false);
@@ -377,6 +383,7 @@ export default class RoundController {
     this.playerByColor('black').offeringDraw = o.bDraw;
     d.possibleMoves = activeColor ? o.dests : undefined;
     d.possibleDrops = activeColor ? o.drops : undefined;
+    d.possibleDropsByRole = activeColor ? o.dropsByRole : undefined;
     d.crazyhouse = o.crazyhouse;
     this.setTitle();
     if (!this.replaying()) {
@@ -396,7 +403,7 @@ export default class RoundController {
           pieces = this.chessground.state.pieces;
         if (
           !o.castle ||
-          (pieces.get(o.castle.king[0])?.role === 'king' && pieces.get(o.castle.rook[0])?.role === 'rook')
+          (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
         ) {
           this.chessground.move(keys[0], keys[1]);
         }
@@ -406,6 +413,9 @@ export default class RoundController {
         turnColor: d.game.player,
         movable: {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves) : new Map(),
+        },
+        dropmode: {
+          dropDests: playing ? chessUtil.readDropsByRole(d.possibleDropsByRole) : new Map(),
         },
         check: !!o.check,
       });

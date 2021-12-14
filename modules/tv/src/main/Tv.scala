@@ -50,7 +50,6 @@ final class Tv(
 object Tv {
   import strategygames.chess.{ variant => V }
   import strategygames.{ Speed => S }
-  import lila.rating.{ PerfType => P }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
   case class Champions(channels: Map[Channel, Champion]) {
@@ -87,49 +86,49 @@ object Tv {
     case object Bullet
         extends Channel(
           name = S.Bullet.name,
-          icon = P.Bullet.iconChar.toString,
+          icon = S.Bullet.perfIcon.toString,
           secondsSinceLastMove = 35,
           filters = Seq(speed(S.Bullet), rated(2000), standard, noBot)
         )
     case object Blitz
         extends Channel(
           name = S.Blitz.name,
-          icon = P.Blitz.iconChar.toString,
+          icon = S.Blitz.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(speed(S.Blitz), rated(2000), standard, noBot)
         )
     case object Rapid
         extends Channel(
           name = S.Rapid.name,
-          icon = P.Rapid.iconChar.toString,
+          icon = S.Rapid.perfIcon.toString,
           secondsSinceLastMove = 60 * 5,
           filters = Seq(speed(S.Rapid), rated(1800), standard, noBot)
         )
     case object Classical
         extends Channel(
           name = S.Classical.name,
-          icon = P.Classical.iconChar.toString,
+          icon = S.Classical.perfIcon.toString,
           secondsSinceLastMove = 60 * 8,
           filters = Seq(speed(S.Classical), rated(1650), standard, noBot)
         )
     case object Chess960
         extends Channel(
           name = V.Chess960.name,
-          icon = P.Chess960.iconChar.toString,
+          icon = V.Chess960.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.Chess960), noBot)
         )
     case object KingOfTheHill
         extends Channel(
           name = V.KingOfTheHill.name,
-          icon = P.KingOfTheHill.iconChar.toString,
+          icon = V.KingOfTheHill.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.KingOfTheHill), noBot)
         )
     case object ThreeCheck
         extends Channel(
           name = V.ThreeCheck.name,
-          icon = P.ThreeCheck.iconChar.toString,
+          icon = V.ThreeCheck.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.ThreeCheck), noBot)
         )
@@ -143,42 +142,42 @@ object Tv {
     case object Antichess
         extends Channel(
           name = V.Antichess.name,
-          icon = P.Antichess.iconChar.toString,
+          icon = V.Antichess.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.Antichess), noBot)
         )
     case object Atomic
         extends Channel(
           name = V.Atomic.name,
-          icon = P.Atomic.iconChar.toString,
+          icon = V.Atomic.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.Atomic), noBot)
         )
     case object Horde
         extends Channel(
           name = V.Horde.name,
-          icon = P.Horde.iconChar.toString,
+          icon = V.Horde.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.Horde), noBot)
         )
     case object RacingKings
         extends Channel(
           name = V.RacingKings.name,
-          icon = P.RacingKings.iconChar.toString,
+          icon = V.RacingKings.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.RacingKings), noBot)
         )
     case object Crazyhouse
         extends Channel(
           name = V.Crazyhouse.name,
-          icon = P.Crazyhouse.iconChar.toString,
+          icon = V.Crazyhouse.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.Crazyhouse), noBot)
         )
     case object UltraBullet
         extends Channel(
           name = S.UltraBullet.name,
-          icon = P.UltraBullet.iconChar.toString,
+          icon = S.UltraBullet.perfIcon.toString,
           secondsSinceLastMove = 20,
           filters = Seq(speed(S.UltraBullet), rated(1600), standard, noBot)
         )

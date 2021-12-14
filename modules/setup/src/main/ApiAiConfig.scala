@@ -1,8 +1,7 @@
 package lila.setup
 
-import strategygames.Clock
 import strategygames.Color.{ Black, White }
-import strategygames.{ Game => StratGame, GameFamily }
+import strategygames.{ Clock, GameFamily, Mode, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition }
@@ -35,7 +34,7 @@ final case class ApiAiConfig(
   def game(user: Option[User]) =
     fenGame { chessGame =>
       val perfPicker = lila.game.PerfPicker.mainOrDefault(
-        strategygames.Speed(chessGame.clock.map(_.config)),
+        Speed(chessGame.clock.map(_.config)),
         chessGame.situation.board.variant,
         makeDaysPerTurn
       )
@@ -50,7 +49,7 @@ final case class ApiAiConfig(
             Player.make(Black, level.some),
             Player.make(Black, user, perfPicker)
           ),
-          mode = strategygames.Mode.Casual,
+          mode = Mode.Casual,
           source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
@@ -71,26 +70,21 @@ object ApiAiConfig extends BaseConfig {
 
   def from(
       l: Int,
-      lib: Int,
-      cv: Option[String],
-      dv: Option[String],
-      lv: Option[String],
+      v: Option[String],
       cl: Option[Clock.Config],
       d: Option[Int],
       c: Option[String],
       pos: Option[String]
-  ) =
+  ) = {
+    val variant = Variant.orDefault(~v)
     new ApiAiConfig(
-      variant = lib match {
-        case 0 => Variant.Chess(strategygames.chess.variant.Variant.orDefault(~cv))
-        case 1 => Variant.Draughts(strategygames.draughts.variant.Variant.orDefault(~dv))
-        case 2 => Variant.Chess(strategygames.chess.variant.Variant.orDefault(~lv))
-      },
+      variant = variant,
       fenVariant = none,
       clock = cl,
       daysO = d,
       color = Color.orDefault(~c),
       level = l,
-      fen = pos.map(f => FEN.apply(GameFamily(lib).codeLib, f))
+      fen = pos.map(f => FEN.apply(variant.gameLogic, f))
     ).autoVariant
+  }
 }

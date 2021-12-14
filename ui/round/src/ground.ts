@@ -15,10 +15,12 @@ export function makeConfig(ctrl: RoundController): Config {
   const data = ctrl.data,
     hooks = ctrl.makeCgHooks(),
     step = plyStep(data, ctrl.ply),
-    playing = ctrl.isPlaying();
+    playing = ctrl.isPlaying(),
+    variantKey = data.game.variant.key as cg.Variant;
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
+    myColor: data.player.color,
     turnColor: step.ply % 2 === 0 ? 'white' : 'black',
     lastMove: util.uci2move(step.uci),
     check: !!step.check,
@@ -61,13 +63,16 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     predroppable: {
-      enabled: data.pref.enablePremove && data.game.variant.key === 'crazyhouse',
+      enabled: data.pref.enablePremove && (data.game.variant.key === 'crazyhouse' || data.game.variant.key === 'shogi'),
       events: {
         set: hooks.onPredrop,
         unset() {
           hooks.onPredrop(undefined);
         },
       },
+    },
+    dropmode: {
+      showDropDests: true,
     },
     draggable: {
       enabled: data.pref.moveEvent !== Prefs.MoveEvent.Click,
@@ -79,8 +84,19 @@ export function makeConfig(ctrl: RoundController): Config {
     drawable: {
       enabled: true,
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
+      pieces: {
+        baseUrl:
+          variantKey === 'shogi'
+            ? 'https://playstrategy.org/assets/piece/shogi/'
+            : variantKey === 'xiangqi'
+            ? 'https://playstrategy.org/assets/piece/xiangqi/'
+            : 'https://playstrategy.org/assets/piece/cburnett/',
+      },
     },
     disableContextMenu: true,
+    dimensions: data.game.variant.boardSize,
+    variant: variantKey,
+    chess960: data.game.variant.key === 'chess960',
   };
 }
 
@@ -90,7 +106,10 @@ export function reload(ctrl: RoundController) {
 
 export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
   const piece = ground.state.pieces.get(key);
-  if (piece && piece.role === 'pawn') {
+  if (
+    (piece && piece.role === 'p-piece' && ground.state.variant !== 'shogi') ||
+    (piece && ground.state.variant == 'shogi' && piece.role !== 'k-piece' && piece.role !== 'g-piece')
+  ) {
     ground.setPieces(
       new Map([
         [

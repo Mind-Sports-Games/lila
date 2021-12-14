@@ -112,7 +112,7 @@ final private[puzzle] class PuzzleFinisher(
                     .void
                 } zip
                 (userPerf != user.perfs.puzzle).?? {
-                  userRepo.setPerf(user.id, PerfType.Puzzle, userPerf.clearRecent) zip
+                  userRepo.setPerf(user.id, PerfType.orDefault("puzzle"), userPerf.clearRecent) zip
                     historyApi.addPuzzle(user = user, completedAt = now, perf = userPerf) void
                 } >>- {
                   if (prevRound.isEmpty)
