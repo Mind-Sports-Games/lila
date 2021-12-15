@@ -104,7 +104,8 @@ function pieceImage(t: Piece, is3d: boolean) {
     const preview = t.name == 'Staunton' ? '-Preview' : '';
     return `images/staunton/piece/${t.name}/White-Knight${preview}.png`;
   }
-  return `piece/${t.gameFamily.toLowerCase()}/${t.name}/${t.displayPiece}.svg`;
+  const ext = t.name === "check_yb_loa" ? ".png" : ".svg"
+  return `piece/${t.gameFamily.toLowerCase()}/${t.name}/${t.displayPiece}${ext}`;
 }
 
 function isActivePiece(t: Piece, current: Piece[]): boolean {
