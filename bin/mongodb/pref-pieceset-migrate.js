@@ -7,7 +7,7 @@ db.pref.find().forEach(c => {
           { name: c.pieceSet, gameFamily: 0 },
           { name: 'wide_crown', gameFamily: 1 },
           { name: 'fabirovsky_loa', gameFamily: 2 },
-          { name: '2kamji', gameFamily: 3 },
+          { name: '2kanji', gameFamily: 3 },
           { name: '2dhanzi', gameFamily: 4 },
         ],
       },
