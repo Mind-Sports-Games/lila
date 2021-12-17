@@ -11,6 +11,7 @@ object StatusText {
     status match {
       case Aborted                  => "Game was aborted."
       case Mate                     => s"${winner(win)} wins by checkmate."
+      case PerpetualCheck           => s"${winner(win)} wins by opponent causing perpetual check."
       case Resign                   => s"${loser(win)} resigns."
       case UnknownFinish            => s"${winner(win)} wins."
       case Stalemate                => "Draw by stalemate."

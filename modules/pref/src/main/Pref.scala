@@ -8,7 +8,7 @@ case class Pref(
     bgImg: Option[String],
     is3d: Boolean,
     theme: String,
-    pieceSet: String,
+    pieceSet: List[PieceSet],
     theme3d: String,
     pieceSet3d: String,
     soundSet: String,
@@ -51,7 +51,7 @@ case class Pref(
   def id = _id
 
   def realTheme      = Theme(theme)
-  def realPieceSet   = PieceSet(pieceSet)
+  def realPieceSet   = pieceSet
   def realTheme3d    = Theme3d(theme3d)
   def realPieceSet3d = PieceSet3d(pieceSet3d)
 
@@ -73,9 +73,7 @@ case class Pref(
           copy(theme = t.name)
         }
       case "pieceSet" =>
-        PieceSet.allByName get value map { p =>
-          copy(pieceSet = p.name)
-        }
+          copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
         Theme3d.allByName get value map { t =>
           copy(theme3d = t.name)
@@ -124,7 +122,7 @@ case class Pref(
   // atob("aHR0cDovL2NoZXNzLWNoZWF0LmNvbS9ob3dfdG9fY2hlYXRfYXRfbGljaGVzcy5odG1s")
   def botCompatible =
     theme == "brown" &&
-      pieceSet == "cburnett" &&
+      pieceSet == PieceSet.defaults &&
       is2d &&
       animation == Animation.NONE &&
       highlight &&
@@ -440,7 +438,7 @@ object Pref {
     bgImg = none,
     is3d = false,
     theme = Theme.default.name,
-    pieceSet = PieceSet.default.name,
+    pieceSet = PieceSet.defaults,
     theme3d = Theme3d.default.name,
     pieceSet3d = PieceSet3d.default.name,
     soundSet = SoundSet.default.name,

@@ -249,7 +249,10 @@ export default class RoundController {
         color: this.isPlaying() ? this.data.player.color : undefined,
         dests: util.parsePossibleMoves(this.data.possibleMoves),
       };
-    this.chessground.set(config);
+    (config.dropmode = {
+      dropDests: this.isPlaying() ? chessUtil.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
+    }),
+      this.chessground.set(config);
     if (s.san && isForwardStep) {
       if (s.san.includes('x')) sound.capture();
       else sound.move();

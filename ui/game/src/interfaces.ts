@@ -75,6 +75,7 @@ export type StatusName =
   | 'noStart'
   | 'cheat'
   | 'variantEnd'
+  | 'perpetualCheck'
   | 'unknownFinish';
 
 export type StatusId = number;
