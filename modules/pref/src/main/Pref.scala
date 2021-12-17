@@ -69,13 +69,13 @@ case class Pref(
       case "bg"    => Pref.Bg.fromString.get(value).map { bg => copy(bg = bg) }
       case "bgImg" => copy(bgImg = value.some).some
       case "theme" =>
-        Theme.allByName get value map { t =>
+        Theme.allByName(0) get value map { t =>
           copy(theme = t.name)
         }
       case "pieceSet" =>
           copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
-        Theme3d.allByName get value map { t =>
+        Theme3d.allByName(0) get value map { t =>
           copy(theme3d = t.name)
         }
       case "pieceSet3d" =>

@@ -62,6 +62,7 @@ export function ctrl(
 
 export function view(ctrl: ThemeCtrl): VNode {
   const d = ctrl.data();
+  console.log("data", d);
   const selectedVariant = document.getElementById('variantForPiece') as HTMLInputElement;
   const sv = selectedVariant
     ? selectedVariant.value === 'LinesOfAction'
@@ -105,7 +106,7 @@ function isActiveTheme(t: Theme, current: Theme[]): boolean {
 function themeView(current: Theme[], displayedThemes: Theme[], set: (t: Theme) => void) {
   return (t: Theme) =>
     h(
-      'a',
+      `a.${t.gameFamily}`,
       {
         hook: bind('click', () => set(t)),
         attrs: { title: t.name },

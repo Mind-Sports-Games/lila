@@ -76,15 +76,16 @@ final class Dasher(env: Env) extends LilaController(env) {
                   "is3d" -> ctx.pref.is3d
                 ),
                 "theme" -> Json.obj(
-                  "d2" -> List(Json.obj(
+                  "d2" -> GameFamily.all.map{ gf => Json.obj(
                     "current" -> Json.obj("name" -> ctx.currentTheme.name,
-                                          "gameFamily" -> "chess", 
+                                          "gameFamily" -> gf.shortName.toLowerCase(),
                                           "displayImage" -> "placeholder"),
-                    "list"    -> lila.pref.Theme.all.map( t =>
+                    "list"    -> lila.pref.Theme.allOfFamily(gf).map( t =>
                                           Json.obj("name" -> t.name,
-                                                   "gameFamily" -> "chess",
-                                                   "displayImage" -> "placeholder"))
-                  )),
+                                                   "gameFamily" -> t.gameFamilyName,
+                                                   "displayImage" -> "placeholder"
+                                                   ))
+                  )},
                   "d3" -> List(Json.obj(
                    "current" -> Json.obj("name" -> ctx.currentTheme.name,
                                           "gameFamily" -> "chess", 
@@ -104,8 +105,8 @@ final class Dasher(env: Env) extends LilaController(env) {
                                             Json.obj("name" -> p.name,
                                                     "gameFamily" -> p.gameFamilyName,
                                                     "displayPiece" -> p.displayPiece 
-                                                    )))
-                    },
+                                                    ))
+                    )},
                     "d3" -> List (Json.obj(
                         "current" -> Json.obj("name" -> ctx.currentPieceSet3d.name,
                                               "gameFamily" -> "chess",
