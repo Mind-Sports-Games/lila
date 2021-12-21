@@ -13,8 +13,8 @@ export function top(boards: Board[]): VNode {
 
 const renderBoardClasses = (board: Board): string =>
   board.gameLogic === 'draughts' && !!board.boardSize
-    ? `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLogic}.is${board.boardSize.key}`
-    : `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLogic}`;
+    ? `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLogic}.is${board.boardSize.key}.${board.variantKey}.variant-${board.variantKey}`
+    : `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLogic}.${board.variantKey}.variant-${board.variantKey}`;
 
 const renderBoardState = (board: Board): string =>
   board.gameLogic === 'draughts' && !!board.boardSize
