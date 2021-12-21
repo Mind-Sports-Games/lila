@@ -14,6 +14,7 @@ object StatusText {
       case PerpetualCheck           => s"${winner(win)} wins by opponent causing perpetual check."
       case Resign                   => s"${loser(win)} resigns."
       case UnknownFinish            => s"${winner(win)} wins."
+      case Stalemate if !variant.stalemateIsDraw => s"${winner(win)} wins by stalemate."
       case Stalemate                => "Draw by stalemate."
       case Timeout if win.isDefined => s"${loser(win)} left the game."
       case Timeout | Draw           => "The game is a draw."
