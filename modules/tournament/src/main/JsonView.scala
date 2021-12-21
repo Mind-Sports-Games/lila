@@ -290,7 +290,8 @@ final class JsonView(
     Json
       .obj(
         "id"          -> game.id,
-        "gameLogic"     -> game.variant.gameLogic.name.toLowerCase(),
+        "gameLogic"   -> game.variant.gameLogic.name.toLowerCase(),
+        "variantKey"  -> game.variant.key,
         "fen"         -> Forsyth.boardAndColor(game.variant.gameLogic, game.situation),
         "orientation" -> game.naturalOrientation.name,
         "color"       -> game.naturalOrientation.name, // app BC https://github.com/ornicar/lila/issues/7195
