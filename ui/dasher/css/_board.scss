@@ -10,11 +10,11 @@
     height: 44px;
 
     &.shogi {
-      height: 125px; 
+      height: 125px;
     }
 
     &.xiangqi {
-      height: 125px; 
+      height: 125px;
     }
 
     @extend %flex-center;
@@ -32,13 +32,13 @@
     height: 32px;
   }
 
-  .list a.shogi span{
+  .list a.shogi span {
     display: block;
     width: 100px;
     height: 100px;
   }
 
-  .list a.xiangqi span{
+  .list a.xiangqi span {
     display: block;
     width: 100px;
     height: 111.11px;
@@ -91,11 +91,11 @@
     'horsey': 'horsey.thumbnail.jpg',
   );
 
-  @each $gameFamily in ('chess', 'draughts', 'loa'){ 
+  @each $gameFamily in ('chess', 'draughts', 'loa') {
     @each $color, $file in $chess-board-files {
       &.d2 .#{$gameFamily}-#{$color} {
         background-image: url(../images/board/#{$gameFamily}/#{$file});
-        @if (str-index(#{$file}, '.svg')){
+        @if (str-index(#{$file}, '.svg')) {
           background-size: 256px;
         }
       }
@@ -122,7 +122,6 @@
       background-image: url(../images/board/xiangqi/xiangqic.svg);
       background-size: 100px;
     }
-
   }
 
   &.d3 {

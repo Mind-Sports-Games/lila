@@ -7,7 +7,6 @@ import { Redraw, Open, bind, header } from './util';
 type Theme = {
   name: string;
   gameFamily: string;
-  displayImage: string;
 };
 
 interface ThemeDimData {
@@ -49,7 +48,7 @@ export function ctrl(
       dgf.current = t;
       applyTheme(t, dgf.list);
       xhr
-        .text('/pref/theme' + (dimension() === 'd3' ? '3d' : ''), {
+        .text('/pref/theme' + (dimension() === 'd3' ? '3d' : '') + `/${t.gameFamily}`, {
           body: xhr.form({ theme: t.name }),
           method: 'post',
         })
@@ -62,7 +61,7 @@ export function ctrl(
 
 export function view(ctrl: ThemeCtrl): VNode {
   const d = ctrl.data();
-  console.log("data", d);
+  console.log('data', d);
   const selectedVariant = document.getElementById('variantForPiece') as HTMLInputElement;
   const sv = selectedVariant
     ? selectedVariant.value === 'LinesOfAction'
@@ -96,7 +95,7 @@ function isActiveTheme(t: Theme, current: Theme[]): boolean {
   //not sure why current.includes(t) doesn't work for the inital load of page and therefore doesn't highlight active theme
   let found = false;
   current.forEach(p => {
-    if (p && p.name === t.name && p.gameFamily === t.gameFamily && p.displayImage === t.displayImage) {
+    if (p && p.name === t.name && p.gameFamily === t.gameFamily) {
       found = true;
     }
   });
@@ -117,6 +116,8 @@ function themeView(current: Theme[], displayedThemes: Theme[], set: (t: Theme) =
 }
 
 function applyTheme(t: Theme, list: Theme[]) {
-  $('body').removeClass(list.map(t => `${t.gameFamily}-${t.name}`).join(' ')).addClass(`${t.gameFamily}-${t.name}`);
+  $('body')
+    .removeClass(list.map(t => `${t.gameFamily}-${t.name}`).join(' '))
+    .addClass(`${t.gameFamily}-${t.name}`);
   changeColorHandle();
 }

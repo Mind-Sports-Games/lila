@@ -87,6 +87,12 @@ final class PrefApi(
       s"Bad pref ${user.id} pieceSet -> $value" flatMap (pref => {
             setPref(pref) inject (Json.toJson(pref.pieceSet).toString)
           })
+  
+  def updatePrefTheme(user: User, gameFamily: String, value: String): Fu[String] =
+    getPref(user) map { _.set("theme", value) } orFail
+      s"Bad pref ${user.id} theme -> $value" flatMap (pref => {
+            setPref(pref) inject (Json.toJson(pref.theme).toString)
+          })
       
 
   def setBot(user: User): Funit =

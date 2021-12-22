@@ -34,11 +34,11 @@ coords {
   color: var(--cg-coord-color-chess-black);
 }
 
-.variant-linesOfAction{
+.variant-linesOfAction {
   coords {
     text-shadow: var(--cg-coord-shadow-loa);
   }
-  
+
   .orientation-white .files coord:nth-child(2n + 1),
   .orientation-white .ranks coord:nth-child(2n),
   .orientation-black .files coord:nth-child(2n),
@@ -49,7 +49,7 @@ coords {
   .orientation-left .ranks coord:nth-child(2n + 1) {
     color: var(--cg-coord-color-loa-white);
   }
-  
+
   .orientation-white .files coord:nth-child(2n),
   .orientation-white .ranks coord:nth-child(2n + 1),
   .orientation-black .files coord:nth-child(2n + 1),

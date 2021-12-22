@@ -139,8 +139,7 @@ object layout {
 
   private def current2dTheme(implicit ctx: Context) =
     if (ctx.pref.is3d && ctx.pref.theme == "horsey") lila.pref.Theme.default
-    //else ctx.currentTheme // TODO change to list of theme per game family
-    else lila.pref.Theme.defaults.map(t => t.cssClass).mkString(" ").pp("theme classes")
+    else ctx.currentTheme.map(t => t.cssClass).mkString(" ")
 
   private def botImage =
     img(
