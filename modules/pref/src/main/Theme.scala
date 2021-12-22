@@ -5,7 +5,7 @@ sealed class Theme private[pref] (val name: String, val colors: Theme.HexColors,
 
   override def toString = name
 
-  def cssClass = name
+  def cssClass = s"${gameFamilyName}-${name}"
 
   def light = colors._1
   def dark  = colors._2
@@ -25,6 +25,8 @@ sealed trait ThemeObject {
 
 
   def apply(name: String, gameFamily: Int = 0) = allByName(gameFamily).getOrElse(name, default)
+
+  def unapply(full: Theme): Some[(String, Int)] = Some((full.name, full.gameFamily))
 
   def contains(name: String, gameFamily: Int = 0) = allByName(gameFamily) contains name
 
@@ -170,25 +172,25 @@ object LinesOfActionTheme extends ThemeObject {
 object ShogiTheme extends ThemeObject {
 
   val all = List(
-    "shogi",
-    "shogi_clear"
+    "wood",
+    "clear"
   ) map { name =>
     new Theme(name, Theme.defaultHexColors, 3)
   }
 
-  lazy val default = allByName(3) get "shogi" err "Can't find default theme D:"
+  lazy val default = allByName(3) get "wood" err "Can't find default theme D:"
 }
 
 object XiangqiTheme extends ThemeObject {
 
   val all = List(
-    "xiangqi",
-    "xiangqic"
+    "grey",
+    "green"
   ) map { name =>
     new Theme(name, Theme.defaultHexColors, 4)
   }
 
-  lazy val default = allByName(4) get "xiangqi" err "Can't find default theme D:"
+  lazy val default = allByName(4) get "grey" err "Can't find default theme D:"
 }
 
 

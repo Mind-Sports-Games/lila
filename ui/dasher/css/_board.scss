@@ -9,6 +9,14 @@
     flex: 0 0 50%;
     height: 44px;
 
+    &.shogi {
+      height: 125px; 
+    }
+
+    &.xiangqi {
+      height: 125px; 
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -22,6 +30,18 @@
     display: block;
     width: 64px;
     height: 32px;
+  }
+
+  .list a.shogi span{
+    display: block;
+    width: 100px;
+    height: 100px;
+  }
+
+  .list a.xiangqi span{
+    display: block;
+    width: 100px;
+    height: 111.11px;
   }
 
   &.d3 .list span {
@@ -43,131 +63,64 @@
     background-color: $c-shade;
   }
 
+  $chess-board-files: (
+    'blue': 'svg/blue.svg',
+    'blue2': 'blue2.thumbnail.jpg',
+    'blue-marble': 'blue-marble.thumbnail.jpg',
+    'wood2': 'wood2.thumbnail.jpg',
+    'wood3': 'wood3.thumbnail.jpg',
+    'wood4': 'wood4.thumbnail.jpg',
+    'blue3': 'blue3.thumbnail.jpg',
+    'marble': 'marble.thumbnail.jpg',
+    'brown': 'svg/brown.svg',
+    'green': 'svg/green.svg',
+    'green-plastic': 'green-plastic.thumbnail.png',
+    'olive': 'olive.thumbnail.jpg',
+    'purple': 'svg/purple.svg',
+    'purple-diag': 'purple-diag.thumbnail.png',
+    'grey': 'grey.thumbnail.jpg',
+    'wood': 'wood.thumbnail.jpg',
+    'canvas': 'canvas2.thumbnail.jpg',
+    'leather': 'leather.thumbnail.jpg',
+    'metal': 'metal.thumbnail.jpg',
+    'maple': 'maple.thumbnail.jpg',
+    'maple2': 'maple2.thumbnail.jpg',
+    'newspaper': 'newspaper.thumbnail.png',
+    'pink': 'pink-pyramid.thumbnail.png',
+    'ic': 'svg/ic.svg',
+    'horsey': 'horsey.thumbnail.jpg',
+  );
+
+  @each $gameFamily in ('chess', 'draughts', 'loa'){ 
+    @each $color, $file in $chess-board-files {
+      &.d2 .#{$gameFamily}-#{$color} {
+        background-image: url(../images/board/#{$gameFamily}/#{$file});
+        @if (str-index(#{$file}, '.svg')){
+          background-size: 256px;
+        }
+      }
+    }
+  }
+
   &.d2 {
-    .blue {
-      background-image: url(../images/board/chess/svg/blue.svg);
-      background-size: 256px;
-    }
-
-    .blue2 {
-      background-image: url(../images/board/chess/blue2.thumbnail.jpg);
-    }
-
-    .blue-marble {
-      background-image: url(../images/board/chess/blue-marble.thumbnail.jpg);
-    }
-
-    .wood2 {
-      background-image: url(../images/board/chess/wood2.thumbnail.jpg);
-    }
-
-    .wood3 {
-      background-image: url(../images/board/chess/wood3.thumbnail.jpg);
-    }
-
-    .wood4 {
-      background-image: url(../images/board/chess/wood4.thumbnail.jpg);
-    }
-
-    .blue3 {
-      background-image: url(../images/board/chess/blue3.thumbnail.jpg);
-    }
-
-    .marble {
-      background-image: url(../images/board/chess/marble.thumbnail.jpg);
-    }
-
-    .brown {
-      background-image: url(../images/board/chess/svg/brown.svg);
-      background-size: 256px;
-    }
-
-    .green {
-      background-image: url(../images/board/chess/svg/green.svg);
-      background-size: 256px;
-    }
-
-    .olive {
-      background-image: url(../images/board/chess/olive.thumbnail.jpg);
-    }
-
-    .purple {
-      background-image: url(../images/board/chess/svg/purple.svg);
-      background-size: 256px;
-    }
-
-    .grey {
-      background-image: url(../images/board/chess/grey.thumbnail.jpg);
-    }
-
-    .wood {
-      background-image: url(../images/board/chess/wood.thumbnail.jpg);
-    }
-
-    .canvas {
-      background-image: url(../images/board/chess/canvas2.thumbnail.jpg);
-    }
-
-    .leather {
-      background-image: url(../images/board/chess/leather.thumbnail.jpg);
-    }
-
-    .metal {
-      background-image: url(../images/board/chess/metal.thumbnail.jpg);
-    }
-
-    .maple {
-      background-image: url(../images/board/chess/maple.thumbnail.jpg);
-    }
-
-    .maple2 {
-      background-image: url(../images/board/chess/maple2.thumbnail.jpg);
-    }
-
-    .newspaper {
-      background-image: url(../images/board/chess/newspaper.thumbnail.png);
-    }
-
-    .green-plastic {
-      background-image: url(../images/board/chess/green-plastic.thumbnail.png);
-    }
-
-    .purple-diag {
-      background-image: url(../images/board/chess/purple-diag.thumbnail.png);
-    }
-
-    .pink {
-      background-image: url(../images/board/chess/pink-pyramid.thumbnail.png);
-    }
-
-    .ic {
-      background-image: url(../images/board/chess/svg/ic.svg);
-      background-size: 256px;
-    }
-
-    .horsey {
-      background-image: url(../images/board/chess/horsey.thumbnail.jpg);
-    }
-
-    //extra for shogi/xiangqi
-    .shogi {
+    .shogi-wood {
       background-image: url(../images/board/shogi/shogi.svg);
-      background-size: 256px;
+      background-size: 100px;
     }
 
-    .shogi_clear {
-      background-image: url(../images/board/shogi/shogi_clear.svg);
-      background-size: 256px;
+    .shogi-clear {
+      background-image: url(../images/board/shogi/shogi_clear.png);
+      background-size: 100px;
     }
 
-    .xiangqi {
+    .xiangqi-grey {
       background-image: url(../images/board/xiangqi/xiangqi.svg);
-      background-size: 256px;
+      background-size: 100px;
     }
 
-    .xiangqic {
+    .xiangqi-green {
       background-image: url(../images/board/xiangqi/xiangqic.svg);
-      background-size: 256px;
+      background-size: 100px;
     }
 
   }

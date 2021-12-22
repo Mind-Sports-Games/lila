@@ -112,11 +112,11 @@ function themeView(current: Theme[], displayedThemes: Theme[], set: (t: Theme) =
         attrs: { title: t.name },
         class: { active: isActiveTheme(t, current), hidden: !displayedThemes.includes(t) },
       },
-      [h('span.' + t.name)]
+      [h(`span.${t.gameFamily}-${t.name}`)]
     );
 }
 
 function applyTheme(t: Theme, list: Theme[]) {
-  $('body').removeClass(list.map(t => t.name).join(' ')).addClass(t.name);
+  $('body').removeClass(list.map(t => `${t.gameFamily}-${t.name}`).join(' ')).addClass(`${t.gameFamily}-${t.name}`);
   changeColorHandle();
 }
