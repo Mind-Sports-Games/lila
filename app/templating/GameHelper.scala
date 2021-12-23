@@ -52,6 +52,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate | PerpetualCheck, _) =>
         s"${playerText(w)} won by opponent perpetually checking"
+      case (Some(w), _, Stalemate, _) if !game.variant.stalemateIsDraw =>
+        s"${playerText(w)} won by stalemate"
       case (_, Some(l), Resign | Timeout | Cheat | NoStart, _) =>
         s"${playerText(l)} resigned"
       case (_, Some(l), Outoftime, _)                  => s"${playerText(l)} forfeits by time"
