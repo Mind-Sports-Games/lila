@@ -5,10 +5,10 @@ db.pref.find().forEach(c => {
       $set: {
         theme: [
           { name: c.theme, gameFamily: 0 },
-          { name: 'brown', gameFamily: 1 },
-          { name: 'brown', gameFamily: 2 },
+          { name: 'blue3', gameFamily: 1 },
+          { name: 'marble', gameFamily: 2 },
           { name: 'wood', gameFamily: 3 },
-          { name: 'grey', gameFamily: 4 },
+          { name: 'green', gameFamily: 4 },
         ],
       },
     }

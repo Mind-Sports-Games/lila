@@ -23,7 +23,6 @@ sealed trait ThemeObject {
     c.name -> c
   } toMap
 
-
   def apply(name: String, gameFamily: Int = 0) = allByName(gameFamily).getOrElse(name, default)
 
   def unapply(full: Theme): Some[(String, Int)] = Some((full.name, full.gameFamily))
@@ -47,11 +46,9 @@ object Theme extends ThemeObject {
     "horsey" -> (HexColor("f1d9b6") -> HexColor("8e6547"))
   )
 
-  val defaults = List(ChessTheme.default,
-                      DraughtsTheme.default,
-                      LinesOfActionTheme.default,
-                      ShogiTheme.default,
-                      XiangqiTheme.default)
+  lazy val default = allByName(0) get "maple" err "Can't find default theme D:"
+
+  val defaults = GameFamily.all.map(gf => new Theme(gf.boardThemeDefault, Theme.colors.getOrElse(gf.boardThemeDefault, Theme.defaultHexColors), gf.id))
 
   def updateBoardTheme(currentThemes : List[Theme], theme: String, gameFamily: Int) : List[Theme] = {
     val newTheme = apply(theme, gameFamily)
@@ -70,138 +67,131 @@ object Theme extends ThemeObject {
                      }}
   }
 
-  val all = ChessTheme.all ::: DraughtsTheme.all ::: LinesOfActionTheme.all ::: ShogiTheme.all ::: XiangqiTheme.all
+  val all: List[Theme] = GameFamily.all.map(gf => gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))).flatten
  
-  def allOfFamily(gf: GameFamily) : List[Theme] = gf match {
-    case GameFamily.Chess() => ChessTheme.all
-    case GameFamily.Draughts() => DraughtsTheme.all
-    case GameFamily.LinesOfAction() => LinesOfActionTheme.all
-    case GameFamily.Shogi() => ShogiTheme.all
-    case GameFamily.Xiangqi() => XiangqiTheme.all
-  }
+  def allOfFamily(gf: GameFamily) : List[Theme] = gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
 
-  lazy val default = allByName(0) get "brown" err "Can't find default theme D:"
 }
 
-object ChessTheme extends ThemeObject {
+// object ChessTheme extends ThemeObject {
 
-  val all = List(
-    "blue",
-    "blue2",
-    "blue3",
-    "blue-marble",
-    "canvas",
-    "wood",
-    "wood2",
-    "wood3",
-    "wood4",
-    "maple",
-    "maple2",
-    "brown",
-    "leather",
-    "green",
-    "marble",
-    "green-plastic",
-    "grey",
-    "metal",
-    "olive",
-    "newspaper",
-    "purple",
-    "purple-diag",
-    "pink",
-    "ic",
-    "horsey"
-  ) map { name =>
-    new Theme(name, Theme.colors.getOrElse(name, Theme.defaultHexColors), 0)
-  }
+//   val all = List(
+//     "blue",
+//     "blue2",
+//     "blue3",
+//     "blue-marble",
+//     "canvas",
+//     "wood",
+//     "wood2",
+//     "wood3",
+//     "wood4",
+//     "maple",
+//     "maple2",
+//     "brown",
+//     "leather",
+//     "green",
+//     "marble",
+//     "green-plastic",
+//     "grey",
+//     "metal",
+//     "olive",
+//     "newspaper",
+//     "purple",
+//     "purple-diag",
+//     "pink",
+//     "ic",
+//     "horsey"
+//   ) map { name =>
+//     new Theme(name, Theme.colors.getOrElse(name, Theme.defaultHexColors), 0)
+//   }
 
-  lazy val default = allByName(0) get "brown" err "Can't find default theme D:"
-}
+//   lazy val default = allByName(0) get "brown" err "Can't find default theme D:"
+// }
 
-object DraughtsTheme extends ThemeObject {
+// object DraughtsTheme extends ThemeObject {
 
-  val all = List(
-    "blue",
-    "blue2",
-    "blue3",
-    "canvas",
-    "wood",
-    "wood2",
-    "wood3",
-    "maple",
-    "brown",
-    "leather",
-    "green",
-    "marble",
-    "grey",
-    "metal",
-    "olive",
-    "purple"
-  ) map { name =>
-    new Theme(name, Theme.colors.getOrElse(name, Theme.defaultHexColors), 1)
-  }
+//   val all = List(
+//     "blue",
+//     "blue2",
+//     "blue3",
+//     "canvas",
+//     "wood",
+//     "wood2",
+//     "wood3",
+//     "maple",
+//     "brown",
+//     "leather",
+//     "green",
+//     "marble",
+//     "grey",
+//     "metal",
+//     "olive",
+//     "purple"
+//   ) map { name =>
+//     new Theme(name, Theme.colors.getOrElse(name, Theme.defaultHexColors), 1)
+//   }
 
-  lazy val default = allByName(1) get "brown" err "Can't find default theme D:"
-}
+//   lazy val default = allByName(1) get "brown" err "Can't find default theme D:"
+// }
 
-object LinesOfActionTheme extends ThemeObject {
+// object LinesOfActionTheme extends ThemeObject {
 
-  val all = List(
-    "blue",
-    "blue2",
-    "blue3",
-    "blue-marble",
-    "canvas",
-    "wood",
-    "wood2",
-    "wood3",
-    "wood4",
-    "maple",
-    "maple2",
-    "brown",
-    "leather",
-    "green",
-    "marble",
-    "green-plastic",
-    "grey",
-    "metal",
-    "olive",
-    "newspaper",
-    "purple",
-    "purple-diag",
-    "pink",
-    "ic",
-    "horsey"
-  ) map { name =>
-    new Theme(name, Theme.colors.getOrElse(name, Theme.defaultHexColors), 2)
-  }
+//   val all = List(
+//     "blue",
+//     "blue2",
+//     "blue3",
+//     "blue-marble",
+//     "canvas",
+//     "wood",
+//     "wood2",
+//     "wood3",
+//     "wood4",
+//     "maple",
+//     "maple2",
+//     "brown",
+//     "leather",
+//     "green",
+//     "marble",
+//     "green-plastic",
+//     "grey",
+//     "metal",
+//     "olive",
+//     "newspaper",
+//     "purple",
+//     "purple-diag",
+//     "pink",
+//     "ic",
+//     "horsey"
+//   ) map { name =>
+//     new Theme(name, Theme.colors.getOrElse(name, Theme.defaultHexColors), 2)
+//   }
 
-  lazy val default = allByName(2) get "brown" err "Can't find default theme D:"
-}
+//   lazy val default = allByName(2) get "brown" err "Can't find default theme D:"
+// }
 
-object ShogiTheme extends ThemeObject {
+// object ShogiTheme extends ThemeObject {
 
-  val all = List(
-    "wood",
-    "clear"
-  ) map { name =>
-    new Theme(name, Theme.defaultHexColors, 3)
-  }
+//   val all = List(
+//     "wood",
+//     "clear"
+//   ) map { name =>
+//     new Theme(name, Theme.defaultHexColors, 3)
+//   }
 
-  lazy val default = allByName(3) get "wood" err "Can't find default theme D:"
-}
+//   lazy val default = allByName(3) get "wood" err "Can't find default theme D:"
+// }
 
-object XiangqiTheme extends ThemeObject {
+// object XiangqiTheme extends ThemeObject {
 
-  val all = List(
-    "grey",
-    "green"
-  ) map { name =>
-    new Theme(name, Theme.defaultHexColors, 4)
-  }
+//   val all = List(
+//     "grey",
+//     "green"
+//   ) map { name =>
+//     new Theme(name, Theme.defaultHexColors, 4)
+//   }
 
-  lazy val default = allByName(4) get "grey" err "Can't find default theme D:"
-}
+//   lazy val default = allByName(4) get "grey" err "Can't find default theme D:"
+// }
 
 
 object Theme3d extends ThemeObject {
