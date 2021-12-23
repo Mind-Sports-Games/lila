@@ -28,7 +28,7 @@ sealed trait ThemeObject {
 
   def unapply(full: Theme): Some[(String, Int)] = Some((full.name, full.gameFamily))
 
-  def contains(name: String, gameFamily: Int = 0) = allByName(gameFamily) contains name
+  def contains(name: String) = all map(t => t.name) contains name
 
 }
 
@@ -52,14 +52,24 @@ object Theme extends ThemeObject {
                       LinesOfActionTheme.default,
                       ShogiTheme.default,
                       XiangqiTheme.default)
-  
-  def updateBoardTheme(currentThemes : List[Theme], theme: String) : List[Theme] = {
-    val newTheme = apply(theme)
+
+  def updateBoardTheme(currentThemes : List[Theme], theme: String, gameFamily: Int) : List[Theme] = {
+    val newTheme = apply(theme, gameFamily)
     currentThemes.map{ x => x.gameFamily match {
                                 case newTheme.gameFamily => newTheme
                                 case _ => x
                      }}
   }
+
+  def updateBoardTheme(currentThemes : List[Theme], theme: String, gameFamily: String) : List[Theme] = {
+    val gf_id = GameFamily.all.filter(gf => gf.shortName.toLowerCase() == gameFamily)(0).id
+    val newTheme = apply(theme, gf_id)
+    currentThemes.map{ x => x.gameFamily match {
+                                case newTheme.gameFamily => newTheme
+                                case _ => x
+                     }}
+  }
+
   val all = ChessTheme.all ::: DraughtsTheme.all ::: LinesOfActionTheme.all ::: ShogiTheme.all ::: XiangqiTheme.all
  
   def allOfFamily(gf: GameFamily) : List[Theme] = gf match {

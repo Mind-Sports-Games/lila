@@ -68,8 +68,8 @@ case class Pref(
     name match {
       case "bg"    => Pref.Bg.fromString.get(value).map { bg => copy(bg = bg) }
       case "bgImg" => copy(bgImg = value.some).some
-      case "theme" =>
-         copy(theme = Theme.updateBoardTheme(theme, value)).some
+      // case "theme" =>
+      //    copy(theme = Theme.updateBoardTheme(theme, value)).some
       case "pieceSet" =>
           copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
@@ -88,6 +88,10 @@ case class Pref(
       case "zen" => copy(zen = if (value == "1") 1 else 0).some
       case _     => none
     }
+
+  def setTheme(value: String, gameFamily: String): Option[Pref] = {
+    copy(theme = Theme.updateBoardTheme(theme, value, gameFamily)).some
+  }
 
   def animationMillis: Int =
     animation match {

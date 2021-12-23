@@ -89,7 +89,7 @@ final class PrefApi(
           })
   
   def updatePrefTheme(user: User, gameFamily: String, value: String): Fu[String] =
-    getPref(user) map { _.set("theme", value) } orFail
+    getPref(user) map { _.setTheme(value, gameFamily) } orFail
       s"Bad pref ${user.id} theme -> $value" flatMap (pref => {
             setPref(pref) inject (Json.toJson(pref.theme).toString)
           })

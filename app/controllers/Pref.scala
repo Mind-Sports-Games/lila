@@ -9,6 +9,7 @@ import lila.pref.PieceSet
 import lila.pref.Theme
 import lila.pref.JsonView._
 import scala.concurrent.{Future}
+import strategygames.{ GameFamily }
 
 import play.api.libs.json._
 
@@ -92,7 +93,6 @@ final class Pref(env: Env) extends LilaController(env) {
     }
 
   private lazy val setters = Map(
-    //"theme"      -> (forms.theme      -> save("theme") _),
     "theme3d"    -> (forms.theme3d    -> save("theme3d") _),
     "pieceSet3d" -> (forms.pieceSet3d -> save("pieceSet3d") _),
     "soundSet"   -> (forms.soundSet   -> save("soundSet") _),
@@ -119,7 +119,7 @@ final class Pref(env: Env) extends LilaController(env) {
       case _ => //get Theme pref from session and update the cookie
           val currentT = ctx.req.session.get("theme")
                           .fold(Theme.defaults)(p => Json.parse(p).validate(themesRead).getOrElse(Theme.defaults))
-          val newT = Theme.updateBoardTheme(currentT, value)
+          val newT = Theme.updateBoardTheme(currentT, value, gameFamily)
           val j = Json.toJson(newT).toString
           fuccess(env.lilaCookie.session("theme", j)(ctx.req))
     }

@@ -32,9 +32,7 @@ object RequestPref {
       req.session.get(name)
         .map(Json.parse)
         .flatMap(_.validate(themesRead).asOpt)
-        .map{t => queryParam(req, name)
-                  .fold(t)(v => Theme.updateBoardTheme(t, v))
-    }}
+    }
 
     default.copy(
       bg = paramOrSession("bg").flatMap(Pref.Bg.fromString.get) | default.bg,
