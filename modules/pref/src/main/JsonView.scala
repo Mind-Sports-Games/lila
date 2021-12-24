@@ -11,7 +11,8 @@ object JsonView {
       "transp"        -> (p.bg == Pref.Bg.TRANSPARENT),
       "bgImg"         -> p.bgImgOrDefault,
       "is3d"          -> p.is3d,
-      "theme"         -> p.theme,
+      "theme"         -> p.theme.map( p => Json.obj( "name" -> p.name,
+                                                     "gameFamily" -> p.gameFamily)),
       "pieceSet"      -> p.pieceSet.map( p => Json.obj( "name" -> p.name,
                                                         "gameFamily" -> p.gameFamily)),
       "theme3d"       -> p.theme3d,
@@ -63,4 +64,21 @@ object JsonView {
 
   implicit val pieceSetsWrite: Writes[List[PieceSet]] = Writes.list(pieceSetFormat)
 
+
+  implicit val themeJsonWrites: Writes[Theme] = (
+    (JsPath \ "name").write[String] and 
+    (JsPath \ "gameFamily").write[Int]
+  )(unlift(Theme.unapply))
+
+  implicit val themeJsonReads: Reads[Theme] = (
+    (JsPath \ "name").read[String] and 
+    (JsPath \ "gameFamily").read[Int]
+  )(Theme.apply _)
+  
+  implicit val themeFormat: Format[Theme] =
+    Format(themeJsonReads, themeJsonWrites)
+
+  implicit val themesRead: Reads[List[Theme]] = Reads.list(themeFormat)
+
+  implicit val themesWrite: Writes[List[Theme]] = Writes.list(themeFormat)
 }

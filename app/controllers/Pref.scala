@@ -6,8 +6,10 @@ import lila.api.Context
 import lila.app._
 import views._
 import lila.pref.PieceSet
+import lila.pref.Theme
 import lila.pref.JsonView._
 import scala.concurrent.{Future}
+import strategygames.{ GameFamily }
 
 import play.api.libs.json._
 
@@ -79,9 +81,18 @@ final class Pref(env: Env) extends LilaController(env) {
           }
         }
     }
+  
+  def updateTheme(gameFamily: String) =
+    OpenBody { implicit ctx =>
+      implicit val req = ctx.body
+        FormResult(forms.theme) { v =>
+          updateThemeForFamily(gameFamily, v, ctx) map { cookie =>
+            Ok(()).withCookies(cookie)
+          }
+        }
+    }
 
   private lazy val setters = Map(
-    "theme"      -> (forms.theme      -> save("theme") _),
     "theme3d"    -> (forms.theme3d    -> save("theme3d") _),
     "pieceSet3d" -> (forms.pieceSet3d -> save("pieceSet3d") _),
     "soundSet"   -> (forms.soundSet   -> save("soundSet") _),
@@ -101,6 +112,17 @@ final class Pref(env: Env) extends LilaController(env) {
           val j = Json.toJson(newPS).toString
           fuccess(env.lilaCookie.session("pieceSet", j)(ctx.req))
     } 
+  
+  private def updateThemeForFamily(gameFamily: String, value: String, ctx: Context): Fu[Cookie] =
+    ctx.me match {
+      case Some(u) => api.updatePrefTheme(u, gameFamily, value).map( j => env.lilaCookie.session("theme", j)(ctx.req))
+      case _ => //get Theme pref from session and update the cookie
+          val currentT = ctx.req.session.get("theme")
+                          .fold(Theme.defaults)(p => Json.parse(p).validate(themesRead).getOrElse(Theme.defaults))
+          val newT = Theme.updateBoardTheme(currentT, value, gameFamily)
+          val j = Json.toJson(newT).toString
+          fuccess(env.lilaCookie.session("theme", j)(ctx.req))
+    }
   
   private def save(name: String)(value: String, ctx: Context): Fu[Cookie] =
     ctx.me ?? {

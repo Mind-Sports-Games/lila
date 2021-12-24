@@ -54,7 +54,7 @@ sealed trait Context extends lila.user.UserContextWrapper {
   def nonce           = pageData.nonce
   def hasClas         = pageData.hasClas
 
-  def currentTheme = lila.pref.Theme(pref.theme)
+  def currentTheme = pref.theme
 
   def currentTheme3d = lila.pref.Theme3d(pref.theme3d)
 

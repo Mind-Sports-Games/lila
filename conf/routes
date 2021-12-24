@@ -377,6 +377,7 @@ GET   /fishnet/status                         controllers.Fishnet.status
 # Pref
 POST  /pref/:name                             controllers.Pref.set(name: String)
 POST  /pref/pieceSet/:gameFamily              controllers.Pref.updatePieceSet(gameFamily: String)
+POST  /pref/theme/:gameFamily                 controllers.Pref.updateTheme(gameFamily: String)
 GET   /account/preferences/:categ             controllers.Pref.form(categ: String)
 POST  /account/preferences                    controllers.Pref.formApply
 

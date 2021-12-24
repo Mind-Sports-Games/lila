@@ -1,13 +1,16 @@
 package lila.pref
+import strategygames.{ GameFamily }
 
-sealed class Theme private[pref] (val name: String, val colors: Theme.HexColors) {
+sealed class Theme private[pref] (val name: String, val colors: Theme.HexColors, val gameFamily: Int) {
 
   override def toString = name
 
-  def cssClass = name
+  def cssClass = s"${gameFamilyName}-${name}"
 
   def light = colors._1
   def dark  = colors._2
+
+  def gameFamilyName = GameFamily(gameFamily).shortName.toLowerCase()
 }
 
 sealed trait ThemeObject {
@@ -16,23 +19,25 @@ sealed trait ThemeObject {
 
   val default: Theme
 
-  lazy val allByName = all map { c =>
+  def allByName(gf:Int) = all filter(t => t.gameFamily == gf) map { c =>
     c.name -> c
   } toMap
 
-  def apply(name: String) = allByName.getOrElse(name, default)
+  def apply(name: String, gameFamily: Int = 0) = allByName(gameFamily).getOrElse(name, default)
 
-  def contains(name: String) = allByName contains name
+  def unapply(full: Theme): Some[(String, Int)] = Some((full.name, full.gameFamily))
+
+  def contains(name: String) = all map(t => t.name) contains name
+
 }
 
 object Theme extends ThemeObject {
 
   case class HexColor(value: String) extends AnyVal with StringValue
   type HexColors = (HexColor, HexColor)
-
   private[pref] val defaultHexColors = (HexColor("b0b0b0"), HexColor("909090"))
 
-  private val colors: Map[String, HexColors] = Map(
+  val colors: Map[String, HexColors] = Map(
     "blue"   -> (HexColor("dee3e6") -> HexColor("8ca2ad")),
     "brown"  -> (HexColor("f0d9b5") -> HexColor("b58863")),
     "green"  -> (HexColor("ffffdd") -> HexColor("86a666")),
@@ -41,37 +46,31 @@ object Theme extends ThemeObject {
     "horsey" -> (HexColor("f1d9b6") -> HexColor("8e6547"))
   )
 
-  val all = List(
-    "blue",
-    "blue2",
-    "blue3",
-    "blue-marble",
-    "canvas",
-    "wood",
-    "wood2",
-    "wood3",
-    "wood4",
-    "maple",
-    "maple2",
-    "brown",
-    "leather",
-    "green",
-    "marble",
-    "green-plastic",
-    "grey",
-    "metal",
-    "olive",
-    "newspaper",
-    "purple",
-    "purple-diag",
-    "pink",
-    "ic",
-    "horsey"
-  ) map { name =>
-    new Theme(name, colors.getOrElse(name, defaultHexColors))
+  lazy val default = allByName(0) get "maple" err "Can't find default theme D:"
+
+  val defaults = GameFamily.all.map(gf => new Theme(gf.boardThemeDefault, Theme.colors.getOrElse(gf.boardThemeDefault, Theme.defaultHexColors), gf.id))
+
+  def updateBoardTheme(currentThemes : List[Theme], theme: String, gameFamily: Int) : List[Theme] = {
+    val newTheme = apply(theme, gameFamily)
+    currentThemes.map{ x => x.gameFamily match {
+                                case newTheme.gameFamily => newTheme
+                                case _ => x
+                     }}
   }
 
-  lazy val default = allByName get "brown" err "Can't find default theme D:"
+  def updateBoardTheme(currentThemes : List[Theme], theme: String, gameFamily: String) : List[Theme] = {
+    val gf_id = GameFamily.all.filter(gf => gf.shortName.toLowerCase() == gameFamily)(0).id
+    val newTheme = apply(theme, gf_id)
+    currentThemes.map{ x => x.gameFamily match {
+                                case newTheme.gameFamily => newTheme
+                                case _ => x
+                     }}
+  }
+
+  val all: List[Theme] = GameFamily.all.map(gf => gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))).flatten
+ 
+  def allOfFamily(gf: GameFamily) : List[Theme] = gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
+
 }
 
 object Theme3d extends ThemeObject {
@@ -97,8 +96,8 @@ object Theme3d extends ThemeObject {
     "Jade",
     "Woodi"
   ) map { name =>
-    new Theme(name, Theme.defaultHexColors)
+    new Theme(name, Theme.defaultHexColors, 0)
   }
 
-  lazy val default = allByName get "Woodi" err "Can't find default theme D:"
+  lazy val default = allByName(0) get "Woodi" err "Can't find default theme D:"
 }

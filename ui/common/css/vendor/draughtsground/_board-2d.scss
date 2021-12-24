@@ -43,11 +43,11 @@ $board-files-64: (
 );
 
 @each $color, $file in $board-files-100 {
-  .#{$color} .is2d {
+  .draughts-#{$color} .is2d {
     .is100,
     &.is100 {
       cg-board {
-        background-image: url(../images/board/#{$file});
+        background-image: url(../images/board/draughts/#{$file});
       }
       square,
       piece {
@@ -69,11 +69,11 @@ $board-files-64: (
   }
 }
 @each $color, $file in $board-files-64 {
-  .#{$color} .is2d {
+  .draughts-#{$color} .is2d {
     .is64,
     &.is64 {
       cg-board {
-        background-image: url(../images/board/#{$file});
+        background-image: url(../images/board/draughts/#{$file});
       }
       square,
       piece {

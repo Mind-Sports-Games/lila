@@ -22,6 +22,17 @@ private object PrefHandlers {
       )
   }
 
+  implicit private[pref] val themeBSONHandler = new BSON[Theme] {
+    
+    def reads(r: BSON.Reader) = Theme.apply(r.str("name"), r.int("gameFamily"))
+
+    def writes(w: BSON.Writer, t: Theme) =
+      $doc( 
+          "name" -> t.name,
+          "gameFamily" -> t.gameFamily
+      )
+  }
+
   implicit val prefBSONHandler = new BSON[Pref] {
 
     def reads(r: BSON.Reader): Pref =
@@ -30,7 +41,7 @@ private object PrefHandlers {
         bg = r.getD("bg", Pref.default.bg),
         bgImg = r.strO("bgImg"),
         is3d = r.getD("is3d", Pref.default.is3d),
-        theme = r.getD("theme", Pref.default.theme),
+        theme = r.getsO[lila.pref.Theme]("theme") getOrElse Pref.default.theme,
         pieceSet = r.getsO[lila.pref.PieceSet]("pieceSet") getOrElse Pref.default.pieceSet,
         theme3d = r.getD("theme3d", Pref.default.theme3d),
         pieceSet3d = r.getD("pieceSet3d", Pref.default.pieceSet3d),
@@ -75,7 +86,7 @@ private object PrefHandlers {
         "bg"            -> o.bg,
         "bgImg"         -> o.bgImg,
         "is3d"          -> o.is3d,
-        "theme"         -> o.theme,
+        "theme"         -> w.listO(o.theme),
         "pieceSet"      -> w.listO(o.pieceSet),
         "theme3d"       -> o.theme3d,
         "pieceSet3d"    -> o.pieceSet3d,
