@@ -5,7 +5,7 @@ import strategygames.Centis
 import strategygames.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Color, Game, GameLogic, Status }
+import strategygames.{ Player => SGPlayer, Game, GameLogic, Status }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
@@ -24,7 +24,7 @@ object PgnImport {
 
   case class End(
       status: Status,
-      winner: Option[Color],
+      winner: Option[SGPlayer],
       resultText: String,
       statusText: String
   )
@@ -56,9 +56,9 @@ object PgnImport {
             val end: Option[End] = (game.finished option game.status).map { status =>
               End(
                 status = status,
-                winner = game.winnerColor,
-                resultText = Color.showResult(game.winnerColor),
-                statusText = lila.game.StatusText(status, game.winnerColor, game.variant)
+                winner = game.winnerSGPlayer,
+                resultText = SGPlayer.showResult(game.winnerSGPlayer),
+                statusText = lila.game.StatusText(status, game.winnerSGPlayer, game.variant)
               )
             }
             val commented =

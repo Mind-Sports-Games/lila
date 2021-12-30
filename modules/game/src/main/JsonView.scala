@@ -4,7 +4,7 @@ import play.api.libs.json._
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.opening.FullOpening
-import strategygames.{ Black, Clock, Color, Division, GameLogic, Pocket, PocketData, Role, Status, White }
+import strategygames.{ P2, Clock, Player => SGPlayer, Division, GameLogic, Pocket, PocketData, Role, Status, P1 }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
 
@@ -23,7 +23,7 @@ final class JsonView(rematches: Rematches) {
         "rated"         -> game.rated,
         "initialFen"    -> (initialFen | (Forsyth.>>(game.variant.gameLogic, game.chess))),
         "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
-        "player"        -> game.turnColor,
+        "player"        -> game.turnSGPlayer,
         "turns"         -> game.turns,
         "startedAtTurn" -> game.chess.startedAtTurn,
         "source"        -> game.source,
@@ -34,7 +34,7 @@ final class JsonView(rematches: Rematches) {
       .add("boosted" -> game.boosted)
       .add("tournamentId" -> game.tournamentId)
       .add("swissId" -> game.swissId)
-      .add("winner" -> game.winnerColor)
+      .add("winner" -> game.winnerSGPlayer)
       .add("lastMove" -> game.lastMoveKeys)
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
@@ -100,7 +100,7 @@ object JsonView {
   }
 
   implicit val pocketDataWriter: OWrites[PocketData] = OWrites { v =>
-    Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
+    Json.obj("pockets" -> List(v.pockets.p1, v.pockets.p2))
   }
 
   implicit val blursWriter: OWrites[Blurs] = OWrites { blurs =>
@@ -162,8 +162,8 @@ object JsonView {
       "running"   -> c.isRunning,
       "initial"   -> c.limitSeconds,
       "increment" -> c.incrementSeconds,
-      "white"     -> c.remainingTime(White).toSeconds,
-      "black"     -> c.remainingTime(Black).toSeconds,
+      "p1"     -> c.remainingTime(P1).toSeconds,
+      "p2"     -> c.remainingTime(P2).toSeconds,
       "emerg"     -> c.config.emergSeconds
     )
   }
@@ -172,8 +172,8 @@ object JsonView {
     Json.obj(
       "daysPerTurn" -> c.daysPerTurn,
       "increment"   -> c.increment,
-      "white"       -> c.whiteTime,
-      "black"       -> c.blackTime
+      "p1"       -> c.p1Time,
+      "p2"       -> c.p2Time
     )
   }
 
@@ -196,7 +196,7 @@ object JsonView {
     JsString(s.name)
   }
 
-  implicit val colorWrites: Writes[Color] = Writes { c =>
+  implicit val sgPlayerWrites: Writes[SGPlayer] = Writes { c =>
     JsString(c.name)
   }
 

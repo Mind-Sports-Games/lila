@@ -6,7 +6,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
-import lila.pref.Pref.Color
+import lila.pref.Pref.SGPlayer
 import play.api.i18n.Lang
 
 import controllers.routes
@@ -32,7 +32,7 @@ object coordinate {
       main(
         id := "trainer",
         cls := "coord-trainer training init",
-        attr("data-color-pref") := ctx.pref.coordColorName,
+        attr("data-sgPlayer-pref") := ctx.pref.coordSGPlayerName,
         attr("data-score-url") := ctx.isAuth.option(routes.Coordinate.score.url)
       )(
         div(cls := "coord-trainer__side")(
@@ -42,18 +42,18 @@ object coordinate {
               div(cls := "scores")(scoreCharts(score))
             }
           ),
-          form(cls := "color buttons", action := routes.Coordinate.color, method := "post")(
+          form(cls := "sgPlayer buttons", action := routes.Coordinate.sgPlayer, method := "post")(
             st.group(cls := "radio")(
-              List(Color.BLACK, Color.RANDOM, Color.WHITE).map { id =>
+              List(SGPlayer.BLACK, SGPlayer.RANDOM, SGPlayer.WHITE).map { id =>
                 div(
                   input(
                     tpe := "radio",
-                    st.id := s"coord_color_$id",
-                    name := "color",
+                    st.id := s"coord_sgPlayer_$id",
+                    name := "sgPlayer",
                     value := id,
-                    (id == ctx.pref.coordColor) option checked
+                    (id == ctx.pref.coordSGPlayer) option checked
                   ),
-                  label(`for` := s"coord_color_$id", cls := s"color color_$id")(i)
+                  label(`for` := s"coord_sgPlayer_$id", cls := s"sgPlayer sgPlayer_$id")(i)
                 )
               }
             )
@@ -91,8 +91,8 @@ object coordinate {
   def scoreCharts(score: lila.coordinate.Score)(implicit ctx: Context) =
     frag(
       List(
-        (trans.coordinates.averageScoreAsWhiteX, score.white),
-        (trans.coordinates.averageScoreAsBlackX, score.black)
+        (trans.coordinates.averageScoreAsP1X, score.p1),
+        (trans.coordinates.averageScoreAsP2X, score.p2)
       ).map { case (averageScoreX, s) =>
         div(cls := "chart_container")(
           s.nonEmpty option frag(

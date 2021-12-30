@@ -29,7 +29,7 @@ private object bits {
         a(cls := "board_editor", href := url)(
           span(cls := "preview")(
             validFen.map { vf =>
-              views.html.board.bits.mini(vf.fen, vf.color, vf.situation.board.variant.key)(div)
+              views.html.board.bits.mini(vf.fen, vf.sgPlayer, vf.situation.board.variant.key)(div)
             }
           )
         )
@@ -195,8 +195,8 @@ private object bits {
       )
     )
 
-  val dataRandomColorVariants =
-    attr("data-random-color-variants") := lila.game.Game.variantsWhereWhiteIsBetter.map(_.id).mkString(",")
+  val dataRandomSGPlayerVariants =
+    attr("data-random-sgPlayer-variants") := lila.game.Game.variantsWhereP1IsBetter.map(_.id).mkString(",")
 
   val dataAnon        = attr("data-anon")
   val dataMin         = attr("data-min")

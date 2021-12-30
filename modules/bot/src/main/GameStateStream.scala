@@ -15,6 +15,8 @@ import lila.hub.actorApi.map.Tell
 import lila.round.actorApi.BotConnected
 import lila.round.actorApi.round.QuietFlag
 
+import strategygames.{ Player => SGPlayer }
+
 final class GameStateStream(
     onlineApiUsers: OnlineApiUsers,
     jsonView: BotJsonView
@@ -27,7 +29,7 @@ final class GameStateStream(
   private val blueprint =
     Source.queue[Option[JsObject]](32, akka.stream.OverflowStrategy.dropHead)
 
-  def apply(init: Game.WithInitialFen, as: strategygames.Color, u: lila.user.User)(implicit
+  def apply(init: Game.WithInitialFen, as: SGPlayer, u: lila.user.User)(implicit
       lang: Lang
   ): Source[Option[JsObject], _] = {
 
@@ -49,7 +51,7 @@ final class GameStateStream(
 
   private def mkActor(
       init: Game.WithInitialFen,
-      as: strategygames.Color,
+      as: SGPlayer,
       user: User,
       queue: SourceQueueWithComplete[Option[JsObject]]
   )(implicit lang: Lang) =

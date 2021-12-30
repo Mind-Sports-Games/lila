@@ -36,8 +36,8 @@ sealed trait Node {
   def idOption: Option[UciCharPair]
   def moveOption: Option[Uci.WithSan]
 
-  // who's color plays next
-  def color = strategygames.Color.fromPly(ply)
+  // who's sgPlayer plays next
+  def sgPlayer = strategygames.Player.fromPly(ply)
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
@@ -156,7 +156,7 @@ object Node {
       Text {
         text.trim
           .take(4000)
-          .replaceAll("""\r\n""", "\n") // these 3 lines dedup white spaces and new lines
+          .replaceAll("""\r\n""", "\n") // these 3 lines dedup p1 spaces and new lines
           .replaceAll("""(?m)(^ *| +(?= |$))""", "")
           .replaceAll("""(?m)^$([\n]+?)(^$[\n]+?^)+""", "$1")
           .replaceAll("[{}]", "") // {} are reserved in PGN comments
@@ -217,7 +217,7 @@ object Node {
     )
   }
   implicit private val pocketDataWriter: OWrites[PocketData] = OWrites { v =>
-    Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
+    Json.obj("pockets" -> List(v.pockets.p1, v.pockets.p2))
   }
 
   implicit val openingWriter: OWrites[FullOpening] = OWrites { o =>

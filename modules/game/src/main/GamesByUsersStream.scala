@@ -54,7 +54,7 @@ final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
           "createdAt" -> g.createdAt,
           "status"    -> g.status.id,
           "players" -> JsObject(g.players map { p =>
-            p.color.name -> Json
+            p.sgPlayer.name -> Json
               .obj(
                 "userId" -> p.userId,
                 "rating" -> p.rating

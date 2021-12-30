@@ -117,7 +117,7 @@ object Quote {
     new Quote("Methodical thinking is of more use in chess than inspiration.", "C. J. S. Purdy"),
     new Quote("When in doubt... play chess!", "Tevis"),
     new Quote(
-      "Who is your opponent tonight, tonight I am playing against the black pieces.",
+      "Who is your opponent tonight, tonight I am playing against the p2 pieces.",
       "Akiba Rubinstein"
     ),
     new Quote("I like the moment when I break a man’s ego.", "Bobby Fischer"),
@@ -126,7 +126,7 @@ object Quote {
     new Quote("Chess is the art of analysis.", "Mikhail Botvinnik"),
     new Quote("The mistakes are there, waiting to be made.", "Savielly Tartakower"),
     new Quote(
-      "After black’s reply to 1.e4 with 1..e5, leaves him always trying to get into the game.",
+      "After p2’s reply to 1.e4 with 1..e5, leaves him always trying to get into the game.",
       "Howard Staunton"
     ),
     new Quote("A player surprised is half beaten.", "Proverb"),
@@ -474,7 +474,7 @@ object Quote {
       "William Steinitz"
     ),
     new Quote(
-      "When I have white, I win because I am white; When I have black, I win because I am Bogolyubov.",
+      "When I have p1, I win because I am p1; When I have p2, I win because I am Bogolyubov.",
       "Bogolyubov"
     ),
     new Quote("Every pawn is a potential queen.", "James Mason"),
@@ -705,7 +705,7 @@ object Quote {
     new Quote("There is only one thing Fischer does in chess without pleasure: to lose!", "Boris Spassky"),
     new Quote("Bobby Fischer is the greatest chess player who has ever lived.", "Ken Smith"),
     new Quote(
-      "Up to this point white has been following well-known analysis. But now he makes a fatal error: he begins to use his own head.",
+      "Up to this point p1 has been following well-known analysis. But now he makes a fatal error: he begins to use his own head.",
       "Siegbert Tarrasch"
     ),
     new Quote(
@@ -717,7 +717,7 @@ object Quote {
       "Anonymous German Expert"
     ),
     new Quote(
-      "White lost because he failed to remember the right continuation and had to think up the moves himself.",
+      "P1 lost because he failed to remember the right continuation and had to think up the moves himself.",
       "Siegbert Tarrasch"
     ),
     new Quote(
@@ -1047,7 +1047,7 @@ object Quote {
       "Mikhail Tal"
     ),
     new Quote(
-      "As often as not, his strategy consists of stifling Black's activity and then winning in an endgame thanks to his superior pawn structure.",
+      "As often as not, his strategy consists of stifling P2's activity and then winning in an endgame thanks to his superior pawn structure.",
       "Neil McDonald (1998)"
     ),
     new Quote("Attack! Always Attack!", "Adolf Anderssen"),
@@ -1068,7 +1068,7 @@ object Quote {
       "Begone! Ignorant and impudent knight, not even in chess can a King be taken.",
       "King Louis VI (reputedly stated to one of his knights in 1110 after he was nearly captured by enemy forces)"
     ),
-    new Quote("Black's d5-square is too weak.", "Ulf Andersson  (on the Dragon variation)"),
+    new Quote("P2's d5-square is too weak.", "Ulf Andersson  (on the Dragon variation)"),
     new Quote("Blitz chess kills your ideas.", "Bobby Fischer"),
     new Quote(
       "Bobby Fischer started off each game with a great advantage: after the opening he had used less time than his opponent and thus had more time available later on. The major reason why he never had serious time pressure was that his rapid opening play simply left sufficient time for the middlegame.",
@@ -1127,7 +1127,7 @@ object Quote {
       "Garry Kasparov"
     ),
     new Quote(
-      "By what right does White, in an absolutely even position, such as after move one, when both sides have advanced 1. e4, sacrifice a pawn, whose recapture is quite uncertain, and open up his kingside to attack? And then follow up this policy by leaving the check of the black queen open? None whatever !",
+      "By what right does P1, in an absolutely even position, such as after move one, when both sides have advanced 1. e4, sacrifice a pawn, whose recapture is quite uncertain, and open up his kingside to attack? And then follow up this policy by leaving the check of the p2 queen open? None whatever !",
       "Emanuel Lasker"
     ),
     new Quote(
@@ -1349,7 +1349,7 @@ object Quote {
       "Pal Benko"
     ),
     new Quote(
-      "Even in the King's Gambit ... White is no longer trying to attack at all costs. He has had to adapt his approach and look for moves with a solid positional foundation",
+      "Even in the King's Gambit ... P1 is no longer trying to attack at all costs. He has had to adapt his approach and look for moves with a solid positional foundation",
       "Neil McDonald  (1998) "
     ),
     new Quote(
@@ -1391,7 +1391,7 @@ object Quote {
       "Alexander Kotov"
     ),
     new Quote(
-      "Failing to open the center at the right moment - a common error by White in the Exchange Lopez - can allow Black an excellent game.",
+      "Failing to open the center at the right moment - a common error by P1 in the Exchange Lopez - can allow P2 an excellent game.",
       "Andy Soltis"
     ),
     new Quote("Far from all of the obvious moves that go without saying are correct.", "David Bronstein"),
@@ -1460,7 +1460,7 @@ object Quote {
       "Alexander Kotov"
     ),
     new Quote(
-      "Had I not played the Sicilian with Black I could have saved myself the trouble of studying for more than 20 years all the more popular lines of this opening, which comprise probably more than 25 percent of all published opening theory!",
+      "Had I not played the Sicilian with P2 I could have saved myself the trouble of studying for more than 20 years all the more popular lines of this opening, which comprise probably more than 25 percent of all published opening theory!",
       "Bent Larsen"
     ),
     new Quote(
@@ -1473,7 +1473,7 @@ object Quote {
     ),
     new Quote("Haste, the great enemy.", "Eugene Znosko-Borowski"),
     new Quote(
-      "Having spent alarmingly large chunks of my life studying the white side of the Open Sicilian, I find myself asking, why did I bother?",
+      "Having spent alarmingly large chunks of my life studying the p1 side of the Open Sicilian, I find myself asking, why did I bother?",
       "Daniel King"
     ),
     new Quote(
@@ -1559,7 +1559,7 @@ object Quote {
     new Quote("Be well enough prepared that preparation won't play a role.", "Magnus Carlsen"),
     new Quote("I don't study; I create.", "Viktor Korchnoi"),
     new Quote(
-      "During the analysis, I discovered something very remarkable: the board is simply too small for two Queens of the same color. They only get in each other's way. I realize that this might sound stupid, but I fully mean it. The advantage is much less than one would expect by counting material.",
+      "During the analysis, I discovered something very remarkable: the board is simply too small for two Queens of the same sgPlayer. They only get in each other's way. I realize that this might sound stupid, but I fully mean it. The advantage is much less than one would expect by counting material.",
       "Viktor Korchnoi"
     ),
     new Quote("You'll be amazed at the people I've lost to while playing online.", "Magnus Carlsen"),

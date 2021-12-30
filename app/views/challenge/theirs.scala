@@ -14,12 +14,12 @@ object theirs {
       c: Challenge,
       json: play.api.libs.json.JsObject,
       user: Option[lila.user.User],
-      color: Option[strategygames.Color]
+      sgPlayer: Option[strategygames.Player]
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = challengeTitle(c),
       openGraph = challengeOpenGraph(c).some,
-      moreJs = bits.js(c, json, owner = false, color),
+      moreJs = bits.js(c, json, owner = false, sgPlayer),
       moreCss = cssTag("challenge.page")
     ) {
       main(cls := "page-small challenge-page challenge-theirs box box-pad")(
@@ -40,18 +40,18 @@ object theirs {
               ),
               bits.details(c),
               c.notableInitialFen.map { fen =>
-                div(cls := "board-preview", views.html.board.bits.miniForVariant(fen, c.variant, !c.finalColor)(div))
+                div(cls := "board-preview", views.html.board.bits.miniForVariant(fen, c.variant, !c.finalSGPlayer)(div))
               },
-              if (color.map(Challenge.ColorChoice.apply).has(c.colorChoice))
+              if (sgPlayer.map(Challenge.SGPlayerChoice.apply).has(c.sgPlayerChoice))
                 badTag(
                   // very rare message, don't translate
-                  s"You have the wrong color link for this open challenge. The ${color.??(_.name)} player has already joined."
+                  s"You have the wrong sgPlayer link for this open challenge. The ${sgPlayer.??(_.name)} player has already joined."
                 )
               else if (!c.mode.rated || ctx.isAuth) {
                 frag(
                   (c.mode.rated && c.unlimited) option
                     badTag(trans.bewareTheGameIsRatedButHasNoClock()),
-                  postForm(cls := "accept", action := routes.Challenge.accept(c.id, color.map(_.name)))(
+                  postForm(cls := "accept", action := routes.Challenge.accept(c.id, sgPlayer.map(_.name)))(
                     submitButton(cls := "text button button-fat", dataIcon := "G")(trans.joinTheGame())
                   )
                 )
@@ -62,7 +62,7 @@ object theirs {
                     p(trans.thisGameIsRated()),
                     a(
                       cls := "button",
-                      href := s"${routes.Auth.login}?referrer=${routes.Round.watcher(c.id, "white")}"
+                      href := s"${routes.Auth.login}?referrer=${routes.Round.watcher(c.id, "p1")}"
                     )(trans.signIn())
                   )
                 )
@@ -79,7 +79,7 @@ object theirs {
               bits.details(c),
               a(
                 id := "challenge-redirect",
-                href := routes.Round.watcher(c.id, "white"),
+                href := routes.Round.watcher(c.id, "p1"),
                 cls := "button button-fat"
               )(
                 trans.joinTheGame()

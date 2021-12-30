@@ -1,47 +1,47 @@
 package lila.game
 
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 import lila.user.User
 
-case class Pov(game: Game, color: Color) {
+case class Pov(game: Game, sgPlayer: SGPlayer) {
 
-  def player = game player color
+  def player = game player sgPlayer
 
   def playerId = player.id
 
   def typedPlayerId = Game.PlayerId(player.id)
 
-  def fullId = game fullIdOf color
+  def fullId = game fullIdOf sgPlayer
 
   def gameId = game.id
 
-  def opponent = game player !color
+  def opponent = game player !sgPlayer
 
-  def unary_! = Pov(game, !color)
+  def unary_! = Pov(game, !sgPlayer)
 
-  def flip = Pov(game, !color)
+  def flip = Pov(game, !sgPlayer)
 
-  def ref = PovRef(game.id, color)
+  def ref = PovRef(game.id, sgPlayer)
 
   def withGame(g: Game)   = copy(game = g)
-  def withColor(c: Color) = copy(color = c)
+  def withSGPlayer(c: SGPlayer) = copy(sgPlayer = c)
 
-  lazy val isMyTurn = game.started && game.playable && game.turnColor == color
+  lazy val isMyTurn = game.started && game.playable && game.turnSGPlayer == sgPlayer
 
   lazy val remainingSeconds: Option[Int] =
-    game.clock.map(c => c.remainingTime(color).roundSeconds).orElse {
-      game.playableCorrespondenceClock.map(_.remainingTime(color).toInt)
+    game.clock.map(c => c.remainingTime(sgPlayer).roundSeconds).orElse {
+      game.playableCorrespondenceClock.map(_.remainingTime(sgPlayer).toInt)
     }
 
-  def hasMoved = game playerHasMoved color
+  def hasMoved = game playerHasMoved sgPlayer
 
-  def moves = game playerMoves color
+  def moves = game playerMoves sgPlayer
 
-  def win = game wonBy color
+  def win = game wonBy sgPlayer
 
-  def loss = game lostBy color
+  def loss = game lostBy sgPlayer
 
-  def forecastable = game.forecastable && game.turnColor != color
+  def forecastable = game.forecastable && game.turnSGPlayer != sgPlayer
 
   override def toString = ref.toString
 }
@@ -55,7 +55,7 @@ object Pov {
   def player(game: Game) = apply(game, game.player)
   def opponent(game: Game) = apply(game, game.opponent(game.player))
 
-  def apply(game: Game, player: Player) = new Pov(game, player.color)
+  def apply(game: Game, player: Player) = new Pov(game, player.sgPlayer)
 
   def apply(game: Game, playerId: Player.ID): Option[Pov] =
     game player playerId map { apply(game, _) }
@@ -89,11 +89,11 @@ object Pov {
     else isFresher(a, b)
 }
 
-case class PovRef(gameId: Game.ID, color: Color) {
+case class PovRef(gameId: Game.ID, sgPlayer: SGPlayer) {
 
-  def unary_! = PovRef(gameId, !color)
+  def unary_! = PovRef(gameId, !sgPlayer)
 
-  override def toString = s"$gameId/${color.name}"
+  override def toString = s"$gameId/${sgPlayer.name}"
 }
 
 case class PlayerRef(gameId: Game.ID, playerId: String)
@@ -103,16 +103,16 @@ object PlayerRef {
   def apply(fullId: String): PlayerRef = PlayerRef(Game takeGameId fullId, Game takePlayerId fullId)
 }
 
-case class LightPov(game: LightGame, color: Color) {
+case class LightPov(game: LightGame, sgPlayer: SGPlayer) {
   def gameId   = game.id
-  def player   = game player color
-  def opponent = game player !color
-  def win      = game wonBy color
+  def player   = game player sgPlayer
+  def opponent = game player !sgPlayer
+  def win      = game wonBy sgPlayer
 }
 
 object LightPov {
 
-  def apply(game: LightGame, player: Player) = new LightPov(game, player.color)
+  def apply(game: LightGame, player: Player) = new LightPov(game, player.sgPlayer)
 
   def ofUserId(game: LightGame, userId: User.ID): Option[LightPov] =
     game playerByUserId userId map { apply(game, _) }

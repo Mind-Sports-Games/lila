@@ -3,7 +3,7 @@ package lila.playban
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 
-import strategygames.{ Centis, Color, Status }
+import strategygames.{ Centis, Player => SGPlayer, Status }
 import lila.common.{ Bus, Iso, Uptime }
 import lila.db.dsl._
 import lila.game.{ Game, Player, Pov, Source }
@@ -48,9 +48,9 @@ final class PlaybanApi(
       blameable(game) flatMap { _ ?? f }
     }
 
-  def abort(pov: Pov, isOnGame: Set[Color]): Funit =
+  def abort(pov: Pov, isOnGame: Set[SGPlayer]): Funit =
     IfBlameable(pov.game) {
-      pov.player.userId.ifTrue(isOnGame(pov.opponent.color)) ?? { userId =>
+      pov.player.userId.ifTrue(isOnGame(pov.opponent.sgPlayer)) ?? { userId =>
         save(Outcome.Abort, userId, RageSit.Reset) >>- feedback.abort(pov)
       }
     }
@@ -62,15 +62,15 @@ final class PlaybanApi(
       }
     }
 
-  def rageQuit(game: Game, quitterColor: Color): Funit =
+  def rageQuit(game: Game, quitterSGPlayer: SGPlayer): Funit =
     IfBlameable(game) {
-      game.player(quitterColor).userId ?? { userId =>
-        save(Outcome.RageQuit, userId, RageSit.imbalanceInc(game, quitterColor)) >>-
-          feedback.rageQuit(Pov(game, quitterColor))
+      game.player(quitterSGPlayer).userId ?? { userId =>
+        save(Outcome.RageQuit, userId, RageSit.imbalanceInc(game, quitterSGPlayer)) >>-
+          feedback.rageQuit(Pov(game, quitterSGPlayer))
       }
     }
 
-  def flag(game: Game, flaggerColor: Color): Funit = {
+  def flag(game: Game, flaggerSGPlayer: SGPlayer): Funit = {
 
     def unreasonableTime =
       game.clock map { c =>
@@ -80,33 +80,33 @@ final class PlaybanApi(
     // flagged after waiting a long time
     def sitting: Option[Funit] =
       for {
-        userId <- game.player(flaggerColor).userId
+        userId <- game.player(flaggerSGPlayer).userId
         seconds = nowSeconds - game.movedAt.getSeconds
         if unreasonableTime.exists(seconds >= _)
-      } yield save(Outcome.Sitting, userId, RageSit.imbalanceInc(game, flaggerColor)) >>-
-        feedback.sitting(Pov(game, flaggerColor)) >>
+      } yield save(Outcome.Sitting, userId, RageSit.imbalanceInc(game, flaggerSGPlayer)) >>-
+        feedback.sitting(Pov(game, flaggerSGPlayer)) >>
         propagateSitting(game, userId)
 
     // flagged after waiting a short time;
     // but the previous move used a long time.
     // assumes game was already checked for sitting
     def sitMoving: Option[Funit] =
-      game.player(flaggerColor).userId.ifTrue {
+      game.player(flaggerSGPlayer).userId.ifTrue {
         ~(for {
-          movetimes    <- game moveTimes flaggerColor
+          movetimes    <- game moveTimes flaggerSGPlayer
           lastMovetime <- movetimes.lastOption
           limit        <- unreasonableTime
         } yield lastMovetime.toSeconds >= limit)
       } map { userId =>
-        save(Outcome.SitMoving, userId, RageSit.imbalanceInc(game, flaggerColor)) >>-
-          feedback.sitting(Pov(game, flaggerColor)) >>
+        save(Outcome.SitMoving, userId, RageSit.imbalanceInc(game, flaggerSGPlayer)) >>-
+          feedback.sitting(Pov(game, flaggerSGPlayer)) >>
           propagateSitting(game, userId)
       }
 
     IfBlameable(game) {
       sitting orElse
         sitMoving getOrElse
-        good(game, flaggerColor)
+        good(game, flaggerSGPlayer)
     }
   }
 
@@ -115,7 +115,7 @@ final class PlaybanApi(
       if (rageSit.isBad) Bus.publish(SittingDetected(game, userId), "playban")
     }
 
-  def other(game: Game, status: Status.type => Status, winner: Option[Color]): Funit =
+  def other(game: Game, status: Status.type => Status, winner: Option[SGPlayer]): Funit =
     IfBlameable(game) {
       ~(for {
         w <- winner
@@ -128,7 +128,7 @@ final class PlaybanApi(
           game.clock
             .filter {
               _.remainingTime(
-                loser.color
+                loser.sgPlayer
               ) < Centis(1000) &&
               game.turnOf(loser) &&
               Status.Resign.is(status)
@@ -138,8 +138,8 @@ final class PlaybanApi(
             }
             .exists(_ < nowSeconds - game.movedAt.getSeconds)
             .option {
-              save(Outcome.SitResign, loserId, RageSit.imbalanceInc(game, loser.color)) >>-
-                feedback.sitting(Pov(game, loser.color)) >>
+              save(Outcome.SitResign, loserId, RageSit.imbalanceInc(game, loser.sgPlayer)) >>-
+                feedback.sitting(Pov(game, loser.sgPlayer)) >>
                 propagateSitting(game, loserId)
             }
             .getOrElse {
@@ -148,8 +148,8 @@ final class PlaybanApi(
       })
     }
 
-  private def good(game: Game, loserColor: Color): Funit =
-    game.player(loserColor).userId ?? {
+  private def good(game: Game, loserSGPlayer: SGPlayer): Funit =
+    game.player(loserSGPlayer).userId ?? {
       save(Outcome.Good, _, RageSit.redeem(game))
     }
 

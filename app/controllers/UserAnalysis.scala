@@ -3,7 +3,7 @@ package controllers
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ Black, Color, GameLogic, Mode, Situation, White }
+import strategygames.{ P2, Player => SGPlayer, GameLogic, Mode, Situation, P1 }
 import play.api.libs.json.Json
 import play.api.mvc._
 import scala.concurrent.duration._
@@ -42,7 +42,7 @@ final class UserAnalysis(
         .filter(_.trim.nonEmpty)
         .orElse(get("fen")) map(s => FEN.clean(variant.gameLogic, s))
       val pov         = makePov(decodedFen, variant)
-      val orientation = get("color").flatMap(Color.fromName) | pov.color
+      val orientation = get("sgPlayer").flatMap(SGPlayer.fromName) | pov.sgPlayer
       env.api.roundApi
         .userAnalysisJson(pov, ctx.pref, decodedFen, orientation, owner = false, me = ctx.me) map { data =>
         EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov)))
@@ -65,31 +65,31 @@ final class UserAnalysis(
             situation = from.situation,
             turns = from.turns
           ),
-          whitePlayer = lila.game.Player.make(White, none),
-          blackPlayer = lila.game.Player.make(Black, none),
+          p1Player = lila.game.Player.make(P1, none),
+          p2Player = lila.game.Player.make(P2, none),
           mode = Mode.Casual,
           source = lila.game.Source.Api,
           pgnImport = None
         )
         .withId("synthetic"),
-      from.situation.color
+      from.situation.player
     )
 
-  def game(id: String, color: String) =
+  def game(id: String, sgPlayer: String) =
     Open { implicit ctx =>
       OptionFuResult(env.game.gameRepo game id) { g =>
         env.round.proxyRepo upgradeIfPresent g flatMap { game =>
-          val pov = Pov(game, Color.fromName(color) | White)
+          val pov = Pov(game, SGPlayer.fromName(sgPlayer) | P1)
           negotiate(
             html =
-              if (game.replayable) Redirect(routes.Round.watcher(game.id, color)).fuccess
+              if (game.replayable) Redirect(routes.Round.watcher(game.id, sgPlayer)).fuccess
               else {
                 val owner = isMyPov(pov)
                 for {
                   initialFen <- env.game.gameRepo initialFen game.id
                   data <-
                     env.api.roundApi
-                      .userAnalysisJson(pov, ctx.pref, initialFen, pov.color, owner = owner, me = ctx.me)
+                      .userAnalysisJson(pov, ctx.pref, initialFen, pov.sgPlayer, owner = owner, me = ctx.me)
                 } yield NoCache(
                   Ok(
                     html.board
@@ -144,12 +144,12 @@ final class UserAnalysis(
               .fold(
                 err => BadRequest(jsonError(err)).as(JSON).fuccess,
                 { case (game, fen) =>
-                  val pov = Pov(game, White)
+                  val pov = Pov(game, P1)
                   env.api.roundApi.userAnalysisJson(
                     pov,
                     ctx.pref,
                     initialFen = fen,
-                    pov.color,
+                    pov.sgPlayer,
                     owner = false,
                     me = ctx.me
                   ) map JsonOk

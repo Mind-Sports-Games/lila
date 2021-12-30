@@ -6,7 +6,7 @@ import strategygames.chess.format.pgn.{ Parser }
 import strategygames.format.pgn.{ ParsedPgn, Reader, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.{ Variant => StratVariant }
-import strategygames.{ Board, Color, GameLogic, Mode, Replay, Status }
+import strategygames.{ Board, Player => SGPlayer, GameLogic, Mode, Replay, Status }
 import play.api.data._
 import play.api.data.Forms._
 import scala.util.chaining._
@@ -37,7 +37,7 @@ object ImporterForm {
   }
 }
 
-private case class TagResult(status: Status, winner: Option[Color])
+private case class TagResult(status: Status, winner: Option[SGPlayer])
 case class Preprocessed(
     game: NewGame,
     replay: Replay,
@@ -113,15 +113,15 @@ case class ImportData(pgn: String, analyse: Option[String]) {
         val dbGame = Game
           .make(
             chess = game,
-            whitePlayer = Player.makeImported(
-              Color.White,
-              parsed.tags(_.White),
-              parsed.tags(_.WhiteElo).flatMap(_.toIntOption)
+            p1Player = Player.makeImported(
+              SGPlayer.P1,
+              parsed.tags(_.P1),
+              parsed.tags(_.P1Elo).flatMap(_.toIntOption)
             ),
-            blackPlayer = Player.makeImported(
-              Color.Black,
-              parsed.tags(_.Black),
-              parsed.tags(_.BlackElo).flatMap(_.toIntOption)
+            p2Player = Player.makeImported(
+              SGPlayer.P2,
+              parsed.tags(_.P2),
+              parsed.tags(_.P2Elo).flatMap(_.toIntOption)
             ),
             mode = Mode.Casual,
             source = Source.Import,
@@ -133,9 +133,9 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           game.situation.status match {
             case Some(situationStatus) => dbGame.finish(situationStatus, game.situation.winner).game
             case None =>
-              parsed.tags.resultColor
+              parsed.tags.resultPlayer
                 .map {
-                  case Some(color) => TagResult(status, color.some)
+                  case Some(sgPlayer) => TagResult(status, sgPlayer.some)
                   case None if status == Status.Outoftime => TagResult(status, none)
                   case None                               => TagResult(Status.Draw, none)
                   case _ => sys.error("Not implemented for draughts yet")

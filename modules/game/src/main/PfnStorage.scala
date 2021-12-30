@@ -3,7 +3,7 @@ package lila.game
 import strategygames.fairysf
 import strategygames.fairysf.format
 import strategygames.fairysf.{ Piece, PieceMap, Pos, PositionHash, Role }
-import strategygames.{ Color, GameFamily }
+import strategygames.{ Player => SGPlayer, GameFamily }
 
 import lila.db.ByteArray
 
@@ -52,10 +52,10 @@ private object PfnStorage {
           //unmovedRooks = UnmovedRooks(unmovedRooks),
           lastMove = Option(decoded.lastUci).flatMap(m => format.Uci.apply(GameFamily.Shogi(), m)),
           //castles = Castles(
-          //  whiteKingSide = unmovedRooks(Pos.H1),
-          //  whiteQueenSide = unmovedRooks(Pos.A1),
-          //  blackKingSide = unmovedRooks(Pos.H8),
-          //  blackQueenSide = unmovedRooks(Pos.A8)
+          //  p1KingSide = unmovedRooks(Pos.H1),
+          //  p1QueenSide = unmovedRooks(Pos.A1),
+          //  p2KingSide = unmovedRooks(Pos.H8),
+          //  p2QueenSide = unmovedRooks(Pos.A8)
           //),
           halfMoveClock = decoded.halfMoveClock
         )
@@ -66,7 +66,7 @@ private object PfnStorage {
       Role.javaSymbolToRole(role.symbol)
 
     private def fairysfPiece(piece: JavaPiece): Piece =
-      Piece(Color.fromWhite(piece.white), fairysfRole(piece.role))
+      Piece(SGPlayer.fromP1(piece.white), fairysfRole(piece.role))
   }
 
   case class Decoded(

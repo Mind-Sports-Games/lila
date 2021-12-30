@@ -4,7 +4,7 @@ import strategygames.draughts
 import strategygames.draughts.{ format, PieceMap }
 import strategygames.draughts.format.Uci
 import strategygames.draughts.{ Piece, Pos, PositionHash, Role }
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 import strategygames.draughts.variant.{ Standard, Variant }
 import lila.db.ByteArray
 
@@ -64,7 +64,7 @@ private object PdnStorage {
       Role.javaSymbolToRole(role.symbol)
 
     private def draughtsPiece(piece: JavaPiece): Piece =
-      Piece(Color(piece.white), draughtsRole(piece.role))
+      Piece(SGPlayer(piece.white), draughtsRole(piece.role))
 
   }
 

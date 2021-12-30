@@ -2,7 +2,7 @@ package controllers
 
 import akka.stream.scaladsl._
 import akka.util.ByteString
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 import play.api.mvc.Result
 import scala.concurrent.duration._
 
@@ -24,12 +24,12 @@ final class Export(env: Env) extends LilaController(env) {
     key = "export.gif.global"
   )
 
-  def gif(id: String, color: String) =
+  def gif(id: String, sgPlayer: String) =
     Open { implicit ctx =>
       OnlyHumansAndFacebookOrTwitter {
         ExportGifRateLimitGlobal("-", msg = HTTPRequest.ipAddress(ctx.req).value) {
           OptionFuResult(env.game.gameRepo gameWithInitialFen id) { case (game, initialFen) =>
-            val pov = Pov(game, Color.fromName(color) | Color.white)
+            val pov = Pov(game, SGPlayer.fromName(sgPlayer) | SGPlayer.p1)
             env.game.gifExport.fromPov(pov, initialFen) map
               stream("image/gif") map
               gameImageCacheSeconds(game)
@@ -61,7 +61,7 @@ final class Export(env: Env) extends LilaController(env) {
           env.game.gifExport.thumbnail(
             fen = puzzle.fenAfterInitialMove,
             lastMove = puzzle.line.head.uci.some,
-            orientation = puzzle.color
+            orientation = puzzle.sgPlayer
           ) map stream("image/gif") map { res =>
             res.withHeaders(CACHE_CONTROL -> "max-age=1209600")
           }

@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 import strategygames.format.FEN
 import lila.game.Game
 import lila.user.User
@@ -9,26 +9,26 @@ case class SwissPairing(
     id: Game.ID,
     swissId: Swiss.Id,
     round: SwissRound.Number,
-    white: User.ID,
-    black: User.ID,
+    p1: User.ID,
+    p2: User.ID,
     status: SwissPairing.Status,
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
     openingFEN: Option[FEN]
 ) {
-  def apply(c: Color)             = c.fold(white, black)
+  def apply(c: SGPlayer)             = c.fold(p1, p2)
   def gameId                      = id
-  def players                     = List(white, black)
-  def has(userId: User.ID)        = white == userId || black == userId
-  def colorOf(userId: User.ID)    = Color.fromWhite(white == userId)
-  def opponentOf(userId: User.ID) = if (white == userId) black else white
+  def players                     = List(p1, p2)
+  def has(userId: User.ID)        = p1 == userId || p2 == userId
+  def sgPlayerOf(userId: User.ID)    = SGPlayer.fromP1(p1 == userId)
+  def opponentOf(userId: User.ID) = if (p1 == userId) p2 else p1
   def winner: Option[User.ID]     = (~status.toOption).map(apply)
   def isOngoing                   = status.isLeft
   def resultFor(userId: User.ID)  = winner.map(userId.==)
-  def whiteWins                   = status == Right(Some(Color.White))
-  def blackWins                   = status == Right(Some(Color.Black))
+  def p1Wins                   = status == Right(Some(SGPlayer.P1))
+  def p2Wins                   = status == Right(Some(SGPlayer.P2))
   def isDraw                      = status == Right(None)
-  def strResultOf(color: Color)   = status.fold(_ => "*", _.fold("1/2")(c => if (c == color) "1" else "0"))
+  def strResultOf(sgPlayer: SGPlayer)   = status.fold(_ => "*", _.fold("1/2")(c => if (c == sgPlayer) "1" else "0"))
 }
 
 case class SwissPairingGameIds(
@@ -48,20 +48,20 @@ case class SwissPairingGames(
   def finishedOrAborted =
     game.finishedOrAborted && (!isMicroMatch || microMatchGame.fold(false)(_.finishedOrAborted))
   def outoftime = if (game.outoftime(true)) List(game) else List() ++ microMatchGame.filter(_.outoftime(true))
-  def winnerColor =
+  def winnerSGPlayer =
     // Single games are easy.
-    if (!isMicroMatch) game.winnerColor
+    if (!isMicroMatch) game.winnerSGPlayer
     else
-      // We'll always report the game1 color as the winner if they won, and if they haven't played the second
+      // We'll always report the game1 sgPlayer as the winner if they won, and if they haven't played the second
       // game yet, it's an unknown result.
       microMatchGame.flatMap(g2 =>
-        (game.winnerColor, g2.winnerColor) match {
+        (game.winnerSGPlayer, g2.winnerSGPlayer) match {
           // Same player winning both games is a win for that player
-          case (Some(color1), Some(color2)) if (color1 != color2) => Some(color1)
-          // The first game was decisive, second game a draw, so first game winner color is the winner
-          case (Some(color1), None)         => Some(color1)
-          // The second game was decisive, first game a draw, so second game winner's opposite color is the winner
-          case (None, Some(color2))         => Some(!color2)
+          case (Some(sgPlayer1), Some(sgPlayer2)) if (sgPlayer1 != sgPlayer2) => Some(sgPlayer1)
+          // The first game was decisive, second game a draw, so first game winner sgPlayer is the winner
+          case (Some(sgPlayer1), None)         => Some(sgPlayer1)
+          // The second game was decisive, first game a draw, so second game winner's opposite sgPlayer is the winner
+          case (None, Some(sgPlayer2))         => Some(!sgPlayer2)
           case _ => None
         }
       )
@@ -77,13 +77,13 @@ object SwissPairing {
 
   sealed trait Ongoing
   case object Ongoing extends Ongoing
-  type Status = Either[Ongoing, Option[Color]]
+  type Status = Either[Ongoing, Option[SGPlayer]]
 
   val ongoing: Status = Left(Ongoing)
 
   case class Pending(
-      white: User.ID,
-      black: User.ID
+      p1: User.ID,
+      p2: User.ID
   )
   case class Bye(player: User.ID)
 

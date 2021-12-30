@@ -30,7 +30,7 @@ final class Challenge(
       }
     }
 
-  def show(id: String, @nowarn("cat=unused") _color: Option[String]) =
+  def show(id: String, @nowarn("cat=unused") _sgPlayer: Option[String]) =
     Open { implicit ctx =>
       showId(id)
     }
@@ -65,7 +65,7 @@ final class Challenge(
           }
           else
             (c.challengerUserId ?? env.user.repo.named) map { user =>
-              Ok(html.challenge.theirs(c, json, user, get("color") flatMap strategygames.Color.fromName))
+              Ok(html.challenge.theirs(c, json, user, get("sgPlayer") flatMap strategygames.Player.fromName))
             },
         api = _ => Ok(json).fuccess
       ) flatMap withChallengeAnonCookie(mine && c.challengerIsAnon, c, owner = true)
@@ -81,21 +81,21 @@ final class Challenge(
   private def isForMe(challenge: ChallengeModel)(implicit ctx: Context) =
     challenge.destUserId.fold(true)(ctx.userId.contains)
 
-  def accept(id: String, color: Option[String]) =
+  def accept(id: String, sgPlayer: Option[String]) =
     Open { implicit ctx =>
       OptionFuResult(api byId id) { c =>
-        val cc = color flatMap strategygames.Color.fromName
+        val cc = sgPlayer flatMap strategygames.Player.fromName
         isForMe(c) ?? api
           .accept(c, ctx.me, HTTPRequest sid ctx.req, cc)
           .flatMap {
             case Some(pov) =>
               negotiate(
-                html = Redirect(routes.Round.watcher(pov.gameId, cc.fold(pov.game.variant.startColor.name)(_.name))).fuccess,
+                html = Redirect(routes.Round.watcher(pov.gameId, cc.fold(pov.game.variant.startPlayer.name)(_.name))).fuccess,
                 api = apiVersion => env.api.roundApi.player(pov, none, apiVersion) map { Ok(_) }
               ) flatMap withChallengeAnonCookie(ctx.isAnon, c, owner = false)
             case None =>
               negotiate(
-                html = Redirect(routes.Round.watcher(c.id, cc.fold("white")(_.name))).fuccess,
+                html = Redirect(routes.Round.watcher(c.id, cc.fold("p1")(_.name))).fuccess,
                 api = _ => notFoundJson("Someone else accepted the challenge")
               )
           }
@@ -124,7 +124,7 @@ final class Challenge(
         _ map { game =>
           env.lilaCookie.cookie(
             AnonCookie.name,
-            game.player(if (owner) c.finalColor else !c.finalColor).id,
+            game.player(if (owner) c.finalSGPlayer else !c.finalSGPlayer).id,
             maxAge = AnonCookie.maxAge.some,
             httpOnly = false.some
           )
@@ -344,7 +344,7 @@ final class Challenge(
         initialFen = config.position,
         timeControl = timeControl,
         mode = config.mode,
-        color = config.color.name,
+        sgPlayer = config.sgPlayer.name,
         challenger = ChallengeModel.toRegistered(config.variant, timeControl)(orig),
         destUser = dest,
         rematchOf = none,
@@ -363,7 +363,7 @@ final class Challenge(
           Json.obj(
             "game" -> {
               env.game.jsonView(g, challenge.initialFen) ++ Json.obj(
-                "url" -> s"${env.net.baseUrl}${routes.Round.watcher(g.id, g.variant.startColor.name)}"
+                "url" -> s"${env.net.baseUrl}${routes.Round.watcher(g.id, g.variant.startPlayer.name)}"
               )
             }
           )
@@ -406,7 +406,7 @@ final class Challenge(
                   timeControl =
                     config.clock.fold[TimeControl](TimeControl.Unlimited)(TimeControl.Clock.apply),
                   mode = strategygames.Mode(config.rated),
-                  color = "random",
+                  sgPlayer = "random",
                   challenger = Challenger.Open,
                   destUser = none,
                   rematchOf = none,
@@ -416,8 +416,8 @@ final class Challenge(
                 case true =>
                   JsonOk(
                     env.challenge.jsonView.show(challenge, SocketVersion(0), none) ++ Json.obj(
-                      "urlWhite" -> s"${env.net.baseUrl}/${challenge.id}?color=white",
-                      "urlBlack" -> s"${env.net.baseUrl}/${challenge.id}?color=black"
+                      "urlP1" -> s"${env.net.baseUrl}/${challenge.id}?sgPlayer=p1",
+                      "urlP2" -> s"${env.net.baseUrl}/${challenge.id}?sgPlayer=p2"
                     )
                   )
                 case false =>

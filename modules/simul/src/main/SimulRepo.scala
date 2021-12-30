@@ -3,9 +3,7 @@ package lila.simul
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 
-import strategygames.GameLogic
-import strategygames.Color.{ Black, White }
-import strategygames.Status
+import strategygames.{ GameLogic, Player => SGPlayer, P1, P2, Status }
 import strategygames.variant.Variant
 import lila.db.BSON
 import lila.db.BSON.{ Reader, Writer }
@@ -42,7 +40,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
         gameId = r str "gameId",
         status = r.get[Status]("status"),
         wins = r boolO "wins",
-        hostColor = r.strO("hostColor").flatMap(strategygames.Color.fromName) | White
+        hostSGPlayer = r.strO("hostSGPlayer").flatMap(SGPlayer.fromName) | P1
       )
     def writes(w: BSON.Writer, o: SimulPairing) =
       $doc(
@@ -50,7 +48,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
         "gameId"    -> o.gameId,
         "status"    -> o.status,
         "wins"      -> o.wins,
-        "hostColor" -> o.hostColor.name
+        "hostSGPlayer" -> o.hostSGPlayer.name
       )
   }
 

@@ -1,13 +1,13 @@
 package lila.game
 
 import strategygames.variant.Variant
-import strategygames.{ Color, Status }
+import strategygames.{ Player => SGPlayer, Status }
 
 object StatusText {
 
   import Status._
 
-  def apply(status: Status, win: Option[Color], variant: Variant): String =
+  def apply(status: Status, win: Option[SGPlayer], variant: Variant): String =
     status match {
       case Aborted                  => "Game was aborted."
       case Mate                     => s"${winner(win)} wins by checkmate."
@@ -38,8 +38,8 @@ object StatusText {
       case _ => ""
     }
 
-  def apply(game: lila.game.Game): String = apply(game.status, game.winnerColor, game.variant)
+  def apply(game: lila.game.Game): String = apply(game.status, game.winnerSGPlayer, game.variant)
 
-  private def winner(win: Option[Color]) = win.??(_.toString)
-  private def loser(win: Option[Color])  = winner(win.map(!_))
+  private def winner(win: Option[SGPlayer]) = win.??(_.toString)
+  private def loser(win: Option[SGPlayer])  = winner(win.map(!_))
 }

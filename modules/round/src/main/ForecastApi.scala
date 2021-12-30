@@ -7,7 +7,7 @@ import lila.db.dsl._
 import org.joda.time.DateTime
 import scala.concurrent.Promise
 
-import strategygames.{ Color, Move }
+import strategygames.{ Player => SGPlayer, Move }
 import strategygames.format.Uci
 import Forecast.Step
 import lila.game.Game.PlayerId
@@ -106,7 +106,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
 
   private def firstStep(steps: Forecast.Steps) = steps.headOption.flatMap(_.headOption)
 
-  def clearGame(g: Game) = coll.delete.one($inIds(Color.all.map(g.fullIdOf))).void
+  def clearGame(g: Game) = coll.delete.one($inIds(SGPlayer.all.map(g.fullIdOf))).void
 
   def clearPov(pov: Pov) = coll.delete.one($id(pov.fullId)).void
 }

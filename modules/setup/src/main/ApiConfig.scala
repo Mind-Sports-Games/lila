@@ -6,7 +6,7 @@ import strategygames.format.{ FEN, Forsyth }
 import strategygames.{ Clock, GameFamily, Mode, Speed }
 
 import lila.game.PerfPicker
-import lila.lobby.Color
+import lila.lobby.SGPlayer
 import lila.rating.PerfType
 import lila.common.Template
 
@@ -15,7 +15,7 @@ final case class ApiConfig(
     clock: Option[Clock.Config],
     days: Option[Int],
     rated: Boolean,
-    color: Color,
+    sgPlayer: SGPlayer,
     position: Option[FEN] = None,
     acceptByToken: Option[String] = None,
     message: Option[Template],
@@ -61,7 +61,7 @@ object ApiConfig extends BaseHumanConfig {
       clock = cl,
       days = d,
       rated = r,
-      color = Color.orDefault(~c),
+      sgPlayer = SGPlayer.orDefault(~c),
       position = pos.map(f => FEN.apply(variant.gameLogic, f)),
       acceptByToken = tok,
       message = msg map Template,

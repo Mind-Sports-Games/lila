@@ -97,7 +97,7 @@ final class BotPlayer(
       tellRound(pov.gameId, DrawNo(PlayerId(pov.playerId)))
 
   def offerDraw(pov: Pov): Unit =
-    if (pov.game.drawable && (pov.game.playerCanOfferDraw(pov.color) || pov.opponent.isOfferingDraw))
+    if (pov.game.drawable && (pov.game.playerCanOfferDraw(pov.sgPlayer) || pov.opponent.isOfferingDraw))
       tellRound(pov.gameId, DrawYes(PlayerId(pov.playerId)))
 
   def setDraw(pov: Pov, v: Boolean): Unit =

@@ -37,12 +37,12 @@ final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
     Results.NotFound(html.base.notFound()(ctx))
   }
 
-  def blacklisted(implicit ctx: Context): Result =
+  def p2listed(implicit ctx: Context): Result =
     if (lila.api.Mobile.Api requested ctx.req)
       Results.Unauthorized(
         Json.obj(
-          "error" -> html.site.message.blacklistedMessage
+          "error" -> html.site.message.p2listedMessage
         )
       )
-    else Results.Unauthorized(html.site.message.blacklistedMessage)
+    else Results.Unauthorized(html.site.message.p2listedMessage)
 }

@@ -1,7 +1,7 @@
 package lila.analyse
 
 import cats.implicits._
-import strategygames.{ Color, GameFamily, GameLogic }
+import strategygames.{ Player => SGPlayer, GameFamily, GameLogic }
 import strategygames.format.Uci
 
 import lila.tree.Eval
@@ -19,7 +19,7 @@ case class Info(
 
   def turn = 1 + (ply - 1) / 2
 
-  def color = Color.fromPly(ply - 1)
+  def sgPlayer = SGPlayer.fromPly(ply - 1)
 
   def encode: String =
     List(
@@ -51,7 +51,7 @@ case class Info(
     }
 
   override def toString =
-    s"Info $color [$ply] ${cp.fold("?")(_.showPawns)} ${mate.??(_.value)} $best"
+    s"Info $sgPlayer [$ply] ${cp.fold("?")(_.showPawns)} ${mate.??(_.value)} $best"
 }
 
 object Info {

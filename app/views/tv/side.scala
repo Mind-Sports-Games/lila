@@ -71,7 +71,7 @@ object side {
         ),
         div(cls := "game__meta__players")(
           game.players.map { p =>
-            div(cls := s"player color-icon is ${p.color.name} text")(
+            div(cls := s"player sgPlayer-icon is ${p.sgPlayer.name} text")(
               playerLink(p, withOnline = false, withDiff = true, withBerserk = true)
             )
           }

@@ -3,6 +3,8 @@ package lila.analyse
 import lila.game.Pov
 import lila.tree.Eval._
 
+import strategygames.{ Player => SGPlayer }
+
 object Accuracy {
 
   private def withSignOf(i: Int, signed: Int) = if (signed < 0) -i else i
@@ -15,33 +17,33 @@ object Accuracy {
   }
 
   case class PovLike(
-      color: strategygames.Color,
-      startColor: strategygames.Color,
+      sgPlayer: SGPlayer,
+      startSGPlayer: SGPlayer,
       startedAtTurn: Int
   )
 
   implicit def povToPovLike(pov: Pov): PovLike =
     PovLike(
-      color = pov.color,
-      startColor = pov.game.startColor,
+      sgPlayer = pov.sgPlayer,
+      startSGPlayer = pov.game.startSGPlayer,
       startedAtTurn = pov.game.chess.startedAtTurn
     )
 
   def diffsList(pov: PovLike, analysis: Analysis): List[Int] = {
-    if (pov.color == pov.startColor) Info.start(pov.startedAtTurn) :: analysis.infos
+    if (pov.sgPlayer == pov.startSGPlayer) Info.start(pov.startedAtTurn) :: analysis.infos
     else analysis.infos
   }.grouped(2)
     .foldLeft(List[Int]()) {
       case (list, List(i1, i2)) =>
         makeDiff.lift((i1.cp, i1.mate, i2.cp, i2.mate)).fold(list) { diff =>
-          (if (pov.color.white) -diff else diff).max(0) :: list
+          (if (pov.sgPlayer.p1) -diff else diff).max(0) :: list
         }
       case (list, _) => list
     }
     .reverse
 
-  def prevColorInfos(pov: PovLike, analysis: Analysis): List[Info] = {
-    if (pov.color == pov.startColor) Info.start(pov.startedAtTurn) :: analysis.infos
+  def prevSGPlayerInfos(pov: PovLike, analysis: Analysis): List[Info] = {
+    if (pov.sgPlayer == pov.startSGPlayer) Info.start(pov.startedAtTurn) :: analysis.infos
     else analysis.infos
   }.zipWithIndex.collect {
     case (e, i) if (i % 2) == 0 => e

@@ -1,6 +1,6 @@
 package lila.challenge
 
-import strategygames.{ Black, Color, GameLogic, Mode, Situation, White }
+import strategygames.{ P2, Player => SGPlayer, GameLogic, Mode, Situation, P1 }
 import strategygames.format.Forsyth
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.variant.Variant
@@ -15,14 +15,14 @@ final private class ChallengeJoiner(
     onStart: lila.round.OnStart
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  def apply(c: Challenge, destUser: Option[User], color: Option[Color]): Fu[Option[Pov]] =
+  def apply(c: Challenge, destUser: Option[User], sgPlayer: Option[SGPlayer]): Fu[Option[Pov]] =
     gameRepo exists c.id flatMap {
       case true                                                           => fuccess(None)
-      case _ if color.map(Challenge.ColorChoice.apply).has(c.colorChoice) => fuccess(None)
+      case _ if sgPlayer.map(Challenge.SGPlayerChoice.apply).has(c.sgPlayerChoice) => fuccess(None)
       case _ =>
         c.challengerUserId.??(userRepo.byId) flatMap { origUser =>
-          val game = ChallengeJoiner.createGame(c, origUser, destUser, color)
-          (gameRepo insertDenormalized game) >>- onStart(game.id) inject Pov(game, !c.finalColor).some
+          val game = ChallengeJoiner.createGame(c, origUser, destUser, sgPlayer)
+          (gameRepo insertDenormalized game) >>- onStart(game.id) inject Pov(game, !c.finalSGPlayer).some
         }
     }
 }
@@ -33,7 +33,7 @@ private object ChallengeJoiner {
       c: Challenge,
       origUser: Option[User],
       destUser: Option[User],
-      color: Option[Color]
+      sgPlayer: Option[SGPlayer]
   ): Game = {
     def makeChess(variant: Variant): strategygames.Game =
       strategygames.Game(variant.gameLogic, situation = Situation(variant.gameLogic, variant), clock = c.clock.map(_.config.toClock))
@@ -59,8 +59,8 @@ private object ChallengeJoiner {
     Game
       .make(
         chess = chessGame,
-        whitePlayer = Player.make(White, c.finalColor.fold(origUser, destUser), perfPicker),
-        blackPlayer = Player.make(Black, c.finalColor.fold(destUser, origUser), perfPicker),
+        p1Player = Player.make(P1, c.finalSGPlayer.fold(origUser, destUser), perfPicker),
+        p2Player = Player.make(P2, c.finalSGPlayer.fold(destUser, origUser), perfPicker),
         mode = if (chessGame.board.variant.fromPosition) Mode.Casual else c.mode,
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,

@@ -1,6 +1,6 @@
 package lila.mod
 
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 
@@ -19,7 +19,7 @@ final private class SandbagWatch(
   private val messageOnceEvery = lila.memo.OnceEvery(1 hour)
 
   def apply(game: Game): Unit = for {
-    loser <- game.loser.map(_.color)
+    loser <- game.loser.map(_.sgPlayer)
     if game.rated && !game.fromApi
     userId <- game.userIds
   } {
@@ -64,12 +64,12 @@ final private class SandbagWatch(
     .expireAfterWrite(3 hours)
     .build[User.ID, Record]()
 
-  private def outcomeOf(game: Game, loser: Color, userId: User.ID): Outcome =
+  private def outcomeOf(game: Game, loser: SGPlayer, userId: User.ID): Outcome =
     game
       .playerByUserId(userId)
       .ifTrue(isSandbag(game))
       .fold[Outcome](Good) { player =>
-        if (player.color == loser) game.winnerUserId.fold[Outcome](Good)(Sandbag.apply)
+        if (player.sgPlayer == loser) game.winnerUserId.fold[Outcome](Good)(Sandbag.apply)
         else game.loserUserId.fold[Outcome](Good)(Boost.apply)
       }
 

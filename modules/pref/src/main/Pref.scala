@@ -33,7 +33,7 @@ case class Pref(
     challenge: Int,
     message: Int,
     studyInvite: Int,
-    coordColor: Int,
+    coordSGPlayer: Int,
     submitMove: Int,
     confirmResign: Int,
     insightShare: Int,
@@ -55,11 +55,11 @@ case class Pref(
   def realTheme3d    = Theme3d(theme3d)
   def realPieceSet3d = PieceSet3d(pieceSet3d)
 
-  def themeColor = if (bg == Bg.LIGHT) "#dbd7d1" else "#2e2a24"
+  def themeSGPlayer = if (bg == Bg.LIGHT) "#dbd7d1" else "#2e2a24"
 
   def realSoundSet = SoundSet(soundSet)
 
-  def coordColorName = Color.choices.toMap.get(coordColor).fold("random")(_.toLowerCase)
+  def coordSGPlayerName = SGPlayer.choices.toMap.get(coordSGPlayer).fold("random")(_.toLowerCase)
   def coordsClass    = Coords classOf coords
 
   def hasDgt = tags contains Tag.dgt
@@ -170,15 +170,15 @@ object Pref {
     val dgt = "dgt"
   }
 
-  object Color {
+  object SGPlayer {
     val WHITE  = 1
     val RANDOM = 2
     val BLACK  = 3
 
     val choices = Seq(
-      WHITE  -> "White",
+      WHITE  -> "P1",
       RANDOM -> "Random",
-      BLACK  -> "Black"
+      BLACK  -> "P2"
     )
   }
 
@@ -463,7 +463,7 @@ object Pref {
     challenge = Challenge.ALWAYS,
     message = Message.ALWAYS,
     studyInvite = StudyInvite.ALWAYS,
-    coordColor = Color.RANDOM,
+    coordSGPlayer = SGPlayer.RANDOM,
     submitMove = SubmitMove.CORRESPONDENCE_ONLY,
     confirmResign = ConfirmResign.YES,
     insightShare = InsightShare.FRIENDS,

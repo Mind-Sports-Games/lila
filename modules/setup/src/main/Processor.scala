@@ -37,7 +37,7 @@ final private[setup] class Processor(
       blocking: Set[String]
   )(implicit ctx: UserContext): Fu[Processor.HookResult] = {
     import Processor.HookResult._
-    val config = configBase.fixColor
+    val config = configBase.fixSGPlayer
     config.hook(sri, ctx.me, sid, blocking) match {
       case Left(hook) =>
         fuccess {

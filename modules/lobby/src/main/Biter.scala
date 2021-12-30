@@ -1,6 +1,6 @@
 package lila.lobby
 
-import strategygames.{ Game => StratGame, Situation }
+import strategygames.{ Game => StratGame, P1, P2, Situation }
 
 import actorApi.{ JoinHook, JoinSeek }
 import lila.game.{ Game, PerfPicker, Player }
@@ -27,44 +27,44 @@ final private class Biter(
     for {
       userOption   <- lobbyUserOption.map(_.id) ?? userRepo.byId
       ownerOption  <- hook.userId ?? userRepo.byId
-      creatorColor <- assignCreatorColor(ownerOption, userOption, hook.realColor)
+      creatorSGPlayer <- assignCreatorSGPlayer(ownerOption, userOption, hook.realSGPlayer)
       game <- makeGame(
         hook,
-        whiteUser = creatorColor.fold(ownerOption, userOption),
-        blackUser = creatorColor.fold(userOption, ownerOption)
+        p1User = creatorSGPlayer.fold(ownerOption, userOption),
+        p2User = creatorSGPlayer.fold(userOption, ownerOption)
       ).withUniqueId
       _ <- gameRepo insertDenormalized game
     } yield {
       lila.mon.lobby.hook.join.increment()
-      JoinHook(sri, hook, game, creatorColor)
+      JoinHook(sri, hook, game, creatorSGPlayer)
     }
 
   private def join(seek: Seek, lobbyUser: LobbyUser): Fu[JoinSeek] =
     for {
       user         <- userRepo byId lobbyUser.id orFail s"No such user: ${lobbyUser.id}"
       owner        <- userRepo byId seek.user.id orFail s"No such user: ${seek.user.id}"
-      creatorColor <- assignCreatorColor(owner.some, user.some, seek.realColor)
+      creatorSGPlayer <- assignCreatorSGPlayer(owner.some, user.some, seek.realSGPlayer)
       game <- makeGame(
         seek,
-        whiteUser = creatorColor.fold(owner.some, user.some),
-        blackUser = creatorColor.fold(user.some, owner.some)
+        p1User = creatorSGPlayer.fold(owner.some, user.some),
+        p2User = creatorSGPlayer.fold(user.some, owner.some)
       ).withUniqueId
       _ <- gameRepo insertDenormalized game
-    } yield JoinSeek(user.id, seek, game, creatorColor)
+    } yield JoinSeek(user.id, seek, game, creatorSGPlayer)
 
-  private def assignCreatorColor(
+  private def assignCreatorSGPlayer(
       creatorUser: Option[User],
       joinerUser: Option[User],
-      color: Color
-  ): Fu[strategygames.Color] =
-    color match {
-      case Color.Random =>
-        userRepo.firstGetsWhite(creatorUser.map(_.id), joinerUser.map(_.id)) map strategygames.Color.fromWhite
-      case Color.White => fuccess(strategygames.White)
-      case Color.Black => fuccess(strategygames.Black)
+      sgPlayer: SGPlayer
+  ): Fu[strategygames.Player] =
+    sgPlayer match {
+      case SGPlayer.Random =>
+        userRepo.firstGetsP1(creatorUser.map(_.id), joinerUser.map(_.id)) map strategygames.Player.fromP1
+      case SGPlayer.P1 => fuccess(strategygames.P1)
+      case SGPlayer.P2 => fuccess(strategygames.P2)
     }
 
-  private def makeGame(hook: Hook, whiteUser: Option[User], blackUser: Option[User]) = {
+  private def makeGame(hook: Hook, p1User: Option[User], p2User: Option[User]) = {
     val clock      = hook.clock.toClock
     val perfPicker = PerfPicker.mainOrDefault(strategygames.Speed(clock.config), hook.realVariant, none)
     Game
@@ -74,8 +74,8 @@ final private class Biter(
           situation = Situation(hook.realVariant.gameLogic, hook.realVariant),
           clock = clock.some
         ),
-        whitePlayer = Player.make(strategygames.White, whiteUser, perfPicker),
-        blackPlayer = Player.make(strategygames.Black, blackUser, perfPicker),
+        p1Player = Player.make(strategygames.P1, p1User, perfPicker),
+        p2Player = Player.make(strategygames.P2, p2User, perfPicker),
         mode = hook.realMode,
         source = lila.game.Source.Lobby,
         pgnImport = None
@@ -83,7 +83,7 @@ final private class Biter(
       .start
   }
 
-  private def makeGame(seek: Seek, whiteUser: Option[User], blackUser: Option[User]) = {
+  private def makeGame(seek: Seek, p1User: Option[User], p2User: Option[User]) = {
     val perfPicker = PerfPicker.mainOrDefault(strategygames.Speed(none), seek.realVariant, seek.daysPerTurn)
     Game
       .make(
@@ -92,8 +92,8 @@ final private class Biter(
           situation = Situation(seek.realVariant.gameLogic, seek.realVariant),
           clock = none
         ),
-        whitePlayer = Player.make(strategygames.White, whiteUser, perfPicker),
-        blackPlayer = Player.make(strategygames.Black, blackUser, perfPicker),
+        p1Player = Player.make(strategygames.P1, p1User, perfPicker),
+        p2Player = Player.make(strategygames.P2, p2User, perfPicker),
         mode = seek.realMode,
         source = lila.game.Source.Lobby,
         daysPerTurn = seek.daysPerTurn,

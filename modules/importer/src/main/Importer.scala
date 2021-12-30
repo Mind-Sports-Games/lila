@@ -20,7 +20,7 @@ final class Importer(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execution
         } >> {
           gameRepo.finish(
             id = game.id,
-            winnerColor = game.winnerColor,
+            winnerSGPlayer = game.winnerSGPlayer,
             winnerId = None,
             status = game.status
           )

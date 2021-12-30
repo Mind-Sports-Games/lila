@@ -58,7 +58,7 @@ final private class StudyMaker(
         setup = Chapter.Setup(
           gameId = pov.gameId.some,
           variant = pov.game.variant,
-          orientation = pov.color
+          orientation = pov.sgPlayer
         ),
         root = root,
         tags = PgnTags(tags),

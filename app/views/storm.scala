@@ -157,8 +157,8 @@ object storm {
       s.puzzlesPlayed,
       s.newRun,
       s.endRun,
-      s.youPlayTheWhitePiecesInAllPuzzles,
-      s.youPlayTheBlackPiecesInAllPuzzles
+      s.youPlayTheP1PiecesInAllPuzzles,
+      s.youPlayTheP2PiecesInAllPuzzles
     ).map(_.key)
   }
 }

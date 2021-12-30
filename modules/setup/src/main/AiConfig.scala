@@ -1,11 +1,10 @@
 package lila.setup
 
-import strategygames.Color.{ Black, White }
-import strategygames.{ GameFamily, GameLogic, Mode, Speed }
+import strategygames.{ GameFamily, GameLogic, Mode, Speed, P1, P2 }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import lila.game.{ Game, Player, Pov, Source }
-import lila.lobby.Color
+import lila.lobby.SGPlayer
 import lila.user.User
 
 case class AiConfig(
@@ -16,14 +15,14 @@ case class AiConfig(
     increment: Int,
     days: Int,
     level: Int,
-    color: Color,
+    sgPlayer: SGPlayer,
     fen: Option[FEN] = None
 ) extends Config
     with Positional {
 
   val strictFen = true
 
-  def >> = (s"{$variant.gameFamily.id}_{$variant.id}", timeMode.id, time, increment, days, level, color.name, fen.map(_.value)).some
+  def >> = (s"{$variant.gameFamily.id}_{$variant.id}", timeMode.id, time, increment, days, level, sgPlayer.name, fen.map(_.value)).some
 
   def game(user: Option[User]) =
     fenGame { chessGame =>
@@ -35,13 +34,13 @@ case class AiConfig(
       Game
         .make(
           chess = chessGame,
-          whitePlayer = creatorColor.fold(
-            Player.make(White, user, perfPicker),
-            Player.make(White, level.some)
+          p1Player = creatorSGPlayer.fold(
+            Player.make(P1, user, perfPicker),
+            Player.make(P1, level.some)
           ),
-          blackPlayer = creatorColor.fold(
-            Player.make(Black, level.some),
-            Player.make(Black, user, perfPicker)
+          p2Player = creatorSGPlayer.fold(
+            Player.make(P2, level.some),
+            Player.make(P2, user, perfPicker)
           ),
           mode = Mode.Casual,
           source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
@@ -51,7 +50,7 @@ case class AiConfig(
         .sloppy
     } start
 
-  def pov(user: Option[User]) = Pov(game(user), creatorColor)
+  def pov(user: Option[User]) = Pov(game(user), creatorSGPlayer)
 
   def timeControlFromPosition = variant != strategygames.chess.variant.FromPosition || time >= 1
 }
@@ -69,7 +68,7 @@ object AiConfig extends BaseConfig {
       increment = i,
       days = d,
       level = level,
-      color = Color(c) err "Invalid color " + c,
+      sgPlayer = SGPlayer(c) err "Invalid sgPlayer " + c,
       fen = fen.map(f => FEN.apply(gameLogic, f))
     )
   }
@@ -82,7 +81,7 @@ object AiConfig extends BaseConfig {
     increment = 8,
     days = 2,
     level = 1,
-    color = Color.default
+    sgPlayer = SGPlayer.default
   )
 
   val levels = (1 to 8).toList
@@ -105,7 +104,7 @@ object AiConfig extends BaseConfig {
         increment = r int "i",
         days = r int "d",
         level = r int "l",
-        color = Color.White,
+        sgPlayer = SGPlayer.P1,
         fen = r.getO[FEN]("f").filter(_.value.nonEmpty)
       )
 

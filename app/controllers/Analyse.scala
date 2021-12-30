@@ -1,7 +1,7 @@
 package controllers
 
 import strategygames.format.FEN
-import strategygames.{ Color, Replay, White }
+import strategygames.{ Player => SGPlayer, Replay, P1 }
 import play.api.mvc._
 import views._
 
@@ -90,11 +90,11 @@ final class Analyse(
         }
       }
 
-  def embed(gameId: String, color: String) =
+  def embed(gameId: String, sgPlayer: String) =
     Action.async { implicit req =>
       env.game.gameRepo.gameWithInitialFen(gameId) flatMap {
         case Some((game, initialFen)) =>
-          val pov = Pov(game, Color.fromName(color) | White)
+          val pov = Pov(game, SGPlayer.fromName(sgPlayer) | P1)
           env.api.roundApi.embed(
             pov,
             lila.api.Mobile.Api.currentVersion,
@@ -109,7 +109,7 @@ final class Analyse(
 
   private def RedirectAtFen(pov: Pov, initialFen: Option[FEN])(or: => Fu[Result])(implicit ctx: Context) =
     get("fen").map(s => FEN.clean(pov.game.variant.gameLogic, s)).fold(or) { atFen =>
-      val url = routes.Round.watcher(pov.gameId, pov.color.name)
+      val url = routes.Round.watcher(pov.gameId, pov.sgPlayer.name)
       fuccess {
         Replay
           .plyAtFen(pov.game.variant.gameLogic, pov.game.pgnMoves, initialFen, pov.game.variant, atFen)

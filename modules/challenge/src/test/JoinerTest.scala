@@ -17,7 +17,7 @@ final class JoinerTest extends Specification {
         initialFen = None,
         timeControl = Challenge.TimeControl.Clock(Clock.Config(300, 0)),
         mode = Mode.Casual,
-        color = "white",
+        sgPlayer = "p1",
         challenger = Challenge.Challenger.Anonymous("secret"),
         destUser = None,
         rematchOf = None
@@ -33,7 +33,7 @@ final class JoinerTest extends Specification {
         initialFen = Some(FEN(GameLogic.Chess(), position)),
         timeControl = Challenge.TimeControl.Clock(Clock.Config(300, 0)),
         mode = Mode.Casual,
-        color = "white",
+        sgPlayer = "p1",
         challenger = Challenge.Challenger.Anonymous("secret"),
         destUser = None,
         rematchOf = None

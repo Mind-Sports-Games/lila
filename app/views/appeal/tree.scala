@@ -195,7 +195,7 @@ object tree {
                 "If you don't want to face lower or higher rated opponents, set a rating range on your seek."
               ),
               li(
-                "Don't abort games if you want to have a particular color, you have to play with both colors."
+                "Don't abort games if you want to have a particular sgPlayer, you have to play with both sgPlayers."
               )
             )
           )

@@ -33,7 +33,7 @@ final class JsonView {
           Json.toJson(D.Date: Dimension[_]),
           Json.toJson(D.Period: Dimension[_]),
           Json.toJson(D.Perf: Dimension[_]),
-          Json.toJson(D.Color: Dimension[_]),
+          Json.toJson(D.SGPlayer: Dimension[_]),
           Json.toJson(D.OpponentStrength: Dimension[_])
         )
       ),

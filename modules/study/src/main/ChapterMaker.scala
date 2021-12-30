@@ -3,11 +3,10 @@ package lila.study
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, PocketData }
+import strategygames.{ GameLogic, Player => SGPlayer, PocketData }
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
 import lila.user.User
-import strategygames.Color
 
 final private class ChapterMaker(
     net: lila.common.config.NetConfig,
@@ -46,14 +45,14 @@ final private class ChapterMaker(
       }
     } yield Chapter.make(
       studyId = study.id,
-      name = parsed.tags(_.White).flatMap { white =>
+      name = parsed.tags(_.P1).flatMap { p1 =>
         parsed
-          .tags(_.Black)
+          .tags(_.P2)
           .ifTrue {
             data.name.value.isEmpty || data.isDefaultName
           }
-          .map { black =>
-            Chapter.Name(s"$white - $black")
+          .map { p2 =>
+            Chapter.Name(s"$p1 - $p2")
           }
       } | data.name,
       setup = Chapter.Setup(
@@ -70,11 +69,11 @@ final private class ChapterMaker(
       conceal = data.isConceal option Chapter.Ply(parsed.root.ply)
     )
 
-  private def resolveOrientation(orientation: Orientation, root: Node.Root, tags: Tags = Tags.empty): Color =
+  private def resolveOrientation(orientation: Orientation, root: Node.Root, tags: Tags = Tags.empty): SGPlayer =
     orientation match {
-      case Orientation.Fixed(color)        => color
-      case _ if tags.resultColor.isDefined => Color.white
-      case _                               => root.lastMainlineNode.color
+      case Orientation.Fixed(sgPlayer)        => sgPlayer
+      case _ if tags.resultPlayer.isDefined => SGPlayer.p1
+      case _                               => root.lastMainlineNode.sgPlayer
     }
 
   private def fromFenOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Chapter = {
@@ -144,8 +143,8 @@ final private class ChapterMaker(
         !game.synthetic option game.id,
         game.variant,
         data.realOrientation match {
-          case Orientation.Auto         => Color.white
-          case Orientation.Fixed(color) => color
+          case Orientation.Auto         => SGPlayer.p1
+          case Orientation.Fixed(sgPlayer) => sgPlayer
         }
       ),
       root = root,
@@ -208,7 +207,7 @@ private[study] object ChapterMaker {
   trait ChapterData {
     def orientation: String
     def mode: String
-    def realOrientation = Color.fromName(orientation).fold[Orientation](Orientation.Auto)(Orientation.Fixed)
+    def realOrientation = SGPlayer.fromName(orientation).fold[Orientation](Orientation.Auto)(Orientation.Fixed)
     def isPractice      = mode == Mode.Practice.key
     def isGamebook      = mode == Mode.Gamebook.key
     def isConceal       = mode == Mode.Conceal.key
@@ -216,7 +215,7 @@ private[study] object ChapterMaker {
 
   sealed trait Orientation
   object Orientation {
-    case class Fixed(color: Color) extends Orientation
+    case class Fixed(sgPlayer: SGPlayer) extends Orientation
     case object Auto               extends Orientation
   }
 
@@ -226,7 +225,7 @@ private[study] object ChapterMaker {
       variant: Option[String] = None,
       fen: Option[FEN] = None,
       pgn: Option[String] = None,
-      orientation: String = "white", // can be "auto"
+      orientation: String = "p1", // can be "auto"
       mode: String = ChapterMaker.Mode.Normal.key,
       initial: Boolean = false,
       isDefaultName: Boolean = true

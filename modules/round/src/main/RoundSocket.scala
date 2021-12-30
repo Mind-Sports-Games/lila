@@ -4,7 +4,7 @@ import actorApi._
 import actorApi.round._
 import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
 import strategygames.format.Uci
-import strategygames.{ Black, Centis, Color, GameFamily, MoveMetrics, Speed, White }
+import strategygames.{ P2, Centis, Player => SGPlayer, GameFamily, MoveMetrics, Speed, P1 }
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.concurrent.duration._
@@ -114,11 +114,11 @@ final class RoundSocket(
         case "outoftime"    => tellRound(id.gameId, QuietFlag) // mobile app BC
         case t              => logger.warn(s"Unhandled round socket message: $t")
       }
-    case Protocol.In.Flag(gameId, color, fromPlayerId) => tellRound(gameId, ClientFlag(color, fromPlayerId))
-    case Protocol.In.PlayerChatSay(id, Right(color), msg) =>
+    case Protocol.In.Flag(gameId, sgPlayer, fromPlayerId) => tellRound(gameId, ClientFlag(sgPlayer, fromPlayerId))
+    case Protocol.In.PlayerChatSay(id, Right(sgPlayer), msg) =>
       gameIfPresent(id.value) foreach {
         _ foreach {
-          messenger.owner(_, color, msg).unit
+          messenger.owner(_, sgPlayer, msg).unit
         }
       }
     case Protocol.In.PlayerChatSay(id, Left(userId), msg) =>
@@ -172,9 +172,9 @@ final class RoundSocket(
 
   Bus.subscribeFun("tvSelect", "roundSocket", "tourStanding", "startGame", "finishGame") {
     case TvSelect(gameId, speed, json) => sendForGameId(gameId)(Protocol.Out.tvSelect(gameId, speed, json))
-    case Tell(gameId, e @ BotConnected(color, v)) =>
+    case Tell(gameId, e @ BotConnected(sgPlayer, v)) =>
       rounds.tell(gameId, e)
-      sendForGameId(gameId)(Protocol.Out.botConnected(gameId, color, v))
+      sendForGameId(gameId)(Protocol.Out.botConnected(gameId, sgPlayer, v))
     case Tell(gameId, msg)          => rounds.tell(gameId, msg)
     case TellIfExists(gameId, msg)  => rounds.tellIfPresent(gameId, msg)
     case TellMany(gameIds, msg)     => rounds.tellIds(gameIds, msg)
@@ -187,7 +187,7 @@ final class RoundSocket(
       }
     case lila.game.actorApi.FinishGame(game, _, _) if game.hasClock =>
       game.userIds.some.filter(_.nonEmpty) foreach { usersPlaying =>
-        sendForGameId(game.id)(Protocol.Out.finishGame(game.id, game.winnerColor, usersPlaying))
+        sendForGameId(game.id)(Protocol.Out.finishGame(game.id, game.winnerSGPlayer, usersPlaying))
       }
   }
 
@@ -231,7 +231,7 @@ object RoundSocket {
     } / {
       pov.game.chess.board.materialImbalance match {
         case _ if pov.game.variant.materialImbalanceVariant                   => 1
-        case i if (pov.color.white && i <= -4) || (pov.color.black && i >= 4) => 3
+        case i if (pov.sgPlayer.p1 && i <= -4) || (pov.sgPlayer.p2 && i >= 4) => 3
         case _                                                                => 1
       }
     } / {
@@ -245,12 +245,12 @@ object RoundSocket {
       case class PlayerOnlines(onlines: Iterable[(Game.Id, Option[RoomCrowd])])        extends P.In
       case class PlayerDo(fullId: FullId, tpe: String)                                 extends P.In
       case class PlayerMove(fullId: FullId, uci: Uci, blur: Boolean, lag: MoveMetrics) extends P.In
-      case class PlayerChatSay(gameId: Game.Id, userIdOrColor: Either[User.ID, Color], msg: String)
+      case class PlayerChatSay(gameId: Game.Id, userIdOrSGPlayer: Either[User.ID, SGPlayer], msg: String)
           extends P.In
       case class WatcherChatSay(gameId: Game.Id, userId: User.ID, msg: String)                    extends P.In
       case class Bye(fullId: FullId)                                                              extends P.In
       case class HoldAlert(fullId: FullId, ip: IpAddress, mean: Int, sd: Int)                     extends P.In
-      case class Flag(gameId: Game.Id, color: Color, fromPlayerId: Option[PlayerId])              extends P.In
+      case class Flag(gameId: Game.Id, sgPlayer: SGPlayer, fromPlayerId: Option[PlayerId])              extends P.In
       case class Berserk(gameId: Game.Id, userId: User.ID)                                        extends P.In
       case class SelfReport(fullId: FullId, ip: IpAddress, userId: Option[User.ID], name: String) extends P.In
 
@@ -289,7 +289,7 @@ object RoundSocket {
             }}
           case "chat/say" =>
             raw.get(3) { case Array(roomId, author, msg) =>
-              PlayerChatSay(Game.Id(roomId), readColor(author).toRight(author), msg).some
+              PlayerChatSay(Game.Id(roomId), readSGPlayer(author).toRight(author), msg).some
             }
           case "chat/say/w" =>
             raw.get(3) { case Array(roomId, userId, msg) =>
@@ -315,8 +315,8 @@ object RoundSocket {
               }
             }
           case "r/flag" =>
-            raw.get(3) { case Array(gameId, color, playerId) =>
-              readColor(color) map {
+            raw.get(3) { case Array(gameId, sgPlayer, playerId) =>
+              readSGPlayer(sgPlayer) map {
                 Flag(Game.Id(gameId), _, P.In.optional(playerId) map PlayerId.apply)
               }
             }
@@ -327,9 +327,9 @@ object RoundSocket {
         if (s == "-") none
         else s.toIntOption map Centis.apply
 
-      private def readColor(s: String) =
-        if (s == "w") Some(White)
-        else if (s == "b") Some(Black)
+      private def readSGPlayer(s: String) =
+        if (s == "w") Some(P1)
+        else if (s == "b") Some(P2)
         else None
     }
 
@@ -358,15 +358,15 @@ object RoundSocket {
       def tvSelect(gameId: Game.ID, speed: strategygames.Speed, data: JsObject) =
         s"tv/select $gameId ${speed.id} ${Json stringify data}"
 
-      def botConnected(gameId: Game.ID, color: Color, v: Boolean) =
-        s"r/bot/online $gameId ${P.Out.color(color)} ${P.Out.boolean(v)}"
+      def botConnected(gameId: Game.ID, sgPlayer: SGPlayer, v: Boolean) =
+        s"r/bot/online $gameId ${P.Out.sgPlayer(sgPlayer)} ${P.Out.boolean(v)}"
 
       def tourStanding(tourId: String, data: JsValue) =
         s"r/tour/standing $tourId ${Json stringify data}"
 
       def startGame(users: List[User.ID]) = s"r/start ${P.Out.commas(users)}"
-      def finishGame(gameId: Game.ID, winner: Option[Color], users: List[User.ID]) =
-        s"r/finish $gameId ${P.Out.color(winner)} ${P.Out.commas(users)}"
+      def finishGame(gameId: Game.ID, winner: Option[SGPlayer], users: List[User.ID]) =
+        s"r/finish $gameId ${P.Out.sgPlayer(winner)} ${P.Out.commas(users)}"
 
       def versioningReady = "r/versioning-ready"
     }

@@ -26,7 +26,7 @@ GET   /tv/frame                        controllers.Tv.frame
 GET   /tv/feed                         controllers.Tv.feed
 GET   /tv/channels                     controllers.Main.movedPermanently(to: String = "/api/tv/channels")
 GET   /tv/:chanKey                     controllers.Tv.onChannel(chanKey: String)
-GET   /tv/$gameId<\w{8}>/$color<white|black>/sides controllers.Tv.sides(gameId: String, color: String)
+GET   /tv/$gameId<\w{8}>/$sgPlayer<p1|p2>/sides controllers.Tv.sides(gameId: String, sgPlayer: String)
 GET   /games                           controllers.Tv.games
 GET   /games/:chanKey                  controllers.Tv.gamesChannel(chanKey: String)
 GET   /api/tv/channels                 controllers.Tv.channels
@@ -83,7 +83,7 @@ GET   /dasher                          controllers.Dasher.get
 # Training - Coordinate
 GET   /training/coordinate             controllers.Coordinate.home
 POST  /training/coordinate/score       controllers.Coordinate.score
-POST  /training/coordinate/color       controllers.Coordinate.color
+POST  /training/coordinate/sgPlayer       controllers.Coordinate.sgPlayer
 
 # Training - Puzzle
 GET   /training                        controllers.Puzzle.home
@@ -226,24 +226,24 @@ GET   /streamer/:username              controllers.Streamer.show(username: Strin
 GET   /streamer/:username/redirect     controllers.Streamer.redirect(username: String)
 
 # Round
-GET   /$gameId<\w{8}>                            controllers.Round.watcher(gameId: String, color: String = "white")
-GET   /$gameId<\w{8}>/$color<white|black>        controllers.Round.watcher(gameId: String, color: String)
+GET   /$gameId<\w{8}>                            controllers.Round.watcher(gameId: String, sgPlayer: String = "p1")
+GET   /$gameId<\w{8}>/$sgPlayer<p1|p2>        controllers.Round.watcher(gameId: String, sgPlayer: String)
 GET   /$fullId<\w{12}>                           controllers.Round.player(fullId: String)
-GET   /$gameId<\w{8}>/$color<white|black>/sides  controllers.Round.sides(gameId: String, color: String)
+GET   /$gameId<\w{8}>/$sgPlayer<p1|p2>/sides  controllers.Round.sides(gameId: String, sgPlayer: String)
 GET   /$gameId<\w{8}>/continue/:mode             controllers.Round.continue(gameId: String, mode: String)
 GET   /$gameId<\w{8}>/note                       controllers.Round.readNote(gameId: String)
 POST  /$gameId<\w{8}>/note                       controllers.Round.writeNote(gameId: String)
-GET   /$gameId<\w{8}>/mini                       controllers.Round.mini(gameId: String, color: String = "white")
-GET   /$gameId<\w{8}>/$color<white|black>/mini   controllers.Round.mini(gameId: String, color: String)
+GET   /$gameId<\w{8}>/mini                       controllers.Round.mini(gameId: String, sgPlayer: String = "p1")
+GET   /$gameId<\w{8}>/$sgPlayer<p1|p2>/mini   controllers.Round.mini(gameId: String, sgPlayer: String)
 GET   /$fullId<\w{12}>/mini                      controllers.Round.miniFullId(fullId: String)
 GET   /$gameId<\w{8}>/edit                       controllers.Editor.game(gameId: String)
-GET   /$gameId<\w{8}>/$color<white|black>/analysis controllers.UserAnalysis.game(gameId: String, color: String)
+GET   /$gameId<\w{8}>/$sgPlayer<p1|p2>/analysis controllers.UserAnalysis.game(gameId: String, sgPlayer: String)
 POST  /$fullId<\w{12}>/forecasts                  controllers.UserAnalysis.forecasts(fullId: String)
 POST  /$fullId<\w{12}>/forecasts/:uci            controllers.UserAnalysis.forecastsOnMyTurn(fullId: String, uci: String)
 POST  /$fullId<\w{12}>/resign                    controllers.Round.resign(fullId: String)
 
-GET   /embed/$gameId<\w{8}>                      controllers.Analyse.embed(gameId: String, color: String = "white")
-GET   /embed/$gameId<\w{8}>/$color<white|black>  controllers.Analyse.embed(gameId: String, color: String)
+GET   /embed/$gameId<\w{8}>                      controllers.Analyse.embed(gameId: String, sgPlayer: String = "p1")
+GET   /embed/$gameId<\w{8}>/$sgPlayer<p1|p2>  controllers.Analyse.embed(gameId: String, sgPlayer: String)
 
 POST  /$gameId<\w{8}>/delete                     controllers.Game.delete(gameId: String)
 
@@ -363,8 +363,8 @@ GET   /game/export/$gameId<\w{8}>                             controllers.Game.e
 GET   /game/export/$gameId<\w{8}>.pgn                         controllers.Game.exportOne(gameId: String)
 GET   /game/export/png/$gameId<\w{8}>.png                     controllers.Export.legacyGameThumbnail(gameId: String)
 GET   /game/export/gif/thumbnail/$gameId<\w{8}>.gif           controllers.Export.gameThumbnail(gameId: String)
-GET   /game/export/gif/$gameId<\w{8}>.gif                     controllers.Export.gif(gameId: String, color: String = "white")
-GET   /game/export/gif/$color<white|black>/$gameId<\w{8}>.gif controllers.Export.gif(gameId: String, color: String)
+GET   /game/export/gif/$gameId<\w{8}>.gif                     controllers.Export.gif(gameId: String, sgPlayer: String = "p1")
+GET   /game/export/gif/$sgPlayer<p1|p2>/$gameId<\w{8}>.gif controllers.Export.gif(gameId: String, sgPlayer: String)
 
 # Fishnet
 GET   /fishnet                                controllers.Main.movedPermanently(to: String = "https://github.com/niklasf/fishnet")
@@ -393,8 +393,8 @@ GET   /setup/validate-fen              controllers.Setup.validateFen
 
 # Challenge
 GET   /challenge                       controllers.Challenge.all
-GET   /challenge/$id<\w{8}>            controllers.Challenge.show(id: String, color: Option[String] ?= None)
-POST  /challenge/$id<\w{8}>/accept     controllers.Challenge.accept(id: String, color: Option[String] ?= None)
+GET   /challenge/$id<\w{8}>            controllers.Challenge.show(id: String, sgPlayer: Option[String] ?= None)
+POST  /challenge/$id<\w{8}>/accept     controllers.Challenge.accept(id: String, sgPlayer: Option[String] ?= None)
 POST  /challenge/$id<\w{8}>/decline    controllers.Challenge.decline(id: String)
 POST  /challenge/$id<\w{8}>/cancel     controllers.Challenge.cancel(id: String)
 POST  /challenge/$id<\w{8}>/to-friend  controllers.Challenge.toFriend(id: String)
@@ -565,7 +565,7 @@ GET   /image/:id/:hash/:name           controllers.Main.image(id: String, hash: 
 # Paste
 GET   /paste                           controllers.Importer.importGame
 POST  /import                          controllers.Importer.sendGame
-GET   /import/master/$id<\w{8}>/:color controllers.Importer.masterGame(id: String, color: String)
+GET   /import/master/$id<\w{8}>/:sgPlayer controllers.Importer.masterGame(id: String, sgPlayer: String)
 
 # Edit
 GET   /editor.json                     controllers.Editor.data

@@ -84,15 +84,15 @@ final class LobbySocket(
         }
         system.scheduler.scheduleOnce(1249 millis)(this ! SendHookRemovals).unit
 
-      case JoinHook(sri, hook, game, creatorColor) =>
+      case JoinHook(sri, hook, game, creatorSGPlayer) =>
         lila.mon.lobby.hook.join.increment()
-        send(P.Out.tellSri(hook.sri, gameStartRedirect(game pov creatorColor)))
-        send(P.Out.tellSri(sri, gameStartRedirect(game pov !creatorColor)))
+        send(P.Out.tellSri(hook.sri, gameStartRedirect(game pov creatorSGPlayer)))
+        send(P.Out.tellSri(sri, gameStartRedirect(game pov !creatorSGPlayer)))
 
-      case JoinSeek(userId, seek, game, creatorColor) =>
+      case JoinSeek(userId, seek, game, creatorSGPlayer) =>
         lila.mon.lobby.seek.join.increment()
-        send(Out.tellLobbyUsers(List(seek.user.id), gameStartRedirect(game pov creatorColor)))
-        send(Out.tellLobbyUsers(List(userId), gameStartRedirect(game pov !creatorColor)))
+        send(Out.tellLobbyUsers(List(seek.user.id), gameStartRedirect(game pov creatorSGPlayer)))
+        send(Out.tellLobbyUsers(List(userId), gameStartRedirect(game pov !creatorSGPlayer)))
 
       case PoolApi.Pairings(pairings) => send(Out.pairings(pairings))
 
@@ -300,9 +300,9 @@ private object LobbySocket {
       def pairings(pairings: List[PoolApi.Pairing]) = {
         val redirs = for {
           pairing <- pairings
-          color   <- strategygames.Color.all
-          sri    = pairing sri color
-          fullId = pairing.game fullIdOf color
+          sgPlayer   <- strategygames.Player.all
+          sri    = pairing sri sgPlayer
+          fullId = pairing.game fullIdOf sgPlayer
         } yield s"$sri:$fullId"
         s"lobby/pairings ${P.Out.commas(redirs)}"
       }

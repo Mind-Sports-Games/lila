@@ -612,14 +612,14 @@ final class Study(
           "position" -> List(
             Glyph.PositionAssessment.equal.copy(name = trans.study.equalPosition.txt()),
             Glyph.PositionAssessment.unclear.copy(name = trans.study.unclearPosition.txt()),
-            Glyph.PositionAssessment.whiteSlightlyBetter
-              .copy(name = trans.study.whiteIsSlightlyBetter.txt()),
-            Glyph.PositionAssessment.blackSlightlyBetter
-              .copy(name = trans.study.blackIsSlightlyBetter.txt()),
-            Glyph.PositionAssessment.whiteQuiteBetter.copy(name = trans.study.whiteIsBetter.txt()),
-            Glyph.PositionAssessment.blackQuiteBetter.copy(name = trans.study.blackIsBetter.txt()),
-            Glyph.PositionAssessment.whiteMuchBetter.copy(name = trans.study.whiteIsWinning.txt()),
-            Glyph.PositionAssessment.blackMuchBetter.copy(name = trans.study.blackIsWinning.txt())
+            Glyph.PositionAssessment.p1SlightlyBetter
+              .copy(name = trans.study.p1IsSlightlyBetter.txt()),
+            Glyph.PositionAssessment.p2SlightlyBetter
+              .copy(name = trans.study.p2IsSlightlyBetter.txt()),
+            Glyph.PositionAssessment.p1QuiteBetter.copy(name = trans.study.p1IsBetter.txt()),
+            Glyph.PositionAssessment.p2QuiteBetter.copy(name = trans.study.p2IsBetter.txt()),
+            Glyph.PositionAssessment.p1MuchBetter.copy(name = trans.study.p1IsWinning.txt()),
+            Glyph.PositionAssessment.p2MuchBetter.copy(name = trans.study.p2IsWinning.txt())
           ),
           "observation" -> List(
             Glyph.Observation.novelty.copy(name = trans.study.novelty.txt()),

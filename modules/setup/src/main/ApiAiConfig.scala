@@ -1,13 +1,12 @@
 package lila.setup
 
-import strategygames.Color.{ Black, White }
-import strategygames.{ Clock, GameFamily, Mode, Speed }
+import strategygames.{ Clock, GameFamily, Mode, Speed, P1, P2 }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition }
 
 import lila.game.{ Game, Player, Pov, Source }
-import lila.lobby.Color
+import lila.lobby.SGPlayer
 import lila.user.User
 
 final case class ApiAiConfig(
@@ -15,7 +14,7 @@ final case class ApiAiConfig(
     fenVariant: Option[Variant],
     clock: Option[Clock.Config],
     daysO: Option[Int],
-    color: Color,
+    sgPlayer: SGPlayer,
     level: Int,
     fen: Option[FEN] = None
 ) extends Config
@@ -41,13 +40,13 @@ final case class ApiAiConfig(
       Game
         .make(
           chess = chessGame,
-          whitePlayer = creatorColor.fold(
-            Player.make(White, user, perfPicker),
-            Player.make(White, level.some)
+          p1Player = creatorSGPlayer.fold(
+            Player.make(P1, user, perfPicker),
+            Player.make(P1, level.some)
           ),
-          blackPlayer = creatorColor.fold(
-            Player.make(Black, level.some),
-            Player.make(Black, user, perfPicker)
+          p2Player = creatorSGPlayer.fold(
+            Player.make(P2, level.some),
+            Player.make(P2, user, perfPicker)
           ),
           mode = Mode.Casual,
           source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
@@ -57,7 +56,7 @@ final case class ApiAiConfig(
         .sloppy
     } start
 
-  def pov(user: Option[User]) = Pov(game(user), creatorColor)
+  def pov(user: Option[User]) = Pov(game(user), creatorSGPlayer)
 
   def autoVariant =
     if (variant.standard && fen.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
@@ -82,7 +81,7 @@ object ApiAiConfig extends BaseConfig {
       fenVariant = none,
       clock = cl,
       daysO = d,
-      color = Color.orDefault(~c),
+      sgPlayer = SGPlayer.orDefault(~c),
       level = l,
       fen = pos.map(f => FEN.apply(variant.gameLogic, f))
     ).autoVariant

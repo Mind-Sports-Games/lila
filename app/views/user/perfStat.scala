@@ -194,14 +194,14 @@ object perfStat {
       )
     )
 
-  private def highlowSide(title: Frag => Frag, opt: Option[lila.perfStat.RatingAt], color: String)(implicit
+  private def highlowSide(title: Frag => Frag, opt: Option[lila.perfStat.RatingAt], sgPlayer: String)(implicit
       lang: Lang
   ): Frag =
     opt match {
       case Some(r) =>
         div(
-          h2(title(strong(tag(color)(r.int)))),
-          a(cls := "glpt", href := routes.Round.watcher(r.gameId, "white"))(absClientDateTime(r.at))
+          h2(title(strong(tag(sgPlayer)(r.int)))),
+          a(cls := "glpt", href := routes.Round.watcher(r.gameId, "p1"))(absClientDateTime(r.at))
         )
       case None => div(h2(title(emptyFrag)), " ", span(notEnoughGames()))
     }
@@ -216,36 +216,36 @@ object perfStat {
     s.from match {
       case Some(from) =>
         fromXToY(
-          a(cls := "glpt", href := routes.Round.watcher(from.gameId, "white"))(absClientDateTime(from.at)),
+          a(cls := "glpt", href := routes.Round.watcher(from.gameId, "p1"))(absClientDateTime(from.at)),
           s.to match {
             case Some(to) =>
-              a(cls := "glpt", href := routes.Round.watcher(to.gameId, "white"))(absClientDateTime(to.at))
+              a(cls := "glpt", href := routes.Round.watcher(to.gameId, "p1"))(absClientDateTime(to.at))
             case None => now()
           }
         )
       case None => nbsp
     }
 
-  private def resultStreakSideStreak(s: lila.perfStat.Streak, title: Frag => Frag, color: String)(implicit
+  private def resultStreakSideStreak(s: lila.perfStat.Streak, title: Frag => Frag, sgPlayer: String)(implicit
       lang: Lang
   ): Frag =
     div(cls := "streak")(
       h3(
         title(
-          if (s.v > 0) tag(color)(trans.nbGames.plural(s.v, strong(s.v)))
+          if (s.v > 0) tag(sgPlayer)(trans.nbGames.plural(s.v, strong(s.v)))
           else "-"
         )
       ),
       fromTo(s)
     )
 
-  private def resultStreakSide(s: lila.perfStat.Streaks, title: Frag, color: String)(implicit
+  private def resultStreakSide(s: lila.perfStat.Streaks, title: Frag, sgPlayer: String)(implicit
       lang: Lang
   ): Frag =
     div(
       h2(title),
-      resultStreakSideStreak(s.max, longestStreak(_), color),
-      resultStreakSideStreak(s.cur, currentStreak(_), color)
+      resultStreakSideStreak(s.max, longestStreak(_), sgPlayer),
+      resultStreakSideStreak(s.cur, currentStreak(_), sgPlayer)
     )
 
   private def resultStreak(streak: lila.perfStat.ResultStreak)(implicit lang: Lang): Frag =
@@ -266,7 +266,7 @@ object perfStat {
           results.results map { r =>
             tr(
               td(userIdLink(r.opId.value.some, withOnline = false), " (", r.opInt, ")"),
-              td(a(cls := "glpt", href := routes.Round.watcher(r.gameId, "white"))(absClientDateTime(r.at)))
+              td(a(cls := "glpt", href := routes.Round.watcher(r.gameId, "p1"))(absClientDateTime(r.at)))
             )
           }
         )

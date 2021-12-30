@@ -1,6 +1,6 @@
 package controllers
 
-import strategygames.{ Color, GameLogic }
+import strategygames.{ Player => SGPlayer, GameLogic }
 import strategygames.variant.Variant
 import strategygames.format.Forsyth
 
@@ -126,25 +126,25 @@ final class Round(
           case None =>
             fuccess(Redirect(currentGame.simulId match {
               case Some(simulId) => routes.Simul.show(simulId)
-              case None          => routes.Round.watcher(gameId, "white")
+              case None          => routes.Round.watcher(gameId, "p1")
             }))
         }
       }
     }
 
-  def watcher(gameId: String, color: String) =
+  def watcher(gameId: String, sgPlayer: String) =
     Open { implicit ctx =>
-      proxyPov(gameId, color) flatMap {
+      proxyPov(gameId, sgPlayer) flatMap {
         case Some(pov) =>
           get("pov") match {
             case Some(requestedPov) =>
               (pov.player.userId, pov.opponent.userId) match {
                 case (Some(_), Some(opponent)) if opponent == requestedPov =>
-                  Redirect(routes.Round.watcher(gameId, (!pov.color).name)).fuccess
+                  Redirect(routes.Round.watcher(gameId, (!pov.sgPlayer).name)).fuccess
                 case (Some(player), Some(_)) if player == requestedPov =>
-                  Redirect(routes.Round.watcher(gameId, pov.color.name)).fuccess
+                  Redirect(routes.Round.watcher(gameId, pov.sgPlayer.name)).fuccess
                 case _ =>
-                  Redirect(routes.Round.watcher(gameId, pov.game.variant.startColor.name)).fuccess
+                  Redirect(routes.Round.watcher(gameId, pov.game.variant.startPlayer.name)).fuccess
               }
             case None =>
               watch(pov)
@@ -153,8 +153,8 @@ final class Round(
       }
     }
 
-  private def proxyPov(gameId: String, color: String): Fu[Option[Pov]] =
-    Color.fromName(color) ?? {
+  private def proxyPov(gameId: String, sgPlayer: String): Fu[Option[Pov]] =
+    SGPlayer.fromName(sgPlayer) ?? {
       env.round.proxyRepo.pov(gameId, _)
     }
 
@@ -162,10 +162,10 @@ final class Round(
       ctx: Context
   ): Fu[Result] =
     playablePovForReq(pov.game) match {
-      case Some(player) if userTv.isEmpty => renderPlayer(pov withColor player.color)
-      case _ if pov.game.variant == Variant.Chess(strategygames.chess.variant.RacingKings) && pov.color.black =>
+      case Some(player) if userTv.isEmpty => renderPlayer(pov withSGPlayer player.sgPlayer)
+      case _ if pov.game.variant == Variant.Chess(strategygames.chess.variant.RacingKings) && pov.sgPlayer.p2 =>
         if (userTv.isDefined) watch(!pov, userTv)
-        else Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startColor.name)).fuccess
+        else Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startPlayer.name)).fuccess
       case _ =>
         negotiate(
           html = {
@@ -283,9 +283,9 @@ final class Round(
       }
     }
 
-  def sides(gameId: String, color: String) =
+  def sides(gameId: String, sgPlayer: String) =
     Open { implicit ctx =>
-      OptionFuResult(proxyPov(gameId, color)) { pov =>
+      OptionFuResult(proxyPov(gameId, sgPlayer)) { pov =>
         env.tournament.api.gameView.withTeamVs(pov.game) zip
           (pov.game.simulId ?? env.simul.repo.find) zip
           env.game.gameRepo.initialFen(pov.game) zip
@@ -342,11 +342,11 @@ final class Round(
       }
     }
 
-  def mini(gameId: String, color: String) =
+  def mini(gameId: String, sgPlayer: String) =
     Open { implicit ctx =>
       OptionOk(
-        Color.fromName(color).??(env.round.proxyRepo.povIfPresent(gameId, _)) orElse env.game.gameRepo
-          .pov(gameId, color)
+        SGPlayer.fromName(sgPlayer).??(env.round.proxyRepo.povIfPresent(gameId, _)) orElse env.game.gameRepo
+          .pov(gameId, sgPlayer)
       )(html.game.mini(_))
     }
 

@@ -1,17 +1,18 @@
 package lila.evaluation
 
-import strategygames.{ Color, Speed }
 import org.joda.time.DateTime
 
 import lila.analyse.{ Accuracy, Analysis }
 import lila.game.{ Game, Player, Pov }
 import lila.user.User
 
+import strategygames.{ Player => SGPlayer, Speed }
+
 case class PlayerAssessment(
     _id: String,
     gameId: Game.ID,
     userId: User.ID,
-    color: Color,
+    sgPlayer: SGPlayer,
     assessment: GameAssessment,
     date: DateTime,
     basics: PlayerAssessment.Basics,
@@ -43,11 +44,11 @@ object PlayerAssessment {
 
   def makeBasics(pov: Pov, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment.Basics = {
     import Statistics._
-    import pov.{ color, game }
+    import pov.{ sgPlayer, game }
 
     Basics(
-      moveTimes = intAvgSd(~game.moveTimes(color) map (_.roundTenths)),
-      blurs = game playerBlurPercent color,
+      moveTimes = intAvgSd(~game.moveTimes(sgPlayer) map (_.roundTenths)),
+      blurs = game playerBlurPercent sgPlayer,
       hold = holdAlerts.exists(_.suspicious),
       blurStreak = highestChunkBlursOf(pov).some.filter(0 <),
       mtStreak = highlyConsistentMoveTimeStreaksOf(pov)
@@ -56,17 +57,17 @@ object PlayerAssessment {
 
   def make(pov: Pov, analysis: Analysis, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment = {
     import Statistics._
-    import pov.{ color, game }
+    import pov.{ sgPlayer, game }
 
     val basics = makeBasics(pov, holdAlerts)
 
     def blursMatter = !game.isSimul && game.hasClock
 
     lazy val highBlurRate: Boolean =
-      blursMatter && game.playerBlurPercent(color) > 90
+      blursMatter && game.playerBlurPercent(sgPlayer) > 90
 
     lazy val moderateBlurRate: Boolean =
-      blursMatter && game.playerBlurPercent(color) > 70
+      blursMatter && game.playerBlurPercent(sgPlayer) > 70
 
     val highestChunkBlurs = highestChunkBlursOf(pov)
 
@@ -89,9 +90,9 @@ object PlayerAssessment {
     lazy val alwaysHasAdvantage: Boolean =
       !analysis.infos.exists { info =>
         info.cp.fold(info.mate.fold(false) { a =>
-          a.signum == color.fold(-1, 1)
+          a.signum == sgPlayer.fold(-1, 1)
         }) { cp =>
-          color.fold(cp.centipawns < -100, cp.centipawns > 100)
+          sgPlayer.fold(cp.centipawns < -100, cp.centipawns > 100)
         }
       }
 
@@ -137,7 +138,7 @@ object PlayerAssessment {
       }
 
       if (flags.suspiciousHoldAlert) assessment
-      else if (~game.wonBy(color)) assessment
+      else if (~game.wonBy(sgPlayer)) assessment
       else if (assessment == Cheating) LikelyCheating
       else if (assessment == LikelyCheating) Unclear
       else assessment
@@ -150,10 +151,10 @@ object PlayerAssessment {
       case _                          => 1.0
     }
     PlayerAssessment(
-      _id = s"${game.id}/${color.name}",
+      _id = s"${game.id}/${sgPlayer.name}",
       gameId = game.id,
-      userId = ~game.player(color).userId,
-      color = color,
+      userId = ~game.player(sgPlayer).userId,
+      sgPlayer = sgPlayer,
       assessment = assessment,
       date = DateTime.now,
       basics = basics,

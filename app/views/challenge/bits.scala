@@ -12,7 +12,7 @@ import controllers.routes
 
 object bits {
 
-  def js(c: Challenge, json: play.api.libs.json.JsObject, owner: Boolean, color: Option[strategygames.Color] = None)(
+  def js(c: Challenge, json: play.api.libs.json.JsObject, owner: Boolean, sgPlayer: Option[strategygames.Player] = None)(
       implicit ctx: Context
   ) =
     frag(
@@ -20,7 +20,7 @@ object bits {
       embedJsUnsafeLoadThen(s"""challengePageStart(${safeJsonValue(
         Json.obj(
           "socketUrl" -> s"/challenge/${c.id}/socket/v$apiVersion",
-          "xhrUrl"    -> routes.Challenge.show(c.id, color.map(_.name)).url,
+          "xhrUrl"    -> routes.Challenge.show(c.id, sgPlayer.map(_.name)).url,
           "owner"     -> owner,
           "data"      -> json
         )

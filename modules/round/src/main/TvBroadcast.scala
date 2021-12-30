@@ -57,11 +57,11 @@ final private class TvBroadcast(
         pov.gameId,
         Json.obj(
           "id"          -> pov.gameId,
-          "orientation" -> pov.color.name,
+          "orientation" -> pov.sgPlayer.name,
           "players" -> pov.game.players.map { p =>
             val user = p.userId.flatMap(lightUserSync)
             Json
-              .obj("color" -> p.color.name)
+              .obj("sgPlayer" -> p.sgPlayer.name)
               .add("user" -> user.map(LightUser.lightUserWrites.writes))
               .add("ai" -> p.aiLevel)
               .add("rating" -> p.rating)
@@ -82,11 +82,11 @@ final private class TvBroadcast(
         "fen",
         Json
           .obj(
-            "fen" -> s"$fen ${game.turnColor.letter}",
+            "fen" -> s"$fen ${game.turnSGPlayer.letter}",
             "lm"  -> move
           )
-          .add("wc" -> game.clock.map(_.remainingTime(strategygames.White).roundSeconds))
-          .add("bc" -> game.clock.map(_.remainingTime(strategygames.Black).roundSeconds))
+          .add("wc" -> game.clock.map(_.remainingTime(strategygames.P1).roundSeconds))
+          .add("bc" -> game.clock.map(_.remainingTime(strategygames.P2).roundSeconds))
       )
       clients.foreach(_.queue offer msg)
       featured foreach { f =>

@@ -662,7 +662,7 @@ final class StudyApi(
               },
               setup = chapter.setup.copy(
                 orientation = data.realOrientation match {
-                  case ChapterMaker.Orientation.Fixed(color) => color
+                  case ChapterMaker.Orientation.Fixed(sgPlayer) => sgPlayer
                   case _                                     => chapter.setup.orientation
                 }
               ),

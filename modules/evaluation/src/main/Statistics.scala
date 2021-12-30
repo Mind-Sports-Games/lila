@@ -38,7 +38,7 @@ object Statistics {
     } yield coef
 
   def moveTimes(pov: lila.game.Pov): Option[List[Centis]] =
-    pov.game.moveTimes(pov.color)
+    pov.game.moveTimes(pov.sgPlayer)
 
   def cvIndicatesHighlyFlatTimes(c: Float) =
     c < 0.25
@@ -66,7 +66,7 @@ object Statistics {
 
   private val fastMove = Centis(50)
   def noFastMoves(pov: lila.game.Pov): Boolean = {
-    val moveTimes = ~pov.game.moveTimes(pov.color)
+    val moveTimes = ~pov.game.moveTimes(pov.sgPlayer)
     moveTimes.count(fastMove >) <= (moveTimes.size / 20) + 2
   }
 

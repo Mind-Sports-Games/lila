@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ Black, Color, White, GameLogic }
+import strategygames.{ P2, Player => SGPlayer, P1, GameLogic }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import org.joda.time.DateTime
@@ -48,8 +48,8 @@ final private class SwissDirector(
                 id = id,
                 swissId = swiss.id,
                 round = swiss.round,
-                white = w,
-                black = b,
+                p1 = w,
+                p2 = b,
                 status = Left(SwissPairing.Ongoing),
                 isMicroMatch = swiss.settings.isMicroMatch,
                 None,
@@ -112,8 +112,8 @@ final private class SwissDirector(
             startedAtTurn = turns
           )
         },
-        whitePlayer = makePlayer(White, players.get(if(rematch) pairing.black else pairing.white) err s"Missing pairing white $pairing"),
-        blackPlayer = makePlayer(Black, players.get(if(rematch) pairing.white else pairing.black) err s"Missing pairing black $pairing"),
+        p1Player = makePlayer(P1, players.get(if(rematch) pairing.p2 else pairing.p1) err s"Missing pairing p1 $pairing"),
+        p2Player = makePlayer(P2, players.get(if(rematch) pairing.p1 else pairing.p2) err s"Missing pairing p2 $pairing"),
         mode = strategygames.Mode(swiss.settings.rated),
         source = lila.game.Source.Swiss,
         pgnImport = None
@@ -122,6 +122,6 @@ final private class SwissDirector(
       .withSwissId(swiss.id.value)
       .start
 
-  private def makePlayer(color: Color, player: SwissPlayer) =
-    lila.game.Player.make(color, player.userId, player.rating, player.provisional)
+  private def makePlayer(sgPlayer: SGPlayer, player: SwissPlayer) =
+    lila.game.Player.make(sgPlayer, player.userId, player.rating, player.provisional)
 }

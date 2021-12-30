@@ -17,7 +17,7 @@ trait ScalatagsAttrs {
   val dataCount      = attr("data-count")
   val dataEnableTime = attr("data-enable-time")
   val datatime24h    = attr("data-time_24h")
-  val dataColor      = attr("data-color")
+  val dataSGPlayer      = attr("data-sgPlayer")
   val dataFen        = attr("data-fen")
   val dataRel        = attr("data-rel")
   val novalidate     = attr("novalidate").empty

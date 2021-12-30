@@ -30,5 +30,5 @@ private object RelayGame {
 
   val playstrategyDomains = List("playstrategy.org", "playstrategy.dev")
 
-  val staticTags = List("white", "black", "round", "event", "site")
+  val staticTags = List("p1", "p2", "round", "event", "site")
 }

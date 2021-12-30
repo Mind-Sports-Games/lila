@@ -1,15 +1,15 @@
 package lila.tournament
 
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 import scala.concurrent.duration._
 
 import lila.memo.CacheApi
 
-//positive strike -> user played straight strike games by white pieces
-//negative strike -> black pieces
-case class ColorHistory(strike: Int, balance: Int) extends Ordered[ColorHistory] {
+//positive strike -> user played straight strike games by p1 pieces
+//negative strike -> p2 pieces
+case class SGPlayerHistory(strike: Int, balance: Int) extends Ordered[SGPlayerHistory] {
 
-  override def compare(that: ColorHistory): Int = {
+  override def compare(that: SGPlayerHistory): Int = {
     if (strike < that.strike) -1
     else if (strike > that.strike) 1
     else if (balance < that.balance) -1
@@ -17,39 +17,39 @@ case class ColorHistory(strike: Int, balance: Int) extends Ordered[ColorHistory]
     else 0
   }
 
-  def firstGetsWhite(that: ColorHistory)(fallback: () => Boolean) = {
+  def firstGetsP1(that: SGPlayerHistory)(fallback: () => Boolean) = {
     val c = compare(that)
     c < 0 || (c == 0 && fallback())
   }
 
-  def inc(color: Color): ColorHistory =
+  def inc(sgPlayer: SGPlayer): SGPlayerHistory =
     copy(
-      strike = color.fold((strike + 1) atLeast 1, (strike - 1) atMost -1),
-      balance = balance + color.fold(1, -1)
+      strike = sgPlayer.fold((strike + 1) atLeast 1, (strike - 1) atMost -1),
+      balance = balance + sgPlayer.fold(1, -1)
     )
 
-  //couldn't play if both players played maxStrike blacks games before
+  //couldn't play if both players played maxStrike p2s games before
   //or both player maxStrike games before
-  def couldPlay(that: ColorHistory, maxStrike: Int): Boolean =
+  def couldPlay(that: SGPlayerHistory, maxStrike: Int): Boolean =
     (strike > -maxStrike || that.strike > -maxStrike) &&
       (strike < maxStrike || that.strike < maxStrike)
 
-  //add some penalty for pairs when both players have played last game with same color
+  //add some penalty for pairs when both players have played last game with same sgPlayer
   //heuristics: after such pairing one streak will be always incremented
-  def sameColors(that: ColorHistory): Boolean = strike.sign * that.strike.sign > 0
+  def sameSGPlayers(that: SGPlayerHistory): Boolean = strike.sign * that.strike.sign > 0
 }
 
-case class PlayerWithColorHistory(player: Player, colorHistory: ColorHistory)
+case class PlayerWithSGPlayerHistory(player: Player, sgPlayerHistory: SGPlayerHistory)
 
-final class ColorHistoryApi(cacheApi: CacheApi) {
+final class SGPlayerHistoryApi(cacheApi: CacheApi) {
 
   private val cache = cacheApi.scaffeine
     .expireAfterAccess(1 hour)
-    .build[Player.ID, ColorHistory]()
+    .build[Player.ID, SGPlayerHistory]()
 
-  def default = ColorHistory(0, 0)
+  def default = SGPlayerHistory(0, 0)
 
   def get(playerId: Player.ID) = cache.getIfPresent(playerId) | default
 
-  def inc(playerId: Player.ID, color: Color) = cache.put(playerId, get(playerId) inc color)
+  def inc(playerId: Player.ID, sgPlayer: SGPlayer) = cache.put(playerId, get(playerId) inc sgPlayer)
 }

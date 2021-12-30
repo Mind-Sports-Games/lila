@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, GameLogic, Replay, White }
+import strategygames.{ Division, Game, GameLogic, Replay, P1 }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -176,7 +176,7 @@ object ServerEval {
 
   def toJson(chapter: Chapter, analysis: Analysis) =
     lila.analyse.JsonView.bothPlayers(
-      lila.analyse.Accuracy.PovLike(White, chapter.root.color, chapter.root.ply),
+      lila.analyse.Accuracy.PovLike(P1, chapter.root.sgPlayer, chapter.root.ply),
       analysis
     )
 }

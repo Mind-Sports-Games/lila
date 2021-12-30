@@ -28,13 +28,13 @@ object SimulForm {
   val clockExtraChoices = options(clockExtras, "%d minute{s}")
   val clockExtraDefault = 0
 
-  val colors = List("white", "random", "black")
-  val colorChoices = List(
-    "white"  -> "White",
+  val sgPlayers = List("p1", "random", "p2")
+  val sgPlayerChoices = List(
+    "p1"  -> "P1",
     "random" -> "Random",
-    "black"  -> "Black"
+    "p2"  -> "P2"
   )
-  val colorDefault = "white"
+  val sgPlayerDefault = "p1"
 
   private def nameType(host: User) =
     eventName(2, 40).verifying(
@@ -66,7 +66,7 @@ object SimulForm {
       clockExtra = clockExtraDefault,
       variants = List(strategygames.chess.variant.Standard.id),
       position = none,
-      color = colorDefault,
+      sgPlayer = sgPlayerDefault,
       text = "",
       estimatedStartAt = none,
       team = none,
@@ -81,7 +81,7 @@ object SimulForm {
       clockExtra = simul.clock.hostExtraMinutes,
       variants = simul.variants.map(_.id),
       position = simul.position,
-      color = simul.color | "random",
+      sgPlayer = simul.sgPlayer | "random",
       text = simul.text,
       estimatedStartAt = simul.estimatedStartAt,
       team = simul.team,
@@ -104,7 +104,7 @@ object SimulForm {
           )
         }.verifying("At least one variant", _.nonEmpty),
         "position" -> optional(lila.common.Form.fen.playableStrict),
-        "color"    -> stringIn(colorChoices),
+        "sgPlayer"    -> stringIn(sgPlayerChoices),
         "text"     -> cleanText,
         "estimatedStartAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
         "team"     -> optional(nonEmptyText.verifying(id => teams.exists(_.id == id))),
@@ -127,7 +127,7 @@ object SimulForm {
       clockExtra: Int,
       variants: List[Int],
       position: Option[FEN],
-      color: String,
+      sgPlayer: String,
       text: String,
       estimatedStartAt: Option[DateTime] = None,
       team: Option[String],

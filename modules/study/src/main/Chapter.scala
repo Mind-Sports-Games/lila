@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.{ Glyph, Tags }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ Centis, Color }
+import strategygames.{ Centis, Player => SGPlayer }
 import org.joda.time.DateTime
 
 import strategygames.opening.{ FullOpening, FullOpeningDB }
@@ -76,8 +76,8 @@ case class Chapter(
       createdAt = DateTime.now
     )
 
-  private def tagsResultColor = tags.resultColor match {
-    case Some(Some(color)) => Some(Some(color))
+  private def tagsResultSGPlayer = tags.resultPlayer match {
+    case Some(Some(sgPlayer)) => Some(Some(sgPlayer))
     case Some(None) => Some(None)
     case None => None
     case _ => sys.error("Not implemented for draughts yet")
@@ -87,7 +87,7 @@ case class Chapter(
     _id = _id,
     name = name,
     setup = setup,
-    resultColor = tagsResultColor.isDefined option tagsResultColor,
+    resultSGPlayer = tagsResultSGPlayer.isDefined option tagsResultSGPlayer,
     hasRelayPath = relay.exists(!_.path.isEmpty)
   )
 
@@ -128,7 +128,7 @@ object Chapter {
   case class Setup(
       gameId: Option[lila.game.Game.ID],
       variant: Variant,
-      orientation: Color,
+      orientation: SGPlayer,
       fromFen: Option[Boolean] = None
   ) {
     def isFromFen = ~fromFen
@@ -147,7 +147,7 @@ object Chapter {
   case class RelayAndTags(id: Id, relay: Relay, tags: Tags) {
 
     def looksAlive =
-      tags.resultColor.isEmpty &&
+      tags.resultPlayer.isEmpty &&
         relay.lastMoveAt.isAfter {
           DateTime.now.minusMinutes {
             tags.clockConfig.fold(40)(_.limitInMinutes.toInt / 2 atLeast 15 atMost 60)
@@ -161,13 +161,13 @@ object Chapter {
       _id: Id,
       name: Name,
       setup: Setup,
-      resultColor: Option[Option[Option[Color]]],
+      resultSGPlayer: Option[Option[Option[SGPlayer]]],
       hasRelayPath: Boolean
   ) extends Like {
 
-    def looksOngoing = resultColor.exists(_.isEmpty) && hasRelayPath
+    def looksOngoing = resultSGPlayer.exists(_.isEmpty) && hasRelayPath
 
-    def resultStr: Option[String] = resultColor.map(_.fold("*")(c => strategygames.Color.showResult(c)).replace("1/2", "½"))
+    def resultStr: Option[String] = resultSGPlayer.map(_.fold("*")(c => SGPlayer.showResult(c)).replace("1/2", "½"))
   }
 
   case class IdName(id: Id, name: Name)

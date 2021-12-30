@@ -9,6 +9,8 @@ import lila.common.String.html.richText
 import lila.rating.PerfType
 import lila.user.User
 
+import strategygames.{ Player => SGPlayer }
+
 object teacherDashboard {
 
   private[clas] def layout(
@@ -174,7 +176,7 @@ object teacherDashboard {
       students: List[Student.WithUser],
       basicCompletion: Map[User.ID, Int],
       practiceCompletion: Map[User.ID, Int],
-      coordScores: Map[User.ID, strategygames.Color.Map[Int]]
+      coordScores: Map[User.ID, SGPlayer.Map[Int]]
   )(implicit ctx: Context) =
     layout(c, students, "progress")(
       progressHeader(c, none),
@@ -191,7 +193,7 @@ object teacherDashboard {
             ),
             tbody(
               students.sortBy(_.user.username).map { case s @ Student.WithUser(_, user) =>
-                val coord = coordScores.getOrElse(user.id, strategygames.Color.Map(0, 0))
+                val coord = coordScores.getOrElse(user.id, SGPlayer.Map(0, 0))
                 tr(
                   studentTd(c, s),
                   td(dataSort := basicCompletion.getOrElse(user.id, 0))(
@@ -202,9 +204,9 @@ object teacherDashboard {
                     practiceCompletion.getOrElse(user.id, 0).toString,
                     "%"
                   ),
-                  td(dataSort := coord.white, cls := "coords")(
-                    i(cls := "color-icon is white")(coord.white),
-                    i(cls := "color-icon is black")(coord.black)
+                  td(dataSort := coord.p1, cls := "coords")(
+                    i(cls := "sgPlayer-icon is p1")(coord.p1),
+                    i(cls := "sgPlayer-icon is p2")(coord.p2)
                   )
                 )
               }

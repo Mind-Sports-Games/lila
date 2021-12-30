@@ -71,14 +71,14 @@ class PgnDumpTest extends Specification {
           node(1, "g1f3", "Nf3")
         )
       )
-      P.toTurns(tree) must beLike { case Vector(Turn(1, Some(white), Some(black))) =>
-        white.san must_== "e4"
-        white.variations must beLike { case List(List(Turn(1, Some(move), None))) =>
+      P.toTurns(tree) must beLike { case Vector(Turn(1, Some(p1), Some(p2))) =>
+        p1.san must_== "e4"
+        p1.variations must beLike { case List(List(Turn(1, Some(move), None))) =>
           move.san must_== "Nf3"
           move.variations must beEmpty
         }
-        black.san must_== "d5"
-        black.variations must beEmpty
+        p2.san must_== "d5"
+        p2.variations must beEmpty
       }
     }
     "two moves and two variations" in {
@@ -99,14 +99,14 @@ class PgnDumpTest extends Specification {
       P.toTurns(tree).mkString(" ").toString must_==
         "1. e4 (1. Nf3) 1... d5 (1... Nf6)"
 
-      P.toTurns(tree) must beLike { case Vector(Turn(1, Some(white), Some(black))) =>
-        white.san must_== "e4"
-        white.variations must beLike { case List(List(Turn(1, Some(move), None))) =>
+      P.toTurns(tree) must beLike { case Vector(Turn(1, Some(p1), Some(p2))) =>
+        p1.san must_== "e4"
+        p1.variations must beLike { case List(List(Turn(1, Some(move), None))) =>
           move.san must_== "Nf3"
           move.variations must beEmpty
         }
-        black.san must_== "d5"
-        black.variations must beLike { case List(List(Turn(1, None, Some(move)))) =>
+        p2.san must_== "d5"
+        p2.variations must beLike { case List(List(Turn(1, None, Some(move)))) =>
           move.san must_== "Nf6"
           move.variations must beEmpty
         }

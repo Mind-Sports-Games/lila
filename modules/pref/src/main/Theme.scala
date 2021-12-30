@@ -1,13 +1,13 @@
 package lila.pref
 
-sealed class Theme private[pref] (val name: String, val colors: Theme.HexColors) {
+sealed class Theme private[pref] (val name: String, val sgPlayers: Theme.HexSGPlayers) {
 
   override def toString = name
 
   def cssClass = name
 
-  def light = colors._1
-  def dark  = colors._2
+  def light = sgPlayers._1
+  def dark  = sgPlayers._2
 }
 
 sealed trait ThemeObject {
@@ -27,18 +27,18 @@ sealed trait ThemeObject {
 
 object Theme extends ThemeObject {
 
-  case class HexColor(value: String) extends AnyVal with StringValue
-  type HexColors = (HexColor, HexColor)
+  case class HexSGPlayer(value: String) extends AnyVal with StringValue
+  type HexSGPlayers = (HexSGPlayer, HexSGPlayer)
 
-  private[pref] val defaultHexColors = (HexColor("b0b0b0"), HexColor("909090"))
+  private[pref] val defaultHexSGPlayers = (HexSGPlayer("b0b0b0"), HexSGPlayer("909090"))
 
-  private val colors: Map[String, HexColors] = Map(
-    "blue"   -> (HexColor("dee3e6") -> HexColor("8ca2ad")),
-    "brown"  -> (HexColor("f0d9b5") -> HexColor("b58863")),
-    "green"  -> (HexColor("ffffdd") -> HexColor("86a666")),
-    "purple" -> (HexColor("9f90b0") -> HexColor("7d4a8d")),
-    "ic"     -> (HexColor("ececec") -> HexColor("c1c18e")),
-    "horsey" -> (HexColor("f1d9b6") -> HexColor("8e6547"))
+  private val sgPlayers: Map[String, HexSGPlayers] = Map(
+    "blue"   -> (HexSGPlayer("dee3e6") -> HexSGPlayer("8ca2ad")),
+    "brown"  -> (HexSGPlayer("f0d9b5") -> HexSGPlayer("b58863")),
+    "green"  -> (HexSGPlayer("ffffdd") -> HexSGPlayer("86a666")),
+    "purple" -> (HexSGPlayer("9f90b0") -> HexSGPlayer("7d4a8d")),
+    "ic"     -> (HexSGPlayer("ececec") -> HexSGPlayer("c1c18e")),
+    "horsey" -> (HexSGPlayer("f1d9b6") -> HexSGPlayer("8e6547"))
   )
 
   val all = List(
@@ -68,7 +68,7 @@ object Theme extends ThemeObject {
     "ic",
     "horsey"
   ) map { name =>
-    new Theme(name, colors.getOrElse(name, defaultHexColors))
+    new Theme(name, sgPlayers.getOrElse(name, defaultHexSGPlayers))
   }
 
   lazy val default = allByName get "brown" err "Can't find default theme D:"
@@ -77,7 +77,7 @@ object Theme extends ThemeObject {
 object Theme3d extends ThemeObject {
 
   val all = List(
-    "Black-White-Aluminium",
+    "P2-P1-Aluminium",
     "Brushed-Aluminium",
     "China-Blue",
     "China-Green",
@@ -89,7 +89,7 @@ object Theme3d extends ThemeObject {
     "Green-Glass",
     "Light-Wood",
     "Power-Coated",
-    "Purple-Black",
+    "Purple-P2",
     "Rosewood",
     "Wood-Glass",
     "Marble",
@@ -97,7 +97,7 @@ object Theme3d extends ThemeObject {
     "Jade",
     "Woodi"
   ) map { name =>
-    new Theme(name, Theme.defaultHexColors)
+    new Theme(name, Theme.defaultHexSGPlayers)
   }
 
   lazy val default = allByName get "Woodi" err "Can't find default theme D:"

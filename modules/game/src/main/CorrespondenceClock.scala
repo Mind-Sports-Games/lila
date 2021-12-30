@@ -1,28 +1,28 @@
 package lila.game
 
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 
 // times are expressed in seconds
 case class CorrespondenceClock(
     increment: Int,
-    whiteTime: Float,
-    blackTime: Float
+    p1Time: Float,
+    p2Time: Float
 ) {
 
   import CorrespondenceClock._
 
   def daysPerTurn = increment / 60 / 60 / 24
 
-  def remainingTime(c: Color) = c.fold(whiteTime, blackTime)
+  def remainingTime(c: SGPlayer) = c.fold(p1Time, p2Time)
 
-  def outoftime(c: Color) = remainingTime(c) == 0
+  def outoftime(c: SGPlayer) = remainingTime(c) == 0
 
-  def moretimeable(c: Color) = remainingTime(c) < (increment - hourSeconds)
+  def moretimeable(c: SGPlayer) = remainingTime(c) < (increment - hourSeconds)
 
-  def giveTime(c: Color) =
+  def giveTime(c: SGPlayer) =
     c.fold(
-      copy(whiteTime = whiteTime + daySeconds),
-      copy(blackTime = blackTime + daySeconds)
+      copy(p1Time = p1Time + daySeconds),
+      copy(p2Time = p2Time + daySeconds)
     )
 
   // in seconds

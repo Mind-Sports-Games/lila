@@ -21,7 +21,7 @@ object embed {
         main(cls := "analyse")
       ),
       footer {
-        val url = routes.Round.watcher(pov.gameId, pov.color.name)
+        val url = routes.Round.watcher(pov.gameId, pov.sgPlayer.name)
         frag(
           div(cls := "left")(
             a(targetBlank, href := url)(h1(titleGame(pov.game))),

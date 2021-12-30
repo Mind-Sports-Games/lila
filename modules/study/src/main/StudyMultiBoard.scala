@@ -1,7 +1,7 @@
 package lila.study
 
 import BSONHandlers._
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Uci }
 import com.github.blemale.scaffeine.AsyncLoadingCache
@@ -70,7 +70,7 @@ final class StudyMultiBoard(
                       "lang" -> "js",
                       "args" -> $arr("$root", "$tags"),
                       "body" -> """function(root, tags) {
-                    |tags = tags.filter(t => t.startsWith('White') || t.startsWith('Black') || t.startsWith('Result'));
+                    |tags = tags.filter(t => t.startsWith('P1') || t.startsWith('P2') || t.startsWith('Result'));
                     |const node = tags.length ? Object.keys(root).reduce((acc, i) => (root[i].p > acc.p) ? root[i] : acc, root['_']) : root['_'];
                     |return {node:{fen:node.f,uci:node.u},tags} }""".stripMargin
                     )
@@ -96,7 +96,7 @@ final class StudyMultiBoard(
             id = id,
             name = name,
             players = tags flatMap ChapterPreview.players,
-            orientation = doc.getAsOpt[Color]("orientation") | Color.White,
+            orientation = doc.getAsOpt[SGPlayer]("orientation") | SGPlayer.P1,
             fen = fen,
             lastMove = lastMove,
             playing = lastMove.isDefined && tags.flatMap(_(_.Result)).has("*")
@@ -115,7 +115,7 @@ final class StudyMultiBoard(
 
     implicit val previewPlayersWriter: Writes[ChapterPreview.Players] = Writes[ChapterPreview.Players] {
       players =>
-        Json.obj("white" -> players.white, "black" -> players.black)
+        Json.obj("p1" -> players.p1, "p2" -> players.p2)
     }
 
     implicit val previewWriter: Writes[ChapterPreview] = Json.writes[ChapterPreview]
@@ -128,7 +128,7 @@ object StudyMultiBoard {
       id: Chapter.Id,
       name: Chapter.Name,
       players: Option[ChapterPreview.Players],
-      orientation: Color,
+      orientation: SGPlayer,
       fen: FEN,
       lastMove: Option[Uci],
       playing: Boolean
@@ -138,15 +138,15 @@ object StudyMultiBoard {
 
     case class Player(name: String, title: Option[String], rating: Option[Int])
 
-    type Players = Color.Map[Player]
+    type Players = SGPlayer.Map[Player]
 
     def players(tags: Tags): Option[Players] =
       for {
-        wName <- tags(_.White)
-        bName <- tags(_.Black)
-      } yield Color.Map(
-        white = Player(wName, tags(_.WhiteTitle), tags(_.WhiteElo) flatMap (_.toIntOption)),
-        black = Player(bName, tags(_.BlackTitle), tags(_.BlackElo) flatMap (_.toIntOption))
+        wName <- tags(_.P1)
+        bName <- tags(_.P2)
+      } yield SGPlayer.Map(
+        p1 = Player(wName, tags(_.P1Title), tags(_.P1Elo) flatMap (_.toIntOption)),
+        p2 = Player(bName, tags(_.P2Title), tags(_.P2Elo) flatMap (_.toIntOption))
       )
   }
 }

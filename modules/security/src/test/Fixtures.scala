@@ -627,7 +627,7 @@ mailimate.com
 mailin8r.com
 mailinater.\w+
 mailinator2.\w+
-mailinblack.com
+mailinp2.com
 mailincubator.com
 mailismagic.com
 mailjunk.\w+

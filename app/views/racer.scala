@@ -64,8 +64,8 @@ object racer {
     List(
       s.score,
       s.combo,
-      s.youPlayTheWhitePiecesInAllPuzzles,
-      s.youPlayTheBlackPiecesInAllPuzzles,
+      s.youPlayTheP1PiecesInAllPuzzles,
+      s.youPlayTheP2PiecesInAllPuzzles,
       s.getReady,
       s.waitingForMorePlayers,
       s.raceComplete,

@@ -26,9 +26,9 @@ object layout {
       }
     def metaCsp(csp: Option[ContentSecurityPolicy])(implicit ctx: Context): Frag =
       metaCsp(csp getOrElse defaultCsp)
-    def metaThemeColor(implicit ctx: Context): Frag =
+    def metaThemeSGPlayer(implicit ctx: Context): Frag =
       raw {
-        s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
+        s"""<meta name="theme-sgPlayer" content="${ctx.pref.themeSGPlayer}">"""
       }
     def pieceSprite(implicit ctx: Context): Frag = {
       ctx.currentPieceSet.map(ps => pieceSprite(ps))
@@ -209,7 +209,7 @@ object layout {
           charset,
           viewport,
           metaCsp(csp),
-          metaThemeColor,
+          metaThemeSGPlayer,
           st.headTitle {
             if (ctx.blind) "playstrategy"
             else if (netConfig.isProd) fullTitle | s"$title • playstrategy.org"

@@ -53,7 +53,7 @@ final class GameSearchApi(
         Fields.uids          -> game.userIds.toArray.some.filterNot(_.isEmpty),
         Fields.winner        -> game.winner.flatMap(_.userId),
         Fields.loser         -> game.loser.flatMap(_.userId),
-        Fields.winnerColor   -> game.winner.fold(3)(_.color.fold(1, 2)),
+        Fields.winnerSGPlayer   -> game.winner.fold(3)(_.sgPlayer.fold(1, 2)),
         Fields.averageRating -> game.averageUsersRating,
         Fields.ai            -> game.aiLevel,
         Fields.date          -> (lila.search.Date.formatter print game.movedAt),
@@ -61,8 +61,8 @@ final class GameSearchApi(
         Fields.clockInit     -> game.clock.map(_.limitSeconds),
         Fields.clockInc      -> game.clock.map(_.incrementSeconds),
         Fields.analysed      -> analysed,
-        Fields.whiteUser     -> game.whitePlayer.userId,
-        Fields.blackUser     -> game.blackPlayer.userId,
+        Fields.p1User     -> game.p1Player.userId,
+        Fields.p2User     -> game.p2Player.userId,
         Fields.source        -> game.source.map(_.id)
       )
       .noNull

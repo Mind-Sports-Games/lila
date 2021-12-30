@@ -40,15 +40,15 @@ object show {
           image = cdnUrl(routes.Export.puzzleThumbnail(puzzle.id.value).url).some,
           title =
             if (isStreak) "Puzzle Streak"
-            else s"Chess tactic #${puzzle.id} - ${puzzle.color.name.capitalize} to play",
+            else s"Chess tactic #${puzzle.id} - ${puzzle.sgPlayer.name.capitalize} to play",
           url = s"$netBaseUrl${routes.Puzzle.show(puzzle.id.value).url}",
           description =
             if (isStreak) trans.puzzle.streakDescription.txt()
             else
-              s"PlayStrategy tactic trainer: ${puzzle.color
+              s"PlayStrategy tactic trainer: ${puzzle.sgPlayer
                 .fold(
-                  trans.puzzle.findTheBestMoveForWhite,
-                  trans.puzzle.findTheBestMoveForBlack
+                  trans.puzzle.findTheBestMoveForP1,
+                  trans.puzzle.findTheBestMoveForP2
                 )
                 .txt()}. Played by ${puzzle.plays} players."
         )

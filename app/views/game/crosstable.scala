@@ -33,7 +33,7 @@ object crosstable {
             case None                 => "glpt"      -> "½"
             case _                    => "glpt loss" -> "0"
           }
-          a(href := s"""${routes.Round.watcher(r.gameId, "white")}?pov=${u.id}""", cls := linkClass)(text)
+          a(href := s"""${routes.Round.watcher(r.gameId, "p1")}?pov=${u.id}""", cls := linkClass)(text)
         })
       },
       matchup map { m =>

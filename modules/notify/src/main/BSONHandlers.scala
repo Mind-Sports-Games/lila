@@ -1,6 +1,6 @@
 package lila.notify
 
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 import lila.db.BSON.{ Reader, Writer }
 import lila.db.dsl._
 import lila.db.{ dsl, BSON }
@@ -49,7 +49,7 @@ private object BSONHandlers {
   implicit val IrwinDoneHandler    = Macros.handler[IrwinDone]
   implicit val GenericLinkHandler  = Macros.handler[GenericLink]
 
-  implicit val ColorBSONHandler = BSONBooleanHandler.as[Color](Color.fromWhite, _.white)
+  implicit val SGPlayerBSONHandler = BSONBooleanHandler.as[SGPlayer](SGPlayer.fromP1, _.p1)
 
   implicit val NotificationContentHandler = new BSON[NotificationContent] {
 

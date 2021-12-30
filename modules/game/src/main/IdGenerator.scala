@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.Color
+import strategygames.{ Player => SGPlayer }
 import java.security.SecureRandom
 import ornicar.scalalib.Random
 
@@ -33,14 +33,14 @@ final class IdGenerator(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execut
 object IdGenerator {
 
   private[this] val secureRandom     = new SecureRandom()
-  private[this] val whiteSuffixChars = ('0' to '4') ++ ('A' to 'Z') mkString
-  private[this] val blackSuffixChars = ('5' to '9') ++ ('a' to 'z') mkString
+  private[this] val p1SuffixChars = ('0' to '4') ++ ('A' to 'Z') mkString
+  private[this] val p2SuffixChars = ('5' to '9') ++ ('a' to 'z') mkString
 
   def uncheckedGame: Game.ID = lila.common.ThreadLocalRandom nextString Game.gameIdSize
 
-  def player(color: Color): Player.ID = {
+  def player(sgPlayer: SGPlayer): Player.ID = {
     // Trick to avoid collisions between player ids in the same game.
-    val suffixChars = color.fold(whiteSuffixChars, blackSuffixChars)
+    val suffixChars = sgPlayer.fold(p1SuffixChars, p2SuffixChars)
     val suffix      = suffixChars(secureRandom nextInt suffixChars.length)
     Random.secureString(Game.playerIdSize - 1) + suffix
   }

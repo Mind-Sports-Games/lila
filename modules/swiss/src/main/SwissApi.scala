@@ -300,12 +300,12 @@ final class SwissApi(
 
   private def getGameRanks(swiss: Swiss, game: Game): Fu[Option[GameRanks]] =
     ~ {
-      game.whitePlayer.userId.ifTrue(swiss.isStarted) flatMap { whiteId =>
-        game.blackPlayer.userId map { blackId =>
+      game.p1Player.userId.ifTrue(swiss.isStarted) flatMap { p1Id =>
+        game.p2Player.userId map { p2Id =>
           rankingApi(swiss) map { ranking =>
             import cats.implicits._
-            (ranking.get(whiteId), ranking.get(blackId)) mapN { (whiteR, blackR) =>
-              GameRanks(whiteR, blackR)
+            (ranking.get(p1Id), ranking.get(p2Id)) mapN { (p1R, p2R) =>
+              GameRanks(p1R, p2R)
             }
           }
         }
@@ -478,7 +478,7 @@ final class SwissApi(
           .updateField(
             $id(game.game.id),
             SwissPairing.Fields.status,
-            pairingStatusHandler.writeTry(Right(game.winnerColor)).get
+            pairingStatusHandler.writeTry(Right(game.winnerSGPlayer)).get
           )
           .flatMap { result =>
             if (result.nModified == 0) fuccess(false) // dedup

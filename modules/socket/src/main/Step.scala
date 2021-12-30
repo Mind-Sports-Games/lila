@@ -1,7 +1,7 @@
 package lila.socket
 
 import strategygames.format.{ FEN, Uci }
-import strategygames.{ Color, GameLogic, Pocket, PocketData, Pos, Role }
+import strategygames.{ Player => SGPlayer, GameLogic, Pocket, PocketData, Pos, Role }
 import play.api.libs.json._
 
 case class Step(
@@ -16,8 +16,8 @@ case class Step(
     captLen: Option[Int]
 ) {
 
-  // who's color plays next
-  def color = Color.fromPly(ply)
+  // who's sgPlayer plays next
+  def sgPlayer = SGPlayer.fromPly(ply)
 
   def toJson = Step.stepJsonWriter writes this
 }
@@ -47,7 +47,7 @@ object Step {
     )
   }
   implicit private val pocketDataWriter: OWrites[PocketData] = OWrites { v =>
-    Json.obj("pockets" -> List(v.pockets.white, v.pockets.black))
+    Json.obj("pockets" -> List(v.pockets.p1, v.pockets.p2))
   }
 
   implicit val stepJsonWriter: Writes[Step] = Writes { step =>

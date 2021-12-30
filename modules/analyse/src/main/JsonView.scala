@@ -5,7 +5,7 @@ import play.api.libs.json._
 import lila.game.Game
 import lila.tree.Eval.JsonHandlers._
 
-import strategygames.Color.{ Black, White }
+import strategygames.Player.{ P2, P1 }
 
 object JsonView {
 
@@ -38,7 +38,7 @@ object JsonView {
 
   def player(pov: Accuracy.PovLike)(analysis: Analysis) =
     analysis.summary
-      .find(_._1 == pov.color)
+      .find(_._1 == pov.sgPlayer)
       .map(_._2)
       .map(s =>
         JsObject(s map { case (nag, nb) =>
@@ -49,15 +49,15 @@ object JsonView {
   def bothPlayers(game: Game, analysis: Analysis) =
     Json.obj(
       "id"    -> analysis.id,
-      "white" -> player(game.whitePov)(analysis),
-      "black" -> player(game.blackPov)(analysis)
+      "p1" -> player(game.p1Pov)(analysis),
+      "p2" -> player(game.p2Pov)(analysis)
     )
 
   def bothPlayers(pov: Accuracy.PovLike, analysis: Analysis) =
     Json.obj(
       "id"    -> analysis.id,
-      "white" -> player(pov.copy(color = White))(analysis),
-      "black" -> player(pov.copy(color = Black))(analysis)
+      "p1" -> player(pov.copy(sgPlayer = P1))(analysis),
+      "p2" -> player(pov.copy(sgPlayer = P2))(analysis)
     )
 
   def mobile(game: Game, analysis: Analysis) =

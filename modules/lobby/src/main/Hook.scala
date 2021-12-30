@@ -20,14 +20,14 @@ case class Hook(
     variant: Int,
     clock: Clock.Config,
     mode: Int,
-    color: String,
+    sgPlayer: String,
     user: Option[LobbyUser],
     ratingRange: String,
     createdAt: DateTime,
     boardApi: Boolean
 ) {
 
-  val realColor = Color orDefault color
+  val realSGPlayer = SGPlayer orDefault sgPlayer
 
   val realVariant = Variant.orDefault(lib, variant)
 
@@ -41,7 +41,7 @@ case class Hook(
       lib == h.lib &&
       variant == h.variant &&
       clock == h.clock &&
-      (realColor compatibleWith h.realColor) &&
+      (realSGPlayer compatibleWith h.realSGPlayer) &&
       ratingRangeCompatibleWith(h) && h.ratingRangeCompatibleWith(this) &&
       (userId.isEmpty || userId != h.userId)
 
@@ -78,13 +78,13 @@ case class Hook(
       .add("rating" -> rating)
       .add("variant" -> realVariant.exotic.option(realVariant.key))
       .add("ra" -> realMode.rated.option(1))
-      .add("c" -> strategygames.Color.fromName(color).map(_.name))
+      .add("c" -> strategygames.Player.fromName(sgPlayer).map(_.name))
       .add("perf" -> perfType.map(_.trans))
 
-  def randomColor = color == "random"
+  def randomSGPlayer = sgPlayer == "random"
 
   lazy val compatibleWithPools =
-    realMode.rated && realVariant.standard && randomColor &&
+    realMode.rated && realVariant.standard && randomSGPlayer &&
       lila.pool.PoolList.clockStringSet.contains(clock.show)
 
   def compatibleWithPool(poolClock: strategygames.Clock.Config) =
@@ -116,7 +116,7 @@ object Hook {
       variant: strategygames.variant.Variant,
       clock: Clock.Config,
       mode: Mode,
-      color: String,
+      sgPlayer: String,
       user: Option[User],
       sid: Option[String],
       ratingRange: RatingRange,
@@ -130,7 +130,7 @@ object Hook {
       variant = variant.id,
       clock = clock,
       mode = mode.id,
-      color = color,
+      sgPlayer = sgPlayer,
       user = user map { LobbyUser.make(_, blocking) },
       sid = sid,
       ratingRange = ratingRange.toString,

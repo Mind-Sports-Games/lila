@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Color, Centis, Game, GameLogic, Pos, Replay, Situation }
+import strategygames.{ Player => SGPlayer, Centis, Game, GameLogic, Pos, Replay, Situation }
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
@@ -88,7 +88,7 @@ object TreeBuilder {
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
             comments = Node.Comments {
               drawOfferPlies(g.turns)
-                .option(makePlayStrategyComment(s"${!Color.fromPly(g.turns)} offers draw"))
+                .option(makePlayStrategyComment(s"${!SGPlayer.fromPly(g.turns)} offers draw"))
                 .toList :::
                 advice
                   .map(_.makeComment(withEval = false, withBestMove = true))

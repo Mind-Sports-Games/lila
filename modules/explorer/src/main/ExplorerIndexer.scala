@@ -1,7 +1,7 @@
 package lila.explorer
 
 import akka.stream.scaladsl._
-import strategygames.Color.{ Black, White }
+import strategygames.{ Player => SGPlayer, P2, P1 }
 import strategygames.GameLogic
 import strategygames.format.pgn.Tag
 import org.joda.time.DateTime
@@ -132,23 +132,23 @@ final private class ExplorerIndexer(
 
   private def makeFastPgn(game: Game, botUserIds: Set[User.ID]): Fu[Option[String]] =
     ~(for {
-      whiteRating <- stableRating(game.whitePlayer)
-      blackRating <- stableRating(game.blackPlayer)
+      p1Rating <- stableRating(game.p1Player)
+      p2Rating <- stableRating(game.p2Player)
       minPlayerRating  = if (game.variant.exotic) 1400 else 1500
       minAverageRating = if (game.variant.exotic) 1520 else 1600
-      if whiteRating >= minPlayerRating
-      if blackRating >= minPlayerRating
-      averageRating = (whiteRating + blackRating) / 2
+      if p1Rating >= minPlayerRating
+      if p2Rating >= minPlayerRating
+      averageRating = (p1Rating + p2Rating) / 2
       if averageRating >= minAverageRating
       if probability(game, averageRating) > nextFloat()
       if !game.userIds.exists(botUserIds.contains)
       if valid(game)
     } yield gameRepo initialFen game flatMap { initialFen =>
       userRepo.usernamesByIds(game.userIds) map { usernames =>
-        def username(color: strategygames.Color) =
-          game.player(color).userId flatMap { id =>
+        def username(sgPlayer: SGPlayer) =
+          game.player(sgPlayer).userId flatMap { id =>
             usernames.find(_.toLowerCase == id)
-          } orElse game.player(color).userId getOrElse "?"
+          } orElse game.player(sgPlayer).userId getOrElse "?"
         val fenTags = initialFen.?? { fen =>
           List(Tag(_.FEN, fen))
         }
@@ -156,10 +156,10 @@ final private class ExplorerIndexer(
           Tag("PlayStrategyID", game.id),
           Tag(_.Variant, game.variant.name),
           Tag.timeControl(game.clock.map(_.config)),
-          Tag(_.White, username(White)),
-          Tag(_.Black, username(Black)),
-          Tag(_.WhiteElo, whiteRating),
-          Tag(_.BlackElo, blackRating),
+          Tag(_.P1, username(P1)),
+          Tag(_.P2, username(P2)),
+          Tag(_.P1Elo, p1Rating),
+          Tag(_.P2Elo, p2Rating),
           Tag(_.Result, PgnDump.result(game, game.variant.gameLogic match {
             case GameLogic.Draughts() => lila.pref.Pref.default.draughtsResult
             case _ => false

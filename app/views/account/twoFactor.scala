@@ -12,7 +12,7 @@ object twoFactor {
   import trans.tfa._
 
   private val qrCode = raw(
-    """<div style="width: 276px; height: 276px; padding: 10px; background: white; margin: 2em auto;"><div id="qrcode" style="width: 256px; height: 256px;"></div></div>"""
+    """<div style="width: 276px; height: 276px; padding: 10px; background: p1; margin: 2em auto;"><div id="qrcode" style="width: 256px; height: 256px;"></div></div>"""
   )
 
   def setup(u: lila.user.User, form: play.api.data.Form[_])(implicit ctx: Context) =
@@ -41,7 +41,7 @@ object twoFactor {
           qrCode,
           div(cls := "form-group")(
             ifYouCannotScanEnterX(
-              span(style := "background:black;color:black;")(~form("secret").value)
+              span(style := "background:p2;sgPlayer:p2;")(~form("secret").value)
             )
           ),
           div(cls := "form-group explanation")(enterPassword()),

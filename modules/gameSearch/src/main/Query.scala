@@ -12,7 +12,7 @@ case class Query(
     user2: Option[String] = None,
     winner: Option[String] = None,
     loser: Option[String] = None,
-    winnerColor: Option[Int] = None,
+    winnerSGPlayer: Option[Int] = None,
     perf: Option[Int] = None,
     source: Option[Int] = None,
     status: Option[Int] = None,
@@ -26,8 +26,8 @@ case class Query(
     clock: Clocking = Clocking(),
     sorting: Sorting = Sorting.default,
     analysed: Option[Boolean] = None,
-    whiteUser: Option[String] = None,
-    blackUser: Option[String] = None
+    p1User: Option[String] = None,
+    p2User: Option[String] = None
 ) {
 
   def nonEmpty =
@@ -35,7 +35,7 @@ case class Query(
       user2.nonEmpty ||
       winner.nonEmpty ||
       loser.nonEmpty ||
-      winnerColor.nonEmpty ||
+      winnerSGPlayer.nonEmpty ||
       perf.nonEmpty ||
       source.nonEmpty ||
       status.nonEmpty ||
@@ -99,7 +99,7 @@ object Query {
   val clockIncs =
     options(List(0, 1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120, 150, 180), "%d second{s}").toList
 
-  val winnerColors = List(1 -> "White", 2 -> "Black", 3 -> "None")
+  val winnerSGPlayers = List(1 -> "P1", 2 -> "P2", 3 -> "None")
 
   val sources = lila.game.Source.searchable map { v =>
     v.id -> v.name.capitalize

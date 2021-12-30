@@ -47,7 +47,7 @@ final class UserGameApi(
         "status"    -> g.status,
         "source"    -> g.source.map(_.name),
         "players" -> JsObject(g.players map { p =>
-          p.color.name -> Json
+          p.sgPlayer.name -> Json
             .obj(
               "user"   -> p.userId.flatMap(lightUser.sync),
               "userId" -> p.userId, // for BC
@@ -59,7 +59,7 @@ final class UserGameApi(
             .add("ratingDiff" -> p.ratingDiff)
         }),
         "fen"       -> Forsyth.exportBoard(g.variant.gameLogic, g.board),
-        "winner"    -> g.winnerColor.map(_.name),
+        "winner"    -> g.winnerSGPlayer.map(_.name),
         "bookmarks" -> g.bookmarks
       )
       .add("bookmarked" -> bookmarked)

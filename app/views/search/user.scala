@@ -45,9 +45,9 @@ object user {
         ),
         winner(hide = false),
         loser(hide = false),
-        colors(hide = false),
+        sgPlayers(hide = false),
         status,
-        winnerColor,
+        winnerSGPlayer,
         sort,
         analysed,
         tr(cls := "action")(

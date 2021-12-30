@@ -48,7 +48,7 @@ object Query {
 
   def clock(c: Boolean): Bdoc = F.clock $exists c
 
-  def clockHistory(c: Boolean): Bdoc = F.whiteClockHistory $exists c
+  def clockHistory(c: Boolean): Bdoc = F.p1ClockHistory $exists c
 
   def user(u: String): Bdoc = F.playerUids $eq u
   def user(u: User): Bdoc   = F.playerUids $eq u.id
@@ -113,12 +113,12 @@ object Query {
   lazy val variantStandard = variant(Variant.Chess(Standard))
 
   //legacy lichess format
-  //lazy val notHordeOrSincePawnsAreWhite: Bdoc = $or(
+  //lazy val notHordeOrSincePawnsAreP1: Bdoc = $or(
   //  F.variant $ne Horde.id,
-  //  sinceHordePawnsAreWhite
+  //  sinceHordePawnsAreP1
   //)
-  //lazy val sinceHordePawnsAreWhite: Bdoc =
-  //  createdSince(Game.hordeWhitePawnsSince)
+  //lazy val sinceHordePawnsAreP1: Bdoc =
+  //  createdSince(Game.hordeP1PawnsSince)
 
   val notFromPosition: Bdoc =
     F.variant $ne FromPosition.id

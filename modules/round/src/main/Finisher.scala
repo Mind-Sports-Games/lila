@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Color, DecayingStats, Status }
+import strategygames.{ Player => SGPlayer, DecayingStats, Status }
 
 import lila.common.{ Bus, Uptime }
 import lila.game.actorApi.{ AbortedBy, FinishGame }
@@ -26,15 +26,15 @@ final private class Finisher(
   def abort(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
     apply(pov.game, _.Aborted, None) >>- {
       getSocketStatus(pov.game) foreach { ss =>
-        playban.abort(pov, ss.colorsOnGame)
+        playban.abort(pov, ss.sgPlayersOnGame)
       }
       Bus.publish(AbortedBy(pov.copy(game = pov.game.abort)), "abortGame")
     }
 
-  def rageQuit(game: Game, winner: Option[Color])(implicit proxy: GameProxy): Fu[Events] =
+  def rageQuit(game: Game, winner: Option[SGPlayer])(implicit proxy: GameProxy): Fu[Events] =
     apply(game, _.Timeout, winner) >>-
-      winner.foreach { color =>
-        playban.rageQuit(game, !color)
+      winner.foreach { sgPlayer =>
+        playban.rageQuit(game, !sgPlayer)
       }
 
   def outOfTime(game: Game)(implicit proxy: GameProxy): Fu[Events] =
@@ -44,10 +44,10 @@ final private class Finisher(
       logger.info(s"Aborting game last played before JVM boot: ${game.id}")
       other(game, _.Aborted, none)
 
-    } else if (game.player(!game.player.color).isOfferingDraw) {
+    } else if (game.player(!game.player.sgPlayer).isOfferingDraw) {
       apply(game, _.Draw, None, Some(trans.drawOfferAccepted.txt()))
     } else {
-      val winner = Some(!game.player.color) ifFalse game.situation.opponentHasInsufficientMaterial
+      val winner = Some(!game.player.sgPlayer) ifFalse game.situation.opponentHasInsufficientMaterial
       apply(game, _.Outoftime, winner) >>-
         winner.foreach { w =>
           playban.flag(game, !w)
@@ -58,14 +58,14 @@ final private class Finisher(
     game.playerWhoDidNotMove ?? { culprit =>
       lila.mon.round.expiration.count.increment()
       playban.noStart(Pov(game, culprit))
-      if (game.isMandatory) apply(game, _.NoStart, Some(!culprit.color))
+      if (game.isMandatory) apply(game, _.NoStart, Some(!culprit.sgPlayer))
       else apply(game, _.Aborted, None, Some("Game aborted by server"))
     }
 
   def other(
       game: Game,
       status: Status.type => Status,
-      winner: Option[Color],
+      winner: Option[SGPlayer],
       message: Option[String] = None
   )(implicit proxy: GameProxy): Fu[Events] =
     apply(game, status, winner, message) >>- playban.other(game, status, winner).unit
@@ -104,12 +104,12 @@ final private class Finisher(
   private def apply(
       game: Game,
       makeStatus: Status.type => Status,
-      winnerC: Option[Color],
+      winnerC: Option[SGPlayer],
       message: Option[String] = None
   )(implicit proxy: GameProxy): Fu[Events] = {
     val status = makeStatus(Status)
     val prog   = game.finish(status, winnerC)
-    if (game.nonAi && game.isCorrespondence) Color.all foreach notifier.gameEnd(prog.game)
+    if (game.nonAi && game.isCorrespondence) SGPlayer.all foreach notifier.gameEnd(prog.game)
     lila.mon.game
       .finish(
         variant = game.variant.key,
@@ -124,17 +124,17 @@ final private class Finisher(
     proxy.save(prog) >>
       gameRepo.finish(
         id = g.id,
-        winnerColor = winnerC,
+        winnerSGPlayer = winnerC,
         winnerId = winnerC flatMap (g.player(_).userId),
         status = prog.game.status
       ) >>
       userRepo
         .pair(
-          g.whitePlayer.userId,
-          g.blackPlayer.userId
+          g.p1Player.userId,
+          g.p2Player.userId
         )
-        .flatMap { case (whiteO, blackO) =>
-          val finish = FinishGame(g, whiteO, blackO)
+        .flatMap { case (p1O, p2O) =>
+          val finish = FinishGame(g, p1O, p2O)
           updateCountAndPerfs(finish) map { ratingDiffs =>
             message foreach { messenger.system(g, _) }
             gameRepo game g.id foreach { newGame =>
@@ -153,11 +153,11 @@ final private class Finisher(
   private def updateCountAndPerfs(finish: FinishGame): Fu[Option[RatingDiffs]] =
     (!finish.isVsSelf && !finish.game.aborted) ?? {
       import cats.implicits._
-      (finish.white, finish.black).mapN((_, _)) ?? { case (white, black) =>
-        crosstableApi.add(finish.game) zip perfsUpdater.save(finish.game, white, black) dmap (_._2)
+      (finish.p1, finish.p2).mapN((_, _)) ?? { case (p1, p2) =>
+        crosstableApi.add(finish.game) zip perfsUpdater.save(finish.game, p1, p2) dmap (_._2)
       } zip
-        (finish.white ?? incNbGames(finish.game)) zip
-        (finish.black ?? incNbGames(finish.game)) dmap (_._1._1)
+        (finish.p1 ?? incNbGames(finish.game)) zip
+        (finish.p2 ?? incNbGames(finish.game)) dmap (_._1._1)
     }
 
   private def incNbGames(game: Game)(user: User): Funit =

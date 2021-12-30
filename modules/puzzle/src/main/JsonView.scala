@@ -172,7 +172,7 @@ final class JsonView(
       "rating"     -> puzzle.glicko.intRating,
       "attempts"   -> puzzle.plays,
       "fen"        -> puzzle.fen.value,
-      "color"      -> puzzle.color.name,
+      "sgPlayer"      -> puzzle.sgPlayer.name,
       "initialPly" -> (puzzle.initialPly + 1),
       "gameId"     -> puzzle.gameId,
       "lines" -> puzzle.line.tail.reverse.foldLeft[JsValue](JsString("win")) { case (acc, move) =>

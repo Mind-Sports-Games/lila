@@ -4,7 +4,7 @@ import scala.language.existentials
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ Black, Color, Mode, Status, White }
+import strategygames.{ P2, Player => SGPlayer, Mode, Status, P1 }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.commands.WriteResult
@@ -34,12 +34,12 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
     def game(gameId: ID): Fu[Option[LightGame]] = coll.byId[LightGame](gameId, LightGame.projection)
 
-    def pov(gameId: ID, color: Color): Fu[Option[LightPov]] =
+    def pov(gameId: ID, sgPlayer: SGPlayer): Fu[Option[LightPov]] =
       game(gameId) dmap2 { (game: LightGame) =>
-        LightPov(game, game player color)
+        LightPov(game, game player sgPlayer)
       }
 
-    def pov(ref: PovRef): Fu[Option[LightPov]] = pov(ref.gameId, ref.color)
+    def pov(ref: PovRef): Fu[Option[LightPov]] = pov(ref.gameId, ref.sgPlayer)
 
     def gamesFromPrimary(gameIds: Seq[ID]): Fu[List[LightGame]] =
       coll.byOrderedIds[LightGame, ID](gameIds, projection = LightGame.projection.some)(_.id)
@@ -55,8 +55,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def finished(gameId: ID): Fu[Option[Game]] =
     coll.one[Game]($id(gameId) ++ Query.finished)
 
-  def player(gameId: ID, color: Color): Fu[Option[Player]] =
-    game(gameId) dmap2 { _ player color }
+  def player(gameId: ID, sgPlayer: SGPlayer): Fu[Option[Player]] =
+    game(gameId) dmap2 { _ player sgPlayer }
 
   def player(gameId: ID, playerId: ID): Fu[Option[Player]] =
     game(gameId) dmap { gameOption =>
@@ -66,20 +66,20 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def player(playerRef: PlayerRef): Fu[Option[Player]] =
     player(playerRef.gameId, playerRef.playerId)
 
-  def pov(gameId: ID, color: Color): Fu[Option[Pov]] =
+  def pov(gameId: ID, sgPlayer: SGPlayer): Fu[Option[Pov]] =
     game(gameId) dmap2 { (game: Game) =>
-      Pov(game, game player color)
+      Pov(game, game player sgPlayer)
     }
 
-  def pov(gameId: ID, color: String): Fu[Option[Pov]] =
-    Color.fromName(color) ?? (pov(gameId, _))
+  def pov(gameId: ID, sgPlayer: String): Fu[Option[Pov]] =
+    SGPlayer.fromName(sgPlayer) ?? (pov(gameId, _))
 
   def pov(playerRef: PlayerRef): Fu[Option[Pov]] =
     game(playerRef.gameId) dmap { _ flatMap { _ playerIdPov playerRef.playerId } }
 
   def pov(fullId: ID): Fu[Option[Pov]] = pov(PlayerRef(fullId))
 
-  def pov(ref: PovRef): Fu[Option[Pov]] = pov(ref.gameId, ref.color)
+  def pov(ref: PovRef): Fu[Option[Pov]] = pov(ref.gameId, ref.sgPlayer)
 
   def remove(id: ID) = coll.delete.one($id(id)).void
 
@@ -162,7 +162,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .one(
         $id(pov.gameId),
         $set(
-          s"${pov.color.fold(F.whitePlayer, F.blackPlayer)}.${Player.BSONFields.berserk}" -> true
+          s"${pov.sgPlayer.fold(F.p1Player, F.p2Player)}.${Player.BSONFields.berserk}" -> true
         )
       )
       .void
@@ -189,8 +189,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.update.one(
       $id(id),
       $set(
-        s"${F.whitePlayer}.${Player.BSONFields.ratingDiff}" -> diffs.white,
-        s"${F.blackPlayer}.${Player.BSONFields.ratingDiff}" -> diffs.black
+        s"${F.p1Player}.${Player.BSONFields.ratingDiff}" -> diffs.p1,
+        s"${F.p2Player}.${Player.BSONFields.ratingDiff}" -> diffs.p2
       )
     )
 
@@ -286,7 +286,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll
       .updateField(
         $id(pov.gameId),
-        holdAlertField(pov.color),
+        holdAlertField(pov.sgPlayer),
         alert
       )
       .void
@@ -295,15 +295,15 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   object holdAlert {
     private val holdAlertSelector = $or(
-      holdAlertField(White) $exists true,
-      holdAlertField(Black) $exists true
+      holdAlertField(P1) $exists true,
+      holdAlertField(P2) $exists true
     )
     private val holdAlertProjection = $doc(
-      holdAlertField(White) -> true,
-      holdAlertField(Black) -> true
+      holdAlertField(P1) -> true,
+      holdAlertField(P2) -> true
     )
-    private def holdAlertOf(doc: Bdoc, color: Color): Option[Player.HoldAlert] =
-      doc.child(color.fold("p0", "p1")).flatMap(_.getAsOpt[Player.HoldAlert](Player.BSONFields.holdAlert))
+    private def holdAlertOf(doc: Bdoc, sgPlayer: SGPlayer): Option[Player.HoldAlert] =
+      doc.child(sgPlayer.fold("p0", "p1")).flatMap(_.getAsOpt[Player.HoldAlert](Player.BSONFields.holdAlert))
 
     def game(game: Game): Fu[Player.HoldAlert.Map] =
       coll.one[Bdoc](
@@ -311,7 +311,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         holdAlertProjection
       ) map {
         _.fold(Player.HoldAlert.emptyMap) { doc =>
-          Color.Map(white = holdAlertOf(doc, White), black = holdAlertOf(doc, Black))
+          SGPlayer.Map(p1 = holdAlertOf(doc, P1), p2 = holdAlertOf(doc, P2))
         }
       }
 
@@ -323,14 +323,14 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         )
         .cursor[Bdoc](ReadPreference.secondaryPreferred)
         .list() map { docs =>
-        val idColors = povs.view.map { p =>
-          p.gameId -> p.color
+        val idSGPlayers = povs.view.map { p =>
+          p.gameId -> p.sgPlayer
         }.toMap
         val holds = for {
           doc   <- docs
           id    <- doc string "_id"
-          color <- idColors get id
-          holds <- holdAlertOf(doc, color)
+          sgPlayer <- idSGPlayers get id
+          holds <- holdAlertOf(doc, sgPlayer)
         } yield id -> holds
         holds.toMap
       }
@@ -340,11 +340,11 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.exists(
       $doc(
         $id(pov.gameId),
-        holdAlertField(pov.color) $exists true
+        holdAlertField(pov.sgPlayer) $exists true
       )
     )
 
-  private def holdAlertField(color: Color) = s"p${color.fold(0, 1)}.${Player.BSONFields.holdAlert}"
+  private def holdAlertField(sgPlayer: SGPlayer) = s"p${sgPlayer.fold(0, 1)}.${Player.BSONFields.holdAlert}"
 
   private val finishUnsets = $doc(
     F.positionHashes                              -> true,
@@ -358,7 +358,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def finish(
       id: ID,
-      winnerColor: Option[Color],
+      winnerSGPlayer: Option[SGPlayer],
       winnerId: Option[String],
       status: Status
   ) =
@@ -368,7 +368,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         "$set",
         $doc(
           F.winnerId    -> winnerId,
-          F.winnerColor -> winnerColor.map(_.white),
+          F.winnerSGPlayer -> winnerSGPlayer.map(_.p1),
           F.status      -> status
         )
       ) ++ $doc(

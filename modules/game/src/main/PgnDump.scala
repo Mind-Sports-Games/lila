@@ -4,7 +4,7 @@ import strategygames.chess.format.pgn.{ Parser, Pgn }
 import strategygames.format.pgn.{ ParsedPgn, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ pgn => chessPgn }
-import strategygames.{ Centis, Color, GameLogic, Status }
+import strategygames.{ Centis, Player => SGPlayer, GameLogic, Status }
 import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
@@ -24,7 +24,7 @@ final class PgnDump(
       game: Game,
       initialFen: Option[FEN],
       flags: WithFlags,
-      teams: Option[Color.Map[String]] = None,
+      teams: Option[SGPlayer.Map[String]] = None,
       hideRatings: Boolean = false
   ): Fu[Pgn] = {
     val imported = game.pgnImport.flatMap { pgni =>
@@ -69,17 +69,17 @@ final class PgnDump(
               val moves2 =
                 if (algebraic) san2alg(moves, variant.boardSize.pos)
                 else moves
-              if (fenSituation.exists(_.situation.color.black)) ".." +: moves2
+              if (fenSituation.exists(_.situation.player.p2)) ".." +: moves2
               else moves2
             }
             case _ => flags keepDelayIf game.playable applyDelay {
-              if (fenSituation.exists(_.situation.color.black)) ".." +: game.pgnMoves
+              if (fenSituation.exists(_.situation.player.p2)) ".." +: game.pgnMoves
               else game.pgnMoves
             }
           },
           fenSituation.map(_.fullMoveNumber) | 1,
           flags.clocks ?? ~game.bothClockStates,
-          game.startColor
+          game.startSGPlayer
         )
       }
       Pgn(ts, turns)
@@ -121,11 +121,11 @@ final class PgnDump(
     }
 
   private def gameLightUsers(game: Game, withProfileName: Boolean): Fu[(Option[LightUser], Option[LightUser])] =
-    (game.whitePlayer.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async}) zip (game.blackPlayer.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async})
+    (game.p1Player.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async}) zip (game.p2Player.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async})
 */
 
   private def gameLightUsers(game: Game): Fu[(Option[LightUser], Option[LightUser])] =
-    (game.whitePlayer.userId ?? lightUserApi.async) zip (game.blackPlayer.userId ?? lightUserApi.async)
+    (game.p1Player.userId ?? lightUserApi.async) zip (game.p2Player.userId ?? lightUserApi.async)
 
   private def rating(p: Player) = p.rating.fold("?")(_.toString)
 
@@ -158,7 +158,7 @@ final class PgnDump(
       initialFen: Option[FEN],
       imported: Option[ParsedPgn],
       withOpening: Boolean,
-      teams: Option[Color.Map[String]] = None,
+      teams: Option[SGPlayer.Map[String]] = None,
       draughtsResult: Boolean = false,
       algebraic: Boolean = false,
       withProfileName: Boolean = false,
@@ -175,8 +175,8 @@ final class PgnDump(
           Tag(_.Site, gameUrl(game.id)).some,
           Tag(_.Date, importedDate | Tag.UTCDate.format.print(game.createdAt)).some,
           imported.flatMap(_.tags(_.Round)).map(Tag(_.Round, _)),
-          Tag(_.White, player(game.whitePlayer, wu)).some,
-          Tag(_.Black, player(game.blackPlayer, bu)).some,
+          Tag(_.P1, player(game.p1Player, wu)).some,
+          Tag(_.P2, player(game.p2Player, bu)).some,
           Tag(_.Result, result(game, draughtsResult)).some,
           importedDate.isEmpty option Tag(
             _.UTCDate,
@@ -186,18 +186,18 @@ final class PgnDump(
             _.UTCTime,
             imported.flatMap(_.tags(_.UTCTime)) | Tag.UTCTime.format.print(game.createdAt)
           ),
-          withRatings option Tag(_.WhiteElo, rating(game.whitePlayer)),
-          withRatings option Tag(_.BlackElo, rating(game.blackPlayer)),
-          withRatings ?? ratingDiffTag(game.whitePlayer, _.WhiteRatingDiff),
-          withRatings ?? ratingDiffTag(game.blackPlayer, _.BlackRatingDiff),
+          withRatings option Tag(_.P1Elo, rating(game.p1Player)),
+          withRatings option Tag(_.P2Elo, rating(game.p2Player)),
+          withRatings ?? ratingDiffTag(game.p1Player, _.P1RatingDiff),
+          withRatings ?? ratingDiffTag(game.p2Player, _.P2RatingDiff),
           wu.flatMap(_.title).map { t =>
-            Tag(_.WhiteTitle, t)
+            Tag(_.P1Title, t)
           },
           bu.flatMap(_.title).map { t =>
-            Tag(_.BlackTitle, t)
+            Tag(_.P2Title, t)
           },
-          teams.map { t => Tag("WhiteTeam", t.white) },
-          teams.map { t => Tag("BlackTeam", t.black) },
+          teams.map { t => Tag("P1Team", t.p1) },
+          teams.map { t => Tag("P2Team", t.p2) },
           Tag(_.Variant, game.variant.name.capitalize).some,
           Tag.timeControl(game.clock.map(_.config)).some,
           game.metadata.microMatchGameId.map(gameId => Tag(_.MicroMatch, gameId)),
@@ -246,19 +246,19 @@ final class PgnDump(
       moves: Seq[String],
       from: Int,
       clocks: Vector[Centis],
-      startColor: Color
+      startSGPlayer: SGPlayer
   ): List[chessPgn.Turn] =
     (moves grouped 2).zipWithIndex.toList map { case (moves, index) =>
-      val clockOffset = startColor.fold(0, 1)
+      val clockOffset = startSGPlayer.fold(0, 1)
       chessPgn.Turn(
         number = index + from,
-        white = moves.headOption filter (".." !=) map { san =>
+        p1 = moves.headOption filter (".." !=) map { san =>
           chessPgn.Move(
             san = san,
             secondsLeft = clocks lift (index * 2 - clockOffset) map (_.roundSeconds)
           )
         },
-        black = moves lift 1 map { san =>
+        p2 = moves lift 1 map { san =>
           chessPgn.Move(
             san = san,
             secondsLeft = clocks lift (index * 2 + 1 - clockOffset) map (_.roundSeconds)
@@ -291,6 +291,6 @@ object PgnDump {
   }
 
   def result(game: Game, draughtsResult: Boolean) =
-    if (game.finished) Color.showResult(game.winnerColor, draughtsResult)
+    if (game.finished) SGPlayer.showResult(game.winnerSGPlayer, draughtsResult)
     else "*"
 }
