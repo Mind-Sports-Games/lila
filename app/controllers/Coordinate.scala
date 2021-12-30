@@ -38,7 +38,7 @@ final class Coordinate(env: Env) extends LilaController(env) {
           value =>
             env.pref.api.setPref(
               me,
-              (p: lila.pref.Pref) => p.copy(coordSGPlayer = value)
+              (p: lila.pref.Pref) => p.copy(coordColor = value)
             ) inject Ok(())
         )
     }
