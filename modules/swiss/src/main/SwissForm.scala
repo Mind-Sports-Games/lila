@@ -24,7 +24,6 @@ final class SwissForm(implicit mode: Mode) {
           "limit"     -> number.verifying(clockLimits.contains _),
           "increment" -> number(min = 0, max = 120)
         )(ClockConfig.apply)(ClockConfig.unapply)
-          .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt"          -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
         "variant"           -> optional(nonEmptyText.verifying(v => Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined)),
         "rated"             -> optional(boolean),
