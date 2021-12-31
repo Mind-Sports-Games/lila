@@ -96,7 +96,6 @@ final class TournamentForm {
         "description"      -> optional(cleanNonEmptyText),
         "hasChat"          -> optional(boolean)
       )(TournamentSetup.apply)(TournamentSetup.unapply)
-        .verifying("Invalid clock", _.validClock)
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
         .verifying("Increase tournament duration, or decrease game clock", _.sufficientDuration)
         .verifying("Reduce tournament duration, or increase game clock", _.excessiveDuration)
@@ -170,8 +169,6 @@ private[tournament] case class TournamentSetup(
     description: Option[String],
     hasChat: Option[Boolean]
 ) {
-
-  def validClock = (clockTime + clockIncrement) > 0
 
   def realMode =
     if (realPosition.isDefined) Mode.Casual
