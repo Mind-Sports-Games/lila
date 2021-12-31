@@ -4,8 +4,34 @@ import reactivemongo.api.bson._
 
 import lila.db.BSON
 import lila.db.dsl._
+import play.api.libs.json._
+import lila.pref.PieceSet
+import scala.util.{ Success } 
+
 
 private object PrefHandlers {
+
+  implicit private[pref] val pieceSetBSONHandler = new BSON[PieceSet] {
+    
+    def reads(r: BSON.Reader) = new PieceSet(r.str("name"), r.int("gameFamily"))
+
+    def writes(w: BSON.Writer, p: PieceSet) =
+      $doc( 
+          "name" -> p.name,
+          "gameFamily" -> p.gameFamily
+      )
+  }
+
+  implicit private[pref] val themeBSONHandler = new BSON[Theme] {
+    
+    def reads(r: BSON.Reader) = Theme.apply(r.str("name"), r.int("gameFamily"))
+
+    def writes(w: BSON.Writer, t: Theme) =
+      $doc( 
+          "name" -> t.name,
+          "gameFamily" -> t.gameFamily
+      )
+  }
 
   implicit val prefBSONHandler = new BSON[Pref] {
 
@@ -15,8 +41,8 @@ private object PrefHandlers {
         bg = r.getD("bg", Pref.default.bg),
         bgImg = r.strO("bgImg"),
         is3d = r.getD("is3d", Pref.default.is3d),
-        theme = r.getD("theme", Pref.default.theme),
-        pieceSet = r.getD("pieceSet", Pref.default.pieceSet),
+        theme = r.getsO[lila.pref.Theme]("theme") getOrElse Pref.default.theme,
+        pieceSet = r.getsO[lila.pref.PieceSet]("pieceSet") getOrElse Pref.default.pieceSet,
         theme3d = r.getD("theme3d", Pref.default.theme3d),
         pieceSet3d = r.getD("pieceSet3d", Pref.default.pieceSet3d),
         soundSet = r.getD("soundSet", Pref.default.soundSet),
@@ -60,8 +86,8 @@ private object PrefHandlers {
         "bg"            -> o.bg,
         "bgImg"         -> o.bgImg,
         "is3d"          -> o.is3d,
-        "theme"         -> o.theme,
-        "pieceSet"      -> o.pieceSet,
+        "theme"         -> w.listO(o.theme),
+        "pieceSet"      -> w.listO(o.pieceSet),
         "theme3d"       -> o.theme3d,
         "pieceSet3d"    -> o.pieceSet3d,
         "soundSet"      -> SoundSet.name2key(o.soundSet),

@@ -37,7 +37,7 @@ case class AnaDrop(
                 dests = Some(movable ?? Game.Chess(game).situation.destinations),
                 opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? FullOpeningDB.findByFen(variant.gameLogic, fen),
                 drops = if (movable) Game.Chess(game).situation.drops else Some(Nil),
-                crazyData = game.situation.board.crazyData
+                pocketData = Game.Chess(game).situation.board.pocketData
               )
             }
         }
@@ -51,9 +51,9 @@ object AnaDrop {
   def parse(o: JsObject) =
     for {
       d    <- o obj "d"
-      role <- d str "role" flatMap Role.allByName(GameLogic.Chess()).get
-      pos  <- d str "pos" flatMap {pos => Pos.fromKey(GameLogic.Chess(), pos)}
       variant = Variant.orDefault(GameLogic.Chess(), ~d.str("variant"))
+      role <- d str "role" flatMap Role.allByName(GameLogic.Chess(), variant.gameFamily).get
+      pos  <- d str "pos" flatMap {pos => Pos.fromKey(GameLogic.Chess(), pos)}
       fen  <- d str "fen" map {fen => FEN.apply(GameLogic.Chess(), fen)}
       path <- d str "path"
     } yield AnaDrop(

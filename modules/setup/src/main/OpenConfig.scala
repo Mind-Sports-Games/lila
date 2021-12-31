@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ Clock, GameFamily }
+import strategygames.{ Clock, GameFamily, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.FromPosition
@@ -10,13 +10,13 @@ import lila.rating.PerfType
 
 final case class OpenConfig(
     name: Option[String],
-    variant: strategygames.variant.Variant,
+    variant: Variant,
     clock: Option[Clock.Config],
     rated: Boolean,
     position: Option[FEN] = None
 ) {
 
-  def perfType: Option[PerfType] = PerfPicker.perfType(strategygames.Speed(clock), variant, none)
+  def perfType: Option[PerfType] = PerfPicker.perfType(Speed(clock), variant, none)
 
   def validFen = ApiConfig.validFen(variant, position)
 
@@ -34,7 +34,7 @@ object OpenConfig {
       rated: Boolean,
       pos: Option[String]
   ) = {
-    val variant = strategygames.variant.Variant.orDefault(~v)
+    val variant = Variant.orDefault(~v)
     new OpenConfig(
       name = n.map(_.trim).filter(_.nonEmpty),
       variant = variant,

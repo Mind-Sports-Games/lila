@@ -267,6 +267,20 @@ export default class Setup {
               break;
           }
           break;
+        case '3':
+          switch (variantId[1]) {
+            case '1':
+              key = 'shogi';
+              break;
+          }
+          break;
+        case '4':
+          switch (variantId[1]) {
+            case '2':
+              key = 'xiangqi';
+              break;
+          }
+          break;
       }
       const $selected = $ratings
         .hide()

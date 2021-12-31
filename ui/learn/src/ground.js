@@ -47,7 +47,7 @@ module.exports = {
         duration: 200,
       },
       disableContextMenu: true,
-      geometry: opts.geometry,
+      dimensions: opts.dimensions,
       variant: opts.variant,
       chess960: opts.chess960,
     });

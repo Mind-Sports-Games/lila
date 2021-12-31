@@ -3,8 +3,7 @@ package lila.study
 import strategygames.format.pgn.{ Glyph, Glyphs, Tag, Tags }
 import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.chess.variant.Crazyhouse
-import strategygames.{ Centis, Color, GameLogic, Pos, PromotableRole, Role }
+import strategygames.{ Centis, Color, GameFamily, GameLogic, Pocket, PocketData, Pockets, Pos, PromotableRole, Role }
 import strategygames.chess.{ Pos => ChessPos }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
@@ -56,17 +55,17 @@ object BSONHandlers {
   }
 
   implicit val PromotableRoleHandler = tryHandler[PromotableRole](
-    { case BSONString(v) => v.headOption flatMap Role.allPromotableByForsyth(GameLogic.Chess()).get toTry s"No such role: $v" },
+    { case BSONString(v) => v.headOption flatMap Role.allPromotableByForsyth(GameLogic.Chess(), GameFamily.Chess()).get toTry s"No such role: $v" },
     x => BSONString(x.forsyth.toString)
   )
 
   implicit val RoleHandler = tryHandler[Role](
-    { case BSONString(v) => v.headOption flatMap Role.allByForsyth(GameLogic.Chess()).get toTry s"No such role: $v" },
+    { case BSONString(v) => v.headOption flatMap Role.allByForsyth(GameLogic.Chess(), GameFamily.Chess()).get toTry s"No such role: $v" },
     x => BSONString(x.forsyth.toString)
   )
 
   implicit val UciHandler = tryHandler[Uci](
-    { case BSONString(v) => Uci(GameLogic.Chess(), v) toTry s"Bad UCI: $v" },
+    { case BSONString(v) => Uci(GameLogic.Chess(), GameFamily.Chess(), v) toTry s"Bad UCI: $v" },
     x => BSONString(x.uci)
   )
 
@@ -117,19 +116,20 @@ object BSONHandlers {
 
   implicit val GamebookBSONHandler = Macros.handler[Gamebook]
 
-  implicit private def CrazyDataBSONHandler: BSON[Crazyhouse.Data] =
-    new BSON[Crazyhouse.Data] {
-      private def writePocket(p: Crazyhouse.Pocket) = p.roles.map(_.forsyth).mkString
-      private def readPocket(p: String)             = Crazyhouse.Pocket(p.view.flatMap(strategygames.chess.Role.forsyth).toList)
+  implicit private def CrazyDataBSONHandler: BSON[PocketData] =
+    new BSON[PocketData] {
+      private def writePocket(p: Pocket) = p.roles.map(_.forsyth).mkString
+      //will need to be updated for different GameFamilys
+      private def readPocket(p: String)  = Pocket(p.view.flatMap(r => Role.forsyth(GameLogic.Chess(), r)).toList)
       def reads(r: Reader) =
-        Crazyhouse.Data(
+        PocketData.Chess(strategygames.chess.PocketData(
           promoted = r.getsD[strategygames.chess.Pos]("o").toSet,
-          pockets = Crazyhouse.Pockets(
+          pockets = Pockets(
             white = readPocket(r.strD("w")),
             black = readPocket(r.strD("b"))
           )
-        )
-      def writes(w: Writer, s: Crazyhouse.Data) =
+        ))
+      def writes(w: Writer, s: PocketData) =
         $doc(
           "o" -> w.listO(s.promoted.toList),
           "w" -> w.strO(writePocket(s.pockets.white)),
@@ -178,7 +178,7 @@ object BSONHandlers {
       glyphs         = doc.getAsOpt[Glyphs](F.glyphs) getOrElse Glyphs.empty
       score          = doc.getAsOpt[Score](F.score)
       clock          = doc.getAsOpt[Centis](F.clock)
-      crazy          = doc.getAsOpt[Crazyhouse.Data](F.crazy)
+      crazy          = doc.getAsOpt[PocketData](F.crazy)
       forceVariation = ~doc.getAsOpt[Boolean](F.forceVariation)
     } yield Node(
       id,
@@ -213,7 +213,7 @@ object BSONHandlers {
       glyphs         -> n.glyphs.nonEmpty,
       score          -> n.score,
       clock          -> n.clock,
-      crazy          -> n.crazyData,
+      crazy          -> n.pocketData,
       forceVariation -> w.boolO(n.forceVariation),
       order -> {
         (n.children.nodes.sizeIs > 1) option n.children.nodes.map(_.id)
@@ -237,7 +237,7 @@ object BSONHandlers {
         glyphs = r.getO[Glyphs](glyphs) | Glyphs.empty,
         score = r.getO[Score](score),
         clock = r.getO[Centis](clock),
-        crazyData = r.getO[Crazyhouse.Data](crazy),
+        pocketData = r.getO[PocketData](crazy),
         children = StudyFlatTree.reader.rootChildren(fullReader.doc)
       )
     }
@@ -253,7 +253,7 @@ object BSONHandlers {
           glyphs   -> r.glyphs.nonEmpty,
           score    -> r.score,
           clock    -> r.clock,
-          crazy    -> r.crazyData
+          crazy    -> r.pocketData
         )
       }
     )

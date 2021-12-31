@@ -44,7 +44,7 @@ final class Page(
           views.html.site.variant.home(doc, resolver)
         },
         api = _ =>
-          Ok(JsArray((Variant.all(GameLogic.Chess()) ::: Variant.all(GameLogic.Draughts())).map { v =>
+          Ok(JsArray((Variant.all).map { v =>
             Json.obj(
               "id"   -> v.id,
               "key"  -> v.key,
@@ -57,8 +57,7 @@ final class Page(
   def variant(key: String) =
     Open { implicit ctx =>
       (for {
-        //TODO push this function into strategygames
-        variant  <- (Variant.all(GameLogic.Chess()) ::: Variant.all(GameLogic.Draughts())).map{
+        variant  <- (Variant.all).map{
           v => (v.key, v)
         }.toMap get key
         perfType <- lila.rating.PerfType byVariant variant

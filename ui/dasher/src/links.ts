@@ -62,7 +62,7 @@ export default function (ctrl: DasherCtrl): VNode {
 
   const background = h('a.sub', modeCfg(ctrl, 'background'), noarg('background'));
 
-  const board = h('a.sub', modeCfg(ctrl, 'board'), noarg('boardGeometry'));
+  //const board = h('a.sub', modeCfg(ctrl, 'board'), noarg('boardGeometry'));
 
   const theme = h('a.sub', modeCfg(ctrl, 'theme'), noarg('boardTheme'));
 

@@ -19,7 +19,6 @@ import strategygames.{
   Status,
   White
 }
-import strategygames.format.Uci
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 
@@ -243,8 +242,8 @@ case class Game(
     }
 
     val events = moveOrDrop.fold(
-      Event.Move(_, game.situation, state, clockEvent, updated.board.crazyData),
-      Event.Drop(_, game.situation, state, clockEvent, updated.board.crazyData)
+      Event.Move(_, game.situation, state, clockEvent, updated.board.pocketData),
+      Event.Drop(_, game.situation, state, clockEvent, updated.board.pocketData)
     ) :: {
       // abstraction leak, I know.
       if (updated.board.variant.gameLogic == GameLogic.Draughts())
@@ -268,8 +267,8 @@ case class Game(
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
-      case Uci.ChessDrop(ChessUci.Drop(target, _)) => s"$target$target"
-      case m: Uci.Move                         => m.keys
+      case d: Uci.Drop => s"${d.role}${d.role}"
+      case m: Uci.Move => m.keys
       case _ => sys.error("Type Error")
     }
 
@@ -341,7 +340,8 @@ case class Game(
 
   def alarmable = hasCorrespondenceClock && playable && nonAi
 
-  def continuable = status != Status.Mate && status != Status.Stalemate
+  def continuable =
+    status != Status.Mate && status != Status.PerpetualCheck && status != Status.Stalemate
 
   def aiLevel: Option[Int] = players find (_.isAi) flatMap (_.aiLevel)
 
@@ -815,7 +815,7 @@ object Game {
     val analysed          = "an"
     val lib               = "l"
     val variant           = "v"
-    val crazyData         = "chd"
+    val pocketData         = "chd"
     val bookmarks         = "bm"
     val createdAt         = "ca"
     val movedAt           = "ua" // ua = updatedAt (bc)

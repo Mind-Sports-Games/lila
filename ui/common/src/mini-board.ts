@@ -29,12 +29,14 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?
         })
       );
     } else {
+      const [_, myColor, __] = $el.data('state').split(',');
       domData.set(
         node,
         'chessground',
         window.Chessground(node, {
           orientation,
           coordinates: false,
+          myColor: myColor,
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
           fen,
@@ -43,6 +45,12 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?
             enabled: false,
             visible: false,
           },
+          dimensions: $el.hasClass('variant-shogi')
+            ? { width: 9, height: 9 }
+            : $el.hasClass('variant-xiangqi')
+            ? { width: 9, height: 10 }
+            : { width: 8, height: 8 },
+          variant: $el.hasClass('variant-shogi') ? 'shogi' : $el.hasClass('variant-xiangqi') ? 'xiangqi' : 'standard',
         })
       );
     }

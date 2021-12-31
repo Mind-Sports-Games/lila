@@ -30,11 +30,13 @@ object layout {
       raw {
         s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
-    def pieceSprite(implicit ctx: Context): Frag = pieceSprite(ctx.currentPieceSet)
+    def pieceSprite(implicit ctx: Context): Frag = {
+      ctx.currentPieceSet.map(ps => pieceSprite(ps))
+    }
     def pieceSprite(ps: lila.pref.PieceSet): Frag =
       link(
-        id := "piece-sprite",
-        href := assetUrl(s"piece-css/$ps.css"),
+        id := s"piece-sprite-${ps.gameFamilyName}",
+        href := assetUrl(s"piece-css/${ps.gameFamilyName}-${ps.name}.css"),
         rel := "stylesheet"
       )
   }
@@ -137,7 +139,7 @@ object layout {
 
   private def current2dTheme(implicit ctx: Context) =
     if (ctx.pref.is3d && ctx.pref.theme == "horsey") lila.pref.Theme.default
-    else ctx.currentTheme
+    else ctx.currentTheme.map(t => t.cssClass).mkString(" ")
 
   private def botImage =
     img(
@@ -247,7 +249,7 @@ object layout {
         ),
         st.body(
           cls := List(
-            s"${ctx.currentBg} ${current2dTheme.cssClass} ${ctx.currentTheme3d.cssClass} ${ctx.currentPieceSet3d.toString} coords-${ctx.pref.coordsClass}" -> true,
+            s"${ctx.currentBg} ${current2dTheme} ${ctx.currentTheme3d.cssClass} ${ctx.currentPieceSet3d.toString} coords-${ctx.pref.coordsClass}" -> true,
             "dark-board"                                                                                                                                   -> (ctx.pref.bg == lila.pref.Pref.Bg.DARKBOARD),
             "piece-letter"                                                                                                                                 -> ctx.pref.pieceNotationIsLetter,
             "zen"                                                                                                                                          -> ctx.pref.isZen,

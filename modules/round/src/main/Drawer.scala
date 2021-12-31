@@ -34,7 +34,7 @@ final private[round] class Drawer(
 
   def yes(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
     pov match {
-      case pov if pov.game.history.threefoldRepetition =>
+      case pov if pov.game.situation.threefoldRepetition =>
         finisher.other(pov.game, _.Draw, None)
       case pov if pov.opponent.isOfferingDraw =>
         finisher.other(pov.game, _.Draw, None, Some(trans.drawOfferAccepted.txt()))
@@ -68,7 +68,7 @@ final private[round] class Drawer(
   }
 
   def claim(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
-    (pov.game.playable && pov.game.history.threefoldRepetition) ?? finisher.other(
+    (pov.game.playable && pov.game.situation.threefoldRepetition) ?? finisher.other(
       pov.game,
       _.Draw,
       None

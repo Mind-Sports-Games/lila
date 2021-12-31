@@ -273,6 +273,18 @@ object TournamentShield {
           iconChar = 'K'
         )
 
+    case object Shogi
+        extends Category(
+          of = Right(Variant.FairySF(strategygames.fairysf.variant.Shogi)),
+          iconChar = 's'
+        )
+
+    case object Xiangqi
+        extends Category(
+          of = Right(Variant.FairySF(strategygames.fairysf.variant.Xiangqi)),
+          iconChar = 't'
+        )
+
     val all: List[Category] = List(
       Bullet,
       SuperBlitz,
@@ -297,7 +309,9 @@ object TournamentShield {
       Breakthrough,
       Russian,
       Brazilian,
-      Pool
+      Pool,
+      Shogi,
+      Xiangqi
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

@@ -55,6 +55,7 @@ object ofPlayer {
                           views.html.board.bits.mini(
                             fen = puzzle.fenAfterInitialMove,
                             color = puzzle.color,
+                            variantKey = "standard",
                             lastMove = puzzle.line.head.uci
                           )(
                             a(

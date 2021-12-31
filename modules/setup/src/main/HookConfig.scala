@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ GameFamily, GameLogic, Mode }
+import strategygames.{ GameFamily, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import lila.lobby.Color
 import lila.lobby.{ Hook, Seek }
@@ -32,7 +32,7 @@ case class HookConfig(
 
   private def perfType = lila.game.PerfPicker.perfType(makeSpeed, variant, makeDaysPerTurn)
 
-  def makeSpeed = strategygames.Speed(makeClock)
+  def makeSpeed = Speed(makeClock)
 
   def fixColor =
     copy(

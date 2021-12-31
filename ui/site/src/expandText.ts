@@ -180,7 +180,7 @@ playstrategy.load.then(() => {
   function configureSrc(url: string) {
     if (url.includes('://')) return url; // youtube, img, etc
     const parsed = new URL(url, window.location.href);
-    const theme = themes.find(theme => document.body.classList.contains(theme));
+    const theme = themes.find(theme => document.body.classList.contains(`chess-${theme}`));
     if (theme) parsed.searchParams.append('theme', theme);
     parsed.searchParams.append('bg', document.body.getAttribute('data-theme')!);
     return parsed.href;

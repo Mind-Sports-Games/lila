@@ -3,6 +3,8 @@
   "include": ["src"],
   "exclude": [],
   "compilerOptions": {
-    "outDir": "."
+    "outDir": ".",
+    "types": ["jest", "cash"],
+    "esModuleInterop": true
   }
 }

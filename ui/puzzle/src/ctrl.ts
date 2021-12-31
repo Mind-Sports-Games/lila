@@ -139,7 +139,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       },
       check: !!node.check,
       lastMove: uciToLastMove(node.uci),
-      geometry: vm.cgConfig.geometry,
+      dimensions: vm.cgConfig.dimensions,
       variant: vm.cgConfig.variant,
       chess960: vm.cgConfig.chess960,
     };
@@ -311,6 +311,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
         name: 'Standard',
         key: 'standard',
         lib: 0,
+        boardSize: { width: 8, height: 8 },
       },
       standardMaterial: true,
       possible: true,

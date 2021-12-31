@@ -21,12 +21,10 @@ object mini {
   def extraClasses(variant: Variant) = {
     val gameLogic = variant.gameLogic.name.toLowerCase()
     variant match {
-      case Variant.Chess(_) => 
+      case Variant.Draughts(v) =>
+        s"${gameLogic} is${v.boardSize.key}"
+      case _ => 
         s"${gameLogic}"
-      case Variant.Draughts(v) => {
-        val boardSize = v.boardSize
-        s"${gameLogic} is${boardSize.key}"
-      }
     }
   }
 
@@ -40,9 +38,10 @@ object mini {
     val isLive = game.isBeingPlayed
     val tag    = if (withLink) a else span
     val extra  = extraClasses(game.variant)
+    val variant = game.variant.key
     tag(
       href := withLink.option(gameLink(game, pov.color, ownerLink, tv)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init ${extra} is2d",
+      cls := s"mini-game mini-game-${game.id} mini-game--init ${extra} ${variant} variant-${variant} is2d",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(
@@ -56,9 +55,10 @@ object mini {
     val game   = pov.game
     val isLive = game.isBeingPlayed
     val extra  = extraClasses(game.variant)
+    val variant = game.variant.key
     a(
       href := (if (tv) routes.Tv.index else routes.Round.watcher(pov.gameId, pov.color.name)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive ?? "mini-game--live"} ${extra}",
+      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive ?? "mini-game--live"} ${extra} ${variant} variant-${variant}",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(
@@ -70,12 +70,10 @@ object mini {
 
   def renderState(pov: Pov) =
     pov.game.variant match {
-      case Variant.Chess(_) => 
+      case Variant.Chess(_) | Variant.FairySF(_) =>
         dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
-      case Variant.Draughts(v) => {
-        val boardSize = v.boardSize
-        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)}|${boardSize.width}x${boardSize.height}|${pov.color.name}|${~pov.game.lastMoveKeys}"
-      }
+      case Variant.Draughts(v) =>
+        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)}|${v.boardSize.width}x${v.boardSize.height}|${pov.color.name}|${~pov.game.lastMoveKeys}"
     }
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =

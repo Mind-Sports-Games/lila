@@ -1,7 +1,7 @@
 package lila.setup
 
 import strategygames.Color.{ Black, White }
-import strategygames.{ Game => StratGame, GameFamily, GameLogic }
+import strategygames.{ GameFamily, GameLogic, Mode, Speed }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import lila.game.{ Game, Player, Pov, Source }
@@ -28,7 +28,7 @@ case class AiConfig(
   def game(user: Option[User]) =
     fenGame { chessGame =>
       val perfPicker = lila.game.PerfPicker.mainOrDefault(
-        strategygames.Speed(chessGame.clock.map(_.config)),
+        Speed(chessGame.clock.map(_.config)),
         chessGame.situation.board.variant,
         makeDaysPerTurn
       )
@@ -43,7 +43,7 @@ case class AiConfig(
             Player.make(Black, level.some),
             Player.make(Black, user, perfPicker)
           ),
-          mode = strategygames.Mode.Casual,
+          mode = Mode.Casual,
           source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None

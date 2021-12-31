@@ -70,7 +70,9 @@ object list {
               userTopPerf(leaderboards.frysk,         PerfType.orDefault("frysk")),
               userTopPerf(leaderboards.russian,       PerfType.orDefault("russian")),
               userTopPerf(leaderboards.brazilian,     PerfType.orDefault("brazilian")),
-              userTopPerf(leaderboards.pool,          PerfType.orDefault("pool"))
+              userTopPerf(leaderboards.pool,          PerfType.orDefault("pool")),
+              userTopPerf(leaderboards.shogi,         PerfType.orDefault("shogi")),
+              userTopPerf(leaderboards.xiangqi,       PerfType.orDefault("xiangqi"))
             )
           )
         )

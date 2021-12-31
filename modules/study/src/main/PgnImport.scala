@@ -43,7 +43,7 @@ object PgnImport {
               comments = comments,
               glyphs = Glyphs.empty,
               clock = parsedPgn.tags.clockConfig.map(_.limit),
-              crazyData = replay.setup.situation.board.crazyData,
+              pocketData = replay.setup.situation.board.pocketData,
               children = Node.Children {
                 val variations = makeVariations(parsedPgn.sans.value, replay.setup, annotator)
                 makeNode(
@@ -128,7 +128,7 @@ object PgnImport {
             _ => none, // illegal move; stop here.
             moveOrDrop => {
               val game   = prev.apply(moveOrDrop)
-              val uci    = moveOrDrop.fold(_.toUci, d => Uci.wrap(d.toUci))
+              val uci    = moveOrDrop.fold(_.toUci, _.toUci)
               val sanStr = moveOrDrop.fold(m => Dumper.apply(lib, m), d => Dumper.apply(lib, d))
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
@@ -141,7 +141,7 @@ object PgnImport {
                     shapes = shapes,
                     comments = comments,
                     glyphs = san.metas.glyphs,
-                    crazyData = game.situation.board.crazyData,
+                    pocketData = game.situation.board.pocketData,
                     clock = clock,
                     children = removeDuplicatedChildrenFirstNode {
                       val variations = makeVariations(rest, game, annotator)

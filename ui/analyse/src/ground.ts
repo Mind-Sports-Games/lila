@@ -43,7 +43,8 @@ export function promote(ground: CgApi, key: Key, role: cg.Role) {
 export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
   const d = ctrl.data,
     pref = d.pref,
-    opts = ctrl.makeCgOpts();
+    opts = ctrl.makeCgOpts(),
+    variantKey = d.game.variant.key as cg.Variant;
   const config = {
     turnColor: opts.turnColor,
     fen: opts.fen,
@@ -89,10 +90,9 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       duration: pref.animationDuration,
     },
     disableContextMenu: true,
-    dimensions: { width: 8, height: 8 },
-    geometry: cg.Geometry.dim8x8,
-    variant: ctrl.data.game.variant.key as cg.Variant,
-    chess960: ctrl.data.game.variant.key == 'chess960',
+    dimensions: d.game.variant.boardSize,
+    variant: variantKey,
+    chess960: variantKey == 'chess960',
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
   return config;

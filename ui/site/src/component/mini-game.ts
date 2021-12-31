@@ -45,6 +45,7 @@ export const init = (node: HTMLElement) => {
         config = {
           coordinates: false,
           viewOnly: true,
+          myColor: orientation,
           resizable: false,
           fen,
           orientation,
@@ -53,6 +54,12 @@ export const init = (node: HTMLElement) => {
             enabled: false,
             visible: false,
           },
+          dimensions: $el.hasClass('variant-shogi')
+            ? { width: 9, height: 9 }
+            : $el.hasClass('variant-xiangqi')
+            ? { width: 9, height: 10 }
+            : { width: 8, height: 8 },
+          variant: $el.hasClass('variant-shogi') ? 'shogi' : $el.hasClass('variant-xiangqi') ? 'xiangqi' : 'standard',
         },
         $cg = $el.find('.cg-wrap'),
         turnColor = fenColor(fen);

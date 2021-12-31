@@ -92,7 +92,9 @@ final class JsonView(
                 "autoQueen" -> (if (pov.game.variant == strategygames.chess.variant.Antichess) Pref.AutoQueen.NEVER
                                 else pref.autoQueen),
                 "clockTenths" -> pref.clockTenths,
-                "moveEvent"   -> pref.moveEvent
+                "moveEvent"   -> pref.moveEvent,
+                "pieceSet" -> pref.pieceSet.map( p => Json.obj( "name" -> p.name,
+                                                                "gameFamily" -> p.gameFamilyName))
               )
               .add("is3d" -> pref.is3d)
               .add("clockBar" -> pref.clockBar)
@@ -120,9 +122,10 @@ final class JsonView(
           .add("correspondence" -> pov.game.correspondenceClock)
           .add("takebackable" -> takebackable)
           .add("moretimeable" -> moretimeable)
-          .add("crazyhouse" -> pov.game.board.crazyData)
+          .add("crazyhouse" -> pov.game.board.pocketData)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
+          .add("possibleDropsByRole" -> possibleDropsByrole(pov))
           .add("expiration" -> pov.game.expirable.option {
             Json.obj(
               "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
@@ -190,7 +193,9 @@ final class JsonView(
                 "coords"            -> pref.coords,
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
-                "clockTenths"       -> pref.clockTenths
+                "clockTenths"       -> pref.clockTenths,
+                "pieceSet" -> pref.pieceSet.map( p => Json.obj( "name" -> p.name,
+                                                                "gameFamily" -> p.gameFamilyName))
               )
               .add("is3d" -> pref.is3d)
               .add("clockBar" -> pref.clockBar)
@@ -229,7 +234,7 @@ final class JsonView(
             "lib"        -> game.variant.gameLogic.id,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
-            "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
+            "initialFen" -> (initialFen | fen),
             "fen"        -> fen,
             "turns"      -> game.turns,
             "player"     -> game.turnColor.name,
@@ -250,7 +255,9 @@ final class JsonView(
           .obj(
             "animationDuration" -> animationMillis(pov, pref),
             "coords"            -> pref.coords,
-            "moveEvent"         -> pref.moveEvent
+            "moveEvent"         -> pref.moveEvent,
+            "pieceSet" -> pref.pieceSet.map( p => Json.obj( "name" -> p.name,
+                                                                "gameFamily" -> p.gameFamilyName))
           )
           .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
           .add("is3d" -> pref.is3d)
@@ -303,8 +310,20 @@ final class JsonView(
             )
           }
         }
+      case (Situation.FairySF(_), Variant.FairySF(_)) => (pov.game playableBy pov.player) option
+        Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
+
+  private def possibleDropsByrole(pov: Pov): Option[JsValue] = 
+   (pov.game.situation, pov.game.variant) match {
+      case (Situation.Chess(_), Variant.Chess(_)) => None
+      case (Situation.FairySF(_), Variant.FairySF(_)) => (pov.game playableBy pov.player) option
+        Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Draughts(_), Variant.Draughts(_)) => None
+      case _ => sys.error("Mismatch of types for possibleDropsByrole")
+    }
+
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
     (pov.game playableBy pov.player) ?? {
