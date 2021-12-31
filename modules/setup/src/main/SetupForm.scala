@@ -120,7 +120,6 @@ object SetupForm {
         "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
         "increment" -> increment
       )(strategygames.Clock.Config.apply)(strategygames.Clock.Config.unapply)
-        .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
 
     lazy val clock = "clock" -> optional(clockMapping)
 
