@@ -59,7 +59,6 @@ object SetupForm {
         "fen"        -> fenField,
         "microMatch" -> boolean
       )(FriendConfig.from)(_.>>)
-        .verifying("Invalid clock", _.validClock)
         .verifying("Invalid speed", _.validSpeed(ctx.me.exists(_.isBot)))
         .verifying("invalidFen", _.validFen)
     )
@@ -79,7 +78,6 @@ object SetupForm {
         "ratingRange" -> optional(ratingRange),
         "color"       -> color
       )(HookConfig.from)(_.>>)
-        .verifying("Invalid clock", _.validClock)
         .verifying("Can't create rated unlimited in lobby", _.noRatedUnlimited)
     )
 
@@ -106,7 +104,6 @@ object SetupForm {
         ratingRange = g.fold(RatingRange.default)(RatingRange.orDefault)
       )
     )(_ => none)
-      .verifying("Invalid clock", _.validClock)
       .verifying(
         "Invalid time control",
         hook => hook.makeClock ?? lila.game.Game.isBoardCompatible
