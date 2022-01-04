@@ -312,7 +312,8 @@ object SwissJson {
     Json
       .obj(
         "id"          -> b.game.id,
-        "gameLogic"     -> b.game.variant.gameLogic.name.toLowerCase(),
+        "gameLogic"   -> b.game.variant.gameLogic.name.toLowerCase(),
+        "variantKey"  -> b.game.variant.key,
         "fen"         -> Forsyth.boardAndPlayer(b.game.variant.gameLogic, b.game.situation),
         "lastMove"    -> ~b.game.lastMoveKeys,
         "orientation" -> b.game.naturalOrientation.name,

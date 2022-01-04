@@ -3,6 +3,7 @@ package lila.pref
 import play.api.mvc.RequestHeader
 import play.api.libs.json._
 import lila.pref.JsonView.pieceSetsRead
+import lila.pref.JsonView.themesRead
 
 object RequestPref {
 
@@ -27,9 +28,15 @@ object RequestPref {
                   .fold(ps)(v => PieceSet.updatePieceSet(ps, v))
     }}
 
+    def updateSessionWithThemeParam(name: String): Option[List[Theme]] = {
+      req.session.get(name)
+        .map(Json.parse)
+        .flatMap(_.validate(themesRead).asOpt)
+    }
+
     default.copy(
       bg = paramOrSession("bg").flatMap(Pref.Bg.fromString.get) | default.bg,
-      theme = paramOrSession("theme") | default.theme,
+      theme = updateSessionWithThemeParam("theme") | default.theme,
       theme3d = paramOrSession("theme3d") | default.theme3d,
       pieceSet = updateSessionWithParam("pieceSet") | default.pieceSet,
       pieceSet3d = paramOrSession("pieceSet3d") | default.pieceSet3d,

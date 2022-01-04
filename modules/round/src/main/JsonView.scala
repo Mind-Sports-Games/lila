@@ -193,7 +193,9 @@ final class JsonView(
                 "coords"            -> pref.coords,
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
-                "clockTenths"       -> pref.clockTenths
+                "clockTenths"       -> pref.clockTenths,
+                "pieceSet" -> pref.pieceSet.map( p => Json.obj( "name" -> p.name,
+                                                                "gameFamily" -> p.gameFamilyName))
               )
               .add("is3d" -> pref.is3d)
               .add("clockBar" -> pref.clockBar)
@@ -253,7 +255,9 @@ final class JsonView(
           .obj(
             "animationDuration" -> animationMillis(pov, pref),
             "coords"            -> pref.coords,
-            "moveEvent"         -> pref.moveEvent
+            "moveEvent"         -> pref.moveEvent,
+            "pieceSet" -> pref.pieceSet.map( p => Json.obj( "name" -> p.name,
+                                                                "gameFamily" -> p.gameFamilyName))
           )
           .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
           .add("is3d" -> pref.is3d)

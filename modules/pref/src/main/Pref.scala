@@ -7,7 +7,7 @@ case class Pref(
     bg: Int,
     bgImg: Option[String],
     is3d: Boolean,
-    theme: String,
+    theme: List[Theme],
     pieceSet: List[PieceSet],
     theme3d: String,
     pieceSet3d: String,
@@ -50,7 +50,7 @@ case class Pref(
 
   def id = _id
 
-  def realTheme      = Theme(theme)
+  def realTheme      = theme
   def realPieceSet   = pieceSet
   def realTheme3d    = Theme3d(theme3d)
   def realPieceSet3d = PieceSet3d(pieceSet3d)
@@ -68,14 +68,12 @@ case class Pref(
     name match {
       case "bg"    => Pref.Bg.fromString.get(value).map { bg => copy(bg = bg) }
       case "bgImg" => copy(bgImg = value.some).some
-      case "theme" =>
-        Theme.allByName get value map { t =>
-          copy(theme = t.name)
-        }
+      // case "theme" =>
+      //    copy(theme = Theme.updateBoardTheme(theme, value)).some
       case "pieceSet" =>
           copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
-        Theme3d.allByName get value map { t =>
+        Theme3d.allByName(0) get value map { t =>
           copy(theme3d = t.name)
         }
       case "pieceSet3d" =>
@@ -90,6 +88,10 @@ case class Pref(
       case "zen" => copy(zen = if (value == "1") 1 else 0).some
       case _     => none
     }
+
+  def setTheme(value: String, gameFamily: String): Option[Pref] = {
+    copy(theme = Theme.updateBoardTheme(theme, value, gameFamily)).some
+  }
 
   def animationMillis: Int =
     animation match {
@@ -437,7 +439,7 @@ object Pref {
     bg = Bg.LIGHT,
     bgImg = none,
     is3d = false,
-    theme = Theme.default.name,
+    theme = Theme.defaults,
     pieceSet = PieceSet.defaults,
     theme3d = Theme3d.default.name,
     pieceSet3d = PieceSet3d.default.name,
