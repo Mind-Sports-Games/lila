@@ -82,7 +82,7 @@ final class JsonView(
     implicit val lightPovWrites = OWrites[LightPov] { p =>
       Json.obj(
         "id"       -> p.game.id,
-        "sgPlayer" -> p.sgPlayer,
+        "color" -> p.sgPlayer,
         "url"      -> s"/${p.game.id}/${p.sgPlayer.name}",
         "opponent" -> p.opponent
       )

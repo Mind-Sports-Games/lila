@@ -199,7 +199,7 @@ final class JsonView(
             Json
               .obj(
                 "id"     -> pov.gameId,
-                "sgPlayer"  -> pov.sgPlayer.name,
+                "color"  -> pov.sgPlayer.name,
                 "op"     -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
                 "win"    -> score.flatMap(_.isWin),
                 "status" -> pov.game.status.id,
@@ -293,7 +293,7 @@ final class JsonView(
         "gameLogic"     -> game.variant.gameLogic.name.toLowerCase(),
         "fen"         -> Forsyth.boardAndPlayer(game.variant.gameLogic, game.situation),
         "orientation" -> game.naturalOrientation.name,
-        "sgPlayer"       -> game.naturalOrientation.name, // app BC https://github.com/ornicar/lila/issues/7195
+        "color"       -> game.variant.playerNames(game.naturalOrientation), // app BC https://github.com/ornicar/lila/issues/7195
         "lastMove"    -> ~game.lastMoveKeys,
         "p1"       -> ofPlayer(featured.p1, game player P1),
         "p2"       -> ofPlayer(featured.p2, game player P2)

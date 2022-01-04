@@ -35,7 +35,7 @@ final class JsonView(
 
   private def commonPlayerJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
-      .obj("sgPlayer" -> p.sgPlayer.name)
+      .obj("color" -> g.variant.playerNames(p.sgPlayer))
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
       .add("rating" -> p.rating)
       .add("ratingDiff" -> p.ratingDiff)
@@ -73,7 +73,7 @@ final class JsonView(
             }.add("onGame" -> (player.isAi || socket.onGame(player.sgPlayer))),
             "opponent" -> {
               commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json.obj(
-                "sgPlayer" -> opponent.sgPlayer.name,
+                "color" -> pov.game.variant.playerNames(opponent.sgPlayer),
                 "ai"    -> opponent.aiLevel
               )
             }.add("isGone" -> (!opponent.isAi && socket.isGone(opponent.sgPlayer)))
@@ -137,7 +137,7 @@ final class JsonView(
   private def commonWatcherJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
       .obj(
-        "sgPlayer" -> p.sgPlayer.name,
+        "color" -> g.variant.playerNames(p.sgPlayer),
         "name"  -> p.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
@@ -182,10 +182,10 @@ final class JsonView(
               "onGame" -> (opponent.isAi || socket.onGame(opponent.sgPlayer))
             ),
             "captureLength" -> captureLength(pov),
-            "orientation" -> pov.sgPlayer.name,
+            "orientation" -> pov.game.variant.playerNames(pov.sgPlayer),
             "url" -> Json.obj(
-              "socket" -> s"/watch/$gameId/${sgPlayer.name}/v$apiVersion",
-              "round"  -> s"/$gameId/${sgPlayer.name}"
+              "socket" -> s"/watch/$gameId/${game.variant.playerNames(sgPlayer)}/v$apiVersion",
+              "round"  -> s"/$gameId/${game.variant.playerNames(sgPlayer)}"
             ),
             "pref" -> Json
               .obj(
@@ -239,13 +239,13 @@ final class JsonView(
             "status"     -> game.status
           )
           .add("division", division)
-          .add("winner", game.winner.map(_.sgPlayer.name)),
+          .add("winner", game.winner.map(w => game.variant.playerNames(w.sgPlayer))),
         "player" -> Json.obj(
           "id"    -> owner.option(pov.playerId),
-          "sgPlayer" -> sgPlayer.name
+          "color" -> game.variant.playerNames(sgPlayer)
         ),
         "opponent" -> Json.obj(
-          "sgPlayer" -> opponent.sgPlayer.name,
+          "color" -> game.variant.playerNames(opponent.sgPlayer),
           "ai"    -> opponent.aiLevel
         ),
         "orientation" -> orientation.name,
