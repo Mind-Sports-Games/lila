@@ -75,11 +75,11 @@ object widgets {
                   g.winner.map { winner =>
                     frag(
                       (gameEndStatus(g) != "").option(", "),
-                      winner.sgPlayer.fold(trans.p1IsVictorious(), trans.p2IsVictorious())
+                      trans.sgPlayerIsVictorious(g.playerTrans(winner.sgPlayer))
                     )
                   }
                 )
-              else g.turnSGPlayer.fold(trans.p1Plays(), trans.p2Plays())
+              else trans.sgPlayerPlays(g.playerTrans(g.turnSGPlayer))
             }
           ),
           if (g.turns > 0) {

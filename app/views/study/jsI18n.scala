@@ -15,8 +15,8 @@ object jsI18n {
     import trans.study._
     List(
       trans.name,
-      trans.p1,
-      trans.p2,
+      trans.white,
+      trans.black,
       trans.variant,
       trans.clearBoard,
       trans.startPosition,

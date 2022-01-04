@@ -173,24 +173,24 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.PerpetualCheck => trans.perpetualCheck.txt()
       case S.Resign =>
         game.loser match {
-          case Some(p) if p.sgPlayer.p1 => trans.p1Resigned.txt()
-          case _                        => trans.p2Resigned.txt()
+          case Some(p) if p.sgPlayer.p1 => trans.sgPlayerResigned(game.playerTrans(P1)).v
+          case _                        => trans.sgPlayerResigned(game.playerTrans(P2)).v
         }
       case S.UnknownFinish => trans.finished.txt()
       case S.Stalemate     => trans.stalemate.txt()
       case S.Timeout =>
         game.loser match {
-          case Some(p) if p.sgPlayer.p1 => trans.p1LeftTheGame.txt()
-          case Some(_)                  => trans.p2LeftTheGame.txt()
+          case Some(p) if p.sgPlayer.p1 => trans.sgPlayerLeftTheGame(game.playerTrans(P1)).v
+          case Some(_)                  => trans.sgPlayerLeftTheGame(game.playerTrans(P2)).v
           case None                     => trans.draw.txt()
         }
       case S.Draw => trans.draw.txt()
       case S.Outoftime =>
         (game.turnSGPlayer, game.loser) match {
-          case (P1, Some(_)) => trans.p1TimeOut.txt()
-          case (P1, None)    => trans.p1TimeOut.txt() + " • " + trans.draw.txt()
-          case (P2, Some(_)) => trans.p2TimeOut.txt()
-          case (P2, None)    => trans.p2TimeOut.txt() + " • " + trans.draw.txt()
+          case (P1, Some(_)) => trans.sgPlayerTimeOut(game.playerTrans(P1)).v
+          case (P1, None)    => trans.sgPlayerTimeOut(game.playerTrans(P1)).v + " • " + trans.draw.txt()
+          case (P2, Some(_)) => trans.sgPlayerTimeOut(game.playerTrans(P2)).v
+          case (P2, None)    => trans.sgPlayerTimeOut(game.playerTrans(P2)).v + " • " + trans.draw.txt()
         }
       case S.NoStart =>
         val sgPlayer = game.loser.fold(SGPlayer.p1)(_.sgPlayer).name.capitalize

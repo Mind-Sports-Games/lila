@@ -69,8 +69,8 @@ object show {
               pluralize("minute", sim.clock.hostExtraMinutes),
               br,
               trans.hostSGPlayerX(sim.sgPlayer match {
-                case Some("p1") => trans.p1()
-                case Some("p2") => trans.p2()
+                case Some("p1") => trans.white()
+                case Some("p2") => trans.black()
                 case _             => trans.randomSGPlayer()
               }),
               sim.position.flatMap(lila.tournament.Thematic.byFen) map { pos =>

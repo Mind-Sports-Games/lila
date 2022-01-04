@@ -26,6 +26,8 @@ import lila.common.Sequence
 import lila.db.ByteArray
 import lila.rating.PerfType
 import lila.user.User
+import lila.i18n.{ I18nKeys => trans }
+import play.api.i18n.Lang
 
 case class Game(
     id: Game.ID,
@@ -653,6 +655,15 @@ case class Game(
   def p2Pov                                      = pov(P2)
   def playerPov(p: Player)                          = pov(p.sgPlayer)
   def loserPov                                      = loser map playerPov
+
+  def playerTrans(p: SGPlayer)(implicit lang: Lang) = chess.board.variant.playerNames(p) match {
+    case "White" => trans.white.txt()
+    case "Black" => trans.black.txt()
+    case "Red"   => trans.red.txt()
+    case "Sente" => trans.sente.txt()
+    case "Gote"  => trans.gote.txt()
+    case s: String => s
+  }
 
   def setAnalysed = copy(metadata = metadata.copy(analysed = true))
 

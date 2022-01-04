@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
   <string name="moveToStart">Move to start</string>
+  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">You play the %s pieces in all puzzles</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">You play the white pieces in all puzzles</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">You play the black pieces in all puzzles</string>
   <string name="puzzlesSolved">puzzles solved</string>

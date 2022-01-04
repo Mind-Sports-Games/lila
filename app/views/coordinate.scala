@@ -91,12 +91,15 @@ object coordinate {
   def scoreCharts(score: lila.coordinate.Score)(implicit ctx: Context) =
     frag(
       List(
-        (trans.coordinates.averageScoreAsP1X, score.p1),
-        (trans.coordinates.averageScoreAsP2X, score.p2)
-      ).map { case (averageScoreX, s) =>
+        (trans.white.txt(), score.p1),
+        (trans.black.txt(), score.p2)
+      ).map { case (transPlayer, s) =>
         div(cls := "chart_container")(
           s.nonEmpty option frag(
-            p(averageScoreX(raw(s"""<strong>${"%.2f".format(s.sum.toDouble / s.size)}</strong>"""))),
+            p(trans.coordinates.averageScoreAsSGPlayerX(
+              transPlayer,
+              raw(s"""<strong>${"%.2f".format(s.sum.toDouble / s.size)}</strong>""")
+            )),
             div(cls := "user_chart", attr("data-points") := safeJsonValue(Json toJson s))
           )
         )

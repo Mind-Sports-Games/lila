@@ -45,8 +45,8 @@ object captcha {
           ),
           div(cls := "captcha-explanation")(
             label(cls := "form-label")(
-              if (captcha.p1) trans.p1CheckmatesInOneMove()
-              else trans.p2CheckmatesInOneMove()
+              if (captcha.p1) trans.sgPlayerCheckmatesInOneMove(trans.white.txt())
+              else trans.sgPlayerCheckmatesInOneMove(trans.black.txt())
             ),
             br,
             br,

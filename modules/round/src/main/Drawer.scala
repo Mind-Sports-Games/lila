@@ -40,7 +40,7 @@ final private[round] class Drawer(
         finisher.other(pov.game, _.Draw, None, Some(trans.drawOfferAccepted.txt()))
       case Pov(g, sgPlayer) if g playerCanOfferDraw sgPlayer =>
         proxy.save {
-          messenger.system(g, sgPlayer.fold(trans.p1OffersDraw, trans.p2OffersDraw).txt())
+          messenger.system(g, trans.sgPlayerOffersDraw(pov.game.playerTrans(sgPlayer)).v)
           Progress(g) map { _ offerDraw sgPlayer }
         } >>- publishDrawOffer(pov) inject List(Event.DrawOffer(by = sgPlayer.some))
       case _ => fuccess(List(Event.ReloadOwner))
@@ -58,7 +58,7 @@ final private[round] class Drawer(
         } inject List(Event.DrawOffer(by = none))
       case Pov(g, sgPlayer) if pov.opponent.isOfferingDraw =>
         proxy.save {
-          messenger.system(g, sgPlayer.fold(trans.p1DeclinesDraw, trans.p2DeclinesDraw).txt())
+          messenger.system(g, trans.sgPlayerDeclinesDraw(pov.game.playerTrans(sgPlayer)).v)
           Progress(g) map { g =>
             g.updatePlayer(!sgPlayer, _.removeDrawOffer)
           }

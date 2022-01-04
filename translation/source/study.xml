@@ -138,10 +138,13 @@
   <string name="zugzwang">Zugzwang</string>
   <string name="equalPosition">Equal position</string>
   <string name="unclearPosition">Unclear position</string>
+  <string name="sgPlayerIsSlightlyBetter">%s is slightly better</string>
   <string name="whiteIsSlightlyBetter">White is slightly better</string>
   <string name="blackIsSlightlyBetter">Black is slightly better</string>
+  <string name="sgPlayerIsBetter">%s is better</string>
   <string name="whiteIsBetter">White is better</string>
   <string name="blackIsBetter">Black is better</string>
+  <string name="sgPlayerIsWinning">%s is winning</string>
   <string name="whiteIsWinning">White is winning</string>
   <string name="blackIsWinning">Black is winning</string>
   <string name="novelty">Novelty</string>

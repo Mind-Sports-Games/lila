@@ -113,7 +113,7 @@ object side {
             game.winner.map { winner =>
               frag(
                 separator,
-                winner.sgPlayer.fold(trans.p1IsVictorious, trans.p2IsVictorious)()
+                trans.sgPlayerIsVictorious(game.playerTrans(winner.sgPlayer))
               )
             }
           )
