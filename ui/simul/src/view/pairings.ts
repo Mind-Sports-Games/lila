@@ -18,9 +18,10 @@ const renderClock = (color: Color, time: number) =>
 
 const miniPairing = (ctrl: SimulCtrl) => (pairing: Pairing) => {
   const game = pairing.game,
-    player = pairing.player;
+    player = pairing.player,
+    variant = pairing.variant;
   return h(
-    `span.mini-game.mini-game-${game.id}.mini-game--init.is2d`,
+    `span.mini-game.mini-game-${game.id}.mini-game--init.is2d.${variant}.variant-${variant}`,
     {
       class: {
         host: ctrl.data.host.gameId === game.id,

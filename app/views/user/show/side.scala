@@ -87,7 +87,7 @@ object side {
         showNonEmptyPerf(u.perfs.antidraughts, PerfType.orDefault("antidraughts")),
         showNonEmptyPerf(u.perfs.breakthrough, PerfType.orDefault("breakthrough")),
         showNonEmptyPerf(u.perfs.russian, PerfType.orDefault("russian")),
-        showNonEmptyPerf(u.perfs.brazilian, PerfType.orDefault("russian")),
+        showNonEmptyPerf(u.perfs.brazilian, PerfType.orDefault("brazilian")),
         showNonEmptyPerf(u.perfs.pool, PerfType.orDefault("pool")),
         showNonEmptyPerf(u.perfs.shogi, PerfType.orDefault("shogi")),
         showNonEmptyPerf(u.perfs.xiangqi, PerfType.orDefault("xiangqi")),

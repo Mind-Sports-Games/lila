@@ -1,6 +1,7 @@
 package lila.pref
 
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 object JsonView {
 
@@ -10,8 +11,10 @@ object JsonView {
       "transp"        -> (p.bg == Pref.Bg.TRANSPARENT),
       "bgImg"         -> p.bgImgOrDefault,
       "is3d"          -> p.is3d,
-      "theme"         -> p.theme,
-      "pieceSet"      -> p.pieceSet,
+      "theme"         -> p.theme.map( p => Json.obj( "name" -> p.name,
+                                                     "gameFamily" -> p.gameFamily)),
+      "pieceSet"      -> p.pieceSet.map( p => Json.obj( "name" -> p.name,
+                                                        "gameFamily" -> p.gameFamily)),
       "theme3d"       -> p.theme3d,
       "pieceSet3d"    -> p.pieceSet3d,
       "soundSet"      -> p.soundSet,
@@ -43,4 +46,39 @@ object JsonView {
       "rookCastle"    -> p.rookCastle
     )
   }
+
+  implicit val pieceSetJsonWrites: Writes[PieceSet] = (
+    (JsPath \ "name").write[String] and 
+    (JsPath \ "gameFamily").write[Int]
+  )(unlift(PieceSet.unapply))
+
+  implicit val pieceSetJsonReads: Reads[PieceSet] = (
+    (JsPath \ "name").read[String] and 
+    (JsPath \ "gameFamily").read[Int]
+  )(PieceSet.apply _)
+  
+  implicit val pieceSetFormat: Format[PieceSet] =
+    Format(pieceSetJsonReads, pieceSetJsonWrites)
+
+  implicit val pieceSetsRead: Reads[List[PieceSet]] = Reads.list(pieceSetFormat)
+
+  implicit val pieceSetsWrite: Writes[List[PieceSet]] = Writes.list(pieceSetFormat)
+
+
+  implicit val themeJsonWrites: Writes[Theme] = (
+    (JsPath \ "name").write[String] and 
+    (JsPath \ "gameFamily").write[Int]
+  )(unlift(Theme.unapply))
+
+  implicit val themeJsonReads: Reads[Theme] = (
+    (JsPath \ "name").read[String] and 
+    (JsPath \ "gameFamily").read[Int]
+  )(Theme.apply _)
+  
+  implicit val themeFormat: Format[Theme] =
+    Format(themeJsonReads, themeJsonWrites)
+
+  implicit val themesRead: Reads[List[Theme]] = Reads.list(themeFormat)
+
+  implicit val themesWrite: Writes[List[Theme]] = Writes.list(themeFormat)
 }

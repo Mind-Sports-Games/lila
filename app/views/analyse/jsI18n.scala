@@ -13,6 +13,7 @@ private object jsI18n {
     trans.flipBoard,
     trans.gameAborted,
     trans.checkmate,
+    trans.perpetualCheck,
     trans.whiteResigned,
     trans.blackResigned,
     trans.stalemate,

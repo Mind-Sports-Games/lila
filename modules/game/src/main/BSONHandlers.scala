@@ -347,13 +347,14 @@ object BSONHandlers {
               //  val counts = r.intsD(F.checkCount)
               //  chess.CheckCount(~counts.headOption, ~counts.lastOption)
               //} else Game.emptyCheckCount
-              ),
+            ),
             variant = gameVariant,
             pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
               case Some(PocketData.FairySF(pd)) => Some(pd)
               case None => None
               case _ => sys.error("non fairysf pocket data")
-            }
+            },
+            uciMoves = strategygames.fairysf.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
           ),
           color = turnColor
         ),

@@ -1,6 +1,6 @@
 $board-image-path: '../images/board';
 
-$board-files: (
+$chess-board-files: (
   'blue': 'svg/blue.svg',
   'blue2': 'blue2.jpg',
   'blue-marble': 'blue-marble.jpg',
@@ -28,6 +28,16 @@ $board-files: (
   'horsey': 'horsey.jpg',
 );
 
+$shogi-board-files: (
+  'wood': 'shogi.svg',
+  'clear': 'shogi_clear.png',
+);
+
+$xiangqi-board-files: (
+  'grey': 'xiangqi.svg',
+  'green': 'xiangqic.svg',
+);
+
 $chess-variants: (
   'standard',
   'chess960',
@@ -39,64 +49,75 @@ $chess-variants: (
   'horde',
   'racingKings',
   'crazyhouse',
-  'linesOfAction',
   'chess'
 );
+
+$loa-variants: ('linesOfAction');
 
 $shogi-variants: ('shogi');
 
 $xiangqi-variants: ('xiangqi');
 
-@each $color, $file in $board-files {
-  .#{$color} .chess.is2d cg-board {
-    background-image: url(../images/board/#{$file});
+@each $gameFamily in ('chess', 'loa') {
+  @each $color, $file in $chess-board-files {
+    .#{$gameFamily}-#{$color} .chess.is2d cg-board {
+      background-image: url(../images/board/chess/#{$file});
+    }
   }
 }
 
-@each $color, $file in $board-files {
-  .#{$color} .variant-shogi.is2d cg-board {
-    background-image: url(../images/board/svg/shogi.svg);
+@each $color, $file in $shogi-board-files {
+  .shogi-#{$color} .variant-shogi.is2d cg-board {
+    background-image: url(../images/board/shogi/#{$file});
   }
 }
 
-@each $color, $file in $board-files {
-  .#{$color} .shogi .is2d cg-board {
-    background-image: url(../images/board/svg/shogi.svg);
+@each $color, $file in $shogi-board-files {
+  .shogi-#{$color} .shogi .is2d cg-board {
+    background-image: url(../images/board/shogi/#{$file});
   }
 }
 
-@each $color, $file in $board-files {
-  .#{$color} .variant-xiangqi.is2d cg-board {
-    background-image: url(../images/board/svg/xiangqi.svg);
+@each $color, $file in $xiangqi-board-files {
+  .xiangqi-#{$color} .variant-xiangqi.is2d cg-board {
+    background-image: url(../images/board/xiangqi/#{$file});
   }
 }
 
-@each $color, $file in $board-files {
-  .#{$color} .xiangqi .is2d cg-board {
-    background-image: url(../images/board/svg/xiangqi.svg);
+@each $color, $file in $xiangqi-board-files {
+  .xiangqi-#{$color} .xiangqi .is2d cg-board {
+    background-image: url(../images/board/xiangqi/#{$file});
   }
 }
 
 @each $variant in $chess-variants {
-  @each $color, $file in $board-files {
-    .#{$color} .is2d .variant-#{$variant} cg-board {
-      background-image: url(../images/board/#{$file});
+  @each $color, $file in $chess-board-files {
+    .chess-#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/chess/#{$file});
+    }
+  }
+}
+
+@each $variant in $loa-variants {
+  @each $color, $file in $chess-board-files {
+    .loa-#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/loa/#{$file});
     }
   }
 }
 
 @each $variant in $shogi-variants {
-  @each $color, $file in $board-files {
-    .#{$color} .is2d .variant-#{$variant} cg-board {
-      background-image: url(../images/board/svg/shogi.svg);
+  @each $color, $file in $shogi-board-files {
+    .shogi-#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/shogi/#{$file});
     }
   }
 }
 
 @each $variant in $xiangqi-variants {
-  @each $color, $file in $board-files {
-    .#{$color} .is2d .variant-#{$variant} cg-board {
-      background-image: url(../images/board/svg/xiangqi.svg);
+  @each $color, $file in $xiangqi-board-files {
+    .xiangqi-#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/xiangqi/#{$file});
     }
   }
 }

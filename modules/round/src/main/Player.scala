@@ -222,9 +222,16 @@ final private class Player(
 
   private def moveFinish(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     game.status match {
-      case Status.Mate                               => finisher.other(game, _.Mate, game.situation.winner)
-      case Status.VariantEnd                         => finisher.other(game, _.VariantEnd, game.situation.winner)
-      case status @ (Status.Stalemate | Status.Draw) => finisher.other(game, _ => status, None)
-      case _                                         => fuccess(Nil)
+      case Status.Mate
+        => finisher.other(game, _.Mate, game.situation.winner)
+      case Status.PerpetualCheck
+        => finisher.other(game, _.PerpetualCheck, game.situation.winner)
+      case Status.VariantEnd
+        => finisher.other(game, _.VariantEnd, game.situation.winner)
+      case Status.Stalemate if !game.variant.stalemateIsDraw
+        => finisher.other(game, _.Stalemate, game.situation.winner)
+      case status @ (Status.Stalemate | Status.Draw)
+        => finisher.other(game, _ => status, None)
+      case _ => fuccess(Nil)
     }
 }

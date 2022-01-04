@@ -182,7 +182,13 @@ export interface Pref {
   showCaptured: boolean;
   submitMove: boolean;
   resizeHandle: Prefs.ShowResizeHandle;
+  pieceSet: Piece[];
 }
+
+type Piece = {
+  name: string;
+  gameFamily: string;
+};
 
 export interface MoveMetadata {
   premove?: boolean;

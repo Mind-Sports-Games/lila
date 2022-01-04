@@ -31,6 +31,7 @@ object userAnalysisI18n {
     trans.backToGame,
     trans.gameAborted,
     trans.checkmate,
+    trans.perpetualCheck,
     trans.whiteResigned,
     trans.blackResigned,
     trans.stalemate,

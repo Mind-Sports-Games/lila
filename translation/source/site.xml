@@ -16,6 +16,7 @@
   <string name="resign">Resign</string>
   <string name="checkmate">Checkmate</string>
   <string name="stalemate">Stalemate</string>
+  <string name="perpetualCheck">Perpetual Check</string>
   <string name="white">White</string>
   <string name="black">Black</string>
   <string name="randomColor">Random side</string>
@@ -141,7 +142,7 @@
   </plurals>
   <string name="moveTimes">Move times</string>
   <string name="flipBoard">Flip board</string>
-  <string name="threefoldRepetition">Threefold repetition</string>
+  <string name="threefoldRepetition">Repetition</string>
   <string name="claimADraw">Claim a draw</string>
   <string name="offerDraw">Offer draw</string>
   <string name="draw">Draw</string>
