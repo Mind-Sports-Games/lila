@@ -244,6 +244,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -401,6 +402,6 @@ case object Perfs {
       xiangqi: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
 
 }

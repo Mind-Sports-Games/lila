@@ -135,7 +135,7 @@ object Tv {
     case object FiveCheck
         extends Channel(
           name = V.FiveCheck.name,
-          icon = P.FiveCheck.iconChar.toString,
+          icon = V.FiveCheck.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.FiveCheck), noBot)
         )

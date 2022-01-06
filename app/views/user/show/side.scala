@@ -75,7 +75,7 @@ object side {
         showNonEmptyPerf(u.perfs.chess960, PerfType.orDefault("chess960")),
         showNonEmptyPerf(u.perfs.kingOfTheHill, PerfType.orDefault("kingOfTheHill")),
         showNonEmptyPerf(u.perfs.threeCheck, PerfType.orDefault("threeCheck")),
-        showNonEmptyPerf(u.perfs.fiveheck, PerfType.orDefault("fiveCheck")),
+        showNonEmptyPerf(u.perfs.fiveCheck, PerfType.orDefault("fiveCheck")),
         showNonEmptyPerf(u.perfs.antichess, PerfType.orDefault("antichess")),
         showNonEmptyPerf(u.perfs.atomic, PerfType.orDefault("atomic")),
         showNonEmptyPerf(u.perfs.horde, PerfType.orDefault("horde")),

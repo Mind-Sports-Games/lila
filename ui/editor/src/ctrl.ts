@@ -220,7 +220,7 @@ export default class EditorCtrl {
     if (rules != 'crazyhouse') this.pockets = undefined;
     else if (!this.pockets) this.pockets = Material.empty();
     if (rules != '3check' && rules != '5check') this.remainingChecks = undefined;
-    else if (!this.remainingChecks){ 
+    else if (!this.remainingChecks) {
       if (rules == '5check') this.remainingChecks = RemainingChecks.fiveCheck();
       else this.remainingChecks = RemainingChecks.default();
     }
