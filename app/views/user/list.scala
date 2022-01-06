@@ -59,6 +59,7 @@ object list {
               userTopPerf(leaderboards.antichess,     PerfType.orDefault("antichess")),
               userTopPerf(leaderboards.atomic,        PerfType.orDefault("atomic")),
               userTopPerf(leaderboards.threeCheck,    PerfType.orDefault("threeCheck")),
+              userTopPerf(leaderboards.fiveCheck,     PerfType.orDefault("fiveCheck")),
               userTopPerf(leaderboards.kingOfTheHill, PerfType.orDefault("kingOfTheHill")),
               userTopPerf(leaderboards.horde,         PerfType.orDefault("horde")),
               userTopPerf(leaderboards.racingKings,   PerfType.orDefault("racingKings")),

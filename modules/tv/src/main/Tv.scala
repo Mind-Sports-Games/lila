@@ -132,6 +132,13 @@ object Tv {
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.ThreeCheck), noBot)
         )
+    case object FiveCheck
+        extends Channel(
+          name = V.FiveCheck.name,
+          icon = V.FiveCheck.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(V.FiveCheck), noBot)
+        )
     case object Antichess
         extends Channel(
           name = V.Antichess.name,
@@ -198,6 +205,7 @@ object Tv {
       Chess960,
       KingOfTheHill,
       ThreeCheck,
+      FiveCheck,
       Antichess,
       Atomic,
       Horde,

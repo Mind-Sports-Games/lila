@@ -28,7 +28,7 @@ final class JsonView(
   import JsonView._
 
   private def checkCount(game: Game, color: Color) =
-    (game.variant == strategygames.chess.variant.ThreeCheck) option game.history.checkCount(color)
+    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.history.checkCount(color)
 
   private def kingMoves(game: Game, color: Color) =
     (game.variant.frisianVariant) option game.history.kingMoves(color)

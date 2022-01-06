@@ -13,6 +13,7 @@ case class Perfs(
     chess960: Perf,
     kingOfTheHill: Perf,
     threeCheck: Perf,
+    fiveCheck: Perf,
     antichess: Perf,
     atomic: Perf,
     horde: Perf,
@@ -47,6 +48,7 @@ case class Perfs(
       "chess960"       -> chess960,
       "kingOfTheHill"  -> kingOfTheHill,
       "threeCheck"     -> threeCheck,
+      "fiveCheck"      -> fiveCheck,
       "antichess"      -> antichess,
       "atomic"         -> atomic,
       "horde"          -> horde,
@@ -137,6 +139,7 @@ case class Perfs(
     "chess960"       -> chess960,
     "kingOfTheHill"  -> kingOfTheHill,
     "threeCheck"     -> threeCheck,
+    "fiveCheck"      -> fiveCheck,
     "antichess"      -> antichess,
     "atomic"         -> atomic,
     "horde"          -> horde,
@@ -241,6 +244,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -267,14 +271,9 @@ case object Perfs {
       case Variant.Chess(strategygames.chess.variant.Chess960)      => Some(_.chess960)
       case Variant.Chess(strategygames.chess.variant.KingOfTheHill) => Some(_.kingOfTheHill)
       case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => Some(_.threeCheck)
+      case Variant.Chess(strategygames.chess.variant.FiveCheck)     => Some(_.fiveCheck)
       case Variant.Chess(strategygames.chess.variant.Antichess)     => Some(_.antichess)
-      case Variant.Chess(strategygames.chess.variant.Atomic)        => Some(_.atomic)
-      case Variant.Chess(strategygames.chess.variant.Horde)         => Some(_.horde)
-      case Variant.Chess(strategygames.chess.variant.RacingKings)   => Some(_.racingKings)
-      case Variant.Chess(strategygames.chess.variant.Crazyhouse)    => Some(_.crazyhouse)
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction) => Some(_.linesOfAction)
       case Variant.Draughts(strategygames.draughts.variant.Standard)     => Some(_.international)
-      case Variant.Draughts(strategygames.draughts.variant.Frisian)      => Some(_.frisian)
       case Variant.Draughts(strategygames.draughts.variant.Frysk)        => Some(_.frysk)
       case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => Some(_.antidraughts)
       case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => Some(_.breakthrough)
@@ -307,6 +306,7 @@ case object Perfs {
         chess960 = perf("chess960"),
         kingOfTheHill = perf("kingOfTheHill"),
         threeCheck = perf("threeCheck"),
+        fiveCheck = perf("fiveCheck"),
         antichess = perf("antichess"),
         atomic = perf("atomic"),
         horde = perf("horde"),
@@ -344,6 +344,7 @@ case object Perfs {
         "chess960"       -> notNew(o.chess960),
         "kingOfTheHill"  -> notNew(o.kingOfTheHill),
         "threeCheck"     -> notNew(o.threeCheck),
+        "fiveCheck"      -> notNew(o.fiveCheck),
         "antichess"      -> notNew(o.antichess),
         "atomic"         -> notNew(o.atomic),
         "horde"          -> notNew(o.horde),
@@ -383,6 +384,7 @@ case object Perfs {
       chess960: List[User.LightPerf],
       kingOfTheHill: List[User.LightPerf],
       threeCheck: List[User.LightPerf],
+      fiveCheck: List[User.LightPerf],
       antichess: List[User.LightPerf],
       atomic: List[User.LightPerf],
       horde: List[User.LightPerf],
@@ -400,5 +402,6 @@ case object Perfs {
       xiangqi: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+
 }

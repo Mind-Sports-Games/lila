@@ -10,6 +10,7 @@ case class History(
     kingOfTheHill: RatingsMap,
     antichess: RatingsMap,
     threeCheck: RatingsMap,
+    fiveCheck: RatingsMap,
     atomic: RatingsMap,
     horde: RatingsMap,
     racingKings: RatingsMap,
@@ -46,6 +47,7 @@ case class History(
       case "kingOfTheHill"  => kingOfTheHill
       case "antichess"      => antichess
       case "threeCheck"     => threeCheck
+      case "fiveCheck"      => fiveCheck
       case "atomic"         => atomic
       case "horde"          => horde
       case "racingKings"    => racingKings
@@ -93,6 +95,7 @@ object History {
           chess960 = ratingsMap("chess960"),
           kingOfTheHill = ratingsMap("kingOfTheHill"),
           threeCheck = ratingsMap("threeCheck"),
+          fiveCheck = ratingsMap("fiveCheck"),
           antichess = ratingsMap("antichess"),
           atomic = ratingsMap("atomic"),
           horde = ratingsMap("horde"),
