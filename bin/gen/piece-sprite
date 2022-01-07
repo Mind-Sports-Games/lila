@@ -63,10 +63,10 @@ types = {
 roles = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece', 'k-piece']
 colors = ['white', 'black']
 chess_variants = ['standard','chess960', 'fromPosition', 'kingOfTheHill', 'threeCheck', 'fiveCheck', 'antichess', 'atomic',
-'horde', 'racingKings', 'crazyhouse']
+'horde', 'racingKings', 'crazyhouse', 'noCastling']
 draughts_variants = ['international','frisian','frysk','antidraughts','breakthrough','russian','brazilian','pool']
 draughts_roles = ['man','king']
-lines_of_action_variants= ['linesOfAction']
+lines_of_action_variants= ['linesOfAction', 'scrambledEggs']
 lines_of_action_roles = ['l-piece']
 shogi_roles_to_imageprefix = [
     ['p-piece','FU'],

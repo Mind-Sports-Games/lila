@@ -19,7 +19,9 @@ case class Perfs(
     horde: Perf,
     racingKings: Perf,
     crazyhouse: Perf,
+    noCastling: Perf,
     linesOfAction: Perf,
+    scrambledEggs: Perf,
     international: Perf,
     frisian: Perf,
     frysk: Perf,
@@ -54,7 +56,9 @@ case class Perfs(
       "horde"          -> horde,
       "racingKings"    -> racingKings,
       "crazyhouse"     -> crazyhouse,
+      "noCastling"     -> noCastling,
       "linesOfAction"  -> linesOfAction,
+      "scrambledEggs"  -> scrambledEggs,
       "international"  -> international,
       "frisian"        -> frisian,
       "frysk"          -> frysk,
@@ -145,7 +149,9 @@ case class Perfs(
     "horde"          -> horde,
     "racingKings"    -> racingKings,
     "crazyhouse"     -> crazyhouse,
+    "noCastling"     -> noCastling,
     "linesOfAction"  -> linesOfAction,
+    "scrambledEggs"  -> scrambledEggs,
     "frisian"        -> frisian,
     "frysk"          -> frysk,
     "international"  -> international,
@@ -245,6 +251,8 @@ case object Perfs {
       p,
       p,
       p,
+      p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -273,6 +281,7 @@ case object Perfs {
       case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => Some(_.threeCheck)
       case Variant.Chess(strategygames.chess.variant.FiveCheck)     => Some(_.fiveCheck)
       case Variant.Chess(strategygames.chess.variant.Antichess)     => Some(_.antichess)
+      case Variant.Chess(strategygames.chess.variant.NoCastling)     => Some(_.noCastling)
       case Variant.Draughts(strategygames.draughts.variant.Standard)     => Some(_.international)
       case Variant.Draughts(strategygames.draughts.variant.Frysk)        => Some(_.frysk)
       case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => Some(_.antidraughts)
@@ -312,7 +321,9 @@ case object Perfs {
         horde = perf("horde"),
         racingKings = perf("racingKings"),
         crazyhouse = perf("crazyhouse"),
+        noCastling = perf("noCastling"),
         linesOfAction = perf("linesOfAction"),
+        scrambledEggs = perf("scrambledEggs"),
         international = perf("international"),
         frisian = perf("frisian"),
         frysk = perf("frysk"),
@@ -350,7 +361,9 @@ case object Perfs {
         "horde"          -> notNew(o.horde),
         "racingKings"    -> notNew(o.racingKings),
         "crazyhouse"     -> notNew(o.crazyhouse),
+        "noCastling"     -> notNew(o.noCastling),
         "linesOfAction"  -> notNew(o.linesOfAction),
+        "scrambledEggs"  -> notNew(o.scrambledEggs),
         "international"  -> notNew(o.international),
         "frisian"        -> notNew(o.frisian),
         "frysk"          -> notNew(o.frysk),
@@ -389,7 +402,9 @@ case object Perfs {
       atomic: List[User.LightPerf],
       horde: List[User.LightPerf],
       racingKings: List[User.LightPerf],
+      noCastling: List[User.LightPerf],
       linesOfAction: List[User.LightPerf],
+      scrambledEggs: List[User.LightPerf],
       international: List[User.LightPerf],
       frisian: List[User.LightPerf],
       frysk: List[User.LightPerf],
@@ -402,6 +417,6 @@ case object Perfs {
       xiangqi: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
 
 }

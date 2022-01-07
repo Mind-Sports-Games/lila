@@ -235,7 +235,7 @@ export default class AnalyseCtrl {
   bottomIsWhite = () => this.bottomColor() === 'white';
 
   getOrientation(): Orientation {
-    if (this.data.game.variant.key === 'linesOfAction') {
+    if (this.data.game.variant.key === 'linesOfAction' || this.data.game.variant.key === 'scrambledEggs') {
       const c = this.data.player.color;
       return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
     } else if (this.data.game.variant.key === 'racingKings') {

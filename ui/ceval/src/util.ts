@@ -1,5 +1,6 @@
 const noCevalVariants = [
   'linesOfAction',
+  'scrambledEggs',
   'international',
   'antidraughts',
   'breakthrough',

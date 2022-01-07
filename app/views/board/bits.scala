@@ -40,6 +40,10 @@ object bits {
           case White => Orientation.White
           case Black => Orientation.Right
         }
+      case Variant.Chess(strategygames.chess.variant.ScrambledEggs) => c match {
+          case White => Orientation.White
+          case Black => Orientation.Right
+        }
       case _ => colorToOrientation(c)
     }
 
