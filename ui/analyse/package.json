@@ -26,7 +26,7 @@
     "chat": "2.0.0",
     "chess": "2.0.0",
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.14",
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#add-variants-no-castling-scrambled-eggs",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.3",
     "common": "2.0.0",
     "draughtsground": "^7.6",
     "game": "2.0.0",
