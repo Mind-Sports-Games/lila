@@ -25,6 +25,13 @@ const boardClasses = (variant: Variant) =>
     variant.gameLogic.id === 1 && variant.boardSize !== undefined ? `.is${variant.boardSize.key}` : ''
   }`;
 
+const boardClasses2 = (variant: Variant): string =>
+  variant.gameLogic.id === 1 //draughts
+    ? `${variant.gameLogic.name.toLowerCase()}${variant.boardSize !== undefined ? `.is${variant.boardSize.key}` : ''}.${
+        variant.key
+      }.variant-${variant.key}`
+    : `${variant.gameFamily}.${variant.key}.variant-${variant.key}`;
+
 export default function (ctrl: LobbyController) {
   return h(
     'div.now-playing',

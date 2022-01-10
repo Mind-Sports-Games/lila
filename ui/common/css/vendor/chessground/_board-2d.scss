@@ -62,7 +62,7 @@ $xiangqi-variants: ('xiangqi');
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
-    .#{$gameFamily}-#{$color} .chess.is2d cg-board {
+    .#{$gameFamily}-#{$color} .#{$gameFamily}.is2d cg-board {
       background-image: url(../images/board/chess/#{$file});
     }
   }

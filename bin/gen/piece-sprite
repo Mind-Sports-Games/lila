@@ -216,7 +216,7 @@ loa_themes.map { |theme|
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.chess.is2d .' + role + '.' + color + ' {' +
+          '.loa.is2d .' + role + '.' + color + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -244,7 +244,7 @@ loa_themes.map { |theme|
   classes_loa_game = colors.map { |color|
     lines_of_action_roles.map { |role|
       piece = color[0] + role.upcase[0]
-      '.chess.is2d .' + role + '.' + color + ' {' +
+      '.loa.is2d .' + role + '.' + color + ' {' +
           "background-image:url('/assets/piece/" + 'loa/' + name + "/" + piece + "." + ext + "')}"
       }
     }.flatten
