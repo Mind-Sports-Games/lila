@@ -99,7 +99,7 @@
     font-size: 0.9em;
   }
 
-  .white {
+  .white, .p1 {
     background: if($theme-light, #fff, #ccc);
     box-shadow: 0 -5px 7px rgba(0, 0, 0, if($theme-light, 0.1, 0.25)) inset;
 
@@ -109,7 +109,7 @@
   }
 
   .draws,
-  .black {
+  .black, .p2 {
     color: if($theme-light, #fff, #ddd);
     box-shadow: 0 5px 7px rgba(255, 255, 255, if($theme-light, 0.2, 0.1)) inset;
   }
@@ -118,7 +118,7 @@
     background: if($theme-light, #a0a0a0, #666);
   }
 
-  .black {
+  .black, .p2 {
     background: if($theme-light, #555, #333);
     color: #ddd;
   }
