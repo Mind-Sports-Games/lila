@@ -20,12 +20,7 @@ function timer(pov: NowPlaying) {
 const boardSize = (boardSize?: VariantBoardSize) =>
   boardSize === undefined ? '' : `${boardSize.size[0]}x${boardSize.size[1]}`;
 
-const boardClasses = (variant: Variant) =>
-  `${variant.gameLogic.name.toLowerCase()}${
-    variant.gameLogic.id === 1 && variant.boardSize !== undefined ? `.is${variant.boardSize.key}` : ''
-  }`;
-
-const boardClasses2 = (variant: Variant): string =>
+const boardClasses = (variant: Variant): string =>
   variant.gameLogic.id === 1 //draughts
     ? `${variant.gameLogic.name.toLowerCase()}${variant.boardSize !== undefined ? `.is${variant.boardSize.key}` : ''}.${
         variant.key
@@ -43,7 +38,7 @@ export default function (ctrl: LobbyController) {
           attrs: { href: '/' + pov.fullId },
         },
         [
-          h(`span.mini-board.cg-wrap.is2d.${boardClasses(pov.variant)}.variant-${pov.variant.key}`, {
+          h(`span.mini-board.cg-wrap.is2d.${boardClasses(pov.variant)}`, {
             attrs:
               pov.variant.gameLogic.id === 1
                 ? {
