@@ -234,7 +234,7 @@ final class JsonView(
             "lib"        -> game.variant.gameLogic.id,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
-            "initialFen" -> (initialFen | fen),
+            "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
             "fen"        -> fen,
             "turns"      -> game.turns,
             "player"     -> game.turnColor.name,
