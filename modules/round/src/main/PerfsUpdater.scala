@@ -47,8 +47,12 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.racingKings, ratingsB.racingKings, game)
               case Variant.Chess(Crazyhouse) =>
                 updateRatings(ratingsW.crazyhouse, ratingsB.crazyhouse, game)
+              case Variant.Chess(NoCastling) =>
+                updateRatings(ratingsW.noCastling, ratingsB.noCastling, game)
               case Variant.Chess(LinesOfAction) =>
                 updateRatings(ratingsW.linesOfAction, ratingsB.linesOfAction, game)
+              case Variant.Chess(ScrambledEggs) =>
+                updateRatings(ratingsW.scrambledEggs, ratingsB.scrambledEggs, game)  
               case Variant.Draughts(strategygames.draughts.variant.Standard) =>
                 updateRatings(ratingsW.international, ratingsB.international, game)
               case Variant.Draughts(strategygames.draughts.variant.Frisian) =>
@@ -114,7 +118,9 @@ final class PerfsUpdater(
       horde: Rating,
       racingKings: Rating,
       crazyhouse: Rating,
+      noCastling: Rating,
       linesOfAction: Rating,
+      scrambledEggs: Rating,
       international: Rating,
       frisian: Rating,
       frysk: Rating,
@@ -144,7 +150,9 @@ final class PerfsUpdater(
       horde = perfs.horde.toRating,
       racingKings = perfs.racingKings.toRating,
       crazyhouse = perfs.crazyhouse.toRating,
+      noCastling = perfs.noCastling.toRating,
       linesOfAction = perfs.linesOfAction.toRating,
+      scrambledEggs = perfs.scrambledEggs.toRating,
       international = perfs.international.toRating,
       frisian = perfs.frisian.toRating,
       frysk = perfs.frysk.toRating,
@@ -207,7 +215,9 @@ final class PerfsUpdater(
           horde = addRatingIf(game.ratingVariant.horde, perfs.horde, ratings.horde),
           racingKings = addRatingIf(game.ratingVariant.racingKings, perfs.racingKings, ratings.racingKings),
           crazyhouse = addRatingIf(game.ratingVariant.crazyhouse, perfs.crazyhouse, ratings.crazyhouse),
+          noCastling = addRatingIf(game.ratingVariant.noCastling, perfs.noCastling, ratings.noCastling),
           linesOfAction = addRatingIf(game.ratingVariant.linesOfAction, perfs.linesOfAction, ratings.linesOfAction),
+          scrambledEggs = addRatingIf(game.ratingVariant.scrambledEggs, perfs.scrambledEggs, ratings.scrambledEggs),
           international = addRatingIf(game.ratingVariant.draughtsStandard, perfs.international, ratings.international),
           frisian = addRatingIf(game.ratingVariant.frisian, perfs.frisian, ratings.frisian),
           frysk = addRatingIf(game.ratingVariant.frysk, perfs.frysk, ratings.frysk),
@@ -238,7 +248,9 @@ final class PerfsUpdater(
           horde = r(PT.orDefault("horde"), perfs.horde, perfs1.horde),
           racingKings = r(PT.orDefault("racingKings"), perfs.racingKings, perfs1.racingKings),
           crazyhouse = r(PT.orDefault("crazyhouse"), perfs.crazyhouse, perfs1.crazyhouse),
+          noCastling = r(PT.orDefault("noCastling"), perfs.noCastling, perfs1.noCastling),
           linesOfAction = r(PT.orDefault("linesOfAction"), perfs.linesOfAction, perfs1.linesOfAction),
+          scrambledEggs = r(PT.orDefault("scrambledEggs"), perfs.scrambledEggs, perfs1.scrambledEggs),
           international = r(PT.orDefault("international"), perfs.international, perfs1.international),
           frisian = r(PT.orDefault("frisian"), perfs.frisian, perfs1.frisian),
           frysk = r(PT.orDefault("frysk"), perfs.frysk, perfs1.frysk),

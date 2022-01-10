@@ -15,7 +15,9 @@ case class History(
     horde: RatingsMap,
     racingKings: RatingsMap,
     crazyhouse: RatingsMap,
+    noCastling: RatingsMap,
     linesOfAction: RatingsMap,
+    scrambledEggs: RatingsMap,
     international: RatingsMap,
     frisian: RatingsMap,
     frysk: RatingsMap,
@@ -52,7 +54,9 @@ case class History(
       case "horde"          => horde
       case "racingKings"    => racingKings
       case "crazyhouse"     => crazyhouse
+      case "noCastling"     => noCastling
       case "linesOfAction"  => linesOfAction
+      case "scrambledEggs"  => scrambledEggs
       case "international"  => international
       case "frisian"        => frisian
       case "frysk"          => frysk
@@ -101,7 +105,9 @@ object History {
           horde = ratingsMap("horde"),
           racingKings = ratingsMap("racingKings"),
           crazyhouse = ratingsMap("crazyhouse"),
+          noCastling = ratingsMap("noCastling"),
           linesOfAction = ratingsMap("linesOfAction"),
+          scrambledEggs = ratingsMap("scrambledEggs"),
           international = ratingsMap("international"),
           frisian = ratingsMap("frisian"),
           frysk = ratingsMap("frysk"),

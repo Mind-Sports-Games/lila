@@ -50,10 +50,11 @@ $chess-variants: (
   'horde',
   'racingKings',
   'crazyhouse',
+  'noCastling',
   'chess'
 );
 
-$loa-variants: ('linesOfAction');
+$loa-variants: ('linesOfAction', 'scrambledEggs');
 
 $shogi-variants: ('shogi');
 

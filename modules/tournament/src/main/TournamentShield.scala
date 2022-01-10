@@ -225,9 +225,21 @@ object TournamentShield {
           iconChar = ''
         )
 
+    case object NoCastling
+        extends Category(
+          of = Right(Variant.Chess(strategygames.chess.variant.NoCastling)),
+          iconChar = ''
+        )    
+
     case object LinesOfAction
         extends Category(
           of = Right(Variant.Chess(strategygames.chess.variant.LinesOfAction)),
+          iconChar = ''
+        )
+    
+    case object ScrambledEggs
+        extends Category(
+          of = Right(Variant.Chess(strategygames.chess.variant.ScrambledEggs)),
           iconChar = ''
         )
 
@@ -308,7 +320,9 @@ object TournamentShield {
       Atomic,
       Horde,
       RacingKings,
+      NoCastling,
       LinesOfAction,
+      ScrambledEggs,
       International,
       Frisian,
       Frysk,

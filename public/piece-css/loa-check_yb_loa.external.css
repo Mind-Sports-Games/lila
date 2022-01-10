@@ -2,3 +2,5 @@
 .chess.is2d .l-piece.black {background-image:url('/assets/piece/loa/check_yb_loa/bL.png')}
 .is2d .variant-linesOfAction .l-piece.white {background-image:url('/assets/piece/loa/check_yb_loa/wL.png')}
 .is2d .variant-linesOfAction .l-piece.black {background-image:url('/assets/piece/loa/check_yb_loa/bL.png')}
+.is2d .variant-scrambledEggs .l-piece.white {background-image:url('/assets/piece/loa/check_yb_loa/wL.png')}
+.is2d .variant-scrambledEggs .l-piece.black {background-image:url('/assets/piece/loa/check_yb_loa/bL.png')}

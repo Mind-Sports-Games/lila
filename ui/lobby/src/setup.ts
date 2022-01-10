@@ -232,6 +232,9 @@ export default class Setup {
             case '12':
               key = 'fiveCheck';
               break;
+            case '13':
+              key = 'noCastling';
+              break;
             default:
               key = 'standard';
               break;
@@ -267,6 +270,9 @@ export default class Setup {
           switch (variantId[1]) {
             case '11':
               key = 'linesOfAction';
+              break;
+            case '14':
+              key = 'scrambledEggs';
               break;
           }
           break;

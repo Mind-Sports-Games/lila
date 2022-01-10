@@ -285,7 +285,9 @@ declare type VariantKey =
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
+  | 'noCastling'
   | 'linesOfAction'
+  | 'scrambledEggs'
   | 'shogi'
   | 'xiangqi';
 
@@ -317,7 +319,9 @@ declare type Perf =
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
+  | 'noCastling'
   | 'linesOfAction'
+  | 'scrambledEggs'
   | 'international'
   | 'antidraughts'
   | 'breakthrough'
