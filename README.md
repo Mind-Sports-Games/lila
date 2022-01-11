@@ -13,7 +13,6 @@ It features a [search engine](https://playstrategy.org/games/search),
 [simuls](https://playstrategy.org/simul),
 [forums](https://playstrategy.org/forum),
 [teams](https://playstrategy.org/team),
-[tactic trainer](https://playstrategy.org/training),
 and a [shared analysis board](https://playstrategy.org/study).
 The UI is available in more than 130 languages.
 
@@ -27,7 +26,6 @@ Playstrategy talks to [Stockfish](https://stockfishchess.org/) deployed in an [A
 It uses [MongoDB](https://mongodb.org) to store more than 1.7 billion games, which are indexed by [elasticsearch](https://github.com/elastic/elasticsearch).
 HTTP requests and WebSocket connections can be proxied by [nginx](https://nginx.org).
 The web client is written in [TypeScript](https://www.typescriptlang.org/) and [snabbdom](https://github.com/snabbdom/snabbdom), using [Sass](https://sass-lang.com/) to generate CSS.
-The [blog](https://playstrategy.org/blog) uses a free open content plan from [prismic.io](https://prismic.io).
 Browser testing done with [Browserstack](https://www.browserstack.com).
 Proxy detection done with [IP2Proxy database](https://www.ip2location.com/database/ip2proxy).
 
@@ -70,4 +68,6 @@ details.
 
 ## Credits
 
-This code exists because of [ornicar](https://github.com/ornicar), and the whole [Lichess project](https://github.com/ornicar/lila)
+This code is forked from, and exists because of [ornicar](https://github.com/ornicar), and the whole [Lichess project](https://github.com/ornicar/lila).
+
+[playstrategy.org](https://playstrategy.org/) currently supports the [Mind Sports Olympiad](https://mindsportsolympiad.com/).
