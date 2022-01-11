@@ -289,7 +289,9 @@ declare type VariantKey =
   | 'linesOfAction'
   | 'scrambledEggs'
   | 'shogi'
-  | 'xiangqi';
+  | 'xiangqi'
+  | 'minishogi'
+  | 'minixiangqi';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -332,7 +334,9 @@ declare type Perf =
   | 'frisian'
   | 'frysk'
   | 'shogi'
-  | 'xiangqi';
+  | 'xiangqi'
+  | 'minishogi'
+  | 'minixiangqi';
 
 declare type Color = 'white' | 'black';
 declare type Orientation = 'white' | 'black' | 'left' | 'right';

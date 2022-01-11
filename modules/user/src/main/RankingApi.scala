@@ -113,6 +113,8 @@ final class RankingApi(
       pool          <- topPerf(PerfType.orDefault("pool").id, nb)
       shogi         <- topPerf(PerfType.orDefault("shogi").id, nb)
       xiangqi       <- topPerf(PerfType.orDefault("xiangqi").id, nb)
+      minishogi     <- topPerf(PerfType.orDefault("minishogi").id, nb)
+      minixiangqi   <- topPerf(PerfType.orDefault("minixiangqi").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -140,7 +142,9 @@ final class RankingApi(
       brazilian = brazilian,
       pool = pool,
       shogi = shogi,
-      xiangqi = xiangqi
+      xiangqi = xiangqi,
+      minishogi = minishogi,
+      minixiangqi = minixiangqi
     )
 
   object weeklyStableRanking {

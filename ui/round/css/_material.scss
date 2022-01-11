@@ -13,7 +13,8 @@ $all-variants: (
   'noCastling',
   'linesOfAction',
   'scrambledEggs',
-  'xiangqi'
+  'xiangqi',
+  'minixiangqi'
 ); //no shogi as its a crazy house style game - material shown in pockets/crazyview
 $chess-piece-roles: (
   'p-piece': 'P.svg',
@@ -54,7 +55,7 @@ $xiangqi-piece-roles: (
       background-size: cover;
       display: inline-block;
 
-      @if $variant == 'xiangqi' {
+      @if ($variant == 'xiangqi' or $variant == 'minixiangqi') {
         @each $role, $r in $xiangqi-piece-roles {
           &.#{$role} {
             background-image: url(../piece/mono/#{$r});

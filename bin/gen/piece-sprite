@@ -86,10 +86,10 @@ shogi_roles_to_imageprefix = [
     ['pb-piece','UM']
   ]
 shogi_colors = ['0','1']
-shogi_variants = ['shogi']
+shogi_variants = ['shogi', 'minishogi']
 xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece', 'pp-piece']
 xiangqi_colors = ['B','R']
-xiangqi_variants = ['xiangqi']
+xiangqi_variants = ['xiangqi', 'minixiangqi']
 
 
 # inline SVG Chess

@@ -27,5 +27,7 @@ export const perf = {
     frysk: 'K',
     shogi: 's',
     xiangqi: 't',
+    minishogi: 's',
+    minixiangqi: 't',
   },
 };

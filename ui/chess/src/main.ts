@@ -52,11 +52,11 @@ export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
 }
 
 export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['shogi'].includes(key);
+  return ['shogi', 'minishogi'].includes(key);
 }
 
 export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['xiangqi'].includes(key);
+  return ['xiangqi', 'minixiangqi'].includes(key);
 }
 
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {

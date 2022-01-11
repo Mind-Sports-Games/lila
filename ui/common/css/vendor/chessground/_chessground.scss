@@ -32,20 +32,30 @@ cg-board {
   height: calc(100% / 9);
 }
 
-.shogi square {
-  width: calc(100% / 9);
-  height: calc(100% / 9);
+.variant-minishogi square {
+  width: calc(100% / 5);
+  height: calc(100% / 5);
 }
+
+// .shogi square {
+//   width: calc(100% / 9);
+//   height: calc(100% / 9);
+// }
 
 .variant-xiangqi square {
   width: calc(100% / 9);
   height: calc(100% / 10);
 }
 
-.xiangqi square {
-  width: calc(100% / 9);
-  height: calc(100% / 10);
+.variant-minixiangqi square {
+  width: calc(100% / 7);
+  height: calc(100% / 7);
 }
+
+// .xiangqi square {
+//   width: calc(100% / 9);
+//   height: calc(100% / 10);
+// }
 
 square {
   position: absolute;
@@ -140,22 +150,34 @@ square {
   transform: scale(0.9);
 }
 
-.shogi piece {
-  width: calc(100% / 9);
-  height: calc(100% / 9);
+.variant-minishogi piece {
+  width: calc(100% / 5);
+  height: calc(100% / 5);
   background-position: center center;
   transform: scale(0.9);
 }
+
+// .shogi piece {
+//   width: calc(100% / 9);
+//   height: calc(100% / 9);
+//   background-position: center center;
+//   transform: scale(0.9);
+// }
 
 .variant-xiangqi piece {
   width: calc(100% / 9);
   height: calc(100% / 10);
 }
 
-.xiangqi piece {
-  width: calc(100% / 9);
-  height: calc(100% / 10);
+.variant-minixiangqi piece {
+  width: calc(100% / 7);
+  height: calc(100% / 7);
 }
+
+// .xiangqi piece {
+//   width: calc(100% / 9);
+//   height: calc(100% / 10);
+// }
 
 piece {
   position: absolute;
@@ -192,20 +214,30 @@ piece {
   padding-bottom: calc(100% / 9);
 }
 
-.shogi cg-helper {
-  width: calc(100% / 9);
-  padding-bottom: calc(100% / 9);
+.variant-minishogi cg-helper {
+  width: calc(100% / 5);
+  padding-bottom: calc(100% / 5);
 }
+
+// .shogi cg-helper {
+//   width: calc(100% / 9);
+//   padding-bottom: calc(100% / 9);
+// }
 
 .variant-xiangqi cg-helper {
   width: calc(100% / 9);
   padding-bottom: calc(100% / 10);
 }
 
-.xiangqi cg-helper {
-  width: calc(100% / 9);
-  padding-bottom: calc(100% / 10);
+.variant-minixiangqi cg-helper {
+  width: calc(100% / 7);
+  padding-bottom: calc(100% / 7);
 }
+
+// .xiangqi cg-helper {
+//   width: calc(100% / 9);
+//   padding-bottom: calc(100% / 10);
+// }
 
 cg-helper {
   position: absolute;
@@ -220,20 +252,30 @@ cg-helper {
   height: calc(100% * 9);
 }
 
-.shogi cg-container {
-  width: calc(100% * 9);
-  height: calc(100% * 9);
+.variant-minishogi cg-container {
+  width: calc(100% * 5);
+  height: calc(100% * 5);
 }
+
+// .shogi cg-container {
+//   width: calc(100% * 9);
+//   height: calc(100% * 9);
+// }
 
 .variant-xiangqi cg-container {
   width: calc(100% * 9);
   height: calc(101% * 11);
 }
 
-.xiangqi cg-container {
-  width: calc(100% * 9);
-  height: calc(101% * 11);
+.variant-minixiangqi cg-container {
+  width: calc(100% * 7);
+  height: calc(100% * 7);
 }
+
+// .xiangqi cg-container {
+//   width: calc(100% * 9);
+//   height: calc(101% * 11);
+// }
 
 cg-container {
   position: absolute;
@@ -272,7 +314,7 @@ cg-container .cg-custom-svgs svg {
   overflow: visible;
 }
 
-/* 9x10 */
+/* 9x10 - for non square boards*/
 .variant-xiangqi .cg-wrap {
   padding-bottom: calc(640 * 100% / 576);
 }

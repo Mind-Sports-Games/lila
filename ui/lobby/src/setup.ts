@@ -281,12 +281,18 @@ export default class Setup {
             case '1':
               key = 'shogi';
               break;
+            case '3':
+              key = 'minishogi';
+              break;
           }
           break;
         case '4':
           switch (variantId[1]) {
             case '2':
               key = 'xiangqi';
+              break;
+            case '4':
+              key = 'minixiangqi';
               break;
           }
           break;
