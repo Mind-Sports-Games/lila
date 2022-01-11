@@ -90,7 +90,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [viewStatus(ctrl), winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.noarg(winner + 'IsVictorious') : '']
+        [viewStatus(ctrl), winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.trans('sgPlayerIsVictorious', ctrl.data.game.winnerPlayer) : '']
       ),
     ]);
   }
@@ -200,12 +200,12 @@ function renderButtons(ctrl: RoundController) {
   );
 }
 
-function initMessage(d: RoundData, trans: TransNoArg) {
+function initMessage(d: RoundData, trans: Trans) {
   return game.playable(d) && d.game.turns === 0 && !d.player.spectator
     ? h('div.message', util.justIcon(''), [
         h('div', [
-          trans(d.player.color === 'white' ? 'youPlayTheWhitePieces' : 'youPlayTheBlackPieces'),
-          ...(d.player.color === 'white' ? [h('br'), h('strong', trans('itsYourTurn'))] : []),
+          trans('youPlayTheSGPlayerPieces', d.player.playerName),
+          ...(d.player.color === 'white' ? [h('br'), h('strong', trans.noarg('itsYourTurn'))] : []),
         ]),
       ])
     : null;
@@ -259,7 +259,7 @@ export function render(ctrl: RoundController): VNode | undefined {
     ? undefined
     : h(rmovesTag, [
         renderButtons(ctrl),
-        initMessage(d, ctrl.trans.noarg) ||
+        initMessage(d, ctrl.trans) ||
           (moves
             ? isCol1()
               ? h('div.col1-moves', [

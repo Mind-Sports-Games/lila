@@ -74,7 +74,7 @@ const feedback = {
               )
             )
           ),
-          h('em', ctrl.noarg(ctrl.color === 'white' ? 'findBetterMoveForWhite' : 'findBetterMoveForBlack')),
+          h('em', ctrl.trans('findBetterMoveForSGPlayer', ctrl.color)),
           skipOrViewSolution(ctrl),
         ]),
       ]),
@@ -106,7 +106,7 @@ const feedback = {
         h('div.icon', '✗'),
         h('div.instruction', [
           h('strong', ctrl.noarg('youCanDoBetter')),
-          h('em', ctrl.noarg(ctrl.color === 'white' ? 'tryAnotherMoveForWhite' : 'tryAnotherMoveForBlack')),
+          h('em', ctrl.trans('tryAnotherMoveForSGPlayer', ctrl.color)),
           skipOrViewSolution(ctrl),
         ]),
       ]),
@@ -178,8 +178,8 @@ const feedback = {
           h(
             'em',
             nothing
-              ? ctrl.noarg(ctrl.color === 'white' ? 'noMistakesFoundForWhite' : 'noMistakesFoundForBlack')
-              : ctrl.noarg(ctrl.color === 'white' ? 'doneReviewingWhiteMistakes' : 'doneReviewingBlackMistakes')
+              ? ctrl.trans('noMistakesFoundForSGPlayer', ctrl.color)
+              : ctrl.trans('doneReviewingSGPlayerMistakes', ctrl.color)
           ),
           h('div.choices.end', [
             nothing
@@ -196,7 +196,7 @@ const feedback = {
               {
                 hook: bind('click', () => ctrl.flip()),
               },
-              ctrl.noarg(ctrl.color === 'white' ? 'reviewBlackMistakes' : 'reviewWhiteMistakes')
+              ctrl.trans('reviewSGPlayerMistakes', ctrl.color === 'white' ? 'black' : 'white')
             ),
           ]),
         ]),

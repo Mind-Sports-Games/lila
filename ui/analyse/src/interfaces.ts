@@ -81,12 +81,16 @@ export interface Game {
   id: string;
   status: Status;
   player: Color;
+  playerName: PlayerName;
+  playerIndex: PlayerIndex;
   turns: number;
   startedAtTurn: number;
   source: Source;
   speed: Speed;
   variant: Variant;
   winner?: Color;
+  winnerPlayer: PlayerName;
+  loserPlayer: PlayerName;
   moveCentis?: number[];
   initialFen?: string;
   importedBy?: string;

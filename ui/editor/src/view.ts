@@ -149,16 +149,16 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               },
             },
           },
-          ['whitePlays', 'blackPlays'].map(function (key) {
+          ['white', 'black'].map(function (key) {
             return h(
               'option',
               {
                 attrs: {
-                  value: key[0] == 'w' ? 'white' : 'black',
+                  value: key,
                   selected: ctrl.turn[0] === key[0],
                 },
               },
-              ctrl.trans(key)
+              ctrl.trans('sgPlayerPlays', key)
             );
           })
         )

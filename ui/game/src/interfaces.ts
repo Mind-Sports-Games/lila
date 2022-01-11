@@ -33,6 +33,8 @@ export interface BaseGame {
   speed: Speed;
   variant: Variant | DraughtsVariant;
   winner?: Color;
+  winnerPlayer: PlayerName;
+  loserPlayer: PlayerName;
   drawOffers?: number[];
   moveCentis?: number[];
   initialFen?: string;
@@ -86,6 +88,8 @@ export interface Player {
   user?: PlayerUser;
   spectator?: boolean;
   color: Color;
+  playerName: PlayerName;
+  playerIndex: PlayerIndex;
   proposingTakeback?: boolean;
   offeringRematch?: boolean;
   offeringDraw?: boolean;
@@ -186,10 +190,10 @@ export interface Blurs {
   percent: number;
 }
 
-export interface Trans {
-  (key: string): string;
-  noarg: (key: string) => string;
-}
+//export interface Trans {
+//  (key: string): string;
+//  noarg: (key: string) => string;
+//}
 
 export interface Hold {
   ply: number;

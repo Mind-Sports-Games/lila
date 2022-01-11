@@ -28,7 +28,15 @@ final class JsonView(rematches: Rematches) {
         "startedAtTurn" -> game.chess.startedAtTurn,
         "source"        -> game.source,
         "status"        -> game.status,
-        "createdAt"     -> game.createdAt
+        "createdAt"     -> game.createdAt,
+        "winnerPlayer"  -> (game.winnerSGPlayer match {
+          case Some(winner) => game.variant.playerNames(winner)
+          case None => ""
+        }),
+        "loserPlayer"   -> (game.winnerSGPlayer match {
+          case Some(winner) => game.variant.playerNames(!winner)
+          case None => ""
+        })
       )
       .add("threefold" -> game.situation.threefoldRepetition)
       .add("boosted" -> game.boosted)

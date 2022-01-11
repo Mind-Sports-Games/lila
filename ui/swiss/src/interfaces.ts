@@ -23,6 +23,8 @@ export interface SwissData {
   startsAt: string;
   clock: Clock;
   variant: string;
+  p1Name: PlayerName;
+  p2Name: PlayerName;
   me?: MyInfo;
   canJoin: boolean;
   joinTeam?: string;
@@ -169,8 +171,8 @@ export interface PlayerExt extends Player {
 
 export interface Stats {
   games: number;
-  whiteWins: number;
-  blackWins: number;
+  p1Wins: number;
+  p2Wins: number;
   draws: number;
   byes: number;
   absences: number;

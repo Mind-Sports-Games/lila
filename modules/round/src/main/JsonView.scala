@@ -2,7 +2,7 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, Player => SGPlayer, Pos, Situation }
+import strategygames.{ Clock, Player => SGPlayer, P1, P2, Pos, Situation }
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.math
@@ -35,7 +35,12 @@ final class JsonView(
 
   private def commonPlayerJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
-      .obj("color" -> g.variant.playerNames(p.sgPlayer))
+      //.obj("color" -> g.variant.playerNames(p.sgPlayer), "playerIndex" -> p.sgPlayer.name)
+      .obj(
+        "color" -> p.sgPlayer.classicName,
+        "playerName" -> g.variant.playerNames(p.sgPlayer),
+        "playerIndex" -> p.sgPlayer.name
+      )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
       .add("rating" -> p.rating)
       .add("ratingDiff" -> p.ratingDiff)
@@ -73,7 +78,10 @@ final class JsonView(
             }.add("onGame" -> (player.isAi || socket.onGame(player.sgPlayer))),
             "opponent" -> {
               commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json.obj(
-                "color" -> pov.game.variant.playerNames(opponent.sgPlayer),
+                //"color" -> pov.game.variant.playerNames(opponent.sgPlayer),
+                "color" -> opponent.sgPlayer.classicName,
+                "playerName" -> pov.game.variant.playerNames(opponent.sgPlayer),
+                "playerIndex" -> opponent.sgPlayer.name,
                 "ai"    -> opponent.aiLevel
               )
             }.add("isGone" -> (!opponent.isAi && socket.isGone(opponent.sgPlayer)))
@@ -137,7 +145,10 @@ final class JsonView(
   private def commonWatcherJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
       .obj(
-        "color" -> g.variant.playerNames(p.sgPlayer),
+        //"color" -> g.variant.playerNames(p.sgPlayer),
+        "color" -> p.sgPlayer.classicName,
+        "playerName" -> g.variant.playerNames(p.sgPlayer),
+        "playerIndex" -> p.sgPlayer.name,
         "name"  -> p.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
@@ -182,7 +193,8 @@ final class JsonView(
               "onGame" -> (opponent.isAi || socket.onGame(opponent.sgPlayer))
             ),
             "captureLength" -> captureLength(pov),
-            "orientation" -> pov.game.variant.playerNames(pov.sgPlayer),
+            //"orientation" -> pov.game.variant.playerNames(pov.sgPlayer),
+            "orientation" -> pov.sgPlayer.classicName,
             "url" -> Json.obj(
               "socket" -> s"/watch/$gameId/${game.variant.playerNames(sgPlayer)}/v$apiVersion",
               "round"  -> s"/$gameId/${game.variant.playerNames(sgPlayer)}"
@@ -244,13 +256,20 @@ final class JsonView(
           .add("winner", game.winner.map(w => game.variant.playerNames(w.sgPlayer))),
         "player" -> Json.obj(
           "id"    -> owner.option(pov.playerId),
-          "color" -> game.variant.playerNames(sgPlayer)
+          //"color" -> game.variant.playerNames(sgPlayer),
+          "color" -> sgPlayer.classicName,
+          "playerName" -> game.variant.playerNames(sgPlayer),
+          "playerIndex" -> sgPlayer.name
         ),
         "opponent" -> Json.obj(
-          "color" -> game.variant.playerNames(opponent.sgPlayer),
+          //"color" -> game.variant.playerNames(opponent.sgPlayer),
+          "color" -> sgPlayer.classicName,
+          "playerName" -> game.variant.playerNames(opponent.sgPlayer),
+          "playerIndex" -> sgPlayer.classicName,
           "ai"    -> opponent.aiLevel
         ),
-        "orientation" -> orientation.name,
+        //"orientation" -> orientation.name,
+        "orientation" -> orientation.classicName,
         "pref" -> Json
           .obj(
             "animationDuration" -> animationMillis(pov, pref),

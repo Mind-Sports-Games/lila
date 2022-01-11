@@ -178,6 +178,8 @@ object SwissJson {
         "name"         -> swiss.name,
         "clock"        -> swiss.clock,
         "variant"      -> swiss.variant.key,
+        "p1Name"       -> swiss.variant.playerNames(P1),
+        "p2Name"       -> swiss.variant.playerNames(P2),
         "round"        -> swiss.round,
         "nbRounds"     -> swiss.actualNbRounds,
         "nbPlayers"    -> swiss.nbPlayers,

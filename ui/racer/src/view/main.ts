@@ -7,7 +7,6 @@ import { playModifiers, renderCombo } from 'puz/view/util';
 import { renderRace } from './race';
 import { MaybeVNodes } from 'puz/interfaces';
 import { renderBoard } from './board';
-import { povMessage } from 'puz/run';
 
 export default function (ctrl: RacerCtrl): VNode {
   return h(
@@ -26,7 +25,7 @@ const selectScreen = (ctrl: RacerCtrl): MaybeVNodes => {
   const noarg = ctrl.trans.noarg;
   switch (ctrl.status()) {
     case 'pre': {
-      const povMsg = h('p.racer__pre__message__pov', ctrl.trans(povMessage(ctrl.run)));
+      const povMsg = h('p.racer__pre__message__pov', ctrl.trans('youPlayTheSGPlayerPiecesInAllPuzzles', ctrl.run.pov));
       return ctrl.race.lobby
         ? [
             waitingToStart(noarg),

@@ -56,7 +56,7 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
     tags.push(
       h('div.status', [
         statusView(ctrl),
-        winner ? ', ' + ctrl.trans(winner.color == 'white' ? 'whiteIsVictorious' : 'blackIsVictorious') : null,
+        winner ? ', ' + ctrl.trans('sgPlayerIsVictorious', winner.color) : null,
       ])
     );
   }

@@ -329,6 +329,8 @@ declare type Perf =
   | 'xiangqi';
 
 declare type Color = 'white' | 'black';
+declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red';
+declare type PlayerIndex = 'p1' | 'p2';
 declare type Orientation = 'white' | 'black' | 'left' | 'right';
 
 declare type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
