@@ -82,9 +82,9 @@ object bits {
     } else {
       s"${fen.value},${orient},$lastMove"
     }
-    val extra = if (libName == "Draughts") s"is${boardSize.key}" else ""
+    val extra = if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}" else ""
     tag(
-      cls := s"mini-board mini-board--init cg-wrap is2d ${libName.toLowerCase()} variant-${variantKey} ${extra}",
+      cls := s"mini-board mini-board--init cg-wrap is2d variant-${variantKey} ${extra}",
       dataState := data
     )(cgWrapContent)
   }

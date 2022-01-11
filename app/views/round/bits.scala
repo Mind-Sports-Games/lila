@@ -72,9 +72,10 @@ object bits {
   // TODO: this is duplicated between here and app/views/board/bits.scala.
   private def boardExtra(variant: Variant): String = {
     val lib = variant.gameLogic.name.toLowerCase()
+    val gameFamily = variant.gameFamily.shortName.toLowerCase()
     variant match {
       case Variant.Draughts(v) => s"${variant.key} variant-${variant.key} ${lib} is${v.boardSize.key}"
-      case _ => s"${variant.key} variant-${variant.key} ${lib}"
+      case _ => s"${variant.key} variant-${variant.key} ${gameFamily}"
     }
   }
 
