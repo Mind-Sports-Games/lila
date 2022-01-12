@@ -138,10 +138,13 @@
   <string name="zugzwang" comment="zugzwang&#10;What zugzwang is: https://playstrategy.org/practice/intermediate-tactics/zugzwang/9cKgYrHb/ybYJ9gNa&#10;&#10;This specific string is a label that can be applied to a position in a study, to indicate one side is in zugzwang.">Zugzwang</string>
   <string name="equalPosition">Posizione equivalente</string>
   <string name="unclearPosition" comment="unclearPosition&#10;It is unclear who is winning or losing.">Posizione non chiara</string>
+  <string name="sgPlayerIsSlightlyBetter">Il %s è in lieve vantaggio</string>
   <string name="whiteIsSlightlyBetter">Il bianco è in lieve vantaggio</string>
   <string name="blackIsSlightlyBetter">Il nero è in lieve vantaggio</string>
+  <string name="sgPlayerIsBetter">Il %s è in vantaggio</string>
   <string name="whiteIsBetter">Il bianco è in vantaggio</string>
   <string name="blackIsBetter">Il nero è in vantaggio</string>
+  <string name="sgPlayerIsWinning">Il %s sta vincendo</string>
   <string name="whiteIsWinning">Il bianco sta vincendo</string>
   <string name="blackIsWinning">Il nero sta vincendo</string>
   <string name="novelty" comment="novelty&#10;&#10;A move in the opening that has not been played before.&#10;https://en.wikipedia.org/wiki/Glossary_of_chess#theoretical_novelty">Novità</string>

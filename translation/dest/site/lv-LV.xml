@@ -20,6 +20,7 @@
   <string name="black">Melnie</string>
   <string name="randomColor">Nejauša krāsa</string>
   <string name="createAGame">Izveidot spēli</string>
+  <string name="sgPlayerIsVictorious">%s ir uzvarējuši</string>
   <string name="whiteIsVictorious">Baltie ir uzvarējuši</string>
   <string name="blackIsVictorious">Melnie ir uzvarējuši</string>
   <string name="youPlayTheWhitePieces">Jūs spēlējat ar baltajiem</string>
@@ -46,8 +47,10 @@
   <string name="forceDraw">Pieprasīt neizšķirtu</string>
   <string name="talkInChat">Tērzējot, lūdzu, esiet pieklājīgi!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Pirmais, kurš izmantos šo saiti, spēlēs ar jums.</string>
+  <string name="sgPlayerResigned">%s padevās</string>
   <string name="whiteResigned">Baltie padevās</string>
   <string name="blackResigned">Melnie padevās</string>
+  <string name="sgPlayerLeftTheGame">%s pameta spēli</string>
   <string name="whiteLeftTheGame">Baltie pameta spēli</string>
   <string name="blackLeftTheGame">Melnie pameta spēli</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Padalies ar šo saiti, lai ļautu skatītājiem redzēt spēli</string>
@@ -81,6 +84,7 @@
   <string name="drawn">Neizšķirts</string>
   <string name="unknown">Neskaidrs</string>
   <string name="database">Datubāze</string>
+  <string name="p1DrawP2">%1$s / Neizšķirts / %2$s</string>
   <string name="whiteDrawBlack">Baltie / Neizšķirts / Melnie</string>
   <string name="averageRatingX">Vidējais reitings: %s</string>
   <string name="recentGames">Nesenas spēles</string>
@@ -230,8 +234,10 @@
   <string name="drawOfferDeclined">Neizšķirta piedāvājums noraidīts</string>
   <string name="drawOfferAccepted">Neizšķirta piedāvājums pieņemts</string>
   <string name="drawOfferCanceled">Neizšķirta piedāvājums atcelts</string>
+  <string name="sgPlayerOffersDraw">%s piedāvā neizšķirtu</string>
   <string name="whiteOffersDraw">Baltie piedāvā neizšķirtu</string>
   <string name="blackOffersDraw">Melnie piedāvā neizšķirtu</string>
+  <string name="sgPlayerDeclinesDraw">%s noraida neizšķirtu</string>
   <string name="whiteDeclinesDraw">Baltie noraida neizšķirtu</string>
   <string name="blackDeclinesDraw">Melnie noraida neizšķirtu</string>
   <string name="yourOpponentOffersADraw">Jūsu pretinieks piedāvā neizšķirtu</string>
@@ -388,6 +394,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Noklikšķiniet uz laukuma, lai izdarītu gājienu un pierādītu, ka esat cilvēks.</string>
   <string name="captcha.fail">Lūdzu, atrisiniet šaha cilvēktestu.</string>
   <string name="notACheckmate">Nav šahs un mats</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s pieteiks matu vienā gājienā</string>
   <string name="whiteCheckmatesInOneMove">Baltie pieteiks matu vienā gājienā</string>
   <string name="blackCheckmatesInOneMove">Melnie pieteiks matu vienā gājienā</string>
   <string name="retry">Mēģināt vēlreiz</string>
@@ -802,6 +809,7 @@
   <string name="hideBestMove">Nerādīt labāko gājienu</string>
   <string name="getAHint">Saņemt padomu</string>
   <string name="evaluatingYourMove">Novērtē jūsu gājienu...</string>
+  <string name="sgPlayerWinsGame">%s uzvar</string>
   <string name="whiteWinsGame">Baltie uzvar</string>
   <string name="blackWinsGame">Melnie uzvar</string>
   <string name="learnFromYourMistakes">Mācīties no savām kļūdām</string>

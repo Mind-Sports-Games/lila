@@ -20,6 +20,7 @@
   <string name="black">Beltza</string>
   <string name="randomColor">Ausazko kolorea</string>
   <string name="createAGame">Partida bat sortu</string>
+  <string name="sgPlayerIsVictorious">%s irabazle</string>
   <string name="whiteIsVictorious">Zuria irabazle</string>
   <string name="blackIsVictorious">Beltza irabazle</string>
   <string name="youPlayTheWhitePieces">Zuk pieza zuriekin jokatzen duzu</string>
@@ -47,6 +48,7 @@
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">URL honetara datorren lehenengoak jokatuko du zurekin.</string>
   <string name="whiteResigned">Zuriak amore eman du</string>
   <string name="blackResigned">Beltzak amore eman du</string>
+  <string name="sgPlayerLeftTheGame">%s partidatik atera da</string>
   <string name="whiteLeftTheGame">Zuria partidatik atera da</string>
   <string name="blackLeftTheGame">Beltza partidatik atera da</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">URL hau partekatu, ikusleak zure partidara gonbidatzeko</string>

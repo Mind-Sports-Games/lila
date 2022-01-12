@@ -21,6 +21,7 @@
   <string name="randomColor">Hazarda koloro</string>
   <string name="createAGame">Krei ludon</string>
   <string name="whiteIsVictorious">Blanko venkas</string>
+  <string name="sgPlayerIsVictorious">%s venkis</string>
   <string name="blackIsVictorious">Nigro venkis</string>
   <string name="youPlayTheWhitePieces">Vi ludas per la blankaj pecoj</string>
   <string name="youPlayTheBlackPieces">Vi ludas per la nigraj pecoj</string>
@@ -33,6 +34,7 @@
   <string name="yourOpponentWantsToPlayANewGameWithYou">Via kontraŭulo volas ludi denove kun vi</string>
   <string name="joinTheGame">Aliĝi al la ludo</string>
   <string name="whitePlays">Blanko ludas</string>
+  <string name="sgPlayerPlays">%s ludas</string>
   <string name="blackPlays">Nigro ludas</string>
   <plurals name="opponentLeftCounter">
     <item quantity="one">Via kontraŭulo forlasis la ludon. Vi povas postuli venkon en %s sekundo.</item>
@@ -45,8 +47,10 @@
   <string name="talkInChat">Bonvolu esti afabla en la babilejo!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">La unua persono, kiu alvenos al ĉi tiu ligilo, ludos kun vi.</string>
   <string name="whiteResigned">Blanko rezignis</string>
+  <string name="sgPlayerResigned">%s rezignis</string>
   <string name="blackResigned">Nigro rezignis</string>
   <string name="whiteLeftTheGame">Blanko forlasis la ludon</string>
+  <string name="sgPlayerLeftTheGame">%s forlasis la ludon</string>
   <string name="blackLeftTheGame">Nigro forlasis la ludon</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Diskonigu ĉi tiun ligilon por inviti spektantojn al la ludo</string>
   <string name="theComputerAnalysisHasFailed">La komputila analizo ne sukcesis</string>
@@ -79,6 +83,7 @@
   <string name="drawn">Kaŭzas egalvenkon</string>
   <string name="unknown">Nekonata</string>
   <string name="database">Datumbazo</string>
+  <string name="p1DrawP2">Blanko / Egalvenko / %2$s</string>
   <string name="whiteDrawBlack">Blanko / Egalvenko / Nigro</string>
   <string name="averageRatingX">Meznombra rango: %s</string>
   <string name="recentGames">Lastaj ludoj</string>
@@ -198,14 +203,17 @@
   </plurals>
   <string name="cancel">Nuligi</string>
   <string name="whiteTimeOut">La tempo de blanko finiĝis</string>
+  <string name="sgPlayerTimeOut">La tempo de %s finiĝis</string>
   <string name="blackTimeOut">La tempo de nigro finiĝis</string>
   <string name="drawOfferSent">Egalvenka propono estis sendita</string>
   <string name="drawOfferDeclined">Egalvenka propono estis malakceptita</string>
   <string name="drawOfferAccepted">Egalvenka propono estis akceptita</string>
   <string name="drawOfferCanceled">Egalvenka propono estis nuligita</string>
   <string name="whiteOffersDraw">Blanko proponas egalvenkon</string>
+  <string name="sgPlayerOffersDraw">%s proponas egalvenkon</string>
   <string name="blackOffersDraw">Nigro proponas egalvenkon</string>
   <string name="whiteDeclinesDraw">Blanko malakceptas egalvenkon</string>
+  <string name="sgPlayerDeclinesDraw">%s malakceptas egalvenkon</string>
   <string name="blackDeclinesDraw">Nigro malakceptas egalvenkon</string>
   <string name="yourOpponentOffersADraw">Via kontraŭulo proponas egalvenkon</string>
   <string name="accept">Akcepti</string>
@@ -348,6 +356,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Alklaku la ŝaktabulon por fari movon kaj pruvi, ke vi estas homa.</string>
   <string name="captcha.fail">Bonvolu solvi la ŝakan captcha-on.</string>
   <string name="notACheckmate">Ne ŝakmato</string>
+  <string name="sgPlayerCheckmatesInOneMove">La %s ludanto devas matigi per unu movo</string>
   <string name="whiteCheckmatesInOneMove">La blanka ludanto devas matigi per unu movo</string>
   <string name="blackCheckmatesInOneMove">La nigra ludanto devas matigi per unu movo</string>
   <string name="retry">Reprovi</string>
@@ -748,21 +757,25 @@
   <string name="getAHint">Ricevi konsileton</string>
   <string name="evaluatingYourMove">Taksante vian movon ...</string>
   <string name="whiteWinsGame">Blanko venkas</string>
+  <string name="sgPlayerWinsGame">%s venkas</string>
   <string name="blackWinsGame">Nigro venkas</string>
   <string name="learnFromYourMistakes">Lerni de viaj eraroj</string>
   <string name="learnFromThisMistake">Lerni de tio ĉi eraro</string>
   <string name="skipThisMove">Preterpasi tion ĉi movon</string>
   <string name="next">Sekva</string>
   <string name="xWasPlayed">%s ludita</string>
+  <string name="findBetterMoveForSGPlayer">Trovi plibonan movon por %s</string>
   <string name="findBetterMoveForWhite">Trovi plibonan movon por blanka</string>
   <string name="findBetterMoveForBlack">Trovi plibonan movon por nigra</string>
   <string name="resumeLearning">Daŭrigi lerni</string>
   <string name="youCanDoBetter">Vi povas fari pli bone</string>
+  <string name="tryAnotherMoveForSGPlayer">Provi por %s alian movon</string>
   <string name="tryAnotherMoveForWhite">Provi por blanka alian movon</string>
   <string name="tryAnotherMoveForBlack">Provi por nigra alian movon</string>
   <string name="solution">Solvo</string>
   <string name="waitingForAnalysis">Atendante analizon</string>
   <string name="noMistakesFoundForWhite">Neniu eraroj trovita por blanko</string>
+  <string name="noMistakesFoundForSGPlayer">Neniu eraroj trovita por %s</string>
   <string name="noMistakesFoundForBlack">Neniu eraroj trovita por nigro</string>
   <string name="doneReviewingWhiteMistakes">Revui blankajn erarojn estas finita</string>
   <string name="doneReviewingBlackMistakes">Revui nigrajn erarojn estas finita</string>

@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Comhordanáidí</string>
   <string name="coordinateTraining">Cleachtadh comhordanáide</string>
+  <string name="averageScoreAsSGPlayerX">Meánscór le %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Meánscór le bán: %s</string>
   <string name="averageScoreAsBlackX">Meánscór le dubh: %s</string>
   <string name="knowingTheChessBoard">Is scil fichille an-tábhachtach é eolas a bheith agat ar chomhordanáidí an chláir fichille:</string>

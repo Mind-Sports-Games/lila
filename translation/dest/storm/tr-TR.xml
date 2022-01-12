@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">Başlamak için hamle yap</string>
+  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">Tüm bulmacalarda %s taraf olacaksın</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">Tüm bulmacalarda beyaz taraf olacaksın</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">Tüm bulmacalarda siyah taraf olacaksın</string>
   <string name="puzzlesSolved">bulmaca çözüldü</string>

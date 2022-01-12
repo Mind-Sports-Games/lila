@@ -20,8 +20,10 @@
   <string name="black">કાળુ</string>
   <string name="randomColor">કોઇ પણ બાજુ</string>
   <string name="createAGame">રમત બનાવો</string>
+  <string name="sgPlayerIsVictorious">%s વિજય રહ્યો</string>
   <string name="whiteIsVictorious">સફેદ વિજય રહ્યો</string>
   <string name="blackIsVictorious">કાળો વિજય રહ્યો</string>
+  <string name="youPlayTheSGPlayerPieces">તમે %s ટુકડાઓ સાથે રમસો</string>
   <string name="youPlayTheWhitePieces">તમે સફેદ ટુકડાઓ સાથે રમસો</string>
   <string name="youPlayTheBlackPieces">તમે કાળા ટુકડાઓ સાથે રમસો</string>
   <string name="itsYourTurn">તમારો વારો!</string>
@@ -44,8 +46,10 @@
   <string name="forceDraw">ફોર્સ ડ્રો</string>
   <string name="talkInChat">કૃપા કરીને ચેટમાં સભ્યતા રાખવી!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">જે સ્પર્ધક પહેલા આવશે url પર તે તમારી સાથે રમશે.</string>
+  <string name="sgPlayerResigned">%s દ્વારા resign કરવામાં આવ્યું</string>
   <string name="whiteResigned">સફેદ દ્વારા resign કરવામાં આવ્યું</string>
   <string name="blackResigned">કાળા દ્વારા resign કરવામાં આવ્યું</string>
+  <string name="sgPlayerLeftTheGame">%s એ ગેમ છોડી દીધી</string>
   <string name="whiteLeftTheGame">સફેદ એ ગેમ છોડી દીધી</string>
   <string name="blackLeftTheGame">કાળા એ ગેમ છોડી દીધી</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">આ url ને શેર કરો દર્શકો ની સાથે</string>
@@ -261,6 +265,7 @@
   <string name="unblock">અનબ્લોક</string>
   <string name="tournamentComplete">પ્રતિયોગિતા પૂર્ણ</string>
   <string name="movesPlayed">ચાલ રમ્યા</string>
+  <string name="sgPlayerWins">%s ની જીત</string>
   <string name="whiteWins">સફેદ ની જીત</string>
   <string name="blackWins">કાળા ની જીત</string>
   <string name="draws">ડ્રો</string>

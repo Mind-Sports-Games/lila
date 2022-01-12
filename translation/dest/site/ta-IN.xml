@@ -20,8 +20,10 @@
   <string name="black">கருப்பு</string>
   <string name="randomColor">ஏதாவது ஒரு நிறம்</string>
   <string name="createAGame">ஆட்டமொன்றை உருவாக்கு</string>
+  <string name="sgPlayerIsVictorious">%s வென்றது</string>
   <string name="whiteIsVictorious">வெள்ளை வென்றது</string>
   <string name="blackIsVictorious">கருப்பு வென்றது</string>
+  <string name="youPlayTheSGPlayerPieces">நீங்கள் %s நிறத்திலுள்ள காய்களுடன் ஆடுகிறீர்கள்</string>
   <string name="youPlayTheWhitePieces">நீங்கள் வெள்ளை நிறத்திலுள்ள காய்களுடன் ஆடுகிறீர்கள்</string>
   <string name="youPlayTheBlackPieces">நீங்கள் கருப்பு நிறத்திலுள்ள காய்களுடன் ஆடுகிறீர்கள்</string>
   <string name="itsYourTurn">நீங்கள் விளையாடனும்!</string>
@@ -32,6 +34,7 @@
   <string name="newOpponent">புது எதிராளி</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">நும் எதிராளி நும்மோடு புது ஆட்டமாட விரும்புகிறார்</string>
   <string name="joinTheGame">ஆட்டத்தில் சேரவும்</string>
+  <string name="sgPlayerPlays">%s விளையாடுகின்றது</string>
   <string name="whitePlays">வெள்ளை விளையாடுகின்றது</string>
   <string name="blackPlays">கருப்பு விளையாடுகின்றது</string>
   <plurals name="opponentLeftCounter">
@@ -44,8 +47,10 @@
   <string name="forceDraw">சமன் செய்ய கோரு</string>
   <string name="talkInChat">உரையாடலில் உரையாடு</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">இந்த்ச் சுட்டியில் வந்தடையும் முதலாள் நும்மோடு விளையாடுவார்</string>
+  <string name="sgPlayerResigned">%s விலகிற்று</string>
   <string name="whiteResigned">வெள்ளை விலகிற்று</string>
   <string name="blackResigned">கருப்பு விலகிற்று</string>
+  <string name="sgPlayerLeftTheGame">%s ஆட்டத்தை விட்டது</string>
   <string name="whiteLeftTheGame">வெள்ளை ஆட்டத்தை விட்டது</string>
   <string name="blackLeftTheGame">கருப்பு ஆட்டத்தை விட்டது</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">பார்வையாளர்கள் ஆட்டத்தைப் பார்க்க இந்தச் சுட்டியைத் தெரிவி</string>
@@ -79,6 +84,7 @@
   <string name="drawn">சமநிலை அடைந்தது</string>
   <string name="unknown">தெரியவில்லை</string>
   <string name="database">தரவுத்தளம்</string>
+  <string name="p1DrawP2">%1$s / காயடைப்புநிலை / %2$s</string>
   <string name="whiteDrawBlack">வெள்ளை / காயடைப்புநிலை / கருப்பு</string>
   <string name="averageRatingX">சராசரி மதிப்பெண்கள்: %s</string>
   <string name="recentGames">சமீபத்திய விளையாட்டு</string>
@@ -201,14 +207,17 @@
     <item quantity="other">%s ஆட்டங்கள் நும்மோடு</item>
   </plurals>
   <string name="cancel">கழி</string>
+  <string name="sgPlayerTimeOut">%s நேரம் முடிந்தது</string>
   <string name="whiteTimeOut">வெள்ளை நேரம் முடிந்தது</string>
   <string name="blackTimeOut">கருப்பு நேரம் முடிந்தது</string>
   <string name="drawOfferSent">இழுபறி முன்வரவு தெரிவிப்பு</string>
   <string name="drawOfferDeclined">இழுபறி முன்வரவு மறுப்பு</string>
   <string name="drawOfferAccepted">இழுபறி முன்வரவு எற்பு</string>
   <string name="drawOfferCanceled">இழுபறி முன்வரவு கழிப்பு</string>
+  <string name="sgPlayerOffersDraw">%s சமநிலை வாய்ப்பளிக்கிறது</string>
   <string name="whiteOffersDraw">வெள்ளை சமநிலை வாய்ப்பளிக்கிறது</string>
   <string name="blackOffersDraw">கருப்பு சமநிலை வாய்ப்பளிக்கிறது</string>
+  <string name="sgPlayerDeclinesDraw">%s சமநிலை வாய்ப்பை ஏற்கவில்லை</string>
   <string name="whiteDeclinesDraw">வெள்ளை சமநிலை வாய்ப்பை ஏற்கவில்லை</string>
   <string name="blackDeclinesDraw">கருப்பு சமநிலை வாய்ப்பை ஏற்கவில்லை</string>
   <string name="yourOpponentOffersADraw">நும் எதிராளி இழுபறிக்கு முன்வருகின்றார்</string>
@@ -387,6 +396,7 @@
   <string name="tournamentIsStarting">போட்டி தொடங்குகின்றது</string>
   <string name="performance">செயல்திறன்</string>
   <string name="movesPlayed">ஆடின ஆட்டங்கள்</string>
+  <string name="sgPlayerWins">%s வெற்றிபெற்றது</string>
   <string name="whiteWins">வெள்ளை வெற்றிபெற்றது</string>
   <string name="blackWins">கருப்பு வெற்றிபெற்றது</string>
   <string name="draws">சமநிலை</string>

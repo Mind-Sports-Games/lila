@@ -80,6 +80,7 @@
   <string name="drawn">Remiză</string>
   <string name="unknown">Necunoscut</string>
   <string name="database">Bază de date</string>
+  <string name="p1DrawP2">%1$s / Remiză / %2$s</string>
   <string name="whiteDrawBlack">Alb / Remiză / Negru</string>
   <string name="averageRatingX">Medie evaluare: %s</string>
   <string name="recentGames">Jocuri recente</string>
@@ -223,6 +224,7 @@
     <item quantity="other">%s partide cu tine</item>
   </plurals>
   <string name="cancel">Anulare</string>
+  <string name="sgPlayerTimeOut">Timpul pentru %s a expirat</string>
   <string name="whiteTimeOut">Timpul pentru alb a expirat</string>
   <string name="blackTimeOut">Timpul pentru negru a expirat</string>
   <string name="drawOfferSent">Propunere de remiză trimisă</string>

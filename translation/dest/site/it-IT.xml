@@ -20,8 +20,10 @@
   <string name="black">Nero</string>
   <string name="randomColor">Colore casuale</string>
   <string name="createAGame">Crea una partita</string>
+  <string name="sgPlayerIsVictorious">Vince il %s</string>
   <string name="whiteIsVictorious">Vince il Bianco</string>
   <string name="blackIsVictorious">Vince il Nero</string>
+  <string name="youPlayTheSGPlayerPieces">Sei il %s</string>
   <string name="youPlayTheWhitePieces">Sei il Bianco</string>
   <string name="youPlayTheBlackPieces">Sei il Nero</string>
   <string name="itsYourTurn">Tocca a te!</string>
@@ -33,6 +35,7 @@
   <string name="newOpponent">Nuovo avversario</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Il tuo avversario vuole giocare un\'altra partita con te</string>
   <string name="joinTheGame">Unisciti alla partita</string>
+  <string name="sgPlayerPlays">Tocca al %s</string>
   <string name="whitePlays">Tocca al Bianco</string>
   <string name="blackPlays">Tocca al Nero</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +48,10 @@
   <string name="forceDraw">Stabilisci la patta</string>
   <string name="talkInChat">Sii educato in chat!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">La prima persona che si presenta a questo URL giocherà con te.</string>
+  <string name="sgPlayerResigned">Il %s ha abbandonato</string>
   <string name="whiteResigned">Il Bianco ha abbandonato</string>
   <string name="blackResigned">Il Nero ha abbandonato</string>
+  <string name="sgPlayerLeftTheGame">Il %s ha lasciato la partita</string>
   <string name="whiteLeftTheGame">Il Bianco ha lasciato la partita</string>
   <string name="blackLeftTheGame">Il Nero ha lasciato la partita</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Condividi questo URL per ammettere spettatori alla partita</string>
@@ -80,6 +85,7 @@
   <string name="drawn">Patta</string>
   <string name="unknown">Posizioni sconosciute</string>
   <string name="database">Database</string>
+  <string name="p1DrawP2">%1$s / Patta / %2$s</string>
   <string name="whiteDrawBlack">Bianco / Patta / Nero</string>
   <string name="averageRatingX">Punteggio medio: %s</string>
   <string name="recentGames">Partite recenti</string>
@@ -210,14 +216,17 @@
     <item quantity="other">%s giocate con te</item>
   </plurals>
   <string name="cancel">Annulla</string>
+  <string name="sgPlayerTimeOut">Timeout %s</string>
   <string name="whiteTimeOut">Timeout bianco</string>
   <string name="blackTimeOut">Timeout nero</string>
   <string name="drawOfferSent">Offerta di patta inviata</string>
   <string name="drawOfferDeclined">Offerta di patta rifiutata</string>
   <string name="drawOfferAccepted">Offerta di patta accettata</string>
   <string name="drawOfferCanceled">Offerta di patta annullata</string>
+  <string name="sgPlayerOffersDraw">Il %s offre patta</string>
   <string name="whiteOffersDraw">Il Bianco offre patta</string>
   <string name="blackOffersDraw">Il Nero offre patta</string>
+  <string name="sgPlayerDeclinesDraw">Il %s rifiuta la patta</string>
   <string name="whiteDeclinesDraw">Il Bianco rifiuta la patta</string>
   <string name="blackDeclinesDraw">Il Nero rifiuta la patta</string>
   <string name="yourOpponentOffersADraw">Il tuo avversario offre patta</string>
@@ -362,6 +371,7 @@ analizzarla con il computer, commentarla in chat, e condividerla tramite un indi
   <string name="clickOnTheBoardToMakeYourMove">Clicca sulla scacchiera e fai la tua mossa, per provare che sei un umano.</string>
   <string name="captcha.fail">Per favore risolvi il captcha di scacchi.</string>
   <string name="notACheckmate">Non è scacco matto</string>
+  <string name="sgPlayerCheckmatesInOneMove">Il %s dà matto in una mossa</string>
   <string name="whiteCheckmatesInOneMove">Il Bianco dà matto in una mossa</string>
   <string name="blackCheckmatesInOneMove">Il Nero dà matto in una mossa</string>
   <string name="retry">Riprova</string>
@@ -431,6 +441,7 @@ analizzarla con il computer, commentarla in chat, e condividerla tramite un indi
   <string name="performance">Performance</string>
   <string name="tournamentComplete">Torneo terminato</string>
   <string name="movesPlayed">Mosse giocate</string>
+  <string name="sgPlayerWins">Il %s vince</string>
   <string name="whiteWins">Il Bianco vince</string>
   <string name="blackWins">Il Nero vince</string>
   <string name="draws">Patte</string>
@@ -765,6 +776,7 @@ analizzarla con il computer, commentarla in chat, e condividerla tramite un indi
   <string name="hideBestMove">Nascondi la mossa migliore</string>
   <string name="getAHint">Vuoi un suggerimento?</string>
   <string name="evaluatingYourMove">Valutazione della tua mossa in corso...</string>
+  <string name="sgPlayerWinsGame">Il %s vince</string>
   <string name="whiteWinsGame">Il Bianco vince</string>
   <string name="blackWinsGame">Il Nero vince</string>
   <string name="learnFromYourMistakes">Impara dai tuoi errori</string>
@@ -772,19 +784,24 @@ analizzarla con il computer, commentarla in chat, e condividerla tramite un indi
   <string name="skipThisMove">Salta questa mossa</string>
   <string name="next">Successivo</string>
   <string name="xWasPlayed">Ultima mossa %s</string>
+  <string name="findBetterMoveForSGPlayer">Trova una mossa migliore per il %s</string>
   <string name="findBetterMoveForWhite">Trova una mossa migliore per il Bianco</string>
   <string name="findBetterMoveForBlack">Trova una mossa migliore per il Nero</string>
   <string name="resumeLearning">Continua ad imparare</string>
   <string name="youCanDoBetter">Puoi fare di meglio</string>
+  <string name="tryAnotherMoveForSGPlayer">Prova un\'altra mossa per il %s</string>
   <string name="tryAnotherMoveForWhite">Prova un\'altra mossa per il bianco</string>
   <string name="tryAnotherMoveForBlack">Prova un\'altra mossa per il nero</string>
   <string name="solution">Soluzione</string>
   <string name="waitingForAnalysis">In attesa dell\'analisi</string>
+  <string name="noMistakesFoundForSGPlayer">Nessun errore trovato per il %s</string>
   <string name="noMistakesFoundForWhite">Nessun errore trovato per il bianco</string>
   <string name="noMistakesFoundForBlack">Nessun errore trovato per il nero</string>
+  <string name="doneReviewingSGPlayerMistakes">Hai finito di rivedere gli errori del %s</string>
   <string name="doneReviewingWhiteMistakes">Hai finito di rivedere gli errori del Bianco</string>
   <string name="doneReviewingBlackMistakes">Hai finito di rivedere gli errori del Nero</string>
   <string name="doItAgain">Rifallo</string>
+  <string name="reviewSGPlayerMistakes">Analizza gli errori del %s</string>
   <string name="reviewWhiteMistakes">Analizza gli errori del Bianco</string>
   <string name="reviewBlackMistakes">Analizza gli errori del Nero</string>
   <string name="advantage">Vantaggio</string>

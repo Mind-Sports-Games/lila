@@ -138,10 +138,13 @@
   <string name="zugzwang" comment="zugzwang&#10;What zugzwang is: https://playstrategy.org/practice/intermediate-tactics/zugzwang/9cKgYrHb/ybYJ9gNa&#10;&#10;This specific string is a label that can be applied to a position in a study, to indicate one side is in zugzwang.">Zugzwang</string>
   <string name="equalPosition">Berdindutako posizioa</string>
   <string name="unclearPosition" comment="unclearPosition&#10;It is unclear who is winning or losing.">Posizioa ez da argia</string>
+  <string name="sgPlayerIsSlightlyBetter">%s hobetoxeago</string>
   <string name="whiteIsSlightlyBetter">Zuria hobetoxeago</string>
   <string name="blackIsSlightlyBetter">Beltza hobetoxeago</string>
+  <string name="sgPlayerIsBetter">%s hobeto</string>
   <string name="whiteIsBetter">Zuria hobeto</string>
   <string name="blackIsBetter">Beltza hobeto</string>
+  <string name="sgPlayerIsWinning">%s irabazten ari da</string>
   <string name="whiteIsWinning">Zuria irabazten ari da</string>
   <string name="blackIsWinning">Beltza irabazten ari da</string>
   <string name="novelty" comment="novelty&#10;&#10;A move in the opening that has not been played before.&#10;https://en.wikipedia.org/wiki/Glossary_of_chess#theoretical_novelty">Berritasuna</string>

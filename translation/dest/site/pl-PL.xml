@@ -47,8 +47,10 @@
   <string name="forceDraw">Ogłoś remis</string>
   <string name="talkInChat">Bądź miły na czacie</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Pierwsza osoba, która przejdzie pod ten adres, dołączy do Twojej partii.</string>
+  <string name="sgPlayerResigned">%s poddały się</string>
   <string name="whiteResigned">Białe poddały się</string>
   <string name="blackResigned">Czarne poddały się</string>
+  <string name="sgPlayerLeftTheGame">%s porzuciły partię</string>
   <string name="whiteLeftTheGame">Białe porzuciły partię</string>
   <string name="blackLeftTheGame">Czarne porzuciły partię</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Udostępnij ten adres innym, by mogli zobaczyć tę partię</string>
@@ -82,6 +84,7 @@
   <string name="drawn">Remisuje</string>
   <string name="unknown">Nieznany</string>
   <string name="database">Baza danych</string>
+  <string name="p1DrawP2">%1$s / Remis / %2$s</string>
   <string name="whiteDrawBlack">Białe / Remis / Czarne</string>
   <string name="averageRatingX">Średni ranking: %s</string>
   <string name="recentGames">Ostatnie partie</string>
@@ -244,8 +247,10 @@
   <string name="drawOfferDeclined">Odrzucono propozycję remisu</string>
   <string name="drawOfferAccepted">Przyjęto propozycję remisu</string>
   <string name="drawOfferCanceled">Wycofano propozycję remisu</string>
+  <string name="sgPlayerOffersDraw">%s proponują remis</string>
   <string name="whiteOffersDraw">Białe proponują remis</string>
   <string name="blackOffersDraw">Czarne proponują remis</string>
+  <string name="sgPlayerDeclinesDraw">%s odrzucają propozycję remisu</string>
   <string name="whiteDeclinesDraw">Białe odrzucają propozycję remisu</string>
   <string name="blackDeclinesDraw">Czarne odrzucają propozycję remisu</string>
   <string name="yourOpponentOffersADraw">Przeciwnik proponuje remis</string>
@@ -415,6 +420,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Wykonaj ruch i udowodnij, że jesteś człowiekiem.</string>
   <string name="captcha.fail">Rozwiąż zadanie szachowe.</string>
   <string name="notACheckmate">To nie jest mat</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s dają mata w jednym ruchu</string>
   <string name="whiteCheckmatesInOneMove">Białe dają mata w jednym ruchu</string>
   <string name="blackCheckmatesInOneMove">Czarne dają mata w jednym ruchu</string>
   <string name="retry">Spróbuj jeszcze raz</string>

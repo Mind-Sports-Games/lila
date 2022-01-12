@@ -11,14 +11,17 @@
   <string name="black">ক’লা</string>
   <string name="randomColor">যাদৃচ্ছিক দল</string>
   <string name="createAGame">নতুন খেল আৰমভ কৰক</string>
+  <string name="sgPlayerIsVictorious">%s দল বিজয়ী</string>
   <string name="whiteIsVictorious">বগা দল বিজয়ী</string>
   <string name="blackIsVictorious">ক’লা দল বিজয়ী</string>
   <string name="kingInTheCenter">ৰজা আহিল মাজ\'লৈ</string>
   <string name="joinTheGame">খেলখনত ভাগ লোৱা</string>
+  <string name="sgPlayerPlays">%s দলৰ পাল</string>
   <string name="whitePlays">বগা দলৰ পাল</string>
   <string name="blackPlays">ক’লা দলৰ পাল</string>
   <string name="forceResignation">জয় লাভ কৰক</string>
   <string name="talkInChat">চেতত ভাল বাবে কথা পাতিব!</string>
+  <string name="sgPlayerLeftTheGame">%s খেলোৱৈয়ে খেলখন এৰি গ\'ল</string>
   <string name="whiteLeftTheGame">বগা খেলোৱৈয়ে খেলখন এৰি গ\'ল</string>
   <string name="blackLeftTheGame">ক\'লা খেলোৱৈয়ে খেলখন এৰি গ\'ল</string>
   <string name="close">বন্ধ</string>

@@ -19,6 +19,7 @@
   <string name="black">Хуррисем</string>
   <string name="randomColor">Ӑнсӑрт йен</string>
   <string name="createAGame">Вӑйӑ йӗркеле</string>
+  <string name="sgPlayerIsVictorious">%s ҫӗнтерчӗҫ</string>
   <string name="whiteIsVictorious">Шуррисем ҫӗнтерчӗҫ</string>
   <string name="blackIsVictorious">Хурисем ҫӗнтерчӗҫ</string>
   <string name="kingInTheCenter">Патша варринче</string>
@@ -36,8 +37,10 @@
   <string name="forceDraw">Парма-пар пирки пӗлтер</string>
   <string name="talkInChat">Калаҫура сӑпайлӑ пул!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Ҫак каҫҫипе пӗрремӗш килекен ҫын санпа вылӗ.</string>
+  <string name="sgPlayerResigned">%s парӑнчӗҫ</string>
   <string name="whiteResigned">Шуррисем парӑнчӗҫ</string>
   <string name="blackResigned">Хурисем парӑнчӗҫ</string>
+  <string name="sgPlayerLeftTheGame">%s вӑййинчен тухрӗҫ</string>
   <string name="whiteLeftTheGame">Шуррисем вӑййинчен тухрӗҫ</string>
   <string name="blackLeftTheGame">Хурисем вӑййинчен тухрӗҫ</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Вӑййине сӑнма ирӗк парас тесе каҫҫине пайлаш</string>
@@ -49,6 +52,7 @@
   <string name="deleteFromHere">Кунтан пуҫласа катерт</string>
   <string name="close">Хуп</string>
   <string name="database">Пӗлӗм пуххи</string>
+  <string name="p1DrawP2">%1$s / Пармапар / Хурисем</string>
   <string name="whiteDrawBlack">Шуррисем / Пармапар / Хурисем</string>
   <string name="averageRatingX">Вӑтамри рейтинг: %s</string>
   <string name="recentGames">Паҫӑрхи вӑйӑсем</string>
@@ -119,8 +123,10 @@
   <string name="drawOfferDeclined">Парма-пар сӗннине сирнӗ</string>
   <string name="drawOfferAccepted">Парма-пар сӗннине йышӑннӑ</string>
   <string name="drawOfferCanceled">Парма-пар сӗннине пӑрахӑҫланӑ</string>
+  <string name="sgPlayerOffersDraw">%s парма-паршӑн</string>
   <string name="whiteOffersDraw">Шуррисем парма-паршӑн</string>
   <string name="blackOffersDraw">Хурисем парма-паршӑн</string>
+  <string name="sgPlayerDeclinesDraw">%s парма-паршӑн мар</string>
   <string name="whiteDeclinesDraw">Шуррисем парма-паршӑн мар</string>
   <string name="blackDeclinesDraw">Хурисем парма-паршӑн мар</string>
   <string name="yourOpponentOffersADraw">Сан ӑмӑртуҫӑ парма-паршӑн</string>
@@ -249,6 +255,7 @@
   <string name="createdBy">Йӗркелӳҫӗ</string>
   <string name="tournamentIsStarting">Турнир кӗҫех пуҫланать</string>
   <string name="berserkRate">Берҫерк хаклавӗ</string>
+  <string name="sgPlayerWins">%s ҫӗнтерни</string>
   <string name="whiteWins">Шуррисем ҫӗнтерни</string>
   <string name="blackWins">Хурисем ҫӗнтерни</string>
   <string name="draws">Парма-пар</string>

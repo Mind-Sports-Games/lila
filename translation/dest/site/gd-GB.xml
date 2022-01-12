@@ -19,6 +19,7 @@
   <string name="black">Dubh</string>
   <string name="randomColor">Dath air thuaiream</string>
   <string name="createAGame">Cruthaich geama</string>
+  <string name="sgPlayerIsVictorious">Bhuannaich %s</string>
   <string name="whiteIsVictorious">Bhuannaich geal</string>
   <string name="blackIsVictorious">Bhuannaich dubh</string>
   <string name="kingInTheCenter">Rìgh sa mheadhan</string>
@@ -27,6 +28,7 @@
   <string name="newOpponent">Nàmhaid ùr</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Tha an nàmhaid agad airson geama ùr a chluich ’nad aghaidh</string>
   <string name="joinTheGame">Thig a-steach dhan gheama</string>
+  <string name="sgPlayerPlays">Tha %s a’ cluich</string>
   <string name="whitePlays">Tha geal a’ cluich</string>
   <string name="blackPlays">Tha dubh a’ cluich</string>
   <string name="opponentLeftChoices">Tha an cluicheadair eile air a\' gheama fhàgail. Is urrainn dhut gèilleadh a chur air, geama ionnannach a ghairm, no feitheamh air a shon.</string>
@@ -35,8 +37,10 @@
   <string name="forceDraw">Gairm geama ionnannach</string>
   <string name="talkInChat">Dèan cabadaich</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Cluichidh a’ chiad neach a thig a-steach air an url seo còmhla riut.</string>
+  <string name="sgPlayerResigned">Ghèill %s</string>
   <string name="whiteResigned">Ghèill geal</string>
   <string name="blackResigned">Ghèill dubh</string>
+  <string name="sgPlayerLeftTheGame">Dh’fhàg %s an geama</string>
   <string name="whiteLeftTheGame">Dh’fhàg geal an geama</string>
   <string name="blackLeftTheGame">Dh’fhàg dubh an geama</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Co-roinn an url seo gus luchd-amhairc a leigeil a-steach dhan gheama</string>
@@ -94,8 +98,10 @@
   <string name="drawOfferDeclined">Dhiùltadh do thairgse airson co-tharraing</string>
   <string name="drawOfferAccepted">Ghabhadh ri do thairgse airson co-tharraing</string>
   <string name="drawOfferCanceled">Sguireadh de do thairgse airson co-tharraing</string>
+  <string name="sgPlayerOffersDraw">Tha %s a\' tairgse co-tharraing</string>
   <string name="whiteOffersDraw">Tha geal a\' tairgse co-tharraing</string>
   <string name="blackOffersDraw">Tha dubh a\' tairgse co-tharraing</string>
+  <string name="sgPlayerDeclinesDraw">Tha %s a\' diùltadh co-tharraing</string>
   <string name="whiteDeclinesDraw">Tha geal a\' diùltadh co-tharraing</string>
   <string name="blackDeclinesDraw">Tha dubh a\' diùltadh co-tharraing</string>
   <string name="yourOpponentOffersADraw">Tha an nàmhaid agad a’ tairgse co-tharraing</string>

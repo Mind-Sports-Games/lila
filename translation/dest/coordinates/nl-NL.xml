@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Coördinaten</string>
   <string name="coordinateTraining">Coördinatentraining</string>
+  <string name="averageScoreAsSGPlayerX">Gemiddelde score als %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Gemiddelde score als wit: %s</string>
   <string name="averageScoreAsBlackX">Gemiddelde score als zwart: %s</string>
   <string name="knowingTheChessBoard">De schaakbordcoördinaten kennen is een zeer belangrijke schaakvaardigheid:</string>

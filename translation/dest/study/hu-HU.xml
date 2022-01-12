@@ -138,10 +138,13 @@
   <string name="zugzwang">Lépéskényszer</string>
   <string name="equalPosition">Egyenlő állás</string>
   <string name="unclearPosition">Zavaros állás</string>
+  <string name="sgPlayerIsSlightlyBetter">%s kicsit jobban áll</string>
   <string name="whiteIsSlightlyBetter">Világos kicsit jobban áll</string>
   <string name="blackIsSlightlyBetter">Sötét kicsit jobban áll</string>
+  <string name="sgPlayerIsBetter">%s jobban áll</string>
   <string name="whiteIsBetter">Világos jobban áll</string>
   <string name="blackIsBetter">Sötét jobban áll</string>
+  <string name="sgPlayerIsWinning">%s nyerésre áll</string>
   <string name="whiteIsWinning">Világos nyerésre áll</string>
   <string name="blackIsWinning">Sötét nyerésre áll</string>
   <string name="novelty" comment="novelty&#10;&#10;A move in the opening that has not been played before.&#10;https://en.wikipedia.org/wiki/Glossary_of_chess#theoretical_novelty">Újítás</string>

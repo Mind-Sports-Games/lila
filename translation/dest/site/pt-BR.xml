@@ -20,8 +20,10 @@
   <string name="black">Pretas</string>
   <string name="randomColor">Cor aleatória</string>
   <string name="createAGame">Criar uma partida</string>
+  <string name="sgPlayerIsVictorious">%s vencem</string>
   <string name="whiteIsVictorious">Brancas vencem</string>
   <string name="blackIsVictorious">Pretas vencem</string>
+  <string name="youPlayTheSGPlayerPieces">Você joga com as peças %s</string>
   <string name="youPlayTheWhitePieces">Você joga com as peças brancas</string>
   <string name="youPlayTheBlackPieces">Você joga com as peças pretas</string>
   <string name="itsYourTurn">É a sua vez!</string>
@@ -33,6 +35,7 @@
   <string name="newOpponent">Novo adversário</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Seu oponente quer jogar uma nova partida contra você</string>
   <string name="joinTheGame">Entrar no jogo</string>
+  <string name="sgPlayerPlays">%s jogam</string>
   <string name="whitePlays">Brancas jogam</string>
   <string name="blackPlays">Pretas jogam</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +48,10 @@
   <string name="forceDraw">Reivindicar empate</string>
   <string name="talkInChat">Por favor, seja gentil no chat!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">A primeira pessoa que acessar esta URL jogará contigo.</string>
+  <string name="sgPlayerResigned">%s desistiram</string>
   <string name="whiteResigned">Brancas desistiram</string>
   <string name="blackResigned">Pretas desistiram</string>
+  <string name="sgPlayerLeftTheGame">%s deixaram a partida</string>
   <string name="whiteLeftTheGame">Brancas deixaram a partida</string>
   <string name="blackLeftTheGame">Pretas deixaram a partida</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Compartilhe esta URL para convidar espectadores</string>
@@ -80,6 +85,7 @@
   <string name="drawn">Empate</string>
   <string name="unknown">Posição desconhecida</string>
   <string name="database">Banco de Dados</string>
+  <string name="p1DrawP2">%1$s / Empate / %2$s</string>
   <string name="whiteDrawBlack">Brancas / Empate / Pretas</string>
   <string name="averageRatingX">Classificação média: %s</string>
   <string name="recentGames">Partidas recentes</string>
@@ -210,14 +216,17 @@
     <item quantity="other">%s partidas contra você</item>
   </plurals>
   <string name="cancel">Cancelar</string>
+  <string name="sgPlayerTimeOut">Tempo das %s esgotado</string>
   <string name="whiteTimeOut">Tempo das brancas esgotado</string>
   <string name="blackTimeOut">Tempo das pretas esgotado</string>
   <string name="drawOfferSent">Proposta de empate enviada</string>
   <string name="drawOfferDeclined">Proposta de empate recusada</string>
   <string name="drawOfferAccepted">Proposta de empate aceita</string>
   <string name="drawOfferCanceled">Proposta de empate cancelada</string>
+  <string name="sgPlayerOffersDraw">%s oferecem empate</string>
   <string name="whiteOffersDraw">Brancas oferecem empate</string>
   <string name="blackOffersDraw">Pretas oferecem empate</string>
+  <string name="sgPlayerDeclinesDraw">%s recusam empate</string>
   <string name="whiteDeclinesDraw">Brancas recusam empate</string>
   <string name="blackDeclinesDraw">Pretas recusam empate</string>
   <string name="yourOpponentOffersADraw">Seu adversário oferece empate</string>
@@ -361,6 +370,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Clique no tabuleiro para fazer seu lance, provando que é humano.</string>
   <string name="captcha.fail">Por favor, resolva o captcha enxadrístico.</string>
   <string name="notACheckmate">Não é xeque-mate</string>
+  <string name="sgPlayerCheckmatesInOneMove">Xeque-mate em um lance para as %s</string>
   <string name="whiteCheckmatesInOneMove">Xeque-mate em um lance para as brancas</string>
   <string name="blackCheckmatesInOneMove">Xeque-mate em um lance para as pretas</string>
   <string name="retry">Tentar novamente</string>
@@ -430,6 +440,7 @@
   <string name="performance">Desempenho</string>
   <string name="tournamentComplete">Torneio completo</string>
   <string name="movesPlayed">Movimentos realizados</string>
+  <string name="sgPlayerWins">%s venceram</string>
   <string name="whiteWins">Brancas venceram</string>
   <string name="blackWins">Pretas venceram</string>
   <string name="draws">Empates</string>
@@ -763,6 +774,7 @@
   <string name="hideBestMove">Esconder o melhor lance</string>
   <string name="getAHint">Obter uma dica</string>
   <string name="evaluatingYourMove">Avaliando o seu movimento ...</string>
+  <string name="sgPlayerWinsGame">%s vencem</string>
   <string name="whiteWinsGame">Brancas vencem</string>
   <string name="blackWinsGame">Pretas vencem</string>
   <string name="learnFromYourMistakes">Aprenda com seus erros</string>
@@ -770,19 +782,24 @@
   <string name="skipThisMove">Ignorar este lance</string>
   <string name="next">Próximo</string>
   <string name="xWasPlayed">%s foi jogado</string>
+  <string name="findBetterMoveForSGPlayer">Encontrar o melhor lance para as %s</string>
   <string name="findBetterMoveForWhite">Encontrar o melhor lance para as Brancas</string>
   <string name="findBetterMoveForBlack">Encontre o melhor lance para as Pretas</string>
   <string name="resumeLearning">Retomar avaliação</string>
   <string name="youCanDoBetter">Você pode fazer melhor</string>
+  <string name="tryAnotherMoveForSGPlayer">Tente um outro lance para as %s</string>
   <string name="tryAnotherMoveForWhite">Tente um outro lance para as Brancas</string>
   <string name="tryAnotherMoveForBlack">Tente um outro lance para as Pretas</string>
   <string name="solution">Solução</string>
   <string name="waitingForAnalysis">Aguardando análise</string>
+  <string name="noMistakesFoundForSGPlayer">Nenhum erro encontrado para as %s</string>
   <string name="noMistakesFoundForWhite">Nenhum erro encontrado para as Brancas</string>
   <string name="noMistakesFoundForBlack">Nenhum erro encontrado para as Pretas</string>
+  <string name="doneReviewingSGPlayerMistakes">Erros das %s já revistos</string>
   <string name="doneReviewingWhiteMistakes">Erros das brancas já revistos</string>
   <string name="doneReviewingBlackMistakes">Erros das pretas já revistos</string>
   <string name="doItAgain">Faça novamente</string>
+  <string name="reviewSGPlayerMistakes">Rever erros das %s</string>
   <string name="reviewWhiteMistakes">Rever erros das Brancas</string>
   <string name="reviewBlackMistakes">Rever erros das Pretas</string>
   <string name="advantage">Vantagem</string>

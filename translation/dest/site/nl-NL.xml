@@ -20,8 +20,10 @@
   <string name="black">Zwart</string>
   <string name="randomColor">Willekeurige kleur</string>
   <string name="createAGame">Start een nieuwe partij</string>
+  <string name="sgPlayerIsVictorious">%s heeft gewonnen</string>
   <string name="whiteIsVictorious">Wit heeft gewonnen</string>
   <string name="blackIsVictorious">Zwart heeft gewonnen</string>
+  <string name="youPlayTheSGPlayerPieces">Je speelt met %s</string>
   <string name="youPlayTheWhitePieces">Je speelt met wit</string>
   <string name="youPlayTheBlackPieces">Je speelt met zwart</string>
   <string name="itsYourTurn">Je bent aan zet!</string>
@@ -33,6 +35,7 @@
   <string name="newOpponent">Nieuwe tegenstander</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Uw tegenstander wil een nieuwe partij met u spelen</string>
   <string name="joinTheGame">Speel mee</string>
+  <string name="sgPlayerPlays">%s aan zet</string>
   <string name="whitePlays">Wit aan zet</string>
   <string name="blackPlays">Zwart aan zet</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +48,10 @@
   <string name="forceDraw">Dwing remise af</string>
   <string name="talkInChat">Wees a.u.b. vriendelijk in de chat!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Degene die als eerste op deze link klikt, zal met u spelen.</string>
+  <string name="sgPlayerResigned">%s geeft op</string>
   <string name="whiteResigned">Wit geeft op</string>
   <string name="blackResigned">Zwart geeft op</string>
+  <string name="sgPlayerLeftTheGame">%s is weggegaan</string>
   <string name="whiteLeftTheGame">Wit is weggegaan</string>
   <string name="blackLeftTheGame">Zwart is weggegaan</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Deel deze link om anderen de partij te laten zien</string>
@@ -80,6 +85,7 @@
   <string name="drawn">Remise</string>
   <string name="unknown">Onbekend</string>
   <string name="database">Databank</string>
+  <string name="p1DrawP2">%1$s / Remise / %2$s</string>
   <string name="whiteDrawBlack">Wit / Remise / Zwart</string>
   <string name="averageRatingX">Gemiddelde rating: %s</string>
   <string name="recentGames">Recente partijen</string>
@@ -210,14 +216,17 @@
     <item quantity="other">%s partijen met u</item>
   </plurals>
   <string name="cancel">Annuleren</string>
+  <string name="sgPlayerTimeOut">Tijd om voor %s</string>
   <string name="whiteTimeOut">Tijd om voor wit</string>
   <string name="blackTimeOut">Tijd om voor zwart</string>
   <string name="drawOfferSent">Remiseaanbod verstuurd</string>
   <string name="drawOfferDeclined">Remiseaanbod geweigerd</string>
   <string name="drawOfferAccepted">Remiseaanbod geaccepteerd</string>
   <string name="drawOfferCanceled">Remiseaanbod geannuleerd</string>
+  <string name="sgPlayerOffersDraw">%s biedt remise aan</string>
   <string name="whiteOffersDraw">Wit biedt remise aan</string>
   <string name="blackOffersDraw">Zwart biedt remise aan</string>
+  <string name="sgPlayerDeclinesDraw">%s weigert remise</string>
   <string name="whiteDeclinesDraw">Wit weigert remise</string>
   <string name="blackDeclinesDraw">Zwart weigert remise</string>
   <string name="yourOpponentOffersADraw">Uw tegenstander biedt remise aan</string>
@@ -361,6 +370,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Klik op het bord om je zet te spelen en te bewijzen dat je een mens bent.</string>
   <string name="captcha.fail">Gelieve de schaak-captcha op te lossen.</string>
   <string name="notACheckmate">Dit is geen schaakmat</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s zet schaakmat in één zet</string>
   <string name="whiteCheckmatesInOneMove">Wit zet schaakmat in één zet</string>
   <string name="blackCheckmatesInOneMove">Zwart zet schaakmat in één zet</string>
   <string name="retry">Probeer het opnieuw</string>
@@ -430,6 +440,7 @@
   <string name="performance">Prestatie</string>
   <string name="tournamentComplete">Toernooi voltooid</string>
   <string name="movesPlayed">Gespeelde zetten</string>
+  <string name="sgPlayerWins">Overwinningen met %s</string>
   <string name="whiteWins">Overwinningen met wit</string>
   <string name="blackWins">Overwinningen met zwart</string>
   <string name="draws">Remises</string>
@@ -763,6 +774,7 @@
   <string name="hideBestMove">Verberg de beste zet</string>
   <string name="getAHint">Een hint vragen</string>
   <string name="evaluatingYourMove">De evaluatie van je zet...</string>
+  <string name="sgPlayerWinsGame">%s wint</string>
   <string name="whiteWinsGame">Wit wint</string>
   <string name="blackWinsGame">Zwart wint</string>
   <string name="learnFromYourMistakes">Leren van je fouten</string>
@@ -770,19 +782,24 @@
   <string name="skipThisMove">Deze zet overslaan</string>
   <string name="next">Volgende</string>
   <string name="xWasPlayed">%s werd gespeeld</string>
+  <string name="findBetterMoveForSGPlayer">Vind een betere zet voor %s</string>
   <string name="findBetterMoveForWhite">Vind een betere zet voor wit</string>
   <string name="findBetterMoveForBlack">Vind een betere zet voor zwart</string>
   <string name="resumeLearning">Ga door met leren</string>
   <string name="youCanDoBetter">Je kunt het beter doen</string>
+  <string name="tryAnotherMoveForSGPlayer">Probeer een andere zet voor %s</string>
   <string name="tryAnotherMoveForWhite">Probeer een andere zet voor wit</string>
   <string name="tryAnotherMoveForBlack">Probeer een andere zet voor zwart</string>
   <string name="solution">Oplossing</string>
   <string name="waitingForAnalysis">Wachten op analyse</string>
+  <string name="noMistakesFoundForSGPlayer">Geen fouten gevonden voor %s</string>
   <string name="noMistakesFoundForWhite">Geen fouten gevonden voor wit</string>
   <string name="noMistakesFoundForBlack">Geen fouten gevonden voor zwart</string>
+  <string name="doneReviewingSGPlayerMistakes">Klaar met analyseren van fouten van %s</string>
   <string name="doneReviewingWhiteMistakes">Klaar met analyseren van fouten van wit</string>
   <string name="doneReviewingBlackMistakes">Klaar met analyseren van fouten van zwart</string>
   <string name="doItAgain">Probeer het opnieuw</string>
+  <string name="reviewSGPlayerMistakes">Bekijk fouten van %s</string>
   <string name="reviewWhiteMistakes">Bekijk fouten van wit</string>
   <string name="reviewBlackMistakes">Bekijk fouten van zwart</string>
   <string name="advantage">Voordeel</string>

@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Koordinater</string>
   <string name="coordinateTraining">Koordinattræning</string>
+  <string name="averageScoreAsSGPlayerX">Gennemsnitlig score som %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Gennemsnitlig score som hvid: %s</string>
   <string name="averageScoreAsBlackX">Gennemsnitlig score som sort: %s</string>
   <string name="knowingTheChessBoard">Det er vigtigt at kende koordinaterne på skakbrættet:</string>

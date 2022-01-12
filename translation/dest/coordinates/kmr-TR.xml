@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Kordînat</string>
   <string name="coordinateTraining">Perwerdeya kordînatê</string>
+  <string name="averageScoreAsSGPlayerX">Skora navîn wek %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Skora navîn wek spî: %s</string>
   <string name="averageScoreAsBlackX">Skora navîn wek reş: %s</string>
   <string name="knowingTheChessBoard">Zanîna koordînatên texteya kişikê qabiliyeteke kişikê yê pir girîng e:</string>

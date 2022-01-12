@@ -20,8 +20,10 @@
   <string name="black">Μαύρα</string>
   <string name="randomColor">Τυχαίο χρώμα</string>
   <string name="createAGame">Δημιουργήστε παιχνίδι</string>
+  <string name="sgPlayerIsVictorious">Τα %s νίκησαν</string>
   <string name="whiteIsVictorious">Τα λευκά νίκησαν</string>
   <string name="blackIsVictorious">Τα μαύρα νίκησαν</string>
+  <string name="youPlayTheSGPlayerPieces">Παίζετε τα %s</string>
   <string name="youPlayTheWhitePieces">Παίζετε τα λευκά</string>
   <string name="youPlayTheBlackPieces">Παίζετε τα μαύρα</string>
   <string name="itsYourTurn">Είναι η σειρά σας!</string>
@@ -33,6 +35,7 @@
   <string name="newOpponent">Νέος αντίπαλος</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Ο αντίπαλος θέλει να παίξει νέο παιχνίδι μαζί σας</string>
   <string name="joinTheGame">Λάβετε μέρος στο παιχνίδι</string>
+  <string name="sgPlayerPlays">Παίζουν τα %s</string>
   <string name="whitePlays">Παίζουν τα λευκά</string>
   <string name="blackPlays">Παίζουν τα μαύρα</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +48,10 @@
   <string name="forceDraw">Δηλώστε ισοπαλία</string>
   <string name="talkInChat">Παρακαλούμε να είστε ευγενικοί στη συνομιλία!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Ο πρώτος που θα επισκεφθεί αυτήν τη διεύθυνση θα παίξει μαζί σας.</string>
+  <string name="sgPlayerResigned">Τα %s παραιτήθηκαν</string>
   <string name="whiteResigned">Τα λευκά παραιτήθηκαν</string>
   <string name="blackResigned">Τα μαύρα παραιτήθηκαν</string>
+  <string name="sgPlayerLeftTheGame">Τα %s έφυγαν από το παιχνίδι</string>
   <string name="whiteLeftTheGame">Τα λευκά έφυγαν από το παιχνίδι</string>
   <string name="blackLeftTheGame">Τα μαύρα έφυγαν από το παιχνίδι</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Στείλτε αυτήν τη διεύθυνση για να επιτρέψετε σε θεατές να δουν το παιχνίδι</string>
@@ -80,6 +85,7 @@
   <string name="drawn">Ισοπαλία</string>
   <string name="unknown">Άγνωστο</string>
   <string name="database">Βάση δεδομένων</string>
+  <string name="p1DrawP2">%1$s / Ισοπαλία / %2$s</string>
   <string name="whiteDrawBlack">Λευκά / Ισοπαλία / Μαύρα</string>
   <string name="averageRatingX">Μέση βαθμολογία: %s</string>
   <string name="recentGames">Πρόσφατα παιχνίδια</string>
@@ -210,14 +216,17 @@
     <item quantity="other">%s παιχνίδια με εσάς</item>
   </plurals>
   <string name="cancel">Ακύρωση</string>
+  <string name="sgPlayerTimeOut">Τέλος χρόνου για τα %s</string>
   <string name="whiteTimeOut">Τέλος χρόνου για τα λευκά</string>
   <string name="blackTimeOut">Τέλος χρόνου για τα μαύρα</string>
   <string name="drawOfferSent">Πρόταση ισοπαλίας εστάλη</string>
   <string name="drawOfferDeclined">Πρόταση ισοπαλίας μη αποδεκτή</string>
   <string name="drawOfferAccepted">Πρόταση ισοπαλίας αποδεκτή</string>
   <string name="drawOfferCanceled">Πρόταση ισοπαλίας ακυρώθηκε</string>
+  <string name="sgPlayerOffersDraw">Τα %s προσφέρουν ισοπαλία</string>
   <string name="whiteOffersDraw">Τα λευκά προσφέρουν ισοπαλία</string>
   <string name="blackOffersDraw">Τα μαύρα προσφέρουν ισοπαλία</string>
+  <string name="sgPlayerDeclinesDraw">Τα %s απορρίπτουν την ισοπαλία</string>
   <string name="whiteDeclinesDraw">Τα λευκά απορρίπτουν την ισοπαλία</string>
   <string name="blackDeclinesDraw">Τα μαύρα απορρίπτουν την ισοπαλία</string>
   <string name="yourOpponentOffersADraw">Ο αντίπαλος σας προτείνει ισοπαλία</string>
@@ -362,6 +371,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Κάνετε κλικ στη σκακιέρα για να κινήσετε τα πιόνια και να αποδείξετε πως είστε άνθρωπος.</string>
   <string name="captcha.fail">Παρακαλούμε λύστε το σκακιστικό captcha.</string>
   <string name="notACheckmate">Δεν είναι ματ</string>
+  <string name="sgPlayerCheckmatesInOneMove">Παίζουν τα %s, κάντε ματ με μια κίνηση</string>
   <string name="whiteCheckmatesInOneMove">Παίζουν τα λευκά, κάντε ματ με μια κίνηση</string>
   <string name="blackCheckmatesInOneMove">Παίζουν τα μαύρα, κάντε ματ με μια κίνηση</string>
   <string name="retry">Επανάληψη</string>
@@ -432,6 +442,7 @@
   <string name="tournamentComplete">Το πρωτάθλημα ολοκληρώθηκε</string>
   <string name="movesPlayed">Παιγμένες κινήσεις</string>
   <string name="whiteWins">Τα άσπρα νικούν</string>
+  <string name="sgPlayerWins">Τα %s νικούν</string>
   <string name="blackWins">Τα μαύρα νικούν</string>
   <string name="draws">Ισοπαλίες</string>
   <string name="nextXTournament">Επόμενο %s πρωτάθλημα:</string>
@@ -764,6 +775,7 @@
   <string name="hideBestMove">Απόκρυψη καλύτερης κίνησης</string>
   <string name="getAHint">Λάβετε μια υπόδειξη</string>
   <string name="evaluatingYourMove">Αξιολογώντας την κίνηση σας...</string>
+  <string name="sgPlayerWinsGame">Κερδίζουν τα %s</string>
   <string name="whiteWinsGame">Κερδίζουν τα λευκά</string>
   <string name="blackWinsGame">Κερδίζουν τα μαύρα</string>
   <string name="learnFromYourMistakes">Μάθετε από τα λάθη σας</string>
@@ -771,16 +783,20 @@
   <string name="skipThisMove">Παραλείψτε αυτό το βήμα</string>
   <string name="next">Επόμενο</string>
   <string name="xWasPlayed">%s παίχτηκε</string>
+  <string name="findBetterMoveForSGPlayer">Βρείτε μια καλύτερη κίνηση για τα %s</string>
   <string name="findBetterMoveForWhite">Βρείτε μια καλύτερη κίνηση για τα λευκά</string>
   <string name="findBetterMoveForBlack">Βρείτε μια καλύτερη κίνηση για τα μαύρα</string>
   <string name="resumeLearning">Συνεχίστε την μάθηση</string>
   <string name="youCanDoBetter">Μπορείτε και καλύτερα</string>
+  <string name="tryAnotherMoveForSGPlayer">Δοκιμάστε μια άλλη κίνηση για τα %s</string>
   <string name="tryAnotherMoveForWhite">Δοκιμάστε μια άλλη κίνηση για τα λευκά</string>
   <string name="tryAnotherMoveForBlack">Δοκιμάστε μια άλλη κίνηση για τα μαύρα</string>
   <string name="solution">Λύση</string>
   <string name="waitingForAnalysis">Αναμονή για την ανάλυση</string>
+  <string name="noMistakesFoundForSGPlayer">Δεν βρέθηκαν λάθη για τα %s</string>
   <string name="noMistakesFoundForWhite">Δεν βρέθηκαν λάθη για τα λευκά</string>
   <string name="noMistakesFoundForBlack">Δεν βρέθηκαν λάθη για τα μαύρα</string>
+  <string name="doneReviewingSGPlayerMistakes">Έγινε έλεγχος λαθών για τα %s</string>
   <string name="doneReviewingWhiteMistakes">Έγινε έλεγχος λαθών για τα λευκά</string>
   <string name="doneReviewingBlackMistakes">Έγινε έλεγχος λαθών για τα μαύρα</string>
   <string name="doItAgain">Κάντε το ξανά</string>

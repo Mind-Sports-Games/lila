@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">निर्देशांक</string>
   <string name="coordinateTraining">निर्देशांक प्रशिक्षण</string>
+  <string name="averageScoreAsSGPlayerX">%1$s के साथ में औसत अंक: %2$s</string>
   <string name="averageScoreAsWhiteX">सफेद के साथ में औसत अंक: %s</string>
   <string name="averageScoreAsBlackX">काले के साथ में औसत अंक: %s</string>
   <string name="knowingTheChessBoard">शतरंज निर्देशांक जानना एक बहुत महत्वपूर्ण शतरंज कौशल है:</string>

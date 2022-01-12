@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Koordinat</string>
   <string name="coordinateTraining">Latihan koordinat</string>
+  <string name="averageScoreAsSGPlayerX">Skor rata-rata %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Skor rata-rata putih: %s</string>
   <string name="averageScoreAsBlackX">Skor rata-rata hitam: %s</string>
   <string name="knowingTheChessBoard">Mengetahui koordinat papan catur adalah kemampuan catur yang sangat penting:</string>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">Mova para começar</string>
+  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">Você joga com as peças %s em todos os quebra-cabeças</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">Você joga com as peças brancas em todos os quebra-cabeças</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">Você joga com as peças pretas em todos os quebra-cabeças</string>
   <string name="puzzlesSolved">quebra-cabeças resolvidos</string>

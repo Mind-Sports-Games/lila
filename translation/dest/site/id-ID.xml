@@ -20,8 +20,10 @@
   <string name="black">Hitam</string>
   <string name="randomColor">Warna acak</string>
   <string name="createAGame">Mulai permainan baru</string>
+  <string name="sgPlayerIsVictorious">%s menang</string>
   <string name="whiteIsVictorious">Putih menang</string>
   <string name="blackIsVictorious">Hitam menang</string>
+  <string name="youPlayTheSGPlayerPieces">Anda bermain dipihak %s</string>
   <string name="youPlayTheWhitePieces">Anda bermain dipihak putih</string>
   <string name="youPlayTheBlackPieces">Anda bermain dipihak hitam</string>
   <string name="itsYourTurn">Giliran Anda!</string>
@@ -32,6 +34,7 @@
   <string name="newOpponent">Penantang baru</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Lawan Anda ingin bermain lagi dengan Anda</string>
   <string name="joinTheGame">Ikuti permainan</string>
+  <string name="sgPlayerPlays">%s melangkah</string>
   <string name="whitePlays">Putih melangkah</string>
   <string name="blackPlays">Hitam melangkah</string>
   <plurals name="opponentLeftCounter">
@@ -43,8 +46,10 @@
   <string name="forceDraw">Nyatakan remis</string>
   <string name="talkInChat">Silahkan mengobrol dengan sopan</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Orang pertama yang datang ke URL ini akan bermain dengan Anda</string>
+  <string name="sgPlayerResigned">%s menyerah</string>
   <string name="whiteResigned">Putih menyerah</string>
   <string name="blackResigned">Hitam menyerah</string>
+  <string name="sgPlayerLeftTheGame">%s meninggalkan permainan</string>
   <string name="whiteLeftTheGame">Putih meninggalkan permainan</string>
   <string name="blackLeftTheGame">Hitam meninggalkan permainan</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Berbagi URL ini untuk mengundang orang menonton permainan</string>
@@ -78,6 +83,7 @@
   <string name="drawn">Langkah remis</string>
   <string name="unknown">Tak diketahui</string>
   <string name="database">Basis Data</string>
+  <string name="p1DrawP2">%1$s / Remis / %2$s</string>
   <string name="whiteDrawBlack">Putih / Remis / Hitam</string>
   <string name="averageRatingX">Rata-rata rating: %s</string>
   <string name="recentGames">Permainan terkini</string>
@@ -186,14 +192,17 @@
     <item quantity="other">%s kali bermain dengan anda</item>
   </plurals>
   <string name="cancel">Batal</string>
+  <string name="sgPlayerTimeOut">%s kehabisan waktu</string>
   <string name="whiteTimeOut">Putih kehabisan waktu</string>
   <string name="blackTimeOut">Hitam kehabisan waktu</string>
   <string name="drawOfferSent">Tawaran remis terkirim</string>
   <string name="drawOfferDeclined">Tawaran remis ditolak</string>
   <string name="drawOfferAccepted">Tawaran remis diterima</string>
   <string name="drawOfferCanceled">Tawaran remis dibatalkan</string>
+  <string name="sgPlayerOffersDraw">%s menawarkan remis</string>
   <string name="whiteOffersDraw">Putih menawarkan remis</string>
   <string name="blackOffersDraw">Hitam menawarkan remis</string>
+  <string name="sgPlayerDeclinesDraw">%s menolak remis</string>
   <string name="whiteDeclinesDraw">Putih menolak remis</string>
   <string name="blackDeclinesDraw">Hitam menolak remis</string>
   <string name="yourOpponentOffersADraw">Lawan anda menawar remis</string>
@@ -324,6 +333,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Klik pada papan untuk melangkah  dan buktikan bahwa anda asli manusia.</string>
   <string name="captcha.fail">Harap selesaikan captcha catur.</string>
   <string name="notACheckmate">Bukan skakmat</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s skakmat dalam satu langkah</string>
   <string name="whiteCheckmatesInOneMove">Putih skakmat dalam satu langkah</string>
   <string name="blackCheckmatesInOneMove">Hitam skakmat dalam satu langkah</string>
   <string name="retry">Mengulang</string>
@@ -389,6 +399,7 @@
   <string name="performance">Prestasi</string>
   <string name="tournamentComplete">Turnamen selesai</string>
   <string name="movesPlayed">Langkah yang dijalankan</string>
+  <string name="sgPlayerWins">%s Menang</string>
   <string name="whiteWins">Putih Menang</string>
   <string name="blackWins">Hitam Menang</string>
   <string name="draws">Remis</string>
@@ -715,6 +726,7 @@
   <string name="hideBestMove">Sembunyikan langkah terbaik</string>
   <string name="getAHint">Dapatkan petunjuk</string>
   <string name="evaluatingYourMove">Mengevaluasi langkah anda ...</string>
+  <string name="sgPlayerWinsGame">%s menang</string>
   <string name="whiteWinsGame">Putih menang</string>
   <string name="blackWinsGame">Hitam menang</string>
   <string name="learnFromYourMistakes">Pelajaran dari kesalahanmu</string>
@@ -722,19 +734,24 @@
   <string name="skipThisMove">Lewatkan langkah ini</string>
   <string name="next">Selanjutnya</string>
   <string name="xWasPlayed">%s sedang diamainkan</string>
+  <string name="findBetterMoveForSGPlayer">Temukan langkah yang lebih baik untuk warna %s</string>
   <string name="findBetterMoveForWhite">Temukan langkah yang lebih baik untuk warna putih</string>
   <string name="findBetterMoveForBlack">Temukan langkah yang lebih baik untuk warna hitam</string>
   <string name="resumeLearning">Lanjutkan materi</string>
   <string name="youCanDoBetter">Kamu bisa melakukan lebih baik</string>
+  <string name="tryAnotherMoveForSGPlayer">Coba langkah lain untuk %s</string>
   <string name="tryAnotherMoveForWhite">Coba langkah lain untuk putih</string>
   <string name="tryAnotherMoveForBlack">Coba langkah lain untuk hitam</string>
   <string name="solution">Solusi</string>
   <string name="waitingForAnalysis">Tunggu untuk menganalisa</string>
+  <string name="noMistakesFoundForSGPlayer">Tidak ditemukan kesalahan untuk %s</string>
   <string name="noMistakesFoundForWhite">Tidak ditemukan kesalahan untuk putih</string>
   <string name="noMistakesFoundForBlack">Tidak ditemukan kesalahan untuk hitam</string>
+  <string name="doneReviewingSGPlayerMistakes">Selesai mempelajari kesalahan %s</string>
   <string name="doneReviewingWhiteMistakes">Selesai mempelajari kesalahan putih</string>
   <string name="doneReviewingBlackMistakes">Selesai mempelajari kesalahan hitam</string>
   <string name="doItAgain">Lakukan lagi</string>
+  <string name="reviewSGPlayerMistakes">Review kesalahan %s</string>
   <string name="reviewWhiteMistakes">Review kesalahan putih</string>
   <string name="reviewBlackMistakes">Review kesalahan hitam</string>
   <string name="advantage">Keuntungan</string>

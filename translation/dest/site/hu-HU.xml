@@ -20,6 +20,7 @@
   <string name="black">Sötét</string>
   <string name="randomColor">Véletlen szín</string>
   <string name="createAGame">Játék létrehozása</string>
+  <string name="sgPlayerIsVictorious">%s nyert</string>
   <string name="whiteIsVictorious">Világos nyert</string>
   <string name="blackIsVictorious">Sötét nyert</string>
   <string name="youPlayTheWhitePieces">Fehérrel fogsz játszani</string>
@@ -33,6 +34,7 @@
   <string name="newOpponent">Új ellenfél</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Az ellenfeled visszavágót szeretne</string>
   <string name="joinTheGame">Csatlakozás a játékhoz</string>
+  <string name="sgPlayerPlays">%s lép</string>
   <string name="whitePlays">Világos lép</string>
   <string name="blackPlays">Sötét lép</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +47,10 @@
   <string name="forceDraw">Döntetlen</string>
   <string name="talkInChat">Légy udvarias másokkal!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Az első ember, aki felkeresi ezt a címet, az lesz az ellenfeled.</string>
+  <string name="sgPlayerResigned">%s feladta</string>
   <string name="whiteResigned">Világos feladta</string>
   <string name="blackResigned">Sötét feladta</string>
+  <string name="sgPlayerLeftTheGame">%s elhagyta a játékot</string>
   <string name="whiteLeftTheGame">Világos elhagyta a játékot</string>
   <string name="blackLeftTheGame">Sötét elhagyta a játékot</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Oszd meg ezt az linket, hogy mások nézhessék a játszmát</string>
@@ -80,6 +84,7 @@
   <string name="drawn">Döntetlen</string>
   <string name="unknown">Ismeretlen</string>
   <string name="database">Adatbázis</string>
+  <string name="p1DrawP2">%1$s / Döntetlen / %2$s</string>
   <string name="whiteDrawBlack">Világos / Döntetlen / Sötét</string>
   <string name="averageRatingX">Átlagos értékszám: %s</string>
   <string name="recentGames">Legutóbbi játszmák</string>
@@ -210,14 +215,17 @@
     <item quantity="other">%s játék veled</item>
   </plurals>
   <string name="cancel">Mégse</string>
+  <string name="sgPlayerTimeOut">%s ideje lejárt</string>
   <string name="whiteTimeOut">Világos ideje lejárt</string>
   <string name="blackTimeOut">Sötét ideje lejárt</string>
   <string name="drawOfferSent">Döntetlen felajánlás elküldve</string>
   <string name="drawOfferDeclined">Döntetlen felajánlás elutasítva</string>
   <string name="drawOfferAccepted">Döntetlen elfogadva</string>
   <string name="drawOfferCanceled">Döntetlen ajánlás elvetve</string>
+  <string name="sgPlayerOffersDraw">%s döntetlent ajánl</string>
   <string name="whiteOffersDraw">Világos döntetlent ajánl</string>
   <string name="blackOffersDraw">Sötét döntetlent ajánl</string>
+  <string name="sgPlayerDeclinesDraw">%s elutasította a döntetlen ajánlatot</string>
   <string name="whiteDeclinesDraw">Világos elutasította a döntetlen ajánlatot</string>
   <string name="blackDeclinesDraw">Sötét elutasította a döntetlen ajánlatot</string>
   <string name="yourOpponentOffersADraw">Az ellenfeled döntetlent ajánl</string>
@@ -430,6 +438,7 @@
   <string name="performance">Teljesítmény</string>
   <string name="tournamentComplete">Verseny összefoglaló</string>
   <string name="movesPlayed">Lépések száma</string>
+  <string name="sgPlayerWins">%s győzelmek</string>
   <string name="whiteWins">Világos győzelmek</string>
   <string name="blackWins">Sötét győzelmek</string>
   <string name="draws">Döntetlenek</string>
@@ -764,6 +773,7 @@
   <string name="hideBestMove">A legjobb lépés elrejtése</string>
   <string name="getAHint">Tipp kérése</string>
   <string name="evaluatingYourMove">Lépés értékelése ...</string>
+  <string name="sgPlayerWinsGame">%s nyert</string>
   <string name="whiteWinsGame">Világos nyert</string>
   <string name="blackWinsGame">Sötét nyert</string>
   <string name="learnFromYourMistakes">Tanulj a hibáidból</string>
@@ -779,11 +789,14 @@
   <string name="tryAnotherMoveForBlack">Próbálj mást lépni feketével</string>
   <string name="solution">Megoldás</string>
   <string name="waitingForAnalysis">Készül az analízis</string>
+  <string name="noMistakesFoundForSGPlayer">Nem talált hibát %s játékában</string>
   <string name="noMistakesFoundForWhite">Nem talált hibát világos játékában</string>
   <string name="noMistakesFoundForBlack">Nem talált hibát sötét játékában</string>
+  <string name="doneReviewingSGPlayerMistakes">%s hibáinak elemzése befejeződött</string>
   <string name="doneReviewingWhiteMistakes">Világos hibáinak elemzése befejeződött</string>
   <string name="doneReviewingBlackMistakes">Sötét hibáinak elemzése befejeződött</string>
   <string name="doItAgain">Újra</string>
+  <string name="reviewSGPlayerMistakes">%s hibáinak áttekintése</string>
   <string name="reviewWhiteMistakes">Világos hibáinak áttekintése</string>
   <string name="reviewBlackMistakes">Sötét hibáinak áttekintése</string>
   <string name="advantage">Előny</string>

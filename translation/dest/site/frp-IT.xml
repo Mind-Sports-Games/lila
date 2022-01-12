@@ -19,6 +19,7 @@
   <string name="black">Néyr</string>
   <string name="createAGame">Skep \'n wedstryd</string>
   <string name="whiteIsVictorious">Lo bllanc ganye</string>
+  <string name="sgPlayerIsVictorious">Lo %s ganye</string>
   <string name="blackIsVictorious">Lo néyr ganye</string>
   <string name="newOpponent">nuwe opponent</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Ton adverséro vòt ‘ncor rejoyi na novela passa avoy-t’</string>

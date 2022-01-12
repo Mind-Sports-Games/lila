@@ -20,6 +20,7 @@
   <string name="black">Must</string>
   <string name="randomColor">Juhuslik värv</string>
   <string name="createAGame">Loo mäng</string>
+  <string name="sgPlayerIsVictorious">Võitis %s</string>
   <string name="whiteIsVictorious">Võitis valge</string>
   <string name="blackIsVictorious">Võitis must</string>
   <string name="youPlayTheWhitePieces">Sa mängid valgete nuppudega</string>
@@ -33,6 +34,7 @@
   <string name="newOpponent">Uus vastane</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Sinu vastane soovib mängida sinuga uut mängu</string>
   <string name="joinTheGame">Ühine mänguga</string>
+  <string name="sgPlayerPlays">%s mängib</string>
   <string name="whitePlays">Valge mängib</string>
   <string name="blackPlays">Must mängib</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +47,10 @@
   <string name="forceDraw">Sunni viiki</string>
   <string name="talkInChat">Palun käitu vestluses viisakalt!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Esimene inimene kes selle URLi peale tuleb, mängib sinuga.</string>
+  <string name="sgPlayerResigned">%s alistus</string>
   <string name="whiteResigned">Valge alistus</string>
   <string name="blackResigned">Must alistus</string>
+  <string name="sgPlayerLeftTheGame">%s lahkus mängust</string>
   <string name="whiteLeftTheGame">Valge lahkus mängust</string>
   <string name="blackLeftTheGame">Must lahkus mängust</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Jaga seda linki, et pealtvaatajad näeksid mängu</string>
@@ -80,6 +84,7 @@
   <string name="drawn">Viik</string>
   <string name="unknown">Teadmatu</string>
   <string name="database">Andmebaas</string>
+  <string name="p1DrawP2">%1$s / Viik / %2$s</string>
   <string name="whiteDrawBlack">Valge / Viik / Must</string>
   <string name="averageRatingX">Keskmine reiting: %s</string>
   <string name="recentGames">Hiljutised mängud</string>
@@ -198,14 +203,17 @@
     <item quantity="other">%s mängu sinuga</item>
   </plurals>
   <string name="cancel">Katkesta</string>
+  <string name="sgPlayerTimeOut">%s aeg sai läbi</string>
   <string name="whiteTimeOut">Valge aeg sai läbi</string>
   <string name="blackTimeOut">Musta aeg sai läbi</string>
   <string name="drawOfferSent">Viigi pakkumine saadetud</string>
   <string name="drawOfferDeclined">Viigi pakkumine tagasi lükatud</string>
   <string name="drawOfferAccepted">Viigi pakkumine vastu võetud</string>
   <string name="drawOfferCanceled">Viigi pakkumine tühistatud</string>
+  <string name="sgPlayerOffersDraw">%s pakub viiki</string>
   <string name="whiteOffersDraw">Valge pakub viiki</string>
   <string name="blackOffersDraw">Must pakub viiki</string>
+  <string name="sgPlayerDeclinesDraw">%s keeldub viigist</string>
   <string name="whiteDeclinesDraw">Valge keeldub viigist</string>
   <string name="blackDeclinesDraw">Must keeldub viigist</string>
   <string name="yourOpponentOffersADraw">Su vastane pakub viiki</string>
@@ -350,6 +358,7 @@ arvutianalüüsi, mängu jututoa ning jagatava URL-i.</string>
   <string name="clickOnTheBoardToMakeYourMove">Tee käik ja tõesta, et oled inimene.</string>
   <string name="captcha.fail">Palun lahendage male robotilõks.</string>
   <string name="notACheckmate">See pole matt</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s teeb mati ühe käiguga</string>
   <string name="whiteCheckmatesInOneMove">Valge teeb mati ühe käiguga</string>
   <string name="blackCheckmatesInOneMove">Must teeb mati ühe käiguga</string>
   <string name="retry">Proovi uuesti</string>
@@ -419,6 +428,7 @@ arvutianalüüsi, mängu jututoa ning jagatava URL-i.</string>
   <string name="performance">Sooritus</string>
   <string name="tournamentComplete">Turniir lõppenud</string>
   <string name="movesPlayed">Tehtud käikude arv</string>
+  <string name="sgPlayerWins">%s võite</string>
   <string name="whiteWins">Valge võite</string>
   <string name="blackWins">Musta võite</string>
   <string name="draws">Viike</string>
@@ -752,6 +762,7 @@ arvutianalüüsi, mängu jututoa ning jagatava URL-i.</string>
   <string name="hideBestMove">Peida parim käik</string>
   <string name="getAHint">Vaata vihjet</string>
   <string name="evaluatingYourMove">Sinu käigu hindamine ...</string>
+  <string name="sgPlayerWinsGame">%s võitis</string>
   <string name="whiteWinsGame">Valge võitis</string>
   <string name="blackWinsGame">Must võitis</string>
   <string name="learnFromYourMistakes">Õpi oma vigadest</string>
@@ -767,11 +778,14 @@ arvutianalüüsi, mängu jututoa ning jagatava URL-i.</string>
   <string name="tryAnotherMoveForBlack">Proovi mingisugust teist käiku mustale</string>
   <string name="solution">Lahendus</string>
   <string name="waitingForAnalysis">Analüüsimine</string>
+  <string name="noMistakesFoundForSGPlayer">%s eksimusi ei leitud</string>
   <string name="noMistakesFoundForWhite">Valge eksimusi ei leitud</string>
   <string name="noMistakesFoundForBlack">Musta eksimusi ei leitud</string>
+  <string name="doneReviewingSGPlayerMistakes">%s vead on üle vaadatud</string>
   <string name="doneReviewingWhiteMistakes">Valge vead on üle vaadatud</string>
   <string name="doneReviewingBlackMistakes">Musta vead on üle vaadatud</string>
   <string name="doItAgain">Tee uuesti</string>
+  <string name="reviewSGPlayerMistakes">Vaata üle %s vead</string>
   <string name="reviewWhiteMistakes">Vaata üle valge vead</string>
   <string name="reviewBlackMistakes">Vaata üle musta vead</string>
   <string name="advantage">Eelis</string>

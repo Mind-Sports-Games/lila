@@ -20,6 +20,7 @@
   <string name="black">Svartur</string>
   <string name="randomColor">Tilvildarligur litur</string>
   <string name="createAGame">Byrja eitt talv</string>
+  <string name="sgPlayerIsVictorious">%s hevur vunnið</string>
   <string name="whiteIsVictorious">Hvítur hevur vunnið</string>
   <string name="blackIsVictorious">Svartur hevur vunnið</string>
   <string name="youPlayTheWhitePieces">Tú telvar við hvítum</string>
@@ -32,6 +33,7 @@
   <string name="newOpponent">Nýggjur móttelvari</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Tín móttelvari vil telva móti tær av nýggjum</string>
   <string name="joinTheGame">Byrja talvið</string>
+  <string name="sgPlayerPlays">%s eigur leik</string>
   <string name="whitePlays">Hvítur eigur leik</string>
   <string name="blackPlays">Svartur eigur leik</string>
   <plurals name="opponentLeftCounter">
@@ -44,8 +46,10 @@
   <string name="forceDraw">Krev remis</string>
   <string name="talkInChat">Ver vinalig/ur í kjattinum!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Tann fyrsti persónurin, sum brúkar hesa adressuna, verður tín mótpartur.</string>
+  <string name="sgPlayerResigned">%s leggur kong</string>
   <string name="whiteResigned">Hvítur leggur kong</string>
   <string name="blackResigned">Svartur legði kong</string>
+  <string name="sgPlayerLeftTheGame">%s er farin frá talvinum</string>
   <string name="whiteLeftTheGame">Hvítur er farin frá talvinum</string>
   <string name="blackLeftTheGame">Svartur er farin frá talvinum</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Deil hesa adressuna við áskoðarar</string>
@@ -79,6 +83,7 @@
   <string name="drawn">Javnt</string>
   <string name="unknown">Ókent</string>
   <string name="database">Dátugrunnur</string>
+  <string name="p1DrawP2">%1$s / Javnt / %2$s</string>
   <string name="whiteDrawBlack">Hvítur / Javnt / Svartur</string>
   <string name="averageRatingX">Miðal styrkismeting: %s</string>
   <string name="recentGames">Nýliga telvað talv</string>
@@ -203,8 +208,10 @@
   <string name="drawOfferDeclined">Tilboð um javnleik havnað</string>
   <string name="drawOfferAccepted">Tilboð um javnleik góðtikið</string>
   <string name="drawOfferCanceled">Tilboð um javnleik avlýst</string>
+  <string name="sgPlayerOffersDraw">%s bjóðar javnt</string>
   <string name="whiteOffersDraw">Hvítur bjóðar javnt</string>
   <string name="blackOffersDraw">Svartur bjóðar javnt</string>
+  <string name="sgPlayerDeclinesDraw">%s tekur ikki av javnleiki</string>
   <string name="whiteDeclinesDraw">Hvítur tekur ikki av javnleiki</string>
   <string name="blackDeclinesDraw">Svartur tekur ikki av javnleiki</string>
   <string name="yourOpponentOffersADraw">Mótleikarin bjóðar tær javnt</string>
@@ -348,6 +355,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Klikk á borðið at leika, og prógva, tú ert eitt menniskja.</string>
   <string name="captcha.fail">Loys vinaliga talv-CAPTCHA\'ið.</string>
   <string name="notACheckmate">Ikki skák og mát</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s setir skák og mát í einum leiki</string>
   <string name="whiteCheckmatesInOneMove">Hvítur setir skák og mát í einum leiki</string>
   <string name="blackCheckmatesInOneMove">Svartur setir skák og mát í einum leiki</string>
   <string name="retry">Royn aftur</string>
@@ -749,6 +757,7 @@
   <string name="hideBestMove">Fjal besta leikin</string>
   <string name="getAHint">Fá eina ábending</string>
   <string name="evaluatingYourMove">Leikurin verður greinaður ...</string>
+  <string name="sgPlayerWinsGame">%s vinnur</string>
   <string name="whiteWinsGame">Hvítur vinnur</string>
   <string name="blackWinsGame">Svartur vinnur</string>
   <string name="learnFromYourMistakes">Lær av tínum mistøkum</string>

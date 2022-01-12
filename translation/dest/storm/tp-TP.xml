@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">o tawa la o open</string>
+  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">sona lili ale la ijo %s li sina</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">sona lili ale la ijo walo li sina</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">sona lili ale la ijo pimeja li sina</string>
   <string name="puzzlesSolved">nanpa pi musi lili pini</string>

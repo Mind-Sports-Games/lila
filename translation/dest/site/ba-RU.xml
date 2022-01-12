@@ -16,6 +16,7 @@
   <string name="black">Ҡаралар</string>
   <string name="randomColor">Осраҡлы төҫ</string>
   <string name="createAGame">Уйын булдырырға</string>
+  <string name="sgPlayerIsVictorious">%s еңде</string>
   <string name="whiteIsVictorious">Аҡтар еңде</string>
   <string name="blackIsVictorious">Ҡаралар еңде</string>
   <string name="youPlayTheWhitePieces">Һеҙ аҡ фигуралар менән уйнайһығыҙ</string>

@@ -19,8 +19,10 @@
   <string name="black">Schwaarz</string>
   <string name="randomColor">Zoufälleg Säit</string>
   <string name="createAGame">Erstell eng Partie</string>
+  <string name="sgPlayerIsVictorious">%s gewënnt</string>
   <string name="whiteIsVictorious">Wäiss gewënnt</string>
   <string name="blackIsVictorious">Schwaarz gewënnt</string>
+  <string name="youPlayTheSGPlayerPieces">Du spills déi %s Figuren</string>
   <string name="youPlayTheWhitePieces">Du spills déi wäiss Figuren</string>
   <string name="youPlayTheBlackPieces">Du spills déi schwaarz Figuren</string>
   <string name="itsYourTurn">Et ass un dir!</string>

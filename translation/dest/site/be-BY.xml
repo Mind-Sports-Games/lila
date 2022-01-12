@@ -20,6 +20,7 @@
   <string name="black">Чорныя</string>
   <string name="randomColor">Выпадковы колер</string>
   <string name="createAGame">Стварыць гульню</string>
+  <string name="sgPlayerIsVictorious">%s перамаглі</string>
   <string name="whiteIsVictorious">Белыя перамаглі</string>
   <string name="blackIsVictorious">Чорныя перамаглі</string>
   <string name="youPlayTheWhitePieces">Вы гуляеце белымі фігурамі</string>
@@ -46,6 +47,7 @@
   <string name="forceDraw">Залічыць нічыю</string>
   <string name="talkInChat">Калі ласка, будзьце ветлівыя!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Той, хто перайдзе па гэтай спасылцы, зможа згуляць з вамі.</string>
+  <string name="sgPlayerResigned">%s здаліся</string>
   <string name="whiteResigned">Белыя здаліся</string>
   <string name="blackResigned">Чорныя здаліся</string>
   <string name="whiteLeftTheGame">Гулец з боку белых выйшаў з гульні</string>
@@ -81,6 +83,7 @@
   <string name="drawn">Нічыя</string>
   <string name="unknown">Невядома</string>
   <string name="database">База звестак</string>
+  <string name="p1DrawP2">%1$s / нічыя / %2$s</string>
   <string name="whiteDrawBlack">Белыя / нічыя / чорныя</string>
   <string name="averageRatingX">Сярэдні рэйтынг: %s</string>
   <string name="recentGames">Нядаўнія гульні</string>
@@ -243,8 +246,10 @@
   <string name="drawOfferDeclined">Прапанова нічыі адхілена</string>
   <string name="drawOfferAccepted">Прапанова нічыі прынята</string>
   <string name="drawOfferCanceled">Прапанова нічыі скасаваная</string>
+  <string name="sgPlayerOffersDraw">%s прапануюць нічыю</string>
   <string name="whiteOffersDraw">Белыя прапануюць нічыю</string>
   <string name="blackOffersDraw">Чорныя прапануюць нічыю</string>
+  <string name="sgPlayerDeclinesDraw">%s адхіляюць нічыю</string>
   <string name="whiteDeclinesDraw">Белыя адхіляюць нічыю</string>
   <string name="blackDeclinesDraw">Чорныя адхіляюць нічыю</string>
   <string name="yourOpponentOffersADraw">Супернік прапануе нічыю</string>
@@ -414,6 +419,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Зрабіце ход, каб даказаць, што вы – чалавек.</string>
   <string name="captcha.fail">Калі ласка, вырашыце шахматную CAPTCHA.</string>
   <string name="notACheckmate">Гэта не мат</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s ставяць мат у адзін ход</string>
   <string name="whiteCheckmatesInOneMove">Белыя ставяць мат у адзін ход</string>
   <string name="blackCheckmatesInOneMove">Чорныя ставяць мат у адзін ход</string>
   <string name="retry">Яшчэ раз</string>
@@ -835,6 +841,7 @@
   <string name="hideBestMove">Схаваць лепшы ход</string>
   <string name="getAHint">Атрымаць падказку</string>
   <string name="evaluatingYourMove">Ацэнка вашага ходу...</string>
+  <string name="sgPlayerWinsGame">%s перамаглі</string>
   <string name="whiteWinsGame">Белыя перамаглі</string>
   <string name="blackWinsGame">Чорныя перамаглі</string>
   <string name="learnFromYourMistakes">Работа над памылкамі</string>

@@ -81,6 +81,7 @@
   <string name="drawn">תיקו</string>
   <string name="unknown">לא ידוע</string>
   <string name="database">מסד נתונים</string>
+  <string name="p1DrawP2">%2$s / תיקו / %1$s</string>
   <string name="whiteDrawBlack">שחור / תיקו / לבן</string>
   <string name="averageRatingX">דירוג ממוצע: %s</string>
   <string name="recentGames">משחקים אחרונים</string>
@@ -237,14 +238,17 @@
     <item quantity="other">%s משחקים איתך</item>
   </plurals>
   <string name="cancel">ביטול</string>
+  <string name="sgPlayerTimeOut">נגמר לך הזמן, שחקן %s</string>
   <string name="whiteTimeOut">נגמר לך הזמן, שחקן לבן</string>
   <string name="blackTimeOut">נגמר הזמן לשחור</string>
   <string name="drawOfferSent">הצעת תיקו נשלחה</string>
   <string name="drawOfferDeclined">הצעת התיקו נדחתה</string>
   <string name="drawOfferAccepted">הצעת התיקו התקבלה</string>
   <string name="drawOfferCanceled">הצעת התיקו בוטלה</string>
+  <string name="sgPlayerOffersDraw">%s מציע תיקו</string>
   <string name="whiteOffersDraw">לבן מציע תיקו</string>
   <string name="blackOffersDraw">שחור מציע תיקו</string>
+  <string name="sgPlayerDeclinesDraw">%s מסרב לתיקו</string>
   <string name="whiteDeclinesDraw">לבן מסרב לתיקו</string>
   <string name="blackDeclinesDraw">שחור מסרב לתיקו</string>
   <string name="yourOpponentOffersADraw">יריבך מציע תיקו</string>
@@ -491,6 +495,7 @@
   <string name="performance">דירוג הביצוע</string>
   <string name="tournamentComplete">הטורניר הושלם</string>
   <string name="movesPlayed">מהלכים ששוחקו</string>
+  <string name="sgPlayerWins">%s מנצח</string>
   <string name="whiteWins">לבן מנצח</string>
   <string name="blackWins">שחור מנצח</string>
   <string name="draws">תוצאות תיקו</string>

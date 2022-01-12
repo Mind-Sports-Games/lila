@@ -19,6 +19,7 @@
   <string name="black">Svartur</string>
   <string name="randomColor">Litur af handahófi</string>
   <string name="createAGame">Hefja leik</string>
+  <string name="sgPlayerIsVictorious">%s vinnur</string>
   <string name="whiteIsVictorious">Hvítur vinnur</string>
   <string name="blackIsVictorious">Svartur vinnur</string>
   <string name="youPlayTheWhitePieces">Þú teflir með hvítu mennina</string>
@@ -31,6 +32,7 @@
   <string name="newOpponent">Nýr andstæðingur</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Andstæðingur þinn vill tefla aðra skák við þig</string>
   <string name="joinTheGame">Hefja leik</string>
+  <string name="sgPlayerPlays">%s á leik</string>
   <string name="whitePlays">Hvítur á leik</string>
   <string name="blackPlays">Svartur á leik</string>
   <plurals name="opponentLeftCounter">
@@ -43,8 +45,10 @@
   <string name="forceDraw">Þvinga jafntefli</string>
   <string name="talkInChat">Vinsamlegast verið vinaleg í spjalli!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Fyrsti einstaklingur sem kemur á þessa vefslóð vill spila við þig</string>
+  <string name="sgPlayerResigned">%s gefst upp</string>
   <string name="whiteResigned">Hvítur gefst upp</string>
   <string name="blackResigned">Svartur gefst upp</string>
+  <string name="sgPlayerLeftTheGame">%s hefur yfirgefið leikinn</string>
   <string name="whiteLeftTheGame">Hvítur hefur yfirgefið leikinn</string>
   <string name="blackLeftTheGame">Svartur hefur yfirgefið leikinn</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Deildu þessum hlekk svo aðrir geti fylgst með leiknum</string>
@@ -78,6 +82,7 @@
   <string name="drawn">Jafntefli</string>
   <string name="unknown">Óþekktur</string>
   <string name="database">Gagnagrunnur</string>
+  <string name="p1DrawP2">Hvitur / Jafntefli / %2$s</string>
   <string name="whiteDrawBlack">Hvitur / Jafntefli / Svartur</string>
   <string name="averageRatingX">Meðal Elo: %s</string>
   <string name="recentGames">Síðustu skákir</string>
@@ -192,14 +197,17 @@
     <item quantity="other">%s skákir með þér</item>
   </plurals>
   <string name="cancel">Hætta við</string>
+  <string name="sgPlayerTimeOut">%s féll á tíma</string>
   <string name="whiteTimeOut">Hvítur féll á tíma</string>
   <string name="blackTimeOut">Svartur féll á tíma</string>
   <string name="drawOfferSent">boð um jafntefli sent</string>
   <string name="drawOfferDeclined">Boði um jafntefli hafnað</string>
   <string name="drawOfferAccepted">Boði um jafntefli samþykkt</string>
   <string name="drawOfferCanceled">Boði um jafntefli afturkallað</string>
+  <string name="sgPlayerOffersDraw">%s býður jafntefli</string>
   <string name="whiteOffersDraw">Hvítur býður jafntefli</string>
   <string name="blackOffersDraw">Svartur býður jafntefli</string>
+  <string name="sgPlayerDeclinesDraw">%s afþakkar jafntefli</string>
   <string name="whiteDeclinesDraw">Hvítur afþakkar jafntefli</string>
   <string name="blackDeclinesDraw">Svartur afþakkar jafntefli</string>
   <string name="yourOpponentOffersADraw">Andstæðingur býður jafntefli</string>
@@ -339,6 +347,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Klikkaðu á borðið til að leika, og sannaðu að þú ert mannvera.</string>
   <string name="captcha.fail">Vinsamlegast leystu skákþrautina til að halda áfram.</string>
   <string name="notACheckmate">Ekki mát</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s mátar í einum leik</string>
   <string name="whiteCheckmatesInOneMove">Hvítur mátar í einum leik</string>
   <string name="blackCheckmatesInOneMove">Svartur mátar í einum leik</string>
   <string name="retry">Reyna aftur</string>
@@ -407,6 +416,7 @@
   <string name="performance">Mótsstig</string>
   <string name="tournamentComplete">Móti lokið</string>
   <string name="movesPlayed">Fjöldi hreyfinga</string>
+  <string name="sgPlayerWins">%s vinnur</string>
   <string name="whiteWins">Hvítur vinnur</string>
   <string name="blackWins">Svartur vinnur</string>
   <string name="draws">Jafntefli</string>
@@ -712,6 +722,7 @@
   <string name="getAHint">Fá vísbendingu</string>
   <string name="evaluatingYourMove">Greini leikinn þinn ...</string>
   <string name="whiteWinsGame">Hvítt vinnur</string>
+  <string name="sgPlayerWinsGame">%s vinnur</string>
   <string name="blackWinsGame">Svartur vinnur</string>
   <string name="learnFromYourMistakes">Lærðu af mistökum þínum</string>
   <string name="learnFromThisMistake">Lærðu af þessum mistökum</string>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">Melangkah untuk memulai</string>
+  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">Anda memainkan bidak %s di semua taktik</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">Anda memainkan bidak putih di semua taktik</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">Anda memainkan bidak hitam di semua taktik</string>
   <string name="puzzlesSolved">teka-teki terpecahkan</string>

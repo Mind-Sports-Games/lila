@@ -20,6 +20,7 @@
   <string name="black">Sort</string>
   <string name="randomColor">Tilfældig farve</string>
   <string name="createAGame">Start et parti</string>
+  <string name="sgPlayerIsVictorious">%s har vundet</string>
   <string name="whiteIsVictorious">Hvid har vundet</string>
   <string name="blackIsVictorious">Sort har vundet</string>
   <string name="youPlayTheWhitePieces">Du spiller med de hvide brikker</string>
@@ -33,6 +34,7 @@
   <string name="newOpponent">Ny modstander</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Din modstander vil gerne spille et nyt spil</string>
   <string name="joinTheGame">Start spillet</string>
+  <string name="sgPlayerPlays">%s i trækket</string>
   <string name="whitePlays">Hvid i trækket</string>
   <string name="blackPlays">Sort til at spille</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +47,10 @@
   <string name="forceDraw">Fremtving remis</string>
   <string name="talkInChat">Hold en venlig tone i chatten!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Den første person der bruger denne URL, vil blive din modstander</string>
+  <string name="sgPlayerResigned">%s har givet op</string>
   <string name="whiteResigned">Hvid har givet op</string>
   <string name="blackResigned">Sort har givet op</string>
+  <string name="sgPlayerLeftTheGame">%s har forladt partiet</string>
   <string name="whiteLeftTheGame">Hvid har forladt partiet</string>
   <string name="blackLeftTheGame">Sort har forladt partiet</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Del denne URL for at lade tilskuere se partiet</string>
@@ -80,6 +84,7 @@
   <string name="drawn">Remis</string>
   <string name="unknown">Ukendt</string>
   <string name="database">Database</string>
+  <string name="p1DrawP2">%1$s / Remis / %2$s</string>
   <string name="whiteDrawBlack">Hvid / Remis / Sort</string>
   <string name="averageRatingX">Gennemsnitlig rating: %s</string>
   <string name="recentGames">Seneste partier</string>
@@ -210,14 +215,17 @@
     <item quantity="other">%s partier med dig</item>
   </plurals>
   <string name="cancel">Afbryd</string>
+  <string name="sgPlayerTimeOut">Tid udløbet for %s</string>
   <string name="whiteTimeOut">Tid udløbet for hvid</string>
   <string name="blackTimeOut">Tid udløbet for sort</string>
   <string name="drawOfferSent">Remistilbud afsendt</string>
   <string name="drawOfferDeclined">Remistilbud afslået</string>
   <string name="drawOfferAccepted">Remistilbud accepteret</string>
   <string name="drawOfferCanceled">Remistilbud trukket tilbage</string>
+  <string name="sgPlayerOffersDraw">%s tilbyder remis</string>
   <string name="whiteOffersDraw">Hvid tilbyder remis</string>
   <string name="blackOffersDraw">Sort tilbyder remis</string>
+  <string name="sgPlayerDeclinesDraw">%s afslår remis</string>
   <string name="whiteDeclinesDraw">Hvid afslår remis</string>
   <string name="blackDeclinesDraw">Sort afslår remis</string>
   <string name="yourOpponentOffersADraw">Din modstander tilbyder remis</string>
@@ -361,6 +369,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Klik på brættet for at foretage dit træk, og bevis at du ikke er en robot.</string>
   <string name="captcha.fail">Løs venligst denne skak-captcha.</string>
   <string name="notACheckmate">Ikke en mat</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s sætter mat i ét træk</string>
   <string name="whiteCheckmatesInOneMove">Hvid sætter mat i ét træk</string>
   <string name="blackCheckmatesInOneMove">Sort sætter mat i ét træk</string>
   <string name="retry">Prøv igen</string>
@@ -430,6 +439,7 @@
   <string name="performance">Præstation</string>
   <string name="tournamentComplete">Turnering afsluttet</string>
   <string name="movesPlayed">Spillede træk</string>
+  <string name="sgPlayerWins">%s vinder</string>
   <string name="whiteWins">Hvid vinder</string>
   <string name="blackWins">Sort vinder</string>
   <string name="draws">Remis</string>
@@ -764,6 +774,7 @@
   <string name="hideBestMove">Skjul bedste træk</string>
   <string name="getAHint">Få et hint</string>
   <string name="evaluatingYourMove">Vurderer dit træk ...</string>
+  <string name="sgPlayerWinsGame">%s vinder</string>
   <string name="whiteWinsGame">Hvid vinder</string>
   <string name="blackWinsGame">Sort vinder</string>
   <string name="learnFromYourMistakes">Lær af dine fejl</string>
@@ -771,16 +782,20 @@
   <string name="skipThisMove">Spring dette træk over</string>
   <string name="next">Næste</string>
   <string name="xWasPlayed">%s blev spillet</string>
+  <string name="findBetterMoveForSGPlayer">Find et bedre træk for %s</string>
   <string name="findBetterMoveForWhite">Find et bedre træk for hvid</string>
   <string name="findBetterMoveForBlack">Find et bedre træk for sort</string>
   <string name="resumeLearning">Fortsæt læring</string>
   <string name="youCanDoBetter">Du kan gøre det bedre</string>
+  <string name="tryAnotherMoveForSGPlayer">Prøv et andet træk for %s</string>
   <string name="tryAnotherMoveForWhite">Prøv et andet træk for hvid</string>
   <string name="tryAnotherMoveForBlack">Prøv et andet træk for sort</string>
   <string name="solution">Løsning</string>
   <string name="waitingForAnalysis">Venter på analyse</string>
+  <string name="noMistakesFoundForSGPlayer">Ingen fejl fundet for %s</string>
   <string name="noMistakesFoundForWhite">Ingen fejl fundet for hvid</string>
   <string name="noMistakesFoundForBlack">Ingen fejl fundet for sort</string>
+  <string name="doneReviewingSGPlayerMistakes">Færdig med gennemgang af fejl for %s</string>
   <string name="doneReviewingWhiteMistakes">Færdig med gennemgang af fejl for hvid</string>
   <string name="doneReviewingBlackMistakes">Færdig med gennemgang af fejl for sort</string>
   <string name="doItAgain">Gentag</string>

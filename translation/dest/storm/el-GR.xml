@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">Μετακινήστε ένα κομμάτι για να αρχίσετε</string>
+  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">Παίζετε με τα %s σε όλους τους γρίφους</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">Παίζετε με τα λευκά σε όλους τους γρίφους</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">Παίζετε με τα μαύρα σε όλους τους γρίφους</string>
   <string name="puzzlesSolved">λυμένοι γρίφοι</string>

@@ -11,6 +11,7 @@
   <string name="goals">ပန်းတိုင်များ</string>
   <string name="didYouLikeThisPuzzle">ဤဉာဏ်စမ်းကို သင် သဘောကျပါသလား</string>
   <string name="voteToLoadNextOne">လာမည့် ဉာဏ်စမ်း အတွက် ဆန္ဒပြုပါ</string>
+  <string name="findTheBestMoveForSGPlayer">%s အတွက် အကောင်းဆုံး ရွှေ့ကွက်ကို ရှာပါ</string>
   <string name="findTheBestMoveForWhite">အဖြူ အတွက် အကောင်းဆုံး ရွှေ့ကွက်ကို ရှာပါ</string>
   <string name="findTheBestMoveForBlack">အနက် အတွက် အကောင်းဆုံး ရွှေ့ကွက်ကို ရှာပါ</string>
   <string name="toGetPersonalizedPuzzles">သင့်အတွက် သီးခြား ဉာဏ်စမ်းများ ရယူရန်</string>

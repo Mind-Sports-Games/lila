@@ -20,8 +20,10 @@
   <string name="black">Reş</string>
   <string name="randomColor">Aliyeke ketober</string>
   <string name="createAGame">Lîstikek çêke</string>
+  <string name="sgPlayerIsVictorious">%s bi ser ket</string>
   <string name="whiteIsVictorious">Spî bi ser ket</string>
   <string name="blackIsVictorious">Reş bi ser ket</string>
+  <string name="youPlayTheSGPlayerPieces">Tu yê bi kevirên %s bileyzî</string>
   <string name="youPlayTheWhitePieces">Tu yê bi kevirên spî bileyzî</string>
   <string name="youPlayTheBlackPieces">Tu yê bi kevirên reş bileyzî</string>
   <string name="itsYourTurn">Dora te ye!</string>
@@ -32,6 +34,7 @@
   <string name="newOpponent">Reqîbek nû</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Reqîbê/a te dixwaze cardin bi te re bilîze</string>
   <string name="joinTheGame">Tevlî lîstikê bibe</string>
+  <string name="sgPlayerPlays">Wê %s bilîze</string>
   <string name="whitePlays">Wê spî bilîze</string>
   <string name="blackPlays">Wê reş bilîze</string>
   <plurals name="opponentLeftCounter">
@@ -44,8 +47,10 @@
   <string name="forceDraw">Wekheviyê bixwaze</string>
   <string name="talkInChat">Ji kerema xwe kibar bin di axaftinê de!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Kesê/a ewil ku xwe gihand vê Girêdankê wê bibe reqîbê/a te.</string>
+  <string name="sgPlayerResigned">%s vekişiya</string>
   <string name="whiteResigned">Spî vekişiya</string>
   <string name="blackResigned">Reş vekişiya</string>
+  <string name="sgPlayerLeftTheGame">%s dev ji lîstikê berda</string>
   <string name="whiteLeftTheGame">Spî dev ji lîstikê berda</string>
   <string name="blackLeftTheGame">Reş dev ji lîstikê berda</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Vê Girêdankê parve bike da ku temaşevan bikaribin lîstikê temaşe bikin</string>
@@ -79,6 +84,7 @@
   <string name="drawn">Wekhevî</string>
   <string name="unknown">Nedîyar</string>
   <string name="database">Agahîdank</string>
+  <string name="p1DrawP2">%1$s / Wekhevî / %2$s</string>
   <string name="whiteDrawBlack">Spî / Wekhevî / Reş</string>
   <string name="averageRatingX">Nirxandina navîn: %s</string>
   <string name="recentGames">Lîstikên herî dawî</string>
@@ -209,14 +215,17 @@
     <item quantity="other">%s lîstikên bi te re</item>
   </plurals>
   <string name="cancel">Betal bike</string>
+  <string name="sgPlayerTimeOut">Dema %s qedîya</string>
   <string name="whiteTimeOut">Dema Spî qedîya</string>
   <string name="blackTimeOut">Dema Reş qedîya</string>
   <string name="drawOfferSent">Pêşniyara wekheviyê hate şandin</string>
   <string name="drawOfferDeclined">Teklîfa wekheviyê hate redkirin</string>
   <string name="drawOfferAccepted">Teklîfa wekheviyê hate qebûlkirin</string>
   <string name="drawOfferCanceled">Teklîfa wekheviyê hate betalkirin</string>
+  <string name="sgPlayerOffersDraw">Ya %s wekheviyê teklîf dike</string>
   <string name="whiteOffersDraw">Ya spî wekheviyê teklîf dike</string>
   <string name="blackOffersDraw">Ya reş wekheviyê teklîf dike</string>
+  <string name="sgPlayerDeclinesDraw">Ya %s wekheviyê red dike</string>
   <string name="whiteDeclinesDraw">Ya spî wekheviyê red dike</string>
   <string name="blackDeclinesDraw">Ya reş wekheviyê red dike</string>
   <string name="yourOpponentOffersADraw">Reqîbê te wekheviyê teklîf dike</string>
@@ -359,6 +368,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Bitikîne ser textê ji bo kirina hemleyê, û birastîne ku tu însan î.</string>
   <string name="captcha.fail">Ji kerema xwe pêşî captcha-yê çareser bike.</string>
   <string name="notACheckmate">Ne şahmatek e</string>
+  <string name="sgPlayerCheckmatesInOneMove">Ya %s bi hemleyekê şahmat dike</string>
   <string name="whiteCheckmatesInOneMove">Ya spî bi hemleyekê şahmat dike</string>
   <string name="blackCheckmatesInOneMove">Ya reş bi hemleyekê şahmat dike</string>
   <string name="retry">Cardin biceribîne</string>
@@ -428,6 +438,7 @@
   <string name="performance">Performans</string>
   <string name="tournamentComplete">Pêşbirk qedîya</string>
   <string name="movesPlayed">Hemleyên lîstî</string>
+  <string name="sgPlayerWins">Serkeftinên %s</string>
   <string name="whiteWins">Serkeftinên spî</string>
   <string name="blackWins">Serkeftinên reş</string>
   <string name="draws">Wekhevî</string>
@@ -754,6 +765,7 @@
   <string name="hideBestMove">Hemleya çêtirîn biveşêre</string>
   <string name="getAHint">Serbendekê werbigire</string>
   <string name="evaluatingYourMove">Hemleya te tê nirxandin ...</string>
+  <string name="sgPlayerWinsGame">%s bi ser ket</string>
   <string name="whiteWinsGame">Spî bi ser ket</string>
   <string name="blackWinsGame">Reş bi ser ket</string>
   <string name="learnFromYourMistakes">Ders bigire ji çewtiyên xwe</string>
@@ -761,19 +773,24 @@
   <string name="skipThisMove">Vê hemleyê derbas bike</string>
   <string name="next">Pêşve</string>
   <string name="xWasPlayed">%s hate lîstin</string>
+  <string name="findBetterMoveForSGPlayer">Hemleyeke çêtir bibîne ji bo %s</string>
   <string name="findBetterMoveForWhite">Hemleyeke çêtir bibîne ji bo spî</string>
   <string name="findBetterMoveForBlack">Hemleyeke çêtir bibîne ji bo reş</string>
   <string name="resumeLearning">Dewam bike hînbûnê</string>
   <string name="youCanDoBetter">Tu dikarî yê çêtir bikî</string>
+  <string name="tryAnotherMoveForSGPlayer">Hemleyeke din biceribîne ji bo %s</string>
   <string name="tryAnotherMoveForWhite">Hemleyeke din biceribîne ji bo spî</string>
   <string name="tryAnotherMoveForBlack">Hemleyeke din biceribîne ji bo reş</string>
   <string name="solution">Çareserî</string>
   <string name="waitingForAnalysis">Li benda analîzê ye</string>
+  <string name="noMistakesFoundForSGPlayer">Ti çewtî nehate dîtin ji bo %s</string>
   <string name="noMistakesFoundForWhite">Ti çewtî nehate dîtin ji bo spî</string>
   <string name="noMistakesFoundForBlack">Ti çewtî nehate dîtin ji bo reş</string>
+  <string name="doneReviewingSGPlayerMistakes">Kontrolkirina çewtiyên %s temam bû</string>
   <string name="doneReviewingWhiteMistakes">Kontrolkirina çewtiyên spî temam bû</string>
   <string name="doneReviewingBlackMistakes">Kontrolkirina çewtiyên reş temam bû</string>
   <string name="doItAgain">Cardin bike</string>
+  <string name="reviewSGPlayerMistakes">Şaşiyên %s binirxîne</string>
   <string name="reviewWhiteMistakes">Şaşiyên spî binirxîne</string>
   <string name="reviewBlackMistakes">Şaşiyên reş binirxîne</string>
   <string name="advantage">Pêşwendî</string>

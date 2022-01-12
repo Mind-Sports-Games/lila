@@ -20,8 +20,10 @@
   <string name="black">ಕಪ್ಪು</string>
   <string name="randomColor">ಯಾದೃಚ್ಛಿಕ ಬಣ್ಣ</string>
   <string name="createAGame">ಒಂದು ಆಟ</string>
+  <string name="sgPlayerIsVictorious">%s ಜಯಶಾಲಿಯಾಗಿದ್ದಾರೆ</string>
   <string name="whiteIsVictorious">ಬಿಳಿ ಜಯಶಾಲಿಯಾಗಿದ್ದಾರೆ</string>
   <string name="blackIsVictorious">ಕಪ್ಪು ಜಯಶಾಲಿಯಾಗಿದ್ದಾರೆ</string>
+  <string name="youPlayTheSGPlayerPieces">ನೀವು %s ತುಂಡುಗಳನ್ನು ಆಡುತ್ತೀರಿ</string>
   <string name="youPlayTheWhitePieces">ನೀವು ಬಿಳಿ ತುಂಡುಗಳನ್ನು ಆಡುತ್ತೀರಿ</string>
   <string name="youPlayTheBlackPieces">ನೀವು ಕಪ್ಪು ತುಂಡುಗಳನ್ನು ಆಡುತ್ತೀರಿ</string>
   <string name="itsYourTurn">ಈಗ ನಿನ್ನ ಸರದಿ!</string>
@@ -33,6 +35,7 @@
   <string name="yourOpponentWantsToPlayANewGameWithYou">ನಿಮ್ಮ ಎದುರಾಳಿಯ ನೀವು ಒಂದು ಹೊಸ ಆಟ ಬಯಸಿದೆ</string>
   <string name="joinTheGame">ಆಟದ ಸೇರಲು</string>
   <string name="whitePlays">ವೈಟ್ ನಾಟಕಗಳು</string>
+  <string name="sgPlayerPlays">%s ನಾಟಕಗಳು</string>
   <string name="blackPlays">ಕಪ್ಪು ನಾಟಕಗಳು</string>
   <plurals name="opponentLeftCounter">
     <item quantity="one">ನಿಮ್ಮ ಎದುರಾಳಿಯು ಆಟವನ್ನು ತೊರೆದನು. ನೀವು %s ಸೆಕೆಂಡಿನಲ್ಲಿ ವಿಜಯ ಸಾಧಿಸಬಹುದು.</item>
@@ -44,8 +47,10 @@
   <string name="forceDraw">ಫೋರ್ಸ್ ಡ್ರಾ</string>
   <string name="talkInChat">ಚಾಟ್ ನಲ್ಲಿ ಮಾತಾಡಿ</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">ಈ ಲಿಂಕ್ ಗೆ ಬರುವ ಮೊದಲ ವ್ಯಕ್ತಿ ನಿಮ್ಮ ಜೊತೆ ಆಟ ಆಡಬಹುದು</string>
+  <string name="sgPlayerResigned">%s ತಂಡದ ಆಟಗಾರ ಸೋಲನ್ನ ಒಪ್ಪಿದ್ದಾರೆ</string>
   <string name="whiteResigned">ಬಿಳಿ ತಂಡದ ಆಟಗಾರ ಸೋಲನ್ನ ಒಪ್ಪಿದ್ದಾರೆ</string>
   <string name="blackResigned">ಕರಿ ತಂಡದ ಆಟಗಾರ ಸೋಲನ್ನ ಒಪ್ಪಿದ್ದಾರೆ</string>
+  <string name="sgPlayerLeftTheGame">%s ಆಟ ಬಿಟ್ಟಿದೆ</string>
   <string name="whiteLeftTheGame">ಬಿಳಿ ಆಟ ಬಿಟ್ಟಿದೆ</string>
   <string name="blackLeftTheGame">ಕಪ್ಪು ಆಟ ಬಿಟ್ಟಿದೆ</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">ಆಟವನ್ನು ವೀಕ್ಷಕರು ನೋಡಲು ಈ URL ಹಂಚಿ</string>
@@ -79,6 +84,7 @@
   <string name="drawn">ಡ್ರಾ ಆಯಿತು</string>
   <string name="unknown">ಅಪರಿಚಿತ</string>
   <string name="database">ಡೇಟಾಬೇಸ್</string>
+  <string name="p1DrawP2">%1$s / ಡ್ರಾ / %2$s</string>
   <string name="whiteDrawBlack">ಬಿಳಿ / ಡ್ರಾ / ಕಪ್ಪು</string>
   <string name="averageRatingX">ಸರಾಸರಿ ಮೌಲ್ಯ: %s</string>
   <string name="recentGames">ಇತ್ತೀಚಿನ ಆಟಗಳು</string>

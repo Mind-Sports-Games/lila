@@ -21,8 +21,10 @@
   <string name="randomColor">ഏതെങ്കിലും നിറം</string>
   <string name="createAGame">പുതിയ കളി തുടങ്ങുക</string>
   <string name="whiteIsVictorious">വെള്ള വിജയിച്ചു</string>
+  <string name="sgPlayerIsVictorious">%s വിജയിച്ചു</string>
   <string name="blackIsVictorious">കറുപ്പ് വിജയിച്ചു</string>
   <string name="youPlayTheWhitePieces">നിങ്ങൾ വെള്ള കരുകൾ വെച്ച് കളിക്കുന്നു</string>
+  <string name="youPlayTheSGPlayerPieces">നിങ്ങൾ %s കരുകൾ വെച്ച് കളിക്കുന്നു</string>
   <string name="youPlayTheBlackPieces">നിങ്ങൾ കറുപ്പ് കരുകൾ വെച്ച് കളിക്കുന്നു</string>
   <string name="itsYourTurn">നിങ്ങളുടെ കളി!</string>
   <string name="kingInTheCenter">കിംഗ് ഇൻ ദി സെന്റർ ഗെയിം</string>
@@ -79,6 +81,7 @@
   <string name="drawn">സമനില പൊസിഷൻ</string>
   <string name="unknown">അറിയപ്പെടാത്ത പൊസിഷൻ</string>
   <string name="database">ഡേറ്റാബേസ്</string>
+  <string name="p1DrawP2">വെള്ള / സമനില / %2$s</string>
   <string name="whiteDrawBlack">വെള്ള / സമനില / കറുപ്പ്</string>
   <string name="averageRatingX">ശരാശരി റേറ്റിങ് %s</string>
   <string name="recentGames">സമീപകാല ഗെയിമുകൾ</string>
@@ -210,14 +213,17 @@
   </plurals>
   <string name="cancel">ഒഴിവാക്കുക</string>
   <string name="whiteTimeOut">വെള്ള സമയം കഴിഞു</string>
+  <string name="sgPlayerTimeOut">%s സമയം കഴിഞ്ഞു</string>
   <string name="blackTimeOut">കറുപ്പ് സമയം കഴിഞ്ഞു</string>
   <string name="drawOfferSent">സമനിലാ വാഗ്ദാനം അയച്ചു</string>
   <string name="drawOfferDeclined">സമനിലാ വാഗ്ദാനം നിരസിക്കപ്പെട്ടു</string>
   <string name="drawOfferAccepted">സമനിലാ വാഗ്ദാനം സ്വീകരിക്കപ്പെട്ടു</string>
   <string name="drawOfferCanceled">സമനിലാ വാഗ്ദാനം റദ്ദാക്കപ്പെട്ടു</string>
   <string name="whiteOffersDraw">വെള്ള സമനില വാഗ്ദാനം ചെയ്യുന്നു</string>
+  <string name="sgPlayerOffersDraw">%s സമനില വാഗ്ദാനം ചെയ്യുന്നു</string>
   <string name="blackOffersDraw">കറുപ്പ് സമനില വാഗ്ദാനം ചെയ്യുന്നു</string>
   <string name="whiteDeclinesDraw">വെള്ള സമനില നിരസിക്കുന്നു</string>
+  <string name="sgPlayerDeclinesDraw">%s സമനില നിരസിക്കുന്നു</string>
   <string name="blackDeclinesDraw">കറുപ്പ് സമനില നിരസിക്കുന്നു</string>
   <string name="yourOpponentOffersADraw">നിങ്ങളുടെ എതിരാളി സമനില വാഗ്ദാനം ചെയ്യുന്നു</string>
   <string name="accept">സ്വീകരിക്കുക</string>

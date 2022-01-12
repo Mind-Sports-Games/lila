@@ -20,6 +20,7 @@
   <string name="black">I ziu</string>
   <string name="randomColor">Ngjyrë e rastësishme</string>
   <string name="createAGame">Krijo një lojë</string>
+  <string name="sgPlayerIsVictorious">Fitoi %s</string>
   <string name="whiteIsVictorious">Fitoi i bardhi</string>
   <string name="blackIsVictorious">Fitoi i ziu</string>
   <string name="youPlayTheWhitePieces">Ti luan me të bardhat</string>
@@ -44,8 +45,10 @@
   <string name="forceDraw">Kërko barazim</string>
   <string name="talkInChat">Ju lutem jini të sjellshëm në bisedë!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Personi i parë që do hapë këtë adresë do të luajë me ju.</string>
+  <string name="sgPlayerResigned">%s u dorëzua</string>
   <string name="whiteResigned">I bardhi u dorëzua</string>
   <string name="blackResigned">I ziu u dorëzua</string>
+  <string name="sgPlayerLeftTheGame">%s e la lojën</string>
   <string name="whiteLeftTheGame">I bardhi e la lojën</string>
   <string name="blackLeftTheGame">I ziu e la lojën</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Shpërndaje këtë link për të lejuar spektatorë të shikojnë lojën</string>
@@ -203,8 +206,10 @@
   <string name="drawOfferDeclined">Oferta për barazim u hodh poshtë</string>
   <string name="drawOfferAccepted">Oferta për barazim u pranua</string>
   <string name="drawOfferCanceled">Oferta për barazim u anullua</string>
+  <string name="sgPlayerOffersDraw">%s ofron barazim</string>
   <string name="whiteOffersDraw">i bardhi ofron barazim</string>
   <string name="blackOffersDraw">i ziu ofron barazim</string>
+  <string name="sgPlayerDeclinesDraw">%s refuzon barazimin</string>
   <string name="whiteDeclinesDraw">i bardhi refuzon barazimin</string>
   <string name="blackDeclinesDraw">i ziu refuzon barazimin</string>
   <string name="yourOpponentOffersADraw">Kundërshtari ju ofron barazim</string>
@@ -417,6 +422,7 @@
   <string name="performance">Paraqitja</string>
   <string name="tournamentComplete">Turneu mbaroi</string>
   <string name="movesPlayed">Levizje të luajtura</string>
+  <string name="sgPlayerWins">%s fiton</string>
   <string name="whiteWins">I bardhi fiton</string>
   <string name="blackWins">I ziu fiton</string>
   <string name="draws">Barazime</string>

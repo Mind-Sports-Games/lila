@@ -20,8 +20,10 @@
   <string name="black">Neri</string>
   <string name="randomColor">Sceglie u campu à l\' imbusca</string>
   <string name="createAGame">Creà una partita</string>
+  <string name="sgPlayerIsVictorious">I %s anu vintu</string>
   <string name="whiteIsVictorious">I bianchi anu vintu</string>
   <string name="blackIsVictorious">I neri anu vintu</string>
+  <string name="youPlayTheSGPlayerPieces">Ghjucate cù i pezzi %s</string>
   <string name="youPlayTheWhitePieces">Ghjucate cù i pezzi bianchi</string>
   <string name="youPlayTheBlackPieces">Ghjucate cù i pezzi neri</string>
   <string name="itsYourTurn">Tocca à vò!</string>
@@ -33,6 +35,7 @@
   <string name="newOpponent">Aversariu novu</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">U vostru aversariu vole ghjucà una partita nova cù voi</string>
   <string name="joinTheGame">Ghjunghjite a partita</string>
+  <string name="sgPlayerPlays">Tocca à i %s</string>
   <string name="whitePlays">Tocca à i bianchi</string>
   <string name="blackPlays">Tocca à i neri</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +48,10 @@
   <string name="forceDraw">Dichjarà a partita patta</string>
   <string name="talkInChat">Pè piace, siate curtese in a discursata!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">A prima persona chì ghjunghje issu URL hà da ghjucà cù voi.</string>
+  <string name="sgPlayerResigned">I %s tralascianu</string>
   <string name="whiteResigned">I bianchi tralascianu</string>
   <string name="blackResigned">I neri tralascianu</string>
+  <string name="sgPlayerLeftTheGame">I %s lascianu a partita</string>
   <string name="whiteLeftTheGame">I bianchi lascianu a partita</string>
   <string name="blackLeftTheGame">I neri lascianu a partita</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Carigate stu URL pè permette à i spettatori di vede a partita</string>
@@ -80,6 +85,7 @@
   <string name="drawn">Annullente</string>
   <string name="unknown">Scunnusciutu</string>
   <string name="database">Databasa</string>
+  <string name="p1DrawP2">Bianchi/ Patta/ %2$s</string>
   <string name="whiteDrawBlack">Bianchi/ Patta/ Neri</string>
   <string name="averageRatingX">Livellu mezanu %s</string>
   <string name="recentGames">Partite recente</string>
@@ -210,14 +216,17 @@
     <item quantity="other">%s partite cù voi</item>
   </plurals>
   <string name="cancel">Annullà</string>
+  <string name="sgPlayerTimeOut">I %s ùn anu più tempu</string>
   <string name="whiteTimeOut">I bianchi ùn anu più tempu</string>
   <string name="blackTimeOut">I neri ùn anu più tempu</string>
   <string name="drawOfferSent">Offerta di partita patta mandata</string>
   <string name="drawOfferDeclined">Offerta di patta scartata</string>
   <string name="drawOfferAccepted">Offerta di patta accettata</string>
   <string name="drawOfferCanceled">Offerta di patta annullata</string>
+  <string name="sgPlayerOffersDraw">I %s pruponenu a partita patta</string>
   <string name="whiteOffersDraw">I bianchi pruponenu a partita patta</string>
   <string name="blackOffersDraw">I neri pruponenu a partita patta</string>
+  <string name="sgPlayerDeclinesDraw">I %s ricusanu a partita patta</string>
   <string name="whiteDeclinesDraw">I bianchi ricusanu a partita patta</string>
   <string name="blackDeclinesDraw">I neri ricusanu a partita patta</string>
   <string name="yourOpponentOffersADraw">U vostru aversariu prupone a partita patta</string>

@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Coordenadas</string>
   <string name="coordinateTraining">Adestramento de coordenadas</string>
+  <string name="averageScoreAsSGPlayerX">Puntuación media con %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Puntuación media con brancas: %s</string>
   <string name="averageScoreAsBlackX">Puntuación media con negras: %s</string>
   <string name="knowingTheChessBoard">Coñecer as coordenadas do taboleiro é unha importante habilidade no xadrez:</string>

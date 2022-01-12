@@ -19,8 +19,10 @@
   <string name="black">nyeusi</string>
   <string name="randomColor">Upande ovyoovyo</string>
   <string name="createAGame">unda mchezo</string>
+  <string name="sgPlayerIsVictorious">%s ameshinda</string>
   <string name="whiteIsVictorious">nyeupe ameshinda</string>
   <string name="blackIsVictorious">nyeusi ameshinda</string>
+  <string name="youPlayTheSGPlayerPieces">Unacheza na %s</string>
   <string name="youPlayTheWhitePieces">Unacheza na nyeupe</string>
   <string name="youPlayTheBlackPieces">Unacheza na nyeusi</string>
   <string name="itsYourTurn">Nafasi ni yako!</string>
@@ -31,6 +33,7 @@
   <string name="newOpponent">mpinzani mwingine</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">mpinzani wako ataka mcheze upya</string>
   <string name="joinTheGame">jiunge na mchezo</string>
+  <string name="sgPlayerPlays">%s acheza</string>
   <string name="whitePlays">nyeupe acheza</string>
   <string name="blackPlays">nyeusi acheza</string>
   <string name="opponentLeftChoices">mchezaji ameondoka, waweza mlazimisha kujiuzulu ama umngoje</string>
@@ -39,8 +42,10 @@
   <string name="forceDraw">Itikia Usawia</string>
   <string name="talkInChat">Kua mpole kwa mawasiliano!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Mtu wa kwanza ambaye ataituma URL hii, atacheza na wewe.</string>
+  <string name="sgPlayerResigned">Mwenye %s ameshindwa</string>
   <string name="whiteResigned">Mwenye nyeupe ameshindwa</string>
   <string name="blackResigned">Mwenye nyeusi ameshindwa</string>
+  <string name="sgPlayerLeftTheGame">Mwenye %s aliondoka mchezo huu</string>
   <string name="whiteLeftTheGame">Mwenye nyeupe aliondoka mchezo huu</string>
   <string name="blackLeftTheGame">Mwenye nyeusi aliondoka mchezo huu</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Sambaza URL hii ili watazamaji waweze kuona mchezo</string>

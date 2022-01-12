@@ -14,6 +14,7 @@
   <string name="didYouLikeThisPuzzle">ئەم مەتەڵەت بەدڵبوو؟</string>
   <string name="voteToLoadNextOne">دەنگبدە بۆ بارکردنی دانەی داهاتوو!</string>
   <string name="yourPuzzleRatingX">هەڵسەنگاندنی مەتەڵەکەت %s</string>
+  <string name="findTheBestMoveForSGPlayer">دۆزینەوەی باشترین جوڵە بۆ %s.</string>
   <string name="findTheBestMoveForWhite">دۆزینەوەی باشترین جوڵە بۆ سپی.</string>
   <string name="findTheBestMoveForBlack">دۆزینەوەی باشترین جوڵە بۆ ڕەش.</string>
   <string name="toGetPersonalizedPuzzles">بۆ بەدەستهێنانی مەتەڵی تایبەتی:</string>

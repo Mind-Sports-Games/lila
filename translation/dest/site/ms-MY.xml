@@ -20,8 +20,10 @@
   <string name="black">Hitam</string>
   <string name="randomColor">Pilihan rawak</string>
   <string name="createAGame">Mencipta permainan</string>
+  <string name="sgPlayerIsVictorious">%s menang</string>
   <string name="whiteIsVictorious">Putih menang</string>
   <string name="blackIsVictorious">Hitam menang</string>
+  <string name="youPlayTheSGPlayerPieces">Mula dengan buah %s</string>
   <string name="youPlayTheWhitePieces">Mula dengan buah putih</string>
   <string name="youPlayTheBlackPieces">Mula dengan buah hitam</string>
   <string name="itsYourTurn">Giliran anda sekarang!</string>
@@ -32,6 +34,7 @@
   <string name="newOpponent">Lawan baru</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Lawan anda mahu bermain perminan yang baru dengan anda</string>
   <string name="joinTheGame">Menyertai permainan</string>
+  <string name="sgPlayerPlays">%s untuk main</string>
   <string name="whitePlays">Putih untuk main</string>
   <string name="blackPlays">Hitam untuk main</string>
   <plurals name="opponentLeftCounter">
@@ -43,8 +46,10 @@
   <string name="forceDraw">Paksa seri</string>
   <string name="talkInChat">Sila jadi baik di ruangan sembang</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Orang pertama yang datang ke URL ini akan bermain dengan anda.</string>
+  <string name="sgPlayerResigned">%s telah menyerah kalah</string>
   <string name="whiteResigned">Putih telah menyerah kalah</string>
   <string name="blackResigned">Hitam telah menyerah kalah</string>
+  <string name="sgPlayerLeftTheGame">%s telah meninggalkan perlawanan</string>
   <string name="whiteLeftTheGame">Putih telah meninggalkan perlawanan</string>
   <string name="blackLeftTheGame">Hitam telah meninggalkan perlawanan</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Kongsi URL ini untuk membenarkan penonton lihat perlawanan</string>
@@ -78,6 +83,7 @@
   <string name="drawn">Seri</string>
   <string name="unknown">Tidak diketahui</string>
   <string name="database">Pangkalan data</string>
+  <string name="p1DrawP2">%1$s / Seri / %2$s</string>
   <string name="whiteDrawBlack">Putih / Seri / Hitam</string>
   <string name="averageRatingX">Purata penilaian: %s</string>
   <string name="recentGames">Permainan terkini</string>
@@ -192,8 +198,10 @@
   <string name="drawOfferDeclined">Tawaran seri ditolak</string>
   <string name="drawOfferAccepted">Tawaran seri diterima</string>
   <string name="drawOfferCanceled">Tawaran seri dibatalkan</string>
+  <string name="sgPlayerOffersDraw">Pemain %s tawar seri</string>
   <string name="whiteOffersDraw">Pemain putih tawar seri</string>
   <string name="blackOffersDraw">Pemain hitam tawar seri</string>
+  <string name="sgPlayerDeclinesDraw">Pemain %s menolak seri</string>
   <string name="whiteDeclinesDraw">Pemain putih menolak seri</string>
   <string name="blackDeclinesDraw">Pemain hitam menolak seri</string>
   <string name="yourOpponentOffersADraw">Lawan anda menawarkan seri</string>
@@ -350,6 +358,7 @@
   <string name="performance">Pencapaian</string>
   <string name="tournamentComplete">Pertandingan selesai</string>
   <string name="movesPlayed">Gerakan dimain</string>
+  <string name="sgPlayerWins">Buah %s menang</string>
   <string name="whiteWins">Buah putih menang</string>
   <plurals name="nbGamesInPlay">
     <item quantity="other">%s permainan sedang berlangsung</item>

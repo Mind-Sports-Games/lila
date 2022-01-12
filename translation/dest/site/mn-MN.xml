@@ -19,6 +19,7 @@
   <string name="black">Хар</string>
   <string name="randomColor">Дурын өнгө</string>
   <string name="createAGame">Үүсгэх</string>
+  <string name="sgPlayerIsVictorious">%s хожлоо</string>
   <string name="whiteIsVictorious">Цагаан хожлоо</string>
   <string name="blackIsVictorious">Хар хожлоо</string>
   <string name="youPlayTheWhitePieces">Та цагаанаар тоглоно</string>
@@ -43,8 +44,10 @@
   <string name="forceDraw">Тэнцээгээр тооцох</string>
   <string name="talkInChat">Та чатаар соёлтой харилцаарай!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Энэ холбоос дээр түрүүлж дарсан тоглогч таньтай тоглоно.</string>
+  <string name="sgPlayerResigned">%s бууж өглөө</string>
   <string name="whiteResigned">Цагаан бууж өглөө</string>
   <string name="blackResigned">Хар бууж өглөө</string>
+  <string name="sgPlayerLeftTheGame">%s тоглолтыг орхилоо</string>
   <string name="whiteLeftTheGame">Цагаан тоглолтыг орхилоо</string>
   <string name="blackLeftTheGame">Хар тоглолтыг орхилоо</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Энэхүү холбоос хаягийг бусадтай хуваалцсанаар тэд энэ өргийг үзэх боломжтой</string>
@@ -78,6 +81,7 @@
   <string name="drawn">Тэнцсэн</string>
   <string name="unknown">Үл мэдэгдэх</string>
   <string name="database">Сан</string>
+  <string name="p1DrawP2">Цагаан/ Тэнцсэн/ %2$s</string>
   <string name="whiteDrawBlack">Цагаан/ Тэнцсэн/ Хар</string>
   <string name="averageRatingX">Дундаж зэрэг: %s</string>
   <string name="recentGames">Сүүлд тоглогдсон өргүүд</string>
@@ -192,8 +196,10 @@
   <string name="drawOfferDeclined">Тэнцэх саналаас татгалзлаа</string>
   <string name="drawOfferAccepted">Тэнцэх саналыг зөвшөөрлөө</string>
   <string name="drawOfferCanceled">Тэнцэх саналаа цуцаллаа</string>
+  <string name="sgPlayerOffersDraw">%s тэнцэхийг санал болгож байна</string>
   <string name="whiteOffersDraw">Цагаан тэнцэхийг санал болгож байна</string>
   <string name="blackOffersDraw">Хар тэнцэхийг санал болгож байна</string>
+  <string name="sgPlayerDeclinesDraw">%s тэнцэхээс татгалзаж байна</string>
   <string name="whiteDeclinesDraw">Цагаан тэнцэхээс татгалзаж байна</string>
   <string name="blackDeclinesDraw">Хар тэнцэхээс татгалзаж байна</string>
   <string name="yourOpponentOffersADraw">Таны өрсөлдөгч тэнцэх санал гаргалаа</string>
@@ -324,6 +330,7 @@
   <string name="captcha.fail">Шатрын бодлогийг бодно уу.</string>
   <string name="notACheckmate">Мадалж чадсангүй</string>
   <string name="whiteCheckmatesInOneMove">Нэг хөдөлгөөнөөр шалгаж байна</string>
+  <string name="sgPlayerCheckmatesInOneMove">Нэг хөдөлгөөнөөр шалгахын тулд %s</string>
   <string name="blackCheckmatesInOneMove">Нэг хөдөлгөөнөөр шалгахын тулд хар</string>
   <string name="retry">Дахин оролдох</string>
   <string name="reconnecting">Эргэн холбогдох оролдлого хийж байна</string>
@@ -709,6 +716,7 @@
   <string name="hideBestMove">Хамгийн сайн нүүдлийг нуух</string>
   <string name="getAHint">Туслалцаа авах</string>
   <string name="evaluatingYourMove">Таны нүүдлийг шинжилж байна ...</string>
+  <string name="sgPlayerWinsGame">%s хожсон</string>
   <string name="whiteWinsGame">Цагаан хожсон</string>
   <string name="blackWinsGame">Хар хожсон</string>
   <string name="learnFromYourMistakes">Алдаанаасаа суралцах</string>

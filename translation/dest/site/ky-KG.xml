@@ -20,8 +20,10 @@
   <string name="black">Кара</string>
   <string name="randomColor">Оң келген тарап</string>
   <string name="createAGame">Оюн куруу</string>
+  <string name="sgPlayerIsVictorious">%s түстөгү оюнчу утту</string>
   <string name="whiteIsVictorious">Ак түстөгү оюнчу утту</string>
   <string name="blackIsVictorious">Кара түстөгү оюнчу утту</string>
+  <string name="youPlayTheSGPlayerPieces">Сиз %s фигуралар менен ойнойсуз</string>
   <string name="youPlayTheWhitePieces">Сиз ак фигуралар менен ойнойсуз</string>
   <string name="youPlayTheBlackPieces">Сиз кара фигуралар менен ойнойсуз</string>
   <string name="itsYourTurn">Сиздин жүрүшүңүз!</string>
@@ -33,6 +35,7 @@
   <string name="newOpponent">Жаңы өнөктөш</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Сиздин өнөктөшүңүз сиз менен жаңы оюн ойноого чакырат</string>
   <string name="joinTheGame">Оюрга кошулуу</string>
+  <string name="sgPlayerPlays">%s түстөгү оюнчу баштайт</string>
   <string name="whitePlays">Ак түстөгү оюнчу баштайт</string>
   <string name="blackPlays">Кара түстөгү оюнчу баштайт</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +48,10 @@
   <string name="forceDraw">Барабардык сурануу</string>
   <string name="talkInChat">Чат менен суйлошүү</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Бул шилтеме менен келген биринчи оюнчу сиз менен ойнойт.</string>
+  <string name="sgPlayerResigned">%s түстөгү оюнчу утулду</string>
   <string name="whiteResigned">Ак түстөгү оюнчу утулду</string>
   <string name="blackResigned">Кара түстөгү оюнчу утулду</string>
+  <string name="sgPlayerLeftTheGame">%s түстөгү оюнчу оюндан чыгып кетти</string>
   <string name="whiteLeftTheGame">Ак түстөгү оюнчу оюндан чыгып кетти</string>
   <string name="blackLeftTheGame">Кара түстөгү оюнчу оюндан чыгып кетти</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Көрүүчүлөр бул оюнду көрүшү үчүн бул шилтемени бөлүшүңүз</string>
@@ -80,6 +85,7 @@
   <string name="drawn">Тең</string>
   <string name="unknown">Белгисиз</string>
   <string name="database">Берилиш базасы</string>
+  <string name="p1DrawP2">Актар / Тең / %2$s</string>
   <string name="whiteDrawBlack">Актар / Тең / Кара</string>
   <string name="averageRatingX">Орточо рейтинг: %s</string>
   <string name="recentGames">Жакында бүткөн оюндар</string>

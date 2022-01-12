@@ -20,6 +20,7 @@
   <string name="black">Crni</string>
   <string name="randomColor">Nasumična boja</string>
   <string name="createAGame">Kreiraj partiju</string>
+  <string name="sgPlayerIsVictorious">%s je pobjednik</string>
   <string name="whiteIsVictorious">Bijeli je pobjednik</string>
   <string name="blackIsVictorious">Crni je pobjednik</string>
   <string name="youPlayTheWhitePieces">Igraš bijelim figurama</string>
@@ -32,6 +33,7 @@
   <string name="newOpponent">Novi protivnik</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Tvoj protivnik želi novu partiju s tobom</string>
   <string name="joinTheGame">Pridruži se igri</string>
+  <string name="sgPlayerPlays">%s je na potezu</string>
   <string name="whitePlays">Bijeli je na potezu</string>
   <string name="blackPlays">Crni je na potezu</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +47,10 @@
   <string name="forceDraw">Forsiranje remija</string>
   <string name="talkInChat">Pristojno se ponašaj u chatu!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Prva osoba koja dođe na ovaj URL će igrati s tobom</string>
+  <string name="sgPlayerResigned">%s predaje</string>
   <string name="whiteResigned">Bijeli predaje</string>
   <string name="blackResigned">Crni predaje</string>
+  <string name="sgPlayerLeftTheGame">%s je napustio partiju</string>
   <string name="whiteLeftTheGame">Bijeli je napustio partiju</string>
   <string name="blackLeftTheGame">Crni je napustio partiju</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Podijeli ovaj URL ukoliko želiš da gledatelji vide ovu partiju</string>
@@ -80,6 +84,7 @@
   <string name="drawn">Remizira</string>
   <string name="unknown">Nepoznati ishod</string>
   <string name="database">Baza podataka</string>
+  <string name="p1DrawP2">%1$s / remi / %2$s</string>
   <string name="whiteDrawBlack">Bijeli / remi / Crni</string>
   <string name="averageRatingX">Prosječni rejting: %s</string>
   <string name="recentGames">Nedavne partije</string>
@@ -214,8 +219,10 @@
   <string name="drawOfferDeclined">Ponuda remija odbijena</string>
   <string name="drawOfferAccepted">Ponuda remija prihvaćena</string>
   <string name="drawOfferCanceled">Opozvana ponuda remija</string>
+  <string name="sgPlayerOffersDraw">%s nudi remi</string>
   <string name="whiteOffersDraw">Bijeli nudi remi</string>
   <string name="blackOffersDraw">Crni nudi remi</string>
+  <string name="sgPlayerDeclinesDraw">%s odbija remi</string>
   <string name="whiteDeclinesDraw">Bijeli odbija remi</string>
   <string name="blackDeclinesDraw">Crni odbija remi</string>
   <string name="yourOpponentOffersADraw">Protivnik nudi remi</string>
@@ -373,6 +380,7 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="clickOnTheBoardToMakeYourMove">Klikni na ploču da povučeš potez i dokažeš da si čovjek.</string>
   <string name="captcha.fail">Molimo riješi šahovski Captcha.</string>
   <string name="notACheckmate">Nije mat</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s matira u jednom potezu</string>
   <string name="whiteCheckmatesInOneMove">Bijeli matira u jednom potezu</string>
   <string name="blackCheckmatesInOneMove">Crnu matira u jednom potezu</string>
   <string name="retry">Pokušaj ponovno</string>
@@ -783,6 +791,7 @@ računalnu analizu, chat partije i URL za dijeljenje.</string>
   <string name="hideBestMove">Sakrij najbolji potez</string>
   <string name="getAHint">Daj mi savjet</string>
   <string name="evaluatingYourMove">Procjena tvog poteza ...</string>
+  <string name="sgPlayerWinsGame">%s pobjeđuje</string>
   <string name="whiteWinsGame">Bijeli pobjeđuje</string>
   <string name="blackWinsGame">Crni pobjeđuje</string>
   <string name="learnFromYourMistakes">Uči iz svojih grešaka</string>

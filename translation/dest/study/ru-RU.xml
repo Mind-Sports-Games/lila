@@ -150,6 +150,7 @@
   <string name="blackIsSlightlyBetter">У чёрных немного лучше</string>
   <string name="whiteIsBetter">У белых лучше</string>
   <string name="blackIsBetter">У чёрных лучше</string>
+  <string name="sgPlayerIsWinning">%s побеждают</string>
   <string name="whiteIsWinning">Белые побеждают</string>
   <string name="blackIsWinning">Чёрные побеждают</string>
   <string name="novelty" comment="novelty&#10;&#10;A move in the opening that has not been played before.&#10;https://en.wikipedia.org/wiki/Glossary_of_chess#theoretical_novelty">Новинка</string>

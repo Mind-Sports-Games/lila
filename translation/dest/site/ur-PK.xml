@@ -19,8 +19,10 @@
   <string name="black">سیاہ</string>
   <string name="randomColor">کوئی بھی رنگ</string>
   <string name="createAGame">نیا مقابلہ</string>
+  <string name="sgPlayerIsVictorious">%s فاتح ہے</string>
   <string name="whiteIsVictorious">سفید فاتح ہے</string>
   <string name="blackIsVictorious">سیاہ فاتح ہے</string>
+  <string name="youPlayTheSGPlayerPieces">آپ کے %s مہرے ہیں۔</string>
   <string name="youPlayTheWhitePieces">آپ کے سفید مہرے ہیں۔</string>
   <string name="youPlayTheBlackPieces">آپ کے سیاہ مہرے ہیں۔</string>
   <string name="itsYourTurn">اب آپ کی باری ہے!</string>
@@ -31,6 +33,7 @@
   <string name="newOpponent">نیا حریف</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">حریف ایک اور مقابلہ چاہتے ہیں</string>
   <string name="joinTheGame">قبول ہے!</string>
+  <string name="sgPlayerPlays">%s کی باری</string>
   <string name="whitePlays">سفید کی باری</string>
   <string name="blackPlays">سیاہ کی باری</string>
   <plurals name="opponentLeftCounter">
@@ -43,8 +46,10 @@
   <string name="forceDraw">مقابلہ برابر رہا</string>
   <string name="talkInChat">برائے مہربانی ، گفتگو مے شہیستیگی برقرار رکھیں</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">اس رابطے پرپہلے پہنچنے والا کھیل سکتا ہے</string>
+  <string name="sgPlayerResigned">%s نے شکست تسلیم کر لی</string>
   <string name="whiteResigned">سفید نے شکست تسلیم کر لی</string>
   <string name="blackResigned">سیاہ نے شکست تسلیم کر لی</string>
+  <string name="sgPlayerLeftTheGame">%s کھلاڑی غیر موجود ہے</string>
   <string name="whiteLeftTheGame">سفید کھلاڑی غیر موجود ہے</string>
   <string name="blackLeftTheGame">سیاہ کھلاڑی غیر موجود ہے</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">یہ رابطہ آپ ناظرین کو دے سکتے ہیں</string>
@@ -196,14 +201,17 @@
     <item quantity="other">آپکے ساتھ %s مقابلے</item>
   </plurals>
   <string name="cancel">مسترد</string>
+  <string name="sgPlayerTimeOut">%s کا وقت ختم</string>
   <string name="whiteTimeOut">سفید کا وقت ختم</string>
   <string name="blackTimeOut">سیاہ کا وقت ختم</string>
   <string name="drawOfferSent">مقابلہ برابری پر ختم کرنے کی پیشکش بھیج دی گئی</string>
   <string name="drawOfferDeclined">مقابلہ برابری پر ختم کرنے کی پیشکش مسترد کردی گئی</string>
   <string name="drawOfferAccepted">مقابلہ برابری پر ختم کرنے کی پیشکش قبول کرلی گئي</string>
   <string name="drawOfferCanceled">مقابلہ برابری پر ختم کرنے کی پیشکش منسوخ کردی گئی</string>
+  <string name="sgPlayerOffersDraw">%s مقابلہ برابری پر ختم کرنا چاہتا ہے</string>
   <string name="whiteOffersDraw">سفید مقابلہ برابری پر ختم کرنا چاہتا ہے</string>
   <string name="blackOffersDraw">سیاہ مقابلہ برابری پر ختم کرنا چاہتا ہے</string>
+  <string name="sgPlayerDeclinesDraw">%s نے برابری کی درخواست مسترد کر دی</string>
   <string name="whiteDeclinesDraw">سفید نے برابری کی درخواست مسترد کر دی</string>
   <string name="blackDeclinesDraw">سیاہ نے برابری کی درخواست مسترد کر دی</string>
   <string name="yourOpponentOffersADraw">حریف مقابلہ برابری پر ختم کرنا چاہتا ہے</string>
@@ -347,6 +355,7 @@
   <string name="clickOnTheBoardToMakeYourMove">ساتھ دی گئی بساط پر پہیلی حل کرکے ثابت کریں کہ آپ انسان ہیں (روبوٹ نہیں(</string>
   <string name="captcha.fail">برائے مہربانی captcha حل کریں.</string>
   <string name="notACheckmate">غلط!</string>
+  <string name="sgPlayerCheckmatesInOneMove">%s ایک چال میں شاہ مات کرے گا</string>
   <string name="whiteCheckmatesInOneMove">سفید ایک چال میں شاہ مات کرے گا</string>
   <string name="blackCheckmatesInOneMove">سیاہ ایک چال میں شاہ مات کرے گا</string>
   <string name="retry">پھر کوشش کریں</string>
@@ -416,6 +425,7 @@
   <string name="performance">کارکردگی</string>
   <string name="tournamentComplete">ٹورنمنٹ مکمل ہوا</string>
   <string name="movesPlayed">چالوں کی تعداد</string>
+  <string name="sgPlayerWins">%s کی فتح</string>
   <string name="whiteWins">سفید کی فتح</string>
   <string name="blackWins">سیاہ کی فتح</string>
   <string name="draws">برابر</string>
@@ -742,6 +752,7 @@
   <string name="hideBestMove">بہترین چال چھپائیں</string>
   <string name="getAHint">اشارہ پائیں</string>
   <string name="evaluatingYourMove">آپ کی چال کا تجزیہ ہو رہا ہے...</string>
+  <string name="sgPlayerWinsGame">%s کی فتح</string>
   <string name="whiteWinsGame">سفید کی فتح</string>
   <string name="blackWinsGame">سیاہ کی فتح</string>
   <string name="learnFromYourMistakes">اپنی غلطیوں سے سیکھیں</string>
@@ -750,18 +761,23 @@
   <string name="next">اگلا</string>
   <string name="xWasPlayed">%s کھیلا گیا تھا</string>
   <string name="findBetterMoveForWhite">سیاہ کے لیے بہترچال ڈھونڈیں</string>
+  <string name="findBetterMoveForSGPlayer">%s کے لیے بہتر چال ڈھونڈیں</string>
   <string name="findBetterMoveForBlack">سیاہ کے لیے بہتر چال ڈھونڈیں</string>
   <string name="resumeLearning">دوبارہ سیکھنا شروع کریں</string>
   <string name="youCanDoBetter">آپ اس سے بہتر چال چل سکتے ہیں</string>
+  <string name="tryAnotherMoveForSGPlayer">%s کے لیے کوئی اور چال چلیں</string>
   <string name="tryAnotherMoveForWhite">سفید کے لیے کوئی اور چال چلیں</string>
   <string name="tryAnotherMoveForBlack">سیاہ کے لیے کوئی اور چال چلیں</string>
   <string name="solution">حل</string>
   <string name="waitingForAnalysis">تجزیے کا انتظار</string>
+  <string name="noMistakesFoundForSGPlayer">%s کی چالوں میں کوئی غلطی نہیں ملی</string>
   <string name="noMistakesFoundForWhite">سفید کی چالوں میں کوئی غلطی نہیں ملی</string>
   <string name="noMistakesFoundForBlack">سیاہ کی چالوں میں کوئی غلطی نہیں ملی</string>
+  <string name="doneReviewingSGPlayerMistakes">%s کی غلطیوں کا جائزہ مکمل ہوا</string>
   <string name="doneReviewingWhiteMistakes">سفید کی غلطیوں کا جائزہ مکمل ہوا</string>
   <string name="doneReviewingBlackMistakes">سیاہ کی غلطیوں کا جائزہ مکمل ہوا</string>
   <string name="doItAgain">دوبارہ کریں</string>
+  <string name="reviewSGPlayerMistakes">%s کی غلطیوں کا جائزہ لیں</string>
   <string name="reviewWhiteMistakes">سفید کی غلطیوں کا جائزہ لیں</string>
   <string name="reviewBlackMistakes">سیاہ کی غلطیوں کا جائزہ لیں</string>
   <string name="advantage">بہتر</string>
