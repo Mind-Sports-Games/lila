@@ -35,7 +35,7 @@ $shogi-board-files: (
 
 $minishogi-board-files: (
   'wood': 'minishogi.png',
-  'clear': 'minishogi_clear.svg',
+  'clear': 'minishogi_clear.png',
 );
 
 $xiangqi-board-files: (
@@ -90,13 +90,6 @@ $xiangqi-variants: ('xiangqi'); // must use same board
   }
 }
 
-//Rather not need otherwise need to add in dimension class?
-// @each $color, $file in $shogi-board-files {
-//   .shogi-#{$color} .shogi .is2d cg-board {
-//     background-image: url(../images/board/shogi/#{$file});
-//   }
-// }
-
 @each $color, $file in $xiangqi-board-files {
   .xiangqi-#{$color} .variant-xiangqi.is2d cg-board {
     background-image: url(../images/board/xiangqi/#{$file});
@@ -108,13 +101,6 @@ $xiangqi-variants: ('xiangqi'); // must use same board
     background-image: url(../images/board/xiangqi/#{$file});
   }
 }
-
-//as above...
-// @each $color, $file in $xiangqi-board-files {
-//   .xiangqi-#{$color} .xiangqi .is2d cg-board {
-//     background-image: url(../images/board/xiangqi/#{$file});
-//   }
-// }
 
 @each $variant in $chess-variants {
   @each $color, $file in $chess-board-files {
