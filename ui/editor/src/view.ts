@@ -375,7 +375,7 @@ function sparePieces(ctrl: EditorCtrl, color: Color, _orientation: Orientation, 
         class: className,
         ...(s !== 'pointer' && s !== 'trash'
           ? {
-              'data-color': s[0],
+              'data-sgPlayer': s[0],
               'data-role': s[1],
             }
           : {}),

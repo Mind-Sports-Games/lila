@@ -54,7 +54,7 @@ export default function pocket(ctrl: RoundController, color: Color, position: Po
             class: { premove: activeColor && preDropRole === role },
             attrs: {
               'data-role': role,
-              'data-color': color,
+              'data-sgPlayer': color,
               'data-nb': nb,
             },
           })

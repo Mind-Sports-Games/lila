@@ -66,7 +66,7 @@ function renderHook(ctrl: LobbyController, hook: Hook): string {
   const color = hook.c || 'random';
   let html = '<div class="inner">';
   if (hook.rating) {
-    html += '<a class="opponent ulpt is color-icon ' + color + '" href="/@/' + hook.u + '">';
+    html += '<a class="opponent ulpt is sgPlayer-icon ' + color + '" href="/@/' + hook.u + '">';
     html += ' ' + hook.u + ' (' + hook.rating + (hook.prov ? '?' : '') + ')';
     html += '</a>';
   } else {

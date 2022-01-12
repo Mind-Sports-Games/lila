@@ -144,10 +144,10 @@ export default class Setup {
       $daysInput = $form.find('.days_choice [name=days]'),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
-      randomColorVariants = $form.data('random-color-variants').split(','),
-      $submits = $form.find('.color-submits__button'),
+      randomSGPlayerVariants = $form.data('random-sgPlayer-variants').split(','),
+      $submits = $form.find('.sgPlayer-submits__button'),
       toggleButtons = () => {
-        randomColorVariants;
+        randomSGPlayerVariants;
         const variantId = ($variantSelect.val() as string).split('_'),
           timeMode = $timeModeSelect.val(),
           rated = $rated.prop('checked'),
@@ -167,7 +167,7 @@ export default class Setup {
           aiOk = typ != 'ai' || variantId[1] != '3' || limit >= 1;
         if (timeOk && ratedOk && aiOk) {
           $submits.toggleClass('nope', false);
-          $submits.filter(':not(.random)').toggle(!rated || !randomColorVariants.includes(variantId[1]));
+          $submits.filter(':not(.random)').toggle(!rated || !randomSGPlayerVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
       },
       save = function () {
@@ -333,7 +333,7 @@ export default class Setup {
     } else
       $form.one('submit', () => {
         $submits.hide();
-        $form.find('.color-submits').append(playstrategy.spinnerHtml);
+        $form.find('.sgPlayer-submits').append(playstrategy.spinnerHtml);
       });
     if (this.root.opts.blindMode) {
       $variantSelect[0]!.focus();

@@ -41,7 +41,7 @@ export default function (ctrl: AnalyseCtrl, color: Color, position: Position) {
           h('piece.' + role + '.' + color, {
             attrs: {
               'data-role': role,
-              'data-color': color,
+              'data-sgPlayer': color,
               'data-nb': nb,
             },
           })

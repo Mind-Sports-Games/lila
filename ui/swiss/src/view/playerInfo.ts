@@ -115,7 +115,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('th', p.isFinalGame ? '' + round : ''),
                 h('td', userName(p.user)),
                 h('td', '' + p.rating),
-                h('td.is.color-icon.' + (p.c ? 'white' : 'black')),
+                h('td.is.sgPlayer-icon.' + (p.c ? 'white' : 'black')),
                 h('td', p.isFinalGame ? res : ''),
               ]
             );

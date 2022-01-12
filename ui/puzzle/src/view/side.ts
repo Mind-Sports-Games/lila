@@ -78,7 +78,7 @@ function gameInfos(ctrl: Controller, game: PuzzleGame, puzzle: Puzzle): VNode {
           'div.players',
           game.players.map(p =>
             h(
-              'div.player.color-icon.is.text.' + p.color,
+              'div.player.sgPlayer-icon.is.text.' + p.color,
               p.userId != 'anon'
                 ? h(
                     'a.user-link.ulpt',

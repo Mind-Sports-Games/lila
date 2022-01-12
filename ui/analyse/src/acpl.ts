@@ -50,12 +50,12 @@ function playerTable(ctrl: AnalyseCtrl, color: Color): VNode {
   const d = ctrl.data;
   const acpl = d.analysis![color].acpl;
   return h('div.advice-summary__side', [
-    h('div.advice-summary__player', [h(`i.is.color-icon.${color}`), renderPlayer(ctrl, color)]),
+    h('div.advice-summary__player', [h(`i.is.sgPlayer-icon.${color}`), renderPlayer(ctrl, color)]),
     ...advices.map(a => {
       const nb: number = d.analysis![color][a.kind];
       const attrs: VNodeData = nb
         ? {
-            'data-color': color,
+            'data-sgPlayer': color,
             'data-symbol': a.symbol,
           }
         : {};
