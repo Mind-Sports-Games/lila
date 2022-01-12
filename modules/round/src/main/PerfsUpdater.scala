@@ -73,6 +73,10 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.shogi, ratingsB.shogi, game)
               case Variant.FairySF(strategygames.fairysf.variant.Xiangqi) =>
                 updateRatings(ratingsW.xiangqi, ratingsB.xiangqi, game)
+              case Variant.FairySF(strategygames.fairysf.variant.MiniShogi) =>
+                updateRatings(ratingsW.minishogi, ratingsB.minishogi, game)
+              case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi) =>
+                updateRatings(ratingsW.minixiangqi, ratingsB.minixiangqi, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -131,6 +135,8 @@ final class PerfsUpdater(
       pool: Rating,
       shogi: Rating,
       xiangqi: Rating,
+      minishogi: Rating,
+      minixiangqi: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -163,6 +169,8 @@ final class PerfsUpdater(
       pool = perfs.pool.toRating,
       shogi = perfs.shogi.toRating,
       xiangqi = perfs.xiangqi.toRating,
+      minishogi = perfs.minishogi.toRating,
+      minixiangqi = perfs.minixiangqi.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -228,6 +236,8 @@ final class PerfsUpdater(
           pool = addRatingIf(game.ratingVariant.pool, perfs.pool, ratings.pool),
           shogi = addRatingIf(game.ratingVariant.shogi, perfs.shogi, ratings.shogi),
           xiangqi = addRatingIf(game.ratingVariant.xiangqi, perfs.xiangqi, ratings.xiangqi),
+          minishogi = addRatingIf(game.ratingVariant.minishogi, perfs.minishogi, ratings.minishogi),
+          minixiangqi = addRatingIf(game.ratingVariant.minixiangqi, perfs.minixiangqi, ratings.minixiangqi),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -261,6 +271,8 @@ final class PerfsUpdater(
           pool = r(PT.orDefault("pool"), perfs.pool, perfs1.pool),
           shogi = r(PT.orDefault("shogi"), perfs.shogi, perfs1.shogi),
           xiangqi = r(PT.orDefault("xiangqi"), perfs.xiangqi, perfs1.xiangqi),
+          minishogi = r(PT.orDefault("minishogi"), perfs.minishogi, perfs1.minishogi),
+          minixiangqi = r(PT.orDefault("minixiangqi"), perfs.minixiangqi, perfs1.minixiangqi),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

@@ -64,7 +64,7 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     predroppable: {
-      enabled: data.pref.enablePremove && (data.game.variant.key === 'crazyhouse' || data.game.variant.key === 'shogi'),
+      enabled: data.pref.enablePremove && ['crazyhouse', 'shogi', 'minishogi'].includes(data.game.variant.key),
       events: {
         set: hooks.onPredrop,
         unset() {
@@ -88,11 +88,11 @@ export function makeConfig(ctrl: RoundController): Config {
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
       pieces: {
         baseUrl:
-          variantKey === 'shogi'
+          variantKey === 'shogi' || variantKey === 'minishogi'
             ? 'https://playstrategy.org/assets/piece/shogi/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
               '/'
-            : variantKey === 'xiangqi'
+            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
               '/'
@@ -115,8 +115,11 @@ export function reload(ctrl: RoundController) {
 export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
   const piece = ground.state.pieces.get(key);
   if (
-    (piece && piece.role === 'p-piece' && ground.state.variant !== 'shogi') ||
-    (piece && ground.state.variant == 'shogi' && piece.role !== 'k-piece' && piece.role !== 'g-piece')
+    (piece && piece.role === 'p-piece' && ground.state.variant !== 'shogi' && ground.state.variant !== 'minishogi') ||
+    (piece &&
+      (ground.state.variant == 'shogi' || ground.state.variant == 'minishogi') &&
+      piece.role !== 'k-piece' &&
+      piece.role !== 'g-piece')
   ) {
     ground.setPieces(
       new Map([

@@ -49,8 +49,20 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?
             ? { width: 9, height: 9 }
             : $el.hasClass('variant-xiangqi')
             ? { width: 9, height: 10 }
+            : $el.hasClass('variant-minishogi')
+            ? { width: 5, height: 5 }
+            : $el.hasClass('variant-minixiangqi')
+            ? { width: 7, height: 7 }
             : { width: 8, height: 8 },
-          variant: $el.hasClass('variant-shogi') ? 'shogi' : $el.hasClass('variant-xiangqi') ? 'xiangqi' : 'standard',
+          variant: $el.hasClass('variant-shogi')
+            ? 'shogi'
+            : $el.hasClass('variant-xiangqi')
+            ? 'xiangqi'
+            : $el.hasClass('variant-minishogi')
+            ? 'minishogi'
+            : $el.hasClass('variant-minixiangqi')
+            ? 'minixiangqi'
+            : 'standard',
         })
       );
     }

@@ -307,6 +307,8 @@ final class User(
                   "pool"          -> leaderboards.pool,
                   "shogi"         -> leaderboards.shogi,
                   "xiangqi"       -> leaderboards.xiangqi,
+                  "minishogi"     -> leaderboards.minishogi,
+                  "minixiangqi"   -> leaderboards.minixiangqi,
                 )
               )
             }
