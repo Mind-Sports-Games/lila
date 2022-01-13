@@ -183,7 +183,7 @@ object features {
           "We believe every mind sports games player deserves the best, and so:",
           br,
           br,
-          strong("All features are free for everybody!"),
+          strong("all features are free for everybody,forever!"),
           br,
           "If you love PlayStrategy, ",
           a(cls := "button", href := routes.Plan.index)("Support us with a Patron account!")
