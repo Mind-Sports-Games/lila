@@ -6,7 +6,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
-import lila.pref.Pref.SGPlayer
+import lila.pref.Pref.PlayerOrder
 import play.api.i18n.Lang
 
 import controllers.routes
@@ -44,7 +44,7 @@ object coordinate {
           ),
           form(cls := "sgPlayer buttons", action := routes.Coordinate.sgPlayer, method := "post")(
             st.group(cls := "radio")(
-              List(SGPlayer.BLACK, SGPlayer.RANDOM, SGPlayer.WHITE).map { id =>
+              List(PlayerOrder.P1, PlayerOrder.RANDOM, PlayerOrder.P2).map { id =>
                 div(
                   input(
                     tpe := "radio",

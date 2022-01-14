@@ -59,7 +59,7 @@ case class Pref(
 
   def realSoundSet = SoundSet(soundSet)
 
-  def coordColorName = SGPlayer.choices.toMap.get(coordColor).fold("random")(_.toLowerCase)
+  def coordColorName = PlayerOrder.choices.toMap.get(coordColor).fold("random")(_.toLowerCase)
   def coordsClass    = Coords classOf coords
 
   def hasDgt = tags contains Tag.dgt
@@ -172,15 +172,15 @@ object Pref {
     val dgt = "dgt"
   }
 
-  object SGPlayer {
-    val WHITE  = 1
+  object PlayerOrder {
+    val P1  = 1
     val RANDOM = 2
-    val BLACK  = 3
+    val P2  = 3
 
     val choices = Seq(
-      WHITE  -> "P1",
+      P1  -> "P1",
       RANDOM -> "Random",
-      BLACK  -> "P2"
+      P2  -> "P2"
     )
   }
 
@@ -465,7 +465,7 @@ object Pref {
     challenge = Challenge.ALWAYS,
     message = Message.ALWAYS,
     studyInvite = StudyInvite.ALWAYS,
-    coordColor = SGPlayer.RANDOM,
+    coordColor = PlayerOrder.RANDOM,
     submitMove = SubmitMove.CORRESPONDENCE_ONLY,
     confirmResign = ConfirmResign.YES,
     insightShare = InsightShare.FRIENDS,
