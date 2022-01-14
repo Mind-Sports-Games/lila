@@ -1,0 +1,4 @@
+.reversi.is2d .r-piece.white {background-image:url('/assets/piece/reversi/check_yb_reversi/wR.png')}
+.reversi.is2d .r-piece.black {background-image:url('/assets/piece/reversi/check_yb_reversi/bR.png')}
+.is2d .variant-reversi .r-piece.white {background-image:url('/assets/piece/reversi/check_yb_reversi/wR.png')}
+.is2d .variant-reversi .r-piece.black {background-image:url('/assets/piece/reversi/check_yb_reversi/bR.png')}

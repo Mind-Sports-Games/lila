@@ -48,6 +48,12 @@ $minixiangqi-board-files: (
   'green': 'minixqlg.svg',
 );
 
+$reversi-board-files: (
+  'green': 'reversi_green_board.svg',
+  'green-marble': 'reversi_green_marble_board.svg',
+  'wood': 'reversi_wood_board.svg',
+);
+
 $chess-variants: (
   'standard',
   'chess960',
@@ -69,6 +75,8 @@ $loa-variants: ('linesOfAction', 'scrambledEggs');
 $shogi-variants: ('shogi'); //must use same board
 
 $xiangqi-variants: ('xiangqi'); // must use same board
+
+$reversi-variants: ('reversi');
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
@@ -101,6 +109,14 @@ $xiangqi-variants: ('xiangqi'); // must use same board
     background-image: url(../images/board/xiangqi/#{$file});
   }
 }
+
+@each $color, $file in $reversi-board-files {
+  .reversi-#{$color} .variant-reversi.is2d cg-board {
+    background-image: url(../images/board/reversi/#{$file});
+  }
+}
+
+//other type of css required below
 
 @each $variant in $chess-variants {
   @each $color, $file in $chess-board-files {
@@ -145,3 +161,11 @@ $xiangqi-variants: ('xiangqi'); // must use same board
     background-image: url(../images/board/xiangqi/#{$file});
   }
 }
+
+@each $color, $file in $reversi-board-files {
+  .reversi-#{$color} .is2d .variant-reversi cg-board {
+    background-image: url(../images/board/reversi/#{$file});
+  }
+}
+
+

@@ -56,6 +56,12 @@ xiangqi_themes = [
   ['2dhanzi', 'svg'],
   ['ka', 'svg']
 ]
+reversi_themes = [
+  ['classic_reversi', 'svg'],
+  ['check_yb_reversi', 'png'],
+  ['marble_bw_reversi', 'svg'],
+  ['fabirovsky_reversi', 'svg']
+]
 types = {
   'svg' => 'svg+xml;base64,',
   'png' => 'png;base64,'
@@ -68,6 +74,7 @@ draughts_variants = ['international','frisian','frysk','antidraughts','breakthro
 draughts_roles = ['man','king']
 lines_of_action_variants= ['linesOfAction', 'scrambledEggs']
 lines_of_action_roles = ['l-piece']
+reversi_roles = ['r-piece']
 shogi_roles_to_imageprefix = [
     ['p-piece','FU'],
     ['l-piece','KY'],
@@ -90,7 +97,7 @@ shogi_variants = ['shogi', 'minishogi']
 xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece', 'pp-piece']
 xiangqi_colors = ['B','R']
 xiangqi_variants = ['xiangqi', 'minixiangqi']
-
+reversi_variants = ['reversi']
 
 # inline SVG Chess
 chess_themes.map { |theme|
@@ -379,4 +386,59 @@ xiangqi_themes.map { |theme|
     }
   }.flatten
   File.open(dest_dir + 'xiangqi-' + name + '.external.css', 'w') { |f| f.puts (classes_xiangqi_game + classes_xiangqi_variant).join("\n") }
+}
+
+# inline SVG reversi
+reversi_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_reversi_game = colors.map { |color|
+    reversi_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      file = source_dir + 'reversi/' + name + '/' + piece + '.' + ext
+      File.open(file, 'r') do|image_file|
+        image = image_file.read
+        base64 = Base64.strict_encode64(image)
+        '.reversi.is2d .' + role + '.' + color + ' {' +
+          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+      end
+    }
+  }.flatten
+  classes_reversi_variant = reversi_variants.map{ |variant|
+    colors.map { |color|
+      reversi_roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        file = source_dir + 'reversi/' + name + '/' + piece + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'reversi-' + name + '.css', 'w') { |f| f.puts (classes_reversi_game + classes_reversi_variant).join("\n") }
+}
+# external SVG reversi
+reversi_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_reversi_game = colors.map { |color|
+    reversi_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      '.reversi.is2d .' + role + '.' + color + ' {' +
+        "background-image:url('/assets/piece/" + 'reversi/' + name + "/" + piece + "." + ext + "')}"
+    }
+  }.flatten
+  classes_reversi_variant = reversi_variants.map { |variant|
+    colors.map { |color|
+      reversi_roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+          "background-image:url('/assets/piece/" + 'reversi/' + name + "/" + piece + "." + ext + "')}"
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'reversi-' + name + '.external.css', 'w') { |f| f.puts (classes_reversi_game + classes_reversi_variant).join("\n") }
 }
