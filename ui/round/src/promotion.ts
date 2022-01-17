@@ -45,6 +45,7 @@ function possiblePromotion(
     piece = ctrl.chessground.state.pieces.get(dest),
     premovePiece = ctrl.chessground.state.pieces.get(orig);
   switch (variant) {
+    case 'minixiangqi':
     case 'xiangqi':
       return false;
     case 'shogi':
