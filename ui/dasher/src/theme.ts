@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import changeColorHandle from 'common/coordsColor';
 import * as xhr from 'common/xhr';
 
-import { Redraw, Open, bind, header } from './util';
+import { Redraw, Open, bind, header, displayGameFamily, convertVariantKeyToGameFamily } from './util';
 
 type Theme = {
   name: string;
@@ -61,12 +61,11 @@ export function ctrl(
 
 export function view(ctrl: ThemeCtrl): VNode {
   const d = ctrl.data();
-  const selectedVariant = document.getElementById('variantForPiece') as HTMLInputElement;
-  const sv = selectedVariant
-    ? selectedVariant.value === 'LinesOfAction'
-      ? 'loa'
-      : selectedVariant.value.toLowerCase()
+  const startingDefaultGameFamily = playstrategy.pageVariant
+    ? convertVariantKeyToGameFamily(playstrategy.pageVariant)
     : 'chess';
+  const selectedGameFamily = document.getElementById('gameFamilyForTheme') as HTMLInputElement;
+  const sv = selectedGameFamily ? selectedGameFamily.value : startingDefaultGameFamily;
   const dgf = d.filter(p => p.current.gameFamily === sv)[0];
 
   const allThemes = d.map(x => x.list).reduce((a, v) => a.concat(v), []);
@@ -74,20 +73,28 @@ export function view(ctrl: ThemeCtrl): VNode {
 
   return h('div.sub.theme.' + ctrl.dimension(), [
     header(ctrl.trans.noarg('boardTheme'), () => ctrl.open('links')),
-    h('label', { attrs: { for: 'variantForPiece' } }, 'Game Family: '),
+    h('label', { attrs: { for: 'gameFamilyForTheme' } }, 'Game Family: '),
     h(
       'select',
-      { attrs: { id: 'variantForPiece' } },
-      variants.map(v => variantOption(v))
+      { attrs: { id: 'gameFamilyForTheme' } },
+      gameFamily.map(v => gameFamilyOption(v, sv))
     ),
     h('div.list', allThemes.map(themeView(currentTheme, dgf.list, ctrl.set))),
   ]);
 }
 
-const variants = ['Chess', 'Draughts', 'LinesOfAction', 'Shogi', 'Xiangqi'];
+const gameFamily: GameFamilyKey[] = ['chess', 'draughts', 'loa', 'shogi', 'xiangqi'];
 
-function variantOption(v: string) {
-  return h('option', { attrs: { title: v } }, v);
+function gameFamilyOption(v: GameFamilyKey, sv: string) {
+  if (v === sv) {
+    return h(
+      'option',
+      { attrs: { title: displayGameFamily(v), value: v, selected: 'selected' } },
+      displayGameFamily(v)
+    );
+  } else {
+    return h('option', { attrs: { title: displayGameFamily(v), value: v } }, displayGameFamily(v));
+  }
 }
 
 function isActiveTheme(t: Theme, current: Theme[]): boolean {

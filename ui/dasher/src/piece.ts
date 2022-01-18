@@ -1,7 +1,7 @@
 import { h, VNode } from 'snabbdom';
 
 import * as xhr from 'common/xhr';
-import { Redraw, Open, bind, header } from './util';
+import { Redraw, Open, bind, header, displayGameFamily, convertVariantKeyToGameFamily } from './util';
 
 type Piece = {
   name: string;
@@ -63,30 +63,37 @@ export function ctrl(
 
 export function view(ctrl: PieceCtrl): VNode {
   const d = ctrl.data();
-  const selectedVariant = document.getElementById('variantForPiece') as HTMLInputElement;
-  const sv = selectedVariant
-    ? selectedVariant.value === 'LinesOfAction'
-      ? 'loa'
-      : selectedVariant.value.toLowerCase()
+  const startingDefaultGameFamily = playstrategy.pageVariant
+    ? convertVariantKeyToGameFamily(playstrategy.pageVariant)
     : 'chess';
+  const selectedGameFamily = document.getElementById('gameFamilyForPiece') as HTMLInputElement;
+  const sv = selectedGameFamily ? selectedGameFamily.value : startingDefaultGameFamily;
   const dgf = d.filter(p => p.current.gameFamily === sv)[0];
 
   return h('div.sub.piece.' + ctrl.dimension(), [
     header(ctrl.trans.noarg('pieceSet'), () => ctrl.open('links')),
-    h('label', { attrs: { for: 'variantForPiece' } }, 'Game Family: '),
+    h('label', { attrs: { for: 'gameFamilyForPiece' } }, 'Game Family: '),
     h(
       'select',
-      { attrs: { id: 'variantForPiece' } },
-      variants.map(v => variantOption(v))
+      { attrs: { id: 'gameFamilyForPiece' } },
+      gameFamily.map(v => gameFamilyOption(v, sv))
     ),
     pieceList(d, dgf, ctrl),
   ]);
 }
 
-const variants = ['Chess', 'Draughts', 'LinesOfAction', 'Shogi', 'Xiangqi'];
+const gameFamily: GameFamilyKey[] = ['chess', 'draughts', 'loa', 'shogi', 'xiangqi'];
 
-function variantOption(v: string) {
-  return h('option', { attrs: { title: v } }, v);
+function gameFamilyOption(v: GameFamilyKey, sv: string) {
+  if (v === sv) {
+    return h(
+      'option',
+      { attrs: { title: displayGameFamily(v), value: v, selected: 'selected' } },
+      displayGameFamily(v)
+    );
+  } else {
+    return h('option', { attrs: { title: displayGameFamily(v), value: v } }, displayGameFamily(v));
+  }
 }
 
 function pieceList(d: PieceDimData[], dgf: PieceDimData, ctrl: PieceCtrl): VNode {

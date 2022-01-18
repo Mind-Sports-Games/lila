@@ -56,3 +56,38 @@ export function spinner() {
     ]),
   ]);
 }
+
+export function displayGameFamily(gameFamilyKey: string): string {
+  switch (gameFamilyKey) {
+    case 'loa':
+      return 'LinesOfAction';
+    default:
+      return gameFamilyKey.charAt(0).toUpperCase() + gameFamilyKey.slice(1);
+  }
+}
+
+export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsVariantKey): string {
+  switch (variantKey) {
+    case 'linesOfAction':
+    case 'scrambledEggs':
+      return 'loa';
+    case 'shogi':
+    case 'minishogi':
+      return 'shogi';
+    case 'xiangqi':
+    case 'minixiangqi':
+      return 'xiangqi';
+    case 'russian':
+    case 'brazilian':
+    case 'breakthrough':
+    case 'frisian':
+    case 'fromPositionDraughts':
+    case 'frysk':
+    case 'antidraughts':
+    case 'pool':
+    case 'international':
+      return 'draughts';
+    default:
+      return 'chess';
+  }
+}
