@@ -225,9 +225,21 @@ object TournamentShield {
           iconChar = ''
         )
 
+    case object NoCastling
+        extends Category(
+          of = Right(Variant.Chess(strategygames.chess.variant.NoCastling)),
+          iconChar = ''
+        )    
+
     case object LinesOfAction
         extends Category(
           of = Right(Variant.Chess(strategygames.chess.variant.LinesOfAction)),
+          iconChar = ''
+        )
+    
+    case object ScrambledEggs
+        extends Category(
+          of = Right(Variant.Chess(strategygames.chess.variant.ScrambledEggs)),
           iconChar = ''
         )
 
@@ -291,6 +303,18 @@ object TournamentShield {
           iconChar = 't'
         )
 
+    case object MiniShogi
+        extends Category(
+          of = Right(Variant.FairySF(strategygames.fairysf.variant.MiniShogi)),
+          iconChar = 's'
+        )
+
+    case object MiniXiangqi
+        extends Category(
+          of = Right(Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)),
+          iconChar = 't'
+        )    
+
     val all: List[Category] = List(
       Bullet,
       SuperBlitz,
@@ -308,7 +332,9 @@ object TournamentShield {
       Atomic,
       Horde,
       RacingKings,
+      NoCastling,
       LinesOfAction,
+      ScrambledEggs,
       International,
       Frisian,
       Frysk,
@@ -318,7 +344,9 @@ object TournamentShield {
       Brazilian,
       Pool,
       Shogi,
-      Xiangqi
+      Xiangqi,
+      MiniShogi,
+      MiniXiangqi
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

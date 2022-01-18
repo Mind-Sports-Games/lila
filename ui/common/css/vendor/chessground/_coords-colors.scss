@@ -34,7 +34,8 @@ coords {
   color: var(--cg-coord-color-chess-black);
 }
 
-.variant-linesOfAction {
+.variant-linesOfAction,
+.variant-scrambledEggs {
   coords {
     text-shadow: var(--cg-coord-shadow-loa);
   }

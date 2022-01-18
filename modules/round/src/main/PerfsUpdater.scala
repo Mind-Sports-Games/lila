@@ -47,8 +47,12 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.racingKings, ratingsB.racingKings, game)
               case Variant.Chess(Crazyhouse) =>
                 updateRatings(ratingsW.crazyhouse, ratingsB.crazyhouse, game)
+              case Variant.Chess(NoCastling) =>
+                updateRatings(ratingsW.noCastling, ratingsB.noCastling, game)
               case Variant.Chess(LinesOfAction) =>
                 updateRatings(ratingsW.linesOfAction, ratingsB.linesOfAction, game)
+              case Variant.Chess(ScrambledEggs) =>
+                updateRatings(ratingsW.scrambledEggs, ratingsB.scrambledEggs, game)  
               case Variant.Draughts(strategygames.draughts.variant.Standard) =>
                 updateRatings(ratingsW.international, ratingsB.international, game)
               case Variant.Draughts(strategygames.draughts.variant.Frisian) =>
@@ -69,6 +73,10 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.shogi, ratingsB.shogi, game)
               case Variant.FairySF(strategygames.fairysf.variant.Xiangqi) =>
                 updateRatings(ratingsW.xiangqi, ratingsB.xiangqi, game)
+              case Variant.FairySF(strategygames.fairysf.variant.MiniShogi) =>
+                updateRatings(ratingsW.minishogi, ratingsB.minishogi, game)
+              case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi) =>
+                updateRatings(ratingsW.minixiangqi, ratingsB.minixiangqi, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -114,7 +122,9 @@ final class PerfsUpdater(
       horde: Rating,
       racingKings: Rating,
       crazyhouse: Rating,
+      noCastling: Rating,
       linesOfAction: Rating,
+      scrambledEggs: Rating,
       international: Rating,
       frisian: Rating,
       frysk: Rating,
@@ -125,6 +135,8 @@ final class PerfsUpdater(
       pool: Rating,
       shogi: Rating,
       xiangqi: Rating,
+      minishogi: Rating,
+      minixiangqi: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -144,7 +156,9 @@ final class PerfsUpdater(
       horde = perfs.horde.toRating,
       racingKings = perfs.racingKings.toRating,
       crazyhouse = perfs.crazyhouse.toRating,
+      noCastling = perfs.noCastling.toRating,
       linesOfAction = perfs.linesOfAction.toRating,
+      scrambledEggs = perfs.scrambledEggs.toRating,
       international = perfs.international.toRating,
       frisian = perfs.frisian.toRating,
       frysk = perfs.frysk.toRating,
@@ -155,6 +169,8 @@ final class PerfsUpdater(
       pool = perfs.pool.toRating,
       shogi = perfs.shogi.toRating,
       xiangqi = perfs.xiangqi.toRating,
+      minishogi = perfs.minishogi.toRating,
+      minixiangqi = perfs.minixiangqi.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -207,7 +223,9 @@ final class PerfsUpdater(
           horde = addRatingIf(game.ratingVariant.horde, perfs.horde, ratings.horde),
           racingKings = addRatingIf(game.ratingVariant.racingKings, perfs.racingKings, ratings.racingKings),
           crazyhouse = addRatingIf(game.ratingVariant.crazyhouse, perfs.crazyhouse, ratings.crazyhouse),
+          noCastling = addRatingIf(game.ratingVariant.noCastling, perfs.noCastling, ratings.noCastling),
           linesOfAction = addRatingIf(game.ratingVariant.linesOfAction, perfs.linesOfAction, ratings.linesOfAction),
+          scrambledEggs = addRatingIf(game.ratingVariant.scrambledEggs, perfs.scrambledEggs, ratings.scrambledEggs),
           international = addRatingIf(game.ratingVariant.draughtsStandard, perfs.international, ratings.international),
           frisian = addRatingIf(game.ratingVariant.frisian, perfs.frisian, ratings.frisian),
           frysk = addRatingIf(game.ratingVariant.frysk, perfs.frysk, ratings.frysk),
@@ -218,6 +236,8 @@ final class PerfsUpdater(
           pool = addRatingIf(game.ratingVariant.pool, perfs.pool, ratings.pool),
           shogi = addRatingIf(game.ratingVariant.shogi, perfs.shogi, ratings.shogi),
           xiangqi = addRatingIf(game.ratingVariant.xiangqi, perfs.xiangqi, ratings.xiangqi),
+          minishogi = addRatingIf(game.ratingVariant.minishogi, perfs.minishogi, ratings.minishogi),
+          minixiangqi = addRatingIf(game.ratingVariant.minixiangqi, perfs.minixiangqi, ratings.minixiangqi),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -238,7 +258,9 @@ final class PerfsUpdater(
           horde = r(PT.orDefault("horde"), perfs.horde, perfs1.horde),
           racingKings = r(PT.orDefault("racingKings"), perfs.racingKings, perfs1.racingKings),
           crazyhouse = r(PT.orDefault("crazyhouse"), perfs.crazyhouse, perfs1.crazyhouse),
+          noCastling = r(PT.orDefault("noCastling"), perfs.noCastling, perfs1.noCastling),
           linesOfAction = r(PT.orDefault("linesOfAction"), perfs.linesOfAction, perfs1.linesOfAction),
+          scrambledEggs = r(PT.orDefault("scrambledEggs"), perfs.scrambledEggs, perfs1.scrambledEggs),
           international = r(PT.orDefault("international"), perfs.international, perfs1.international),
           frisian = r(PT.orDefault("frisian"), perfs.frisian, perfs1.frisian),
           frysk = r(PT.orDefault("frysk"), perfs.frysk, perfs1.frysk),
@@ -249,6 +271,8 @@ final class PerfsUpdater(
           pool = r(PT.orDefault("pool"), perfs.pool, perfs1.pool),
           shogi = r(PT.orDefault("shogi"), perfs.shogi, perfs1.shogi),
           xiangqi = r(PT.orDefault("xiangqi"), perfs.xiangqi, perfs1.xiangqi),
+          minishogi = r(PT.orDefault("minishogi"), perfs.minishogi, perfs1.minishogi),
+          minixiangqi = r(PT.orDefault("minixiangqi"), perfs.minixiangqi, perfs1.minixiangqi),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

@@ -294,7 +294,9 @@ final class User(
                   "atomic"        -> leaderboards.atomic,
                   "horde"         -> leaderboards.horde,
                   "racingKings"   -> leaderboards.racingKings,
+                  "noCastling"    -> leaderboards.noCastling,
                   "linesOfAction" -> leaderboards.linesOfAction,
+                  "scrambledEggs" -> leaderboards.scrambledEggs,
                   "international" -> leaderboards.international,
                   "frisian"       -> leaderboards.frisian,
                   "frysk"         -> leaderboards.frysk,
@@ -305,6 +307,8 @@ final class User(
                   "pool"          -> leaderboards.pool,
                   "shogi"         -> leaderboards.shogi,
                   "xiangqi"       -> leaderboards.xiangqi,
+                  "minishogi"     -> leaderboards.minishogi,
+                  "minixiangqi"   -> leaderboards.minixiangqi,
                 )
               )
             }

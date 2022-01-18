@@ -232,6 +232,9 @@ export default class Setup {
             case '12':
               key = 'fiveCheck';
               break;
+            case '13':
+              key = 'noCastling';
+              break;
             default:
               key = 'standard';
               break;
@@ -268,6 +271,9 @@ export default class Setup {
             case '11':
               key = 'linesOfAction';
               break;
+            case '14':
+              key = 'scrambledEggs';
+              break;
           }
           break;
         case '3':
@@ -275,12 +281,18 @@ export default class Setup {
             case '1':
               key = 'shogi';
               break;
+            case '5':
+              key = 'minishogi';
+              break;
           }
           break;
         case '4':
           switch (variantId[1]) {
             case '2':
               key = 'xiangqi';
+              break;
+            case '4':
+              key = 'minixiangqi';
               break;
           }
           break;
@@ -486,7 +498,7 @@ export default class Setup {
     $variantSelect
       .on('change', function (this: HTMLElement) {
         const variantId = ($variantSelect.val() as string).split('_'),
-          isFen = variantId[1] == '3';
+          isFen = variantId[1] == '3'; //each gameFamily with id=3 assumed to be "From Position"
         let ground = 'chessground';
         if (variantId[0] == '1') ground = 'draughtsground';
         ground += '.resize';

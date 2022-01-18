@@ -174,6 +174,13 @@ object Tv {
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(V.Crazyhouse), noBot)
         )
+    case object NoCastling
+        extends Channel(
+          name = V.NoCastling.name,
+          icon = V.NoCastling.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(V.NoCastling), noBot)
+        )   
     case object UltraBullet
         extends Channel(
           name = S.UltraBullet.name,
@@ -210,6 +217,7 @@ object Tv {
       Atomic,
       Horde,
       RacingKings,
+      NoCastling,
       UltraBullet,
       Bot,
       Computer

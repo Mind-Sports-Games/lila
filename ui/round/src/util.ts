@@ -161,7 +161,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction', 'shogi', 'xiangqi'];
+const noAnalysisVariants = ['linesOfAction', 'scrambledEggs', 'shogi', 'xiangqi', 'minishogi', 'minixiangqi'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;

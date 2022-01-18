@@ -204,7 +204,7 @@ final private[api] class RoundApi(
       obj: JsObject
   ) =
     obj + ("treeParts" -> partitionTreeJsonWriter.writes(
-      lila.round.TreeBuilder(pov.game, analysis, initialFen | (Forsyth.>>(pov.game.variant.gameLogic, pov.game.chess)), withFlags)
+      lila.round.TreeBuilder(pov.game, analysis, initialFen | pov.game.variant.initialFen, withFlags)
     ))
 
   private def withSteps(pov: Pov, initialFen: Option[FEN])(obj: JsObject) =
