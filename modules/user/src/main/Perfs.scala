@@ -13,12 +13,15 @@ case class Perfs(
     chess960: Perf,
     kingOfTheHill: Perf,
     threeCheck: Perf,
+    fiveCheck: Perf,
     antichess: Perf,
     atomic: Perf,
     horde: Perf,
     racingKings: Perf,
     crazyhouse: Perf,
+    noCastling: Perf,
     linesOfAction: Perf,
+    scrambledEggs: Perf,
     international: Perf,
     frisian: Perf,
     frysk: Perf,
@@ -29,6 +32,8 @@ case class Perfs(
     pool: Perf,
     shogi: Perf,
     xiangqi: Perf,
+    minishogi: Perf,
+    minixiangqi: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -47,12 +52,15 @@ case class Perfs(
       "chess960"       -> chess960,
       "kingOfTheHill"  -> kingOfTheHill,
       "threeCheck"     -> threeCheck,
+      "fiveCheck"      -> fiveCheck,
       "antichess"      -> antichess,
       "atomic"         -> atomic,
       "horde"          -> horde,
       "racingKings"    -> racingKings,
       "crazyhouse"     -> crazyhouse,
+      "noCastling"     -> noCastling,
       "linesOfAction"  -> linesOfAction,
+      "scrambledEggs"  -> scrambledEggs,
       "international"  -> international,
       "frisian"        -> frisian,
       "frysk"          -> frysk,
@@ -63,6 +71,8 @@ case class Perfs(
       "pool"           -> pool,
       "shogi"          -> shogi,
       "xiangqi"        -> xiangqi,
+      "minishogi"      -> minishogi,
+      "minixiangqi"    -> minixiangqi,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -137,12 +147,15 @@ case class Perfs(
     "chess960"       -> chess960,
     "kingOfTheHill"  -> kingOfTheHill,
     "threeCheck"     -> threeCheck,
+    "fiveCheck"      -> fiveCheck,
     "antichess"      -> antichess,
     "atomic"         -> atomic,
     "horde"          -> horde,
     "racingKings"    -> racingKings,
     "crazyhouse"     -> crazyhouse,
+    "noCastling"     -> noCastling,
     "linesOfAction"  -> linesOfAction,
+    "scrambledEggs"  -> scrambledEggs,
     "frisian"        -> frisian,
     "frysk"          -> frysk,
     "international"  -> international,
@@ -153,6 +166,8 @@ case class Perfs(
     "pool"           -> pool,
     "shogi"          -> shogi,
     "xiangqi"        -> xiangqi,
+    "minishogi"      -> minishogi,
+    "minixiangqi"    -> minixiangqi,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
     "blitz"          -> blitz,
@@ -241,6 +256,11 @@ case object Perfs {
       p,
       p,
       p,
+      p,
+      p,
+      p,
+      p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -267,14 +287,10 @@ case object Perfs {
       case Variant.Chess(strategygames.chess.variant.Chess960)      => Some(_.chess960)
       case Variant.Chess(strategygames.chess.variant.KingOfTheHill) => Some(_.kingOfTheHill)
       case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => Some(_.threeCheck)
+      case Variant.Chess(strategygames.chess.variant.FiveCheck)     => Some(_.fiveCheck)
       case Variant.Chess(strategygames.chess.variant.Antichess)     => Some(_.antichess)
-      case Variant.Chess(strategygames.chess.variant.Atomic)        => Some(_.atomic)
-      case Variant.Chess(strategygames.chess.variant.Horde)         => Some(_.horde)
-      case Variant.Chess(strategygames.chess.variant.RacingKings)   => Some(_.racingKings)
-      case Variant.Chess(strategygames.chess.variant.Crazyhouse)    => Some(_.crazyhouse)
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction) => Some(_.linesOfAction)
+      case Variant.Chess(strategygames.chess.variant.NoCastling)     => Some(_.noCastling)
       case Variant.Draughts(strategygames.draughts.variant.Standard)     => Some(_.international)
-      case Variant.Draughts(strategygames.draughts.variant.Frisian)      => Some(_.frisian)
       case Variant.Draughts(strategygames.draughts.variant.Frysk)        => Some(_.frysk)
       case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => Some(_.antidraughts)
       case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => Some(_.breakthrough)
@@ -283,6 +299,8 @@ case object Perfs {
       case Variant.Draughts(strategygames.draughts.variant.Pool)         => Some(_.pool)
       case Variant.FairySF(strategygames.fairysf.variant.Shogi)          => Some(_.shogi)
       case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)        => Some(_.xiangqi)
+      case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)      => Some(_.minishogi)
+      case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)    => Some(_.minixiangqi)
       case _                           => none
     }
 
@@ -307,12 +325,15 @@ case object Perfs {
         chess960 = perf("chess960"),
         kingOfTheHill = perf("kingOfTheHill"),
         threeCheck = perf("threeCheck"),
+        fiveCheck = perf("fiveCheck"),
         antichess = perf("antichess"),
         atomic = perf("atomic"),
         horde = perf("horde"),
         racingKings = perf("racingKings"),
         crazyhouse = perf("crazyhouse"),
+        noCastling = perf("noCastling"),
         linesOfAction = perf("linesOfAction"),
+        scrambledEggs = perf("scrambledEggs"),
         international = perf("international"),
         frisian = perf("frisian"),
         frysk = perf("frysk"),
@@ -323,6 +344,8 @@ case object Perfs {
         pool = perf("pool"),
         shogi = perf("shogi"),
         xiangqi = perf("xiangqi"),
+        minishogi = perf("minishogi"),
+        minixiangqi = perf("minixiangqi"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -344,12 +367,15 @@ case object Perfs {
         "chess960"       -> notNew(o.chess960),
         "kingOfTheHill"  -> notNew(o.kingOfTheHill),
         "threeCheck"     -> notNew(o.threeCheck),
+        "fiveCheck"      -> notNew(o.fiveCheck),
         "antichess"      -> notNew(o.antichess),
         "atomic"         -> notNew(o.atomic),
         "horde"          -> notNew(o.horde),
         "racingKings"    -> notNew(o.racingKings),
         "crazyhouse"     -> notNew(o.crazyhouse),
+        "noCastling"     -> notNew(o.noCastling),
         "linesOfAction"  -> notNew(o.linesOfAction),
+        "scrambledEggs"  -> notNew(o.scrambledEggs),
         "international"  -> notNew(o.international),
         "frisian"        -> notNew(o.frisian),
         "frysk"          -> notNew(o.frysk),
@@ -360,6 +386,8 @@ case object Perfs {
         "pool"           -> notNew(o.pool),
         "shogi"          -> notNew(o.shogi),
         "xiangqi"        -> notNew(o.xiangqi),
+        "minishogi"      -> notNew(o.minishogi),
+        "minixiangqi"    -> notNew(o.minixiangqi),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
         "blitz"          -> notNew(o.blitz),
@@ -383,11 +411,14 @@ case object Perfs {
       chess960: List[User.LightPerf],
       kingOfTheHill: List[User.LightPerf],
       threeCheck: List[User.LightPerf],
+      fiveCheck: List[User.LightPerf],
       antichess: List[User.LightPerf],
       atomic: List[User.LightPerf],
       horde: List[User.LightPerf],
       racingKings: List[User.LightPerf],
+      noCastling: List[User.LightPerf],
       linesOfAction: List[User.LightPerf],
+      scrambledEggs: List[User.LightPerf],
       international: List[User.LightPerf],
       frisian: List[User.LightPerf],
       frysk: List[User.LightPerf],
@@ -397,8 +428,11 @@ case object Perfs {
       brazilian: List[User.LightPerf],
       pool: List[User.LightPerf],
       shogi: List[User.LightPerf],
-      xiangqi: List[User.LightPerf]
+      xiangqi: List[User.LightPerf],
+      minishogi: List[User.LightPerf],
+      minixiangqi: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+
 }

@@ -1,5 +1,6 @@
 const noCevalVariants = [
   'linesOfAction',
+  'scrambledEggs',
   'international',
   'antidraughts',
   'breakthrough',
@@ -11,6 +12,8 @@ const noCevalVariants = [
   'frysk',
   'shogi',
   'xiangqi',
+  'minishogi',
+  'minixiangqi',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {
@@ -27,7 +30,7 @@ export function sanIrreversible(variant: VariantKey, san: string): boolean {
   if (variant === 'crazyhouse') return false;
   if (san.includes('x')) return true; // capture
   if (san.toLowerCase() === san) return true; // pawn move
-  return variant === 'threeCheck' && san.includes('+');
+  return (variant === 'threeCheck' || variant === 'fiveCheck') && san.includes('+');
 }
 
 export function allowCevalForVariant(variant: VariantKey) {

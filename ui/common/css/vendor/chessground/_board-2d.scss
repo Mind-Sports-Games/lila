@@ -33,9 +33,19 @@ $shogi-board-files: (
   'clear': 'shogi_clear.png',
 );
 
+$minishogi-board-files: (
+  'wood': 'minishogi.png',
+  'clear': 'minishogi_clear.png',
+);
+
 $xiangqi-board-files: (
   'grey': 'xiangqi.svg',
   'green': 'xiangqic.svg',
+);
+
+$minixiangqi-board-files: (
+  'grey': 'minixiangqi.svg',
+  'green': 'minixqlg.svg',
 );
 
 $chess-variants: (
@@ -44,23 +54,25 @@ $chess-variants: (
   'fromPosition',
   'kingOfTheHill',
   'threeCheck',
+  'fiveCheck',
   'antichess',
   'atomic',
   'horde',
   'racingKings',
   'crazyhouse',
+  'noCastling',
   'chess'
 );
 
-$loa-variants: ('linesOfAction');
+$loa-variants: ('linesOfAction', 'scrambledEggs');
 
-$shogi-variants: ('shogi');
+$shogi-variants: ('shogi'); //must use same board
 
-$xiangqi-variants: ('xiangqi');
+$xiangqi-variants: ('xiangqi'); // must use same board
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
-    .#{$gameFamily}-#{$color} .chess.is2d cg-board {
+    .#{$gameFamily}-#{$color} .#{$gameFamily}.is2d cg-board {
       background-image: url(../images/board/chess/#{$file});
     }
   }
@@ -72,8 +84,8 @@ $xiangqi-variants: ('xiangqi');
   }
 }
 
-@each $color, $file in $shogi-board-files {
-  .shogi-#{$color} .shogi .is2d cg-board {
+@each $color, $file in $minishogi-board-files {
+  .shogi-#{$color} .variant-minishogi.is2d cg-board {
     background-image: url(../images/board/shogi/#{$file});
   }
 }
@@ -84,8 +96,8 @@ $xiangqi-variants: ('xiangqi');
   }
 }
 
-@each $color, $file in $xiangqi-board-files {
-  .xiangqi-#{$color} .xiangqi .is2d cg-board {
+@each $color, $file in $minixiangqi-board-files {
+  .xiangqi-#{$color} .variant-minixiangqi.is2d cg-board {
     background-image: url(../images/board/xiangqi/#{$file});
   }
 }
@@ -114,10 +126,22 @@ $xiangqi-variants: ('xiangqi');
   }
 }
 
+@each $color, $file in $minishogi-board-files {
+  .shogi-#{$color} .is2d .variant-minishogi cg-board {
+    background-image: url(../images/board/shogi/#{$file});
+  }
+}
+
 @each $variant in $xiangqi-variants {
   @each $color, $file in $xiangqi-board-files {
     .xiangqi-#{$color} .is2d .variant-#{$variant} cg-board {
       background-image: url(../images/board/xiangqi/#{$file});
     }
+  }
+}
+
+@each $color, $file in $minixiangqi-board-files {
+  .xiangqi-#{$color} .is2d .variant-minixiangqi cg-board {
+    background-image: url(../images/board/xiangqi/#{$file});
   }
 }

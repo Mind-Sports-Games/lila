@@ -6,6 +6,10 @@
   flex: 0 0 calc(100% / 7);
 }
 
+.variant-minishogi .pocket-c1 {
+  flex: 0 0 calc(100% / 5);
+}
+
 .pocket {
   @extend %box-radius;
 

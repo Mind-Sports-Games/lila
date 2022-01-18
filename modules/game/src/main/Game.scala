@@ -254,7 +254,7 @@ case class Game(
           blackKing = updated.history.kingMoves.blackKing.map(Pos.Draughts)
         ))
       else//chess
-        (updated.board.variant.threeCheck && game.situation.check) ?? List(
+        ((updated.board.variant.threeCheck || updated.board.variant.fiveCheck) && game.situation.check) ?? List(
           Event.CheckCount(
             white = updated.history.checkCount.white,
             black = updated.history.checkCount.black

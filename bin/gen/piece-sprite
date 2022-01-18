@@ -62,11 +62,11 @@ types = {
 }
 roles = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece', 'k-piece']
 colors = ['white', 'black']
-chess_variants = ['standard','chess960', 'fromPosition', 'kingOfTheHill', 'threeCheck', 'antichess', 'atomic',
-'horde', 'racingKings', 'crazyhouse']
+chess_variants = ['standard','chess960', 'fromPosition', 'kingOfTheHill', 'threeCheck', 'fiveCheck', 'antichess', 'atomic',
+'horde', 'racingKings', 'crazyhouse', 'noCastling']
 draughts_variants = ['international','frisian','frysk','antidraughts','breakthrough','russian','brazilian','pool']
 draughts_roles = ['man','king']
-lines_of_action_variants= ['linesOfAction']
+lines_of_action_variants= ['linesOfAction', 'scrambledEggs']
 lines_of_action_roles = ['l-piece']
 shogi_roles_to_imageprefix = [
     ['p-piece','FU'],
@@ -86,10 +86,10 @@ shogi_roles_to_imageprefix = [
     ['pb-piece','UM']
   ]
 shogi_colors = ['0','1']
-shogi_variants = ['shogi']
+shogi_variants = ['shogi', 'minishogi']
 xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece', 'pp-piece']
 xiangqi_colors = ['B','R']
-xiangqi_variants = ['xiangqi']
+xiangqi_variants = ['xiangqi', 'minixiangqi']
 
 
 # inline SVG Chess
@@ -216,7 +216,7 @@ loa_themes.map { |theme|
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.chess.is2d .' + role + '.' + color + ' {' +
+          '.loa.is2d .' + role + '.' + color + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -244,7 +244,7 @@ loa_themes.map { |theme|
   classes_loa_game = colors.map { |color|
     lines_of_action_roles.map { |role|
       piece = color[0] + role.upcase[0]
-      '.chess.is2d .' + role + '.' + color + ' {' +
+      '.loa.is2d .' + role + '.' + color + ' {' +
           "background-image:url('/assets/piece/" + 'loa/' + name + "/" + piece + "." + ext + "')}"
       }
     }.flatten

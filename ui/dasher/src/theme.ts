@@ -61,7 +61,6 @@ export function ctrl(
 
 export function view(ctrl: ThemeCtrl): VNode {
   const d = ctrl.data();
-  console.log('data', d);
   const selectedVariant = document.getElementById('variantForPiece') as HTMLInputElement;
   const sv = selectedVariant
     ? selectedVariant.value === 'LinesOfAction'

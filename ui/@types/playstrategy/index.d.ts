@@ -280,13 +280,18 @@ declare type VariantKey =
   | 'fromPosition'
   | 'kingOfTheHill'
   | 'threeCheck'
+  | 'fiveCheck'
   | 'atomic'
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
+  | 'noCastling'
   | 'linesOfAction'
+  | 'scrambledEggs'
   | 'shogi'
-  | 'xiangqi';
+  | 'xiangqi'
+  | 'minishogi'
+  | 'minixiangqi';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -311,11 +316,14 @@ declare type Perf =
   | 'fromPosition'
   | 'kingOfTheHill'
   | 'threeCheck'
+  | 'fiveCheck'
   | 'atomic'
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
+  | 'noCastling'
   | 'linesOfAction'
+  | 'scrambledEggs'
   | 'international'
   | 'antidraughts'
   | 'breakthrough'
@@ -326,7 +334,9 @@ declare type Perf =
   | 'frisian'
   | 'frysk'
   | 'shogi'
-  | 'xiangqi';
+  | 'xiangqi'
+  | 'minishogi'
+  | 'minixiangqi';
 
 declare type Color = 'white' | 'black';
 declare type Orientation = 'white' | 'black' | 'left' | 'right';

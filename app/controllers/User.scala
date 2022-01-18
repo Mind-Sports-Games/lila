@@ -289,11 +289,14 @@ final class User(
                   "chess960"      -> leaderboards.chess960,
                   "kingOfTheHill" -> leaderboards.kingOfTheHill,
                   "threeCheck"    -> leaderboards.threeCheck,
+                  "fiveCheck"     -> leaderboards.fiveCheck,
                   "antichess"     -> leaderboards.antichess,
                   "atomic"        -> leaderboards.atomic,
                   "horde"         -> leaderboards.horde,
                   "racingKings"   -> leaderboards.racingKings,
+                  "noCastling"    -> leaderboards.noCastling,
                   "linesOfAction" -> leaderboards.linesOfAction,
+                  "scrambledEggs" -> leaderboards.scrambledEggs,
                   "international" -> leaderboards.international,
                   "frisian"       -> leaderboards.frisian,
                   "frysk"         -> leaderboards.frysk,
@@ -304,6 +307,8 @@ final class User(
                   "pool"          -> leaderboards.pool,
                   "shogi"         -> leaderboards.shogi,
                   "xiangqi"       -> leaderboards.xiangqi,
+                  "minishogi"     -> leaderboards.minishogi,
+                  "minixiangqi"   -> leaderboards.minixiangqi,
                 )
               )
             }

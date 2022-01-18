@@ -115,7 +115,15 @@ coords {
     display: none;
   }
 
+  .coords-out .variant-minishogi coords {
+    display: none;
+  }
+
   .coords-out .variant-xiangqi coords {
+    display: none;
+  }
+
+  .coords-out .variant-minixiangqi coords {
     display: none;
   }
 }

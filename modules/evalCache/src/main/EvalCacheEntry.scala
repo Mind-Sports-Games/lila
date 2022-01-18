@@ -128,6 +128,8 @@ object EvalCacheEntry {
       val str = variant match {
         case Variant.Chess(strategygames.chess.variant.ThreeCheck)
           => base + ~fen.value.split(' ').lift(6)
+        case Variant.Chess(strategygames.chess.variant.FiveCheck)
+          => base + ~fen.value.split(' ').lift(6)
         case _                         => base
       }
       new SmallFen(str)
