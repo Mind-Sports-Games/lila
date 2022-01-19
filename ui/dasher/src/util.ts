@@ -57,7 +57,7 @@ export function spinner() {
   ]);
 }
 
-export function displayGameFamily(gameFamilyKey: string): string {
+export function displayGameFamily(gameFamilyKey: GameFamilyKey): string {
   switch (gameFamilyKey) {
     case 'loa':
       return 'LinesOfAction';
