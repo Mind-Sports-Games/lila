@@ -199,7 +199,7 @@ final class JsonView(
             Json
               .obj(
                 "id"     -> pov.gameId,
-                "color"  -> pov.playerIndex.name,
+                "playerIndex" -> pov.playerIndex.name,
                 "op"     -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
                 "win"    -> score.flatMap(_.isWin),
                 "status" -> pov.game.status.id,

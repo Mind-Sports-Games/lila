@@ -37,7 +37,7 @@ final class JsonView(
     Json
       //.obj("color" -> g.variant.playerNames(p.playerIndex), "playerIndex" -> p.playerIndex.name)
       .obj(
-        "color" -> p.playerIndex.classicName,
+        //"color" -> p.playerIndex.classicName,
         "playerName" -> g.variant.playerNames(p.playerIndex),
         "playerIndex" -> p.playerIndex.name
       )
@@ -79,7 +79,7 @@ final class JsonView(
             "opponent" -> {
               commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json.obj(
                 //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
-                "color" -> opponent.playerIndex.classicName,
+                //"color" -> opponent.playerIndex.classicName,
                 "playerName" -> pov.game.variant.playerNames(opponent.playerIndex),
                 "playerIndex" -> opponent.playerIndex.name,
                 "ai"    -> opponent.aiLevel
@@ -146,7 +146,7 @@ final class JsonView(
     Json
       .obj(
         //"color" -> g.variant.playerNames(p.playerIndex),
-        "color" -> p.playerIndex.classicName,
+        //"color" -> p.playerIndex.classicName,
         "playerName" -> g.variant.playerNames(p.playerIndex),
         "playerIndex" -> p.playerIndex.name,
         "name"  -> p.name
@@ -194,7 +194,7 @@ final class JsonView(
             ),
             "captureLength" -> captureLength(pov),
             //"orientation" -> pov.game.variant.playerNames(pov.playerIndex),
-            "orientation" -> pov.playerIndex.classicName,
+            "orientation" -> pov.playerIndex.name,
             "url" -> Json.obj(
               "socket" -> s"/watch/$gameId/${game.variant.playerNames(playerIndex)}/v$apiVersion",
               "round"  -> s"/$gameId/${game.variant.playerNames(playerIndex)}"
@@ -257,19 +257,18 @@ final class JsonView(
         "player" -> Json.obj(
           "id"    -> owner.option(pov.playerId),
           //"color" -> game.variant.playerNames(playerIndex),
-          "color" -> playerIndex.classicName,
+          //"color" -> playerIndex.classicName,
           "playerName" -> game.variant.playerNames(playerIndex),
           "playerIndex" -> playerIndex.name
         ),
         "opponent" -> Json.obj(
           //"color" -> game.variant.playerNames(opponent.playerIndex),
-          "color" -> playerIndex.classicName,
+          //"color" -> playerIndex.classicName,
           "playerName" -> game.variant.playerNames(opponent.playerIndex),
           "playerIndex" -> playerIndex.classicName,
           "ai"    -> opponent.aiLevel
         ),
-        //"orientation" -> orientation.name,
-        "orientation" -> orientation.classicName,
+        "orientation" -> orientation.name,
         "pref" -> Json
           .obj(
             "animationDuration" -> animationMillis(pov, pref),
