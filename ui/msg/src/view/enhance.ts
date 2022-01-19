@@ -51,7 +51,7 @@ interface Link {
 type LinkType = 'game';
 
 const domain = window.location.host;
-const gameRegex = new RegExp(`(?:https?://)${domain}/(?:embed/)?(\\w{8})(?:(?:/(white|black))|\\w{4}|)(#\\d+)?$`);
+const gameRegex = new RegExp(`(?:https?://)${domain}/(?:embed/)?(\\w{8})(?:(?:/(p1|p2))|\\w{4}|)(#\\d+)?$`);
 const notGames = ['training', 'analysis', 'insights', 'practice', 'features', 'password', 'streamer', 'timeline'];
 
 export function expandIFrames(el: HTMLElement) {

@@ -47,7 +47,7 @@ function renderGoal(practice: StudyPracticeCtrl, inMoves: number) {
     case 'equalIn':
       return 'Equalize in ' + plural('move', inMoves);
     case 'evalIn':
-      if (practice.isWhite() === goal.cp! >= 0) return 'Get a winning position in ' + plural('move', inMoves);
+      if (practice.isP1() === goal.cp! >= 0) return 'Get a winning position in ' + plural('move', inMoves);
       return 'Defend for ' + plural('move', inMoves);
     case 'promotion':
       return 'Safely promote your pawn';

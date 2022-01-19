@@ -15,7 +15,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
     if (
       piece &&
       piece.role == 'p-piece' &&
-      ((dest[1] == '8' && g.state.turnColor == 'black') || (dest[1] == '1' && g.state.turnColor == 'white'))
+      ((dest[1] == '8' && g.state.turnPlayerIndex == 'p2') || (dest[1] == '1' && g.state.turnPlayerIndex == 'p1'))
     ) {
       promoting = {
         orig,
@@ -36,7 +36,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
           [
             key,
             {
-              color: piece.color,
+              playerIndex: piece.playerIndex,
               role,
               promoted: true,
             },
@@ -62,13 +62,13 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
     }
   }
 
-  function renderPromotion(dest: Key, pieces: Role[], color: Color, orientation: Orientation): MaybeVNode {
+  function renderPromotion(dest: Key, pieces: Role[], playerIndex: PlayerIndex, orientation: Orientation): MaybeVNode {
     if (!promoting) return;
 
     let left = (7 - cgUtil.key2pos(dest)[0]) * 12.5;
-    if (orientation === 'white') left = 87.5 - left;
+    if (orientation === 'p1') left = 87.5 - left;
 
-    const vertical = color === orientation ? 'top' : 'bottom';
+    const vertical = playerIndex === orientation ? 'top' : 'bottom';
 
     return h(
       'div#promotion-choice.' + vertical,
@@ -79,7 +79,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
         }),
       },
       pieces.map(function (serverRole, i) {
-        const top = (color === orientation ? i : 7 - i) * 12.5;
+        const top = (playerIndex === orientation ? i : 7 - i) * 12.5;
         return h(
           'square',
           {
@@ -91,7 +91,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
               finish(serverRole);
             }),
           },
-          [h('piece.' + serverRole + '.' + color)]
+          [h('piece.' + serverRole + '.' + playerIndex)]
         );
       })
     );
@@ -106,7 +106,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
       return renderPromotion(
         promoting.dest,
         pieces,
-        cgUtil.opposite(getGround().state.turnColor),
+        cgUtil.opposite(getGround().state.turnPlayerIndex),
         getGround().state.orientation
       );
     },

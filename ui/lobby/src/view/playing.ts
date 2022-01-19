@@ -41,10 +41,10 @@ export default function (ctrl: LobbyController) {
               pov.variant.gameLogic.id === 1
                 ? {
                     // Draughts
-                    'data-state': `${pov.fen}|${boardSize(pov.variant.boardSize)}|${pov.color}|${pov.lastMove}`,
+                    'data-state': `${pov.fen}|${boardSize(pov.variant.boardSize)}|${pov.playerIndex}|${pov.lastMove}`,
                   }
                 : {
-                    'data-state': `${pov.fen},${pov.color},${pov.lastMove}`,
+                    'data-state': `${pov.fen},${pov.playerIndex},${pov.lastMove}`,
                   },
             hook: {
               insert(vnode) {

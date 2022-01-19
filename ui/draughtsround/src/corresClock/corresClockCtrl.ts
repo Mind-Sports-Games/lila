@@ -4,50 +4,50 @@ import RoundController from '../ctrl';
 export interface CorresClockData {
   daysPerTurn: number;
   increment: Seconds;
-  white: Seconds;
-  black: Seconds;
+  p1: Seconds;
+  p2: Seconds;
   showBar: boolean;
 }
 
 export interface CorresClockController {
   root: RoundController;
   data: CorresClockData;
-  timePercent(color: Color): number;
-  update(white: Seconds, black: Seconds): void;
-  tick(color: Color): void;
-  millisOf(color: Color): Millis;
+  timePercent(playerIndex: PlayerIndex): number;
+  update(p1: Seconds, p2: Seconds): void;
+  tick(playerIndex: PlayerIndex): void;
+  millisOf(playerIndex: PlayerIndex): Millis;
 }
 
 interface Times {
-  white: Millis;
-  black: Millis;
+  p1: Millis;
+  p2: Millis;
   lastUpdate: Millis;
 }
 
 export function ctrl(root: RoundController, data: CorresClockData, onFlag: () => void): CorresClockController {
   const timePercentDivisor = 0.1 / data.increment;
 
-  const timePercent = (color: Color): number => Math.max(0, Math.min(100, times[color] * timePercentDivisor));
+  const timePercent = (playerIndex: PlayerIndex): number => Math.max(0, Math.min(100, times[playerIndex] * timePercentDivisor));
 
   let times: Times;
 
-  function update(white: Seconds, black: Seconds): void {
+  function update(p1: Seconds, p2: Seconds): void {
     times = {
-      white: white * 1000,
-      black: black * 1000,
+      p1: p1 * 1000,
+      p2: p2 * 1000,
       lastUpdate: performance.now(),
     };
   }
-  update(data.white, data.black);
+  update(data.p1, data.p2);
 
-  function tick(color: Color): void {
+  function tick(playerIndex: PlayerIndex): void {
     const now = performance.now();
-    times[color] -= now - times.lastUpdate;
+    times[playerIndex] -= now - times.lastUpdate;
     times.lastUpdate = now;
-    if (times[color] <= 0) onFlag();
+    if (times[playerIndex] <= 0) onFlag();
   }
 
-  const millisOf = (color: Color): Millis => Math.max(0, times[color]);
+  const millisOf = (playerIndex: PlayerIndex): Millis => Math.max(0, times[playerIndex]);
 
   return {
     root,

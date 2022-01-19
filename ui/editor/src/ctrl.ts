@@ -19,7 +19,7 @@ export default class EditorCtrl {
   selected: Prop<Selected>;
 
   pockets: Material | undefined;
-  turn: Color;
+  turn: PlayerIndex;
   unmovedRooks: SquareSet | undefined;
   castlingToggles: CastlingToggles<boolean>;
   epSquare: Square | undefined;
@@ -155,10 +155,10 @@ export default class EditorCtrl {
     return baseUrl + encodeURIComponent(fen).replace(/%20/g, '_').replace(/%2F/g, '/');
   }
 
-  bottomColor(): Color {
+  bottomPlayerIndex(): PlayerIndex {
     const orientation = this.chessground ? this.chessground.state.orientation : this.options.orientation;
-    if (orientation === 'white' || orientation == 'black') return orientation;
-    else return 'black'; // TODO: this needs to be fixed for games other than LinesOfAction
+    if (orientation === 'p1' || orientation == 'p2') return orientation;
+    else return 'p2'; // TODO: this needs to be fixed for games other than LinesOfAction
   }
 
   setCastlingToggle(id: CastlingToggle, value: boolean): void {
@@ -167,7 +167,7 @@ export default class EditorCtrl {
     this.onChange();
   }
 
-  setTurn(turn: Color): void {
+  setTurn(turn: PlayerIndex): void {
     this.turn = turn;
     this.onChange();
   }
@@ -201,10 +201,10 @@ export default class EditorCtrl {
         this.fullmoves = setup.fullmoves;
 
         const castles = Castles.fromSetup(setup);
-        this.castlingToggles['K'] = defined(castles.rook.white.h);
-        this.castlingToggles['Q'] = defined(castles.rook.white.a);
-        this.castlingToggles['k'] = defined(castles.rook.black.h);
-        this.castlingToggles['q'] = defined(castles.rook.black.a);
+        this.castlingToggles['K'] = defined(castles.rook.p1.h);
+        this.castlingToggles['Q'] = defined(castles.rook.p1.a);
+        this.castlingToggles['k'] = defined(castles.rook.p2.h);
+        this.castlingToggles['q'] = defined(castles.rook.p2.a);
 
         this.onChange();
         return true;
@@ -222,7 +222,7 @@ export default class EditorCtrl {
     this.onChange();
   }
 
-  setOrientation(o: Color): void {
+  setOrientation(o: PlayerIndex): void {
     this.options.orientation = o;
     if (this.chessground!.state.orientation !== o) this.chessground!.toggleOrientation();
     this.redraw();

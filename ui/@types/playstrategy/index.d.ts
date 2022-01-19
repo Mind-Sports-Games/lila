@@ -48,7 +48,7 @@ interface PlayStrategy {
     init(node: HTMLElement): string | null;
     initAll(parent?: HTMLElement): void;
     update(node: HTMLElement, data: GameUpdate): void;
-    finish(node: HTMLElement, win?: Color): void;
+    finish(node: HTMLElement, win?: PlayerIndex): void;
   };
   ab?: any;
 
@@ -201,7 +201,7 @@ interface PlayStrategyAnnouncement {
 
 interface PlayStrategyEditor {
   getFen(): string;
-  setOrientation(o: Color): void;
+  setOrientation(o: PlayerIndex): void;
 }
 
 declare namespace Editor {
@@ -328,10 +328,10 @@ declare type Perf =
   | 'shogi'
   | 'xiangqi';
 
-declare type Color = 'white' | 'black';
+//declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red';
 declare type PlayerIndex = 'p1' | 'p2';
-declare type Orientation = 'white' | 'black' | 'left' | 'right';
+declare type Orientation = 'p1' | 'p2' | 'left' | 'right';
 
 declare type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
 declare type Ranks = '1' | '2' | '3' | '4' | '5' | '5' | '6' | '7' | '8' | '9' | '10';
@@ -452,7 +452,7 @@ declare namespace Tree {
   }
 
   export interface TablebaseHit {
-    winner: Color | undefined;
+    winner: PlayerIndex | undefined;
     best?: Uci;
   }
 

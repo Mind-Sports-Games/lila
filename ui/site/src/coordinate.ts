@@ -23,7 +23,7 @@ playstrategy.load.then(() => {
     let startAt, score;
     let wrongTimeout;
 
-    const showColor = function () {
+    const showPlayerIndex = function () {
       color = colorPref == 'random' ? ['white', 'black'][Math.round(Math.random())] : colorPref;
       if (!ground)
         ground = window.Chessground($board[0], {
@@ -34,13 +34,13 @@ playstrategy.load.then(() => {
             color: null,
           },
           orientation: color,
-          myColor: color,
+          myPlayerIndex: color,
           addPieceZIndex: $('#main-wrap').hasClass('is3d'),
         });
       else if (color !== ground.state.orientation) ground.toggleOrientation();
       $trainer.removeClass('white black').addClass(color);
     };
-    showColor();
+    showPlayerIndex();
 
     $trainer.find('form.color').each(function (this: HTMLFormElement) {
       const form = this,
@@ -54,7 +54,7 @@ playstrategy.load.then(() => {
         }[selected];
         if (c !== colorPref) xhr.formToXhr(form);
         colorPref = c;
-        showColor();
+        showPlayerIndex();
         return false;
       });
     });
@@ -184,7 +184,7 @@ playstrategy.load.then(() => {
       $explanation.remove();
       $trainer.addClass('play').removeClass('init');
       $timer.removeClass('hurry');
-      showColor();
+      showPlayerIndex();
       clearCoords();
       centerRight();
       score = 0;

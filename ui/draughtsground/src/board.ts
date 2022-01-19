@@ -150,13 +150,13 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture
     promotable =
       (variant === 'russian' || !state.movable.captLen || state.movable.captLen <= captured) &&
       origPiece.role === 'man' &&
-      ((origPiece.color === 'white' && finalDest[1] === 1) ||
-        (origPiece.color === 'black' && finalDest[1] === state.boardSize[1]));
+      ((origPiece.playerIndex === 'p1' && finalDest[1] === 1) ||
+        (origPiece.playerIndex === 'p2' && finalDest[1] === state.boardSize[1]));
   const destPiece =
     !state.movable.free && promotable
       ? ({
           role: 'king',
-          color: origPiece.color,
+          playerIndex: origPiece.playerIndex,
         } as cg.Piece)
       : state.pieces.get(orig);
 
@@ -169,7 +169,7 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture
   if (captureUci && captKey) {
     state.pieces.delete(captKey);
     const maybePromote = destPiece.role === 'man' && variant === 'russian',
-      promoteAt = origPiece.color === 'white' ? 1 : state.boardSize[1];
+      promoteAt = origPiece.playerIndex === 'p1' ? 1 : state.boardSize[1];
     let doPromote = false;
     for (let s = 2; s + 4 <= captureUci.length; s += 2) {
       const nextOrig = key2pos(captureUci.slice(s, s + 2) as cg.Key, bs),
@@ -191,7 +191,7 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture
     if (captKey) {
       const captPiece = state.pieces.get(captKey);
       if (captPiece) {
-        const captColor = captPiece.color;
+        const captPlayerIndex = captPiece.playerIndex;
         const captRole = captPiece.role;
         state.pieces.delete(captKey);
 
@@ -200,12 +200,12 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture
           if (captRole === 'man') {
             state.pieces.set(captKey, {
               role: 'ghostman',
-              color: captColor,
+              playerIndex: captPlayerIndex,
             });
           } else if (captRole === 'king') {
             state.pieces.set(captKey, {
               role: 'ghostking',
-              color: captColor,
+              playerIndex: captPlayerIndex,
             });
           }
         } else {
@@ -244,7 +244,7 @@ export function baseNewPiece(state: State, piece: cg.Piece, key: cg.Key, force?:
   state.lastMove = [key];
   callUserFunction(state.events.change);
   state.movable.dests = undefined;
-  state.turnColor = opposite(state.turnColor);
+  state.turnPlayerIndex = opposite(state.turnPlayerIndex);
   return true;
 }
 
@@ -252,7 +252,7 @@ function baseUserMove(state: State, orig: cg.Key, dest: cg.Key): cg.Piece | bool
   const result = baseMove(state, orig, dest);
   if (result) {
     state.movable.dests = undefined;
-    if (!state.movable.captLen || state.movable.captLen <= 1) state.turnColor = opposite(state.turnColor);
+    if (!state.movable.captLen || state.movable.captLen <= 1) state.turnPlayerIndex = opposite(state.turnPlayerIndex);
     state.animation.current = undefined;
   }
   return result;
@@ -350,7 +350,7 @@ function isMovable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
-    (state.movable.color === 'both' || (state.movable.color === piece.color && state.turnColor === piece.color))
+    (state.movable.playerIndex === 'both' || (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
   );
 }
 
@@ -368,13 +368,13 @@ function canDrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
     !!piece &&
     dest &&
     (orig === dest || !state.pieces.has(dest)) &&
-    (state.movable.color === 'both' || (state.movable.color === piece.color && state.turnColor === piece.color))
+    (state.movable.playerIndex === 'both' || (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
   );
 }
 
 function isPremovable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
-  return !!piece && state.premovable.enabled && state.movable.color === piece.color && state.turnColor !== piece.color;
+  return !!piece && state.premovable.enabled && state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex !== piece.playerIndex;
 }
 
 function canPremove(state: State, orig: cg.Key, dest: cg.Key): boolean {
@@ -390,10 +390,10 @@ function canPredrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
   const destPiece = state.pieces.get(dest);
   return (
     !!piece &&
-    (!destPiece || destPiece.color !== state.movable.color) &&
+    (!destPiece || destPiece.playerIndex !== state.movable.playerIndex) &&
     state.predroppable.enabled &&
-    state.movable.color === piece.color &&
-    state.turnColor !== piece.color
+    state.movable.playerIndex === piece.playerIndex &&
+    state.turnPlayerIndex !== piece.playerIndex
   );
 }
 
@@ -402,8 +402,8 @@ export function isDraggable(state: State, orig: cg.Key): boolean {
   return (
     !!piece &&
     state.draggable.enabled &&
-    (state.movable.color === 'both' ||
-      (state.movable.color === piece.color && (state.turnColor === piece.color || state.premovable.enabled)))
+    (state.movable.playerIndex === 'both' ||
+      (state.movable.playerIndex === piece.playerIndex && (state.turnPlayerIndex === piece.playerIndex || state.premovable.enabled)))
   );
 }
 
@@ -433,7 +433,7 @@ export function playPredrop(state: State, validate: (drop: cg.Drop) => boolean):
   if (validate(drop)) {
     const piece = {
       role: drop.role,
-      color: state.movable.color,
+      playerIndex: state.movable.playerIndex,
     } as cg.Piece;
     if (baseNewPiece(state, piece, drop.key)) {
       callUserFunction(state.movable.events.afterNewPiece, drop.role, drop.key, {
@@ -453,20 +453,20 @@ export function cancelMove(state: State): void {
 }
 
 export function stop(state: State): void {
-  state.movable.color = state.movable.dests = state.animation.current = undefined;
+  state.movable.playerIndex = state.movable.dests = state.animation.current = undefined;
   cancelMove(state);
 }
 
 export function getKeyAtDomPos(
   pos: cg.NumberPair,
   boardSize: cg.BoardSize,
-  asWhite: boolean,
+  asP1: boolean,
   bounds: ClientRect
 ): cg.Key | undefined {
   let row = Math.ceil(boardSize[1] * ((pos[1] - bounds.top) / bounds.height));
-  if (!asWhite) row = boardSize[1] + 1 - row;
+  if (!asP1) row = boardSize[1] + 1 - row;
   let col = Math.ceil(boardSize[0] * ((pos[0] - bounds.left) / bounds.width));
-  if (!asWhite) col = boardSize[0] + 1 - col;
+  if (!asP1) col = boardSize[0] + 1 - col;
 
   // on odd rows we skip fields 1,3,5 etc and on even rows 2,4,6 etc
   if (row % 2 !== 0) {
@@ -484,13 +484,13 @@ export function getKeyAtDomPos(
 export function unusedFieldAtDomPos(
   pos: cg.NumberPair,
   boardSize: cg.BoardSize,
-  asWhite: boolean,
+  asP1: boolean,
   bounds: ClientRect
 ): boolean {
   let row = Math.ceil(boardSize[1] * ((pos[1] - bounds.top) / bounds.height));
-  if (!asWhite) row = boardSize[1] + 1 - row;
+  if (!asP1) row = boardSize[1] + 1 - row;
   let col = Math.ceil(boardSize[0] * ((pos[0] - bounds.left) / bounds.width));
-  if (!asWhite) col = boardSize[0] + 1 - col;
+  if (!asP1) col = boardSize[0] + 1 - col;
 
   if (row % 2 !== 0) {
     if (col % 2 !== 0) return true;
@@ -504,6 +504,6 @@ export function boardFields(s: State): number {
   return (s.boardSize[0] * s.boardSize[1]) / 2;
 }
 
-export function whitePov(s: State): boolean {
-  return s.orientation === 'white';
+export function p1Pov(s: State): boolean {
+  return s.orientation === 'p1';
 }

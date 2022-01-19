@@ -119,12 +119,12 @@ export interface Step {
 export interface ApiMove extends Step {
   dests: EncodedDests;
   clock?: {
-    white: Seconds;
-    black: Seconds;
+    p1: Seconds;
+    p2: Seconds;
     lag?: Centis;
   };
   status: Status;
-  winner?: Color;
+  winner?: PlayerIndex;
   check: boolean;
   threefold: boolean;
   wDraw: boolean;
@@ -140,18 +140,18 @@ export interface ApiMove extends Step {
   castle?: {
     king: [cg.Key, cg.Key];
     rook: [cg.Key, cg.Key];
-    color: Color;
+    playerIndex: PlayerIndex;
   };
   isMove?: true;
   isDrop?: true;
 }
 
 export interface ApiEnd {
-  winner?: Color;
+  winner?: PlayerIndex;
   status: Status;
   ratingDiff?: {
-    white: number;
-    black: number;
+    p1: number;
+    p2: number;
   };
   boosted: boolean;
   clock?: {
@@ -202,10 +202,10 @@ export interface MaterialDiffSide {
   [role: string]: number;
 }
 export interface MaterialDiff {
-  white: MaterialDiffSide;
-  black: MaterialDiffSide;
+  p1: MaterialDiffSide;
+  p2: MaterialDiffSide;
 }
 export interface CheckCount {
-  white: number;
-  black: number;
+  p1: number;
+  p2: number;
 }

@@ -8,7 +8,7 @@ import { ClockData } from '../clock/clockCtrl';
 import RoundController from '../ctrl';
 
 function analysisBoardOrientation(data: RoundData) {
-  return data.game.variant.key === 'racingKings' ? 'white' : data.player.color;
+  return data.game.variant.key === 'racingKings' ? 'p1' : data.player.playerIndex;
 }
 
 function poolUrl(clock: ClockData, blocking?: game.PlayerUser) {
@@ -53,7 +53,7 @@ function rematchButtons(ctrl: RoundController): MaybeVNodes {
         )
       : null,
     h(
-      'button.fbt.rematch.white',
+      'button.fbt.rematch.p1',
       {
         class: {
           me,
@@ -67,7 +67,7 @@ function rematchButtons(ctrl: RoundController): MaybeVNodes {
           'click',
           e => {
             const d = ctrl.data;
-            if (d.game.rematch) location.href = gameRoute(d.game.rematch, d.opponent.color);
+            if (d.game.rematch) location.href = gameRoute(d.game.rematch, d.opponent.playerIndex);
             else if (d.player.offeringRematch) {
               d.player.offeringRematch = false;
               ctrl.socket.send('rematch-no');
@@ -400,7 +400,7 @@ export function watcherFollowUp(ctrl: RoundController): VNode | null {
             'a.fbt.text',
             {
               attrs: {
-                href: `/${d.game.rematch}/${d.opponent.color}`,
+                href: `/${d.game.rematch}/${d.opponent.playerIndex}`,
               },
             },
             ctrl.noarg('viewRematch')

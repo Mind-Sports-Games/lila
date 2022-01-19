@@ -13,7 +13,7 @@ export interface RetroCtrl {
   noarg: TransNoArg;
   current: Prop<Retrospection | null>;
   feedback: Prop<Feedback>;
-  color: Color;
+  playerIndex: PlayerIndex;
   isPlySolved(ply: Ply): boolean;
   onJump(): void;
   jumpToNext(): void;
@@ -46,7 +46,7 @@ interface Retrospection {
 
 type Feedback = 'find' | 'eval' | 'win' | 'fail' | 'view';
 
-export function make(root: AnalyseCtrl, color: Color): RetroCtrl {
+export function make(root: AnalyseCtrl, playerIndex: PlayerIndex): RetroCtrl {
   const game = root.data.game;
   let candidateNodes: Tree.Node[] = [];
   const explorerCancelPlies: number[] = [];
@@ -61,8 +61,8 @@ export function make(root: AnalyseCtrl, color: Color): RetroCtrl {
   }
 
   function findNextNode(): Tree.Node | undefined {
-    const colorModulo = color == 'white' ? 1 : 0;
-    candidateNodes = evalSwings(root.mainline, n => n.ply % 2 === colorModulo && !explorerCancelPlies.includes(n.ply));
+    const playerIndexModulo = playerIndex == 'p1' ? 1 : 0;
+    candidateNodes = evalSwings(root.mainline, n => n.ply % 2 === playerIndexModulo && !explorerCancelPlies.includes(n.ply));
     return candidateNodes.find(n => !isPlySolved(n.ply));
   }
 
@@ -102,7 +102,7 @@ export function make(root: AnalyseCtrl, color: Color): RetroCtrl {
         const cur = current()!;
         const ucis: Uci[] = [];
         res!.moves.forEach(m => {
-          if (m.white + m.draws + m.black > 1) ucis.push(m.uci);
+          if (m.p1 + m.draws + m.p2 > 1) ucis.push(m.uci);
         });
         if (ucis.includes(fault.node.uci!)) {
           explorerCancelPlies.push(fault.node.ply);
@@ -152,7 +152,7 @@ export function make(root: AnalyseCtrl, color: Color): RetroCtrl {
       cur = current();
     if (!cur || feedback() !== 'eval' || cur.fault.node.ply !== node.ply) return;
     if (isCevalReady(node)) {
-      const diff = winningChances.povDiff(color, node.ceval!, cur.prev.node.eval!);
+      const diff = winningChances.povDiff(playerIndex, node.ceval!, cur.prev.node.eval!);
       if (diff > -0.035) onWin();
       else onFail();
     }
@@ -191,7 +191,7 @@ export function make(root: AnalyseCtrl, color: Color): RetroCtrl {
   }
 
   function hideComputerLine(node: Tree.Node): boolean {
-    return (node.ply % 2 === 0) !== (color === 'white') && !isPlySolved(node.ply);
+    return (node.ply % 2 === 0) !== (playerIndex === 'p1') && !isPlySolved(node.ply);
   }
 
   function showBadNode(): Tree.Node | undefined {
@@ -213,7 +213,7 @@ export function make(root: AnalyseCtrl, color: Color): RetroCtrl {
 
   return {
     current,
-    color,
+    playerIndex,
     isPlySolved,
     onJump,
     jumpToNext,
@@ -233,7 +233,7 @@ export function make(root: AnalyseCtrl, color: Color): RetroCtrl {
     flip() {
       if (root.data.game.variant.key !== 'racingKings') root.flip();
       else {
-        root.retro = make(root, opposite(color));
+        root.retro = make(root, opposite(playerIndex));
         redraw();
       }
     },

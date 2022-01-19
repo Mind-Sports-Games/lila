@@ -25,7 +25,7 @@ export default function premove(pieces: cg.Pieces, boardSize: cg.BoardSize, key:
   switch (piece.role) {
     case 'man':
       //
-      //It is always impossible to premove a capture if the first field in that direction contains a piece of our own color:
+      //It is always impossible to premove a capture if the first field in that direction contains a piece of our own playerIndex:
       //enemy pieces can never land there because you only take pieces from the board after capture sequence is completed
       //
 
@@ -33,10 +33,10 @@ export default function premove(pieces: cg.Pieces, boardSize: cg.BoardSize, key:
         let f = movesUp[field][i];
         if (f != -1) {
           const key = field2key(f);
-          if (piece.color === 'white' && i < 2) dests.push(key);
+          if (piece.playerIndex === 'p1' && i < 2) dests.push(key);
 
           const pc = pieces.get(key);
-          if (pc === undefined || pc.color !== piece.color) {
+          if (pc === undefined || pc.playerIndex !== piece.playerIndex) {
             f = movesUp[f][i];
             if (f !== -1) dests.push(field2key(f));
           }
@@ -47,10 +47,10 @@ export default function premove(pieces: cg.Pieces, boardSize: cg.BoardSize, key:
         let f = movesDown[field][i];
         if (f != -1) {
           const key = field2key(f);
-          if (piece.color === 'black' && i < 2) dests.push(key);
+          if (piece.playerIndex === 'p2' && i < 2) dests.push(key);
 
           const pc = pieces.get(key);
-          if (pc === undefined || pc.color !== piece.color) {
+          if (pc === undefined || pc.playerIndex !== piece.playerIndex) {
             f = movesDown[f][i];
             if (f !== -1) dests.push(field2key(f));
           }
@@ -62,7 +62,7 @@ export default function premove(pieces: cg.Pieces, boardSize: cg.BoardSize, key:
           let f = movesHorizontal[field][i];
           if (f != -1) {
             const pc = pieces.get(field2key(f));
-            if (pc === undefined || pc.color !== piece.color) {
+            if (pc === undefined || pc.playerIndex !== piece.playerIndex) {
               f = movesHorizontal[f][i];
               if (f !== -1) dests.push(field2key(f));
             }

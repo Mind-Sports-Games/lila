@@ -82,14 +82,14 @@ function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece | undefined {
 
 function ghostPiece(piece: cg.Piece): cg.Piece {
   if (piece.role === 'man')
-    return { role: 'ghostman', color: piece.color, promoted: piece.promoted, kingMoves: piece.kingMoves };
+    return { role: 'ghostman', playerIndex: piece.playerIndex, promoted: piece.promoted, kingMoves: piece.kingMoves };
   else if (piece.role === 'king')
-    return { role: 'ghostking', color: piece.color, promoted: piece.promoted, kingMoves: piece.kingMoves };
-  else return { role: piece.role, color: piece.color, promoted: piece.promoted, kingMoves: piece.kingMoves };
+    return { role: 'ghostking', playerIndex: piece.playerIndex, promoted: piece.promoted, kingMoves: piece.kingMoves };
+  else return { role: piece.role, playerIndex: piece.playerIndex, promoted: piece.promoted, kingMoves: piece.kingMoves };
 }
 
-function isPromotablePos(color: cg.Color, pos: cg.Pos, boardSize: cg.BoardSize): boolean {
-  return (color === 'white' && pos[1] === 1) || (color === 'black' && pos[1] === boardSize[1]);
+function isPromotablePos(playerIndex: cg.PlayerIndex, pos: cg.Pos, boardSize: cg.BoardSize): boolean {
+  return (playerIndex === 'p1' && pos[1] === 1) || (playerIndex === 'p2' && pos[1] === boardSize[1]);
 }
 
 function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, noCaptSequences = false): AnimPlan {
@@ -115,17 +115,17 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
     if (curP) {
       if (preP) {
         if (!util.samePiece(curP, preP.piece)) {
-          if (preP.piece.color === 'white') missingsW.push(preP);
+          if (preP.piece.playerIndex === 'p1') missingsW.push(preP);
           else missingsB.push(preP);
-          if (curP.color === 'white') newsW.push(makePiece(key, bs, curP));
+          if (curP.playerIndex === 'p1') newsW.push(makePiece(key, bs, curP));
           else newsB.push(makePiece(key, bs, curP));
         }
       } else {
-        if (curP.color === 'white') newsW.push(makePiece(key, bs, curP));
+        if (curP.playerIndex === 'p1') newsW.push(makePiece(key, bs, curP));
         else newsB.push(makePiece(key, bs, curP));
       }
     } else if (preP) {
-      if (preP.piece.color === 'white') missingsW.push(preP);
+      if (preP.piece.playerIndex === 'p1') missingsW.push(preP);
       else missingsB.push(preP);
     }
   }
@@ -159,10 +159,10 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
     const doubleKey = current.lastMove[animateFrom];
     curP = current.pieces.get(doubleKey);
     preP = prePieces.get(doubleKey);
-    if (!!curP && !!preP && curP.color === 'white' && missingsB.length !== 0) {
+    if (!!curP && !!preP && curP.playerIndex === 'p1' && missingsB.length !== 0) {
       missingsW.push(preP);
       newsW.push(makePiece(doubleKey, bs, curP));
-    } else if (!!curP && !!preP && curP.color === 'black' && missingsW.length !== 0) {
+    } else if (!!curP && !!preP && curP.playerIndex === 'p2' && missingsW.length !== 0) {
       missingsB.push(preP);
       newsB.push(makePiece(doubleKey, bs, curP));
     }
@@ -177,19 +177,19 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
         filteredMissings = missings.filter(
           p =>
             !samePieces[p.key] &&
-            newP.piece.color === p.piece.color &&
+            newP.piece.playerIndex === p.piece.playerIndex &&
             (newP.piece.role === p.piece.role ||
               (p.piece.role === 'man' &&
                 newP.piece.role === 'king' &&
-                isPromotablePos(newP.piece.color, newP.pos, bs)) ||
-              (p.piece.role === 'king' && newP.piece.role === 'man' && isPromotablePos(p.piece.color, p.pos, bs)))
+                isPromotablePos(newP.piece.playerIndex, newP.pos, bs)) ||
+              (p.piece.role === 'king' && newP.piece.role === 'man' && isPromotablePos(p.piece.playerIndex, p.pos, bs)))
         );
       if (!filteredMissings.length && (variant === 'russian' || variant === 'pool')) {
         maybePromote = true;
         filteredMissings = missings.filter(
           p =>
             !samePieces[p.key] &&
-            newP.piece.color === p.piece.color &&
+            newP.piece.playerIndex === p.piece.playerIndex &&
             ((p.piece.role === 'man' && newP.piece.role === 'king') ||
               (p.piece.role === 'king' && newP.piece.role === 'man'))
         );
@@ -200,7 +200,7 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
         let tempRole: cg.Role | undefined =
           preP.piece.role === 'man' &&
           newP.piece.role === 'king' &&
-          (maybePromote || isPromotablePos(newP.piece.color, newP.pos, bs))
+          (maybePromote || isPromotablePos(newP.piece.playerIndex, newP.pos, bs))
             ? 'man'
             : undefined;
         if (
@@ -227,7 +227,7 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
 
           plan.captures = new Map();
           missings.forEach(p => {
-            if (p.piece.color !== newP.piece.color) {
+            if (p.piece.playerIndex !== newP.piece.playerIndex) {
               if (captKeys.indexOf(p.key) !== -1) plan.captures.set(p.key, ghostPiece(p.piece));
               else plan.captures.set(p.key, p.piece);
             }
@@ -242,7 +242,7 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
             nextPlan.anims.set(newP.key, v);
             nextPlan.nextPlan = newPlan;
             if (tempRole) {
-              if (variant === 'russian' && isPromotablePos(newP.piece.color, lastPos, bs)) {
+              if (variant === 'russian' && isPromotablePos(newP.piece.playerIndex, lastPos, bs)) {
                 tempRole = undefined;
               } else {
                 nextPlan.tempRole.set(newP.key, tempRole);
@@ -259,7 +259,7 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
 
             nextPlan.captures = new Map();
             missings.forEach(p => {
-              if (p.piece.color !== newP.piece.color) {
+              if (p.piece.playerIndex !== newP.piece.playerIndex) {
                 if (captKeys.indexOf(p.key) !== -1) nextPlan.captures.set(p.key, ghostPiece(p.piece));
                 else nextPlan.captures.set(p.key, p.piece);
               }

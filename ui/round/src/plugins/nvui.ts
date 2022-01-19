@@ -79,8 +79,8 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
         [
           h('h1', gameText(ctrl)),
           h('h2', 'Game info'),
-          ...['white', 'black'].map((color: Color) =>
-            h('p', [color + ' player: ', playerHtml(ctrl, ctrl.playerByColor(color))])
+          ...['p1', 'p2'].map((playerIndex: PlayerIndex) =>
+            h('p', [playerIndex + ' player: ', playerHtml(ctrl, ctrl.playerByPlayerIndex(playerIndex))])
           ),
           h('p', `${d.game.rated ? 'Rated' : 'Casual'} ${d.game.perf}`),
           d.clock ? h('p', `Clock: ${d.clock.initial / 60} + ${d.clock.increment}`) : null,
@@ -135,7 +135,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                   },
                   [
                     h('label', [
-                      d.player.color === d.game.player ? 'Your move' : 'Waiting',
+                      d.player.playerIndex === d.game.player ? 'Your move' : 'Waiting',
                       h('input.move.mousetrap', {
                         attrs: {
                           name: 'move',
@@ -180,12 +180,12 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                   )
                 );
                 const $buttons = $board.find('button');
-                $buttons.on('click', selectionHandler(ctrl.data.opponent.color, selectSound));
-                $buttons.on('keydown', arrowKeyHandler(ctrl.data.player.color, borderSound));
+                $buttons.on('click', selectionHandler(ctrl.data.opponent.playerIndex, selectSound));
+                $buttons.on('keydown', arrowKeyHandler(ctrl.data.player.playerIndex, borderSound));
                 $buttons.on(
                   'keypress',
                   possibleMovesHandler(
-                    ctrl.data.player.color,
+                    ctrl.data.player.playerIndex,
                     ctrl.chessground.getFen,
                     () => ctrl.chessground.state.pieces
                   )
@@ -196,7 +196,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
             },
             renderBoard(
               ctrl.chessground.state.pieces,
-              ctrl.data.player.color,
+              ctrl.data.player.playerIndex,
               pieceStyle.get(),
               prefixStyle.get(),
               positionStyle.get(),
@@ -312,7 +312,7 @@ function onSubmit(ctrl: RoundController, notify: (txt: string) => void, style: (
           },
           { ackable: true }
         );
-      else notify(d.player.color === d.game.player ? `Invalid move: ${input}` : 'Not your turn');
+      else notify(d.player.playerIndex === d.game.player ? `Invalid move: ${input}` : 'Not your turn');
     }
     $input.val('');
     return false;
@@ -345,7 +345,7 @@ function anyClock(ctrl: RoundController, position: Position) {
     player = ctrl.playerAt(position);
   return (
     (ctrl.clock && renderClock(ctrl, player, position)) ||
-    (d.correspondence && renderCorresClock(ctrl.corresClock!, ctrl.trans, player.color, position, d.game.player)) ||
+    (d.correspondence && renderCorresClock(ctrl.corresClock!, ctrl.trans, player.playerIndex, position, d.game.player)) ||
     undefined
   );
 }
@@ -420,7 +420,7 @@ function gameText(ctrl: RoundController) {
   return [
     d.game.status.name == 'started'
       ? ctrl.isPlaying()
-        ? 'You play the ' + ctrl.data.player.color + ' pieces.'
+        ? 'You play the ' + ctrl.data.player.playerIndex + ' pieces.'
         : 'Spectating.'
       : 'Game over.',
     d.game.rated ? 'Rated' : 'Casual',

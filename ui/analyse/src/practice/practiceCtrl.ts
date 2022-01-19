@@ -45,7 +45,7 @@ export interface PracticeCtrl {
   commentShape(enable: boolean): void;
   hint(): void;
   currentNode(): Tree.Node;
-  bottomColor(): Color;
+  bottomPlayerIndex(): PlayerIndex;
   redraw: Redraw;
 }
 
@@ -82,7 +82,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
       hit &&
       (hit.winner
         ? {
-            mate: hit.winner === 'white' ? 10 : -10,
+            mate: hit.winner === 'p1' ? 10 : -10,
           }
         : { cp: 0 })
     );
@@ -100,7 +100,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
       const nodeEval: Eval =
         tbhitToEval(node.tbhit) || (node.threefold || (outcome && !outcome.winner) ? { cp: 0 } : (node.ceval as Eval));
       const prevEval: Eval = tbhitToEval(prev.tbhit) || prev.ceval!;
-      const shift = -winningChances.povDiff(root.bottomColor(), nodeEval, prevEval);
+      const shift = -winningChances.povDiff(root.bottomPlayerIndex(), nodeEval, prevEval);
 
       best = nodeBestUci(prev);
       if (best === node.uci || (node.san!.startsWith('O-O') && best === (altCastles as Dictionary<Uci>)[node.uci!]))
@@ -131,7 +131,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
   }
 
   function isMyTurn(): boolean {
-    return root.turnColor() === root.bottomColor();
+    return root.turnPlayerIndex() === root.bottomPlayerIndex();
   }
 
   function checkCeval() {
@@ -252,7 +252,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
       root.setAutoShapes();
     },
     currentNode: () => root.node,
-    bottomColor: root.bottomColor,
+    bottomPlayerIndex: root.bottomPlayerIndex,
     redraw: root.redraw,
   };
 }

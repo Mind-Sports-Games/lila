@@ -15,6 +15,6 @@ export const anonPoolSeek = (pool: Pool) =>
       time: pool.lim,
       increment: pool.inc,
       days: 1,
-      color: 'random',
+      playerIndex: 'random',
     }),
   });

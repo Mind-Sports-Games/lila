@@ -54,7 +54,7 @@ const feedback = {
   find(ctrl: RetroCtrl): VNode[] {
     return [
       h('div.player', [
-        h('div.no-square', h('piece.k-piece.' + ctrl.color)),
+        h('div.no-square', h('piece.k-piece.' + ctrl.playerIndex)),
         h('div.instruction', [
           h(
             'strong',
@@ -74,7 +74,7 @@ const feedback = {
               )
             )
           ),
-          h('em', ctrl.trans('findBetterMoveForSGPlayer', ctrl.color)),
+          h('em', ctrl.trans('findBetterMoveForSGPlayer', ctrl.playerIndex)),
           skipOrViewSolution(ctrl),
         ]),
       ]),
@@ -106,7 +106,7 @@ const feedback = {
         h('div.icon', '✗'),
         h('div.instruction', [
           h('strong', ctrl.noarg('youCanDoBetter')),
-          h('em', ctrl.trans('tryAnotherMoveForSGPlayer', ctrl.color)),
+          h('em', ctrl.trans('tryAnotherMoveForSGPlayer', ctrl.playerIndex)),
           skipOrViewSolution(ctrl),
         ]),
       ]),
@@ -173,13 +173,13 @@ const feedback = {
     const nothing = !ctrl.completion()[1];
     return [
       h('div.player', [
-        h('div.no-square', h('piece.k-piece.' + ctrl.color)),
+        h('div.no-square', h('piece.k-piece.' + ctrl.playerIndex)),
         h('div.instruction', [
           h(
             'em',
             nothing
-              ? ctrl.trans('noMistakesFoundForSGPlayer', ctrl.color)
-              : ctrl.trans('doneReviewingSGPlayerMistakes', ctrl.color)
+              ? ctrl.trans('noMistakesFoundForSGPlayer', ctrl.playerIndex)
+              : ctrl.trans('doneReviewingSGPlayerMistakes', ctrl.playerIndex)
           ),
           h('div.choices.end', [
             nothing
@@ -196,7 +196,7 @@ const feedback = {
               {
                 hook: bind('click', () => ctrl.flip()),
               },
-              ctrl.trans('reviewSGPlayerMistakes', ctrl.color === 'white' ? 'black' : 'white')
+              ctrl.trans('reviewSGPlayerMistakes', ctrl.playerIndex === 'p1' ? 'p2' : 'p1')
             ),
           ]),
         ]),

@@ -39,13 +39,13 @@ function renderOffTrack(root: AnalyseCtrl, ctrl: PracticeCtrl): VNode {
 }
 
 function renderEnd(root: AnalyseCtrl, end: Outcome): VNode {
-  const color = end.winner || root.turnColor();
+  const playerIndex = end.winner || root.turnPlayerIndex();
   return h('div.player', [
-    color ? h('div.no-square', h('piece.k-piece.' + color)) : h('div.icon.off', '!'),
+    playerIndex ? h('div.no-square', h('piece.k-piece.' + playerIndex)) : h('div.icon.off', '!'),
     h('div.instruction', [
       h('strong', root.trans.noarg(end.winner ? 'checkmate' : 'draw')),
       end.winner
-        ? h('em', h('color', root.trans('sgPlayerWinsGame', end.winner)))
+        ? h('em', h('playerIndex', root.trans('sgPlayerWinsGame', end.winner)))
         : h('em', root.trans.noarg('theGameIsADraw')),
     ]),
   ]);
@@ -69,7 +69,7 @@ function renderEvalProgress(node: Tree.Node, maxDepth: number): VNode {
 function renderRunning(root: AnalyseCtrl, ctrl: PracticeCtrl): VNode {
   const hint = ctrl.hinting();
   return h('div.player.running', [
-    h('div.no-square', h('piece.k-piece.' + root.turnColor())),
+    h('div.no-square', h('piece.k-piece.' + root.turnPlayerIndex())),
     h(
       'div.instruction',
       (ctrl.isMyTurn()

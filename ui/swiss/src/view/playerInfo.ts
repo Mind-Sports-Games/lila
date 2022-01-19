@@ -106,7 +106,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
               'tr.glpt.' + (res === '1' ? '.win' : res === '0' ? '.loss' : ''),
               {
                 key: round,
-                attrs: { 'data-href': '/' + p.g + (p.c ? '' : '/black') },
+                attrs: { 'data-href': '/' + p.g + (p.c ? '' : '/p2') },
                 hook: {
                   destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
                 },
@@ -115,7 +115,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('th', p.isFinalGame ? '' + round : ''),
                 h('td', userName(p.user)),
                 h('td', '' + p.rating),
-                h('td.is.sgPlayer-icon.' + (p.c ? 'white' : 'black')),
+                h('td.is.sgPlayer-icon.' + (p.c ? 'p1' : 'p2')),
                 h('td', p.isFinalGame ? res : ''),
               ]
             );

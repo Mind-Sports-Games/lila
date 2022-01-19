@@ -29,7 +29,7 @@ export function start(
   if (
     piece &&
     piece.role == 'p-piece' &&
-    ((dest[1] == '8' && s.turnColor == 'black') || (dest[1] == '1' && s.turnColor == 'white'))
+    ((dest[1] == '8' && s.turnPlayerIndex == 'p2') || (dest[1] == '1' && s.turnPlayerIndex == 'p1'))
   ) {
     promoting = {
       orig,
@@ -63,15 +63,15 @@ function renderPromotion(
   ctrl: AnalyseCtrl,
   dest: Key,
   pieces: string[],
-  color: Color,
+  playerIndex: PlayerIndex,
   orientation: Orientation
 ): MaybeVNode {
   if (!promoting) return;
 
   let left = (7 - util.key2pos(dest)[0]) * 12.5;
-  if (orientation === 'white') left = 87.5 - left;
+  if (orientation === 'p1') left = 87.5 - left;
 
-  const vertical = color === orientation ? 'top' : 'bottom';
+  const vertical = playerIndex === orientation ? 'top' : 'bottom';
 
   return h(
     'div#promotion-choice.' + vertical,
@@ -82,7 +82,7 @@ function renderPromotion(
       }),
     },
     pieces.map(function (serverRole: Role, i) {
-      const top = (color === orientation ? i : 7 - i) * 12.5;
+      const top = (playerIndex === orientation ? i : 7 - i) * 12.5;
       return h(
         'square',
         {
@@ -94,7 +94,7 @@ function renderPromotion(
             finish(ctrl, serverRole);
           }),
         },
-        [h(`piece.${serverRole}.${color}`)]
+        [h(`piece.${serverRole}.${playerIndex}`)]
       );
     })
   );
@@ -109,7 +109,7 @@ export function view(ctrl: AnalyseCtrl): MaybeVNode {
     ctrl,
     promoting.dest,
     ctrl.data.game.variant.key === 'antichess' ? roles.concat('k-piece') : roles,
-    promoting.dest[1] === '8' ? 'white' : 'black',
+    promoting.dest[1] === '8' ? 'p1' : 'p2',
     ctrl.chessground.state.orientation
   );
 }

@@ -7,8 +7,8 @@ import * as cg from './types';
 export interface Config {
   fen?: cg.FEN; // draughts position in Forsyth notation
   boardSize?: cg.BoardSize; // board size (width / height)
-  orientation?: cg.Color; // board orientation. white | black
-  turnColor?: cg.Color; // turn to play. white | black
+  orientation?: cg.PlayerIndex; // board orientation. p1 | p2
+  turnPlayerIndex?: cg.PlayerIndex; // turn to play. p1 | p2
   captureLength?: number; //Amount of forced captures in this turn
   lastMove?: cg.Key[]; // squares part of the last move ["c3", "c4"]
   selected?: cg.Key; // square currently selected "a1"
@@ -29,7 +29,7 @@ export interface Config {
   };
   movable?: {
     free?: boolean; // all moves are valid - board editor
-    color?: cg.Color | 'both'; // color that can move. white | black | both | undefined
+    playerIndex?: cg.PlayerIndex | 'both'; // playerIndex that can move. p1 | p2 | both | undefined
     dests?: cg.Dests; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     showDests?: boolean; // whether to add the move-dest class on squares
     captureUci?: Array<string>; // possible multicaptures, when played by clicking to the final square (or first ambiguity)
@@ -40,7 +40,7 @@ export interface Config {
     };
   };
   premovable?: {
-    enabled?: boolean; // allow premoves for color that can not move
+    enabled?: boolean; // allow premoves for playerIndex that can not move
     showDests?: boolean; // whether to add the premove-dest class on squares
     castle?: boolean; // whether to allow king castle premoves
     variant?: string; // game variant, to determine premove squares
@@ -51,7 +51,7 @@ export interface Config {
     };
   };
   predroppable?: {
-    enabled?: boolean; // allow predrops for color that can not move
+    enabled?: boolean; // allow predrops for playerIndex that can not move
     events?: {
       set?: (role: cg.Role, key: cg.Key) => void; // called after the predrop has been set
       unset?: () => void; // called after the predrop has been unset
@@ -72,7 +72,7 @@ export interface Config {
   events?: {
     change?: () => void; // called after the situation changes on the board
     // called after a piece has been moved.
-    // capturedPiece is undefined or like {color: 'white'; 'role': 'king'}
+    // capturedPiece is undefined or like {playerIndex: 'p1'; 'role': 'king'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void; // called when a square is selected
@@ -144,14 +144,14 @@ export function setKingMoves(state: State, kingMoves: cg.KingMoves) {
 }
 
 function doSetKingMoves(state: State, kingMoves: cg.KingMoves) {
-  if (kingMoves.white.count > 0 && kingMoves.white.key) {
-    const piece = state.pieces.get(kingMoves.white.key);
-    if (piece && piece.role === 'king' && piece.color === 'white') piece.kingMoves = kingMoves.white.count;
+  if (kingMoves.p1.count > 0 && kingMoves.p1.key) {
+    const piece = state.pieces.get(kingMoves.p1.key);
+    if (piece && piece.role === 'king' && piece.playerIndex === 'p1') piece.kingMoves = kingMoves.p1.count;
   }
 
-  if (kingMoves.black.count > 0 && kingMoves.black.key) {
-    const piece = state.pieces.get(kingMoves.black.key);
-    if (piece && piece.role === 'king' && piece.color === 'black') piece.kingMoves = kingMoves.black.count;
+  if (kingMoves.p2.count > 0 && kingMoves.p2.key) {
+    const piece = state.pieces.get(kingMoves.p2.key);
+    if (piece && piece.role === 'king' && piece.playerIndex === 'p2') piece.kingMoves = kingMoves.p2.count;
   }
 }
 

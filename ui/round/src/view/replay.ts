@@ -82,10 +82,10 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
   let result: string | undefined;
   if (status.finished(ctrl.data))
     switch (ctrl.data.game.winner) {
-      case 'white':
+      case 'p1':
         result = '1-0';
         break;
-      case 'black':
+      case 'p2':
         result = '0-1';
         break;
       default:
@@ -150,7 +150,7 @@ export function analysisButton(ctrl: RoundController): VNode | undefined {
           },
           attrs: {
             title: ctrl.noarg('analysis'),
-            href: gameRoute(ctrl.data, ctrl.data.player.color) + '/analysis#' + ctrl.ply,
+            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + ctrl.ply,
             'data-icon': 'A',
           },
         },
@@ -177,7 +177,7 @@ function renderButtons(ctrl: RoundController) {
               target.getAttribute('data-act') || (target.parentNode as HTMLElement).getAttribute('data-act');
             if (action === 'flip') {
               if (d.tv) location.href = '/tv/' + d.tv.channel + (d.tv.flip ? '' : '?flip=1');
-              else if (d.player.spectator) location.href = gameRoute(d, d.opponent.color);
+              else if (d.player.spectator) location.href = gameRoute(d, d.opponent.playerIndex);
               else ctrl.flipNow();
             }
           }
@@ -220,7 +220,7 @@ function initMessage(d: RoundData, trans: Trans) {
     ? h('div.message', util.justIcon(''), [
         h('div', [
           trans('youPlayTheSGPlayerPieces', d.player.playerName),
-          ...(d.player.color === 'white' ? [h('br'), h('strong', trans.noarg('itsYourTurn'))] : []),
+          ...(d.player.playerIndex === 'p1' ? [h('br'), h('strong', trans.noarg('itsYourTurn'))] : []),
         ]),
       ])
     : null;

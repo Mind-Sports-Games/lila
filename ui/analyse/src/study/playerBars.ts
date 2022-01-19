@@ -6,8 +6,8 @@ import AnalyseCtrl from '../ctrl';
 import { isFinished, findTag, resultOf } from './studyChapters';
 
 interface PlayerNames {
-  white: string;
-  black: string;
+  p1: string;
+  p2: string;
 }
 
 export default function (ctrl: AnalyseCtrl): VNode[] | undefined {
@@ -15,14 +15,14 @@ export default function (ctrl: AnalyseCtrl): VNode[] | undefined {
   if (!study || ctrl.embed) return;
   const tags = study.data.chapter.tags,
     playerNames = {
-      white: findTag(tags, 'white')!,
-      black: findTag(tags, 'black')!,
+      p1: findTag(tags, 'p1')!,
+      p2: findTag(tags, 'p2')!,
     };
-  if (!playerNames.white && !playerNames.black && !treeOps.findInMainline(ctrl.tree.root, n => !!n.clock)) return;
+  if (!playerNames.p1 && !playerNames.p2 && !treeOps.findInMainline(ctrl.tree.root, n => !!n.clock)) return;
   const clocks = renderClocks(ctrl),
-    ticking = !isFinished(study.data.chapter) && ctrl.turnColor();
-  return (['white', 'black'] as Color[]).map(color =>
-    renderPlayer(tags, clocks, playerNames, color, ticking === color, ctrl.bottomColor() !== color)
+    ticking = !isFinished(study.data.chapter) && ctrl.turnPlayerIndex();
+  return (['p1', 'p2'] as PlayerIndex[]).map(playerIndex =>
+    renderPlayer(tags, clocks, playerNames, playerIndex, ticking === playerIndex, ctrl.bottomPlayerIndex() !== playerIndex)
   );
 }
 
@@ -30,13 +30,13 @@ function renderPlayer(
   tags: TagArray[],
   clocks: [VNode, VNode] | undefined,
   playerNames: PlayerNames,
-  color: Color,
+  playerIndex: PlayerIndex,
   ticking: boolean,
   top: boolean
 ): VNode {
-  const title = findTag(tags, `${color}title`),
-    elo = findTag(tags, `${color}elo`),
-    result = resultOf(tags, color === 'white');
+  const title = findTag(tags, `${playerIndex}title`),
+    elo = findTag(tags, `${playerIndex}elo`),
+    result = resultOf(tags, playerIndex === 'p1');
   return h(
     `div.study__player.study__player-${top ? 'top' : 'bot'}`,
     {
@@ -47,11 +47,11 @@ function renderPlayer(
         result && h('span.result', result),
         h('span.info', [
           title && h('span.utitle', title == 'BOT' ? { attrs: { 'data-bot': true } } : {}, title + ' '),
-          h('span.name', playerNames[color]),
+          h('span.name', playerNames[playerIndex]),
           elo && h('span.elo', elo),
         ]),
       ]),
-      clocks && clocks[color === 'white' ? 0 : 1],
+      clocks && clocks[playerIndex === 'p1' ? 0 : 1],
     ]
   );
 }

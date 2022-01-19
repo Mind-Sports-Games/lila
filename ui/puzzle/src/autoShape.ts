@@ -26,7 +26,7 @@ function makeAutoShapesFromUci(uci: Uci, brush: string, modifiers?: DrawModifier
 export default function (opts: Opts): DrawShape[] {
   const n = opts.vm.node,
     hovering = opts.ceval.hovering(),
-    color = opts.ground.state.movable.color;
+    playerIndex = opts.ground.state.movable.playerIndex;
   let shapes: DrawShape[] = [];
   if (hovering && hovering.fen === n.fen) shapes = shapes.concat(makeAutoShapesFromUci(hovering.uci, 'paleBlue'));
   if (opts.vm.showAutoShapes() && opts.vm.showComputer()) {
@@ -44,7 +44,7 @@ export default function (opts: Opts): DrawShape[] {
       ) {
         n.ceval.pvs.forEach(function (pv) {
           if (pv.moves[0] === nextBest) return;
-          const shift = winningChances.povDiff(color as Color, n.ceval!.pvs[0], pv);
+          const shift = winningChances.povDiff(playerIndex as PlayerIndex, n.ceval!.pvs[0], pv);
           if (shift > 0.2 || isNaN(shift) || shift < 0) return;
           shapes = shapes.concat(
             makeAutoShapesFromUci(pv.moves[0], 'paleGrey', {
@@ -59,7 +59,7 @@ export default function (opts: Opts): DrawShape[] {
     if (n.threat.pvs[1]) {
       shapes = shapes.concat(makeAutoShapesFromUci(n.threat.pvs[0].moves[0], 'paleRed'));
       n.threat.pvs.slice(1).forEach(function (pv) {
-        const shift = winningChances.povDiff(opposite(color as Color), pv, n.threat!.pvs[0]);
+        const shift = winningChances.povDiff(opposite(playerIndex as PlayerIndex), pv, n.threat!.pvs[0]);
         if (shift > 0.2 || isNaN(shift) || shift < 0) return;
         shapes = shapes.concat(
           makeAutoShapesFromUci(pv.moves[0], 'paleRed', {

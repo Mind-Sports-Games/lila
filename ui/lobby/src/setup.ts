@@ -112,11 +112,11 @@ export default class Setup {
     return undefined;
   };
 
-  private hookToPoolMember = (color: string, form: HTMLFormElement) => {
+  private hookToPoolMember = (playerIndex: string, form: HTMLFormElement) => {
     const data = Array.from(new FormData(form).entries());
     const hash: any = {};
     for (const i in data) hash[data[i][0]] = data[i][1];
-    const valid = color == 'random' && hash.variant == 1 && hash.mode == 1 && hash.timeMode == 1,
+    const valid = playerIndex == 'random' && hash.variant == 1 && hash.mode == 1 && hash.timeMode == 1,
       id = parseFloat(hash.time) + '+' + parseInt(hash.increment);
     return valid && this.root.pools.find(p => p.id === id)
       ? {
@@ -297,7 +297,7 @@ export default class Setup {
           .prop('disabled', true)
           .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
       }
-      const ajaxSubmit = (color: string) => {
+      const ajaxSubmit = (playerIndex: string) => {
         const form = $form[0] as HTMLFormElement;
         const rating = parseInt($modal.find('.ratings input').val() as string) || 1500;
         if (form.ratingRange)
@@ -306,7 +306,7 @@ export default class Setup {
             rating + parseInt(form.ratingRange_range_max.value),
           ].join('-');
         save();
-        const poolMember = this.hookToPoolMember(color, form);
+        const poolMember = this.hookToPoolMember(playerIndex, form);
         modal.close();
         if (poolMember) {
           this.root.enterPool(poolMember);
@@ -316,7 +316,7 @@ export default class Setup {
             method: 'post',
             body: (() => {
               const data = new FormData($form[0] as HTMLFormElement);
-              data.append('color', color);
+              data.append('playerIndex', playerIndex);
               return data;
             })(),
           });

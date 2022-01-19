@@ -96,7 +96,7 @@ export default function (ctrl: TournamentController): VNode {
               'tr.glpt.' + (res === '1' ? ' win' : res === '0' ? ' loss' : ''),
               {
                 key: p.id,
-                attrs: { 'data-href': '/' + p.id + '/' + p.color },
+                attrs: { 'data-href': '/' + p.id + '/' + p.playerIndex },
                 hook: {
                   destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
                 },
@@ -105,7 +105,7 @@ export default function (ctrl: TournamentController): VNode {
                 h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
                 h('td', playerName(p.op)),
                 h('td', p.op.rating),
-                h('td.is.sgPlayer-icon.' + p.color),
+                h('td.is.sgPlayer-icon.' + p.playerIndex),
                 h('td', res),
               ]
             );

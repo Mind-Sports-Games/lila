@@ -46,10 +46,10 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes | 
   const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + main.id, main);
   if (conceal === 'hide') return;
   if (opts.isMainline) {
-    const isWhite = main.ply % 2 === 1,
+    const isP1 = main.ply % 2 === 1,
       commentTags = renderMainlineCommentsOf(ctx, main, conceal, true).filter(nonEmpty);
     if (!cs[1] && isEmpty(commentTags) && !main.forceVariation)
-      return ((isWhite ? [moveView.renderIndex(main.ply, false)] : []) as MaybeVNodes).concat(
+      return ((isP1 ? [moveView.renderIndex(main.ply, false)] : []) as MaybeVNodes).concat(
         renderMoveAndChildrenOf(ctx, main, {
           parentPath: opts.parentPath,
           isMainline: true,
@@ -68,9 +68,9 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes | 
       isMainline: !main.forceVariation,
       conceal,
     };
-    return (isWhite ? [moveView.renderIndex(main.ply, false)] : ([] as MaybeVNodes))
+    return (isP1 ? [moveView.renderIndex(main.ply, false)] : ([] as MaybeVNodes))
       .concat(
-        main.forceVariation ? [] : [renderMoveOf(ctx, main, passOpts), isWhite ? emptyMove(passOpts.conceal) : null]
+        main.forceVariation ? [] : [renderMoveOf(ctx, main, passOpts), isP1 ? emptyMove(passOpts.conceal) : null]
       )
       .concat([
         h(
@@ -85,7 +85,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes | 
           )
         ),
       ] as MaybeVNodes)
-      .concat(isWhite && mainChildren ? [moveView.renderIndex(main.ply, false), emptyMove(passOpts.conceal)] : [])
+      .concat(isP1 && mainChildren ? [moveView.renderIndex(main.ply, false), emptyMove(passOpts.conceal)] : [])
       .concat(mainChildren || []);
   }
   if (!cs[1]) return renderMoveAndChildrenOf(ctx, main, opts);
@@ -202,14 +202,14 @@ function renderInline(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
   );
 }
 
-function renderMainlineCommentsOf(ctx: Ctx, node: Tree.Node, conceal: Conceal, withColor: boolean): MaybeVNodes {
+function renderMainlineCommentsOf(ctx: Ctx, node: Tree.Node, conceal: Conceal, withPlayerIndex: boolean): MaybeVNodes {
   if (!ctx.ctrl.showComments || isEmpty(node.comments)) return [];
 
-  const colorClass = withColor ? (node.ply % 2 === 0 ? '.black ' : '.white ') : '';
+  const playerIndexClass = withPlayerIndex ? (node.ply % 2 === 0 ? '.p2 ' : '.p1 ') : '';
 
   return node.comments!.map(comment => {
     if (comment.by === 'playstrategy' && !ctx.showComputer) return;
-    let sel = 'comment' + colorClass;
+    let sel = 'comment' + playerIndexClass;
     if (comment.text.startsWith('Inaccuracy.')) sel += '.inaccuracy';
     else if (comment.text.startsWith('Mistake.')) sel += '.mistake';
     else if (comment.text.startsWith('Blunder.')) sel += '.blunder';

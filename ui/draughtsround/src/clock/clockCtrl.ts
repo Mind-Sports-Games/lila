@@ -8,7 +8,7 @@ export type Millis = number;
 
 interface ClockOpts {
   onFlag(): void;
-  soundColor?: Color;
+  soundPlayerIndex?: PlayerIndex;
   nvui: boolean;
 }
 
@@ -16,8 +16,8 @@ export interface ClockData {
   running: boolean;
   initial: Seconds;
   increment: Seconds;
-  white: Seconds;
-  black: Seconds;
+  p1: Seconds;
+  p2: Seconds;
   emerg: Seconds;
   showTenths: Prefs.ShowClockTenths;
   showBar: boolean;
@@ -25,13 +25,13 @@ export interface ClockData {
 }
 
 interface Times {
-  white: Millis;
-  black: Millis;
-  activeColor?: Color;
+  p1: Millis;
+  p2: Millis;
+  activePlayerIndex?: PlayerIndex;
   lastUpdate: Millis;
 }
 
-type ColorMap<T> = { [C in Color]: T };
+type PlayerIndexMap<T> = { [C in PlayerIndex]: T };
 
 export interface ClockElements {
   time?: HTMLElement;
@@ -45,8 +45,8 @@ interface EmergSound {
   next?: number;
   delay: Millis;
   playable: {
-    white: boolean;
-    black: boolean;
+    p1: boolean;
+    p2: boolean;
   };
 }
 
@@ -55,8 +55,8 @@ export class ClockController {
     play: () => playstrategy.sound.play('lowTime'),
     delay: 20000,
     playable: {
-      white: true,
-      black: true,
+      p1: true,
+      p2: true,
     },
   };
 
@@ -69,9 +69,9 @@ export class ClockController {
   emergMs: Millis;
 
   elements = {
-    white: {},
-    black: {},
-  } as ColorMap<ClockElements>;
+    p1: {},
+    p2: {},
+  } as PlayerIndexMap<ClockElements>;
 
   private tickCallback?: number;
 
@@ -90,40 +90,40 @@ export class ClockController {
 
     this.emergMs = 1000 * Math.min(60, Math.max(10, cdata.initial * 0.125));
 
-    this.setClock(d, cdata.white, cdata.black);
+    this.setClock(d, cdata.p1, cdata.p2);
   }
 
   timeRatio = (millis: number): number => Math.min(1, millis * this.timeRatioDivisor);
 
-  setClock = (d: RoundData, white: Seconds, black: Seconds, delay: Centis = 0) => {
+  setClock = (d: RoundData, p1: Seconds, p2: Seconds, delay: Centis = 0) => {
     const isClockRunning = game.playable(d) && (game.playedTurns(d) > 1 || d.clock!.running),
       delayMs = delay * 10;
 
     this.times = {
-      white: white * 1000,
-      black: black * 1000,
-      activeColor: isClockRunning ? d.game.player : undefined,
+      p1: p1 * 1000,
+      p2: p2 * 1000,
+      activePlayerIndex: isClockRunning ? d.game.player : undefined,
       lastUpdate: performance.now() + delayMs,
     };
 
     if (isClockRunning) this.scheduleTick(this.times[d.game.player], delayMs);
   };
 
-  addTime = (color: Color, time: Centis): void => {
-    this.times[color] += time * 10;
+  addTime = (playerIndex: PlayerIndex, time: Centis): void => {
+    this.times[playerIndex] += time * 10;
   };
 
   stopClock = (): Millis | void => {
-    const color = this.times.activeColor;
-    if (color) {
+    const playerIndex = this.times.activePlayerIndex;
+    if (playerIndex) {
       const curElapse = this.elapsed();
-      this.times[color] = Math.max(0, this.times[color] - curElapse);
-      this.times.activeColor = undefined;
+      this.times[playerIndex] = Math.max(0, this.times[playerIndex] - curElapse);
+      this.times.activePlayerIndex = undefined;
       return curElapse;
     }
   };
 
-  hardStopClock = (): void => (this.times.activeColor = undefined);
+  hardStopClock = (): void => (this.times.activePlayerIndex = undefined);
 
   private scheduleTick = (time: Millis, extraDelay: Millis) => {
     if (this.tickCallback !== undefined) clearTimeout(this.tickCallback);
@@ -139,33 +139,33 @@ export class ClockController {
   private tick = (): void => {
     this.tickCallback = undefined;
 
-    const color = this.times.activeColor;
-    if (color === undefined) return;
+    const playerIndex = this.times.activePlayerIndex;
+    if (playerIndex === undefined) return;
 
     const now = performance.now();
-    const millis = Math.max(0, this.times[color] - this.elapsed(now));
+    const millis = Math.max(0, this.times[playerIndex] - this.elapsed(now));
 
     this.scheduleTick(millis, 0);
     if (millis === 0) this.opts.onFlag();
-    else updateElements(this, this.elements[color], millis);
+    else updateElements(this, this.elements[playerIndex], millis);
 
-    if (this.opts.soundColor === color) {
-      if (this.emergSound.playable[color]) {
+    if (this.opts.soundPlayerIndex === playerIndex) {
+      if (this.emergSound.playable[playerIndex]) {
         if (millis < this.emergMs && !(now < this.emergSound.next!)) {
           this.emergSound.play();
           this.emergSound.next = now + this.emergSound.delay;
-          this.emergSound.playable[color] = false;
+          this.emergSound.playable[playerIndex] = false;
         }
       } else if (millis > 1.5 * this.emergMs) {
-        this.emergSound.playable[color] = true;
+        this.emergSound.playable[playerIndex] = true;
       }
     }
   };
 
   elapsed = (now = performance.now()) => Math.max(0, now - this.times.lastUpdate);
 
-  millisOf = (color: Color): Millis =>
-    this.times.activeColor === color ? Math.max(0, this.times[color] - this.elapsed()) : this.times[color];
+  millisOf = (playerIndex: PlayerIndex): Millis =>
+    this.times.activePlayerIndex === playerIndex ? Math.max(0, this.times[playerIndex] - this.elapsed()) : this.times[playerIndex];
 
-  isRunning = () => this.times.activeColor !== undefined;
+  isRunning = () => this.times.activePlayerIndex !== undefined;
 }

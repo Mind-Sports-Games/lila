@@ -10,10 +10,10 @@ export const makeCgOpts = (run: Run, canMove: boolean): CgConfig => {
   return {
     fen: makeFen(pos.toSetup()),
     orientation: run.pov,
-    myColor: run.pov,
-    turnColor: pos.turn,
+    myPlayerIndex: run.pov,
+    turnPlayerIndex: pos.turn,
     movable: {
-      color: run.pov,
+      playerIndex: run.pov,
       dests: canMove ? chessgroundDests(pos) : undefined,
     },
     check: !!pos.isCheck(),

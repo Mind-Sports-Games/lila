@@ -56,7 +56,7 @@ function hintZone(ctrl: GamebookPlayCtrl) {
 
 function renderFeedback(ctrl: GamebookPlayCtrl, state: State) {
   const fb = state.feedback,
-    color = ctrl.root.turnColor();
+    playerIndex = ctrl.root.turnPlayerIndex();
   if (fb === 'bad')
     return h(
       'div.feedback.act.bad' + (state.comment ? '.com' : ''),
@@ -80,10 +80,10 @@ function renderFeedback(ctrl: GamebookPlayCtrl, state: State) {
       'div',
       fb === 'play'
         ? [
-            h('div.no-square', h('piece.k-piece.' + color)),
+            h('div.no-square', h('piece.k-piece.' + playerIndex)),
             h('div.instruction', [
               h('strong', ctrl.trans.noarg('yourTurn')),
-              h('em', ctrl.trans('findTheBestMoveForSGPlayer', color)),
+              h('em', ctrl.trans('findTheBestMoveForSGPlayer', playerIndex)),
             ]),
           ]
         : ['Good move!']

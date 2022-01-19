@@ -21,8 +21,8 @@ function renderRatingDiff(rd: number | undefined): VNode | undefined {
   return;
 }
 
-function renderPlayer(ctrl: AnalyseCtrl, color: Color): VNode {
-  const p = game.getPlayer(ctrl.data, color);
+function renderPlayer(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): VNode {
+  const p = game.getPlayer(ctrl.data, playerIndex);
   if (p.user)
     return h(
       'a.user-link.ulpt',
@@ -35,7 +35,7 @@ function renderPlayer(ctrl: AnalyseCtrl, color: Color): VNode {
     'span',
     p.name ||
       (p.ai && 'Stockfish level ' + p.ai) ||
-      (ctrl.study && findTag(ctrl.study.data.chapter.tags, color)) ||
+      (ctrl.study && findTag(ctrl.study.data.chapter.tags, playerIndex)) ||
       'Anonymous'
   );
 }
@@ -46,16 +46,16 @@ const advices: Advice[] = [
   { kind: 'blunder', i18n: 'nbBlunders', symbol: '??' },
 ];
 
-function playerTable(ctrl: AnalyseCtrl, color: Color): VNode {
+function playerTable(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): VNode {
   const d = ctrl.data;
-  const acpl = d.analysis![color].acpl;
+  const acpl = d.analysis![playerIndex].acpl;
   return h('div.advice-summary__side', [
-    h('div.advice-summary__player', [h(`i.is.sgPlayer-icon.${color}`), renderPlayer(ctrl, color)]),
+    h('div.advice-summary__player', [h(`i.is.sgPlayer-icon.${playerIndex}`), renderPlayer(ctrl, playerIndex)]),
     ...advices.map(a => {
-      const nb: number = d.analysis![color][a.kind];
+      const nb: number = d.analysis![playerIndex][a.kind];
       const attrs: VNodeData = nb
         ? {
-            'data-sgPlayer': color,
+            'data-sgPlayer': playerIndex,
             'data-symbol': a.symbol,
           }
         : {};
@@ -79,13 +79,13 @@ function doRender(ctrl: AnalyseCtrl): VNode {
       hook: {
         insert: vnode => {
           $(vnode.elm as HTMLElement).on('click', 'div.symbol', function (this: Element) {
-            ctrl.jumpToGlyphSymbol($(this).data('color'), $(this).data('symbol'));
+            ctrl.jumpToGlyphSymbol($(this).data('sgPlayer'), $(this).data('symbol'));
           });
         },
       },
     },
     [
-      playerTable(ctrl, 'white'),
+      playerTable(ctrl, 'p1'),
       ctrl.study
         ? null
         : h(
@@ -97,7 +97,7 @@ function doRender(ctrl: AnalyseCtrl): VNode {
             },
             ctrl.trans.noarg('learnFromYourMistakes')
           ),
-      playerTable(ctrl, 'black'),
+      playerTable(ctrl, 'p2'),
     ]
   );
 }

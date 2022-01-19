@@ -6,11 +6,11 @@ import { opposite } from 'chessground/util';
 import { DrawModifiers, DrawShape } from 'chessground/draw';
 import AnalyseCtrl from './ctrl';
 
-function pieceDrop(key: cg.Key, role: cg.Role, color: Color): DrawShape {
+function pieceDrop(key: cg.Key, role: cg.Role, playerIndex: PlayerIndex): DrawShape {
   return {
     orig: key,
     piece: {
-      color,
+      playerIndex,
       role,
       scale: 0.8,
     },
@@ -18,10 +18,10 @@ function pieceDrop(key: cg.Key, role: cg.Role, color: Color): DrawShape {
   };
 }
 
-export function makeShapesFromUci(color: Color, uci: Uci, brush: string, modifiers?: DrawModifiers): DrawShape[] {
+export function makeShapesFromUci(playerIndex: PlayerIndex, uci: Uci, brush: string, modifiers?: DrawModifiers): DrawShape[] {
   const move = parseUci(uci)!;
   const to = makeSquare(move.to);
-  if (isDrop(move)) return [{ orig: to, brush }, pieceDrop(to, move.role, color)];
+  if (isDrop(move)) return [{ orig: to, brush }, pieceDrop(to, move.role, playerIndex)];
 
   const shapes: DrawShape[] = [
     {
@@ -31,19 +31,19 @@ export function makeShapesFromUci(color: Color, uci: Uci, brush: string, modifie
       modifiers,
     },
   ];
-  if (move.promotion) shapes.push(pieceDrop(to, move.promotion, color));
+  if (move.promotion) shapes.push(pieceDrop(to, move.promotion, playerIndex));
   return shapes;
 }
 
 export function compute(ctrl: AnalyseCtrl): DrawShape[] {
-  const color = ctrl.node.fen.includes(' w ') ? 'white' : 'black';
-  const rcolor = opposite(color);
+  const playerIndex = ctrl.node.fen.includes(' w ') ? 'p1' : 'p2';
+  const rPlayerIndex = opposite(playerIndex);
   if (ctrl.practice) {
     const hovering = ctrl.practice.hovering();
-    if (hovering) return makeShapesFromUci(color, hovering.uci, 'green');
+    if (hovering) return makeShapesFromUci(playerIndex, hovering.uci, 'green');
     const hint = ctrl.practice.hinting();
     if (hint) {
-      if (hint.mode === 'move') return makeShapesFromUci(color, hint.uci, 'paleBlue');
+      if (hint.mode === 'move') return makeShapesFromUci(playerIndex, hint.uci, 'paleBlue');
       else
         return [
           {
@@ -61,24 +61,24 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
   let shapes: DrawShape[] = [],
     badNode;
   if (ctrl.retro && (badNode = ctrl.retro.showBadNode())) {
-    return makeShapesFromUci(color, badNode.uci!, 'paleRed', {
+    return makeShapesFromUci(playerIndex, badNode.uci!, 'paleRed', {
       lineWidth: 8,
     });
   }
-  if (hovering && hovering.fen === nFen) shapes = shapes.concat(makeShapesFromUci(color, hovering.uci, 'paleBlue'));
+  if (hovering && hovering.fen === nFen) shapes = shapes.concat(makeShapesFromUci(playerIndex, hovering.uci, 'paleBlue'));
   if (ctrl.showAutoShapes() && ctrl.showComputer()) {
-    if (nEval.best) shapes = shapes.concat(makeShapesFromUci(rcolor, nEval.best, 'paleGreen'));
+    if (nEval.best) shapes = shapes.concat(makeShapesFromUci(rPlayerIndex, nEval.best, 'paleGreen'));
     if (!hovering && parseInt(instance.multiPv())) {
       let nextBest = ctrl.nextNodeBest();
       if (!nextBest && instance.enabled() && nCeval) nextBest = nCeval.pvs[0].moves[0];
-      if (nextBest) shapes = shapes.concat(makeShapesFromUci(color, nextBest, 'paleBlue'));
+      if (nextBest) shapes = shapes.concat(makeShapesFromUci(playerIndex, nextBest, 'paleBlue'));
       if (instance.enabled() && nCeval && nCeval.pvs[1] && !(ctrl.threatMode() && nThreat && nThreat.pvs.length > 2)) {
         nCeval.pvs.forEach(function (pv) {
           if (pv.moves[0] === nextBest) return;
-          const shift = winningChances.povDiff(color, nCeval.pvs[0], pv);
+          const shift = winningChances.povDiff(playerIndex, nCeval.pvs[0], pv);
           if (shift >= 0 && shift < 0.2) {
             shapes = shapes.concat(
-              makeShapesFromUci(color, pv.moves[0], 'paleGrey', {
+              makeShapesFromUci(playerIndex, pv.moves[0], 'paleGrey', {
                 lineWidth: Math.round(12 - shift * 50), // 12 to 2
               })
             );
@@ -90,13 +90,13 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
   if (instance.enabled() && ctrl.threatMode() && nThreat) {
     const [pv0, ...pv1s] = nThreat.pvs;
 
-    shapes = shapes.concat(makeShapesFromUci(rcolor, pv0.moves[0], pv1s.length > 0 ? 'paleRed' : 'red'));
+    shapes = shapes.concat(makeShapesFromUci(rPlayerIndex, pv0.moves[0], pv1s.length > 0 ? 'paleRed' : 'red'));
 
     pv1s.forEach(function (pv) {
-      const shift = winningChances.povDiff(rcolor, pv, pv0);
+      const shift = winningChances.povDiff(rPlayerIndex, pv, pv0);
       if (shift >= 0 && shift < 0.2) {
         shapes = shapes.concat(
-          makeShapesFromUci(rcolor, pv.moves[0], 'paleRed', {
+          makeShapesFromUci(rPlayerIndex, pv.moves[0], 'paleRed', {
             lineWidth: Math.round(11 - shift * 45), // 11 to 2
           })
         );
@@ -111,7 +111,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
       if (svg) {
         const move = parseUci(uci)!;
         const destSquare = san.startsWith('O-O') // castle, short or long
-          ? squareRank(move.to) === 0 // white castle
+          ? squareRank(move.to) === 0 // p1 castle
             ? san === 'O-O-O'
               ? 'c1'
               : 'g1'

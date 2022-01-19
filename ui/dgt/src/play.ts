@@ -33,8 +33,8 @@ export default function (token: string) {
     '(=)': 'Game ends in draw',
     'O-O-O': 'Castles queenside',
     'O-O': 'Castles kingside',
-    white: 'White',
-    black: 'Black',
+    p1: 'White',
+    p2: 'Black',
     'wins by': 'wins by',
     timeout: 'timeout',
     resignation: 'resignation',
@@ -58,7 +58,7 @@ export default function (token: string) {
    */
   const time = new Date(); //A Global time object
   let currentGameId = ''; //Track which is the current Game, in case there are several open games
-  let currentGameColor = ''; //Track which color is being currently played by the player. 'white' or 'black'
+  let currentGamePlayerIndex = ''; //Track which playerIndex is being currently played by the player. 'p1' or 'p2'
   let me: { id: string; username: string }; //Track my information
   const gameInfoMap = new Map(); //A collection of key values to store game immutable information of all open games
   const gameStateMap = new Map(); //A collection of key values to store the changing state of all open games
@@ -66,8 +66,8 @@ export default function (token: string) {
   const gameChessBoardMap = new Map<string, Chess>(); //A collection of chessops Boards representing the current board of the games
   let eventSteamStatus = { connected: false, lastEvent: time.getTime() }; //An object to store network status of the main eventStream
   const keywordsBase = [
-    'white',
-    'black',
+    'p1',
+    'p2',
     'K',
     'Q',
     'R',
@@ -216,7 +216,7 @@ export default function (token: string) {
 
     Examples:
     {"type":"gameStart","game":{"id":"kjKzl2MO"}}
-    {"type":"challenge","challenge":{"id":"WTr3JNcm","status":"created","challenger":{"id":"andrescavallin","name":"andrescavallin","title":null,"rating":1362,"provisional":true,"online":true,"lag":3},"destUser":{"id":"godking666","name":"Godking666","title":null,"rating":1910,"online":true,"lag":3},"variant":{"key":"standard","name":"Standard","short":"Std"},"rated":false,"speed":"rapid","timeControl":{"type":"clock","limit":900,"increment":10,"show":"15+10"},"color":"white","perf":{"icon":"#","name":"Rapid"}}}
+    {"type":"challenge","challenge":{"id":"WTr3JNcm","status":"created","challenger":{"id":"andrescavallin","name":"andrescavallin","title":null,"rating":1362,"provisional":true,"online":true,"lag":3},"destUser":{"id":"godking666","name":"Godking666","title":null,"rating":1910,"online":true,"lag":3},"variant":{"key":"standard","name":"Standard","short":"Std"},"rated":false,"speed":"rapid","timeControl":{"type":"clock","limit":900,"increment":10,"show":"15+10"},"playerIndex":"p1","perf":{"icon":"#","name":"Rapid"}}}
     {"type":"gameFinish","game":{"id":"MhG878ij"}}
  */
   async function connectToEventStream() {
@@ -293,19 +293,19 @@ export default function (token: string) {
   Examples:
    
   New Game
-  {"id":"972RKuuq","variant":{"key":"standard","name":"Standard","short":"Std"},"clock":{"initial":900000,"increment":10000},"speed":"rapid","perf":{"name":"Rapid"},"rated":false,"createdAt":1586647003562,"white":{"id":"godking666","name":"Godking666","title":null,"rating":1761},"black":{"id":"andrescavallin","name":"andrescavallin","title":null,"rating":1362,"provisional":true},"initialFen":"startpos","type":"gameFull","state":{"type":"gameState","moves":"e2e4","wtime":900000,"btime":900000,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"started"}}
+  {"id":"972RKuuq","variant":{"key":"standard","name":"Standard","short":"Std"},"clock":{"initial":900000,"increment":10000},"speed":"rapid","perf":{"name":"Rapid"},"rated":false,"createdAt":1586647003562,"p1":{"id":"godking666","name":"Godking666","title":null,"rating":1761},"p2":{"id":"andrescavallin","name":"andrescavallin","title":null,"rating":1362,"provisional":true},"initialFen":"startpos","type":"gameFull","state":{"type":"gameState","moves":"e2e4","wtime":900000,"btime":900000,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"started"}}
   First Move
   {"type":"gameState","moves":"e2e4","wtime":900000,"btime":900000,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"started"}
   Middle Game
   {"type":"gameState","moves":"e2e4 c7c6 g1f3 d7d5 e4e5 c8f5 d2d4 e7e6 h2h3 f5e4 b1d2 f8b4 c2c3 b4a5 d2e4 d5e4 f3d2 d8h4 g2g3 h4e7 d2e4 e7d7 e4d6 e8f8 d1f3 g8h6 c1h6 h8g8 h6g5 a5c7 e1c1 c7d6 e5d6 d7d6 g5f4 d6d5 f3d5 c6d5 f4d6 f8e8 d6b8 a8b8 f1b5 e8f8 h1e1 f8e7 d1d3 a7a6 b5a4 g8c8 a4b3 b7b5 b3d5 e7f8","wtime":903960,"btime":847860,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"started"}
   After reconnect
-  {"id":"ZQDjy4sa","variant":{"key":"standard","name":"Standard","short":"Std"},"clock":{"initial":900000,"increment":10000},"speed":"rapid","perf":{"name":"Rapid"},"rated":true,"createdAt":1586643869056,"white":{"id":"gg60","name":"gg60","title":null,"rating":1509},"black":{"id":"andrescavallin","name":"andrescavallin","title":null,"rating":1433,"provisional":true},"initialFen":"startpos","type":"gameFull","state":{"type":"gameState","moves":"e2e4 c7c6 g1f3 d7d5 e4e5 c8f5 d2d4 e7e6 h2h3 f5e4 b1d2 f8b4 c2c3 b4a5 d2e4 d5e4 f3d2 d8h4 g2g3 h4e7 d2e4 e7d7 e4d6 e8f8 d1f3 g8h6 c1h6 h8g8 h6g5 a5c7 e1c1 c7d6 e5d6 d7d6 g5f4 d6d5 f3d5 c6d5 f4d6 f8e8 d6b8 a8b8 f1b5 e8f8 h1e1 f8e7 d1d3 a7a6 b5a4 g8c8 a4b3 b7b5 b3d5 e7f8 d5b3 a6a5 a2a3 a5a4 b3a2 f7f6 e1e6 f8f7 e6b6","wtime":912940,"btime":821720,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"resign","winner":"white"}}
+  {"id":"ZQDjy4sa","variant":{"key":"standard","name":"Standard","short":"Std"},"clock":{"initial":900000,"increment":10000},"speed":"rapid","perf":{"name":"Rapid"},"rated":true,"createdAt":1586643869056,"p1":{"id":"gg60","name":"gg60","title":null,"rating":1509},"p2":{"id":"andrescavallin","name":"andrescavallin","title":null,"rating":1433,"provisional":true},"initialFen":"startpos","type":"gameFull","state":{"type":"gameState","moves":"e2e4 c7c6 g1f3 d7d5 e4e5 c8f5 d2d4 e7e6 h2h3 f5e4 b1d2 f8b4 c2c3 b4a5 d2e4 d5e4 f3d2 d8h4 g2g3 h4e7 d2e4 e7d7 e4d6 e8f8 d1f3 g8h6 c1h6 h8g8 h6g5 a5c7 e1c1 c7d6 e5d6 d7d6 g5f4 d6d5 f3d5 c6d5 f4d6 f8e8 d6b8 a8b8 f1b5 e8f8 h1e1 f8e7 d1d3 a7a6 b5a4 g8c8 a4b3 b7b5 b3d5 e7f8 d5b3 a6a5 a2a3 a5a4 b3a2 f7f6 e1e6 f8f7 e6b6","wtime":912940,"btime":821720,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"resign","winner":"p1"}}
   Draw Offered
   {"type":"gameState","moves":"e2e4 c7c6","wtime":880580,"btime":900000,"winc":10000,"binc":10000,"wdraw":false,"bdraw":true,"status":"started"}
   After draw accepted
   {"type":"gameState","moves":"e2e4 c7c6","wtime":865460,"btime":900000,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"draw"}
   Out of Time
-  {"type":"gameState","moves":"e2e3 e7e5","wtime":0,"btime":900000,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"outoftime","winner":"black"}
+  {"type":"gameState","moves":"e2e3 e7e5","wtime":0,"btime":900000,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"outoftime","winner":"p2"}
   Mate
   {"type":"gameState","moves":"e2e4 e7e5 f1c4 d7d6 d1f3 b8c6 f3f7","wtime":900480,"btime":907720,"winc":10000,"binc":10000,"wdraw":false,"bdraw":false,"status":"mate"}
   Promotion
@@ -443,7 +443,7 @@ export default function (token: string) {
     /*
     if (playableGames.length == 1) {
       currentGameId = playableGames[0].gameId;
-      attachCurrentGameIdToDGTBoard(); //Let the board know which color the player is actually playing and setup the position
+      attachCurrentGameIdToDGTBoard(); //Let the board know which playerIndex the player is actually playing and setup the position
       console.log('Active game updated. currentGameId: ' + currentGameId);
     }
     else 
@@ -500,7 +500,7 @@ export default function (token: string) {
           if (verbose)
             console.log('chooseCurrentGame - Position matched to gameId: ' + playableGames[Number(index)].gameId);
           currentGameId = playableGames[Number(index)].gameId;
-          attachCurrentGameIdToDGTBoard(); //Let the board know which color the player is actually playing and setup the position
+          attachCurrentGameIdToDGTBoard(); //Let the board know which playerIndex the player is actually playing and setup the position
           console.log('Active game updated. currentGameId: ' + currentGameId);
         } else {
           //The board matches currentGameId . No need to do anything.
@@ -571,17 +571,17 @@ export default function (token: string) {
             const normalizedMove = chess.normalizeMove(uciMove); //This is because chessops uses UCI_960
             if (normalizedMove && chess.isLegal(normalizedMove)) {
               //This is a good chance to get the move in SAN format
-              if (chess.turn == 'black')
+              if (chess.turn == 'p2')
                 lastSanMove = {
-                  player: 'black',
+                  player: 'p2',
                   move: makeSan(chess, normalizedMove),
-                  by: gameInfoMap.get(currentGameId).black.id,
+                  by: gameInfoMap.get(currentGameId).p2.id,
                 };
               else
                 lastSanMove = {
-                  player: 'white',
+                  player: 'p1',
                   move: makeSan(chess, normalizedMove),
-                  by: gameInfoMap.get(currentGameId).white.id,
+                  by: gameInfoMap.get(currentGameId).p1.id,
                 };
               chess.play(normalizedMove);
             }
@@ -598,14 +598,14 @@ export default function (token: string) {
   }
 
   /**
-   * Utility function to update which color is being played with the board
+   * Utility function to update which playerIndex is being played with the board
    */
   function attachCurrentGameIdToDGTBoard() {
     //Every times a new game is connected clear the console except on verbose
     if (!verbose) consoleOutput.innerHTML = '';
     //
-    if (me.id == gameInfoMap.get(currentGameId).white.id) currentGameColor = 'white';
-    else currentGameColor = 'black';
+    if (me.id == gameInfoMap.get(currentGameId).p1.id) currentGamePlayerIndex = 'p1';
+    else currentGamePlayerIndex = 'p2';
     //Send the position to LiveChess for synchronization
     sendBoardToLiveChess(gameChessBoardMap.get(currentGameId)!);
   }
@@ -641,13 +641,13 @@ export default function (token: string) {
         //var gameState = gameStateMap.get(keys[i]);
         const lastMove = getLastUCIMove(keys[i]);
         const versus =
-          gameInfo.black.id == me.id
-            ? (gameInfo.white.title !== null ? gameInfo.white.title : '@') + ' ' + gameInfo.white.name
-            : (gameInfo.black.title !== null ? gameInfo.black.title : '@') + ' ' + gameInfo.black.name;
+          gameInfo.p2.id == me.id
+            ? (gameInfo.p1.title !== null ? gameInfo.p1.title : '@') + ' ' + gameInfo.p1.name
+            : (gameInfo.p2.title !== null ? gameInfo.p2.title : '@') + ' ' + gameInfo.p2.name;
         playableGames.push({
           gameId: gameInfo.id,
           versus: versus,
-          'vs rating': gameInfo.black.id == me.id ? gameInfo.white.rating : gameInfo.black.rating,
+          'vs rating': gameInfo.p2.id == me.id ? gameInfo.p1.rating : gameInfo.p2.rating,
           'game rating': gameInfo.variant.short + ' ' + (gameInfo.rated ? 'rated' : 'unrated'),
           Timer:
             gameInfo.speed +
@@ -675,19 +675,19 @@ export default function (token: string) {
       console.log(''); //process.stdout.write("\n"); Changed to support browser
       /* Log before migrating to browser
       if (verbose) console.table({
-        'Title': { white: ((gameInfo.white.title !== null) ? gameInfo.white.title : '@'), black: ((gameInfo.black.title !== null) ? gameInfo.black.title : '@'), game: 'Id: ' + gameInfo.id },
-        'Username': { white: gameInfo.white.name, black: gameInfo.black.name, game: 'Status: ' + gameState.status },
-        'Rating': { white: gameInfo.white.rating, black: gameInfo.black.rating, game: gameInfo.variant.short + ' ' + (gameInfo.rated ? 'rated' : 'unrated') },
-        'Timer': { white: formattedTimer(gameState.wtime), black: formattedTimer(gameState.btime), game: gameInfo.speed + ' ' + ((gameInfo.clock !== null) ? (String(gameInfo.clock.initial / 60000) + "'+" + String(gameInfo.clock.increment / 1000) + "''") : '∞') },
-        'Last Move': { white: (lastMove.player == 'white' ? lastMove.move : '?'), black: (lastMove.player == 'black' ? lastMove.move : '?'), game: lastMove.player },
+        'Title': { p1: ((gameInfo.p1.title !== null) ? gameInfo.p1.title : '@'), p2: ((gameInfo.p2.title !== null) ? gameInfo.p2.title : '@'), game: 'Id: ' + gameInfo.id },
+        'Username': { p1: gameInfo.p1.name, p2: gameInfo.p2.name, game: 'Status: ' + gameState.status },
+        'Rating': { p1: gameInfo.p1.rating, p2: gameInfo.p2.rating, game: gameInfo.variant.short + ' ' + (gameInfo.rated ? 'rated' : 'unrated') },
+        'Timer': { p1: formattedTimer(gameState.wtime), p2: formattedTimer(gameState.btime), game: gameInfo.speed + ' ' + ((gameInfo.clock !== null) ? (String(gameInfo.clock.initial / 60000) + "'+" + String(gameInfo.clock.increment / 1000) + "''") : '∞') },
+        'Last Move': { p1: (lastMove.player == 'p1' ? lastMove.move : '?'), p2: (lastMove.player == 'p2' ? lastMove.move : '?'), game: lastMove.player },
       });
       */
       const innerTable =
         `<table class="dgt-table"><tr><th> - </th><th>Title</th><th>Username</th><th>Rating</th><th>Timer</th><th>Last Move</th><th>gameId: ${gameInfo.id}</th></tr>` +
-        `<tr><td>White</td><td>${gameInfo.white.title !== null ? gameInfo.white.title : '@'}</td><td>${
-          gameInfo.white.name
-        }</td><td>${gameInfo.white.rating}</td><td>${formattedTimer(gameState.wtime)}</td><td>${
-          lastMove.player == 'white' ? lastMove.move : '?'
+        `<tr><td>White</td><td>${gameInfo.p1.title !== null ? gameInfo.p1.title : '@'}</td><td>${
+          gameInfo.p1.name
+        }</td><td>${gameInfo.p1.rating}</td><td>${formattedTimer(gameState.wtime)}</td><td>${
+          lastMove.player == 'p1' ? lastMove.move : '?'
         }</td><td>${
           gameInfo.speed +
           ' ' +
@@ -695,10 +695,10 @@ export default function (token: string) {
             ? String(gameInfo.clock.initial / 60000) + "'+" + String(gameInfo.clock.increment / 1000) + "''"
             : '∞')
         }</td></tr>` +
-        `<tr><td>Black</td><td>${gameInfo.black.title !== null ? gameInfo.black.title : '@'}</td><td>${
-          gameInfo.black.name
-        }</td><td>${gameInfo.black.rating}</td><td>${formattedTimer(gameState.btime)}</td><td>${
-          lastMove.player == 'black' ? lastMove.move : '?'
+        `<tr><td>Black</td><td>${gameInfo.p2.title !== null ? gameInfo.p2.title : '@'}</td><td>${
+          gameInfo.p2.name
+        }</td><td>${gameInfo.p2.rating}</td><td>${formattedTimer(gameState.btime)}</td><td>${
+          lastMove.player == 'p2' ? lastMove.move : '?'
         }</td><td>Status: ${gameState.status}</td></tr>`;
       console.log(innerTable);
       switch (gameState.status) {
@@ -754,8 +754,8 @@ export default function (token: string) {
         const moves = gameState.moves.split(' ');
         if (verbose)
           console.log(`getLastUCIMove - ${moves.length} moves detected. Last one: ${moves[moves.length - 1]}`);
-        if (moves.length % 2 == 0) return { player: 'black', move: moves[moves.length - 1], by: gameInfo.black.id };
-        else return { player: 'white', move: moves[moves.length - 1], by: gameInfo.white.id };
+        if (moves.length % 2 == 0) return { player: 'p2', move: moves[moves.length - 1], by: gameInfo.p2.id };
+        else return { player: 'p1', move: moves[moves.length - 1], by: gameInfo.p1.id };
       }
     }
     if (verbose) console.log('getLastUCIMove - No moves.');
@@ -766,8 +766,8 @@ export default function (token: string) {
    * Feedback the user about the detected move
    *
    * @param lastMove JSON object with the move information
-   * @param wtime Remaining time for white
-   * @param btime Remaining time for black
+   * @param wtime Remaining time for p1
+   * @param btime Remaining time for p2
    */
   function announcePlay(lastMove: { player: string; move: string; by: string }) {
     //ttsSay(lastMove.player);
@@ -780,17 +780,17 @@ export default function (token: string) {
       moveText = lastMove.move;
       ttsSay(padBeforeNumbers(lastMove.move));
     }
-    if (lastMove.player == 'white') {
-      console.log('<span class="dgt-white-move">' + moveText + ' by White' + '</span>');
+    if (lastMove.player == 'p1') {
+      console.log('<span class="dgt-p1-move">' + moveText + ' by White' + '</span>');
     } else {
-      console.log('<span class="dgt-black-move">' + moveText + ' by Black' + '</span>');
+      console.log('<span class="dgt-p2-move">' + moveText + ' by Black' + '</span>');
     }
     //TODO
     //Give feedback on running out of time
   }
 
   function announceWinner(winner: string, status: string, message: string) {
-    if (winner == 'white') {
+    if (winner == 'p1') {
       console.log('  ' + status + '  -  ' + message);
     } else {
       console.log('  ' + status + '  -  ' + message);
@@ -800,7 +800,7 @@ export default function (token: string) {
   }
 
   function announceInvalidMove() {
-    if (currentGameColor == 'white') {
+    if (currentGamePlayerIndex == 'p1') {
       console.warn('  [ X X ]  - Illegal move by white.');
     } else {
       console.warn('  [ X X ]  - Illegal move by black.');
@@ -897,7 +897,7 @@ export default function (token: string) {
           if (movesToProcess > 1) {
             if (verbose)
               console.warn('onmessage - Multiple moves received on single message - movesToProcess: ' + movesToProcess);
-            if (localBoard.turn == currentGameColor) {
+            if (localBoard.turn == currentGamePlayerIndex) {
               //If more than one move is received when its the DGT board player's turn this may be a invalid move
               //Move will be quarantined by 2.5 seconds
               const quarantinedlastLegalParam = lastLegalParam;
@@ -934,8 +934,8 @@ export default function (token: string) {
             //if valid move on local chessops
             if (moveObject && localBoard.isLegal(moveObject)) {
               if (verbose) console.info('onmessage - Move is legal');
-              //if received move.color == this.currentGameColor
-              if (localBoard.turn == currentGameColor) {
+              //if received move.playerIndex == this.currentGamePlayerIndex
+              if (localBoard.turn == currentGamePlayerIndex) {
                 //This is a valid new move send it to playstrategy
                 if (verbose) console.info('onmessage - Valid Move played: ' + SANMove);
                 await validateAndSendBoardMove(moveObject);
@@ -1221,12 +1221,12 @@ export default function (token: string) {
   }
 
   /*
-  function opponent(): { color: string, id: string, name: string } {
-    //"white":{"id":"godking666","name":"Godking666","title":null,"rating":1761},"black":{"id":"andrescavallin","name":"andrescavallin","title":null
-    if (gameInfoMap.get(currentGameId).white.id == me.id)
-      return { color: 'black', id: gameInfoMap.get(currentGameId).black.id, name: gameInfoMap.get(currentGameId).black.name };
+  function opponent(): { playerIndex: string, id: string, name: string } {
+    //"p1":{"id":"godking666","name":"Godking666","title":null,"rating":1761},"p2":{"id":"andrescavallin","name":"andrescavallin","title":null
+    if (gameInfoMap.get(currentGameId).p1.id == me.id)
+      return { playerIndex: 'p2', id: gameInfoMap.get(currentGameId).p2.id, name: gameInfoMap.get(currentGameId).p2.name };
     else
-      return { color: 'white', id: gameInfoMap.get(currentGameId).white.id, name: gameInfoMap.get(currentGameId).white.name };
+      return { playerIndex: 'p1', id: gameInfoMap.get(currentGameId).p1.id, name: gameInfoMap.get(currentGameId).p1.name };
   }
   */
 
