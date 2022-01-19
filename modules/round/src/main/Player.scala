@@ -31,7 +31,7 @@ final private class Player(
           case Pov(game, _) if game.turns > Game.maxPlies =>
             round ! TooManyPlies
             fuccess(Nil)
-          case Pov(game, sgPlayer) if game playableBy sgPlayer =>
+          case Pov(game, playerIndex) if game playableBy playerIndex =>
             applyUci(game, uci, blur, lag, finalSquare)
               .leftMap(e => s"$pov $e")
               .fold(errs => fufail(ClientError(errs)), fuccess)
@@ -43,7 +43,7 @@ final private class Player(
               }
           case Pov(game, _) if game.finished           => fufail(ClientError(s"$pov game is finished"))
           case Pov(game, _) if game.aborted            => fufail(ClientError(s"$pov game is aborted"))
-          case Pov(game, sgPlayer) if !game.turnOf(sgPlayer) => fufail(ClientError(s"$pov not your turn"))
+          case Pov(game, playerIndex) if !game.turnOf(playerIndex) => fufail(ClientError(s"$pov not your turn"))
           case _                                       => fufail(ClientError(s"$pov move refused for some reason"))
         }
     }
@@ -53,7 +53,7 @@ final private class Player(
       case Pov(game, _) if game.turns > Game.maxPlies =>
         round ! TooManyPlies
         fuccess(Nil)
-      case Pov(game, sgPlayer) if game playableBy sgPlayer =>
+      case Pov(game, playerIndex) if game playableBy playerIndex =>
         applyUci(game, uci, blur = false, botLag)
           .fold(errs => fufail(ClientError(errs)), fuccess)
           .flatMap {
@@ -63,7 +63,7 @@ final private class Player(
           }
       case Pov(game, _) if game.finished           => fufail(GameIsFinishedError(pov))
       case Pov(game, _) if game.aborted            => fufail(ClientError(s"$pov game is aborted"))
-      case Pov(game, sgPlayer) if !game.turnOf(sgPlayer) => fufail(ClientError(s"$pov not your turn"))
+      case Pov(game, playerIndex) if !game.turnOf(playerIndex) => fufail(ClientError(s"$pov not your turn"))
       case _                                       => fufail(ClientError(s"$pov move refused for some reason"))
     }
 
@@ -175,7 +175,7 @@ final private class Player(
         }
       case _ => sys.error(s"Could not apply move: $uci")
     }).map {
-      case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnSGPlayer, withGrace = false)) => Flagged
+      case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
       case (newChessGame, moveOrDrop) =>
         MoveApplied(
           game.update(newChessGame, moveOrDrop, blur),
@@ -185,7 +185,7 @@ final private class Player(
 
   private def notifyMove(moveOrDrop: MoveOrDrop, game: Game): Unit = {
     import lila.hub.actorApi.round.{ CorresMoveEvent, MoveEvent, SimulMoveEvent }
-    val sgPlayer = moveOrDrop.fold(_.player, _.player)
+    val playerIndex = moveOrDrop.fold(_.player, _.player)
     val moveEvent = MoveEvent(
       gameId = game.id,
       fen = Forsyth.exportBoard(game.board.variant.gameLogic, game.board),
@@ -202,7 +202,7 @@ final private class Player(
       Bus.publish(
         CorresMoveEvent(
           move = moveEvent,
-          playerUserId = game.player(sgPlayer).userId,
+          playerUserId = game.player(playerIndex).userId,
           mobilePushable = game.mobilePushable,
           alarmable = game.alarmable,
           unlimited = game.isUnlimited
@@ -213,7 +213,7 @@ final private class Player(
     // publish simul moves
     for {
       simulId        <- game.simulId
-      opponentUserId <- game.player(!sgPlayer).userId
+      opponentUserId <- game.player(!playerIndex).userId
     } Bus.publish(
       SimulMoveEvent(move = moveEvent, simulId = simulId, opponentUserId = opponentUserId),
       "moveEventSimul"

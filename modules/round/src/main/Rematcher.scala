@@ -3,7 +3,7 @@ package lila.round
 import strategygames.format.Forsyth
 import strategygames.chess.variant._
 import strategygames.variant.Variant
-import strategygames.{ P2, Clock, Player => SGPlayer, Game => ChessGame, Board, Situation, History, P1, Mode, Piece, PieceMap, Pos }
+import strategygames.{ P2, Clock, Player => PlayerIndex, Game => ChessGame, Board, Situation, History, P1, Mode, Piece, PieceMap, Pos }
 import strategygames.chess.Castles
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
@@ -43,12 +43,12 @@ final private class Rematcher(
 
   private val chess960 = new ExpireSetMemo(3 hours)
 
-  def isOffering(pov: Pov): Boolean = offers.getIfPresent(pov.gameId).exists(_(pov.sgPlayer))
+  def isOffering(pov: Pov): Boolean = offers.getIfPresent(pov.gameId).exists(_(pov.playerIndex))
 
   def yes(pov: Pov): Fu[Events] =
     pov match {
-      case Pov(game, sgPlayer) if game.playerCouldRematch =>
-        if (isOffering(!pov) || game.opponent(sgPlayer).isAi)
+      case Pov(game, playerIndex) if game.playerCouldRematch =>
+        if (isOffering(!pov) || game.opponent(playerIndex).isAi)
           rematches.of(game.id).fold(rematchJoin(pov.game))(rematchExists(pov))
         else if (!declined.get(pov.flip.fullId) && rateLimit(pov.fullId)(true)(false))
           fuccess(rematchCreate(pov))
@@ -97,8 +97,8 @@ final private class Rematcher(
     pov.opponent.userId foreach { forId =>
       Bus.publish(lila.hub.actorApi.round.RematchOffer(pov.gameId), s"rematchFor:$forId")
     }
-    offers.put(pov.gameId, Offers(p1 = pov.sgPlayer.p1, p2 = pov.sgPlayer.p2))
-    List(Event.RematchOffer(by = pov.sgPlayer.some))
+    offers.put(pov.gameId, Offers(p1 = pov.playerIndex.p1, p2 = pov.playerIndex.p2))
+    List(Event.RematchOffer(by = pov.playerIndex.some))
   }
 
   private def chessPieceMap(pieces: strategygames.chess.PieceMap): PieceMap =
@@ -141,7 +141,7 @@ final private class Rematcher(
           situation = Situation(
             game.variant.gameLogic,
             board = board,
-            player = situation.fold[SGPlayer](P1)(_.situation.player)
+            player = situation.fold[PlayerIndex](P1)(_.situation.player)
           ),
           clock = game.clock map { c =>
             Clock(c.config)
@@ -160,13 +160,13 @@ final private class Rematcher(
     } yield game
   }
 
-  private def returnPlayer(game: Game, sgPlayer: SGPlayer, users: List[User]): lila.game.Player =
-    game.opponent(sgPlayer).aiLevel match {
-      case Some(ai) => lila.game.Player.make(sgPlayer, ai.some)
+  private def returnPlayer(game: Game, playerIndex: PlayerIndex, users: List[User]): lila.game.Player =
+    game.opponent(playerIndex).aiLevel match {
+      case Some(ai) => lila.game.Player.make(playerIndex, ai.some)
       case None =>
         lila.game.Player.make(
-          sgPlayer,
-          game.opponent(sgPlayer).userId.flatMap { id =>
+          playerIndex,
+          game.opponent(playerIndex).userId.flatMap { id =>
             users.find(_.id == id)
           },
           PerfPicker.mainOrDefault(game)
@@ -188,6 +188,6 @@ final private class Rematcher(
 private object Rematcher {
 
   case class Offers(p1: Boolean, p2: Boolean) {
-    def apply(sgPlayer: SGPlayer) = sgPlayer.fold(p1, p2)
+    def apply(playerIndex: PlayerIndex) = playerIndex.fold(p1, p2)
   }
 }

@@ -1,7 +1,7 @@
 package lila.api
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 import play.api.i18n.Lang
 import play.api.libs.json._
 
@@ -178,7 +178,7 @@ final private[api] class RoundApi(
       pov: Pov,
       pref: Pref,
       initialFen: Option[FEN],
-      orientation: SGPlayer,
+      orientation: PlayerIndex,
       owner: Boolean,
       me: Option[User]
   ) =
@@ -194,7 +194,7 @@ final private[api] class RoundApi(
       pov: Pov,
       pref: Pref,
       initialFen: Option[FEN],
-      orientation: SGPlayer,
+      orientation: PlayerIndex,
       me: Option[User]
   ) =
     withTree(pov, analysis = none, initialFen, WithFlags(opening = true))(
@@ -276,7 +276,7 @@ final private[api] class RoundApi(
         )
         .add(
           "team",
-          v.teamVs.map(_.teams(pov.sgPlayer)) map { id =>
+          v.teamVs.map(_.teams(pov.playerIndex)) map { id =>
             Json.obj("name" -> getTeamName(id))
           }
         )

@@ -105,7 +105,7 @@ export default function (ctrl: TournamentController): VNode {
                 h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
                 h('td', playerName(p.op)),
                 h('td', p.op.rating),
-                h('td.is.sgPlayer-icon.' + p.playerIndex),
+                h('td.is.playerIndex-icon.' + p.playerIndex),
                 h('td', res),
               ]
             );

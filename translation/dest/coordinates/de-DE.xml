@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Koordinaten</string>
   <string name="coordinateTraining">Koordinatentraining</string>
-  <string name="averageScoreAsSGPlayerX">Durchschnittliche Punktzahl als %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Durchschnittliche Punktzahl als %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Durchschnittliche Punktzahl als Weiß: %s</string>
   <string name="averageScoreAsBlackX">Durchschnittliche Punktzahl als Schwarz: %s</string>
   <string name="knowingTheChessBoard">Die Koordinaten des Schachbretts zu kennen ist eine wichtige Fähigkeit:</string>

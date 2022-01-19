@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 
 // times are expressed in seconds
 case class CorrespondenceClock(
@@ -13,13 +13,13 @@ case class CorrespondenceClock(
 
   def daysPerTurn = increment / 60 / 60 / 24
 
-  def remainingTime(c: SGPlayer) = c.fold(p1Time, p2Time)
+  def remainingTime(c: PlayerIndex) = c.fold(p1Time, p2Time)
 
-  def outoftime(c: SGPlayer) = remainingTime(c) == 0
+  def outoftime(c: PlayerIndex) = remainingTime(c) == 0
 
-  def moretimeable(c: SGPlayer) = remainingTime(c) < (increment - hourSeconds)
+  def moretimeable(c: PlayerIndex) = remainingTime(c) < (increment - hourSeconds)
 
-  def giveTime(c: SGPlayer) =
+  def giveTime(c: PlayerIndex) =
     c.fold(
       copy(p1Time = p1Time + daySeconds),
       copy(p2Time = p2Time + daySeconds)

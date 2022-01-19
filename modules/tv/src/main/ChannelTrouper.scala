@@ -1,6 +1,6 @@
 package lila.tv
 
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 
@@ -89,18 +89,18 @@ final private[tv] class ChannelTrouper(
   private type Heuristic = Game => Int
 
   private val heuristics: List[Heuristic] = List(
-    ratingHeuristic(SGPlayer.P1),
-    ratingHeuristic(SGPlayer.P2),
-    titleHeuristic(SGPlayer.P1),
-    titleHeuristic(SGPlayer.P2)
+    ratingHeuristic(PlayerIndex.P1),
+    ratingHeuristic(PlayerIndex.P2),
+    titleHeuristic(PlayerIndex.P1),
+    titleHeuristic(PlayerIndex.P2)
   )
 
-  private def ratingHeuristic(sgPlayer: SGPlayer): Heuristic =
-    game => game.player(sgPlayer).stableRating | 1300
+  private def ratingHeuristic(playerIndex: PlayerIndex): Heuristic =
+    game => game.player(playerIndex).stableRating | 1300
 
-  private def titleHeuristic(sgPlayer: SGPlayer): Heuristic = game =>
+  private def titleHeuristic(playerIndex: PlayerIndex): Heuristic = game =>
     ~game
-      .player(sgPlayer)
+      .player(playerIndex)
       .some
       .flatMap { p =>
         p.stableRating.exists(2100 <) ?? p.userId

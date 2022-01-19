@@ -23,7 +23,7 @@ private object GameToRoot {
   private def endComment(game: Game) =
     game.finished option {
       import lila.tree.Node.Comment
-      val result = strategygames.Player.showResult(game.winnerSGPlayer)
+      val result = strategygames.Player.showResult(game.winnerPlayerIndex)
       val status = lila.game.StatusText(game)
       val text   = s"$result $status"
       Comment(Comment.Id.make, Comment.Text(text), Comment.Author.PlayStrategy)

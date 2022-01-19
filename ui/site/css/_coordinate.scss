@@ -97,10 +97,10 @@ $mq-col3: $mq-x-large;
     }
   }
 
-  form.sgPlayer {
+  form.playerIndex {
     margin-top: $block-gap;
 
-    .sgPlayer i {
+    .playerIndex i {
       display: block;
       width: 30px;
       height: 30px;
@@ -109,15 +109,15 @@ $mq-col3: $mq-x-large;
       padding: 0;
     }
 
-    .sgPlayer_1 i {
+    .playerIndex_1 i {
       background-image: url(../piece/chess/cburnett/wK.svg);
     }
 
-    .sgPlayer_2 i {
+    .playerIndex_2 i {
       background-image: url(../images/wbK.svg);
     }
 
-    .sgPlayer_3 i {
+    .playerIndex_3 i {
       background-image: url(../piece/chess/cburnett/bK.svg);
     }
   }
@@ -189,7 +189,7 @@ $mq-col3: $mq-x-large;
 
   &.play .start,
   #next_coord,
-  &.play form.sgPlayer {
+  &.play form.playerIndex {
     display: none;
   }
 
@@ -220,7 +220,7 @@ $mq-col3: $mq-x-large;
       opacity: 0;
     }
 
-    form.sgPlayer {
+    form.playerIndex {
       margin-bottom: $block-gap;
     }
   }

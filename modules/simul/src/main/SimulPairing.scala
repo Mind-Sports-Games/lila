@@ -7,7 +7,7 @@ final case class SimulPairing(
     gameId: String,
     status: strategygames.Status,
     wins: Option[Boolean],
-    hostSGPlayer: strategygames.Player
+    hostPlayerIndex: strategygames.Player
 ) {
 
   def finished = status >= strategygames.Status.Aborted
@@ -22,9 +22,9 @@ final case class SimulPairing(
       wins = w map player.is
     )
 
-  def winnerSGPlayer =
+  def winnerPlayerIndex =
     wins.map { w =>
-      if (w) !hostSGPlayer else hostSGPlayer
+      if (w) !hostPlayerIndex else hostPlayerIndex
     }
 }
 
@@ -36,6 +36,6 @@ private[simul] object SimulPairing {
       gameId = IdGenerator.uncheckedGame,
       status = strategygames.Status.Created,
       wins = none,
-      hostSGPlayer = strategygames.P1
+      hostPlayerIndex = strategygames.P1
     )
 }

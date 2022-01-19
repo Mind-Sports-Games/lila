@@ -20,9 +20,9 @@ final class Tv(
       (lila.tv.Tv.Channel.byKey get chanKey).fold(notFound)(playstrategyTv)
     }
 
-  def sides(gameId: String, sgPlayer: String) =
+  def sides(gameId: String, playerIndex: String) =
     Open { implicit ctx =>
-      OptionFuResult(strategygames.Player.fromName(sgPlayer) ?? { env.round.proxyRepo.pov(gameId, _) }) { pov =>
+      OptionFuResult(strategygames.Player.fromName(playerIndex) ?? { env.round.proxyRepo.pov(gameId, _) }) { pov =>
         env.game.crosstableApi.withMatchup(pov.game) map { ct =>
           Ok(html.tv.side.sides(pov, ct))
         }

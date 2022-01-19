@@ -10,14 +10,14 @@ final private class AbortListener(
 
   def apply(pov: Pov): Funit =
     (pov.game.isCorrespondence ?? recreateSeek(pov)) >>-
-      cancelSGPlayerIncrement(pov) >>-
+      cancelPlayerIndexIncrement(pov) >>-
       lobbyTrouper.registerAbortedGame(pov.game)
 
-  private def cancelSGPlayerIncrement(pov: Pov): Unit =
+  private def cancelPlayerIndexIncrement(pov: Pov): Unit =
     if (pov.game.source.exists(s => s == Source.Lobby || s == Source.Pool)) pov.game.userIds match {
       case List(u1, u2) =>
-        userRepo.incSGPlayer(u1, -1)
-        userRepo.incSGPlayer(u2, 1)
+        userRepo.incPlayerIndex(u1, -1)
+        userRepo.incPlayerIndex(u2, 1)
       case _ =>
     }
 

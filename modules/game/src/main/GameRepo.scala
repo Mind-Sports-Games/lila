@@ -4,7 +4,7 @@ import scala.language.existentials
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ P2, Player => SGPlayer, Mode, Status, P1 }
+import strategygames.{ P2, Player => PlayerIndex, Mode, Status, P1 }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.commands.WriteResult
@@ -34,12 +34,12 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
     def game(gameId: ID): Fu[Option[LightGame]] = coll.byId[LightGame](gameId, LightGame.projection)
 
-    def pov(gameId: ID, sgPlayer: SGPlayer): Fu[Option[LightPov]] =
+    def pov(gameId: ID, playerIndex: PlayerIndex): Fu[Option[LightPov]] =
       game(gameId) dmap2 { (game: LightGame) =>
-        LightPov(game, game player sgPlayer)
+        LightPov(game, game player playerIndex)
       }
 
-    def pov(ref: PovRef): Fu[Option[LightPov]] = pov(ref.gameId, ref.sgPlayer)
+    def pov(ref: PovRef): Fu[Option[LightPov]] = pov(ref.gameId, ref.playerIndex)
 
     def gamesFromPrimary(gameIds: Seq[ID]): Fu[List[LightGame]] =
       coll.byOrderedIds[LightGame, ID](gameIds, projection = LightGame.projection.some)(_.id)
@@ -55,8 +55,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def finished(gameId: ID): Fu[Option[Game]] =
     coll.one[Game]($id(gameId) ++ Query.finished)
 
-  def player(gameId: ID, sgPlayer: SGPlayer): Fu[Option[Player]] =
-    game(gameId) dmap2 { _ player sgPlayer }
+  def player(gameId: ID, playerIndex: PlayerIndex): Fu[Option[Player]] =
+    game(gameId) dmap2 { _ player playerIndex }
 
   def player(gameId: ID, playerId: ID): Fu[Option[Player]] =
     game(gameId) dmap { gameOption =>
@@ -66,20 +66,20 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def player(playerRef: PlayerRef): Fu[Option[Player]] =
     player(playerRef.gameId, playerRef.playerId)
 
-  def pov(gameId: ID, sgPlayer: SGPlayer): Fu[Option[Pov]] =
+  def pov(gameId: ID, playerIndex: PlayerIndex): Fu[Option[Pov]] =
     game(gameId) dmap2 { (game: Game) =>
-      Pov(game, game player sgPlayer)
+      Pov(game, game player playerIndex)
     }
 
-  def pov(gameId: ID, sgPlayer: String): Fu[Option[Pov]] =
-    SGPlayer.fromName(sgPlayer) ?? (pov(gameId, _))
+  def pov(gameId: ID, playerIndex: String): Fu[Option[Pov]] =
+    PlayerIndex.fromName(playerIndex) ?? (pov(gameId, _))
 
   def pov(playerRef: PlayerRef): Fu[Option[Pov]] =
     game(playerRef.gameId) dmap { _ flatMap { _ playerIdPov playerRef.playerId } }
 
   def pov(fullId: ID): Fu[Option[Pov]] = pov(PlayerRef(fullId))
 
-  def pov(ref: PovRef): Fu[Option[Pov]] = pov(ref.gameId, ref.sgPlayer)
+  def pov(ref: PovRef): Fu[Option[Pov]] = pov(ref.gameId, ref.playerIndex)
 
   def remove(id: ID) = coll.delete.one($id(id)).void
 
@@ -162,7 +162,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .one(
         $id(pov.gameId),
         $set(
-          s"${pov.sgPlayer.fold(F.p1Player, F.p2Player)}.${Player.BSONFields.berserk}" -> true
+          s"${pov.playerIndex.fold(F.p1Player, F.p2Player)}.${Player.BSONFields.berserk}" -> true
         )
       )
       .void
@@ -286,7 +286,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll
       .updateField(
         $id(pov.gameId),
-        holdAlertField(pov.sgPlayer),
+        holdAlertField(pov.playerIndex),
         alert
       )
       .void
@@ -302,8 +302,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       holdAlertField(P1) -> true,
       holdAlertField(P2) -> true
     )
-    private def holdAlertOf(doc: Bdoc, sgPlayer: SGPlayer): Option[Player.HoldAlert] =
-      doc.child(sgPlayer.fold("p0", "p1")).flatMap(_.getAsOpt[Player.HoldAlert](Player.BSONFields.holdAlert))
+    private def holdAlertOf(doc: Bdoc, playerIndex: PlayerIndex): Option[Player.HoldAlert] =
+      doc.child(playerIndex.fold("p0", "p1")).flatMap(_.getAsOpt[Player.HoldAlert](Player.BSONFields.holdAlert))
 
     def game(game: Game): Fu[Player.HoldAlert.Map] =
       coll.one[Bdoc](
@@ -311,7 +311,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         holdAlertProjection
       ) map {
         _.fold(Player.HoldAlert.emptyMap) { doc =>
-          SGPlayer.Map(p1 = holdAlertOf(doc, P1), p2 = holdAlertOf(doc, P2))
+          PlayerIndex.Map(p1 = holdAlertOf(doc, P1), p2 = holdAlertOf(doc, P2))
         }
       }
 
@@ -323,14 +323,14 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         )
         .cursor[Bdoc](ReadPreference.secondaryPreferred)
         .list() map { docs =>
-        val idSGPlayers = povs.view.map { p =>
-          p.gameId -> p.sgPlayer
+        val idPlayerIndexs = povs.view.map { p =>
+          p.gameId -> p.playerIndex
         }.toMap
         val holds = for {
           doc   <- docs
           id    <- doc string "_id"
-          sgPlayer <- idSGPlayers get id
-          holds <- holdAlertOf(doc, sgPlayer)
+          playerIndex <- idPlayerIndexs get id
+          holds <- holdAlertOf(doc, playerIndex)
         } yield id -> holds
         holds.toMap
       }
@@ -340,11 +340,11 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.exists(
       $doc(
         $id(pov.gameId),
-        holdAlertField(pov.sgPlayer) $exists true
+        holdAlertField(pov.playerIndex) $exists true
       )
     )
 
-  private def holdAlertField(sgPlayer: SGPlayer) = s"p${sgPlayer.fold(0, 1)}.${Player.BSONFields.holdAlert}"
+  private def holdAlertField(playerIndex: PlayerIndex) = s"p${playerIndex.fold(0, 1)}.${Player.BSONFields.holdAlert}"
 
   private val finishUnsets = $doc(
     F.positionHashes                              -> true,
@@ -358,7 +358,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def finish(
       id: ID,
-      winnerSGPlayer: Option[SGPlayer],
+      winnerPlayerIndex: Option[PlayerIndex],
       winnerId: Option[String],
       status: Status
   ) =
@@ -368,7 +368,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         "$set",
         $doc(
           F.winnerId    -> winnerId,
-          F.winnerSGPlayer -> winnerSGPlayer.map(_.p1),
+          F.winnerPlayerIndex -> winnerPlayerIndex.map(_.p1),
           F.status      -> status
         )
       ) ++ $doc(

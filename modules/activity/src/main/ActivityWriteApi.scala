@@ -25,7 +25,7 @@ final class ActivityWriteApi(
           a <- getOrCreate(userId)
           setGames = !game.isCorrespondence ?? $doc(
             ActivityFields.games -> a.games.orDefault
-              .add(pt, Score.make(game wonBy player.sgPlayer, RatingProg make player))
+              .add(pt, Score.make(game wonBy player.playerIndex, RatingProg make player))
           )
           setCorres = game.hasCorrespondenceClock ?? $doc(
             ActivityFields.corres -> a.corres.orDefault.add(GameId(game.id), moved = false, ended = true)

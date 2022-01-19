@@ -4,7 +4,7 @@ import controllers.routes
 import play.api.libs.json.Json
 import scala.language.reflectiveCalls
 
-import strategygames.{ Player => SGPlayer, GameLogic }
+import strategygames.{ Player => PlayerIndex, GameLogic }
 import strategygames.format.FEN
 
 import lila.api.Context
@@ -34,7 +34,7 @@ object captcha {
           div(cls := "challenge")(
             views.html.board.bits.mini(
               FEN(GameLogic.Chess(), captcha.fenBoard),
-              SGPlayer.fromP1(captcha.p1),
+              PlayerIndex.fromP1(captcha.p1),
               variantKey = "standard"
             ) {
               div(
@@ -45,8 +45,8 @@ object captcha {
           ),
           div(cls := "captcha-explanation")(
             label(cls := "form-label")(
-              if (captcha.p1) trans.sgPlayerCheckmatesInOneMove(trans.white.txt())
-              else trans.sgPlayerCheckmatesInOneMove(trans.black.txt())
+              if (captcha.p1) trans.playerIndexCheckmatesInOneMove(trans.white.txt())
+              else trans.playerIndexCheckmatesInOneMove(trans.black.txt())
             ),
             br,
             br,

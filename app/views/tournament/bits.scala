@@ -71,7 +71,7 @@ object bits {
     trans.performance,
     trans.tournamentComplete,
     trans.movesPlayed,
-    trans.sgPlayerWins,
+    trans.playerIndexWins,
     trans.draws,
     trans.nextXTournament,
     trans.averageOpponent,

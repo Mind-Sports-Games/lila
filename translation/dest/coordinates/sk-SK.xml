@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Súradnice</string>
   <string name="coordinateTraining">Tréning znalosti šachovnicových súradníc</string>
-  <string name="averageScoreAsSGPlayerX">Priemerné skóre ako %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Priemerné skóre ako %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Priemerné skóre ako biely: %s</string>
   <string name="averageScoreAsBlackX">Priemerné skóre ako čierny: %s</string>
   <string name="knowingTheChessBoard">Znalosť šachovnicových súradníc je pre šach veľmi dôležitá:</string>

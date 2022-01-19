@@ -1,6 +1,6 @@
 package lila.playban
 
-import strategygames.{ Player => SGPlayer, Speed }
+import strategygames.{ Player => PlayerIndex, Speed }
 import scala.math.{ log10, sqrt }
 
 import lila.game.Game
@@ -25,7 +25,7 @@ object RageSit {
   case object Reset      extends Update
   case class Inc(v: Int) extends Update
 
-  def imbalanceInc(game: Game, loser: SGPlayer) =
+  def imbalanceInc(game: Game, loser: PlayerIndex) =
     Inc {
       {
         game.chess.board.materialImbalance match {

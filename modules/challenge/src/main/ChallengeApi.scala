@@ -86,15 +86,15 @@ final class ChallengeApi(
       c: Challenge,
       user: Option[User],
       sid: Option[String],
-      sgPlayer: Option[strategygames.Player] = None
+      playerIndex: Option[strategygames.Player] = None
   ): Fu[Option[Pov]] =
     acceptQueue {
       if (user.exists(_.isBot) && !Game.isBotCompatible(strategygames.Speed(c.clock.map(_.config))))
         fuccess(none)
       else if (c.challengerIsOpen)
-        repo.setChallenger(c.setChallenger(user, sid), sgPlayer) inject none
+        repo.setChallenger(c.setChallenger(user, sid), playerIndex) inject none
       else
-        joiner(c, user, sgPlayer).flatMap {
+        joiner(c, user, playerIndex).flatMap {
           _ ?? { pov =>
             (repo accept c) >>- {
               uncacheAndNotify(c)

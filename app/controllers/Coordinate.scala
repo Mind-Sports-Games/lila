@@ -28,10 +28,10 @@ final class Coordinate(env: Env) extends LilaController(env) {
       }
     }
 
-  def sgPlayer =
+  def playerIndex =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      env.coordinate.forms.sgPlayer
+      env.coordinate.forms.playerIndex
         .bindFromRequest()
         .fold(
           _ => fuccess(BadRequest),

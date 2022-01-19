@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.{ Status => S, Clock, Mode, Player => SGPlayer, P2, P1, GameLogic }
+import strategygames.{ Status => S, Clock, Mode, Player => PlayerIndex, P2, P1, GameLogic }
 import strategygames.variant.Variant
 import controllers.routes
 import play.api.i18n.Lang
@@ -21,7 +21,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     lila.app.ui.OpenGraph(
       image = cdnUrl(routes.Export.gameThumbnail(pov.gameId).url).some,
       title = titleGame(pov.game),
-      url = s"$netBaseUrl${routes.Round.watcher(pov.gameId, pov.sgPlayer.name).url}",
+      url = s"$netBaseUrl${routes.Round.watcher(pov.gameId, pov.playerIndex.name).url}",
       description = describePov(pov)
     )
 
@@ -173,28 +173,28 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.PerpetualCheck => trans.perpetualCheck.txt()
       case S.Resign =>
         game.loser match {
-          case Some(p) if p.sgPlayer.p1 => trans.sgPlayerResigned(game.playerTrans(P1)).v
-          case _                        => trans.sgPlayerResigned(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexResigned(game.playerTrans(P1)).v
+          case _                        => trans.playerIndexResigned(game.playerTrans(P2)).v
         }
       case S.UnknownFinish => trans.finished.txt()
       case S.Stalemate     => trans.stalemate.txt()
       case S.Timeout =>
         game.loser match {
-          case Some(p) if p.sgPlayer.p1 => trans.sgPlayerLeftTheGame(game.playerTrans(P1)).v
-          case Some(_)                  => trans.sgPlayerLeftTheGame(game.playerTrans(P2)).v
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexLeftTheGame(game.playerTrans(P1)).v
+          case Some(_)                  => trans.playerIndexLeftTheGame(game.playerTrans(P2)).v
           case None                     => trans.draw.txt()
         }
       case S.Draw => trans.draw.txt()
       case S.Outoftime =>
-        (game.turnSGPlayer, game.loser) match {
-          case (P1, Some(_)) => trans.sgPlayerTimeOut(game.playerTrans(P1)).v
-          case (P1, None)    => trans.sgPlayerTimeOut(game.playerTrans(P1)).v + " • " + trans.draw.txt()
-          case (P2, Some(_)) => trans.sgPlayerTimeOut(game.playerTrans(P2)).v
-          case (P2, None)    => trans.sgPlayerTimeOut(game.playerTrans(P2)).v + " • " + trans.draw.txt()
+        (game.turnPlayerIndex, game.loser) match {
+          case (P1, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P1)).v
+          case (P1, None)    => trans.playerIndexTimeOut(game.playerTrans(P1)).v + " • " + trans.draw.txt()
+          case (P2, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P2)).v
+          case (P2, None)    => trans.playerIndexTimeOut(game.playerTrans(P2)).v + " • " + trans.draw.txt()
         }
       case S.NoStart =>
-        val sgPlayer = game.loser.fold(SGPlayer.p1)(_.sgPlayer).name.capitalize
-        s"$sgPlayer didn't move"
+        val playerIndex = game.loser.fold(PlayerIndex.p1)(_.playerIndex).name.capitalize
+        s"$playerIndex didn't move"
       case S.Cheat => trans.cheatDetected.txt()
       case S.VariantEnd =>
         game.variant match {
@@ -208,9 +208,9 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case _ => ""
     }
 
-  def gameTitle(game: Game, sgPlayer: SGPlayer): String = {
-    val u1 = playerText(game player sgPlayer, withRating = true)
-    val u2 = playerText(game opponent sgPlayer, withRating = true)
+  def gameTitle(game: Game, playerIndex: PlayerIndex): String = {
+    val u1 = playerText(game player playerIndex, withRating = true)
+    val u2 = playerText(game opponent playerIndex, withRating = true)
     val clock = game.clock ?? { c =>
       " • " + c.config.show
     }
@@ -220,29 +220,29 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
 
   // p1Username 1-0 p2Username
   def gameSummary(p1UserId: String, p2UserId: String, finished: Boolean, result: Option[Boolean]) = {
-    val res = if (finished) SGPlayer.showResult(result map SGPlayer.fromP1) else "*"
+    val res = if (finished) PlayerIndex.showResult(result map PlayerIndex.fromP1) else "*"
     s"${usernameOrId(p1UserId)} $res ${usernameOrId(p2UserId)}"
   }
 
   def gameResult(game: Game) =
-    if (game.finished) SGPlayer.showResult(game.winnerSGPlayer)
+    if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex)
     else "*"
 
   def gameLink(
       game: Game,
-      sgPlayer: SGPlayer,
+      playerIndex: PlayerIndex,
       ownerLink: Boolean = false,
       tv: Boolean = false
   )(implicit ctx: Context): String = {
     val owner = ownerLink ?? ctx.me.flatMap(game.player)
     if (tv) routes.Tv.index
     else
-      owner.fold(routes.Round.watcher(game.id, sgPlayer.name)) { o =>
-        routes.Round.player(game fullIdOf o.sgPlayer)
+      owner.fold(routes.Round.watcher(game.id, playerIndex.name)) { o =>
+        routes.Round.player(game fullIdOf o.playerIndex)
       }
   }.toString
 
-  def gameLink(pov: Pov)(implicit ctx: Context): String = gameLink(pov.game, pov.sgPlayer)
+  def gameLink(pov: Pov)(implicit ctx: Context): String = gameLink(pov.game, pov.playerIndex)
 
   def challengeTitle(c: lila.challenge.Challenge)(implicit lang: Lang) = {
     val speed = c.clock.map(_.config).fold(strategygames.Speed.Correspondence.name) { clock =>

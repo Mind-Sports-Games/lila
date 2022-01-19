@@ -199,7 +199,7 @@ final class JsonView(
             Json
               .obj(
                 "id"     -> pov.gameId,
-                "color"  -> pov.sgPlayer.name,
+                "color"  -> pov.playerIndex.name,
                 "op"     -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
                 "win"    -> score.flatMap(_.isWin),
                 "status" -> pov.game.status.id,
@@ -308,7 +308,7 @@ final class JsonView(
           )
         }
       )
-      .add("winner" -> game.winnerSGPlayer.map(_.name))
+      .add("winner" -> game.winnerPlayerIndex.map(_.name))
       .add("boardSize" -> boardSizeJson(game.variant))
   }
 

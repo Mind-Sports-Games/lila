@@ -173,7 +173,7 @@ final class JsonView(
       "attempts"   -> puzzle.plays,
       "fen"        -> puzzle.fen.value,
       //puzzles are only chess currently so assume P1 -> white P2 -> black
-      "color"      -> puzzle.sgPlayer.classicName,
+      "color"      -> puzzle.playerIndex.classicName,
       "initialPly" -> (puzzle.initialPly + 1),
       "gameId"     -> puzzle.gameId,
       "lines" -> puzzle.line.tail.reverse.foldLeft[JsValue](JsString("win")) { case (acc, move) =>

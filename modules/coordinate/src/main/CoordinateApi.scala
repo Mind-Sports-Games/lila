@@ -6,7 +6,7 @@ import reactivemongo.api.ReadPreference
 import lila.user.User
 import lila.db.dsl._
 
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 
 final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -35,7 +35,7 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
       )
       .void
 
-  def bestScores(userIds: List[User.ID]): Fu[Map[User.ID, SGPlayer.Map[Int]]] =
+  def bestScores(userIds: List[User.ID]): Fu[Map[User.ID, PlayerIndex.Map[Int]]] =
     scoreColl
       .aggregateList(
         maxDocs = Int.MaxValue,
@@ -54,7 +54,7 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
       .map {
         _.flatMap { doc =>
           doc.string("_id") map {
-            _ -> SGPlayer.Map(
+            _ -> PlayerIndex.Map(
               ~doc.int("p1"),
               ~doc.int("p2")
             )

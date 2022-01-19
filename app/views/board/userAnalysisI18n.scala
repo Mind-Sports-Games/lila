@@ -32,20 +32,20 @@ object userAnalysisI18n {
     trans.gameAborted,
     trans.checkmate,
     trans.perpetualCheck,
-    trans.sgPlayerResigned,
+    trans.playerIndexResigned,
     trans.stalemate,
-    trans.sgPlayerLeftTheGame,
+    trans.playerIndexLeftTheGame,
     trans.draw,
-    trans.sgPlayerTimeOut,
+    trans.playerIndexTimeOut,
     trans.playingRightNow,
-    trans.sgPlayerIsVictorious,
+    trans.playerIndexIsVictorious,
     trans.promotion,
     trans.cheatDetected,
     trans.kingInTheCenter,
     trans.threeChecks,
     trans.checkersConnected,
     trans.variantEnding,
-    trans.sgPlayerPlays,
+    trans.playerIndexPlays,
     trans.gameOver,
     trans.importPgn,
     trans.requestAComputerAnalysis,
@@ -84,7 +84,7 @@ object userAnalysisI18n {
     trans.bestWasX,
     trans.youBrowsedAway,
     trans.resumePractice,
-    trans.sgPlayerWinsGame,
+    trans.playerIndexWinsGame,
     trans.theGameIsADraw,
     trans.yourTurn,
     trans.computerThinking,
@@ -93,7 +93,7 @@ object userAnalysisI18n {
     trans.getAHint,
     trans.evaluatingYourMove,
     // gamebook
-    trans.puzzle.findTheBestMoveForSGPlayer
+    trans.puzzle.findTheBestMoveForPlayerIndex
   ).map(_.key)
 
   private val cevalTranslations: Vector[MessageKey] = Vector(

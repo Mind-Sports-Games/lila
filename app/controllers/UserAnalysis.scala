@@ -3,7 +3,7 @@ package controllers
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ P2, Player => SGPlayer, GameLogic, Mode, Situation, P1 }
+import strategygames.{ P2, Player => PlayerIndex, GameLogic, Mode, Situation, P1 }
 import play.api.libs.json.Json
 import play.api.mvc._
 import scala.concurrent.duration._
@@ -42,7 +42,7 @@ final class UserAnalysis(
         .filter(_.trim.nonEmpty)
         .orElse(get("fen")) map(s => FEN.clean(variant.gameLogic, s))
       val pov         = makePov(decodedFen, variant)
-      val orientation = get("sgPlayer").flatMap(SGPlayer.fromName) | pov.sgPlayer
+      val orientation = get("playerIndex").flatMap(PlayerIndex.fromName) | pov.playerIndex
       env.api.roundApi
         .userAnalysisJson(pov, ctx.pref, decodedFen, orientation, owner = false, me = ctx.me) map { data =>
         EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov)))
@@ -75,21 +75,21 @@ final class UserAnalysis(
       from.situation.player
     )
 
-  def game(id: String, sgPlayer: String) =
+  def game(id: String, playerIndex: String) =
     Open { implicit ctx =>
       OptionFuResult(env.game.gameRepo game id) { g =>
         env.round.proxyRepo upgradeIfPresent g flatMap { game =>
-          val pov = Pov(game, SGPlayer.fromName(sgPlayer) | P1)
+          val pov = Pov(game, PlayerIndex.fromName(playerIndex) | P1)
           negotiate(
             html =
-              if (game.replayable) Redirect(routes.Round.watcher(game.id, sgPlayer)).fuccess
+              if (game.replayable) Redirect(routes.Round.watcher(game.id, playerIndex)).fuccess
               else {
                 val owner = isMyPov(pov)
                 for {
                   initialFen <- env.game.gameRepo initialFen game.id
                   data <-
                     env.api.roundApi
-                      .userAnalysisJson(pov, ctx.pref, initialFen, pov.sgPlayer, owner = owner, me = ctx.me)
+                      .userAnalysisJson(pov, ctx.pref, initialFen, pov.playerIndex, owner = owner, me = ctx.me)
                 } yield NoCache(
                   Ok(
                     html.board
@@ -149,7 +149,7 @@ final class UserAnalysis(
                     pov,
                     ctx.pref,
                     initialFen = fen,
-                    pov.sgPlayer,
+                    pov.playerIndex,
                     owner = false,
                     me = ctx.me
                   ) map JsonOk

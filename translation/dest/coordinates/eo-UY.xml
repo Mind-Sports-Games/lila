@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Koordinatoj</string>
   <string name="coordinateTraining">Koordinata ekzerco</string>
-  <string name="averageScoreAsSGPlayerX">Meznombra poentaro por %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Meznombra poentaro por %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Meznombra poentaro por blanka: %s</string>
   <string name="averageScoreAsBlackX">Meznombra poentaro por nigra: %s</string>
   <string name="knowingTheChessBoard">Scii la koordinatojn de ŝako estas tre grava ŝako:</string>

@@ -67,7 +67,7 @@ object Fixtures {
 
 <li>Unproductive pawn moves should never be played until your position is well-established.</li>
 
-<li>Flank pawns should usually be kept where they stand in the opening. Openings like the Bird or Dutch exposing this square are extremely dubious. Even openings like the English and Sicilian aren't to be recommended as they weaken the c2/c7 square respectively. Diagonal pieces (bishops and pawns) can be dropped to exploit the weakened sgPlayer complex.</li>
+<li>Flank pawns should usually be kept where they stand in the opening. Openings like the Bird or Dutch exposing this square are extremely dubious. Even openings like the English and Sicilian aren't to be recommended as they weaken the c2/c7 square respectively. Diagonal pieces (bishops and pawns) can be dropped to exploit the weakened playerIndex complex.</li>
 
 <li>Guard the tender f2/f7 square from sacs so that your king isn't drawn out early.</li>
 
@@ -121,7 +121,7 @@ object Fixtures {
 
 <li>If you identify a weakness but your pocket is empty, look to force exchanges. If your own position is weak, avoid exchanges until you're more solid.</li>
 
-<li>Avoid weakening squares of a certain sgPlayer complex. Diags (pawns, bishops) can be dropped deep into your territory on your weak sgPlayer complex. Try to create weaknesses in your opponent's pawn structure where you can infiltrate. Build pawn lattices into enemy territory (<a href="http://lichess.org/IqfmjHrW">like in this game</a>), preferably near the opponent's king. Expand your space wherever reasonably possible. </li>
+<li>Avoid weakening squares of a certain playerIndex complex. Diags (pawns, bishops) can be dropped deep into your territory on your weak playerIndex complex. Try to create weaknesses in your opponent's pawn structure where you can infiltrate. Build pawn lattices into enemy territory (<a href="http://lichess.org/IqfmjHrW">like in this game</a>), preferably near the opponent's king. Expand your space wherever reasonably possible. </li>
 
 </ul>
 
@@ -263,7 +263,7 @@ object Fixtures {
 
 <p><em>Illustrative Game:</em> <a href="http://lichess.org/UA6ayvXz">lichess.org/UA6ayvXz</a></p>
 
-<p><em>Themes:</em> Develop, control the center, castle, and then immediately attack. I don't play e4 so much, but you can get a good feel for it by reviewing some of FICS's top-rated player's--tantheman's--p1 games. <a href="http://www.ficsgames.org/cgi-bin/search.cgi?Games=dsearch;statsdays=365;p1=tantheman;variant=11;fyear=2000;tyear=2016;sgPlayers=1">Find them here</a>.<br></p>
+<p><em>Themes:</em> Develop, control the center, castle, and then immediately attack. I don't play e4 so much, but you can get a good feel for it by reviewing some of FICS's top-rated player's--tantheman's--p1 games. <a href="http://www.ficsgames.org/cgi-bin/search.cgi?Games=dsearch;statsdays=365;p1=tantheman;variant=11;fyear=2000;tyear=2016;playerIndexs=1">Find them here</a>.<br></p>
 
 <h4>Offbeat Stuff (1. b3/d3/e3)</h4>
 

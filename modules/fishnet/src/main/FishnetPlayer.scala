@@ -38,7 +38,7 @@ final class FishnetPlayer(
         clock     = g.clock | defaultClock
         totalTime = clock.estimateTotalTime.centis
         if totalTime > 20 * 100
-        delay = (clock.remainingTime(pov.sgPlayer).centis atMost totalTime) * delayFactor
+        delay = (clock.remainingTime(pov.playerIndex).centis atMost totalTime) * delayFactor
         accel = 1 - ((g.turns - 20) atLeast 0 atMost 100) / 150f
         sleep = (delay * accel) atMost 500
         if sleep > 25

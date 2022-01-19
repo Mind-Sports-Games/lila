@@ -146,7 +146,7 @@
   <string name="blackIsSlightlyBetter">Melnajiem nedaudz labāka pozīcija</string>
   <string name="whiteIsBetter">Baltajiem labāka pozīcija</string>
   <string name="blackIsBetter">Melnajiem labāka pozīcija</string>
-  <string name="sgPlayerIsWinning">%s tuvojas uzvarai</string>
+  <string name="playerIndexIsWinning">%s tuvojas uzvarai</string>
   <string name="whiteIsWinning">Baltie tuvojas uzvarai</string>
   <string name="blackIsWinning">Melnie tuvojas uzvarai</string>
   <string name="novelty" comment="novelty&#10;&#10;A move in the opening that has not been played before.&#10;https://en.wikipedia.org/wiki/Glossary_of_chess#theoretical_novelty">Oriģināls gājiens</string>

@@ -19,7 +19,7 @@
   <string name="black">Сиеҳҳо</string>
   <string name="randomColor">Тарафи тасодуфӣ</string>
   <string name="createAGame">Бозии нав</string>
-  <string name="sgPlayerIsVictorious">Ғалабаи %s</string>
+  <string name="playerIndexIsVictorious">Ғалабаи %s</string>
   <string name="whiteIsVictorious">Ғалабаи сафедҳо</string>
   <string name="blackIsVictorious">Ғалабаи сиеҳҳо</string>
   <string name="kingInTheCenter">Шоҳ дар марказ аст</string>
@@ -29,7 +29,7 @@
   <string name="newOpponent">Ҳарифи нав</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Ҳарифи шумо бозии нав пешниҳод дорад</string>
   <string name="joinTheGame">Ба бози муттахид шудан</string>
-  <string name="sgPlayerPlays">Гашти %s</string>
+  <string name="playerIndexPlays">Гашти %s</string>
   <string name="whitePlays">Гашти сафедҳо</string>
   <string name="blackPlays">Гашти сиеҳҳо</string>
   <string name="opponentLeftChoices">Ҳарифи шумо аз бози баромад. Шумо метованед ғалаба ё дуранг эълон кунед.</string>
@@ -38,10 +38,10 @@
   <string name="forceDraw">Дуранг</string>
   <string name="talkInChat">Дар диалог якдигарро эҳтиром кунед!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Касе яккум ба ин URL биёяд бо шумо бози мекунад.</string>
-  <string name="sgPlayerResigned">%s таслим кардан</string>
+  <string name="playerIndexResigned">%s таслим кардан</string>
   <string name="whiteResigned">Сафедҳо таслим кардан</string>
   <string name="blackResigned">Сиеҳҳо таслим кардан</string>
-  <string name="sgPlayerLeftTheGame">%s аз бози баромадан</string>
+  <string name="playerIndexLeftTheGame">%s аз бози баромадан</string>
   <string name="whiteLeftTheGame">Сафедҳо аз бози баромадан</string>
   <string name="blackLeftTheGame">Сиеҳҳо аз бози баромадан</string>
   <string name="viewTheComputerAnalysis">Анализи компютериро тамошо кардан</string>

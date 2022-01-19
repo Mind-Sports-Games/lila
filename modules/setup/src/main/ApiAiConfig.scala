@@ -6,7 +6,7 @@ import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition }
 
 import lila.game.{ Game, Player, Pov, Source }
-import lila.lobby.SGPlayer
+import lila.lobby.PlayerIndex
 import lila.user.User
 
 final case class ApiAiConfig(
@@ -14,7 +14,7 @@ final case class ApiAiConfig(
     fenVariant: Option[Variant],
     clock: Option[Clock.Config],
     daysO: Option[Int],
-    sgPlayer: SGPlayer,
+    playerIndex: PlayerIndex,
     level: Int,
     fen: Option[FEN] = None
 ) extends Config
@@ -40,11 +40,11 @@ final case class ApiAiConfig(
       Game
         .make(
           chess = chessGame,
-          p1Player = creatorSGPlayer.fold(
+          p1Player = creatorPlayerIndex.fold(
             Player.make(P1, user, perfPicker),
             Player.make(P1, level.some)
           ),
-          p2Player = creatorSGPlayer.fold(
+          p2Player = creatorPlayerIndex.fold(
             Player.make(P2, level.some),
             Player.make(P2, user, perfPicker)
           ),
@@ -56,7 +56,7 @@ final case class ApiAiConfig(
         .sloppy
     } start
 
-  def pov(user: Option[User]) = Pov(game(user), creatorSGPlayer)
+  def pov(user: Option[User]) = Pov(game(user), creatorPlayerIndex)
 
   def autoVariant =
     if (variant.standard && fen.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
@@ -81,7 +81,7 @@ object ApiAiConfig extends BaseConfig {
       fenVariant = none,
       clock = cl,
       daysO = d,
-      sgPlayer = SGPlayer.orDefault(~c),
+      playerIndex = PlayerIndex.orDefault(~c),
       level = l,
       fen = pos.map(f => FEN.apply(variant.gameLogic, f))
     ).autoVariant

@@ -50,12 +50,12 @@ function playerTable(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): VNode {
   const d = ctrl.data;
   const acpl = d.analysis![playerIndex].acpl;
   return h('div.advice-summary__side', [
-    h('div.advice-summary__player', [h(`i.is.sgPlayer-icon.${playerIndex}`), renderPlayer(ctrl, playerIndex)]),
+    h('div.advice-summary__player', [h(`i.is.playerIndex-icon.${playerIndex}`), renderPlayer(ctrl, playerIndex)]),
     ...advices.map(a => {
       const nb: number = d.analysis![playerIndex][a.kind];
       const attrs: VNodeData = nb
         ? {
-            'data-sgPlayer': playerIndex,
+            'data-playerIndex': playerIndex,
             'data-symbol': a.symbol,
           }
         : {};
@@ -79,7 +79,7 @@ function doRender(ctrl: AnalyseCtrl): VNode {
       hook: {
         insert: vnode => {
           $(vnode.elm as HTMLElement).on('click', 'div.symbol', function (this: Element) {
-            ctrl.jumpToGlyphSymbol($(this).data('sgPlayer'), $(this).data('symbol'));
+            ctrl.jumpToGlyphSymbol($(this).data('playerIndex'), $(this).data('symbol'));
           });
         },
       },

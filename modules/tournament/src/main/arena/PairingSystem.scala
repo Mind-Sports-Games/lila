@@ -7,7 +7,7 @@ final private[tournament] class PairingSystem(
     pairingRepo: PairingRepo,
     playerRepo: PlayerRepo,
     userRepo: UserRepo,
-    sgPlayerHistoryApi: SGPlayerHistoryApi
+    playerIndexHistoryApi: PlayerIndexHistoryApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     idGenerator: lila.game.IdGenerator
@@ -69,20 +69,20 @@ final private[tournament] class PairingSystem(
   private def prepsToPairings(preps: List[Pairing.Prep]): Fu[List[Pairing]] =
     idGenerator.games(preps.size) map { ids =>
       preps.zip(ids).map { case (prep, id) =>
-        //sgPlayer was chosen in prepWithSGPlayer function
+        //playerIndex was chosen in prepWithPlayerIndex function
         prep.toPairing(id)
       }
     }
 
   private def proximityPairings(tour: Tournament, players: List[RankedPlayer]): List[Pairing.Prep] =
-    addSGPlayerHistory(players) grouped 2 collect { case List(p1, p2) =>
-      Pairing.prepWithSGPlayer(tour, p1, p2)
+    addPlayerIndexHistory(players) grouped 2 collect { case List(p1, p2) =>
+      Pairing.prepWithPlayerIndex(tour, p1, p2)
     } toList
 
   private def bestPairings(data: Data, players: RankedPlayers): List[Pairing.Prep] =
-    (players.sizeIs > 1) ?? AntmaPairing(data, addSGPlayerHistory(players))
+    (players.sizeIs > 1) ?? AntmaPairing(data, addPlayerIndexHistory(players))
 
-  private def addSGPlayerHistory(players: RankedPlayers) = players.map(_ withSGPlayerHistory sgPlayerHistoryApi.get)
+  private def addPlayerIndexHistory(players: RankedPlayers) = players.map(_ withPlayerIndexHistory playerIndexHistoryApi.get)
 }
 
 private object PairingSystem {
@@ -106,8 +106,8 @@ private object PairingSystem {
    * bottom rank factor = 300
    */
   def rankFactorFor(
-      players: List[RankedPlayerWithSGPlayerHistory]
-  ): (RankedPlayerWithSGPlayerHistory, RankedPlayerWithSGPlayerHistory) => Int = {
+      players: List[RankedPlayerWithPlayerIndexHistory]
+  ): (RankedPlayerWithPlayerIndexHistory, RankedPlayerWithPlayerIndexHistory) => Int = {
     val maxRank = players.maxBy(_.rank).rank
     (a, b) => {
       val rank = Math.min(a.rank, b.rank)

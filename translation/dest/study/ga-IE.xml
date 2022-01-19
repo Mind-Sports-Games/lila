@@ -150,13 +150,13 @@
   <string name="zugzwang" comment="zugzwang&#10;What zugzwang is: https://playstrategy.org/practice/intermediate-tactics/zugzwang/9cKgYrHb/ybYJ9gNa&#10;&#10;This specific string is a label that can be applied to a position in a study, to indicate one side is in zugzwang.">Zugzwang</string>
   <string name="equalPosition">Suíomh cothrom</string>
   <string name="unclearPosition" comment="unclearPosition&#10;It is unclear who is winning or losing.">Suíomh doiléir</string>
-  <string name="sgPlayerIsSlightlyBetter">Tá %s píosa beag níos fearr</string>
+  <string name="playerIndexIsSlightlyBetter">Tá %s píosa beag níos fearr</string>
   <string name="whiteIsSlightlyBetter">Tá bán píosa beag níos fearr</string>
   <string name="blackIsSlightlyBetter">Tá dubh píosa beag níos fearr</string>
-  <string name="sgPlayerIsBetter">Tá %s níos fearr</string>
+  <string name="playerIndexIsBetter">Tá %s níos fearr</string>
   <string name="whiteIsBetter">Tá bán níos fearr</string>
   <string name="blackIsBetter">Tá dubh níos fearr</string>
-  <string name="sgPlayerIsWinning">%s ag bua</string>
+  <string name="playerIndexIsWinning">%s ag bua</string>
   <string name="whiteIsWinning">Bán ag bua</string>
   <string name="blackIsWinning">Dubh ag bua</string>
   <string name="novelty" comment="novelty&#10;&#10;A move in the opening that has not been played before.&#10;https://en.wikipedia.org/wiki/Glossary_of_chess#theoretical_novelty">Nuaga</string>

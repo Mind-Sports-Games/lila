@@ -3,7 +3,7 @@ package lila.setup
 import strategygames.{ GameFamily, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import lila.lobby.SGPlayer
+import lila.lobby.PlayerIndex
 import lila.rating.PerfType
 import lila.game.PerfPicker
 
@@ -15,7 +15,7 @@ case class FriendConfig(
     increment: Int,
     days: Int,
     mode: Mode,
-    sgPlayer: SGPlayer,
+    playerIndex: PlayerIndex,
     fen: Option[FEN] = None,
     microMatch: Boolean = false
 ) extends HumanConfig
@@ -23,7 +23,7 @@ case class FriendConfig(
 
   val strictFen = false
 
-  def >> = (s"{$variant.gameFamily.id}_{$variant.id}", fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, sgPlayer.name, fen.map(_.value), microMatch).some
+  def >> = (s"{$variant.gameFamily.id}_{$variant.id}", fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, playerIndex.name, fen.map(_.value), microMatch).some
 
   def isPersistent = timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
 
@@ -47,7 +47,7 @@ object FriendConfig extends BaseHumanConfig {
       increment = i,
       days = d,
       mode = m.fold(Mode.default)(Mode.orDefault),
-      sgPlayer = SGPlayer(c) err "Invalid sgPlayer " + c,
+      playerIndex = PlayerIndex(c) err "Invalid playerIndex " + c,
       fen = fen.map(f => FEN.apply(gameLogic, f)),
       microMatch = mm
     )
@@ -61,7 +61,7 @@ object FriendConfig extends BaseHumanConfig {
     increment = 8,
     days = 2,
     mode = Mode.default,
-    sgPlayer = SGPlayer.default
+    playerIndex = PlayerIndex.default
   )
 
   import lila.db.BSON
@@ -81,7 +81,7 @@ object FriendConfig extends BaseHumanConfig {
         increment = r int "i",
         days = r int "d",
         mode = Mode orDefault (r int "m"),
-        sgPlayer = SGPlayer.P1,
+        playerIndex = PlayerIndex.P1,
         fen = r.getO[FEN]("f") filter (_.value.nonEmpty),
         microMatch = ~r.boolO("mm")
       )

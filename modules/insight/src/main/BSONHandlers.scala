@@ -3,7 +3,7 @@ package lila.insight
 import reactivemongo.api.bson._
 
 import strategygames.chess.opening.{ Ecopening, EcopeningDB }
-import strategygames.{ Player => SGPlayer, GameFamily, GameLogic, Role }
+import strategygames.{ Player => PlayerIndex, GameFamily, GameLogic, Role }
 import lila.db.BSON
 import lila.db.dsl._
 import lila.rating.BSONHandlers.perfTypeIdHandler
@@ -127,7 +127,7 @@ private object BSONHandlers {
           id = r.str(id),
           number = r.int(number),
           userId = r.str(userId),
-          sgPlayer = r.get[SGPlayer](sgPlayer),
+          playerIndex = r.get[PlayerIndex](playerIndex),
           perf = r.get[PerfType](perf),
           eco = r.getO[Ecopening](eco),
           myCastling = r.get[Castling](myCastling),
@@ -148,7 +148,7 @@ private object BSONHandlers {
           id               -> e.id,
           number           -> e.number,
           userId           -> e.userId,
-          sgPlayer            -> e.sgPlayer,
+          playerIndex            -> e.playerIndex,
           perf             -> e.perf,
           eco              -> e.eco,
           myCastling       -> e.myCastling,

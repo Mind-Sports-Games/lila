@@ -6,7 +6,7 @@ import strategygames.chess.format.pgn.{ Parser }
 import strategygames.format.pgn.{ ParsedPgn, Reader, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.{ Variant => StratVariant }
-import strategygames.{ Board, Player => SGPlayer, GameLogic, Mode, Replay, Status }
+import strategygames.{ Board, Player => PlayerIndex, GameLogic, Mode, Replay, Status }
 import play.api.data._
 import play.api.data.Forms._
 import scala.util.chaining._
@@ -37,7 +37,7 @@ object ImporterForm {
   }
 }
 
-private case class TagResult(status: Status, winner: Option[SGPlayer])
+private case class TagResult(status: Status, winner: Option[PlayerIndex])
 case class Preprocessed(
     game: NewGame,
     replay: Replay,
@@ -114,12 +114,12 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           .make(
             chess = game,
             p1Player = Player.makeImported(
-              SGPlayer.P1,
+              PlayerIndex.P1,
               parsed.tags(_.P1),
               parsed.tags(_.P1Elo).flatMap(_.toIntOption)
             ),
             p2Player = Player.makeImported(
-              SGPlayer.P2,
+              PlayerIndex.P2,
               parsed.tags(_.P2),
               parsed.tags(_.P2Elo).flatMap(_.toIntOption)
             ),
@@ -135,7 +135,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             case None =>
               parsed.tags.resultPlayer
                 .map {
-                  case Some(sgPlayer) => TagResult(status, sgPlayer.some)
+                  case Some(playerIndex) => TagResult(status, playerIndex.some)
                   case None if status == Status.Outoftime => TagResult(status, none)
                   case None                               => TagResult(Status.Draw, none)
                   case _ => sys.error("Not implemented for draughts yet")

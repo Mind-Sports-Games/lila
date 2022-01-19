@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 import strategygames.format.FEN
 import lila.game.Game
 import lila.user.User
@@ -16,19 +16,19 @@ case class SwissPairing(
     microMatchGameId: Option[Game.ID],
     openingFEN: Option[FEN]
 ) {
-  def apply(c: SGPlayer)             = c.fold(p1, p2)
+  def apply(c: PlayerIndex)             = c.fold(p1, p2)
   def gameId                      = id
   def players                     = List(p1, p2)
   def has(userId: User.ID)        = p1 == userId || p2 == userId
-  def sgPlayerOf(userId: User.ID)    = SGPlayer.fromP1(p1 == userId)
+  def playerIndexOf(userId: User.ID)    = PlayerIndex.fromP1(p1 == userId)
   def opponentOf(userId: User.ID) = if (p1 == userId) p2 else p1
   def winner: Option[User.ID]     = (~status.toOption).map(apply)
   def isOngoing                   = status.isLeft
   def resultFor(userId: User.ID)  = winner.map(userId.==)
-  def p1Wins                   = status == Right(Some(SGPlayer.P1))
-  def p2Wins                   = status == Right(Some(SGPlayer.P2))
+  def p1Wins                   = status == Right(Some(PlayerIndex.P1))
+  def p2Wins                   = status == Right(Some(PlayerIndex.P2))
   def isDraw                      = status == Right(None)
-  def strResultOf(sgPlayer: SGPlayer)   = status.fold(_ => "*", _.fold("1/2")(c => if (c == sgPlayer) "1" else "0"))
+  def strResultOf(playerIndex: PlayerIndex)   = status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
 }
 
 case class SwissPairingGameIds(
@@ -48,20 +48,20 @@ case class SwissPairingGames(
   def finishedOrAborted =
     game.finishedOrAborted && (!isMicroMatch || microMatchGame.fold(false)(_.finishedOrAborted))
   def outoftime = if (game.outoftime(true)) List(game) else List() ++ microMatchGame.filter(_.outoftime(true))
-  def winnerSGPlayer =
+  def winnerPlayerIndex =
     // Single games are easy.
-    if (!isMicroMatch) game.winnerSGPlayer
+    if (!isMicroMatch) game.winnerPlayerIndex
     else
-      // We'll always report the game1 sgPlayer as the winner if they won, and if they haven't played the second
+      // We'll always report the game1 playerIndex as the winner if they won, and if they haven't played the second
       // game yet, it's an unknown result.
       microMatchGame.flatMap(g2 =>
-        (game.winnerSGPlayer, g2.winnerSGPlayer) match {
+        (game.winnerPlayerIndex, g2.winnerPlayerIndex) match {
           // Same player winning both games is a win for that player
-          case (Some(sgPlayer1), Some(sgPlayer2)) if (sgPlayer1 != sgPlayer2) => Some(sgPlayer1)
-          // The first game was decisive, second game a draw, so first game winner sgPlayer is the winner
-          case (Some(sgPlayer1), None)         => Some(sgPlayer1)
-          // The second game was decisive, first game a draw, so second game winner's opposite sgPlayer is the winner
-          case (None, Some(sgPlayer2))         => Some(!sgPlayer2)
+          case (Some(playerIndex1), Some(playerIndex2)) if (playerIndex1 != playerIndex2) => Some(playerIndex1)
+          // The first game was decisive, second game a draw, so first game winner playerIndex is the winner
+          case (Some(playerIndex1), None)         => Some(playerIndex1)
+          // The second game was decisive, first game a draw, so second game winner's opposite playerIndex is the winner
+          case (None, Some(playerIndex2))         => Some(!playerIndex2)
           case _ => None
         }
       )
@@ -77,7 +77,7 @@ object SwissPairing {
 
   sealed trait Ongoing
   case object Ongoing extends Ongoing
-  type Status = Either[Ongoing, Option[SGPlayer]]
+  type Status = Either[Ongoing, Option[PlayerIndex]]
 
   val ongoing: Status = Left(Ongoing)
 

@@ -66,7 +66,7 @@ final private class PushApi(
     Future.delay(2 seconds) {
       proxyRepo.game(move.gameId) flatMap {
         _.filter(_.playable) ?? { game =>
-          val pov = Pov(game, game.player.sgPlayer)
+          val pov = Pov(game, game.player.playerIndex)
           game.player.userId ?? { userId =>
             IfAway(pov) {
               gameRepo.countWhereUserTurn(userId) flatMap { nbMyTurn =>
@@ -236,7 +236,7 @@ final private class PushApi(
     }
 
   def challengeAccept(c: Challenge, joinerId: Option[String]): Funit =
-    c.challengerUser.ifTrue(c.finalSGPlayer.p1 && !c.hasClock) ?? { challenger =>
+    c.challengerUser.ifTrue(c.finalPlayerIndex.p1 && !c.hasClock) ?? { challenger =>
       joinerId ?? lightUser flatMap { lightJoiner =>
         pushToAll(
           challenger.id,
@@ -282,7 +282,7 @@ final private class PushApi(
 
   private def IfAway(pov: Pov)(f: => Funit): Funit =
     lila.common.Bus.ask[Boolean]("roundSocket") { p =>
-      Tell(pov.gameId, IsOnGame(pov.sgPlayer, p))
+      Tell(pov.gameId, IsOnGame(pov.playerIndex, p))
     } flatMap {
       case true  => funit
       case false => f

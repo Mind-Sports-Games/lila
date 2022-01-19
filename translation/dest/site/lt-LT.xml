@@ -20,7 +20,7 @@
   <string name="black">Juodieji</string>
   <string name="randomColor">Atsitiktinė spalva</string>
   <string name="createAGame">Kurti žaidimą</string>
-  <string name="sgPlayerIsVictorious">%s laimėjo</string>
+  <string name="playerIndexIsVictorious">%s laimėjo</string>
   <string name="whiteIsVictorious">Baltieji laimėjo</string>
   <string name="blackIsVictorious">Juodieji laimėjo</string>
   <string name="youPlayTheWhitePieces">Žaidžiate baltomis figūromis</string>
@@ -48,10 +48,10 @@
   <string name="forceDraw">Įskaityti lygiąsias</string>
   <string name="talkInChat">Pokalbyje būkite malonūs!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Pirmasis šiuo adresu atėjęs žmogus taps jūsų varžovu.</string>
-  <string name="sgPlayerResigned">%s pasidavė</string>
+  <string name="playerIndexResigned">%s pasidavė</string>
   <string name="whiteResigned">Baltieji pasidavė</string>
   <string name="blackResigned">Juodieji pasidavė</string>
-  <string name="sgPlayerLeftTheGame">%s paliko žaidimą</string>
+  <string name="playerIndexLeftTheGame">%s paliko žaidimą</string>
   <string name="whiteLeftTheGame">Baltieji paliko žaidimą</string>
   <string name="blackLeftTheGame">Juodieji paliko žaidimą</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Pasidalinę šiuo adresu leisite žiūrovams stebėti partiją</string>
@@ -248,10 +248,10 @@
   <string name="drawOfferDeclined">Lygiųjų pasiūlymas atmestas</string>
   <string name="drawOfferAccepted">Lygiųjų pasiūlymas priimtas</string>
   <string name="drawOfferCanceled">Lygiųjų pasiūlymas atšauktas</string>
-  <string name="sgPlayerOffersDraw">%s siūlo lygiąsias</string>
+  <string name="playerIndexOffersDraw">%s siūlo lygiąsias</string>
   <string name="whiteOffersDraw">Baltieji siūlo lygiąsias</string>
   <string name="blackOffersDraw">Juodieji siūlo lygiąsias</string>
-  <string name="sgPlayerDeclinesDraw">%s atsisako lygiųjų</string>
+  <string name="playerIndexDeclinesDraw">%s atsisako lygiųjų</string>
   <string name="whiteDeclinesDraw">Baltieji atsisako lygiųjų</string>
   <string name="blackDeclinesDraw">Juodieji atsisako lygiųjų</string>
   <string name="yourOpponentOffersADraw">Jūsų varžovas siūlo lygiąsias</string>
@@ -847,7 +847,7 @@ kompiuterinę analizę, partijos pokalbį bei URL dalinimuisi.</string>
   <string name="hideBestMove">Slėpti geriausią ėjimą</string>
   <string name="getAHint">Gauti užuominą</string>
   <string name="evaluatingYourMove">Vertinamas jūsų ėjimas...</string>
-  <string name="sgPlayerWinsGame">Laimėjo %s</string>
+  <string name="playerIndexWinsGame">Laimėjo %s</string>
   <string name="whiteWinsGame">Laimėjo baltieji</string>
   <string name="blackWinsGame">Laimėjo juodieji</string>
   <string name="learnFromYourMistakes">Mokykitės iš savo klaidų</string>

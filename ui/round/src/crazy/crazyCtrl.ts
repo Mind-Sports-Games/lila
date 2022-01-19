@@ -14,7 +14,7 @@ export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
   if (ctrl.replaying() || !ctrl.isPlaying()) return;
   const el = e.target as HTMLElement,
     role = el.getAttribute('data-role') as cg.Role,
-    playerIndex = el.getAttribute('data-sgPlayer') as cg.PlayerIndex,
+    playerIndex = el.getAttribute('data-playerIndex') as cg.PlayerIndex,
     number = el.getAttribute('data-nb');
   if (!role || !playerIndex || number === '0') return;
   e.stopPropagation();

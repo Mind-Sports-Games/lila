@@ -27,41 +27,41 @@ final private class Biter(
     for {
       userOption   <- lobbyUserOption.map(_.id) ?? userRepo.byId
       ownerOption  <- hook.userId ?? userRepo.byId
-      creatorSGPlayer <- assignCreatorSGPlayer(ownerOption, userOption, hook.realSGPlayer)
+      creatorPlayerIndex <- assignCreatorPlayerIndex(ownerOption, userOption, hook.realPlayerIndex)
       game <- makeGame(
         hook,
-        p1User = creatorSGPlayer.fold(ownerOption, userOption),
-        p2User = creatorSGPlayer.fold(userOption, ownerOption)
+        p1User = creatorPlayerIndex.fold(ownerOption, userOption),
+        p2User = creatorPlayerIndex.fold(userOption, ownerOption)
       ).withUniqueId
       _ <- gameRepo insertDenormalized game
     } yield {
       lila.mon.lobby.hook.join.increment()
-      JoinHook(sri, hook, game, creatorSGPlayer)
+      JoinHook(sri, hook, game, creatorPlayerIndex)
     }
 
   private def join(seek: Seek, lobbyUser: LobbyUser): Fu[JoinSeek] =
     for {
       user         <- userRepo byId lobbyUser.id orFail s"No such user: ${lobbyUser.id}"
       owner        <- userRepo byId seek.user.id orFail s"No such user: ${seek.user.id}"
-      creatorSGPlayer <- assignCreatorSGPlayer(owner.some, user.some, seek.realSGPlayer)
+      creatorPlayerIndex <- assignCreatorPlayerIndex(owner.some, user.some, seek.realPlayerIndex)
       game <- makeGame(
         seek,
-        p1User = creatorSGPlayer.fold(owner.some, user.some),
-        p2User = creatorSGPlayer.fold(user.some, owner.some)
+        p1User = creatorPlayerIndex.fold(owner.some, user.some),
+        p2User = creatorPlayerIndex.fold(user.some, owner.some)
       ).withUniqueId
       _ <- gameRepo insertDenormalized game
-    } yield JoinSeek(user.id, seek, game, creatorSGPlayer)
+    } yield JoinSeek(user.id, seek, game, creatorPlayerIndex)
 
-  private def assignCreatorSGPlayer(
+  private def assignCreatorPlayerIndex(
       creatorUser: Option[User],
       joinerUser: Option[User],
-      sgPlayer: SGPlayer
+      playerIndex: PlayerIndex
   ): Fu[strategygames.Player] =
-    sgPlayer match {
-      case SGPlayer.Random =>
+    playerIndex match {
+      case PlayerIndex.Random =>
         userRepo.firstGetsP1(creatorUser.map(_.id), joinerUser.map(_.id)) map strategygames.Player.fromP1
-      case SGPlayer.P1 => fuccess(strategygames.P1)
-      case SGPlayer.P2 => fuccess(strategygames.P2)
+      case PlayerIndex.P1 => fuccess(strategygames.P1)
+      case PlayerIndex.P2 => fuccess(strategygames.P2)
     }
 
   private def makeGame(hook: Hook, p1User: Option[User], p2User: Option[User]) = {

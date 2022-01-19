@@ -2,7 +2,7 @@ package lila.round
 
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl._
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 import strategygames.format.Forsyth
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext
@@ -41,7 +41,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
                 clk   <- game.clock
                 times <- game.bothClockStates
               } yield Vector(clk.config.initTime, clk.config.initTime) ++ times)
-              val clockOffset = game.startSGPlayer.fold(0, 1)
+              val clockOffset = game.startPlayerIndex.fold(0, 1)
               Replay.situations(game.variant.gameLogic, game.pgnMoves, initialFen, game.variant) foreach {
                 _.zipWithIndex foreach { case (s, index) =>
                   val clk = for {
@@ -80,7 +80,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
   private def toJson(game: Game, fen: String, lastMoveUci: Option[String]): JsObject =
     toJson(
       fen,
-      game.turnSGPlayer,
+      game.turnPlayerIndex,
       lastMoveUci,
       game.clock.map { clk =>
         (clk.remainingTime(strategygames.P1), clk.remainingTime(strategygames.P2))
@@ -89,13 +89,13 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
 
   private def toJson(
       boardFen: String,
-      turnSGPlayer: SGPlayer,
+      turnPlayerIndex: PlayerIndex,
       lastMoveUci: Option[String],
       clock: Option[(Centis, Centis)]
   ): JsObject =
     clock.foldLeft(
       Json
-        .obj("fen" -> s"$boardFen ${turnSGPlayer.letter}")
+        .obj("fen" -> s"$boardFen ${turnPlayerIndex.letter}")
         .add("lm" -> lastMoveUci)
     ) { case (js, clk) =>
       js ++ Json.obj("wc" -> clk._1.roundSeconds, "bc" -> clk._2.roundSeconds)

@@ -1,6 +1,6 @@
 package lila.chat
 
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 
 import lila.user.{ Title, User }
 
@@ -36,11 +36,11 @@ case class UserLine(
   def isPlayStrategy = userId == User.playstrategyId
 }
 case class PlayerLine(
-    sgPlayer: SGPlayer,
+    playerIndex: PlayerIndex,
     text: String
 ) extends Line {
   def deleted     = false
-  def author      = sgPlayer.name
+  def author      = playerIndex.name
   def troll       = false
   def userIdMaybe = none
 }
@@ -88,13 +88,13 @@ object Line {
 
   def strToLine(str: String): Option[Line] =
     strToUserLine(str) orElse {
-      str.headOption flatMap SGPlayer.apply map { sgPlayer =>
-        PlayerLine(sgPlayer, str drop 2)
+      str.headOption flatMap PlayerIndex.apply map { playerIndex =>
+        PlayerLine(playerIndex, str drop 2)
       }
     }
   def lineToStr(x: Line) =
     x match {
       case u: UserLine   => userLineToStr(u)
-      case p: PlayerLine => s"${p.sgPlayer.letter} ${p.text}"
+      case p: PlayerLine => s"${p.playerIndex.letter} ${p.text}"
     }
 }

@@ -34,7 +34,7 @@ final class TournamentApi(
     tellRound: lila.round.TellRound,
     roundSocket: lila.round.RoundSocket,
     trophyApi: lila.user.TrophyApi,
-    sgPlayerHistoryApi: SGPlayerHistoryApi,
+    playerIndexHistoryApi: PlayerIndexHistoryApi,
     verify: Condition.Verify,
     duelStore: DuelStore,
     pause: Pause,
@@ -393,8 +393,8 @@ final class TournamentApi(
           Sequencing(tourId)(tournamentRepo.startedById) { tour =>
             pairingRepo.findPlaying(tour.id, userId) flatMap {
               case Some(pairing) if !pairing.berserkOf(userId) =>
-                (pairing sgPlayerOf userId) ?? { sgPlayer =>
-                  roundSocket.rounds.ask(gameId) { GoBerserk(sgPlayer, _) } flatMap {
+                (pairing playerIndexOf userId) ?? { playerIndex =>
+                  roundSocket.rounds.ask(gameId) { GoBerserk(playerIndex, _) } flatMap {
                     _ ?? pairingRepo.setBerserk(pairing, userId)
                   }
                 }
@@ -447,7 +447,7 @@ final class TournamentApi(
             } | player.performance
           )
         } >>- finishing.flatMap(_.p1Player.userId).foreach { p1UserId =>
-          sgPlayerHistoryApi.inc(player.id, strategygames.Player.fromP1(player is p1UserId))
+          playerIndexHistoryApi.inc(player.id, strategygames.Player.fromP1(player is p1UserId))
         }
       }
     }
@@ -538,7 +538,7 @@ final class TournamentApi(
         _ ?? { tour =>
           getTeamVs(tour, pov.game) zip getGameRanks(tour, pov.game) flatMap { case (teamVs, ranks) =>
             teamVs.fold(tournamentTop(tour.id) dmap some) { vs =>
-              cached.teamInfo.get(tour.id -> vs.teams(pov.sgPlayer)) map2 { info =>
+              cached.teamInfo.get(tour.id -> vs.teams(pov.playerIndex)) map2 { info =>
                 TournamentTop(info.topPlayers take tournamentTopNb)
               }
             } dmap {

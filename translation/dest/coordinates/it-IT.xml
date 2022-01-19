@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Coordinate</string>
   <string name="coordinateTraining">Allenamento sulle coordinate</string>
-  <string name="averageScoreAsSGPlayerX">Punteggio medio come %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Punteggio medio come %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Punteggio medio come bianco: %s</string>
   <string name="averageScoreAsBlackX">Punteggio medio come nero: %s</string>
   <string name="knowingTheChessBoard">Conoscere le coordinate della scacchiera è un\'abilità molto importante:</string>

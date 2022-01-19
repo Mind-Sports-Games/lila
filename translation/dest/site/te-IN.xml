@@ -22,7 +22,7 @@
   <string name="createAGame">ఒక ఆట మొదలుపెడదాం</string>
   <string name="whiteIsVictorious">తెలుపు పక్షం గెలిచింది</string>
   <string name="blackIsVictorious">నలుపు పక్షం గెలిచింది</string>
-  <string name="youPlayTheSGPlayerPieces">మీరు %s లాగా ఆడాలి</string>
+  <string name="youPlayThePlayerIndexPieces">మీరు %s లాగా ఆడాలి</string>
   <string name="youPlayTheWhitePieces">మీరు తెలుపు రంగు లాగా ఆడాలి</string>
   <string name="youPlayTheBlackPieces">మీరు నలుపు రంగు లాగా ఆడాలి</string>
   <string name="itsYourTurn">ఇప్పుడు మీ వంతు!</string>

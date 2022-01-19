@@ -6,13 +6,13 @@ import lila.analyse.{ Accuracy, Analysis }
 import lila.game.{ Game, Player, Pov }
 import lila.user.User
 
-import strategygames.{ Player => SGPlayer, Speed }
+import strategygames.{ Player => PlayerIndex, Speed }
 
 case class PlayerAssessment(
     _id: String,
     gameId: Game.ID,
     userId: User.ID,
-    sgPlayer: SGPlayer,
+    playerIndex: PlayerIndex,
     assessment: GameAssessment,
     date: DateTime,
     basics: PlayerAssessment.Basics,
@@ -44,11 +44,11 @@ object PlayerAssessment {
 
   def makeBasics(pov: Pov, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment.Basics = {
     import Statistics._
-    import pov.{ sgPlayer, game }
+    import pov.{ playerIndex, game }
 
     Basics(
-      moveTimes = intAvgSd(~game.moveTimes(sgPlayer) map (_.roundTenths)),
-      blurs = game playerBlurPercent sgPlayer,
+      moveTimes = intAvgSd(~game.moveTimes(playerIndex) map (_.roundTenths)),
+      blurs = game playerBlurPercent playerIndex,
       hold = holdAlerts.exists(_.suspicious),
       blurStreak = highestChunkBlursOf(pov).some.filter(0 <),
       mtStreak = highlyConsistentMoveTimeStreaksOf(pov)
@@ -57,17 +57,17 @@ object PlayerAssessment {
 
   def make(pov: Pov, analysis: Analysis, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment = {
     import Statistics._
-    import pov.{ sgPlayer, game }
+    import pov.{ playerIndex, game }
 
     val basics = makeBasics(pov, holdAlerts)
 
     def blursMatter = !game.isSimul && game.hasClock
 
     lazy val highBlurRate: Boolean =
-      blursMatter && game.playerBlurPercent(sgPlayer) > 90
+      blursMatter && game.playerBlurPercent(playerIndex) > 90
 
     lazy val moderateBlurRate: Boolean =
-      blursMatter && game.playerBlurPercent(sgPlayer) > 70
+      blursMatter && game.playerBlurPercent(playerIndex) > 70
 
     val highestChunkBlurs = highestChunkBlursOf(pov)
 
@@ -90,9 +90,9 @@ object PlayerAssessment {
     lazy val alwaysHasAdvantage: Boolean =
       !analysis.infos.exists { info =>
         info.cp.fold(info.mate.fold(false) { a =>
-          a.signum == sgPlayer.fold(-1, 1)
+          a.signum == playerIndex.fold(-1, 1)
         }) { cp =>
-          sgPlayer.fold(cp.centipawns < -100, cp.centipawns > 100)
+          playerIndex.fold(cp.centipawns < -100, cp.centipawns > 100)
         }
       }
 
@@ -138,7 +138,7 @@ object PlayerAssessment {
       }
 
       if (flags.suspiciousHoldAlert) assessment
-      else if (~game.wonBy(sgPlayer)) assessment
+      else if (~game.wonBy(playerIndex)) assessment
       else if (assessment == Cheating) LikelyCheating
       else if (assessment == LikelyCheating) Unclear
       else assessment
@@ -151,10 +151,10 @@ object PlayerAssessment {
       case _                          => 1.0
     }
     PlayerAssessment(
-      _id = s"${game.id}/${sgPlayer.name}",
+      _id = s"${game.id}/${playerIndex.name}",
       gameId = game.id,
-      userId = ~game.player(sgPlayer).userId,
-      sgPlayer = sgPlayer,
+      userId = ~game.player(playerIndex).userId,
+      playerIndex = playerIndex,
       assessment = assessment,
       date = DateTime.now,
       basics = basics,

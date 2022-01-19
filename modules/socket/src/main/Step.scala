@@ -1,7 +1,7 @@
 package lila.socket
 
 import strategygames.format.{ FEN, Uci }
-import strategygames.{ Player => SGPlayer, GameLogic, Pocket, PocketData, Pos, Role }
+import strategygames.{ Player => PlayerIndex, GameLogic, Pocket, PocketData, Pos, Role }
 import play.api.libs.json._
 
 case class Step(
@@ -16,8 +16,8 @@ case class Step(
     captLen: Option[Int]
 ) {
 
-  // who's sgPlayer plays next
-  def sgPlayer = SGPlayer.fromPly(ply)
+  // who's playerIndex plays next
+  def playerIndex = PlayerIndex.fromPly(ply)
 
   def toJson = Step.stepJsonWriter writes this
 }

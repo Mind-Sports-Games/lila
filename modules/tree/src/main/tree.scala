@@ -36,8 +36,8 @@ sealed trait Node {
   def idOption: Option[UciCharPair]
   def moveOption: Option[Uci.WithSan]
 
-  // who's sgPlayer plays next
-  def sgPlayer = strategygames.Player.fromPly(ply)
+  // who's playerIndex plays next
+  def playerIndex = strategygames.Player.fromPly(ply)
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)

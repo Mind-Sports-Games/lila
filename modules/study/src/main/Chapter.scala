@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.{ Glyph, Tags }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ Centis, Player => SGPlayer }
+import strategygames.{ Centis, Player => PlayerIndex }
 import org.joda.time.DateTime
 
 import strategygames.opening.{ FullOpening, FullOpeningDB }
@@ -76,8 +76,8 @@ case class Chapter(
       createdAt = DateTime.now
     )
 
-  private def tagsResultSGPlayer = tags.resultPlayer match {
-    case Some(Some(sgPlayer)) => Some(Some(sgPlayer))
+  private def tagsResultPlayerIndex = tags.resultPlayer match {
+    case Some(Some(playerIndex)) => Some(Some(playerIndex))
     case Some(None) => Some(None)
     case None => None
     case _ => sys.error("Not implemented for draughts yet")
@@ -87,7 +87,7 @@ case class Chapter(
     _id = _id,
     name = name,
     setup = setup,
-    resultSGPlayer = tagsResultSGPlayer.isDefined option tagsResultSGPlayer,
+    resultPlayerIndex = tagsResultPlayerIndex.isDefined option tagsResultPlayerIndex,
     hasRelayPath = relay.exists(!_.path.isEmpty)
   )
 
@@ -128,7 +128,7 @@ object Chapter {
   case class Setup(
       gameId: Option[lila.game.Game.ID],
       variant: Variant,
-      orientation: SGPlayer,
+      orientation: PlayerIndex,
       fromFen: Option[Boolean] = None
   ) {
     def isFromFen = ~fromFen
@@ -161,13 +161,13 @@ object Chapter {
       _id: Id,
       name: Name,
       setup: Setup,
-      resultSGPlayer: Option[Option[Option[SGPlayer]]],
+      resultPlayerIndex: Option[Option[Option[PlayerIndex]]],
       hasRelayPath: Boolean
   ) extends Like {
 
-    def looksOngoing = resultSGPlayer.exists(_.isEmpty) && hasRelayPath
+    def looksOngoing = resultPlayerIndex.exists(_.isEmpty) && hasRelayPath
 
-    def resultStr: Option[String] = resultSGPlayer.map(_.fold("*")(c => SGPlayer.showResult(c)).replace("1/2", "½"))
+    def resultStr: Option[String] = resultPlayerIndex.map(_.fold("*")(c => PlayerIndex.showResult(c)).replace("1/2", "½"))
   }
 
   case class IdName(id: Id, name: Name)

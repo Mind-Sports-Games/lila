@@ -5,7 +5,7 @@ import strategygames.variant.Variant
 import strategygames.format.FEN
 
 import lila.game.Game
-import lila.lobby.SGPlayer
+import lila.lobby.PlayerIndex
 
 private[setup] trait Config {
 
@@ -24,12 +24,12 @@ private[setup] trait Config {
   // Game variant code
   val variant: Variant
 
-  // Creator player sgPlayer
-  val sgPlayer: SGPlayer
+  // Creator player playerIndex
+  val playerIndex: PlayerIndex
 
   def hasClock = timeMode == TimeMode.RealTime
 
-  lazy val creatorSGPlayer = sgPlayer.resolve
+  lazy val creatorPlayerIndex = playerIndex.resolve
 
   def makeGame(v: Variant): StratGame =
     StratGame(v.gameLogic, situation = Situation(v.gameLogic, v), clock = makeClock.map(_.toClock))

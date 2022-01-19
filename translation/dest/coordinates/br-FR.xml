@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Daveennoù</string>
   <string name="coordinateTraining">Pleustriñ war an daveennoù</string>
-  <string name="averageScoreAsSGPlayerX">Disoc\'h keitat eus tu %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Disoc\'h keitat eus tu %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Disoc\'h keitat eus tu ar re wenn: %s</string>
   <string name="averageScoreAsBlackX">Disoc\'h keitat eus tu ar re zu: %s</string>
   <string name="knowingTheChessBoard">Anavezout daveennoù an dachenn emgann zo ur varregezh a-bouez bras:</string>

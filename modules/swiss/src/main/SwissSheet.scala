@@ -48,7 +48,7 @@ private object SwissSheet {
             pairing.status match {
               case Left(_)            => Ongoing
               case Right(None)        => Draw
-              case Right(Some(sgPlayer)) => if (pairing(sgPlayer) == player.userId) Win else Loss
+              case Right(Some(playerIndex)) => if (pairing(playerIndex) == player.userId) Win else Loss
             }
           case None if player.byes(round) => Bye
           case None if round.value == 1   => Late

@@ -19,7 +19,7 @@ object widgets {
       val fromPlayer  = user flatMap g.player
       val firstPlayer = fromPlayer | g.player(g.naturalOrientation)
       st.article(cls := "game-row paginated")(
-        a(cls := "game-row__overlay", href := gameLink(g, firstPlayer.sgPlayer, ownerLink)),
+        a(cls := "game-row__overlay", href := gameLink(g, firstPlayer.playerIndex, ownerLink)),
         div(cls := "game-row__board")(
           views.html.board.bits.mini(Pov(g, firstPlayer))(span)
         ),
@@ -75,11 +75,11 @@ object widgets {
                   g.winner.map { winner =>
                     frag(
                       (gameEndStatus(g) != "").option(", "),
-                      trans.sgPlayerIsVictorious(g.playerTrans(winner.sgPlayer))
+                      trans.playerIndexIsVictorious(g.playerTrans(winner.playerIndex))
                     )
                   }
                 )
-              else trans.sgPlayerPlays(g.playerTrans(g.turnSGPlayer))
+              else trans.playerIndexPlays(g.playerTrans(g.turnPlayerIndex))
             }
           ),
           if (g.turns > 0) {
@@ -126,7 +126,7 @@ object widgets {
   private lazy val anonSpan = span(cls := "anon")(lila.user.User.anonymous)
 
   private def gamePlayer(player: Player)(implicit ctx: Context) =
-    div(cls := s"player ${player.sgPlayer.name}")(
+    div(cls := s"player ${player.playerIndex.name}")(
       player.playerUser map { playerUser =>
         frag(
           userIdLink(playerUser.id.some, withOnline = false),

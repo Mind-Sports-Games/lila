@@ -42,18 +42,18 @@ object coordinate {
               div(cls := "scores")(scoreCharts(score))
             }
           ),
-          form(cls := "sgPlayer buttons", action := routes.Coordinate.sgPlayer, method := "post")(
+          form(cls := "playerIndex buttons", action := routes.Coordinate.playerIndex, method := "post")(
             st.group(cls := "radio")(
               List(PlayerOrder.P1, PlayerOrder.RANDOM, PlayerOrder.P2).map { id =>
                 div(
                   input(
                     tpe := "radio",
-                    st.id := s"coord_sgPlayer_$id",
-                    name := "sgPlayer",
+                    st.id := s"coord_playerIndex_$id",
+                    name := "playerIndex",
                     value := id,
                     (id == ctx.pref.coordColor) option checked
                   ),
-                  label(`for` := s"coord_sgPlayer_$id", cls := s"sgPlayer sgPlayer_$id")(i)
+                  label(`for` := s"coord_playerIndex_$id", cls := s"playerIndex playerIndex_$id")(i)
                 )
               }
             )
@@ -96,7 +96,7 @@ object coordinate {
       ).map { case (transPlayer, s) =>
         div(cls := "chart_container")(
           s.nonEmpty option frag(
-            p(trans.coordinates.averageScoreAsSGPlayerX(
+            p(trans.coordinates.averageScoreAsPlayerIndexX(
               transPlayer,
               raw(s"""<strong>${"%.2f".format(s.sum.toDouble / s.size)}</strong>""")
             )),

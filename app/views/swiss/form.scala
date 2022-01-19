@@ -136,7 +136,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     form3.group(
       form("nbRounds"),
       "Number of rounds",
-      help = raw("An odd number of rounds allows optimal sgPlayer balance.").some,
+      help = raw("An odd number of rounds allows optimal playerIndex balance.").some,
       half = true
     )(
       form3.input(_, typ = "number")

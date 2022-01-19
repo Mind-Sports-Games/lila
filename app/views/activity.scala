@@ -160,7 +160,7 @@ object activity {
         subTag(
           povs.map { pov =>
             frag(
-              a(cls := "glpt", href := routes.Round.watcher(pov.gameId, pov.sgPlayer.name))("Game"),
+              a(cls := "glpt", href := routes.Round.watcher(pov.gameId, pov.playerIndex.name))("Game"),
               " vs ",
               playerLink(pov.opponent, withRating = true, withDiff = false, withOnline = true, link = true),
               br
@@ -180,8 +180,8 @@ object activity {
         subTag(
           povs.map { pov =>
             frag(
-              a(cls := "glpt", href := routes.Round.watcher(pov.gameId, pov.sgPlayer.name))(
-                pov.game.wonBy(pov.sgPlayer) match {
+              a(cls := "glpt", href := routes.Round.watcher(pov.gameId, pov.playerIndex.name))(
+                pov.game.wonBy(pov.playerIndex) match {
                   case Some(true)  => trans.victory()
                   case Some(false) => trans.defeat()
                   case _           => "Draw"

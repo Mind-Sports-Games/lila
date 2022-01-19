@@ -20,7 +20,7 @@ final class Importer(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execution
         } >> {
           gameRepo.finish(
             id = game.id,
-            winnerSGPlayer = game.winnerSGPlayer,
+            winnerPlayerIndex = game.winnerPlayerIndex,
             winnerId = None,
             status = game.status
           )

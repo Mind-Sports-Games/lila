@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">Başlamaq üçün gediş edin</string>
-  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">Hər pazlda %s hissələrlə oynay</string>
+  <string name="youPlayThePlayerIndexPiecesInAllPuzzles">Hər pazlda %s hissələrlə oynay</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">Hər pazlda ağ hissələrlə oynay</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">Hər pazlda qara hissələrlə oyna</string>
   <string name="puzzlesSolved">həll edilən tapmaca</string>

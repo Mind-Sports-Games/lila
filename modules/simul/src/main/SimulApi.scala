@@ -2,7 +2,7 @@ package lila.simul
 
 import akka.actor._
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, Player => SGPlayer }
+import strategygames.{ GameLogic, Player => PlayerIndex }
 import play.api.libs.json.Json
 import scala.concurrent.duration._
 
@@ -57,7 +57,7 @@ final class SimulApi(
       variants = setup.actualVariants,
       position = setup.realPosition,
       host = me,
-      sgPlayer = setup.sgPlayer,
+      playerIndex = setup.playerIndex,
       text = setup.text,
       estimatedStartAt = setup.estimatedStartAt,
       team = setup.team,
@@ -74,7 +74,7 @@ final class SimulApi(
       clock = setup.clock,
       variants = setup.actualVariants,
       position = setup.realPosition,
-      sgPlayer = setup.sgPlayer.some,
+      playerIndex = setup.playerIndex.some,
       text = setup.text,
       estimatedStartAt = setup.estimatedStartAt,
       team = setup.team,
@@ -124,8 +124,8 @@ final class SimulApi(
                 games.headOption foreach { case (game, _) =>
                   socket.startSimul(simul, game)
                 }
-                games.foldLeft(started) { case (s, (g, hostSGPlayer)) =>
-                  s.setPairingHostSGPlayer(g.id, hostSGPlayer)
+                games.foldLeft(started) { case (s, (g, hostPlayerIndex)) =>
+                  s.setPairingHostPlayerIndex(g.id, hostPlayerIndex)
                 }
               }
             } flatMap { s =>
@@ -234,15 +234,15 @@ final class SimulApi(
 
   private def makeGame(simul: Simul, host: User)(
       pairingAndNumber: (SimulPairing, Int)
-  ): Fu[(Game, SGPlayer)] =
+  ): Fu[(Game, PlayerIndex)] =
     pairingAndNumber match {
       case (pairing, number) =>
         for {
           user <- userRepo byId pairing.player.user orFail s"No user with id ${pairing.player.user}"
-          hostSGPlayer = simul.hostSGPlayer | SGPlayer.fromP1(number % 2 == 0)
-          p1User = hostSGPlayer.fold(host, user)
-          p2User = hostSGPlayer.fold(user, host)
-          clock     = simul.clock.chessClockOf(hostSGPlayer)
+          hostPlayerIndex = simul.hostPlayerIndex | PlayerIndex.fromP1(number % 2 == 0)
+          p1User = hostPlayerIndex.fold(host, user)
+          p2User = hostPlayerIndex.fold(user, host)
+          clock     = simul.clock.chessClockOf(hostPlayerIndex)
           perfPicker =
             lila.game.PerfPicker.mainOrDefault(strategygames.Speed(clock.config), pairing.player.variant, none)
           game1 = Game.make(
@@ -270,7 +270,7 @@ final class SimulApi(
             (gameRepo insertDenormalized game2) >>-
               onGameStart(game2.id) >>-
               socket.startGame(simul, game2)
-        } yield game2 -> hostSGPlayer
+        } yield game2 -> hostPlayerIndex
     }
 
   private def update(simul: Simul): Funit =

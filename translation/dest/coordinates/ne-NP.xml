@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">को‍-अर्डिनेटहरु</string>
   <string name="coordinateTraining">को-अर्डिनेटको अभ्यास</string>
-  <string name="averageScoreAsSGPlayerX">%1$s लिएर औसत अंक: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">%1$s लिएर औसत अंक: %2$s</string>
   <string name="averageScoreAsWhiteX">सेतो लिएर औसत अंक: %s</string>
   <string name="averageScoreAsBlackX">कालो लिएर औसत अंक: %s</string>
   <string name="knowingTheChessBoard">चेस बोर्ड को को-अर्डिनेटहरूको को ज्ञान हुनु धेरै महत्वपूर्ण छ:</string>

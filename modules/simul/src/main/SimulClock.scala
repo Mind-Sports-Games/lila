@@ -1,6 +1,6 @@
 package lila.simul
 
-import strategygames.{ Centis, Clock, Player => SGPlayer }
+import strategygames.{ Centis, Clock, Player => PlayerIndex }
 
 // All durations are expressed in seconds
 case class SimulClock(
@@ -8,8 +8,8 @@ case class SimulClock(
     hostExtraTime: Int
 ) {
 
-  def chessClockOf(hostSGPlayer: SGPlayer) =
-    config.toClock.giveTime(hostSGPlayer, Centis.ofSeconds(hostExtraTime))
+  def chessClockOf(hostPlayerIndex: PlayerIndex) =
+    config.toClock.giveTime(hostPlayerIndex, Centis.ofSeconds(hostExtraTime))
 
   def hostExtraMinutes = hostExtraTime / 60
 }

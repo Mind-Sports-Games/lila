@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ P2, Player => SGPlayer, P1, GameLogic }
+import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import org.joda.time.DateTime
@@ -122,6 +122,6 @@ final private class SwissDirector(
       .withSwissId(swiss.id.value)
       .start
 
-  private def makePlayer(sgPlayer: SGPlayer, player: SwissPlayer) =
-    lila.game.Player.make(sgPlayer, player.userId, player.rating, player.provisional)
+  private def makePlayer(playerIndex: PlayerIndex, player: SwissPlayer) =
+    lila.game.Player.make(playerIndex, player.userId, player.rating, player.provisional)
 }

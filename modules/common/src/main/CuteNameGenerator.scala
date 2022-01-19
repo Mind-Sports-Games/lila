@@ -24,13 +24,13 @@ object CuteNameGenerator {
     vec(Math.abs(seed) % vec.size)
 
   lazy val combinations: Vector[List[Vector[String]]] = Vector(
-    List(sgPlayers ++ adjectives, animals ++ pieces ++ jobs),
-    List(sgPlayers, adjectives, animals ++ pieces ++ jobs),
-    List(sgPlayers ++ adjectives, adjectives, animals ++ pieces ++ jobs),
-    List(sgPlayers ++ adjectives, jobs, animals ++ pieces)
+    List(playerIndexs ++ adjectives, animals ++ pieces ++ jobs),
+    List(playerIndexs, adjectives, animals ++ pieces ++ jobs),
+    List(playerIndexs ++ adjectives, adjectives, animals ++ pieces ++ jobs),
+    List(playerIndexs ++ adjectives, jobs, animals ++ pieces)
   )
 
-  def sgPlayers =
+  def playerIndexs =
     Vector(
       "Amber",
       "Aqua",

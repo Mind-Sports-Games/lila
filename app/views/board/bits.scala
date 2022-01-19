@@ -1,7 +1,7 @@
 package views.html.board
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Player => SGPlayer, P2, P1 }
+import strategygames.{ Player => PlayerIndex, P2, P1 }
 import strategygames.variant.Variant
 import strategygames.{ GameLogic, Situation }
 import strategygames.draughts.Board
@@ -25,7 +25,7 @@ object bits {
     final case object Right extends Orientation
   }
 
-  def sgPlayerToOrientation(c: SGPlayer): Orientation =
+  def playerIndexToOrientation(c: PlayerIndex): Orientation =
     c match {
         case P1 => Orientation.P1
         case P2 => Orientation.P2
@@ -33,17 +33,17 @@ object bits {
 
   private val dataState = attr("data-state")
 
-  private def boardOrientation(variant: Variant, c: SGPlayer): Orientation =
+  private def boardOrientation(variant: Variant, c: PlayerIndex): Orientation =
     variant match {
       case Variant.Chess(strategygames.chess.variant.RacingKings)   => Orientation.P1
       case Variant.Chess(strategygames.chess.variant.LinesOfAction) => c match {
           case P1 => Orientation.P1
           case P2 => Orientation.Right
         }
-      case _ => sgPlayerToOrientation(c)
+      case _ => playerIndexToOrientation(c)
     }
 
-  private def boardOrientation(pov: Pov): Orientation = boardOrientation(pov.game.variant, pov.sgPlayer)
+  private def boardOrientation(pov: Pov): Orientation = boardOrientation(pov.game.variant, pov.playerIndex)
 
   private def boardSize(pov: Pov): Option[Board.BoardSize] = pov.game.variant match {
     case Variant.Draughts(v) => Some(v.boardSize)
@@ -85,19 +85,19 @@ object bits {
     )(cgWrapContent)
   }
 
-  def mini(fen: FEN, sgPlayer: SGPlayer = P1, variantKey: String, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, sgPlayerToOrientation(sgPlayer), lastMove, None, variantKey)(tag)
+  def mini(fen: FEN, playerIndex: PlayerIndex = P1, variantKey: String, lastMove: String = "")(tag: Tag): Tag =
+    miniWithOrientation(fen, playerIndexToOrientation(playerIndex), lastMove, None, variantKey)(tag)
 
-  def miniForVariant(fen: FEN, variant: Variant, sgPlayer: SGPlayer = P1, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, boardOrientation(variant, sgPlayer), lastMove, None, variant.key)(tag)
+  def miniForVariant(fen: FEN, variant: Variant, playerIndex: PlayerIndex = P1, lastMove: String = "")(tag: Tag): Tag =
+    miniWithOrientation(fen, boardOrientation(variant, playerIndex), lastMove, None, variant.key)(tag)
 
 
-  def miniSpan(fen: FEN, sgPlayer: SGPlayer = P1, variantKey: String, lastMove: String = "") =
-    mini(fen, sgPlayer, variantKey, lastMove)(span)
+  def miniSpan(fen: FEN, playerIndex: PlayerIndex = P1, variantKey: String, lastMove: String = "") =
+    mini(fen, playerIndex, variantKey, lastMove)(span)
 
-  private def sitCanCastle(sit: Situation, sgPlayer: SGPlayer, side: strategygames.chess.Side): Boolean =
+  private def sitCanCastle(sit: Situation, playerIndex: PlayerIndex, side: strategygames.chess.Side): Boolean =
     sit match {
-      case Situation.Chess(sit) => sit canCastle sgPlayer on side
+      case Situation.Chess(sit) => sit canCastle playerIndex on side
       case _ => false
     }
 
@@ -108,7 +108,7 @@ object bits {
     Json.obj(
       "fen"     -> fen.value.split(" ").take(4).mkString(" "),
       "baseUrl" -> s"$netBaseUrl${routes.Editor.load("")}",
-      "sgPlayer"   -> sit.player.letter.toString,
+      "playerIndex"   -> sit.player.letter.toString,
       "castles" -> Json.obj(
         "K" -> sitCanCastle(sit, P1, strategygames.chess.KingSide),
         "Q" -> sitCanCastle(sit, P1, strategygames.chess.QueenSide),
@@ -131,7 +131,7 @@ object bits {
     trans.castling,
     trans.whiteCastlingKingside,
     trans.blackCastlingKingside,
-    trans.sgPlayerPlays,
+    trans.playerIndexPlays,
     trans.variant,
     trans.continueFromHere,
     trans.playWithTheMachine,

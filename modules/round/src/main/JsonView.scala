@@ -2,7 +2,7 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, Player => SGPlayer, P1, P2, Pos, Situation }
+import strategygames.{ Clock, Player => PlayerIndex, P1, P2, Pos, Situation }
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.math
@@ -27,19 +27,19 @@ final class JsonView(
 
   import JsonView._
 
-  private def checkCount(game: Game, sgPlayer: SGPlayer) =
-    (game.variant == strategygames.chess.variant.ThreeCheck) option game.history.checkCount(sgPlayer)
+  private def checkCount(game: Game, playerIndex: PlayerIndex) =
+    (game.variant == strategygames.chess.variant.ThreeCheck) option game.history.checkCount(playerIndex)
 
-  private def kingMoves(game: Game, sgPlayer: SGPlayer) =
-    (game.variant.frisianVariant) option game.history.kingMoves(sgPlayer)
+  private def kingMoves(game: Game, playerIndex: PlayerIndex) =
+    (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
   private def commonPlayerJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
-      //.obj("color" -> g.variant.playerNames(p.sgPlayer), "playerIndex" -> p.sgPlayer.name)
+      //.obj("color" -> g.variant.playerNames(p.playerIndex), "playerIndex" -> p.playerIndex.name)
       .obj(
-        "color" -> p.sgPlayer.classicName,
-        "playerName" -> g.variant.playerNames(p.sgPlayer),
-        "playerIndex" -> p.sgPlayer.name
+        "color" -> p.playerIndex.classicName,
+        "playerName" -> g.variant.playerNames(p.playerIndex),
+        "playerIndex" -> p.playerIndex.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
       .add("rating" -> p.rating)
@@ -48,8 +48,8 @@ final class JsonView(
       .add("offeringRematch" -> isOfferingRematch(Pov(g, p)))
       .add("offeringDraw" -> p.isOfferingDraw)
       .add("proposingTakeback" -> p.isProposingTakeback)
-      .add("checks" -> checkCount(g, p.sgPlayer))
-      .add("kingMoves" -> kingMoves(g, p.sgPlayer))
+      .add("checks" -> checkCount(g, p.playerIndex))
+      .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
 
@@ -75,17 +75,17 @@ final class JsonView(
                 "id"      -> playerId,
                 "version" -> socket.version.value
               )
-            }.add("onGame" -> (player.isAi || socket.onGame(player.sgPlayer))),
+            }.add("onGame" -> (player.isAi || socket.onGame(player.playerIndex))),
             "opponent" -> {
               commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json.obj(
-                //"color" -> pov.game.variant.playerNames(opponent.sgPlayer),
-                "color" -> opponent.sgPlayer.classicName,
-                "playerName" -> pov.game.variant.playerNames(opponent.sgPlayer),
-                "playerIndex" -> opponent.sgPlayer.name,
+                //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
+                "color" -> opponent.playerIndex.classicName,
+                "playerName" -> pov.game.variant.playerNames(opponent.playerIndex),
+                "playerIndex" -> opponent.playerIndex.name,
                 "ai"    -> opponent.aiLevel
               )
-            }.add("isGone" -> (!opponent.isAi && socket.isGone(opponent.sgPlayer)))
-              .add("onGame" -> (opponent.isAi || socket.onGame(opponent.sgPlayer))),
+            }.add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
+              .add("onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex))),
             "url" -> Json.obj(
               "socket" -> s"/play/$fullId/v$apiVersion",
               "round"  -> s"/$fullId"
@@ -145,10 +145,10 @@ final class JsonView(
   private def commonWatcherJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
       .obj(
-        //"color" -> g.variant.playerNames(p.sgPlayer),
-        "color" -> p.sgPlayer.classicName,
-        "playerName" -> g.variant.playerNames(p.sgPlayer),
-        "playerIndex" -> p.sgPlayer.name,
+        //"color" -> g.variant.playerNames(p.playerIndex),
+        "color" -> p.playerIndex.classicName,
+        "playerName" -> g.variant.playerNames(p.playerIndex),
+        "playerIndex" -> p.playerIndex.name,
         "name"  -> p.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
@@ -156,8 +156,8 @@ final class JsonView(
       .add("rating" -> p.rating)
       .add("ratingDiff" -> p.ratingDiff)
       .add("provisional" -> p.provisional)
-      .add("checks" -> checkCount(g, p.sgPlayer))
-      .add("kingMoves" -> kingMoves(g, p.sgPlayer))
+      .add("checks" -> checkCount(g, p.playerIndex))
+      .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
 
@@ -188,16 +188,16 @@ final class JsonView(
                 "spectator" -> true,
                 "id"        -> me.flatMap(game.player).map(_.id)
               )
-            }.add("onGame" -> (player.isAi || socket.onGame(player.sgPlayer))),
+            }.add("onGame" -> (player.isAi || socket.onGame(player.playerIndex))),
             "opponent" -> commonWatcherJson(game, opponent, opponentUser, withFlags).add(
-              "onGame" -> (opponent.isAi || socket.onGame(opponent.sgPlayer))
+              "onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex))
             ),
             "captureLength" -> captureLength(pov),
-            //"orientation" -> pov.game.variant.playerNames(pov.sgPlayer),
-            "orientation" -> pov.sgPlayer.classicName,
+            //"orientation" -> pov.game.variant.playerNames(pov.playerIndex),
+            "orientation" -> pov.playerIndex.classicName,
             "url" -> Json.obj(
-              "socket" -> s"/watch/$gameId/${game.variant.playerNames(sgPlayer)}/v$apiVersion",
-              "round"  -> s"/$gameId/${game.variant.playerNames(sgPlayer)}"
+              "socket" -> s"/watch/$gameId/${game.variant.playerNames(playerIndex)}/v$apiVersion",
+              "round"  -> s"/$gameId/${game.variant.playerNames(playerIndex)}"
             ),
             "pref" -> Json
               .obj(
@@ -231,7 +231,7 @@ final class JsonView(
       pov: Pov,
       pref: Pref,
       initialFen: Option[FEN],
-      orientation: SGPlayer,
+      orientation: PlayerIndex,
       owner: Boolean,
       me: Option[User],
       division: Option[strategygames.Division] = none
@@ -249,23 +249,23 @@ final class JsonView(
             "initialFen" -> (initialFen | fen),
             "fen"        -> fen,
             "turns"      -> game.turns,
-            "player"     -> game.turnSGPlayer.name,
+            "player"     -> game.turnPlayerIndex.name,
             "status"     -> game.status
           )
           .add("division", division)
-          .add("winner", game.winner.map(w => game.variant.playerNames(w.sgPlayer))),
+          .add("winner", game.winner.map(w => game.variant.playerNames(w.playerIndex))),
         "player" -> Json.obj(
           "id"    -> owner.option(pov.playerId),
-          //"color" -> game.variant.playerNames(sgPlayer),
-          "color" -> sgPlayer.classicName,
-          "playerName" -> game.variant.playerNames(sgPlayer),
-          "playerIndex" -> sgPlayer.name
+          //"color" -> game.variant.playerNames(playerIndex),
+          "color" -> playerIndex.classicName,
+          "playerName" -> game.variant.playerNames(playerIndex),
+          "playerIndex" -> playerIndex.name
         ),
         "opponent" -> Json.obj(
-          //"color" -> game.variant.playerNames(opponent.sgPlayer),
-          "color" -> sgPlayer.classicName,
-          "playerName" -> game.variant.playerNames(opponent.sgPlayer),
-          "playerIndex" -> sgPlayer.classicName,
+          //"color" -> game.variant.playerNames(opponent.playerIndex),
+          "color" -> playerIndex.classicName,
+          "playerName" -> game.variant.playerNames(opponent.playerIndex),
+          "playerIndex" -> playerIndex.classicName,
           "ai"    -> opponent.aiLevel
         ),
         //"orientation" -> orientation.name,
@@ -291,7 +291,7 @@ final class JsonView(
   private def blurs(game: Game, player: lila.game.Player) =
     player.blurs.nonEmpty option {
       blursWriter.writes(player.blurs) +
-        ("percent" -> JsNumber(game.playerBlurPercent(player.sgPlayer)))
+        ("percent" -> JsNumber(game.playerBlurPercent(player.playerIndex)))
     }
 
   private def clockJson(clock: Clock): JsObject =

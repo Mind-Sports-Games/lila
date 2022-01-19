@@ -3,7 +3,7 @@ package lila.game
 import akka.stream.scaladsl._
 import akka.util.ByteString
 import strategygames.format.{ FEN, Forsyth, Uci }
-import strategygames.{ Centis, Player => SGPlayer, Replay, Situation, Game => ChessGame }
+import strategygames.{ Centis, Player => PlayerIndex, Replay, Situation, Game => ChessGame }
 import play.api.libs.json._
 import play.api.libs.ws.JsonBodyWritables._
 import play.api.libs.ws.StandaloneWSClient
@@ -31,7 +31,7 @@ final class GifExport(
             "p1"       -> Namer.playerTextBlocking(pov.game.p1Player, withRating = true)(lightUserApi.sync),
             "p2"       -> Namer.playerTextBlocking(pov.game.p2Player, withRating = true)(lightUserApi.sync),
             "comment"     -> s"${baseUrl.value}/${pov.game.id} rendered with https://github.com/niklasf/lila-gif",
-            "orientation" -> pov.sgPlayer.name,
+            "orientation" -> pov.playerIndex.name,
             "delay"       -> targetMedianTime.centis, // default delay for frames
             "frames"      -> frames(pov.game, initialFen)
           )
@@ -68,7 +68,7 @@ final class GifExport(
     }
   }
 
-  def thumbnail(fen: FEN, lastMove: Option[String], orientation: SGPlayer): Fu[Source[ByteString, _]] = {
+  def thumbnail(fen: FEN, lastMove: Option[String], orientation: PlayerIndex): Fu[Source[ByteString, _]] = {
     val query = List(
       "fen"         -> fen.value,
       "orientation" -> orientation.name

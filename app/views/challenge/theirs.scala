@@ -14,12 +14,12 @@ object theirs {
       c: Challenge,
       json: play.api.libs.json.JsObject,
       user: Option[lila.user.User],
-      sgPlayer: Option[strategygames.Player]
+      playerIndex: Option[strategygames.Player]
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = challengeTitle(c),
       openGraph = challengeOpenGraph(c).some,
-      moreJs = bits.js(c, json, owner = false, sgPlayer),
+      moreJs = bits.js(c, json, owner = false, playerIndex),
       moreCss = cssTag("challenge.page")
     ) {
       main(cls := "page-small challenge-page challenge-theirs box box-pad")(
@@ -40,18 +40,18 @@ object theirs {
               ),
               bits.details(c),
               c.notableInitialFen.map { fen =>
-                div(cls := "board-preview", views.html.board.bits.miniForVariant(fen, c.variant, !c.finalSGPlayer)(div))
+                div(cls := "board-preview", views.html.board.bits.miniForVariant(fen, c.variant, !c.finalPlayerIndex)(div))
               },
-              if (sgPlayer.map(Challenge.SGPlayerChoice.apply).has(c.sgPlayerChoice))
+              if (playerIndex.map(Challenge.PlayerIndexChoice.apply).has(c.playerIndexChoice))
                 badTag(
                   // very rare message, don't translate
-                  s"You have the wrong sgPlayer link for this open challenge. The ${sgPlayer.??(_.name)} player has already joined."
+                  s"You have the wrong playerIndex link for this open challenge. The ${playerIndex.??(_.name)} player has already joined."
                 )
               else if (!c.mode.rated || ctx.isAuth) {
                 frag(
                   (c.mode.rated && c.unlimited) option
                     badTag(trans.bewareTheGameIsRatedButHasNoClock()),
-                  postForm(cls := "accept", action := routes.Challenge.accept(c.id, sgPlayer.map(_.name)))(
+                  postForm(cls := "accept", action := routes.Challenge.accept(c.id, playerIndex.map(_.name)))(
                     submitButton(cls := "text button button-fat", dataIcon := "G")(trans.joinTheGame())
                   )
                 )

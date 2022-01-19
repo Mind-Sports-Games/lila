@@ -19,10 +19,10 @@
   <string name="black">Swart</string>
   <string name="randomColor">Kleur makket neat út</string>
   <string name="createAGame">In spul opsette</string>
-  <string name="sgPlayerIsVictorious">%s wint</string>
+  <string name="playerIndexIsVictorious">%s wint</string>
   <string name="whiteIsVictorious">Wyt wint</string>
   <string name="blackIsVictorious">Swart wint</string>
-  <string name="youPlayTheSGPlayerPieces">Do spilest mei %s</string>
+  <string name="youPlayThePlayerIndexPieces">Do spilest mei %s</string>
   <string name="youPlayTheWhitePieces">Do spilest mei wyt</string>
   <string name="youPlayTheBlackPieces">Do spilest mei swart</string>
   <string name="itsYourTurn">Do bist oan \'e beurt!</string>
@@ -33,7 +33,7 @@
   <string name="newOpponent">Nije tsjinstanner</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Dyn tsjinstanner wol in nij spul mei dy dwaan</string>
   <string name="joinTheGame">Meidwaan oan it spul</string>
-  <string name="sgPlayerPlays">%s oan set</string>
+  <string name="playerIndexPlays">%s oan set</string>
   <string name="whitePlays">Wyt oan set</string>
   <string name="blackPlays">Swart oan set</string>
   <plurals name="opponentLeftCounter">
@@ -46,10 +46,10 @@
   <string name="forceDraw">Pat neame</string>
   <string name="talkInChat">Wês aardich by it chatten!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">De earste persoan dy\'t nei dizze URL komt sil mei dy spylje.</string>
-  <string name="sgPlayerResigned">%s hat opjûn</string>
+  <string name="playerIndexResigned">%s hat opjûn</string>
   <string name="whiteResigned">Wyt hat opjûn</string>
   <string name="blackResigned">Swart hat opjûn</string>
-  <string name="sgPlayerLeftTheGame">%s hat it spul ferlitten</string>
+  <string name="playerIndexLeftTheGame">%s hat it spul ferlitten</string>
   <string name="whiteLeftTheGame">Wyt hat it spul ferlitten</string>
   <string name="blackLeftTheGame">Swart hat it spul ferlitten</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Diel dizze URL om taskôgers it spul te litten sjen</string>
@@ -186,17 +186,17 @@
     <item quantity="other">%s spullen mei jo</item>
   </plurals>
   <string name="cancel">Annulearje</string>
-  <string name="sgPlayerTimeOut">Tiid fan %s ôfrûn</string>
+  <string name="playerIndexTimeOut">Tiid fan %s ôfrûn</string>
   <string name="whiteTimeOut">Tiid fan wyt ôfrûn</string>
   <string name="blackTimeOut">Tiid fan swart ôfrûn</string>
   <string name="drawOfferSent">Remise oanbod stjoerd</string>
   <string name="drawOfferDeclined">Remise oanbod ôfslein</string>
   <string name="drawOfferAccepted">Remise oanbod akseptearre</string>
   <string name="drawOfferCanceled">Remise oanbod annulearre</string>
-  <string name="sgPlayerOffersDraw">%s biedt remise oan</string>
+  <string name="playerIndexOffersDraw">%s biedt remise oan</string>
   <string name="whiteOffersDraw">Wyt biedt remise oan</string>
   <string name="blackOffersDraw">Swart biedt remise oan</string>
-  <string name="sgPlayerDeclinesDraw">%s wegert remise-oanbod</string>
+  <string name="playerIndexDeclinesDraw">%s wegert remise-oanbod</string>
   <string name="whiteDeclinesDraw">Wyt wegert remise-oanbod</string>
   <string name="blackDeclinesDraw">Swart wegert remise-oanbod</string>
   <string name="yourOpponentOffersADraw">Dyn tsjinstander biedt remise oan</string>
@@ -297,7 +297,7 @@ kompjûteranalyze, partijpetear en dielbere URL te krijen.</string>
   <string name="clickOnTheBoardToMakeYourMove">Klik op it boerd om in set te dwaan, en te bewizen datsto in minske bist.</string>
   <string name="captcha.fail">Los de \'skaak- captcha\' op.</string>
   <string name="notACheckmate">Dit is gjin skaakmat</string>
-  <string name="sgPlayerCheckmatesInOneMove">Skaakmat foar %s yn ien set</string>
+  <string name="playerIndexCheckmatesInOneMove">Skaakmat foar %s yn ien set</string>
   <string name="whiteCheckmatesInOneMove">Skaakmat foar wyt yn ien set</string>
   <string name="blackCheckmatesInOneMove">Skaakmat foar swart yn ien set</string>
   <string name="retry">Op \'e nij besykje</string>
@@ -355,7 +355,7 @@ kompjûteranalyze, partijpetear en dielbere URL te krijen.</string>
   <string name="performance">Prestaasje</string>
   <string name="tournamentComplete">Toernoai ôfrûn</string>
   <string name="movesPlayed">Setten spile</string>
-  <string name="sgPlayerWins">Wûn mei %s</string>
+  <string name="playerIndexWins">Wûn mei %s</string>
   <string name="whiteWins">Wûn mei wyt</string>
   <string name="blackWins">Wûn mei swart</string>
   <string name="draws">Lyk spul</string>

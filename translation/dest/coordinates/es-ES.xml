@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Coordenadas</string>
   <string name="coordinateTraining">Entrenar coordenadas</string>
-  <string name="averageScoreAsSGPlayerX">Puntuación media con %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Puntuación media con %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Puntuación media con blancas: %s</string>
   <string name="averageScoreAsBlackX">Puntuación media con negras: %s</string>
   <string name="knowingTheChessBoard">Conocer las coordenadas de los escaques es esencial en el ajedrez:</string>

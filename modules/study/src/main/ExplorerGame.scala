@@ -70,7 +70,7 @@ final private class ExplorerGame(
     val pgn    = g.pgnImport.flatMap(pgnImport => Parser.full(pgnImport.pgn).toOption)
     val p1  = pgn.flatMap(_.tags(_.P1)) | Namer.playerTextBlocking(g.p1Player)(lightUserApi.sync)
     val p2  = pgn.flatMap(_.tags(_.P2)) | Namer.playerTextBlocking(g.p2Player)(lightUserApi.sync)
-    val result = strategygames.Player.showResult(g.winnerSGPlayer)
+    val result = strategygames.Player.showResult(g.winnerPlayerIndex)
     val event: Option[String] =
       (pgn.flatMap(_.tags(_.Event)), pgn.flatMap(_.tags.year).map(_.toString)) match {
         case (Some(event), Some(year)) if event.contains(year) => event.some

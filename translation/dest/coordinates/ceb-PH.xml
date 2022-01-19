@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Ang pagbalo sa mga posisyon</string>
   <string name="coordinateTraining">Coordinate nga pagbansay</string>
-  <string name="averageScoreAsSGPlayerX">Average nga puntos ingon %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Average nga puntos ingon %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Average nga puntos ingon puti: %s</string>
   <string name="averageScoreAsBlackX">Average nga iskor ingon itom: %s</string>
   <string name="knowingTheChessBoard">Ang pagkahibalo sa mga coordinate sa chessboard usa ka hinungdanon kaayo nga kahanas sa chess:</string>

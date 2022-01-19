@@ -83,7 +83,7 @@ function renderFeedback(ctrl: GamebookPlayCtrl, state: State) {
             h('div.no-square', h('piece.k-piece.' + playerIndex)),
             h('div.instruction', [
               h('strong', ctrl.trans.noarg('yourTurn')),
-              h('em', ctrl.trans('findTheBestMoveForSGPlayer', playerIndex)),
+              h('em', ctrl.trans('findTheBestMoveForPlayerIndex', playerIndex)),
             ]),
           ]
         : ['Good move!']

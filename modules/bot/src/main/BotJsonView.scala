@@ -60,7 +60,7 @@ final class BotJsonView(
           "bdraw"  -> game.p2Player.isOfferingDraw,
           "status" -> game.status.name
         )
-        .add("winner" -> game.winnerSGPlayer)
+        .add("winner" -> game.winnerPlayerIndex)
         .add("rematch" -> rematches.of(game.id))
     }
   }
@@ -87,8 +87,8 @@ final class BotJsonView(
 
   private def millisOf(pov: Pov): Int =
     pov.game.clock
-      .map(_.remainingTime(pov.sgPlayer).millis.toInt)
-      .orElse(pov.game.correspondenceClock.map(_.remainingTime(pov.sgPlayer).toInt * 1000))
+      .map(_.remainingTime(pov.playerIndex).millis.toInt)
+      .orElse(pov.game.correspondenceClock.map(_.remainingTime(pov.playerIndex).toInt * 1000))
       .getOrElse(Int.MaxValue)
 
   implicit private val clockConfigWriter: OWrites[strategygames.Clock.Config] = OWrites { c =>

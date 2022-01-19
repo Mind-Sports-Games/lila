@@ -144,8 +144,8 @@ Allow: /
           "short_name"       -> "PlayStrategy",
           "start_url"        -> "/",
           "display"          -> "standalone",
-          "background_sgPlayer" -> "#161512",
-          "theme_sgPlayer"      -> "#161512",
+          "background_playerIndex" -> "#161512",
+          "theme_playerIndex"      -> "#161512",
           "description"      -> "The (really) free, no-ads, open source chess server.",
           "icons" -> List(32, 64, 128, 192, 256, 512, 1024).map { size =>
             Json.obj(

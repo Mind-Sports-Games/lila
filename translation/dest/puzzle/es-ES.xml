@@ -14,7 +14,7 @@
   <string name="didYouLikeThisPuzzle">¿Te ha gustado este ejercicio?</string>
   <string name="voteToLoadNextOne">¡Vota para cargar el siguiente!</string>
   <string name="yourPuzzleRatingX">Tu puntuación en los ejercicios: %s</string>
-  <string name="findTheBestMoveForSGPlayer">Encuentra el mejor movimiento para las %s.</string>
+  <string name="findTheBestMoveForPlayerIndex">Encuentra el mejor movimiento para las %s.</string>
   <string name="findTheBestMoveForWhite">Encuentra el mejor movimiento para las blancas.</string>
   <string name="findTheBestMoveForBlack">Encuentra el mejor movimiento para las negras.</string>
   <string name="toGetPersonalizedPuzzles">Para conseguir ejercicios personalizados:</string>

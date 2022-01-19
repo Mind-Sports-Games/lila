@@ -176,7 +176,7 @@ object ServerEval {
 
   def toJson(chapter: Chapter, analysis: Analysis) =
     lila.analyse.JsonView.bothPlayers(
-      lila.analyse.Accuracy.PovLike(P1, chapter.root.sgPlayer, chapter.root.ply),
+      lila.analyse.Accuracy.PovLike(P1, chapter.root.playerIndex, chapter.root.ply),
       analysis
     )
 }

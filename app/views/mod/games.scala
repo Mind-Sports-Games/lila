@@ -168,7 +168,7 @@ object games {
                     )
                   },
                   td(dataSort := pov.game.movedAt.getSeconds.toString)(
-                    a(href := routes.Round.watcher(pov.gameId, pov.sgPlayer.name), cls := "glpt")(
+                    a(href := routes.Round.watcher(pov.gameId, pov.playerIndex.name), cls := "glpt")(
                       momentFromNowServerText(pov.game.movedAt)
                     )
                   )

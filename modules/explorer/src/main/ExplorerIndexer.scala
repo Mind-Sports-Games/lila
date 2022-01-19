@@ -1,7 +1,7 @@
 package lila.explorer
 
 import akka.stream.scaladsl._
-import strategygames.{ Player => SGPlayer, P2, P1 }
+import strategygames.{ Player => PlayerIndex, P2, P1 }
 import strategygames.GameLogic
 import strategygames.format.pgn.Tag
 import org.joda.time.DateTime
@@ -145,10 +145,10 @@ final private class ExplorerIndexer(
       if valid(game)
     } yield gameRepo initialFen game flatMap { initialFen =>
       userRepo.usernamesByIds(game.userIds) map { usernames =>
-        def username(sgPlayer: SGPlayer) =
-          game.player(sgPlayer).userId flatMap { id =>
+        def username(playerIndex: PlayerIndex) =
+          game.player(playerIndex).userId flatMap { id =>
             usernames.find(_.toLowerCase == id)
-          } orElse game.player(sgPlayer).userId getOrElse "?"
+          } orElse game.player(playerIndex).userId getOrElse "?"
         val fenTags = initialFen.?? { fen =>
           List(Tag(_.FEN, fen))
         }

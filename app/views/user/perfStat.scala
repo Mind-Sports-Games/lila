@@ -194,13 +194,13 @@ object perfStat {
       )
     )
 
-  private def highlowSide(title: Frag => Frag, opt: Option[lila.perfStat.RatingAt], sgPlayer: String)(implicit
+  private def highlowSide(title: Frag => Frag, opt: Option[lila.perfStat.RatingAt], playerIndex: String)(implicit
       lang: Lang
   ): Frag =
     opt match {
       case Some(r) =>
         div(
-          h2(title(strong(tag(sgPlayer)(r.int)))),
+          h2(title(strong(tag(playerIndex)(r.int)))),
           a(cls := "glpt", href := routes.Round.watcher(r.gameId, "p1"))(absClientDateTime(r.at))
         )
       case None => div(h2(title(emptyFrag)), " ", span(notEnoughGames()))
@@ -226,26 +226,26 @@ object perfStat {
       case None => nbsp
     }
 
-  private def resultStreakSideStreak(s: lila.perfStat.Streak, title: Frag => Frag, sgPlayer: String)(implicit
+  private def resultStreakSideStreak(s: lila.perfStat.Streak, title: Frag => Frag, playerIndex: String)(implicit
       lang: Lang
   ): Frag =
     div(cls := "streak")(
       h3(
         title(
-          if (s.v > 0) tag(sgPlayer)(trans.nbGames.plural(s.v, strong(s.v)))
+          if (s.v > 0) tag(playerIndex)(trans.nbGames.plural(s.v, strong(s.v)))
           else "-"
         )
       ),
       fromTo(s)
     )
 
-  private def resultStreakSide(s: lila.perfStat.Streaks, title: Frag, sgPlayer: String)(implicit
+  private def resultStreakSide(s: lila.perfStat.Streaks, title: Frag, playerIndex: String)(implicit
       lang: Lang
   ): Frag =
     div(
       h2(title),
-      resultStreakSideStreak(s.max, longestStreak(_), sgPlayer),
-      resultStreakSideStreak(s.cur, currentStreak(_), sgPlayer)
+      resultStreakSideStreak(s.max, longestStreak(_), playerIndex),
+      resultStreakSideStreak(s.cur, currentStreak(_), playerIndex)
     )
 
   private def resultStreak(streak: lila.perfStat.ResultStreak)(implicit lang: Lang): Frag =

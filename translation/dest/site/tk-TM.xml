@@ -192,7 +192,7 @@
     <item quantity="other">Size garşy %s oýun</item>
   </plurals>
   <string name="cancel">Goýbolsun et</string>
-  <string name="sgPlayerTimeOut">%s wagty gutardy</string>
+  <string name="playerIndexTimeOut">%s wagty gutardy</string>
   <string name="whiteTimeOut">Ak wagty gutardy</string>
   <string name="blackTimeOut">Gara wagty gutardy</string>
   <string name="drawOfferSent">Deňlik teklibi iberildi</string>

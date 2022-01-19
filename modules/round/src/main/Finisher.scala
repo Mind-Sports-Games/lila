@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Player => SGPlayer, DecayingStats, Status }
+import strategygames.{ Player => PlayerIndex, DecayingStats, Status }
 
 import lila.common.{ Bus, Uptime }
 import lila.game.actorApi.{ AbortedBy, FinishGame }
@@ -26,15 +26,15 @@ final private class Finisher(
   def abort(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
     apply(pov.game, _.Aborted, None) >>- {
       getSocketStatus(pov.game) foreach { ss =>
-        playban.abort(pov, ss.sgPlayersOnGame)
+        playban.abort(pov, ss.playerIndexsOnGame)
       }
       Bus.publish(AbortedBy(pov.copy(game = pov.game.abort)), "abortGame")
     }
 
-  def rageQuit(game: Game, winner: Option[SGPlayer])(implicit proxy: GameProxy): Fu[Events] =
+  def rageQuit(game: Game, winner: Option[PlayerIndex])(implicit proxy: GameProxy): Fu[Events] =
     apply(game, _.Timeout, winner) >>-
-      winner.foreach { sgPlayer =>
-        playban.rageQuit(game, !sgPlayer)
+      winner.foreach { playerIndex =>
+        playban.rageQuit(game, !playerIndex)
       }
 
   def outOfTime(game: Game)(implicit proxy: GameProxy): Fu[Events] =
@@ -44,10 +44,10 @@ final private class Finisher(
       logger.info(s"Aborting game last played before JVM boot: ${game.id}")
       other(game, _.Aborted, none)
 
-    } else if (game.player(!game.player.sgPlayer).isOfferingDraw) {
+    } else if (game.player(!game.player.playerIndex).isOfferingDraw) {
       apply(game, _.Draw, None, Some(trans.drawOfferAccepted.txt()))
     } else {
-      val winner = Some(!game.player.sgPlayer) ifFalse game.situation.opponentHasInsufficientMaterial
+      val winner = Some(!game.player.playerIndex) ifFalse game.situation.opponentHasInsufficientMaterial
       apply(game, _.Outoftime, winner) >>-
         winner.foreach { w =>
           playban.flag(game, !w)
@@ -58,14 +58,14 @@ final private class Finisher(
     game.playerWhoDidNotMove ?? { culprit =>
       lila.mon.round.expiration.count.increment()
       playban.noStart(Pov(game, culprit))
-      if (game.isMandatory) apply(game, _.NoStart, Some(!culprit.sgPlayer))
+      if (game.isMandatory) apply(game, _.NoStart, Some(!culprit.playerIndex))
       else apply(game, _.Aborted, None, Some("Game aborted by server"))
     }
 
   def other(
       game: Game,
       status: Status.type => Status,
-      winner: Option[SGPlayer],
+      winner: Option[PlayerIndex],
       message: Option[String] = None
   )(implicit proxy: GameProxy): Fu[Events] =
     apply(game, status, winner, message) >>- playban.other(game, status, winner).unit
@@ -104,12 +104,12 @@ final private class Finisher(
   private def apply(
       game: Game,
       makeStatus: Status.type => Status,
-      winnerC: Option[SGPlayer],
+      winnerC: Option[PlayerIndex],
       message: Option[String] = None
   )(implicit proxy: GameProxy): Fu[Events] = {
     val status = makeStatus(Status)
     val prog   = game.finish(status, winnerC)
-    if (game.nonAi && game.isCorrespondence) SGPlayer.all foreach notifier.gameEnd(prog.game)
+    if (game.nonAi && game.isCorrespondence) PlayerIndex.all foreach notifier.gameEnd(prog.game)
     lila.mon.game
       .finish(
         variant = game.variant.key,
@@ -124,7 +124,7 @@ final private class Finisher(
     proxy.save(prog) >>
       gameRepo.finish(
         id = g.id,
-        winnerSGPlayer = winnerC,
+        winnerPlayerIndex = winnerC,
         winnerId = winnerC flatMap (g.player(_).userId),
         status = prog.game.status
       ) >>

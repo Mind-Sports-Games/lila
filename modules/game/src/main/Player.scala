@@ -1,7 +1,7 @@
 package lila.game
 
 import cats.implicits._
-import strategygames.{ Player => SGPlayer, P1 }
+import strategygames.{ Player => PlayerIndex, P1 }
 import scala.util.chaining._
 
 import lila.user.User
@@ -10,7 +10,7 @@ case class PlayerUser(id: String, rating: Int, ratingDiff: Option[Int])
 
 case class Player(
     id: Player.ID,
-    sgPlayer: SGPlayer,
+    playerIndex: PlayerIndex,
     aiLevel: Option[Int],
     isWinner: Option[Boolean] = None,
     isOfferingDraw: Boolean = false,
@@ -84,35 +84,35 @@ object Player {
   private val nameSplitRegex = """([^(]++)\((\d++)\)""".r
 
   def make(
-      sgPlayer: SGPlayer,
+      playerIndex: PlayerIndex,
       aiLevel: Option[Int] = None
   ): Player =
     Player(
-      id = IdGenerator.player(sgPlayer),
-      sgPlayer = sgPlayer,
+      id = IdGenerator.player(playerIndex),
+      playerIndex = playerIndex,
       aiLevel = aiLevel
     )
 
   def make(
-      sgPlayer: SGPlayer,
+      playerIndex: PlayerIndex,
       userPerf: (User.ID, lila.rating.Perf)
   ): Player =
     make(
-      sgPlayer = sgPlayer,
+      playerIndex = playerIndex,
       userId = userPerf._1,
       rating = userPerf._2.intRating,
       provisional = userPerf._2.glicko.provisional
     )
 
   def make(
-      sgPlayer: SGPlayer,
+      playerIndex: PlayerIndex,
       userId: User.ID,
       rating: Int,
       provisional: Boolean
   ): Player =
     Player(
-      id = IdGenerator.player(sgPlayer),
-      sgPlayer = sgPlayer,
+      id = IdGenerator.player(playerIndex),
+      playerIndex = playerIndex,
       aiLevel = none,
       userId = userId.some,
       rating = rating.some,
@@ -120,22 +120,22 @@ object Player {
     )
 
   def make(
-      sgPlayer: SGPlayer,
+      playerIndex: PlayerIndex,
       user: Option[User],
       perfPicker: lila.user.Perfs => lila.rating.Perf
   ): Player =
-    user.fold(make(sgPlayer)) { u =>
-      make(sgPlayer, (u.id, perfPicker(u.perfs)))
+    user.fold(make(playerIndex)) { u =>
+      make(playerIndex, (u.id, perfPicker(u.perfs)))
     }
 
   def makeImported(
-      sgPlayer: SGPlayer,
+      playerIndex: PlayerIndex,
       name: Option[String],
       rating: Option[Int]
   ): Player =
     Player(
-      id = IdGenerator.player(sgPlayer),
-      sgPlayer = sgPlayer,
+      id = IdGenerator.player(playerIndex),
+      playerIndex = playerIndex,
       aiLevel = none,
       name = name orElse "?".some,
       rating = rating
@@ -145,8 +145,8 @@ object Player {
     def suspicious = HoldAlert.suspicious(ply)
   }
   object HoldAlert {
-    type Map = SGPlayer.Map[Option[HoldAlert]]
-    val emptyMap: Map                 = SGPlayer.Map(none, none)
+    type Map = PlayerIndex.Map[Option[HoldAlert]]
+    val emptyMap: Map                 = PlayerIndex.Map(none, none)
     def suspicious(ply: Int): Boolean = ply >= 16 && ply <= 40
     def suspicious(m: Map): Boolean   = m exists { _ exists (_.suspicious) }
   }
@@ -176,7 +176,7 @@ object Player {
   type ID      = String
   type UserId  = Option[String]
   type Win     = Option[Boolean]
-  type Builder = SGPlayer => ID => UserId => Win => Player
+  type Builder = PlayerIndex => ID => UserId => Win => Player
 
   private def safeRange(range: Range)(v: Int): Option[Int] =
     range.contains(v) option v
@@ -190,13 +190,13 @@ object Player {
     import Blurs._
 
     def reads(r: BSON.Reader) =
-      sgPlayer =>
+      playerIndex =>
         id =>
           userId =>
             win =>
               Player(
                 id = id,
-                sgPlayer = sgPlayer,
+                playerIndex = playerIndex,
                 aiLevel = r intO aiLevel,
                 isWinner = win,
                 isOfferingDraw = r boolD isOfferingDraw,

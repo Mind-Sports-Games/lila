@@ -26,9 +26,9 @@ object layout {
       }
     def metaCsp(csp: Option[ContentSecurityPolicy])(implicit ctx: Context): Frag =
       metaCsp(csp getOrElse defaultCsp)
-    def metaThemeSGPlayer(implicit ctx: Context): Frag =
+    def metaThemePlayerIndex(implicit ctx: Context): Frag =
       raw {
-        s"""<meta name="theme-sgPlayer" content="${ctx.pref.themeSGPlayer}">"""
+        s"""<meta name="theme-playerIndex" content="${ctx.pref.themePlayerIndex}">"""
       }
     def pieceSprite(implicit ctx: Context): Frag = {
       ctx.currentPieceSet.map(ps => pieceSprite(ps))
@@ -209,7 +209,7 @@ object layout {
           charset,
           viewport,
           metaCsp(csp),
-          metaThemeSGPlayer,
+          metaThemePlayerIndex,
           st.headTitle {
             if (ctx.blind) "playstrategy"
             else if (netConfig.isProd) fullTitle | s"$title • playstrategy.org"

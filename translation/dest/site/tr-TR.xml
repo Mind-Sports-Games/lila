@@ -22,7 +22,7 @@
   <string name="createAGame">Yeni bir oyun kur</string>
   <string name="whiteIsVictorious">Zafer Beyazın</string>
   <string name="blackIsVictorious">Zafer Siyahın</string>
-  <string name="youPlayTheSGPlayerPieces">%s taşlar sizin</string>
+  <string name="youPlayThePlayerIndexPieces">%s taşlar sizin</string>
   <string name="youPlayTheWhitePieces">Beyaz taşlar sizin</string>
   <string name="youPlayTheBlackPieces">Siyah taşlar sizin</string>
   <string name="itsYourTurn">Sıra sizde!</string>
@@ -46,10 +46,10 @@
   <string name="forceDraw">Beraberlik ilan et</string>
   <string name="talkInChat">Lütfen sohbette nazik ol!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Bağlantıya ilk ulaşan kişi rakibiniz olacak.</string>
-  <string name="sgPlayerResigned">%s oyundan çekildi</string>
+  <string name="playerIndexResigned">%s oyundan çekildi</string>
   <string name="whiteResigned">Beyaz oyundan çekildi</string>
   <string name="blackResigned">Siyah oyundan çekildi</string>
-  <string name="sgPlayerLeftTheGame">%s oyundan ayrıldı</string>
+  <string name="playerIndexLeftTheGame">%s oyundan ayrıldı</string>
   <string name="whiteLeftTheGame">Beyaz oyundan ayrıldı</string>
   <string name="blackLeftTheGame">Siyah oyundan ayrıldı</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Oyunu izlemek isteyenlerle bu bağlantıyı paylaşın</string>
@@ -220,10 +220,10 @@
   <string name="drawOfferDeclined">Beraberlik teklifi reddedildi</string>
   <string name="drawOfferAccepted">Beraberlik teklifi kabul edildi</string>
   <string name="drawOfferCanceled">Beraberlik teklifi iptal edildi</string>
-  <string name="sgPlayerOffersDraw">%s beraberlik teklif ediyor</string>
+  <string name="playerIndexOffersDraw">%s beraberlik teklif ediyor</string>
   <string name="whiteOffersDraw">Beyaz beraberlik teklif ediyor</string>
   <string name="blackOffersDraw">Siyah beraberlik teklif ediyor</string>
-  <string name="sgPlayerDeclinesDraw">%s beraberlik teklifini geri çevirdi</string>
+  <string name="playerIndexDeclinesDraw">%s beraberlik teklifini geri çevirdi</string>
   <string name="whiteDeclinesDraw">Beyaz beraberlik teklifini geri çevirdi</string>
   <string name="blackDeclinesDraw">Siyah beraberlik teklifini geri çevirdi</string>
   <string name="yourOpponentOffersADraw">Rakibiniz beraberlik teklif ediyor</string>
@@ -367,7 +367,7 @@
   <string name="clickOnTheBoardToMakeYourMove">İnsan olduğunuzu kanıtlamak için tahtaya tıklayın ve hamlenizi yapın.</string>
   <string name="captcha.fail">Lütfen satranç doğrulamasını yapın.</string>
   <string name="notACheckmate">Mat değil</string>
-  <string name="sgPlayerCheckmatesInOneMove">%s bir hamlede mat eder</string>
+  <string name="playerIndexCheckmatesInOneMove">%s bir hamlede mat eder</string>
   <string name="whiteCheckmatesInOneMove">Beyaz bir hamlede mat eder</string>
   <string name="blackCheckmatesInOneMove">Siyah bir hamlede mat eder</string>
   <string name="retry">Tekrar dene</string>
@@ -437,7 +437,7 @@
   <string name="performance">Performans</string>
   <string name="tournamentComplete">Turnuva sona erdi</string>
   <string name="movesPlayed">Toplam hamle sayısı</string>
-  <string name="sgPlayerWins">%s zaferleri</string>
+  <string name="playerIndexWins">%s zaferleri</string>
   <string name="whiteWins">Beyaz zaferleri</string>
   <string name="blackWins">Siyah zaferleri</string>
   <string name="draws">Beraberlikler</string>
@@ -771,7 +771,7 @@
   <string name="hideBestMove">En iyi hamleyi gizle</string>
   <string name="getAHint">İpucu</string>
   <string name="evaluatingYourMove">Hamleniz değerlendiriliyor...</string>
-  <string name="sgPlayerWinsGame">%s kazandı</string>
+  <string name="playerIndexWinsGame">%s kazandı</string>
   <string name="whiteWinsGame">Beyaz kazandı</string>
   <string name="blackWinsGame">Siyah kazandı</string>
   <string name="learnFromYourMistakes">Hatalarından ders al</string>
@@ -779,12 +779,12 @@
   <string name="skipThisMove">Bu hamleyi geç</string>
   <string name="next">Sonraki</string>
   <string name="xWasPlayed">%s oynandı</string>
-  <string name="findBetterMoveForSGPlayer">%s için en iyi hamleyi bulun</string>
+  <string name="findBetterMoveForPlayerIndex">%s için en iyi hamleyi bulun</string>
   <string name="findBetterMoveForWhite">Beyaz için en iyi hamleyi bulun</string>
   <string name="findBetterMoveForBlack">Siyah için en iyi hamleyi bulun</string>
   <string name="resumeLearning">Kaldığınız yerden devam edin</string>
   <string name="youCanDoBetter">Daha iyisini yapabilirsin</string>
-  <string name="tryAnotherMoveForSGPlayer">%s için başka bir hamle dene</string>
+  <string name="tryAnotherMoveForPlayerIndex">%s için başka bir hamle dene</string>
   <string name="tryAnotherMoveForWhite">Beyaz için başka bir hamle dene</string>
   <string name="tryAnotherMoveForBlack">Siyah için başka bir hamle dene</string>
   <string name="solution">Çözüm</string>

@@ -1,7 +1,7 @@
 package lila.socket
 
 import akka.actor.{ ActorSystem, CoordinatedShutdown }
-import strategygames.{ Centis, Player => SGPlayer }
+import strategygames.{ Centis, Player => PlayerIndex }
 import io.lettuce.core._
 import io.lettuce.core.pubsub.{ StatefulRedisPubSubConnection => PubSub }
 import java.util.concurrent.atomic.AtomicReference
@@ -318,8 +318,8 @@ object RemoteSocket {
       def commas(strs: Iterable[Any]): String = if (strs.isEmpty) "-" else strs mkString ","
       def boolean(v: Boolean): String         = if (v) "+" else "-"
       def optional(str: Option[String])       = str getOrElse "-"
-      def sgPlayer(c: SGPlayer): String             = c.fold("w", "b")
-      def sgPlayer(c: Option[SGPlayer]): String     = optional(c.map(_.fold("w", "b")))
+      def playerIndex(c: PlayerIndex): String             = c.fold("w", "b")
+      def playerIndex(c: Option[PlayerIndex]): String     = optional(c.map(_.fold("w", "b")))
     }
   }
 

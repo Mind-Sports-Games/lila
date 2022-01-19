@@ -66,7 +66,7 @@ final private[api] class UserApi(
             Json
               .obj(
                 "url"            -> makeUrl(s"@/${u.username}"), // for app BC
-                "playing"        -> gameOption.map(g => makeUrl(s"${g.gameId}/${g.sgPlayer.name}")),
+                "playing"        -> gameOption.map(g => makeUrl(s"${g.gameId}/${g.playerIndex.name}")),
                 "nbFollowing"    -> following,
                 "nbFollowers"    -> followers,
                 "completionRate" -> completionRate,

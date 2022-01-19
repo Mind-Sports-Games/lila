@@ -14,7 +14,7 @@
   <string name="didYouLikeThisPuzzle">Avez-vous aimé ce problème ?</string>
   <string name="voteToLoadNextOne">Votez pour afficher le suivant !</string>
   <string name="yourPuzzleRatingX">Votre classement de tactique : %s</string>
-  <string name="findTheBestMoveForSGPlayer">Trouvez le meilleur coup pour les %s.</string>
+  <string name="findTheBestMoveForPlayerIndex">Trouvez le meilleur coup pour les %s.</string>
   <string name="findTheBestMoveForWhite">Trouvez le meilleur coup pour les Blancs.</string>
   <string name="findTheBestMoveForBlack">Trouvez le meilleur coup pour les Noirs.</string>
   <string name="toGetPersonalizedPuzzles">Pour obtenir des problèmes personnalisés :</string>

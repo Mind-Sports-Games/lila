@@ -55,7 +55,7 @@ case class Pref(
   def realTheme3d    = Theme3d(theme3d)
   def realPieceSet3d = PieceSet3d(pieceSet3d)
 
-  def themeSGPlayer = if (bg == Bg.LIGHT) "#dbd7d1" else "#2e2a24"
+  def themePlayerIndex = if (bg == Bg.LIGHT) "#dbd7d1" else "#2e2a24"
 
   def realSoundSet = SoundSet(soundSet)
 

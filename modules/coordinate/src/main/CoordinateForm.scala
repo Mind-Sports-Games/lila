@@ -5,21 +5,21 @@ import play.api.data.Forms._
 
 object CoordinateForm {
 
-  val sgPlayer = Form(
+  val playerIndex = Form(
     single(
-      "sgPlayer" -> number(min = 1, max = 3)
+      "playerIndex" -> number(min = 1, max = 3)
     )
   )
 
   val score = Form(
     mapping(
-      "sgPlayer" -> text.verifying(Set("p1", "p2") contains _),
+      "playerIndex" -> text.verifying(Set("p1", "p2") contains _),
       "score" -> number(min = 0, max = 100)
     )(ScoreData.apply)(ScoreData.unapply)
   )
 
-  case class ScoreData(sgPlayer: String, score: Int) {
+  case class ScoreData(playerIndex: String, score: Int) {
 
-    def isP1 = sgPlayer == "p1"
+    def isP1 = playerIndex == "p1"
   }
 }

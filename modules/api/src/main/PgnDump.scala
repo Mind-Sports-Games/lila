@@ -47,7 +47,7 @@ final class PgnDump(
         info.turn,
         turn =>
           turn.update(
-            info.sgPlayer,
+            info.playerIndex,
             move => {
               val comment = info.cp
                 .map(_.pawns.toString)

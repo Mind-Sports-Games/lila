@@ -25,7 +25,7 @@ sealed trait RootOrNode {
   def addChild(node: Node): RootOrNode
   def fullMoveNumber = 1 + ply / 2
   def mainline: Vector[Node]
-  def sgPlayer = strategygames.Player.fromPly(ply)
+  def playerIndex = strategygames.Player.fromPly(ply)
   def moveOption: Option[Uci.WithSan]
 }
 

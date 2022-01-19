@@ -4,7 +4,7 @@ import play.api.libs.json._
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.opening.FullOpening
-import strategygames.{ P2, Clock, Player => SGPlayer, Division, GameLogic, Pocket, PocketData, Role, Status, P1 }
+import strategygames.{ P2, Clock, Player => PlayerIndex, Division, GameLogic, Pocket, PocketData, Role, Status, P1 }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
 
@@ -23,17 +23,17 @@ final class JsonView(rematches: Rematches) {
         "rated"         -> game.rated,
         "initialFen"    -> (initialFen | (Forsyth.>>(game.variant.gameLogic, game.chess))),
         "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
-        "player"        -> game.turnSGPlayer,
+        "player"        -> game.turnPlayerIndex,
         "turns"         -> game.turns,
         "startedAtTurn" -> game.chess.startedAtTurn,
         "source"        -> game.source,
         "status"        -> game.status,
         "createdAt"     -> game.createdAt,
-        "winnerPlayer"  -> (game.winnerSGPlayer match {
+        "winnerPlayer"  -> (game.winnerPlayerIndex match {
           case Some(winner) => game.variant.playerNames(winner)
           case None => ""
         }),
-        "loserPlayer"   -> (game.winnerSGPlayer match {
+        "loserPlayer"   -> (game.winnerPlayerIndex match {
           case Some(winner) => game.variant.playerNames(!winner)
           case None => ""
         })
@@ -42,7 +42,7 @@ final class JsonView(rematches: Rematches) {
       .add("boosted" -> game.boosted)
       .add("tournamentId" -> game.tournamentId)
       .add("swissId" -> game.swissId)
-      .add("winner" -> game.winnerSGPlayer)
+      .add("winner" -> game.winnerPlayerIndex)
       .add("lastMove" -> game.lastMoveKeys)
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
@@ -204,7 +204,7 @@ object JsonView {
     JsString(s.name)
   }
 
-  implicit val sgPlayerWrites: Writes[SGPlayer] = Writes { c =>
+  implicit val playerIndexWrites: Writes[PlayerIndex] = Writes { c =>
     JsString(c.name)
   }
 

@@ -1,7 +1,7 @@
 package lila.study
 
 import BSONHandlers._
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Uci }
 import com.github.blemale.scaffeine.AsyncLoadingCache
@@ -96,7 +96,7 @@ final class StudyMultiBoard(
             id = id,
             name = name,
             players = tags flatMap ChapterPreview.players,
-            orientation = doc.getAsOpt[SGPlayer]("orientation") | SGPlayer.P1,
+            orientation = doc.getAsOpt[PlayerIndex]("orientation") | PlayerIndex.P1,
             fen = fen,
             lastMove = lastMove,
             playing = lastMove.isDefined && tags.flatMap(_(_.Result)).has("*")
@@ -128,7 +128,7 @@ object StudyMultiBoard {
       id: Chapter.Id,
       name: Chapter.Name,
       players: Option[ChapterPreview.Players],
-      orientation: SGPlayer,
+      orientation: PlayerIndex,
       fen: FEN,
       lastMove: Option[Uci],
       playing: Boolean
@@ -138,13 +138,13 @@ object StudyMultiBoard {
 
     case class Player(name: String, title: Option[String], rating: Option[Int])
 
-    type Players = SGPlayer.Map[Player]
+    type Players = PlayerIndex.Map[Player]
 
     def players(tags: Tags): Option[Players] =
       for {
         wName <- tags(_.P1)
         bName <- tags(_.P2)
-      } yield SGPlayer.Map(
+      } yield PlayerIndex.Map(
         p1 = Player(wName, tags(_.P1Title), tags(_.P1Elo) flatMap (_.toIntOption)),
         p2 = Player(bName, tags(_.P2Title), tags(_.P2Elo) flatMap (_.toIntOption))
       )

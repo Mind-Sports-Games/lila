@@ -12,7 +12,7 @@ final class JsonView(
     proxyRepo: lila.round.GameProxyRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  implicit private val sgPlayerWriter: Writes[strategygames.Player] = Writes { c =>
+  implicit private val playerIndexWriter: Writes[strategygames.Player] = Writes { c =>
     JsString(c.name)
   }
 
@@ -132,7 +132,7 @@ final class JsonView(
           g.situation
         )),
         "lastMove" -> ~g.lastMoveKeys,
-        "orient"   -> g.playerByUserId(hostId).map(_.sgPlayer)
+        "orient"   -> g.playerByUserId(hostId).map(_.playerIndex)
       )
       .add(
         "clock" -> g.clock.ifTrue(g.isBeingPlayed).map { c =>
@@ -142,7 +142,7 @@ final class JsonView(
           )
         }
       )
-      .add("winner" -> g.winnerSGPlayer.map(_.name))
+      .add("winner" -> g.winnerPlayerIndex.map(_.name))
 
   private def pairingJson(games: List[Game], hostId: String)(p: SimulPairing): Fu[Option[JsObject]] =
     games.find(_.id == p.gameId) ?? { game =>
@@ -151,7 +151,7 @@ final class JsonView(
           .obj(
             "player"    -> player,
             "variant"   -> p.player.variant.key,
-            "hostSGPlayer" -> p.hostSGPlayer,
+            "hostPlayerIndex" -> p.hostPlayerIndex,
             "game"      -> gameJson(hostId, game)
           )
           .some

@@ -103,7 +103,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [viewStatus(ctrl), winner ? ' • ' + ctrl.trans('sgPlayerIsVictorious', ctrl.data.game.winnerPlayer) : '']
+        [viewStatus(ctrl), winner ? ' • ' + ctrl.trans('playerIndexIsVictorious', ctrl.data.game.winnerPlayer) : '']
       ),
     ]);
   }
@@ -219,7 +219,7 @@ function initMessage(d: RoundData, trans: Trans) {
   return game.playable(d) && d.game.turns === 0 && !d.player.spectator
     ? h('div.message', util.justIcon(''), [
         h('div', [
-          trans('youPlayTheSGPlayerPieces', d.player.playerName),
+          trans('youPlayThePlayerIndexPieces', d.player.playerName),
           ...(d.player.playerIndex === 'p1' ? [h('br'), h('strong', trans.noarg('itsYourTurn'))] : []),
         ]),
       ])

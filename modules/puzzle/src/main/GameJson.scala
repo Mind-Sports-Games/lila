@@ -86,7 +86,7 @@ final private class GameJson(
       .obj(
         "userId" -> userId,
         "name"   -> s"${user.name}${p.rating.??(r => s" ($r)")}",
-        "sgPlayer"  -> p.sgPlayer.name
+        "playerIndex"  -> p.playerIndex.name
       )
       .add("title" -> user.title)
   })

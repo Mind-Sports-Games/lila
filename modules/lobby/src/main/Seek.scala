@@ -16,7 +16,7 @@ case class Seek(
     variant: Int,
     daysPerTurn: Option[Int],
     mode: Int,
-    sgPlayer: String,
+    playerIndex: String,
     user: LobbyUser,
     ratingRange: String,
     createdAt: DateTime
@@ -24,7 +24,7 @@ case class Seek(
 
   def id = _id
 
-  val realSGPlayer = SGPlayer orDefault sgPlayer
+  val realPlayerIndex = PlayerIndex orDefault playerIndex
 
   val realVariant = strategygames.variant.Variant.orDefault(gameLogic, variant)
 
@@ -33,7 +33,7 @@ case class Seek(
   def compatibleWith(h: Seek) =
     user.id != h.user.id &&
       compatibilityProperties == h.compatibilityProperties &&
-      (realSGPlayer compatibleWith h.realSGPlayer) &&
+      (realPlayerIndex compatibleWith h.realPlayerIndex) &&
       ratingRangeCompatibleWith(h) && h.ratingRangeCompatibleWith(this)
 
   private def ratingRangeCompatibleWith(s: Seek) =
@@ -62,7 +62,7 @@ case class Seek(
         ),
         "mode"  -> realMode.id,
         "days"  -> daysPerTurn,
-        "sgPlayer" -> strategygames.Player.fromName(sgPlayer).??(_.name),
+        "playerIndex" -> strategygames.Player.fromName(playerIndex).??(_.name),
         "perf" -> Json.obj(
           "icon" -> perfType.map(_.iconChar.toString),
           "name" -> perfType.map(_.trans)
@@ -81,7 +81,7 @@ object Seek {
       variant: strategygames.variant.Variant,
       daysPerTurn: Option[Int],
       mode: Mode,
-      sgPlayer: String,
+      playerIndex: String,
       user: User,
       ratingRange: RatingRange,
       blocking: Set[String]
@@ -92,7 +92,7 @@ object Seek {
       variant = variant.id,
       daysPerTurn = daysPerTurn,
       mode = mode.id,
-      sgPlayer = sgPlayer,
+      playerIndex = playerIndex,
       user = LobbyUser.make(user, blocking),
       ratingRange = ratingRange.toString,
       createdAt = DateTime.now
@@ -105,7 +105,7 @@ object Seek {
       variant = seek.variant,
       daysPerTurn = seek.daysPerTurn,
       mode = seek.mode,
-      sgPlayer = seek.sgPlayer,
+      playerIndex = seek.playerIndex,
       user = seek.user,
       ratingRange = seek.ratingRange,
       createdAt = DateTime.now

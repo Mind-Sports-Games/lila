@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.pgn.{ Tag, Tags }
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, Player => SGPlayer, Pos }
+import strategygames.{ GameLogic, Player => PlayerIndex, Pos }
 import play.api.libs.json._
 import scala.util.chaining._
 
@@ -138,7 +138,7 @@ object JsonView {
   implicit private[study] val pathWrites: Writes[Path] = Writes[Path] { p =>
     JsString(p.toString)
   }
-  implicit private[study] val sgPlayerWriter: Writes[SGPlayer] = Writes[SGPlayer] { c =>
+  implicit private[study] val playerIndexWriter: Writes[PlayerIndex] = Writes[PlayerIndex] { c =>
     JsString(c.name)
   }
   implicit private[study] val fenWriter: Writes[FEN] = Writes[FEN] { f =>

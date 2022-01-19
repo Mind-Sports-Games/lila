@@ -25,7 +25,7 @@ const selectScreen = (ctrl: RacerCtrl): MaybeVNodes => {
   const noarg = ctrl.trans.noarg;
   switch (ctrl.status()) {
     case 'pre': {
-      const povMsg = h('p.racer__pre__message__pov', ctrl.trans('youPlayTheSGPlayerPiecesInAllPuzzles', ctrl.run.pov));
+      const povMsg = h('p.racer__pre__message__pov', ctrl.trans('youPlayThePlayerIndexPiecesInAllPuzzles', ctrl.run.pov));
       return ctrl.race.lobby
         ? [
             waitingToStart(noarg),

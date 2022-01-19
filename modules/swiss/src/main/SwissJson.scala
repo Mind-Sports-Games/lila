@@ -330,7 +330,7 @@ object SwissJson {
           )
         }
       )
-      .add("winner" -> b.game.winnerSGPlayer.map(_.name))
+      .add("winner" -> b.game.winnerPlayerIndex.map(_.name))
       .add("boardSize" -> boardSizeJson(b.game.variant))
       .add("isMicroMatch" -> b.board.isMicroMatch)
       .add("microMatchGameId" -> b.board.microMatchGameId)

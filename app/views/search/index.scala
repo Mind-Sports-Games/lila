@@ -42,7 +42,7 @@ object index {
                 div(cls := "half")(form3.input(form("players")(p))(tpe := "text"))
               })
             ),
-            sgPlayers(hide = true),
+            playerIndexs(hide = true),
             winner(hide = true),
             loser(hide = true),
             rating,
@@ -56,7 +56,7 @@ object index {
             clockTime,
             clockIncrement,
             status,
-            winnerSGPlayer,
+            winnerPlayerIndex,
             date,
             sort,
             analysed,

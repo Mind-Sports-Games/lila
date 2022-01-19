@@ -115,8 +115,8 @@ object form {
         )(
           form3.select(_, clockExtraChoices)
         ),
-        form3.group(form("sgPlayer"), raw("Host sgPlayer for each game"), half = true)(
-          form3.select(_, sgPlayerChoices)
+        form3.group(form("playerIndex"), raw("Host playerIndex for each game"), half = true)(
+          form3.select(_, playerIndexChoices)
         )
       ),
       form3.split(

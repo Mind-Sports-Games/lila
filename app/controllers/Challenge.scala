@@ -30,7 +30,7 @@ final class Challenge(
       }
     }
 
-  def show(id: String, @nowarn("cat=unused") _sgPlayer: Option[String]) =
+  def show(id: String, @nowarn("cat=unused") _playerIndex: Option[String]) =
     Open { implicit ctx =>
       showId(id)
     }
@@ -65,7 +65,7 @@ final class Challenge(
           }
           else
             (c.challengerUserId ?? env.user.repo.named) map { user =>
-              Ok(html.challenge.theirs(c, json, user, get("sgPlayer") flatMap strategygames.Player.fromName))
+              Ok(html.challenge.theirs(c, json, user, get("playerIndex") flatMap strategygames.Player.fromName))
             },
         api = _ => Ok(json).fuccess
       ) flatMap withChallengeAnonCookie(mine && c.challengerIsAnon, c, owner = true)
@@ -81,10 +81,10 @@ final class Challenge(
   private def isForMe(challenge: ChallengeModel)(implicit ctx: Context) =
     challenge.destUserId.fold(true)(ctx.userId.contains)
 
-  def accept(id: String, sgPlayer: Option[String]) =
+  def accept(id: String, playerIndex: Option[String]) =
     Open { implicit ctx =>
       OptionFuResult(api byId id) { c =>
-        val cc = sgPlayer flatMap strategygames.Player.fromName
+        val cc = playerIndex flatMap strategygames.Player.fromName
         isForMe(c) ?? api
           .accept(c, ctx.me, HTTPRequest sid ctx.req, cc)
           .flatMap {
@@ -124,7 +124,7 @@ final class Challenge(
         _ map { game =>
           env.lilaCookie.cookie(
             AnonCookie.name,
-            game.player(if (owner) c.finalSGPlayer else !c.finalSGPlayer).id,
+            game.player(if (owner) c.finalPlayerIndex else !c.finalPlayerIndex).id,
             maxAge = AnonCookie.maxAge.some,
             httpOnly = false.some
           )
@@ -344,7 +344,7 @@ final class Challenge(
         initialFen = config.position,
         timeControl = timeControl,
         mode = config.mode,
-        sgPlayer = config.sgPlayer.name,
+        playerIndex = config.playerIndex.name,
         challenger = ChallengeModel.toRegistered(config.variant, timeControl)(orig),
         destUser = dest,
         rematchOf = none,
@@ -406,7 +406,7 @@ final class Challenge(
                   timeControl =
                     config.clock.fold[TimeControl](TimeControl.Unlimited)(TimeControl.Clock.apply),
                   mode = strategygames.Mode(config.rated),
-                  sgPlayer = "random",
+                  playerIndex = "random",
                   challenger = Challenger.Open,
                   destUser = none,
                   rematchOf = none,
@@ -416,8 +416,8 @@ final class Challenge(
                 case true =>
                   JsonOk(
                     env.challenge.jsonView.show(challenge, SocketVersion(0), none) ++ Json.obj(
-                      "urlP1" -> s"${env.net.baseUrl}/${challenge.id}?sgPlayer=p1",
-                      "urlP2" -> s"${env.net.baseUrl}/${challenge.id}?sgPlayer=p2"
+                      "urlP1" -> s"${env.net.baseUrl}/${challenge.id}?playerIndex=p1",
+                      "urlP2" -> s"${env.net.baseUrl}/${challenge.id}?playerIndex=p2"
                     )
                   )
                 case false =>

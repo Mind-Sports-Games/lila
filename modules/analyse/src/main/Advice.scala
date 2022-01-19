@@ -11,7 +11,7 @@ sealed trait Advice {
 
   def ply   = info.ply
   def turn  = info.turn
-  def sgPlayer = info.sgPlayer
+  def playerIndex = info.playerIndex
   def cp    = info.cp
   def mate  = info.mate
 
@@ -74,7 +74,7 @@ private[analyse] object CpAdvice {
       prevWinningChances    = cpWinningChances(cp)
       currentWinningChances = cpWinningChances(infoCp)
       delta = (currentWinningChances - prevWinningChances) pipe { d =>
-        info.sgPlayer.fold(-d, d)
+        info.playerIndex.fold(-d, d)
       }
       judgement <- winningChanceJudgements find { case (d, _) => d <= delta } map (_._2)
     } yield CpAdvice(judgement, info, prev)
@@ -111,8 +111,8 @@ private[analyse] case class MateAdvice(
 private[analyse] object MateAdvice {
 
   def apply(prev: Info, info: Info): Option[MateAdvice] = {
-    def invertCp(cp: Cp)       = cp invertIf info.sgPlayer.p2
-    def invertMate(mate: Mate) = mate invertIf info.sgPlayer.p2
+    def invertCp(cp: Cp)       = cp invertIf info.playerIndex.p2
+    def invertMate(mate: Mate) = mate invertIf info.playerIndex.p2
     def prevCp                 = prev.cp.map(invertCp).??(_.centipawns)
     def nextCp                 = info.cp.map(invertCp).??(_.centipawns)
     MateSequence(prev.mate map invertMate, info.mate map invertMate) flatMap { sequence =>

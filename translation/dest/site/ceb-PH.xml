@@ -19,7 +19,7 @@
   <string name="black">Itom</string>
   <string name="randomColor">Bisag asa nga side</string>
   <string name="createAGame">Magbuhat ug duwa</string>
-  <string name="sgPlayerIsVictorious">Ang %s ang nakadaog</string>
+  <string name="playerIndexIsVictorious">Ang %s ang nakadaog</string>
   <string name="whiteIsVictorious">Ang puti ang nakadaog</string>
   <string name="blackIsVictorious">Itom ang nakadaog</string>
   <string name="youPlayTheWhitePieces">ikaw mo duso sa white</string>
@@ -32,7 +32,7 @@
   <string name="newOpponent">Bag-ong kontra</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Ang imong kontra kay gusto moduwa ug bag-ong duwa sa imo</string>
   <string name="joinTheGame">Apil sa duwa</string>
-  <string name="sgPlayerPlays">%s ang moduwa</string>
+  <string name="playerIndexPlays">%s ang moduwa</string>
   <string name="whitePlays">Puti ang moduwa</string>
   <string name="blackPlays">Itom ang moduwa</string>
   <string name="opponentLeftChoices">Ang laing kontra kay basin nihawa na sa duwa, Pwede na nimo kuhaon ang pagkadaog, himoang tabla ang duwa, o maghuwat.</string>
@@ -41,10 +41,10 @@
   <string name="forceDraw">Tawagi ug tabla</string>
   <string name="talkInChat">Palihug pagbinuotan sa chat!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Ang unang taw ng moari sa URL kay makigduwa sa imo.</string>
-  <string name="sgPlayerResigned">Niundang ang %s</string>
+  <string name="playerIndexResigned">Niundang ang %s</string>
   <string name="whiteResigned">Niundang ang puti</string>
   <string name="blackResigned">Niundang ang itom</string>
-  <string name="sgPlayerLeftTheGame">Niundang ang %s sa duwa</string>
+  <string name="playerIndexLeftTheGame">Niundang ang %s sa duwa</string>
   <string name="whiteLeftTheGame">Niundang ang puti sa duwa</string>
   <string name="blackLeftTheGame">Ninundang ang itom sa duwa</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Ipanghatag ni nga URL para makakita ang mga motan-aw</string>

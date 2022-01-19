@@ -113,7 +113,7 @@ final class Setup(
                       initialFen = config.fen,
                       timeControl = timeControl,
                       mode = config.mode,
-                      sgPlayer = config.sgPlayer.name,
+                      playerIndex = config.playerIndex.name,
                       challenger = (ctx.me, HTTPRequest sid req) match {
                         case (Some(user), _) => toRegistered(config.variant, timeControl)(user)
                         case (_, Some(sid))  => Challenger.Anonymous(sid)
@@ -234,7 +234,7 @@ final class Setup(
             config =>
               env.relation.api.fetchBlocking(me.id) flatMap { blocking =>
                 val uniqId = s"sri:${me.id}"
-                config.fixSGPlayer.hook(Sri(uniqId), me.some, sid = uniqId.some, blocking) match {
+                config.fixPlayerIndex.hook(Sri(uniqId), me.some, sid = uniqId.some, blocking) match {
                   case Left(hook) =>
                     PostRateLimit(HTTPRequest ipAddress req) {
                       BoardApiHookConcurrencyLimitPerUser(me.id)(
@@ -256,7 +256,7 @@ final class Setup(
     Open { implicit ctx =>
       get("fen") map(s => FEN.clean(gameLogic(getInt("lib")), s)) flatMap ValidFen(getBool("strict")) match {
         case None    => BadRequest.fuccess
-        case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.sgPlayer, v.situation.board.variant.key)).fuccess
+        case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.playerIndex, v.situation.board.variant.key)).fuccess
       }
     }
 

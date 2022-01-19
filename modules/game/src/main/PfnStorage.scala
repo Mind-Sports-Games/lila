@@ -3,7 +3,7 @@ package lila.game
 import strategygames.fairysf
 import strategygames.fairysf.format
 import strategygames.fairysf.{ Piece, PieceMap, Pos, PositionHash, Role }
-import strategygames.{ Player => SGPlayer, GameFamily }
+import strategygames.{ Player => PlayerIndex, GameFamily }
 
 import lila.db.ByteArray
 
@@ -66,7 +66,7 @@ private object PfnStorage {
       Role.javaSymbolToRole(role.symbol)
 
     private def fairysfPiece(piece: JavaPiece): Piece =
-      Piece(SGPlayer.fromP1(piece.white), fairysfRole(piece.role))
+      Piece(PlayerIndex.fromP1(piece.white), fairysfRole(piece.role))
   }
 
   case class Decoded(

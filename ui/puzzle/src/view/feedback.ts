@@ -45,7 +45,7 @@ const initial = (ctrl: Controller): VNode =>
       h('div.no-square', h('piece.k-piece.' + ctrl.vm.pov)),
       h('div.instruction', [
         h('strong', ctrl.trans.noarg('yourTurn')),
-        h('em', ctrl.trans('findTheBestMoveForSGPlayer', ctrl.vm.pov)),
+        h('em', ctrl.trans('findTheBestMoveForPlayerIndex', ctrl.vm.pov)),
       ]),
     ]),
     viewSolution(ctrl),

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">Fes una jugada per començar</string>
-  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">Jugues amb %s a tots els problemes</string>
+  <string name="youPlayThePlayerIndexPiecesInAllPuzzles">Jugues amb %s a tots els problemes</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">Jugues amb blanques a tots els problemes</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">Jugues amb negres a tots els problemes</string>
   <string name="puzzlesSolved">problemes resolts</string>

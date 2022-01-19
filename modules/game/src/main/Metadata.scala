@@ -3,7 +3,7 @@ package lila.game
 import java.security.MessageDigest
 import lila.db.ByteArray
 import org.joda.time.DateTime
-import strategygames.{ P2, Player => SGPlayer, P1 }
+import strategygames.{ P2, Player => PlayerIndex, P1 }
 
 private[game] case class Metadata(
     source: Option[Source],
@@ -48,17 +48,17 @@ private[game] object Metadata {
 // plies
 case class GameDrawOffers(p1: Set[Int], p2: Set[Int]) {
 
-  def lastBy(sgPlayer: SGPlayer): Option[Int] = sgPlayer.fold(p1, p2).maxOption
+  def lastBy(playerIndex: PlayerIndex): Option[Int] = playerIndex.fold(p1, p2).maxOption
 
-  def add(sgPlayer: SGPlayer, ply: Int) =
-    sgPlayer.fold(copy(p1 = p1 incl ply), copy(p2 = p2 incl ply))
+  def add(playerIndex: PlayerIndex, ply: Int) =
+    playerIndex.fold(copy(p1 = p1 incl ply), copy(p2 = p2 incl ply))
 
   def isEmpty = this == GameDrawOffers.empty
 
   // playstrategy allows to offer draw on either turn,
   // normalize to pretend it was done on the opponent turn.
-  def normalize(sgPlayer: SGPlayer): Set[Int] = sgPlayer.fold(p1, p2) map {
-    case ply if (ply % 2 == 0) == sgPlayer.p1 => ply + 1
+  def normalize(playerIndex: PlayerIndex): Set[Int] = playerIndex.fold(p1, p2) map {
+    case ply if (ply % 2 == 0) == playerIndex.p1 => ply + 1
     case ply => ply
   }
   def normalizedPlies: Set[Int] = normalize(P1) ++ normalize(P2)

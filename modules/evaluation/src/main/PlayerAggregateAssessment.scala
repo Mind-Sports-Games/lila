@@ -116,7 +116,7 @@ case class PlayerAggregateAssessment(
       .sortBy(-_.assessment.id)
       .take(maxGames)
       .map { a =>
-        a.assessment.emoticon + " playstrategy.org/" + a.gameId + "/" + a.sgPlayer.name
+        a.assessment.emoticon + " playstrategy.org/" + a.gameId + "/" + a.playerIndex.name
       }
       .mkString("\n")
 
@@ -129,6 +129,6 @@ case class PlayerAggregateAssessment(
 object PlayerAggregateAssessment {
 
   case class WithGames(pag: PlayerAggregateAssessment, games: List[lila.game.Game]) {
-    def pov(pa: PlayerAssessment) = games find (_.id == pa.gameId) map { lila.game.Pov(_, pa.sgPlayer) }
+    def pov(pa: PlayerAssessment) = games find (_.id == pa.gameId) map { lila.game.Pov(_, pa.playerIndex) }
   }
 }

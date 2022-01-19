@@ -1,7 +1,7 @@
 package lila.storm
 
 import cats.data.NonEmptyList
-import strategygames.{ Player => SGPlayer, P1 }
+import strategygames.{ Player => PlayerIndex, P1 }
 import strategygames.chess.format.{ FEN, Forsyth, Uci }
 
 import lila.puzzle.Puzzle
@@ -15,7 +15,7 @@ case class StormPuzzle(
   // ply after "initial move" when we start solving
   def initialPly: Int =
     fen.fullMove ?? { fm =>
-      fm * 2 - sgPlayer.fold(1, 2)
+      fm * 2 - playerIndex.fold(1, 2)
     }
 
   lazy val fenAfterInitialMove: FEN = {
@@ -25,5 +25,5 @@ case class StormPuzzle(
     } yield Forsyth >> sit2
   } err s"Can't apply puzzle $id first move"
 
-  def sgPlayer = fen.player.fold[SGPlayer](P1)(!_)
+  def playerIndex = fen.player.fold[PlayerIndex](P1)(!_)
 }

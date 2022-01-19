@@ -48,12 +48,12 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
       .cursor[Challenge]()
       .list()
 
-  def setChallenger(c: Challenge, sgPlayer: Option[strategygames.Player]) =
+  def setChallenger(c: Challenge, playerIndex: Option[strategygames.Player]) =
     coll.update
       .one(
         $id(c.id),
-        $set($doc("challenger" -> c.challenger) ++ sgPlayer.?? { c =>
-          $doc("sgPlayerChoice" -> Challenge.SGPlayerChoice(c), "finalSGPlayer" -> c)
+        $set($doc("challenger" -> c.challenger) ++ playerIndex.?? { c =>
+          $doc("playerIndexChoice" -> Challenge.PlayerIndexChoice(c), "finalPlayerIndex" -> c)
         })
       )
       .void

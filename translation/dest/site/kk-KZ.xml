@@ -20,10 +20,10 @@
   <string name="black">Қара</string>
   <string name="randomColor">Кез-келген түс</string>
   <string name="createAGame">Ойын бастау</string>
-  <string name="sgPlayerIsVictorious">%s жеңді</string>
+  <string name="playerIndexIsVictorious">%s жеңді</string>
   <string name="whiteIsVictorious">Ақ жеңді</string>
   <string name="blackIsVictorious">Қара жеңді</string>
-  <string name="youPlayTheSGPlayerPieces">Сіз %s таспен ойнайсыз</string>
+  <string name="youPlayThePlayerIndexPieces">Сіз %s таспен ойнайсыз</string>
   <string name="youPlayTheWhitePieces">Сіз ақ таспен ойнайсыз</string>
   <string name="youPlayTheBlackPieces">Сіз қара таспен ойнайсыз</string>
   <string name="itsYourTurn">Кезек сізде!</string>
@@ -46,10 +46,10 @@
   <string name="forceDraw">Теңдік болсын</string>
   <string name="talkInChat">Сөйлескенде, әдеп сақтаңыз!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Бұл сілтемеден бірінші келген адам сізбен ойнайды.</string>
-  <string name="sgPlayerResigned">%s берілді</string>
+  <string name="playerIndexResigned">%s берілді</string>
   <string name="whiteResigned">Ақ берілді</string>
   <string name="blackResigned">Қара берілді</string>
-  <string name="sgPlayerLeftTheGame">%s ойыннан шықты</string>
+  <string name="playerIndexLeftTheGame">%s ойыннан шықты</string>
   <string name="whiteLeftTheGame">Ақ ойыннан шықты</string>
   <string name="blackLeftTheGame">Қара ойыннан шықты</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Ойынды көрермендерге көрсету үшін бұл сілтемені жіберіңіз</string>
@@ -208,10 +208,10 @@
   <string name="drawOfferDeclined">Тепе-теңдікке келіспеді</string>
   <string name="drawOfferAccepted">Тепе-теңдікке келісті</string>
   <string name="drawOfferCanceled">Тепе-теңдік сұрау тоқтатылды</string>
-  <string name="sgPlayerOffersDraw">%s тепе-теңдік сұрауда</string>
+  <string name="playerIndexOffersDraw">%s тепе-теңдік сұрауда</string>
   <string name="whiteOffersDraw">Ақ тепе-теңдік сұрауда</string>
   <string name="blackOffersDraw">Қара тепе-теңдік сұрауда</string>
-  <string name="sgPlayerDeclinesDraw">%s тепе-теңдіктен бас тартты</string>
+  <string name="playerIndexDeclinesDraw">%s тепе-теңдіктен бас тартты</string>
   <string name="whiteDeclinesDraw">Ақ тепе-теңдіктен бас тартты</string>
   <string name="blackDeclinesDraw">Қара тепе-теңдіктен бас тартты</string>
   <string name="yourOpponentOffersADraw">Қарсыласыңыз тепе-теңдік сұрап отыр</string>
@@ -355,7 +355,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Адам екеніңізді растау үшін тақтаға басып, жүріс жасаңыз.</string>
   <string name="captcha.fail">Шахмат түрлі есепті шешіңіз.</string>
   <string name="notACheckmate">Мат емес</string>
-  <string name="sgPlayerCheckmatesInOneMove">%s жағы бір жүріспен мат қояды</string>
+  <string name="playerIndexCheckmatesInOneMove">%s жағы бір жүріспен мат қояды</string>
   <string name="whiteCheckmatesInOneMove">Ақ жағы бір жүріспен мат қояды</string>
   <string name="blackCheckmatesInOneMove">Қара жағы бір жүріспен мат қояды</string>
   <string name="retry">Қайталау</string>
@@ -755,7 +755,7 @@
   <string name="hideBestMove">Үздік жүрісті жасыру</string>
   <string name="getAHint">Көмек алу</string>
   <string name="evaluatingYourMove">Жүрісіңізді өңдеуде ...</string>
-  <string name="sgPlayerWinsGame">%s жеңді</string>
+  <string name="playerIndexWinsGame">%s жеңді</string>
   <string name="whiteWinsGame">Ақ жеңді</string>
   <string name="blackWinsGame">Қара жеңді</string>
   <string name="learnFromYourMistakes">Өз қателеріңізден сабақ алыңыз</string>
@@ -763,7 +763,7 @@
   <string name="skipThisMove">Осы жүрісті елемеу</string>
   <string name="next">Келесі</string>
   <string name="xWasPlayed">%s ойналды</string>
-  <string name="findBetterMoveForSGPlayer">%s пайдасына ең тиімді жүрісті табыңыз</string>
+  <string name="findBetterMoveForPlayerIndex">%s пайдасына ең тиімді жүрісті табыңыз</string>
   <string name="findBetterMoveForWhite">Ақ пайдасына ең тиімді жүрісті табыңыз</string>
   <string name="findBetterMoveForBlack">Қара пайдасына ең тиімді жүрісті табыңыз</string>
   <string name="resumeLearning">Үйренуді қорытындылау</string>

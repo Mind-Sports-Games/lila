@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ P2, Board, Centis, Clock, Player => SGPlayer, GameLogic, History, PocketData, P1 }
+import strategygames.{ P2, Board, Centis, Clock, Player => PlayerIndex, GameLogic, History, PocketData, P1 }
 import strategygames.chess.CheckCount
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
@@ -53,13 +53,13 @@ object GameDiff {
     def dOptTry[A](name: String, getter: Game => A, toBson: A => Option[Try[BSONValue]]): Unit =
       dOpt[A](name, getter, a => toBson(a).map(_.get))
 
-    def getClockHistory(sgPlayer: SGPlayer)(g: Game): Option[ClockHistorySide] =
+    def getClockHistory(playerIndex: PlayerIndex)(g: Game): Option[ClockHistorySide] =
       for {
         clk     <- g.clock
         history <- g.clockHistory
-        curSGPlayer = g.turnSGPlayer
-        times    = history(sgPlayer)
-      } yield (clk.limit, times, g.flagged has sgPlayer)
+        curPlayerIndex = g.turnPlayerIndex
+        times    = history(playerIndex)
+      } yield (clk.limit, times, g.flagged has playerIndex)
 
     def clockHistoryToBytes(o: Option[ClockHistorySide]) =
       o.flatMap { case (x, y, z) =>

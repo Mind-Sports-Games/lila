@@ -40,7 +40,7 @@
   <string name="forceDraw">Dweba ucingo</string>
   <string name="talkInChat">Sicela ujabule engxoxweni!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Umuntu wokuqala oza kule URL uzodlala nawe.</string>
-  <string name="sgPlayerResigned">Ukumiswa %s</string>
+  <string name="playerIndexResigned">Ukumiswa %s</string>
   <string name="whiteResigned">Ukumiswa okumhlophe</string>
   <string name="blackResigned">Okumnyama kususwe</string>
   <string name="whiteLeftTheGame">Umhlophe ushiye umdlalo</string>
@@ -184,7 +184,7 @@
   </plurals>
   <string name="cancel">Khansela</string>
   <string name="whiteTimeOut">Isikhathi siphelili elimhlophe</string>
-  <string name="sgPlayerTimeOut">Isikhathi siphelili %s</string>
+  <string name="playerIndexTimeOut">Isikhathi siphelili %s</string>
   <string name="blackTimeOut">Isikhathi siphelili mnyama</string>
   <string name="drawOfferSent">Dweba okunikezwayo kuthunyelwe</string>
   <string name="drawOfferDeclined">Ukunikezwa komdwebo kunqatshiwe</string>

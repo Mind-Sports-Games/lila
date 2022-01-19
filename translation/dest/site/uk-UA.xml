@@ -20,7 +20,7 @@
   <string name="black">Чорні</string>
   <string name="randomColor">Випадковий колір</string>
   <string name="createAGame">Створити гру</string>
-  <string name="sgPlayerIsVictorious">%s перемогли</string>
+  <string name="playerIndexIsVictorious">%s перемогли</string>
   <string name="whiteIsVictorious">Білі перемогли</string>
   <string name="blackIsVictorious">Чорні перемогли</string>
   <string name="youPlayTheWhitePieces">Ви граєте білими фігурами</string>
@@ -47,10 +47,10 @@
   <string name="forceDraw">Вимагати нічиєї</string>
   <string name="talkInChat">Будь ласка, будьте ввічливими!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Перша людина, яка перейде за цим посиланням, гратиме з вами.</string>
-  <string name="sgPlayerResigned">%s здалися</string>
+  <string name="playerIndexResigned">%s здалися</string>
   <string name="whiteResigned">Білі здалися</string>
   <string name="blackResigned">Чорні здалися</string>
-  <string name="sgPlayerLeftTheGame">%s залишили гру</string>
+  <string name="playerIndexLeftTheGame">%s залишили гру</string>
   <string name="whiteLeftTheGame">Білі залишили гру</string>
   <string name="blackLeftTheGame">Чорні залишили гру</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Поширте це посилання, щоб глядачі могли спостерігати за грою</string>
@@ -229,10 +229,10 @@
   <string name="drawOfferDeclined">Пропозицію нічиєї відхилено</string>
   <string name="drawOfferAccepted">Пропозицію нічиєї прийнято</string>
   <string name="drawOfferCanceled">Пропозицію нічиєї скасовано</string>
-  <string name="sgPlayerOffersDraw">%s пропонують нічию</string>
+  <string name="playerIndexOffersDraw">%s пропонують нічию</string>
   <string name="whiteOffersDraw">Білі пропонують нічию</string>
   <string name="blackOffersDraw">Чорні пропонують нічию</string>
-  <string name="sgPlayerDeclinesDraw">%s відхилили нічию</string>
+  <string name="playerIndexDeclinesDraw">%s відхилили нічию</string>
   <string name="whiteDeclinesDraw">Білі відхилили нічию</string>
   <string name="blackDeclinesDraw">Чорні відхилили нічию</string>
   <string name="yourOpponentOffersADraw">Ваш суперник пропонує нічию</string>
@@ -403,7 +403,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Натисніть на дошці, щоб зробити хід і довести, що ви людина.</string>
   <string name="captcha.fail">Будь ласка, вирішіть шахову капчу.</string>
   <string name="notACheckmate">Це не мат</string>
-  <string name="sgPlayerCheckmatesInOneMove">%s ставлять мат в один хід</string>
+  <string name="playerIndexCheckmatesInOneMove">%s ставлять мат в один хід</string>
   <string name="whiteCheckmatesInOneMove">Білі ставлять мат в один хід</string>
   <string name="blackCheckmatesInOneMove">Чорні ставлять мат в один хід</string>
   <string name="retry">Спробуйте ще</string>
@@ -824,7 +824,7 @@
   <string name="hideBestMove">Приховати найкращий хід</string>
   <string name="getAHint">Отримати підказку</string>
   <string name="evaluatingYourMove">Оцінка вашого ходу...</string>
-  <string name="sgPlayerWinsGame">%s виграли</string>
+  <string name="playerIndexWinsGame">%s виграли</string>
   <string name="whiteWinsGame">Білі виграли</string>
   <string name="blackWinsGame">Чорні виграли</string>
   <string name="learnFromYourMistakes">Робота над помилками</string>

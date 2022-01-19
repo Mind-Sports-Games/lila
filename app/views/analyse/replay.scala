@@ -76,7 +76,7 @@ object replay {
           dataIcon := "$",
           cls := "text",
           targetBlank,
-          href := cdnUrl(routes.Export.gif(pov.gameId, pov.sgPlayer.name).url)
+          href := cdnUrl(routes.Export.gif(pov.gameId, pov.playerIndex.name).url)
         )(
           "Share as a GIF"
         )

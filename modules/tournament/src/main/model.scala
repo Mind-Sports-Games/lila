@@ -61,7 +61,7 @@ case class RankedPairing(pairing: Pairing, rank1: Int, rank2: Int) {
   def bestRank = rank1 min rank2
   // def rankSum = rank1 + rank2
 
-  def bestSGPlayer = strategygames.Player.fromP1(rank1 < rank2)
+  def bestPlayerIndex = strategygames.Player.fromP1(rank1 < rank2)
 }
 
 object RankedPairing {
@@ -77,8 +77,8 @@ case class RankedPlayer(rank: Int, player: Player) {
 
   def is(other: RankedPlayer) = player is other.player
 
-  def withSGPlayerHistory(getHistory: Player.ID => SGPlayerHistory) =
-    RankedPlayerWithSGPlayerHistory(rank, player, getHistory(player.id))
+  def withPlayerIndexHistory(getHistory: Player.ID => PlayerIndexHistory) =
+    RankedPlayerWithPlayerIndexHistory(rank, player, getHistory(player.id))
 
   override def toString = s"$rank. ${player.userId}[${player.rating}]"
 }
@@ -91,7 +91,7 @@ object RankedPlayer {
     }
 }
 
-case class RankedPlayerWithSGPlayerHistory(rank: Int, player: Player, sgPlayerHistory: SGPlayerHistory) {
+case class RankedPlayerWithPlayerIndexHistory(rank: Int, player: Player, playerIndexHistory: PlayerIndexHistory) {
 
   def is(other: RankedPlayer) = player is other.player
 

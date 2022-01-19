@@ -9,7 +9,7 @@ import lila.common.String.html.richText
 import lila.rating.PerfType
 import lila.user.User
 
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 
 object teacherDashboard {
 
@@ -176,7 +176,7 @@ object teacherDashboard {
       students: List[Student.WithUser],
       basicCompletion: Map[User.ID, Int],
       practiceCompletion: Map[User.ID, Int],
-      coordScores: Map[User.ID, SGPlayer.Map[Int]]
+      coordScores: Map[User.ID, PlayerIndex.Map[Int]]
   )(implicit ctx: Context) =
     layout(c, students, "progress")(
       progressHeader(c, none),
@@ -193,7 +193,7 @@ object teacherDashboard {
             ),
             tbody(
               students.sortBy(_.user.username).map { case s @ Student.WithUser(_, user) =>
-                val coord = coordScores.getOrElse(user.id, SGPlayer.Map(0, 0))
+                val coord = coordScores.getOrElse(user.id, PlayerIndex.Map(0, 0))
                 tr(
                   studentTd(c, s),
                   td(dataSort := basicCompletion.getOrElse(user.id, 0))(
@@ -205,8 +205,8 @@ object teacherDashboard {
                     "%"
                   ),
                   td(dataSort := coord.p1, cls := "coords")(
-                    i(cls := "sgPlayer-icon is p1")(coord.p1),
-                    i(cls := "sgPlayer-icon is p2")(coord.p2)
+                    i(cls := "playerIndex-icon is p1")(coord.p1),
+                    i(cls := "playerIndex-icon is p2")(coord.p2)
                   )
                 )
               }

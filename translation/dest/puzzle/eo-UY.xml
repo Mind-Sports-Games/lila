@@ -15,7 +15,7 @@
   <string name="voteToLoadNextOne">Voĉdonu por iri al la venonta puzlo!</string>
   <string name="yourPuzzleRatingX">Via puzla rango: %s</string>
   <string name="findTheBestMoveForWhite">Trovu la plej bonan movon por blanko.</string>
-  <string name="findTheBestMoveForSGPlayer">Trovu la plej bonan movon por %s.</string>
+  <string name="findTheBestMoveForPlayerIndex">Trovu la plej bonan movon por %s.</string>
   <string name="findTheBestMoveForBlack">Trovu la plej bonan movon por nigro.</string>
   <string name="puzzleId">Puzlo %s</string>
   <string name="puzzleOfTheDay">Puzlo de la tago</string>

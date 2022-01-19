@@ -1,6 +1,6 @@
 package lila.tournament
 
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 import lila.game.Game
 import lila.user.User
 
@@ -42,9 +42,9 @@ case class Pairing(
   def notLostBy(user: User.ID): Boolean = winner.fold(true)(user ==)
   def draw: Boolean                     = finished && winner.isEmpty
 
-  def sgPlayerOf(userId: User.ID): Option[SGPlayer] =
-    if (userId == user1) SGPlayer.P1.some
-    else if (userId == user2) SGPlayer.P2.some
+  def playerIndexOf(userId: User.ID): Option[PlayerIndex] =
+    if (userId == user1) PlayerIndex.P1.some
+    else if (userId == user2) PlayerIndex.P2.some
     else none
 
   def berserkOf(userId: User.ID): Boolean =
@@ -52,7 +52,7 @@ case class Pairing(
     else if (userId == user2) berserk2
     else false
 
-  def berserkOf(sgPlayer: SGPlayer) = sgPlayer.fold(berserk1, berserk2)
+  def berserkOf(playerIndex: PlayerIndex) = playerIndex.fold(berserk1, berserk2)
 
   def similar(other: Pairing) = other.contains(user1, user2)
 }
@@ -84,8 +84,8 @@ private[tournament] object Pairing {
       make(gameId, tourId, user1, user2)
   }
 
-  def prepWithSGPlayer(tour: Tournament, p1: RankedPlayerWithSGPlayerHistory, p2: RankedPlayerWithSGPlayerHistory) =
-    if (p1.sgPlayerHistory.firstGetsP1(p2.sgPlayerHistory)(() => lila.common.ThreadLocalRandom.nextBoolean()))
+  def prepWithPlayerIndex(tour: Tournament, p1: RankedPlayerWithPlayerIndexHistory, p2: RankedPlayerWithPlayerIndexHistory) =
+    if (p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() => lila.common.ThreadLocalRandom.nextBoolean()))
       Prep(tour.id, p1.player.userId, p2.player.userId)
     else Prep(tour.id, p2.player.userId, p1.player.userId)
 }

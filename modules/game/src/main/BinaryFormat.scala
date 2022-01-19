@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ P2, Board, Centis, Clock, ClockPlayer, Player => SGPlayer, GameLogic, Piece, PieceMap, Pos, Role, Timestamp, P1 }
+import strategygames.{ P2, Board, Centis, Clock, ClockPlayer, Player => PlayerIndex, GameLogic, Piece, PieceMap, Pos, Role, Timestamp, P1 }
 import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.draughts
@@ -43,7 +43,7 @@ object BinaryFormat {
       if (flagged) decoded :+ Centis(0) else decoded
     }
 
-    def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[SGPlayer]) =
+    def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
       Try {
         ClockHistory(
           readSide(start, bw, flagged has P1),
@@ -90,8 +90,8 @@ object BinaryFormat {
 
   case class clock(start: Timestamp) {
 
-    def legacyElapsed(clock: Clock, sgPlayer: SGPlayer) =
-      clock.limit - clock.players(sgPlayer).remaining
+    def legacyElapsed(clock: Clock, playerIndex: PlayerIndex) =
+      clock.limit - clock.players(playerIndex).remaining
 
     def computeRemaining(config: Clock.Config, legacyElapsed: Centis) =
       config.limit - legacyElapsed
@@ -103,8 +103,8 @@ object BinaryFormat {
         clock.timer.fold(Array.empty[Byte])(writeTimer)
     }
 
-    def read(ba: ByteArray, p1Berserk: Boolean, p2Berserk: Boolean): SGPlayer => Clock =
-      sgPlayer => {
+    def read(ba: ByteArray, p1Berserk: Boolean, p2Berserk: Boolean): PlayerIndex => Clock =
+      playerIndex => {
         val ia = ba.value map toInt
 
         // ba.size might be greater than 12 with 5 bytes timers
@@ -122,8 +122,8 @@ object BinaryFormat {
             val legacyP2 = Centis(readSignedInt24(b6, b7, b8))
             Clock(
               config = config,
-              player = sgPlayer,
-              players = SGPlayer.Map(
+              player = playerIndex,
+              players = PlayerIndex.Map(
                 ClockPlayer
                   .withConfig(config)
                   .copy(berserk = p1Berserk)
@@ -224,7 +224,7 @@ object BinaryFormat {
       }
       def intPiece(int: Int): Option[chess.Piece] =
         chess.Role.binaryInt(int & 127) map {
-          role => chess.Piece(SGPlayer.fromP1((int & 128) == 0), role)
+          role => chess.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
         }
       (chess.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
@@ -259,7 +259,7 @@ object BinaryFormat {
       }
       def intPiece(int: Int): Option[draughts.Piece] =
         draughts.Role.binaryInt(int & 7) map {
-          role => draughts.Piece(SGPlayer((int & 8) == 0), role)
+          role => draughts.Piece(PlayerIndex((int & 8) == 0), role)
         }
       val pieceInts = ba.value flatMap splitInts
       (variant.boardSize.pos.all zip pieceInts).flatMap {
@@ -282,7 +282,7 @@ object BinaryFormat {
       //}
       def intPiece(int: Int): Option[fairysf.Piece] =
         fairysf.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map {
-          role => fairysf.Piece(SGPlayer.fromP1((int & 128) == 0), role)
+          role => fairysf.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
         }
       (fairysf.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>

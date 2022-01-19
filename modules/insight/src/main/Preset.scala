@@ -69,7 +69,7 @@ object Preset {
             D.Perf,
             PerfType.standard
           ),
-          Filter(D.SGPlayer, List(strategygames.P1))
+          Filter(D.PlayerIndex, List(strategygames.P1))
         )
       )
     ),

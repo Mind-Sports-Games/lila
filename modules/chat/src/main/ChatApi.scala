@@ -1,6 +1,6 @@
 package lila.chat
 
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 import reactivemongo.api.ReadPreference
 import scala.concurrent.duration._
 
@@ -277,18 +277,18 @@ final class ChatApi(
     def optionsByOrderedIds(chatIds: List[Chat.Id]): Fu[List[Option[MixedChat]]] =
       coll.optionsByOrderedIds[MixedChat, Chat.Id](chatIds, none, ReadPreference.secondaryPreferred)(_.id)
 
-    def write(chatId: Chat.Id, sgPlayer: SGPlayer, text: String, busChan: BusChan.Select): Funit =
-      makeLine(chatId, sgPlayer, text) ?? { line =>
+    def write(chatId: Chat.Id, playerIndex: PlayerIndex, text: String, busChan: BusChan.Select): Funit =
+      makeLine(chatId, playerIndex, text) ?? { line =>
         persistLine(chatId, line) >>- {
           publish(chatId, actorApi.ChatLine(chatId, line), busChan)
           lila.mon.chat.message("anonPlayer", troll = false).increment().unit
         }
       }
 
-    private def makeLine(chatId: Chat.Id, sgPlayer: SGPlayer, t1: String): Option[Line] =
+    private def makeLine(chatId: Chat.Id, playerIndex: PlayerIndex, t1: String): Option[Line] =
       Writer cut t1 flatMap { t2 =>
-        flood.allowMessage(s"$chatId/${sgPlayer.letter}", t2) option
-          PlayerLine(sgPlayer, Writer preprocessUserInput t2)
+        flood.allowMessage(s"$chatId/${playerIndex.letter}", t2) option
+          PlayerLine(playerIndex, Writer preprocessUserInput t2)
       }
   }
 

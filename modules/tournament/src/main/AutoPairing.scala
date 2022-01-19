@@ -1,6 +1,6 @@
 package lila.tournament
 
-import strategygames.{ P2, Player => SGPlayer, P1, Game => StratGame, GameLogic }
+import strategygames.{ P2, Player => PlayerIndex, P1, Game => StratGame, GameLogic }
 import strategygames.variant.Variant
 import scala.util.chaining._
 
@@ -61,8 +61,8 @@ final class AutoPairing(
     } inject game
   }
 
-  private def makePlayer(sgPlayer: SGPlayer, player: Player) =
-    GamePlayer.make(sgPlayer, player.userId, player.rating, player.provisional)
+  private def makePlayer(playerIndex: PlayerIndex, player: Player) =
+    GamePlayer.make(playerIndex, player.userId, player.rating, player.provisional)
 
   private def usernameOf(userId: User.ID) =
     lightUserApi.sync(userId).fold(userId)(_.name)

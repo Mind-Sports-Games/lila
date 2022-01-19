@@ -161,7 +161,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         $inIds(List(u1, u2)),
         $id(true).some
       )
-      .sort($doc(F.sgPlayerIt -> 1))
+      .sort($doc(F.playerIndexIt -> 1))
       .one[Bdoc]
       .map {
         _.fold(ThreadLocalRandom.nextBoolean()) { doc =>
@@ -169,19 +169,19 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         }
       }
       .addEffect { v =>
-        incSGPlayer(u1, if (v) 1 else -1)
-        incSGPlayer(u2, if (v) -1 else 1)
+        incPlayerIndex(u1, if (v) 1 else -1)
+        incPlayerIndex(u2, if (v) -1 else 1)
       }
 
   def firstGetsP1(u1O: Option[User.ID], u2O: Option[User.ID]): Fu[Boolean] =
     (u1O, u2O).mapN(firstGetsP1) | fuccess(ThreadLocalRandom.nextBoolean())
 
-  def incSGPlayer(userId: User.ID, value: Int): Unit =
+  def incPlayerIndex(userId: User.ID, value: Int): Unit =
     coll
       .update(ordered = false, WriteConcern.Unacknowledged)
       .one(
-        $id(userId) ++ (value < 0).??($doc(F.sgPlayerIt $gt -3)),
-        $inc(F.sgPlayerIt -> value)
+        $id(userId) ++ (value < 0).??($doc(F.playerIndexIt $gt -3)),
+        $inc(F.playerIndexIt -> value)
       )
       .unit
 

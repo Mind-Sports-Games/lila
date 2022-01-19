@@ -18,12 +18,12 @@
   <string name="white">Blanko</string>
   <string name="black">Nigro</string>
   <string name="createAGame">Krear ludo</string>
-  <string name="sgPlayerIsVictorious">%s triumfas</string>
+  <string name="playerIndexIsVictorious">%s triumfas</string>
   <string name="whiteIsVictorious">Blanko triumfas</string>
   <string name="blackIsVictorious">Nigro triumfas</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Vua adverso volas komencar nova ludo kun vu</string>
   <string name="joinTheGame">Partoprenar la ludo</string>
-  <string name="sgPlayerPlays">%s strokas</string>
+  <string name="playerIndexPlays">%s strokas</string>
   <string name="whitePlays">Blanko strokas</string>
   <string name="blackPlays">Nigro strokas</string>
   <string name="opponentLeftChoices">La altra ludero livis la ludo. Vu povas igar lua rezigno, o vartar lu.</string>
@@ -31,10 +31,10 @@
   <string name="forceResignation">Igar rezigno</string>
   <string name="talkInChat">Konversar en babilado...</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">La unesma persono arivanta an ica URL ludos kun vu.</string>
-  <string name="sgPlayerResigned">%s rezignis</string>
+  <string name="playerIndexResigned">%s rezignis</string>
   <string name="whiteResigned">Blanko rezignis</string>
   <string name="blackResigned">Nigro rezignis</string>
-  <string name="sgPlayerLeftTheGame">%s livis la ludo</string>
+  <string name="playerIndexLeftTheGame">%s livis la ludo</string>
   <string name="whiteLeftTheGame">Blanko livis la ludo</string>
   <string name="blackLeftTheGame">Nigro livis la ludo</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Partigez ica URL por permisar spekteri vidar la ludo</string>

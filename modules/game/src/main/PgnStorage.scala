@@ -3,7 +3,7 @@ package lila.game
 import strategygames.chess
 import strategygames.chess.format
 import strategygames.chess.{ Castles, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks }
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 
 import lila.db.ByteArray
 
@@ -64,7 +64,7 @@ private object PgnStorage {
       Role.javaSymbolToRole(role.symbol)
 
     private def chessPiece(piece: JavaPiece): Piece =
-      Piece(SGPlayer.fromP1(piece.white), chessRole(piece.role))
+      Piece(PlayerIndex.fromP1(piece.white), chessRole(piece.role))
   }
 
   case class Decoded(

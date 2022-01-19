@@ -57,11 +57,11 @@ final private class TvBroadcast(
         pov.gameId,
         Json.obj(
           "id"          -> pov.gameId,
-          "orientation" -> pov.sgPlayer.name,
+          "orientation" -> pov.playerIndex.name,
           "players" -> pov.game.players.map { p =>
             val user = p.userId.flatMap(lightUserSync)
             Json
-              .obj("sgPlayer" -> p.sgPlayer.name)
+              .obj("playerIndex" -> p.playerIndex.name)
               .add("user" -> user.map(LightUser.lightUserWrites.writes))
               .add("ai" -> p.aiLevel)
               .add("rating" -> p.rating)
@@ -82,7 +82,7 @@ final private class TvBroadcast(
         "fen",
         Json
           .obj(
-            "fen" -> s"$fen ${game.turnSGPlayer.letter}",
+            "fen" -> s"$fen ${game.turnPlayerIndex.letter}",
             "lm"  -> move
           )
           .add("wc" -> game.clock.map(_.remainingTime(strategygames.P1).roundSeconds))

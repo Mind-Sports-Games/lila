@@ -20,7 +20,7 @@ final private[gameSearch] class GameSearchForm {
         "p1"  -> optional(nonEmptyText),
         "p2"  -> optional(nonEmptyText)
       )(SearchPlayer.apply)(SearchPlayer.unapply),
-      "winnerSGPlayer" -> optional(numberIn(Query.winnerSGPlayers)),
+      "winnerPlayerIndex" -> optional(numberIn(Query.winnerPlayerIndexs)),
       "perf"        -> optional(numberIn(lila.rating.PerfType.nonPuzzle.map(_.id))),
       "source"      -> optional(numberIn(Query.sources)),
       "mode"        -> optional(numberIn(Query.modes)),
@@ -59,7 +59,7 @@ private[gameSearch] object GameSearchForm {
 
 private[gameSearch] case class SearchData(
     players: SearchPlayer = SearchPlayer(),
-    winnerSGPlayer: Option[Int] = None,
+    winnerPlayerIndex: Option[Int] = None,
     perf: Option[Int] = None,
     source: Option[Int] = None,
     mode: Option[Int] = None,
@@ -88,7 +88,7 @@ private[gameSearch] case class SearchData(
       user2 = players.cleanB,
       winner = players.cleanWinner,
       loser = players.cleanLoser,
-      winnerSGPlayer = winnerSGPlayer,
+      winnerPlayerIndex = winnerPlayerIndex,
       perf = perf,
       source = source,
       rated = mode flatMap Mode.apply map (_.rated),

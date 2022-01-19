@@ -86,7 +86,7 @@ object mine {
               c.notableInitialFen.map { fen =>
                 frag(
                   br,
-                  div(cls := "board-preview", views.html.board.bits.mini(fen, c.finalSGPlayer, c.variant.key)(div))
+                  div(cls := "board-preview", views.html.board.bits.mini(fen, c.finalPlayerIndex, c.variant.key)(div))
                 )
               },
               !c.isOpen option cancelForm

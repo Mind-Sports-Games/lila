@@ -261,7 +261,7 @@ package round {
       opponentUserId: String
   )
   case class Berserk(gameId: String, userId: String)
-  case class IsOnGame(sgPlayer: strategygames.Player, promise: Promise[Boolean])
+  case class IsOnGame(playerIndex: strategygames.Player, promise: Promise[Boolean])
   case class TourStandingOld(data: JsArray)
   case class TourStanding(tourId: String, data: JsArray)
   case class FishnetPlay(uci: Uci, ply: Int)

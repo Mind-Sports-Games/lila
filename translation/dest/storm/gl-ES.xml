@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">Move para comezar</string>
-  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">Xogas coas pezas %s en todos os crebacabezas</string>
+  <string name="youPlayThePlayerIndexPiecesInAllPuzzles">Xogas coas pezas %s en todos os crebacabezas</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">Xogas coas pezas brancas en todos os crebacabezas</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">Xogas as negras en todos os crebacabezas</string>
   <string name="puzzlesSolved">crebacabezas resoltos</string>

@@ -478,7 +478,7 @@ final class SwissApi(
           .updateField(
             $id(game.game.id),
             SwissPairing.Fields.status,
-            pairingStatusHandler.writeTry(Right(game.winnerSGPlayer)).get
+            pairingStatusHandler.writeTry(Right(game.winnerPlayerIndex)).get
           )
           .flatMap { result =>
             if (result.nModified == 0) fuccess(false) // dedup

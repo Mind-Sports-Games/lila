@@ -158,7 +158,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   selected: ctrl.turn[0] === key[0],
                 },
               },
-              ctrl.trans('sgPlayerPlays', key)
+              ctrl.trans('playerIndexPlays', key)
             );
           })
         )
@@ -375,7 +375,7 @@ function sparePieces(ctrl: EditorCtrl, playerIndex: PlayerIndex, _orientation: O
         class: className,
         ...(s !== 'pointer' && s !== 'trash'
           ? {
-              'data-sgPlayer': s[0],
+              'data-playerIndex': s[0],
               'data-role': s[1],
             }
           : {}),

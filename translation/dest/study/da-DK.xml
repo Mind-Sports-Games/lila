@@ -138,13 +138,13 @@
   <string name="zugzwang">Zugzwang</string>
   <string name="equalPosition">Lige position</string>
   <string name="unclearPosition">Uafklaret position</string>
-  <string name="sgPlayerIsSlightlyBetter">%s står lidt bedre</string>
+  <string name="playerIndexIsSlightlyBetter">%s står lidt bedre</string>
   <string name="whiteIsSlightlyBetter">Hvid står lidt bedre</string>
   <string name="blackIsSlightlyBetter">Sort står lidt bedre</string>
-  <string name="sgPlayerIsBetter">%s står bedre</string>
+  <string name="playerIndexIsBetter">%s står bedre</string>
   <string name="whiteIsBetter">Hvid står bedre</string>
   <string name="blackIsBetter">Sort står bedre</string>
-  <string name="sgPlayerIsWinning">%s vinder</string>
+  <string name="playerIndexIsWinning">%s vinder</string>
   <string name="whiteIsWinning">Hvid vinder</string>
   <string name="blackIsWinning">Sort vinder</string>
   <string name="novelty">Nyfunden</string>

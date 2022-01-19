@@ -224,7 +224,7 @@
     <item quantity="other">%s partide cu tine</item>
   </plurals>
   <string name="cancel">Anulare</string>
-  <string name="sgPlayerTimeOut">Timpul pentru %s a expirat</string>
+  <string name="playerIndexTimeOut">Timpul pentru %s a expirat</string>
   <string name="whiteTimeOut">Timpul pentru alb a expirat</string>
   <string name="blackTimeOut">Timpul pentru negru a expirat</string>
   <string name="drawOfferSent">Propunere de remiză trimisă</string>

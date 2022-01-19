@@ -74,7 +74,7 @@ const feedback = {
               )
             )
           ),
-          h('em', ctrl.trans('findBetterMoveForSGPlayer', ctrl.playerIndex)),
+          h('em', ctrl.trans('findBetterMoveForPlayerIndex', ctrl.playerIndex)),
           skipOrViewSolution(ctrl),
         ]),
       ]),
@@ -106,7 +106,7 @@ const feedback = {
         h('div.icon', '✗'),
         h('div.instruction', [
           h('strong', ctrl.noarg('youCanDoBetter')),
-          h('em', ctrl.trans('tryAnotherMoveForSGPlayer', ctrl.playerIndex)),
+          h('em', ctrl.trans('tryAnotherMoveForPlayerIndex', ctrl.playerIndex)),
           skipOrViewSolution(ctrl),
         ]),
       ]),
@@ -178,8 +178,8 @@ const feedback = {
           h(
             'em',
             nothing
-              ? ctrl.trans('noMistakesFoundForSGPlayer', ctrl.playerIndex)
-              : ctrl.trans('doneReviewingSGPlayerMistakes', ctrl.playerIndex)
+              ? ctrl.trans('noMistakesFoundForPlayerIndex', ctrl.playerIndex)
+              : ctrl.trans('doneReviewingPlayerIndexMistakes', ctrl.playerIndex)
           ),
           h('div.choices.end', [
             nothing
@@ -196,7 +196,7 @@ const feedback = {
               {
                 hook: bind('click', () => ctrl.flip()),
               },
-              ctrl.trans('reviewSGPlayerMistakes', ctrl.playerIndex === 'p1' ? 'p2' : 'p1')
+              ctrl.trans('reviewPlayerIndexMistakes', ctrl.playerIndex === 'p1' ? 'p2' : 'p1')
             ),
           ]),
         ]),

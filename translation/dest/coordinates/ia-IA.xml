@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Coordinatas</string>
   <string name="coordinateTraining">Trainamento de coordinatas</string>
-  <string name="averageScoreAsSGPlayerX">Punctos medie como %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Punctos medie como %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Punctos medie como blanco: %s</string>
   <string name="averageScoreAsBlackX">Punctos medie como nigro: %s</string>
   <string name="knowingTheChessBoard">Recognoscer le coordinatas del tabuliero es un habilitate multo importante in le chacos:</string>

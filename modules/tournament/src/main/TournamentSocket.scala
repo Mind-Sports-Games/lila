@@ -38,7 +38,7 @@ final private class TournamentSocket(
   def startGame(tourId: Tournament.ID, game: Game): Unit = {
     game.players foreach { player =>
       player.userId foreach { userId =>
-        send(RP.Out.tellRoomUser(RoomId(tourId), userId, makeMessage("redirect", game fullIdOf player.sgPlayer)))
+        send(RP.Out.tellRoomUser(RoomId(tourId), userId, makeMessage("redirect", game fullIdOf player.playerIndex)))
       }
     }
     reload(tourId)

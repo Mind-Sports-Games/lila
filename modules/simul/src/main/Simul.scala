@@ -1,6 +1,6 @@
 package lila.simul
 
-import strategygames.{ Player => SGPlayer, Speed }
+import strategygames.{ Player => PlayerIndex, Speed }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -25,7 +25,7 @@ case class Simul(
     startedAt: Option[DateTime],
     finishedAt: Option[DateTime],
     hostSeenAt: Option[DateTime],
-    sgPlayer: Option[String],
+    playerIndex: Option[String],
     text: String,
     team: Option[String],
     featurable: Option[Boolean]
@@ -126,10 +126,10 @@ case class Simul(
 
   def playingPairings = pairings filterNot (_.finished)
 
-  def hostSGPlayer: Option[SGPlayer] = sgPlayer flatMap SGPlayer.fromName
+  def hostPlayerIndex: Option[PlayerIndex] = playerIndex flatMap PlayerIndex.fromName
 
-  def setPairingHostSGPlayer(gameId: String, hostSGPlayer: SGPlayer) =
-    updatePairing(gameId, _.copy(hostSGPlayer = hostSGPlayer))
+  def setPairingHostPlayerIndex(gameId: String, hostPlayerIndex: PlayerIndex) =
+    updatePairing(gameId, _.copy(hostPlayerIndex = hostPlayerIndex))
 
   private def Created(s: => Simul): Simul = if (isCreated) s else this
 
@@ -151,7 +151,7 @@ object Simul {
       clock: SimulClock,
       variants: List[Variant],
       position: Option[FEN],
-      sgPlayer: String,
+      playerIndex: String,
       text: String,
       estimatedStartAt: Option[DateTime],
       team: Option[String],
@@ -182,7 +182,7 @@ object Simul {
       startedAt = none,
       finishedAt = none,
       hostSeenAt = DateTime.now.some,
-      sgPlayer = sgPlayer.some,
+      playerIndex = playerIndex.some,
       text = text,
       team = team,
       featurable = featurable

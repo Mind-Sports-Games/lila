@@ -5,7 +5,7 @@ import scala.concurrent.Promise
 import scala.concurrent.duration._
 
 import strategygames.format.Uci
-import strategygames.{ Player => SGPlayer, Move, MoveMetrics }
+import strategygames.{ Player => PlayerIndex, Move, MoveMetrics }
 
 import lila.common.IpAddress
 import lila.game.Game.PlayerId
@@ -20,12 +20,12 @@ case class SocketStatus(
     p2OnGame: Boolean,
     p2IsGone: Boolean
 ) {
-  def onGame(sgPlayer: SGPlayer)     = sgPlayer.fold(p1OnGame, p2OnGame)
-  def isGone(sgPlayer: SGPlayer)     = sgPlayer.fold(p1IsGone, p2IsGone)
-  def sgPlayersOnGame: Set[SGPlayer] = SGPlayer.all.filter(onGame).toSet
+  def onGame(playerIndex: PlayerIndex)     = playerIndex.fold(p1OnGame, p2OnGame)
+  def isGone(playerIndex: PlayerIndex)     = playerIndex.fold(p1IsGone, p2IsGone)
+  def playerIndexsOnGame: Set[PlayerIndex] = PlayerIndex.all.filter(onGame).toSet
 }
 case class RoomCrowd(p1: Boolean, p2: Boolean)
-case class BotConnected(sgPlayer: SGPlayer, v: Boolean)
+case class BotConnected(playerIndex: PlayerIndex, v: Boolean)
 
 package round {
 
@@ -53,12 +53,12 @@ package round {
   object Moretime { val defaultDuration = 15.seconds }
   case class Moretime(playerId: PlayerId, seconds: FiniteDuration = Moretime.defaultDuration)
   case object QuietFlag
-  case class ClientFlag(sgPlayer: SGPlayer, fromPlayerId: Option[PlayerId])
+  case class ClientFlag(playerIndex: PlayerIndex, fromPlayerId: Option[PlayerId])
   case object Abandon
   case class ForecastPlay(lastMove: Move)
-  case class Cheat(sgPlayer: SGPlayer)
+  case class Cheat(playerIndex: PlayerIndex)
   case class HoldAlert(playerId: PlayerId, mean: Int, sd: Int, ip: IpAddress)
-  case class GoBerserk(sgPlayer: SGPlayer, promise: Promise[Boolean])
+  case class GoBerserk(playerIndex: PlayerIndex, promise: Promise[Boolean])
   case object NoStart
   case object StartClock
   case object TooManyPlies

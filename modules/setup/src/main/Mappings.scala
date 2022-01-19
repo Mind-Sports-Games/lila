@@ -6,7 +6,7 @@ import play.api.data.format.Formats._
 import strategygames.{ GameFamily, Mode }
 import strategygames.variant.Variant
 import lila.rating.RatingRange
-import lila.lobby.SGPlayer
+import lila.lobby.PlayerIndex
 
 private object Mappings {
 
@@ -39,7 +39,7 @@ private object Mappings {
       .verifying(HookConfig.modes contains _)
       .verifying(m => m == Mode.Casual.id || withRated)
   val ratingRange = text.verifying(RatingRange valid _)
-  val sgPlayer       = text.verifying(SGPlayer.names contains _)
+  val playerIndex       = text.verifying(PlayerIndex.names contains _)
   val level       = number.verifying(AiConfig.levels contains _)
   val speed       = number.verifying(Config.speeds contains _)
   val fenField    = optional(nonEmptyText)

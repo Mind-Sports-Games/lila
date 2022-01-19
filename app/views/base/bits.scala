@@ -29,7 +29,7 @@ object bits {
     href := "https://playstrategy.org",
     style := """
 background: #7f1010;
-sgPlayer: #fff;
+playerIndex: #fff;
 position: fixed;
 bottom: 0;
 left: 0;

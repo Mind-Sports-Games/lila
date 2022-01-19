@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ P2, Player => SGPlayer, Speed, P1 }
+import strategygames.{ P2, Player => PlayerIndex, Speed, P1 }
 import strategygames.variant.Variant
 import strategygames.chess.variant._
 import org.goochjs.glicko2._
@@ -87,7 +87,7 @@ final class PerfsUpdater(
             val perfsW                      = mkPerfs(ratingsW, p1 -> p2, game)
             val perfsB                      = mkPerfs(ratingsB, p2 -> p1, game)
             def intRatingLens(perfs: Perfs) = mainPerf(perfs).glicko.intRating
-            val ratingDiffs = SGPlayer.Map(
+            val ratingDiffs = PlayerIndex.Map(
               intRatingLens(perfsW) - intRatingLens(p1.perfs),
               intRatingLens(perfsB) - intRatingLens(p2.perfs)
             )
@@ -160,7 +160,7 @@ final class PerfsUpdater(
     )
 
   private def updateRatings(p1: Rating, p2: Rating, game: Game): Unit = {
-    val result = game.winnerSGPlayer match {
+    val result = game.winnerPlayerIndex match {
       case Some(P1) => Glicko.Result.Win
       case Some(P2) => Glicko.Result.Loss
       case None              => Glicko.Result.Draw

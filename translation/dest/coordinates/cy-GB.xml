@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Sgwariau</string>
   <string name="coordinateTraining">Hyfforddi sgwariau</string>
-  <string name="averageScoreAsSGPlayerX">Sgôr cyfartalog fel %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Sgôr cyfartalog fel %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Sgôr cyfartalog fel gwyn: %s</string>
   <string name="averageScoreAsBlackX">Sgôr cyfartalog fel du: %s</string>
   <string name="knowingTheChessBoard">Mae medru enwi\'r sgwariau yn sgil bwysig:</string>

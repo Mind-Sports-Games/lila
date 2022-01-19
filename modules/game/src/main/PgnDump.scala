@@ -4,7 +4,7 @@ import strategygames.chess.format.pgn.{ Parser, Pgn }
 import strategygames.format.pgn.{ ParsedPgn, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ pgn => chessPgn }
-import strategygames.{ Centis, Player => SGPlayer, GameLogic, Status }
+import strategygames.{ Centis, Player => PlayerIndex, GameLogic, Status }
 import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
@@ -24,7 +24,7 @@ final class PgnDump(
       game: Game,
       initialFen: Option[FEN],
       flags: WithFlags,
-      teams: Option[SGPlayer.Map[String]] = None,
+      teams: Option[PlayerIndex.Map[String]] = None,
       hideRatings: Boolean = false
   ): Fu[Pgn] = {
     val imported = game.pgnImport.flatMap { pgni =>
@@ -79,7 +79,7 @@ final class PgnDump(
           },
           fenSituation.map(_.fullMoveNumber) | 1,
           flags.clocks ?? ~game.bothClockStates,
-          game.startSGPlayer
+          game.startPlayerIndex
         )
       }
       Pgn(ts, turns)
@@ -158,7 +158,7 @@ final class PgnDump(
       initialFen: Option[FEN],
       imported: Option[ParsedPgn],
       withOpening: Boolean,
-      teams: Option[SGPlayer.Map[String]] = None,
+      teams: Option[PlayerIndex.Map[String]] = None,
       draughtsResult: Boolean = false,
       algebraic: Boolean = false,
       withProfileName: Boolean = false,
@@ -246,10 +246,10 @@ final class PgnDump(
       moves: Seq[String],
       from: Int,
       clocks: Vector[Centis],
-      startSGPlayer: SGPlayer
+      startPlayerIndex: PlayerIndex
   ): List[chessPgn.Turn] =
     (moves grouped 2).zipWithIndex.toList map { case (moves, index) =>
-      val clockOffset = startSGPlayer.fold(0, 1)
+      val clockOffset = startPlayerIndex.fold(0, 1)
       chessPgn.Turn(
         number = index + from,
         p1 = moves.headOption filter (".." !=) map { san =>
@@ -291,6 +291,6 @@ object PgnDump {
   }
 
   def result(game: Game, draughtsResult: Boolean) =
-    if (game.finished) SGPlayer.showResult(game.winnerSGPlayer, draughtsResult)
+    if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex, draughtsResult)
     else "*"
 }

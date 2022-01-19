@@ -38,7 +38,7 @@ object JsonView {
 
   def player(pov: Accuracy.PovLike)(analysis: Analysis) =
     analysis.summary
-      .find(_._1 == pov.sgPlayer)
+      .find(_._1 == pov.playerIndex)
       .map(_._2)
       .map(s =>
         JsObject(s map { case (nag, nb) =>
@@ -56,8 +56,8 @@ object JsonView {
   def bothPlayers(pov: Accuracy.PovLike, analysis: Analysis) =
     Json.obj(
       "id"    -> analysis.id,
-      "p1" -> player(pov.copy(sgPlayer = P1))(analysis),
-      "p2" -> player(pov.copy(sgPlayer = P2))(analysis)
+      "p1" -> player(pov.copy(playerIndex = P1))(analysis),
+      "p2" -> player(pov.copy(playerIndex = P2))(analysis)
     )
 
   def mobile(game: Game, analysis: Analysis) =

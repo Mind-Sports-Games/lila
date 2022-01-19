@@ -50,7 +50,7 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
           .path {
             _.aggregateList(poolSize) { framework =>
               import framework._
-              val fenSGPlayerRegex = $doc(
+              val fenPlayerIndexRegex = $doc(
                 "$regexMatch" -> $doc(
                   "input" -> "$fen",
                   "regex" -> { if (scala.util.Random.nextBoolean()) " w " else " b " }
@@ -68,7 +68,7 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
                     Sample(1),
                     Project($doc("_id" -> false, "ids" -> true)),
                     UnwindField("ids"),
-                    // ensure we have enough after filtering deviation & sgPlayer
+                    // ensure we have enough after filtering deviation & playerIndex
                     Sample(nbPuzzles * 7),
                     PipelineOperator(
                       $doc(
@@ -83,7 +83,7 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
                                   "$and" -> $arr(
                                     $doc("$eq"  -> $arr("$_id", "$$id")),
                                     $doc("$lte" -> $arr("$glicko.d", maxDeviation)),
-                                    fenSGPlayerRegex
+                                    fenPlayerIndexRegex
                                   )
                                 )
                               )

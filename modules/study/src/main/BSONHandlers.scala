@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.{ Glyph, Glyphs, Tag, Tags }
 import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Centis, Player => SGPlayer, GameFamily, GameLogic, Pocket, PocketData, Pockets, Pos, PromotableRole, Role }
+import strategygames.{ Centis, Player => PlayerIndex, GameFamily, GameLogic, Pocket, PocketData, Pockets, Pos, PromotableRole, Role }
 import strategygames.chess.{ Pos => ChessPos }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
@@ -374,14 +374,14 @@ object BSONHandlers {
       id    <- doc.getAsTry[Chapter.Id]("_id")
       name  <- doc.getAsTry[Chapter.Name]("name")
       setup <- doc.getAsTry[Chapter.Setup]("setup")
-      resultSGPlayer = doc
+      resultPlayerIndex = doc
         .getAsOpt[List[String]]("tags")
         .map {
           _.headOption
             .map(_ drop 7)
-            .filter("*" !=) map SGPlayer.fromResult
+            .filter("*" !=) map PlayerIndex.fromResult
         }
       hasRelayPath = doc.getAsOpt[Bdoc]("relay").flatMap(_ string "path").exists(_.nonEmpty)
-    } yield Chapter.Metadata(id, name, setup, resultSGPlayer, hasRelayPath)
+    } yield Chapter.Metadata(id, name, setup, resultPlayerIndex, hasRelayPath)
   }
 }

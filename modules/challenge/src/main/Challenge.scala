@@ -3,7 +3,7 @@ package lila.challenge
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.variant.Chess960
-import strategygames.{ P2, Player => SGPlayer, GameFamily, GameLogic, Mode, Speed, P1 }
+import strategygames.{ P2, Player => PlayerIndex, GameFamily, GameLogic, Mode, Speed, P1 }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
@@ -18,8 +18,8 @@ case class Challenge(
     initialFen: Option[FEN],
     timeControl: Challenge.TimeControl,
     mode: Mode,
-    sgPlayerChoice: Challenge.SGPlayerChoice,
-    finalSGPlayer: SGPlayer,
+    playerIndexChoice: Challenge.PlayerIndexChoice,
+    finalPlayerIndex: PlayerIndex,
     challenger: Challenge.Challenger,
     destUser: Option[Challenge.Challenger.Registered],
     rematchOf: Option[Game.ID],
@@ -185,12 +185,12 @@ object Challenge {
     }
   }
 
-  sealed trait SGPlayerChoice
-  object SGPlayerChoice {
-    case object Random extends SGPlayerChoice
-    case object P1  extends SGPlayerChoice
-    case object P2  extends SGPlayerChoice
-    def apply(c: SGPlayer) = c.fold[SGPlayerChoice](P1, P2)
+  sealed trait PlayerIndexChoice
+  object PlayerIndexChoice {
+    case object Random extends PlayerIndexChoice
+    case object P1  extends PlayerIndexChoice
+    case object P2  extends PlayerIndexChoice
+    def apply(c: PlayerIndex) = c.fold[PlayerIndexChoice](P1, P2)
   }
 
   private def speedOf(timeControl: TimeControl) =
@@ -221,7 +221,7 @@ object Challenge {
   def toRegistered(variant: Variant, timeControl: TimeControl)(u: User) =
     Challenger.Registered(u.id, Rating(u.perfs(perfTypeOf(variant, timeControl))))
 
-  def randomSGPlayer = SGPlayer.fromP1(lila.common.ThreadLocalRandom.nextBoolean())
+  def randomPlayerIndex = PlayerIndex.fromP1(lila.common.ThreadLocalRandom.nextBoolean())
 
   // NOTE: Only variants with standardInitialPosition = false!
   private val draughtsFenVariants: Set[Variant] =
@@ -235,17 +235,17 @@ object Challenge {
       initialFen: Option[FEN],
       timeControl: TimeControl,
       mode: Mode,
-      sgPlayer: String,
+      playerIndex: String,
       challenger: Challenger,
       destUser: Option[User],
       rematchOf: Option[Game.ID],
       name: Option[String] = None,
       microMatch: Boolean = false
   ): Challenge = {
-    val (sgPlayerChoice, finalSGPlayer) = sgPlayer match {
-      case "p1" => SGPlayerChoice.P1  -> P1
-      case "p2" => SGPlayerChoice.P2  -> P2
-      case _       => SGPlayerChoice.Random -> randomSGPlayer
+    val (playerIndexChoice, finalPlayerIndex) = playerIndex match {
+      case "p1" => PlayerIndexChoice.P1  -> P1
+      case "p2" => PlayerIndexChoice.P2  -> P2
+      case _       => PlayerIndexChoice.Random -> randomPlayerIndex
     }
     val finalVariant = fenVariant match {
       case Some(v) if draughtsFenVariants(variant) =>
@@ -282,8 +282,8 @@ object Challenge {
         else !variant.standardInitialPosition option variant.initialFen,
       timeControl = timeControl,
       mode = finalMode,
-      sgPlayerChoice = sgPlayerChoice,
-      finalSGPlayer = finalSGPlayer,
+      playerIndexChoice = playerIndexChoice,
+      finalPlayerIndex = finalPlayerIndex,
       challenger = challenger,
       destUser = destUser map toRegistered(variant, timeControl),
       rematchOf = rematchOf,

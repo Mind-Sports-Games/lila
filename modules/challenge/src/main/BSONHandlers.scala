@@ -15,16 +15,16 @@ private object BSONHandlers {
 
   import Challenge._
 
-  implicit val SGPlayerChoiceBSONHandler = BSONIntegerHandler.as[SGPlayerChoice](
+  implicit val PlayerIndexChoiceBSONHandler = BSONIntegerHandler.as[PlayerIndexChoice](
     {
-      case 1 => SGPlayerChoice.P1
-      case 2 => SGPlayerChoice.P2
-      case _ => SGPlayerChoice.Random
+      case 1 => PlayerIndexChoice.P1
+      case 2 => PlayerIndexChoice.P2
+      case _ => PlayerIndexChoice.Random
     },
     {
-      case SGPlayerChoice.P1  => 1
-      case SGPlayerChoice.P2  => 2
-      case SGPlayerChoice.Random => 0
+      case PlayerIndexChoice.P1  => 1
+      case PlayerIndexChoice.P2  => 2
+      case PlayerIndexChoice.Random => 0
     }
   )
   implicit val TimeControlBSONHandler = new BSON[TimeControl] {

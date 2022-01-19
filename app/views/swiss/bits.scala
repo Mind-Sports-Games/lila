@@ -93,7 +93,7 @@ object bits {
     trans.signIn,
     trans.averageElo,
     trans.gamesPlayed,
-    trans.sgPlayerWins,
+    trans.playerIndexWins,
     trans.draws,
     trans.winRate,
     trans.performance,

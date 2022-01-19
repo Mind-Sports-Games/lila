@@ -45,9 +45,9 @@ object user {
         ),
         winner(hide = false),
         loser(hide = false),
-        sgPlayers(hide = false),
+        playerIndexs(hide = false),
         status,
-        winnerSGPlayer,
+        winnerPlayerIndex,
         sort,
         analysed,
         tr(cls := "action")(

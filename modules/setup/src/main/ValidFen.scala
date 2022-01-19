@@ -5,7 +5,7 @@ import strategygames.format.FEN
 
 case class ValidFen(fen: FEN, situation: strategygames.Situation) {
 
-  def sgPlayer = situation.player
+  def playerIndex = situation.player
 }
 
 object ValidFen {

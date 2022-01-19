@@ -1559,7 +1559,7 @@ object Quote {
     new Quote("Be well enough prepared that preparation won't play a role.", "Magnus Carlsen"),
     new Quote("I don't study; I create.", "Viktor Korchnoi"),
     new Quote(
-      "During the analysis, I discovered something very remarkable: the board is simply too small for two Queens of the same sgPlayer. They only get in each other's way. I realize that this might sound stupid, but I fully mean it. The advantage is much less than one would expect by counting material.",
+      "During the analysis, I discovered something very remarkable: the board is simply too small for two Queens of the same playerIndex. They only get in each other's way. I realize that this might sound stupid, but I fully mean it. The advantage is much less than one would expect by counting material.",
       "Viktor Korchnoi"
     ),
     new Quote("You'll be amazed at the people I've lost to while playing online.", "Magnus Carlsen"),

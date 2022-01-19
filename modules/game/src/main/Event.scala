@@ -2,7 +2,7 @@ package lila.game
 
 import play.api.libs.json._
 
-import strategygames.{ Board, Centis, Player => SGPlayer, GameFamily, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, P1, P2 }
+import strategygames.{ Board, Centis, Player => PlayerIndex, GameFamily, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, P1, P2 }
 import strategygames.chess
 import strategygames.variant.Variant
 import strategygames.format.Forsyth
@@ -13,11 +13,11 @@ import lila.common.ApiVersion
 sealed trait Event {
   def typ: String
   def data: JsValue
-  def only: Option[SGPlayer]   = None
+  def only: Option[PlayerIndex]   = None
   def owner: Boolean        = false
   def watcher: Boolean      = false
   def troll: Boolean        = false
-  def moveBy: Option[SGPlayer] = None
+  def moveBy: Option[PlayerIndex] = None
 }
 
 object Event {
@@ -111,7 +111,7 @@ object Event {
           .add("enpassant" -> enpassant.map(_.data))
           .add("castle" -> castle.map(_.data))
       }
-    override def moveBy = Some(!state.sgPlayer)
+    override def moveBy = Some(!state.playerIndex)
   }
   object Move {
     def apply(
@@ -214,7 +214,7 @@ object Event {
           "san"  -> san
         )
       }
-    override def moveBy = Some(!state.sgPlayer)
+    override def moveBy = Some(!state.playerIndex)
   }
   object Drop {
     def apply(
@@ -294,27 +294,27 @@ object Event {
         }
   }
 
-  case class Enpassant(pos: Pos, sgPlayer: SGPlayer) extends Event {
+  case class Enpassant(pos: Pos, playerIndex: PlayerIndex) extends Event {
     def typ = "enpassant"
     def data =
       Json.obj(
         "key"   -> pos.key,
-        "sgPlayer" -> sgPlayer
+        "playerIndex" -> playerIndex
       )
   }
 
-  case class Castling(king: (Pos, Pos), rook: (Pos, Pos), sgPlayer: SGPlayer) extends Event {
+  case class Castling(king: (Pos, Pos), rook: (Pos, Pos), playerIndex: PlayerIndex) extends Event {
     def typ = "castling"
     def data =
       Json.obj(
         "king"  -> Json.arr(king._1.key, king._2.key),
         "rook"  -> Json.arr(rook._1.key, rook._2.key),
-        "sgPlayer" -> sgPlayer
+        "playerIndex" -> playerIndex
       )
   }
 
   case class RedirectOwner(
-      sgPlayer: SGPlayer,
+      playerIndex: PlayerIndex,
       id: String,
       cookie: Option[JsObject]
   ) extends Event {
@@ -326,7 +326,7 @@ object Event {
           "url" -> s"/$id"
         )
         .add("cookie" -> cookie)
-    override def only = Some(sgPlayer)
+    override def only = Some(playerIndex)
   }
 
   case class Promotion(role: PromotableRole, pos: Pos) extends Event {
@@ -360,7 +360,7 @@ object Event {
   }
 
   // for mobile app BC only
-  case class End(winner: Option[SGPlayer]) extends Event {
+  case class End(winner: Option[PlayerIndex]) extends Event {
     def typ  = "end"
     def data = Json.toJson(winner)
   }
@@ -370,7 +370,7 @@ object Event {
     def data =
       Json
         .obj(
-          "winner" -> game.winnerSGPlayer,
+          "winner" -> game.winnerPlayerIndex,
           "status" -> game.status
         )
         .add("clock" -> game.clock.map { c =>
@@ -381,8 +381,8 @@ object Event {
         })
         .add("ratingDiff" -> ratingDiff.map { rds =>
           Json.obj(
-            SGPlayer.P1.name -> rds.p1,
-            SGPlayer.P2.name -> rds.p2
+            PlayerIndex.P1.name -> rds.p1,
+            PlayerIndex.P2.name -> rds.p2
           )
         })
         .add("boosted" -> game.boosted)
@@ -400,7 +400,7 @@ object Event {
 
   // use t:reload for mobile app BC,
   // but send extra data for the web to avoid reloading
-  case class RematchOffer(by: Option[SGPlayer]) extends Event {
+  case class RematchOffer(by: Option[PlayerIndex]) extends Event {
     def typ            = "reload"
     def data           = reloadOr("rematchOffer", by)
     override def owner = true
@@ -411,16 +411,16 @@ object Event {
     def data = reloadOr("rematchTaken", nextId)
   }
 
-  case class DrawOffer(by: Option[SGPlayer]) extends Event {
+  case class DrawOffer(by: Option[PlayerIndex]) extends Event {
     def typ  = "reload"
     def data = reloadOr("drawOffer", by)
   }
 
-  case class ClockInc(sgPlayer: SGPlayer, time: Centis) extends Event {
+  case class ClockInc(playerIndex: PlayerIndex, time: Centis) extends Event {
     def typ = "clockInc"
     def data =
       Json.obj(
-        "sgPlayer" -> sgPlayer,
+        "playerIndex" -> playerIndex,
         "time"  -> time.centis
       )
   }
@@ -446,9 +446,9 @@ object Event {
       )
   }
 
-  case class Berserk(sgPlayer: SGPlayer) extends Event {
+  case class Berserk(playerIndex: PlayerIndex) extends Event {
     def typ  = "berserk"
-    def data = Json.toJson(sgPlayer)
+    def data = Json.toJson(playerIndex)
   }
 
   case class CorrespondenceClock(p1: Float, p2: Float) extends ClockEvent {
@@ -480,10 +480,10 @@ object Event {
   }
 
   case class State(
-      sgPlayer: SGPlayer,
+      playerIndex: PlayerIndex,
       turns: Int,
       status: Option[Status],
-      winner: Option[SGPlayer],
+      winner: Option[PlayerIndex],
       p1OffersDraw: Boolean,
       p2OffersDraw: Boolean
   ) extends Event {
@@ -491,7 +491,7 @@ object Event {
     def data =
       Json
         .obj(
-          "sgPlayer" -> sgPlayer,
+          "playerIndex" -> playerIndex,
           "turns" -> turns
         )
         .add("status" -> status)

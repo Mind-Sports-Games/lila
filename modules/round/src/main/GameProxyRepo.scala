@@ -2,7 +2,7 @@ package lila.round
 
 import lila.game.{ Game, PlayerRef, Pov }
 
-import strategygames.{ Player => SGPlayer }
+import strategygames.{ Player => PlayerIndex }
 
 final class GameProxyRepo(
     gameRepo: lila.game.GameRepo,
@@ -14,8 +14,8 @@ final class GameProxyRepo(
   def pov(gameId: Game.ID, user: lila.user.User): Fu[Option[Pov]] =
     game(gameId) dmap { _ flatMap { Pov(_, user) } }
 
-  def pov(gameId: Game.ID, sgPlayer: SGPlayer): Fu[Option[Pov]] =
-    game(gameId) dmap2 { Pov(_, sgPlayer) }
+  def pov(gameId: Game.ID, playerIndex: PlayerIndex): Fu[Option[Pov]] =
+    game(gameId) dmap2 { Pov(_, playerIndex) }
 
   def pov(fullId: Game.ID): Fu[Option[Pov]] = pov(PlayerRef(fullId))
 
@@ -30,7 +30,7 @@ final class GameProxyRepo(
     else roundSocket upgradeIfPresent game
 
   def upgradeIfPresent(pov: Pov): Fu[Pov] =
-    upgradeIfPresent(pov.game).dmap(_ pov pov.sgPlayer)
+    upgradeIfPresent(pov.game).dmap(_ pov pov.playerIndex)
 
   def upgradeIfPresent(games: List[Game]): Fu[List[Game]] =
     games.map(upgradeIfPresent).sequenceFu
@@ -38,8 +38,8 @@ final class GameProxyRepo(
   // update the proxied game
   def updateIfPresent = roundSocket.updateIfPresent _
 
-  def povIfPresent(gameId: Game.ID, sgPlayer: SGPlayer): Fu[Option[Pov]] =
-    gameIfPresent(gameId) dmap2 { Pov(_, sgPlayer) }
+  def povIfPresent(gameId: Game.ID, playerIndex: PlayerIndex): Fu[Option[Pov]] =
+    gameIfPresent(gameId) dmap2 { Pov(_, playerIndex) }
 
   def povIfPresent(fullId: Game.ID): Fu[Option[Pov]] = povIfPresent(PlayerRef(fullId))
 

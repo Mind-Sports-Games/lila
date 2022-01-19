@@ -8,7 +8,7 @@ import strategygames.{
   P2,
   Centis,
   Clock,
-  Player => SGPlayer,
+  Player => PlayerIndex,
   Game => StratGame,
   GameLogic,
   Mode,
@@ -58,7 +58,7 @@ case class Game(
 
   val players = List(p1Player, p2Player)
 
-  def player(sgPlayer: SGPlayer): Player = sgPlayer.fold(p1Player, p2Player)
+  def player(playerIndex: PlayerIndex): Player = playerIndex.fold(p1Player, p2Player)
 
   def player(playerId: Player.ID): Option[Player] =
     players find (_.id == playerId)
@@ -66,12 +66,12 @@ case class Game(
   def player(user: User): Option[Player] =
     players find (_ isUser user)
 
-  def player(c: SGPlayer.type => SGPlayer): Player = player(c(SGPlayer))
+  def player(c: PlayerIndex.type => PlayerIndex): Player = player(c(PlayerIndex))
 
   def isPlayerFullId(player: Player, fullId: String): Boolean =
     (fullId.lengthIs == Game.fullIdSize) && player.id == (fullId drop Game.gameIdSize)
 
-  def player: Player = player(turnSGPlayer)
+  def player: Player = player(turnPlayerIndex)
 
   def playerByUserId(userId: User.ID): Option[Player]   = players.find(_.userId contains userId)
   def opponentByUserId(userId: User.ID): Option[Player] = playerByUserId(userId) map opponent
@@ -79,29 +79,29 @@ case class Game(
   def hasUserIds(userId1: User.ID, userId2: User.ID) =
     playerByUserId(userId1).isDefined && playerByUserId(userId2).isDefined
 
-  def opponent(p: Player): Player = opponent(p.sgPlayer)
+  def opponent(p: Player): Player = opponent(p.playerIndex)
 
-  def opponent(c: SGPlayer): Player = player(!c)
+  def opponent(c: PlayerIndex): Player = player(!c)
 
   lazy val naturalOrientation = variant match {
     case Variant.Chess(v) if v.racingKings => P1
-    case _                                 => SGPlayer.fromP1(p1Player before p2Player)
+    case _                                 => PlayerIndex.fromP1(p1Player before p2Player)
   }
 
-  def turnSGPlayer = chess.player
+  def turnPlayerIndex = chess.player
 
   def turnOf(p: Player): Boolean = p == player
-  def turnOf(c: SGPlayer): Boolean  = c == turnSGPlayer
+  def turnOf(c: PlayerIndex): Boolean  = c == turnPlayerIndex
   def turnOf(u: User): Boolean   = player(u) ?? turnOf
 
   def playedTurns = turns - chess.startedAtTurn
 
-  def flagged = (status == Status.Outoftime).option(turnSGPlayer)
+  def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
   def fullIdOf(player: Player): Option[String] =
     (players contains player) option s"$id${player.id}"
 
-  def fullIdOf(sgPlayer: SGPlayer): String = s"$id${player(sgPlayer).id}"
+  def fullIdOf(playerIndex: PlayerIndex): String = s"$id${player(playerIndex).id}"
 
   def tournamentId = metadata.tournamentId
   def simulId      = metadata.simulId
@@ -134,25 +134,25 @@ case class Game(
       case _              => l
     }
 
-  def moveTimes(sgPlayer: SGPlayer): Option[List[Centis]] = {
+  def moveTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
       clk <- clock
-      inc = clk.incrementOf(sgPlayer)
+      inc = clk.incrementOf(playerIndex)
       history <- clockHistory
-      clocks = history(sgPlayer)
+      clocks = history(playerIndex)
     } yield Centis(0) :: {
       val pairs = clocks.iterator zip clocks.iterator.drop(1)
 
-      // We need to determine if this sgPlayer's last clock had inc applied.
+      // We need to determine if this playerIndex's last clock had inc applied.
       // if finished and history.size == playedTurns then game was ended
       // by a players move, such as with mate or autodraw. In this case,
       // the last move of the game, and the only one without inc, is the
-      // last entry of the clock history for !turnSGPlayer.
+      // last entry of the clock history for !turnPlayerIndex.
       //
       // On the other hand, if history.size is more than playedTurns,
       // then the game ended during a players turn by async event, and
-      // the last recorded time is in the history for turnSGPlayer.
-      val noLastInc = finished && (history.size <= playedTurns) == (sgPlayer != turnSGPlayer)
+      // the last recorded time is in the history for turnPlayerIndex.
+      val noLastInc = finished && (history.size <= playedTurns) == (playerIndex != turnPlayerIndex)
 
       pairs map { case (first, second) =>
         {
@@ -164,17 +164,17 @@ case class Game(
   } orElse binaryMoveTimes.map { binary =>
     // TODO: make movetime.read return List after writes are disabled.
     val base = BinaryFormat.moveTime.read(binary, playedTurns)
-    val mts  = if (sgPlayer == startSGPlayer) base else base.drop(1)
+    val mts  = if (playerIndex == startPlayerIndex) base else base.drop(1)
     everyOther(mts.toList)
   }
 
   def moveTimes: Option[Vector[Centis]] =
     for {
-      a <- moveTimes(startSGPlayer)
-      b <- moveTimes(!startSGPlayer)
+      a <- moveTimes(startPlayerIndex)
+      b <- moveTimes(!startPlayerIndex)
     } yield Sequence.interleave(a, b)
 
-  def bothClockStates: Option[Vector[Centis]] = clockHistory.map(_ bothClockStates startSGPlayer)
+  def bothClockStates: Option[Vector[Centis]] = clockHistory.map(_ bothClockStates startPlayerIndex)
 
   def pdnMovesConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
     chess match {
@@ -182,8 +182,8 @@ case class Game(
       case _ => sys.error("Cant call pdnMovesConcat for a gamelogic other than draughts")
     }
 
-  def pgnMoves(sgPlayer: SGPlayer): PgnMoves = {
-    val pivot = if (sgPlayer == startSGPlayer) 0 else 1
+  def pgnMoves(playerIndex: PlayerIndex): PgnMoves = {
+    val pivot = if (playerIndex == startPlayerIndex) 0 else 1
     val pgnMoves = variant.gameLogic match {
       case GameLogic.Draughts() => pdnMovesConcat()
       case _ => chess.pgnMoves
@@ -201,9 +201,9 @@ case class Game(
   ): Progress = {
 
     def copyPlayer(player: Player) =
-      if (blur && moveOrDrop.fold(_.player, _.player) == player.sgPlayer)
+      if (blur && moveOrDrop.fold(_.player, _.player) == player.playerIndex)
         player.copy(
-          blurs = player.blurs.add(playerMoves(player.sgPlayer))
+          blurs = player.blurs.add(playerMoves(player.playerIndex))
         )
       else player
 
@@ -212,7 +212,7 @@ case class Game(
     val newClockHistory = for {
       clk <- game.clock
       ch  <- clockHistory
-    } yield ch.record(turnSGPlayer, clk)
+    } yield ch.record(turnPlayerIndex, clk)
 
     val updated = copy(
       p1Player = copyPlayer(p1Player),
@@ -231,7 +231,7 @@ case class Game(
     )
 
     val state = Event.State(
-      sgPlayer = game.situation.player,
+      playerIndex = game.situation.player,
       turns = game.turns,
       status = (status != updated.status) option updated.status,
       winner = game.situation.winner,
@@ -274,8 +274,8 @@ case class Game(
       case _ => sys.error("Type Error")
     }
 
-  def updatePlayer(sgPlayer: SGPlayer, f: Player => Player) =
-    sgPlayer.fold(
+  def updatePlayer(playerIndex: PlayerIndex, f: Player => Player) =
+    playerIndex.fold(
       copy(p1Player = f(p1Player)),
       copy(p2Player = f(p2Player))
     )
@@ -305,8 +305,8 @@ case class Game(
       val secondsLeft = (movedAt.getSeconds + increment - nowSeconds).toInt max 0
       CorrespondenceClock(
         increment = increment,
-        p1Time = turnSGPlayer.fold(secondsLeft, increment).toFloat,
-        p2Time = turnSGPlayer.fold(increment, secondsLeft).toFloat
+        p1Time = turnPlayerIndex.fold(secondsLeft, increment).toFloat,
+        p2Time = turnPlayerIndex.fold(increment, secondsLeft).toFloat
       )
     }
 
@@ -334,7 +334,7 @@ case class Game(
 
   def playableBy(p: Player): Boolean = playable && turnOf(p)
 
-  def playableBy(c: SGPlayer): Boolean = playableBy(player(c))
+  def playableBy(c: PlayerIndex): Boolean = playableBy(player(c))
 
   def playableByAi: Boolean = playable && player.isAi
 
@@ -350,7 +350,7 @@ case class Game(
   def hasAi: Boolean = players.exists(_.isAi)
   def nonAi          = !hasAi
 
-  def aiPov: Option[Pov] = players.find(_.isAi).map(_.sgPlayer) map pov
+  def aiPov: Option[Pov] = players.find(_.isAi).map(_.playerIndex) map pov
 
   def mapPlayers(f: Player => Player) =
     copy(
@@ -360,19 +360,19 @@ case class Game(
 
   def drawOffers = metadata.drawOffers
 
-  def playerCanOfferDraw(sgPlayer: SGPlayer) =
+  def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&
       turns >= 2 &&
-      !player(sgPlayer).isOfferingDraw &&
-      !opponent(sgPlayer).isAi &&
-      !playerHasOfferedDrawRecently(sgPlayer)
+      !player(playerIndex).isOfferingDraw &&
+      !opponent(playerIndex).isAi &&
+      !playerHasOfferedDrawRecently(playerIndex)
 
-  def playerHasOfferedDrawRecently(sgPlayer: SGPlayer) =
-    drawOffers.lastBy(sgPlayer) ?? (_ >= turns - 20)
+  def playerHasOfferedDrawRecently(playerIndex: PlayerIndex) =
+    drawOffers.lastBy(playerIndex) ?? (_ >= turns - 20)
 
-  def offerDraw(sgPlayer: SGPlayer) = copy(
-    metadata = metadata.copy(drawOffers = drawOffers.add(sgPlayer, turns))
-  ).updatePlayer(sgPlayer, _.offerDraw)
+  def offerDraw(playerIndex: PlayerIndex) = copy(
+    metadata = metadata.copy(drawOffers = drawOffers.add(playerIndex, turns))
+  ).updatePlayer(playerIndex, _.offerDraw)
 
   def playerCouldRematch =
     finishedOrAborted &&
@@ -381,41 +381,41 @@ case class Game(
         hasAi && variant.fromPositionVariant && clock.exists(_.config.limitSeconds < 60)
       }
 
-  def playerCanProposeTakeback(sgPlayer: SGPlayer) =
+  def playerCanProposeTakeback(playerIndex: PlayerIndex) =
     started && playable && !isTournament && !isSimul &&
       bothPlayersHaveMoved &&
-      !player(sgPlayer).isProposingTakeback &&
-      !opponent(sgPlayer).isProposingTakeback
+      !player(playerIndex).isProposingTakeback &&
+      !opponent(playerIndex).isProposingTakeback
 
   def boosted = rated && finished && bothPlayersHaveMoved && playedTurns < 10
 
-  def moretimeable(sgPlayer: SGPlayer) =
+  def moretimeable(playerIndex: PlayerIndex) =
     playable && nonMandatory && {
-      clock.??(_ moretimeable sgPlayer) || correspondenceClock.??(_ moretimeable sgPlayer)
+      clock.??(_ moretimeable playerIndex) || correspondenceClock.??(_ moretimeable playerIndex)
     }
 
   def abortable = status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory && !metadata.microMatchGameNr.contains(2)
 
   def berserkable = clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
 
-  def goBerserk(sgPlayer: SGPlayer): Option[Progress] =
-    clock.ifTrue(berserkable && !player(sgPlayer).berserk).map { c =>
-      val newClock = c goBerserk sgPlayer
+  def goBerserk(playerIndex: PlayerIndex): Option[Progress] =
+    clock.ifTrue(berserkable && !player(playerIndex).berserk).map { c =>
+      val newClock = c goBerserk playerIndex
       Progress(
         this,
         copy(
           chess = chess.copy(clock = Some(newClock)),
           loadClockHistory = _ =>
             clockHistory.map(history => {
-              if (history(sgPlayer).isEmpty) history
-              else history.reset(sgPlayer).record(sgPlayer, newClock)
+              if (history(playerIndex).isEmpty) history
+              else history.reset(playerIndex).record(playerIndex, newClock)
             })
-        ).updatePlayer(sgPlayer, _.goBerserk)
+        ).updatePlayer(playerIndex, _.goBerserk)
       ) ++
         List(
-          Event.ClockInc(sgPlayer, -c.config.berserkPenalty),
+          Event.ClockInc(playerIndex, -c.config.berserkPenalty),
           Event.Clock(newClock), // BC
-          Event.Berserk(sgPlayer)
+          Event.Berserk(playerIndex)
         )
     }
 
@@ -423,7 +423,7 @@ case class Game(
   def drawable        = playable && !abortable
   def forceResignable = resignable && nonAi && !fromFriend && hasClock && !isSwiss
 
-  def finish(status: Status, winner: Option[SGPlayer]) = {
+  def finish(status: Status, winner: Option[PlayerIndex]) = {
     val newClock = clock map { _.stop }
     Progress(
       this,
@@ -437,10 +437,10 @@ case class Game(
             // If not already finished, we're ending due to an event
             // in the middle of a turn, such as resignation or draw
             // acceptance. In these cases, record a final clock time
-            // for the active sgPlayer. This ensures the end time in
+            // for the active playerIndex. This ensures the end time in
             // clockHistory always matches the final clock time on
             // the board.
-            if (!finished) history.record(turnSGPlayer, clk)
+            if (!finished) history.record(turnPlayerIndex, clk)
             else history
           }
       ),
@@ -480,15 +480,15 @@ case class Game(
 
   def loser = winner map opponent
 
-  def winnerSGPlayer: Option[SGPlayer] = winner map (_.sgPlayer)
+  def winnerPlayerIndex: Option[PlayerIndex] = winner map (_.playerIndex)
 
   def winnerUserId: Option[String] = winner flatMap (_.userId)
 
   def loserUserId: Option[String] = loser flatMap (_.userId)
 
-  def wonBy(c: SGPlayer): Option[Boolean] = winner map (_.sgPlayer == c)
+  def wonBy(c: PlayerIndex): Option[Boolean] = winner map (_.playerIndex == c)
 
-  def lostBy(c: SGPlayer): Option[Boolean] = winner map (_.sgPlayer != c)
+  def lostBy(c: PlayerIndex): Option[Boolean] = winner map (_.playerIndex != c)
 
   def drawn = finished && winner.isEmpty
 
@@ -498,14 +498,14 @@ case class Game(
   private def outoftimeClock(withGrace: Boolean): Boolean =
     clock ?? { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
-        c.outOfTime(turnSGPlayer, withGrace) || {
+        c.outOfTime(turnPlayerIndex, withGrace) || {
           !c.isRunning && c.players.exists(_.elapsed.centis > 0)
         }
       }
     }
 
   private def outoftimeCorrespondence: Boolean =
-    playableCorrespondenceClock ?? { _ outoftime turnSGPlayer }
+    playableCorrespondenceClock ?? { _ outoftime turnPlayerIndex }
 
   def isCorrespondence = speed == Speed.Correspondence
 
@@ -564,24 +564,24 @@ case class Game(
 
   def playerWhoDidNotMove: Option[Player] =
     playedTurns match {
-      case 0 => player(startSGPlayer).some
-      case 1 => player(!startSGPlayer).some
+      case 0 => player(startPlayerIndex).some
+      case 1 => player(!startPlayerIndex).some
       case _ => none
     }
 
   def onePlayerHasMoved    = playedTurns > 0
   def bothPlayersHaveMoved = playedTurns > 1
 
-  def startSGPlayer = SGPlayer.fromPly(chess.startedAtTurn)
+  def startPlayerIndex = PlayerIndex.fromPly(chess.startedAtTurn)
 
-  def playerMoves(sgPlayer: SGPlayer): Int =
-    if (sgPlayer == startSGPlayer) (playedTurns + 1) / 2
+  def playerMoves(playerIndex: PlayerIndex): Int =
+    if (playerIndex == startPlayerIndex) (playedTurns + 1) / 2
     else playedTurns / 2
 
-  def playerHasMoved(sgPlayer: SGPlayer) = playerMoves(sgPlayer) > 0
+  def playerHasMoved(playerIndex: PlayerIndex) = playerMoves(playerIndex) > 0
 
-  def playerBlurPercent(sgPlayer: SGPlayer): Int =
-    if (playedTurns > 5) (player(sgPlayer).blurs.nb * 100) / playerMoves(sgPlayer)
+  def playerBlurPercent(playerIndex: PlayerIndex): Int =
+    if (playedTurns > 5) (player(playerIndex).blurs.nb * 100) / playerMoves(playerIndex)
     else 0
 
   def isBeingPlayed = !isPgnImport && !finishedOrAborted
@@ -649,14 +649,14 @@ case class Game(
 
   private def playerMaps[A](f: Player => Option[A]): List[A] = players flatMap f
 
-  def pov(c: SGPlayer)                                 = Pov(this, c)
+  def pov(c: PlayerIndex)                                 = Pov(this, c)
   def playerIdPov(playerId: Player.ID): Option[Pov] = player(playerId) map { Pov(this, _) }
   def p1Pov                                      = pov(P1)
   def p2Pov                                      = pov(P2)
-  def playerPov(p: Player)                          = pov(p.sgPlayer)
+  def playerPov(p: Player)                          = pov(p.playerIndex)
   def loserPov                                      = loser map playerPov
 
-  def playerTrans(p: SGPlayer)(implicit lang: Lang) = chess.board.variant.playerNames(p) match {
+  def playerTrans(p: PlayerIndex)(implicit lang: Lang) = chess.board.variant.playerNames(p) match {
     case "White" => trans.white.txt()
     case "Black" => trans.black.txt()
     case "Red"   => trans.red.txt()
@@ -836,7 +836,7 @@ object Game {
     val swissId           = "iid"
     val simulId           = "sid"
     val tvAt              = "tv"
-    val winnerSGPlayer       = "w"
+    val winnerPlayerIndex       = "w"
     val winnerId          = "wid"
     val initialFen        = "if"
     val checkAt           = "ck"
@@ -877,22 +877,22 @@ case class ClockHistory(
     p2: Vector[Centis] = Vector.empty
 ) {
 
-  def update(sgPlayer: SGPlayer, f: Vector[Centis] => Vector[Centis]): ClockHistory =
-    sgPlayer.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
+  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
+    playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
 
-  def record(sgPlayer: SGPlayer, clock: Clock): ClockHistory =
-    update(sgPlayer, _ :+ clock.remainingTime(sgPlayer))
+  def record(playerIndex: PlayerIndex, clock: Clock): ClockHistory =
+    update(playerIndex, _ :+ clock.remainingTime(playerIndex))
 
-  def reset(sgPlayer: SGPlayer) = update(sgPlayer, _ => Vector.empty)
+  def reset(playerIndex: PlayerIndex) = update(playerIndex, _ => Vector.empty)
 
-  def apply(sgPlayer: SGPlayer): Vector[Centis] = sgPlayer.fold(p1, p2)
+  def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
 
-  def last(sgPlayer: SGPlayer) = apply(sgPlayer).lastOption
+  def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
 
   def size = p1.size + p2.size
 
-  // first state is of the sgPlayer that moved first.
-  def bothClockStates(firstMoveBy: SGPlayer): Vector[Centis] =
+  // first state is of the playerIndex that moved first.
+  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
     Sequence.interleave(
       firstMoveBy.fold(p1, p2),
       firstMoveBy.fold(p2, p1)

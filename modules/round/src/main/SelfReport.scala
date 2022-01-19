@@ -60,7 +60,7 @@ final class SelfReport(
                     name.contains("__puppeteer_evaluation_script__")
                 ))
               ) fuccess {
-                if (userId.isDefined) tellRound(pov.gameId, lila.round.actorApi.round.Cheat(pov.sgPlayer))
+                if (userId.isDefined) tellRound(pov.gameId, lila.round.actorApi.round.Cheat(pov.playerIndex))
                 user.ifTrue(name == "cma") foreach { u =>
                   lila.common.Bus.publish(lila.hub.actorApi.mod.SelfReportMark(u.id, name), "selfReportMark")
                 }

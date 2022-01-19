@@ -111,7 +111,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
           coll.update.one(
             $id(p.id),
             $set(
-              "w" -> p.sgPlayerOf(userId).map(_.p2)
+              "w" -> p.playerIndexOf(userId).map(_.p2)
             )
           )
         }.sequenceFu
@@ -174,7 +174,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
           $id(g.id),
           $set(
             "s" -> g.status.id,
-            "w" -> g.winnerSGPlayer.map(_.p1),
+            "w" -> g.winnerPlayerIndex.map(_.p1),
             "t" -> g.turns
           )
         )

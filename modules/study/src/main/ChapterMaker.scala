@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, Player => SGPlayer, PocketData }
+import strategygames.{ GameLogic, Player => PlayerIndex, PocketData }
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
 import lila.user.User
@@ -69,11 +69,11 @@ final private class ChapterMaker(
       conceal = data.isConceal option Chapter.Ply(parsed.root.ply)
     )
 
-  private def resolveOrientation(orientation: Orientation, root: Node.Root, tags: Tags = Tags.empty): SGPlayer =
+  private def resolveOrientation(orientation: Orientation, root: Node.Root, tags: Tags = Tags.empty): PlayerIndex =
     orientation match {
-      case Orientation.Fixed(sgPlayer)        => sgPlayer
-      case _ if tags.resultPlayer.isDefined => SGPlayer.p1
-      case _                               => root.lastMainlineNode.sgPlayer
+      case Orientation.Fixed(playerIndex)        => playerIndex
+      case _ if tags.resultPlayer.isDefined => PlayerIndex.p1
+      case _                               => root.lastMainlineNode.playerIndex
     }
 
   private def fromFenOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Chapter = {
@@ -143,8 +143,8 @@ final private class ChapterMaker(
         !game.synthetic option game.id,
         game.variant,
         data.realOrientation match {
-          case Orientation.Auto         => SGPlayer.p1
-          case Orientation.Fixed(sgPlayer) => sgPlayer
+          case Orientation.Auto         => PlayerIndex.p1
+          case Orientation.Fixed(playerIndex) => playerIndex
         }
       ),
       root = root,
@@ -207,7 +207,7 @@ private[study] object ChapterMaker {
   trait ChapterData {
     def orientation: String
     def mode: String
-    def realOrientation = SGPlayer.fromName(orientation).fold[Orientation](Orientation.Auto)(Orientation.Fixed)
+    def realOrientation = PlayerIndex.fromName(orientation).fold[Orientation](Orientation.Auto)(Orientation.Fixed)
     def isPractice      = mode == Mode.Practice.key
     def isGamebook      = mode == Mode.Gamebook.key
     def isConceal       = mode == Mode.Conceal.key
@@ -215,7 +215,7 @@ private[study] object ChapterMaker {
 
   sealed trait Orientation
   object Orientation {
-    case class Fixed(sgPlayer: SGPlayer) extends Orientation
+    case class Fixed(playerIndex: PlayerIndex) extends Orientation
     case object Auto               extends Orientation
   }
 

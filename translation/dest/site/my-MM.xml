@@ -67,7 +67,7 @@
   <string name="time">အချိန်</string>
   <string name="username">ကစားသူအမည်</string>
   <string name="usernameOrEmail">ကစားသူအမည် သို့မဟုတ် email လိပ်စာ</string>
-  <string name="sgPlayerTimeOut">%s အချိန်ကုန်</string>
+  <string name="playerIndexTimeOut">%s အချိန်ကုန်</string>
   <string name="whiteTimeOut">အဖြူ အချိန်ကုန်</string>
   <string name="blackTimeOut">အနက် အချိန်ကုန်</string>
   <string name="play">ကစားမည်</string>

@@ -20,10 +20,10 @@
   <string name="black">কালো</string>
   <string name="randomColor">যে কোন রঙ</string>
   <string name="createAGame">খেলা তৈরি করুন</string>
-  <string name="sgPlayerIsVictorious">%s বিজয়ী</string>
+  <string name="playerIndexIsVictorious">%s বিজয়ী</string>
   <string name="whiteIsVictorious">সাদা বিজয়ী</string>
   <string name="blackIsVictorious">কালো বিজয়ী</string>
-  <string name="youPlayTheSGPlayerPieces">আপনি %s গুটি নিয়ে খেলছেন</string>
+  <string name="youPlayThePlayerIndexPieces">আপনি %s গুটি নিয়ে খেলছেন</string>
   <string name="youPlayTheWhitePieces">আপনি সাদা গুটি নিয়ে খেলছেন</string>
   <string name="youPlayTheBlackPieces">আপনি কালো গুটি নিয়ে খেলছেন</string>
   <string name="itsYourTurn">এবার আপনার দান!</string>
@@ -46,10 +46,10 @@
   <string name="forceDraw">সমান ঘোষণা করুন</string>
   <string name="talkInChat">আড্ডায় কথা বলুন</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">এই URL দিয়ে আসা প্রথম ব্যক্তি আপনার সাথে খেলবেন</string>
-  <string name="sgPlayerResigned">%s হার মেনে নিলেন</string>
+  <string name="playerIndexResigned">%s হার মেনে নিলেন</string>
   <string name="whiteResigned">সাদা হার মেনে নিলেন</string>
   <string name="blackResigned">কালো হার মেনে নিলেন</string>
-  <string name="sgPlayerLeftTheGame">%s খেলাটি ছেড়ে চলে গেছেন</string>
+  <string name="playerIndexLeftTheGame">%s খেলাটি ছেড়ে চলে গেছেন</string>
   <string name="whiteLeftTheGame">সাদা খেলাটি ছেড়ে চলে গেছেন</string>
   <string name="blackLeftTheGame">কালো খেলাটি ছেড়ে চলে গেছেন</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">এই URL টি শেয়ার করে দর্শকদের খেলাটি দেখার সুযোগ করে দিন</string>
@@ -208,10 +208,10 @@
   <string name="drawOfferDeclined">সমান অফার প্রত্যাখ্যাত হয়েছে</string>
   <string name="drawOfferAccepted">সমান অফার গ্রহণ করা হয়েছে</string>
   <string name="drawOfferCanceled">সমান অফার বাতিল করা হয়েছে</string>
-  <string name="sgPlayerOffersDraw">%s অফার সমান</string>
+  <string name="playerIndexOffersDraw">%s অফার সমান</string>
   <string name="whiteOffersDraw">সাদা অফার সমান</string>
   <string name="blackOffersDraw">কালো অফার সমান</string>
-  <string name="sgPlayerDeclinesDraw">%s সমান প্রত্যাখান করেছে</string>
+  <string name="playerIndexDeclinesDraw">%s সমান প্রত্যাখান করেছে</string>
   <string name="whiteDeclinesDraw">সাদা সমান প্রত্যাখান করেছে</string>
   <string name="blackDeclinesDraw">কালো সমান প্রত্যাখান করেছে</string>
   <string name="yourOpponentOffersADraw">আপনার প্রতিপক্ষ সমান অফার করেছেন</string>
@@ -356,7 +356,7 @@
   <string name="clickOnTheBoardToMakeYourMove">বোর্ডে ক্লিক করে চাল দিয়ে প্রমাণ করুন যে আপনি সত্যিই মানুষ, রোবট নন।</string>
   <string name="captcha.fail">দয়া করে দাবার ক্যাপচা সমাধান করুন.</string>
   <string name="notACheckmate">এটি কিস্তিমাত নয়</string>
-  <string name="sgPlayerCheckmatesInOneMove">%s দলের একটি মুভে চেকমেট</string>
+  <string name="playerIndexCheckmatesInOneMove">%s দলের একটি মুভে চেকমেট</string>
   <string name="whiteCheckmatesInOneMove">সাদা দলের একটি মুভে চেকমেট</string>
   <string name="blackCheckmatesInOneMove">কালো দলের একটি মুভে চেকমেট</string>
   <string name="retry">আবার চেষ্টা করুন</string>
@@ -426,7 +426,7 @@
   <string name="performance">সম্পাদন</string>
   <string name="tournamentComplete">ক্রীড়া-প্রতিযোগিতা সম্পন্ন হয়েছে</string>
   <string name="movesPlayed">খেলা সরানো হয়েছে</string>
-  <string name="sgPlayerWins">%s বিজয়ী</string>
+  <string name="playerIndexWins">%s বিজয়ী</string>
   <string name="whiteWins">সাদা বিজয়ী</string>
   <string name="blackWins">কালো বিজয়ী</string>
   <string name="draws">সমান</string>
@@ -760,7 +760,7 @@
   <string name="hideBestMove">লুকান সেরা চাল</string>
   <string name="getAHint">একটি সূত্র পান</string>
   <string name="evaluatingYourMove">আপনার চাল মূল্যায়ন করবে...</string>
-  <string name="sgPlayerWinsGame">%s জিতেছে</string>
+  <string name="playerIndexWinsGame">%s জিতেছে</string>
   <string name="whiteWinsGame">সাদা জিতেছে</string>
   <string name="blackWinsGame">কালো জিতেছে</string>
   <string name="learnFromYourMistakes">আপনার ভুলগুলো থেকে শিখুন</string>

@@ -1,6 +1,6 @@
 package lila.mod
 
-import strategygames.{ P2, Player => SGPlayer, P1 }
+import strategygames.{ P2, Player => PlayerIndex, P1 }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import reactivemongo.api.ReadPreference
@@ -61,7 +61,7 @@ final class AssessApi(
 
   private def buildMissing(povs: List[Pov]): Funit =
     assessRepo.coll
-      .distinctEasy[Game.ID, Set]("gameId", $inIds(povs.map(p => s"${p.gameId}/${p.sgPlayer.name}"))) flatMap {
+      .distinctEasy[Game.ID, Set]("gameId", $inIds(povs.map(p => s"${p.gameId}/${p.playerIndex.name}"))) flatMap {
       existingIds =>
         val missing = povs collect {
           case pov if pov.game.metadata.analysed && !existingIds.contains(pov.gameId) => pov.gameId
@@ -76,7 +76,7 @@ final class AssessApi(
                 }
                 .map { case (pov, analysis) =>
                   gameRepo.holdAlert game pov.game flatMap { holdAlerts =>
-                    createPlayerAssessment(PlayerAssessment.make(pov, analysis, holdAlerts(pov.sgPlayer)))
+                    createPlayerAssessment(PlayerAssessment.make(pov, analysis, holdAlerts(pov.playerIndex)))
                   }
                 }
                 .sequenceFu
@@ -90,7 +90,7 @@ final class AssessApi(
     buildMissing(povs) >>
       assessRepo.coll
         .idsMap[PlayerAssessment, Game.ID](
-          ids = povs.map(p => s"${p.gameId}/${p.sgPlayer.name}"),
+          ids = povs.map(p => s"${p.gameId}/${p.playerIndex.name}"),
           readPreference = ReadPreference.secondaryPreferred
         )(_.gameId)
         .flatMap { fulls =>
@@ -186,25 +186,25 @@ final class AssessApi(
     import AutoAnalysis.Reason._
 
     def manyBlurs(player: Player) =
-      game.playerBlurPercent(player.sgPlayer) >= 70
+      game.playerBlurPercent(player.playerIndex) >= 70
 
     def winnerGreatProgress(player: Player): Boolean =
       game.winner.has(player) && game.perfType ?? { perfType =>
-        player.sgPlayer.fold(p1, p2).perfs(perfType).progress >= 90
+        player.playerIndex.fold(p1, p2).perfs(perfType).progress >= 90
       }
 
     def noFastCoefVariation(player: Player): Option[Float] =
       Statistics.noFastMoves(Pov(game, player)) ?? Statistics.moveTimeCoefVariation(Pov(game, player))
 
-    def winnerUserOption = game.winnerSGPlayer.map(_.fold(p1, p2))
-    def loserUserOption  = game.winnerSGPlayer.map(_.fold(p2, p1))
+    def winnerUserOption = game.winnerPlayerIndex.map(_.fold(p1, p2))
+    def loserUserOption  = game.winnerPlayerIndex.map(_.fold(p2, p1))
     def winnerNbGames =
       for {
         user     <- winnerUserOption
         perfType <- game.perfType
       } yield user.perfs(perfType).nb
 
-    def suspCoefVariation(c: SGPlayer) = {
+    def suspCoefVariation(c: PlayerIndex) = {
       val x = noFastCoefVariation(game player c)
       x.filter(_ < 0.45f) orElse x.filter(_ < 0.5f).ifTrue(ThreadLocalRandom.nextBoolean())
     }

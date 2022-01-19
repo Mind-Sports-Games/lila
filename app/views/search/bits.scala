@@ -27,14 +27,14 @@ private object bits {
           data(s"req-$f") := ~form("players")(f).value
         }
 
-      def sgPlayers(hide: Boolean) =
-        strategygames.Player.all.map { sgPlayer =>
-          tr(cls := List(s"${sgPlayer.name}User user-row" -> true, "none" -> hide))(
-            th(label(`for` := form3.id(form("players")(sgPlayer.name)))(sgPlayer.fold(trans.p1, trans.p2)())),
+      def playerIndexs(hide: Boolean) =
+        strategygames.Player.all.map { playerIndex =>
+          tr(cls := List(s"${playerIndex.name}User user-row" -> true, "none" -> hide))(
+            th(label(`for` := form3.id(form("players")(playerIndex.name)))(playerIndex.fold(trans.p1, trans.p2)())),
             td(cls := "single")(
               st.select(
-                id := form3.id(form("players")(sgPlayer.name)),
-                name := form("players")(sgPlayer.name).name
+                id := form3.id(form("players")(playerIndex.name)),
+                name := form("players")(playerIndex.name).name
               )(
                 option(cls := "blank", value := "")
               )
@@ -176,10 +176,10 @@ private object bits {
           td(cls := "single")(form3.select(form("status"), Query.statuses, "".some))
         )
 
-      def winnerSGPlayer =
+      def winnerPlayerIndex =
         tr(
-          th(label(`for` := form3.id(form("winnerSGPlayer")))(trans.search.winnerSGPlayer())),
-          td(cls := "single")(form3.select(form("winnerSGPlayer"), Query.winnerSGPlayers, "".some))
+          th(label(`for` := form3.id(form("winnerPlayerIndex")))(trans.search.winnerPlayerIndex())),
+          td(cls := "single")(form3.select(form("winnerPlayerIndex"), Query.winnerPlayerIndexs, "".some))
         )
 
       def date =

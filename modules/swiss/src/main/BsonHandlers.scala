@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ Player => SGPlayer, GameLogic }
+import strategygames.{ Player => PlayerIndex, GameLogic }
 import strategygames.format.FEN
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
@@ -58,7 +58,7 @@ object BsonHandlers {
   implicit val pairingStatusHandler = lila.db.dsl.quickHandler[SwissPairing.Status](
     {
       case BSONBoolean(true)  => Left(SwissPairing.Ongoing)
-      case BSONInteger(index) => Right(SGPlayer.fromP1(index == 0).some)
+      case BSONInteger(index) => Right(PlayerIndex.fromP1(index == 0).some)
       case _                  => Right(none)
     },
     {

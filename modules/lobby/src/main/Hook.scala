@@ -20,14 +20,14 @@ case class Hook(
     variant: Int,
     clock: Clock.Config,
     mode: Int,
-    sgPlayer: String,
+    playerIndex: String,
     user: Option[LobbyUser],
     ratingRange: String,
     createdAt: DateTime,
     boardApi: Boolean
 ) {
 
-  val realSGPlayer = SGPlayer orDefault sgPlayer
+  val realPlayerIndex = PlayerIndex orDefault playerIndex
 
   val realVariant = Variant.orDefault(lib, variant)
 
@@ -41,7 +41,7 @@ case class Hook(
       lib == h.lib &&
       variant == h.variant &&
       clock == h.clock &&
-      (realSGPlayer compatibleWith h.realSGPlayer) &&
+      (realPlayerIndex compatibleWith h.realPlayerIndex) &&
       ratingRangeCompatibleWith(h) && h.ratingRangeCompatibleWith(this) &&
       (userId.isEmpty || userId != h.userId)
 
@@ -78,13 +78,13 @@ case class Hook(
       .add("rating" -> rating)
       .add("variant" -> realVariant.exotic.option(realVariant.key))
       .add("ra" -> realMode.rated.option(1))
-      .add("c" -> strategygames.Player.fromName(sgPlayer).map(_.name))
+      .add("c" -> strategygames.Player.fromName(playerIndex).map(_.name))
       .add("perf" -> perfType.map(_.trans))
 
-  def randomSGPlayer = sgPlayer == "random"
+  def randomPlayerIndex = playerIndex == "random"
 
   lazy val compatibleWithPools =
-    realMode.rated && realVariant.standard && randomSGPlayer &&
+    realMode.rated && realVariant.standard && randomPlayerIndex &&
       lila.pool.PoolList.clockStringSet.contains(clock.show)
 
   def compatibleWithPool(poolClock: strategygames.Clock.Config) =
@@ -116,7 +116,7 @@ object Hook {
       variant: strategygames.variant.Variant,
       clock: Clock.Config,
       mode: Mode,
-      sgPlayer: String,
+      playerIndex: String,
       user: Option[User],
       sid: Option[String],
       ratingRange: RatingRange,
@@ -130,7 +130,7 @@ object Hook {
       variant = variant.id,
       clock = clock,
       mode = mode.id,
-      sgPlayer = sgPlayer,
+      playerIndex = playerIndex,
       user = user map { LobbyUser.make(_, blocking) },
       sid = sid,
       ratingRange = ratingRange.toString,

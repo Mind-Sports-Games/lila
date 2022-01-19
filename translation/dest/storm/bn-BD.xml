@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">সুরু করতে চাল দিন</string>
-  <string name="youPlayTheSGPlayerPiecesInAllPuzzles">আপনি সমস্ত ধাঁধাতে %s ঘুঁটি নিয়ে খেলছেন।</string>
+  <string name="youPlayThePlayerIndexPiecesInAllPuzzles">আপনি সমস্ত ধাঁধাতে %s ঘুঁটি নিয়ে খেলছেন।</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">আপনি সমস্ত ধাঁধাতে সাদা ঘুঁটি নিয়ে খেলছেন।</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">আপনি সমস্ত ধাঁধাতে কালো ঘুঁটি নিয়ে খেলছেন।</string>
   <string name="puzzlesSolved">ধাঁধা সমাধান করা হয়েছে</string>

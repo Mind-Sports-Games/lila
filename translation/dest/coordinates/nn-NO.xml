@@ -2,7 +2,7 @@
 <resources>
   <string name="coordinates">Koordinatar</string>
   <string name="coordinateTraining">Koordinatøving</string>
-  <string name="averageScoreAsSGPlayerX">Gjennomsnittleg poengsum som %1$s: %2$s</string>
+  <string name="averageScoreAsPlayerIndexX">Gjennomsnittleg poengsum som %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Gjennomsnittleg poengsum som kvit: %s</string>
   <string name="averageScoreAsBlackX">Gjennomsnittleg poengsum som svart: %s</string>
   <string name="knowingTheChessBoard">Det er svært viktig å kjenne til koordinatane på sjakkbrettet:</string>

@@ -20,10 +20,10 @@
   <string name="black">କଳା</string>
   <string name="randomColor">ଅନିୟମିତ ପାର୍ଶ୍ୱ</string>
   <string name="createAGame">ଏକ ଖେଳ ସୃଷ୍ଟି କରନ୍ତୁ</string>
-  <string name="sgPlayerIsVictorious">%s ବିଜୟୀ ଅଟେ</string>
+  <string name="playerIndexIsVictorious">%s ବିଜୟୀ ଅଟେ</string>
   <string name="whiteIsVictorious">ଧଳା ବିଜୟୀ ଅଟେ</string>
   <string name="blackIsVictorious">କଳା ବିଜୟୀ ଅଟେ</string>
-  <string name="youPlayTheSGPlayerPieces">ଆପଣ %s ଖଣ୍ଡଗୁଡ଼ିକ ଖେଳୁଛନ୍ତି</string>
+  <string name="youPlayThePlayerIndexPieces">ଆପଣ %s ଖଣ୍ଡଗୁଡ଼ିକ ଖେଳୁଛନ୍ତି</string>
   <string name="youPlayTheWhitePieces">ଆପଣ ଧଳା ଖଣ୍ଡଗୁଡ଼ିକ ଖେଳୁଛନ୍ତି</string>
   <string name="youPlayTheBlackPieces">ଆପଣ କଳା ଖଣ୍ଡଗୁଡ଼ିକ ଖେଳୁଛନ୍ତି</string>
   <string name="itsYourTurn">ଏହା ଆପଣଙ୍କର ପାଳି!</string>
@@ -42,10 +42,10 @@
   <string name="forceDraw">କଲ୍ ଡ୍ର</string>
   <string name="talkInChat">ଦୟାକରି ଚାଟରେ ଭଲ ହୁଅନ୍ତୁ!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">ଏହି URL କୁ ଆସିଥିବା ପ୍ରଥମ ବ୍ୟକ୍ତି ଆପଣଙ୍କ ସହିତ ଖେଳିବେ |</string>
-  <string name="sgPlayerResigned">%s ଇସ୍ତଫା ଦେଇଛନ୍ତି</string>
+  <string name="playerIndexResigned">%s ଇସ୍ତଫା ଦେଇଛନ୍ତି</string>
   <string name="whiteResigned">ଧଳା ଇସ୍ତଫା ଦେଇଛନ୍ତି</string>
   <string name="blackResigned">କଳା ଇସ୍ତଫା ଦେଇଛନ୍ତି</string>
-  <string name="sgPlayerLeftTheGame">%s ଖେଳ ଛାଡିଥିଲେ</string>
+  <string name="playerIndexLeftTheGame">%s ଖେଳ ଛାଡିଥିଲେ</string>
   <string name="whiteLeftTheGame">ଧଳା ଖେଳ ଛାଡିଥିଲେ</string>
   <string name="blackLeftTheGame">କଳା ଖେଳ ଛାଡିଥିଲେ</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">ଦର୍ଶକଙ୍କୁ ଖେଳ ଦେଖିବାକୁ ଏହି URL ଅଂଶୀଦାର କରନ୍ତୁ |</string>

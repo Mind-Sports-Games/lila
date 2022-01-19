@@ -64,7 +64,7 @@ object PoolApi {
   }
 
   case class Pairing(game: Game, p1Sri: Sri, p2Sri: Sri) {
-    def sri(sgPlayer: strategygames.Player) = sgPlayer.fold(p1Sri, p2Sri)
+    def sri(playerIndex: strategygames.Player) = playerIndex.fold(p1Sri, p2Sri)
   }
   case class Pairings(pairings: List[Pairing])
 }
