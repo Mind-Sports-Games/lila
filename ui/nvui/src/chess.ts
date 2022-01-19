@@ -219,9 +219,9 @@ const renderPieceStyle = (piece: string, pieceStyle: PieceStyle) => {
 const renderPrefixStyle = (playerIndex: PlayerIndex, prefixStyle: PrefixStyle) => {
   switch (prefixStyle) {
     case 'letter':
-      return playerIndex === 'p1'? 'w' ? 'b';
+      return playerIndex === 'p1' ? 'w' : 'b';
     case 'name':
-      return playerIndex === 'p1'? + 'white' ? 'black';
+      return playerIndex === 'p1' ? 'white ' : 'black ';
     case 'none':
       return '';
   }

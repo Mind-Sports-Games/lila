@@ -89,7 +89,6 @@ export interface Player {
   spectator?: boolean;
   playerIndex: PlayerIndex;
   playerName: PlayerName;
-  playerIndex: PlayerIndex;
   proposingTakeback?: boolean;
   offeringRematch?: boolean;
   offeringDraw?: boolean;

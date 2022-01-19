@@ -1,4 +1,4 @@
-import changePlayerIndexHandle from 'common/coordsPlayerIndex';
+import changePlayerIndexHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
 import { Chessground } from 'chessground';
 import { Config as CgConfig } from 'chessground/config';

@@ -34,7 +34,7 @@ import { make as makeRetro, RetroCtrl } from './retrospect/retroCtrl';
 import { make as makeSocket, Socket } from './socket';
 import { nextGlyphSymbol } from './nodeFinder';
 import { opposite, parseUci, makeSquare, roleToChar } from 'chessops/util';
-import { Outcome, isNormal } from 'chessops/types';
+import { PLAYERINDEXES, Outcome, isNormal } from 'chessops/types';
 import { SquareSet } from 'chessops/squareSet';
 import { parseFen } from 'chessops/fen';
 import { Position, PositionError } from 'chessops/chess';
@@ -624,7 +624,7 @@ export default class AnalyseCtrl {
         !this.data.game.initialFen ||
         parseFen(this.data.game.initialFen).unwrap(
           setup =>
-            ['p1', 'p2'].every(playerIndex => {
+            PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
               const pieces = board[playerIndex];
               const promotedPieces =

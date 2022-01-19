@@ -1,7 +1,7 @@
 import * as control from '../control';
 import * as side from './side';
 import theme from './theme';
-import changePlayerIndexHandle from 'common/coordsPlayerIndex';
+import changePlayerIndexHandle from 'common/coordsColor';
 import chessground from './chessground';
 import feedbackView from './feedback';
 import { Controller } from '../interfaces';
