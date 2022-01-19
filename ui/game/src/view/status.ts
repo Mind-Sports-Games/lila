@@ -19,18 +19,18 @@ export default function status(ctrl: Ctrl): string {
       }
       return '';
     case 'resign':
-      return ctrl.trans('playerIndexResigned', d.game.loserPlayer);
+      return ctrl.trans('playerIndexResigned', d.game.loserPlayer ? d.game.loserPlayer : '');
     case 'stalemate':
       return noarg('stalemate');
     case 'timeout':
-      return d.game.winner ? ctrl.trans('playerIndexLeftTheGame', d.game.loserPlayer) : noarg('draw');
+      return d.game.loserPlayer ? ctrl.trans('playerIndexLeftTheGame', d.game.loserPlayer) : noarg('draw');
     case 'draw':
       return noarg('draw');
     case 'outoftime':
       //return `${d.game.turns % 2 === 0 ? noarg('whiteTimeOut') : noarg('blackTimeOut')}${
       //  d.game.winner ? '' : ` • ${noarg('draw')}`
       //}`;
-      return d.game.winner ? ctrl.trans('playerIndexTimeOut', d.game.loserPlayer) : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
+      return d.game.loserPlayer ? ctrl.trans('playerIndexTimeOut', d.game.loserPlayer) : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
     case 'noStart':
       return d.game.loserPlayer + " didn't move";
     case 'cheat':

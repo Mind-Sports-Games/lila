@@ -29,20 +29,14 @@ final class JsonView(rematches: Rematches) {
         "source"        -> game.source,
         "status"        -> game.status,
         "createdAt"     -> game.createdAt,
-        "winnerPlayer"  -> (game.winnerPlayerIndex match {
-          case Some(winner) => game.variant.playerNames(winner)
-          case None => ""
-        }),
-        "loserPlayer"   -> (game.winnerPlayerIndex match {
-          case Some(winner) => game.variant.playerNames(!winner)
-          case None => ""
-        })
       )
       .add("threefold" -> game.situation.threefoldRepetition)
       .add("boosted" -> game.boosted)
       .add("tournamentId" -> game.tournamentId)
       .add("swissId" -> game.swissId)
       .add("winner" -> game.winnerPlayerIndex)
+      .add("winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames))
+      .add("loserPlayer" -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)))
       .add("lastMove" -> game.lastMoveKeys)
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))

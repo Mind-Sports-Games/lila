@@ -17,8 +17,8 @@ export const status = (ctrl: RoundController) => {
   if (s == 'playingRightNow') window.PlayStrategySpeech!.step(ctrl.stepAt(ctrl.ply), false);
   else {
     withSpeech(speech => speech.say(s, false));
-    const w = ctrl.data.game.winner;
-    if (w) withSpeech(speech => speech.say(ctrl.trans('playerIndexIsVictorious', ctrl.data.game.winnerPlayer), false));
+    const w = ctrl.data.game.winnerPlayer;
+    if (w) withSpeech(speech => speech.say(ctrl.trans('playerIndexIsVictorious', w), false));
   }
 };
 

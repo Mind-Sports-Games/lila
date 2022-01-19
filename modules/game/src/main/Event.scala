@@ -371,6 +371,8 @@ object Event {
       Json
         .obj(
           "winner" -> game.winnerPlayerIndex,
+          "winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames),
+          "loserPlayer" -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)),
           "status" -> game.status
         )
         .add("clock" -> game.clock.map { c =>

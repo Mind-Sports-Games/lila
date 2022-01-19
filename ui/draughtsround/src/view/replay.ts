@@ -79,7 +79,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
         result = ctrl.data.pref.draughtsResult ? '1-1' : '½-½';
     }
   if (result || status.aborted(ctrl.data)) {
-    const winner = ctrl.data.game.winner;
+    const winner = ctrl.data.game.winnerPlayer;
     return h('div.result-wrap', [
       h('p.result', result || ''),
       h(
@@ -90,7 +90,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [viewStatus(ctrl), winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.trans('playerIndexIsVictorious', ctrl.data.game.winnerPlayer) : '']
+        [viewStatus(ctrl), winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.trans('playerIndexIsVictorious', winner) : '']
       ),
     ]);
   }

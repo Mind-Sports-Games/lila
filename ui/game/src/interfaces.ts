@@ -33,8 +33,8 @@ export interface BaseGame {
   speed: Speed;
   variant: Variant | DraughtsVariant;
   winner?: PlayerIndex;
-  winnerPlayer: PlayerName;
-  loserPlayer: PlayerName;
+  winnerPlayer?: PlayerName;
+  loserPlayer?: PlayerName;
   drawOffers?: number[];
   moveCentis?: number[];
   initialFen?: string;
