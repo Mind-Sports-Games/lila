@@ -1,8 +1,8 @@
 .shogi.is2d .p-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0FU.svg')}
 .shogi.is2d .l-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0KY.svg')}
 .shogi.is2d .n-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0KE.svg')}
-.shogi.is2d .k-piece.ally.black {background-image:url('/assets/piece/shogi/2kanji/0OU.svg')}
-.shogi.is2d .k-piece.ally.white {background-image:url('/assets/piece/shogi/2kanji/0GY.svg')}
+.shogi.is2d .k-piece.ally.p2 {background-image:url('/assets/piece/shogi/2kanji/0OU.svg')}
+.shogi.is2d .k-piece.ally.p1 {background-image:url('/assets/piece/shogi/2kanji/0GY.svg')}
 .shogi.is2d .s-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0GI.svg')}
 .shogi.is2d .pp-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0TO.svg')}
 .shogi.is2d .pl-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0NY.svg')}
@@ -16,8 +16,8 @@
 .shogi.is2d .p-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1FU.svg')}
 .shogi.is2d .l-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1KY.svg')}
 .shogi.is2d .n-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1KE.svg')}
-.shogi.is2d .k-piece.enemy.black {background-image:url('/assets/piece/shogi/2kanji/1OU.svg')}
-.shogi.is2d .k-piece.enemy.white {background-image:url('/assets/piece/shogi/2kanji/1GY.svg')}
+.shogi.is2d .k-piece.enemy.p2 {background-image:url('/assets/piece/shogi/2kanji/1OU.svg')}
+.shogi.is2d .k-piece.enemy.p1 {background-image:url('/assets/piece/shogi/2kanji/1GY.svg')}
 .shogi.is2d .s-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1GI.svg')}
 .shogi.is2d .pp-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1TO.svg')}
 .shogi.is2d .pl-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1NY.svg')}
@@ -31,8 +31,8 @@
 .is2d .variant-shogi .p-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0FU.svg')}
 .is2d .variant-shogi .l-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0KY.svg')}
 .is2d .variant-shogi .n-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0KE.svg')}
-.is2d .variant-shogi .k-piece.ally.black {background-image:url('/assets/piece/shogi/2kanji/0OU.svg')}
-.is2d .variant-shogi .k-piece.ally.white {background-image:url('/assets/piece/shogi/2kanji/0GY.svg')}
+.is2d .variant-shogi .k-piece.ally.p2 {background-image:url('/assets/piece/shogi/2kanji/0OU.svg')}
+.is2d .variant-shogi .k-piece.ally.p1 {background-image:url('/assets/piece/shogi/2kanji/0GY.svg')}
 .is2d .variant-shogi .s-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0GI.svg')}
 .is2d .variant-shogi .pp-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0TO.svg')}
 .is2d .variant-shogi .pl-piece.ally {background-image:url('/assets/piece/shogi/2kanji/0NY.svg')}
@@ -46,8 +46,8 @@
 .is2d .variant-shogi .p-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1FU.svg')}
 .is2d .variant-shogi .l-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1KY.svg')}
 .is2d .variant-shogi .n-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1KE.svg')}
-.is2d .variant-shogi .k-piece.enemy.black {background-image:url('/assets/piece/shogi/2kanji/1OU.svg')}
-.is2d .variant-shogi .k-piece.enemy.white {background-image:url('/assets/piece/shogi/2kanji/1GY.svg')}
+.is2d .variant-shogi .k-piece.enemy.p2 {background-image:url('/assets/piece/shogi/2kanji/1OU.svg')}
+.is2d .variant-shogi .k-piece.enemy.p1 {background-image:url('/assets/piece/shogi/2kanji/1GY.svg')}
 .is2d .variant-shogi .s-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1GI.svg')}
 .is2d .variant-shogi .pp-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1TO.svg')}
 .is2d .variant-shogi .pl-piece.enemy {background-image:url('/assets/piece/shogi/2kanji/1NY.svg')}

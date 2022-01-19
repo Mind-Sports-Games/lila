@@ -1,32 +1,32 @@
-.xiangqi.is2d .a-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BA.svg')}
-.xiangqi.is2d .b-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BE.svg')}
-.xiangqi.is2d .c-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BC.svg')}
-.xiangqi.is2d .k-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BK.svg')}
-.xiangqi.is2d .n-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BH.svg')}
-.xiangqi.is2d .p-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BP.svg')}
-.xiangqi.is2d .r-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BR.svg')}
-.xiangqi.is2d .pp-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BP.svg')}
-.xiangqi.is2d .a-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RA.svg')}
-.xiangqi.is2d .b-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RE.svg')}
-.xiangqi.is2d .c-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RC.svg')}
-.xiangqi.is2d .k-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RK.svg')}
-.xiangqi.is2d .n-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RH.svg')}
-.xiangqi.is2d .p-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RP.svg')}
-.xiangqi.is2d .r-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RR.svg')}
-.xiangqi.is2d .pp-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RP.svg')}
-.is2d .variant-xiangqi .a-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BA.svg')}
-.is2d .variant-xiangqi .b-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BE.svg')}
-.is2d .variant-xiangqi .c-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BC.svg')}
-.is2d .variant-xiangqi .k-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BK.svg')}
-.is2d .variant-xiangqi .n-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BH.svg')}
-.is2d .variant-xiangqi .p-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BP.svg')}
-.is2d .variant-xiangqi .r-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BR.svg')}
-.is2d .variant-xiangqi .pp-piece.black {background-image:url('/assets/piece/xiangqi/2dhanzi/BP.svg')}
-.is2d .variant-xiangqi .a-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RA.svg')}
-.is2d .variant-xiangqi .b-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RE.svg')}
-.is2d .variant-xiangqi .c-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RC.svg')}
-.is2d .variant-xiangqi .k-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RK.svg')}
-.is2d .variant-xiangqi .n-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RH.svg')}
-.is2d .variant-xiangqi .p-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RP.svg')}
-.is2d .variant-xiangqi .r-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RR.svg')}
-.is2d .variant-xiangqi .pp-piece.white {background-image:url('/assets/piece/xiangqi/2dhanzi/RP.svg')}
+.xiangqi.is2d .a-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BA.svg')}
+.xiangqi.is2d .b-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BE.svg')}
+.xiangqi.is2d .c-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BC.svg')}
+.xiangqi.is2d .k-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BK.svg')}
+.xiangqi.is2d .n-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BH.svg')}
+.xiangqi.is2d .p-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BP.svg')}
+.xiangqi.is2d .r-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BR.svg')}
+.xiangqi.is2d .pp-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BP.svg')}
+.xiangqi.is2d .a-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RA.svg')}
+.xiangqi.is2d .b-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RE.svg')}
+.xiangqi.is2d .c-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RC.svg')}
+.xiangqi.is2d .k-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RK.svg')}
+.xiangqi.is2d .n-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RH.svg')}
+.xiangqi.is2d .p-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RP.svg')}
+.xiangqi.is2d .r-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RR.svg')}
+.xiangqi.is2d .pp-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RP.svg')}
+.is2d .variant-xiangqi .a-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BA.svg')}
+.is2d .variant-xiangqi .b-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BE.svg')}
+.is2d .variant-xiangqi .c-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BC.svg')}
+.is2d .variant-xiangqi .k-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BK.svg')}
+.is2d .variant-xiangqi .n-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BH.svg')}
+.is2d .variant-xiangqi .p-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BP.svg')}
+.is2d .variant-xiangqi .r-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BR.svg')}
+.is2d .variant-xiangqi .pp-piece.p2 {background-image:url('/assets/piece/xiangqi/2dhanzi/BP.svg')}
+.is2d .variant-xiangqi .a-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RA.svg')}
+.is2d .variant-xiangqi .b-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RE.svg')}
+.is2d .variant-xiangqi .c-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RC.svg')}
+.is2d .variant-xiangqi .k-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RK.svg')}
+.is2d .variant-xiangqi .n-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RH.svg')}
+.is2d .variant-xiangqi .p-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RP.svg')}
+.is2d .variant-xiangqi .r-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RR.svg')}
+.is2d .variant-xiangqi .pp-piece.p1 {background-image:url('/assets/piece/xiangqi/2dhanzi/RP.svg')}
