@@ -82,6 +82,7 @@ interface PlayStrategy {
   quietMode?: boolean;
   keyboardMove?: any;
   analysis?: any; // expose the analysis ctrl
+  pageVariant: PageVariant;
 }
 
 type I18nDict = { [key: string]: string };
@@ -340,6 +341,9 @@ declare type Perf =
 
 declare type Color = 'white' | 'black';
 declare type Orientation = 'white' | 'black' | 'left' | 'right';
+
+declare type PageVariant = VariantKey | DraughtsVariantKey | undefined;
+declare type GameFamilyKey = 'chess' | 'draughts' | 'loa' | 'shogi' | 'xiangqi';
 
 declare type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
 declare type Ranks = '1' | '2' | '3' | '4' | '5' | '5' | '6' | '7' | '8' | '9' | '10';
