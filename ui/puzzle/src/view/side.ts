@@ -78,6 +78,7 @@ function gameInfos(ctrl: Controller, game: PuzzleGame, puzzle: Puzzle): VNode {
           'div.players',
           game.players.map(p =>
             h(
+              //TODO: when puzzle has different game families it should use playerColor not playerIndex
               'div.player.playerIndex-icon.is.text.' + p.playerIndex,
               p.userId != 'anon'
                 ? h(

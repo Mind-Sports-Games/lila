@@ -115,7 +115,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('th', p.isFinalGame ? '' + round : ''),
                 h('td', userName(p.user)),
                 h('td', '' + p.rating),
-                h('td.is.playerIndex-icon.' + (p.c ? 'p1' : 'p2')),
+                h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
                 h('td', p.isFinalGame ? res : ''),
               ]
             );

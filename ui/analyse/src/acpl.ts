@@ -50,6 +50,7 @@ function playerTable(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): VNode {
   const d = ctrl.data;
   const acpl = d.analysis![playerIndex].acpl;
   return h('div.advice-summary__side', [
+    //TODO: when analyse has different game families it should use playerColor not playerIndex
     h('div.advice-summary__player', [h(`i.is.playerIndex-icon.${playerIndex}`), renderPlayer(ctrl, playerIndex)]),
     ...advices.map(a => {
       const nb: number = d.analysis![playerIndex][a.kind];

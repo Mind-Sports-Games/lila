@@ -25,6 +25,8 @@ export interface SwissData {
   variant: string;
   p1Name: PlayerName;
   p2Name: PlayerName;
+  p1Color: PlayerColor;
+  p2Color: PlayerColor;
   me?: MyInfo;
   canJoin: boolean;
   joinTeam?: string;

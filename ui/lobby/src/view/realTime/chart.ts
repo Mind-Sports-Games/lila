@@ -64,9 +64,10 @@ function renderPlot(ctrl: LobbyController, hook: Hook) {
 
 function renderHook(ctrl: LobbyController, hook: Hook): string {
   const playerIndex = hook.c || 'random';
+  const playerColor = hook.variantC || 'random';
   let html = '<div class="inner">';
   if (hook.rating) {
-    html += '<a class="opponent ulpt is playerIndex-icon ' + playerIndex + '" href="/@/' + hook.u + '">';
+    html += '<a class="opponent ulpt is playerIndex-icon ' + playerColor + '" href="/@/' + hook.u + '">';
     html += ' ' + hook.u + ' (' + hook.rating + (hook.prov ? '?' : '') + ')';
     html += '</a>';
   } else {

@@ -97,7 +97,7 @@ object side {
           div(cls := "game__meta__players")(
             game.players.map { p =>
               frag(
-                div(cls := s"player playerIndex-icon is ${p.playerIndex.name} text")(
+                div(cls := s"player playerIndex-icon is ${game.variant.playerColors(p.playerIndex)} text")(
                   playerLink(p, withOnline = false, withDiff = true, withBerserk = true)
                 ),
                 tour.flatMap(_.teamVs).map(_.teams(p.playerIndex)) map {

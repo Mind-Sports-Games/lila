@@ -53,14 +53,14 @@ object bits {
       isGranted(_.ViewBlurs) option div(cls := "round__mod")(
         game.players.filter(p => game.playerBlurPercent(p.playerIndex) > 30) map { p =>
           div(
-            playerLink(p, cssClass = s"is playerIndex-icon ${p.playerIndex.name}".some, withOnline = false, mod = true),
+            playerLink(p, cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some, withOnline = false, mod = true),
             s" ${p.blurs.nb}/${game.playerMoves(p.playerIndex)} blurs ",
             strong(game.playerBlurPercent(p.playerIndex), "%")
           )
         }
         // game.players flatMap { p => p.holdAlert.map(p ->) } map {
         //   case (p, h) => div(
-        //     playerLink(p, cssClass = s"is playerIndex-icon ${p.playerIndex.name}".some, mod = true, withOnline = false),
+        //     playerLink(p, cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some, mod = true, withOnline = false),
         //     "hold alert",
         //     br,
         //     s"(ply: ${h.ply}, mean: ${h.mean} ms, SD: ${h.sd})"

@@ -200,6 +200,7 @@ final class JsonView(
               .obj(
                 "id"     -> pov.gameId,
                 "playerIndex" -> pov.playerIndex.name,
+                "playerColor" -> tour.variant.playerColors(pov.playerIndex),
                 "op"     -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
                 "win"    -> score.flatMap(_.isWin),
                 "status" -> pov.game.status.id,

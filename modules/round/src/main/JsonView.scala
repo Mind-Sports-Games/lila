@@ -39,7 +39,8 @@ final class JsonView(
       .obj(
         //"color" -> p.playerIndex.classicName,
         "playerName" -> g.variant.playerNames(p.playerIndex),
-        "playerIndex" -> p.playerIndex.name
+        "playerIndex" -> p.playerIndex.name,
+        "playerColor" -> g.variant.playerColors(p.playerIndex)
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
       .add("rating" -> p.rating)
@@ -82,6 +83,7 @@ final class JsonView(
                 //"color" -> opponent.playerIndex.classicName,
                 "playerName" -> pov.game.variant.playerNames(opponent.playerIndex),
                 "playerIndex" -> opponent.playerIndex.name,
+                "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
                 "ai"    -> opponent.aiLevel
               )
             }.add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
@@ -149,6 +151,7 @@ final class JsonView(
         //"color" -> p.playerIndex.classicName,
         "playerName" -> g.variant.playerNames(p.playerIndex),
         "playerIndex" -> p.playerIndex.name,
+        "playerColors" -> g.variant.playerColors(p.playerIndex),
         "name"  -> p.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
@@ -259,13 +262,15 @@ final class JsonView(
           //"color" -> game.variant.playerNames(playerIndex),
           //"color" -> playerIndex.classicName,
           "playerName" -> game.variant.playerNames(playerIndex),
-          "playerIndex" -> playerIndex.name
+          "playerIndex" -> playerIndex.name,
+          "playerColor" -> game.variant.playerColors(playerIndex)
         ),
         "opponent" -> Json.obj(
           //"color" -> game.variant.playerNames(opponent.playerIndex),
           //"color" -> playerIndex.classicName,
           "playerName" -> game.variant.playerNames(opponent.playerIndex),
-          "playerIndex" -> playerIndex.classicName,
+          "playerIndex" -> opponent.playerIndex.name,
+          "playerColor" -> game.variant.playerColors(opponent.playerIndex),
           "ai"    -> opponent.aiLevel
         ),
         "orientation" -> orientation.name,

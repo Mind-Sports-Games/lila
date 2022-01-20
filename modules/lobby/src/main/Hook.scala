@@ -79,6 +79,7 @@ case class Hook(
       .add("variant" -> realVariant.exotic.option(realVariant.key))
       .add("ra" -> realMode.rated.option(1))
       .add("c" -> strategygames.Player.fromName(playerIndex).map(_.name))
+      .add("variantC" -> strategygames.Player.fromName(playerIndex).map(realVariant.playerColors))
       .add("perf" -> perfType.map(_.trans))
 
   def randomPlayerIndex = playerIndex == "random"
