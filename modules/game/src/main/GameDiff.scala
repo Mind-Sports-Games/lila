@@ -122,7 +122,7 @@ object GameDiff {
             CastleLastMove.castleLastMoveBSONHandler.writeTry
           )
           // since variants are always OldBin
-          if (a.variant.threeCheck)
+          if (a.variant.threeCheck || a.variant.fiveCheck)
             dOpt(
               checkCount,
               _.history.checkCount,

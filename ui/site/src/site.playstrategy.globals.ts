@@ -62,4 +62,5 @@ export default function () {
   l.miniGame = miniGame;
   l.timeago = timeago;
   l.contentLoaded = (parent?: HTMLElement) => pubsub.emit('content-loaded', parent);
+  l.pageVariant = undefined;
 }

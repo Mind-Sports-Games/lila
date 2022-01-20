@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import * as round from '../round';
-import { drag, crazyKeys, pieceRoles, pieceShogiRoles } from './crazyCtrl';
+import { drag, crazyKeys, pieceRoles, pieceShogiRoles, pieceMiniShogiRoles } from './crazyCtrl';
 import * as cg from 'chessground/types';
 import RoundController from '../ctrl';
 import { onInsert } from '../util';
@@ -11,7 +11,8 @@ const eventNames = ['mousedown', 'touchstart'];
 export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, position: Position) {
   const step = round.plyStep(ctrl.data, ctrl.ply);
   const variantKey = ctrl.data.game.variant.key;
-  const dropRoles = variantKey == 'crazyhouse' ? pieceRoles : pieceShogiRoles;
+  const dropRoles =
+    variantKey == 'crazyhouse' ? pieceRoles : variantKey == 'minishogi' ? pieceMiniShogiRoles : pieceShogiRoles;
   if (!step.crazy) return;
   const droppedRole = ctrl.justDropped,
     preDropRole = ctrl.preDrop,
@@ -23,7 +24,7 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
   const capturedPiece = ctrl.justCaptured;
   const captured =
     capturedPiece &&
-    (variantKey === 'shogi' && capturedPiece['promoted']
+    ((variantKey === 'shogi' || variantKey === 'minishogi') && capturedPiece['promoted']
       ? (capturedPiece.role.slice(1) as cg.Role)
       : capturedPiece['promoted']
       ? 'p-piece'

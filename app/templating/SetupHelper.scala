@@ -180,7 +180,7 @@ trait SetupHelper { self: I18nHelper =>
     GameFamily.all.filter(_.aiEnabled).map(gf => (translatedGameFamilyChoice(gf),
       translatedVariantChoicesByGameFamily(gf, encodeId) :::
       gf.variants.filter(
-        v => v != gf.defaultVariant && !v.fromPositionVariant
+        v => v != gf.defaultVariant && !v.fromPositionVariant && v.aiVariant
       ).map(variantTupleId) ::: gf.variants.filter(
         _.fromPositionVariant
       ).map(variantTupleId)

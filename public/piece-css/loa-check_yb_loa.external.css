@@ -1,4 +1,6 @@
-.chess.is2d .l-piece.p2 {background-image:url('/assets/piece/loa/check_yb_loa/wL.png')}
-.chess.is2d .l-piece.p1 {background-image:url('/assets/piece/loa/check_yb_loa/bL.png')}
+.loa.is2d .l-piece.p2 {background-image:url('/assets/piece/loa/check_yb_loa/wL.png')}
+.loa.is2d .l-piece.p1 {background-image:url('/assets/piece/loa/check_yb_loa/bL.png')}
 .is2d .variant-linesOfAction .l-piece.p2 {background-image:url('/assets/piece/loa/check_yb_loa/wL.png')}
 .is2d .variant-linesOfAction .l-piece.p1 {background-image:url('/assets/piece/loa/check_yb_loa/bL.png')}
+.is2d .variant-scrambledEggs .l-piece.p2 {background-image:url('/assets/piece/loa/check_yb_loa/wL.png')}
+.is2d .variant-scrambledEggs .l-piece.p1 {background-image:url('/assets/piece/loa/check_yb_loa/bL.png')}

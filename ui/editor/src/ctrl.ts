@@ -137,12 +137,18 @@ export default class EditorCtrl {
         return this.makeUrl('/analysis/', legalFen);
       case '3check':
         return this.makeUrl('/analysis/threeCheck/', legalFen);
+      case '5check':
+        return this.makeUrl('/analysis/fiveCheck/', legalFen);
       case 'kingofthehill':
         return this.makeUrl('/analysis/kingOfTheHill/', legalFen);
       case 'racingkings':
         return this.makeUrl('/analysis/racingKings/', legalFen);
+      case 'nocastling':
+        return this.makeUrl('/analysis/noCastling/', legalFen);
       case 'linesofaction':
         return this.makeUrl('/analysis/linesOfAction/', legalFen);
+      case 'scrambledeggs':
+        return this.makeUrl('/analysis/scrambledEggs/', legalFen);
       case 'antichess':
       case 'atomic':
       case 'horde':
@@ -217,8 +223,11 @@ export default class EditorCtrl {
     this.rules = rules;
     if (rules != 'crazyhouse') this.pockets = undefined;
     else if (!this.pockets) this.pockets = Material.empty();
-    if (rules != '3check') this.remainingChecks = undefined;
-    else if (!this.remainingChecks) this.remainingChecks = RemainingChecks.default();
+    if (rules != '3check' && rules != '5check') this.remainingChecks = undefined;
+    else if (!this.remainingChecks) {
+      if (rules == '5check') this.remainingChecks = RemainingChecks.fiveCheck();
+      else this.remainingChecks = RemainingChecks.default();
+    }
     this.onChange();
   }
 

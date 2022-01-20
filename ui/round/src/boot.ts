@@ -8,6 +8,7 @@ import { tourStandingCtrl, TourStandingCtrl } from './tourStanding';
 export default function (opts: RoundOpts): void {
   const element = document.querySelector('.round__app') as HTMLElement,
     data: RoundData = opts.data;
+  playstrategy.pageVariant = data.game.variant.key;
   if (data.tournament) $('body').data('tournament-id', data.tournament.id);
   playstrategy.socket = new playstrategy.StrongSocket(data.url.socket, data.player.version, {
     params: { userTv: data.userTv && data.userTv.id },

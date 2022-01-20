@@ -58,14 +58,16 @@ export function main(ctrl: RoundController): VNode {
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
 
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (d.game.variant.key == 'xiangqi' || d.game.variant.key == 'shogi') {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(d.game.variant.key)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi'].includes(d.game.variant.key) ? '.piece-letter' : '';
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(d.game.variant.key)
+    ? '.piece-letter'
+    : '';
 
   return ctrl.nvui
     ? ctrl.nvui.render(ctrl)

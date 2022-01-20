@@ -36,7 +36,7 @@ object bits {
   private def boardOrientation(variant: Variant, c: PlayerIndex): Orientation =
     variant match {
       case Variant.Chess(strategygames.chess.variant.RacingKings)   => Orientation.P1
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction) => c match {
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction) | Variant.Chess(strategygames.chess.variant.ScrambledEggs) => c match {
           case P1 => Orientation.P1
           case P2 => Orientation.Right
         }
@@ -78,9 +78,9 @@ object bits {
     } else {
       s"${fen.value},${orient},$lastMove"
     }
-    val extra = if (libName == "Draughts") s"is${boardSize.key}" else ""
+    val extra = if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}" else ""
     tag(
-      cls := s"mini-board mini-board--init cg-wrap is2d ${libName.toLowerCase()} variant-${variantKey} ${extra}",
+      cls := s"mini-board mini-board--init cg-wrap is2d variant-${variantKey} ${extra}",
       dataState := data
     )(cgWrapContent)
   }

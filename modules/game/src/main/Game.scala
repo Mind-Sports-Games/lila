@@ -256,7 +256,7 @@ case class Game(
           p2King = updated.history.kingMoves.p2King.map(Pos.Draughts)
         ))
       else//chess
-        (updated.board.variant.threeCheck && game.situation.check) ?? List(
+        ((updated.board.variant.threeCheck || updated.board.variant.fiveCheck) && game.situation.check) ?? List(
           Event.CheckCount(
             p1 = updated.history.checkCount.p1,
             p2 = updated.history.checkCount.p2

@@ -25,7 +25,7 @@ export function sendPromotion(
   meta: cg.MoveMetadata
 ): boolean {
   const piece = ctrl.chessground.state.pieces.get(dest);
-  if (ctrl.data.game.variant.key === 'shogi' && piece && piece.role === role) {
+  if (['shogi', 'minishogi'].includes(ctrl.data.game.variant.key) && piece && piece.role === role) {
     // shogi decision not to promote
     ctrl.sendMove(orig, dest, undefined, ctrl.data.game.variant.key, meta);
   } else {
@@ -45,6 +45,7 @@ function possiblePromotion(
     piece = ctrl.chessground.state.pieces.get(dest),
     premovePiece = ctrl.chessground.state.pieces.get(orig);
   switch (variant) {
+    case 'minixiangqi':
     case 'xiangqi':
       return false;
     case 'shogi':
@@ -56,6 +57,17 @@ function possiblePromotion(
             premovePiece.role !== 'g-piece')) &&
         ((['7', '8', '9'].includes(dest[1]) && d.player.playerIndex === 'p1') ||
           (['1', '2', '3'].includes(dest[1]) && d.player.playerIndex === 'p2')) &&
+        orig != 'a0' // cant promote from a drop
+      );
+    case 'minishogi':
+      return (
+        ((piece && !piece.promoted && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
+          (premovePiece &&
+            !premovePiece.promoted &&
+            premovePiece.role !== 'k-piece' &&
+            premovePiece.role !== 'g-piece')) &&
+        ((['5'].includes(dest[1]) && d.player.playerIndex === 'p1') ||
+          (['1'].includes(dest[1]) && d.player.playerIndex === 'p2')) &&
         orig != 'a0' // cant promote from a drop
       );
     default:
@@ -82,6 +94,18 @@ function forcedShogiPromotion(ctrl: RoundController, orig: cg.Key, dest: cg.Key)
   );
 }
 
+// forced promotion for shogi pawn in last rank
+// assumes possible promotion is passed through (therefore no checks for drops etc).
+function forcedMiniShogiPromotion(ctrl: RoundController, orig: cg.Key, dest: cg.Key): boolean | undefined {
+  const d = ctrl.data,
+    piece = ctrl.chessground.state.pieces.get(dest),
+    premovePiece = ctrl.chessground.state.pieces.get(orig);
+  return (
+    ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
+    ((dest[1] === '5' && d.player.playerIndex === 'p1') || (dest[1] == '1' && d.player.playerIndex === 'p2'))
+  );
+}
+
 export function start(
   ctrl: RoundController,
   orig: cg.Key,
@@ -97,6 +121,10 @@ export function start(
       const role = premovePiece ? premovePiece.role : piece!.role;
       return sendPromotion(ctrl, orig, dest, ('p' + role) as cg.Role, meta);
     }
+    if (variantKey === 'minishogi' && forcedMiniShogiPromotion(ctrl, orig, dest)) {
+      const role = premovePiece ? premovePiece.role : piece!.role;
+      return sendPromotion(ctrl, orig, dest, ('p' + role) as cg.Role, meta);
+    }
     if (prePromotionRole && meta && meta.premove) return sendPromotion(ctrl, orig, dest, prePromotionRole, meta);
     if (
       !meta.ctrlKey &&
@@ -106,7 +134,7 @@ export function start(
         ctrl.keyboardMove?.justSelected())
     ) {
       if (premovePiece) {
-        if (variantKey === 'shogi') {
+        if (variantKey === 'shogi' || variantKey === 'minishogi') {
           setPrePromotion(ctrl, dest, ('p' + premovePiece.role) as cg.Role);
         } else {
           setPrePromotion(ctrl, dest, 'q-piece');
@@ -229,7 +257,7 @@ export function view(ctrl: RoundController): MaybeVNode {
   const piece = ctrl.chessground.state.pieces.get(promoting.move[1]),
     varaintKey = ctrl.data.game.variant.key,
     rolesToChoose =
-      varaintKey === 'shogi'
+      varaintKey === 'shogi' || varaintKey === 'minishogi'
         ? (['p' + piece?.role, piece?.role] as cg.Role[])
         : varaintKey === 'antichess'
         ? roles.concat('k-piece')

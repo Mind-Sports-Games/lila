@@ -292,6 +292,7 @@ final class JsonView(
       .obj(
         "id"          -> game.id,
         "gameLogic"   -> game.variant.gameLogic.name.toLowerCase(),
+        "gameFamily"  -> game.variant.gameFamily.shortName.toLowerCase(),
         "variantKey"  -> game.variant.key,
         "fen"         -> Forsyth.boardAndPlayer(game.variant.gameLogic, game.situation),
         "orientation" -> game.naturalOrientation.name,

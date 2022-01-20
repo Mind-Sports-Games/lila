@@ -62,7 +62,7 @@ final class TournamentForm {
       hasChat = tour.hasChat.some
     )
 
-  private val blockList = List("playstrategy", "liсhess")
+  private val blockList = List("playstrategy", "lichess")
 
   private def nameType(user: User) = eventName(2, 30).verifying(
     Constraint[String] { (t: String) =>

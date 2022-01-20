@@ -148,7 +148,7 @@ object BSONHandlers {
               halfMoveClock = decoded.halfMoveClock,
               positionHashes = decoded.positionHashes,
               unmovedRooks = decoded.unmovedRooks,
-              checkCount = if (gameVariant.threeCheck) {
+              checkCount = if (gameVariant.threeCheck || gameVariant.fiveCheck) {
                 val counts = r.intsD(F.checkCount)
                 chess.CheckCount(~counts.headOption, ~counts.lastOption)
               } else Game.emptyCheckCount

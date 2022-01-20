@@ -8,6 +8,7 @@ import * as chessUtil from 'chess';
 
 export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
 export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
+export const pieceMiniShogiRoles: cg.Role[] = ['p-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 
 export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
@@ -70,14 +71,19 @@ export function init(ctrl: RoundController) {
   const setDrop = () => {
     if (activeCursor) document.body.classList.remove(activeCursor);
     if (crazyKeys.length > 0) {
-      const dropRoles = ctrl.data.game.variant.key === 'shogi' ? pieceShogiRoles : pieceRoles,
+      const dropRoles =
+          ctrl.data.game.variant.key === 'shogi'
+            ? pieceShogiRoles
+            : ctrl.data.game.variant.key === 'minishogi'
+            ? pieceMiniShogiRoles
+            : pieceRoles,
         role = dropRoles[crazyKeys[crazyKeys.length - 1] - 1],
         playerIndex = ctrl.data.player.playerIndex,
         crazyData = ctrl.data.crazyhouse;
       if (!crazyData) return;
       const nb = crazyData.pockets[playerIndex === 'p1' ? 0 : 1][role];
       setDropMode(ctrl.chessground.state, nb > 0 ? { playerIndex, role } : undefined);
-      if (ctrl.data.game.variant.key === 'shogi') {
+      if (ctrl.data.game.variant.key === 'shogi' || ctrl.data.game.variant.key === 'minishogi') {
         activeCursor = `cursor-${role}-shogi`;
       } else {
         activeCursor = `cursor-${playerIndex}-${role}-chess`;

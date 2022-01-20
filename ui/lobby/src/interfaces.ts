@@ -47,6 +47,7 @@ export interface GameLogic {
 
 export interface Variant {
   gameLogic: GameLogic;
+  gameFamily: string;
   key: string;
   name: string;
   boardSize?: VariantBoardSize;

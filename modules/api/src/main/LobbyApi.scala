@@ -53,6 +53,7 @@ final class LobbyApi(
             "id" -> pov.game.variant.gameLogic.id,
             "name" -> pov.game.variant.gameLogic.name,
           ),
+          "gameFamily" -> pov.game.variant.gameFamily.shortName.toLowerCase(),
           "key"  -> pov.game.variant.key,
           "name" -> pov.game.variant.name,
           "boardSize" -> boardSize(pov.game.variant),

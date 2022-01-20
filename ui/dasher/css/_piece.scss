@@ -39,6 +39,11 @@
       height: 100%;
     }
 
+    .shogi piece {
+      background-position: center center;
+      transform: scale(0.9);
+    }
+
     &.d3 piece {
       left: 0;
       top: 0;

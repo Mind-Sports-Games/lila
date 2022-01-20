@@ -27,9 +27,13 @@ object StatusText {
             => s"${winner(win)} brings the king in the center."
           case Variant.Chess(strategygames.chess.variant.ThreeCheck)
             => s"${winner(win)} gives the third check."
+          case Variant.Chess(strategygames.chess.variant.FiveCheck)
+            => s"${winner(win)} gives the fifth check."
           case Variant.Chess(strategygames.chess.variant.RacingKings)
             => s"${winner(win)} wins the race."
           case Variant.Chess(strategygames.chess.variant.LinesOfAction)
+            => s"${winner(win)} connects all of their pieces."
+          case Variant.Chess(strategygames.chess.variant.ScrambledEggs)
             => s"${winner(win)} connects all of their pieces."
           case Variant.Draughts(strategygames.draughts.variant.Breakthrough)
             => s"${winner(win)} has a promotion first."

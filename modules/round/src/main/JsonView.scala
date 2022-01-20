@@ -28,7 +28,7 @@ final class JsonView(
   import JsonView._
 
   private def checkCount(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.chess.variant.ThreeCheck) option game.history.checkCount(playerIndex)
+    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.history.checkCount(playerIndex)
 
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
@@ -249,7 +249,7 @@ final class JsonView(
             "lib"        -> game.variant.gameLogic.id,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
-            "initialFen" -> (initialFen | fen),
+            "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
             "fen"        -> fen,
             "turns"      -> game.turns,
             "player"     -> game.turnPlayerIndex.name,
