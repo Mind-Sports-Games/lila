@@ -71,7 +71,7 @@ object show {
               trans.hostPlayerIndexX(sim.playerIndex match {
                 case Some("p1") => trans.white()
                 case Some("p2") => trans.black()
-                case _             => trans.randomPlayerIndex()
+                case _             => trans.randomColor()
               }),
               sim.position.flatMap(lila.tournament.Thematic.byFen) map { pos =>
                 frag(
