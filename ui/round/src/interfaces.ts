@@ -148,6 +148,8 @@ export interface ApiMove extends Step {
 
 export interface ApiEnd {
   winner?: PlayerIndex;
+  winnerPlayer?: PlayerName;
+  loserPlayer?: PlayerName;
   status: Status;
   ratingDiff?: {
     p1: number;
