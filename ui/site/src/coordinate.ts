@@ -18,42 +18,42 @@ playstrategy.load.then(() => {
     const scoreUrl = $trainer.data('score-url');
     const duration = 30 * 1000;
     const tickDelay = 50;
-    let colorPref = $trainer.data('color-pref');
-    let color;
+    let playerIndexPref = $trainer.data('playerIndex-pref');
+    let playerIndex;
     let startAt, score;
     let wrongTimeout;
 
     const showPlayerIndex = function () {
-      color = colorPref == 'random' ? ['white', 'black'][Math.round(Math.random())] : colorPref;
+      playerIndex = playerIndexPref == 'random' ? ['p1', 'p2'][Math.round(Math.random())] : playerIndexPref;
       if (!ground)
         ground = window.Chessground($board[0], {
           coordinates: false,
           drawable: { enabled: false },
           movable: {
             free: false,
-            color: null,
+            playerIndex: null,
           },
-          orientation: color,
-          myPlayerIndex: color,
+          orientation: playerIndex,
+          myPlayerIndex: playerIndex,
           addPieceZIndex: $('#main-wrap').hasClass('is3d'),
         });
-      else if (color !== ground.state.orientation) ground.toggleOrientation();
-      $trainer.removeClass('white black').addClass(color);
+      else if (playerIndex !== ground.state.orientation) ground.toggleOrientation();
+      $trainer.removeClass('p1 p2').addClass(playerIndex);
     };
     showPlayerIndex();
 
-    $trainer.find('form.color').each(function (this: HTMLFormElement) {
+    $trainer.find('form.playerIndex').each(function (this: HTMLFormElement) {
       const form = this,
         $form = $(this);
       $form.find('input').on('change', function () {
         const selected = $form.find('input:checked').val() as string;
-        const c = {
-          1: 'white',
+        const pi = {
+          1: 'p1',
           2: 'random',
-          3: 'black',
+          3: 'p2',
         }[selected];
-        if (c !== colorPref) xhr.formToXhr(form);
-        colorPref = c;
+        if (pi !== playerIndexPref) xhr.formToXhr(form);
+        playerIndexPref = pi;
         showPlayerIndex();
         return false;
       });
@@ -159,7 +159,7 @@ playstrategy.load.then(() => {
         xhr
           .text(scoreUrl, {
             method: 'post',
-            body: xhr.form({ color, score }),
+            body: xhr.form({ playerIndex, score }),
           })
           .then(charts => {
             $side.find('.scores').html(charts);

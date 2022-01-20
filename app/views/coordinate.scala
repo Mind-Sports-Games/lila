@@ -32,7 +32,7 @@ object coordinate {
       main(
         id := "trainer",
         cls := "coord-trainer training init",
-        attr("data-color-pref") := ctx.pref.coordColorName,
+        attr("data-playerIndex-pref") := ctx.pref.coordPlayerIndexName,
         attr("data-score-url") := ctx.isAuth.option(routes.Coordinate.score.url)
       )(
         div(cls := "coord-trainer__side")(
@@ -51,7 +51,7 @@ object coordinate {
                     st.id := s"coord_playerIndex_$id",
                     name := "playerIndex",
                     value := id,
-                    (id == ctx.pref.coordColor) option checked
+                    (id == ctx.pref.coordPlayerIndex) option checked
                   ),
                   label(`for` := s"coord_playerIndex_$id", cls := s"playerIndex playerIndex_$id")(i)
                 )
