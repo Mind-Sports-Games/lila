@@ -259,7 +259,7 @@ final class User(
 
   def list =
     Open { implicit ctx =>
-      env.user.cachedtop10.get {} flatMap { leaderboards =>
+      env.user.cached.top10.get {} flatMap { leaderboards =>
         negotiate(
           html =
             for {
