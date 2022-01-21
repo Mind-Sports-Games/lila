@@ -32,15 +32,60 @@ db.pref.find()
     );
   });
 
+db.user4.find()
+  .forEach(s => {
+    //print(`${s._id} it: ${s.colorIt}`);
+    db.user4.update(
+      { _id: s._id },
+      {
+        $set: {
+          'playerIndexIt': s.colorIt
+        },
+        $unset: {
+          colorIt: ""
+        },
+      }
+    );
+  });
+
+db.cache.find({"v.whiteWins" : {$exists:true}})
+  .forEach(s => {
+    //print(`${s._id} whiteWins: ${s.v.whiteWins}`);
+    db.cache.update(
+      { _id: s._id },
+      {
+        $set: {
+          'v.p1Wins': s.v.whiteWins
+        },
+        $unset: {
+          v.whiteWins: ""
+        },
+      }
+    );
+  });
+
+db.cache.find({"v.blackWins" : {$exists:true}})
+  .forEach(s => {
+    //print(`${s._id} blackWins: ${s.v.blackWins}`);
+    db.cache.update(
+      { _id: s._id },
+      {
+        $set: {
+          'v.p2Wins': s.v.blackWins
+        },
+        $unset: {
+          v.blackWins: ""
+        },
+      }
+    );
+  });
+
 //TODO:
 //
 //Update the following keys changing color->playerIndex, white->p1, black->p2. Some of these are nested keys.
 //
-//pref: coordColor
 //seek: color
 //simul: color, hostColor
-//user: colorIt [look at what this one actually is?]
-//cache: whiteWins, blackWins
 //coordinate_score: white, black
 //player_assessment: white, black
 //
