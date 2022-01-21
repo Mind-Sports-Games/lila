@@ -16,7 +16,7 @@ object side {
       baseUrl: String
   ): Frag =
     div(cls := "tv-channels subnav")(
-      lila.tv.Tv.Channel.all.map { c =>
+      lila.tv.Tv.Channel.toDisplay.map { c =>
         a(
           href := s"$baseUrl/${c.key}",
           cls := List(
