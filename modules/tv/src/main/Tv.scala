@@ -251,6 +251,55 @@ object Tv {
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(DV.Standard.key), noBot)
         )
+    case object Frisian
+        extends Channel(
+          name = DV.Frisian.name,
+          icon = DV.Frisian.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(DV.Frisian.key), noBot)
+        )
+    case object Frysk
+        extends Channel(
+          name = DV.Frysk.name,
+          icon = DV.Frysk.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(DV.Frysk.key), noBot)
+        )
+    case object Antidraughts
+        extends Channel(
+          name = DV.Antidraughts.name,
+          icon = DV.Antidraughts.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(DV.Antidraughts.key), noBot)
+        )
+    case object Breakthrough
+        extends Channel(
+          name = DV.Breakthrough.name,
+          icon = DV.Breakthrough.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(DV.Breakthrough.key), noBot)
+        )
+    case object Russian
+        extends Channel(
+          name = DV.Russian.name,
+          icon = DV.Russian.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(DV.Russian.key), noBot)
+        )
+    case object Brazilian
+        extends Channel(
+          name = DV.Brazilian.name,
+          icon = DV.Brazilian.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(DV.Brazilian.key), noBot)
+        )
+    case object Pool
+        extends Channel(
+          name = DV.Pool.name,
+          icon = DV.Pool.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(DV.Pool.key), noBot)
+        )
     case object Shogi
         extends Channel(
           name = FV.Shogi.name,
@@ -315,7 +364,14 @@ object Tv {
       RacingKings,
       NoCastling,
       UltraBullet,
-      International, //add other draughts
+      International,
+      Frisian,
+      Frysk,
+      Antidraughts,
+      Breakthrough,
+      Russian,
+      Brazilian,
+      Pool,
       LinesOfAction,
       ScrambledEggs,
       Shogi,
