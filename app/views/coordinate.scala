@@ -32,7 +32,7 @@ object coordinate {
       main(
         id := "trainer",
         cls := "coord-trainer training init",
-        attr("data-playerIndex-pref") := ctx.pref.coordPlayerIndexName,
+        attr("data-playerindex-pref") := ctx.pref.coordPlayerIndexName,
         attr("data-score-url") := ctx.isAuth.option(routes.Coordinate.score.url)
       )(
         div(cls := "coord-trainer__side")(

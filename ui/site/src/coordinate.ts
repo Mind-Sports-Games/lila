@@ -18,7 +18,7 @@ playstrategy.load.then(() => {
     const scoreUrl = $trainer.data('score-url');
     const duration = 30 * 1000;
     const tickDelay = 50;
-    let playerIndexPref = $trainer.data('playerIndex-pref');
+    let playerIndexPref = $trainer.data('playerindex-pref');
     let playerIndex;
     let startAt, score;
     let wrongTimeout;
