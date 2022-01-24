@@ -144,7 +144,7 @@ export default class Setup {
       $daysInput = $form.find('.days_choice [name=days]'),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
-      randomPlayerIndexVariants = $form.data('random-playerIndex-variants').split(','),
+      randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
       $submits = $form.find('.playerIndex-submits__button'),
       toggleButtons = () => {
         randomPlayerIndexVariants;

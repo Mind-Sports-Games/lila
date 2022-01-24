@@ -196,7 +196,7 @@ private object bits {
     )
 
   val dataRandomPlayerIndexVariants =
-    attr("data-random-playerIndex-variants") := lila.game.Game.variantsWhereP1IsBetter.map(_.id).mkString(",")
+    attr("data-random-playerindex-variants") := lila.game.Game.variantsWhereP1IsBetter.map(_.id).mkString(",")
 
   val dataAnon        = attr("data-anon")
   val dataMin         = attr("data-min")
