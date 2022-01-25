@@ -56,7 +56,7 @@ function playerTable(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): VNode {
       const nb: number = d.analysis![playerIndex][a.kind];
       const attrs: VNodeData = nb
         ? {
-            'data-playerIndex': playerIndex,
+            'data-playerindex': playerIndex,
             'data-symbol': a.symbol,
           }
         : {};

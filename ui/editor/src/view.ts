@@ -140,7 +140,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
         ]),
     h('div.metadata', [
       h(
-        'div.playerIndex',
+        'div.playerindex',
         h(
           'select',
           {

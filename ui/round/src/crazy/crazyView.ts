@@ -55,7 +55,7 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
             class: { premove: activePlayerIndex && preDropRole === role },
             attrs: {
               'data-role': role,
-              'data-playerIndex': playerIndex,
+              'data-playerindex': playerIndex,
               'data-nb': nb,
             },
           })

@@ -41,7 +41,7 @@ export default function (ctrl: AnalyseCtrl, playerIndex: PlayerIndex, position: 
           h('piece.' + role + '.' + playerIndex, {
             attrs: {
               'data-role': role,
-              'data-playerIndex': playerIndex,
+              'data-playerindex': playerIndex,
               'data-nb': nb,
             },
           })
