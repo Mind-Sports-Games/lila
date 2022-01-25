@@ -28,7 +28,7 @@ object layout {
       metaCsp(csp getOrElse defaultCsp)
     def metaThemePlayerIndex(implicit ctx: Context): Frag =
       raw {
-        s"""<meta name="theme-playerIndex" content="${ctx.pref.themePlayerIndex}">"""
+        s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
     def pieceSprite(implicit ctx: Context): Frag = {
       ctx.currentPieceSet.map(ps => pieceSprite(ps))
