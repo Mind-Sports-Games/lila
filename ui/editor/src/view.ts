@@ -156,7 +156,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               {
                 attrs: {
                   value: key,
-                  selected: ctrl.turn[0] === key[0],
+                  selected: ctrl.turn === key,
                 },
               },
               ctrl.trans('playerIndexPlays', key == 'p1' ? 'White' : 'Black')
