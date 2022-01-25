@@ -304,6 +304,31 @@ export default class Setup {
       $modal.find('.ratings input').val($selected.find('strong').text());
       save();
     };
+    const showStartingImages = () => {
+      const variantId = ($variantSelect.val() as string).split('_');
+      let key = 'chess';
+      let class_list = 'chess draughts loa shogi xiangqi';
+      switch (variantId[0]) {
+        case '0':
+          key = 'chess';
+          break;
+        case '1':
+          key = 'draughts';
+          break;
+        case '2':
+          key = 'loa';
+          break;
+        case '3':
+          key = 'shogi';
+          break;
+        case '4':
+          key = 'xiangqi';
+          break;
+      }
+      $form.find('.playerIndex-submits').removeClass(class_list);
+      $form.find('.playerIndex-submits').addClass(key);
+      save();
+    };
     if (typ == 'hook') {
       if ($form.data('anon')) {
         $timeModeSelect
@@ -510,6 +535,7 @@ export default class Setup {
           requestAnimationFrame(() => document.body.dispatchEvent(new Event(ground)));
         }
         showRating();
+        showStartingImages();
         toggleButtons();
       })
       .trigger('change');
