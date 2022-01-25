@@ -99,7 +99,7 @@ object Query {
   val clockIncs =
     options(List(0, 1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120, 150, 180), "%d second{s}").toList
 
-  val winnerPlayerIndexs = List(1 -> "P1", 2 -> "P2", 3 -> "None")
+  val winnerPlayerIndexs = List(1 -> "Player 1", 2 -> "Player 2", 3 -> "None")
 
   val sources = lila.game.Source.searchable map { v =>
     v.id -> v.name.capitalize
