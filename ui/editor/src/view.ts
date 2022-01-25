@@ -159,7 +159,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   selected: ctrl.turn[0] === key[0],
                 },
               },
-              ctrl.trans('playerIndexPlays', key)
+              ctrl.trans('playerIndexPlays', key == 'p1' ? 'White' : 'Black')
             );
           })
         )
@@ -167,11 +167,11 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
       h('div.castling', [
         h('strong', ctrl.trans.noarg('castling')),
         h('div', [
-          castleCheckBox(ctrl, 'K', ctrl.trans.noarg('p1CastlingKingside'), !!ctrl.options.inlineCastling),
+          castleCheckBox(ctrl, 'K', ctrl.trans.noarg('whiteCastlingKingside'), !!ctrl.options.inlineCastling),
           castleCheckBox(ctrl, 'Q', 'O-O-O', true),
         ]),
         h('div', [
-          castleCheckBox(ctrl, 'k', ctrl.trans.noarg('p2CastlingKingside'), !!ctrl.options.inlineCastling),
+          castleCheckBox(ctrl, 'k', ctrl.trans.noarg('blackCastlingKingside'), !!ctrl.options.inlineCastling),
           castleCheckBox(ctrl, 'q', 'O-O-O', true),
         ]),
       ]),
