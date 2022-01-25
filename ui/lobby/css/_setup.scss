@@ -1,6 +1,26 @@
 $c-setup: $c-secondary;
 $c-slider: $c-setup;
 
+$game-family: ('chess', 'draughts', 'loa', 'shogi', 'xiangqi');
+
+$game-family-random-pieces: ('wbK.svg', 'wbK.png', 'bwL.png', 'bwK.png', 'rbK.png');
+
+$game-family-p1-pieces: (
+  'chess/cburnett/wK.svg',
+  'draughts/wide_crown/wK.svg',
+  'loa/check_yb_loa/bL.png',
+  'shogi/ctw/0GY.svg',
+  'xiangqi/ka/RK.svg'
+);
+
+$game-family-p2-pieces: (
+  'chess/cburnett/bK.svg',
+  'draughts/wide_crown/bK.svg',
+  'loa/check_yb_loa/wL.png',
+  'shogi/ctw/0OU.svg',
+  'xiangqi/ka/BK.svg'
+);
+
 .game-setup {
   display: block;
 
@@ -125,69 +145,67 @@ $c-slider: $c-setup;
     display: none;
   }
 
-  .playerIndex-submits {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    margin: 1em auto;
-    text-align: center;
+  @each $gf in $game-family {
+    $iter: index($game-family, $gf);
+    .playerIndex-submits.#{$gf} {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      margin: 1em auto;
+      text-align: center;
 
-    &__button {
-      margin: 0 0.5em;
-      width: 64px;
-      height: 64px;
-      padding: 7px;
-
-      i {
-        display: block;
-        padding: 0;
-        width: 50px;
-        height: 50px;
-        background-size: 50px 50px;
-      }
-
-      &.p1 i {
-        background-image: img-url('../piece/chess/cburnett/wK.svg');
-      }
-
-      &.p2 i {
-        background-image: img-url('../piece/chess/cburnett/bK.svg');
-      }
-
-      &.white i {
-        background-image: img-url('../piece/chess/cburnett/wK.svg');
-      }
-
-      &.black i {
-        background-image: img-url('../piece/chess/cburnett/bK.svg');
-      }
-
-      &.random {
-        width: 85px;
-        height: 85px;
-        padding: 10px;
+      .playerIndex-submits__button {
+        margin: 0 0.5em;
+        width: 64px;
+        height: 64px;
+        padding: 7px;
 
         i {
-          background-image: img-url('wbK.svg');
-          background-size: 65px 65px;
-          width: 65px;
-          height: 65px;
+          display: block;
+          padding: 0;
+          width: 50px;
+          height: 50px;
+          background-size: 50px 50px;
+        }
+
+        $p1-piece: nth($game-family-p1-pieces, $iter);
+        &.p1 i {
+          background-image: url(../piece/#{$p1-piece});
+        }
+
+        $p2-piece: nth($game-family-p2-pieces, $iter);
+        &.p2 i {
+          background-image: url(../piece/#{$p2-piece});
+        }
+
+        &.random {
+          width: 85px;
+          height: 85px;
+          padding: 10px;
+
+          $file: nth($game-family-random-pieces, $iter);
+          & i {
+            background-image: url(../piece/#{$gf}/#{$file});
+            background-size: 65px 65px;
+            width: 65px;
+            height: 65px;
+          }
+        }
+
+        &.nope {
+          visibility: hidden;
+        }
+
+        &:disabled {
+          opacity: 0.3;
         }
       }
 
-      &.nope {
-        visibility: hidden;
+      .spinner {
+        width: 85px;
+        height: 85px;
+        margin: 10px auto 20px auto;
       }
-
-      &:disabled {
-        opacity: 0.3;
-      }
-    }
-
-    .spinner {
-      width: 85px;
-      height: 85px;
-      margin: 10px auto 20px auto;
     }
   }
 }
