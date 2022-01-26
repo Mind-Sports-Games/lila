@@ -152,7 +152,7 @@ object home {
         ),
         featured map { g =>
           div(cls := "lobby__tv")(
-            views.html.game.mini(Pov naturalOrientation g, tv = true)
+            views.html.game.mini(Pov naturalOrientation g, tv = (homepage.counters.rounds > 0))
           )
         },
         puzzle map { p =>
