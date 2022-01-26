@@ -306,8 +306,8 @@ export default class Setup {
     };
     const showStartingImages = () => {
       const variantId = ($variantSelect.val() as string).split('_');
+      const class_list = 'chess draughts loa shogi xiangqi';
       let key = 'chess';
-      let class_list = 'chess draughts loa shogi xiangqi';
       switch (variantId[0]) {
         case '0':
           key = 'chess';
