@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ P2, P1, Clock }
+import strategygames.{ P1, P2, Clock }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
