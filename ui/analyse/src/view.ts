@@ -4,7 +4,7 @@ import * as chessground from './ground';
 import { bind, onInsert, dataIcon, spinner, bindMobileMousedown } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
-import { getPlayer, playable } from 'game';
+import { playable } from 'game';
 import * as router from 'game/router';
 import statusView from 'game/view/status';
 import { path as treePath } from 'tree';
@@ -52,12 +52,9 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
   const tags: VNode[] = [];
   if (result) {
     tags.push(h('div.result', result));
-    const winner = getPlayer(ctrl.data, ctrl.data.game.winner!);
+    const winner = ctrl.data.game.winnerPlayer;
     tags.push(
-      h('div.status', [
-        statusView(ctrl),
-        winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner.playerIndex) : null,
-      ])
+      h('div.status', [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null])
     );
   }
   return tags;
