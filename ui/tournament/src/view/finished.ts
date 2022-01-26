@@ -24,8 +24,8 @@ function stats(data: TournamentData, trans: Trans): VNode {
     numberRow(noarg('averageElo'), data.stats.averageRating, 'raw'),
     numberRow(noarg('gamesPlayed'), data.stats.games),
     numberRow(noarg('movesPlayed'), data.stats.moves),
-    numberRow(trans('playerIndexWins', 'P1'), [data.stats.p1Wins, data.stats.games], 'percent'),
-    numberRow(trans('playerIndexWins', 'P2'), [data.stats.p2Wins, data.stats.games], 'percent'),
+    numberRow(trans('playerIndexWins', data.p1Name ? data.p1Name : 'P1'), [data.stats.p1Wins, data.stats.games], 'percent'),
+    numberRow(trans('playerIndexWins', data.p2Name ? data.p2Name : 'P2'), [data.stats.p2Wins, data.stats.games], 'percent'),
     numberRow(noarg('draws'), [data.stats.draws, data.stats.games], 'percent'),
   ];
 

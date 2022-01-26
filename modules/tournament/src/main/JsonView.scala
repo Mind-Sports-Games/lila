@@ -118,7 +118,9 @@ final class JsonView(
             "perf"      -> full.option(tour.perfType),
             "clock"     -> full.option(tour.clock),
             "lib"       -> full.option(tour.variant.gameLogic.id),
-            "variant"   -> full.option(tour.variant.key)
+            "variant"   -> full.option(tour.variant.key),
+            "p1Name"    -> full.option(tour.variant.playerNames(P1)),
+            "p2Name"    -> full.option(tour.variant.playerNames(P2))
           )
           .add("spotlight" -> tour.spotlight)
           .add("berserkable" -> tour.berserkable)
