@@ -163,8 +163,9 @@ export default class EditorCtrl {
 
   bottomPlayerIndex(): PlayerIndex {
     const orientation = this.chessground ? this.chessground.state.orientation : this.options.orientation;
+    //TODO: rework this function
     if (orientation === undefined) return 'p1';
-    else if (orientation === 'p1' || orientation == 'p2') return orientation;
+    else if (orientation === 'p1' || orientation === 'p2') return orientation;
     else return 'p2'; // TODO: this needs to be fixed for games other than LinesOfAction
   }
 
