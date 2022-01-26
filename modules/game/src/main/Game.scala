@@ -659,7 +659,7 @@ case class Game(
   def playerTrans(p: PlayerIndex)(implicit lang: Lang) = chess.board.variant.playerNames(p) match {
     case "White" => trans.white.txt()
     case "Black" => trans.black.txt()
-    case "Red"   => trans.red.txt()
+    //case "Red"   => trans.red.txt()
     case "Sente" => trans.sente.txt()
     case "Gote"  => trans.gote.txt()
     case s: String => s
