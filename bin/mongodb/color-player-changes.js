@@ -24,7 +24,7 @@ db.pref.find({ coordColor: { $exists: true } }).forEach(s => {
         coordPlayerIndex: s.coordColor,
       },
       $unset: {
-        coordPlayerIndex: '',
+        coordColor: '',
       },
     }
   );
