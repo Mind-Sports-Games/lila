@@ -15,13 +15,13 @@ db.challenge.find().forEach(s => {
   );
 });
 
-db.pref.find().forEach(s => {
-  //print(`${s._id} coord: ${s.coordPlayerIndex}`);
+db.pref.find({ 'coordColor': { $exists: true } }).forEach(s => {
+  //print(`${s._id} coord: ${s.coordColor}`);
   db.pref.update(
     { _id: s._id },
     {
       $set: {
-        coordPlayerIndex: s.coordPlayerIndex,
+        coordPlayerIndex: s.coordColor,
       },
       $unset: {
         coordPlayerIndex: '',
@@ -30,7 +30,7 @@ db.pref.find().forEach(s => {
   );
 });
 
-db.user4.find().forEach(s => {
+db.user4.find({ 'colorIt': { $exists: true } }).forEach(s => {
   //print(`${s._id} it: ${s.colorIt}`);
   db.user4.update(
     { _id: s._id },
@@ -75,7 +75,7 @@ db.cache.find({ 'v.blackWins': { $exists: true } }).forEach(s => {
   );
 });
 
-db.coordinate_score.find().forEach(s => {
+db.coordinate_score.find({ 'white': { $exists: true } }).forEach(s => {
   //print(`${s._id} white: ${s.white}`);
   db.coordinate_score.update(
     { _id: s._id },
@@ -90,7 +90,7 @@ db.coordinate_score.find().forEach(s => {
   );
 });
 
-db.coordinate_score.find().forEach(s => {
+db.coordinate_score.find({ 'black': { $exists: true } }).forEach(s => {
   //print(`${s._id} black: ${s.black}`);
   db.coordinate_score.update(
     { _id: s._id },
@@ -105,7 +105,7 @@ db.coordinate_score.find().forEach(s => {
   );
 });
 
-db.player_assessment.find().forEach(s => {
+db.player_assessment.find({ 'white': { $exists: true } }).forEach(s => {
   //print(`${s._id} white: ${s.white}`);
   db.player_assessment.update(
     { _id: s._id },
