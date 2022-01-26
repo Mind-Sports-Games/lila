@@ -43,7 +43,8 @@ main {
     margin-top: -3px;
   }
 
-  .black, .p2 {
+  .black,
+  .p2 {
     width: 100%;
     height: 50%;
     background: if($theme-light, #888, #666);

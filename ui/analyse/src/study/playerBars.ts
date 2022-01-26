@@ -22,7 +22,14 @@ export default function (ctrl: AnalyseCtrl): VNode[] | undefined {
   const clocks = renderClocks(ctrl),
     ticking = !isFinished(study.data.chapter) && ctrl.turnPlayerIndex();
   return (['p1', 'p2'] as PlayerIndex[]).map(playerIndex =>
-    renderPlayer(tags, clocks, playerNames, playerIndex, ticking === playerIndex, ctrl.bottomPlayerIndex() !== playerIndex)
+    renderPlayer(
+      tags,
+      clocks,
+      playerNames,
+      playerIndex,
+      ticking === playerIndex,
+      ctrl.bottomPlayerIndex() !== playerIndex
+    )
   );
 }
 

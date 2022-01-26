@@ -195,8 +195,7 @@ const posToTranslateBase: (
     ];
   } else {
     return [
-      (!asP1 ? xf - ((pos[1] % 2 !== 0 ? -0.5 : -1.0) + pos[0]) : (pos[1] % 2 !== 0 ? -0.5 : -1.0) + pos[0]) *
-        xFactor,
+      (!asP1 ? xf - ((pos[1] % 2 !== 0 ? -0.5 : -1.0) + pos[0]) : (pos[1] % 2 !== 0 ? -0.5 : -1.0) + pos[0]) * xFactor,
       (!asP1 ? boardSize[1] - pos[1] : pos[1] - 1.0) * yFactor,
     ];
   }

@@ -165,7 +165,9 @@ export class ClockController {
   elapsed = (now = performance.now()) => Math.max(0, now - this.times.lastUpdate);
 
   millisOf = (playerIndex: PlayerIndex): Millis =>
-    this.times.activePlayerIndex === playerIndex ? Math.max(0, this.times[playerIndex] - this.elapsed()) : this.times[playerIndex];
+    this.times.activePlayerIndex === playerIndex
+      ? Math.max(0, this.times[playerIndex] - this.elapsed())
+      : this.times[playerIndex];
 
   isRunning = () => this.times.activePlayerIndex !== undefined;
 }

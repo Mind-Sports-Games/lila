@@ -345,7 +345,8 @@ function anyClock(ctrl: RoundController, position: Position) {
     player = ctrl.playerAt(position);
   return (
     (ctrl.clock && renderClock(ctrl, player, position)) ||
-    (d.correspondence && renderCorresClock(ctrl.corresClock!, ctrl.trans, player.playerIndex, position, d.game.player)) ||
+    (d.correspondence &&
+      renderCorresClock(ctrl.corresClock!, ctrl.trans, player.playerIndex, position, d.game.player)) ||
     undefined
   );
 }

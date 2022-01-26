@@ -30,7 +30,9 @@ export default function status(ctrl: Ctrl): string {
       //return `${d.game.turns % 2 === 0 ? noarg('whiteTimeOut') : noarg('blackTimeOut')}${
       //  d.game.winner ? '' : ` • ${noarg('draw')}`
       //}`;
-      return d.game.loserPlayer ? ctrl.trans('playerIndexTimeOut', d.game.loserPlayer) : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
+      return d.game.loserPlayer
+        ? ctrl.trans('playerIndexTimeOut', d.game.loserPlayer)
+        : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
     case 'noStart':
       return d.game.loserPlayer + " didn't move";
     case 'cheat':

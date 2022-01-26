@@ -69,9 +69,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes | 
       conceal,
     };
     return (isP1 ? [moveView.renderIndex(main.ply, false)] : ([] as MaybeVNodes))
-      .concat(
-        main.forceVariation ? [] : [renderMoveOf(ctx, main, passOpts), isP1 ? emptyMove(passOpts.conceal) : null]
-      )
+      .concat(main.forceVariation ? [] : [renderMoveOf(ctx, main, passOpts), isP1 ? emptyMove(passOpts.conceal) : null])
       .concat([
         h(
           'interrupt',

@@ -85,7 +85,8 @@ function ghostPiece(piece: cg.Piece): cg.Piece {
     return { role: 'ghostman', playerIndex: piece.playerIndex, promoted: piece.promoted, kingMoves: piece.kingMoves };
   else if (piece.role === 'king')
     return { role: 'ghostking', playerIndex: piece.playerIndex, promoted: piece.promoted, kingMoves: piece.kingMoves };
-  else return { role: piece.role, playerIndex: piece.playerIndex, promoted: piece.promoted, kingMoves: piece.kingMoves };
+  else
+    return { role: piece.role, playerIndex: piece.playerIndex, promoted: piece.promoted, kingMoves: piece.kingMoves };
 }
 
 function isPromotablePos(playerIndex: cg.PlayerIndex, pos: cg.Pos, boardSize: cg.BoardSize): boolean {

@@ -360,7 +360,13 @@ export function renderBoard(
         return orig;
     }
   };
-  const doPieceButton = (rank: Rank, file: File, letter: string, playerIndex: PlayerIndex | 'none', text: string): VNode => {
+  const doPieceButton = (
+    rank: Rank,
+    file: File,
+    letter: string,
+    playerIndex: PlayerIndex | 'none',
+    text: string
+  ): VNode => {
     return h(
       'button',
       {

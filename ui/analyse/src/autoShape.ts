@@ -18,7 +18,12 @@ function pieceDrop(key: cg.Key, role: cg.Role, playerIndex: PlayerIndex): DrawSh
   };
 }
 
-export function makeShapesFromUci(playerIndex: PlayerIndex, uci: Uci, brush: string, modifiers?: DrawModifiers): DrawShape[] {
+export function makeShapesFromUci(
+  playerIndex: PlayerIndex,
+  uci: Uci,
+  brush: string,
+  modifiers?: DrawModifiers
+): DrawShape[] {
   const move = parseUci(uci)!;
   const to = makeSquare(move.to);
   if (isDrop(move)) return [{ orig: to, brush }, pieceDrop(to, move.role, playerIndex)];
@@ -65,7 +70,8 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
       lineWidth: 8,
     });
   }
-  if (hovering && hovering.fen === nFen) shapes = shapes.concat(makeShapesFromUci(playerIndex, hovering.uci, 'paleBlue'));
+  if (hovering && hovering.fen === nFen)
+    shapes = shapes.concat(makeShapesFromUci(playerIndex, hovering.uci, 'paleBlue'));
   if (ctrl.showAutoShapes() && ctrl.showComputer()) {
     if (nEval.best) shapes = shapes.concat(makeShapesFromUci(rPlayerIndex, nEval.best, 'paleGreen'));
     if (!hovering && parseInt(instance.multiPv())) {

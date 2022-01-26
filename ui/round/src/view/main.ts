@@ -87,7 +87,8 @@ export function main(ctrl: RoundController): VNode {
             },
             [renderGround(ctrl), promotion.view(ctrl)]
           ),
-          crazyView(ctrl, topPlayerIndex, 'top') || renderMaterial(material[topPlayerIndex], -score, 'top', checks[topPlayerIndex]),
+          crazyView(ctrl, topPlayerIndex, 'top') ||
+            renderMaterial(material[topPlayerIndex], -score, 'top', checks[topPlayerIndex]),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
             renderMaterial(material[bottomPlayerIndex], score, 'bottom', checks[bottomPlayerIndex]),

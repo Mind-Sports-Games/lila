@@ -28,11 +28,13 @@
     th {
       width: 32px;
       border: 1px solid black;
-      .black, .p2 {
+      .black,
+      .p2 {
         background-color: black;
         color: white;
       }
-      .white, .p1 {
+      .white,
+      .p1 {
         background-color: white;
         color: black;
       }

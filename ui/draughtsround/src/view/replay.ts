@@ -90,7 +90,10 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [viewStatus(ctrl), winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.trans('playerIndexIsVictorious', winner) : '']
+        [
+          viewStatus(ctrl),
+          winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.trans('playerIndexIsVictorious', winner) : '',
+        ]
       ),
     ]);
   }

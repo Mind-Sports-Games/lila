@@ -51,7 +51,9 @@ const renderPlay = (ctrl: StormCtrl): VNode[] => {
         renderClock(run, ctrl.endNow, true),
         !!malus && malus.at > now - 900 ? h('div.puz-clock__malus', '-' + malus.seconds) : null,
         !!bonus && bonus.at > now - 900 ? h('div.puz-clock__bonus', '+' + bonus.seconds) : null,
-        ...(run.clock.started() ? [] : [h('span.puz-clock__pov', ctrl.trans('youPlayThePlayerIndexPiecesInAllPuzzles', run.pov))]),
+        ...(run.clock.started()
+          ? []
+          : [h('span.puz-clock__pov', ctrl.trans('youPlayThePlayerIndexPiecesInAllPuzzles', run.pov))]),
       ]),
       h('div.puz-side__table', [renderControls(ctrl), renderCombo(config, renderBonus)(run)]),
     ]),

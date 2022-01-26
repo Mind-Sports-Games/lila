@@ -350,7 +350,8 @@ function isMovable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
-    (state.movable.playerIndex === 'both' || (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
+    (state.movable.playerIndex === 'both' ||
+      (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
   );
 }
 
@@ -368,13 +369,19 @@ function canDrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
     !!piece &&
     dest &&
     (orig === dest || !state.pieces.has(dest)) &&
-    (state.movable.playerIndex === 'both' || (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
+    (state.movable.playerIndex === 'both' ||
+      (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
   );
 }
 
 function isPremovable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
-  return !!piece && state.premovable.enabled && state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex !== piece.playerIndex;
+  return (
+    !!piece &&
+    state.premovable.enabled &&
+    state.movable.playerIndex === piece.playerIndex &&
+    state.turnPlayerIndex !== piece.playerIndex
+  );
 }
 
 function canPremove(state: State, orig: cg.Key, dest: cg.Key): boolean {
@@ -403,7 +410,8 @@ export function isDraggable(state: State, orig: cg.Key): boolean {
     !!piece &&
     state.draggable.enabled &&
     (state.movable.playerIndex === 'both' ||
-      (state.movable.playerIndex === piece.playerIndex && (state.turnPlayerIndex === piece.playerIndex || state.premovable.enabled)))
+      (state.movable.playerIndex === piece.playerIndex &&
+        (state.turnPlayerIndex === piece.playerIndex || state.premovable.enabled)))
   );
 }
 

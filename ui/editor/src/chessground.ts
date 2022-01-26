@@ -71,7 +71,8 @@ function onMouseEvent(ctrl: EditorCtrl): (e: MouchEvent) => void {
           playerIndex: sel[0],
           role: sel[1],
         };
-        const samePiece = existingPiece && piece.playerIndex == existingPiece.playerIndex && piece.role == existingPiece.role;
+        const samePiece =
+          existingPiece && piece.playerIndex == existingPiece.playerIndex && piece.role == existingPiece.role;
 
         if ((e.type === 'mousedown' || e.type === 'touchstart') && samePiece) {
           deleteOrHidePiece(ctrl, key, e);

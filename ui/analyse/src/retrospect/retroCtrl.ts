@@ -62,7 +62,10 @@ export function make(root: AnalyseCtrl, playerIndex: PlayerIndex): RetroCtrl {
 
   function findNextNode(): Tree.Node | undefined {
     const playerIndexModulo = playerIndex == 'p1' ? 1 : 0;
-    candidateNodes = evalSwings(root.mainline, n => n.ply % 2 === playerIndexModulo && !explorerCancelPlies.includes(n.ply));
+    candidateNodes = evalSwings(
+      root.mainline,
+      n => n.ply % 2 === playerIndexModulo && !explorerCancelPlies.includes(n.ply)
+    );
     return candidateNodes.find(n => !isPlySolved(n.ply));
   }
 

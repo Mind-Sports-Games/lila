@@ -314,7 +314,8 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 'select#chapter-orientation.form-control',
                 {
                   hook: bind('change', e => {
-                    ctrl.vm.editor && ctrl.vm.editor.setOrientation((e.target as HTMLInputElement).value as PlayerIndex);
+                    ctrl.vm.editor &&
+                      ctrl.vm.editor.setOrientation((e.target as HTMLInputElement).value as PlayerIndex);
                   }),
                 },
                 ['p1', 'p2'].map(function (playerIndex) {
