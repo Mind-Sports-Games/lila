@@ -4,7 +4,7 @@ import debounce from 'common/debounce';
 import { opposite } from 'chessground/util';
 import { controller as configCtrl } from './explorerConfig';
 import * as xhr from './explorerXhr';
-import { winnerOf, colorOf } from './explorerUtil';
+import { winnerOf, playerIndexOf } from './explorerUtil';
 import * as gameUtil from 'game';
 import AnalyseCtrl from '../ctrl';
 import {
@@ -190,7 +190,7 @@ export default function (root: AnalyseCtrl, opts: ExplorerOpts, allow: boolean):
         return {
           fen: fen,
           best: move && move.uci,
-          winner: res.checkmate ? opposite(colorOf(fen)) : res.stalemate ? undefined : winnerOf(fen, move!),
+          winner: res.checkmate ? opposite(playerIndexOf(fen)) : res.stalemate ? undefined : winnerOf(fen, move!),
         } as SimpleTablebaseHit;
       });
     },

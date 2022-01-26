@@ -14,6 +14,7 @@
   <string name="didYouLikeThisPuzzle">Gillade du det här problemet?</string>
   <string name="voteToLoadNextOne">Rösta för att ladda nästa!</string>
   <string name="yourPuzzleRatingX">Din problemrating: %s</string>
+  <string name="findTheBestMoveForPlayerIndex">Hitta bästa draget för %s.</string>
   <string name="findTheBestMoveForWhite">Hitta bästa draget för vit.</string>
   <string name="findTheBestMoveForBlack">Hitta bästa draget för svart.</string>
   <string name="toGetPersonalizedPuzzles">För att få personanpassade problem:</string>

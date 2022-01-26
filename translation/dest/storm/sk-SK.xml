@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">Odštartujte potiahnutím</string>
+  <string name="youPlayThePlayerIndexPiecesInAllPuzzles">Vo všetkých úlohách ste %s</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">Vo všetkých úlohách ste biely</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">Vo všetkých úlohách ste čierny</string>
   <string name="puzzlesSolved">vyriešených úloh</string>

@@ -14,6 +14,7 @@
   <string name="didYouLikeThisPuzzle">Apakah anda menyukai teka-teki ini?</string>
   <string name="voteToLoadNextOne">Isi untuk memanggil yang satunya lagi!</string>
   <string name="yourPuzzleRatingX">Rating teka-teki anda: %s</string>
+  <string name="findTheBestMoveForPlayerIndex">Temukan langkah terbaik %s.</string>
   <string name="findTheBestMoveForWhite">Temukan langkah terbaik putih.</string>
   <string name="findTheBestMoveForBlack">Temukan langkah terbaik hitam.</string>
   <string name="toGetPersonalizedPuzzles">Untuk mendapatkan teka-teki yang diatur:</string>

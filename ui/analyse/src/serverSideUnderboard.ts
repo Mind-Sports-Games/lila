@@ -60,8 +60,8 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
           if (mainlinePly != chart.lastPly) {
             if (mainlinePly === false) unselect(chart);
             else {
-              const white = mainlinePly % 2 !== 0;
-              const serie = white ? 0 : 1;
+              const p1 = mainlinePly % 2 !== 0;
+              const serie = p1 ? 0 : 1;
               const turn = Math.floor((mainlinePly - 1 - data.game.startedAtTurn) / 2);
               const point = chart.series[serie].data[turn];
               if (defined(point)) point.select();

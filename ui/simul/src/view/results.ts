@@ -12,7 +12,7 @@ export default function (ctrl: SimulCtrl) {
     ),
     h(
       'div',
-      trans(ctrl, 'nbWins', p => p.game.winner === p.hostColor)
+      trans(ctrl, 'nbWins', p => p.game.winner === p.hostPlayerIndex)
     ),
     h(
       'div',
@@ -20,7 +20,7 @@ export default function (ctrl: SimulCtrl) {
     ),
     h(
       'div',
-      trans(ctrl, 'nbLosses', p => p.game.winner === opposite(p.hostColor))
+      trans(ctrl, 'nbLosses', p => p.game.winner === opposite(p.hostPlayerIndex))
     ),
   ]);
 }

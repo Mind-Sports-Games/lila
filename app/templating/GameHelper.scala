@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.{ Status => S, Clock, Mode, Color, Black, White, GameLogic }
+import strategygames.{ Status => S, Clock, Mode, Player => PlayerIndex, P2, P1, GameLogic }
 import strategygames.variant.Variant
 import controllers.routes
 import play.api.i18n.Lang
@@ -21,14 +21,14 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     lila.app.ui.OpenGraph(
       image = cdnUrl(routes.Export.gameThumbnail(pov.gameId).url).some,
       title = titleGame(pov.game),
-      url = s"$netBaseUrl${routes.Round.watcher(pov.gameId, pov.color.name).url}",
+      url = s"$netBaseUrl${routes.Round.watcher(pov.gameId, pov.playerIndex.name).url}",
       description = describePov(pov)
     )
 
   def titleGame(g: Game) = {
     val speed   = strategygames.Speed(g.clock.map(_.config)).name
     val variant = g.variant.exotic ?? s" ${g.variant.name}"
-    s"$speed$variant ${g.variant.gameLogic.name} • ${playerText(g.whitePlayer)} vs ${playerText(g.blackPlayer)}"
+    s"$speed$variant ${g.variant.gameLogic.name} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
   }
 
   def describePov(pov: Pov) = {
@@ -173,28 +173,28 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.PerpetualCheck => trans.perpetualCheck.txt()
       case S.Resign =>
         game.loser match {
-          case Some(p) if p.color.white => trans.whiteResigned.txt()
-          case _                        => trans.blackResigned.txt()
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexResigned(game.playerTrans(P1)).v
+          case _                        => trans.playerIndexResigned(game.playerTrans(P2)).v
         }
       case S.UnknownFinish => trans.finished.txt()
       case S.Stalemate     => trans.stalemate.txt()
       case S.Timeout =>
         game.loser match {
-          case Some(p) if p.color.white => trans.whiteLeftTheGame.txt()
-          case Some(_)                  => trans.blackLeftTheGame.txt()
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexLeftTheGame(game.playerTrans(P1)).v
+          case Some(_)                  => trans.playerIndexLeftTheGame(game.playerTrans(P2)).v
           case None                     => trans.draw.txt()
         }
       case S.Draw => trans.draw.txt()
       case S.Outoftime =>
-        (game.turnColor, game.loser) match {
-          case (White, Some(_)) => trans.whiteTimeOut.txt()
-          case (White, None)    => trans.whiteTimeOut.txt() + " • " + trans.draw.txt()
-          case (Black, Some(_)) => trans.blackTimeOut.txt()
-          case (Black, None)    => trans.blackTimeOut.txt() + " • " + trans.draw.txt()
+        (game.turnPlayerIndex, game.loser) match {
+          case (P1, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P1)).v
+          case (P1, None)    => trans.playerIndexTimeOut(game.playerTrans(P1)).v + " • " + trans.draw.txt()
+          case (P2, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P2)).v
+          case (P2, None)    => trans.playerIndexTimeOut(game.playerTrans(P2)).v + " • " + trans.draw.txt()
         }
       case S.NoStart =>
-        val color = game.loser.fold(Color.white)(_.color).name.capitalize
-        s"$color didn't move"
+        val playerIndex = game.loser.fold(PlayerIndex.p1)(_.playerIndex).name.capitalize
+        s"$playerIndex didn't move"
       case S.Cheat => trans.cheatDetected.txt()
       case S.VariantEnd =>
         game.variant match {
@@ -210,9 +210,9 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case _ => ""
     }
 
-  def gameTitle(game: Game, color: Color): String = {
-    val u1 = playerText(game player color, withRating = true)
-    val u2 = playerText(game opponent color, withRating = true)
+  def gameTitle(game: Game, playerIndex: PlayerIndex): String = {
+    val u1 = playerText(game player playerIndex, withRating = true)
+    val u2 = playerText(game opponent playerIndex, withRating = true)
     val clock = game.clock ?? { c =>
       " • " + c.config.show
     }
@@ -220,31 +220,31 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     s"$u1 vs $u2$clock$variant"
   }
 
-  // whiteUsername 1-0 blackUsername
-  def gameSummary(whiteUserId: String, blackUserId: String, finished: Boolean, result: Option[Boolean]) = {
-    val res = if (finished) Color.showResult(result map Color.fromWhite) else "*"
-    s"${usernameOrId(whiteUserId)} $res ${usernameOrId(blackUserId)}"
+  // p1Username 1-0 p2Username
+  def gameSummary(p1UserId: String, p2UserId: String, finished: Boolean, result: Option[Boolean]) = {
+    val res = if (finished) PlayerIndex.showResult(result map PlayerIndex.fromP1) else "*"
+    s"${usernameOrId(p1UserId)} $res ${usernameOrId(p2UserId)}"
   }
 
   def gameResult(game: Game) =
-    if (game.finished) strategygames.Color.showResult(game.winnerColor)
+    if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex)
     else "*"
 
   def gameLink(
       game: Game,
-      color: Color,
+      playerIndex: PlayerIndex,
       ownerLink: Boolean = false,
       tv: Boolean = false
   )(implicit ctx: Context): String = {
     val owner = ownerLink ?? ctx.me.flatMap(game.player)
     if (tv) routes.Tv.index
     else
-      owner.fold(routes.Round.watcher(game.id, color.name)) { o =>
-        routes.Round.player(game fullIdOf o.color)
+      owner.fold(routes.Round.watcher(game.id, playerIndex.name)) { o =>
+        routes.Round.player(game fullIdOf o.playerIndex)
       }
   }.toString
 
-  def gameLink(pov: Pov)(implicit ctx: Context): String = gameLink(pov.game, pov.color)
+  def gameLink(pov: Pov)(implicit ctx: Context): String = gameLink(pov.game, pov.playerIndex)
 
   def challengeTitle(c: lila.challenge.Challenge)(implicit lang: Lang) = {
     val speed = c.clock.map(_.config).fold(strategygames.Speed.Correspondence.name) { clock =>
@@ -266,7 +266,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
   def challengeOpenGraph(c: lila.challenge.Challenge)(implicit lang: Lang) =
     lila.app.ui.OpenGraph(
       title = challengeTitle(c),
-      url = s"$netBaseUrl${routes.Round.watcher(c.id, White.name).url}",
+      url = s"$netBaseUrl${routes.Round.watcher(c.id, P1.name).url}",
       description = "Join the challenge or watch the game here."
     )
 }

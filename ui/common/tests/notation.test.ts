@@ -359,28 +359,28 @@ test('moveFromNotationStyle xiangqi 3 pawns in column sideways move', () => {
   expect(notation).toBe('27=6');
 });
 
-test('moveFromNotationStyle xiangqi 3 pawns in column black move', () => {
+test('moveFromNotationStyle xiangqi 3 pawns in column p2 move', () => {
   const move = { san: '', uci: 'g3g2', fen: 'rnbakabnr/9/1c5c1/p1P6/6p2/P5p2/8P/1C5C1/4A1p2/RNB1KABNR w - - 11 13' };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('17+1');
 });
 
-test('moveFromNotationStyle xiangqi 3 pawns in column black sideways move', () => {
+test('moveFromNotationStyle xiangqi 3 pawns in column p2 sideways move', () => {
   const move = { san: '', uci: 'g5f5', fen: 'rnbakabnr/9/1c5c1/p1P6/6p2/P4p3/8P/1CN4C1/4A1p2/R1B1KABNR w - - 13 14' };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('27=6');
 });
 
-test('moveFromNotationStyle xiangqi 4 pawns in column black move', () => {
+test('moveFromNotationStyle xiangqi 4 pawns in column p2 move', () => {
   const move = { san: '', uci: 'g6g5', fen: 'rnbakabnr/9/1c5c1/1CP6/9/6p2/R5p1P/2N3pC1/4A4/2B1KApNR w - - 6 26' };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('47+1');
 });
 
-test('moveFromNotationStyle xiangqi 4 pawns in column black sideways move', () => {
+test('moveFromNotationStyle xiangqi 4 pawns in column p2 sideways move', () => {
   const move = { san: '', uci: 'g4f4', fen: 'rnbakabnr/9/1c5c1/1CP6/9/1N4p2/R4p2P/6pC1/4A4/2B1KApNR w - - 8 27' };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);

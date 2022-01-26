@@ -46,8 +46,8 @@ final class IrwinStream {
       "games" -> req.games.map { case (game, analysis) =>
         Json.obj(
           "id"    -> game.id,
-          "white" -> game.whitePlayer.userId,
-          "black" -> game.blackPlayer.userId,
+          "p1" -> game.p1Player.userId,
+          "p2" -> game.p2Player.userId,
           "pgn"   -> game.pgnMoves.mkString(" "),
           "emts"  -> game.clockHistory.isDefined ?? game.moveTimes.map(_.map(_.centis)),
           "analysis" -> analysis.map {

@@ -40,7 +40,7 @@ final class SwissTrf(
         s"092 Individual: Swiss-System",
         s"102 $baseUrl/swiss",
         s"XXR ${swiss.settings.nbRounds}",
-        s"XXC ${strategygames.Color.fromWhite(swiss.id.value(0).toInt % 2 == 0).name}1"
+        s"XXC ${strategygames.Player.fromP1(swiss.id.value(0).toInt % 2 == 0).name}1"
       )
     )
 
@@ -59,7 +59,7 @@ final class SwissTrf(
         val pairing = pairings get rn
         List(
           95 -> pairing.map(_ opponentOf p.userId).flatMap(playerIds.get).??(_.toString),
-          97 -> pairing.map(_ colorOf p.userId).??(_.fold("w", "b")),
+          97 -> pairing.map(_ playerIndexOf p.userId).??(_.fold("w", "b")),
           99 -> {
             import SwissSheet._
             outcome match {

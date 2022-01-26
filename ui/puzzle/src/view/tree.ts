@@ -47,10 +47,10 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): MaybeVNo
     main = cs[0];
   if (!main) return [];
   if (opts.isMainline) {
-    const isWhite = main.ply % 2 === 1;
+    const isP1 = main.ply % 2 === 1;
     if (!cs[1])
       return [
-        isWhite ? renderIndex(main.ply, false) : null,
+        isP1 ? renderIndex(main.ply, false) : null,
         ...renderMoveAndChildrenOf(ctx, main, {
           parentPath: opts.parentPath,
           isMainline: true,
@@ -65,9 +65,9 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): MaybeVNo
         isMainline: true,
       };
     return [
-      isWhite ? renderIndex(main.ply, false) : null,
+      isP1 ? renderIndex(main.ply, false) : null,
       renderMoveOf(ctx, main, passOpts),
-      isWhite ? emptyMove() : null,
+      isP1 ? emptyMove() : null,
       h(
         'interrupt',
         renderLines(ctx, cs.slice(1), {
@@ -75,7 +75,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): MaybeVNo
           isMainline: true,
         })
       ),
-      ...(isWhite && mainChildren ? [renderIndex(main.ply, false), emptyMove()] : []),
+      ...(isP1 && mainChildren ? [renderIndex(main.ply, false), emptyMove()] : []),
       ...mainChildren,
     ];
   }

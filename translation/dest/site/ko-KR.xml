@@ -20,6 +20,7 @@
   <string name="black">흑색</string>
   <string name="randomColor">무작위</string>
   <string name="createAGame">새 게임 만들기</string>
+  <string name="playerIndexIsVictorious">%s 승리</string>
   <string name="whiteIsVictorious">백색 승리</string>
   <string name="blackIsVictorious">흑색 승리</string>
   <string name="youPlayTheWhitePieces">당신은 백으로 둡니다</string>
@@ -33,6 +34,7 @@
   <string name="newOpponent">새 상대</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">상대가 재대결을 원합니다</string>
   <string name="joinTheGame">게임 참가</string>
+  <string name="playerIndexPlays">%s 차례</string>
   <string name="whitePlays">백색 차례</string>
   <string name="blackPlays">흑색 차례</string>
   <plurals name="opponentLeftCounter">
@@ -44,6 +46,7 @@
   <string name="forceDraw">무승부 처리</string>
   <string name="talkInChat">건전한 채팅을 해주세요!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">이 URL로 가장 먼저 들어온 사람과 체스를 두게 됩니다.</string>
+  <string name="playerIndexResigned">%s 기권</string>
   <string name="whiteResigned">백색 기권</string>
   <string name="blackResigned">흑색 기권</string>
   <string name="whiteLeftTheGame">백색이 게임을 나갔습니다</string>
@@ -196,6 +199,7 @@
     <item quantity="other">나와 %s번 대국 함</item>
   </plurals>
   <string name="cancel">취소</string>
+  <string name="playerIndexTimeOut">%s 시간 초과</string>
   <string name="whiteTimeOut">백색 시간 초과</string>
   <string name="blackTimeOut">흑색 시간 초과</string>
   <string name="drawOfferSent">무승부를 요청했습니다</string>

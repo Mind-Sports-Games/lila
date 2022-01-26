@@ -57,8 +57,8 @@ const changeColorHandle = (): void => {
       const style = document.documentElement.style,
         colors = dict[theme].split(' ');
       const gf = theme.split('-')[0];
-      style.setProperty(`--cg-coord-color-${gf}-white`, colors[0]);
-      style.setProperty(`--cg-coord-color-${gf}-black`, colors[1]);
+      style.setProperty(`--cg-coord-color-${gf}-p1`, colors[0]);
+      style.setProperty(`--cg-coord-color-${gf}-p2`, colors[1]);
       style.setProperty(`--cg-coord-shadow-${gf}`, 'none');
     }
   }

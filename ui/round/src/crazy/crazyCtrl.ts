@@ -15,12 +15,12 @@ export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
   if (ctrl.replaying() || !ctrl.isPlaying()) return;
   const el = e.target as HTMLElement,
     role = el.getAttribute('data-role') as cg.Role,
-    color = el.getAttribute('data-color') as cg.Color,
+    playerIndex = el.getAttribute('data-playerindex') as cg.PlayerIndex,
     number = el.getAttribute('data-nb');
-  if (!role || !color || number === '0') return;
+  if (!role || !playerIndex || number === '0') return;
   e.stopPropagation();
   e.preventDefault();
-  dragNewPiece(ctrl.chessground.state, { color, role }, e);
+  dragNewPiece(ctrl.chessground.state, { playerIndex, role }, e);
 }
 
 let dropWithKey = false;
@@ -78,15 +78,15 @@ export function init(ctrl: RoundController) {
             ? pieceMiniShogiRoles
             : pieceRoles,
         role = dropRoles[crazyKeys[crazyKeys.length - 1] - 1],
-        color = ctrl.data.player.color,
+        playerIndex = ctrl.data.player.playerIndex,
         crazyData = ctrl.data.crazyhouse;
       if (!crazyData) return;
-      const nb = crazyData.pockets[color === 'white' ? 0 : 1][role];
-      setDropMode(ctrl.chessground.state, nb > 0 ? { color, role } : undefined);
+      const nb = crazyData.pockets[playerIndex === 'p1' ? 0 : 1][role];
+      setDropMode(ctrl.chessground.state, nb > 0 ? { playerIndex, role } : undefined);
       if (ctrl.data.game.variant.key === 'shogi' || ctrl.data.game.variant.key === 'minishogi') {
         activeCursor = `cursor-${role}-shogi`;
       } else {
-        activeCursor = `cursor-${color}-${role}-chess`;
+        activeCursor = `cursor-${playerIndex}-${role}-chess`;
       }
       document.body.classList.add(activeCursor);
     } else {
@@ -153,10 +153,10 @@ export function init(ctrl: RoundController) {
 // so preload when the feature might be used.
 // Images are used in _zh.scss, which should be kept in sync.
 function preloadMouseIcons(data: RoundData) {
-  const colorKey = data.player.color[0];
-  const colorNum = data.player.color == 'white' ? '0' : '1';
-  for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/chess/cburnett/${colorKey}${pKey}.svg`));
+  const playerIndexKey = data.player.playerIndex == 'p1' ? 'w' : 'b';
+  const playerIndexNum = data.player.playerIndex == 'p1' ? '0' : '1';
+  for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/chess/cburnett/${playerIndexKey}${pKey}.svg`));
   for (const pKey of ['FU', 'KY', 'KE', 'GI', 'KI', 'KA', 'HI'])
-    fetch(playstrategy.assetUrl(`piece/shogi/2kanji/${colorNum}${pKey}.svg`));
+    fetch(playstrategy.assetUrl(`piece/shogi/2kanji/${playerIndexNum}${pKey}.svg`));
   mouseIconsLoaded = true;
 }

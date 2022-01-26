@@ -83,7 +83,7 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
         moves = rewinded.situation.destinations map { case (from, dests) =>
           from.key -> dests.mkString
         }
-      } yield Captcha(game.id, fen(rewinded), rewinded.player.white, solutions, moves = moves)
+      } yield Captcha(game.id, fen(rewinded), rewinded.player.p1, solutions, moves = moves)
 
     private def solve(game: StratGame): Option[Captcha.Solutions] =
       game.situation.moves.view

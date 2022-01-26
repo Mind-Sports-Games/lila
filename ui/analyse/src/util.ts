@@ -11,8 +11,8 @@ export function clearSelection() {
   window.getSelection()?.removeAllRanges();
 }
 
-export function plyColor(ply: number): Color {
-  return ply % 2 === 0 ? 'white' : 'black';
+export function plyPlayerIndex(ply: number): PlayerIndex {
+  return ply % 2 === 0 ? 'p1' : 'p2';
 }
 
 export function bindMobileMousedown(el: HTMLElement, f: (e: Event) => unknown, redraw?: () => void) {

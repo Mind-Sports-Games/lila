@@ -7,7 +7,7 @@ import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
 
 import strategygames.{ GameLogic, Situation, Speed }
-import strategygames.Color.{ Black, White }
+import strategygames.Player.{ P2, P1 }
 
 import lila.common.Bus
 import lila.common.LilaStream
@@ -97,12 +97,12 @@ final class ChallengeBulkApi(
     val perfType = PerfType(bulk.variant, Speed(bulk.clock))
     Source(bulk.games)
       .mapAsyncUnordered(8) { game =>
-        userRepo.pair(game.white, game.black) map2 { case (white, black) =>
-          (game.id, white, black)
+        userRepo.pair(game.p1, game.p2) map2 { case (p1, p2) =>
+          (game.id, p1, p2)
         }
       }
       .mapConcat(_.toList)
-      .map { case (id, white, black) =>
+      .map { case (id, p1, p2) =>
         val game = Game
           .make(
             chess = strategygames
@@ -111,23 +111,23 @@ final class ChallengeBulkApi(
                 situation = Situation(bulk.variant.gameLogic, bulk.variant),
                 clock = bulk.clock.toClock.some
               ),
-            whitePlayer = Player.make(White, white.some, _(perfType)),
-            blackPlayer = Player.make(Black, black.some, _(perfType)),
+            p1Player = Player.make(P1, p1.some, _(perfType)),
+            p2Player = Player.make(P2, p2.some, _(perfType)),
             mode = bulk.mode,
             source = lila.game.Source.Api,
             pgnImport = None
           )
           .withId(id)
           .start
-        (game, white, black)
+        (game, p1, p2)
       }
-      .mapAsyncUnordered(8) { case (game, white, black) =>
+      .mapAsyncUnordered(8) { case (game, p1, p2) =>
         gameRepo.insertDenormalized(game) >>- onStart(game.id) inject {
-          (game, white, black)
+          (game, p1, p2)
         }
       }
-      .mapAsyncUnordered(8) { case (game, white, black) =>
-        msgApi.onApiPair(game.id, white.light, black.light)(bulk.by, bulk.message)
+      .mapAsyncUnordered(8) { case (game, p1, p2) =>
+        msgApi.onApiPair(game.id, p1.light, p2.light)(bulk.by, bulk.message)
       }
       .toMat(LilaStream.sinkCount)(Keep.right)
       .run()

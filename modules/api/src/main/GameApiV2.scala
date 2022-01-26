@@ -3,7 +3,7 @@ package lila.api
 import akka.stream.scaladsl._
 import strategygames.format.FEN
 import strategygames.format.pgn.Tag
-import strategygames.{ Black, White }
+import strategygames.{ Player => PlayerIndex, P2, P1 }
 import org.joda.time.DateTime
 import play.api.libs.json._
 import scala.concurrent.duration._
@@ -70,8 +70,8 @@ final class GameApiV2(
       fileR.replaceAllIn(
         "playstrategy_pgn_%s_%s_vs_%s.%s.%s".format(
           Tag.UTCDate.format.print(game.createdAt),
-          pgnDump.dumper.player(game.whitePlayer, wu),
-          pgnDump.dumper.player(game.blackPlayer, bu),
+          pgnDump.dumper.player(game.p1Player, wu),
+          pgnDump.dumper.player(game.p2Player, bu),
           game.id,
           format.toString.toLowerCase
         ),
@@ -171,7 +171,7 @@ final class GameApiV2(
                       playerTeams.get(
                         pairing.user2
                       )
-                    ) mapN strategygames.Color.Map.apply[String]
+                    ) mapN PlayerIndex.Map.apply[String]
                   )
                 }
               }
@@ -185,15 +185,15 @@ final class GameApiV2(
             config.format match {
               case Format.PGN => pgnDump.formatter(config.flags)(game, fen, analysis, teams, none)
               case Format.JSON =>
-                def addBerserk(color: strategygames.Color)(json: JsObject) =
-                  if (pairing berserkOf color)
+                def addBerserk(playerIndex: PlayerIndex)(json: JsObject) =
+                  if (pairing berserkOf playerIndex)
                     json deepMerge Json.obj(
-                      "players" -> Json.obj(color.name -> Json.obj("berserk" -> true))
+                      "players" -> Json.obj(playerIndex.name -> Json.obj("berserk" -> true))
                     )
                   else json
                 toJson(game, fen, analysis, config.flags, teams) dmap
-                  addBerserk(White) dmap
-                  addBerserk(Black) dmap { json =>
+                  addBerserk(P1) dmap
+                  addBerserk(P2) dmap { json =>
                     s"${Json.stringify(json)}\n"
                   }
             }
@@ -290,7 +290,7 @@ final class GameApiV2(
         "lastMoveAt" -> g.movedAt,
         "status"     -> g.status.name,
         "players" -> JsObject(g.players zip lightUsers map { case (p, user) =>
-          p.color.name -> Json
+          p.playerIndex.name -> Json
             .obj()
             .add("user", user)
             .add("rating", p.rating)
@@ -298,14 +298,14 @@ final class GameApiV2(
             .add("name", p.name)
             .add("provisional" -> p.provisional)
             .add("aiLevel" -> p.aiLevel)
-            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.color)))
-            .add("team" -> teams.map(_(p.color)))
-        // .add("moveCentis" -> withFlags.moveTimes ?? g.moveTimes(p.color).map(_.map(_.centis)))
+            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
+            .add("team" -> teams.map(_(p.playerIndex)))
+        // .add("moveCentis" -> withFlags.moveTimes ?? g.moveTimes(p.playerIndex).map(_.map(_.centis)))
         })
       )
       .add("initialFen" -> initialFen)
       .add("microMatch" -> g.metadata.microMatchGameId)
-      .add("winner" -> g.winnerColor.map(_.name))
+      .add("winner" -> g.winnerPlayerIndex.map(_.name))
       .add("opening" -> g.opening.ifTrue(withFlags.opening))
       .add("moves" -> withFlags.moves.option {
         withFlags keepDelayIf g.playable applyDelay g.pgnMoves mkString " "
@@ -323,7 +323,7 @@ final class GameApiV2(
       })
 
   private def gameLightUsers(game: Game): Fu[(Option[LightUser], Option[LightUser])] =
-    (game.whitePlayer.userId ?? getLightUser) zip (game.blackPlayer.userId ?? getLightUser)
+    (game.p1Player.userId ?? getLightUser) zip (game.p2Player.userId ?? getLightUser)
 }
 
 object GameApiV2 {
@@ -358,7 +358,7 @@ object GameApiV2 {
       perfType: Set[lila.rating.PerfType],
       analysed: Option[Boolean] = None,
       ongoing: Boolean = false,
-      color: Option[strategygames.Color],
+      playerIndex: Option[PlayerIndex],
       flags: WithFlags,
       perSecond: MaxPerSecond,
       playerFile: Option[String]
@@ -366,7 +366,7 @@ object GameApiV2 {
     def postFilter(g: Game) =
       rated.fold(true)(g.rated ==) && {
         perfType.isEmpty || g.perfType.exists(perfType.contains)
-      } && color.fold(true) { c =>
+      } && playerIndex.fold(true) { c =>
         g.player(c).userId has user.id
       } && analysed.fold(true)(g.metadata.analysed ==)
   }

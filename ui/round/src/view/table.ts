@@ -84,16 +84,16 @@ export const renderTablePlay = (ctrl: RoundController) => {
   ];
 };
 
-function whosTurn(ctrl: RoundController, color: Color, position: Position) {
+function whosTurn(ctrl: RoundController, playerIndex: PlayerIndex, position: Position) {
   const d = ctrl.data;
   if (status.finished(d) || status.aborted(d)) return;
   return h('div.rclock.rclock-turn.rclock-' + position, [
-    d.game.player === color
+    d.game.player === playerIndex
       ? h(
           'div.rclock-turn__text',
           d.player.spectator
             ? ctrl.trans(d.game.player + 'Plays')
-            : ctrl.trans(d.game.player === d.player.color ? 'yourTurn' : 'waitingForOpponent')
+            : ctrl.trans(d.game.player === d.player.playerIndex ? 'yourTurn' : 'waitingForOpponent')
         )
       : null,
   ]);
@@ -103,8 +103,8 @@ function anyClock(ctrl: RoundController, position: Position) {
   const player = ctrl.playerAt(position);
   if (ctrl.clock) return renderClock(ctrl, player, position);
   else if (ctrl.data.correspondence && ctrl.data.game.turns > 1)
-    return renderCorresClock(ctrl.corresClock!, ctrl.trans, player.color, position, ctrl.data.game.player);
-  else return whosTurn(ctrl, player.color, position);
+    return renderCorresClock(ctrl.corresClock!, ctrl.trans, player.playerIndex, position, ctrl.data.game.player);
+  else return whosTurn(ctrl, player.playerIndex, position);
 }
 
 export const renderTable = (ctrl: RoundController): MaybeVNodes => [

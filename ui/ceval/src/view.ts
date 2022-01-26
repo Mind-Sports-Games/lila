@@ -130,7 +130,7 @@ export function renderGauge(ctrl: ParentCtrl): VNode | undefined {
   const bestEv = getBestEval(ctrl.currentEvals());
   let ev;
   if (bestEv) {
-    ev = winningChances.povChances('white', bestEv);
+    ev = winningChances.povChances('p1', bestEv);
     gaugeLast = ev;
   } else ev = gaugeLast;
   return h(
@@ -138,10 +138,10 @@ export function renderGauge(ctrl: ParentCtrl): VNode | undefined {
     {
       class: {
         empty: ev === null,
-        reverse: ctrl.getOrientation() === 'black',
+        reverse: ctrl.getOrientation() === 'p2',
       },
     },
-    [h('div.black', { attrs: { style: `height: ${100 - (ev + 1) * 50}%` } }), ...gaugeTicks]
+    [h('div.p2', { attrs: { style: `height: ${100 - (ev + 1) * 50}%` } }), ...gaugeTicks]
   );
 }
 
@@ -300,7 +300,7 @@ export function renderPvs(ctrl: ParentCtrl): VNode | undefined {
   else pvs = [];
   if (threat) {
     setup.turn = opposite(setup.turn);
-    if (setup.turn == 'white') setup.fullmoves += 1;
+    if (setup.turn == 'p1') setup.fullmoves += 1;
   }
   const pos = setupPosition(lichessVariantRules(instance.variant.key), setup);
 
@@ -401,7 +401,7 @@ function renderPvMoves(pos: Position, pv: Uci[]): VNode[] {
   let key = makeBoardFen(pos.board);
   for (let i = 0; i < pv.length; i++) {
     let text;
-    if (pos.turn === 'white') {
+    if (pos.turn === 'p1') {
       text = `${pos.fullmoves}.`;
     } else if (i === 0) {
       text = `${pos.fullmoves}...`;

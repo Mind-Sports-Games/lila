@@ -4,7 +4,7 @@ import renderEnd from './end';
 import StormCtrl from '../ctrl';
 import { Chessground } from 'chessground';
 import { h, VNode } from 'snabbdom';
-import { makeCgOpts, povMessage } from 'puz/run';
+import { makeCgOpts } from 'puz/run';
 import { makeConfig as makeCgConfig } from 'puz/view/chessground';
 import { getNow, onInsert } from 'puz/util';
 import { playModifiers, renderCombo } from 'puz/view/util';
@@ -51,7 +51,9 @@ const renderPlay = (ctrl: StormCtrl): VNode[] => {
         renderClock(run, ctrl.endNow, true),
         !!malus && malus.at > now - 900 ? h('div.puz-clock__malus', '-' + malus.seconds) : null,
         !!bonus && bonus.at > now - 900 ? h('div.puz-clock__bonus', '+' + bonus.seconds) : null,
-        ...(run.clock.started() ? [] : [h('span.puz-clock__pov', ctrl.trans.noarg(povMessage(run)))]),
+        ...(run.clock.started()
+          ? []
+          : [h('span.puz-clock__pov', ctrl.trans('youPlayThePlayerIndexPiecesInAllPuzzles', run.pov))]),
       ]),
       h('div.puz-side__table', [renderControls(ctrl), renderCombo(config, renderBonus)(run)]),
     ]),

@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Koördinate</string>
   <string name="coordinateTraining">Koördinaat oefening</string>
+  <string name="averageScoreAsPlayerIndexX">Gemiddelde telling as %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Gemiddelde telling as wit: %s</string>
   <string name="averageScoreAsBlackX">Gemiddelde telling as swart: %s</string>
   <string name="knowingTheChessBoard">Om die koördinate op die skaakbord te ken is \'n baie belangrike skaakvaardigheid:</string>

@@ -7,7 +7,7 @@ final private[tournament] class PairingSystem(
     pairingRepo: PairingRepo,
     playerRepo: PlayerRepo,
     userRepo: UserRepo,
-    colorHistoryApi: ColorHistoryApi
+    playerIndexHistoryApi: PlayerIndexHistoryApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     idGenerator: lila.game.IdGenerator
@@ -69,20 +69,20 @@ final private[tournament] class PairingSystem(
   private def prepsToPairings(preps: List[Pairing.Prep]): Fu[List[Pairing]] =
     idGenerator.games(preps.size) map { ids =>
       preps.zip(ids).map { case (prep, id) =>
-        //color was chosen in prepWithColor function
+        //playerIndex was chosen in prepWithPlayerIndex function
         prep.toPairing(id)
       }
     }
 
   private def proximityPairings(tour: Tournament, players: List[RankedPlayer]): List[Pairing.Prep] =
-    addColorHistory(players) grouped 2 collect { case List(p1, p2) =>
-      Pairing.prepWithColor(tour, p1, p2)
+    addPlayerIndexHistory(players) grouped 2 collect { case List(p1, p2) =>
+      Pairing.prepWithPlayerIndex(tour, p1, p2)
     } toList
 
   private def bestPairings(data: Data, players: RankedPlayers): List[Pairing.Prep] =
-    (players.sizeIs > 1) ?? AntmaPairing(data, addColorHistory(players))
+    (players.sizeIs > 1) ?? AntmaPairing(data, addPlayerIndexHistory(players))
 
-  private def addColorHistory(players: RankedPlayers) = players.map(_ withColorHistory colorHistoryApi.get)
+  private def addPlayerIndexHistory(players: RankedPlayers) = players.map(_ withPlayerIndexHistory playerIndexHistoryApi.get)
 }
 
 private object PairingSystem {
@@ -106,8 +106,8 @@ private object PairingSystem {
    * bottom rank factor = 300
    */
   def rankFactorFor(
-      players: List[RankedPlayerWithColorHistory]
-  ): (RankedPlayerWithColorHistory, RankedPlayerWithColorHistory) => Int = {
+      players: List[RankedPlayerWithPlayerIndexHistory]
+  ): (RankedPlayerWithPlayerIndexHistory, RankedPlayerWithPlayerIndexHistory) => Int = {
     val maxRank = players.maxBy(_.rank).rank
     (a, b) => {
       val rank = Math.min(a.rank, b.rank)

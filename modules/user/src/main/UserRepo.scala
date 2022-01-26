@@ -155,13 +155,13 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     }
   }
 
-  def firstGetsWhite(u1: User.ID, u2: User.ID): Fu[Boolean] =
+  def firstGetsP1(u1: User.ID, u2: User.ID): Fu[Boolean] =
     coll
       .find(
         $inIds(List(u1, u2)),
         $id(true).some
       )
-      .sort($doc(F.colorIt -> 1))
+      .sort($doc(F.playerIndexIt -> 1))
       .one[Bdoc]
       .map {
         _.fold(ThreadLocalRandom.nextBoolean()) { doc =>
@@ -169,19 +169,19 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         }
       }
       .addEffect { v =>
-        incColor(u1, if (v) 1 else -1)
-        incColor(u2, if (v) -1 else 1)
+        incPlayerIndex(u1, if (v) 1 else -1)
+        incPlayerIndex(u2, if (v) -1 else 1)
       }
 
-  def firstGetsWhite(u1O: Option[User.ID], u2O: Option[User.ID]): Fu[Boolean] =
-    (u1O, u2O).mapN(firstGetsWhite) | fuccess(ThreadLocalRandom.nextBoolean())
+  def firstGetsP1(u1O: Option[User.ID], u2O: Option[User.ID]): Fu[Boolean] =
+    (u1O, u2O).mapN(firstGetsP1) | fuccess(ThreadLocalRandom.nextBoolean())
 
-  def incColor(userId: User.ID, value: Int): Unit =
+  def incPlayerIndex(userId: User.ID, value: Int): Unit =
     coll
       .update(ordered = false, WriteConcern.Unacknowledged)
       .one(
-        $id(userId) ++ (value < 0).??($doc(F.colorIt $gt -3)),
-        $inc(F.colorIt -> value)
+        $id(userId) ++ (value < 0).??($doc(F.playerIndexIt $gt -3)),
+        $inc(F.playerIndexIt -> value)
       )
       .unit
 

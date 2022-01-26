@@ -15,8 +15,8 @@ object String {
   def lcfirst(str: String) = s"${str(0).toLower}${str.drop(1)}"
 
   def slugify(input: String) = {
-    val nowhitespace = input.trim.replace(' ', '-')
-    val singleDashes = slugMultiDashRegex.replaceAllIn(nowhitespace, "-")
+    val nop1space = input.trim.replace(' ', '-')
+    val singleDashes = slugMultiDashRegex.replaceAllIn(nop1space, "-")
     val normalized   = Normalizer.normalize(singleDashes, Normalizer.Form.NFD)
     val slug         = slugR.replaceAllIn(normalized, "")
     slug.toLowerCase

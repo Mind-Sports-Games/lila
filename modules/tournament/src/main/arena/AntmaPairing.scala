@@ -9,7 +9,7 @@ private object AntmaPairing {
 
   private[this] val maxStrike = 3
 
-  private type RPlayer = RankedPlayerWithColorHistory
+  private type RPlayer = RankedPlayerWithPlayerIndexHistory
 
   def apply(data: Data, players: List[RPlayer]): List[Pairing.Prep] =
     players.nonEmpty ?? {
@@ -24,7 +24,7 @@ private object AntmaPairing {
       def pairScore(a: RPlayer, b: RPlayer): Option[Int] =
         if (
           justPlayedTogether(a.player.userId, b.player.userId) ||
-          !a.colorHistory.couldPlay(b.colorHistory, maxStrike)
+          !a.playerIndexHistory.couldPlay(b.playerIndexHistory, maxStrike)
         ) None
         else
           Some {
@@ -49,7 +49,7 @@ private object AntmaPairing {
             Nil
           },
           _ map { case (a, b) =>
-            Pairing.prepWithColor(tour, a, b)
+            Pairing.prepWithPlayerIndex(tour, a, b)
           }
         )
       }

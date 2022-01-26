@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Koordinatlar</string>
   <string name="coordinateTraining">Koordinat Antrenmanı</string>
+  <string name="averageScoreAsPlayerIndexX">%1$s olarak ortalama skor: %2$s</string>
   <string name="averageScoreAsWhiteX">Beyaz olarak ortalama skor: %s</string>
   <string name="averageScoreAsBlackX">Siyah olarak ortalama skor: %s</string>
   <string name="knowingTheChessBoard">Satranç tahtasının koordinatlarını bilmek çok önemli bir satranç becerisidir:</string>

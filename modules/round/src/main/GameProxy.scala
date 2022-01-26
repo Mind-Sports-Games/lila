@@ -4,7 +4,7 @@ import akka.actor.{ Cancellable, Scheduler }
 import scala.concurrent.duration._
 import scala.util.Success
 
-import strategygames.Color
+import strategygames.{ Player => PlayerIndex }
 import lila.game.{ Game, GameRepo, Pov, Progress }
 
 // NOT thread safe
@@ -48,8 +48,8 @@ final private class GameProxy(
 
   // convenience helpers
 
-  def withPov[A](color: Color)(f: Pov => Fu[A]): Fu[A] =
-    withGame(g => f(Pov(g, color)))
+  def withPov[A](playerIndex: PlayerIndex)(f: Pov => Fu[A]): Fu[A] =
+    withGame(g => f(Pov(g, playerIndex)))
 
   def withPov[A](playerId: Game.PlayerId)(f: Option[Pov] => Fu[A]): Fu[A] =
     withGame(g => f(Pov(g, playerId.value)))

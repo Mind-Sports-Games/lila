@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Coordenadas</string>
   <string name="coordinateTraining">Entrenar coordenadas</string>
+  <string name="averageScoreAsPlayerIndexX">Puntuación meya con %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Puntuación meya con blancas: %s</string>
   <string name="averageScoreAsBlackX">Puntuación meya con negras: %s</string>
   <string name="knowingTheChessBoard">Conoixer las coordenadas d\'os escaques ye esencial en os escaques:</string>

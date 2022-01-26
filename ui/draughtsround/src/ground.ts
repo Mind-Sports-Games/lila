@@ -22,7 +22,7 @@ export function makeConfig(ctrl: RoundController): Config {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
     boardSize: data.game.variant.board.size,
-    turnColor: (step.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'white' : 'black',
+    turnPlayerIndex: (step.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'p1' : 'p2',
     lastMove: util.uci2move(step.uci),
     captureLength: data.captureLength,
     coordinates: data.pref.coords, // TODO: When we get these as prefs we need to be able to change this.
@@ -42,7 +42,7 @@ export function makeConfig(ctrl: RoundController): Config {
     },
     movable: {
       free: false,
-      color: playing ? data.player.color : undefined,
+      playerIndex: playing ? data.player.playerIndex : undefined,
       dests: playing ? util.parsePossibleMoves(data.possibleMoves) : new Map(),
       showDests: data.pref.destination,
       variant: data.game.variant.key,
@@ -93,7 +93,7 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
         [
           key,
           {
-            color: piece.color,
+            playerIndex: piece.playerIndex,
             role,
             promoted: true,
           },
@@ -103,8 +103,8 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
   }
 }
 
-export function boardOrientation(data: RoundData, flip: boolean): Color {
-  return flip ? data.opponent.color : data.player.color;
+export function boardOrientation(data: RoundData, flip: boolean): PlayerIndex {
+  return flip ? data.opponent.playerIndex : data.player.playerIndex;
 }
 
 export function render(ctrl: RoundController) {

@@ -135,8 +135,8 @@ object PgnDump {
   def toTurn(first: Node, second: Option[Node], variations: Variations)(implicit flags: WithFlags) =
     chessPgn.Turn(
       number = first.fullMoveNumber,
-      white = node2move(first, variations).some,
-      black = second map { node2move(_, first.children.variations) }
+      p1 = node2move(first, variations).some,
+      p2 = second map { node2move(_, first.children.variations) }
     )
 
   def toTurns(root: Node.Root)(implicit flags: WithFlags): Vector[chessPgn.Turn] =
@@ -151,14 +151,14 @@ object PgnDump {
       case first +: rest if first.ply % 2 == 0 =>
         chessPgn.Turn(
           number = 1 + (first.ply - 1) / 2,
-          white = none,
-          black = node2move(first, variations).some
-        ) +: toTurnsFromWhite(rest, first.children.variations)
-      case l => toTurnsFromWhite(l, variations)
+          p1 = none,
+          p2 = node2move(first, variations).some
+        ) +: toTurnsFromP1(rest, first.children.variations)
+      case l => toTurnsFromP1(l, variations)
     }
   }.filterNot(_.isEmpty)
 
-  def toTurnsFromWhite(line: Vector[Node], variations: Variations)(implicit
+  def toTurnsFromP1(line: Vector[Node], variations: Variations)(implicit
       flags: WithFlags
   ): Vector[chessPgn.Turn] =
     line

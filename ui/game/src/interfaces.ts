@@ -26,13 +26,15 @@ export interface DraughtsGameData extends BaseGameData {
 export interface BaseGame {
   id: string;
   status: Status;
-  player: Color;
+  player: PlayerIndex;
   turns: number;
   startedAtTurn?: number;
   source: Source;
   speed: Speed;
   variant: Variant | DraughtsVariant;
-  winner?: Color;
+  winner?: PlayerIndex;
+  winnerPlayer?: PlayerName;
+  loserPlayer?: PlayerName;
   drawOffers?: number[];
   moveCentis?: number[];
   initialFen?: string;
@@ -85,7 +87,9 @@ export interface Player {
   name: string;
   user?: PlayerUser;
   spectator?: boolean;
-  color: Color;
+  playerIndex: PlayerIndex;
+  playerName: PlayerName;
+  playerColor: PlayerColor;
   proposingTakeback?: boolean;
   offeringRematch?: boolean;
   offeringDraw?: boolean;
@@ -104,8 +108,8 @@ export interface Player {
 }
 
 export interface TournamentRanks {
-  white: number;
-  black: number;
+  p1: number;
+  p2: number;
 }
 
 export interface Tournament {
@@ -151,8 +155,8 @@ export interface Clock {
 export interface CorrespondenceClock {
   daysPerTurn: number;
   increment: number;
-  white: number;
-  black: number;
+  p1: number;
+  p2: number;
 }
 
 export type Source = 'import' | 'lobby' | 'pool' | 'friend';
@@ -186,10 +190,10 @@ export interface Blurs {
   percent: number;
 }
 
-export interface Trans {
-  (key: string): string;
-  noarg: (key: string) => string;
-}
+//export interface Trans {
+//  (key: string): string;
+//  noarg: (key: string) => string;
+//}
 
 export interface Hold {
   ply: number;

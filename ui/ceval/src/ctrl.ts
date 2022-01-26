@@ -150,7 +150,7 @@ export default function (opts: CevalOpts): CevalCtrl {
   let lastEmitFen: string | null = null;
 
   const onEmit = throttle(200, (ev: Tree.ClientEval, work: Work) => {
-    sortPvsInPlace(ev.pvs, work.ply % 2 === (work.threatMode ? 1 : 0) ? 'white' : 'black');
+    sortPvsInPlace(ev.pvs, work.ply % 2 === (work.threatMode ? 1 : 0) ? 'p1' : 'p2');
     npsRecorder(ev);
     curEval = ev;
     opts.emit(ev, work);
@@ -163,9 +163,9 @@ export default function (opts: CevalOpts): CevalCtrl {
 
   const effectiveMaxDepth = () => (isDeeper() || infinite() ? 99 : parseInt(maxDepth()));
 
-  const sortPvsInPlace = (pvs: Tree.PvData[], color: Color) =>
+  const sortPvsInPlace = (pvs: Tree.PvData[], playerIndex: PlayerIndex) =>
     pvs.sort(function (a, b) {
-      return povChances(color, b) - povChances(color, a);
+      return povChances(playerIndex, b) - povChances(playerIndex, a);
     });
 
   const start = (path: Tree.Path, steps: Step[], threatMode: boolean, deeper: boolean) => {

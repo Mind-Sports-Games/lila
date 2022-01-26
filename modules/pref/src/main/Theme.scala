@@ -9,7 +9,6 @@ sealed class Theme private[pref] (val name: String, val colors: Theme.HexColors,
 
   def light = colors._1
   def dark  = colors._2
-
   def gameFamilyName = GameFamily(gameFamily).shortName.toLowerCase()
 }
 

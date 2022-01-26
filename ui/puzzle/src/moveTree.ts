@@ -25,7 +25,7 @@ export function pgnToTree(pgn: San[]): Tree.Node {
   return root;
 }
 
-export function mergeSolution(root: TreeWrapper, initialPath: Tree.Path, solution: Uci[], pov: Color): void {
+export function mergeSolution(root: TreeWrapper, initialPath: Tree.Path, solution: Uci[], pov: PlayerIndex): void {
   const initialNode = root.nodeAtPath(initialPath);
   const pos = Chess.fromSetup(parseFen(initialNode.fen).unwrap()).unwrap();
   const fromPly = initialNode.ply;
@@ -34,7 +34,7 @@ export function mergeSolution(root: TreeWrapper, initialPath: Tree.Path, solutio
     const san = makeSan(pos, move);
     pos.play(move);
     const node = makeNode(pos, move, fromPly + i + 1, san);
-    if ((pov == 'white') == (node.ply % 2 == 1)) node.puzzle = 'good';
+    if ((pov == 'p1') == (node.ply % 2 == 1)) node.puzzle = 'good';
     return node;
   });
   root.addNodes(nodes, initialPath);

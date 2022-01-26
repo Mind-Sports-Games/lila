@@ -1,12 +1,12 @@
 import { State } from './state';
 import { key2pos, createEl } from './util';
-import { whitePov } from './board';
+import { p1Pov } from './board';
 import * as util from './util';
 import { AnimCurrent, AnimVectors, AnimVector, AnimCaptures, AnimRoles } from './anim';
 import { DragCurrent } from './drag';
 import * as cg from './types';
 
-// `$color $role`
+// `$playerIndex $role`
 type PieceName = string;
 
 interface SamePieces {
@@ -22,7 +22,7 @@ interface SquareClasses {
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/draughtsground/view.js
 // in case of bugs, blame @veloce
 export function render(s: State): void {
-  const asWhite: boolean = whitePov(s),
+  const asP1: boolean = p1Pov(s),
     bs = s.boardSize,
     posToTranslate = s.dom.relative ? util.posToTranslateRel(bs) : util.posToTranslateAbs(s.dom.bounds(), bs),
     translate = s.dom.relative ? util.translateRel : util.translateAbs,
@@ -70,7 +70,7 @@ export function render(s: State): void {
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        translate(el, posToTranslate(key2pos(k, bs), asWhite, 0));
+        translate(el, posToTranslate(key2pos(k, bs), asP1, 0));
         el.cgDragging = false;
       }
       if (el.classList.contains('temporary') && tempPiece) {
@@ -103,7 +103,7 @@ export function render(s: State): void {
             if (pieceAtKey.role === 'king') el.className = el.className.replace('man', 'king');
             else if (pieceAtKey.role === 'man') el.className = el.className.replace('king', 'man');
           }
-          translate(el, posToTranslate(pos, asWhite, anim[4]));
+          translate(el, posToTranslate(pos, asP1, anim[4]));
         } else if (el.cgAnimating) {
           el.cgAnimating = false;
           el.classList.remove('anim');
@@ -112,8 +112,8 @@ export function render(s: State): void {
             if (pieceAtKey.role === 'king') el.className = el.className.replace('man', 'king');
             else if (pieceAtKey.role === 'man') el.className = el.className.replace('king', 'man');
           }
-          translate(el, posToTranslate(key2pos(k, bs), asWhite, 0));
-          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k, bs), asWhite);
+          translate(el, posToTranslate(key2pos(k, bs), asP1, 0));
+          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k, bs), asP1);
         }
 
         // same piece: flag as same. Exception for capture ending on the start square, as no pieces are added or removed
@@ -142,7 +142,7 @@ export function render(s: State): void {
     if (!sameSquares[sk]) {
       sMvdset = movedSquares.get(squares[sk]);
       sMvd = sMvdset && sMvdset.pop();
-      const translation = posToTranslate(key2pos(sk as cg.Key, bs), asWhite, 0);
+      const translation = posToTranslate(key2pos(sk as cg.Key, bs), asP1, 0);
       if (sMvd) {
         sMvd.cgKey = sk as cg.Key;
         translate(sMvd, translation);
@@ -169,7 +169,7 @@ export function render(s: State): void {
         // apply dom changes
         pMvd.cgKey = k;
         const pos = key2pos(k, bs);
-        if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, asWhite);
+        if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, asP1);
         let shift: number;
         if (anim) {
           pMvd.cgAnimating = true;
@@ -185,7 +185,7 @@ export function render(s: State): void {
             }
           }
         } else shift = 0;
-        translate(pMvd, posToTranslate(pos, asWhite, shift));
+        translate(pMvd, posToTranslate(pos, asP1, shift));
       }
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
@@ -207,9 +207,9 @@ export function render(s: State): void {
             pieceNode.classList.add('temprole');
           }
         } else shift = 0;
-        translate(pieceNode, posToTranslate(pos, asWhite, shift));
+        translate(pieceNode, posToTranslate(pos, asP1, shift));
 
-        if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, asWhite);
+        if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, asP1);
 
         boardEl.appendChild(pieceNode);
       }
@@ -225,8 +225,8 @@ export function render(s: State): void {
         pos = key2pos(k, bs);
       pieceNode.cgPiece = pieceName;
       pieceNode.cgKey = k;
-      translate(pieceNode, posToTranslate(pos, asWhite, 0));
-      if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, asWhite);
+      translate(pieceNode, posToTranslate(pos, asP1, 0));
+      if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, asP1);
       boardEl.appendChild(pieceNode);
     }
   }
@@ -238,12 +238,12 @@ export function render(s: State): void {
 
 export function updateBounds(s: State) {
   if (s.dom.relative) return;
-  const asWhite: boolean = whitePov(s),
+  const asP1: boolean = p1Pov(s),
     posToTranslate = util.posToTranslateAbs(s.dom.bounds(), s.boardSize);
   let el = s.dom.elements.board.firstChild as HTMLElement | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el) || isFieldNumber(el)) {
-      util.translateAbs(el, posToTranslate(key2pos(el.cgKey, s.boardSize), asWhite, 0));
+      util.translateAbs(el, posToTranslate(key2pos(el.cgKey, s.boardSize), asP1, 0));
     }
     el = el.nextSibling as HTMLElement | undefined;
   }
@@ -263,20 +263,20 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (const i in nodes) s.dom.elements.board.removeChild(nodes[i]);
 }
 
-function posZIndex(pos: cg.Pos, asWhite: boolean): string {
+function posZIndex(pos: cg.Pos, asP1: boolean): string {
   let z = 2 + (pos[1] - 1) * 8 + (8 - pos[0]);
-  if (asWhite) z = 67 - z;
+  if (asP1) z = 67 - z;
   return z + '';
 }
 
 export function pieceNameOf(piece: cg.Piece): string {
-  if (piece.role === 'ghostman') return `${piece.color} man ghost`;
+  if (piece.role === 'ghostman') return `${piece.playerIndex} man ghost`;
   else if (piece.role === 'ghostking') {
-    if (piece.kingMoves && piece.kingMoves > 0) return `${piece.color} king ghost king${piece.kingMoves}`;
-    else return `${piece.color} king ghost`;
+    if (piece.kingMoves && piece.kingMoves > 0) return `${piece.playerIndex} king ghost king${piece.kingMoves}`;
+    else return `${piece.playerIndex} king ghost`;
   } else if (piece.role === 'king' && piece.kingMoves && piece.kingMoves > 0)
-    return `${piece.color} king king${piece.kingMoves}`;
-  else return `${piece.color} ${piece.role}`;
+    return `${piece.playerIndex} king king${piece.kingMoves}`;
+  else return `${piece.playerIndex} ${piece.role}`;
 }
 
 function computeSquareClasses(s: State): SquareClasses {

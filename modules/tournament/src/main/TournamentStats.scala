@@ -3,7 +3,7 @@ package lila.tournament
 import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
 
-import strategygames.Color
+import strategygames.{ Player => PlayerIndex }
 import lila.db.dsl._
 
 final class TournamentStatsApi(
@@ -38,8 +38,8 @@ final class TournamentStatsApi(
 case class TournamentStats(
     games: Int,
     moves: Int,
-    whiteWins: Int,
-    blackWins: Int,
+    p1Wins: Int,
+    p2Wins: Int,
     draws: Int,
     berserks: Int,
     averageRating: Int
@@ -47,14 +47,14 @@ case class TournamentStats(
 
 private object TournamentStats {
 
-  private case class ColorStats(games: Int, moves: Int, b1: Int, b2: Int) {
+  private case class PlayerIndexStats(games: Int, moves: Int, b1: Int, b2: Int) {
     def berserks = b1 + b2
   }
 
   def readAggregation(rating: Int)(docs: List[Bdoc]): TournamentStats = {
-    val colorStats: Map[Option[Color], ColorStats] = docs.view.map { doc =>
-      doc.getAsOpt[Boolean]("_id").map(Color.fromWhite) ->
-        ColorStats(
+    val playerIndexStats: Map[Option[PlayerIndex], PlayerIndexStats] = docs.view.map { doc =>
+      doc.getAsOpt[Boolean]("_id").map(PlayerIndex.fromP1) ->
+        PlayerIndexStats(
           ~doc.int("games"),
           ~doc.int("moves"),
           ~doc.int("b1"),
@@ -62,12 +62,12 @@ private object TournamentStats {
         )
     }.toMap
     TournamentStats(
-      games = colorStats.foldLeft(0)(_ + _._2.games),
-      moves = colorStats.foldLeft(0)(_ + _._2.moves),
-      whiteWins = colorStats.get(Color.White.some).??(_.games),
-      blackWins = colorStats.get(Color.Black.some).??(_.games),
-      draws = colorStats.get(none).??(_.games),
-      berserks = colorStats.foldLeft(0)(_ + _._2.berserks),
+      games = playerIndexStats.foldLeft(0)(_ + _._2.games),
+      moves = playerIndexStats.foldLeft(0)(_ + _._2.moves),
+      p1Wins = playerIndexStats.get(PlayerIndex.P1.some).??(_.games),
+      p2Wins = playerIndexStats.get(PlayerIndex.P2.some).??(_.games),
+      draws = playerIndexStats.get(none).??(_.games),
+      berserks = playerIndexStats.foldLeft(0)(_ + _._2.berserks),
       averageRating = rating
     )
   }

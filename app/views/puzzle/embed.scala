@@ -31,6 +31,8 @@ object embed {
   )(
     span(cls := "text")(trans.puzzle.puzzleOfTheDay()),
     raw(daily.html),
-    span(cls := "text")(daily.puzzle.color.fold(trans.whitePlays, trans.blackPlays)())
+    span(cls := "text")(trans.playerIndexPlays(
+      daily.puzzle.playerIndex.fold(trans.white.txt(), trans.black.txt())
+    ))
   )
 }

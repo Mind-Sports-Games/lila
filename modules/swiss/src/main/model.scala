@@ -20,7 +20,7 @@ case class GameView(
     swiss: Swiss,
     ranks: Option[GameRanks]
 )
-case class GameRanks(whiteRank: Int, blackRank: Int)
+case class GameRanks(p1Rank: Int, p2Rank: Int)
 
 case class FeaturedSwisses(
     created: List[Swiss],

@@ -20,8 +20,10 @@
   <string name="black">سیاه</string>
   <string name="randomColor">رنگ تصادفی</string>
   <string name="createAGame">ایجاد بازی</string>
+  <string name="playerIndexIsVictorious">بازیکن %s برنده است</string>
   <string name="whiteIsVictorious">بازیکن سفید برنده است</string>
   <string name="blackIsVictorious">بازیکن سیاه برنده است</string>
+  <string name="youPlayThePlayerIndexPieces">شما با مهری %s بازی میکنید</string>
   <string name="youPlayTheWhitePieces">شما با مهری سفید بازی میکنید</string>
   <string name="youPlayTheBlackPieces">شما با مهره سیاه بازی میکنید</string>
   <string name="itsYourTurn">نوبت شماست!</string>
@@ -32,6 +34,7 @@
   <string name="newOpponent">حریف جدید</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">حریف شما می خواهد که دوباره با شما بازی کند</string>
   <string name="joinTheGame">به بازی بپیوندید</string>
+  <string name="playerIndexPlays">نوبت %s</string>
   <string name="whitePlays">نوبت سفید</string>
   <string name="blackPlays">نوبت سیاه</string>
   <plurals name="opponentLeftCounter">
@@ -44,8 +47,10 @@
   <string name="forceDraw">اعلام تساوی</string>
   <string name="talkInChat">لطفا در گپ زدن مودب باشید!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">نخستین کسی که به این لینک بیاید با شما بازی می کند.</string>
+  <string name="playerIndexResigned">بازیکن %s تسلیم شد</string>
   <string name="whiteResigned">بازیکن سفید تسلیم شد</string>
   <string name="blackResigned">بازیکن سیاه تسلیم شد</string>
+  <string name="playerIndexLeftTheGame">بازیکن %s بازی را ترک کرد</string>
   <string name="whiteLeftTheGame">بازیکن سفید بازی را ترک کرد</string>
   <string name="blackLeftTheGame">بازیکن سیاه بازی را ترک کرد</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">این لینک را با تماشاگران به اشتراک بگذارید تا بازی را ببینند‌.</string>
@@ -79,6 +84,7 @@
   <string name="drawn">حرکت تساوی دهنده</string>
   <string name="unknown">مجهول</string>
   <string name="database">پایگاه داده</string>
+  <string name="p1DrawP2">%1$s / مساوی / %2$s</string>
   <string name="whiteDrawBlack">سفید / مساوی / سیاه</string>
   <string name="averageRatingX">میانگین امتیاز: %s</string>
   <string name="recentGames">بازی های اخیر</string>
@@ -193,14 +199,17 @@
     <item quantity="other">%s بازی با شما</item>
   </plurals>
   <string name="cancel">انصراف</string>
+  <string name="playerIndexTimeOut">زمان %s به اتمام رسید</string>
   <string name="whiteTimeOut">زمان سفید به اتمام رسید</string>
   <string name="blackTimeOut">زمان سیاه به اتمام رسید</string>
   <string name="drawOfferSent">پیشنهاد تساوی ارسال شد</string>
   <string name="drawOfferDeclined">پیشنهاد تساوی پذیرفته نشد</string>
   <string name="drawOfferAccepted">پیشنهاد تساوی پذیرفته شد</string>
   <string name="drawOfferCanceled">پیشنهاد تساوی لغو شد</string>
+  <string name="playerIndexOffersDraw">%s پیشنهاد تساوی می دهد</string>
   <string name="whiteOffersDraw">سفید پیشنهاد تساوی می دهد</string>
   <string name="blackOffersDraw">سیاه پیشنهاد تساوی می دهد</string>
+  <string name="playerIndexDeclinesDraw">%s تساوی را نمی پذیرد</string>
   <string name="whiteDeclinesDraw">سفید تساوی را نمی پذیرد</string>
   <string name="blackDeclinesDraw">سیاه تساوی را نمی پذیرد</string>
   <string name="yourOpponentOffersADraw">حریف شما پیشنهاد تساوی می دهد</string>
@@ -344,6 +353,7 @@
   <string name="clickOnTheBoardToMakeYourMove">برای اثبات اینکه کامپیوتر نیستید، روی صفحه کلیک کنید تا حرکت خود را انجام دهید</string>
   <string name="captcha.fail">لطفا captcha را حل کنید</string>
   <string name="notACheckmate">عدم کیش و مات</string>
+  <string name="playerIndexCheckmatesInOneMove">%s در یک حرکت مات می‌کند</string>
   <string name="whiteCheckmatesInOneMove">سفید در یک حرکت مات می‌کند</string>
   <string name="blackCheckmatesInOneMove">سیاه در یک حرکت مات می‌کند</string>
   <string name="retry">تلاش دوباره</string>
@@ -413,6 +423,7 @@
   <string name="performance">عملکرد</string>
   <string name="tournamentComplete">مسابقه به اتمام رسید</string>
   <string name="movesPlayed">حرکات انجام شده</string>
+  <string name="playerIndexWins">پیروزی با مهره %s</string>
   <string name="whiteWins">پیروزی با مهره سفید</string>
   <string name="blackWins">سیاه برنده شد</string>
   <string name="draws">مساوی</string>
@@ -742,6 +753,7 @@
   <string name="hideBestMove">پنهان کردن بهترین حرکت</string>
   <string name="getAHint">راهنمایی</string>
   <string name="evaluatingYourMove">در حال بررسی حرکت شما...</string>
+  <string name="playerIndexWinsGame">%s برنده شد</string>
   <string name="whiteWinsGame">سفید برنده شد</string>
   <string name="blackWinsGame">سیاه برنده شد</string>
   <string name="learnFromYourMistakes">از اشتباهات خود درس بگیرید</string>
@@ -749,6 +761,7 @@
   <string name="skipThisMove">رد کردن این حرکت</string>
   <string name="next">بعدی</string>
   <string name="xWasPlayed">%s بازی شد</string>
+  <string name="findBetterMoveForPlayerIndex">یه حرکت بهتر برای %s پیدا کنید</string>
   <string name="findBetterMoveForWhite">یه حرکت بهتر برای سفید پیدا کنید</string>
   <string name="findBetterMoveForBlack">یه حرکت بهتر برای سیاه پیدا کنید</string>
   <string name="resumeLearning">ادامه یادگیری</string>
@@ -757,11 +770,14 @@
   <string name="tryAnotherMoveForBlack">برای سیاه،حرکت دیگری را امتحان کنید</string>
   <string name="solution">راه حل</string>
   <string name="waitingForAnalysis">در انتظار برای آنالیز</string>
+  <string name="noMistakesFoundForPlayerIndex">هیچ اشتباهی برای %s مشاهده نشد</string>
   <string name="noMistakesFoundForWhite">هیچ اشتباهی برای سفید مشاهده نشد</string>
   <string name="noMistakesFoundForBlack">هیچ اشتباهی برای سیاه مشاهده نشد</string>
+  <string name="doneReviewingPlayerIndexMistakes">اشتباهات %s بررسی شد</string>
   <string name="doneReviewingWhiteMistakes">اشتباهات سفید بررسی شد</string>
   <string name="doneReviewingBlackMistakes">اشتباهات سیاه بررسی شد.</string>
   <string name="doItAgain">دوباره</string>
+  <string name="reviewPlayerIndexMistakes">بررسی اشتباهات %s</string>
   <string name="reviewWhiteMistakes">بررسی اشتباهات سفید</string>
   <string name="reviewBlackMistakes">بررسی اشتباهات سیاه</string>
   <string name="advantage">برتری</string>

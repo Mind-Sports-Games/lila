@@ -80,13 +80,17 @@ export interface CachedEval {
 export interface Game {
   id: string;
   status: Status;
-  player: Color;
+  player: PlayerIndex;
+  playerName: PlayerName;
+  playerIndex: PlayerIndex;
   turns: number;
   startedAtTurn: number;
   source: Source;
   speed: Speed;
   variant: Variant;
-  winner?: Color;
+  winner?: PlayerIndex;
+  winnerPlayer: PlayerName;
+  loserPlayer: PlayerName;
   moveCentis?: number[];
   initialFen?: string;
   importedBy?: string;
@@ -109,8 +113,8 @@ export interface Division {
 
 export interface Analysis {
   id: string;
-  white: AnalysisSide;
-  black: AnalysisSide;
+  p1: AnalysisSide;
+  p2: AnalysisSide;
   partial: boolean;
 }
 

@@ -5,10 +5,10 @@ import lila.common.constants.bannedYoutubeIds
 final class Spam(spamKeywords: () => lila.common.Strings) {
 
   def detect(text: String) =
-    staticBlacklist.exists(text.contains) ||
+    staticP2list.exists(text.contains) ||
       spamKeywords().value.exists(text.contains)
 
-  private def referBlacklist =
+  private def referP2list =
     List(
       /* While links to other chess websites are welcome,
        * refer links grant the referrer money or advantages,
@@ -21,12 +21,12 @@ final class Spam(spamKeywords: () => lila.common.Strings) {
       "aimchess.com/i/"
     )
 
-  private lazy val staticBlacklist = List(
+  private lazy val staticP2list = List(
     "chess-bot.com",
     "chessbotx",
     "/auth/magic-link/login/",
     "/auth/token/"
-  ) ::: bannedYoutubeIds ::: referBlacklist
+  ) ::: bannedYoutubeIds ::: referP2list
 
   def replace(text: String) =
     replacements.foldLeft(text) { case (t, (regex, rep)) =>

@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ Black, White }
+import strategygames.{ P2, P1 }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -178,6 +178,8 @@ object SwissJson {
         "name"         -> swiss.name,
         "clock"        -> swiss.clock,
         "variant"      -> swiss.variant.key,
+        "p1Name"       -> swiss.variant.playerNames(P1),
+        "p2Name"       -> swiss.variant.playerNames(P2),
         "round"        -> swiss.round,
         "nbRounds"     -> swiss.actualNbRounds,
         "nbPlayers"    -> swiss.nbPlayers,
@@ -276,7 +278,7 @@ object SwissJson {
       )
       .add("o" -> pairing.isOngoing)
       .add("w" -> pairing.resultFor(player.userId))
-      .add("c" -> (pairing.white == player.userId))
+      .add("c" -> (pairing.p1 == player.userId))
 
   private def pairingJsonOrOutcome(
       player: SwissPlayer
@@ -315,21 +317,21 @@ object SwissJson {
         "gameLogic"   -> b.game.variant.gameLogic.name.toLowerCase(),
         "gameFamily"  -> b.game.variant.gameFamily.shortName.toLowerCase(),
         "variantKey"  -> b.game.variant.key,
-        "fen"         -> Forsyth.boardAndColor(b.game.variant.gameLogic, b.game.situation),
+        "fen"         -> Forsyth.boardAndPlayer(b.game.variant.gameLogic, b.game.situation),
         "lastMove"    -> ~b.game.lastMoveKeys,
         "orientation" -> b.game.naturalOrientation.name,
-        "white"       -> boardPlayerJson(b.board.white),
-        "black"       -> boardPlayerJson(b.board.black)
+        "p1"       -> boardPlayerJson(b.board.p1),
+        "p2"       -> boardPlayerJson(b.board.p2)
       )
       .add(
         "clock" -> b.game.clock.ifTrue(b.game.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(White).roundSeconds,
-            "black" -> c.remainingTime(Black).roundSeconds
+            "p1" -> c.remainingTime(P1).roundSeconds,
+            "p2" -> c.remainingTime(P2).roundSeconds
           )
         }
       )
-      .add("winner" -> b.game.winnerColor.map(_.name))
+      .add("winner" -> b.game.winnerPlayerIndex.map(_.name))
       .add("boardSize" -> boardSizeJson(b.game.variant))
       .add("isMicroMatch" -> b.board.isMicroMatch)
       .add("microMatchGameId" -> b.board.microMatchGameId)

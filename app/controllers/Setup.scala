@@ -113,7 +113,7 @@ final class Setup(
                       initialFen = config.fen,
                       timeControl = timeControl,
                       mode = config.mode,
-                      color = config.color.name,
+                      playerIndex = config.playerIndex.name,
                       challenger = (ctx.me, HTTPRequest sid req) match {
                         case (Some(user), _) => toRegistered(config.variant, timeControl)(user)
                         case (_, Some(sid))  => Challenger.Anonymous(sid)
@@ -126,7 +126,7 @@ final class Setup(
                     (env.challenge.api create challenge) flatMap {
                       case true =>
                         negotiate(
-                          html = fuccess(Redirect(routes.Round.watcher(challenge.id, config.variant.startColor.name))),
+                          html = fuccess(Redirect(routes.Round.watcher(challenge.id, config.variant.startPlayer.name))),
                           api = _ => challengeC.showChallenge(challenge, justCreated = true)
                         )
                       case false =>
@@ -234,7 +234,7 @@ final class Setup(
             config =>
               env.relation.api.fetchBlocking(me.id) flatMap { blocking =>
                 val uniqId = s"sri:${me.id}"
-                config.fixColor.hook(Sri(uniqId), me.some, sid = uniqId.some, blocking) match {
+                config.fixPlayerIndex.hook(Sri(uniqId), me.some, sid = uniqId.some, blocking) match {
                   case Left(hook) =>
                     PostRateLimit(HTTPRequest ipAddress req) {
                       BoardApiHookConcurrencyLimitPerUser(me.id)(
@@ -256,7 +256,7 @@ final class Setup(
     Open { implicit ctx =>
       get("fen") map(s => FEN.clean(gameLogic(getInt("lib")), s)) flatMap ValidFen(getBool("strict")) match {
         case None    => BadRequest.fuccess
-        case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.color, v.situation.board.variant.key)).fuccess
+        case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.playerIndex, v.situation.board.variant.key)).fuccess
       }
     }
 
@@ -303,7 +303,7 @@ final class Setup(
     }
 
   private[controllers] def redirectPov(pov: Pov)(implicit ctx: Context) = {
-    val redir = Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startColor.name))
+    val redir = Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startPlayer.name))
     if (ctx.isAuth) redir
     else
       redir withCookies env.lilaCookie.cookie(

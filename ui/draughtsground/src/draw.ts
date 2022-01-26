@@ -1,5 +1,5 @@
 import { State } from './state';
-import { unselect, cancelMove, getKeyAtDomPos, whitePov } from './board';
+import { unselect, cancelMove, getKeyAtDomPos, p1Pov } from './board';
 import { eventPosition, isRightButton } from './util';
 import * as cg from './types';
 
@@ -13,7 +13,7 @@ export interface DrawShape {
 
 export interface DrawShapePiece {
   role: cg.Role;
-  color: cg.Color;
+  playerIndex: cg.PlayerIndex;
   scale?: number;
 }
 
@@ -67,7 +67,7 @@ export function start(state: State, e: cg.MouchEvent): void {
   e.preventDefault();
   e.ctrlKey ? unselect(state) : cancelMove(state);
   const pos = eventPosition(e) as cg.NumberPair,
-    orig = getKeyAtDomPos(pos, state.boardSize, whitePov(state), state.dom.bounds());
+    orig = getKeyAtDomPos(pos, state.boardSize, p1Pov(state), state.dom.bounds());
   if (!orig) return;
   state.drawable.current = {
     orig,
@@ -81,7 +81,7 @@ export function processDraw(state: State): void {
   requestAnimationFrame(() => {
     const cur = state.drawable.current;
     if (cur) {
-      const mouseSq = getKeyAtDomPos(cur.pos, state.boardSize, whitePov(state), state.dom.bounds());
+      const mouseSq = getKeyAtDomPos(cur.pos, state.boardSize, p1Pov(state), state.dom.bounds());
       if (mouseSq !== cur.mouseSq) {
         if (!mouseSq) {
           cur.prev = cur.mouseSq;

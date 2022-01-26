@@ -63,9 +63,9 @@ export interface Opening {
 
 export interface OpeningGame {
   id: string;
-  white: OpeningPlayer;
-  black: OpeningPlayer;
-  winner?: Color;
+  p1: OpeningPlayer;
+  p2: OpeningPlayer;
+  winner?: PlayerIndex;
   year?: string;
 }
 
@@ -92,8 +92,8 @@ export interface MoveStats {
 }
 
 export interface OpeningMoveStats extends MoveStats {
-  white: number;
-  black: number;
+  p1: number;
+  p2: number;
   draws: number;
   averageRating: number;
 }
@@ -125,7 +125,7 @@ export function hasDtz(m: TablebaseMoveStats): m is TablebaseMoveStatsWithDtz {
 export interface SimpleTablebaseHit {
   fen: Fen;
   best?: Uci; // no move if checkmate/stalemate
-  winner: Color | undefined;
+  winner: PlayerIndex | undefined;
 }
 
 export interface ExplorerCtrl {

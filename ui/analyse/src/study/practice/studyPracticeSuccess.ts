@@ -8,16 +8,16 @@ function isDrawish(node: Tree.Node): boolean | null {
   return !node.ceval!.mate && Math.abs(node.ceval!.cp!) < 150;
 }
 // returns null if not deep enough to know
-function isWinning(node: Tree.Node, goalCp: number, color: Color): boolean | null {
+function isWinning(node: Tree.Node, goalCp: number, playerIndex: PlayerIndex): boolean | null {
   if (!hasSolidEval(node)) return null;
   const cp = node.ceval!.mate! > 0 ? 99999 : node.ceval!.mate! < 0 ? -99999 : node.ceval!.cp;
-  return color === 'white' ? cp! >= goalCp : cp! <= goalCp;
+  return playerIndex === 'p1' ? cp! >= goalCp : cp! <= goalCp;
 }
 // returns null if not deep enough to know
-function myMateIn(node: Tree.Node, color: Color): number | boolean | null {
+function myMateIn(node: Tree.Node, playerIndex: PlayerIndex): number | boolean | null {
   if (!hasSolidEval(node)) return null;
   if (!node.ceval!.mate) return false;
-  const mateIn = node.ceval!.mate! * (color === 'white' ? 1 : -1);
+  const mateIn = node.ceval!.mate! * (playerIndex === 'p1' ? 1 : -1);
   return mateIn > 0 ? mateIn : false;
 }
 
@@ -34,8 +34,8 @@ export default function (root: AnalyseCtrl, goal: Goal, nbMoves: number): boolea
   const node = root.node;
   if (!node.uci) return null;
   const outcome = root.outcome();
-  if (outcome && outcome.winner && outcome.winner !== root.bottomColor()) return false;
-  if (outcome && outcome.winner && outcome.winner === root.bottomColor()) return true;
+  if (outcome && outcome.winner && outcome.winner !== root.bottomPlayerIndex()) return false;
+  if (outcome && outcome.winner && outcome.winner === root.bottomPlayerIndex()) return true;
   if (hasBlundered(root.practice!.comment())) return false;
   switch (goal.result) {
     case 'drawIn':
@@ -47,18 +47,18 @@ export default function (root: AnalyseCtrl, goal: Goal, nbMoves: number): boolea
       if (nbMoves >= goal.moves!) return isDrawish(node);
       break;
     case 'evalIn':
-      if (nbMoves >= goal.moves!) return isWinning(node, goal.cp!, root.bottomColor());
+      if (nbMoves >= goal.moves!) return isWinning(node, goal.cp!, root.bottomPlayerIndex());
       break;
     case 'mateIn': {
       if (nbMoves > goal.moves!) return false;
-      const mateIn = myMateIn(node, root.bottomColor());
+      const mateIn = myMateIn(node, root.bottomPlayerIndex());
       if (mateIn === null) return null;
       if (!mateIn || (mateIn as number) + nbMoves > goal.moves!) return false;
       break;
     }
     case 'promotion':
       if (!node.uci[4]) return null;
-      return isWinning(node, goal.cp!, root.bottomColor());
+      return isWinning(node, goal.cp!, root.bottomPlayerIndex());
     case 'mate':
   }
   return null;

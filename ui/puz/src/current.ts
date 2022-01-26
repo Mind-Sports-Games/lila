@@ -7,7 +7,7 @@ export default class CurrentPuzzle {
   line: Uci[];
   startAt: number;
   moveIndex = 0;
-  pov: Color;
+  pov: PlayerIndex;
 
   constructor(readonly index: number, readonly puzzle: Puzzle) {
     this.line = puzzle.line.split(' ');

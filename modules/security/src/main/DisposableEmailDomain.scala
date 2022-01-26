@@ -10,19 +10,19 @@ final class DisposableEmailDomain(
     checkMailBlocked: () => Fu[List[String]]
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  private val staticRegex = toRegexStr(DisposableEmailDomain.staticBlacklist.iterator)
+  private val staticRegex = toRegexStr(DisposableEmailDomain.staticP2list.iterator)
 
   private var regex = finalizeRegex(staticRegex)
 
   private[security] def refresh(): Unit =
     for {
-      blacklist <- ws.url(providerUrl).get().map(_.body.linesIterator) recover { case e: Exception =>
+      p2list <- ws.url(providerUrl).get().map(_.body.linesIterator) recover { case e: Exception =>
         logger.warn("DisposableEmailDomain.refresh", e)
         Iterator.empty
       }
       checked <- checkMailBlocked()
     } {
-      val regexStr  = s"${toRegexStr(blacklist)}|${toRegexStr(checked.iterator)}"
+      val regexStr  = s"${toRegexStr(p2list)}|${toRegexStr(checked.iterator)}"
       val nbDomains = regexStr.count('|' ==)
       lila.mon.email.disposableDomain.update(nbDomains)
       regex = finalizeRegex(s"$staticRegex|$regexStr")
@@ -34,7 +34,7 @@ final class DisposableEmailDomain(
 
   def apply(domain: Domain): Boolean = {
     val lower = domain.lower
-    !DisposableEmailDomain.whitelisted(lower) && regex.find(lower.value)
+    !DisposableEmailDomain.p1listed(lower) && regex.find(lower.value)
   }
 
   def isOk(domain: Domain) = !apply(domain)
@@ -44,15 +44,15 @@ final class DisposableEmailDomain(
 
 private object DisposableEmailDomain {
 
-  def whitelisted(domain: Domain.Lower) = whitelist contains domain.value
+  def p1listed(domain: Domain.Lower) = p1list contains domain.value
 
-  private val staticBlacklist = Set(
+  private val staticP2list = Set(
     "playstrategy.org",
     "gamil.com",
     "gmali.com"
   )
 
-  private val whitelist = Set(
+  private val p1list = Set(
     "fide.com", // https://check-mail.org/domain/fide.com/ says DISPOSABLE / TEMPORARY DOMAIN
     /* Default domains included */
     "aol.com",

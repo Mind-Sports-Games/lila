@@ -117,8 +117,8 @@ object forms {
 
   private def blindSideChoice(form: Form[_])(implicit ctx: Context) =
     ctx.blind option frag(
-      renderLabel(form("color"), trans.side()),
-      renderSelect(form("color").copy(value = "random".some), translatedSideChoices)
+      renderLabel(form("playerIndex"), trans.side()),
+      renderSelect(form("playerIndex").copy(value = "random".some), translatedSideChoices)
     )
 
   private def layout(
@@ -141,20 +141,20 @@ object forms {
           postForm(
             action := route,
             novalidate,
-            dataRandomColorVariants,
+            dataRandomPlayerIndexVariants,
             dataType := typ,
             dataAnon := ctx.isAnon.option("1")
           )(
             fields,
             if (ctx.blind) submitButton("Create the game")
             else
-              div(cls := "color-submits")(
+              div(cls := "playerIndex-submits")(
                 translatedSideChoices.map { case (key, name, _) =>
                   submitButton(
                     (typ == "hook") option disabled,
                     title := name,
-                    cls := s"color-submits__button button button-metal $key",
-                    st.name := "color",
+                    cls := s"playerIndex-submits__button button button-metal $key",
+                    st.name := "playerIndex",
                     value := key
                   )(i)
                 }

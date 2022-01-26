@@ -18,7 +18,7 @@ object PgnTags {
     })
 
   private def removeContradictingTermination(tags: Tags) =
-    if (tags.resultColor.isDefined)
+    if (tags.resultPlayer.isDefined)
       Tags(tags.value.filterNot { t =>
         t.name == Tag.Termination && t.value.toLowerCase == "unterminated"
       })
@@ -29,14 +29,14 @@ object PgnTags {
   private val sortedTypes: List[TagType] = {
     import Tag._
     List(
-      White,
-      WhiteElo,
-      WhiteTitle,
-      WhiteTeam,
-      Black,
-      BlackElo,
-      BlackTitle,
-      BlackTeam,
+      P1,
+      P1Elo,
+      P1Title,
+      P1Team,
+      P2,
+      P2Elo,
+      P2Title,
+      P2Team,
       TimeControl,
       Date,
       Result,

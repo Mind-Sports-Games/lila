@@ -8,8 +8,8 @@ import * as cg from './types';
 export interface State {
   pieces: cg.Pieces;
   boardSize: cg.BoardSize;
-  orientation: cg.Color; // board orientation. white | black
-  turnColor: cg.Color; // turn to play. white | black
+  orientation: cg.PlayerIndex; // board orientation. p1 | p2
+  turnPlayerIndex: cg.PlayerIndex; // turn to play. p1 | p2
   lastMove?: cg.Key[]; // ucis of the last move [32, 27]
   animateFrom?: number; // startindex in lastMove to animate
   /** square currently selected "a1" */
@@ -32,7 +32,7 @@ export interface State {
   };
   movable: {
     free: boolean; // all moves are valid - board editor
-    color?: cg.Color | 'both'; // color that can move. white | black | both
+    playerIndex?: cg.PlayerIndex | 'both'; // playerIndex that can move. p1 | p2 | both
     dests?: cg.Dests; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     captLen?: number;
     captureUci?: Array<string>;
@@ -44,7 +44,7 @@ export interface State {
     };
   };
   premovable: {
-    enabled: boolean; // allow premoves for color that can not move
+    enabled: boolean; // allow premoves for playerIndex that can not move
     showDests: boolean; // whether to add the premove-dest class on squares
     dests?: cg.Key[]; // premove destinations for the current selection
     variant?: string; // game variant, to determine premove squares
@@ -55,7 +55,7 @@ export interface State {
     };
   };
   predroppable: {
-    enabled: boolean; // allow predrops for color that can not move
+    enabled: boolean; // allow predrops for playerIndex that can not move
     current?: {
       // current saved predrop {role: 'knight'; key: 'e4'}
       role: cg.Role;
@@ -92,7 +92,7 @@ export interface State {
   events: {
     change?: () => void; // called after the situation changes on the board
     // called after a piece has been moved.
-    // capturedPiece is undefined or like {color: 'white'; 'role': 'king'}
+    // capturedPiece is undefined or like {playerIndex: 'p1'; 'role': 'king'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void; // called when a square is selected
@@ -109,8 +109,8 @@ export function defaults(): Partial<State> {
   return {
     pieces: fen.read(fen.initial),
     boardSize: [10, 10],
-    orientation: 'white',
-    turnColor: 'white',
+    orientation: 'p1',
+    turnPlayerIndex: 'p1',
     coordinates: 2,
     viewOnly: false,
     disableContextMenu: false,
@@ -127,7 +127,7 @@ export function defaults(): Partial<State> {
     },
     movable: {
       free: true,
-      color: 'both',
+      playerIndex: 'both',
       showDests: true,
       events: {},
     },

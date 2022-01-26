@@ -20,6 +20,7 @@
   <string name="black">Ater</string>
   <string name="randomColor">Latus fortuitus</string>
   <string name="createAGame">Ludum facere</string>
+  <string name="playerIndexIsVictorious">%s victor est</string>
   <string name="whiteIsVictorious">Albus victor est</string>
   <string name="blackIsVictorious">Ater victor est</string>
   <string name="youPlayTheWhitePieces">ludis cales albas</string>
@@ -32,6 +33,7 @@
   <string name="newOpponent">Adversarius novus</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Tuus adversarius tecum novum ludum ludere vult</string>
   <string name="joinTheGame">Inire ad ludum</string>
+  <string name="playerIndexPlays">%s lusurus</string>
   <string name="whitePlays">Albus lusurus</string>
   <string name="blackPlays">Ater lusurus</string>
   <plurals name="opponentLeftCounter">
@@ -44,8 +46,10 @@
   <string name="forceDraw">Agere indutiam</string>
   <string name="talkInChat">Es lepidus in sermo!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Primus homo quis venit ad hōc URL tecum ludet.</string>
+  <string name="playerIndexResigned">%s concessit</string>
   <string name="whiteResigned">Albus concessit</string>
   <string name="blackResigned">Ater concessit</string>
+  <string name="playerIndexLeftTheGame">%s ludō decessus est</string>
   <string name="whiteLeftTheGame">Albus ludō decessus est</string>
   <string name="blackLeftTheGame">Ater ludō decessus est</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Divide hōc URL ut sinas spectatores ludum visuros esse</string>
@@ -78,6 +82,7 @@
   <string name="drawn">Aequans</string>
   <string name="unknown">Ignotum</string>
   <string name="database">Archivum</string>
+  <string name="p1DrawP2">%1$s / Aequatio / %2$s</string>
   <string name="whiteDrawBlack">Albus / Aequatio / Ater</string>
   <string name="averageRatingX">Ratio media: %s</string>
   <string name="recentGames">Recentes ludi</string>
@@ -204,8 +209,10 @@
   <string name="drawOfferDeclined">Recusata est pacis conditio</string>
   <string name="drawOfferAccepted">Accepta est pacis conditio</string>
   <string name="drawOfferCanceled">Sublata est pacis conditio</string>
+  <string name="playerIndexOffersDraw">%s terminum proponit.</string>
   <string name="whiteOffersDraw">Albus terminum proponit.</string>
   <string name="blackOffersDraw">Niger terminum proponit.</string>
+  <string name="playerIndexDeclinesDraw">%s terminum negat.</string>
   <string name="whiteDeclinesDraw">Albus terminum negat.</string>
   <string name="blackDeclinesDraw">Niger terminum negat.</string>
   <string name="yourOpponentOffersADraw">Pacem adversarius offert</string>
@@ -399,6 +406,7 @@
   <string name="performance">Gressus</string>
   <string name="tournamentComplete">Certamen completum est</string>
   <string name="movesPlayed">Motus lusiones</string>
+  <string name="playerIndexWins">Est victor %s</string>
   <string name="whiteWins">Est victor Albus</string>
   <string name="blackWins">Est victor Niger</string>
   <string name="draws">Indutiae</string>
@@ -684,6 +692,7 @@
   <string name="perfRatingX">Ordo: %s</string>
   <string name="seeBestMove">Maxime motum videre</string>
   <string name="hideBestMove">Maxime motum celare</string>
+  <string name="playerIndexWinsGame">%s vincit</string>
   <string name="whiteWinsGame">Albus vincit</string>
   <string name="blackWinsGame">Niger vincit</string>
   <string name="learnFromYourMistakes">Disce ex errata tua</string>

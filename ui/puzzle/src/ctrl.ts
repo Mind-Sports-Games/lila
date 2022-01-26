@@ -84,7 +84,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     vm.lastFeedback = 'init';
     vm.initialPath = initialPath;
     vm.initialNode = tree.nodeAtPath(initialPath);
-    vm.pov = vm.initialNode.ply % 2 == 1 ? 'black' : 'white';
+    vm.pov = vm.initialNode.ply % 2 == 1 ? 'p2' : 'p1';
 
     setPath(treePath.init(initialPath));
     setTimeout(() => {
@@ -115,24 +115,24 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
 
   function makeCgOpts(): CgConfig {
     const node = vm.node;
-    const color: Color = node.ply % 2 === 0 ? 'white' : 'black';
+    const playerIndex: PlayerIndex = node.ply % 2 === 0 ? 'p1' : 'p2';
     const dests = chessgroundDests(position());
     const nextNode = vm.node.children[0];
-    const canMove = vm.mode === 'view' || (color === vm.pov && (!nextNode || nextNode.puzzle == 'fail'));
+    const canMove = vm.mode === 'view' || (playerIndex === vm.pov && (!nextNode || nextNode.puzzle == 'fail'));
     const movable = canMove
       ? {
-          color: dests.size > 0 ? color : undefined,
+          playerIndex: dests.size > 0 ? playerIndex : undefined,
           dests,
         }
       : {
-          color: undefined,
+          playerIndex: undefined,
           dests: new Map(),
         };
     const config = {
       fen: node.fen,
       orientation: vm.pov,
-      myColor: vm.pov,
-      turnColor: color,
+      myPlayerIndex: vm.pov,
+      turnPlayerIndex: playerIndex,
       movable: movable,
       premovable: {
         enabled: false,
@@ -144,8 +144,8 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       chess960: vm.cgConfig.chess960,
     };
     if (node.ply >= vm.initialNode.ply) {
-      if (vm.mode !== 'view' && color !== vm.pov && !nextNode) {
-        config.movable.color = vm.pov;
+      if (vm.mode !== 'view' && playerIndex !== vm.pov && !nextNode) {
+        config.movable.playerIndex = vm.pov;
         config.premovable.enabled = true;
       }
     }
@@ -184,7 +184,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     const check = pos.isCheck() ? pos.board.kingOf(pos.turn) : undefined;
     addNode(
       {
-        ply: 2 * (pos.fullmoves - 1) + (pos.turn == 'white' ? 0 : 1),
+        ply: 2 * (pos.fullmoves - 1) + (pos.turn == 'p1' ? 0 : 1),
         fen: makeFen(pos.toSetup()),
         id: scalachessCharPair(move),
         uci: makeUci(move),

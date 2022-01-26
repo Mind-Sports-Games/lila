@@ -5,7 +5,7 @@ package templating
 import strategygames.Pos
 import strategygames.chess
 import strategygames.draughts
-import strategygames.{ Board, Color, History }
+import strategygames.{ Board, Player => PlayerIndex, History }
 import lila.api.Context
 
 import lila.app.ui.ScalatagsTemplate._
@@ -19,7 +19,7 @@ trait ChessgroundHelper {
   private val cgBoard     = tag("cg-board")
   val cgWrapContent       = cgHelper(cgContainer(cgBoard))
 
-  def chessground(board: Board, orient: Color, lastMove: List[Pos] = Nil)(implicit ctx: Context): Frag =
+  def chessground(board: Board, orient: PlayerIndex, lastMove: List[Pos] = Nil)(implicit ctx: Context): Frag =
     wrap {
       cgBoard {
         raw {
@@ -43,7 +43,7 @@ trait ChessgroundHelper {
               else
                   board.pieces.map {
                     case (pos, piece) =>
-                      val klass = s"${piece.color.name} ${piece.role.name}"
+                      val klass = s"${piece.player.name} ${piece.role.name}"
                       s"""<piece class="$klass" style="top:${top(pos)}%;left:${left(pos)}%"></piece>"""
                   } mkString ""
             s"$highlights$pieces"
@@ -52,7 +52,7 @@ trait ChessgroundHelper {
       }
     }
 
-  def draughtsground(board: draughts.Board, orient: Color, lastMove: List[draughts.Pos] = Nil)(implicit ctx: Context): Frag = wrap {
+  def draughtsground(board: draughts.Board, orient: PlayerIndex, lastMove: List[draughts.Pos] = Nil)(implicit ctx: Context): Frag = wrap {
     cgBoard {
       raw {
         def addX(p: draughts.PosMotion) = if (p.y % 2 != 0) -0.5 else -1.0
@@ -66,7 +66,7 @@ trait ChessgroundHelper {
           if (ctx.pref.isBlindfold) ""
           else board.pieces.map {
             case (pos, piece) =>
-              val klass = s"${piece.color.name} ${piece.role.name}"
+              val klass = s"${piece.player.name} ${piece.role.name}"
               val pm = board.posAt(pos)
               s"""<piece class="$klass" style="top:${top(pm)}%;left:${left(pm)}%"></piece>"""
           } mkString ""
@@ -80,7 +80,7 @@ trait ChessgroundHelper {
       case (board: Board.Chess, history: History.Chess) =>
         chessground(
           board = board,
-          orient = pov.color,
+          orient = pov.playerIndex,
           lastMove = history.lastMove.map(_.origDest) ?? {
             case (orig, dest) => List(orig, dest)
           }
@@ -89,7 +89,7 @@ trait ChessgroundHelper {
       case (board: Board.FairySF, history: History.FairySF) =>
         chessground(
           board = board,
-          orient = pov.color,
+          orient = pov.playerIndex,
           lastMove = history.lastMove.map(_.origDest) ?? {
             case (orig, dest) => List(orig, dest)
           }
@@ -97,7 +97,7 @@ trait ChessgroundHelper {
       case (Board.Draughts(board), History.Draughts(history)) =>
         draughtsground(
           board = board,
-          orient = pov.color,
+          orient = pov.playerIndex,
           lastMove = history.lastMove.map(_.origDest) ?? {
             case (orig, dest) => List(orig, dest)
           }

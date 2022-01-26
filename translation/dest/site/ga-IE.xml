@@ -20,6 +20,7 @@
   <string name="black">Dubh</string>
   <string name="randomColor">Taobh randamach</string>
   <string name="createAGame">Cruthaigh cluiche</string>
+  <string name="playerIndexIsVictorious">Tá an bua ag %s</string>
   <string name="whiteIsVictorious">Tá an bua ag Bán</string>
   <string name="blackIsVictorious">Tá an bua ag Dubh</string>
   <string name="youPlayTheWhitePieces">Imir leis na píosaí bána</string>
@@ -33,6 +34,7 @@
   <string name="newOpponent">Céile comhraic nua</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Ba mhaith le do chéile comhraic cluiche nua a imirt leat</string>
   <string name="joinTheGame">Téigh isteach sa chluiche</string>
+  <string name="playerIndexPlays">Is le %s an imirt</string>
   <string name="whitePlays">Is le Bán an imirt</string>
   <string name="blackPlays">Is le Dubh an imirt</string>
   <plurals name="opponentLeftCounter">
@@ -48,8 +50,10 @@
   <string name="forceDraw">Fógair cluiche cothrom</string>
   <string name="talkInChat">Bí dea-bhéasach sa chomhrá!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Imreoidh an chéad duine a thagann go dtí an URL seo leat</string>
+  <string name="playerIndexResigned">D\'éirigh %s as</string>
   <string name="whiteResigned">D\'éirigh Bán as</string>
   <string name="blackResigned">D\'éirigh Dubh as</string>
+  <string name="playerIndexLeftTheGame">D\'fhág %s an cluiche</string>
   <string name="whiteLeftTheGame">D\'fhág Bán an cluiche</string>
   <string name="blackLeftTheGame">D\'fhág Dubh an cluiche</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Comhroinn an URL seo chun ligean do lucht féachana an cluiche a fheiceáil</string>
@@ -83,6 +87,7 @@
   <string name="drawn">Comhscór</string>
   <string name="unknown">Anaithnid</string>
   <string name="database">Bunachar</string>
+  <string name="p1DrawP2">%1$s / Comhscór / %2$s</string>
   <string name="whiteDrawBlack">Bán / Comhscór / Dubh</string>
   <string name="averageRatingX">Meán-rátáil: %s</string>
   <string name="recentGames">Cluichí is déanaí</string>
@@ -252,14 +257,17 @@
     <item quantity="other">%s cluiche leat</item>
   </plurals>
   <string name="cancel">Cealaigh</string>
+  <string name="playerIndexTimeOut">Am %s istigh</string>
   <string name="whiteTimeOut">Am Bán istigh</string>
   <string name="blackTimeOut">Am Dubh istigh</string>
   <string name="drawOfferSent">Tairiscint comhscór seolta</string>
   <string name="drawOfferDeclined">Diúltaíodh an tairiscint comhscór</string>
   <string name="drawOfferAccepted">Glacadh leis an tairiscint comhscór</string>
   <string name="drawOfferCanceled">Tairiscint comhscór curtha ar ceal</string>
+  <string name="playerIndexOffersDraw">Tairgeann %s comhscór</string>
   <string name="whiteOffersDraw">Tairgeann Bán comhscór</string>
   <string name="blackOffersDraw">Tairgeann Dubh comhscór</string>
+  <string name="playerIndexDeclinesDraw">Diúltaíonn %s do chomhscór</string>
   <string name="whiteDeclinesDraw">Diúltaíonn Bán do chomhscór</string>
   <string name="blackDeclinesDraw">Diúltaíonn Dubh do chomhscór</string>
   <string name="yourOpponentOffersADraw">Tá do chéile comhraic ag tairiscint comhscór</string>
@@ -443,6 +451,7 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="clickOnTheBoardToMakeYourMove">Cliceáil ar an bhord le beart a dhéanamh, agus cruthaigh gur duine thú.</string>
   <string name="captcha.fail">Réitigh an captcha fichille, le do thoil.</string>
   <string name="notACheckmate">Ní marbhsháinn í sin</string>
+  <string name="playerIndexCheckmatesInOneMove">Marbhsháinn ag %s le beart amháin</string>
   <string name="whiteCheckmatesInOneMove">Marbhsháinn ag bán le beart amháin</string>
   <string name="blackCheckmatesInOneMove">Marbhsháinn ag dubh le beart amháin</string>
   <string name="retry">Atriail</string>
@@ -524,6 +533,7 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="performance">Caighdeán imeartha</string>
   <string name="tournamentComplete">Comórtas críochnaithe</string>
   <string name="movesPlayed">Bearta imeartha</string>
+  <string name="playerIndexWins">Buanna ag %s</string>
   <string name="whiteWins">Buanna ag bán</string>
   <string name="blackWins">Buanna ag dubh</string>
   <string name="draws">Comhscór</string>
@@ -879,6 +889,7 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="hideBestMove">Folaigh an beart is fearr</string>
   <string name="getAHint">Faigh leid</string>
   <string name="evaluatingYourMove">Ag meas do bheart ...</string>
+  <string name="playerIndexWinsGame">Bhuaigh %s</string>
   <string name="whiteWinsGame">Bhuaigh bán</string>
   <string name="blackWinsGame">Bhuaigh dubh</string>
   <string name="learnFromYourMistakes">Foghlaim ó do chuid botúin</string>
@@ -886,14 +897,17 @@ anailís ríomhaire, comhrá cluiche agus URL inroinnte.</string>
   <string name="skipThisMove">Ná bac leis an mbeart seo</string>
   <string name="next">Ar aghaidh</string>
   <string name="xWasPlayed">Imríodh %s</string>
+  <string name="findBetterMoveForPlayerIndex">Faigh beart níos fearr do %s</string>
   <string name="findBetterMoveForWhite">Faigh beart níos fearr do bán</string>
   <string name="findBetterMoveForBlack">Faigh beart níos fearr do dubh</string>
   <string name="resumeLearning">Atosaigh an fhoghlaim</string>
   <string name="youCanDoBetter">Tá beart níos fearr ann</string>
+  <string name="tryAnotherMoveForPlayerIndex">Triail beart %s eile</string>
   <string name="tryAnotherMoveForWhite">Triail beart bán eile</string>
   <string name="tryAnotherMoveForBlack">Triail beart dubh eile</string>
   <string name="solution">Réiteach</string>
   <string name="waitingForAnalysis">Ag fanacht ar anailís</string>
+  <string name="noMistakesFoundForPlayerIndex">Ní bhfuarthas aon bhotúin ó %s</string>
   <string name="noMistakesFoundForWhite">Ní bhfuarthas aon bhotúin ó bán</string>
   <string name="noMistakesFoundForBlack">Ní bhfuarthas aon bhotúin ó dubh</string>
   <string name="doneReviewingWhiteMistakes">Déanta ag athbhreithniú botúin bhána</string>

@@ -16,7 +16,7 @@ function renderSeek(ctrl: LobbyController, seek: Seek): VNode {
       },
     },
     tds([
-      h('span.is.is2.color-icon.' + (seek.color || 'random')),
+      h('span.is.is2.playerIndex-icon.' + (seek.playerColor || 'random')),
       seek.rating
         ? h(
             'span.ulpt',

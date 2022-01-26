@@ -57,14 +57,14 @@ export function ctrl(root: RoundController, step: Step, redraw: Redraw): Keyboar
     drop(key, piece) {
       const role = sanToRole[piece];
       const crazyData = root.data.crazyhouse;
-      const color = root.data.player.color;
+      const playerIndex = root.data.player.playerIndex;
       // Square occupied
       if (!role || !crazyData || cgState.pieces.has(key)) return;
       // Piece not in Pocket
-      if (!crazyData.pockets[color === 'white' ? 0 : 1][role]) return;
+      if (!crazyData.pockets[playerIndex === 'p1' ? 0 : 1][role]) return;
       if (!crazyValid(root.data, role, key)) return;
       root.chessground.cancelMove();
-      root.chessground.newPiece({ role, color }, key);
+      root.chessground.newPiece({ role, playerIndex }, key);
       root.sendNewPiece(role, key, root.data.game.variant.key, false);
     },
     promote(orig, dest, piece) {

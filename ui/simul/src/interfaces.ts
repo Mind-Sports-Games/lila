@@ -65,7 +65,7 @@ export interface Applicant {
 export interface Pairing {
   player: Player;
   variant: VariantKey;
-  hostColor: Color;
+  hostPlayerIndex: PlayerIndex;
   game: Game;
 }
 
@@ -74,10 +74,10 @@ export interface Game {
   status: number;
   fen: string;
   lastMove: string;
-  orient: Color;
+  orient: PlayerIndex;
   clock?: {
-    white: number;
-    black: number;
+    p1: number;
+    p2: number;
   };
-  winner?: Color;
+  winner?: PlayerIndex;
 }

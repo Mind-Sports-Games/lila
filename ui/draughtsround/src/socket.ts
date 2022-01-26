@@ -73,8 +73,8 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
   const handlers: Handlers = {
     takebackOffers(o) {
       ctrl.setLoading(false);
-      ctrl.data.player.proposingTakeback = o[ctrl.data.player.color];
-      const fromOp = (ctrl.data.opponent.proposingTakeback = o[ctrl.data.opponent.color]);
+      ctrl.data.player.proposingTakeback = o[ctrl.data.player.playerIndex];
+      const fromOp = (ctrl.data.opponent.proposingTakeback = o[ctrl.data.opponent.playerIndex]);
       if (fromOp) notify(ctrl.noarg('yourOpponentProposesATakeback'));
       ctrl.redraw();
     },
@@ -84,28 +84,28 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     redirect: ctrl.setRedirecting,
     clockInc(o) {
       if (ctrl.clock) {
-        ctrl.clock.addTime(o.color, o.time);
+        ctrl.clock.addTime(o.playerIndex, o.time);
         ctrl.redraw();
       }
     },
     cclock(o) {
       if (ctrl.corresClock) {
-        ctrl.data.correspondence.white = o.white;
-        ctrl.data.correspondence.black = o.black;
-        ctrl.corresClock.update(o.white, o.black);
+        ctrl.data.correspondence.p1 = o.p1;
+        ctrl.data.correspondence.p2 = o.p2;
+        ctrl.corresClock.update(o.p1, o.p2);
         ctrl.redraw();
       }
     },
     crowd(o) {
-      ['white', 'black'].forEach(c => {
-        if (defined(o[c])) game.setOnGame(ctrl.data, c as Color, o[c]);
+      ['p1', 'p2'].forEach(c => {
+        if (defined(o[c])) game.setOnGame(ctrl.data, c as PlayerIndex, o[c]);
       });
       ctrl.redraw();
     },
     endData: ctrl.endWithData,
-    rematchOffer(by: Color) {
-      ctrl.data.player.offeringRematch = by === ctrl.data.player.color;
-      if ((ctrl.data.opponent.offeringRematch = by === ctrl.data.opponent.color))
+    rematchOffer(by: PlayerIndex) {
+      ctrl.data.player.offeringRematch = by === ctrl.data.player.playerIndex;
+      if ((ctrl.data.opponent.offeringRematch = by === ctrl.data.opponent.playerIndex))
         notify(ctrl.noarg('yourOpponentWantsToPlayANewGameWithYou'));
       ctrl.redraw();
     },
@@ -116,27 +116,27 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     },
     drawOffer(by) {
       if (ctrl.isPlaying()) {
-        ctrl.data.player.offeringDraw = by === ctrl.data.player.color;
-        const fromOp = (ctrl.data.opponent.offeringDraw = by === ctrl.data.opponent.color);
+        ctrl.data.player.offeringDraw = by === ctrl.data.player.playerIndex;
+        const fromOp = (ctrl.data.opponent.offeringDraw = by === ctrl.data.opponent.playerIndex);
         if (fromOp) notify(ctrl.noarg('yourOpponentOffersADraw'));
       }
       if (by) {
         let ply = ctrl.lastPly();
-        if ((by == 'white') == (ply % 2 == 0)) ply++;
+        if ((by == 'p1') == (ply % 2 == 0)) ply++;
         ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([ply]);
       }
       ctrl.redraw();
     },
-    berserk(color: Color) {
-      ctrl.setBerserk(color);
+    berserk(playerIndex: PlayerIndex) {
+      ctrl.setBerserk(playerIndex);
     },
     gone: ctrl.setGone,
     goneIn: ctrl.setGone,
     kingMoves(e) {
       if (ctrl.data.pref.showKingMoves) {
         ctrl.draughtsground.setKingMoves({
-          white: { count: e.white, key: e.whiteKing },
-          black: { count: e.black, key: e.blackKing },
+          p1: { count: e.p1, key: e.p1King },
+          p2: { count: e.p2, key: e.p2King },
         });
         ctrl.redraw();
       }

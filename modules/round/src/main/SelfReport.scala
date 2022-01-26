@@ -14,7 +14,7 @@ final class SelfReport(
     proxyRepo: GameProxyRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  private val whitelist = Set("treehugger")
+  private val p1list = Set("treehugger")
 
   private val onceEvery = lila.memo.OnceEvery(1 hour)
 
@@ -24,7 +24,7 @@ final class SelfReport(
       fullId: Game.FullId,
       name: String
   ): Funit =
-    !userId.exists(whitelist.contains) ?? {
+    !userId.exists(p1list.contains) ?? {
       userId.??(userRepo.named) flatMap { user =>
         val known = user.exists(_.marks.engine)
         lila.mon.cheat.cssBot.increment()
@@ -60,7 +60,7 @@ final class SelfReport(
                     name.contains("__puppeteer_evaluation_script__")
                 ))
               ) fuccess {
-                if (userId.isDefined) tellRound(pov.gameId, lila.round.actorApi.round.Cheat(pov.color))
+                if (userId.isDefined) tellRound(pov.gameId, lila.round.actorApi.round.Cheat(pov.playerIndex))
                 user.ifTrue(name == "cma") foreach { u =>
                   lila.common.Bus.publish(lila.hub.actorApi.mod.SelfReportMark(u.id, name), "selfReportMark")
                 }

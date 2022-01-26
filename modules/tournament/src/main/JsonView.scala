@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Black, White, Clock }
+import strategygames.{ P2, P1, Clock }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -199,7 +199,8 @@ final class JsonView(
             Json
               .obj(
                 "id"     -> pov.gameId,
-                "color"  -> pov.color.name,
+                "playerIndex" -> pov.playerIndex.name,
+                "playerColor" -> tour.variant.playerColors(pov.playerIndex),
                 "op"     -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
                 "win"    -> score.flatMap(_.isWin),
                 "status" -> pov.game.status.id,
@@ -293,23 +294,23 @@ final class JsonView(
         "gameLogic"   -> game.variant.gameLogic.name.toLowerCase(),
         "gameFamily"  -> game.variant.gameFamily.shortName.toLowerCase(),
         "variantKey"  -> game.variant.key,
-        "fen"         -> Forsyth.boardAndColor(game.variant.gameLogic, game.situation),
+        "fen"         -> Forsyth.boardAndPlayer(game.variant.gameLogic, game.situation),
         "orientation" -> game.naturalOrientation.name,
-        "color"       -> game.naturalOrientation.name, // app BC https://github.com/ornicar/lila/issues/7195
+        "color"       -> game.variant.playerNames(game.naturalOrientation), // app BC https://github.com/ornicar/lila/issues/7195
         "lastMove"    -> ~game.lastMoveKeys,
-        "white"       -> ofPlayer(featured.white, game player White),
-        "black"       -> ofPlayer(featured.black, game player Black)
+        "p1"       -> ofPlayer(featured.p1, game player P1),
+        "p2"       -> ofPlayer(featured.p2, game player P2)
       )
       .add(
         // not named `clock` to avoid conflict with lichobile
         "c" -> game.clock.ifTrue(game.isBeingPlayed).map { c =>
           Json.obj(
-            "white" -> c.remainingTime(White).roundSeconds,
-            "black" -> c.remainingTime(Black).roundSeconds
+            "p1" -> c.remainingTime(P1).roundSeconds,
+            "p2" -> c.remainingTime(P2).roundSeconds
           )
         }
       )
-      .add("winner" -> game.winnerColor.map(_.name))
+      .add("winner" -> game.winnerPlayerIndex.map(_.name))
       .add("boardSize" -> boardSizeJson(game.variant))
   }
 

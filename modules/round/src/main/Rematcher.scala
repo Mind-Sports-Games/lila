@@ -3,7 +3,7 @@ package lila.round
 import strategygames.format.Forsyth
 import strategygames.chess.variant._
 import strategygames.variant.Variant
-import strategygames.{ Black, Clock, Color, Game => ChessGame, Board, Situation, History, White, Mode, Piece, PieceMap, Pos }
+import strategygames.{ P2, Clock, Player => PlayerIndex, Game => ChessGame, Board, Situation, History, P1, Mode, Piece, PieceMap, Pos }
 import strategygames.chess.Castles
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
@@ -43,12 +43,12 @@ final private class Rematcher(
 
   private val chess960 = new ExpireSetMemo(3 hours)
 
-  def isOffering(pov: Pov): Boolean = offers.getIfPresent(pov.gameId).exists(_(pov.color))
+  def isOffering(pov: Pov): Boolean = offers.getIfPresent(pov.gameId).exists(_(pov.playerIndex))
 
   def yes(pov: Pov): Fu[Events] =
     pov match {
-      case Pov(game, color) if game.playerCouldRematch =>
-        if (isOffering(!pov) || game.opponent(color).isAi)
+      case Pov(game, playerIndex) if game.playerCouldRematch =>
+        if (isOffering(!pov) || game.opponent(playerIndex).isAi)
           rematches.of(game.id).fold(rematchJoin(pov.game))(rematchExists(pov))
         else if (!declined.get(pov.flip.fullId) && rateLimit(pov.fullId)(true)(false))
           fuccess(rematchCreate(pov))
@@ -97,8 +97,8 @@ final private class Rematcher(
     pov.opponent.userId foreach { forId =>
       Bus.publish(lila.hub.actorApi.round.RematchOffer(pov.gameId), s"rematchFor:$forId")
     }
-    offers.put(pov.gameId, Offers(white = pov.color.white, black = pov.color.black))
-    List(Event.RematchOffer(by = pov.color.some))
+    offers.put(pov.gameId, Offers(p1 = pov.playerIndex.p1, p2 = pov.playerIndex.p2))
+    List(Event.RematchOffer(by = pov.playerIndex.some))
   }
 
   private def chessPieceMap(pieces: strategygames.chess.PieceMap): PieceMap =
@@ -141,7 +141,7 @@ final private class Rematcher(
           situation = Situation(
             game.variant.gameLogic,
             board = board,
-            color = situation.fold[Color](White)(_.situation.color)
+            player = situation.fold[PlayerIndex](P1)(_.situation.player)
           ),
           clock = game.clock map { c =>
             Clock(c.config)
@@ -149,8 +149,8 @@ final private class Rematcher(
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)
         ),
-        whitePlayer = returnPlayer(game, White, users),
-        blackPlayer = returnPlayer(game, Black, users),
+        p1Player = returnPlayer(game, P1, users),
+        p2Player = returnPlayer(game, P2, users),
         mode = if (users.exists(_.lame)) Mode.Casual else game.mode,
         source = game.source | Source.Lobby,
         daysPerTurn = game.daysPerTurn,
@@ -160,13 +160,13 @@ final private class Rematcher(
     } yield game
   }
 
-  private def returnPlayer(game: Game, color: Color, users: List[User]): lila.game.Player =
-    game.opponent(color).aiLevel match {
-      case Some(ai) => lila.game.Player.make(color, ai.some)
+  private def returnPlayer(game: Game, playerIndex: PlayerIndex, users: List[User]): lila.game.Player =
+    game.opponent(playerIndex).aiLevel match {
+      case Some(ai) => lila.game.Player.make(playerIndex, ai.some)
       case None =>
         lila.game.Player.make(
-          color,
-          game.opponent(color).userId.flatMap { id =>
+          playerIndex,
+          game.opponent(playerIndex).userId.flatMap { id =>
             users.find(_.id == id)
           },
           PerfPicker.mainOrDefault(game)
@@ -174,11 +174,11 @@ final private class Rematcher(
     }
 
   private def redirectEvents(game: Game): Events = {
-    val whiteId = game fullIdOf White
-    val blackId = game fullIdOf Black
+    val p1Id = game fullIdOf P1
+    val p2Id = game fullIdOf P2
     List(
-      Event.RedirectOwner(White, blackId, AnonCookie.json(game pov Black)),
-      Event.RedirectOwner(Black, whiteId, AnonCookie.json(game pov White)),
+      Event.RedirectOwner(P1, p2Id, AnonCookie.json(game pov P2)),
+      Event.RedirectOwner(P2, p1Id, AnonCookie.json(game pov P1)),
       // tell spectators about the rematch
       Event.RematchTaken(game.id)
     )
@@ -187,7 +187,7 @@ final private class Rematcher(
 
 private object Rematcher {
 
-  case class Offers(white: Boolean, black: Boolean) {
-    def apply(color: Color) = color.fold(white, black)
+  case class Offers(p1: Boolean, p2: Boolean) {
+    def apply(playerIndex: PlayerIndex) = playerIndex.fold(p1, p2)
   }
 }

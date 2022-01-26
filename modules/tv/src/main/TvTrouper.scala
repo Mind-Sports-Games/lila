@@ -68,7 +68,7 @@ final private[tv] class TvTrouper(
       val data = Json.obj(
         "channel" -> channel.key,
         "id"      -> game.id,
-        "color"   -> game.naturalOrientation.name,
+        "playerIndex"   -> game.naturalOrientation.name,
         "player" -> user.map { u =>
           Json.obj(
             "name"   -> u.name,
@@ -88,7 +88,7 @@ final private[tv] class TvTrouper(
               "featured",
               Json.obj(
                 "html"  -> html,
-                "color" -> pov.color.name,
+                "playerIndex" -> pov.playerIndex.name,
                 "id"    -> game.id
               )
             )

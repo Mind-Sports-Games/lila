@@ -57,7 +57,7 @@ export interface NowPlaying {
   fullId: string;
   gameId: string;
   fen: Fen;
-  color: Color;
+  playerIndex: PlayerIndex;
   lastMove: string;
   variant: Variant;
   speed: string;

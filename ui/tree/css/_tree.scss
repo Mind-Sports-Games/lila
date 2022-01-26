@@ -207,6 +207,15 @@ $c-blunder: #df5353;
     max-width: 9em;
   }
 
+  &-column comment.p1 {
+    border-left: 3px solid;
+  }
+
+  &-column comment.p2 {
+    border-right: 3px solid;
+    overflow-x: hidden;
+  }
+
   &-column comment.white {
     border-left: 3px solid;
   }
