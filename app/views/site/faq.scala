@@ -192,15 +192,18 @@ object faq {
             )
           ),
           ol(
-            li(havePlayedMoreThanThirtyGamesInThatRating()),
-            li(havePlayedARatedGameAtLeastOneWeekAgo()),
-            li(
-              ratingDeviationLowerThanXinChessYinVariants(
-                lila.rating.Glicko.standardRankableDeviation,
-                lila.rating.Glicko.variantRankableDeviation
-              )
-            ),
-            li(beInTopTen())
+            // //change back when more regular users
+            // li(havePlayedMoreThanThirtyGamesInThatRating()),
+            // li(havePlayedARatedGameAtLeastOneWeekAgo()),
+            // li(
+            //   ratingDeviationLowerThanXinChessYinVariants(
+            //     lila.rating.Glicko.standardRankableDeviation,
+            //     lila.rating.Glicko.variantRankableDeviation
+            //   )
+            // ),
+            // li(beInTopTen())
+            li(beInTopTen()),
+            li(havePlayedARatedGameAtLeastOneMonthAgo())
           ),
           p(
             secondRequirementToStopOldPlayersTrustingLeaderboards()
