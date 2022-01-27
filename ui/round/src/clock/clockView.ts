@@ -8,13 +8,13 @@ import { Position } from '../interfaces';
 
 export function renderClock(ctrl: RoundController, player: game.Player, position: Position) {
   const clock = ctrl.clock!,
-    millis = clock.millisOf(player.color),
-    isPlayer = ctrl.data.player.color === player.color,
-    isRunning = player.color === clock.times.activeColor;
+    millis = clock.millisOf(player.playerIndex),
+    isPlayer = ctrl.data.player.playerIndex === player.playerIndex,
+    isRunning = player.playerIndex === clock.times.activePlayerIndex;
   const update = (el: HTMLElement) => {
-    const els = clock.elements[player.color],
-      millis = clock.millisOf(player.color),
-      isRunning = player.color === clock.times.activeColor;
+    const els = clock.elements[player.playerIndex],
+      millis = clock.millisOf(player.playerIndex),
+      isRunning = player.playerIndex === clock.times.activePlayerIndex;
     els.time = el;
     els.clock = el.parentElement!;
     el.innerHTML = formatClockTime(millis, clock.showTenths(millis), isRunning, clock.opts.nvui);
@@ -40,16 +40,16 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
           }),
         ]
       : [
-          clock.showBar && game.bothPlayersHavePlayed(ctrl.data) ? showBar(ctrl, player.color) : undefined,
+          clock.showBar && game.bothPlayersHavePlayed(ctrl.data) ? showBar(ctrl, player.playerIndex) : undefined,
           h('div.time', {
             class: {
               hour: millis > 3600 * 1000,
             },
             hook: timeHook,
           }),
-          renderBerserk(ctrl, player.color, position),
+          renderBerserk(ctrl, player.playerIndex, position),
           isPlayer ? goBerserk(ctrl) : button.moretime(ctrl),
-          tourRank(ctrl, player.color, position),
+          tourRank(ctrl, player.playerIndex, position),
         ]
   );
 }
@@ -86,31 +86,31 @@ function formatClockTime(time: Millis, showTenths: boolean, isRunning: boolean, 
   }
 }
 
-function showBar(ctrl: RoundController, color: Color) {
+function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
   const clock = ctrl.clock!;
   const update = (el: HTMLElement) => {
     if (el.animate !== undefined) {
-      let anim = clock.elements[color].barAnim;
+      let anim = clock.elements[playerIndex].barAnim;
       if (anim === undefined || !anim.effect || (anim.effect as KeyframeEffect).target !== el) {
         anim = el.animate([{ transform: 'scale(1)' }, { transform: 'scale(0, 1)' }], {
           duration: clock.barTime,
           fill: 'both',
         });
-        clock.elements[color].barAnim = anim;
+        clock.elements[playerIndex].barAnim = anim;
       }
-      const remaining = clock.millisOf(color);
+      const remaining = clock.millisOf(playerIndex);
       anim.currentTime = clock.barTime - remaining;
-      if (color === clock.times.activeColor) {
+      if (playerIndex === clock.times.activePlayerIndex) {
         // Calling play after animations finishes restarts anim
         if (remaining > 0) anim.play();
       } else anim.pause();
     } else {
-      clock.elements[color].bar = el;
-      el.style.transform = 'scale(' + clock.timeRatio(clock.millisOf(color)) + ',1)';
+      clock.elements[playerIndex].bar = el;
+      el.style.transform = 'scale(' + clock.timeRatio(clock.millisOf(playerIndex)) + ',1)';
     }
   };
   return h('div.bar', {
-    class: { berserk: !!ctrl.goneBerserk[color] },
+    class: { berserk: !!ctrl.goneBerserk[playerIndex] },
     hook: {
       insert: vnode => update(vnode.elm as HTMLElement),
       postpatch: (_, vnode) => update(vnode.elm as HTMLElement),
@@ -128,17 +128,17 @@ export function updateElements(clock: ClockController, els: ClockElements, milli
   }
 }
 
-function showBerserk(ctrl: RoundController, color: Color): boolean {
-  return !!ctrl.goneBerserk[color] && ctrl.data.game.turns <= 1 && game.playable(ctrl.data);
+function showBerserk(ctrl: RoundController, playerIndex: PlayerIndex): boolean {
+  return !!ctrl.goneBerserk[playerIndex] && ctrl.data.game.turns <= 1 && game.playable(ctrl.data);
 }
 
-function renderBerserk(ctrl: RoundController, color: Color, position: Position) {
-  return showBerserk(ctrl, color) ? h('div.berserked.' + position, justIcon('`')) : null;
+function renderBerserk(ctrl: RoundController, playerIndex: PlayerIndex, position: Position) {
+  return showBerserk(ctrl, playerIndex) ? h('div.berserked.' + position, justIcon('`')) : null;
 }
 
 function goBerserk(ctrl: RoundController) {
   if (!game.berserkableBy(ctrl.data)) return;
-  if (ctrl.goneBerserk[ctrl.data.player.color]) return;
+  if (ctrl.goneBerserk[ctrl.data.player.playerIndex]) return;
   return h('button.fbt.go-berserk', {
     attrs: {
       title: 'GO BERSERK! Half the time, no increment, bonus point',
@@ -148,16 +148,16 @@ function goBerserk(ctrl: RoundController) {
   });
 }
 
-function tourRank(ctrl: RoundController, color: Color, position: Position) {
+function tourRank(ctrl: RoundController, playerIndex: PlayerIndex, position: Position) {
   const d = ctrl.data,
     ranks = d.tournament?.ranks || d.swiss?.ranks;
-  return ranks && !showBerserk(ctrl, color)
+  return ranks && !showBerserk(ctrl, playerIndex)
     ? h(
         'div.tour-rank.' + position,
         {
           attrs: { title: 'Current tournament rank' },
         },
-        '#' + ranks[color]
+        '#' + ranks[playerIndex]
       )
     : null;
 }

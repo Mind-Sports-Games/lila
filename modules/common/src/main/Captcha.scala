@@ -5,7 +5,7 @@ import cats.data.NonEmptyList
 case class Captcha(
     gameId: String,
     fenBoard: String,
-    white: Boolean,
+    p1: Boolean,
     solutions: Captcha.Solutions,
     moves: Map[String, String]
 ) {
@@ -20,7 +20,7 @@ object Captcha {
   val default = Captcha(
     gameId = "00000000",
     fenBoard = "1k3b1r/r5pp/pNQppq2/2p5/4P3/P3B3/1P3PPP/n4RK1",
-    white = true,
+    p1 = true,
     solutions = NonEmptyList.one("c6 c8"),
     moves = Map("c6" -> "c8")
   )

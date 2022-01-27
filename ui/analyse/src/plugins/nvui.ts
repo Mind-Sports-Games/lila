@@ -64,8 +64,8 @@ playstrategy.AnalyseNVUI = function (redraw: Redraw) {
         h('div.nvui', [
           h('h1', 'Textual representation'),
           h('h2', 'Game info'),
-          ...['white', 'black'].map((color: Color) =>
-            h('p', [color + ' player: ', renderPlayer(ctrl, playerByColor(d, color))])
+          ...['p1', 'p2'].map((playerIndex: PlayerIndex) =>
+            h('p', [playerIndex + ' player: ', renderPlayer(ctrl, playerByPlayerIndex(d, playerIndex))])
           ),
           h('p', `${d.game.rated ? 'Rated' : 'Casual'} ${d.game.perf}`),
           d.clock ? h('p', `Clock: ${d.clock.initial / 60} + ${d.clock.increment}`) : null,
@@ -134,8 +134,8 @@ playstrategy.AnalyseNVUI = function (redraw: Redraw) {
                   const $board = $(el.elm as HTMLElement);
                   $board.on('keypress', boardCommandsHandler());
                   const $buttons = $board.find('button');
-                  $buttons.on('click', selectionHandler(ctrl.data.opponent.color, selectSound));
-                  $buttons.on('keydown', arrowKeyHandler(ctrl.data.player.color, borderSound));
+                  $buttons.on('click', selectionHandler(ctrl.data.opponent.playerIndex, selectSound));
+                  $buttons.on('keydown', arrowKeyHandler(ctrl.data.player.playerIndex, borderSound));
                   $buttons.on('keypress', positionJumpHandler());
                   $buttons.on('keypress', pieceJumpingHandler(wrapSound, errorSound));
                 },
@@ -143,7 +143,7 @@ playstrategy.AnalyseNVUI = function (redraw: Redraw) {
             },
             renderBoard(
               ctrl.chessground.state.pieces,
-              ctrl.data.player.color,
+              ctrl.data.player.playerIndex,
               pieceStyle.get(),
               prefixStyle.get(),
               positionStyle.get(),
@@ -233,9 +233,9 @@ function renderAcpl(ctrl: AnalyseController, style: Style): MaybeVNodes | undefi
   if (!anal) return undefined;
   const analysisNodes = ctrl.mainline.filter(n => (n.glyphs || []).find(g => analysisGlyphs.includes(g.symbol)));
   const res: Array<VNode> = [];
-  ['white', 'black'].forEach((color: Color) => {
-    const acpl = anal[color].acpl;
-    res.push(h('h3', `${color} player: ${acpl} ACPL`));
+  ['p1', 'p2'].forEach((playerIndex: PlayerIndex) => {
+    const acpl = anal[playerIndex].acpl;
+    res.push(h('h3', `${playerIndex} player: ${acpl} ACPL`));
     res.push(
       h(
         'select',
@@ -246,7 +246,7 @@ function renderAcpl(ctrl: AnalyseController, style: Style): MaybeVNodes | undefi
           }),
         },
         analysisNodes
-          .filter(n => (n.ply % 2 === 1) === (color === 'white'))
+          .filter(n => (n.ply % 2 === 1) === (playerIndex === 'p1'))
           .map(node =>
             h(
               'option',
@@ -360,6 +360,6 @@ function userHtml(ctrl: AnalyseController, player: Player) {
     : 'Anonymous';
 }
 
-function playerByColor(d: AnalyseData, color: Color) {
-  return color === d.player.color ? d.player : d.opponent;
+function playerByPlayerIndex(d: AnalyseData, playerIndex: PlayerIndex) {
+  return playerIndex === d.player.playerIndex ? d.player : d.opponent;
 }

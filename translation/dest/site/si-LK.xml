@@ -20,6 +20,7 @@
   <string name="black">කළු</string>
   <string name="randomColor">අහඹු පැත්ත</string>
   <string name="createAGame">ක්‍රීඩාවක් නිර්මාණය කරන්න</string>
+  <string name="playerIndexIsVictorious">%s ජයග්‍රාහී වේ</string>
   <string name="whiteIsVictorious">සුදු ජයග්‍රාහී වේ</string>
   <string name="blackIsVictorious">කළු ජයග්‍රාහී වේ</string>
   <string name="youPlayTheWhitePieces">You play the white pieces</string>
@@ -32,6 +33,7 @@
   <string name="newOpponent">නව ප්‍රතිවාදියා</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">ඔබේ ප්‍රතිවාදියාට ඔබ සමඟ නව ක්‍රීඩාවක් කිරීමට අවශ්‍යයි</string>
   <string name="joinTheGame">ක්‍රීඩාවට සම්බන්ධ වන්න</string>
+  <string name="playerIndexPlays">සෙල්ලම් කිරීමට %s</string>
   <string name="whitePlays">සෙල්ලම් කිරීමට සුදු</string>
   <string name="blackPlays">සෙල්ලම් කිරීමට කළු</string>
   <string name="opponentLeftChoices">අනෙක් ක්‍රීඩකයා ක්‍රීඩාවෙන් ඉවත් වන්නට ඇත. ඔබට ජයග්‍රහණයට හිමිකම් කීමට, ක්‍රීඩාව දිනුම් ඇදීමක් ලෙස හැඳින්විමට, නැතහොත් රැඳී සිටින්න.</string>
@@ -40,8 +42,10 @@
   <string name="forceDraw">ඇමතුම් දිනුම් ඇදීම</string>
   <string name="talkInChat">කරුණාකර පිළිසඳරෙහි දී හොඳින් හැසිරෙන්න!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">මෙම URL වෙත පැමිණි පළමු පුද්ගලයා ඔබ සමඟ සෙල්ලම් කරනු ඇත.</string>
+  <string name="playerIndexResigned">%s ඉල්ලා අස්</string>
   <string name="whiteResigned">සුදු ඉල්ලා අස්</string>
   <string name="blackResigned">කළු ඉල්ලා අස්විය</string>
+  <string name="playerIndexLeftTheGame">%s ක්‍රීඩාවෙන් ඉවත් විය</string>
   <string name="whiteLeftTheGame">සුදු ක්‍රීඩාවෙන් ඉවත් විය</string>
   <string name="blackLeftTheGame">කළු ක්‍රීඩාවෙන් ඉවත් විය</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">ප්‍රේක්ෂකයින්ට ක්‍රීඩාව බැලීමට මෙම URL බෙදාගන්න</string>

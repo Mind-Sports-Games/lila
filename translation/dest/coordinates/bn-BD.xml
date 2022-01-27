@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">স্থানাংকসমূহ</string>
   <string name="coordinateTraining">স্থানাংক প্রশিক্ষণ</string>
+  <string name="averageScoreAsPlayerIndexX">%1$s হিসাবে গড় মান: %2$s</string>
   <string name="averageScoreAsWhiteX">সাদা হিসাবে গড় মান: %s</string>
   <string name="averageScoreAsBlackX">কালো হিসাবে গড় মান: %s</string>
   <string name="knowingTheChessBoard">দাবার বোর্ড জানার জন্য স্থানাংক হয় একটি গুরুত্বপূর্ন দাবার দক্ষতা:</string>

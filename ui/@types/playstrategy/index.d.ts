@@ -48,7 +48,7 @@ interface PlayStrategy {
     init(node: HTMLElement): string | null;
     initAll(parent?: HTMLElement): void;
     update(node: HTMLElement, data: GameUpdate): void;
-    finish(node: HTMLElement, win?: Color): void;
+    finish(node: HTMLElement, win?: PlayerIndex): void;
   };
   ab?: any;
 
@@ -202,7 +202,7 @@ interface PlayStrategyAnnouncement {
 
 interface PlayStrategyEditor {
   getFen(): string;
-  setOrientation(o: Color): void;
+  setOrientation(o: PlayerIndex): void;
 }
 
 declare namespace Editor {
@@ -339,8 +339,11 @@ declare type Perf =
   | 'minishogi'
   | 'minixiangqi';
 
-declare type Color = 'white' | 'black';
-declare type Orientation = 'white' | 'black' | 'left' | 'right';
+//declare type Color = 'white' | 'black';
+declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red';
+declare type PlayerIndex = 'p1' | 'p2';
+declare type PlayerColor = 'white' | 'black';
+declare type Orientation = 'p1' | 'p2' | 'left' | 'right';
 
 declare type PageVariant = VariantKey | DraughtsVariantKey | undefined;
 declare type GameFamilyKey = 'chess' | 'draughts' | 'loa' | 'shogi' | 'xiangqi';
@@ -464,7 +467,7 @@ declare namespace Tree {
   }
 
   export interface TablebaseHit {
-    winner: Color | undefined;
+    winner: PlayerIndex | undefined;
     best?: Uci;
   }
 

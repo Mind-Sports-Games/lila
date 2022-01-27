@@ -76,9 +76,9 @@ private[study] object CommentParser {
       case circlesRegex(str) =>
         val circles = str.split(',').toList.map(_.trim).flatMap { c =>
           for {
-            color <- c.headOption
+            playerIndex <- c.headOption
             pos   <- Pos.fromKey(GameLogic.Chess(), c.drop(1))
-          } yield Shape.Circle(toBrush(color), pos)
+          } yield Shape.Circle(toBrush(playerIndex), pos)
         }
         Shapes(circles) -> circlesRemoveRegex.replaceAllIn(comment, "").trim
       case _ => Shapes(Nil) -> comment
@@ -89,17 +89,17 @@ private[study] object CommentParser {
       case arrowsRegex(str) =>
         val arrows = str.split(',').toList.flatMap { c =>
           for {
-            color <- c.headOption
+            playerIndex <- c.headOption
             orig  <- Pos.fromKey(GameLogic.Chess(), c.slice(1, 3))
             dest  <- Pos.fromKey(GameLogic.Chess(), c.slice(3, 5))
-          } yield Shape.Arrow(toBrush(color), orig, dest)
+          } yield Shape.Arrow(toBrush(playerIndex), orig, dest)
         }
         Shapes(arrows) -> arrowsRemoveRegex.replaceAllIn(comment, "").trim
       case _ => Shapes(Nil) -> comment
     }
 
-  private def toBrush(color: Char): Shape.Brush =
-    color match {
+  private def toBrush(playerIndex: Char): Shape.Brush =
+    playerIndex match {
       case 'G' => "green"
       case 'R' => "red"
       case 'Y' => "yellow"

@@ -113,12 +113,12 @@ function previousLocationsOfPiece(role: string, dest: string): string[] {
     case 'N':
       sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 2).toString());
       sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 2).toString());
-      break; // n-piece (white)
+      break; // n-piece (p1)
 
     case 'n':
       sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) - 2).toString());
       sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) - 2).toString());
-      break; // n-piece (black)
+      break; // n-piece (p2)
 
     case 'S':
       sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 1).toString());
@@ -126,7 +126,7 @@ function previousLocationsOfPiece(role: string, dest: string): string[] {
       sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 1).toString());
       sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) - 1).toString());
       sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) - 1).toString());
-      break; // s-piece (white)
+      break; // s-piece (p1)
 
     case 's':
       sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) - 1).toString());
@@ -134,7 +134,7 @@ function previousLocationsOfPiece(role: string, dest: string): string[] {
       sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) - 1).toString());
       sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 1).toString());
       sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 1).toString());
-      break; // s-piece (black)
+      break; // s-piece (p2)
 
     case 'b':
     case 'B':
@@ -167,7 +167,7 @@ function previousLocationsOfPiece(role: string, dest: string): string[] {
       sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 0).toString());
       sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 0).toString());
       sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) - 1).toString());
-      break; // g-piece (white)
+      break; // g-piece (p1)
 
     case '+s':
     case '+n':
@@ -180,7 +180,7 @@ function previousLocationsOfPiece(role: string, dest: string): string[] {
       sb.push((parseInt(dest[0]) - 1).toString() + (parseInt(dest[1]) + 0).toString());
       sb.push((parseInt(dest[0]) + 1).toString() + (parseInt(dest[1]) + 0).toString());
       sb.push((parseInt(dest[0]) + 0).toString() + (parseInt(dest[1]) + 1).toString());
-      break; // g-piece (black)
+      break; // g-piece (p2)
 
     case '+b':
     case '+B':
@@ -250,7 +250,7 @@ function xiangqiNotation(move: ExtendedMoveInfo, variant: Variant): string {
     board = readFen(move.fen, variant.boardSize.height, variant.boardSize.width),
     role = board.pieces[parsed.dest],
     piece = xiangqiRoleToPiece(role),
-    //converting to xiangiq from shogi board notation -> ranks: black=1, white=10 ; rows: left-right white pov, 9-1 for white, 1-9 black
+    //converting to xiangqi from shogi board notation -> ranks: p2=1, p1=10 ; rows: left-right p1 pov, 9-1 for p1, 1-9 p2
     prevFile = board.wMoved ? parseInt(parsed.orig[0]) : variant.boardSize.width + 1 - parseInt(parsed.orig[0]),
     prevRank = parseInt(parsed.orig.slice(1)),
     newFile = board.wMoved ? parseInt(parsed.dest[0]) : variant.boardSize.width + 1 - parseInt(parsed.dest[0]),

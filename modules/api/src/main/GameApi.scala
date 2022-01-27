@@ -212,7 +212,7 @@ final private[api] class GameApi(
         "createdAt"  -> g.createdAt,
         "lastMoveAt" -> g.movedAt,
         "turns"      -> g.turns,
-        "color"      -> g.turnColor.name,
+        "playerIndex"      -> g.turnPlayerIndex.name,
         "status"     -> g.status.name,
         "clock" -> g.clock.map { clock =>
           Json.obj(
@@ -223,7 +223,7 @@ final private[api] class GameApi(
         },
         "daysPerTurn" -> g.daysPerTurn,
         "players" -> JsObject(g.players map { p =>
-          p.color.name -> Json
+          p.playerIndex.name -> Json
             .obj(
               "userId"     -> p.userId,
               "rating"     -> p.rating,
@@ -231,9 +231,9 @@ final private[api] class GameApi(
             )
             .add("name", p.name)
             .add("provisional" -> p.provisional)
-            .add("moveCentis" -> withFlags.moveTimes ?? g.moveTimes(p.color).map(_.map(_.centis)))
+            .add("moveCentis" -> withFlags.moveTimes ?? g.moveTimes(p.playerIndex).map(_.map(_.centis)))
             .add("blurs" -> withFlags.blurs.option(p.blurs.nb))
-            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.color)))
+            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
         }),
         "analysis" -> analysisOption.ifTrue(withFlags.analysis).map(analysisJson.moves(_)),
         "moves"    -> withFlags.moves.option(g.variant match {
@@ -272,7 +272,7 @@ final private[api] class GameApi(
               JsArray(boards.map{b => Forsyth.exportBoard(b.variant.gameLogic, b)} map JsString.apply)
           }
         },
-        "winner" -> g.winnerColor.map(_.name),
+        "winner" -> g.winnerPlayerIndex.map(_.name),
         "url"    -> makeUrl(g)
       )
       .noNull

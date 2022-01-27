@@ -19,25 +19,22 @@ export default function status(ctrl: Ctrl): string {
       }
       return '';
     case 'resign':
-      return noarg(d.game.winner == 'white' ? 'blackResigned' : 'whiteResigned');
+      return ctrl.trans('playerIndexResigned', d.game.loserPlayer ? d.game.loserPlayer : '');
     case 'stalemate':
       return noarg('stalemate');
     case 'timeout':
-      switch (d.game.winner) {
-        case 'white':
-          return noarg('blackLeftTheGame');
-        case 'black':
-          return noarg('whiteLeftTheGame');
-      }
-      return noarg('draw');
+      return d.game.loserPlayer ? ctrl.trans('playerIndexLeftTheGame', d.game.loserPlayer) : noarg('draw');
     case 'draw':
       return noarg('draw');
     case 'outoftime':
-      return `${d.game.turns % 2 === 0 ? noarg('whiteTimeOut') : noarg('blackTimeOut')}${
-        d.game.winner ? '' : ` • ${noarg('draw')}`
-      }`;
+      //return `${d.game.turns % 2 === 0 ? noarg('whiteTimeOut') : noarg('blackTimeOut')}${
+      //  d.game.winner ? '' : ` • ${noarg('draw')}`
+      //}`;
+      return d.game.loserPlayer
+        ? ctrl.trans('playerIndexTimeOut', d.game.loserPlayer)
+        : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
     case 'noStart':
-      return (d.game.winner == 'white' ? 'Black' : 'White') + " didn't move";
+      return d.game.loserPlayer + " didn't move";
     case 'cheat':
       return noarg('cheatDetected');
     case 'perpetualCheck':

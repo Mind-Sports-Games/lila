@@ -6,7 +6,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
-import lila.pref.Pref.Color
+import lila.pref.Pref.PlayerOrder
 import play.api.i18n.Lang
 
 import controllers.routes
@@ -32,7 +32,7 @@ object coordinate {
       main(
         id := "trainer",
         cls := "coord-trainer training init",
-        attr("data-color-pref") := ctx.pref.coordColorName,
+        attr("data-playerindex-pref") := ctx.pref.coordPlayerIndexName,
         attr("data-score-url") := ctx.isAuth.option(routes.Coordinate.score.url)
       )(
         div(cls := "coord-trainer__side")(
@@ -42,18 +42,18 @@ object coordinate {
               div(cls := "scores")(scoreCharts(score))
             }
           ),
-          form(cls := "color buttons", action := routes.Coordinate.color, method := "post")(
+          form(cls := "playerIndex buttons", action := routes.Coordinate.playerIndex, method := "post")(
             st.group(cls := "radio")(
-              List(Color.BLACK, Color.RANDOM, Color.WHITE).map { id =>
+              List(PlayerOrder.P1, PlayerOrder.RANDOM, PlayerOrder.P2).map { id =>
                 div(
                   input(
                     tpe := "radio",
-                    st.id := s"coord_color_$id",
-                    name := "color",
+                    st.id := s"coord_playerIndex_$id",
+                    name := "playerIndex",
                     value := id,
-                    (id == ctx.pref.coordColor) option checked
+                    (id == ctx.pref.coordPlayerIndex) option checked
                   ),
-                  label(`for` := s"coord_color_$id", cls := s"color color_$id")(i)
+                  label(`for` := s"coord_playerIndex_$id", cls := s"playerIndex playerIndex_$id")(i)
                 )
               }
             )
@@ -91,12 +91,15 @@ object coordinate {
   def scoreCharts(score: lila.coordinate.Score)(implicit ctx: Context) =
     frag(
       List(
-        (trans.coordinates.averageScoreAsWhiteX, score.white),
-        (trans.coordinates.averageScoreAsBlackX, score.black)
-      ).map { case (averageScoreX, s) =>
+        (trans.white.txt(), score.p1),
+        (trans.black.txt(), score.p2)
+      ).map { case (transPlayer, s) =>
         div(cls := "chart_container")(
           s.nonEmpty option frag(
-            p(averageScoreX(raw(s"""<strong>${"%.2f".format(s.sum.toDouble / s.size)}</strong>"""))),
+            p(trans.coordinates.averageScoreAsPlayerIndexX(
+              transPlayer,
+              raw(s"""<strong>${"%.2f".format(s.sum.toDouble / s.size)}</strong>""")
+            )),
             div(cls := "user_chart", attr("data-points") := safeJsonValue(Json toJson s))
           )
         )

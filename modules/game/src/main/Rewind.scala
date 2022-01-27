@@ -34,23 +34,23 @@ object Rewind {
             tags = createTags(initialFen, game)
           )
     }).flatMap(_.valid) map { replay =>
-      val color        = game.turnColor
+      val playerIndex        = game.turnPlayerIndex
       val rewindedGame = replay.state
       val newClock = game.clock.map(_.takeback) map { clk =>
-        game.clockHistory.flatMap(_.last(color)).fold(clk) { t =>
-          clk.setRemainingTime(color, t)
+        game.clockHistory.flatMap(_.last(playerIndex)).fold(clk) { t =>
+          clk.setRemainingTime(playerIndex, t)
         }
       }
       def rewindPlayer(player: Player) = player.copy(proposeTakebackAt = 0)
       val newGame = game.copy(
-        whitePlayer = rewindPlayer(game.whitePlayer),
-        blackPlayer = rewindPlayer(game.blackPlayer),
+        p1Player = rewindPlayer(game.p1Player),
+        p2Player = rewindPlayer(game.p2Player),
         chess = rewindedGame.copy(clock = newClock),
         binaryMoveTimes = game.binaryMoveTimes.map { binary =>
           val moveTimes = BinaryFormat.moveTime.read(binary, game.playedTurns)
           BinaryFormat.moveTime.write(moveTimes.dropRight(1))
         },
-        loadClockHistory = _ => game.clockHistory.map(_.update(!color, _.dropRight(1))),
+        loadClockHistory = _ => game.clockHistory.map(_.update(!playerIndex, _.dropRight(1))),
         movedAt = DateTime.now
       )
       Progress(game, newGame)

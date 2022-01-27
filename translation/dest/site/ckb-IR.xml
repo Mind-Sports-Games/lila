@@ -19,6 +19,7 @@
   <string name="black">رەش</string>
   <string name="randomColor">لایەکی هەرەمەکی</string>
   <string name="createAGame">دروستکردن و ڕێکخستنی یاریەک</string>
+  <string name="playerIndexIsVictorious">%s براوەیە</string>
   <string name="whiteIsVictorious">سپی براوەیە</string>
   <string name="blackIsVictorious">رەش براوەیە</string>
   <string name="youPlayTheWhitePieces">یاری بە پارچە سپیەکان دەکەیت</string>
@@ -39,8 +40,10 @@
   <string name="forceDraw">یەکسانبوون هەڵبژێرە</string>
   <string name="talkInChat">تکایە بەرێزەوە دەمەتەقێ بکە!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">یەکەم کەس ئەم لینکە بەکاربهێنێت یاریت لەگەڵ دەکات.</string>
+  <string name="playerIndexResigned">%s خۆی بەدەستەوەدا</string>
   <string name="whiteResigned">سپی خۆی بەدەستەوەدا</string>
   <string name="blackResigned">رەش خۆی بەدەستەوەدا</string>
+  <string name="playerIndexLeftTheGame">%s وازیهێنا لە یاریکردن</string>
   <string name="whiteLeftTheGame">سپی وازیهێنا لە یاریکردن</string>
   <string name="blackLeftTheGame">ڕەش وازیهێنا لە یاریکردن</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">ئەم لینکە بڵاو بکەوە بۆ ئەوەی بینەران چاودێری یاریەکە بن</string>
@@ -69,6 +72,7 @@
   <string name="drawn">جولەی یەکسانبوون</string>
   <string name="unknown">نەزانراو</string>
   <string name="database">داتابەیس</string>
+  <string name="p1DrawP2">%1$s / یەکسان / ڕەش</string>
   <string name="whiteDrawBlack">سپی / یەکسان / ڕەش</string>
   <string name="averageRatingX">پۆلێنکردنی تێکرا: %s</string>
   <string name="recentGames">دوایین یاریەکانت</string>

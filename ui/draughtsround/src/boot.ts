@@ -24,7 +24,7 @@ export default function (opts: RoundOpts): void {
           );
       },
       end() {
-        xhr.text(`${data.tv ? '/tv' : ''}/${data.game.id}/${data.player.color}/sides`).then(html => {
+        xhr.text(`${data.tv ? '/tv' : ''}/${data.game.id}/${data.player.playerIndex}/sides`).then(html => {
           const $html = $(html),
             $meta = $html.find('.game__meta');
           $meta.length && $('.game__meta').replaceWith($meta);

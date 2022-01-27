@@ -20,9 +20,11 @@
   <string name="black">Itim</string>
   <string name="randomColor">Ibat-ibang panig</string>
   <string name="createAGame">Gumawa ng laro</string>
+  <string name="playerIndexIsVictorious">Nanalo ang %s</string>
   <string name="whiteIsVictorious">Nanalo ang Puti</string>
   <string name="blackIsVictorious">Nanalo ang Itim</string>
   <string name="youPlayTheWhitePieces">Nilalaro mo ang mga puting piyesa</string>
+  <string name="youPlayThePlayerIndexPieces">Nilalaro mo ang mga %s na piyesa</string>
   <string name="youPlayTheBlackPieces">Nilalaro mo ang mga itim na piyesa</string>
   <string name="itsYourTurn">Turno mo na!</string>
   <string name="cheatDetected">Natuklasan na Mandaraya</string>
@@ -33,6 +35,7 @@
   <string name="newOpponent">Bagong Kalaban</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Gusto muling makipaglaro ng iyong katunggali</string>
   <string name="joinTheGame">Sumali ka sa laro</string>
+  <string name="playerIndexPlays">Galaw ng %s</string>
   <string name="whitePlays">Galaw ng Puti</string>
   <string name="blackPlays">Galaw ng itim</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +48,10 @@
   <string name="forceDraw">Tumawag ng tabla</string>
   <string name="talkInChat">Maging magalang sa kachat!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Ang unang taong pupunta sa link nito ay makakalaro mo.</string>
+  <string name="playerIndexResigned">Nagpatalo ang %s</string>
   <string name="whiteResigned">Nagpatalo ang Puti</string>
   <string name="blackResigned">Nagpatalo ang Itim</string>
+  <string name="playerIndexLeftTheGame">Umalis sa laro ang %s</string>
   <string name="whiteLeftTheGame">Umalis sa laro ang puti</string>
   <string name="blackLeftTheGame">Umalis sa laro ang Itim</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Ibahagi ang URL na ito para makita ng mga tumitingin sa laro</string>
@@ -80,6 +85,7 @@
   <string name="drawn">Natabla</string>
   <string name="unknown">Hindi kilala</string>
   <string name="database">Database</string>
+  <string name="p1DrawP2">%1$s / Tabla / %2$s</string>
   <string name="whiteDrawBlack">Puti / Tabla / Itim</string>
   <string name="averageRatingX">Pangkaraniwang marka: %s</string>
   <string name="recentGames">Bagong mga laro</string>
@@ -198,14 +204,17 @@
     <item quantity="other">%s mga laro ko</item>
   </plurals>
   <string name="cancel">Ikansela</string>
+  <string name="playerIndexTimeOut">%s oras na</string>
   <string name="whiteTimeOut">Puti oras na</string>
   <string name="blackTimeOut">Itim oras na</string>
   <string name="drawOfferSent">Naipadala na ang alok na tabla</string>
   <string name="drawOfferDeclined">Tinanggihan ang alok na tabla</string>
   <string name="drawOfferAccepted">Tinanggap ang alok na tabla</string>
   <string name="drawOfferCanceled">Kinansela ang alok na tabla</string>
+  <string name="playerIndexOffersDraw">Ang %s ay nag-alok ng tabla</string>
   <string name="whiteOffersDraw">Ang puti ay nag-alok ng tabla</string>
   <string name="blackOffersDraw">Ang itim ay nag-alok ng tabla</string>
+  <string name="playerIndexDeclinesDraw">Tinanggihan ng %s ang alok</string>
   <string name="whiteDeclinesDraw">Tinanggihan ng puti ang alok</string>
   <string name="blackDeclinesDraw">Tinanggihan ng itim ang tabla</string>
   <string name="yourOpponentOffersADraw">Ang iyong kalaban ay nag-alok ng tabla</string>
@@ -349,6 +358,7 @@
   <string name="clickOnTheBoardToMakeYourMove">I-click sa board para makagawa ng iyong galaw, at patunayan na ikaw ay tao.</string>
   <string name="captcha.fail">Pakilutas ang captcha ng chess.</string>
   <string name="notACheckmate">Hindi ito checkmate</string>
+  <string name="playerIndexCheckmatesInOneMove">Magmamate ang %s sa isang tira</string>
   <string name="whiteCheckmatesInOneMove">Magmamate ang Puti sa isang tira</string>
   <string name="blackCheckmatesInOneMove">Magmamate ang Itim sa isang tira</string>
   <string name="retry">Subukan muli</string>
@@ -418,6 +428,7 @@
   <string name="performance">Pagganap</string>
   <string name="tournamentComplete">Ang paligsahan ay kompleto na</string>
   <string name="movesPlayed">Mga Galaw na nagawa</string>
+  <string name="playerIndexWins">Nanalo ang %s</string>
   <string name="whiteWins">Nanalo ang puti</string>
   <string name="blackWins">Nanalo ang itim</string>
   <string name="draws">Mga tabla</string>
@@ -751,6 +762,7 @@
   <string name="hideBestMove">Itago ang pinakamahusay na galaw</string>
   <string name="getAHint">Kumuha ng pahiwatig</string>
   <string name="evaluatingYourMove">Sinusuri ang iyong galaw...</string>
+  <string name="playerIndexWinsGame">Nanalo ang %s</string>
   <string name="whiteWinsGame">Nanalo ang puti</string>
   <string name="blackWinsGame">Nanalo ang itim</string>
   <string name="learnFromYourMistakes">Matuto sa iyong pagkakamali</string>
@@ -758,19 +770,24 @@
   <string name="skipThisMove">Laktawan ang galaw na ito</string>
   <string name="next">Sunod</string>
   <string name="xWasPlayed">%s nalaro</string>
+  <string name="findBetterMoveForPlayerIndex">Humanap ng mas mahusay na galaw para sa %s</string>
   <string name="findBetterMoveForWhite">Humanap ng mas mahusay na galaw para sa puti</string>
   <string name="findBetterMoveForBlack">Humanap ng mas mahusay na galaw para sa itim</string>
   <string name="resumeLearning">Ipagpatuloy ang pag-aaral</string>
   <string name="youCanDoBetter">Ikaw ay makakagawa pa ng mas mahusay</string>
+  <string name="tryAnotherMoveForPlayerIndex">Subukan ang ibang galaw para sa %s</string>
   <string name="tryAnotherMoveForWhite">Subukan ang ibang galaw para sa puti</string>
   <string name="tryAnotherMoveForBlack">Subukan ang ibang galaw para sa itim</string>
   <string name="solution">Solusyon</string>
   <string name="waitingForAnalysis">Naghihintay sa pagsusuri</string>
+  <string name="noMistakesFoundForPlayerIndex">Walang nakitang mga mali sa %s</string>
   <string name="noMistakesFoundForWhite">Walang nakitang mga mali sa puti</string>
   <string name="noMistakesFoundForBlack">Walang nakitang mali sa itim</string>
+  <string name="doneReviewingPlayerIndexMistakes">Tapos ng tingnan muli ang mga pagkakamali ng %s</string>
   <string name="doneReviewingWhiteMistakes">Tapos ng tingnan muli ang mga pagkakamali ng puti</string>
   <string name="doneReviewingBlackMistakes">Tapos ng tingnan muli ang mga pagkakamali ng itim</string>
   <string name="doItAgain">Gawin muli ito</string>
+  <string name="reviewPlayerIndexMistakes">Tingnan muli ang mga pagkakamali ng %s</string>
   <string name="reviewWhiteMistakes">Tingnan muli ang mga pagkakamali ng puti</string>
   <string name="reviewBlackMistakes">Tingnan muli ang mga pagkakamali ng itim</string>
   <string name="advantage">Kalamangan</string>

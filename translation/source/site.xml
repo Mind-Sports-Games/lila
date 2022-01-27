@@ -19,6 +19,11 @@
   <string name="perpetualCheck">Perpetual Check</string>
   <string name="white">White</string>
   <string name="black">Black</string>
+  <string name="red">Red</string>
+  <string name="sente">Sente</string>
+  <string name="gote">Gote</string>
+  <string name="p1">Player 1</string>
+  <string name="p2">Player 2</string>
   <string name="randomColor">Random side</string>
   <string name="microMatch">Micro-match</string>
   <string name="microMatchChallenge">This challenge is a micro-match!</string>
@@ -27,9 +32,11 @@
   <string name="microMatchGameX">Micro-match game %s</string>
   <string name="microMatchDefinition">Play 2 games in succession with opponents (one as first player, one as second player)</string>
   <string name="createAGame">Create a game</string>
+  <string name="playerIndexIsVictorious">%s is victorious</string>
   <string name="whiteIsVictorious">White is victorious</string>
   <string name="blackIsVictorious">Black is victorious</string>
   <string name="promotion">Promotion</string>
+  <string name="youPlayThePlayerIndexPieces">You play the %s pieces</string>
   <string name="youPlayTheWhitePieces">You play the white pieces</string>
   <string name="youPlayTheBlackPieces">You play the black pieces</string>
   <string name="itsYourTurn">It's your turn!</string>
@@ -43,6 +50,7 @@
   <string name="newOpponent">New opponent</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Your opponent wants to play a new game with you</string>
   <string name="joinTheGame">Join the game</string>
+  <string name="playerIndexPlays">%s to play</string>
   <string name="whitePlays">White to play</string>
   <string name="blackPlays">Black to play</string>
   <plurals name="opponentLeftCounter">
@@ -55,8 +63,10 @@
   <string name="forceDraw">Call draw</string>
   <string name="talkInChat">Please be nice in the chat!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">The first person to come to this URL will play with you.</string>
+  <string name="playerIndexResigned">%s resigned</string>
   <string name="whiteResigned">White resigned</string>
   <string name="blackResigned">Black resigned</string>
+  <string name="playerIndexLeftTheGame">%s left the game</string>
   <string name="whiteLeftTheGame">White left the game</string>
   <string name="blackLeftTheGame">Black left the game</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Share this URL to let spectators see the game</string>
@@ -90,6 +100,7 @@
   <string name="drawn">Drawn</string>
   <string name="unknown">Unknown</string>
   <string name="database">Database</string>
+  <string name="p1DrawP2">%1$s / Draw / %2$s</string>
   <string name="whiteDrawBlack">White / Draw / Black</string>
   <string name="averageRatingX">Average rating: %s</string>
   <string name="recentGames">Recent games</string>
@@ -222,14 +233,17 @@
     <item quantity="other">%s games with you</item>
   </plurals>
   <string name="cancel">Cancel</string>
+  <string name="playerIndexTimeOut">%s time out</string>
   <string name="whiteTimeOut">White time out</string>
   <string name="blackTimeOut">Black time out</string>
   <string name="drawOfferSent">Draw offer sent</string>
   <string name="drawOfferDeclined">Draw offer declined</string>
   <string name="drawOfferAccepted">Draw offer accepted</string>
   <string name="drawOfferCanceled">Draw offer cancelled</string>
+  <string name="playerIndexOffersDraw">%s offers draw</string>
   <string name="whiteOffersDraw">White offers draw</string>
   <string name="blackOffersDraw">Black offers draw</string>
+  <string name="playerIndexDeclinesDraw">%s declines draw</string>
   <string name="whiteDeclinesDraw">White declines draw</string>
   <string name="blackDeclinesDraw">Black declines draw</string>
   <string name="yourOpponentOffersADraw">Your opponent offers a draw</string>
@@ -374,6 +388,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="clickOnTheBoardToMakeYourMove">Click on the board to make your move, and prove you are human.</string>
   <string name="captcha.fail">Please solve the chess captcha.</string>
   <string name="notACheckmate">Not a checkmate</string>
+  <string name="playerIndexCheckmatesInOneMove">%s to checkmate in one move</string>
   <string name="whiteCheckmatesInOneMove">White to checkmate in one move</string>
   <string name="blackCheckmatesInOneMove">Black to checkmate in one move</string>
   <string name="retry">Retry</string>
@@ -443,6 +458,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="performance">Performance</string>
   <string name="tournamentComplete">Tournament complete</string>
   <string name="movesPlayed">Moves played</string>
+  <string name="playerIndexWins">%s wins</string>
   <string name="whiteWins">White wins</string>
   <string name="blackWins">Black wins</string>
   <string name="draws">Draws</string>
@@ -778,6 +794,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="hideBestMove">Hide best move</string>
   <string name="getAHint">Get a hint</string>
   <string name="evaluatingYourMove">Evaluating your move ...</string>
+  <string name="playerIndexWinsGame">%s wins</string>
   <string name="whiteWinsGame">White wins</string>
   <string name="blackWinsGame">Black wins</string>
   <string name="learnFromYourMistakes">Learn from your mistakes</string>
@@ -785,19 +802,24 @@ computer analysis, game chat and shareable URL.</string>
   <string name="skipThisMove">Skip this move</string>
   <string name="next">Next</string>
   <string name="xWasPlayed">%s was played</string>
+  <string name="findBetterMoveForPlayerIndex">Find a better move for %s</string>
   <string name="findBetterMoveForWhite">Find a better move for white</string>
   <string name="findBetterMoveForBlack">Find a better move for black</string>
   <string name="resumeLearning">Resume learning</string>
   <string name="youCanDoBetter">You can do better</string>
+  <string name="tryAnotherMoveForPlayerIndex">Try another move for %s</string>
   <string name="tryAnotherMoveForWhite">Try another move for white</string>
   <string name="tryAnotherMoveForBlack">Try another move for black</string>
   <string name="solution">Solution</string>
   <string name="waitingForAnalysis">Waiting for analysis</string>
+  <string name="noMistakesFoundForPlayerIndex">No mistakes found for %s</string>
   <string name="noMistakesFoundForWhite">No mistakes found for white</string>
   <string name="noMistakesFoundForBlack">No mistakes found for black</string>
+  <string name="doneReviewingPlayerIndexMistakes">Done reviewing %s mistakes</string>
   <string name="doneReviewingWhiteMistakes">Done reviewing white mistakes</string>
   <string name="doneReviewingBlackMistakes">Done reviewing black mistakes</string>
   <string name="doItAgain">Do it again</string>
+  <string name="reviewPlayerIndexMistakes">Review %s mistakes</string>
   <string name="reviewWhiteMistakes">Review white mistakes</string>
   <string name="reviewBlackMistakes">Review black mistakes</string>
   <string name="advantage">Advantage</string>

@@ -29,7 +29,7 @@ object SetupForm {
       "increment" -> increment,
       "days"      -> days,
       "level"     -> level,
-      "color"     -> color,
+      "playerIndex"     -> playerIndex,
       "fen"       -> fenField
     )(AiConfig.from)(_.>>)
       .verifying("invalidFen", _.validFen)
@@ -55,7 +55,7 @@ object SetupForm {
         "increment"  -> increment,
         "days"       -> days,
         "mode"       -> mode(withRated = ctx.isAuth),
-        "color"      -> color,
+        "playerIndex"      -> playerIndex,
         "fen"        -> fenField,
         "microMatch" -> boolean
       )(FriendConfig.from)(_.>>)
@@ -77,7 +77,7 @@ object SetupForm {
         "days"        -> days,
         "mode"        -> mode(ctx.isAuth),
         "ratingRange" -> optional(ratingRange),
-        "color"       -> color
+        "playerIndex"       -> playerIndex
       )(HookConfig.from)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Can't create rated unlimited in lobby", _.noRatedUnlimited)
@@ -89,7 +89,7 @@ object SetupForm {
       "time"        -> time,
       "increment"   -> increment,
       "rated"       -> optional(boolean),
-      "color"       -> optional(color),
+      "playerIndex"       -> optional(playerIndex),
       "ratingRange" -> optional(ratingRange)
     )((v, t, i, r, c, g) =>
       HookConfig(
@@ -102,7 +102,7 @@ object SetupForm {
         increment = i,
         days = 1,
         mode = strategygames.Mode(~r),
-        color = lila.lobby.Color.orDefault(c),
+        playerIndex = lila.lobby.PlayerIndex.orDefault(c),
         ratingRange = g.fold(RatingRange.default)(RatingRange.orDefault)
       )
     )(_ => none)
@@ -145,7 +145,7 @@ object SetupForm {
         clock,
         "days"          -> optional(days),
         "rated"         -> boolean,
-        "color"         -> optional(color),
+        "playerIndex"         -> optional(playerIndex),
         "fen"           -> fenField,
         "acceptByToken" -> optional(nonEmptyText),
         "message"       -> message,
@@ -160,7 +160,7 @@ object SetupForm {
         variant,
         clock,
         "days"  -> optional(days),
-        "color" -> optional(color),
+        "playerIndex" -> optional(playerIndex),
         "fen"   -> fenField
       )(ApiAiConfig.from)(_ => none).verifying("invalidFen", _.validFen)
     )

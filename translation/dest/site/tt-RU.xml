@@ -20,8 +20,10 @@
   <string name="black">Кара</string>
   <string name="randomColor">Очраклы төс</string>
   <string name="createAGame">Уен башларга</string>
+  <string name="playerIndexIsVictorious">%s җиңде</string>
   <string name="whiteIsVictorious">Ак җиңде</string>
   <string name="blackIsVictorious">Кара җиңде</string>
+  <string name="youPlayThePlayerIndexPieces">Сез %s фигуралар белән уйныйсыз</string>
   <string name="youPlayTheWhitePieces">Сез ак фигуралар белән уйныйсыз</string>
   <string name="youPlayTheBlackPieces">Сез кара фигуралар белән уйныйсыз</string>
   <string name="itsYourTurn">Сезнең йөрүегез!</string>
@@ -46,6 +48,7 @@
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Сылтамага кергән беренче кеше сезнең белән уйнар.</string>
   <string name="whiteResigned">Аклар истифа итте</string>
   <string name="blackResigned">Каралар истифа итте</string>
+  <string name="playerIndexLeftTheGame">%s уеннан чыкты</string>
   <string name="whiteLeftTheGame">Ак уеннан чыкты</string>
   <string name="blackLeftTheGame">Кара уеннан чыкты</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Бу сылтама белән күзәтүчеләрне чакырыгыз</string>

@@ -23,18 +23,18 @@ private object bits {
     new {
 
       def dataReqs =
-        List("winner", "loser", "white", "black").map { f =>
+        List("winner", "loser", "p1", "p2").map { f =>
           data(s"req-$f") := ~form("players")(f).value
         }
 
-      def colors(hide: Boolean) =
-        strategygames.Color.all.map { color =>
-          tr(cls := List(s"${color.name}User user-row" -> true, "none" -> hide))(
-            th(label(`for` := form3.id(form("players")(color.name)))(color.fold(trans.white, trans.black)())),
+      def playerIndexs(hide: Boolean) =
+        strategygames.Player.all.map { playerIndex =>
+          tr(cls := List(s"${playerIndex.name}User user-row" -> true, "none" -> hide))(
+            th(label(`for` := form3.id(form("players")(playerIndex.name)))(playerIndex.fold(trans.p1, trans.p2)())),
             td(cls := "single")(
               st.select(
-                id := form3.id(form("players")(color.name)),
-                name := form("players")(color.name).name
+                id := form3.id(form("players")(playerIndex.name)),
+                name := form("players")(playerIndex.name).name
               )(
                 option(cls := "blank", value := "")
               )
@@ -176,10 +176,10 @@ private object bits {
           td(cls := "single")(form3.select(form("status"), Query.statuses, "".some))
         )
 
-      def winnerColor =
+      def winnerPlayerIndex =
         tr(
-          th(label(`for` := form3.id(form("winnerColor")))(trans.search.winnerColor())),
-          td(cls := "single")(form3.select(form("winnerColor"), Query.winnerColors, "".some))
+          th(label(`for` := form3.id(form("winnerPlayerIndex")))(trans.search.winnerPlayerIndex())),
+          td(cls := "single")(form3.select(form("winnerPlayerIndex"), Query.winnerPlayerIndexs, "".some))
         )
 
       def date =

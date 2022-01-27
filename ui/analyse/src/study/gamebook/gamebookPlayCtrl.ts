@@ -62,7 +62,7 @@ export default class GamebookPlayCtrl {
     }
   };
 
-  isMyMove = () => this.root.turnColor() === this.root.data.orientation;
+  isMyMove = () => this.root.turnPlayerIndex() === this.root.data.orientation;
 
   retry = () => {
     let path = this.root.path;
@@ -104,7 +104,9 @@ export default class GamebookPlayCtrl {
   };
 
   solution = () => {
-    this.root.chessground.setShapes(makeShapesFromUci(this.root.turnColor(), this.root.node.children[0].uci!, 'green'));
+    this.root.chessground.setShapes(
+      makeShapesFromUci(this.root.turnPlayerIndex(), this.root.node.children[0].uci!, 'green')
+    );
   };
 
   canJumpTo = (path: Tree.Path) => treePath.contains(this.root.path, path);

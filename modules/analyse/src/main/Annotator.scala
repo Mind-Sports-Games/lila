@@ -3,7 +3,7 @@ package lila.analyse
 import strategygames.chess.format.pgn.{ Move, Pgn, Turn }
 import strategygames.format.pgn.{ Glyphs, Tag }
 import strategygames.opening.FullOpening
-import strategygames.{ Color, Status }
+import strategygames.{ Player => PlayerIndex, Status }
 import strategygames.variant.Variant
 
 import lila.game.GameDrawOffers
@@ -12,7 +12,7 @@ import lila.game.Game
 final class Annotator(netDomain: lila.common.config.NetDomain) {
 
   def apply(p: Pgn, game: Game, analysis: Option[Analysis]): Pgn =
-    annotateStatus(game.winnerColor, game.status, game.variant) {
+    annotateStatus(game.winnerPlayerIndex, game.status, game.variant) {
       annotateOpening(game.opening) {
         annotateTurns(
           annotateDrawOffers(p, game.drawOffers),
@@ -23,7 +23,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       )
     }
 
-  private def annotateStatus(winner: Option[Color], status: Status, variant: Variant)(p: Pgn) =
+  private def annotateStatus(winner: Option[PlayerIndex], status: Status, variant: Variant)(p: Pgn) =
     lila.game.StatusText(status, winner, variant) match {
       case ""   => p
       case text => p.updateLastPly(_.copy(result = text.some))
@@ -40,7 +40,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
         advice.turn,
         turn =>
           turn.update(
-            advice.color,
+            advice.playerIndex,
             move =>
               move.copy(
                 glyphs = Glyphs.fromList(advice.judgment.glyph :: Nil),
@@ -58,8 +58,8 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
         pgn.updatePly(
           ply,
           move => {
-            val color = !Color.fromPly(ply)
-            move.copy(comments = s"$color offers draw" :: move.comments)
+            val playerIndex = !PlayerIndex.fromPly(ply)
+            move.copy(comments = s"$playerIndex offers draw" :: move.comments)
           }
         )
       }
@@ -69,6 +69,6 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       advice.info.variation take 20 map { san =>
         Move(san)
       },
-      turn plyOf advice.color
+      turn plyOf advice.playerIndex
     )
 }

@@ -7,7 +7,7 @@ interface UpdateData {
   bc?: number;
 }
 
-const fenColor = (fen: string) => (fen.indexOf(' b') > 0 ? 'black' : 'white');
+const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
 
 export const init = (node: HTMLElement) => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 200);
@@ -30,13 +30,13 @@ export const init = (node: HTMLElement) => {
           },
         },
         $cg = $el.find('.cg-wrap'),
-        turnColor = fenColor(fen);
+        turnPlayerIndex = fenPlayerIndex(fen);
       domData.set($cg[0] as HTMLElement, 'draughtsground', window.Draughtsground($cg[0], config));
-      ['white', 'black'].forEach(color =>
-        $el.find('.mini-game__clock--' + color).each(function (this: HTMLElement) {
+      ['p1', 'p2'].forEach(playerIndex =>
+        $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
           $(this).clock({
             time: parseInt(this.getAttribute('data-time')!),
-            pause: color != turnColor,
+            pause: playerIndex != turnPlayerIndex,
           });
         })
       );
@@ -45,7 +45,7 @@ export const init = (node: HTMLElement) => {
         config = {
           coordinates: false,
           viewOnly: true,
-          myColor: orientation,
+          myPlayerIndex: orientation,
           resizable: false,
           fen,
           orientation,
@@ -74,13 +74,13 @@ export const init = (node: HTMLElement) => {
             : 'standard',
         },
         $cg = $el.find('.cg-wrap'),
-        turnColor = fenColor(fen);
+        turnPlayerIndex = fenPlayerIndex(fen);
       domData.set($cg[0] as HTMLElement, 'chessground', window.Chessground($cg[0], config));
-      ['white', 'black'].forEach(color =>
-        $el.find('.mini-game__clock--' + color).each(function (this: HTMLElement) {
+      ['p1', 'p2'].forEach(playerIndex =>
+        $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
           $(this).clock({
             time: parseInt(this.getAttribute('data-time')!),
-            pause: color != turnColor,
+            pause: playerIndex != turnPlayerIndex,
           });
         })
       );
@@ -111,26 +111,27 @@ export const update = (node: HTMLElement, data: UpdateData) => {
       fen: data.fen,
       lastMove,
     });
-  const turnColor = fenColor(data.fen);
-  const renderClock = (time: number | undefined, color: string) => {
+  const turnPlayerIndex = fenPlayerIndex(data.fen);
+  const renderClock = (time: number | undefined, playerIndex: string) => {
     if (!isNaN(time!))
-      $el.find('.mini-game__clock--' + color).clock('set', {
+      $el.find('.mini-game__clock--' + playerIndex).clock('set', {
         time,
-        pause: color != turnColor,
+        pause: playerIndex != turnPlayerIndex,
       });
   };
-  renderClock(data.wc, 'white');
-  renderClock(data.bc, 'black');
+  renderClock(data.wc, 'p1');
+  renderClock(data.bc, 'p2');
 };
 
 export const finish = (node: HTMLElement, win?: string) =>
-  ['white', 'black'].forEach(color => {
+  ['p1', 'p2'].forEach(playerIndex => {
     const $clock = $(node)
-      .find('.mini-game__clock--' + color)
+      .find('.mini-game__clock--' + playerIndex)
       .each(function (this: HTMLElement) {
         $(this).clock('destroy');
       });
+    const colorLetter = playerIndex === 'p1' ? 'w' : 'b';
     if (!$clock.data('managed'))
       // snabbdom
-      $clock.replaceWith(`<span class="mini-game__result">${win ? (win == color[0] ? 1 : 0) : '½'}</span>`);
+      $clock.replaceWith(`<span class="mini-game__result">${win ? (win == colorLetter ? 1 : 0) : '½'}</span>`);
   });

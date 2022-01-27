@@ -143,8 +143,8 @@ function focusChat() {
 
 function readClocks(clockCtrl: any | undefined) {
   if (!clockCtrl) return;
-  const msgs = ['white', 'black'].map(color => {
-    const time = clockCtrl.millisOf(color);
+  const msgs = ['p1', 'p2'].map(playerIndex => {
+    const time = clockCtrl.millisOf(playerIndex);
     const date = new Date(time);
     const msg =
       (time >= 3600000 ? simplePlural(Math.floor(time / 3600000), 'hour') : '') +
@@ -152,7 +152,7 @@ function readClocks(clockCtrl: any | undefined) {
       simplePlural(date.getUTCMinutes(), 'minute') +
       ' ' +
       simplePlural(date.getUTCSeconds(), 'second');
-    return `${color}: ${msg}`;
+    return `${playerIndex}: ${msg}`;
   });
   playstrategy.sound.say(msgs.join('. '));
 }

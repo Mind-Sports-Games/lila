@@ -21,8 +21,8 @@ export function makeConfig(ctrl: RoundController): Config {
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
-    myColor: data.player.color,
-    turnColor: step.ply % 2 === 0 ? 'white' : 'black',
+    myPlayerIndex: data.player.playerIndex,
+    turnPlayerIndex: step.ply % 2 === 0 ? 'p1' : 'p2',
     lastMove: util.uci2move(step.uci),
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
@@ -41,7 +41,7 @@ export function makeConfig(ctrl: RoundController): Config {
     },
     movable: {
       free: false,
-      color: playing ? data.player.color : undefined,
+      playerIndex: playing ? data.player.playerIndex : undefined,
       dests: playing ? util.parsePossibleMoves(data.possibleMoves) : new Map(),
       showDests: data.pref.destination,
       rookCastle: data.pref.rookCastle,
@@ -126,7 +126,7 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
         [
           key,
           {
-            color: piece.color,
+            playerIndex: piece.playerIndex,
             role,
             promoted: true,
           },
@@ -137,10 +137,10 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
 }
 
 export function boardOrientation(data: RoundData, flip: boolean): cg.Orientation {
-  if (data.game.variant.key === 'racingKings') return flip ? 'black' : 'white';
+  if (data.game.variant.key === 'racingKings') return flip ? 'p2' : 'p1';
   if (data.game.variant.key === 'linesOfAction' || data.game.variant.key === 'scrambledEggs') {
-    return flip ? oppositeOrientationForLOA(data.player.color) : orientationForLOA(data.player.color);
-  } else return flip ? data.opponent.color : data.player.color;
+    return flip ? oppositeOrientationForLOA(data.player.playerIndex) : orientationForLOA(data.player.playerIndex);
+  } else return flip ? data.opponent.playerIndex : data.player.playerIndex;
 }
 
 export function render(ctrl: RoundController) {

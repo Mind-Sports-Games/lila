@@ -92,7 +92,7 @@ object SetupBulk {
 
   case class BadToken(token: AccessToken.Id, error: OAuthServer.AuthError)
 
-  case class ScheduledGame(id: Game.ID, white: User.ID, black: User.ID)
+  case class ScheduledGame(id: Game.ID, p1: User.ID, p2: User.ID)
 
   case class ScheduledBulk(
       _id: String,
@@ -107,7 +107,7 @@ object SetupBulk {
       message: Option[Template],
       pairedAt: Option[DateTime] = None
   ) {
-    def userSet = Set(games.flatMap(g => List(g.white, g.black)))
+    def userSet = Set(games.flatMap(g => List(g.p1, g.p2)))
     def collidesWith(other: ScheduledBulk) = {
       pairAt == other.pairAt || startClocksAt == startClocksAt
     } && userSet.exists(other.userSet.contains)
@@ -127,8 +127,8 @@ object SetupBulk {
         "games" -> games.map { g =>
           Json.obj(
             "id"    -> g.id,
-            "white" -> g.white,
-            "black" -> g.black
+            "p1" -> g.p1,
+            "p2" -> g.p2
           )
         },
         "variant" -> variant.key,
@@ -164,8 +164,8 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
 
   def apply(data: BulkFormData, me: User): Fu[Result] =
     Source(extractTokenPairs(data.tokens))
-      .mapConcat { case (whiteToken, blackToken) =>
-        List(whiteToken, blackToken) // flatten now, re-pair later!
+      .mapConcat { case (p1Token, p2Token) =>
+        List(p1Token, p2Token) // flatten now, re-pair later!
       }
       .mapAsync(8) { token =>
         oauthServer.auth(token, List(OAuthScope.Challenge.Write)) map {

@@ -40,7 +40,7 @@ final private class SimulSocket(
 
   def startGame(simul: Simul, game: Game): Unit =
     game.playerByUserId(simul.hostId) foreach { opponent =>
-      redirectPlayer(simul, Pov(game, !opponent.color))
+      redirectPlayer(simul, Pov(game, !opponent.playerIndex))
     }
 
   def filterPresent(simul: Simul, userIds: Set[User.ID]): Fu[Seq[User.ID]] =

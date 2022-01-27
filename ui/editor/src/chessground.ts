@@ -68,10 +68,11 @@ function onMouseEvent(ctrl: EditorCtrl): (e: MouchEvent) => void {
       else {
         const existingPiece = ctrl.chessground!.state.pieces.get(key);
         const piece = {
-          color: sel[0],
+          playerIndex: sel[0],
           role: sel[1],
         };
-        const samePiece = existingPiece && piece.color == existingPiece.color && piece.role == existingPiece.role;
+        const samePiece =
+          existingPiece && piece.playerIndex == existingPiece.playerIndex && piece.role == existingPiece.role;
 
         if ((e.type === 'mousedown' || e.type === 'touchstart') && samePiece) {
           deleteOrHidePiece(ctrl, key, e);
@@ -120,13 +121,13 @@ function deletePiece(ctrl: EditorCtrl, key: Key): void {
 function makeConfig(ctrl: EditorCtrl): CgConfig {
   return {
     fen: ctrl.cfg.fen,
-    orientation: ctrl.options.orientation || 'white',
+    orientation: ctrl.options.orientation || 'p1',
     coordinates: !ctrl.cfg.embed,
     autoCastle: false,
     addPieceZIndex: ctrl.cfg.is3d,
     movable: {
       free: true,
-      color: 'both',
+      playerIndex: 'both',
     },
     animation: {
       duration: ctrl.cfg.animation.duration,

@@ -20,12 +20,12 @@ final private[round] class Drawer(
     Pov(game)
       .map { pov =>
         import Pref.PrefZero
-        if (game.playerHasOfferedDrawRecently(pov.color)) fuccess(pov.some)
+        if (game.playerHasOfferedDrawRecently(pov.playerIndex)) fuccess(pov.some)
         else
           pov.player.userId ?? prefApi.getPref map { pref =>
             pref.autoThreefold == Pref.AutoThreefold.ALWAYS || {
               pref.autoThreefold == Pref.AutoThreefold.TIME &&
-              game.clock ?? { _.remainingTime(pov.color) < Centis.ofSeconds(30) }
+              game.clock ?? { _.remainingTime(pov.playerIndex) < Centis.ofSeconds(30) }
             } || pov.player.userId.exists(isBotSync)
           } map (_ option pov)
       }
@@ -38,29 +38,29 @@ final private[round] class Drawer(
         finisher.other(pov.game, _.Draw, None)
       case pov if pov.opponent.isOfferingDraw =>
         finisher.other(pov.game, _.Draw, None, Some(trans.drawOfferAccepted.txt()))
-      case Pov(g, color) if g playerCanOfferDraw color =>
+      case Pov(g, playerIndex) if g playerCanOfferDraw playerIndex =>
         proxy.save {
-          messenger.system(g, color.fold(trans.whiteOffersDraw, trans.blackOffersDraw).txt())
-          Progress(g) map { _ offerDraw color }
-        } >>- publishDrawOffer(pov) inject List(Event.DrawOffer(by = color.some))
+          messenger.system(g, trans.playerIndexOffersDraw(pov.game.playerTrans(playerIndex)).v)
+          Progress(g) map { _ offerDraw playerIndex }
+        } >>- publishDrawOffer(pov) inject List(Event.DrawOffer(by = playerIndex.some))
       case _ => fuccess(List(Event.ReloadOwner))
     }
   }
 
   def no(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
     pov match {
-      case Pov(g, color) if pov.player.isOfferingDraw =>
+      case Pov(g, playerIndex) if pov.player.isOfferingDraw =>
         proxy.save {
           messenger.system(g, trans.drawOfferCanceled.txt())
           Progress(g) map { g =>
-            g.updatePlayer(color, _.removeDrawOffer)
+            g.updatePlayer(playerIndex, _.removeDrawOffer)
           }
         } inject List(Event.DrawOffer(by = none))
-      case Pov(g, color) if pov.opponent.isOfferingDraw =>
+      case Pov(g, playerIndex) if pov.opponent.isOfferingDraw =>
         proxy.save {
-          messenger.system(g, color.fold(trans.whiteDeclinesDraw, trans.blackDeclinesDraw).txt())
+          messenger.system(g, trans.playerIndexDeclinesDraw(pov.game.playerTrans(playerIndex)).v)
           Progress(g) map { g =>
-            g.updatePlayer(!color, _.removeDrawOffer)
+            g.updatePlayer(!playerIndex, _.removeDrawOffer)
           }
         } inject List(Event.DrawOffer(by = none))
       case _ => fuccess(List(Event.ReloadOwner))
@@ -84,7 +84,7 @@ final private[round] class Drawer(
       )
     if (lila.game.Game.isBoardCompatible(pov.game))
       proxy
-        .withPov(pov.color) { p =>
+        .withPov(pov.playerIndex) { p =>
           fuccess(
             Bus.publish(
               lila.game.actorApi.BoardDrawOffer(p),

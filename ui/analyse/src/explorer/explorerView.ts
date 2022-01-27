@@ -18,8 +18,8 @@ import {
 } from './interfaces';
 
 function resultBar(move: OpeningMoveStats): VNode {
-  const sum = move.white + move.draws + move.black;
-  function section(key: 'white' | 'black' | 'draws') {
+  const sum = move.p1 + move.draws + move.p2;
+  function section(key: 'p1' | 'p2' | 'draws') {
     const percent = (move[key] * 100) / sum;
     return percent === 0
       ? null
@@ -31,7 +31,7 @@ function resultBar(move: OpeningMoveStats): VNode {
           percent > 12 ? Math.round(percent) + (percent > 20 ? '%' : '') : ''
         );
   }
-  return h('div.bar', ['white', 'draws', 'black'].map(section));
+  return h('div.bar', ['p1', 'draws', 'p2'].map(section));
 }
 
 function moveTableAttributes(ctrl: AnalyseCtrl, fen: Fen) {
@@ -73,7 +73,7 @@ function showMoveTable(ctrl: AnalyseCtrl, data: OpeningData): VNode | null {
   const trans = ctrl.trans.noarg;
   return h('table.moves', [
     h('thead', [
-      h('tr', [h('th.title', trans('move')), h('th.title', trans('games')), h('th.title', trans('whiteDrawBlack'))]),
+      h('tr', [h('th.title', trans('move')), h('th.title', trans('games')), h('th.title', trans('p1DrawP2'))]),
     ]),
     h(
       'tbody',
@@ -90,7 +90,7 @@ function showMoveTable(ctrl: AnalyseCtrl, data: OpeningData): VNode | null {
           },
           [
             h('td', move.san[0] === 'P' ? move.san.slice(1) : move.san),
-            h('td', numberFormat(move.white + move.draws + move.black)),
+            h('td', numberFormat(move.p1 + move.draws + move.p2)),
             h('td', resultBar(move)),
           ]
         );
@@ -99,9 +99,9 @@ function showMoveTable(ctrl: AnalyseCtrl, data: OpeningData): VNode | null {
   ]);
 }
 
-function showResult(winner?: Color): VNode {
-  if (winner === 'white') return h('result.white', '1-0');
-  if (winner === 'black') return h('result.black', '0-1');
+function showResult(winner?: PlayerIndex): VNode {
+  if (winner === 'p1') return h('result.p1', '1-0');
+  if (winner === 'p2') return h('result.p2', '0-1');
   return h('result.draws', '½-½');
 }
 
@@ -135,11 +135,11 @@ function showGameTable(ctrl: AnalyseCtrl, title: string, games: OpeningGame[]): 
               [
                 h(
                   'td',
-                  [game.white, game.black].map(p => h('span', '' + p.rating))
+                  [game.p1, game.p2].map(p => h('span', '' + p.rating))
                 ),
                 h(
                   'td',
-                  [game.white, game.black].map(p => h('span', p.name))
+                  [game.p1, game.p2].map(p => h('span', p.name))
                 ),
                 h('td', showResult(game.winner)),
                 h('td', [game.year]),
@@ -176,7 +176,7 @@ function gameActions(ctrl: AnalyseCtrl, game: OpeningGame): VNode {
           attrs: { colspan: 4 },
         },
         [
-          h('div.game_title', `${game.white.name} - ${game.black.name}, ${showResult(game.winner).text}, ${game.year}`),
+          h('div.game_title', `${game.p1.name} - ${game.p2.name}, ${showResult(game.winner).text}, ${game.year}`),
           h('div.menu', [
             h(
               'a.text',

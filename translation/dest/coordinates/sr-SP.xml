@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Координате</string>
   <string name="coordinateTraining">Тренинг координата</string>
+  <string name="averageScoreAsPlayerIndexX">Просечан резултат као %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Просечан резултат као бели: %s</string>
   <string name="averageScoreAsBlackX">Просечан резултат као црни: %s</string>
   <string name="knowingTheChessBoard">Знање координата шаховске табле је веома важна шаховска вештина:</string>

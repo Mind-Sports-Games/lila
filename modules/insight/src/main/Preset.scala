@@ -60,7 +60,7 @@ object Preset {
       )
     ),
     Preset(
-      "What is the Win-Rate of my favourite openings as white?",
+      "What is the Win-Rate of my favourite openings as p1?",
       Question(
         D.Opening,
         M.Result,
@@ -69,7 +69,7 @@ object Preset {
             D.Perf,
             PerfType.standard
           ),
-          Filter(D.Color, List(strategygames.White))
+          Filter(D.PlayerIndex, List(strategygames.P1))
         )
       )
     ),

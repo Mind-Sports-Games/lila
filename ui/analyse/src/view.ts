@@ -4,7 +4,7 @@ import * as chessground from './ground';
 import { bind, onInsert, dataIcon, spinner, bindMobileMousedown } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
-import { getPlayer, playable } from 'game';
+import { playable } from 'game';
 import * as router from 'game/router';
 import statusView from 'game/view/status';
 import { path as treePath } from 'tree';
@@ -40,10 +40,10 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
   if (ctrl.data.game.status.id >= 30)
     switch (ctrl.data.game.winner) {
-      case 'white':
+      case 'p1':
         result = '1-0';
         break;
-      case 'black':
+      case 'p2':
         result = '0-1';
         break;
       default:
@@ -52,12 +52,9 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
   const tags: VNode[] = [];
   if (result) {
     tags.push(h('div.result', result));
-    const winner = getPlayer(ctrl.data, ctrl.data.game.winner!);
+    const winner = ctrl.data.game.winnerPlayer;
     tags.push(
-      h('div.status', [
-        statusView(ctrl),
-        winner ? ', ' + ctrl.trans(winner.color == 'white' ? 'whiteIsVictorious' : 'blackIsVictorious') : null,
-      ])
+      h('div.status', [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null])
     );
   }
   return tags;
@@ -355,14 +352,14 @@ export default function (ctrl: AnalyseCtrl): VNode {
           },
           [
             ...(clocks || []),
-            playerBars ? playerBars[ctrl.bottomIsWhite() ? 1 : 0] : null,
+            playerBars ? playerBars[ctrl.bottomIsP1() ? 1 : 0] : null,
             chessground.render(ctrl),
-            playerBars ? playerBars[ctrl.bottomIsWhite() ? 0 : 1] : null,
+            playerBars ? playerBars[ctrl.bottomIsP1() ? 0 : 1] : null,
             renderPromotion(ctrl),
           ]
         ),
       gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-      menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topColor(), 'top'),
+      menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
       gamebookPlayView ||
         (tour
           ? null
@@ -377,7 +374,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
                     retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
                   ]),
             ])),
-      menuIsOpen || tour ? null : crazyView(ctrl, ctrl.bottomColor(), 'bottom'),
+      menuIsOpen || tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
       gamebookPlayView || tour ? null : controls(ctrl),
       ctrl.embed || tour
         ? null
@@ -415,7 +412,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
                           'a.button.button-empty.text',
                           {
                             attrs: {
-                              href: router.game(ctrl.data, ctrl.data.player.color),
+                              href: router.game(ctrl.data, ctrl.data.player.playerIndex),
                               'data-icon': 'i',
                             },
                           },

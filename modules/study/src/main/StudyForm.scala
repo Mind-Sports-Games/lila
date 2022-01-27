@@ -1,7 +1,7 @@
 package lila.study
 
 import strategygames.format.FEN
-import strategygames.{ Color, White }
+import strategygames.{ Player => PlayerIndex, P1 }
 import play.api.data._
 import play.api.data.Forms._
 
@@ -31,7 +31,7 @@ object StudyForm {
         asStr: Option[String] = None
     ) {
 
-      def orientation = orientationStr.flatMap(Color.fromName) | White
+      def orientation = orientationStr.flatMap(PlayerIndex.fromName) | P1
 
       def as: As =
         asStr match {
@@ -91,7 +91,7 @@ object StudyForm {
             pgn = onePgn.some,
             orientation =
               if (pgns.sizeIs > 1) "auto"
-              else (orientationStr.flatMap(Color.fromName) | White).name,
+              else (orientationStr.flatMap(PlayerIndex.fromName) | P1).name,
             mode = mode,
             initial = initial && index == 0
           )

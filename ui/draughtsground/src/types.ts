@@ -1,4 +1,4 @@
-export type Color = 'white' | 'black';
+export type PlayerIndex = 'p1' | 'p2';
 export type Role = 'king' | 'man' | 'ghostman' | 'ghostking';
 export type Key =
   | '00'
@@ -57,7 +57,7 @@ export type Pos = [number, number];
 export type BoardSize = [number, number];
 export interface Piece {
   role: Role;
-  color: Color;
+  playerIndex: PlayerIndex;
   promoted?: boolean;
   kingMoves?: number;
 }
@@ -82,8 +82,8 @@ export interface MaterialDiffSide {
   [role: string]: number;
 }
 export interface MaterialDiff {
-  white: MaterialDiffSide;
-  black: MaterialDiffSide;
+  p1: MaterialDiffSide;
+  p2: MaterialDiffSide;
 }
 export interface Elements {
   board: HTMLElement;
@@ -110,8 +110,8 @@ export interface PlayerKingMoves {
   key?: Key;
 }
 export interface KingMoves {
-  white: PlayerKingMoves;
-  black: PlayerKingMoves;
+  p1: PlayerKingMoves;
+  p2: PlayerKingMoves;
 }
 
 export interface MoveMetadata {

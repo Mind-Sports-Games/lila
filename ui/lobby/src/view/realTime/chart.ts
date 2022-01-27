@@ -63,14 +63,15 @@ function renderPlot(ctrl: LobbyController, hook: Hook) {
 }
 
 function renderHook(ctrl: LobbyController, hook: Hook): string {
-  const color = hook.c || 'random';
+  const playerIndex = hook.c || 'random';
+  const playerColor = hook.variantC || 'random';
   let html = '<div class="inner">';
   if (hook.rating) {
-    html += '<a class="opponent ulpt is color-icon ' + color + '" href="/@/' + hook.u + '">';
+    html += '<a class="opponent ulpt is playerIndex-icon ' + playerColor + '" href="/@/' + hook.u + '">';
     html += ' ' + hook.u + ' (' + hook.rating + (hook.prov ? '?' : '') + ')';
     html += '</a>';
   } else {
-    html += '<span class="opponent anon ' + color + '">' + ctrl.trans('anonymous') + '</span>';
+    html += '<span class="opponent anon ' + playerIndex + '">' + ctrl.trans('anonymous') + '</span>';
   }
   html += '<div class="inner-clickable">';
   html += `<div>${hook.clock}</div>`;

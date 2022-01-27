@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Black, Color, Speed, White }
+import strategygames.{ P2, Player => PlayerIndex, Speed, P1 }
 import strategygames.variant.Variant
 import strategygames.chess.variant._
 import org.goochjs.glicko2._
@@ -20,14 +20,14 @@ final class PerfsUpdater(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   // returns rating diffs
-  def save(game: Game, white: User, black: User): Fu[Option[RatingDiffs]] =
+  def save(game: Game, p1: User, p2: User): Fu[Option[RatingDiffs]] =
     botFarming(game) flatMap {
       case true => fuccess(none)
       case _ =>
         PerfPicker.main(game) ?? { mainPerf =>
-          (game.rated && game.finished && game.accountable && !white.lame && !black.lame) ?? {
-            val ratingsW = mkRatings(white.perfs)
-            val ratingsB = mkRatings(black.perfs)
+          (game.rated && game.finished && game.accountable && !p1.lame && !p2.lame) ?? {
+            val ratingsW = mkRatings(p1.perfs)
+            val ratingsB = mkRatings(p2.perfs)
             game.ratingVariant match {
               case Variant.Chess(Chess960) =>
                 updateRatings(ratingsW.chess960, ratingsB.chess960, game)
@@ -94,20 +94,20 @@ final class PerfsUpdater(
                 }
               case _ =>
             }
-            val perfsW                      = mkPerfs(ratingsW, white -> black, game)
-            val perfsB                      = mkPerfs(ratingsB, black -> white, game)
+            val perfsW                      = mkPerfs(ratingsW, p1 -> p2, game)
+            val perfsB                      = mkPerfs(ratingsB, p2 -> p1, game)
             def intRatingLens(perfs: Perfs) = mainPerf(perfs).glicko.intRating
-            val ratingDiffs = Color.Map(
-              intRatingLens(perfsW) - intRatingLens(white.perfs),
-              intRatingLens(perfsB) - intRatingLens(black.perfs)
+            val ratingDiffs = PlayerIndex.Map(
+              intRatingLens(perfsW) - intRatingLens(p1.perfs),
+              intRatingLens(perfsB) - intRatingLens(p2.perfs)
             )
             gameRepo.setRatingDiffs(game.id, ratingDiffs) zip
-              userRepo.setPerfs(white, perfsW, white.perfs) zip
-              userRepo.setPerfs(black, perfsB, black.perfs) zip
-              historyApi.add(white, game, perfsW) zip
-              historyApi.add(black, game, perfsB) zip
-              rankingApi.save(white, game.perfType, perfsW) zip
-              rankingApi.save(black, game.perfType, perfsB) inject ratingDiffs.some
+              userRepo.setPerfs(p1, perfsW, p1.perfs) zip
+              userRepo.setPerfs(p2, perfsB, p2.perfs) zip
+              historyApi.add(p1, game, perfsW) zip
+              historyApi.add(p2, game, perfsB) zip
+              rankingApi.save(p1, game.perfType, perfsW) zip
+              rankingApi.save(p2, game.perfType, perfsB) inject ratingDiffs.some
           }
         }
     }
@@ -179,17 +179,17 @@ final class PerfsUpdater(
       correspondence = perfs.correspondence.toRating
     )
 
-  private def updateRatings(white: Rating, black: Rating, game: Game): Unit = {
-    val result = game.winnerColor match {
-      case Some(White) => Glicko.Result.Win
-      case Some(Black) => Glicko.Result.Loss
+  private def updateRatings(p1: Rating, p2: Rating, game: Game): Unit = {
+    val result = game.winnerPlayerIndex match {
+      case Some(P1) => Glicko.Result.Win
+      case Some(P2) => Glicko.Result.Loss
       case None              => Glicko.Result.Draw
     }
     val results = new RatingPeriodResults()
     result match {
-      case Glicko.Result.Draw => results.addDraw(white, black)
-      case Glicko.Result.Win  => results.addResult(white, black)
-      case Glicko.Result.Loss => results.addResult(black, white)
+      case Glicko.Result.Draw => results.addDraw(p1, p2)
+      case Glicko.Result.Win  => results.addResult(p1, p2)
+      case Glicko.Result.Loss => results.addResult(p2, p1)
     }
     try {
       Glicko.system.updateRatings(results, true)

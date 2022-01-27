@@ -44,8 +44,8 @@ object message {
       "Sorry, boosters and sandbaggers are not allowed here."
     }
 
-  def blacklistedMessage(implicit ctx: Context) =
-    s"Sorry, your IP address ${HTTPRequest ipAddress ctx.req} has been used to violate the ToS, and is now blacklisted."
+  def p2listedMessage(implicit ctx: Context) =
+    s"Sorry, your IP address ${HTTPRequest ipAddress ctx.req} has been used to violate the ToS, and is now p2listed."
 
   def privateStudy(study: lila.study.Study)(implicit ctx: Context) =
     apply(

@@ -54,7 +54,7 @@ object ofPlayer {
                         div(cls := "puzzle-of-player__puzzle")(
                           views.html.board.bits.mini(
                             fen = puzzle.fenAfterInitialMove,
-                            color = puzzle.color,
+                            playerIndex = puzzle.playerIndex,
                             variantKey = "standard",
                             lastMove = puzzle.line.head.uci
                           )(

@@ -27,13 +27,13 @@ export default function (root: AnalyseCtrl, studyData: StudyData, data: StudyPra
     success(null);
     const chapter = studyData.chapter;
     history.replaceState(null, chapter.name, data.url + '/' + chapter.id);
-    analysisUrl('/analysis/standard/' + root.node.fen.replace(/ /g, '_') + '?color=' + root.bottomColor());
+    analysisUrl('/analysis/standard/' + root.node.fen.replace(/ /g, '_') + '?playerIndex=' + root.bottomPlayerIndex());
   }
   onLoad();
 
   function computeNbMoves(): number {
     let plies = root.node.ply - root.tree.root.ply;
-    if (root.bottomColor() !== root.data.player.color) plies--;
+    if (root.bottomPlayerIndex() !== root.data.player.playerIndex) plies--;
     return Math.ceil(plies / 2);
   }
 
@@ -101,7 +101,7 @@ export default function (root: AnalyseCtrl, studyData: StudyData, data: StudyPra
       onLoad();
       root.practice!.resume();
     },
-    isWhite: root.bottomIsWhite,
+    isP1: root.bottomIsP1,
     analysisUrl,
     autoNext,
     goToNext,

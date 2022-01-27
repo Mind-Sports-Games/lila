@@ -41,7 +41,7 @@ object mini {
     val extra  = extraClasses(game.variant)
     val variant = game.variant.key
     tag(
-      href := withLink.option(gameLink(game, pov.color, ownerLink, tv)),
+      href := withLink.option(gameLink(game, pov.playerIndex, ownerLink, tv)),
       cls := s"mini-game mini-game-${game.id} mini-game--init ${extra} ${variant} variant-${variant} is2d",
       dataLive := isLive.option(game.id),
       renderState(pov)
@@ -58,7 +58,7 @@ object mini {
     val extra  = extraClasses(game.variant)
     val variant = game.variant.key
     a(
-      href := (if (tv) routes.Tv.index else routes.Round.watcher(pov.gameId, pov.color.name)),
+      href := (if (tv) routes.Tv.index else routes.Round.watcher(pov.gameId, pov.playerIndex.name)),
       cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive ?? "mini-game--live"} ${extra} ${variant} variant-${variant}",
       dataLive := isLive.option(game.id),
       renderState(pov)
@@ -72,9 +72,9 @@ object mini {
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Chess(_) | Variant.FairySF(_) =>
-        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)},${pov.color.name},${~pov.game.lastMoveKeys}"
+        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)},${pov.playerIndex.name},${~pov.game.lastMoveKeys}"
       case Variant.Draughts(v) =>
-        dataState := s"${Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)}|${v.boardSize.width}x${v.boardSize.height}|${pov.color.name}|${~pov.game.lastMoveKeys}"
+        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${v.boardSize.width}x${v.boardSize.height}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
     }
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
@@ -84,20 +84,20 @@ object mini {
         span(cls := "rating")(lila.game.Namer ratingString pov.player)
       ),
       if (pov.game.finished) renderResult(pov)
-      else pov.game.clock.map { renderClock(_, pov.color) }
+      else pov.game.clock.map { renderClock(_, pov.playerIndex) }
     )
 
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(
-      pov.game.winnerColor.fold("½") { c =>
-        if (c == pov.color) "1" else "0"
+      pov.game.winnerPlayerIndex.fold("½") { c =>
+        if (c == pov.playerIndex) "1" else "0"
       }
     )
 
-  private def renderClock(clock: strategygames.Clock, color: strategygames.Color) = {
-    val s = clock.remainingTime(color).roundSeconds
+  private def renderClock(clock: strategygames.Clock, playerIndex: strategygames.Player) = {
+    val s = clock.remainingTime(playerIndex).roundSeconds
     span(
-      cls := s"mini-game__clock mini-game__clock--${color.name}",
+      cls := s"mini-game__clock mini-game__clock--${playerIndex.name}",
       dataTime := s
     )(
       f"${s / 60}:${s % 60}%02d"

@@ -164,8 +164,8 @@ function viewLoaded(ctrl: StudyChapterEditFormCtrl, data: StudyChapterConfig): V
         ),
         h(
           'select#chapter-orientation.form-control',
-          ['white', 'black'].map(function (color) {
-            return option(color, data.orientation, ctrl.trans.noarg(color));
+          ['p1', 'p2'].map(function (playerIndex) {
+            return option(playerIndex, data.orientation, ctrl.trans.noarg(playerIndex));
           })
         ),
       ]),

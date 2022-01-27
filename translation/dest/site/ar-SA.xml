@@ -83,6 +83,7 @@
   <string name="drawn">تعادل</string>
   <string name="unknown">مجهول</string>
   <string name="database">قاعدة بيانات</string>
+  <string name="p1DrawP2">%2$s / تعادل / %1$s</string>
   <string name="whiteDrawBlack">أسود / تعادل / أبيض</string>
   <string name="averageRatingX">متوسط التقييم: %s</string>
   <string name="recentGames">أحدث المباريات</string>

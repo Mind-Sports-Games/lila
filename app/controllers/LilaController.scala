@@ -291,7 +291,7 @@ abstract private[controllers] class LilaController(val env: Env)
 
   protected def Firewall[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     if (env.security.firewall accepts ctx.req) a
-    else keyPages.blacklisted.fuccess
+    else keyPages.p2listed.fuccess
 
   protected def NoTor(res: => Fu[Result])(implicit ctx: Context) =
     if (env.security.tor isExitNode HTTPRequest.ipAddress(ctx.req))

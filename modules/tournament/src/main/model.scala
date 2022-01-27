@@ -54,14 +54,14 @@ case class PlayerInfoExt(
     recentPovs: List[lila.game.LightPov]
 )
 
-case class GameRanks(whiteRank: Int, blackRank: Int)
+case class GameRanks(p1Rank: Int, p2Rank: Int)
 
 case class RankedPairing(pairing: Pairing, rank1: Int, rank2: Int) {
 
   def bestRank = rank1 min rank2
   // def rankSum = rank1 + rank2
 
-  def bestColor = strategygames.Color.fromWhite(rank1 < rank2)
+  def bestPlayerIndex = strategygames.Player.fromP1(rank1 < rank2)
 }
 
 object RankedPairing {
@@ -77,8 +77,8 @@ case class RankedPlayer(rank: Int, player: Player) {
 
   def is(other: RankedPlayer) = player is other.player
 
-  def withColorHistory(getHistory: Player.ID => ColorHistory) =
-    RankedPlayerWithColorHistory(rank, player, getHistory(player.id))
+  def withPlayerIndexHistory(getHistory: Player.ID => PlayerIndexHistory) =
+    RankedPlayerWithPlayerIndexHistory(rank, player, getHistory(player.id))
 
   override def toString = s"$rank. ${player.userId}[${player.rating}]"
 }
@@ -91,7 +91,7 @@ object RankedPlayer {
     }
 }
 
-case class RankedPlayerWithColorHistory(rank: Int, player: Player, colorHistory: ColorHistory) {
+case class RankedPlayerWithPlayerIndexHistory(rank: Int, player: Player, playerIndexHistory: PlayerIndexHistory) {
 
   def is(other: RankedPlayer) = player is other.player
 
@@ -100,8 +100,8 @@ case class RankedPlayerWithColorHistory(rank: Int, player: Player, colorHistory:
 
 case class FeaturedGame(
     game: lila.game.Game,
-    white: RankedPlayer,
-    black: RankedPlayer
+    p1: RankedPlayer,
+    p2: RankedPlayer
 )
 
 final class GetTourName(f: (Tournament.ID, Lang) => Option[String])

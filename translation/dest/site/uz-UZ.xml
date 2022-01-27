@@ -79,6 +79,7 @@
   <string name="drawn">Durrang</string>
   <string name="unknown">Noaniq</string>
   <string name="database">Ma\'lumotlar ombori</string>
+  <string name="p1DrawP2">Oq/ Durrang / %2$s</string>
   <string name="whiteDrawBlack">Oq/ Durrang / Qora</string>
   <string name="averageRatingX">O\'rtacha reyting: %s</string>
   <string name="recentGames">So\'nggi o\'yinlar</string>

@@ -23,6 +23,10 @@ export interface SwissData {
   startsAt: string;
   clock: Clock;
   variant: string;
+  p1Name: PlayerName;
+  p2Name: PlayerName;
+  p1Color: PlayerColor;
+  p2Color: PlayerColor;
   me?: MyInfo;
   canJoin: boolean;
   joinTeam?: string;
@@ -76,7 +80,7 @@ export interface PairingBase {
 }
 
 export interface Pairing extends PairingBase {
-  c: boolean; // color
+  c: boolean; // playerIndex
 }
 export interface PairingExt extends Pairing {
   user: LightUser;
@@ -124,16 +128,16 @@ export interface Board {
   boardSize?: BoardSize;
   fen: string;
   lastMove?: string;
-  orientation: Color;
-  white: BoardPlayer;
-  black: BoardPlayer;
+  orientation: PlayerIndex;
+  p1: BoardPlayer;
+  p2: BoardPlayer;
   isMicroMatch: boolean;
   microMatchGameId?: string;
   clock?: {
-    white: number;
-    black: number;
+    p1: number;
+    p2: number;
   };
-  winner?: Color;
+  winner?: PlayerIndex;
 }
 
 export interface BoardPlayer extends BasePlayer {
@@ -170,8 +174,8 @@ export interface PlayerExt extends Player {
 
 export interface Stats {
   games: number;
-  whiteWins: number;
-  blackWins: number;
+  p1Wins: number;
+  p2Wins: number;
   draws: number;
   byes: number;
   absences: number;

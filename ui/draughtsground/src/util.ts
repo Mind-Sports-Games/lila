@@ -1,6 +1,6 @@
 import * as cg from './types';
 
-export const colors: cg.Color[] = ['white', 'black'];
+export const playerIndexs: cg.PlayerIndex[] = ['p1', 'p2'];
 
 export const allKeys: cg.Key[] = [
   '01',
@@ -164,7 +164,7 @@ export const timer: () => cg.Timer = () => {
   };
 };
 
-export const opposite = (c: cg.Color) => (c === 'white' ? 'black' : 'white');
+export const opposite = (c: cg.PlayerIndex) => (c === 'p1' ? 'p2' : 'p1');
 
 export function containsX<X>(xs: X[] | undefined, x: X): boolean {
   return xs !== undefined && xs.indexOf(x) !== -1;
@@ -177,27 +177,26 @@ export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
 };
 
 export const samePiece: (p1: cg.Piece, p2: cg.Piece) => boolean = (p1, p2) =>
-  p1.role === p2.role && p1.color === p2.color;
+  p1.role === p2.role && p1.playerIndex === p2.playerIndex;
 
 const posToTranslateBase: (
   pos: cg.Pos,
   boardSize: cg.BoardSize,
-  asWhite: boolean,
+  asP1: boolean,
   xFactor: number,
   yFactor: number,
   shift: number
-) => cg.NumberPair = (pos, boardSize, asWhite, xFactor, yFactor, shift: number) => {
+) => cg.NumberPair = (pos, boardSize, asP1, xFactor, yFactor, shift: number) => {
   const xf = boardSize[0] / 2 - 0.5;
   if (shift !== 0) {
     return [
-      (!asWhite ? xf - (shift - 0.5 + pos[0]) : shift - 0.5 + pos[0]) * xFactor,
-      (!asWhite ? boardSize[1] - pos[1] : pos[1] - 1.0) * yFactor,
+      (!asP1 ? xf - (shift - 0.5 + pos[0]) : shift - 0.5 + pos[0]) * xFactor,
+      (!asP1 ? boardSize[1] - pos[1] : pos[1] - 1.0) * yFactor,
     ];
   } else {
     return [
-      (!asWhite ? xf - ((pos[1] % 2 !== 0 ? -0.5 : -1.0) + pos[0]) : (pos[1] % 2 !== 0 ? -0.5 : -1.0) + pos[0]) *
-        xFactor,
-      (!asWhite ? boardSize[1] - pos[1] : pos[1] - 1.0) * yFactor,
+      (!asP1 ? xf - ((pos[1] % 2 !== 0 ? -0.5 : -1.0) + pos[0]) : (pos[1] % 2 !== 0 ? -0.5 : -1.0) + pos[0]) * xFactor,
+      (!asP1 ? boardSize[1] - pos[1] : pos[1] - 1.0) * yFactor,
     ];
   }
 };
@@ -205,13 +204,13 @@ const posToTranslateBase: (
 export const posToTranslateAbs = (bounds: ClientRect, boardSize: cg.BoardSize) => {
   const xFactor = bounds.width / (boardSize[0] / 2),
     yFactor = bounds.height / boardSize[1];
-  return (pos: cg.Pos, asWhite: boolean, shift: number) =>
-    posToTranslateBase(pos, boardSize, asWhite, xFactor, yFactor, shift);
+  return (pos: cg.Pos, asP1: boolean, shift: number) =>
+    posToTranslateBase(pos, boardSize, asP1, xFactor, yFactor, shift);
 };
 
 export const posToTranslateRel = (boardSize: cg.BoardSize) => {
-  return (pos: cg.Pos, asWhite: boolean, shift: number) =>
-    posToTranslateBase(pos, boardSize, asWhite, (2 * 100) / boardSize[0], 100 / boardSize[1], shift);
+  return (pos: cg.Pos, asP1: boolean, shift: number) =>
+    posToTranslateBase(pos, boardSize, asP1, (2 * 100) / boardSize[0], 100 / boardSize[1], shift);
 };
 /**
  * Modifies dom element style with asolute value (translate attribute, amount of pixels)

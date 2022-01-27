@@ -4,7 +4,7 @@ import scala.util.chaining._
 import cats.data.NonEmptyList
 
 import strategygames.format.FEN
-import strategygames.{ Board, Color, Divider, Division, GameFamily, GameLogic, Piece, Replay, Role }
+import strategygames.{ Board, Player => PlayerIndex, Divider, Division, GameFamily, GameLogic, Piece, Replay, Role }
 import strategygames.{ Centis, Stats }
 import lila.analyse.{ Accuracy, Advice }
 import lila.game.{ Game, Pov }
@@ -57,7 +57,7 @@ final private class PovToEntry(
                   )
                   .toOption
                   .flatMap(_.toNel)
-              movetimes <- game.moveTimes(pov.color).flatMap(_.toNel)
+              movetimes <- game.moveTimes(pov.playerIndex).flatMap(_.toNel)
             } yield RichPov(
               pov = pov,
               provisional = provisional,
@@ -82,14 +82,14 @@ final private class PovToEntry(
   private def makeMoves(from: RichPov): List[InsightMove] = {
     val cpDiffs = ~from.moveAccuracy toVector
     val prevInfos = from.analysis.?? { an =>
-      Accuracy.prevColorInfos(from.pov, an) pipe { is =>
-        from.pov.color.fold(is, is.map(_.invert))
+      Accuracy.prevPlayerIndexInfos(from.pov, an) pipe { is =>
+        from.pov.playerIndex.fold(is, is.map(_.invert))
       }
     }
     val movetimes = from.movetimes.toList
-    val roles     = from.pov.game.pgnMoves(from.pov.color).map(pgnMoveToRole(from.pov.game.variant.gameFamily, _))
+    val roles     = from.pov.game.pgnMoves(from.pov.playerIndex).map(pgnMoveToRole(from.pov.game.variant.gameFamily, _))
     val boards = {
-      val pivot = if (from.pov.color == from.pov.game.startColor) 0 else 1
+      val pivot = if (from.pov.playerIndex == from.pov.game.startPlayerIndex) 0 else 1
       from.boards.toList.zipWithIndex.collect {
         case (e, i) if (i % 2) == pivot => e
       }
@@ -101,7 +101,7 @@ final private class PovToEntry(
     val timeCvs = slidingMoveTimesCvs(movetimes)
     movetimes.zip(roles).zip(boards).zip(blurs).zip(timeCvs).zipWithIndex.map {
       case (((((movetime, role), board), blur), timeCv), i) =>
-        val ply      = i * 2 + from.pov.color.fold(1, 2)
+        val ply      = i * 2 + from.pov.playerIndex.fold(1, 2)
         val prevInfo = prevInfos lift i
         val opportunism = from.advices.get(ply - 1) flatMap {
           case o if o.judgment.isBlunder =>
@@ -126,7 +126,7 @@ final private class PovToEntry(
           eval = prevInfo.flatMap(_.cp).map(_.ceiled.centipawns),
           mate = prevInfo.flatMap(_.mate).map(_.moves),
           cpl = cpDiffs lift i,
-          material = board.materialImbalance * from.pov.color.fold(1, -1),
+          material = board.materialImbalance * from.pov.playerIndex.fold(1, -1),
           opportunism = opportunism,
           luck = luck,
           blur = blur,
@@ -160,8 +160,8 @@ final private class PovToEntry(
     QueenTrade {
       from.division.end.fold(from.boards.last.some)(from.boards.toList.lift) match {
         case Some(board) =>
-          Color.all.forall { color =>
-            !board.hasPiece(Piece(GameLogic.Chess(), color, Role.ChessRole(strategygames.chess.Queen)))
+          PlayerIndex.all.forall { playerIndex =>
+            !board.hasPiece(Piece(GameLogic.Chess(), playerIndex, Role.ChessRole(strategygames.chess.Queen)))
           }
         case _ =>
           logger.warn(s"https://playstrategy.org/${from.pov.gameId} missing endgame board")
@@ -181,15 +181,15 @@ final private class PovToEntry(
       id = InsightEntry povToId pov,
       number = 0, // temporary :-/ the Indexer will set it
       userId = myId,
-      color = pov.color,
+      playerIndex = pov.playerIndex,
       perf = perfType,
       eco =
         if (game.playable || game.turns < 4 || game.fromPosition || game.variant.exotic) none
         else strategygames.chess.opening.Ecopening fromGame game.pgnMoves.toList,
-      myCastling = Castling.fromMoves(game pgnMoves pov.color),
+      myCastling = Castling.fromMoves(game pgnMoves pov.playerIndex),
       opponentRating = opRating,
       opponentStrength = RelativeStrength(opRating - myRating),
-      opponentCastling = Castling.fromMoves(game pgnMoves !pov.color),
+      opponentCastling = Castling.fromMoves(game pgnMoves !pov.playerIndex),
       moves = makeMoves(from),
       queenTrade = queenTrade(from),
       result = game.winnerUserId match {

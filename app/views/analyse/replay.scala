@@ -17,7 +17,7 @@ import lila.game.Pov
 object replay {
 
   private[analyse] def titleOf(pov: Pov)(implicit lang: Lang) =
-    s"${playerText(pov.game.whitePlayer)} vs ${playerText(pov.game.blackPlayer)}: ${pov.game.opening
+    s"${playerText(pov.game.p1Player)} vs ${playerText(pov.game.p2Player)}: ${pov.game.opening
       .fold(trans.analysis.txt())(_.opening.toString())}"
 
   def apply(
@@ -76,7 +76,7 @@ object replay {
           dataIcon := "$",
           cls := "text",
           targetBlank,
-          href := cdnUrl(routes.Export.gif(pov.gameId, pov.color.name).url)
+          href := cdnUrl(routes.Export.gif(pov.gameId, pov.playerIndex.name).url)
         )(
           "Share as a GIF"
         )

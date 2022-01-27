@@ -1,5 +1,13 @@
-.color-icon {
+.playerIndex-icon {
   @if $theme-light {
+    &.p1::before {
+      content: 'K';
+    }
+
+    &.p2::before {
+      content: 'J';
+    }
+
     &.white::before {
       content: 'K';
     }
@@ -8,6 +16,14 @@
       content: 'J';
     }
   } @else {
+    &.p1::before {
+      content: 'J';
+    }
+
+    &.p2::before {
+      content: 'K';
+    }
+
     &.white::before {
       content: 'J';
     }

@@ -11,9 +11,9 @@ export function read(fen: cg.FEN, fields?: number): cg.Pieces {
   for (const fenPart of fen.split(':')) {
     if (fenPart.length <= 1) continue;
     const first = fenPart.slice(0, 1);
-    let clr: cg.Color;
-    if (first.toUpperCase() === 'W') clr = 'white';
-    else if (first.toUpperCase() === 'B') clr = 'black';
+    let clr: cg.PlayerIndex;
+    if (first.toUpperCase() === 'W') clr = 'p1';
+    else if (first.toUpperCase() === 'B') clr = 'p2';
     else continue;
     const fenPieces = fenPart.slice(1).split(',');
     for (const fenPiece of fenPieces) {
@@ -44,7 +44,7 @@ export function read(fen: cg.FEN, fields?: number): cg.Pieces {
       }
       if (fieldNumber && (!fields || fieldNumber <= fields)) {
         pieces.set(fieldStr as cg.Key, {
-          color: clr,
+          playerIndex: clr,
           role,
         });
       }
@@ -61,7 +61,7 @@ export function write(pieces: cg.Pieces, fields?: number, algebraic?: boolean): 
     const key = allKeys[f - 1],
       piece = pieces.get(key);
     if (!piece) continue;
-    if (piece.color === 'white') {
+    if (piece.playerIndex === 'p1') {
       if (fenW.length > 1) fenW += ',';
       if (piece.role === 'king') fenW += 'K';
       else if (piece.role === 'ghostman') fenW += 'G';
@@ -180,14 +180,14 @@ export function readKingMoves(fen: cg.FEN): cg.KingMoves | undefined {
   });
   if (playerMoves.length !== 2) return undefined;
 
-  const whiteMoves = parseInt(playerMoves[1].slice(0, 1)),
-    blackMoves = parseInt(playerMoves[0].slice(0, 1)),
+  const p1Moves = parseInt(playerMoves[1].slice(0, 1)),
+    p2Moves = parseInt(playerMoves[0].slice(0, 1)),
     result: cg.KingMoves = {
-      white: { count: whiteMoves },
-      black: { count: blackMoves },
+      p1: { count: p1Moves },
+      p2: { count: p2Moves },
     };
-  if (whiteMoves > 0) result.white.key = playerMoves[1].slice(1) as cg.Key;
-  if (blackMoves > 0) result.black.key = playerMoves[0].slice(1) as cg.Key;
+  if (p1Moves > 0) result.p1.key = playerMoves[1].slice(1) as cg.Key;
+  if (p2Moves > 0) result.p2.key = playerMoves[0].slice(1) as cg.Key;
 
   return result;
 }

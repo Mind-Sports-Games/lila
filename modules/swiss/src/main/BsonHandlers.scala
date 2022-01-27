@@ -1,7 +1,6 @@
 package lila.swiss
 
-import strategygames.Color
-import strategygames.GameLogic
+import strategygames.{ Player => PlayerIndex, GameLogic }
 import strategygames.format.FEN
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
@@ -59,7 +58,7 @@ object BsonHandlers {
   implicit val pairingStatusHandler = lila.db.dsl.quickHandler[SwissPairing.Status](
     {
       case BSONBoolean(true)  => Left(SwissPairing.Ongoing)
-      case BSONInteger(index) => Right(Color.fromWhite(index == 0).some)
+      case BSONInteger(index) => Right(PlayerIndex.fromP1(index == 0).some)
       case _                  => Right(none)
     },
     {
@@ -77,8 +76,8 @@ object BsonHandlers {
             id = r str id,
             swissId = r.get[Swiss.Id](swissId),
             round = r.get[SwissRound.Number](round),
-            white = w,
-            black = b,
+            p1 = w,
+            p2 = b,
             status = r.getO[SwissPairing.Status](status) | Right(none),
             // TODO: long term we may want to skip storing both of these fields
             //       in the case that it's not a micromatch to save on storage

@@ -21,7 +21,7 @@ function squareDist(a: number, b: number) {
   return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
 }
 
-function isBlack(p: string) {
+function isP2(p: string) {
   return p === p.toLowerCase();
 }
 
@@ -102,7 +102,7 @@ function sanOf(board: Board, uci: string) {
   }
 
   // castling
-  if (pt == 'k' && ((d && isBlack(p) === isBlack(d)) || squareDist(from, to) > 1)) {
+  if (pt == 'k' && ((d && isP2(p) === isP2(d)) || squareDist(from, to) > 1)) {
     if (to < from) return 'O-O-O';
     else return 'O-O';
   }

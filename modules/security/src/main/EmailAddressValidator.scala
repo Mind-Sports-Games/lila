@@ -66,10 +66,10 @@ final class EmailAddressValidator(
   // make sure the cache is warmed up, so next call can be synchronous
   def preloadDns(e: EmailAddress): Funit = hasAcceptableDns(e).void
 
-  // only compute valid and non-whitelisted email domains
+  // only compute valid and non-p1listed email domains
   private def hasAcceptableDns(e: EmailAddress): Fu[Boolean] =
     isAcceptable(e) ?? e.domain.map(_.lower) ?? { domain =>
-      if (DisposableEmailDomain whitelisted domain) fuccess(true)
+      if (DisposableEmailDomain p1listed domain) fuccess(true)
       else
         dnsApi.mx(domain).dmap { domains =>
           domains.nonEmpty && !domains.exists { disposable(_) }

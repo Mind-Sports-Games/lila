@@ -8,8 +8,8 @@ export default function (ctrl: SimulCtrl) {
   return h('div.game-list.now-playing.box__pad', ctrl.data.pairings.map(miniPairing(ctrl)));
 }
 
-const renderClock = (color: Color, time: number) =>
-  h(`span.mini-game__clock.mini-game__clock--${color}`, {
+const renderClock = (playerIndex: PlayerIndex, time: number) =>
+  h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
     attrs: {
       'data-time': time,
       'data-managed': 1,
