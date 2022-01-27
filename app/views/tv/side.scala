@@ -23,7 +23,7 @@ object side {
             "tv-channel" -> true,
             c.key        -> true,
             "active"     -> (c == channel),
-            "hidden"     -> !(c.gameFamily == channel.gameFamily || c.familyChannel)
+            "hidden"     -> !((c.gameFamily == channel.gameFamily || c.familyChannel) && (champions.get(c).fold(false)( _ => true) || c.name == "Top Rated"))
           )
         )(
           span(dataIcon := c.icon)(
