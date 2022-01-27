@@ -450,6 +450,8 @@ export default class RoundController {
   endWithData = (o: ApiEnd): void => {
     const d = this.data;
     d.game.winner = o.winner;
+    d.game.winnerPlayer = o.winnerPlayer;
+    d.game.loserPlayer = o.loserPlayer;
     d.game.status = o.status;
     d.game.boosted = o.boosted;
     this.userJump(this.lastPly());
