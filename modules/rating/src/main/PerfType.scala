@@ -19,7 +19,7 @@ object PuzzlePerf {
   case object ChessPuzzle
       extends PuzzlePerf(
         GameFamily.Chess(),
-        50, // changed from 20 to 50 as was same as loa perf id.... currently unused as puzzles disabled
+        50, // changed from 20 to 50 as was same as noCastling perf id.... currently unused as puzzles disabled
         key = "puzzle",
         name = "Training",
         title = "Chess tactics trainer",

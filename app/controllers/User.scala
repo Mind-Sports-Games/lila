@@ -263,7 +263,7 @@ final class User(
         negotiate(
           html =
             for {
-              nbAllTime      <- (env.user.cached.top10NbGame.get {})
+              nbAllTime      <- env.user.cached.top10NbGame.get {}
               tourneyWinners <- env.tournament.winners.all.map(_.top)
               topOnline      <- env.user.cached.getTop50Online
               anyOnline      <- env.user.cached.get50Online
