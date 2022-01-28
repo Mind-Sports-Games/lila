@@ -1,6 +1,10 @@
 .tv-channel {
   padding: 0.4rem 0.8rem 0.4rem 0 !important;
 
+  &.hidden {
+    display: none;
+  }
+
   > span {
     @extend %flex-center-nowrap;
 
