@@ -123,11 +123,14 @@ db.player_assessment.find({ white: { $exists: true } }).forEach(s => {
 });
 
 //seems to duplicate not overwrite, probably because _id (pk) is changing?
-db.player_assessment.find.forEach(function(e,i) {e._id=e._id.replace("white", "p1"); e._id=e._id.replace("black", "p2"); db.player_assessment.save(e);});
+db.player_assessment.find.forEach(function (e, i) {
+  e._id = e._id.replace('white', 'p1');
+  e._id = e._id.replace('black', 'p2');
+  db.player_assessment.save(e);
+});
 
-db.player_assessment.remove({ _id: { $regex: '/white' } })
-db.player_assessment.remove({ _id: { $regex: '/black' } })
-
+db.player_assessment.remove({ _id: { $regex: '/white' } });
+db.player_assessment.remove({ _id: { $regex: '/black' } });
 
 db.seek_archive.find().forEach(s => {
   //print(`${s._id} color: ${s.color}`);
