@@ -1,3 +1,5 @@
+//If you are ever considering running this script in its entirity (and I dont know why you would now its been run on production), maybe consider going through each update individually and double checking.
+
 db.challenge.find().forEach(s => {
   //print(`${s._id} choice: ${s.colorChoice} final: ${s.finalColor}`);
   db.challenge.update(
@@ -120,25 +122,15 @@ db.player_assessment.find({ white: { $exists: true } }).forEach(s => {
   );
 });
 
-db.player_assessment.updateMany({ _id: { $regex: '/white' } }, [
-  {
-    $set: {
-      _id: {
-        $replaceOne: { input: '$URL', find: '/white', replacement: '/p1' },
-      },
-    },
-  },
-]);
+//seems to duplicate not overwrite, probably because _id (pk) is changing?
+db.player_assessment.find.forEach(function (e, i) {
+  e._id = e._id.replace('white', 'p1');
+  e._id = e._id.replace('black', 'p2');
+  db.player_assessment.save(e);
+});
 
-db.player_assessment.updateMany({ _id: { $regex: '/black' } }, [
-  {
-    $set: {
-      _id: {
-        $replaceOne: { input: '$URL', find: '/black', replacement: '/p2' },
-      },
-    },
-  },
-]);
+db.player_assessment.remove({ _id: { $regex: '/white' } });
+db.player_assessment.remove({ _id: { $regex: '/black' } });
 
 db.seek_archive.find().forEach(s => {
   //print(`${s._id} color: ${s.color}`);
