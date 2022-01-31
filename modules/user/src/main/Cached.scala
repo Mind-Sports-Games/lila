@@ -79,6 +79,15 @@ final class Cached(
       }
   }
 
+  private val first50OnlineCache = cacheApi.unit[List[User]] {
+    _.refreshAfterWrite(1 minute)
+      .buildAsyncFuture { _ =>
+        userRepo.byAscendingUsernamesNoBot(onlineUserIds(), 50)
+      }
+  }
+
+  def get50Online = first50OnlineCache.getUnit
+
   private val top50OnlineCache = cacheApi.unit[List[User]] {
     _.refreshAfterWrite(1 minute)
       .buildAsyncFuture { _ =>

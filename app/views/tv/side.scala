@@ -22,7 +22,8 @@ object side {
           cls := List(
             "tv-channel" -> true,
             c.key        -> true,
-            "active"     -> (c == channel)
+            "active"     -> (c == channel),
+            "hidden"     -> !((c.gameFamily == channel.gameFamily || c.familyChannel) && (champions.get(c).nonEmpty || c.name == "Top Rated"))
           )
         )(
           span(dataIcon := c.icon)(

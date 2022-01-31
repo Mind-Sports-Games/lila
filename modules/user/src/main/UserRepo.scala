@@ -124,6 +124,17 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .cursor[User](ReadPreference.secondaryPreferred)
       .list(nb)
 
+  def byAscendingUsernamesNoBot(ids: Iterable[ID], nb: Int): Fu[List[User]] =
+    coll
+      .find(
+        $doc(
+          F.enabled -> true
+        ) ++ $inIds(ids) ++ botSelect(false)
+      )
+      .sort($sort asc "username")
+      .cursor[User](ReadPreference.secondaryPreferred)
+      .list(nb)
+
   def botsByIds(ids: Iterable[ID]): Fu[List[User]] =
     coll.list[User]($inIds(ids) ++ botSelect(true), ReadPreference.secondaryPreferred)
 
