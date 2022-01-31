@@ -47,7 +47,7 @@ object topnav {
       ),*/
       st.section(
         //linkTitle(routes.Practice.index.path, trans.learnMenu()),
-        linkTitle(routes.Study.allDefault(1).path, trans.learnMenu()),
+        linkTitle(routes.Page.variantHome.path, trans.learnMenu()),
         div(role := "group")(
           a(href := routes.Page.variantHome)(trans.rulesVariants()),
           ctx.noBot option frag(
@@ -61,7 +61,7 @@ object topnav {
         )
       ),
       st.section(
-        linkTitle(routes.Tv.index.path, trans.watch()),
+        linkTitle(routes.Tv.games.path, trans.watch()),
         div(role := "group")(
           a(href := routes.Tv.index)("PlayStrategy TV"),
           a(href := routes.Tv.games)(trans.currentGames()),
