@@ -49,13 +49,13 @@ object topnav {
         //linkTitle(routes.Practice.index.path, trans.learnMenu()),
         linkTitle(routes.Study.allDefault(1).path, trans.learnMenu()),
         div(role := "group")(
+          a(href := routes.Page.variantHome)(trans.rulesVariants()),
           ctx.noBot option frag(
             //a(href := routes.Learn.index)(trans.chessBasics()),
             //a(href := routes.Practice.index)(trans.practice()),
-            a(href := routes.Coordinate.home)(trans.coordinates.coordinates())
+            a(href := routes.Coordinate.home)(s"Chess ${trans.coordinates.coordinates.txt()}")
           ),
           a(href := routes.Study.allDefault(1))(trans.studyMenu()),
-          a(href := routes.Page.variantHome)(trans.rulesVariants()),
           //ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
           canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.playstrategyClasses())
         )
@@ -82,10 +82,10 @@ object topnav {
       st.section(
         linkTitle(routes.UserAnalysis.index.path, trans.tools()),
         div(role := "group")(
-          a(href := routes.UserAnalysis.index)(trans.analysis()),
-          a(href := s"${routes.UserAnalysis.index}#explorer")(trans.openingExplorer()),
-          a(href := routes.Editor.index)(trans.boardEditor()),
-          a(href := routes.Importer.importGame)(trans.importGame()),
+          a(href := routes.UserAnalysis.index)(s"Chess ${trans.analysis.txt()}"),
+          //a(href := s"${routes.UserAnalysis.index}#explorer")(trans.openingExplorer()),
+          a(href := routes.Editor.index)(s"Chess ${trans.boardEditor.txt()}"),
+          //a(href := routes.Importer.importGame)(trans.importGame()),
           a(href := routes.Search.index())(trans.search.advancedSearch())
         )
       )
