@@ -95,6 +95,7 @@ object side {
         showNonEmptyPerf(u.perfs.xiangqi, PerfType.orDefault("xiangqi")),
         showNonEmptyPerf(u.perfs.minishogi, PerfType.orDefault("minishogi")),
         showNonEmptyPerf(u.perfs.minixiangqi, PerfType.orDefault("minixiangqi")),
+        showNonEmptyPerf(u.perfs.flipello, PerfType.orDefault("flipello")),
         u.noBot option frag(
           hr,
           showPerf(u.perfs.puzzle, PerfType.orDefault("puzzle")),

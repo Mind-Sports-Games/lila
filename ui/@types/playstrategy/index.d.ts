@@ -292,7 +292,8 @@ declare type VariantKey =
   | 'shogi'
   | 'xiangqi'
   | 'minishogi'
-  | 'minixiangqi';
+  | 'minixiangqi'
+  | 'flipello';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -337,7 +338,8 @@ declare type Perf =
   | 'shogi'
   | 'xiangqi'
   | 'minishogi'
-  | 'minixiangqi';
+  | 'minixiangqi'
+  | 'flipello';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red';

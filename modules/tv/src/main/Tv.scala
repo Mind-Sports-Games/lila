@@ -134,6 +134,15 @@ object Tv {
           familyChannel = true,
           gameFamily = "xiangqi"
         )  
+    case object FlipelloFamily
+        extends Channel(
+          name = "All Flipello",
+          icon = FV.Flipello.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(anyVariant(FV.Variant.all.filter(v => v.gameFamily == GameFamily.Flipello() ).map(_.key)), noBot),
+          familyChannel = true,
+          gameFamily = "flipello"
+        )  
     case object Bullet
         extends Channel(
           name = S.Bullet.name,
@@ -399,6 +408,15 @@ object Tv {
           filters = Seq(variant(FV.MiniXiangqi.key), noBot),
           familyChannel = false,
           gameFamily = "xiangqi"
+        )
+    case object Flipello
+        extends Channel(
+          name = FV.Flipello.name,
+          icon = FV.Flipello.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(FV.Flipello.key), noBot),
+          familyChannel = false,
+          gameFamily = "flipello"
         )
     case object Bot
         extends Channel(

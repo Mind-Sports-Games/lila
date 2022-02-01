@@ -2491,9 +2491,9 @@ chessops@^0.10.4:
   dependencies:
     "@badrap/result" "^0.2"
 
-"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.9":
-  version "0.8.1-pstrat3.9"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#8294d3fe13ec642a89913f917ff5636bce95c131"
+"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.10":
+  version "0.8.1-pstrat3.10"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#949c6a6a318e8dde36c34a2caca9ef74f507cec2"
   dependencies:
     "@badrap/result" "^0.2.8"
     chessops "^0.10.4"

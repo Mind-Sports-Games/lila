@@ -58,7 +58,7 @@ export function main(ctrl: RoundController): VNode {
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
 
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(d.game.variant.key)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(d.game.variant.key)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }

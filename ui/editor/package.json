@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.16",
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.9",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.10",
     "common": "2.0.0",
     "snabbdom": "^3.0.1"
   },

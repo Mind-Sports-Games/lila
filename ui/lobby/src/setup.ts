@@ -296,6 +296,9 @@ export default class Setup {
               break;
           }
           break;
+        case '5':
+          key = 'flipello';
+          break;
       }
       const $selected = $ratings
         .hide()
