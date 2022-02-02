@@ -266,11 +266,12 @@ final class User(
               nbAllTime      <- env.user.cached.top10NbGame.get {}
               tourneyWinners <- env.tournament.winners.all.map(_.top)
               topOnline      <- env.user.cached.getTop50Online
+              anyOnline      <- env.user.cached.get50Online
               _              <- env.user.lightUserApi preloadMany tourneyWinners.map(_.userId)
             } yield Ok(
               html.user.list(
                 tourneyWinners = tourneyWinners,
-                online = topOnline,
+                online = if(topOnline.isEmpty || topOnline.length < 25) anyOnline else topOnline,
                 leaderboards = leaderboards,
                 nbAllTime = nbAllTime
               )
