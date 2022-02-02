@@ -56,6 +56,12 @@ xiangqi_themes = [
   ['2dhanzi', 'svg'],
   ['ka', 'svg']
 ]
+flipello_themes = [
+  ['classic_flipello', 'svg'],
+  ['check_yb_flipello', 'png'],
+  ['marble_bw_flipello', 'svg'],
+  ['fabirovsky_flipello', 'svg']
+]
 types = {
   'svg' => 'svg+xml;base64,',
   'png' => 'png;base64,'
@@ -68,6 +74,7 @@ draughts_variants = ['international','frisian','frysk','antidraughts','breakthro
 draughts_roles = ['man','king']
 lines_of_action_variants= ['linesOfAction', 'scrambledEggs']
 lines_of_action_roles = ['l-piece']
+flipello_roles = ['p-piece']
 shogi_roles_to_imageprefix = [
     ['p-piece','FU'],
     ['l-piece','KY'],
@@ -90,6 +97,7 @@ shogi_variants = ['shogi', 'minishogi']
 xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece', 'pp-piece']
 xiangqi_colors = ['B','R']
 xiangqi_variants = ['xiangqi', 'minixiangqi']
+flipello_variants = ['flipello']
 
 
 # inline SVG Chess
@@ -379,4 +387,59 @@ xiangqi_themes.map { |theme|
     }
   }.flatten
   File.open(dest_dir + 'xiangqi-' + name + '.external.css', 'w') { |f| f.puts (classes_xiangqi_game + classes_xiangqi_variant).join("\n") }
+}
+
+# inline SVG flipello (reversi)
+flipello_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_flipello_game = colors.map { |color|
+    flipello_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      file = source_dir + 'flipello/' + name + '/' + piece + '.' + ext
+      File.open(file, 'r') do|image_file|
+        image = image_file.read
+        base64 = Base64.strict_encode64(image)
+        '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+      end
+    }
+  }.flatten
+  classes_flipello_variant = flipello_variants.map{ |variant|
+    colors.map { |color|
+      flipello_roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        file = source_dir + 'flipello/' + name + '/' + piece + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'flipello-' + name + '.css', 'w') { |f| f.puts (classes_flipello_game + classes_flipello_variant).join("\n") }
+}
+# external SVG flipello
+flipello_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_flipello_game = colors.map { |color|
+    flipello_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+        "background-image:url('/assets/piece/" + 'flipello/' + name + "/" + piece + "." + ext + "')}"
+    }
+  }.flatten
+  classes_flipello_variant = flipello_variants.map { |variant|
+    colors.map { |color|
+      flipello_roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+          "background-image:url('/assets/piece/" + 'flipello/' + name + "/" + piece + "." + ext + "')}"
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'flipello-' + name + '.external.css', 'w') { |f| f.puts (classes_flipello_game + classes_flipello_variant).join("\n") }
 }
