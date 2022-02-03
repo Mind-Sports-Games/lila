@@ -12,7 +12,12 @@ import lila.game.Pov
 
 object home {
 
-  def apply(homepage: Homepage)(implicit ctx: Context) = {
+  def apply(
+    homepage: Homepage,
+    chatOption: Option[lila.chat.UserChat.Mine] = None,
+  )(implicit
+    ctx: Context
+  ) = {
     import homepage._
     views.html.base.layout(
       title = "",
@@ -33,6 +38,17 @@ object home {
               },
               "i18n" -> i18nJsObject(i18nKeys)
             )
+            //.add("socketVersion" -> socketVersion.map(_.value))
+            .add("chat" -> chatOption.map { chat =>
+              views.html.chat.json(
+                chat.chat,
+                name = trans.chatRoom.txt(),
+                timeout = chat.timeout,
+                public = true,
+                resourceId = lila.chat.Chat.ResourceId(s"team/${chat.chat.id}"),
+                localMod = false
+              )
+            })
           )})"""
         )
       ),
@@ -131,14 +147,18 @@ object home {
             )
           ),
           if (ctx.isAuth)
-            div(cls := "timeline")(
-              ctx.blind option h2("Timeline"),
-              views.html.timeline entries userTimeline,
-              userTimeline.nonEmpty option a(cls := "more", href := routes.Timeline.home)(
-                trans.more(),
-                " »"
-              )
+            frag(
+              views.html.chat.frag,
+              views.html.chat.spectatorsFrag
             )
+            //div(cls := "timeline")(
+            //  ctx.blind option h2("Timeline"),
+            //  views.html.timeline entries userTimeline,
+            //  userTimeline.nonEmpty option a(cls := "more", href := routes.Timeline.home)(
+            //    trans.more(),
+            //    " »"
+            //  )
+            //)
           else
             div(cls := "about-side")(
               ctx.blind option h2("About"),
