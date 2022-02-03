@@ -42,7 +42,7 @@ object PieceSet extends PieceSetObject {
 
   def updatePieceSet(currentPieceSets : List[PieceSet], theme: String) : List[PieceSet] = {
     val newPieceSet = applyThemeOnly(theme)
-    currentPieceSets.map{ x => 
+    addMissingDefaultsIfAny(currentPieceSets).map{ x => 
                             x.gameFamily match {
                                 case newPieceSet.gameFamily => newPieceSet
                                 case _ => x
@@ -50,6 +50,15 @@ object PieceSet extends PieceSetObject {
                         }
   }
 
+  def addMissingDefaultsIfAny(currentPieceSets: List[PieceSet]): List[PieceSet] = {
+    defaults.map{
+      x => if( currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily).size == 1 ){
+        currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily)(0)
+      } else{
+        x
+      }
+    }
+  }
   val all : List[PieceSet] = GameFamily.all.map(gf => gf.pieceSetThemes.map(t => new PieceSet(t, gf.id))).flatten
   
   def allOfFamily(gf: GameFamily) : List[PieceSet] = gf.pieceSetThemes.map(t => new PieceSet(t, gf.id))
