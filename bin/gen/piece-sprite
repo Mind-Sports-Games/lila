@@ -400,7 +400,7 @@ flipello_themes.map { |theme|
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+        '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
@@ -413,7 +413,7 @@ flipello_themes.map { |theme|
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -428,7 +428,7 @@ flipello_themes.map { |theme|
   classes_flipello_game = colors.map { |color|
     flipello_roles.map { |role|
       piece = color[0] + role.upcase[0]
-      '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+      '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
         "background-image:url('/assets/piece/" + 'flipello/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
@@ -436,7 +436,7 @@ flipello_themes.map { |theme|
     colors.map { |color|
       flipello_roles.map { |role|
         piece = color[0] + role.upcase[0]
-        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
           "background-image:url('/assets/piece/" + 'flipello/' + name + "/" + piece + "." + ext + "')}"
       }
     }
