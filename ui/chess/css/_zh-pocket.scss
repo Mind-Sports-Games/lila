@@ -14,6 +14,10 @@
   flex: 0 0 100%;
 }
 
+.variant-flipello .pocket {
+  width: 20%;
+}
+
 .pocket {
   @extend %box-radius;
 
