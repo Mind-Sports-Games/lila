@@ -17,6 +17,10 @@
       height: 125px;
     }
 
+    &.flipello {
+      height: 125px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -42,6 +46,12 @@
     display: block;
     width: 100px;
     height: 111.11px;
+  }
+
+  .list a.flipello span {
+    display: block;
+    width: 100px;
+    height: 100px;
   }
 
   &.d3 .list span {
@@ -122,6 +132,22 @@
       background-image: url(../images/board/xiangqi/xiangqic.svg);
       background-size: 100px;
     }
+
+    .flipello-green{
+      background-image: url(../images/board/flipello/flipello_green_board.svg);
+      background-size: 100px;
+    }
+
+    .flipello-green-marble{
+      background-image: url(../images/board/flipello/flipello_green_marble_board.svg);
+      background-size: 100px;
+    }
+
+    .flipello-wood{
+      background-image: url(../images/board/flipello/flipello_wood_board.svg);
+      background-size: 100px;
+    }
+
   }
 
   &.d3 {
