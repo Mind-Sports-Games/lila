@@ -55,7 +55,7 @@ export function makeConfig(ctrl: RoundController): Config {
       duration: data.pref.animationDuration,
     },
     premovable: {
-      enabled: data.pref.enablePremove,
+      enabled: data.pref.enablePremove && data.game.variant.key !== 'flipello',
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {
@@ -64,7 +64,7 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     predroppable: {
-      enabled: data.pref.enablePremove && ['crazyhouse', 'shogi', 'minishogi'].includes(data.game.variant.key),
+      enabled: data.pref.enablePremove && ['crazyhouse', 'shogi', 'minishogi', 'flipello'].includes(data.game.variant.key),
       events: {
         set: hooks.onPredrop,
         unset() {

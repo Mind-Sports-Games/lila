@@ -19,6 +19,7 @@ import { CorresClockController, ctrl as makeCorresClock } from './corresClock/co
 import MoveOn from './moveOn';
 import TransientMove from './transientMove';
 import * as atomic from './atomic';
+import * as flipello from './flipello';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -170,6 +171,10 @@ export default class RoundController {
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
+      if (this.data.game.variant.key === 'flipello'){
+        flipello.flip(this, key);
+        this.redraw();
+      }
     } else this.jump(this.ply);
   };
 
@@ -179,6 +184,8 @@ export default class RoundController {
         sound.explode();
         atomic.capture(this, dest);
       } else sound.capture();
+    } else if (this.data.game.variant.key === 'flipello'){
+      flipello.flip(this, dest);
     } else sound.move();
   };
 
@@ -200,7 +207,7 @@ export default class RoundController {
   };
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
-    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi','flipello'].includes(this.data.game.variant.key)) return false;
+    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(this.data.game.variant.key)) return false;
     if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'p-piece') return false;
     const pos = (dest[0] + orig[1]) as cg.Key;
     this.chessground.setPieces(new Map([[pos, undefined]]));
@@ -459,9 +466,9 @@ export default class RoundController {
     }
     if (!this.replaying() && playedPlayerIndex != d.player.playerIndex) {
       // atrocious hack to prevent race condition
-      // with explosions and premoves
+      // with explosions and premoves (and flipping pieces?)
       // https://github.com/ornicar/lila/issues/343
-      const premoveDelay = d.game.variant.key === 'atomic' ? 100 : 1;
+      const premoveDelay = d.game.variant.key === 'atomic' || d.game.variant.key === 'flipello' ? 100 : 1;
       setTimeout(() => {
         if (!this.chessground.playPremove() && !this.playPredrop()) {
           promotion.cancel(this);

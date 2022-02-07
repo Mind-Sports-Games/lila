@@ -89,7 +89,7 @@ export function init(ctrl: RoundController) {
       if (ctrl.data.game.variant.key === 'shogi' || ctrl.data.game.variant.key === 'minishogi') {
         activeCursor = `cursor-${role}-shogi`;
       }else if (ctrl.data.game.variant.key === 'flipello') {
-        activeCursor = `cursor-${role}-flipello`;
+        activeCursor = `cursor-${playerIndex}-${role}-flipello`;
       } else {
         activeCursor = `cursor-${playerIndex}-${role}-chess`;
       }
@@ -163,5 +163,6 @@ function preloadMouseIcons(data: RoundData) {
   for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/chess/cburnett/${playerIndexKey}${pKey}.svg`));
   for (const pKey of ['FU', 'KY', 'KE', 'GI', 'KI', 'KA', 'HI'])
     fetch(playstrategy.assetUrl(`piece/shogi/2kanji/${playerIndexNum}${pKey}.svg`));
+  fetch(playstrategy.assetUrl(`piece/flipello/classic_flipello/${playerIndexKey}P.png`));
   mouseIconsLoaded = true;
 }
