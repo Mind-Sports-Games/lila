@@ -129,6 +129,14 @@ export function getScore(variant: VariantKey, pieces: cg.Pieces): number {
   return score;
 }
 
+export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerIndex: String): number {
+  let score = 0;
+  for (const p of pieces.values()) {
+    score += pieceScores(variant, p.role, p.promoted) * (p.playerIndex === playerIndex ? 1 : 0);
+  }
+  return score;
+}
+
 export const noChecks: CheckCount = {
   p1: 0,
   p2: 0,

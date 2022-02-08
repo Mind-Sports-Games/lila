@@ -143,7 +143,7 @@ object bits {
     )
 
   def roundAppPreload(pov: Pov, controls: Boolean)(implicit ctx: Context) =
-    div(cls := "round__app")(
+    div(cls := s"round__app")(
       div(cls := "round__app__board main-board")(chessground(pov)),
       div(cls := "col1-rmoves-preload")
     )

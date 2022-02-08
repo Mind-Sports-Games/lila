@@ -26,6 +26,15 @@ function renderMaterial(material: MaterialDiffSide, score: number, position: Pos
   return h('div.material.material-' + position, children);
 }
 
+function renderPlayerScore(score: number, position: Position, playerIndex: String) : VNode | undefined{
+  if (score == -1){
+    return undefined
+  }
+  const children: VNode[] = [];
+  children.push( h('piece.p-piece.' + playerIndex, {attrs: {'data-score': score }}));
+  return h('div.game-score.game-score-' + position, children);
+}
+
 function wheel(ctrl: RoundController, e: WheelEvent): void {
   if (!ctrl.isPlaying()) {
     e.preventDefault();
@@ -46,6 +55,16 @@ export function main(ctrl: RoundController): VNode {
     topPlayerIndex = d[ctrl.flip ? 'player' : 'opponent'].playerIndex,
     bottomPlayerIndex = d[ctrl.flip ? 'opponent' : 'player'].playerIndex,
     boardSize = d.game.variant.boardSize;
+  
+  let topScore = -1, bottomScore = -1;
+  if (d.game.variant.key === 'flipello'){
+    const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
+    const p1Score = util.getPlayerScore(d.game.variant.key, pieces, 'p1');
+    const p2Score = util.getPlayerScore(d.game.variant.key, pieces, 'p2');
+    topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+    bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+  } 
+  
   let material: MaterialDiff,
     score = 0;
   if (d.pref.showCaptured) {
@@ -87,11 +106,13 @@ export function main(ctrl: RoundController): VNode {
             },
             [renderGround(ctrl), promotion.view(ctrl)]
           ),
+          renderPlayerScore(topScore, 'top', topPlayerIndex),
           crazyView(ctrl, topPlayerIndex, 'top') ||
             renderMaterial(material[topPlayerIndex], -score, 'top', checks[topPlayerIndex]),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
             renderMaterial(material[bottomPlayerIndex], score, 'bottom', checks[bottomPlayerIndex]),
+          renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex),
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ]
       );
