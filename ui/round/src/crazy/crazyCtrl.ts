@@ -88,7 +88,7 @@ export function init(ctrl: RoundController) {
       setDropMode(ctrl.chessground.state, nb > 0 ? { playerIndex, role } : undefined);
       if (ctrl.data.game.variant.key === 'shogi' || ctrl.data.game.variant.key === 'minishogi') {
         activeCursor = `cursor-${role}-shogi`;
-      }else if (ctrl.data.game.variant.key === 'flipello') {
+      } else if (ctrl.data.game.variant.key === 'flipello') {
         activeCursor = `cursor-${playerIndex}-${role}-flipello`;
       } else {
         activeCursor = `cursor-${playerIndex}-${role}-chess`;
@@ -110,7 +110,8 @@ export function init(ctrl: RoundController) {
   playstrategy.pubsub.on('ply', () => {
     if (crazyKeys.length > 0) setDrop();
   });
-  const numDropPieces = ctrl.data.game.variant.key == 'crazyhouse' ? 5 : ctrl.data.game.variant.key == 'flipello' ? 1 : 7;
+  const numDropPieces =
+    ctrl.data.game.variant.key == 'crazyhouse' ? 5 : ctrl.data.game.variant.key == 'flipello' ? 1 : 7;
   for (let i = 1; i <= numDropPieces; i++) {
     const iStr = i.toString();
     k.bind(iStr, () => {

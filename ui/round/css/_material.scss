@@ -36,7 +36,7 @@ $xiangqi-piece-roles: (
   'r-piece': 'chariot.svg',
 );
 $flipello-piece-roles: (
-  'p-piece': 'flipello.svg'
+  'p-piece': 'flipello.svg',
 );
 
 @each $variant in $all-variants {
@@ -65,7 +65,7 @@ $flipello-piece-roles: (
             background-image: url(../piece/mono/#{$r});
           }
         }
-      } @else if ($variant == 'flipello'){
+      } @else if ($variant == 'flipello') {
         @each $role, $r in $flipello-piece-roles {
           &.#{$role} {
             background-image: url(../piece/mono/#{$r});

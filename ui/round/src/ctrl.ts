@@ -162,7 +162,7 @@ export default class RoundController {
   };
 
   private onUserMove = (orig: cg.Key, dest: cg.Key, meta: cg.MoveMetadata) => {
-    console.log("onUserMove")
+    console.log('onUserMove');
     if (!this.keyboardMove || !this.keyboardMove.usedSan) ab.move(this, meta);
     if (!promotion.start(this, orig, dest, meta)) {
       this.sendMove(orig, dest, undefined, this.data.game.variant.key, meta);
@@ -172,7 +172,7 @@ export default class RoundController {
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
-      if (this.data.game.variant.key === 'flipello'){
+      if (this.data.game.variant.key === 'flipello') {
         flipello.flip(this, key);
         this.redraw();
       }
@@ -180,14 +180,14 @@ export default class RoundController {
   };
 
   private onMove = (orig: cg.Key, dest: cg.Key, captured?: cg.Piece) => {
-    console.log("captured: ", captured);
-    console.log("onMove: orgi, dest ", orig, dest);
+    console.log('captured: ', captured);
+    console.log('onMove: orgi, dest ', orig, dest);
     if (captured || this.enpassant(orig, dest)) {
       if (this.data.game.variant.key === 'atomic') {
         sound.explode();
         atomic.capture(this, dest);
       } else sound.capture();
-    } else if (this.data.game.variant.key === 'flipello'){
+    } else if (this.data.game.variant.key === 'flipello') {
       flipello.flip(this, dest);
     } else sound.move();
   };

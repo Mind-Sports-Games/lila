@@ -141,7 +141,7 @@ object Tv {
           name = "All Flipello",
           icon = FV.Flipello.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(FV.Variant.all.filter(v => v.gameFamily == GameFamily.Flipello() ).map(_.key)), noBot),
+          filters = Seq(anyVariant(Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.Flipello() )), noBot),
           familyChannel = true,
           gameFamily = "flipello"
         )  
@@ -416,7 +416,7 @@ object Tv {
           name = FV.Flipello.name,
           icon = FV.Flipello.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(variant(FV.Flipello.key), noBot),
+          filters = Seq(variant(Variant.wrap(FV.Flipello)), noBot),
           familyChannel = false,
           gameFamily = "flipello"
         )
@@ -474,6 +474,8 @@ object Tv {
       XiangqiFamily,
       Xiangqi,
       MiniXiangqi,
+      //FlipelloFamily,
+      Flipello,
       Bot,
       Computer
     )

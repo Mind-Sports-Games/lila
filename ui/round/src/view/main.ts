@@ -26,12 +26,12 @@ function renderMaterial(material: MaterialDiffSide, score: number, position: Pos
   return h('div.material.material-' + position, children);
 }
 
-function renderPlayerScore(score: number, position: Position, playerIndex: String) : VNode | undefined{
-  if (score == -1){
-    return undefined
+function renderPlayerScore(score: number, position: Position, playerIndex: string): VNode | undefined {
+  if (score == -1) {
+    return undefined;
   }
   const children: VNode[] = [];
-  children.push( h('piece.p-piece.' + playerIndex, {attrs: {'data-score': score }}));
+  children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
   return h('div.game-score.game-score-' + position, children);
 }
 
@@ -55,16 +55,17 @@ export function main(ctrl: RoundController): VNode {
     topPlayerIndex = d[ctrl.flip ? 'player' : 'opponent'].playerIndex,
     bottomPlayerIndex = d[ctrl.flip ? 'opponent' : 'player'].playerIndex,
     boardSize = d.game.variant.boardSize;
-  
-  let topScore = -1, bottomScore = -1;
-  if (d.game.variant.key === 'flipello'){
+
+  let topScore = -1,
+    bottomScore = -1;
+  if (d.game.variant.key === 'flipello') {
     const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
     const p1Score = util.getPlayerScore(d.game.variant.key, pieces, 'p1');
     const p2Score = util.getPlayerScore(d.game.variant.key, pieces, 'p2');
     topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
     bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
-  } 
-  
+  }
+
   let material: MaterialDiff,
     score = 0;
   if (d.pref.showCaptured) {

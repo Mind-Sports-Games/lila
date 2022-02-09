@@ -129,7 +129,7 @@ export function getScore(variant: VariantKey, pieces: cg.Pieces): number {
   return score;
 }
 
-export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerIndex: String): number {
+export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerIndex: string): number {
   let score = 0;
   for (const p of pieces.values()) {
     score += pieceScores(variant, p.role, p.promoted) * (p.playerIndex === playerIndex ? 1 : 0);
@@ -169,7 +169,15 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction', 'scrambledEggs', 'shogi', 'xiangqi', 'minishogi', 'minixiangqi', 'flipello'];
+const noAnalysisVariants = [
+  'linesOfAction',
+  'scrambledEggs',
+  'shogi',
+  'xiangqi',
+  'minishogi',
+  'minixiangqi',
+  'flipello',
+];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;

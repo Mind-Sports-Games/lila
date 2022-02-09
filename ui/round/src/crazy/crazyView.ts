@@ -12,7 +12,13 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
   const step = round.plyStep(ctrl.data, ctrl.ply);
   const variantKey = ctrl.data.game.variant.key;
   const dropRoles =
-    variantKey == 'crazyhouse' ? pieceRoles : variantKey == 'minishogi' ? pieceMiniShogiRoles : variantKey == 'flipello' ? pieceFlipelloRoles : pieceShogiRoles;
+    variantKey == 'crazyhouse'
+      ? pieceRoles
+      : variantKey == 'minishogi'
+      ? pieceMiniShogiRoles
+      : variantKey == 'flipello'
+      ? pieceFlipelloRoles
+      : pieceShogiRoles;
   if (!step.crazy) return;
   const droppedRole = ctrl.justDropped,
     preDropRole = ctrl.preDrop,
