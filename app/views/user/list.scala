@@ -52,8 +52,8 @@ object list {
               userTopPerf(leaderboards.rapid,       PerfType.orDefault("rapid")),
               userTopPerf(leaderboards.classical,   PerfType.orDefault("classical")),
               userTopPerf(leaderboards.ultraBullet, PerfType.orDefault("ultraBullet")),
-              userTopActive(nbAllTime, trans.activePlayers(), icon = 'U'.some),
-              tournamentWinners(tourneyWinners),
+              //userTopActive(nbAllTime, trans.activePlayers(), icon = 'U'.some),
+              //tournamentWinners(tourneyWinners),
               userTopPerf(leaderboards.crazyhouse,    PerfType.orDefault("crazyhouse")),
               userTopPerf(leaderboards.chess960,      PerfType.orDefault("chess960")),
               userTopPerf(leaderboards.antichess,     PerfType.orDefault("antichess")),
@@ -103,7 +103,8 @@ object list {
   private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =
     st.section(cls := "user-top")(
       h2(cls := "text", dataIcon := perfType.iconChar)(
-        a(href := routes.User.topNb(200, perfType.key))(perfType.trans)
+        perfType.trans
+        //a(href := routes.User.topNb(200, perfType.key))(perfType.trans)
       ),
       ol(users map { l =>
         li(

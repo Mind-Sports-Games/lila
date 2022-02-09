@@ -92,7 +92,10 @@ function whosTurn(ctrl: RoundController, playerIndex: PlayerIndex, position: Pos
       ? h(
           'div.rclock-turn__text',
           d.player.spectator
-            ? ctrl.trans(d.game.player + 'Plays')
+            ? ctrl.trans(
+                'playerIndexPlays',
+                d.game.player === d.player.playerIndex ? d.player.playerName : d.opponent.playerName
+              )
             : ctrl.trans(d.game.player === d.player.playerIndex ? 'yourTurn' : 'waitingForOpponent')
         )
       : null,
