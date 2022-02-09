@@ -162,7 +162,6 @@ export default class RoundController {
   };
 
   private onUserMove = (orig: cg.Key, dest: cg.Key, meta: cg.MoveMetadata) => {
-    console.log('onUserMove');
     if (!this.keyboardMove || !this.keyboardMove.usedSan) ab.move(this, meta);
     if (!promotion.start(this, orig, dest, meta)) {
       this.sendMove(orig, dest, undefined, this.data.game.variant.key, meta);
@@ -173,22 +172,20 @@ export default class RoundController {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
       if (this.data.game.variant.key === 'flipello') {
-        flipello.flip(this, key);
+        flipello.flip(this, key, this.data.player.playerIndex);
         this.redraw();
       }
     } else this.jump(this.ply);
   };
 
   private onMove = (orig: cg.Key, dest: cg.Key, captured?: cg.Piece) => {
-    console.log('captured: ', captured);
-    console.log('onMove: orgi, dest ', orig, dest);
     if (captured || this.enpassant(orig, dest)) {
       if (this.data.game.variant.key === 'atomic') {
         sound.explode();
         atomic.capture(this, dest);
       } else sound.capture();
     } else if (this.data.game.variant.key === 'flipello') {
-      flipello.flip(this, dest);
+      flipello.flip(this, dest, this.data.player.playerIndex);
     } else sound.move();
   };
 
@@ -385,7 +382,6 @@ export default class RoundController {
   apiMove = (o: ApiMove): true => {
     const d = this.data,
       playing = this.isPlaying();
-
     d.game.turns = o.ply;
     d.game.player = o.ply % 2 === 0 ? 'p1' : 'p2';
     const playedPlayerIndex = o.ply % 2 === 0 ? 'p2' : 'p1',
@@ -409,7 +405,9 @@ export default class RoundController {
           },
           o.uci.substr(2, 2) as cg.Key
         );
-      else {
+      if (d.game.variant.key == 'flipello') {
+        flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
+      } else {
         // This block needs to be idempotent, even for castling moves in
         // Chess960.
         const keys = util.uci2move(o.uci)!,

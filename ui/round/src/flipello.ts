@@ -2,8 +2,7 @@ import * as util from 'chessground/util';
 import * as cg from 'chessground/types';
 import RoundController from './ctrl';
 
-export function flip(ctrl: RoundController, key: cg.Key) {
-  console.log('flipping some pieces');
+export function flip(ctrl: RoundController, key: cg.Key, playedPlayerIndex: 'p1' | 'p2') {
   const flipping: cg.Key[] = [];
   const diff: cg.PiecesDiff = new Map();
 
@@ -33,10 +32,10 @@ export function flip(ctrl: RoundController, key: cg.Key) {
       }
       const k = util.pos2key(pos);
       const p = ctrl.chessground.state.pieces.get(k);
-      if (p && p.playerIndex == ctrl.data.player.playerIndex) {
+      if (p && p.playerIndex == playedPlayerIndex) {
         flip_list.forEach(x => flipping.push(x));
         break;
-      } else if (p && p.playerIndex != ctrl.data.player.playerIndex) {
+      } else if (p && p.playerIndex != playedPlayerIndex) {
         flip_list.push(util.pos2key(pos));
       } else {
         break;
@@ -44,7 +43,7 @@ export function flip(ctrl: RoundController, key: cg.Key) {
     }
   }
 
-  const piece: cg.Piece = { role: 'p-piece', playerIndex: ctrl.data.player.playerIndex };
+  const piece: cg.Piece = { role: 'p-piece', playerIndex: playedPlayerIndex };
   flipping.forEach(x => diff.set(x, piece));
   ctrl.chessground.setPieces(diff);
 }
