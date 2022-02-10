@@ -161,9 +161,10 @@ export function init(ctrl: RoundController) {
 function preloadMouseIcons(data: RoundData) {
   const playerIndexKey = data.player.playerIndex == 'p1' ? 'w' : 'b';
   const playerIndexNum = data.player.playerIndex == 'p1' ? '0' : '1';
+  const playerIndexKeyFilpello = playerIndexKey == 'w' ? 'b' : 'w'
   for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/chess/cburnett/${playerIndexKey}${pKey}.svg`));
   for (const pKey of ['FU', 'KY', 'KE', 'GI', 'KI', 'KA', 'HI'])
     fetch(playstrategy.assetUrl(`piece/shogi/2kanji/${playerIndexNum}${pKey}.svg`));
-  fetch(playstrategy.assetUrl(`piece/flipello/classic_flipello/${playerIndexKey}P.png`));
+  fetch(playstrategy.assetUrl(`piece/flipello/classic_flipello/${playerIndexKeyFilpello}P.svg`));
   mouseIconsLoaded = true;
 }

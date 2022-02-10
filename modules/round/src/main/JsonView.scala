@@ -133,6 +133,7 @@ final class JsonView(
           .add("takebackable" -> takebackable)
           .add("moretimeable" -> moretimeable)
           .add("crazyhouse" -> pov.game.board.pocketData)
+          .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))

@@ -55,7 +55,7 @@ export function makeConfig(ctrl: RoundController): Config {
       duration: data.pref.animationDuration,
     },
     premovable: {
-      enabled: data.pref.enablePremove && data.game.variant.key !== 'flipello',
+      enabled: data.pref.enablePremove && !data.onlyDropsVariant,
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {
@@ -106,6 +106,7 @@ export function makeConfig(ctrl: RoundController): Config {
     dimensions: data.game.variant.boardSize,
     variant: variantKey,
     chess960: data.game.variant.key === 'chess960',
+    onlyDropsVariant: data.onlyDropsVariant,
   };
 }
 
