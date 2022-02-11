@@ -2481,8 +2481,8 @@ chartjs-color@^2.1.0:
   resolved "https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249"
 
 "chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#othello":
-  version "7.11.1-pstrat2.16"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#7ce8b9cd0885d19c25014eac7ef28be4f5bfa2a8"
+  version "7.11.1-pstrat2.17"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#cb41f4bca1923f3d04be36948d5c250ef669c5bb"
 
 chessops@^0.10.4:
   version "0.10.4"

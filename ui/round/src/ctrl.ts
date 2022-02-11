@@ -14,6 +14,8 @@ import * as speech from './speech';
 import * as cg from 'chessground/types';
 import { Config as CgConfig } from 'chessground/config';
 import { Api as CgApi } from 'chessground/api';
+import { setDropMode, cancelDropMode } from 'chessground/drop';
+import { State } from 'chessground/state';
 import { ClockController } from './clock/clockCtrl';
 import { CorresClockController, ctrl as makeCorresClock } from './corresClock/corresClockCtrl';
 import MoveOn from './moveOn';
@@ -214,6 +216,18 @@ export default class RoundController {
     return true;
   };
 
+  private setDropOnlyVariantDropMode = (
+    activePlayerIndex: boolean,
+    currentPlayerIndex: 'p1' | 'p2',
+    s: State
+  ): void => {
+    if (activePlayerIndex) {
+      return setDropMode(s, { playerIndex: currentPlayerIndex, role: 'p-piece' });
+    } else {
+      return cancelDropMode(s);
+    }
+  };
+
   lastPly = () => round.lastPly(this.data);
 
   makeCgHooks = () => ({
@@ -250,8 +264,10 @@ export default class RoundController {
         check: !!s.check,
         turnPlayerIndex: this.ply % 2 === 0 ? 'p1' : 'p2',
       };
-    if (this.replaying()) this.chessground.stop();
-    else
+    if (this.replaying()) {
+      cancelDropMode(this.chessground.state);
+      this.chessground.stop();
+    } else
       config.movable = {
         playerIndex: this.isPlaying() ? this.data.player.playerIndex : undefined,
         dests: util.parsePossibleMoves(this.data.possibleMoves),
@@ -260,6 +276,17 @@ export default class RoundController {
       dropDests: this.isPlaying() ? chessUtil.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
     }),
       this.chessground.set(config);
+    if (this.data.onlyDropsVariant) {
+      if (ply == this.lastPly()) {
+        this.setDropOnlyVariantDropMode(
+          this.data.player.playerIndex === this.data.game.player,
+          this.data.player.playerIndex,
+          this.chessground.state
+        );
+      } else {
+        cancelDropMode(this.chessground.state);
+      }
+    }
     if (s.san && isForwardStep) {
       if (s.san.includes('x')) sound.capture();
       else sound.move();
@@ -397,7 +424,7 @@ export default class RoundController {
     this.setTitle();
     if (!this.replaying()) {
       this.ply++;
-      if (o.role)
+      if (o.role) {
         this.chessground.newPiece(
           {
             role: o.role,
@@ -405,8 +432,10 @@ export default class RoundController {
           },
           o.uci.substr(2, 2) as cg.Key
         );
-      if (d.game.variant.key == 'flipello') {
-        flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
+        if (d.game.variant.key == 'flipello') {
+          flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
+          this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
+        }
       } else {
         // This block needs to be idempotent, even for castling moves in
         // Chess960.
@@ -467,9 +496,9 @@ export default class RoundController {
     }
     if (!this.replaying() && playedPlayerIndex != d.player.playerIndex) {
       // atrocious hack to prevent race condition
-      // with explosions and premoves (and flipping pieces?)
+      // with explosions and premoves
       // https://github.com/ornicar/lila/issues/343
-      const premoveDelay = d.game.variant.key === 'atomic' || d.game.variant.key === 'flipello' ? 100 : 1;
+      const premoveDelay = d.game.variant.key === 'atomic' ? 100 : 1;
       setTimeout(() => {
         if (!this.chessground.playPremove() && !this.playPredrop()) {
           promotion.cancel(this);
@@ -686,6 +715,13 @@ export default class RoundController {
 
   private onChange = () => {
     if (this.opts.onChange) setTimeout(() => this.opts.onChange(this.data), 150);
+    if (this.data.onlyDropsVariant) {
+      this.setDropOnlyVariantDropMode(
+        this.data.player.playerIndex === this.data.game.player,
+        this.data.player.playerIndex,
+        this.chessground.state
+      );
+    }
   };
 
   private goneTick?: number;
