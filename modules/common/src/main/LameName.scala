@@ -24,6 +24,7 @@ object LameName {
   private val baseWords = List(
     "1488",
     "8814",
+    "admin",
     "administrator",
     "anus",
     "asshole",
@@ -35,6 +36,8 @@ object LameName {
     "cancer",
     "cheat",
     "coon",
+    "corona",
+    "covid",
     "cuck",
     "cunniling",
     "cunt",
@@ -54,6 +57,7 @@ object LameName {
     "mongool",
     "nazi",
     "nigg",
+    "paedo",
     "pedo",
     "penis",
     "pidar",
@@ -77,7 +81,7 @@ object LameName {
   )
 
   private val usernameRegex = lameWords(
-    baseWords ::: List("playstrategy", "lichess", "mindsportsolympiad", "corona", "covid")
+    baseWords ::: List("lichess", "mindsportsolympiad", "mind-sports-olympiad", "lidraughts", "lishogi", "pychess")
   )
 
   private val tournamentRegex = lameWords(baseWords)
