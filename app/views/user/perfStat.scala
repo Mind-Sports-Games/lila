@@ -53,7 +53,7 @@ object perfStat {
                 dataIcon := perfType.iconChar,
                 href := s"${routes.User.games(u.username, "search")}?perf=${perfType.id}"
               )(viewTheGames()),
-              bits.perfTrophies(u, rankMap.view.filterKeys(perfType.==).toMap)
+              if (User.topPerfTrophiesEnabled) bits.perfTrophies(u, rankMap.view.filterKeys(perfType.==).toMap)
             )
           ),
           ratingChart.isDefined option div(cls := "rating-history")(spinner),

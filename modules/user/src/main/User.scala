@@ -352,4 +352,6 @@ object User {
       case Left(Right(v)) => v.gameLogic
       case _              => GameLogic.Chess()
     }) == GameLogic.Chess())
+
+  val topPerfTrophiesEnabled = false
 }
