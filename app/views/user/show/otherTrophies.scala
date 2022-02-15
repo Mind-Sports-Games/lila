@@ -63,7 +63,7 @@ object otherTrophies {
           )
         )
       },*/
-      info.trophies.filter(_.kind.withCustomImage).map { t =>
+      info.trophies.pp("info.trophies").filter(_.kind.withCustomImage).map { t =>
         a(
           awardCls(t),
           href := (t.url match {
