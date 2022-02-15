@@ -30,7 +30,7 @@ $mq-not-col3: $mq-not-small;
   @include breakpoint($mq-col2) {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: auto repeat(3, fit-content(0));
-    grid-template-areas: 'table  table' 'app    app' 'side   tv' 'side   puzzle' 'blog   blog' 'leader winner' 'tours  tours' 'simuls simuls' 'forum  forum' 'about  support';
+    grid-template-areas: 'table  table' 'app    app' 'side   tv' 'side   puzzle' 'blog   blog' 'winner winner' 'tours  tours' 'simuls simuls' 'forum  forum' 'about  support';
   }
 
   @include breakpoint($mq-col3) {
