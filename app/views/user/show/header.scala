@@ -35,7 +35,7 @@ object header {
             "packed"   -> (info.countTrophiesAndPerfCups > 7)
           )
         )(
-          if (User.topPerfTrophiesEnabled) views.html.user.bits.perfTrophies(u, info.ranks),
+          views.html.user.bits.perfTrophies(u, info.ranks),
           otherTrophies(info),
           u.plan.active option
             a(
