@@ -157,3 +157,34 @@ export function treeReconstruct(parts: Tree.Node[]): Tree.Node {
   node.children = node.children || [];
   return root;
 }
+
+
+export interface NodeWithParentIntermediate {
+  nodes: Tree.ParentedNode[];
+  prev?: Tree.Node
+}
+
+export function parentedNodesFromOrdering(nodes: Tree.Node[]): Tree.ParentedNode[] {
+  let withParent: Tree.ParentedNode[] = [];
+  if (nodes.length > 0) {
+    const initial: NodeWithParentIntermediate = { nodes: [], prev: undefined  };
+    withParent = nodes.reduce(
+      ({nodes, prev}, node) => {
+        return {
+          nodes: nodes.concat([{parent: prev, ...node, tag: 'parented'}]),
+          prev: node
+        };
+      },
+      initial
+    ).nodes;
+  }
+  return withParent;
+}
+
+export function parentedNode(node: Tree.Node, parent?: Tree.Node): Tree.ParentedNode {
+  return { tag: 'parented', parent, ...node }
+}
+
+export function parentedNodes(nodes: Tree.Node[], parent?: Tree.Node): Tree.ParentedNode[] {
+  return nodes.map(n => parentedNode(n, parent));
+}

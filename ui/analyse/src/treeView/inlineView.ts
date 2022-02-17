@@ -5,9 +5,12 @@ import * as moveView from '../moveView';
 import AnalyseCtrl from '../ctrl';
 import { MaybeVNodes } from '../interfaces';
 import { mainHook, nodeClasses, findCurrentPath, renderInlineCommentsOf, retroLine, Ctx, Opts } from './treeView';
+import { notationStyle } from 'chess';
+import { moveFromNotationStyle } from 'common/notation';
+import { parentedNode, parentedNodes, parentedNodesFromOrdering } from '../util';
 
-function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes | undefined {
-  const cs = node.children,
+function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes | undefined {
+  const cs = parentedNodes(node.children, node),
     main = cs[0];
   if (!main) return;
   if (opts.isMainline) {
@@ -50,7 +53,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes | 
   return renderInlined(ctx, cs, opts) || [renderLines(ctx, cs, opts)];
 }
 
-function renderInlined(ctx: Ctx, nodes: Tree.Node[], opts: Opts): MaybeVNodes | undefined {
+function renderInlined(ctx: Ctx, nodes: Tree.ParentedNode[], opts: Opts): MaybeVNodes | undefined {
   // only 2 branches
   if (!nodes[1] || nodes[2] || nodes[0].forceVariation) return;
   // only if second branch has no sub-branches
@@ -63,9 +66,11 @@ function renderInlined(ctx: Ctx, nodes: Tree.Node[], opts: Opts): MaybeVNodes | 
 }
 
 function renderLines(ctx: Ctx, nodes: Tree.Node[], opts: Opts): VNode {
+  // reduce((previousValue, currentValue) => { /* ... */ }, initialValue )
+  // reduce((previousValue, currentValue, currentIndex, array) => { /* ... */ }, initialValue)
   return h(
     'lines',
-    nodes.map(n => {
+    parentedNodesFromOrdering(nodes).map(n => {
       return (
         retroLine(ctx, n) ||
         h(
@@ -82,13 +87,14 @@ function renderLines(ctx: Ctx, nodes: Tree.Node[], opts: Opts): VNode {
   );
 }
 
-function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes {
+function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes {
   const path = opts.parentPath + node.id,
     comments = renderInlineCommentsOf(ctx, node);
   if (opts.truncate === 0) return [h('move', { attrs: { p: path } }, '[...]')];
   return ([renderMoveOf(ctx, node, opts)] as MaybeVNodes)
     .concat(comments)
-    .concat(opts.inline ? renderInline(ctx, opts.inline, opts) : null)
+    // TODO: I'm not 100% sure about this parentedNodeCall
+    .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
     .concat(
       renderChildrenOf(ctx, node, {
         parentPath: path,
@@ -99,7 +105,7 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVN
     );
 }
 
-function renderInline(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
+function renderInline(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   return h(
     'inline',
     renderMoveAndChildrenOf(ctx, node, {
@@ -110,11 +116,19 @@ function renderInline(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
   );
 }
 
-function renderMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
+function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
+  const variant = ctx.ctrl.data.game.variant;
+  const notation = notationStyle(variant.key);
   const path = opts.parentPath + node.id,
     content: MaybeVNodes = [
       opts.withIndex || node.ply & 1 ? moveView.renderIndex(node.ply, true) : null,
-      fixCrazySan(node.san!),
+      // TODO: the || '' are probably not correct
+      moveFromNotationStyle(notation)({
+        san: fixCrazySan(node.san || ''),
+        uci: node.uci || '',
+        fen: node.fen,
+        prevFen: node.parent?.fen || ''
+      }, variant),
     ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
   return h(
@@ -143,7 +157,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     },
     [
       ...renderInlineCommentsOf(ctx, ctrl.tree.root),
-      ...(renderChildrenOf(ctx, ctrl.tree.root, {
+      ...(renderChildrenOf(ctx, parentedNode(ctrl.tree.root), {
         parentPath: '',
         isMainline: true,
       }) || []),

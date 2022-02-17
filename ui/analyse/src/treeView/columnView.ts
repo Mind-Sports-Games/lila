@@ -1,6 +1,7 @@
 import { h, VNode } from 'snabbdom';
 import { isEmpty } from 'common';
 import { fixCrazySan, notationStyle } from 'chess';
+import { moveFromNotationStyle } from 'common/notation';
 import { path as treePath, ops as treeOps } from 'tree';
 import * as moveView from '../moveView';
 import { authorText as commentAuthorText } from '../study/studyComments';
@@ -148,9 +149,20 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
 }
 
 function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
+  const variant = ctx.ctrl.data.game.variant;
+  const notation = notationStyle(variant.key);
   const withIndex = opts.withIndex || node.ply % 2 === 1,
     path = opts.parentPath + node.id,
-    content: MaybeVNodes = [withIndex ? moveView.renderIndex(node.ply, true) : null, fixCrazySan(node.san!)],
+    content: MaybeVNodes = [
+      withIndex ? moveView.renderIndex(node.ply, true) : null,
+      // TODO: the || '' are probably not correct
+      moveFromNotationStyle(notation)({
+        san: fixCrazySan(node.san || ''),
+        uci: node.uci || '',
+        fen: node.fen,
+        prevFen: ''
+      }, variant),
+    ],
     classes = nodeClasses(ctx, node, path);
   if (opts.conceal) classes[opts.conceal as string] = true;
   if (node.glyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));

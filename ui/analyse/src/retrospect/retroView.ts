@@ -64,6 +64,7 @@ const feedback = {
                 'move',
                 renderIndexAndMove(
                   {
+                    variant: ctrl.
                     withDots: true,
                     showGlyphs: true,
                     showEval: false,
