@@ -307,7 +307,7 @@ export function backToSwiss(ctrl: RoundController): VNode | undefined {
   if (d.swiss?.isMicroMatch) {
     ctrl.setRedirecting();
     setTimeout(() => {
-      location.href = '/swiss/' + d.swiss.id;
+      location.href = '/swiss/' + d.swiss?.id;
       return undefined;
     }, 2500);
   }
@@ -318,7 +318,7 @@ export function backToSwiss(ctrl: RoundController): VNode | undefined {
           {
             attrs: {
               'data-icon': 'G',
-              href: '/swiss/' + d.swiss.id,
+              href: '/swiss/' + d.swiss?.id,
             },
             hook: util.bind('click', ctrl.setRedirecting),
           },
