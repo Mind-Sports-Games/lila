@@ -25,7 +25,7 @@ import { defined, prop, Prop } from 'common';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { playstrategyVariantRules } from 'chessops/compat';
+import { playstrategyRules } from 'chessops/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -664,7 +664,7 @@ export default class AnalyseCtrl {
 
   position(node: Tree.Node): Result<Position, PositionError> {
     const setup = parseFen(node.fen).unwrap();
-    return setupPosition(playstrategyVariantRules(this.data.game.variant.key), setup);
+    return setupPosition(playstrategyRules(this.data.game.variant.key), setup);
   }
 
   canUseCeval(): boolean {
