@@ -15,7 +15,9 @@ case class History(
     horde: RatingsMap,
     racingKings: RatingsMap,
     crazyhouse: RatingsMap,
+    noCastling: RatingsMap,
     linesOfAction: RatingsMap,
+    scrambledEggs: RatingsMap,
     international: RatingsMap,
     frisian: RatingsMap,
     frysk: RatingsMap,
@@ -26,6 +28,8 @@ case class History(
     pool: RatingsMap,
     shogi: RatingsMap,
     xiangqi: RatingsMap,
+    minishogi: RatingsMap,
+    minixiangqi: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -52,7 +56,9 @@ case class History(
       case "horde"          => horde
       case "racingKings"    => racingKings
       case "crazyhouse"     => crazyhouse
+      case "noCastling"     => noCastling
       case "linesOfAction"  => linesOfAction
+      case "scrambledEggs"  => scrambledEggs
       case "international"  => international
       case "frisian"        => frisian
       case "frysk"          => frysk
@@ -63,6 +69,8 @@ case class History(
       case "pool"           => pool
       case "shogi"          => shogi
       case "xiangqi"        => xiangqi
+      case "minishogi"      => minishogi
+      case "minixiangqi"    => minixiangqi
       case "puzzle"         => puzzle
       case "ultraBullet"    => ultraBullet
       case x                => sys error s"No history for perf $x"
@@ -101,7 +109,9 @@ object History {
           horde = ratingsMap("horde"),
           racingKings = ratingsMap("racingKings"),
           crazyhouse = ratingsMap("crazyhouse"),
+          noCastling = ratingsMap("noCastling"),
           linesOfAction = ratingsMap("linesOfAction"),
+          scrambledEggs = ratingsMap("scrambledEggs"),
           international = ratingsMap("international"),
           frisian = ratingsMap("frisian"),
           frysk = ratingsMap("frysk"),
@@ -112,6 +122,8 @@ object History {
           pool = ratingsMap("pool"),
           shogi = ratingsMap("shogi"),
           xiangqi = ratingsMap("xiangqi"),
+          minishogi = ratingsMap("minishogi"),
+          minixiangqi = ratingsMap("minixiangqi"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),

@@ -21,10 +21,10 @@ class BinaryCLMTest extends Specification {
       write(clmt) must_== {
         "11110000" :: _0_ :: Nil
       }
-      write(clmt.copy(castles = clmt.castles without White) must_== {
+      write(clmt.copy(castles = clmt.castles without P1) must_== {
         "00110000" :: _0_ :: Nil
       }
-      write(clmt.copy(castles = clmt.castles.without(Black), QueenSide))) must_== {
+      write(clmt.copy(castles = clmt.castles.without(P2), QueenSide))) must_== {
         "11100000" :: _0_ :: Nil
       }
       write(clmt.copy(lastMove = Uci("a1a2"))) must_== {
@@ -40,10 +40,10 @@ class BinaryCLMTest extends Specification {
         clmt
       }
       read("00110000" :: _0_ :: List.fill(3)(_0_)) must_== {
-        clmt.copy(castles = clmt.castles without White)
+        clmt.copy(castles = clmt.castles without P1)
       }
       read("11100000" :: _0_ :: List.fill(3)(_0_)) must_== {
-        clmt.copy(castles = clmt.castles.without(Black, QueenSide))
+        clmt.copy(castles = clmt.castles.without(P2, QueenSide))
       }
       read("00000000" :: "00000001" :: List.fill(3)(_0_)) must_== {
         clmt.copy(castles = Castles.none, lastMove = Uci("a1a2"))

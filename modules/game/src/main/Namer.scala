@@ -30,12 +30,12 @@ object Namer {
   def gameVsTextBlocking(game: Game, withRatings: Boolean = false)(implicit
       lightUser: LightUser.GetterSync
   ): String =
-    s"${playerTextBlocking(game.whitePlayer, withRatings)} - ${playerTextBlocking(game.blackPlayer, withRatings)}"
+    s"${playerTextBlocking(game.p1Player, withRatings)} - ${playerTextBlocking(game.p2Player, withRatings)}"
 
   def gameVsText(game: Game, withRatings: Boolean = false)(implicit lightUser: LightUser.Getter): Fu[String] =
-    game.whitePlayer.userId.??(lightUser) zip
-      game.blackPlayer.userId.??(lightUser) dmap { case (wu, bu) =>
-        s"${playerTextUser(game.whitePlayer, wu, withRatings)} - ${playerTextUser(game.blackPlayer, bu, withRatings)}"
+    game.p1Player.userId.??(lightUser) zip
+      game.p2Player.userId.??(lightUser) dmap { case (wu, bu) =>
+        s"${playerTextUser(game.p1Player, wu, withRatings)} - ${playerTextUser(game.p2Player, bu, withRatings)}"
       }
 
   def ratingString(p: Player) =

@@ -34,7 +34,7 @@ final class RankingApi(
           "rating"    -> perf.intRating,
           "prog"      -> perf.progress,
           "stable"    -> perf.rankable(PerfType variantOf perfType),
-          "expiresAt" -> DateTime.now.plusDays(7)
+          "expiresAt" -> DateTime.now.plusDays(31) // change back to 7 when more regular users
         ),
         upsert = true
       )
@@ -63,7 +63,8 @@ final class RankingApi(
   private[user] def topPerf(perfId: Perf.ID, nb: Int): Fu[List[User.LightPerf]] =
     PerfType.id2key(perfId) ?? { perfKey =>
       coll
-        .find($doc("perf" -> perfId, "stable" -> true))
+        //.find($doc("perf" -> perfId, "stable" -> true)) // change back to stable when more regular users
+        .find($doc("perf" -> perfId))
         .sort($doc("rating" -> -1))
         .cursor[Ranking](ReadPreference.secondaryPreferred)
         .list(nb)
@@ -100,7 +101,9 @@ final class RankingApi(
       horde         <- topPerf(PerfType.orDefault("horde").id, nb)
       racingKings   <- topPerf(PerfType.orDefault("racingKings").id, nb)
       crazyhouse    <- topPerf(PerfType.orDefault("crazyhouse").id, nb)
+      noCastling    <- topPerf(PerfType.orDefault("noCastling").id, nb)
       linesOfAction <- topPerf(PerfType.orDefault("linesOfAction").id, nb)
+      scrambledEggs <- topPerf(PerfType.orDefault("scrambledEggs").id, nb)
       international <- topPerf(PerfType.orDefault("international").id, nb)
       frisian       <- topPerf(PerfType.orDefault("frisian").id, nb)
       frysk         <- topPerf(PerfType.orDefault("frysk").id, nb)
@@ -111,6 +114,8 @@ final class RankingApi(
       pool          <- topPerf(PerfType.orDefault("pool").id, nb)
       shogi         <- topPerf(PerfType.orDefault("shogi").id, nb)
       xiangqi       <- topPerf(PerfType.orDefault("xiangqi").id, nb)
+      minishogi     <- topPerf(PerfType.orDefault("minishogi").id, nb)
+      minixiangqi   <- topPerf(PerfType.orDefault("minixiangqi").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -126,7 +131,9 @@ final class RankingApi(
       atomic = atomic,
       horde = horde,
       racingKings = racingKings,
+      noCastling = noCastling,
       linesOfAction = linesOfAction,
+      scrambledEggs = scrambledEggs,
       international = international,
       frisian = frisian,
       frysk = frysk,
@@ -136,7 +143,9 @@ final class RankingApi(
       brazilian = brazilian,
       pool = pool,
       shogi = shogi,
-      xiangqi = xiangqi
+      xiangqi = xiangqi,
+      minishogi = minishogi,
+      minixiangqi = minixiangqi
     )
 
   object weeklyStableRanking {

@@ -1,6 +1,6 @@
 package lila.tournament
 
-import strategygames.{ Black, Color, White, Game => StratGame, GameLogic }
+import strategygames.{ P2, Player => PlayerIndex, P1, Game => StratGame, GameLogic }
 import strategygames.variant.Variant
 import scala.util.chaining._
 
@@ -40,8 +40,8 @@ final class AutoPairing(
             startedAtTurn = turns
           )
         },
-        whitePlayer = makePlayer(White, player1),
-        blackPlayer = makePlayer(Black, player2),
+        p1Player = makePlayer(P1, player1),
+        p2Player = makePlayer(P2, player2),
         mode = tour.mode,
         source = Source.Tournament,
         pgnImport = None
@@ -54,15 +54,15 @@ final class AutoPairing(
       duelStore.add(
         tour = tour,
         game = game,
-        p1 = usernameOf(pairing.user1) -> ~game.whitePlayer.rating,
-        p2 = usernameOf(pairing.user2) -> ~game.blackPlayer.rating,
+        p1 = usernameOf(pairing.user1) -> ~game.p1Player.rating,
+        p2 = usernameOf(pairing.user2) -> ~game.p2Player.rating,
         ranking = ranking
       )
     } inject game
   }
 
-  private def makePlayer(color: Color, player: Player) =
-    GamePlayer.make(color, player.userId, player.rating, player.provisional)
+  private def makePlayer(playerIndex: PlayerIndex, player: Player) =
+    GamePlayer.make(playerIndex, player.userId, player.rating, player.provisional)
 
   private def usernameOf(userId: User.ID) =
     lightUserApi.sync(userId).fold(userId)(_.name)

@@ -20,6 +20,7 @@
   <string name="black">Svart</string>
   <string name="randomColor">Vilkårleg farge</string>
   <string name="createAGame">Start eit parti</string>
+  <string name="playerIndexIsVictorious">%s vann partiet</string>
   <string name="whiteIsVictorious">Kvit vann partiet</string>
   <string name="blackIsVictorious">Svart vann partiet</string>
   <string name="youPlayTheWhitePieces">Du spelar med dei kvite brikkene</string>
@@ -33,6 +34,7 @@
   <string name="newOpponent">Ny motspelar</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Motspelaren din ønskjer å spela eit nytt parti med deg</string>
   <string name="joinTheGame">Bli med</string>
+  <string name="playerIndexPlays">%s i trekket</string>
   <string name="whitePlays">Kvit i trekket</string>
   <string name="blackPlays">Svart i trekket</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +47,10 @@
   <string name="forceDraw">Erklær remis</string>
   <string name="talkInChat">Vær venleg i praterommet</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Den første som kjem til denne lekkja vil spela med deg.</string>
+  <string name="playerIndexResigned">%s gav opp</string>
   <string name="whiteResigned">Kvit gav opp</string>
   <string name="blackResigned">Svart gav opp</string>
+  <string name="playerIndexLeftTheGame">%s har forlate partiet</string>
   <string name="whiteLeftTheGame">Kvit har forlate partiet</string>
   <string name="blackLeftTheGame">Svart har forlate partiet</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Del denne lekkja slik at andre kan sjå partiet</string>
@@ -80,6 +84,7 @@
   <string name="drawn">Remis</string>
   <string name="unknown">Ukjend</string>
   <string name="database">Database</string>
+  <string name="p1DrawP2">%1$s / Remis / %2$s</string>
   <string name="whiteDrawBlack">Kvit / Remis / Svart</string>
   <string name="averageRatingX">Gjennomsnittleg rating: %s</string>
   <string name="recentGames">Nylege parti</string>
@@ -210,14 +215,17 @@
     <item quantity="other">%s parti med deg</item>
   </plurals>
   <string name="cancel">Avbryt</string>
+  <string name="playerIndexTimeOut">Tida er ute for %s</string>
   <string name="whiteTimeOut">Tida er ute for kvit</string>
   <string name="blackTimeOut">Tida er ute for svart</string>
   <string name="drawOfferSent">Tilbod om remis er sendt</string>
   <string name="drawOfferDeclined">Remistilbod avslått</string>
   <string name="drawOfferAccepted">Remistilbod godtatt</string>
   <string name="drawOfferCanceled">Remistilbodet vart trekt attende</string>
+  <string name="playerIndexOffersDraw">%s tilbyr remis</string>
   <string name="whiteOffersDraw">Kvit tilbyr remis</string>
   <string name="blackOffersDraw">Svart tilbyr remis</string>
+  <string name="playerIndexDeclinesDraw">%s avslår remis</string>
   <string name="whiteDeclinesDraw">Kvit avslår remis</string>
   <string name="blackDeclinesDraw">Svart avslår remis</string>
   <string name="yourOpponentOffersADraw">Motspelaren tilbyr remis</string>
@@ -362,6 +370,7 @@ få en computeranalyse, chatte eller dele ein URL.</string>
   <string name="clickOnTheBoardToMakeYourMove">Gjer eit trekk på brettet for å prova at du er eit menneske.</string>
   <string name="captcha.fail">Ver venleg og løys sjakkproblemet.</string>
   <string name="notACheckmate">Ikkje sjakk matt</string>
+  <string name="playerIndexCheckmatesInOneMove">%s set matt i eitt trekk</string>
   <string name="whiteCheckmatesInOneMove">Kvit set matt i eitt trekk</string>
   <string name="blackCheckmatesInOneMove">Svart set matt i eitt trekk</string>
   <string name="retry">Prøv om att</string>
@@ -431,6 +440,7 @@ få en computeranalyse, chatte eller dele ein URL.</string>
   <string name="performance">Prestasjon</string>
   <string name="tournamentComplete">Turnering fullførd</string>
   <string name="movesPlayed">Trekk spela</string>
+  <string name="playerIndexWins">%s vinn</string>
   <string name="whiteWins">Kvit vinn</string>
   <string name="blackWins">Svart vinn</string>
   <string name="draws">Remis</string>
@@ -765,6 +775,7 @@ få en computeranalyse, chatte eller dele ein URL.</string>
   <string name="hideBestMove">Skjul beste trekk</string>
   <string name="getAHint">Få eit hint</string>
   <string name="evaluatingYourMove">Vurderer trekket ditt...</string>
+  <string name="playerIndexWinsGame">%s vinn</string>
   <string name="whiteWinsGame">Kvit vinn</string>
   <string name="blackWinsGame">Svart vinn</string>
   <string name="learnFromYourMistakes">Lær av feila dine</string>
@@ -772,19 +783,24 @@ få en computeranalyse, chatte eller dele ein URL.</string>
   <string name="skipThisMove">Hopp over dette trekket</string>
   <string name="next">Neste</string>
   <string name="xWasPlayed">%s vart spela</string>
+  <string name="findBetterMoveForPlayerIndex">Finn eit betre trekk for %s</string>
   <string name="findBetterMoveForWhite">Finn eit betre trekk for kvit</string>
   <string name="findBetterMoveForBlack">Finn eit betre trekk for svart</string>
   <string name="resumeLearning">Hald fram med læring</string>
   <string name="youCanDoBetter">Du kan gjera det betre</string>
+  <string name="tryAnotherMoveForPlayerIndex">Prøv eit anna trekk for %s</string>
   <string name="tryAnotherMoveForWhite">Prøv eit anna trekk for kvit</string>
   <string name="tryAnotherMoveForBlack">Prøv eit anna trekk for svart</string>
   <string name="solution">Løysing</string>
   <string name="waitingForAnalysis">Ventar på analyse</string>
+  <string name="noMistakesFoundForPlayerIndex">Ingen feil funne for %s</string>
   <string name="noMistakesFoundForWhite">Ingen feil funne for kvit</string>
   <string name="noMistakesFoundForBlack">Ingen feil funne for svart</string>
+  <string name="doneReviewingPlayerIndexMistakes">Ferdig med å gå gjennom %s sine feil</string>
   <string name="doneReviewingWhiteMistakes">Ferdig med å gå gjennom kvit sine feil</string>
   <string name="doneReviewingBlackMistakes">Ferdig med å gå gjennom svart sine feil</string>
   <string name="doItAgain">Gjer om att</string>
+  <string name="reviewPlayerIndexMistakes">Gå gjennom %s sine feil</string>
   <string name="reviewWhiteMistakes">Gå gjennom kvit sine feil</string>
   <string name="reviewBlackMistakes">Gå gjennom svart sine feil</string>
   <string name="advantage">Fordel</string>

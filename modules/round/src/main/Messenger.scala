@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.Color
+import strategygames.{ Player => PlayerIndex }
 
 import lila.chat.{ Chat, ChatApi, ChatTimeout }
 import lila.game.Game
@@ -41,9 +41,9 @@ final class Messenger(api: ChatApi) {
         api.userChat.write(Chat.Id(gameId.value), userId, text, publicSource = none, _.Round)
     }
 
-  def owner(game: Game, anonColor: Color, text: String): Funit =
+  def owner(game: Game, anonPlayerIndex: PlayerIndex, text: String): Funit =
     (game.fromFriend || presets.contains(text)) ??
-      api.playerChat.write(Chat.Id(game.id), anonColor, text, _.Round)
+      api.playerChat.write(Chat.Id(game.id), anonPlayerIndex, text, _.Round)
 
   def timeout(chatId: Chat.Id, modId: User.ID, suspect: User.ID, reason: String, text: String): Funit =
     ChatTimeout.Reason(reason) ?? { r =>

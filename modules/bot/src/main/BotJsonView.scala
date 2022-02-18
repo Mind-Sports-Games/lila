@@ -38,8 +38,8 @@ final class BotJsonView(
         },
         "rated"      -> game.rated,
         "createdAt"  -> game.createdAt,
-        "white"      -> playerJson(game.whitePov),
-        "black"      -> playerJson(game.blackPov),
+        "p1"      -> playerJson(game.p1Pov),
+        "p2"      -> playerJson(game.p2Pov),
         "initialFen" -> fen.fold("startpos")(_.value)
       )
       .add("tournamentId" -> game.tournamentId)
@@ -52,15 +52,15 @@ final class BotJsonView(
         .obj(
           "type"   -> "gameState",
           "moves"  -> uciMoves.mkString(" "),
-          "wtime"  -> millisOf(game.whitePov),
-          "btime"  -> millisOf(game.blackPov),
+          "wtime"  -> millisOf(game.p1Pov),
+          "btime"  -> millisOf(game.p2Pov),
           "winc"   -> game.clock.??(_.config.increment.millis),
           "binc"   -> game.clock.??(_.config.increment.millis),
-          "wdraw"  -> game.whitePlayer.isOfferingDraw,
-          "bdraw"  -> game.blackPlayer.isOfferingDraw,
+          "wdraw"  -> game.p1Player.isOfferingDraw,
+          "bdraw"  -> game.p2Player.isOfferingDraw,
           "status" -> game.status.name
         )
-        .add("winner" -> game.winnerColor)
+        .add("winner" -> game.winnerPlayerIndex)
         .add("rematch" -> rematches.of(game.id))
     }
   }
@@ -87,8 +87,8 @@ final class BotJsonView(
 
   private def millisOf(pov: Pov): Int =
     pov.game.clock
-      .map(_.remainingTime(pov.color).millis.toInt)
-      .orElse(pov.game.correspondenceClock.map(_.remainingTime(pov.color).toInt * 1000))
+      .map(_.remainingTime(pov.playerIndex).millis.toInt)
+      .orElse(pov.game.correspondenceClock.map(_.remainingTime(pov.playerIndex).toInt * 1000))
       .getOrElse(Int.MaxValue)
 
   implicit private val clockConfigWriter: OWrites[strategygames.Clock.Config] = OWrites { c =>

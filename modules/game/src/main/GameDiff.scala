@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Black, Board, Centis, Clock, Color, GameLogic, History, PocketData, White }
+import strategygames.{ P2, Board, Centis, Clock, Player => PlayerIndex, GameLogic, History, PocketData, P1 }
 import strategygames.chess.CheckCount
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
@@ -53,13 +53,13 @@ object GameDiff {
     def dOptTry[A](name: String, getter: Game => A, toBson: A => Option[Try[BSONValue]]): Unit =
       dOpt[A](name, getter, a => toBson(a).map(_.get))
 
-    def getClockHistory(color: Color)(g: Game): Option[ClockHistorySide] =
+    def getClockHistory(playerIndex: PlayerIndex)(g: Game): Option[ClockHistorySide] =
       for {
         clk     <- g.clock
         history <- g.clockHistory
-        curColor = g.turnColor
-        times    = history(color)
-      } yield (clk.limit, times, g.flagged has color)
+        curPlayerIndex = g.turnPlayerIndex
+        times    = history(playerIndex)
+      } yield (clk.limit, times, g.flagged has playerIndex)
 
     def clockHistoryToBytes(o: Option[ClockHistorySide]) =
       o.flatMap { case (x, y, z) =>
@@ -122,7 +122,7 @@ object GameDiff {
             CastleLastMove.castleLastMoveBSONHandler.writeTry
           )
           // since variants are always OldBin
-          if (a.variant.threeCheck)
+          if (a.variant.threeCheck || a.variant.fiveCheck)
             dOpt(
               checkCount,
               _.history.checkCount,
@@ -156,8 +156,8 @@ object GameDiff {
 
     d(turns, _.turns, w.int)
     dOpt(moveTimes, _.binaryMoveTimes, (o: Option[ByteArray]) => o flatMap ByteArrayBSONHandler.writeOpt)
-    dOpt(whiteClockHistory, getClockHistory(White), clockHistoryToBytes)
-    dOpt(blackClockHistory, getClockHistory(Black), clockHistoryToBytes)
+    dOpt(p1ClockHistory, getClockHistory(P1), clockHistoryToBytes)
+    dOpt(p2ClockHistory, getClockHistory(P2), clockHistoryToBytes)
     dOpt(
       clock,
       _.clock,
@@ -170,7 +170,7 @@ object GameDiff {
     for (i <- 0 to 1) {
       import Player.BSONFields._
       val name                   = s"p$i."
-      val player: Game => Player = if (i == 0) (_.whitePlayer) else (_.blackPlayer)
+      val player: Game => Player = if (i == 0) (_.p1Player) else (_.p2Player)
       dOpt(s"$name$isOfferingDraw", player(_).isOfferingDraw, w.boolO)
       dOpt(s"$name$proposeTakebackAt", player(_).proposeTakebackAt, w.intO)
       dTry(s"$name$blursBits", player(_).blurs, Blurs.BlursBSONHandler.writeTry)

@@ -33,7 +33,7 @@ export interface Puzzle {
 }
 
 export interface Run {
-  pov: Color;
+  pov: PlayerIndex;
   moves: number;
   errors: number;
   current: CurrentPuzzle;

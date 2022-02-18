@@ -44,7 +44,7 @@ object model {
       povs.foldLeft(ScoreZero.zero) {
         case (score, pov) if pov.game.finished =>
           score add make(
-            res = pov.game.wonBy(pov.color),
+            res = pov.game.wonBy(pov.playerIndex),
             rp = RatingProg.make(pov.player)
           )
         case (score, _) => score

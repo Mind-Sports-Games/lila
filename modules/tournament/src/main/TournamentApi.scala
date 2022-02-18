@@ -34,7 +34,7 @@ final class TournamentApi(
     tellRound: lila.round.TellRound,
     roundSocket: lila.round.RoundSocket,
     trophyApi: lila.user.TrophyApi,
-    colorHistoryApi: ColorHistoryApi,
+    playerIndexHistoryApi: PlayerIndexHistoryApi,
     verify: Condition.Verify,
     duelStore: DuelStore,
     pause: Pause,
@@ -393,8 +393,8 @@ final class TournamentApi(
           Sequencing(tourId)(tournamentRepo.startedById) { tour =>
             pairingRepo.findPlaying(tour.id, userId) flatMap {
               case Some(pairing) if !pairing.berserkOf(userId) =>
-                (pairing colorOf userId) ?? { color =>
-                  roundSocket.rounds.ask(gameId) { GoBerserk(color, _) } flatMap {
+                (pairing playerIndexOf userId) ?? { playerIndex =>
+                  roundSocket.rounds.ask(gameId) { GoBerserk(playerIndex, _) } flatMap {
                     _ ?? pairingRepo.setBerserk(pairing, userId)
                   }
                 }
@@ -446,8 +446,8 @@ final class TournamentApi(
               } toInt
             } | player.performance
           )
-        } >>- finishing.flatMap(_.whitePlayer.userId).foreach { whiteUserId =>
-          colorHistoryApi.inc(player.id, strategygames.Color.fromWhite(player is whiteUserId))
+        } >>- finishing.flatMap(_.p1Player.userId).foreach { p1UserId =>
+          playerIndexHistoryApi.inc(player.id, strategygames.Player.fromP1(player is p1UserId))
         }
       }
     }
@@ -538,7 +538,7 @@ final class TournamentApi(
         _ ?? { tour =>
           getTeamVs(tour, pov.game) zip getGameRanks(tour, pov.game) flatMap { case (teamVs, ranks) =>
             teamVs.fold(tournamentTop(tour.id) dmap some) { vs =>
-              cached.teamInfo.get(tour.id -> vs.teams(pov.color)) map2 { info =>
+              cached.teamInfo.get(tour.id -> vs.teams(pov.playerIndex)) map2 { info =>
                 TournamentTop(info.topPlayers take tournamentTopNb)
               }
             } dmap {
@@ -582,12 +582,12 @@ final class TournamentApi(
 
     private def getGameRanks(tour: Tournament, game: Game): Fu[Option[GameRanks]] =
       ~ {
-        game.whitePlayer.userId.ifTrue(tour.isStarted) flatMap { whiteId =>
-          game.blackPlayer.userId map { blackId =>
+        game.p1Player.userId.ifTrue(tour.isStarted) flatMap { p1Id =>
+          game.p2Player.userId map { p2Id =>
             cached ranking tour map { ranking =>
               import cats.implicits._
-              (ranking.get(whiteId), ranking.get(blackId)) mapN { (whiteR, blackR) =>
-                GameRanks(whiteR + 1, blackR + 1)
+              (ranking.get(p1Id), ranking.get(p2Id)) mapN { (p1R, p2R) =>
+                GameRanks(p1R + 1, p2R + 1)
               }
             }
           }

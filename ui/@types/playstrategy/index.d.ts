@@ -48,7 +48,7 @@ interface PlayStrategy {
     init(node: HTMLElement): string | null;
     initAll(parent?: HTMLElement): void;
     update(node: HTMLElement, data: GameUpdate): void;
-    finish(node: HTMLElement, win?: Color): void;
+    finish(node: HTMLElement, win?: PlayerIndex): void;
   };
   ab?: any;
 
@@ -82,6 +82,7 @@ interface PlayStrategy {
   quietMode?: boolean;
   keyboardMove?: any;
   analysis?: any; // expose the analysis ctrl
+  pageVariant: PageVariant;
 }
 
 type I18nDict = { [key: string]: string };
@@ -201,7 +202,7 @@ interface PlayStrategyAnnouncement {
 
 interface PlayStrategyEditor {
   getFen(): string;
-  setOrientation(o: Color): void;
+  setOrientation(o: PlayerIndex): void;
 }
 
 declare namespace Editor {
@@ -285,9 +286,13 @@ declare type VariantKey =
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
+  | 'noCastling'
   | 'linesOfAction'
+  | 'scrambledEggs'
   | 'shogi'
-  | 'xiangqi';
+  | 'xiangqi'
+  | 'minishogi'
+  | 'minixiangqi';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -317,7 +322,9 @@ declare type Perf =
   | 'horde'
   | 'racingKings'
   | 'crazyhouse'
+  | 'noCastling'
   | 'linesOfAction'
+  | 'scrambledEggs'
   | 'international'
   | 'antidraughts'
   | 'breakthrough'
@@ -328,10 +335,18 @@ declare type Perf =
   | 'frisian'
   | 'frysk'
   | 'shogi'
-  | 'xiangqi';
+  | 'xiangqi'
+  | 'minishogi'
+  | 'minixiangqi';
 
-declare type Color = 'white' | 'black';
-declare type Orientation = 'white' | 'black' | 'left' | 'right';
+//declare type Color = 'white' | 'black';
+declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red';
+declare type PlayerIndex = 'p1' | 'p2';
+declare type PlayerColor = 'white' | 'black';
+declare type Orientation = 'p1' | 'p2' | 'left' | 'right';
+
+declare type PageVariant = VariantKey | DraughtsVariantKey | undefined;
+declare type GameFamilyKey = 'chess' | 'draughts' | 'loa' | 'shogi' | 'xiangqi';
 
 declare type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
 declare type Ranks = '1' | '2' | '3' | '4' | '5' | '5' | '6' | '7' | '8' | '9' | '10';
@@ -452,7 +467,7 @@ declare namespace Tree {
   }
 
   export interface TablebaseHit {
-    winner: Color | undefined;
+    winner: PlayerIndex | undefined;
     best?: Uci;
   }
 

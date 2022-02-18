@@ -206,7 +206,7 @@ function renderLine(ctrl: Ctrl, line: Line): VNode {
 
   if (line.u === 'playstrategy') return h('li.system', textNode);
 
-  if (line.c) return h('li', [h('span.color', '[' + line.c + ']'), textNode]);
+  if (line.c) return h('li', [h('span.playerIndex', '[' + line.c + ']'), textNode]);
 
   const userNode = thunk('a', line.u, userLink, [line.u, line.title]);
 

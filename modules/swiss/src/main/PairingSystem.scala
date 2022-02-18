@@ -50,9 +50,9 @@ final private class PairingSystem(trf: SwissTrf, rankingApi: SwissRankingApi, ex
           }
         case Array(w, b) =>
           for {
-            white <- w.toIntOption flatMap idsToPlayers.get
-            black <- b.toIntOption flatMap idsToPlayers.get
-          } yield Right(SwissPairing.Pending(white, black))
+            p1 <- w.toIntOption flatMap idsToPlayers.get
+            p2 <- b.toIntOption flatMap idsToPlayers.get
+          } yield Right(SwissPairing.Pending(p1, p2))
       }
       .flatten
 

@@ -54,7 +54,7 @@ const feedback = {
   find(ctrl: RetroCtrl): VNode[] {
     return [
       h('div.player', [
-        h('div.no-square', h('piece.k-piece.' + ctrl.color)),
+        h('div.no-square', h('piece.k-piece.' + ctrl.playerIndex)),
         h('div.instruction', [
           h(
             'strong',
@@ -75,7 +75,7 @@ const feedback = {
               )
             )
           ),
-          h('em', ctrl.noarg(ctrl.color === 'white' ? 'findBetterMoveForWhite' : 'findBetterMoveForBlack')),
+          h('em', ctrl.trans('findBetterMoveForPlayerIndex', ctrl.playerIndex)),
           skipOrViewSolution(ctrl),
         ]),
       ]),
@@ -107,7 +107,7 @@ const feedback = {
         h('div.icon', '✗'),
         h('div.instruction', [
           h('strong', ctrl.noarg('youCanDoBetter')),
-          h('em', ctrl.noarg(ctrl.color === 'white' ? 'tryAnotherMoveForWhite' : 'tryAnotherMoveForBlack')),
+          h('em', ctrl.trans('tryAnotherMoveForPlayerIndex', ctrl.playerIndex)),
           skipOrViewSolution(ctrl),
         ]),
       ]),
@@ -174,13 +174,13 @@ const feedback = {
     const nothing = !ctrl.completion()[1];
     return [
       h('div.player', [
-        h('div.no-square', h('piece.k-piece.' + ctrl.color)),
+        h('div.no-square', h('piece.k-piece.' + ctrl.playerIndex)),
         h('div.instruction', [
           h(
             'em',
             nothing
-              ? ctrl.noarg(ctrl.color === 'white' ? 'noMistakesFoundForWhite' : 'noMistakesFoundForBlack')
-              : ctrl.noarg(ctrl.color === 'white' ? 'doneReviewingWhiteMistakes' : 'doneReviewingBlackMistakes')
+              ? ctrl.trans('noMistakesFoundForPlayerIndex', ctrl.playerIndex)
+              : ctrl.trans('doneReviewingPlayerIndexMistakes', ctrl.playerIndex)
           ),
           h('div.choices.end', [
             nothing
@@ -197,7 +197,7 @@ const feedback = {
               {
                 hook: bind('click', () => ctrl.flip()),
               },
-              ctrl.noarg(ctrl.color === 'white' ? 'reviewBlackMistakes' : 'reviewWhiteMistakes')
+              ctrl.trans('reviewPlayerIndexMistakes', ctrl.playerIndex === 'p1' ? 'p2' : 'p1')
             ),
           ]),
         ]),

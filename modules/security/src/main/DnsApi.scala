@@ -18,7 +18,7 @@ final private class DnsApi(
     system: akka.actor.ActorSystem
 ) {
 
-  // only valid email domains that are not whitelisted should make it here
+  // only valid email domains that are not p1listed should make it here
   def mx(domain: Domain.Lower): Fu[List[Domain]] =
     failsafe(domain, List(domain.domain)) {
       mxCache get domain

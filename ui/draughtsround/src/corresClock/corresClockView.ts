@@ -34,28 +34,28 @@ function formatClockTime(trans: Trans, time: Millis) {
 export default function (
   ctrl: CorresClockController,
   trans: Trans,
-  color: Color,
+  playerIndex: PlayerIndex,
   position: Position,
-  runningColor: Color
+  runningPlayerIndex: PlayerIndex
 ) {
-  const millis = ctrl.millisOf(color),
+  const millis = ctrl.millisOf(playerIndex),
     update = (el: HTMLElement) => {
       el.innerHTML = formatClockTime(trans, millis);
     },
-    isPlayer = ctrl.root.data.player.color === color;
+    isPlayer = ctrl.root.data.player.playerIndex === playerIndex;
   return h(
     'div.rclock.rclock-correspondence.rclock-' + position,
     {
       class: {
         outoftime: millis <= 0,
-        running: runningColor === color,
+        running: runningPlayerIndex === playerIndex,
       },
     },
     [
       ctrl.data.showBar
         ? h('div.bar', [
             h('span', {
-              attrs: { style: `width: ${ctrl.timePercent(color)}%` },
+              attrs: { style: `width: ${ctrl.timePercent(playerIndex)}%` },
             }),
           ])
         : null,

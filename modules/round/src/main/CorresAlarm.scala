@@ -42,7 +42,7 @@ final private class CorresAlarm(
         _ foreach { game =>
           game.bothPlayersHaveMoved ?? {
             game.playableCorrespondenceClock ?? { clock =>
-              val remainingTime = clock remainingTime game.turnColor
+              val remainingTime = clock remainingTime game.turnPlayerIndex
               val ringsAt       = DateTime.now.plusSeconds(remainingTime.toInt * 8 / 10)
               coll.update
                 .one(
@@ -69,7 +69,7 @@ final private class CorresAlarm(
       .mapAsyncUnordered(4)(alarm => proxyGame(alarm._id))
       .via(LilaStream.collect)
       .mapAsyncUnordered(4) { game =>
-        val pov = Pov(game, game.turnColor)
+        val pov = Pov(game, game.turnPlayerIndex)
         pov.player.userId.fold(fuccess(true))(u => hasUserId(pov.game, u)).addEffect {
           case true  => // already looking at the game
           case false => Bus.publish(lila.game.actorApi.CorresAlarmEvent(pov), "corresAlarm")

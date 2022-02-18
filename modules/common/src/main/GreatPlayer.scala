@@ -50,7 +50,7 @@ object GreatPlayer {
     ("Bird", "Henry_Bird_(chess_player)"),
     ("Bisguier", "Arthur_Bisguier"),
     ("Biyiasas", "Peter_Biyiasas"),
-    ("Blackburne", "Joseph_Henry_Blackburne"),
+    ("P2burne", "Joseph_Henry_P2burne"),
     ("Bledow", "Ludwig_Bledow"),
     ("Blumenfeld", "Benjamin_Blumenfeld"),
     ("Bobotsov", "Milko_Bobotsov"),

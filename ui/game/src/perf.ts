@@ -13,7 +13,9 @@ export const perf = {
     antichess: '@',
     atomic: '>',
     horde: '_',
+    noCastling: '+',
     linesOfAction: '',
+    scrambledEggs: '',
     international: 'K',
     antidraughts: 'K',
     breakthrough: 'K',
@@ -25,5 +27,7 @@ export const perf = {
     frysk: 'K',
     shogi: 's',
     xiangqi: 't',
+    minishogi: 's',
+    minixiangqi: 't',
   },
 };

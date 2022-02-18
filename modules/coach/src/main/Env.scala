@@ -58,10 +58,10 @@ final class Env(
       api.reviews.deleteAllBy(userId).unit
     case lila.hub.actorApi.mod.SetPermissions(userId, permissions) =>
       api.toggleApproved(userId, permissions.has(Permission.Coach.dbKey)).unit
-    case lila.game.actorApi.FinishGame(game, white, black) if game.rated =>
+    case lila.game.actorApi.FinishGame(game, p1, p2) if game.rated =>
       if (game.perfType.exists(lila.rating.PerfType.standard.contains)) {
-        white ?? api.setRating
-        black ?? api.setRating
+        p1 ?? api.setRating
+        p2 ?? api.setRating
       }.unit
   }
 

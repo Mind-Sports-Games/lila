@@ -8,15 +8,15 @@ import TournamentController from '../ctrl';
 const renderGameClasses = (game: FeaturedGame): string =>
   game.gameLogic === 'draughts' && !!game.boardSize
     ? `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLogic}.is${game.boardSize.key}.${game.variantKey}.variant-${game.variantKey}`
-    : `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLogic}.${game.variantKey}.variant-${game.variantKey}`;
+    : `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameFamily}.${game.variantKey}.variant-${game.variantKey}`;
 
 const renderGameState = (game: FeaturedGame): string =>
   game.gameLogic === 'draughts' && !!game.boardSize
     ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orientation}|${game.lastMove}`
     : `${game.fen},${game.orientation},${game.lastMove}`;
 
-function featuredPlayer(game: FeaturedGame, color: Color) {
-  const player = game[color];
+function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex) {
+  const player = game[playerIndex];
   const clock = game.c || game.clock; // temporary BC, remove me
   return h('span.mini-game__player', [
     h('span.mini-game__user', [
@@ -32,13 +32,13 @@ function featuredPlayer(game: FeaturedGame, color: Color) {
         : null,
     ]),
     clock
-      ? h(`span.mini-game__clock.mini-game__clock--${color}`, {
+      ? h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
           attrs: {
-            'data-time': clock[color],
+            'data-time': clock[playerIndex],
             'data-managed': 1,
           },
         })
-      : h('span.mini-game__result', game.winner ? (game.winner == color ? 1 : 0) : '½'),
+      : h('span.mini-game__result', game.winner ? (game.winner == playerIndex ? 1 : 0) : '½'),
   ]);
 }
 

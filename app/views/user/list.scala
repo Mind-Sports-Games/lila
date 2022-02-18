@@ -52,8 +52,8 @@ object list {
               userTopPerf(leaderboards.rapid,       PerfType.orDefault("rapid")),
               userTopPerf(leaderboards.classical,   PerfType.orDefault("classical")),
               userTopPerf(leaderboards.ultraBullet, PerfType.orDefault("ultraBullet")),
-              userTopActive(nbAllTime, trans.activePlayers(), icon = 'U'.some),
-              tournamentWinners(tourneyWinners),
+              //userTopActive(nbAllTime, trans.activePlayers(), icon = 'U'.some),
+              //tournamentWinners(tourneyWinners),
               userTopPerf(leaderboards.crazyhouse,    PerfType.orDefault("crazyhouse")),
               userTopPerf(leaderboards.chess960,      PerfType.orDefault("chess960")),
               userTopPerf(leaderboards.antichess,     PerfType.orDefault("antichess")),
@@ -63,7 +63,9 @@ object list {
               userTopPerf(leaderboards.kingOfTheHill, PerfType.orDefault("kingOfTheHill")),
               userTopPerf(leaderboards.horde,         PerfType.orDefault("horde")),
               userTopPerf(leaderboards.racingKings,   PerfType.orDefault("racingKings")),
+              userTopPerf(leaderboards.noCastling,    PerfType.orDefault("noCastling")),
               userTopPerf(leaderboards.linesOfAction, PerfType.orDefault("linesOfAction")),
+              userTopPerf(leaderboards.scrambledEggs, PerfType.orDefault("scrambledEggs")),
               userTopPerf(leaderboards.international, PerfType.orDefault("international")),
               userTopPerf(leaderboards.frisian,       PerfType.orDefault("frisian")),
               userTopPerf(leaderboards.antidraughts,  PerfType.orDefault("antidraughts")),
@@ -73,7 +75,9 @@ object list {
               userTopPerf(leaderboards.brazilian,     PerfType.orDefault("brazilian")),
               userTopPerf(leaderboards.pool,          PerfType.orDefault("pool")),
               userTopPerf(leaderboards.shogi,         PerfType.orDefault("shogi")),
-              userTopPerf(leaderboards.xiangqi,       PerfType.orDefault("xiangqi"))
+              userTopPerf(leaderboards.xiangqi,       PerfType.orDefault("xiangqi")),
+              userTopPerf(leaderboards.minishogi,     PerfType.orDefault("minishogi")),
+              userTopPerf(leaderboards.minixiangqi,   PerfType.orDefault("minixiangqi"))
             )
           )
         )
@@ -98,7 +102,8 @@ object list {
   private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =
     st.section(cls := "user-top")(
       h2(cls := "text", dataIcon := perfType.iconChar)(
-        a(href := routes.User.topNb(200, perfType.key))(perfType.trans)
+        perfType.trans
+        //a(href := routes.User.topNb(200, perfType.key))(perfType.trans)
       ),
       ol(users map { l =>
         li(

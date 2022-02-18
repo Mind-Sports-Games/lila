@@ -233,8 +233,8 @@ function stats(ctrl: SwissCtrl): VNode | undefined {
         h('table', [
           numberRow(noarg('averageElo'), s.averageRating, 'raw'),
           numberRow(noarg('gamesPlayed'), s.games),
-          numberRow(noarg('whiteWins'), [s.whiteWins, slots], 'percent'),
-          numberRow(noarg('blackWins'), [s.blackWins, slots], 'percent'),
+          numberRow(ctrl.trans('playerIndexWins', ctrl.data.p1Name), [s.p1Wins, slots], 'percent'),
+          numberRow(ctrl.trans('playerIndexWins', ctrl.data.p2Name), [s.p2Wins, slots], 'percent'),
           numberRow(noarg('draws'), [s.draws, slots], 'percent'),
           numberRow('Byes', [s.byes, slots], 'percent'),
           numberRow('Absences', [s.absences, slots], 'percent'),

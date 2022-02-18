@@ -47,6 +47,7 @@ export interface GameLogic {
 
 export interface Variant {
   gameLogic: GameLogic;
+  gameFamily: string;
   key: string;
   name: string;
   boardSize?: VariantBoardSize;
@@ -56,7 +57,7 @@ export interface NowPlaying {
   fullId: string;
   gameId: string;
   fen: Fen;
-  color: Color;
+  playerIndex: PlayerIndex;
   lastMove: string;
   variant: Variant;
   speed: string;

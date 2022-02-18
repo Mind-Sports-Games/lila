@@ -15,7 +15,9 @@ import controllers.routes
 
 object userAnalysis {
 
-  def noAnalysisVariants = List(Variant.Chess(strategygames.chess.variant.FromPosition), Variant.Chess(strategygames.chess.variant.LinesOfAction))
+  def noAnalysisVariants = List(Variant.Chess(strategygames.chess.variant.FromPosition),
+                                Variant.Chess(strategygames.chess.variant.LinesOfAction),
+                                Variant.Chess(strategygames.chess.variant.ScrambledEggs))
 
   def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) =
     views.html.base.layout(

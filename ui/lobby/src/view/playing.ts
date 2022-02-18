@@ -20,10 +20,12 @@ function timer(pov: NowPlaying) {
 const boardSize = (boardSize?: VariantBoardSize) =>
   boardSize === undefined ? '' : `${boardSize.size[0]}x${boardSize.size[1]}`;
 
-const boardClasses = (variant: Variant) =>
-  `${variant.gameLogic.name.toLowerCase()}${
-    variant.gameLogic.id === 1 && variant.boardSize !== undefined ? `.is${variant.boardSize.key}` : ''
-  }`;
+const boardClasses = (variant: Variant): string =>
+  variant.gameLogic.id === 1 //draughts
+    ? `${variant.gameLogic.name.toLowerCase()}${variant.boardSize !== undefined ? `.is${variant.boardSize.key}` : ''}.${
+        variant.key
+      }.variant-${variant.key}`
+    : `${variant.gameFamily}.${variant.key}.variant-${variant.key}`;
 
 export default function (ctrl: LobbyController) {
   return h(
@@ -36,15 +38,15 @@ export default function (ctrl: LobbyController) {
           attrs: { href: '/' + pov.fullId },
         },
         [
-          h(`span.mini-board.cg-wrap.is2d.${boardClasses(pov.variant)}.variant-${pov.variant.key}`, {
+          h(`span.mini-board.cg-wrap.is2d.${boardClasses(pov.variant)}`, {
             attrs:
               pov.variant.gameLogic.id === 1
                 ? {
                     // Draughts
-                    'data-state': `${pov.fen}|${boardSize(pov.variant.boardSize)}|${pov.color}|${pov.lastMove}`,
+                    'data-state': `${pov.fen}|${boardSize(pov.variant.boardSize)}|${pov.playerIndex}|${pov.lastMove}`,
                   }
                 : {
-                    'data-state': `${pov.fen},${pov.color},${pov.lastMove}`,
+                    'data-state': `${pov.fen},${pov.playerIndex},${pov.lastMove}`,
                   },
             hook: {
               insert(vnode) {

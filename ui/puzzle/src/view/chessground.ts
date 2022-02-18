@@ -1,4 +1,4 @@
-import changeColorHandle from 'common/coordsColor';
+import changePlayerIndexHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
 import { Chessground } from 'chessground';
 import { Config as CgConfig } from 'chessground/config';
@@ -19,15 +19,15 @@ function makeConfig(ctrl: Controller): CgConfig {
   return {
     fen: opts.fen,
     orientation: opts.orientation,
-    myColor: opts.myColor,
-    turnColor: opts.turnColor,
+    myPlayerIndex: opts.myPlayerIndex,
+    turnPlayerIndex: opts.turnPlayerIndex,
     check: opts.check,
     lastMove: opts.lastMove,
     coordinates: ctrl.pref.coords !== Prefs.Coords.Hidden,
     addPieceZIndex: ctrl.pref.is3d,
     movable: {
       free: false,
-      color: opts.movable!.color,
+      playerIndex: opts.movable!.playerIndex,
       dests: opts.movable!.dests,
       showDests: ctrl.pref.destination,
       rookCastle: ctrl.pref.rookCastle,
@@ -43,7 +43,7 @@ function makeConfig(ctrl: Controller): CgConfig {
       move: ctrl.userMove,
       insert(elements) {
         resizeHandle(elements, Prefs.ShowResizeHandle.Always, ctrl.vm.node.ply, _ => true);
-        if (ctrl.pref.coords === Prefs.Coords.Inside) changeColorHandle();
+        if (ctrl.pref.coords === Prefs.Coords.Inside) changePlayerIndexHandle();
       },
     },
     premovable: {

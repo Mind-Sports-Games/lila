@@ -70,8 +70,8 @@ final class StudySearchApi(
     Tag.Variant,
     Tag.Event,
     Tag.Round,
-    Tag.White,
-    Tag.Black,
+    Tag.P1,
+    Tag.P2,
     Tag.ECO,
     Tag.Opening,
     Tag.Annotator

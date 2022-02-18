@@ -20,8 +20,10 @@
   <string name="black">Mainty</string>
   <string name="randomColor">Loko voafantina</string>
   <string name="createAGame">Mamorona lalao</string>
+  <string name="playerIndexIsVictorious">Naharesy ny %s</string>
   <string name="whiteIsVictorious">Naharesy ny fotsy</string>
   <string name="blackIsVictorious">Naharesy ny mainty</string>
+  <string name="youPlayThePlayerIndexPieces">Milalao ny %s ianao</string>
   <string name="youPlayTheWhitePieces">Milalao ny fotsy ianao</string>
   <string name="youPlayTheBlackPieces">Milalao ny mainty ianao</string>
   <string name="itsYourTurn">Anjaranao izao!</string>
@@ -31,6 +33,7 @@
   <string name="newOpponent">Mpifanandrina vaovao</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Te hanomboka lalao vaovao ny mpifanandrina aminao</string>
   <string name="joinTheGame">Idiro ny lalao</string>
+  <string name="playerIndexPlays">Milalao ny %s</string>
   <string name="whitePlays">Milalao ny fotsy</string>
   <string name="blackPlays">Milalao ny mainty</string>
   <plurals name="opponentLeftCounter">
@@ -43,8 +46,10 @@
   <string name="forceDraw">Angataho ny hahasahala ny lalao</string>
   <string name="talkInChat">Miresaha ao amin\'ny chat</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Ny olona voalohany ho tonga eto amin\'ito URL ito no hilalao aminao.</string>
+  <string name="playerIndexResigned">Nanaiky resy ny %s</string>
   <string name="whiteResigned">Nanaiky resy ny fotsy</string>
   <string name="blackResigned">Nanaiky resy ny maintsy</string>
+  <string name="playerIndexLeftTheGame">Nandao ny lalao ny %s</string>
   <string name="whiteLeftTheGame">Nandao ny lalao ny fotsy</string>
   <string name="blackLeftTheGame">Nandao ny lalao ny mainty</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Zarao ity URL ity ahafahan\'ny mpijery manaraka ny lalao</string>
@@ -64,6 +69,7 @@
   <string name="losing">Resy</string>
   <string name="drawn">Sahala</string>
   <string name="unknown">Tsy fantatra</string>
+  <string name="p1DrawP2">%1$s / Sahala / %2$s</string>
   <string name="whiteDrawBlack">Fotsy / Sahala / Mainty</string>
   <string name="recentGames">Lalao vao aingana</string>
   <string name="noGameFound">Tsy misy lalao hita</string>
@@ -152,14 +158,17 @@
     <item quantity="other">%s lalao niaraka taminao</item>
   </plurals>
   <string name="cancel">Cancel</string>
+  <string name="playerIndexTimeOut">Lany fotoana ny %s</string>
   <string name="whiteTimeOut">Lany fotoana ny fotsy</string>
   <string name="blackTimeOut">Lany fotoana ny mainty</string>
   <string name="drawOfferSent">Lasa ny fangatahana lalao sahala</string>
   <string name="drawOfferDeclined">Lavo ny fangatahana ny hahasahala ny lalao</string>
   <string name="drawOfferAccepted">Nekena ny fangatahana ny hahasahala ny lalao</string>
   <string name="drawOfferCanceled">Nadaboka ny fangatahana ny hahasahala ny lalao</string>
+  <string name="playerIndexOffersDraw">Mangataka ny fahasahalan\'ny lalao ny %s</string>
   <string name="whiteOffersDraw">Mangataka ny fahasahalan\'ny lalao ny fotsy</string>
   <string name="blackOffersDraw">Mangataka ny fahasahalan\'ny lalao ny mainty</string>
+  <string name="playerIndexDeclinesDraw">Mandà ny fahasahalan\'ny lalao ny %s</string>
   <string name="whiteDeclinesDraw">Mandà ny fahasahalan\'ny lalao ny fotsy</string>
   <string name="blackDeclinesDraw">Mandà ny fahasahalan\'ny lalao ny mainty</string>
   <string name="yourOpponentOffersADraw">Mangataka ny hahasahala ny lalao ny mpifanandrina aminao</string>

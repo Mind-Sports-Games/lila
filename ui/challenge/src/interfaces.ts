@@ -49,7 +49,7 @@ export interface Challenge {
   initialFen: FEN;
   rated: boolean;
   timeControl: TimeControl;
-  color: Color;
+  playerIndex: PlayerIndex;
   perf: {
     icon: string;
     name: string;

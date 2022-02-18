@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Black, Color, Speed, White }
+import strategygames.{ P2, Player => PlayerIndex, Speed, P1 }
 import strategygames.variant.Variant
 import strategygames.chess.variant._
 import org.goochjs.glicko2._
@@ -20,14 +20,14 @@ final class PerfsUpdater(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   // returns rating diffs
-  def save(game: Game, white: User, black: User): Fu[Option[RatingDiffs]] =
+  def save(game: Game, p1: User, p2: User): Fu[Option[RatingDiffs]] =
     botFarming(game) flatMap {
       case true => fuccess(none)
       case _ =>
         PerfPicker.main(game) ?? { mainPerf =>
-          (game.rated && game.finished && game.accountable && !white.lame && !black.lame) ?? {
-            val ratingsW = mkRatings(white.perfs)
-            val ratingsB = mkRatings(black.perfs)
+          (game.rated && game.finished && game.accountable && !p1.lame && !p2.lame) ?? {
+            val ratingsW = mkRatings(p1.perfs)
+            val ratingsB = mkRatings(p2.perfs)
             game.ratingVariant match {
               case Variant.Chess(Chess960) =>
                 updateRatings(ratingsW.chess960, ratingsB.chess960, game)
@@ -47,8 +47,12 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.racingKings, ratingsB.racingKings, game)
               case Variant.Chess(Crazyhouse) =>
                 updateRatings(ratingsW.crazyhouse, ratingsB.crazyhouse, game)
+              case Variant.Chess(NoCastling) =>
+                updateRatings(ratingsW.noCastling, ratingsB.noCastling, game)
               case Variant.Chess(LinesOfAction) =>
                 updateRatings(ratingsW.linesOfAction, ratingsB.linesOfAction, game)
+              case Variant.Chess(ScrambledEggs) =>
+                updateRatings(ratingsW.scrambledEggs, ratingsB.scrambledEggs, game)  
               case Variant.Draughts(strategygames.draughts.variant.Standard) =>
                 updateRatings(ratingsW.international, ratingsB.international, game)
               case Variant.Draughts(strategygames.draughts.variant.Frisian) =>
@@ -69,6 +73,10 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.shogi, ratingsB.shogi, game)
               case Variant.FairySF(strategygames.fairysf.variant.Xiangqi) =>
                 updateRatings(ratingsW.xiangqi, ratingsB.xiangqi, game)
+              case Variant.FairySF(strategygames.fairysf.variant.MiniShogi) =>
+                updateRatings(ratingsW.minishogi, ratingsB.minishogi, game)
+              case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi) =>
+                updateRatings(ratingsW.minixiangqi, ratingsB.minixiangqi, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -86,20 +94,20 @@ final class PerfsUpdater(
                 }
               case _ =>
             }
-            val perfsW                      = mkPerfs(ratingsW, white -> black, game)
-            val perfsB                      = mkPerfs(ratingsB, black -> white, game)
+            val perfsW                      = mkPerfs(ratingsW, p1 -> p2, game)
+            val perfsB                      = mkPerfs(ratingsB, p2 -> p1, game)
             def intRatingLens(perfs: Perfs) = mainPerf(perfs).glicko.intRating
-            val ratingDiffs = Color.Map(
-              intRatingLens(perfsW) - intRatingLens(white.perfs),
-              intRatingLens(perfsB) - intRatingLens(black.perfs)
+            val ratingDiffs = PlayerIndex.Map(
+              intRatingLens(perfsW) - intRatingLens(p1.perfs),
+              intRatingLens(perfsB) - intRatingLens(p2.perfs)
             )
             gameRepo.setRatingDiffs(game.id, ratingDiffs) zip
-              userRepo.setPerfs(white, perfsW, white.perfs) zip
-              userRepo.setPerfs(black, perfsB, black.perfs) zip
-              historyApi.add(white, game, perfsW) zip
-              historyApi.add(black, game, perfsB) zip
-              rankingApi.save(white, game.perfType, perfsW) zip
-              rankingApi.save(black, game.perfType, perfsB) inject ratingDiffs.some
+              userRepo.setPerfs(p1, perfsW, p1.perfs) zip
+              userRepo.setPerfs(p2, perfsB, p2.perfs) zip
+              historyApi.add(p1, game, perfsW) zip
+              historyApi.add(p2, game, perfsB) zip
+              rankingApi.save(p1, game.perfType, perfsW) zip
+              rankingApi.save(p2, game.perfType, perfsB) inject ratingDiffs.some
           }
         }
     }
@@ -114,7 +122,9 @@ final class PerfsUpdater(
       horde: Rating,
       racingKings: Rating,
       crazyhouse: Rating,
+      noCastling: Rating,
       linesOfAction: Rating,
+      scrambledEggs: Rating,
       international: Rating,
       frisian: Rating,
       frysk: Rating,
@@ -125,6 +135,8 @@ final class PerfsUpdater(
       pool: Rating,
       shogi: Rating,
       xiangqi: Rating,
+      minishogi: Rating,
+      minixiangqi: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -144,7 +156,9 @@ final class PerfsUpdater(
       horde = perfs.horde.toRating,
       racingKings = perfs.racingKings.toRating,
       crazyhouse = perfs.crazyhouse.toRating,
+      noCastling = perfs.noCastling.toRating,
       linesOfAction = perfs.linesOfAction.toRating,
+      scrambledEggs = perfs.scrambledEggs.toRating,
       international = perfs.international.toRating,
       frisian = perfs.frisian.toRating,
       frysk = perfs.frysk.toRating,
@@ -155,6 +169,8 @@ final class PerfsUpdater(
       pool = perfs.pool.toRating,
       shogi = perfs.shogi.toRating,
       xiangqi = perfs.xiangqi.toRating,
+      minishogi = perfs.minishogi.toRating,
+      minixiangqi = perfs.minixiangqi.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -163,17 +179,17 @@ final class PerfsUpdater(
       correspondence = perfs.correspondence.toRating
     )
 
-  private def updateRatings(white: Rating, black: Rating, game: Game): Unit = {
-    val result = game.winnerColor match {
-      case Some(White) => Glicko.Result.Win
-      case Some(Black) => Glicko.Result.Loss
+  private def updateRatings(p1: Rating, p2: Rating, game: Game): Unit = {
+    val result = game.winnerPlayerIndex match {
+      case Some(P1) => Glicko.Result.Win
+      case Some(P2) => Glicko.Result.Loss
       case None              => Glicko.Result.Draw
     }
     val results = new RatingPeriodResults()
     result match {
-      case Glicko.Result.Draw => results.addDraw(white, black)
-      case Glicko.Result.Win  => results.addResult(white, black)
-      case Glicko.Result.Loss => results.addResult(black, white)
+      case Glicko.Result.Draw => results.addDraw(p1, p2)
+      case Glicko.Result.Win  => results.addResult(p1, p2)
+      case Glicko.Result.Loss => results.addResult(p2, p1)
     }
     try {
       Glicko.system.updateRatings(results, true)
@@ -207,7 +223,9 @@ final class PerfsUpdater(
           horde = addRatingIf(game.ratingVariant.horde, perfs.horde, ratings.horde),
           racingKings = addRatingIf(game.ratingVariant.racingKings, perfs.racingKings, ratings.racingKings),
           crazyhouse = addRatingIf(game.ratingVariant.crazyhouse, perfs.crazyhouse, ratings.crazyhouse),
+          noCastling = addRatingIf(game.ratingVariant.noCastling, perfs.noCastling, ratings.noCastling),
           linesOfAction = addRatingIf(game.ratingVariant.linesOfAction, perfs.linesOfAction, ratings.linesOfAction),
+          scrambledEggs = addRatingIf(game.ratingVariant.scrambledEggs, perfs.scrambledEggs, ratings.scrambledEggs),
           international = addRatingIf(game.ratingVariant.draughtsStandard, perfs.international, ratings.international),
           frisian = addRatingIf(game.ratingVariant.frisian, perfs.frisian, ratings.frisian),
           frysk = addRatingIf(game.ratingVariant.frysk, perfs.frysk, ratings.frysk),
@@ -218,6 +236,8 @@ final class PerfsUpdater(
           pool = addRatingIf(game.ratingVariant.pool, perfs.pool, ratings.pool),
           shogi = addRatingIf(game.ratingVariant.shogi, perfs.shogi, ratings.shogi),
           xiangqi = addRatingIf(game.ratingVariant.xiangqi, perfs.xiangqi, ratings.xiangqi),
+          minishogi = addRatingIf(game.ratingVariant.minishogi, perfs.minishogi, ratings.minishogi),
+          minixiangqi = addRatingIf(game.ratingVariant.minixiangqi, perfs.minixiangqi, ratings.minixiangqi),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -238,7 +258,9 @@ final class PerfsUpdater(
           horde = r(PT.orDefault("horde"), perfs.horde, perfs1.horde),
           racingKings = r(PT.orDefault("racingKings"), perfs.racingKings, perfs1.racingKings),
           crazyhouse = r(PT.orDefault("crazyhouse"), perfs.crazyhouse, perfs1.crazyhouse),
+          noCastling = r(PT.orDefault("noCastling"), perfs.noCastling, perfs1.noCastling),
           linesOfAction = r(PT.orDefault("linesOfAction"), perfs.linesOfAction, perfs1.linesOfAction),
+          scrambledEggs = r(PT.orDefault("scrambledEggs"), perfs.scrambledEggs, perfs1.scrambledEggs),
           international = r(PT.orDefault("international"), perfs.international, perfs1.international),
           frisian = r(PT.orDefault("frisian"), perfs.frisian, perfs1.frisian),
           frysk = r(PT.orDefault("frysk"), perfs.frysk, perfs1.frysk),
@@ -249,6 +271,8 @@ final class PerfsUpdater(
           pool = r(PT.orDefault("pool"), perfs.pool, perfs1.pool),
           shogi = r(PT.orDefault("shogi"), perfs.shogi, perfs1.shogi),
           xiangqi = r(PT.orDefault("xiangqi"), perfs.xiangqi, perfs1.xiangqi),
+          minishogi = r(PT.orDefault("minishogi"), perfs.minishogi, perfs1.minishogi),
+          minixiangqi = r(PT.orDefault("minixiangqi"), perfs.minixiangqi, perfs1.minixiangqi),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

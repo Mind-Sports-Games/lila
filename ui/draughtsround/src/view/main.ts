@@ -33,21 +33,21 @@ function wheel(ctrl: RoundController, e: WheelEvent): void {
 }
 
 const emptyMaterialDiff: MaterialDiff = {
-  white: {},
-  black: {},
+  p1: {},
+  p2: {},
 };
 
 export function main(ctrl: RoundController): VNode {
   const d = ctrl.data,
     cgState = ctrl.draughtsground && ctrl.draughtsground.state,
-    topColor = d[ctrl.flip ? 'player' : 'opponent'].color,
-    bottomColor = d[ctrl.flip ? 'opponent' : 'player'].color;
+    topPlayerIndex = d[ctrl.flip ? 'player' : 'opponent'].playerIndex,
+    bottomPlayerIndex = d[ctrl.flip ? 'opponent' : 'player'].playerIndex;
   let material: MaterialDiff,
     score = 0;
   if (d.pref.showCaptured) {
     const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen);
     material = util.getMaterialDiff(pieces);
-    score = util.getScore(pieces) * (bottomColor === 'white' ? 1 : -1);
+    score = util.getScore(pieces) * (bottomPlayerIndex === 'p1' ? 1 : -1);
   } else material = emptyMaterialDiff;
 
   return ctrl.nvui
@@ -68,9 +68,9 @@ export function main(ctrl: RoundController): VNode {
             },
             [renderGround(ctrl)]
           ),
-          renderMaterial(material[topColor], -score, 'top'),
+          renderMaterial(material[topPlayerIndex], -score, 'top'),
           ...renderTable(ctrl),
-          renderMaterial(material[bottomColor], score, 'bottom'),
+          renderMaterial(material[bottomPlayerIndex], score, 'bottom'),
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ]
       );

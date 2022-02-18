@@ -2,10 +2,10 @@ import * as domData from './data';
 
 export const init = (node: HTMLElement): void => {
   const [fen, orientation, lm] = node.getAttribute('data-state')!.split(',');
-  initWith(node, fen, orientation as Color, lm);
+  initWith(node, fen, orientation as PlayerIndex, lm);
 };
 
-export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?: string): void => {
+export const initWith = (node: HTMLElement, fen: string, orientation: PlayerIndex, lm?: string): void => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 500);
   else {
     const $el = $(node);
@@ -29,14 +29,14 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?
         })
       );
     } else {
-      const [_, myColor, __] = $el.data('state').split(',');
+      const [_, myPlayerIndex, __] = $el.data('state').split(',');
       domData.set(
         node,
         'chessground',
         window.Chessground(node, {
           orientation,
           coordinates: false,
-          myColor: myColor,
+          myPlayerIndex: myPlayerIndex,
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
           fen,
@@ -49,8 +49,20 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Color, lm?
             ? { width: 9, height: 9 }
             : $el.hasClass('variant-xiangqi')
             ? { width: 9, height: 10 }
+            : $el.hasClass('variant-minishogi')
+            ? { width: 5, height: 5 }
+            : $el.hasClass('variant-minixiangqi')
+            ? { width: 7, height: 7 }
             : { width: 8, height: 8 },
-          variant: $el.hasClass('variant-shogi') ? 'shogi' : $el.hasClass('variant-xiangqi') ? 'xiangqi' : 'standard',
+          variant: $el.hasClass('variant-shogi')
+            ? 'shogi'
+            : $el.hasClass('variant-xiangqi')
+            ? 'xiangqi'
+            : $el.hasClass('variant-minishogi')
+            ? 'minishogi'
+            : $el.hasClass('variant-minixiangqi')
+            ? 'minixiangqi'
+            : 'standard',
         })
       );
     }

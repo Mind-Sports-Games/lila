@@ -1,6 +1,6 @@
 import { State } from './state';
 import {
-  colors,
+  playerIndexs,
   translateAway,
   translateAbs,
   posToTranslateAbs,
@@ -33,7 +33,7 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
   // for a slight performance improvement! (avoids recomputing style)
   element.classList.add('cg-wrap');
 
-  colors.forEach(c => element.classList.toggle('orientation-' + c, s.orientation === c));
+  playerIndexs.forEach(c => element.classList.toggle('orientation-' + c, s.orientation === c));
   element.classList.toggle('manipulable', !s.viewOnly);
 
   const helper = createEl('cg-helper');
@@ -55,17 +55,17 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
     if (s.coordinates === 2) {
       if (s.boardSize[0] === 8 && s.boardSize[1] === 8) {
         // TODO: restore this once we have a prefernce. s.coordSystem === 1) {
-        container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'black' ? ' black' : ' white')));
-        container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'black' ? ' black' : ' white')));
-      } else if (s.orientation === 'black') {
-        const filesBlack: number[] = [],
-          ranksBlack: number[] = [],
+        container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'p2' ? ' p2' : ' p1')));
+        container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'p2' ? ' p2' : ' p1')));
+      } else if (s.orientation === 'p2') {
+        const filesP2: number[] = [],
+          ranksP2: number[] = [],
           rankBase = s.boardSize[0] / 2,
           fileSteps = s.boardSize[1] / 2;
-        for (let i = 1; i <= rankBase; i++) filesBlack.push(i);
-        for (let i = 0; i < fileSteps; i++) ranksBlack.push(rankBase + s.boardSize[0] * i + 1);
-        container.appendChild(renderCoords(ranksBlack, 'ranks is100 black'));
-        container.appendChild(renderCoords(filesBlack, 'files is100 black'));
+        for (let i = 1; i <= rankBase; i++) filesP2.push(i);
+        for (let i = 0; i < fileSteps; i++) ranksP2.push(rankBase + s.boardSize[0] * i + 1);
+        container.appendChild(renderCoords(ranksP2, 'ranks is100 p2'));
+        container.appendChild(renderCoords(filesP2, 'files is100 p2'));
       } else {
         const files: number[] = [],
           ranks: number[] = [],
@@ -78,8 +78,8 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
         container.appendChild(renderCoords(files, 'files is100'));
       }
     } else if (s.boardSize[0] === 8 && s.boardSize[1] === 8) {
-      container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'black' ? ' black' : ' white')));
-      container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'black' ? ' black' : ' white')));
+      container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'p2' ? ' p2' : ' p1')));
+      container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'p2' ? ' p2' : ' p1')));
     } else if (!relative && s.coordinates === 1) {
       renderFieldnumbers(board, s, board.getBoundingClientRect());
     }
@@ -101,15 +101,15 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 }
 
 function renderFieldnumbers(element: HTMLElement, s: State, bounds: ClientRect) {
-  const asWhite = s.orientation !== 'black',
+  const asP1 = s.orientation !== 'p2',
     count = boardFields(s);
   for (let f = 1; f <= count; f++) {
-    const field = createEl('fieldnumber', 'black') as FieldNumber,
+    const field = createEl('fieldnumber', 'p2') as FieldNumber,
       san = f.toString(),
       k = allKeys[f - 1];
     field.textContent = s.coordSystem === 1 ? san2alg[san] : san;
     field.cgKey = k;
-    const coords = posToTranslateAbs(bounds, s.boardSize)(key2pos(k, s.boardSize), asWhite, 0);
+    const coords = posToTranslateAbs(bounds, s.boardSize)(key2pos(k, s.boardSize), asP1, 0);
     translateAbs(field, [coords['0'], coords['1']]);
     element.appendChild(field);
   }

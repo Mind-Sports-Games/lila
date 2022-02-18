@@ -63,8 +63,8 @@ object PoolApi {
     def is(member: PoolMember) = userId == member.userId
   }
 
-  case class Pairing(game: Game, whiteSri: Sri, blackSri: Sri) {
-    def sri(color: strategygames.Color) = color.fold(whiteSri, blackSri)
+  case class Pairing(game: Game, p1Sri: Sri, p2Sri: Sri) {
+    def sri(playerIndex: strategygames.Player) = playerIndex.fold(p1Sri, p2Sri)
   }
   case class Pairings(pairings: List[Pairing])
 }

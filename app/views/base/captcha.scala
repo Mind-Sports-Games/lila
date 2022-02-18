@@ -4,7 +4,7 @@ import controllers.routes
 import play.api.libs.json.Json
 import scala.language.reflectiveCalls
 
-import strategygames.{ Color, GameLogic }
+import strategygames.{ Player => PlayerIndex, GameLogic }
 import strategygames.format.FEN
 
 import lila.api.Context
@@ -23,7 +23,7 @@ object captcha {
       form3.hidden(form("gameId"), captcha.gameId.some),
       if (ctx.blind) form3.hidden(form("move"), captcha.solutions.head.some)
       else {
-        val url = netBaseUrl + routes.Round.watcher(captcha.gameId, if (captcha.white) "white" else "black")
+        val url = netBaseUrl + routes.Round.watcher(captcha.gameId, if (captcha.p1) "p1" else "p2")
         div(
           cls := List(
             "captcha form-group" -> true,
@@ -34,7 +34,7 @@ object captcha {
           div(cls := "challenge")(
             views.html.board.bits.mini(
               FEN(GameLogic.Chess(), captcha.fenBoard),
-              Color.fromWhite(captcha.white),
+              PlayerIndex.fromP1(captcha.p1),
               variantKey = "standard"
             ) {
               div(
@@ -45,8 +45,8 @@ object captcha {
           ),
           div(cls := "captcha-explanation")(
             label(cls := "form-label")(
-              if (captcha.white) trans.whiteCheckmatesInOneMove()
-              else trans.blackCheckmatesInOneMove()
+              if (captcha.p1) trans.playerIndexCheckmatesInOneMove(trans.white.txt())
+              else trans.playerIndexCheckmatesInOneMove(trans.black.txt())
             ),
             br,
             br,

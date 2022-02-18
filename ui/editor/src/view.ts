@@ -38,7 +38,7 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
       },
     },
     [
-      h('input', { attrs: { type: 'hidden', name: 'orientation', value: ctrl.bottomColor() } }),
+      h('input', { attrs: { type: 'hidden', name: 'orientation', value: ctrl.bottomPlayerIndex() } }),
       h('input', { attrs: { type: 'hidden', name: 'variant', value: ctrl.rules } }),
       h('input', { attrs: { type: 'hidden', name: 'fen', value: state.legalFen || '' } }),
       h(
@@ -140,26 +140,26 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
         ]),
     h('div.metadata', [
       h(
-        'div.color',
+        'div.playerindex',
         h(
           'select',
           {
             on: {
               change(e) {
-                ctrl.setTurn((e.target as HTMLSelectElement).value as Color);
+                ctrl.setTurn((e.target as HTMLSelectElement).value as PlayerIndex);
               },
             },
           },
-          ['whitePlays', 'blackPlays'].map(function (key) {
+          ['p1', 'p2'].map(function (key) {
             return h(
               'option',
               {
                 attrs: {
-                  value: key[0] == 'w' ? 'white' : 'black',
-                  selected: ctrl.turn[0] === key[0],
+                  value: key,
+                  selected: ctrl.turn === key,
                 },
               },
-              ctrl.trans(key)
+              ctrl.trans('playerIndexPlays', key == 'p1' ? 'White' : 'Black')
             );
           })
         )
@@ -349,25 +349,30 @@ function inputs(ctrl: EditorCtrl, fen: string): VNode | undefined {
   ]);
 }
 
-// can be 'pointer', 'trash', or [color, role]
+// can be 'pointer', 'trash', or [playerIndex, role]
 function selectedToClass(s: Selected): string {
   return s === 'pointer' || s === 'trash' ? s : s.join(' ');
 }
 
 let lastTouchMovePos: NumberPair | undefined;
 
-function sparePieces(ctrl: EditorCtrl, color: Color, _orientation: Orientation, position: 'top' | 'bottom'): VNode {
+function sparePieces(
+  ctrl: EditorCtrl,
+  playerIndex: PlayerIndex,
+  _orientation: Orientation,
+  position: 'top' | 'bottom'
+): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
 
   const pieces = ['k-piece', 'q-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
-    return [color, role];
+    return [playerIndex, role];
   });
 
   return h(
     'div',
     {
       attrs: {
-        class: ['spare', 'spare-' + position, 'spare-' + color].join(' '),
+        class: ['spare', 'spare-' + position, 'spare-' + playerIndex].join(' '),
       },
     },
     ['pointer', ...pieces, 'trash'].map((s: Selected) => {
@@ -376,7 +381,7 @@ function sparePieces(ctrl: EditorCtrl, color: Color, _orientation: Orientation, 
         class: className,
         ...(s !== 'pointer' && s !== 'trash'
           ? {
-              'data-color': s[0],
+              'data-playerIndex': s[0],
               'data-role': s[1],
             }
           : {}),
@@ -421,7 +426,7 @@ function onSelectSparePiece(ctrl: EditorCtrl, s: Selected, upEvent: string): (e:
       dragNewPiece(
         ctrl.chessground!.state,
         {
-          color: s[0],
+          playerIndex: s[0],
           role: s[1],
         },
         e,
@@ -453,7 +458,7 @@ function makeCursor(selected: Selected): string {
 
 export default function (ctrl: EditorCtrl): VNode {
   const state = ctrl.getState();
-  const color = ctrl.bottomColor();
+  const playerIndex = ctrl.bottomPlayerIndex();
 
   return h(
     'div.board-editor' + '.variant-' + convertRulesToCGVariant(ctrl.rules),
@@ -463,9 +468,9 @@ export default function (ctrl: EditorCtrl): VNode {
       },
     },
     [
-      sparePieces(ctrl, opposite(color), color, 'top'),
+      sparePieces(ctrl, opposite(playerIndex), playerIndex, 'top'),
       h('div.main-board', [chessground(ctrl)]),
-      sparePieces(ctrl, color, color, 'bottom'),
+      sparePieces(ctrl, playerIndex, playerIndex, 'bottom'),
       controls(ctrl, state),
       inputs(ctrl, state.fen),
     ]

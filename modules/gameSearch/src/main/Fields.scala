@@ -9,7 +9,7 @@ private[gameSearch] object Fields {
   val uids          = "u"
   val winner        = "w"
   val loser         = "o"
-  val winnerColor   = "c"
+  val winnerPlayerIndex   = "c"
   val averageRating = "a"
   val ai            = "i"
   val date          = "d"
@@ -17,7 +17,7 @@ private[gameSearch] object Fields {
   val clockInit     = "ct"
   val clockInc      = "ci"
   val analysed      = "n"
-  val whiteUser     = "wu"
-  val blackUser     = "bu"
+  val p1User     = "wu"
+  val p2User     = "bu"
   val source        = "so"
 }

@@ -87,10 +87,10 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
   return dec;
 }
 
-// {white: {'p-piece': 3 'q-piece': 1}, black: {'b-piece': 2}}
+// {p1: {'p-piece': 3 'q-piece': 1}, p2: {'b-piece': 2}}
 export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
   const diff: MaterialDiff = {
-    white: {
+    p1: {
       'a-piece': 0,
       'b-piece': 0,
       'c-piece': 0,
@@ -101,7 +101,7 @@ export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
       'q-piece': 0,
       'r-piece': 0,
     },
-    black: {
+    p2: {
       'a-piece': 0,
       'b-piece': 0,
       'c-piece': 0,
@@ -114,9 +114,9 @@ export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
     },
   };
   for (const p of pieces.values()) {
-    const them = diff[opposite(p.color)];
+    const them = diff[opposite(p.playerIndex)];
     if (them[p.role] > 0) them[p.role]--;
-    else diff[p.color][p.role]++;
+    else diff[p.playerIndex][p.role]++;
   }
   return diff;
 }
@@ -124,14 +124,14 @@ export function getMaterialDiff(pieces: cg.Pieces): MaterialDiff {
 export function getScore(variant: VariantKey, pieces: cg.Pieces): number {
   let score = 0;
   for (const p of pieces.values()) {
-    score += pieceScores(variant, p.role, p.promoted) * (p.color === 'white' ? 1 : -1);
+    score += pieceScores(variant, p.role, p.promoted) * (p.playerIndex === 'p1' ? 1 : -1);
   }
   return score;
 }
 
 export const noChecks: CheckCount = {
-  white: 0,
-  black: 0,
+  p1: 0,
+  p2: 0,
 };
 
 export function countChecks(steps: Step[], ply: Ply): CheckCount {
@@ -139,8 +139,8 @@ export function countChecks(steps: Step[], ply: Ply): CheckCount {
   for (const step of steps) {
     if (ply < step.ply) break;
     if (step.check) {
-      if (step.ply % 2 === 1) checks.white++;
-      else checks.black++;
+      if (step.ply % 2 === 1) checks.p1++;
+      else checks.p2++;
     }
   }
   return checks;
@@ -161,7 +161,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction'];
+const noAnalysisVariants = ['linesOfAction', 'scrambledEggs'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;

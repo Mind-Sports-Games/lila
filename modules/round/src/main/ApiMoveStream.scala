@@ -2,7 +2,7 @@ package lila.round
 
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl._
-import strategygames.Color
+import strategygames.{ Player => PlayerIndex }
 import strategygames.format.Forsyth
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext
@@ -41,16 +41,16 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
                 clk   <- game.clock
                 times <- game.bothClockStates
               } yield Vector(clk.config.initTime, clk.config.initTime) ++ times)
-              val clockOffset = game.startColor.fold(0, 1)
+              val clockOffset = game.startPlayerIndex.fold(0, 1)
               Replay.situations(game.variant.gameLogic, game.pgnMoves, initialFen, game.variant) foreach {
                 _.zipWithIndex foreach { case (s, index) =>
                   val clk = for {
-                    white <- clocks.lift(index + 1 - clockOffset)
-                    black <- clocks.lift(index - clockOffset)
-                  } yield (white, black)
+                    p1 <- clocks.lift(index + 1 - clockOffset)
+                    p2 <- clocks.lift(index - clockOffset)
+                  } yield (p1, p2)
                   queue offer toJson(
                     Forsyth.exportBoard(s.board.variant.gameLogic, s.board),
-                    s.color,
+                    s.player,
                     s.board.history.lastMove.map(_.uci),
                     clk
                   )
@@ -80,22 +80,22 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
   private def toJson(game: Game, fen: String, lastMoveUci: Option[String]): JsObject =
     toJson(
       fen,
-      game.turnColor,
+      game.turnPlayerIndex,
       lastMoveUci,
       game.clock.map { clk =>
-        (clk.remainingTime(strategygames.White), clk.remainingTime(strategygames.Black))
+        (clk.remainingTime(strategygames.P1), clk.remainingTime(strategygames.P2))
       }
     )
 
   private def toJson(
       boardFen: String,
-      turnColor: Color,
+      turnPlayerIndex: PlayerIndex,
       lastMoveUci: Option[String],
       clock: Option[(Centis, Centis)]
   ): JsObject =
     clock.foldLeft(
       Json
-        .obj("fen" -> s"$boardFen ${turnColor.letter}")
+        .obj("fen" -> s"$boardFen ${turnPlayerIndex.letter}")
         .add("lm" -> lastMoveUci)
     ) { case (js, clk) =>
       js ++ Json.obj("wc" -> clk._1.roundSeconds, "bc" -> clk._2.roundSeconds)

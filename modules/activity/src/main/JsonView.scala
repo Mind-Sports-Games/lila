@@ -6,7 +6,7 @@ import play.api.libs.json._
 
 import lila.common.Iso
 import lila.common.Json._
-import lila.game.JsonView.colorWrites
+import lila.game.JsonView.playerIndexWrites
 import lila.game.LightPov
 import lila.rating.PerfType
 import lila.simul.Simul
@@ -82,8 +82,8 @@ final class JsonView(
     implicit val lightPovWrites = OWrites[LightPov] { p =>
       Json.obj(
         "id"       -> p.game.id,
-        "color"    -> p.color,
-        "url"      -> s"/${p.game.id}/${p.color.name}",
+        "playerIndex" -> p.playerIndex,
+        "url"      -> s"/${p.game.id}/${p.playerIndex.name}",
         "opponent" -> p.opponent
       )
     }

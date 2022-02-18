@@ -162,7 +162,7 @@ body { margin-top: 45px; }
 #email-confirm {
   height: 40px;
   background: #3893E8;
-  color: #fff!important;
+  playerIndex: #fff!important;
   font-size: 1.3em;
   display: flex;
   flex-flow: row nowrap;
@@ -177,7 +177,7 @@ body { margin-top: 45px; }
   z-index: 107;
 }
 #email-confirm a {
-  color: #fff!important;
+  playerIndex: #fff!important;
   text-decoration: underline;
   margin-left: 1em;
 }

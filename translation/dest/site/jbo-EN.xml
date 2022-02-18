@@ -19,6 +19,7 @@
   <string name="black">la xekri</string>
   <string name="randomColor">cunso cuxna</string>
   <string name="createAGame">cfagau su\'o nunjvi</string>
+  <string name="playerIndexIsVictorious">%s cu jinga</string>
   <string name="whiteIsVictorious">la blabi cu jinga</string>
   <string name="blackIsVictorious">la xekri cu jinga</string>
   <string name="youPlayTheWhitePieces">do blabi</string>
@@ -31,6 +32,7 @@
   <string name="newOpponent">cnino jivna</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">lo se jivna be do cu friti lo ka za\'u re\'u jivna</string>
   <string name="joinTheGame">fitytu\'i</string>
+  <string name="playerIndexPlays">%s pu\'o zukte</string>
   <string name="whitePlays">la blabi pu\'o zukte</string>
   <string name="blackPlays">la xekri pu\'o zukte</string>
   <plurals name="opponentLeftCounter">
@@ -42,8 +44,10 @@
   <string name="forceDraw">xusra tu\'a co\'u je mo\'u nai</string>
   <string name="talkInChat">.e\'u do ga nai tavla gi xendo</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">lo pa moi be lo vitke be tu\'a lo .urli ba jivna do</string>
+  <string name="playerIndexResigned">%s pu randa</string>
   <string name="whiteResigned">la blabi pu randa</string>
   <string name="blackResigned">la xekri pu randa</string>
+  <string name="playerIndexLeftTheGame">%s co\'u cliva lo nunjvi</string>
   <string name="whiteLeftTheGame">la blabi co\'u cliva lo nunjvi</string>
   <string name="blackLeftTheGame">la xekri co\'u cliva lo nunjvi</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">ko benji di\'e noi .urli ku\'o lo voi do djica lo nu ke\'a zgana lo nunjvi</string>

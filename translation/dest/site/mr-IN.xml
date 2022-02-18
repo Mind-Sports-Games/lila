@@ -79,6 +79,7 @@
   <string name="drawn">अनिर्णीत</string>
   <string name="unknown">अज्ञात</string>
   <string name="database">माहितीसंच</string>
+  <string name="p1DrawP2">%1$s / बरोबरी / %2$s</string>
   <string name="whiteDrawBlack">पांढरा / बरोबरी / काळा</string>
   <string name="averageRatingX">सरासरी दर्जा: %s</string>
   <string name="recentGames">अलीकडचे खेळ</string>
@@ -348,6 +349,7 @@
   <string name="clickOnTheBoardToMakeYourMove">तुम्ही मनुष्य आहात हे सिद्धा करण्यासाठी पटावर क्लिक करून आपली चाल खेळा</string>
   <string name="captcha.fail">कृपया बुद्धिबळ कोडे सोडवा.</string>
   <string name="notACheckmate">ही शहमात नाही</string>
+  <string name="playerIndexCheckmatesInOneMove">%s एका चालीत शहमात करणार</string>
   <string name="whiteCheckmatesInOneMove">पांढरा एका चालीत शहमात करणार</string>
   <string name="blackCheckmatesInOneMove">काळा एका चालीत शहमात करणार</string>
   <string name="retry">परत प्रयत्न करा</string>
@@ -747,6 +749,7 @@
   <string name="hideBestMove">सर्वोत्तम चाल लपवा</string>
   <string name="getAHint">मदत घ्या</string>
   <string name="evaluatingYourMove">तुमच्या चालीचे मुल्यमापन सुरू आहे...</string>
+  <string name="playerIndexWinsGame">%s जिंकला</string>
   <string name="whiteWinsGame">पांढरा जिंकला</string>
   <string name="blackWinsGame">काळा जिंकला</string>
   <string name="learnFromYourMistakes">तुमच्या चुकांपासून शिका</string>

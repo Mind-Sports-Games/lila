@@ -51,16 +51,16 @@ object bits {
     frag(
       views.html.chat.spectatorsFrag,
       isGranted(_.ViewBlurs) option div(cls := "round__mod")(
-        game.players.filter(p => game.playerBlurPercent(p.color) > 30) map { p =>
+        game.players.filter(p => game.playerBlurPercent(p.playerIndex) > 30) map { p =>
           div(
-            playerLink(p, cssClass = s"is color-icon ${p.color.name}".some, withOnline = false, mod = true),
-            s" ${p.blurs.nb}/${game.playerMoves(p.color)} blurs ",
-            strong(game.playerBlurPercent(p.color), "%")
+            playerLink(p, cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some, withOnline = false, mod = true),
+            s" ${p.blurs.nb}/${game.playerMoves(p.playerIndex)} blurs ",
+            strong(game.playerBlurPercent(p.playerIndex), "%")
           )
         }
         // game.players flatMap { p => p.holdAlert.map(p ->) } map {
         //   case (p, h) => div(
-        //     playerLink(p, cssClass = s"is color-icon ${p.color.name}".some, mod = true, withOnline = false),
+        //     playerLink(p, cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some, mod = true, withOnline = false),
         //     "hold alert",
         //     br,
         //     s"(ply: ${h.ply}, mean: ${h.mean} ms, SD: ${h.sd})"
@@ -72,9 +72,10 @@ object bits {
   // TODO: this is duplicated between here and app/views/board/bits.scala.
   private def boardExtra(variant: Variant): String = {
     val lib = variant.gameLogic.name.toLowerCase()
+    val gameFamily = variant.gameFamily.shortName.toLowerCase()
     variant match {
       case Variant.Draughts(v) => s"${variant.key} variant-${variant.key} ${lib} is${v.boardSize.key}"
-      case _ => s"${variant.key} variant-${variant.key} ${lib}"
+      case _ => s"${variant.key} variant-${variant.key} ${gameFamily}"
     }
   }
 

@@ -80,6 +80,7 @@
   <string name="drawn">Реми</string>
   <string name="unknown">Неизвестно</string>
   <string name="database">База данни</string>
+  <string name="p1DrawP2">%1$s / Реми / %2$s</string>
   <string name="whiteDrawBlack">Бели / Реми / Черни</string>
   <string name="averageRatingX">Среден рейтинг: %s</string>
   <string name="recentGames">Скорошни игри</string>

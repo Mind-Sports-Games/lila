@@ -1,7 +1,7 @@
 package lila.insight
 
 import strategygames.chess.opening.Ecopening
-import strategygames.{ Color, Role }
+import strategygames.{ Player => PlayerIndex, Role }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, Pov }
@@ -12,7 +12,7 @@ case class InsightEntry(
     id: String,  // gameId + w/b
     number: Int, // auto increment over userId
     userId: User.ID,
-    color: Color,
+    playerIndex: PlayerIndex,
     perf: PerfType,
     eco: Option[Ecopening],
     myCastling: Castling,
@@ -34,13 +34,13 @@ case class InsightEntry(
 
 case object InsightEntry {
 
-  def povToId(pov: Pov) = pov.gameId + pov.color.letter
+  def povToId(pov: Pov) = pov.gameId + pov.playerIndex.letter
 
   object BSONFields {
     val id                       = "_id"
     val number                   = "n"
     val userId                   = "u"
-    val color                    = "c"
+    val playerIndex                    = "c"
     val perf                     = "p"
     val eco                      = "e"
     val myCastling               = "mc"

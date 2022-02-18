@@ -84,11 +84,11 @@ final class Env(
 
   lila.common.Bus.subscribeFuns(
     "finishGame" -> {
-      case lila.game.actorApi.FinishGame(game, whiteUserOption, blackUserOption) if !game.aborted =>
+      case lila.game.actorApi.FinishGame(game, p1UserOption, p2UserOption) if !game.aborted =>
         import cats.implicits._
-        (whiteUserOption, blackUserOption) mapN { (whiteUser, blackUser) =>
+        (p1UserOption, p2UserOption) mapN { (p1User, p2User) =>
           sandbagWatch(game)
-          assessApi.onGameReady(game, whiteUser, blackUser)
+          assessApi.onGameReady(game, p1User, p2User)
         }
         if (game.status == strategygames.Status.Cheat)
           game.loserUserId foreach { userId =>

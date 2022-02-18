@@ -263,7 +263,7 @@ object User {
     val verbatimEmail         = "verbatimEmail"
     val mustConfirmEmail      = "mustConfirmEmail"
     val prevEmail             = "prevEmail"
-    val colorIt               = "colorIt"
+    val playerIndexIt               = "playerIndexIt"
     val plan                  = "plan"
     val salt                  = "salt"
     val bpass                 = "bpass"

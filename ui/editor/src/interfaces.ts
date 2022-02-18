@@ -16,4 +16,4 @@ export interface EditorState {
 
 export type Redraw = () => void;
 
-export type Selected = 'pointer' | 'trash' | [Color, Role];
+export type Selected = 'pointer' | 'trash' | [PlayerIndex, Role];

@@ -36,22 +36,23 @@ export interface FeaturedGame {
   id: string;
   fen: Fen;
   gameLogic: string;
+  gameFamily: string;
   variantKey: string;
   boardSize?: BoardSize;
-  orientation: Color;
+  orientation: PlayerIndex;
   lastMove: string;
-  white: FeaturedPlayer;
-  black: FeaturedPlayer;
+  p1: FeaturedPlayer;
+  p2: FeaturedPlayer;
   c?: {
-    white: number;
-    black: number;
+    p1: number;
+    p2: number;
   };
   clock?: {
     // temporary BC, remove me
-    white: number;
-    black: number;
+    p1: number;
+    p2: number;
   };
-  winner?: Color;
+  winner?: PlayerIndex;
 }
 
 interface FeaturedPlayer {

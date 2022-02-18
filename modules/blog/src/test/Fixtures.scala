@@ -14,11 +14,11 @@ object Fixtures {
 
 <p class="block-img"><img alt="" src="https://d27t3nufpewl0w.cloudfront.net/lichess/de5a66765de83e6c30865a558d067fda66459bd1_tuto1-arrow.png" width="530" height="359" /></p>
 
-<p>In this example, White has two previously captured Black pieces in their <em>pocket</em>, a knight and a bishop. These pieces were captured by White earlier in the game. White can check the Black king by <strong><em>dropping</em></strong><strong> a bishop on c3!</strong></p>
+<p>In this example, P1 has two previously captured P2 pieces in their <em>pocket</em>, a knight and a bishop. These pieces were captured by P1 earlier in the game. P1 can check the P2 king by <strong><em>dropping</em></strong><strong> a bishop on c3!</strong></p>
 
 <p class="block-img"><img alt="" src="https://d27t3nufpewl0w.cloudfront.net/lichess/a109d485184efb7600bdb2df9964ab50b2b3358b_tuto2-arrow.png" width="530" height="361" /></p>
 
-<p>In turn Black can block the check by <strong>dropping a knight on e5!</strong></p>
+<p>In turn P2 can block the check by <strong>dropping a knight on e5!</strong></p>
 
 <p><a href="http://lichess.org/variant/crazyhouse"><strong>Read more about crazyhouse rules and strategies here</strong></a></p>
 
@@ -61,13 +61,13 @@ object Fixtures {
 
 <h3>Opening</h3>
 
-<p>As white, you have an extra tempo which you should use to at best start an attack and at worst gain a positional advantage. As black, your goal is first to neutralize white's initiative and then equalize by imbalancing the position or counterpunching.<br>The standard rules apply: develop your pieces, control the center, and get your king to safety. But there are some opening ideas uniquely emphasized in Crazyhouse:</p>
+<p>As p1, you have an extra tempo which you should use to at best start an attack and at worst gain a positional advantage. As p2, your goal is first to neutralize p1's initiative and then equalize by imbalancing the position or counterpunching.<br>The standard rules apply: develop your pieces, control the center, and get your king to safety. But there are some opening ideas uniquely emphasized in Crazyhouse:</p>
 
 <ul>
 
 <li>Unproductive pawn moves should never be played until your position is well-established.</li>
 
-<li>Flank pawns should usually be kept where they stand in the opening. Openings like the Bird or Dutch exposing this square are extremely dubious. Even openings like the English and Sicilian aren't to be recommended as they weaken the c2/c7 square respectively. Diagonal pieces (bishops and pawns) can be dropped to exploit the weakened color complex.</li>
+<li>Flank pawns should usually be kept where they stand in the opening. Openings like the Bird or Dutch exposing this square are extremely dubious. Even openings like the English and Sicilian aren't to be recommended as they weaken the c2/c7 square respectively. Diagonal pieces (bishops and pawns) can be dropped to exploit the weakened playerIndex complex.</li>
 
 <li>Guard the tender f2/f7 square from sacs so that your king isn't drawn out early.</li>
 
@@ -79,7 +79,7 @@ object Fixtures {
 
 <li>Note that getting your king to safety does not always mean castling: sometimes it means keeping it in the center and fortifying the tender points of egress. Before castling you need to make sure you have a ready reply to pawn drops and piece sacs on your kingside.</li>
 
-<li>If black doesn't challenge the center at all, it's a good rule of thumb to play both d4 and e4.</li>
+<li>If p2 doesn't challenge the center at all, it's a good rule of thumb to play both d4 and e4.</li>
 
 </ul>
 
@@ -121,13 +121,13 @@ object Fixtures {
 
 <li>If you identify a weakness but your pocket is empty, look to force exchanges. If your own position is weak, avoid exchanges until you're more solid.</li>
 
-<li>Avoid weakening squares of a certain color complex. Diags (pawns, bishops) can be dropped deep into your territory on your weak color complex. Try to create weaknesses in your opponent's pawn structure where you can infiltrate. Build pawn lattices into enemy territory (<a href="http://lichess.org/IqfmjHrW">like in this game</a>), preferably near the opponent's king. Expand your space wherever reasonably possible. </li>
+<li>Avoid weakening squares of a certain playerIndex complex. Diags (pawns, bishops) can be dropped deep into your territory on your weak playerIndex complex. Try to create weaknesses in your opponent's pawn structure where you can infiltrate. Build pawn lattices into enemy territory (<a href="http://lichess.org/IqfmjHrW">like in this game</a>), preferably near the opponent's king. Expand your space wherever reasonably possible. </li>
 
 </ul>
 
 <p class="block-img"><img alt="" src="https://d27t3nufpewl0w.cloudfront.net/lichess/d4d9512ed572781594bcc3968cbe21364ad21333_crazy3.jpg" width="190" height="192" /></p>
 
-<p>In this example, without the g-pawn, the dark squares, particularly g7, are weak. So white places a pawn on h6 to control that square, and will then look to exchange for more pieces, especially diagonals, to drop on black's dark kingside squares. Notice that a situation like this makes a queen trade highly desirable for white and losing for black, giving white even more control over the game.</p>
+<p>In this example, without the g-pawn, the dark squares, particularly g7, are weak. So p1 places a pawn on h6 to control that square, and will then look to exchange for more pieces, especially diagonals, to drop on p2's dark kingside squares. Notice that a situation like this makes a queen trade highly desirable for p1 and losing for p2, giving p1 even more control over the game.</p>
 
 <ul>
 
@@ -145,7 +145,7 @@ object Fixtures {
 
 <li>Pawns should be dropped to build deep lattices into enemy territory, to pry open your opponent's king, to fortify your own king, or to fork two pieces.</li>
 
-<li>Bishops should be used to pin, to block pins, or to fortify your kingside.<br>Your kingside bishop (white's light-squared bishop and black's dark-square bishop) is in many scenarios best kept near your king and used as a defensive piece.</li>
+<li>Bishops should be used to pin, to block pins, or to fortify your kingside.<br>Your kingside bishop (p1's light-squared bishop and p2's dark-square bishop) is in many scenarios best kept near your king and used as a defensive piece.</li>
 
 <li>Knights should be kept on hand until you can drop them to attack weak squares around the enemy's king, place extra pressure on a pin, or drop into a fork.</li>
 
@@ -153,7 +153,7 @@ object Fixtures {
 
 <li>Knights can be used to smother mate. Smother mates are more common in z because of the ability to drop a Q or R to force a smothered king combined with the ability to drop the N onto the checking square.</li>
 
-<li>Knights are often strongest when placed on the fifth rank (as white) or the fourth rank (as black), as from there they observe key squares on the seventh (or second) rank. For example, I sometimes like placing a knight N@h5 with the idea of sacking on g7 to pull the king out. <a href="http://lichess.org/THYYswro#29">Example in this game at move 15</a>.</li>
+<li>Knights are often strongest when placed on the fifth rank (as p1) or the fourth rank (as p2), as from there they observe key squares on the seventh (or second) rank. For example, I sometimes like placing a knight N@h5 with the idea of sacking on g7 to pull the king out. <a href="http://lichess.org/THYYswro#29">Example in this game at move 15</a>.</li>
 
 <li>Rooks should for the most part be kept in your pocket until you can exploit the back rank.</li>
 
@@ -169,17 +169,17 @@ object Fixtures {
 
 <li>Place pieces where they will serve multiple functions. For example, placing pieces with check which also accomplish other functions is ideal, like placing a bishop on the a or h file with check which also defends key pawns/squares like c2/f2.</li>
 
-<li>Castling without protective minor pieces or pawn stacks on the kingside can be very dangerous, as pieces/pawns can be placed and then sacked to expose your king, like white does <a href="http://ficsgames.org/cgi-bin/show.cgi?ID=382131059">on move 20 in this game</a>. Don't castle if it weakens the protection around your king; sometimes, if you build strong command of the center, it's best to leave your king in the center.</li>
+<li>Castling without protective minor pieces or pawn stacks on the kingside can be very dangerous, as pieces/pawns can be placed and then sacked to expose your king, like p1 does <a href="http://ficsgames.org/cgi-bin/show.cgi?ID=382131059">on move 20 in this game</a>. Don't castle if it weakens the protection around your king; sometimes, if you build strong command of the center, it's best to leave your king in the center.</li>
 
 <li>Rooks are more or less of comparable value to minor pieces, unless the back rank is weak, in which case they increase in relative importance.</li>
 
 <li>If the 7th rank is weak and a rook is exposed, place two pawns side-by-side attacking the rook with ideas of Queening. <a href="http://lichess.org/Gpk2WwCD#29">Example on move 15 here</a>. Promoted pieces turn back into pawns when re-captured.</li>
 
-<li>Sometimes it's not worth saving your queen if it weakens your squares or puts you on the defensive: in such cases it can be okay to just protect it with a bishop or continue your attack. For example, on move 10 <a href="http://ficsgames.org/cgi-bin/show.cgi?ID=382131253">in this game</a>, black sacs his Queen (in a safe position) so that he can begin an attack.</li>
+<li>Sometimes it's not worth saving your queen if it weakens your squares or puts you on the defensive: in such cases it can be okay to just protect it with a bishop or continue your attack. For example, on move 10 <a href="http://ficsgames.org/cgi-bin/show.cgi?ID=382131253">in this game</a>, p2 sacs his Queen (in a safe position) so that he can begin an attack.</li>
 
 <li>Only ever trade queens early if it's advantageous to your position. An early queen trade means you need to be extremely aware of drop attacks moving forward.</li>
 
-<li>Fill the holes in your defense with pawns, as black does on moves 10 and 12 <a href="http://ficsgames.org/cgi-bin/show.cgi?ID=382131217">in this game</a>.</li>
+<li>Fill the holes in your defense with pawns, as p2 does on moves 10 and 12 <a href="http://ficsgames.org/cgi-bin/show.cgi?ID=382131217">in this game</a>.</li>
 
 <li>When you're castled on the kingside be wary of your opponent's ideas of capturing on d5 where your Queen (or any undefended piece besides a knight) recaptures, as they can place a knight on e2 winning the Queen.</li>
 
@@ -201,33 +201,33 @@ object Fixtures {
 
 <ul>
 
-<li><a href="http://lichess.org/THYYswro/white#40">Pawn and knight</a></li>
+<li><a href="http://lichess.org/THYYswro/p1#40">Pawn and knight</a></li>
 
-<li><a href="http://lichess.org/PBCIKH6G/black#43">Two knights & pawn</a></li>
+<li><a href="http://lichess.org/PBCIKH6G/p2#43">Two knights & pawn</a></li>
 
-<li><a href="http://lichess.org/loeNxFMk/black#52">Diagonal & queen</a></li>
+<li><a href="http://lichess.org/loeNxFMk/p2#52">Diagonal & queen</a></li>
 
-<li><a href="http://lichess.org/zlen3fXC/white#50">Bishop & rook</a></li>
+<li><a href="http://lichess.org/zlen3fXC/p1#50">Bishop & rook</a></li>
 
-<li><a href="http://lichess.org/0PBzadZe/white#16">Pawn smother</a></li>
+<li><a href="http://lichess.org/0PBzadZe/p1#16">Pawn smother</a></li>
 
-<li><a href="http://lichess.org/Ix9npN7B/black#49">Knight & queen</a>. Play continues gxN Q@g2#, Kf1 Q@f2#, or Kh1 Q@g1 Rxg1 Nf2#.</li>
+<li><a href="http://lichess.org/Ix9npN7B/p2#49">Knight & queen</a>. Play continues gxN Q@g2#, Kf1 Q@f2#, or Kh1 Q@g1 Rxg1 Nf2#.</li>
 
-<li><a href="http://lichess.org/G5UBLNT4/white#86">Queen & knight</a></li>
+<li><a href="http://lichess.org/G5UBLNT4/p1#86">Queen & knight</a></li>
 
-<li><a href="http://lichess.org/xSp1YyCi/black#23">Knight & rook</a></li>
+<li><a href="http://lichess.org/xSp1YyCi/p2#23">Knight & rook</a></li>
 
-<li><a href="http://lichess.org/vDAmSwoR/white#68">Back rank spanker</a></li>
+<li><a href="http://lichess.org/vDAmSwoR/p1#68">Back rank spanker</a></li>
 
-<li><a href="http://lichess.org/RBYkTfFO/black#25">Pawn, bishop, & knight</a></li>
+<li><a href="http://lichess.org/RBYkTfFO/p2#25">Pawn, bishop, & knight</a></li>
 
-<li><a href="http://lichess.org/i3oGc2Xy/white#38">Protected pawn & rook</a></li>
+<li><a href="http://lichess.org/i3oGc2Xy/p1#38">Protected pawn & rook</a></li>
 
-<li><a href="http://lichess.org/DOgAUBQv/white#51">Two adjacent diags</a></li>
+<li><a href="http://lichess.org/DOgAUBQv/p1#51">Two adjacent diags</a></li>
 
-<li><a href="http://lichess.org/UzMyzMys/black#35">Smother mate</a></li>
+<li><a href="http://lichess.org/UzMyzMys/p2#35">Smother mate</a></li>
 
-<li><a href="http://lichess.org/xFA300uL/white#46">Knight & bishop</a></li>
+<li><a href="http://lichess.org/xFA300uL/p1#46">Knight & bishop</a></li>
 
 </ul>
 
@@ -235,7 +235,7 @@ object Fixtures {
 
 <p>Here's my Crazyhouse opening repertoire, listed by the frequency with which I play it. I'm not going to claim it's anywhere near perfected, or even that it's what you should play. But I've had success with it. Obviously the move orders will change quite a bit depending on what your opponent does and you'll have to be flexible, but I'm going to list the common move order for each just so you can get a feel for the general set-up. I can't go through each variation because it would take forever, but if there's a certain line you're interested in let me know.</p>
 
-<h3>White Openings</h3>
+<h3>P1 Openings</h3>
 
 <h4>Modified Catalan </h4>
 
@@ -245,7 +245,7 @@ object Fixtures {
 
 <p><em>Illustrative Game:</em> <a href="http://lichess.org/THYYswro">lichess.org/THYYswro</a></p>
 
-<p><em>Themes:</em> Solidify and fortify your king before you attack. h3 is an important move so your opponent can't place a pawn there attacking your fianchettoed bishop. You start out a bit passive but extremely solid. Black will have a hard time breaking through while you use the time he's trying to drum something up to form an attack of your own on his likely more exposed kingside. Trade pieces in the center and then drop on the kingside. Often p@e5 to challenge the center or a pinned piece or p@h6 to pry open the king. You can allow the f3 knight to be captured, whereafter you'll often recapture with the e-pawn to build a nice box around your king. If they sac on h3, capture and then simply replace the pieces right back where they were. If no tension develops after the first 8 moves and there is no obvious attacking idea, bring a rook to c1 and break with c4 (or just play c4 immediately) to trade pawns and open things up.</p>
+<p><em>Themes:</em> Solidify and fortify your king before you attack. h3 is an important move so your opponent can't place a pawn there attacking your fianchettoed bishop. You start out a bit passive but extremely solid. P2 will have a hard time breaking through while you use the time he's trying to drum something up to form an attack of your own on his likely more exposed kingside. Trade pieces in the center and then drop on the kingside. Often p@e5 to challenge the center or a pinned piece or p@h6 to pry open the king. You can allow the f3 knight to be captured, whereafter you'll often recapture with the e-pawn to build a nice box around your king. If they sac on h3, capture and then simply replace the pieces right back where they were. If no tension develops after the first 8 moves and there is no obvious attacking idea, bring a rook to c1 and break with c4 (or just play c4 immediately) to trade pawns and open things up.</p>
 
 <h4>Modified Chigorin/Trompowsky </h4>
 
@@ -255,7 +255,7 @@ object Fixtures {
 
 <p><em>Illustrative Game:</em> <a href="http://lichess.org/LTdPNcHW">lichess.org/LTdPNcHW</a></p>
 
-<p><em>Themes:</em> Focus on the pin on the h4-d8 diagonal. Sometimes exchange for a second bishop which you can place behind the first on h4. Pile up on the pin. Option of trading on f6 for a pocket knight or on e7 for a pocket bishop. Try to advance e4-e5 if given the chance and claim space. If the black bishop goes to f5, challenge it with Bd3 and re-capture with the c pawn for a strong center; if it goes to g4, block the pin with Be2. If given the chance, exchange pawns in the center and place p@h6. In completely passive or dubious black systems where they're generating little or no counterplay it can be explosive to play e4, d4, and then after the minor pieces are deployed f4!? followed by 0-0 and f5.</p>
+<p><em>Themes:</em> Focus on the pin on the h4-d8 diagonal. Sometimes exchange for a second bishop which you can place behind the first on h4. Pile up on the pin. Option of trading on f6 for a pocket knight or on e7 for a pocket bishop. Try to advance e4-e5 if given the chance and claim space. If the p2 bishop goes to f5, challenge it with Bd3 and re-capture with the c pawn for a strong center; if it goes to g4, block the pin with Be2. If given the chance, exchange pawns in the center and place p@h6. In completely passive or dubious p2 systems where they're generating little or no counterplay it can be explosive to play e4, d4, and then after the minor pieces are deployed f4!? followed by 0-0 and f5.</p>
 
 <h4>e4 systems</h4>
 
@@ -263,7 +263,7 @@ object Fixtures {
 
 <p><em>Illustrative Game:</em> <a href="http://lichess.org/UA6ayvXz">lichess.org/UA6ayvXz</a></p>
 
-<p><em>Themes:</em> Develop, control the center, castle, and then immediately attack. I don't play e4 so much, but you can get a good feel for it by reviewing some of FICS's top-rated player's--tantheman's--white games. <a href="http://www.ficsgames.org/cgi-bin/search.cgi?Games=dsearch;statsdays=365;white=tantheman;variant=11;fyear=2000;tyear=2016;colors=1">Find them here</a>.<br></p>
+<p><em>Themes:</em> Develop, control the center, castle, and then immediately attack. I don't play e4 so much, but you can get a good feel for it by reviewing some of FICS's top-rated player's--tantheman's--p1 games. <a href="http://www.ficsgames.org/cgi-bin/search.cgi?Games=dsearch;statsdays=365;p1=tantheman;variant=11;fyear=2000;tyear=2016;playerIndexs=1">Find them here</a>.<br></p>
 
 <h4>Offbeat Stuff (1. b3/d3/e3)</h4>
 
@@ -273,13 +273,13 @@ object Fixtures {
 
 <p><em>Themes:</em> Throw your opponent off. Build a solid structure and ask your opponent how he's going to break through. Castle queenside occasionally. Break with c4 or throw your kingside pawns at him.</p>
 
-<h3>Black Openings</h3>
+<h3>P2 Openings</h3>
 
 <h4>Crosky Gambit</h4>
 
 <div data-oembed="https://www.youtube.com/watch?v=uz-dZ2W4Bf0#t=9m32s" data-oembed-type="video" data-oembed-provider="youtube"><iframe width="480" height="270" src="https://www.youtube.com/embed/uz-dZ2W4Bf0?feature=oembed" frameborder="0" allowfullscreen></iframe></div>
 
-<p>This affectionately self-titled opening is one I developed through many games of trial and error on FICS, and it's my go-to weapon as black. It looks dubious at first glance but it's held up even at very high levels of play. Its themes can actually carry over into several other opening variations in which you allow your f6 knight to be captured.</p>
+<p>This affectionately self-titled opening is one I developed through many games of trial and error on FICS, and it's my go-to weapon as p2. It looks dubious at first glance but it's held up even at very high levels of play. Its themes can actually carry over into several other opening variations in which you allow your f6 knight to be captured.</p>
 
 <p><em>Basic setup:</em> 1. e4 Nf6 2. e5 Nc6!? 3. exf6 gxf6! 4. ... d5 (can transpose with 2. ... d5 instead of Nc6) 5. ... Rg8 6. ...Bg4 7. ...e6</p>
 
@@ -287,7 +287,7 @@ object Fixtures {
 
 <p><em>Illustrative Game:</em> <a href="http://lichess.org/W4lzqvxx">lichess.org/W4lzqvxx</a></p>
 
-<p><em>Themes:</em> Firstly, you build a strong center around your king. The pawn on f6 prevents a knight from coming to the key g5 and e5 squares where it could attack f7. Then your rook is coming to the g file where it's going to dictate play on the kingside and constantly pressure g2. You'll often have a pin on the h5-d1 diagonal where you can win your piece back by placing p@e4; otherwise, that pawn will often be placed p@h3. In return for the piece you get a pawn that you'll use to severely weaken white's position and tremendous pressure on his light square complex in the upper left quadrant of the board (near his king). Capturing the knight on f3 and then dropping N@h4 where it attacks both f3 and g2 is a common motif. Your king will always remain in the center where it's well-guarded. Be careful not to let your h-pawn fall or too much pressure to be dropped around your rook or your king will be come exposed quickly. All in all, you're offering to temporarily go down in material for an open, exciting game where you have immediate counterpunching chances that white will be hard-pressed to deal with without precise play.<br>A second variation deviates on move 3 with 3. ... exf6 instead of gxf6 and continues 4. ... d5, whereafter you develop normally. This is perfectly viable. You offer a knight for a pawn to achieve open lines and accelerated development.</p>
+<p><em>Themes:</em> Firstly, you build a strong center around your king. The pawn on f6 prevents a knight from coming to the key g5 and e5 squares where it could attack f7. Then your rook is coming to the g file where it's going to dictate play on the kingside and constantly pressure g2. You'll often have a pin on the h5-d1 diagonal where you can win your piece back by placing p@e4; otherwise, that pawn will often be placed p@h3. In return for the piece you get a pawn that you'll use to severely weaken p1's position and tremendous pressure on his light square complex in the upper left quadrant of the board (near his king). Capturing the knight on f3 and then dropping N@h4 where it attacks both f3 and g2 is a common motif. Your king will always remain in the center where it's well-guarded. Be careful not to let your h-pawn fall or too much pressure to be dropped around your rook or your king will be come exposed quickly. All in all, you're offering to temporarily go down in material for an open, exciting game where you have immediate counterpunching chances that p1 will be hard-pressed to deal with without precise play.<br>A second variation deviates on move 3 with 3. ... exf6 instead of gxf6 and continues 4. ... d5, whereafter you develop normally. This is perfectly viable. You offer a knight for a pawn to achieve open lines and accelerated development.</p>
 
 <h4>Modified Modern</h4>
 
@@ -297,7 +297,7 @@ object Fixtures {
 
 <p><em>Illustrative Game:</em> <a href="http://lichess.org/Ix9npN7B">lichess.org/Ix9npN7B</a></p>
 
-<p>Themes: This is going to operate much like the modified Catalan I described above, except for black. You build a strong little box around your king (see image above), whereafter you break with d5. White will often push or place a pawn on e5, and you can either move the knight or use the tempo to start an attack or do something else constructive with the idea of allowing the capture on f6 so you can recapture with the e-pawn and build your box. Exchange in the center and drop on white's kingside. King safety is paramount; keep your box fortress stable with pawn drops as needed (p@e7, p@g5, etc.) and then counterpunch. When attacking pawns can often be placed p@e4 to challenge a pinned piece and gain central influence or p@h3 to open his king.</p>
+<p>Themes: This is going to operate much like the modified Catalan I described above, except for p2. You build a strong little box around your king (see image above), whereafter you break with d5. P1 will often push or place a pawn on e5, and you can either move the knight or use the tempo to start an attack or do something else constructive with the idea of allowing the capture on f6 so you can recapture with the e-pawn and build your box. Exchange in the center and drop on p1's kingside. King safety is paramount; keep your box fortress stable with pawn drops as needed (p@e7, p@g5, etc.) and then counterpunch. When attacking pawns can often be placed p@e4 to challenge a pinned piece and gain central influence or p@h3 to open his king.</p>
 
 <h4>Two Knights Defense</h4>
 
@@ -305,7 +305,7 @@ object Fixtures {
 
 <p><em>Illustrative Game:</em> <a href="http://lichess.org/Hjrcklag">lichess.org/Hjrcklag</a></p>
 
-<p><em>Themes:</em> Get your pieces out quickly and build a contained, modest setup staring down white's center without creating tension (d6 e6) or create immediate imbalances by breaking in the center with a quick d5/e5. Often castle kingside, sometimes leave it in the center.</p>
+<p><em>Themes:</em> Get your pieces out quickly and build a contained, modest setup staring down p1's center without creating tension (d6 e6) or create immediate imbalances by breaking in the center with a quick d5/e5. Often castle kingside, sometimes leave it in the center.</p>
 
 <h4>Modified French</h4>
 
@@ -349,6 +349,6 @@ object Fixtures {
 
 <h2>tl;dr</h2>
 
-<p>Beginners may be best served by playing conventional e4/d4 systems as white and the French as black. Avoid pawn moves which weaken key squares; fortify weak squares around your king. Maintain the initiative and attack. Sac when it draws the king out and you have a follow-up. Emphasize king safety over material gain. Calculate what your opponent (and you) can do with exchanged pieces before entering into tactical complications. Go crazy!</p>
+<p>Beginners may be best served by playing conventional e4/d4 systems as p1 and the French as p2. Avoid pawn moves which weaken key squares; fortify weak squares around your king. Maintain the initiative and attack. Sac when it draws the king out and you have a follow-up. Emphasize king safety over material gain. Calculate what your opponent (and you) can do with exchanged pieces before entering into tactical complications. Go crazy!</p>
 """
 }

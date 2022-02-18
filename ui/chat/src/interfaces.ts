@@ -45,7 +45,7 @@ export interface Line {
   u?: string; // username
   t: string; // text
   d: boolean; // deleted
-  c?: string; // color
+  c?: string; // playerIndex
   r?: boolean; // troll
   title?: string;
 }

@@ -13,11 +13,11 @@ playstrategy.load.then(() => {
         dests = new Map();
       for (const k in destsObj) dests.set(k, destsObj[k].match(/.{2}/g));
       cg.set({
-        turnColor: cg.state.orientation,
+        turnPlayerIndex: cg.state.orientation,
         movable: {
           free: false,
           dests,
-          color: cg.state.orientation,
+          playerIndex: cg.state.orientation,
           events: {
             after(orig: string, dest: string) {
               $captcha.removeClass('success failure');
@@ -37,7 +37,7 @@ playstrategy.load.then(() => {
               () =>
                 cg.set({
                   fen: fen,
-                  turnColor: cg.state.orientation,
+                  turnPlayerIndex: cg.state.orientation,
                   movable: { dests },
                 }),
               300

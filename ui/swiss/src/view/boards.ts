@@ -14,7 +14,7 @@ export function top(boards: Board[]): VNode {
 const renderBoardClasses = (board: Board): string =>
   board.gameLogic === 'draughts' && !!board.boardSize
     ? `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLogic}.is${board.boardSize.key}.${board.variantKey}.variant-${board.variantKey}`
-    : `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLogic}.${board.variantKey}.variant-${board.variantKey}`;
+    : `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameFamily}.${board.variantKey}.variant-${board.variantKey}`;
 
 const renderBoardState = (board: Board): string =>
   board.gameLogic === 'draughts' && !!board.boardSize
@@ -47,17 +47,17 @@ const renderBoard = (board: Board): VNode =>
     ]
   );
 
-function boardPlayer(board: Board, color: Color) {
-  const player = board[color];
+function boardPlayer(board: Board, playerIndex: PlayerIndex) {
+  const player = board[playerIndex];
   return h('span.mini-game__player', [
     h('span.mini-game__user', [h('strong', '#' + player.rank), renderPlayer(player, true, true)]),
     board.clock
-      ? h(`span.mini-game__clock.mini-game__clock--${color}`, {
+      ? h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
           attrs: {
-            'data-time': board.clock[color],
+            'data-time': board.clock[playerIndex],
             'data-managed': 1,
           },
         })
-      : h('span.mini-game__result', board.winner ? (board.winner == color ? 1 : 0) : '½'),
+      : h('span.mini-game__result', board.winner ? (board.winner == playerIndex ? 1 : 0) : '½'),
   ]);
 }

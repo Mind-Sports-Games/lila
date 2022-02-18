@@ -75,7 +75,7 @@ object JsonView {
 
     implicit private val playerLineWriter = OWrites[PlayerLine] { l =>
       Json.obj(
-        "c" -> l.color.name,
+        "c" -> l.playerIndex.name,
         "t" -> l.text
       )
     }

@@ -8,7 +8,7 @@ import play.api.mvc._
 private[controllers] trait TheftPrevention { self: LilaController =>
 
   protected def PreventTheft(pov: Pov)(ok: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    if (isTheft(pov)) fuccess(Redirect(routes.Round.watcher(pov.gameId, pov.color.name)))
+    if (isTheft(pov)) fuccess(Redirect(routes.Round.watcher(pov.gameId, pov.playerIndex.name)))
     else ok
 
   protected def isTheft(pov: Pov)(implicit ctx: Context) =

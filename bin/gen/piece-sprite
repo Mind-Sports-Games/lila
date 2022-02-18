@@ -61,12 +61,12 @@ types = {
   'png' => 'png;base64,'
 }
 roles = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece', 'k-piece']
-colors = ['white', 'black']
+colors = ['w', 'b']
 chess_variants = ['standard','chess960', 'fromPosition', 'kingOfTheHill', 'threeCheck', 'fiveCheck', 'antichess', 'atomic',
-'horde', 'racingKings', 'crazyhouse']
+'horde', 'racingKings', 'crazyhouse', 'noCastling']
 draughts_variants = ['international','frisian','frysk','antidraughts','breakthrough','russian','brazilian','pool']
 draughts_roles = ['man','king']
-lines_of_action_variants= ['linesOfAction']
+lines_of_action_variants= ['linesOfAction', 'scrambledEggs']
 lines_of_action_roles = ['l-piece']
 shogi_roles_to_imageprefix = [
     ['p-piece','FU'],
@@ -86,10 +86,10 @@ shogi_roles_to_imageprefix = [
     ['pb-piece','UM']
   ]
 shogi_colors = ['0','1']
-shogi_variants = ['shogi']
+shogi_variants = ['shogi', 'minishogi']
 xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece', 'pp-piece']
 xiangqi_colors = ['B','R']
-xiangqi_variants = ['xiangqi']
+xiangqi_variants = ['xiangqi', 'minixiangqi']
 
 
 # inline SVG Chess
@@ -103,7 +103,7 @@ chess_themes.map { |theme|
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.chess.is2d .' + role + '.' + color + ' {' +
+        '.chess.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
@@ -116,7 +116,7 @@ chess_themes.map { |theme|
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -133,7 +133,7 @@ chess_themes.map { |theme|
     roles.map { |role|
       piece = color[0] + role.upcase[0]
       game_class = (role == 'man' || role == 'king') ? 'draughts' : 'chess'
-      '.' + game_class + '.is2d .' + role + '.' + color + ' {' +
+      '.' + game_class + '.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
         "background-image:url('/assets/piece/" + "chess/" + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
@@ -142,7 +142,7 @@ chess_themes.map { |theme|
       roles.map { |role|
         piece = color[0] + role.upcase[0]
         game_class = (role == 'man' || role == 'king') ? 'draughts' : 'chess'
-        '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
           "background-image:url('/assets/piece/" + "chess/" + name + "/" + piece + "." + ext + "')}"
       }
     }
@@ -161,7 +161,7 @@ draughts_themes.map { |theme|
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.draughts.is2d .' + role + '.' + color + ' {' +
+        '.draughts.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
@@ -174,7 +174,7 @@ draughts_themes.map { |theme|
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -189,7 +189,7 @@ draughts_themes.map { |theme|
   classes_draughts_game = colors.map { |color|
     draughts_roles.map { |role|
       piece = color[0] + role.upcase[0]
-      '.draughts.is2d .' + role + '.' + color + ' {' +
+      '.draughts.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
         "background-image:url('/assets/piece/" + 'draughts/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
@@ -197,7 +197,7 @@ draughts_themes.map { |theme|
     colors.map { |color|
       draughts_roles.map { |role|
         piece = color[0] + role.upcase[0]
-        '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
           "background-image:url('/assets/piece/" + 'draughts/' + name + "/" + piece + "." + ext + "')}"
       }
     }
@@ -216,7 +216,7 @@ loa_themes.map { |theme|
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.chess.is2d .' + role + '.' + color + ' {' +
+          '.loa.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -229,7 +229,7 @@ loa_themes.map { |theme|
           File.open(file, 'r') do|image_file|
             image = image_file.read
             base64 = Base64.strict_encode64(image)
-            '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+            '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
               "background-image:url('data:image/" + types[ext] + base64 + "')}"
           end
         }
@@ -244,7 +244,7 @@ loa_themes.map { |theme|
   classes_loa_game = colors.map { |color|
     lines_of_action_roles.map { |role|
       piece = color[0] + role.upcase[0]
-      '.chess.is2d .' + role + '.' + color + ' {' +
+      '.loa.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
           "background-image:url('/assets/piece/" + 'loa/' + name + "/" + piece + "." + ext + "')}"
       }
     }.flatten
@@ -252,7 +252,7 @@ loa_themes.map { |theme|
       colors.map { |color|
       lines_of_action_roles.map { |role|
           piece = color[0] + role.upcase[0]
-          '.is2d .variant-' + variant + ' .' + role + '.' + color + ' {' +
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
             "background-image:url('/assets/piece/" + 'loa/' + name + "/" + piece + "." + ext + "')}"
         }
       }
@@ -269,7 +269,7 @@ shogi_themes.map { |theme|
       role_piece_prefix = role_image[1]
       piece = color[0] + role_piece_prefix
       file = source_dir + 'shogi/' + name + '/' + piece + '.' + ext
-      color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
+      color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.p2' : '.p1') : '')
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
@@ -285,7 +285,7 @@ shogi_themes.map { |theme|
         role_piece_prefix = role_image[1]
         piece = color[0] + role_piece_prefix
         file = source_dir + 'shogi/' + name + '/' + piece + '.' + ext
-        color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
+        color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.p2' : '.p1') : '')
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
@@ -306,7 +306,7 @@ shogi_themes.map { |theme|
       role = role_image[0]
       role_piece_prefix = role_image[1] 
       piece = color[0] + role_piece_prefix
-      color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
+      color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.p2' : '.p1') : '')
       '.shogi.is2d .' + role + '.' + color_class + ' {' +
         "background-image:url('/assets/piece/" + 'shogi/' + name + "/" + piece + "." + ext + "')}"
     }
@@ -317,7 +317,7 @@ shogi_themes.map { |theme|
         role = role_image[0]
         role_piece_prefix = role_image[1]
         piece = color[0] + role_piece_prefix
-        color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.black' : '.white') : '')
+        color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.p2' : '.p1') : '')
         '.is2d .variant-' + variant + ' .' + role + '.' + color_class + ' {' +
           "background-image:url('/assets/piece/" + 'shogi/' + name + "/" + piece + "." + ext + "')}"
       }
@@ -337,7 +337,7 @@ xiangqi_themes.map { |theme|
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.xiangqi.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+        '.xiangqi.is2d .' + role + '.' + (color == 'R' ? 'p1' : 'p2') + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
@@ -350,7 +350,7 @@ xiangqi_themes.map { |theme|
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'R' ? 'p1' : 'p2') + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -365,7 +365,7 @@ xiangqi_themes.map { |theme|
   classes_xiangqi_game = xiangqi_colors.map { |color|
     xiangqi_roles.map { |role|
       piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
-      '.xiangqi.is2d .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+      '.xiangqi.is2d .' + role + '.' + (color == 'R' ? 'p1' : 'p2') + ' {' +
         "background-image:url('/assets/piece/" + 'xiangqi/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
@@ -373,7 +373,7 @@ xiangqi_themes.map { |theme|
     xiangqi_colors.map { |color|
       xiangqi_roles.map { |role|
         piece = color[0] + (role == 'n-piece' ? 'H' : role == 'b-piece' ? 'E' : role.upcase[0])
-        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'R' ? 'white' : 'black') + ' {' +
+        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'R' ? 'p1' : 'p2') + ' {' +
           "background-image:url('/assets/piece/" + 'xiangqi/' + name + "/" + piece + "." + ext + "')}"
       }
     }

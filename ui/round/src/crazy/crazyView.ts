@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import * as round from '../round';
-import { drag, crazyKeys, pieceRoles, pieceShogiRoles } from './crazyCtrl';
+import { drag, crazyKeys, pieceRoles, pieceShogiRoles, pieceMiniShogiRoles } from './crazyCtrl';
 import * as cg from 'chessground/types';
 import RoundController from '../ctrl';
 import { onInsert } from '../util';
@@ -8,22 +8,23 @@ import { Position } from '../interfaces';
 
 const eventNames = ['mousedown', 'touchstart'];
 
-export default function pocket(ctrl: RoundController, color: Color, position: Position) {
+export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, position: Position) {
   const step = round.plyStep(ctrl.data, ctrl.ply);
   const variantKey = ctrl.data.game.variant.key;
-  const dropRoles = variantKey == 'crazyhouse' ? pieceRoles : pieceShogiRoles;
+  const dropRoles =
+    variantKey == 'crazyhouse' ? pieceRoles : variantKey == 'minishogi' ? pieceMiniShogiRoles : pieceShogiRoles;
   if (!step.crazy) return;
   const droppedRole = ctrl.justDropped,
     preDropRole = ctrl.preDrop,
-    pocket = step.crazy.pockets[color === 'white' ? 0 : 1],
+    pocket = step.crazy.pockets[playerIndex === 'p1' ? 0 : 1],
     usablePos = position === (ctrl.flip ? 'top' : 'bottom'),
     shogiPlayer = position === 'top' ? 'enemy' : 'ally',
     usable = usablePos && !ctrl.replaying() && ctrl.isPlaying(),
-    activeColor = color === ctrl.data.player.color;
+    activePlayerIndex = playerIndex === ctrl.data.player.playerIndex;
   const capturedPiece = ctrl.justCaptured;
   const captured =
     capturedPiece &&
-    (variantKey === 'shogi' && capturedPiece['promoted']
+    ((variantKey === 'shogi' || variantKey === 'minishogi') && capturedPiece['promoted']
       ? (capturedPiece.role.slice(1) as cg.Role)
       : capturedPiece['promoted']
       ? 'p-piece'
@@ -42,7 +43,7 @@ export default function pocket(ctrl: RoundController, color: Color, position: Po
     },
     dropRoles.map(role => {
       let nb = pocket[role] || 0;
-      if (activeColor) {
+      if (activePlayerIndex) {
         if (droppedRole === role) nb--;
         if (captured === role) nb++;
       }
@@ -50,11 +51,11 @@ export default function pocket(ctrl: RoundController, color: Color, position: Po
         'div.pocket-c1',
         h(
           'div.pocket-c2',
-          h('piece.' + role + '.' + color + '.' + shogiPlayer, {
-            class: { premove: activeColor && preDropRole === role },
+          h('piece.' + role + '.' + playerIndex + '.' + shogiPlayer, {
+            class: { premove: activePlayerIndex && preDropRole === role },
             attrs: {
               'data-role': role,
-              'data-color': color,
+              'data-playerindex': playerIndex,
               'data-nb': nb,
             },
           })

@@ -1,6 +1,6 @@
 package lila.analyse
 
-import strategygames.Color
+import strategygames.{ Player => PlayerIndex }
 
 import org.joda.time.DateTime
 import lila.user.User
@@ -24,11 +24,11 @@ case class Analysis(
 
   lazy val advices: List[Advice] = infoAdvices.flatMap(_._2)
 
-  def summary: List[(Color, List[(Advice.Judgement, Int)])] =
-    Color.all map { color =>
-      color -> (Advice.Judgement.all map { judgment =>
+  def summary: List[(PlayerIndex, List[(Advice.Judgement, Int)])] =
+    PlayerIndex.all map { playerIndex =>
+      playerIndex -> (Advice.Judgement.all map { judgment =>
         judgment -> (advices count { adv =>
-          adv.color == color && adv.judgment == judgment
+          adv.playerIndex == playerIndex && adv.judgment == judgment
         })
       })
     }

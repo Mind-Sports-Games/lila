@@ -80,7 +80,9 @@ object side {
         showNonEmptyPerf(u.perfs.atomic, PerfType.orDefault("atomic")),
         showNonEmptyPerf(u.perfs.horde, PerfType.orDefault("horde")),
         showNonEmptyPerf(u.perfs.racingKings, PerfType.orDefault("racingKings")),
+        showNonEmptyPerf(u.perfs.noCastling, PerfType.orDefault("noCastling")),
         showNonEmptyPerf(u.perfs.linesOfAction, PerfType.orDefault("linesOfAction")),
+        showNonEmptyPerf(u.perfs.scrambledEggs, PerfType.orDefault("scrambledEggs")),
         showNonEmptyPerf(u.perfs.international, PerfType.orDefault("international")),
         showNonEmptyPerf(u.perfs.frisian, PerfType.orDefault("frisian")),
         showNonEmptyPerf(u.perfs.frysk, PerfType.orDefault("frysk")),
@@ -91,6 +93,8 @@ object side {
         showNonEmptyPerf(u.perfs.pool, PerfType.orDefault("pool")),
         showNonEmptyPerf(u.perfs.shogi, PerfType.orDefault("shogi")),
         showNonEmptyPerf(u.perfs.xiangqi, PerfType.orDefault("xiangqi")),
+        showNonEmptyPerf(u.perfs.minishogi, PerfType.orDefault("minishogi")),
+        showNonEmptyPerf(u.perfs.minixiangqi, PerfType.orDefault("minixiangqi")),
         u.noBot option frag(
           hr,
           showPerf(u.perfs.puzzle, PerfType.orDefault("puzzle")),

@@ -8,7 +8,7 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import strategygames.{ Color, GameLogic }
+import strategygames.{ Player => PlayerIndex, GameLogic }
 import strategygames.format.{ FEN => StratFEN }
 import strategygames.variant.{ Variant => StratVariant }
 import strategygames.chess.format.FEN
@@ -123,7 +123,7 @@ trait Handlers {
   implicit val normalizedEmailAddressHandler =
     isoHandler[NormalizedEmailAddress, String](normalizedEmailAddressIso)
 
-  implicit val colorBoolHandler = BSONBooleanHandler.as[Color](Color.fromWhite, _.white)
+  implicit val playerIndexBoolHandler = BSONBooleanHandler.as[PlayerIndex](PlayerIndex.fromP1, _.p1)
 
   implicit val FENHandler: BSONHandler[FEN] = stringAnyValHandler[FEN](_.value, FEN.apply)
 

@@ -21,43 +21,43 @@ class BinaryPieceTest extends Specification {
       "empty board" in {
         write(Map.empty) must_== List.fill(64)(noop)
       }
-      "A1 white king" in {
-        write(Map(A1 -> Piece(White, King))) must_== {
+      "A1 p1 king" in {
+        write(Map(A1 -> Piece(P1, King))) must_== {
           "00000001" :: List.fill(63)(noop)
         }
       }
-      "A1 black knight" in {
-        write(Map(A1 -> Piece(Black, Knight))) must_== {
+      "A1 p2 knight" in {
+        write(Map(A1 -> Piece(P2, Knight))) must_== {
           "10000100" :: List.fill(63)(noop)
         }
       }
-      "B1 black pawn" in {
-        write(Map(B1 -> Piece(Black, Pawn))) must_== {
+      "B1 p2 pawn" in {
+        write(Map(B1 -> Piece(P2, Pawn))) must_== {
           noop :: "10000110" :: List.fill(62)(noop)
         }
       }
-      "A1 black knight, B1 white bishop" in {
-        write(Map(A1 -> Piece(Black, Knight), B1 -> Piece(White, Bishop))) must_== {
+      "A1 p2 knight, B1 p1 bishop" in {
+        write(Map(A1 -> Piece(P2, Knight), B1 -> Piece(P1, Bishop))) must_== {
           "10000100" :: "00000101" :: List.fill(62)(noop)
         }
       }
-      "A1 black knight, B1 white bishop, C1 white queen" in {
-        write(Map(A1 -> Piece(Black, Knight), B1 -> Piece(White, Bishop), C1 -> Piece(White, Queen))) must_== {
+      "A1 p2 knight, B1 p1 bishop, C1 p1 queen" in {
+        write(Map(A1 -> Piece(P2, Knight), B1 -> Piece(P1, Bishop), C1 -> Piece(P1, Queen))) must_== {
           "10000100" :: "00000101" :: "00000010" :: List.fill(61)(noop)
         }
       }
-      "H8 black knight" in {
-        write(Map(H8 -> Piece(Black, Knight))) must_== {
+      "H8 p2 knight" in {
+        write(Map(H8 -> Piece(P2, Knight))) must_== {
           List.fill(63)(noop) :+ "10000100"
         }
       }
-      "G8 black knight, H8 white bishop" in {
-        write(Map(G8 -> Piece(Black, Knight), H8 -> Piece(White, Bishop))) must_== {
+      "G8 p2 knight, H8 p1 bishop" in {
+        write(Map(G8 -> Piece(P2, Knight), H8 -> Piece(P1, Bishop))) must_== {
           List.fill(62)(noop) :+ "10000100" :+ "00000101"
         }
       }
-      "A1 black LOAChecker, B1 white LOAChecker" in {
-        write(Map(A1 -> Piece(Black, LOAChecker), B1 -> Piece(White, LOAChecker))) must_== {
+      "A1 p2 LOAChecker, B1 p1 LOAChecker" in {
+        write(Map(A1 -> Piece(P2, LOAChecker), B1 -> Piece(P1, LOAChecker))) must_== {
           "10001000" :: "00001000" :: List.fill(62)(noop)
         }
       }
@@ -65,14 +65,14 @@ class BinaryPieceTest extends Specification {
     "read" should {
       "empty board" in {
         read(List.fill(64)(noop)) must_== Map.empty
-        "A1 white king" in {
-          read("00000001" :: List.fill(63)(noop)) must_== Map(A1 -> Piece(White, King))
+        "A1 p1 king" in {
+          read("00000001" :: List.fill(63)(noop)) must_== Map(A1 -> Piece(P1, King))
         }
-        "B1 black pawn" in {
-          read(noop :: "10000110" :: List.fill(62)(noop)) must_== Map(B1 -> Piece(Black, Pawn))
+        "B1 p2 pawn" in {
+          read(noop :: "10000110" :: List.fill(62)(noop)) must_== Map(B1 -> Piece(P2, Pawn))
         }
-        "A1 black LOAChecker, B1 white LOAChecker" in {
-          read("10001000" :: "00001000" :: List.fill(62)(noop), LinesOfAction) must_== Map(A1 -> Piece(Black, LOAChecker), B1 -> Piece(White, LOAChecker))
+        "A1 p2 LOAChecker, B1 p1 LOAChecker" in {
+          read("10001000" :: "00001000" :: List.fill(62)(noop), LinesOfAction) must_== Map(A1 -> Piece(P2, LOAChecker), B1 -> Piece(P1, LOAChecker))
         }
       }
     }

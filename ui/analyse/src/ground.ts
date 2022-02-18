@@ -30,7 +30,7 @@ export function promote(ground: CgApi, key: Key, role: cg.Role) {
         [
           key,
           {
-            color: piece.color,
+            playerIndex: piece.playerIndex,
             role,
             promoted: true,
           },
@@ -46,18 +46,18 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     opts = ctrl.makeCgOpts(),
     variantKey = d.game.variant.key as cg.Variant;
   const config = {
-    turnColor: opts.turnColor,
+    turnPlayerIndex: opts.turnPlayerIndex,
     fen: opts.fen,
     check: opts.check,
     lastMove: opts.lastMove,
     orientation: ctrl.getOrientation(),
-    myColor: ctrl.data.player.color,
+    myPlayerIndex: ctrl.data.player.playerIndex,
     coordinates: pref.coords !== Prefs.Coords.Hidden && !ctrl.embed,
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,
     movable: {
       free: false,
-      color: opts.movable!.color,
+      playerIndex: opts.movable!.playerIndex,
       dests: opts.movable!.dests,
       showDests: pref.destination,
       rookCastle: pref.rookCastle,

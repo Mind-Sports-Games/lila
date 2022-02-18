@@ -44,8 +44,8 @@ import {
 } from './interfaces';
 
 interface GoneBerserk {
-  white?: boolean;
-  black?: boolean;
+  p1?: boolean;
+  p2?: boolean;
 }
 
 type Timeout = number;
@@ -91,8 +91,8 @@ export default class RoundController {
     const d = (this.data = opts.data);
 
     this.ply = round.lastPly(d);
-    this.goneBerserk[d.player.color] = d.player.berserk;
-    this.goneBerserk[d.opponent.color] = d.opponent.berserk;
+    this.goneBerserk[d.player.playerIndex] = d.player.berserk;
+    this.goneBerserk[d.opponent.playerIndex] = d.opponent.berserk;
 
     setTimeout(() => {
       this.firstSeconds = false;
@@ -106,7 +106,7 @@ export default class RoundController {
     if (d.clock)
       this.clock = new ClockController(d, {
         onFlag: this.socket.outoftime,
-        soundColor: d.simul || d.player.spectator || !d.pref.clockSound ? undefined : d.player.color,
+        soundPlayerIndex: d.simul || d.player.spectator || !d.pref.clockSound ? undefined : d.player.playerIndex,
         nvui: !!this.nvui,
       });
     else {
@@ -200,7 +200,7 @@ export default class RoundController {
   };
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
-    if (['xiangqi', 'shogi'].includes(this.data.game.variant.key)) return false;
+    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(this.data.game.variant.key)) return false;
     if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'p-piece') return false;
     const pos = (dest[0] + orig[1]) as cg.Key;
     this.chessground.setPieces(new Map([[pos, undefined]]));
@@ -241,12 +241,12 @@ export default class RoundController {
         fen: s.fen,
         lastMove: util.uci2move(s.uci),
         check: !!s.check,
-        turnColor: this.ply % 2 === 0 ? 'white' : 'black',
+        turnPlayerIndex: this.ply % 2 === 0 ? 'p1' : 'p2',
       };
     if (this.replaying()) this.chessground.stop();
     else
       config.movable = {
-        color: this.isPlaying() ? this.data.player.color : undefined,
+        playerIndex: this.isPlaying() ? this.data.player.playerIndex : undefined,
         dests: util.parsePossibleMoves(this.data.possibleMoves),
       };
     (config.dropmode = {
@@ -370,23 +370,23 @@ export default class RoundController {
       notify(() => renderUser.userTxt(this, d.opponent) + '\njoined the game.');
   };
 
-  playerByColor = (c: Color) => this.data[c === this.data.player.color ? 'player' : 'opponent'];
+  playerByPlayerIndex = (c: PlayerIndex) => this.data[c === this.data.player.playerIndex ? 'player' : 'opponent'];
 
   apiMove = (o: ApiMove): true => {
     const d = this.data,
       playing = this.isPlaying();
 
     d.game.turns = o.ply;
-    d.game.player = o.ply % 2 === 0 ? 'white' : 'black';
-    const playedColor = o.ply % 2 === 0 ? 'black' : 'white',
-      activeColor = d.player.color === d.game.player;
+    d.game.player = o.ply % 2 === 0 ? 'p1' : 'p2';
+    const playedPlayerIndex = o.ply % 2 === 0 ? 'p2' : 'p1',
+      activePlayerIndex = d.player.playerIndex === d.game.player;
     if (o.status) d.game.status = o.status;
     if (o.winner) d.game.winner = o.winner;
-    this.playerByColor('white').offeringDraw = o.wDraw;
-    this.playerByColor('black').offeringDraw = o.bDraw;
-    d.possibleMoves = activeColor ? o.dests : undefined;
-    d.possibleDrops = activeColor ? o.drops : undefined;
-    d.possibleDropsByRole = activeColor ? o.dropsByRole : undefined;
+    this.playerByPlayerIndex('p1').offeringDraw = o.wDraw;
+    this.playerByPlayerIndex('p2').offeringDraw = o.bDraw;
+    d.possibleMoves = activePlayerIndex ? o.dests : undefined;
+    d.possibleDrops = activePlayerIndex ? o.drops : undefined;
+    d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
     d.crazyhouse = o.crazyhouse;
     this.setTitle();
     if (!this.replaying()) {
@@ -395,7 +395,7 @@ export default class RoundController {
         this.chessground.newPiece(
           {
             role: o.role,
-            color: playedColor,
+            playerIndex: playedPlayerIndex,
           },
           o.uci.substr(2, 2) as cg.Key
         );
@@ -413,7 +413,7 @@ export default class RoundController {
       }
       if (o.promotion) ground.promote(this.chessground, o.promotion.key, o.promotion.pieceClass);
       this.chessground.set({
-        turnColor: d.game.player,
+        turnPlayerIndex: d.game.player,
         movable: {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves) : new Map(),
         },
@@ -438,26 +438,26 @@ export default class RoundController {
     d.steps.push(step);
     this.justDropped = undefined;
     this.justCaptured = undefined;
-    game.setOnGame(d, playedColor, true);
+    game.setOnGame(d, playedPlayerIndex, true);
     this.data.forecastCount = undefined;
     if (o.clock) {
       this.shouldSendMoveTime = true;
       const oc = o.clock,
-        delay = playing && activeColor ? 0 : oc.lag || 1;
-      if (this.clock) this.clock.setClock(d, oc.white, oc.black, delay);
-      else if (this.corresClock) this.corresClock.update(oc.white, oc.black);
+        delay = playing && activePlayerIndex ? 0 : oc.lag || 1;
+      if (this.clock) this.clock.setClock(d, oc.p1, oc.p2, delay);
+      else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
     if (this.data.expiration) {
       if (this.data.steps.length > 2) this.data.expiration = undefined;
       else this.data.expiration.movedAt = Date.now();
     }
     this.redraw();
-    if (playing && playedColor == d.player.color) {
+    if (playing && playedPlayerIndex == d.player.playerIndex) {
       this.transientMove.clear();
       this.moveOn.next();
       cevalSub.publish(d, o);
     }
-    if (!this.replaying() && playedColor != d.player.color) {
+    if (!this.replaying() && playedPlayerIndex != d.player.playerIndex) {
       // atrocious hack to prevent race condition
       // with explosions and premoves
       // https://github.com/ornicar/lila/issues/343
@@ -471,7 +471,7 @@ export default class RoundController {
     }
     this.autoScroll();
     this.onChange();
-    if (this.keyboardMove) this.keyboardMove.update(step, playedColor != d.player.color);
+    if (this.keyboardMove) this.keyboardMove.update(step, playedPlayerIndex != d.player.playerIndex);
     if (this.music) this.music.jump(o);
     speech.step(step);
     return true; // prevents default socket pubsub
@@ -495,8 +495,8 @@ export default class RoundController {
     this.data = d;
     this.clearJust();
     this.shouldSendMoveTime = false;
-    if (this.clock) this.clock.setClock(d, d.clock!.white, d.clock!.black);
-    if (this.corresClock) this.corresClock.update(d.correspondence.white, d.correspondence.black);
+    if (this.clock) this.clock.setClock(d, d.clock!.p1, d.clock!.p2);
+    if (this.corresClock) this.corresClock.update(d.correspondence.p1, d.correspondence.p2);
     if (!this.replaying()) ground.reload(this);
     this.setTitle();
     this.moveOn.next();
@@ -511,16 +511,18 @@ export default class RoundController {
   endWithData = (o: ApiEnd): void => {
     const d = this.data;
     d.game.winner = o.winner;
+    d.game.winnerPlayer = o.winnerPlayer;
+    d.game.loserPlayer = o.loserPlayer;
     d.game.status = o.status;
     d.game.boosted = o.boosted;
     this.userJump(this.lastPly());
     this.chessground.stop();
     if (o.ratingDiff) {
-      d.player.ratingDiff = o.ratingDiff[d.player.color];
-      d.opponent.ratingDiff = o.ratingDiff[d.opponent.color];
+      d.player.ratingDiff = o.ratingDiff[d.player.playerIndex];
+      d.opponent.ratingDiff = o.ratingDiff[d.opponent.playerIndex];
     }
     if (!d.player.spectator && d.game.turns > 1) {
-      const key = o.winner ? (d.player.color === o.winner ? 'victory' : 'defeat') : 'draw';
+      const key = o.winner ? (d.player.playerIndex === o.winner ? 'victory' : 'defeat') : 'draw';
       playstrategy.sound.play(key);
       if (
         key != 'victory' &&
@@ -594,7 +596,7 @@ export default class RoundController {
       playstrategy.quietMode = is;
       $('body')
         .toggleClass('playing', is)
-        .toggleClass('no-select', is && this.clock && this.clock.millisOf(this.data.player.color) <= 3e5);
+        .toggleClass('no-select', is && this.clock && this.clock.millisOf(this.data.player.playerIndex) <= 3e5);
     }
   };
 
@@ -625,12 +627,12 @@ export default class RoundController {
     playstrategy.sound.play('berserk');
   };
 
-  setBerserk = (color: Color): void => {
-    if (this.goneBerserk[color]) return;
-    this.goneBerserk[color] = true;
-    if (color !== this.data.player.color) playstrategy.sound.play('berserk');
+  setBerserk = (playerIndex: PlayerIndex): void => {
+    if (this.goneBerserk[playerIndex]) return;
+    this.goneBerserk[playerIndex] = true;
+    if (playerIndex !== this.data.player.playerIndex) playstrategy.sound.play('berserk');
     this.redraw();
-    $('<i data-icon="`">').appendTo($(`.game__meta .player.${color} .user-link`));
+    $('<i data-icon="`">').appendTo($(`.game__meta .player.${playerIndex} .user-link`));
   };
 
   setLoading = (v: boolean, duration = 1500) => {
@@ -680,7 +682,7 @@ export default class RoundController {
 
   private goneTick?: number;
   setGone = (gone: number | boolean) => {
-    game.setGone(this.data, this.data.opponent.color, gone);
+    game.setGone(this.data, this.data.opponent.playerIndex, gone);
     clearTimeout(this.goneTick);
     if (Number(gone) > 1)
       this.goneTick = setTimeout(() => {
@@ -731,7 +733,7 @@ export default class RoundController {
 
   private delayedInit = () => {
     const d = this.data;
-    if (this.isPlaying() && game.nbMoves(d, d.player.color) === 0 && !this.isSimulHost()) {
+    if (this.isPlaying() && game.nbMoves(d, d.player.playerIndex) === 0 && !this.isSimulHost()) {
       playstrategy.sound.play('genericNotify');
     }
     playstrategy.requestIdleCallback(() => {

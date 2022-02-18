@@ -20,6 +20,7 @@
   <string name="black">Schwarz</string>
   <string name="randomColor">Zufällige Farbe</string>
   <string name="createAGame">Neue Partie</string>
+  <string name="playerIndexIsVictorious">%s gewinnt</string>
   <string name="whiteIsVictorious">Weiß gewinnt</string>
   <string name="blackIsVictorious">Schwarz gewinnt</string>
   <string name="youPlayTheWhitePieces">Du spielst mit den weißen Figuren</string>
@@ -33,6 +34,7 @@
   <string name="newOpponent">Neuer Gegner</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Dein Gegner möchte ein neues Spiel mit dir spielen</string>
   <string name="joinTheGame">Der Partie beitreten</string>
+  <string name="playerIndexPlays">%s am Zug</string>
   <string name="whitePlays">Weiß am Zug</string>
   <string name="blackPlays">Schwarz am Zug</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +47,10 @@
   <string name="forceDraw">Remis erklären</string>
   <string name="talkInChat">Bitte sei freundlich im Chat!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Die erste Person, die diese URL aufruft, wird dein Gegner.</string>
+  <string name="playerIndexResigned">%s hat aufgegeben</string>
   <string name="whiteResigned">Weiß hat aufgegeben</string>
   <string name="blackResigned">Schwarz hat aufgegeben</string>
+  <string name="playerIndexLeftTheGame">%s hat die Partie verlassen</string>
   <string name="whiteLeftTheGame">Weiß hat die Partie verlassen</string>
   <string name="blackLeftTheGame">Schwarz hat die Partie verlassen</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Teile diese URL, um Zuschauer einzuladen</string>
@@ -80,6 +84,7 @@
   <string name="drawn">Remis</string>
   <string name="unknown">Unbekannt</string>
   <string name="database">Datenbank</string>
+  <string name="p1DrawP2">%1$s / Remis / %2$s</string>
   <string name="whiteDrawBlack">Weiß / Remis / Schwarz</string>
   <string name="averageRatingX">Durchschnittliche Wertungszahl: %s</string>
   <string name="recentGames">Neue Partien</string>
@@ -210,14 +215,17 @@
     <item quantity="other">%s Partien mit dir</item>
   </plurals>
   <string name="cancel">Abbrechen</string>
+  <string name="playerIndexTimeOut">Zeitüberschreitung von %s</string>
   <string name="whiteTimeOut">Zeitüberschreitung von Weiß</string>
   <string name="blackTimeOut">Zeitüberschreitung von Schwarz</string>
   <string name="drawOfferSent">Remisangebot gesendet</string>
   <string name="drawOfferDeclined">Remisangebot abgelehnt</string>
   <string name="drawOfferAccepted">Remisangebot angenommen</string>
   <string name="drawOfferCanceled">Remisangebot zurückgezogen</string>
+  <string name="playerIndexOffersDraw">%s bietet Remis</string>
   <string name="whiteOffersDraw">Weiß bietet Remis</string>
   <string name="blackOffersDraw">Schwarz bietet Remis</string>
+  <string name="playerIndexDeclinesDraw">%s lehnt Remis ab</string>
   <string name="whiteDeclinesDraw">Weiß lehnt Remis ab</string>
   <string name="blackDeclinesDraw">Schwarz lehnt Remis ab</string>
   <string name="yourOpponentOffersADraw">Dein Gegner bietet Remis an</string>
@@ -361,6 +369,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Mach einen Zug, um zu beweisen, dass du ein Mensch bist.</string>
   <string name="captcha.fail">Bitte löse die Schachaufgabe.</string>
   <string name="notACheckmate">Kein Matt</string>
+  <string name="playerIndexCheckmatesInOneMove">%s setzt in einem Zug Matt</string>
   <string name="whiteCheckmatesInOneMove">Weiß setzt in einem Zug Matt</string>
   <string name="blackCheckmatesInOneMove">Schwarz setzt in einem Zug Matt</string>
   <string name="retry">Erneut versuchen</string>
@@ -764,6 +773,7 @@
   <string name="hideBestMove">Den besten Zug ausblenden</string>
   <string name="getAHint">Hinweis anzeigen</string>
   <string name="evaluatingYourMove">Zug wird bewertet ...</string>
+  <string name="playerIndexWinsGame">%s gewinnt</string>
   <string name="whiteWinsGame">Weiß gewinnt</string>
   <string name="blackWinsGame">Schwarz gewinnt</string>
   <string name="learnFromYourMistakes">Lerne aus deinen Fehlern</string>
@@ -771,19 +781,24 @@
   <string name="skipThisMove">Überspringe diesen Zug</string>
   <string name="next">Nächster</string>
   <string name="xWasPlayed">%s wurde gespielt</string>
+  <string name="findBetterMoveForPlayerIndex">Finde einen besseren Zug für %s</string>
   <string name="findBetterMoveForWhite">Finde einen besseren Zug für Weiß</string>
   <string name="findBetterMoveForBlack">Finde einen besseren Zug für Schwarz</string>
   <string name="resumeLearning">Mit dem Lernen fortfahren</string>
   <string name="youCanDoBetter">Finde eine bessere Variante</string>
+  <string name="tryAnotherMoveForPlayerIndex">Versuche einen anderen Zug für %s</string>
   <string name="tryAnotherMoveForWhite">Versuche einen anderen Zug für Weiß</string>
   <string name="tryAnotherMoveForBlack">Versuche einen anderen Zug für Schwarz</string>
   <string name="solution">Lösung</string>
   <string name="waitingForAnalysis">Warte auf Analyse</string>
+  <string name="noMistakesFoundForPlayerIndex">Keine Fehler bei %s gefunden</string>
   <string name="noMistakesFoundForWhite">Keine Fehler bei Weiß gefunden</string>
   <string name="noMistakesFoundForBlack">Keine Fehler bei Schwarz gefunden</string>
+  <string name="doneReviewingPlayerIndexMistakes">Überprüfen der Fehler von %s abgeschlossen</string>
   <string name="doneReviewingWhiteMistakes">Überprüfen der Fehler von Weiß abgeschlossen</string>
   <string name="doneReviewingBlackMistakes">Überprüfen der Fehler von Schwarz abgeschlossen</string>
   <string name="doItAgain">Wiederholen</string>
+  <string name="reviewPlayerIndexMistakes">Fehler von %s überprüfen</string>
   <string name="reviewWhiteMistakes">Fehler von Weiß überprüfen</string>
   <string name="reviewBlackMistakes">Fehler von Schwarz überprüfen</string>
   <string name="advantage">Vorteil</string>

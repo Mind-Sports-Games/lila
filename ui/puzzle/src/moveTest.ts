@@ -15,8 +15,8 @@ export default function moveTest(vm: Vm, puzzle: Puzzle): MoveTestReturn {
   if (vm.mode === 'view') return;
   if (!pathOps.contains(vm.path, vm.initialPath)) return;
 
-  const playedByColor = vm.node.ply % 2 === 1 ? 'white' : 'black';
-  if (playedByColor !== vm.pov) return;
+  const playedByPlayerIndex = vm.node.ply % 2 === 1 ? 'p1' : 'p2';
+  if (playedByPlayerIndex !== vm.pov) return;
 
   const nodes = vm.nodeList.slice(pathOps.size(vm.initialPath) + 1).map(node => ({
     uci: node.uci,

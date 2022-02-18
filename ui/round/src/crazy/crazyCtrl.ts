@@ -8,18 +8,19 @@ import * as chessUtil from 'chess';
 
 export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
 export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
+export const pieceMiniShogiRoles: cg.Role[] = ['p-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 
 export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (ctrl.replaying() || !ctrl.isPlaying()) return;
   const el = e.target as HTMLElement,
     role = el.getAttribute('data-role') as cg.Role,
-    color = el.getAttribute('data-color') as cg.Color,
+    playerIndex = el.getAttribute('data-playerindex') as cg.PlayerIndex,
     number = el.getAttribute('data-nb');
-  if (!role || !color || number === '0') return;
+  if (!role || !playerIndex || number === '0') return;
   e.stopPropagation();
   e.preventDefault();
-  dragNewPiece(ctrl.chessground.state, { color, role }, e);
+  dragNewPiece(ctrl.chessground.state, { playerIndex, role }, e);
 }
 
 let dropWithKey = false;
@@ -70,17 +71,22 @@ export function init(ctrl: RoundController) {
   const setDrop = () => {
     if (activeCursor) document.body.classList.remove(activeCursor);
     if (crazyKeys.length > 0) {
-      const dropRoles = ctrl.data.game.variant.key === 'shogi' ? pieceShogiRoles : pieceRoles,
+      const dropRoles =
+          ctrl.data.game.variant.key === 'shogi'
+            ? pieceShogiRoles
+            : ctrl.data.game.variant.key === 'minishogi'
+            ? pieceMiniShogiRoles
+            : pieceRoles,
         role = dropRoles[crazyKeys[crazyKeys.length - 1] - 1],
-        color = ctrl.data.player.color,
+        playerIndex = ctrl.data.player.playerIndex,
         crazyData = ctrl.data.crazyhouse;
       if (!crazyData) return;
-      const nb = crazyData.pockets[color === 'white' ? 0 : 1][role];
-      setDropMode(ctrl.chessground.state, nb > 0 ? { color, role } : undefined);
-      if (ctrl.data.game.variant.key === 'shogi') {
+      const nb = crazyData.pockets[playerIndex === 'p1' ? 0 : 1][role];
+      setDropMode(ctrl.chessground.state, nb > 0 ? { playerIndex, role } : undefined);
+      if (ctrl.data.game.variant.key === 'shogi' || ctrl.data.game.variant.key === 'minishogi') {
         activeCursor = `cursor-${role}-shogi`;
       } else {
-        activeCursor = `cursor-${color}-${role}-chess`;
+        activeCursor = `cursor-${playerIndex}-${role}-chess`;
       }
       document.body.classList.add(activeCursor);
     } else {
@@ -147,10 +153,10 @@ export function init(ctrl: RoundController) {
 // so preload when the feature might be used.
 // Images are used in _zh.scss, which should be kept in sync.
 function preloadMouseIcons(data: RoundData) {
-  const colorKey = data.player.color[0];
-  const colorNum = data.player.color == 'white' ? '0' : '1';
-  for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/chess/cburnett/${colorKey}${pKey}.svg`));
+  const playerIndexKey = data.player.playerIndex == 'p1' ? 'w' : 'b';
+  const playerIndexNum = data.player.playerIndex == 'p1' ? '0' : '1';
+  for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/chess/cburnett/${playerIndexKey}${pKey}.svg`));
   for (const pKey of ['FU', 'KY', 'KE', 'GI', 'KI', 'KA', 'HI'])
-    fetch(playstrategy.assetUrl(`piece/shogi/2kanji/${colorNum}${pKey}.svg`));
+    fetch(playstrategy.assetUrl(`piece/shogi/2kanji/${playerIndexNum}${pKey}.svg`));
   mouseIconsLoaded = true;
 }

@@ -20,6 +20,7 @@
   <string name="black">Svart</string>
   <string name="randomColor">Slumpvis färg</string>
   <string name="createAGame">Skapa ett parti</string>
+  <string name="playerIndexIsVictorious">%s har vunnit</string>
   <string name="whiteIsVictorious">Vit har vunnit</string>
   <string name="blackIsVictorious">Svart har vunnit</string>
   <string name="youPlayTheWhitePieces">Du spelar med de vita pjäserna</string>
@@ -45,8 +46,10 @@
   <string name="forceDraw">Begär remi</string>
   <string name="talkInChat">Vänligen uppträd trevligt i chatten!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Den första som använder den här länken kommer att spela med dig.</string>
+  <string name="playerIndexResigned">%s har gett upp</string>
   <string name="whiteResigned">Vit har gett upp</string>
   <string name="blackResigned">Svart har gett upp</string>
+  <string name="playerIndexLeftTheGame">%s har lämnat partiet</string>
   <string name="whiteLeftTheGame">Vit har lämnat partiet</string>
   <string name="blackLeftTheGame">Svart har lämnat partiet</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Dela länken till åskådare som vill se partiet</string>
@@ -80,6 +83,7 @@
   <string name="drawn">Remi</string>
   <string name="unknown">Okänd</string>
   <string name="database">Databas</string>
+  <string name="p1DrawP2">%1$s / Remi / %2$s</string>
   <string name="whiteDrawBlack">Vit / Remi / Svart</string>
   <string name="averageRatingX">Medelrating: %s</string>
   <string name="recentGames">Senaste partier</string>
@@ -216,8 +220,10 @@
   <string name="drawOfferDeclined">Remierbjudande avböjt</string>
   <string name="drawOfferAccepted">Remierbjudande accepterat</string>
   <string name="drawOfferCanceled">Remierbjudande avbrutet</string>
+  <string name="playerIndexOffersDraw">%s erbjuder remi</string>
   <string name="whiteOffersDraw">Vit erbjuder remi</string>
   <string name="blackOffersDraw">Svart erbjuder remi</string>
+  <string name="playerIndexDeclinesDraw">%s avböjer remi</string>
   <string name="whiteDeclinesDraw">Vit avböjer remi</string>
   <string name="blackDeclinesDraw">Svart avböjer remi</string>
   <string name="yourOpponentOffersADraw">Din motståndare erbjuder remi</string>
@@ -361,6 +367,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Klicka på brädet och gör ditt drag för att bevisa att du är en människa.</string>
   <string name="captcha.fail">Vänligen lös schack-captchan.</string>
   <string name="notACheckmate">Inte schackmatt</string>
+  <string name="playerIndexCheckmatesInOneMove">%s gör schackmatt på ett drag</string>
   <string name="whiteCheckmatesInOneMove">Vit gör schackmatt på ett drag</string>
   <string name="blackCheckmatesInOneMove">Svart gör schackmatt på ett drag</string>
   <string name="retry">Försök igen</string>
@@ -430,6 +437,7 @@
   <string name="performance">Prestation</string>
   <string name="tournamentComplete">Turneringen avslutad</string>
   <string name="movesPlayed">Drag spelade</string>
+  <string name="playerIndexWins">Vinster %s</string>
   <string name="whiteWins">Vinster Vit</string>
   <string name="blackWins">Vinster Svart</string>
   <string name="draws">Remier</string>
@@ -763,6 +771,7 @@
   <string name="hideBestMove">Dölj det bästa draget</string>
   <string name="getAHint">Ledtråd?</string>
   <string name="evaluatingYourMove">Utvärderar ditt drag...</string>
+  <string name="playerIndexWinsGame">%s vinner</string>
   <string name="whiteWinsGame">Vit vinner</string>
   <string name="blackWinsGame">Svart vinner</string>
   <string name="learnFromYourMistakes">Lär av dina misstag</string>
@@ -770,14 +779,17 @@
   <string name="skipThisMove">Hoppa över detta drag</string>
   <string name="next">Nästa</string>
   <string name="xWasPlayed">%s spelades</string>
+  <string name="findBetterMoveForPlayerIndex">Hitta ett bättre drag för %s</string>
   <string name="findBetterMoveForWhite">Hitta ett bättre drag för vit</string>
   <string name="findBetterMoveForBlack">Hitta ett bättre drag för svart</string>
   <string name="resumeLearning">Återuppta inlärning</string>
   <string name="youCanDoBetter">Du kan bättre</string>
+  <string name="tryAnotherMoveForPlayerIndex">Prova ett annat drag som %s</string>
   <string name="tryAnotherMoveForWhite">Prova ett annat drag som vit</string>
   <string name="tryAnotherMoveForBlack">Prova ett annat drag som svart</string>
   <string name="solution">Lösning</string>
   <string name="waitingForAnalysis">Väntar på analys</string>
+  <string name="noMistakesFoundForPlayerIndex">Hittar inga misstag för %s</string>
   <string name="noMistakesFoundForWhite">Hittar inga misstag för vit</string>
   <string name="noMistakesFoundForBlack">Hittar inga misstag för svart</string>
   <string name="doneReviewingWhiteMistakes">Färdig med utvärderingen av vits misstag</string>
