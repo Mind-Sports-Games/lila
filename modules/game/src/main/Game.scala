@@ -54,6 +54,8 @@ case class Game(
   def variant   = chess.situation.board.variant
   def turns     = chess.turns
   def clock     = chess.clock
+  // TODO: we really should rename pgnMoves to something more general,
+  //       because only our chess games ae using PGN.
   def pgnMoves  = chess.pgnMoves
 
   val players = List(p1Player, p2Player)
