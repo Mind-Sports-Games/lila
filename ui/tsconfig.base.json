@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "strict": true,
-    "strictFunctionTypes": true,
-    "strictPropertyInitialization": true,
+    "strictFunctionTypes": false,
+    "strictPropertyInitialization": false,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,

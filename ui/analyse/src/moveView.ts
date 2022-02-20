@@ -8,7 +8,7 @@ export interface Ctx {
   withDots?: boolean;
   showEval: boolean;
   showGlyphs?: boolean;
-  variant: Variant
+  variant: Variant;
 }
 
 export const plyToTurn = (ply: Ply): number => Math.floor((ply - 1) / 2) + 1;
