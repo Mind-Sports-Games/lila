@@ -3,7 +3,7 @@ package lila.game
 import akka.stream.scaladsl._
 import akka.util.ByteString
 import strategygames.format.{ FEN, Forsyth, Uci }
-import strategygames.{ Centis, Color, Replay, Situation, Game => ChessGame }
+import strategygames.{ Centis, Player => PlayerIndex, Replay, Situation, Game => ChessGame }
 import play.api.libs.json._
 import play.api.libs.ws.JsonBodyWritables._
 import play.api.libs.ws.StandaloneWSClient
@@ -28,10 +28,10 @@ final class GifExport(
         .addHttpHeaders("Content-Type" -> "application/json")
         .withBody(
           Json.obj(
-            "white"       -> Namer.playerTextBlocking(pov.game.whitePlayer, withRating = true)(lightUserApi.sync),
-            "black"       -> Namer.playerTextBlocking(pov.game.blackPlayer, withRating = true)(lightUserApi.sync),
+            "p1"       -> Namer.playerTextBlocking(pov.game.p1Player, withRating = true)(lightUserApi.sync),
+            "p2"       -> Namer.playerTextBlocking(pov.game.p2Player, withRating = true)(lightUserApi.sync),
             "comment"     -> s"${baseUrl.value}/${pov.game.id} rendered with https://github.com/niklasf/lila-gif",
-            "orientation" -> pov.color.name,
+            "orientation" -> pov.playerIndex.name,
             "delay"       -> targetMedianTime.centis, // default delay for frames
             "frames"      -> frames(pov.game, initialFen)
           )
@@ -47,8 +47,8 @@ final class GifExport(
   def gameThumbnail(game: Game): Fu[Source[ByteString, _]] = {
     val query = List(
       "fen"         -> (Forsyth.>>(game.variant.gameLogic, game.chess)).value,
-      "white"       -> Namer.playerTextBlocking(game.whitePlayer, withRating = true)(lightUserApi.sync),
-      "black"       -> Namer.playerTextBlocking(game.blackPlayer, withRating = true)(lightUserApi.sync),
+      "p1"       -> Namer.playerTextBlocking(game.p1Player, withRating = true)(lightUserApi.sync),
+      "p2"       -> Namer.playerTextBlocking(game.p2Player, withRating = true)(lightUserApi.sync),
       "orientation" -> game.naturalOrientation.name
     ) ::: List(
       game.lastMoveKeys.map { "lastMove" -> _ },
@@ -68,7 +68,7 @@ final class GifExport(
     }
   }
 
-  def thumbnail(fen: FEN, lastMove: Option[String], orientation: Color): Fu[Source[ByteString, _]] = {
+  def thumbnail(fen: FEN, lastMove: Option[String], orientation: PlayerIndex): Fu[Source[ByteString, _]] = {
     val query = List(
       "fen"         -> fen.value,
       "orientation" -> orientation.name

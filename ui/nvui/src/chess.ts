@@ -226,12 +226,12 @@ const renderPieceStyle = (piece: string, pieceStyle: PieceStyle) => {
       return whiteUpperNamePiece[piece];
   }
 };
-const renderPrefixStyle = (color: Color, prefixStyle: PrefixStyle) => {
+const renderPrefixStyle = (playerIndex: PlayerIndex, prefixStyle: PrefixStyle) => {
   switch (prefixStyle) {
     case 'letter':
-      return color.charAt(0);
+      return playerIndex === 'p1' ? 'w' : 'b';
     case 'name':
-      return color + ' ';
+      return playerIndex === 'p1' ? 'white ' : 'black ';
     case 'none':
       return '';
   }
@@ -248,9 +248,9 @@ export function lastCaptured(movesGenerator: () => string[], pieceStyle: PieceSt
   const newSplitFen = newFen.split(' ')[0];
   for (const p of 'kKqQrRbBnNpP') {
     const diff = oldSplitFen.split(p).length - 1 - (newSplitFen.split(p).length - 1);
-    const pcolor = p.toUpperCase() === p ? 'white' : 'black';
+    const pPlayerIndex = p.toUpperCase() === p ? 'p1' : 'p2';
     if (diff === 1) {
-      const prefix = renderPrefixStyle(pcolor, prefixStyle);
+      const prefix = renderPrefixStyle(pPlayerIndex, prefixStyle);
       const piece = renderPieceStyle(p, pieceStyle);
       return prefix + piece;
     }
@@ -289,17 +289,17 @@ export function renderSan(san: San, uci: Uci | undefined, style: Style) {
 export function renderPieces(pieces: Pieces, style: Style): VNode {
   return h(
     'div',
-    ['white', 'black'].map(color => {
+    ['p1', 'p2'].map(playerIndex => {
       const lists: any = [];
       ['king', 'queen', 'rook', 'bishop', 'knight', 'pawn', 'loachecker'].forEach(role => {
         const keys = [];
         for (const [key, piece] of pieces) {
-          if (piece.color === color && chessGroundRoleToLilaRole[piece.role] === role) keys.push(key);
+          if (piece.playerIndex === playerIndex && chessGroundRoleToLilaRole[piece.role] === role) keys.push(key);
         }
         if (keys.length) lists.push([`${role}${keys.length > 1 ? 's' : ''}`, ...keys]);
       });
       return h('div', [
-        h('h3', `${color} pieces`),
+        h('h3', `${playerIndex} pieces`),
         ...lists
           .map(
             (l: any) =>
@@ -318,7 +318,7 @@ export function renderPieceKeys(pieces: Pieces, p: string, style: Style): string
   const name = `${p === p.toUpperCase() ? 'white' : 'black'} ${roles[p.toUpperCase()]}`;
   const res: Key[] = [];
   for (const [k, piece] of pieces) {
-    if (piece && `${piece.color} ${chessGroundRoleToLilaRole[piece.role]}` === name) res.push(k as Key);
+    if (piece && `${piece.playerIndex} ${chessGroundRoleToLilaRole[piece.role]}` === name) res.push(k as Key);
   }
   return `${name}: ${res.length ? res.map(k => renderKey(k, style)).join(', ') : 'none'}`;
 }
@@ -328,7 +328,7 @@ export function renderPiecesOn(pieces: Pieces, rankOrFile: string, style: Style)
   for (const k of allKeys()) {
     if (k.includes(rankOrFile)) {
       const piece = pieces.get(k);
-      if (piece) res.push(`${renderKey(k, style)} ${piece.color} ${chessGroundRoleToLilaRole[piece.role]}`);
+      if (piece) res.push(`${renderKey(k, style)} ${piece.playerIndex} ${chessGroundRoleToLilaRole[piece.role]}`);
     }
   }
   return res.length ? res.join(', ') : 'blank';
@@ -336,7 +336,7 @@ export function renderPiecesOn(pieces: Pieces, rankOrFile: string, style: Style)
 
 export function renderBoard(
   pieces: Pieces,
-  pov: Color,
+  pov: PlayerIndex,
   pieceStyle: PieceStyle,
   prefixStyle: PrefixStyle,
   positionStyle: PositionStyle,
@@ -347,7 +347,7 @@ export function renderBoard(
   };
   const doFileHeaders = (): VNode => {
     const ths = files.map(file => h('th', { attrs: { scope: 'col' } }, file));
-    if (pov === 'black') ths.reverse();
+    if (pov === 'p2') ths.reverse();
     return h('tr', [h('td'), ...ths, h('td')]);
   };
   const renderPositionStyle = (rank: Rank, file: File, orig: string) => {
@@ -360,11 +360,17 @@ export function renderBoard(
         return orig;
     }
   };
-  const doPieceButton = (rank: Rank, file: File, letter: string, color: Color | 'none', text: string): VNode => {
+  const doPieceButton = (
+    rank: Rank,
+    file: File,
+    letter: string,
+    playerIndex: PlayerIndex | 'none',
+    text: string
+  ): VNode => {
     return h(
       'button',
       {
-        attrs: { rank: rank, file: file, piece: letter.toLowerCase(), color: color },
+        attrs: { rank: rank, file: file, piece: letter.toLowerCase(), playerIndex: playerIndex },
       },
       text
     );
@@ -375,29 +381,29 @@ export function renderBoard(
     const pieceWrapper = boardStyle === 'table' ? 'td' : 'span';
     if (piece) {
       const role = chessGroundRoleToLetter[piece.role];
-      const pieceText = renderPieceStyle(piece.color === 'white' ? role.toUpperCase() : role, pieceStyle);
-      const prefix = renderPrefixStyle(piece.color, prefixStyle);
+      const pieceText = renderPieceStyle(piece.playerIndex === 'p1' ? role.toUpperCase() : role, pieceStyle);
+      const prefix = renderPrefixStyle(piece.playerIndex, prefixStyle);
       const text = renderPositionStyle(rank, file, prefix + pieceText);
-      return h(pieceWrapper, doPieceButton(rank, file, role, piece.color, text));
+      return h(pieceWrapper, doPieceButton(rank, file, role, piece.playerIndex, text));
     } else {
       const letter = (key.charCodeAt(0) + key.charCodeAt(1)) % 2 ? '-' : '+';
       const text = renderPositionStyle(rank, file, letter);
       return h(pieceWrapper, doPieceButton(rank, file, letter, 'none', text));
     }
   };
-  const doRank = (pov: Color, rank: Rank): VNode => {
+  const doRank = (pov: PlayerIndex, rank: Rank): VNode => {
     const rankElements = [];
     if (boardStyle === 'table') rankElements.push(doRankHeader(rank));
     rankElements.push(...files.map(file => doPiece(rank, file)));
     if (boardStyle === 'table') rankElements.push(doRankHeader(rank));
-    if (pov === 'black') rankElements.reverse();
+    if (pov === 'p2') rankElements.reverse();
     return h(boardStyle === 'table' ? 'tr' : 'div', rankElements);
   };
   const ranks: VNode[] = [];
   if (boardStyle === 'table') ranks.push(doFileHeaders());
   ranks.push(...invRanks.map(rank => doRank(pov, rank)));
   if (boardStyle === 'table') ranks.push(doFileHeaders());
-  if (pov === 'black') ranks.reverse();
+  if (pov === 'p2') ranks.reverse();
   return h(boardStyle === 'table' ? 'table.board-wrapper' : 'div.board-wrapper', ranks);
 }
 
@@ -495,10 +501,10 @@ export function pieceJumpingHandler(wrapSound: () => void, errorSound: () => voi
   };
 }
 
-export function arrowKeyHandler(pov: Color, borderSound: () => void) {
+export function arrowKeyHandler(pov: PlayerIndex, borderSound: () => void) {
   return (ev: KeyboardEvent) => {
     const $currBtn = $(ev.target as HTMLElement);
-    const $isWhite = pov === 'white';
+    const $isWhite = pov === 'p1';
     let $file = $currBtn.attr('file') ?? ' ';
     let $rank = Number($currBtn.attr('rank'));
     if (ev.key === 'ArrowUp') {
@@ -523,21 +529,21 @@ export function arrowKeyHandler(pov: Color, borderSound: () => void) {
   };
 }
 
-export function selectionHandler(opponentColor: Color, selectSound: () => void) {
+export function selectionHandler(opponentPlayerIndex: PlayerIndex, selectSound: () => void) {
   return (ev: MouseEvent) => {
     // this depends on the current document structure. This may not be advisable in case the structure wil change.
     const $evBtn = $(ev.target as HTMLElement);
     const $rank = $evBtn.attr('rank');
     const $pos = ($evBtn.attr('file') ?? '') + $rank;
     const $boardLive = $('.boardstatus');
-    const $promotionRank = opponentColor === 'black' ? '8' : '1';
+    const $promotionRank = opponentPlayerIndex === 'p2' ? '8' : '1';
     const $moveBox = $(document.querySelector('input.move') as HTMLInputElement);
     if (!$moveBox) return false;
 
     // if no move in box yet
     if ($moveBox.val() === '') {
       // if user selects anothers' piece first
-      if ($evBtn.attr('color') === opponentColor) return false;
+      if ($evBtn.attr('playerIndex') === opponentPlayerIndex) return false;
       // as long as the user is selecting a piece and not a blank tile
       if ($evBtn.text().match(/^[^\-+]+/g)) {
         $moveBox.val($pos);
@@ -545,7 +551,7 @@ export function selectionHandler(opponentColor: Color, selectSound: () => void) 
       }
     } else {
       // if user selects their own piece second
-      if ($evBtn.attr('color') === (opponentColor === 'black' ? 'white' : 'black')) return false;
+      if ($evBtn.attr('playerIndex') === (opponentPlayerIndex === 'p2' ? 'p1' : 'p2')) return false;
 
       const $first = $moveBox.val();
       const $firstPiece = $('.board-wrapper [file="' + $first[0] + '"][rank="' + $first[1] + '"]');
@@ -603,13 +609,13 @@ export function lastCapturedCommandHandler(steps: () => string[], pieceStyle: Pi
   };
 }
 
-export function possibleMovesHandler(color: Color, fen: () => string, pieces: () => Pieces) {
+export function possibleMovesHandler(playerIndex: PlayerIndex, fen: () => string, pieces: () => Pieces) {
   return (ev: KeyboardEvent) => {
     if (ev.key !== 'm' && ev.key !== 'M') return true;
     const $boardLive = $('.boardstatus');
     const $pieces = pieces();
-    const myTurnFen = color === 'white' ? 'w' : 'b';
-    const opponentTurnFen = color === 'white' ? 'b' : 'w';
+    const myTurnFen = playerIndex === 'p1' ? 'w' : 'b';
+    const opponentTurnFen = playerIndex === 'p2' ? 'b' : 'w';
 
     const $btn = $(ev.target as HTMLElement);
     const $pos = (($btn.attr('file') ?? '') + $btn.attr('rank')) as SquareName;

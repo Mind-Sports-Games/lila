@@ -67,7 +67,7 @@ final class Editor(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       OptionResult(env.game.gameRepo game id) { game =>
         Redirect {
-          if (game.playable) routes.Round.watcher(game.id, game.variant.startColor.name)
+          if (game.playable) routes.Round.watcher(game.id, game.variant.startPlayer.name)
           else routes.Editor.load(get("fen") | (Forsyth.>>(game.variant.gameLogic, game.chess)).value)
         }
       }

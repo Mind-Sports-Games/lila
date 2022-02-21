@@ -943,7 +943,7 @@
     "@babel/helper-validator-identifier" "^7.15.7"
     to-fast-properties "^2.0.0"
 
-"@badrap/result@^0.2.8":
+"@badrap/result@^0.2", "@badrap/result@^0.2.8":
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/@badrap/result/-/result-0.2.8.tgz#76b835c17c4c2d12575a4b205a7df3d14e3ad39c"
   integrity sha512-zC6LgWe8QWSTwxfQVoRyieFaTbCJ2WYvpJdZ0fONoUJT1ln/oWNb3zBPlPP5J9ehLAaFIZJ7aB8oISzYFs6grQ==
@@ -2480,15 +2480,23 @@ chartjs-color@^2.1.0:
   version "0.10.2"
   resolved "https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249"
 
-"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.14":
-  version "7.11.1-pstrat2.14"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#92cc423d58d676df8b4513c22ca2b20d05d1d4e6"
+"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.16":
+  version "7.11.1-pstrat2.16"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#e29d39ef220dd9f210ad79320181ce0d1d497078"
 
-"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.4":
-  version "0.8.1-pstrat3.4"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#f02ee249c2853b96f540454572e5d320f7ee3bbf"
+chessops@^0.10.4:
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/chessops/-/chessops-0.10.4.tgz#a5bc17e4fc5047a84f0eea510980bddc8aeda0f4"
+  integrity sha512-n84zaa2qwBJ+Tj2OM9rHN/3pyC+VUe5YkkMCk4lFif1d/GdgR9IOY7nkYZ9Z8mTawxQRlfr8ar2VJEx2l1xiyw==
+  dependencies:
+    "@badrap/result" "^0.2"
+
+"chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.9":
+  version "0.8.1-pstrat3.9"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#8294d3fe13ec642a89913f917ff5636bce95c131"
   dependencies:
     "@badrap/result" "^0.2.8"
+    chessops "^0.10.4"
 
 chokidar@^2.0.0:
   version "2.1.8"

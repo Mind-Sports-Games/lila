@@ -61,12 +61,12 @@ export function findTag(tags: TagArray[], name: string): string | undefined {
   return t && t[1];
 }
 
-export function resultOf(tags: TagArray[], isWhite: boolean): string | undefined {
+export function resultOf(tags: TagArray[], isP1: boolean): string | undefined {
   switch (findTag(tags, 'result')) {
     case '1-0':
-      return isWhite ? '1' : '0';
+      return isP1 ? '1' : '0';
     case '0-1':
-      return isWhite ? '0' : '1';
+      return isP1 ? '0' : '1';
     case '1/2-1/2':
       return '1/2';
     default:

@@ -69,17 +69,17 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
   let result: string | undefined;
   if (status.finished(ctrl.data))
     switch (ctrl.data.game.winner) {
-      case 'white':
+      case 'p1':
         result = ctrl.data.pref.draughtsResult ? '2-0' : '1-0';
         break;
-      case 'black':
+      case 'p2':
         result = ctrl.data.pref.draughtsResult ? '0-2' : '0-1';
         break;
       default:
         result = ctrl.data.pref.draughtsResult ? '1-1' : '½-½';
     }
   if (result || status.aborted(ctrl.data)) {
-    const winner = ctrl.data.game.winner;
+    const winner = ctrl.data.game.winnerPlayer;
     return h('div.result-wrap', [
       h('p.result', result || ''),
       h(
@@ -90,7 +90,10 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [viewStatus(ctrl), winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.noarg(winner + 'IsVictorious') : '']
+        [
+          viewStatus(ctrl),
+          winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.trans('playerIndexIsVictorious', winner) : '',
+        ]
       ),
     ]);
   }
@@ -135,7 +138,7 @@ export function analysisButton(ctrl: RoundController): VNode | undefined {
           },
           attrs: {
             title: ctrl.noarg('analysis'),
-            href: gameRoute(ctrl.data, ctrl.data.player.color) + '/analysis#' + ctrl.ply,
+            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + ctrl.ply,
             'data-icon': 'A',
           },
         },
@@ -162,7 +165,7 @@ function renderButtons(ctrl: RoundController) {
               target.getAttribute('data-act') || (target.parentNode as HTMLElement).getAttribute('data-act');
             if (action === 'flip') {
               if (d.tv) location.href = '/tv/' + d.tv.channel + (d.tv.flip ? '' : '?flip=1');
-              else if (d.player.spectator) location.href = gameRoute(d, d.opponent.color);
+              else if (d.player.spectator) location.href = gameRoute(d, d.opponent.playerIndex);
               else ctrl.flipNow();
             }
           }
@@ -200,12 +203,12 @@ function renderButtons(ctrl: RoundController) {
   );
 }
 
-function initMessage(d: RoundData, trans: TransNoArg) {
+function initMessage(d: RoundData, trans: Trans) {
   return game.playable(d) && d.game.turns === 0 && !d.player.spectator
     ? h('div.message', util.justIcon(''), [
         h('div', [
-          trans(d.player.color === 'white' ? 'youPlayTheWhitePieces' : 'youPlayTheBlackPieces'),
-          ...(d.player.color === 'white' ? [h('br'), h('strong', trans('itsYourTurn'))] : []),
+          trans('youPlayThePlayerIndexPieces', d.player.playerName),
+          ...(d.player.playerIndex === 'p1' ? [h('br'), h('strong', trans.noarg('itsYourTurn'))] : []),
         ]),
       ])
     : null;
@@ -259,7 +262,7 @@ export function render(ctrl: RoundController): VNode | undefined {
     ? undefined
     : h(rmovesTag, [
         renderButtons(ctrl),
-        initMessage(d, ctrl.trans.noarg) ||
+        initMessage(d, ctrl.trans) ||
           (moves
             ? isCol1()
               ? h('div.col1-moves', [

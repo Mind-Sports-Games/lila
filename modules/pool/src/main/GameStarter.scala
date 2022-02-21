@@ -2,8 +2,7 @@ package lila.pool
 
 import scala.concurrent.duration._
 
-import strategygames.{ Game => StratGame }
-import strategygames.Color.{ Black, White }
+import strategygames.{ Game => StratGame, P1, P2 }
 import strategygames.chess
 
 import lila.game.{ Game, GameRepo, IdGenerator, Player }
@@ -46,22 +45,22 @@ final private class GameStarter(
     import cats.implicits._
     (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) ?? { case (perf1, perf2) =>
       for {
-        p1White <- userRepo.firstGetsWhite(p1.userId, p2.userId)
-        (whitePerf, blackPerf)     = if (p1White) perf1 -> perf2 else perf2 -> perf1
-        (whiteMember, blackMember) = if (p1White) p1 -> p2 else p2 -> p1
+        p1P1 <- userRepo.firstGetsP1(p1.userId, p2.userId)
+        (p1Perf, p2Perf)     = if (p1P1) perf1 -> perf2 else perf2 -> perf1
+        (p1Member, p2Member) = if (p1P1) p1 -> p2 else p2 -> p1
         game = makeGame(
           id,
           pool,
-          whiteMember.userId -> whitePerf,
-          blackMember.userId -> blackPerf
+          p1Member.userId -> p1Perf,
+          p2Member.userId -> p2Perf
         ).start
         _ <- gameRepo insertDenormalized game
       } yield {
         onStart(Game.Id(game.id))
         Pairing(
           game,
-          whiteSri = whiteMember.sri,
-          blackSri = blackMember.sri
+          p1Sri = p1Member.sri,
+          p2Sri = p2Member.sri
         ).some
       }
     }
@@ -70,8 +69,8 @@ final private class GameStarter(
   private def makeGame(
       id: Game.ID,
       pool: PoolConfig,
-      whiteUser: (User.ID, Perf),
-      blackUser: (User.ID, Perf)
+      p1User: (User.ID, Perf),
+      p2User: (User.ID, Perf)
   ) =
     Game(
       id = id,
@@ -81,8 +80,8 @@ final private class GameStarter(
           clock = pool.clock.toClock.some
         )
       ),
-      whitePlayer = Player.make(White, whiteUser),
-      blackPlayer = Player.make(Black, blackUser),
+      p1Player = Player.make(P1, p1User),
+      p2Player = Player.make(P2, p2User),
       mode = strategygames.Mode.Rated,
       status = strategygames.Status.Created,
       daysPerTurn = none,

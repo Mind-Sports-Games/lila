@@ -16,7 +16,7 @@ export function running(ctrl: AnalyseCtrl): boolean {
 
 export function render(ctrl: AnalyseCtrl): VNode {
   const study = ctrl.study!,
-    isMyMove = ctrl.turnColor() === ctrl.data.orientation,
+    isMyMove = ctrl.turnPlayerIndex() === ctrl.data.orientation,
     isCommented = !!(ctrl.node.comments || []).find(c => c.text.length > 2),
     hasVariation = ctrl.tree.parentNode(ctrl.path).children.length > 1;
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="moveToStart">Grit un taol evit kregiñ</string>
+  <string name="youPlayThePlayerIndexPiecesInAllPuzzles">C\'hoari a rit gant %s e pep poelladenn</string>
   <string name="youPlayTheWhitePiecesInAllPuzzles">C\'hoari a rit gant ar re wenn e pep poelladenn</string>
   <string name="youPlayTheBlackPiecesInAllPuzzles">C\'hoari a rit gant ar re zu e pep poelladenn</string>
   <string name="puzzlesSolved">poelladennoù diskoulmet</string>

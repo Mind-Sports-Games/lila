@@ -5,7 +5,7 @@ import scala.concurrent.Promise
 import scala.concurrent.duration._
 
 import strategygames.format.Uci
-import strategygames.{ Color, Move, MoveMetrics }
+import strategygames.{ Player => PlayerIndex, Move, MoveMetrics }
 
 import lila.common.IpAddress
 import lila.game.Game.PlayerId
@@ -15,17 +15,17 @@ case class ByePlayer(playerId: PlayerId)
 case class GetSocketStatus(promise: Promise[SocketStatus])
 case class SocketStatus(
     version: SocketVersion,
-    whiteOnGame: Boolean,
-    whiteIsGone: Boolean,
-    blackOnGame: Boolean,
-    blackIsGone: Boolean
+    p1OnGame: Boolean,
+    p1IsGone: Boolean,
+    p2OnGame: Boolean,
+    p2IsGone: Boolean
 ) {
-  def onGame(color: Color)     = color.fold(whiteOnGame, blackOnGame)
-  def isGone(color: Color)     = color.fold(whiteIsGone, blackIsGone)
-  def colorsOnGame: Set[Color] = Color.all.filter(onGame).toSet
+  def onGame(playerIndex: PlayerIndex)     = playerIndex.fold(p1OnGame, p2OnGame)
+  def isGone(playerIndex: PlayerIndex)     = playerIndex.fold(p1IsGone, p2IsGone)
+  def playerIndexsOnGame: Set[PlayerIndex] = PlayerIndex.all.filter(onGame).toSet
 }
-case class RoomCrowd(white: Boolean, black: Boolean)
-case class BotConnected(color: Color, v: Boolean)
+case class RoomCrowd(p1: Boolean, p2: Boolean)
+case class BotConnected(playerIndex: PlayerIndex, v: Boolean)
 
 package round {
 
@@ -53,12 +53,12 @@ package round {
   object Moretime { val defaultDuration = 15.seconds }
   case class Moretime(playerId: PlayerId, seconds: FiniteDuration = Moretime.defaultDuration)
   case object QuietFlag
-  case class ClientFlag(color: Color, fromPlayerId: Option[PlayerId])
+  case class ClientFlag(playerIndex: PlayerIndex, fromPlayerId: Option[PlayerId])
   case object Abandon
   case class ForecastPlay(lastMove: Move)
-  case class Cheat(color: Color)
+  case class Cheat(playerIndex: PlayerIndex)
   case class HoldAlert(playerId: PlayerId, mean: Int, sd: Int, ip: IpAddress)
-  case class GoBerserk(color: Color, promise: Promise[Boolean])
+  case class GoBerserk(playerIndex: PlayerIndex, promise: Promise[Boolean])
   case object NoStart
   case object StartClock
   case object TooManyPlies

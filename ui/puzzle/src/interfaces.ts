@@ -77,7 +77,7 @@ export interface Vm {
   nodeList: Tree.Node[];
   node: Tree.Node;
   mainline: Tree.Node[];
-  pov: Color;
+  pov: PlayerIndex;
   mode: 'play' | 'view' | 'try';
   round?: PuzzleRound;
   next: Deferred<PuzzleData>;
@@ -157,7 +157,7 @@ export interface PuzzlePlayer {
   userId: string;
   name: string;
   title?: string;
-  color: Color;
+  playerIndex: PlayerIndex;
 }
 
 export interface PuzzleUser {

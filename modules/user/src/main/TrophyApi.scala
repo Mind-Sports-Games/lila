@@ -42,21 +42,24 @@ final class TrophyApi(
         user = user.id,
         kind = kindCache sync TrophyKind.moderator,
         date = org.joda.time.DateTime.now,
-        url = none
+        url = none,
+        name = none
       ),
       isDev option Trophy(
         _id = "",
         user = user.id,
         kind = kindCache sync TrophyKind.developer,
         date = org.joda.time.DateTime.now,
-        url = none
+        url = none,
+        name = none
       ),
       isVerified option Trophy(
         _id = "",
         user = user.id,
         kind = kindCache sync TrophyKind.verified,
         date = org.joda.time.DateTime.now,
-        url = none
+        url = none,
+        name = none
       )
     ).flatten
 

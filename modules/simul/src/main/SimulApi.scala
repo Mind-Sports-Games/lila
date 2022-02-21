@@ -2,7 +2,7 @@ package lila.simul
 
 import akka.actor._
 import strategygames.variant.Variant
-import strategygames.GameLogic
+import strategygames.{ GameLogic, Player => PlayerIndex }
 import play.api.libs.json.Json
 import scala.concurrent.duration._
 
@@ -57,7 +57,7 @@ final class SimulApi(
       variants = setup.actualVariants,
       position = setup.realPosition,
       host = me,
-      color = setup.color,
+      playerIndex = setup.playerIndex,
       text = setup.text,
       estimatedStartAt = setup.estimatedStartAt,
       team = setup.team,
@@ -74,7 +74,7 @@ final class SimulApi(
       clock = setup.clock,
       variants = setup.actualVariants,
       position = setup.realPosition,
-      color = setup.color.some,
+      playerIndex = setup.playerIndex.some,
       text = setup.text,
       estimatedStartAt = setup.estimatedStartAt,
       team = setup.team,
@@ -124,8 +124,8 @@ final class SimulApi(
                 games.headOption foreach { case (game, _) =>
                   socket.startSimul(simul, game)
                 }
-                games.foldLeft(started) { case (s, (g, hostColor)) =>
-                  s.setPairingHostColor(g.id, hostColor)
+                games.foldLeft(started) { case (s, (g, hostPlayerIndex)) =>
+                  s.setPairingHostPlayerIndex(g.id, hostPlayerIndex)
                 }
               }
             } flatMap { s =>
@@ -234,15 +234,15 @@ final class SimulApi(
 
   private def makeGame(simul: Simul, host: User)(
       pairingAndNumber: (SimulPairing, Int)
-  ): Fu[(Game, strategygames.Color)] =
+  ): Fu[(Game, PlayerIndex)] =
     pairingAndNumber match {
       case (pairing, number) =>
         for {
           user <- userRepo byId pairing.player.user orFail s"No user with id ${pairing.player.user}"
-          hostColor = simul.hostColor | strategygames.Color.fromWhite(number % 2 == 0)
-          whiteUser = hostColor.fold(host, user)
-          blackUser = hostColor.fold(user, host)
-          clock     = simul.clock.chessClockOf(hostColor)
+          hostPlayerIndex = simul.hostPlayerIndex | PlayerIndex.fromP1(number % 2 == 0)
+          p1User = hostPlayerIndex.fold(host, user)
+          p2User = hostPlayerIndex.fold(user, host)
+          clock     = simul.clock.chessClockOf(hostPlayerIndex)
           perfPicker =
             lila.game.PerfPicker.mainOrDefault(strategygames.Speed(clock.config), pairing.player.variant, none)
           game1 = Game.make(
@@ -255,8 +255,8 @@ final class SimulApi(
                 fen = simul.position
               )
               .copy(clock = clock.start.some),
-            whitePlayer = lila.game.Player.make(strategygames.White, whiteUser.some, perfPicker),
-            blackPlayer = lila.game.Player.make(strategygames.Black, blackUser.some, perfPicker),
+            p1Player = lila.game.Player.make(strategygames.P1, p1User.some, perfPicker),
+            p2Player = lila.game.Player.make(strategygames.P2, p2User.some, perfPicker),
             mode = strategygames.Mode.Casual,
             source = lila.game.Source.Simul,
             pgnImport = None
@@ -270,7 +270,7 @@ final class SimulApi(
             (gameRepo insertDenormalized game2) >>-
               onGameStart(game2.id) >>-
               socket.startGame(simul, game2)
-        } yield game2 -> hostColor
+        } yield game2 -> hostPlayerIndex
     }
 
   private def update(simul: Simul): Funit =

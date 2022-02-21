@@ -2,7 +2,7 @@ package lila.game
 
 import play.api.libs.json._
 
-import strategygames.{ Board, Centis, Color, GameFamily, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, White, Black }
+import strategygames.{ Board, Centis, Player => PlayerIndex, GameFamily, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, P1, P2 }
 import strategygames.chess
 import strategygames.variant.Variant
 import strategygames.format.Forsyth
@@ -13,11 +13,11 @@ import lila.common.ApiVersion
 sealed trait Event {
   def typ: String
   def data: JsValue
-  def only: Option[Color]   = None
+  def only: Option[PlayerIndex]   = None
   def owner: Boolean        = false
   def watcher: Boolean      = false
   def troll: Boolean        = false
-  def moveBy: Option[Color] = None
+  def moveBy: Option[PlayerIndex] = None
 }
 
 object Event {
@@ -59,8 +59,8 @@ object Event {
         .add("winner" -> state.winner)
         .add("check" -> check)
         .add("threefold" -> threefold)
-        .add("wDraw" -> state.whiteOffersDraw)
-        .add("bDraw" -> state.blackOffersDraw)
+        .add("wDraw" -> state.p1OffersDraw)
+        .add("bDraw" -> state.p2OffersDraw)
         .add("crazyhouse" -> pocketData)
         .add("drops" -> possibleDrops.map { squares =>
           JsString(squares.map(_.key).mkString)
@@ -111,7 +111,7 @@ object Event {
           .add("enpassant" -> enpassant.map(_.data))
           .add("castle" -> castle.map(_.data))
       }
-    override def moveBy = Some(!state.color)
+    override def moveBy = Some(!state.playerIndex)
   }
   object Move {
     def apply(
@@ -143,10 +143,10 @@ object Event {
         threefold = situation.threefoldRepetition,
         promotion = move.promotion.map { Promotion(_, move.dest) },
         enpassant = (move.capture ifTrue move.enpassant).map {
-          (capture: List[Pos]) => Event.Enpassant(capture(0), !move.color)
+          (capture: List[Pos]) => Event.Enpassant(capture(0), !move.player)
         },
         castle = move.castle.map { case (king, rook) =>
-          Castling(king, rook, move.color)
+          Castling(king, rook, move.player)
         },
         state = state,
         clock = clock,
@@ -214,7 +214,7 @@ object Event {
           "san"  -> san
         )
       }
-    override def moveBy = Some(!state.color)
+    override def moveBy = Some(!state.playerIndex)
   }
   object Drop {
     def apply(
@@ -294,27 +294,27 @@ object Event {
         }
   }
 
-  case class Enpassant(pos: Pos, color: Color) extends Event {
+  case class Enpassant(pos: Pos, playerIndex: PlayerIndex) extends Event {
     def typ = "enpassant"
     def data =
       Json.obj(
         "key"   -> pos.key,
-        "color" -> color
+        "playerIndex" -> playerIndex
       )
   }
 
-  case class Castling(king: (Pos, Pos), rook: (Pos, Pos), color: Color) extends Event {
+  case class Castling(king: (Pos, Pos), rook: (Pos, Pos), playerIndex: PlayerIndex) extends Event {
     def typ = "castling"
     def data =
       Json.obj(
         "king"  -> Json.arr(king._1.key, king._2.key),
         "rook"  -> Json.arr(rook._1.key, rook._2.key),
-        "color" -> color
+        "playerIndex" -> playerIndex
       )
   }
 
   case class RedirectOwner(
-      color: Color,
+      playerIndex: PlayerIndex,
       id: String,
       cookie: Option[JsObject]
   ) extends Event {
@@ -326,7 +326,7 @@ object Event {
           "url" -> s"/$id"
         )
         .add("cookie" -> cookie)
-    override def only = Some(color)
+    override def only = Some(playerIndex)
   }
 
   case class Promotion(role: PromotableRole, pos: Pos) extends Event {
@@ -360,7 +360,7 @@ object Event {
   }
 
   // for mobile app BC only
-  case class End(winner: Option[Color]) extends Event {
+  case class End(winner: Option[PlayerIndex]) extends Event {
     def typ  = "end"
     def data = Json.toJson(winner)
   }
@@ -370,19 +370,21 @@ object Event {
     def data =
       Json
         .obj(
-          "winner" -> game.winnerColor,
+          "winner" -> game.winnerPlayerIndex,
+          "winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames),
+          "loserPlayer" -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)),
           "status" -> game.status
         )
         .add("clock" -> game.clock.map { c =>
           Json.obj(
-            "wc" -> c.remainingTime(White).centis,
-            "bc" -> c.remainingTime(Black).centis
+            "wc" -> c.remainingTime(P1).centis,
+            "bc" -> c.remainingTime(P2).centis
           )
         })
         .add("ratingDiff" -> ratingDiff.map { rds =>
           Json.obj(
-            Color.White.name -> rds.white,
-            Color.Black.name -> rds.black
+            PlayerIndex.P1.name -> rds.p1,
+            PlayerIndex.P2.name -> rds.p2
           )
         })
         .add("boosted" -> game.boosted)
@@ -400,7 +402,7 @@ object Event {
 
   // use t:reload for mobile app BC,
   // but send extra data for the web to avoid reloading
-  case class RematchOffer(by: Option[Color]) extends Event {
+  case class RematchOffer(by: Option[PlayerIndex]) extends Event {
     def typ            = "reload"
     def data           = reloadOr("rematchOffer", by)
     override def owner = true
@@ -411,119 +413,119 @@ object Event {
     def data = reloadOr("rematchTaken", nextId)
   }
 
-  case class DrawOffer(by: Option[Color]) extends Event {
+  case class DrawOffer(by: Option[PlayerIndex]) extends Event {
     def typ  = "reload"
     def data = reloadOr("drawOffer", by)
   }
 
-  case class ClockInc(color: Color, time: Centis) extends Event {
+  case class ClockInc(playerIndex: PlayerIndex, time: Centis) extends Event {
     def typ = "clockInc"
     def data =
       Json.obj(
-        "color" -> color,
+        "playerIndex" -> playerIndex,
         "time"  -> time.centis
       )
   }
 
   sealed trait ClockEvent extends Event
 
-  case class Clock(white: Centis, black: Centis, nextLagComp: Option[Centis] = None) extends ClockEvent {
+  case class Clock(p1: Centis, p2: Centis, nextLagComp: Option[Centis] = None) extends ClockEvent {
     def typ = "clock"
     def data =
       Json
         .obj(
-          "white" -> white.toSeconds,
-          "black" -> black.toSeconds
+          "p1" -> p1.toSeconds,
+          "p2" -> p2.toSeconds
         )
         .add("lag" -> nextLagComp.collect { case Centis(c) if c > 1 => c })
   }
   object Clock {
     def apply(clock: strategygames.Clock): Clock =
       Clock(
-        clock remainingTime White,
-        clock remainingTime Black,
-        clock lagCompEstimate clock.color
+        clock remainingTime P1,
+        clock remainingTime P2,
+        clock lagCompEstimate clock.player
       )
   }
 
-  case class Berserk(color: Color) extends Event {
+  case class Berserk(playerIndex: PlayerIndex) extends Event {
     def typ  = "berserk"
-    def data = Json.toJson(color)
+    def data = Json.toJson(playerIndex)
   }
 
-  case class CorrespondenceClock(white: Float, black: Float) extends ClockEvent {
+  case class CorrespondenceClock(p1: Float, p2: Float) extends ClockEvent {
     def typ  = "cclock"
-    def data = Json.obj("white" -> white, "black" -> black)
+    def data = Json.obj("p1" -> p1, "p2" -> p2)
   }
   object CorrespondenceClock {
     def apply(clock: lila.game.CorrespondenceClock): CorrespondenceClock =
-      CorrespondenceClock(clock.whiteTime, clock.blackTime)
+      CorrespondenceClock(clock.p1Time, clock.p2Time)
   }
 
-  case class CheckCount(white: Int, black: Int) extends Event {
+  case class CheckCount(p1: Int, p2: Int) extends Event {
     def typ = "checkCount"
     def data =
       Json.obj(
-        "white" -> white,
-        "black" -> black
+        "p1" -> p1,
+        "p2" -> p2
       )
   }
 
-  case class KingMoves(white: Int, black: Int, whiteKing: Option[Pos], blackKing: Option[Pos]) extends Event {
+  case class KingMoves(p1: Int, p2: Int, p1King: Option[Pos], p2King: Option[Pos]) extends Event {
     def typ = "kingMoves"
     def data = Json.obj(
-      "white" -> white,
-      "black" -> black,
-      "whiteKing" -> whiteKing.map(_.toString),
-      "blackKing" -> blackKing.map(_.toString)
+      "p1" -> p1,
+      "p2" -> p2,
+      "p1King" -> p1King.map(_.toString),
+      "p2King" -> p2King.map(_.toString)
     )
   }
 
   case class State(
-      color: Color,
+      playerIndex: PlayerIndex,
       turns: Int,
       status: Option[Status],
-      winner: Option[Color],
-      whiteOffersDraw: Boolean,
-      blackOffersDraw: Boolean
+      winner: Option[PlayerIndex],
+      p1OffersDraw: Boolean,
+      p2OffersDraw: Boolean
   ) extends Event {
     def typ = "state"
     def data =
       Json
         .obj(
-          "color" -> color,
+          "playerIndex" -> playerIndex,
           "turns" -> turns
         )
         .add("status" -> status)
         .add("winner" -> winner)
-        .add("wDraw" -> whiteOffersDraw)
-        .add("bDraw" -> blackOffersDraw)
+        .add("wDraw" -> p1OffersDraw)
+        .add("bDraw" -> p2OffersDraw)
   }
 
   case class TakebackOffers(
-      white: Boolean,
-      black: Boolean
+      p1: Boolean,
+      p2: Boolean
   ) extends Event {
     def typ = "takebackOffers"
     def data =
       Json
         .obj()
-        .add("white" -> white)
-        .add("black" -> black)
+        .add("p1" -> p1)
+        .add("p2" -> p2)
     override def owner = true
   }
 
   case class Crowd(
-      white: Boolean,
-      black: Boolean,
+      p1: Boolean,
+      p2: Boolean,
       watchers: Option[JsValue]
   ) extends Event {
     def typ = "crowd"
     def data =
       Json
         .obj(
-          "white" -> white,
-          "black" -> black
+          "p1" -> p1,
+          "p2" -> p2
         )
         .add("watchers" -> watchers)
   }

@@ -314,11 +314,12 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 'select#chapter-orientation.form-control',
                 {
                   hook: bind('change', e => {
-                    ctrl.vm.editor && ctrl.vm.editor.setOrientation((e.target as HTMLInputElement).value as Color);
+                    ctrl.vm.editor &&
+                      ctrl.vm.editor.setOrientation((e.target as HTMLInputElement).value as PlayerIndex);
                   }),
                 },
-                ['white', 'black'].map(function (color) {
-                  return option(color, currentChapter.setup.orientation, noarg(color));
+                ['p1', 'p2'].map(function (playerIndex) {
+                  return option(playerIndex, currentChapter.setup.orientation, noarg(playerIndex));
                 })
               ),
             ]),

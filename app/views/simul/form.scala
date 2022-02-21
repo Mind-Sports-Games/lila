@@ -115,8 +115,8 @@ object form {
         )(
           form3.select(_, clockExtraChoices)
         ),
-        form3.group(form("color"), raw("Host color for each game"), half = true)(
-          form3.select(_, colorChoices)
+        form3.group(form("playerIndex"), raw("Host playerIndex for each game"), half = true)(
+          form3.select(_, playerIndexChoices)
         )
       ),
       form3.split(

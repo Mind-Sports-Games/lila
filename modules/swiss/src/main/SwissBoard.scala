@@ -7,8 +7,8 @@ import lila.game.Game
 
 private case class SwissBoard(
     gameId: Game.ID,
-    white: SwissBoard.Player,
-    black: SwissBoard.Player,
+    p1: SwissBoard.Player,
+    p2: SwissBoard.Player,
     // TODO: This interface seems ugly, but I guess it's fine.
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
@@ -63,16 +63,16 @@ final private class SwissBoardApi(
                 .take(displayBoards)
                 .flatMap { pairing =>
                   for {
-                    p1 <- playerMap get pairing.white
-                    p2 <- playerMap get pairing.black
+                    p1 <- playerMap get pairing.p1
+                    p2 <- playerMap get pairing.p2
                     u1 <- lightUserApi sync p1.userId
                     u2 <- lightUserApi sync p2.userId
                     r1 <- ranks get p1.userId
                     r2 <- ranks get p2.userId
                   } yield SwissBoard(
                     pairing.gameId,
-                    white = SwissBoard.Player(u1, r1, p1.rating),
-                    black = SwissBoard.Player(u2, r2, p2.rating),
+                    p1 = SwissBoard.Player(u1, r1, p1.rating),
+                    p2 = SwissBoard.Player(u2, r2, p2.rating),
                     isMicroMatch = pairing.isMicroMatch,
                     microMatchGameId = pairing.microMatchGameId
                   )

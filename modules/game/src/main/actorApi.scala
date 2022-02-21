@@ -7,10 +7,10 @@ case class StartGame(game: Game)
 
 case class FinishGame(
     game: Game,
-    white: Option[User],
-    black: Option[User]
+    p1: Option[User],
+    p2: Option[User]
 ) {
-  def isVsSelf = white.isDefined && white == black
+  def isVsSelf = p1.isDefined && p1 == p2
 }
 
 case class InsertGame(game: Game)

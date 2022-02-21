@@ -61,8 +61,8 @@ case class RealPlayers(players: Map[User.ID, RealPlayer]) {
         game.players.flatMap { player =>
           player.userId.flatMap(players.get) ?? { rp =>
             List(
-              rp.name.map { name => Tag(player.color.fold(Tag.White, Tag.Black), name) },
-              rp.rating.map { rating => Tag(player.color.fold(Tag.WhiteElo, Tag.BlackElo), rating.toString) }
+              rp.name.map { name => Tag(player.playerIndex.fold(Tag.P1, Tag.P2), name) },
+              rp.rating.map { rating => Tag(player.playerIndex.fold(Tag.P1Elo, Tag.P2Elo), rating.toString) }
             ).flatten
           }
         }

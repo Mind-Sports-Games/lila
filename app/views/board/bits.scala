@@ -1,7 +1,7 @@
 package views.html.board
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Color, Black, White }
+import strategygames.{ Player => PlayerIndex, P2, P1 }
 import strategygames.variant.Variant
 import strategygames.{ GameLogic, Situation }
 import strategygames.draughts.Board
@@ -19,35 +19,31 @@ object bits {
   sealed abstract class Orientation extends Product
 
   object Orientation {
-    final case object White extends Orientation
-    final case object Black extends Orientation
+    final case object P1 extends Orientation
+    final case object P2 extends Orientation
     final case object Left extends Orientation
     final case object Right extends Orientation
   }
 
-  def colorToOrientation(c: Color): Orientation =
+  def playerIndexToOrientation(c: PlayerIndex): Orientation =
     c match {
-        case White => Orientation.White
-        case Black => Orientation.Black
+        case P1 => Orientation.P1
+        case P2 => Orientation.P2
     }
 
   private val dataState = attr("data-state")
 
-  private def boardOrientation(variant: Variant, c: Color): Orientation =
+  private def boardOrientation(variant: Variant, c: PlayerIndex): Orientation =
     variant match {
-      case Variant.Chess(strategygames.chess.variant.RacingKings)   => Orientation.White
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction) => c match {
-          case White => Orientation.White
-          case Black => Orientation.Right
+      case Variant.Chess(strategygames.chess.variant.RacingKings)   => Orientation.P1
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction) | Variant.Chess(strategygames.chess.variant.ScrambledEggs) => c match {
+          case P1 => Orientation.P1
+          case P2 => Orientation.Right
         }
-      case Variant.Chess(strategygames.chess.variant.ScrambledEggs) => c match {
-          case White => Orientation.White
-          case Black => Orientation.Right
-        }
-      case _ => colorToOrientation(c)
+      case _ => playerIndexToOrientation(c)
     }
 
-  private def boardOrientation(pov: Pov): Orientation = boardOrientation(pov.game.variant, pov.color)
+  private def boardOrientation(pov: Pov): Orientation = boardOrientation(pov.game.variant, pov.playerIndex)
 
   private def boardSize(pov: Pov): Option[Board.BoardSize] = pov.game.variant match {
     case Variant.Draughts(v) => Some(v.boardSize)
@@ -55,7 +51,7 @@ object bits {
   }
   def mini(pov: Pov): Tag => Tag =
     miniWithOrientation(
-      FEN(pov.game.variant.gameLogic, Forsyth.boardAndColor(pov.game.variant.gameLogic, pov.game.situation)),
+      FEN(pov.game.variant.gameLogic, Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)),
       boardOrientation(pov),
       ~pov.game.lastMoveKeys,
       boardSize(pov),
@@ -64,7 +60,7 @@ object bits {
 
   def miniWithOrientation(
     fen: FEN,
-    orientation: Orientation = Orientation.White,
+    orientation: Orientation = Orientation.P1,
     lastMove: String = "",
     boardSizeOpt: Option[Board.BoardSize],
     variantKey: String = "standard"
@@ -82,26 +78,26 @@ object bits {
     } else {
       s"${fen.value},${orient},$lastMove"
     }
-    val extra = if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}" else ""
+    val extra = if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}" else s"${libName.toLowerCase()}"
     tag(
       cls := s"mini-board mini-board--init cg-wrap is2d variant-${variantKey} ${extra}",
       dataState := data
     )(cgWrapContent)
   }
 
-  def mini(fen: FEN, color: Color = White, variantKey: String, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, colorToOrientation(color), lastMove, None, variantKey)(tag)
+  def mini(fen: FEN, playerIndex: PlayerIndex = P1, variantKey: String, lastMove: String = "")(tag: Tag): Tag =
+    miniWithOrientation(fen, playerIndexToOrientation(playerIndex), lastMove, None, variantKey)(tag)
 
-  def miniForVariant(fen: FEN, variant: Variant, color: Color = White, lastMove: String = "")(tag: Tag): Tag =
-    miniWithOrientation(fen, boardOrientation(variant, color), lastMove, None, variant.key)(tag)
+  def miniForVariant(fen: FEN, variant: Variant, playerIndex: PlayerIndex = P1, lastMove: String = "")(tag: Tag): Tag =
+    miniWithOrientation(fen, boardOrientation(variant, playerIndex), lastMove, None, variant.key)(tag)
 
 
-  def miniSpan(fen: FEN, color: Color = White, variantKey: String, lastMove: String = "") =
-    mini(fen, color, variantKey, lastMove)(span)
+  def miniSpan(fen: FEN, playerIndex: PlayerIndex = P1, variantKey: String, lastMove: String = "") =
+    mini(fen, playerIndex, variantKey, lastMove)(span)
 
-  private def sitCanCastle(sit: Situation, color: Color, side: strategygames.chess.Side): Boolean =
+  private def sitCanCastle(sit: Situation, playerIndex: PlayerIndex, side: strategygames.chess.Side): Boolean =
     sit match {
-      case Situation.Chess(sit) => sit canCastle color on side
+      case Situation.Chess(sit) => sit canCastle playerIndex on side
       case _ => false
     }
 
@@ -112,12 +108,12 @@ object bits {
     Json.obj(
       "fen"     -> fen.value.split(" ").take(4).mkString(" "),
       "baseUrl" -> s"$netBaseUrl${routes.Editor.load("")}",
-      "color"   -> sit.color.letter.toString,
+      "playerIndex"   -> sit.player.letter.toString,
       "castles" -> Json.obj(
-        "K" -> sitCanCastle(sit, White, strategygames.chess.KingSide),
-        "Q" -> sitCanCastle(sit, White, strategygames.chess.QueenSide),
-        "k" -> sitCanCastle(sit, Black, strategygames.chess.KingSide),
-        "q" -> sitCanCastle(sit, Black, strategygames.chess.QueenSide)
+        "K" -> sitCanCastle(sit, P1, strategygames.chess.KingSide),
+        "Q" -> sitCanCastle(sit, P1, strategygames.chess.QueenSide),
+        "k" -> sitCanCastle(sit, P2, strategygames.chess.KingSide),
+        "q" -> sitCanCastle(sit, P2, strategygames.chess.QueenSide)
       ),
       "animation" -> Json.obj("duration" -> ctx.pref.animationMillis),
       "is3d"      -> ctx.pref.is3d,
@@ -135,8 +131,7 @@ object bits {
     trans.castling,
     trans.whiteCastlingKingside,
     trans.blackCastlingKingside,
-    trans.whitePlays,
-    trans.blackPlays,
+    trans.playerIndexPlays,
     trans.variant,
     trans.continueFromHere,
     trans.playWithTheMachine,

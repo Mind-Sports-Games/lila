@@ -96,7 +96,7 @@ object irwin {
             case lila.irwin.IrwinReport.GameReport.WithPov(gameReport, pov) =>
               tr(cls := "text")(
                 td(cls := "moves")(
-                  a(href := routes.Round.watcher(pov.gameId, pov.color.name))(
+                  a(href := routes.Round.watcher(pov.gameId, pov.playerIndex.name))(
                     gameReport.moves.map { move =>
                       span(
                         cls := percentClass(move.activation),
@@ -107,7 +107,7 @@ object irwin {
                   )
                 ),
                 td(
-                  a(href := routes.Round.watcher(pov.gameId, pov.color.name))(
+                  a(href := routes.Round.watcher(pov.gameId, pov.playerIndex.name))(
                     playerLink(
                       pov.opponent,
                       withRating = true,
@@ -131,7 +131,7 @@ object irwin {
                   em("assessment")
                 ),
                 td {
-                  val blurs = pov.game.playerBlurPercent(pov.color)
+                  val blurs = pov.game.playerBlurPercent(pov.playerIndex)
                   frag(strong(cls := percentClass(blurs))(blurs, "%"), " ", em("blurs"))
                 }
                 // td(

@@ -47,8 +47,10 @@
   <string name="forceDraw">Объявить ничью</string>
   <string name="talkInChat">Будьте вежливы в чате!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">С вами сыграет первый, кто перейдёт по этой ссылке.</string>
+  <string name="playerIndexResigned">%s сдались</string>
   <string name="whiteResigned">Белые сдались</string>
   <string name="blackResigned">Чёрные сдались</string>
+  <string name="playerIndexLeftTheGame">%s вышли из игры</string>
   <string name="whiteLeftTheGame">Белые вышли из игры</string>
   <string name="blackLeftTheGame">Чёрные вышли из игры</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Пригласите зрителей с помощью этой ссылки</string>
@@ -82,6 +84,7 @@
   <string name="drawn">Вничью</string>
   <string name="unknown">Неизвестно</string>
   <string name="database">Архив партий</string>
+  <string name="p1DrawP2">%1$s / Ничья / %2$s</string>
   <string name="whiteDrawBlack">Белые / Ничья / Чёрные</string>
   <string name="averageRatingX">Средний рейтинг: %s</string>
   <string name="recentGames">Недавние игры</string>
@@ -238,14 +241,17 @@
     <item quantity="other">%s партий с вами</item>
   </plurals>
   <string name="cancel">Отменить</string>
+  <string name="playerIndexTimeOut">%s просрочили время</string>
   <string name="whiteTimeOut">Белые просрочили время</string>
   <string name="blackTimeOut">Чёрные просрочили время</string>
   <string name="drawOfferSent">Предложение ничьей отправлено</string>
   <string name="drawOfferDeclined">Предложение ничьей отклонено</string>
   <string name="drawOfferAccepted">Предложение ничьей принято</string>
   <string name="drawOfferCanceled">Предложение ничьей отменено</string>
+  <string name="playerIndexOffersDraw">%s предлагают ничью</string>
   <string name="whiteOffersDraw">Белые предлагают ничью</string>
   <string name="blackOffersDraw">Чёрные предлагают ничью</string>
+  <string name="playerIndexDeclinesDraw">%s отклонили предложение ничьей</string>
   <string name="whiteDeclinesDraw">Белые отклонили предложение ничьей</string>
   <string name="blackDeclinesDraw">Чёрные отклонили предложение ничьей</string>
   <string name="yourOpponentOffersADraw">Ваш соперник предлагает вам ничью</string>
@@ -415,6 +421,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Кликните по доске и сделайте ход, чтобы доказать, что вы человек, а не компьютер. (Всем известно, что компьютеры не умеют играть в шахматы!).</string>
   <string name="captcha.fail">Пожалуйста, решите шахматную капчу.</string>
   <string name="notACheckmate">Это не мат</string>
+  <string name="playerIndexCheckmatesInOneMove">%s ставят мат в один ход</string>
   <string name="whiteCheckmatesInOneMove">Белые ставят мат в один ход</string>
   <string name="blackCheckmatesInOneMove">Чёрные ставят мат в один ход</string>
   <string name="retry">Повторить</string>
@@ -840,6 +847,7 @@
   <string name="hideBestMove">Скрыть лучший ход</string>
   <string name="getAHint">Взять подсказку</string>
   <string name="evaluatingYourMove">Оценка вашего хода...</string>
+  <string name="playerIndexWinsGame">%s выиграли</string>
   <string name="whiteWinsGame">Белые выиграли</string>
   <string name="blackWinsGame">Чёрные выиграли</string>
   <string name="learnFromYourMistakes">Разобрать свои ошибки</string>

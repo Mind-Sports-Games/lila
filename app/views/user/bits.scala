@@ -21,7 +21,7 @@ object bits {
         trans.tournamentWinners()
       ),
       a(cls := active.active("shield"), href := routes.Tournament.shields)("Shields"),
-      a(cls := active.active("bots"), href := routes.PlayApi.botOnline)("Online bots")
+      //a(cls := active.active("bots"), href := routes.PlayApi.botOnline)("Online bots")
     )
 
   def miniClosed(u: User)(implicit ctx: Context) =
@@ -45,7 +45,7 @@ object bits {
     }
 
   def perfTrophies(u: User, rankMap: lila.rating.UserRankMap)(implicit lang: Lang) =
-    !u.lame ??
+    (!u.lame && User.topPerfTrophiesEnabled) ??
       rankMap.toList.sortBy(_._2).collect {
         case (perf, rank) if rank == 1 =>
           span(cls := "trophy perf top1", title := s"${perf.trans} Champion!")(

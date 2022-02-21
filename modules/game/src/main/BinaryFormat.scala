@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Black, Board, Centis, Clock, ClockPlayer, Color, GameLogic, Piece, PieceMap, Pos, Role, Timestamp, White }
+import strategygames.{ P2, Board, Centis, Clock, ClockPlayer, Player => PlayerIndex, GameLogic, Piece, PieceMap, Pos, Role, Timestamp, P1 }
 import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.draughts
@@ -43,11 +43,11 @@ object BinaryFormat {
       if (flagged) decoded :+ Centis(0) else decoded
     }
 
-    def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[Color]) =
+    def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
       Try {
         ClockHistory(
-          readSide(start, bw, flagged has White),
-          readSide(start, bb, flagged has Black)
+          readSide(start, bw, flagged has P1),
+          readSide(start, bb, flagged has P2)
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },
@@ -90,21 +90,21 @@ object BinaryFormat {
 
   case class clock(start: Timestamp) {
 
-    def legacyElapsed(clock: Clock, color: Color) =
-      clock.limit - clock.players(color).remaining
+    def legacyElapsed(clock: Clock, playerIndex: PlayerIndex) =
+      clock.limit - clock.players(playerIndex).remaining
 
     def computeRemaining(config: Clock.Config, legacyElapsed: Centis) =
       config.limit - legacyElapsed
 
     def write(clock: Clock): ByteArray = {
       Array(writeClockLimit(clock.limitSeconds), clock.incrementSeconds.toByte) ++
-        writeSignedInt24(legacyElapsed(clock, White).centis) ++
-        writeSignedInt24(legacyElapsed(clock, Black).centis) ++
+        writeSignedInt24(legacyElapsed(clock, P1).centis) ++
+        writeSignedInt24(legacyElapsed(clock, P2).centis) ++
         clock.timer.fold(Array.empty[Byte])(writeTimer)
     }
 
-    def read(ba: ByteArray, whiteBerserk: Boolean, blackBerserk: Boolean): Color => Clock =
-      color => {
+    def read(ba: ByteArray, p1Berserk: Boolean, p2Berserk: Boolean): PlayerIndex => Clock =
+      playerIndex => {
         val ia = ba.value map toInt
 
         // ba.size might be greater than 12 with 5 bytes timers
@@ -118,20 +118,20 @@ object BinaryFormat {
         ia match {
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, _*) =>
             val config      = Clock.Config(readClockLimit(b1), b2)
-            val legacyWhite = Centis(readSignedInt24(b3, b4, b5))
-            val legacyBlack = Centis(readSignedInt24(b6, b7, b8))
+            val legacyP1 = Centis(readSignedInt24(b3, b4, b5))
+            val legacyP2 = Centis(readSignedInt24(b6, b7, b8))
             Clock(
               config = config,
-              color = color,
-              players = Color.Map(
+              player = playerIndex,
+              players = PlayerIndex.Map(
                 ClockPlayer
                   .withConfig(config)
-                  .copy(berserk = whiteBerserk)
-                  .setRemaining(computeRemaining(config, legacyWhite)),
+                  .copy(berserk = p1Berserk)
+                  .setRemaining(computeRemaining(config, legacyP1)),
                 ClockPlayer
                   .withConfig(config)
-                  .copy(berserk = blackBerserk)
-                  .setRemaining(computeRemaining(config, legacyBlack))
+                  .copy(berserk = p2Berserk)
+                  .setRemaining(computeRemaining(config, legacyP2))
               ),
               timer = timer
             )
@@ -212,7 +212,7 @@ object BinaryFormat {
     def writeChess(pieces: chess.PieceMap): ByteArray = {
       def posInt(pos: chess.Pos): Int =
         (pieces get pos).fold(0) { piece =>
-          piece.color.fold(0, 128) + piece.role.binaryInt
+          piece.player.fold(0, 128) + piece.role.binaryInt
         }
       ByteArray(chess.Pos.all.map(posInt(_).toByte).toArray)
     }
@@ -224,7 +224,7 @@ object BinaryFormat {
       }
       def intPiece(int: Int): Option[chess.Piece] =
         chess.Role.binaryInt(int & 127) map {
-          role => chess.Piece(Color.fromWhite((int & 128) == 0), role)
+          role => chess.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
         }
       (chess.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
@@ -243,7 +243,7 @@ object BinaryFormat {
 
     def writeDraughts(pieces: draughts.PieceMap, variant: draughts.variant.Variant): ByteArray = {
       def posInt(pos: draughts.Pos): Int = (pieces get pos).fold(0) { piece =>
-        piece.color.fold(0, 8) + piece.role.binaryInt
+        piece.player.fold(0, 8) + piece.role.binaryInt
       }
       ByteArray(groupedPos(variant.boardSize) map {
         case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
@@ -259,7 +259,7 @@ object BinaryFormat {
       }
       def intPiece(int: Int): Option[draughts.Piece] =
         draughts.Role.binaryInt(int & 7) map {
-          role => draughts.Piece(Color((int & 8) == 0), role)
+          role => draughts.Piece(PlayerIndex((int & 8) == 0), role)
         }
       val pieceInts = ba.value flatMap splitInts
       (variant.boardSize.pos.all zip pieceInts).flatMap {
@@ -270,7 +270,7 @@ object BinaryFormat {
     def writeFairySF(pieces: fairysf.PieceMap): ByteArray = {
       def posInt(pos: fairysf.Pos): Int =
         (pieces get pos).fold(0) { piece =>
-          piece.color.fold(0, 128) + piece.role.binaryInt
+          piece.player.fold(0, 128) + piece.role.binaryInt
         }
       ByteArray(fairysf.Pos.all.map(posInt(_).toByte).toArray)
     }
@@ -282,7 +282,7 @@ object BinaryFormat {
       //}
       def intPiece(int: Int): Option[fairysf.Piece] =
         fairysf.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map {
-          role => fairysf.Piece(Color.fromWhite((int & 128) == 0), role)
+          role => fairysf.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
         }
       (fairysf.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
@@ -310,13 +310,13 @@ object BinaryFormat {
     def write(o: UnmovedRooks): ByteArray = {
       if (o.pos.isEmpty) emptyByteArray
       else {
-        var white = 0
-        var black = 0
+        var p1 = 0
+        var p2 = 0
         o.pos.foreach { pos =>
-          if (pos.rank == Rank.First) white = white | (1 << (7 - pos.file.index))
-          else black = black | (1 << (7 - pos.file.index))
+          if (pos.rank == Rank.First) p1 = p1 | (1 << (7 - pos.file.index))
+          else p2 = p2 | (1 << (7 - pos.file.index))
         }
-        Array(white.toByte, black.toByte)
+        Array(p1.toByte, p2.toByte)
       }
     }
 
@@ -324,8 +324,8 @@ object BinaryFormat {
 
     private val arrIndexes = 0 to 1
     private val bitIndexes = 0 to 7
-    private val whiteStd   = Set(chess.Pos.A1, chess.Pos.H1)
-    private val blackStd   = Set(chess.Pos.A8, chess.Pos.H8)
+    private val p1Std   = Set(chess.Pos.A1, chess.Pos.H1)
+    private val p2Std   = Set(chess.Pos.A8, chess.Pos.H8)
 
     def read(ba: ByteArray) =
       UnmovedRooks {
@@ -333,7 +333,7 @@ object BinaryFormat {
         arrIndexes.foreach { i =>
           val int = ba.value(i).toInt
           if (int != 0) {
-            if (int == -127) set = if (i == 0) whiteStd else set ++ blackStd
+            if (int == -127) set = if (i == 0) p1Std else set ++ p2Std
             else
               bitIndexes.foreach { j =>
                 if (bitAt(int, j) == 1) set = set + chess.Pos.at(7 - j, 7 * i).get

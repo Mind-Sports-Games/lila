@@ -17,10 +17,10 @@ final private[gameSearch] class GameSearchForm {
         "b"      -> optional(nonEmptyText),
         "winner" -> optional(nonEmptyText),
         "loser"  -> optional(nonEmptyText),
-        "white"  -> optional(nonEmptyText),
-        "black"  -> optional(nonEmptyText)
+        "p1"  -> optional(nonEmptyText),
+        "p2"  -> optional(nonEmptyText)
       )(SearchPlayer.apply)(SearchPlayer.unapply),
-      "winnerColor" -> optional(numberIn(Query.winnerColors)),
+      "winnerPlayerIndex" -> optional(numberIn(Query.winnerPlayerIndexs)),
       "perf"        -> optional(numberIn(lila.rating.PerfType.nonPuzzle.map(_.id))),
       "source"      -> optional(numberIn(Query.sources)),
       "mode"        -> optional(numberIn(Query.modes)),
@@ -59,7 +59,7 @@ private[gameSearch] object GameSearchForm {
 
 private[gameSearch] case class SearchData(
     players: SearchPlayer = SearchPlayer(),
-    winnerColor: Option[Int] = None,
+    winnerPlayerIndex: Option[Int] = None,
     perf: Option[Int] = None,
     source: Option[Int] = None,
     mode: Option[Int] = None,
@@ -88,7 +88,7 @@ private[gameSearch] case class SearchData(
       user2 = players.cleanB,
       winner = players.cleanWinner,
       loser = players.cleanLoser,
-      winnerColor = winnerColor,
+      winnerPlayerIndex = winnerPlayerIndex,
       perf = perf,
       source = source,
       rated = mode flatMap Mode.apply map (_.rated),
@@ -101,8 +101,8 @@ private[gameSearch] case class SearchData(
       date = Range(dateMin, dateMax),
       status = status,
       analysed = analysed map (_ == 1),
-      whiteUser = players.cleanWhite,
-      blackUser = players.cleanBlack,
+      p1User = players.cleanP1,
+      p2User = players.cleanP2,
       sorting = Sorting(sortOrDefault.field, sortOrDefault.order)
     )
 
@@ -114,16 +114,16 @@ private[gameSearch] case class SearchPlayer(
     b: Option[String] = None,
     winner: Option[String] = None,
     loser: Option[String] = None,
-    white: Option[String] = None,
-    black: Option[String] = None
+    p1: Option[String] = None,
+    p2: Option[String] = None
 ) {
 
   lazy val cleanA = clean(a)
   lazy val cleanB = clean(b)
   def cleanWinner = oneOf(winner)
   def cleanLoser  = oneOf(loser)
-  def cleanWhite  = oneOf(white)
-  def cleanBlack  = oneOf(black)
+  def cleanP1  = oneOf(p1)
+  def cleanP2  = oneOf(p2)
 
   private def oneOf(s: Option[String]) = clean(s).filter(List(cleanA, cleanB).flatten.contains)
   private def clean(s: Option[String]) = s map (_.trim.toLowerCase) filter (_.nonEmpty)

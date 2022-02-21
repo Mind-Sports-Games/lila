@@ -34,7 +34,7 @@ import { make as makeRetro, RetroCtrl } from './retrospect/retroCtrl';
 import { make as makeSocket, Socket } from './socket';
 import { nextGlyphSymbol } from './nodeFinder';
 import { opposite, parseUci, makeSquare, roleToChar } from 'chessops/util';
-import { COLORS, Outcome, isNormal } from 'chessops/types';
+import { PLAYERINDEXES, Outcome, isNormal } from 'chessops/types';
 import { SquareSet } from 'chessops/squareSet';
 import { parseFen } from 'chessops/fen';
 import { Position, PositionError } from 'chessops/chess';
@@ -218,28 +218,28 @@ export default class AnalyseCtrl {
       orientation: this.getOrientation(),
     });
     if (this.retro && this.data.game.variant.key !== 'racingKings') {
-      this.retro = makeRetro(this, this.bottomColor());
+      this.retro = makeRetro(this, this.bottomPlayerIndex());
     }
     if (this.practice) this.restartPractice();
     this.redraw();
   };
 
-  topColor(): Color {
-    return opposite(this.bottomColor());
+  topPlayerIndex(): PlayerIndex {
+    return opposite(this.bottomPlayerIndex());
   }
 
-  bottomColor(): Color {
-    return this.flipped ? opposite(this.data.player.color) : this.data.player.color;
+  bottomPlayerIndex(): PlayerIndex {
+    return this.flipped ? opposite(this.data.player.playerIndex) : this.data.player.playerIndex;
   }
 
-  bottomIsWhite = () => this.bottomColor() === 'white';
+  bottomIsP1 = () => this.bottomPlayerIndex() === 'p1';
 
   getOrientation(): Orientation {
     if (this.data.game.variant.key === 'linesOfAction' || this.data.game.variant.key === 'scrambledEggs') {
-      const c = this.data.player.color;
+      const c = this.data.player.playerIndex;
       return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
     } else if (this.data.game.variant.key === 'racingKings') {
-      return 'white';
+      return 'p1';
     } else {
       const o = this.data.orientation;
       return this.flipped ? oppositeOrientation(o) : o;
@@ -250,8 +250,8 @@ export default class AnalyseCtrl {
     return this.node;
   }
 
-  turnColor(): Color {
-    return util.plyColor(this.node.ply);
+  turnPlayerIndex(): PlayerIndex {
+    return util.plyPlayerIndex(this.node.ply);
   }
 
   togglePlay(delay: AutoplayDelay): void {
@@ -286,27 +286,27 @@ export default class AnalyseCtrl {
 
   makeCgOpts(): ChessgroundConfig {
     const node = this.node,
-      color = this.turnColor(),
+      playerIndex = this.turnPlayerIndex(),
       dests = chessUtil.readDests(this.node.dests),
       drops = chessUtil.readDrops(this.node.drops),
-      movableColor = this.gamebookPlay()
-        ? color
+      movablePlayerIndex = this.gamebookPlay()
+        ? playerIndex
         : this.practice
-        ? this.bottomColor()
+        ? this.bottomPlayerIndex()
         : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length)
-        ? color
+        ? playerIndex
         : undefined,
       config: ChessgroundConfig = {
         fen: node.fen,
-        turnColor: color,
+        turnPlayerIndex: playerIndex,
         movable: this.embed
           ? {
-              color: undefined,
+              playerIndex: undefined,
               dests: new Map(),
             }
           : {
-              color: movableColor,
-              dests: (movableColor === color && dests) || new Map(),
+              playerIndex: movablePlayerIndex,
+              dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
             },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
@@ -314,11 +314,11 @@ export default class AnalyseCtrl {
     if (!dests && !node.check) {
       // premove while dests are loading from server
       // can't use when in check because it highlights the wrong king
-      config.turnColor = opposite(color);
-      config.movable!.color = color;
+      config.turnPlayerIndex = opposite(playerIndex);
+      config.movable!.playerIndex = playerIndex;
     }
     config.premovable = {
-      enabled: config.movable!.color && config.turnColor !== config.movable!.color,
+      enabled: config.movable!.playerIndex && config.turnPlayerIndex !== config.movable!.playerIndex,
     };
     this.cgConfig = config;
     return config;
@@ -413,8 +413,8 @@ export default class AnalyseCtrl {
     this.jumpToMain(index + 1 + this.tree.root.ply);
   };
 
-  jumpToGlyphSymbol(color: Color, symbol: string): void {
-    const node = nextGlyphSymbol(color, symbol, this.mainline, this.node.ply);
+  jumpToGlyphSymbol(playerIndex: PlayerIndex, symbol: string): void {
+    const node = nextGlyphSymbol(playerIndex, symbol, this.mainline, this.node.ply);
     if (node) this.jumpToMain(node.ply);
     this.redraw();
   }
@@ -504,9 +504,9 @@ export default class AnalyseCtrl {
 
   private preparePremoving(): void {
     this.chessground.set({
-      turnColor: this.chessground.state.movable.color as cg.Color,
+      turnPlayerIndex: this.chessground.state.movable.playerIndex as cg.PlayerIndex,
       movable: {
-        color: opposite(this.chessground.state.movable.color as cg.Color),
+        playerIndex: opposite(this.chessground.state.movable.playerIndex as cg.PlayerIndex),
       },
       premovable: {
         enabled: true,
@@ -624,9 +624,9 @@ export default class AnalyseCtrl {
         !this.data.game.initialFen ||
         parseFen(this.data.game.initialFen).unwrap(
           setup =>
-            COLORS.every(color => {
+            PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
-              const pieces = board[color];
+              const pieces = board[playerIndex];
               const promotedPieces =
                 Math.max(board['q-piece'].intersect(pieces).size() - 1, 0) +
                 Math.max(board['r-piece'].intersect(pieces).size() - 2, 0) +
@@ -811,13 +811,13 @@ export default class AnalyseCtrl {
       this.sendMove(
         makeSquare(move.from),
         to,
-        capture && piece && capture.color !== piece.color ? capture : undefined,
+        capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
         move.promotion
       );
     } else
       this.chessground.newPiece(
         {
-          color: this.chessground.state.movable.color as Color,
+          playerIndex: this.chessground.state.movable.playerIndex as PlayerIndex,
           role: move.role,
         },
         to
@@ -869,7 +869,7 @@ export default class AnalyseCtrl {
   toggleRetro = (): void => {
     if (this.retro) this.retro = undefined;
     else {
-      this.retro = makeRetro(this, this.bottomColor());
+      this.retro = makeRetro(this, this.bottomPlayerIndex());
       if (this.practice) this.togglePractice();
       if (this.explorer.enabled()) this.toggleExplorer();
     }

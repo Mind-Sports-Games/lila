@@ -20,6 +20,7 @@
   <string name="black">Црни</string>
   <string name="randomColor">Насумична боја</string>
   <string name="createAGame">Започни нову партију</string>
+  <string name="playerIndexIsVictorious">%s је победник</string>
   <string name="whiteIsVictorious">Бели је победник</string>
   <string name="blackIsVictorious">Црни је победник</string>
   <string name="youPlayTheWhitePieces">Играте са белим фигурама</string>
@@ -32,6 +33,7 @@
   <string name="newOpponent">Нови противник</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Твој противник жели да игра нову партију са тобом</string>
   <string name="joinTheGame">Придружи се партији</string>
+  <string name="playerIndexPlays">%s је на потезу</string>
   <string name="whitePlays">Бели је на потезу</string>
   <string name="blackPlays">Црни је на потезу</string>
   <plurals name="opponentLeftCounter">
@@ -45,8 +47,10 @@
   <string name="forceDraw">Приморај на реми</string>
   <string name="talkInChat">Буди љубазан у ћаскању!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Прва особа која кликне на овај линк ће играти са тобом.</string>
+  <string name="playerIndexResigned">%s је предао</string>
   <string name="whiteResigned">Бели је предао</string>
   <string name="blackResigned">Црни је предао</string>
+  <string name="playerIndexLeftTheGame">%s је напустио партију</string>
   <string name="whiteLeftTheGame">Бели је напустио партију</string>
   <string name="blackLeftTheGame">Црни је напустио партију</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Подели овај линк како би посматрачи могли да гледају партију</string>
@@ -80,6 +84,7 @@
   <string name="drawn">Реми</string>
   <string name="unknown">Не зна се</string>
   <string name="database">База података</string>
+  <string name="p1DrawP2">%1$s / Реми / %2$s</string>
   <string name="whiteDrawBlack">Бели / Реми / Црни</string>
   <string name="averageRatingX">Просечан рејтинг: %s</string>
   <string name="recentGames">Недавне партије</string>
@@ -214,8 +219,10 @@
   <string name="drawOfferDeclined">Предлог за реми је одбијен</string>
   <string name="drawOfferAccepted">Предлог за реми је прихваћен</string>
   <string name="drawOfferCanceled">Предлог за реми је повучен</string>
+  <string name="playerIndexOffersDraw">%s нуди реми</string>
   <string name="whiteOffersDraw">Бели нуди реми</string>
   <string name="blackOffersDraw">Црни нуди реми</string>
+  <string name="playerIndexDeclinesDraw">%s одбија реми</string>
   <string name="whiteDeclinesDraw">Бели одбија реми</string>
   <string name="blackDeclinesDraw">Црни одбија реми</string>
   <string name="yourOpponentOffersADraw">Противник нуди реми</string>
@@ -373,6 +380,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Кликни на таблу и направи потез да би доказао да си човек.</string>
   <string name="captcha.fail">Решите CAPTCHA шаховски проблем.</string>
   <string name="notACheckmate">Није шахмат</string>
+  <string name="playerIndexCheckmatesInOneMove">%s матирау једном потезу</string>
   <string name="whiteCheckmatesInOneMove">Бели матирау једном потезу</string>
   <string name="blackCheckmatesInOneMove">Црни матирау једном потезу</string>
   <string name="retry">Покушај поново</string>
@@ -446,6 +454,7 @@
   <string name="performance">Перформанса</string>
   <string name="tournamentComplete">Турнир завршен</string>
   <string name="movesPlayed">Одиграно потеза</string>
+  <string name="playerIndexWins">Победе као %s</string>
   <string name="whiteWins">Победе као бели</string>
   <string name="blackWins">Победе као црни</string>
   <string name="draws">Ремија</string>
@@ -785,6 +794,7 @@
   <string name="hideBestMove">Сакријте најбољи потез</string>
   <string name="getAHint">Добиј те помоћ</string>
   <string name="evaluatingYourMove">Процењивање вашег потеза ...</string>
+  <string name="playerIndexWinsGame">%s је победио</string>
   <string name="whiteWinsGame">Бели је победио</string>
   <string name="blackWinsGame">Црни је победио</string>
   <string name="learnFromYourMistakes">Научите из грешака</string>

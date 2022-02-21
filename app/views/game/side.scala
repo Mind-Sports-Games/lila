@@ -97,10 +97,10 @@ object side {
           div(cls := "game__meta__players")(
             game.players.map { p =>
               frag(
-                div(cls := s"player color-icon is ${p.color.name} text")(
+                div(cls := s"player playerIndex-icon is ${game.variant.playerColors(p.playerIndex)} text")(
                   playerLink(p, withOnline = false, withDiff = true, withBerserk = true)
                 ),
-                tour.flatMap(_.teamVs).map(_.teams(p.color)) map {
+                tour.flatMap(_.teamVs).map(_.teams(p.playerIndex)) map {
                   teamLink(_, withIcon = false)(cls := "team")
                 }
               )
@@ -113,7 +113,7 @@ object side {
             game.winner.map { winner =>
               frag(
                 separator,
-                winner.color.fold(trans.whiteIsVictorious, trans.blackIsVictorious)()
+                trans.playerIndexIsVictorious(game.playerTrans(winner.playerIndex))
               )
             }
           )
@@ -157,13 +157,13 @@ object side {
           st.section(cls := "game__micro-match")(
             if (m.startsWith("1:") && m.length == 10) frag(
               trans.microMatch(), ": ",
-              a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.color).name))(trans.gameNumberX(1)), " ",
+              a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(trans.gameNumberX(1)), " ",
               span(cls := "current")(trans.gameNumberX(2))
             )
             else if (m.startsWith("2:") && m.length == 10) frag(
               trans.microMatch(), ": ",
               span(cls := "current")(trans.gameNumberX(1)), " ",
-              a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.color).name))(trans.gameNumberX(2))
+              a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(trans.gameNumberX(2))
             )
             else trans.microMatchGameX(1)
           )

@@ -26,7 +26,7 @@ object layout {
       }
     def metaCsp(csp: Option[ContentSecurityPolicy])(implicit ctx: Context): Frag =
       metaCsp(csp getOrElse defaultCsp)
-    def metaThemeColor(implicit ctx: Context): Frag =
+    def metaThemePlayerIndex(implicit ctx: Context): Frag =
       raw {
         s"""<meta name="theme-color" content="${ctx.pref.themeColor}">"""
       }
@@ -209,7 +209,7 @@ object layout {
           charset,
           viewport,
           metaCsp(csp),
-          metaThemeColor,
+          metaThemePlayerIndex,
           st.headTitle {
             if (ctx.blind) "playstrategy"
             else if (netConfig.isProd) fullTitle | s"$title • playstrategy.org"

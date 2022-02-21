@@ -9,26 +9,26 @@ export default function renderClocks(ctrl: AnalyseCtrl): [VNode, VNode] | undefi
     clock = node.clock;
   if (!clock && clock !== 0) return;
 
-  const whitePov = ctrl.bottomIsWhite(),
+  const p1Pov = ctrl.bottomIsP1(),
     parentClock = ctrl.tree.getParentClock(node, ctrl.path),
-    isWhiteTurn = node.ply % 2 === 0,
+    isP1Turn = node.ply % 2 === 0,
     centis: Array<number | undefined> = [parentClock, clock];
 
-  if (!isWhiteTurn) centis.reverse();
+  if (!isP1Turn) centis.reverse();
 
   const study = ctrl.study,
     relay = study && study.data.chapter.relay;
   if (relay && relay.lastMoveAt && relay.path === ctrl.path && ctrl.path !== '' && !isFinished(study!.data.chapter)) {
     const spent = (Date.now() - relay.lastMoveAt) / 10;
-    const i = isWhiteTurn ? 0 : 1;
+    const i = isP1Turn ? 0 : 1;
     if (centis[i]) centis[i] = Math.max(0, centis[i]! - spent);
   }
 
   const showTenths = !ctrl.study || !ctrl.study.relay;
 
   return [
-    renderClock(centis[0], isWhiteTurn, whitePov ? 'bottom' : 'top', showTenths),
-    renderClock(centis[1], !isWhiteTurn, whitePov ? 'top' : 'bottom', showTenths),
+    renderClock(centis[0], isP1Turn, p1Pov ? 'bottom' : 'top', showTenths),
+    renderClock(centis[1], !isP1Turn, p1Pov ? 'top' : 'bottom', showTenths),
   ];
 }
 

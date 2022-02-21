@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Coordenades</string>
   <string name="coordinateTraining">Entrenament de coordenades</string>
+  <string name="averageScoreAsPlayerIndexX">Puntuació mitja amb %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Puntuació mitja amb blanques: %s</string>
   <string name="averageScoreAsBlackX">Puntuació mitja amb negres: %s</string>
   <string name="knowingTheChessBoard">Saber les coordenades del tauler és una habilitat important:</string>

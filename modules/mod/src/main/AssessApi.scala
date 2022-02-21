@@ -1,6 +1,6 @@
 package lila.mod
 
-import strategygames.{ Black, Color, White }
+import strategygames.{ P2, Player => PlayerIndex, P1 }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import reactivemongo.api.ReadPreference
@@ -61,7 +61,7 @@ final class AssessApi(
 
   private def buildMissing(povs: List[Pov]): Funit =
     assessRepo.coll
-      .distinctEasy[Game.ID, Set]("gameId", $inIds(povs.map(p => s"${p.gameId}/${p.color.name}"))) flatMap {
+      .distinctEasy[Game.ID, Set]("gameId", $inIds(povs.map(p => s"${p.gameId}/${p.playerIndex.name}"))) flatMap {
       existingIds =>
         val missing = povs collect {
           case pov if pov.game.metadata.analysed && !existingIds.contains(pov.gameId) => pov.gameId
@@ -76,7 +76,7 @@ final class AssessApi(
                 }
                 .map { case (pov, analysis) =>
                   gameRepo.holdAlert game pov.game flatMap { holdAlerts =>
-                    createPlayerAssessment(PlayerAssessment.make(pov, analysis, holdAlerts(pov.color)))
+                    createPlayerAssessment(PlayerAssessment.make(pov, analysis, holdAlerts(pov.playerIndex)))
                   }
                 }
                 .sequenceFu
@@ -90,7 +90,7 @@ final class AssessApi(
     buildMissing(povs) >>
       assessRepo.coll
         .idsMap[PlayerAssessment, Game.ID](
-          ids = povs.map(p => s"${p.gameId}/${p.color.name}"),
+          ids = povs.map(p => s"${p.gameId}/${p.playerIndex.name}"),
           readPreference = ReadPreference.secondaryPreferred
         )(_.gameId)
         .flatMap { fulls =>
@@ -141,11 +141,11 @@ final class AssessApi(
         else if (game.createdAt isBefore bottomDate) false
         else true
       shouldAssess.?? {
-        createPlayerAssessment(PlayerAssessment.make(game pov White, analysis, holdAlerts.white)) >>
-          createPlayerAssessment(PlayerAssessment.make(game pov Black, analysis, holdAlerts.black))
+        createPlayerAssessment(PlayerAssessment.make(game pov P1, analysis, holdAlerts.p1)) >>
+          createPlayerAssessment(PlayerAssessment.make(game pov P2, analysis, holdAlerts.p2))
       } >> {
         (shouldAssess && thenAssessUser) ?? {
-          game.whitePlayer.userId.??(assessUser) >> game.blackPlayer.userId.??(assessUser)
+          game.p1Player.userId.??(assessUser) >> game.p2Player.userId.??(assessUser)
         }
       }
     }
@@ -181,35 +181,35 @@ final class AssessApi(
   private def randomPercent(percent: Int): Boolean =
     ThreadLocalRandom.nextInt(100) < percent
 
-  def onGameReady(game: Game, white: User, black: User): Funit = {
+  def onGameReady(game: Game, p1: User, p2: User): Funit = {
 
     import AutoAnalysis.Reason._
 
     def manyBlurs(player: Player) =
-      game.playerBlurPercent(player.color) >= 70
+      game.playerBlurPercent(player.playerIndex) >= 70
 
     def winnerGreatProgress(player: Player): Boolean =
       game.winner.has(player) && game.perfType ?? { perfType =>
-        player.color.fold(white, black).perfs(perfType).progress >= 90
+        player.playerIndex.fold(p1, p2).perfs(perfType).progress >= 90
       }
 
     def noFastCoefVariation(player: Player): Option[Float] =
       Statistics.noFastMoves(Pov(game, player)) ?? Statistics.moveTimeCoefVariation(Pov(game, player))
 
-    def winnerUserOption = game.winnerColor.map(_.fold(white, black))
-    def loserUserOption  = game.winnerColor.map(_.fold(black, white))
+    def winnerUserOption = game.winnerPlayerIndex.map(_.fold(p1, p2))
+    def loserUserOption  = game.winnerPlayerIndex.map(_.fold(p2, p1))
     def winnerNbGames =
       for {
         user     <- winnerUserOption
         perfType <- game.perfType
       } yield user.perfs(perfType).nb
 
-    def suspCoefVariation(c: Color) = {
+    def suspCoefVariation(c: PlayerIndex) = {
       val x = noFastCoefVariation(game player c)
       x.filter(_ < 0.45f) orElse x.filter(_ < 0.5f).ifTrue(ThreadLocalRandom.nextBoolean())
     }
-    lazy val whiteSuspCoefVariation = suspCoefVariation(White)
-    lazy val blackSuspCoefVariation = suspCoefVariation(Black)
+    lazy val p1SuspCoefVariation = suspCoefVariation(P1)
+    lazy val p2SuspCoefVariation = suspCoefVariation(P2)
 
     def isUpset = ~(for {
       winner <- game.winner
@@ -220,7 +220,7 @@ final class AssessApi(
 
     val shouldAnalyse: Fu[Option[AutoAnalysis.Reason]] =
       if (!game.analysable) fuccess(none)
-      else if (game.speed >= strategygames.Speed.Blitz && (white.hasTitle || black.hasTitle))
+      else if (game.speed >= strategygames.Speed.Blitz && (p1.hasTitle || p2.hasTitle))
         fuccess(TitledPlayer.some)
       else if (!game.source.exists(assessableSources.contains)) fuccess(none)
       // give up on correspondence games
@@ -234,10 +234,10 @@ final class AssessApi(
       // discard old games
       else if (game.createdAt isBefore bottomDate) fuccess(none)
       else if (isUpset) fuccess(Upset.some)
-      // white has consistent move times
-      else if (whiteSuspCoefVariation.isDefined) fuccess(WhiteMoveTime.some)
-      // black has consistent move times
-      else if (blackSuspCoefVariation.isDefined) fuccess(BlackMoveTime.some)
+      // p1 has consistent move times
+      else if (p1SuspCoefVariation.isDefined) fuccess(P1MoveTime.some)
+      // p2 has consistent move times
+      else if (p2SuspCoefVariation.isDefined) fuccess(P2MoveTime.some)
       else
         // someone is using a bot
         gameRepo.holdAlert game game map { holdAlerts =>

@@ -20,6 +20,7 @@
   <string name="randomColor">توکلي</string>
   <string name="createAGame">لوبه جوړه کړئ</string>
   <string name="whiteIsVictorious">سپین فاتح دی</string>
+  <string name="playerIndexIsVictorious">%s فاتح دی</string>
   <string name="blackIsVictorious">تور فاتح دی</string>
   <string name="kingInTheCenter">باچا مينځ کښې</string>
   <string name="threeChecks">درې کشت</string>
@@ -29,6 +30,7 @@
   <string name="yourOpponentWantsToPlayANewGameWithYou">سیال مو نوې لوبه پیلول غواړي</string>
   <string name="joinTheGame">يوځلی بيا</string>
   <string name="whitePlays">سپین لوبه کوی</string>
+  <string name="playerIndexPlays">%s لوبه کوی</string>
   <string name="blackPlays">تور لوبه کوی</string>
   <string name="opponentLeftChoices">-سيال کېدې شي چی لوبه پرېښودلی وي -اقتدار لری چی لوبه ترلاسه كړی, يا مساوي كړی, او يا صبر وکړی</string>
   <string name="makeYourOpponentResign">په زوره لوبه وګټی</string>
@@ -37,8 +39,10 @@
   <string name="talkInChat">!لطفاٌ ښه وينه وکړی</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">د لومړي کس چې د دې URL به له تاسو سره ولوبوي راشي.</string>
   <string name="whiteResigned">سپین غاړه کېښود</string>
+  <string name="playerIndexResigned">%s غاړه کېښود</string>
   <string name="blackResigned">تور غاړه کېښود</string>
   <string name="whiteLeftTheGame">سپین لوبه پرېښود</string>
+  <string name="playerIndexLeftTheGame">%s لوبه پرېښود</string>
   <string name="blackLeftTheGame">تور لوبه پرېښود</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Vertaal  Share this URL to let spectators see the game د دې یو شریک ته اجازه نندارچیانو د لوبې وګورئ</string>
   <string name="theComputerAnalysisHasFailed">د کمپيوټر په تحلیل کې پاتې راغلی</string>

@@ -2,6 +2,7 @@
 <resources>
   <string name="coordinates">Hnit</string>
   <string name="coordinateTraining">Hnitaþjálfun</string>
+  <string name="averageScoreAsPlayerIndexX">Meðalskor sem %1$s: %2$s</string>
   <string name="averageScoreAsWhiteX">Meðalskor sem hvítur: %s</string>
   <string name="averageScoreAsBlackX">Meðalskor sem svartur: %s</string>
   <string name="knowingTheChessBoard">Að þekkja hnit borðsins er mikilvægur hæfileiki í skák:</string>

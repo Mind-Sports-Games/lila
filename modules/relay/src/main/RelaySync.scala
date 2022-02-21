@@ -140,7 +140,7 @@ final private class RelaySync(
         chapterId = chapter.id,
         tags = chapterNewTags
       )(actorApi.Who(chapter.ownerId, sri)) >> {
-        val newEnd = chapter.tags.resultColor.isEmpty && tags.resultColor.isDefined
+        val newEnd = chapter.tags.resultPlayer.isEmpty && tags.resultPlayer.isDefined
         newEnd ?? onChapterEnd(tour, study, chapter)
       }
     }
@@ -162,8 +162,8 @@ final private class RelaySync(
     chapterRepo.nextOrderByStudy(study.id) flatMap { order =>
       val name = {
         for {
-          w <- game.tags(_.White)
-          b <- game.tags(_.Black)
+          w <- game.tags(_.P1)
+          b <- game.tags(_.P2)
         } yield s"$w - $b"
       } orElse game.tags("board") getOrElse "?"
       val chapter = Chapter.make(
@@ -172,7 +172,7 @@ final private class RelaySync(
         setup = Chapter.Setup(
           none,
           game.variant,
-          strategygames.Color.White
+          strategygames.P1
         ),
         root = game.root,
         tags = game.tags,
@@ -202,7 +202,7 @@ final private class RelaySync(
 
   private val sri = Sri("")
 
-  private def vs(tags: Tags) = s"${tags(_.White) | "?"} - ${tags(_.Black) | "?"}"
+  private def vs(tags: Tags) = s"${tags(_.P1) | "?"} - ${tags(_.P2) | "?"}"
 
   private def showSC(study: Study, chapter: Chapter) =
     s"#${study.id} chapter[${chapter.relay.fold("?")(_.index.toString)}]"

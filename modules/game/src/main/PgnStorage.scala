@@ -3,7 +3,7 @@ package lila.game
 import strategygames.chess
 import strategygames.chess.format
 import strategygames.chess.{ Castles, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks }
-import strategygames.Color
+import strategygames.{ Player => PlayerIndex }
 
 import lila.db.ByteArray
 
@@ -50,10 +50,10 @@ private object PgnStorage {
           unmovedRooks = UnmovedRooks(unmovedRooks),
           lastMove = Option(decoded.lastUci) flatMap format.Uci.apply,
           castles = Castles(
-            whiteKingSide = unmovedRooks(Pos.H1),
-            whiteQueenSide = unmovedRooks(Pos.A1),
-            blackKingSide = unmovedRooks(Pos.H8),
-            blackQueenSide = unmovedRooks(Pos.A8)
+            p1KingSide = unmovedRooks(Pos.H1),
+            p1QueenSide = unmovedRooks(Pos.A1),
+            p2KingSide = unmovedRooks(Pos.H8),
+            p2QueenSide = unmovedRooks(Pos.A8)
           ),
           halfMoveClock = decoded.halfMoveClock
         )
@@ -64,7 +64,7 @@ private object PgnStorage {
       Role.javaSymbolToRole(role.symbol)
 
     private def chessPiece(piece: JavaPiece): Piece =
-      Piece(Color.fromWhite(piece.white), chessRole(piece.role))
+      Piece(PlayerIndex.fromP1(piece.white), chessRole(piece.role))
   }
 
   case class Decoded(

@@ -49,17 +49,17 @@ export function parsePossibleMoves(dests?: EncodedDests): DecodedDests {
   return dec;
 }
 
-// {white: {man: 3}, black: {king: 1}}
+// {p1: {man: 3}, p2: {king: 1}}
 export function getMaterialDiff(pieces: cg.Pieces): cg.MaterialDiff {
   const diff: cg.MaterialDiff = {
-    white: { king: 0, man: 0 },
-    black: { king: 0, man: 0 },
+    p1: { king: 0, man: 0 },
+    p2: { king: 0, man: 0 },
   };
   for (const p of pieces.values()) {
     if (p.role != 'ghostman' && p.role != 'ghostking') {
-      const them = diff[opposite(p.color)];
+      const them = diff[opposite(p.playerIndex)];
       if (them[p.role] > 0) them[p.role]--;
-      else diff[p.color][p.role]++;
+      else diff[p.playerIndex][p.role]++;
     }
   }
   return diff;
@@ -68,7 +68,7 @@ export function getMaterialDiff(pieces: cg.Pieces): cg.MaterialDiff {
 export function getScore(pieces: cg.Pieces): number {
   let score = 0;
   for (const p of pieces.values()) {
-    score += pieceScores[p.role] * (p.color === 'white' ? 1 : -1);
+    score += pieceScores[p.role] * (p.playerIndex === 'p1' ? 1 : -1);
   }
   return score;
 }

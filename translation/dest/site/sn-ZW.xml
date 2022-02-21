@@ -19,6 +19,7 @@
   <string name="black">Tema</string>
   <string name="randomColor">Chero divi</string>
   <string name="createAGame">Gadzira mutambo</string>
+  <string name="playerIndexIsVictorious">%s yawhina</string>
   <string name="whiteIsVictorious">Chena yawhina</string>
   <string name="blackIsVictorious">Tema yawhina</string>
   <string name="youPlayTheWhitePieces">Tamba nezvichena</string>

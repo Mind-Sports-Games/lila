@@ -297,7 +297,7 @@ object mod {
                 b(e.showAction),
                 " ",
                 e.gameId.fold[Frag](~e.details) { gameId =>
-                  a(href := s"${routes.Round.watcher(gameId, "white").url}?pov=${~e.user}")(~e.details)
+                  a(href := s"${routes.Round.watcher(gameId, "p1").url}?pov=${~e.user}")(~e.details)
                 },
                 " ",
                 momentFromNowServer(e.date)
@@ -462,7 +462,7 @@ object mod {
             .map { result =>
               tr(
                 td(
-                  a(href := routes.Round.watcher(result.gameId, result.color.name))(
+                  a(href := routes.Round.watcher(result.gameId, result.playerIndex.name))(
                     pag.pov(result).fold[Frag](result.gameId) { p =>
                       playerUsername(p.opponent)
                     }
@@ -470,7 +470,7 @@ object mod {
                 ),
                 td(
                   pag.pov(result).map { p =>
-                    a(href := routes.Round.watcher(p.gameId, p.color.name))(
+                    a(href := routes.Round.watcher(p.gameId, p.playerIndex.name))(
                       p.game.isTournament option iconTag("g"),
                       p.game.perfType.map { pt =>
                         iconTag(pt.iconChar)(cls := "text")

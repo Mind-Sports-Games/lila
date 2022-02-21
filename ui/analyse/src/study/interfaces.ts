@@ -149,7 +149,7 @@ export interface StudyChapterMeta {
 }
 
 export interface StudyChapterConfig extends StudyChapterMeta {
-  orientation: Color;
+  orientation: PlayerIndex;
   description?: string;
   practice: boolean;
   gamebook: boolean;
@@ -182,7 +182,7 @@ interface StudyChapterSetup {
     key: VariantKey;
     name: string;
   };
-  orientation: Color;
+  orientation: PlayerIndex;
   fromFen?: string;
 }
 
@@ -215,10 +215,10 @@ export interface ChapterPreview {
   id: string;
   name: string;
   players?: {
-    white: ChapterPreviewPlayer;
-    black: ChapterPreviewPlayer;
+    p1: ChapterPreviewPlayer;
+    p2: ChapterPreviewPlayer;
   };
-  orientation: Color;
+  orientation: PlayerIndex;
   fen: string;
   lastMove?: string;
   playing: boolean;
@@ -230,7 +230,7 @@ export interface ChapterPreviewPlayer {
   rating?: number;
 }
 
-export type Orientation = 'black' | 'white' | 'auto';
+export type Orientation = 'p2' | 'p1' | 'auto';
 export type ChapterMode = 'normal' | 'practice' | 'gamebook' | 'conceal';
 
 export interface ChapterData {

@@ -44,8 +44,10 @@
   <string name="forceDraw">Хæрæгсаст фæуын</string>
   <string name="talkInChat">Ныхасы уæздан у!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">Демæ хъаздзæн фыццаг адæймаг, ацы дæнцæгæй чи æрбацæудзæн.</string>
+  <string name="playerIndexResigned">%s банымадтой сæ дæрæн</string>
   <string name="whiteResigned">Урсытæ банымадтой сæ дæрæн</string>
   <string name="blackResigned">Саутæ банымадтой сæ дæрæн</string>
+  <string name="playerIndexLeftTheGame">%s ныууагътой хъазт</string>
   <string name="whiteLeftTheGame">Урсытæ ныууагътой хъазт</string>
   <string name="blackLeftTheGame">Саутæ ныууагътой хъазт</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">Æрбахон кæсæджыты ацы дæнцæгæйæ</string>
@@ -79,6 +81,7 @@
   <string name="drawn">Хæрæгсаст фæугæ</string>
   <string name="unknown">Бæрæг нæу</string>
   <string name="database">Бæрæггæнæнты æвæрæн</string>
+  <string name="p1DrawP2">%1$s / Хæрæгсаст / %2$s</string>
   <string name="whiteDrawBlack">Урсытæ / Хæрæгсаст / Саутæ</string>
   <string name="averageRatingX">Астæуккаг рейтинг: %s</string>
   <string name="recentGames">Æрæджыон хъæзтытæ</string>
@@ -215,8 +218,10 @@
   <string name="drawOfferDeclined">Хæрæгсаст фæуын æнхъарæн райст нæ уыди</string>
   <string name="drawOfferAccepted">Хæрæгсаст фæуын æнхъарæн райст уыди</string>
   <string name="drawOfferCanceled">Хæрæгсаст фæуын æнхъарæн аивд уыди</string>
+  <string name="playerIndexOffersDraw">%s æнхъарынц хæрæхсаст фæуын</string>
   <string name="whiteOffersDraw">Урсытæ æнхъарынц хæрæхсаст фæуын</string>
   <string name="blackOffersDraw">Саутæ æнхъарынц хæрæхсаст фæуын</string>
+  <string name="playerIndexDeclinesDraw">%s хæрæгсаст фæуын æнхъарæн нæ райстой</string>
   <string name="whiteDeclinesDraw">Урсытæ хæрæгсаст фæуын æнхъарæн нæ райстой</string>
   <string name="blackDeclinesDraw">Саутæ хæрæгсаст фæуын æнхъарæн нæ райстой</string>
   <string name="yourOpponentOffersADraw">Дæ ныхмæлæууæг хæрæгсаст фæуын æнхъары</string>
@@ -360,6 +365,7 @@
   <string name="clickOnTheBoardToMakeYourMove">Æрæлхъив фæйнæгыл æмæ скæн дæ цыд, цæмæй равдисын, адæймаг дæ æви компьютер дæ.</string>
   <string name="captcha.fail">Табуафси, райхал шахмæттон капчæ.</string>
   <string name="notACheckmate">Уый мат нæ у</string>
+  <string name="playerIndexCheckmatesInOneMove">%s сæвæрынц мат иу цыды фæстæ</string>
   <string name="whiteCheckmatesInOneMove">Урсытæ сæвæрынц мат иу цыды фæстæ</string>
   <string name="blackCheckmatesInOneMove">Саутæ сæвæрынц мат иу цыды фæстæ</string>
   <string name="retry">Рафæлхатын</string>

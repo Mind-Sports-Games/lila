@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Black, Centis, Clock, White }
+import strategygames.{ P2, Centis, Clock, P1 }
 import org.specs2.mutable._
 import scala.util.chaining._
 
@@ -12,7 +12,7 @@ class BinaryClockTest extends Specification {
   val since                = org.joda.time.DateTime.now.minusHours(1)
   def writeBytes(c: Clock) = BinaryFormat.clock(since) write c
   def readBytes(bytes: ByteArray, berserk: Boolean = false): Clock =
-    (BinaryFormat.clock(since).read(bytes, berserk, false))(White)
+    (BinaryFormat.clock(since).read(bytes, berserk, false))(P1)
   def isomorphism(c: Clock): Clock = readBytes(writeBytes(c))
 
   def write(c: Clock): List[String] = writeBytes(c).showBytes.split(',').toList
@@ -25,10 +25,10 @@ class BinaryClockTest extends Specification {
       write(clock) must_== {
         bits22 ::: List.fill(6)(_0_)
       }
-      write(clock.giveTime(White, Centis(3))) must_== {
+      write(clock.giveTime(P1, Centis(3))) must_== {
         bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(3)(_0_)
       }
-      write(clock.giveTime(White, Centis(-3))) must_== {
+      write(clock.giveTime(P1, Centis(-3))) must_== {
         bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(3)(_0_)
       }
       write(Clock(0, 3)) must_== {
@@ -41,10 +41,10 @@ class BinaryClockTest extends Specification {
           clock
         }
         read(bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(8)(_0_)) must_== {
-          clock.giveTime(White, Centis(3))
+          clock.giveTime(P1, Centis(3))
         }
         read(bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(8)(_0_)) must_== {
-          clock.giveTime(White, Centis(-3))
+          clock.giveTime(P1, Centis(-3))
         }
       }
       "without timer bytes" in {
@@ -52,10 +52,10 @@ class BinaryClockTest extends Specification {
           clock
         }
         read(bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(4)(_0_)) must_== {
-          clock.giveTime(White, Centis(3))
+          clock.giveTime(P1, Centis(3))
         }
         read(bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(4)(_0_)) must_== {
-          clock.giveTime(White, Centis(-3))
+          clock.giveTime(P1, Centis(-3))
         }
       }
     }
@@ -64,10 +64,10 @@ class BinaryClockTest extends Specification {
       "without berserk" in {
         isomorphism(clock) must_== clock
 
-        val c2 = clock.giveTime(White, Centis.ofSeconds(15))
+        val c2 = clock.giveTime(P1, Centis.ofSeconds(15))
         isomorphism(c2) must_== c2
 
-        val c3 = clock.giveTime(Black, Centis.ofSeconds(5))
+        val c3 = clock.giveTime(P2, Centis.ofSeconds(5))
         isomorphism(c3) must_== c3
 
         val c4 = clock.start
@@ -79,13 +79,13 @@ class BinaryClockTest extends Specification {
       }
 
       "with berserk" in {
-        val b1 = clock.goBerserk(White)
+        val b1 = clock.goBerserk(P1)
         readBytes(writeBytes(b1), true) must_== b1
 
-        val b2 = clock.giveTime(White, Centis(15)).goBerserk(White)
+        val b2 = clock.giveTime(P1, Centis(15)).goBerserk(P1)
         readBytes(writeBytes(b2), true) must_== b2
 
-        val b3 = Clock(60, 2).goBerserk(White)
+        val b3 = Clock(60, 2).goBerserk(P1)
         readBytes(writeBytes(b3), true) must_== b3
       }
     }

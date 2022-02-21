@@ -1,7 +1,7 @@
 package views.html
 package swiss
 
-import strategygames.{ Black, White }
+import strategygames.{ P2, P1 }
 
 import controllers.routes
 import play.api.libs.json.Json
@@ -99,11 +99,11 @@ object show {
           tbody(cls := "infinite-scroll")(
             pairings.currentPageResults map { p =>
               tr(cls := "paginated")(
-                td(a(href := routes.Round.watcher(p.gameId, "white"), cls := "glpt")(s"#${p.gameId}")),
-                td(userIdLink(p.white.some)),
-                td(p strResultOf White),
-                td(p strResultOf Black),
-                td(userIdLink(p.black.some))
+                td(a(href := routes.Round.watcher(p.gameId, "p1"), cls := "glpt")(s"#${p.gameId}")),
+                td(userIdLink(p.p1.some)),
+                td(p strResultOf P1),
+                td(p strResultOf P2),
+                td(userIdLink(p.p2.some))
               )
             },
             pagerNextTable(pairings, p => routes.Swiss.round(s.id.value, r.value).url)

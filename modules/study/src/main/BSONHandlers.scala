@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.{ Glyph, Glyphs, Tag, Tags }
 import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Centis, Color, GameFamily, GameLogic, Pocket, PocketData, Pockets, Pos, PromotableRole, Role }
+import strategygames.{ Centis, Player => PlayerIndex, GameFamily, GameLogic, Pocket, PocketData, Pockets, Pos, PromotableRole, Role }
 import strategygames.chess.{ Pos => ChessPos }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
@@ -125,15 +125,15 @@ object BSONHandlers {
         PocketData.Chess(strategygames.chess.PocketData(
           promoted = r.getsD[strategygames.chess.Pos]("o").toSet,
           pockets = Pockets(
-            white = readPocket(r.strD("w")),
-            black = readPocket(r.strD("b"))
+            p1 = readPocket(r.strD("w")),
+            p2 = readPocket(r.strD("b"))
           )
         ))
       def writes(w: Writer, s: PocketData) =
         $doc(
           "o" -> w.listO(s.promoted.toList),
-          "w" -> w.strO(writePocket(s.pockets.white)),
-          "b" -> w.strO(writePocket(s.pockets.black))
+          "w" -> w.strO(writePocket(s.pockets.p1)),
+          "b" -> w.strO(writePocket(s.pockets.p2))
         )
     }
 
@@ -374,14 +374,14 @@ object BSONHandlers {
       id    <- doc.getAsTry[Chapter.Id]("_id")
       name  <- doc.getAsTry[Chapter.Name]("name")
       setup <- doc.getAsTry[Chapter.Setup]("setup")
-      resultColor = doc
+      resultPlayerIndex = doc
         .getAsOpt[List[String]]("tags")
         .map {
           _.headOption
             .map(_ drop 7)
-            .filter("*" !=) map Color.fromResult
+            .filter("*" !=) map PlayerIndex.fromResult
         }
       hasRelayPath = doc.getAsOpt[Bdoc]("relay").flatMap(_ string "path").exists(_.nonEmpty)
-    } yield Chapter.Metadata(id, name, setup, resultColor, hasRelayPath)
+    } yield Chapter.Metadata(id, name, setup, resultPlayerIndex, hasRelayPath)
   }
 }

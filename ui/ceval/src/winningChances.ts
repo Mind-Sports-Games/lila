@@ -1,7 +1,7 @@
 import { Eval } from './types';
 
-function toPov(color: Color, diff: number): number {
-  return color === 'white' ? diff : -diff;
+function toPov(playerIndex: PlayerIndex, diff: number): number {
+  return playerIndex === 'p1' ? diff : -diff;
 }
 
 /**
@@ -25,16 +25,16 @@ function evalWinningChances(ev: Eval): number {
   return typeof ev.mate !== 'undefined' ? mateWinningChances(ev.mate) : cpWinningChances(ev.cp!);
 }
 
-// winning chances for a color
+// winning chances for a playerIndex
 // 1  infinitely winning
 // -1 infinitely losing
-export function povChances(color: Color, ev: Eval): number {
-  return toPov(color, evalWinningChances(ev));
+export function povChances(playerIndex: PlayerIndex, ev: Eval): number {
+  return toPov(playerIndex, evalWinningChances(ev));
 }
 
 // computes the difference, in winning chances, between two evaluations
 // 1  = e1 is infinitely better than e2
 // -1 = e1 is infinitely worse  than e2
-export function povDiff(color: Color, e1: Eval, e2: Eval): number {
-  return (povChances(color, e1) - povChances(color, e2)) / 2;
+export function povDiff(playerIndex: PlayerIndex, e1: Eval, e2: Eval): number {
+  return (povChances(playerIndex, e1) - povChances(playerIndex, e2)) / 2;
 }

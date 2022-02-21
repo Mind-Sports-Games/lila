@@ -25,8 +25,8 @@ playstrategy.load.then(() => {
       option.push("<option value='" + user + "'");
       option.push(isSelected(row, 'winner', user, 'req-winner'));
       option.push(isSelected(row, 'loser', user, 'req-loser'));
-      option.push(isSelected(row, 'whiteUser', user, 'req-white'));
-      option.push(isSelected(row, 'blackUser', user, 'req-black'));
+      option.push(isSelected(row, 'p1User', user, 'req-p1'));
+      option.push(isSelected(row, 'p2User', user, 'req-p2'));
       option.push('>' + user + '</option>');
       options.push(option.join(''));
     });

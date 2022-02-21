@@ -2,7 +2,7 @@ package lila.setup
 
 import strategygames.{ GameFamily, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
-import lila.lobby.Color
+import lila.lobby.PlayerIndex
 import lila.lobby.{ Hook, Seek }
 import lila.rating.RatingRange
 import lila.user.User
@@ -14,7 +14,7 @@ case class HookConfig(
     increment: Int,
     days: Int,
     mode: Mode,
-    color: Color,
+    playerIndex: PlayerIndex,
     ratingRange: RatingRange
 ) extends HumanConfig {
 
@@ -34,19 +34,19 @@ case class HookConfig(
 
   def makeSpeed = Speed(makeClock)
 
-  def fixColor =
+  def fixPlayerIndex =
     copy(
-      color =
+      playerIndex =
         if (
           mode == Mode.Rated &&
-          lila.game.Game.variantsWhereWhiteIsBetter(variant) &&
-          color != Color.Random
-        ) Color.Random
-        else color
+          lila.game.Game.variantsWhereP1IsBetter(variant) &&
+          playerIndex != PlayerIndex.Random
+        ) PlayerIndex.Random
+        else playerIndex
     )
 
   def >> =
-    (s"{$variant.gameLogic.id}_{$variant.id}", timeMode.id, time, increment, days, mode.id.some, ratingRange.toString.some, color.name).some
+    (s"{$variant.gameLogic.id}_{$variant.id}", timeMode.id, time, increment, days, mode.id.some, ratingRange.toString.some, playerIndex.name).some
 
   def withTimeModeString(tc: Option[String]) =
     tc match {
@@ -71,7 +71,7 @@ case class HookConfig(
             variant = variant,
             clock = clock,
             mode = if (lila.game.Game.allowRated(variant, clock.some)) mode else Mode.Casual,
-            color = color.name,
+            playerIndex = playerIndex.name,
             user = user,
             blocking = blocking,
             sid = sid,
@@ -84,7 +84,7 @@ case class HookConfig(
             variant = variant,
             daysPerTurn = makeDaysPerTurn,
             mode = mode,
-            color = color.name,
+            playerIndex = playerIndex.name,
             user = u,
             blocking = blocking,
             ratingRange = ratingRange
@@ -121,7 +121,7 @@ object HookConfig extends BaseHumanConfig {
       days = d,
       mode = realMode,
       ratingRange = e.fold(RatingRange.default)(RatingRange.orDefault),
-      color = Color(c) err s"Invalid color $c"
+      playerIndex = PlayerIndex(c) err s"Invalid playerIndex $c"
     )
   }
 
@@ -135,7 +135,7 @@ object HookConfig extends BaseHumanConfig {
     days = 2,
     mode = Mode.default,
     ratingRange = RatingRange.default,
-    color = Color.default
+    playerIndex = PlayerIndex.default
   )
 
   import lila.db.BSON
@@ -151,7 +151,7 @@ object HookConfig extends BaseHumanConfig {
         increment = r int "i",
         days = r int "d",
         mode = Mode orDefault (r int "m"),
-        color = Color.Random,
+        playerIndex = PlayerIndex.Random,
         ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default
       )
 

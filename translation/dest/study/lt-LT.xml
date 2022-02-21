@@ -150,6 +150,7 @@
   <string name="blackIsSlightlyBetter">Šiek tiek geriau juodiesiems</string>
   <string name="whiteIsBetter">Geriau baltiesiems</string>
   <string name="blackIsBetter">Geriau juodiesiems</string>
+  <string name="playerIndexIsWinning">Laimi %s</string>
   <string name="whiteIsWinning">Laimi baltieji</string>
   <string name="blackIsWinning">Laimi juodieji</string>
   <string name="novelty" comment="novelty&#10;&#10;A move in the opening that has not been played before.&#10;https://en.wikipedia.org/wiki/Glossary_of_chess#theoretical_novelty">Naujovė</string>

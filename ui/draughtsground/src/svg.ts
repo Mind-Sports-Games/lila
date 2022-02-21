@@ -139,7 +139,7 @@ function shapeHash(
 }
 
 function pieceHash(piece: DrawShapePiece): Hash {
-  return [piece.color, piece.role, piece.scale].filter(x => x).join(',');
+  return [piece.playerIndex, piece.role, piece.scale].filter(x => x).join(',');
 }
 
 function modifiersHash(m: DrawModifiers): Hash {
@@ -243,9 +243,9 @@ function renderPiece(
 ): SVGElement {
   const o = pos2px(pos, bounds, boardSize),
     size = (bounds.width / boardSize[0]) * (piece.scale || 1),
-    name = piece.color[0] + piece.role[0].toUpperCase();
+    name = piece.playerIndex[0] + piece.role[0].toUpperCase();
   return setAttributes(createElement('image'), {
-    className: `${piece.role} ${piece.color}`,
+    className: `${piece.role} ${piece.playerIndex}`,
     x: o[0] - size / 2,
     y: o[1] - size / 2,
     width: size,
@@ -278,8 +278,8 @@ function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SVGElemen
   return el;
 }
 
-function orient(pos: cg.Pos, color: cg.Color, boardSize: cg.BoardSize): cg.Pos {
-  return color === 'white' ? pos : [boardSize[0] / 2 + 1 - pos[0], boardSize[1] + 1 - pos[1]];
+function orient(pos: cg.Pos, playerIndex: cg.PlayerIndex, boardSize: cg.BoardSize): cg.Pos {
+  return playerIndex === 'p1' ? pos : [boardSize[0] / 2 + 1 - pos[0], boardSize[1] + 1 - pos[1]];
 }
 
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {

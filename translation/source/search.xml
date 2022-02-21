@@ -20,6 +20,7 @@
   <string name="nbTurns">Number of turns</string>
   <string name="result">Result</string>
   <string name="winnerColor">Winner color</string>
+  <string name="winnerPlayerIndex">Winner player order</string>
   <string name="date">Date</string>
   <string name="sortBy">Sort by</string>
   <string name="analysis">Analysis</string>

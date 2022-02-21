@@ -24,7 +24,7 @@ object mine {
       moreJs = bits.js(c, json, owner = true),
       moreCss = cssTag("challenge.page")
     ) {
-      val challengeLink = s"$netBaseUrl${routes.Round.watcher(c.id, "white")}"
+      val challengeLink = s"$netBaseUrl${routes.Round.watcher(c.id, "p1")}"
       main(cls := s"page-small challenge-page box box-pad challenge--${c.status.name}")(
         c.status match {
           case Status.Created | Status.Offline =>
@@ -86,7 +86,7 @@ object mine {
               c.notableInitialFen.map { fen =>
                 frag(
                   br,
-                  div(cls := "board-preview", views.html.board.bits.mini(fen, c.finalColor, c.variant.key)(div))
+                  div(cls := "board-preview", views.html.board.bits.mini(fen, c.finalPlayerIndex, c.variant.key)(div))
                 )
               },
               !c.isOpen option cancelForm
@@ -105,7 +105,7 @@ object mine {
             div(cls := "follow-up")(
               h1(trans.challenge.challengeAccepted()),
               bits.details(c),
-              a(id := "challenge-redirect", href := routes.Round.watcher(c.id, "white"), cls := "button-fat")(
+              a(id := "challenge-redirect", href := routes.Round.watcher(c.id, "p1"), cls := "button-fat")(
                 trans.joinTheGame()
               )
             )

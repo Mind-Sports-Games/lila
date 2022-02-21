@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.Color
+import strategygames.{ Player => PlayerIndex }
 
 import lila.game.{ Event, Game, Pov, Progress }
 import lila.pref.{ Pref, PrefApi }
@@ -14,11 +14,11 @@ final private class Moretimer(
   // pov of the player giving more time
   def apply(pov: Pov, duration: FiniteDuration): Fu[Option[Progress]] =
     IfAllowed(pov.game) {
-      (pov.game moretimeable !pov.color) ?? {
-        if (pov.game.hasClock) give(pov.game, List(!pov.color), duration).some
+      (pov.game moretimeable !pov.playerIndex) ?? {
+        if (pov.game.hasClock) give(pov.game, List(!pov.playerIndex), duration).some
         else
           pov.game.hasCorrespondenceClock option {
-            messenger.volatile(pov.game, s"${!pov.color} gets more time")
+            messenger.volatile(pov.game, s"${!pov.playerIndex} gets more time")
             val p = pov.game.correspondenceGiveTime
             p.game.correspondenceClock.map(Event.CorrespondenceClock.apply).fold(p)(p + _)
           }
@@ -29,16 +29,16 @@ final private class Moretimer(
     if (game.isMandatory) fuFalse
     else isAllowedByPrefs(game)
 
-  private[round] def give(game: Game, colors: List[Color], duration: FiniteDuration): Progress =
+  private[round] def give(game: Game, playerIndexs: List[PlayerIndex], duration: FiniteDuration): Progress =
     game.clock.fold(Progress(game)) { clock =>
       val centis = duration.toCentis
-      val newClock = colors.foldLeft(clock) { case (c, color) =>
-        c.giveTime(color, centis)
+      val newClock = playerIndexs.foldLeft(clock) { case (c, playerIndex) =>
+        c.giveTime(playerIndex, centis)
       }
-      colors.foreach { c =>
+      playerIndexs.foreach { c =>
         messenger.volatile(game, s"$c + ${duration.toSeconds} seconds")
       }
-      (game withClock newClock) ++ colors.map { Event.ClockInc(_, centis) }
+      (game withClock newClock) ++ playerIndexs.map { Event.ClockInc(_, centis) }
     }
 
   private def isAllowedByPrefs(game: Game): Fu[Boolean] =

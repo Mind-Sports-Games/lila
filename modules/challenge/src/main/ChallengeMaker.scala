@@ -45,7 +45,7 @@ final class ChallengeMaker(
         initialFen = initialFen,
         timeControl = timeControl,
         mode = pov.game.mode,
-        color = (!pov.color).name,
+        playerIndex = (!pov.playerIndex).name,
         challenger = Challenge.toRegistered(pov.game.variant, timeControl)(challenger),
         destUser = dest.some,
         rematchOf = pov.gameId.some,

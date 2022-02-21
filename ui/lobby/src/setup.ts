@@ -112,11 +112,11 @@ export default class Setup {
     return undefined;
   };
 
-  private hookToPoolMember = (color: string, form: HTMLFormElement) => {
+  private hookToPoolMember = (playerIndex: string, form: HTMLFormElement) => {
     const data = Array.from(new FormData(form).entries());
     const hash: any = {};
     for (const i in data) hash[data[i][0]] = data[i][1];
-    const valid = color == 'random' && hash.variant == 1 && hash.mode == 1 && hash.timeMode == 1,
+    const valid = playerIndex == 'random' && hash.variant == 1 && hash.mode == 1 && hash.timeMode == 1,
       id = parseFloat(hash.time) + '+' + parseInt(hash.increment);
     return valid && this.root.pools.find(p => p.id === id)
       ? {
@@ -144,10 +144,10 @@ export default class Setup {
       $daysInput = $form.find('.days_choice [name=days]'),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
-      randomColorVariants = $form.data('random-color-variants').split(','),
-      $submits = $form.find('.color-submits__button'),
+      randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
+      $submits = $form.find('.playerIndex-submits__button'),
       toggleButtons = () => {
-        randomColorVariants;
+        randomPlayerIndexVariants;
         const variantId = ($variantSelect.val() as string).split('_'),
           timeMode = $timeModeSelect.val(),
           rated = $rated.prop('checked'),
@@ -167,7 +167,7 @@ export default class Setup {
           aiOk = typ != 'ai' || variantId[1] != '3' || limit >= 1;
         if (timeOk && ratedOk && aiOk) {
           $submits.toggleClass('nope', false);
-          $submits.filter(':not(.random)').toggle(!rated || !randomColorVariants.includes(variantId[1]));
+          $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
       },
       save = function () {
@@ -304,6 +304,31 @@ export default class Setup {
       $modal.find('.ratings input').val($selected.find('strong').text());
       save();
     };
+    const showStartingImages = () => {
+      const variantId = ($variantSelect.val() as string).split('_');
+      const class_list = 'chess draughts loa shogi xiangqi';
+      let key = 'chess';
+      switch (variantId[0]) {
+        case '0':
+          key = 'chess';
+          break;
+        case '1':
+          key = 'draughts';
+          break;
+        case '2':
+          key = 'loa';
+          break;
+        case '3':
+          key = 'shogi';
+          break;
+        case '4':
+          key = 'xiangqi';
+          break;
+      }
+      $form.find('.playerIndex-submits').removeClass(class_list);
+      $form.find('.playerIndex-submits').addClass(key);
+      save();
+    };
     if (typ == 'hook') {
       if ($form.data('anon')) {
         $timeModeSelect
@@ -312,7 +337,7 @@ export default class Setup {
           .prop('disabled', true)
           .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
       }
-      const ajaxSubmit = (color: string) => {
+      const ajaxSubmit = (playerIndex: string) => {
         const form = $form[0] as HTMLFormElement;
         const rating = parseInt($modal.find('.ratings input').val() as string) || 1500;
         if (form.ratingRange)
@@ -321,7 +346,7 @@ export default class Setup {
             rating + parseInt(form.ratingRange_range_max.value),
           ].join('-');
         save();
-        const poolMember = this.hookToPoolMember(color, form);
+        const poolMember = this.hookToPoolMember(playerIndex, form);
         modal.close();
         if (poolMember) {
           this.root.enterPool(poolMember);
@@ -331,7 +356,7 @@ export default class Setup {
             method: 'post',
             body: (() => {
               const data = new FormData($form[0] as HTMLFormElement);
-              data.append('color', color);
+              data.append('playerIndex', playerIndex);
               return data;
             })(),
           });
@@ -348,7 +373,7 @@ export default class Setup {
     } else
       $form.one('submit', () => {
         $submits.hide();
-        $form.find('.color-submits').append(playstrategy.spinnerHtml);
+        $form.find('.playerIndex-submits').append(playstrategy.spinnerHtml);
       });
     if (this.root.opts.blindMode) {
       $variantSelect[0]!.focus();
@@ -510,6 +535,7 @@ export default class Setup {
           requestAnimationFrame(() => document.body.dispatchEvent(new Event(ground)));
         }
         showRating();
+        showStartingImages();
         toggleButtons();
       })
       .trigger('change');

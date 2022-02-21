@@ -18,6 +18,7 @@
   <string name="black">ጥቁር</string>
   <string name="randomColor">ከሁለት በአንዱ</string>
   <string name="createAGame">ጨዋታ ይፍጠሩ</string>
+  <string name="playerIndexIsVictorious">%s አሸንፏል</string>
   <string name="whiteIsVictorious">ነጭ አሸንፏል</string>
   <string name="blackIsVictorious">ጥቁር አሸንፏል</string>
   <string name="kingInTheCenter">ንጉስ መሃል ላይ</string>
@@ -34,8 +35,10 @@
   <string name="forceDraw">እኩል ለመውጣት ይጠይቁ</string>
   <string name="talkInChat">እባክዎን ውይይት ላይ ጥሩ ባህሪ ይኑርዎት!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">ይህን ማስፈንጥሪያ የተጠቀመ የመጀመሪያ ሰው ከእርስዎ ጋር ይጫወታል.</string>
+  <string name="playerIndexResigned">%s እጅ ሰቷል</string>
   <string name="whiteResigned">ነጭ እጅ ሰቷል</string>
   <string name="blackResigned">ጥቁር እጅ ሰቷል</string>
+  <string name="playerIndexLeftTheGame">%s ጨዋታውን ትቶ ሄዷል</string>
   <string name="whiteLeftTheGame">ነጭ ጨዋታውን ትቶ ሄዷል</string>
   <string name="blackLeftTheGame">ጥቁር ጨዋታውን ትቶ ሄዷል</string>
   <string name="shareThisUrlToLetSpectatorsSeeTheGame">ይህን ማስፈንጠሪያ ለተመልካቾች ያጋሩ</string>

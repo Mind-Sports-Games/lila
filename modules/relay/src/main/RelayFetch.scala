@@ -255,21 +255,21 @@ private object RelayFetch {
           List(fname, mname, lname).flatten mkString " "
         }.filter(_.nonEmpty)
     }
-    case class RoundJsonPairing(white: PairingPlayer, black: PairingPlayer, result: String) {
+    case class RoundJsonPairing(p1: PairingPlayer, p2: PairingPlayer, result: String) {
       def tags =
         Tags(
           List(
-            white.fullName map { v =>
-              Tag(_.White, v)
+            p1.fullName map { v =>
+              Tag(_.P1, v)
             },
-            white.title map { v =>
-              Tag(_.WhiteTitle, v)
+            p1.title map { v =>
+              Tag(_.P1Title, v)
             },
-            black.fullName map { v =>
-              Tag(_.Black, v)
+            p2.fullName map { v =>
+              Tag(_.P2, v)
             },
-            black.title map { v =>
-              Tag(_.BlackTitle, v)
+            p2.title map { v =>
+              Tag(_.P2Title, v)
             },
             Tag(_.Result, result).some
           ).flatten
