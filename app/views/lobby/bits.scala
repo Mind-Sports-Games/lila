@@ -20,7 +20,7 @@ object bits {
       tournamentWinners: List[lila.tournament.Winner]
   )(implicit ctx: Context) =
     frag(
-      div(cls := "lobby__leaderboard lobby__box")(
+      /*div(cls := "lobby__leaderboard lobby__box")(
         div(cls := "lobby__box__top")(
           h2(cls := "title text", dataIcon := "C")(trans.leaderboard()),
           a(cls := "more", href := routes.User.list)(trans.more(), " »")
@@ -40,7 +40,7 @@ object bits {
             )
           )
         )
-      ),
+      ),*/
       div(cls := "lobby__winners lobby__box")(
         div(cls := "lobby__box__top")(
           h2(cls := "title text", dataIcon := "g")(trans.tournamentWinners()),
