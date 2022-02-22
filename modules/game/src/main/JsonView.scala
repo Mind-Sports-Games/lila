@@ -18,6 +18,7 @@ final class JsonView(rematches: Rematches) {
         "id"            -> game.id,
         "lib"           -> game.variant.gameLogic.id,
         "variant"       -> game.variant,
+        "gameFamily"    -> game.variant.gameFamily.shortName.toLowerCase(),
         "speed"         -> game.speed.key,
         "perf"          -> PerfPicker.key(game),
         "rated"         -> game.rated,

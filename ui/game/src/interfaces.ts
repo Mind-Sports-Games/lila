@@ -32,6 +32,7 @@ export interface BaseGame {
   source: Source;
   speed: Speed;
   variant: Variant | DraughtsVariant;
+  gameFamily: GameFamilyKey;
   winner?: PlayerIndex;
   winnerPlayer?: PlayerName;
   loserPlayer?: PlayerName;
