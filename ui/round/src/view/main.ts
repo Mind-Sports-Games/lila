@@ -92,7 +92,7 @@ export function main(ctrl: RoundController): VNode {
   return ctrl.nvui
     ? ctrl.nvui.render(ctrl)
     : h(
-        'div.round__app.variant-' + d.game.variant.key + notationBasic,
+        `div.round__app.variant-${d.game.variant.key}${notationBasic}.${d.game.gameFamily}`,
         {
           class: { 'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit) },
         },

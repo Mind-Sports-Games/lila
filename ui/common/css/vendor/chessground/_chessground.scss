@@ -47,6 +47,13 @@ cg-board {
   height: calc(100% / 7);
 }
 
+$alternate-board-highlights: (
+  'flipello-green': 'flipello',
+  'flipello-green-marble': 'flipello',
+  'flipello-wood': 'flipello',
+);
+$alternate-color: rgba(20, 30, 85, 0.5);
+
 square {
   position: absolute;
   width: 12.5%;
@@ -56,6 +63,12 @@ square {
   &.move-dest {
     background: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
     pointer-events: auto;
+
+    @each $color, $gameFamily in $alternate-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: radial-gradient($alternate-color 19%, rgba(0, 0, 0, 0) 20%);
+      }
+    }
   }
 
   &.premove-dest {
@@ -71,17 +84,18 @@ square {
     background: radial-gradient(transparent 0%, transparent 79%, rgba(20, 30, 85, 0.2) 80%);
   }
 
-  body.green &.last-move,
-  body.green-plastic &.last-move,
-  body.marble &.last-move {
-    background-color: rgba(0, 155, 199, 0.41);
+  @each $color, $gameFamily in $alternate-board-highlights {
+    body.#{$color} .#{$gameFamily} &.last-move {
+      background-color: $alternate-color;
+    }
   }
 
   &.last-move {
     will-change: transform;
     background-color: rgba(155, 199, 0, 0.41);
 
-    body.horsey &:not(.move-dest) {
+    body.chess-horsey &:not(.move-dest),
+    body.loa-horsey &:not(.move-dest) {
       background: url(../images/board/horsey.last-move.png);
       background-size: cover;
     }
@@ -100,7 +114,8 @@ square {
   &.selected {
     background-color: rgba(20, 85, 30, 0.5);
 
-    body.horsey & {
+    body.chess-horsey &,
+    body.loa-horsey & {
       background: url(../images/board/horsey.selected.png);
       background-size: cover;
     }
@@ -109,7 +124,8 @@ square {
   &.current-premove {
     background-color: rgba(20, 30, 85, 0.5) !important;
 
-    body.horsey & {
+    body.chess-horsey &,
+    body.loa-horsey & {
       background: url(../images/board/horsey.current-premove.png);
       background-size: cover;
     }
@@ -118,9 +134,16 @@ square {
   &.move-dest:hover {
     background: rgba(20, 85, 30, 0.3);
 
-    body.horsey & {
+    body.chess-horsey &,
+    body.loa-horsey & {
       background: url(../images/board/horsey.move-dest.png);
       background-size: cover;
+    }
+
+    @each $color, $gameFamily in $alternate-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: $alternate-color;
+      }
     }
   }
 
