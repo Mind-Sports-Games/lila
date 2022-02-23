@@ -36,6 +36,7 @@ object jsI18n {
     trans.threeChecks,
     trans.fiveChecks,
     trans.checkersConnected,
+    trans.gameFinished,
     trans.variantEnding
   ).map(_.key)
 
