@@ -11,7 +11,14 @@ import { render as keyboardMove } from '../keyboardMove';
 import { render as renderGround } from '../ground';
 import { renderTable } from './table';
 
-function renderMaterial(material: MaterialDiffSide, score: number, position: Position, checks?: number) {
+function renderMaterial(
+  material: MaterialDiffSide,
+  score: number,
+  position: Position,
+  noMaterial: boolean,
+  checks?: number
+) {
+  if (noMaterial) return;
   const children: VNode[] = [];
   let role: string, i: number;
   for (role in material) {
@@ -55,7 +62,6 @@ export function main(ctrl: RoundController): VNode {
     topPlayerIndex = d[ctrl.flip ? 'player' : 'opponent'].playerIndex,
     bottomPlayerIndex = d[ctrl.flip ? 'opponent' : 'player'].playerIndex,
     boardSize = d.game.variant.boardSize;
-
   let topScore = -1,
     bottomScore = -1;
   if (d.game.variant.key === 'flipello') {
@@ -109,10 +115,10 @@ export function main(ctrl: RoundController): VNode {
           ),
           renderPlayerScore(topScore, 'top', topPlayerIndex),
           crazyView(ctrl, topPlayerIndex, 'top') ||
-            renderMaterial(material[topPlayerIndex], -score, 'top', checks[topPlayerIndex]),
+            renderMaterial(material[topPlayerIndex], -score, 'top', d.onlyDropsVariant, checks[topPlayerIndex]),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
-            renderMaterial(material[bottomPlayerIndex], score, 'bottom', checks[bottomPlayerIndex]),
+            renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.onlyDropsVariant, checks[bottomPlayerIndex]),
           renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex),
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ]

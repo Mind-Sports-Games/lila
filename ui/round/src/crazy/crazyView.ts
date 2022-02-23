@@ -19,7 +19,7 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
       : variantKey == 'flipello'
       ? pieceFlipelloRoles
       : pieceShogiRoles;
-  if (!step.crazy) return;
+  if (!step.crazy || ctrl.data.onlyDropsVariant) return;
   const droppedRole = ctrl.justDropped,
     preDropRole = ctrl.preDrop,
     pocket = step.crazy.pockets[playerIndex === 'p1' ? 0 : 1],
