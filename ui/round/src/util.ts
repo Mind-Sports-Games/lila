@@ -182,3 +182,12 @@ const noAnalysisVariants = [
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;
 }
+
+export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): cg.Piece | undefined {
+  switch (variant) {
+    case 'flipello':
+      return { playerIndex: turnPlayerIndex, role: 'p-piece' };
+    default:
+      return undefined;
+  }
+}

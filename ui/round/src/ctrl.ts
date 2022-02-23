@@ -222,7 +222,7 @@ export default class RoundController {
     s: State
   ): void => {
     if (activePlayerIndex) {
-      return setDropMode(s, { playerIndex: currentPlayerIndex, role: 'p-piece' });
+      return setDropMode(s, util.onlyDropsVariantPiece(s.variant as VariantKey, currentPlayerIndex));
     } else {
       return cancelDropMode(s);
     }
@@ -432,8 +432,8 @@ export default class RoundController {
           },
           o.uci.substr(2, 2) as cg.Key
         );
-        if (d.game.variant.key == 'flipello') {
-          flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
+        if (d.game.variant.key == 'flipello') flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
+        if (this.data.onlyDropsVariant) {
           this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
         }
       } else {
@@ -715,13 +715,6 @@ export default class RoundController {
 
   private onChange = () => {
     if (this.opts.onChange) setTimeout(() => this.opts.onChange(this.data), 150);
-    if (this.data.onlyDropsVariant) {
-      this.setDropOnlyVariantDropMode(
-        this.data.player.playerIndex === this.data.game.player,
-        this.data.player.playerIndex,
-        this.chessground.state
-      );
-    }
   };
 
   private goneTick?: number;

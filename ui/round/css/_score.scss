@@ -15,9 +15,8 @@
       @extend %active, %box-radius;
 
       content: attr(data-score);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      top: 0;
+      right: 0;
       position: absolute;
       line-height: 0.9em;
       padding: 3px 0.3em;
