@@ -2,7 +2,23 @@ package lila.game
 
 import play.api.libs.json._
 
-import strategygames.{ Board, Centis, Player => PlayerIndex, GameFamily, GameLogic, Move => StratMove, Drop => StratDrop, PromotableRole, PocketData, Pos, Situation, Status, Role, P1, P2 }
+import strategygames.{
+  Board,
+  Centis,
+  Player => PlayerIndex,
+  GameFamily,
+  GameLogic,
+  Move => StratMove,
+  Drop => StratDrop,
+  PromotableRole,
+  PocketData,
+  Pos,
+  Situation,
+  Status,
+  Role,
+  P1,
+  P2
+}
 import strategygames.chess
 import strategygames.variant.Variant
 import strategygames.format.Forsyth
@@ -14,9 +30,9 @@ sealed trait Event {
   def typ: String
   def data: JsValue
   def only: Option[PlayerIndex]   = None
-  def owner: Boolean        = false
-  def watcher: Boolean      = false
-  def troll: Boolean        = false
+  def owner: Boolean              = false
+  def watcher: Boolean            = false
+  def troll: Boolean              = false
   def moveBy: Option[PlayerIndex] = None
 }
 
@@ -37,6 +53,7 @@ object Event {
         fen: String,
         check: Boolean,
         threefold: Boolean,
+        postPass: Boolean,
         state: State,
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
@@ -47,11 +64,11 @@ object Event {
     )(extra: JsObject) = {
       extra ++ Json
         .obj(
-          "fen"   -> fen,
-          "ply"   -> state.turns,
-          "dests" -> PossibleMoves.oldJson(possibleMoves),
-          "captLen" -> ~captLen,
-          "gf"      -> gf.id,
+          "fen"         -> fen,
+          "ply"         -> state.turns, //(state.turns - (if (postPass) 1 else 0)),
+          "dests"       -> PossibleMoves.oldJson(possibleMoves),
+          "captLen"     -> ~captLen,
+          "gf"          -> gf.id,
           "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty))
         )
         .add("clock" -> clock.map(_.data))
@@ -59,6 +76,7 @@ object Event {
         .add("winner" -> state.winner)
         .add("check" -> check)
         .add("threefold" -> threefold)
+        .add("postPass" -> postPass)
         .add("wDraw" -> state.p1OffersDraw)
         .add("bDraw" -> state.p2OffersDraw)
         .add("crazyhouse" -> pocketData)
@@ -94,6 +112,7 @@ object Event {
         fen,
         check,
         threefold,
+        false, //postPass
         state,
         clock,
         possibleMoves,
@@ -130,10 +149,14 @@ object Event {
           case StratMove.Draughts(move) => strategygames.draughts.format.pdn.Dumper(move)
           case StratMove.FairySF(move)  => strategygames.fairysf.format.pgn.Dumper(move)
         },
-        fen = if (situation.board.variant.gameLogic == GameLogic.Draughts() && situation.board.variant.frisianVariant)
+        fen =
+          if (
+            situation.board.variant.gameLogic == GameLogic
+              .Draughts() && situation.board.variant.frisianVariant
+          )
             situation.board match {
-              case Board.Draughts(board)
-                => Forsyth.exportBoard(GameLogic.Draughts(), situation.board) + ":" + 
+              case Board.Draughts(board) =>
+                Forsyth.exportBoard(GameLogic.Draughts(), situation.board) + ":" +
                   strategygames.draughts.format.Forsyth.exportKingMoves(board)
               case _ => sys.error("mismatched board lib types")
             }
@@ -142,8 +165,8 @@ object Event {
         check = situation.check,
         threefold = situation.threefoldRepetition,
         promotion = move.promotion.map { Promotion(_, move.dest) },
-        enpassant = (move.capture ifTrue move.enpassant).map {
-          (capture: List[Pos]) => Event.Enpassant(capture(0), !move.player)
+        enpassant = (move.capture ifTrue move.enpassant).map { (capture: List[Pos]) =>
+          Event.Enpassant(capture(0), !move.player)
         },
         castle = move.castle.map { case (king, rook) =>
           Castling(king, rook, move.player)
@@ -153,20 +176,22 @@ object Event {
         possibleMoves = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
             if (situation.ghosts > 0)
-              Map(Pos.Draughts(moveDest) ->
-                situation.destinationsFrom(moveDest).map(Pos.Draughts)
+              Map(
+                Pos.Draughts(moveDest) ->
+                  situation.destinationsFrom(moveDest).map(Pos.Draughts)
               )
-            else situation.allDestinations.map{
-              case(from, to) => (Pos.Draughts(from), to.map(Pos.Draughts))
-            }
+            else
+              situation.allDestinations.map { case (from, to) =>
+                (Pos.Draughts(from), to.map(Pos.Draughts))
+              }
           case _ => situation.destinations
         },
         possibleDrops = situation.drops,
-        possibleDropsByRole = (situation) match {
-          case (Situation.FairySF(_)) => 
-              situation.dropsByRole
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
           case _ => None
-          },
+        },
         pocketData = pocketData,
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
@@ -176,6 +201,37 @@ object Event {
               situation.allMovesCaptureLength.some
           case _ => None
         }
+      )
+
+    //for Flipello
+    def applyPass(
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): Move =
+      Move(
+        gf = situation.board.variant.gameFamily,
+        orig = Pos.FairySF(strategygames.fairysf.Pos.D1),
+        dest = Pos.FairySF(strategygames.fairysf.Pos.D1),
+        san = "PASSSAN",
+        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        check = false,
+        threefold = false,
+        promotion = None,
+        enpassant = None,
+        castle = None,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        pocketData = pocketData,
+        captLen = None
       )
   }
 
@@ -187,12 +243,13 @@ object Event {
       fen: String,
       check: Boolean,
       threefold: Boolean,
+      postPass: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
-      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]]
   ) extends Event {
     def typ = "drop"
     def data =
@@ -201,6 +258,7 @@ object Event {
         fen,
         check,
         threefold,
+        postPass,
         state,
         clock,
         possibleMoves,
@@ -235,15 +293,20 @@ object Event {
         fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
+        postPass = situation match {
+          case Situation.FairySF(situation) =>
+            situation.board.variant.passUci == situation.board.uciMoves.lastOption
+          case _ => false
+        },
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        possibleDropsByRole = (situation) match {
-          case (Situation.FairySF(_)) => 
-              situation.dropsByRole
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
           case _ => None
-          },
+        },
         pocketData = pocketData
       )
   }
@@ -263,7 +326,7 @@ object Event {
         }
         JsString(sb.toString)
       }
-      
+
   }
 
   object PossibleMoves {
@@ -298,7 +361,7 @@ object Event {
     def typ = "enpassant"
     def data =
       Json.obj(
-        "key"   -> pos.key,
+        "key"         -> pos.key,
         "playerIndex" -> playerIndex
       )
   }
@@ -307,8 +370,8 @@ object Event {
     def typ = "castling"
     def data =
       Json.obj(
-        "king"  -> Json.arr(king._1.key, king._2.key),
-        "rook"  -> Json.arr(rook._1.key, rook._2.key),
+        "king"        -> Json.arr(king._1.key, king._2.key),
+        "rook"        -> Json.arr(rook._1.key, rook._2.key),
         "playerIndex" -> playerIndex
       )
   }
@@ -370,10 +433,10 @@ object Event {
     def data =
       Json
         .obj(
-          "winner" -> game.winnerPlayerIndex,
+          "winner"       -> game.winnerPlayerIndex,
           "winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames),
-          "loserPlayer" -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)),
-          "status" -> game.status
+          "loserPlayer"  -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)),
+          "status"       -> game.status
         )
         .add("clock" -> game.clock.map { c =>
           Json.obj(
@@ -423,7 +486,7 @@ object Event {
     def data =
       Json.obj(
         "playerIndex" -> playerIndex,
-        "time"  -> time.centis
+        "time"        -> time.centis
       )
   }
 
@@ -474,8 +537,8 @@ object Event {
   case class KingMoves(p1: Int, p2: Int, p1King: Option[Pos], p2King: Option[Pos]) extends Event {
     def typ = "kingMoves"
     def data = Json.obj(
-      "p1" -> p1,
-      "p2" -> p2,
+      "p1"     -> p1,
+      "p2"     -> p2,
       "p1King" -> p1King.map(_.toString),
       "p2King" -> p2King.map(_.toString)
     )
@@ -494,7 +557,7 @@ object Event {
       Json
         .obj(
           "playerIndex" -> playerIndex,
-          "turns" -> turns
+          "turns"       -> turns
         )
         .add("status" -> status)
         .add("winner" -> winner)

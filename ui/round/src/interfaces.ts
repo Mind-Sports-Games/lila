@@ -128,6 +128,7 @@ export interface ApiMove extends Step {
   winner?: PlayerIndex;
   check: boolean;
   threefold: boolean;
+  postPass: boolean;
   wDraw: boolean;
   bDraw: boolean;
   crazyhouse?: CrazyData;
