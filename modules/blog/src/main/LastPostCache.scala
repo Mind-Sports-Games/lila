@@ -8,7 +8,7 @@ final class LastPostCache(
     config: BlogConfig,
     cacheApi: CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
-/*
+
   private val cache = cacheApi.sync[Boolean, List[MiniPost]](
     name = "blog.lastPost",
     initialCapacity = 1,
@@ -37,5 +37,5 @@ final class LastPostCache(
     }
 
   def apply: List[MiniPost] = cache sync true
-*/
+
 }

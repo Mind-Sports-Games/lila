@@ -14,7 +14,6 @@ final class Blog(
     prismicC: Prismic
 )(implicit ws: play.api.libs.ws.StandaloneWSClient)
     extends LilaController(env) {
-/*
   import prismicC._
 
   private def blogApi = env.blog.api
@@ -155,5 +154,4 @@ final class Blog(
       case document if document.slugs.exists(StringUtils.stripEnd(_, ".") == slug) =>
         fuccess(callback(Left(document.slug)))
     } getOrElse notFound
-  */
 }

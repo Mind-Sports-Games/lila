@@ -10,7 +10,7 @@ import controllers.routes
 
 object index {
 
-/*
+
   def apply(
       pager: Paginator[io.prismic.Document]
   )(implicit ctx: Context, prismic: lila.blog.BlogApi.Context) = {
@@ -92,5 +92,5 @@ object index {
           )
         )
       )
-    )*/
+    )
 }
