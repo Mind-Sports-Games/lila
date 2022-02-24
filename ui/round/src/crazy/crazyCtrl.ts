@@ -9,7 +9,6 @@ import * as chessUtil from 'chess';
 export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
 export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 export const pieceMiniShogiRoles: cg.Role[] = ['p-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
-export const pieceFlipelloRoles: cg.Role[] = ['p-piece'];
 
 export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
@@ -77,8 +76,6 @@ export function init(ctrl: RoundController) {
             ? pieceShogiRoles
             : ctrl.data.game.variant.key === 'minishogi'
             ? pieceMiniShogiRoles
-            : ctrl.data.game.variant.key == 'flipello'
-            ? pieceFlipelloRoles
             : pieceRoles,
         role = dropRoles[crazyKeys[crazyKeys.length - 1] - 1],
         playerIndex = ctrl.data.player.playerIndex,
@@ -88,8 +85,6 @@ export function init(ctrl: RoundController) {
       setDropMode(ctrl.chessground.state, nb > 0 ? { playerIndex, role } : undefined);
       if (ctrl.data.game.variant.key === 'shogi' || ctrl.data.game.variant.key === 'minishogi') {
         activeCursor = `cursor-${role}-shogi`;
-      } else if (ctrl.data.game.variant.key === 'flipello') {
-        activeCursor = `cursor-${playerIndex}-${role}-flipello`;
       } else {
         activeCursor = `cursor-${playerIndex}-${role}-chess`;
       }
@@ -110,8 +105,7 @@ export function init(ctrl: RoundController) {
   playstrategy.pubsub.on('ply', () => {
     if (crazyKeys.length > 0) setDrop();
   });
-  const numDropPieces =
-    ctrl.data.game.variant.key == 'crazyhouse' ? 5 : ctrl.data.game.variant.key == 'flipello' ? 1 : 7;
+  const numDropPieces = ctrl.data.game.variant.key == 'crazyhouse' ? 5 : 7;
   for (let i = 1; i <= numDropPieces; i++) {
     const iStr = i.toString();
     k.bind(iStr, () => {
@@ -161,10 +155,8 @@ export function init(ctrl: RoundController) {
 function preloadMouseIcons(data: RoundData) {
   const playerIndexKey = data.player.playerIndex == 'p1' ? 'w' : 'b';
   const playerIndexNum = data.player.playerIndex == 'p1' ? '0' : '1';
-  const playerIndexKeyFilpello = playerIndexKey == 'w' ? 'b' : 'w';
   for (const pKey of 'PNBRQ') fetch(playstrategy.assetUrl(`piece/chess/cburnett/${playerIndexKey}${pKey}.svg`));
   for (const pKey of ['FU', 'KY', 'KE', 'GI', 'KI', 'KA', 'HI'])
     fetch(playstrategy.assetUrl(`piece/shogi/2kanji/${playerIndexNum}${pKey}.svg`));
-  fetch(playstrategy.assetUrl(`piece/flipello/classic_flipello/${playerIndexKeyFilpello}P.svg`));
   mouseIconsLoaded = true;
 }

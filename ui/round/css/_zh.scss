@@ -96,11 +96,3 @@ $shogi-piece-drops-roles: (
     cursor: url(../piece/shogi/2kanji/0#{$r}.svg) 22 22, auto !important;
   }
 }
-
-@each $color, $c in ('p1': 'b', 'p2': 'w') {
-  @each $role, $r in ('p-piece': 'P') {
-    body.cursor-#{$color}-#{$role}-flipello * {
-      cursor: url(../piece/flipello/classic_flipello/#{$c}#{$r}.svg) 22 22, auto !important;
-    }
-  }
-}

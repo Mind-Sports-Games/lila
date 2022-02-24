@@ -10,14 +10,6 @@
   flex: 0 0 calc(100% / 5);
 }
 
-.variant-flipello .pocket-c1 {
-  flex: 0 0 100%;
-}
-
-.variant-flipello .pocket {
-  width: 20%;
-}
-
 .pocket {
   @extend %box-radius;
 
