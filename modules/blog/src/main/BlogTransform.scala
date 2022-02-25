@@ -6,11 +6,11 @@ import scala.util.matching.Regex
 
 object BlogTransform {
 
-  private val RemoveRegex          = """http://(\w{2}\.)?+lichess\.org""".r
-  def removeProtocol(html: String) = RemoveRegex.replaceAllIn(html, _ => "//lichess.org")
+  private val RemoveRegex          = """http://(\w{2}\.)?+playstrategy\.org""".r
+  def removeProtocol(html: String) = RemoveRegex.replaceAllIn(html, _ => "//playstrategy.org")
 
-  private val AddRegex          = """(https?+:)?+(//)?+(\w{2}\.)?+lichess\.org""".r
-  def addProtocol(html: String) = AddRegex.replaceAllIn(html, _ => "https://lichess.org")
+  private val AddRegex          = """(https?+:)?+(//)?+(\w{2}\.)?+playstrategy\.org""".r
+  def addProtocol(html: String) = AddRegex.replaceAllIn(html, _ => "https://playstrategy.org")
 
   object markdown {
     private type Text = String
