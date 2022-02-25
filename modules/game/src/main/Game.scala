@@ -15,7 +15,6 @@ import strategygames.{
   Move,
   MoveOrDrop,
   Pos,
-  Situation,
   Speed,
   Status,
   P1
@@ -91,9 +90,9 @@ case class Game(
 
   def turnPlayerIndex = chess.player
 
-  def turnOf(p: Player): Boolean      = p == player
-  def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
-  def turnOf(u: User): Boolean        = player(u) ?? turnOf
+  def turnOf(p: Player): Boolean = p == player
+  def turnOf(c: PlayerIndex): Boolean  = c == turnPlayerIndex
+  def turnOf(u: User): Boolean   = player(u) ?? turnOf
 
   def playedTurns = turns - chess.startedAtTurn
 
@@ -112,7 +111,7 @@ case class Game(
   def isSimul      = simulId.isDefined
   def isSwiss      = swissId.isDefined
   def isMandatory  = isTournament || isSimul || isSwiss
-  def isClassical = perfType match {
+  def isClassical  = perfType match {
     case Some(pt) => pt.key == "classical"
     case _        => false
   }
@@ -180,14 +179,14 @@ case class Game(
   def pdnMovesConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
     chess match {
       case StratGame.Draughts(game) => game.pdnMovesConcat(fullCaptures, dropGhosts)
-      case _                        => sys.error("Cant call pdnMovesConcat for a gamelogic other than draughts")
+      case _ => sys.error("Cant call pdnMovesConcat for a gamelogic other than draughts")
     }
 
   def pgnMoves(playerIndex: PlayerIndex): PgnMoves = {
     val pivot = if (playerIndex == startPlayerIndex) 0 else 1
     val pgnMoves = variant.gameLogic match {
       case GameLogic.Draughts() => pdnMovesConcat()
-      case _                    => chess.pgnMoves
+      case _ => chess.pgnMoves
     }
     pgnMoves.zipWithIndex.collect {
       case (e, i) if (i % 2) == pivot => e
@@ -249,29 +248,20 @@ case class Game(
       Event.Drop(_, game.situation, state, clockEvent, updated.board.pocketData)
     ) :: {
       // abstraction leak, I know.
-      game.situation match {
-        case Situation.Draughts(_) =>
-          //if (updated.board.variant.gameLogic == GameLogic.Draughts())
-          (updated.board.variant.frisianVariant || updated.board.variant.draughts64Variant) ?? List(
-            Event.KingMoves(
-              p1 = updated.history.kingMoves.p1,
-              p2 = updated.history.kingMoves.p2,
-              p1King = updated.history.kingMoves.p1King.map(Pos.Draughts),
-              p2King = updated.history.kingMoves.p2King.map(Pos.Draughts)
-            )
+      if (updated.board.variant.gameLogic == GameLogic.Draughts())
+        (updated.board.variant.frisianVariant || updated.board.variant.draughts64Variant) ?? List(Event.KingMoves(
+          p1 = updated.history.kingMoves.p1,
+          p2 = updated.history.kingMoves.p2,
+          p1King = updated.history.kingMoves.p1King.map(Pos.Draughts),
+          p2King = updated.history.kingMoves.p2King.map(Pos.Draughts)
+        ))
+      else//chess
+        ((updated.board.variant.threeCheck || updated.board.variant.fiveCheck) && game.situation.check) ?? List(
+          Event.CheckCount(
+            p1 = updated.history.checkCount.p1,
+            p2 = updated.history.checkCount.p2
           )
-        case Situation.FairySF(situation) =>
-          (situation.board.variant.passUci == situation.board.uciMoves.lastOption) ?? List(
-            Event.Move.applyPass(game.situation, state, clockEvent, updated.board.pocketData)
-          )
-        case Situation.Chess(_) =>
-          ((updated.board.variant.threeCheck || updated.board.variant.fiveCheck) && game.situation.check) ?? List(
-            Event.CheckCount(
-              p1 = updated.history.checkCount.p1,
-              p2 = updated.history.checkCount.p2
-            )
-          )
-      }
+        )
     }
 
     Progress(this, updated, events)
@@ -281,7 +271,7 @@ case class Game(
     history.lastMove map {
       case d: Uci.Drop => s"${d.role}${d.role}"
       case m: Uci.Move => m.keys
-      case _           => sys.error("Type Error")
+      case _ => sys.error("Type Error")
     }
 
   def updatePlayer(playerIndex: PlayerIndex, f: Player => Player) =
@@ -404,9 +394,7 @@ case class Game(
       clock.??(_ moretimeable playerIndex) || correspondenceClock.??(_ moretimeable playerIndex)
     }
 
-  def abortable =
-    status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory && !metadata.microMatchGameNr
-      .contains(2)
+  def abortable = status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory && !metadata.microMatchGameNr.contains(2)
 
   def berserkable = clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
 
@@ -661,10 +649,10 @@ case class Game(
 
   private def playerMaps[A](f: Player => Option[A]): List[A] = players flatMap f
 
-  def pov(c: PlayerIndex)                           = Pov(this, c)
+  def pov(c: PlayerIndex)                                 = Pov(this, c)
   def playerIdPov(playerId: Player.ID): Option[Pov] = player(playerId) map { Pov(this, _) }
-  def p1Pov                                         = pov(P1)
-  def p2Pov                                         = pov(P2)
+  def p1Pov                                      = pov(P1)
+  def p2Pov                                      = pov(P2)
   def playerPov(p: Player)                          = pov(p.playerIndex)
   def loserPov                                      = loser map playerPov
 
@@ -674,8 +662,8 @@ case class Game(
     case "Black" => trans.black.txt()
     //Xiangqi add back in when adding red as a colour for Xiangqi
     //case "Red"   => trans.red.txt()
-    case "Sente"   => trans.sente.txt()
-    case "Gote"    => trans.gote.txt()
+    case "Sente" => trans.sente.txt()
+    case "Gote"  => trans.gote.txt()
     case s: String => s
   }
 
@@ -792,13 +780,10 @@ object Game {
         status = Status.Created,
         daysPerTurn = daysPerTurn,
         mode = mode,
-        metadata =
-          metadata(source).copy(pgnImport = pgnImport, drawLimit = drawLimit, microMatch = microMatch),
+        metadata = metadata(source).copy(pgnImport = pgnImport, drawLimit = drawLimit, microMatch = microMatch),
         createdAt = createdAt,
         movedAt = createdAt,
-        pdnStorage =
-          if (chess.situation.board.variant.gameLogic == GameLogic.Draughts()) Some(PdnStorage.OldBin)
-          else None
+        pdnStorage = if (chess.situation.board.variant.gameLogic == GameLogic.Draughts()) Some(PdnStorage.OldBin) else None
       )
     )
   }
@@ -817,8 +802,8 @@ object Game {
   object BSONFields {
 
     val id                = "_id"
-    val p1Player          = "p0"
-    val p2Player          = "p1"
+    val p1Player       = "p0"
+    val p2Player       = "p1"
     val playerIds         = "is"
     val playerUids        = "us"
     val playingUids       = "pl"
@@ -837,13 +822,13 @@ object Game {
     val unmovedRooks      = "ur"
     val daysPerTurn       = "cd"
     val moveTimes         = "mt"
-    val p1ClockHistory    = "cw"
-    val p2ClockHistory    = "cb"
+    val p1ClockHistory = "cw"
+    val p2ClockHistory = "cb"
     val rated             = "ra"
     val analysed          = "an"
     val lib               = "l"
     val variant           = "v"
-    val pocketData        = "chd"
+    val pocketData         = "chd"
     val bookmarks         = "bm"
     val createdAt         = "ca"
     val movedAt           = "ua" // ua = updatedAt (bc)
@@ -853,17 +838,17 @@ object Game {
     val swissId           = "iid"
     val simulId           = "sid"
     val tvAt              = "tv"
-    val winnerPlayerIndex = "w"
+    val winnerPlayerIndex       = "w"
     val winnerId          = "wid"
     val initialFen        = "if"
     val checkAt           = "ck"
     val perfType          = "pt" // only set on student games for aggregation
     val drawOffers        = "do"
     //draughts
-    val simulPairing = "sp"
-    val timeOutUntil = "to"
-    val microMatch   = "mm"
-    val drawLimit    = "dl"
+    val simulPairing      = "sp"
+    val timeOutUntil      = "to"
+    val microMatch        = "mm"
+    val drawLimit         = "dl"
   }
 }
 
