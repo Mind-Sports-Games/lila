@@ -64,13 +64,12 @@ object Event {
     )(extra: JsObject) = {
       extra ++ Json
         .obj(
-          "fen"     -> fen,
-          "ply"     -> (state.turns - (if (postPass) 1 else 0)),
-          "dests"   -> PossibleMoves.oldJson(possibleMoves),
-          "captLen" -> ~captLen,
-          "gf"      -> gf.id,
-          "dropsByRole" -> (if (postPass) ""
-                            else PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty)))
+          "fen"         -> fen,
+          "ply"         -> state.turns, //(state.turns - (if (postPass) 1 else 0)),
+          "dests"       -> PossibleMoves.oldJson(possibleMoves),
+          "captLen"     -> ~captLen,
+          "gf"          -> gf.id,
+          "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty))
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -84,13 +83,6 @@ object Event {
         .add("drops" -> possibleDrops.map { squares =>
           JsString(squares.map(_.key).mkString)
         })
-      // .add(
-      //   "drops" -> (if (postPass) JsString("")
-      //               else
-      //                 possibleDrops.map { squares =>
-      //                   JsString(squares.map(_.key).mkString)
-      //                 })
-      // )
     }
   }
 
