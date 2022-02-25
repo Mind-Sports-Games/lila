@@ -433,9 +433,6 @@ export default class RoundController {
           o.uci.substr(2, 2) as cg.Key
         );
         if (d.game.variant.key == 'flipello') flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
-        if (this.data.onlyDropsVariant) {
-          this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
-        }
       } else {
         // This block needs to be idempotent, even for castling moves in
         // Chess960.
@@ -447,6 +444,9 @@ export default class RoundController {
         ) {
           this.chessground.move(keys[0], keys[1]);
         }
+      }
+      if (this.data.onlyDropsVariant) {
+        this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
       }
       if (o.promotion) ground.promote(this.chessground, o.promotion.key, o.promotion.pieceClass);
       this.chessground.set({
@@ -511,6 +511,17 @@ export default class RoundController {
     if (this.keyboardMove) this.keyboardMove.update(step, playedPlayerIndex != d.player.playerIndex);
     if (this.music) this.music.jump(o);
     speech.step(step);
+    if (playing && !this.replaying() && d.game.variant.key === 'flipello' && d.possibleMoves){
+      const possibleMoves = util.parsePossibleMoves(d.possibleMoves);
+      if (possibleMoves.size == 1){
+        const passOrig = possibleMoves.keys().next().value;
+        const passDests = possibleMoves.get(passOrig);
+        if (passDests && passDests.length == 1){
+          const passDest = passDests[0];
+          this.sendMove(passOrig, passDest, undefined, d.game.variant.key, {'premove' : false});
+        }
+      }
+    }
     return true; // prevents default socket pubsub
   };
 

@@ -336,6 +336,8 @@ function numFriendlyPawnsInColumn(
 }
 
 function destPosOnlyNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  if (!move.uci.includes("@")) return 'PASS';
+
   const reg = move.uci.match(/[a-zA-Z][1-9@]0?/g) as string[];
   const dest = reg[1];
 
