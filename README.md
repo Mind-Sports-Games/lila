@@ -2,7 +2,7 @@
 
 [![Build server](https://github.com/Mind-Sports-Games/lila/workflows/Build%20server/badge.svg)](https://github.com/Mind-Sports-Games/lila/actions?query=workflow%3A%22Build+server%22)
 [![Build assets](https://github.com/Mind-Sports-Games/lila/workflows/Build%20assets/badge.svg)](https://github.com/Mind-Sports-Games/lila/actions?query=workflow%3A%22Build+assets%22)
-
+[![Twitter](https://img.shields.io/badge/Twitter-%40mindsporrtsolymp-blue.svg)](https://twitter.com/mindsportsolymp)
 <img src="https://raw.githubusercontent.com/Mind-Sports-Games/lila/master/public/images/home-bicolor.png" alt="Playstrategy homepage" title="Playstrategy comes with light and dark theme, this screenshot shows both." />
 
 Lila (li[chess in sca]la) is a free online chess game server focused on [realtime](https://playstrategy.org/games) gameplay and ease of use.
