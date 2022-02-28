@@ -39,18 +39,20 @@ object history {
       )
     }
 
-  private def nameOf(f: Freq) = if (f == Freq.Weekend) "Elite" else f.name
+  private def nameOf(f: Freq) = if (f == Freq.Weekend) "Elite" else f.display
 
   private val allFreqs = List(
-    Freq.Unique,
-    Freq.Marathon,
-    Freq.Shield,
-    Freq.Yearly,
-    Freq.Monthly,
-    Freq.Weekend,
-    Freq.Weekly,
-    Freq.Daily,
-    Freq.Eastern,
-    Freq.Hourly
+    Freq.MSO21,
+    Freq.MSOGP,
+    Freq.Introductory,
+    Freq.Unique
+    //Freq.Marathon,
+    //Freq.Shield,
+    //Freq.Yearly,
+    //Freq.Monthly,
+    //Freq.Weekend,
+    //Freq.Weekly,
+    //Freq.Daily,
+    //Freq.Hourly
   )
 }

@@ -103,39 +103,92 @@ final private class TournamentScheduler(
 
     // all dates UTC
     List(
-      
       //Pre MSO schedule
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Horde        ),  30)(new DateTime(2021, 8,  3, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Standard     ),  30)(new DateTime(2021, 8,  3, 0, 0)),
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.LinesOfAction),  30)(new DateTime(2021, 8,  4, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Crazyhouse   ),  30)(new DateTime(2021, 8,  4, 0, 0)),
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.RacingKings  ),  30)(new DateTime(2021, 8,  5, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.ThreeCheck   ),  30)(new DateTime(2021, 8,  5, 0, 0)),
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Antichess    ),  30)(new DateTime(2021, 8,  6, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Chess960     ),  30)(new DateTime(2021, 8,  6, 0, 0)),
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Standard     ),  30)(new DateTime(2021, 8,  7, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.LinesOfAction),  30)(new DateTime(2021, 8,  7, 0, 0)),
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Crazyhouse   ),  30)(new DateTime(2021, 8,  8, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Chess960     ),  30)(new DateTime(2021, 8,  8, 0, 0)),
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.KingOfTheHill),  30)(new DateTime(2021, 8,  9, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Atomic       ),  30)(new DateTime(2021, 8,  9, 0, 0)),
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.RacingKings  ),  30)(new DateTime(2021, 8, 10, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.ThreeCheck   ),  30)(new DateTime(2021, 8, 10, 0, 0)),
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.LinesOfAction),  30)(new DateTime(2021, 8, 11, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Chess960     ),  30)(new DateTime(2021, 8, 11, 0, 0)),
-      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Standard     ),  30)(new DateTime(2021, 8, 12, 0, 0)),
-      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Crazyhouse   ),  30)(new DateTime(2021, 8, 12, 0, 0)),
-
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Horde), 30)(
+        new DateTime(2021, 8, 3, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Standard), 30)(
+        new DateTime(2021, 8, 3, 0, 0)
+      ),
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.LinesOfAction), 30)(
+        new DateTime(2021, 8, 4, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Crazyhouse), 30)(
+        new DateTime(2021, 8, 4, 0, 0)
+      ),
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.RacingKings), 30)(
+        new DateTime(2021, 8, 5, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.ThreeCheck), 30)(
+        new DateTime(2021, 8, 5, 0, 0)
+      ),
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Antichess), 30)(
+        new DateTime(2021, 8, 6, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Chess960), 30)(
+        new DateTime(2021, 8, 6, 0, 0)
+      ),
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Standard), 30)(
+        new DateTime(2021, 8, 7, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.LinesOfAction), 30)(
+        new DateTime(2021, 8, 7, 0, 0)
+      ),
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Crazyhouse), 30)(
+        new DateTime(2021, 8, 8, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Chess960), 30)(
+        new DateTime(2021, 8, 8, 0, 0)
+      ),
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.KingOfTheHill), 30)(
+        new DateTime(2021, 8, 9, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Atomic), 30)(
+        new DateTime(2021, 8, 9, 0, 0)
+      ),
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.RacingKings), 30)(
+        new DateTime(2021, 8, 10, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.ThreeCheck), 30)(
+        new DateTime(2021, 8, 10, 0, 0)
+      ),
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.LinesOfAction), 30)(
+        new DateTime(2021, 8, 11, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Chess960), 30)(
+        new DateTime(2021, 8, 11, 0, 0)
+      ),
+      scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Standard), 30)(
+        new DateTime(2021, 8, 12, 0, 0)
+      ),
+      scheduleUnique(20, Blitz32, Variant.Chess(strategygames.chess.variant.Crazyhouse), 30)(
+        new DateTime(2021, 8, 12, 0, 0)
+      ),
       //MSO arena schedule
-      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.Standard     ), 180)(new DateTime(2021, 8, 15, 0, 0)),
-      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.KingOfTheHill), 120)(new DateTime(2021, 8, 18, 0, 0)),
-      scheduleUnique(19, Blitz35, Variant.Chess(strategygames.chess.variant.Horde        ), 120)(new DateTime(2021, 8, 22, 0, 0)),
-      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.RacingKings  ),  60)(new DateTime(2021, 8, 25, 0, 0)),
-      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.Crazyhouse   ), 120)(new DateTime(2021, 8, 26, 0, 0)),
-      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.Atomic       ), 120)(new DateTime(2021, 8, 27, 0, 0)),
-      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.Antichess    ), 120)(new DateTime(2021, 8, 29, 0, 0)),
-      scheduleUnique(19, Bullet,  Variant.Chess(strategygames.chess.variant.Standard     ),  60)(new DateTime(2021, 8, 30, 0, 0))
-
+      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.Standard), 180)(
+        new DateTime(2021, 8, 15, 0, 0)
+      ),
+      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.KingOfTheHill), 120)(
+        new DateTime(2021, 8, 18, 0, 0)
+      ),
+      scheduleUnique(19, Blitz35, Variant.Chess(strategygames.chess.variant.Horde), 120)(
+        new DateTime(2021, 8, 22, 0, 0)
+      ),
+      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.RacingKings), 60)(
+        new DateTime(2021, 8, 25, 0, 0)
+      ),
+      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.Crazyhouse), 120)(
+        new DateTime(2021, 8, 26, 0, 0)
+      ),
+      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.Atomic), 120)(
+        new DateTime(2021, 8, 27, 0, 0)
+      ),
+      scheduleUnique(19, Blitz32, Variant.Chess(strategygames.chess.variant.Antichess), 120)(
+        new DateTime(2021, 8, 29, 0, 0)
+      ),
+      scheduleUnique(19, Bullet, Variant.Chess(strategygames.chess.variant.Standard), 60)(
+        new DateTime(2021, 8, 30, 0, 0)
+      )
 
       /*//Pre UKGE schedule
       mwfs.flatMap(schedule32(16, KingOfTheHill)), // MWFS KoTH @ 17:00 UK
@@ -157,7 +210,7 @@ final private class TournamentScheduler(
       fss.flatMap(schedule51(13, LinesOfAction)),  // FSS LOA @ 14:00 UK
       fss.flatMap(schedule32(14, Standard)),       // FSS Chess @ 15:00 UK
       fss.flatMap(schedule32(15, Chess960))        // FSS 960 @ 16:00 UK
-      */
+       */
 
       /*List( // legendary tournaments!
         at(birthday.withYear(today.getYear), 12) map orNextYear map { date =>
@@ -567,7 +620,7 @@ Thank you all, you rock!"""
   private def overlaps(t: Tournament, ts: List[Tournament]): Boolean =
     t.schedule exists { s =>
       ts exists { t2 =>
-        t.variant == t2.variant && t2.schedule.fold(false)({ s2 =>
+        t.variant == t2.variant && t2.schedule.fold(false) { s2 =>
           // prevent daily && weekly on the same day - we don't care about this.
           // case s2 if s.freq.isDailyOrBetter && s2.freq.isDailyOrBetter && s.sameSpeed(s2) => s sameDay s2
           (
@@ -575,7 +628,7 @@ Thank you all, you rock!"""
               s.hasMaxRating ||  // overlapping same rating limit
               s.similarSpeed(s2) // overlapping similar
           ) && s.similarConditions(s2) && t.overlaps(t2)
-        })
+        }
       }
     }
 
