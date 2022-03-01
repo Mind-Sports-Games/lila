@@ -8,7 +8,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -59,6 +59,10 @@ export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
   return ['xiangqi', 'minixiangqi'].includes(key);
 }
 
+export function variantUsesDestPosOnlyNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['flipello'].includes(key);
+}
+
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
   return variantUsesUCINotation(key)
     ? 'uci'
@@ -66,5 +70,7 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
     ? 'usi'
     : variantUsesWXFNotation(key)
     ? 'wxf'
+    : variantUsesDestPosOnlyNotation(key)
+    ? 'dpo'
     : 'san';
 }

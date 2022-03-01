@@ -51,20 +51,31 @@ object Theme extends ThemeObject {
 
   def updateBoardTheme(currentThemes : List[Theme], theme: String, gameFamily: Int) : List[Theme] = {
     val newTheme = apply(theme, gameFamily)
-    currentThemes.map{ x => x.gameFamily match {
-                                case newTheme.gameFamily => newTheme
-                                case _ => x
-                     }}
+    addMissingDefaultsIfAny(currentThemes).map{ x => x.gameFamily match {
+                                              case newTheme.gameFamily => newTheme
+                                              case _ => x
+                                  }}
   }
 
   def updateBoardTheme(currentThemes : List[Theme], theme: String, gameFamily: String) : List[Theme] = {
     val gf_id = GameFamily.all.filter(gf => gf.shortName.toLowerCase() == gameFamily)(0).id
     val newTheme = apply(theme, gf_id)
-    currentThemes.map{ x => x.gameFamily match {
-                                case newTheme.gameFamily => newTheme
-                                case _ => x
-                     }}
+    addMissingDefaultsIfAny(currentThemes).map{ x => x.gameFamily match {
+                                              case newTheme.gameFamily => newTheme
+                                              case _ => x
+                                  }}
   }
+
+  def addMissingDefaultsIfAny(currentThemes: List[Theme]): List[Theme] = {
+    defaults.map{
+      x => if( currentThemes.filter(t => t.gameFamily == x.gameFamily).size == 1 ){
+        currentThemes.filter(t => t.gameFamily == x.gameFamily)(0)
+      } else{
+        x
+      }
+    }
+  }
+
 
   val all: List[Theme] = GameFamily.all.map(gf => gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))).flatten
  

@@ -205,6 +205,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Variant.Chess(strategygames.chess.variant.LinesOfAction) => trans.checkersConnected.txt()
           case Variant.Chess(strategygames.chess.variant.ScrambledEggs) => trans.checkersConnected.txt()
           case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => trans.promotion.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Flipello) => trans.gameFinished.txt()
           case _                           => trans.variantEnding.txt()
         }
       case _ => ""

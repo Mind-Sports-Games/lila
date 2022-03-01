@@ -31,7 +31,7 @@ object bits {
       openGraph = openGraph,
       moreJs = moreJs,
       moreCss = frag(
-        cssTag { if (variant.dropsVariant) "round.zh" else "round" },
+        cssTag { if (variant.dropsVariant && !variant.onlyDropsVariant) "round.zh" else "round" },
         ctx.blind option cssTag("round.nvui"),
         moreCss
       ),
@@ -143,7 +143,7 @@ object bits {
     )
 
   def roundAppPreload(pov: Pov, controls: Boolean)(implicit ctx: Context) =
-    div(cls := "round__app")(
+    div(cls := s"round__app")(
       div(cls := "round__app__board main-board")(chessground(pov)),
       div(cls := "col1-rmoves-preload")
     )

@@ -17,12 +17,13 @@ export function makeConfig(ctrl: RoundController): Config {
     hooks = ctrl.makeCgHooks(),
     step = plyStep(data, ctrl.ply),
     playing = ctrl.isPlaying(),
-    variantKey = data.game.variant.key as cg.Variant;
+    variantKey = data.game.variant.key as cg.Variant,
+    turnPlayerIndex = step.ply % 2 === 0 ? 'p1' : 'p2';
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
     myPlayerIndex: data.player.playerIndex,
-    turnPlayerIndex: step.ply % 2 === 0 ? 'p1' : 'p2',
+    turnPlayerIndex: turnPlayerIndex,
     lastMove: util.uci2move(step.uci),
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
@@ -55,7 +56,7 @@ export function makeConfig(ctrl: RoundController): Config {
       duration: data.pref.animationDuration,
     },
     premovable: {
-      enabled: data.pref.enablePremove,
+      enabled: data.pref.enablePremove && !data.onlyDropsVariant,
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {
@@ -75,6 +76,11 @@ export function makeConfig(ctrl: RoundController): Config {
     dropmode: {
       showDropDests: true,
       dropDests: playing ? chessUtil.readDropsByRole(data.possibleDropsByRole) : new Map(),
+      active: data.onlyDropsVariant && playing ? true : false,
+      piece:
+        data.onlyDropsVariant && playing
+          ? util.onlyDropsVariantPiece(data.game.variant.key, turnPlayerIndex)
+          : undefined,
     },
     draggable: {
       enabled: data.pref.moveEvent !== Prefs.MoveEvent.Click,
@@ -105,6 +111,7 @@ export function makeConfig(ctrl: RoundController): Config {
     dimensions: data.game.variant.boardSize,
     variant: variantKey,
     chess960: data.game.variant.key === 'chess960',
+    onlyDropsVariant: data.onlyDropsVariant,
   };
 }
 

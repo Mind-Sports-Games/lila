@@ -5,6 +5,7 @@ import { SquareSet } from 'chessops/squareSet';
 import { Board } from 'chessops/board';
 import { Setup, Material, RemainingChecks } from 'chessops/setup';
 import { Castles, setupPosition } from 'chessops/variant';
+import { playstrategyVariants } from 'chessops/compat';
 import { makeFen, parseFen, parseCastlingFen, INITIAL_FEN, EMPTY_FEN, INITIAL_EPD } from 'chessops/fen';
 import { defined, prop, Prop } from 'common';
 
@@ -132,29 +133,8 @@ export default class EditorCtrl {
   }
 
   makeAnalysisUrl(legalFen: string): string {
-    switch (this.rules) {
-      case 'chess':
-        return this.makeUrl('/analysis/', legalFen);
-      case '3check':
-        return this.makeUrl('/analysis/threeCheck/', legalFen);
-      case '5check':
-        return this.makeUrl('/analysis/fiveCheck/', legalFen);
-      case 'kingofthehill':
-        return this.makeUrl('/analysis/kingOfTheHill/', legalFen);
-      case 'racingkings':
-        return this.makeUrl('/analysis/racingKings/', legalFen);
-      case 'nocastling':
-        return this.makeUrl('/analysis/noCastling/', legalFen);
-      case 'linesofaction':
-        return this.makeUrl('/analysis/linesOfAction/', legalFen);
-      case 'scrambledeggs':
-        return this.makeUrl('/analysis/scrambledEggs/', legalFen);
-      case 'antichess':
-      case 'atomic':
-      case 'horde':
-      case 'crazyhouse':
-        return this.makeUrl(`/analysis/${this.rules}/`, legalFen);
-    }
+    const variant = this.rules === 'chess' ? '' : playstrategyVariants(this.rules) + '/';
+    return this.makeUrl(`/analysis/${variant}`, legalFen);
   }
 
   makeUrl(baseUrl: string, fen: string): string {

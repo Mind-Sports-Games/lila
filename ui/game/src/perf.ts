@@ -29,5 +29,6 @@ export const perf = {
     xiangqi: 't',
     minishogi: 's',
     minixiangqi: 't',
+    flipello: 'l',
   },
 };

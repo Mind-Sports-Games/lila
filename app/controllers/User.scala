@@ -310,6 +310,7 @@ final class User(
                   "xiangqi"       -> leaderboards.xiangqi,
                   "minishogi"     -> leaderboards.minishogi,
                   "minixiangqi"   -> leaderboards.minixiangqi,
+                  "flipello"      -> leaderboards.flipello,
                 )
               )
             }

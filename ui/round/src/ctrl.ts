@@ -14,11 +14,14 @@ import * as speech from './speech';
 import * as cg from 'chessground/types';
 import { Config as CgConfig } from 'chessground/config';
 import { Api as CgApi } from 'chessground/api';
+import { setDropMode, cancelDropMode } from 'chessground/drop';
+import { State } from 'chessground/state';
 import { ClockController } from './clock/clockCtrl';
 import { CorresClockController, ctrl as makeCorresClock } from './corresClock/corresClockCtrl';
 import MoveOn from './moveOn';
 import TransientMove from './transientMove';
 import * as atomic from './atomic';
+import * as flipello from './flipello';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -170,6 +173,10 @@ export default class RoundController {
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
+      if (this.data.game.variant.key === 'flipello') {
+        flipello.flip(this, key, this.data.player.playerIndex);
+        this.redraw();
+      }
     } else this.jump(this.ply);
   };
 
@@ -179,6 +186,8 @@ export default class RoundController {
         sound.explode();
         atomic.capture(this, dest);
       } else sound.capture();
+    } else if (this.data.game.variant.key === 'flipello') {
+      flipello.flip(this, dest, this.data.player.playerIndex);
     } else sound.move();
   };
 
@@ -200,11 +209,23 @@ export default class RoundController {
   };
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
-    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(this.data.game.variant.key)) return false;
+    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(this.data.game.variant.key)) return false;
     if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'p-piece') return false;
     const pos = (dest[0] + orig[1]) as cg.Key;
     this.chessground.setPieces(new Map([[pos, undefined]]));
     return true;
+  };
+
+  private setDropOnlyVariantDropMode = (
+    activePlayerIndex: boolean,
+    currentPlayerIndex: 'p1' | 'p2',
+    s: State
+  ): void => {
+    if (activePlayerIndex) {
+      return setDropMode(s, util.onlyDropsVariantPiece(s.variant as VariantKey, currentPlayerIndex));
+    } else {
+      return cancelDropMode(s);
+    }
   };
 
   lastPly = () => round.lastPly(this.data);
@@ -243,8 +264,10 @@ export default class RoundController {
         check: !!s.check,
         turnPlayerIndex: this.ply % 2 === 0 ? 'p1' : 'p2',
       };
-    if (this.replaying()) this.chessground.stop();
-    else
+    if (this.replaying()) {
+      cancelDropMode(this.chessground.state);
+      this.chessground.stop();
+    } else
       config.movable = {
         playerIndex: this.isPlaying() ? this.data.player.playerIndex : undefined,
         dests: util.parsePossibleMoves(this.data.possibleMoves),
@@ -253,6 +276,17 @@ export default class RoundController {
       dropDests: this.isPlaying() ? chessUtil.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
     }),
       this.chessground.set(config);
+    if (this.data.onlyDropsVariant) {
+      if (ply == this.lastPly()) {
+        this.setDropOnlyVariantDropMode(
+          this.data.player.playerIndex === this.data.game.player,
+          this.data.player.playerIndex,
+          this.chessground.state
+        );
+      } else {
+        cancelDropMode(this.chessground.state);
+      }
+    }
     if (s.san && isForwardStep) {
       if (s.san.includes('x')) sound.capture();
       else sound.move();
@@ -375,7 +409,6 @@ export default class RoundController {
   apiMove = (o: ApiMove): true => {
     const d = this.data,
       playing = this.isPlaying();
-
     d.game.turns = o.ply;
     d.game.player = o.ply % 2 === 0 ? 'p1' : 'p2';
     const playedPlayerIndex = o.ply % 2 === 0 ? 'p2' : 'p1',
@@ -391,7 +424,7 @@ export default class RoundController {
     this.setTitle();
     if (!this.replaying()) {
       this.ply++;
-      if (o.role)
+      if (o.role) {
         this.chessground.newPiece(
           {
             role: o.role,
@@ -399,7 +432,8 @@ export default class RoundController {
           },
           o.uci.substr(2, 2) as cg.Key
         );
-      else {
+        if (d.game.variant.key == 'flipello') flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
+      } else {
         // This block needs to be idempotent, even for castling moves in
         // Chess960.
         const keys = util.uci2move(o.uci)!,
@@ -410,6 +444,9 @@ export default class RoundController {
         ) {
           this.chessground.move(keys[0], keys[1]);
         }
+      }
+      if (this.data.onlyDropsVariant) {
+        this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
       }
       if (o.promotion) ground.promote(this.chessground, o.promotion.key, o.promotion.pieceClass);
       this.chessground.set({
@@ -474,6 +511,17 @@ export default class RoundController {
     if (this.keyboardMove) this.keyboardMove.update(step, playedPlayerIndex != d.player.playerIndex);
     if (this.music) this.music.jump(o);
     speech.step(step);
+    if (playing && !this.replaying() && d.game.variant.key === 'flipello' && d.possibleMoves) {
+      const possibleMoves = util.parsePossibleMoves(d.possibleMoves);
+      if (possibleMoves.size == 1) {
+        const passOrig = possibleMoves.keys().next().value;
+        const passDests = possibleMoves.get(passOrig);
+        if (passDests && passDests.length == 1) {
+          const passDest = passDests[0];
+          this.sendMove(passOrig, passDest, undefined, d.game.variant.key, { premove: false });
+        }
+      }
+    }
     return true; // prevents default socket pubsub
   };
 

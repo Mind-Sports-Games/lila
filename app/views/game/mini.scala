@@ -84,23 +84,43 @@ object mini {
         span(cls := "rating")(lila.game.Namer ratingString pov.player)
       ),
       if (pov.game.finished) renderResult(pov)
-      else pov.game.clock.map { renderClock(_, pov.playerIndex) }
+      else pov.game.clock.map { renderClock(_, pov) }
     )
+
+  private def calculateScore(pov: Pov): String = 
+    pov.game.variant.key match {
+      case "flipello" => 
+        "(" + pov.game.board.pieces
+              .map{ case(_, piece) => piece.player.name}
+              .filter( p => p == pov.playerIndex.name)
+              .size
+              .toString() + ")"
+      case "threeCheck" | "fivecheck" =>
+        "(" + pov.game.history
+              .checkCount(pov.game.opponent(pov.playerIndex).playerIndex)
+              .toString() + ")"
+      case _ => ""
+    }    
+  
 
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(
       pov.game.winnerPlayerIndex.fold("½") { c =>
         if (c == pov.playerIndex) "1" else "0"
-      }
+      } 
+      +
+      calculateScore(pov)
     )
 
-  private def renderClock(clock: strategygames.Clock, playerIndex: strategygames.Player) = {
-    val s = clock.remainingTime(playerIndex).roundSeconds
+  private def renderClock(clock: strategygames.Clock, pov: Pov) = {
+    val s = clock.remainingTime(pov.playerIndex).roundSeconds
     span(
-      cls := s"mini-game__clock mini-game__clock--${playerIndex.name}",
+      cls := s"mini-game__clock mini-game__clock--${pov.playerIndex.name}",
       dataTime := s
     )(
       f"${s / 60}:${s % 60}%02d"
+      +
+      calculateScore(pov)
     )
   }
 }
