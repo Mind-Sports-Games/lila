@@ -511,14 +511,14 @@ export default class RoundController {
     if (this.keyboardMove) this.keyboardMove.update(step, playedPlayerIndex != d.player.playerIndex);
     if (this.music) this.music.jump(o);
     speech.step(step);
-    if (playing && !this.replaying() && d.game.variant.key === 'flipello' && d.possibleMoves){
+    if (playing && !this.replaying() && d.game.variant.key === 'flipello' && d.possibleMoves) {
       const possibleMoves = util.parsePossibleMoves(d.possibleMoves);
-      if (possibleMoves.size == 1){
+      if (possibleMoves.size == 1) {
         const passOrig = possibleMoves.keys().next().value;
         const passDests = possibleMoves.get(passOrig);
-        if (passDests && passDests.length == 1){
+        if (passDests && passDests.length == 1) {
           const passDest = passDests[0];
-          this.sendMove(passOrig, passDest, undefined, d.game.variant.key, {'premove' : false});
+          this.sendMove(passOrig, passDest, undefined, d.game.variant.key, { premove: false });
         }
       }
     }
