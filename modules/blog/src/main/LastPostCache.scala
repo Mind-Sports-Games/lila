@@ -22,7 +22,7 @@ final class LastPostCache(
     api.prismicApi flatMap { prismic =>
       api.recent(prismic, page = 1, lila.common.config.MaxPerPage(3), none) map {
         _ ?? {
-          _.currentPageResults.toList flatMap MiniPost.fromDocument(config.collection)
+          _.currentPageResults.toList flatMap MiniPost.fromDocument(config.collection, "main")
         }
       }
     }
