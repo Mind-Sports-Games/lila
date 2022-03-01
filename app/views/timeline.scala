@@ -11,7 +11,7 @@ object timeline {
 
   def entries(entries: Vector[lila.timeline.Entry])(implicit ctx: Context) =
     div(cls := "entries")(
-      filterEntries(entries) map { entry =>
+      filterEntries(filterBlogPosts(entries)) map { entry =>
         div(cls := "entry")(timeline.entry(entry))
       }
     )
@@ -32,6 +32,9 @@ object timeline {
         )
       )
     )
+
+  private def filterBlogPosts(entries: Vector[lila.timeline.Entry]) = 
+    entries.filter(e => e.typ != "blog-post")
 
   private def filterEntries(entries: Vector[lila.timeline.Entry])(implicit ctx: Context) =
     if (ctx.noKid) entries
