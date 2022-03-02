@@ -81,7 +81,14 @@ object LameName {
   )
 
   private val usernameRegex = lameWords(
-    baseWords ::: List("playstrategy", "playstrat", "lichess", "mindsportsolympiad", "mind-sports-olympiad", "lidraughts", "lishogi", "pychess")
+    baseWords ::: List(
+      "lichess",
+      "mindsportsolympiad",
+      "mind-sports-olympiad",
+      "lidraughts",
+      "lishogi",
+      "pychess"
+    )
   )
 
   private val tournamentRegex = lameWords(baseWords)
