@@ -12,8 +12,8 @@ object atom {
   def apply(
       pager: Paginator[io.prismic.Document],
       baseUrl: BaseUrl
-  )(implicit prismic: lila.blog.BlogApi.Context) = ()
-    /*frag(
+  )(implicit prismic: lila.blog.BlogApi.Context) =
+    frag(
       raw("""<?xml version="1.0" encoding="UTF-8"?>"""),
       raw(
         """<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">"""
@@ -21,7 +21,7 @@ object atom {
       tag("id")(s"$baseUrl${routes.Blog.index()}"),
       link(rel := "alternate", tpe := "text/html", href := s"$baseUrl${routes.Blog.index()}"),
       link(rel := "self", tpe := "application/atom+xml", href := s"$baseUrl${routes.Blog.atom}"),
-      tag("title")("lichess.org blog"),
+      tag("title")("playstrategy.org blog"),
       tag("updated")(pager.currentPageResults.headOption.flatMap(atomDate("blog.date"))),
       pager.currentPageResults.map { doc =>
         tag("entry")(
@@ -55,5 +55,5 @@ object atom {
         )
       },
       raw("</feed>")
-    )*/
+    )
 }
