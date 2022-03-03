@@ -260,7 +260,7 @@ export default class RoundController {
     const s = this.stepAt(ply),
       config: CgConfig = {
         fen: s.fen,
-        lastMove: util.uci2move(s.uci),
+        lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
         check: !!s.check,
         turnPlayerIndex: this.ply % 2 === 0 ? 'p1' : 'p2',
       };

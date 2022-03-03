@@ -24,7 +24,7 @@ export function makeConfig(ctrl: RoundController): Config {
     orientation: boardOrientation(data, ctrl.flip),
     myPlayerIndex: data.player.playerIndex,
     turnPlayerIndex: turnPlayerIndex,
-    lastMove: util.uci2move(step.uci),
+    lastMove: util.lastMove(data.onlyDropsVariant, step.uci),
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     addPieceZIndex: ctrl.data.pref.is3d,
