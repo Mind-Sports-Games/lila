@@ -9,6 +9,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
+import lila.i18n.VariantKeys
 
 object show {
 
@@ -54,7 +55,7 @@ object show {
                 div(
                   span(cls := "clock")(sim.clock.config.show),
                   div(cls := "setup")(
-                    sim.variants.map(_.name).mkString(", "),
+                    sim.variants.map(VariantKeys.variantName).mkString(", "),
                     " • ",
                     trans.casual(),
                     (isGranted(_.ManageSimul) || ctx.userId.has(sim.hostId)) && sim.isCreated option frag(
@@ -71,7 +72,7 @@ object show {
               trans.hostPlayerIndexX(sim.playerIndex match {
                 case Some("p1") => trans.white()
                 case Some("p2") => trans.black()
-                case _             => trans.randomColor()
+                case _          => trans.randomColor()
               }),
               sim.position.flatMap(lila.tournament.Thematic.byFen) map { pos =>
                 frag(

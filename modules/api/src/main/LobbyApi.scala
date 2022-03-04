@@ -8,6 +8,7 @@ import play.api.libs.json.{ JsArray, JsObject, Json }
 
 import lila.game.Pov
 import lila.lobby.SeekApi
+import lila.i18n.VariantKeys
 
 final class LobbyApi(
     lightUserApi: lila.user.LightUserApi,
@@ -33,30 +34,33 @@ final class LobbyApi(
       }
 
   def boardSize(variant: Variant) = variant match {
-    case Variant.Draughts(v) => Some(Json.obj(
-      "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
-      "key" -> v.boardSize.key,
-    ))
+    case Variant.Draughts(v) =>
+      Some(
+        Json.obj(
+          "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+          "key"  -> v.boardSize.key
+        )
+      )
     case _ => None
   }
 
   def nowPlaying(pov: Pov) =
     Json
       .obj(
-        "fullId"   -> pov.fullId,
-        "gameId"   -> pov.gameId,
-        "fen"      -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
-        "playerIndex"    -> (if (pov.game.variant.racingKings) P1 else pov.playerIndex).name,
-        "lastMove" -> ~pov.game.lastMoveKeys,
+        "fullId"      -> pov.fullId,
+        "gameId"      -> pov.gameId,
+        "fen"         -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
+        "playerIndex" -> (if (pov.game.variant.racingKings) P1 else pov.playerIndex).name,
+        "lastMove"    -> ~pov.game.lastMoveKeys,
         "variant" -> Json.obj(
           "gameLogic" -> Json.obj(
-            "id" -> pov.game.variant.gameLogic.id,
-            "name" -> pov.game.variant.gameLogic.name,
+            "id"   -> pov.game.variant.gameLogic.id,
+            "name" -> pov.game.variant.gameLogic.name
           ),
-          "gameFamily" -> pov.game.variant.gameFamily.shortName.toLowerCase(),
-          "key"  -> pov.game.variant.key,
-          "name" -> pov.game.variant.name,
-          "boardSize" -> boardSize(pov.game.variant),
+          "gameFamily" -> pov.game.variant.gameFamily.key,
+          "key"        -> pov.game.variant.key,
+          "name"       -> VariantKeys.variantName(pov.game.variant),
+          "boardSize"  -> boardSize(pov.game.variant)
         ),
         "speed"    -> pov.game.speed.key,
         "perf"     -> lila.game.PerfPicker.key(pov.game),

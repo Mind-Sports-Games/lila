@@ -5,6 +5,7 @@ import strategygames.variant.Variant
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
@@ -23,7 +24,9 @@ object side {
             "tv-channel" -> true,
             c.key        -> true,
             "active"     -> (c == channel),
-            "hidden"     -> !((c.gameFamily == channel.gameFamily || c.familyChannel) && (champions.get(c).nonEmpty || c.name == "Top Rated"))
+            "hidden" -> !((c.gameFamily == channel.gameFamily || c.familyChannel) && (champions
+              .get(c)
+              .nonEmpty || c.name == "Top Rated"))
           )
         )(
           span(dataIcon := c.icon)(
@@ -60,8 +63,9 @@ object side {
               if (game.variant.exotic)
                 views.html.game.bits.variantLink(
                   game.variant,
-                  (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) game.variant.shortName
-                   else game.variant.name).toUpperCase
+                  (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
+                     VariantKeys.variantShortName(game.variant)
+                   else VariantKeys.variantName(game.variant)).toUpperCase
                 )
               else
                 game.perfType.map { pt =>

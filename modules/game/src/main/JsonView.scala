@@ -4,9 +4,21 @@ import play.api.libs.json._
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.opening.FullOpening
-import strategygames.{ P2, Clock, Player => PlayerIndex, Division, GameLogic, Pocket, PocketData, Role, Status, P1 }
+import strategygames.{
+  P2,
+  Clock,
+  Player => PlayerIndex,
+  Division,
+  GameLogic,
+  Pocket,
+  PocketData,
+  Role,
+  Status,
+  P1
+}
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
+import lila.i18n.VariantKeys
 
 final class JsonView(rematches: Rematches) {
 
@@ -18,7 +30,7 @@ final class JsonView(rematches: Rematches) {
         "id"            -> game.id,
         "lib"           -> game.variant.gameLogic.id,
         "variant"       -> game.variant,
-        "gameFamily"    -> game.variant.gameFamily.shortName.toLowerCase(),
+        "gameFamily"    -> game.variant.gameFamily.key,
         "speed"         -> game.speed.key,
         "perf"          -> PerfPicker.key(game),
         "rated"         -> game.rated,
@@ -29,7 +41,7 @@ final class JsonView(rematches: Rematches) {
         "startedAtTurn" -> game.chess.startedAtTurn,
         "source"        -> game.source,
         "status"        -> game.status,
-        "createdAt"     -> game.createdAt,
+        "createdAt"     -> game.createdAt
       )
       .add("threefold" -> game.situation.threefoldRepetition)
       .add("boosted" -> game.boosted)
@@ -43,7 +55,8 @@ final class JsonView(rematches: Rematches) {
       .add("rematch" -> rematches.of(game.id))
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedPlies))
       .add("microMatch" -> game.metadata.microMatchGameNr.map { index =>
-        Json.obj("index" -> index)
+        Json
+          .obj("index" -> index)
           .add("gameId" -> game.metadata.microMatchGameId.filter("*" !=))
       })
 }
@@ -87,18 +100,21 @@ object JsonView {
 
   implicit val pocketWriter: OWrites[Pocket] = OWrites { v =>
     JsObject(
-      Role.storable(v.roles.headOption match {
-        case Some(r) => r match {
-          case Role.ChessRole(_)   => GameLogic.Chess()
-          case Role.FairySFRole(_) => GameLogic.FairySF()
-          case _ => sys.error("Pocket not implemented for GameLogic")
+      Role
+        .storable(v.roles.headOption match {
+          case Some(r) =>
+            r match {
+              case Role.ChessRole(_)   => GameLogic.Chess()
+              case Role.FairySFRole(_) => GameLogic.FairySF()
+              case _                   => sys.error("Pocket not implemented for GameLogic")
+            }
+          case None => GameLogic.Chess()
+        })
+        .flatMap { role =>
+          Some(v.roles.count(role ==)).filter(0 <).map { count =>
+            role.groundName -> JsNumber(count)
+          }
         }
-        case None => GameLogic.Chess()
-      }).flatMap { role =>
-        Some(v.roles.count(role ==)).filter(0 <).map { count =>
-          role.groundName -> JsNumber(count)
-        }
-      }
     )
   }
 
@@ -117,56 +133,58 @@ object JsonView {
     v match {
       case Variant.Draughts(draughtsVariant) =>
         Json.obj(
-          "key"   -> v.key,
-          "name"  -> v.name,
-          "short" -> v.shortName,
+          "key"      -> v.key,
+          "name"     -> VariantKeys.variantName(v),
+          "short"    -> VariantKeys.variantShortName(v),
           "gameType" -> v.gameType,
-          "board" -> draughtsVariant.boardSize,
-          "lib"   -> v.gameLogic.id
+          "board"    -> draughtsVariant.boardSize,
+          "lib"      -> v.gameLogic.id
         )
       case Variant.FairySF(fairyVariant) =>
         Json.obj(
-          "key"   -> v.key,
-          "name"  -> v.name,
-          "short" -> v.shortName,
-          "lib"   -> v.gameLogic.id,
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
           "boardSize" -> fairyVariant.boardSize
         )
       case _ =>
         Json.obj(
           "key"   -> v.key,
-          "name"  -> v.name,
-          "short" -> v.shortName,
+          "name"  -> VariantKeys.variantName(v),
+          "short" -> VariantKeys.variantShortName(v),
           "lib"   -> v.gameLogic.id,
           "boardSize" -> Json.obj(
-                              "width" -> 8,
-                              "height" -> 8
-                            )
+            "width"  -> 8,
+            "height" -> 8
+          )
         )
     }
   }
 
-  implicit val boardSizeFairyWriter: Writes[strategygames.fairysf.Board.BoardSize] = Writes[strategygames.fairysf.Board.BoardSize] { b =>
-    Json.obj(
-      "width" -> b.width,
-      "height" -> b.height
-    )
-  }
+  implicit val boardSizeFairyWriter: Writes[strategygames.fairysf.Board.BoardSize] =
+    Writes[strategygames.fairysf.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
 
-  implicit val boardSizeWriter: Writes[strategygames.draughts.Board.BoardSize] = Writes[strategygames.draughts.Board.BoardSize] { b =>
-    Json.obj(
-      "key" -> b.key,
-      "size" -> b.sizes
-    )
-  }
+  implicit val boardSizeWriter: Writes[strategygames.draughts.Board.BoardSize] =
+    Writes[strategygames.draughts.Board.BoardSize] { b =>
+      Json.obj(
+        "key"  -> b.key,
+        "size" -> b.sizes
+      )
+    }
 
   implicit val clockWriter: OWrites[Clock] = OWrites { c =>
     Json.obj(
       "running"   -> c.isRunning,
       "initial"   -> c.limitSeconds,
       "increment" -> c.incrementSeconds,
-      "p1"     -> c.remainingTime(P1).toSeconds,
-      "p2"     -> c.remainingTime(P2).toSeconds,
+      "p1"        -> c.remainingTime(P1).toSeconds,
+      "p2"        -> c.remainingTime(P2).toSeconds,
       "emerg"     -> c.config.emergSeconds
     )
   }
@@ -175,8 +193,8 @@ object JsonView {
     Json.obj(
       "daysPerTurn" -> c.daysPerTurn,
       "increment"   -> c.increment,
-      "p1"       -> c.p1Time,
-      "p2"       -> c.p2Time
+      "p1"          -> c.p1Time,
+      "p2"          -> c.p2Time
     )
   }
 

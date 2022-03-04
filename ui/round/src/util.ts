@@ -191,3 +191,15 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
       return undefined;
   }
 }
+
+export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {
+  if (onlyDropsVariant) {
+    if (uci && uci[1] === '@') {
+      return uci2move(uci);
+    } else {
+      return undefined;
+    }
+  } else {
+    return uci2move(uci);
+  }
+}

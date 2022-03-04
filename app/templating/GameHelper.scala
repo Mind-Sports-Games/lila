@@ -9,7 +9,7 @@ import play.api.i18n.Lang
 import lila.api.Context
 import lila.app.ui.ScalatagsTemplate._
 import lila.game.{ Game, Namer, Player, Pov }
-import lila.i18n.{ I18nKeys => trans, defaultLang }
+import lila.i18n.{ I18nKeys => trans, VariantKeys, defaultLang }
 import lila.user.Title
 
 trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHelper with ChessgroundHelper =>
@@ -27,7 +27,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
 
   def titleGame(g: Game) = {
     val speed   = strategygames.Speed(g.clock.map(_.config)).name
-    val variant = g.variant.exotic ?? s" ${g.variant.name}"
+    val variant = g.variant.exotic ?? s" ${VariantKeys.variantName(g.variant)}"
     s"$speed$variant ${g.variant.gameLogic.name} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
   }
 
@@ -43,8 +43,9 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         }
     val mode = game.mode.name
     val variant =
-      if (game.variant == Variant.libFromPosition(game.variant.gameLogic)) s"position setup ${game.variant.gameLogic.name}"
-      else if (game.variant.exotic) game.variant.name
+      if (game.variant == Variant.libFromPosition(game.variant.gameLogic))
+        s"position setup ${game.variant.gameLogic.name}"
+      else if (game.variant.exotic) VariantKeys.variantName(game.variant)
       else game.variant.gameLogic.name.toLowerCase()
     import strategygames.Status._
     val result = (game.winner, game.loser, game.status, game.variant.gameLogic) match {
@@ -60,19 +61,15 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (Some(w), _, UnknownFinish, _)              => s"${playerText(w)} won"
       case (_, _, Draw | Stalemate | UnknownFinish, _) => "Game is a draw"
       case (_, _, Aborted, _)                          => "Game has been aborted"
-      case (_, _, VariantEnd, _)                       => game.variant.title.dropRight(1)
-      case _ => "Game is still being played"
+      case (_, _, VariantEnd, _)                       => VariantKeys.variantTitle(game.variant)
+      case _                                           => "Game is still being played"
     }
     val moves = s"${game.chess.fullMoveNumber} moves"
     s"$p1 plays $p2 in a $mode $speedAndClock game of $variant. $result after $moves. Click to replay, analyse, and discuss the game!"
   }
 
   def variantName(variant: Variant)(implicit lang: Lang) =
-    variant match {
-      case Variant.Chess(strategygames.chess.variant.Standard)     => trans.standard.txt()
-      case Variant.Chess(strategygames.chess.variant.FromPosition) => trans.fromPosition.txt()
-      case v                          => v.name
-    }
+    VariantKeys.variantName(variant)
 
   def variantNameNoCtx(variant: Variant) = variantName(variant)(defaultLang)
 
@@ -166,23 +163,24 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
   def gameEndStatus(game: Game)(implicit lang: Lang): String =
     game.status match {
       case S.Aborted => trans.gameAborted.txt()
-      case S.Mate    => game.variant.gameLogic match {
-        case GameLogic.Chess() | GameLogic.FairySF() => trans.checkmate.txt()
-        case _                                       => ""
-      }
+      case S.Mate =>
+        game.variant.gameLogic match {
+          case GameLogic.Chess() | GameLogic.FairySF() => trans.checkmate.txt()
+          case _                                       => ""
+        }
       case S.PerpetualCheck => trans.perpetualCheck.txt()
       case S.Resign =>
         game.loser match {
           case Some(p) if p.playerIndex.p1 => trans.playerIndexResigned(game.playerTrans(P1)).v
-          case _                        => trans.playerIndexResigned(game.playerTrans(P2)).v
+          case _                           => trans.playerIndexResigned(game.playerTrans(P2)).v
         }
       case S.UnknownFinish => trans.finished.txt()
       case S.Stalemate     => trans.stalemate.txt()
       case S.Timeout =>
         game.loser match {
           case Some(p) if p.playerIndex.p1 => trans.playerIndexLeftTheGame(game.playerTrans(P1)).v
-          case Some(_)                  => trans.playerIndexLeftTheGame(game.playerTrans(P2)).v
-          case None                     => trans.draw.txt()
+          case Some(_)                     => trans.playerIndexLeftTheGame(game.playerTrans(P2)).v
+          case None                        => trans.draw.txt()
         }
       case S.Draw => trans.draw.txt()
       case S.Outoftime =>
@@ -198,15 +196,15 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Cheat => trans.cheatDetected.txt()
       case S.VariantEnd =>
         game.variant match {
-          case Variant.Chess(strategygames.chess.variant.KingOfTheHill) => trans.kingInTheCenter.txt()
-          case Variant.Chess(strategygames.chess.variant.ThreeCheck)    => trans.threeChecks.txt()
-          case Variant.Chess(strategygames.chess.variant.FiveCheck)    => trans.fiveChecks.txt()
-          case Variant.Chess(strategygames.chess.variant.RacingKings)   => trans.raceFinished.txt()
-          case Variant.Chess(strategygames.chess.variant.LinesOfAction) => trans.checkersConnected.txt()
-          case Variant.Chess(strategygames.chess.variant.ScrambledEggs) => trans.checkersConnected.txt()
+          case Variant.Chess(strategygames.chess.variant.KingOfTheHill)      => trans.kingInTheCenter.txt()
+          case Variant.Chess(strategygames.chess.variant.ThreeCheck)         => trans.threeChecks.txt()
+          case Variant.Chess(strategygames.chess.variant.FiveCheck)          => trans.fiveChecks.txt()
+          case Variant.Chess(strategygames.chess.variant.RacingKings)        => trans.raceFinished.txt()
+          case Variant.Chess(strategygames.chess.variant.LinesOfAction)      => trans.checkersConnected.txt()
+          case Variant.Chess(strategygames.chess.variant.ScrambledEggs)      => trans.checkersConnected.txt()
           case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => trans.promotion.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Flipello) => trans.gameFinished.txt()
-          case _                           => trans.variantEnding.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => trans.gameFinished.txt()
+          case _                                                             => trans.variantEnding.txt()
         }
       case _ => ""
     }
@@ -217,7 +215,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     val clock = game.clock ?? { c =>
       " • " + c.config.show
     }
-    val variant = game.variant.exotic ?? s" • ${game.variant.name}"
+    val variant = game.variant.exotic ?? s" • ${VariantKeys.variantName(game.variant)}"
     s"$u1 vs $u2$clock$variant"
   }
 
@@ -251,7 +249,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     val speed = c.clock.map(_.config).fold(strategygames.Speed.Correspondence.name) { clock =>
       s"${strategygames.Speed(clock).name} (${clock.show})"
     }
-    val variant = c.variant.exotic ?? s" ${c.variant.name}"
+    val variant = c.variant.exotic ?? s" ${VariantKeys.variantName(c.variant)}"
     val challenger = c.challengerUser.fold(trans.anonymous.txt()) { reg =>
       s"${usernameOrId(reg.id)} (${reg.rating.show})"
     }

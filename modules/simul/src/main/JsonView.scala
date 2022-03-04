@@ -5,6 +5,7 @@ import play.api.libs.json._
 import lila.common.LightUser
 import lila.game.{ Game, GameRepo }
 import lila.user.User
+import lila.i18n.VariantKeys
 
 final class JsonView(
     gameRepo: GameRepo,
@@ -97,7 +98,7 @@ final class JsonView(
     Json.obj(
       "key"  -> v.key,
       "icon" -> lila.game.PerfPicker.perfType(speed, v, none).map(_.iconChar.toString),
-      "name" -> v.name
+      "name" -> VariantKeys.variantName(v)
     )
 
   private def playerJson(player: SimulPlayer): Fu[JsObject] =
@@ -125,9 +126,9 @@ final class JsonView(
   private def gameJson(hostId: User.ID, g: Game) =
     Json
       .obj(
-        "id"       -> g.id,
-        "status"   -> g.status.id,
-        "fen"      -> (strategygames.format.Forsyth.boardAndPlayer(
+        "id"     -> g.id,
+        "status" -> g.status.id,
+        "fen" -> (strategygames.format.Forsyth.boardAndPlayer(
           g.situation.board.variant.gameLogic,
           g.situation
         )),
@@ -149,10 +150,10 @@ final class JsonView(
       playerJson(p.player) map { player =>
         Json
           .obj(
-            "player"    -> player,
-            "variant"   -> p.player.variant.key,
+            "player"          -> player,
+            "variant"         -> p.player.variant.key,
             "hostPlayerIndex" -> p.hostPlayerIndex,
-            "game"      -> gameJson(hostId, game)
+            "game"            -> gameJson(hostId, game)
           )
           .some
       }

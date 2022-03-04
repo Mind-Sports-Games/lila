@@ -4,6 +4,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.game.{ Game, Pov }
+import lila.i18n.VariantKeys
 
 import strategygames.format.FEN
 import strategygames.variant.Variant
@@ -52,6 +53,6 @@ object bits {
         case v => routes.Page.variant(v.key).url
       }),
       targetBlank,
-      title := variant.title
+      title := VariantKeys.variantTitle(variant)
     )(name)
 }

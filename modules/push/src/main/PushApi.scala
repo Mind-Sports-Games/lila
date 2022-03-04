@@ -10,6 +10,7 @@ import lila.game.{ Game, Namer, Pov }
 import lila.hub.actorApi.map.Tell
 import lila.hub.actorApi.round.{ IsOnGame, MoveEvent }
 import lila.user.User
+import lila.i18n.VariantKeys
 
 final private class PushApi(
     firebasePush: FirebasePush,
@@ -276,7 +277,7 @@ final private class PushApi(
         case Correspondence(d) => s"$d days"
         case c: Clock          => c.show
       },
-      c.variant.name
+      VariantKeys.variantName(c.variant)
     ) mkString " • "
   }
 

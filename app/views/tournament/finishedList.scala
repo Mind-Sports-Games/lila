@@ -4,6 +4,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.tournament.Tournament
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
@@ -33,7 +34,7 @@ object finishedList {
         span(
           t.clock.show,
           " • ",
-          if (t.variant.exotic) t.variant.name else t.perfType.trans,
+          if (t.variant.exotic) VariantKeys.variantName(t.variant) else t.perfType.trans,
           t.position.isDefined option frag(" • ", trans.thematic()),
           " • ",
           t.mode.fold(trans.casualTournament, trans.ratedTournament)(),

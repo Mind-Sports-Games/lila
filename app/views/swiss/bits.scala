@@ -3,7 +3,7 @@ package views.html.swiss
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.i18n.{ I18nKeys => trans }
+import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.swiss.Swiss
 
 import controllers.routes
@@ -53,7 +53,7 @@ object bits {
                 span(cls := "setup")(
                   s.clock.show,
                   " • ",
-                  if (s.variant.exotic) s.variant.name else s.perfType.trans,
+                  if (s.variant.exotic) VariantKeys.variantName(s.variant) else s.perfType.trans,
                   " • ",
                   if (s.settings.rated) trans.ratedTournament() else trans.casualTournament(),
                   " • ",
