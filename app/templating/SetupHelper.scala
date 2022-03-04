@@ -5,7 +5,7 @@ import strategygames.{ GameFamily, Mode, Speed }
 import strategygames.variant.Variant
 import play.api.i18n.Lang
 
-import lila.i18n.{ I18nKeys => trans }
+import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.pref.Pref
 import lila.report.Reason
 import lila.setup.TimeMode
@@ -104,99 +104,115 @@ trait SetupHelper { self: I18nHelper =>
       (Mode.Rated.id.toString, trans.ratedTournament.txt(), none)
     )
 
-  private val encodeId = (v: Variant) => v.id.toString
+  private val encodeId           = (v: Variant) => v.id.toString
   private val encodeGameFamilyId = (lib: GameFamily) => lib.id.toString
 
   private def variantTupleId = variantTuple(encodeId) _
 
   private def variantTuple(
-    encode: Variant => String, variantName: Variant => String = _.name
+      encode: Variant => String,
+      variantName: Variant => String = VariantKeys.variantName(_)
   )(variant: Variant) =
-    (encode(variant), variantName(variant), variant.title.some)
+    (encode(variant), variantName(variant), VariantKeys.variantTitle(variant).some)
 
   def translatedGameFamilyChoices(implicit lang: Lang): List[SelectChoice] =
     GameFamily.all.map(translatedGameFamilyChoice(_))
 
   private def translatedGameFamilyChoice(
-    gameFamily: GameFamily
+      gameFamily: GameFamily
   )(implicit lang: Lang): SelectChoice =
     (encodeGameFamilyId(gameFamily), gameFamily.name, gameFamily.name.some)
 
   def translatedVariantChoices(
-    encode: Variant => String = encodeId
+      encode: Variant => String = encodeId
   )(implicit lang: Lang): List[(SelectChoice, List[SelectChoice])] =
-    GameFamily.all.map(gf => (
-      translatedGameFamilyChoice(gf),
-      translatedVariantChoicesByGameFamily(gf, encode)
-    ))
+    GameFamily.all.map(gf =>
+      (
+        translatedGameFamilyChoice(gf),
+        translatedVariantChoicesByGameFamily(gf, encode)
+      )
+    )
 
   private def translatedVariantChoicesByGameFamily(
-    gameFamily: GameFamily,
-    encode: Variant => String
+      gameFamily: GameFamily,
+      encode: Variant => String
   )(implicit lang: Lang): List[SelectChoice] =
     List(gameFamily.defaultVariant).map(variantTuple(encode))
 
-  def translatedVariantChoicesWithVariants(
-    implicit lang: Lang
+  def translatedVariantChoicesWithVariants(implicit
+      lang: Lang
   ): List[(SelectChoice, List[SelectChoice])] =
     translatedVariantChoicesWithVariants(encodeId)
 
   def translatedVariantChoicesWithVariants(
-    encode: Variant => String = encodeId
+      encode: Variant => String = encodeId
   )(implicit lang: Lang): List[(SelectChoice, List[SelectChoice])] =
-    GameFamily.all.map(gf => (translatedGameFamilyChoice(gf),
-      translatedVariantChoicesWithVariantsByGameFamily(gf, encode)
-    ))
+    GameFamily.all.map(gf =>
+      (translatedGameFamilyChoice(gf), translatedVariantChoicesWithVariantsByGameFamily(gf, encode))
+    )
 
   def translatedAllVariantChoicesWithVariants(
-    encode: Variant => String
+      encode: Variant => String
   )(implicit lang: Lang): List[SelectChoice] =
-    GameFamily.all.map(
-      translatedVariantChoicesWithVariantsByGameFamily(_, encode)
-    ).flatten
+    GameFamily.all
+      .map(
+        translatedVariantChoicesWithVariantsByGameFamily(_, encode)
+      )
+      .flatten
 
   def translatedVariantChoicesWithVariantsByGameFamily(
-    gameFamily: GameFamily,
-    encode: Variant => String = encodeId
+      gameFamily: GameFamily,
+      encode: Variant => String = encodeId
   )(implicit lang: Lang): List[SelectChoice] =
     translatedVariantChoicesByGameFamily(gameFamily, encode) :::
-    gameFamily.variants.filter(
-      v => v != gameFamily.defaultVariant && !v.fromPositionVariant
-    ).map(variantTuple(encode))
+      gameFamily.variants
+        .filter(v => v != gameFamily.defaultVariant && !v.fromPositionVariant)
+        .map(variantTuple(encode))
 
-  def translatedVariantChoicesWithFen(
-    implicit lang: Lang
+  def translatedVariantChoicesWithFen(implicit
+      lang: Lang
   ): List[(SelectChoice, List[SelectChoice])] =
-    GameFamily.all.map(gf => (translatedGameFamilyChoice(gf),
-      translatedVariantChoicesByGameFamily(gf, encodeId) :::
-      gf.variants.filter(
-        v => v.fenVariant || v.fromPositionVariant
-      ).map(variantTupleId)
-    ))
+    GameFamily.all.map(gf =>
+      (
+        translatedGameFamilyChoice(gf),
+        translatedVariantChoicesByGameFamily(gf, encodeId) :::
+          gf.variants.filter(v => v.fenVariant || v.fromPositionVariant).map(variantTupleId)
+      )
+    )
 
-  def translatedAiVariantChoices(
-    implicit lang: Lang
+  def translatedAiVariantChoices(implicit
+      lang: Lang
   ): List[(SelectChoice, List[SelectChoice])] =
-    GameFamily.all.filter(_.aiEnabled).map(gf => (translatedGameFamilyChoice(gf),
-      translatedVariantChoicesByGameFamily(gf, encodeId) :::
-      gf.variants.filter(
-        v => v != gf.defaultVariant && !v.fromPositionVariant && v.aiVariant
-      ).map(variantTupleId) ::: gf.variants.filter(
-        _.fromPositionVariant
-      ).map(variantTupleId)
-    ))
+    GameFamily.all
+      .filter(_.aiEnabled)
+      .map(gf =>
+        (
+          translatedGameFamilyChoice(gf),
+          translatedVariantChoicesByGameFamily(gf, encodeId) :::
+            gf.variants
+              .filter(v => v != gf.defaultVariant && !v.fromPositionVariant && v.aiVariant)
+              .map(variantTupleId) ::: gf.variants
+              .filter(
+                _.fromPositionVariant
+              )
+              .map(variantTupleId)
+        )
+      )
 
-  def translatedVariantChoicesWithVariantsAndFen(
-    implicit lang: Lang
+  def translatedVariantChoicesWithVariantsAndFen(implicit
+      lang: Lang
   ): List[(SelectChoice, List[SelectChoice])] =
-    GameFamily.all.map(gf => (translatedGameFamilyChoice(gf),
-      translatedVariantChoicesWithVariantsByGameFamily(gf, encodeId) :::
-      gf.variants.filter(_.fromPositionVariant).map(variantTupleId)
-    ))
+    GameFamily.all.map(gf =>
+      (
+        translatedGameFamilyChoice(gf),
+        translatedVariantChoicesWithVariantsByGameFamily(gf, encodeId) :::
+          gf.variants.filter(_.fromPositionVariant).map(variantTupleId)
+      )
+    )
 
   //used in lidraughts but not in lila (yet?)
   //private def fromPositionVariantTupleId(v: Variant)(implicit lang: Lang) =
-  //  variantTuple(encodeId, v => fromPositionVariantName(v.name))(v)
+  //  variantTuple(encodeId, v => fromPositionVariantName(VariantKeys.variantName(v)))(v)
 
   //private def fromPositionVariantName(variantName: String) =
   //  s"From Position | ${variantName}"

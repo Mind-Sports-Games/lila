@@ -7,6 +7,7 @@ import org.joda.time.DateTime
 import play.api.i18n.Lang
 
 import lila.rating.PerfType
+import lila.i18n.VariantKeys
 
 case class Schedule(
     freq: Schedule.Freq,
@@ -20,7 +21,7 @@ case class Schedule(
 
   // Simpler naming for now.
   def name(full: Boolean = true)(implicit lang: Lang): String = {
-    s"${variant.name} Mind Sports Olympiad Warm-up"
+    s"${VariantKeys.variantName(variant)} Mind Sports Olympiad Warm-up"
     /*
     import Schedule.Freq._
     import Schedule.Speed._
@@ -84,22 +85,22 @@ case class Schedule(
       if (full) xArena.txt(n) else n
     } else
       freq match {
-        case Hourly if full  => hourlyXArena.txt(variant.name)
-        case Hourly          => hourlyX.txt(variant.name)
-        case Daily if full   => dailyXArena.txt(variant.name)
-        case Daily           => dailyX.txt(variant.name)
-        case Eastern if full => easternXArena.txt(variant.name)
-        case Eastern         => easternX.txt(variant.name)
-        case Weekly if full  => weeklyXArena.txt(variant.name)
-        case Weekly          => weeklyX.txt(variant.name)
-        case Monthly if full => monthlyXArena.txt(variant.name)
-        case Monthly         => monthlyX.txt(variant.name)
-        case Yearly if full  => yearlyXArena.txt(variant.name)
-        case Yearly          => yearlyX.txt(variant.name)
-        case Shield if full  => xShieldArena.txt(variant.name)
-        case Shield          => xShield.txt(variant.name)
+        case Hourly if full  => hourlyXArena.txt(VariantKeys.variantName(variant))
+        case Hourly          => hourlyX.txt(VariantKeys.variantName(variant))
+        case Daily if full   => dailyXArena.txt(VariantKeys.variantName(variant))
+        case Daily           => dailyX.txt(VariantKeys.variantName(variant))
+        case Eastern if full => easternXArena.txt(VariantKeys.variantName(variant))
+        case Eastern         => easternX.txt(VariantKeys.variantName(variant))
+        case Weekly if full  => weeklyXArena.txt(VariantKeys.variantName(variant))
+        case Weekly          => weeklyX.txt(VariantKeys.variantName(variant))
+        case Monthly if full => monthlyXArena.txt(VariantKeys.variantName(variant))
+        case Monthly         => monthlyX.txt(VariantKeys.variantName(variant))
+        case Yearly if full  => yearlyXArena.txt(VariantKeys.variantName(variant))
+        case Yearly          => yearlyX.txt(VariantKeys.variantName(variant))
+        case Shield if full  => xShieldArena.txt(VariantKeys.variantName(variant))
+        case Shield          => xShield.txt(VariantKeys.variantName(variant))
         case _ =>
-          val n = s"${freq.name} ${variant.name}"
+          val n = s"${freq.name} ${VariantKeys.variantName(variant)}"
           if (full) xArena.txt(n) else n
       }*/
   }
@@ -219,7 +220,19 @@ object Schedule {
     case object Blitz35     extends Speed(75)
     case object Blitz51     extends Speed(80)
     val all: List[Speed] =
-      List(UltraBullet, HyperBullet, Bullet, HippoBullet, SuperBlitz, Blitz, Blitz32, Blitz35, Blitz51, Rapid, Classical)
+      List(
+        UltraBullet,
+        HyperBullet,
+        Bullet,
+        HippoBullet,
+        SuperBlitz,
+        Blitz,
+        Blitz32,
+        Blitz35,
+        Blitz51,
+        Rapid,
+        Classical
+      )
     val mostPopular: List[Speed] = List(Bullet, Blitz, Rapid, Classical)
     def apply(key: String)       = all.find(_.key == key) orElse all.find(_.key.toLowerCase == key.toLowerCase)
     def byId(id: Int)            = all find (_.id == id)
@@ -246,8 +259,8 @@ object Schedule {
         case HyperBullet | Bullet | HippoBullet => PerfType.orDefaultSpeed("bullet")
         case SuperBlitz | Blitz | Blitz32 | Blitz35 | Blitz51 =>
           PerfType.orDefaultSpeed("blitz")
-        case Rapid                              => PerfType.orDefaultSpeed("rapid")
-        case Classical                          => PerfType.orDefaultSpeed("classical")
+        case Rapid     => PerfType.orDefaultSpeed("rapid")
+        case Classical => PerfType.orDefaultSpeed("classical")
       }
   }
 
@@ -373,7 +386,7 @@ object Schedule {
       import Freq._, Speed._
 
       // No rated games required, because no-one has them.
-      val nbRatedGame = 0/*(s.freq, s.speed) match {
+      val nbRatedGame = 0 /*(s.freq, s.speed) match {
 
         case (Hourly | Daily | Eastern, HyperBullet | Bullet)             => 20
         case (Hourly | Daily | Eastern, HippoBullet | SuperBlitz | Blitz) => 15
@@ -386,8 +399,8 @@ object Schedule {
         case _ => 0
       }*/
 
-     // No min rating for the same reason.
-      val minRating = 0/*(s.freq, s.variant) match {
+      // No min rating for the same reason.
+      val minRating = 0 /*(s.freq, s.variant) match {
         case (Weekend, strategygames.chess.variant.Crazyhouse) => 2100
         case (Weekend, _)                        => 2200
         case _                                   => 0

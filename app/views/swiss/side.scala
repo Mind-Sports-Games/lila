@@ -12,6 +12,7 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.markdownLinksOrRichText
 import lila.swiss.{ Swiss, SwissCondition }
 import lila.common.Form
+import lila.i18n.VariantKeys
 
 object side {
 
@@ -35,8 +36,9 @@ object side {
               if (s.variant.exotic) {
                 views.html.game.bits.variantLink(
                   s.variant,
-                  if (s.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) s.variant.shortName
-                  else s.variant.name
+                  if (s.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
+                    VariantKeys.variantShortName(s.variant)
+                  else VariantKeys.variantName(s.variant)
                 )
               } else s.perfType.trans,
               separator,
@@ -44,11 +46,11 @@ object side {
             ),
             p(
               span(cls := "swiss__meta__round")(
-                if (s.settings.isMicroMatch){(title := trans.microMatchDefinition.txt())},
+                if (s.settings.isMicroMatch) { (title := trans.microMatchDefinition.txt()) },
                 s"${s.round}/${s.settings.nbRounds}",
-                if (s.settings.isMicroMatch){
+                if (s.settings.isMicroMatch) {
                   " micro-match rounds"
-                  } else " rounds"
+                } else " rounds"
               ),
               separator,
               a(href := routes.Swiss.home)("Swiss"),

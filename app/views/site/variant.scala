@@ -5,6 +5,7 @@ import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import lila.i18n.VariantKeys
 
 import strategygames.variant.Variant
 
@@ -18,11 +19,11 @@ object variant {
   )(implicit ctx: Context) =
     layout(
       active = perfType.some,
-      title = s"${variant.name} • ${variant.title}",
+      title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
       klass = "box-pad page variant"
     )(
-      h1(cls := "text", dataIcon := perfType.iconChar)(variant.name),
-      h2(cls := "headline")(variant.title),
+      h1(cls := "text", dataIcon := perfType.iconChar)(VariantKeys.variantName(variant)),
+      h2(cls := "headline")(VariantKeys.variantTitle(variant)),
       div(cls := "body")(raw(~doc.getHtml("pages.content", resolver)))
     )
 
@@ -41,8 +42,8 @@ object variant {
           val variant = lila.rating.PerfType variantOf pt
           a(cls := "variant text box__pad", href := routes.Page.variant(pt.key), dataIcon := pt.iconChar)(
             span(
-              h2(variant.name),
-              h3(cls := "headline")(variant.title)
+              h2(VariantKeys.variantName(variant)),
+              h3(cls := "headline")(VariantKeys.variantTitle(variant))
             )
           )
         }

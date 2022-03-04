@@ -7,9 +7,9 @@ sealed class Theme private[pref] (val name: String, val colors: Theme.HexColors,
 
   def cssClass = s"${gameFamilyName}-${name}"
 
-  def light = colors._1
-  def dark  = colors._2
-  def gameFamilyName = GameFamily(gameFamily).shortName.toLowerCase()
+  def light          = colors._1
+  def dark           = colors._2
+  def gameFamilyName = GameFamily(gameFamily).key
 }
 
 sealed trait ThemeObject {
@@ -18,7 +18,7 @@ sealed trait ThemeObject {
 
   val default: Theme
 
-  def allByName(gf:Int) = all filter(t => t.gameFamily == gf) map { c =>
+  def allByName(gf: Int) = all filter (t => t.gameFamily == gf) map { c =>
     c.name -> c
   } toMap
 
@@ -26,7 +26,7 @@ sealed trait ThemeObject {
 
   def unapply(full: Theme): Some[(String, Int)] = Some((full.name, full.gameFamily))
 
-  def contains(name: String) = all map(t => t.name) contains name
+  def contains(name: String) = all map (t => t.name) contains name
 
 }
 
@@ -47,39 +47,53 @@ object Theme extends ThemeObject {
 
   lazy val default = allByName(0) get "maple" err "Can't find default theme D:"
 
-  val defaults = GameFamily.all.map(gf => new Theme(gf.boardThemeDefault, Theme.colors.getOrElse(gf.boardThemeDefault, Theme.defaultHexColors), gf.id))
+  val defaults = GameFamily.all.map(gf =>
+    new Theme(
+      gf.boardThemeDefault,
+      Theme.colors.getOrElse(gf.boardThemeDefault, Theme.defaultHexColors),
+      gf.id
+    )
+  )
 
-  def updateBoardTheme(currentThemes : List[Theme], theme: String, gameFamily: Int) : List[Theme] = {
+  def updateBoardTheme(currentThemes: List[Theme], theme: String, gameFamily: Int): List[Theme] = {
     val newTheme = apply(theme, gameFamily)
-    addMissingDefaultsIfAny(currentThemes).map{ x => x.gameFamily match {
-                                              case newTheme.gameFamily => newTheme
-                                              case _ => x
-                                  }}
+    addMissingDefaultsIfAny(currentThemes).map { x =>
+      x.gameFamily match {
+        case newTheme.gameFamily => newTheme
+        case _                   => x
+      }
+    }
   }
 
-  def updateBoardTheme(currentThemes : List[Theme], theme: String, gameFamily: String) : List[Theme] = {
-    val gf_id = GameFamily.all.filter(gf => gf.shortName.toLowerCase() == gameFamily)(0).id
+  def updateBoardTheme(currentThemes: List[Theme], theme: String, gameFamily: String): List[Theme] = {
+    val gf_id    = GameFamily.all.filter(gf => gf.key == gameFamily)(0).id
     val newTheme = apply(theme, gf_id)
-    addMissingDefaultsIfAny(currentThemes).map{ x => x.gameFamily match {
-                                              case newTheme.gameFamily => newTheme
-                                              case _ => x
-                                  }}
+    addMissingDefaultsIfAny(currentThemes).map { x =>
+      x.gameFamily match {
+        case newTheme.gameFamily => newTheme
+        case _                   => x
+      }
+    }
   }
 
   def addMissingDefaultsIfAny(currentThemes: List[Theme]): List[Theme] = {
-    defaults.map{
-      x => if( currentThemes.filter(t => t.gameFamily == x.gameFamily).size == 1 ){
+    defaults.map { x =>
+      if (currentThemes.filter(t => t.gameFamily == x.gameFamily).size == 1) {
         currentThemes.filter(t => t.gameFamily == x.gameFamily)(0)
-      } else{
+      } else {
         x
       }
     }
   }
 
+  val all: List[Theme] = GameFamily.all
+    .map(gf =>
+      gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
+    )
+    .flatten
 
-  val all: List[Theme] = GameFamily.all.map(gf => gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))).flatten
- 
-  def allOfFamily(gf: GameFamily) : List[Theme] = gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
+  def allOfFamily(gf: GameFamily): List[Theme] =
+    gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
 
 }
 
