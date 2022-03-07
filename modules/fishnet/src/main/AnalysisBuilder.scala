@@ -46,8 +46,9 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
                 startPly = work.startPly,
                 fk = !client.playstrategy option client.key.value,
                 date = DateTime.now
-              )
             ) match {
+              ),
+              work.game.variant
               case (analysis, errors) =>
                 errors foreach { e =>
                   logger.debug(s"[UciToPgn] $debug $e")
