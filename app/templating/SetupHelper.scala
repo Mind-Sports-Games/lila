@@ -121,7 +121,7 @@ trait SetupHelper { self: I18nHelper =>
   private def translatedGameFamilyChoice(
       gameFamily: GameFamily
   )(implicit lang: Lang): SelectChoice =
-    (encodeGameFamilyId(gameFamily), gameFamily.name, gameFamily.name.some)
+    (encodeGameFamilyId(gameFamily), VariantKeys.gameFamilyName(gameFamily), VariantKeys.gameFamilyName(gameFamily).some)
 
   def translatedVariantChoices(
       encode: Variant => String = encodeId
