@@ -45,14 +45,15 @@ object Work {
   }
 
   private[fishnet] case class Game(
-      id: String, // can be a study chapter ID, if studyId is set
-      initialFen: Option[String],//FEN
+      id: String,                 // can be a study chapter ID, if studyId is set
+      initialFen: Option[String], //FEN
       studyId: Option[String],
       variant: Variant,
       moves: String
   ) {
 
-    def uciList: List[Uci] = ~(Uci.readList(GameLogic.Chess(), GameFamily.Chess(), moves))
+    def uciList: List[Uci] =
+      ~(Uci.readList(variant.gameLogic, variant.gameFamily, moves))
   }
 
   case class Sender(

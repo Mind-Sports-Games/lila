@@ -1,6 +1,7 @@
 package lila.fishnet
 
 import scala.concurrent.duration._
+import strategygames.format.Uci
 
 final private class Monitor(
     repo: FishnetRepo,
@@ -43,7 +44,7 @@ final private class Monitor(
         } / 1000000)
 
     val metaMovesSample = sample(result.evaluations.drop(6).filterNot(_.mateFound), 100)
-    def avgOf(f: JsonApi.Request.Evaluation => Option[Int]): Option[Int] = {
+    def avgOf(f: JsonApi.Request.Evaluation[Uci] => Option[Int]): Option[Int] = {
       val (sum, nb) = metaMovesSample.foldLeft(0 -> 0) { case ((sum, nb), move) =>
         f(move).fold(sum -> nb) { v =>
           (sum + v, nb + 1)

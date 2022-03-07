@@ -1,5 +1,7 @@
 package lila.fishnet
 
+import strategygames.variant.Variant
+import strategygames.format.Uci
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
@@ -79,15 +81,17 @@ final class FishnetApi(
   def postAnalysis(
       workId: Work.Id,
       client: Client,
-      data: JsonApi.Request.PostAnalysis
-  ): Fu[PostAnalysisResult] =
+      stringData: JsonApi.Request.PostAnalysisString
+  ): Fu[PostAnalysisResult] = {
     repo
       .getAnalysis(workId)
       .flatMap {
         case None =>
           Monitor.notFound(workId, client)
           fufail(WorkNotFound)
-        case Some(work) if work isAcquiredBy client =>
+        case Some(work) if work isAcquiredBy client => {
+          val v = work.game.variant
+          val data = stringData.toUci(v.gameLogic, v.gameFamily)
           data.completeOrPartial match {
             case complete: CompleteAnalysis =>
               {
@@ -114,6 +118,7 @@ final class FishnetApi(
                 case false => fuccess(PostAnalysisResult.UnusedPartial)
               }
           }
+        }
         case Some(work) =>
           Monitor.notAcquired(work, client)
           fufail(NotAcquired)
@@ -130,6 +135,7 @@ final class FishnetApi(
         case r @ PostAnalysisResult.Partial(res)  => sink progress res inject r
         case r @ PostAnalysisResult.UnusedPartial => fuccess(r)
       }
+  }
 
   def abort(workId: Work.Id, client: Client): Funit =
     workQueue {

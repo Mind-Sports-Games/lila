@@ -11,6 +11,7 @@ import lila.common.{ IpAddress, Maths }
 import lila.fishnet.{ Work => W }
 import lila.tree.Eval.JsonHandlers._
 import lila.tree.Eval.{ Cp, Mate }
+import akka.actor.typed.PostStop
 
 object JsonApi {
 
@@ -40,10 +41,30 @@ object JsonApi {
         fishnet: Fishnet
     ) extends Request
 
-    case class PostAnalysis(
+    case class PostAnalysisString(
         fishnet: Fishnet,
         stockfish: Stockfish,
-        analysis: List[Option[Evaluation.OrSkipped]]
+        analysis: List[Option[Evaluation.OrSkipped[String]]]
+    ) extends Request
+        with Result {
+
+      def toUci(gl: GameLogic, gf: GameFamily) =
+        PostAnalysisUci(
+          fishnet,
+          stockfish,
+          analysis.map(o =>
+            o.map({
+              case Right(e) => Right(Evaluation.toUci(e, gl, gf))
+              case Left(s)  => Left(s)
+            })
+          )
+        )
+    }
+
+    case class PostAnalysisUci(
+        fishnet: Fishnet,
+        stockfish: Stockfish,
+        analysis: List[Option[Evaluation.OrSkipped[Uci]]]
     ) extends Request
         with Result {
 
@@ -55,7 +76,7 @@ object JsonApi {
     case class CompleteAnalysis(
         fishnet: Fishnet,
         stockfish: Stockfish,
-        analysis: List[Evaluation.OrSkipped]
+        analysis: List[Evaluation.OrSkipped[Uci]]
     ) {
 
       def evaluations = analysis.collect { case Right(e) => e }
@@ -76,11 +97,16 @@ object JsonApi {
     case class PartialAnalysis(
         fishnet: Fishnet,
         stockfish: Stockfish,
-        analysis: List[Option[Evaluation.OrSkipped]]
+        analysis: List[Option[Evaluation.OrSkipped[Uci]]]
     )
 
-    case class Evaluation(
-        pv: List[Uci],
+    // Because the incoming json won't know what variant or gamefamily
+    // the initial parsing is _just_ into a list of strings.
+    // To handle that, i've made this generic and some parts of the code
+    // will deal with Evaluation[String], and other parts will deal with
+    // Evaluation[Uci]
+    case class Evaluation[T](
+        pv: List[T],
         score: Evaluation.Score,
         time: Option[Int],
         nodes: Option[Int],
@@ -100,7 +126,7 @@ object JsonApi {
 
       object Skipped
 
-      type OrSkipped = Either[Skipped.type, Evaluation]
+      type OrSkipped[T] = Either[Skipped.type, Evaluation[T]]
 
       case class Score(cp: Option[Cp], mate: Option[Mate]) {
         def invert                  = copy(cp.map(_.invert), mate.map(_.invert))
@@ -111,22 +137,42 @@ object JsonApi {
 
       private val legacyDesiredNodes = 3_000_000
       val legacyAcceptableNodes      = legacyDesiredNodes * 0.9
+
+      def toUci(eval: Evaluation[String], gl: GameLogic, gf: GameFamily): Evaluation[Uci] =
+        Evaluation[Uci](
+          eval.pv.flatMap(Uci(gl, gf, _)),
+          eval.score,
+          eval.time,
+          eval.nodes,
+          eval.nps,
+          eval.depth
+        )
     }
   }
 
+  case class UciGame(
+      game_id: String,
+      position: String, //FEN
+      variant: Variant,
+      moves: List[Uci]
+  )
+
   case class Game(
       game_id: String,
-      position: String,//FEN
+      position: String, //FEN
       variant: Variant,
       moves: String
-  )
+  ) {
+    def uciMoves = ~(Uci.readList(variant.gameLogic, variant.gameFamily, moves))
+    def toUci = UciGame(game_id, position, variant, uciMoves)
+  }
 
   def fromGame(g: W.Game) =
     Game(
       game_id = if (g.studyId.isDefined) "" else g.id,
       position = g.initialFen match {
         case Some(initialFen) => initialFen
-        case None => g.variant.initialFen.value
+        case None             => g.variant.initialFen.value
       },
       variant = g.variant,
       moves = g.moves
@@ -154,39 +200,45 @@ object JsonApi {
 
   object readers {
     import play.api.libs.functional.syntax._
-    implicit val ClientVersionReads = Reads.of[String].map(Client.Version(_))
-    implicit val ClientPythonReads  = Reads.of[String].map(Client.Python(_))
-    implicit val ClientKeyReads     = Reads.of[String].map(Client.Key(_))
-    implicit val StockfishReads     = Json.reads[Request.Stockfish]
-    implicit val FishnetReads       = Json.reads[Request.Fishnet]
-    implicit val AcquireReads       = Json.reads[Request.Acquire]
-    implicit val ScoreReads         = Json.reads[Request.Evaluation.Score]
-    implicit val uciListReads = Reads.of[String] map { str =>
-      ~Uci.readList(GameLogic.Chess(), GameFamily.Chess(), str)
-    }
+    implicit val ClientVersionReads  = Reads.of[String].map(Client.Version(_))
+    implicit val ClientPythonReads   = Reads.of[String].map(Client.Python(_))
+    implicit val ClientKeyReads      = Reads.of[String].map(Client.Key(_))
+    implicit val StockfishReads      = Json.reads[Request.Stockfish]
+    implicit val FishnetReads        = Json.reads[Request.Fishnet]
+    implicit val AcquireReads        = Json.reads[Request.Acquire]
+    implicit val ScoreReads          = Json.reads[Request.Evaluation.Score]
+    implicit val uciListReadsStrings = Reads.of[String] map { str => str.split(" ") }
 
-    implicit val EvaluationReads: Reads[Request.Evaluation] = (
-      (__ \ "pv").readNullable[List[Uci]].map(~_) and
+    implicit val EvaluationReads: Reads[Request.Evaluation[String]] = (
+      (__ \ "pv").readNullable[String].map(~_).map(_.split(" ").toList) and
         (__ \ "score").read[Request.Evaluation.Score] and
         (__ \ "time").readNullable[Int] and
         (__ \ "nodes").readNullable[Long].map(_.map(_.toSaturatedInt)) and
         (__ \ "nps").readNullable[Long].map(_.map(_.toSaturatedInt)) and
         (__ \ "depth").readNullable[Int]
-    )(Request.Evaluation.apply _)
-    implicit val EvaluationOptionReads = Reads[Option[Request.Evaluation.OrSkipped]] {
+    )((moves, score, time, nodes, nps, depth) =>
+      Request.Evaluation[String](moves, score, time, nodes, nps, depth)
+    )
+    implicit val EvaluationOptionReads = Reads[Option[Request.Evaluation.OrSkipped[String]]] {
       case JsNull => JsSuccess(None)
       case obj =>
         if (~(obj boolean "skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
         else EvaluationReads reads obj map Right.apply map some
     }
-    implicit val PostAnalysisReads: Reads[Request.PostAnalysis] = Json.reads[Request.PostAnalysis]
+    implicit val PostAnalysisReads: Reads[Request.PostAnalysisString] =
+      Json.reads[Request.PostAnalysisString]
   }
 
   object writers {
     implicit val VariantWrites = Writes[Variant] { v =>
       JsString(v.key)
     }
-    implicit val GameWrites: Writes[Game] = Json.writes[Game]
+    implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g => Json.obj(
+      "game_id" -> g.game_id,
+      "position"  -> g.position,
+      "variant"  -> g.variant,
+      "moves"  -> g.moves.map(_.fishnetUci).mkString(" ")
+    )}
     implicit val WorkIdWrites = Writes[Work.Id] { id =>
       JsString(id.value)
     }
@@ -198,14 +250,16 @@ object JsonApi {
               "type" -> "analysis",
               "id"   -> a.id,
               "nodes" -> Json.obj(
-                "nnue"      -> a.nodes,
-                "classical" -> a.nodes * 18 / 10
-              )
+                "sf15"      -> a.nodes,
+                "sf14"      -> a.nodes * 14 / 10,
+                "nnue"      -> a.nodes * 14 / 10, // bc fishnet <= 2.3.4
+                "classical" -> a.nodes * 28 / 10
+              ),
+              "timeout" -> Cleaner.timeoutPerPly.toMillis
             ),
-            "nodes"         -> a.nodes * 18 / 10, // bc for fishnet 1.x clients without nnue
             "skipPositions" -> a.skipPositions
           )
-      }) ++ Json.toJson(work.game).as[JsObject]
+      }) ++ Json.toJson(work.game.toUci).as[JsObject]
     }
   }
 }
