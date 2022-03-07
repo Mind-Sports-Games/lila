@@ -28,8 +28,8 @@ final class Preload(
     playbanApi: lila.playban.PlaybanApi,
     lightUserApi: LightUserApi,
     roundProxy: lila.round.GameProxyRepo,
-    simulIsFeaturable: SimulIsFeaturable
-    //lastPostCache: lila.blog.LastPostCache
+    simulIsFeaturable: SimulIsFeaturable,
+    lastPostCache: lila.blog.LastPostCache
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   import Preload._
@@ -78,7 +78,7 @@ final class Preload(
               tWinners,
               puzzle,
               streams.excludeUsers(events.flatMap(_.hostedBy)),
-              //lastPostCache.apply,
+              lastPostCache.apply,
               playban,
               currentGame,
               simulIsFeaturable,
@@ -121,7 +121,7 @@ object Preload {
       tournamentWinners: List[Winner],
       puzzle: Option[lila.puzzle.DailyPuzzle.WithHtml],
       streams: LiveStreams.WithTitles,
-      //lastPost: List[lila.blog.MiniPost],
+      lastPost: List[lila.blog.MiniPost],
       playban: Option[TempBan],
       currentGame: Option[Preload.CurrentGame],
       isFeaturable: Simul => Boolean,
