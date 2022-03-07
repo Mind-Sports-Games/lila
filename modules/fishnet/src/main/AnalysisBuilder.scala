@@ -46,9 +46,9 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
                 startPly = work.startPly,
                 fk = !client.playstrategy option client.key.value,
                 date = DateTime.now
-            ) match {
               ),
               work.game.variant
+            ) match {
               case (analysis, errors) =>
                 errors foreach { e =>
                   logger.debug(s"[UciToPgn] $debug $e")
@@ -80,7 +80,11 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
         }
     }
 
-  private def makeInfos(evals: List[Option[Evaluation[Uci]]], moves: List[Uci], startedAtPly: Int): List[Info] =
+  private def makeInfos(
+      evals: List[Option[Evaluation[Uci]]],
+      moves: List[Uci],
+      startedAtPly: Int
+  ): List[Info] =
     (evals filterNot (_ ?? (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map {
       case ((List(Some(before), Some(after)), move), index) =>
         val variation = before.cappedPv match {
