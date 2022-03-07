@@ -18,7 +18,7 @@ Compile / resourceDirectory := baseDirectory.value / "conf"
 // format: off
 libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
   macwire.macros, macwire.util, play.json, jodaForms,
-  chess, compression, scalalib, hasher,
+  strategyGames, compression, scalalib, hasher,
   reactivemongo.driver, reactivemongo.kamon, maxmind, prismic, scalatags,
   kamon.core, kamon.influxdb, kamon.metrics, kamon.prometheus,
   scrimage, scaffeine, lettuce, uaparser
@@ -123,7 +123,7 @@ lazy val evaluation = module("evaluation",
 lazy val common = smallModule("common",
   Seq(),
   Seq(
-    scalalib, scalaUri, chess, autoconfig,
+    scalalib, scalaUri, strategyGames, autoconfig,
     kamon.core, scalatags, jodaForms, scaffeine, specs2, apacheText
   ) ++ reactivemongo.bundle ++ flexmark.bundle
 )
