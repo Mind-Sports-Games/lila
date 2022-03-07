@@ -138,7 +138,7 @@ object Tv {
         )  
     case object FlipelloFamily
         extends Channel(
-          name = "All Flipello",
+          name = "All Reversi",
           icon = FV.Flipello.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(anyVariant(Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.Flipello() )), noBot),
