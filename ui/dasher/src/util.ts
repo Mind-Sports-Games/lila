@@ -61,6 +61,8 @@ export function displayGameFamily(gameFamilyKey: GameFamilyKey): string {
   switch (gameFamilyKey) {
     case 'loa':
       return 'LinesOfAction';
+    case 'flipello':
+      return 'Reversi';
     default:
       return gameFamilyKey.charAt(0).toUpperCase() + gameFamilyKey.slice(1);
   }
