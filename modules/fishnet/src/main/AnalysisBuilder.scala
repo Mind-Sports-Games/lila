@@ -31,7 +31,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       Replay(
         work.game.variant.gameLogic,
         work.game.uciList,
-        work.game.initialFen.map(fen => FEN(work.game.variant.gameLogic, fen)),
+        work.game.initialFen,
         work.game.variant
       )
         .fold(

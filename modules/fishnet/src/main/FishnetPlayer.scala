@@ -55,7 +55,7 @@ final class FishnetPlayer(
             _id = Work.makeId,
             game = Work.Game(
               id = game.id,
-              initialFen = initialFen.map(_.value),
+              initialFen = initialFen,
               studyId = none,
               variant = game.variant,
               moves = moves mkString " "

@@ -152,14 +152,14 @@ object JsonApi {
 
   case class UciGame(
       game_id: String,
-      position: String, //FEN
+      position: FEN,
       variant: Variant,
       moves: List[Uci]
   )
 
   case class Game(
       game_id: String,
-      position: String, //FEN
+      position: FEN,
       variant: Variant,
       moves: String
   ) {
@@ -172,7 +172,7 @@ object JsonApi {
       game_id = if (g.studyId.isDefined) "" else g.id,
       position = g.initialFen match {
         case Some(initialFen) => initialFen
-        case None             => g.variant.initialFen.value
+        case None             => g.variant.initialFen
       },
       variant = g.variant,
       moves = g.moves

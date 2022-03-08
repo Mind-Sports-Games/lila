@@ -56,7 +56,7 @@ final class FishnetRedis(
       work.level,
       work.clock ?? writeClock,
       work.game.variant.some.filter(_.exotic).??(_.key),
-      work.game.initialFen | "",
+      work.game.initialFen,
       work.game.moves
     ) mkString ";"
 
