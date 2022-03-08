@@ -629,6 +629,7 @@ POST  /api/tournament/team-battle/:id  controllers.Tournament.apiTeamBattleUpdat
 POST  /api/swiss/new/:teamId           controllers.Swiss.apiCreate(teamId: String)
 POST  /api/swiss/:id/terminate         controllers.Swiss.apiTerminate(id: String)
 GET   /api/swiss/:id/games             controllers.Api.swissGames(id: String)
+GET   /api/swiss/:id/standings         controllers.Api.swissStandings(id: String)
 GET   /api/swiss/:id/results           controllers.Api.swissResults(id: String)
 GET   /api/simul                       controllers.Simul.apiList
 GET   /api/status                      controllers.Api.status

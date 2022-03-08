@@ -307,7 +307,7 @@ final class Api(
       }
     }
 
-  def swissResults(id: String) = Action.async { implicit req =>
+  def swissStandings(id: String) = Action.async { implicit req =>
     val csv = HTTPRequest.acceptsCsv(req) || get("as", req).has("csv")
     env.swiss.api byId lila.swiss.Swiss.Id(id) map {
       _ ?? { swiss =>
@@ -324,6 +324,35 @@ final class Api(
     }
   }
 
+  def swissResults(id: String) = Action.async { implicit req =>
+    val csv = HTTPRequest.acceptsCsv(req) || get("as", req).has("csv")
+    env.swiss.api byId lila.swiss.Swiss.Id(id) map {
+      _ ?? { swiss =>
+        Ok.chunked(env.swiss.trf.applyCSV(swiss, sorted = true) intersperse "\n")
+          .pipe(asAttachmentStream(env.api.gameApiV2.filename(swiss, "csv")))
+      //val source = env.swiss.api
+      //  .resultGrid(swiss, MaxPerSecond(50), getInt("nb", req) | Int.MaxValue)
+      //  .mapAsync(8) { p =>
+      //    env.user.lightUserApi.asyncFallback(p.player.userId) map p.withUser
+      //  }
+      //val result =
+      //  if (csv) csvStream(lila.swiss.SwissCsv(source))
+      //  else jsonStream(source.map(env.swiss.json.playerResult))
+      //result.pipe(asAttachment(env.api.gameApiV2.filename(swiss, if (csv) "csv" else "ndjson")))
+      }
+    }
+  }
+
+  //def exportTrf(id: String) =
+  //  Action.async {
+  //    env.swiss.api.byId(SwissId(id)) map {
+  //      case None => NotFound("Tournament not found")
+  //      case Some(swiss) =>
+  //        Ok.chunked(env.swiss.trf(swiss, sorted = true) intersperse "\n")
+  //          .pipe(asAttachmentStream(env.api.gameApiV2.filename(swiss, "trf")))
+  //    }
+  //  }
+
   def gamesByUsersStream =
     AnonOrScopedBody(parse.tolerantText)()(
       anon = gamesByUsers(300),
@@ -336,18 +365,20 @@ final class Api(
   }
 
   def cloudEval =
-    Action.async { req => {
-      val lib = gameLogic(get("lib", req))
-      get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
-        JsonOptionOk(
-          env.evalCache.api.getEvalJson(
-            Variant.orDefault(lib, ~get("variant", req)),
-            FEN(lib, fen),
-            getInt("multiPv", req) | 1
+    Action.async { req =>
+      {
+        val lib = gameLogic(get("lib", req))
+        get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
+          JsonOptionOk(
+            env.evalCache.api.getEvalJson(
+              Variant.orDefault(lib, ~get("variant", req)),
+              FEN(lib, fen),
+              getInt("multiPv", req) | 1
+            )
           )
-        )
+        }
       }
-    }}
+    }
 
   private def gamesByUsers(max: Int)(req: Request[String]) =
     GlobalConcurrencyLimitPerIP(HTTPRequest ipAddress req)(

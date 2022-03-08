@@ -95,7 +95,8 @@ final class SwissApi(
   def update(swiss: Swiss, data: SwissForm.SwissData): Funit =
     Sequencing(swiss.id)(byId) { old =>
       val position =
-        if (old.isCreated || old.settings.position.isDefined) data.realVariant.standardVariant ?? data.realPosition
+        if (old.isCreated || old.settings.position.isDefined)
+          data.realVariant.standardVariant ?? data.realPosition
         else old.settings.position
       val swiss =
         old.copy(
@@ -443,11 +444,11 @@ final class SwissApi(
                     SwissPairing.fields { f2 =>
                       colls.pairing.update
                         .one($doc(f2.id -> pairing.id), $set(f2.microMatchGameId -> rematchId)) >>- {
-                          val pairingUpdated = pairing.copy(microMatchGameId=Some(rematchId))
-                          val game = director.makeGame(swiss, playerMap, true)(pairingUpdated)
-                          gameRepo.insertDenormalized(game) >>- onStart(game.id).unit
-                          // >>- socket.reload(swiss.id) TODO: ??
-                          println("rematched")
+                        val pairingUpdated = pairing.copy(microMatchGameId = Some(rematchId))
+                        val game           = director.makeGame(swiss, playerMap, true)(pairingUpdated)
+                        gameRepo.insertDenormalized(game) >>- onStart(game.id).unit
+                        // >>- socket.reload(swiss.id) TODO: ??
+                        println("rematched")
                       }
                     }
                   )
@@ -766,6 +767,36 @@ final class SwissApi(
           SwissPlayer.WithRank(player, index.toInt + 1)
         }
     }
+
+  //def resultGrid(
+  //    swiss: Swiss,
+  //    perSecond: MaxPerSecond,
+  //    nb: Int
+  //): Source[SwissPlayer.WithRank, _] =
+  //  SwissPlayer.fields { f =>
+  //    colls.player
+  //      .find($doc(f.swissId -> swiss.id))
+  //      .sort($sort desc f.score)
+  //      .batchSize(perSecond.value)
+  //      .cursor[SwissPlayer](ReadPreference.secondaryPreferred)
+  //      .documentSource(nb)
+  //      .throttle(perSecond.value, 1 second)
+  //      .zipWithIndex
+  //      .map { case (player, index) =>
+  //        val pairingMap = pairings.view.map { p =>
+  //          p.pairing.round -> p
+  //        }.toMap
+  //        SwissPlayer
+  //          .ViewExt(
+  //            player,
+  //            index,
+  //            user.light,
+  //            pairingMap,
+  //            SwissSheet.one(swiss, pairingMap.view.mapValues(_.pairing).toMap, player)
+  //          )
+  //          .some
+  //      }
+  //  }
 
   private val idNameProjection = $doc("name" -> true)
 

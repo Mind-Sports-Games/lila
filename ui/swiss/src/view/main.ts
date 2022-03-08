@@ -288,11 +288,22 @@ function stats(ctrl: SwissCtrl): VNode | undefined {
             {
               attrs: {
                 'data-icon': 'x',
+                href: `/api/swiss/${ctrl.data.id}/standings?as=csv`,
+                download: true,
+              },
+            },
+            'Download standings as CSV'
+          ),
+          h(
+            'a.text',
+            {
+              attrs: {
+                'data-icon': 'x',
                 href: `/api/swiss/${ctrl.data.id}/results?as=csv`,
                 download: true,
               },
             },
-            'Download results as CSV'
+            'Download results grid as CSV'
           ),
           h('br'),
           h(
