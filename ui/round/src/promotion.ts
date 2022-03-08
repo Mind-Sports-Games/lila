@@ -47,6 +47,7 @@ function possiblePromotion(
   switch (variant) {
     case 'minixiangqi':
     case 'xiangqi':
+    case 'flipello':
       return false;
     case 'shogi':
       return (

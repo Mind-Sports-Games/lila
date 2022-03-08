@@ -6,6 +6,7 @@ import play.api.libs.json._
 import lila.common.Json.jodaWrites
 import lila.rating.PerfType
 import lila.user.LightUserApi
+import lila.i18n.VariantKeys
 
 final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -47,8 +48,8 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
         "nbPlayers" -> tour.nbPlayers,
         "variant" -> Json.obj(
           "key"   -> tour.variant.key,
-          "short" -> tour.variant.shortName,
-          "name"  -> tour.variant.name
+          "short" -> VariantKeys.variantShortName(tour.variant),
+          "name"  -> VariantKeys.variantName(tour.variant)
         ),
         "startsAt"   -> tour.startsAt,
         "finishesAt" -> tour.finishesAt,

@@ -5,6 +5,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.game.{ Game, Player, Pov }
+import lila.i18n.VariantKeys
 
 object widgets {
 
@@ -34,8 +35,9 @@ object widgets {
                       frag(" ", trans.by(userIdLink(user.some, None, withOnline = false)))
                     },
                     separator,
-                    if (g.variant.exotic) bits.variantLink(g.variant, g.variant.name.toUpperCase)
-                    else g.variant.name.toUpperCase
+                    if (g.variant.exotic)
+                      bits.variantLink(g.variant, VariantKeys.variantName(g.variant).toUpperCase)
+                    else VariantKeys.variantName(g.variant).toUpperCase
                   )
                 else
                   frag(

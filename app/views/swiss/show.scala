@@ -1,7 +1,7 @@
 package views.html
 package swiss
 
-import strategygames.{ P2, P1 }
+import strategygames.{ P1, P2 }
 
 import controllers.routes
 import play.api.libs.json.Json
@@ -14,6 +14,7 @@ import lila.swiss.{ Swiss, SwissCondition }
 import lila.swiss.SwissRound
 import lila.common.paginator.Paginator
 import lila.swiss.SwissPairing
+import lila.i18n.VariantKeys
 
 object show {
 
@@ -61,7 +62,7 @@ object show {
       chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = s"${fullName(s)}: ${s.variant.name} ${s.clock.show} #${s.id}",
+          title = s"${fullName(s)}: ${VariantKeys.variantName(s.variant)} ${s.clock.show} #${s.id}",
           url = s"$netBaseUrl${routes.Swiss.show(s.id.value).url}",
           description =
             s"${s.nbPlayers} players compete in the ${showEnglishDate(s.startsAt)} ${s.name} swiss tournament " +

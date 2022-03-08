@@ -5,8 +5,8 @@ import play.api.libs.json._
 import lila.api.Context
 import lila.app._
 import lila.common.LightUser.lightUserWrites
-import lila.i18n.{ enLang, I18nKeys => trans, I18nLangPicker, LangList }
-import strategygames.{GameFamily}
+import lila.i18n.{ enLang, I18nKeys => trans, I18nLangPicker, LangList, VariantKeys }
+import strategygames.{ GameFamily }
 
 final class Dasher(env: Env) extends LilaController(env) {
 
@@ -76,43 +76,58 @@ final class Dasher(env: Env) extends LilaController(env) {
                   "is3d" -> ctx.pref.is3d
                 ),
                 "theme" -> Json.obj(
-                  "d2" -> GameFamily.all.map{ gf => Json.obj(
-                    "current" -> Json.obj("name" -> ctx.currentTheme(gf.id).name,
-                                          "gameFamily" -> gf.shortName.toLowerCase()),
-                    "list"    -> lila.pref.Theme.allOfFamily(gf).map( t =>
-                                          Json.obj("name" -> t.name,
-                                                   "gameFamily" -> t.gameFamilyName
-                                                   ))
-                  )},
-                  "d3" -> List(Json.obj(
-                   "current" -> Json.obj("name" -> ctx.currentTheme3d.name,
-                                          "gameFamily" -> "chess"),
-                    "list"    -> lila.pref.Theme3d.all.map( t =>
-                                          Json.obj("name" -> t.name,
-                                                   "gameFamily" -> "chess"))
-                  ))
+                  "d2" -> GameFamily.all.map { gf =>
+                    Json.obj(
+                      "current" -> Json.obj("name" -> ctx.currentTheme(gf.id).name, "gameFamily" -> gf.key),
+                      "list" -> lila.pref.Theme
+                        .allOfFamily(gf)
+                        .map(t => Json.obj("name" -> t.name, "gameFamily" -> t.gameFamilyName))
+                    )
+                  },
+                  "d3" -> List(
+                    Json.obj(
+                      "current" -> Json.obj("name" -> ctx.currentTheme3d.name, "gameFamily" -> "chess"),
+                      "list" -> lila.pref.Theme3d.all.map(t =>
+                        Json.obj("name" -> t.name, "gameFamily" -> "chess")
+                      )
+                    )
+                  )
                 ),
                 "piece" -> Json.obj(
-                    "d2" -> GameFamily.all.map{ gf => Json.obj(
-                        "current" -> Json.obj("name" -> ctx.currentPieceSet(gf.id).name,
-                                              "gameFamily" -> gf.shortName.toLowerCase(), 
-                                              "displayPiece" -> ctx.currentPieceSet(gf.id).displayPiece),
-                        "list"    -> lila.pref.PieceSet.allOfFamily(gf).map( p =>
-                                            Json.obj("name" -> p.name,
-                                                    "gameFamily" -> p.gameFamilyName,
-                                                    "displayPiece" -> p.displayPiece 
-                                                    ))
-                    )},
-                    "d3" -> List (Json.obj(
-                        "current" -> Json.obj("name" -> ctx.currentPieceSet3d.name,
-                                              "gameFamily" -> "chess",
-                                               "displayPiece" -> "wN"),
-                        "list"    -> lila.pref.PieceSet3d.all.map( p => 
-                                            Json.obj("name" -> p.name,
-                                                    "gameFamily" -> p.gameFamilyName,
-                                                    "displayPiece" -> p.displayPiece 
-                                                    ))
-                      ))
+                  "d2" -> GameFamily.all.map { gf =>
+                    Json.obj(
+                      "current" -> Json.obj(
+                        "name"         -> ctx.currentPieceSet(gf.id).name,
+                        "gameFamily"   -> gf.key,
+                        "displayPiece" -> ctx.currentPieceSet(gf.id).displayPiece
+                      ),
+                      "list" -> lila.pref.PieceSet
+                        .allOfFamily(gf)
+                        .map(p =>
+                          Json.obj(
+                            "name"         -> p.name,
+                            "gameFamily"   -> p.gameFamilyName,
+                            "displayPiece" -> p.displayPiece
+                          )
+                        )
+                    )
+                  },
+                  "d3" -> List(
+                    Json.obj(
+                      "current" -> Json.obj(
+                        "name"         -> ctx.currentPieceSet3d.name,
+                        "gameFamily"   -> "chess",
+                        "displayPiece" -> "wN"
+                      ),
+                      "list" -> lila.pref.PieceSet3d.all.map(p =>
+                        Json.obj(
+                          "name"         -> p.name,
+                          "gameFamily"   -> p.gameFamilyName,
+                          "displayPiece" -> p.displayPiece
+                        )
+                      )
+                    )
+                  )
                 ),
                 "coach"    -> isGranted(_.Coach),
                 "streamer" -> isStreamer,

@@ -4,15 +4,15 @@ import strategygames.{ Centis, GameFamily, GameLogic, Speed }
 import strategygames.variant.Variant
 import play.api.i18n.Lang
 
-import lila.i18n.I18nKeys
+import lila.i18n.{ I18nKeys, VariantKeys }
 
 sealed abstract class PuzzlePerf(
-  val gameFamily: GameFamily,
-  val id: Perf.ID,
-  val key: Perf.Key,
-  val name: String,
-  val title: String,
-  val iconChar: Char
+    val gameFamily: GameFamily,
+    val id: Perf.ID,
+    val key: Perf.Key,
+    val name: String,
+    val title: String,
+    val iconChar: Char
 )
 
 object PuzzlePerf {
@@ -45,13 +45,13 @@ class PerfType(
 
   private val name: String = category match {
     case Left(Left(s))  => s.name
-    case Left(Right(v)) => v.name
+    case Left(Right(v)) => VariantKeys.variantName(v)
     case Right(p)       => p.name
   }
 
   private val title: String = category match {
     case Left(Left(s))  => s.title
-    case Left(Right(v)) => s"${v.name} variant"
+    case Left(Right(v)) => s"${VariantKeys.variantName(v)} variant"
     case Right(p)       => p.title
   }
 
@@ -124,7 +124,7 @@ object PerfType {
     allSpeed.filter(_.category == Left(Left(speed))) match {
       case List(pt) => pt
       //unnecessary default to keep compiler happy
-      case _        => orDefaultSpeed("")
+      case _ => orDefaultSpeed("")
     }
 
   def apply(variant: Variant, speed: Speed): PerfType =

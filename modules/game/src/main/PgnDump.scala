@@ -10,6 +10,7 @@ import strategygames.variant.Variant
 import lila.common.config.BaseUrl
 import lila.common.LightUser
 import lila.common.Form
+import lila.i18n.VariantKeys
 
 final class PgnDump(
     baseUrl: BaseUrl,
@@ -31,40 +32,43 @@ final class PgnDump(
       Parser.full(pgni.pgn).toOption
     }
     val algebraic = game.variant match {
-      case Variant.Draughts(variant) => variant.boardSize.pos.hasAlgebraic// && flags.algebraic
-      case _ => false
+      case Variant.Draughts(variant) => variant.boardSize.pos.hasAlgebraic // && flags.algebraic
+      case _                         => false
     }
     val tagsFuture =
-      if (flags.tags) tags(
-        game,
-        initialFen,
-        imported,
-        withOpening = flags.opening,
-        //draughtsResult = flags.draughtsResult, //Need to set this elsewhere in lila
-        algebraic = algebraic,
-        //withProfileName = flags.profileName, //Need to set this elsewhere in lila
-        withRatings = !hideRatings,
-        teams = teams
-      )
+      if (flags.tags)
+        tags(
+          game,
+          initialFen,
+          imported,
+          withOpening = flags.opening,
+          //draughtsResult = flags.draughtsResult, //Need to set this elsewhere in lila
+          algebraic = algebraic,
+          //withProfileName = flags.profileName, //Need to set this elsewhere in lila
+          withRatings = !hideRatings,
+          teams = teams
+        )
       else fuccess(Tags(Nil))
     tagsFuture map { ts =>
       val turns = flags.moves ?? {
-        val fenSituation = ts.fen.flatMap{fen => Forsyth.<<<(game.variant.gameLogic, fen)}
+        val fenSituation = ts.fen.flatMap { fen => Forsyth.<<<(game.variant.gameLogic, fen) }
         makeTurns(
           game.variant match {
             case Variant.Draughts(variant) => {
               val pdnMovesFull = game.pdnMovesConcat(true, true)
-              val pdnMoves = strategygames.draughts.Replay.unambiguousPdnMoves(
-                pdnMoves = pdnMovesFull,
-                initialFen = ts.fen match {
-                  case Some(FEN.Draughts(fen)) => Some(fen)
-                  case None => None
-                  case _ => sys.error("invalid draughts fen in pgnDump")
-                },
-                variant = variant
-              //TODO: draughts, this used to be a Valid[List[String]] type
-              //and now we have lost the error. Perhaps we need to reconsider this
-              ).fold(shortenMoves(pdnMovesFull))(moves => moves)
+              val pdnMoves = strategygames.draughts.Replay
+                .unambiguousPdnMoves(
+                  pdnMoves = pdnMovesFull,
+                  initialFen = ts.fen match {
+                    case Some(FEN.Draughts(fen)) => Some(fen)
+                    case None                    => None
+                    case _                       => sys.error("invalid draughts fen in pgnDump")
+                  },
+                  variant = variant
+                  //TODO: draughts, this used to be a Valid[List[String]] type
+                  //and now we have lost the error. Perhaps we need to reconsider this
+                )
+                .fold(shortenMoves(pdnMovesFull))(moves => moves)
               val moves = flags keepDelayIf game.playable applyDelay pdnMoves
               val moves2 =
                 if (algebraic) san2alg(moves, variant.boardSize.pos)
@@ -72,10 +76,11 @@ final class PgnDump(
               if (fenSituation.exists(_.situation.player.p2)) ".." +: moves2
               else moves2
             }
-            case _ => flags keepDelayIf game.playable applyDelay {
-              if (fenSituation.exists(_.situation.player.p2)) ".." +: game.pgnMoves
-              else game.pgnMoves
-            }
+            case _ =>
+              flags keepDelayIf game.playable applyDelay {
+                if (fenSituation.exists(_.situation.player.p2)) ".." +: game.pgnMoves
+                else game.pgnMoves
+              }
           },
           fenSituation.map(_.fullMoveNumber) | 1,
           flags.clocks ?? ~game.bothClockStates,
@@ -98,10 +103,10 @@ final class PgnDump(
 
   private def san2alg(moves: Seq[String], boardPos: strategygames.draughts.BoardPos) =
     moves map { move =>
-      val capture = move.contains('x')
-      val fields = if (capture) move.split("x") else move.split("-")
+      val capture         = move.contains('x')
+      val fields          = if (capture) move.split("x") else move.split("-")
       val algebraicFields = fields.flatMap { boardPos.algebraic(_) }
-      val sep = if (capture) "x" else "-"
+      val sep             = if (capture) "x" else "-"
       algebraicFields mkString sep
     }
 
@@ -122,7 +127,7 @@ final class PgnDump(
 
   private def gameLightUsers(game: Game, withProfileName: Boolean): Fu[(Option[LightUser], Option[LightUser])] =
     (game.p1Player.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async}) zip (game.p2Player.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async})
-*/
+   */
 
   private def gameLightUsers(game: Game): Fu[(Option[LightUser], Option[LightUser])] =
     (game.p1Player.userId ?? lightUserApi.async) zip (game.p2Player.userId ?? lightUserApi.async)
@@ -133,9 +138,12 @@ final class PgnDump(
     p.aiLevel.fold(u.fold(p.name | lila.user.User.anonymous)(_.name))("playstrategy AI level " + _)
 
   private val customStartPosition: Set[Variant] =
-    strategygames.chess.variant.Variant.all.filter(
-      !_.standardInitialPosition
-    ).map(Variant.Chess).toSet
+    strategygames.chess.variant.Variant.all
+      .filter(
+        !_.standardInitialPosition
+      )
+      .map(Variant.Chess)
+      .toSet
 
   private def eventOf(game: Game) = {
     val perf = game.perfType.fold("Standard")(_.trans(lila.i18n.defaultLang))
@@ -198,7 +206,7 @@ final class PgnDump(
           },
           teams.map { t => Tag("P1Team", t.p1) },
           teams.map { t => Tag("P2Team", t.p2) },
-          Tag(_.Variant, game.variant.name.capitalize).some,
+          Tag(_.Variant, VariantKeys.variantName(game.variant).capitalize).some,
           Tag.timeControl(game.clock.map(_.config)).some,
           game.metadata.microMatchGameId.map(gameId => Tag(_.MicroMatch, gameId)),
           Tag(_.ECO, game.opening.fold("?")(_.opening.eco)).some,
@@ -207,37 +215,39 @@ final class PgnDump(
             _.Termination, {
               import Status._
               game.status match {
-                case Created | Started                             => "Unterminated"
-                case Aborted | NoStart                             => "Abandoned"
-                case Timeout | Outoftime                           => "Time forfeit"
+                case Created | Started                                              => "Unterminated"
+                case Aborted | NoStart                                              => "Abandoned"
+                case Timeout | Outoftime                                            => "Time forfeit"
                 case Resign | Draw | Stalemate | Mate | PerpetualCheck | VariantEnd => "Normal"
-                case Cheat                                         => "Rules infraction"
-                case UnknownFinish                                 => "Unknown"
+                case Cheat                                                          => "Rules infraction"
+                case UnknownFinish                                                  => "Unknown"
               }
             }
           ).some
         ).flatten ::: customStartPosition(game.variant).??(game.variant match {
-          case Variant.Draughts(variant) => List(
-            Tag(
-              _.FEN,
-              (initialFen match {
-                case Some(FEN.Draughts(fen)) => Some(fen)
-                case None => None
-                case _ => sys.error("invalid draughts fen in pgnDump tags")
-              }).flatMap { fen =>
-                if (algebraic)
-                  strategygames.draughts.format.Forsyth.toAlgebraic(
-                    variant,
-                    fen
-                  )
-                else fen.some
-              }.fold("?")(f => strategygames.draughts.format.Forsyth.shorten(f).value)
+          case Variant.Draughts(variant) =>
+            List(
+              Tag(
+                _.FEN,
+                (initialFen match {
+                  case Some(FEN.Draughts(fen)) => Some(fen)
+                  case None                    => None
+                  case _                       => sys.error("invalid draughts fen in pgnDump tags")
+                }).flatMap { fen =>
+                  if (algebraic)
+                    strategygames.draughts.format.Forsyth.toAlgebraic(
+                      variant,
+                      fen
+                    )
+                  else fen.some
+                }.fold("?")(f => strategygames.draughts.format.Forsyth.shorten(f).value)
+              )
             )
-          )
-          case _ => List(
-            Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLogic)).value),
-            Tag("SetUp", "1")
-          )
+          case _ =>
+            List(
+              Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLogic)).value),
+              Tag("SetUp", "1")
+            )
         })
       }
     }

@@ -33,6 +33,7 @@
   <string name="threeChecks">Three checks</string>
   <string name="raceFinished">Race finished</string>
   <string name="checkersConnected">All checkers connected</string>
+  <string name="gameFinished">Game finished</string>
   <string name="variantEnding">Variant ending</string>
   <string name="newOpponent">New opponent</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Your opponent wants to play a new game with you</string>

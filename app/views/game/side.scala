@@ -7,6 +7,7 @@ import strategygames.variant.Variant
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
@@ -53,12 +54,13 @@ object side {
                       if (game.variant.exotic)
                         bits.variantLink(
                           game.variant,
-                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) game.variant.shortName
-                           else game.variant.name).toUpperCase,
+                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
+                             VariantKeys.variantShortName(game.variant)
+                           else VariantKeys.variantName(game.variant)).toUpperCase,
                           initialFen = initialFen
                         )
                       else
-                        game.variant.name.toUpperCase
+                        VariantKeys.variantName(game.variant).toUpperCase
                     )
                   else
                     frag(
@@ -69,8 +71,9 @@ object side {
                       if (game.variant.exotic)
                         bits.variantLink(
                           game.variant,
-                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) game.variant.shortName
-                           else game.variant.name).toUpperCase,
+                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
+                             VariantKeys.variantShortName(game.variant)
+                           else VariantKeys.variantName(game.variant)).toUpperCase,
                           initialFen = initialFen
                         )
                       else
@@ -120,10 +123,10 @@ object side {
         },
         initialFen
           .ifTrue(game.variant.chess960)
-          .flatMap {
-            fen => fen match {
+          .flatMap { fen =>
+            fen match {
               case FEN.Chess(fen) => strategygames.chess.variant.Chess960.positionNumber(fen)
-              case _ => sys.error("Mismatched fen gamelogic")
+              case _              => sys.error("Mismatched fen gamelogic")
             }
           }
           .map { number =>
@@ -155,16 +158,26 @@ object side {
         },
         game.metadata.microMatch map { m =>
           st.section(cls := "game__micro-match")(
-            if (m.startsWith("1:") && m.length == 10) frag(
-              trans.microMatch(), ": ",
-              a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(trans.gameNumberX(1)), " ",
-              span(cls := "current")(trans.gameNumberX(2))
-            )
-            else if (m.startsWith("2:") && m.length == 10) frag(
-              trans.microMatch(), ": ",
-              span(cls := "current")(trans.gameNumberX(1)), " ",
-              a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(trans.gameNumberX(2))
-            )
+            if (m.startsWith("1:") && m.length == 10)
+              frag(
+                trans.microMatch(),
+                ": ",
+                a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
+                  trans.gameNumberX(1)
+                ),
+                " ",
+                span(cls := "current")(trans.gameNumberX(2))
+              )
+            else if (m.startsWith("2:") && m.length == 10)
+              frag(
+                trans.microMatch(),
+                ": ",
+                span(cls := "current")(trans.gameNumberX(1)),
+                " ",
+                a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
+                  trans.gameNumberX(2)
+                )
+              )
             else trans.microMatchGameX(1)
           )
         }

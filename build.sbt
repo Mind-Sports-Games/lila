@@ -28,7 +28,7 @@ libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
 }
 
 lazy val fairystockfish = Artifact("fairystockfish", "linux-x86_64")
-libraryDependencies += "org.playstrategy"        % "fairystockfish"           % "0.0.4" artifacts(fairystockfish)
+libraryDependencies += "org.playstrategy"        % "fairystockfish"           % "0.0.7" artifacts(fairystockfish)
 classpathTypes ++= Set("linux-x86_64")
 
 lazy val modules = Seq(
@@ -64,7 +64,7 @@ lazy val i18n = smallModule("i18n",
     MessageCompiler(
       sourceDir = new File("translation/source"),
       destDir = new File("translation/dest"),
-      dbs = "site arena emails learn activity coordinates study class contact patron coach broadcast streamer tfa settings preferences team perfStat search tourname faq lag swiss puzzle puzzleTheme challenge storm".split(' ').toList,
+      dbs = "site arena emails learn activity coordinates study class contact patron coach broadcast streamer tfa settings preferences team perfStat search tourname faq lag swiss puzzle puzzleTheme challenge storm variantName variantShortName variantTitle".split(' ').toList,
       compileTo = (Compile / sourceManaged).value
     )
   }.taskValue

@@ -6,6 +6,7 @@ import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants._
 import scala.util.chaining._
+import lila.i18n.VariantKeys
 
 final private class TournamentScheduler(
     api: TournamentApi,
@@ -327,8 +328,8 @@ Thank you all, you rock!"""
             at(day, 16) map { date =>
               Schedule(Shield, Blitz, variant, none, date) plan {
                 _.copy(
-                  name = s"${variant.name} Shield",
-                  spotlight = Some(TournamentShield spotlight variant.name)
+                  name = s"${VariantKeys.variantName(variant)} Shield",
+                  spotlight = Some(TournamentShield spotlight VariantKeys.variantName(variant))
                 )
               }
             }

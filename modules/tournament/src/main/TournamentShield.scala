@@ -7,6 +7,7 @@ import scala.concurrent.duration._
 import lila.db.dsl._
 import lila.user.User
 import lila.memo.CacheApi._
+import lila.i18n.VariantKeys
 
 import strategygames.variant.Variant
 
@@ -118,7 +119,7 @@ object TournamentShield {
       val iconChar: Char
   ) {
     def key  = of.fold(_.key, _.key)
-    def name = of.fold(_.name, _.name)
+    def name = of.fold(_.name, VariantKeys.variantName(_))
     def matches(tour: Tournament) =
       if (tour.variant.standard) ~(for {
         tourSpeed  <- tour.schedule.map(_.speed)
@@ -229,14 +230,14 @@ object TournamentShield {
         extends Category(
           of = Right(Variant.Chess(strategygames.chess.variant.NoCastling)),
           iconChar = ''
-        )    
+        )
 
     case object LinesOfAction
         extends Category(
           of = Right(Variant.Chess(strategygames.chess.variant.LinesOfAction)),
           iconChar = ''
         )
-    
+
     case object ScrambledEggs
         extends Category(
           of = Right(Variant.Chess(strategygames.chess.variant.ScrambledEggs)),
@@ -313,7 +314,13 @@ object TournamentShield {
         extends Category(
           of = Right(Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)),
           iconChar = 't'
-        )    
+        )
+
+    case object Flipello
+        extends Category(
+          of = Right(Variant.FairySF(strategygames.fairysf.variant.Flipello)),
+          iconChar = 'l'
+        )
 
     val all: List[Category] = List(
       Bullet,
@@ -346,7 +353,8 @@ object TournamentShield {
       Shogi,
       Xiangqi,
       MiniShogi,
-      MiniXiangqi
+      MiniXiangqi,
+      Flipello
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)
@@ -358,8 +366,7 @@ object TournamentShield {
     Spotlight(
       iconFont = "5".some,
       headline = s"Battle for the $name Shield",
-      description =
-        s"""This [Shield trophy] is unique.
+      description = s"""This [Shield trophy] is unique.
 The winner keeps it for one month,
 then must defend it during the next $name Shield tournament!""",
       homepageHours = 6.some

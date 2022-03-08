@@ -9,6 +9,7 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.tournament.Tournament
 import lila.user.User
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
@@ -51,7 +52,8 @@ object show {
       chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = s"${tour.name()}: ${tour.variant.name} ${tour.clock.show} ${tour.mode.name} #${tour.id}",
+          title = s"${tour.name()}: ${VariantKeys
+            .variantName(tour.variant)} ${tour.clock.show} ${tour.mode.name} #${tour.id}",
           url = s"$netBaseUrl${routes.Tournament.show(tour.id).url}",
           description =
             s"${tour.nbPlayers} players compete in the ${showEnglishDate(tour.startsAt)} ${tour.name()}. " +

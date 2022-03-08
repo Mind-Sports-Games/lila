@@ -4,6 +4,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.{ Trophy, TrophyKind }
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
@@ -34,7 +35,7 @@ object otherTrophies {
       info.revolutions.map { revol =>
         a(
           cls := "revol_trophy combo-trophy",
-          ariaTitle(s"${revol.variant.name} Revolution"),
+          ariaTitle(s"${VariantKeys.variantName(revol.variant)} Revolution"),
           href := routes.Tournament.show(revol.tourId)
         )(revol.iconChar.toString)
       },
@@ -68,11 +69,11 @@ object otherTrophies {
           awardCls(t),
           href := (t.url match {
             case Some(url) => Some(url)
-            case None => t.kind.url
+            case None      => t.kind.url
           }),
           ariaTitle(t.name match {
             case Some(name) => name
-            case None => t.kind.name
+            case None       => t.kind.name
           }),
           style := "width: 65px; margin: 0 3px!important;"
         )(

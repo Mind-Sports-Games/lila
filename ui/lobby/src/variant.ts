@@ -26,6 +26,8 @@ const variantConfirms = {
   minishogi: 'This is a Mini Shogi game!\n\nThe aim of the game is to checkmate the opponent',
   xiangqi: 'This is a Xiangqi game!\n\nThe aim of the game is to checkmate the opponent',
   minixiangqi: 'This is a Mini Xiangqi game!\n\nThe aim of the game is to checkmate the opponent',
+  flipello:
+    'This is a Reversi game!\n\nPlayers take it in turns to place counters, flipping all opposition counters between their placed counter and another counter on the edge. The winner is the player who has the most counters face up at the end.',
 };
 
 function storageKey(key) {

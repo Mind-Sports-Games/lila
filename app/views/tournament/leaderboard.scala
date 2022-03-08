@@ -6,6 +6,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.rating.PerfType
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
@@ -99,7 +100,7 @@ object leaderboard {
             Variant.all.map { v =>
               PerfType.byVariant(v).map { pt =>
                 winners.variants.get(pt.key).map { w =>
-                  freqWinners(w, pt, v.name)
+                  freqWinners(w, pt, VariantKeys.variantName(v))
                 }
               }
             }

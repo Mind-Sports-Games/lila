@@ -136,6 +136,15 @@ object Tv {
           familyChannel = true,
           gameFamily = "xiangqi"
         )  
+    case object FlipelloFamily
+        extends Channel(
+          name = "All Reversi",
+          icon = FV.Flipello.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(anyVariant(Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.Flipello() )), noBot),
+          familyChannel = true,
+          gameFamily = "flipello"
+        )  
     case object Bullet
         extends Channel(
           name = S.Bullet.name,
@@ -402,6 +411,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "xiangqi"
         )
+    case object Flipello
+        extends Channel(
+          name = FV.Flipello.name,
+          icon = FV.Flipello.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(FV.Flipello)), noBot),
+          familyChannel = false,
+          gameFamily = "flipello"
+        )
     case object Bot
         extends Channel(
           name = "Bot",
@@ -456,6 +474,8 @@ object Tv {
       XiangqiFamily,
       Xiangqi,
       MiniXiangqi,
+      //FlipelloFamily,
+      Flipello,
       Bot,
       Computer
     )

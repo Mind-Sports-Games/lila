@@ -40,7 +40,7 @@ db.game5.aggregate([
 //src/main/scala/draughts/variant/Pool.scala:      id = 13,
 //src/main/scala/draughts/variant/Russian.scala:      id = 11,
 //src/main/scala/draughts/variant/Standard.scala:      id = 1,
-//src/main/scala/fairysf/variant/Flipello.scala:      id = 3,
+//src/main/scala/fairysf/variant/Flipello.scala:      id = 6,
 //src/main/scala/fairysf/variant/MiniShogi.scala:      id = 5,
 //src/main/scala/fairysf/variant/MiniXiangqi.scala:      id = 4,
 //src/main/scala/fairysf/variant/Shogi.scala:      id = 1,
