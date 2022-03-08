@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+  <string name="chess">Chess</string>
   <string name="standard">Chess</string>
   <string name="fromPosition">From Position</string>
   <string name="antichess">Antichess</string>
@@ -14,6 +15,7 @@
   <string name="threeCheck">Three-check</string>
   <string name="linesOfAction">Lines Of Action</string>
   <string name="scrambledEggs">Scrambled Eggs</string>
+  <string name="draughts">Draughts</string>
   <string name="international">International</string>
   <string name="antidraughts">Antidraughts</string>
   <string name="brazilian">Brazilian</string>
