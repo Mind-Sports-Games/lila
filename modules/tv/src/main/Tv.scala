@@ -3,8 +3,9 @@ package lila.tv
 import lila.common.LightUser
 import lila.game.{ Game, GameRepo, Pov }
 import lila.hub.Trouper
+import lila.i18n.VariantKeys
 import strategygames.variant.Variant
-import strategygames.GameLogic
+import strategygames.{ GameFamily, GameLogic }
 
 final class Tv(
     gameRepo: GameRepo,
@@ -93,16 +94,16 @@ object Tv {
         )
     case object ChessFamily
         extends Channel(
-          name = "All Chess",
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.Chess())}",
           icon = CV.Standard.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(Variant.all.filter(v => v.gameFamily == GameFamily.Chess() )), noBot),
+          filters = Seq(anyVariant(Variant.all.filter(v => v.gameFamily == GameFamily.Chess())), noBot),
           familyChannel = true,
           gameFamily = "chess"
-        )     
+        )
     case object DraughtsFamily
         extends Channel(
-          name = "All Draughts",
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.Draughts())}",
           icon = DV.Standard.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(anyVariant(Variant.all(GameLogic.Draughts())), noBot),
@@ -111,40 +112,50 @@ object Tv {
         )
     case object LinesOfActionFamily
         extends Channel(
-          name = "All Lines of Action",
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.LinesOfAction())}",
           icon = CV.LinesOfAction.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(Variant.all.filter(v => v.gameFamily == GameFamily.LinesOfAction() )), noBot),
+          filters =
+            Seq(anyVariant(Variant.all.filter(v => v.gameFamily == GameFamily.LinesOfAction())), noBot),
           familyChannel = true,
           gameFamily = "loa"
         )
     case object ShogiFamily
         extends Channel(
-          name = "All Shogi",
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.Shogi())}",
           icon = FV.Shogi.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.Shogi() )), noBot),
+          filters = Seq(
+            anyVariant(Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.Shogi())),
+            noBot
+          ),
           familyChannel = true,
           gameFamily = "shogi"
-        )      
+        )
     case object XiangqiFamily
         extends Channel(
-          name = "All Xiangqi",
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.Xiangqi())}",
           icon = FV.Xiangqi.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.Xiangqi() )), noBot),
+          filters = Seq(
+            anyVariant(Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.Xiangqi())),
+            noBot
+          ),
           familyChannel = true,
           gameFamily = "xiangqi"
-        )  
+        )
     case object FlipelloFamily
         extends Channel(
-          name = "All Reversi",
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.Flipello())}",
           icon = FV.Flipello.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.Flipello() )), noBot),
+          filters = Seq(
+            anyVariant(Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.Flipello())),
+            noBot
+          ),
           familyChannel = true,
           gameFamily = "flipello"
-        )  
+        )
     case object Bullet
         extends Channel(
           name = S.Bullet.name,
@@ -274,7 +285,7 @@ object Tv {
           filters = Seq(variant(Variant.wrap(CV.NoCastling)), noBot),
           familyChannel = false,
           gameFamily = "chess"
-        )   
+        )
     case object UltraBullet
         extends Channel(
           name = S.UltraBullet.name,
@@ -293,7 +304,7 @@ object Tv {
           filters = Seq(variant(Variant.wrap(CV.LinesOfAction)), noBot),
           familyChannel = false,
           gameFamily = "loa"
-        ) 
+        )
     case object ScrambledEggs
         extends Channel(
           name = CV.ScrambledEggs.name,
