@@ -496,6 +496,7 @@ declare namespace Tree {
     comp?: boolean;
     san?: string;
     threefold?: boolean;
+    perpetualWarning?: boolean;
     fail?: boolean;
     puzzle?: 'win' | 'fail' | 'good' | 'retry';
     crazy?: NodeCrazy;
