@@ -464,6 +464,7 @@ export default class RoundController {
       playstrategy.pubsub.emit('ply', this.ply);
     }
     d.game.threefold = !!o.threefold;
+    d.game.perpetualWarning = !!o.perpetualWarning;
     const step = {
       ply: this.lastPly() + 1,
       fen: o.fen,

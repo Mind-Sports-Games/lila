@@ -41,6 +41,7 @@ export interface BaseGame {
   initialFen?: string;
   importedBy?: string;
   threefold?: boolean;
+  perpetualWarning?: boolean;
   boosted?: boolean;
   rematch?: string;
   microMatch?: MicroMatch;
