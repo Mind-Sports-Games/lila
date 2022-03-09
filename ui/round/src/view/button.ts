@@ -185,7 +185,7 @@ export function threefoldClaimDraw(ctrl: RoundController) {
 
 //not technically a button
 export function perpetualWarning(ctrl: RoundController) {
-  return (ctrl.data.game.perpetualWarning && ctrl.data.player.playerIndex === ctrl.data.game.player)
+  return ctrl.data.game.perpetualWarning && ctrl.data.player.playerIndex === ctrl.data.game.player
     ? h('div.suggestion', [
         h(
           'p',
