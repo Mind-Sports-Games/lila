@@ -71,7 +71,7 @@ object RoomSocket {
           .write(
             Chat.Id(roomId.value),
             userId,
-            msg,
+            msg.pp("msg"),
             publicSource(roomId)(PublicSource),
             chatBusChan
           )

@@ -1,6 +1,7 @@
 import * as xhr from 'common/xhr';
 import main from './main';
 import modal from 'common/modal';
+import { ChatCtrl } from 'chat';
 import { LobbyOpts } from './interfaces';
 import { numberFormat } from 'common/number';
 
@@ -119,6 +120,13 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   }
 
   suggestBgSwitch();
+
+  const chatOpts = opts.chat;
+  console.log("lobby chat Opts", chatOpts);
+  if (chatOpts) {
+    //chatOpts.alwaysEnabled = true;
+    chatOpts.instance = playstrategy.makeChat(chatOpts) as Promise<ChatCtrl>;
+  }
 }
 
 function suggestBgSwitch() {

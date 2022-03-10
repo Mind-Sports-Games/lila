@@ -18,11 +18,13 @@ final class Env(
     gameRepo: lila.game.GameRepo,
     poolApi: lila.pool.PoolApi,
     cacheApi: lila.memo.CacheApi,
+    chatApi: lila.chat.ChatApi,
     remoteSocketApi: lila.socket.RemoteSocket
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: akka.actor.ActorSystem,
-    idGenerator: lila.game.IdGenerator
+    idGenerator: lila.game.IdGenerator,
+    mode: play.api.Mode
 ) {
 
   private lazy val maxPlaying = appConfig.get[Max]("setup.max_playing")

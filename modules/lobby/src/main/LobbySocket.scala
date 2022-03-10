@@ -12,6 +12,7 @@ import lila.i18n.defaultLang
 import lila.pool.{ PoolApi, PoolConfig }
 import lila.rating.RatingRange
 import lila.socket.RemoteSocket.{ Protocol => P, _ }
+import lila.room.RoomSocket.{ Protocol => RP, _ }
 import lila.socket.Socket.{ makeMessage, Sri, Sris }
 import lila.user.User
 import lila.round.ChangeFeatured
@@ -25,8 +26,12 @@ final class LobbySocket(
     lobby: LobbyTrouper,
     relationApi: lila.relation.RelationApi,
     poolApi: PoolApi,
-    system: akka.actor.ActorSystem
-)(implicit ec: scala.concurrent.ExecutionContext) {
+    system: akka.actor.ActorSystem,
+    chat: lila.chat.ChatApi
+)(implicit 
+    ec: scala.concurrent.ExecutionContext,
+    mode: play.api.Mode
+) {
 
   import LobbySocket._
   import Protocol._
@@ -111,6 +116,7 @@ final class LobbySocket(
           P.Out.tellSri(member.sri, makeMessage("hooks", JsArray(hooks.map(_.render(defaultLang)))))
         )
         hookSubscriberSris += member.sri.value
+      case m => sys.error(m.toString)
     }
 
     lila.common.Bus.subscribe(this, "changeFeaturedGame", "streams", "poolPairings", "lobbySocket")
@@ -237,7 +243,7 @@ final class LobbySocket(
       }
     }
 
-  private val handler: Handler = {
+  private val lobbyHandler: Handler = {
 
     case P.In.ConnectSris(cons) =>
       cons foreach { case (sri, userId) =>
@@ -264,12 +270,28 @@ final class LobbySocket(
       trouper ! LeaveAll
   }
 
+  lazy val rooms = makeRoomMap(send)
+  subscribeChat(rooms, _.Global)
+
+  private lazy val chatHandler: Handler =
+    roomHandler(
+      rooms,
+      chat,
+      logger,
+      roomId => _.Lobby("lobbyhome").some,
+      chatBusChan = _.Global,
+      localTimeout = None
+    )
+
   private val messagesHandled: Set[String] =
     Set("join", "cancel", "joinSeek", "cancelSeek", "idle", "poolIn", "poolOut", "hookIn", "hookOut")
 
-  remoteSocketApi.subscribe("lobby-in", In.reader)(handler orElse remoteSocketApi.baseHandler)
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("lobby-out").apply _
 
-  private val send: String => Unit = remoteSocketApi.makeSender("lobby-out").apply _
+  remoteSocketApi.subscribe("lobby-in", In.reader)(
+    lobbyHandler orElse chatHandler orElse remoteSocketApi.baseHandler
+  )
+
 }
 
 private object LobbySocket {

@@ -20,7 +20,7 @@ $mq-not-col3: $mq-not-small;
 .lobby {
   grid-area: main;
   display: grid;
-  grid-template-areas: 'app' 'table' 'side' 'blog' 'tv' 'puzzle' 'leader' 'winner' 'tours' 'simuls' 'forum' 'support' 'about' '.';
+  grid-template-areas: 'app' 'table' 'side' 'blog' 'tv' 'puzzle' 'chat' 'leader' 'winner' 'tours' 'simuls' 'forum' 'support' 'about' '.';
   grid-gap: $block-gap;
 
   &__counters {
@@ -56,7 +56,7 @@ $mq-not-col3: $mq-not-small;
   @include breakpoint($mq-col4) {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, fit-content(0));
-    grid-template-areas: 'side    blog    blog    .' 'side   app     app    table' 'tv     winner  winner puzzle' '.     tours   tours  .' '.      simuls  simuls .' 'about    forum    forum    support';
+    grid-template-areas: 'side    blog    blog    table' 'side   app     app    chat' 'tv     winner  winner puzzle' '.     tours   tours  .' '.      simuls  simuls .' 'about    forum    forum    support';
 
     &__tournaments,
     &__simuls {
@@ -87,6 +87,10 @@ $mq-not-col3: $mq-not-small;
 
   &__tv {
     grid-area: tv;
+  }
+
+  &__chat {
+    grid-area: chat;
   }
 
   &__leaderboard {
