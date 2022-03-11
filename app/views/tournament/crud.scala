@@ -22,6 +22,7 @@ object crud {
       moreCss = cssTag(css),
       moreJs = frag(
         jsModule("flatpickr"),
+        jsModule("tourForm"),
         evenMoreJs
       )
     ) {
