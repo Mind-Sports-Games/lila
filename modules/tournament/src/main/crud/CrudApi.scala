@@ -27,7 +27,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       clockTime = tour.clock.limitInMinutes,
       clockIncrement = tour.clock.incrementSeconds,
       minutes = tour.minutes,
-      variant = tour.variant.id,
+      variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
       position = tour.position,
       date = tour.startsAt,
       image = ~tour.spotlight.flatMap(_.iconImg),
