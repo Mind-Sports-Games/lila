@@ -21,8 +21,7 @@ object home {
                             name = trans.chatRoom.txt(),
                             timeout = chat.timeout,
                             public = true,
-                            resourceId = lila.chat.Chat.ResourceId("lobbyhome"),
-                            palantir = ctx.me.exists(_.canPalantir)
+                            resourceId = lila.chat.Chat.ResourceId("lobbyhome/lobbyhome"),
                           )
                         }
 

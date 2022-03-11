@@ -142,7 +142,7 @@ final class RemoteSocket(
 
   def subscribe(channel: Channel, reader: In.Reader)(handler: Handler): Funit =
     connectAndSubscribe(channel) { message =>
-      reader(RawMsg(message.pp("message in subscribe"))) collect handler match {
+      reader(RawMsg(message)) collect handler match {
         case Some(_) => // processed
         case None    => logger.warn(s"Unhandled $channel $message")
       }
@@ -165,7 +165,7 @@ final class RemoteSocket(
   private def connectAndSubscribe(channel: Channel)(f: String => Unit): Funit = {
     val conn = redisClient.connectPubSub()
     conn.addListener(new pubsub.RedisPubSubAdapter[String, String] {
-      override def message(_channel: String, message: String): Unit = f(message.pp("m remote socket"))
+      override def message(_channel: String, message: String): Unit = f(message)
     })
     val subPromise = Promise[Unit]()
     conn.async.subscribe(channel).thenRun { () =>

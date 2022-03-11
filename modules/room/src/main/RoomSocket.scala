@@ -69,9 +69,9 @@ object RoomSocket {
       case Protocol.In.ChatSay(roomId, userId, msg) =>
         chat.userChat
           .write(
-            Chat.Id(roomId.value),
-            userId,
-            msg.pp("msg"),
+            Chat.Id(roomId.value).pp("chat id RH"),
+            userId.pp("useri d RH"),
+            msg.pp("msg RH"),
             publicSource(roomId)(PublicSource),
             chatBusChan
           )
@@ -133,11 +133,11 @@ object RoomSocket {
       case class SetVersions(versions: Iterable[(String, SocketVersion)]) extends P.In
 
       val reader: P.In.Reader = raw =>
-        raw.path match {
+        raw.path.pp("raw path") match {
           case "room/alives" => KeepAlives(P.In.commas(raw.args) map RoomId.apply).some
           case "chat/say" =>
             raw.get(3) { case Array(roomId, userId, msg) =>
-              ChatSay(RoomId(roomId), userId, msg).some
+              ChatSay(RoomId(roomId), userId, msg.pp("msg chat/say")).some
             }
           case "chat/timeout" =>
             raw.get(5) { case Array(roomId, userId, suspect, reason, text) =>

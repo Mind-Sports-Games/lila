@@ -5,15 +5,17 @@ import play.api.libs.json._
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 
+import lila.chat.{ BusChan, Chat }
 import lila.game.Pov
 import lila.hub.actorApi.timeline._
 import lila.hub.Trouper
+import lila.hub.actorApi.shutup.PublicSource
 import lila.i18n.defaultLang
 import lila.pool.{ PoolApi, PoolConfig }
 import lila.rating.RatingRange
 import lila.socket.RemoteSocket.{ Protocol => P, _ }
 import lila.room.RoomSocket.{ Protocol => RP, _ }
-import lila.socket.Socket.{ makeMessage, Sri, Sris }
+import lila.socket.Socket.{ makeMessage, Sri, Sris, GetVersion, SocketVersion }
 import lila.user.User
 import lila.round.ChangeFeatured
 
@@ -46,6 +48,7 @@ final class LobbySocket(
     private val idleSris           = collection.mutable.Set[SriStr]()
     private val hookSubscriberSris = collection.mutable.Set[SriStr]()
     private val removedHookIds     = new collection.mutable.StringBuilder(1024)
+    private var version = SocketVersion(0)
 
     val process: Trouper.Receive = {
 
@@ -116,6 +119,16 @@ final class LobbySocket(
           P.Out.tellSri(member.sri, makeMessage("hooks", JsArray(hooks.map(_.render(defaultLang)))))
         )
         hookSubscriberSris += member.sri.value
+      case GetVersion(promise) => promise success version
+      case SetVersion(v)       => version = v
+      case nv: NotifyVersion[_] =>
+        version = version.inc
+        send {
+          val tell =
+            if (chatMsgs(nv.tpe)) Protocol.Out.tellRoomChat _
+            else Protocol.Out.tellRoomVersion _
+          tell(RoomId("lobbyhome"), nv.msg, version, nv.troll)
+        }  
       case m => sys.error(m.toString)
     }
 
@@ -268,10 +281,21 @@ final class LobbySocket(
       logger.warn("Remote socket boot")
       lobby ! LeaveAll
       trouper ! LeaveAll
+    
+    // case Protocol.In.ChatSay(roomId, userId, msg) =>
+    //     chat.userChat
+    //       .write(
+    //         Chat.Id(roomId.value),
+    //         userId,
+    //         msg,
+    //         PublicSource.Lobby("lobbyhome").some,
+    //         _.Lobby
+    //       )
+    //       .unit
   }
 
   lazy val rooms = makeRoomMap(send)
-  subscribeChat(rooms, _.Global)
+  subscribeChat(rooms.pp("rooms"), _.Lobby)
 
   private lazy val chatHandler: Handler =
     roomHandler(
@@ -279,18 +303,20 @@ final class LobbySocket(
       chat,
       logger,
       roomId => _.Lobby("lobbyhome").some,
-      chatBusChan = _.Global,
-      localTimeout = None
+      localTimeout = None,
+      chatBusChan = _.Lobby
     )
 
+  private val chatMsgs = Set("message", "chat_timeout", "chat_reinstate")
   private val messagesHandled: Set[String] =
     Set("join", "cancel", "joinSeek", "cancelSeek", "idle", "poolIn", "poolOut", "hookIn", "hookOut")
 
   private lazy val send: String => Unit = remoteSocketApi.makeSender("lobby-out").apply _
 
-  remoteSocketApi.subscribe("lobby-in", In.reader)(
-    lobbyHandler orElse chatHandler orElse remoteSocketApi.baseHandler
-  )
+  remoteSocketApi.subscribe("lobby-in", Protocol.In.reader)(
+    lobbyHandler.pp("lobbyH") orElse chatHandler orElse remoteSocketApi.baseHandler
+  ) >>- send(P.Out.boot)
+
 
 }
 
@@ -307,14 +333,19 @@ private object LobbySocket {
   object Protocol {
     object In {
       case class Counters(members: Int, rounds: Int) extends P.In
+      case class ChatSay(roomId: RoomId, userId: String, msg: String) extends P.In
 
       val reader: P.In.Reader = raw =>
-        raw.path match {
+        raw.path.pp("path") match {
           case "counters" =>
             import cats.implicits._
             raw.get(2) { case Array(m, r) =>
               (m.toIntOption, r.toIntOption).mapN(Counters)
             }
+          case "chat/say" =>
+            raw.get(3) { case Array(roomId, userId, msg) =>
+              ChatSay(RoomId(roomId).pp("room chat/say"), userId.pp("userid chat/say"), msg.pp("msg chat/say")).some
+            }  
           case _ => P.In.baseReader(raw)
         }
     }
@@ -332,6 +363,10 @@ private object LobbySocket {
       def tellLobbyActive(payload: JsObject) = s"tell/lobby/active ${Json stringify payload}"
       def tellLobbyUsers(userIds: Iterable[User.ID], payload: JsObject) =
         s"tell/lobby/users ${P.Out.commas(userIds)} ${Json stringify payload}"
+      def tellRoomChat(roomId: RoomId, payload: JsObject, version: SocketVersion, isTroll: Boolean) =
+        s"tell/room/chat $roomId $version ${P.Out.boolean(isTroll)} ${Json stringify payload}"
+      def tellRoomVersion(roomId: RoomId, payload: JsObject, version: SocketVersion, isTroll: Boolean) =
+        s"tell/room/version $roomId $version ${P.Out.boolean(isTroll)} ${Json stringify payload}"
     }
   }
 
@@ -340,4 +375,5 @@ private object LobbySocket {
   case class GetMember(sri: Sri, promise: Promise[Option[Member]])
   object SendHookRemovals
   case class SetIdle(sri: Sri, value: Boolean)
+  case class SetVersion(version: SocketVersion)
 }
