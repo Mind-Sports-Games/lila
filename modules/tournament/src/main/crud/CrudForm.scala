@@ -15,7 +15,7 @@ object CrudForm {
   import TournamentForm._
   import lila.common.Form.UTCDate._
 
-  val maxHomepageHours = 24
+  val maxHomepageHours = 168
 
   lazy val apply = Form(
     mapping(
