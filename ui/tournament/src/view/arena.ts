@@ -79,8 +79,16 @@ function podiumStats(p, berserkable, trans: Trans): VNode {
   ]);
 }
 
-function podiumPosition(p, pos: string, berserkable, trans: Trans): VNode | undefined {
-  if (p) return h('div.' + pos, [h('div.trophy'), podiumUsername(p), podiumStats(p, berserkable, trans)]);
+function podiumTrophy(img: string): VNode {
+  if (img) {
+    return h('img.customTrophy', {
+      attrs: { src: playstrategy.assetUrl('images/trophy/' + img + '.png') },
+    });
+  } else return h('div.trophy');
+}
+
+function podiumPosition(p, pos: string, trophyImg: string, berserkable, trans: Trans): VNode | undefined {
+  if (p) return h('div.' + pos, [podiumTrophy(trophyImg), podiumUsername(p), podiumStats(p, berserkable, trans)]);
 }
 
 let lastBody: MaybeVNodes | undefined;
@@ -88,9 +96,9 @@ let lastBody: MaybeVNodes | undefined;
 export function podium(ctrl: TournamentController) {
   const p = ctrl.data.podium || [];
   return h('div.podium', [
-    podiumPosition(p[1], 'second', ctrl.data.berserkable, ctrl.trans),
-    podiumPosition(p[0], 'first', ctrl.data.berserkable, ctrl.trans),
-    podiumPosition(p[2], 'third', ctrl.data.berserkable, ctrl.trans),
+    podiumPosition(p[1], 'second', ctrl.data.trophy2nd, ctrl.data.berserkable, ctrl.trans),
+    podiumPosition(p[0], 'first', ctrl.data.trophy1st, ctrl.data.berserkable, ctrl.trans),
+    podiumPosition(p[2], 'third', ctrl.data.trophy3rd, ctrl.data.berserkable, ctrl.trans),
   ]);
 }
 

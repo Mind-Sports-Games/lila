@@ -37,6 +37,9 @@ case class Tournament(
     featuredId: Option[String] = None,
     spotlight: Option[Spotlight] = None,
     description: Option[String] = None,
+    trophy1st: Option[String] = None,
+    trophy2nd: Option[String] = None,
+    trophy3rd: Option[String] = None,
     hasChat: Boolean = true
 ) {
 

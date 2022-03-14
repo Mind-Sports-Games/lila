@@ -78,6 +78,18 @@
     background-image: img-url('trophy/playstrategy-bronze-2.svg');
   }
 
+  .first .customTrophy {
+    width: 9em;
+  }
+
+  .second .customTrophy {
+    width: 9em;
+  }
+
+  .third .customTrophy {
+    width: 9em;
+  }
+
   @include breakpoint($mq-not-xx-small) {
     .trophy {
       display: none;
