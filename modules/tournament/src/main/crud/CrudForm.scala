@@ -13,7 +13,7 @@ import strategygames.{ GameFamily, GameLogic }
 object CrudForm {
 
   import TournamentForm._
-  import lila.common.Form.UTCDate._
+  import lila.common.Form.ISODateTime._
 
   val maxHomepageHours = 168
 
@@ -30,7 +30,7 @@ object CrudForm {
         )
       ),
       "position"    -> optional(lila.common.Form.fen.playableStrict),
-      "date"        -> utcDate,
+      "date"        -> isoDateTime,
       "image"       -> stringIn(imageChoices),
       "headline"    -> text(minLength = 5, maxLength = 30),
       "description" -> text(minLength = 10, maxLength = 400),
@@ -99,8 +99,8 @@ object CrudForm {
   }
 
   val imageChoices = List(
-    ""                    -> "PlayStrategy",
-    "offerspill.logo.png" -> "Offerspill"
+    ""             -> "PlayStrategy",
+    "mso.logo.png" -> "MSO"
   )
   val imageDefault = ""
 }
