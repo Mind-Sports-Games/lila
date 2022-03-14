@@ -72,8 +72,8 @@ object RoomSocket {
             Chat.Id(roomId.value).pp("chat id RH"),
             userId.pp("useri d RH"),
             msg.pp("msg RH"),
-            publicSource(roomId)(PublicSource),
-            chatBusChan
+            publicSource(roomId)(PublicSource).pp("public source RH"),
+            chatBusChan.pp("chatbuschan RH")
           )
           .unit
       case Protocol.In.ChatTimeout(roomId, modId, suspect, reason, text) =>

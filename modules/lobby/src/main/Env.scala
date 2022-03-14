@@ -3,6 +3,7 @@ package lila.lobby
 import com.softwaremill.macwire._
 import play.api.Configuration
 import scala.concurrent.duration._
+import lila.socket.Socket.{ GetVersion, SocketVersion }
 
 import lila.common.config._
 
@@ -52,6 +53,8 @@ final class Env(
   private lazy val biter = wire[Biter]
 
   val socket = wire[LobbySocket]
+
+  def version(id:String = "lobbyhome") = socket.rooms.ask[SocketVersion](id)(GetVersion)
 
   lila.common.Bus.subscribeFun("abortGame") { case lila.game.actorApi.AbortedBy(pov) =>
     abortListener(pov).unit

@@ -282,16 +282,6 @@ final class LobbySocket(
       lobby ! LeaveAll
       trouper ! LeaveAll
     
-    // case Protocol.In.ChatSay(roomId, userId, msg) =>
-    //     chat.userChat
-    //       .write(
-    //         Chat.Id(roomId.value),
-    //         userId,
-    //         msg,
-    //         PublicSource.Lobby("lobbyhome").some,
-    //         _.Lobby
-    //       )
-    //       .unit
   }
 
   lazy val rooms = makeRoomMap(send)
@@ -314,7 +304,7 @@ final class LobbySocket(
   private lazy val send: String => Unit = remoteSocketApi.makeSender("lobby-out").apply _
 
   remoteSocketApi.subscribe("lobby-in", Protocol.In.reader)(
-    lobbyHandler.pp("lobbyH") orElse chatHandler orElse remoteSocketApi.baseHandler
+    lobbyHandler orElse chatHandler orElse remoteSocketApi.baseHandler
   ) >>- send(P.Out.boot)
 
 
@@ -333,20 +323,17 @@ private object LobbySocket {
   object Protocol {
     object In {
       case class Counters(members: Int, rounds: Int) extends P.In
-      case class ChatSay(roomId: RoomId, userId: String, msg: String) extends P.In
+      
+      val reader: P.In.Reader = raw => lobbyReader(raw) orElse RP.In.reader(raw)
 
-      val reader: P.In.Reader = raw =>
+      val lobbyReader: P.In.Reader = raw =>
         raw.path.pp("path") match {
           case "counters" =>
             import cats.implicits._
             raw.get(2) { case Array(m, r) =>
               (m.toIntOption, r.toIntOption).mapN(Counters)
             }
-          case "chat/say" =>
-            raw.get(3) { case Array(roomId, userId, msg) =>
-              ChatSay(RoomId(roomId).pp("room chat/say"), userId.pp("userid chat/say"), msg.pp("msg chat/say")).some
-            }  
-          case _ => P.In.baseReader(raw)
+          case _ => none
         }
     }
     object Out {

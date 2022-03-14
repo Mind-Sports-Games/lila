@@ -67,7 +67,7 @@ final class Team(
       _ <- env.user.lightUserApi preloadMany {
         info.userIds ::: chat.??(_.chat.userIds)
       }
-      version <- hasChat ?? env.team.version(team.id).dmap(some)
+      version <- hasChat ?? env.team.pp("team team").version(team.id).pp("team version").dmap(some)
     } yield html.team.show(team, members, info, chat, version)
 
   private def canHaveChat(team: TeamModel, info: lila.app.mashup.TeamInfo)(implicit ctx: Context): Boolean =

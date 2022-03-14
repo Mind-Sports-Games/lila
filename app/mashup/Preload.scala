@@ -40,7 +40,8 @@ final class Preload(
       events: Fu[List[Event]],
       simuls: Fu[List[Simul]],
       streamerSpots: Int,
-      chatOption: Fu[Option[lila.chat.UserChat.Mine]]
+      chatOption: Fu[Option[lila.chat.UserChat.Mine]],
+      chatVersion: Fu[Option[lila.socket.Socket.SocketVersion]]
   )(implicit ctx: Context): Fu[Homepage] =
     lobbyApi(ctx).mon(_.lobby segment "lobbyApi") zip
       posts.mon(_.lobby segment "posts") zip
@@ -57,9 +58,9 @@ final class Preload(
         .mon(_.lobby segment "streams")) zip
       (ctx.userId ?? playbanApi.currentBan).mon(_.lobby segment "playban") zip
       (ctx.blind ?? ctx.me ?? roundProxy.urgentGames) zip
-      chatOption flatMap {
+      chatOption zip chatVersion flatMap {
         // format: off
-        case ((((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), playban), blindGames), chatOption) =>
+        case (((((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), playban), blindGames), chatOption), chatVersion) =>
         // format: on
         (ctx.me ?? currentGameMyTurn(povs, lightUserApi.sync))
           .mon(_.lobby segment "currentGame") zip
@@ -86,7 +87,8 @@ final class Preload(
               simulIsFeaturable,
               blindGames,
               lobbySocket.counters,
-              chatOption
+              chatOption,
+              chatVersion
             )
           }
       }
@@ -130,7 +132,8 @@ object Preload {
       isFeaturable: Simul => Boolean,
       blindGames: List[Pov],
       counters: lila.lobby.LobbyCounters,
-      chatOption: Option[lila.chat.UserChat.Mine]
+      chatOption: Option[lila.chat.UserChat.Mine],
+      chatVersion: Option[lila.socket.Socket.SocketVersion]
   )
 
   case class CurrentGame(pov: Pov, opponent: String)
