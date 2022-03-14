@@ -82,7 +82,7 @@ export function view(ctrl: PieceCtrl): VNode {
   ]);
 }
 
-const gameFamily: GameFamilyKey[] = ['chess', 'draughts', 'loa', 'shogi', 'xiangqi'];
+const gameFamily: GameFamilyKey[] = ['chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello'];
 
 function gameFamilyOption(v: GameFamilyKey, sv: string) {
   if (v === sv) {
@@ -111,7 +111,9 @@ function pieceImage(t: Piece, is3d: boolean) {
     const preview = t.name == 'Staunton' ? '-Preview' : '';
     return `images/staunton/piece/${t.name}/White-Knight${preview}.png`;
   }
-  const ext = t.name === 'check_yb_loa' ? '.png' : '.svg';
+  const ext = ['check_yb_loa', 'check_yb_flipello', 'marble_bw_flipello', 'classic_flipello'].includes(t.name)
+    ? '.png'
+    : '.svg';
   return `piece/${t.gameFamily.toLowerCase()}/${t.name}/${t.displayPiece}${ext}`;
 }
 

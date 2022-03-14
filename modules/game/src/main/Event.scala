@@ -37,6 +37,7 @@ object Event {
         fen: String,
         check: Boolean,
         threefold: Boolean,
+        perpetualWarning: Boolean,
         state: State,
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
@@ -59,6 +60,7 @@ object Event {
         .add("winner" -> state.winner)
         .add("check" -> check)
         .add("threefold" -> threefold)
+        .add("perpetualWarning" -> perpetualWarning)
         .add("wDraw" -> state.p1OffersDraw)
         .add("bDraw" -> state.p2OffersDraw)
         .add("crazyhouse" -> pocketData)
@@ -76,6 +78,7 @@ object Event {
       fen: String, // not a FEN, just a board fen
       check: Boolean,
       threefold: Boolean,
+      perpetualWarning: Boolean,
       promotion: Option[Promotion],
       enpassant: Option[Enpassant],
       castle: Option[Castling],
@@ -94,6 +97,7 @@ object Event {
         fen,
         check,
         threefold,
+        perpetualWarning,
         state,
         clock,
         possibleMoves,
@@ -141,6 +145,7 @@ object Event {
             Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
         promotion = move.promotion.map { Promotion(_, move.dest) },
         enpassant = (move.capture ifTrue move.enpassant).map {
           (capture: List[Pos]) => Event.Enpassant(capture(0), !move.player)
@@ -187,6 +192,7 @@ object Event {
       fen: String,
       check: Boolean,
       threefold: Boolean,
+      perpetualWarning: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -201,6 +207,7 @@ object Event {
         fen,
         check,
         threefold,
+        perpetualWarning,
         state,
         clock,
         possibleMoves,
@@ -235,6 +242,7 @@ object Event {
         fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,

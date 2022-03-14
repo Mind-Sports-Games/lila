@@ -10,14 +10,17 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.rating.PerfType.iconByVariant
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
 object userAnalysis {
 
-  def noAnalysisVariants = List(Variant.Chess(strategygames.chess.variant.FromPosition),
-                                Variant.Chess(strategygames.chess.variant.LinesOfAction),
-                                Variant.Chess(strategygames.chess.variant.ScrambledEggs))
+  def noAnalysisVariants = List(
+    Variant.Chess(strategygames.chess.variant.FromPosition),
+    Variant.Chess(strategygames.chess.variant.LinesOfAction),
+    Variant.Chess(strategygames.chess.variant.ScrambledEggs)
+  )
 
   def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) =
     views.html.base.layout(
@@ -57,13 +60,15 @@ object userAnalysis {
         pov.game.synthetic option st.aside(cls := "analyse__side")(
           views.html.base.bits.mselect(
             "analyse-variant",
-            span(cls := "text", dataIcon := iconByVariant(pov.game.variant))(pov.game.variant.name),
+            span(cls := "text", dataIcon := iconByVariant(pov.game.variant))(
+              VariantKeys.variantName(pov.game.variant)
+            ),
             Variant.all(GameLogic.Chess()).filterNot(noAnalysisVariants.contains(_)).map { v =>
               a(
                 dataIcon := iconByVariant(v),
                 cls := (pov.game.variant == v).option("current"),
                 href := routes.UserAnalysis.parseArg(v.key)
-              )(v.name)
+              )(VariantKeys.variantName(v))
             }
           )
         ),

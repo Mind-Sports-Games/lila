@@ -14,7 +14,6 @@ final class Blog(
     prismicC: Prismic
 )(implicit ws: play.api.libs.ws.StandaloneWSClient)
     extends LilaController(env) {
-/*
   import prismicC._
 
   private def blogApi = env.blog.api
@@ -116,7 +115,7 @@ final class Blog(
 
   def discuss(id: String) =
     WithPrismic { _ => implicit prismic =>
-      val categSlug = "general-chess-discussion"
+      val categSlug = "playstrategy-feedback"
       val topicSlug = s"blog-$id"
       val redirect  = Redirect(routes.ForumTopic.show(categSlug, topicSlug))
       env.forum.topicRepo.existsByTree(categSlug, topicSlug) flatMap {
@@ -155,5 +154,4 @@ final class Blog(
       case document if document.slugs.exists(StringUtils.stripEnd(_, ".") == slug) =>
         fuccess(callback(Left(document.slug)))
     } getOrElse notFound
-  */
 }

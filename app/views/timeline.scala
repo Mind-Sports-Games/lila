@@ -11,7 +11,7 @@ object timeline {
 
   def entries(entries: Vector[lila.timeline.Entry])(implicit ctx: Context) =
     div(cls := "entries")(
-      filterEntries(entries) map { entry =>
+      filterEntries(filterBlogPosts(entries)) map { entry =>
         div(cls := "entry")(timeline.entry(entry))
       }
     )
@@ -32,6 +32,9 @@ object timeline {
         )
       )
     )
+
+  private def filterBlogPosts(entries: Vector[lila.timeline.Entry]) = 
+    entries.filter(e => e.typ != "blog-post")
 
   private def filterEntries(entries: Vector[lila.timeline.Entry])(implicit ctx: Context) =
     if (ctx.noKid) entries
@@ -106,8 +109,8 @@ object timeline {
           a(href := routes.Plan.index)(
             trans.patron.xBecamePatron(userIdLink(userId.some, withOnline = true))
           )
-        /*case BlogPost(id, slug, title) =>
-          a(cls := "text", dataIcon := "6", href := routes.Blog.show(id, slug))(title)*/
+        case BlogPost(id, slug, title) =>
+          a(cls := "text", dataIcon := "6", href := routes.Blog.show(id, slug))(title)
         case StreamStart(id, name) =>
           views.html.streamer.bits
             .redirectLink(id)(cls := "text", dataIcon := "")(trans.xStartedStreaming(name))

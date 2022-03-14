@@ -75,10 +75,8 @@ object BSONHandlers {
           case _ => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
         }),
         "f" -> (o match {
-          case PocketData.Chess(_)   => 0
-          //If we need to distinguish further then
-          //we can look at the role.gameFamily in the pockets
-          case PocketData.FairySF(_) => 3//Shogi
+          case PocketData.Chess(_)    => 0
+          case PocketData.FairySF(pd) => pd.gameFamily.getOrElse(GameFamily.Shogi()).id
         }),
         "p" -> {
           o.pockets.p1.roles.map(_.forsyth.toUpper).mkString +

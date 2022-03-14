@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <string name="standard">Chess</string>
+  <string name="fromPosition">FEN</string>
+  <string name="antichess">AntiC</string>
+  <string name="atomic">Atom</string>
+  <string name="chess960">960</string>
+  <string name="crazyhouse">Crazy</string>
+  <string name="fiveCheck">5check</string>
+  <string name="horde">Horde</string>
+  <string name="kingOfTheHill">KotH</string>
+  <string name="noCastling">NoC</string>
+  <string name="racingKings">RacingK</string>
+  <string name="threeCheck">3check</string>
+  <string name="linesOfAction">LOA</string>
+  <string name="scrambledEggs">SEggs</string>
+  <string name="international">Int</string>
+  <string name="antidraughts">AntiD</string>
+  <string name="brazilian">Brazil</string>
+  <string name="breakthrough">BreakT</string>
+  <string name="frisian">Frisian</string>
+  <string name="frysk">Frysk</string>
+  <string name="pool">Pool</string>
+  <string name="russian">Russia</string>
+  <string name="shogi">Shogi</string>
+  <string name="xiangqi">Xiangqi</string>
+  <string name="minishogi">MShogi</string>
+  <string name="minixiangqi">MXiangqi</string>
+  <string name="flipello">Flip</string>
+</resources>

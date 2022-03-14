@@ -14,7 +14,7 @@ import lila.common.LilaStream
 import lila.db.dsl._
 import lila.game.{ Game, GameRepo, PgnDump, Player, Query }
 import lila.user.{ User, UserRepo }
-
+import lila.i18n.VariantKeys
 
 final private class ExplorerIndexer(
     gameRepo: GameRepo,
@@ -110,22 +110,23 @@ final private class ExplorerIndexer(
   // probability of the game being indexed, between 0 and 1
   private def probability(game: Game, rating: Int) = {
     game.perfType match {
-      case Some(pt) => pt.key match {
-        case "correspondence"                        => 1
-        case "rapid" | "classical" if rating >= 2000 => 1
-        case "rapid" | "classical" if rating >= 1800 => 2 / 5f
-        case "rapid" | "classical"                   => 1 / 8f
-        case "blitz" if rating >= 2000               => 1
-        case "blitz" if rating >= 1800               => 1 / 4f
-        case "blitz"                                 => 1 / 15f
-        case "bullet" if rating >= 2300              => 1
-        case "bullet" if rating >= 2200              => 4 / 5f
-        case "bullet" if rating >= 2000              => 1 / 4f
-        case "bullet" if rating >= 1800              => 1 / 7f
-        case "bullet"                                => 1 / 20f
-        case _ if rating >= 1600                     => 1      // variant games
-        case _                                       => 1 / 2f // noob variant games
-      }
+      case Some(pt) =>
+        pt.key match {
+          case "correspondence"                        => 1
+          case "rapid" | "classical" if rating >= 2000 => 1
+          case "rapid" | "classical" if rating >= 1800 => 2 / 5f
+          case "rapid" | "classical"                   => 1 / 8f
+          case "blitz" if rating >= 2000               => 1
+          case "blitz" if rating >= 1800               => 1 / 4f
+          case "blitz"                                 => 1 / 15f
+          case "bullet" if rating >= 2300              => 1
+          case "bullet" if rating >= 2200              => 4 / 5f
+          case "bullet" if rating >= 2000              => 1 / 4f
+          case "bullet" if rating >= 1800              => 1 / 7f
+          case "bullet"                                => 1 / 20f
+          case _ if rating >= 1600                     => 1      // variant games
+          case _                                       => 1 / 2f // noob variant games
+        }
       case _ => 1 / 2f
     }
   }
@@ -154,16 +155,22 @@ final private class ExplorerIndexer(
         }
         val otherTags = List(
           Tag("PlayStrategyID", game.id),
-          Tag(_.Variant, game.variant.name),
+          Tag(_.Variant, VariantKeys.variantName(game.variant)),
           Tag.timeControl(game.clock.map(_.config)),
           Tag(_.P1, username(P1)),
           Tag(_.P2, username(P2)),
           Tag(_.P1Elo, p1Rating),
           Tag(_.P2Elo, p2Rating),
-          Tag(_.Result, PgnDump.result(game, game.variant.gameLogic match {
-            case GameLogic.Draughts() => lila.pref.Pref.default.draughtsResult
-            case _ => false
-          })),
+          Tag(
+            _.Result,
+            PgnDump.result(
+              game,
+              game.variant.gameLogic match {
+                case GameLogic.Draughts() => lila.pref.Pref.default.draughtsResult
+                case _                    => false
+              }
+            )
+          ),
           Tag(_.Date, pgnDateFormat.print(game.createdAt))
         )
         val allTags = fenTags ::: otherTags

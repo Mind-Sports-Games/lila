@@ -1,0 +1,60 @@
+.variant-flipello .game-score {
+  @extend %box-radius;
+  display: block;
+  width: 7em;
+  height: 7em;
+  background-color: #aaa;
+
+  piece {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    position: relative;
+
+    &::after {
+      @extend %active, %box-radius;
+
+      content: attr(data-score);
+      top: 0;
+      right: 0;
+      position: absolute;
+      line-height: 0.9em;
+      padding: 3px 0.3em;
+      font-weight: bold;
+      font-size: 1.5em;
+    }
+  }
+
+  &-top {
+    grid-area: mat-top;
+    margin-bottom: -0.5em;
+  }
+
+  &-bottom {
+    grid-area: mat-bot;
+    margin-top: -0.5em;
+  }
+
+  @include breakpoint($mq-col1) {
+    &-top {
+      grid-area: pocket-top;
+      margin-left: 20%;
+    }
+
+    &-bottom {
+      grid-area: pocket-top;
+      margin-left: 65%;
+      margin-top: 0;
+    }
+  }
+
+  @include breakpoint($mq-col2-uniboard) {
+    &-top {
+      margin-bottom: $block-gap;
+    }
+
+    &-bottom {
+      margin-top: $block-gap;
+    }
+  }
+}

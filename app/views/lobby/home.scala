@@ -168,7 +168,7 @@ object home {
             views.html.forum.post recent forumRecent
           )
         ),
-        //bits.lastPosts(lastPost),
+        bits.lastPosts(lastPost),
         div(cls := "lobby__support")(
           a(href := routes.Plan.index)(
             iconTag(patronIconChar),

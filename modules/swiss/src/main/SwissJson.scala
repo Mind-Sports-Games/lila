@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ P2, P1 }
+import strategygames.{ P1, P2 }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -262,9 +262,9 @@ object SwissJson {
     val status =
       if (pairing.isOngoing) "o"
       else pairing.resultFor(player.userId).fold("d") { r => if (r) "w" else "l" }
-    val microMatch = if (pairing.isMicroMatch) "m" else ""
+    val microMatch   = if (pairing.isMicroMatch) "m" else ""
     val microMatchId = pairing.microMatchGameId.fold("")(g => s"_${g}")
-    val openingFEN = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
+    val openingFEN   = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
     s"${pairing.gameId}$status$microMatch$microMatchId$openingFEN"
   }
 
@@ -315,13 +315,13 @@ object SwissJson {
       .obj(
         "id"          -> b.game.id,
         "gameLogic"   -> b.game.variant.gameLogic.name.toLowerCase(),
-        "gameFamily"  -> b.game.variant.gameFamily.shortName.toLowerCase(),
+        "gameFamily"  -> b.game.variant.gameFamily.key,
         "variantKey"  -> b.game.variant.key,
         "fen"         -> Forsyth.boardAndPlayer(b.game.variant.gameLogic, b.game.situation),
         "lastMove"    -> ~b.game.lastMoveKeys,
         "orientation" -> b.game.naturalOrientation.name,
-        "p1"       -> boardPlayerJson(b.board.p1),
-        "p2"       -> boardPlayerJson(b.board.p2)
+        "p1"          -> boardPlayerJson(b.board.p1),
+        "p2"          -> boardPlayerJson(b.board.p2)
       )
       .add(
         "clock" -> b.game.clock.ifTrue(b.game.isBeingPlayed).map { c =>

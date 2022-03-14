@@ -24,6 +24,8 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
       return move => (move.san[0] === 'P' ? move.san.slice(1) : move.san);
     case 'uci':
       return move => move.uci;
+    case 'dpo':
+      return destPosOnlyNotation;
   }
 }
 
@@ -331,4 +333,17 @@ function numFriendlyPawnsInColumn(
     }
   });
   return pawnRanks;
+}
+
+function destPosOnlyNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  if (!move.uci.includes('@')) return 'PASS';
+
+  const reg = move.uci.match(/[a-zA-Z][1-9@]0?/g) as string[];
+  const dest = reg[1];
+
+  //convert into flipello notation - a1 is top left for first player (not bottom left)
+  const newRank = variant.boardSize.height + 1 - parseInt(dest.slice(1));
+  const destPos = dest[0] + newRank;
+
+  return `${destPos}`;
 }

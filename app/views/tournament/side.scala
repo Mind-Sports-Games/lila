@@ -11,6 +11,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.markdownLinksOrRichText
 import lila.tournament.{ TeamBattle, Tournament, TournamentShield }
+import lila.i18n.VariantKeys
 
 object side {
 
@@ -33,8 +34,9 @@ object side {
               if (tour.variant.exotic) {
                 views.html.game.bits.variantLink(
                   tour.variant,
-                  if (tour.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) tour.variant.shortName
-                  else tour.variant.name
+                  if (tour.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
+                    VariantKeys.variantShortName(tour.variant)
+                  else VariantKeys.variantName(tour.variant)
                 )
               } else tour.perfType.trans,
               tour.position.isDefined ?? s"$separator${trans.thematic.txt()}",

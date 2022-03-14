@@ -54,6 +54,7 @@ export interface RoundData extends GameData {
   possibleDropsByRole?: string;
   forecastCount?: number;
   crazyhouse?: CrazyData;
+  onlyDropsVariant: boolean;
   correspondence: CorresClockData;
   url: {
     socket: string;
@@ -127,6 +128,7 @@ export interface ApiMove extends Step {
   winner?: PlayerIndex;
   check: boolean;
   threefold: boolean;
+  perpetualWarning: boolean;
   wDraw: boolean;
   bDraw: boolean;
   crazyhouse?: CrazyData;

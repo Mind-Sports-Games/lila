@@ -4,6 +4,7 @@ import strategygames.variant.Variant
 import strategygames.GameLogic
 
 import lila.app._
+import lila.i18n.VariantKeys
 
 final class Page(
     env: Env,
@@ -48,7 +49,7 @@ final class Page(
             Json.obj(
               "id"   -> v.id,
               "key"  -> v.key,
-              "name" -> v.name
+              "name" -> VariantKeys.variantName(v)
             )
           })).fuccess
       )
@@ -57,8 +58,8 @@ final class Page(
   def variant(key: String) =
     Open { implicit ctx =>
       (for {
-        variant  <- (Variant.all).map{
-          v => (v.key, v)
+        variant <- (Variant.all).map { v =>
+          (v.key, v)
         }.toMap get key
         perfType <- lila.rating.PerfType byVariant variant
       } yield OptionOk(prismicC getBookmark key) { case (doc, resolver) =>

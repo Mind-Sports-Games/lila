@@ -11,6 +11,7 @@ import lila.common.Json._
 import lila.socket.Socket.Sri
 import lila.tree.Node.Shape
 import lila.user.User
+import lila.i18n.VariantKeys
 
 final class JsonView(
     studyRepo: StudyRepo,
@@ -133,7 +134,8 @@ object JsonView {
     JsString(u.uci)
   }
   implicit private val posReader: Reads[Pos] = Reads[Pos] { v =>
-    (v.asOpt[String] flatMap {p => Pos.fromKey(GameLogic.Chess(), p)}).fold[JsResult[Pos]](JsError(Nil))(JsSuccess(_))
+    (v.asOpt[String] flatMap { p => Pos.fromKey(GameLogic.Chess(), p) })
+      .fold[JsResult[Pos]](JsError(Nil))(JsSuccess(_))
   }
   implicit private[study] val pathWrites: Writes[Path] = Writes[Path] { p =>
     JsString(p.toString)
@@ -179,7 +181,7 @@ object JsonView {
   }
 
   implicit private val variantWrites = OWrites[Variant] { v =>
-    Json.obj("key" -> v.key, "name" -> v.name)
+    Json.obj("key" -> v.key, "name" -> VariantKeys.variantName(v))
   }
   implicit val pgnTagWrites: Writes[Tag] = Writes[Tag] { t =>
     Json.arr(t.name.toString, t.value)
