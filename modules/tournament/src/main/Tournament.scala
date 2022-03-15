@@ -57,7 +57,9 @@ case class Tournament(
     if (isMarathon || isUnique) name
     else if (isTeamBattle && full) xTeamBattle.txt(name)
     else if (isTeamBattle) name
-    else schedule.fold(if (full) s"$name Arena" else name)(_.name(full))
+    //else schedule.fold(if (full) s"$name Arena" else name)(_.name(full))
+    else if (full) s"$name Arena"
+    else name
   }
 
   def isMarathon =
