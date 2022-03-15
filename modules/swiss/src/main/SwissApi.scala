@@ -33,6 +33,7 @@ final class SwissApi(
     verify: SwissCondition.Verify,
     chatApi: lila.chat.ChatApi,
     lightUserApi: lila.user.LightUserApi,
+    trophyApi: lila.user.TrophyApi,
     roundSocket: lila.round.RoundSocket,
     gameRepo: lila.game.GameRepo,
     onStart: Game.ID => Unit,
@@ -74,6 +75,9 @@ final class SwissApi(
       startsAt = data.realStartsAt,
       finishedAt = none,
       winnerId = none,
+      trophy1st = none,
+      trophy2nd = none,
+      trophy3rd = none,
       settings = Swiss.Settings(
         nbRounds = data.nbRounds,
         rated = data.realPosition.isEmpty && data.isRated,
@@ -95,7 +99,8 @@ final class SwissApi(
   def update(swiss: Swiss, data: SwissForm.SwissData): Funit =
     Sequencing(swiss.id)(byId) { old =>
       val position =
-        if (old.isCreated || old.settings.position.isDefined) data.realVariant.standardVariant ?? data.realPosition
+        if (old.isCreated || old.settings.position.isDefined)
+          data.realVariant.standardVariant ?? data.realPosition
         else old.settings.position
       val swiss =
         old.copy(
@@ -443,11 +448,11 @@ final class SwissApi(
                     SwissPairing.fields { f2 =>
                       colls.pairing.update
                         .one($doc(f2.id -> pairing.id), $set(f2.microMatchGameId -> rematchId)) >>- {
-                          val pairingUpdated = pairing.copy(microMatchGameId=Some(rematchId))
-                          val game = director.makeGame(swiss, playerMap, true)(pairingUpdated)
-                          gameRepo.insertDenormalized(game) >>- onStart(game.id).unit
-                          // >>- socket.reload(swiss.id) TODO: ??
-                          println("rematched")
+                        val pairingUpdated = pairing.copy(microMatchGameId = Some(rematchId))
+                        val game           = director.makeGame(swiss, playerMap, true)(pairingUpdated)
+                        gameRepo.insertDenormalized(game) >>- onStart(game.id).unit
+                        // >>- socket.reload(swiss.id) TODO: ??
+                        println("rematched")
                       }
                     }
                   )
@@ -573,6 +578,7 @@ final class SwissApi(
           }
         }
         .unit
+      //awardTrophies(swiss).unit
     }
 
   def kill(swiss: Swiss): Funit = {
@@ -581,6 +587,26 @@ final class SwissApi(
     else if (swiss.isCreated) destroy(swiss)
     else funit
   } >>- cache.featuredInTeam.invalidate(swiss.teamId)
+
+  //def awardTrophies(swiss: Swiss): Funit = {
+  //  import lila.user.TrophyKind._
+  //  import lila.swiss.Swiss.swissUrl
+  //  swiss.trophy1st ?? { trophyKind =>
+  //    SwissPlayer
+  //      .fields { f =>
+  //        colls.player.primitiveOne[User.ID](
+  //          $doc(f.swissId -> swiss.id),
+  //          $sort desc f.score,
+  //          f.userId
+  //        )
+  //      }
+  //      .flatMap {
+  //        _.map { winnerUserId =>
+  //          trophyApi.award(swissUrl(swiss.id), winnerUserId.toString, trophyKind, swiss.name.some)
+  //        }
+  //      }
+  //  }
+  //}
 
   def roundInfo = cache.roundInfo.get _
 
