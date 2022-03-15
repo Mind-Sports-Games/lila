@@ -262,7 +262,7 @@ final class TournamentApi(
     tour.trophy1st ?? { trophyKind =>
       playerRepo.bestByTourWithRank(tour.id, 1).flatMap {
         _.map { case rp =>
-          trophyApi.award(tournamentUrl(tour.id), rp.player.userId, trophyKind)
+          trophyApi.award(tournamentUrl(tour.id), rp.player.userId, trophyKind, tour.name.some)
         }.sequenceFu.void
       }
     }
@@ -270,7 +270,7 @@ final class TournamentApi(
       playerRepo.bestByTourWithRank(tour.id, 2).flatMap {
         _.map {
           case rp if rp.rank == 2 =>
-            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, trophyKind)
+            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, trophyKind, tour.name.some)
           case _ => funit
         }.sequenceFu.void
       }
@@ -279,7 +279,7 @@ final class TournamentApi(
       playerRepo.bestByTourWithRank(tour.id, 3).flatMap {
         _.map {
           case rp if rp.rank == 3 =>
-            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, trophyKind)
+            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, trophyKind, tour.name.some)
           case _ => funit
         }.sequenceFu.void
       }

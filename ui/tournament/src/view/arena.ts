@@ -81,9 +81,12 @@ function podiumStats(p, berserkable, trans: Trans): VNode {
 
 function podiumTrophy(img: string): VNode {
   if (img) {
-    return h('img.customTrophy', {
-      attrs: { src: playstrategy.assetUrl('images/trophy/' + img + '.png') },
-    });
+    return h(
+      'div',
+      h('img.customTrophy', {
+        attrs: { src: playstrategy.assetUrl('images/trophy/' + img + '.png') },
+      })
+    );
   } else return h('div.trophy');
 }
 
