@@ -78,6 +78,30 @@ object side {
             views.html.base.bits.fenAnalysisLink(fen)
           )
         },
+        !s.isFinished option s.trophy1st.map { trophy1st =>
+          table(cls := "trophyPreview")(
+            tr(
+              td(
+                img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy1st}.png"))
+              ),
+              s.trophy2nd.map { trophy2nd =>
+                td(
+                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy2nd}.png"))
+                )
+              },
+              s.trophy3rd.map { trophy3rd =>
+                td(
+                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy3rd}.png"))
+                )
+              }
+            ),
+            tr(
+              td("1st Place"),
+              s.trophy2nd.map { _ => td("2nd Place") },
+              s.trophy3rd.map { _ => td("3rd Place") }
+            )
+          )
+        },
         teamLink(s.teamId),
         if (verdicts.relevant)
           st.section(
