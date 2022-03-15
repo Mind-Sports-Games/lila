@@ -98,26 +98,6 @@ object side {
         ),
         tour.noBerserk option div(cls := "text", dataIcon := "`")("No Berserk allowed"),
         tour.noStreak option div(cls := "text", dataIcon := "Q")("No Arena streaks"),
-        !tour.isScheduled && tour.description.isEmpty option frag(
-          trans.by(userIdLink(tour.createdBy.some)),
-          br
-        ),
-        (!tour.isStarted || (tour.isScheduled && tour.position.isDefined)) option absClientDateTime(
-          tour.startsAt
-        ),
-        tour.startingPosition.map { pos =>
-          p(
-            a(targetBlank, href := pos.url)(strong(pos.eco), " ", pos.name),
-            separator,
-            views.html.base.bits.fenAnalysisLink(FEN.Chess(pos.fen))
-          )
-        } orElse tour.position.map { fen =>
-          p(
-            "Custom position",
-            separator,
-            views.html.base.bits.fenAnalysisLink(fen)
-          )
-        },
         !tour.isFinished option tour.trophy1st.map { trophy1st =>
           table(cls := "trophyPreview")(
             tr(
@@ -140,6 +120,26 @@ object side {
               tour.trophy2nd.map { _ => td("2nd Place") },
               tour.trophy3rd.map { _ => td("3rd Place") }
             )
+          )
+        },
+        !tour.isScheduled && tour.description.isEmpty option frag(
+          trans.by(userIdLink(tour.createdBy.some)),
+          br
+        ),
+        (!tour.isStarted || (tour.isScheduled && tour.position.isDefined)) option absClientDateTime(
+          tour.startsAt
+        ),
+        tour.startingPosition.map { pos =>
+          p(
+            a(targetBlank, href := pos.url)(strong(pos.eco), " ", pos.name),
+            separator,
+            views.html.base.bits.fenAnalysisLink(FEN.Chess(pos.fen))
+          )
+        } orElse tour.position.map { fen =>
+          p(
+            "Custom position",
+            separator,
+            views.html.base.bits.fenAnalysisLink(fen)
           )
         }
       ),
