@@ -17,7 +17,7 @@ object home {
 
     val chatJson = chatOption map { chat =>
                           views.html.chat.json(
-                            chat.chat,
+                            chat.chat.getlast(250),
                             name = trans.chatRoom.txt(),
                             timeout = chat.timeout,
                             public = true,
@@ -43,7 +43,8 @@ object home {
                 )
               },
               "i18n" -> i18nJsObject(i18nKeys),
-              "chat" -> chatJson
+              "chat" -> chatJson,
+              "chatSocketVersion" -> chatVersion
             )
           )})"""
         )

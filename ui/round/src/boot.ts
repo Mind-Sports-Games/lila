@@ -62,7 +62,6 @@ export default function (opts: RoundOpts): void {
 
   const round: RoundApi = (window['PlayStrategyRound'] as RoundMain).app(opts);
   const chatOpts = opts.chat;
-  console.log("round chat Opts", chatOpts);
   if (chatOpts) {
     if (data.tournament?.top) {
       chatOpts.plugin = tourStandingCtrl(data.tournament.top, data.tournament.team, opts.i18n.standing);

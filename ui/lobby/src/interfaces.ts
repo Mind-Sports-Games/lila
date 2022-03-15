@@ -29,6 +29,7 @@ export interface LobbyOpts extends Untyped {
   pools: Pool[];
   blindMode: boolean;
   chat?: ChatOpts;
+  chatSocketVersion: number;
 }
 
 export interface ChatOpts {

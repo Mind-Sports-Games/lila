@@ -27,7 +27,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       const match = RegExp('[?&]' + name + '=([^&]*)').exec(location.search);
       return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
     };
-  playstrategy.socket = new playstrategy.StrongSocket('/lobby/socket/v5', false, {
+  playstrategy.socket = new playstrategy.StrongSocket('/lobby/socket/v5', opts.chatSocketVersion, {
     receive(t: string, d: any) {
       lobby.socketReceive(t, d);
     },
@@ -122,9 +122,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   suggestBgSwitch();
 
   const chatOpts = opts.chat;
-  console.log("lobby chat Opts", chatOpts);
   if (chatOpts) {
-    //chatOpts.alwaysEnabled = true;
     chatOpts.instance = playstrategy.makeChat(chatOpts) as Promise<ChatCtrl>;
   }
 }
