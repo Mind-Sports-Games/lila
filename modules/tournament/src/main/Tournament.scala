@@ -74,6 +74,12 @@ case class Tournament(
 
   def isMarathonOrUnique = isMarathon || isUnique
 
+  def isMSO = (schedule.map(_.freq) has Schedule.Freq.MSO21) || (schedule.map(_.freq) has Schedule.Freq.MSOGP)
+
+  def isIntro = schedule.map(_.freq) has Schedule.Freq.Introductory
+
+  def isPlayStrategyHeadline = isMSO || isIntro
+
   def isScheduled = schedule.isDefined
 
   def isRated = mode == Mode.Rated
@@ -87,7 +93,7 @@ case class Tournament(
   def pairingsClosed = secondsToFinish < math.max(30, math.min(clock.limitSeconds / 2, 120))
 
   def isStillWorthEntering =
-    isMarathonOrUnique || {
+    isPlayStrategyHeadline || isMarathonOrUnique || {
       secondsToFinish > (minutes * 60 / 3).atMost(20 * 60)
     }
 
