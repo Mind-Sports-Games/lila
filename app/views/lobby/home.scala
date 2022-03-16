@@ -19,7 +19,7 @@ object home {
     views.html.base.layout(
       title = "",
       fullTitle = Some {
-        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • ${trans.freeOnlineChess.txt()}"
+        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • 2 player strategy games"
       },
       moreJs = frag(
         jsModule("lobby"),
@@ -44,7 +44,7 @@ object home {
         .OpenGraph(
           image = assetUrl("logo/playstrategy-tile-wide.png").some,
           twitterImage = assetUrl("logo/playstrategy-tile.png").some,
-          title = "The best free, adless Chess server",
+          title = "The two player strategy games platform. Chess, Draughts, Shogi, Xiangqi and more!",
           url = netBaseUrl,
           description = trans.siteDescription.txt()
         )
