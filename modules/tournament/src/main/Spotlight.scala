@@ -15,13 +15,15 @@ object Spotlight {
 
   import Schedule.Freq._
 
-  implicit private val importanceOrdering = Ordering.by[Tournament, Int](_.schedule.??(_.freq.importance))
+  //if re-enabling original lichess ordering, will want to change botN to topN
+  //implicit private val importanceOrdering = Ordering.by[Tournament, Int](_.schedule.??(_.freq.importance))
+  implicit private val importanceOrdering = Ordering.by[Tournament, org.joda.time.DateTime](_.startsAt)
 
   def select(tours: List[Tournament], user: Option[User], max: Int): List[Tournament] =
-    user.fold(tours topN max) { select(tours, _, max) }
+    user.fold(tours botN max) { select(tours, _, max) }
 
   def select(tours: List[Tournament], user: User, max: Int): List[Tournament] =
-    tours.filter { select(_, user) } topN max
+    tours.filter { select(_, user) } botN max
 
   private def select(tour: Tournament, user: User): Boolean =
     !tour.isFinished &&
