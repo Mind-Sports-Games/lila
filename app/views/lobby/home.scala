@@ -17,7 +17,7 @@ object home {
     views.html.base.layout(
       title = "",
       fullTitle = Some {
-        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • 2 player strategy games"
+        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • ${trans.playstrategySiteTitleShort.txt()}"
       },
       moreJs = frag(
         jsModule("lobby"),
@@ -42,9 +42,9 @@ object home {
         .OpenGraph(
           image = assetUrl("logo/playstrategy-tile-wide.png").some,
           twitterImage = assetUrl("logo/playstrategy-tile.png").some,
-          title = "The two player strategy games platform. Chess, Draughts, Shogi, Xiangqi and more!",
+          title = trans.playstrategySiteTitle.txt(),
           url = netBaseUrl,
-          description = trans.siteDescription.txt()
+          description = trans.playstrategySiteDescription.txt()
         )
         .some
     ) {
