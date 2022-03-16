@@ -12,6 +12,8 @@ import lila.game.Pov
 
 object home {
 
+  private val maxSpotlights: Int = 3
+
   def apply(homepage: Homepage)(implicit ctx: Context) = {
     import homepage._
     views.html.base.layout(
@@ -124,7 +126,7 @@ object home {
           div(cls := "lobby__spotlights")(
             events.map(bits.spotlight),
             !ctx.isBot option frag(
-              lila.tournament.Spotlight.select(tours, ctx.me, 3 - events.size) map {
+              lila.tournament.Spotlight.select(tours, ctx.me, maxSpotlights - events.size) map {
                 views.html.tournament.homepageSpotlight(_)
               },
               simuls.filter(isFeaturable) map views.html.simul.bits.homepageSpotlight
