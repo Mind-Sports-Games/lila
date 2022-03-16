@@ -223,7 +223,7 @@ object layout {
           moreCss,
           pieceSprite,
           meta(
-            content := openGraph.fold(trans.siteDescription.txt())(o => o.description),
+            content := openGraph.fold(trans.playstrategySiteDescription.txt())(o => o.description),
             name := "description"
           ),
           link(rel := "mask-icon", href := assetUrl("logo/playstrategy.svg"), color := "black"),
