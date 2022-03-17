@@ -12,7 +12,24 @@ function podiumStats(p: PodiumPlayer, trans: Trans, isMM: boolean): VNode {
   ]);
 }
 
-function podiumPosition(p: PodiumPlayer, pos: string, trans: Trans, isMM: boolean): VNode | undefined {
+function podiumTrophy(img: string): VNode {
+  if (img) {
+    return h(
+      'div',
+      h('img.customTrophy', {
+        attrs: { src: playstrategy.assetUrl('images/trophy/' + img + '.png') },
+      })
+    );
+  } else return h('div.trophy');
+}
+
+function podiumPosition(
+  p: PodiumPlayer,
+  pos: string,
+  trophyImg: string,
+  trans: Trans,
+  isMM: boolean
+): VNode | undefined {
   return p
     ? h(
         'div.' + pos,
@@ -22,7 +39,7 @@ function podiumPosition(p: PodiumPlayer, pos: string, trans: Trans, isMM: boolea
           },
         },
         [
-          h('div.trophy'),
+          podiumTrophy(trophyImg),
           h(
             'a.text.ulpt.user-link',
             {
@@ -40,8 +57,8 @@ export default function podium(ctrl: SwissCtrl) {
   const isMM = ctrl.data.isMicroMatch;
   const p = ctrl.data.podium || [];
   return h('div.podium', [
-    podiumPosition(p[1], 'second', ctrl.trans, isMM),
-    podiumPosition(p[0], 'first', ctrl.trans, isMM),
-    podiumPosition(p[2], 'third', ctrl.trans, isMM),
+    podiumPosition(p[1], 'second', ctrl.data.trophy2nd, ctrl.trans, isMM),
+    podiumPosition(p[0], 'first', ctrl.data.trophy1st, ctrl.trans, isMM),
+    podiumPosition(p[2], 'third', ctrl.data.trophy3rd, ctrl.trans, isMM),
   ]);
 }

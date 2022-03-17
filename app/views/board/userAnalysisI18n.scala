@@ -81,6 +81,7 @@ object userAnalysisI18n {
     trans.inaccuracy,
     trans.mistake,
     trans.blunder,
+    trans.perpetualWarning,
     trans.threefoldRepetition,
     trans.anotherWasX,
     trans.bestWasX,

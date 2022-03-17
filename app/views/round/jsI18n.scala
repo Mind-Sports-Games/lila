@@ -68,6 +68,7 @@ object jsI18n {
     trans.opponentLeftChoices,
     trans.forceResignation,
     trans.forceDraw,
+    trans.perpetualWarning,
     trans.threefoldRepetition,
     trans.claimADraw,
     trans.drawOfferSent,

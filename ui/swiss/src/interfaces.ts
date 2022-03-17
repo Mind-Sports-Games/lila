@@ -34,6 +34,9 @@ export interface SwissData {
   nbRounds: number;
   nbPlayers: number;
   nbOngoing: number;
+  trophy1st: string;
+  trophy2nd: string;
+  trophy3rd: string;
   isMicroMatch: boolean;
   microMatchGameId?: string;
   status: Status;

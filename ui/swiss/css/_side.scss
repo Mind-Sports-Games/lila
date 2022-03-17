@@ -85,6 +85,17 @@
     max-height: 20vh;
     overflow-y: auto;
   }
+
+  .customTrophy {
+    width: 100%;
+    max-width: 122px;
+  }
+
+  .trophyPreview {
+    margin-top: 2em;
+    margin-bottom: 2em;
+    text-align: center;
+  }
 }
 
 .chat__members {

@@ -63,13 +63,19 @@ final class TrophyApi(
       )
     ).flatten
 
-  def award(trophyUrl: String, userId: String, kindKey: String): Funit =
+  def award(
+      trophyUrl: String,
+      userId: String,
+      kindKey: String,
+      trophyName: Option[String] = None
+  ): Funit =
     coll.insert
       .one(
         $doc(
           "_id"  -> lila.common.ThreadLocalRandom.nextString(8),
           "user" -> userId,
           "kind" -> kindKey,
+          "name" -> trophyName,
           "url"  -> trophyUrl,
           "date" -> DateTime.now
         )

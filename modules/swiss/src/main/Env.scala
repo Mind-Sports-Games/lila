@@ -20,6 +20,7 @@ final class Env(
     cacheApi: lila.memo.CacheApi,
     lightUserApi: lila.user.LightUserApi,
     historyApi: lila.history.HistoryApi,
+    trophyApi: lila.user.TrophyApi,
     gameProxyRepo: lila.round.GameProxyRepo,
     roundSocket: lila.round.RoundSocket,
     mongoCache: lila.memo.MongoCache.Api,
