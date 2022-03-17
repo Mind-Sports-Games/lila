@@ -40,12 +40,11 @@ body {
 }
 
 .lobby__chat {
-  
   .mchat {
     flex: 1 1 0;
-    margin-top: 30px;
-    height: 570px;
-    margin-bottom: $block-gap;
+    margin-top: 0px;
+    height: 370px;
+    margin-bottom: 0px;
 
     @if $theme-dark {
       box-shadow: none;
@@ -59,20 +58,13 @@ body {
     }
 
     @include breakpoint($mq-col3) {
-      height: 370px;
-      margin-bottom: 0px;
+      margin-top: 30px;
     }
 
-    @include breakpoint($mq-col2) {
-      margin-top: 0px;
-      height: 370px;
-      margin-bottom: 0px;
-    }
-
-    @include breakpoint($mq-col1) {
-      margin-top: 0px;
-      height: 370px;
-      margin-bottom: 0px;
+    @include breakpoint($mq-col4) {
+      margin-top: 30px;
+      height: 570px;
+      margin-bottom: $block-gap;
     }
   }
 }

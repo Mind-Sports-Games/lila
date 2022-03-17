@@ -67,8 +67,14 @@ $mq-not-col3: $mq-not-small;
       margin-top: 2em;
     }
 
+    &__start {
+      flex-flow: column;
+      align-items: stretch;
+      justify-content: center;
+    }
+
     &__counters {
-      margin: 0;
+      margin: #{$block-gap / 3} 0 #{$block-gap / -3} 0;
     }
   }
 
