@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <string name="standard">Standard rules of chess (FIDE)</string>
+  <string name="fromPosition">Custom starting position</string>
+  <string name="antichess">Lose all your pieces (or get stalemated) to win</string>
+  <string name="atomic">Nuke your opponent's king to win</string>
+  <string name="chess960">Starting position of the home rank pieces is randomized</string>
+  <string name="crazyhouse">Captured pieces can be dropped back on the board instead of moving a piece</string>
+  <string name="fiveCheck">Check your opponent 5 times to win</string>
+  <string name="horde">Destroy the horde to win</string>
+  <string name="kingOfTheHill">Bring your King to the center to win</string>
+  <string name="noCastling">Standard chess but no castling</string>
+  <string name="racingKings">Race your King to the eighth rank to win</string>
+  <string name="threeCheck">Check your opponent 3 times to win</string>
+  <string name="linesOfAction">Connect all of your checkers to win</string>
+  <string name="scrambledEggs">Connect all of your scrambled checkers to win</string>
+  <string name="international">Standard rules of international draughts (FMJD)</string>
+  <string name="antidraughts">Lose all your pieces (or run out of moves) to win</string>
+  <string name="brazilian">Same rules as international draughts, played on an 8x8 board</string>
+  <string name="breakthrough">The first player who makes a king wins</string>
+  <string name="frisian">Pieces can also capture horizontally and vertically</string>
+  <string name="frysk">Frisian draughts starting with 5 pieces each</string>
+  <string name="pool">The same rules as Russian Draughts, but with no promotion during a capture chain</string>
+  <string name="russian">Choice of capture, promotion during a multi-capture</string>
+  <string name="shogi">Shogi (Japanese Chess)</string>
+  <string name="xiangqi">Xiangqi (Chinese Chess)</string>
+  <string name="minishogi">Mini Shogi (Japanese Chess on a smaller board)</string>
+  <string name="minixiangqi">Mini Xiangqi (Chinese Chess on a smaller board)</string>
+  <string name="flipello">Flip pieces between your color to get the most board area</string>
+</resources>

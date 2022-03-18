@@ -8,6 +8,7 @@ import play.api.i18n.Lang
 import lila.game.PerfPicker
 import lila.rating.RatingRange
 import lila.user.User
+import lila.i18n.VariantKeys
 
 // correspondence chess, persistent
 case class Seek(
@@ -57,11 +58,11 @@ case class Seek(
         "rating"   -> rating,
         "variant" -> Json.obj(
           "key"   -> realVariant.key,
-          "short" -> realVariant.shortName,
-          "name"  -> realVariant.name
+          "short" -> VariantKeys.variantShortName(realVariant),
+          "name"  -> VariantKeys.variantName(realVariant)
         ),
-        "mode"  -> realMode.id,
-        "days"  -> daysPerTurn,
+        "mode"        -> realMode.id,
+        "days"        -> daysPerTurn,
         "playerIndex" -> strategygames.Player.fromName(playerIndex).??(_.name),
         "perf" -> Json.obj(
           "icon" -> perfType.map(_.iconChar.toString),

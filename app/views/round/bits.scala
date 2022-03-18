@@ -31,7 +31,7 @@ object bits {
       openGraph = openGraph,
       moreJs = moreJs,
       moreCss = frag(
-        cssTag { if (variant.dropsVariant) "round.zh" else "round" },
+        cssTag { if (variant.dropsVariant && !variant.onlyDropsVariant) "round.zh" else "round" },
         ctx.blind option cssTag("round.nvui"),
         moreCss
       ),
@@ -53,7 +53,12 @@ object bits {
       isGranted(_.ViewBlurs) option div(cls := "round__mod")(
         game.players.filter(p => game.playerBlurPercent(p.playerIndex) > 30) map { p =>
           div(
-            playerLink(p, cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some, withOnline = false, mod = true),
+            playerLink(
+              p,
+              cssClass = s"is playerIndex-icon ${game.variant.playerColors(p.playerIndex)}".some,
+              withOnline = false,
+              mod = true
+            ),
             s" ${p.blurs.nb}/${game.playerMoves(p.playerIndex)} blurs ",
             strong(game.playerBlurPercent(p.playerIndex), "%")
           )
@@ -71,11 +76,11 @@ object bits {
 
   // TODO: this is duplicated between here and app/views/board/bits.scala.
   private def boardExtra(variant: Variant): String = {
-    val lib = variant.gameLogic.name.toLowerCase()
-    val gameFamily = variant.gameFamily.shortName.toLowerCase()
+    val lib        = variant.gameLogic.name.toLowerCase()
+    val gameFamily = variant.gameFamily.key
     variant match {
       case Variant.Draughts(v) => s"${variant.key} variant-${variant.key} ${lib} is${v.boardSize.key}"
-      case _ => s"${variant.key} variant-${variant.key} ${gameFamily}"
+      case _                   => s"${variant.key} variant-${variant.key} ${gameFamily}"
     }
   }
 
@@ -143,7 +148,7 @@ object bits {
     )
 
   def roundAppPreload(pov: Pov, controls: Boolean)(implicit ctx: Context) =
-    div(cls := "round__app")(
+    div(cls := s"round__app")(
       div(cls := "round__app__board main-board")(chessground(pov)),
       div(cls := "col1-rmoves-preload")
     )

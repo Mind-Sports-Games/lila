@@ -116,6 +116,7 @@ final class RankingApi(
       xiangqi       <- topPerf(PerfType.orDefault("xiangqi").id, nb)
       minishogi     <- topPerf(PerfType.orDefault("minishogi").id, nb)
       minixiangqi   <- topPerf(PerfType.orDefault("minixiangqi").id, nb)
+      flipello      <- topPerf(PerfType.orDefault("flipello").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -145,7 +146,8 @@ final class RankingApi(
       shogi = shogi,
       xiangqi = xiangqi,
       minishogi = minishogi,
-      minixiangqi = minixiangqi
+      minixiangqi = minixiangqi,
+      flipello = flipello
     )
 
   object weeklyStableRanking {

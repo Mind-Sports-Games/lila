@@ -5,11 +5,12 @@ import strategygames.GameLogic
 import strategygames.format.{ FEN }
 import strategygames.format.pgn.{ Reader, Sans, Tag, Tags }
 import org.joda.time.DateTime
+import lila.i18n.VariantKeys
 
 object Rewind {
 
   private def createTags(fen: Option[FEN], game: Game) = {
-    val variantTag = Some(Tag(_.Variant, game.variant.name))
+    val variantTag = Some(Tag(_.Variant, VariantKeys.variantName(game.variant)))
     val fenTag     = fen.map(f => Tag(_.FEN, f.value))
 
     Tags(List(variantTag, fenTag).flatten)
@@ -34,7 +35,7 @@ object Rewind {
             tags = createTags(initialFen, game)
           )
     }).flatMap(_.valid) map { replay =>
-      val playerIndex        = game.turnPlayerIndex
+      val playerIndex  = game.turnPlayerIndex
       val rewindedGame = replay.state
       val newClock = game.clock.map(_.takeback) map { clk =>
         game.clockHistory.flatMap(_.last(playerIndex)).fold(clk) { t =>

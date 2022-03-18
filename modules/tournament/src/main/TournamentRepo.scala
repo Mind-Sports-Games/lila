@@ -27,7 +27,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   private def forTeamSelect(id: TeamID)        = $doc("forTeams" -> id)
   private def forTeamsSelect(ids: Seq[TeamID]) = $doc("forTeams" $in ids)
   private def sinceSelect(date: DateTime)      = $doc("startsAt" $gt date)
-  private def libSelect(lib: GameLogic)          = $doc("lib" -> lib.id)
+  private def libSelect(lib: GameLogic)        = $doc("lib" -> lib.id)
   private def variantSelect(variant: Variant) =
     if (variant.standardVariant) $doc("variant" $exists false)
     else $doc("variant" -> variant.id)
@@ -283,9 +283,12 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           case Monthly | Shield           => 6 * 60
           case Weekly | Weekend           => 3 * 60
           case Daily                      => 1 * 60
-          case _                          => 30
+          case Introductory | MSO21 | MSOGP =>
+            tour.spotlight.flatMap(_.homepageHours).fold(crud.CrudForm.maxHomepageHours * 60)(60 *)
+          case _ => 30
         }
-        if (tour.variant.exotic) base / 3 else base
+        //if (tour.variant.exotic) base / 3 else
+        base
       }
     }
 
@@ -331,19 +334,25 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           (
             tour :: tours,
             sched.freq match {
-              case Schedule.Freq.Daily   => Schedule.Freq.Eastern.some
-              case Schedule.Freq.Eastern => Schedule.Freq.Daily.some
-              case _                     => skip
+              //case Schedule.Freq.Daily   => Schedule.Freq.Eastern.some
+              //case Schedule.Freq.Eastern => Schedule.Freq.Daily.some
+              case _ => skip
             }
           )
       }._1
         .reverse
     }
 
-  def lastFinishedScheduledByFreq(freq: Schedule.Freq, since: DateTime, lib: GameLogic): Fu[List[Tournament]] =
+  def lastFinishedScheduledByFreq(
+      freq: Schedule.Freq,
+      since: DateTime,
+      lib: GameLogic
+  ): Fu[List[Tournament]] =
     coll
       .find(
-        finishedSelect ++ sinceSelect(since) ++ libSelect(lib) ++ variantSelect(Variant.libStandard(lib)) ++ $doc(
+        finishedSelect ++ sinceSelect(since) ++ libSelect(lib) ++ variantSelect(
+          Variant.libStandard(lib)
+        ) ++ $doc(
           "schedule.freq" -> freq.name,
           "schedule.speed" $in Schedule.Speed.mostPopular.map(_.key)
         )

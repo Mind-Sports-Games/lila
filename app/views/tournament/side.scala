@@ -11,6 +11,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.markdownLinksOrRichText
 import lila.tournament.{ TeamBattle, Tournament, TournamentShield }
+import lila.i18n.VariantKeys
 
 object side {
 
@@ -33,8 +34,9 @@ object side {
               if (tour.variant.exotic) {
                 views.html.game.bits.variantLink(
                   tour.variant,
-                  if (tour.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) tour.variant.shortName
-                  else tour.variant.name
+                  if (tour.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
+                    VariantKeys.variantShortName(tour.variant)
+                  else VariantKeys.variantName(tour.variant)
                 )
               } else tour.perfType.trans,
               tour.position.isDefined ?? s"$separator${trans.thematic.txt()}",
@@ -96,6 +98,30 @@ object side {
         ),
         tour.noBerserk option div(cls := "text", dataIcon := "`")("No Berserk allowed"),
         tour.noStreak option div(cls := "text", dataIcon := "Q")("No Arena streaks"),
+        !tour.isFinished option tour.trophy1st.map { trophy1st =>
+          table(cls := "trophyPreview")(
+            tr(
+              td(
+                img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy1st}.png"))
+              ),
+              tour.trophy2nd.map { trophy2nd =>
+                td(
+                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy2nd}.png"))
+                )
+              },
+              tour.trophy3rd.map { trophy3rd =>
+                td(
+                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy3rd}.png"))
+                )
+              }
+            ),
+            tr(
+              td("1st Place"),
+              tour.trophy2nd.map { _ => td("2nd Place") },
+              tour.trophy3rd.map { _ => td("3rd Place") }
+            )
+          )
+        },
         !tour.isScheduled && tour.description.isEmpty option frag(
           trans.by(userIdLink(tour.createdBy.some)),
           br

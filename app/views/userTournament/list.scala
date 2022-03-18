@@ -7,6 +7,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.paginator.Paginator
 import lila.user.User
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
@@ -42,7 +43,8 @@ object list {
                     span(cls := "setup")(
                       e.tour.clock.show,
                       " • ",
-                      if (e.tour.variant.exotic) e.tour.variant.name else e.tour.perfType.trans,
+                      if (e.tour.variant.exotic) VariantKeys.variantName(e.tour.variant)
+                      else e.tour.perfType.trans,
                       " • ",
                       momentFromNow(e.tour.startsAt)
                     )

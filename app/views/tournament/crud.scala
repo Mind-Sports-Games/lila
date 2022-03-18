@@ -10,6 +10,7 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.paginator.Paginator
 import lila.tournament.crud.CrudForm
 import lila.tournament.{ Tournament, TournamentForm }
+import lila.i18n.VariantKeys
 
 object crud {
 
@@ -21,6 +22,7 @@ object crud {
       moreCss = cssTag(css),
       moreJs = frag(
         jsModule("flatpickr"),
+        jsModule("tourForm"),
         evenMoreJs
       )
     ) {
@@ -158,7 +160,7 @@ object crud {
                     em(tour.spotlight.map(_.headline))
                   )
                 ),
-                td(tour.variant.name),
+                td(VariantKeys.variantName(tour.variant)),
                 td(tour.clock.toString),
                 td(tour.minutes, "m"),
                 td(showDateTimeUTC(tour.startsAt), " ", momentFromNow(tour.startsAt, alwaysRelative = true)),

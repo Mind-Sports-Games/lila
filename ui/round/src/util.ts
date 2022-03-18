@@ -129,6 +129,14 @@ export function getScore(variant: VariantKey, pieces: cg.Pieces): number {
   return score;
 }
 
+export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerIndex: string): number {
+  let score = 0;
+  for (const p of pieces.values()) {
+    score += pieceScores(variant, p.role, p.promoted) * (p.playerIndex === playerIndex ? 1 : 0);
+  }
+  return score;
+}
+
 export const noChecks: CheckCount = {
   p1: 0,
   p2: 0,
@@ -165,4 +173,25 @@ const noAnalysisVariants = ['linesOfAction', 'scrambledEggs'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;
+}
+
+export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): cg.Piece | undefined {
+  switch (variant) {
+    case 'flipello':
+      return { playerIndex: turnPlayerIndex, role: 'p-piece' };
+    default:
+      return undefined;
+  }
+}
+
+export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {
+  if (onlyDropsVariant) {
+    if (uci && uci[1] === '@') {
+      return uci2move(uci);
+    } else {
+      return undefined;
+    }
+  } else {
+    return uci2move(uci);
+  }
 }

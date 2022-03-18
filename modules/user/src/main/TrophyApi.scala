@@ -42,31 +42,40 @@ final class TrophyApi(
         user = user.id,
         kind = kindCache sync TrophyKind.moderator,
         date = org.joda.time.DateTime.now,
-        url = none
+        url = none,
+        name = none
       ),
       isDev option Trophy(
         _id = "",
         user = user.id,
         kind = kindCache sync TrophyKind.developer,
         date = org.joda.time.DateTime.now,
-        url = none
+        url = none,
+        name = none
       ),
       isVerified option Trophy(
         _id = "",
         user = user.id,
         kind = kindCache sync TrophyKind.verified,
         date = org.joda.time.DateTime.now,
-        url = none
+        url = none,
+        name = none
       )
     ).flatten
 
-  def award(trophyUrl: String, userId: String, kindKey: String): Funit =
+  def award(
+      trophyUrl: String,
+      userId: String,
+      kindKey: String,
+      trophyName: Option[String] = None
+  ): Funit =
     coll.insert
       .one(
         $doc(
           "_id"  -> lila.common.ThreadLocalRandom.nextString(8),
           "user" -> userId,
           "kind" -> kindKey,
+          "name" -> trophyName,
           "url"  -> trophyUrl,
           "date" -> DateTime.now
         )

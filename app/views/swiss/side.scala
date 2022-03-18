@@ -12,6 +12,7 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.markdownLinksOrRichText
 import lila.swiss.{ Swiss, SwissCondition }
 import lila.common.Form
+import lila.i18n.VariantKeys
 
 object side {
 
@@ -35,8 +36,9 @@ object side {
               if (s.variant.exotic) {
                 views.html.game.bits.variantLink(
                   s.variant,
-                  if (s.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill)) s.variant.shortName
-                  else s.variant.name
+                  if (s.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
+                    VariantKeys.variantShortName(s.variant)
+                  else VariantKeys.variantName(s.variant)
                 )
               } else s.perfType.trans,
               separator,
@@ -44,11 +46,11 @@ object side {
             ),
             p(
               span(cls := "swiss__meta__round")(
-                if (s.settings.isMicroMatch){(title := trans.microMatchDefinition.txt())},
+                if (s.settings.isMicroMatch) { (title := trans.microMatchDefinition.txt()) },
                 s"${s.round}/${s.settings.nbRounds}",
-                if (s.settings.isMicroMatch){
+                if (s.settings.isMicroMatch) {
                   " micro-match rounds"
-                  } else " rounds"
+                } else " rounds"
               ),
               separator,
               a(href := routes.Swiss.home)("Swiss"),
@@ -74,6 +76,30 @@ object side {
           div(
             "Custom position • ",
             views.html.base.bits.fenAnalysisLink(fen)
+          )
+        },
+        !s.isFinished option s.trophy1st.map { trophy1st =>
+          table(cls := "trophyPreview")(
+            tr(
+              td(
+                img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy1st}.png"))
+              ),
+              s.trophy2nd.map { trophy2nd =>
+                td(
+                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy2nd}.png"))
+                )
+              },
+              s.trophy3rd.map { trophy3rd =>
+                td(
+                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy3rd}.png"))
+                )
+              }
+            ),
+            tr(
+              td("1st Place"),
+              s.trophy2nd.map { _ => td("2nd Place") },
+              s.trophy3rd.map { _ => td("3rd Place") }
+            )
           )
         },
         teamLink(s.teamId),

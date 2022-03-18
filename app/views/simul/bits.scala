@@ -5,6 +5,7 @@ import play.api.i18n.Lang
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
@@ -55,7 +56,7 @@ object bits {
     span(cls := List("setup" -> true, "rich" -> sim.variantRich))(
       sim.clock.config.show,
       " • ",
-      sim.variants.map(_.name).mkString(", ")
+      sim.variants.map(VariantKeys.variantName).mkString(", ")
     )
 
   private val baseTranslations = Vector(

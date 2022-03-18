@@ -8,6 +8,7 @@ import org.joda.time.format.DateTimeFormat
 
 import lila.common.String.slugify
 import lila.tree.Node.{ Shape, Shapes }
+import lila.i18n.VariantKeys
 
 final class PgnDump(
     chapterRepo: ChapterRepo,
@@ -69,7 +70,7 @@ final class PgnDump(
         Tag(_.Site, chapterUrl(study.id, chapter.id)),
         Tag(_.UTCDate, Tag.UTCDate.format.print(chapter.createdAt)),
         Tag(_.UTCTime, Tag.UTCTime.format.print(chapter.createdAt)),
-        Tag(_.Variant, chapter.setup.variant.name.capitalize),
+        Tag(_.Variant, VariantKeys.variantName(chapter.setup.variant).capitalize),
         Tag(_.ECO, opening.fold("?")(_.eco)),
         Tag(_.Opening, opening.fold("?")(_.name)),
         Tag(_.Result, "*") // required for SCID to import

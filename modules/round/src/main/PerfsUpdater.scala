@@ -77,6 +77,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.minishogi, ratingsB.minishogi, game)
               case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi) =>
                 updateRatings(ratingsW.minixiangqi, ratingsB.minixiangqi, game)
+              case Variant.FairySF(strategygames.fairysf.variant.Flipello) =>
+                updateRatings(ratingsW.flipello, ratingsB.flipello, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -137,6 +139,7 @@ final class PerfsUpdater(
       xiangqi: Rating,
       minishogi: Rating,
       minixiangqi: Rating,
+      flipello: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -171,6 +174,7 @@ final class PerfsUpdater(
       xiangqi = perfs.xiangqi.toRating,
       minishogi = perfs.minishogi.toRating,
       minixiangqi = perfs.minixiangqi.toRating,
+      flipello = perfs.flipello.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -238,6 +242,7 @@ final class PerfsUpdater(
           xiangqi = addRatingIf(game.ratingVariant.xiangqi, perfs.xiangqi, ratings.xiangqi),
           minishogi = addRatingIf(game.ratingVariant.minishogi, perfs.minishogi, ratings.minishogi),
           minixiangqi = addRatingIf(game.ratingVariant.minixiangqi, perfs.minixiangqi, ratings.minixiangqi),
+          flipello = addRatingIf(game.ratingVariant.flipello, perfs.flipello, ratings.flipello),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -273,6 +278,7 @@ final class PerfsUpdater(
           xiangqi = r(PT.orDefault("xiangqi"), perfs.xiangqi, perfs1.xiangqi),
           minishogi = r(PT.orDefault("minishogi"), perfs.minishogi, perfs1.minishogi),
           minixiangqi = r(PT.orDefault("minixiangqi"), perfs.minixiangqi, perfs1.minixiangqi),
+          flipello = r(PT.orDefault("flipello"), perfs.flipello, perfs1.flipello),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

@@ -72,13 +72,13 @@ GET   /player/autocomplete             controllers.User.autocomplete
 GET   /dasher                          controllers.Dasher.get
 
 # Blog
-# GET   /blog                            controllers.Blog.index(page: Int ?= 1)
-# GET   /blog/all                        controllers.Blog.all
-# GET   /blog/:year                      controllers.Blog.year(year: Int)
-# GET   /blog/discuss/:id                controllers.Blog.discuss(id: String)
-# GET   /blog/:id/:slug                  controllers.Blog.show(id: String, slug: String, ref: Option[String] ?= None)
-# GET   /blog.atom                       controllers.Blog.atom
-# GET   /blog.txt                        controllers.Blog.sitemapTxt
+GET   /blog                            controllers.Blog.index(page: Int ?= 1)
+GET   /blog/all                        controllers.Blog.all
+GET   /blog/:year                      controllers.Blog.year(year: Int)
+GET   /blog/discuss/:id                controllers.Blog.discuss(id: String)
+GET   /blog/:id/:slug                  controllers.Blog.show(id: String, slug: String, ref: Option[String] ?= None)
+GET   /blog.atom                       controllers.Blog.atom
+GET   /blog.txt                        controllers.Blog.sitemapTxt
 
 # Training - Coordinate
 GET   /training/coordinate             controllers.Coordinate.home
@@ -259,7 +259,7 @@ GET   /tournament/team-battle/new/:teamId     controllers.Tournament.teamBattleF
 GET   /tournament/team-battle/edit/:id        controllers.Tournament.teamBattleEdit(id: String)
 POST  /tournament/team-battle/edit/:id        controllers.Tournament.teamBattleUpdate(id: String)
 GET   /tournament/calendar                    controllers.Tournament.calendar
-GET   /tournament/history                     controllers.Tournament.history(freq: String = "unique", page: Int ?= 1)
+GET   /tournament/history                     controllers.Tournament.history(freq: String = "mso21", page: Int ?= 1)
 GET   /tournament/history/:freq               controllers.Tournament.history(freq: String, page: Int ?= 1)
 GET   /tournament/$id<\w{8}>                  controllers.Tournament.show(id: String)
 GET   /tournament/$id<\w{8}>/standing/:page   controllers.Tournament.standing(id: String, page: Int)
@@ -782,7 +782,7 @@ POST  /dgt/config/token                controllers.DgtCtrl.generateToken
 # Accessibility
 POST  /toggle-blind-mode               controllers.Main.toggleBlindMode
 
-#GET   /prismic-preview                 controllers.Blog.preview(token: String)
+GET   /prismic-preview                 controllers.Blog.preview(token: String)
 POST  /jslog/$id<\w{12}>               controllers.Main.jslog(id: String)
 POST  /jsmon/:event                    controllers.Main.jsmon(event: String)
 

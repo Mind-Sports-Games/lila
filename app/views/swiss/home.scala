@@ -4,6 +4,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.swiss.{ FeaturedSwisses, Swiss }
+import lila.i18n.VariantKeys
 
 import controllers.routes
 
@@ -57,18 +58,18 @@ object home {
             ),
             td(cls := "infos")(
               span(cls := "rounds")(
-                if (s.settings.isMicroMatch){(title := trans.microMatchDefinition.txt())},
+                if (s.settings.isMicroMatch) { (title := trans.microMatchDefinition.txt()) },
                 s.isStarted option frag(s.round.value, " / "),
                 s.settings.nbRounds,
-                if (s.settings.isMicroMatch){
-                  (" micro-match rounds Swiss")
+                if (s.settings.isMicroMatch) {
+                  " micro-match rounds Swiss"
                 } else " rounds Swiss"
                 //" rounds Swiss"
               ),
               span(cls := "setup")(
                 s.clock.show,
                 " • ",
-                if (s.variant.exotic) s.variant.name else s.perfType.trans,
+                if (s.variant.exotic) VariantKeys.variantName(s.variant) else s.perfType.trans,
                 " • ",
                 (if (s.settings.rated) trans.ratedTournament else trans.casualTournament)()
               )

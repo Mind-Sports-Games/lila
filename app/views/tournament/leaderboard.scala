@@ -6,8 +6,11 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.rating.PerfType
+import lila.i18n.VariantKeys
 
 import controllers.routes
+
+import strategygames.variant.Variant
 
 object leaderboard {
 
@@ -36,6 +39,15 @@ object leaderboard {
         },
         fws.daily.map { w =>
           freqWinner(w, "Daily")
+        },
+        fws.mso21.map { w =>
+          freqWinner(w, "MSO 2021")
+        },
+        fws.msoGP.map { w =>
+          freqWinner(w, "MSO Grand Prix")
+        },
+        fws.introductory.map { w =>
+          freqWinner(w, "Introductory")
         }
       )
     )
@@ -46,7 +58,7 @@ object leaderboard {
       moreCss = cssTag("tournament.leaderboard"),
       wrapClass = "full-screen-force"
     ) {
-      def eliteWinners =
+      /*def eliteWinners =
         section(
           h2(cls := "text", dataIcon := "C")("Elite Arena"),
           ul(
@@ -72,23 +84,23 @@ object leaderboard {
               )
             }
           )
-        )
+        )*/
       main(cls := "page-menu")(
         views.html.user.bits.communityMenu("tournament"),
         div(cls := "page-menu__content box box-pad")(
           h1("Tournament winners"),
           div(cls := "tournament-leaderboards")(
-            eliteWinners,
+            /*eliteWinners,
             freqWinners(winners.hyperbullet, PerfType.orDefaultSpeed("bullet"), "HyperBullet"),
             freqWinners(winners.bullet, PerfType.orDefaultSpeed("bullet"), "Bullet"),
             freqWinners(winners.superblitz, PerfType.orDefaultSpeed("blitz"), "SuperBlitz"),
             freqWinners(winners.blitz, PerfType.orDefaultSpeed("blitz"), "Blitz"),
             freqWinners(winners.rapid, PerfType.orDefaultSpeed("rapid"), "Rapid"),
-            marathonWinners,
-            lila.tournament.WinnersApi.variants.map { v =>
+            marathonWinners,*/
+            Variant.all.map { v =>
               PerfType.byVariant(v).map { pt =>
                 winners.variants.get(pt.key).map { w =>
-                  freqWinners(w, pt, v.name)
+                  freqWinners(w, pt, VariantKeys.variantName(v))
                 }
               }
             }

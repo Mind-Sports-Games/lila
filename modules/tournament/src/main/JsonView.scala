@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ P1, P2, Clock }
+import strategygames.{ Clock, P1, P2 }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -127,6 +127,9 @@ final class JsonView(
           .add("position" -> tour.position.ifTrue(full).map(positionJson))
           .add("verdicts" -> verdicts.map(Condition.JSONHandlers.verdictsFor(_, lang)))
           .add("schedule" -> tour.schedule.map(scheduleJson))
+          .add("trophy1st" -> tour.trophy1st)
+          .add("trophy2nd" -> tour.trophy2nd)
+          .add("trophy3rd" -> tour.trophy3rd)
           .add("private" -> tour.isPrivate)
           .add("quote" -> tour.isCreated.option(lila.quote.Quote.one(tour.id)))
           .add("defender" -> shieldOwner.map(_.value))
@@ -200,13 +203,13 @@ final class JsonView(
           "pairings" -> povScores.map { case (pov, score) =>
             Json
               .obj(
-                "id"     -> pov.gameId,
+                "id"          -> pov.gameId,
                 "playerIndex" -> pov.playerIndex.name,
                 "playerColor" -> tour.variant.playerColors(pov.playerIndex),
-                "op"     -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
-                "win"    -> score.flatMap(_.isWin),
-                "status" -> pov.game.status.id,
-                "score"  -> score.map(sheetScoreJson)
+                "op"          -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
+                "win"         -> score.flatMap(_.isWin),
+                "status"      -> pov.game.status.id,
+                "score"       -> score.map(sheetScoreJson)
               )
               .add("berserk" -> pov.player.berserk)
           }
@@ -270,10 +273,12 @@ final class JsonView(
 
   private[tournament] def boardSizeJson(v: Variant) = v match {
     case Variant.Draughts(v) =>
-      Some(Json.obj(
-        "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
-        "key" -> v.boardSize.key
-      ))
+      Some(
+        Json.obj(
+          "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+          "key"  -> v.boardSize.key
+        )
+      )
     case _ => None
   }
 
@@ -294,12 +299,14 @@ final class JsonView(
       .obj(
         "id"          -> game.id,
         "gameLogic"   -> game.variant.gameLogic.name.toLowerCase(),
-        "gameFamily"  -> game.variant.gameFamily.shortName.toLowerCase(),
+        "gameFamily"  -> game.variant.gameFamily.key,
         "variantKey"  -> game.variant.key,
         "fen"         -> Forsyth.boardAndPlayer(game.variant.gameLogic, game.situation),
         "orientation" -> game.naturalOrientation.name,
-        "color"       -> game.variant.playerNames(game.naturalOrientation), // app BC https://github.com/ornicar/lila/issues/7195
-        "lastMove"    -> ~game.lastMoveKeys,
+        "color" -> game.variant.playerNames(
+          game.naturalOrientation
+        ), // app BC https://github.com/ornicar/lila/issues/7195
+        "lastMove" -> ~game.lastMoveKeys,
         "p1"       -> ofPlayer(featured.p1, game player P1),
         "p2"       -> ofPlayer(featured.p2, game player P2)
       )

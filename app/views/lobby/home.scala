@@ -12,12 +12,14 @@ import lila.game.Pov
 
 object home {
 
+  private val maxSpotlights: Int = 3
+
   def apply(homepage: Homepage)(implicit ctx: Context) = {
     import homepage._
     views.html.base.layout(
       title = "",
       fullTitle = Some {
-        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • ${trans.freeOnlineChess.txt()}"
+        s"playstrategy.${if (netConfig.isProd) "org" else "dev"} • ${trans.playstrategySiteTitleShort.txt()}"
       },
       moreJs = frag(
         jsModule("lobby"),
@@ -42,9 +44,9 @@ object home {
         .OpenGraph(
           image = assetUrl("logo/playstrategy-tile-wide.png").some,
           twitterImage = assetUrl("logo/playstrategy-tile.png").some,
-          title = "The best free, adless Chess server",
+          title = trans.playstrategySiteTitle.txt(),
           url = netBaseUrl,
-          description = trans.siteDescription.txt()
+          description = trans.playstrategySiteDescription.txt()
         )
         .some
     ) {
@@ -124,7 +126,7 @@ object home {
           div(cls := "lobby__spotlights")(
             events.map(bits.spotlight),
             !ctx.isBot option frag(
-              lila.tournament.Spotlight.select(tours, ctx.me, 3 - events.size) map {
+              lila.tournament.Spotlight.select(tours, ctx.me, maxSpotlights - events.size) map {
                 views.html.tournament.homepageSpotlight(_)
               },
               simuls.filter(isFeaturable) map views.html.simul.bits.homepageSpotlight
@@ -168,7 +170,7 @@ object home {
             views.html.forum.post recent forumRecent
           )
         ),
-        //bits.lastPosts(lastPost),
+        bits.lastPosts(lastPost),
         div(cls := "lobby__support")(
           a(href := routes.Plan.index)(
             iconTag(patronIconChar),

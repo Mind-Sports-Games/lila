@@ -36,6 +36,7 @@ object jsI18n {
     trans.threeChecks,
     trans.fiveChecks,
     trans.checkersConnected,
+    trans.gameFinished,
     trans.variantEnding
   ).map(_.key)
 
@@ -67,6 +68,7 @@ object jsI18n {
     trans.opponentLeftChoices,
     trans.forceResignation,
     trans.forceDraw,
+    trans.perpetualWarning,
     trans.threefoldRepetition,
     trans.claimADraw,
     trans.drawOfferSent,

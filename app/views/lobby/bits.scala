@@ -20,7 +20,7 @@ object bits {
       tournamentWinners: List[lila.tournament.Winner]
   )(implicit ctx: Context) =
     frag(
-      div(cls := "lobby__leaderboard lobby__box")(
+      /*div(cls := "lobby__leaderboard lobby__box")(
         div(cls := "lobby__box__top")(
           h2(cls := "title text", dataIcon := "C")(trans.leaderboard()),
           a(cls := "more", href := routes.User.list)(trans.more(), " »")
@@ -40,7 +40,7 @@ object bits {
             )
           )
         )
-      ),
+      ),*/
       div(cls := "lobby__winners lobby__box")(
         div(cls := "lobby__box__top")(
           h2(cls := "title text", dataIcon := "g")(trans.tournamentWinners()),
@@ -83,27 +83,25 @@ object bits {
       )
     )
 
-  /*def lastPosts(posts: List[lila.blog.MiniPost])(implicit ctx: Context): Option[Frag] =
-    posts.nonEmpty option
-      div(cls := "lobby__blog lobby__box")(
-        a(cls := "lobby__box__top", href := routes.Blog.index())(
-          h2(cls := "title text", dataIcon := "6")(trans.latestUpdates()),
-          span(cls := "more")(trans.more(), " »")
-        ),
-        div(cls := "lobby__box__content")(
-          posts map { post =>
-            a(cls := "post", href := routes.Blog.show(post.id, post.slug))(
-              img(src := post.image),
-              span(cls := "text")(
-                strong(post.title),
-                span(post.shortlede)
+  def lastPosts(posts: List[lila.blog.MiniPost])(implicit ctx: Context): Option[Frag] =
+      posts.nonEmpty option
+      div(cls := "lobby__blog blog-post-cards")(
+         posts map { post =>
+            a(cls := "blog-post-card blog-post-card--link", href := routes.Blog.show(post.id, post.slug))(
+              img(
+                src := post.image,
+                cls := "blog-post-card__image",
+                widthA := 400,
+                heightA := 400 * 10 / 16
               ),
-              semanticDate(post.date)
+              span(cls := "blog-post-card__content")(
+                h2(cls := "blog-post-card__title")(post.title),
+                semanticDate(post.date)(ctx.lang)(cls := "blog-post-card__over-image")
+              )
             )
           }
         )
-      )*/
-
+  
   def playbanInfo(ban: lila.playban.TempBan)(implicit ctx: Context) =
     nopeInfo(
       h1(trans.sorry()),

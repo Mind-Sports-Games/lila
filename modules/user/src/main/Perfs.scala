@@ -34,6 +34,7 @@ case class Perfs(
     xiangqi: Perf,
     minishogi: Perf,
     minixiangqi: Perf,
+    flipello: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -73,6 +74,7 @@ case class Perfs(
       "xiangqi"        -> xiangqi,
       "minishogi"      -> minishogi,
       "minixiangqi"    -> minixiangqi,
+      "flipello"       -> flipello,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -168,6 +170,7 @@ case class Perfs(
     "xiangqi"        -> xiangqi,
     "minishogi"      -> minishogi,
     "minixiangqi"    -> minixiangqi,
+    "flipello"       -> flipello,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
     "blitz"          -> blitz,
@@ -261,6 +264,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -308,6 +312,7 @@ case object Perfs {
       case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)        => Some(_.xiangqi)
       case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)      => Some(_.minishogi)
       case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)    => Some(_.minixiangqi)
+      case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => Some(_.flipello)
       case _                           => none
     }
 
@@ -353,6 +358,7 @@ case object Perfs {
         xiangqi = perf("xiangqi"),
         minishogi = perf("minishogi"),
         minixiangqi = perf("minixiangqi"),
+        flipello = perf("flipello"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -395,6 +401,7 @@ case object Perfs {
         "xiangqi"        -> notNew(o.xiangqi),
         "minishogi"      -> notNew(o.minishogi),
         "minixiangqi"    -> notNew(o.minixiangqi),
+        "flipello"       -> notNew(o.flipello),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
         "blitz"          -> notNew(o.blitz),
@@ -437,9 +444,10 @@ case object Perfs {
       shogi: List[User.LightPerf],
       xiangqi: List[User.LightPerf],
       minishogi: List[User.LightPerf],
-      minixiangqi: List[User.LightPerf]
+      minixiangqi: List[User.LightPerf],
+      flipello: List[User.LightPerf],
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
 
 }
