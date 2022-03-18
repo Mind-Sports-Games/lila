@@ -1,11 +1,10 @@
 import { h, VNode } from 'snabbdom';
-import { fixCrazySan } from 'chess';
+import { fixCrazySan, notationStyle } from 'chess';
 import { path as treePath, ops as treeOps } from 'tree';
 import * as moveView from '../moveView';
 import AnalyseCtrl from '../ctrl';
 import { MaybeVNodes } from '../interfaces';
 import { mainHook, nodeClasses, findCurrentPath, renderInlineCommentsOf, retroLine, Ctx, Opts } from './treeView';
-import { notationStyle } from 'chess';
 import { moveFromNotationStyle } from 'common/notation';
 import { parentedNode, parentedNodes, parentedNodesFromOrdering } from '../util';
 
