@@ -1,5 +1,7 @@
 package lila.fishnet
 
+import scala.util.control.Exception._
+
 import strategygames.format.Uci
 import strategygames.{ GameFamily, GameLogic }
 import io.lettuce.core._
@@ -34,9 +36,10 @@ final class FishnetRedis(
 
         case Array("start") => Bus.publish(TellAll(FishnetStart), "roundSocket")
 
-        case Array(gameId, plyS, uci) =>
+        case Array(familyId, gameId, plyS, uci) =>
           for {
-            move <- Uci(GameLogic.Chess(), GameFamily.Chess(), uci)
+            family <- allCatch.opt(familyId.toInt).map(GameFamily.apply)
+            move <- Uci(family.gameLogic, family, uci)
             ply  <- plyS.toIntOption
           } Bus.publish(Tell(gameId, FishnetPlay(move, ply)), "roundSocket")
         case _ =>
