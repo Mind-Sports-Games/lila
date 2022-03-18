@@ -65,8 +65,6 @@ function renderInlined(ctx: Ctx, nodes: Tree.ParentedNode[], opts: Opts): MaybeV
 }
 
 function renderLines(ctx: Ctx, nodes: Tree.Node[], opts: Opts): VNode {
-  // reduce((previousValue, currentValue) => { /* ... */ }, initialValue )
-  // reduce((previousValue, currentValue, currentIndex, array) => { /* ... */ }, initialValue)
   return h(
     'lines',
     parentedNodesFromOrdering(nodes).map(n => {
