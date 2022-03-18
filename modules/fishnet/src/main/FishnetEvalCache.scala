@@ -39,7 +39,7 @@ final private class FishnetEvalCache(
       .situationsFromUci(
         game.variant.gameLogic,
         game.uciList.take(maxPlies - 1),
-        game.initialFen.map(fen => FEN(game.variant.gameLogic, fen)),
+        game.initialFen,
         game.variant
       )
       .fold(
