@@ -50,6 +50,8 @@ case class UserChat(
 
   def truncate(max: Int) = copy(lines = lines.drop((lines.size - max) atLeast 0))
 
+  def getlast(num: Int) = copy(lines = lines.takeRight(num atMost lines.size))
+
   def hasRecentLine(u: User): Boolean = lines.reverse.take(12).exists(_.userId == u.id)
 }
 

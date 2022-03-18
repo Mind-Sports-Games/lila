@@ -16,6 +16,17 @@ object home {
 
   def apply(homepage: Homepage)(implicit ctx: Context) = {
     import homepage._
+
+    val chatJson = chatOption map { chat =>
+                          views.html.chat.json(
+                            chat.chat.getlast(250),
+                            name = trans.chatRoom.txt(),
+                            timeout = chat.timeout,
+                            public = true,
+                            resourceId = lila.chat.Chat.ResourceId("lobbyhome/lobbyhome"),
+                          )
+                        }
+
     views.html.base.layout(
       title = "",
       fullTitle = Some {
@@ -33,7 +44,9 @@ object home {
                   "remainingSeconds" -> (pb.remainingSeconds + 3)
                 )
               },
-              "i18n" -> i18nJsObject(i18nKeys)
+              "i18n" -> i18nJsObject(i18nKeys),
+              "chat" -> chatJson,
+              "chatSocketVersion" -> chatVersion
             )
           )})"""
         )
@@ -108,6 +121,9 @@ object home {
               )
             )
           )
+        ),
+        div(cls := "lobby__chat")(
+          chatOption.isDefined option frag(views.html.chat.frag)
         ),
         currentGame.map(bits.currentGameInfo) orElse
           playban.map(bits.playbanInfo) getOrElse {

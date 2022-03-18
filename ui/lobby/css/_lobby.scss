@@ -39,6 +39,36 @@ body {
   overflow: hidden;
 }
 
+.lobby__chat {
+  .mchat {
+    flex: 1 1 0;
+    margin-top: 0px;
+    height: 370px;
+    margin-bottom: 0px;
+
+    @if $theme-dark {
+      box-shadow: none;
+
+      &__tabs,
+      &__content,
+      &__say,
+      &__tab-active {
+        background: $c-bg-page !important;
+      }
+    }
+
+    @include breakpoint($mq-col3) {
+      margin-top: 30px;
+    }
+
+    @include breakpoint($mq-col4) {
+      margin-top: 30px;
+      height: 570px;
+      margin-bottom: $block-gap;
+    }
+  }
+}
+
 .lobby__nope {
   @include lobby-app-size;
 

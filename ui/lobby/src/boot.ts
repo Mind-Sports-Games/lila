@@ -1,6 +1,7 @@
 import * as xhr from 'common/xhr';
 import main from './main';
 import modal from 'common/modal';
+import { ChatCtrl } from 'chat';
 import { LobbyOpts } from './interfaces';
 import { numberFormat } from 'common/number';
 
@@ -26,7 +27,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       const match = RegExp('[?&]' + name + '=([^&]*)').exec(location.search);
       return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
     };
-  playstrategy.socket = new playstrategy.StrongSocket('/lobby/socket/v5', false, {
+  playstrategy.socket = new playstrategy.StrongSocket('/lobby/socket/v5', opts.chatSocketVersion, {
     receive(t: string, d: any) {
       lobby.socketReceive(t, d);
     },
@@ -119,6 +120,11 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   }
 
   suggestBgSwitch();
+
+  const chatOpts = opts.chat;
+  if (chatOpts) {
+    chatOpts.instance = playstrategy.makeChat(chatOpts) as Promise<ChatCtrl>;
+  }
 }
 
 function suggestBgSwitch() {

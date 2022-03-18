@@ -38,7 +38,7 @@ object page {
   )
 
   def source(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver)(implicit ctx: Context) = {
-    val title = ~doc.getText("pages.title").pp("pages.title")
+    val title = ~doc.getText("pages.title")
     layout(
       title = title,
       active = "source",
