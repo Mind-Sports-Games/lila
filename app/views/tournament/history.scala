@@ -42,10 +42,10 @@ object history {
   private def nameOf(f: Freq) = if (f == Freq.Weekend) "Elite" else f.display
 
   private val allFreqs = List(
-    Freq.MSO21,
-    Freq.MSOGP,
-    Freq.MSOWarmUp,
     Freq.Introductory,
+    Freq.MSOGP,
+    Freq.MSO21,
+    Freq.MSOWarmUp,
     Freq.Unique
     //Freq.Marathon,
     //Freq.Shield,
