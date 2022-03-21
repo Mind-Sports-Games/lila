@@ -76,9 +76,11 @@ case class Tournament(
 
   def isMSO = (schedule.map(_.freq) has Schedule.Freq.MSO21) || (schedule.map(_.freq) has Schedule.Freq.MSOGP)
 
+  def isMSOWarmUp = schedule.map(_.freq) has Schedule.Freq.MSOWarmUp
+
   def isIntro = schedule.map(_.freq) has Schedule.Freq.Introductory
 
-  def isPlayStrategyHeadline = isMSO || isIntro
+  def isPlayStrategyHeadline = isMSO || isMSOWarmUp || isIntro
 
   def isScheduled = schedule.isDefined
 

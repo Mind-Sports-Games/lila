@@ -64,7 +64,7 @@ object home {
             },
             a(href := routes.Tournament.calendar)(trans.tournamentCalendar()),
             br,
-            a(href := routes.Tournament.history(Freq.Unique.name))(trans.arena.history()),
+            a(href := routes.Tournament.history(Freq.Introductory.name))(trans.arena.history()),
             br,
             a(href := routes.Tournament.help("arena".some))(trans.tournamentFAQ())
           ),

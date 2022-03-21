@@ -44,6 +44,7 @@ object history {
   private val allFreqs = List(
     Freq.MSO21,
     Freq.MSOGP,
+    Freq.MSOWarmUp,
     Freq.Introductory,
     Freq.Unique
     //Freq.Marathon,
