@@ -81,7 +81,7 @@ final class FishnetApi(
   def postAnalysis(
       workId: Work.Id,
       client: Client,
-      stringData: JsonApi.Request.PostAnalysisString
+      lexicalData: JsonApi.Request.PostAnalysisLexicalUci
   ): Fu[PostAnalysisResult] = {
     repo
       .getAnalysis(workId)
@@ -91,7 +91,7 @@ final class FishnetApi(
           fufail(WorkNotFound)
         case Some(work) if work isAcquiredBy client => {
           val v = work.game.variant
-          val data = stringData.toUci(v.gameLogic, v.gameFamily)
+          val data = lexicalData.toUci(v.gameLogic, v.gameFamily)
           data.completeOrPartial match {
             case complete: CompleteAnalysis =>
               {

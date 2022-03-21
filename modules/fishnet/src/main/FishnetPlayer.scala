@@ -3,6 +3,7 @@ package lila.fishnet
 import scala.concurrent.duration._
 
 import strategygames.{ P2, Clock, P1 }
+import strategygames.format.Uci
 
 import lila.common.Future
 import lila.game.{ Game, GameRepo, UciMemo }
@@ -58,7 +59,7 @@ final class FishnetPlayer(
               initialFen = initialFen,
               studyId = none,
               variant = game.variant,
-              moves = moves mkString " "
+              moves = moves.flatMap(Uci(game.variant.gameLogic, game.variant.gameFamily, _)).map(_.fishnetUci).mkString(" ")
             ),
             level =
               if (level < 3 && game.clock.exists(_.config.limit.toSeconds < 60)) 3

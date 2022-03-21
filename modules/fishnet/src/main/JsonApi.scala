@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import strategygames.format.{ FEN, Uci }
+import strategygames.format.{ FEN, Uci, LexicalUci }
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameLogic }
 import org.joda.time.DateTime
@@ -41,10 +41,10 @@ object JsonApi {
         fishnet: Fishnet
     ) extends Request
 
-    case class PostAnalysisString(
+    case class PostAnalysisLexicalUci(
         fishnet: Fishnet,
         stockfish: Stockfish,
-        analysis: List[Option[Evaluation.OrSkipped[String]]]
+        analysis: List[Option[Evaluation.OrSkipped[LexicalUci]]]
     ) extends Request
         with Result {
 
@@ -138,9 +138,9 @@ object JsonApi {
       private val legacyDesiredNodes = 3_000_000
       val legacyAcceptableNodes      = legacyDesiredNodes * 0.9
 
-      def toUci(eval: Evaluation[String], gl: GameLogic, gf: GameFamily): Evaluation[Uci] =
+      def toUci(eval: Evaluation[LexicalUci], gl: GameLogic, gf: GameFamily): Evaluation[Uci] =
         Evaluation[Uci](
-          eval.pv.flatMap(Uci(gl, gf, _)),
+          eval.pv.flatMap(u => Uci(gl, gf, u.uci)),
           eval.score,
           eval.time,
           eval.nodes,
@@ -164,7 +164,7 @@ object JsonApi {
       moves: String
   ) {
     def uciMoves = ~(Uci.readList(variant.gameLogic, variant.gameFamily, moves))
-    def toUci = UciGame(game_id, position, variant, uciMoves)
+    def toUci    = UciGame(game_id, position, variant, uciMoves)
   }
 
   def fromGame(g: W.Game) =
@@ -200,45 +200,47 @@ object JsonApi {
 
   object readers {
     import play.api.libs.functional.syntax._
-    implicit val ClientVersionReads  = Reads.of[String].map(Client.Version(_))
-    implicit val ClientPythonReads   = Reads.of[String].map(Client.Python(_))
-    implicit val ClientKeyReads      = Reads.of[String].map(Client.Key(_))
-    implicit val StockfishReads      = Json.reads[Request.Stockfish]
-    implicit val FishnetReads        = Json.reads[Request.Fishnet]
-    implicit val AcquireReads        = Json.reads[Request.Acquire]
-    implicit val ScoreReads          = Json.reads[Request.Evaluation.Score]
-    implicit val uciListReadsStrings = Reads.of[String] map { str => str.split(" ") }
+    implicit val ClientVersionReads      = Reads.of[String].map(Client.Version(_))
+    implicit val ClientPythonReads       = Reads.of[String].map(Client.Python(_))
+    implicit val ClientKeyReads          = Reads.of[String].map(Client.Key(_))
+    implicit val StockfishReads          = Json.reads[Request.Stockfish]
+    implicit val FishnetReads            = Json.reads[Request.Fishnet]
+    implicit val AcquireReads            = Json.reads[Request.Acquire]
+    implicit val ScoreReads              = Json.reads[Request.Evaluation.Score]
+    implicit val uciListReadsLexicalUcis = Reads.of[String] map { str => str.split(" ").flatMap(LexicalUci.apply) }
 
-    implicit val EvaluationReads: Reads[Request.Evaluation[String]] = (
-      (__ \ "pv").readNullable[String].map(~_).map(_.split(" ").toList) and
+    implicit val EvaluationReads: Reads[Request.Evaluation[LexicalUci]] = (
+      (__ \ "pv").readNullable[String].map(~_).map(_.split(" ").flatMap(LexicalUci.apply).toList) and
         (__ \ "score").read[Request.Evaluation.Score] and
         (__ \ "time").readNullable[Int] and
         (__ \ "nodes").readNullable[Long].map(_.map(_.toSaturatedInt)) and
         (__ \ "nps").readNullable[Long].map(_.map(_.toSaturatedInt)) and
         (__ \ "depth").readNullable[Int]
     )((moves, score, time, nodes, nps, depth) =>
-      Request.Evaluation[String](moves, score, time, nodes, nps, depth)
+      Request.Evaluation[LexicalUci](moves, score, time, nodes, nps, depth)
     )
-    implicit val EvaluationOptionReads = Reads[Option[Request.Evaluation.OrSkipped[String]]] {
+    implicit val EvaluationOptionReads = Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] {
       case JsNull => JsSuccess(None)
       case obj =>
         if (~(obj boolean "skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
         else EvaluationReads reads obj map Right.apply map some
     }
-    implicit val PostAnalysisReads: Reads[Request.PostAnalysisString] =
-      Json.reads[Request.PostAnalysisString]
+    implicit val PostAnalysisReads: Reads[Request.PostAnalysisLexicalUci] =
+      Json.reads[Request.PostAnalysisLexicalUci]
   }
 
   object writers {
     implicit val VariantWrites = Writes[Variant] { v =>
       JsString(v.key)
     }
-    implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g => Json.obj(
-      "game_id" -> g.game_id,
-      "position"  -> g.position,
-      "variant"  -> g.variant,
-      "moves"  -> g.moves.map(_.fishnetUci).mkString(" ")
-    )}
+    implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g =>
+      Json.obj(
+        "game_id"  -> g.game_id,
+        "position" -> g.position,
+        "variant"  -> g.variant,
+        "moves"    -> g.moves.map(_.fishnetUci).mkString(" ")
+      )
+    }
     implicit val WorkIdWrites = Writes[Work.Id] { id =>
       JsString(id.value)
     }
