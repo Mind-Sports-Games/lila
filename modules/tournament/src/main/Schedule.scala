@@ -188,12 +188,16 @@ object Schedule {
     case object Yearly       extends Freq(70, 70)
     case object Introductory extends Freq(80, 65)
     case object Unique       extends Freq(90, 59)
-    case object MSO21 extends Freq(121, 75) {
+    case object MSOWarmUp extends Freq(120, 41) {
+      override val display = "MSO Warm-Up"
+    }
+    case object MSO21 extends Freq(121, 61) {
       override val display = "MSO 2021"
     }
     case object MSOGP extends Freq(122, 75) {
       override val display = "MSO Grand Prix"
     }
+
     val all: List[Freq] = List(
       Hourly,
       Daily,
@@ -207,6 +211,7 @@ object Schedule {
       Yearly,
       Introductory,
       Unique,
+      MSOWarmUp,
       MSO21,
       MSOGP
     )
