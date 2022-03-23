@@ -49,6 +49,8 @@ export interface AnalyseData {
   userTv?: {
     id: string;
   };
+  onlyDropsVariant: boolean;
+  possibleDropsByRole?: string;
 }
 
 export interface AnalysePref {
@@ -164,8 +166,9 @@ export interface EvalPutData extends Tree.ServerEval {
   variant?: VariantKey;
 }
 
-
 export type Conceal = false | 'conceal' | 'hide' | null;
 export type ConcealOf = (isMainline: boolean) => (path: Tree.Path, node: Tree.Node) => Conceal;
 
 export type Redraw = () => void;
+
+export type Position = 'top' | 'bottom';
