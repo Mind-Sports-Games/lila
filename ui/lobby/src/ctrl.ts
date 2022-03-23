@@ -82,6 +82,8 @@ export default class LobbyController {
     });
   }
 
+  reload = (): void => playstrategy.reload();
+
   private doFlushHooks() {
     this.stepHooks = this.data.hooks.slice(0);
     if (this.tab === 'real_time') this.redraw();
@@ -215,6 +217,7 @@ export default class LobbyController {
         xhr.seeks().then(this.setSeeks);
         break;
     }
+    this.reload();
   };
 
   // after click on round "new opponent" button

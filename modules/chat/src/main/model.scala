@@ -20,6 +20,7 @@ object BusChan {
   case object Team       extends BusChan
   case object Swiss      extends BusChan
   case object Global     extends BusChan
+  case object Lobby      extends BusChan
 
   type Select = BusChan.type => BusChan
 }

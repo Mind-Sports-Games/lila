@@ -3,6 +3,7 @@ package lila.lobby
 import com.softwaremill.macwire._
 import play.api.Configuration
 import scala.concurrent.duration._
+import lila.socket.Socket.{ GetVersion, SocketVersion }
 
 import lila.common.config._
 
@@ -18,11 +19,13 @@ final class Env(
     gameRepo: lila.game.GameRepo,
     poolApi: lila.pool.PoolApi,
     cacheApi: lila.memo.CacheApi,
+    chatApi: lila.chat.ChatApi,
     remoteSocketApi: lila.socket.RemoteSocket
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: akka.actor.ActorSystem,
-    idGenerator: lila.game.IdGenerator
+    idGenerator: lila.game.IdGenerator,
+    mode: play.api.Mode
 ) {
 
   private lazy val maxPlaying = appConfig.get[Max]("setup.max_playing")
@@ -50,6 +53,8 @@ final class Env(
   private lazy val biter = wire[Biter]
 
   val socket = wire[LobbySocket]
+
+  def version(id:String = "lobbyhome") = socket.rooms.ask[SocketVersion](id)(GetVersion)
 
   lila.common.Bus.subscribeFun("abortGame") { case lila.game.actorApi.AbortedBy(pov) =>
     abortListener(pov).unit
