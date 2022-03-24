@@ -8,14 +8,14 @@ import play.api.data.Forms._
 import strategygames.variant.Variant
 import lila.common.Form._
 import strategygames.format.FEN
-import strategygames.GameLogic
+import strategygames.{ GameFamily, GameLogic }
 
 object CrudForm {
 
   import TournamentForm._
-  import lila.common.Form.UTCDate._
+  import lila.common.Form.ISODateTime._
 
-  val maxHomepageHours = 24
+  val maxHomepageHours = 168
 
   lazy val apply = Form(
     mapping(
@@ -24,17 +24,21 @@ object CrudForm {
       "clockTime"      -> numberInDouble(clockTimeChoices),
       "clockIncrement" -> numberIn(clockIncrementChoices),
       "minutes"        -> number(min = 20, max = 1440),
-      "variant"        -> number.verifying(num => Variant.exists(GameLogic.Chess(), num)),
-      "position"       -> optional(lila.common.Form.fen.playableStrict),
-      "date"           -> utcDate,
-      "image"          -> stringIn(imageChoices),
-      "headline"       -> text(minLength = 5, maxLength = 30),
-      "description"    -> text(minLength = 10, maxLength = 400),
-      "conditions"     -> Condition.DataForm.all(Nil),
-      "berserkable"    -> boolean,
-      "streakable"     -> boolean,
-      "teamBattle"     -> boolean,
-      "hasChat"        -> boolean
+      "variant" -> optional(
+        nonEmptyText.verifying(v =>
+          Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined
+        )
+      ),
+      "position"    -> optional(lila.common.Form.fen.playableStrict),
+      "date"        -> isoDateTime,
+      "image"       -> stringIn(imageChoices),
+      "headline"    -> text(minLength = 5, maxLength = 30),
+      "description" -> text(minLength = 10, maxLength = 400),
+      "conditions"  -> Condition.DataForm.all(Nil),
+      "berserkable" -> boolean,
+      "streakable"  -> boolean,
+      "teamBattle"  -> boolean,
+      "hasChat"     -> boolean
     )(CrudForm.Data.apply)(CrudForm.Data.unapply)
       .verifying("Invalid clock", _.validClock)
       .verifying("Increase tournament duration, or decrease game clock", _.validTiming)
@@ -44,7 +48,7 @@ object CrudForm {
     clockTime = clockTimeDefault,
     clockIncrement = clockIncrementDefault,
     minutes = minuteDefault,
-    variant = Variant.libStandard(GameLogic.Chess()).id,
+    variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
     position = none,
     date = DateTime.now plusDays 7,
     image = "",
@@ -63,7 +67,7 @@ object CrudForm {
       clockTime: Double,
       clockIncrement: Int,
       minutes: Int,
-      variant: Int,
+      variant: Option[String],
       position: Option[FEN],
       date: DateTime,
       image: String,
@@ -76,7 +80,14 @@ object CrudForm {
       hasChat: Boolean
   ) {
 
-    def realVariant = Variant.orDefault(GameLogic.Chess(), variant)
+    def gameLogic = variant match {
+      case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
+      case None    => GameLogic.Chess()
+    }
+
+    def realVariant = variant flatMap { v =>
+      Variant.apply(gameLogic, v.split("_")(1).toInt)
+    } getOrElse Variant.default(gameLogic)
 
     def realPosition = position ifTrue realVariant.standard
 
@@ -88,8 +99,8 @@ object CrudForm {
   }
 
   val imageChoices = List(
-    ""                    -> "PlayStrategy",
-    "offerspill.logo.png" -> "Offerspill"
+    ""             -> "PlayStrategy",
+    "mso.logo.png" -> "MSO"
   )
   val imageDefault = ""
 }

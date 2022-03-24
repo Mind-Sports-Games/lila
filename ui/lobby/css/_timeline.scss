@@ -4,6 +4,10 @@
   flex: 1 1 auto;
   margin: 1em 0 0 $block-gap;
 
+  @include breakpoint($mq-col3) {
+    flex: 1 1 0;
+  }
+
   @include hoverflow;
 
   .entry {

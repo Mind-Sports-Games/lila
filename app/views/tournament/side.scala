@@ -98,6 +98,30 @@ object side {
         ),
         tour.noBerserk option div(cls := "text", dataIcon := "`")("No Berserk allowed"),
         tour.noStreak option div(cls := "text", dataIcon := "Q")("No Arena streaks"),
+        !tour.isFinished option tour.trophy1st.map { trophy1st =>
+          table(cls := "trophyPreview")(
+            tr(
+              td(
+                img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy1st}.png"))
+              ),
+              tour.trophy2nd.map { trophy2nd =>
+                td(
+                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy2nd}.png"))
+                )
+              },
+              tour.trophy3rd.map { trophy3rd =>
+                td(
+                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy3rd}.png"))
+                )
+              }
+            ),
+            tr(
+              td("1st Place"),
+              tour.trophy2nd.map { _ => td("2nd Place") },
+              tour.trophy3rd.map { _ => td("3rd Place") }
+            )
+          )
+        },
         !tour.isScheduled && tour.description.isEmpty option frag(
           trans.by(userIdLink(tour.createdBy.some)),
           br

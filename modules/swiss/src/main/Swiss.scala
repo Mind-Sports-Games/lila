@@ -26,7 +26,10 @@ case class Swiss(
     settings: Swiss.Settings,
     nextRoundAt: Option[DateTime],
     finishedAt: Option[DateTime],
-    winnerId: Option[User.ID] = None
+    winnerId: Option[User.ID] = None,
+    trophy1st: Option[String] = None,
+    trophy2nd: Option[String] = None,
+    trophy3rd: Option[String] = None
 ) {
   def id = _id
 
@@ -143,4 +146,7 @@ object Swiss {
       teamId: TeamID,
       chatFor: ChatFor
   )
+
+  def swissUrl(swissId: Swiss.Id): String = s"https://playstrategy.org/swiss/${swissId.value}"
+
 }

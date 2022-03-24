@@ -63,10 +63,8 @@ object BSONHandlers {
 
   implicit val tournamentHandler = new BSON[Tournament] {
     def reads(r: BSON.Reader) = {
-      val lib = GameLogic(r.intD("lib"))
-      val variant = r.intO("variant").fold[Variant](Variant.default(lib))(
-        v => Variant.orDefault(lib, v)
-      )
+      val lib     = GameLogic(r.intD("lib"))
+      val variant = r.intO("variant").fold[Variant](Variant.default(lib))(v => Variant.orDefault(lib, v))
       val position: Option[FEN] =
         r.getO[FEN]("fen").filterNot(_.initial) orElse
           r.strO("eco").flatMap(Thematic.byEco).map(f => FEN.wrap(f.fen)) // for BC
@@ -98,6 +96,9 @@ object BSONHandlers {
         winnerId = r strO "winner",
         featuredId = r strO "featured",
         spotlight = r.getO[Spotlight]("spotlight"),
+        trophy1st = r strO "trophy1st",
+        trophy2nd = r strO "trophy2nd",
+        trophy3rd = r strO "trophy3rd",
         description = r strO "description",
         hasChat = r boolO "chat" getOrElse true
       )
@@ -126,6 +127,9 @@ object BSONHandlers {
         "winner"      -> o.winnerId,
         "featured"    -> o.featuredId,
         "spotlight"   -> o.spotlight,
+        "trophy1st"   -> o.trophy1st,
+        "trophy2nd"   -> o.trophy2nd,
+        "trophy3rd"   -> o.trophy3rd,
         "description" -> o.description,
         "chat"        -> (!o.hasChat).option(false)
       )

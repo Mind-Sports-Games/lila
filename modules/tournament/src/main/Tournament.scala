@@ -37,6 +37,9 @@ case class Tournament(
     featuredId: Option[String] = None,
     spotlight: Option[Spotlight] = None,
     description: Option[String] = None,
+    trophy1st: Option[String] = None,
+    trophy2nd: Option[String] = None,
+    trophy3rd: Option[String] = None,
     hasChat: Boolean = true
 ) {
 
@@ -54,7 +57,9 @@ case class Tournament(
     if (isMarathon || isUnique) name
     else if (isTeamBattle && full) xTeamBattle.txt(name)
     else if (isTeamBattle) name
-    else schedule.fold(if (full) s"$name Arena" else name)(_.name(full))
+    //else schedule.fold(if (full) s"$name Arena" else name)(_.name(full))
+    else if (full) s"$name Arena"
+    else name
   }
 
   def isMarathon =
@@ -69,6 +74,14 @@ case class Tournament(
 
   def isMarathonOrUnique = isMarathon || isUnique
 
+  def isMSO = (schedule.map(_.freq) has Schedule.Freq.MSO21) || (schedule.map(_.freq) has Schedule.Freq.MSOGP)
+
+  def isMSOWarmUp = schedule.map(_.freq) has Schedule.Freq.MSOWarmUp
+
+  def isIntro = schedule.map(_.freq) has Schedule.Freq.Introductory
+
+  def isPlayStrategyHeadline = isMSO || isMSOWarmUp || isIntro
+
   def isScheduled = schedule.isDefined
 
   def isRated = mode == Mode.Rated
@@ -82,7 +95,7 @@ case class Tournament(
   def pairingsClosed = secondsToFinish < math.max(30, math.min(clock.limitSeconds / 2, 120))
 
   def isStillWorthEntering =
-    isMarathonOrUnique || {
+    isPlayStrategyHeadline || isMarathonOrUnique || {
       secondsToFinish > (minutes * 60 / 3).atMost(20 * 60)
     }
 

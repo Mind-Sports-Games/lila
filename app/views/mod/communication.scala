@@ -111,6 +111,7 @@ object communication {
                   case PublicSource.Watcher(id)    => a(href := routes.Round.watcher(id, "p1"))("Game #", id)
                   case PublicSource.Study(id)      => a(href := routes.Study.show(id))("Study #", id)
                   case PublicSource.Swiss(id)      => views.html.swiss.bits.link(lila.swiss.Swiss.Id(id))
+                  case PublicSource.Lobby(id)      => span(id)
                 },
                 " ",
                 highlightBad(line.text)

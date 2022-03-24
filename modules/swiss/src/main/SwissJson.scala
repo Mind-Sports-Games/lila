@@ -184,6 +184,9 @@ object SwissJson {
         "nbRounds"     -> swiss.actualNbRounds,
         "nbPlayers"    -> swiss.nbPlayers,
         "nbOngoing"    -> swiss.nbOngoing,
+        "trophy1st"    -> swiss.trophy1st,
+        "trophy2nd"    -> swiss.trophy2nd,
+        "trophy3rd"    -> swiss.trophy3rd,
         "isMicroMatch" -> swiss.settings.isMicroMatch,
         "status" -> {
           if (swiss.isStarted) "started"
