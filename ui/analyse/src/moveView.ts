@@ -36,15 +36,19 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationSty
   const variant = ctx.variant;
   const ev = cevalView.getBestEval({ client: node.ceval, server: node.eval });
   const nodes = [
-    h('move',
+    h(
+      'move',
       // TODO: the || '' are probably not correct
-      moveFromNotationStyle(style)({
-        san: fixCrazySan(node.san || ''),
-        uci: node.uci || '',
-        fen: node.fen,
-        prevFen: node.parent?.fen || '',
-      }, variant)
-    )
+      moveFromNotationStyle(style)(
+        {
+          san: fixCrazySan(node.san || ''),
+          uci: node.uci || '',
+          fen: node.fen,
+          prevFen: node.parent?.fen || '',
+        },
+        variant
+      )
+    ),
   ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => nodes.push(renderGlyph(g)));
   if (node.shapes) nodes.push(h('shapes'));

@@ -60,10 +60,10 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
     const mainChildren = main.forceVariation
       ? undefined
       : renderChildrenOf(ctx, main, {
-        parentPath: opts.parentPath + main.id,
-        isMainline: true,
-        conceal,
-      });
+          parentPath: opts.parentPath + main.id,
+          isMainline: true,
+          conceal,
+        });
     const passOpts = {
       parentPath: opts.parentPath,
       isMainline: !main.forceVariation,
@@ -143,7 +143,10 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VN
       class: classes,
     },
     moveView.renderMove(
-      { variant: ctx.ctrl.data.game.variant, ...ctx }, node, notationStyle(ctx.ctrl.data.game.variant.key))
+      { variant: ctx.ctrl.data.game.variant, ...ctx },
+      node,
+      notationStyle(ctx.ctrl.data.game.variant.key)
+    )
   );
 }
 
@@ -155,12 +158,15 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
     content: MaybeVNodes = [
       withIndex ? moveView.renderIndex(node.ply, true) : null,
       // TODO: the || '' are probably not correct
-      moveFromNotationStyle(notation)({
-        san: fixCrazySan(node.san || ''),
-        uci: node.uci || '',
-        fen: node.fen,
-        prevFen: ''
-      }, variant),
+      moveFromNotationStyle(notation)(
+        {
+          san: fixCrazySan(node.san || ''),
+          uci: node.uci || '',
+          fen: node.fen,
+          prevFen: '',
+        },
+        variant
+      ),
     ],
     classes = nodeClasses(ctx, node, path);
   if (opts.conceal) classes[opts.conceal as string] = true;
@@ -233,13 +239,13 @@ function renderMainlineCommentsOf(ctx: Ctx, node: Tree.Node, conceal: Conceal, w
   });
 }
 
-const emptyConcealOf: ConcealOf = function() {
-  return function() {
+const emptyConcealOf: ConcealOf = function () {
+  return function () {
     return null;
   };
 };
 
-export default function(ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
+export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
   const root = parentedNode(ctrl.tree.root);
   const ctx: Ctx = {
     ctrl,

@@ -88,18 +88,20 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
   const path = opts.parentPath + node.id,
     comments = renderInlineCommentsOf(ctx, node);
   if (opts.truncate === 0) return [h('move', { attrs: { p: path } }, '[...]')];
-  return ([renderMoveOf(ctx, node, opts)] as MaybeVNodes)
-    .concat(comments)
-    // TODO: I'm not 100% sure about this parentedNodeCall
-    .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
-    .concat(
-      renderChildrenOf(ctx, node, {
-        parentPath: path,
-        isMainline: opts.isMainline,
-        truncate: opts.truncate ? opts.truncate - 1 : undefined,
-        withIndex: !!comments[0],
-      }) || []
-    );
+  return (
+    ([renderMoveOf(ctx, node, opts)] as MaybeVNodes)
+      .concat(comments)
+      // TODO: I'm not 100% sure about this parentedNodeCall
+      .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
+      .concat(
+        renderChildrenOf(ctx, node, {
+          parentPath: path,
+          isMainline: opts.isMainline,
+          truncate: opts.truncate ? opts.truncate - 1 : undefined,
+          withIndex: !!comments[0],
+        }) || []
+      )
+  );
 }
 
 function renderInline(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
@@ -120,12 +122,15 @@ function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
     content: MaybeVNodes = [
       opts.withIndex || node.ply & 1 ? moveView.renderIndex(node.ply, true) : null,
       // TODO: the || '' are probably not correct
-      moveFromNotationStyle(notation)({
-        san: fixCrazySan(node.san || ''),
-        uci: node.uci || '',
-        fen: node.fen,
-        prevFen: node.parent?.fen || ''
-      }, variant),
+      moveFromNotationStyle(notation)(
+        {
+          san: fixCrazySan(node.san || ''),
+          uci: node.uci || '',
+          fen: node.fen,
+          prevFen: node.parent?.fen || '',
+        },
+        variant
+      ),
     ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
   return h(

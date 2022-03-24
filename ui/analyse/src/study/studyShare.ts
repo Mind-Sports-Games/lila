@@ -83,15 +83,15 @@ export function view(ctrl: StudyShareCtrl): VNode {
     h('div.downloads', [
       ctrl.cloneable
         ? h(
-          'a.button.text',
-          {
-            attrs: {
-              'data-icon': '4',
-              href: `/study/${studyId}/clone`,
+            'a.button.text',
+            {
+              attrs: {
+                'data-icon': '4',
+                href: `/study/${studyId}/clone`,
+              },
             },
-          },
-          ctrl.trans.noarg('cloneStudy')
-        )
+            ctrl.trans.noarg('cloneStudy')
+          )
         : null,
       h(
         'a.button.text',
@@ -130,14 +130,14 @@ export function view(ctrl: StudyShareCtrl): VNode {
     h('form.form3', [
       ...(ctrl.relay
         ? [
-          ['broadcastUrl', `${ctrl.relay.tourPath()}`],
-          ['currentRoundUrl', `${ctrl.relay.roundPath()}`],
-          ['currentGameUrl', `${ctrl.relay.roundPath()}/${chapter.id}`],
-        ]
+            ['broadcastUrl', `${ctrl.relay.tourPath()}`],
+            ['currentRoundUrl', `${ctrl.relay.roundPath()}`],
+            ['currentGameUrl', `${ctrl.relay.roundPath()}/${chapter.id}`],
+          ]
         : [
-          ['studyUrl', `/study/${studyId}`],
-          ['currentChapterUrl', addPly(`/study/${studyId}/${chapter.id}`), true],
-        ]
+            ['studyUrl', `/study/${studyId}`],
+            ['currentChapterUrl', addPly(`/study/${studyId}/${chapter.id}`), true],
+          ]
       ).map(([i18n, path, isFull]: [string, string, boolean]) =>
         h('div.form-group', [
           h('label.form-label', ctrl.trans.noarg(i18n)),
@@ -149,17 +149,17 @@ export function view(ctrl: StudyShareCtrl): VNode {
           }),
           ...(isFull
             ? [
-              fromPly(ctrl),
-              !isPrivate
-                ? h(
-                  'p.form-help.text',
-                  {
-                    attrs: { 'data-icon': '' },
-                  },
-                  ctrl.trans.noarg('youCanPasteThisInTheForumToEmbed')
-                )
-                : null,
-            ]
+                fromPly(ctrl),
+                !isPrivate
+                  ? h(
+                      'p.form-help.text',
+                      {
+                        attrs: { 'data-icon': '' },
+                      },
+                      ctrl.trans.noarg('youCanPasteThisInTheForumToEmbed')
+                    )
+                  : null,
+              ]
             : []),
         ])
       ),
@@ -173,28 +173,28 @@ export function view(ctrl: StudyShareCtrl): VNode {
               disabled: isPrivate,
               value: !isPrivate
                 ? `<iframe width=600 height=371 src="${baseUrl()}${addPly(
-                  `/study/embed/${studyId}/${chapter.id}`
-                )}" frameborder=0></iframe>`
+                    `/study/embed/${studyId}/${chapter.id}`
+                  )}" frameborder=0></iframe>`
                 : ctrl.trans.noarg('onlyPublicStudiesCanBeEmbedded'),
             },
           }),
         ].concat(
           !isPrivate
             ? [
-              fromPly(ctrl),
-              h(
-                'a.form-help.text',
-                {
-                  attrs: {
-                    href: '/developers#embed-study',
-                    target: '_blank',
-                    rel: 'noopener',
-                    'data-icon': '',
+                fromPly(ctrl),
+                h(
+                  'a.form-help.text',
+                  {
+                    attrs: {
+                      href: '/developers#embed-study',
+                      target: '_blank',
+                      rel: 'noopener',
+                      'data-icon': '',
+                    },
                   },
-                },
-                ctrl.trans.noarg('readMoreAboutEmbedding')
-              ),
-            ]
+                  ctrl.trans.noarg('readMoreAboutEmbedding')
+                ),
+              ]
             : []
         )
       ),
