@@ -742,7 +742,11 @@ export default class AnalyseCtrl {
   };
 
   showEvalGauge(): boolean {
-    return this.hasAnyComputerAnalysis() && this.showGauge() && !this.outcome() && this.showComputer();
+    return this.cevalVariant() && this.hasAnyComputerAnalysis() && this.showGauge() && !this.outcome() && this.showComputer();
+  }
+
+  cevalVariant(): boolean {
+    return util.allowCevalForVariant(this.data.game.variant.key);
   }
 
   hasAnyComputerAnalysis(): boolean {

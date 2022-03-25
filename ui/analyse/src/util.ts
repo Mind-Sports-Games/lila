@@ -80,7 +80,7 @@ export function onInsert<A extends HTMLElement>(f: (element: A) => void): Hooks 
 }
 
 export function readOnlyProp<A>(value: A): () => A {
-  return function (): A {
+  return function(): A {
     return value;
   };
 }
@@ -235,4 +235,18 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
     score += pieceScores(variant, p.role, p.promoted) * (p.playerIndex === playerIndex ? 1 : 0);
   }
   return score;
+}
+
+const noCevalVariants = [
+  'linesOfAction',
+  'scrambledEggs',
+  'shogi',
+  'xiangqi',
+  'minishogi',
+  'minixiangqi',
+  'flipello',
+]
+
+export function allowCevalForVariant(variant: VariantKey) {
+  return noCevalVariants.indexOf(variant) == -1;
 }
