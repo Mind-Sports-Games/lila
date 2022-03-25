@@ -27,7 +27,7 @@ object userAnalysis {
       title = trans.analysis.txt(),
       moreCss = frag(
         cssTag("analyse.free"),
-        pov.game.variant == Variant.Chess(strategygames.chess.variant.Crazyhouse) option cssTag("analyse.zh"),
+        (pov.game.variant.dropsVariant && !pov.game.variant.onlyDropsVariant) option cssTag("analyse.zh"),
         withForecast option cssTag("analyse.forecast"),
         ctx.blind option cssTag("round.nvui")
       ),
