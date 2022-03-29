@@ -84,15 +84,15 @@ private[analyse] object CpAdvice {
 sealed abstract private[analyse] class MateSequence(val desc: String)
 private[analyse] case object MateCreated
     extends MateSequence(
-      desc = "Checkmate is now unavoidable"
+      desc = "Your opponent can now force a win"
     )
 private[analyse] case object MateDelayed
     extends MateSequence(
-      desc = "Not the best checkmate sequence"
+      desc = "Not the best forced winning sequence"
     )
 private[analyse] case object MateLost
     extends MateSequence(
-      desc = "Lost forced checkmate sequence"
+      desc = "Lost forced winning sequence"
     )
 
 private[analyse] object MateSequence {
