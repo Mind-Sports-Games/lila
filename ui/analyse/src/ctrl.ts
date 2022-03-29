@@ -296,10 +296,12 @@ export default class AnalyseCtrl {
         : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length)
         ? playerIndex
         : undefined,
+
+      isChessOpsEnabled = util.isChessOpsEnabled(this.data.game.variant.key),
       config: ChessgroundConfig = {
         fen: node.fen,
         turnPlayerIndex: playerIndex,
-        movable: this.embed
+        movable: (this.embed || !isChessOpsEnabled)
           ? {
               playerIndex: undefined,
               dests: new Map(),
@@ -318,7 +320,7 @@ export default class AnalyseCtrl {
       config.movable!.playerIndex = playerIndex;
     }
     config.premovable = {
-      enabled: config.movable!.playerIndex && config.turnPlayerIndex !== config.movable!.playerIndex,
+      enabled: false,
     };
     this.cgConfig = config;
     return config;
@@ -530,6 +532,7 @@ export default class AnalyseCtrl {
   }
 
   addDests(dests: string, path: Tree.Path): void {
+    if (!util.isChessOpsEnabled(this.data.game.variant.key)) return;
     this.tree.addDests(dests, path);
     if (path === this.path) {
       this.showGround();

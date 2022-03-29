@@ -66,7 +66,7 @@ export function readFen(fen: string, ranks: number, files: number) {
   return board;
 }
 
-export function parseUci(uci: string, files: number, ranks: number): ParsedMove {
+function parseUciToUsi(uci: string, files: number, ranks: number): ParsedMove {
   //account for ranks going up to 10, files are just a letter
   const reg = uci.match(/[a-zA-Z][1-9@]0?/g) as string[];
   return {
@@ -84,7 +84,7 @@ export function parseUCISquareToUSI(str: string, files: number, ranks: number): 
 }
 
 function shogiNotation(move: ExtendedMoveInfo, variant: Variant): string {
-  const parsed = parseUci(move.uci, variant.boardSize.width, variant.boardSize.height),
+  const parsed = parseUciToUsi(move.uci, variant.boardSize.width, variant.boardSize.height),
     board = readFen(move.fen, variant.boardSize.height, variant.boardSize.width),
     prevBoard = readFen(move.prevFen!, variant.boardSize.height, variant.boardSize.width),
     prevrole = prevBoard.pieces[parsed.orig],

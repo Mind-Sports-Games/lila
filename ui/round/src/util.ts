@@ -50,6 +50,7 @@ export const justIcon = (icon: string): VNodeData => ({
   attrs: { 'data-icon': icon },
 });
 
+// TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
   if (!uci) return undefined;
   const pos = uci.match(/[a-z][1-9]0?/g) as cg.Key[];

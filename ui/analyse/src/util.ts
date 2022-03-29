@@ -250,3 +250,41 @@ const noCevalVariants = [
 export function allowCevalForVariant(variant: VariantKey) {
   return noCevalVariants.indexOf(variant) == -1;
 }
+
+// TODO: Right now chessops can't parse the fens for the above variants.
+export const isChessOpsEnabled = allowCevalForVariant;
+
+export type LexicalUci = {
+  from: cg.Key,
+  to: cg.Key,
+  dropRole?: cg.Role,
+  promotion?: cg.Role,
+}
+
+export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
+  if (!uci) return undefined;
+  const pos = uci.match(/[a-z][1-9]0?/g) as cg.Key[];
+
+  if (uci[1] === '@') {
+    return {
+      from: pos[0],
+      to: pos[0],
+      dropRole: `${uci[0].toLowerCase()}-piece` as cg.Role
+    };
+  }
+
+  // e7e8Q
+  let promotion: cg.Role | undefined = undefined; 
+
+  const uciToFrom = `${pos[0]}${pos[1]}`;
+  if (uci.startsWith(uciToFrom) && uci.length == uciToFrom.length +1) {
+    promotion = `${uci[uci.length-1]}-piece` as cg.Role;
+  }
+
+  return {
+    from: pos[0],
+    to: pos[1],
+    promotion
+  };
+};
+

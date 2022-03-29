@@ -1,10 +1,9 @@
-import { parseUci, makeSquare, squareRank } from 'chessops/util';
-import { isDrop } from 'chessops/types';
 import { winningChances } from 'ceval';
 import * as cg from 'chessground/types';
 import { opposite } from 'chessground/util';
 import { DrawModifiers, DrawShape } from 'chessground/draw';
 import AnalyseCtrl from './ctrl';
+import { parseLexicalUci } from './util';
 
 function pieceDrop(key: cg.Key, role: cg.Role, playerIndex: PlayerIndex): DrawShape {
   return {
@@ -24,13 +23,17 @@ export function makeShapesFromUci(
   brush: string,
   modifiers?: DrawModifiers
 ): DrawShape[] {
-  const move = parseUci(uci)!;
-  const to = makeSquare(move.to);
-  if (isDrop(move)) return [{ orig: to, brush }, pieceDrop(to, move.role, playerIndex)];
+  // TODO: add this in chessops
+  const move = parseLexicalUci(uci);
+  if (move === undefined) return [];
+
+  const to = move.to;
+  const dropRole = move.dropRole;
+  if (dropRole !== undefined) return [{ orig: to, brush }, pieceDrop(to, dropRole, playerIndex)];
 
   const shapes: DrawShape[] = [
     {
-      orig: makeSquare(move.from),
+      orig: move.from,
       dest: to,
       brush,
       modifiers,
@@ -79,7 +82,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
       if (!nextBest && instance.enabled() && nCeval) nextBest = nCeval.pvs[0].moves[0];
       if (nextBest) shapes = shapes.concat(makeShapesFromUci(playerIndex, nextBest, 'paleBlue'));
       if (instance.enabled() && nCeval && nCeval.pvs[1] && !(ctrl.threatMode() && nThreat && nThreat.pvs.length > 2)) {
-        nCeval.pvs.forEach(function (pv) {
+        nCeval.pvs.forEach(function(pv) {
           if (pv.moves[0] === nextBest) return;
           const shift = winningChances.povDiff(playerIndex, nCeval.pvs[0], pv);
           if (shift >= 0 && shift < 0.2) {
@@ -98,7 +101,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
 
     shapes = shapes.concat(makeShapesFromUci(rPlayerIndex, pv0.moves[0], pv1s.length > 0 ? 'paleRed' : 'red'));
 
-    pv1s.forEach(function (pv) {
+    pv1s.forEach(function(pv) {
       const shift = winningChances.povDiff(rPlayerIndex, pv, pv0);
       if (shift >= 0 && shift < 0.2) {
         shapes = shapes.concat(
@@ -115,16 +118,16 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
       const glyph = glyphs[0];
       const svg = (glyphToSvg as Dictionary<string>)[glyph.symbol];
       if (svg) {
-        const move = parseUci(uci)!;
+        const move = parseLexicalUci(uci)!;
         const destSquare = san.startsWith('O-O') // castle, short or long
-          ? squareRank(move.to) === 0 // p1 castle
+          ? move.to[1] === '1' // p1 castle
             ? san === 'O-O-O'
               ? 'c1'
               : 'g1'
             : san === 'O-O-O'
-            ? 'c8'
-            : 'g8'
-          : makeSquare(move.to);
+              ? 'c8'
+              : 'g8'
+          : move.to;
         shapes = shapes.concat({
           orig: destSquare,
           customSvg: svg,
