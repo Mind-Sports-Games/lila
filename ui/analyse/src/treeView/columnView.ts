@@ -60,10 +60,10 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
     const mainChildren = main.forceVariation
       ? undefined
       : renderChildrenOf(ctx, main, {
-          parentPath: opts.parentPath + main.id,
-          isMainline: true,
-          conceal,
-        });
+        parentPath: opts.parentPath + main.id,
+        isMainline: true,
+        conceal,
+      });
     const passOpts = {
       parentPath: opts.parentPath,
       isMainline: !main.forceVariation,
@@ -150,7 +150,7 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VN
   );
 }
 
-function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
+function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const variant = ctx.ctrl.data.game.variant;
   const notation = notationStyle(variant.key);
   const withIndex = opts.withIndex || node.ply % 2 === 1,
@@ -163,7 +163,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
           san: fixCrazySan(node.san || ''),
           uci: node.uci || '',
           fen: node.fen,
-          prevFen: '',
+          prevFen: node.parent?.fen,
         },
         variant
       ),
@@ -239,13 +239,13 @@ function renderMainlineCommentsOf(ctx: Ctx, node: Tree.Node, conceal: Conceal, w
   });
 }
 
-const emptyConcealOf: ConcealOf = function () {
-  return function () {
+const emptyConcealOf: ConcealOf = function() {
+  return function() {
     return null;
   };
 };
 
-export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
+export default function(ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
   const root = parentedNode(ctrl.tree.root);
   const ctx: Ctx = {
     ctrl,
