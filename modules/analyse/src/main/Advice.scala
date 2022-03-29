@@ -25,7 +25,8 @@ sealed trait Advice {
       }) + "." + {
         withBestMove ?? {
           info.variation.headOption ?? { move =>
-            s" $move was best."
+            // TODO: put this back in when we have proper move notation in scala: s" $move was best."
+            s" The following was best."
           }
         }
       }
