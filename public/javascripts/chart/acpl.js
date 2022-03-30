@@ -14,7 +14,8 @@ playstrategy.advantageChart = function (data, trans, el) {
 
         var fillColor = Highcharts.theme.playstrategy.area.white;
         var negativeFillColor = Highcharts.theme.playstrategy.area.black;
-        if (data.game.variant.key === 'flipello') {
+        var oppositeColorVariants = ['flipello', 'shogi', 'minishogi'];
+        if (oppositeColorVariants.find(function(k) { return k == data.game.variant.key; })) {
           fillColor = Highcharts.theme.playstrategy.area.black;
           negativeFillColor = Highcharts.theme.playstrategy.area.white;
         }
