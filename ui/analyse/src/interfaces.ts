@@ -55,6 +55,7 @@ export interface AnalyseData {
 
 export interface AnalysePref {
   coords: Prefs.Coords;
+  pieceSet: Piece[];
   is3d?: boolean;
   showDests?: boolean;
   rookCastle?: boolean;
@@ -62,6 +63,11 @@ export interface AnalysePref {
   highlight?: boolean;
   animationDuration?: number;
 }
+
+type Piece = {
+  name: string;
+  gameFamily: string;
+};
 
 export interface ServerEvalData {
   ch: string;
