@@ -21,6 +21,13 @@ playstrategy.movetimeChart = function (data, trans) {
 
             var logC = Math.pow(Math.log(3), 2);
 
+            var fillColor = Highcharts.theme.playstrategy.area.white;
+            var negativeFillColor = Highcharts.theme.playstrategy.area.black;
+            if (data.game.variant.key === 'flipello') {
+              fillColor = Highcharts.theme.playstrategy.area.black;
+              negativeFillColor = Highcharts.theme.playstrategy.area.white;
+            }
+
             var blurs = [toBlurArray(data.player), toBlurArray(data.opponent)];
             if (data.player.color === 'white') blurs.reverse();
 
@@ -28,6 +35,7 @@ playstrategy.movetimeChart = function (data, trans) {
               var node = tree[i + 1];
               ply = node ? node.ply : ply + 1;
               var san = node ? node.san : '-';
+              if (san === "NOSAN") san = node.uci;
 
               var turn = (ply + 1) >> 1;
               var color = ply & 1;
@@ -91,8 +99,8 @@ playstrategy.movetimeChart = function (data, trans) {
                   animation: false,
                 },
                 area: {
-                  fillColor: Highcharts.theme.playstrategy.area.white,
-                  negativeFillColor: Highcharts.theme.playstrategy.area.black,
+                  fillColor: fillColor,
+                  negativeFillColor: negativeFillColor,
                   fillOpacity: 1,
                   threshold: 0,
                   lineWidth: 1,
