@@ -248,7 +248,7 @@ function promotionSymbol(prevBoard: Board, board: Board, parsed: ParsedMove): st
 }
 
 function xiangqiNotation(move: ExtendedMoveInfo, variant: Variant): string {
-  const parsed = parseUci(move.uci, variant.boardSize.width, variant.boardSize.height),
+  const parsed = parseUciToUsi(move.uci, variant.boardSize.width, variant.boardSize.height),
     board = readFen(move.fen, variant.boardSize.height, variant.boardSize.width),
     role = board.pieces[parsed.dest],
     piece = xiangqiRoleToPiece(role),
