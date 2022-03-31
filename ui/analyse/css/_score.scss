@@ -1,0 +1,55 @@
+@import 'variables';
+
+$pocket-col1-height: auto;
+$pocket-height: 7em;
+
+.variant-flipello .game-score {
+  @extend %box-radius;
+  display: block;
+  width: 7em;
+  height: 7em;
+  background-color: #aaa;
+
+  piece {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    position: relative;
+
+    &::after {
+      @extend %active, %box-radius;
+
+      content: attr(data-score);
+      top: 0;
+      right: 0;
+      position: absolute;
+      line-height: 0.9em;
+      padding: 3px 0.3em;
+      font-weight: bold;
+      font-size: 1.5em;
+    }
+  }
+
+  &-top {
+    grid-area: pocket-top;
+  }
+
+  &-bottom {
+    grid-area: pocket-bot;
+  }
+}
+
+.analyse.variant-flipello {
+  grid-template-rows: $pocket-col1-height auto $pocket-col1-height auto 50vh;
+  grid-template-areas: 'pocket-top' 'board' 'pocket-bot' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $pocket-height auto $pocket-height;
+    grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+  }
+}

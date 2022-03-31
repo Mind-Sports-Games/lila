@@ -15,6 +15,14 @@ on:
       - 'ui/**'
       - 'package.json'
       - 'yarn.lock'
+      #add back end options to ensure full build gets triggered
+      - 'app/**'
+      - 'conf/**'
+      - 'modules/**'
+      - 'project/**'
+      - 'translation/source/**'
+      - 'build.sbt'
+      - 'lila'
 
 jobs:
   assets:

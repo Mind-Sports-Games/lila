@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import strategygames.format.{ FEN, Forsyth }
+import strategygames.format.{ FEN, Forsyth, Uci}
 import strategygames.{ GameLogic, Replay }
 import JsonApi.Request.Evaluation
 
@@ -14,11 +14,11 @@ final private class FishnetEvalCache(
   def skipPositions(game: Work.Game): Fu[List[Int]] =
     rawEvals(game).dmap(_.map(_._1))
 
-  def evals(work: Work.Analysis): Fu[Map[Int, Evaluation]] =
+  def evals(work: Work.Analysis): Fu[Map[Int, Evaluation[Uci]]] =
     rawEvals(work.game) map {
       _.map { case (i, eval) =>
         val pv = eval.pvs.head
-        i -> Evaluation(
+        i -> Evaluation[Uci](
           pv = pv.moves.value.toList,
           score = Evaluation
             .Score(
@@ -39,7 +39,7 @@ final private class FishnetEvalCache(
       .situationsFromUci(
         game.variant.gameLogic,
         game.uciList.take(maxPlies - 1),
-        game.initialFen.map(fen => FEN(game.variant.gameLogic, fen)),
+        game.initialFen,
         game.variant
       )
       .fold(

@@ -1,6 +1,7 @@
 import { h, VNode } from 'snabbdom';
 import { isEmpty } from 'common';
 import { fixCrazySan, notationStyle } from 'chess';
+import { moveFromNotationStyle } from 'common/notation';
 import { path as treePath, ops as treeOps } from 'tree';
 import * as moveView from '../moveView';
 import { authorText as commentAuthorText } from '../study/studyComments';
@@ -17,7 +18,7 @@ import {
   Ctx as BaseCtx,
   Opts as BaseOpts,
 } from './treeView';
-import { enrichText, innerHTML } from '../util';
+import { enrichText, innerHTML, parentedNodes, parentedNode } from '../util';
 
 interface Ctx extends BaseCtx {
   concealOf: ConcealOf;
@@ -39,8 +40,8 @@ function emptyMove(conceal?: Conceal): VNode {
   );
 }
 
-function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes | undefined {
-  const cs = node.children,
+function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes | undefined {
+  const cs = parentedNodes(node.children, node),
     main = cs[0];
   if (!main) return;
   const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + main.id, main);
@@ -90,7 +91,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes | 
   return renderInlined(ctx, cs, opts) || [renderLines(ctx, cs, opts)];
 }
 
-function renderInlined(ctx: Ctx, nodes: Tree.Node[], opts: Opts): MaybeVNodes | undefined {
+function renderInlined(ctx: Ctx, nodes: Tree.ParentedNode[], opts: Opts): MaybeVNodes | undefined {
   // only 2 branches
   if (!nodes[1] || nodes[2]) return;
   // only if second branch has no sub-branches
@@ -103,7 +104,7 @@ function renderInlined(ctx: Ctx, nodes: Tree.Node[], opts: Opts): MaybeVNodes | 
   });
 }
 
-function renderLines(ctx: Ctx, nodes: Tree.Node[], opts: Opts): VNode {
+function renderLines(ctx: Ctx, nodes: Tree.ParentedNode[], opts: Opts): VNode {
   return h(
     'lines',
     {
@@ -127,11 +128,11 @@ function renderLines(ctx: Ctx, nodes: Tree.Node[], opts: Opts): VNode {
   );
 }
 
-function renderMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
+function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   return opts.isMainline ? renderMainlineMoveOf(ctx, node, opts) : renderVariationMoveOf(ctx, node, opts);
 }
 
-function renderMainlineMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
+function renderMainlineMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const path = opts.parentPath + node.id,
     classes = nodeClasses(ctx, node, path);
   if (opts.conceal) classes[opts.conceal as string] = true;
@@ -141,14 +142,32 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
       attrs: { p: path },
       class: classes,
     },
-    moveView.renderMove(ctx, node, notationStyle(ctx.ctrl.data.game.variant.key))
+    moveView.renderMove(
+      { variant: ctx.ctrl.data.game.variant, ...ctx },
+      node,
+      notationStyle(ctx.ctrl.data.game.variant.key)
+    )
   );
 }
 
-function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
+function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
+  const variant = ctx.ctrl.data.game.variant;
+  const notation = notationStyle(variant.key);
   const withIndex = opts.withIndex || node.ply % 2 === 1,
     path = opts.parentPath + node.id,
-    content: MaybeVNodes = [withIndex ? moveView.renderIndex(node.ply, true) : null, fixCrazySan(node.san!)],
+    content: MaybeVNodes = [
+      withIndex ? moveView.renderIndex(node.ply, true) : null,
+      // TODO: the || '' are probably not correct
+      moveFromNotationStyle(notation)(
+        {
+          san: fixCrazySan(node.san || ''),
+          uci: node.uci || '',
+          fen: node.fen,
+          prevFen: node.parent?.fen,
+        },
+        variant
+      ),
+    ],
     classes = nodeClasses(ctx, node, path);
   if (opts.conceal) classes[opts.conceal as string] = true;
   if (node.glyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
@@ -162,7 +181,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
   );
 }
 
-function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVNodes {
+function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes {
   const path = opts.parentPath + node.id;
   if (opts.truncate === 0)
     return [
@@ -176,7 +195,7 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVN
     ];
   return ([renderMoveOf(ctx, node, opts)] as MaybeVNodes)
     .concat(renderInlineCommentsOf(ctx, node))
-    .concat(opts.inline ? renderInline(ctx, opts.inline, opts) : null)
+    .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
     .concat(
       renderChildrenOf(ctx, node, {
         parentPath: path,
@@ -187,7 +206,7 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.Node, opts: Opts): MaybeVN
     );
 }
 
-function renderInline(ctx: Ctx, node: Tree.Node, opts: Opts): VNode {
+function renderInline(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   return h(
     'inline',
     renderMoveAndChildrenOf(ctx, node, {
@@ -227,7 +246,7 @@ const emptyConcealOf: ConcealOf = function () {
 };
 
 export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
-  const root = ctrl.tree.root;
+  const root = parentedNode(ctrl.tree.root);
   const ctx: Ctx = {
     ctrl,
     truncateComments: !ctrl.embed,

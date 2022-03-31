@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { bind, baseUrl } from '../util';
+import { bind, baseUrl, parentedNode } from '../util';
 import { prop, Prop } from 'common';
 import { renderIndexAndMove } from '../moveView';
 import { notationStyle } from 'chess';
@@ -16,17 +16,18 @@ export interface StudyShareCtrl {
   cloneable: boolean;
   redraw: () => void;
   trans: Trans;
-  variantKey: VariantKey;
+  variant: Variant;
 }
 
 function fromPly(ctrl: StudyShareCtrl): VNode {
   const renderedMove = renderIndexAndMove(
     {
+      variant: ctrl.variant,
       withDots: true,
       showEval: false,
     },
-    ctrl.currentNode(),
-    notationStyle(ctrl.variantKey)
+    parentedNode(ctrl.currentNode()),
+    notationStyle(ctrl.variant.key)
   );
   return h(
     'div.ply-wrap',
@@ -69,7 +70,7 @@ export function ctrl(
     cloneable: data.features.cloneable,
     redraw,
     trans,
-    variantKey: data.chapter.setup.variant.key,
+    variant: data.chapter.setup.variant,
   };
 }
 

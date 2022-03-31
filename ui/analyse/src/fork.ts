@@ -3,7 +3,7 @@ import { renderIndexAndMove } from './moveView';
 import { notationStyle } from 'chess';
 import { defined } from 'common';
 import { ConcealOf } from './interfaces';
-import { onInsert } from './util';
+import { onInsert, parentedNode } from './util';
 import AnalyseCtrl from './ctrl';
 
 export interface ForkCtrl {
@@ -91,11 +91,12 @@ export function view(root: AnalyseCtrl, concealOf?: ConcealOf) {
           },
           renderIndexAndMove(
             {
+              variant: root.data.game.variant,
               withDots: true,
               showEval: root.showComputer(),
               showGlyphs: root.showComputer(),
             },
-            node,
+            parentedNode(node, state.node),
             notationStyle(root.data.game.variant.key)
           )!
         );

@@ -12,15 +12,30 @@ playstrategy.advantageChart = function (data, trans, el) {
         var blurs = [toBlurArray(data.player), toBlurArray(data.opponent)];
         if (data.player.color === 'white') blurs.reverse();
 
+        var fillColor = Highcharts.theme.playstrategy.area.white;
+        var negativeFillColor = Highcharts.theme.playstrategy.area.black;
+        var oppositeColorVariants = ['flipello', 'shogi', 'minishogi'];
+        if (
+          oppositeColorVariants.find(function (k) {
+            return k == data.game.variant.key;
+          })
+        ) {
+          fillColor = Highcharts.theme.playstrategy.area.black;
+          negativeFillColor = Highcharts.theme.playstrategy.area.white;
+        }
+
         var makeSerieData = function (d) {
           var partial = !d.analysis || d.analysis.partial;
           return d.treeParts.slice(1).map(function (node) {
             var color = node.ply & 1,
               cp;
 
+            var san = node.san;
+            if (san === 'NOSAN') san = node.uci;
+
             if (node.eval && node.eval.mate) {
               cp = node.eval.mate > 0 ? Infinity : -Infinity;
-            } else if (node.san.includes('#')) {
+            } else if (san.includes('#')) {
               cp = color === 1 ? Infinity : -Infinity;
               if (d.game.variant.key === 'antichess') cp = -cp;
             } else if (node.eval && typeof node.eval.cp !== 'undefined') {
@@ -33,7 +48,7 @@ playstrategy.advantageChart = function (data, trans, el) {
             var turn = Math.floor((node.ply - 1) / 2) + 1;
             var dots = color === 1 ? '.' : '...';
             var point = {
-              name: turn + dots + ' ' + node.san,
+              name: turn + dots + ' ' + san,
               y: 2 / (1 + Math.exp(-0.004 * cp)) - 1,
             };
             if (!partial && blurs[color].shift() === '1') {
@@ -76,8 +91,8 @@ playstrategy.advantageChart = function (data, trans, el) {
               animation: false,
             },
             area: {
-              fillColor: Highcharts.theme.playstrategy.area.white,
-              negativeFillColor: Highcharts.theme.playstrategy.area.black,
+              fillColor: fillColor,
+              negativeFillColor: negativeFillColor,
               threshold: 0,
               lineWidth: 1,
               color: '#d85000',
