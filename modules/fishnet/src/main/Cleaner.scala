@@ -50,3 +50,8 @@ final private class Cleaner(
     cleanAnalysis.unit
   }
 }
+
+
+object Cleaner {
+  val timeoutPerPly = 7.seconds
+}

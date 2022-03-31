@@ -81,6 +81,24 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       enabled: !ctrl.embed,
       eraseOnClick: !ctrl.opts.study || !!ctrl.opts.practice,
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
+      pieces: {
+        baseUrl:
+          variantKey === 'shogi' || variantKey === 'minishogi'
+            ? 'https://playstrategy.org/assets/piece/shogi/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
+              '/'
+            : variantKey === 'flipello'
+            ? 'https://playstrategy.org/assets/piece/flipello/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
+              '/'
+            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
+            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+              '/'
+            : 'https://playstrategy.org/assets/piece/chess/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+              '/',
+      },
     },
     highlight: {
       lastMove: pref.highlight,

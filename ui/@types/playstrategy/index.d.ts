@@ -502,6 +502,11 @@ declare namespace Tree {
     crazy?: NodeCrazy;
   }
 
+  export interface ParentedNode extends Node {
+    parent?: Tree.Node;
+    tag: 'parented';
+  }
+
   export interface NodeCrazy {
     pockets: [CrazyPocket, CrazyPocket];
   }

@@ -1,10 +1,9 @@
-import { parseUci, makeSquare, squareRank } from 'chessops/util';
-import { isDrop } from 'chessops/types';
 import { winningChances } from 'ceval';
 import * as cg from 'chessground/types';
 import { opposite } from 'chessground/util';
 import { DrawModifiers, DrawShape } from 'chessground/draw';
 import AnalyseCtrl from './ctrl';
+import { parseLexicalUci } from './util';
 
 function pieceDrop(key: cg.Key, role: cg.Role, playerIndex: PlayerIndex): DrawShape {
   return {
@@ -24,13 +23,17 @@ export function makeShapesFromUci(
   brush: string,
   modifiers?: DrawModifiers
 ): DrawShape[] {
-  const move = parseUci(uci)!;
-  const to = makeSquare(move.to);
-  if (isDrop(move)) return [{ orig: to, brush }, pieceDrop(to, move.role, playerIndex)];
+  // TODO: add this in chessops
+  const move = parseLexicalUci(uci);
+  if (move === undefined) return [];
+
+  const to = move.to;
+  const dropRole = move.dropRole;
+  if (dropRole !== undefined) return [{ orig: to, brush }, pieceDrop(to, dropRole, playerIndex)];
 
   const shapes: DrawShape[] = [
     {
-      orig: makeSquare(move.from),
+      orig: move.from,
       dest: to,
       brush,
       modifiers,
@@ -115,16 +118,16 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
       const glyph = glyphs[0];
       const svg = (glyphToSvg as Dictionary<string>)[glyph.symbol];
       if (svg) {
-        const move = parseUci(uci)!;
+        const move = parseLexicalUci(uci)!;
         const destSquare = san.startsWith('O-O') // castle, short or long
-          ? squareRank(move.to) === 0 // p1 castle
+          ? move.to[1] === '1' // p1 castle
             ? san === 'O-O-O'
               ? 'c1'
               : 'g1'
             : san === 'O-O-O'
             ? 'c8'
             : 'g8'
-          : makeSquare(move.to);
+          : move.to;
         shapes = shapes.concat({
           orig: destSquare,
           customSvg: svg,

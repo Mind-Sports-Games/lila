@@ -178,10 +178,7 @@ export interface StudyChapterRelay {
 
 interface StudyChapterSetup {
   gameId?: string;
-  variant: {
-    key: VariantKey;
-    name: string;
-  };
+  variant: Variant;
   orientation: PlayerIndex;
   fromFen?: string;
 }

@@ -1,5 +1,6 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
 import { fixCrazySan } from 'chess';
+import * as cg from 'chessground/types';
 
 export { autolink, innerHTML, enrichText, richHTML, toYouTubeEmbed, toTwitchEmbed } from 'common/richText';
 
@@ -157,3 +158,124 @@ export function treeReconstruct(parts: Tree.Node[]): Tree.Node {
   node.children = node.children || [];
   return root;
 }
+
+export interface NodeWithParentIntermediate {
+  nodes: Tree.ParentedNode[];
+  prev?: Tree.Node;
+}
+
+export function parentedNodesFromOrdering(nodes: Tree.Node[]): Tree.ParentedNode[] {
+  let withParent: Tree.ParentedNode[] = [];
+  if (nodes.length > 0) {
+    const initial: NodeWithParentIntermediate = { nodes: [], prev: undefined };
+    withParent = nodes.reduce(({ nodes, prev }, node) => {
+      return {
+        nodes: nodes.concat([{ parent: prev, ...node, tag: 'parented' }]),
+        prev: node,
+      };
+    }, initial).nodes;
+  }
+  return withParent;
+}
+
+export function parentedNode(node: Tree.Node, parent?: Tree.Node): Tree.ParentedNode {
+  return { tag: 'parented', parent, ...node };
+}
+
+export function parentedNodes(nodes: Tree.Node[], parent?: Tree.Node): Tree.ParentedNode[] {
+  return nodes.map(n => parentedNode(n, parent));
+}
+
+function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
+  switch (variant) {
+    case 'xiangqi':
+      switch (piece) {
+        case 'p-piece':
+          return isPromoted ? 2 : 1;
+        case 'a-piece':
+          return 2;
+        case 'b-piece':
+          return 2;
+        case 'n-piece':
+          return 4;
+        case 'c-piece':
+          return 4.5;
+        case 'r-piece':
+          return 9;
+        case 'k-piece':
+          return 0;
+        default:
+          return 0;
+      }
+    default:
+      switch (piece) {
+        case 'p-piece':
+          return 1;
+        case 'n-piece':
+          return 3;
+        case 'b-piece':
+          return 3;
+        case 'r-piece':
+          return 5;
+        case 'q-piece':
+          return 9;
+        case 'k-piece':
+          return 0;
+        case 'l-piece':
+          return 0;
+        default:
+          return 0;
+      }
+  }
+}
+
+export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerIndex: string): number {
+  let score = 0;
+  for (const p of pieces.values()) {
+    score += pieceScores(variant, p.role, p.promoted) * (p.playerIndex === playerIndex ? 1 : 0);
+  }
+  return score;
+}
+
+const noCevalVariants = ['linesOfAction', 'scrambledEggs', 'shogi', 'xiangqi', 'minishogi', 'minixiangqi', 'flipello'];
+
+export function allowCevalForVariant(variant: VariantKey) {
+  return noCevalVariants.indexOf(variant) == -1;
+}
+
+// TODO: Right now chessops can't parse the fens for the above variants.
+export const isChessOpsEnabled = allowCevalForVariant;
+
+export type LexicalUci = {
+  from: cg.Key;
+  to: cg.Key;
+  dropRole?: cg.Role;
+  promotion?: cg.Role;
+};
+
+export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
+  if (!uci) return undefined;
+  const pos = uci.match(/[a-z][1-9]0?/g) as cg.Key[];
+
+  if (uci[1] === '@') {
+    return {
+      from: pos[0],
+      to: pos[0],
+      dropRole: `${uci[0].toLowerCase()}-piece` as cg.Role,
+    };
+  }
+
+  // e7e8Q
+  let promotion: cg.Role | undefined = undefined;
+
+  const uciToFrom = `${pos[0]}${pos[1]}`;
+  if (uci.startsWith(uciToFrom) && uci.length == uciToFrom.length + 1) {
+    promotion = `${uci[uci.length - 1]}-piece` as cg.Role;
+  }
+
+  return {
+    from: pos[0],
+    to: pos[1],
+    promotion,
+  };
+};

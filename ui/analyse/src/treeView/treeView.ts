@@ -153,7 +153,7 @@ export function mainHook(ctrl: AnalyseCtrl): Hooks {
   };
 }
 
-export function retroLine(ctx: Ctx, node: Tree.Node): VNode | undefined {
+export function retroLine(ctx: Ctx, node: Tree.ParentedNode): VNode | undefined {
   return node.comp && ctx.ctrl.retro && ctx.ctrl.retro.hideComputerLine(node)
     ? h('line', ctx.ctrl.trans.noarg('learnFromThisMistake'))
     : undefined;
