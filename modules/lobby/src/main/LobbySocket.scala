@@ -5,13 +5,16 @@ import play.api.libs.json._
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 
+import lila.chat.{ BusChan, Chat }
 import lila.game.Pov
 import lila.hub.actorApi.timeline._
 import lila.hub.Trouper
+import lila.hub.actorApi.shutup.PublicSource
 import lila.i18n.defaultLang
 import lila.pool.{ PoolApi, PoolConfig }
 import lila.rating.RatingRange
 import lila.socket.RemoteSocket.{ Protocol => P, _ }
+import lila.room.RoomSocket.{ Protocol => RP, _ }
 import lila.socket.Socket.{ makeMessage, Sri, Sris }
 import lila.user.User
 import lila.round.ChangeFeatured
@@ -25,8 +28,12 @@ final class LobbySocket(
     lobby: LobbyTrouper,
     relationApi: lila.relation.RelationApi,
     poolApi: PoolApi,
-    system: akka.actor.ActorSystem
-)(implicit ec: scala.concurrent.ExecutionContext) {
+    system: akka.actor.ActorSystem,
+    chat: lila.chat.ChatApi
+)(implicit 
+    ec: scala.concurrent.ExecutionContext,
+    mode: play.api.Mode
+) {
 
   import LobbySocket._
   import Protocol._
@@ -111,6 +118,8 @@ final class LobbySocket(
           P.Out.tellSri(member.sri, makeMessage("hooks", JsArray(hooks.map(_.render(defaultLang)))))
         )
         hookSubscriberSris += member.sri.value
+      
+      case m => sys.error(m.toString)
     }
 
     lila.common.Bus.subscribe(this, "changeFeaturedGame", "streams", "poolPairings", "lobbySocket")
@@ -237,7 +246,7 @@ final class LobbySocket(
       }
     }
 
-  private val handler: Handler = {
+  private val lobbyHandler: Handler = {
 
     case P.In.ConnectSris(cons) =>
       cons foreach { case (sri, userId) =>
@@ -262,14 +271,32 @@ final class LobbySocket(
       logger.warn("Remote socket boot")
       lobby ! LeaveAll
       trouper ! LeaveAll
+    
   }
+
+  lazy val rooms = makeRoomMap(send)
+  subscribeChat(rooms, _.Lobby)
+
+  private lazy val chatHandler: Handler =
+    roomHandler(
+      rooms,
+      chat,
+      logger,
+      roomId => _.Lobby("lobbyhome").some,
+      localTimeout = None,
+      chatBusChan = _.Lobby
+    )
 
   private val messagesHandled: Set[String] =
     Set("join", "cancel", "joinSeek", "cancelSeek", "idle", "poolIn", "poolOut", "hookIn", "hookOut")
 
-  remoteSocketApi.subscribe("lobby-in", In.reader)(handler orElse remoteSocketApi.baseHandler)
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("lobby-out").apply _
 
-  private val send: String => Unit = remoteSocketApi.makeSender("lobby-out").apply _
+  remoteSocketApi.subscribe("lobby-in", Protocol.In.reader)(
+    lobbyHandler orElse chatHandler orElse remoteSocketApi.baseHandler
+  ) >>- send(P.Out.boot)
+
+
 }
 
 private object LobbySocket {
@@ -285,15 +312,17 @@ private object LobbySocket {
   object Protocol {
     object In {
       case class Counters(members: Int, rounds: Int) extends P.In
+      
+      val reader: P.In.Reader = raw => lobbyReader(raw) orElse RP.In.reader(raw)
 
-      val reader: P.In.Reader = raw =>
+      val lobbyReader: P.In.Reader = raw =>
         raw.path match {
           case "counters" =>
             import cats.implicits._
             raw.get(2) { case Array(m, r) =>
               (m.toIntOption, r.toIntOption).mapN(Counters)
             }
-          case _ => P.In.baseReader(raw)
+          case _ => none
         }
     }
     object Out {

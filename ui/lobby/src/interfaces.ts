@@ -1,3 +1,4 @@
+import { ChatCtrl, ChatPlugin } from 'chat';
 import { VNode } from 'snabbdom';
 
 export type MaybeVNode = VNode | string | null | undefined;
@@ -27,6 +28,19 @@ export interface LobbyOpts extends Untyped {
   socketSend: SocketSend;
   pools: Pool[];
   blindMode: boolean;
+  chat?: ChatOpts;
+  chatSocketVersion: number;
+}
+
+export interface ChatOpts {
+  preset: 'start' | 'end' | undefined;
+  parseMoves?: boolean;
+  plugin?: ChatPlugin;
+  alwaysEnabled: boolean;
+  noteId?: string;
+  noteAge?: number;
+  noteText?: string;
+  instance?: Promise<ChatCtrl>;
 }
 
 export interface LobbyData extends Untyped {

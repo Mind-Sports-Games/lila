@@ -283,7 +283,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           case Monthly | Shield           => 6 * 60
           case Weekly | Weekend           => 3 * 60
           case Daily                      => 1 * 60
-          case Introductory | MSO21 | MSOGP =>
+          case Introductory | MSO21 | MSOGP | MSOWarmUp =>
             tour.spotlight.flatMap(_.homepageHours).fold(crud.CrudForm.maxHomepageHours * 60)(60 *)
           case _ => 30
         }

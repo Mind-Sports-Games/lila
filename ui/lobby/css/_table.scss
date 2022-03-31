@@ -26,15 +26,6 @@
         opacity: 0.2;
       }
     }
-
-    @include breakpoint($mq-col4) {
-      justify-content: center;
-
-      a {
-        margin: 1.2em 0;
-        padding: 1em;
-      }
-    }
   }
 
   &__counters {
@@ -49,10 +40,8 @@
     }
 
     @include breakpoint($mq-col4) {
-      flex-flow: column;
-      align-items: flex-start;
-      position: absolute;
-      bottom: 0;
+      background: none;
+      padding: 0;
     }
 
     a {

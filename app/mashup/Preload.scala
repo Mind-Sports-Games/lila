@@ -39,7 +39,9 @@ final class Preload(
       tours: Fu[List[Tournament]],
       events: Fu[List[Event]],
       simuls: Fu[List[Simul]],
-      streamerSpots: Int
+      streamerSpots: Int,
+      chatOption: Fu[Option[lila.chat.UserChat.Mine]],
+      chatVersion: Fu[Option[lila.socket.Socket.SocketVersion]]
   )(implicit ctx: Context): Fu[Homepage] =
     lobbyApi(ctx).mon(_.lobby segment "lobbyApi") zip
       posts.mon(_.lobby segment "posts") zip
@@ -55,9 +57,10 @@ final class Preload(
         .dmap(_.homepage(streamerSpots, ctx.req, ctx.me.flatMap(_.lang)) withTitles lightUserApi)
         .mon(_.lobby segment "streams")) zip
       (ctx.userId ?? playbanApi.currentBan).mon(_.lobby segment "playban") zip
-      (ctx.blind ?? ctx.me ?? roundProxy.urgentGames) flatMap {
+      (ctx.blind ?? ctx.me ?? roundProxy.urgentGames) zip
+      chatOption zip chatVersion flatMap {
         // format: off
-        case (((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), playban), blindGames) =>
+        case (((((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), playban), blindGames), chatOption), chatVersion) =>
         // format: on
         (ctx.me ?? currentGameMyTurn(povs, lightUserApi.sync))
           .mon(_.lobby segment "currentGame") zip
@@ -83,7 +86,9 @@ final class Preload(
               currentGame,
               simulIsFeaturable,
               blindGames,
-              lobbySocket.counters
+              lobbySocket.counters,
+              chatOption,
+              chatVersion
             )
           }
       }
@@ -126,7 +131,9 @@ object Preload {
       currentGame: Option[Preload.CurrentGame],
       isFeaturable: Simul => Boolean,
       blindGames: List[Pov],
-      counters: lila.lobby.LobbyCounters
+      counters: lila.lobby.LobbyCounters,
+      chatOption: Option[lila.chat.UserChat.Mine],
+      chatVersion: Option[lila.socket.Socket.SocketVersion]
   )
 
   case class CurrentGame(pov: Pov, opponent: String)
