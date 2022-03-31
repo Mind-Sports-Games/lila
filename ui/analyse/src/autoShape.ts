@@ -82,7 +82,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
       if (!nextBest && instance.enabled() && nCeval) nextBest = nCeval.pvs[0].moves[0];
       if (nextBest) shapes = shapes.concat(makeShapesFromUci(playerIndex, nextBest, 'paleBlue'));
       if (instance.enabled() && nCeval && nCeval.pvs[1] && !(ctrl.threatMode() && nThreat && nThreat.pvs.length > 2)) {
-        nCeval.pvs.forEach(function(pv) {
+        nCeval.pvs.forEach(function (pv) {
           if (pv.moves[0] === nextBest) return;
           const shift = winningChances.povDiff(playerIndex, nCeval.pvs[0], pv);
           if (shift >= 0 && shift < 0.2) {
@@ -101,7 +101,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
 
     shapes = shapes.concat(makeShapesFromUci(rPlayerIndex, pv0.moves[0], pv1s.length > 0 ? 'paleRed' : 'red'));
 
-    pv1s.forEach(function(pv) {
+    pv1s.forEach(function (pv) {
       const shift = winningChances.povDiff(rPlayerIndex, pv, pv0);
       if (shift >= 0 && shift < 0.2) {
         shapes = shapes.concat(
@@ -125,8 +125,8 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
               ? 'c1'
               : 'g1'
             : san === 'O-O-O'
-              ? 'c8'
-              : 'g8'
+            ? 'c8'
+            : 'g8'
           : move.to;
         shapes = shapes.concat({
           orig: destSquare,
