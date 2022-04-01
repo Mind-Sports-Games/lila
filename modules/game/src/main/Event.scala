@@ -133,6 +133,7 @@ object Event {
           case StratMove.Chess(move)    => strategygames.chess.format.pgn.Dumper(move)
           case StratMove.Draughts(move) => strategygames.draughts.format.pdn.Dumper(move)
           case StratMove.FairySF(move)  => strategygames.fairysf.format.pgn.Dumper(move)
+          case StratMove.Mancala(move)  => strategygames.mancala.format.pgn.Dumper(move)
         },
         fen = if (situation.board.variant.gameLogic == GameLogic.Draughts() && situation.board.variant.frisianVariant)
             situation.board match {
@@ -342,6 +343,7 @@ object Event {
       case Pos.Chess(_)    => GameLogic.Chess().id
       case Pos.Draughts(_) => GameLogic.Draughts().id
       case Pos.FairySF(_)  => GameLogic.FairySF().id
+      case Pos.Mancala(_)  => GameLogic.Mancala().id
     }
     def typ = "promotion"
     def data =

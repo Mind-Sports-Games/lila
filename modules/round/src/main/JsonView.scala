@@ -339,6 +339,8 @@ final class JsonView(
         }
       case (Situation.FairySF(_), Variant.FairySF(_)) => (pov.game playableBy pov.player) option
         Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Mancala(_), Variant.Mancala(_)) => (pov.game playableBy pov.player) option
+        Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
@@ -347,6 +349,7 @@ final class JsonView(
       case (Situation.Chess(_), Variant.Chess(_)) => None
       case (Situation.FairySF(_), Variant.FairySF(_)) => (pov.game playableBy pov.player) option
         Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Mancala(_), Variant.Mancala(_)) => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
       case _ => sys.error("Mismatch of types for possibleDropsByrole")
     }

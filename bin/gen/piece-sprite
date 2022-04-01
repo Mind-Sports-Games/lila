@@ -62,6 +62,9 @@ flipello_themes = [
   ['marble_bw_flipello', 'png'],
   ['fabirovsky_flipello', 'svg']
 ]
+mancala_themes =[
+  ['blue_mancala', 'png']
+]
 types = {
   'svg' => 'svg+xml;base64,',
   'png' => 'png;base64,'
@@ -98,6 +101,8 @@ xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece'
 xiangqi_colors = ['B','R']
 xiangqi_variants = ['xiangqi', 'minixiangqi']
 flipello_variants = ['flipello']
+mancala_roles=['d-piece']
+mancala_variants = ['oware']
 
 
 # inline SVG Chess
@@ -443,3 +448,51 @@ flipello_themes.map { |theme|
   }.flatten
   File.open(dest_dir + 'flipello-' + name + '.external.css', 'w') { |f| f.puts (classes_flipello_game + classes_flipello_variant).join("\n") }
 }
+
+# inline SVG mancala (oware)
+mancala_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_mancala_game = mancala_roles.map { |role|
+      piece = role[0]
+      file = source_dir + 'mancala/' + name + '/' + piece + '.' + ext
+      File.open(file, 'r') do|image_file|
+        image = image_file.read
+        base64 = Base64.strict_encode64(image)
+        '.mancala.is2d .' + role + ' {' +
+          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+      end
+  }.flatten
+  classes_mancala_variant = mancala_variants.map{ |variant|
+      mancala_roles.map { |role|
+        piece = role[0]
+        file = source_dir + 'mancala/' + name + '/' + piece + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          '.is2d .variant-' + variant + ' .' + role + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+  }.flatten
+  File.open(dest_dir + 'mancala-' + name + '.css', 'w') { |f| f.puts (classes_mancala_game + classes_mancala_variant).join("\n") }
+}
+# external SVG mancala
+mancala_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_mancala_game = mancala_roles.map { |role|
+      piece = role[0]
+      '.mancala.is2d .' + role + ' {' +
+        "background-image:url('/assets/piece/" + 'mancala/' + name + "/" + piece + "." + ext + "')}"
+  }.flatten
+  classes_mancala_variant = mancala_variants.map { |variant|
+      mancala_roles.map { |role|
+        piece = role[0]
+        '.is2d .variant-' + variant + ' .' + role + ' {' +
+          "background-image:url('/assets/piece/" + 'mancala/' + name + "/" + piece + "." + ext + "')}"
+      }
+  }.flatten
+  File.open(dest_dir + 'mancala-' + name + '.external.css', 'w') { |f| f.puts (classes_mancala_game + classes_mancala_variant).join("\n") }
+}
+

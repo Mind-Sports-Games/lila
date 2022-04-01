@@ -47,6 +47,11 @@ cg-board {
   height: calc(100% / 7);
 }
 
+.variant-oware square {
+  width: calc(100% / 6);
+  height: calc(100% / 2);
+}
+
 $alternate-board-highlights: (
   'flipello-green': 'flipello',
   'flipello-green-marble': 'flipello',
@@ -180,6 +185,11 @@ square {
   height: calc(100% / 7);
 }
 
+.variant-oware piece {
+  width: calc(100% / 6);
+  height: calc(100% / 2);
+}
+
 piece {
   position: absolute;
   top: 0;
@@ -230,6 +240,11 @@ piece {
   padding-bottom: calc(100% / 7);
 }
 
+.variant-oware cg-helper {
+  width: calc(100% / 6);
+  padding-bottom: calc(100% / 2);
+}
+
 cg-helper {
   position: absolute;
   width: 12.5%;
@@ -256,6 +271,11 @@ cg-helper {
 .variant-minixiangqi cg-container {
   width: calc(100% * 7);
   height: calc(100% * 7);
+}
+
+.variant-oware cg-container {
+  width: calc(100% * 6);
+  height: calc(100% * 2);
 }
 
 cg-container {
@@ -295,7 +315,7 @@ cg-container .cg-custom-svgs svg {
   overflow: visible;
 }
 
-/* 9x10 - for non square boards*/
+/* 9x10 - for non square boards that are taller than wide*/
 .variant-xiangqi .cg-wrap {
   padding-bottom: calc(640 * 100% / 576);
 }

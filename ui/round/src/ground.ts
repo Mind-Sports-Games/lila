@@ -102,6 +102,10 @@ export function makeConfig(ctrl: RoundController): Config {
             ? 'https://playstrategy.org/assets/piece/flipello/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
               '/'
+            : variantKey === 'oware'
+            ? 'https://playstrategy.org/assets/piece/mancala/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'mancala')[0].name +
+              '/'
             : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +

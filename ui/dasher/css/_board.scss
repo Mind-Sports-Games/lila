@@ -21,6 +21,10 @@
       height: 125px;
     }
 
+    &.mancala {
+      height: 125px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -52,6 +56,12 @@
     display: block;
     width: 100px;
     height: 100px;
+  }
+
+  .list a.mancala span {
+    display: block;
+    width: 100px;
+    height: 33.33px;
   }
 
   &.d3 .list span {
@@ -145,6 +155,16 @@
 
     .flipello-wood {
       background-image: url(../images/board/flipello/flipello_wood_board.svg);
+      background-size: 100px;
+    }
+
+    .mancala-light-wood {
+      background-image: url(../images/board/mancala/oware_light_wood_board.svg);
+      background-size: 100px;
+    }
+
+    .mancala-dark-wood {
+      background-image: url(../images/board/mancala/oware_dark_wood_board.svg);
       background-size: 100px;
     }
   }

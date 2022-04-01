@@ -140,6 +140,7 @@ trait Handlers {
       case StratFEN.Chess(f)    => BSONString(s"0~${f.value}")
       case StratFEN.Draughts(f) => BSONString(s"1~${f.value}")
       case StratFEN.FairySF(f)  => BSONString(s"2~${f.value}")
+      case StratFEN.Mancala(f)  => BSONString(s"3~${f.value}")
     }
   )
 

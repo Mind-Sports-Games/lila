@@ -19,8 +19,8 @@
   "dependencies": {
     "ceval": "2.0.0",
     "chart.js": "^2.9",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.18",
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.12",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#96-add-oware",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#96-add-oware",
     "common": "2.0.0",
     "snabbdom": "^3.0.1",
     "tree": "2.0.0"

@@ -27,4 +27,5 @@
   <string name="minishogi">Mini Shogi (Japanese Chess on a smaller board)</string>
   <string name="minixiangqi">Mini Xiangqi (Chinese Chess on a smaller board)</string>
   <string name="flipello">Flip pieces between your color to get the most board area</string>
+  <string name="oware">Capture the most stones to win</string>
 </resources>

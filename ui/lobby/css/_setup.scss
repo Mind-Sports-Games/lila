@@ -1,9 +1,10 @@
 $c-setup: $c-secondary;
 $c-slider: $c-setup;
 
-$game-family: ('chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello');
+// these must all be the same size as we iterate through them...
+$game-family: ('chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello', 'mancala');
 
-$game-family-random-pieces: ('wbK.svg', 'wbK.png', 'bwL.png', 'bwK.png', 'rbK.png', 'bwP.png');
+$game-family-random-pieces: ('wbK.svg', 'wbK.png', 'bwL.png', 'bwK.png', 'rbK.png', 'bwP.png', 'wbK.svg');
 
 $game-family-p1-pieces: (
   'chess/cburnett/wK.svg',
@@ -11,7 +12,8 @@ $game-family-p1-pieces: (
   'loa/check_yb_loa/bL.png',
   'shogi/ctw/0GY.svg',
   'xiangqi/ka/RK.svg',
-  'flipello/classic_flipello/bP.png'
+  'flipello/classic_flipello/bP.png',
+  'chess/cburnett/wK.svg'
 );
 
 $game-family-p2-pieces: (
@@ -20,7 +22,8 @@ $game-family-p2-pieces: (
   'loa/check_yb_loa/wL.png',
   'shogi/ctw/0OU.svg',
   'xiangqi/ka/BK.svg',
-  'flipello/classic_flipello/wP.png'
+  'flipello/classic_flipello/wP.png',
+  'chess/cburnett/bK.svg'
 );
 
 .game-setup {

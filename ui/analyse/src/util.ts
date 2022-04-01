@@ -237,7 +237,16 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
   return score;
 }
 
-const noCevalVariants = ['linesOfAction', 'scrambledEggs', 'shogi', 'xiangqi', 'minishogi', 'minixiangqi', 'flipello'];
+const noCevalVariants = [
+  'linesOfAction',
+  'scrambledEggs',
+  'shogi',
+  'xiangqi',
+  'minishogi',
+  'minixiangqi',
+  'flipello',
+  'oware',
+];
 
 export function allowCevalForVariant(variant: VariantKey) {
   return noCevalVariants.indexOf(variant) == -1;

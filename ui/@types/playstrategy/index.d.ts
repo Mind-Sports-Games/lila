@@ -293,7 +293,8 @@ declare type VariantKey =
   | 'xiangqi'
   | 'minishogi'
   | 'minixiangqi'
-  | 'flipello';
+  | 'flipello'
+  | 'oware';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -339,7 +340,8 @@ declare type Perf =
   | 'xiangqi'
   | 'minishogi'
   | 'minixiangqi'
-  | 'flipello';
+  | 'flipello'
+  | 'oware';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red';
@@ -348,7 +350,7 @@ declare type PlayerColor = 'white' | 'black';
 declare type Orientation = 'p1' | 'p2' | 'left' | 'right';
 
 declare type PageVariant = VariantKey | DraughtsVariantKey | undefined;
-declare type GameFamilyKey = 'chess' | 'draughts' | 'loa' | 'shogi' | 'xiangqi' | 'flipello';
+declare type GameFamilyKey = 'chess' | 'draughts' | 'loa' | 'shogi' | 'xiangqi' | 'flipello' | 'mancala';
 
 declare type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
 declare type Ranks = '1' | '2' | '3' | '4' | '5' | '5' | '6' | '7' | '8' | '9' | '10';

@@ -157,6 +157,15 @@ final private class Player(
         ) map { case (ncg, move) =>
           ncg -> (Left(move): MoveOrDrop)
         }
+      case Uci.MancalaMove(uci) =>
+        game.chess(
+          Pos.Mancala(uci.orig),
+          Pos.Mancala(uci.dest),
+          None,
+          metrics
+        ) map { case (ncg, move) =>
+          ncg -> (Left(move): MoveOrDrop)
+        }
       case Uci.ChessDrop(uci) =>
         game.chess.drop(
           Role.ChessRole(uci.role),

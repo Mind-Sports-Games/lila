@@ -68,6 +68,9 @@ object GameDiff {
 
     def pfnStorageWriter(pgnMoves: PgnMoves) =
       PfnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
+    
+    def pmnStorageWriter(pgnMoves: PgnMoves) =
+      PmnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
 
     a.variant.gameLogic match {
       case GameLogic.Draughts() =>
@@ -151,6 +154,17 @@ object GameDiff {
             _.board.pocketData,
             (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
           )
+      }
+      case GameLogic.Mancala() => {
+        dTry(oldPgn, _.board match {
+          case Board.Mancala(b) => b.uciMoves.toVector
+          case _ => sys.error("Wrong board type")
+        }, writeBytes compose pmnStorageWriter)
+        dTry(binaryPieces, _.board match {
+          case Board.Mancala(b) => b.pieces
+          case _ => sys.error("Wrong board type")
+        }, writeBytes compose BinaryFormat.piece.writeMancala)
+        d(positionHashes, _.history.positionHashes, w.bytes)
       }
     }
 
