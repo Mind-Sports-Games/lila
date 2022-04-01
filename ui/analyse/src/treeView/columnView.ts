@@ -60,10 +60,10 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
     const mainChildren = main.forceVariation
       ? undefined
       : renderChildrenOf(ctx, main, {
-        parentPath: opts.parentPath + main.id,
-        isMainline: true,
-        conceal,
-      });
+          parentPath: opts.parentPath + main.id,
+          isMainline: true,
+          conceal,
+        });
     const passOpts = {
       parentPath: opts.parentPath,
       isMainline: !main.forceVariation,
@@ -239,13 +239,13 @@ function renderMainlineCommentsOf(ctx: Ctx, node: Tree.Node, conceal: Conceal, w
   });
 }
 
-const emptyConcealOf: ConcealOf = function() {
-  return function() {
+const emptyConcealOf: ConcealOf = function () {
+  return function () {
     return null;
   };
 };
 
-export default function(ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
+export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
   const root = parentedNode(ctrl.tree.root);
   const ctx: Ctx = {
     ctrl,

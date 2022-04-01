@@ -21,6 +21,7 @@ case class Winner(
 case class FreqWinners(
     mso21: Option[Winner],
     msoGP: Option[Winner],
+    msoWarmUp: Option[Winner],
     introductory: Option[Winner],
     yearly: Option[Winner],
     monthly: Option[Winner],
@@ -33,11 +34,13 @@ case class FreqWinners(
       weekly.filter(_.date isAfter DateTime.now.minusDays(1)) orElse
       monthly.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
       yearly.filter(_.date isAfter DateTime.now.minusDays(28)) orElse
-      mso21.filter(_.date isAfter DateTime.now.minusDays(28)) orElse
-      msoGP.filter(_.date isAfter DateTime.now.minusDays(28)) orElse
-      introductory orElse msoGP orElse mso21 orElse yearly orElse monthly orElse weekly orElse daily
+      mso21.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
+      msoGP.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
+      msoWarmUp.filter(_.date isAfter DateTime.now.minusDays(14)) orElse
+      introductory orElse msoGP orElse mso21 orElse msoWarmUp orElse yearly orElse monthly orElse weekly orElse daily
 
-  def userIds = List(mso21, msoGP, introductory, yearly, monthly, weekly, daily).flatten.map(_.userId)
+  def userIds =
+    List(mso21, msoGP, msoWarmUp, introductory, yearly, monthly, weekly, daily).flatten.map(_.userId)
 }
 
 case class AllWinners(
@@ -107,6 +110,7 @@ final class WinnersApi(
       dailies      <- fetchLastFreq(Freq.Daily, DateTime.now.minusDays(2))
       mso21        <- fetchLastFreq(Freq.MSO21, DateTime.now.minusMonths(8))
       msoGP        <- fetchLastFreq(Freq.MSOGP, DateTime.now.minusMonths(10))
+      msoWarmUp    <- fetchLastFreq(Freq.MSOWarmUp, DateTime.now.minusWeeks(3))
       introductory <- fetchLastFreq(Freq.Introductory, DateTime.now.minusYears(1))
       //elites    <- fetchLastFreq(Freq.Weekend, DateTime.now.minusWeeks(3))
       //marathons <- fetchLastFreq(Freq.Marathon, DateTime.now.minusMonths(13))
@@ -134,7 +138,8 @@ final class WinnersApi(
             daily = firstVariantWinner(dailies, v),
             mso21 = firstVariantWinner(mso21, v),
             msoGP = firstVariantWinner(msoGP, v),
-            introductory = firstVariantWinner(msoGP, v)
+            msoWarmUp = firstVariantWinner(msoWarmUp, v),
+            introductory = firstVariantWinner(introductory, v)
           )
         }.toMap
       )

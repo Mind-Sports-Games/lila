@@ -80,7 +80,7 @@ export function onInsert<A extends HTMLElement>(f: (element: A) => void): Hooks 
 }
 
 export function readOnlyProp<A>(value: A): () => A {
-  return function(): A {
+  return function (): A {
     return value;
   };
 }
@@ -237,15 +237,7 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
   return score;
 }
 
-const noCevalVariants = [
-  'linesOfAction',
-  'scrambledEggs',
-  'shogi',
-  'xiangqi',
-  'minishogi',
-  'minixiangqi',
-  'flipello',
-]
+const noCevalVariants = ['linesOfAction', 'scrambledEggs', 'shogi', 'xiangqi', 'minishogi', 'minixiangqi', 'flipello'];
 
 export function allowCevalForVariant(variant: VariantKey) {
   return noCevalVariants.indexOf(variant) == -1;
@@ -255,11 +247,11 @@ export function allowCevalForVariant(variant: VariantKey) {
 export const isChessOpsEnabled = allowCevalForVariant;
 
 export type LexicalUci = {
-  from: cg.Key,
-  to: cg.Key,
-  dropRole?: cg.Role,
-  promotion?: cg.Role,
-}
+  from: cg.Key;
+  to: cg.Key;
+  dropRole?: cg.Role;
+  promotion?: cg.Role;
+};
 
 export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
   if (!uci) return undefined;
@@ -269,22 +261,21 @@ export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
     return {
       from: pos[0],
       to: pos[0],
-      dropRole: `${uci[0].toLowerCase()}-piece` as cg.Role
+      dropRole: `${uci[0].toLowerCase()}-piece` as cg.Role,
     };
   }
 
   // e7e8Q
-  let promotion: cg.Role | undefined = undefined; 
+  let promotion: cg.Role | undefined = undefined;
 
   const uciToFrom = `${pos[0]}${pos[1]}`;
-  if (uci.startsWith(uciToFrom) && uci.length == uciToFrom.length +1) {
-    promotion = `${uci[uci.length-1]}-piece` as cg.Role;
+  if (uci.startsWith(uciToFrom) && uci.length == uciToFrom.length + 1) {
+    promotion = `${uci[uci.length - 1]}-piece` as cg.Role;
   }
 
   return {
     from: pos[0],
     to: pos[1],
-    promotion
+    promotion,
   };
 };
-

@@ -56,8 +56,9 @@ function possiblePromotion(
             !premovePiece.promoted &&
             premovePiece.role !== 'k-piece' &&
             premovePiece.role !== 'g-piece')) &&
-        ((['7', '8', '9'].includes(dest[1]) && d.player.playerIndex === 'p1') ||
-          (['1', '2', '3'].includes(dest[1]) && d.player.playerIndex === 'p2')) &&
+        ((d.player.playerIndex === 'p1' && (['7', '8', '9'].includes(dest[1]) || ['7', '8', '9'].includes(orig[1]))) ||
+          (d.player.playerIndex === 'p2' &&
+            (['1', '2', '3'].includes(dest[1]) || ['1', '2', '3'].includes(orig[1])))) &&
         orig != 'a0' // cant promote from a drop
       );
     case 'minishogi':
@@ -67,8 +68,8 @@ function possiblePromotion(
             !premovePiece.promoted &&
             premovePiece.role !== 'k-piece' &&
             premovePiece.role !== 'g-piece')) &&
-        ((['5'].includes(dest[1]) && d.player.playerIndex === 'p1') ||
-          (['1'].includes(dest[1]) && d.player.playerIndex === 'p2')) &&
+        ((d.player.playerIndex === 'p1' && (['5'].includes(dest[1]) || ['5'].includes(orig[1]))) ||
+          (d.player.playerIndex === 'p2' && (['1'].includes(dest[1]) || ['1'].includes(orig[1])))) &&
         orig != 'a0' // cant promote from a drop
       );
     default:

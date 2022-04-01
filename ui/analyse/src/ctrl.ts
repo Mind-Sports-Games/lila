@@ -296,20 +296,20 @@ export default class AnalyseCtrl {
         : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length)
         ? playerIndex
         : undefined,
-
       isChessOpsEnabled = util.isChessOpsEnabled(this.data.game.variant.key),
       config: ChessgroundConfig = {
         fen: node.fen,
         turnPlayerIndex: playerIndex,
-        movable: (this.embed || !isChessOpsEnabled)
-          ? {
-              playerIndex: undefined,
-              dests: new Map(),
-            }
-          : {
-              playerIndex: movablePlayerIndex,
-              dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
-            },
+        movable:
+          this.embed || !isChessOpsEnabled
+            ? {
+                playerIndex: undefined,
+                dests: new Map(),
+              }
+            : {
+                playerIndex: movablePlayerIndex,
+                dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
+              },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
       };
@@ -745,7 +745,9 @@ export default class AnalyseCtrl {
   };
 
   showEvalGauge(): boolean {
-    return this.cevalVariant() && this.hasAnyComputerAnalysis() && this.showGauge() && !this.outcome() && this.showComputer();
+    return (
+      this.cevalVariant() && this.hasAnyComputerAnalysis() && this.showGauge() && !this.outcome() && this.showComputer()
+    );
   }
 
   cevalVariant(): boolean {

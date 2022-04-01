@@ -15,7 +15,11 @@ playstrategy.advantageChart = function (data, trans, el) {
         var fillColor = Highcharts.theme.playstrategy.area.white;
         var negativeFillColor = Highcharts.theme.playstrategy.area.black;
         var oppositeColorVariants = ['flipello', 'shogi', 'minishogi'];
-        if (oppositeColorVariants.find(function(k) { return k == data.game.variant.key; })) {
+        if (
+          oppositeColorVariants.find(function (k) {
+            return k == data.game.variant.key;
+          })
+        ) {
           fillColor = Highcharts.theme.playstrategy.area.black;
           negativeFillColor = Highcharts.theme.playstrategy.area.white;
         }
@@ -27,7 +31,7 @@ playstrategy.advantageChart = function (data, trans, el) {
               cp;
 
             var san = node.san;
-            if (san === "NOSAN") san = node.uci;
+            if (san === 'NOSAN') san = node.uci;
 
             if (node.eval && node.eval.mate) {
               cp = node.eval.mate > 0 ? Infinity : -Infinity;
