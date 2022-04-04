@@ -242,7 +242,7 @@ piece {
 
 .variant-oware cg-helper {
   width: calc(100% / 6);
-  padding-bottom: calc(100% / 2);
+  padding-bottom: calc(100% / 6);
 }
 
 cg-helper {
@@ -315,15 +315,29 @@ cg-container .cg-custom-svgs svg {
   overflow: visible;
 }
 
-/* 9x10 - for non square boards that are taller than wide*/
+/* 9x10 - for non square boards */
 .variant-xiangqi .cg-wrap {
   padding-bottom: calc(640 * 100% / 576);
+}
+
+.variant-oware .cg-wrap {
+  padding-bottom: calc(213.333 * 100% / 640);
 }
 
 .variant-xiangqi .round__app__board {
   padding-bottom: calc(640 * 100% / 576);
 }
 
+.variant-oware .round__app__board {
+  padding-bottom: calc(213.333 * 100% / 640);
+  padding-top: calc(0.25 * 213.333 * 100% / 640);
+}
+
 .variant-xiangqi .analyse__board {
   padding-bottom: calc(640 * 100% / 576);
+}
+
+.variant-oware .analyse__board {
+  padding-bottom: calc(213.333 * 100% / 640);
+  padding-top: calc(0.25 * 213.333 * 100% / 640);
 }
