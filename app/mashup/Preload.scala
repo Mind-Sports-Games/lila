@@ -56,11 +56,12 @@ final class Preload(
       (ctx.noKid ?? liveStreamApi.all
         .dmap(_.homepage(streamerSpots, ctx.req, ctx.me.flatMap(_.lang)) withTitles lightUserApi)
         .mon(_.lobby segment "streams")) zip
+      lastPostCache.async zip
       (ctx.userId ?? playbanApi.currentBan).mon(_.lobby segment "playban") zip
       (ctx.blind ?? ctx.me ?? roundProxy.urgentGames) zip
       chatOption zip chatVersion flatMap {
         // format: off
-        case (((((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), playban), blindGames), chatOption), chatVersion) =>
+        case ((((((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), lastPosts), playban), blindGames), chatOption), chatVersion) =>
         // format: on
         (ctx.me ?? currentGameMyTurn(povs, lightUserApi.sync))
           .mon(_.lobby segment "currentGame") zip
@@ -81,7 +82,7 @@ final class Preload(
               tWinners,
               puzzle,
               streams.excludeUsers(events.flatMap(_.hostedBy)),
-              lastPostCache.apply,
+              lastPosts,
               playban,
               currentGame,
               simulIsFeaturable,
