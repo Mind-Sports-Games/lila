@@ -15,18 +15,29 @@ cg-board {
   }
 }
 
-//miniboards
+//miniboards - alter non-square boards
 .variant-xiangqi.is2d {
   width: calc(100% * 10 / 11);
   margin-left: calc(50% / 11);
 }
+.mini-board.variant-oware.is2d {
+  padding-bottom: calc(213.333 * 100% / 640);
+  padding-top: calc(213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
+}
 
-//main board
+.mini-game.variant-oware.is2d {
+  margin-top: calc(-213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
+}
+
+//main board - alter non-square boards
 .is2d .variant-xiangqi {
   width: calc(100% * 10 / 11);
   margin-right: calc(100% / 11);
 }
 
+//Squares
 .variant-shogi square {
   width: calc(100% / 9);
   height: calc(100% / 9);
@@ -320,17 +331,14 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(640 * 100% / 576);
 }
 
-.variant-oware .cg-wrap {
-  padding-bottom: calc(213.333 * 100% / 640);
-}
-
 .variant-xiangqi .round__app__board {
   padding-bottom: calc(640 * 100% / 576);
 }
 
 .variant-oware .round__app__board {
   padding-bottom: calc(213.333 * 100% / 640);
-  padding-top: calc(0.25 * 213.333 * 100% / 640);
+  padding-top: calc(0.38 * 213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
 }
 
 .variant-xiangqi .analyse__board {
@@ -339,5 +347,6 @@ cg-container .cg-custom-svgs svg {
 
 .variant-oware .analyse__board {
   padding-bottom: calc(213.333 * 100% / 640);
-  padding-top: calc(0.25 * 213.333 * 100% / 640);
+  padding-top: calc(0.38 * 213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
 }

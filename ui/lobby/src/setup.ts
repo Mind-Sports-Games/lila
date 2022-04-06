@@ -312,7 +312,7 @@ export default class Setup {
     };
     const showStartingImages = () => {
       const variantId = ($variantSelect.val() as string).split('_');
-      const class_list = 'chess draughts loa shogi xiangqi flipello oware';
+      const class_list = 'chess draughts loa shogi xiangqi flipello mancala';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':
@@ -334,7 +334,7 @@ export default class Setup {
           key = 'flipello';
           break;
         case '6':
-          key = 'oware';
+          key = 'mancala';
           break;
       }
       $form.find('.playerIndex-submits').removeClass(class_list);
