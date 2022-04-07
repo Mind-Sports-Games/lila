@@ -134,6 +134,7 @@ final class JsonView(
           .add("moretimeable" -> moretimeable)
           .add("crazyhouse" -> pov.game.board.pocketData)
           .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("hasGameScore" -> pov.game.variant.hasGameScore)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
@@ -229,6 +230,7 @@ final class JsonView(
             Json.obj("id" -> userId)
           })
           .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("hasGameScore" -> pov.game.variant.hasGameScore)
 
       }
 
@@ -294,6 +296,7 @@ final class JsonView(
       .add("evalPut" -> me.??(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
       .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+      .add("hasGameScore" -> pov.game.variant.hasGameScore)
   }
 
   private def blurs(game: Game, player: lila.game.Player) =

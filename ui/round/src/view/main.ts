@@ -64,12 +64,20 @@ export function main(ctrl: RoundController): VNode {
     boardSize = d.game.variant.boardSize;
   let topScore = -1,
     bottomScore = -1;
-  if (d.game.variant.key === 'flipello') {
-    const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
-    const p1Score = util.getPlayerScore(d.game.variant.key, pieces, 'p1');
-    const p2Score = util.getPlayerScore(d.game.variant.key, pieces, 'p2');
-    topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-    bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+  if (d.hasGameScore) {
+    if (d.game.variant.key === 'flipello') {
+      const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
+      const p1Score = util.getPlayerScore(d.game.variant.key, pieces, 'p1');
+      const p2Score = util.getPlayerScore(d.game.variant.key, pieces, 'p2');
+      topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+      bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+    } else {
+      //TODO update score based on oware (make general function in util?)
+      const p1Score = 2;
+      const p2Score = 3;
+      topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+      bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+    }
   }
 
   let material: MaterialDiff,
@@ -115,10 +123,10 @@ export function main(ctrl: RoundController): VNode {
           ),
           renderPlayerScore(topScore, 'top', topPlayerIndex),
           crazyView(ctrl, topPlayerIndex, 'top') ||
-            renderMaterial(material[topPlayerIndex], -score, 'top', d.onlyDropsVariant, checks[topPlayerIndex]),
+            renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
-            renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.onlyDropsVariant, checks[bottomPlayerIndex]),
+            renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.hasGameScore, checks[bottomPlayerIndex]),
           renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex),
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ]

@@ -321,12 +321,20 @@ export default function (ctrl: AnalyseCtrl): VNode {
   let topScore = -1,
     bottomScore = -1;
   const cgState = ctrl.chessground && ctrl.chessground.state;
-  if (ctrl.data.game.variant.key === 'flipello') {
-    const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize);
-    const p1Score = getPlayerScore(ctrl.data.game.variant.key, pieces, 'p1');
-    const p2Score = getPlayerScore(ctrl.data.game.variant.key, pieces, 'p2');
-    topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-    bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+  if (ctrl.data.hasGameScore) {
+    if (ctrl.data.game.variant.key === 'flipello') {
+      const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize);
+      const p1Score = getPlayerScore(ctrl.data.game.variant.key, pieces, 'p1');
+      const p2Score = getPlayerScore(ctrl.data.game.variant.key, pieces, 'p2');
+      topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+      bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+    } else {
+      //TODO update score based on oware (make general function in util?)
+      const p1Score = 2;
+      const p2Score = 3;
+      topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+      bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+    }
   }
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
   if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(ctrl.data.game.variant.key)) {

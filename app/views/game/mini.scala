@@ -102,9 +102,11 @@ object mini {
         "(" + pov.game.history
           .checkCount(pov.game.opponent(pov.playerIndex).playerIndex)
           .toString() + ")"
+      case "oware" => //TODO change once we know how to get score from board
+        "(" + pov.playerIndex.name + ")"
       case _ => ""
     }
-
+    
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(
       pov.game.winnerPlayerIndex.fold("½") { c =>
