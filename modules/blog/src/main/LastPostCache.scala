@@ -37,6 +37,5 @@ final class LastPostCache(
     }
 
   def apply: List[MiniPost] = cache sync true
-  def async: Fu[List[MiniPost]] = cache async true
 
 }
