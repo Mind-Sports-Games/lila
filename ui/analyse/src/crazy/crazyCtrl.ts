@@ -1,8 +1,9 @@
 import { dragNewPiece } from 'chessground/drag';
-import { readDrops } from 'chess';
+import { readDrops, readDropsByRole } from 'chess';
 import AnalyseCtrl from '../ctrl';
 import * as cg from 'chessground/types';
 import { Api as ChessgroundApi } from 'chessground/api';
+import { AnalyseData } from '../interfaces';
 
 export function drag(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
@@ -18,17 +19,23 @@ export function drag(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.MouchEve
 
 export function valid(
   chessground: ChessgroundApi,
+  data: AnalyseData,
   possibleDrops: string | undefined | null,
   piece: cg.Piece,
   pos: Key
 ): boolean {
   if (piece.playerIndex !== chessground.state.movable.playerIndex) return false;
+  if (data.game.variant.key === 'crazyhouse') {
+    if (piece.role === 'p-piece' && (pos[1] === '1' || pos[1] === '8')) return false;
 
-  if (piece.role === 'p-piece' && (pos[1] === '1' || pos[1] === '8')) return false;
+    const drops = readDrops(possibleDrops);
 
-  const drops = readDrops(possibleDrops);
+    if (drops === null) return true;
 
-  if (drops === null) return true;
-
-  return drops.includes(pos);
+    return drops.includes(pos);
+  } else {
+    //otherwise shogi and use the newer dropsByRole data
+    const dropsByRole = readDropsByRole(data.possibleDropsByRole);
+    return dropsByRole.get(piece.role)?.includes(pos) || false;
+  }
 }

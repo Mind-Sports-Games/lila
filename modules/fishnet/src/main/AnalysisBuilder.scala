@@ -12,15 +12,15 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
     ec: scala.concurrent.ExecutionContext
 ) {
 
-  def apply(client: Client, work: Work.Analysis, evals: List[Evaluation.OrSkipped]): Fu[Analysis] =
+  def apply(client: Client, work: Work.Analysis, evals: List[Evaluation.OrSkipped[Uci]]): Fu[Analysis] =
     partial(client, work, evals map some, isPartial = false)
 
   def partial(
       client: Client,
       work: Work.Analysis,
-      evals: List[Option[Evaluation.OrSkipped]],
+      evals: List[Option[Evaluation.OrSkipped[Uci]]],
       isPartial: Boolean = true
-  ): Fu[Analysis] =
+  ): Fu[Analysis] = {
     evalCache.evals(work) flatMap { cachedFull =>
       /* remove first eval in partial analysis
        * to prevent the mobile app from thinking it's complete
@@ -31,7 +31,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       Replay(
         work.game.variant.gameLogic,
         work.game.uciList,
-        work.game.initialFen.map(fen => FEN(work.game.variant.gameLogic, fen)),
+        work.game.initialFen,
         work.game.variant
       )
         .fold(
@@ -46,7 +46,8 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
                 startPly = work.startPly,
                 fk = !client.playstrategy option client.key.value,
                 date = DateTime.now
-              )
+              ),
+              work.game.variant
             ) match {
               case (analysis, errors) =>
                 errors foreach { e =>
@@ -62,23 +63,28 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
             }
         )
     }
+  }
 
   private def mergeEvalsAndCached(
       work: Work.Analysis,
-      evals: List[Option[Evaluation.OrSkipped]],
-      cached: Map[Int, Evaluation]
-  ): List[Option[Evaluation]] =
+      evals: List[Option[Evaluation.OrSkipped[Uci]]],
+      cached: Map[Int, Evaluation[Uci]]
+  ): List[Option[Evaluation[Uci]]] =
     evals.zipWithIndex.map {
       case (None, i)              => cached get i
       case (Some(Right(eval)), i) => cached.getOrElse(i, eval).some
       case (_, i) =>
         cached get i orElse {
           logger.error(s"Missing cached eval for skipped position at index $i in $work")
-          none[Evaluation]
+          none[Evaluation[Uci]]
         }
     }
 
-  private def makeInfos(evals: List[Option[Evaluation]], moves: List[Uci], startedAtPly: Int): List[Info] =
+  private def makeInfos(
+      evals: List[Option[Evaluation[Uci]]],
+      moves: List[Uci],
+      startedAtPly: Int
+  ): List[Info] =
     (evals filterNot (_ ?? (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map {
       case ((List(Some(before), Some(after)), move), index) =>
         val variation = before.cappedPv match {

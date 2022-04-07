@@ -6,6 +6,7 @@ import cats.implicits._
 import strategygames.format.pgn.Dumper
 import strategygames.format.Uci
 import strategygames.{ GameFamily, GameLogic, Drop, Move, Replay, Situation }
+import strategygames.variant.Variant
 
 import lila.analyse.{ Analysis, Info, PgnMove }
 import lila.base.LilaException
@@ -16,7 +17,7 @@ private object UciToPgn {
 
   type WithErrors[A] = (A, List[Exception])
 
-  def apply(replay: Replay, analysis: Analysis): WithErrors[Analysis] = {
+  def apply(replay: Replay, analysis: Analysis, variant: Variant): WithErrors[Analysis] = {
 
     val pliesWithAdviceAndVariation: Set[Int] = analysis.advices.view.collect {
       case a if a.info.hasVariation => a.ply
@@ -26,13 +27,15 @@ private object UciToPgn {
       if (pliesWithAdviceAndVariation(info.ply)) info
       else info.dropVariation
     }
+    val logic = variant.gameLogic
+    val family = variant.gameFamily
 
     def uciToPgn(ply: Int, variation: List[String]): Validated[String, List[PgnMove]] =
       for {
         situation <-
           if (ply == replay.setup.startedAtTurn + 1) valid(replay.setup.situation)
           else replay moveAtPly ply map (_.fold(_.situationBefore, _.situationBefore)) toValid "No move found"
-        ucis <- variation.map(v => Uci.apply(GameLogic.Chess(), GameFamily.Chess(), v)).sequence toValid "Invalid UCI moves " + variation
+        ucis <- variation.map(v => Uci(logic, family, v)).sequence toValid "Invalid UCI moves " + variation
         moves <-
           ucis.foldLeft[Validated[String, (Situation, List[Either[Move, Drop]])]](valid(situation -> Nil)) {
             case (Validated.Valid((sit, moves)), uci: Uci.Move) =>
@@ -46,8 +49,8 @@ private object UciToPgn {
             case (failure, _) => failure
           }
       } yield moves._2.reverse map (_.fold(
-        move => Dumper.apply(GameLogic.Chess(), move),
-        drop => Dumper.apply(GameLogic.Chess(), drop)
+        move => Dumper(logic, move),
+        drop => Dumper(logic, drop)
       ))
 
     onlyMeaningfulVariations.foldLeft[WithErrors[List[Info]]]((Nil, Nil)) {

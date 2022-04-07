@@ -296,18 +296,20 @@ export default class AnalyseCtrl {
         : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length)
         ? playerIndex
         : undefined,
+      isChessOpsEnabled = util.isChessOpsEnabled(this.data.game.variant.key),
       config: ChessgroundConfig = {
         fen: node.fen,
         turnPlayerIndex: playerIndex,
-        movable: this.embed
-          ? {
-              playerIndex: undefined,
-              dests: new Map(),
-            }
-          : {
-              playerIndex: movablePlayerIndex,
-              dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
-            },
+        movable:
+          this.embed || !isChessOpsEnabled
+            ? {
+                playerIndex: undefined,
+                dests: new Map(),
+              }
+            : {
+                playerIndex: movablePlayerIndex,
+                dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
+              },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
       };
@@ -318,7 +320,7 @@ export default class AnalyseCtrl {
       config.movable!.playerIndex = playerIndex;
     }
     config.premovable = {
-      enabled: config.movable!.playerIndex && config.turnPlayerIndex !== config.movable!.playerIndex,
+      enabled: false,
     };
     this.cgConfig = config;
     return config;
@@ -459,7 +461,7 @@ export default class AnalyseCtrl {
   }
 
   userNewPiece = (piece: cg.Piece, pos: Key): void => {
-    if (crazyValid(this.chessground, this.node.drops, piece, pos)) {
+    if (crazyValid(this.chessground, this.data, this.node.drops, piece, pos)) {
       this.justPlayed = roleToChar(piece.role).toUpperCase() + '@' + pos;
       this.justDropped = piece.role;
       this.justCaptured = undefined;
@@ -530,6 +532,7 @@ export default class AnalyseCtrl {
   }
 
   addDests(dests: string, path: Tree.Path): void {
+    if (!util.isChessOpsEnabled(this.data.game.variant.key)) return;
     this.tree.addDests(dests, path);
     if (path === this.path) {
       this.showGround();
@@ -742,7 +745,13 @@ export default class AnalyseCtrl {
   };
 
   showEvalGauge(): boolean {
-    return this.hasAnyComputerAnalysis() && this.showGauge() && !this.outcome() && this.showComputer();
+    return (
+      this.cevalVariant() && this.hasAnyComputerAnalysis() && this.showGauge() && !this.outcome() && this.showComputer()
+    );
+  }
+
+  cevalVariant(): boolean {
+    return util.allowCevalForVariant(this.data.game.variant.key);
   }
 
   hasAnyComputerAnalysis(): boolean {

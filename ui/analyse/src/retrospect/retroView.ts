@@ -2,7 +2,7 @@ import { renderIndexAndMove } from '../moveView';
 import { notationStyle } from 'chess';
 import { RetroCtrl } from './retroCtrl';
 import AnalyseCtrl from '../ctrl';
-import { bind, dataIcon, spinner } from '../util';
+import { bind, dataIcon, spinner, parentedNode } from '../util';
 import { h, VNode } from 'snabbdom';
 
 function skipOrViewSolution(ctrl: RetroCtrl) {
@@ -64,12 +64,13 @@ const feedback = {
                 'move',
                 renderIndexAndMove(
                   {
+                    variant: ctrl.variant,
                     withDots: true,
                     showGlyphs: true,
                     showEval: false,
                   },
-                  ctrl.current()!.fault.node,
-                  notationStyle(ctrl.variantKey)
+                  parentedNode(ctrl.current()!.fault.node),
+                  notationStyle(ctrl.variant.key)
                 )!
               )
             )
@@ -137,11 +138,13 @@ const feedback = {
                   'strong',
                   renderIndexAndMove(
                     {
-                      withDots: true,
                       showEval: false,
+                      variant: ctrl.variant,
+                      withDots: true,
+                      showGlyphs: true,
                     },
-                    ctrl.current()!.solution.node,
-                    notationStyle(ctrl.variantKey)
+                    parentedNode(ctrl.current()!.solution.node),
+                    notationStyle(ctrl.variant.key)
                   )!
                 )
               )

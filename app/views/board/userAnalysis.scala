@@ -27,7 +27,7 @@ object userAnalysis {
       title = trans.analysis.txt(),
       moreCss = frag(
         cssTag("analyse.free"),
-        pov.game.variant == Variant.Chess(strategygames.chess.variant.Crazyhouse) option cssTag("analyse.zh"),
+        (pov.game.variant.dropsVariant && !pov.game.variant.onlyDropsVariant) option cssTag("analyse.zh"),
         withForecast option cssTag("analyse.forecast"),
         ctx.blind option cssTag("round.nvui")
       ),
@@ -49,9 +49,9 @@ object userAnalysis {
       chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Chess analysis board",
+          title = "Chess analysis board", // TODO: wrong name
           url = s"$netBaseUrl${routes.UserAnalysis.index.url}",
-          description = "Analyse chess positions and variations on an interactive chess board"
+          description = "Analyse chess positions and variations on an interactive chess board" // TODO: wrong description
         )
         .some,
       zoomable = true

@@ -292,6 +292,8 @@ final class JsonView(
         "userAnalysis" -> true
       )
       .add("evalPut" -> me.??(evalCache.shouldPut))
+      .add("possibleDropsByRole" -> possibleDropsByrole(pov))
+      .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
   }
 
   private def blurs(game: Game, player: lila.game.Player) =

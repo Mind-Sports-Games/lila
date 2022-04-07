@@ -1,7 +1,8 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'chessops/fen';
 import * as chessground from './ground';
-import { bind, onInsert, dataIcon, spinner, bindMobileMousedown } from './util';
+import { read as fenRead } from 'chessground/fen';
+import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import { playable } from 'game';
@@ -29,7 +30,7 @@ import * as studyPracticeView from './study/practice/studyPracticeView';
 import { view as forkView } from './fork';
 import { render as acplView } from './acpl';
 import AnalyseCtrl from './ctrl';
-import { ConcealOf } from './interfaces';
+import { ConcealOf, Position } from './interfaces';
 import relayManager from './study/relay/relayManagerView';
 import relayTour from './study/relay/relayTourView';
 import renderPlayerBars from './study/playerBars';
@@ -293,6 +294,15 @@ function addChapterId(study: StudyCtrl | undefined, cssClass: string) {
   return cssClass + (study && study.data.chapter ? '.' + study.data.chapter.id : '');
 }
 
+function renderPlayerScore(score: number, position: Position, playerIndex: string): VNode | undefined {
+  if (score == -1) {
+    return undefined;
+  }
+  const children: VNode[] = [];
+  children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
+  return h('div.game-score.game-score-' + position, children);
+}
+
 export default function (ctrl: AnalyseCtrl): VNode {
   if (ctrl.nvui) return ctrl.nvui.render(ctrl);
   const concealOf = makeConcealOf(ctrl),
@@ -307,8 +317,30 @@ export default function (ctrl: AnalyseCtrl): VNode {
     gaugeOn = ctrl.showEvalGauge(),
     needsInnerCoords = !!gaugeOn || !!playerBars,
     tour = relayTour(ctrl);
+
+  let topScore = -1,
+    bottomScore = -1;
+  const cgState = ctrl.chessground && ctrl.chessground.state;
+  if (ctrl.data.game.variant.key === 'flipello') {
+    const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize);
+    const p1Score = getPlayerScore(ctrl.data.game.variant.key, pieces, 'p1');
+    const p2Score = getPlayerScore(ctrl.data.game.variant.key, pieces, 'p2');
+    topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+    bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+  }
+  // fix coordinates for non-chess games to display them outside due to not working well displaying on board
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(ctrl.data.game.variant.key)) {
+    if (!$('body').hasClass('coords-no')) {
+      $('body').removeClass('coords-in').addClass('coords-out');
+    }
+  }
+
+  //Add piece-letter class for games which dont want Noto Chess (font-famliy)
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(ctrl.data.game.variant.key)
+    ? '.piece-letter'
+    : '';
   return h(
-    'main.analyse.variant-' + ctrl.data.game.variant.key,
+    `main.analyse.variant-${ctrl.data.game.variant.key}${notationBasic}.${ctrl.data.game.gameFamily}`,
     {
       hook: {
         insert: vn => {
@@ -359,6 +391,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
           ]
         ),
       gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
+      menuIsOpen || tour ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex()),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
       gamebookPlayView ||
         (tour
@@ -374,6 +407,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
                     retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
                   ]),
             ])),
+      menuIsOpen || tour ? null : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex()),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
       gamebookPlayView || tour ? null : controls(ctrl),
       ctrl.embed || tour
