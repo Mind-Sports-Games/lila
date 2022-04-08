@@ -33,12 +33,11 @@ function renderMaterial(
   return h('div.material.material-' + position, children);
 }
 
-function renderPlayerScore(score: number, position: Position, playerIndex: string): VNode | undefined {
-  if (score == -1) {
-    return undefined;
-  }
+function renderPlayerScore(score: number, position: Position, playerIndex: string, variantKey: VariantKey): VNode {
+  //TODO change the g-piece to reflect the score in oware or keep orange box in css/score.scss
+  const pieceClass = variantKey === 'oware' ? 'piece.g-piece.' : 'piece.p-piece.';
   const children: VNode[] = [];
-  children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
+  children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
   return h('div.game-score.game-score-' + position, children);
 }
 
@@ -61,14 +60,15 @@ export function main(ctrl: RoundController): VNode {
     cgState = ctrl.chessground && ctrl.chessground.state,
     topPlayerIndex = d[ctrl.flip ? 'player' : 'opponent'].playerIndex,
     bottomPlayerIndex = d[ctrl.flip ? 'opponent' : 'player'].playerIndex,
-    boardSize = d.game.variant.boardSize;
-  let topScore = -1,
-    bottomScore = -1;
+    boardSize = d.game.variant.boardSize,
+    varaintKey = d.game.variant.key;
+  let topScore = 0,
+    bottomScore = 0;
   if (d.hasGameScore) {
-    if (d.game.variant.key === 'flipello') {
+    if (varaintKey === 'flipello') {
       const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
-      const p1Score = util.getPlayerScore(d.game.variant.key, pieces, 'p1');
-      const p2Score = util.getPlayerScore(d.game.variant.key, pieces, 'p2');
+      const p1Score = util.getPlayerScore(varaintKey, pieces, 'p1');
+      const p2Score = util.getPlayerScore(varaintKey, pieces, 'p2');
       topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
       bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
     } else {
@@ -85,28 +85,26 @@ export function main(ctrl: RoundController): VNode {
   if (d.pref.showCaptured) {
     const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
     material = util.getMaterialDiff(pieces);
-    score = util.getScore(d.game.variant.key, pieces) * (bottomPlayerIndex === 'p1' ? 1 : -1);
+    score = util.getScore(varaintKey, pieces) * (bottomPlayerIndex === 'p1' ? 1 : -1);
   } else material = emptyMaterialDiff;
 
   const checks: CheckCount =
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
 
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'oware'].includes(d.game.variant.key)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'oware'].includes(varaintKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(d.game.variant.key)
-    ? '.piece-letter'
-    : '';
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(varaintKey) ? '.piece-letter' : '';
 
   return ctrl.nvui
     ? ctrl.nvui.render(ctrl)
     : h(
-        `div.round__app.variant-${d.game.variant.key}${notationBasic}.${d.game.gameFamily}`,
+        `div.round__app.variant-${varaintKey}${notationBasic}.${d.game.gameFamily}`,
         {
           class: { 'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit) },
         },
@@ -121,13 +119,13 @@ export function main(ctrl: RoundController): VNode {
             },
             [renderGround(ctrl), promotion.view(ctrl)]
           ),
-          renderPlayerScore(topScore, 'top', topPlayerIndex),
+          ctrl.data.hasGameScore ? renderPlayerScore(topScore, 'top', topPlayerIndex, varaintKey) : null,
           crazyView(ctrl, topPlayerIndex, 'top') ||
             renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
             renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.hasGameScore, checks[bottomPlayerIndex]),
-          renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex),
+          ctrl.data.hasGameScore ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, varaintKey) : null,
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ]
       );
