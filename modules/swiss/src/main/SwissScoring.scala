@@ -34,19 +34,22 @@ final private class SwissScoring(
           playerMap = SwissPlayer.toMap(withPoints)
           players = withPoints.map { p =>
             val playerPairings = (~pairingMap.get(p.userId)).values
-            val (tieBreak, perfSum) = playerPairings.foldLeft(0f -> 0f) {
-              case ((tieBreak, perfSum), pairing) =>
+            // TODO: calculate based on rounds, rather than pairings
+            val (sbTieBreak, bhTieBreak, perfSum) = playerPairings.foldLeft((0f, 0f, 0f)) {
+              case ((sbTieBreak, bhTieBreak, perfSum), pairing) =>
                 val opponent       = playerMap.get(pairing opponentOf p.userId)
                 val opponentPoints = opponent.??(_.points.value)
                 val result         = pairing.resultFor(p.userId)
-                val newTieBreak    = tieBreak + result.fold(opponentPoints / 2) { _ ?? opponentPoints }
+                val newSbTieBreak  = sbTieBreak + result.fold(opponentPoints / 2) { _ ?? opponentPoints }
+                val newBhTieBreak  = bhTieBreak + opponentPoints // TODO: make sure this is how we calculate
                 val newPerf = perfSum + opponent.??(_.rating) + result.?? { win =>
                   if (win) 500 else -500
                 }
-                newTieBreak -> newPerf
+                (newSbTieBreak, newBhTieBreak, newPerf)
             }
             p.copy(
-              tieBreak = Swiss.TieBreak(tieBreak),
+              sbTieBreak = Swiss.SonnenbornBerger(sbTieBreak),
+              bhTieBreak = Some(Swiss.Buccholz(bhTieBreak)),
               performance = playerPairings.nonEmpty option Swiss.Performance(perfSum / playerPairings.size)
             ).recomputeScore
           }
@@ -62,7 +65,8 @@ final private class SwissScoring(
                     $id(player.id),
                     $set(
                       f.points      -> player.points,
-                      f.tieBreak    -> player.tieBreak,
+                      f.sbTieBreak    -> player.sbTieBreak,
+                      f.bhTieBreak    -> player.bhTieBreak,
                       f.performance -> player.performance,
                       f.score       -> player.score
                     )

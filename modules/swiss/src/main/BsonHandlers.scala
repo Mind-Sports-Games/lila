@@ -15,10 +15,11 @@ object BsonHandlers {
   implicit val stratVariantHandler  = stratVariantByKeyHandler
   implicit val clockHandler         = clockConfigHandler
   implicit val swissPointsHandler   = intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
-  implicit val swissTieBreakHandler = doubleAnyValHandler[Swiss.TieBreak](_.value, Swiss.TieBreak.apply)
+  implicit val swissSBTieBreakHandler = doubleAnyValHandler[Swiss.SonnenbornBerger](_.value, Swiss.SonnenbornBerger.apply)
+  implicit val swissBHTieBreakHandler = doubleAnyValHandler[Swiss.Buccholz](_.value, Swiss.Buccholz.apply)
   implicit val swissPerformanceHandler =
     floatAnyValHandler[Swiss.Performance](_.value, Swiss.Performance.apply)
-  implicit val swissScoreHandler  = intAnyValHandler[Swiss.Score](_.value, Swiss.Score.apply)
+  implicit val swissScoreHandler  = longAnyValHandler[Swiss.Score](_.value, Swiss.Score.apply)
   implicit val roundNumberHandler = intAnyValHandler[SwissRound.Number](_.value, SwissRound.Number.apply)
   implicit val swissIdHandler     = stringAnyValHandler[Swiss.Id](_.value, Swiss.Id.apply)
   implicit val playerIdHandler    = stringAnyValHandler[SwissPlayer.Id](_.value, SwissPlayer.Id.apply)
@@ -33,7 +34,8 @@ object BsonHandlers {
         rating = r int rating,
         provisional = r boolD provisional,
         points = r.get[Swiss.Points](points),
-        tieBreak = r.get[Swiss.TieBreak](tieBreak),
+        sbTieBreak = r.get[Swiss.SonnenbornBerger](sbTieBreak),
+        bhTieBreak = r.getO[Swiss.Buccholz](bhTieBreak),
         performance = r.getO[Swiss.Performance](performance),
         score = r.get[Swiss.Score](score),
         absent = r.boolD(absent),
@@ -47,7 +49,8 @@ object BsonHandlers {
         rating      -> o.rating,
         provisional -> w.boolO(o.provisional),
         points      -> o.points,
-        tieBreak    -> o.tieBreak,
+        sbTieBreak  -> o.sbTieBreak,
+        bhTieBreak  -> o.bhTieBreak,
         performance -> o.performance,
         score       -> o.score,
         absent      -> w.boolO(o.absent),

@@ -11,7 +11,8 @@ case class SwissPlayer(
     rating: Int,
     provisional: Boolean,
     points: Swiss.Points,
-    tieBreak: Swiss.TieBreak,
+    sbTieBreak: Swiss.SonnenbornBerger,
+    bhTieBreak: Option[Swiss.Buccholz],
     performance: Option[Swiss.Performance],
     score: Swiss.Score,
     absent: Boolean,
@@ -22,9 +23,17 @@ case class SwissPlayer(
   def is(other: SwissPlayer): Boolean = is(other.userId)
   def present                         = !absent
 
+  // If bhTieBreak is None, then we'll use sb, otherwise, we'll use
+  val tieBreak = bhTieBreak.fold(sbTieBreak.value)(_.value)
+
   def recomputeScore =
     copy(
-      score = Swiss.makeScore(points, tieBreak, performance | Swiss.Performance(rating.toFloat))
+      score = Swiss.makeScore(
+        points,
+        ~bhTieBreak,
+        sbTieBreak,
+        performance | Swiss.Performance(rating.toFloat)
+      )
     )
 }
 
@@ -46,7 +55,8 @@ object SwissPlayer {
       rating = user.perfs(perf).intRating,
       provisional = user.perfs(perf).provisional,
       points = Swiss.Points(0),
-      tieBreak = Swiss.TieBreak(0),
+      sbTieBreak = Swiss.SonnenbornBerger(0),
+      bhTieBreak = Some(Swiss.Buccholz(0)),
       performance = none,
       score = Swiss.Score(0),
       absent = false,
@@ -98,7 +108,8 @@ object SwissPlayer {
     val rating      = "r"
     val provisional = "pr"
     val points      = "p"
-    val tieBreak    = "t"
+    val sbTieBreak  = "t"
+    val bhTieBreak  = "tb"
     val performance = "e"
     val score       = "c"
     val absent      = "a"

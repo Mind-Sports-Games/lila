@@ -155,7 +155,7 @@ final class SwissJson(
         .obj(
           "rank"     -> rank,
           "points"   -> player.points.value,
-          "tieBreak" -> player.tieBreak.value,
+          "tieBreak" -> player.tieBreak,
           "rating"   -> player.rating,
           "username" -> user.name
         )
@@ -247,7 +247,7 @@ object SwissJson {
         "user"     -> user,
         "rating"   -> p.rating,
         "points"   -> p.points,
-        "tieBreak" -> p.tieBreak
+        "tieBreak" -> p.tieBreak,
       )
       .add("performance" -> (performance ?? p.performance))
       .add("provisional" -> p.provisional)
@@ -351,9 +351,6 @@ object SwissJson {
   }
   implicit private val pointsWriter: Writes[Swiss.Points] = Writes[Swiss.Points] { p =>
     JsNumber(p.value)
-  }
-  implicit private val tieBreakWriter: Writes[Swiss.TieBreak] = Writes[Swiss.TieBreak] { t =>
-    JsNumber(t.value)
   }
   implicit private val performanceWriter: Writes[Swiss.Performance] = Writes[Swiss.Performance] { t =>
     JsNumber(t.value.toInt)

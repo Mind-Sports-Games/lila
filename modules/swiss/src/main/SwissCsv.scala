@@ -26,7 +26,7 @@ object SwissCsv {
     p.user.name,
     p.player.rating.toString,
     p.player.points.value.toString,
-    p.player.tieBreak.value.toString,
+    p.player.tieBreak.toString,
     p.player.performance.??(_.value.toString)
   )
 
