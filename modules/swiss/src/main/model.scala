@@ -42,8 +42,8 @@ object SwissBounds {
     // NOTE: the above max values need an extra value added to them
     //       in order to be used as the totalValues here, because 0
     //       is also one of the valid values.
-    def score(value: Long) = WithBounds(value, maxScore + 1)
-    def buccholz(value: Long) = WithBounds(value, maxBuccholz + 1)
+    def score(value: Long)            = WithBounds(value, maxScore + 1)
+    def buccholz(value: Long)         = WithBounds(value, maxBuccholz + 1)
     def sonnenbornBerger(value: Long) = WithBounds(value, maxSonnenbornBerger + 1)
     // Although not in this case, because this is already
     // an overestimated upper bound
@@ -54,15 +54,16 @@ object SwissBounds {
   //       it fits, rather than overflows
   // in this case it is assumed the first value will be put
   // into the LSB, and the later values into the MORE SB
-  def encodeIntoLong(data: WithBounds*) =
+  def encodeIntoLong(data: WithBounds*) = {
     encodeIntoLongRecurse(1, data: _*)
+  }
 
   def encodeIntoLongRecurse(factor: Long, data: WithBounds*): Long =
     data match {
-      case first :: Nil => factor * first.value
-      case first :: rest =>
+      case Seq(first) => factor * first.value
+      case Seq(first, as @ _*) =>
         (factor * first.value)
-        +encodeIntoLongRecurse(factor * first.totalValues, rest: _*)
-      case Nil => 0
+        +encodeIntoLongRecurse(factor * first.totalValues, as: _*)
+      case Seq() => 0
     }
 }

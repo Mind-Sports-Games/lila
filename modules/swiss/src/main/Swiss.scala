@@ -152,10 +152,10 @@ object Swiss {
     val wb = b.WithBounds
     Score(
       b.encodeIntoLong(
-        wb.score(points.value.toLong),
         wb.performance(perf.value.toLong),
         wb.sonnenbornBerger(sonnenbornBerger.value.toLong),
         wb.buccholz(buccholz.value.toLong),
+        wb.score(points.value.toLong),
       )
     )
   }
