@@ -32,8 +32,8 @@ case class SwissFinish(id: Swiss.Id, ranking: Ranking)
 object SwissBounds {
   val maxRounds           = 100
   val maxScore            = maxRounds * 2
-  val maxBuccholz         = maxScore * 2
-  val maxSonnenbornBerger = maxScore * 2
+  val maxBuccholz         = maxRounds * maxScore
+  val maxSonnenbornBerger = maxRounds * maxScore
   val maxPerformance      = 5000
 
   // TODO: these are a candidates to be moved elsewhere
