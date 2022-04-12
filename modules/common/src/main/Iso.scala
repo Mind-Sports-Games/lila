@@ -19,6 +19,7 @@ object Iso {
 
   type StringIso[B]  = Iso[String, B]
   type IntIso[B]     = Iso[Int, B]
+  type LongIso[B]    = Iso[Long, B]
   type BooleanIso[B] = Iso[Boolean, B]
   type DoubleIso[B]  = Iso[Double, B]
   type FloatIso[B]   = Iso[Float, B]
@@ -65,7 +66,7 @@ object Iso {
 
   implicit val langIso = string[Lang](Lang.apply, _.toString)
 
-  implicit val fenIso = string[FEN](FEN.apply, _.value)
+  implicit val fenIso      = string[FEN](FEN.apply, _.value)
   implicit val stratFenIso = string[StratFEN](f => StratFEN.wrap(FEN(f)), _.value)
   //implicit val StratFENHandler: BSONHandler[StratFEN] = stringAnyValHandler[StratFEN](_.value, f => StratFEN.wrap(FEN(f)))
 

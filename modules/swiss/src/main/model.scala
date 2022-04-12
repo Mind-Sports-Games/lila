@@ -28,3 +28,42 @@ case class FeaturedSwisses(
 )
 
 case class SwissFinish(id: Swiss.Id, ranking: Ranking)
+
+object SwissBounds {
+  val maxRounds           = 100
+  val maxScore            = maxRounds * 2
+  val maxBuchholz         = maxRounds * maxScore
+  val maxSonnenbornBerger = maxRounds * maxScore
+  val maxPerformance      = 5000
+
+  // TODO: these are a candidates to be moved elsewhere
+  case class WithBounds(value: Long, totalValues: Long)
+  object WithBounds {
+    // NOTE: the above max values need an extra value added to them
+    //       in order to be used as the totalValues here, because 0
+    //       is also one of the valid values.
+    def score(value: Long)            = WithBounds(value, maxScore + 1)
+    def buchholz(value: Long)         = WithBounds(value, maxBuchholz + 1)
+    def sonnenbornBerger(value: Long) = WithBounds(value, maxSonnenbornBerger + 1)
+    // Although not in this case, because this is already
+    // an overestimated upper bound
+    def performance(value: Long) = WithBounds(value, maxPerformance)
+  }
+
+  // TODO: could also do a quick check here to ensure
+  //       it fits, rather than overflows
+  // in this case it is assumed the first value will be put
+  // into the LSB, and the later values into the MORE SB
+  def encodeIntoLong(data: WithBounds*) = {
+    encodeIntoLongRecurse(1, data: _*)
+  }
+
+  def encodeIntoLongRecurse(factor: Long, data: WithBounds*): Long =
+    data match {
+      case Seq(first) => factor * first.value
+      case Seq(first, as @ _*) =>
+        (factor * first.value)
+        +encodeIntoLongRecurse(factor * first.totalValues, as: _*)
+      case Seq() => 0
+    }
+}

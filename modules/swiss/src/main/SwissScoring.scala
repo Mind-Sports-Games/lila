@@ -5,6 +5,51 @@ import scala.concurrent.duration._
 
 import lila.db.dsl._
 
+import strategygames.tiebreaks.{ Player => TiebreakPlayer, Result => TiebreakResult, Tiebreak, Tournament }
+
+// TODO: This was WAY more code than I expected. It's annoying
+//       but I don't want our tiebreak code to be too tied to the Swiss
+//       representation, so I split it out into strategy games.
+//       I'm happy to receive feedback though.
+final private class SwissTiebreak(
+    swiss: Swiss,
+    playerMap: SwissPlayer.PlayerMap,
+    pairingMap: SwissPairing.PairingMap
+) extends Tournament {
+  val nbRounds = swiss.settings.nbRounds
+  def resultsForPlayer(hero: TiebreakPlayer): List[TiebreakResult] = {
+    playerMap
+      .get(hero.id)
+      .fold[List[TiebreakResult]](List())(player => {
+        val playerPairingMap = ~pairingMap.get(hero.id)
+        swiss.allRounds.flatMap { round =>
+          {
+            // We use 1-based indexing here, 
+            // but the tiebreakers use 0 based indexing
+            val r = Tiebreak.Round(round.value-1)
+            playerPairingMap get round match {
+              case Some(pairing) => {
+                val foe = TiebreakPlayer(pairing opponentOf hero.id)
+                pairing.status match {
+                  case Left(_)     => None
+                  case Right(None) => Some(r.draw(hero, foe))
+                  case Right(Some(playerIndex)) =>
+                    if (pairing(playerIndex) == hero.id)
+                      Some(r.win(hero, foe))
+                    else
+                      Some(r.lose(hero, foe))
+                }
+              }
+              case None if player.byes(round) => Some(r.bye(hero))
+              case None if round.value == 1   => Some(r.noShowDraw(hero))
+              case None                       => Some(r.withdrawn(hero))
+            }
+          }
+        }
+      })
+  }
+}
+
 final private class SwissScoring(
     colls: SwissColls
 )(implicit system: akka.actor.ActorSystem, ec: scala.concurrent.ExecutionContext, mode: play.api.Mode) {
@@ -32,23 +77,28 @@ final private class SwissScoring(
             player.copy(points = sheet.points)
           }
           playerMap = SwissPlayer.toMap(withPoints)
+          tiebreaks = new Tiebreak(new SwissTiebreak(swiss, playerMap, pairingMap))
           players = withPoints.map { p =>
-            val playerPairings = (~pairingMap.get(p.userId)).values
-            val (tieBreak, perfSum) = playerPairings.foldLeft(0f -> 0f) {
-              case ((tieBreak, perfSum), pairing) =>
-                val opponent       = playerMap.get(pairing opponentOf p.userId)
-                val opponentPoints = opponent.??(_.points.value)
-                val result         = pairing.resultFor(p.userId)
-                val newTieBreak    = tieBreak + result.fold(opponentPoints / 2) { _ ?? opponentPoints }
-                val newPerf = perfSum + opponent.??(_.rating) + result.?? { win =>
-                  if (win) 500 else -500
-                }
-                newTieBreak -> newPerf
+            {
+              val playerPairings = (~pairingMap.get(p.userId)).values
+              val sbTieBreak = tiebreaks.lilaSonnenbornBerger(TiebreakPlayer(p.userId))
+              val bhTieBreak = tiebreaks.fideBuchholz(TiebreakPlayer(p.userId))
+              // TODO: should the perf rating be in stratgames too?
+              val perfSum = playerPairings.foldLeft(0f) {
+                case (perfSum, pairing) =>
+                  val opponent       = playerMap.get(pairing opponentOf p.userId)
+                  val result         = pairing.resultFor(p.userId)
+                  val newPerf = perfSum + opponent.??(_.rating) + result.?? { win =>
+                    if (win) 500 else -500
+                  }
+                  newPerf
+              }
+              p.copy(
+                sbTieBreak = Swiss.SonnenbornBerger(sbTieBreak),
+                bhTieBreak = Some(Swiss.Buchholz(bhTieBreak)),
+                performance = playerPairings.nonEmpty option Swiss.Performance(perfSum / playerPairings.size)
+              ).recomputeScore
             }
-            p.copy(
-              tieBreak = Swiss.TieBreak(tieBreak),
-              performance = playerPairings.nonEmpty option Swiss.Performance(perfSum / playerPairings.size)
-            ).recomputeScore
           }
           _ <- SwissPlayer.fields { f =>
             prevPlayers
@@ -62,7 +112,8 @@ final private class SwissScoring(
                     $id(player.id),
                     $set(
                       f.points      -> player.points,
-                      f.tieBreak    -> player.tieBreak,
+                      f.sbTieBreak  -> player.sbTieBreak,
+                      f.bhTieBreak  -> player.bhTieBreak,
                       f.performance -> player.performance,
                       f.score       -> player.score
                     )
