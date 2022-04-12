@@ -32,7 +32,7 @@ case class SwissFinish(id: Swiss.Id, ranking: Ranking)
 object SwissBounds {
   val maxRounds           = 100
   val maxScore            = maxRounds * 2
-  val maxBuccholz         = maxRounds * maxScore
+  val maxBuchholz         = maxRounds * maxScore
   val maxSonnenbornBerger = maxRounds * maxScore
   val maxPerformance      = 5000
 
@@ -43,7 +43,7 @@ object SwissBounds {
     //       in order to be used as the totalValues here, because 0
     //       is also one of the valid values.
     def score(value: Long)            = WithBounds(value, maxScore + 1)
-    def buccholz(value: Long)         = WithBounds(value, maxBuccholz + 1)
+    def buchholz(value: Long)         = WithBounds(value, maxBuchholz + 1)
     def sonnenbornBerger(value: Long) = WithBounds(value, maxSonnenbornBerger + 1)
     // Although not in this case, because this is already
     // an overestimated upper bound

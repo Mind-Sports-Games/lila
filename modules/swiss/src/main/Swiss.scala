@@ -99,12 +99,12 @@ object Swiss {
     def value: Double
   }
   case class SonnenbornBerger(val value: Double) extends AnyVal with TieBreak
-  case class Buccholz(val value: Double)         extends AnyVal with TieBreak
+  case class Buchholz(val value: Double)         extends AnyVal with TieBreak
   case class Performance(value: Float)           extends AnyVal
   case class Score(value: Long)                  extends AnyVal
 
   implicit val SonnenbornBergerZero: Zero[SonnenbornBerger] = Zero.instance(SonnenbornBerger(0))
-  implicit val BuccholzZero: Zero[Buccholz]                 = Zero.instance(Buccholz(0))
+  implicit val BuchholzZero: Zero[Buchholz]                 = Zero.instance(Buchholz(0))
 
   case class IdName(_id: Id, name: String) {
     def id = _id
@@ -144,7 +144,7 @@ object Swiss {
 
   def makeScore(
       points: Points,
-      buccholz: Buccholz,
+      buchholz: Buchholz,
       sonnenbornBerger: SonnenbornBerger,
       perf: Performance
   ) = {
@@ -154,7 +154,7 @@ object Swiss {
       b.encodeIntoLong(
         wb.performance(perf.value.toLong),
         wb.sonnenbornBerger(sonnenbornBerger.value.toLong),
-        wb.buccholz(buccholz.value.toLong),
+        wb.buchholz(buchholz.value.toLong),
         wb.score(points.value.toLong),
       )
     )

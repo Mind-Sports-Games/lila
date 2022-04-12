@@ -16,7 +16,7 @@ object BsonHandlers {
   implicit val clockHandler         = clockConfigHandler
   implicit val swissPointsHandler   = intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
   implicit val swissSBTieBreakHandler = doubleAnyValHandler[Swiss.SonnenbornBerger](_.value, Swiss.SonnenbornBerger.apply)
-  implicit val swissBHTieBreakHandler = doubleAnyValHandler[Swiss.Buccholz](_.value, Swiss.Buccholz.apply)
+  implicit val swissBHTieBreakHandler = doubleAnyValHandler[Swiss.Buchholz](_.value, Swiss.Buchholz.apply)
   implicit val swissPerformanceHandler =
     floatAnyValHandler[Swiss.Performance](_.value, Swiss.Performance.apply)
   implicit val swissScoreHandler  = longAnyValHandler[Swiss.Score](_.value, Swiss.Score.apply)
@@ -35,7 +35,7 @@ object BsonHandlers {
         provisional = r boolD provisional,
         points = r.get[Swiss.Points](points),
         sbTieBreak = r.get[Swiss.SonnenbornBerger](sbTieBreak),
-        bhTieBreak = r.getO[Swiss.Buccholz](bhTieBreak),
+        bhTieBreak = r.getO[Swiss.Buchholz](bhTieBreak),
         performance = r.getO[Swiss.Performance](performance),
         score = r.get[Swiss.Score](score),
         absent = r.boolD(absent),
