@@ -42,12 +42,12 @@ object SwissBounds {
     // NOTE: the above max values need an extra value added to them
     //       in order to be used as the totalValues here, because 0
     //       is also one of the valid values.
-    def score(value: Long)            = WithBounds(value, maxScore + 1)
-    def buchholz(value: Long)         = WithBounds(value*2, maxBuchholz + 1)
-    def sonnenbornBerger(value: Long) = WithBounds(value*4, maxSonnenbornBerger + 1)
+    def score(value: Double)            = WithBounds(value.toLong, maxScore + 1)
+    def buchholz(value: Double)         = WithBounds((value*2).toLong, maxBuchholz + 1)
+    def sonnenbornBerger(value: Double) = WithBounds((value*4).toLong, maxSonnenbornBerger + 1)
     // Although not in this case, because this is already
     // an overestimated upper bound
-    def performance(value: Long) = WithBounds(value, maxPerformance)
+    def performance(value: Double) = WithBounds(value.toLong, maxPerformance)
   }
 
   // TODO: could also do a quick check here to ensure
