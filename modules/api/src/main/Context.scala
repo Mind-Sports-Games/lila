@@ -48,7 +48,7 @@ sealed trait Context extends lila.user.UserContextWrapper {
   def teamNbRequests  = pageData.teamNbRequests
   def nbChallenges    = pageData.nbChallenges
   def nbNotifications = pageData.nbNotifications
-  def pref            = pageData.pref
+  def pref            = pageData.pref.copy(pieceSet = lila.pref.PieceSet.addMissingDefaultsIfAny(pageData.pref.pieceSet))
   def blind           = pageData.blindMode
   def noBlind         = !blind
   def nonce           = pageData.nonce
