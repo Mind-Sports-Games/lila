@@ -153,11 +153,12 @@ final class SwissJson(
     case SwissPlayer.WithUserAndRank(player, user, rank) =>
       Json
         .obj(
-          "rank"     -> rank,
-          "points"   -> player.points.value,
-          "tieBreak" -> player.tieBreak,
-          "rating"   -> player.rating,
-          "username" -> user.name
+          "rank"      -> rank,
+          "points"    -> player.points.value,
+          "tieBreak"  -> player.tieBreak,
+          "tieBreak2" -> player.tieBreak2,
+          "rating"    -> player.rating,
+          "username"  -> user.name
         )
         .add("title" -> user.title)
         .add("performance" -> player.performance)
@@ -244,10 +245,11 @@ object SwissJson {
   ): JsObject =
     Json
       .obj(
-        "user"     -> user,
-        "rating"   -> p.rating,
-        "points"   -> p.points,
-        "tieBreak" -> p.tieBreak,
+        "user"      -> user,
+        "rating"    -> p.rating,
+        "points"    -> p.points,
+        "tieBreak"  -> p.tieBreak,
+        "tieBreak2" -> p.tieBreak2
       )
       .add("performance" -> (performance ?? p.performance))
       .add("provisional" -> p.provisional)
