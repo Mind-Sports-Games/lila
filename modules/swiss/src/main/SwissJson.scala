@@ -256,7 +256,6 @@ object SwissJson {
   private def outcomeJson(outcome: SwissSheet.Outcome): String =
     outcome match {
       case SwissSheet.Absent => "absent"
-      case SwissSheet.Late   => "late"
       case SwissSheet.Bye    => "bye"
       case _                 => ""
     }
