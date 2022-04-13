@@ -64,7 +64,6 @@ final class SwissTrf(
             import SwissSheet._
             outcome match {
               case Absent  => "-"
-              case Late    => "H"
               case Bye     => "U"
               case Draw    => "="
               case Win     => "1"

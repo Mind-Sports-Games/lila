@@ -13,7 +13,6 @@ private object SwissSheet {
 
   sealed trait Outcome
   case object Bye     extends Outcome
-  case object Late    extends Outcome // missed the first round
   case object Absent  extends Outcome
   case object Ongoing extends Outcome
   case object Win     extends Outcome
@@ -51,7 +50,6 @@ private object SwissSheet {
               case Right(Some(playerIndex)) => if (pairing(playerIndex) == player.userId) Win else Loss
             }
           case None if player.byes(round) => Bye
-          case None if round.value == 1   => Late
           case None                       => Absent
         }
       }

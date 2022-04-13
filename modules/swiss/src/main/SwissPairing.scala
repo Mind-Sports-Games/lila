@@ -16,26 +16,27 @@ case class SwissPairing(
     microMatchGameId: Option[Game.ID],
     openingFEN: Option[FEN]
 ) {
-  def apply(c: PlayerIndex)             = c.fold(p1, p2)
-  def gameId                      = id
-  def players                     = List(p1, p2)
-  def has(userId: User.ID)        = p1 == userId || p2 == userId
-  def playerIndexOf(userId: User.ID)    = PlayerIndex.fromP1(p1 == userId)
-  def opponentOf(userId: User.ID) = if (p1 == userId) p2 else p1
-  def winner: Option[User.ID]     = (~status.toOption).map(apply)
-  def isOngoing                   = status.isLeft
-  def resultFor(userId: User.ID)  = winner.map(userId.==)
-  def p1Wins                   = status == Right(Some(PlayerIndex.P1))
-  def p2Wins                   = status == Right(Some(PlayerIndex.P2))
-  def isDraw                      = status == Right(None)
-  def strResultOf(playerIndex: PlayerIndex)   = status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
+  def apply(c: PlayerIndex)          = c.fold(p1, p2)
+  def gameId                         = id
+  def players                        = List(p1, p2)
+  def has(userId: User.ID)           = p1 == userId || p2 == userId
+  def playerIndexOf(userId: User.ID) = PlayerIndex.fromP1(p1 == userId)
+  def opponentOf(userId: User.ID)    = if (p1 == userId) p2 else p1
+  def winner: Option[User.ID]        = (~status.toOption).map(apply)
+  def isOngoing                      = status.isLeft
+  def resultFor(userId: User.ID)     = winner.map(userId.==)
+  def p1Wins                         = status == Right(Some(PlayerIndex.P1))
+  def p2Wins                         = status == Right(Some(PlayerIndex.P2))
+  def isDraw                         = status == Right(None)
+  def strResultOf(playerIndex: PlayerIndex) =
+    status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
 }
 
 case class SwissPairingGameIds(
-  id: Game.ID,
-  isMicroMatch: Boolean,
-  microMatchGameId: Option[Game.ID],
-  openingFEN: Option[FEN]
+    id: Game.ID,
+    isMicroMatch: Boolean,
+    microMatchGameId: Option[Game.ID],
+    openingFEN: Option[FEN]
 )
 
 case class SwissPairingGames(
@@ -47,7 +48,7 @@ case class SwissPairingGames(
 ) {
   def finishedOrAborted =
     game.finishedOrAborted && (!isMicroMatch || microMatchGame.fold(false)(_.finishedOrAborted))
-  def outoftime = if (game.outoftime(true)) List(game) else List() ++ microMatchGame.filter(_.outoftime(true))
+  def outoftime         = if (game.outoftime(true)) List(game) else List() ++ microMatchGame.filter(_.outoftime(true))
   def winnerPlayerIndex =
     // Single games are easy.
     if (!isMicroMatch) game.winnerPlayerIndex
@@ -57,12 +58,12 @@ case class SwissPairingGames(
       microMatchGame.flatMap(g2 =>
         (game.winnerPlayerIndex, g2.winnerPlayerIndex) match {
           // Same player winning both games is a win for that player
-          case (Some(playerIndex1), Some(playerIndex2)) if (playerIndex1 != playerIndex2) => Some(playerIndex1)
+          case (Some(playerIndex1), Some(playerIndex2)) if playerIndex1 != playerIndex2 => Some(playerIndex1)
           // The first game was decisive, second game a draw, so first game winner playerIndex is the winner
-          case (Some(playerIndex1), None)         => Some(playerIndex1)
+          case (Some(playerIndex1), None) => Some(playerIndex1)
           // The second game was decisive, first game a draw, so second game winner's opposite playerIndex is the winner
-          case (None, Some(playerIndex2))         => Some(!playerIndex2)
-          case _ => None
+          case (None, Some(playerIndex2)) => Some(!playerIndex2)
+          case _                          => None
         }
       )
   def playersWhoDidNotMove =
@@ -73,7 +74,12 @@ case class SwissPairingGames(
 object SwissPairing {
 
   implicit def toSwissPairingGameIds(swissPairing: SwissPairing): SwissPairingGameIds =
-    SwissPairingGameIds(swissPairing.id, swissPairing.isMicroMatch, swissPairing.microMatchGameId, swissPairing.openingFEN)
+    SwissPairingGameIds(
+      swissPairing.id,
+      swissPairing.isMicroMatch,
+      swissPairing.microMatchGameId,
+      swissPairing.openingFEN
+    )
 
   sealed trait Ongoing
   case object Ongoing extends Ongoing
