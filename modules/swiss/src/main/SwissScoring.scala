@@ -81,8 +81,8 @@ final private class SwissScoring(
           players = withPoints.map { p =>
             {
               val playerPairings = (~pairingMap.get(p.userId)).values
-              val sbTieBreak = tiebreaks.lilaSonnenbornBerger(TiebreakPlayer(p.userId))
-              val bhTieBreak = tiebreaks.fideBuchholz(TiebreakPlayer(p.userId))
+              val sbTieBreak = 0.5*tiebreaks.lilaSonnenbornBerger(TiebreakPlayer(p.userId))
+              val bhTieBreak = 0.5*tiebreaks.fideBuchholz(TiebreakPlayer(p.userId))
               // TODO: should the perf rating be in stratgames too?
               val perfSum = playerPairings.foldLeft(0f) {
                 case (perfSum, pairing) =>
