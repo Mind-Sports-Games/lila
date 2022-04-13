@@ -16,7 +16,7 @@ final private class SwissTiebreak(
     playerMap: SwissPlayer.PlayerMap,
     pairingMap: SwissPairing.PairingMap
 ) extends Tournament {
-  val nbRounds = swiss.settings.nbRounds
+  val nbRounds = swiss.actualNbRounds
   def resultsForPlayer(hero: TiebreakPlayer): List[TiebreakResult] = {
     playerMap
       .get(hero.id)
