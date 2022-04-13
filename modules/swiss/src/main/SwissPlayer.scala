@@ -25,6 +25,8 @@ case class SwissPlayer(
 
   // If bhTieBreak is None, then we'll use sb, otherwise, we'll use
   val tieBreak = bhTieBreak.fold(sbTieBreak.value)(_.value)
+  // If bhTieBreak is None, then there is no secondary tb, else its sb
+  val tieBreak2 = bhTieBreak.map(_ => sbTieBreak.value)
 
   def recomputeScore =
     copy(

@@ -169,13 +169,19 @@ object home {
       i("?"),
       p(
         strong("How are tie breaks calculated?"),
-        "With the ",
+        "From April 2022, the primary tie breaker is the ",
+        a(
+          href := "https://en.wikipedia.org/wiki/Buchholz_system"
+        )("Buchholz System [BH]"),
+        " in full (without dropping any opponent scores). Put simply, this is the sum of all opponents tournament scores. Byes and opponents who are absent for rounds are handled as per FIDE guidlines.",
+        br,
+        "The secondary tie breaker is the ",
         a(
           href := "https://en.wikipedia.org/wiki/Tie-breaking_in_Swiss-system_tournaments#Sonneborn%E2%80%93Berger_score"
-        )("Sonneborn–Berger score"),
-        ".",
+        )("Sonneborn–Berger score [SB]"),
+        ". Put simply, this is calculated by adding the scores of every opponent the player beats and half of the score of every opponent the player draws.",
         br,
-        "Add the scores of every opponent the player beats and half of the score of every opponent the player draws."
+        "The Sonneborn-Berger score is the primary tie breaker for any Swiss tournaments run before April 2022."
       )
     ),
     div(cls := "faq")(
