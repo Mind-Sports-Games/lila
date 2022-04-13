@@ -23,7 +23,7 @@ private object SwissSheet {
   def pointsFor(outcome: Outcome) =
     outcome match {
       case Win | Bye => 2
-      case Draw      => 1 // TODO: make Late 0 for future
+      case Draw      => 1
       case _         => 0
     }
 
