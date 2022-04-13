@@ -62,8 +62,10 @@ object SwissBounds {
     data match {
       case Seq(first) => factor * first.value
       case Seq(first, as @ _*) =>
-        (factor * first.value)
-        +encodeIntoLongRecurse(factor * first.totalValues, as: _*)
+        ((factor * first.value) + encodeIntoLongRecurse(
+          factor * first.totalValues,
+          as: _*
+        ))
       case Seq() => 0
     }
 }
