@@ -170,7 +170,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction', 'scrambledEggs'];
+const noAnalysisVariants = ['linesOfAction', 'scrambledEggs', 'flipello'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;
