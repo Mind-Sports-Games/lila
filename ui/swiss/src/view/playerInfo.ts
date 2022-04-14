@@ -66,8 +66,8 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
         h('h2', [h('span.rank', data.rank + '. '), renderPlayer(data, true, false)]),
         h('table', [
           numberRow('Points', isMM ? data.points * 2 : data.points, 'raw'),
-          numberRow('Tie break' + (data.tieBreak2 ? ' [BH]' : ' [SB]'), data.tieBreak, 'raw'),
-          data.tieBreak2 ? numberRow('Tie break [SB]', data.tieBreak2, 'raw') : null,
+          numberRow('Tiebreak' + (data.tieBreak2 ? ' [BH]' : ' [SB]'), data.tieBreak, 'raw'),
+          data.tieBreak2 ? numberRow('Tiebreak [SB]', data.tieBreak2, 'raw') : null,
           ...(games
             ? [
                 data.performance
