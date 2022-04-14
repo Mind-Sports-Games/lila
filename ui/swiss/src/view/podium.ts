@@ -7,7 +7,7 @@ function podiumStats(p: PodiumPlayer, trans: Trans, isMM: boolean): VNode {
   const noarg = trans.noarg;
   return h('table.stats', [
     h('tr', [h('th', 'Points'), h('td', isMM ? '' + p.points * 2 : '' + p.points)]),
-    h('tr', [h('th', 'Tie Break'), h('td', '' + p.tieBreak)]),
+    h('tr', [h('th', 'Tiebreak'), h('td', '' + p.tieBreak)]),
     p.performance ? h('tr', [h('th', noarg('performance')), h('td', '' + p.performance)]) : null,
   ]);
 }

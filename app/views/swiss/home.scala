@@ -106,7 +106,7 @@ object home {
       tr(
         th("Pairing system"),
         td("Any available opponent with similar ranking"),
-        td("Best pairing based on points and tie breaks")
+        td("Best pairing based on points and tiebreaks")
       ),
       tr(
         th("Pairing wait time"),
@@ -168,20 +168,20 @@ object home {
     div(cls := "faq")(
       i("?"),
       p(
-        strong("How are tie breaks calculated?"),
-        "From April 2022, the primary tie breaker is the ",
+        strong("How are tiebreaks calculated?"),
+        "From April 2022, the primary tiebreaker is the ",
         a(
           href := "https://en.wikipedia.org/wiki/Buchholz_system"
         )("Buchholz System [BH]"),
-        " in full (without dropping any opponent scores). Put simply, this is the sum of all opponents tournament scores. Byes and opponents who are absent for rounds are handled as per FIDE guidlines.",
+        " in full (without dropping any opponent scores). Put simply, this is the sum of all opponents tournament scores. Byes and opponents who are absent for rounds are handled as per FIDE guidelines.",
         br,
-        "The secondary tie breaker is the ",
+        "The secondary tiebreaker is the ",
         a(
           href := "https://en.wikipedia.org/wiki/Tie-breaking_in_Swiss-system_tournaments#Sonneborn%E2%80%93Berger_score"
         )("Sonneborn–Berger score [SB]"),
         ". Put simply, this is calculated by adding the scores of every opponent the player beats and half of the score of every opponent the player draws.",
         br,
-        "The Sonneborn-Berger score is the primary tie breaker for any Swiss tournaments run before April 2022."
+        "The Sonneborn-Berger score is the primary tiebreaker for any Swiss tournaments run before April 2022."
       )
     ),
     div(cls := "faq")(

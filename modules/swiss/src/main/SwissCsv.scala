@@ -13,7 +13,7 @@ object SwissCsv {
           "Username",
           "Rating",
           "Points",
-          "Tie Break",
+          "Tiebreak",
           "Performance"
         )
       )
