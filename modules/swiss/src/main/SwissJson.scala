@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ P1, P2 }
+import strategygames.{ P1, P2, Player => PlayerIndex }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -314,6 +314,9 @@ object SwissJson {
     case _ => None
   }
 
+  private def checkCount(game: Game, playerIndex: PlayerIndex) =
+    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.history.checkCount(playerIndex)
+
   private[swiss] def boardJson(b: SwissBoard.WithGame) =
     Json
       .obj(
@@ -339,6 +342,8 @@ object SwissJson {
       .add("boardSize" -> boardSizeJson(b.game.variant))
       .add("isMicroMatch" -> b.board.isMicroMatch)
       .add("microMatchGameId" -> b.board.microMatchGameId)
+      .add("p1Checks" -> checkCount(b.game, b.game.p1Player.playerIndex))
+      .add("p2Checks" -> checkCount(b.game, b.game.p2Player.playerIndex))
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(

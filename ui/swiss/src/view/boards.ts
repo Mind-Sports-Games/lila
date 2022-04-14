@@ -47,6 +47,38 @@ const renderBoard = (board: Board): VNode =>
     ]
   );
 
+function calculateScore(board: Board, playerIndex: PlayerIndex): String {  
+  console.log("board ", board);
+  var score = ""
+  switch(board.variantKey) {
+      case "flipello": {
+        const boardFen = board.fen.split(" ")[0].split("[")[0];
+        if (playerIndex == 'p1'){
+          score = "(" + (boardFen.split('p').length - 1).toString() + ")"
+        }else{
+          score = "(" + (boardFen.split('P').length - 1).toString() + ")"
+        }
+        break;
+      }
+      case "threeCheck":
+      case "fiveCheck": {
+        var numChecks: number = 0
+        if (playerIndex == 'p1'){
+          numChecks = board.p1Checks ? board.p1Checks : 0
+        }else{
+          numChecks = board.p2Checks ? board.p2Checks : 0
+        }      
+        score = "(" + numChecks.toString() + ")"
+        break;
+      }
+      default: {
+       score = ""
+       break;
+      }
+  }
+  return score;
+}
+
 function boardPlayer(board: Board, playerIndex: PlayerIndex) {
   const player = board[playerIndex];
   return h('span.mini-game__player', [
@@ -59,5 +91,6 @@ function boardPlayer(board: Board, playerIndex: PlayerIndex) {
           },
         })
       : h('span.mini-game__result', board.winner ? (board.winner == playerIndex ? 1 : 0) : '½'),
+      h('span', calculateScore(board, playerIndex)),
   ]);
 }

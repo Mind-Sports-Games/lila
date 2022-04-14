@@ -142,6 +142,8 @@ export interface Board {
     p2: number;
   };
   winner?: PlayerIndex;
+  p1Checks?: number;
+  p2Checks?: number;
 }
 
 export interface BoardPlayer extends BasePlayer {

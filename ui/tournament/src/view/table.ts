@@ -37,9 +37,42 @@ function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex) {
             'data-time': clock[playerIndex],
             'data-managed': 1,
           },
-        })
+        } )
       : h('span.mini-game__result', game.winner ? (game.winner == playerIndex ? 1 : 0) : '½'),
+    h('span', calculateScore(game, playerIndex))
   ]);
+}
+
+function calculateScore(game: FeaturedGame, playerIndex: PlayerIndex): String {  
+  console.log("game ", game);
+  var score = ""
+  switch(game.variantKey) {
+      case "flipello": {
+        const boardFen = game.fen.split(" ")[0].split("[")[0];
+        if (playerIndex == 'p1'){
+          score = "(" + (boardFen.split('p').length - 1).toString() + ")"
+        }else{
+          score = "(" + (boardFen.split('P').length - 1).toString() + ")"
+        }
+        break;
+      }
+      case "threeCheck":
+      case "fiveCheck": {
+        var numChecks: number = 0
+        if (playerIndex == 'p1'){
+          numChecks = game.p1Checks ? game.p1Checks : 0
+        }else{
+          numChecks = game.p2Checks ? game.p2Checks : 0
+        }      
+        score = "(" + numChecks.toString() + ")"
+        break;
+      }
+      default: {
+       score = ""
+       break;
+      }
+  }
+  return score;
 }
 
 function featured(game: FeaturedGame): VNode {

@@ -53,6 +53,8 @@ export interface FeaturedGame {
     p2: number;
   };
   winner?: PlayerIndex;
+  p1Checks?: number;
+  p2Checks?: number;
 }
 
 interface FeaturedPlayer {

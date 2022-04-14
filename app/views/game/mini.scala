@@ -98,7 +98,7 @@ object mini {
           .filter(p => p == pov.playerIndex.name)
           .size
           .toString() + ")"
-      case "threeCheck" | "fivecheck" =>
+      case "threeCheck" | "fiveCheck" =>
         "(" + pov.game.history
           .checkCount(pov.game.opponent(pov.playerIndex).playerIndex)
           .toString() + ")"

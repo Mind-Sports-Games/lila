@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, P1, P2 }
+import strategygames.{ Clock, P1, P2, Player => PlayerIndex }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -282,6 +282,10 @@ final class JsonView(
     case _ => None
   }
 
+  private def checkCount(game: Game, playerIndex: PlayerIndex) =
+    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.pp("game").history.pp("history").checkCount(playerIndex).pp("checkcount")
+
+
   private def featuredJson(featured: FeaturedGame) = {
     val game = featured.game
     def ofPlayer(rp: RankedPlayer, p: lila.game.Player) = {
@@ -321,6 +325,9 @@ final class JsonView(
       )
       .add("winner" -> game.winnerPlayerIndex.map(_.name))
       .add("boardSize" -> boardSizeJson(game.variant))
+      .add("p1Checks"  -> checkCount(game, game.p1Player.playerIndex.pp("p1")))
+      .add("p2Checks"  -> checkCount(game, game.p2Player.playerIndex.pp("p2")))
+
   }
 
   private def myInfoJson(u: Option[User], delay: Option[Pause.Delay])(i: MyInfo) =
