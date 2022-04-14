@@ -1,5 +1,7 @@
 package lila.swiss
 
+import ornicar.scalalib.Zero
+
 import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
 import strategygames.Speed
@@ -93,9 +95,16 @@ object Swiss {
     def value: Float = double / 2f
     def +(p: Points) = Points(double + p.double)
   }
-  case class TieBreak(value: Double)   extends AnyVal
-  case class Performance(value: Float) extends AnyVal
-  case class Score(value: Int)         extends AnyVal
+  trait TieBreak extends Any {
+    def value: Double
+  }
+  case class SonnenbornBerger(val value: Double) extends AnyVal with TieBreak
+  case class Buchholz(val value: Double)         extends AnyVal with TieBreak
+  case class Performance(value: Float)           extends AnyVal
+  case class Score(value: Long)                  extends AnyVal
+
+  implicit val SonnenbornBergerZero: Zero[SonnenbornBerger] = Zero.instance(SonnenbornBerger(0))
+  implicit val BuchholzZero: Zero[Buchholz]                 = Zero.instance(Buchholz(0))
 
   case class IdName(_id: Id, name: String) {
     def id = _id
@@ -133,10 +142,23 @@ object Swiss {
     val manual = 99999999
   }
 
-  def makeScore(points: Points, tieBreak: TieBreak, perf: Performance) =
+  def makeScore(
+      points: Points,
+      buchholz: Buchholz,
+      sonnenbornBerger: SonnenbornBerger,
+      perf: Performance
+  ) = {
+    val b = SwissBounds
+    val wb = b.WithBounds
     Score(
-      (points.value * 10000000 + tieBreak.value * 10000 + perf.value).toInt
+      b.encodeIntoLong(
+        wb.performance(perf.value),
+        wb.sonnenbornBerger(sonnenbornBerger.value),
+        wb.buchholz(buchholz.value),
+        wb.score(points.double),
+      )
     )
+  }
 
   def makeId = Id(lila.common.ThreadLocalRandom nextString 8)
 

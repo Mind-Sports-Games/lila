@@ -3,7 +3,7 @@ package lila.swiss
 import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, GameFamily }
+import strategygames.{ GameFamily, GameLogic }
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -25,11 +25,15 @@ final class SwissForm(implicit mode: Mode) {
           "increment" -> number(min = 0, max = 120)
         )(ClockConfig.apply)(ClockConfig.unapply)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
-        "startsAt"          -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "variant"           -> optional(nonEmptyText.verifying(v => Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined)),
+        "startsAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
+        "variant" -> optional(
+          nonEmptyText.verifying(v =>
+            Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined
+          )
+        ),
         "rated"             -> optional(boolean),
         "microMatch"        -> optional(boolean),
-        "nbRounds"          -> number(min = minRounds, max = 100),
+        "nbRounds"          -> number(min = minRounds, max = SwissBounds.maxRounds),
         "description"       -> optional(cleanNonEmptyText),
         "drawTables"        -> optional(boolean),
         "position"          -> optional(lila.common.Form.fen.playableStrict),
@@ -164,8 +168,8 @@ object SwissForm {
       case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
       case None    => GameLogic.Chess()
     }
-    def realVariant = variant flatMap {
-      v => Variant.apply(gameLogic, v.split("_")(1).toInt)
+    def realVariant = variant flatMap { v =>
+      Variant.apply(gameLogic, v.split("_")(1).toInt)
     } getOrElse Variant.default(gameLogic)
     def realStartsAt = startsAt | DateTime.now.plusMinutes(10)
     def realChatFor  = chatFor | Swiss.ChatFor.default
@@ -185,9 +189,9 @@ object SwissForm {
       }
     }.seconds
     def useDrawTables = drawTables | false
-    def realPosition = position ifTrue realVariant.standardVariant
+    def realPosition  = position ifTrue realVariant.standardVariant
 
-    def isRated = rated | true
+    def isRated      = rated | true
     def isMicroMatch = microMatch | false
     def validRatedVariant =
       !isRated ||
