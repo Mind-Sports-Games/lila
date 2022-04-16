@@ -42,7 +42,7 @@ final private class SwissTiebreak(
               case None                       => Some(r.withdrawn(hero))
             }
           }
-        } pp("Something")
+        }
       })
   }
 }
