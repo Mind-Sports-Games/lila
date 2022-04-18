@@ -10,7 +10,7 @@ playstrategy.advantageChart = function (data, trans, el) {
         };
 
         var blurs = [toBlurArray(data.player), toBlurArray(data.opponent)];
-        if (data.player.color === 'white') blurs.reverse();
+        if (data.player.playerIndex === 'p1') blurs.reverse();
 
         var fillColor = Highcharts.theme.playstrategy.area.white;
         var negativeFillColor = Highcharts.theme.playstrategy.area.black;
