@@ -38,7 +38,7 @@ final private class SwissTiebreak(
                 }
               }
               case None if player.byes(round) => Some(r.bye(hero))
-              case None if round.value == 1   => Some(r.noShowDraw(hero))
+              case None if round.value == 1   => Some(r.absentLoss(hero))
               case None                       => Some(r.withdrawn(hero))
             }
           }
