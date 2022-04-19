@@ -7,22 +7,19 @@ import lila.db.dsl._
 
 import strategygames.tiebreaks.{ Player => TiebreakPlayer, Result => TiebreakResult, Tiebreak, Tournament }
 
-// TODO: This was WAY more code than I expected. It's annoying
-//       but I don't want our tiebreak code to be too tied to the Swiss
-//       representation, so I split it out into strategy games.
-//       I'm happy to receive feedback though.
 final private class SwissTiebreak(
     swiss: Swiss,
     playerMap: SwissPlayer.PlayerMap,
     pairingMap: SwissPairing.PairingMap
 ) extends Tournament {
-  val nbRounds = swiss.actualNbRounds
+  val rounds = swiss.tieBreakRounds
+  val nbRounds = rounds.length
   def resultsForPlayer(hero: TiebreakPlayer): List[TiebreakResult] = {
     playerMap
       .get(hero.id)
       .fold[List[TiebreakResult]](List())(player => {
         val playerPairingMap = ~pairingMap.get(hero.id)
-        swiss.allRounds.flatMap { round =>
+        rounds.flatMap { round =>
           {
             // We use 1-based indexing here, 
             // but the tiebreakers use 0 based indexing
@@ -41,7 +38,7 @@ final private class SwissTiebreak(
                 }
               }
               case None if player.byes(round) => Some(r.bye(hero))
-              case None if round.value == 1   => Some(r.noShowDraw(hero))
+              case None if round.value == 1   => Some(r.absentLoss(hero))
               case None                       => Some(r.withdrawn(hero))
             }
           }
