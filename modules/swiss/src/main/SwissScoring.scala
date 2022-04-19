@@ -12,10 +12,8 @@ final private class SwissTiebreak(
     playerMap: SwissPlayer.PlayerMap,
     pairingMap: SwissPairing.PairingMap
 ) extends Tournament {
-  //val rounds = swiss.tieBreakRounds
-  val rounds = swiss.allRounds
-  //val nbRounds = rounds.length
-  val nbRounds = swiss.actualNbRounds
+  val rounds = swiss.tieBreakRounds
+  val nbRounds = rounds.length
   def resultsForPlayer(hero: TiebreakPlayer): List[TiebreakResult] = {
     playerMap
       .get(hero.id)
@@ -40,7 +38,7 @@ final private class SwissTiebreak(
                 }
               }
               case None if player.byes(round) => Some(r.bye(hero))
-              case None if round.value == 1   => Some(r.noShowDraw(hero))
+              case None if round.value == 1   => Some(r.absentLoss(hero))
               case None                       => Some(r.withdrawn(hero))
             }
           }
