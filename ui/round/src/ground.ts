@@ -19,6 +19,7 @@ export function makeConfig(ctrl: RoundController): Config {
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
     turnPlayerIndex = step.ply % 2 === 0 ? 'p1' : 'p2';
+  console.log("data: ", data);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),

@@ -102,8 +102,11 @@ object mini {
         "(" + pov.game.history
           .checkCount(pov.game.opponent(pov.playerIndex).playerIndex)
           .toString() + ")"
-      case "oware" => //TODO change once we know how to get score from board
-        "(" + pov.playerIndex.name + ")"
+      case "oware" => 
+        val fen = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
+        //val score = if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score //TODO replace below when new SG available
+        val score = if(pov.playerIndex.name == "p1") "7" else "5"
+        "(" + score.toString() + ")"
       case _ => ""
     }
     

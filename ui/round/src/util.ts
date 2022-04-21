@@ -138,6 +138,13 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
   return score;
 }
 
+export function getOwareScore(fen: string, playerIndex: string): number {
+  const pIndex = playerIndex === 'p1' ? 1 : 2
+  const asciiNum = fen.split(' ')[pIndex].charCodeAt(0);
+  if (asciiNum == 48) return 0
+  return (asciiNum > 90) ? (asciiNum - 70) : (asciiNum - 64)
+}
+
 export const noChecks: CheckCount = {
   p1: 0,
   p2: 0,

@@ -1,52 +1,54 @@
-.mancala.is2d .a-piece {background-image:url('/assets/piece/mancala/black_mancala/a.svg')}
-.mancala.is2d .b-piece {background-image:url('/assets/piece/mancala/black_mancala/b.svg')}
-.mancala.is2d .c-piece {background-image:url('/assets/piece/mancala/black_mancala/c.svg')}
-.mancala.is2d .d-piece {background-image:url('/assets/piece/mancala/black_mancala/d.svg')}
-.mancala.is2d .e-piece {background-image:url('/assets/piece/mancala/black_mancala/e.svg')}
-.mancala.is2d .f-piece {background-image:url('/assets/piece/mancala/black_mancala/f.svg')}
-.mancala.is2d .g-piece {background-image:url('/assets/piece/mancala/black_mancala/g.svg')}
-.mancala.is2d .h-piece {background-image:url('/assets/piece/mancala/black_mancala/h.svg')}
-.mancala.is2d .i-piece {background-image:url('/assets/piece/mancala/black_mancala/i.svg')}
-.mancala.is2d .j-piece {background-image:url('/assets/piece/mancala/black_mancala/j.svg')}
-.mancala.is2d .k-piece {background-image:url('/assets/piece/mancala/black_mancala/k.svg')}
-.mancala.is2d .l-piece {background-image:url('/assets/piece/mancala/black_mancala/l.svg')}
-.mancala.is2d .m-piece {background-image:url('/assets/piece/mancala/black_mancala/m.svg')}
-.mancala.is2d .n-piece {background-image:url('/assets/piece/mancala/black_mancala/n.svg')}
-.mancala.is2d .o-piece {background-image:url('/assets/piece/mancala/black_mancala/o.svg')}
-.mancala.is2d .p-piece {background-image:url('/assets/piece/mancala/black_mancala/p.svg')}
-.mancala.is2d .q-piece {background-image:url('/assets/piece/mancala/black_mancala/q.svg')}
-.mancala.is2d .r-piece {background-image:url('/assets/piece/mancala/black_mancala/r.svg')}
-.mancala.is2d .s-piece {background-image:url('/assets/piece/mancala/black_mancala/s.svg')}
-.mancala.is2d .t-piece {background-image:url('/assets/piece/mancala/black_mancala/t.svg')}
-.mancala.is2d .u-piece {background-image:url('/assets/piece/mancala/black_mancala/u.svg')}
-.mancala.is2d .v-piece {background-image:url('/assets/piece/mancala/black_mancala/v.svg')}
-.mancala.is2d .w-piece {background-image:url('/assets/piece/mancala/black_mancala/w.svg')}
-.mancala.is2d .x-piece {background-image:url('/assets/piece/mancala/black_mancala/x.svg')}
-.mancala.is2d .y-piece {background-image:url('/assets/piece/mancala/black_mancala/y.svg')}
-.mancala.is2d .z-piece {background-image:url('/assets/piece/mancala/black_mancala/z.svg')}
-.is2d .variant-oware .a-piece {background-image:url('/assets/piece/mancala/black_mancala/a.svg')}
-.is2d .variant-oware .b-piece {background-image:url('/assets/piece/mancala/black_mancala/b.svg')}
-.is2d .variant-oware .c-piece {background-image:url('/assets/piece/mancala/black_mancala/c.svg')}
-.is2d .variant-oware .d-piece {background-image:url('/assets/piece/mancala/black_mancala/d.svg')}
-.is2d .variant-oware .e-piece {background-image:url('/assets/piece/mancala/black_mancala/e.svg')}
-.is2d .variant-oware .f-piece {background-image:url('/assets/piece/mancala/black_mancala/f.svg')}
-.is2d .variant-oware .g-piece {background-image:url('/assets/piece/mancala/black_mancala/g.svg')}
-.is2d .variant-oware .h-piece {background-image:url('/assets/piece/mancala/black_mancala/h.svg')}
-.is2d .variant-oware .i-piece {background-image:url('/assets/piece/mancala/black_mancala/i.svg')}
-.is2d .variant-oware .j-piece {background-image:url('/assets/piece/mancala/black_mancala/j.svg')}
-.is2d .variant-oware .k-piece {background-image:url('/assets/piece/mancala/black_mancala/k.svg')}
-.is2d .variant-oware .l-piece {background-image:url('/assets/piece/mancala/black_mancala/l.svg')}
-.is2d .variant-oware .m-piece {background-image:url('/assets/piece/mancala/black_mancala/m.svg')}
-.is2d .variant-oware .n-piece {background-image:url('/assets/piece/mancala/black_mancala/n.svg')}
-.is2d .variant-oware .o-piece {background-image:url('/assets/piece/mancala/black_mancala/o.svg')}
-.is2d .variant-oware .p-piece {background-image:url('/assets/piece/mancala/black_mancala/p.svg')}
-.is2d .variant-oware .q-piece {background-image:url('/assets/piece/mancala/black_mancala/q.svg')}
-.is2d .variant-oware .r-piece {background-image:url('/assets/piece/mancala/black_mancala/r.svg')}
-.is2d .variant-oware .s-piece {background-image:url('/assets/piece/mancala/black_mancala/s.svg')}
-.is2d .variant-oware .t-piece {background-image:url('/assets/piece/mancala/black_mancala/t.svg')}
-.is2d .variant-oware .u-piece {background-image:url('/assets/piece/mancala/black_mancala/u.svg')}
-.is2d .variant-oware .v-piece {background-image:url('/assets/piece/mancala/black_mancala/v.svg')}
-.is2d .variant-oware .w-piece {background-image:url('/assets/piece/mancala/black_mancala/w.svg')}
-.is2d .variant-oware .x-piece {background-image:url('/assets/piece/mancala/black_mancala/x.svg')}
-.is2d .variant-oware .y-piece {background-image:url('/assets/piece/mancala/black_mancala/y.svg')}
-.is2d .variant-oware .z-piece {background-image:url('/assets/piece/mancala/black_mancala/z.svg')}
+.mancala.is2d .A-piece {background-image:url('/assets/piece/mancala/black_mancala/1.svg')}
+.mancala.is2d .B-piece {background-image:url('/assets/piece/mancala/black_mancala/2.svg')}
+.mancala.is2d .C-piece {background-image:url('/assets/piece/mancala/black_mancala/3.svg')}
+.mancala.is2d .D-piece {background-image:url('/assets/piece/mancala/black_mancala/4.svg')}
+.mancala.is2d .E-piece {background-image:url('/assets/piece/mancala/black_mancala/5.svg')}
+.mancala.is2d .F-piece {background-image:url('/assets/piece/mancala/black_mancala/6.svg')}
+.mancala.is2d .G-piece {background-image:url('/assets/piece/mancala/black_mancala/7.svg')}
+.mancala.is2d .H-piece {background-image:url('/assets/piece/mancala/black_mancala/8.svg')}
+.mancala.is2d .I-piece {background-image:url('/assets/piece/mancala/black_mancala/9.svg')}
+.mancala.is2d .J-piece {background-image:url('/assets/piece/mancala/black_mancala/10.svg')}
+.mancala.is2d .K-piece {background-image:url('/assets/piece/mancala/black_mancala/11.svg')}
+.mancala.is2d .L-piece {background-image:url('/assets/piece/mancala/black_mancala/12.svg')}
+.mancala.is2d .M-piece {background-image:url('/assets/piece/mancala/black_mancala/13.svg')}
+.mancala.is2d .N-piece {background-image:url('/assets/piece/mancala/black_mancala/14.svg')}
+.mancala.is2d .O-piece {background-image:url('/assets/piece/mancala/black_mancala/15.svg')}
+.mancala.is2d .P-piece {background-image:url('/assets/piece/mancala/black_mancala/16.svg')}
+.mancala.is2d .Q-piece {background-image:url('/assets/piece/mancala/black_mancala/17.svg')}
+.mancala.is2d .R-piece {background-image:url('/assets/piece/mancala/black_mancala/18.svg')}
+.mancala.is2d .S-piece {background-image:url('/assets/piece/mancala/black_mancala/19.svg')}
+.mancala.is2d .T-piece {background-image:url('/assets/piece/mancala/black_mancala/20.svg')}
+.mancala.is2d .U-piece {background-image:url('/assets/piece/mancala/black_mancala/21.svg')}
+.mancala.is2d .V-piece {background-image:url('/assets/piece/mancala/black_mancala/22.svg')}
+.mancala.is2d .W-piece {background-image:url('/assets/piece/mancala/black_mancala/23.svg')}
+.mancala.is2d .X-piece {background-image:url('/assets/piece/mancala/black_mancala/24.svg')}
+.mancala.is2d .Y-piece {background-image:url('/assets/piece/mancala/black_mancala/25.svg')}
+.mancala.is2d .Z-piece {background-image:url('/assets/piece/mancala/black_mancala/26.svg')}
+.mancala.is2d .a-piece {background-image:url('/assets/piece/mancala/black_mancala/27.svg')}
+.is2d .variant-oware .A-piece {background-image:url('/assets/piece/mancala/black_mancala/1.svg')}
+.is2d .variant-oware .B-piece {background-image:url('/assets/piece/mancala/black_mancala/2.svg')}
+.is2d .variant-oware .C-piece {background-image:url('/assets/piece/mancala/black_mancala/3.svg')}
+.is2d .variant-oware .D-piece {background-image:url('/assets/piece/mancala/black_mancala/4.svg')}
+.is2d .variant-oware .E-piece {background-image:url('/assets/piece/mancala/black_mancala/5.svg')}
+.is2d .variant-oware .F-piece {background-image:url('/assets/piece/mancala/black_mancala/6.svg')}
+.is2d .variant-oware .G-piece {background-image:url('/assets/piece/mancala/black_mancala/7.svg')}
+.is2d .variant-oware .H-piece {background-image:url('/assets/piece/mancala/black_mancala/8.svg')}
+.is2d .variant-oware .I-piece {background-image:url('/assets/piece/mancala/black_mancala/9.svg')}
+.is2d .variant-oware .J-piece {background-image:url('/assets/piece/mancala/black_mancala/10.svg')}
+.is2d .variant-oware .K-piece {background-image:url('/assets/piece/mancala/black_mancala/11.svg')}
+.is2d .variant-oware .L-piece {background-image:url('/assets/piece/mancala/black_mancala/12.svg')}
+.is2d .variant-oware .M-piece {background-image:url('/assets/piece/mancala/black_mancala/13.svg')}
+.is2d .variant-oware .N-piece {background-image:url('/assets/piece/mancala/black_mancala/14.svg')}
+.is2d .variant-oware .O-piece {background-image:url('/assets/piece/mancala/black_mancala/15.svg')}
+.is2d .variant-oware .P-piece {background-image:url('/assets/piece/mancala/black_mancala/16.svg')}
+.is2d .variant-oware .Q-piece {background-image:url('/assets/piece/mancala/black_mancala/17.svg')}
+.is2d .variant-oware .R-piece {background-image:url('/assets/piece/mancala/black_mancala/18.svg')}
+.is2d .variant-oware .S-piece {background-image:url('/assets/piece/mancala/black_mancala/19.svg')}
+.is2d .variant-oware .T-piece {background-image:url('/assets/piece/mancala/black_mancala/20.svg')}
+.is2d .variant-oware .U-piece {background-image:url('/assets/piece/mancala/black_mancala/21.svg')}
+.is2d .variant-oware .V-piece {background-image:url('/assets/piece/mancala/black_mancala/22.svg')}
+.is2d .variant-oware .W-piece {background-image:url('/assets/piece/mancala/black_mancala/23.svg')}
+.is2d .variant-oware .X-piece {background-image:url('/assets/piece/mancala/black_mancala/24.svg')}
+.is2d .variant-oware .Y-piece {background-image:url('/assets/piece/mancala/black_mancala/25.svg')}
+.is2d .variant-oware .Z-piece {background-image:url('/assets/piece/mancala/black_mancala/26.svg')}
+.is2d .variant-oware .a-piece {background-image:url('/assets/piece/mancala/black_mancala/27.svg')}

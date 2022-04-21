@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { parseFen } from 'chessops/fen';
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
-import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore } from './util';
+import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore, getOwareScore } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import { playable } from 'game';
@@ -301,7 +301,7 @@ function renderPlayerScore(
   variantKey: VariantKey
 ): VNode | undefined {
   //TODO change the g-piece to reflect the score in oware or keep orange box in css/score.scss
-  const pieceClass = variantKey === 'oware' ? 'piece.g-piece.' : 'piece.p-piece.';
+  const pieceClass = variantKey === 'oware' ? 'piece.G-piece.' : 'piece.p-piece.';
   const children: VNode[] = [];
   children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
   return h('div.game-score.game-score-' + position, children);
@@ -327,18 +327,26 @@ export default function (ctrl: AnalyseCtrl): VNode {
     bottomScore = 0;
   const cgState = ctrl.chessground && ctrl.chessground.state;
   if (ctrl.data.hasGameScore) {
-    if (varaintKey === 'flipello') {
-      const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize);
-      const p1Score = getPlayerScore(varaintKey, pieces, 'p1');
-      const p2Score = getPlayerScore(varaintKey, pieces, 'p2');
-      topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-      bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
-    } else {
-      //TODO update score based on oware (make general function in util?)
-      const p1Score = 2;
-      const p2Score = 3;
-      topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-      bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+    switch (varaintKey){
+      case 'flipello': {
+        const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize);
+        const p1Score = getPlayerScore(varaintKey, pieces, 'p1');
+        const p2Score = getPlayerScore(varaintKey, pieces, 'p2');
+        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      case 'oware':{
+        const fen = ctrl.node.fen;
+        const p1Score = getOwareScore(fen, 'p1');
+        const p2Score = getOwareScore(fen, 'p2');
+        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      default: {
+        break;
+      }
     }
   }
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board

@@ -35,7 +35,7 @@ function renderMaterial(
 
 function renderPlayerScore(score: number, position: Position, playerIndex: string, variantKey: VariantKey): VNode {
   //TODO change the g-piece to reflect the score in oware or keep orange box in css/score.scss
-  const pieceClass = variantKey === 'oware' ? 'piece.g-piece.' : 'piece.p-piece.';
+  const pieceClass = variantKey === 'oware' ? 'piece.G-piece.' : 'piece.p-piece.';
   const children: VNode[] = [];
   children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
   return h('div.game-score.game-score-' + position, children);
@@ -65,21 +65,28 @@ export function main(ctrl: RoundController): VNode {
   let topScore = 0,
     bottomScore = 0;
   if (d.hasGameScore) {
-    if (varaintKey === 'flipello') {
-      const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
-      const p1Score = util.getPlayerScore(varaintKey, pieces, 'p1');
-      const p2Score = util.getPlayerScore(varaintKey, pieces, 'p2');
-      topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-      bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
-    } else {
-      //TODO update score based on oware (make general function in util?)
-      const p1Score = 2;
-      const p2Score = 3;
-      topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-      bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+    switch (varaintKey){
+      case 'flipello': {
+        const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize);
+        const p1Score = util.getPlayerScore(varaintKey, pieces, 'p1');
+        const p2Score = util.getPlayerScore(varaintKey, pieces, 'p2');
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      case 'oware':{
+        const fen = plyStep(ctrl.data, ctrl.ply).fen;
+        const p1Score = util.getOwareScore(fen, 'p1');
+        const p2Score = util.getOwareScore(fen, 'p2');
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      default: {
+        break;
+      }
     }
   }
-
   let material: MaterialDiff,
     score = 0;
   if (d.pref.showCaptured) {
