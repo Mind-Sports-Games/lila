@@ -2482,7 +2482,7 @@ chartjs-color@^2.1.0:
 
 "chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#96-add-oware":
   version "7.11.1-pstrat2.19"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#f5b41c29e21376f81cf3ac68ed22bb91d70f9cde"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#ea6161faa7cd7ffaea5b92d2d7b5b21965e4f188"
 
 chessops@^0.10.4:
   version "0.10.4"
@@ -2493,7 +2493,7 @@ chessops@^0.10.4:
 
 "chessops@git+ssh://git@github.com:Mind-Sports-Games/chessops.git#96-add-oware":
   version "0.8.1-pstrat3.13"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#d91e3da250809732ea12baf72c4dab12d3ae31ba"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#1f8e30df08e60ae3304bb61aa2e8936414edf9e7"
   dependencies:
     "@badrap/result" "^0.2.8"
     chessops "^0.10.4"

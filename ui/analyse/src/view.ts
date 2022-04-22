@@ -321,17 +321,17 @@ export default function (ctrl: AnalyseCtrl): VNode {
     gaugeOn = ctrl.showEvalGauge(),
     needsInnerCoords = !!gaugeOn || !!playerBars,
     tour = relayTour(ctrl),
-    varaintKey = ctrl.data.game.variant.key;
+    variantKey = ctrl.data.game.variant.key;
 
   let topScore = 0,
     bottomScore = 0;
   const cgState = ctrl.chessground && ctrl.chessground.state;
   if (ctrl.data.hasGameScore) {
-    switch (varaintKey){
+    switch (variantKey){
       case 'flipello': {
-        const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize);
-        const p1Score = getPlayerScore(varaintKey, pieces, 'p1');
-        const p2Score = getPlayerScore(varaintKey, pieces, 'p2');
+        const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize, variantKey);
+        const p1Score = getPlayerScore(variantKey, pieces, 'p1');
+        const p2Score = getPlayerScore(variantKey, pieces, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
@@ -350,16 +350,16 @@ export default function (ctrl: AnalyseCtrl): VNode {
     }
   }
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(varaintKey)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(varaintKey) ? '.piece-letter' : '';
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) ? '.piece-letter' : '';
   return h(
-    `main.analyse.variant-${varaintKey}${notationBasic}.${ctrl.data.game.gameFamily}`,
+    `main.analyse.variant-${variantKey}${notationBasic}.${ctrl.data.game.gameFamily}`,
     {
       hook: {
         insert: vn => {
@@ -412,7 +412,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
       gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
       menuIsOpen || tour || !ctrl.data.hasGameScore
         ? null
-        : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), varaintKey),
+        : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
       gamebookPlayView ||
         (tour
@@ -430,7 +430,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
             ])),
       menuIsOpen || tour || !ctrl.data.hasGameScore
         ? null
-        : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), varaintKey),
+        : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
       gamebookPlayView || tour ? null : controls(ctrl),
       ctrl.embed || tour
