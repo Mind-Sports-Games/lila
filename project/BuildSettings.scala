@@ -16,7 +16,7 @@ object BuildSettings {
     Defaults.coreDefaultSettings ++ Seq(
       version := lilaVersion,
       organization := "org.lichess",
-      resolvers ++= Seq(lilaMaven, wslLocalMaven, dockerLocalMaven), //TODO change to use sys.env as in SG
+      resolvers ++= Seq(lilaMaven) ++ localMaven,
       scalaVersion := globalScalaVersion,
       scalacOptions ++= compilerOptions,
       // No bloop project for tests
