@@ -32,7 +32,7 @@ final private class Player(
             round ! TooManyPlies
             fuccess(Nil)
           case Pov(game, playerIndex) if game playableBy playerIndex =>
-            applyUci(game.pp("game"), uci.pp("uci"), blur, lag, finalSquare)
+            applyUci(game, uci, blur, lag, finalSquare)
               .leftMap(e => s"$pov $e")
               .fold(errs => fufail(ClientError(errs)), fuccess)
               .flatMap {
@@ -159,8 +159,8 @@ final private class Player(
         }
       case Uci.MancalaMove(uci) => 
         game.chess(
-          Pos.Mancala(uci.orig.pp("orig")),
-          Pos.Mancala(uci.dest.pp("dest")),
+          Pos.Mancala(uci.orig),
+          Pos.Mancala(uci.dest),
           promotion = None,
           metrics
         ) map { case (ncg, move) =>

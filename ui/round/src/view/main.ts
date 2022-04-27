@@ -106,8 +106,8 @@ export function main(ctrl: RoundController): VNode {
     }
   }
 
-  //Add piece-letter class for games which dont want Noto Chess (font-famliy)q
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) ? '.piece-letter' : '';
+  //Add piece-letter class for games which dont want Noto Chess (font-famliy)
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey) ? '.piece-letter' : '';
 
   return ctrl.nvui
     ? ctrl.nvui.render(ctrl)

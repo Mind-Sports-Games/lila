@@ -8,7 +8,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'man';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -48,7 +48,7 @@ export const altCastles = {
 };
 
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs', 'oware'].includes(key);
+  return ['linesOfAction', 'scrambledEggs'].includes(key);
 }
 
 export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
@@ -63,6 +63,10 @@ export function variantUsesDestPosOnlyNotation(key: VariantKey | DraughtsVariant
   return ['flipello'].includes(key);
 }
 
+export function varaintUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['oware'].includes(key);
+}
+
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
   return variantUsesUCINotation(key)
     ? 'uci'
@@ -72,5 +76,7 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
     ? 'wxf'
     : variantUsesDestPosOnlyNotation(key)
     ? 'dpo'
+    : varaintUsesMancalaNotation(key)
+    ? 'man'
     : 'san';
 }
