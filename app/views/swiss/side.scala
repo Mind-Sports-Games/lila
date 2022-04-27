@@ -28,12 +28,14 @@ object side {
   ) =
     frag(
       div(cls := "swiss__meta")(
-        st.section(dataIcon := s.perfType.iconChar.toString)(
+        st.section(dataIcon := (if (s.isMedley) "5" else s.perfType.iconChar.toString))(
           div(
             p(
               s.clock.show,
               separator,
-              if (s.variant.exotic) {
+              if (s.isMedley) {
+                views.html.game.bits.medleyLink
+              } else if (s.variant.exotic) {
                 views.html.game.bits.variantLink(
                   s.variant,
                   if (s.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
@@ -61,6 +63,14 @@ object side {
             ),
             bits.showInterval(s)
           )
+        ),
+        s.isMedley option views.html.swiss.bits.medleyGames(
+          s.settings.medleyVariants,
+          s.isCreated
+        ),
+        s.isFinished && s.isMedley option views.html.swiss.bits.medleyRounds(
+          s.settings.medleyVariants,
+          s.settings.nbRounds
         ),
         s.settings.description map { d =>
           st.section(cls := "description")(markdownLinksOrRichText(d))

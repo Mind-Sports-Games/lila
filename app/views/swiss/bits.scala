@@ -5,6 +5,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.swiss.Swiss
+import strategygames.variant.Variant
 
 import controllers.routes
 
@@ -81,6 +82,30 @@ object bits {
           else pluralize("minute", s.settings.intervalSeconds / 60),
           " between rounds"
         )
+    }
+
+  def medleyGames(medleyVariants: Option[List[Variant]], displayFirstRound: Boolean) =
+    div(cls := "medley__info")(
+      if (displayFirstRound)
+        medleyVariants.map { variants =>
+          variants.headOption.map { v =>
+            span("First Round: ", a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v)))
+          }
+        }
+    )
+
+  def medleyRounds(medleyVariants: Option[List[Variant]], maxRounds: Int) =
+    medleyVariants.map { variants =>
+      table(cls := "medley__variants")(
+        tbody(
+          variants.zipWithIndex.filter { case (_, i) => i < maxRounds }.map { case (v, i) =>
+            tr(
+              td(s"Round ${i + 1}"),
+              td(a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v)))
+            )
+          }
+        )
+      )
     }
 
   def jsI18n(implicit ctx: Context) = i18nJsObject(i18nKeys)
