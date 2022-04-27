@@ -26,7 +26,8 @@ cg-board {
   margin-bottom: calc(213.333 * 100% / 640);
 }
 
-.mini-game.variant-oware.is2d {
+//only add for fixed mini-games, not the popup which create an <a>
+span.mini-game.variant-oware.is2d {
   margin-top: calc(-213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
 }

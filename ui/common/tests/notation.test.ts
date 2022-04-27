@@ -397,14 +397,14 @@ test('moveFromNotationStyle xiangqi 4 pawns in column p2 sideways move', () => {
 
 //Oware
 test('moveFromNotationStyle oware c1 pos stone from starting', () => {
-  const move = { san: '', uci: 'c1f2', fen: 'DDDDDD/DDDDDD S 0 0' };
+  const move = { san: '', uci: 'c1f2', fen: 'DDDDDD/DDDDDD 0 0 S' };
 
   const notation = moveFromNotationStyle('man')(move, owareVariant);
   expect(notation).toBe('C');
 });
 
 test('moveFromNotationStyle oware b2 pos stone', () => {
-  const move = { san: '', uci: 'b2c1', fen: 'DDDCDD/DDEDDD N 0 0' };
+  const move = { san: '', uci: 'b2c1', fen: 'DDDCDD/DDEDDD 0 0 N' };
 
   const notation = moveFromNotationStyle('man')(move, owareVariant);
   expect(notation).toBe('e');
