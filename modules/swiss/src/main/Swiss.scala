@@ -43,10 +43,12 @@ case class Swiss(
   def isRecentlyFinished = finishedAt.exists(f => (nowSeconds - f.getSeconds) < 30 * 60)
   def isEnterable =
     isNotFinished && round.value <= settings.nbRounds / 2 && nbPlayers < Swiss.maxPlayers
+  def isMedley = settings.medleyVariants.nonEmpty
 
   def allRounds: List[SwissRound.Number]      = (1 to round.value).toList.map(SwissRound.Number.apply)
   def finishedRounds: List[SwissRound.Number] = (1 until round.value).toList.map(SwissRound.Number.apply)
-  def tieBreakRounds: List[SwissRound.Number] = if(isFinished) allRounds else (1 until ((round.value+1) atMost guessNbRounds)).toList.map(SwissRound.Number.apply)
+  def tieBreakRounds: List[SwissRound.Number] = if (isFinished) allRounds
+  else (1 until ((round.value + 1) atMost guessNbRounds)).toList.map(SwissRound.Number.apply)
 
   def guessNbRounds  = settings.nbRounds atMost nbPlayers atLeast 2
   def actualNbRounds = if (isFinished) round.value else guessNbRounds
@@ -72,6 +74,13 @@ case class Swiss(
   }
 
   def roundInfo = Swiss.RoundInfo(teamId, settings.chatFor)
+
+  def betweenRounds = nextRoundAt.nonEmpty
+
+  def roundVariant = variantForRound(round.value + (if (betweenRounds) 1 else 0))
+
+  def variantForRound(roundIndex: Int) =
+    settings.medleyVariants.getOrElse(List()).lift(roundIndex - 1).getOrElse(variant)
 
   def withConditions(conditions: SwissCondition.All) = copy(
     settings = settings.copy(conditions = conditions)
@@ -122,7 +131,8 @@ object Swiss {
       password: Option[String] = None,
       conditions: SwissCondition.All,
       roundInterval: FiniteDuration,
-      forbiddenPairings: String
+      forbiddenPairings: String,
+      medleyVariants: Option[List[Variant]] = None
   ) {
     lazy val intervalSeconds = roundInterval.toSeconds.toInt
     def manualRounds         = intervalSeconds == Swiss.RoundInterval.manual
@@ -149,14 +159,14 @@ object Swiss {
       sonnenbornBerger: SonnenbornBerger,
       perf: Performance
   ) = {
-    val b = SwissBounds
+    val b  = SwissBounds
     val wb = b.WithBounds
     Score(
       b.encodeIntoLong(
         wb.performance(perf.value),
         wb.sonnenbornBerger(sonnenbornBerger.value),
         wb.buchholz(buchholz.value),
-        wb.score(points.double),
+        wb.score(points.double)
       )
     )
   }

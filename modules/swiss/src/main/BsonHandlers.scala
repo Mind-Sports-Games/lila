@@ -1,6 +1,7 @@
 package lila.swiss
 
 import strategygames.{ Player => PlayerIndex, GameLogic }
+import strategygames.variant.Variant
 import strategygames.format.FEN
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
@@ -11,11 +12,11 @@ import lila.user.User
 
 object BsonHandlers {
 
-  implicit val variantHandler       = variantByKeyHandler
-  implicit val stratVariantHandler  = stratVariantByKeyHandler
-  implicit val clockHandler         = clockConfigHandler
-  implicit val swissPointsHandler   = intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
-  implicit val swissSBTieBreakHandler = doubleAnyValHandler[Swiss.SonnenbornBerger](_.value, Swiss.SonnenbornBerger.apply)
+  implicit val stratVariantHandler = stratVariantByKeyHandler
+  implicit val clockHandler        = clockConfigHandler
+  implicit val swissPointsHandler  = intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
+  implicit val swissSBTieBreakHandler =
+    doubleAnyValHandler[Swiss.SonnenbornBerger](_.value, Swiss.SonnenbornBerger.apply)
   implicit val swissBHTieBreakHandler = doubleAnyValHandler[Swiss.Buchholz](_.value, Swiss.Buchholz.apply)
   implicit val swissPerformanceHandler =
     floatAnyValHandler[Swiss.Performance](_.value, Swiss.Performance.apply)
@@ -139,7 +140,8 @@ object BsonHandlers {
         roundInterval = (r.intO("i") | 60).seconds,
         password = r.strO("p"),
         conditions = r.getO[SwissCondition.All]("o") getOrElse SwissCondition.All.empty,
-        forbiddenPairings = r.getD[String]("fp")
+        forbiddenPairings = r.getD[String]("fp"),
+        medleyVariants = r.getO[List[Variant]]("mv")
       )
     def writes(w: BSON.Writer, s: Swiss.Settings) =
       $doc(
@@ -153,7 +155,8 @@ object BsonHandlers {
         "i"  -> s.roundInterval.toSeconds.toInt,
         "p"  -> s.password,
         "o"  -> s.conditions.ifNonEmpty,
-        "fp" -> s.forbiddenPairings.some.filter(_.nonEmpty)
+        "fp" -> s.forbiddenPairings.some.filter(_.nonEmpty),
+        "mv" -> s.medleyVariants
       )
   }
 
