@@ -381,6 +381,9 @@ final class SwissApi(
       }.void
     } >> recomputeAndUpdateAll(id)
 
+  def recomputeScore(id: String): Funit =
+    recomputeAndUpdateAll(Swiss.Id(id))
+
   private[swiss] def toGamesMap(pairs: List[(Game.ID, Option[Game])]): Map[Game.ID, Game] =
     pairs.collect { case (id, Some(g)) =>
       (id, g)

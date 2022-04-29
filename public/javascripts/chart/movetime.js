@@ -34,7 +34,7 @@ playstrategy.movetimeChart = function (data, trans) {
             }
 
             var blurs = [toBlurArray(data.player), toBlurArray(data.opponent)];
-            if (data.player.color === 'white') blurs.reverse();
+            if (data.player.playerIndex === 'p1') blurs.reverse();
 
             data.game.moveCentis.forEach(function (time, i) {
               var node = tree[i + 1];

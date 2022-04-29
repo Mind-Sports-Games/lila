@@ -1,5 +1,7 @@
 package lila.swiss
 
+import ornicar.scalalib.Zero
+
 import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
 import strategygames.Speed
@@ -44,6 +46,7 @@ case class Swiss(
 
   def allRounds: List[SwissRound.Number]      = (1 to round.value).toList.map(SwissRound.Number.apply)
   def finishedRounds: List[SwissRound.Number] = (1 until round.value).toList.map(SwissRound.Number.apply)
+  def tieBreakRounds: List[SwissRound.Number] = if(isFinished) allRounds else (1 until ((round.value+1) atMost guessNbRounds)).toList.map(SwissRound.Number.apply)
 
   def guessNbRounds  = settings.nbRounds atMost nbPlayers atLeast 2
   def actualNbRounds = if (isFinished) round.value else guessNbRounds
@@ -93,9 +96,16 @@ object Swiss {
     def value: Float = double / 2f
     def +(p: Points) = Points(double + p.double)
   }
-  case class TieBreak(value: Double)   extends AnyVal
-  case class Performance(value: Float) extends AnyVal
-  case class Score(value: Int)         extends AnyVal
+  trait TieBreak extends Any {
+    def value: Double
+  }
+  case class SonnenbornBerger(val value: Double) extends AnyVal with TieBreak
+  case class Buchholz(val value: Double)         extends AnyVal with TieBreak
+  case class Performance(value: Float)           extends AnyVal
+  case class Score(value: Long)                  extends AnyVal
+
+  implicit val SonnenbornBergerZero: Zero[SonnenbornBerger] = Zero.instance(SonnenbornBerger(0))
+  implicit val BuchholzZero: Zero[Buchholz]                 = Zero.instance(Buchholz(0))
 
   case class IdName(_id: Id, name: String) {
     def id = _id
@@ -133,10 +143,23 @@ object Swiss {
     val manual = 99999999
   }
 
-  def makeScore(points: Points, tieBreak: TieBreak, perf: Performance) =
+  def makeScore(
+      points: Points,
+      buchholz: Buchholz,
+      sonnenbornBerger: SonnenbornBerger,
+      perf: Performance
+  ) = {
+    val b = SwissBounds
+    val wb = b.WithBounds
     Score(
-      (points.value * 10000000 + tieBreak.value * 10000 + perf.value).toInt
+      b.encodeIntoLong(
+        wb.performance(perf.value),
+        wb.sonnenbornBerger(sonnenbornBerger.value),
+        wb.buchholz(buchholz.value),
+        wb.score(points.double),
+      )
     )
+  }
 
   def makeId = Id(lila.common.ThreadLocalRandom nextString 8)
 

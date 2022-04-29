@@ -97,13 +97,13 @@ object side {
         showNonEmptyPerf(u.perfs.minixiangqi, PerfType.orDefault("minixiangqi")),
         showNonEmptyPerf(u.perfs.flipello, PerfType.orDefault("flipello")),
         showNonEmptyPerf(u.perfs.oware, PerfType.orDefault("oware")),
-        u.noBot option frag(
-          hr,
-          showPerf(u.perfs.puzzle, PerfType.orDefault("puzzle")),
-          showStorm(u.perfs.storm, u),
-          showRacer(u.perfs.racer, u),
-          showStreak(u.perfs.streak, u)
-        )
+//         u.noBot option frag(
+//           hr,
+//           showPerf(u.perfs.puzzle, PerfType.orDefault("puzzle")),
+//           showStorm(u.perfs.storm, u),
+//           showRacer(u.perfs.racer, u),
+//           showStreak(u.perfs.streak, u)
+//         )
       )
     )
   }

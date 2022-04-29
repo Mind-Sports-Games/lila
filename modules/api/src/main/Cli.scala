@@ -18,7 +18,8 @@ final private[api] class Cli(
     plan: lila.plan.Env,
     msg: lila.msg.Env,
     slackApi: lila.irc.SlackApi,
-    email: lila.security.AutomaticEmail
+    email: lila.security.AutomaticEmail,
+    swiss: lila.swiss.Env
 )(implicit ec: scala.concurrent.ExecutionContext)
     extends lila.common.Cli {
 
@@ -37,6 +38,8 @@ final private[api] class Cli(
       import lila.common.AssetVersion
       AssetVersion.change()
       fuccess(s"Changed to ${AssetVersion.current}")
+    case "swiss" :: "update" :: "score" :: id :: Nil =>
+      swiss.api.recomputeScore(id).map(_=>s"Updated score for Swiss $id")
     case "gdpr" :: "erase" :: username :: "forever" :: Nil =>
       userRepo named username map {
         case None                       => "No such user."

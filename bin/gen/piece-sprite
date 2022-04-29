@@ -50,7 +50,8 @@ loa_themes = [
 ]
 shogi_themes = [
   ['2kanji', 'svg'],
-  ['ctw', 'svg']
+  ['ctw', 'svg'],
+  ['1kanji', 'svg']
 ]
 xiangqi_themes = [
   ['2dhanzi', 'svg'],

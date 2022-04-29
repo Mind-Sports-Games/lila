@@ -169,7 +169,7 @@ final class Round(
       case _ =>
         negotiate(
           html = {
-            if (pov.game.replayable && pov.game.variant.aiVariant) analyseC.replay(pov, userTv = userTv)
+            if (pov.game.replayable && pov.game.variant.aiVariant && pov.game.variant.gameFamily.aiEnabled) analyseC.replay(pov, userTv = userTv)
             else if (HTTPRequest.isHuman(ctx.req))
               env.tournament.api.gameView.watcher(pov.game) zip
                 (pov.game.simulId ?? env.simul.repo.find) zip
