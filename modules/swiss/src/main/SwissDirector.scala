@@ -3,6 +3,7 @@ package lila.swiss
 import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic }
 import strategygames.variant.Variant
 import strategygames.format.FEN
+import strategygames.draughts.variant.{ Variant => DraughtsVariant }
 import org.joda.time.DateTime
 import scala.util.chaining._
 import scala.util.Random
@@ -22,6 +23,13 @@ final private class SwissDirector(
 ) {
   import BsonHandlers._
 
+  private def drawTables(variant: Variant) =
+    variant match {
+      case Variant.Draughts(variant) =>
+        strategygames.draughts.OpeningTable.tablesForVariant(variant).map(FEN.Draughts)
+      case _ => List()
+    }
+
   // sequenced by SwissApi
   private[swiss] def startRound(from: Swiss): Fu[Option[Swiss]] =
     pairingSystem(from)
@@ -30,14 +38,10 @@ final private class SwissDirector(
         if (pendingPairings.isEmpty) fuccess(none) // terminate
         else {
           val swiss = from.startRound
-          val drawTableList: List[FEN] = if (swiss.settings.useDrawTables) swiss.variant match {
-            case Variant.Draughts(variant) =>
-              strategygames.draughts.OpeningTable.tablesForVariant(variant).map(FEN.Draughts)
-            case _ => List()
-          }
-          else List()
-          val openingFEN = if (drawTableList.isEmpty) swiss.settings.position
-          else drawTableList(Random.nextInt(drawTableList.size)).some
+          val tables: Option[List[FEN]] = drawTables(swiss.variant)
+          val openingFEN =
+            if (!swiss.settings.useDrawTables || tables.isEmpty) swiss.settings.position
+            else drawTableList(Random.nextInt(tables.size)).some
           for {
             players <- SwissPlayer.fields { f =>
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
@@ -112,8 +116,14 @@ final private class SwissDirector(
             startedAtTurn = turns
           )
         },
-        p1Player = makePlayer(P1, players.get(if(rematch) pairing.p2 else pairing.p1) err s"Missing pairing p1 $pairing"),
-        p2Player = makePlayer(P2, players.get(if(rematch) pairing.p1 else pairing.p2) err s"Missing pairing p2 $pairing"),
+        p1Player = makePlayer(
+          P1,
+          players.get(if (rematch) pairing.p2 else pairing.p1) err s"Missing pairing p1 $pairing"
+        ),
+        p2Player = makePlayer(
+          P2,
+          players.get(if (rematch) pairing.p1 else pairing.p2) err s"Missing pairing p2 $pairing"
+        ),
         mode = strategygames.Mode(swiss.settings.rated),
         source = lila.game.Source.Swiss,
         pgnImport = None
