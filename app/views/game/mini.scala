@@ -104,8 +104,7 @@ object mini {
           .toString() + ")"
       case "oware" => 
         val fen = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
-        //val score = if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score //TODO replace below when new SG available
-        val score = if(pov.playerIndex.name == "p1") "7" else "5"
+        val score = if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score
         "(" + score.toString() + ")"
       case _ => ""
     }

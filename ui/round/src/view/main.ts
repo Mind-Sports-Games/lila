@@ -35,7 +35,6 @@ function renderMaterial(
 }
 
 function renderPlayerScore(score: number, position: Position, playerIndex: string, variantKey: VariantKey): VNode {
-  //TODO change the g-piece to reflect the score in oware or keep orange box in css/score.scss
   const pieceClass = variantKey === 'oware' ? 'piece.G-piece.' : 'piece.p-piece.';
   const children: VNode[] = [];
   children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
