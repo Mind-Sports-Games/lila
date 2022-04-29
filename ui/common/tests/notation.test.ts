@@ -22,7 +22,7 @@ const owareVariant = {
   short: 'oware',
   lib: 1,
   boardSize: { height: 2, width: 6 },
-}
+};
 
 test('testing e4 maps to 56', () => {
   expect(parseUCISquareToUSI('e4', 9, 9)).toBe('56');

@@ -66,7 +66,7 @@ export function main(ctrl: RoundController): VNode {
   let topScore = 0,
     bottomScore = 0;
   if (d.hasGameScore) {
-    switch (variantKey){
+    switch (variantKey) {
       case 'flipello': {
         const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize, variantKey);
         const p1Score = util.getPlayerScore(variantKey, pieces, 'p1');
@@ -75,7 +75,7 @@ export function main(ctrl: RoundController): VNode {
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'oware':{
+      case 'oware': {
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
         const p1Score = util.getOwareScore(fen, 'p1');
         const p2Score = util.getOwareScore(fen, 'p2');
@@ -91,7 +91,9 @@ export function main(ctrl: RoundController): VNode {
   let material: MaterialDiff,
     score = 0;
   if (d.pref.showCaptured) {
-    const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize, variantKey as cg.Variant);
+    const pieces = cgState
+      ? cgState.pieces
+      : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize, variantKey as cg.Variant);
     material = util.getMaterialDiff(pieces);
     score = util.getScore(variantKey, pieces) * (bottomPlayerIndex === 'p1' ? 1 : -1);
   } else material = emptyMaterialDiff;
@@ -107,7 +109,9 @@ export function main(ctrl: RoundController): VNode {
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey) ? '.piece-letter' : '';
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)
+    ? '.piece-letter'
+    : '';
 
   return ctrl.nvui
     ? ctrl.nvui.render(ctrl)

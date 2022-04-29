@@ -22,6 +22,7 @@ import MoveOn from './moveOn';
 import TransientMove from './transientMove';
 import * as atomic from './atomic';
 import * as flipello from './flipello';
+import * as oware from './oware';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -188,6 +189,10 @@ export default class RoundController {
       } else sound.capture();
     } else if (this.data.game.variant.key === 'flipello') {
       flipello.flip(this, dest, this.data.player.playerIndex);
+    } else if (this.data.game.variant.key === 'oware') {
+      // a lot of pieces can change from 1 move so update them all
+      console.log('oware onMove - do we need to update board pieces, like in flipello?');
+      // oware.updateBoardFromMove(this, o.fen);
     } else sound.move();
   };
 
@@ -410,7 +415,8 @@ export default class RoundController {
   apiMove = (o: ApiMove): true => {
     const d = this.data,
       playing = this.isPlaying();
-    console.log("data ", d);
+    console.log('data ', d);
+    console.log('o.role', o.role);
     d.game.turns = o.ply;
     d.game.player = o.ply % 2 === 0 ? 'p1' : 'p2';
     const playedPlayerIndex = o.ply % 2 === 0 ? 'p2' : 'p1',
@@ -446,6 +452,10 @@ export default class RoundController {
         ) {
           this.chessground.move(keys[0], keys[1]);
         }
+      }
+      if (this.data.game.variant.key === 'oware') {
+        // a lot of pieces can change from 1 move so update them all
+        oware.updateBoardFromMove(this, o.fen);
       }
       if (this.data.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);

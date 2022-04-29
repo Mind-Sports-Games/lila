@@ -353,11 +353,14 @@ function destPosOnlyNotation(move: ExtendedMoveInfo, variant: Variant): string {
 function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const reg = move.uci.match(/[a-z][1-2]/g) as string[];
   const orig = reg[0];
-  const origLetter = orig[1] === '1' ? orig[0].toUpperCase() : nextAsciiLetter(orig[0], (96 - orig.charCodeAt(0))*2 + variant.boardSize.width + 1)
+  const origLetter =
+    orig[1] === '1'
+      ? orig[0].toUpperCase()
+      : nextAsciiLetter(orig[0], (96 - orig.charCodeAt(0)) * 2 + variant.boardSize.width + 1);
 
   return `${origLetter}`;
 }
 
-function nextAsciiLetter(letter: string, n:number): string {
-  return String.fromCharCode(letter.charCodeAt(0) + n)
+function nextAsciiLetter(letter: string, n: number): string {
+  return String.fromCharCode(letter.charCodeAt(0) + n);
 }

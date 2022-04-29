@@ -327,7 +327,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     bottomScore = 0;
   const cgState = ctrl.chessground && ctrl.chessground.state;
   if (ctrl.data.hasGameScore) {
-    switch (variantKey){
+    switch (variantKey) {
       case 'flipello': {
         const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize, variantKey);
         const p1Score = getPlayerScore(variantKey, pieces, 'p1');
@@ -336,7 +336,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'oware':{
+      case 'oware': {
         const fen = ctrl.node.fen;
         const p1Score = getOwareScore(fen, 'p1');
         const p2Score = getOwareScore(fen, 'p2');

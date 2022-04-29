@@ -19,7 +19,7 @@ export function makeConfig(ctrl: RoundController): Config {
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
     turnPlayerIndex = step.ply % 2 === 0 ? 'p1' : 'p2';
-  console.log("data: ", data);
+  console.log('data: ', data);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -57,7 +57,7 @@ export function makeConfig(ctrl: RoundController): Config {
       duration: data.pref.animationDuration,
     },
     premovable: {
-      enabled: data.pref.enablePremove && !data.onlyDropsVariant,
+      enabled: data.pref.enablePremove && !data.onlyDropsVariant && data.game.variant.key !== 'oware',
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {

@@ -139,10 +139,10 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
 }
 
 export function getOwareScore(fen: string, playerIndex: string): number {
-  const pIndex = playerIndex === 'p1' ? 1 : 2
+  const pIndex = playerIndex === 'p1' ? 1 : 2;
   const asciiNum = fen.split(' ')[pIndex].charCodeAt(0);
-  if (asciiNum == 48) return 0
-  return (asciiNum > 90) ? (asciiNum - 70) : (asciiNum - 64)
+  if (asciiNum == 48) return 0;
+  return asciiNum > 90 ? asciiNum - 70 : asciiNum - 64;
 }
 
 export const noChecks: CheckCount = {

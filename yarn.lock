@@ -2482,7 +2482,7 @@ chartjs-color@^2.1.0:
 
 "chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#96-add-oware":
   version "7.11.1-pstrat2.19"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#ea6161faa7cd7ffaea5b92d2d7b5b21965e4f188"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#c981d5c854402a3ececce75484d69f3bf5406daf"
 
 chessops@^0.10.4:
   version "0.10.4"
