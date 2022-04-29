@@ -90,7 +90,8 @@ final class SwissApi(
         roundInterval = data.realRoundInterval,
         password = data.password,
         conditions = data.conditions.all,
-        forbiddenPairings = ~data.forbiddenPairings
+        forbiddenPairings = ~data.forbiddenPairings,
+        medleyVariants = data.medleyVariants
       )
     )
     colls.swiss.insert.one(addFeaturable(swiss)) >>-
@@ -125,7 +126,15 @@ final class SwissApi(
               else old.settings.roundInterval,
             password = data.password,
             conditions = data.conditions.all,
-            forbiddenPairings = ~data.forbiddenPairings
+            forbiddenPairings = ~data.forbiddenPairings,
+            medleyVariants =
+              if (
+                old.medleyGameFamilies != Some(
+                  data.medleyGameFamilies.sortWith(_.name < _.name)
+                ) || old.settings.nbRounds != data.nbRounds
+              )
+                data.medleyVariants
+              else old.settings.medleyVariants
           )
         ) pipe { s =>
           if (

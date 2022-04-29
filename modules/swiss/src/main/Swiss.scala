@@ -4,7 +4,7 @@ import ornicar.scalalib.Zero
 
 import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
-import strategygames.Speed
+import strategygames.{ GameFamily, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import scala.concurrent.duration._
@@ -81,6 +81,13 @@ case class Swiss(
 
   def variantForRound(roundIndex: Int) =
     settings.medleyVariants.getOrElse(List()).lift(roundIndex - 1).getOrElse(variant)
+
+  def medleyGameFamilies: Option[List[GameFamily]] = settings.medleyVariants.map(
+    _.map(_.gameFamily).distinct.sortWith(_.name < _.name)
+  )
+
+  def medleyGameFamiliesString: Option[String] =
+    medleyGameFamilies.map(_.map(_.name).mkString(", "))
 
   def withConditions(conditions: SwissCondition.All) = copy(
     settings = settings.copy(conditions = conditions)

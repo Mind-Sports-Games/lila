@@ -65,7 +65,8 @@ object side {
           )
         ),
         s.isMedley option views.html.swiss.bits.medleyGames(
-          s.settings.medleyVariants,
+          s.medleyGameFamiliesString.getOrElse(""),
+          s.settings.medleyVariants.getOrElse(List[Variant]()),
           s.isCreated
         ),
         s.isFinished && s.isMedley option views.html.swiss.bits.medleyRounds(

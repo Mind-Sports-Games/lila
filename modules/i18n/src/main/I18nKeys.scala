@@ -162,6 +162,7 @@ val `variants` = new I18nKey("variants")
 val `rulesVariants` = new I18nKey("rulesVariants")
 val `medley` = new I18nKey("medley")
 val `medleyTournaments` = new I18nKey("medleyTournaments")
+val `medleyDefinition` = new I18nKey("medleyDefinition")
 val `timeControl` = new I18nKey("timeControl")
 val `realTime` = new I18nKey("realTime")
 val `correspondence` = new I18nKey("correspondence")
@@ -1881,6 +1882,8 @@ val `lagCompensationExplanation` = new I18nKey("lag:lagCompensationExplanation")
 
 object swiss {
 val `swissTournaments` = new I18nKey("swiss:swissTournaments")
+val `medleyGameFamilies` = new I18nKey("swiss:medleyGameFamilies")
+val `firstRound` = new I18nKey("swiss:firstRound")
 val `viewAllXRounds` = new I18nKey("swiss:viewAllXRounds")
 }
 

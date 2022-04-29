@@ -21,7 +21,7 @@ object bits {
     )(name)
 
   def idToName(id: Swiss.Id): String = env.swiss.getName(id) getOrElse "Tournament"
-  def iconChar(swiss: Swiss): String = swiss.perfType.iconChar.toString
+  def iconChar(swiss: Swiss): String = if (swiss.isMedley) "5" else swiss.perfType.iconChar.toString
 
   def notFound()(implicit ctx: Context) =
     views.html.base.layout(
@@ -84,13 +84,14 @@ object bits {
         )
     }
 
-  def medleyGames(medleyVariants: Option[List[Variant]], displayFirstRound: Boolean) =
+  def medleyGames(gameFamilies: String, variants: List[Variant], displayFirstRound: Boolean) =
     div(cls := "medley__info")(
+      div(
+        s"Game families that could appear in this Medley: ${gameFamilies}."
+      ),
       if (displayFirstRound)
-        medleyVariants.map { variants =>
-          variants.headOption.map { v =>
-            span("First Round: ", a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v)))
-          }
+        variants.headOption.map { v =>
+          div("First Round: ", a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v)))
         }
     )
 
@@ -126,6 +127,8 @@ object bits {
     trans.averageOpponent,
     trans.tournamentComplete,
     trans.password,
+    trans.swiss.medleyGameFamilies,
+    trans.swiss.firstRound,
     trans.swiss.viewAllXRounds
   ).map(_.key)
 }

@@ -9,6 +9,9 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.hub.LightTeam.TeamID
 import lila.swiss.{ Swiss, SwissCondition, SwissForm }
 import lila.tournament.TournamentForm
+import lila.i18n.VariantKeys
+
+import strategygames.GameFamily
 
 object form {
 
@@ -26,6 +29,15 @@ object form {
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
             form3.split(fields.microMatch, fields.drawTables),
+            fields.medley,
+            form3.split(
+              fields.chess,
+              fields.draughts,
+              fields.shogi,
+              fields.xiangqi,
+              fields.loa,
+              fields.flipello
+            ),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -62,6 +74,15 @@ object form {
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
             form3.split(fields.microMatch, fields.drawTables),
+            fields.medley,
+            form3.split(
+              fields.chess,
+              fields.draughts,
+              fields.shogi,
+              fields.xiangqi,
+              fields.loa,
+              fields.flipello
+            ),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -147,7 +168,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.checkbox(
         form("rated"),
         trans.rated(),
-        help = raw("Games are rated<br>and impact players ratings").some
+        help = raw("Games are rated and impact players ratings").some
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
@@ -156,11 +177,78 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.checkbox(
         form("microMatch"),
         trans.microMatch(),
-        help = raw(trans.microMatchDefinition.txt().replace("(","<br>(")).some
+        help = raw(trans.microMatchDefinition.txt().replace("(", "<br>(")).some
+      )
+    )
+  def medley =
+    frag(
+      form3.checkbox(
+        form("medley"),
+        trans.medley(),
+        help = frag(
+          trans.medleyDefinition.txt(),
+          br,
+          a(href := routes.Page.loneBookmark("medley"), target := "_blank")("More detail here")
+        ).some
+      )
+    )
+  def chess =
+    frag(
+      form3.checkbox(
+        form("chess"),
+        VariantKeys.gameFamilyName(GameFamily.Chess()),
+        klass = "medleyGameLogic",
+        displayed = false
       ),
+      st.input(tpe := "hidden", st.name := form("chess").name, value := "false") // hack allow disabling chess
+    )
+  def draughts =
+    frag(
+      form3.checkbox(
+        form("draughts"),
+        VariantKeys.gameFamilyName(GameFamily.Draughts()),
+        klass = "medleyGameLogic",
+        displayed = false
+      )
+    )
+  def loa =
+    frag(
+      form3.checkbox(
+        form("loa"),
+        VariantKeys.gameFamilyName(GameFamily.LinesOfAction()),
+        klass = "medleyGameLogic",
+        displayed = false
+      )
+    )
+  def shogi =
+    frag(
+      form3.checkbox(
+        form("shogi"),
+        VariantKeys.gameFamilyName(GameFamily.Shogi()),
+        klass = "medleyGameLogic",
+        displayed = false
+      )
+    )
+  def xiangqi =
+    frag(
+      form3.checkbox(
+        form("xiangqi"),
+        VariantKeys.gameFamilyName(GameFamily.Xiangqi()),
+        klass = "medleyGameLogic",
+        displayed = false
+      )
+    )
+  def flipello =
+    frag(
+      form3.checkbox(
+        form("flipello"),
+        VariantKeys.gameFamilyName(GameFamily.Flipello()),
+        klass = "medleyGameLogic",
+        displayed = false
+      )
     )
   def variant =
-    form3.group(form("variant"), trans.variant(), klass="variant", half = true)(
+    form3.group(form("variant"), trans.variant(), klass = "variant", half = true)(
       form3.selectWithOptGroups(
         _,
         translatedVariantChoicesWithVariants,
@@ -204,9 +292,11 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         "Use Draw Tables",
         klass = "drawTables",
         half = true,
-        help = raw("Each round of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant.").some,
+        help = raw(
+          "Each round of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant."
+        ).some,
         displayed = false
-      ),
+      )
     )
   def startsAt =
     form3.group(
