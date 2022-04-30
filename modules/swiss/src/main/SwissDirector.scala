@@ -43,14 +43,12 @@ final private class SwissDirector(
         val pendingPairings = pendings.collect { case Right(p) => p }
         if (pendingPairings.isEmpty) fuccess(none) // terminate
         else {
-          val swiss               = from.startRound
-          val randomPosition      = randomDrawForVariant(swiss.variant) _
-          val pairingDrawIsRandom = swiss.settings.usePerPairingDrawTables
-          val roundDrawIsRandom   = swiss.settings.useDrawTables && !pairingDrawIsRandom
-          val perSwissPosition    = swiss.settings.position
-          val perRoundPosition =
-            if (roundDrawIsRandom) randomPosition().orElse(perSwissPosition)
-            else perSwissPosition
+          val swiss            = from.startRound
+          val randomPos        = randomDrawForVariant(swiss.variant) _
+          val randomPairingPos = swiss.settings.usePerPairingDrawTables
+          val randomRoundPos   = swiss.settings.useDrawTables && !randomPairingPos
+          val perSwissPos      = swiss.settings.position
+          val perRoundPos      = if (randomRoundPos) randomPos().orElse(perSwissPos) else perSwissPos
           for {
             players <- SwissPlayer.fields { f =>
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
@@ -66,8 +64,7 @@ final private class SwissDirector(
                 status = Left(SwissPairing.Ongoing),
                 isMicroMatch = swiss.settings.isMicroMatch,
                 None,
-                if (pairingDrawIsRandom) randomPosition().orElse(perRoundPosition)
-                else perRoundPosition
+                if (randomPairingPos) randomPos().orElse(perRoundPos) else perRoundPos
               )
             }
             _ <-
