@@ -84,6 +84,7 @@ final class SwissApi(
         isMicroMatch = data.isMicroMatch,
         description = data.description,
         useDrawTables = data.useDrawTables,
+        usePerPairingDrawTables = data.usePerPairingDrawTables,
         position = data.realPosition,
         chatFor = data.realChatFor,
         roundInterval = data.realRoundInterval,
@@ -117,6 +118,7 @@ final class SwissApi(
             isMicroMatch = data.isMicroMatch | old.settings.isMicroMatch,
             description = data.description orElse old.settings.description,
             useDrawTables = data.useDrawTables | old.settings.useDrawTables,
+            usePerPairingDrawTables = data.usePerPairingDrawTables | old.settings.usePerPairingDrawTables,
             position = position,
             chatFor = data.chatFor | old.settings.chatFor,
             roundInterval =

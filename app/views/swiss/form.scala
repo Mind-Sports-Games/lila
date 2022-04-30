@@ -25,7 +25,8 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            form3.split(fields.microMatch, fields.drawTables),
+            fields.microMatch,
+            form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -61,7 +62,8 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            form3.split(fields.microMatch, fields.drawTables),
+            fields.microMatch,
+            form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -201,10 +203,21 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     frag(
       form3.checkbox(
         form("drawTables"),
-        "Use Draw Tables",
+        "Use Draw Tables (per round)",
         klass = "drawTables",
         half = true,
         help = raw("Each round of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant.").some,
+        displayed = false
+      ),
+    )
+  def perPairingDrawTables =
+    frag(
+      form3.checkbox(
+        form("perPairingDrawTables"),
+        "Use Draw Tables (per pairing)",
+        klass = "perPairingDrawTables",
+        half = true,
+        help = raw("Each pairing of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant.").some,
         displayed = false
       ),
     )

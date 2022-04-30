@@ -23,12 +23,18 @@ final private class SwissDirector(
 ) {
   import BsonHandlers._
 
-  private def drawTables(variant: Variant) =
+  private def availableDrawTables(variant: Variant) =
     variant match {
       case Variant.Draughts(variant) =>
         strategygames.draughts.OpeningTable.tablesForVariant(variant).map(FEN.Draughts)
       case _ => List()
     }
+
+  private def randomDrawForVariant(variant: Variant)(): Option[FEN] = {
+    val tables: List[FEN] = availableDrawTables(variant)
+    if (tables.isEmpty) None
+    else tables.lift(Random.nextInt(tables.size))
+  }
 
   // sequenced by SwissApi
   private[swiss] def startRound(from: Swiss): Fu[Option[Swiss]] =
@@ -37,11 +43,14 @@ final private class SwissDirector(
         val pendingPairings = pendings.collect { case Right(p) => p }
         if (pendingPairings.isEmpty) fuccess(none) // terminate
         else {
-          val swiss = from.startRound
-          val tables: Option[List[FEN]] = drawTables(swiss.variant)
-          val openingFEN =
-            if (!swiss.settings.useDrawTables || tables.isEmpty) swiss.settings.position
-            else drawTableList(Random.nextInt(tables.size)).some
+          val swiss               = from.startRound
+          val randomPosition      = randomDrawForVariant(swiss.variant) _
+          val pairingDrawIsRandom = swiss.settings.usePerPairingDrawTables
+          val roundDrawIsRandom   = swiss.settings.useDrawTables && !pairingDrawIsRandom
+          val perSwissPosition    = swiss.settings.position
+          val perRoundPosition =
+            if (roundDrawIsRandom) randomPosition().orElse(perSwissPosition)
+            else perSwissPosition
           for {
             players <- SwissPlayer.fields { f =>
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
@@ -57,7 +66,8 @@ final private class SwissDirector(
                 status = Left(SwissPairing.Ongoing),
                 isMicroMatch = swiss.settings.isMicroMatch,
                 None,
-                openingFEN
+                if (pairingDrawIsRandom) randomPosition().orElse(perRoundPosition)
+                else perRoundPosition
               )
             }
             _ <-
