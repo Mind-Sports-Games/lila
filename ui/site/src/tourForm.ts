@@ -3,12 +3,10 @@ import flatpickr from 'flatpickr';
 playstrategy.load.then(() => {
   const $variant = $('#form3-variant'),
     $medley = $('#form3-medley'),
-    showPosition = () => $('.form3 .position').toggle(
-      ['0_1', '1_1'].includes($variant.val() as string) && !$medley.is(':checked')
-    ),
-    showDrawTables = () => $('.form3 .drawTables').toggle(
-      ($variant.val() as string).startsWith('1_') && !$medley.is(':checked')
-    ),
+    showPosition = () =>
+      $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string) && !$medley.is(':checked')),
+    showDrawTables = () =>
+      $('.form3 .drawTables').toggle(($variant.val() as string).startsWith('1_') && !$medley.is(':checked')),
     showGameLogics = () => {
       $('.form3 .medleyGameLogic').toggle($medley.is(':checked'));
       $('.form3 .variant').toggle(!$medley.is(':checked'));
