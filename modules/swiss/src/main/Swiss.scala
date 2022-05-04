@@ -117,6 +117,7 @@ object Swiss {
       isMicroMatch: Boolean,
       description: Option[String] = None,
       useDrawTables: Boolean,
+      usePerPairingDrawTables: Boolean,
       position: Option[FEN],
       chatFor: ChatFor = ChatFor.default,
       password: Option[String] = None,

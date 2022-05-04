@@ -2,8 +2,16 @@ import flatpickr from 'flatpickr';
 
 playstrategy.load.then(() => {
   const $variant = $('#form3-variant'),
+    $drawTables = $('.form3 .drawTables'),
+    $perPairingDrawTables = $('.form3 .perPairingDrawTables'),
     showPosition = () => $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string)),
-    showDrawTables = () => $('.form3 .drawTables').toggle(($variant.val() as string).startsWith('1_'));
+    showDrawTables = () => $drawTables.add($perPairingDrawTables).toggle(($variant.val() as string).startsWith('1_')),
+    toggleOther = (selector: Selector) => () => {
+      const $other = $(selector);
+      if ($other.is(':checked')) {
+        $other.prop('checked', false);
+      }
+    };
 
   $variant.find('optgroup').each((_, optgroup: HTMLElement) => {
     optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
@@ -11,6 +19,8 @@ playstrategy.load.then(() => {
 
   $variant.on('change', showPosition);
   $variant.on('change', showDrawTables);
+  $drawTables.on('change', toggleOther('#form3-perPairingDrawTables'));
+  $perPairingDrawTables.on('change', toggleOther('#form3-drawTables'));
   showPosition();
   showDrawTables();
 
