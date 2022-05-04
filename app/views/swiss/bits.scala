@@ -84,30 +84,36 @@ object bits {
         )
     }
 
-  def medleyGames(gameFamilies: String, variants: List[Variant], displayFirstRound: Boolean) =
+  def medleyGames(
+      gameFamilies: String,
+      variants: List[Variant],
+      displayFirstRound: Boolean,
+      displayAllRounds: Boolean,
+      maxRounds: Int
+  )(implicit ctx: Context) =
     div(cls := "medley__info")(
       div(
-        s"Game families that could appear in this Medley: ${gameFamilies}."
+        s"${trans.swiss.medleyGameFamilies.txt()}: ${gameFamilies}."
       ),
       if (displayFirstRound)
         variants.headOption.map { v =>
-          div("First Round: ", a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v)))
+          div(cls := "medley__rounds")(
+            s"${trans.swiss.firstRound.txt()}: ",
+            a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v))
+          )
         }
-    )
-
-  def medleyRounds(medleyVariants: Option[List[Variant]], maxRounds: Int) =
-    medleyVariants.map { variants =>
-      table(cls := "medley__variants")(
-        tbody(
-          variants.zipWithIndex.filter { case (_, i) => i < maxRounds }.map { case (v, i) =>
-            tr(
-              td(s"Round ${i + 1}"),
-              td(a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v)))
-            )
-          }
+      else if (displayAllRounds)
+        table(cls := "medley__rounds")(
+          tbody(
+            variants.zipWithIndex.filter { case (_, i) => i < maxRounds }.map { case (v, i) =>
+              tr(
+                td(cls := "medley__table__round__col")(s"Round ${i + 1}"),
+                td(a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v)))
+              )
+            }
+          )
         )
-      )
-    }
+    )
 
   def jsI18n(implicit ctx: Context) = i18nJsObject(i18nKeys)
 
