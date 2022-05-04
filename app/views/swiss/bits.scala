@@ -5,6 +5,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.swiss.Swiss
+import strategygames.variant.Variant
 
 import controllers.routes
 
@@ -20,7 +21,7 @@ object bits {
     )(name)
 
   def idToName(id: Swiss.Id): String = env.swiss.getName(id) getOrElse "Tournament"
-  def iconChar(swiss: Swiss): String = swiss.perfType.iconChar.toString
+  def iconChar(swiss: Swiss): String = if (swiss.isMedley) "5" else swiss.perfType.iconChar.toString
 
   def notFound()(implicit ctx: Context) =
     views.html.base.layout(
@@ -83,6 +84,37 @@ object bits {
         )
     }
 
+  def medleyGames(
+      gameFamilies: String,
+      variants: List[Variant],
+      displayFirstRound: Boolean,
+      displayAllRounds: Boolean,
+      maxRounds: Int
+  )(implicit ctx: Context) =
+    div(cls := "medley__info")(
+      div(
+        s"${trans.swiss.medleyGameFamilies.txt()}: ${gameFamilies}."
+      ),
+      if (displayFirstRound)
+        variants.headOption.map { v =>
+          div(cls := "medley__rounds")(
+            s"${trans.swiss.firstRound.txt()}: ",
+            a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v))
+          )
+        }
+      else if (displayAllRounds)
+        table(cls := "medley__rounds")(
+          tbody(
+            variants.zipWithIndex.filter { case (_, i) => i < maxRounds }.map { case (v, i) =>
+              tr(
+                td(cls := "medley__table__round__col")(s"Round ${i + 1}"),
+                td(a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v)))
+              )
+            }
+          )
+        )
+    )
+
   def jsI18n(implicit ctx: Context) = i18nJsObject(i18nKeys)
 
   private val i18nKeys = List(
@@ -101,6 +133,8 @@ object bits {
     trans.averageOpponent,
     trans.tournamentComplete,
     trans.password,
+    trans.swiss.medleyGameFamilies,
+    trans.swiss.firstRound,
     trans.swiss.viewAllXRounds
   ).map(_.key)
 }

@@ -44,7 +44,7 @@ final private class SwissDirector(
         if (pendingPairings.isEmpty) fuccess(none) // terminate
         else {
           val swiss            = from.startRound
-          val randomPos        = randomDrawForVariant(swiss.variant) _
+          val randomPos        = randomDrawForVariant(swiss.roundVariant) _
           val randomPairingPos = swiss.settings.usePerPairingDrawTables
           val randomRoundPos   = swiss.settings.useDrawTables && !randomPairingPos
           val perSwissPos      = swiss.settings.position
@@ -109,10 +109,10 @@ final private class SwissDirector(
     Game
       .make(
         chess = strategygames.Game(
-          swiss.variant.gameLogic,
+          swiss.roundVariant.gameLogic,
           variant = Some {
-            if (swiss.settings.position.isEmpty) swiss.variant
-            else Variant.libFromPosition(swiss.variant.gameLogic)
+            if (swiss.settings.position.isEmpty) swiss.roundVariant
+            else Variant.libFromPosition(swiss.roundVariant.gameLogic)
           },
           fen = pairing.openingFEN
         ) pipe { g =>
