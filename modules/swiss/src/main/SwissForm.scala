@@ -40,17 +40,18 @@ final class SwissForm(implicit mode: Mode) {
           "loa"      -> optional(boolean),
           "flipello" -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
-        "rated"             -> optional(boolean),
-        "microMatch"        -> optional(boolean),
-        "nbRounds"          -> number(min = minRounds, max = SwissBounds.maxRounds),
-        "description"       -> optional(cleanNonEmptyText),
-        "drawTables"        -> optional(boolean),
-        "position"          -> optional(lila.common.Form.fen.playableStrict),
-        "chatFor"           -> optional(numberIn(chatForChoices.map(_._1))),
-        "roundInterval"     -> optional(numberIn(roundIntervals)),
-        "password"          -> optional(cleanNonEmptyText),
-        "conditions"        -> SwissCondition.DataForm.all,
-        "forbiddenPairings" -> optional(cleanNonEmptyText)
+        "rated"                -> optional(boolean),
+        "microMatch"           -> optional(boolean),
+        "nbRounds"             -> number(min = minRounds, max = SwissBounds.maxRounds),
+        "description"          -> optional(cleanNonEmptyText),
+        "drawTables"           -> optional(boolean),
+        "perPairingDrawTables" -> optional(boolean),
+        "position"             -> optional(lila.common.Form.fen.playableStrict),
+        "chatFor"              -> optional(numberIn(chatForChoices.map(_._1))),
+        "roundInterval"        -> optional(numberIn(roundIntervals)),
+        "password"             -> optional(cleanNonEmptyText),
+        "conditions"           -> SwissCondition.DataForm.all,
+        "forbiddenPairings"    -> optional(cleanNonEmptyText)
       )(SwissData.apply)(SwissData.unapply)
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
     )
@@ -77,6 +78,7 @@ final class SwissForm(implicit mode: Mode) {
       nbRounds = 7,
       description = none,
       drawTables = false.some,
+      perPairingDrawTables = false.some,
       position = none,
       chatFor = Swiss.ChatFor.default.some,
       roundInterval = Swiss.RoundInterval.auto.some,
@@ -105,6 +107,7 @@ final class SwissForm(implicit mode: Mode) {
       nbRounds = s.settings.nbRounds,
       description = s.settings.description,
       drawTables = s.settings.useDrawTables.some,
+      perPairingDrawTables = s.settings.usePerPairingDrawTables.some,
       position = s.settings.position,
       chatFor = s.settings.chatFor.some,
       roundInterval = s.settings.roundInterval.toSeconds.toInt.some,
@@ -189,6 +192,7 @@ object SwissForm {
       nbRounds: Int,
       description: Option[String],
       drawTables: Option[Boolean],
+      perPairingDrawTables: Option[Boolean],
       position: Option[FEN],
       chatFor: Option[Int],
       roundInterval: Option[Int],
@@ -220,8 +224,9 @@ object SwissForm {
         case i => i
       }
     }.seconds
-    def useDrawTables = drawTables | false
-    def realPosition  = position ifTrue realVariant.standardVariant
+    def useDrawTables           = drawTables | false
+    def usePerPairingDrawTables = perPairingDrawTables | false
+    def realPosition            = position ifTrue realVariant.standardVariant
 
     def isRated      = rated | true
     def isMicroMatch = microMatch | false

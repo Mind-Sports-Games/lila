@@ -135,6 +135,7 @@ object BsonHandlers {
         isMicroMatch = r.boolO("m") | false,
         description = r.strO("d"),
         useDrawTables = r.boolO("dt") | false,
+        usePerPairingDrawTables = r.boolO("pdt") | false,
         position = r.getO[FEN]("f"),
         chatFor = r.intO("c") | Swiss.ChatFor.default,
         roundInterval = (r.intO("i") | 60).seconds,
@@ -145,18 +146,19 @@ object BsonHandlers {
       )
     def writes(w: BSON.Writer, s: Swiss.Settings) =
       $doc(
-        "n"  -> s.nbRounds,
-        "r"  -> (!s.rated).option(false),
-        "m"  -> s.isMicroMatch,
-        "d"  -> s.description,
-        "dt" -> s.useDrawTables,
-        "f"  -> s.position,
-        "c"  -> (s.chatFor != Swiss.ChatFor.default).option(s.chatFor),
-        "i"  -> s.roundInterval.toSeconds.toInt,
-        "p"  -> s.password,
-        "o"  -> s.conditions.ifNonEmpty,
-        "fp" -> s.forbiddenPairings.some.filter(_.nonEmpty),
-        "mv" -> s.medleyVariants
+        "n"   -> s.nbRounds,
+        "r"   -> (!s.rated).option(false),
+        "m"   -> s.isMicroMatch,
+        "d"   -> s.description,
+        "dt"  -> s.useDrawTables,
+        "pdt" -> s.usePerPairingDrawTables,
+        "f"   -> s.position,
+        "c"   -> (s.chatFor != Swiss.ChatFor.default).option(s.chatFor),
+        "i"   -> s.roundInterval.toSeconds.toInt,
+        "p"   -> s.password,
+        "o"   -> s.conditions.ifNonEmpty,
+        "fp"  -> s.forbiddenPairings.some.filter(_.nonEmpty),
+        "mv"  -> s.medleyVariants
       )
   }
 
