@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="swissTournaments">Swiss tournaments</string>
+  <string name="medleyGameFamilies">Game families that could appear in this Medley</string>
+  <string name="firstRound">First Round</string>
   <plurals name="viewAllXRounds">
     <item quantity="one">View the round</item>
     <item quantity="other">View all %s rounds</item>

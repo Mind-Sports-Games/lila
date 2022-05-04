@@ -71,7 +71,7 @@ object EvaluationBsonHandlers {
         "_id"        -> o._id,
         "gameId"     -> o.gameId,
         "userId"     -> o.userId,
-        "p1"      -> o.playerIndex.p1,
+        "p1"         -> o.playerIndex.p1,
         "assessment" -> o.assessment,
         "date"       -> o.date,
         "flags"      -> o.flags,
