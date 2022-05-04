@@ -31,13 +31,15 @@ final class SwissForm(implicit mode: Mode) {
             Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined
           )
         ),
-        "medley"            -> optional(boolean),
-        "chess"             -> optional(boolean),
-        "draughts"          -> optional(boolean),
-        "shogi"             -> optional(boolean),
-        "xiangqi"           -> optional(boolean),
-        "loa"               -> optional(boolean),
-        "flipello"          -> optional(boolean),
+        "medley" -> optional(boolean),
+        "medleyGameFamilies" -> mapping(
+          "chess"    -> optional(boolean),
+          "draughts" -> optional(boolean),
+          "shogi"    -> optional(boolean),
+          "xiangqi"  -> optional(boolean),
+          "loa"      -> optional(boolean),
+          "flipello" -> optional(boolean)
+        )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "rated"             -> optional(boolean),
         "microMatch"        -> optional(boolean),
         "nbRounds"          -> number(min = minRounds, max = SwissBounds.maxRounds),
@@ -62,12 +64,14 @@ final class SwissForm(implicit mode: Mode) {
       }),
       variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
       medley = false.some,
-      chess = true.some,
-      draughts = true.some,
-      shogi = true.some,
-      xiangqi = true.some,
-      loa = true.some,
-      flipello = true.some,
+      medleyGameFamilies = MedleyGameFamilies(
+        chess = true.some,
+        draughts = true.some,
+        shogi = true.some,
+        xiangqi = true.some,
+        loa = true.some,
+        flipello = true.some
+      ),
       rated = true.some,
       microMatch = false.some,
       nbRounds = 7,
@@ -88,12 +92,14 @@ final class SwissForm(implicit mode: Mode) {
       startsAt = s.startsAt.some,
       variant = s"${s.variant.gameFamily.id}_${s.variant.id}".some,
       medley = s.isMedley.some,
-      chess = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Chess()).some,
-      draughts = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Draughts()).some,
-      shogi = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Shogi()).some,
-      xiangqi = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Xiangqi()).some,
-      loa = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.LinesOfAction()).some,
-      flipello = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Flipello()).some,
+      medleyGameFamilies = MedleyGameFamilies(
+        chess = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Chess()).some,
+        draughts = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Draughts()).some,
+        shogi = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Shogi()).some,
+        xiangqi = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Xiangqi()).some,
+        loa = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.LinesOfAction()).some,
+        flipello = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Flipello()).some
+      ),
       rated = s.settings.rated.some,
       microMatch = s.settings.isMicroMatch.some,
       nbRounds = s.settings.nbRounds,
@@ -177,12 +183,7 @@ object SwissForm {
       startsAt: Option[DateTime],
       variant: Option[String],
       medley: Option[Boolean],
-      chess: Option[Boolean],
-      draughts: Option[Boolean],
-      shogi: Option[Boolean],
-      xiangqi: Option[Boolean],
-      loa: Option[Boolean],
-      flipello: Option[Boolean],
+      medleyGameFamilies: MedleyGameFamilies,
       rated: Option[Boolean],
       microMatch: Option[Boolean],
       nbRounds: Int,
@@ -228,20 +229,12 @@ object SwissForm {
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
 
-    def isMedley = (medley | false) && medleyGameFamilies.nonEmpty
-
-    lazy val medleyGameFamilies: List[GameFamily] = GameFamily.all
-      .filterNot(gf => if (!chess.getOrElse(false)) gf == GameFamily.Chess() else false)
-      .filterNot(gf => if (!draughts.getOrElse(false)) gf == GameFamily.Draughts() else false)
-      .filterNot(gf => if (!shogi.getOrElse(false)) gf == GameFamily.Shogi() else false)
-      .filterNot(gf => if (!xiangqi.getOrElse(false)) gf == GameFamily.Xiangqi() else false)
-      .filterNot(gf => if (!loa.getOrElse(false)) gf == GameFamily.LinesOfAction() else false)
-      .filterNot(gf => if (!flipello.getOrElse(false)) gf == GameFamily.Flipello() else false)
+    def isMedley = (medley | false) && medleyGameFamilies.gfList.nonEmpty
 
     private def generateMedleyVariants: List[Variant] =
       scala.util.Random
         .shuffle(
-          Variant.all.filter(v => medleyGameFamilies.contains(v.gameFamily) && !v.fromPositionVariant)
+          Variant.all.filter(v => medleyGameFamilies.gfList.contains(v.gameFamily) && !v.fromPositionVariant)
         )
 
     def medleyVariants: Option[List[Variant]] =
@@ -251,5 +244,24 @@ object SwissForm {
         while (fullMedleyList.size < nbRounds) fullMedleyList = fullMedleyList ::: medleyList
         fullMedleyList.some
       } else None
+  }
+
+  case class MedleyGameFamilies(
+      chess: Option[Boolean],
+      draughts: Option[Boolean],
+      shogi: Option[Boolean],
+      xiangqi: Option[Boolean],
+      loa: Option[Boolean],
+      flipello: Option[Boolean]
+  ) {
+
+    lazy val gfList: List[GameFamily] = GameFamily.all
+      .filterNot(gf => if (!chess.getOrElse(false)) gf == GameFamily.Chess() else false)
+      .filterNot(gf => if (!draughts.getOrElse(false)) gf == GameFamily.Draughts() else false)
+      .filterNot(gf => if (!shogi.getOrElse(false)) gf == GameFamily.Shogi() else false)
+      .filterNot(gf => if (!xiangqi.getOrElse(false)) gf == GameFamily.Xiangqi() else false)
+      .filterNot(gf => if (!loa.getOrElse(false)) gf == GameFamily.LinesOfAction() else false)
+      .filterNot(gf => if (!flipello.getOrElse(false)) gf == GameFamily.Flipello() else false)
+
   }
 }

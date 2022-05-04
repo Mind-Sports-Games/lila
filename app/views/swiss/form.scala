@@ -30,14 +30,7 @@ object form {
             form3.split(fields.rated, fields.variant),
             form3.split(fields.microMatch, fields.drawTables),
             fields.medley,
-            form3.split(
-              fields.chess,
-              fields.draughts,
-              fields.shogi,
-              fields.xiangqi,
-              fields.loa,
-              fields.flipello
-            ),
+            fields.medleyGameFamilies,
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -75,14 +68,7 @@ object form {
             form3.split(fields.rated, fields.variant),
             form3.split(fields.microMatch, fields.drawTables),
             fields.medley,
-            form3.split(
-              fields.chess,
-              fields.draughts,
-              fields.shogi,
-              fields.xiangqi,
-              fields.loa,
-              fields.flipello
-            ),
+            fields.medleyGameFamilies,
             fields.clock,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -192,58 +178,67 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         ).some
       )
     )
-  def chess =
+  def medleyGameFamilies =
+    form3.split(
+      chess,
+      draughts,
+      loa,
+      shogi,
+      xiangqi,
+      flipello
+    )
+
+  private def chess =
     frag(
       form3.checkbox(
-        form("chess"),
+        form("medleyGameFamilies.chess"),
         VariantKeys.gameFamilyName(GameFamily.Chess()),
-        klass = "medleyGameLogic",
+        klass = "medleyGameFamily",
         displayed = false
-      ),
-      st.input(tpe := "hidden", st.name := form("chess").name, value := "false") // hack allow disabling chess
+      )
     )
-  def draughts =
+  private def draughts =
     frag(
       form3.checkbox(
-        form("draughts"),
+        form("medleyGameFamilies.draughts"),
         VariantKeys.gameFamilyName(GameFamily.Draughts()),
-        klass = "medleyGameLogic",
+        klass = "medleyGameFamily",
         displayed = false
       )
     )
-  def loa =
+  private def loa =
     frag(
       form3.checkbox(
-        form("loa"),
+        form("medleyGameFamilies.loa"),
         VariantKeys.gameFamilyName(GameFamily.LinesOfAction()),
-        klass = "medleyGameLogic",
+        klass = "medleyGameFamily",
         displayed = false
       )
     )
-  def shogi =
+  private def shogi =
     frag(
       form3.checkbox(
-        form("shogi"),
+        form("medleyGameFamilies.shogi"),
         VariantKeys.gameFamilyName(GameFamily.Shogi()),
-        klass = "medleyGameLogic",
+        klass = "medleyGameFamily",
         displayed = false
       )
     )
-  def xiangqi =
+  private def xiangqi =
     frag(
       form3.checkbox(
-        form("xiangqi"),
+        form("medleyGameFamilies.xiangqi"),
         VariantKeys.gameFamilyName(GameFamily.Xiangqi()),
-        klass = "medleyGameLogic",
+        klass = "medleyGameFamily",
         displayed = false
       )
     )
-  def flipello =
+  private def flipello =
     frag(
       form3.checkbox(
-        form("flipello"),
+        form("medleyGameFamilies.flipello"),
         VariantKeys.gameFamilyName(GameFamily.Flipello()),
-        klass = "medleyGameLogic",
+        klass = "medleyGameFamily",
         displayed = false
       )
     )

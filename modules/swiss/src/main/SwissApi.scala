@@ -130,8 +130,8 @@ final class SwissApi(
             medleyVariants =
               if (
                 old.medleyGameFamilies != Some(
-                  data.medleyGameFamilies.sortWith(_.name < _.name)
-                ) || old.settings.nbRounds != data.nbRounds
+                  data.medleyGameFamilies.gfList.sortWith(_.name < _.name)
+                ) || old.settings.nbRounds < data.nbRounds
               )
                 data.medleyVariants
               else old.settings.medleyVariants
