@@ -132,7 +132,10 @@ final class Round(
       }
     }
 
-  def watcher(gameId: String, playerIndex: String) =
+  def watcherAnalysis(gameId: String, playerIndex: String) =
+    watcher(gameId, playerIndex, true)
+
+  def watcher(gameId: String, playerIndex: String, forceAnalysis: Boolean = false) =
     Open { implicit ctx =>
       proxyPov(gameId, playerIndex) flatMap {
         case Some(pov) =>
@@ -147,7 +150,7 @@ final class Round(
                   Redirect(routes.Round.watcher(gameId, pov.game.variant.startPlayer.name)).fuccess
               }
             case None =>
-              watch(pov)
+              watch(pov, None, forceAnalysis)
           }
         case None => userC.tryRedirect(gameId) getOrElse challengeC.showId(gameId)
       }
@@ -158,18 +161,23 @@ final class Round(
       env.round.proxyRepo.pov(gameId, _)
     }
 
-  private[controllers] def watch(pov: Pov, userTv: Option[UserModel] = None)(implicit
-      ctx: Context
-  ): Fu[Result] =
+  private[controllers] def watch(pov: Pov, userTv: Option[UserModel] = None, forceAnalysis: Boolean = false)(
+      implicit ctx: Context
+  ): Fu[Result] = {
     playablePovForReq(pov.game) match {
       case Some(player) if userTv.isEmpty => renderPlayer(pov withPlayerIndex player.playerIndex)
-      case _ if pov.game.variant == Variant.Chess(strategygames.chess.variant.RacingKings) && pov.playerIndex.p2 =>
+      case _
+          if pov.game.variant == Variant.Chess(
+            strategygames.chess.variant.RacingKings
+          ) && pov.playerIndex.p2 =>
         if (userTv.isDefined) watch(!pov, userTv)
         else Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startPlayer.name)).fuccess
       case _ =>
         negotiate(
           html = {
-            if (pov.game.replayable && pov.game.variant.aiVariant && pov.game.variant.gameFamily.aiEnabled) analyseC.replay(pov, userTv = userTv)
+            val canAnalyse = forceAnalysis || pov.game.variant.aiVariant && pov.game.variant.gameFamily.aiEnabled
+            if (pov.game.replayable && canAnalyse)
+              analyseC.replay(pov, userTv = userTv)
             else if (HTTPRequest.isHuman(ctx.req))
               env.tournament.api.gameView.watcher(pov.game) zip
                 (pov.game.simulId ?? env.simul.repo.find) zip
@@ -218,6 +226,7 @@ final class Round(
             }
         ) map { NoCache(_) }
     }
+  }
 
   private[controllers] def getWatcherChat(
       game: GameModel
@@ -345,7 +354,9 @@ final class Round(
   def mini(gameId: String, playerIndex: String) =
     Open { implicit ctx =>
       OptionOk(
-        PlayerIndex.fromName(playerIndex).??(env.round.proxyRepo.povIfPresent(gameId, _)) orElse env.game.gameRepo
+        PlayerIndex
+          .fromName(playerIndex)
+          .??(env.round.proxyRepo.povIfPresent(gameId, _)) orElse env.game.gameRepo
           .pov(gameId, playerIndex)
       )(html.game.mini(_))
     }
