@@ -191,7 +191,6 @@ export default class RoundController {
       flipello.flip(this, dest, this.data.player.playerIndex);
     } else if (this.data.game.variant.key === 'oware') {
       // a lot of pieces can change from 1 move so update them all
-      console.log('oware onMove - do we need to update board pieces, like in flipello?');
       // oware.updateBoardFromMove(this, o.fen);
     } else sound.move();
   };
@@ -415,8 +414,6 @@ export default class RoundController {
   apiMove = (o: ApiMove): true => {
     const d = this.data,
       playing = this.isPlaying();
-    console.log('data ', d);
-    console.log('o.role', o.role);
     d.game.turns = o.ply;
     d.game.player = o.ply % 2 === 0 ? 'p1' : 'p2';
     const playedPlayerIndex = o.ply % 2 === 0 ? 'p2' : 'p1',
