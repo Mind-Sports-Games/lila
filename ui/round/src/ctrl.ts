@@ -22,6 +22,7 @@ import MoveOn from './moveOn';
 import TransientMove from './transientMove';
 import * as atomic from './atomic';
 import * as flipello from './flipello';
+import * as oware from './oware';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -188,6 +189,9 @@ export default class RoundController {
       } else sound.capture();
     } else if (this.data.game.variant.key === 'flipello') {
       flipello.flip(this, dest, this.data.player.playerIndex);
+    } else if (this.data.game.variant.key === 'oware') {
+      // a lot of pieces can change from 1 move so update them all
+      // oware.updateBoardFromMove(this, o.fen);
     } else sound.move();
   };
 
@@ -209,7 +213,8 @@ export default class RoundController {
   };
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
-    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(this.data.game.variant.key)) return false;
+    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'oware'].includes(this.data.game.variant.key))
+      return false;
     if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'p-piece') return false;
     const pos = (dest[0] + orig[1]) as cg.Key;
     this.chessground.setPieces(new Map([[pos, undefined]]));
@@ -444,6 +449,10 @@ export default class RoundController {
         ) {
           this.chessground.move(keys[0], keys[1]);
         }
+      }
+      if (this.data.game.variant.key === 'oware') {
+        // a lot of pieces can change from 1 move so update them all
+        oware.updateBoardFromMove(this, o.fen);
       }
       if (this.data.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);

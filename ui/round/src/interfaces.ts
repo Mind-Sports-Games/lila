@@ -55,6 +55,7 @@ export interface RoundData extends GameData {
   forecastCount?: number;
   crazyhouse?: CrazyData;
   onlyDropsVariant: boolean;
+  hasGameScore: boolean;
   correspondence: CorresClockData;
   url: {
     socket: string;

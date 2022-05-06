@@ -15,18 +15,30 @@ cg-board {
   }
 }
 
-//miniboards
+//miniboards - alter non-square boards
 .variant-xiangqi.is2d {
   width: calc(100% * 10 / 11);
   margin-left: calc(50% / 11);
 }
+.mini-board.variant-oware.is2d {
+  padding-bottom: calc(213.333 * 100% / 640);
+  padding-top: calc(213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
+}
 
-//main board
+//only add for fixed mini-games, not the popup which create an <a>
+span.mini-game.variant-oware.is2d {
+  margin-top: calc(-213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
+}
+
+//main board - alter non-square boards
 .is2d .variant-xiangqi {
   width: calc(100% * 10 / 11);
   margin-right: calc(100% / 11);
 }
 
+//Squares
 .variant-shogi square {
   width: calc(100% / 9);
   height: calc(100% / 9);
@@ -45,6 +57,11 @@ cg-board {
 .variant-minixiangqi square {
   width: calc(100% / 7);
   height: calc(100% / 7);
+}
+
+.variant-oware square {
+  width: calc(100% / 6);
+  height: calc(100% / 2);
 }
 
 $alternate-board-highlights: (
@@ -180,6 +197,11 @@ square {
   height: calc(100% / 7);
 }
 
+.variant-oware piece {
+  width: calc(100% / 6);
+  height: calc(100% / 2);
+}
+
 piece {
   position: absolute;
   top: 0;
@@ -230,6 +252,11 @@ piece {
   padding-bottom: calc(100% / 7);
 }
 
+.variant-oware cg-helper {
+  width: calc(100% / 6);
+  padding-bottom: calc(100% / 6);
+}
+
 cg-helper {
   position: absolute;
   width: 12.5%;
@@ -256,6 +283,11 @@ cg-helper {
 .variant-minixiangqi cg-container {
   width: calc(100% * 7);
   height: calc(100% * 7);
+}
+
+.variant-oware cg-container {
+  width: calc(100% * 6);
+  height: calc(100% * 2);
 }
 
 cg-container {
@@ -295,7 +327,7 @@ cg-container .cg-custom-svgs svg {
   overflow: visible;
 }
 
-/* 9x10 - for non square boards*/
+/* 9x10 - for non square boards */
 .variant-xiangqi .cg-wrap {
   padding-bottom: calc(640 * 100% / 576);
 }
@@ -304,6 +336,18 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(640 * 100% / 576);
 }
 
+.variant-oware .round__app__board {
+  padding-bottom: calc(213.333 * 100% / 640);
+  padding-top: calc(0.38 * 213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
+}
+
 .variant-xiangqi .analyse__board {
   padding-bottom: calc(640 * 100% / 576);
+}
+
+.variant-oware .analyse__board {
+  padding-bottom: calc(213.333 * 100% / 640);
+  padding-top: calc(0.38 * 213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
 }

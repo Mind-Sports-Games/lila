@@ -134,6 +134,7 @@ final class JsonView(
           .add("moretimeable" -> moretimeable)
           .add("crazyhouse" -> pov.game.board.pocketData)
           .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("hasGameScore" -> pov.game.variant.hasGameScore)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
@@ -229,6 +230,7 @@ final class JsonView(
             Json.obj("id" -> userId)
           })
           .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("hasGameScore" -> pov.game.variant.hasGameScore)
 
       }
 
@@ -294,6 +296,7 @@ final class JsonView(
       .add("evalPut" -> me.??(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
       .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+      .add("hasGameScore" -> pov.game.variant.hasGameScore)
   }
 
   private def blurs(game: Game, player: lila.game.Player) =
@@ -339,6 +342,8 @@ final class JsonView(
         }
       case (Situation.FairySF(_), Variant.FairySF(_)) => (pov.game playableBy pov.player) option
         Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Mancala(_), Variant.Mancala(_)) => (pov.game playableBy pov.player) option
+        Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
@@ -347,6 +352,7 @@ final class JsonView(
       case (Situation.Chess(_), Variant.Chess(_)) => None
       case (Situation.FairySF(_), Variant.FairySF(_)) => (pov.game playableBy pov.player) option
         Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Mancala(_), Variant.Mancala(_)) => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
       case _ => sys.error("Mismatch of types for possibleDropsByrole")
     }

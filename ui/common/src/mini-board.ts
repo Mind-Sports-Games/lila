@@ -53,6 +53,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? { width: 5, height: 5 }
             : $el.hasClass('variant-minixiangqi')
             ? { width: 7, height: 7 }
+            : $el.hasClass('variant-oware')
+            ? { width: 6, height: 2 }
             : { width: 8, height: 8 },
           variant: $el.hasClass('variant-shogi')
             ? 'shogi'
@@ -62,6 +64,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? 'minishogi'
             : $el.hasClass('variant-minixiangqi')
             ? 'minixiangqi'
+            : $el.hasClass('variant-oware')
+            ? 'oware'
             : 'standard',
         })
       );

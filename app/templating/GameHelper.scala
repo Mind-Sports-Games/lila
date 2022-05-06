@@ -49,7 +49,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       else game.variant.gameLogic.name.toLowerCase()
     import strategygames.Status._
     val result = (game.winner, game.loser, game.status, game.variant.gameLogic) match {
-      case (Some(w), _, Mate, GameLogic.Chess() | GameLogic.FairySF()) =>
+      case (Some(w), _, Mate, GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Mancala()) =>
         s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate | PerpetualCheck, _) =>
         s"${playerText(w)} won by opponent perpetually checking"
@@ -165,7 +165,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Aborted => trans.gameAborted.txt()
       case S.Mate =>
         game.variant.gameLogic match {
-          case GameLogic.Chess() | GameLogic.FairySF() => trans.checkmate.txt()
+          case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Mancala() => trans.checkmate.txt()
           case _                                       => ""
         }
       case S.PerpetualCheck => trans.perpetualCheck.txt()
@@ -204,6 +204,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Variant.Chess(strategygames.chess.variant.ScrambledEggs)      => trans.checkersConnected.txt()
           case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => trans.promotion.txt()
           case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => trans.gameFinished.txt()
+          case Variant.Mancala(strategygames.mancala.variant.Oware)          => trans.gameFinished.txt()
           case _                                                             => trans.variantEnding.txt()
         }
       case _ => ""

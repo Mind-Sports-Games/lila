@@ -16,6 +16,14 @@ const xiangqiVariant = {
   boardSize: { height: 10, width: 9 },
 };
 
+const owareVariant = {
+  key: 'oware' as VariantKey,
+  name: 'oware',
+  short: 'oware',
+  lib: 1,
+  boardSize: { height: 2, width: 6 },
+};
+
 test('testing e4 maps to 56', () => {
   expect(parseUCISquareToUSI('e4', 9, 9)).toBe('56');
 });
@@ -167,7 +175,7 @@ test('moveFromNotationStyle shogi Pawn capture', () => {
 test('moveFromNotationStyle shogi Pawn drop', () => {
   const move = {
     san: '',
-    uci: 'a0e6',
+    uci: 'P@e6',
     fen: 'lnsgkgsnl/1r5b1/pppp1pppp/4p4/9/4R4/PPPP1PPPP/1B7/LNSGKGSNL[P] w - - 1 5',
     prevFen: 'lnsgkgsnl/1r5b1/pppp1pppp/9/9/4R4/PPPP1PPPP/1B7/LNSGKGSNL[Pp] b - - 0 4',
   };
@@ -215,7 +223,7 @@ test('moveFromNotationStyle shogi Dragon moving no promotion', () => {
 test('moveFromNotationStyle shogi Knight drop no promotion', () => {
   const move = {
     san: '',
-    uci: 'a0b7',
+    uci: 'N@b7',
     fen: 'lnsg2s1l/1r2g1kb1/1Np+R1p1pp/1p7/p2N5/2P6/PP1P1PNPP/9/L1SGKGS1L[PPPppb] b - - 2 14',
     prevFen: 'lnsg2s1l/1r2g1kb1/2p+R1p1pp/1p7/p2N5/2P6/PP1P1PNPP/9/L1SGKGS1L[NPPPppb] w - - 1 14',
   };
@@ -385,4 +393,19 @@ test('moveFromNotationStyle xiangqi 4 pawns in column p2 sideways move', () => {
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('37=6');
+});
+
+//Oware
+test('moveFromNotationStyle oware c1 pos stone from starting', () => {
+  const move = { san: '', uci: 'c1f2', fen: 'DDDDDD/DDDDDD 0 0 S' };
+
+  const notation = moveFromNotationStyle('man')(move, owareVariant);
+  expect(notation).toBe('C');
+});
+
+test('moveFromNotationStyle oware b2 pos stone', () => {
+  const move = { san: '', uci: 'b2c1', fen: 'DDDCDD/DDEDDD 0 0 N' };
+
+  const notation = moveFromNotationStyle('man')(move, owareVariant);
+  expect(notation).toBe('e');
 });

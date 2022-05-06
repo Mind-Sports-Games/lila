@@ -31,8 +31,8 @@ private object BSONHandlers {
   implicit val RoleBSONHandler = tryHandler[Role](
     { case BSONString(r) => r.split(":") match {
       case Array(lib, r) =>
-        //if we add future to strategygames.GameCollection we might need to change this
-        if (lib.toInt >= 2) Role.allByForsyth(
+        //require gf for fairy as roles are different, all other gamelogic currently dont need this
+        if (lib.toInt == 2) Role.allByForsyth(
           GameLogic.FairySF(),
           GameFamily(lib.toInt)
         ) get r.head toTry s"Invalid role $r"
@@ -46,6 +46,7 @@ private object BSONHandlers {
       case Role.DraughtsPromotableRole(r) => BSONString(s"1:${r.forsyth.toString}")
       case Role.FairySFRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
       case Role.FairySFPromotableRole(r)  => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
+      case Role.MancalaRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
     }
   )
   implicit val TerminationBSONHandler = tryHandler[Termination](

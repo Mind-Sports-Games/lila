@@ -44,6 +44,10 @@
       transform: scale(0.9);
     }
 
+    .mancala piece {
+      background-position: center center;
+    }
+
     &.d3 piece {
       left: 0;
       top: 0;

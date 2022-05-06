@@ -29,4 +29,6 @@
   <string name="minishogi">Mini Shogi</string>
   <string name="minixiangqi">Mini Xiangqi</string>
   <string name="flipello">Flipello</string>
+  <string name="oware">Oware</string>
+  <string name="mancala">Mancala</string>
 </resources>

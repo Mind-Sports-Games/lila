@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { parseFen } from 'chessops/fen';
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
-import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore } from './util';
+import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore, getOwareScore } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import { playable } from 'game';
@@ -294,12 +294,15 @@ function addChapterId(study: StudyCtrl | undefined, cssClass: string) {
   return cssClass + (study && study.data.chapter ? '.' + study.data.chapter.id : '');
 }
 
-function renderPlayerScore(score: number, position: Position, playerIndex: string): VNode | undefined {
-  if (score == -1) {
-    return undefined;
-  }
+function renderPlayerScore(
+  score: number,
+  position: Position,
+  playerIndex: string,
+  variantKey: VariantKey
+): VNode | undefined {
+  const pieceClass = variantKey === 'oware' ? 'piece.G-piece.' : 'piece.p-piece.';
   const children: VNode[] = [];
-  children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
+  children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
   return h('div.game-score.game-score-' + position, children);
 }
 
@@ -316,31 +319,46 @@ export default function (ctrl: AnalyseCtrl): VNode {
     clocks = !playerBars && renderClocks(ctrl),
     gaugeOn = ctrl.showEvalGauge(),
     needsInnerCoords = !!gaugeOn || !!playerBars,
-    tour = relayTour(ctrl);
+    tour = relayTour(ctrl),
+    variantKey = ctrl.data.game.variant.key;
 
-  let topScore = -1,
-    bottomScore = -1;
+  let topScore = 0,
+    bottomScore = 0;
   const cgState = ctrl.chessground && ctrl.chessground.state;
-  if (ctrl.data.game.variant.key === 'flipello') {
-    const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize);
-    const p1Score = getPlayerScore(ctrl.data.game.variant.key, pieces, 'p1');
-    const p2Score = getPlayerScore(ctrl.data.game.variant.key, pieces, 'p2');
-    topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
-    bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+  if (ctrl.data.hasGameScore) {
+    switch (variantKey) {
+      case 'flipello': {
+        const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize, variantKey);
+        const p1Score = getPlayerScore(variantKey, pieces, 'p1');
+        const p2Score = getPlayerScore(variantKey, pieces, 'p2');
+        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      case 'oware': {
+        const fen = ctrl.node.fen;
+        const p1Score = getOwareScore(fen, 'p1');
+        const p2Score = getOwareScore(fen, 'p2');
+        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      default: {
+        break;
+      }
+    }
   }
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(ctrl.data.game.variant.key)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(ctrl.data.game.variant.key)
-    ? '.piece-letter'
-    : '';
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) ? '.piece-letter' : '';
   return h(
-    `main.analyse.variant-${ctrl.data.game.variant.key}${notationBasic}.${ctrl.data.game.gameFamily}`,
+    `main.analyse.variant-${variantKey}${notationBasic}.${ctrl.data.game.gameFamily}`,
     {
       hook: {
         insert: vn => {
@@ -391,7 +409,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
           ]
         ),
       gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-      menuIsOpen || tour ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex()),
+      menuIsOpen || tour || !ctrl.data.hasGameScore
+        ? null
+        : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
       gamebookPlayView ||
         (tour
@@ -407,7 +427,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
                     retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
                   ]),
             ])),
-      menuIsOpen || tour ? null : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex()),
+      menuIsOpen || tour || !ctrl.data.hasGameScore
+        ? null
+        : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
       gamebookPlayView || tour ? null : controls(ctrl),
       ctrl.embed || tour

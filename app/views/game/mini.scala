@@ -71,7 +71,7 @@ object mini {
 
   def renderState(pov: Pov) =
     pov.game.variant match {
-      case Variant.Chess(_) | Variant.FairySF(_) =>
+      case Variant.Chess(_) | Variant.FairySF(_) | Variant.Mancala(_) =>
         dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)},${pov.playerIndex.name},${~pov.game.lastMoveKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
@@ -102,9 +102,13 @@ object mini {
         "(" + pov.game.history
           .checkCount(pov.game.opponent(pov.playerIndex).playerIndex)
           .toString() + ")"
+      case "oware" => 
+        val fen = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
+        val score = if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score
+        "(" + score.toString() + ")"
       case _ => ""
     }
-
+    
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(
       pov.game.winnerPlayerIndex.fold("½") { c =>

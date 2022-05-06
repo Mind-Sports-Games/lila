@@ -50,6 +50,7 @@ export interface AnalyseData {
     id: string;
   };
   onlyDropsVariant: boolean;
+  hasGameScore: boolean;
   possibleDropsByRole?: string;
 }
 
