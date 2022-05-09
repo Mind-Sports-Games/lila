@@ -38,7 +38,8 @@ final class SwissForm(implicit mode: Mode) {
           "shogi"    -> optional(boolean),
           "xiangqi"  -> optional(boolean),
           "loa"      -> optional(boolean),
-          "flipello" -> optional(boolean)
+          "flipello" -> optional(boolean),
+          "mancala"  -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "rated"                -> optional(boolean),
         "microMatch"           -> optional(boolean),
@@ -71,7 +72,8 @@ final class SwissForm(implicit mode: Mode) {
         shogi = true.some,
         xiangqi = true.some,
         loa = true.some,
-        flipello = true.some
+        flipello = true.some,
+        mancala = true.some
       ),
       rated = true.some,
       microMatch = false.some,
@@ -100,7 +102,8 @@ final class SwissForm(implicit mode: Mode) {
         shogi = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Shogi()).some,
         xiangqi = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Xiangqi()).some,
         loa = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.LinesOfAction()).some,
-        flipello = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Flipello()).some
+        flipello = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Flipello()).some,
+        mancala = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Mancala()).some
       ),
       rated = s.settings.rated.some,
       microMatch = s.settings.isMicroMatch.some,
@@ -257,7 +260,8 @@ object SwissForm {
       shogi: Option[Boolean],
       xiangqi: Option[Boolean],
       loa: Option[Boolean],
-      flipello: Option[Boolean]
+      flipello: Option[Boolean],
+      mancala: Option[Boolean]
   ) {
 
     lazy val gfList: List[GameFamily] = GameFamily.all
@@ -267,6 +271,7 @@ object SwissForm {
       .filterNot(gf => if (!xiangqi.getOrElse(false)) gf == GameFamily.Xiangqi() else false)
       .filterNot(gf => if (!loa.getOrElse(false)) gf == GameFamily.LinesOfAction() else false)
       .filterNot(gf => if (!flipello.getOrElse(false)) gf == GameFamily.Flipello() else false)
+      .filterNot(gf => if (!mancala.getOrElse(false)) gf == GameFamily.Mancala() else false)
 
   }
 }
