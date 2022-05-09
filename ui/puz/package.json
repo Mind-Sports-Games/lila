@@ -14,8 +14,8 @@
     "prod": "yarn run compile"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#96-add-oware",
-    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#96-add-oware",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.19",
+    "chessops": "git+ssh://git@github.com:Mind-Sports-Games/chessops.git#v0.8.1-pstrat3.13",
     "common": "2.0.0",
     "snabbdom": "^3.0.1"
   },

@@ -1,6 +1,6 @@
 //total game count by lib and variant
 db.game5.aggregate([
-  //{ $match: { l: { $exists: true } } }, \\ old games dont have library (pre Aug 2021)
+  { $match: { l: { $exists: true } } }, // old games dont have library (pre Aug 2021)
   {
     $project: {
       l: 1,
