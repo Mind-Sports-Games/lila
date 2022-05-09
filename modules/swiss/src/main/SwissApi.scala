@@ -17,6 +17,7 @@ import lila.game.{ Game, Pov }
 import lila.hub.LightTeam.TeamID
 import lila.round.actorApi.round.QuietFlag
 import lila.user.{ User, UserRepo }
+import lila.i18n.VariantKeys
 
 import strategygames.GameLogic
 
@@ -84,12 +85,14 @@ final class SwissApi(
         isMicroMatch = data.isMicroMatch,
         description = data.description,
         useDrawTables = data.useDrawTables,
+        usePerPairingDrawTables = data.usePerPairingDrawTables,
         position = data.realPosition,
         chatFor = data.realChatFor,
         roundInterval = data.realRoundInterval,
         password = data.password,
         conditions = data.conditions.all,
-        forbiddenPairings = ~data.forbiddenPairings
+        forbiddenPairings = ~data.forbiddenPairings,
+        medleyVariants = data.medleyVariants
       )
     )
     colls.swiss.insert.one(addFeaturable(swiss)) >>-
@@ -117,6 +120,7 @@ final class SwissApi(
             isMicroMatch = data.isMicroMatch | old.settings.isMicroMatch,
             description = data.description orElse old.settings.description,
             useDrawTables = data.useDrawTables | old.settings.useDrawTables,
+            usePerPairingDrawTables = data.usePerPairingDrawTables | old.settings.usePerPairingDrawTables,
             position = position,
             chatFor = data.chatFor | old.settings.chatFor,
             roundInterval =
@@ -124,7 +128,15 @@ final class SwissApi(
               else old.settings.roundInterval,
             password = data.password,
             conditions = data.conditions.all,
-            forbiddenPairings = ~data.forbiddenPairings
+            forbiddenPairings = ~data.forbiddenPairings,
+            medleyVariants =
+              if (
+                old.medleyGameFamilies != Some(
+                  data.medleyGameFamilies.gfList.sortWith(_.name < _.name)
+                ) || old.settings.nbRounds < data.nbRounds
+              )
+                data.medleyVariants
+              else old.settings.medleyVariants
           )
         ) pipe { s =>
           if (
@@ -525,7 +537,10 @@ final class SwissApi(
                         }
                       )
                       .void >>-
-                      systemChat(swiss.id, s"Round ${swiss.round.value + 1} will start soon.")
+                      systemChat(
+                        swiss.id,
+                        s"Round ${swiss.round.value + 1}${medleyRoundText(swiss, 1)} will start soon."
+                      )
                 }
               } inject true
           }
@@ -533,6 +548,11 @@ final class SwissApi(
       case true => recomputeAndUpdateAll(game.swissId)
       case _    => funit
     }
+
+  private def medleyRoundText(swiss: Swiss, offset: Int = 0) =
+    if (swiss.isMedley)
+      s" [${VariantKeys.variantName(swiss.variantForRound(swiss.round.value + offset))}]"
+    else ""
 
   private[swiss] def destroy(swiss: Swiss): Funit =
     colls.swiss.delete.one($id(swiss.id)) >>
@@ -649,7 +669,7 @@ final class SwissApi(
                   doFinish(swiss)
                 } {
                   case s if s.nextRoundAt.isEmpty =>
-                    systemChat(s.id, s"Round ${s.round.value} started.")
+                    systemChat(s.id, s"Round ${s.round.value}${medleyRoundText(s)} started.")
                     funit
                   case s =>
                     systemChat(s.id, s"Round ${s.round.value} failed.", volatile = true)

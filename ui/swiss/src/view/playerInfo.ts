@@ -63,18 +63,18 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
         hook: bind('click', () => ctrl.showPlayerInfo(data), ctrl.redraw),
       }),
       h('div.stats', [
-        h('h2', [h('span.rank', data.rank + '. '), renderPlayer(data, true, false)]),
+        h('h2', [h('span.rank', data.rank + '. '), renderPlayer(data, true, !ctrl.data.isMedley)]),
         h('table', [
           numberRow('Points', isMM ? data.points * 2 : data.points, 'raw'),
           numberRow('Tiebreak' + (data.tieBreak2 ? ' [BH]' : ' [SB]'), data.tieBreak, 'raw'),
           data.tieBreak2 ? numberRow('Tiebreak [SB]', data.tieBreak2, 'raw') : null,
           ...(games
             ? [
-                data.performance
+                data.performance && !ctrl.data.isMedley
                   ? numberRow(noarg('performance'), data.performance + (games < 3 ? '?' : ''), 'raw')
                   : null,
                 numberRow(noarg('winRate'), [wins, games], 'percent'),
-                numberRow(noarg('averageOpponent'), avgOp, 'raw'),
+                !ctrl.data.isMedley ? numberRow(noarg('averageOpponent'), avgOp, 'raw') : null,
               ]
             : []),
         ]),

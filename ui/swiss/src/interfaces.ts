@@ -23,6 +23,8 @@ export interface SwissData {
   startsAt: string;
   clock: Clock;
   variant: string;
+  isMedley: boolean;
+  roundVariant: string;
   p1Name: PlayerName;
   p2Name: PlayerName;
   p1Color: PlayerColor;
