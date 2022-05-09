@@ -216,7 +216,6 @@ db.trophy.insert({
   name: 'Crazyhouse Swiss - MSO GP 2022',
 });
 
-
 //BRONZE
 db.trophy.insert({
   _id: 'msogp-bronze-SHSGP-2022-clawmac',
