@@ -32,5 +32,5 @@ export function updateBoardFromMove(ctrl: RoundController, newFen: string) {
   //update empty squares as there could have been captures, which are not currently calculated in chessground
   emptySquares.forEach(x => diff.set(x, undefined));
 
-  ctrl.chessground.setPieces(diff);
+  ctrl.chessground.setPiecesNoAnim(diff);
 }
