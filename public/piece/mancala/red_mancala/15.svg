@@ -1,1019 +1,173 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   width="100px"
-   height="100px"
-   viewBox="0 0 100 100"
-   version="1.1"
-   id="svg2499"
-   sodipodi:docname="seeds-8+.svg"
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04, custom)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:dc="http://purl.org/dc/elements/1.1/">
-  <sodipodi:namedview
-     id="namedview2501"
-     pagecolor="#505050"
-     bordercolor="#ffffff"
-     borderopacity="1"
-     inkscape:pageshadow="0"
-     inkscape:pageopacity="0"
-     inkscape:pagecheckerboard="1"
-     showgrid="false"
-     inkscape:zoom="4.78"
-     inkscape:cx="-9.4142259"
-     inkscape:cy="50.104603"
-     inkscape:window-width="1916"
-     inkscape:window-height="1031"
-     inkscape:window-x="0"
-     inkscape:window-y="20"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg2499" />
-  <title
-     id="title2295">seeds-8+</title>
-  <defs
-     id="defs2374">
-    <filter
-       x="-0.17777778"
-       y="-0.20869565"
-       width="1.3555556"
-       height="1.4173913"
-       filterUnits="objectBoundingBox"
-       id="filter-1">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2297" />
-    </filter>
-    <radialGradient
-       cx="46.387808%"
-       cy="46.387808%"
-       fx="46.387808%"
-       fy="46.387808%"
-       r="46.1573049%"
-       gradientTransform="translate(0.463878,0.463878),scale(0.851852,1.000000),rotate(90.000000),translate(-0.463878,-0.463878)"
-       id="radialGradient-2">
-      <stop
-         stop-color="#FFFFFF"
-         stop-opacity="0.1"
-         offset="0%"
-         id="stop2300" />
-      <stop
-         stop-color="#FFFFFF"
-         stop-opacity="0.0858890035"
-         offset="63.5889013%"
-         id="stop2302" />
-      <stop
-         stop-color="#000000"
-         stop-opacity="0.08"
-         offset="100%"
-         id="stop2304" />
-    </radialGradient>
-    <ellipse
-       id="path-3"
-       cx="13.5"
-       cy="11.5"
-       rx="13.5"
-       ry="11.5" />
-    <radialGradient
-       cx="46.387808%"
-       cy="46.387808%"
-       fx="46.387808%"
-       fy="46.387808%"
-       r="46.1573049%"
-       gradientTransform="translate(0.463878,0.463878),scale(0.851852,1.000000),rotate(90.000000),translate(-0.463878,-0.463878)"
-       id="radialGradient-4">
-      <stop
-         stop-color="#D02424"
-         stop-opacity="0.1"
-         offset="0%"
-         id="stop2308" />
-      <stop
-         stop-color="#D02424"
-         stop-opacity="0.0858890035"
-         offset="63.5889013%"
-         id="stop2310" />
-      <stop
-         stop-color="#D02424"
-         stop-opacity="0.08"
-         offset="100%"
-         id="stop2312" />
-    </radialGradient>
-    <filter
-       x="-0.27684845"
-       y="-0.30908902"
-       width="1.5536969"
-       height="1.618178"
-       filterUnits="objectBoundingBox"
-       id="filter-5">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2315" />
-    </filter>
-    <filter
-       x="-0.17777778"
-       y="-0.20869565"
-       width="1.3555556"
-       height="1.4173913"
-       filterUnits="objectBoundingBox"
-       id="filter-6">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2318" />
-    </filter>
-    <ellipse
-       id="path-7"
-       cx="13.5"
-       cy="11.5"
-       rx="13.5"
-       ry="11.5" />
-    <filter
-       x="-0.27684845"
-       y="-0.30908902"
-       width="1.5536969"
-       height="1.618178"
-       filterUnits="objectBoundingBox"
-       id="filter-8">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2322" />
-    </filter>
-    <filter
-       x="-0.17777778"
-       y="-0.20869565"
-       width="1.3555556"
-       height="1.4173913"
-       filterUnits="objectBoundingBox"
-       id="filter-9">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2325" />
-    </filter>
-    <ellipse
-       id="path-10"
-       cx="13.5"
-       cy="11.5"
-       rx="13.5"
-       ry="11.5" />
-    <filter
-       x="-0.27684845"
-       y="-0.30908902"
-       width="1.5536969"
-       height="1.618178"
-       filterUnits="objectBoundingBox"
-       id="filter-11">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2329" />
-    </filter>
-    <filter
-       x="-0.17777778"
-       y="-0.20869565"
-       width="1.3555556"
-       height="1.4173913"
-       filterUnits="objectBoundingBox"
-       id="filter-12">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2332" />
-    </filter>
-    <ellipse
-       id="path-13"
-       cx="13.5"
-       cy="11.5"
-       rx="13.5"
-       ry="11.5" />
-    <filter
-       x="-0.27684845"
-       y="-0.30908902"
-       width="1.5536969"
-       height="1.618178"
-       filterUnits="objectBoundingBox"
-       id="filter-14">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2336" />
-    </filter>
-    <filter
-       x="-0.17777778"
-       y="-0.20869565"
-       width="1.3555556"
-       height="1.4173913"
-       filterUnits="objectBoundingBox"
-       id="filter-15">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2339" />
-    </filter>
-    <ellipse
-       id="path-16"
-       cx="13.5"
-       cy="11.5"
-       rx="13.5"
-       ry="11.5" />
-    <filter
-       x="-0.27684845"
-       y="-0.30908902"
-       width="1.5536969"
-       height="1.618178"
-       filterUnits="objectBoundingBox"
-       id="filter-17">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2343" />
-    </filter>
-    <filter
-       x="-0.17777778"
-       y="-0.20869565"
-       width="1.3555556"
-       height="1.4173913"
-       filterUnits="objectBoundingBox"
-       id="filter-18">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2346" />
-    </filter>
-    <ellipse
-       id="path-19"
-       cx="13.5"
-       cy="11.5"
-       rx="13.5"
-       ry="11.5" />
-    <filter
-       x="-0.27684845"
-       y="-0.30908902"
-       width="1.5536969"
-       height="1.618178"
-       filterUnits="objectBoundingBox"
-       id="filter-20">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2350" />
-    </filter>
-    <filter
-       x="-0.17777778"
-       y="-0.20869565"
-       width="1.3555556"
-       height="1.4173913"
-       filterUnits="objectBoundingBox"
-       id="filter-21">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2353" />
-    </filter>
-    <ellipse
-       id="path-22"
-       cx="13.5"
-       cy="11.5"
-       rx="13.5"
-       ry="11.5" />
-    <filter
-       x="-0.27684845"
-       y="-0.30908902"
-       width="1.5536969"
-       height="1.618178"
-       filterUnits="objectBoundingBox"
-       id="filter-23">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2357" />
-    </filter>
-    <filter
-       x="-0.17777778"
-       y="-0.20869565"
-       width="1.3555556"
-       height="1.4173913"
-       filterUnits="objectBoundingBox"
-       id="filter-24">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2360" />
-    </filter>
-    <ellipse
-       id="path-25"
-       cx="13.5"
-       cy="11.5"
-       rx="13.5"
-       ry="11.5" />
-    <filter
-       x="-0.27684845"
-       y="-0.30908902"
-       width="1.5536969"
-       height="1.618178"
-       filterUnits="objectBoundingBox"
-       id="filter-26">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2364" />
-    </filter>
-    <filter
-       x="-0.17777778"
-       y="-0.20869565"
-       width="1.3555556"
-       height="1.4173913"
-       filterUnits="objectBoundingBox"
-       id="filter-27">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2367" />
-    </filter>
-    <ellipse
-       id="path-28"
-       cx="13.5"
-       cy="11.5"
-       rx="13.5"
-       ry="11.5" />
-    <filter
-       x="-0.27684845"
-       y="-0.30908902"
-       width="1.5536969"
-       height="1.618178"
-       filterUnits="objectBoundingBox"
-       id="filter-29">
-      <feGaussianBlur
-         stdDeviation="2"
-         in="SourceGraphic"
-         id="feGaussianBlur2371" />
-    </filter>
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-4"
-       id="radialGradient3710"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="11.559783"
-       cy="11.559783"
-       fx="11.559783"
-       fy="11.559783"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-2"
-       id="radialGradient3712"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="17.097532"
-       cy="18.692079"
-       fx="17.097532"
-       fy="18.692079"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-4"
-       id="radialGradient3714"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="11.559783"
-       cy="11.559783"
-       fx="11.559783"
-       fy="11.559783"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-2"
-       id="radialGradient3716"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="17.097532"
-       cy="18.692079"
-       fx="17.097532"
-       fy="18.692079"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-4"
-       id="radialGradient3718"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="11.559783"
-       cy="11.559783"
-       fx="11.559783"
-       fy="11.559783"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-2"
-       id="radialGradient3720"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="17.097532"
-       cy="18.692079"
-       fx="17.097532"
-       fy="18.692079"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-4"
-       id="radialGradient3722"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="11.559783"
-       cy="11.559783"
-       fx="11.559783"
-       fy="11.559783"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-2"
-       id="radialGradient3724"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="17.097532"
-       cy="18.692079"
-       fx="17.097532"
-       fy="18.692079"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-4"
-       id="radialGradient3726"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="11.559783"
-       cy="11.559783"
-       fx="11.559783"
-       fy="11.559783"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-2"
-       id="radialGradient3728"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="17.097532"
-       cy="18.692079"
-       fx="17.097532"
-       fy="18.692079"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-4"
-       id="radialGradient3730"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="11.559783"
-       cy="11.559783"
-       fx="11.559783"
-       fy="11.559783"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-2"
-       id="radialGradient3732"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="17.097532"
-       cy="18.692079"
-       fx="17.097532"
-       fy="18.692079"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-4"
-       id="radialGradient3734"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="11.559783"
-       cy="11.559783"
-       fx="11.559783"
-       fy="11.559783"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-2"
-       id="radialGradient3736"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="17.097532"
-       cy="18.692079"
-       fx="17.097532"
-       fy="18.692079"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-4"
-       id="radialGradient3738"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="11.559783"
-       cy="11.559783"
-       fx="11.559783"
-       fy="11.559783"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-2"
-       id="radialGradient3740"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="17.097532"
-       cy="18.692079"
-       fx="17.097532"
-       fy="18.692079"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-4"
-       id="radialGradient3742"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="11.559783"
-       cy="11.559783"
-       fx="11.559783"
-       fy="11.559783"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#radialGradient-2"
-       id="radialGradient3744"
-       gradientTransform="scale(1.0834727,0.92295821)"
-       cx="17.097532"
-       cy="18.692079"
-       fx="17.097532"
-       fy="18.692079"
-       r="11.502341"
-       gradientUnits="userSpaceOnUse" />
-  </defs>
-  <g
-     id="seeds-8+"
-     stroke="none"
-     stroke-width="1"
-     fill="none"
-     fill-rule="evenodd"
-     transform="matrix(0.85528329,0,0,0.85528329,7.2119553,7.1422211)">
-    <g
-       id="Group-2"
-       transform="translate(0,4)">
-      <g
-         id="Group"
-         transform="translate(28,21)">
-        <ellipse
-           id="shadow"
-           fill="#000000"
-           opacity="0.4"
-           style="mix-blend-mode:multiply"
-           filter="url(#filter-1)"
-           cx="18.5"
-           cy="19.082811"
-           rx="13.5"
-           ry="11.5" />
-        <g
-           id="colour"
-           transform="translate(6,6.582812)">
-          <use
-             fill="#d02424"
-             xlink:href="#path-3"
-             id="use2377"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-          <use
-             fill="url(#radialGradient-4)"
-             xlink:href="#path-3"
-             id="use2379"
-             style="fill:url(#radialGradient3710)"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="144px" height="144px" viewBox="0 0 144 144" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>seeds-15</title>
+    <defs>
+        <filter x="-22.2%" y="-26.1%" width="144.4%" height="152.2%" filterUnits="objectBoundingBox" id="filter-1">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <radialGradient cx="46.387808%" cy="46.387808%" fx="46.387808%" fy="46.387808%" r="46.1573049%" gradientTransform="translate(0.463878,0.463878),scale(0.851852,1.000000),rotate(90.000000),translate(-0.463878,-0.463878)" id="radialGradient-2">
+            <stop stop-color="#FFFFFF" stop-opacity="0.1" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0.0858890035" offset="63.5889013%"></stop>
+            <stop stop-color="#000000" stop-opacity="0.08" offset="100%"></stop>
+        </radialGradient>
+        <ellipse id="path-3" cx="13.5" cy="11.5" rx="13.5" ry="11.5"></ellipse>
+        <radialGradient cx="46.387808%" cy="46.387808%" fx="46.387808%" fy="46.387808%" r="46.1573049%" gradientTransform="translate(0.463878,0.463878),scale(0.851852,1.000000),rotate(90.000000),translate(-0.463878,-0.463878)" id="radialGradient-4">
+            <stop stop-color="#D02424" stop-opacity="0.1" offset="0%"></stop>
+            <stop stop-color="#D02424" stop-opacity="0.0858890035" offset="63.5889013%"></stop>
+            <stop stop-color="#D02424" stop-opacity="0.08" offset="100%"></stop>
+        </radialGradient>
+        <filter x="-34.6%" y="-38.6%" width="169.2%" height="177.3%" filterUnits="objectBoundingBox" id="filter-5">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <filter x="-22.2%" y="-26.1%" width="144.4%" height="152.2%" filterUnits="objectBoundingBox" id="filter-6">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <ellipse id="path-7" cx="13.5" cy="11.5" rx="13.5" ry="11.5"></ellipse>
+        <filter x="-34.6%" y="-38.6%" width="169.2%" height="177.3%" filterUnits="objectBoundingBox" id="filter-8">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <filter x="-22.2%" y="-26.1%" width="144.4%" height="152.2%" filterUnits="objectBoundingBox" id="filter-9">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <ellipse id="path-10" cx="13.5" cy="11.5" rx="13.5" ry="11.5"></ellipse>
+        <filter x="-34.6%" y="-38.6%" width="169.2%" height="177.3%" filterUnits="objectBoundingBox" id="filter-11">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <filter x="-22.2%" y="-26.1%" width="144.4%" height="152.2%" filterUnits="objectBoundingBox" id="filter-12">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <ellipse id="path-13" cx="13.5" cy="11.5" rx="13.5" ry="11.5"></ellipse>
+        <filter x="-34.6%" y="-38.6%" width="169.2%" height="177.3%" filterUnits="objectBoundingBox" id="filter-14">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <filter x="-22.2%" y="-26.1%" width="144.4%" height="152.2%" filterUnits="objectBoundingBox" id="filter-15">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <ellipse id="path-16" cx="13.5" cy="11.5" rx="13.5" ry="11.5"></ellipse>
+        <filter x="-34.6%" y="-38.6%" width="169.2%" height="177.3%" filterUnits="objectBoundingBox" id="filter-17">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <filter x="-22.2%" y="-26.1%" width="144.4%" height="152.2%" filterUnits="objectBoundingBox" id="filter-18">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <ellipse id="path-19" cx="13.5" cy="11.5" rx="13.5" ry="11.5"></ellipse>
+        <filter x="-34.6%" y="-38.6%" width="169.2%" height="177.3%" filterUnits="objectBoundingBox" id="filter-20">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <filter x="-22.2%" y="-26.1%" width="144.4%" height="152.2%" filterUnits="objectBoundingBox" id="filter-21">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <ellipse id="path-22" cx="13.5" cy="11.5" rx="13.5" ry="11.5"></ellipse>
+        <filter x="-34.6%" y="-38.6%" width="169.2%" height="177.3%" filterUnits="objectBoundingBox" id="filter-23">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <filter x="-22.2%" y="-26.1%" width="144.4%" height="152.2%" filterUnits="objectBoundingBox" id="filter-24">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <ellipse id="path-25" cx="13.5" cy="11.5" rx="13.5" ry="11.5"></ellipse>
+        <filter x="-34.6%" y="-38.6%" width="169.2%" height="177.3%" filterUnits="objectBoundingBox" id="filter-26">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <filter x="-22.2%" y="-26.1%" width="144.4%" height="152.2%" filterUnits="objectBoundingBox" id="filter-27">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+        <ellipse id="path-28" cx="13.5" cy="11.5" rx="13.5" ry="11.5"></ellipse>
+        <filter x="-34.6%" y="-38.6%" width="169.2%" height="177.3%" filterUnits="objectBoundingBox" id="filter-29">
+            <feGaussianBlur stdDeviation="2" in="SourceGraphic"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="-" transform="translate(-340.000000, -332.000000)">
+            <g id="seeds-15" transform="translate(340.000000, 332.000000)">
+                <rect id="Rectangle" fill-opacity="0.1" fill="#FFFFFF" x="0" y="0" width="144" height="144"></rect>
+                <g id="Group-2" transform="translate(21.000000, 26.000000)">
+                    <g id="Group" transform="translate(28.000000, 21.000000)">
+                        <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-1)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <g id="colour" transform="translate(6.000000, 6.582812)">
+                            <use fill="#D02424" xlink:href="#path-3"></use>
+                            <use fill="url(#radialGradient-4)" xlink:href="#path-3"></use>
+                        </g>
+                        <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-5)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
+                    </g>
+                    <g id="Group" transform="translate(32.000000, 44.000000)">
+                        <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-6)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <g id="colour" transform="translate(6.000000, 6.582812)">
+                            <use fill="#D02424" xlink:href="#path-7"></use>
+                            <use fill="url(#radialGradient-4)" xlink:href="#path-7"></use>
+                        </g>
+                        <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-8)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
+                    </g>
+                    <g id="Group" transform="translate(0.000000, 31.000000)">
+                        <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-9)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <g id="colour" transform="translate(6.000000, 6.582812)">
+                            <use fill="#D02424" xlink:href="#path-10"></use>
+                            <use fill="url(#radialGradient-4)" xlink:href="#path-10"></use>
+                        </g>
+                        <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-11)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
+                    </g>
+                    <g id="Group" transform="translate(14.000000, 52.000000)">
+                        <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-12)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <g id="colour" transform="translate(6.000000, 6.582812)">
+                            <use fill="#D02424" xlink:href="#path-13"></use>
+                            <use fill="url(#radialGradient-4)" xlink:href="#path-13"></use>
+                        </g>
+                        <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-14)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
+                    </g>
+                    <g id="Group" transform="translate(42.000000, 56.000000)">
+                        <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-15)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <g id="colour" transform="translate(6.000000, 6.582812)">
+                            <use fill="#D02424" xlink:href="#path-16"></use>
+                            <use fill="url(#radialGradient-4)" xlink:href="#path-16"></use>
+                        </g>
+                        <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-17)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
+                    </g>
+                    <g id="Group" transform="translate(61.000000, 38.000000)">
+                        <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-18)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <g id="colour" transform="translate(6.000000, 6.582812)">
+                            <use fill="#D02424" xlink:href="#path-19"></use>
+                            <use fill="url(#radialGradient-4)" xlink:href="#path-19"></use>
+                        </g>
+                        <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-20)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
+                    </g>
+                    <g id="Group" transform="translate(57.000000, 14.000000)">
+                        <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-21)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <g id="colour" transform="translate(6.000000, 6.582812)">
+                            <use fill="#D02424" xlink:href="#path-22"></use>
+                            <use fill="url(#radialGradient-4)" xlink:href="#path-22"></use>
+                        </g>
+                        <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-23)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
+                    </g>
+                    <g id="Group" transform="translate(9.000000, 8.000000)">
+                        <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-24)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <g id="colour" transform="translate(6.000000, 6.582812)">
+                            <use fill="#D02424" xlink:href="#path-25"></use>
+                            <use fill="url(#radialGradient-4)" xlink:href="#path-25"></use>
+                        </g>
+                        <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-26)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
+                    </g>
+                    <g id="Group" transform="translate(36.000000, 0.000000)">
+                        <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-27)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <g id="colour" transform="translate(6.000000, 6.582812)">
+                            <use fill="#D02424" xlink:href="#path-28"></use>
+                            <use fill="url(#radialGradient-4)" xlink:href="#path-28"></use>
+                        </g>
+                        <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
+                        <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-29)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
+                    </g>
+                </g>
+                <g id="Group" transform="translate(93.000000, 26.000000)">
+                    <circle id="Oval" fill="#000000" cx="19" cy="19" r="19"></circle>
+                    <path d="M16.3125,25 L16.3125,12.76 L13.9495,12.76 L11.6545,14.137 L11.6545,16.687 L13.9495,15.276 L13.9495,25 L16.3125,25 Z M23.1805,25.255 C24.3365,25.255 24.3365,25.255 25.3225,24.70675 C26.3085,24.1585 26.3085,24.1585 26.912,23.22775 C27.5155,22.297 27.5155,22.297 27.5155,21.141 C27.5155,19.985 27.5155,19.985 27.01825,19.08825 C26.521,18.1915 26.521,18.1915 25.64125,17.67725 C24.7615,17.163 24.7615,17.163 23.6055,17.163 C23.0955,17.163 23.0955,17.163 22.509,17.333 C22.2744,17.401 22.2744,17.401 22.0602,17.50164 L21.901,17.585 L22.063,14.919 L26.6995,14.919 L26.6995,12.76 L20.0185,12.76 L19.6445,19.271 L21.5995,19.866 C21.8035,19.6705 21.8035,19.6705 22.2115,19.45375 C22.6195,19.237 22.6195,19.237 23.2655,19.237 C23.7925,19.237 23.7925,19.237 24.23025,19.492 C24.668,19.747 24.668,19.747 24.92725,20.1805 C25.1865,20.614 25.1865,20.614 25.1865,21.141 C25.1865,21.668 25.1865,21.668 24.92725,22.1015 C24.668,22.535 24.668,22.535 24.23025,22.79 C23.7925,23.045 23.7925,23.045 23.2655,23.045 C22.866,23.045 22.866,23.045 22.48775,22.87075 C22.1095,22.6965 22.1095,22.6965 21.82475,22.382 C21.54,22.0675 21.54,22.0675 21.4295,21.634 L21.4295,21.634 L19.2025,22.229 C19.4575,23.13 19.4575,23.13 20.044,23.81 C20.6305,24.49 20.6305,24.49 21.44225,24.8725 C22.254,25.255 22.254,25.255 23.1805,25.255 Z" id="Combined-Shape" fill="#FFFFFF"></path>
+                </g>
+            </g>
         </g>
-        <ellipse
-           id="gradient"
-           fill="url(#radialGradient-2)"
-           cx="19.5"
-           cy="18.082811"
-           rx="13.5"
-           ry="11.5"
-           style="fill:url(#radialGradient3712)" />
-        <path
-           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
-           id="glow"
-           fill="#ffffff"
-           filter="url(#filter-5)"
-           transform="rotate(60,20.854074,17.270301)" />
-      </g>
-      <g
-         id="g2397"
-         transform="translate(32,44)">
-        <ellipse
-           id="ellipse2385"
-           fill="#000000"
-           opacity="0.4"
-           style="mix-blend-mode:multiply"
-           filter="url(#filter-6)"
-           cx="18.5"
-           cy="19.082811"
-           rx="13.5"
-           ry="11.5" />
-        <g
-           id="g2391"
-           transform="translate(6,6.582812)">
-          <use
-             fill="#d02424"
-             xlink:href="#path-7"
-             id="use2387"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-          <use
-             fill="url(#radialGradient-4)"
-             xlink:href="#path-7"
-             id="use2389"
-             style="fill:url(#radialGradient3714)"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-        </g>
-        <ellipse
-           id="ellipse2393"
-           fill="url(#radialGradient-2)"
-           cx="19.5"
-           cy="18.082811"
-           rx="13.5"
-           ry="11.5"
-           style="fill:url(#radialGradient3716)" />
-        <path
-           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
-           id="path2395"
-           fill="#ffffff"
-           filter="url(#filter-8)"
-           transform="rotate(60,20.854074,17.270301)" />
-      </g>
-      <g
-         id="g2411"
-         transform="translate(0,31)">
-        <ellipse
-           id="ellipse2399"
-           fill="#000000"
-           opacity="0.4"
-           style="mix-blend-mode:multiply"
-           filter="url(#filter-9)"
-           cx="18.5"
-           cy="19.082811"
-           rx="13.5"
-           ry="11.5" />
-        <g
-           id="g2405"
-           transform="translate(6,6.582812)">
-          <use
-             fill="#d02424"
-             xlink:href="#path-10"
-             id="use2401"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-          <use
-             fill="url(#radialGradient-4)"
-             xlink:href="#path-10"
-             id="use2403"
-             style="fill:url(#radialGradient3718)"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-        </g>
-        <ellipse
-           id="ellipse2407"
-           fill="url(#radialGradient-2)"
-           cx="19.5"
-           cy="18.082811"
-           rx="13.5"
-           ry="11.5"
-           style="fill:url(#radialGradient3720)" />
-        <path
-           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
-           id="path2409"
-           fill="#ffffff"
-           filter="url(#filter-11)"
-           transform="rotate(60,20.854074,17.270301)" />
-      </g>
-      <g
-         id="g2425"
-         transform="translate(14,52)">
-        <ellipse
-           id="ellipse2413"
-           fill="#000000"
-           opacity="0.4"
-           style="mix-blend-mode:multiply"
-           filter="url(#filter-12)"
-           cx="18.5"
-           cy="19.082811"
-           rx="13.5"
-           ry="11.5" />
-        <g
-           id="g2419"
-           transform="translate(6,6.582812)">
-          <use
-             fill="#d02424"
-             xlink:href="#path-13"
-             id="use2415"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-          <use
-             fill="url(#radialGradient-4)"
-             xlink:href="#path-13"
-             id="use2417"
-             style="fill:url(#radialGradient3722)"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-        </g>
-        <ellipse
-           id="ellipse2421"
-           fill="url(#radialGradient-2)"
-           cx="19.5"
-           cy="18.082811"
-           rx="13.5"
-           ry="11.5"
-           style="fill:url(#radialGradient3724)" />
-        <path
-           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
-           id="path2423"
-           fill="#ffffff"
-           filter="url(#filter-14)"
-           transform="rotate(60,20.854074,17.270301)" />
-      </g>
-      <g
-         id="g2439"
-         transform="translate(42,56)">
-        <ellipse
-           id="ellipse2427"
-           fill="#000000"
-           opacity="0.4"
-           style="mix-blend-mode:multiply"
-           filter="url(#filter-15)"
-           cx="18.5"
-           cy="19.082811"
-           rx="13.5"
-           ry="11.5" />
-        <g
-           id="g2433"
-           transform="translate(6,6.582812)">
-          <use
-             fill="#d02424"
-             xlink:href="#path-16"
-             id="use2429"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-          <use
-             fill="url(#radialGradient-4)"
-             xlink:href="#path-16"
-             id="use2431"
-             style="fill:url(#radialGradient3726)"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-        </g>
-        <ellipse
-           id="ellipse2435"
-           fill="url(#radialGradient-2)"
-           cx="19.5"
-           cy="18.082811"
-           rx="13.5"
-           ry="11.5"
-           style="fill:url(#radialGradient3728)" />
-        <path
-           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
-           id="path2437"
-           fill="#ffffff"
-           filter="url(#filter-17)"
-           transform="rotate(60,20.854074,17.270301)" />
-      </g>
-      <g
-         id="g2453"
-         transform="translate(61,38)">
-        <ellipse
-           id="ellipse2441"
-           fill="#000000"
-           opacity="0.4"
-           style="mix-blend-mode:multiply"
-           filter="url(#filter-18)"
-           cx="18.5"
-           cy="19.082811"
-           rx="13.5"
-           ry="11.5" />
-        <g
-           id="g2447"
-           transform="translate(6,6.582812)">
-          <use
-             fill="#d02424"
-             xlink:href="#path-19"
-             id="use2443"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-          <use
-             fill="url(#radialGradient-4)"
-             xlink:href="#path-19"
-             id="use2445"
-             style="fill:url(#radialGradient3730)"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-        </g>
-        <ellipse
-           id="ellipse2449"
-           fill="url(#radialGradient-2)"
-           cx="19.5"
-           cy="18.082811"
-           rx="13.5"
-           ry="11.5"
-           style="fill:url(#radialGradient3732)" />
-        <path
-           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
-           id="path2451"
-           fill="#ffffff"
-           filter="url(#filter-20)"
-           transform="rotate(60,20.854074,17.270301)" />
-      </g>
-      <g
-         id="g2467"
-         transform="translate(57,14)">
-        <ellipse
-           id="ellipse2455"
-           fill="#000000"
-           opacity="0.4"
-           style="mix-blend-mode:multiply"
-           filter="url(#filter-21)"
-           cx="18.5"
-           cy="19.082811"
-           rx="13.5"
-           ry="11.5" />
-        <g
-           id="g2461"
-           transform="translate(6,6.582812)">
-          <use
-             fill="#d02424"
-             xlink:href="#path-22"
-             id="use2457"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-          <use
-             fill="url(#radialGradient-4)"
-             xlink:href="#path-22"
-             id="use2459"
-             style="fill:url(#radialGradient3734)"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-        </g>
-        <ellipse
-           id="ellipse2463"
-           fill="url(#radialGradient-2)"
-           cx="19.5"
-           cy="18.082811"
-           rx="13.5"
-           ry="11.5"
-           style="fill:url(#radialGradient3736)" />
-        <path
-           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
-           id="path2465"
-           fill="#ffffff"
-           filter="url(#filter-23)"
-           transform="rotate(60,20.854074,17.270301)" />
-      </g>
-      <g
-         id="g2481"
-         transform="translate(9,8)">
-        <ellipse
-           id="ellipse2469"
-           fill="#000000"
-           opacity="0.4"
-           style="mix-blend-mode:multiply"
-           filter="url(#filter-24)"
-           cx="18.5"
-           cy="19.082811"
-           rx="13.5"
-           ry="11.5" />
-        <g
-           id="g2475"
-           transform="translate(6,6.582812)">
-          <use
-             fill="#d02424"
-             xlink:href="#path-25"
-             id="use2471"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-          <use
-             fill="url(#radialGradient-4)"
-             xlink:href="#path-25"
-             id="use2473"
-             style="fill:url(#radialGradient3738)"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-        </g>
-        <ellipse
-           id="ellipse2477"
-           fill="url(#radialGradient-2)"
-           cx="19.5"
-           cy="18.082811"
-           rx="13.5"
-           ry="11.5"
-           style="fill:url(#radialGradient3740)" />
-        <path
-           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
-           id="path2479"
-           fill="#ffffff"
-           filter="url(#filter-26)"
-           transform="rotate(60,20.854074,17.270301)" />
-      </g>
-      <g
-         id="g2495"
-         transform="translate(36)">
-        <ellipse
-           id="ellipse2483"
-           fill="#000000"
-           opacity="0.4"
-           style="mix-blend-mode:multiply"
-           filter="url(#filter-27)"
-           cx="18.5"
-           cy="19.082811"
-           rx="13.5"
-           ry="11.5" />
-        <g
-           id="g2489"
-           transform="translate(6,6.582812)">
-          <use
-             fill="#d02424"
-             xlink:href="#path-28"
-             id="use2485"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-          <use
-             fill="url(#radialGradient-4)"
-             xlink:href="#path-28"
-             id="use2487"
-             style="fill:url(#radialGradient3742)"
-             x="0"
-             y="0"
-             width="100%"
-             height="100%" />
-        </g>
-        <ellipse
-           id="ellipse2491"
-           fill="url(#radialGradient-2)"
-           cx="19.5"
-           cy="18.082811"
-           rx="13.5"
-           ry="11.5"
-           style="fill:url(#radialGradient3744)" />
-        <path
-           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
-           id="path2493"
-           fill="#ffffff"
-           filter="url(#filter-29)"
-           transform="rotate(60,20.854074,17.270301)" />
-      </g>
     </g>
-  </g>
-  <metadata
-     id="metadata2503">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:title>seeds-8+</dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
 </svg>
