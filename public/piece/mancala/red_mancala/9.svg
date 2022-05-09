@@ -1,0 +1,1038 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="100px"
+   height="100px"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg2772"
+   sodipodi:docname="seeds-9.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview2774"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     showgrid="false"
+     inkscape:zoom="4.78"
+     inkscape:cx="-9.4142259"
+     inkscape:cy="50.104603"
+     inkscape:window-width="1916"
+     inkscape:window-height="1031"
+     inkscape:window-x="0"
+     inkscape:window-y="20"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2772" />
+  <title
+     id="title2562">seeds-8+</title>
+  <defs
+     id="defs2641">
+    <filter
+       x="-0.17777778"
+       y="-0.20869565"
+       width="1.3555556"
+       height="1.4173913"
+       filterUnits="objectBoundingBox"
+       id="filter-1">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2564" />
+    </filter>
+    <radialGradient
+       cx="46.387808%"
+       cy="46.387808%"
+       fx="46.387808%"
+       fy="46.387808%"
+       r="46.1573049%"
+       gradientTransform="translate(0.463878,0.463878),scale(0.851852,1.000000),rotate(90.000000),translate(-0.463878,-0.463878)"
+       id="radialGradient-2">
+      <stop
+         stop-color="#FFFFFF"
+         stop-opacity="0.1"
+         offset="0%"
+         id="stop2567" />
+      <stop
+         stop-color="#FFFFFF"
+         stop-opacity="0.0858890035"
+         offset="63.5889013%"
+         id="stop2569" />
+      <stop
+         stop-color="#000000"
+         stop-opacity="0.08"
+         offset="100%"
+         id="stop2571" />
+    </radialGradient>
+    <ellipse
+       id="path-3"
+       cx="13.5"
+       cy="11.5"
+       rx="13.5"
+       ry="11.5" />
+    <radialGradient
+       cx="46.387808%"
+       cy="46.387808%"
+       fx="46.387808%"
+       fy="46.387808%"
+       r="46.1573049%"
+       gradientTransform="translate(0.463878,0.463878),scale(0.851852,1.000000),rotate(90.000000),translate(-0.463878,-0.463878)"
+       id="radialGradient-4">
+      <stop
+         stop-color="#D02424"
+         stop-opacity="0.1"
+         offset="0%"
+         id="stop2575" />
+      <stop
+         stop-color="#D02424"
+         stop-opacity="0.0858890035"
+         offset="63.5889013%"
+         id="stop2577" />
+      <stop
+         stop-color="#D02424"
+         stop-opacity="0.08"
+         offset="100%"
+         id="stop2579" />
+    </radialGradient>
+    <filter
+       x="-0.27684845"
+       y="-0.30908902"
+       width="1.5536969"
+       height="1.618178"
+       filterUnits="objectBoundingBox"
+       id="filter-5">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2582" />
+    </filter>
+    <filter
+       x="-0.17777778"
+       y="-0.20869565"
+       width="1.3555556"
+       height="1.4173913"
+       filterUnits="objectBoundingBox"
+       id="filter-6">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2585" />
+    </filter>
+    <ellipse
+       id="path-7"
+       cx="13.5"
+       cy="11.5"
+       rx="13.5"
+       ry="11.5" />
+    <filter
+       x="-0.27684845"
+       y="-0.30908902"
+       width="1.5536969"
+       height="1.618178"
+       filterUnits="objectBoundingBox"
+       id="filter-8">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2589" />
+    </filter>
+    <filter
+       x="-0.17777778"
+       y="-0.20869565"
+       width="1.3555556"
+       height="1.4173913"
+       filterUnits="objectBoundingBox"
+       id="filter-9">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2592" />
+    </filter>
+    <ellipse
+       id="path-10"
+       cx="13.5"
+       cy="11.5"
+       rx="13.5"
+       ry="11.5" />
+    <filter
+       x="-0.27684845"
+       y="-0.30908902"
+       width="1.5536969"
+       height="1.618178"
+       filterUnits="objectBoundingBox"
+       id="filter-11">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2596" />
+    </filter>
+    <filter
+       x="-0.17777778"
+       y="-0.20869565"
+       width="1.3555556"
+       height="1.4173913"
+       filterUnits="objectBoundingBox"
+       id="filter-12">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2599" />
+    </filter>
+    <ellipse
+       id="path-13"
+       cx="13.5"
+       cy="11.5"
+       rx="13.5"
+       ry="11.5" />
+    <filter
+       x="-0.27684845"
+       y="-0.30908902"
+       width="1.5536969"
+       height="1.618178"
+       filterUnits="objectBoundingBox"
+       id="filter-14">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2603" />
+    </filter>
+    <filter
+       x="-0.17777778"
+       y="-0.20869565"
+       width="1.3555556"
+       height="1.4173913"
+       filterUnits="objectBoundingBox"
+       id="filter-15">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2606" />
+    </filter>
+    <ellipse
+       id="path-16"
+       cx="13.5"
+       cy="11.5"
+       rx="13.5"
+       ry="11.5" />
+    <filter
+       x="-0.27684845"
+       y="-0.30908902"
+       width="1.5536969"
+       height="1.618178"
+       filterUnits="objectBoundingBox"
+       id="filter-17">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2610" />
+    </filter>
+    <filter
+       x="-0.17777778"
+       y="-0.20869565"
+       width="1.3555556"
+       height="1.4173913"
+       filterUnits="objectBoundingBox"
+       id="filter-18">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2613" />
+    </filter>
+    <ellipse
+       id="path-19"
+       cx="13.5"
+       cy="11.5"
+       rx="13.5"
+       ry="11.5" />
+    <filter
+       x="-0.27684845"
+       y="-0.30908902"
+       width="1.5536969"
+       height="1.618178"
+       filterUnits="objectBoundingBox"
+       id="filter-20">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2617" />
+    </filter>
+    <filter
+       x="-0.17777778"
+       y="-0.20869565"
+       width="1.3555556"
+       height="1.4173913"
+       filterUnits="objectBoundingBox"
+       id="filter-21">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2620" />
+    </filter>
+    <ellipse
+       id="path-22"
+       cx="13.5"
+       cy="11.5"
+       rx="13.5"
+       ry="11.5" />
+    <filter
+       x="-0.27684845"
+       y="-0.30908902"
+       width="1.5536969"
+       height="1.618178"
+       filterUnits="objectBoundingBox"
+       id="filter-23">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2624" />
+    </filter>
+    <filter
+       x="-0.17777778"
+       y="-0.20869565"
+       width="1.3555556"
+       height="1.4173913"
+       filterUnits="objectBoundingBox"
+       id="filter-24">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2627" />
+    </filter>
+    <ellipse
+       id="path-25"
+       cx="13.5"
+       cy="11.5"
+       rx="13.5"
+       ry="11.5" />
+    <filter
+       x="-0.27684845"
+       y="-0.30908902"
+       width="1.5536969"
+       height="1.618178"
+       filterUnits="objectBoundingBox"
+       id="filter-26">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2631" />
+    </filter>
+    <filter
+       x="-0.17777778"
+       y="-0.20869565"
+       width="1.3555556"
+       height="1.4173913"
+       filterUnits="objectBoundingBox"
+       id="filter-27">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2634" />
+    </filter>
+    <ellipse
+       id="path-28"
+       cx="13.5"
+       cy="11.5"
+       rx="13.5"
+       ry="11.5" />
+    <filter
+       x="-0.27684845"
+       y="-0.30908902"
+       width="1.5536969"
+       height="1.618178"
+       filterUnits="objectBoundingBox"
+       id="filter-29">
+      <feGaussianBlur
+         stdDeviation="2"
+         in="SourceGraphic"
+         id="feGaussianBlur2638" />
+    </filter>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-4"
+       id="radialGradient3887"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="11.559783"
+       cy="11.559783"
+       fx="11.559783"
+       fy="11.559783"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-2"
+       id="radialGradient3889"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="17.097532"
+       cy="18.692079"
+       fx="17.097532"
+       fy="18.692079"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-4"
+       id="radialGradient3891"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="11.559783"
+       cy="11.559783"
+       fx="11.559783"
+       fy="11.559783"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-2"
+       id="radialGradient3893"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="17.097532"
+       cy="18.692079"
+       fx="17.097532"
+       fy="18.692079"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-4"
+       id="radialGradient3895"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="11.559783"
+       cy="11.559783"
+       fx="11.559783"
+       fy="11.559783"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-2"
+       id="radialGradient3897"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="17.097532"
+       cy="18.692079"
+       fx="17.097532"
+       fy="18.692079"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-4"
+       id="radialGradient3899"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="11.559783"
+       cy="11.559783"
+       fx="11.559783"
+       fy="11.559783"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-2"
+       id="radialGradient3901"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="17.097532"
+       cy="18.692079"
+       fx="17.097532"
+       fy="18.692079"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-4"
+       id="radialGradient3903"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="11.559783"
+       cy="11.559783"
+       fx="11.559783"
+       fy="11.559783"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-2"
+       id="radialGradient3905"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="17.097532"
+       cy="18.692079"
+       fx="17.097532"
+       fy="18.692079"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-4"
+       id="radialGradient3907"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="11.559783"
+       cy="11.559783"
+       fx="11.559783"
+       fy="11.559783"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-2"
+       id="radialGradient3909"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="17.097532"
+       cy="18.692079"
+       fx="17.097532"
+       fy="18.692079"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-4"
+       id="radialGradient3911"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="11.559783"
+       cy="11.559783"
+       fx="11.559783"
+       fy="11.559783"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-2"
+       id="radialGradient3913"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="17.097532"
+       cy="18.692079"
+       fx="17.097532"
+       fy="18.692079"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-4"
+       id="radialGradient3915"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="11.559783"
+       cy="11.559783"
+       fx="11.559783"
+       fy="11.559783"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-2"
+       id="radialGradient3917"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="17.097532"
+       cy="18.692079"
+       fx="17.097532"
+       fy="18.692079"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-4"
+       id="radialGradient3919"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="11.559783"
+       cy="11.559783"
+       fx="11.559783"
+       fy="11.559783"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#radialGradient-2"
+       id="radialGradient3921"
+       gradientTransform="scale(1.0834727,0.92295821)"
+       cx="17.097532"
+       cy="18.692079"
+       fx="17.097532"
+       fy="18.692079"
+       r="11.502341"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     id="seeds-8+"
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd"
+     transform="matrix(0.85028875,0,0,0.85028875,7.460858,7.3887171)">
+    <g
+       id="Group-2"
+       transform="translate(0,4)">
+      <g
+         id="Group"
+         transform="translate(28,21)">
+        <ellipse
+           id="shadow"
+           fill="#000000"
+           opacity="0.4"
+           style="mix-blend-mode:multiply"
+           filter="url(#filter-1)"
+           cx="18.5"
+           cy="19.082811"
+           rx="13.5"
+           ry="11.5" />
+        <g
+           id="colour"
+           transform="translate(6,6.582812)">
+          <use
+             fill="#d02424"
+             xlink:href="#path-3"
+             id="use2644"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+          <use
+             fill="url(#radialGradient-4)"
+             xlink:href="#path-3"
+             id="use2646"
+             style="fill:url(#radialGradient3887)"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+        </g>
+        <ellipse
+           id="gradient"
+           fill="url(#radialGradient-2)"
+           cx="19.5"
+           cy="18.082811"
+           rx="13.5"
+           ry="11.5"
+           style="fill:url(#radialGradient3889)" />
+        <path
+           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
+           id="glow"
+           fill="#ffffff"
+           filter="url(#filter-5)"
+           transform="rotate(60,20.854074,17.270301)" />
+      </g>
+      <g
+         id="g2664"
+         transform="translate(32,44)">
+        <ellipse
+           id="ellipse2652"
+           fill="#000000"
+           opacity="0.4"
+           style="mix-blend-mode:multiply"
+           filter="url(#filter-6)"
+           cx="18.5"
+           cy="19.082811"
+           rx="13.5"
+           ry="11.5" />
+        <g
+           id="g2658"
+           transform="translate(6,6.582812)">
+          <use
+             fill="#d02424"
+             xlink:href="#path-7"
+             id="use2654"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+          <use
+             fill="url(#radialGradient-4)"
+             xlink:href="#path-7"
+             id="use2656"
+             style="fill:url(#radialGradient3891)"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+        </g>
+        <ellipse
+           id="ellipse2660"
+           fill="url(#radialGradient-2)"
+           cx="19.5"
+           cy="18.082811"
+           rx="13.5"
+           ry="11.5"
+           style="fill:url(#radialGradient3893)" />
+        <path
+           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
+           id="path2662"
+           fill="#ffffff"
+           filter="url(#filter-8)"
+           transform="rotate(60,20.854074,17.270301)" />
+      </g>
+      <g
+         id="g2678"
+         transform="translate(0,31)">
+        <ellipse
+           id="ellipse2666"
+           fill="#000000"
+           opacity="0.4"
+           style="mix-blend-mode:multiply"
+           filter="url(#filter-9)"
+           cx="18.5"
+           cy="19.082811"
+           rx="13.5"
+           ry="11.5" />
+        <g
+           id="g2672"
+           transform="translate(6,6.582812)">
+          <use
+             fill="#d02424"
+             xlink:href="#path-10"
+             id="use2668"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+          <use
+             fill="url(#radialGradient-4)"
+             xlink:href="#path-10"
+             id="use2670"
+             style="fill:url(#radialGradient3895)"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+        </g>
+        <ellipse
+           id="ellipse2674"
+           fill="url(#radialGradient-2)"
+           cx="19.5"
+           cy="18.082811"
+           rx="13.5"
+           ry="11.5"
+           style="fill:url(#radialGradient3897)" />
+        <path
+           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
+           id="path2676"
+           fill="#ffffff"
+           filter="url(#filter-11)"
+           transform="rotate(60,20.854074,17.270301)" />
+      </g>
+      <g
+         id="g2692"
+         transform="translate(14,52)">
+        <ellipse
+           id="ellipse2680"
+           fill="#000000"
+           opacity="0.4"
+           style="mix-blend-mode:multiply"
+           filter="url(#filter-12)"
+           cx="18.5"
+           cy="19.082811"
+           rx="13.5"
+           ry="11.5" />
+        <g
+           id="g2686"
+           transform="translate(6,6.582812)">
+          <use
+             fill="#d02424"
+             xlink:href="#path-13"
+             id="use2682"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+          <use
+             fill="url(#radialGradient-4)"
+             xlink:href="#path-13"
+             id="use2684"
+             style="fill:url(#radialGradient3899)"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+        </g>
+        <ellipse
+           id="ellipse2688"
+           fill="url(#radialGradient-2)"
+           cx="19.5"
+           cy="18.082811"
+           rx="13.5"
+           ry="11.5"
+           style="fill:url(#radialGradient3901)" />
+        <path
+           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
+           id="path2690"
+           fill="#ffffff"
+           filter="url(#filter-14)"
+           transform="rotate(60,20.854074,17.270301)" />
+      </g>
+      <g
+         id="g2706"
+         transform="translate(42,56)">
+        <ellipse
+           id="ellipse2694"
+           fill="#000000"
+           opacity="0.4"
+           style="mix-blend-mode:multiply"
+           filter="url(#filter-15)"
+           cx="18.5"
+           cy="19.082811"
+           rx="13.5"
+           ry="11.5" />
+        <g
+           id="g2700"
+           transform="translate(6,6.582812)">
+          <use
+             fill="#d02424"
+             xlink:href="#path-16"
+             id="use2696"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+          <use
+             fill="url(#radialGradient-4)"
+             xlink:href="#path-16"
+             id="use2698"
+             style="fill:url(#radialGradient3903)"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+        </g>
+        <ellipse
+           id="ellipse2702"
+           fill="url(#radialGradient-2)"
+           cx="19.5"
+           cy="18.082811"
+           rx="13.5"
+           ry="11.5"
+           style="fill:url(#radialGradient3905)" />
+        <path
+           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
+           id="path2704"
+           fill="#ffffff"
+           filter="url(#filter-17)"
+           transform="rotate(60,20.854074,17.270301)" />
+      </g>
+      <g
+         id="g2720"
+         transform="translate(61,38)">
+        <ellipse
+           id="ellipse2708"
+           fill="#000000"
+           opacity="0.4"
+           style="mix-blend-mode:multiply"
+           filter="url(#filter-18)"
+           cx="18.5"
+           cy="19.082811"
+           rx="13.5"
+           ry="11.5" />
+        <g
+           id="g2714"
+           transform="translate(6,6.582812)">
+          <use
+             fill="#d02424"
+             xlink:href="#path-19"
+             id="use2710"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+          <use
+             fill="url(#radialGradient-4)"
+             xlink:href="#path-19"
+             id="use2712"
+             style="fill:url(#radialGradient3907)"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+        </g>
+        <ellipse
+           id="ellipse2716"
+           fill="url(#radialGradient-2)"
+           cx="19.5"
+           cy="18.082811"
+           rx="13.5"
+           ry="11.5"
+           style="fill:url(#radialGradient3909)" />
+        <path
+           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
+           id="path2718"
+           fill="#ffffff"
+           filter="url(#filter-20)"
+           transform="rotate(60,20.854074,17.270301)" />
+      </g>
+      <g
+         id="g2734"
+         transform="translate(57,14)">
+        <ellipse
+           id="ellipse2722"
+           fill="#000000"
+           opacity="0.4"
+           style="mix-blend-mode:multiply"
+           filter="url(#filter-21)"
+           cx="18.5"
+           cy="19.082811"
+           rx="13.5"
+           ry="11.5" />
+        <g
+           id="g2728"
+           transform="translate(6,6.582812)">
+          <use
+             fill="#d02424"
+             xlink:href="#path-22"
+             id="use2724"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+          <use
+             fill="url(#radialGradient-4)"
+             xlink:href="#path-22"
+             id="use2726"
+             style="fill:url(#radialGradient3911)"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+        </g>
+        <ellipse
+           id="ellipse2730"
+           fill="url(#radialGradient-2)"
+           cx="19.5"
+           cy="18.082811"
+           rx="13.5"
+           ry="11.5"
+           style="fill:url(#radialGradient3913)" />
+        <path
+           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
+           id="path2732"
+           fill="#ffffff"
+           filter="url(#filter-23)"
+           transform="rotate(60,20.854074,17.270301)" />
+      </g>
+      <g
+         id="g2748"
+         transform="translate(9,8)">
+        <ellipse
+           id="ellipse2736"
+           fill="#000000"
+           opacity="0.4"
+           style="mix-blend-mode:multiply"
+           filter="url(#filter-24)"
+           cx="18.5"
+           cy="19.082811"
+           rx="13.5"
+           ry="11.5" />
+        <g
+           id="g2742"
+           transform="translate(6,6.582812)">
+          <use
+             fill="#d02424"
+             xlink:href="#path-25"
+             id="use2738"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+          <use
+             fill="url(#radialGradient-4)"
+             xlink:href="#path-25"
+             id="use2740"
+             style="fill:url(#radialGradient3915)"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+        </g>
+        <ellipse
+           id="ellipse2744"
+           fill="url(#radialGradient-2)"
+           cx="19.5"
+           cy="18.082811"
+           rx="13.5"
+           ry="11.5"
+           style="fill:url(#radialGradient3917)" />
+        <path
+           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
+           id="path2746"
+           fill="#ffffff"
+           filter="url(#filter-26)"
+           transform="rotate(60,20.854074,17.270301)" />
+      </g>
+      <g
+         id="g2762"
+         transform="translate(36)">
+        <ellipse
+           id="ellipse2750"
+           fill="#000000"
+           opacity="0.4"
+           style="mix-blend-mode:multiply"
+           filter="url(#filter-27)"
+           cx="18.5"
+           cy="19.082811"
+           rx="13.5"
+           ry="11.5" />
+        <g
+           id="g2756"
+           transform="translate(6,6.582812)">
+          <use
+             fill="#d02424"
+             xlink:href="#path-28"
+             id="use2752"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+          <use
+             fill="url(#radialGradient-4)"
+             xlink:href="#path-28"
+             id="use2754"
+             style="fill:url(#radialGradient3919)"
+             x="0"
+             y="0"
+             width="100%"
+             height="100%" />
+        </g>
+        <ellipse
+           id="ellipse2758"
+           fill="url(#radialGradient-2)"
+           cx="19.5"
+           cy="18.082811"
+           rx="13.5"
+           ry="11.5"
+           style="fill:url(#radialGradient3921)" />
+        <path
+           d="m 12.594874,25.035054 c -1.204969,-6.33905 0.247347,-10.859563 4.356946,-13.561542 4.109599,-2.7019777 8.300018,-2.6216332 12.571257,0.241034 -3.892171,-1.01208 -7.733501,-0.04572 -11.523993,2.899081 -3.790492,2.944801 -5.591895,6.41861 -5.40421,10.421427 z"
+           id="path2760"
+           fill="#ffffff"
+           filter="url(#filter-29)"
+           transform="rotate(60,20.854074,17.270301)" />
+      </g>
+    </g>
+    <g
+       id="g2769"
+       transform="translate(60,9)">
+      <circle
+         id="Oval"
+         fill="#000000"
+         cx="19"
+         cy="19"
+         r="19" />
+      <text
+         id="9"
+         font-family="Manrope-ExtraBold, Manrope"
+         font-size="14px"
+         font-weight="700"
+         fill="#ffffff"><tspan
+           x="15.146"
+           y="24"
+           id="tspan2766">9</tspan></text>
+    </g>
+  </g>
+  <metadata
+     id="metadata2776">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>seeds-8+</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
