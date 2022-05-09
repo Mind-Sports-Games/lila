@@ -75,7 +75,7 @@ object otherTrophies {
             case Some(name) => name
             case None       => t.kind.name
           }),
-          style := "width: 65px; margin: 0 3px!important;"
+          style := "width: 65px; margin: 0 !important;"
         )(
           img(src := assetUrl(s"images/trophy/${t.kind._id}.png"), width := 65, height := 80)
         )
