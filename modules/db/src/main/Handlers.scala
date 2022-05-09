@@ -168,7 +168,6 @@ trait Handlers {
           case _             => sys.error("lib not encoded into variant handler")
         }
       case _ => sys.error("variant not encoded in handler. Previously this defaulted to standard chess")
-      //case _ => StratVariant.default(GameLogic.Chess())
     },
     v => BSONString(s"${v.gameLogic.id}:${v.key}")
   )

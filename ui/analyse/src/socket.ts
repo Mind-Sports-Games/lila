@@ -170,7 +170,6 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
       addStudyData(req);
       send('anaDests', req);
       anaDestsTimeout = setTimeout(function () {
-        console.log(req, 'resendAnaDests');
         sendAnaDests(req);
       }, 3000);
     }

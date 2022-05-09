@@ -27,7 +27,22 @@ function clock(ctrl: SwissCtrl): VNode | undefined {
       }),
     ]);
   return h(`div.clock.clock-created.time-cache-${next.at}`, [
-    h('span.shy', ctrl.data.status == 'created' ? 'Starting in' : 'Next round'),
+    h('span.shy', [
+      ctrl.data.status == 'created' ? 'Starting in:' : 'Next round: ',
+      ctrl.data.status != 'created' && ctrl.data.isMedley
+        ? h(
+            'a',
+            {
+              attrs: {
+                href: '../variant/' + ctrl.data.roundVariant,
+                target: '_blank',
+                rel: 'noopener',
+              },
+            },
+            ctrl.data.roundVariant
+          )
+        : undefined,
+    ]),
     h('span.time.text', {
       hook: startClock(next.in + 1),
     }),

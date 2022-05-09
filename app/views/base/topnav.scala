@@ -50,6 +50,7 @@ object topnav {
         linkTitle(routes.Page.variantHome.path, trans.learnMenu()),
         div(role := "group")(
           a(href := routes.Page.variantHome)(trans.rulesVariants()),
+          a(href := routes.Page.loneBookmark("medley"))(trans.medleyTournaments()),
           ctx.noBot option frag(
             //a(href := routes.Learn.index)(trans.chessBasics()),
             //a(href := routes.Practice.index)(trans.practice()),
@@ -65,7 +66,7 @@ object topnav {
         div(role := "group")(
           a(href := routes.Tv.index)("PlayStrategy TV"),
           a(href := routes.Tv.games)(trans.currentGames()),
-          ctx.noKid option a(href := routes.Streamer.index())(trans.streamersMenu()),
+          ctx.noKid option a(href := routes.Streamer.index())(trans.streamersMenu())
           //a(href := routes.RelayTour.index())(trans.broadcast.broadcasts()),
           //ctx.noBot option a(href := routes.Video.index)(trans.videoLibrary())
         )
