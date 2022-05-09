@@ -69,7 +69,9 @@ object home {
               span(cls := "setup")(
                 s.clock.show,
                 " • ",
-                if (s.variant.exotic) VariantKeys.variantName(s.variant) else s.perfType.trans,
+                if (s.isMedley) trans.medley.txt()
+                else if (s.variant.exotic) VariantKeys.variantName(s.variant)
+                else s.perfType.trans,
                 " • ",
                 (if (s.settings.rated) trans.ratedTournament else trans.casualTournament)()
               )

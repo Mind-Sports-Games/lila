@@ -336,6 +336,16 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(640 * 100% / 576);
 }
 
+//swiss and arena
+.swiss__board,
+.tour__featured {
+  &.variant-oware .cg-wrap {
+    padding-bottom: calc(213.333 * 100% / 640);
+    padding-top: calc(213.333 * 100% / 640);
+    margin-bottom: calc(213.333 * 100% / 640);
+  }
+}
+
 .variant-oware .round__app__board {
   padding-bottom: calc(213.333 * 100% / 640);
   padding-top: calc(0.38 * 213.333 * 100% / 640);
