@@ -1,8 +1,13 @@
 @import 'board-2d';
 @import 'dark-board';
 
+//not background shadow for board as its has rounded corners.
+:not(.variant-oware) .cg-board {
+  @extend %box-shadow;
+}
+
 cg-board {
-  @extend %box-shadow, %abs-100;
+  @extend %abs-100;
 
   top: 0;
   left: 0;
@@ -71,6 +76,11 @@ $alternate-board-highlights: (
 );
 $alternate-color: rgba(20, 30, 85, 0.5);
 
+$mancala-board-highlights: (
+  'mancala-light-wood': 'mancala',
+  'mancala-dark-wood': 'mancala',
+);
+
 square {
   position: absolute;
   width: 12.5%;
@@ -84,6 +94,20 @@ square {
     @each $color, $gameFamily in $alternate-board-highlights {
       body.#{$color} .#{$gameFamily} & {
         background: radial-gradient($alternate-color 19%, rgba(0, 0, 0, 0) 20%);
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/mancala/highlights/dashed.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.from {
+        background: url(../images/board/mancala/highlights/dashed.svg);
+        background-size: cover;
       }
     }
   }
@@ -104,6 +128,18 @@ square {
   @each $color, $gameFamily in $alternate-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move {
       background-color: $alternate-color;
+    }
+  }
+
+  @each $color, $gameFamily in $mancala-board-highlights {
+    body.#{$color} .#{$gameFamily} &.last-move.from {
+      background: url(../images/board/mancala/highlights/solid.svg);
+      background-size: cover;
+    }
+
+    body.#{$color} .#{$gameFamily} &.last-move.to {
+      background: url(../images/board/mancala/highlights/dashed.svg);
+      background-size: cover;
     }
   }
 
@@ -135,6 +171,20 @@ square {
     body.loa-horsey & {
       background: url(../images/board/horsey.selected.png);
       background-size: cover;
+    }
+
+    @each $color, $gameFamily in $mancala-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/mancala/highlights/solid.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/mancala/highlights/solid.svg);
+        background-size: cover;
+      }
     }
   }
 
