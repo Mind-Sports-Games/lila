@@ -8,7 +8,7 @@
             <use xlink:href="#path-1" fill="black"></use>
         </mask>
     </defs>
-    <g id="starting-ring" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.200000003" stroke-dasharray="8,4">
+    <g id="starting-ring" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.400000003">
         <use id="ring" stroke="#000000" mask="url(#mask-2)" stroke-width="9" xlink:href="#path-1"></use>
     </g>
 </svg>

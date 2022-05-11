@@ -134,12 +134,12 @@ square {
 
   @each $color, $gameFamily in $mancala-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move.from {
-      background: url(../images/board/mancala/highlights/solid.svg);
+      background: url(../images/board/mancala/highlights/solid_darker.svg);
       background-size: cover;
     }
 
     body.#{$color} .#{$gameFamily} &.last-move.to {
-      background: url(../images/board/mancala/highlights/dashed.svg);
+      background: url(../images/board/mancala/highlights/dashed_darker.svg);
       background-size: cover;
     }
   }
