@@ -66,7 +66,8 @@ flipello_themes = [
 mancala_themes =[
   ['green_mancala', 'svg'],
   ['purple_mancala', 'svg'],
-  ['black_mancala', 'svg']
+  ['black_mancala', 'svg'],
+  ['red_mancala', 'svg']
 ]
 types = {
   'svg' => 'svg+xml;base64,',
