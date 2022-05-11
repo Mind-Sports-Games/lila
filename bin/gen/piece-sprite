@@ -64,9 +64,6 @@ flipello_themes = [
   ['fabirovsky_flipello', 'svg']
 ]
 mancala_themes =[
-  ['green_mancala', 'svg'],
-  ['purple_mancala', 'svg'],
-  ['black_mancala', 'svg'],
   ['red_mancala', 'svg']
 ]
 types = {
@@ -107,7 +104,8 @@ xiangqi_variants = ['xiangqi', 'minixiangqi']
 flipello_variants = ['flipello']
 mancala_roles=['A-piece','B-piece','C-piece','D-piece','E-piece','F-piece','G-piece','H-piece','I-piece','J-piece','K-piece',
 'L-piece','M-piece','N-piece','O-piece','P-piece','Q-piece','R-piece','S-piece','T-piece','U-piece','V-piece','W-piece',
-'X-piece','Y-piece','Z-piece','a-piece']
+'X-piece','Y-piece','Z-piece','a-piece','b-piece','c-piece','d-piece','e-piece','f-piece','g-piece','h-piece','i-piece',
+'j-piece','k-piece','l-piece','m-piece','n-piece','o-piece','p-piece','q-piece','r-piece','s-piece','t-piece','u-piece','v-piece']
 mancala_variants = ['oware']
 
 
