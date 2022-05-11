@@ -1,13 +1,9 @@
 @import 'board-2d';
 @import 'dark-board';
 
-//not background shadow for board as its has rounded corners.
-:not(.variant-oware) .cg-board {
-  @extend %box-shadow;
-}
-
 cg-board {
   @extend %abs-100;
+  @extend %box-shadow;
 
   top: 0;
   left: 0;
@@ -18,6 +14,11 @@ cg-board {
   .manipulable & {
     cursor: pointer;
   }
+}
+
+//no background shadow for board as its has rounded corners.
+.variant-oware cg-board {
+  box-shadow: none;
 }
 
 //miniboards - alter non-square boards

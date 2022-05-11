@@ -1,5 +1,20 @@
 $score-variants: ('flipello', 'oware');
 
+.variant-flipello .game-score {
+  piece::after {
+    @extend %active, %box-radius;
+
+    content: attr(data-score);
+    top: 0;
+    right: 0;
+    position: absolute;
+    line-height: 0.9em;
+    padding: 3px 0.3em;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+}
+
 @each $variant in $score-variants {
   .variant-#{$variant} .game-score {
     @extend %box-radius;
@@ -13,19 +28,6 @@ $score-variants: ('flipello', 'oware');
       width: 100% !important;
       height: 100% !important;
       position: relative;
-
-      &::after {
-        @extend %active, %box-radius;
-
-        content: attr(data-score);
-        top: 0;
-        right: 0;
-        position: absolute;
-        line-height: 0.9em;
-        padding: 3px 0.3em;
-        font-weight: bold;
-        font-size: 1.5em;
-      }
     }
 
     &-top {
