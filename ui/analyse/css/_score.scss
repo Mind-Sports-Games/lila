@@ -20,6 +20,11 @@ $score-variants: ('flipello', 'oware');
   }
 }
 
+body.mancala-light-wood .variant-oware .game-score {
+  background: url(../images/board/mancala/oware_light_wood_house.png);
+  background-size: cover;
+}
+
 @each $variant in $score-variants {
   .variant-#{$variant} .game-score {
     @extend %box-radius;
