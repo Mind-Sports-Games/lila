@@ -25,6 +25,7 @@ object FormCompatLayer {
         "behavior",
         List(
           "moveEvent",
+          "mancalaMove",
           "premove",
           "takeback",
           "autoQueen",

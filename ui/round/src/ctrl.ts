@@ -447,14 +447,18 @@ export default class RoundController {
           !o.castle ||
           (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
         ) {
-          this.chessground.move(keys[0], keys[1]);
+          if (d.game.variant.key === 'oware') {
+            this.chessground.moveNoAnim(keys[0], keys[1]);
+          } else {
+            this.chessground.move(keys[0], keys[1]);
+          }
         }
       }
-      if (this.data.game.variant.key === 'oware') {
+      if (d.game.variant.key === 'oware') {
         // a lot of pieces can change from 1 move so update them all
         oware.updateBoardFromMove(this, o.fen);
       }
-      if (this.data.onlyDropsVariant) {
+      if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
       }
       if (o.promotion) ground.promote(this.chessground, o.promotion.key, o.promotion.pieceClass);

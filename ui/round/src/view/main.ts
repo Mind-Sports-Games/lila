@@ -35,9 +35,12 @@ function renderMaterial(
 }
 
 function renderPlayerScore(score: number, position: Position, playerIndex: string, variantKey: VariantKey): VNode {
-  const pieceClass = variantKey === 'oware' ? 'piece.G-piece.' : 'piece.p-piece.';
+  const owareLetterFromScore =
+    score <= 0 ? 'empty' : score < 27 ? String.fromCharCode(score + 64) : String.fromCharCode(score + 70);
+  const pieceClass = variantKey === 'oware' ? `piece.${owareLetterFromScore}-piece.` : 'piece.p-piece.';
   const children: VNode[] = [];
   children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
+
   return h('div.game-score.game-score-' + position, children);
 }
 

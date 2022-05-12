@@ -112,6 +112,10 @@ object pref {
               radios(form("behavior.moveEvent"), translatedMoveEventChoices)
             ),
             setting(
+              howDoYouMoveMancalaSeeds(),
+              radios(form("behavior.mancalaMove"), translatedMancalaMoveChoices)
+            ),
+            setting(
               premovesPlayingDuringOpponentTurn(),
               radios(form("behavior.premove"), booleanChoices)
             ),

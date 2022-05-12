@@ -182,6 +182,7 @@ export interface Pref {
   is3d: boolean;
   keyboardMove: boolean;
   moveEvent: Prefs.MoveEvent;
+  mancalaMove: boolean;
   replay: Prefs.Replay;
   rookCastle: boolean;
   showCaptured: boolean;
