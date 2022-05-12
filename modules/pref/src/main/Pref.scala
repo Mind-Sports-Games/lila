@@ -255,7 +255,7 @@ object Pref {
 
     val choices = Seq(
       SINGLE_CLICK    -> "Single Click",
-      TWO_HOUSE_CLICK -> "Click start and destination houses"
+      TWO_HOUSE_CLICK -> "Click/Drag start and destination houses"
     )
   }
 

@@ -28,7 +28,7 @@
   <string name="bothClicksAndDrag">Either</string>
   <string name="howDoYouMoveMancalaSeeds">How do you move Mancala seeds?</string>
   <string name="singleClick">Single click</string>
-  <string name="clickTwoHouses">Click start and destination houses</string>
+  <string name="clickTwoHouses">Click/Drag start and destination houses</string>
   <string name="premovesPlayingDuringOpponentTurn">Premoves (playing during opponent turn)</string>
   <string name="takebacksWithOpponentApproval">Takebacks (with opponent approval)</string>
   <string name="inCasualGamesOnly">In casual games only</string>
