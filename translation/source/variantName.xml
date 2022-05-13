@@ -28,5 +28,5 @@
   <string name="xiangqi">Xiangqi</string>
   <string name="minishogi">Mini Shogi</string>
   <string name="minixiangqi">Mini Xiangqi</string>
-  <string name="flipello">Flipello</string>
+  <string name="flipello">Othello</string>
 </resources>
