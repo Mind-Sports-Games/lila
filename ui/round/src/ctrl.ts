@@ -190,8 +190,8 @@ export default class RoundController {
     } else if (this.data.game.variant.key === 'flipello') {
       flipello.flip(this, dest, this.data.player.playerIndex);
     } else if (this.data.game.variant.key === 'oware') {
-      // a lot of pieces can change from 1 move so update them all
-      // oware.updateBoardFromMove(this, o.fen);
+      //always play the capture sound regardless of move TODO change depending on number of stones?
+      sound.capture();
     } else sound.move();
   };
 
