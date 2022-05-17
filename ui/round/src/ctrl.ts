@@ -499,8 +499,10 @@ export default class RoundController {
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
     if (this.data.expiration) {
-      if (this.data.steps.length > 2) this.data.expiration = undefined;
-      else this.data.expiration.movedAt = Date.now();
+      const moveIndicater = true;
+      if (this.data.steps.length > 2 && !moveIndicater) {
+        this.data.expiration = undefined;
+      } else this.data.expiration.movedAt = Date.now();
     }
     this.redraw();
     if (playing && playedPlayerIndex == d.player.playerIndex) {

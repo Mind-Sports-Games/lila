@@ -47,8 +47,8 @@
   display: grid;
 
   @include breakpoint($mq-col1) {
-    grid-template-rows: auto $col1-pocket-height $col1-user-height $col1-mat-height auto $expiration-height $col1-mat-height $col1-user-height $col1-pocket-height;
-    grid-template-areas: 'moves' 'pocket-top' 'user-top' 'mat-top' 'board' 'expi-bot' 'mat-bot' 'user-bot' 'pocket-bot' 'kb-move' 'controls';
+    grid-template-rows: auto $col1-pocket-height $col1-user-height $col1-mat-height $expiration-height auto $expiration-height $col1-mat-height $col1-user-height $col1-pocket-height;
+    grid-template-areas: 'moves' 'pocket-top' 'user-top' 'mat-top' 'expi-top' 'board' 'expi-bot' 'mat-bot' 'user-bot' 'pocket-bot' 'kb-move' 'controls';
 
     // Put clocks and players in the same grid cell.
     // This allows having a single cell column, instead of
@@ -60,15 +60,11 @@
     }
 
     .rclock-bottom {
-      grid-area: 7 / 1 / 9 / 2;
+      grid-area: 8 / 1 / 10 / 2;
     }
 
     cg-board {
       box-shadow: none;
-    }
-
-    .expiration-top {
-      display: none;
     }
 
     &__table {
@@ -77,7 +73,7 @@
 
     &.move-confirm {
       // replace move list with move confirmation
-      grid-template-areas: 'controls' 'pocket-top' 'mat-top' 'user-top' 'board' 'expi-bot' 'user-bot' 'mat-bot' 'pocket-bot' 'kb-move';
+      grid-template-areas: 'controls' 'pocket-top' 'mat-top' 'user-top' 'expi-top' 'board' 'expi-bot' 'user-bot' 'mat-bot' 'pocket-bot' 'kb-move';
 
       #{$rmoves-tag} {
         display: none;
