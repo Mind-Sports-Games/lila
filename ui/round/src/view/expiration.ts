@@ -6,10 +6,10 @@ import { isPlayerTurn, playable } from 'game';
 let rang = false;
 
 export default function (ctrl: RoundController, position: Position): MaybeVNode {
-  const moveIndicater = true;
+  const moveIndicator = ctrl.data.pref.playerTurnIndicator;
   const d = playable(ctrl.data) && ctrl.data.expiration;
   let timeLeft = 8000;
-  if ((!d && !moveIndicater) || !playable(ctrl.data)) return;
+  if ((!d && !moveIndicator) || !playable(ctrl.data)) return;
   if (d) {
     timeLeft = Math.max(0, d.movedAt - Date.now() + d.millisToMove);
   }
@@ -21,18 +21,22 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
     rang = true;
   }
   const side = myTurn != ctrl.flip ? 'bottom' : 'top';
-  let moveIndicaterText = ctrl.trans.vdomPlural(
+  let moveIndicatorText = ctrl.trans.vdomPlural(
     'nbSecondsToPlayTheFirstMove',
     secondsLeft,
     h('strong', '' + secondsLeft)
   );
 
-  if (moveIndicater && ctrl.data.steps.length > 2) {
+  //make it even clearer who it is to move when the countdown is on screen for first moves
+  if (moveIndicator)
+    moveIndicatorText.unshift(myTurn ? ctrl.trans('yourTurn') + ':' : ctrl.trans('waitingForOpponent') + ':');
+
+  if (moveIndicator && (ctrl.data.steps.length > 2 || !ctrl.data.expiration)) {
     emerg = false;
     if (myTurn) {
-      moveIndicaterText = [ctrl.trans('yourTurn')];
+      moveIndicatorText = [ctrl.trans('yourTurn')];
     } else {
-      moveIndicaterText = [ctrl.trans('waitingForOpponent')];
+      moveIndicatorText = [ctrl.trans('waitingForOpponent')];
     }
   }
 
@@ -45,7 +49,7 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
           'bar-glider': myTurn,
         },
       },
-      moveIndicaterText
+      moveIndicatorText
     );
   } else {
     return h(

@@ -30,6 +30,7 @@ object JsonView {
       "follow"           -> p.follow,
       "highlight"        -> p.highlight,
       "destination"      -> p.destination,
+      "playerTurnIndicator" -> p.playerTurnIndicator,
       "coords"           -> p.coords,
       "replay"           -> p.replay,
       "challenge"        -> p.challenge,
