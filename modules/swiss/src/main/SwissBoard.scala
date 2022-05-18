@@ -1,5 +1,7 @@
 package lila.swiss
 
+import cats.implicits._
+
 import scala.concurrent.duration._
 
 import lila.common.LightUser
@@ -16,7 +18,7 @@ private case class SwissBoard(
 
 private object SwissBoard {
   case class Player(user: LightUser, rank: Int, rating: Int)
-  case class WithGame(board: SwissBoard, game: Game)
+  case class WithGame(board: SwissBoard, game: Game, microMatchGame: Option[Game])
 }
 
 final private class SwissBoardApi(
@@ -34,10 +36,10 @@ final private class SwissBoardApi(
 
   def apply(id: Swiss.Id): Fu[List[SwissBoard.WithGame]] =
     boardsCache.getIfPresent(id) ?? {
-      _.map { board =>
-        gameProxyRepo.game(board.gameId) map2 {
-          SwissBoard.WithGame(board, _)
-        }
+      _.map { board => 
+          (gameProxyRepo.game(board.gameId) zip board.microMatchGameId.traverse(gameProxyRepo.game)).map {
+            case (game: Option[Game], microMatchGame: Option[Option[Game]]) => game.map(g => SwissBoard.WithGame(board, g, microMatchGame.flatten))
+          }
       }.sequenceFu
         .dmap(_.flatten)
     }
