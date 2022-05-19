@@ -1,7 +1,6 @@
 import { lastStep } from './round';
 import RoundController from './ctrl';
 import { ApiMove, RoundData } from './interfaces';
-import * as xhr from 'common/xhr';
 
 let found = false;
 
@@ -30,10 +29,8 @@ export function subscribe(ctrl: RoundController): void {
   playstrategy.storage.fire('ceval.disable');
 
   playstrategy.storage.make('ceval.fen').listen(e => {
-    const d = ctrl.data,
-      step = lastStep(ctrl.data);
+    const step = lastStep(ctrl.data);
     if (!found && step.ply > 14 && ctrl.isPlaying() && e.value && truncateFen(step.fen) == truncateFen(e.value)) {
-      xhr.text(`/jslog/${d.game.id}${d.player.id}?n=ceval`, { method: 'post' });
       found = true;
     }
   });
