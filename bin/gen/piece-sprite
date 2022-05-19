@@ -64,7 +64,9 @@ flipello_themes = [
   ['fabirovsky_flipello', 'svg']
 ]
 mancala_themes =[
-  ['red_mancala', 'svg']
+  ['red_mancala', 'svg'],
+  ['green_mancala', 'svg'],
+  ['blue_mancala', 'svg']
 ]
 types = {
   'svg' => 'svg+xml;base64,',

@@ -25,6 +25,11 @@ body.mancala-light-wood .variant-oware .game-score {
   background-size: cover;
 }
 
+body.mancala-dark-wood .variant-oware .game-score {
+  background: url(../images/board/mancala/oware_dark_wood_house.png);
+  background-size: cover;
+}
+
 @each $variant in $score-variants {
   .variant-#{$variant} .game-score {
     @extend %box-radius;
