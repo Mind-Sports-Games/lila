@@ -64,6 +64,10 @@ object pref {
               radios(form("display.destination"), booleanChoices)
             ),
             setting(
+              playerTurnIndicator(),
+              radios(form("display.playerTurnIndicator"), booleanChoices)
+            ),
+            setting(
               boardCoordinates(),
               radios(form("display.coords"), translatedBoardCoordinateChoices)
             ),

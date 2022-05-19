@@ -190,8 +190,8 @@ export default class RoundController {
     } else if (this.data.game.variant.key === 'flipello') {
       flipello.flip(this, dest, this.data.player.playerIndex);
     } else if (this.data.game.variant.key === 'oware') {
-      // a lot of pieces can change from 1 move so update them all
-      // oware.updateBoardFromMove(this, o.fen);
+      //always play the capture sound regardless of move TODO change depending on number of stones?
+      sound.capture();
     } else sound.move();
   };
 
@@ -499,8 +499,9 @@ export default class RoundController {
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
     if (this.data.expiration) {
-      if (this.data.steps.length > 2) this.data.expiration = undefined;
-      else this.data.expiration.movedAt = Date.now();
+      if (this.data.steps.length > 2 && !this.data.pref.playerTurnIndicator) {
+        this.data.expiration = undefined;
+      } else this.data.expiration.movedAt = Date.now();
     }
     this.redraw();
     if (playing && playedPlayerIndex == d.player.playerIndex) {

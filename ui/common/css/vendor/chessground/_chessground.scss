@@ -77,8 +77,10 @@ $alternate-board-highlights: (
 );
 $alternate-color: rgba(20, 30, 85, 0.5);
 
-$mancala-board-highlights: (
+$mancala-light-board-highlights: (
   'mancala-light-wood': 'mancala',
+);
+$mancala-dark-board-highlights: (
   'mancala-dark-wood': 'mancala',
 );
 
@@ -98,23 +100,44 @@ square {
       }
     }
 
-    @each $color, $gameFamily in $mancala-board-highlights {
+    @each $color, $gameFamily in $mancala-light-board-highlights {
       body.#{$color} .#{$gameFamily} & {
         background: url(../images/board/mancala/highlights/dashed.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-board-highlights {
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-light-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.from {
         background: url(../images/board/mancala/highlights/dashed.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-board-highlights {
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.from {
+        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-light-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
         background: url(../images/board/mancala/highlights/dashed.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
         background-size: cover;
       }
     }
@@ -139,7 +162,7 @@ square {
     }
   }
 
-  @each $color, $gameFamily in $mancala-board-highlights {
+  @each $color, $gameFamily in $mancala-light-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move.from {
       background: url(../images/board/mancala/highlights/solid_darker.svg);
       background-size: cover;
@@ -147,6 +170,18 @@ square {
 
     body.#{$color} .#{$gameFamily} &.last-move.to {
       background: url(../images/board/mancala/highlights/dashed_darker.svg);
+      background-size: cover;
+    }
+  }
+
+  @each $color, $gameFamily in $mancala-dark-board-highlights {
+    body.#{$color} .#{$gameFamily} &.last-move.from {
+      background: url(../images/board/mancala/highlights/solid_lighter.svg);
+      background-size: cover;
+    }
+
+    body.#{$color} .#{$gameFamily} &.last-move.to {
+      background: url(../images/board/mancala/highlights/dashed_lighter.svg);
       background-size: cover;
     }
   }
@@ -181,16 +216,30 @@ square {
       background-size: cover;
     }
 
-    @each $color, $gameFamily in $mancala-board-highlights {
+    @each $color, $gameFamily in $mancala-light-board-highlights {
       body.#{$color} .#{$gameFamily} & {
         background: url(../images/board/mancala/highlights/solid.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-board-highlights {
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/mancala/highlights/solid_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-light-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
         background: url(../images/board/mancala/highlights/solid.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/mancala/highlights/solid_lighter.svg);
         background-size: cover;
       }
     }
@@ -408,6 +457,11 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(213.333 * 100% / 640);
   padding-top: calc(0.38 * 213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
+
+  @include breakpoint($mq-col1-uniboard) {
+    padding-top: 5px;
+    margin-bottom: 15px;
+  }
 }
 
 .variant-xiangqi .analyse__board {

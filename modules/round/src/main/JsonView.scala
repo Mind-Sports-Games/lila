@@ -119,6 +119,7 @@ final class JsonView(
               .add("blindfold" -> pref.isBlindfold)
               .add("highlight" -> pref.highlight)
               .add("destination" -> (pref.destination && !pref.isBlindfold))
+              .add("playerTurnIndicator" -> pref.playerTurnIndicator)
               .add("enablePremove" -> pref.premove)
               .add("showCaptured" -> pref.captured)
               .add("submitMove" -> {
@@ -223,6 +224,7 @@ final class JsonView(
               .add("clockBar" -> pref.clockBar)
               .add("highlight" -> pref.highlight)
               .add("destination" -> (pref.destination && !pref.isBlindfold))
+              .add("playerTurnIndicator" -> false)
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("showCaptured" -> pref.captured),
             "evalPut" -> JsBoolean(me.??(evalCache.shouldPut))
@@ -294,7 +296,8 @@ final class JsonView(
           .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
           .add("is3d" -> pref.is3d)
           .add("highlight" -> pref.highlight)
-          .add("destination" -> (pref.destination && !pref.isBlindfold)),
+          .add("destination" -> (pref.destination && !pref.isBlindfold))
+          .add("playerTurnIndicator" -> false),
         "path"         -> pov.game.turns,
         "userAnalysis" -> true
       )
