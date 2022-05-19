@@ -17,7 +17,7 @@
         </filter>
     </defs>
     <g id="orientation-random" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <polygon id="Triangle" fill="#000000" opacity="0.200000003" transform="translate(19.000000, 59.000000) scale(1, -1) translate(-19.000000, -59.000000) " points="19 53 27 65 11 65"></polygon>
+        <polygon id="Triangle" fill="#000000" opacity="0.600000003" transform="translate(19.000000, 59.000000) scale(1, -1) translate(-19.000000, -59.000000) " points="19 53 27 65 11 65"></polygon>
         <g id="Group" transform="translate(0.000000, 14.000000)">
             <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-1)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
             <g id="colour" transform="translate(6.000000, 6.582812)">
@@ -33,6 +33,6 @@
             <ellipse id="gradient" fill="url(#radialGradient-2)" cx="19.5" cy="18.0828118" rx="13.5" ry="11.5"></ellipse>
             <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" filter="url(#filter-5)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
         </g>
-        <polygon id="Triangle-Copy-4" fill="#000000" opacity="0.200000003" points="19 0 27 12 11 12"></polygon>
+        <polygon id="Triangle-Copy-4" fill="#000000" opacity="0.600000003" points="19 0 27 12 11 12"></polygon>
     </g>
 </svg>

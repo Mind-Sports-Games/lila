@@ -17,7 +17,7 @@
         </filter>
     </defs>
     <g id="orientation-up" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <polygon id="Triangle" fill="#000000" opacity="0.200000003" points="20 0 28 12 12 12"></polygon>
+        <polygon id="Triangle" fill="#000000" opacity="0.600000003" points="20 0 28 12 12 12"></polygon>
         <g id="Group" transform="translate(0.000000, 10.000000)">
             <ellipse id="shadow" fill="#000000" opacity="0.4" style="mix-blend-mode: multiply;" filter="url(#filter-1)" cx="18.5" cy="19.0828118" rx="13.5" ry="11.5"></ellipse>
             <g id="colour" transform="translate(6.000000, 6.582812)">

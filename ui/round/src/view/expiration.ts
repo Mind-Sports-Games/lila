@@ -28,8 +28,7 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   );
 
   //make it even clearer who it is to move when the countdown is on screen for first moves
-  if (moveIndicator)
-    moveIndicatorText.unshift(myTurn ? ctrl.trans('yourTurn') + ':' : ctrl.trans('waitingForOpponent') + ':');
+  if (moveIndicator) moveIndicatorText.push(' - ', myTurn ? ctrl.trans('yourTurn') : ctrl.trans('waitingForOpponent'));
 
   if (moveIndicator && (ctrl.data.steps.length > 2 || !ctrl.data.expiration)) {
     emerg = false;
