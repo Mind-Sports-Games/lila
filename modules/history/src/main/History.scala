@@ -31,6 +31,7 @@ case class History(
     minishogi: RatingsMap,
     minixiangqi: RatingsMap,
     flipello: RatingsMap,
+    oware: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -73,6 +74,7 @@ case class History(
       case "minishogi"      => minishogi
       case "minixiangqi"    => minixiangqi
       case "flipello"       => flipello
+      case "oware"          => oware
       case "puzzle"         => puzzle
       case "ultraBullet"    => ultraBullet
       case x                => sys error s"No history for perf $x"
@@ -127,6 +129,7 @@ object History {
           minishogi = ratingsMap("minishogi"),
           minixiangqi = ratingsMap("minixiangqi"),
           flipello = ratingsMap("flipello"),
+          oware = ratingsMap("oware"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),

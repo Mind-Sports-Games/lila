@@ -54,6 +54,11 @@ $flipello-board-files: (
   'wood': 'flipello_wood_board.svg',
 );
 
+$oware-board-files: (
+  'light-wood': 'oware_light_wood_board.png',
+  'dark-wood': 'oware_dark_wood_board.png',
+);
+
 $chess-variants: (
   'standard',
   'chess960',
@@ -77,6 +82,8 @@ $shogi-variants: ('shogi'); //must use same board
 $xiangqi-variants: ('xiangqi'); // must use same board
 
 $flipello-variants: ('flipello');
+
+$mancala-variants: ('oware'); // must use same board
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
@@ -113,6 +120,12 @@ $flipello-variants: ('flipello');
 @each $color, $file in $flipello-board-files {
   .flipello-#{$color} .variant-flipello.is2d cg-board {
     background-image: url(../images/board/flipello/#{$file});
+  }
+}
+
+@each $color, $file in $oware-board-files {
+  .mancala-#{$color} .variant-oware.is2d cg-board {
+    background-image: url(../images/board/mancala/#{$file});
   }
 }
 
@@ -165,5 +178,11 @@ $flipello-variants: ('flipello');
 @each $color, $file in $flipello-board-files {
   .flipello-#{$color} .is2d .variant-flipello cg-board {
     background-image: url(../images/board/flipello/#{$file});
+  }
+}
+
+@each $color, $file in $oware-board-files {
+  .mancala-#{$color} .is2d .variant-oware cg-board {
+    background-image: url(../images/board/mancala/#{$file});
   }
 }

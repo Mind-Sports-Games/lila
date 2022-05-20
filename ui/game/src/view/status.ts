@@ -55,6 +55,8 @@ export default function status(ctrl: Ctrl): string {
           return noarg('promotion');
         case 'flipello':
           return noarg('gameFinished');
+        case 'oware':
+          return noarg('gameFinished');
       }
       return noarg('variantEnding');
     case 'unknownFinish':

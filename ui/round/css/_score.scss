@@ -1,60 +1,76 @@
+$score-variants: ('flipello', 'oware');
+
 .variant-flipello .game-score {
-  @extend %box-radius;
-  display: block;
-  width: 7em;
-  height: 7em;
-  background-color: #aaa;
+  piece::after {
+    @extend %active, %box-radius;
 
-  piece {
+    content: attr(data-score);
+    top: 0;
+    right: 0;
+    position: absolute;
+    line-height: 0.9em;
+    padding: 3px 0.3em;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+}
+
+body.mancala-light-wood .variant-oware .game-score {
+  background: url(../images/board/mancala/oware_light_wood_house.png);
+  background-size: cover;
+}
+
+body.mancala-dark-wood .variant-oware .game-score {
+  background: url(../images/board/mancala/oware_dark_wood_house.png);
+  background-size: cover;
+}
+
+@each $variant in $score-variants {
+  .variant-#{$variant} .game-score {
+    @extend %box-radius;
     display: block;
-    width: 100% !important;
-    height: 100% !important;
-    position: relative;
+    width: 7em;
+    height: 7em;
+    background-color: #aaa;
 
-    &::after {
-      @extend %active, %box-radius;
-
-      content: attr(data-score);
-      top: 0;
-      right: 0;
-      position: absolute;
-      line-height: 0.9em;
-      padding: 3px 0.3em;
-      font-weight: bold;
-      font-size: 1.5em;
+    piece {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      position: relative;
     }
-  }
 
-  &-top {
-    grid-area: mat-top;
-    margin-bottom: -0.5em;
-  }
-
-  &-bottom {
-    grid-area: mat-bot;
-    margin-top: -0.5em;
-  }
-
-  @include breakpoint($mq-col1) {
     &-top {
-      grid-area: pocket-top;
-      margin-left: 20%;
+      grid-area: mat-top;
+      margin-bottom: -0.5em;
     }
 
     &-bottom {
-      grid-area: pocket-top;
-      margin-left: 65%;
-      margin-top: 0;
-    }
-  }
-
-  @include breakpoint($mq-col2-uniboard) {
-    &-top {
-      margin-bottom: $block-gap;
+      grid-area: mat-bot;
+      margin-top: -0.5em;
     }
 
-    &-bottom {
-      margin-top: $block-gap;
+    @include breakpoint($mq-col1) {
+      &-top {
+        grid-area: pocket-top;
+        margin-left: 20%;
+      }
+
+      &-bottom {
+        grid-area: pocket-top;
+        margin-left: 65%;
+        margin-top: 0;
+      }
+    }
+
+    @include breakpoint($mq-col2-uniboard) {
+      &-top {
+        margin-bottom: $block-gap;
+      }
+
+      &-bottom {
+        margin-top: $block-gap;
+      }
     }
   }
 }

@@ -187,7 +187,8 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       loa,
       shogi,
       xiangqi,
-      flipello
+      flipello,
+      mancala
     )
 
   private def chess =
@@ -240,6 +241,15 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.checkbox(
         form("medleyGameFamilies.flipello"),
         VariantKeys.gameFamilyName(GameFamily.Flipello()),
+        klass = "medleyGameFamily",
+        displayed = false
+      )
+    )
+  private def mancala =
+    frag(
+      form3.checkbox(
+        form("medleyGameFamilies.mancala"),
+        VariantKeys.gameFamilyName(GameFamily.Mancala()),
         klass = "medleyGameFamily",
         displayed = false
       )

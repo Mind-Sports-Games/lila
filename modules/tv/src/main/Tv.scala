@@ -54,6 +54,7 @@ object Tv {
   import strategygames.chess.{ variant => CV }
   import strategygames.draughts.{ variant => DV }
   import strategygames.fairysf.{ variant => FV }
+  import strategygames.mancala.{ variant => MV }
   import strategygames.{ Speed => S, GameFamily }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
@@ -155,6 +156,18 @@ object Tv {
           ),
           familyChannel = true,
           gameFamily = "flipello"
+        )
+    case object MancalaFamily
+        extends Channel(
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.Mancala())}",
+          icon = MV.Oware.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(
+            anyVariant(Variant.all(GameLogic.Mancala()).filter(v => v.gameFamily == GameFamily.Mancala())),
+            noBot
+          ),
+          familyChannel = true,
+          gameFamily = "mancala"
         )
     case object Bullet
         extends Channel(
@@ -431,6 +444,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "flipello"
         )
+    case object Oware
+        extends Channel(
+          name = MV.Oware.name,
+          icon = MV.Oware.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(MV.Oware)), noBot),
+          familyChannel = false,
+          gameFamily = "mancala"
+        )
     case object Bot
         extends Channel(
           name = "Bot",
@@ -487,6 +509,8 @@ object Tv {
       MiniXiangqi,
       //FlipelloFamily,
       Flipello,
+      //MancalaFamily,
+      Oware,
       Bot,
       Computer
     )

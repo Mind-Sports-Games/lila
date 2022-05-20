@@ -28,7 +28,8 @@ final class JsonView(
   import JsonView._
 
   private def checkCount(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.history.checkCount(playerIndex)
+    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.history
+      .checkCount(playerIndex)
 
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
@@ -38,7 +39,7 @@ final class JsonView(
       //.obj("color" -> g.variant.playerNames(p.playerIndex), "playerIndex" -> p.playerIndex.name)
       .obj(
         //"color" -> p.playerIndex.classicName,
-        "playerName" -> g.variant.playerNames(p.playerIndex),
+        "playerName"  -> g.variant.playerNames(p.playerIndex),
         "playerIndex" -> p.playerIndex.name,
         "playerColor" -> g.variant.playerColors(p.playerIndex)
       )
@@ -81,10 +82,10 @@ final class JsonView(
               commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json.obj(
                 //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
                 //"color" -> opponent.playerIndex.classicName,
-                "playerName" -> pov.game.variant.playerNames(opponent.playerIndex),
+                "playerName"  -> pov.game.variant.playerNames(opponent.playerIndex),
                 "playerIndex" -> opponent.playerIndex.name,
                 "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
-                "ai"    -> opponent.aiLevel
+                "ai"          -> opponent.aiLevel
               )
             }.add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
               .add("onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex))),
@@ -99,12 +100,15 @@ final class JsonView(
                 "coords"            -> pref.coords,
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
-                "autoQueen" -> (if (pov.game.variant == strategygames.chess.variant.Antichess) Pref.AutoQueen.NEVER
+                "autoQueen" -> (if (pov.game.variant == strategygames.chess.variant.Antichess)
+                                  Pref.AutoQueen.NEVER
                                 else pref.autoQueen),
                 "clockTenths" -> pref.clockTenths,
                 "moveEvent"   -> pref.moveEvent,
-                "pieceSet" -> pref.pieceSet.map( p => Json.obj( "name" -> p.name,
-                                                                "gameFamily" -> p.gameFamilyName))
+                "mancalaMove" -> (pref.mancalaMove == Pref.MancalaMove.SINGLE_CLICK),
+                "pieceSet" -> pref.pieceSet.map(p =>
+                  Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName)
+                )
               )
               .add("is3d" -> pref.is3d)
               .add("clockBar" -> pref.clockBar)
@@ -115,16 +119,17 @@ final class JsonView(
               .add("blindfold" -> pref.isBlindfold)
               .add("highlight" -> pref.highlight)
               .add("destination" -> (pref.destination && !pref.isBlindfold))
+              .add("playerTurnIndicator" -> pref.playerTurnIndicator)
               .add("enablePremove" -> pref.premove)
               .add("showCaptured" -> pref.captured)
               .add("submitMove" -> {
                 import Pref.SubmitMove._
                 pref.submitMove match {
                   case _ if pov.game.hasAi || nvui                            => false
-                  case ALWAYS                                             => true
+                  case ALWAYS                                                 => true
                   case CORRESPONDENCE_UNLIMITED if pov.game.isCorrespondence  => true
                   case CORRESPONDENCE_ONLY if pov.game.hasCorrespondenceClock => true
-                  case _                                                  => false
+                  case _                                                      => false
                 }
               })
           )
@@ -134,6 +139,7 @@ final class JsonView(
           .add("moretimeable" -> moretimeable)
           .add("crazyhouse" -> pov.game.board.pocketData)
           .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("hasGameScore" -> pov.game.variant.hasGameScore)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
@@ -150,10 +156,10 @@ final class JsonView(
       .obj(
         //"color" -> g.variant.playerNames(p.playerIndex),
         //"color" -> p.playerIndex.classicName,
-        "playerName" -> g.variant.playerNames(p.playerIndex),
-        "playerIndex" -> p.playerIndex.name,
+        "playerName"   -> g.variant.playerNames(p.playerIndex),
+        "playerIndex"  -> p.playerIndex.name,
         "playerColors" -> g.variant.playerColors(p.playerIndex),
-        "name"  -> p.name
+        "name"         -> p.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
       .add("ai" -> p.aiLevel)
@@ -210,13 +216,15 @@ final class JsonView(
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
                 "clockTenths"       -> pref.clockTenths,
-                "pieceSet" -> pref.pieceSet.map( p => Json.obj( "name" -> p.name,
-                                                                "gameFamily" -> p.gameFamilyName))
+                "pieceSet" -> pref.pieceSet.map(p =>
+                  Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName)
+                )
               )
               .add("is3d" -> pref.is3d)
               .add("clockBar" -> pref.clockBar)
               .add("highlight" -> pref.highlight)
               .add("destination" -> (pref.destination && !pref.isBlindfold))
+              .add("playerTurnIndicator" -> false)
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("showCaptured" -> pref.captured),
             "evalPut" -> JsBoolean(me.??(evalCache.shouldPut))
@@ -229,6 +237,7 @@ final class JsonView(
             Json.obj("id" -> userId)
           })
           .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("hasGameScore" -> pov.game.variant.hasGameScore)
 
       }
 
@@ -260,20 +269,20 @@ final class JsonView(
           .add("division", division)
           .add("winner", game.winner.map(w => game.variant.playerNames(w.playerIndex))),
         "player" -> Json.obj(
-          "id"    -> owner.option(pov.playerId),
+          "id" -> owner.option(pov.playerId),
           //"color" -> game.variant.playerNames(playerIndex),
           //"color" -> playerIndex.classicName,
-          "playerName" -> game.variant.playerNames(playerIndex),
+          "playerName"  -> game.variant.playerNames(playerIndex),
           "playerIndex" -> playerIndex.name,
           "playerColor" -> game.variant.playerColors(playerIndex)
         ),
         "opponent" -> Json.obj(
           //"color" -> game.variant.playerNames(opponent.playerIndex),
           //"color" -> playerIndex.classicName,
-          "playerName" -> game.variant.playerNames(opponent.playerIndex),
+          "playerName"  -> game.variant.playerNames(opponent.playerIndex),
           "playerIndex" -> opponent.playerIndex.name,
           "playerColor" -> game.variant.playerColors(opponent.playerIndex),
-          "ai"    -> opponent.aiLevel
+          "ai"          -> opponent.aiLevel
         ),
         "orientation" -> orientation.name,
         "pref" -> Json
@@ -281,19 +290,21 @@ final class JsonView(
             "animationDuration" -> animationMillis(pov, pref),
             "coords"            -> pref.coords,
             "moveEvent"         -> pref.moveEvent,
-            "pieceSet" -> pref.pieceSet.map( p => Json.obj( "name" -> p.name,
-                                                                "gameFamily" -> p.gameFamilyName))
+            "mancalaMove"       -> (pref.mancalaMove == Pref.MancalaMove.SINGLE_CLICK),
+            "pieceSet"          -> pref.pieceSet.map(p => Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName))
           )
           .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
           .add("is3d" -> pref.is3d)
           .add("highlight" -> pref.highlight)
-          .add("destination" -> (pref.destination && !pref.isBlindfold)),
+          .add("destination" -> (pref.destination && !pref.isBlindfold))
+          .add("playerTurnIndicator" -> false),
         "path"         -> pov.game.turns,
         "userAnalysis" -> true
       )
       .add("evalPut" -> me.??(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
       .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+      .add("hasGameScore" -> pov.game.variant.hasGameScore)
   }
 
   private def blurs(game: Game, player: lila.game.Player) =
@@ -307,12 +318,13 @@ final class JsonView(
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
-      case (Situation.Chess(_), Variant.Chess(_)) => (pov.game playableBy pov.player) option
-        Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
-      case (Situation.Draughts(situation), Variant.Draughts(variant))
-        => (pov.game playableBy pov.player) option {
+      case (Situation.Chess(_), Variant.Chess(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
+        (pov.game playableBy pov.player) option {
           if (situation.ghosts > 0) {
-            val move = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+            val move    = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
             val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
             destPos match {
               case Some(dest) =>
@@ -322,35 +334,40 @@ final class JsonView(
                 )
               case _ =>
                 Event.PossibleMoves.json(
-                  situation.allDestinations.map{
-                    case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts))
+                  situation.allDestinations.map { case (p, lp) =>
+                    (Pos.Draughts(p), lp.map(Pos.Draughts))
                   },
                   apiVersion
                 )
             }
           } else {
             Event.PossibleMoves.json(
-              situation.allDestinations.map{
-                case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts))
+              situation.allDestinations.map { case (p, lp) =>
+                (Pos.Draughts(p), lp.map(Pos.Draughts))
               },
               apiVersion
             )
           }
         }
-      case (Situation.FairySF(_), Variant.FairySF(_)) => (pov.game playableBy pov.player) option
-        Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.FairySF(_), Variant.FairySF(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Mancala(_), Variant.Mancala(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
-  private def possibleDropsByrole(pov: Pov): Option[JsValue] = 
-   (pov.game.situation, pov.game.variant) match {
+  private def possibleDropsByrole(pov: Pov): Option[JsValue] =
+    (pov.game.situation, pov.game.variant) match {
       case (Situation.Chess(_), Variant.Chess(_)) => None
-      case (Situation.FairySF(_), Variant.FairySF(_)) => (pov.game playableBy pov.player) option
-        Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.FairySF(_), Variant.FairySF(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Mancala(_), Variant.Mancala(_))   => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
-      case _ => sys.error("Mismatch of types for possibleDropsByrole")
+      case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
     }
-
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
     (pov.game playableBy pov.player) ?? {
@@ -364,11 +381,11 @@ final class JsonView(
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         if (situation.ghosts > 0) {
-          val move = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+          val move    = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
           val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
           destPos match {
             case Some(dest) => ~situation.captureLengthFrom(dest)
-            case _ => situation.allMovesCaptureLength
+            case _          => situation.allMovesCaptureLength
           }
         } else
           situation.allMovesCaptureLength

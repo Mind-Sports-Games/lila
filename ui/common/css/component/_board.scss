@@ -15,6 +15,12 @@
   @extend %square;
 }
 
+a.mini-game.variant-oware .cg-wrap {
+  @extend %square;
+
+  padding-bottom: 33.33%;
+}
+
 .cg-wrap,
 .mini-game .cg-wrap {
   display: table; // part of hack to round to full pixel size in chrome

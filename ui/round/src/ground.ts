@@ -56,7 +56,7 @@ export function makeConfig(ctrl: RoundController): Config {
       duration: data.pref.animationDuration,
     },
     premovable: {
-      enabled: data.pref.enablePremove && !data.onlyDropsVariant,
+      enabled: data.pref.enablePremove && !data.onlyDropsVariant && data.game.variant.key !== 'oware',
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {
@@ -102,6 +102,10 @@ export function makeConfig(ctrl: RoundController): Config {
             ? 'https://playstrategy.org/assets/piece/flipello/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
               '/'
+            : variantKey === 'oware'
+            ? 'https://playstrategy.org/assets/piece/mancala/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'mancala')[0].name +
+              '/'
             : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
@@ -116,6 +120,7 @@ export function makeConfig(ctrl: RoundController): Config {
     variant: variantKey,
     chess960: data.game.variant.key === 'chess960',
     onlyDropsVariant: data.onlyDropsVariant,
+    singleClickMoveVariant: data.game.variant.key === 'oware' && data.pref.mancalaMove,
   };
 }
 
