@@ -22,7 +22,8 @@ const renderBoardState = (board: Board): string =>
     : `${board.fen},${board.orientation},${board.lastMove}`;
 
 const renderBoard = (incomingBoard: Board): VNode => {
-  const board = (incomingBoard.isMicroMatch && incomingBoard.microMatchGame) ? incomingBoard.microMatchGame : incomingBoard;
+  const board =
+    incomingBoard.isMicroMatch && incomingBoard.microMatchGame ? incomingBoard.microMatchGame : incomingBoard;
   return h(
     `div${renderBoardClasses(board)}`,
     {
@@ -47,7 +48,7 @@ const renderBoard = (incomingBoard: Board): VNode => {
       boardPlayer(board, board.orientation),
     ]
   );
-}
+};
 
 function boardPlayer(board: Board, playerIndex: PlayerIndex) {
   const player = board[playerIndex];
@@ -55,11 +56,11 @@ function boardPlayer(board: Board, playerIndex: PlayerIndex) {
     h('span.mini-game__user', [h('strong', '#' + player.rank), renderPlayer(player, true, true)]),
     board.clock
       ? h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
-        attrs: {
-          'data-time': board.clock[playerIndex],
-          'data-managed': 1,
-        },
-      })
+          attrs: {
+            'data-time': board.clock[playerIndex],
+            'data-managed': 1,
+          },
+        })
       : h('span.mini-game__result', board.winner ? (board.winner == playerIndex ? 1 : 0) : '½'),
   ]);
 }
