@@ -12,6 +12,7 @@ import scala.concurrent.duration._
 import lila.hub.LightTeam.TeamID
 import lila.rating.PerfType
 import lila.user.User
+import lila.i18n.VariantKeys
 
 case class Swiss(
     _id: Swiss.Id,
@@ -82,12 +83,14 @@ case class Swiss(
   def variantForRound(roundIndex: Int) =
     settings.medleyVariants.getOrElse(List()).lift(roundIndex - 1).getOrElse(variant)
 
+  def roundPerfType: PerfType = PerfType(roundVariant, speed)
+
   def medleyGameFamilies: Option[List[GameFamily]] = settings.medleyVariants.map(
     _.map(_.gameFamily).distinct.sortWith(_.name < _.name)
   )
 
   def medleyGameFamiliesString: Option[String] =
-    medleyGameFamilies.map(_.map(_.name).mkString(", "))
+    medleyGameFamilies.map(_.map(VariantKeys.gameFamilyName).mkString(", "))
 
   def withConditions(conditions: SwissCondition.All) = copy(
     settings = settings.copy(conditions = conditions)
