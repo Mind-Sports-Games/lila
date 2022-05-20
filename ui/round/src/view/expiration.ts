@@ -22,21 +22,17 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   }
   const side = myTurn != ctrl.flip ? 'bottom' : 'top';
   let moveIndicatorText = ctrl.trans.vdomPlural(
-    'nbSecondsToPlayTheFirstMove',
+    myTurn ? 'nbSecondsToPlayTheFirstMove' : 'nbSecondsForOpponentToPlayTheFirstMove',
     secondsLeft,
     h('strong', '' + secondsLeft)
   );
 
-  //make it even clearer who it is to move when the countdown is on screen for first moves
-  if (moveIndicator) moveIndicatorText.push(' - ', myTurn ? ctrl.trans('yourTurn') : ctrl.trans('waitingForOpponent'));
-
   if (moveIndicator && (ctrl.data.steps.length > 2 || !ctrl.data.expiration)) {
-    emerg = false;
-    if (myTurn) {
-      moveIndicatorText = [ctrl.trans('yourTurn')];
-    } else {
-      moveIndicatorText = [ctrl.trans('waitingForOpponent')];
-    }
+    emerg =
+      ctrl.clock !== undefined &&
+      ctrl.clock.times.activePlayerIndex !== undefined &&
+      ctrl.clock?.millisOf(ctrl.clock.times.activePlayerIndex) < 10000;
+    moveIndicatorText = myTurn ? [ctrl.trans('yourTurn')] : [ctrl.trans('waitingForOpponent')];
   }
 
   if (position == side) {

@@ -792,6 +792,7 @@ val `nbForumPosts` = new I18nKey("nbForumPosts")
 val `nbPerfTypePlayersThisWeek` = new I18nKey("nbPerfTypePlayersThisWeek")
 val `availableInNbLanguages` = new I18nKey("availableInNbLanguages")
 val `nbSecondsToPlayTheFirstMove` = new I18nKey("nbSecondsToPlayTheFirstMove")
+val `nbSecondsForOpponentToPlayTheFirstMove` = new I18nKey("nbSecondsForOpponentToPlayTheFirstMove")
 val `nbSeconds` = new I18nKey("nbSeconds")
 val `andSaveNbPremoveLines` = new I18nKey("andSaveNbPremoveLines")
 
