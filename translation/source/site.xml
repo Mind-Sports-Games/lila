@@ -791,6 +791,10 @@ computer analysis, game chat and shareable URL.</string>
     <item quantity="one">%s second to play the first move</item>
     <item quantity="other">%s seconds to play the first move</item>
   </plurals>
+  <plurals name="nbSecondsForOpponentToPlayTheFirstMove">
+    <item quantity="one">%s second for opponent to play first move</item>
+    <item quantity="other">%s seconds for opponent to play first move</item>
+  </plurals>
   <string name="practiceWithComputer">Practice with computer</string>
   <string name="anotherWasX">Another was %s</string>
   <string name="bestWasX">Best was %s</string>

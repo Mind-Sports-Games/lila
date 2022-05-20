@@ -19,12 +19,13 @@ object PrefForm {
   val pref = Form(
     mapping(
       "display" -> mapping(
-        "animation"     -> numberIn(Set(0, 1, 2, 3)),
-        "captured"      -> booleanNumber,
-        "highlight"     -> booleanNumber,
-        "destination"   -> booleanNumber,
-        "coords"        -> checkedNumber(Pref.Coords.choices),
-        "replay"        -> checkedNumber(Pref.Replay.choices),
+        "animation"   -> numberIn(Set(0, 1, 2, 3)),
+        "captured"    -> booleanNumber,
+        "highlight"   -> booleanNumber,
+        "destination" -> booleanNumber,
+        "playerTurnIndicator" -> booleanNumber,
+        "coords"      -> checkedNumber(Pref.Coords.choices),
+        "replay"      -> checkedNumber(Pref.Replay.choices),
         //"gameResult"    -> checkedNumber(Pref.DraughtsGameResult.choices),
         //"coordSystem"   -> checkedNumber(Pref.DraughtsCoordSystem.choices),
         "pieceNotation" -> optional(booleanNumber),
@@ -34,6 +35,7 @@ object PrefForm {
       )(DisplayData.apply)(DisplayData.unapply),
       "behavior" -> mapping(
         "moveEvent"     -> optional(numberIn(Set(0, 1, 2))),
+        "mancalaMove"   -> optional(booleanNumber),
         "premove"       -> booleanNumber,
         "takeback"      -> checkedNumber(Pref.Takeback.choices),
         "autoQueen"     -> checkedNumber(Pref.AutoQueen.choices),
@@ -62,6 +64,7 @@ object PrefForm {
       captured: Int,
       highlight: Int,
       destination: Int,
+      playerTurnIndicator: Int,
       coords: Int,
       replay: Int,
       //gameResult: Int,
@@ -74,6 +77,7 @@ object PrefForm {
 
   case class BehaviorData(
       moveEvent: Option[Int],
+      mancalaMove: Option[Int],
       premove: Int,
       takeback: Int,
       autoQueen: Int,
@@ -114,6 +118,7 @@ object PrefForm {
         follow = follow == 1,
         highlight = display.highlight == 1,
         destination = display.destination == 1,
+        playerTurnIndicator = display.playerTurnIndicator == 1,
         coords = display.coords,
         replay = display.replay,
         //gameResult = display.gameResult,
@@ -133,7 +138,8 @@ object PrefForm {
         resizeHandle = display.resizeHandle | pref.resizeHandle,
         rookCastle = behavior.rookCastle | pref.rookCastle,
         pieceNotation = display.pieceNotation | pref.pieceNotation,
-        moveEvent = behavior.moveEvent | pref.moveEvent
+        moveEvent = behavior.moveEvent | pref.moveEvent,
+        mancalaMove = behavior.mancalaMove | pref.mancalaMove
       )
   }
 
@@ -143,6 +149,7 @@ object PrefForm {
         display = DisplayData(
           highlight = if (pref.highlight) 1 else 0,
           destination = if (pref.destination) 1 else 0,
+          playerTurnIndicator = if(pref.playerTurnIndicator) 1 else 0,
           animation = pref.animation,
           coords = pref.coords,
           replay = pref.replay,
@@ -156,6 +163,7 @@ object PrefForm {
         ),
         behavior = BehaviorData(
           moveEvent = pref.moveEvent.some,
+          mancalaMove = pref.mancalaMove.some,
           premove = if (pref.premove) 1 else 0,
           takeback = pref.takeback,
           autoQueen = pref.autoQueen,

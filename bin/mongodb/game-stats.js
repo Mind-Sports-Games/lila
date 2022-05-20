@@ -45,3 +45,4 @@ db.game5.aggregate([
 //src/main/scala/fairysf/variant/MiniXiangqi.scala:      id = 4,
 //src/main/scala/fairysf/variant/Shogi.scala:      id = 1,
 //src/main/scala/fairysf/variant/Xiangqi.scala:      id = 2,
+//src/main/scala/mancala/variant/Oware.scala:      id = 1,

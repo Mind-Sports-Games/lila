@@ -139,6 +139,7 @@ export interface Board {
   p2: BoardPlayer;
   isMicroMatch: boolean;
   microMatchGameId?: string;
+  microMatchGame?: Board;
   clock?: {
     p1: number;
     p2: number;

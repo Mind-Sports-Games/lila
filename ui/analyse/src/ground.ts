@@ -91,6 +91,10 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             ? 'https://playstrategy.org/assets/piece/flipello/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
               '/'
+            : variantKey === 'oware'
+            ? 'https://playstrategy.org/assets/piece/mancala/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'mancala')[0].name +
+              '/'
             : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +

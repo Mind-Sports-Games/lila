@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import strategygames.format.{ FEN, Uci, LexicalUci }
+import strategygames.format.{ FEN, LexicalUci, Uci }
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameLogic }
 import org.joda.time.DateTime
@@ -200,14 +200,16 @@ object JsonApi {
 
   object readers {
     import play.api.libs.functional.syntax._
-    implicit val ClientVersionReads      = Reads.of[String].map(Client.Version(_))
-    implicit val ClientPythonReads       = Reads.of[String].map(Client.Python(_))
-    implicit val ClientKeyReads          = Reads.of[String].map(Client.Key(_))
-    implicit val StockfishReads          = Json.reads[Request.Stockfish]
-    implicit val FishnetReads            = Json.reads[Request.Fishnet]
-    implicit val AcquireReads            = Json.reads[Request.Acquire]
-    implicit val ScoreReads              = Json.reads[Request.Evaluation.Score]
-    implicit val uciListReadsLexicalUcis = Reads.of[String] map { str => str.split(" ").flatMap(LexicalUci.apply) }
+    implicit val ClientVersionReads = Reads.of[String].map(Client.Version(_))
+    implicit val ClientPythonReads  = Reads.of[String].map(Client.Python(_))
+    implicit val ClientKeyReads     = Reads.of[String].map(Client.Key(_))
+    implicit val StockfishReads     = Json.reads[Request.Stockfish]
+    implicit val FishnetReads       = Json.reads[Request.Fishnet]
+    implicit val AcquireReads       = Json.reads[Request.Acquire]
+    implicit val ScoreReads         = Json.reads[Request.Evaluation.Score]
+    implicit val uciListReadsLexicalUcis = Reads.of[String] map { str =>
+      str.split(" ").flatMap(LexicalUci.apply)
+    }
 
     implicit val EvaluationReads: Reads[Request.Evaluation[LexicalUci]] = (
       (__ \ "pv").readNullable[String].map(~_).map(_.split(" ").flatMap(LexicalUci.apply).toList) and
@@ -231,7 +233,11 @@ object JsonApi {
 
   object writers {
     implicit val VariantWrites = Writes[Variant] { v =>
-      JsString(v.key)
+      v.key match {
+        case "fiveCheck"  => JsString("5check")
+        case "noCastling" => JsString("nocastle")
+        case key          => JsString(key)
+      }
     }
     implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g =>
       Json.obj(

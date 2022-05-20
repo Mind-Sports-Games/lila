@@ -6,6 +6,7 @@
   <string name="materialDifference">Material difference</string>
   <string name="boardHighlights">Board highlights (last move and check)</string>
   <string name="pieceDestinations">Piece destinations (valid moves and premoves)</string>
+  <string name="playerTurnIndicator">Additional player turn indicator</string>
   <string name="boardCoordinates">Board coordinates (A-H, 1-8)</string>
   <string name="moveListWhilePlaying">Move list while playing</string>
   <string name="pgnPieceNotation">Move notation</string>
@@ -26,6 +27,9 @@
   <string name="clickTwoSquares">Click two squares</string>
   <string name="dragPiece">Drag a piece</string>
   <string name="bothClicksAndDrag">Either</string>
+  <string name="howDoYouMoveMancalaSeeds">How do you move Mancala seeds?</string>
+  <string name="singleClick">Single click</string>
+  <string name="clickTwoHouses">Click/Drag start and destination houses</string>
   <string name="premovesPlayingDuringOpponentTurn">Premoves (playing during opponent turn)</string>
   <string name="takebacksWithOpponentApproval">Takebacks (with opponent approval)</string>
   <string name="inCasualGamesOnly">In casual games only</string>

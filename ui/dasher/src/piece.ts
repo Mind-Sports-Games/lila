@@ -82,7 +82,7 @@ export function view(ctrl: PieceCtrl): VNode {
   ]);
 }
 
-const gameFamily: GameFamilyKey[] = ['chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello'];
+const gameFamily: GameFamilyKey[] = ['chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello', 'mancala'];
 
 function gameFamilyOption(v: GameFamilyKey, sv: string) {
   if (v === sv) {

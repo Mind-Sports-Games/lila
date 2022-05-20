@@ -64,6 +64,10 @@ object pref {
               radios(form("display.destination"), booleanChoices)
             ),
             setting(
+              playerTurnIndicator(),
+              radios(form("display.playerTurnIndicator"), booleanChoices)
+            ),
+            setting(
               boardCoordinates(),
               radios(form("display.coords"), translatedBoardCoordinateChoices)
             ),
@@ -110,6 +114,10 @@ object pref {
             setting(
               howDoYouMovePieces(),
               radios(form("behavior.moveEvent"), translatedMoveEventChoices)
+            ),
+            setting(
+              howDoYouMoveMancalaSeeds(),
+              radios(form("behavior.mancalaMove"), translatedMancalaMoveChoices)
             ),
             setting(
               premovesPlayingDuringOpponentTurn(),

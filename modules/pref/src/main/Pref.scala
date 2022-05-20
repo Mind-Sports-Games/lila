@@ -26,6 +26,7 @@ case class Pref(
     follow: Boolean,
     highlight: Boolean,
     destination: Boolean,
+    playerTurnIndicator: Boolean,
     coords: Int,
     replay: Int,
     gameResult: Int,
@@ -41,6 +42,7 @@ case class Pref(
     zen: Int,
     rookCastle: Int,
     moveEvent: Int,
+    mancalaMove: Int,
     pieceNotation: Int,
     resizeHandle: Int,
     tags: Map[String, String] = Map.empty
@@ -60,7 +62,7 @@ case class Pref(
   def realSoundSet = SoundSet(soundSet)
 
   def coordPlayerIndexName = PlayerOrder.choices.toMap.get(coordPlayerIndex).fold("random")(_.toLowerCase)
-  def coordsClass    = Coords classOf coords
+  def coordsClass          = Coords classOf coords
 
   def hasDgt = tags contains Tag.dgt
 
@@ -71,7 +73,7 @@ case class Pref(
       // case "theme" =>
       //    copy(theme = Theme.updateBoardTheme(theme, value)).some
       case "pieceSet" =>
-          copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
+        copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
         Theme3d.allByName(0) get value map { t =>
           copy(theme3d = t.name)
@@ -112,7 +114,7 @@ case class Pref(
 
   def isAlgebraic(v: Variant) = v match {
     case Variant.Draughts(v) => canAlgebraic && v.boardSize.pos.hasAlgebraic
-    case _ => false
+    case _                   => false
   }
 
   def canAlgebraic = coordSystem == Pref.DraughtsCoordSystem.ALGEBRAIC
@@ -173,14 +175,14 @@ object Pref {
   }
 
   object PlayerOrder {
-    val P1  = 1
+    val P1     = 1
     val RANDOM = 2
-    val P2  = 3
+    val P2     = 3
 
     val choices = Seq(
-      P1  -> "P1",
+      P1     -> "P1",
       RANDOM -> "Random",
-      P2  -> "P2"
+      P2     -> "P2"
     )
   }
 
@@ -245,6 +247,16 @@ object Pref {
       CLICK -> "Click two squares",
       DRAG  -> "Drag a piece",
       BOTH  -> "Both clicks and drag"
+    )
+  }
+
+  object MancalaMove {
+    val SINGLE_CLICK    = 0
+    val TWO_HOUSE_CLICK = 1
+
+    val choices = Seq(
+      SINGLE_CLICK    -> "Single Click",
+      TWO_HOUSE_CLICK -> "Click/Drag start and destination houses"
     )
   }
 
@@ -358,11 +370,11 @@ object Pref {
 
   object DraughtsCoordSystem {
     val FIELDNUMBERS = 0
-    val ALGEBRAIC = 1
+    val ALGEBRAIC    = 1
 
     val choices = Seq(
       FIELDNUMBERS -> "Fieldnumbers",
-      ALGEBRAIC -> "Algebraic"
+      ALGEBRAIC    -> "Algebraic"
     )
   }
 
@@ -457,6 +469,7 @@ object Pref {
     follow = true,
     highlight = true,
     destination = true,
+    playerTurnIndicator = true,
     coords = Coords.INSIDE,
     replay = Replay.ALWAYS,
     gameResult = DraughtsGameResult.DRAUGHTS,
@@ -473,6 +486,7 @@ object Pref {
     zen = Zen.NO,
     rookCastle = RookCastle.YES,
     moveEvent = MoveEvent.BOTH,
+    mancalaMove = MancalaMove.SINGLE_CLICK,
     pieceNotation = PieceNotation.SYMBOL,
     resizeHandle = ResizeHandle.INITIAL,
     tags = Map.empty

@@ -9,6 +9,8 @@ db.pref.find().forEach(c => {
           { name: 'check_yb_loa', gameFamily: 2 },
           { name: '2kanji', gameFamily: 3 },
           { name: '2dhanzi', gameFamily: 4 },
+          { name: 'fabirovsky_flipello', gameFamily: 5 },
+          { name: 'black_mancala', gameFamily: 6 },
         ],
       },
     }

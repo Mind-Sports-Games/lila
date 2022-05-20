@@ -121,7 +121,11 @@ trait SetupHelper { self: I18nHelper =>
   private def translatedGameFamilyChoice(
       gameFamily: GameFamily
   )(implicit lang: Lang): SelectChoice =
-    (encodeGameFamilyId(gameFamily), VariantKeys.gameFamilyName(gameFamily), VariantKeys.gameFamilyName(gameFamily).some)
+    (
+      encodeGameFamilyId(gameFamily),
+      VariantKeys.gameFamilyName(gameFamily),
+      VariantKeys.gameFamilyName(gameFamily).some
+    )
 
   def translatedVariantChoices(
       encode: Variant => String = encodeId
@@ -281,6 +285,12 @@ trait SetupHelper { self: I18nHelper =>
       (Pref.MoveEvent.CLICK, trans.preferences.clickTwoSquares.txt()),
       (Pref.MoveEvent.DRAG, trans.preferences.dragPiece.txt()),
       (Pref.MoveEvent.BOTH, trans.preferences.bothClicksAndDrag.txt())
+    )
+
+  def translatedMancalaMoveChoices(implicit lang: Lang) =
+    List(
+      (Pref.MancalaMove.SINGLE_CLICK, trans.preferences.singleClick.txt()),
+      (Pref.MancalaMove.TWO_HOUSE_CLICK, trans.preferences.clickTwoHouses.txt())
     )
 
   def translatedTakebackChoices(implicit lang: Lang) =

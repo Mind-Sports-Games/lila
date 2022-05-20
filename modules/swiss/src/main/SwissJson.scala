@@ -316,31 +316,34 @@ object SwissJson {
     case _ => None
   }
 
-  private[swiss] def boardJson(b: SwissBoard.WithGame) =
+  private[swiss] def boardGameJson(g: Game, p1: SwissBoard.Player, p2: SwissBoard.Player) =
     Json
       .obj(
-        "id"          -> b.game.id,
-        "gameLogic"   -> b.game.variant.gameLogic.name.toLowerCase(),
-        "gameFamily"  -> b.game.variant.gameFamily.key,
-        "variantKey"  -> b.game.variant.key,
-        "fen"         -> Forsyth.boardAndPlayer(b.game.variant.gameLogic, b.game.situation),
-        "lastMove"    -> ~b.game.lastMoveKeys,
-        "orientation" -> b.game.naturalOrientation.name,
-        "p1"          -> boardPlayerJson(b.board.p1),
-        "p2"          -> boardPlayerJson(b.board.p2)
-      )
-      .add(
-        "clock" -> b.game.clock.ifTrue(b.game.isBeingPlayed).map { c =>
+        "id"          -> g.id,
+        "gameLogic"   -> g.variant.gameLogic.name.toLowerCase(),
+        "gameFamily"  -> g.variant.gameFamily.key,
+        "variantKey"  -> g.variant.key,
+        "fen"         -> Forsyth.boardAndPlayer(g.variant.gameLogic, g.situation),
+        "lastMove"    -> ~g.lastMoveKeys,
+        "orientation" -> g.naturalOrientation.name,
+        "p1"          -> boardPlayerJson(p1),
+        "p2"          -> boardPlayerJson(p2)
+      ).add(
+        "clock" -> g.clock.ifTrue(g.isBeingPlayed).map { c =>
           Json.obj(
             "p1" -> c.remainingTime(P1).roundSeconds,
             "p2" -> c.remainingTime(P2).roundSeconds
           )
         }
       )
+
+  private[swiss] def boardJson(b: SwissBoard.WithGame) =
+    boardGameJson(b.game, b.board.p1, b.board.p2)
       .add("winner" -> b.game.winnerPlayerIndex.map(_.name))
       .add("boardSize" -> boardSizeJson(b.game.variant))
       .add("isMicroMatch" -> b.board.isMicroMatch)
       .add("microMatchGameId" -> b.board.microMatchGameId)
+      .add("microMatchGame" -> b.microMatchGame.map(g => boardGameJson(g, b.board.p2, b.board.p1)))
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(

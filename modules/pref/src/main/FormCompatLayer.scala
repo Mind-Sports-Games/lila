@@ -25,6 +25,7 @@ object FormCompatLayer {
         "behavior",
         List(
           "moveEvent",
+          "mancalaMove",
           "premove",
           "takeback",
           "autoQueen",
@@ -41,6 +42,7 @@ object FormCompatLayer {
           "captured",
           "highlight",
           "destination",
+          "playerTurnIndicator",
           "coords",
           "replay",
           "pieceNotation",
