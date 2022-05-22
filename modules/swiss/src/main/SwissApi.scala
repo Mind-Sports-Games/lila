@@ -462,12 +462,10 @@ final class SwissApi(
                   idGenerator.game.map(rematchId =>
                     SwissPairing.fields { f2 =>
                       colls.pairing.update
-                        .one($doc(f2.id -> pairing.id), $set(f2.microMatchGameId -> rematchId)) >>- {
+                        .one($doc(f2.id -> pairing.id), $set(f2.microMatchGameId -> rematchId)) >> {
                         val pairingUpdated = pairing.copy(microMatchGameId = Some(rematchId))
                         val game           = director.makeGame(swiss, playerMap, true)(pairingUpdated)
-                        gameRepo.insertDenormalized(game) >>- onStart(game.id).unit
-                        // >>- socket.reload(swiss.id) TODO: ??
-                        println("rematched")
+                        gameRepo.insertDenormalized(game) >> recomputeAndUpdateAll(pairing.swissId) >>- onStart(game.id)
                       }
                     }
                   )
