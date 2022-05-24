@@ -36,11 +36,12 @@ export function mergeSteps(steps: Step[], coordSystem: number): Step[] {
     } else {
       const originalStep = steps[i];
       for (let m = 0; m < step.captLen - 1 && i + 1 < steps.length; m++) {
-        if (m === 0){ 
-          originalStep.uci = originalStep.uci.substr(0, 4)
-        } else if (steps[i].uci.slice(-2) != steps[i + 1].uci.slice(0, 2)) {
+        if (m === 0) {
+          originalStep.uci = originalStep.uci.substr(0, 4);
+        } else if (steps[i].ply != steps[i + 1].ply && steps[i].uci.slice(-2) != steps[i + 1].uci.slice(-2)) {
+          // hack for multi choice capture, stop merging if the final move is next and the dests do not match (they should normally)
           break;
-        };
+        }
         i++;
         mergeStep(originalStep, steps[i]);
       }
