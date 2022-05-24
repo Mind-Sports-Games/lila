@@ -121,11 +121,14 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture
       // Fix bug - shorter option move capture (in pool) should be king in final row.
       const destPiece = state.pieces.get(dest);
       const destPos = key2pos(dest, state.boardSize);
-      if (destPiece && destPiece.role === "man" && 
-          ((destPiece.playerIndex === 'p1' && destPos[1] === 1) ||
-          (destPiece.playerIndex === 'p2' && destPos[1] === state.boardSize[1]))){
-          destPiece.role = "king";
-          state.pieces.set(dest, destPiece);
+      if (
+        destPiece &&
+        destPiece.role === 'man' &&
+        ((destPiece.playerIndex === 'p1' && destPos[1] === 1) ||
+          (destPiece.playerIndex === 'p2' && destPos[1] === state.boardSize[1]))
+      ) {
+        destPiece.role = 'king';
+        state.pieces.set(dest, destPiece);
       }
 
       for (let i = 0; i < allKeys.length; i++) {
@@ -153,7 +156,7 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture
 
   if (dest == state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captPiece);
-  
+
   const captured = captureUci ? (captureUci.length - 2) / 2 : 1,
     finalDest = captureUci ? key2pos(captureUci.slice(captureUci.length - 2) as cg.Key, bs) : destPos,
     variant = (state.movable && state.movable.variant) || (state.premovable && state.premovable.variant),
