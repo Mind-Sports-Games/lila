@@ -36,7 +36,11 @@ export function mergeSteps(steps: Step[], coordSystem: number): Step[] {
     } else {
       const originalStep = steps[i];
       for (let m = 0; m < step.captLen - 1 && i + 1 < steps.length; m++) {
-        if (m === 0) originalStep.uci = originalStep.uci.substr(0, 4);
+        if (m === 0){ 
+          originalStep.uci = originalStep.uci.substr(0, 4)
+        } else if (steps[i].uci.slice(-2) != steps[i + 1].uci.slice(0, 2)) {
+          break;
+        };
         i++;
         mergeStep(originalStep, steps[i]);
       }
