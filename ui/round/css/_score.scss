@@ -29,15 +29,17 @@ body.mancala-dark-wood .variant-oware .game-score {
   .variant-#{$variant} .game-score {
     @extend %box-radius;
     display: block;
-    width: 7em;
-    height: 7em;
+    width: 35%;
+    padding-top: 35%;
+    position: relative;
     background-color: #aaa;
 
     piece {
-      display: block;
       width: 100% !important;
       height: 100% !important;
-      position: relative;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
     &-top {
@@ -54,12 +56,17 @@ body.mancala-dark-wood .variant-oware .game-score {
       &-top {
         grid-area: pocket-top;
         margin-left: 20%;
+        width: 20%;
+        padding-top: 20%;
+        margin-bottom: 0;
       }
 
       &-bottom {
         grid-area: pocket-top;
         margin-left: 65%;
         margin-top: 0;
+        width: 20%;
+        padding-top: 20%;
       }
     }
 

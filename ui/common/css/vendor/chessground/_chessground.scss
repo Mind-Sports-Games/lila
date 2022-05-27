@@ -455,12 +455,12 @@ cg-container .cg-custom-svgs svg {
 
 .variant-oware .round__app__board {
   padding-bottom: calc(213.333 * 100% / 640);
-  padding-top: calc(0.38 * 213.333 * 100% / 640);
+  margin-top: calc(213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
 
   @include breakpoint($mq-col1-uniboard) {
-    padding-top: 5px;
-    margin-bottom: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
   }
 }
 
@@ -470,6 +470,11 @@ cg-container .cg-custom-svgs svg {
 
 .variant-oware .analyse__board {
   padding-bottom: calc(213.333 * 100% / 640);
-  padding-top: calc(0.38 * 213.333 * 100% / 640);
+  margin-top: calc(213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
+
+  @include breakpoint($mq-col1-uniboard) {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
 }
