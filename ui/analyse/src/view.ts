@@ -351,14 +351,16 @@ export default function (ctrl: AnalyseCtrl): VNode {
     }
   }
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(variantKey)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'oware'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) ? '.piece-letter' : '';
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)
+    ? '.piece-letter'
+    : '';
   return h(
     `main.analyse.variant-${variantKey}${notationBasic}.${ctrl.data.game.gameFamily}`,
     {
