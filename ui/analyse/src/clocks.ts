@@ -26,6 +26,16 @@ export default function renderClocks(ctrl: AnalyseCtrl): [VNode, VNode] | undefi
 
   const showTenths = !ctrl.study || !ctrl.study.relay;
 
+  //fix display of starting clock for not starting in time for swiss match
+  const initialTime = ctrl.data.clock ? ctrl.data.clock?.initial * 100 : centis[1];
+  if (node.ply === 0) {
+    centis[0] = initialTime;
+    centis[1] = initialTime;
+  }
+  if (node.ply === 1) {
+    centis[1] = initialTime;
+  }
+
   return [
     renderClock(centis[0], isP1Turn, p1Pov ? 'bottom' : 'top', showTenths),
     renderClock(centis[1], !isP1Turn, p1Pov ? 'top' : 'bottom', showTenths),

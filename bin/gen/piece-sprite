@@ -67,7 +67,8 @@ mancala_themes =[
   ['red_mancala', 'svg'],
   ['green_mancala', 'svg'],
   ['blue_mancala', 'svg'],
-  ['grey_mancala', 'svg']
+  ['grey_mancala', 'svg'],
+  ['green_numbers_mancala', 'svg'],
 ]
 types = {
   'svg' => 'svg+xml;base64,',
