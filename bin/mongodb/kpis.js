@@ -50,11 +50,11 @@ db.game5.aggregate([
   {
     $project: {
       date: {
-        day: {$dayOfMonth: '$ca' },
+        day: { $dayOfMonth: '$ca' },
         month: { $month: '$ca' },
         year: { $year: '$ca' },
-      }
-    }
+      },
+    },
   },
   {
     $group: {
