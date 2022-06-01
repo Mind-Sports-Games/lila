@@ -86,7 +86,11 @@ export default class RoundController {
   private music?: any;
 
   constructor(readonly opts: RoundOpts, readonly redraw: Redraw) {
-    opts.data.steps = round.mergeSteps(opts.data.steps, this.isAlgebraic(opts.data) ? 1 : 0);
+    opts.data.steps = round.mergeSteps(
+      opts.data.steps,
+      this.isAlgebraic(opts.data) ? 1 : 0,
+      opts.data.game.variant.key
+    );
     round.massage(opts.data);
 
     const d = (this.data = opts.data);
@@ -428,7 +432,7 @@ export default class RoundController {
   }
 
   reload = (d: RoundData): void => {
-    d.steps = round.mergeSteps(d.steps, this.coordSystem());
+    d.steps = round.mergeSteps(d.steps, this.coordSystem(), d.game.variant.key);
     if (d.steps.length !== this.data.steps.length) this.ply = d.steps[d.steps.length - 1].ply;
     round.massage(d);
     this.data = d;
