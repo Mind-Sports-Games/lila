@@ -44,6 +44,29 @@ db.game5.aggregate([
   { $sort: { '_id.date.year': -1, '_id.date.month': -1, count: -1 } },
 ]);
 
+//total game count over time by matched games (lib and varaint)
+db.game5.aggregate([
+  { $match: { l: 0, v: 5 } },
+  {
+    $project: {
+      date: {
+        day: { $dayOfMonth: '$ca' },
+        month: { $month: '$ca' },
+        year: { $year: '$ca' },
+      },
+    },
+  },
+  {
+    $group: {
+      _id: {
+        date: '$date',
+      },
+      count: { $sum: 1 },
+    },
+  },
+  { $sort: { '_id.date.year': 1, '_id.date.month': 1, '_id.date.day': 1 } },
+]);
+
 //total game count per month
 db.game5.aggregate([
   {
@@ -132,6 +155,9 @@ db.user4.find().forEach(function (user) {
 
 //most games played by user (top 10)
 db.user4.find({}, { 'count.game': 1 }).sort({ 'count.game': -1 }).limit(10);
+
+//most time players by user (top 10)
+db.user4.find({}, { 'time.total': 1 }).sort({ 'time.total': -1 }).limit(10);
 
 //Users over time ( added each month)
 print(db.user4.count() + ' total users');
