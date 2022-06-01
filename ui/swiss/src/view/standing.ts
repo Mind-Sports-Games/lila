@@ -29,7 +29,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
             })
           : [player.rank]
       ),
-      h('td.player', renderPlayer(player, false, true)),
+      h('td.player', renderPlayer(player, false, !ctrl.data.isMedley)),
       h(
         'td.pairings',
         h(
@@ -64,7 +64,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
         )
       ),
       h('td.points', title('Points'), '' + (isMM ? player.points * 2 : player.points)),
-      h('td.tieBreak', title('Tie Break'), '' + player.tieBreak),
+      h('td.tieBreak', title('Tiebreak'), '' + player.tieBreak),
     ]
   );
 }

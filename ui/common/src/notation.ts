@@ -4,7 +4,7 @@ interface ExtendedMoveInfo {
   san: string;
   uci: string;
   fen: string;
-  prevFen?: string; //needed for shogi not xiangqi
+  prevFen?: string; //needed for shogi and oware not xiangqi
 }
 
 interface ParsedMove {
@@ -26,6 +26,8 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
       return move => move.uci;
     case 'dpo':
       return destPosOnlyNotation;
+    case 'man':
+      return mancalaNotation;
   }
 }
 
@@ -346,4 +348,32 @@ function destPosOnlyNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const destPos = dest[0] + newRank;
 
   return `${destPos}`;
+}
+
+function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  const reg = move.uci.match(/[a-z][1-2]/g) as string[];
+  const orig = reg[0];
+  const origLetter =
+    orig[1] === '1'
+      ? orig[0].toUpperCase()
+      : nextAsciiLetter(orig[0], (96 - orig.charCodeAt(0)) * 2 + variant.boardSize.width + 1);
+  //captured number of stones
+  const scoreDiff =
+    getOwareScore(move.fen, 'p1') +
+    getOwareScore(move.fen, 'p2') -
+    getOwareScore(move.prevFen!, 'p1') -
+    getOwareScore(move.prevFen!, 'p2');
+  const scoreText = scoreDiff <= 0 ? '' : ` + ${scoreDiff}`;
+  return `${origLetter}${scoreText}`;
+}
+
+function nextAsciiLetter(letter: string, n: number): string {
+  return String.fromCharCode(letter.charCodeAt(0) + n);
+}
+
+export function getOwareScore(fen: string, playerIndex: string): number {
+  const pIndex = playerIndex === 'p1' ? 1 : 2;
+  const asciiNum = fen.split(' ')[pIndex].charCodeAt(0);
+  if (asciiNum == 48) return 0;
+  return asciiNum > 90 ? asciiNum - 70 : asciiNum - 64;
 }

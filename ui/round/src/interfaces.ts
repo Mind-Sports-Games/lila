@@ -55,6 +55,7 @@ export interface RoundData extends GameData {
   forecastCount?: number;
   crazyhouse?: CrazyData;
   onlyDropsVariant: boolean;
+  hasGameScore: boolean;
   correspondence: CorresClockData;
   url: {
     socket: string;
@@ -176,11 +177,13 @@ export interface Pref {
   confirmResign: boolean;
   coords: Prefs.Coords;
   destination: boolean;
+  playerTurnIndicator: boolean;
   enablePremove: boolean;
   highlight: boolean;
   is3d: boolean;
   keyboardMove: boolean;
   moveEvent: Prefs.MoveEvent;
+  mancalaMove: boolean;
   replay: Prefs.Replay;
   rookCastle: boolean;
   showCaptured: boolean;

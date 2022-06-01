@@ -5,6 +5,7 @@ import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.draughts
 import strategygames.fairysf
+import strategygames.mancala
 import strategygames.format
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -291,6 +292,26 @@ object BinaryFormat {
         .to(Map)
     }
 
+    def writeMancala(pieces: mancala.PieceMap): ByteArray = {
+      def posInt(pos: mancala.Pos): Int =
+        (pieces get pos).fold(0) { piece =>
+          piece.player.fold(0, 128) + piece.role.binaryInt
+        }
+      ByteArray(mancala.Pos.all.map(posInt(_).toByte).toArray)
+    }
+
+    def readMancala(ba: ByteArray, variant: mancala.variant.Variant): mancala.PieceMap = {
+      def intPiece(int: Int): Option[mancala.Piece] =
+        mancala.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map {
+          role => mancala.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
+        }
+      (mancala.Pos.all zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(int) map (pos -> _)
+        }
+        .to(Map)
+    }
+
     // cache standard start position
     def standard(lib: GameLogic) = lib match {
       case GameLogic.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
@@ -298,6 +319,7 @@ object BinaryFormat {
         draughts.Board.init(draughts.variant.Standard).pieces,
         draughts.variant.Standard
       )
+      case GameLogic.Mancala() => writeMancala(mancala.Board.init(mancala.variant.Oware).pieces)
       case _ => sys.error("Cant write to binary for lib")
     }
 

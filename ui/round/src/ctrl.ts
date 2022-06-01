@@ -22,6 +22,7 @@ import MoveOn from './moveOn';
 import TransientMove from './transientMove';
 import * as atomic from './atomic';
 import * as flipello from './flipello';
+import * as oware from './oware';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -188,6 +189,9 @@ export default class RoundController {
       } else sound.capture();
     } else if (this.data.game.variant.key === 'flipello') {
       flipello.flip(this, dest, this.data.player.playerIndex);
+    } else if (this.data.game.variant.key === 'oware') {
+      //always play the capture sound regardless of move TODO change depending on number of stones?
+      sound.capture();
     } else sound.move();
   };
 
@@ -209,7 +213,8 @@ export default class RoundController {
   };
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
-    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello'].includes(this.data.game.variant.key)) return false;
+    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'oware'].includes(this.data.game.variant.key))
+      return false;
     if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'p-piece') return false;
     const pos = (dest[0] + orig[1]) as cg.Key;
     this.chessground.setPieces(new Map([[pos, undefined]]));
@@ -442,10 +447,18 @@ export default class RoundController {
           !o.castle ||
           (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
         ) {
-          this.chessground.move(keys[0], keys[1]);
+          if (d.game.variant.key === 'oware') {
+            this.chessground.moveNoAnim(keys[0], keys[1]);
+          } else {
+            this.chessground.move(keys[0], keys[1]);
+          }
         }
       }
-      if (this.data.onlyDropsVariant) {
+      if (d.game.variant.key === 'oware') {
+        // a lot of pieces can change from 1 move so update them all
+        oware.updateBoardFromMove(this, o.fen);
+      }
+      if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
       }
       if (o.promotion) ground.promote(this.chessground, o.promotion.key, o.promotion.pieceClass);
@@ -486,8 +499,9 @@ export default class RoundController {
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
     if (this.data.expiration) {
-      if (this.data.steps.length > 2) this.data.expiration = undefined;
-      else this.data.expiration.movedAt = Date.now();
+      if (this.data.steps.length > 2 && !this.data.pref.playerTurnIndicator) {
+        this.data.expiration = undefined;
+      } else this.data.expiration.movedAt = Date.now();
     }
     this.redraw();
     if (playing && playedPlayerIndex == d.player.playerIndex) {

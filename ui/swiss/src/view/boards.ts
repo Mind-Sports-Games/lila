@@ -21,8 +21,10 @@ const renderBoardState = (board: Board): string =>
     ? `${board.fen}|${board.boardSize.size[0]}x${board.boardSize.size[1]}|${board.orientation}|${board.lastMove}`
     : `${board.fen},${board.orientation},${board.lastMove}`;
 
-const renderBoard = (board: Board): VNode =>
-  h(
+const renderBoard = (incomingBoard: Board): VNode => {
+  const board =
+    incomingBoard.isMicroMatch && incomingBoard.microMatchGame ? incomingBoard.microMatchGame : incomingBoard;
+  return h(
     `div${renderBoardClasses(board)}`,
     {
       key: board.id,
@@ -46,6 +48,7 @@ const renderBoard = (board: Board): VNode =>
       boardPlayer(board, board.orientation),
     ]
   );
+};
 
 function boardPlayer(board: Board, playerIndex: PlayerIndex) {
   const player = board[playerIndex];

@@ -1,6 +1,7 @@
 package lila.swiss
 
 import strategygames.{ Player => PlayerIndex, GameLogic }
+import strategygames.variant.Variant
 import strategygames.format.FEN
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
@@ -11,14 +12,15 @@ import lila.user.User
 
 object BsonHandlers {
 
-  implicit val variantHandler       = variantByKeyHandler
-  implicit val stratVariantHandler  = stratVariantByKeyHandler
-  implicit val clockHandler         = clockConfigHandler
-  implicit val swissPointsHandler   = intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
-  implicit val swissTieBreakHandler = doubleAnyValHandler[Swiss.TieBreak](_.value, Swiss.TieBreak.apply)
+  implicit val stratVariantHandler = stratVariantByKeyHandler
+  implicit val clockHandler        = clockConfigHandler
+  implicit val swissPointsHandler  = intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
+  implicit val swissSBTieBreakHandler =
+    doubleAnyValHandler[Swiss.SonnenbornBerger](_.value, Swiss.SonnenbornBerger.apply)
+  implicit val swissBHTieBreakHandler = doubleAnyValHandler[Swiss.Buchholz](_.value, Swiss.Buchholz.apply)
   implicit val swissPerformanceHandler =
     floatAnyValHandler[Swiss.Performance](_.value, Swiss.Performance.apply)
-  implicit val swissScoreHandler  = intAnyValHandler[Swiss.Score](_.value, Swiss.Score.apply)
+  implicit val swissScoreHandler  = longAnyValHandler[Swiss.Score](_.value, Swiss.Score.apply)
   implicit val roundNumberHandler = intAnyValHandler[SwissRound.Number](_.value, SwissRound.Number.apply)
   implicit val swissIdHandler     = stringAnyValHandler[Swiss.Id](_.value, Swiss.Id.apply)
   implicit val playerIdHandler    = stringAnyValHandler[SwissPlayer.Id](_.value, SwissPlayer.Id.apply)
@@ -33,7 +35,8 @@ object BsonHandlers {
         rating = r int rating,
         provisional = r boolD provisional,
         points = r.get[Swiss.Points](points),
-        tieBreak = r.get[Swiss.TieBreak](tieBreak),
+        sbTieBreak = r.get[Swiss.SonnenbornBerger](sbTieBreak),
+        bhTieBreak = r.getO[Swiss.Buchholz](bhTieBreak),
         performance = r.getO[Swiss.Performance](performance),
         score = r.get[Swiss.Score](score),
         absent = r.boolD(absent),
@@ -47,7 +50,8 @@ object BsonHandlers {
         rating      -> o.rating,
         provisional -> w.boolO(o.provisional),
         points      -> o.points,
-        tieBreak    -> o.tieBreak,
+        sbTieBreak  -> o.sbTieBreak,
+        bhTieBreak  -> o.bhTieBreak,
         performance -> o.performance,
         score       -> o.score,
         absent      -> w.boolO(o.absent),
@@ -131,26 +135,30 @@ object BsonHandlers {
         isMicroMatch = r.boolO("m") | false,
         description = r.strO("d"),
         useDrawTables = r.boolO("dt") | false,
+        usePerPairingDrawTables = r.boolO("pdt") | false,
         position = r.getO[FEN]("f"),
         chatFor = r.intO("c") | Swiss.ChatFor.default,
         roundInterval = (r.intO("i") | 60).seconds,
         password = r.strO("p"),
         conditions = r.getO[SwissCondition.All]("o") getOrElse SwissCondition.All.empty,
-        forbiddenPairings = r.getD[String]("fp")
+        forbiddenPairings = r.getD[String]("fp"),
+        medleyVariants = r.getO[List[Variant]]("mv")
       )
     def writes(w: BSON.Writer, s: Swiss.Settings) =
       $doc(
-        "n"  -> s.nbRounds,
-        "r"  -> (!s.rated).option(false),
-        "m"  -> s.isMicroMatch,
-        "d"  -> s.description,
-        "dt" -> s.useDrawTables,
-        "f"  -> s.position,
-        "c"  -> (s.chatFor != Swiss.ChatFor.default).option(s.chatFor),
-        "i"  -> s.roundInterval.toSeconds.toInt,
-        "p"  -> s.password,
-        "o"  -> s.conditions.ifNonEmpty,
-        "fp" -> s.forbiddenPairings.some.filter(_.nonEmpty)
+        "n"   -> s.nbRounds,
+        "r"   -> (!s.rated).option(false),
+        "m"   -> s.isMicroMatch,
+        "d"   -> s.description,
+        "dt"  -> s.useDrawTables,
+        "pdt" -> s.usePerPairingDrawTables,
+        "f"   -> s.position,
+        "c"   -> (s.chatFor != Swiss.ChatFor.default).option(s.chatFor),
+        "i"   -> s.roundInterval.toSeconds.toInt,
+        "p"   -> s.password,
+        "o"   -> s.conditions.ifNonEmpty,
+        "fp"  -> s.forbiddenPairings.some.filter(_.nonEmpty),
+        "mv"  -> s.medleyVariants
       )
   }
 

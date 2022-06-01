@@ -2,7 +2,8 @@
 @import 'dark-board';
 
 cg-board {
-  @extend %box-shadow, %abs-100;
+  @extend %abs-100;
+  @extend %box-shadow;
 
   top: 0;
   left: 0;
@@ -15,18 +16,35 @@ cg-board {
   }
 }
 
-//miniboards
+//no background shadow for board as its has rounded corners.
+.variant-oware cg-board {
+  box-shadow: none;
+}
+
+//miniboards - alter non-square boards
 .variant-xiangqi.is2d {
   width: calc(100% * 10 / 11);
   margin-left: calc(50% / 11);
 }
+.mini-board.variant-oware.is2d {
+  padding-bottom: calc(213.333 * 100% / 640);
+  padding-top: calc(213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
+}
 
-//main board
+//only add for fixed mini-games, not the popup which create an <a>
+span.mini-game.variant-oware.is2d {
+  margin-top: calc(-213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
+}
+
+//main board - alter non-square boards
 .is2d .variant-xiangqi {
   width: calc(100% * 10 / 11);
   margin-right: calc(100% / 11);
 }
 
+//Squares
 .variant-shogi square {
   width: calc(100% / 9);
   height: calc(100% / 9);
@@ -47,12 +65,24 @@ cg-board {
   height: calc(100% / 7);
 }
 
+.variant-oware square {
+  width: calc(100% / 6);
+  height: calc(100% / 2);
+}
+
 $alternate-board-highlights: (
   'flipello-green': 'flipello',
   'flipello-green-marble': 'flipello',
   'flipello-wood': 'flipello',
 );
 $alternate-color: rgba(20, 30, 85, 0.5);
+
+$mancala-light-board-highlights: (
+  'mancala-light-wood': 'mancala',
+);
+$mancala-dark-board-highlights: (
+  'mancala-dark-wood': 'mancala',
+);
 
 square {
   position: absolute;
@@ -67,6 +97,48 @@ square {
     @each $color, $gameFamily in $alternate-board-highlights {
       body.#{$color} .#{$gameFamily} & {
         background: radial-gradient($alternate-color 19%, rgba(0, 0, 0, 0) 20%);
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-light-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/mancala/highlights/dashed.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-light-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.from {
+        background: url(../images/board/mancala/highlights/dashed.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.from {
+        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-light-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/mancala/highlights/dashed.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background-size: cover;
       }
     }
   }
@@ -87,6 +159,30 @@ square {
   @each $color, $gameFamily in $alternate-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move {
       background-color: $alternate-color;
+    }
+  }
+
+  @each $color, $gameFamily in $mancala-light-board-highlights {
+    body.#{$color} .#{$gameFamily} &.last-move.from {
+      background: url(../images/board/mancala/highlights/solid_darker.svg);
+      background-size: cover;
+    }
+
+    body.#{$color} .#{$gameFamily} &.last-move.to {
+      background: url(../images/board/mancala/highlights/dashed_darker.svg);
+      background-size: cover;
+    }
+  }
+
+  @each $color, $gameFamily in $mancala-dark-board-highlights {
+    body.#{$color} .#{$gameFamily} &.last-move.from {
+      background: url(../images/board/mancala/highlights/solid_lighter.svg);
+      background-size: cover;
+    }
+
+    body.#{$color} .#{$gameFamily} &.last-move.to {
+      background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+      background-size: cover;
     }
   }
 
@@ -118,6 +214,34 @@ square {
     body.loa-horsey & {
       background: url(../images/board/horsey.selected.png);
       background-size: cover;
+    }
+
+    @each $color, $gameFamily in $mancala-light-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/mancala/highlights/solid.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/mancala/highlights/solid_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-light-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/mancala/highlights/solid.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $mancala-dark-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/mancala/highlights/solid_lighter.svg);
+        background-size: cover;
+      }
     }
   }
 
@@ -180,6 +304,11 @@ square {
   height: calc(100% / 7);
 }
 
+.variant-oware piece {
+  width: calc(100% / 6);
+  height: calc(100% / 2);
+}
+
 piece {
   position: absolute;
   top: 0;
@@ -230,6 +359,11 @@ piece {
   padding-bottom: calc(100% / 7);
 }
 
+.variant-oware cg-helper {
+  width: calc(100% / 6);
+  padding-bottom: calc(100% / 6);
+}
+
 cg-helper {
   position: absolute;
   width: 12.5%;
@@ -256,6 +390,11 @@ cg-helper {
 .variant-minixiangqi cg-container {
   width: calc(100% * 7);
   height: calc(100% * 7);
+}
+
+.variant-oware cg-container {
+  width: calc(100% * 6);
+  height: calc(100% * 2);
 }
 
 cg-container {
@@ -295,7 +434,7 @@ cg-container .cg-custom-svgs svg {
   overflow: visible;
 }
 
-/* 9x10 - for non square boards*/
+/* 9x10 - for non square boards */
 .variant-xiangqi .cg-wrap {
   padding-bottom: calc(640 * 100% / 576);
 }
@@ -304,6 +443,38 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(640 * 100% / 576);
 }
 
+//swiss and arena
+.swiss__board,
+.tour__featured {
+  &.variant-oware .cg-wrap {
+    padding-bottom: calc(213.333 * 100% / 640);
+    padding-top: calc(213.333 * 100% / 640);
+    margin-bottom: calc(213.333 * 100% / 640);
+  }
+}
+
+.variant-oware .round__app__board {
+  padding-bottom: calc(213.333 * 100% / 640);
+  margin-top: calc(213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
+
+  @include breakpoint($mq-col1-uniboard) {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+}
+
 .variant-xiangqi .analyse__board {
   padding-bottom: calc(640 * 100% / 576);
+}
+
+.variant-oware .analyse__board {
+  padding-bottom: calc(213.333 * 100% / 640);
+  margin-top: calc(213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640);
+
+  @include breakpoint($mq-col1-uniboard) {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
 }

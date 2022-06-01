@@ -3,12 +3,12 @@ import SwissCtrl from '../ctrl';
 import { PodiumPlayer } from '../interfaces';
 import { userName } from './util';
 
-function podiumStats(p: PodiumPlayer, trans: Trans, isMM: boolean): VNode {
+function podiumStats(p: PodiumPlayer, trans: Trans, isMM: boolean, isMedley: boolean): VNode {
   const noarg = trans.noarg;
   return h('table.stats', [
     h('tr', [h('th', 'Points'), h('td', isMM ? '' + p.points * 2 : '' + p.points)]),
-    h('tr', [h('th', 'Tie Break'), h('td', '' + p.tieBreak)]),
-    p.performance ? h('tr', [h('th', noarg('performance')), h('td', '' + p.performance)]) : null,
+    h('tr', [h('th', 'Tiebreak'), h('td', '' + p.tieBreak)]),
+    p.performance && !isMedley ? h('tr', [h('th', noarg('performance')), h('td', '' + p.performance)]) : null,
   ]);
 }
 
@@ -28,7 +28,8 @@ function podiumPosition(
   pos: string,
   trophyImg: string,
   trans: Trans,
-  isMM: boolean
+  isMM: boolean,
+  isMedley: boolean
 ): VNode | undefined {
   return p
     ? h(
@@ -47,7 +48,7 @@ function podiumPosition(
             },
             userName(p.user)
           ),
-          podiumStats(p, trans, isMM),
+          podiumStats(p, trans, isMM, isMedley),
         ]
       )
     : undefined;
@@ -55,10 +56,11 @@ function podiumPosition(
 
 export default function podium(ctrl: SwissCtrl) {
   const isMM = ctrl.data.isMicroMatch;
+  const isMedley = ctrl.data.isMedley;
   const p = ctrl.data.podium || [];
   return h('div.podium', [
-    podiumPosition(p[1], 'second', ctrl.data.trophy2nd, ctrl.trans, isMM),
-    podiumPosition(p[0], 'first', ctrl.data.trophy1st, ctrl.trans, isMM),
-    podiumPosition(p[2], 'third', ctrl.data.trophy3rd, ctrl.trans, isMM),
+    podiumPosition(p[1], 'second', ctrl.data.trophy2nd, ctrl.trans, isMM, isMedley),
+    podiumPosition(p[0], 'first', ctrl.data.trophy1st, ctrl.trans, isMM, isMedley),
+    podiumPosition(p[2], 'third', ctrl.data.trophy3rd, ctrl.trans, isMM, isMedley),
   ]);
 }

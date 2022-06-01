@@ -23,6 +23,8 @@ export interface SwissData {
   startsAt: string;
   clock: Clock;
   variant: string;
+  isMedley: boolean;
+  roundVariant: string;
   p1Name: PlayerName;
   p2Name: PlayerName;
   p1Color: PlayerColor;
@@ -104,6 +106,7 @@ export interface BasePlayer {
   withdraw?: boolean;
   points: number;
   tieBreak: number;
+  tieBreak2: number;
   performance?: number;
   absent: boolean;
 }
@@ -136,6 +139,7 @@ export interface Board {
   p2: BoardPlayer;
   isMicroMatch: boolean;
   microMatchGameId?: string;
+  microMatchGame?: Board;
   clock?: {
     p1: number;
     p2: number;

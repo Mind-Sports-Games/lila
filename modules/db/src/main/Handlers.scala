@@ -38,6 +38,9 @@ trait Handlers {
   def intIsoHandler[A](implicit iso: IntIso[A]): BSONHandler[A]         = BSONIntegerHandler.as[A](iso.from, iso.to)
   def intAnyValHandler[A](to: A => Int, from: Int => A): BSONHandler[A] = intIsoHandler(Iso(from, to))
 
+  def longIsoHandler[A](implicit iso: LongIso[A]): BSONHandler[A]          = BSONLongHandler.as[A](iso.from, iso.to)
+  def longAnyValHandler[A](to: A => Long, from: Long => A): BSONHandler[A] = longIsoHandler(Iso(from, to))
+
   def booleanIsoHandler[A](implicit iso: BooleanIso[A]): BSONHandler[A] =
     BSONBooleanHandler.as[A](iso.from, iso.to)
   def booleanAnyValHandler[A](to: A => Boolean, from: Boolean => A): BSONHandler[A] =
@@ -129,18 +132,21 @@ trait Handlers {
 
   implicit val StratFENHandler: BSONHandler[StratFEN] = quickHandler[StratFEN](
     {
-      case BSONString(f) => f.split("~") match {
-        case Array(lib, f) => StratFEN(GameLogic(lib.toInt), f)
-        case Array(f) => StratFEN(GameLogic.Chess(), f)
-        case _ => sys.error("error decoding fen in handler")
-      }
+      case BSONString(f) =>
+        f.split("~") match {
+          case Array(lib, f) => StratFEN(GameLogic(lib.toInt), f)
+          case Array(f)      => StratFEN(GameLogic.Chess(), f)
+          case _             => sys.error("error decoding fen in handler")
+        }
       case _ => sys.error("fen not encoded in handler")
     },
-    f => f match {
-      case StratFEN.Chess(f)    => BSONString(s"0~${f.value}")
-      case StratFEN.Draughts(f) => BSONString(s"1~${f.value}")
-      case StratFEN.FairySF(f)  => BSONString(s"2~${f.value}")
-    }
+    f =>
+      f match {
+        case StratFEN.Chess(f)    => BSONString(s"0~${f.value}")
+        case StratFEN.Draughts(f) => BSONString(s"1~${f.value}")
+        case StratFEN.FairySF(f)  => BSONString(s"2~${f.value}")
+        case StratFEN.Mancala(f)  => BSONString(s"3~${f.value}")
+      }
   )
 
   implicit val modeHandler = BSONBooleanHandler.as[strategygames.Mode](strategygames.Mode.apply, _.rated)
@@ -155,13 +161,13 @@ trait Handlers {
 
   val stratVariantByKeyHandler: BSONHandler[StratVariant] = quickHandler[StratVariant](
     {
-      case BSONString(v) => v.split(":") match {
-        case Array(lib, v) => StratVariant orDefault(GameLogic(lib.toInt), v)
-        case Array(v)      => StratVariant orDefault(GameLogic.Chess(), v)
-        case _ => sys.error("lib not encoded into variant handler")
-      }
+      case BSONString(v) =>
+        v.split(":") match {
+          case Array(lib, v) => StratVariant orDefault (GameLogic(lib.toInt), v)
+          case Array(v)      => StratVariant orDefault (GameLogic.Chess(), v)
+          case _             => sys.error("lib not encoded into variant handler")
+        }
       case _ => sys.error("variant not encoded in handler. Previously this defaulted to standard chess")
-      //case _ => StratVariant.default(GameLogic.Chess())
     },
     v => BSONString(s"${v.gameLogic.id}:${v.key}")
   )

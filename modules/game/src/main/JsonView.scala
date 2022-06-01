@@ -134,12 +134,13 @@ object JsonView {
     v match {
       case Variant.Draughts(draughtsVariant) =>
         Json.obj(
-          "key"      -> v.key,
-          "name"     -> VariantKeys.variantName(v),
-          "short"    -> VariantKeys.variantShortName(v),
-          "gameType" -> v.gameType,
-          "board"    -> draughtsVariant.boardSize,
-          "lib"      -> v.gameLogic.id
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "gameType"  -> v.gameType,
+          "board"     -> draughtsVariant.boardSize,
+          "boardSize" -> draughtsVariant.boardSize,
+          "lib"       -> v.gameLogic.id
         )
       case Variant.FairySF(fairyVariant) =>
         Json.obj(
@@ -147,7 +148,15 @@ object JsonView {
           "name"      -> VariantKeys.variantName(v),
           "short"     -> VariantKeys.variantShortName(v),
           "lib"       -> v.gameLogic.id,
-          "boardSize" -> fairyVariant.boardSize
+          "boardSize" -> fairyVariant.boardSize,
+        )
+      case Variant.Mancala(mancalaVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> mancalaVariant.boardSize
         )
       case _ =>
         Json.obj(
@@ -170,12 +179,22 @@ object JsonView {
         "height" -> b.height
       )
     }
+  
+  implicit val boardSizeMancalaWriter: Writes[strategygames.mancala.Board.BoardSize] =
+    Writes[strategygames.mancala.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
 
   implicit val boardSizeWriter: Writes[strategygames.draughts.Board.BoardSize] =
     Writes[strategygames.draughts.Board.BoardSize] { b =>
       Json.obj(
         "key"  -> b.key,
-        "size" -> b.sizes
+        "size" -> b.sizes,
+        "width" -> b.width,
+        "height" -> b.height,
       )
     }
 

@@ -21,8 +21,9 @@ export const massage = (d: RoundData): void => {
   if (d.expiration) d.expiration.movedAt = Date.now() - d.expiration.idleMillis;
 };
 
-export function mergeSteps(steps: Step[], coordSystem: number): Step[] {
+export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: DraughtsVariantKey): Step[] {
   const mergedSteps: Step[] = new Array<Step>();
+  const choiceOfCaptureVariants: DraughtsVariantKey[] = ['pool', 'russian'];
   if (steps.length == 0) return mergedSteps;
   else mergedSteps.push(addNotation(steps[0], coordSystem));
 
@@ -36,7 +37,16 @@ export function mergeSteps(steps: Step[], coordSystem: number): Step[] {
     } else {
       const originalStep = steps[i];
       for (let m = 0; m < step.captLen - 1 && i + 1 < steps.length; m++) {
-        if (m === 0) originalStep.uci = originalStep.uci.substr(0, 4);
+        if (m === 0) {
+          originalStep.uci = originalStep.uci.substr(0, 4);
+        } else if (
+          choiceOfCaptureVariants.includes(varaintKey) &&
+          steps[i].ply != steps[i + 1].ply &&
+          steps[i].uci.slice(-2) != steps[i + 1].uci.slice(-2)
+        ) {
+          // hack for pool/russian multi choice capture, stop merging if the final move is next and the dests do not match (they should normally)
+          break;
+        }
         i++;
         mergeStep(originalStep, steps[i]);
       }

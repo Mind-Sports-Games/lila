@@ -1,9 +1,10 @@
 $c-setup: $c-secondary;
 $c-slider: $c-setup;
 
-$game-family: ('chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello');
+// these must all be the same size as we iterate through them...
+$game-family: ('chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello', 'mancala');
 
-$game-family-random-pieces: ('wbK.svg', 'wbK.png', 'bwL.png', 'bwK.png', 'rbK.png', 'bwP.png');
+$game-family-random-pieces: ('wbK.svg', 'wbK.png', 'bwL.png', 'bwK.png', 'rbK.png', 'bwP.png', 'mixed.svg');
 
 $game-family-p1-pieces: (
   'chess/cburnett/wK.svg',
@@ -11,7 +12,8 @@ $game-family-p1-pieces: (
   'loa/check_yb_loa/bL.png',
   'shogi/ctw/0GY.svg',
   'xiangqi/ka/RK.svg',
-  'flipello/classic_flipello/bP.png'
+  'flipello/classic_flipello/bP.png',
+  'mancala/south.svg'
 );
 
 $game-family-p2-pieces: (
@@ -20,7 +22,8 @@ $game-family-p2-pieces: (
   'loa/check_yb_loa/wL.png',
   'shogi/ctw/0OU.svg',
   'xiangqi/ka/BK.svg',
-  'flipello/classic_flipello/wP.png'
+  'flipello/classic_flipello/wP.png',
+  'mancala/north.svg'
 );
 
 .game-setup {
@@ -156,18 +159,21 @@ $game-family-p2-pieces: (
       margin: 1em auto;
       text-align: center;
 
+      $padding_button: if($gf == 'mancala', 0px, 7px);
+      $padding_random: if($gf == 'mancala', 0px, 10px);
+
       .playerIndex-submits__button {
         margin: 0 0.5em;
         width: 64px;
         height: 64px;
-        padding: 7px;
+        padding: $padding_button;
 
         i {
           display: block;
           padding: 0;
-          width: 50px;
-          height: 50px;
-          background-size: 50px 50px;
+          width: calc(64px - 2 * #{$padding_button});
+          height: calc(64px - 2 * #{$padding_button});
+          background-size: calc(64px - 2 * #{$padding_button}) calc(64px - 2 * #{$padding_button});
         }
 
         $p1-piece: nth($game-family-p1-pieces, $iter);
@@ -183,14 +189,14 @@ $game-family-p2-pieces: (
         &.random {
           width: 85px;
           height: 85px;
-          padding: 10px;
+          padding: $padding_random;
 
           $file: nth($game-family-random-pieces, $iter);
           & i {
             background-image: url(../piece/#{$gf}/#{$file});
-            background-size: 65px 65px;
-            width: 65px;
-            height: 65px;
+            background-size: calc(85px - 2 * #{$padding_random}) calc(85px - 2 * #{$padding_random});
+            width: calc(85px - 2 * #{$padding_random});
+            height: calc(85px - 2 * #{$padding_random});
           }
         }
 

@@ -105,7 +105,7 @@ final class SwissJson(
 
   private def updatePlayerRating(swiss: Swiss, player: SwissPlayer, user: User): Funit =
     swiss.settings.rated
-      .option(user perfs swiss.perfType)
+      .option(user perfs swiss.roundPerfType)
       .filter(_.intRating != player.rating)
       .?? { perf =>
         SwissPlayer.fields { f =>
@@ -153,11 +153,12 @@ final class SwissJson(
     case SwissPlayer.WithUserAndRank(player, user, rank) =>
       Json
         .obj(
-          "rank"     -> rank,
-          "points"   -> player.points.value,
-          "tieBreak" -> player.tieBreak.value,
-          "rating"   -> player.rating,
-          "username" -> user.name
+          "rank"      -> rank,
+          "points"    -> player.points.value,
+          "tieBreak"  -> player.tieBreak,
+          "tieBreak2" -> player.tieBreak2,
+          "rating"    -> player.rating,
+          "username"  -> user.name
         )
         .add("title" -> user.title)
         .add("performance" -> player.performance)
@@ -178,9 +179,11 @@ object SwissJson {
         "name"         -> swiss.name,
         "clock"        -> swiss.clock,
         "variant"      -> swiss.variant.key,
+        "isMedley"     -> swiss.isMedley,
         "p1Name"       -> swiss.variant.playerNames(P1),
         "p2Name"       -> swiss.variant.playerNames(P2),
         "round"        -> swiss.round,
+        "roundVariant" -> swiss.roundVariant.key,
         "nbRounds"     -> swiss.actualNbRounds,
         "nbPlayers"    -> swiss.nbPlayers,
         "nbOngoing"    -> swiss.nbOngoing,
@@ -244,10 +247,11 @@ object SwissJson {
   ): JsObject =
     Json
       .obj(
-        "user"     -> user,
-        "rating"   -> p.rating,
-        "points"   -> p.points,
-        "tieBreak" -> p.tieBreak
+        "user"      -> user,
+        "rating"    -> p.rating,
+        "points"    -> p.points,
+        "tieBreak"  -> p.tieBreak,
+        "tieBreak2" -> p.tieBreak2
       )
       .add("performance" -> (performance ?? p.performance))
       .add("provisional" -> p.provisional)
@@ -256,7 +260,6 @@ object SwissJson {
   private def outcomeJson(outcome: SwissSheet.Outcome): String =
     outcome match {
       case SwissSheet.Absent => "absent"
-      case SwissSheet.Late   => "late"
       case SwissSheet.Bye    => "bye"
       case _                 => ""
     }
@@ -313,31 +316,34 @@ object SwissJson {
     case _ => None
   }
 
-  private[swiss] def boardJson(b: SwissBoard.WithGame) =
+  private[swiss] def boardGameJson(g: Game, p1: SwissBoard.Player, p2: SwissBoard.Player) =
     Json
       .obj(
-        "id"          -> b.game.id,
-        "gameLogic"   -> b.game.variant.gameLogic.name.toLowerCase(),
-        "gameFamily"  -> b.game.variant.gameFamily.key,
-        "variantKey"  -> b.game.variant.key,
-        "fen"         -> Forsyth.boardAndPlayer(b.game.variant.gameLogic, b.game.situation),
-        "lastMove"    -> ~b.game.lastMoveKeys,
-        "orientation" -> b.game.naturalOrientation.name,
-        "p1"          -> boardPlayerJson(b.board.p1),
-        "p2"          -> boardPlayerJson(b.board.p2)
-      )
-      .add(
-        "clock" -> b.game.clock.ifTrue(b.game.isBeingPlayed).map { c =>
+        "id"          -> g.id,
+        "gameLogic"   -> g.variant.gameLogic.name.toLowerCase(),
+        "gameFamily"  -> g.variant.gameFamily.key,
+        "variantKey"  -> g.variant.key,
+        "fen"         -> Forsyth.boardAndPlayer(g.variant.gameLogic, g.situation),
+        "lastMove"    -> ~g.lastMoveKeys,
+        "orientation" -> g.naturalOrientation.name,
+        "p1"          -> boardPlayerJson(p1),
+        "p2"          -> boardPlayerJson(p2)
+      ).add(
+        "clock" -> g.clock.ifTrue(g.isBeingPlayed).map { c =>
           Json.obj(
             "p1" -> c.remainingTime(P1).roundSeconds,
             "p2" -> c.remainingTime(P2).roundSeconds
           )
         }
       )
+
+  private[swiss] def boardJson(b: SwissBoard.WithGame) =
+    boardGameJson(b.game, b.board.p1, b.board.p2)
       .add("winner" -> b.game.winnerPlayerIndex.map(_.name))
       .add("boardSize" -> boardSizeJson(b.game.variant))
       .add("isMicroMatch" -> b.board.isMicroMatch)
       .add("microMatchGameId" -> b.board.microMatchGameId)
+      .add("microMatchGame" -> b.microMatchGame.map(g => boardGameJson(g, b.board.p2, b.board.p1)))
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(
@@ -351,9 +357,6 @@ object SwissJson {
   }
   implicit private val pointsWriter: Writes[Swiss.Points] = Writes[Swiss.Points] { p =>
     JsNumber(p.value)
-  }
-  implicit private val tieBreakWriter: Writes[Swiss.TieBreak] = Writes[Swiss.TieBreak] { t =>
-    JsNumber(t.value)
   }
   implicit private val performanceWriter: Writes[Swiss.Performance] = Writes[Swiss.Performance] { t =>
     JsNumber(t.value.toInt)

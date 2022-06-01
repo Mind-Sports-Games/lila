@@ -13,7 +13,6 @@ private object SwissSheet {
 
   sealed trait Outcome
   case object Bye     extends Outcome
-  case object Late    extends Outcome // missed the first round
   case object Absent  extends Outcome
   case object Ongoing extends Outcome
   case object Win     extends Outcome
@@ -22,9 +21,9 @@ private object SwissSheet {
 
   def pointsFor(outcome: Outcome) =
     outcome match {
-      case Win | Bye   => 2
-      case Late | Draw => 1
-      case _           => 0
+      case Win | Bye => 2
+      case Draw      => 1
+      case _         => 0
     }
 
   def many(
@@ -46,12 +45,11 @@ private object SwissSheet {
         pairingMap get round match {
           case Some(pairing) =>
             pairing.status match {
-              case Left(_)            => Ongoing
-              case Right(None)        => Draw
+              case Left(_)                  => Ongoing
+              case Right(None)              => Draw
               case Right(Some(playerIndex)) => if (pairing(playerIndex) == player.userId) Win else Loss
             }
           case None if player.byes(round) => Bye
-          case None if round.value == 1   => Late
           case None                       => Absent
         }
       }

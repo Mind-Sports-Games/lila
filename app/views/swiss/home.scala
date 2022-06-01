@@ -69,7 +69,9 @@ object home {
               span(cls := "setup")(
                 s.clock.show,
                 " • ",
-                if (s.variant.exotic) VariantKeys.variantName(s.variant) else s.perfType.trans,
+                if (s.isMedley) trans.medley.txt()
+                else if (s.variant.exotic) VariantKeys.variantName(s.variant)
+                else s.perfType.trans,
                 " • ",
                 (if (s.settings.rated) trans.ratedTournament else trans.casualTournament)()
               )
@@ -106,7 +108,7 @@ object home {
       tr(
         th("Pairing system"),
         td("Any available opponent with similar ranking"),
-        td("Best pairing based on points and tie breaks")
+        td("Best pairing based on points and tiebreaks")
       ),
       tr(
         th("Pairing wait time"),
@@ -168,14 +170,20 @@ object home {
     div(cls := "faq")(
       i("?"),
       p(
-        strong("How are tie breaks calculated?"),
-        "With the ",
+        strong("How are tiebreaks calculated?"),
+        "From April 2022, the primary tiebreaker is the ",
+        a(
+          href := "https://en.wikipedia.org/wiki/Buchholz_system"
+        )("Buchholz System [BH]"),
+        " in full (without dropping any opponent scores). Put simply, this is the sum of all opponents tournament scores. Byes and opponents who are absent for rounds are handled as per FIDE guidelines.",
+        br,
+        "The secondary tiebreaker is the ",
         a(
           href := "https://en.wikipedia.org/wiki/Tie-breaking_in_Swiss-system_tournaments#Sonneborn%E2%80%93Berger_score"
-        )("Sonneborn–Berger score"),
-        ".",
+        )("Sonneborn–Berger score [SB]"),
+        ". Put simply, this is calculated by adding the scores of every opponent the player beats and half of the score of every opponent the player draws.",
         br,
-        "Add the scores of every opponent the player beats and half of the score of every opponent the player draws."
+        "The Sonneborn-Berger score is the primary tiebreaker for any Swiss tournaments run before April 2022."
       )
     ),
     div(cls := "faq")(
@@ -234,8 +242,7 @@ object home {
       p(
         strong("Can players late-join?"),
         "Yes, until more than half the rounds have started; for example in a 11-rounds swiss players can join before round 6 starts and in a 12-rounds before round 7 starts.",
-        br,
-        "Late joiners get a single bye, even if they missed several rounds."
+        br
       )
     ),
     div(cls := "faq")(

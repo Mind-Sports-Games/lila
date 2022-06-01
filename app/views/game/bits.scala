@@ -55,4 +55,13 @@ object bits {
       targetBlank,
       title := VariantKeys.variantTitle(variant)
     )(name)
+
+  def medleyLink =
+    a(
+      cls := "variant-link",
+      href := routes.Page.loneBookmark("medley"),
+      targetBlank,
+      title := "Medley"
+    )("MEDLEY")
+
 }

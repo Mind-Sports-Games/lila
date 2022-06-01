@@ -192,6 +192,9 @@
   <string name="variant">Variant</string>
   <string name="variants">Variants</string>
   <string name="rulesVariants">Rules &amp; Variants</string>
+  <string name="medley">Medley</string>
+  <string name="medleyTournaments">Medley Tournaments</string>
+  <string name="medleyDefinition">A different game in every round of the Swiss</string>
   <string name="timeControl">Time control</string>
   <string name="realTime">Real time</string>
   <string name="correspondence">Correspondence</string>
@@ -787,6 +790,10 @@ computer analysis, game chat and shareable URL.</string>
   <plurals name="nbSecondsToPlayTheFirstMove">
     <item quantity="one">%s second to play the first move</item>
     <item quantity="other">%s seconds to play the first move</item>
+  </plurals>
+  <plurals name="nbSecondsForOpponentToPlayTheFirstMove">
+    <item quantity="one">%s second for opponent to play first move</item>
+    <item quantity="other">%s seconds for opponent to play first move</item>
   </plurals>
   <string name="practiceWithComputer">Practice with computer</string>
   <string name="anotherWasX">Another was %s</string>

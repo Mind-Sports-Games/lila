@@ -62,7 +62,7 @@ export function displayGameFamily(gameFamilyKey: GameFamilyKey): string {
     case 'loa':
       return 'LinesOfAction';
     case 'flipello':
-      return 'Flipello';
+      return 'Othello';
     default:
       return gameFamilyKey.charAt(0).toUpperCase() + gameFamilyKey.slice(1);
   }
@@ -81,6 +81,8 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
       return 'xiangqi';
     case 'flipello':
       return 'flipello';
+    case 'oware':
+      return 'mancala';
     case 'russian':
     case 'brazilian':
     case 'breakthrough':

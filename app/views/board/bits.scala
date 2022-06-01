@@ -70,6 +70,7 @@ object bits {
       case FEN.Chess(_) => GameLogic.Chess().name
       case FEN.Draughts(_) => GameLogic.Draughts().name
       case FEN.FairySF(_) => GameLogic.FairySF().name
+      case FEN.Mancala(_) => GameLogic.Mancala().name
     }
     val orient = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)
