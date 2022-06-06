@@ -117,6 +117,126 @@ db.trophy.insert({
   url: '//playstrategy.org/swiss/9qUwBvTG',
   name: 'Crazyhouse Swiss - MSO GP 2022',
 });
+db.trophy.insert({
+  _id: 'msogp-gold-DRUGP-Dracarys',
+  kind: 'msogp-gold-medal',
+  user: 'dracarys',
+  date: ISODate('2022-05-14T23:59:00Z'),
+  url: '//playstrategy.org/swiss/X5QsyPDA',
+  name: 'Russian Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-OTSGP-SOLFAREMI',
+  kind: 'msogp-gold-medal',
+  user: 'solfaremi',
+  date: ISODate('2022-05-14T23:59:00Z'),
+  url: '//playstrategy.org/swiss/z1vvLnxU',
+  name: 'Othello Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-C3SGP-knightleap',
+  kind: 'msogp-gold-medal',
+  user: 'knightleap',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/ZgKruvOO',
+  name: 'Three Check Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-DANGP-derarzt',
+  kind: 'msogp-gold-medal',
+  user: 'derarzt',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/lMMzpkvw',
+  name: 'Antidraughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-DRKGP-FS-Schach',
+  kind: 'msogp-gold-medal',
+  user: 'fs-schach',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/RfudwA8Z',
+  name: 'Racing Kings Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-CKSGP-abdekker',
+  kind: 'msogp-gold-medal',
+  user: 'abdekker',
+  date: ISODate('2022-05-18T23:59:00Z'),
+  url: '//playstrategy.org/swiss/AV19dsnc',
+  name: 'King of the Hill Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-DBRGP-ayx',
+  kind: 'msogp-gold-medal',
+  user: 'ayx',
+  date: ISODate('2022-05-19T23:59:00Z'),
+  url: '//playstrategy.org/swiss/IEi4hVKk',
+  name: 'Brazilian Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-DMEGP-derarzt',
+  kind: 'msogp-gold-medal',
+  user: 'derarzt',
+  date: ISODate('2022-05-21T23:59:00Z'),
+  url: '//playstrategy.org/swiss/kTV4wbsC',
+  name: 'Draughts Medley Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-DBTGP-derarzt',
+  kind: 'msogp-gold-medal',
+  user: 'derarzt',
+  date: ISODate('2022-05-22T23:59:00Z'),
+  url: '//playstrategy.org/swiss/imlv8HOk',
+  name: 'Breakthrough Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-DFYGP-derarzt',
+  kind: 'msogp-gold-medal',
+  user: 'derarzt',
+  date: ISODate('2022-05-22T23:59:00Z'),
+  url: '//playstrategy.org/swiss/yM5IMuKy',
+  name: 'Frysk Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-DPOGP-Ramazon_Master_IDF',
+  kind: 'msogp-gold-medal',
+  user: 'ramazon_master_idf',
+  date: ISODate('2022-05-24T23:59:00Z'),
+  url: '//playstrategy.org/swiss/LFWq409r',
+  name: 'Pool Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-PSMGP-clawmac',
+  kind: 'msogp-gold-medal',
+  user: 'clawmac',
+  date: ISODate('2022-05-27T23:59:00Z'),
+  url: '//playstrategy.org/swiss/dHxPPVOh',
+  name: 'PlayStrategy Medley Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-CASGP-ginko81',
+  kind: 'msogp-gold-medal',
+  user: 'ginko81',
+  date: ISODate('2022-05-28T23:59:00Z'),
+  url: '//playstrategy.org/swiss/OpGOTBdq',
+  name: 'Atomic Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-CMSGP-AyushZzz',
+  kind: 'msogp-gold-medal',
+  user: 'ayushzzz',
+  date: ISODate('2022-05-29T23:59:00Z'),
+  url: '//playstrategy.org/swiss/jm8O8RJf',
+  name: 'Chess Medley Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-gold-OWAGP-mrjohnson',
+  kind: 'msogp-gold-medal',
+  user: 'mrjohnson',
+  date: ISODate('2022-05-29T23:59:00Z'),
+  url: '//playstrategy.org/swiss/sAhJOfNX',
+  name: 'Oware Swiss - MSO GP 2022',
+});
 
 //SILVER
 db.trophy.insert({
@@ -215,6 +335,126 @@ db.trophy.insert({
   url: '//playstrategy.org/swiss/9qUwBvTG',
   name: 'Crazyhouse Swiss - MSO GP 2022',
 });
+db.trophy.insert({
+  _id: 'msogp-silver-DRUGP-fulltilt',
+  kind: 'msogp-silver-medal',
+  user: 'fulltilt',
+  date: ISODate('2022-05-14T23:59:00Z'),
+  url: '//playstrategy.org/swiss/X5QsyPDA',
+  name: 'Russian Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-OTSGP-TuanViet',
+  kind: 'msogp-silver-medal',
+  user: 'tuanviet',
+  date: ISODate('2022-05-14T23:59:00Z'),
+  url: '//playstrategy.org/swiss/z1vvLnxU',
+  name: 'Othello Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-C3SGP-abdekker',
+  kind: 'msogp-silver-medal',
+  user: 'abdekker',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/ZgKruvOO',
+  name: 'Three Check Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-DANGP-drobakhin59',
+  kind: 'msogp-silver-medal',
+  user: 'drobakhin59',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/lMMzpkvw',
+  name: 'Antidraughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-DRKGP-berserker',
+  kind: 'msogp-silver-medal',
+  user: 'berserker',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/RfudwA8Z',
+  name: 'Racing Kings Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-CKSGP-Scabripok',
+  kind: 'msogp-silver-medal',
+  user: 'scabripok',
+  date: ISODate('2022-05-18T23:59:00Z'),
+  url: '//playstrategy.org/swiss/AV19dsnc',
+  name: 'King of the Hill Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-DBRGP-fulltilt',
+  kind: 'msogp-silver-medal',
+  user: 'fulltilt',
+  date: ISODate('2022-05-19T23:59:00Z'),
+  url: '//playstrategy.org/swiss/IEi4hVKk',
+  name: 'Brazilian Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-DMEGP-fulltilt',
+  kind: 'msogp-silver-medal',
+  user: 'fulltilt',
+  date: ISODate('2022-05-21T23:59:00Z'),
+  url: '//playstrategy.org/swiss/kTV4wbsC',
+  name: 'Draughts Medley Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-DBTGP-ZAS',
+  kind: 'msogp-silver-medal',
+  user: 'zas',
+  date: ISODate('2022-05-22T23:59:00Z'),
+  url: '//playstrategy.org/swiss/imlv8HOk',
+  name: 'Breakthrough Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-DFYGP-pergioco',
+  kind: 'msogp-silver-medal',
+  user: 'pergioco',
+  date: ISODate('2022-05-22T23:59:00Z'),
+  url: '//playstrategy.org/swiss/yM5IMuKy',
+  name: 'Frysk Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-DPOGP-Countess',
+  kind: 'msogp-silver-medal',
+  user: 'countess',
+  date: ISODate('2022-05-24T23:59:00Z'),
+  url: '//playstrategy.org/swiss/LFWq409r',
+  name: 'Pool Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-PSMGP-kspttw',
+  kind: 'msogp-silver-medal',
+  user: 'kspttw',
+  date: ISODate('2022-05-27T23:59:00Z'),
+  url: '//playstrategy.org/swiss/dHxPPVOh',
+  name: 'PlayStrategy Medley Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-CASGP-AyushZzz',
+  kind: 'msogp-silver-medal',
+  user: 'ayushzzz',
+  date: ISODate('2022-05-28T23:59:00Z'),
+  url: '//playstrategy.org/swiss/OpGOTBdq',
+  name: 'Atomic Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-CMSGP-BlackGoesFirst',
+  kind: 'msogp-silver-medal',
+  user: 'blackgoesfirst',
+  date: ISODate('2022-05-29T23:59:00Z'),
+  url: '//playstrategy.org/swiss/jm8O8RJf',
+  name: 'Chess Medley Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-silver-OWAGP-Calculus',
+  kind: 'msogp-silver-medal',
+  user: 'calculus',
+  date: ISODate('2022-05-29T23:59:00Z'),
+  url: '//playstrategy.org/swiss/sAhJOfNX',
+  name: 'Oware Swiss - MSO GP 2022',
+});
 
 //BRONZE
 db.trophy.insert({
@@ -312,4 +552,132 @@ db.trophy.insert({
   date: ISODate('2022-05-08T23:59:00Z'),
   url: '//playstrategy.org/swiss/9qUwBvTG',
   name: 'Crazyhouse Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-DRUGP-Maxvolchok13',
+  kind: 'msogp-bronze-medal',
+  user: 'maxvolchok13',
+  date: ISODate('2022-05-14T23:59:00Z'),
+  url: '//playstrategy.org/swiss/X5QsyPDA',
+  name: 'Russian Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-OTSGP-shimgar',
+  kind: 'msogp-bronze-medal',
+  user: 'shimgar',
+  date: ISODate('2022-05-14T23:59:00Z'),
+  url: '//playstrategy.org/swiss/z1vvLnxU',
+  name: 'Othello Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-C3SGP-ginko81',
+  kind: 'msogp-bronze-medal',
+  user: 'ginko81',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/ZgKruvOO',
+  name: 'Three Check Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-DANGP-vitalavvs',
+  kind: 'msogp-bronze-medal',
+  user: 'vitalavvs',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/lMMzpkvw',
+  name: 'Antidraughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-DANGP-raphael20odrich',
+  kind: 'msogp-bronze-medal',
+  user: 'raphael20odrich',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/lMMzpkvw',
+  name: 'Antidraughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-DRKGP-kspttw',
+  kind: 'msogp-bronze-medal',
+  user: 'kspttw',
+  date: ISODate('2022-05-15T23:59:00Z'),
+  url: '//playstrategy.org/swiss/RfudwA8Z',
+  name: 'Racing Kings Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-CKSGP-mrtake',
+  kind: 'msogp-bronze-medal',
+  user: 'mrtake',
+  date: ISODate('2022-05-18T23:59:00Z'),
+  url: '//playstrategy.org/swiss/AV19dsnc',
+  name: 'King of the Hill Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-DBRGP-matvey27',
+  kind: 'msogp-bronze-medal',
+  user: 'matvey27',
+  date: ISODate('2022-05-19T23:59:00Z'),
+  url: '//playstrategy.org/swiss/IEi4hVKk',
+  name: 'Brazilian Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-DMEGP-jankis',
+  kind: 'msogp-bronze-medal',
+  user: 'jankis',
+  date: ISODate('2022-05-21T23:59:00Z'),
+  url: '//playstrategy.org/swiss/kTV4wbsC',
+  name: 'Draughts Medley Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-DBTGP-pergioco',
+  kind: 'msogp-bronze-medal',
+  user: 'pergioco',
+  date: ISODate('2022-05-22T23:59:00Z'),
+  url: '//playstrategy.org/swiss/imlv8HOk',
+  name: 'Breakthrough Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-DFYGP-raphael20odrich',
+  kind: 'msogp-bronze-medal',
+  user: 'raphael20odrich',
+  date: ISODate('2022-05-22T23:59:00Z'),
+  url: '//playstrategy.org/swiss/yM5IMuKy',
+  name: 'Frysk Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-DPOGP-fulltilt',
+  kind: 'msogp-bronze-medal',
+  user: 'fulltilt',
+  date: ISODate('2022-05-24T23:59:00Z'),
+  url: '//playstrategy.org/swiss/LFWq409r',
+  name: 'Pool Draughts Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-PSMGP-Jheps',
+  kind: 'msogp-bronze-medal',
+  user: 'jheps',
+  date: ISODate('2022-05-27T23:59:00Z'),
+  url: '//playstrategy.org/swiss/dHxPPVOh',
+  name: 'PlayStrategy Medley Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-CASGP-BlackGoesFirst',
+  kind: 'msogp-bronze-medal',
+  user: 'blackgoesfirst',
+  date: ISODate('2022-05-28T23:59:00Z'),
+  url: '//playstrategy.org/swiss/OpGOTBdq',
+  name: 'Atomic Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-CMSGP-kspttw',
+  kind: 'msogp-bronze-medal',
+  user: 'kspttw',
+  date: ISODate('2022-05-29T23:59:00Z'),
+  url: '//playstrategy.org/swiss/jm8O8RJf',
+  name: 'Chess Medley Swiss - MSO GP 2022',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-OWAGP-roberisco',
+  kind: 'msogp-bronze-medal',
+  user: 'roberisco',
+  date: ISODate('2022-05-29T23:59:00Z'),
+  url: '//playstrategy.org/swiss/sAhJOfNX',
+  name: 'Oware Swiss - MSO GP 2022',
 });
