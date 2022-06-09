@@ -1888,6 +1888,9 @@ val `lagCompensationExplanation` = new I18nKey("lag:lagCompensationExplanation")
 object swiss {
 val `swissTournaments` = new I18nKey("swiss:swissTournaments")
 val `medleyGameFamilies` = new I18nKey("swiss:medleyGameFamilies")
+val `onePerGameFamily` = new I18nKey("onePerGameFamily")
+val `exoticChessVariants` = new I18nKey("exoticChessVariants")
+val `draughts64Variants` = new I18nKey("draughts64Variants")
 val `firstRound` = new I18nKey("swiss:firstRound")
 val `viewAllXRounds` = new I18nKey("swiss:viewAllXRounds")
 }
