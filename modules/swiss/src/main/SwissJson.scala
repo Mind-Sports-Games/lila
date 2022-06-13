@@ -17,6 +17,7 @@ import lila.game.Game
 import lila.quote.Quote.quoteWriter
 import lila.socket.Socket.SocketVersion
 import lila.user.{ User, UserRepo }
+import lila.i18n.VariantKeys
 
 final class SwissJson(
     colls: SwissColls,
@@ -173,24 +174,25 @@ object SwissJson {
   private def swissJsonBase(swiss: Swiss) =
     Json
       .obj(
-        "id"           -> swiss.id.value,
-        "createdBy"    -> swiss.createdBy,
-        "startsAt"     -> formatDate(swiss.startsAt),
-        "name"         -> swiss.name,
-        "clock"        -> swiss.clock,
-        "variant"      -> swiss.variant.key,
-        "isMedley"     -> swiss.isMedley,
-        "p1Name"       -> swiss.variant.playerNames(P1),
-        "p2Name"       -> swiss.variant.playerNames(P2),
-        "round"        -> swiss.round,
-        "roundVariant" -> swiss.roundVariant.key,
-        "nbRounds"     -> swiss.actualNbRounds,
-        "nbPlayers"    -> swiss.nbPlayers,
-        "nbOngoing"    -> swiss.nbOngoing,
-        "trophy1st"    -> swiss.trophy1st,
-        "trophy2nd"    -> swiss.trophy2nd,
-        "trophy3rd"    -> swiss.trophy3rd,
-        "isMicroMatch" -> swiss.settings.isMicroMatch,
+        "id"               -> swiss.id.value,
+        "createdBy"        -> swiss.createdBy,
+        "startsAt"         -> formatDate(swiss.startsAt),
+        "name"             -> swiss.name,
+        "clock"            -> swiss.clock,
+        "variant"          -> swiss.variant.key,
+        "isMedley"         -> swiss.isMedley,
+        "p1Name"           -> swiss.variant.playerNames(P1),
+        "p2Name"           -> swiss.variant.playerNames(P2),
+        "round"            -> swiss.round,
+        "roundVariant"     -> swiss.roundVariant.key,
+        "roundVariantName" -> VariantKeys.variantName(swiss.roundVariant),
+        "nbRounds"         -> swiss.actualNbRounds,
+        "nbPlayers"        -> swiss.nbPlayers,
+        "nbOngoing"        -> swiss.nbOngoing,
+        "trophy1st"        -> swiss.trophy1st,
+        "trophy2nd"        -> swiss.trophy2nd,
+        "trophy3rd"        -> swiss.trophy3rd,
+        "isMicroMatch"     -> swiss.settings.isMicroMatch,
         "status" -> {
           if (swiss.isStarted) "started"
           else if (swiss.isFinished) "finished"
@@ -328,7 +330,8 @@ object SwissJson {
         "orientation" -> g.naturalOrientation.name,
         "p1"          -> boardPlayerJson(p1),
         "p2"          -> boardPlayerJson(p2)
-      ).add(
+      )
+      .add(
         "clock" -> g.clock.ifTrue(g.isBeingPlayed).map { c =>
           Json.obj(
             "p1" -> c.remainingTime(P1).roundSeconds,
