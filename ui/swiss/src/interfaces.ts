@@ -25,6 +25,7 @@ export interface SwissData {
   variant: string;
   isMedley: boolean;
   roundVariant: string;
+  roundVariantName: string;
   p1Name: PlayerName;
   p2Name: PlayerName;
   p1Color: PlayerColor;
