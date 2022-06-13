@@ -31,6 +31,7 @@ object form {
             fields.microMatch,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
+            fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clock,
             form3.split(fields.description, fields.position),
@@ -70,6 +71,7 @@ object form {
             fields.microMatch,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
+            fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clock,
             form3.split(fields.description, fields.position),
@@ -180,6 +182,12 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         ).some
       )
     )
+  def medleyDefaults =
+    form3.split(
+      onePerGameFamily,
+      chessVariants,
+      draughts64
+    )
   def medleyGameFamilies =
     form3.split(
       chess,
@@ -191,6 +199,33 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       mancala
     )
 
+  private def onePerGameFamily =
+    frag(
+      form3.checkbox(
+        form("medleyDefaults.onePerGameFamily"),
+        "Where possible, use one game per game family",
+        klass = "medleyDefaults",
+        displayed = false
+      )
+    )
+  private def chessVariants =
+    frag(
+      form3.checkbox(
+        form("medleyDefaults.exoticChessVariants"),
+        "Only exotic chess variants",
+        klass = "medleyDefaults",
+        displayed = false
+      )
+    )
+  private def draughts64 =
+    frag(
+      form3.checkbox(
+        form("medleyDefaults.draughts64Variants"),
+        "Only draughts 64 variants",
+        klass = "medleyDefaults",
+        displayed = false
+      )
+    )
   private def chess =
     frag(
       form3.checkbox(

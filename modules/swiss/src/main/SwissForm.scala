@@ -32,6 +32,11 @@ final class SwissForm(implicit mode: Mode) {
           )
         ),
         "medley" -> optional(boolean),
+        "medleyDefaults" -> mapping(
+          "onePerGameFamily"    -> optional(boolean),
+          "exoticChessVariants" -> optional(boolean),
+          "draughts64Variants"  -> optional(boolean)
+        )(MedleyDefaults.apply)(MedleyDefaults.unapply),
         "medleyGameFamilies" -> mapping(
           "chess"    -> optional(boolean),
           "draughts" -> optional(boolean),
@@ -66,6 +71,11 @@ final class SwissForm(implicit mode: Mode) {
       }),
       variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
       medley = false.some,
+      medleyDefaults = MedleyDefaults(
+        onePerGameFamily = false.some,
+        exoticChessVariants = false.some,
+        draughts64Variants = false.some
+      ),
       medleyGameFamilies = MedleyGameFamilies(
         chess = true.some,
         draughts = true.some,
@@ -96,6 +106,11 @@ final class SwissForm(implicit mode: Mode) {
       startsAt = s.startsAt.some,
       variant = s"${s.variant.gameFamily.id}_${s.variant.id}".some,
       medley = s.isMedley.some,
+      medleyDefaults = MedleyDefaults(
+        onePerGameFamily = onePerGameFamilyInMedley(s.settings.medleyVariants).some,
+        exoticChessVariants = exoticChessVariants(s.settings.medleyVariants).some,
+        draughts64Variants = draughts64Variants(s.settings.medleyVariants).some
+      ),
       medleyGameFamilies = MedleyGameFamilies(
         chess = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Chess()).some,
         draughts = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Draughts()).some,
@@ -126,8 +141,24 @@ final class SwissForm(implicit mode: Mode) {
       )
     )
 
+  private def medleyVariantsList(medleyVariants: Option[List[Variant]]) =
+    medleyVariants.getOrElse(List[Variant]())
+
   private def gameFamilyInMedley(medleyVariants: Option[List[Variant]], gf: GameFamily) =
-    medleyVariants.getOrElse(List[Variant]()).map(v => v.gameFamily).contains(gf)
+    medleyVariantsList(medleyVariants).map(v => v.gameFamily).contains(gf)
+
+  private def onePerGameFamilyInMedley(medleyVariants: Option[List[Variant]]) = {
+    val mvList       = medleyVariantsList(medleyVariants)
+    val gameFamilies = mvList.map(_.gameFamily).distinct
+    mvList.map(_.gameFamily).take(gameFamilies.size) == gameFamilies && gameFamilies.size > 1
+  }
+
+  private def exoticChessVariants(medleyVariants: Option[List[Variant]]) =
+    medleyVariantsList(medleyVariants).filterNot(_.exoticChessVariant).isEmpty
+
+  private def draughts64Variants(medleyVariants: Option[List[Variant]]) =
+    medleyVariantsList(medleyVariants).filterNot(_.draughts64Variant).isEmpty
+
 }
 
 object SwissForm {
@@ -189,6 +220,7 @@ object SwissForm {
       startsAt: Option[DateTime],
       variant: Option[String],
       medley: Option[Boolean],
+      medleyDefaults: MedleyDefaults,
       medleyGameFamilies: MedleyGameFamilies,
       rated: Option[Boolean],
       microMatch: Option[Boolean],
@@ -239,11 +271,29 @@ object SwissForm {
 
     def isMedley = (medley | false) && medleyGameFamilies.gfList.nonEmpty
 
-    private def generateMedleyVariants: List[Variant] =
+    //shuffle all variants from the selected game families
+    private lazy val generateNoDefaultsMedleyVariants: List[Variant] =
       scala.util.Random
         .shuffle(
           Variant.all.filter(v => medleyGameFamilies.gfList.contains(v.gameFamily) && !v.fromPositionVariant)
         )
+
+    private def generateMedleyVariants: List[Variant] =
+      if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
+        //take a shuffled list of all variants and pull the first for each game family to the front
+        val onePerGameFamilyVariantList = scala.util.Random.shuffle(
+          medleyGameFamilies.gfList.map(gf =>
+            generateNoDefaultsMedleyVariants.filter(_.gameFamily == gf).head
+          )
+        )
+        onePerGameFamilyVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
+          onePerGameFamilyVariantList.contains(_)
+        )
+      } else if (medleyDefaults.exoticChessVariants.getOrElse(false))
+        scala.util.Random.shuffle(Variant.all.filter(_.exoticChessVariant))
+      else if (medleyDefaults.draughts64Variants.getOrElse(false))
+        scala.util.Random.shuffle(Variant.all.filter(_.draughts64Variant))
+      else generateNoDefaultsMedleyVariants
 
     def medleyVariants: Option[List[Variant]] =
       if (isMedley) {
@@ -252,7 +302,14 @@ object SwissForm {
         while (fullMedleyList.size < nbRounds) fullMedleyList = fullMedleyList ::: medleyList
         fullMedleyList.some
       } else None
+
   }
+
+  case class MedleyDefaults(
+      onePerGameFamily: Option[Boolean],
+      exoticChessVariants: Option[Boolean],
+      draughts64Variants: Option[Boolean]
+  )
 
   case class MedleyGameFamilies(
       chess: Option[Boolean],
