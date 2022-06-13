@@ -39,7 +39,7 @@ function clock(ctrl: SwissCtrl): VNode | undefined {
                 rel: 'noopener',
               },
             },
-            ctrl.data.roundVariant
+            ctrl.data.roundVariantName
           )
         : undefined,
     ]),
