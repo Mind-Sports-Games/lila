@@ -21,25 +21,25 @@ playstrategy.load.then(() => {
       showPosition();
       showDrawTables();
     },
-    toggleOther = (selector: Selector) => () => {
+    toggleOff = (selector: Selector) => {
       const $other = $(selector);
       if ($other.is(':checked')) {
         $other.prop('checked', false);
       }
     },
     toggleOnePerGameFamily = () => {
-      toggleOther('#form3-medleyDefaults_exoticChessVariants');
-      toggleOther('#form3-medleyDefaults_draughts64Variants');
+      toggleOff('#form3-medleyDefaults_exoticChessVariants');
+      toggleOff('#form3-medleyDefaults_draughts64Variants');
       $('.form3 .medleyGameFamily').toggle($medley.is(':checked'));
     },
     toggleChessVariants = () => {
-      toggleOther('#form3-medleyDefaults_onePerGameFamily');
-      toggleOther('#form3-medleyDefaults_draughts64Variants');
+      toggleOff('#form3-medleyDefaults_onePerGameFamily');
+      toggleOff('#form3-medleyDefaults_draughts64Variants');
       $('.form3 .medleyGameFamily').toggle(!$exoticChessVariants.is(':checked'));
     },
     toggleDraughts64Variants = () => {
-      toggleOther('#form3-medleyDefaults_onePerGameFamily');
-      toggleOther('#form3-medleyDefaults_exoticChessVariants');
+      toggleOff('#form3-medleyDefaults_onePerGameFamily');
+      toggleOff('#form3-medleyDefaults_exoticChessVariants');
       $('.form3 .medleyGameFamily').toggle(!$draughts64Variants.is(':checked'));
     };
 
@@ -49,8 +49,8 @@ playstrategy.load.then(() => {
 
   $variant.on('change', showPosition);
   $variant.on('change', showDrawTables);
-  $drawTables.on('change', toggleOther('#form3-perPairingDrawTables'));
-  $perPairingDrawTables.on('change', toggleOther('#form3-drawTables'));
+  $drawTables.on('change', () => toggleOff('#form3-perPairingDrawTables'));
+  $perPairingDrawTables.on('change', () => toggleOff('#form3-drawTables'));
   $medley.on('change', showMedleySettings);
   $onePerGameFamily.on('change', toggleOnePerGameFamily);
   $exoticChessVariants.on('change', toggleChessVariants);

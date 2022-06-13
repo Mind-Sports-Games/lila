@@ -279,7 +279,7 @@ object SwissForm {
         )
 
     private def generateMedleyVariants: List[Variant] =
-      if (medleyDefaults.pp("medleyDefaults").onePerGameFamily.getOrElse(false)) {
+      if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
         //take a shuffled list of all variants and pull the first for each game family to the front
         val onePerGameFamilyVariantList = scala.util.Random.shuffle(
           medleyGameFamilies.gfList.map(gf =>
