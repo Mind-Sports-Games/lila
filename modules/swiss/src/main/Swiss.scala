@@ -102,6 +102,8 @@ case class Swiss(
       clock.estimateTotalSeconds * 2 * settings.nbRounds > 3600 * 8
 
   lazy val looksLikePrize = lila.common.String.looksLikePrize(s"$name ${~settings.description}")
+
+  lazy val trophies = List(trophy1st, trophy2nd, trophy3rd)
 }
 
 object Swiss {

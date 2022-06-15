@@ -465,7 +465,9 @@ final class SwissApi(
                         .one($doc(f2.id -> pairing.id), $set(f2.microMatchGameId -> rematchId)) >> {
                         val pairingUpdated = pairing.copy(microMatchGameId = Some(rematchId))
                         val game           = director.makeGame(swiss, playerMap, true)(pairingUpdated)
-                        gameRepo.insertDenormalized(game) >> recomputeAndUpdateAll(pairing.swissId) >>- onStart(game.id)
+                        gameRepo.insertDenormalized(game) >> recomputeAndUpdateAll(
+                          pairing.swissId
+                        ) >>- onStart(game.id)
                       }
                     }
                   )
@@ -598,8 +600,7 @@ final class SwissApi(
             Bus.publish(SwissFinish(swiss.id, ranking), "swissFinish")
           }
         }
-        .unit
-      //awardTrophies(swiss).unit
+      awardTrophies(swiss).unit
     }
 
   def kill(swiss: Swiss): Funit = {
@@ -609,25 +610,29 @@ final class SwissApi(
     else funit
   } >>- cache.featuredInTeam.invalidate(swiss.teamId)
 
-  //def awardTrophies(swiss: Swiss): Funit = {
-  //  import lila.user.TrophyKind._
-  //  import lila.swiss.Swiss.swissUrl
-  //  swiss.trophy1st ?? { trophyKind =>
-  //    SwissPlayer
-  //      .fields { f =>
-  //        colls.player.primitiveOne[User.ID](
-  //          $doc(f.swissId -> swiss.id),
-  //          $sort desc f.score,
-  //          f.userId
-  //        )
-  //      }
-  //      .flatMap {
-  //        _.map { winnerUserId =>
-  //          trophyApi.award(swissUrl(swiss.id), winnerUserId.toString, trophyKind, swiss.name.some)
-  //        }
-  //      }
-  //  }
-  //}
+  private def awardTrophies(swiss: Swiss): Funit = {
+    import lila.user.TrophyKind._
+    import lila.swiss.Swiss.swissUrl
+    SwissPlayer
+      .fields { f =>
+        colls.player.primitive[User.ID](
+          $doc(f.swissId -> swiss.id),
+          $sort desc f.score,
+          3,
+          f.userId
+        )
+      }
+      .map(userIds =>
+        swiss.trophies
+          .zip(userIds)
+          .map { case (t, p) => t.zip(p.some) }
+          .flatten
+          .map { case (trophyKind, userId) =>
+            trophyApi.award(swissUrl(swiss.id), userId.toString, trophyKind, swiss.name.some)
+          }
+          .unit
+      )
+  }
 
   def roundInfo = cache.roundInfo.get _
 
