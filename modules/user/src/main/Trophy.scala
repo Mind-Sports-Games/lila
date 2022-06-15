@@ -7,6 +7,7 @@ case class Trophy(
     user: String,
     kind: TrophyKind,
     date: DateTime,
+    expiry: Option[DateTime],
     url: Option[String],
     name: Option[String]
 ) extends Ordered[Trophy] {

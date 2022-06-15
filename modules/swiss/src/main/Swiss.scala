@@ -32,7 +32,8 @@ case class Swiss(
     winnerId: Option[User.ID] = None,
     trophy1st: Option[String] = None,
     trophy2nd: Option[String] = None,
-    trophy3rd: Option[String] = None
+    trophy3rd: Option[String] = None,
+    trophyExpiryDays: Option[Int] = None
 ) {
   def id = _id
 
