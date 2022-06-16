@@ -628,7 +628,13 @@ final class SwissApi(
           .map { case (t, p) => t.zip(p.some) }
           .flatten
           .map { case (trophyKind, userId) =>
-            trophyApi.award(swissUrl(swiss.id), userId.toString, trophyKind, swiss.name.some)
+            trophyApi.award(
+              swissUrl(swiss.id),
+              userId.toString,
+              trophyKind,
+              swiss.name.some,
+              swiss.trophyExpiryDays
+            )
           }
           .unit
       )

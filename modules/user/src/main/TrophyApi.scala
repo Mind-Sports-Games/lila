@@ -43,7 +43,8 @@ final class TrophyApi(
         kind = kindCache sync TrophyKind.moderator,
         date = org.joda.time.DateTime.now,
         url = none,
-        name = none
+        name = none,
+        expiry = none
       ),
       isDev option Trophy(
         _id = "",
@@ -51,7 +52,8 @@ final class TrophyApi(
         kind = kindCache sync TrophyKind.developer,
         date = org.joda.time.DateTime.now,
         url = none,
-        name = none
+        name = none,
+        expiry = none
       ),
       isVerified option Trophy(
         _id = "",
@@ -59,7 +61,8 @@ final class TrophyApi(
         kind = kindCache sync TrophyKind.verified,
         date = org.joda.time.DateTime.now,
         url = none,
-        name = none
+        name = none,
+        expiry = none
       )
     ).flatten
 
@@ -67,17 +70,19 @@ final class TrophyApi(
       trophyUrl: String,
       userId: String,
       kindKey: String,
-      trophyName: Option[String] = None
+      trophyName: Option[String] = None,
+      trophyExpiryDays: Option[Int] = None
   ): Funit =
     coll.insert
       .one(
         $doc(
-          "_id"  -> lila.common.ThreadLocalRandom.nextString(8),
-          "user" -> userId,
-          "kind" -> kindKey,
-          "name" -> trophyName,
-          "url"  -> trophyUrl,
-          "date" -> DateTime.now
+          "_id"    -> lila.common.ThreadLocalRandom.nextString(8),
+          "user"   -> userId,
+          "kind"   -> kindKey,
+          "name"   -> trophyName,
+          "url"    -> trophyUrl,
+          "date"   -> DateTime.now,
+          "expiry" -> trophyExpiryDays.map(DateTime.now.plusDays(_))
         )
       ) void
 }
