@@ -698,8 +698,8 @@ db.trophyKind.insert({
   withCustomImage: true,
 });
 
-db.trophy.remove({"user":"kspttw", "kind":"msogp-silver-medal"})
-db.trophy.remove({"user":"kspttw", "kind":"msogp-bronze-medal"})
+db.trophy.remove({ user: 'kspttw', kind: 'msogp-silver-medal' });
+db.trophy.remove({ user: 'kspttw', kind: 'msogp-bronze-medal' });
 
 db.trophy.insert({
   _id: 'msogp-silver-6-kspttw',
