@@ -163,6 +163,12 @@ db.user4.find({}, { 'time.total': 1 }).sort({ 'time.total': -1 }).limit(10);
 print(db.user4.count() + ' total users');
 db.user4.aggregate([
   {
+    $match: {
+      "enabled": true,
+      "count.game" : {$gt : 0}
+    }
+  },
+  {
     $project: {
       date: {
         month: { $month: '$createdAt' },
