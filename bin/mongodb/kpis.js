@@ -164,9 +164,9 @@ print(db.user4.count() + ' total users');
 db.user4.aggregate([
   {
     $match: {
-      "enabled": true,
-      "count.game" : {$gt : 0}
-    }
+      enabled: true,
+      'count.game': { $gt: 0 },
+    },
   },
   {
     $project: {
