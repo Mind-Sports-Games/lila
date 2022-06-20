@@ -1,5 +1,7 @@
 package views.html.user.show
 
+import org.joda.time.DateTime
+
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -64,22 +66,28 @@ object otherTrophies {
           )
         )
       },*/
-      info.trophies.filter(_.kind.withCustomImage).map { t =>
-        a(
-          awardCls(t),
-          href := (t.url match {
-            case Some(url) => Some(url)
-            case None      => t.kind.url
-          }),
-          ariaTitle(t.name match {
-            case Some(name) => name
-            case None       => t.kind.name
-          }),
-          style := "width: 65px; margin: 0 !important;"
-        )(
-          img(src := assetUrl(s"images/trophy/${t.kind._id}.png"), width := 65, height := 80)
+      info.trophies
+        .filter(t =>
+          t.kind.withCustomImage && t.expiry
+            .getOrElse(DateTime.now.plusDays(1))
+            .isAfter(DateTime.now)
         )
-      },
+        .map { t =>
+          a(
+            awardCls(t),
+            href := (t.url match {
+              case Some(url) => Some(url)
+              case None      => t.kind.url
+            }),
+            ariaTitle(t.name match {
+              case Some(name) => name
+              case None       => t.kind.name
+            }),
+            style := "width: 65px; margin: 0 !important;"
+          )(
+            img(src := assetUrl(s"images/trophy/${t.kind._id}.png"), width := 65, height := 80)
+          )
+        },
       info.trophies.filter(_.kind.klass.has("icon3d")).sorted.map { trophy =>
         trophy.kind.icon.map { iconChar =>
           a(
