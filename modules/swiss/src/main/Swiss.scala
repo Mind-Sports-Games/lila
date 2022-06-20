@@ -32,7 +32,8 @@ case class Swiss(
     winnerId: Option[User.ID] = None,
     trophy1st: Option[String] = None,
     trophy2nd: Option[String] = None,
-    trophy3rd: Option[String] = None
+    trophy3rd: Option[String] = None,
+    trophyExpiryDays: Option[Int] = None
 ) {
   def id = _id
 
@@ -102,6 +103,8 @@ case class Swiss(
       clock.estimateTotalSeconds * 2 * settings.nbRounds > 3600 * 8
 
   lazy val looksLikePrize = lila.common.String.looksLikePrize(s"$name ${~settings.description}")
+
+  lazy val trophies = List(trophy1st, trophy2nd, trophy3rd)
 }
 
 object Swiss {

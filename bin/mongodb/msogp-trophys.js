@@ -681,3 +681,39 @@ db.trophy.insert({
   url: '//playstrategy.org/swiss/sAhJOfNX',
   name: 'Oware Swiss - MSO GP 2022',
 });
+
+//Maciej trophy cabinet tidy up
+db.trophyKind.insert({
+  _id: 'msogp-silver-medal-x6',
+  name: 'MSO Grand Prix Silver Medals',
+  url: '//mso.juliahayward.com/Report/YearMedals?year=2022',
+  order: NumberInt(18),
+  withCustomImage: true,
+});
+db.trophyKind.insert({
+  _id: 'msogp-bronze-medal-x5',
+  name: 'MSO Grand Prix Bronze Medals',
+  url: '//mso.juliahayward.com/Report/YearMedals?year=2022',
+  order: NumberInt(19),
+  withCustomImage: true,
+});
+
+db.trophy.remove({ user: 'kspttw', kind: 'msogp-silver-medal' });
+db.trophy.remove({ user: 'kspttw', kind: 'msogp-bronze-medal' });
+
+db.trophy.insert({
+  _id: 'msogp-silver-6-kspttw',
+  kind: 'msogp-silver-medal-x6',
+  user: 'kspttw',
+  date: ISODate('2022-05-29T23:59:00Z'),
+  url: '//mso.juliahayward.com/Report/ContestantMedals?contestantId=11913',
+  name: '6 MSO GP 2022 Silver Medals',
+});
+db.trophy.insert({
+  _id: 'msogp-bronze-5-kspttw',
+  kind: 'msogp-bronze-medal-x5',
+  user: 'kspttw',
+  date: ISODate('2022-05-29T23:59:00Z'),
+  url: '//mso.juliahayward.com/Report/ContestantMedals?contestantId=11913',
+  name: '5 MSO GP 2022 Bronze Medals',
+});
