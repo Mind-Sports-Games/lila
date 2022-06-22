@@ -93,6 +93,13 @@ case class Swiss(
   def medleyGameFamiliesString: Option[String] =
     medleyGameFamilies.map(_.map(VariantKeys.gameFamilyName).mkString(", "))
 
+  def mainGameFamily: Option[GameFamily] =
+    if (isMedley) {
+      val firstGameFamily = medleyGameFamilies.flatMap(_.headOption)
+      if (firstGameFamily.toList.some == medleyGameFamilies) firstGameFamily
+      else None
+    } else variant.gameFamily.some
+
   def withConditions(conditions: SwissCondition.All) = copy(
     settings = settings.copy(conditions = conditions)
   )
