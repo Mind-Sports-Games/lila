@@ -85,9 +85,9 @@ lazy val racer = module("racer",
   reactivemongo.bundle
 )
 
-lazy val quote = smallModule("quote",
-  Seq(),
-  Seq(play.json)
+lazy val quote = module("quote",
+  Seq(common),
+  reactivemongo.bundle
 )
 
 lazy val video = smallModule("video",

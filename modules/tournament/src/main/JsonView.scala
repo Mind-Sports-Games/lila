@@ -15,6 +15,7 @@ import lila.common.{ GreatPlayer, LightUser, Uptime }
 import lila.game.{ Game, LightPov }
 import lila.hub.LightTeam.TeamID
 import lila.memo.CacheApi._
+import lila.quote.Quote
 import lila.rating.PerfType
 import lila.socket.Socket.SocketVersion
 import lila.user.{ LightUserApi, User }
@@ -131,7 +132,7 @@ final class JsonView(
           .add("trophy2nd" -> tour.trophy2nd)
           .add("trophy3rd" -> tour.trophy3rd)
           .add("private" -> tour.isPrivate)
-          .add("quote" -> tour.isCreated.option(lila.quote.Quote.one(tour.id)))
+          .add("quote" -> tour.isCreated.option(Quote.one(tour.id, tour.variant.gameFamily.some)))
           .add("defender" -> shieldOwner.map(_.value))
           .add("greatPlayer" -> GreatPlayer.wikiUrl(tour.name).map { url =>
             Json.obj("name" -> tour.name, "url" -> url)

@@ -6,6 +6,9 @@ import lila.common.LightUser
 import lila.game.{ Game, GameRepo }
 import lila.user.User
 import lila.i18n.VariantKeys
+import lila.quote.Quote
+
+import strategygames.GameFamily
 
 final class JsonView(
     gameRepo: GameRepo,
@@ -40,7 +43,7 @@ final class JsonView(
         "pairings"   -> pairings
       )
       .add("team", team)
-      .add("quote" -> simul.isCreated.option(lila.quote.Quote.one(simul.id)))
+      .add("quote" -> simul.isCreated.option(Quote.one(simul.id, GameFamily.Chess().some)))
 
   def api(simul: Simul): Fu[JsObject] =
     getLightUser(simul.hostId) map { lightHost =>
