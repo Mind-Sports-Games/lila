@@ -186,11 +186,15 @@ export default class RoundController {
       if (this.data.game.variant.key === 'atomic') {
         sound.explode();
         atomic.capture(this, dest);
+      } else if (this.data.game.variant.key === 'oware') {
+        oware.updateBoardFromMove(this, orig, dest);
+        sound.capture();
       } else sound.capture();
     } else if (this.data.game.variant.key === 'flipello') {
       flipello.flip(this, dest, this.data.player.playerIndex);
     } else if (this.data.game.variant.key === 'oware') {
       //always play the capture sound regardless of move TODO change depending on number of stones?
+      oware.updateBoardFromMove(this, orig, dest);
       sound.capture();
     } else sound.move();
   };
@@ -456,7 +460,7 @@ export default class RoundController {
       }
       if (d.game.variant.key === 'oware') {
         // a lot of pieces can change from 1 move so update them all
-        oware.updateBoardFromMove(this, o.fen);
+        oware.updateBoardFromFen(this, o.fen);
       }
       if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
