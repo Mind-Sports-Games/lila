@@ -48,6 +48,7 @@ function possiblePromotion(
     case 'oware':
     case 'minixiangqi':
     case 'xiangqi':
+    case 'flipello10':
     case 'flipello':
       return false;
     case 'shogi':

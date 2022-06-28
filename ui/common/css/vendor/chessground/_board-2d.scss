@@ -54,6 +54,12 @@ $flipello-board-files: (
   'wood': 'flipello_wood_board.svg',
 );
 
+$flipello10-board-files: (
+  'green': 'flipello10_green_board.svg',
+  'green-marble': 'flipello10_green_marble_board.svg',
+  'wood': 'flipello10_wood_board.svg',
+);
+
 $oware-board-files: (
   'light-wood': 'oware_light_wood_board.png',
   'dark-wood': 'oware_dark_wood_board.png',
@@ -81,7 +87,7 @@ $shogi-variants: ('shogi'); //must use same board
 
 $xiangqi-variants: ('xiangqi'); // must use same board
 
-$flipello-variants: ('flipello');
+$flipello-variants: ('flipello'); // must use same board
 
 $mancala-variants: ('oware'); // must use same board
 
@@ -119,6 +125,12 @@ $mancala-variants: ('oware'); // must use same board
 
 @each $color, $file in $flipello-board-files {
   .flipello-#{$color} .variant-flipello.is2d cg-board {
+    background-image: url(../images/board/flipello/#{$file});
+  }
+}
+
+@each $color, $file in $flipello10-board-files {
+  .flipello-#{$color} .variant-flipello10.is2d cg-board {
     background-image: url(../images/board/flipello/#{$file});
   }
 }
@@ -177,6 +189,12 @@ $mancala-variants: ('oware'); // must use same board
 
 @each $color, $file in $flipello-board-files {
   .flipello-#{$color} .is2d .variant-flipello cg-board {
+    background-image: url(../images/board/flipello/#{$file});
+  }
+}
+
+@each $color, $file in $flipello10-board-files {
+  .flipello-#{$color} .is2d .variant-flipello10 cg-board {
     background-image: url(../images/board/flipello/#{$file});
   }
 }
