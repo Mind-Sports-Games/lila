@@ -21,6 +21,23 @@ object shields {
         views.html.user.bits.communityMenu("shield"),
         div(cls := "page-menu__content box box-pad")(
           h1("Tournament shields"),
+          h2("Medley Shields:"),
+          div(cls := "medley-shields")(
+            TournamentShield.MedleyShield.all.map { medley =>
+              section(
+                h2(
+                  a(href := routes.Tournament.medleyShield(medley.key))(
+                    span(cls := "medley-shield-trophy")(
+                      img(cls := "medley-trophy", src := assetUrl(s"images/trophy/${medley.key}.png"))
+                    ),
+                    medley.name
+                  )
+                )
+              )
+            }
+          ),
+          h2("Variant Shields:"),
+          h3("Coming Soon..."),
           div(cls := "tournament-shields")(
             history.sorted.map { case (categ, awards) =>
               section(

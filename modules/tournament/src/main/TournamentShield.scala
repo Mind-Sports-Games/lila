@@ -10,6 +10,7 @@ import lila.memo.CacheApi._
 import lila.i18n.VariantKeys
 
 import strategygames.variant.Variant
+import strategygames.GameFamily
 
 final class TournamentShieldApi(
     tournamentRepo: TournamentRepo,
@@ -112,230 +113,191 @@ object TournamentShield {
       )
   }
 
-  private type SpeedOrVariant = Either[Schedule.Speed, Variant]
+  sealed abstract class MedleyShield(
+      val key: String,
+      val name: String,
+      val eligibleVariants: List[Variant]
+  )
+
+  object MedleyShield {
+
+    case object PlayStrategyMedley
+        extends MedleyShield(
+          "shieldPlayStrategyMedley",
+          "PlayStrategy",
+          Variant.all
+        )
+
+    case object ChessVariantsMedley
+        extends MedleyShield(
+          "shieldChessMedley",
+          "Chess Variants",
+          Variant.all.filter(_.exoticChessVariant)
+        )
+
+    case object DraughtsMedley
+        extends MedleyShield(
+          "shieldDraughtsMedley",
+          "Draughts",
+          Variant.all.filter(_.gameFamily == GameFamily.Draughts())
+        )
+
+    val all = List(
+      PlayStrategyMedley,
+      ChessVariantsMedley,
+      DraughtsMedley
+    )
+
+  }
 
   sealed abstract class Category(
-      val of: SpeedOrVariant,
-      val iconChar: Char
+      val variant: Variant
   ) {
-    def key  = of.fold(_.key, _.key)
-    def name = of.fold(_.name, VariantKeys.variantName(_))
-    def matches(tour: Tournament) =
-      if (tour.variant.standard) ~(for {
-        tourSpeed  <- tour.schedule.map(_.speed)
-        categSpeed <- of.left.toOption
-      } yield tourSpeed == categSpeed)
-      else of.toOption.has(tour.variant)
+    def key                       = variant.key
+    def name                      = VariantKeys.variantName(variant)
+    def iconChar                  = variant.perfIcon
+    def matches(tour: Tournament) = Some(variant).has(tour.variant)
   }
 
   object Category {
 
-    case object UltraBullet
+    case object Chess
         extends Category(
-          of = Left(Schedule.Speed.UltraBullet),
-          iconChar = '{'
-        )
-
-    case object HyperBullet
-        extends Category(
-          of = Left(Schedule.Speed.HyperBullet),
-          iconChar = 'T'
-        )
-
-    case object Bullet
-        extends Category(
-          of = Left(Schedule.Speed.Bullet),
-          iconChar = 'T'
-        )
-
-    case object SuperBlitz
-        extends Category(
-          of = Left(Schedule.Speed.SuperBlitz),
-          iconChar = ')'
-        )
-
-    case object Blitz
-        extends Category(
-          of = Left(Schedule.Speed.Blitz),
-          iconChar = ')'
-        )
-
-    case object Rapid
-        extends Category(
-          of = Left(Schedule.Speed.Rapid),
-          iconChar = '#'
-        )
-
-    case object Classical
-        extends Category(
-          of = Left(Schedule.Speed.Classical),
-          iconChar = '+'
+          Variant.Chess(strategygames.chess.variant.Standard)
         )
 
     case object Chess960
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.Chess960)),
-          iconChar = '\''
+          Variant.Chess(strategygames.chess.variant.Chess960)
         )
 
     case object KingOfTheHill
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.KingOfTheHill)),
-          iconChar = '('
+          Variant.Chess(strategygames.chess.variant.KingOfTheHill)
         )
 
     case object Antichess
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.Antichess)),
-          iconChar = '@'
+          Variant.Chess(strategygames.chess.variant.Antichess)
         )
 
     case object Atomic
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.Atomic)),
-          iconChar = '>'
+          Variant.Chess(strategygames.chess.variant.Atomic)
         )
 
     case object ThreeCheck
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.ThreeCheck)),
-          iconChar = '.'
+          Variant.Chess(strategygames.chess.variant.ThreeCheck)
         )
 
     case object FiveCheck
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.FiveCheck)),
-          iconChar = '.'
+          Variant.Chess(strategygames.chess.variant.FiveCheck)
         )
 
     case object Horde
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.Horde)),
-          iconChar = '_'
+          Variant.Chess(strategygames.chess.variant.Horde)
         )
 
     case object RacingKings
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.RacingKings)),
-          iconChar = ''
+          Variant.Chess(strategygames.chess.variant.RacingKings)
         )
 
     case object Crazyhouse
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.Crazyhouse)),
-          iconChar = ''
+          Variant.Chess(strategygames.chess.variant.Crazyhouse)
         )
 
     case object NoCastling
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.NoCastling)),
-          iconChar = ''
+          Variant.Chess(strategygames.chess.variant.NoCastling)
         )
 
     case object LinesOfAction
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.LinesOfAction)),
-          iconChar = ''
+          Variant.Chess(strategygames.chess.variant.LinesOfAction)
         )
 
     case object ScrambledEggs
         extends Category(
-          of = Right(Variant.Chess(strategygames.chess.variant.ScrambledEggs)),
-          iconChar = ''
+          Variant.Chess(strategygames.chess.variant.ScrambledEggs)
         )
 
     case object International
         extends Category(
-          of = Right(Variant.Draughts(strategygames.draughts.variant.Standard)),
-          iconChar = 'K'
+          Variant.Draughts(strategygames.draughts.variant.Standard)
         )
 
     case object Frisian
         extends Category(
-          of = Right(Variant.Draughts(strategygames.draughts.variant.Frisian)),
-          iconChar = 'K'
+          Variant.Draughts(strategygames.draughts.variant.Frisian)
         )
 
     case object Frysk
         extends Category(
-          of = Right(Variant.Draughts(strategygames.draughts.variant.Frysk)),
-          iconChar = 'K'
+          Variant.Draughts(strategygames.draughts.variant.Frysk)
         )
 
     case object Antidraughts
         extends Category(
-          of = Right(Variant.Draughts(strategygames.draughts.variant.Antidraughts)),
-          iconChar = 'K'
+          Variant.Draughts(strategygames.draughts.variant.Antidraughts)
         )
 
     case object Breakthrough
         extends Category(
-          of = Right(Variant.Draughts(strategygames.draughts.variant.Breakthrough)),
-          iconChar = 'K'
+          Variant.Draughts(strategygames.draughts.variant.Breakthrough)
         )
 
     case object Russian
         extends Category(
-          of = Right(Variant.Draughts(strategygames.draughts.variant.Russian)),
-          iconChar = 'K'
+          Variant.Draughts(strategygames.draughts.variant.Russian)
         )
 
     case object Brazilian
         extends Category(
-          of = Right(Variant.Draughts(strategygames.draughts.variant.Brazilian)),
-          iconChar = 'K'
+          Variant.Draughts(strategygames.draughts.variant.Brazilian)
         )
 
     case object Pool
         extends Category(
-          of = Right(Variant.Draughts(strategygames.draughts.variant.Pool)),
-          iconChar = 'K'
+          Variant.Draughts(strategygames.draughts.variant.Pool)
         )
 
     case object Shogi
         extends Category(
-          of = Right(Variant.FairySF(strategygames.fairysf.variant.Shogi)),
-          iconChar = 's'
+          Variant.FairySF(strategygames.fairysf.variant.Shogi)
         )
 
     case object Xiangqi
         extends Category(
-          of = Right(Variant.FairySF(strategygames.fairysf.variant.Xiangqi)),
-          iconChar = 't'
+          Variant.FairySF(strategygames.fairysf.variant.Xiangqi)
         )
 
     case object MiniShogi
         extends Category(
-          of = Right(Variant.FairySF(strategygames.fairysf.variant.MiniShogi)),
-          iconChar = 's'
+          Variant.FairySF(strategygames.fairysf.variant.MiniShogi)
         )
 
     case object MiniXiangqi
         extends Category(
-          of = Right(Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)),
-          iconChar = 't'
+          Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)
         )
 
     case object Flipello
         extends Category(
-          of = Right(Variant.FairySF(strategygames.fairysf.variant.Flipello)),
-          iconChar = 'l'
+          Variant.FairySF(strategygames.fairysf.variant.Flipello)
         )
+
     case object Oware
         extends Category(
-          of = Right(Variant.Mancala(strategygames.mancala.variant.Oware)),
-          iconChar = 'K'
+          Variant.Mancala(strategygames.mancala.variant.Oware)
         )
 
     val all: List[Category] = List(
-      Bullet,
-      SuperBlitz,
-      Blitz,
-      Rapid,
-      Classical,
-      HyperBullet,
-      UltraBullet,
-      Crazyhouse,
+      Chess,
       Chess960,
       KingOfTheHill,
       ThreeCheck,
