@@ -52,7 +52,7 @@ final class PerfsUpdater(
               case Variant.Chess(LinesOfAction) =>
                 updateRatings(ratingsW.linesOfAction, ratingsB.linesOfAction, game)
               case Variant.Chess(ScrambledEggs) =>
-                updateRatings(ratingsW.scrambledEggs, ratingsB.scrambledEggs, game)
+                updateRatings(ratingsW.scrambledEggs, ratingsB.scrambledEggs, game)  
               case Variant.Draughts(strategygames.draughts.variant.Standard) =>
                 updateRatings(ratingsW.international, ratingsB.international, game)
               case Variant.Draughts(strategygames.draughts.variant.Frisian) =>
@@ -79,8 +79,6 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.minixiangqi, ratingsB.minixiangqi, game)
               case Variant.FairySF(strategygames.fairysf.variant.Flipello) =>
                 updateRatings(ratingsW.flipello, ratingsB.flipello, game)
-              case Variant.FairySF(strategygames.fairysf.variant.Flipello10) =>
-                updateRatings(ratingsW.flipello10, ratingsB.flipello10, game)
               case Variant.Mancala(strategygames.mancala.variant.Oware) =>
                 updateRatings(ratingsW.oware, ratingsB.oware, game)
               case Variant.Chess(Standard) =>
@@ -144,7 +142,6 @@ final class PerfsUpdater(
       minishogi: Rating,
       minixiangqi: Rating,
       flipello: Rating,
-      flipello10: Rating,
       oware: Rating,
       ultraBullet: Rating,
       bullet: Rating,
@@ -181,7 +178,6 @@ final class PerfsUpdater(
       minishogi = perfs.minishogi.toRating,
       minixiangqi = perfs.minixiangqi.toRating,
       flipello = perfs.flipello.toRating,
-      flipello10 = perfs.flipello10.toRating,
       oware = perfs.oware.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
@@ -195,7 +191,7 @@ final class PerfsUpdater(
     val result = game.winnerPlayerIndex match {
       case Some(P1) => Glicko.Result.Win
       case Some(P2) => Glicko.Result.Loss
-      case None     => Glicko.Result.Draw
+      case None              => Glicko.Result.Draw
     }
     val results = new RatingPeriodResults()
     result match {
@@ -236,18 +232,13 @@ final class PerfsUpdater(
           racingKings = addRatingIf(game.ratingVariant.racingKings, perfs.racingKings, ratings.racingKings),
           crazyhouse = addRatingIf(game.ratingVariant.crazyhouse, perfs.crazyhouse, ratings.crazyhouse),
           noCastling = addRatingIf(game.ratingVariant.noCastling, perfs.noCastling, ratings.noCastling),
-          linesOfAction =
-            addRatingIf(game.ratingVariant.linesOfAction, perfs.linesOfAction, ratings.linesOfAction),
-          scrambledEggs =
-            addRatingIf(game.ratingVariant.scrambledEggs, perfs.scrambledEggs, ratings.scrambledEggs),
-          international =
-            addRatingIf(game.ratingVariant.draughtsStandard, perfs.international, ratings.international),
+          linesOfAction = addRatingIf(game.ratingVariant.linesOfAction, perfs.linesOfAction, ratings.linesOfAction),
+          scrambledEggs = addRatingIf(game.ratingVariant.scrambledEggs, perfs.scrambledEggs, ratings.scrambledEggs),
+          international = addRatingIf(game.ratingVariant.draughtsStandard, perfs.international, ratings.international),
           frisian = addRatingIf(game.ratingVariant.frisian, perfs.frisian, ratings.frisian),
           frysk = addRatingIf(game.ratingVariant.frysk, perfs.frysk, ratings.frysk),
-          antidraughts =
-            addRatingIf(game.ratingVariant.antidraughts, perfs.antidraughts, ratings.antidraughts),
-          breakthrough =
-            addRatingIf(game.ratingVariant.breakthrough, perfs.breakthrough, ratings.breakthrough),
+          antidraughts = addRatingIf(game.ratingVariant.antidraughts, perfs.antidraughts, ratings.antidraughts),
+          breakthrough = addRatingIf(game.ratingVariant.breakthrough, perfs.breakthrough, ratings.breakthrough),
           russian = addRatingIf(game.ratingVariant.russian, perfs.russian, ratings.russian),
           brazilian = addRatingIf(game.ratingVariant.brazilian, perfs.brazilian, ratings.brazilian),
           pool = addRatingIf(game.ratingVariant.pool, perfs.pool, ratings.pool),
@@ -256,7 +247,6 @@ final class PerfsUpdater(
           minishogi = addRatingIf(game.ratingVariant.minishogi, perfs.minishogi, ratings.minishogi),
           minixiangqi = addRatingIf(game.ratingVariant.minixiangqi, perfs.minixiangqi, ratings.minixiangqi),
           flipello = addRatingIf(game.ratingVariant.flipello, perfs.flipello, ratings.flipello),
-          flipello10 = addRatingIf(game.ratingVariant.flipello10, perfs.flipello10, ratings.flipello10),
           oware = addRatingIf(game.ratingVariant.oware, perfs.oware, ratings.oware),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
@@ -294,7 +284,6 @@ final class PerfsUpdater(
           minishogi = r(PT.orDefault("minishogi"), perfs.minishogi, perfs1.minishogi),
           minixiangqi = r(PT.orDefault("minixiangqi"), perfs.minixiangqi, perfs1.minixiangqi),
           flipello = r(PT.orDefault("flipello"), perfs.flipello, perfs1.flipello),
-          flipello10 = r(PT.orDefault("flipello10"), perfs.flipello10, perfs1.flipello10),
           oware = r(PT.orDefault("oware"), perfs.oware, perfs1.oware),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),

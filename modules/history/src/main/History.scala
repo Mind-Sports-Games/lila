@@ -31,7 +31,6 @@ case class History(
     minishogi: RatingsMap,
     minixiangqi: RatingsMap,
     flipello: RatingsMap,
-    flipello10: RatingsMap,
     oware: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
@@ -75,7 +74,6 @@ case class History(
       case "minishogi"      => minishogi
       case "minixiangqi"    => minixiangqi
       case "flipello"       => flipello
-      case "flipello10"     => flipello10
       case "oware"          => oware
       case "puzzle"         => puzzle
       case "ultraBullet"    => ultraBullet
@@ -131,7 +129,6 @@ object History {
           minishogi = ratingsMap("minishogi"),
           minixiangqi = ratingsMap("minixiangqi"),
           flipello = ratingsMap("flipello"),
-          flipello10 = ratingsMap("flipello10"),
           oware = ratingsMap("oware"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),

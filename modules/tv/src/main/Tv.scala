@@ -444,15 +444,6 @@ object Tv {
           familyChannel = false,
           gameFamily = "flipello"
         )
-    case object Flipello10
-        extends Channel(
-          name = FV.Flipello10.name,
-          icon = FV.Flipello10.perfIcon.toString,
-          secondsSinceLastMove = freshBlitz,
-          filters = Seq(variant(Variant.wrap(FV.Flipello10)), noBot),
-          familyChannel = false,
-          gameFamily = "flipello"
-        )
     case object Oware
         extends Channel(
           name = MV.Oware.name,
@@ -516,9 +507,8 @@ object Tv {
       XiangqiFamily,
       Xiangqi,
       MiniXiangqi,
-      FlipelloFamily,
+      //FlipelloFamily,
       Flipello,
-      Flipello10,
       //MancalaFamily,
       Oware,
       Bot,
