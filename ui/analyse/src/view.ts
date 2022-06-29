@@ -329,7 +329,6 @@ export default function (ctrl: AnalyseCtrl): VNode {
   const cgState = ctrl.chessground && ctrl.chessground.state;
   if (ctrl.data.hasGameScore) {
     switch (variantKey) {
-      case 'flipello10':
       case 'flipello': {
         const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize, variantKey);
         const p1Score = getPlayerScore(variantKey, pieces, 'p1');
@@ -352,7 +351,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     }
   }
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(variantKey)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'oware'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }

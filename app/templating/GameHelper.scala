@@ -166,7 +166,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Mate =>
         game.variant.gameLogic match {
           case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Mancala() => trans.checkmate.txt()
-          case _                                                             => ""
+          case _                                       => ""
         }
       case S.PerpetualCheck => trans.perpetualCheck.txt()
       case S.Resign =>
@@ -204,7 +204,6 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Variant.Chess(strategygames.chess.variant.ScrambledEggs)      => trans.checkersConnected.txt()
           case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => trans.promotion.txt()
           case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Flipello10)     => trans.gameFinished.txt()
           case Variant.Mancala(strategygames.mancala.variant.Oware)          => trans.gameFinished.txt()
           case _                                                             => trans.variantEnding.txt()
         }
