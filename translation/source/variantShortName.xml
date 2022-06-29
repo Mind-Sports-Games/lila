@@ -27,5 +27,6 @@
   <string name="minishogi">MShogi</string>
   <string name="minixiangqi">MXiangqi</string>
   <string name="flipello">Flip</string>
+  <string name="flipello10">XFlip</string>
   <string name="oware">Oware</string>
 </resources>

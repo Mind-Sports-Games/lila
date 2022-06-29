@@ -53,6 +53,7 @@ export default function status(ctrl: Ctrl): string {
           return noarg('checkersConnected');
         case 'breakthrough':
           return noarg('promotion');
+        case 'flipello10':
         case 'flipello':
           return noarg('gameFinished');
         case 'oware':

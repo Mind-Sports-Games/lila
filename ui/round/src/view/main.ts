@@ -69,6 +69,7 @@ export function main(ctrl: RoundController): VNode {
     bottomScore = 0;
   if (d.hasGameScore) {
     switch (variantKey) {
+      case 'flipello10':
       case 'flipello': {
         const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize, variantKey);
         const p1Score = util.getPlayerScore(variantKey, pieces, 'p1');
@@ -104,7 +105,7 @@ export function main(ctrl: RoundController): VNode {
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
 
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'oware'].includes(variantKey)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }

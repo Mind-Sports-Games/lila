@@ -271,7 +271,7 @@ final class User(
             } yield Ok(
               html.user.list(
                 tourneyWinners = tourneyWinners,
-                online = if(topOnline.isEmpty || topOnline.length < 25) anyOnline else topOnline,
+                online = if (topOnline.isEmpty || topOnline.length < 25) anyOnline else topOnline,
                 leaderboards = leaderboards,
                 nbAllTime = nbAllTime
               )
@@ -311,7 +311,8 @@ final class User(
                   "minishogi"     -> leaderboards.minishogi,
                   "minixiangqi"   -> leaderboards.minixiangqi,
                   "flipello"      -> leaderboards.flipello,
-                  "oware"         -> leaderboards.oware,
+                  "flipello10"    -> leaderboards.flipello10,
+                  "oware"         -> leaderboards.oware
                 )
               )
             }
