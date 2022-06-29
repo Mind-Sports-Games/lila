@@ -174,7 +174,7 @@ export default class RoundController {
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
-      if (this.data.game.variant.key === 'flipello') {
+      if (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') {
         flipello.flip(this, key, this.data.player.playerIndex);
         this.redraw();
       }
@@ -190,7 +190,7 @@ export default class RoundController {
         oware.updateBoardFromMove(this, orig, dest);
         sound.capture();
       } else sound.capture();
-    } else if (this.data.game.variant.key === 'flipello') {
+    } else if (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') {
       flipello.flip(this, dest, this.data.player.playerIndex);
     } else if (this.data.game.variant.key === 'oware') {
       //always play the capture sound regardless of move TODO change depending on number of stones?
@@ -217,7 +217,11 @@ export default class RoundController {
   };
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
-    if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'oware'].includes(this.data.game.variant.key))
+    if (
+      ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(
+        this.data.game.variant.key
+      )
+    )
       return false;
     if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'p-piece') return false;
     const pos = (dest[0] + orig[1]) as cg.Key;
@@ -439,9 +443,10 @@ export default class RoundController {
             role: o.role,
             playerIndex: playedPlayerIndex,
           },
-          o.uci.substr(2, 2) as cg.Key
+          util.uci2move(o.uci)![1] as cg.Key
         );
-        if (d.game.variant.key == 'flipello') flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
+        if (d.game.variant.key == 'flipello' || d.game.variant.key == 'flipello10')
+          flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
       } else {
         // This block needs to be idempotent, even for castling moves in
         // Chess960.
@@ -530,7 +535,12 @@ export default class RoundController {
     if (this.keyboardMove) this.keyboardMove.update(step, playedPlayerIndex != d.player.playerIndex);
     if (this.music) this.music.jump(o);
     speech.step(step);
-    if (playing && !this.replaying() && d.game.variant.key === 'flipello' && d.possibleMoves) {
+    if (
+      playing &&
+      !this.replaying() &&
+      (d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') &&
+      d.possibleMoves
+    ) {
       const possibleMoves = util.parsePossibleMoves(d.possibleMoves);
       if (possibleMoves.size == 1) {
         const passOrig = possibleMoves.keys().next().value;
