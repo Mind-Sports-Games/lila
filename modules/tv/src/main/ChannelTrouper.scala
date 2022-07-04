@@ -28,7 +28,7 @@ final private[tv] class ChannelTrouper(
   // the list of candidates by descending rating order
   private var manyIds = List.empty[Game.ID]
 
-  private val candidateIds = new lila.memo.ExpireSetMemo(3 minutes)
+  private val candidateIds = new lila.memo.ExpireSetMemo(10 minutes)
 
   protected val process: Trouper.Receive = {
 
@@ -59,6 +59,8 @@ final private[tv] class ChannelTrouper(
           manyIds = candidates
             .sortBy { g =>
               -(~g.averageUsersRating)
+              -(if (!g.olderThan(30)) 5000 else 0)
+              -(if (g.hasClock) 10000 else 0)
             }
             .take(50)
             .map(_.id)

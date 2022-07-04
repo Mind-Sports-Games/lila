@@ -42,9 +42,9 @@ final class Tv(
       _.map(roundProxyGame).sequenceFu.map(_.flatten)
     }
 
-  def getBestGame = getGame(Tv.Channel.Best) orElse gameRepo.random
+  def getBestGame = getGame(Tv.Channel.AllGames) orElse gameRepo.random
 
-  def getBestAndHistory = getGameAndHistory(Tv.Channel.Best)
+  def getBestAndHistory = getGameAndHistory(Tv.Channel.AllGames)
 
   def getChampions: Fu[Champions] =
     trouper.ask[Champions](TvTrouper.GetChampions.apply)
@@ -95,15 +95,15 @@ object Tv {
           familyChannel = true,
           gameFamily = "other"
         )
-    case object Best
-        extends Channel(
-          name = "Top Rated",
-          icon = "C",
-          secondsSinceLastMove = freshBlitz,
-          filters = Seq(rated(1250), noBot),
-          familyChannel = true,
-          gameFamily = "other"
-        )
+    // case object Best
+    //     extends Channel(
+    //       name = "Top Rated",
+    //       icon = "C",
+    //       secondsSinceLastMove = freshBlitz,
+    //       filters = Seq(rated(1250), noBot),
+    //       familyChannel = true,
+    //       gameFamily = "other"
+    //     )
     case object ChessFamily
         extends Channel(
           name = s"All ${VariantKeys.gameFamilyName(GameFamily.Chess())}",
@@ -222,7 +222,7 @@ object Tv {
         )
     case object Chess960
         extends Channel(
-          name = CV.Chess960.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.Chess960)),
           icon = CV.Chess960.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.Chess960)), noBot),
@@ -231,7 +231,7 @@ object Tv {
         )
     case object KingOfTheHill
         extends Channel(
-          name = CV.KingOfTheHill.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.KingOfTheHill)),
           icon = CV.KingOfTheHill.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.KingOfTheHill)), noBot),
@@ -240,7 +240,7 @@ object Tv {
         )
     case object ThreeCheck
         extends Channel(
-          name = CV.ThreeCheck.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.ThreeCheck)),
           icon = CV.ThreeCheck.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.ThreeCheck)), noBot),
@@ -249,7 +249,7 @@ object Tv {
         )
     case object FiveCheck
         extends Channel(
-          name = CV.FiveCheck.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.FiveCheck)),
           icon = CV.FiveCheck.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.FiveCheck)), noBot),
@@ -258,7 +258,7 @@ object Tv {
         )
     case object Antichess
         extends Channel(
-          name = CV.Antichess.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.Antichess)),
           icon = CV.Antichess.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.Antichess)), noBot),
@@ -267,7 +267,7 @@ object Tv {
         )
     case object Atomic
         extends Channel(
-          name = CV.Atomic.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.Atomic)),
           icon = CV.Atomic.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.Atomic)), noBot),
@@ -276,7 +276,7 @@ object Tv {
         )
     case object Horde
         extends Channel(
-          name = CV.Horde.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.Horde)),
           icon = CV.Horde.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.Horde)), noBot),
@@ -285,7 +285,7 @@ object Tv {
         )
     case object RacingKings
         extends Channel(
-          name = CV.RacingKings.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.RacingKings)),
           icon = CV.RacingKings.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.RacingKings)), noBot),
@@ -294,7 +294,7 @@ object Tv {
         )
     case object Crazyhouse
         extends Channel(
-          name = CV.Crazyhouse.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.Crazyhouse)),
           icon = CV.Crazyhouse.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.Crazyhouse)), noBot),
@@ -303,7 +303,7 @@ object Tv {
         )
     case object NoCastling
         extends Channel(
-          name = CV.NoCastling.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.NoCastling)),
           icon = CV.NoCastling.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.NoCastling)), noBot),
@@ -322,7 +322,7 @@ object Tv {
         )
     case object LinesOfAction
         extends Channel(
-          name = CV.LinesOfAction.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.LinesOfAction)),
           icon = CV.LinesOfAction.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.LinesOfAction)), noBot),
@@ -331,7 +331,7 @@ object Tv {
         )
     case object ScrambledEggs
         extends Channel(
-          name = CV.ScrambledEggs.name,
+          name = VariantKeys.variantName(Variant.wrap(CV.ScrambledEggs)),
           icon = CV.ScrambledEggs.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(CV.ScrambledEggs)), noBot),
@@ -340,7 +340,7 @@ object Tv {
         )
     case object International
         extends Channel(
-          name = DV.Standard.name,
+          name = VariantKeys.variantName(Variant.wrap(DV.Standard)),
           icon = DV.Standard.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(DV.Standard)), noBot),
@@ -349,7 +349,7 @@ object Tv {
         )
     case object Frisian
         extends Channel(
-          name = DV.Frisian.name,
+          name = VariantKeys.variantName(Variant.wrap(DV.Frisian)),
           icon = DV.Frisian.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(DV.Frisian)), noBot),
@@ -358,7 +358,7 @@ object Tv {
         )
     case object Frysk
         extends Channel(
-          name = DV.Frysk.name,
+          name = VariantKeys.variantName(Variant.wrap(DV.Frysk)),
           icon = DV.Frysk.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(DV.Frysk)), noBot),
@@ -367,7 +367,7 @@ object Tv {
         )
     case object Antidraughts
         extends Channel(
-          name = DV.Antidraughts.name,
+          name = VariantKeys.variantName(Variant.wrap(DV.Antidraughts)),
           icon = DV.Antidraughts.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(DV.Antidraughts)), noBot),
@@ -376,7 +376,7 @@ object Tv {
         )
     case object Breakthrough
         extends Channel(
-          name = DV.Breakthrough.name,
+          name = VariantKeys.variantName(Variant.wrap(DV.Breakthrough)),
           icon = DV.Breakthrough.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(DV.Breakthrough)), noBot),
@@ -385,7 +385,7 @@ object Tv {
         )
     case object Russian
         extends Channel(
-          name = DV.Russian.name,
+          name = VariantKeys.variantName(Variant.wrap(DV.Russian)),
           icon = DV.Russian.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(DV.Russian)), noBot),
@@ -394,7 +394,7 @@ object Tv {
         )
     case object Brazilian
         extends Channel(
-          name = DV.Brazilian.name,
+          name = VariantKeys.variantName(Variant.wrap(DV.Brazilian)),
           icon = DV.Brazilian.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(DV.Brazilian)), noBot),
@@ -403,7 +403,7 @@ object Tv {
         )
     case object Pool
         extends Channel(
-          name = DV.Pool.name,
+          name = VariantKeys.variantName(Variant.wrap(DV.Pool)),
           icon = DV.Pool.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(DV.Pool)), noBot),
@@ -412,7 +412,7 @@ object Tv {
         )
     case object Shogi
         extends Channel(
-          name = FV.Shogi.name,
+          name = VariantKeys.variantName(Variant.wrap(FV.Shogi)),
           icon = FV.Shogi.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(FV.Shogi)), noBot),
@@ -421,7 +421,7 @@ object Tv {
         )
     case object MiniShogi
         extends Channel(
-          name = FV.MiniShogi.name,
+          name = VariantKeys.variantName(Variant.wrap(FV.MiniShogi)),
           icon = FV.MiniShogi.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(FV.MiniShogi)), noBot),
@@ -430,7 +430,7 @@ object Tv {
         )
     case object Xiangqi
         extends Channel(
-          name = FV.Xiangqi.name,
+          name = VariantKeys.variantName(Variant.wrap(FV.Xiangqi)),
           icon = FV.Xiangqi.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(FV.Xiangqi)), noBot),
@@ -439,7 +439,7 @@ object Tv {
         )
     case object MiniXiangqi
         extends Channel(
-          name = FV.MiniXiangqi.name,
+          name = VariantKeys.variantName(Variant.wrap(FV.MiniXiangqi)),
           icon = FV.MiniXiangqi.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(FV.MiniXiangqi)), noBot),
@@ -466,7 +466,7 @@ object Tv {
         )
     case object Oware
         extends Channel(
-          name = MV.Oware.name,
+          name = VariantKeys.variantName(Variant.wrap(MV.Oware)),
           icon = MV.Oware.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(MV.Oware)), noBot),
