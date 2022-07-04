@@ -79,11 +79,22 @@ object Tv {
       val familyChannel: Boolean,
       val gameFamily: String
   ) {
-    def isFresh(g: Game): Boolean     = fresh(secondsSinceLastMove, g)
-    def filter(c: Candidate): Boolean = filters.forall { _(c) } && isFresh(c.game)
+    def isFresh(g: Game): Boolean       = fresh(secondsSinceLastMove, g)
+    def isOngoingGame(g: Game): Boolean = onGoingGame(g)
+    //def filter(c: Candidate): Boolean = filters.forall { _(c) } && isFresh(c.game)
+    def filter(c: Candidate): Boolean = filters.forall { _(c) } && isOngoingGame(c.game)
     val key                           = s"${toString.head.toLower}${toString.drop(1)}"
   }
   object Channel {
+    case object AllGames
+        extends Channel(
+          name = "All Games",
+          icon = "C",
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(),
+          familyChannel = true,
+          gameFamily = "other"
+        )
     case object Best
         extends Channel(
           name = "Top Rated",
@@ -437,7 +448,7 @@ object Tv {
         )
     case object Flipello
         extends Channel(
-          name = FV.Flipello.name,
+          name = VariantKeys.variantName(Variant.wrap(FV.Flipello)),
           icon = FV.Flipello.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(FV.Flipello)), noBot),
@@ -446,7 +457,7 @@ object Tv {
         )
     case object Flipello10
         extends Channel(
-          name = FV.Flipello10.name,
+          name = VariantKeys.variantName(Variant.wrap(FV.Flipello10)),
           icon = FV.Flipello10.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(FV.Flipello10)), noBot),
@@ -481,7 +492,8 @@ object Tv {
           gameFamily = "other"
         )
     val all = List(
-      Best,
+      AllGames,
+      //Best,
       ChessFamily,
       Bullet,
       Blitz,
@@ -541,11 +553,16 @@ object Tv {
   private def hasBot(c: Candidate)                      = c.hasBot
   private def noBot(c: Candidate)                       = !c.hasBot
 
+  private def onGoingGame(game: Game): Boolean = {
+    !game.finished || (game.finished && !game.olderThan(7))
+  }
+
   private def fresh(seconds: Int, game: Game): Boolean = {
     game.isBeingPlayed && !game.olderThan(seconds)
   } || {
     game.finished && !game.olderThan(7)
   } // rematch time
+
   private def hasMinRating(g: Game, min: Int) = g.players.exists(_.rating.exists(_ >= min))
 
   private[tv] val titleScores = Map(

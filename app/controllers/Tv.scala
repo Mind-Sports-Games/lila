@@ -58,7 +58,7 @@ final class Tv(
       )
     }
 
-  def games = gamesChannel(lila.tv.Tv.Channel.Best.key)
+  def games = gamesChannel(lila.tv.Tv.Channel.AllGames.key)
 
   def gamesChannel(chanKey: String) =
     Open { implicit ctx =>

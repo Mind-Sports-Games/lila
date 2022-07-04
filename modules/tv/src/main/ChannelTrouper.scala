@@ -47,11 +47,11 @@ final private[tv] class ChannelTrouper(
         .map(proxyGame)
         .sequenceFu
         .map(_.view.collect {
-          case Some(g) if channel isFresh g => g
+          case Some(g) if channel isOngoingGame g => g
         }.toList)
         .foreach { candidates =>
           oneId ?? proxyGame foreach {
-            case Some(current) if channel isFresh current =>
+            case Some(current) if channel isOngoingGame current =>
               fuccess(wayBetter(current, candidates)) orElse rematch(current) foreach elect
             case Some(current) => rematch(current) orElse fuccess(bestOf(candidates)) foreach elect
             case _             => elect(bestOf(candidates))
