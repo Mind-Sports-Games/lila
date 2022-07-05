@@ -28,7 +28,7 @@ export function readDests(lines?: string): Dests | null {
 
 export function readDrops(line?: string | null): Key[] | null {
   if (typeof line === 'undefined' || line === null) return null;
-  return (line.match(/.{2}/g) as Key[]) || [];
+  return (line.match(/[a-z][1-9]0?/g) as Key[]) || [];
 }
 
 export function readDropsByRole(line?: string | null): Map<Role, Key[]> {
@@ -36,7 +36,7 @@ export function readDropsByRole(line?: string | null): Map<Role, Key[]> {
   const roledrops = new Map();
   line
     .split(' ')
-    .forEach(d => roledrops.set((d[0].toLowerCase() + '-piece') as Role, d.slice(1).match(/.{2}/g) as Key[]));
+    .forEach(d => roledrops.set((d[0].toLowerCase() + '-piece') as Role, d.slice(1).match(/[a-z][1-9]0?/g) as Key[]));
   return roledrops;
 }
 
@@ -60,7 +60,7 @@ export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
 }
 
 export function variantUsesDestPosOnlyNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['flipello'].includes(key);
+  return ['flipello', 'flipello10'].includes(key);
 }
 
 export function varaintUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {

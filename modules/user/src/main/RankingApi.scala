@@ -117,6 +117,7 @@ final class RankingApi(
       minishogi     <- topPerf(PerfType.orDefault("minishogi").id, nb)
       minixiangqi   <- topPerf(PerfType.orDefault("minixiangqi").id, nb)
       flipello      <- topPerf(PerfType.orDefault("flipello").id, nb)
+      flipello10    <- topPerf(PerfType.orDefault("flipello10").id, nb)
       oware         <- topPerf(PerfType.orDefault("oware").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
@@ -149,6 +150,7 @@ final class RankingApi(
       minishogi = minishogi,
       minixiangqi = minixiangqi,
       flipello = flipello,
+      flipello10 = flipello10,
       oware = oware
     )
 
