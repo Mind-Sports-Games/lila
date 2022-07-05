@@ -45,7 +45,7 @@ final private[tv] class TvTrouper(
     case GetChampions(promise) => promise success Tv.Champions(channelChampions)
 
     case lila.game.actorApi.StartGame(g) =>
-      if (g.hasClock) {
+      if (g.hasClock || g.hasCorrespondenceClock || g.isUnlimited) {
         val candidate = Tv.toCandidate(lightUserSync)(g)
         channelTroupers collect {
           case (chan, trouper) if chan filter candidate => trouper
@@ -66,9 +66,9 @@ final private[tv] class TvTrouper(
       }
       recentTvGames.put(game)
       val data = Json.obj(
-        "channel" -> channel.key,
-        "id"      -> game.id,
-        "playerIndex"   -> game.naturalOrientation.name,
+        "channel"     -> channel.key,
+        "id"          -> game.id,
+        "playerIndex" -> game.naturalOrientation.name,
         "player" -> user.map { u =>
           Json.obj(
             "name"   -> u.name,
@@ -78,7 +78,7 @@ final private[tv] class TvTrouper(
         }
       )
       Bus.publish(lila.hub.actorApi.tv.TvSelect(game.id, game.speed, data), "tvSelect")
-      if (channel == Tv.Channel.Best) {
+      if (channel == Tv.Channel.AllGames) {
         implicit def timeout = makeTimeout(100 millis)
         actorAsk(renderer.actor, actorApi.RenderFeaturedJs(game)) foreach { case html: String =>
           val pov = Pov naturalOrientation game
@@ -87,9 +87,9 @@ final private[tv] class TvTrouper(
             makeMessage(
               "featured",
               Json.obj(
-                "html"  -> html,
+                "html"        -> html,
                 "playerIndex" -> pov.playerIndex.name,
-                "id"    -> game.id
+                "id"          -> game.id
               )
             )
           )
