@@ -65,6 +65,11 @@ span.mini-game.variant-oware.is2d {
   height: calc(100% / 7);
 }
 
+.variant-flipello10 square {
+  width: calc(100% / 10);
+  height: calc(100% / 10);
+}
+
 .variant-oware square {
   width: calc(100% / 6);
   height: calc(100% / 2);
@@ -304,6 +309,11 @@ square {
   height: calc(100% / 7);
 }
 
+.variant-flipello10 piece {
+  width: calc(100% / 10);
+  height: calc(100% / 10);
+}
+
 .variant-oware piece {
   width: calc(100% / 6);
   height: calc(100% / 2);
@@ -359,6 +369,11 @@ piece {
   padding-bottom: calc(100% / 7);
 }
 
+.variant-flipello10 cg-helper {
+  width: calc(100% / 10);
+  padding-bottom: calc(100% / 10);
+}
+
 .variant-oware cg-helper {
   width: calc(100% / 6);
   padding-bottom: calc(100% / 6);
@@ -390,6 +405,11 @@ cg-helper {
 .variant-minixiangqi cg-container {
   width: calc(100% * 7);
   height: calc(100% * 7);
+}
+
+.variant-flipello10 cg-container {
+  width: calc(100% * 10);
+  height: calc(100% * 10);
 }
 
 .variant-oware cg-container {

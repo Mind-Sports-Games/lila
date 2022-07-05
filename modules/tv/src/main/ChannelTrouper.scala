@@ -28,7 +28,7 @@ final private[tv] class ChannelTrouper(
   // the list of candidates by descending rating order
   private var manyIds = List.empty[Game.ID]
 
-  private val candidateIds = new lila.memo.ExpireSetMemo(3 minutes)
+  private val candidateIds = new lila.memo.ExpireSetMemo(10 minutes)
 
   protected val process: Trouper.Receive = {
 
@@ -47,11 +47,11 @@ final private[tv] class ChannelTrouper(
         .map(proxyGame)
         .sequenceFu
         .map(_.view.collect {
-          case Some(g) if channel isFresh g => g
+          case Some(g) if channel isOngoingGame g => g
         }.toList)
         .foreach { candidates =>
           oneId ?? proxyGame foreach {
-            case Some(current) if channel isFresh current =>
+            case Some(current) if channel isOngoingGame current =>
               fuccess(wayBetter(current, candidates)) orElse rematch(current) foreach elect
             case Some(current) => rematch(current) orElse fuccess(bestOf(candidates)) foreach elect
             case _             => elect(bestOf(candidates))
@@ -59,6 +59,8 @@ final private[tv] class ChannelTrouper(
           manyIds = candidates
             .sortBy { g =>
               -(~g.averageUsersRating)
+              -(if (!g.olderThan(30)) 5000 else 0)
+              -(if (g.hasClock) 10000 else 0)
             }
             .take(50)
             .map(_.id)

@@ -306,6 +306,11 @@ object TournamentShield {
           Variant.FairySF(strategygames.fairysf.variant.Flipello)
         )
 
+    case object Flipello10
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.Flipello10),
+        )
+
     case object Oware
         extends Category(
           Variant.Mancala(strategygames.mancala.variant.Oware)
@@ -337,6 +342,7 @@ object TournamentShield {
       MiniShogi,
       MiniXiangqi,
       Flipello,
+      Flipello10,
       Oware
     )
 

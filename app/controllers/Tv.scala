@@ -13,7 +13,7 @@ final class Tv(
     apiC: => Api
 ) extends LilaController(env) {
 
-  def index = onChannel(lila.tv.Tv.Channel.Best.key)
+  def index = onChannel(lila.tv.Tv.Channel.AllGames.key)
 
   def onChannel(chanKey: String) =
     Open { implicit ctx =>
@@ -22,10 +22,11 @@ final class Tv(
 
   def sides(gameId: String, playerIndex: String) =
     Open { implicit ctx =>
-      OptionFuResult(strategygames.Player.fromName(playerIndex) ?? { env.round.proxyRepo.pov(gameId, _) }) { pov =>
-        env.game.crosstableApi.withMatchup(pov.game) map { ct =>
-          Ok(html.tv.side.sides(pov, ct))
-        }
+      OptionFuResult(strategygames.Player.fromName(playerIndex) ?? { env.round.proxyRepo.pov(gameId, _) }) {
+        pov =>
+          env.game.crosstableApi.withMatchup(pov.game) map { ct =>
+            Ok(html.tv.side.sides(pov, ct))
+          }
       }
     }
 
@@ -58,7 +59,7 @@ final class Tv(
       )
     }
 
-  def games = gamesChannel(lila.tv.Tv.Channel.Best.key)
+  def games = gamesChannel(lila.tv.Tv.Channel.AllGames.key)
 
   def gamesChannel(chanKey: String) =
     Open { implicit ctx =>

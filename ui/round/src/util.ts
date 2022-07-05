@@ -177,7 +177,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction', 'scrambledEggs', 'flipello', 'oware'];
+const noAnalysisVariants = ['linesOfAction', 'scrambledEggs', 'flipello', 'flipello10', 'oware'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;
@@ -185,6 +185,7 @@ export function allowAnalysisForVariant(variant: VariantKey) {
 
 export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): cg.Piece | undefined {
   switch (variant) {
+    case 'flipello10':
     case 'flipello':
       return { playerIndex: turnPlayerIndex, role: 'p-piece' };
     default:
