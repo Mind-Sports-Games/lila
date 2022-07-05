@@ -28,6 +28,8 @@ const variantConfirms = {
   minixiangqi: 'This is a Mini Xiangqi game!\n\nThe aim of the game is to checkmate the opponent.',
   flipello:
     'This is a Othello game!\n\nPlayers take it in turns to place counters, flipping all opposition counters between their placed counter and another counter on the edge. The winner is the player who has the most counters face up at the end.',
+  flipello10:
+    'This is a Grand Othello game!\n\nPlayers take it in turns to place counters, flipping all opposition counters between their placed counter and another counter on the edge. The winner is the player who has the most counters face up at the end.',
   oware: 'This is an Oware game!\n\nThe aim of the game is to capture the most stones.',
 };
 
