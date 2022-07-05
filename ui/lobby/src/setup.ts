@@ -297,14 +297,7 @@ export default class Setup {
           }
           break;
         case '5':
-          switch (variantId[1]) {
-            case '6':
-              key = 'flipello';
-              break;
-            case '7':
-              key = 'flipello10';
-              break;
-          }
+          key = 'flipello';
           break;
         case '6':
           key = 'oware';

@@ -15,7 +15,6 @@ const noCevalVariants = [
   'minishogi',
   'minixiangqi',
   'flipello',
-  'flipello10',
   'oware',
 ];
 
