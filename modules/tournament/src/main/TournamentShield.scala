@@ -39,6 +39,8 @@ final class TournamentShieldApi(
       }
     }
 
+  def byMedleyKey(k: String): Option[MedleyShield] = MedleyShield.byKey(k)
+
   def currentOwner(tour: Tournament): Fu[Option[OwnerId]] =
     tour.isShield ?? {
       Category.of(tour) ?? { cat =>
@@ -116,8 +118,11 @@ object TournamentShield {
   sealed abstract class MedleyShield(
       val key: String,
       val name: String,
-      val eligibleVariants: List[Variant]
-  )
+      val eligibleVariants: List[Variant],
+      val formatStr: String
+  ) {
+    def hasAllVariants = eligibleVariants == Variant.all
+  }
 
   object MedleyShield {
 
@@ -125,21 +130,29 @@ object TournamentShield {
         extends MedleyShield(
           "shieldPlayStrategyMedley",
           "PlayStrategy",
-          Variant.all
+          Variant.all,
+          s"7 round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
         )
+
+    private val chessVariantOptions = Variant.all.filter(_.exoticChessVariant)
 
     case object ChessVariantsMedley
         extends MedleyShield(
           "shieldChessMedley",
           "Chess Variants",
-          Variant.all.filter(_.exoticChessVariant)
+          chessVariantOptions,
+          s"5 round Swiss using micro-match rounds (each pairing plays twice, once each as the start player). 5 from the ${chessVariantOptions.length} listed chess variants will be picked."
         )
+
+    private val draughtsVariantOptions =
+      Variant.all.filter(_.gameFamily == GameFamily.Draughts()).filterNot(_.fromPositionVariant)
 
     case object DraughtsMedley
         extends MedleyShield(
           "shieldDraughtsMedley",
           "Draughts",
-          Variant.all.filter(_.gameFamily == GameFamily.Draughts())
+          draughtsVariantOptions,
+          s"7 round Swiss where 7 from the ${draughtsVariantOptions.length} listed draughts variants will be picked."
         )
 
     val all = List(
@@ -147,6 +160,8 @@ object TournamentShield {
       ChessVariantsMedley,
       DraughtsMedley
     )
+
+    def byKey(k: String): Option[MedleyShield] = all.find(_.key == k)
 
   }
 
