@@ -640,18 +640,26 @@ final class SwissApi(
       )
   }
 
+  //TODO: Make regex work (untested)
+  def shieldWinners: Fu[List[Swiss]] =
+    colls.swiss
+      .find($doc("trophy1st" -> { "$regex" -> "shield.*" }, "finishedAt" $exists true))
+      .sort($sort desc "startsAt")
+      .cursor[Swiss](ReadPreference.secondaryPreferred)
+      .list()
+
   def winnersByTrophy(trophy: String): Fu[List[Swiss]] =
     colls.swiss
       .find($doc("trophy1st" -> trophy, "finishedAt" $exists true))
       .sort($sort desc "startsAt")
-      .cursor[Swiss]()
+      .cursor[Swiss](ReadPreference.secondaryPreferred)
       .list()
 
   def nextByTrophy(trophy: String): Fu[Option[Swiss]] =
     colls.swiss
       .find($doc("trophy1st" -> trophy, "finishedAt" $exists false))
       .sort($sort asc "startsAt")
-      .cursor[Swiss]()
+      .cursor[Swiss](ReadPreference.secondaryPreferred)
       .headOption
 
   def roundInfo = cache.roundInfo.get _

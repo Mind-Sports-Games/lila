@@ -8,13 +8,15 @@ import lila.db.dsl._
 import lila.user.User
 import lila.memo.CacheApi._
 import lila.i18n.VariantKeys
+import lila.swiss.Swiss
 
 import strategygames.variant.Variant
 import strategygames.GameFamily
 
 final class TournamentShieldApi(
     tournamentRepo: TournamentRepo,
-    cacheApi: lila.memo.CacheApi
+    cacheApi: lila.memo.CacheApi,
+    swissApi: lila.swiss.SwissApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   import TournamentShield._
@@ -41,6 +43,8 @@ final class TournamentShieldApi(
 
   def byMedleyKey(k: String): Option[MedleyShield] = MedleyShield.byKey(k)
 
+  //def byMedleyKey2(k: String): Option[MedleyShield] =
+
   def currentOwner(tour: Tournament): Fu[Option[OwnerId]] =
     tour.isShield ?? {
       Category.of(tour) ?? { cat =>
@@ -55,10 +59,14 @@ final class TournamentShieldApi(
     if (hist.value.exists(_._2.exists(_.owner.value === userId))) clear()
   }
 
+  //TODO:
+  //- make Either work for mixedTours
+  //- change Award and History to accept Swiss
+  //- merge MedleyShield and Category?
   private val cache = cacheApi.unit[History] {
     _.refreshAfterWrite(1 day)
       .buildAsyncFuture { _ =>
-        tournamentRepo.coll
+        val mixedTours: Either[Tournament, Swiss] = tournamentRepo.coll
           .find(
             $doc(
               "schedule.freq" -> scheduleFreqHandler.writeTry(Schedule.Freq.Shield).get,
@@ -67,7 +75,10 @@ final class TournamentShieldApi(
           )
           .sort($sort asc "startsAt")
           .cursor[Tournament](ReadPreference.secondaryPreferred)
-          .list() map { tours =>
+          .list()
+          .map(Left(_)) :::
+          swissApi.shieldWinners.map(Right(_))
+        mixedTours map { tours =>
           for {
             tour   <- tours
             categ  <- Category of tour
@@ -76,7 +87,7 @@ final class TournamentShieldApi(
             categ = categ,
             owner = OwnerId(winner),
             date = tour.finishesAt,
-            tourId = tour.id
+            tourId = Left(tour.id)
           )
         } map {
           _.foldLeft(Map.empty[Category, List[Award]]) { case (hist, entry) =>
@@ -95,7 +106,7 @@ object TournamentShield {
       categ: Category,
       owner: OwnerId,
       date: DateTime,
-      tourId: Tournament.ID
+      tourId: Either[Tournament.ID, Swiss.Id]
   )
   // newer entry first
   case class History(value: Map[Category, List[Award]]) {

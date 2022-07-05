@@ -52,7 +52,12 @@ object shields {
                 ol(awards.map { aw =>
                   li(
                     userIdLink(aw.owner.value.some),
-                    a(href := routes.Tournament.show(aw.tourId))(showDate(aw.date))
+                    a(
+                      href := aw.tourId
+                        .fold(routes.Tournament.show, swissId => routes.Swiss.show(swissId.value))
+                    )(
+                      showDate(aw.date)
+                    )
                   )
                 })
               )
@@ -79,7 +84,10 @@ object shields {
             li(
               span(cls := "shield-trophy")(categ.iconChar.toString),
               userIdLink(aw.owner.value.some),
-              a(href := routes.Tournament.show(aw.tourId))(showDate(aw.date))
+              a(
+                href := aw.tourId
+                  .fold(routes.Tournament.show, swissId => routes.Swiss.show(swissId.value))
+              )(showDate(aw.date))
             )
           })
         )
