@@ -84,7 +84,8 @@ final class Tournament(
         (!tour.isPrivate || json.fold(true)(jsonHasMe) || ctx.userId.has(tour.createdBy) || isGranted(
           _.ChatTimeout
         )) && // private tournament that I joined or has ChatTimeout
-        env.chat.panic.allowed(u, tighter = tour.variant == Variant.Chess(strategygames.chess.variant.Antichess))
+        env.chat.panic
+          .allowed(u, tighter = tour.variant == Variant.Chess(strategygames.chess.variant.Antichess))
       }
 
   private def jsonHasMe(js: JsObject): Boolean = (js \ "me").toOption.isDefined
@@ -534,6 +535,18 @@ final class Tournament(
       OptionFuOk(env.tournament.shieldApi.byCategKey(k)) { case (categ, awards) =>
         env.user.lightUserApi preloadMany awards.map(_.owner.value) inject
           html.tournament.shields.byCateg(categ, awards)
+      }
+    }
+
+  def medleyShield(k: String) =
+    Open { implicit ctx =>
+      env.tournament.shieldApi.byMedleyKey(k) match {
+        case Some(medley) =>
+          for {
+            winners <- env.swiss.api.winnersByTrophy(k)
+            next    <- env.swiss.api.nextByTrophy(k)
+          } yield html.tournament.shields.medley(medley, next, winners)
+        case None => notFound
       }
     }
 
