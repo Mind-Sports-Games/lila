@@ -541,18 +541,21 @@ export default class RoundController {
       (d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') &&
       d.possibleMoves
     ) {
-      const possibleMoves = util.parsePossibleMoves(d.possibleMoves);
-      if (possibleMoves.size == 1) {
-        const passOrig = possibleMoves.keys().next().value;
-        const passDests = possibleMoves.get(passOrig);
-        if (passDests && passDests.length == 1) {
-          const passDest = passDests[0];
-          this.sendMove(passOrig, passDest, undefined, d.game.variant.key, { premove: false });
-        }
-      }
+      this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
     }
     return true; // prevents default socket pubsub
   };
+
+  private forceMove(possibleMoves: cg.Dests, variantKey: VariantKey) {
+    if (possibleMoves.size == 1) {
+      const passOrig = possibleMoves.keys().next().value;
+      const passDests = possibleMoves.get(passOrig);
+      if (passDests && passDests.length == 1) {
+        const passDest = passDests[0];
+        this.sendMove(passOrig, passDest, undefined, variantKey, { premove: false });
+      }
+    }
+  }
 
   private playPredrop = () => {
     return this.chessground.playPredrop(drop => {
@@ -810,6 +813,14 @@ export default class RoundController {
 
   private delayedInit = () => {
     const d = this.data;
+    if (
+      this.isPlaying() &&
+      !this.replaying() &&
+      (d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') &&
+      d.possibleMoves
+    ) {
+      this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
+    }
     if (this.isPlaying() && game.nbMoves(d, d.player.playerIndex) === 0 && !this.isSimulHost()) {
       playstrategy.sound.play('genericNotify');
     }
