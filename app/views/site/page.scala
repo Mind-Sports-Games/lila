@@ -105,7 +105,9 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           h1("HTTP API"),
           p(
             raw(
-              """PlayStrategy exposes a RESTish HTTP/JSON API that you are welcome to use. Read the <a href="/api" class="blue">HTTP API documentation</a>."""
+              """PlayStrategy exposes a RESTish HTTP/JSON API that you are welcome to use. Read the <a href="/api" class="blue">HTTP API documentation</a>.
+              <br/>
+              <strong>Note</strong> - Embed only supports chess games at the moment..."""
             )
           )
         ),
@@ -128,42 +130,42 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           )
         },
         br,
-        div(cls := "box box-pad developers body") {
-          val args = """style="width: 400px; height: 444px;" allowtransparency="true" frameborder="0""""
-          frag(
-            h1(id := "embed-puzzle")("Embed the daily puzzle in your site"),
-            div(cls := "center")(
-              raw(s"""<iframe src="/training/frame?theme=brown&bg=dark" $args></iframe>""")
-            ),
-            p("Add the following HTML to your site:"),
-            p(cls := "copy-zone")(
-              input(
-                id := "puzzle-embed-src",
-                cls := "copyable autoselect",
-                value := s"""<iframe src="$netBaseUrl/training/frame?theme=brown&bg=dark" $args></iframe>"""
-              ),
-              button(
-                title := "Copy code",
-                cls := "copy button",
-                dataRel := "puzzle-embed-src",
-                dataIcon := "\""
-              )
-            ),
-            parameters,
-            p("The text is automatically translated to your visitor's language."),
-            p(
-              "Alternatively, you can ",
-              a(href := routes.Main.dailyPuzzleSlackApp)("post the puzzle in your slack workspace"),
-              "."
-            )
-          )
-        },
-        br,
+        // div(cls := "box box-pad developers body") {
+        //   val args = """style="width: 400px; height: 444px;" allowtransparency="true" frameborder="0""""
+        //   frag(
+        //     h1(id := "embed-puzzle")("Embed the daily puzzle in your site"),
+        //     div(cls := "center")(
+        //       raw(s"""<iframe src="/training/frame?theme=brown&bg=dark" $args></iframe>""")
+        //     ),
+        //     p("Add the following HTML to your site:"),
+        //     p(cls := "copy-zone")(
+        //       input(
+        //         id := "puzzle-embed-src",
+        //         cls := "copyable autoselect",
+        //         value := s"""<iframe src="$netBaseUrl/training/frame?theme=brown&bg=dark" $args></iframe>"""
+        //       ),
+        //       button(
+        //         title := "Copy code",
+        //         cls := "copy button",
+        //         dataRel := "puzzle-embed-src",
+        //         dataIcon := "\""
+        //       )
+        //     ),
+        //     parameters,
+        //     p("The text is automatically translated to your visitor's language."),
+        //     p(
+        //       "Alternatively, you can ",
+        //       a(href := routes.Main.dailyPuzzleSlackApp)("post the puzzle in your slack workspace"),
+        //       "."
+        //     )
+        //   )
+        // },
+        // br,
         div(cls := "box box-pad developers body") {
           val args = """style="width: 600px; height: 397px;" frameborder="0""""
           frag(
             h1(id := "embed-study")("Embed a chess analysis in your site"),
-            raw(s"""<iframe src="/study/embed/XtFCFYlM/GCUTf2Jk?bg=auto&theme=auto" $args></iframe>"""),
+            raw(s"""<iframe src="/study/embed/3H4yU2WE/3H4yU2WE?bg=auto&theme=auto" $args></iframe>"""),
             p(
               "Create ",
               a(href := routes.Study.allDefault(1))("a study"),
@@ -178,7 +180,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           val args = """style="width: 600px; height: 397px;" frameborder="0""""
           frag(
             h1("Embed a game in your site"),
-            raw(s"""<iframe src="/embed/MPJcy1JW?bg=auto&theme=auto" $args></iframe>"""),
+            raw(s"""<iframe src="/embed/0kpSHmXZ?bg=auto&theme=auto" $args></iframe>"""),
             p(
               raw("""On a game analysis page, click the <em>"FEN &amp; PGN"</em> tab at the bottom, then """),
               "\"",
@@ -223,7 +225,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           sep,
           //a(activeCls("webmasters"), href := routes.Main.webmasters)(trans.webmasters()),
           //a(activeCls("database"), href := "https://database.playstrategy.org")(trans.database(), external),
-          //a(activeCls("api"), href := routes.Api.index)("API", external),
+          a(activeCls("api"), href := routes.Api.index)("API", external),
           sep,
           a(activeCls("lag"), href := routes.Main.lag)(trans.lag.isPlayStrategyLagging())
           //a(activeCls("ads"), href := "/ads")("Block ads")

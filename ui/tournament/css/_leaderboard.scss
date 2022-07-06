@@ -1,12 +1,16 @@
 $user-list-width: 35ch;
+$narrow-user-list-width: 30ch;
 
 .tournament-leaderboards,
-.tournament-shields {
+.tournament-shields,
+.medley-shields,
+.medley-variants {
   @extend %box-radius;
 
   border: $border;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax($user-list-width, 1fr));
+  margin-top: 30px;
+  margin-bottom: 40px;
 
   &__item {
     background: $c-bg-box;
@@ -16,15 +20,11 @@ $user-list-width: 35ch;
   h2 {
     @extend %metal, %box-shadow;
 
-    font-size: 1.45em;
-    line-height: 2.5em;
     padding-left: 0.8rem;
-    text-transform: uppercase;
     margin: 0;
     white-space: nowrap;
 
     a {
-      color: $c-brag;
       display: block;
 
       &:hover {
@@ -44,39 +44,156 @@ $user-list-width: 35ch;
   }
 }
 
+.tournament-leaderboards,
+.tournament-shields,
+.medley-shield {
+  h2 {
+    text-transform: uppercase;
+  }
+
+  a {
+    color: $c-brag;
+  }
+}
+
+.tournament-medley-shields {
+  h2,
+  h4 {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  h2 {
+    margin-top: 40px;
+    margin-bottom: 15px;
+  }
+
+  h4 {
+    font-size: 1.15em;
+  }
+}
+
+.tournament-leaderboards,
+.tournament-shields {
+  grid-template-columns: repeat(auto-fit, minmax($user-list-width, 1fr));
+}
+
+.medley-variants {
+  grid-template-columns: repeat(auto-fit, minmax($narrow-user-list-width, 1fr));
+
+  a {
+    color: $c-font;
+  }
+
+  h2 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+}
+
+.tournament-leaderboards,
+.tournament-shields,
+.medley-variants {
+  h2 {
+    font-size: 1.45em;
+    line-height: 2.5em;
+  }
+}
+
+.medley-shields {
+  h2 {
+    font-size: 3em;
+    line-height: 2.2em;
+  }
+}
+
+@media (min-width: 1700px) {
+  .medley-shields {
+    grid-template-columns: repeat(auto-fit, minmax($user-list-width, 1fr));
+  }
+}
+
 .tournament-leaderboards__item h2 {
   display: flex;
   align-items: center;
   overflow: hidden;
 }
 
-.tournament-shields {
+.tournament-shields,
+.medley-shields {
   h2 {
     position: relative;
-    padding-left: 95px;
     border-bottom: $border;
   }
 }
 
-.shield-trophy {
+.tournament-shields {
+  h2 {
+    padding-left: 95px;
+  }
+}
+
+.medley-shields {
+  h2 {
+    padding-left: 120px;
+  }
+}
+
+.shield-trophy,
+.medley-shield-trophy {
   position: absolute;
   top: -11px;
-  left: 15px;
   width: 67px;
-  height: 80px;
-  background: img-url('trophy/shield-gold.png') no-repeat;
-  background-size: contain;
   font-family: 'playstrategy' !important;
   font-size: 40px;
   line-height: 76px;
   text-align: center;
+  text-transform: none;
   letter-spacing: normal;
   color: #333;
   text-shadow: 0 0 6px #fff;
   filter: drop-shadow(0 0 10px $c-brag);
 }
 
-.tournament-categ-shields {
+.shield-trophy {
+  left: 15px;
+  height: 80px;
+  background: img-url('trophy/shield-gold.png') no-repeat;
+  background-size: contain;
+}
+
+.medley-trophy {
+  height: 120px;
+}
+
+.medley-shield-trophy {
+  left: 10px;
+  height: 120px;
+}
+
+.page-medley-current {
+  text-align: center;
+}
+
+.one-medley-shield-trophy {
+  width: 12em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.reigning-shield-holder {
+  font-size: 1.6em;
+  font-weight: bold;
+}
+
+.medley-variant-name {
+  margin-left: 0.6em;
+}
+
+.tournament-categ-shields,
+.tournament-medley-shields {
   font-size: 1.1em;
 
   .shield-trophy {
@@ -94,5 +211,14 @@ $user-list-width: 35ch;
     &:nth-child(odd) {
       background: $c-bg-zebra;
     }
+  }
+}
+
+.next-tournament {
+  h2 {
+    text-align: center;
+    background: $c-bg-zebra;
+    line-height: 2em;
+    margin-top: 20px;
   }
 }

@@ -14,6 +14,7 @@ import scala.concurrent.ExecutionContext
 import lila.common.{ GreatPlayer, LightUser }
 import lila.db.dsl._
 import lila.game.Game
+import lila.quote.Quote
 import lila.quote.Quote.quoteWriter
 import lila.socket.Socket.SocketVersion
 import lila.user.{ User, UserRepo }
@@ -199,7 +200,7 @@ object SwissJson {
           else "created"
         }
       )
-      .add("quote" -> swiss.isCreated.option(lila.quote.Quote.one(swiss.id.value)))
+      .add("quote" -> swiss.isCreated.option(Quote.one(swiss.id.value, swiss.mainGameFamily)))
       .add("nextRound" -> swiss.nextRoundAt.map { next =>
         Json.obj(
           "at" -> formatDate(next),

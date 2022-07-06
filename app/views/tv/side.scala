@@ -26,7 +26,7 @@ object side {
             "active"     -> (c == channel),
             "hidden" -> !((c.gameFamily == channel.gameFamily || c.familyChannel) && (champions
               .get(c)
-              .nonEmpty || c.name == "Top Rated"))
+              .nonEmpty || c.name == "All Games"))
           )
         )(
           span(dataIcon := c.icon)(

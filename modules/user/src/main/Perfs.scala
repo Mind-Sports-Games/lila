@@ -35,6 +35,7 @@ case class Perfs(
     minishogi: Perf,
     minixiangqi: Perf,
     flipello: Perf,
+    flipello10: Perf,
     oware: Perf,
     ultraBullet: Perf,
     bullet: Perf,
@@ -76,6 +77,7 @@ case class Perfs(
       "minishogi"      -> minishogi,
       "minixiangqi"    -> minixiangqi,
       "flipello"       -> flipello,
+      "flipello10"     -> flipello10,
       "oware"          -> oware,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
@@ -173,6 +175,7 @@ case class Perfs(
     "minishogi"      -> minishogi,
     "minixiangqi"    -> minixiangqi,
     "flipello"       -> flipello,
+    "flipello10"     -> flipello10,
     "oware"          -> oware,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
@@ -269,6 +272,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -317,8 +321,9 @@ case object Perfs {
       case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)      => Some(_.minishogi)
       case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)    => Some(_.minixiangqi)
       case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => Some(_.flipello)
+      case Variant.FairySF(strategygames.fairysf.variant.Flipello10)     => Some(_.flipello10)
       case Variant.Mancala(strategygames.mancala.variant.Oware)          => Some(_.oware)
-      case _                           => none
+      case _                                                             => none
     }
 
   def speedLens(speed: Speed): Perfs => Perf =
@@ -364,6 +369,7 @@ case object Perfs {
         minishogi = perf("minishogi"),
         minixiangqi = perf("minixiangqi"),
         flipello = perf("flipello"),
+        flipello10 = perf("flipello10"),
         oware = perf("oware"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
@@ -408,6 +414,7 @@ case object Perfs {
         "minishogi"      -> notNew(o.minishogi),
         "minixiangqi"    -> notNew(o.minixiangqi),
         "flipello"       -> notNew(o.flipello),
+        "flipello10"     -> notNew(o.flipello10),
         "oware"          -> notNew(o.oware),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
@@ -453,9 +460,43 @@ case object Perfs {
       minishogi: List[User.LightPerf],
       minixiangqi: List[User.LightPerf],
       flipello: List[User.LightPerf],
-      oware: List[User.LightPerf],
+      flipello10: List[User.LightPerf],
+      oware: List[User.LightPerf]
   )
 
-  val emptyLeaderboards = Leaderboards(Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+  val emptyLeaderboards = Leaderboards(
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil,
+    Nil
+  )
 
 }
