@@ -92,7 +92,7 @@ object mini {
 
   private def calculateScore(pov: Pov): String =
     pov.game.variant.key match {
-      case "flipello" =>
+      case "flipello" | "flipello10" =>
         "(" + pov.game.board.pieces
           .map { case (_, piece) => piece.player.name }
           .filter(p => p == pov.playerIndex.name)
@@ -102,13 +102,13 @@ object mini {
         "(" + pov.game.history
           .checkCount(pov.game.opponent(pov.playerIndex).playerIndex)
           .toString() + ")"
-      case "oware" => 
-        val fen = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
+      case "oware" =>
+        val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
         val score = if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score
         "(" + score.toString() + ")"
       case _ => ""
     }
-    
+
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(
       pov.game.winnerPlayerIndex.fold("½") { c =>

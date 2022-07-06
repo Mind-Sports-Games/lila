@@ -30,6 +30,7 @@ export const perf = {
     minishogi: 's',
     minixiangqi: 't',
     flipello: 'l',
+    flipello10: 'l',
     oware: '',
   },
 };

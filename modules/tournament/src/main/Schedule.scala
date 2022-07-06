@@ -220,7 +220,7 @@ object Schedule {
   }
 
   sealed abstract class Speed(val id: Int) {
-    val name = toString
+    val name = s"${toString} Chess"
     val key  = lila.common.String lcfirst name
   }
   object Speed {

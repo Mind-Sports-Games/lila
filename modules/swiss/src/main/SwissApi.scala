@@ -640,6 +640,20 @@ final class SwissApi(
       )
   }
 
+  def winnersByTrophy(trophy: String): Fu[List[Swiss]] =
+    colls.swiss
+      .find($doc("trophy1st" -> trophy, "finishedAt" $exists true))
+      .sort($sort desc "startsAt")
+      .cursor[Swiss]()
+      .list()
+
+  def nextByTrophy(trophy: String): Fu[Option[Swiss]] =
+    colls.swiss
+      .find($doc("trophy1st" -> trophy, "finishedAt" $exists false))
+      .sort($sort asc "startsAt")
+      .cursor[Swiss]()
+      .headOption
+
   def roundInfo = cache.roundInfo.get _
 
   def byTeamCursor(teamId: TeamID) =

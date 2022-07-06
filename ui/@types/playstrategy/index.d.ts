@@ -294,6 +294,7 @@ declare type VariantKey =
   | 'minishogi'
   | 'minixiangqi'
   | 'flipello'
+  | 'flipello10'
   | 'oware';
 
 declare type DraughtsVariantKey =
@@ -341,6 +342,7 @@ declare type Perf =
   | 'minishogi'
   | 'minixiangqi'
   | 'flipello'
+  | 'flipello10'
   | 'oware';
 
 //declare type Color = 'white' | 'black';
