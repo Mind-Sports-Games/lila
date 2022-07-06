@@ -21,6 +21,7 @@ export interface Pool {
   lim: number;
   inc: number;
   perf: string;
+  variant: VariantKey | DraughtsVariantKey ;
 }
 
 export interface LobbyOpts extends Untyped {

@@ -76,7 +76,8 @@ final private class GameStarter(
       id = id,
       chess = StratGame.Chess(
         chess.Game(
-          situation = chess.Situation(chess.variant.Standard),
+          //situation = chess.Situation(chess.variant.Standard),
+          situation = chess.Situation(pool.variant),
           clock = pool.clock.toClock.some
         )
       ),
