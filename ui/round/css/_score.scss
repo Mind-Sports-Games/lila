@@ -1,6 +1,7 @@
-$score-variants: ('flipello', 'oware');
+$score-variants: ('flipello', 'flipello10', 'oware');
 
-.variant-flipello .game-score {
+.variant-flipello .game-score,
+.variant-flipello10 .game-score {
   piece::after {
     @extend %active, %box-radius;
 

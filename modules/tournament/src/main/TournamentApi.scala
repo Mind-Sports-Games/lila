@@ -33,6 +33,7 @@ final class TournamentApi(
     socket: TournamentSocket,
     tellRound: lila.round.TellRound,
     roundSocket: lila.round.RoundSocket,
+    //swissApi: lila.swiss.SwissApi,
     trophyApi: lila.user.TrophyApi,
     playerIndexHistoryApi: PlayerIndexHistoryApi,
     verify: Condition.Verify,
