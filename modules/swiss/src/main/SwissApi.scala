@@ -599,8 +599,9 @@ final class SwissApi(
           rankingApi(swiss) foreach { ranking =>
             Bus.publish(SwissFinish(swiss.id, ranking), "swissFinish")
           }
+          awardTrophies(swiss).unit
         }
-      awardTrophies(swiss).unit
+        .unit
     }
 
   def kill(swiss: Swiss): Funit = {
