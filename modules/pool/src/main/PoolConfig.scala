@@ -2,7 +2,8 @@ package lila.pool
 
 import scala.concurrent.duration._
 import strategygames.variant.Variant
-
+import strategygames.chess.variant.Standard
+import lila.i18n.VariantKeys
 import lila.rating.PerfType
 
 import strategygames.{ Clock, Speed }
@@ -14,10 +15,15 @@ case class PoolConfig(
 ) {
 
   val perfType =
-    if (variant === Variant.Chess) PerfType.apply(Speed(clock).key) | PerfType.orDefault(Speed.Classical.key)
-    else PerfType.apply(variant.key)
+    variant.key match {
+      case "standard" =>
+        PerfType.apply(Speed(clock).key) | PerfType
+          .orDefault(Speed.Classical.key)
 
-  val id = PoolConfig clockAndVariantToId clock variant
+      case variantKey => PerfType.orDefault(variantKey)
+    }
+
+  val id = PoolConfig clockAndVariantToId (clock, variant)
 }
 
 object PoolConfig {
@@ -38,7 +44,7 @@ object PoolConfig {
       "lim"        -> p.clock.limitInMinutes,
       "inc"        -> p.clock.incrementSeconds,
       "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
-      "variantKey" -> p.variant.key
+      "variantKey" -> VariantKeys.variantName(p.variant)
     )
   }
 }

@@ -243,6 +243,8 @@ export default class Setup {
         case '1':
           switch (variantId[1]) {
             case '1':
+              key = 'international';
+              break;
             case '10':
               key = 'frisian';
               break;

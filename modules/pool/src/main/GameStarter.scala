@@ -2,10 +2,10 @@ package lila.pool
 
 import scala.concurrent.duration._
 
-import strategygames.{ Game => StratGame, P1, P2 }
+import strategygames.{ Game => StratGame, P1, P2, Situation, GameLogic }
 import strategygames.chess
 
-import lila.game.{ Game, GameRepo, IdGenerator, Player }
+import lila.game.{ Game, GameRepo, IdGenerator, Player, Source }
 import lila.rating.Perf
 import lila.user.{ User, UserRepo }
 
@@ -72,20 +72,20 @@ final private class GameStarter(
       p1User: (User.ID, Perf),
       p2User: (User.ID, Perf)
   ) =
-    Game(
-      id = id,
-      chess = StratGame.Chess(
-        chess.Game(
-          //situation = chess.Situation(chess.variant.Standard),
-          situation = chess.Situation(pool.variant),
-          clock = pool.clock.toClock.some
-        )
-      ),
-      p1Player = Player.make(P1, p1User),
-      p2Player = Player.make(P2, p2User),
-      mode = strategygames.Mode.Rated,
-      status = strategygames.Status.Created,
-      daysPerTurn = none,
-      metadata = Game.metadata(lila.game.Source.Pool)
-    )
+    Game
+      .make(
+        chess = strategygames
+          .Game(
+            pool.variant.gameLogic,
+            situation = Situation(pool.variant.gameLogic, pool.variant),
+            clock = pool.clock.toClock.some
+          ),
+        p1Player = Player.make(P1, p1User),
+        p2Player = Player.make(P2, p2User),
+        mode = strategygames.Mode.Rated,
+        source = Source.Pool,
+        daysPerTurn = None,
+        pgnImport = None
+      )
+      .withId(id)
 }

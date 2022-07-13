@@ -47,7 +47,7 @@
 
     background: $c-bg-popup;
 
-    .perf {
+    .clock, .logo {
       display: none;
     }
   }
@@ -58,16 +58,10 @@
 
   .spinner {
     flex: 0 0 auto;
-    margin: .1em 0 .6em 0;
+    margin: .3em 0 .6em 0;
     width: 2em;
     height: 2em;
     pointer-events: none;
   }
 
-  .clock {
-    display: block;
-    font-size: 1.5em;
-    line-height: 1.6em;
-    letter-spacing: .1em;
-  }
 }
