@@ -10,7 +10,7 @@ export const anonPoolSeek = (pool: Pool) =>
   xhr.json('/setup/hook/' + playstrategy.sri, {
     method: 'POST',
     body: xhr.form({
-      variant: 1,
+      variant: pool.variantId,
       timeMode: 1,
       time: pool.lim,
       increment: pool.inc,

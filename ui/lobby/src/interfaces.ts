@@ -23,6 +23,7 @@ export interface Pool {
   perf: string;
   variant: DraughtsVariantKey | VariantKey;
   variantDisplayName: string;
+  variantId: string;
 }
 
 export interface LobbyOpts extends Untyped {
