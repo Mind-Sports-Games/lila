@@ -25,14 +25,14 @@ object MatchMaking {
   private object wmMatching {
 
     // above that, no pairing is allowed (however the miss bonus can extend this)
-    // 1000 ~> 300
-    // 1200 ~> 300
-    // 1500 ~> 300
-    // 2000 ~> 400
+    // 1000 ~> 500
+    // 1200 ~> 500
+    // 1500 ~> 500
+    // 2000 ~> 500
     // 2500 ~> 500
     // 3000 ~> 600
     private def ratingToMaxScore(rating: Int) =
-      if (rating < 1500) 300
+      if (rating < 2500) 500
       else rating / 5
 
     // quality of a potential pairing. Lower is better.

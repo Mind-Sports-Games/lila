@@ -21,7 +21,7 @@ object PoolList {
       Wave(22 seconds, 30 players),
       Variant.Chess(strategygames.chess.variant.LinesOfAction)
     ),
-    PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Shogi)),
+    PoolConfig(5 ++ 3, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Shogi)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Xiangqi)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Flipello)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.Mancala(strategygames.mancala.variant.Oware))
