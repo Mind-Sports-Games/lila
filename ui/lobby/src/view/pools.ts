@@ -1,6 +1,6 @@
 import { h, Hooks } from 'snabbdom';
 import LobbyController from '../ctrl';
-import { bind, spinner } from './util';
+import { bind, spinner, perfIcons } from './util';
 
 function renderRange(range: string) {
   return h('div.range', range.replace('-', '–'));
@@ -36,8 +36,11 @@ export function render(ctrl: LobbyController) {
           attrs: { 'data-id': pool.id },
         },
         [
+          h('div.variant', pool.variantDisplayName),
+          active && member!.range
+            ? renderRange(member!.range!)
+            : h('div.logo', { attrs: { 'data-icon': perfIcons[pool.perf] } }),
           h('div.clock', pool.lim + '+' + pool.inc),
-          active && member!.range ? renderRange(member!.range!) : h('div.perf', pool.perf),
           active ? spinner() : null,
         ]
       );

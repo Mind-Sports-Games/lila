@@ -166,6 +166,31 @@ coords {
     }
   }
 
+  .coords-out .orientation-right coords {
+    &.ranks.right {
+      bottom: -15px;
+      top: unset;
+      width: 100%;
+      text-align: center;
+
+      coord {
+        transform: none;
+      }
+    }
+
+    &.files.right {
+      right: -15px;
+      top: 0;
+      width: 12px;
+      left: unset;
+      text-align: unset;
+
+      coord {
+        transform: translateY(42%);
+      }
+    }
+  }
+
   .coords-out .orientation-p2 coords {
     &.files.p2 {
       bottom: -15px;
