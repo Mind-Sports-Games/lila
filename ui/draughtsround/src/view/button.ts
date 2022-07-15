@@ -11,8 +11,10 @@ function analysisBoardOrientation(data: RoundData) {
   return data.player.playerIndex;
 }
 
-function poolUrl(clock: ClockData, blocking?: game.PlayerUser) {
-  return '/#pool/' + clock.initial / 60 + '+' + clock.increment + (blocking ? '/' + blocking.id : '');
+function poolUrl(clock: ClockData, variantKey: DraughtsVariantKey, blocking?: game.PlayerUser) {
+  return (
+    '/#pool/' + clock.initial / 60 + '+' + clock.increment + '-' + variantKey + (blocking ? '/' + blocking.id : '')
+  );
 }
 
 function analysisButton(ctrl: RoundController): VNode | null {
@@ -393,7 +395,12 @@ export function followUp(ctrl: RoundController): VNode {
       ? h(
           'a.fbt',
           {
-            attrs: { href: d.game.source === 'pool' ? poolUrl(d.clock!, d.opponent.user) : '/?hook_like=' + d.game.id },
+            attrs: {
+              href:
+                d.game.source === 'pool'
+                  ? poolUrl(d.clock!, d.game.variant.key, d.opponent.user)
+                  : '/?hook_like=' + d.game.id,
+            },
           },
           ctrl.noarg('newOpponent')
         )
