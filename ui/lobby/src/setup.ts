@@ -116,7 +116,7 @@ export default class Setup {
     const data = Array.from(new FormData(form).entries());
     const hash: any = {};
     for (const i in data) hash[data[i][0]] = data[i][1];
-    const valid = playerIndex == 'random' && hash.variant == 1 && hash.mode == 1 && hash.timeMode == 1,
+    const valid = playerIndex == 'random' && hash.mode == 1 && hash.timeMode == 1,
       id = parseFloat(hash.time) + '+' + parseInt(hash.increment);
     return valid && this.root.pools.find(p => p.id === id)
       ? {
@@ -243,6 +243,8 @@ export default class Setup {
         case '1':
           switch (variantId[1]) {
             case '1':
+              key = 'international';
+              break;
             case '10':
               key = 'frisian';
               break;

@@ -23,14 +23,14 @@ object SetupForm {
 
   lazy val ai = Form(
     mapping(
-      "variant"   -> variant(Config.aiVariants),
-      "timeMode"  -> timeMode,
-      "time"      -> time,
-      "increment" -> increment,
-      "days"      -> days,
-      "level"     -> level,
-      "playerIndex"     -> playerIndex,
-      "fen"       -> fenField
+      "variant"     -> variant(Config.aiVariants),
+      "timeMode"    -> timeMode,
+      "time"        -> time,
+      "increment"   -> increment,
+      "days"        -> days,
+      "level"       -> level,
+      "playerIndex" -> playerIndex,
+      "fen"         -> fenField
     )(AiConfig.from)(_.>>)
       .verifying("invalidFen", _.validFen)
       .verifying("Can't play that time control from a position", _.timeControlFromPosition)
@@ -38,26 +38,29 @@ object SetupForm {
 
   def friendFilled(lib: GameLogic, fen: Option[FEN])(implicit ctx: UserContext): Form[FriendConfig] =
     friend(ctx) fill fen.foldLeft(FriendConfig.default(lib.id)) { case (config, f) =>
-      config.copy(fen = f.some, variant = lib match {
-        case GameLogic.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
-        case GameLogic.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
-        case _ => sys.error("No from position variant")
-      })
+      config.copy(
+        fen = f.some,
+        variant = lib match {
+          case GameLogic.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
+          case GameLogic.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
+          case _                    => sys.error("No from position variant")
+        }
+      )
     }
 
   def friend(ctx: UserContext) =
     Form(
       mapping(
-        "variant"    -> variant(Config.variantsWithFenAndVariants),
-        "fenVariant" -> optional(draughtsFenVariants),
-        "timeMode"   -> timeMode,
-        "time"       -> time,
-        "increment"  -> increment,
-        "days"       -> days,
-        "mode"       -> mode(withRated = ctx.isAuth),
-        "playerIndex"      -> playerIndex,
-        "fen"        -> fenField,
-        "microMatch" -> boolean
+        "variant"     -> variant(Config.variantsWithFenAndVariants),
+        "fenVariant"  -> optional(draughtsFenVariants),
+        "timeMode"    -> timeMode,
+        "time"        -> time,
+        "increment"   -> increment,
+        "days"        -> days,
+        "mode"        -> mode(withRated = ctx.isAuth),
+        "playerIndex" -> playerIndex,
+        "fen"         -> fenField,
+        "microMatch"  -> boolean
       )(FriendConfig.from)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Invalid speed", _.validSpeed(ctx.me.exists(_.isBot)))
@@ -77,7 +80,7 @@ object SetupForm {
         "days"        -> days,
         "mode"        -> mode(ctx.isAuth),
         "ratingRange" -> optional(ratingRange),
-        "playerIndex"       -> playerIndex
+        "playerIndex" -> playerIndex
       )(HookConfig.from)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Can't create rated unlimited in lobby", _.noRatedUnlimited)
@@ -89,12 +92,15 @@ object SetupForm {
       "time"        -> time,
       "increment"   -> increment,
       "rated"       -> optional(boolean),
-      "playerIndex"       -> optional(playerIndex),
+      "playerIndex" -> optional(playerIndex),
       "ratingRange" -> optional(ratingRange)
     )((v, t, i, r, c, g) =>
       HookConfig(
         variant = v match {
-          case Some(v) => Variant.apply(GameFamily(v.split('_')(0).toInt).gameLogic, v.split('_')(1)) | Variant.default(GameFamily(v.split('_')(0).toInt).gameLogic)
+          case Some(v) =>
+            Variant.apply(GameFamily(v.split('_')(0).toInt).gameLogic, v.split('_')(1)) | Variant.default(
+              GameFamily(v.split('_')(0).toInt).gameLogic
+            )
           case None => Variant.default(GameLogic.Chess())
         },
         timeMode = TimeMode.RealTime,
@@ -145,7 +151,7 @@ object SetupForm {
         clock,
         "days"          -> optional(days),
         "rated"         -> boolean,
-        "playerIndex"         -> optional(playerIndex),
+        "playerIndex"   -> optional(playerIndex),
         "fen"           -> fenField,
         "acceptByToken" -> optional(nonEmptyText),
         "message"       -> message,
@@ -159,9 +165,9 @@ object SetupForm {
         "level" -> level,
         variant,
         clock,
-        "days"  -> optional(days),
+        "days"        -> optional(days),
         "playerIndex" -> optional(playerIndex),
-        "fen"   -> fenField
+        "fen"         -> fenField
       )(ApiAiConfig.from)(_ => none).verifying("invalidFen", _.validFen)
     )
 

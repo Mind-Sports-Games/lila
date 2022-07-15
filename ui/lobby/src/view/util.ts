@@ -56,4 +56,8 @@ export const perfIcons = {
   Russian: 'K',
   Brazilian: 'K',
   Pool: 'K',
+  Shogi: 's',
+  Xiangqi: 't',
+  Flipello: 'l',
+  Oware: '',
 };

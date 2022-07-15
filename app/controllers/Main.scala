@@ -78,7 +78,7 @@ final class Main(
         html.mobile(doc, resolver)
       }
     }
-  */
+   */
 
   def dailyPuzzleSlackApp =
     Open { implicit ctx =>
@@ -140,13 +140,13 @@ Allow: /
     Action {
       JsonOk {
         Json.obj(
-          "name"             -> env.net.domain.value,
-          "short_name"       -> "PlayStrategy",
-          "start_url"        -> "/",
-          "display"          -> "standalone",
+          "name"                   -> env.net.domain.value,
+          "short_name"             -> "PlayStrategy",
+          "start_url"              -> "/",
+          "display"                -> "standalone",
           "background_playerIndex" -> "#161512",
           "theme_playerIndex"      -> "#161512",
-          "description"      -> "The (really) free, no-ads, open source chess server.",
+          "description"            -> "The (really) free, no-ads, open source chess server.",
           "icons" -> List(32, 64, 128, 192, 256, 512, 1024).map { size =>
             Json.obj(
               "src"   -> s"//${env.net.assetDomain.value}/assets/logo/playstrategy-favicon-$size.png",
@@ -211,9 +211,9 @@ Allow: /
       if (ctx.isAuth) fuccess(Redirect(routes.Lobby.home))
       else
         fuccess {
-          Redirect(s"${routes.Lobby.home}#pool/10+0").withCookies(
+          Redirect(s"${routes.Lobby.home}#pool/3+2-standard").withCookies(
             env.lilaCookie.withSession { s =>
-              s + ("theme" -> "ic") //+ ("pieceSet" -> "icpieces")
+              s // + ("theme" -> "ic") //+ ("pieceSet" -> "icpieces") //these are both arrays now, and not really required
             }
           )
         }
@@ -232,16 +232,16 @@ Allow: /
           case 29   => s"$faq#titles"
           case 4811 => s"$faq#lm"
           //case 216  => routes.Main.mobile.url
-          case 340  => s"$faq#trophies"
-          case 6    => s"$faq#ratings"
-          case 207  => s"$faq#hide-ratings"
-          case 547  => s"$faq#leaving"
-          case 259  => s"$faq#trophies"
-          case 342  => s"$faq#provisional"
-          case 50   => routes.Page.help.url
-          case 46   => s"$faq#name"
-          case 122  => s"$faq#marks"
-          case _    => faq
+          case 340 => s"$faq#trophies"
+          case 6   => s"$faq#ratings"
+          case 207 => s"$faq#hide-ratings"
+          case 547 => s"$faq#leaving"
+          case 259 => s"$faq#trophies"
+          case 342 => s"$faq#provisional"
+          case 50  => routes.Page.help.url
+          case 46  => s"$faq#name"
+          case 122 => s"$faq#marks"
+          case _   => faq
         }
       }.fuccess
     }

@@ -41,11 +41,11 @@ final class Setup(
   def aiForm =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        fuccess(forms aiFilled(get("fen").map(s => FEN.clean(GameLogic.Chess(), s)))) map { form =>
+        fuccess(forms aiFilled (get("fen").map(s => FEN.clean(GameLogic.Chess(), s)))) map { form =>
           html.setup.forms.ai(
             form,
             env.fishnet.aiPerfApi.intRatings,
-            form("fen").value map(s => FEN.clean(GameLogic.Chess(), s)) flatMap ValidFen(getBool("strict"))
+            form("fen").value map (s => FEN.clean(GameLogic.Chess(), s)) flatMap ValidFen(getBool("strict"))
           )
         }
       } else Redirect(s"${routes.Lobby.home}#ai").fuccess
@@ -60,8 +60,8 @@ final class Setup(
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
         val lib = gameLogic(getInt("lib"))
-        fuccess(forms friendFilled(lib, get("fen").map(s => FEN.clean(lib, s)))) flatMap { form =>
-          val validFen = form("fen").value map(s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
+        fuccess(forms friendFilled (lib, get("fen").map(s => FEN.clean(lib, s)))) flatMap { form =>
+          val validFen = form("fen").value map (s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
           userId ?? env.user.repo.named flatMap {
             case None => Ok(html.setup.forms.friend(form, none, none, validFen)).fuccess
             case Some(user) =>
@@ -126,7 +126,9 @@ final class Setup(
                     (env.challenge.api create challenge) flatMap {
                       case true =>
                         negotiate(
-                          html = fuccess(Redirect(routes.Round.watcher(challenge.id, config.variant.startPlayer.name))),
+                          html = fuccess(
+                            Redirect(routes.Round.watcher(challenge.id, config.variant.startPlayer.name))
+                          ),
                           api = _ => challengeC.showChallenge(challenge, justCreated = true)
                         )
                       case false =>
@@ -254,9 +256,10 @@ final class Setup(
 
   def validateFen =
     Open { implicit ctx =>
-      get("fen") map(s => FEN.clean(gameLogic(getInt("lib")), s)) flatMap ValidFen(getBool("strict")) match {
-        case None    => BadRequest.fuccess
-        case Some(v) => Ok(html.board.bits.miniSpan(v.fen, v.playerIndex, v.situation.board.variant.key)).fuccess
+      get("fen") map (s => FEN.clean(gameLogic(getInt("lib")), s)) flatMap ValidFen(getBool("strict")) match {
+        case None => BadRequest.fuccess
+        case Some(v) =>
+          Ok(html.board.bits.miniSpan(v.fen, v.playerIndex, v.situation.board.variant.key)).fuccess
       }
     }
 

@@ -1,19 +1,29 @@
 package lila.pool
 
 import scala.concurrent.duration._
-
+import strategygames.variant.Variant
+import strategygames.chess.variant.Standard
+import lila.i18n.VariantKeys
 import lila.rating.PerfType
 
 import strategygames.{ Clock, Speed }
 
 case class PoolConfig(
     clock: Clock.Config,
-    wave: PoolConfig.Wave
+    wave: PoolConfig.Wave,
+    variant: Variant
 ) {
 
-  val perfType = PerfType.apply(Speed(clock).key) | PerfType.orDefault(Speed.Classical.key)
+  val perfType =
+    variant.key match {
+      case "standard" =>
+        PerfType.apply(Speed(clock).key) | PerfType
+          .orDefault(Speed.Classical.key)
 
-  val id = PoolConfig clockToId clock
+      case variantKey => PerfType.orDefault(variantKey)
+    }
+
+  val id = PoolConfig clockAndVariantToId (clock, variant)
 }
 
 object PoolConfig {
@@ -23,15 +33,18 @@ object PoolConfig {
 
   case class Wave(every: FiniteDuration, players: NbPlayers)
 
-  def clockToId(clock: Clock.Config) = Id(clock.show)
+  //def clockToId(clock: Clock.Config) = Id(clock.show)
+
+  def clockAndVariantToId(clock: Clock.Config, variant: Variant) = Id(clock.show + "-" + variant.key)
 
   import play.api.libs.json._
   implicit val poolConfigJsonWriter = OWrites[PoolConfig] { p =>
     Json.obj(
-      "id"   -> p.id.value,
-      "lim"  -> p.clock.limitInMinutes,
-      "inc"  -> p.clock.incrementSeconds,
-      "perf" -> p.perfType.trans(lila.i18n.defaultLang)
+      "id"         -> p.id.value,
+      "lim"        -> p.clock.limitInMinutes,
+      "inc"        -> p.clock.incrementSeconds,
+      "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+      "variantKey" -> VariantKeys.variantName(p.variant)
     )
   }
 }
