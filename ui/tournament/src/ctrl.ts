@@ -6,6 +6,7 @@ import * as tour from './tournament';
 import { TournamentData, TournamentOpts, Pages, PlayerInfo, TeamInfo, Standing } from './interfaces';
 // eslint-disable-next-line no-duplicate-imports
 import { TournamentSocket } from './socket';
+//import { medleyVariantListItems } from './view/util';
 
 interface CtrlTeamInfo {
   requested?: string;
@@ -146,6 +147,13 @@ export default class TournamentController {
       this.joinSpinner = true;
       this.focusOnMe = true;
     }
+  };
+
+  newVariant = (variant: Variant) => {
+    this.data.variant = variant;
+    this.data.medleyRound += 1;
+    $('.tour__notice').html(this.trans('standByXForY', this.data.me.username, variant.name));
+    //$('.medley-variants-list').html(medleyVariantListItems(this.data.medleyVariants, this.data.medleyRound));
   };
 
   scrollToMe = () => {

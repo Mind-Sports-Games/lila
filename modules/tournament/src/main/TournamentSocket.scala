@@ -5,6 +5,9 @@ import java.util.concurrent.ConcurrentHashMap
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 
+import play.api.libs.json.JsObject
+
+import lila.chat.Chat
 import lila.game.Game
 import lila.hub.LateMultiThrottler
 import lila.room.RoomSocket.{ Protocol => RP, _ }
@@ -38,11 +41,17 @@ final private class TournamentSocket(
   def startGame(tourId: Tournament.ID, game: Game): Unit = {
     game.players foreach { player =>
       player.userId foreach { userId =>
-        send(RP.Out.tellRoomUser(RoomId(tourId), userId, makeMessage("redirect", game fullIdOf player.playerIndex)))
+        send(
+          RP.Out
+            .tellRoomUser(RoomId(tourId), userId, makeMessage("redirect", game fullIdOf player.playerIndex))
+        )
       }
     }
     reload(tourId)
   }
+
+  def newMedleyVariant(tourId: Tournament.ID, variantName: JsObject): Unit =
+    send(RP.Out.tellRoom(RoomId(tourId), makeMessage("newVariant", variantName)))
 
   def getWaitingUsers(tour: Tournament): Fu[WaitingUsers] = {
     send(Protocol.Out.getWaitingUsers(RoomId(tour.id), tour.name()(lila.i18n.defaultLang)))
@@ -120,4 +129,8 @@ final private class TournamentSocket(
       def getWaitingUsers(roomId: RoomId, name: String) = s"tour/get/waiting $roomId $name"
     }
   }
+
+  def systemChat(tourId: Tournament.ID, text: String, volatile: Boolean = false): Unit =
+    chat.userChat.service(Chat.Id(tourId), text, _.Tournament, volatile)
+
 }

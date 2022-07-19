@@ -26,10 +26,10 @@ final class AutoPairing(
     val game = Game
       .make(
         chess = StratGame(
-          tour.variant.gameLogic,
+          tour.currentVariant.gameLogic,
           Some {
-            if (tour.position.isEmpty) tour.variant
-            else Variant.libFromPosition(tour.variant.gameLogic)
+            if (tour.position.isEmpty) tour.currentVariant
+            else Variant.libFromPosition(tour.currentVariant.gameLogic)
           },
           tour.position
         ) pipe { g =>

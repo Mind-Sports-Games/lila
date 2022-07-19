@@ -3,8 +3,9 @@ package views.html.tournament
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.i18n.{ I18nKeys => trans }
+import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.tournament.Tournament
+import strategygames.variant.Variant
 
 import controllers.routes
 
@@ -50,6 +51,33 @@ object bits {
         "If it has prizes, PlayStrategy is NOT responsible for paying them."
       )
 
+  def medleyGames(
+      variants: List[Variant],
+      tourLength: Int,
+      medleyInterval: Int,
+      pairingsClosedMins: Double
+  )(implicit ctx: Context) =
+    div(cls := "medley__info")(
+      table(cls := "medley__rounds")(
+        tbody(
+          tr(
+            td(cls := "medley__table__time__col")("Time Remaining"),
+            td("Variant")
+          ),
+          List
+            .tabulate((tourLength / medleyInterval) + 1)(n => tourLength - (n * medleyInterval))
+            .filter(_ > pairingsClosedMins)
+            .zip(variants)
+            .map { case (i, v) =>
+              tr(
+                td(cls := "medley__table__time__col")(s"${i} minutes"),
+                td(a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v)))
+              )
+            }
+        )
+      )
+    )
+
   def jsI18n(implicit ctx: Context) = i18nJsObject(i18nKeys)
 
   private val i18nKeys = List(
@@ -57,7 +85,9 @@ object bits {
     trans.starting,
     trans.tournamentIsStarting,
     trans.youArePlaying,
+    trans.medleyTournamentVariantChange,
     trans.standByX,
+    trans.standByXForY,
     trans.tournamentPairingsAreNowClosed,
     trans.join,
     trans.withdraw,

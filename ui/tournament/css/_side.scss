@@ -75,6 +75,21 @@
     }
   }
 
+  .medley__info {
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    max-height: 20vh;
+    overflow-y: auto;
+  }
+
+  .medley__table__time__col {
+    padding-right: 10px;
+    text-align: right;
+  }
+
   .description {
     @extend %break-word;
 

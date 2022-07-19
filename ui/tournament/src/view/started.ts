@@ -20,9 +20,15 @@ function joinTheGame(ctrl: TournamentController, gameId: string) {
   );
 }
 
+function standByMsg(ctrl: TournamentController): string {
+  return ctrl.data.medley
+    ? ctrl.trans('standByXForY', ctrl.data.me.username, ctrl.data.variant.name)
+    : ctrl.trans('standByX', ctrl.data.me.username);
+}
+
 function notice(ctrl: TournamentController): VNode {
   return tour.willBePaired(ctrl)
-    ? h('div.tour__notice.bar-glider', ctrl.trans('standByX', ctrl.data.me.username))
+    ? h('div.tour__notice.bar-glider', standByMsg(ctrl))
     : h('div.tour__notice.closed', ctrl.trans('tournamentPairingsAreNowClosed'));
 }
 

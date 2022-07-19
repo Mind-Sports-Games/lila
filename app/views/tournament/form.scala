@@ -9,6 +9,9 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.hub.LeaderTeam
 import lila.tournament.{ Condition, Tournament, TournamentForm }
+import lila.i18n.VariantKeys
+
+import strategygames.GameFamily
 
 object form {
 
@@ -28,6 +31,9 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.create)(
             fields.name,
             form3.split(fields.rated, fields.variant),
+            fields.medleyControls,
+            fields.medleyDefaults,
+            fields.medleyGameFamilies,
             fields.clock,
             form3.split(fields.minutes, fields.waitMinutes),
             form3.split(fields.description(true), fields.startPosition),
@@ -63,6 +69,9 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
             form3.split(fields.name, tour.isCreated option fields.startDate),
             form3.split(fields.rated, fields.variant),
+            fields.medleyControls,
+            fields.medleyDefaults,
+            fields.medleyGameFamilies,
             fields.clock,
             form3.split(
               if (TournamentForm.minutes contains tour.minutes) form3.split(fields.minutes)
@@ -233,11 +242,146 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
   def variant =
-    form3.group(form("variant"), trans.variant(), klass="variant", half = true)(
+    form3.group(form("variant"), trans.variant(), klass = "variant", half = true)(
       form3.selectWithOptGroups(
         _,
         translatedVariantChoicesWithVariants,
         disabled = disabledAfterStart
+      )
+    )
+  def medley =
+    frag(
+      form3.checkbox(
+        form("medley"),
+        trans.medley(),
+        help = frag(
+          trans.medleyArenaDefinition.txt(),
+          br,
+          a(href := routes.Page.loneBookmark("medley"), target := "_blank")("More detail here")
+        ).some,
+        half = true
+      )
+    )
+  def medleyMinutes =
+    form3.group(
+      form("medleyMinutes"),
+      trans.medleyInterval(),
+      klass = "medleyMinutes",
+      half = true,
+      help = trans.medleyIntervalDefinition().some,
+      displayed = false
+    )(
+      form3.select(_, TournamentForm.medleyMinuteChoices)
+    )
+  def medleyControls =
+    form3.split(
+      medley,
+      medleyMinutes
+    )
+  def medleyDefaults =
+    form3.split(
+      onePerGameFamily,
+      chessVariants,
+      draughts64
+    )
+  def medleyGameFamilies =
+    form3.split(
+      chess,
+      draughts,
+      loa,
+      shogi,
+      xiangqi,
+      flipello,
+      mancala
+    )
+  private def onePerGameFamily =
+    frag(
+      form3.checkbox(
+        form("medleyDefaults.onePerGameFamily"),
+        "Where possible, use one game per game family",
+        klass = "medleyDefaults",
+        displayed = false
+      )
+    )
+  private def chessVariants =
+    frag(
+      form3.checkbox(
+        form("medleyDefaults.exoticChessVariants"),
+        "Only exotic chess variants",
+        klass = "medleyDefaults",
+        displayed = false
+      )
+    )
+  private def draughts64 =
+    frag(
+      form3.checkbox(
+        form("medleyDefaults.draughts64Variants"),
+        "Only draughts 64 variants",
+        klass = "medleyDefaults",
+        displayed = false
+      )
+    )
+  private def chess =
+    frag(
+      form3.checkbox(
+        form("medleyGameFamilies.chess"),
+        VariantKeys.gameFamilyName(GameFamily.Chess()),
+        klass = "medleyGameFamily",
+        displayed = false
+      )
+    )
+  private def draughts =
+    frag(
+      form3.checkbox(
+        form("medleyGameFamilies.draughts"),
+        VariantKeys.gameFamilyName(GameFamily.Draughts()),
+        klass = "medleyGameFamily",
+        displayed = false
+      )
+    )
+  private def loa =
+    frag(
+      form3.checkbox(
+        form("medleyGameFamilies.loa"),
+        VariantKeys.gameFamilyName(GameFamily.LinesOfAction()),
+        klass = "medleyGameFamily",
+        displayed = false
+      )
+    )
+  private def shogi =
+    frag(
+      form3.checkbox(
+        form("medleyGameFamilies.shogi"),
+        VariantKeys.gameFamilyName(GameFamily.Shogi()),
+        klass = "medleyGameFamily",
+        displayed = false
+      )
+    )
+  private def xiangqi =
+    frag(
+      form3.checkbox(
+        form("medleyGameFamilies.xiangqi"),
+        VariantKeys.gameFamilyName(GameFamily.Xiangqi()),
+        klass = "medleyGameFamily",
+        displayed = false
+      )
+    )
+  private def flipello =
+    frag(
+      form3.checkbox(
+        form("medleyGameFamilies.flipello"),
+        VariantKeys.gameFamilyName(GameFamily.Flipello()),
+        klass = "medleyGameFamily",
+        displayed = false
+      )
+    )
+  private def mancala =
+    frag(
+      form3.checkbox(
+        form("medleyGameFamilies.mancala"),
+        VariantKeys.gameFamilyName(GameFamily.Mancala()),
+        klass = "medleyGameFamily",
+        displayed = false
       )
     )
   def startPosition =

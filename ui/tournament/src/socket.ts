@@ -14,6 +14,10 @@ export default function (send: SocketSend, ctrl: TournamentController) {
       ctrl.redirectFirst(fullId.slice(0, 8), true);
       return true; // prevent default redirect
     },
+    newVariant(variant: Variant) {
+      ctrl.newVariant(variant);
+      return true;
+    },
   };
 
   return {

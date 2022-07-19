@@ -19,6 +19,7 @@ import lila.quote.Quote
 import lila.rating.PerfType
 import lila.socket.Socket.SocketVersion
 import lila.user.{ LightUserApi, User }
+import lila.i18n.{ I18nKeys => trans, VariantKeys }
 
 final class JsonView(
     lightUserApi: LightUserApi,
@@ -110,18 +111,27 @@ final class JsonView(
       full.?? {
         Json
           .obj(
-            "id"        -> tour.id,
-            "createdBy" -> tour.createdBy,
-            "startsAt"  -> formatDate(tour.startsAt),
-            "system"    -> "arena", // BC
-            "fullName"  -> tour.name(),
-            "minutes"   -> tour.minutes,
-            "perf"      -> full.option(tour.perfType),
-            "clock"     -> full.option(tour.clock),
-            "lib"       -> full.option(tour.variant.gameLogic.id),
-            "variant"   -> full.option(tour.variant.key),
-            "p1Name"    -> full.option(tour.variant.playerNames(P1)),
-            "p2Name"    -> full.option(tour.variant.playerNames(P2))
+            "id"            -> tour.id,
+            "createdBy"     -> tour.createdBy,
+            "startsAt"      -> formatDate(tour.startsAt),
+            "system"        -> "arena", // BC
+            "fullName"      -> tour.name(),
+            "minutes"       -> tour.minutes,
+            "medley"        -> tour.isMedley,
+            "medleyMinutes" -> tour.medleyMinutes,
+            "medleyRound"   -> full.option(tour.medleyRound.getOrElse(-1)),
+            "perf"          -> full.option(tour.currentPerfType),
+            "clock"         -> full.option(tour.clock),
+            "lib"           -> full.option(tour.currentVariant.gameLogic.id),
+            "variant"       -> full.option(variantJson(tour.currentVariant)),
+            "p1Name" -> full.option(
+              if (tour.isMedley) trans.p1.txt()
+              else tour.variant.playerNames(P1)
+            ),
+            "p2Name" -> full.option(
+              if (tour.isMedley) trans.p2.txt()
+              else tour.variant.playerNames(P2)
+            )
           )
           .add("spotlight" -> tour.spotlight)
           .add("berserkable" -> tour.berserkable)
@@ -131,6 +141,7 @@ final class JsonView(
           .add("trophy1st" -> tour.trophy1st)
           .add("trophy2nd" -> tour.trophy2nd)
           .add("trophy3rd" -> tour.trophy3rd)
+          .add("medleyVariants" -> tour.medleyRounds.map(_.map(variantJson)))
           .add("private" -> tour.isPrivate)
           .add("quote" -> tour.isCreated.option(Quote.one(tour.id, tour.variant.gameFamily.some)))
           .add("defender" -> shieldOwner.map(_.value))
@@ -550,6 +561,14 @@ object JsonView {
 
   private def formatDate(date: DateTime) = ISODateTimeFormat.dateTime print date
 
+  private[tournament] def variantJson(v: Variant)(implicit lang: Lang) =
+    Json.obj(
+      "key"      -> v.key,
+      "short"    -> VariantKeys.variantShortName(v),
+      "name"     -> VariantKeys.variantName(v),
+      "iconChar" -> v.perfIcon.toString
+    )
+
   private[tournament] def scheduleJson(s: Schedule) =
     Json.obj(
       "freq"  -> s.freq.name,
@@ -600,4 +619,5 @@ object JsonView {
     }
 
   implicit private[tournament] val statsWrites: Writes[TournamentStats] = Json.writes[TournamentStats]
+
 }
