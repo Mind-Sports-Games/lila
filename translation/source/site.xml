@@ -194,7 +194,10 @@
   <string name="rulesVariants">Rules &amp; Variants</string>
   <string name="medley">Medley</string>
   <string name="medleyTournaments">Medley Tournaments</string>
-  <string name="medleyDefinition">A different game in every round of the Swiss</string>
+  <string name="medleyDefinition">A different game/variant in every round of the Swiss</string>
+  <string name="medleyArenaDefinition">The game/variant changes at regular intervals in the tournament</string>
+  <string name="medleyInterval">Medley Interval</string>
+  <string name="medleyIntervalDefinition">How long each game/variant gets in the medley tournament</string>
   <string name="timeControl">Time control</string>
   <string name="realTime">Real time</string>
   <string name="correspondence">Correspondence</string>
@@ -457,9 +460,11 @@ computer analysis, game chat and shareable URL.</string>
   <string name="losses">Losses</string>
   <string name="winStreak">Win streak</string>
   <string name="createdBy">Created by</string>
+  <string name="medleyTournamentVariantChange">Medley Tournament variant has changed to: %s</string>
   <string name="tournamentIsStarting">The tournament is starting</string>
   <string name="tournamentPairingsAreNowClosed">The tournament pairings are now closed.</string>
   <string name="standByX">Stand by %s, pairing players, get ready!</string>
+  <string name="standByXForY">Stand by %1$s, pairing players for %2$s, get ready!</string>
   <string name="youArePlaying">You are playing!</string>
   <string name="winRate">Win rate</string>
   <string name="berserkRate">Berserk rate</string>

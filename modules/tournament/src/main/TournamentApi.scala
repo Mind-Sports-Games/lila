@@ -4,6 +4,7 @@ import akka.actor.{ ActorSystem, Props }
 import akka.stream.scaladsl._
 import org.joda.time.DateTime
 import play.api.libs.json._
+import play.api.i18n.Lang
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 import scala.util.chaining._
@@ -14,6 +15,7 @@ import lila.common.{ Bus, Debouncer, LightUser }
 import lila.game.{ Game, GameRepo, LightPov, Pov }
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam._
+import lila.i18n.{ defaultLang, I18nKeys => trans, VariantKeys }
 import lila.round.actorApi.round.{ AbortForce, GoBerserk }
 import lila.socket.Socket.SendToFlag
 import lila.user.{ User, UserRepo }
@@ -74,6 +76,8 @@ final class TournamentApi(
       mode = setup.realMode,
       password = setup.password,
       variant = setup.realVariant,
+      medleyVariants = setup.medleyVariants,
+      medleyMinutes = setup.medleyMinutes,
       position = setup.realPosition,
       berserkable = setup.berserkable | true,
       streakable = setup.streakable | true,
@@ -239,6 +243,18 @@ final class TournamentApi(
       }
     }
 
+  private[tournament] def newMedleyRound(tour: Tournament)(implicit lang: Lang = defaultLang) = {
+    tournamentRepo.setMedleyVariant(tour.id, tour.currentVariant)
+    socket.systemChat(
+      tour.id,
+      trans.medleyTournamentVariantChange.txt(VariantKeys.variantName(tour.currentVariant))
+    )
+    socket.newMedleyVariant(tour.id, apiJsonView.variantJson(tour.currentVariant))
+    //socket.newMedleyVariant(tour.id, VariantKeys.variantName(tour.currentVariant))
+    //socket.reload(tour.id)
+    //publish()
+  }
+
   def kill(tour: Tournament): Funit = {
     if (tour.isStarted) finish(tour)
     else if (tour.isCreated) destroy(tour)
@@ -323,7 +339,7 @@ final class TournamentApi(
               else if (!pause.canJoin(me.id, tour)) fuccess(JoinResult.Paused)
               else {
                 def proceedWithTeam(team: Option[String]): Fu[JoinResult] =
-                  playerRepo.join(tour.id, me, tour.perfType, team) >>
+                  playerRepo.join(tour.id, me, tour.currentPerfType, team) >>
                     updateNbPlayers(tour.id) >>- {
                       socket.reload(tour.id)
                       publish()
@@ -453,7 +469,7 @@ final class TournamentApi(
         Game
       ] // if set, update the player performance. Leave to none to just recompute the sheet.
   )(userId: User.ID): Funit =
-    tour.mode.rated ?? { userRepo.perfOf(userId, tour.perfType) } flatMap { perf =>
+    tour.mode.rated ?? { userRepo.perfOf(userId, tour.currentPerfType) } flatMap { perf =>
       playerRepo.update(tour.id, userId) { player =>
         cached.sheet.update(tour, userId).map { sheet =>
           player.copy(

@@ -54,13 +54,19 @@ final private class StartedOrganizer(
         .unit
   }
 
-  private def processTour(tour: Tournament): Fu[Int] =
+  private def processTour(tour: Tournament): Fu[Int] = {
     if (tour.secondsToFinish <= 0) api finish tour inject 0
-    else if (!tour.isScheduled && tour.nbPlayers < 30 && ThreadLocalRandom.nextInt(10) == 0) {
-      playerRepo nbActiveUserIds tour.id flatMap { nb =>
-        (nb >= 2) ?? startPairing(tour)
-      }
-    } else startPairing(tour)
+    else {
+      if (tour.currentVariant != tour.variant){ api newMedleyRound tour }
+      if (!tour.isScheduled && tour.nbPlayers < 30 && ThreadLocalRandom.nextInt(10) == 0) {
+        playerRepo nbActiveUserIds tour.id flatMap { nb =>
+          (nb >= 2) ?? startPairing(tour)
+        }
+      } else startPairing(tour)
+    }
+  }
+
+  //private def medleyChangeVariant(tour: Tournament): Fu[Int] =
 
   // returns number of users actively awaiting a pairing
   private def startPairing(tour: Tournament): Fu[Int] =

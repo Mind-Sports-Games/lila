@@ -8,6 +8,8 @@ import lila.rating.PerfType
 import lila.user.LightUserApi
 import lila.i18n.VariantKeys
 
+import strategygames.variant.Variant
+
 final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import JsonView._
@@ -38,23 +40,19 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
   private def baseJson(tour: Tournament)(implicit lang: Lang): JsObject =
     Json
       .obj(
-        "id"        -> tour.id,
-        "createdBy" -> tour.createdBy,
-        "system"    -> "arena", // BC
-        "minutes"   -> tour.minutes,
-        "clock"     -> tour.clock,
-        "rated"     -> tour.mode.rated,
-        "fullName"  -> tour.name(),
-        "nbPlayers" -> tour.nbPlayers,
-        "variant" -> Json.obj(
-          "key"   -> tour.variant.key,
-          "short" -> VariantKeys.variantShortName(tour.variant),
-          "name"  -> VariantKeys.variantName(tour.variant)
-        ),
+        "id"         -> tour.id,
+        "createdBy"  -> tour.createdBy,
+        "system"     -> "arena", // BC
+        "minutes"    -> tour.minutes,
+        "clock"      -> tour.clock,
+        "rated"      -> tour.mode.rated,
+        "fullName"   -> tour.name(),
+        "nbPlayers"  -> tour.nbPlayers,
+        "variant"    -> variantJson(tour.currentVariant),
         "startsAt"   -> tour.startsAt,
         "finishesAt" -> tour.finishesAt,
         "status"     -> tour.status.id,
-        "perf"       -> perfJson(tour.perfType)
+        "perf"       -> perfJson(tour.currentPerfType)
       )
       .add("secondsToStart", tour.secondsToStart.some.filter(0 <))
       .add("hasMaxRating", tour.conditions.maxRating.isDefined)
@@ -95,4 +93,11 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
       "position" -> ~perfPositions.get(p)
     )
 
+  def variantJson(v: Variant)(implicit lang: Lang) =
+    Json.obj(
+      "key"      -> v.key,
+      "short"    -> VariantKeys.variantShortName(v),
+      "name"     -> VariantKeys.variantName(v),
+      "iconChar" -> v.perfIcon.toString
+    )
 }

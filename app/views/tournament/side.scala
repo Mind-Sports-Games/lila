@@ -26,12 +26,14 @@ object side {
   )(implicit ctx: Context) =
     frag(
       div(cls := "tour__meta")(
-        st.section(dataIcon := tour.perfType.iconChar.toString)(
+        st.section(dataIcon := (if (tour.isMedley) "5" else tour.perfType.iconChar.toString))(
           div(
             p(
               tour.clock.show,
               separator,
-              if (tour.variant.exotic) {
+              if (tour.isMedley) {
+                views.html.game.bits.medleyLink
+              } else if (tour.variant.exotic) {
                 views.html.game.bits.variantLink(
                   tour.variant,
                   if (tour.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
@@ -63,6 +65,14 @@ object side {
                 userIdLink(owner.value.some)
               )
             }
+          )
+        },
+        tour.medleyVariants.map { medleyVariants =>
+          views.html.tournament.bits.medleyGames(
+            medleyVariants,
+            tour.minutes,
+            tour.medleyMinutes.getOrElse(0),
+            tour.pairingsClosedSeconds.toDouble / 60
           )
         },
         tour.description map { d =>
