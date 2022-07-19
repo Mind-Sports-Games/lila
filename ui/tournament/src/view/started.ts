@@ -20,7 +20,7 @@ function joinTheGame(ctrl: TournamentController, gameId: string) {
   );
 }
 
-function standByMsg(ctrl: TournamentController): String {
+function standByMsg(ctrl: TournamentController): string {
   return ctrl.data.medley
     ? ctrl.trans('standByXForY', ctrl.data.me.username, ctrl.data.variant.name)
     : ctrl.trans('standByX', ctrl.data.me.username);
