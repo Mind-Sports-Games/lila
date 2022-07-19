@@ -9,6 +9,11 @@ import * as pagination from '../pagination';
 import * as tour from '../tournament';
 import TournamentController from '../ctrl';
 import { MaybeVNodes } from '../interfaces';
+import { medleyVariantListItems } from './util';
+
+function medleyVariants(ctrl: TournamentController) {
+  return h('div.medley-variants-horiz', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound));
+}
 
 function joinTheGame(ctrl: TournamentController, gameId: string) {
   return h(
@@ -39,6 +44,7 @@ export function main(ctrl: TournamentController): MaybeVNodes {
     pag = pagination.players(ctrl);
   return [
     header(ctrl),
+    ctrl.data.medley ? medleyVariants(ctrl) : null,
     gameId ? joinTheGame(ctrl, gameId) : tour.isIn(ctrl) ? notice(ctrl) : null,
     teamStanding(ctrl, 'started'),
     controls(ctrl, pag),

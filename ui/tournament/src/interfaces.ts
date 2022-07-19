@@ -37,7 +37,7 @@ export interface FeaturedGame {
   fen: Fen;
   gameLogic: string;
   gameFamily: string;
-  variant: Variant;
+  variantKey: string;
   boardSize?: BoardSize;
   orientation: PlayerIndex;
   lastMove: string;
