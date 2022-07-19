@@ -129,6 +129,7 @@
 
 $narrow-user-list-width: 30ch;
 
+.medley-variants-horiz,
 .medley-variants {
   @extend %box-radius;
 
@@ -189,8 +190,25 @@ $narrow-user-list-width: 30ch;
   h3 {
     margin: 5px;
   }
+
+  .medley-variant-name {
+    margin-left: 0.6em;
+  }
 }
 
-.medley-variant-name {
-  margin-left: 0.6em;
+.medley-variants-horiz {
+  overflow: auto;
+  white-space: nowrap;
+
+  .medley-variant__item {
+    width: 13.5em;
+    display: inline-block;
+  }
+}
+
+.medley-variants {
+  .medley-variants-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax($narrow-user-list-width, 1fr));
+  }
 }

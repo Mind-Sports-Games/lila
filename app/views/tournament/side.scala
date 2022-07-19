@@ -67,14 +67,14 @@ object side {
             }
           )
         },
-        tour.medleyVariants.map { medleyVariants =>
-          views.html.tournament.bits.medleyGames(
-            medleyVariants,
-            tour.minutes,
-            tour.medleyMinutes.getOrElse(0),
-            tour.pairingsClosedSeconds.toDouble / 60
-          )
-        },
+        //tour.medleyVariants.map { medleyVariants =>
+        //  views.html.tournament.bits.medleyGames(
+        //    medleyVariants,
+        //    tour.minutes,
+        //    tour.medleyMinutes.getOrElse(0),
+        //    tour.pairingsClosedSeconds.toDouble / 60
+        //  )
+        //},
         tour.description map { d =>
           st.section(cls := "description")(markdownLinksOrRichText(d))
         },

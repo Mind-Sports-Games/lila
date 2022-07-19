@@ -247,7 +247,7 @@ final class TournamentApi(
     tournamentRepo.setMedleyVariant(tour.id, tour.currentVariant)
     socket.systemChat(
       tour.id,
-      trans.medleyTournamentVariantChange.txt(VariantKeys.variantName(tour.currentVariant))
+      trans.nowPairingX.txt(VariantKeys.variantName(tour.currentVariant))
     )
     socket.newMedleyVariant(tour.id, apiJsonView.variantJson(tour.currentVariant))
     //socket.newMedleyVariant(tour.id, VariantKeys.variantName(tour.currentVariant))
