@@ -78,3 +78,36 @@ export function spinner(): VNode {
     ]),
   ]);
 }
+
+export function medleyVariantListItems(variants: Variant[], medleyRound: number) {
+  const variantsH = [] as (string | VNode)[];
+  variants.forEach((v, index) => {
+    variantsH.push(
+      h(
+        'section.medley-variant__item',
+        h(
+          'h2' + (medleyRound == index ? '.current-variant' : ''),
+          h(
+            'a.medley-variant' + (medleyRound == index ? '.current-variant-link' : ''),
+            {
+              attrs: {
+                href: '/variant/' + v.key,
+                'data-icon': typeof v.iconChar == 'undefined' ? '' : v.iconChar,
+              },
+            },
+            h('span.medley-variant-name', v.name)
+          )
+        )
+      )
+    );
+  });
+  return variantsH;
+}
+
+export function medleyVariantsList(variants: Variant[], medleyMinutes: number, medleyRound: number) {
+  return h('div.medley-variants', [
+    h('h2', 'Medley Variants'),
+    h('h3', medleyMinutes.toString() + ' minutes for each variant'),
+    h('div.medley-variants-list', medleyVariantListItems(variants, medleyRound)),
+  ]);
+}
