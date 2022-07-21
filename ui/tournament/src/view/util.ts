@@ -1,5 +1,6 @@
 import { Attrs, h, Hooks, VNode } from 'snabbdom';
 import { numberFormat } from 'common/number';
+import TournamentController from '../ctrl';
 
 export function bind(eventName: string, f: (e: Event) => any, redraw?: () => void): Hooks {
   return onInsert(el =>
@@ -79,6 +80,10 @@ export function spinner(): VNode {
   ]);
 }
 
+export function medleyVariants(ctrl: TournamentController) {
+  return h('div.medley-variants-horiz', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound));
+}
+
 export function medleyVariantListItems(variants: Variant[], medleyRound: number) {
   const variantsH = [] as (string | VNode)[];
   variants.forEach((v, index) => {
@@ -104,10 +109,9 @@ export function medleyVariantListItems(variants: Variant[], medleyRound: number)
   return variantsH;
 }
 
-export function medleyVariantsList(variants: Variant[], medleyMinutes: number, medleyRound: number) {
-  return h('div.medley-variants', [
-    h('h2', 'Medley Variants'),
-    h('h3', medleyMinutes.toString() + ' minutes for each variant'),
+export function medleyVariantsList(variants: Variant[], medleyMinutesTrans: string, medleyRound: number) {
+  return h('div.medley-variants.tour__actor-info', [
+    h('h1', medleyMinutesTrans),
     h('div.medley-variants-list', medleyVariantListItems(variants, medleyRound)),
   ]);
 }
