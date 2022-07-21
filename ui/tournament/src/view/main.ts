@@ -46,7 +46,11 @@ export default function (ctrl: TournamentController) {
         })
       : null,
     ctrl.data.medley && handler.name == 'created'
-      ? medleyVariantsList(ctrl.data.medleyVariants, ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes), ctrl.data.medleyRound)
+      ? medleyVariantsList(
+          ctrl.data.medleyVariants,
+          ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes),
+          ctrl.data.medleyRound
+        )
       : null,
     ctrl.joinWithTeamSelector ? joinWithTeamSelector(ctrl) : null,
   ]);
