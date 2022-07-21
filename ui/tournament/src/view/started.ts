@@ -9,6 +9,7 @@ import * as pagination from '../pagination';
 import * as tour from '../tournament';
 import TournamentController from '../ctrl';
 import { MaybeVNodes } from '../interfaces';
+import { medleyVariants } from './util';
 
 function joinTheGame(ctrl: TournamentController, gameId: string) {
   return h(
@@ -20,9 +21,15 @@ function joinTheGame(ctrl: TournamentController, gameId: string) {
   );
 }
 
+function standByMsg(ctrl: TournamentController): string {
+  return ctrl.data.medley
+    ? ctrl.trans('standByXForY', ctrl.data.me.username, ctrl.data.variant.name)
+    : ctrl.trans('standByX', ctrl.data.me.username);
+}
+
 function notice(ctrl: TournamentController): VNode {
   return tour.willBePaired(ctrl)
-    ? h('div.tour__notice.bar-glider', ctrl.trans('standByX', ctrl.data.me.username))
+    ? h('div.tour__notice.bar-glider', standByMsg(ctrl))
     : h('div.tour__notice.closed', ctrl.trans('tournamentPairingsAreNowClosed'));
 }
 
@@ -33,6 +40,7 @@ export function main(ctrl: TournamentController): MaybeVNodes {
     pag = pagination.players(ctrl);
   return [
     header(ctrl),
+    ctrl.data.medley ? medleyVariants(ctrl) : null,
     gameId ? joinTheGame(ctrl, gameId) : tour.isIn(ctrl) ? notice(ctrl) : null,
     teamStanding(ctrl, 'started'),
     controls(ctrl, pag),

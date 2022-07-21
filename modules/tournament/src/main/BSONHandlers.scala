@@ -13,6 +13,8 @@ import lila.user.User.playstrategyId
 
 object BSONHandlers {
 
+  implicit val stratVariantHandler = stratVariantByKeyHandler
+
   implicit private[tournament] val statusBSONHandler = tryHandler[Status](
     { case BSONInteger(v) => Status(v) toTry s"No such status: $v" },
     x => BSONInteger(x.id)
@@ -77,6 +79,8 @@ object BSONHandlers {
         clock = r.get[strategygames.Clock.Config]("clock"),
         minutes = r int "minutes",
         variant = variant,
+        medleyVariants = r.getO[List[Variant]]("mVariants"),
+        medleyMinutes = r.intO("mMinutes"),
         position = position,
         mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,
         password = r.strO("password"),
@@ -112,6 +116,8 @@ object BSONHandlers {
         "minutes"     -> o.minutes,
         "lib"         -> o.variant.gameLogic.id,
         "variant"     -> o.variant.some.filterNot(_.standard).map(_.id),
+        "mVariants"   -> o.medleyVariants,
+        "mMinutes"    -> o.medleyMinutes,
         "fen"         -> o.position.map(_.value),
         "mode"        -> o.mode.some.filterNot(_.rated).map(_.id),
         "password"    -> o.password,

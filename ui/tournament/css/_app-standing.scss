@@ -126,3 +126,98 @@
     padding-right: $block-gap;
   }
 }
+
+$narrow-user-list-width: 30ch;
+
+.medley-variants-horiz,
+.medley-variants {
+  @extend %box-radius;
+
+  &__item {
+    background: $c-bg-box;
+    border-right: $border;
+  }
+
+  h1 {
+    font-size: 1.7em;
+    padding: 10px;
+    margin-bottom: 0px;
+  }
+
+  h2 {
+    @extend %metal, %box-shadow;
+
+    padding-left: 0.8rem;
+    margin: 0;
+    white-space: nowrap;
+
+    a {
+      display: block;
+
+      &:hover {
+        color: $c-link;
+      }
+    }
+  }
+
+  li {
+    @extend %flex-between;
+
+    padding: 1.2rem 1.2rem 1.2rem 0.5rem;
+
+    &:nth-child(even) {
+      background: $c-bg-zebra;
+    }
+  }
+
+  a {
+    color: $c-font;
+  }
+
+  h2 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-size: 1.25em;
+    line-height: 2em;
+  }
+
+  .current-variant {
+    background: $c-good;
+  }
+
+  .current-variant-link {
+    color: $c-bg-box;
+    &:hover {
+      color: $c-bg-box;
+      font-weight: bold;
+    }
+  }
+
+  h3 {
+    margin: 5px;
+  }
+
+  .medley-variant-name {
+    margin-left: 0.6em;
+  }
+}
+
+.medley-variants-horiz {
+  overflow: auto;
+  white-space: nowrap;
+
+  .medley-variant__item {
+    width: 13em;
+    display: inline-block;
+  }
+
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+}
+
+.medley-variants {
+  .medley-variants-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax($narrow-user-list-width, 1fr));
+  }
+}

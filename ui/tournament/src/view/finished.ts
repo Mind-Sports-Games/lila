@@ -7,7 +7,7 @@ import { teamStanding } from './battle';
 import header from './header';
 import playerInfo from './playerInfo';
 import teamInfo from './teamInfo';
-import { numberRow } from './util';
+import { numberRow, medleyVariants } from './util';
 
 function confetti(data: TournamentData): VNode | undefined {
   if (data.me && data.isRecentlyFinished && playstrategy.once('tournament.end.canvas.' + data.id))
@@ -115,6 +115,7 @@ export function main(ctrl: TournamentController): MaybeVNodes {
   const teamS = teamStanding(ctrl, 'finished');
   return [
     ...(teamS ? [header(ctrl), teamS] : [h('div.podium-wrap', [confetti(ctrl.data), header(ctrl), podium(ctrl)])]),
+    ctrl.data.medley ? medleyVariants(ctrl) : null,
     controls(ctrl, pag),
     standing(ctrl, pag),
   ];
