@@ -28,7 +28,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            fields.microMatch,
+            form3.split(fields.microMatch, fields.useMatchScore),
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
             fields.medleyDefaults,
@@ -68,7 +68,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            fields.microMatch,
+            form3.split(fields.microMatch, fields.useMatchScore),
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
             fields.medleyDefaults,
@@ -167,7 +167,17 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.checkbox(
         form("microMatch"),
         trans.microMatch(),
+        half = true,
         help = raw(trans.microMatchDefinition.txt().replace("(", "<br>(")).some
+      )
+    )
+  def useMatchScore =
+    frag(
+      form3.checkbox(
+        form("useMatchScore"),
+        trans.useMatchScore(),
+        half = true,
+        help = raw(trans.useMatchScoreDefinition.txt().replace("(", "<br>(")).some
       )
     )
   def medley =

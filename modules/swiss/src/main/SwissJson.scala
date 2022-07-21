@@ -194,6 +194,7 @@ object SwissJson {
         "trophy2nd"        -> swiss.trophy2nd,
         "trophy3rd"        -> swiss.trophy3rd,
         "isMicroMatch"     -> swiss.settings.isMicroMatch,
+        "useMatchScore"    -> swiss.settings.useMatchScore,
         "status" -> {
           if (swiss.isStarted) "started"
           else if (swiss.isFinished) "finished"

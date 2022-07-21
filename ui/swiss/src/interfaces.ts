@@ -42,6 +42,7 @@ export interface SwissData {
   trophy3rd: string;
   isMicroMatch: boolean;
   microMatchGameId?: string;
+  useMatchScore: boolean;
   status: Status;
   standing: Standing;
   boards: Board[];

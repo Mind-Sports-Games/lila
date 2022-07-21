@@ -144,6 +144,7 @@ object Swiss {
       nbRounds: Int,
       rated: Boolean,
       isMicroMatch: Boolean,
+      useMatchScore: Boolean,
       description: Option[String] = None,
       useDrawTables: Boolean,
       usePerPairingDrawTables: Boolean,

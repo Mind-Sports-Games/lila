@@ -48,6 +48,7 @@ final class SwissForm(implicit mode: Mode) {
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "rated"                -> optional(boolean),
         "microMatch"           -> optional(boolean),
+        "useMatchScore"        -> optional(boolean),
         "nbRounds"             -> number(min = minRounds, max = SwissBounds.maxRounds),
         "description"          -> optional(cleanNonEmptyText),
         "drawTables"           -> optional(boolean),
@@ -87,6 +88,7 @@ final class SwissForm(implicit mode: Mode) {
       ),
       rated = true.some,
       microMatch = false.some,
+      useMatchScore = false.some,
       nbRounds = 7,
       description = none,
       drawTables = false.some,
@@ -122,6 +124,7 @@ final class SwissForm(implicit mode: Mode) {
       ),
       rated = s.settings.rated.some,
       microMatch = s.settings.isMicroMatch.some,
+      useMatchScore = s.settings.useMatchScore.some,
       nbRounds = s.settings.nbRounds,
       description = s.settings.description,
       drawTables = s.settings.useDrawTables.some,
@@ -224,6 +227,7 @@ object SwissForm {
       medleyGameFamilies: MedleyGameFamilies,
       rated: Option[Boolean],
       microMatch: Option[Boolean],
+      useMatchScore: Option[Boolean],
       nbRounds: Int,
       description: Option[String],
       drawTables: Option[Boolean],
@@ -263,8 +267,9 @@ object SwissForm {
     def usePerPairingDrawTables = perPairingDrawTables | false
     def realPosition            = position ifTrue realVariant.standardVariant
 
-    def isRated      = rated | true
-    def isMicroMatch = microMatch | false
+    def isRated         = rated | true
+    def isMicroMatch    = microMatch | false
+    def isUseMatchScore = useMatchScore | false
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
