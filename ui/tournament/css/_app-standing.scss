@@ -138,6 +138,12 @@ $narrow-user-list-width: 30ch;
     border-right: $border;
   }
 
+  h1 {
+    font-size: 1.7em;
+    padding: 10px;
+    margin-bottom: 0px;
+  }
+
   h2 {
     @extend %metal, %box-shadow;
 
@@ -197,13 +203,18 @@ $narrow-user-list-width: 30ch;
 }
 
 .medley-variants-horiz {
+
   overflow: auto;
   white-space: nowrap;
 
   .medley-variant__item {
-    width: 13.5em;
+    width: 13em;
     display: inline-block;
   }
+
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+
 }
 
 .medley-variants {

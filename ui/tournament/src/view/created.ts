@@ -7,6 +7,7 @@ import { teamStanding } from './battle';
 import teamInfo from './teamInfo';
 import { onInsert } from './util';
 import header from './header';
+import { medleyVariants } from './util';
 
 export const name = 'created';
 
@@ -14,6 +15,7 @@ export function main(ctrl: TournamentController): MaybeVNodes {
   const pag = pagination.players(ctrl);
   return [
     header(ctrl),
+    ctrl.data.medley ? medleyVariants(ctrl) : null,
     teamStanding(ctrl, 'created'),
     controls(ctrl, pag),
     standing(ctrl, pag, 'created'),
