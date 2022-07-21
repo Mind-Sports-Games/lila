@@ -7,8 +7,7 @@ import { teamStanding } from './battle';
 import header from './header';
 import playerInfo from './playerInfo';
 import teamInfo from './teamInfo';
-import { numberRow } from './util';
-import { medleyVariants } from './util';
+import { numberRow, medleyVariants } from './util';
 
 function confetti(data: TournamentData): VNode | undefined {
   if (data.me && data.isRecentlyFinished && playstrategy.once('tournament.end.canvas.' + data.id))
