@@ -92,6 +92,9 @@ export function medleyVariantListItems(variants: Variant[], medleyRound: number)
         'section.medley-variant__item',
         h(
           'h2' + (medleyRound == index ? '.current-variant' : ''),
+          {
+            hook: bind('click', _ => console.log('here'))//, ctrl.redraw),
+          },
           h(
             'a.medley-variant' + (medleyRound == index ? '.current-variant-link' : ''),
             {
