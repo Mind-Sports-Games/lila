@@ -281,6 +281,11 @@ object TournamentShield {
           Variant.Draughts(strategygames.draughts.variant.Pool)
         )
 
+    case object Portuguese
+        extends Category(
+          Variant.Draughts(strategygames.draughts.variant.Portuguese)
+        )
+
     case object Shogi
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.Shogi)
@@ -308,7 +313,7 @@ object TournamentShield {
 
     case object Flipello10
         extends Category(
-          Variant.FairySF(strategygames.fairysf.variant.Flipello10),
+          Variant.FairySF(strategygames.fairysf.variant.Flipello10)
         )
 
     case object Oware
@@ -337,6 +342,7 @@ object TournamentShield {
       Russian,
       Brazilian,
       Pool,
+      Portuguese,
       Shogi,
       Xiangqi,
       MiniShogi,
