@@ -222,6 +222,17 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   def setStatus(tourId: Tournament.ID, status: Status) =
     coll.updateField($id(tourId), "status", status.id).void
 
+  def setMedleyVariant(tourId: Tournament.ID, variant: Variant) =
+    coll.update
+      .one(
+        $id(tourId),
+        $set(
+          "lib"     -> variant.gameLogic.id,
+          "variant" -> variant.id
+        )
+      )
+      .void
+
   def setNbPlayers(tourId: Tournament.ID, nb: Int) =
     coll.updateField($id(tourId), "nbPlayers", nb).void
 

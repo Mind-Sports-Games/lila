@@ -1,5 +1,6 @@
 import { Attrs, h, Hooks, VNode } from 'snabbdom';
 import { numberFormat } from 'common/number';
+import TournamentController from '../ctrl';
 
 export function bind(eventName: string, f: (e: Event) => any, redraw?: () => void): Hooks {
   return onInsert(el =>
@@ -76,5 +77,44 @@ export function spinner(): VNode {
         attrs: { cx: 20, cy: 20, r: 18, fill: 'none' },
       }),
     ]),
+  ]);
+}
+
+export function medleyVariants(ctrl: TournamentController) {
+  return h('div.medley-variants-horiz', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound));
+}
+
+export function medleyVariantListItems(variants: Variant[], medleyRound: number) {
+  const variantsH = [] as (string | VNode)[];
+  variants.forEach((v, index) => {
+    variantsH.push(
+      h(
+        'section.medley-variant__item',
+        h(
+          'h2' + (medleyRound == index ? '.current-variant' : ''),
+          //{
+          //  hook: bind('click', _ => console.log('here')), //, ctrl.redraw),
+          //},
+          h(
+            'a.medley-variant' + (medleyRound == index ? '.current-variant-link' : ''),
+            {
+              attrs: {
+                href: '/variant/' + v.key,
+                'data-icon': typeof v.iconChar == 'undefined' ? '' : v.iconChar,
+              },
+            },
+            h('span.medley-variant-name', v.name)
+          )
+        )
+      )
+    );
+  });
+  return variantsH;
+}
+
+export function medleyVariantsList(variants: Variant[], medleyMinutesTrans: string, medleyRound: number) {
+  return h('div.medley-variants.tour__actor-info', [
+    h('h1', medleyMinutesTrans),
+    h('div.medley-variants-list', medleyVariantListItems(variants, medleyRound)),
   ]);
 }

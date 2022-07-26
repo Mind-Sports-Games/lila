@@ -29,6 +29,22 @@ final class TournamentForm {
       waitMinutes = waitMinuteDefault.some,
       startDate = none,
       variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
+      medley = false.some,
+      medleyMinutes = medleyMinutesDefault.some,
+      medleyDefaults = MedleyDefaults(
+        onePerGameFamily = false.some,
+        exoticChessVariants = false.some,
+        draughts64Variants = false.some
+      ),
+      medleyGameFamilies = MedleyGameFamilies(
+        chess = true.some,
+        draughts = true.some,
+        shogi = true.some,
+        xiangqi = true.some,
+        loa = true.some,
+        flipello = true.some,
+        mancala = true.some
+      ),
       position = None,
       password = None,
       mode = none,
@@ -50,6 +66,22 @@ final class TournamentForm {
       waitMinutes = none,
       startDate = tour.startsAt.some,
       variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
+      medley = tour.isMedley.some,
+      medleyMinutes = tour.medleyMinutes,
+      medleyDefaults = MedleyDefaults(
+        onePerGameFamily = onePerGameFamilyInMedley(tour.medleyVariants).some,
+        exoticChessVariants = exoticChessVariants(tour.medleyVariants).some,
+        draughts64Variants = draughts64Variants(tour.medleyVariants).some
+      ),
+      medleyGameFamilies = MedleyGameFamilies(
+        chess = gameFamilyInMedley(tour.medleyVariants, GameFamily.Chess()).some,
+        draughts = gameFamilyInMedley(tour.medleyVariants, GameFamily.Draughts()).some,
+        shogi = gameFamilyInMedley(tour.medleyVariants, GameFamily.Shogi()).some,
+        xiangqi = gameFamilyInMedley(tour.medleyVariants, GameFamily.Xiangqi()).some,
+        loa = gameFamilyInMedley(tour.medleyVariants, GameFamily.LinesOfAction()).some,
+        flipello = gameFamilyInMedley(tour.medleyVariants, GameFamily.Flipello()).some,
+        mancala = gameFamilyInMedley(tour.medleyVariants, GameFamily.Mancala()).some
+      ),
       position = tour.position,
       mode = none,
       rated = tour.mode.rated.some,
@@ -72,6 +104,24 @@ final class TournamentForm {
     }
   )
 
+  private def medleyVariantsList(medleyVariants: Option[List[Variant]]) =
+    medleyVariants.getOrElse(List[Variant]())
+
+  private def gameFamilyInMedley(medleyVariants: Option[List[Variant]], gf: GameFamily) =
+    medleyVariantsList(medleyVariants).map(v => v.gameFamily).contains(gf)
+
+  private def onePerGameFamilyInMedley(medleyVariants: Option[List[Variant]]) = {
+    val mvList       = medleyVariantsList(medleyVariants)
+    val gameFamilies = mvList.map(_.gameFamily).distinct
+    mvList.map(_.gameFamily).take(gameFamilies.size) == gameFamilies && gameFamilies.size > 1
+  }
+
+  private def exoticChessVariants(medleyVariants: Option[List[Variant]]) =
+    medleyVariantsList(medleyVariants).filterNot(_.exoticChessVariant).isEmpty
+
+  private def draughts64Variants(medleyVariants: Option[List[Variant]]) =
+    medleyVariantsList(medleyVariants).filterNot(_.draughts64Variant).isEmpty
+
   private def form(user: User, leaderTeams: List[LeaderTeam]) =
     Form(
       mapping(
@@ -82,9 +132,29 @@ final class TournamentForm {
           if (lila.security.Granter(_.ManageTournament)(user)) number
           else numberIn(minuteChoices)
         },
-        "waitMinutes"      -> optional(numberIn(waitMinuteChoices)),
-        "startDate"        -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "variant"           -> optional(nonEmptyText.verifying(v => Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined)),
+        "waitMinutes" -> optional(numberIn(waitMinuteChoices)),
+        "startDate"   -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
+        "variant" -> optional(
+          nonEmptyText.verifying(v =>
+            Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined
+          )
+        ),
+        "medley"        -> optional(boolean),
+        "medleyMinutes" -> optional(numberIn(medleyMinutes)),
+        "medleyDefaults" -> mapping(
+          "onePerGameFamily"    -> optional(boolean),
+          "exoticChessVariants" -> optional(boolean),
+          "draughts64Variants"  -> optional(boolean)
+        )(MedleyDefaults.apply)(MedleyDefaults.unapply),
+        "medleyGameFamilies" -> mapping(
+          "chess"    -> optional(boolean),
+          "draughts" -> optional(boolean),
+          "shogi"    -> optional(boolean),
+          "xiangqi"  -> optional(boolean),
+          "loa"      -> optional(boolean),
+          "flipello" -> optional(boolean),
+          "mancala"  -> optional(boolean)
+        )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
         "rated"            -> optional(boolean),
@@ -123,6 +193,10 @@ object TournamentForm {
   val minuteDefault = 45
   val minuteChoices = options(minutes, "%d minute{s}")
 
+  val medleyMinutes        = (5 to 30 by 5) ++ (40 to 40) ++ (45 to 60 by 15)
+  val medleyMinuteChoices  = options(medleyMinutes, "%d minute{s}")
+  val medleyMinutesDefault = 10
+
   val waitMinutes       = Seq(1, 2, 3, 5, 10, 15, 20, 30, 45, 60)
   val waitMinuteChoices = options(waitMinutes, "%d minute{s}")
   val waitMinuteDefault = 5
@@ -159,6 +233,10 @@ private[tournament] case class TournamentSetup(
     waitMinutes: Option[Int],
     startDate: Option[DateTime],
     variant: Option[String],
+    medley: Option[Boolean],
+    medleyMinutes: Option[Int],
+    medleyDefaults: MedleyDefaults,
+    medleyGameFamilies: MedleyGameFamilies,
     position: Option[FEN],
     mode: Option[Int], // deprecated, use rated
     rated: Option[Boolean],
@@ -182,8 +260,8 @@ private[tournament] case class TournamentSetup(
     case None    => GameLogic.Chess()
   }
 
-  def realVariant = variant flatMap {
-    v => Variant.apply(gameLogic, v.split("_")(1).toInt)
+  def realVariant = variant flatMap { v =>
+    Variant.apply(gameLogic, v.split("_")(1).toInt)
   } getOrElse Variant.default(gameLogic)
 
   def realPosition = position ifTrue realVariant.standardVariant
@@ -210,6 +288,14 @@ private[tournament] case class TournamentSetup(
         minutes = minutes,
         mode = realMode,
         variant = newVariant,
+        medleyVariants =
+          if (
+            old.medleyGameFamilies != medleyGameFamilies.gfList
+              .sortWith(_.name < _.name)
+              .some || old.medleyMinutes != medleyMinutes || old.minutes != minutes
+          ) medleyVariants
+          else old.medleyVariants,
+        medleyMinutes = medleyMinutes,
         startsAt = startDate | old.startsAt,
         password = password,
         position = newVariant.standardVariant ?? {
@@ -256,4 +342,66 @@ private[tournament] case class TournamentSetup(
   private def estimatedGameSeconds: Double = {
     (60 * clockTime + 30 * clockIncrement) * 2 * 0.8
   } + 15
+
+  def isMedley = (medley | false) && medleyGameFamilies.gfList.nonEmpty
+
+  def maxMedleyRounds = medleyMinutes.map(mm => Math.ceil(minutes.toDouble / mm).toInt)
+
+  //shuffle all variants from the selected game families
+  private lazy val generateNoDefaultsMedleyVariants: List[Variant] =
+    scala.util.Random
+      .shuffle(
+        Variant.all.filter(v => medleyGameFamilies.gfList.contains(v.gameFamily) && !v.fromPositionVariant)
+      )
+
+  private def generateMedleyVariants: List[Variant] =
+    if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
+      //take a shuffled list of all variants and pull the first for each game family to the front
+      val onePerGameFamilyVariantList = scala.util.Random.shuffle(
+        medleyGameFamilies.gfList.map(gf => generateNoDefaultsMedleyVariants.filter(_.gameFamily == gf).head)
+      )
+      onePerGameFamilyVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
+        onePerGameFamilyVariantList.contains(_)
+      )
+    } else if (medleyDefaults.exoticChessVariants.getOrElse(false))
+      scala.util.Random.shuffle(Variant.all.filter(_.exoticChessVariant))
+    else if (medleyDefaults.draughts64Variants.getOrElse(false))
+      scala.util.Random.shuffle(Variant.all.filter(_.draughts64Variant))
+    else generateNoDefaultsMedleyVariants
+
+  def medleyVariants: Option[List[Variant]] =
+    if (isMedley) {
+      val medleyList     = generateMedleyVariants
+      var fullMedleyList = medleyList
+      while (fullMedleyList.size < maxMedleyRounds.getOrElse(0))
+        fullMedleyList = fullMedleyList ::: medleyList
+      fullMedleyList.some
+    } else None
+}
+
+case class MedleyDefaults(
+    onePerGameFamily: Option[Boolean],
+    exoticChessVariants: Option[Boolean],
+    draughts64Variants: Option[Boolean]
+)
+
+case class MedleyGameFamilies(
+    chess: Option[Boolean],
+    draughts: Option[Boolean],
+    shogi: Option[Boolean],
+    xiangqi: Option[Boolean],
+    loa: Option[Boolean],
+    flipello: Option[Boolean],
+    mancala: Option[Boolean]
+) {
+
+  lazy val gfList: List[GameFamily] = GameFamily.all
+    .filterNot(gf => if (!chess.getOrElse(false)) gf == GameFamily.Chess() else false)
+    .filterNot(gf => if (!draughts.getOrElse(false)) gf == GameFamily.Draughts() else false)
+    .filterNot(gf => if (!shogi.getOrElse(false)) gf == GameFamily.Shogi() else false)
+    .filterNot(gf => if (!xiangqi.getOrElse(false)) gf == GameFamily.Xiangqi() else false)
+    .filterNot(gf => if (!loa.getOrElse(false)) gf == GameFamily.LinesOfAction() else false)
+    .filterNot(gf => if (!flipello.getOrElse(false)) gf == GameFamily.Flipello() else false)
+    .filterNot(gf => if (!mancala.getOrElse(false)) gf == GameFamily.Mancala() else false)
+
 }
