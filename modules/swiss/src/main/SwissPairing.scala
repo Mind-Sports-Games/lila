@@ -28,8 +28,16 @@ case class SwissPairing(
   def p1Wins                         = status == Right(Some(PlayerIndex.P1))
   def p2Wins                         = status == Right(Some(PlayerIndex.P2))
   def isDraw                         = status == Right(None)
+  def matchOutcome: List[Option[PlayerIndex]] =
+    List(Some(PlayerIndex.P1), None) //TODO change to get from game ids
   def strResultOf(playerIndex: PlayerIndex) =
-    status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
+    if (!isMicroMatch) status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
+    else {
+      matchOutcome
+        .map(outcome => outcome.fold(1)(c => if (c == playerIndex) 2 else 0))
+        .foldLeft(0)(_ + _)
+        .toString()
+    }
 }
 
 case class SwissPairingGameIds(
