@@ -87,6 +87,7 @@ object BsonHandlers {
             //       in the case that it's not a micromatch to save on storage
             isMicroMatch = r.getD[Boolean](isMicroMatch),
             microMatchGameId = r.getO[String](microMatchGameId),
+            useMatchScore = r.getD[Boolean](useMatchScore),
             //TODO allow this to work for chess too?
             openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
           )
@@ -103,6 +104,7 @@ object BsonHandlers {
         //       in the case that it's not a micromatch to save on storage
         isMicroMatch     -> o.isMicroMatch,
         microMatchGameId -> o.microMatchGameId,
+        useMatchScore    -> o.useMatchScore,
         openingFEN       -> o.openingFEN.map(_.value)
       )
   }
@@ -113,6 +115,7 @@ object BsonHandlers {
         id = r str id,
         isMicroMatch = r.get[Boolean](isMicroMatch),
         microMatchGameId = r.getO[String](microMatchGameId),
+        useMatchScore = r.get[Boolean](useMatchScore),
         //TODO allow this to work for chess too?
         openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
       )
@@ -121,6 +124,7 @@ object BsonHandlers {
         id               -> o.id,
         isMicroMatch     -> o.isMicroMatch,
         microMatchGameId -> o.microMatchGameId,
+        useMatchScore    -> o.useMatchScore,
         openingFEN       -> o.openingFEN.map(_.value)
       )
   }

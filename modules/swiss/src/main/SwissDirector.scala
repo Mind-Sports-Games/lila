@@ -64,6 +64,7 @@ final private class SwissDirector(
                 status = Left(SwissPairing.Ongoing),
                 isMicroMatch = swiss.settings.isMicroMatch,
                 None,
+                useMatchScore = swiss.settings.useMatchScore,
                 if (randomPairingPos) randomPos().orElse(perRoundPos) else perRoundPos
               )
             }

@@ -14,6 +14,7 @@ case class SwissPairing(
     status: SwissPairing.Status,
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
+    useMatchScore: Boolean,
     openingFEN: Option[FEN]
 ) {
   def apply(c: PlayerIndex)          = c.fold(p1, p2)
@@ -29,7 +30,7 @@ case class SwissPairing(
   def p2Wins                         = status == Right(Some(PlayerIndex.P2))
   def isDraw                         = status == Right(None)
   def matchOutcome: List[Option[PlayerIndex]] =
-    List(Some(PlayerIndex.P1), None) //TODO change to get from game ids
+    List(Some(PlayerIndex.P1), None) // TODO change to get from game ids/input?
   def strResultOf(playerIndex: PlayerIndex) =
     if (!isMicroMatch) status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
     else {
@@ -38,12 +39,14 @@ case class SwissPairing(
         .foldLeft(0)(_ + _)
         .toString()
     }
+
 }
 
 case class SwissPairingGameIds(
     id: Game.ID,
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
+    useMatchScore: Boolean,
     openingFEN: Option[FEN]
 )
 
@@ -52,6 +55,7 @@ case class SwissPairingGames(
     game: Game,
     isMicroMatch: Boolean,
     microMatchGame: Option[Game],
+    useMatchScore: Boolean,
     openingFEN: Option[FEN]
 ) {
   def finishedOrAborted =
@@ -77,6 +81,13 @@ case class SwissPairingGames(
   def playersWhoDidNotMove =
     List() ++ game.playerWhoDidNotMove ++ microMatchGame.flatMap(_.playerWhoDidNotMove)
   def createdAt = microMatchGame.fold(game.createdAt)(_.createdAt)
+  def matchOutcome: List[Option[PlayerIndex]] =
+    if (useMatchScore && isMicroMatch)
+      microMatchGame match {
+        case Some(g2) => List(game.winnerPlayerIndex, g2.winnerPlayerIndex)
+        case None     => List(game.winnerPlayerIndex, None)
+      }
+    else List(game.winnerPlayerIndex)
 }
 
 object SwissPairing {
@@ -86,12 +97,14 @@ object SwissPairing {
       swissPairing.id,
       swissPairing.isMicroMatch,
       swissPairing.microMatchGameId,
+      swissPairing.useMatchScore,
       swissPairing.openingFEN
     )
 
   sealed trait Ongoing
   case object Ongoing extends Ongoing
-  type Status = Either[Ongoing, Option[PlayerIndex]]
+  type Status      = Either[Ongoing, Option[PlayerIndex]]
+  type MatchStatus = Either[Ongoing, List[Option[PlayerIndex]]]
 
   val ongoing: Status = Left(Ongoing)
 
@@ -116,6 +129,7 @@ object SwissPairing {
     val status           = "t"
     val isMicroMatch     = "mm"
     val microMatchGameId = "mmid"
+    val useMatchScore    = "ms"
     val openingFEN       = "of"
   }
   def fields[A](f: Fields.type => A): A = f(Fields)

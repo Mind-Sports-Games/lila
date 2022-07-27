@@ -49,7 +49,8 @@ const readSheetMin = (str: string) =>
               g: s.slice(0, 8),
               o: s[8] == 'o',
               w: s[8] == 'w' ? true : s[8] == 'l' ? false : undefined,
-              m: s.length > 9 && s[9] == 'm',
+              ms: s.length > 9 && s[9] == 's',
+              m: (s.length > 9 && s[9] == 'm') || (s.length > 10 && s[9] == 's' && s[10] == 'm'),
             }
       )
     : [];

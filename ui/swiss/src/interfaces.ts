@@ -76,6 +76,7 @@ export interface MyInfo {
   gameId?: string;
   isMicroMatch: boolean;
   microMatchGameId?: string;
+  useMatchScore: boolean;
 }
 
 export interface PairingBase {
@@ -84,6 +85,7 @@ export interface PairingBase {
   w?: boolean; // won
   m: boolean; // isMicroMatch
   mmid?: string; // isMicroMatch
+  ms: boolean; // useMatchScore
 }
 
 export interface Pairing extends PairingBase {

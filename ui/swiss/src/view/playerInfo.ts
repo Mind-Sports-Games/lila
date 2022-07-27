@@ -38,6 +38,7 @@ const microMatchGames = (sheet: (PairingExt | Outcome)[]): (MicroMatchPairing | 
 export default function (ctrl: SwissCtrl): VNode | undefined {
   if (!ctrl.playerInfoId) return;
   const isMM = ctrl.data.isMicroMatch;
+  const useMatchScore = ctrl.data.useMatchScore;
   const data = ctrl.data.playerInfo;
   const noarg = ctrl.trans.noarg;
   const tag = 'div.swiss__player-info.swiss__table';
@@ -65,7 +66,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
       h('div.stats', [
         h('h2', [h('span.rank', data.rank + '. '), renderPlayer(data, true, !ctrl.data.isMedley)]),
         h('table', [
-          numberRow('Points', isMM ? data.points * 2 : data.points, 'raw'),
+          numberRow('Points', isMM && !useMatchScore ? data.points * 2 : data.points, 'raw'),
           numberRow('Tiebreak' + (data.tieBreak2 ? ' [BH]' : ' [SB]'), data.tieBreak, 'raw'),
           data.tieBreak2 ? numberRow('Tiebreak [SB]', data.tieBreak2, 'raw') : null,
           ...(games
@@ -99,7 +100,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 [
                   h('th', '' + round),
                   h('td.outcome', { attrs: { colspan: 3 } }, p.outcome),
-                  h('td', p.outcome == 'absent' ? '-' : p.outcome == 'bye' ? '1' : '½'),
+                  h('td', p.outcome == 'absent' ? '-' : p.outcome == 'bye' ? (useMatchScore && isMM ? '2' : '1') : '½'),
                 ]
               );
             const res = result(p);
@@ -127,6 +128,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
   );
 }
 
+//TODO change result to get actual results for ms (useMatchScore)
 function result(p: MicroMatchPairing): string {
   switch (p.w) {
     case true:

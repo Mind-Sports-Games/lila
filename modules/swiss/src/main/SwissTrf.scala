@@ -70,6 +70,7 @@ final class SwissTrf(
               case Loss     => "0"
               case Ongoing  => "Z"
               case WinWin   => "1" //todo change when working
+              case MatchBye => "U"
               case WinDraw  => "1"
               case WinLose  => "="
               case LoseWin  => "="

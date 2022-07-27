@@ -24,6 +24,7 @@ private object SwissSheet {
   case object Loss     extends Outcome
   case object Draw     extends Outcome
   case object WinWin   extends Outcome
+  case object MatchBye extends Outcome
   case object WinDraw  extends Outcome
   case object LoseWin  extends Outcome
   case object WinLose  extends Outcome
@@ -32,28 +33,28 @@ private object SwissSheet {
   case object LoseLose extends Outcome
 
   def pointsFor(outcome: Outcome) =
-    outcome match {
-      case Win | Bye => 2
-      case Draw      => 1
-      case WinWin    => 4
-      case WinDraw   => 3
-      case WinLose   => 2
-      case DrawDraw  => 2
-      case LoseWin   => 2
-      case LoseDraw  => 1
-      case _         => 0
+    outcome.pp("outcome in points") match {
+      case Win | Bye         => 2
+      case Draw              => 1
+      case WinWin | MatchBye => 4
+      case WinDraw           => 3
+      case WinLose           => 2
+      case DrawDraw          => 2
+      case LoseWin           => 2
+      case LoseDraw          => 1
+      case _                 => 0
     }
 
   //BBpairings can only handle the same points for a win, loss or draw therefore we have to lie to it
   def pointsForTrf(outcome: Outcome): Int =
     outcome match {
-      case Win | Bye => 2
-      case Draw      => 1
-      case WinWin    => 2
-      case WinDraw   => 2
-      case WinLose   => 1
-      case LoseWin   => 1
-      case _         => 0
+      case Win | Bye         => 2
+      case Draw              => 1
+      case WinWin | MatchBye => 2
+      case WinDraw           => 2
+      case WinLose           => 1
+      case LoseWin           => 1
+      case _                 => 0
     }
 
   def many(
@@ -62,7 +63,7 @@ private object SwissSheet {
       pairingMap: SwissPairing.PairingMap
   ): List[SwissSheet] =
     players.map { player =>
-      one(swiss, ~pairingMap.get(player.userId), player)
+      one(swiss, ~pairingMap.get(player.userId), player).pp("one outcome")
     }
 
   def one(
@@ -81,7 +82,8 @@ private object SwissSheet {
               case Right(Some(playerIndex)) =>
                 if (swiss.settings.useMatchScore) {
                   pairing.matchOutcome
-                    .map(outcome => outcome.fold(1)(c => if (c == playerIndex) 2 else 0))
+                    .pp("match outcome")
+                    .map(outcome => outcome.fold(1)(c => if (pairing(c) == player.userId) 2 else 0))
                     .foldLeft(0)(_ + _) match {
                     case 4 => WinWin
                     case 3 => WinDraw
@@ -92,8 +94,9 @@ private object SwissSheet {
                 } else if (pairing(playerIndex) == player.userId) Win
                 else Loss
             }
-          case None if player.byes(round) => Bye
-          case None                       => Absent
+          case None if player.byes(round) =>
+            if (swiss.settings.useMatchScore && swiss.settings.isMicroMatch) MatchBye else Bye
+          case None => Absent
         }
       }
     }

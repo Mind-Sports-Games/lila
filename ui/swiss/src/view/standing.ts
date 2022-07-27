@@ -64,12 +64,13 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
             .concat([...Array(Math.max(0, ctrl.data.nbRounds - player.sheet.length))].map(_ => h('r')))
         )
       ),
-      h('td.points', title('Points'), '' + (isMM ? player.points * 2 : player.points)),
+      h('td.points', title('Points'), '' + (isMM && !useMatchScore ? player.points * 2 : player.points)),
       h('td.tieBreak', title('Tiebreak'), '' + player.tieBreak),
     ]
   );
 }
 
+//TODO change result to get actual results for ms (useMatchScore)
 const result = (p: PairingBase): string => {
   switch (p.w) {
     case true:

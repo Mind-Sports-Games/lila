@@ -91,7 +91,8 @@ final class SwissJson(
                     $doc(
                       f.id               -> true,
                       f.isMicroMatch     -> true,
-                      f.microMatchGameId -> true
+                      f.microMatchGameId -> true,
+                      f.useMatchScore    -> true
                     ).some
                   )
                   .one[SwissPairingGameIds]
@@ -263,19 +264,21 @@ object SwissJson {
 
   private def outcomeJson(outcome: SwissSheet.Outcome): String =
     outcome match {
-      case SwissSheet.Absent => "absent"
-      case SwissSheet.Bye    => "bye"
-      case _                 => ""
+      case SwissSheet.Absent   => "absent"
+      case SwissSheet.Bye      => "bye"
+      case SwissSheet.MatchBye => "bye"
+      case _                   => ""
     }
 
   private def pairingJsonMin(player: SwissPlayer, pairing: SwissPairing): String = {
     val status =
       if (pairing.isOngoing) "o"
       else pairing.resultFor(player.userId).fold("d") { r => if (r) "w" else "l" }
-    val microMatch   = if (pairing.isMicroMatch) "m" else ""
-    val microMatchId = pairing.microMatchGameId.fold("")(g => s"_${g}")
-    val openingFEN   = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
-    s"${pairing.gameId}$status$microMatch$microMatchId$openingFEN"
+    val microMatch    = if (pairing.isMicroMatch) "m" else ""
+    val microMatchId  = pairing.microMatchGameId.fold("")(g => s"_${g}")
+    val useMatchScore = if (pairing.useMatchScore) "s" else ""
+    val openingFEN    = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
+    s"${pairing.gameId}$status$useMatchScore$microMatch$microMatchId$openingFEN"
   }
 
   private def pairingJson(player: SwissPlayer, pairing: SwissPairing) =
@@ -284,6 +287,7 @@ object SwissJson {
         "g"    -> pairing.gameId,
         "m"    -> pairing.isMicroMatch,
         "mmid" -> pairing.microMatchGameId,
+        "ms"   -> pairing.useMatchScore,
         "of"   -> pairing.openingFEN.map(_.value)
       )
       .add("o" -> pairing.isOngoing)
@@ -304,6 +308,7 @@ object SwissJson {
         "gameId"           -> i.gameIds.map(_.id),
         "isMicroMatch"     -> i.gameIds.map(_.isMicroMatch),
         "microMatchGameId" -> i.gameIds.flatMap(_.microMatchGameId),
+        "useMatchScore"    -> i.gameIds.map(_.useMatchScore),
         "id"               -> i.user.id,
         "name"             -> i.user.username,
         "absent"           -> i.player.absent

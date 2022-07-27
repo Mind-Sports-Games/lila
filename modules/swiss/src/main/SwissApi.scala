@@ -419,6 +419,7 @@ final class SwissApi(
           g,
           ids.isMicroMatch,
           ids.microMatchGameId.flatMap(gamesById.get),
+          ids.useMatchScore,
           ids.openingFEN
         )
       )
@@ -730,7 +731,8 @@ final class SwissApi(
                   $doc(
                     "id"               -> f.id,
                     "isMicroMatch"     -> f.isMicroMatch,
-                    "microMatchGameId" -> f.microMatchGameId
+                    "microMatchGameId" -> f.microMatchGameId,
+                    "useMatchScore"    -> f.useMatchScore
                   )
                 )
               )

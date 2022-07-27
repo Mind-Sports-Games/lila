@@ -3,10 +3,10 @@ import SwissCtrl from '../ctrl';
 import { PodiumPlayer } from '../interfaces';
 import { userName } from './util';
 
-function podiumStats(p: PodiumPlayer, trans: Trans, isMM: boolean, isMedley: boolean): VNode {
+function podiumStats(p: PodiumPlayer, trans: Trans, isMM: boolean, isMedley: boolean, useMatchScore: boolean): VNode {
   const noarg = trans.noarg;
   return h('table.stats', [
-    h('tr', [h('th', 'Points'), h('td', isMM ? '' + p.points * 2 : '' + p.points)]),
+    h('tr', [h('th', 'Points'), h('td', isMM && !useMatchScore ? '' + p.points * 2 : '' + p.points)]),
     h('tr', [h('th', 'Tiebreak'), h('td', '' + p.tieBreak)]),
     p.performance && !isMedley ? h('tr', [h('th', noarg('performance')), h('td', '' + p.performance)]) : null,
   ]);
@@ -29,7 +29,8 @@ function podiumPosition(
   trophyImg: string,
   trans: Trans,
   isMM: boolean,
-  isMedley: boolean
+  isMedley: boolean,
+  useMatchScore: boolean
 ): VNode | undefined {
   return p
     ? h(
@@ -48,7 +49,7 @@ function podiumPosition(
             },
             userName(p.user)
           ),
-          podiumStats(p, trans, isMM, isMedley),
+          podiumStats(p, trans, isMM, isMedley, useMatchScore),
         ]
       )
     : undefined;
@@ -57,10 +58,11 @@ function podiumPosition(
 export default function podium(ctrl: SwissCtrl) {
   const isMM = ctrl.data.isMicroMatch;
   const isMedley = ctrl.data.isMedley;
+  const useMatchScore = ctrl.data.useMatchScore;
   const p = ctrl.data.podium || [];
   return h('div.podium', [
-    podiumPosition(p[1], 'second', ctrl.data.trophy2nd, ctrl.trans, isMM, isMedley),
-    podiumPosition(p[0], 'first', ctrl.data.trophy1st, ctrl.trans, isMM, isMedley),
-    podiumPosition(p[2], 'third', ctrl.data.trophy3rd, ctrl.trans, isMM, isMedley),
+    podiumPosition(p[1], 'second', ctrl.data.trophy2nd, ctrl.trans, isMM, isMedley, useMatchScore),
+    podiumPosition(p[0], 'first', ctrl.data.trophy1st, ctrl.trans, isMM, isMedley, useMatchScore),
+    podiumPosition(p[2], 'third', ctrl.data.trophy3rd, ctrl.trans, isMM, isMedley, useMatchScore),
   ]);
 }
