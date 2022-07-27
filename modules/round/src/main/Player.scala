@@ -127,7 +127,7 @@ final private class Player(
       metrics: MoveMetrics,
       finalSquare: Boolean = false
   ): Validated[String, MoveResult] =
-    game.chess(uci, metrics, finalSquare).map {
+    game.chess.applyUci(uci, metrics, finalSquare).map {
       case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
       case (newChessGame, moveOrDrop) =>
         MoveApplied(
