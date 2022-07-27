@@ -103,7 +103,7 @@ export default function (ctrl: TournamentController): VNode {
               },
               [
                 h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
-                h('td', { attrs: { 'data-icon': p.variantIcon } }, ''),
+                ctrl.data.medley ? h('td', { attrs: { 'data-icon': p.variantIcon } }, '') : null,
                 h('td', playerName(p.op)),
                 h('td', ctrl.data.medley ? '' : p.op.rating),
                 h('td.is.playerIndex-icon.' + p.playerColor),
