@@ -183,13 +183,13 @@ $narrow-user-list-width: 30ch;
 
   .current-variant {
     background: $c-good;
-  }
 
-  .current-variant-link {
-    color: $c-bg-box;
-    &:hover {
+    .medley-variant {
       color: $c-bg-box;
-      font-weight: bold;
+      &:hover {
+        color: $c-bg-box;
+        font-weight: bold;
+      }
     }
   }
 
@@ -215,6 +215,7 @@ $narrow-user-list-width: 30ch;
 .medley-horiz-icon {
   font-size: 2em;
   line-height: 0.5em;
+  cursor: pointer;
 }
 
 .medley-variants-scrollable {

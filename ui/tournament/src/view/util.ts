@@ -116,9 +116,9 @@ export function medleyVariantListItems(variants: Variant[], medleyRound: number)
       h(
         'section.medley-variant__item',
         h(
-          'h2' + (medleyRound == index ? '.current-variant' : ''),
+          'h2' + (medleyRound == index ? '.current-variant' : '') + '.medley-round-' + index,
           h(
-            'a.medley-variant' + (medleyRound == index ? '.current-variant-link' : ''),
+            'a.medley-variant',
             {
               attrs: {
                 href: '/variant/' + v.key,

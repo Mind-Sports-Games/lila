@@ -154,6 +154,8 @@ export default class TournamentController {
     this.data.variant = variant;
     this.data.medleyRound += 1;
     $('.tour__notice').html(this.trans('standByXForY', this.data.me.username, variant.name));
+    $('.current-variant').removeClass('current-variant');
+    $('.medley-round-' + this.data.medleyRound).addClass('current-variant');
     //$('.medley-variants-list').html(medleyVariantListItems(this.data.medleyVariants, this.data.medleyRound));
   };
 
