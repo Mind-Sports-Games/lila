@@ -86,7 +86,7 @@ export function medleyVariantsHoriz(ctrl: TournamentController) {
       'div.medley-horiz-icon',
       {
         attrs: { 'data-icon': 5 },
-        hook: bind('click', _ => ctrl.showMedleyVariants(true), ctrl.redraw),
+        hook: bind('click', _ => ctrl.showMedleyVariants(!ctrl.showingMedleyVariants), ctrl.redraw),
       },
       ''
     ),

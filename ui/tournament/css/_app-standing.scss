@@ -220,7 +220,7 @@ $narrow-user-list-width: 30ch;
 .medley-horiz-icon {
   font-size: 2em;
   cursor: pointer;
-  display: contents;
+  display: flex;
 }
 
 .medley-variants-wide {
