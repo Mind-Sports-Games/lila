@@ -88,7 +88,8 @@ object BsonHandlers {
             isMicroMatch = r.getD[Boolean](isMicroMatch),
             microMatchGameId = r.getO[String](microMatchGameId),
             //TODO allow this to work for chess too?
-            openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
+            openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen)),
+            variant = r.getO[Variant](variant)
           )
         case _ => sys error "Invalid swiss pairing users"
       }
@@ -103,7 +104,8 @@ object BsonHandlers {
         //       in the case that it's not a micromatch to save on storage
         isMicroMatch     -> o.isMicroMatch,
         microMatchGameId -> o.microMatchGameId,
-        openingFEN       -> o.openingFEN.map(_.value)
+        openingFEN       -> o.openingFEN.map(_.value),
+        variant          -> o.variant
       )
   }
   implicit val pairingGamesHandler = new BSON[SwissPairingGameIds] {

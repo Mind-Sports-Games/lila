@@ -80,41 +80,74 @@ export function spinner(): VNode {
   ]);
 }
 
-export function medleyVariants(ctrl: TournamentController) {
-  return h('div.medley-variants-horiz', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound));
+export function medleyVariantsHoriz(ctrl: TournamentController) {
+  return h(
+    'div.medley-variants-horiz',
+    h(
+      'table',
+      h(
+        'tbody',
+        h('tr', [
+          h(
+            'td',
+            h(
+              'div.medley-horiz-icon',
+              {
+                attrs: { 'data-icon': 5 },
+                hook: bind('click', _ => ctrl.showMedleyVariants(true), ctrl.redraw),
+              },
+              ''
+            )
+          ),
+          h(
+            'td',
+            h(
+              'div.medley-variants-scrollable',
+              medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, false)
+            )
+          ),
+        ])
+      )
+    )
+  );
 }
 
-export function medleyVariantListItems(variants: Variant[], medleyRound: number) {
+export function medleyVariantListItems(variants: Variant[], medleyRound: number, displayCompleted: boolean) {
   const variantsH = [] as (string | VNode)[];
   variants.forEach((v, index) => {
-    variantsH.push(
-      h(
-        'section.medley-variant__item',
-        h(
-          'h2' + (medleyRound == index ? '.current-variant' : ''),
-          //{
-          //  hook: bind('click', _ => console.log('here')), //, ctrl.redraw),
-          //},
+    displayCompleted || index >= medleyRound
+      ? variantsH.push(
           h(
-            'a.medley-variant' + (medleyRound == index ? '.current-variant-link' : ''),
-            {
-              attrs: {
-                href: '/variant/' + v.key,
-                'data-icon': typeof v.iconChar == 'undefined' ? '' : v.iconChar,
-              },
-            },
-            h('span.medley-variant-name', v.name)
+            'section.medley-variant__item.medley-round-' + index + (index == medleyRound ? '.current-variant' : ''),
+            h(
+              'h2',
+              h(
+                'a.medley-variant',
+                {
+                  attrs: {
+                    href: '/variant/' + v.key,
+                    'data-icon': typeof v.iconChar == 'undefined' ? '' : v.iconChar,
+                  },
+                },
+                h('span.medley-variant-name', v.name)
+              )
+            )
           )
         )
-      )
-    );
+      : null;
   });
   return variantsH;
 }
 
-export function medleyVariantsList(variants: Variant[], medleyMinutesTrans: string, medleyRound: number) {
+export function medleyVariantsList(ctrl: TournamentController, withClose: boolean) {
   return h('div.medley-variants.tour__actor-info', [
-    h('h1', medleyMinutesTrans),
-    h('div.medley-variants-list', medleyVariantListItems(variants, medleyRound)),
+    withClose
+      ? h('a.close', {
+          attrs: dataIcon('L'),
+          hook: bind('click', () => ctrl.showMedleyVariants(false), ctrl.redraw),
+        })
+      : null,
+    h('h1', ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes)),
+    h('div.medley-variants-list', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, true)),
   ]);
 }

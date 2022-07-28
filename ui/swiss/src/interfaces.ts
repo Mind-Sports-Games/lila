@@ -83,6 +83,7 @@ export interface PairingBase {
   w?: boolean; // won
   m: boolean; // isMicroMatch
   mmid?: string; // isMicroMatch
+  vi?: string; //variant icon
 }
 
 export interface Pairing extends PairingBase {

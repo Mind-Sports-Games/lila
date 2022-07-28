@@ -2,6 +2,7 @@ package lila.swiss
 
 import strategygames.{ Player => PlayerIndex }
 import strategygames.format.FEN
+import strategygames.variant.Variant
 import lila.game.Game
 import lila.user.User
 
@@ -14,7 +15,8 @@ case class SwissPairing(
     status: SwissPairing.Status,
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
-    openingFEN: Option[FEN]
+    openingFEN: Option[FEN],
+    variant: Option[Variant] = None
 ) {
   def apply(c: PlayerIndex)          = c.fold(p1, p2)
   def gameId                         = id
@@ -109,6 +111,7 @@ object SwissPairing {
     val isMicroMatch     = "mm"
     val microMatchGameId = "mmid"
     val openingFEN       = "of"
+    val variant          = "v"
   }
   def fields[A](f: Fields.type => A): A = f(Fields)
 
