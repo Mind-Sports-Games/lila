@@ -182,7 +182,9 @@ $narrow-user-list-width: 30ch;
   }
 
   .current-variant {
-    background: $c-good;
+    h2 {
+      background: $c-good;
+    }
 
     .medley-variant {
       color: $c-bg-box;

@@ -101,7 +101,10 @@ export function medleyVariantsHoriz(ctrl: TournamentController) {
           ),
           h(
             'td',
-            h('div.medley-variants-scrollable', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound))
+            h(
+              'div.medley-variants-scrollable',
+              medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, false)
+            )
           ),
         ])
       )
@@ -109,27 +112,29 @@ export function medleyVariantsHoriz(ctrl: TournamentController) {
   );
 }
 
-export function medleyVariantListItems(variants: Variant[], medleyRound: number) {
+export function medleyVariantListItems(variants: Variant[], medleyRound: number, displayCompleted: boolean) {
   const variantsH = [] as (string | VNode)[];
   variants.forEach((v, index) => {
-    variantsH.push(
-      h(
-        'section.medley-variant__item',
-        h(
-          'h2' + (medleyRound == index ? '.current-variant' : '') + '.medley-round-' + index,
+    displayCompleted || index >= medleyRound
+      ? variantsH.push(
           h(
-            'a.medley-variant',
-            {
-              attrs: {
-                href: '/variant/' + v.key,
-                'data-icon': typeof v.iconChar == 'undefined' ? '' : v.iconChar,
-              },
-            },
-            h('span.medley-variant-name', v.name)
+            'section.medley-variant__item.medley-round-' + index + (index == medleyRound ? '.current-variant' : ''),
+            h(
+              'h2',
+              h(
+                'a.medley-variant',
+                {
+                  attrs: {
+                    href: '/variant/' + v.key,
+                    'data-icon': typeof v.iconChar == 'undefined' ? '' : v.iconChar,
+                  },
+                },
+                h('span.medley-variant-name', v.name)
+              )
+            )
           )
         )
-      )
-    );
+      : null;
   });
   return variantsH;
 }
@@ -143,6 +148,6 @@ export function medleyVariantsList(ctrl: TournamentController, withClose: boolea
         })
       : null,
     h('h1', ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes)),
-    h('div.medley-variants-list', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound)),
+    h('div.medley-variants-list', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, true)),
   ]);
 }
