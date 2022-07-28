@@ -81,35 +81,23 @@ export function spinner(): VNode {
 }
 
 export function medleyVariantsHoriz(ctrl: TournamentController) {
-  return h(
-    'div.medley-variants-horiz',
+  return h('div.medley-variants-horiz', [
     h(
-      'table',
+      'div.medley-horiz-icon',
+      {
+        attrs: { 'data-icon': 5 },
+        hook: bind('click', _ => ctrl.showMedleyVariants(true), ctrl.redraw),
+      },
+      ''
+    ),
+    h(
+      'div.medley-variants-wide',
       h(
-        'tbody',
-        h('tr', [
-          h(
-            'td',
-            h(
-              'div.medley-horiz-icon',
-              {
-                attrs: { 'data-icon': 5 },
-                hook: bind('click', _ => ctrl.showMedleyVariants(true), ctrl.redraw),
-              },
-              ''
-            )
-          ),
-          h(
-            'td',
-            h(
-              'div.medley-variants-scrollable',
-              medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, false)
-            )
-          ),
-        ])
+        'div.medley-variants-scrollable',
+        medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, false)
       )
-    )
-  );
+    ),
+  ]);
 }
 
 export function medleyVariantListItems(variants: Variant[], medleyRound: number, displayCompleted: boolean) {

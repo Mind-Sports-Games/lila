@@ -208,32 +208,31 @@ $narrow-user-list-width: 30ch;
   border-top: 1px solid;
   border-bottom: 1px solid;
   white-space: nowrap;
+  display: flex;
+  flex-direction: row;
   overflow: hidden;
-  div {
-    display: inline-block;
+  width: 100vw;
+  @include breakpoint($mq-small) {
+    width: unset;
   }
 }
 
 .medley-horiz-icon {
   font-size: 2em;
-  line-height: 0.5em;
   cursor: pointer;
+  display: contents;
+}
+
+.medley-variants-wide {
+  overflow: scroll;
 }
 
 .medley-variants-scrollable {
   white-space: nowrap;
-  margin-bottom: -0.3em;
 
   .medley-variant__item {
     width: 13em;
     display: inline-block;
-  }
-
-  overflow: auto;
-  max-width: 100vw;
-
-  @include breakpoint($mq-small) {
-    width: unset;
   }
 }
 
