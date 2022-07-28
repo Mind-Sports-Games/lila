@@ -25,6 +25,7 @@ export default class TournamentController {
   joinSpinner = false;
   playerInfo: PlayerInfo = {};
   teamInfo: CtrlTeamInfo = {};
+  showingMedleyVariants = false;
   disableClicks = true;
   searching = false;
   joinWithTeamSelector = false;
@@ -176,11 +177,23 @@ export default class TournamentController {
       player: player,
       data: null,
     };
-    if (this.playerInfo.id) xhr.playerInfo(this, this.playerInfo.id);
+    if (this.playerInfo.id) {
+      this.setShowMedleyVariants(false);
+      xhr.playerInfo(this, this.playerInfo.id);
+    }
   };
 
   setPlayerInfoData = data => {
     if (data.player.id === this.playerInfo.id) this.playerInfo.data = data;
+  };
+
+  showMedleyVariants = bool => {
+    if (this.data.secondsToStart) return;
+    this.setShowMedleyVariants(bool);
+  };
+
+  setShowMedleyVariants = bool => {
+    this.showingMedleyVariants = bool;
   };
 
   showTeamInfo = (teamId: string) => {
