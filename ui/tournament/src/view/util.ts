@@ -94,7 +94,7 @@ export function medleyVariantsHoriz(ctrl: TournamentController) {
       'div.medley-variants-wide',
       h(
         'div.medley-variants-scrollable',
-        medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, false)
+        medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, ctrl.data.isFinished)
       )
     ),
   ]);
