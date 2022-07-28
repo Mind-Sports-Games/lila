@@ -221,7 +221,8 @@ final class JsonView(
                 "op"          -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
                 "win"         -> score.flatMap(_.isWin),
                 "status"      -> pov.game.status.id,
-                "score"       -> score.map(sheetScoreJson)
+                "score"       -> score.map(sheetScoreJson),
+                "variantIcon" -> pov.game.variant.perfIcon.toString
               )
               .add("berserk" -> pov.player.berserk)
           }

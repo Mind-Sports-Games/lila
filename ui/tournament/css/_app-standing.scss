@@ -182,14 +182,16 @@ $narrow-user-list-width: 30ch;
   }
 
   .current-variant {
-    background: $c-good;
-  }
+    h2 {
+      background: $c-good;
+    }
 
-  .current-variant-link {
-    color: $c-bg-box;
-    &:hover {
+    .medley-variant {
       color: $c-bg-box;
-      font-weight: bold;
+      &:hover {
+        color: $c-bg-box;
+        font-weight: bold;
+      }
     }
   }
 
@@ -203,16 +205,35 @@ $narrow-user-list-width: 30ch;
 }
 
 .medley-variants-horiz {
-  overflow: auto;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  width: 100vw;
+  @include breakpoint($mq-small) {
+    width: unset;
+  }
+}
+
+.medley-horiz-icon {
+  font-size: 2em;
+  cursor: pointer;
+  display: contents;
+}
+
+.medley-variants-wide {
+  overflow: scroll;
+}
+
+.medley-variants-scrollable {
   white-space: nowrap;
 
   .medley-variant__item {
     width: 13em;
     display: inline-block;
   }
-
-  border-top: 1px solid;
-  border-bottom: 1px solid;
 }
 
 .medley-variants {

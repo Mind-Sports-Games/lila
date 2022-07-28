@@ -5,7 +5,7 @@ import * as pagination from '../pagination';
 import { controls, standing } from './arena';
 import { teamStanding } from './battle';
 import teamInfo from './teamInfo';
-import { onInsert, medleyVariants } from './util';
+import { onInsert, medleyVariantsHoriz } from './util';
 import header from './header';
 
 export const name = 'created';
@@ -14,7 +14,7 @@ export function main(ctrl: TournamentController): MaybeVNodes {
   const pag = pagination.players(ctrl);
   return [
     header(ctrl),
-    ctrl.data.medley ? medleyVariants(ctrl) : null,
+    ctrl.data.medley ? medleyVariantsHoriz(ctrl) : null,
     teamStanding(ctrl, 'created'),
     controls(ctrl, pag),
     standing(ctrl, pag, 'created'),

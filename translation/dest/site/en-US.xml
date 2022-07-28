@@ -184,7 +184,7 @@
   <string name="medleyArenaDefinition">The game/variant changes at regular intervals in the tournament</string>
   <string name="medleyInterval">Medley Interval</string>
   <string name="medleyIntervalDefinition">How long each game/variant gets in the medley tournament</string>
-  <string name="medleyVariantsXMinutesEach">Medley Variants - %s minutes each</string>
+  <string name="medleyVariantsXMinutesEach">Medley Variants: %s minutes each</string>
   <string name="timeControl">Time control</string>
   <string name="realTime">Real time</string>
   <string name="correspondence">Correspondence</string>

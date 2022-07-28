@@ -45,13 +45,7 @@ export default function (ctrl: TournamentController) {
           hook: onInsert(playstrategy.watchers),
         })
       : null,
-    ctrl.data.medley && handler.name == 'created'
-      ? medleyVariantsList(
-          ctrl.data.medleyVariants,
-          ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes),
-          ctrl.data.medleyRound
-        )
-      : null,
+    ctrl.data.medley && handler.name == 'created' ? medleyVariantsList(ctrl, false) : null,
     ctrl.joinWithTeamSelector ? joinWithTeamSelector(ctrl) : null,
   ]);
 }
