@@ -50,7 +50,8 @@ const readSheetMin = (str: string) =>
               o: s[8] == 'o',
               w: s[8] == 'w' ? true : s[8] == 'l' ? false : undefined,
               ms: s.length > 9 && s[9] == 's',
-              m: (s.length > 9 && s[9] == 'm') || (s.length > 10 && s[9] == 's' && s[10] == 'm'),
+              mp: s.length > 9 && s[9] == 's' ? s.slice(10, 12) : undefined, // match points x2 for ints could convert to ascii?
+              m: (s.length > 9 && s[9] == 'm') || (s.length > 12 && s[9] == 's' && s[12] == 'm'),
             }
       )
     : [];

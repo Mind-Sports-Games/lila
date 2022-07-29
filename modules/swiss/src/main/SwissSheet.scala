@@ -53,6 +53,7 @@ private object SwissSheet {
       case WinWin | MatchBye => 2
       case WinDraw           => 2
       case WinLose           => 1
+      case DrawDraw          => 1
       case LoseWin           => 1
       case _                 => 0
     }
@@ -73,23 +74,37 @@ private object SwissSheet {
   ): SwissSheet =
     SwissSheet {
       swiss.allRounds.map { round =>
-        pairingMap.pp("pairing map") get round match {
+        pairingMap get round match {
           case Some(pairing) =>
-            pairing.pp("pairing").status match {
+            pairing.status.pp("status") match {
               case Left(_) => Ongoing
               case Right(None) =>
-                if (swiss.settings.useMatchScore) WinLose else Draw //todo get actual results not just WinLose
+                if (swiss.settings.useMatchScore && swiss.settings.isMicroMatch)
+                  DrawDraw //todo get actual results not just DrawDraw
+                else Draw
               case Right(Some(playerIndex)) =>
                 if (swiss.settings.useMatchScore) {
-                  pairing.matchOutcome
-                    .pp("match outcome")
-                    .map(outcome => outcome.fold(1)(c => if (pairing(c) == player.userId) 2 else 0))
-                    .foldLeft(0)(_ + _) match {
-                    case 4 => WinWin
-                    case 3 => WinDraw
-                    case 2 => DrawDraw
-                    case 1 => LoseDraw
-                    case 0 => LoseLose
+                  pairing.matchStatus.pp("match Status/outcome") match {
+                    case Left(_) => Ongoing
+                    case Right(l) =>
+                      l.zipWithIndex
+                        .map { case (outcome, index) =>
+                          outcome.fold(1)(c =>
+                            if (
+                              (pairing(c) == player.userId && index % 2 == 0) || (pairing(
+                                c
+                              ) != player.userId && index % 2 == 1)
+                            ) 2
+                            else 0
+                          )
+                        }
+                        .foldLeft(0)(_ + _) match {
+                        case 4 => WinWin
+                        case 3 => WinDraw  //change to reflect actual order (e.g. list not 1 state)
+                        case 2 => DrawDraw //change to relfect actual games
+                        case 1 => LoseDraw
+                        case 0 => LoseLose
+                      }
                   }
                 } else if (pairing(playerIndex) == player.userId) Win
                 else Loss

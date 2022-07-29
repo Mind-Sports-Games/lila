@@ -70,8 +70,19 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
   );
 }
 
-//TODO change result to get actual results for ms (useMatchScore)
 const result = (p: PairingBase): string => {
+  if (p.ms) {
+    if (!p.mp) return '?';
+    const score = parseInt(p.mp, 10);
+    const isOdd = score % 2 == 1;
+    const oddPart = isOdd ? '½' : '';
+    const base = Math.floor(score / 2);
+    if (score == 1) {
+      return '½';
+    } else {
+      return `${base}${oddPart}`;
+    }
+  }
   switch (p.w) {
     case true:
       return p.m ? '2' : '1';

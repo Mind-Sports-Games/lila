@@ -71,6 +71,36 @@ object BsonHandlers {
       case _              => BSONNull
     }
   )
+  implicit val pairingMatchStatusHandler = lila.db.dsl.quickHandler[SwissPairing.MatchStatus](
+    {
+      case BSONBoolean(true) => Left(SwissPairing.Ongoing)
+      case BSONArray(indexs) =>
+        Right(
+          indexs
+            .map(i =>
+              i match {
+                case BSONInteger(0) => None
+                case BSONInteger(1) => PlayerIndex.fromName("p1")
+                case BSONInteger(2) => PlayerIndex.fromName("p2")
+                case _              => None
+              }
+            )
+            .toList
+        )
+      case _ => Right(List(none))
+    },
+    {
+      case Left(_) => BSONBoolean(true)
+      case Right(l) =>
+        BSONArray(l.map { p =>
+          p match {
+            case Some(p) => BSONInteger(if (p.name == "p1") 1 else 2)
+            case _       => BSONInteger(0)
+          }
+        })
+      case _ => BSONNull
+    }
+  )
   implicit val pairingHandler = new BSON[SwissPairing] {
     import SwissPairing.Fields._
     def reads(r: BSON.Reader) =
@@ -83,6 +113,7 @@ object BsonHandlers {
             p1 = w,
             p2 = b,
             status = r.getO[SwissPairing.Status](status) | Right(none),
+            matchStatus = r.getO[SwissPairing.MatchStatus](matchStatus) | Right(List(none)),
             // TODO: long term we may want to skip storing both of these fields
             //       in the case that it's not a micromatch to save on storage
             isMicroMatch = r.getD[Boolean](isMicroMatch),
@@ -95,11 +126,12 @@ object BsonHandlers {
       }
     def writes(w: BSON.Writer, o: SwissPairing) =
       $doc(
-        id      -> o.id,
-        swissId -> o.swissId,
-        round   -> o.round,
-        players -> o.players,
-        status  -> o.status,
+        id          -> o.id,
+        swissId     -> o.swissId,
+        round       -> o.round,
+        players     -> o.players,
+        status      -> o.status,
+        matchStatus -> o.matchStatus,
         // TODO: long term we may want to skip storing both of these fields
         //       in the case that it's not a micromatch to save on storage
         isMicroMatch     -> o.isMicroMatch,

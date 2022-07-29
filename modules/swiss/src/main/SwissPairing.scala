@@ -12,6 +12,7 @@ case class SwissPairing(
     p1: User.ID,
     p2: User.ID,
     status: SwissPairing.Status,
+    matchStatus: SwissPairing.MatchStatus,
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
     useMatchScore: Boolean,
@@ -29,15 +30,45 @@ case class SwissPairing(
   def p1Wins                         = status == Right(Some(PlayerIndex.P1))
   def p2Wins                         = status == Right(Some(PlayerIndex.P2))
   def isDraw                         = status == Right(None)
-  def matchOutcome: List[Option[PlayerIndex]] =
-    List(Some(PlayerIndex.P1), None) // TODO change to get from game ids/input?
+  def matchScoreFor(userId: User.ID) =
+    if (useMatchScore)
+      matchStatus match {
+        case Left(_) => "00"
+        case Right(l) =>
+          l.zipWithIndex
+            .map { case (outcome, index) =>
+              outcome.fold(1)(c =>
+                if ( //players swap playerindex each game of multi match
+                  (c == playerIndexOf(userId) && (index % 2 == 0)) || (c != playerIndexOf(
+                    userId
+                  ) && (index % 2 == 1))
+                ) 2
+                else 0
+              )
+            }
+            .foldLeft(0)(_ + _)
+            .toString()
+            .reverse
+            .padTo(2, '0')
+            .reverse
+      }
+    else ""
   def strResultOf(playerIndex: PlayerIndex) =
     if (!isMicroMatch) status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
     else {
-      matchOutcome
-        .map(outcome => outcome.fold(1)(c => if (c == playerIndex) 2 else 0))
-        .foldLeft(0)(_ + _)
-        .toString()
+      matchStatus
+        .pp("MatchStatus")
+        .fold(
+          _ => "*",
+          _.zipWithIndex
+            .map { case (outcome, index) =>
+              outcome.fold(1)(c =>
+                if ((c == playerIndex && (index % 2 == 0)) || (c != playerIndex && (index % 2 == 1))) 2 else 0
+              )
+            }
+            .foldLeft(0)(_ + _)
+            .toString()
+        )
     }
 
 }
@@ -127,6 +158,7 @@ object SwissPairing {
     val gameId           = "g"
     val players          = "p"
     val status           = "t"
+    val matchStatus      = "mt"
     val isMicroMatch     = "mm"
     val microMatchGameId = "mmid"
     val useMatchScore    = "ms"

@@ -62,6 +62,7 @@ final private class SwissDirector(
                 p1 = w,
                 p2 = b,
                 status = Left(SwissPairing.Ongoing),
+                matchStatus = Left(SwissPairing.Ongoing),
                 isMicroMatch = swiss.settings.isMicroMatch,
                 None,
                 useMatchScore = swiss.settings.useMatchScore,

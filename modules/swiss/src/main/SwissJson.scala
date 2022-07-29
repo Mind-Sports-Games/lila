@@ -277,8 +277,10 @@ object SwissJson {
     val microMatch    = if (pairing.isMicroMatch) "m" else ""
     val microMatchId  = pairing.microMatchGameId.fold("")(g => s"_${g}")
     val useMatchScore = if (pairing.useMatchScore) "s" else ""
-    val openingFEN    = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
-    s"${pairing.gameId}$status$useMatchScore$microMatch$microMatchId$openingFEN"
+    val matchScore =
+      pairing.matchScoreFor(player.userId) // "" if useMatchScore is false, otherwise 2 digit string number
+    val openingFEN = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
+    s"${pairing.gameId}$status$useMatchScore$matchScore$microMatch$microMatchId$openingFEN"
   }
 
   private def pairingJson(player: SwissPlayer, pairing: SwissPairing) =
@@ -288,6 +290,7 @@ object SwissJson {
         "m"    -> pairing.isMicroMatch,
         "mmid" -> pairing.microMatchGameId,
         "ms"   -> pairing.useMatchScore,
+        "mp"   -> pairing.matchScoreFor(player.userId),
         "of"   -> pairing.openingFEN.map(_.value)
       )
       .add("o" -> pairing.isOngoing)

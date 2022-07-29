@@ -105,7 +105,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
               );
             const res = result(p);
             return h(
-              'tr.glpt.' + (res === '1' ? '.win' : res === '0' ? '.loss' : ''),
+              'tr.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
               {
                 key: round,
                 attrs: { 'data-href': '/' + p.g + (p.c ? '' : '/p2') },
@@ -128,8 +128,19 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
   );
 }
 
-//TODO change result to get actual results for ms (useMatchScore)
 function result(p: MicroMatchPairing): string {
+  if (p.ms) {
+    if (!p.mp) return '?';
+    const score = parseInt(p.mp, 10);
+    const isOdd = score % 2 == 1;
+    const oddPart = isOdd ? '½' : '';
+    const base = Math.floor(score / 2);
+    if (score == 1) {
+      return '½';
+    } else {
+      return `${base}${oddPart}`;
+    }
+  }
   switch (p.w) {
     case true:
       return p.m ? '2' : '1';
