@@ -26,6 +26,7 @@ object Step {
 
   case class Move(uci: Uci, san: String) {
     def uciString = uci.uci
+    def shortUciString = uci.shortUci
   }
 
   // TODO copied from lila.game
@@ -56,7 +57,7 @@ object Step {
     Json
       .obj(
         "ply" -> ply,
-        "uci" -> move.map(_.uciString),
+        "uci" -> move.map(_.shortUciString),
         "san" -> move.map(_.san),
         "fen" -> fen.value,
         "captLen" -> ~captLen
