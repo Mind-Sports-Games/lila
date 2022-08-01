@@ -15,13 +15,13 @@ const renderGameState = (game: FeaturedGame): string =>
     ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orientation}|${game.lastMove}`
     : `${game.fen},${game.orientation},${game.lastMove}`;
 
-function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex) {
+function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating: boolean) {
   const player = game[playerIndex];
   const clock = game.c || game.clock; // temporary BC, remove me
   return h('span.mini-game__player', [
     h('span.mini-game__user', [
       h('strong', '#' + player.rank),
-      renderPlayer(player, true, true, false),
+      renderPlayer(player, true, withRating, false),
       player.berserk
         ? h('i', {
             attrs: {
@@ -42,7 +42,7 @@ function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex) {
   ]);
 }
 
-function featured(game: FeaturedGame): VNode {
+function featured(game: FeaturedGame, withRating: boolean): VNode {
   return h(
     `div${renderGameClasses(game)}`,
     {
@@ -53,13 +53,13 @@ function featured(game: FeaturedGame): VNode {
       hook: onInsert(playstrategy.powertip.manualUserIn),
     },
     [
-      featuredPlayer(game, opposite(game.orientation)),
+      featuredPlayer(game, opposite(game.orientation), withRating),
       h('a.cg-wrap', {
         attrs: {
           href: `/${game.id}/${game.orientation}`,
         },
       }),
-      featuredPlayer(game, game.orientation),
+      featuredPlayer(game, game.orientation, withRating),
     ]
   );
 }
@@ -101,7 +101,7 @@ export default function (ctrl: TournamentController): VNode {
       },
     },
     [
-      ctrl.data.featured ? featured(ctrl.data.featured) : null,
+      ctrl.data.featured ? featured(ctrl.data.featured, !ctrl.data.medley) : null,
       ctrl.data.duels.length
         ? h(
             'section.tour__duels',
