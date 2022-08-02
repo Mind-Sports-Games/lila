@@ -52,7 +52,8 @@ object side {
                 s"${s.round}/${s.settings.nbRounds}",
                 if (s.settings.isMicroMatch) {
                   " micro-match rounds"
-                } else " rounds"
+                } else " rounds",
+                if (s.settings.useMatchScore) " (match score)" else ""
               ),
               separator,
               a(href := routes.Swiss.home)("Swiss"),

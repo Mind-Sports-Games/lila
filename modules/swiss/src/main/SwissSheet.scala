@@ -1,6 +1,6 @@
 package lila.swiss
 
-private case class SwissSheet(outcomes: List[SwissSheet.Outcome]) {
+private case class SwissSheet(outcomes: List[List[SwissSheet.Outcome]]) {
   import SwissSheet._
 
   def points =
@@ -17,45 +17,28 @@ private case class SwissSheet(outcomes: List[SwissSheet.Outcome]) {
 private object SwissSheet {
 
   sealed trait Outcome
-  case object Bye      extends Outcome
-  case object Absent   extends Outcome
-  case object Ongoing  extends Outcome
-  case object Win      extends Outcome
-  case object Loss     extends Outcome
-  case object Draw     extends Outcome
-  case object WinWin   extends Outcome
-  case object MatchBye extends Outcome
-  case object WinDraw  extends Outcome
-  case object LoseWin  extends Outcome
-  case object WinLose  extends Outcome
-  case object DrawDraw extends Outcome
-  case object LoseDraw extends Outcome
-  case object LoseLose extends Outcome
+  case object Bye     extends Outcome
+  case object Absent  extends Outcome
+  case object Ongoing extends Outcome
+  case object Win     extends Outcome
+  case object Loss    extends Outcome
+  case object Draw    extends Outcome
 
-  def pointsFor(outcome: Outcome) =
-    outcome.pp("outcome in points") match {
-      case Win | Bye         => 2
-      case Draw              => 1
-      case WinWin | MatchBye => 4
-      case WinDraw           => 3
-      case WinLose           => 2
-      case DrawDraw          => 2
-      case LoseWin           => 2
-      case LoseDraw          => 1
-      case _                 => 0
+  def pointsFor(outcome: List[Outcome]) =
+    outcome.foldLeft(0) { case (acc, out) =>
+      acc + (out match {
+        case Win | Bye => 2
+        case Draw      => 1
+        case _         => 0
+      })
     }
 
   //BBpairings can only handle the same points for a win, loss or draw therefore we have to lie to it
-  def pointsForTrf(outcome: Outcome): Int =
-    outcome match {
-      case Win | Bye         => 2
-      case Draw              => 1
-      case WinWin | MatchBye => 2
-      case WinDraw           => 2
-      case WinLose           => 1
-      case DrawDraw          => 1
-      case LoseWin           => 1
-      case _                 => 0
+  def pointsForTrf(outcome: List[Outcome]): Int =
+    pointsFor(outcome) match {
+      case score if score > outcome.length  => 2
+      case score if score == outcome.length => 1
+      case _                                => 0
     }
 
   def many(
@@ -64,7 +47,7 @@ private object SwissSheet {
       pairingMap: SwissPairing.PairingMap
   ): List[SwissSheet] =
     players.map { player =>
-      one(swiss, ~pairingMap.get(player.userId), player).pp("one outcome")
+      one(swiss, ~pairingMap.get(player.userId), player)
     }
 
   def one(
@@ -76,44 +59,41 @@ private object SwissSheet {
       swiss.allRounds.map { round =>
         pairingMap get round match {
           case Some(pairing) =>
-            pairing.status.pp("status") match {
-              case Left(_) => Ongoing
+            pairing.status match {
+              case Left(_) => List(Ongoing)
               case Right(None) =>
                 if (swiss.settings.useMatchScore && swiss.settings.isMicroMatch)
-                  DrawDraw //todo get actual results not just DrawDraw
-                else Draw
+                  outcomeListFromMultiMatch(player, pairing)
+                else List(Draw)
               case Right(Some(playerIndex)) =>
                 if (swiss.settings.useMatchScore) {
-                  pairing.matchStatus.pp("match Status/outcome") match {
-                    case Left(_) => Ongoing
-                    case Right(l) =>
-                      l.zipWithIndex
-                        .map { case (outcome, index) =>
-                          outcome.fold(1)(c =>
-                            if (
-                              (pairing(c) == player.userId && index % 2 == 0) || (pairing(
-                                c
-                              ) != player.userId && index % 2 == 1)
-                            ) 2
-                            else 0
-                          )
-                        }
-                        .foldLeft(0)(_ + _) match {
-                        case 4 => WinWin
-                        case 3 => WinDraw  //change to reflect actual order (e.g. list not 1 state)
-                        case 2 => DrawDraw //change to relfect actual games
-                        case 1 => LoseDraw
-                        case 0 => LoseLose
-                      }
-                  }
-                } else if (pairing(playerIndex) == player.userId) Win
-                else Loss
+                  outcomeListFromMultiMatch(player, pairing)
+                } else if (pairing(playerIndex) == player.userId) List(Win)
+                else List(Loss)
             }
           case None if player.byes(round) =>
-            if (swiss.settings.useMatchScore && swiss.settings.isMicroMatch) MatchBye else Bye
-          case None => Absent
+            if (swiss.settings.useMatchScore && swiss.settings.isMicroMatch) List(Bye, Bye)
+            else List(Bye) //TODO this might change in best of x?
+          case None => List(Absent)
         }
       }
+    }
+
+  def outcomeListFromMultiMatch(player: SwissPlayer, pairing: SwissPairing): List[Outcome] =
+    pairing.matchStatus match {
+      case Left(_) => List(Ongoing)
+      case Right(l) =>
+        l.zipWithIndex
+          .map { case (outcome, index) =>
+            outcome.fold[Outcome](Draw)(c =>
+              if (
+                (pairing(c) == player.userId && index % 2 == 0) || (pairing(
+                  c
+                ) != player.userId && index % 2 == 1)
+              ) Win
+              else Loss
+            )
+          }
     }
 
 }

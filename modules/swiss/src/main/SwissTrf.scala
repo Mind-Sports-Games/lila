@@ -63,20 +63,22 @@ final class SwissTrf(
           99 -> {
             import SwissSheet._
             outcome match {
-              case Absent   => "-"
-              case Bye      => "U"
-              case Draw     => "="
-              case Win      => "1"
-              case Loss     => "0"
-              case Ongoing  => "Z"
-              case WinWin   => "1" //todo change when working
-              case MatchBye => "U"
-              case WinDraw  => "1"
-              case WinLose  => "="
-              case LoseWin  => "="
-              case DrawDraw => "="
-              case LoseDraw => "0"
-              case LoseLose => "0"
+              case res if outcome.length == 1 =>
+                res(0) match {
+                  case Absent  => "-"
+                  case Bye     => "U"
+                  case Draw    => "="
+                  case Win     => "1"
+                  case Loss    => "0"
+                  case Ongoing => "Z"
+                }
+              case _ if outcome(0) == Bye => "U"
+              case l =>
+                pointsForTrf(l) match {
+                  case 2 => "1"
+                  case 1 => "="
+                  case _ => "0"
+                }
             }
           }
         ).map { case (l, s) => (l + (rn.value - 1) * 10, s) }

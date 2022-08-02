@@ -262,12 +262,11 @@ object SwissJson {
       .add("provisional" -> p.provisional)
       .add("absent" -> p.absent)
 
-  private def outcomeJson(outcome: SwissSheet.Outcome): String =
-    outcome match {
-      case SwissSheet.Absent   => "absent"
-      case SwissSheet.Bye      => "bye"
-      case SwissSheet.MatchBye => "bye"
-      case _                   => ""
+  private def outcomeJson(outcome: List[SwissSheet.Outcome]): String =
+    outcome.head match {
+      case SwissSheet.Absent => "absent"
+      case SwissSheet.Bye    => "bye"
+      case _                 => ""
     }
 
   private def pairingJsonMin(player: SwissPlayer, pairing: SwissPairing): String = {
@@ -299,7 +298,7 @@ object SwissJson {
 
   private def pairingJsonOrOutcome(
       player: SwissPlayer
-  ): ((Option[SwissPairing], SwissSheet.Outcome)) => String = {
+  ): ((Option[SwissPairing], List[SwissSheet.Outcome])) => String = {
     case (Some(pairing), _) => pairingJsonMin(player, pairing)
     case (_, outcome)       => outcomeJson(outcome)
   }
