@@ -46,6 +46,9 @@ final class BotJsonView(
   }
 
   def gameState(wf: Game.WithInitialFen): Fu[JsObject] = {
+    // NOTE: this uses UciDump to generate the moves for the bot
+    // while the round game json uses the round.StepBuilder object.
+    // not sure why the difference.
     import wf._
     strategygames.format.UciDump(game.variant.gameLogic, game.pgnMoves, fen, game.variant).toFuture map { uciMoves =>
       Json

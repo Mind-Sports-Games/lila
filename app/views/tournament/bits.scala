@@ -85,6 +85,7 @@ object bits {
     trans.starting,
     trans.tournamentIsStarting,
     trans.youArePlaying,
+    trans.medleyVariantsXMinutesEach,
     trans.nowPairingX,
     trans.standByX,
     trans.standByXForY,

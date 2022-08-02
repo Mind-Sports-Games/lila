@@ -115,6 +115,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
               },
               [
                 h('th', p.isFinalGame ? '' + round : ''),
+                ctrl.data.isMedley && p.vi ? h('td', { attrs: { 'data-icon': p.vi } }, '') : null,
                 h('td', userName(p.user)),
                 h('td', ctrl.data.isMedley ? '' : '' + p.rating),
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),

@@ -25,6 +25,7 @@ export default class TournamentController {
   joinSpinner = false;
   playerInfo: PlayerInfo = {};
   teamInfo: CtrlTeamInfo = {};
+  showingMedleyVariants = false;
   disableClicks = true;
   searching = false;
   joinWithTeamSelector = false;
@@ -153,7 +154,10 @@ export default class TournamentController {
     this.data.variant = variant;
     this.data.medleyRound += 1;
     $('.tour__notice').html(this.trans('standByXForY', this.data.me.username, variant.name));
-    //$('.medley-variants-list').html(medleyVariantListItems(this.data.medleyVariants, this.data.medleyRound));
+    //$('.medley-variants-horiz').find('.current-variant').remove();
+    $('.current-variant').removeClass('current-variant');
+    $('.medley-round-' + this.data.medleyRound).addClass('current-variant');
+    this.redraw();
   };
 
   scrollToMe = () => {
@@ -176,11 +180,23 @@ export default class TournamentController {
       player: player,
       data: null,
     };
-    if (this.playerInfo.id) xhr.playerInfo(this, this.playerInfo.id);
+    if (this.playerInfo.id) {
+      this.setShowMedleyVariants(false);
+      xhr.playerInfo(this, this.playerInfo.id);
+    }
   };
 
   setPlayerInfoData = data => {
     if (data.player.id === this.playerInfo.id) this.playerInfo.data = data;
+  };
+
+  showMedleyVariants = bool => {
+    if (this.data.secondsToStart) return;
+    this.setShowMedleyVariants(bool);
+  };
+
+  setShowMedleyVariants = bool => {
+    this.showingMedleyVariants = bool;
   };
 
   showTeamInfo = (teamId: string) => {

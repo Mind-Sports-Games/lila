@@ -31,7 +31,7 @@ object StepBuilder {
             pocketData = init.situation.board.pocketData,
             captLen = init.situation match {
               case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
-              case _ => None
+              case _                             => None
             }
           )
           val moveSteps = games.map { case (g, m) =>
@@ -45,7 +45,7 @@ object StepBuilder {
               pocketData = g.situation.board.pocketData,
               captLen = (g.situation, m) match {
                 case (Situation.Draughts(situation), Uci.DraughtsWithSan(m)) =>
-                  if (situation.ghosts > 0) 
+                  if (situation.ghosts > 0)
                     situation.captureLengthFrom(m.uci.origDest._2)
                   else
                     situation.allMovesCaptureLength.some

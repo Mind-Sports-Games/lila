@@ -87,6 +87,7 @@ export interface PairingBase {
   mmid?: string; // isMicroMatch
   ms: boolean; // useMatchScore
   mp?: string; //match points for player if using matchScore
+  vi?: string; //variant icon
 }
 
 export interface Pairing extends PairingBase {

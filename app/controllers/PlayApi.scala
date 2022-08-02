@@ -52,7 +52,7 @@ final class PlayApi(
 
   def boardGameStream(id: String) =
     Scoped(_.Board.Play) { implicit req => me =>
-      WithPovAsBoard(id, me) { impl.gameStream(me, _) }
+     WithPovAsBoard(id, me) { impl.gameStream(me, _) }
     }
 
   def boardMove(id: String, uci: String, offeringDraw: Option[Boolean]) =

@@ -127,63 +127,7 @@ final private class Player(
       metrics: MoveMetrics,
       finalSquare: Boolean = false
   ): Validated[String, MoveResult] =
-    //TODO push this into strategygames
-    (uci match {
-      case Uci.ChessMove(uci) =>
-        game.chess(
-          Pos.Chess(uci.orig),
-          Pos.Chess(uci.dest),
-          uci.promotion.map(Role.ChessPromotableRole),
-          metrics
-        ) map { case (ncg, move) =>
-          ncg -> (Left(move): MoveOrDrop)
-        }
-      case Uci.DraughtsMove(uci) =>
-        game.chess(
-          Pos.Draughts(uci.orig),
-          Pos.Draughts(uci.dest),
-          uci.promotion.map(Role.DraughtsPromotableRole),
-          metrics,
-          finalSquare
-        ) map { case (ncg, move) =>
-          ncg -> (Left(move): MoveOrDrop)
-        }
-      case Uci.FairySFMove(uci) =>
-        game.chess(
-          Pos.FairySF(uci.orig),
-          Pos.FairySF(uci.dest),
-          uci.promotion.map(Role.FairySFPromotableRole),
-          metrics
-        ) map { case (ncg, move) =>
-          ncg -> (Left(move): MoveOrDrop)
-        }
-      case Uci.MancalaMove(uci) => 
-        game.chess(
-          Pos.Mancala(uci.orig),
-          Pos.Mancala(uci.dest),
-          promotion = None,
-          metrics
-        ) map { case (ncg, move) =>
-          ncg -> (Left(move): MoveOrDrop)
-        }
-      case Uci.ChessDrop(uci) =>
-        game.chess.drop(
-          Role.ChessRole(uci.role),
-          Pos.Chess(uci.pos),
-          metrics
-        ) map { case (ncg, drop) =>
-          ncg -> (Right(drop): MoveOrDrop)
-        }
-      case Uci.FairySFDrop(uci) =>
-        game.chess.drop(
-          Role.FairySFRole(uci.role),
-          Pos.FairySF(uci.pos),
-          metrics
-        ) map { case (ncg, drop) =>
-          ncg -> (Right(drop): MoveOrDrop)
-        }
-      case _ => sys.error(s"Could not apply move: $uci")
-    }).map {
+    game.chess.applyUci(uci, metrics, finalSquare).map {
       case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
       case (newChessGame, moveOrDrop) =>
         MoveApplied(
