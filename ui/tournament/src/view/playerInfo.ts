@@ -68,7 +68,7 @@ export default function (ctrl: TournamentController): VNode {
             )
           : null,
         h('table', [
-          data.player.performance
+          data.player.performance && !ctrl.data.medley
             ? numberRow(noarg('performance'), data.player.performance + (nb.game < 3 ? '?' : ''), 'raw')
             : null,
           numberRow(noarg('gamesPlayed'), nb.game),

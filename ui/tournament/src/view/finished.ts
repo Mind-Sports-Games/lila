@@ -21,7 +21,7 @@ function confetti(data: TournamentData): VNode | undefined {
 function stats(data: TournamentData, trans: Trans): VNode {
   const noarg = trans.noarg;
   const tableData = [
-    numberRow(noarg('averageElo'), data.stats.averageRating, 'raw'),
+    !data.medley ? numberRow(noarg('averageElo'), data.stats.averageRating, 'raw') : null,
     numberRow(noarg('gamesPlayed'), data.stats.games),
     numberRow(noarg('movesPlayed'), data.stats.moves),
     numberRow(

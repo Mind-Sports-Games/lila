@@ -141,50 +141,54 @@ final class TournamentApi(
 
   private val hadPairings = new lila.memo.ExpireSetMemo(1 hour)
 
+  private def updatePlayerRatingsForMedley(userIds: Set[User.ID], tour: Tournament): Funit =
+    if (tour.isMedley) userIds.map(updatePlayer(tour, None)).sequenceFu.void else funit
+
   private[tournament] def makePairings(forTour: Tournament, users: WaitingUsers): Funit =
     (users.size > 1 && (!hadPairings.get(forTour.id) || users.haveWaitedEnough)) ??
       Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
-        cached
-          .ranking(tour)
-          .mon(_.tournament.pairing.createRanking)
-          .flatMap { ranking =>
-            pairingSystem
-              .createPairings(tour, users, ranking)
-              .mon(_.tournament.pairing.createPairings)
-              .flatMap {
-                case Nil => funit
-                case pairings =>
-                  hadPairings put tour.id
-                  playerRepo
-                    .byTourAndUserIds(tour.id, pairings.flatMap(_.users))
-                    .map {
-                      _.view.map { player =>
-                        player.userId -> player
-                      }.toMap
-                    }
-                    .mon(_.tournament.pairing.createPlayerMap)
-                    .flatMap { playersMap =>
-                      pairings
-                        .map { pairing =>
-                          pairingRepo.insert(pairing) >>
-                            autoPairing(tour, pairing, playersMap, ranking)
-                              .mon(_.tournament.pairing.createAutoPairing)
-                              .map {
-                                socket.startGame(tour.id, _)
-                              }
-                        }
-                        .sequenceFu
-                        .mon(_.tournament.pairing.createInserts) >>
-                        featureOneOf(tour, pairings, ranking)
-                          .mon(_.tournament.pairing.createFeature) >>-
-                        lila.mon.tournament.pairing.batchSize.record(pairings.size).unit
-                    }
-              }
-          }
-          .monSuccess(_.tournament.pairing.create)
-          .chronometer
-          .logIfSlow(100, logger)(_ => s"Pairings for https://playstrategy.org/tournament/${tour.id}")
-          .result
+        updatePlayerRatingsForMedley(users.all, tour) >>
+          cached
+            .ranking(tour)
+            .mon(_.tournament.pairing.createRanking)
+            .flatMap { ranking =>
+              pairingSystem
+                .createPairings(tour, users, ranking)
+                .mon(_.tournament.pairing.createPairings)
+                .flatMap {
+                  case Nil => funit
+                  case pairings =>
+                    hadPairings put tour.id
+                    playerRepo
+                      .byTourAndUserIds(tour.id, pairings.flatMap(_.users))
+                      .map {
+                        _.view.map { player =>
+                          player.userId -> player
+                        }.toMap
+                      }
+                      .mon(_.tournament.pairing.createPlayerMap)
+                      .flatMap { playersMap =>
+                        pairings
+                          .map { pairing =>
+                            pairingRepo.insert(pairing) >>
+                              autoPairing(tour, pairing, playersMap, ranking)
+                                .mon(_.tournament.pairing.createAutoPairing)
+                                .map {
+                                  socket.startGame(tour.id, _)
+                                }
+                          }
+                          .sequenceFu
+                          .mon(_.tournament.pairing.createInserts) >>
+                          featureOneOf(tour, pairings, ranking)
+                            .mon(_.tournament.pairing.createFeature) >>-
+                          lila.mon.tournament.pairing.batchSize.record(pairings.size).unit
+                      }
+                }
+            }
+            .monSuccess(_.tournament.pairing.create)
+            .chronometer
+            .logIfSlow(100, logger)(_ => s"Pairings for https://playstrategy.org/tournament/${tour.id}")
+            .result
       }
 
   private def featureOneOf(tour: Tournament, pairings: Pairings, ranking: Ranking): Funit = {
