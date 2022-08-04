@@ -210,7 +210,7 @@ $narrow-user-list-width: 30ch;
   white-space: nowrap;
   display: flex;
   flex-direction: row;
-  overflow: hidden;
+  overflow-x: hidden;
   width: 100vw;
   @include breakpoint($mq-small) {
     width: unset;
@@ -224,7 +224,7 @@ $narrow-user-list-width: 30ch;
 }
 
 .medley-variants-wide {
-  overflow: scroll;
+  overflow-x: scroll;
 }
 
 .medley-variants-scrollable {
