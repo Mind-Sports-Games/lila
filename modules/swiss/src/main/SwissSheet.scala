@@ -24,14 +24,15 @@ private object SwissSheet {
   case object Loss    extends Outcome
   case object Draw    extends Outcome
 
-  def pointsFor(outcome: List[Outcome]) =
-    outcome.foldLeft(0) { case (acc, out) =>
-      acc + (out match {
-        case Win | Bye => 2
-        case Draw      => 1
-        case _         => 0
-      })
+  def pointsFor(outcome: Outcome): Int =
+    outcome match {
+      case Win | Bye => 2
+      case Draw      => 1
+      case _         => 0
     }
+
+  def pointsFor(outcome: List[Outcome]): Int =
+    outcome.foldLeft(0) { case (acc, out) => acc + pointsFor(out) }
 
   //BBpairings can only handle the same points for a win, loss or draw therefore we have to lie to it
   def pointsForTrf(outcome: List[Outcome]): Int =

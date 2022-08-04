@@ -32,6 +32,7 @@ case class SwissPairing(
   def p1Wins                         = status == Right(Some(PlayerIndex.P1))
   def p2Wins                         = status == Right(Some(PlayerIndex.P2))
   def isDraw                         = status == Right(None)
+  // matchScoreFor returns a two digit score (or empty string)
   def matchScoreFor(userId: User.ID) =
     if (useMatchScore)
       matchStatus match {
@@ -59,7 +60,6 @@ case class SwissPairing(
     if (!isMicroMatch) status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
     else {
       matchStatus
-        .pp("MatchStatus")
         .fold(
           _ => "*",
           _.zipWithIndex
@@ -136,7 +136,8 @@ object SwissPairing {
 
   sealed trait Ongoing
   case object Ongoing extends Ongoing
-  type Status      = Either[Ongoing, Option[PlayerIndex]]
+  type Status = Either[Ongoing, Option[PlayerIndex]]
+  // The right side of either denotes the list of results for a multi match (Win by playerIndex or none for Draw)
   type MatchStatus = Either[Ongoing, List[Option[PlayerIndex]]]
 
   val ongoing: Status = Left(Ongoing)

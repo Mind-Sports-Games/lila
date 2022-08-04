@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { spinner, bind, userName, dataIcon, player as renderPlayer, numberRow } from './util';
+import { spinner, bind, userName, dataIcon, player as renderPlayer, numberRow, matchScoreDisplay } from './util';
 import { PairingExt, Outcome } from '../interfaces';
 import { isOutcome } from '../util';
 import SwissCtrl from '../ctrl';
@@ -131,16 +131,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
 
 function result(p: MicroMatchPairing): string {
   if (p.ms) {
-    if (!p.mp) return '?';
-    const score = parseInt(p.mp, 10);
-    const isOdd = score % 2 == 1;
-    const oddPart = isOdd ? '½' : '';
-    const base = Math.floor(score / 2);
-    if (score == 1) {
-      return '½';
-    } else {
-      return `${base}${oddPart}`;
-    }
+    return matchScoreDisplay(p);
   }
   switch (p.w) {
     case true:

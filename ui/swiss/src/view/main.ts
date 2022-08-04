@@ -11,7 +11,6 @@ import playerInfo from './playerInfo';
 
 export default function (ctrl: SwissCtrl) {
   const d = ctrl.data;
-  console.log('data', d);
   const content = d.status == 'created' ? created(ctrl) : d.status == 'started' ? started(ctrl) : finished(ctrl);
   return h(
     'main.' + ctrl.opts.classes,

@@ -6,7 +6,6 @@ import { MaybeVNodes, PairingBase, Player, Pager } from '../interfaces';
 function playerTr(ctrl: SwissCtrl, player: Player) {
   const isMM = ctrl.data.isMicroMatch;
   const useMatchScore = ctrl.data.useMatchScore;
-  console.log(isMM, useMatchScore);
   const userId = player.user.id;
   return h(
     'tr',

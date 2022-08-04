@@ -40,6 +40,7 @@ const playerInfo = (ctrl: SwissCtrl, userId: string) =>
     ctrl.redraw();
   }, onFail);
 
+//TODO change to load in normal json structure rather than sting that gets stripped apart.
 const readSheetMin = (str: string) =>
   str
     ? str.split('|').map(s =>

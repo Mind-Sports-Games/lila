@@ -1,5 +1,5 @@
 import { Attrs, h, Hooks, VNode } from 'snabbdom';
-import { BasePlayer } from '../interfaces';
+import { BasePlayer, PairingBase } from '../interfaces';
 import { numberFormat } from 'common/number';
 
 export function bind(eventName: string, f: (e: Event) => any, redraw?: () => void): Hooks {
@@ -70,4 +70,21 @@ export function spinner(): VNode {
       }),
     ]),
   ]);
+}
+
+export function matchScoreDisplay(p: PairingBase): string {
+  const regex = /^[0-9]*$/g;
+  if (p.mp && regex.test(p.mp)) {
+    const score = parseInt(p.mp, 10);
+    const isOdd = score % 2 == 1;
+    const oddPart = isOdd ? '½' : '';
+    const base = Math.floor(score / 2);
+    if (score == 1) {
+      return '½';
+    } else {
+      return `${base}${oddPart}`;
+    }
+  } else {
+    return '?';
+  }
 }
