@@ -42,6 +42,7 @@ case class Tournament(
     trophy1st: Option[String] = None,
     trophy2nd: Option[String] = None,
     trophy3rd: Option[String] = None,
+    trophyExpiryDays: Option[Int] = None,
     hasChat: Boolean = true
 ) {
 
@@ -254,7 +255,9 @@ object Tournament {
   def scheduleAs(sched: Schedule, minutes: Int) =
     Tournament(
       id = makeId,
-      name = sched.name(full = false)(defaultLang),
+      name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
+        TournamentShield.MedleyShield.makeName(ms.medleyName)
+      ),
       status = Status.Created,
       clock = Schedule clockFor sched,
       minutes = minutes,
@@ -262,11 +265,16 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = sched.variant,
+      medleyVariants = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
+      medleyMinutes = sched.medleyShield.map(_.arenaMedleyMinutes),
       position = sched.position,
       mode = Mode.Rated,
       conditions = sched.conditions,
       schedule = Some(sched),
-      startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60)
+      startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60),
+      description = sched.medleyShield.map(_.arenaDescriptionFull),
+      trophy1st = sched.medleyShield.map(_.key),
+      trophyExpiryDays = if (sched.medleyShield.isDefined) 7.some else none
     )
 
   def tournamentUrl(tourId: String): String = s"https://playstrategy.org/tournament/$tourId"

@@ -3,7 +3,7 @@ package views.html.tournament
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.tournament.TournamentShield
+import lila.tournament.{ Tournament, TournamentShield }
 import lila.swiss.Swiss
 import lila.i18n.VariantKeys
 
@@ -86,7 +86,11 @@ object shields {
       )
     }
 
-  def medley(medleyShield: TournamentShield.MedleyShield, next: Option[Swiss], history: List[Swiss])(implicit
+  def medley(
+      medleyShield: TournamentShield.MedleyShield,
+      next: Option[Either[Tournament, Swiss]],
+      history: List[Either[Tournament, Swiss]]
+  )(implicit
       ctx: Context
   ) =
     views.html.base.layout(
@@ -105,14 +109,19 @@ object shields {
             img(cls := "one-medley-shield-trophy", src := assetUrl(s"images/trophy/${medleyShield.key}.png")),
             history.headOption.map { latest =>
               span(
-                a(href := routes.Swiss.show(latest.id.value))("Holder"),
+                a(
+                  href := latest.fold(
+                    arena => routes.Tournament.show(arena.id),
+                    swiss => routes.Swiss.show(swiss.id.value)
+                  )
+                )("Holder"),
                 br
               )
             },
             history.headOption.map { latest =>
               span(
                 userIdLink(
-                  userIdOption = latest.winnerId,
+                  userIdOption = latest.fold(_.winnerId, _.winnerId),
                   cssClass = "reigning-shield-holder".some,
                   withOnline = false
                 )
@@ -121,15 +130,21 @@ object shields {
           ),
           h2("Next Tournament"),
           next.map { next =>
-            a(cls := "next-tournament", href := routes.Swiss.show(next.id.value))(
+            a(
+              cls := "next-tournament",
+              href := next.fold(
+                arena => routes.Tournament.show(arena.id),
+                swiss => routes.Swiss.show(swiss.id.value)
+              )
+            )(
               h2(
-                s"${next.name} @ ",
-                absClientDateTime(next.startsAt)
+                s"${next.fold(_.name, _.name)} @ ",
+                absClientDateTime(next.fold(_.startsAt, _.startsAt))
               )
             )
           },
           h2("Current Tournament Format"),
-          h4(medleyShield.formatStr),
+          h4(medleyShield.arenaFormatFull),
           h2("Variants Used in this Medley"),
           if (medleyShield.hasAllVariants) {
             h4(
@@ -160,8 +175,13 @@ object shields {
           h2("Roll of Honour"),
           ol(history.map { aw =>
             li(
-              userIdLink(aw.winnerId),
-              a(href := routes.Swiss.show(aw.id.value))(showDate(aw.startsAt))
+              userIdLink(aw.fold(_.winnerId, _.winnerId)),
+              a(
+                href := aw.fold(
+                  arena => routes.Tournament.show(arena.id),
+                  swiss => routes.Swiss.show(swiss.id.value)
+                )
+              )(showDate(aw.fold(_.startsAt, _.startsAt)))
             )
           })
         )

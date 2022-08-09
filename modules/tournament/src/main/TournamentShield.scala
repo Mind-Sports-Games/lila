@@ -1,8 +1,9 @@
 package lila.tournament
 
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, Weeks }
 import reactivemongo.api.ReadPreference
 import scala.concurrent.duration._
+import scala.util.Random
 
 import lila.db.dsl._
 import lila.user.User
@@ -118,41 +119,91 @@ object TournamentShield {
   sealed abstract class MedleyShield(
       val key: String,
       val name: String,
+      val teamOwner: Condition.TeamMember,
       val eligibleVariants: List[Variant],
-      val formatStr: String
+      val generateVariants: List[Variant] => List[Variant],
+      val dayOfWeek: Int,
+      val hour: Int,
+      val arenaMinutes: Int,
+      val arenaMedleyMinutes: Int,
+      val swissFormat: String,
+      val arenaFormat: String,
+      val arenaDescription: String
   ) {
-    def hasAllVariants = eligibleVariants == Variant.all
+    def hasAllVariants  = eligibleVariants == Variant.all
+    def medleyName      = s"${name} Medley Shield"
+    def url             = s"https://playstrategy.org/tournament/medley-shield/${key}"
+    def arenaFormatFull = s"${arenaFormat} Each variant is active for ${arenaMedleyMinutes} minutes."
+    def arenaDescriptionFull =
+      s"${arenaDescription}\r\n\r\nWin the tournament, win the shield... until next week!\r\n\r\nMore info here: ${url}"
   }
 
   object MedleyShield {
+
+    private def playStrategyMedleyGeneration(variants: List[Variant]) = {
+      val thisOrder =
+        Random.shuffle(variants)
+      val onePerGameFamily =
+        Random.shuffle(GameFamily.all.map(gf => thisOrder.filter(_.gameFamily == gf).head))
+      onePerGameFamily ::: thisOrder.filterNot(onePerGameFamily.contains(_))
+    }
+    private val playStrategyRounds = 7
 
     case object PlayStrategyMedley
         extends MedleyShield(
           "shieldPlayStrategyMedley",
           "PlayStrategy",
-          Variant.all,
-          s"7 round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
+          Condition.TeamMember("playstrategy-medleys", "PlayStrategy Medleys"),
+          Variant.all.filterNot(_.fromPositionVariant),
+          playStrategyMedleyGeneration,
+          7,
+          19,
+          105,
+          15,
+          s"${playStrategyRounds} round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
+          s"${playStrategyRounds} variant Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
+          s"PlayStrategy Medley Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
         )
 
+    private def randomVariantOrder(variants: List[Variant]) = Random.shuffle(variants)
+
     private val chessVariantOptions = Variant.all.filter(_.exoticChessVariant)
+    private val chessVariantRounds  = 5
 
     case object ChessVariantsMedley
         extends MedleyShield(
           "shieldChessMedley",
           "Chess Variants",
+          Condition.TeamMember("playstrategy-chess-variants", "PlayStrategy Chess Variants"),
           chessVariantOptions,
-          s"5 round Swiss using micro-match rounds (each pairing plays twice, once each as the start player). 5 from the ${chessVariantOptions.length} listed chess variants will be picked."
+          randomVariantOrder,
+          6,
+          19,
+          100,
+          20,
+          s"${chessVariantRounds} round Swiss using micro-match rounds (each pairing plays twice, once each as the start player). ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants will be picked.",
+          s"${chessVariantRounds} variant Arena where ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants are picked.",
+          s"Chess Variants Medley Arena, where ${chessVariantRounds} from the following ${chessVariantOptions.length} chess variants are picked: ${chessVariantOptions.map(VariantKeys.variantName).mkString(", ")}."
         )
 
     private val draughtsVariantOptions =
       Variant.all.filter(_.gameFamily == GameFamily.Draughts()).filterNot(_.fromPositionVariant)
+    private val draughtsRounds = 7
 
     case object DraughtsMedley
         extends MedleyShield(
           "shieldDraughtsMedley",
           "Draughts",
+          Condition.TeamMember("playstrategy-draughts", "PlayStrategy Draughts"),
           draughtsVariantOptions,
-          s"7 round Swiss where 7 from the ${draughtsVariantOptions.length} listed draughts variants will be picked."
+          randomVariantOrder,
+          6,
+          13,
+          105,
+          15,
+          s"${draughtsRounds} round Swiss where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants will be picked.",
+          s"${draughtsRounds} variant Arena where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants are picked.",
+          s"Draughts Medley Arena, where ${draughtsRounds} from the following ${draughtsVariantOptions.length} Draughts variants are picked: ${draughtsVariantOptions.map(VariantKeys.variantName).mkString(", ")}."
         )
 
     val all = List(
@@ -163,6 +214,12 @@ object TournamentShield {
 
     def byKey(k: String): Option[MedleyShield] = all.find(_.key == k)
 
+    private val medleyStartDate = new DateTime(2022, 6, 10, 0, 0)
+    val arenaMedleyStartDate    = new DateTime(2022, 8, 7, 22, 0)
+
+    def weeksSinceStart = Weeks.weeksBetween(medleyStartDate, DateTime.now()).getWeeks()
+
+    def makeName(baseName: String) = s"${baseName} ${weeksSinceStart + 1}"
   }
 
   sealed abstract class Category(
@@ -308,7 +365,7 @@ object TournamentShield {
 
     case object Flipello10
         extends Category(
-          Variant.FairySF(strategygames.fairysf.variant.Flipello10),
+          Variant.FairySF(strategygames.fairysf.variant.Flipello10)
         )
 
     case object Oware
