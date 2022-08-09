@@ -88,10 +88,6 @@ final class TournamentApi(
       tour.copy(conditions = setup.conditions.convert(tour.perfType, leaderTeams.view.map(_.pair).toMap))
     }
     tournamentRepo.insert(tour) >> {
-      setup.teamBattleByTeam.orElse(tour.conditions.teamMember.map(_.teamId)).?? { teamId =>
-        tournamentRepo.setForTeam(tour.id, teamId).void
-      }
-    } >> {
       andJoin ?? join(
         tour.id,
         me,
@@ -283,7 +279,13 @@ final class TournamentApi(
     tour.trophy1st ?? { trophyKind =>
       playerRepo.bestByTourWithRank(tour.id, 1).flatMap {
         _.map { case rp =>
-          trophyApi.award(tournamentUrl(tour.id), rp.player.userId, trophyKind, tour.name.some)
+          trophyApi.award(
+            tournamentUrl(tour.id),
+            rp.player.userId,
+            trophyKind,
+            tour.name.some,
+            tour.trophyExpiryDays
+          )
         }.sequenceFu.void
       }
     }
@@ -291,7 +293,13 @@ final class TournamentApi(
       playerRepo.bestByTourWithRank(tour.id, 2).flatMap {
         _.map {
           case rp if rp.rank == 2 =>
-            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, trophyKind, tour.name.some)
+            trophyApi.award(
+              tournamentUrl(tour.id),
+              rp.player.userId,
+              trophyKind,
+              tour.name.some,
+              tour.trophyExpiryDays
+            )
           case _ => funit
         }.sequenceFu.void
       }
@@ -300,7 +308,13 @@ final class TournamentApi(
       playerRepo.bestByTourWithRank(tour.id, 3).flatMap {
         _.map {
           case rp if rp.rank == 3 =>
-            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, trophyKind, tour.name.some)
+            trophyApi.award(
+              tournamentUrl(tour.id),
+              rp.player.userId,
+              trophyKind,
+              tour.name.some,
+              tour.trophyExpiryDays
+            )
           case _ => funit
         }.sequenceFu.void
       }
