@@ -8,7 +8,7 @@ object Title {
   implicit val titleBsonHandler = lila.db.dsl.stringIsoHandler(Title.titleIso)
   implicit val titleJsonWrites  = lila.common.Json.stringIsoWriter(Title.titleIso)
 
-  val LM  = Title("LM")
+  val PM  = Title("PM")
   val BOT = Title("BOT")
 
   // important: names are as stated on FIDE profile pages
@@ -23,8 +23,8 @@ object Title {
     Title("CM")  -> "Candidate Master",
     Title("WCM") -> "Woman Candidate Master",
     Title("WNM") -> "Woman National Master",
-    LM           -> "PlayStrategy Master",
-    BOT          -> "Chess Robot"
+    PM           -> "PlayStrategy Master",
+    BOT          -> "Robot"
   )
 
   val names          = all.toMap
