@@ -43,9 +43,10 @@ object Spotlight {
       sched.freq match {
         case Hourly                                   => canMaybeJoinLimited(tour, user) && playedSinceWeeks(2)
         case Daily                                    => playedSinceWeeks(2)
-        case Weekly | Weekend | MedleyShield          => playedSinceWeeks(4)
+        case Weekly | Weekend                         => playedSinceWeeks(4)
         case Unique                                   => playedSinceWeeks(4)
-        case Monthly | Shield                         => playedSinceWeeks(8)
+        case Monthly                                  => playedSinceWeeks(8)
+        case MedleyShield | Shield                    => true
         case Marathon | Yearly                        => true
         case Introductory | MSO21 | MSOGP | MSOWarmUp => true
         case ExperimentalMarathon                     => false
