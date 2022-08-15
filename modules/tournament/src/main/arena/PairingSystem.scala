@@ -24,9 +24,9 @@ final private[tournament] class PairingSystem(
       ranking: Ranking
   ): Fu[Pairings] = {
     for {
-      lastOpponents        <- pairingRepo.lastOpponents(tour.id, users.all, Math.min(300, users.size * 4))
+      lastOpponents        <- pairingRepo.lastOpponents(tour.id, users.allIds, Math.min(300, users.size * 4))
       onlyTwoActivePlayers <- (tour.nbPlayers <= 12) ?? playerRepo.countActive(tour.id).dmap(2 ==)
-      data = Data(tour, lastOpponents, ranking, onlyTwoActivePlayers)
+      data = Data(tour, lastOpponents.pp("lastOpponents"), ranking, onlyTwoActivePlayers.pp("only2AP"))
       preps    <- (lastOpponents.hash.isEmpty || users.haveWaitedEnough) ?? evenOrAll(data, users)
       pairings <- prepsToPairings(preps)
     } yield pairings
@@ -38,8 +38,9 @@ final private[tournament] class PairingSystem(
 
   private def evenOrAll(data: Data, users: WaitingUsers) =
     makePreps(data, users.evenNumber) flatMap {
-      case Nil if users.isOdd => makePreps(data, users.all)
-      case x                  => fuccess(x)
+      case Nil if users.isOddNoBots => makePreps(data, users.allIdsNoBots)
+      //case Nil if users.isOdd => makePreps(data, users.allIds)
+      case x => fuccess(x)
     }
 
   private val maxGroupSize = 100
@@ -82,7 +83,8 @@ final private[tournament] class PairingSystem(
   private def bestPairings(data: Data, players: RankedPlayers): List[Pairing.Prep] =
     (players.sizeIs > 1) ?? AntmaPairing(data, addPlayerIndexHistory(players))
 
-  private def addPlayerIndexHistory(players: RankedPlayers) = players.map(_ withPlayerIndexHistory playerIndexHistoryApi.get)
+  private def addPlayerIndexHistory(players: RankedPlayers) =
+    players.map(_ withPlayerIndexHistory playerIndexHistoryApi.get)
 }
 
 private object PairingSystem {

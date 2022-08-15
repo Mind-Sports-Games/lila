@@ -143,7 +143,7 @@ final class TournamentApi(
   private[tournament] def makePairings(forTour: Tournament, users: WaitingUsers): Funit =
     (users.size > 1 && (!hadPairings.get(forTour.id) || users.haveWaitedEnough)) ??
       Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
-        updatePlayerRatingsForMedley(users.all, tour) >>
+        updatePlayerRatingsForMedley(users.allIds, tour) >>
           cached
             .ranking(tour)
             .mon(_.tournament.pairing.createRanking)
