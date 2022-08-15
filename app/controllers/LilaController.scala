@@ -310,8 +310,14 @@ abstract private[controllers] class LilaController(val env: Env)
   protected def NoBot[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     if (ctx.me.exists(_.isBot)) Forbidden(views.html.site.message.noBot).fuccess else a
 
+  protected def NoUserBot[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
+    if (ctx.me.exists(_.isUserBot)) Forbidden(views.html.site.message.noBot).fuccess else a
+
   protected def NoLameOrBot[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     NoLame(NoBot(a))
+
+  protected def NoLameOrUserBot[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
+    NoLame(NoUserBot(a))
 
   protected def NoShadowban[A <: Result](a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     if (ctx.me.exists(_.marks.troll)) notFound else a
