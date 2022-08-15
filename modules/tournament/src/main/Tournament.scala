@@ -258,7 +258,7 @@ object Tournament {
     Tournament(
       id = makeId,
       name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
-        TournamentShield.MedleyShield.makeName(ms.medleyName)
+        TournamentShield.MedleyShield.makeName(ms.medleyName, sched.at)
       ),
       status = Status.Created,
       clock = Schedule clockFor sched,
