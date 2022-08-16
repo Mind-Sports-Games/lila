@@ -5,7 +5,8 @@ import lila.game.Game
 
 object SwissRound {
 
-  case class Number(value: Int) extends AnyVal with IntValue
+  case class Number(value: Int)        extends AnyVal with IntValue
+  case class GamesPerRound(value: Int) extends AnyVal with IntValue
 }
 
 case class MyInfo(rank: Int, gameIds: Option[SwissPairingGameIds], user: User, player: SwissPlayer) {
@@ -31,6 +32,7 @@ case class SwissFinish(id: Swiss.Id, ranking: Ranking)
 
 object SwissBounds {
   val maxRounds           = 100
+  val maxGamesPerRound    = 11
   val maxScore            = maxRounds * 2
   val maxBuchholz         = maxRounds * maxScore
   val maxSonnenbornBerger = maxRounds * maxScore * 2
@@ -43,8 +45,8 @@ object SwissBounds {
     //       in order to be used as the totalValues here, because 0
     //       is also one of the valid values.
     def score(value: Double)            = WithBounds(value.toLong, maxScore + 1)
-    def buchholz(value: Double)         = WithBounds((value*2).toLong, maxBuchholz + 1)
-    def sonnenbornBerger(value: Double) = WithBounds((value*4).toLong, maxSonnenbornBerger + 1)
+    def buchholz(value: Double)         = WithBounds((value * 2).toLong, maxBuchholz + 1)
+    def sonnenbornBerger(value: Double) = WithBounds((value * 4).toLong, maxSonnenbornBerger + 1)
     // Although not in this case, because this is already
     // an overestimated upper bound
     def performance(value: Double) = WithBounds(value.toLong, maxPerformance)

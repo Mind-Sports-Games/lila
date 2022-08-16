@@ -69,6 +69,7 @@ object form {
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
             form3.split(fields.microMatch, fields.useMatchScore),
+            form3.split(fields.bestOfX, fields.nbGamesPerRound),
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
             fields.medleyDefaults,
@@ -179,6 +180,24 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         half = true,
         help = raw(trans.useMatchScoreDefinition.txt().replace("(", "<br>(")).some
       )
+    )
+  def bestOfX =
+    frag(
+      form3.checkbox(
+        form("bestOfX"),
+        "Best of X",
+        half = true,
+        help = raw("Each round, play best of X games with opponent").some
+      )
+    )
+  def nbGamesPerRound =
+    form3.group(
+      form("nbGamesPerRound"),
+      "Number of games",
+      help = raw("An odd number is best, 2 is a micro-match)").some,
+      half = true
+    )(
+      form3.input(_, typ = "number")
     )
   def medley =
     frag(

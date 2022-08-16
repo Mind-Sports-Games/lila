@@ -66,6 +66,8 @@ final private class SwissDirector(
                 isMicroMatch = swiss.settings.isMicroMatch,
                 None,
                 useMatchScore = swiss.settings.useMatchScore,
+                isBestOfX = swiss.settings.isBestOfX,
+                nbGamesPerRound = swiss.settings.nbGamesPerRound,
                 if (randomPairingPos) randomPos().orElse(perRoundPos) else perRoundPos,
                 swiss.roundVariant.some
               )

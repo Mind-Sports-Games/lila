@@ -49,6 +49,8 @@ final class SwissForm(implicit mode: Mode) {
         "rated"                -> optional(boolean),
         "microMatch"           -> optional(boolean),
         "useMatchScore"        -> optional(boolean),
+        "bestOfX"              -> optional(boolean),
+        "nbGamesPerRound"      -> number(min = 1, max = SwissBounds.maxGamesPerRound),
         "nbRounds"             -> number(min = minRounds, max = SwissBounds.maxRounds),
         "description"          -> optional(cleanNonEmptyText),
         "drawTables"           -> optional(boolean),

@@ -17,6 +17,8 @@ case class SwissPairing(
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
     useMatchScore: Boolean,
+    isBestOfX: Boolean,
+    nbGamesPerRound: SwissRound.GamesPerRound = 1,
     openingFEN: Option[FEN],
     variant: Option[Variant] = None
 ) {

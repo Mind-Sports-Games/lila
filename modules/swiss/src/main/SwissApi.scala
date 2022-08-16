@@ -84,6 +84,8 @@ final class SwissApi(
         rated = data.realPosition.isEmpty && data.isRated,
         isMicroMatch = data.isMicroMatch,
         useMatchScore = data.isUseMatchScore,
+        isBestOfX = data.isBestOfX,
+        nbGamesPerRound = data.nbGamesPerRound,
         description = data.description,
         useDrawTables = data.useDrawTables,
         usePerPairingDrawTables = data.usePerPairingDrawTables,
@@ -120,6 +122,8 @@ final class SwissApi(
             rated = position.isEmpty && (data.rated | old.settings.rated),
             isMicroMatch = data.isMicroMatch | old.settings.isMicroMatch,
             useMatchScore = data.isUseMatchScore | old.settings.useMatchScore,
+            isBestOfX = data.isBestOfX | old.settings.isBestOfX,
+            nbGamesPerRound = data.nbGamesPerRound | 1,
             description = data.description orElse old.settings.description,
             useDrawTables = data.useDrawTables | old.settings.useDrawTables,
             usePerPairingDrawTables = data.usePerPairingDrawTables | old.settings.usePerPairingDrawTables,
@@ -420,6 +424,8 @@ final class SwissApi(
           ids.isMicroMatch,
           ids.microMatchGameId.flatMap(gamesById.get),
           ids.useMatchScore,
+          ids.isBestOfX,
+          ids.nbGamesPerRound,
           ids.openingFEN
         )
       )
@@ -739,7 +745,9 @@ final class SwissApi(
                     "id"               -> f.id,
                     "isMicroMatch"     -> f.isMicroMatch,
                     "microMatchGameId" -> f.microMatchGameId,
-                    "useMatchScore"    -> f.useMatchScore
+                    "useMatchScore"    -> f.useMatchScore,
+                    "isBestOfX"        -> f.isBestOfX,
+                    "nbGamesPerRound"  -> f.nbGamesPerRound
                   )
                 )
               )
