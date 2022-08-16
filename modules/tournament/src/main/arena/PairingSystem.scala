@@ -38,9 +38,9 @@ final private[tournament] class PairingSystem(
 
   private def evenOrAll(data: Data, users: WaitingUsers) =
     makePreps(data, users.evenNumber) flatMap {
-      case Nil if users.isOddNoBots => makePreps(data, users.allIdsNoBots)
-      //case Nil if users.isOdd => makePreps(data, users.allIds)
-      case x => fuccess(x)
+      //case Nil if users.isOddNoBots => makePreps(data, users.allIdsNoBots)
+      case Nil if users.isOdd => makePreps(data, users.allIds)
+      case x                  => fuccess(x)
     }
 
   private val maxGroupSize = 100
