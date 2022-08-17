@@ -49,14 +49,17 @@ final private class TournamentScheduler(
     val thisMonth = new OfMonth(0)
     val nextMonth = new OfMonth(1)
 
-    def nextDayOfWeek(number: Int) = today.plusDays((number + 7 - today.getDayOfWeek) % 7)
-    val nextMonday                 = nextDayOfWeek(1)
-    val nextTuesday                = nextDayOfWeek(2)
-    val nextWednesday              = nextDayOfWeek(3)
-    val nextThursday               = nextDayOfWeek(4)
-    val nextFriday                 = nextDayOfWeek(5)
-    val nextSaturday               = nextDayOfWeek(6)
-    val nextSunday                 = nextDayOfWeek(7)
+    def nextDayOfWeeks(dayNumber: Int, weekNumber: Int) =
+      today.plusDays((dayNumber + 7 * weekNumber - today.getDayOfWeek) % (7 * weekNumber))
+    def nextDayOfWeek(number: Int)      = nextDayOfWeeks(number, 1)
+    def nextDayOfFortnight(number: Int) = nextDayOfWeeks(number, 2)
+    val nextMonday                      = nextDayOfWeek(1)
+    val nextTuesday                     = nextDayOfWeek(2)
+    val nextWednesday                   = nextDayOfWeek(3)
+    val nextThursday                    = nextDayOfWeek(4)
+    val nextFriday                      = nextDayOfWeek(5)
+    val nextSaturday                    = nextDayOfWeek(6)
+    val nextSunday                      = nextDayOfWeek(7)
 
     def secondWeekOf(month: Int) = {
       val start = orNextYear(startOfYear.withMonthOfYear(month))
@@ -126,10 +129,20 @@ final private class TournamentScheduler(
         ).plan
       }
 
+    //schedule this week
     TournamentShield.MedleyShield.all
       .map(ms =>
         scheduleMedleyShield(Blitz53, ms)(
           nextDayOfWeek(ms.dayOfWeek)
+        )
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    //and schedule two weeks in advance
+    TournamentShield.MedleyShield.all
+      .map(ms =>
+        scheduleMedleyShield(Blitz53, ms)(
+          nextDayOfFortnight(ms.dayOfWeek + 7)
         )
       )
       .flatten filter { _.schedule.at isAfter rightNow }

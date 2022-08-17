@@ -26,7 +26,7 @@ object side {
   )(implicit ctx: Context) =
     frag(
       div(cls := "tour__meta")(
-        st.section(dataIcon := (if (tour.isMedley) "5" else tour.perfType.iconChar.toString))(
+        st.section(dataIcon := (tour.iconChar.toString))(
           div(
             p(
               tour.clock.show,

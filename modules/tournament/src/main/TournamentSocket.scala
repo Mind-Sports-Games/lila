@@ -8,6 +8,7 @@ import scala.concurrent.Promise
 import play.api.libs.json.JsObject
 
 import lila.chat.Chat
+import lila.common.LightUser
 import lila.game.Game
 import lila.hub.LateMultiThrottler
 import lila.room.RoomSocket.{ Protocol => RP, _ }
@@ -18,7 +19,8 @@ import lila.user.User
 final private class TournamentSocket(
     repo: TournamentRepo,
     remoteSocketApi: lila.socket.RemoteSocket,
-    chat: lila.chat.ChatApi
+    chat: lila.chat.ChatApi,
+    lightUserApi: lila.user.LightUserApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
@@ -93,7 +95,9 @@ final private class TournamentSocket(
       .computeIfPresent(
         roomId.value,
         (_: Tournament.ID, cur: WaitingUsers.WithNext) => {
-          val newWaiting = cur.waiting.update(users)
+          val newWaiting = cur.waiting.update(users.map { u =>
+            lightUserApi.sync(u) | LightUser.fallback(u)
+          })
           cur.next.foreach(_ success newWaiting)
           WaitingUsers.WithNext(newWaiting, none)
         }

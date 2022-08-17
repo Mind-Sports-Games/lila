@@ -214,12 +214,14 @@ object TournamentShield {
 
     def byKey(k: String): Option[MedleyShield] = all.find(_.key == k)
 
-    private val medleyStartDate = new DateTime(2022, 6, 10, 0, 0)
+    private val medleyStartDate = new DateTime(2022, 6, 11, 0, 0)
     val arenaMedleyStartDate    = new DateTime(2022, 8, 7, 22, 0)
 
-    def weeksSinceStart = Weeks.weeksBetween(medleyStartDate, DateTime.now()).getWeeks()
+    def weeksSinceStart(startsAt: DateTime) =
+      Weeks.weeksBetween(medleyStartDate, startsAt).getWeeks()
 
-    def makeName(baseName: String) = s"${baseName} ${weeksSinceStart + 1}"
+    def makeName(baseName: String, startsAt: DateTime) =
+      s"${baseName} ${weeksSinceStart(startsAt) + 1}"
   }
 
   sealed abstract class Category(
@@ -365,7 +367,7 @@ object TournamentShield {
 
     case object Flipello10
         extends Category(
-          Variant.FairySF(strategygames.fairysf.variant.Flipello10)
+          Variant.FairySF(strategygames.fairysf.variant.Flipello10),
         )
 
     case object Oware

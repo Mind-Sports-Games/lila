@@ -31,7 +31,7 @@ object SwissCondition {
   case object Titled extends SwissCondition with FlatCond {
     def name(perf: PerfType)(implicit lang: Lang) = "Only titled players"
     def apply(user: User, perf: PerfType) =
-      if (user.title.exists(_ != Title.LM)) Accepted
+      if (user.title.exists(_ != Title.PM)) Accepted
       else Refused(name(perf)(_))
   }
 
