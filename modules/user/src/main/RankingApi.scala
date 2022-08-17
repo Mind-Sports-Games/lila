@@ -112,7 +112,6 @@ final class RankingApi(
       russian       <- topPerf(PerfType.orDefault("russian").id, nb)
       brazilian     <- topPerf(PerfType.orDefault("brazilian").id, nb)
       pool          <- topPerf(PerfType.orDefault("pool").id, nb)
-      portuguese    <- topPerf(PerfType.orDefault("portuguese").id, nb)
       shogi         <- topPerf(PerfType.orDefault("shogi").id, nb)
       xiangqi       <- topPerf(PerfType.orDefault("xiangqi").id, nb)
       minishogi     <- topPerf(PerfType.orDefault("minishogi").id, nb)
@@ -146,7 +145,6 @@ final class RankingApi(
       russian = russian,
       brazilian = brazilian,
       pool = pool,
-      portuguese = portuguese,
       shogi = shogi,
       xiangqi = xiangqi,
       minishogi = minishogi,
