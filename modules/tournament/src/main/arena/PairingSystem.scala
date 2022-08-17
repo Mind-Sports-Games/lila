@@ -26,7 +26,7 @@ final private[tournament] class PairingSystem(
     for {
       lastOpponents        <- pairingRepo.lastOpponents(tour.id, users.allIds, Math.min(300, users.size * 4))
       onlyTwoActivePlayers <- (tour.nbPlayers <= 12) ?? playerRepo.countActive(tour.id).dmap(2 ==)
-      data = Data(tour, lastOpponents.pp("lastOpponents"), ranking, onlyTwoActivePlayers.pp("only2AP"))
+      data = Data(tour, lastOpponents, ranking, onlyTwoActivePlayers)
       preps    <- (lastOpponents.hash.isEmpty || users.haveWaitedEnough) ?? evenOrAll(data, users)
       pairings <- prepsToPairings(preps)
     } yield pairings
