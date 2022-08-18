@@ -120,7 +120,7 @@ object BsonHandlers {
             microMatchGameId = r.getO[String](microMatchGameId),
             useMatchScore = r.getD[Boolean](useMatchScore),
             isBestOfX = r.getD[Boolean](isBestOfX),
-            nbGamesPerRound = r.get[SwissRound.GamesPerRound](nbGamesPerRound),
+            nbGamesPerRound = r.get[Int](nbGamesPerRound),
             //TODO allow this to work for chess too?
             openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
           )
@@ -153,7 +153,7 @@ object BsonHandlers {
         microMatchGameId = r.getO[String](microMatchGameId),
         useMatchScore = r.get[Boolean](useMatchScore),
         isBestOfX = r.get[Boolean](isBestOfX),
-        nbGamesPerRound = r.get[SwissRound.GamesPerRound](nbGamesPerRound) | 1,
+        nbGamesPerRound = r.get[Int](nbGamesPerRound),
         //TODO allow this to work for chess too?
         openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
       )
@@ -179,7 +179,7 @@ object BsonHandlers {
         isMicroMatch = r.boolO("m") | false,
         useMatchScore = r.boolO("ms") | false,
         isBestOfX = r.boolO("x") | false,
-        nbGamesPerRound = r.get[Int]("g") | 1,
+        nbGamesPerRound = r.get[Int]("gpr") | 1,
         description = r.strO("d"),
         useDrawTables = r.boolO("dt") | false,
         usePerPairingDrawTables = r.boolO("pdt") | false,
@@ -197,8 +197,8 @@ object BsonHandlers {
         "r"   -> (!s.rated).option(false),
         "m"   -> s.isMicroMatch,
         "ms"  -> s.useMatchScore,
-        "x"   -> s.bestOfX,
-        "g"   -> s.nbGamesPerRound,
+        "x"   -> s.isBestOfX,
+        "gpr" -> s.nbGamesPerRound,
         "d"   -> s.description,
         "dt"  -> s.useDrawTables,
         "pdt" -> s.usePerPairingDrawTables,

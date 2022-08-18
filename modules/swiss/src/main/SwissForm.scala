@@ -91,6 +91,8 @@ final class SwissForm(implicit mode: Mode) {
       rated = true.some,
       microMatch = false.some,
       useMatchScore = false.some,
+      bestOfX = false.some,
+      nbGamesPerRound = 1,
       nbRounds = 7,
       description = none,
       drawTables = false.some,
@@ -127,6 +129,8 @@ final class SwissForm(implicit mode: Mode) {
       rated = s.settings.rated.some,
       microMatch = s.settings.isMicroMatch.some,
       useMatchScore = s.settings.useMatchScore.some,
+      bestOfX = s.settings.isBestOfX.some,
+      nbGamesPerRound = s.settings.nbGamesPerRound,
       nbRounds = s.settings.nbRounds,
       description = s.settings.description,
       drawTables = s.settings.useDrawTables.some,
@@ -230,6 +234,8 @@ object SwissForm {
       rated: Option[Boolean],
       microMatch: Option[Boolean],
       useMatchScore: Option[Boolean],
+      bestOfX: Option[Boolean],
+      nbGamesPerRound: Int,
       nbRounds: Int,
       description: Option[String],
       drawTables: Option[Boolean],
@@ -272,6 +278,7 @@ object SwissForm {
     def isRated         = rated | true
     def isMicroMatch    = microMatch | false
     def isUseMatchScore = useMatchScore | false
+    def isBestOfX       = bestOfX | false
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)

@@ -5,8 +5,7 @@ import lila.game.Game
 
 object SwissRound {
 
-  case class Number(value: Int)        extends AnyVal with IntValue
-  case class GamesPerRound(value: Int) extends AnyVal with IntValue
+  case class Number(value: Int) extends AnyVal with IntValue
 }
 
 case class MyInfo(rank: Int, gameIds: Option[SwissPairingGameIds], user: User, player: SwissPlayer) {

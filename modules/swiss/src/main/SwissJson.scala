@@ -92,7 +92,9 @@ final class SwissJson(
                       f.id               -> true,
                       f.isMicroMatch     -> true,
                       f.microMatchGameId -> true,
-                      f.useMatchScore    -> true
+                      f.useMatchScore    -> true,
+                      f.isBestOfX        -> true,
+                      f.nbGamesPerRound  -> true
                     ).some
                   )
                   .one[SwissPairingGameIds]
@@ -196,6 +198,8 @@ object SwissJson {
         "trophy3rd"        -> swiss.trophy3rd,
         "isMicroMatch"     -> swiss.settings.isMicroMatch,
         "useMatchScore"    -> swiss.settings.useMatchScore,
+        "isBestOfX"        -> swiss.settings.isBestOfX,
+        "nbGamesPerRound"  -> swiss.settings.nbGamesPerRound,
         "status" -> {
           if (swiss.isStarted) "started"
           else if (swiss.isFinished) "finished"
@@ -278,8 +282,9 @@ object SwissJson {
     val useMatchScore = if (pairing.useMatchScore) "s" else ""
     val matchScore =
       pairing.matchScoreFor(player.userId) // "" if useMatchScore is false, otherwise 2 digit string number
+    val bestOfX    = if (pairing.isBestOfX) "x" else ""
     val openingFEN = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
-    s"${pairing.gameId}$status$useMatchScore$matchScore$microMatch$microMatchId$openingFEN"
+    s"${pairing.gameId}$status${pairing.nbGamesPerRound}$bestOfX$useMatchScore$matchScore$microMatch$microMatchId$openingFEN"
   }
 
   private def pairingJson(player: SwissPlayer, pairing: SwissPairing) =
@@ -288,6 +293,8 @@ object SwissJson {
         "g"    -> pairing.gameId,
         "m"    -> pairing.isMicroMatch,
         "mmid" -> pairing.microMatchGameId,
+        "x"    -> pairing.isBestOfX,
+        "gpr"  -> pairing.nbGamesPerRound,
         "ms"   -> pairing.useMatchScore,
         "mp"   -> pairing.matchScoreFor(player.userId),
         "of"   -> pairing.openingFEN.map(_.value)
@@ -312,6 +319,8 @@ object SwissJson {
         "isMicroMatch"     -> i.gameIds.map(_.isMicroMatch),
         "microMatchGameId" -> i.gameIds.flatMap(_.microMatchGameId),
         "useMatchScore"    -> i.gameIds.map(_.useMatchScore),
+        "isBestOfX"        -> i.gameIds.map(_.isBestOfX),
+        "nbGamesPerRound"  -> i.gameIds.map(_.nbGamesPerRound),
         "id"               -> i.user.id,
         "name"             -> i.user.username,
         "absent"           -> i.player.absent
@@ -368,6 +377,10 @@ object SwissJson {
   implicit private val roundNumberWriter: Writes[SwissRound.Number] = Writes[SwissRound.Number] { n =>
     JsNumber(n.value)
   }
+  // implicit private val gamesPerRoundNumberWriter: Writes[SwissRound.GamesPerRound] =
+  //   Writes[SwissRound.GamesPerRound] { n =>
+  //     JsNumber(n.value)
+  //   }
   implicit private val pointsWriter: Writes[Swiss.Points] = Writes[Swiss.Points] { p =>
     JsNumber(p.value)
   }

@@ -146,7 +146,7 @@ object Swiss {
       isMicroMatch: Boolean,
       useMatchScore: Boolean,
       isBestOfX: Boolean,
-      nbGamesPerRound: Int = 1,
+      nbGamesPerRound: Int,
       description: Option[String] = None,
       useDrawTables: Boolean,
       usePerPairingDrawTables: Boolean,

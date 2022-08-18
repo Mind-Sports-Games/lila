@@ -43,6 +43,8 @@ export interface SwissData {
   isMicroMatch: boolean;
   microMatchGameId?: string;
   useMatchScore: boolean;
+  isBestOfX: boolean;
+  nbGamesPerRound: number;
   status: Status;
   standing: Standing;
   boards: Board[];
@@ -77,6 +79,8 @@ export interface MyInfo {
   isMicroMatch: boolean;
   microMatchGameId?: string;
   useMatchScore: boolean;
+  isBestOfX: boolean;
+  nbGamesPerRound: number;
 }
 
 export interface PairingBase {
@@ -86,6 +90,8 @@ export interface PairingBase {
   m: boolean; // isMicroMatch
   mmid?: string; // isMicroMatch
   ms: boolean; // useMatchScore
+  x: boolean; // isBestOfX
+  gpr: string; //nbGamesPerRound
   mp?: string; //match points for player if using matchScore
   vi?: string; //variant icon
 }

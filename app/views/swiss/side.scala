@@ -52,7 +52,7 @@ object side {
                 s"${s.round}/${s.settings.nbRounds}",
                 if (s.settings.isMicroMatch) {
                   " micro-match rounds"
-                } else if (s.settings.bestOfX) {
+                } else if (s.settings.isBestOfX) {
                   s" (best of ${s.settings.nbGamesPerRound}) rounds"
                 } else " rounds",
                 if (s.settings.useMatchScore) " (match score)" else ""

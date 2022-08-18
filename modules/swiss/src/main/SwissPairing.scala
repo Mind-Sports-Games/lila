@@ -18,7 +18,7 @@ case class SwissPairing(
     microMatchGameId: Option[Game.ID],
     useMatchScore: Boolean,
     isBestOfX: Boolean,
-    nbGamesPerRound: SwissRound.GamesPerRound = 1,
+    nbGamesPerRound: Int,
     openingFEN: Option[FEN],
     variant: Option[Variant] = None
 ) {
@@ -82,6 +82,8 @@ case class SwissPairingGameIds(
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
     useMatchScore: Boolean,
+    isBestOfX: Boolean,
+    nbGamesPerRound: Int,
     openingFEN: Option[FEN]
 )
 
@@ -91,6 +93,8 @@ case class SwissPairingGames(
     isMicroMatch: Boolean,
     microMatchGame: Option[Game],
     useMatchScore: Boolean,
+    isBestOfX: Boolean,
+    nbGamesPerRound: Int,
     openingFEN: Option[FEN]
 ) {
   def finishedOrAborted =
@@ -133,6 +137,8 @@ object SwissPairing {
       swissPairing.isMicroMatch,
       swissPairing.microMatchGameId,
       swissPairing.useMatchScore,
+      swissPairing.isBestOfX,
+      swissPairing.nbGamesPerRound,
       swissPairing.openingFEN
     )
 
@@ -167,6 +173,8 @@ object SwissPairing {
     val isMicroMatch     = "mm"
     val microMatchGameId = "mmid"
     val useMatchScore    = "ms"
+    val isBestOfX        = "x"
+    val nbGamesPerRound  = "gpr"
     val openingFEN       = "of"
     val variant          = "v"
   }
