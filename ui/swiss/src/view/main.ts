@@ -201,7 +201,11 @@ function joinButton(ctrl: SwissCtrl): VNode | undefined {
 }
 
 function joinTheGame(ctrl: SwissCtrl) {
-  const gameId = ctrl.data.me?.microMatchGameId ? ctrl.data.me?.microMatchGameId : ctrl.data.me?.gameId;
+  const gameId = ctrl.data.me?.microMatchGameId
+    ? ctrl.data.me?.microMatchGameId
+    : ctrl.data.me?.multiMatchGameIds
+    ? ctrl.data.me?.multiMatchGameIds.slice(-1)[0]
+    : ctrl.data.me?.gameId;
   return gameId
     ? h(
         'a.swiss__ur-playing.button.is.is-after',

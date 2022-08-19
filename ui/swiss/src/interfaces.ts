@@ -42,6 +42,7 @@ export interface SwissData {
   trophy3rd: string;
   isMicroMatch: boolean;
   microMatchGameId?: string;
+  multiMatchGameIds?: string[];
   useMatchScore: boolean;
   isBestOfX: boolean;
   nbGamesPerRound: number;
@@ -78,6 +79,7 @@ export interface MyInfo {
   gameId?: string;
   isMicroMatch: boolean;
   microMatchGameId?: string;
+  multiMatchGameIds?: string[];
   useMatchScore: boolean;
   isBestOfX: boolean;
   nbGamesPerRound: number;
@@ -152,6 +154,9 @@ export interface Board {
   isMicroMatch: boolean;
   microMatchGameId?: string;
   microMatchGame?: Board;
+  multiMatchGameIds?: string[];
+  multiMatchGames?: Board[];
+  isBestOfX: boolean;
   clock?: {
     p1: number;
     p2: number;

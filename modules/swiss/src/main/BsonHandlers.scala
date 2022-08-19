@@ -118,6 +118,7 @@ object BsonHandlers {
             //       in the case that it's not a micromatch to save on storage
             isMicroMatch = r.getD[Boolean](isMicroMatch),
             microMatchGameId = r.getO[String](microMatchGameId),
+            multiMatchGameIds = r.getsO[String](multiMatchGameIds),
             useMatchScore = r.getD[Boolean](useMatchScore),
             isBestOfX = r.getD[Boolean](isBestOfX),
             nbGamesPerRound = r.get[Int](nbGamesPerRound),
@@ -136,12 +137,13 @@ object BsonHandlers {
         matchStatus -> o.matchStatus,
         // TODO: long term we may want to skip storing both of these fields
         //       in the case that it's not a micromatch to save on storage
-        isMicroMatch     -> o.isMicroMatch,
-        microMatchGameId -> o.microMatchGameId,
-        useMatchScore    -> o.useMatchScore,
-        isBestOfX        -> o.isBestOfX,
-        nbGamesPerRound  -> o.nbGamesPerRound,
-        openingFEN       -> o.openingFEN.map(_.value)
+        isMicroMatch      -> o.isMicroMatch,
+        microMatchGameId  -> o.microMatchGameId,
+        multiMatchGameIds -> o.multiMatchGameIds,
+        useMatchScore     -> o.useMatchScore,
+        isBestOfX         -> o.isBestOfX,
+        nbGamesPerRound   -> o.nbGamesPerRound,
+        openingFEN        -> o.openingFEN.map(_.value)
       )
   }
   implicit val pairingGamesHandler = new BSON[SwissPairingGameIds] {
@@ -151,6 +153,7 @@ object BsonHandlers {
         id = r str id,
         isMicroMatch = r.get[Boolean](isMicroMatch),
         microMatchGameId = r.getO[String](microMatchGameId),
+        multiMatchGameIds = r.getsO[String](multiMatchGameIds),
         useMatchScore = r.get[Boolean](useMatchScore),
         isBestOfX = r.get[Boolean](isBestOfX),
         nbGamesPerRound = r.get[Int](nbGamesPerRound),
@@ -159,13 +162,14 @@ object BsonHandlers {
       )
     def writes(w: BSON.Writer, o: SwissPairingGameIds) =
       $doc(
-        id               -> o.id,
-        isMicroMatch     -> o.isMicroMatch,
-        microMatchGameId -> o.microMatchGameId,
-        useMatchScore    -> o.useMatchScore,
-        isBestOfX        -> o.isBestOfX,
-        nbGamesPerRound  -> o.nbGamesPerRound,
-        openingFEN       -> o.openingFEN.map(_.value)
+        id                -> o.id,
+        isMicroMatch      -> o.isMicroMatch,
+        microMatchGameId  -> o.microMatchGameId,
+        multiMatchGameIds -> o.multiMatchGameIds,
+        useMatchScore     -> o.useMatchScore,
+        isBestOfX         -> o.isBestOfX,
+        nbGamesPerRound   -> o.nbGamesPerRound,
+        openingFEN        -> o.openingFEN.map(_.value)
       )
   }
 

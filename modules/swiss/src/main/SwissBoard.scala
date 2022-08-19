@@ -14,11 +14,18 @@ private case class SwissBoard(
     // TODO: This interface seems ugly, but I guess it's fine.
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
+    isBestOfX: Boolean,
+    multiMatchGameIds: Option[List[Game.ID]]
 )
 
 private object SwissBoard {
   case class Player(user: LightUser, rank: Int, rating: Int)
-  case class WithGame(board: SwissBoard, game: Game, microMatchGame: Option[Game])
+  case class WithGame(
+      board: SwissBoard,
+      game: Game,
+      microMatchGame: Option[Game],
+      multiMatchGames: Option[List[Game]]
+  )
 }
 
 final private class SwissBoardApi(
@@ -36,9 +43,21 @@ final private class SwissBoardApi(
 
   def apply(id: Swiss.Id): Fu[List[SwissBoard.WithGame]] =
     boardsCache.getIfPresent(id) ?? {
-      _.map { board => 
-          (gameProxyRepo.game(board.gameId) zip board.microMatchGameId.traverse(gameProxyRepo.game)).map {
-            case (game: Option[Game], microMatchGame: Option[Option[Game]]) => game.map(g => SwissBoard.WithGame(board, g, microMatchGame.flatten))
+      _.map { board =>
+        (gameProxyRepo.game(board.gameId) zip board.microMatchGameId
+          .traverse(
+            gameProxyRepo.game
+          )
+          .map(_.flatten) zip (
+          board.multiMatchGameIds
+            .traverse(l => l.traverse(gid => gameProxyRepo.game(gid)).map(_.flatten))
+        ))
+          .map {
+            case (
+                  (game: Option[Game], microMatchGame: Option[Game]),
+                  multiMatchGames: Option[List[Game]]
+                ) =>
+              game.map(g => SwissBoard.WithGame(board, g, microMatchGame, multiMatchGames))
           }
       }.sequenceFu
         .dmap(_.flatten)
@@ -76,7 +95,9 @@ final private class SwissBoardApi(
                     p1 = SwissBoard.Player(u1, r1, p1.rating),
                     p2 = SwissBoard.Player(u2, r2, p2.rating),
                     isMicroMatch = pairing.isMicroMatch,
-                    microMatchGameId = pairing.microMatchGameId
+                    microMatchGameId = pairing.microMatchGameId,
+                    isBestOfX = pairing.isBestOfX,
+                    multiMatchGameIds = pairing.multiMatchGameIds
                   )
                 }
             )

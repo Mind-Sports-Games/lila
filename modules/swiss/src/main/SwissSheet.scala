@@ -63,7 +63,7 @@ private object SwissSheet {
             pairing.status match {
               case Left(_) => List(Ongoing)
               case Right(None) =>
-                if (swiss.settings.useMatchScore && swiss.settings.isMicroMatch)
+                if (swiss.settings.useMatchScore && (swiss.settings.isMicroMatch || swiss.settings.isBestOfX))
                   outcomeListFromMultiMatch(player, pairing)
                 else List(Draw)
               case Right(Some(playerIndex)) =>
@@ -74,7 +74,10 @@ private object SwissSheet {
             }
           case None if player.byes(round) =>
             if (swiss.settings.useMatchScore && swiss.settings.isMicroMatch) List(Bye, Bye)
-            else List(Bye) //TODO this might change in best of x?
+            else if (swiss.settings.useMatchScore && swiss.settings.isBestOfX)
+              //(1 to swiss.settings.nbGamesPerRound).map(_ => Bye)
+              List.fill(swiss.settings.nbGamesPerRound)(Bye)
+            else List(Bye)
           case None => List(Absent)
         }
       }

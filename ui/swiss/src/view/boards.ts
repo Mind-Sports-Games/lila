@@ -23,7 +23,11 @@ const renderBoardState = (board: Board): string =>
 
 const renderBoard = (incomingBoard: Board): VNode => {
   const board =
-    incomingBoard.isMicroMatch && incomingBoard.microMatchGame ? incomingBoard.microMatchGame : incomingBoard;
+    incomingBoard.isMicroMatch && incomingBoard.microMatchGame
+      ? incomingBoard.microMatchGame
+      : incomingBoard.isBestOfX && incomingBoard.multiMatchGames
+      ? incomingBoard.multiMatchGames.slice(-1)[0]
+      : incomingBoard;
   return h(
     `div${renderBoardClasses(board)}`,
     {

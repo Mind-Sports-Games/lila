@@ -65,6 +65,7 @@ final private class SwissDirector(
                 matchStatus = Left(SwissPairing.Ongoing),
                 isMicroMatch = swiss.settings.isMicroMatch,
                 None,
+                None,
                 useMatchScore = swiss.settings.useMatchScore,
                 isBestOfX = swiss.settings.isBestOfX,
                 nbGamesPerRound = swiss.settings.nbGamesPerRound,
@@ -130,17 +131,22 @@ final private class SwissDirector(
         },
         p1Player = makePlayer(
           P1,
-          players.get(if (rematch) pairing.p2 else pairing.p1) err s"Missing pairing p1 $pairing"
+          players.get(
+            if (rematch && pairing.multiMatchGameIds.size % 2 == 1) pairing.p2 else pairing.p1
+          ) err s"Missing pairing p1 $pairing"
         ),
         p2Player = makePlayer(
           P2,
-          players.get(if (rematch) pairing.p1 else pairing.p2) err s"Missing pairing p2 $pairing"
+          players.get(
+            if (rematch && pairing.multiMatchGameIds.size % 2 == 1) pairing.p1 else pairing.p2
+          ) err s"Missing pairing p2 $pairing"
         ),
         mode = strategygames.Mode(swiss.settings.rated),
         source = lila.game.Source.Swiss,
         pgnImport = None
       )
-      .withId(if (rematch) pairing.microMatchGameId.getOrElse(pairing.gameId) else pairing.id)
+      //.withId(if (rematch) pairing.microMatchGameId.getOrElse(pairing.gameId) else pairing.id)
+      .withId(if (rematch) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id)
       .withSwissId(swiss.id.value)
       .start
 
