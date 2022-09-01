@@ -473,7 +473,7 @@ object TournamentShield {
     def byKey(k: String): Option[Category] = all.find(_.key == k)
   }
 
-  val defaultShieldHour = 19
+  val defaultShieldHour = 18 //UTC
 
   def spotlight(name: String, icon: Char) =
     Spotlight(

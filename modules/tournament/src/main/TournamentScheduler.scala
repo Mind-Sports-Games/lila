@@ -174,23 +174,23 @@ final private class TournamentScheduler(
       .flatten filter { _.schedule.at isAfter rightNow }
 
     //and schedule next month
-    //TournamentShield.Category.all
-    //  .map(shield =>
-    //    at(nextMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
-    //      Schedule(Shield, shield.speed, shield.variant, none, date) plan {
-    //        _.copy(
-    //          name = s"${VariantKeys.variantName(shield.variant)} Shield",
-    //          spotlight = Some(
-    //            TournamentShield.spotlight(
-    //              VariantKeys.variantName(shield.variant),
-    //              shield.variant.perfIcon
-    //            )
-    //          )
-    //        )
-    //      }
-    //    }
-    //  )
-    //  .flatten filter { _.schedule.at isAfter rightNow }
+    TournamentShield.Category.all
+      .map(shield =>
+        at(nextMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
+          Schedule(Shield, shield.speed, shield.variant, none, date) plan {
+            _.copy(
+              name = s"${VariantKeys.variantName(shield.variant)} Shield",
+              spotlight = Some(
+                TournamentShield.spotlight(
+                  VariantKeys.variantName(shield.variant),
+                  shield.variant.perfIcon
+                )
+              )
+            )
+          }
+        }
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
 
 //          List( // shield tournaments!
 //            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,
