@@ -294,7 +294,7 @@ object Schedule {
     case object Winter extends Season
   }
 
-  private val defaultDuration: Int = 57
+  private val defaultDuration: Int = 55
 
   private[tournament] def durationFor(s: Schedule): Int = s.duration match {
     case Some(duration) => duration
