@@ -39,7 +39,6 @@ object shields {
             }
           ),
           h2("Variant Shields:"),
-          h3("Coming Soon..."),
           div(cls := "tournament-shields")(
             history.sorted.map { case (categ, awards) =>
               section(
