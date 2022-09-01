@@ -440,14 +440,14 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 
   def winnersByTrophy(trophy: String): Fu[List[Tournament]] =
     coll
-      .find($doc("trophy1st" -> trophy, "finishedAt" $exists true))
+      .find($doc("trophy1st" -> trophy, "winner" $exists true))
       .sort($sort desc "startsAt")
       .cursor[Tournament]()
       .list()
 
   def nextByTrophy(trophy: String): Fu[Option[Tournament]] =
     coll
-      .find($doc("trophy1st" -> trophy, "finishedAt" $exists false))
+      .find($doc("trophy1st" -> trophy, "winner" $exists false))
       .sort($sort asc "startsAt")
       .cursor[Tournament]()
       .headOption
