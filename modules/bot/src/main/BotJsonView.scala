@@ -18,7 +18,7 @@ final class BotJsonView(
   def gameFull(game: Game)(implicit lang: Lang): Fu[JsObject] = gameRepo.withInitialFen(game) flatMap gameFull
 
   def gameFull(wf: Game.WithInitialFen)(implicit lang: Lang): Fu[JsObject] =
-    gameState(wf) map { state =>
+    gameState(wf).thenPp("gameState") map { state =>
       gameImmutable(wf) ++ Json.obj(
         "type"  -> "gameFull",
         "state" -> state
@@ -54,14 +54,14 @@ final class BotJsonView(
       Json
         .obj(
           "type"   -> "gameState",
-          "moves"  -> uciMoves.mkString(" "),
+          "moves"  -> uciMoves.mkString(" ").pp("moves"),
           "wtime"  -> millisOf(game.p1Pov),
           "btime"  -> millisOf(game.p2Pov),
           "winc"   -> game.clock.??(_.config.increment.millis),
           "binc"   -> game.clock.??(_.config.increment.millis),
           "wdraw"  -> game.p1Player.isOfferingDraw,
           "bdraw"  -> game.p2Player.isOfferingDraw,
-          "status" -> game.status.name
+          "status" -> game.status.name.pp("status")
         )
         .add("winner" -> game.winnerPlayerIndex)
         .add("rematch" -> rematches.of(game.id))
