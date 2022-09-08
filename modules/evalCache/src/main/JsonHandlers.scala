@@ -43,10 +43,13 @@ object JsonHandlers {
       pvObjs <- d objs "pvs"
       pvs    <- pvObjs.map(parsePv).sequence.flatMap(_.toNel)
       variant = Variant.orDefault(
-        GameLogic(d int "lib" match {
-          case Some(lib) => lib
-          case None      => sys.error("lib must be provided for readPutData")
-        }),
+        //Same defaulting problem/temp fix as below for Game Family.
+        //Can resolve both properly at the same time.
+        GameLogic.Chess(),
+        //GameLogic(d int "lib" match {
+        //  case Some(lib) => lib
+        //  case None      => sys.error("lib must be provided for readPutData")
+        //}),
         ~d.str("variant")
       )
     } yield Input.Candidate(
