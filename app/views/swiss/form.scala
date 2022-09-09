@@ -28,8 +28,9 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            form3.split(fields.microMatch, fields.useMatchScore),
-            form3.split(fields.bestOfX, fields.nbGamesPerRound),
+            //fields.microMatch,
+            fields.xGamesChoice,
+            form3.split(fields.useMatchScore, fields.nbGamesPerRound),
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
             fields.medleyDefaults,
@@ -69,8 +70,9 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            form3.split(fields.microMatch, fields.useMatchScore),
-            form3.split(fields.bestOfX, fields.nbGamesPerRound),
+            //fields.microMatch,
+            fields.xGamesChoice,
+            form3.split(fields.useMatchScore, fields.nbGamesPerRound),
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
             fields.medleyDefaults,
@@ -182,13 +184,29 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         help = raw(trans.useMatchScoreDefinition.txt().replace("(", "<br>(")).some
       )
     )
+  def xGamesChoice =
+    form3.split(
+      bestOfX,
+      playX
+    )
   def bestOfX =
     frag(
       form3.checkbox(
-        form("bestOfX"),
+        form("xGamesChoice.bestOfX"),
         "Best of X",
+        klass = "xGamesChoice",
         half = true,
         help = raw("Each round, play best of X games with opponent").some
+      )
+    )
+  def playX =
+    frag(
+      form3.checkbox(
+        form("xGamesChoice.playX"),
+        "Play X Games",
+        klass = "xGamesChoice",
+        half = true,
+        help = raw("Each round, play X games with opponent").some
       )
     )
   def nbGamesPerRound =

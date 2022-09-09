@@ -19,6 +19,7 @@ case class SwissPairing(
     multiMatchGameIds: Option[List[Game.ID]],
     useMatchScore: Boolean,
     isBestOfX: Boolean,
+    isPlayX: Boolean,
     nbGamesPerRound: Int,
     openingFEN: Option[FEN],
     variant: Option[Variant] = None
@@ -85,6 +86,7 @@ case class SwissPairingGameIds(
     multiMatchGameIds: Option[List[Game.ID]],
     useMatchScore: Boolean,
     isBestOfX: Boolean,
+    isPlayX: Boolean,
     nbGamesPerRound: Int,
     openingFEN: Option[FEN]
 )
@@ -97,13 +99,14 @@ case class SwissPairingGames(
     multiMatchGames: Option[List[Game]],
     useMatchScore: Boolean,
     isBestOfX: Boolean,
+    isPlayX: Boolean,
     nbGamesPerRound: Int,
     openingFEN: Option[FEN]
 ) {
   def finishedOrAborted =
     game.finishedOrAborted && (!isMicroMatch || microMatchGame.fold(false)(
       _.finishedOrAborted
-    )) && (!isBestOfX || !requireMoreGamesInBestOfX)
+    )) && (!isBestOfX || !requireMoreGamesInBestOfX) && (!isPlayX || !requireMoreGamesInPlayX)
   def requireMoreGamesInBestOfX: Boolean = {
     val nbGamesLeft = nbGamesPerRound - (multiMatchGames.fold(0)(x => x.length) + 1);
     nbGamesLeft != 0 && ((
@@ -126,6 +129,10 @@ case class SwissPairingGames(
       case x if x < 0 => -x <= nbGamesLeft
       case _          => true
     })
+  }
+  def requireMoreGamesInPlayX: Boolean = {
+    val nbGamesLeft = nbGamesPerRound - (multiMatchGames.fold(0)(x => x.length) + 1);
+    nbGamesLeft != 0
   }
   def outoftime = if (game.outoftime(true)) List(game)
   else
@@ -176,7 +183,7 @@ case class SwissPairingGames(
       .flatMap(_.last.playerWhoDidNotMove)
   def createdAt = if (isMicroMatch) {
     microMatchGame.fold(game.createdAt)(_.createdAt)
-  } else if (isBestOfX) {
+  } else if (isBestOfX || isPlayX) {
     multiMatchGames.fold(game.createdAt)(_.last.createdAt)
   } else game.createdAt
   def matchOutcome: List[Option[PlayerIndex]] =
@@ -185,7 +192,7 @@ case class SwissPairingGames(
         case Some(g2) => List(game.winnerPlayerIndex, g2.winnerPlayerIndex)
         case None     => List(game.winnerPlayerIndex, None)
       }
-    } else if (useMatchScore && isBestOfX) {
+    } else if (useMatchScore && (isBestOfX || isPlayX)) {
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(_.winnerPlayerIndex)
     } else List(game.winnerPlayerIndex)
 }
@@ -200,6 +207,7 @@ object SwissPairing {
       swissPairing.multiMatchGameIds,
       swissPairing.useMatchScore,
       swissPairing.isBestOfX,
+      swissPairing.isPlayX,
       swissPairing.nbGamesPerRound,
       swissPairing.openingFEN
     )
@@ -237,6 +245,7 @@ object SwissPairing {
     val multiMatchGameIds = "mmids"
     val useMatchScore     = "ms"
     val isBestOfX         = "x"
+    val isPlayX           = "px"
     val nbGamesPerRound   = "gpr"
     val openingFEN        = "of"
     val variant           = "v"

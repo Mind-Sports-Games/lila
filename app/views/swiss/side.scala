@@ -54,6 +54,8 @@ object side {
                   " micro-match rounds"
                 } else if (s.settings.isBestOfX) {
                   s" (best of ${s.settings.nbGamesPerRound}) rounds"
+                } else if (s.settings.isPlayX) {
+                  s" (${s.settings.nbGamesPerRound} games) rounds Swiss"
                 } else " rounds",
                 if (s.settings.useMatchScore) " (match score)" else ""
               ),

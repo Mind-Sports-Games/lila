@@ -65,6 +65,8 @@ object home {
                   " micro-match rounds Swiss"
                 } else if (s.settings.isBestOfX) {
                   s" (best of ${s.settings.nbGamesPerRound}) rounds Swiss"
+                } else if (s.settings.isPlayX) {
+                  s" (${s.settings.nbGamesPerRound} games) rounds Swiss"
                 } else " rounds Swiss",
                 if (s.settings.useMatchScore) " (match score)" else ""
                 // if (s.settings.isMicroMatch) {

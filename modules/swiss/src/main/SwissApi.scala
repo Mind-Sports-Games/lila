@@ -85,6 +85,7 @@ final class SwissApi(
         isMicroMatch = data.isMicroMatch,
         useMatchScore = data.isUseMatchScore,
         isBestOfX = data.isBestOfX,
+        isPlayX = data.isPlayX,
         nbGamesPerRound = data.nbGamesPerRound,
         description = data.description,
         useDrawTables = data.useDrawTables,
@@ -123,6 +124,7 @@ final class SwissApi(
             isMicroMatch = data.isMicroMatch | old.settings.isMicroMatch,
             useMatchScore = data.isUseMatchScore | old.settings.useMatchScore,
             isBestOfX = data.isBestOfX | old.settings.isBestOfX,
+            isPlayX = data.isPlayX | old.settings.isPlayX,
             nbGamesPerRound = data.nbGamesPerRound | 1,
             description = data.description orElse old.settings.description,
             useDrawTables = data.useDrawTables | old.settings.useDrawTables,
@@ -426,6 +428,7 @@ final class SwissApi(
           ids.multiMatchGameIds.fold[Option[List[Game]]](None)(l => Some(l.flatMap(gamesById.get))),
           ids.useMatchScore,
           ids.isBestOfX,
+          ids.isPlayX,
           ids.nbGamesPerRound,
           ids.openingFEN
         )
@@ -551,7 +554,7 @@ final class SwissApi(
   private[swiss] def updateMultiMatchProgress(game: SwissPairingGames): Funit =
     (
       game.finishedOrAborted,
-      game.isBestOfX,
+      game.isBestOfX || game.isPlayX,
       game.multiMatchGames
     ) match {
       case (true, _, _)        => finishGame(game)
@@ -816,6 +819,7 @@ final class SwissApi(
                     "multiMatchGameIds" -> f.multiMatchGameIds,
                     "useMatchScore"     -> f.useMatchScore,
                     "isBestOfX"         -> f.isBestOfX,
+                    "isPlayX"           -> f.isPlayX,
                     "nbGamesPerRound"   -> f.nbGamesPerRound
                   )
                 )

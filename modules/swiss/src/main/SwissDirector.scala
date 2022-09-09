@@ -68,6 +68,7 @@ final private class SwissDirector(
                 None,
                 useMatchScore = swiss.settings.useMatchScore,
                 isBestOfX = swiss.settings.isBestOfX,
+                isPlayX = swiss.settings.isPlayX,
                 nbGamesPerRound = swiss.settings.nbGamesPerRound,
                 if (randomPairingPos) randomPos().orElse(perRoundPos) else perRoundPos,
                 swiss.roundVariant.some
@@ -147,7 +148,7 @@ final private class SwissDirector(
         source = lila.game.Source.Swiss,
         pgnImport = None,
         multiMatch =
-          if (swiss.settings.isBestOfX) "multiMatch".some
+          if (swiss.settings.isBestOfX || swiss.settings.isPlayX) "multiMatch".some
           else none //todo update for each game in match - use rematch?
       )
       //.withId(if (rematch) pairing.microMatchGameId.getOrElse(pairing.gameId) else pairing.id)

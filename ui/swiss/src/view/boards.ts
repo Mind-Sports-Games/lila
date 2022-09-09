@@ -25,7 +25,7 @@ const renderBoard = (incomingBoard: Board): VNode => {
   const board =
     incomingBoard.isMicroMatch && incomingBoard.microMatchGame
       ? incomingBoard.microMatchGame
-      : incomingBoard.isBestOfX && incomingBoard.multiMatchGames
+      : (incomingBoard.isBestOfX || incomingBoard.isPlayX) && incomingBoard.multiMatchGames
       ? incomingBoard.multiMatchGames.slice(-1)[0]
       : incomingBoard;
   return h(

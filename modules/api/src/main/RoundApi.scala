@@ -290,6 +290,7 @@ final private[api] class RoundApi(
           "running"         -> s.swiss.isStarted,
           "isMicroMatch"    -> s.swiss.settings.isMicroMatch,
           "isBestOfX"       -> s.swiss.settings.isBestOfX,
+          "isPlayX"         -> s.swiss.settings.isPlayX,
           "nbGamesPerRound" -> s.swiss.settings.nbGamesPerRound
         )
         .add("ranks" -> s.ranks.map { r =>

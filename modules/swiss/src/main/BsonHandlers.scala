@@ -121,6 +121,7 @@ object BsonHandlers {
             multiMatchGameIds = r.getsO[String](multiMatchGameIds),
             useMatchScore = r.getD[Boolean](useMatchScore),
             isBestOfX = r.getD[Boolean](isBestOfX),
+            isPlayX = r.getD[Boolean](isPlayX),
             nbGamesPerRound = r.get[Int](nbGamesPerRound),
             //TODO allow this to work for chess too?
             openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
@@ -142,6 +143,7 @@ object BsonHandlers {
         multiMatchGameIds -> o.multiMatchGameIds,
         useMatchScore     -> o.useMatchScore,
         isBestOfX         -> o.isBestOfX,
+        isPlayX           -> o.isPlayX,
         nbGamesPerRound   -> o.nbGamesPerRound,
         openingFEN        -> o.openingFEN.map(_.value)
       )
@@ -156,6 +158,7 @@ object BsonHandlers {
         multiMatchGameIds = r.getsO[String](multiMatchGameIds),
         useMatchScore = r.get[Boolean](useMatchScore),
         isBestOfX = r.get[Boolean](isBestOfX),
+        isPlayX = r.get[Boolean](isPlayX),
         nbGamesPerRound = r.get[Int](nbGamesPerRound),
         //TODO allow this to work for chess too?
         openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
@@ -168,6 +171,7 @@ object BsonHandlers {
         multiMatchGameIds -> o.multiMatchGameIds,
         useMatchScore     -> o.useMatchScore,
         isBestOfX         -> o.isBestOfX,
+        isPlayX           -> o.isPlayX,
         nbGamesPerRound   -> o.nbGamesPerRound,
         openingFEN        -> o.openingFEN.map(_.value)
       )
@@ -183,6 +187,7 @@ object BsonHandlers {
         isMicroMatch = r.boolO("m") | false,
         useMatchScore = r.boolO("ms") | false,
         isBestOfX = r.boolO("x") | false,
+        isPlayX = r.boolO("px") | false,
         nbGamesPerRound = r.get[Int]("gpr") | 1,
         description = r.strO("d"),
         useDrawTables = r.boolO("dt") | false,
@@ -202,6 +207,7 @@ object BsonHandlers {
         "m"   -> s.isMicroMatch,
         "ms"  -> s.useMatchScore,
         "x"   -> s.isBestOfX,
+        "px"  -> s.isPlayX,
         "gpr" -> s.nbGamesPerRound,
         "d"   -> s.description,
         "dt"  -> s.useDrawTables,

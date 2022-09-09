@@ -15,6 +15,7 @@ private case class SwissBoard(
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
     isBestOfX: Boolean,
+    isPlayX: Boolean,
     multiMatchGameIds: Option[List[Game.ID]]
 )
 
@@ -97,6 +98,7 @@ final private class SwissBoardApi(
                     isMicroMatch = pairing.isMicroMatch,
                     microMatchGameId = pairing.microMatchGameId,
                     isBestOfX = pairing.isBestOfX,
+                    isPlayX = pairing.isPlayX,
                     multiMatchGameIds = pairing.multiMatchGameIds
                   )
                 }

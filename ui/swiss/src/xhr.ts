@@ -52,17 +52,24 @@ const readSheetMin = (str: string) =>
               w: s[8] == 'w' ? true : s[8] == 'l' ? false : undefined,
               gpr: s[9],
               x: s.length > 9 && s[10] == 'x',
-              ms: (s.length > 10 && s[10] == 's') || (s.length > 11 && s[10] == 'x' && s[11] == 's'),
+              px: s.length > 10 && s.slice(10, 12) == 'px',
+              ms:
+                (s.length > 10 && s[10] == 's') ||
+                (s.length > 11 && s[10] == 'x' && s[11] == 's') ||
+                (s.length > 12 && s[11] == 'x' && s[12] == 's'),
               mp:
                 s.length > 10 && s[10] == 's'
                   ? s.slice(11, 13)
                   : s.length > 11 && s[10] == 'x' && s[11] == 's'
                   ? s.slice(12, 14)
+                  : s.length > 12 && s[11] == 'x' && s[12] == 's'
+                  ? s.slice(13, 15)
                   : undefined, // match points x2 for ints could convert to ascii?
               m:
                 (s.length > 10 && s[10] == 'm') ||
                 (s.length > 13 && s[10] == 's' && s[13] == 'm') ||
-                (s.length > 13 && s[10] == 'x' && s[11] == 'm'),
+                (s.length > 13 && s[10] == 'x' && s[11] == 'm') ||
+                (s.length > 14 && s[11] == 'x' && s[12] == 'm'),
             }
       )
     : [];

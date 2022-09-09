@@ -46,10 +46,13 @@ final class SwissForm(implicit mode: Mode) {
           "flipello" -> optional(boolean),
           "mancala"  -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
-        "rated"                -> optional(boolean),
-        "microMatch"           -> optional(boolean),
-        "useMatchScore"        -> optional(boolean),
-        "bestOfX"              -> optional(boolean),
+        "rated"         -> optional(boolean),
+        "microMatch"    -> optional(boolean),
+        "useMatchScore" -> optional(boolean),
+        "xGamesChoice" -> mapping(
+          "bestOfX" -> optional(boolean),
+          "playX"   -> optional(boolean)
+        )(XGamesChoice.apply)(XGamesChoice.unapply),
         "nbGamesPerRound"      -> number(min = 1, max = SwissBounds.maxGamesPerRound),
         "nbRounds"             -> number(min = minRounds, max = SwissBounds.maxRounds),
         "description"          -> optional(cleanNonEmptyText),
@@ -63,6 +66,14 @@ final class SwissForm(implicit mode: Mode) {
         "forbiddenPairings"    -> optional(cleanNonEmptyText)
       )(SwissData.apply)(SwissData.unapply)
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
+        .verifying(
+          "must have > 1 game per round if using 'Best of X' or 'Play X' options",
+          _.validXGamesSetup
+        )
+        .verifying(
+          "Cannot have matchScore with an odd number of games per round in best of X",
+          _.validMatchScoreSetup
+        )
     )
 
   def create =
@@ -91,7 +102,10 @@ final class SwissForm(implicit mode: Mode) {
       rated = true.some,
       microMatch = false.some,
       useMatchScore = false.some,
-      bestOfX = false.some,
+      xGamesChoice = XGamesChoice(
+        bestOfX = false.some,
+        playX = false.some
+      ),
       nbGamesPerRound = 1,
       nbRounds = 7,
       description = none,
@@ -129,7 +143,10 @@ final class SwissForm(implicit mode: Mode) {
       rated = s.settings.rated.some,
       microMatch = s.settings.isMicroMatch.some,
       useMatchScore = s.settings.useMatchScore.some,
-      bestOfX = s.settings.isBestOfX.some,
+      xGamesChoice = XGamesChoice(
+        bestOfX = s.settings.isBestOfX.some,
+        playX = s.settings.isPlayX.some
+      ),
       nbGamesPerRound = s.settings.nbGamesPerRound,
       nbRounds = s.settings.nbRounds,
       description = s.settings.description,
@@ -234,7 +251,7 @@ object SwissForm {
       rated: Option[Boolean],
       microMatch: Option[Boolean],
       useMatchScore: Option[Boolean],
-      bestOfX: Option[Boolean],
+      xGamesChoice: XGamesChoice,
       nbGamesPerRound: Int,
       nbRounds: Int,
       description: Option[String],
@@ -275,10 +292,13 @@ object SwissForm {
     def usePerPairingDrawTables = perPairingDrawTables | false
     def realPosition            = position ifTrue realVariant.standardVariant
 
-    def isRated         = rated | true
-    def isMicroMatch    = microMatch | false
-    def isUseMatchScore = useMatchScore | false
-    def isBestOfX       = bestOfX | false
+    def isRated              = rated | true
+    def isMicroMatch         = microMatch | false
+    def isUseMatchScore      = useMatchScore | false
+    def isBestOfX            = xGamesChoice.bestOfX | false
+    def isPlayX              = xGamesChoice.playX | false
+    def validXGamesSetup     = ((!isBestOfX && !isPlayX) || nbGamesPerRound > 1) && !(isBestOfX && isPlayX)
+    def validMatchScoreSetup = !isUseMatchScore || !(isBestOfX && nbGamesPerRound % 2 == 1)
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
@@ -318,6 +338,11 @@ object SwissForm {
       } else None
 
   }
+
+  case class XGamesChoice(
+      bestOfX: Option[Boolean],
+      playX: Option[Boolean]
+  )
 
   case class MedleyDefaults(
       onePerGameFamily: Option[Boolean],

@@ -188,51 +188,63 @@ db.user4.aggregate([
 ]);
 
 //Users active within 24 hours (also can do for last week)
- db.user4.count({"seenAt" : { $gt : new Date(ISODate().getTime() - 1000*60*60*24)}} )
+db.user4.count({ seenAt: { $gt: new Date(ISODate().getTime() - 1000 * 60 * 60 * 24) } });
 
 //Users activity that we are defining
 var irregular_user = 0;
 var active_user = 0;
 var super_users = 0;
-db.user4.find({"enabled":true, "count.game": {$gt: 0}}).limit(50).forEach(function (user) {
-  var games = db.game5;
-  var uid = user._id;
-  var details = {
-    name: uid,
-    //enabled: user.enabled,
-    //game_count_total: user.count.game,
-    //games_count_last_1_days: games.count({us: uid, ca: {$gt : new Date(ISODate().getTime() - 1000*60*60*24)}}),
-    games_count_last_7_days: games.count({us: uid, ca: {$gt : new Date(ISODate().getTime() - 1000*60*60*24*7)}}),
-    games_count_last_30_days: games.count({us: uid, ca: {$gt : new Date(ISODate().getTime() - 1000*60*60*24*30)}}),
-    //games_count_last_90_days: games.count({us: uid, ca: {$gt : new Date(ISODate().getTime() - 1000*60*60*24*90)}}),
-    //games_count_last_365_days: games.count({us: uid, ca: {$gt : new Date(ISODate().getTime() - 1000*60*60*24*365)}}),
-    chess_games: games.count({ us: uid, l: { $eq: 0 } }),
-    draughts_games: games.count({ us: uid, l: { $eq: 1 } }),
-    fairy_games: games.count({ us: uid, l: { $eq: 2 } }),
-    mancala_games: games.count({ us: uid, l: { $eq: 3 } }),
-    //ai: games.count({ us: uid, $or: [{ 'p0.ai': { $exists: true } }, { 'p1.ai': { $exists: true } }] }),
-    //playing_time_seconds: user.time.total,
-    //account_age_days: (Date.now() - user.createdAt) / 1000 / 3600 / 24,
-    last_seen_days: (Date.now() - user.seenAt) / 1000 / 3600 / 24,
-  };
-  //printjson(details);
-  if (details.games_count_last_30_days > 10 && details.last_seen_days < 7){
-    active_user++
-    if (details.chess_games > 0 && details.draughts_games > 0 && details.fairy_games > 0 && details.mancala_games > 0
-      && details.games_count_last_7_days > 10){
-      super_users++
+db.user4
+  .find({ enabled: true, 'count.game': { $gt: 0 } })
+  .limit(50)
+  .forEach(function (user) {
+    var games = db.game5;
+    var uid = user._id;
+    var details = {
+      name: uid,
+      //enabled: user.enabled,
+      //game_count_total: user.count.game,
+      //games_count_last_1_days: games.count({us: uid, ca: {$gt : new Date(ISODate().getTime() - 1000*60*60*24)}}),
+      games_count_last_7_days: games.count({
+        us: uid,
+        ca: { $gt: new Date(ISODate().getTime() - 1000 * 60 * 60 * 24 * 7) },
+      }),
+      games_count_last_30_days: games.count({
+        us: uid,
+        ca: { $gt: new Date(ISODate().getTime() - 1000 * 60 * 60 * 24 * 30) },
+      }),
+      //games_count_last_90_days: games.count({us: uid, ca: {$gt : new Date(ISODate().getTime() - 1000*60*60*24*90)}}),
+      //games_count_last_365_days: games.count({us: uid, ca: {$gt : new Date(ISODate().getTime() - 1000*60*60*24*365)}}),
+      chess_games: games.count({ us: uid, l: { $eq: 0 } }),
+      draughts_games: games.count({ us: uid, l: { $eq: 1 } }),
+      fairy_games: games.count({ us: uid, l: { $eq: 2 } }),
+      mancala_games: games.count({ us: uid, l: { $eq: 3 } }),
+      //ai: games.count({ us: uid, $or: [{ 'p0.ai': { $exists: true } }, { 'p1.ai': { $exists: true } }] }),
+      //playing_time_seconds: user.time.total,
+      //account_age_days: (Date.now() - user.createdAt) / 1000 / 3600 / 24,
+      last_seen_days: (Date.now() - user.seenAt) / 1000 / 3600 / 24,
+    };
+    //printjson(details);
+    if (details.games_count_last_30_days > 10 && details.last_seen_days < 7) {
+      active_user++;
+      if (
+        details.chess_games > 0 &&
+        details.draughts_games > 0 &&
+        details.fairy_games > 0 &&
+        details.mancala_games > 0 &&
+        details.games_count_last_7_days > 10
+      ) {
+        super_users++;
+      }
+    } else {
+      irregular_user++;
     }
-  }else{
-    irregular_user++
-  }
-});
-print(db.user4.count({"enabled": true}) + " total members"); 
-print(irregular_user + " irregular members");
-print(active_user + " active members");
-print(super_users + " super members");
-print("Active members stats collected!");
-
-
+  });
+print(db.user4.count({ enabled: true }) + ' total members');
+print(irregular_user + ' irregular members');
+print(active_user + ' active members');
+print(super_users + ' super members');
+print('Active members stats collected!');
 
 //users time joined vs time playing (scatter plot)
 db.user4.find().forEach(function (user) {

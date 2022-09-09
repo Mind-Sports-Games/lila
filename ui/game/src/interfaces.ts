@@ -148,6 +148,7 @@ export interface Swiss {
   running?: boolean;
   isMicroMatch?: boolean;
   isBestOfX?: boolean;
+  isPlayX?: boolean;
   ranks?: TournamentRanks;
 }
 
