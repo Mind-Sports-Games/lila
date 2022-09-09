@@ -42,10 +42,16 @@ object JsonHandlers {
       depth  <- d int "depth"
       pvObjs <- d objs "pvs"
       pvs    <- pvObjs.map(parsePv).sequence.flatMap(_.toNel)
-      variant = Variant.orDefault(GameLogic(d int "lib" match {
-        case Some(lib) => lib
-        case None      => sys.error("lib must be provided for readPutData")
-      }), ~d.str("variant"))
+      variant = Variant.orDefault(
+        //Same defaulting problem/temp fix as below for Game Family.
+        //Can resolve both properly at the same time.
+        GameLogic.Chess(),
+        //GameLogic(d int "lib" match {
+        //  case Some(lib) => lib
+        //  case None      => sys.error("lib must be provided for readPutData")
+        //}),
+        ~d.str("variant")
+      )
     } yield Input.Candidate(
       variant,
       fen,
@@ -61,11 +67,15 @@ object JsonHandlers {
   private def parsePv(d: JsObject): Option[Pv] =
     for {
       movesStr <- d str "moves"
-      //TODO: test?
-      gameFamily = GameFamily(d int "gf" match {
-        case Some(gf) => gf
-        case None      => sys.error("gf must be provided for parsePv")
-      })
+      //We can hard code this for now as this is only triggered by in browser analysis
+      //for which we only have enabled for Chess. When we extend in browser analysis
+      //to other Game Families then we will need to add GameFamily to the JsObject here
+      //Currently the GameFamily isn't being passed through, but GameLogic is.
+      gameFamily = GameFamily.Chess()
+      //gameFamily = GameFamily(d int "gf" match {
+      //  case Some(gf) => gf
+      //  case None      => sys.error("gf must be provided for parsePv")
+      //})
       moves <-
         movesStr
           .split(' ')
