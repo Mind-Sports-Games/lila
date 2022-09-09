@@ -113,7 +113,8 @@ case class Schedule(
 
   def similarSpeed(other: Schedule) = Schedule.Speed.similar(speed, other.speed)
 
-  def sameVariant(other: Schedule) = variant.id == other.variant.id
+  def sameVariant(other: Schedule) =
+    (variant.id == other.variant.id) && (variant.gameLogic.id == other.variant.gameLogic.id)
 
   def sameVariantAndSpeed(other: Schedule) = sameVariant(other) && sameSpeed(other)
 
