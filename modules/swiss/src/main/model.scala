@@ -31,7 +31,7 @@ case class SwissFinish(id: Swiss.Id, ranking: Ranking)
 
 object SwissBounds {
   val maxRounds           = 100
-  val maxGamesPerRound    = 11
+  val maxGamesPerRound    = 9
   val maxScore            = maxRounds * 2
   val maxBuchholz         = maxRounds * maxScore
   val maxSonnenbornBerger = maxRounds * maxScore * 2

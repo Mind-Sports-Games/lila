@@ -523,7 +523,8 @@ final class SwissApi(
                           _ ++ List(rematchId)
                         )
                         val pairingUpdated = pairing.copy(multiMatchGameIds = Some(gameIds))
-                        val game           = director.makeGame(swiss, playerMap, true)(pairingUpdated)
+                        val game =
+                          director.makeGame(swiss, playerMap, true)(pairingUpdated)
                         gameRepo.insertDenormalized(game) >> recomputeAndUpdateAll(
                           pairing.swissId
                         ) >>- onStart(game.id)
@@ -548,11 +549,18 @@ final class SwissApi(
     }
 
   private[swiss] def updateMultiMatchProgress(game: SwissPairingGames): Funit =
-    (game.finishedOrAborted, game.isBestOfX, game.multiMatchGames) match {
-      case (true, _, _) => finishGame(game)
-      case (false, true, None) =>
-        rematchForMultiGame(game) //TODO logic for if next game and also update matchStatus
-      case (false, true, Some(_)) => funit // This will be called by checkOngoingGames
+    (
+      game.finishedOrAborted,
+      game.isBestOfX,
+      game.multiMatchGames
+    ) match {
+      case (true, _, _)        => finishGame(game)
+      case (false, true, None) => rematchForMultiGame(game)
+      case (false, true, Some(g)) => {
+        if (g.length + 1 < game.nbGamesPerRound) // actual logic in SwissPairing (game.finishedOrAborted)
+          rematchForMultiGame(game)
+        else funit // This will be called by checkOngoingGames
+      }
       case (false, false, _) =>
         sys.error("Why is this being called when the game isn't finished and not a multimatch!?")
     }
@@ -839,7 +847,7 @@ final class SwissApi(
               lila.mon.swiss.games("missing").record(missingIds.size)
               if (flagged.nonEmpty)
                 Bus.publish(lila.hub.actorApi.map.TellMany(flagged.map(_.id), QuietFlag), "roundSocket")
-              ongoing.foreach(updateMicroMatchProgress)
+              //ongoing.foreach(updateMicroMatchProgress)
               ongoing.foreach(updateMultiMatchProgress)
               if (missingIds.nonEmpty)
                 colls.pairing.delete.one($inIds(missingIds))

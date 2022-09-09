@@ -19,7 +19,7 @@ final case class ApiConfig(
     position: Option[FEN] = None,
     acceptByToken: Option[String] = None,
     message: Option[Template],
-    microMatch: Boolean
+    multiMatch: Boolean
 ) {
 
   def perfType: Option[PerfType] = PerfPicker.perfType(Speed(clock), variant, days)
@@ -65,7 +65,7 @@ object ApiConfig extends BaseHumanConfig {
       position = pos.map(f => FEN.apply(variant.gameLogic, f)),
       acceptByToken = tok,
       message = msg map Template,
-      microMatch = ~mm
+      multiMatch = ~mm
     ).autoVariant
   }
 

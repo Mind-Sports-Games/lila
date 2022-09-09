@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 import lila.common.config._
 import lila.common.{ Bus, Uptime }
 import lila.game.{ Game, GameRepo, Pov }
-import lila.hub.actorApi.round.{ Abort, Resign, MicroRematch }
+import lila.hub.actorApi.round.{ Abort, MultiMatchRematch, Resign }
 import lila.hub.actorApi.simul.GetHostIds
 import lila.hub.actors
 import lila.user.User
@@ -101,10 +101,13 @@ final class Env(
       onStart(gameId)
     },
     "finishGame" -> {
-      case lila.game.actorApi.FinishGame(game, _, _) if !game.aborted && game.metadata.needsMicroRematch =>
-        scheduler.scheduleOnce(2 seconds) {
-          tellRound(game.id, MicroRematch)
-        }.unit
+      case lila.game.actorApi.FinishGame(game, _, _)
+          if !game.aborted && game.metadata.needsMultiMatchRematch =>
+        scheduler
+          .scheduleOnce(2 seconds) {
+            tellRound(game.id, MultiMatchRematch)
+          }
+          .unit
     },
     "selfReport" -> { case RoundSocket.Protocol.In.SelfReport(fullId, ip, userId, name) =>
       selfReport(userId, ip, fullId, name).unit

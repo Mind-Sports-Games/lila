@@ -12,8 +12,13 @@ import controllers.routes
 
 object bits {
 
-  def js(c: Challenge, json: play.api.libs.json.JsObject, owner: Boolean, playerIndex: Option[strategygames.Player] = None)(
-      implicit ctx: Context
+  def js(
+      c: Challenge,
+      json: play.api.libs.json.JsObject,
+      owner: Boolean,
+      playerIndex: Option[strategygames.Player] = None
+  )(implicit
+      ctx: Context
   ) =
     frag(
       jsModule("challengePage"),
@@ -46,10 +51,11 @@ object bits {
       ),
       div(cls := "mode")(modeName(c.mode))
     ),
-    c.isMicroMatch option div(cls := "micro-match")(
-      trans.microMatchChallenge(), " ",
-      trans.microMatchDefinition()
+    c.isMultiMatch option div(cls := "micro-match")(
+      trans.multiMatchChallenge(),
+      " ",
+      trans.multiMatchDefinition()
     )
-  )    
+  )
 
 }

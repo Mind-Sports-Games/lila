@@ -17,20 +17,34 @@ private[game] case class Metadata(
     simulPairing: Option[Int] = None,
     timeOutUntil: Option[DateTime] = None,
     drawLimit: Option[Int] = None,
-    microMatch: Option[String] = None,
+    multiMatch: Option[String] = None
 ) {
 
-  def needsMicroRematch = microMatch.contains("micromatch")
+  //TODO change for play x
+  def needsMultiMatchRematch =
+    multiMatch.contains("multiMatch") || multiMatch.contains(
+      "1:"
+    ) || multiMatch.contains(
+      "2:"
+    )
 
-  def microMatchGameNr = microMatch ?? { mm =>
-    if (mm == "micromatch" || mm.startsWith("2:")) 1.some
-    else if (mm.startsWith("1:")) 2.some
+  def multiMatchGameNr = multiMatch ?? { mm =>
+    if (mm == "multiMatch") 1.some
+    else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1)).map(x => x + 1)
     else none
-    }
+  }
 
-  def microMatchGameId = microMatch.map { mm =>
-    if (mm.startsWith("2:") || mm.startsWith("1:")) mm.drop(2)
+  def multiMatchGameId = multiMatch.map { mm =>
+    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2)
     else "*"
+  }
+
+  private def toInt(s: String): Option[Int] = {
+    try {
+      Some(s.toInt)
+    } catch {
+      case _: Exception => None
+    }
   }
 
   def pgnDate = pgnImport flatMap (_.date)

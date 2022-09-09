@@ -399,8 +399,8 @@ case class Game(
     }
 
   def abortable =
-    status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory && !metadata.microMatchGameNr
-      .contains(2)
+    status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory &&
+      metadata.multiMatchGameNr.fold(true)(x => x < 2)
 
   def berserkable = clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
 
@@ -774,7 +774,7 @@ object Game {
       pgnImport: Option[PgnImport],
       daysPerTurn: Option[Int] = None,
       drawLimit: Option[Int] = None,
-      microMatch: Option[String] = None
+      multiMatch: Option[String] = None
   ): NewGame = {
     val createdAt = DateTime.now
     NewGame(
@@ -786,8 +786,12 @@ object Game {
         status = Status.Created,
         daysPerTurn = daysPerTurn,
         mode = mode,
-        metadata =
-          metadata(source).copy(pgnImport = pgnImport, drawLimit = drawLimit, microMatch = microMatch),
+        metadata = metadata(source)
+          .copy(
+            pgnImport = pgnImport,
+            drawLimit = drawLimit,
+            multiMatch = multiMatch
+          ),
         createdAt = createdAt,
         movedAt = createdAt,
         pdnStorage =
@@ -856,7 +860,7 @@ object Game {
     //draughts
     val simulPairing = "sp"
     val timeOutUntil = "to"
-    val microMatch   = "mm"
+    val multiMatch   = "mm"
     val drawLimit    = "dl"
   }
 }

@@ -75,7 +75,6 @@ private object SwissSheet {
           case None if player.byes(round) =>
             if (swiss.settings.useMatchScore && swiss.settings.isMicroMatch) List(Bye, Bye)
             else if (swiss.settings.useMatchScore && swiss.settings.isBestOfX)
-              //(1 to swiss.settings.nbGamesPerRound).map(_ => Bye)
               List.fill(swiss.settings.nbGamesPerRound)(Bye)
             else List(Bye)
           case None => List(Absent)

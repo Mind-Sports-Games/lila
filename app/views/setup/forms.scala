@@ -107,7 +107,8 @@ object forms {
         renderVariant(form, translatedVariantChoicesWithVariantsAndFen),
         fenInput(form("fen"), strict = false, validFen),
         renderTimeMode(form, allowAnon = true),
-        renderMicroMatch(form),
+        //renderMicroMatch(form),
+        renderMultiMatch(form),
         ctx.isAuth option div(cls := "mode_choice buttons")(
           renderRadios(form("mode"), translatedModeChoices)
         ),

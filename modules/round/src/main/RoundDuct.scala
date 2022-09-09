@@ -19,6 +19,7 @@ import lila.hub.actorApi.round.{
   FishnetStart,
   IsOnGame,
   MicroRematch,
+  MultiMatchRematch,
   RematchNo,
   RematchYes,
   Resign
@@ -350,19 +351,35 @@ final private[round] class RoundDuct(
     case RematchNo(playerId)  => handle(PlayerId(playerId))(rematcher.no)
 
     //TODO: microMatch: This almost certainly doesnt work as wanted (port issues)
-    case MicroRematch => handle { game =>
-      rematcher.microMatch(game) map { events =>
-        events.foreach {
-          case Event.RematchTaken(gameId) =>
-            val microMatch = s"2:$gameId"
-            gameRepo.setMicroMatch(game.id, microMatch).void andThen {
-              case _ => updateGame(game => game.copy(metadata = (game.metadata.copy(microMatch = microMatch.some))))
-            }
-          case _ =>
+    // case MicroRematch => handle { game =>
+    //   rematcher.microMatch(game) map { events =>
+    //     events.foreach {
+    //       case Event.RematchTaken(gameId) =>
+    //         val microMatch = s"2:$gameId"
+    //         gameRepo.setMicroMatch(game.id, microMatch).void andThen {
+    //           case _ => updateGame(game => game.copy(metadata = (game.metadata.copy(microMatch = microMatch.some))))
+    //         }
+    //       case _ =>
+    //     }
+    //     events
+    //   }
+    // }
+
+    //TODO: multiMatch: This almost certainly doesnt work as wanted (port issues)
+    case MultiMatchRematch =>
+      handle { game =>
+        rematcher.multiMatch(game) map { events =>
+          events.foreach {
+            case Event.RematchTaken(gameId) =>
+              val multiMatch = s"2:$gameId"
+              gameRepo.setMultiMatch(game.id, multiMatch).void andThen { case _ =>
+                updateGame(game => game.copy(metadata = (game.metadata.copy(multiMatch = multiMatch.some))))
+              }
+            case _ =>
+          }
+          events
         }
-        events
       }
-    }
 
     case TakebackYes(playerId) =>
       handle(playerId) { pov =>
@@ -391,10 +408,15 @@ final private[round] class RoundDuct(
     case ForecastPlay(lastMove) =>
       handle { game =>
         val nextMove = lastMove match {
-          case Move.Draughts(lastMove) => lastMove.situationBefore.captureLengthFrom(lastMove.orig) match {
-            case Some(captLen) if captLen > 1 => forecastApi.moveOpponent(game, Move.Draughts(lastMove)) >> forecastApi.nextMove(game, Move.Draughts(lastMove))
-            case _ => forecastApi.nextMove(game, Move.Draughts(lastMove))
-          }
+          case Move.Draughts(lastMove) =>
+            lastMove.situationBefore.captureLengthFrom(lastMove.orig) match {
+              case Some(captLen) if captLen > 1 =>
+                forecastApi.moveOpponent(game, Move.Draughts(lastMove)) >> forecastApi.nextMove(
+                  game,
+                  Move.Draughts(lastMove)
+                )
+              case _ => forecastApi.nextMove(game, Move.Draughts(lastMove))
+            }
           case _ => forecastApi.nextMove(game, lastMove)
         }
         nextMove map { mOpt =>

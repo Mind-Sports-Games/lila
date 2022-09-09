@@ -44,7 +44,7 @@ export interface BaseGame {
   perpetualWarning?: boolean;
   boosted?: boolean;
   rematch?: string;
-  microMatch?: MicroMatch;
+  multiMatch?: MultiMatch;
   rated?: boolean;
   perf: string;
 }
@@ -57,7 +57,7 @@ export interface DraughtsGame extends BaseGame {
   variant: DraughtsVariant;
 }
 
-export interface MicroMatch {
+export interface MultiMatch {
   index: number;
   gameId?: string;
 }
@@ -147,6 +147,7 @@ export interface Swiss {
   id: string;
   running?: boolean;
   isMicroMatch?: boolean;
+  isBestOfX?: boolean;
   ranks?: TournamentRanks;
 }
 

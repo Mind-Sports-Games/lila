@@ -103,7 +103,30 @@ case class SwissPairingGames(
   def finishedOrAborted =
     game.finishedOrAborted && (!isMicroMatch || microMatchGame.fold(false)(
       _.finishedOrAborted
-    )) && (!isBestOfX || multiMatchGames.fold(false)(_.last.finishedOrAborted))
+    )) && (!isBestOfX || !requireMoreGamesInBestOfX)
+  def requireMoreGamesInBestOfX: Boolean = {
+    val nbGamesLeft = nbGamesPerRound - (multiMatchGames.fold(0)(x => x.length) + 1);
+    nbGamesLeft != 0 && ((
+      multiMatchGames
+        .foldLeft(List(game))(_ ++ _)
+        .map(g => g.winnerPlayerIndex)
+      )
+      .zipWithIndex
+      .map { case (outcome, index) =>
+        outcome.fold(0)(playerIndex =>
+          if (index % 2 == 0) {
+            if (playerIndex == PlayerIndex.P1) 1 else -1
+          } else {
+            if (playerIndex == PlayerIndex.P2) 1 else -1
+          }
+        )
+      }
+      .foldLeft(0)(_ + _) match {
+      case x if x > 0 => x <= nbGamesLeft
+      case x if x < 0 => -x <= nbGamesLeft
+      case _          => true
+    })
+  }
   def outoftime = if (game.outoftime(true)) List(game)
   else
     List() ++ microMatchGame.filter(_.outoftime(true)) ++ multiMatchGames.fold[List[Game]](List())(

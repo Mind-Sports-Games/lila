@@ -19,7 +19,7 @@ function poolUrl(clock: ClockData, variantKey: DraughtsVariantKey, blocking?: ga
 
 function analysisButton(ctrl: RoundController): VNode | null {
   const d = ctrl.data,
-    mm = d.game.microMatch,
+    mm = d.game.multiMatch,
     awaitingAutoRematch =
       !d.game.rematch && !d.player.spectator && mm && mm.index === 1 && !mm.gameId && !status.aborted(d),
     url = gameRoute(d, analysisBoardOrientation(d)) + '#' + ctrl.ply;
@@ -306,7 +306,7 @@ export function backToTournament(ctrl: RoundController): VNode | undefined {
 
 export function backToSwiss(ctrl: RoundController): VNode | undefined {
   const d = ctrl.data;
-  if (d.swiss?.isMicroMatch) {
+  if (d.swiss?.isBestOfX) {
     ctrl.setRedirecting();
     setTimeout(() => {
       location.href = '/swiss/' + d.swiss?.id;
@@ -345,7 +345,7 @@ export function moretime(ctrl: RoundController) {
 
 export function followUp(ctrl: RoundController): VNode {
   const d = ctrl.data,
-    mm = d.game.microMatch,
+    mm = d.game.multiMatch,
     awaitingAutoRematch = !d.game.rematch && mm && mm.index === 1 && !mm.gameId && !status.aborted(d),
     rematchable =
       !d.game.rematch &&
@@ -369,7 +369,7 @@ export function followUp(ctrl: RoundController): VNode {
       : rematchable || d.game.rematch
       ? rematchButtons(ctrl)
       : awaitingAutoRematch
-      ? [h('button.fbt.rematch.disabled.micromatch', ctrl.noarg('microMatchRematchAwaiting'))]
+      ? [h('button.fbt.rematch.disabled.multimatch', ctrl.noarg('multiMatchRematchAwaiting'))]
       : [];
   return h('div.follow-up', [
     ...rematchZone,
@@ -411,7 +411,7 @@ export function followUp(ctrl: RoundController): VNode {
 
 export function watcherFollowUp(ctrl: RoundController): VNode | null {
   const d = ctrl.data,
-    mm = d.game.microMatch,
+    mm = d.game.multiMatch,
     awaitingAutoRematch = !d.game.rematch && mm && mm.index === 1 && !mm.gameId && !status.aborted(d),
     content = [
       d.game.rematch
@@ -426,7 +426,7 @@ export function watcherFollowUp(ctrl: RoundController): VNode | null {
             ctrl.noarg('viewRematch')
           )
         : awaitingAutoRematch
-        ? h('button.fbt.rematch.disabled.micromatch', ctrl.noarg('microMatchRematchAwaiting'))
+        ? h('button.fbt.rematch.disabled.multimatch', ctrl.noarg('multiMatchRematchAwaiting'))
         : null,
       d.tournament
         ? h(

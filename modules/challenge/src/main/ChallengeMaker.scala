@@ -49,7 +49,7 @@ final class ChallengeMaker(
         challenger = Challenge.toRegistered(pov.game.variant, timeControl)(challenger),
         destUser = dest.some,
         rematchOf = pov.gameId.some,
-        microMatch = pov.game.metadata.microMatchGameNr.contains(2)
+        multiMatch = pov.game.metadata.multiMatchGameNr.fold(false)(x => x >= 2)
       )
     }
 }

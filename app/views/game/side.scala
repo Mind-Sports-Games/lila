@@ -156,11 +156,11 @@ object side {
             a(href := routes.Simul.show(sim.id))(sim.fullName)
           )
         },
-        game.metadata.microMatch map { m =>
+        game.metadata.multiMatch map { m =>
           st.section(cls := "game__micro-match")(
             if (m.startsWith("1:") && m.length == 10)
               frag(
-                trans.microMatch(),
+                trans.multiMatch(),
                 ": ",
                 a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
                   trans.gameNumberX(1)
@@ -170,7 +170,7 @@ object side {
               )
             else if (m.startsWith("2:") && m.length == 10)
               frag(
-                trans.microMatch(),
+                trans.multiMatch(),
                 ": ",
                 span(cls := "current")(trans.gameNumberX(1)),
                 " ",
@@ -178,7 +178,7 @@ object side {
                   trans.gameNumberX(2)
                 )
               )
-            else trans.microMatchGameX(1)
+            else trans.multiMatchGameX(1)
           )
         }
       )

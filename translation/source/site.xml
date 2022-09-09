@@ -31,6 +31,12 @@
   <string name="microMatchRematchAwaiting">Awaiting second game of micro-match</string>
   <string name="microMatchGameX">Micro-match game %s</string>
   <string name="microMatchDefinition">Play 2 games in succession with opponents (one as first player, one as second player)</string>
+  <string name="multiMatch">Multi-match</string>
+  <string name="multiMatchChallenge">This challenge is a multi-match!</string>
+  <string name="multiMatchRematchStarted">Started next game of multi-match</string>
+  <string name="multiMatchRematchAwaiting">Awaiting next game of multi-match</string>
+  <string name="multiMatchGameX">Multi-match game %s</string>
+  <string name="multiMatchDefinition">Play multiple games in succession with opponents (swapping first player each game)</string>
   <string name="useMatchScore">Use Match Score</string>
   <string name="useMatchScoreDefinition">Use score of entire match against opponent as tournament points (instead of overall result 2/1/0 win/draw/loss for micro-match)</string>
   <string name="createAGame">Create a game</string>

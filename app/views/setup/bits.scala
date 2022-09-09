@@ -54,10 +54,13 @@ private object bits {
       renderLabel(form("Variant"), trans.variant()),
       renderSelectWithOptGroups(
         form("variant"),
-        variants.map{ case (gf, v) =>
-          (gf, v.filter { case (id, _, _) =>
-            ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
-          })
+        variants.map { case (gf, v) =>
+          (
+            gf,
+            v.filter { case (id, _, _) =>
+              ctx.noBlind || lila.game.Game.blindModeVariants.exists(_.id.toString == id)
+            }
+          )
         }
       )
     )
@@ -77,7 +80,7 @@ private object bits {
       compare: (String, String) => Boolean = (a, b) => a == b
   ) =
     select(id := s"$prefix${field.id}", name := field.name)(
-      options.map { case((ogValue, ogName, _), opts) =>
+      options.map { case ((ogValue, ogName, _), opts) =>
         optgroup(name := ogName)(
           renderOptions(field, opts, compare, ogValue + '_')
         )
@@ -137,9 +140,14 @@ private object bits {
     renderLabel(field, labelContent)
   )
 
-  def renderMicroMatch(form: Form[_])(implicit ctx: Context) =
-    div(cls := "micro_match", title := trans.microMatchDefinition.txt())(
-      renderCheckbox(form("microMatch"), trans.microMatch())
+  // def renderMicroMatch(form: Form[_])(implicit ctx: Context) =
+  //   div(cls := "micro_match", title := trans.microMatchDefinition.txt())(
+  //     renderCheckbox(form("microMatch"), trans.microMatch())
+  //   )
+
+  def renderMultiMatch(form: Form[_])(implicit ctx: Context) =
+    div(cls := "multi_match", title := trans.multiMatchDefinition.txt())(
+      renderCheckbox(form("multiMatch"), trans.multiMatch())
     )
 
   def renderTimeMode(form: Form[_], allowAnon: Boolean)(implicit ctx: Context) =
@@ -169,7 +177,9 @@ private object bits {
           div(cls := "time_choice range")(
             trans.minutesPerSide(),
             ": ",
-            span(strategygames.Clock.Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0).limitString),
+            span(
+              strategygames.Clock.Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0).limitString
+            ),
             renderDissociatedRange(form("time"))
           ),
           div(cls := "increment_choice range")(
