@@ -137,7 +137,7 @@ final private class TournamentScheduler(
       }
 
     //schedule this week
-    TournamentShield.MedleyShield.all
+    val thisWeekMedleyShields = TournamentShield.MedleyShield.all
       .map(ms =>
         scheduleMedleyShield(Blitz53, ms)(
           nextDayOfWeek(ms.dayOfWeek)
@@ -146,7 +146,7 @@ final private class TournamentScheduler(
       .flatten filter { _.schedule.at isAfter rightNow }
 
     //and schedule two weeks in advance
-    TournamentShield.MedleyShield.all
+    val nextWeekMedleyShields = TournamentShield.MedleyShield.all
       .map(ms =>
         scheduleMedleyShield(Blitz53, ms)(
           nextDayOfFortnight(ms.dayOfWeek + 7)
@@ -155,7 +155,7 @@ final private class TournamentScheduler(
       .flatten filter { _.schedule.at isAfter rightNow }
 
     //schedule this months shields
-    TournamentShield.Category.all
+    val thisMonthShields = TournamentShield.Category.all
       .map(shield =>
         at(thisMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
           Schedule(Shield, shield.speed, shield.variant, none, date) plan {
@@ -174,7 +174,7 @@ final private class TournamentScheduler(
       .flatten filter { _.schedule.at isAfter rightNow }
 
     //and schedule next month
-    TournamentShield.Category.all
+    val nextMonthShields = TournamentShield.Category.all
       .map(shield =>
         at(nextMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
           Schedule(Shield, shield.speed, shield.variant, none, date) plan {
@@ -191,6 +191,8 @@ final private class TournamentScheduler(
         }
       )
       .flatten filter { _.schedule.at isAfter rightNow }
+
+    thisWeekMedleyShields ::: nextWeekMedleyShields ::: thisMonthShields ::: nextMonthShields
 
 //          List( // shield tournaments!
 //            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,
