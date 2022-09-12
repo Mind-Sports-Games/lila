@@ -365,14 +365,15 @@ final private[round] class RoundDuct(
     //   }
     // }
 
-    //TODO: multiMatch: This almost certainly doesnt work as wanted (port issues)
+    //TODO: multiMatch: set correct gamenb
     case MultiMatchRematch =>
       handle { game =>
-        rematcher.multiMatch(game) map { events =>
-          events.foreach {
+        rematcher.multiMatch(game.pp("game")) map { events =>
+          events.pp("events").foreach {
             case Event.RematchTaken(gameId) =>
-              val multiMatch = s"2:$gameId"
-              gameRepo.setMultiMatch(game.id, multiMatch).void andThen { case _ =>
+              val newGameNb  = game.metadata.multiMatchGameNr.pp("newGameNb").getOrElse(1)
+              val multiMatch = s"$newGameNb:$gameId"
+              gameRepo.setMultiMatch(game.id, multiMatch.pp("new multiMatch id")).void andThen { case _ =>
                 updateGame(game => game.copy(metadata = (game.metadata.copy(multiMatch = multiMatch.some))))
               }
             case _ =>

@@ -157,27 +157,40 @@ object side {
           )
         },
         game.metadata.multiMatch map { m =>
-          st.section(cls := "game__micro-match")(
-            if (m.startsWith("1:") && m.length == 10)
+          st.section(cls := "game__multi-match")(
+            if (m.matches("[1-9]:.*")) {
+              val gamenb = m.take(1).toInt;
               frag(
                 trans.multiMatch(),
                 ": ",
                 a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
-                  trans.gameNumberX(1)
+                  trans.gameNumberX(gamenb)
                 ),
                 " ",
-                span(cls := "current")(trans.gameNumberX(2))
+                (1 to (gamenb - 1)).map(i => span(cls := "current")(trans.gameNumberX(i)))
               )
-            else if (m.startsWith("2:") && m.length == 10)
-              frag(
-                trans.multiMatch(),
-                ": ",
-                span(cls := "current")(trans.gameNumberX(1)),
-                " ",
-                a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
-                  trans.gameNumberX(2)
-                )
-              )
+            }
+            //TODO fix for multi games ....
+            // if (m.startsWith("1:") && m.length == 10)
+            //   frag(
+            //     trans.multiMatch(),
+            //     ": ",
+            //     a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
+            //       trans.gameNumberX(1)
+            //     ),
+            //     " ",
+            //     span(cls := "current")(trans.gameNumberX(2))
+            //   )
+            // else if (m.startsWith("2:") && m.length == 10)
+            //   frag(
+            //     trans.multiMatch(),
+            //     ": ",
+            //     span(cls := "current")(trans.gameNumberX(1)),
+            //     " ",
+            //     a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
+            //       trans.gameNumberX(2)
+            //     )
+            //   )
             else trans.multiMatchGameX(1)
           )
         }

@@ -72,7 +72,18 @@
     margin-top: 0.2em;
   }
 }
-
+.game__multi-match {
+  span,
+  a {
+    margin: 0 0.4em;
+    &:first-child {
+      margin-left: 0.6em;
+    }
+  }
+  .current {
+    font-weight: bold;
+  }
+}
 @media (hover: hover) {
   .game__meta .bookmark {
     display: none;

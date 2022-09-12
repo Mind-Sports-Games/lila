@@ -4,22 +4,22 @@ import { PairingExt, Outcome } from '../interfaces';
 import { isOutcome } from '../util';
 import SwissCtrl from '../ctrl';
 
-interface MicroMatchOutcome {
+interface MultiMatchOutcome {
   t: 'o';
   outcome: Outcome;
   round: number;
 }
 
-interface MicroMatchPairing extends PairingExt {
+interface MultiMatchPairing extends PairingExt {
   t: 'p';
   round: number;
   isFinalGame: boolean;
 }
 
-const isMicroMatchOutcome = (p: MicroMatchPairing | MicroMatchOutcome): p is MicroMatchOutcome => p.t === 'o';
+const isMultiMatchOutcome = (p: MultiMatchPairing | MultiMatchOutcome): p is MultiMatchOutcome => p.t === 'o';
 
-const microMatchGames = (sheet: (PairingExt | Outcome)[]): (MicroMatchPairing | MicroMatchOutcome)[] => {
-  const newSheet: (MicroMatchPairing | MicroMatchOutcome)[] = [];
+const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | MultiMatchOutcome)[] => {
+  const newSheet: (MultiMatchPairing | MultiMatchOutcome)[] = [];
   let round = 1;
   sheet.forEach(v => {
     if (isOutcome(v)) {
@@ -27,6 +27,11 @@ const microMatchGames = (sheet: (PairingExt | Outcome)[]): (MicroMatchPairing | 
     } else if (v.m && v.mmid) {
       newSheet.push({ t: 'p', round: round, isFinalGame: false, ...v });
       newSheet.push({ t: 'p', round: round, isFinalGame: true, ...v, g: v.mmid });
+    } else if ((v.x || v.px) && v.mmids){
+      newSheet.push({ t: 'p', round: round, isFinalGame: false, ...v });
+      v.mmids.forEach( gid => 
+        newSheet.push({ t: 'p', round: round, isFinalGame: gid == v.mmids![v.mmids!.length - 1], ...v, g: gid })
+      )
     } else {
       newSheet.push({ t: 'p', round: round, isFinalGame: true, ...v });
     }
@@ -89,9 +94,9 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
               if (href) window.open(href, '_blank', 'noopener');
             }),
           },
-          microMatchGames(data.sheet).map(p => {
+          multiMatchGames(data.sheet).map(p => {
             const round = ctrl.data.round - p.round + 1;
-            if (isMicroMatchOutcome(p))
+            if (isMultiMatchOutcome(p))
               return h(
                 'tr.' + p.outcome,
                 {
@@ -129,7 +134,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
   );
 }
 
-function result(p: MicroMatchPairing): string {
+function result(p: MultiMatchPairing): string {
   if (p.ms) {
     return matchScoreDisplay(p);
   }

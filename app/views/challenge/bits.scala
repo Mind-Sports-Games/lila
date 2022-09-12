@@ -51,7 +51,7 @@ object bits {
       ),
       div(cls := "mode")(modeName(c.mode))
     ),
-    c.isMultiMatch option div(cls := "micro-match")(
+    c.isMultiMatch option div(cls := "multi-match")(
       trans.multiMatchChallenge(),
       " ",
       trans.multiMatchDefinition()

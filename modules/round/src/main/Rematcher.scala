@@ -96,7 +96,7 @@ final private class Rematcher(
           _ = if (game.variant == Variant.Chess(Chess960) && !chess960.get(game.id)) chess960.put(nextGame.id)
           _ <- gameRepo insertDenormalized nextGame
         } yield {
-          if (nextGame.metadata.multiMatchGameNr.fold(false)(x => x >= 2))
+          if (nextGame.metadata.pp("next game metadata").multiMatchGameNr.fold(false)(x => x >= 2))
             messenger.system(game, trans.multiMatchRematchStarted.txt())
           else messenger.system(game, trans.rematchOfferAccepted.txt())
           onStart(nextGame.id)
@@ -121,7 +121,7 @@ final private class Rematcher(
 
   private def nextMultiMatch(g: Game): Option[String] =
     if (!g.aborted) {
-      g.metadata.multiMatch.fold("multiMatch".some) { s =>
+      g.metadata.multiMatch.pp("multimatch").fold("multiMatch".some) { s =>
         if (s.contains("multiMatch")) {
           s"1:${g.id}".some
         } else if (s.substring(1, 2) == ":") {
@@ -176,7 +176,7 @@ final private class Rematcher(
         source = game.source | Source.Lobby,
         daysPerTurn = game.daysPerTurn,
         pgnImport = None,
-        multiMatch = nextMultiMatch(game)
+        multiMatch = (nextMultiMatch(game)).pp("next multimatch")
       ) withUniqueId idGenerator
     } yield game
   }

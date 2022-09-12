@@ -74,6 +74,10 @@ final class SwissForm(implicit mode: Mode) {
           "Cannot have matchScore with an odd number of games per round in best of X",
           _.validMatchScoreSetup
         )
+        .verifying(
+          "Number of games per round must be 1 unless using best of X or Play x modes",
+          _.validNumberofGames
+        )
     )
 
   def create =
@@ -299,6 +303,7 @@ object SwissForm {
     def isPlayX              = xGamesChoice.playX | false
     def validXGamesSetup     = ((!isBestOfX && !isPlayX) || nbGamesPerRound > 1) && !(isBestOfX && isPlayX)
     def validMatchScoreSetup = !isUseMatchScore || !(isBestOfX && nbGamesPerRound % 2 == 1)
+    def validNumberofGames   = (nbGamesPerRound > 1 && (isBestOfX || isPlayX)) || nbGamesPerRound == 1
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)

@@ -226,6 +226,7 @@ object BSONHandlers {
           tournamentId = r strO F.tournamentId,
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
+          multiMatch = r strO F.multiMatch,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
@@ -425,6 +426,7 @@ object BSONHandlers {
           tournamentId = r strO F.tournamentId,
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
+          multiMatch = r strO F.multiMatch,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
@@ -506,6 +508,7 @@ object BSONHandlers {
           tournamentId = r strO F.tournamentId,
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
+          multiMatch = r strO F.multiMatch,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )

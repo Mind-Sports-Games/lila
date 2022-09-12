@@ -28,14 +28,14 @@ private[game] case class Metadata(
       "2:"
     )
 
-  def multiMatchGameNr = multiMatch ?? { mm =>
-    if (mm == "multiMatch") 1.some
-    else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1)).map(x => x + 1)
+  def multiMatchGameNr = multiMatch.pp("multiMatch get nb") ?? { mm =>
+    if (mm.pp("mm") == "multiMatch") 1.some
+    else if (mm.length() == 10 && mm.substring(1, 2) == ":")(toInt(mm.take(1)).map(x => x + 1)).pp("game nb")
     else none
   }
 
   def multiMatchGameId = multiMatch.map { mm =>
-    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2)
+    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2).pp("gameId")
     else "*"
   }
 

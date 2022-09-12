@@ -8,6 +8,8 @@ playstrategy.load.then(() => {
     $onePerGameFamily = $('#form3-medleyDefaults_onePerGameFamily'),
     $exoticChessVariants = $('#form3-medleyDefaults_exoticChessVariants'),
     $draughts64Variants = $('#form3-medleyDefaults_draughts64Variants'),
+    $bestOfX = $('#form3-xGamesChoice_bestOfX'),
+    $playX = $('#form3-xGamesChoice_playX'),
     showPosition = () =>
       $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string) && !$medley.is(':checked')),
     showDrawTables = () =>
@@ -57,6 +59,9 @@ playstrategy.load.then(() => {
   $exoticChessVariants.on('change', toggleChessVariants);
   $draughts64Variants.on('change', toggleDraughts64Variants);
   showMedleySettings();
+
+  $bestOfX.on('change', () => toggleOff($playX));
+  $playX.on('change', () => toggleOff($bestOfX));
 
   $('form .conditions a.show').on('click', function (this: HTMLAnchorElement) {
     $(this).remove();

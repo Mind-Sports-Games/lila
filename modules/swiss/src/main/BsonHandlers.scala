@@ -188,7 +188,7 @@ object BsonHandlers {
         useMatchScore = r.boolO("ms") | false,
         isBestOfX = r.boolO("x") | false,
         isPlayX = r.boolO("px") | false,
-        nbGamesPerRound = r.get[Int]("gpr") | 1,
+        nbGamesPerRound = r.get[Int]("gpr"),
         description = r.strO("d"),
         useDrawTables = r.boolO("dt") | false,
         usePerPairingDrawTables = r.boolO("pdt") | false,
