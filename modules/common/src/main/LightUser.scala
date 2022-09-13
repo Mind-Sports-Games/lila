@@ -49,4 +49,14 @@ object LightUser {
   final class IsBotSync(f: UserID => Boolean) extends (UserID => Boolean) {
     def apply(userId: UserID) = f(userId)
   }
+
+  val tourBotUsers: List[LightUser] = List(
+    LightUser(
+      id = "ps-random-mover",
+      name = "PS-Random-Mover",
+      title = "BOT".some,
+      isPatron = false
+    )
+  )
+
 }

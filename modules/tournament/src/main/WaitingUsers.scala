@@ -50,7 +50,7 @@ private[tournament] case class WaitingUsers(
   def evenNumber: Set[User.ID] = {
     if (isOddNoBots)
       if (isOdd)
-        // skips the most recent user if odd
+        // skips the most recent user if truly odd
         if (size == sizeNoBots) (all - hash.maxBy(_._2.getMillis)._1).map(_.id)
         // we have bots so exclude the most recent bot
         else (all - botHash.maxBy(_._2.getMillis)._1).map(_.id)
