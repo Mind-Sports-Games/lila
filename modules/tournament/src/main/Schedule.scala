@@ -113,7 +113,8 @@ case class Schedule(
 
   def similarSpeed(other: Schedule) = Schedule.Speed.similar(speed, other.speed)
 
-  def sameVariant(other: Schedule) = variant.id == other.variant.id
+  def sameVariant(other: Schedule) =
+    (variant.id == other.variant.id) && (variant.gameLogic.id == other.variant.gameLogic.id)
 
   def sameVariantAndSpeed(other: Schedule) = sameVariant(other) && sameSpeed(other)
 
@@ -294,7 +295,7 @@ object Schedule {
     case object Winter extends Season
   }
 
-  private val defaultDuration: Int = 57
+  private val defaultDuration: Int = 55
 
   private[tournament] def durationFor(s: Schedule): Int = s.duration match {
     case Some(duration) => duration

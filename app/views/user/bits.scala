@@ -21,7 +21,7 @@ object bits {
         trans.tournamentWinners()
       ),
       a(cls := active.active("shield"), href := routes.Tournament.shields)("Shields"),
-      //a(cls := active.active("bots"), href := routes.PlayApi.botOnline)("Online bots")
+      a(cls := active.active("bots"), href := routes.PlayApi.botOnline)("Online bots")
     )
 
   def miniClosed(u: User)(implicit ctx: Context) =

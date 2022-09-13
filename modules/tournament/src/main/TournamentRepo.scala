@@ -292,10 +292,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
         val base = schedule.freq match {
           case Unique                     => tour.spotlight.flatMap(_.homepageHours).fold(24 * 60)(60 *)
           case Unique | Yearly | Marathon => 24 * 60
-          case Monthly | Shield           => 6 * 60
+          case Monthly                    => 6 * 60
           case Weekly | Weekend           => 3 * 60
           case Daily                      => 1 * 60
-          case Introductory | MSO21 | MSOGP | MSOWarmUp =>
+          case Introductory | MSO21 | MSOGP | MSOWarmUp | MedleyShield | Shield =>
             tour.spotlight.flatMap(_.homepageHours).fold(crud.CrudForm.maxHomepageHours * 60)(60 *)
           case _ => 30
         }
@@ -440,14 +440,14 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 
   def winnersByTrophy(trophy: String): Fu[List[Tournament]] =
     coll
-      .find($doc("trophy1st" -> trophy, "finishedAt" $exists true))
+      .find($doc("trophy1st" -> trophy, "winner" $exists true))
       .sort($sort desc "startsAt")
       .cursor[Tournament]()
       .list()
 
   def nextByTrophy(trophy: String): Fu[Option[Tournament]] =
     coll
-      .find($doc("trophy1st" -> trophy, "finishedAt" $exists false))
+      .find($doc("trophy1st" -> trophy, "winner" $exists false))
       .sort($sort asc "startsAt")
       .cursor[Tournament]()
       .headOption
