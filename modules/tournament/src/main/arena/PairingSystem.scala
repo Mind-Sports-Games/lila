@@ -1,6 +1,7 @@
 package lila.tournament
 package arena
 
+import lila.common.LightUser
 import lila.user.{ User, UserRepo }
 
 final private[tournament] class PairingSystem(
@@ -24,10 +25,10 @@ final private[tournament] class PairingSystem(
       ranking: Ranking
   ): Fu[Pairings] = {
     for {
-      lastOpponents        <- pairingRepo.lastOpponents(tour.id, users.allIds, Math.min(300, users.size * 4))
-      onlyTwoActivePlayers <- (tour.nbPlayers <= 12) ?? playerRepo.countActive(tour.id).dmap(2 ==)
-      data = Data(tour, lastOpponents, ranking, onlyTwoActivePlayers)
-      preps    <- (lastOpponents.hash.isEmpty || users.haveWaitedEnough) ?? evenOrAll(data, users)
+      lastOpponents <- pairingRepo.lastOpponents(tour.id, users.allIds, Math.min(300, users.size * 4))
+      activePlayers <- (tour.nbPlayers <= 12) ?? playerRepo.countActive(tour.id).thenPp("activep")
+      data = Data(tour, lastOpponents, ranking, activePlayers == 2)
+      preps    <- (lastOpponents.hash.isEmpty || users.haveWaitedEnough) ?? evenOrAll(data, users, activePlayers)
       pairings <- prepsToPairings(preps)
     } yield pairings
   }.chronometer
@@ -36,12 +37,19 @@ final private[tournament] class PairingSystem(
     }
     .result
 
-  private def evenOrAll(data: Data, users: WaitingUsers) =
-    makePreps(data, users.evenNumber) flatMap {
+  private def evenOrAll(data: Data, users: WaitingUsers, activePlayers: Int) = {
+    val usersWithBots =
+      if (activePlayers <= maxNumberToIncludeBots)
+        users.update(LightUser.tourBotUsers.take(maxNumberToIncludeBots + 1 - activePlayers).toSet)
+      else users
+    makePreps(data, usersWithBots.evenNumber) flatMap {
       //case Nil if users.isOddNoBots => makePreps(data, users.allIdsNoBots)
-      case Nil if users.isOdd => makePreps(data, users.allIds)
-      case x                  => fuccess(x)
+      case Nil if usersWithBots.isOdd => makePreps(data, usersWithBots.allIds)
+      case x                          => fuccess(x)
     }
+  }
+
+  private val maxNumberToIncludeBots = 3
 
   private val maxGroupSize = 100
 
