@@ -26,7 +26,7 @@ final private[tournament] class PairingSystem(
   ): Fu[Pairings] = {
     for {
       lastOpponents <- pairingRepo.lastOpponents(tour.id, users.allIds, Math.min(300, users.size * 4))
-      activePlayers <- (tour.nbPlayers <= 12) ?? playerRepo.countActive(tour.id).thenPp("activep")
+      activePlayers <- playerRepo.countActive(tour.id).thenPp("activep")
       data = Data(tour, lastOpponents, ranking, activePlayers == 2)
       preps    <- (lastOpponents.hash.isEmpty || users.haveWaitedEnough) ?? evenOrAll(data, users, activePlayers)
       pairings <- prepsToPairings(preps)
@@ -39,17 +39,15 @@ final private[tournament] class PairingSystem(
 
   private def evenOrAll(data: Data, users: WaitingUsers, activePlayers: Int) = {
     val usersWithBots =
-      if (activePlayers <= maxNumberToIncludeBots)
-        users.update(LightUser.tourBotUsers.take(maxNumberToIncludeBots + 1 - activePlayers).toSet)
+      if (activePlayers <= WaitingUsers.minPlayersForNoBots)
+        users.pp("origusers").addBotUsers(activePlayers)
       else users
-    makePreps(data, usersWithBots.evenNumber) flatMap {
+    makePreps(data, usersWithBots.pp("usersWithBots").evenNumber.pp("evenNo")) flatMap {
       //case Nil if users.isOddNoBots => makePreps(data, users.allIdsNoBots)
       case Nil if usersWithBots.isOdd => makePreps(data, usersWithBots.allIds)
       case x                          => fuccess(x)
     }
   }
-
-  private val maxNumberToIncludeBots = 3
 
   private val maxGroupSize = 100
 
@@ -57,7 +55,7 @@ final private[tournament] class PairingSystem(
     import data._
     if (users.sizeIs < 2) fuccess(Nil)
     else
-      playerRepo.rankedByTourAndUserIds(tour.id, users, ranking) map { idles =>
+      playerRepo.rankedByTourAndUserIds(tour.id, users, ranking).thenPp("ranked") map { idles =>
         val nbIdles = idles.size
         if (data.tour.isRecentlyStarted && !data.tour.isTeamBattle) proximityPairings(tour, idles)
         else if (nbIdles > maxGroupSize) {

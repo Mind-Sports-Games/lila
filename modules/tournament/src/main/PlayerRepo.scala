@@ -21,6 +21,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
     )
   private val selectActive   = $doc("w" $ne true)
   private val selectWithdraw = $doc("w" -> true)
+  private val selectNonBot   = $doc("b" $ne true)
   private val bestSort       = $doc("m" -> -1)
 
   def byId(id: Tournament.ID): Fu[Option[Player]] = coll.one[Player](selectId(id))
@@ -176,7 +177,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
     }
 
   def countActive(tourId: Tournament.ID): Fu[Int] =
-    coll.countSel(selectTour(tourId) ++ selectActive)
+    coll.countSel(selectTour(tourId) ++ selectActive ++ selectNonBot)
 
   def count(tourId: Tournament.ID): Fu[Int] = coll.countSel(selectTour(tourId))
 
