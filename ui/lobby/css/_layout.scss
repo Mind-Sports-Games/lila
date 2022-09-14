@@ -20,7 +20,7 @@ $mq-not-col3: $mq-not-small;
 .lobby {
   grid-area: main;
   display: grid;
-  grid-template-areas: 'app' 'table' 'side' 'blog' 'tv' 'puzzle' 'chat' 'leader' 'winner' 'tours' 'simuls' 'forum' 'support' 'about' '.';
+  grid-template-areas: 'app' 'table' 'side' 'chat' 'blog' 'tv' 'puzzle' 'tours' 'leader' 'winner' 'simuls' 'forum' 'support' 'about' '.';
   grid-gap: $block-gap;
 
   &__counters {
@@ -36,7 +36,7 @@ $mq-not-col3: $mq-not-small;
   @include breakpoint($mq-col3) {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto repeat(2, fit-content(0));
-    grid-template-areas: 'side    blog    blog' 'chat   app     app' 'table    app     app' 'tv      tours  tours' 'puzzle  winner   winner' 'support   simuls  simuls' 'about forum forum ';
+    grid-template-areas: 'side    blog    blog' 'table   app     app' 'chat    app     app' 'tv      tours  tours' 'support  winner   winner' 'puzzle   simuls  simuls' 'about forum forum ';
 
     &__start {
       flex-flow: column;
@@ -56,9 +56,8 @@ $mq-not-col3: $mq-not-small;
   @include breakpoint($mq-col4) {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, fit-content(0));
-    grid-template-areas: 'side    blog    blog    table' 'side   app     app    chat' 'tv     tours  tours puzzle' '.     winner   winner  .' '.      simuls  simuls .' 'about    forum    forum    support';
+    grid-template-areas: 'side    blog    blog    table' 'side   app     app    chat' 'tv     tours  tours winner' '.      .       .      puzzle' '.      simuls  simuls .' 'about    forum    forum    support';
 
-    &__tournaments,
     &__simuls {
       max-height: 20em;
     }

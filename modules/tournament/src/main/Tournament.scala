@@ -152,6 +152,8 @@ case class Tournament(
 
   def perfType: PerfType = PerfType(variant, speed)
 
+  def iconChar = if (isMedley) '5' else perfType.iconChar
+
   def durationString =
     if (minutes < 60) s"${minutes}m"
     else s"${minutes / 60}h" + (if (minutes % 60 != 0) s" ${minutes % 60}m" else "")
@@ -256,7 +258,7 @@ object Tournament {
     Tournament(
       id = makeId,
       name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
-        TournamentShield.MedleyShield.makeName(ms.medleyName)
+        TournamentShield.MedleyShield.makeName(ms.medleyName, sched.at)
       ),
       status = Status.Created,
       clock = Schedule clockFor sched,

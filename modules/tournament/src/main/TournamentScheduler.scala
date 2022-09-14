@@ -49,14 +49,24 @@ final private class TournamentScheduler(
     val thisMonth = new OfMonth(0)
     val nextMonth = new OfMonth(1)
 
-    def nextDayOfWeek(number: Int) = today.plusDays((number + 7 - today.getDayOfWeek) % 7)
-    val nextMonday                 = nextDayOfWeek(1)
-    val nextTuesday                = nextDayOfWeek(2)
-    val nextWednesday              = nextDayOfWeek(3)
-    val nextThursday               = nextDayOfWeek(4)
-    val nextFriday                 = nextDayOfWeek(5)
-    val nextSaturday               = nextDayOfWeek(6)
-    val nextSunday                 = nextDayOfWeek(7)
+    def xMonthWithDay(fromNowMonths: Int)(dayOfMonth: Int) =
+      new DateTime().plusMonths(fromNowMonths).withDayOfMonth(dayOfMonth).withTimeAtStartOfDay
+    def thisMonthWithDay(dayOfMonth: Int) =
+      xMonthWithDay(0)(dayOfMonth)
+    def nextMonthWithDay(dayOfMonth: Int) =
+      xMonthWithDay(1)(dayOfMonth)
+
+    def nextDayOfWeeks(dayNumber: Int, weekNumber: Int) =
+      today.plusDays((dayNumber + 7 * weekNumber - today.getDayOfWeek) % (7 * weekNumber))
+    def nextDayOfWeek(number: Int)      = nextDayOfWeeks(number, 1)
+    def nextDayOfFortnight(number: Int) = nextDayOfWeeks(number, 2)
+    val nextMonday                      = nextDayOfWeek(1)
+    val nextTuesday                     = nextDayOfWeek(2)
+    val nextWednesday                   = nextDayOfWeek(3)
+    val nextThursday                    = nextDayOfWeek(4)
+    val nextFriday                      = nextDayOfWeek(5)
+    val nextSaturday                    = nextDayOfWeek(6)
+    val nextSunday                      = nextDayOfWeek(7)
 
     def secondWeekOf(month: Int) = {
       val start = orNextYear(startOfYear.withMonthOfYear(month))
@@ -126,13 +136,101 @@ final private class TournamentScheduler(
         ).plan
       }
 
-    TournamentShield.MedleyShield.all
+    //schedule this week
+    val thisWeekMedleyShields = TournamentShield.MedleyShield.all
       .map(ms =>
         scheduleMedleyShield(Blitz53, ms)(
           nextDayOfWeek(ms.dayOfWeek)
         )
       )
       .flatten filter { _.schedule.at isAfter rightNow }
+
+    //and schedule two weeks in advance
+    val nextWeekMedleyShields = TournamentShield.MedleyShield.all
+      .map(ms =>
+        scheduleMedleyShield(Blitz53, ms)(
+          nextDayOfFortnight(ms.dayOfWeek + 7)
+        )
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    //schedule this months shields
+    val thisMonthShields = TournamentShield.Category.all
+      .map(shield =>
+        at(thisMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
+          Schedule(Shield, shield.speed, shield.variant, none, date) plan {
+            _.copy(
+              name = s"${VariantKeys.variantName(shield.variant)} Shield",
+              spotlight = Some(
+                TournamentShield.spotlight(
+                  VariantKeys.variantName(shield.variant),
+                  shield.variant.perfIcon
+                )
+              )
+            )
+          }
+        }
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    //and schedule next month
+    val nextMonthShields = TournamentShield.Category.all
+      .map(shield =>
+        at(nextMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
+          Schedule(Shield, shield.speed, shield.variant, none, date) plan {
+            _.copy(
+              name = s"${VariantKeys.variantName(shield.variant)} Shield",
+              spotlight = Some(
+                TournamentShield.spotlight(
+                  VariantKeys.variantName(shield.variant),
+                  shield.variant.perfIcon
+                )
+              )
+            )
+          }
+        }
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    thisWeekMedleyShields ::: nextWeekMedleyShields ::: thisMonthShields ::: nextMonthShields
+
+//          List( // shield tournaments!
+//            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,
+//            month.firstWeek.withDayOfWeek(TUESDAY)   -> SuperBlitz,
+//            month.firstWeek.withDayOfWeek(WEDNESDAY) -> Blitz,
+//            month.firstWeek.withDayOfWeek(THURSDAY)  -> Rapid,
+//            month.firstWeek.withDayOfWeek(FRIDAY)    -> Classical,
+//            month.firstWeek.withDayOfWeek(SATURDAY)  -> HyperBullet,
+//            month.firstWeek.withDayOfWeek(SUNDAY)    -> UltraBullet
+//          ).flatMap { case (day, speed) =>
+//            at(day, 16) map { date =>
+//              Schedule(Shield, speed, Standard, none, date) plan {
+//                _.copy(
+//                  name = s"${speed.toString} Shield",
+//                  spotlight = Some(TournamentShield spotlight speed.toString)
+//                )
+//              }
+//            }
+//          },
+//          List( // shield variant tournaments!
+//            month.secondWeek.withDayOfWeek(SUNDAY)   -> Chess960,
+//            month.thirdWeek.withDayOfWeek(MONDAY)    -> Crazyhouse,
+//            month.thirdWeek.withDayOfWeek(TUESDAY)   -> KingOfTheHill,
+//            month.thirdWeek.withDayOfWeek(WEDNESDAY) -> RacingKings,
+//            month.thirdWeek.withDayOfWeek(THURSDAY)  -> Antichess,
+//            month.thirdWeek.withDayOfWeek(FRIDAY)    -> Atomic,
+//            month.thirdWeek.withDayOfWeek(SATURDAY)  -> Horde,
+//            month.thirdWeek.withDayOfWeek(SUNDAY)    -> ThreeCheck
+//          ).flatMap { case (day, variant) =>
+//            at(day, 16) map { date =>
+//              Schedule(Shield, Blitz, variant, none, date) plan {
+//                _.copy(
+//                  name = s"${VariantKeys.variantName(variant)} Shield",
+//                  spotlight = Some(TournamentShield spotlight VariantKeys.variantName(variant))
+//                )
+//              }
+//            }
+//          }
 
     /*// all dates UTC
     List(

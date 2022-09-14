@@ -92,7 +92,6 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'frysk':
     case 'antidraughts':
     case 'pool':
-    case 'portuguese':
     case 'international':
       return 'draughts';
     default:
