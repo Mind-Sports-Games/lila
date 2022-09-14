@@ -42,23 +42,23 @@ private[tournament] case class WaitingUsers(
   def isOddNoBots = sizeNoBots % 2 == 1
 
   //// skips the most recent user if odd
-  //def evenNumber: Set[User.ID] = {
-  //  if (isOdd) (all - hash.maxBy(_._2.getMillis)._1).map(_.id)
-  //  else allIds
-  //}
-
   def evenNumber: Set[User.ID] = {
-    if (isOddNoBots)
-      if (isOdd)
-        // skips the most recent user if truly odd
-        if (size == sizeNoBots) (all - hash.maxBy(_._2.getMillis)._1).map(_.id)
-        // we have bots so exclude the most recent bot
-        else (all - botHash.maxBy(_._2.getMillis)._1).map(_.id)
-      // adding bots makes us even
-      else allIds
-    // without bots we have an even number
-    else allIdsNoBots
+    if (isOdd) (all - hash.maxBy(_._2.getMillis)._1).map(_.id)
+    else allIds
   }
+
+  //def evenNumber: Set[User.ID] = {
+  //  if (isOddNoBots)
+  //    if (isOdd)
+  //      // skips the most recent user if truly odd
+  //      if (size == sizeNoBots) (all - hash.maxBy(_._2.getMillis)._1).map(_.id)
+  //      // we have bots so exclude the most recent bot
+  //      else (all - botHash.maxBy(_._2.getMillis)._1).map(_.id)
+  //    // adding bots makes us even
+  //    else allIds
+  //  // without bots we have an even number
+  //  else allIdsNoBots
+  //}
 
   lazy val haveWaitedEnough: Boolean =
     size > 100 || {
@@ -77,6 +77,19 @@ private[tournament] case class WaitingUsers(
     )
   }
 
+  def addBotUsers(activePlayers: Int) = {
+    val newDate = DateTime.now
+    //when we have more than one tourBotUsers we will want to ensure we add the right number
+    //that aren't already in WaitingUsers
+    val botUsersToAdd = LightUser.tourBotUsers.take(WaitingUsers.minPlayersForNoBots - activePlayers).toSet
+    copy(
+      date = newDate,
+      hash = {
+        hash ++ botUsersToAdd.filterNot(hash.contains).map { _ -> newDate }
+      }.toMap
+    )
+  }
+
   def hasUser(userId: User.ID) = allIds contains userId
 }
 
@@ -87,4 +100,7 @@ private[tournament] object WaitingUsers {
   case class WithNext(waiting: WaitingUsers, next: Option[Promise[WaitingUsers]])
 
   def emptyWithNext(clock: TournamentClock) = WithNext(empty(clock), none)
+
+  val minPlayersForNoBots = 4
+
 }
