@@ -127,6 +127,7 @@ export default class Setup {
   };
 
   prepareForm = ($modal: Cash) => {
+    let fenOk = false;
     const self = this,
       $form = $modal.find('form'),
       $timeModeSelect = $form.find('#sf_timeMode'),
@@ -162,10 +163,11 @@ export default class Setup {
           return toggleButtons();
         }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
-        const timeOk = timeMode != '1' || limit > 0 || inc > 0,
-          ratedOk = typ != 'hook' || !rated || timeMode != '0',
-          aiOk = typ != 'ai' || variantId[1] != '3' || limit >= 1;
-        if (timeOk && ratedOk && aiOk) {
+        const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
+          ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
+          aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
+          posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk;
+        if (timeOk && ratedOk && aiOk && posOk) {
           $submits.toggleClass('nope', false);
           $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
@@ -513,17 +515,20 @@ export default class Setup {
               this.href = this.href.replace(/editor\/.+$/, 'editor/' + fen);
             });
             $submits.removeClass('nope');
+            fenOk = true;
             playstrategy.contentLoaded();
           },
           _ => {
             $fenInput.addClass('failure');
             $fenPosition.find('.preview').html('');
             $submits.addClass('nope');
+            fenOk = false;
           }
         );
       }
     }, 200);
     $fenInput.on('keyup', validateFen);
+    validateFen();
 
     if (forceFromPosition) {
       switch (($variantSelect.val() as string).split('_')[0]) {
