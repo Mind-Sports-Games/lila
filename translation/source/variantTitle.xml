@@ -15,6 +15,7 @@
   <string name="linesOfAction">Connect all of your checkers to win</string>
   <string name="scrambledEggs">Connect all of your scrambled checkers to win</string>
   <string name="international">Standard rules of international draughts (FMJD)</string>
+  <string name="draughtsFromPosition">Custom starting position</string>
   <string name="antidraughts">Lose all your pieces (or run out of moves) to win</string>
   <string name="brazilian">Same rules as international draughts, played on an 8x8 board</string>
   <string name="breakthrough">The first player who makes a king wins</string>
