@@ -120,7 +120,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     initialFen = ctrl.data.game.initialFen || '';
   if (typeof lastPly === 'undefined') return [];
 
-  const pairs: Array<Array<Step|null>> = [];
+  const pairs: Array<Array<Step | null>> = [];
   let startAt = 1;
   if (firstPly % 2 === 1) {
     pairs.push([null, steps[1]]);
@@ -132,8 +132,8 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     if (i === 0 && pairI === 0) {
       return initialFen;
     }
-    const step = (pairI === 1) ? pairs[i][0] : pairs[i-1][1];
-    return (step !== null) ? step.fen : initialFen;
+    const step = pairI === 1 ? pairs[i][0] : pairs[i - 1][1];
+    return step !== null ? step.fen : initialFen;
   };
 
   const els: MaybeVNodes = [],
