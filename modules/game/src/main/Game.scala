@@ -400,7 +400,7 @@ case class Game(
 
   def abortable =
     status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory &&
-      metadata.multiMatchGameNr.fold(true)(x => x < 2)
+      metadata.multiMatchGameNr.pp("gameNr for abortable").fold(true)(x => x < 2)
 
   def berserkable = clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
 

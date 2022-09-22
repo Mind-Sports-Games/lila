@@ -92,17 +92,29 @@ final private class Rematcher(
         for {
           nextGame <- returnGame(game) map (_.start)
           _ = offers invalidate game.id
-          _ = rematches.cache.put(game.id, nextGame.id)
+          _ = rematches.cache.put(game.id, nextGame.id.pp("next game Id"))
           _ = if (game.variant == Variant.Chess(Chess960) && !chess960.get(game.id)) chess960.put(nextGame.id)
           _ <- gameRepo insertDenormalized nextGame
+          // _ <- gameRepo.setMultiMatch(
+          //   nextGame.id,
+          //   nextGame.metadata.multiMatchGameNr.fold("multiMatch")(x =>
+          //     s"$x:${game.id}"
+          //   ) // initially link to previous game - gets overridden during end of game update to next multi match is there is one
+          // )
         } yield {
-          if (nextGame.metadata.pp("next game metadata").multiMatchGameNr.fold(false)(x => x >= 2))
+          if (
+            nextGame.metadata
+              .pp("next game metadata")
+              .multiMatchGameNr
+              .pp("next game number")
+              .fold(false)(x => x >= 2)
+          )
             messenger.system(game, trans.multiMatchRematchStarted.txt())
           else messenger.system(game, trans.rematchOfferAccepted.txt())
           onStart(nextGame.id)
           redirectEvents(nextGame)
         }
-      case Some(rematchId) => gameRepo game rematchId map { _ ?? redirectEvents }
+      case Some(rematchId) => gameRepo game rematchId.pp("(2) reamtchId") map { _ ?? redirectEvents }
     }
 
   private def rematchCreate(pov: Pov): Events = {
@@ -119,13 +131,14 @@ final private class Rematcher(
       (Pos.Chess(pos), Piece.Chess(piece))
     }
 
-  private def nextMultiMatch(g: Game): Option[String] =
+  //this actually returns the previous multi match game - for display link purposes?
+  private def previousMultiMatch(g: Game): Option[String] =
     if (!g.aborted) {
-      g.metadata.multiMatch.pp("multimatch").fold("multiMatch".some) { s =>
+      g.metadata.multiMatch.pp("multimatch").fold(g.metadata.multiMatch.isDefined option "multiMatch") { s =>
         if (s.contains("multiMatch")) {
           s"1:${g.id}".some
         } else if (s.substring(1, 2) == ":") {
-          s"${s.take(1).toInt + 1}:${g.id}".some
+          s"${s.take(1).toInt - 1}:${g.id}".some
         } else "multiMatch".some
       }
     } else g.metadata.multiMatch.isDefined option "multiMatch"
@@ -176,7 +189,7 @@ final private class Rematcher(
         source = game.source | Source.Lobby,
         daysPerTurn = game.daysPerTurn,
         pgnImport = None,
-        multiMatch = (nextMultiMatch(game)).pp("next multimatch")
+        multiMatch = (previousMultiMatch(game)).pp("previous multimatch")
       ) withUniqueId idGenerator
     } yield game
   }
@@ -201,7 +214,7 @@ final private class Rematcher(
       Event.RedirectOwner(P1, p2Id, AnonCookie.json(game pov P2)),
       Event.RedirectOwner(P2, p1Id, AnonCookie.json(game pov P1)),
       // tell spectators about the rematch
-      Event.RematchTaken(game.id)
+      Event.RematchTaken(game.id.pp("gameid of rematch taken"))
     )
   }
 }

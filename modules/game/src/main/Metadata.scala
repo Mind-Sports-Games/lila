@@ -22,11 +22,11 @@ private[game] case class Metadata(
 
   //TODO change for play x
   def needsMultiMatchRematch =
-    multiMatch.contains("multiMatch") || multiMatch.contains(
-      "1:"
-    ) || multiMatch.contains(
-      "2:"
-    )
+    //  (multiMatch.pp("needsmmCalled mm is").contains("multiMatch") || multiMatch.contains(":")).pp("needs mm")
+    false
+  // (
+  //   multiMatch.pp("needsmmCalled mm is").fold(false)(x => x.contains("multiMatch") || x.contains(":"))
+  // ).pp("needs mm")
 
   def multiMatchGameNr = multiMatch.pp("multiMatch get nb") ?? { mm =>
     if (mm.pp("mm") == "multiMatch") 1.some
@@ -35,7 +35,7 @@ private[game] case class Metadata(
   }
 
   def multiMatchGameId = multiMatch.map { mm =>
-    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2).pp("gameId")
+    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2).pp("mm gameId")
     else "*"
   }
 

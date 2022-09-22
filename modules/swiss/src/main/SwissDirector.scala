@@ -148,8 +148,15 @@ final private class SwissDirector(
         source = lila.game.Source.Swiss,
         pgnImport = None,
         multiMatch =
-          if (swiss.settings.isBestOfX || swiss.settings.isPlayX) "multiMatch".some
-          else none //todo update for each game in match - use rematch?
+          if (rematch)
+            pairing.multiMatchGameIds
+              .pp("mm game ids")
+              .fold("multiMatch".some) { ids =>
+                val previousGameId = if (ids.size <= 1) pairing.id else ids(ids.size - 2)
+                (s"${ids.size}:$previousGameId".some).pp("multiMatch for previous game")
+              } // link to previous mm game while playing, gets overridden to next game if available when complete in roundduct?
+          else if (swiss.settings.isBestOfX || swiss.settings.isPlayX) "multiMatch".some
+          else none
       )
       //.withId(if (rematch) pairing.microMatchGameId.getOrElse(pairing.gameId) else pairing.id)
       .withId(if (rematch) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id)

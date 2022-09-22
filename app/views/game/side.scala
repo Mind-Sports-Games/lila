@@ -156,7 +156,7 @@ object side {
             a(href := routes.Simul.show(sim.id))(sim.fullName)
           )
         },
-        game.metadata.multiMatch map { m =>
+        game.metadata.multiMatch.pp("side game metadata mm") map { m =>
           st.section(cls := "game__multi-match")(
             if (m.matches("[1-9]:.*")) {
               val gamenb = m.take(1).toInt;

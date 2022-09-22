@@ -371,10 +371,14 @@ final private[round] class RoundDuct(
         rematcher.multiMatch(game.pp("game")) map { events =>
           events.pp("events").foreach {
             case Event.RematchTaken(gameId) =>
-              val newGameNb  = game.metadata.multiMatchGameNr.pp("newGameNb").getOrElse(1)
+              val newGameNb  = game.metadata.multiMatchGameNr.pp("newGameNb").getOrElse(0) + 1
               val multiMatch = s"$newGameNb:$gameId"
               gameRepo.setMultiMatch(game.id, multiMatch.pp("new multiMatch id")).void andThen { case _ =>
-                updateGame(game => game.copy(metadata = (game.metadata.copy(multiMatch = multiMatch.some))))
+                updateGame(game =>
+                  game.copy(metadata =
+                    (game.metadata.copy(multiMatch = multiMatch.pp("metadata update mm").some))
+                  )
+                )
               }
             case _ =>
           }
