@@ -269,6 +269,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def setMultiMatch(id: ID, multiMatch: String) =
     coll.updateField($id(id), F.multiMatch, multiMatch)
 
+  def setIsLastMultiMatchGame(id: ID, isLastMultiMatchGame: Boolean) =
+    coll.updateField($id(id), F.isLastMultiMatchGame, isLastMultiMatchGame)
+
   def setAnalysed(id: ID): Unit   = coll.updateFieldUnchecked($id(id), F.analysed, true)
   def setUnanalysed(id: ID): Unit = coll.updateFieldUnchecked($id(id), F.analysed, false)
 

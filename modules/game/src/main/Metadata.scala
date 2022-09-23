@@ -17,25 +17,25 @@ private[game] case class Metadata(
     simulPairing: Option[Int] = None,
     timeOutUntil: Option[DateTime] = None,
     drawLimit: Option[Int] = None,
-    multiMatch: Option[String] = None
+    multiMatch: Option[String] = None,
+    isLastMultiMatchGame: Boolean = true
 ) {
 
-  //TODO change for play x
   def needsMultiMatchRematch =
-    //  (multiMatch.pp("needsmmCalled mm is").contains("multiMatch") || multiMatch.contains(":")).pp("needs mm")
-    false
-  // (
-  //   multiMatch.pp("needsmmCalled mm is").fold(false)(x => x.contains("multiMatch") || x.contains(":"))
-  // ).pp("needs mm")
+    multiMatch.fold(false)(x => x.contains("challengeMultiMatch"))
 
-  def multiMatchGameNr = multiMatch.pp("multiMatch get nb") ?? { mm =>
-    if (mm.pp("mm") == "multiMatch") 1.some
-    else if (mm.length() == 10 && mm.substring(1, 2) == ":")(toInt(mm.take(1)).map(x => x + 1)).pp("game nb")
+  def multiMatchGameDisplayNr: Option[Int] = multiMatch.fold[Option[Int]](None) { mm =>
+    if (isLastMultiMatchGame) toInt(mm.take(1)).map(x => x + 1) else toInt(mm.take(1)).map(x => x - 1)
+  }
+
+  def multiMatchGameNr = multiMatch ?? { mm =>
+    if (mm == "multiMatch") 1.some
+    else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1)).map(x => x + 1)
     else none
   }
 
   def multiMatchGameId = multiMatch.map { mm =>
-    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2).pp("mm gameId")
+    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2)
     else "*"
   }
 

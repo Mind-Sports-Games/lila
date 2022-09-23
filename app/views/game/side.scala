@@ -156,42 +156,28 @@ object side {
             a(href := routes.Simul.show(sim.id))(sim.fullName)
           )
         },
-        game.metadata.multiMatch.pp("side game metadata mm") map { m =>
+        game.metadata.multiMatch map { m =>
           st.section(cls := "game__multi-match")(
             if (m.matches("[1-9]:.*")) {
-              val gamenb = m.take(1).toInt;
+              val gamenb        = m.take(1).toInt;
+              val nbGames       = if (game.metadata.isLastMultiMatchGame) gamenb + 1 else gamenb;
+              val currentGameNb = if (game.metadata.isLastMultiMatchGame) gamenb + 1 else gamenb - 1;
               frag(
                 trans.multiMatch(),
                 ": ",
-                a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
-                  trans.gameNumberX(gamenb)
-                ),
-                " ",
-                (1 to (gamenb - 1)).map(i => span(cls := "current")(trans.gameNumberX(i)))
+                (1 to nbGames).map(i =>
+                  if (i == gamenb) {
+                    a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
+                      trans.gameNumberX(gamenb)
+                    )
+                  } else if (i == currentGameNb) {
+                    span(cls := "current")(trans.gameNumberX(i))
+                  } else {
+                    span(cls := "")(trans.gameNumberX(i))
+                  }
+                )
               )
-            }
-            //TODO fix for multi games ....
-            // if (m.startsWith("1:") && m.length == 10)
-            //   frag(
-            //     trans.multiMatch(),
-            //     ": ",
-            //     a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
-            //       trans.gameNumberX(1)
-            //     ),
-            //     " ",
-            //     span(cls := "current")(trans.gameNumberX(2))
-            //   )
-            // else if (m.startsWith("2:") && m.length == 10)
-            //   frag(
-            //     trans.multiMatch(),
-            //     ": ",
-            //     span(cls := "current")(trans.gameNumberX(1)),
-            //     " ",
-            //     a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
-            //       trans.gameNumberX(2)
-            //     )
-            //   )
-            else trans.multiMatchGameX(1)
+            } else trans.multiMatchGameX(1)
           )
         }
       )

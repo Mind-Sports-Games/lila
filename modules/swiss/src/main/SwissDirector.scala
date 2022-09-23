@@ -150,11 +150,10 @@ final private class SwissDirector(
         multiMatch =
           if (rematch)
             pairing.multiMatchGameIds
-              .pp("mm game ids")
               .fold("multiMatch".some) { ids =>
                 val previousGameId = if (ids.size <= 1) pairing.id else ids(ids.size - 2)
-                (s"${ids.size}:$previousGameId".some).pp("multiMatch for previous game")
-              } // link to previous mm game while playing, gets overridden to next game if available when complete in roundduct?
+                (s"${ids.size}:$previousGameId".some)
+              } // link to previous mm game while playing, gets overridden to next game if available during rematch
           else if (swiss.settings.isBestOfX || swiss.settings.isPlayX) "multiMatch".some
           else none
       )

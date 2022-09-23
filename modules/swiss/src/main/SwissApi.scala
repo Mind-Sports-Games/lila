@@ -523,7 +523,7 @@ final class SwissApi(
                       colls.pairing.update
                         .one(
                           $doc(f2.id                 -> pairing.id),
-                          $push(f2.multiMatchGameIds -> rematchId.pp("rematch id"))
+                          $push(f2.multiMatchGameIds -> rematchId)
                         ) >> {
                         val gameIds: List[Game.ID] = pairing.multiMatchGameIds.fold(List(rematchId))(
                           _ ++ List(rematchId)
@@ -533,16 +533,12 @@ final class SwissApi(
                           director.makeGame(swiss, playerMap, true)(pairingUpdated)
                         val previousGameId =
                           if (gameIds.size <= 1) game.game.id else gameIds((gameIds.size - 2))
-                        gameRepo
-                          .setMultiMatch(
-                            previousGameId.pp("prev game id"),
-                            s"${gameIds.size + 1}:${nextGame.id}"
-                          )
-                          .void andThen { case _ =>
-                          gameRepo.insertDenormalized(nextGame) >> recomputeAndUpdateAll(
-                            pairing.swissId
-                          ) >>- onStart(nextGame.id.pp("game id starting"))
-                        }
+                        val multiMatch = s"${gameIds.size + 1}:${nextGame.id}"
+                        gameRepo.setMultiMatch(previousGameId, multiMatch)
+                        gameRepo.setIsLastMultiMatchGame(previousGameId, false)
+                        gameRepo.insertDenormalized(nextGame) >> recomputeAndUpdateAll(
+                          pairing.swissId
+                        ) >>- onStart(nextGame.id)
                       }
                     }
                   )
@@ -565,9 +561,9 @@ final class SwissApi(
 
   private[swiss] def updateMultiMatchProgress(game: SwissPairingGames): Funit =
     (
-      game.finishedOrAborted.pp("game finshed or aborted"),
+      game.finishedOrAborted,
       game.isBestOfX || game.isPlayX,
-      game.multiMatchGames.pp("multimatch games")
+      game.multiMatchGames
     ) match {
       case (true, _, _)        => finishGame(game)
       case (false, true, None) => rematchForMultiGame(game)
@@ -864,7 +860,7 @@ final class SwissApi(
               if (flagged.nonEmpty)
                 Bus.publish(lila.hub.actorApi.map.TellMany(flagged.map(_.id), QuietFlag), "roundSocket")
               //ongoing.foreach(updateMicroMatchProgress)
-              ongoing.pp("ongoing").foreach(updateMultiMatchProgress)
+              ongoing.foreach(updateMultiMatchProgress)
               if (missingIds.nonEmpty)
                 colls.pairing.delete.one($inIds(missingIds))
               finished

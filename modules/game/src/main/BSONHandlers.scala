@@ -227,6 +227,7 @@ object BSONHandlers {
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
           multiMatch = r strO F.multiMatch,
+          isLastMultiMatchGame = r boolD F.isLastMultiMatchGame,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
@@ -330,6 +331,7 @@ object BSONHandlers {
           simulPairing = r intO F.simulPairing,
           timeOutUntil = r dateO F.timeOutUntil,
           multiMatch = r strO F.multiMatch,
+          isLastMultiMatchGame = r boolD F.isLastMultiMatchGame,
           drawLimit = r intO F.drawLimit,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty) //should be empty for draughts
@@ -427,6 +429,7 @@ object BSONHandlers {
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
           multiMatch = r strO F.multiMatch,
+          isLastMultiMatchGame = r boolD F.isLastMultiMatchGame,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
@@ -509,6 +512,7 @@ object BSONHandlers {
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
           multiMatch = r strO F.multiMatch,
+          isLastMultiMatchGame = r boolD F.isLastMultiMatchGame,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
@@ -550,24 +554,25 @@ object BSONHandlers {
         F.clock -> (o.chess.clock flatMap { c =>
           clockBSONWrite(o.createdAt, c).toOption
         }),
-        F.daysPerTurn    -> o.daysPerTurn,
-        F.moveTimes      -> o.binaryMoveTimes,
-        F.p1ClockHistory -> clockHistory(P1, o.clockHistory, o.chess.clock, o.flagged),
-        F.p2ClockHistory -> clockHistory(P2, o.clockHistory, o.chess.clock, o.flagged),
-        F.rated          -> w.boolO(o.mode.rated),
-        F.lib            -> o.board.variant.gameLogic.id,
-        F.variant        -> o.board.variant.exotic.option(w int o.board.variant.id),
-        F.bookmarks      -> w.intO(o.bookmarks),
-        F.createdAt      -> w.date(o.createdAt),
-        F.movedAt        -> w.date(o.movedAt),
-        F.source         -> o.metadata.source.map(_.id),
-        F.pgnImport      -> o.metadata.pgnImport,
-        F.tournamentId   -> o.metadata.tournamentId,
-        F.swissId        -> o.metadata.swissId,
-        F.simulId        -> o.metadata.simulId,
-        F.multiMatch     -> o.metadata.multiMatch,
-        F.drawLimit      -> o.metadata.drawLimit,
-        F.analysed       -> w.boolO(o.metadata.analysed)
+        F.daysPerTurn          -> o.daysPerTurn,
+        F.moveTimes            -> o.binaryMoveTimes,
+        F.p1ClockHistory       -> clockHistory(P1, o.clockHistory, o.chess.clock, o.flagged),
+        F.p2ClockHistory       -> clockHistory(P2, o.clockHistory, o.chess.clock, o.flagged),
+        F.rated                -> w.boolO(o.mode.rated),
+        F.lib                  -> o.board.variant.gameLogic.id,
+        F.variant              -> o.board.variant.exotic.option(w int o.board.variant.id),
+        F.bookmarks            -> w.intO(o.bookmarks),
+        F.createdAt            -> w.date(o.createdAt),
+        F.movedAt              -> w.date(o.movedAt),
+        F.source               -> o.metadata.source.map(_.id),
+        F.pgnImport            -> o.metadata.pgnImport,
+        F.tournamentId         -> o.metadata.tournamentId,
+        F.swissId              -> o.metadata.swissId,
+        F.simulId              -> o.metadata.simulId,
+        F.multiMatch           -> o.metadata.multiMatch,
+        F.isLastMultiMatchGame -> w.boolO(o.metadata.isLastMultiMatchGame),
+        F.drawLimit            -> o.metadata.drawLimit,
+        F.analysed             -> w.boolO(o.metadata.analysed)
       ) ++ {
         o.board.variant.gameLogic match {
           case GameLogic.Draughts() =>

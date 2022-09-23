@@ -27,11 +27,11 @@ const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | 
     } else if (v.m && v.mmid) {
       newSheet.push({ t: 'p', round: round, isFinalGame: false, ...v });
       newSheet.push({ t: 'p', round: round, isFinalGame: true, ...v, g: v.mmid });
-    } else if ((v.x || v.px) && v.mmids){
+    } else if ((v.x || v.px) && v.mmids) {
       newSheet.push({ t: 'p', round: round, isFinalGame: false, ...v });
-      v.mmids.forEach( gid => 
+      v.mmids.forEach(gid =>
         newSheet.push({ t: 'p', round: round, isFinalGame: gid == v.mmids![v.mmids!.length - 1], ...v, g: gid })
-      )
+      );
     } else {
       newSheet.push({ t: 'p', round: round, isFinalGame: true, ...v });
     }

@@ -350,36 +350,23 @@ final private[round] class RoundDuct(
     case RematchYes(playerId) => handle(PlayerId(playerId))(rematcher.yes)
     case RematchNo(playerId)  => handle(PlayerId(playerId))(rematcher.no)
 
-    //TODO: microMatch: This almost certainly doesnt work as wanted (port issues)
-    // case MicroRematch => handle { game =>
-    //   rematcher.microMatch(game) map { events =>
-    //     events.foreach {
-    //       case Event.RematchTaken(gameId) =>
-    //         val microMatch = s"2:$gameId"
-    //         gameRepo.setMicroMatch(game.id, microMatch).void andThen {
-    //           case _ => updateGame(game => game.copy(metadata = (game.metadata.copy(microMatch = microMatch.some))))
-    //         }
-    //       case _ =>
-    //     }
-    //     events
-    //   }
-    // }
-
-    //TODO: multiMatch: set correct gamenb
+    //TODO: challengeMultiMatch: check this works for non-swiss MulitMatch, currently disabled in ui
     case MultiMatchRematch =>
       handle { game =>
-        rematcher.multiMatch(game.pp("game")) map { events =>
-          events.pp("events").foreach {
-            case Event.RematchTaken(gameId) =>
-              val newGameNb  = game.metadata.multiMatchGameNr.pp("newGameNb").getOrElse(0) + 1
+        rematcher.multiMatch(game) map { events =>
+          events.foreach {
+            case Event.RematchTaken(gameId) => {
+              val newGameNb  = game.metadata.multiMatchGameNr.getOrElse(0) + 1
               val multiMatch = s"$newGameNb:$gameId"
-              gameRepo.setMultiMatch(game.id, multiMatch.pp("new multiMatch id")).void andThen { case _ =>
+              gameRepo.setIsLastMultiMatchGame(game.id, false)
+              gameRepo.setMultiMatch(game.id, multiMatch).void andThen { case _ =>
                 updateGame(game =>
                   game.copy(metadata =
-                    (game.metadata.copy(multiMatch = multiMatch.pp("metadata update mm").some))
+                    (game.metadata.copy(multiMatch = multiMatch.some, isLastMultiMatchGame = false))
                   )
                 )
               }
+            }
             case _ =>
           }
           events

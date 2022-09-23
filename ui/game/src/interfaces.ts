@@ -60,6 +60,7 @@ export interface DraughtsGame extends BaseGame {
 export interface MultiMatch {
   index: number;
   gameId?: string;
+  isLastMultiMatchGame: boolean;
 }
 
 export interface Status {

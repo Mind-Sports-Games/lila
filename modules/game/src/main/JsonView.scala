@@ -55,10 +55,11 @@ final class JsonView(rematches: Rematches) {
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedPlies))
-      .add("multiMatch" -> game.metadata.multiMatchGameNr.pp("json mmgameNb").map { index =>
+      .add("multiMatch" -> game.metadata.multiMatchGameNr.map { index =>
         Json
           .obj("index" -> index)
           .add("gameId" -> game.metadata.multiMatchGameId.filter("*" !=))
+          .add("isLastMultiMatchGame" -> game.metadata.isLastMultiMatchGame)
       })
 }
 
