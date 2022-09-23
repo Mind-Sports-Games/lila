@@ -354,6 +354,8 @@ case class Game(
   def hasAi: Boolean = players.exists(_.isAi)
   def nonAi          = !hasAi
 
+  def hasPSBot: Boolean = players.exists(_.isPSBot)
+
   def aiPov: Option[Pov] = players.find(_.isAi).map(_.playerIndex) map pov
 
   def mapPlayers(f: Player => Player) =
@@ -756,7 +758,7 @@ object Game {
     Speed(clock) >= Speed.Rapid
 
   def isBotCompatible(game: Game): Boolean = {
-    game.hasAi || game.fromFriend || game.fromApi
+    game.hasAi || game.fromFriend || game.fromApi || game.hasPSBot
   } && isBotCompatible(game.speed)
 
   def isBotCompatible(speed: Speed): Boolean = speed >= Speed.Bullet
