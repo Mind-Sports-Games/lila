@@ -141,7 +141,7 @@ final class TournamentApi(
     if (tour.isMedley) userIds.map(updatePlayer(tour, None)).sequenceFu.void else funit
 
   private[tournament] def makePairings(forTour: Tournament, users: WaitingUsers): Funit =
-    (users.size > 1 && (!hadPairings.get(forTour.id) || users.haveWaitedEnough)) ??
+    (users.size > 0 && (!hadPairings.get(forTour.id) || users.haveWaitedEnough(1))) ??
       Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
         updatePlayerRatingsForMedley(users.allIds, tour) >>
           cached

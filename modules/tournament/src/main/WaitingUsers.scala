@@ -60,10 +60,11 @@ private[tournament] case class WaitingUsers(
   //  else allIdsNoBots
   //}
 
-  lazy val haveWaitedEnough: Boolean =
+  //lazy val haveWaitedEnough: Boolean =
+  def haveWaitedEnough(minWaiters: Int): Boolean =
     size > 100 || {
       val since = date minusSeconds waitSeconds
-      hash.count { case (_, d) => d.isBefore(since) } > 1
+      hash.count { case (_, d) => d.isBefore(since) } >= minWaiters.pp("minWaiters")//> 1
     }
 
   def update(us: Set[LightUser]) = {
@@ -77,15 +78,12 @@ private[tournament] case class WaitingUsers(
     )
   }
 
-  def addBotUsers(activePlayers: Int) = {
+  def addBotUsers(bots: Set[LightUser]) = {
     val newDate = DateTime.now
-    //when we have more than one tourBotUsers we will want to ensure we add the right number
-    //that aren't already in WaitingUsers
-    val botUsersToAdd = LightUser.tourBotUsers.take(WaitingUsers.minPlayersForNoBots - activePlayers).toSet
     copy(
       date = newDate,
       hash = {
-        hash ++ botUsersToAdd.filterNot(hash.contains).map { _ -> newDate }
+        hash ++ bots.filterNot(hash.contains).map { _ -> newDate }
       }.toMap
     )
   }
