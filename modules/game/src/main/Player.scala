@@ -4,6 +4,7 @@ import cats.implicits._
 import strategygames.{ Player => PlayerIndex, P1 }
 import scala.util.chaining._
 
+import lila.common.LightUser
 import lila.user.User
 
 case class PlayerUser(id: String, rating: Int, ratingDiff: Option[Int])
@@ -32,6 +33,8 @@ case class Player(
   def isAi = aiLevel.isDefined
 
   def isHuman = !isAi
+
+  def isPSBot = userId ?? LightUser.tourBots.map(_.id).contains
 
   def hasUser = userId.isDefined
 

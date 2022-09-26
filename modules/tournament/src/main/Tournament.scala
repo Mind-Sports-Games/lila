@@ -43,6 +43,7 @@ case class Tournament(
     trophy2nd: Option[String] = None,
     trophy3rd: Option[String] = None,
     trophyExpiryDays: Option[Int] = None,
+    botsAllowed: Boolean = false,
     hasChat: Boolean = true
 ) {
 
@@ -193,6 +194,8 @@ case class Tournament(
   def medleyGameFamiliesString: Option[String] =
     medleyGameFamilies.map(_.map(_.name).mkString(", "))
 
+  val minWaitingUsersForPairings: Int = if (botsAllowed) 1 else 2
+
   override def toString = s"$id $startsAt ${name()(defaultLang)} $minutes minutes, $clock, $nbPlayers players"
 }
 
@@ -276,7 +279,9 @@ object Tournament {
       startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60),
       description = sched.medleyShield.map(_.arenaDescriptionFull),
       trophy1st = sched.medleyShield.map(_.key),
-      trophyExpiryDays = if (sched.medleyShield.isDefined) 7.some else none
+      trophyExpiryDays = if (sched.medleyShield.isDefined) 7.some else none,
+      //we've scheduled this tour so make bots allowed for any of our tours
+      botsAllowed = true
     )
 
   def tournamentUrl(tourId: String): String = s"https://playstrategy.org/tournament/$tourId"

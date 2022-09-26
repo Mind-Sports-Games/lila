@@ -104,6 +104,7 @@ object BSONHandlers {
         trophy2nd = r strO "trophy2nd",
         trophy3rd = r strO "trophy3rd",
         trophyExpiryDays = r intO "trophyExpiryDays",
+        botsAllowed = r boolD "botsAllowed",
         description = r strO "description",
         hasChat = r boolO "chat" getOrElse true
       )
@@ -139,6 +140,7 @@ object BSONHandlers {
         "trophy2nd"        -> o.trophy2nd,
         "trophy3rd"        -> o.trophy3rd,
         "trophyExpiryDays" -> o.trophyExpiryDays,
+        "botsAllowed"      -> o.botsAllowed,
         "description"      -> o.description,
         "chat"             -> (!o.hasChat).option(false)
       )

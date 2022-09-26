@@ -61,6 +61,10 @@ private[tournament] object Pairing {
 
   case class LastOpponents(hash: Map[User.ID, User.ID]) extends AnyVal
 
+  object LastOpponents {
+    val empty = LastOpponents(Map[User.ID, User.ID]().empty)
+  }
+
   private def make(
       gameId: Game.ID,
       tourId: Tournament.ID,

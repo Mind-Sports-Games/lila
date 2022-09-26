@@ -50,13 +50,10 @@ object LightUser {
     def apply(userId: UserID) = f(userId)
   }
 
-  val tourBotUsers: List[LightUser] = List(
-    LightUser(
-      id = "ps-random-mover",
-      name = "PS-Random-Mover",
-      title = "BOT".some,
-      isPatron = false
-    )
+  val tourBots: List[LightUser] = List(
+    LightUser("ps-random-mover", "PS-Random-Mover", "BOT".some, false)
   )
+
+  val tourBotsIDs: List[UserID] = tourBots.map(_.id)
 
 }
