@@ -17,24 +17,6 @@ final private[tournament] class PairingSystem(
   import PairingSystem._
   import lila.tournament.Tournament.tournamentUrl
 
-  //private def addBotUsersToWaiting(tourId: Tournament.ID, users: WaitingUsers, activePlayers: Int) =
-  //  if (activePlayers <= WaitingUsers.minPlayersForNoBots) {
-  //    //when we have more than one tourBotUsers we will want to ensure we add the right number
-  //    //that aren't already in WaitingUsers
-  //    val botUsersToAdd = LightUser.tourBotUsers
-  //      .filter(lu =>
-  //        //for {
-  //        //  botJoinedTour <- playerRepo.existsActive(tourId, lu.id)
-  //        //  botPlaying    <- pairingRepo.isPlaying(tourId, lu.id)
-  //        //  canAdd        <- botJoinedTour && botPlaying
-  //        //} yield canAdd //(botJoinedTour && botPlaying)
-  //        lu == lu
-  //      )
-  //      .take(WaitingUsers.minPlayersForNoBots - activePlayers)
-  //      .toSet
-  //    users.pp("origusers").addBotUsers(botUsersToAdd)
-  //  } else users
-
   // if waiting users can make pairings
   // then pair all users
   def createPairings(
@@ -43,34 +25,12 @@ final private[tournament] class PairingSystem(
       ranking: Ranking
   ): Fu[Pairings] = {
     for {
-      activePlayers <- playerRepo.countActive(tour.id).thenPp("activep")
-      joinedBots <- playerRepo
-        .byTourAndUserIds(tour.id, LightUser.tourBotUsers.map(_.id))
-        .thenPp("joinedBots")
-      //playingBots   <- pairingRepo.userIdsArePlaying(tour.id, joinedBots.filter(!_.withdraw).map(_.id))
-      oneBot = joinedBots.filter(!_.withdraw).head
-      playingBot <- pairingRepo.isPlaying(tour.id, oneBot.userId).thenPp("playingBot")
-      validBots = if (playingBot) List() else List(oneBot)
-      lastOpponents <- pairingRepo.lastOpponents(tour.id, users.allIds, Math.min(300, users.size * 4))
-      limitedLastOpponents =
-        if (activePlayers <= 2 && users.size < WaitingUsers.minPlayersForNoBots && users.size % 2 == 1)
-          Pairing.LastOpponents.empty
-        else lastOpponents
-      //usersWithBots        = if (tour.botsAllowed) addBotUsersToWaiting(tour.id, users, activePlayers) else users
-      usersWithBots =
-        if (tour.botsAllowed)
-          users
-            .pp("origUsers")
-            .addBotUsers(
-              LightUser.tourBotUsers
-                .filter(lu => validBots.pp("validBots").map(_.userId).contains(lu.id))
-                .toSet
-            )
-        else users
-      data = Data(tour, limitedLastOpponents, ranking, activePlayers == 2)
-      preps <- (limitedLastOpponents.hash.isEmpty || usersWithBots.haveWaitedEnough(
-        Math.min(2, activePlayers)
-      )) ?? evenOrAll(
+      activePlayers <- playerRepo.countActive(tour.id)
+      lastOpponents <- limitLastOpponents(tour, users, activePlayers)
+      botsToAdd     <- botsToAdd(tour)
+      usersWithBots = users.addBotUsers(botsToAdd)
+      data          = Data(tour, lastOpponents, ranking, activePlayers == 2)
+      preps <- readyToRunPreps(lastOpponents, usersWithBots, activePlayers) ?? evenOrAll(
         data,
         usersWithBots,
         activePlayers
@@ -83,10 +43,51 @@ final private[tournament] class PairingSystem(
     }
     .result
 
+  private def limitLastOpponents(
+      tour: Tournament,
+      users: WaitingUsers,
+      activePlayers: Int
+  ): Fu[Pairing.LastOpponents] =
+    //this check enables an empty lastOpponents hash when we have just 2 users
+    //to allow repeat pairings when a tournament only has 2 users
+    //additional checks are made to ensure tournamnets with bots run as expected
+    if (
+      activePlayers <= 2 && users.size < WaitingUsers.minPlayersForNoBots && users.size % 2 == 1 && (!tour.botsAllowed || activePlayers % 2 == 1)
+    )
+      fuccess(Pairing.LastOpponents.empty)
+    else pairingRepo.lastOpponents(tour.id, users.all, users.size * 4)
+
+  private def readyToRunPreps(
+      lastOpponents: Pairing.LastOpponents,
+      users: WaitingUsers,
+      activePlayers: Int
+  ): Boolean =
+    lastOpponents.hash.isEmpty || users.haveWaitedEnough(Math.min(2, activePlayers))
+
+  private def botsToAdd(tour: Tournament): Fu[Set[User.ID]] =
+    if (tour.botsAllowed)
+      playerRepo.byTourAndUserIds(tour.id, LightUser.tourBotsIDs) flatMap { joinedBots =>
+        {
+          //headOption because only handling one bot atm
+          val oneBotId = joinedBots.filter(!_.withdraw).headOption.map(_.userId)
+          oneBotId match {
+            case Some(botId) =>
+              pairingRepo.isPlaying(tour.id, botId) flatMap { playingBot =>
+                fuccess(
+                  LightUser.tourBotsIDs
+                    .filter(u => (if (playingBot) List() else oneBotId.toList).contains(u))
+                    .toSet
+                )
+              }
+            case None => fuccess(Set())
+          }
+        }
+      }
+    else fuccess(Set())
+
   private def evenOrAll(data: Data, users: WaitingUsers, activePlayers: Int) = {
-    makePreps(data, users.pp("usersWithBots").evenNumber.pp("evenNo")) flatMap {
-      //case Nil if users.isOddNoBots => makePreps(data, users.allIdsNoBots)
-      case Nil if users.isOdd => makePreps(data, users.allIds)
+    makePreps(data, users.evenNumber) flatMap {
+      case Nil if users.isOdd => makePreps(data, users.all)
       case x                  => fuccess(x)
     }
   }
@@ -97,7 +98,7 @@ final private[tournament] class PairingSystem(
     import data._
     if (users.sizeIs < 2) fuccess(Nil)
     else
-      playerRepo.rankedByTourAndUserIds(tour.id, users, ranking).thenPp("ranked") map { idles =>
+      playerRepo.rankedByTourAndUserIds(tour.id, users, ranking) map { idles =>
         val nbIdles = idles.size
         if (data.tour.isRecentlyStarted && !data.tour.isTeamBattle) proximityPairings(tour, idles)
         else if (nbIdles > maxGroupSize) {

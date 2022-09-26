@@ -194,6 +194,8 @@ case class Tournament(
   def medleyGameFamiliesString: Option[String] =
     medleyGameFamilies.map(_.map(_.name).mkString(", "))
 
+  val minWaitingUsersForPairings: Int = if (botsAllowed) 1 else 2
+
   override def toString = s"$id $startsAt ${name()(defaultLang)} $minutes minutes, $clock, $nbPlayers players"
 }
 
