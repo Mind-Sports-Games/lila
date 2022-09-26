@@ -46,7 +46,8 @@ object TreeBuilder {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val openingOf: OpeningOf =
-          if (withFlags.opening && Variant.openingSensibleVariants(game.variant.gameLogic)(game.variant)) fullOpeningOf
+          if (withFlags.opening && Variant.openingSensibleVariants(game.variant.gameLogic)(game.variant))
+            fullOpeningOf
           else _ => None
         val fen                 = Forsyth.>>(game.variant.gameLogic, init)
         val infos: Vector[Info] = analysis.??(_.infos.toVector)
@@ -59,7 +60,7 @@ object TreeBuilder {
           check = init.situation.check,
           captureLength = init.situation match {
             case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
-            case _ => None
+            case _                             => None
           },
           opening = openingOf(fen),
           clock = withClocks.flatMap(_.headOption),
@@ -89,7 +90,11 @@ object TreeBuilder {
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
             comments = Node.Comments {
               drawOfferPlies(g.turns)
-                .option(makePlayStrategyComment(s"${!PlayerIndex.fromPly(g.turns)} offers draw"))
+                .option(
+                  makePlayStrategyComment(
+                    s"${g.situation.board.variant.playerNames(!PlayerIndex.fromPly(g.turns))} offers draw"
+                  )
+                )
                 .toList :::
                 advice
                   .map(_.makeComment(withEval = false, withBestMove = true))
@@ -99,7 +104,13 @@ object TreeBuilder {
           )
           advices.get(g.turns + 1).flatMap { adv =>
             games.lift(index - 1).map { case (fromGame, _) =>
-              withAnalysisChild(game.id, branch, game.variant, Forsyth.>>(game.variant.gameLogic, fromGame), openingOf)(adv.info)
+              withAnalysisChild(
+                game.id,
+                branch,
+                game.variant,
+                Forsyth.>>(game.variant.gameLogic, fromGame),
+                openingOf
+              )(adv.info)
             }
           } getOrElse branch
         }
