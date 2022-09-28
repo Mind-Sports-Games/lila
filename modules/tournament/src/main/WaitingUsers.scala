@@ -76,6 +76,4 @@ private[tournament] object WaitingUsers {
 
   def emptyWithNext(clock: TournamentClock) = WithNext(empty(clock), none)
 
-  val minPlayersForNoBots = 4
-
 }

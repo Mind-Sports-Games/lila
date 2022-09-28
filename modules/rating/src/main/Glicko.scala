@@ -89,14 +89,6 @@ case object Glicko {
   val defaultManaged       = Glicko(1200d, managedDeviation, defaultVolatility)
   val defaultManagedPuzzle = Glicko(1000d, managedDeviation, defaultVolatility)
 
-  //userId -> starting rating
-  private val defaultBots = Map(
-      "pst-rando" -> 800d,
-    )
-
-  def defaultUser(userId: String): Glicko =
-    defaultBots.get(userId).map(Glicko(_, managedDeviation, defaultVolatility)) | default
-
   // rating that can be lost or gained with a single game
   val maxRatingDelta = 700
 
