@@ -73,7 +73,10 @@ final private[tournament] class PairingSystem(
   private def availableBots(tourId: Tournament.ID)(joinedBots: List[Player]): Fu[Set[User.ID]] =
     Future
       .traverse(
-        joinedBots.filterNot(_.withdraw).map(_.userId)
+        //headOption used as we've only ever tested with one bot
+        //in a tournament at any one time and would want to work
+        //out some sytem for cycling through bots
+        joinedBots.filterNot(_.withdraw).map(_.userId).headOption.toList
       )(
         isBotAvailable(tourId)
       )
