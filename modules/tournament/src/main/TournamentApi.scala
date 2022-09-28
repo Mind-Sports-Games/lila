@@ -137,16 +137,24 @@ final class TournamentApi(
 
   private val hadPairings = new lila.memo.ExpireSetMemo(1 hour)
 
-  private def updatePlayerRatingsForMedley(userIds: Set[User.ID], tour: Tournament): Funit =
+  private def updatePlayerRatingsForMedley(tour: Tournament, userIds: Set[User.ID]): Funit =
     if (tour.isMedley) userIds.map(updatePlayer(tour, None)).sequenceFu.void else funit
 
   private def usersReady(tour: Tournament, users: WaitingUsers): Boolean =
     !hadPairings.get(tour.id) || users.haveWaitedEnough(tour.minWaitingUsersForPairings)
 
+  private[tournament] def withdrawInactivePlayers(tourId: Tournament.ID, userIds: Set[User.ID]): Funit =
+    if (hadPairings.get(tourId)) funit
+    else
+      playerRepo.nonActivePlayers(tourId, userIds) flatMap {
+        _.map(player => playerRepo.withdraw(tourId, player.userId).void).sequenceFu.void
+      }
+
   private[tournament] def makePairings(forTour: Tournament, users: WaitingUsers): Funit =
     (users.size >= forTour.minWaitingUsersForPairings && usersReady(forTour, users)) ??
       Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
-        updatePlayerRatingsForMedley(users.all, tour) >>
+        updatePlayerRatingsForMedley(tour, users.all) >>
+          withdrawInactivePlayers(tour.id, users.all) >>
           cached
             .ranking(tour)
             .mon(_.tournament.pairing.createRanking)
@@ -354,6 +362,7 @@ final class TournamentApi(
         import Tournament.JoinResult
         val fuResult: Fu[JoinResult] =
           if (!playerExists && tour.password.exists(p => !password.has(p))) fuccess(JoinResult.WrongPassword)
+          else if (!tour.botsAllowed && me.isBot) fuccess(JoinResult.NoBotsAllowed)
           else
             getVerdicts(tour, me.some, getUserTeamIds) flatMap { verdicts =>
               if (!verdicts.accepted) fuccess(JoinResult.Verdicts)

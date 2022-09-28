@@ -34,7 +34,7 @@ case class Player(
 
   def isHuman = !isAi
 
-  def isPSBot = userId ?? LightUser.tourBots.map(_.id).contains
+  def isPSBot = userId ?? LightUser.tourBotsIDs.contains
 
   def hasUser = userId.isDefined
 
