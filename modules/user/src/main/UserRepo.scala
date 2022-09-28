@@ -302,7 +302,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .dmap {
         _.flatMap(_ child F.perfs)
           .flatMap(_ child perfType.key)
-          .flatMap(_.getAsOpt[Glicko]("gl")) | Glicko.defaultUser(userId)
+          .flatMap(_.getAsOpt[Glicko]("gl")) | Glicko.default
       }
 
   def incNbGames(

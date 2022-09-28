@@ -19,6 +19,8 @@ final private[tournament] class PairingSystem(
   import PairingSystem._
   import lila.tournament.Tournament.tournamentUrl
 
+  private val minPlayersForNoBots = 4
+
   // if waiting users can make pairings
   // then pair all users
   def createPairings(
@@ -29,7 +31,7 @@ final private[tournament] class PairingSystem(
     for {
       activePlayers <- playerRepo.countActive(tour.id)
       lastOpponents <- limitLastOpponents(tour, users, activePlayers)
-      botsToAdd     <- botsToAdd(tour)
+      botsToAdd     <- botsToAdd(tour, activePlayers)
       usersWithBots = users.addBotUsers(botsToAdd)
       data          = Data(tour, lastOpponents, ranking, activePlayers == 2)
       preps <- readyToRunPreps(lastOpponents, usersWithBots, activePlayers) ?? evenOrAll(
@@ -54,7 +56,7 @@ final private[tournament] class PairingSystem(
     if (
       activePlayers <= 2 &&
       users.size % 2 == 1 &&
-      users.size < WaitingUsers.minPlayersForNoBots &&
+      users.size < minPlayersForNoBots &&
       (!tour.botsAllowed || activePlayers % 2 == 1)
     )
       fuccess(Pairing.LastOpponents.empty)
@@ -82,8 +84,8 @@ final private[tournament] class PairingSystem(
       )
       .map(_.flatten.toSet)
 
-  private def botsToAdd(tour: Tournament): Fu[Set[User.ID]] =
-    if (tour.botsAllowed)
+  private def botsToAdd(tour: Tournament, activePlayers: Int): Fu[Set[User.ID]] =
+    if (tour.botsAllowed && activePlayers < minPlayersForNoBots)
       playerRepo
         .byTourAndUserIds(tour.id, LightUser.tourBotsIDs)
         .flatMap { availableBots(tour.id) }
