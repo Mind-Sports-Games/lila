@@ -50,8 +50,10 @@ object LightUser {
     def apply(userId: UserID) = f(userId)
   }
 
+  //when adding an entry here will want to consider whether we want to add a default rating
+  //see modules/rating/src/main/Glicko.scala Glicko.defaultBots
   val tourBots: List[LightUser] = List(
-    LightUser("ps-random-mover", "PS-Random-Mover", "BOT".some, false)
+    LightUser("pst-rando", "PST-Rando", "BOT".some, false)
   )
 
   val tourBotsIDs: List[UserID] = tourBots.map(_.id)
