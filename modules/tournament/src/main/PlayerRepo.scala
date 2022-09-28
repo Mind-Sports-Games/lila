@@ -277,6 +277,15 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       }
       .result
 
+  def nonActivePlayers(tourId: Tournament.ID, userIds: Iterable[User.ID]): Fu[List[Player]] =
+    coll
+      .list[Player](selectTour(tourId) ++ selectActive ++ selectNonBot ++ $doc("uid" $nin userIds))
+      .chronometer
+      .logIfSlow(200, logger) { players =>
+        s"PlayerRepo.nonActivePlayers $tourId ${userIds.size} user IDs, ${players.size} players"
+      }
+      .result
+
   def pairByTourAndUserIds(tourId: Tournament.ID, id1: User.ID, id2: User.ID): Fu[Option[(Player, Player)]] =
     byTourAndUserIds(tourId, List(id1, id2)) map {
       case List(p1, p2) if p1.is(id1) && p2.is(id2) => Some(p1 -> p2)

@@ -4,6 +4,8 @@ package arena
 import lila.common.LightUser
 import lila.user.{ User, UserRepo }
 
+import scala.concurrent.Future
+
 final private[tournament] class PairingSystem(
     pairingRepo: PairingRepo,
     playerRepo: PlayerRepo,
@@ -48,11 +50,12 @@ final private[tournament] class PairingSystem(
       users: WaitingUsers,
       activePlayers: Int
   ): Fu[Pairing.LastOpponents] =
-    //this check enables an empty lastOpponents hash when we have just 2 users
-    //to allow repeat pairings when a tournament only has 2 users
-    //additional checks are made to ensure tournamnets with bots run as expected
+    //this check enables pairing to happen with a bot when we have low numbers
     if (
-      activePlayers <= 2 && users.size < WaitingUsers.minPlayersForNoBots && users.size % 2 == 1 && (!tour.botsAllowed || activePlayers % 2 == 1)
+      activePlayers <= 2 &&
+      users.size % 2 == 1 &&
+      users.size < WaitingUsers.minPlayersForNoBots &&
+      (!tour.botsAllowed || activePlayers % 2 == 1)
     )
       fuccess(Pairing.LastOpponents.empty)
     else pairingRepo.lastOpponents(tour.id, users.all, users.size * 4)
@@ -64,25 +67,23 @@ final private[tournament] class PairingSystem(
   ): Boolean =
     lastOpponents.hash.isEmpty || users.haveWaitedEnough(Math.min(2, activePlayers))
 
+  private def isBotAvailable(tourId: Tournament.ID)(botId: User.ID): Fu[Option[User.ID]] =
+    pairingRepo.isPlaying(tourId, botId).fold(_ => None, if (_) None else Some(botId))
+
+  private def availableBots(tourId: Tournament.ID)(joinedBots: List[Player]): Fu[Set[User.ID]] =
+    Future
+      .traverse(
+        joinedBots.filterNot(_.withdraw).map(_.userId)
+      )(
+        isBotAvailable(tourId)
+      )
+      .map(_.flatten.toSet)
+
   private def botsToAdd(tour: Tournament): Fu[Set[User.ID]] =
     if (tour.botsAllowed)
-      playerRepo.byTourAndUserIds(tour.id, LightUser.tourBotsIDs) flatMap { joinedBots =>
-        {
-          //headOption because only handling one bot atm
-          val oneBotId = joinedBots.filter(!_.withdraw).headOption.map(_.userId)
-          oneBotId match {
-            case Some(botId) =>
-              pairingRepo.isPlaying(tour.id, botId) flatMap { playingBot =>
-                fuccess(
-                  LightUser.tourBotsIDs
-                    .filter(u => (if (playingBot) List() else oneBotId.toList).contains(u))
-                    .toSet
-                )
-              }
-            case None => fuccess(Set())
-          }
-        }
-      }
+      playerRepo
+        .byTourAndUserIds(tour.id, LightUser.tourBotsIDs)
+        .flatMap { availableBots(tour.id) }
     else fuccess(Set())
 
   private def evenOrAll(data: Data, users: WaitingUsers, activePlayers: Int) = {

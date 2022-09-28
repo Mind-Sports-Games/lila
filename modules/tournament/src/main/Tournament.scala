@@ -299,6 +299,7 @@ object Tournament {
     case object Paused        extends JoinResult("Your pause is not over yet".some)
     case object Verdicts      extends JoinResult("Tournament restrictions".some)
     case object MissingTeam   extends JoinResult("Missing team".some)
+    case object NoBotsAllowed extends JoinResult("No bots allowed".some)
     case object Nope          extends JoinResult("Couldn't join for some reason?".some)
   }
 }
