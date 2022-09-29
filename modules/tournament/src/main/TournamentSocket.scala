@@ -95,9 +95,7 @@ final private class TournamentSocket(
       .computeIfPresent(
         roomId.value,
         (_: Tournament.ID, cur: WaitingUsers.WithNext) => {
-          val newWaiting = cur.waiting.update(users.map { u =>
-            lightUserApi.sync(u) | LightUser.fallback(u)
-          })
+          val newWaiting = cur.waiting.update(users)
           cur.next.foreach(_ success newWaiting)
           WaitingUsers.WithNext(newWaiting, none)
         }

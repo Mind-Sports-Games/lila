@@ -133,8 +133,8 @@ case class User(
   def isAdmin      = roles.exists(_ contains "ROLE_ADMIN") || isSuperAdmin
   def isApiHog     = roles.exists(_ contains "ROLE_API_HOG")
 
-  def isPlayStrategyBot = roles.exists(_ contains "ROLE_PSBOT")
-  def isUserBot         = isBot && !isPlayStrategyBot
+  def isPlayStrategyTourBot = roles.exists(_ contains "ROLE_PSTBOT")
+  def isUserBot             = isBot && !isPlayStrategyTourBot
 }
 
 object User {

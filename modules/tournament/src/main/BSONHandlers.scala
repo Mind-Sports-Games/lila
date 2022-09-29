@@ -104,6 +104,7 @@ object BSONHandlers {
         trophy2nd = r strO "trophy2nd",
         trophy3rd = r strO "trophy3rd",
         trophyExpiryDays = r intO "trophyExpiryDays",
+        botsAllowed = r boolD "botsAllowed",
         description = r strO "description",
         hasChat = r boolO "chat" getOrElse true
       )
@@ -139,6 +140,7 @@ object BSONHandlers {
         "trophy2nd"        -> o.trophy2nd,
         "trophy3rd"        -> o.trophy3rd,
         "trophyExpiryDays" -> o.trophyExpiryDays,
+        "botsAllowed"      -> o.botsAllowed,
         "description"      -> o.description,
         "chat"             -> (!o.hasChat).option(false)
       )
@@ -152,6 +154,7 @@ object BSONHandlers {
         userId = r str "uid",
         rating = r int "r",
         provisional = r boolD "pr",
+        isBot = r boolD "b",
         withdraw = r boolD "w",
         score = r intD "s",
         fire = r boolD "f",
@@ -165,6 +168,7 @@ object BSONHandlers {
         "uid" -> o.userId,
         "r"   -> o.rating,
         "pr"  -> w.boolO(o.provisional),
+        "b"   -> w.boolO(o.isBot),
         "w"   -> w.boolO(o.withdraw),
         "s"   -> w.intO(o.score),
         "m"   -> o.magicScore,

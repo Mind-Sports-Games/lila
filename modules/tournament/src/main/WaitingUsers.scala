@@ -8,10 +8,9 @@ import lila.user.User
 import lila.common.LightUser
 
 private[tournament] case class WaitingUsers(
-    hash: Map[LightUser, DateTime],
+    hash: Map[User.ID, DateTime],
     clock: TournamentClock,
-    date: DateTime //,
-    //lightUserApi: lila.user.LightUserApi
+    date: DateTime
 ) {
 
   // ultrabullet -> 8
@@ -24,49 +23,28 @@ private[tournament] case class WaitingUsers(
     if (clock.estimateTotalSeconds < 30) 8
     else if (clock.estimateTotalSeconds < 60) 10
     else {
-      clock.estimateTotalSeconds / 10 + 6
-    } atMost 50 atLeast 15
+      clock.estimateTotalSeconds / 20 + 6
+    } atMost 30 atLeast 15
 
-  lazy val all       = hash.keySet
-  lazy val allNoBots = hash.keySet.filterNot(_.isBot)
-  lazy val allBots   = hash.keySet.filter(_.isBot)
-  lazy val botHash   = hash.view.filterKeys(allBots).toMap
+  lazy val all = hash.keySet
 
-  lazy val allIds       = all.map(_.id)
-  lazy val allIdsNoBots = allNoBots.map(_.id)
+  lazy val size = hash.size
 
-  lazy val size       = hash.size
-  lazy val sizeNoBots = allNoBots.size
+  def isOdd = size % 2 == 1
 
-  def isOdd       = size       % 2 == 1
-  def isOddNoBots = sizeNoBots % 2 == 1
-
-  //// skips the most recent user if odd
-  //def evenNumber: Set[User.ID] = {
-  //  if (isOdd) (all - hash.maxBy(_._2.getMillis)._1).map(_.id)
-  //  else allIds
-  //}
-
+  // skips the most recent user if odd
   def evenNumber: Set[User.ID] = {
-    if (isOddNoBots)
-      if (isOdd)
-        // skips the most recent user if odd
-        if (size == sizeNoBots) (all - hash.maxBy(_._2.getMillis)._1).map(_.id)
-        // we have bots so exclude the most recent bot
-        else (all - botHash.maxBy(_._2.getMillis)._1).map(_.id)
-      // adding bots makes us even
-      else allIds
-    // without bots we have an even number
-    else allIdsNoBots
+    if (isOdd) all - hash.maxBy(_._2.getMillis)._1
+    else all
   }
 
-  lazy val haveWaitedEnough: Boolean =
+  def haveWaitedEnough(minWaiters: Int): Boolean =
     size > 100 || {
       val since = date minusSeconds waitSeconds
-      hash.count { case (_, d) => d.isBefore(since) } > 1
+      hash.count { case (_, d) => d.isBefore(since) } >= minWaiters
     }
 
-  def update(us: Set[LightUser]) = {
+  def update(us: Set[User.ID]) = {
     val newDate = DateTime.now
     copy(
       date = newDate,
@@ -77,7 +55,17 @@ private[tournament] case class WaitingUsers(
     )
   }
 
-  def hasUser(userId: User.ID) = allIds contains userId
+  def addBotUsers(bots: Set[User.ID]) = {
+    val newDate = DateTime.now
+    copy(
+      date = newDate,
+      hash = {
+        hash ++ bots.filterNot(hash.contains).map { _ -> newDate }
+      }.toMap
+    )
+  }
+
+  def hasUser(userId: User.ID) = hash contains userId
 }
 
 private[tournament] object WaitingUsers {
@@ -87,4 +75,5 @@ private[tournament] object WaitingUsers {
   case class WithNext(waiting: WaitingUsers, next: Option[Promise[WaitingUsers]])
 
   def emptyWithNext(clock: TournamentClock) = WithNext(empty(clock), none)
+
 }
