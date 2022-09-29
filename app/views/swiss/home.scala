@@ -69,10 +69,6 @@ object home {
                   s" (${s.settings.nbGamesPerRound} games) rounds Swiss"
                 } else " rounds Swiss",
                 if (s.settings.useMatchScore) " (match score)" else ""
-                // if (s.settings.isMicroMatch) {
-                //   " micro-match rounds Swiss"
-                // } else " rounds Swiss"
-                //" rounds Swiss"
               ),
               span(cls := "setup")(
                 s.clock.show,

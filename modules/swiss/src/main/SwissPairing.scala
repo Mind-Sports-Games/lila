@@ -192,7 +192,7 @@ case class SwissPairingGames(
         case Some(g2) => List(game.winnerPlayerIndex, g2.winnerPlayerIndex)
         case None     => List(game.winnerPlayerIndex, None)
       }
-    } else if (useMatchScore && (isBestOfX || isPlayX)) {
+    } else if (nbGamesPerRound > 1) {
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(_.winnerPlayerIndex)
     } else List(game.winnerPlayerIndex)
 }

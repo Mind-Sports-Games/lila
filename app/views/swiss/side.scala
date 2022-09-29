@@ -48,8 +48,10 @@ object side {
             ),
             p(
               span(cls := "swiss__meta__round")(
+                s"${s.round}/${s.settings.nbRounds}"
+              ),
+              span(cls := "swiss__meta__rounds")(
                 if (s.settings.isMicroMatch) { (title := trans.microMatchDefinition.txt()) },
-                s"${s.round}/${s.settings.nbRounds}",
                 if (s.settings.isMicroMatch) {
                   " micro-match rounds"
                 } else if (s.settings.isBestOfX) {
