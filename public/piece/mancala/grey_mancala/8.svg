@@ -80,10 +80,10 @@
     <g id="grey-/-seeds-8" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="Seeds-Grey" filter="url(#filter-1)" transform="translate(17.781033, 18.955429)">
             <g id="Group" transform="translate(35.218967, 38.044571)">
-                <g id="seed-copy-6" transform="translate(20.000000, 18.000000) rotate(39.000000) translate(-20.000000, -18.000000) ">
+                <g id="seed-copy-3" transform="translate(20.000000, 18.000000) rotate(39.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-4"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-4"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-4"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-4"></use>
                         </g>
@@ -96,7 +96,7 @@
                 <g id="seeds-9+" transform="translate(20.000000, 18.000000) rotate(151.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-7"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-7"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-7"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-7"></use>
                         </g>
@@ -109,7 +109,7 @@
                 <g id="seed-copy-8" transform="translate(20.000000, 18.000000) rotate(-34.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-10"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-10"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-10"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-10"></use>
                         </g>
@@ -121,7 +121,7 @@
             <g id="Group" transform="translate(46.218967, 67.044571)">
                 <g id="colour-2" transform="translate(3.859429, 3.837141)">
                     <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                        <use fill="#ACBADB" xlink:href="#path-13"></use>
+                        <use fill="#8D9CBE" xlink:href="#path-13"></use>
                         <use fill="url(#radialGradient-2)" xlink:href="#path-13"></use>
                         <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-13"></use>
                     </g>
@@ -133,7 +133,7 @@
                 <g id="seed-copy-10" transform="translate(20.000000, 18.000000) rotate(61.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-16"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-16"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-16"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-16"></use>
                         </g>
@@ -146,7 +146,7 @@
                 <g id="seed-copy-6" transform="translate(20.000000, 18.000000) rotate(75.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-19"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-19"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-19"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-19"></use>
                         </g>
@@ -158,7 +158,7 @@
             <g id="Group" transform="translate(12.218967, 16.044571)">
                 <g id="colour-2" transform="translate(3.859429, 3.837141)">
                     <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                        <use fill="#ACBADB" xlink:href="#path-22"></use>
+                        <use fill="#8D9CBE" xlink:href="#path-22"></use>
                         <use fill="url(#radialGradient-2)" xlink:href="#path-22"></use>
                         <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-22"></use>
                     </g>
@@ -167,10 +167,10 @@
                 <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" opacity="0.600000024" filter="url(#filter-24)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
             </g>
             <g id="Group" transform="translate(37.218967, 4.044571)">
-                <g id="seed-copy-4" transform="translate(20.000000, 18.000000) rotate(97.000000) translate(-20.000000, -18.000000) ">
+                <g id="seed-copy-5" transform="translate(20.000000, 18.000000) rotate(97.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-25"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-25"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-25"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-25"></use>
                         </g>
@@ -179,6 +179,10 @@
                     <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" opacity="0.600000024" filter="url(#filter-27)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
                 </g>
             </g>
+        </g>
+        <g id="Number" transform="translate(93.000000, 26.000000)">
+            <circle id="Oval" fill="#000000" cx="19" cy="19" r="19"></circle>
+            <path d="M19.4915,25.255 C20.7325,25.255 20.7325,25.255 21.7015,24.74925 C22.6705,24.2435 22.6705,24.2435 23.223,23.35525 C23.7755,22.467 23.7755,22.467 23.7755,21.328 C23.7755,20.359 23.7755,20.359 23.33775,19.492 C23.0641562,18.950125 23.0641562,18.950125 22.6461289,18.5477031 L22.497,18.415 L22.6113469,18.2828316 C22.8387653,18.0062347 22.8387653,18.0062347 23.0021735,17.7226122 L23.104,17.53275 C23.4355,16.8655 23.4355,16.8655 23.4355,16.024 C23.4355,14.9615 23.4355,14.9615 22.92975,14.171 C22.424,13.3805 22.424,13.3805 21.53575,12.94275 C20.6475,12.505 20.6475,12.505 19.4915,12.505 C18.3355,12.505 18.3355,12.505 17.44725,12.94275 C16.559,13.3805 16.559,13.3805 16.05325,14.171 C15.5475,14.9615 15.5475,14.9615 15.5475,16.024 C15.5475,16.8655 15.5475,16.8655 15.90025,17.537 C16.1354167,17.9846667 16.1354167,17.9846667 16.4895833,18.4021111 L16.504,18.419 L16.3605117,18.5502266 C16.0207773,18.8811953 16.0207773,18.8811953 15.7777305,19.2907891 L15.66225,19.5005 C15.2245,20.359 15.2245,20.359 15.2245,21.328 C15.2245,22.467 15.2245,22.467 15.77275,23.35525 C16.321,24.2435 16.321,24.2435 17.28575,24.74925 C18.2505,25.255 18.2505,25.255 19.4915,25.255 Z M19.4915,17.367 C18.8285,17.367 18.8285,17.367 18.412,17.03975 C17.9955,16.7125 17.9955,16.7125 17.9955,16.024 C17.9955,15.3355 17.9955,15.3355 18.412,14.99975 C18.8285,14.664 18.8285,14.664 19.4915,14.664 C20.1545,14.664 20.1545,14.664 20.571,14.99975 C20.9875,15.3355 20.9875,15.3355 20.9875,16.024 C20.9875,16.7125 20.9875,16.7125 20.571,17.03975 C20.1545,17.367 20.1545,17.367 19.4915,17.367 Z M19.4915,23.079 C18.6755,23.079 18.6755,23.079 18.174,22.637 C17.6725,22.195 17.6725,22.195 17.6725,21.328 C17.6725,20.4695 17.6725,20.4695 18.174,20.01475 C18.6755,19.56 18.6755,19.56 19.4915,19.56 C20.3075,19.56 20.3075,19.56 20.8175,20.01475 C21.3275,20.4695 21.3275,20.4695 21.3275,21.328 C21.3275,22.195 21.3275,22.195 20.8175,22.637 C20.3075,23.079 20.3075,23.079 19.4915,23.079 Z" id="Masked-text-object" fill="#FFFFFF"></path>
         </g>
     </g>
 </svg>
