@@ -76,7 +76,7 @@
                 <g transform="translate(20.000000, 18.000000) rotate(92.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-4"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-4"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-4"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-4"></use>
                         </g>
@@ -89,7 +89,7 @@
                 <g transform="translate(20.000000, 18.000000) rotate(-16.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-7"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-7"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-7"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-7"></use>
                         </g>
@@ -102,7 +102,7 @@
                 <g transform="translate(20.000000, 18.000000) rotate(-14.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-10"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-10"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-10"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-10"></use>
                         </g>
@@ -115,7 +115,7 @@
                 <g transform="translate(20.000000, 18.000000) rotate(117.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-13"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-13"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-13"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-13"></use>
                         </g>
@@ -128,7 +128,7 @@
                 <g transform="translate(20.000000, 18.000000) rotate(45.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-16"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-16"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-16"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-16"></use>
                         </g>
@@ -141,7 +141,7 @@
                 <g transform="translate(20.000000, 18.000000) rotate(15.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-19"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-19"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-19"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-19"></use>
                         </g>
@@ -154,7 +154,7 @@
                 <g transform="translate(20.000000, 18.000000) rotate(-29.000000) translate(-20.000000, -18.000000) ">
                     <g id="colour-2" transform="translate(3.859429, 3.837141)">
                         <g id="colour" transform="translate(15.640571, 14.265301) rotate(12.000000) translate(-15.640571, -14.265301) ">
-                            <use fill="#ACBADB" xlink:href="#path-22"></use>
+                            <use fill="#8D9CBE" xlink:href="#path-22"></use>
                             <use fill="url(#radialGradient-2)" xlink:href="#path-22"></use>
                             <use fill-opacity="0.5" fill="url(#radialGradient-3)" xlink:href="#path-22"></use>
                         </g>
@@ -163,6 +163,10 @@
                     <path d="M12.5948736,25.0350541 C11.3899054,18.6960045 12.8422208,14.1754906 16.9518199,11.4735124 C21.0614189,8.7715343 25.2518379,8.85187883 29.5230768,11.714546 C25.6309065,10.7024657 21.7895756,11.6688261 17.999084,14.6136272 C14.2085923,17.5584284 12.4071889,21.0322373 12.5948736,25.0350541 Z" id="glow" fill="#FFFFFF" opacity="0.600000024" filter="url(#filter-24)" transform="translate(20.854074, 17.270301) rotate(-300.000000) translate(-20.854074, -17.270301) "></path>
                 </g>
             </g>
+        </g>
+        <g id="Number" transform="translate(93.000000, 26.000000)">
+            <circle id="Oval" fill="#000000" cx="19" cy="19" r="19"></circle>
+            <path d="M19.177,25 L23.274,14.936 L23.274,12.76 L15.556,12.76 L15.556,14.936 L20.792,14.936 L16.678,25 L19.177,25 Z" id="Masked-text-object" fill="#FFFFFF"></path>
         </g>
     </g>
 </svg>
