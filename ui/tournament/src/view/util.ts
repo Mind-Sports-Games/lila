@@ -1,5 +1,6 @@
 import { Attrs, h, Hooks, VNode } from 'snabbdom';
 import { numberFormat } from 'common/number';
+import TournamentController from '../ctrl';
 
 export function bind(eventName: string, f: (e: Event) => any, redraw?: () => void): Hooks {
   return onInsert(el =>
@@ -76,5 +77,65 @@ export function spinner(): VNode {
         attrs: { cx: 20, cy: 20, r: 18, fill: 'none' },
       }),
     ]),
+  ]);
+}
+
+export function medleyVariantsHoriz(ctrl: TournamentController) {
+  return h('div.medley-variants-horiz', [
+    h(
+      'div.medley-horiz-icon',
+      {
+        attrs: { 'data-icon': 5 },
+        hook: bind('click', _ => ctrl.showMedleyVariants(!ctrl.showingMedleyVariants), ctrl.redraw),
+      },
+      ''
+    ),
+    h(
+      'div.medley-variants-wide',
+      h(
+        'div.medley-variants-scrollable',
+        medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, ctrl.data.isFinished)
+      )
+    ),
+  ]);
+}
+
+export function medleyVariantListItems(variants: Variant[], medleyRound: number, displayCompleted: boolean) {
+  const variantsH = [] as (string | VNode)[];
+  variants.forEach((v, index) => {
+    displayCompleted || index >= medleyRound
+      ? variantsH.push(
+          h(
+            'section.medley-variant__item.medley-round-' + index + (index == medleyRound ? '.current-variant' : ''),
+            h(
+              'h2',
+              h(
+                'a.medley-variant',
+                {
+                  attrs: {
+                    href: '/variant/' + v.key,
+                    'data-icon': typeof v.iconChar == 'undefined' ? '' : v.iconChar,
+                  },
+                },
+                h('span.medley-variant-name', v.name)
+              )
+            )
+          )
+        )
+      : null;
+  });
+  return variantsH;
+}
+
+export function medleyVariantsList(ctrl: TournamentController, withClose: boolean) {
+  return h('div.medley-variants.tour__actor-info', [
+    withClose
+      ? h('a.close', {
+          attrs: dataIcon('L'),
+          hook: bind('click', () => ctrl.showMedleyVariants(false), ctrl.redraw),
+        })
+      : null,
+    h('h1', ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes)),
+    h('div.medley-variants-list', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, true)),
   ]);
 }

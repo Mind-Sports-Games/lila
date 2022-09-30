@@ -17,7 +17,7 @@ final private class ChallengeJoiner(
 
   def apply(c: Challenge, destUser: Option[User], playerIndex: Option[PlayerIndex]): Fu[Option[Pov]] =
     gameRepo exists c.id flatMap {
-      case true                                                           => fuccess(None)
+      case true                                                                             => fuccess(None)
       case _ if playerIndex.map(Challenge.PlayerIndexChoice.apply).has(c.playerIndexChoice) => fuccess(None)
       case _ =>
         c.challengerUserId.??(userRepo.byId) flatMap { origUser =>
@@ -36,7 +36,11 @@ private object ChallengeJoiner {
       playerIndex: Option[PlayerIndex]
   ): Game = {
     def makeChess(variant: Variant): strategygames.Game =
-      strategygames.Game(variant.gameLogic, situation = Situation(variant.gameLogic, variant), clock = c.clock.map(_.config.toClock))
+      strategygames.Game(
+        variant.gameLogic,
+        situation = Situation(variant.gameLogic, variant),
+        clock = c.clock.map(_.config.toClock)
+      )
 
     val baseState = c.initialFen.ifTrue(c.variant.fromPosition || c.variant.chess960) flatMap {
       Forsyth.<<<@(c.variant.gameLogic, c.variant, _)
@@ -52,7 +56,7 @@ private object ChallengeJoiner {
         )
         if (c.variant.fromPosition && Forsyth.>>(c.variant.gameLogic, game).initial)
           makeChess(Variant.libStandard(c.variant.gameLogic)) -> none
-        else game                           -> baseState
+        else game                                             -> baseState
     }
     val microMatch = c.isMicroMatch && c.customStartingPosition option "micromatch"
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)

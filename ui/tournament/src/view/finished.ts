@@ -7,7 +7,7 @@ import { teamStanding } from './battle';
 import header from './header';
 import playerInfo from './playerInfo';
 import teamInfo from './teamInfo';
-import { numberRow } from './util';
+import { numberRow, medleyVariantsHoriz, medleyVariantsList } from './util';
 
 function confetti(data: TournamentData): VNode | undefined {
   if (data.me && data.isRecentlyFinished && playstrategy.once('tournament.end.canvas.' + data.id))
@@ -21,7 +21,7 @@ function confetti(data: TournamentData): VNode | undefined {
 function stats(data: TournamentData, trans: Trans): VNode {
   const noarg = trans.noarg;
   const tableData = [
-    numberRow(noarg('averageElo'), data.stats.averageRating, 'raw'),
+    !data.medley ? numberRow(noarg('averageElo'), data.stats.averageRating, 'raw') : null,
     numberRow(noarg('gamesPlayed'), data.stats.games),
     numberRow(noarg('movesPlayed'), data.stats.moves),
     numberRow(
@@ -115,13 +115,16 @@ export function main(ctrl: TournamentController): MaybeVNodes {
   const teamS = teamStanding(ctrl, 'finished');
   return [
     ...(teamS ? [header(ctrl), teamS] : [h('div.podium-wrap', [confetti(ctrl.data), header(ctrl), podium(ctrl)])]),
+    ctrl.data.medley ? medleyVariantsHoriz(ctrl) : null,
     controls(ctrl, pag),
     standing(ctrl, pag),
   ];
 }
 
 export function table(ctrl: TournamentController): VNode | undefined {
-  return ctrl.playerInfo.id
+  return ctrl.showingMedleyVariants
+    ? medleyVariantsList(ctrl, true)
+    : ctrl.playerInfo.id
     ? playerInfo(ctrl)
     : ctrl.teamInfo.requested
     ? teamInfo(ctrl)

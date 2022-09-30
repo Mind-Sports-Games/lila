@@ -19,19 +19,18 @@ The UI is available in more than 130 languages.
 Playstrategy is written in [Scala 2.13](https://www.scala-lang.org/),
 and relies on the [Play 2.8](https://www.playframework.com/) framework.
 [scalatags](https://www.lihaoyi.com/scalatags/) is used for templating.
-Pure chess logic is contained in the [scalachess](https://github.com/Mind-Sports-Games/scalachess) submodule.
+Pure chess logic is contained in the [strategygames](https://github.com/Mind-Sports-Games/strategygames) submodule.
 The server is fully asynchronous, making heavy use of Scala Futures and [Akka streams](https://akka.io).
 WebSocket connections are handled by a [separate server](https://github.com/Mind-Sports-Games/lila-ws) that communicates using [redis](https://redis.io/).
 Playstrategy talks to [Stockfish](https://stockfishchess.org/) deployed in an [AI cluster](https://github.com/niklasf/fishnet) of donated servers.
-It uses [MongoDB](https://mongodb.org) to store more than 1.7 billion games, which are indexed by [elasticsearch](https://github.com/elastic/elasticsearch).
+It uses [MongoDB](https://mongodb.org) to store games.
 HTTP requests and WebSocket connections can be proxied by [nginx](https://nginx.org).
 The web client is written in [TypeScript](https://www.typescriptlang.org/) and [snabbdom](https://github.com/snabbdom/snabbdom), using [Sass](https://sass-lang.com/) to generate CSS.
-Browser testing done with [Browserstack](https://www.browserstack.com).
 Proxy detection done with [IP2Proxy database](https://www.ip2location.com/database/ip2proxy).
 
 See [playstrategy.org/source](https://playstrategy.org/source) for a list of repositories.
 
-[Join us on discord](https://discord.gg/hy5jqSs) for more info.
+Join us on discord for more info (coming soon...).
 Use [GitHub issues](https://github.com/Mind-Sports-Games/lila/issues) for bug reports and feature requests.
 
 ## Installation
@@ -41,7 +40,7 @@ Use [GitHub issues](https://github.com/Mind-Sports-Games/lila/issues) for bug re
 run
 ```
 
-The Wiki describes [how to setup a development environment](https://github.com/Mind-Sports-Games/lila/wiki/Lichess-Development-Onboarding).
+The Lichess Wiki describes [how to setup a development environment](https://github.com/lichess-org/lila/wiki/Lichess-Development-Onboarding), which is the same process as PlayStrategy.
 
 ## HTTP API
 

@@ -68,7 +68,7 @@ export default function (ctrl: TournamentController): VNode {
             )
           : null,
         h('table', [
-          data.player.performance
+          data.player.performance && !ctrl.data.medley
             ? numberRow(noarg('performance'), data.player.performance + (nb.game < 3 ? '?' : ''), 'raw')
             : null,
           numberRow(noarg('gamesPlayed'), nb.game),
@@ -103,8 +103,9 @@ export default function (ctrl: TournamentController): VNode {
               },
               [
                 h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
+                ctrl.data.medley ? h('td', { attrs: { 'data-icon': p.variantIcon } }, '') : null,
                 h('td', playerName(p.op)),
-                h('td', p.op.rating),
+                h('td', ctrl.data.medley ? '' : p.op.rating),
                 h('td.is.playerIndex-icon.' + p.playerColor),
                 h('td', res),
               ]

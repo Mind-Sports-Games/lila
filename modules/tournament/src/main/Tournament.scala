@@ -2,7 +2,7 @@ package lila.tournament
 
 import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
-import strategygames.{ Mode, Speed }
+import strategygames.{ GameFamily, Mode, Speed }
 import strategygames.variant.Variant
 import org.joda.time.{ DateTime, Duration, Interval }
 import play.api.i18n.Lang
@@ -21,6 +21,8 @@ case class Tournament(
     clock: ClockConfig,
     minutes: Int,
     variant: Variant,
+    medleyVariants: Option[List[Variant]] = None,
+    medleyMinutes: Option[Int] = None,
     position: Option[FEN],
     mode: Mode,
     password: Option[String] = None,
@@ -40,6 +42,8 @@ case class Tournament(
     trophy1st: Option[String] = None,
     trophy2nd: Option[String] = None,
     trophy3rd: Option[String] = None,
+    trophyExpiryDays: Option[Int] = None,
+    botsAllowed: Boolean = false,
     hasChat: Boolean = true
 ) {
 
@@ -86,13 +90,39 @@ case class Tournament(
 
   def isRated = mode == Mode.Rated
 
+  def isMedley = medleyVariants.nonEmpty
+
   def finishesAt = startsAt plusMinutes minutes
 
   def secondsToStart = (startsAt.getSeconds - nowSeconds).toInt atLeast 0
 
   def secondsToFinish = (finishesAt.getSeconds - nowSeconds).toInt atLeast 0
 
-  def pairingsClosed = secondsToFinish < math.max(30, math.min(clock.limitSeconds / 2, 120))
+  def pairingsClosedSeconds = math.max(30, math.min(clock.limitSeconds / 2, 120))
+
+  def pairingsClosed = secondsToFinish < pairingsClosedSeconds
+
+  def medleyRound: Option[Int] =
+    if (isStarted) medleyMinutes.map(_ * 60).map((nowSeconds - startsAt.getSeconds).toInt / _)
+    else None
+
+  def currentVariant =
+    medleyVariants.getOrElse(List()).lift(medleyRound.getOrElse(0)).getOrElse(variant)
+
+  def currentPerfType: PerfType = PerfType(currentVariant, speed)
+
+  //essentially take medleyVariants and discard ones not to display
+  def medleyRounds: Option[List[Variant]] =
+    medleyRoundsWithMinsRemaining.map(_.map { case (_, v) => v })
+
+  //might want to make this public for something at some point
+  private def medleyRoundsWithMinsRemaining: Option[List[(Int, Variant)]] =
+    medleyMinutes.map(mm =>
+      List
+        .tabulate((minutes / mm) + 1)(n => minutes - (n * mm))
+        .filter(_ > (pairingsClosedSeconds.toDouble / 60))
+        .zip(medleyVariants.getOrElse(List()))
+    )
 
   def isStillWorthEntering =
     isPlayStrategyHeadline || isMarathonOrUnique || {
@@ -122,6 +152,8 @@ case class Tournament(
   def speed = Speed(clock)
 
   def perfType: PerfType = PerfType(variant, speed)
+
+  def iconChar = if (isMedley) '5' else perfType.iconChar
 
   def durationString =
     if (minutes < 60) s"${minutes}m"
@@ -155,6 +187,15 @@ case class Tournament(
 
   lazy val looksLikePrize = !isScheduled && lila.common.String.looksLikePrize(s"$name $description")
 
+  def medleyGameFamilies: Option[List[GameFamily]] = medleyVariants.map(
+    _.map(_.gameFamily).distinct.sortWith(_.name < _.name)
+  )
+
+  def medleyGameFamiliesString: Option[String] =
+    medleyGameFamilies.map(_.map(_.name).mkString(", "))
+
+  val minWaitingUsersForPairings: Int = if (botsAllowed) 1 else 2
+
   override def toString = s"$id $startsAt ${name()(defaultLang)} $minutes minutes, $clock, $nbPlayers players"
 }
 
@@ -172,6 +213,8 @@ object Tournament {
       clock: ClockConfig,
       minutes: Int,
       variant: Variant,
+      medleyVariants: Option[List[Variant]] = None,
+      medleyMinutes: Option[Int] = None,
       position: Option[FEN],
       mode: Mode,
       password: Option[String],
@@ -196,6 +239,8 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = variant,
+      medleyVariants = medleyVariants,
+      medleyMinutes = medleyMinutes,
       position = position,
       mode = mode,
       password = password,
@@ -215,7 +260,9 @@ object Tournament {
   def scheduleAs(sched: Schedule, minutes: Int) =
     Tournament(
       id = makeId,
-      name = sched.name(full = false)(defaultLang),
+      name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
+        TournamentShield.MedleyShield.makeName(ms.medleyName, sched.at)
+      ),
       status = Status.Created,
       clock = Schedule clockFor sched,
       minutes = minutes,
@@ -223,11 +270,18 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = sched.variant,
+      medleyVariants = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
+      medleyMinutes = sched.medleyShield.map(_.arenaMedleyMinutes),
       position = sched.position,
       mode = Mode.Rated,
       conditions = sched.conditions,
       schedule = Some(sched),
-      startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60)
+      startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60),
+      description = sched.medleyShield.map(_.arenaDescriptionFull),
+      trophy1st = sched.medleyShield.map(_.key),
+      trophyExpiryDays = if (sched.medleyShield.isDefined) 7.some else none,
+      //we've scheduled this tour so make bots allowed for any of our tours
+      botsAllowed = true
     )
 
   def tournamentUrl(tourId: String): String = s"https://playstrategy.org/tournament/$tourId"
@@ -245,6 +299,7 @@ object Tournament {
     case object Paused        extends JoinResult("Your pause is not over yet".some)
     case object Verdicts      extends JoinResult("Tournament restrictions".some)
     case object MissingTeam   extends JoinResult("Missing team".some)
+    case object NoBotsAllowed extends JoinResult("No bots allowed".some)
     case object Nope          extends JoinResult("Couldn't join for some reason?".some)
   }
 }

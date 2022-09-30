@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import * as created from './created';
 import * as started from './started';
 import * as finished from './finished';
-import { onInsert } from './util';
+import { onInsert, medleyVariantsList } from './util';
 import { joinWithTeamSelector } from './battle';
 import TournamentController from '../ctrl';
 import { MaybeVNodes } from '../interfaces';
@@ -45,6 +45,7 @@ export default function (ctrl: TournamentController) {
           hook: onInsert(playstrategy.watchers),
         })
       : null,
+    ctrl.data.medley && handler.name == 'created' ? medleyVariantsList(ctrl, false) : null,
     ctrl.joinWithTeamSelector ? joinWithTeamSelector(ctrl) : null,
   ]);
 }

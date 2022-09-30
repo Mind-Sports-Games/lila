@@ -6,6 +6,7 @@ import * as tour from './tournament';
 import { TournamentData, TournamentOpts, Pages, PlayerInfo, TeamInfo, Standing } from './interfaces';
 // eslint-disable-next-line no-duplicate-imports
 import { TournamentSocket } from './socket';
+//import { medleyVariantListItems } from './view/util';
 
 interface CtrlTeamInfo {
   requested?: string;
@@ -24,6 +25,7 @@ export default class TournamentController {
   joinSpinner = false;
   playerInfo: PlayerInfo = {};
   teamInfo: CtrlTeamInfo = {};
+  showingMedleyVariants = false;
   disableClicks = true;
   searching = false;
   joinWithTeamSelector = false;
@@ -148,6 +150,16 @@ export default class TournamentController {
     }
   };
 
+  newVariant = (variant: Variant) => {
+    this.data.variant = variant;
+    this.data.medleyRound += 1;
+    $('.tour__notice').html(this.trans('standByXForY', this.data.me.username, variant.name));
+    //$('.medley-variants-horiz').find('.current-variant').remove();
+    $('.current-variant').removeClass('current-variant');
+    $('.medley-round-' + this.data.medleyRound).addClass('current-variant');
+    this.redraw();
+  };
+
   scrollToMe = () => {
     const page = myPage(this);
     if (page && page !== this.page) this.setPage(page);
@@ -168,11 +180,23 @@ export default class TournamentController {
       player: player,
       data: null,
     };
-    if (this.playerInfo.id) xhr.playerInfo(this, this.playerInfo.id);
+    if (this.playerInfo.id) {
+      this.setShowMedleyVariants(false);
+      xhr.playerInfo(this, this.playerInfo.id);
+    }
   };
 
   setPlayerInfoData = data => {
     if (data.player.id === this.playerInfo.id) this.playerInfo.data = data;
+  };
+
+  showMedleyVariants = bool => {
+    if (this.data.secondsToStart) return;
+    this.setShowMedleyVariants(bool);
+  };
+
+  setShowMedleyVariants = bool => {
+    this.showingMedleyVariants = bool;
   };
 
   showTeamInfo = (teamId: string) => {

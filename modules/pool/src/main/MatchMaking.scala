@@ -24,17 +24,16 @@ object MatchMaking {
 
   private object wmMatching {
 
-    // above that, no pairing is allowed
-    // 1000 ~> 130
-    // 1200 ~> 100
-    // 1500 ~> 100
-    // 2000 ~> 133
-    // 2500 ~> 166
-    // 3000 ~> 200
+    // above that, no pairing is allowed (however the miss bonus can extend this)
+    // 1000 ~> 500
+    // 1200 ~> 500
+    // 1500 ~> 500
+    // 2000 ~> 500
+    // 2500 ~> 500
+    // 3000 ~> 600
     private def ratingToMaxScore(rating: Int) =
-      if (rating < 1000) 130
-      else if (rating < 1500) 100
-      else rating / 15
+      if (rating < 2500) 500
+      else rating / 5
 
     // quality of a potential pairing. Lower is better.
     // None indicates a forbidden pairing
@@ -52,7 +51,7 @@ object MatchMaking {
     // score bonus based on how many waves the member missed
     // when the user's sit counter is lower than -3, the maximum bonus becomes lower
     private def missBonus(p: PoolMember) =
-      (p.misses * 12) atMost ((460 + (p.rageSitCounter atMost -3) * 20) atLeast 0)
+      (p.misses * 50) atMost ((760 + (p.rageSitCounter atMost -3) * 20) atLeast 0)
 
     // if players have conflicting rating ranges
     private def rangeMalus(a: PoolMember, b: PoolMember) =

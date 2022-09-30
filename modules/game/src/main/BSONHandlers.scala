@@ -1,6 +1,26 @@
 package lila.game
 
-import strategygames.{ Player => PlayerIndex, Clock, P1, P2, Game => StratGame, GameFamily, GameLogic, History, Status, Mode, Piece, Pocket, PocketData, Pockets, Pos, PositionHash, Situation, Board, Role }
+import strategygames.{
+  Player => PlayerIndex,
+  Clock,
+  P1,
+  P2,
+  Game => StratGame,
+  GameFamily,
+  GameLogic,
+  History,
+  Status,
+  Mode,
+  Piece,
+  Pocket,
+  PocketData,
+  Pockets,
+  Pos,
+  PositionHash,
+  Situation,
+  Board,
+  Role
+}
 import strategygames.chess
 import strategygames.draughts
 import strategygames.fairysf
@@ -41,31 +61,35 @@ object BSONHandlers {
     def reads(r: BSON.Reader) =
       GameLogic(r.intD("l")) match {
         case GameLogic.Chess() =>
-          PocketData.Chess(chess.PocketData(
-            pockets = {
-              val (p1, p2) = {
-                r.str("p").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
-              }.partition(_ is P1)
-              Pockets(
-                p1 = Pocket(p1.map(_.role).map(Role.ChessRole)),
-                p2 = Pocket(p2.map(_.role).map(Role.ChessRole))
-              )
-            },
-            promoted = r.str("t").view.flatMap(chess.Pos.piotr).to(Set)
-          ))
+          PocketData.Chess(
+            chess.PocketData(
+              pockets = {
+                val (p1, p2) = {
+                  r.str("p").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
+                }.partition(_ is P1)
+                Pockets(
+                  p1 = Pocket(p1.map(_.role).map(Role.ChessRole)),
+                  p2 = Pocket(p2.map(_.role).map(Role.ChessRole))
+                )
+              },
+              promoted = r.str("t").view.flatMap(chess.Pos.piotr).to(Set)
+            )
+          )
         case GameLogic.FairySF() =>
-          PocketData.FairySF(fairysf.PocketData(
-            pockets = {
-              val (p1, p2) = {
-                r.str("p").view.flatMap(c => fairysf.Piece.fromChar(GameFamily(r.intD("f")), c)).to(List)
-              }.partition(_ is P1)
-              Pockets(
-                p1 = Pocket(p1.map(_.role).map(Role.FairySFRole)),
-                p2 = Pocket(p2.map(_.role).map(Role.FairySFRole))
-              )
-            },
-            promoted = r.str("t").view.flatMap(fairysf.Pos.piotr).to(Set)
-          ))
+          PocketData.FairySF(
+            fairysf.PocketData(
+              pockets = {
+                val (p1, p2) = {
+                  r.str("p").view.flatMap(c => fairysf.Piece.fromChar(GameFamily(r.intD("f")), c)).to(List)
+                }.partition(_ is P1)
+                Pockets(
+                  p1 = Pocket(p1.map(_.role).map(Role.FairySFRole)),
+                  p2 = Pocket(p2.map(_.role).map(Role.FairySFRole))
+                )
+              },
+              promoted = r.str("t").view.flatMap(fairysf.Pos.piotr).to(Set)
+            )
+          )
         case _ => sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
       }
 
@@ -74,7 +98,7 @@ object BSONHandlers {
         "l" -> (o match {
           case PocketData.Chess(_)   => 0
           case PocketData.FairySF(_) => 2
-          case _ => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
+          case _                     => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
         }),
         "f" -> (o match {
           case PocketData.Chess(_)    => 0
@@ -103,8 +127,10 @@ object BSONHandlers {
   import Player.playerBSONHandler
   private val emptyPlayerBuilder = playerBSONHandler.read($empty)
 
-  private[game] implicit val kingMovesWriter = new BSONWriter[draughts.KingMoves] {
-    def writeTry(km: draughts.KingMoves) = Try{BSONArray(km.p1, km.p2, km.p1King.fold(0)(_.fieldNumber), km.p2King.fold(0)(_.fieldNumber))}
+  implicit private[game] val kingMovesWriter = new BSONWriter[draughts.KingMoves] {
+    def writeTry(km: draughts.KingMoves) = Try {
+      BSONArray(km.p1, km.p2, km.p1King.fold(0)(_.fieldNumber), km.p2King.fold(0)(_.fieldNumber))
+    }
   }
 
   implicit val gameBSONHandler: BSON[Game] = new BSON[Game] {
@@ -113,11 +139,11 @@ object BSONHandlers {
     import PgnImport.pgnImportBSONHandler
 
     def readChessGame(r: BSON.Reader): Game = {
-      val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val startedAtTurn = r intD F.startedAtTurn
-      val plies         = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnPlayerIndex     = PlayerIndex.fromPly(plies)
-      val createdAt     = r date F.createdAt
+      val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val startedAtTurn   = r intD F.startedAtTurn
+      val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
+      val turnPlayerIndex = PlayerIndex.fromPly(plies)
+      val createdAt       = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
       val gameVariant = ChessVariant(r intD F.variant) | ChessStandard
@@ -152,12 +178,12 @@ object BSONHandlers {
                 val counts = r.intsD(F.checkCount)
                 chess.CheckCount(~counts.headOption, ~counts.lastOption)
               } else Game.emptyCheckCount
-              ),
+            ),
             variant = gameVariant,
             pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
               case Some(PocketData.Chess(pd)) => Some(pd)
-              case None => None
-              case _ => sys.error("non chess pocket data")
+              case None                       => None
+              case _                          => sys.error("non chess pocket data")
             }
           ),
           player = turnPlayerIndex
@@ -210,18 +236,18 @@ object BSONHandlers {
 
       //lila.mon.game.fetch()
 
-      val light = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val gameVariant = DraughtsVariant(r intD F.variant) | DraughtsStandard
+      val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val gameVariant   = DraughtsVariant(r intD F.variant) | DraughtsStandard
       val startedAtTurn = r intD F.startedAtTurn
-      val plies = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val playedPlies = plies - startedAtTurn
+      val plies         = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
+      val playedPlies   = plies - startedAtTurn
 
       val decoded = r.bytesO(F.huffmanPgn).map { PdnStorage.Huffman.decode(_, playedPlies) } | {
         PdnStorage.Decoded(
           pdnMoves = PdnStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies),
           pieces = BinaryFormat.piece.readDraughts(r bytes F.binaryPieces, gameVariant),
           positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
-          lastMove = r strO F.historyLastMove flatMap(draughts.format.Uci.apply),
+          lastMove = r strO F.historyLastMove flatMap (draughts.format.Uci.apply),
           //lastMove = r strO F.historyLastMove flatMap(uci => Uci.wrap(draughts.format.Uci(uci))),
           format = PdnStorage.OldBin
         )
@@ -234,7 +260,7 @@ object BSONHandlers {
           positionHashes = decoded.positionHashes,
           kingMoves = if (gameVariant.frisianVariant || gameVariant.draughts64Variant) {
             val counts = r.intsD(F.kingMoves)
-            if (counts.length > 0){
+            if (counts.length > 0) {
               draughts.KingMoves(
                 ~counts.headOption,
                 ~counts.tail.headOption,
@@ -248,8 +274,9 @@ object BSONHandlers {
         variant = gameVariant
       )
 
-      val midCapture = decoded.pdnMoves.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
-      val currentPly = if (midCapture) plies - 1 else plies
+      val midCapture =
+        decoded.pdnMoves.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
+      val currentPly      = if (midCapture) plies - 1 else plies
       val turnPlayerIndex = PlayerIndex.fromPly(currentPly)
 
       val decodedSituation = draughts.Situation(
@@ -277,12 +304,14 @@ object BSONHandlers {
         p1Player = light.p1Player,
         p2Player = light.p2Player,
         chess = StratGame.Draughts(draughtsGame),
-        loadClockHistory = clk => for {
-          bw <- p1ClockHistory
-          bb <- p2ClockHistory
-          history <- BinaryFormat.clockHistory.read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(decodedSituation.player))
-          _ = lila.mon.game.loadClockHistory.increment()
-        } yield history,
+        loadClockHistory = clk =>
+          for {
+            bw <- p1ClockHistory
+            bb <- p2ClockHistory
+            history <- BinaryFormat.clockHistory
+              .read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(decodedSituation.player))
+            _ = lila.mon.game.loadClockHistory.increment()
+          } yield history,
         pdnStorage = Some(decoded.format),
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
@@ -302,17 +331,17 @@ object BSONHandlers {
           microMatch = r strO F.microMatch,
           drawLimit = r intO F.drawLimit,
           analysed = r boolD F.analysed,
-          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)//should be empty for draughts
+          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty) //should be empty for draughts
         )
       )
     }
 
     def readFairySFGame(r: BSON.Reader): Game = {
-      val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val startedAtTurn = r intD F.startedAtTurn
-      val plies         = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnPlayerIndex     = PlayerIndex.fromPly(plies)
-      val createdAt     = r date F.createdAt
+      val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val startedAtTurn   = r intD F.startedAtTurn
+      val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
+      val turnPlayerIndex = PlayerIndex.fromPly(plies)
+      val createdAt       = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
       val gameVariant = FairySFVariant(r intD F.variant) | FairySFStandard
@@ -341,7 +370,7 @@ object BSONHandlers {
               lastMove = decoded.lastMove,
               //castles = decoded.castles,
               halfMoveClock = decoded.halfMoveClock,
-              positionHashes = decoded.positionHashes//,
+              positionHashes = decoded.positionHashes //,
               //unmovedRooks = decoded.unmovedRooks,
               //checkCount = if (gameVariant.threeCheck) {
               //  val counts = r.intsD(F.checkCount)
@@ -351,8 +380,8 @@ object BSONHandlers {
             variant = gameVariant,
             pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
               case Some(PocketData.FairySF(pd)) => Some(pd)
-              case None => None
-              case _ => sys.error("non fairysf pocket data")
+              case None                         => None
+              case _                            => sys.error("non fairysf pocket data")
             },
             uciMoves = strategygames.fairysf.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
           ),
@@ -403,11 +432,11 @@ object BSONHandlers {
     }
 
     def readMancalaGame(r: BSON.Reader): Game = {
-      val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val startedAtTurn = r intD F.startedAtTurn
-      val plies         = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnPlayerIndex     = PlayerIndex.fromPly(plies)
-      val createdAt     = r date F.createdAt
+      val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val startedAtTurn   = r intD F.startedAtTurn
+      val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
+      val turnPlayerIndex = PlayerIndex.fromPly(plies)
+      val createdAt       = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
       val gameVariant = MancalaVariant(r intD F.variant) | MancalaStandard
@@ -518,60 +547,62 @@ object BSONHandlers {
         F.clock -> (o.chess.clock flatMap { c =>
           clockBSONWrite(o.createdAt, c).toOption
         }),
-        F.daysPerTurn       -> o.daysPerTurn,
-        F.moveTimes         -> o.binaryMoveTimes,
+        F.daysPerTurn    -> o.daysPerTurn,
+        F.moveTimes      -> o.binaryMoveTimes,
         F.p1ClockHistory -> clockHistory(P1, o.clockHistory, o.chess.clock, o.flagged),
         F.p2ClockHistory -> clockHistory(P2, o.clockHistory, o.chess.clock, o.flagged),
-        F.rated             -> w.boolO(o.mode.rated),
-        F.lib               -> o.board.variant.gameLogic.id,
-        F.variant           -> o.board.variant.exotic.option(w int o.board.variant.id),
-        F.bookmarks         -> w.intO(o.bookmarks),
-        F.createdAt         -> w.date(o.createdAt),
-        F.movedAt           -> w.date(o.movedAt),
-        F.source            -> o.metadata.source.map(_.id),
-        F.pgnImport         -> o.metadata.pgnImport,
-        F.tournamentId      -> o.metadata.tournamentId,
-        F.swissId           -> o.metadata.swissId,
-        F.simulId           -> o.metadata.simulId,
-        F.microMatch        -> o.metadata.microMatch,
-        F.drawLimit         -> o.metadata.drawLimit,
-        F.analysed          -> w.boolO(o.metadata.analysed)
+        F.rated          -> w.boolO(o.mode.rated),
+        F.lib            -> o.board.variant.gameLogic.id,
+        F.variant        -> o.board.variant.exotic.option(w int o.board.variant.id),
+        F.bookmarks      -> w.intO(o.bookmarks),
+        F.createdAt      -> w.date(o.createdAt),
+        F.movedAt        -> w.date(o.movedAt),
+        F.source         -> o.metadata.source.map(_.id),
+        F.pgnImport      -> o.metadata.pgnImport,
+        F.tournamentId   -> o.metadata.tournamentId,
+        F.swissId        -> o.metadata.swissId,
+        F.simulId        -> o.metadata.simulId,
+        F.microMatch     -> o.metadata.microMatch,
+        F.drawLimit      -> o.metadata.drawLimit,
+        F.analysed       -> w.boolO(o.metadata.analysed)
       ) ++ {
         o.board.variant.gameLogic match {
           case GameLogic.Draughts() =>
             o.pdnStorage match {
-              case Some(PdnStorage.OldBin) => $doc(
-                F.oldPgn -> PdnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
-                F.binaryPieces -> BinaryFormat.piece.writeDraughts(o.board match {
-                  case Board.Draughts(board) => board
-                  case _ => sys.error("invalid draughts board")
-                }),
-                F.positionHashes -> o.history.positionHashes,
-                F.historyLastMove -> o.history.lastMove.map(_.uci),
-                // since variants are always OldBin
-                F.kingMoves -> o.history.kingMoves.nonEmpty.option(o.history.kingMoves)
-              )
-              case Some(PdnStorage.Huffman) => $doc(
-                F.huffmanPgn -> PdnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies)
-              )
+              case Some(PdnStorage.OldBin) =>
+                $doc(
+                  F.oldPgn -> PdnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
+                  F.binaryPieces -> BinaryFormat.piece.writeDraughts(o.board match {
+                    case Board.Draughts(board) => board
+                    case _                     => sys.error("invalid draughts board")
+                  }),
+                  F.positionHashes  -> o.history.positionHashes,
+                  F.historyLastMove -> o.history.lastMove.map(_.uci),
+                  // since variants are always OldBin
+                  F.kingMoves -> o.history.kingMoves.nonEmpty.option(o.history.kingMoves)
+                )
+              case Some(PdnStorage.Huffman) =>
+                $doc(
+                  F.huffmanPgn -> PdnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies)
+                )
               case _ => sys.error("invalid draughts storage")
             }
           case GameLogic.FairySF() =>
             $doc(
-              F.oldPgn         -> PfnStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
-              F.binaryPieces   -> BinaryFormat.piece.writeFairySF(o.board match {
+              F.oldPgn -> PfnStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.binaryPieces -> BinaryFormat.piece.writeFairySF(o.board match {
                 case Board.FairySF(board) => board.pieces
-                case _ => sys.error("invalid fairysf board")
+                case _                    => sys.error("invalid fairysf board")
               }),
               F.positionHashes -> o.history.positionHashes,
               F.pocketData     -> o.board.pocketData
             )
           case GameLogic.Mancala() =>
             $doc(
-              F.oldPgn         -> PmnStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
-              F.binaryPieces   -> BinaryFormat.piece.writeMancala(o.board match {
+              F.oldPgn -> PmnStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.binaryPieces -> BinaryFormat.piece.writeMancala(o.board match {
                 case Board.Mancala(board) => board.pieces
-                case _ => sys.error("invalid mancala board")
+                case _                    => sys.error("invalid mancala board")
               }),
               F.positionHashes -> o.history.positionHashes
             )
@@ -580,10 +611,10 @@ object BSONHandlers {
               $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies))
             else {
               $doc(
-                F.oldPgn         -> PgnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
-                F.binaryPieces   -> BinaryFormat.piece.writeChess(o.board match {
+                F.oldPgn -> PgnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
+                F.binaryPieces -> BinaryFormat.piece.writeChess(o.board match {
                   case Board.Chess(board) => board.pieces
-                  case _ => sys.error("invalid chess board")
+                  case _                  => sys.error("invalid chess board")
                 }),
                 F.positionHashes -> o.history.positionHashes,
                 F.unmovedRooks   -> o.history.unmovedRooks,
@@ -593,7 +624,7 @@ object BSONHandlers {
                       castles = o.history.castles,
                       lastMove = o.history match {
                         case History.Chess(h) => h.lastMove
-                        case _ => sys.error("Invalid history")
+                        case _                => sys.error("Invalid history")
                       }
                     )
                   )
@@ -618,8 +649,8 @@ object BSONHandlers {
 
     def readsWithPlayerIds(r: BSON.Reader, playerIds: String): LightGame = {
       val (p1Id, p2Id)   = playerIds splitAt 4
-      val winC                 = r boolO F.winnerPlayerIndex map(PlayerIndex.fromP1)
-      val uids                 = ~r.getO[List[lila.user.User.ID]](F.playerUids)
+      val winC           = r boolO F.winnerPlayerIndex map (PlayerIndex.fromP1)
+      val uids           = ~r.getO[List[lila.user.User.ID]](F.playerUids)
       val (p1Uid, p2Uid) = (uids.headOption.filter(_.nonEmpty), uids.lift(1).filter(_.nonEmpty))
       def makePlayer(field: String, playerIndex: PlayerIndex, id: Player.ID, uid: Player.UserId): Player = {
         val builder = r.getO[Player.Builder](field)(playerBSONHandler) | emptyPlayerBuilder
@@ -629,7 +660,9 @@ object BSONHandlers {
         id = r str F.id,
         p1Player = makePlayer(F.p1Player, P1, p1Id, p1Uid),
         p2Player = makePlayer(F.p2Player, P2, p2Id, p2Uid),
-        status = r.get[Status](F.status)
+        status = r.get[Status](F.status),
+        lib = r intD F.lib,
+        variant_id = r intD F.variant
       )
     }
   }

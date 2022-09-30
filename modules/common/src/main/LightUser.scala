@@ -49,4 +49,13 @@ object LightUser {
   final class IsBotSync(f: UserID => Boolean) extends (UserID => Boolean) {
     def apply(userId: UserID) = f(userId)
   }
+
+  //when adding an entry here will want to consider whether we want to add a default rating
+  //see modules/rating/src/main/Glicko.scala Glicko.defaultBots
+  val tourBots: List[LightUser] = List(
+    LightUser("pst-rando", "PST-Rando", "BOT".some, false)
+  )
+
+  val tourBotsIDs: List[UserID] = tourBots.map(_.id)
+
 }

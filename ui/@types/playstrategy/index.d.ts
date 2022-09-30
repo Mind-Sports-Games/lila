@@ -427,6 +427,7 @@ interface Variant {
   title?: string;
   lib: number;
   boardSize: BoardDim;
+  iconChar?: string;
 }
 
 interface DraughtsVariant {
@@ -436,6 +437,7 @@ interface DraughtsVariant {
   title?: string;
   board: BoardData;
   lib: number;
+  iconChar?: string;
 }
 
 interface BoardDim {

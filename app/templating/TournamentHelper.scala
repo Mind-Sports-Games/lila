@@ -48,10 +48,10 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
   object scheduledTournamentNameShortHtml {
     private def icon(c: Char) = s"""<span data-icon="$c"></span>"""
     private val replacements = List(
-      "PlayStrategy "    -> "",
-      "Marathon"    -> icon('\\'),
-      "HyperBullet" -> s"H${icon(Speed.Bullet.perfIcon)}",
-      "SuperBlitz"  -> s"S${icon(Speed.Blitz.perfIcon)}"
+      "PlayStrategy " -> "",
+      "Marathon"      -> icon('\\'),
+      "HyperBullet"   -> s"H${icon(Speed.Bullet.perfIcon)}",
+      "SuperBlitz"    -> s"S${icon(Speed.Blitz.perfIcon)}"
     ) ::: PerfType.leaderboardable.filterNot(PerfType.translated.contains).map { pt =>
       pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
     }
@@ -67,6 +67,6 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
   def tournamentIconChar(tour: Tournament): String =
     tour.schedule.map(_.freq) match {
       case Some(Schedule.Freq.Marathon | Schedule.Freq.ExperimentalMarathon) => "\\"
-      case _                                                                 => tour.spotlight.flatMap(_.iconFont) | tour.perfType.iconChar.toString
+      case _                                                                 => tour.spotlight.flatMap(_.iconFont) | tour.iconChar.toString
     }
 }

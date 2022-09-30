@@ -139,11 +139,17 @@ object PerfType {
   def iconByVariant(variant: Variant): Char =
     byVariant(variant).fold('C')(_.iconChar)
 
+  private def trimTrans(trans: String, maxLength: Int = 10): String =
+    trans.substring(0, Math.min(trans.length(), maxLength))
+
   def trans(pt: PerfType)(implicit lang: Lang): String =
     pt.key match {
-      case "rapid"          => I18nKeys.rapid.txt()
-      case "classical"      => I18nKeys.classical.txt()
-      case "Correspondence" => I18nKeys.correspondence.txt()
+      case "ultraBullet"    => "UltraBullet Chess"
+      case "bullet"         => "Bullet Chess"
+      case "blitz"          => "Blitz Chess"
+      case "rapid"          => s"${trimTrans(I18nKeys.rapid.txt())} Chess"
+      case "classical"      => s"${trimTrans(I18nKeys.classical.txt())} Chess"
+      case "correspondence" => s"${trimTrans(I18nKeys.correspondence.txt())} Chess"
       case "puzzle"         => I18nKeys.puzzles.txt()
       case _                => pt.name
     }

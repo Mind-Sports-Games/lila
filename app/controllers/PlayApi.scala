@@ -148,7 +148,7 @@ final class PlayApi(
 
   def botOnline =
     Open { implicit ctx =>
-      env.user.repo.botsByIds(env.bot.onlineApiUsers.get) map { users =>
+      env.user.repo.botsByIds(env.bot.onlineApiUsers.get.filterNot(_.startsWith("pst-"))) map { users =>
         Ok(views.html.user.bots(users))
       }
     }

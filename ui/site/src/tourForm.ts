@@ -15,6 +15,7 @@ playstrategy.load.then(() => {
         .add($perPairingDrawTables)
         .toggle(($variant.val() as string).startsWith('1_') && !$medley.is(':checked')),
     showMedleySettings = () => {
+      $('.form3 .medleyMinutes').toggle($medley.is(':checked'));
       $('.form3 .medleyDefaults').toggle($medley.is(':checked'));
       $('.form3 .medleyGameFamily').toggle($medley.is(':checked'));
       $('.form3 .variant').toggle(!$medley.is(':checked'));

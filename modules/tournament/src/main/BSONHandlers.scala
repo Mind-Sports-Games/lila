@@ -13,6 +13,8 @@ import lila.user.User.playstrategyId
 
 object BSONHandlers {
 
+  implicit val stratVariantHandler = stratVariantByKeyHandler
+
   implicit private[tournament] val statusBSONHandler = tryHandler[Status](
     { case BSONInteger(v) => Status(v) toTry s"No such status: $v" },
     x => BSONInteger(x.id)
@@ -77,6 +79,8 @@ object BSONHandlers {
         clock = r.get[strategygames.Clock.Config]("clock"),
         minutes = r int "minutes",
         variant = variant,
+        medleyVariants = r.getO[List[Variant]]("mVariants"),
+        medleyMinutes = r.intO("mMinutes"),
         position = position,
         mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,
         password = r.strO("password"),
@@ -88,7 +92,7 @@ object BSONHandlers {
           doc   <- r.getO[Bdoc]("schedule")
           freq  <- doc.getAsOpt[Schedule.Freq]("freq")
           speed <- doc.getAsOpt[Schedule.Speed]("speed")
-        } yield Schedule(freq, speed, variant, position, startsAt, None, conditions),
+        } yield Schedule(freq, speed, variant, position, startsAt, None, None, conditions),
         nbPlayers = r int "nbPlayers",
         createdAt = r date "createdAt",
         createdBy = r strO "createdBy" getOrElse playstrategyId,
@@ -99,39 +103,46 @@ object BSONHandlers {
         trophy1st = r strO "trophy1st",
         trophy2nd = r strO "trophy2nd",
         trophy3rd = r strO "trophy3rd",
+        trophyExpiryDays = r intO "trophyExpiryDays",
+        botsAllowed = r boolD "botsAllowed",
         description = r strO "description",
         hasChat = r boolO "chat" getOrElse true
       )
     }
     def writes(w: BSON.Writer, o: Tournament) =
       $doc(
-        "_id"         -> o.id,
-        "name"        -> o.name,
-        "status"      -> o.status,
-        "clock"       -> o.clock,
-        "minutes"     -> o.minutes,
-        "lib"         -> o.variant.gameLogic.id,
-        "variant"     -> o.variant.some.filterNot(_.standard).map(_.id),
-        "fen"         -> o.position.map(_.value),
-        "mode"        -> o.mode.some.filterNot(_.rated).map(_.id),
-        "password"    -> o.password,
-        "conditions"  -> o.conditions.ifNonEmpty,
-        "teamBattle"  -> o.teamBattle,
-        "noBerserk"   -> w.boolO(o.noBerserk),
-        "noStreak"    -> w.boolO(o.noStreak),
-        "schedule"    -> o.schedule,
-        "nbPlayers"   -> o.nbPlayers,
-        "createdAt"   -> w.date(o.createdAt),
-        "createdBy"   -> o.nonPlayStrategyCreatedBy,
-        "startsAt"    -> w.date(o.startsAt),
-        "winner"      -> o.winnerId,
-        "featured"    -> o.featuredId,
-        "spotlight"   -> o.spotlight,
-        "trophy1st"   -> o.trophy1st,
-        "trophy2nd"   -> o.trophy2nd,
-        "trophy3rd"   -> o.trophy3rd,
-        "description" -> o.description,
-        "chat"        -> (!o.hasChat).option(false)
+        "_id"              -> o.id,
+        "name"             -> o.name,
+        "status"           -> o.status,
+        "clock"            -> o.clock,
+        "minutes"          -> o.minutes,
+        "lib"              -> o.variant.gameLogic.id,
+        "variant"          -> o.variant.some.filterNot(_.standard).map(_.id),
+        "mVariants"        -> o.medleyVariants,
+        "mMinutes"         -> o.medleyMinutes,
+        "fen"              -> o.position.map(_.value),
+        "mode"             -> o.mode.some.filterNot(_.rated).map(_.id),
+        "password"         -> o.password,
+        "conditions"       -> o.conditions.ifNonEmpty,
+        "forTeams"         -> o.conditions.teamMember.map(_.teamId),
+        "teamBattle"       -> o.teamBattle,
+        "noBerserk"        -> w.boolO(o.noBerserk),
+        "noStreak"         -> w.boolO(o.noStreak),
+        "schedule"         -> o.schedule,
+        "nbPlayers"        -> o.nbPlayers,
+        "createdAt"        -> w.date(o.createdAt),
+        "createdBy"        -> o.nonPlayStrategyCreatedBy,
+        "startsAt"         -> w.date(o.startsAt),
+        "winner"           -> o.winnerId,
+        "featured"         -> o.featuredId,
+        "spotlight"        -> o.spotlight,
+        "trophy1st"        -> o.trophy1st,
+        "trophy2nd"        -> o.trophy2nd,
+        "trophy3rd"        -> o.trophy3rd,
+        "trophyExpiryDays" -> o.trophyExpiryDays,
+        "botsAllowed"      -> o.botsAllowed,
+        "description"      -> o.description,
+        "chat"             -> (!o.hasChat).option(false)
       )
   }
 
@@ -143,6 +154,7 @@ object BSONHandlers {
         userId = r str "uid",
         rating = r int "r",
         provisional = r boolD "pr",
+        isBot = r boolD "b",
         withdraw = r boolD "w",
         score = r intD "s",
         fire = r boolD "f",
@@ -156,6 +168,7 @@ object BSONHandlers {
         "uid" -> o.userId,
         "r"   -> o.rating,
         "pr"  -> w.boolO(o.provisional),
+        "b"   -> w.boolO(o.isBot),
         "w"   -> w.boolO(o.withdraw),
         "s"   -> w.intO(o.score),
         "m"   -> o.magicScore,

@@ -15,6 +15,7 @@
   <string name="linesOfAction">LOA</string>
   <string name="scrambledEggs">SEggs</string>
   <string name="international">Int</string>
+  <string name="draughtsFromPosition">FEN</string>
   <string name="antidraughts">AntiD</string>
   <string name="brazilian">Brazil</string>
   <string name="breakthrough">BreakT</string>
