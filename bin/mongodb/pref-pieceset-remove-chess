@@ -1,0 +1,38 @@
+db.pref.count()
+
+//find out populatiry of piecesets
+var pSets = {0 : {}, 1: {}, 2: {}, 3: {}, 4:{}, 5:{}, 6:{}};
+db.pref.find().forEach(c => {
+  var ps = c.pieceSet;
+  for (let i=0; i < ps.length; i++){
+    var name = ps[i].name;
+    var gf = ps[i].gameFamily;
+    if (name in pSets[gf]){
+      pSets[gf][name] += 1
+    }else{
+      pSets[gf][name] = 1
+    }
+  }
+});
+printjson(pSets);
+print("done");
+//print(new Array(...pSets[0]).join(' '));
+
+//Uupdate removed piece sets back to default 
+db.pref.find().forEach(c => {
+  var ps = c.pieceSet;
+  if (["icpieces","pixel","riohacha", "horsey", "chessnut", "chess7"].includes(ps[0].name)){
+    print(c._id + " uses " + ps[0].name);
+    ps[0].name = 'staunty';
+    db.pref.update(
+    { _id: c._id },
+    {
+      $set: {
+        pieceSet: ps
+      },
+    });
+    print(c._id + " updated to use staunty");
+}
+});
+
+//["icpieces","pixel","riohacha", "horsey", "chessnut", "chess7"]

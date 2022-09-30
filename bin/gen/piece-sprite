@@ -14,17 +14,13 @@ chess_themes = [
   ['merida', 'svg'],
   ['pirouetti', 'svg'],
   ['spatial', 'svg'],
-  ['chess7', 'svg'],
   ['reillycraig', 'svg'],
   ['fantasy', 'svg'],
   ['shapes', 'svg'],
-  ['chessnut', 'svg'],
   ['companion', 'svg'],
   ['letter', 'svg'],
-  ['riohacha', 'svg'],
   ['leipzig', 'svg'],
   ['kosal', 'svg'],
-  ['pixel', 'svg'],
   ['california', 'svg'],
   ['maestro', 'svg'],
   ['fresca', 'svg'],
@@ -35,8 +31,6 @@ chess_themes = [
   ['governor', 'svg'],
   ['libra', 'svg'],
   ['dubrovny', 'svg'],
-  ['icpieces', 'svg'],
-  ['horsey', 'svg']
 ]
 draughts_themes = [
   ['wide_crown', 'svg'],
@@ -69,6 +63,7 @@ mancala_themes =[
   ['blue_mancala', 'svg'],
   ['grey_mancala', 'svg'],
   ['green_numbers_mancala', 'svg'],
+  ['green_seed_mancala', 'svg'],
 ]
 types = {
   'svg' => 'svg+xml;base64,',
