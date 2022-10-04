@@ -541,6 +541,7 @@ object JsonView {
           "score"  -> p.score,
           "sheet"  -> sheet.map(sheetJson(streakable))
         )
+        .add("country" -> light.flatMap(_.country))
         .add("title" -> light.flatMap(_.title))
         .add("provisional" -> p.provisional)
         .add("withdraw" -> p.withdraw)
