@@ -5,6 +5,7 @@ import play.api.libs.json._
 case class LightUser(
     id: String,
     name: String,
+    country: Option[String],
     title: Option[String],
     isPatron: Boolean
 ) {
@@ -18,7 +19,7 @@ object LightUser {
 
   private type UserID = String
 
-  val ghost = LightUser("ghost", "ghost", none, false)
+  val ghost = LightUser("ghost", "ghost", none, none, false)
 
   implicit val lightUserWrites = OWrites[LightUser] { u =>
     writeNoId(u) + ("id" -> JsString(u.id))
@@ -27,6 +28,7 @@ object LightUser {
   def writeNoId(u: LightUser): JsObject =
     Json
       .obj("name" -> u.name)
+      .add("country" -> u.country)
       .add("title" -> u.title)
       .add("patron" -> u.isPatron)
 
@@ -34,6 +36,7 @@ object LightUser {
     LightUser(
       id = name.toLowerCase,
       name = name,
+      country = None,
       title = None,
       isPatron = false
     )
@@ -53,7 +56,7 @@ object LightUser {
   //when adding an entry here will want to consider whether we want to add a default rating
   //see modules/rating/src/main/Glicko.scala Glicko.defaultBots
   val tourBots: List[LightUser] = List(
-    LightUser("pst-rando", "PST-Rando", "BOT".some, false)
+    LightUser("pst-rando", "PST-Rando", "_playstrategy".some, "BOT".some, false)
   )
 
   val tourBotsIDs: List[UserID] = tourBots.map(_.id)
