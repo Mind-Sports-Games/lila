@@ -91,6 +91,7 @@ object side {
         showNonEmptyPerf(u.perfs.russian, PerfType.orDefault("russian")),
         showNonEmptyPerf(u.perfs.brazilian, PerfType.orDefault("brazilian")),
         showNonEmptyPerf(u.perfs.pool, PerfType.orDefault("pool")),
+        showNonEmptyPerf(u.perfs.portuguese, PerfType.orDefault("portuguese")),
         showNonEmptyPerf(u.perfs.shogi, PerfType.orDefault("shogi")),
         showNonEmptyPerf(u.perfs.xiangqi, PerfType.orDefault("xiangqi")),
         showNonEmptyPerf(u.perfs.minishogi, PerfType.orDefault("minishogi")),

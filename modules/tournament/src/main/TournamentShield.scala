@@ -388,6 +388,13 @@ object TournamentShield {
           25
         )
 
+    //case object Portuguese
+    //    extends Category(
+    //      Variant.Draughts(strategygames.draughts.variant.Portuguese),
+    //      Blitz32,
+    //      29
+    //    )
+
     case object Shogi
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.Shogi),
@@ -459,6 +466,7 @@ object TournamentShield {
       Russian,
       Brazilian,
       Pool,
+      //Portuguese,
       Shogi,
       Xiangqi,
       MiniShogi,
