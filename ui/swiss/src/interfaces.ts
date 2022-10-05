@@ -91,7 +91,7 @@ export interface PairingBase {
   g: string; // game
   o?: boolean; // ongoing
   w?: boolean; // won
-  m: boolean; // isMicroMatch
+  m?: boolean; // isMicroMatch
   mmid?: string; // isMicroMatch
   mmids?: string[]; //multimatch gameids
   ms: boolean; // useMatchScore

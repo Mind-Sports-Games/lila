@@ -208,7 +208,7 @@ final class PgnDump(
           teams.map { t => Tag("P2Team", t.p2) },
           Tag(_.Variant, VariantKeys.variantName(game.variant).capitalize).some,
           Tag.timeControl(game.clock.map(_.config)).some,
-          game.metadata.multiMatchGameId.map(gameId => Tag(_.MicroMatch, gameId)),
+          game.metadata.multiMatchGameId.map(gameId => Tag(_.MultiMatch, gameId)),
           Tag(_.ECO, game.opening.fold("?")(_.opening.eco)).some,
           withOpening option Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
           Tag(

@@ -230,20 +230,21 @@ object SwissJson {
       )
 
   def playerJsonExt(swiss: Swiss, view: SwissPlayer.ViewExt): JsObject =
-    playerJsonBase(view, performance = true) ++ Json.obj(
-      "sheet" -> swiss.allRounds
-        .zip(view.sheet.outcomes)
-        .reverse
-        .map { case (round, outcome) =>
-          view.pairings.get(round).fold[JsValue](JsString(outcomeJson(outcome))) { p =>
-            pairingJson(view.player, p.pairing) ++
-              Json.obj(
-                "user"   -> p.player.user,
-                "rating" -> p.player.player.rating
-              )
+    playerJsonBase(view, performance = true) ++ Json
+      .obj(
+        "sheet" -> swiss.allRounds
+          .zip(view.sheet.outcomes)
+          .reverse
+          .map { case (round, outcome) =>
+            view.pairings.get(round).fold[JsValue](JsString(outcomeJson(outcome))) { p =>
+              pairingJson(view.player, p.pairing) ++
+                Json.obj(
+                  "user"   -> p.player.user,
+                  "rating" -> p.player.player.rating
+                )
+            }
           }
-        }
-    )
+      )
 
   private def playerJsonBase(
       view: SwissPlayer.Viewish,
@@ -280,8 +281,6 @@ object SwissJson {
     val status =
       if (pairing.isOngoing) "o"
       else pairing.resultFor(player.userId).fold("d") { r => if (r) "w" else "l" }
-    val microMatch    = if (pairing.isMicroMatch) "m" else ""
-    val microMatchId  = pairing.microMatchGameId.fold("")(g => s"_${g}")
     val multiMatchIds = pairing.multiMatchGameIds.fold("")(l => "_" + l.mkString("_"))
     val useMatchScore = if (pairing.useMatchScore) "s" else ""
     val matchScore =
@@ -289,7 +288,7 @@ object SwissJson {
     val bestOfX    = if (pairing.isBestOfX) "x" else ""
     val playX      = if (pairing.isPlayX) "px" else ""
     val openingFEN = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
-    s"${pairing.gameId}$status${pairing.nbGamesPerRound}$bestOfX$playX$useMatchScore$matchScore$microMatch$microMatchId$multiMatchIds$openingFEN"
+    s"${pairing.gameId}$status${pairing.nbGamesPerRound}$bestOfX$playX$useMatchScore$matchScore$multiMatchIds$openingFEN"
   }
 
   private def pairingJson(player: SwissPlayer, pairing: SwissPairing) =
