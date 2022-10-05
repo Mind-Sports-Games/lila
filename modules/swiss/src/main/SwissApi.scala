@@ -458,16 +458,16 @@ final class SwissApi(
         .one[SwissPairing]
     }
 
-  private[swiss] def updateMicroMatchProgress(game: Game): Funit = {
-    getSwissPairingForGame(game).flatMap {
-      _ ?? { pairing =>
-        getGamesMap(List(pairing.id) ++ pairing.microMatchGameId) map { gamesById =>
-          toSwissPairingGames(pairing.swissId, pairing, gamesById) map updateMicroMatchProgress
-        }
-      }
-    }
-    funit
-  }
+  // private[swiss] def updateMicroMatchProgress(game: Game): Funit = {
+  //   getSwissPairingForGame(game).flatMap {
+  //     _ ?? { pairing =>
+  //       getGamesMap(List(pairing.id) ++ pairing.microMatchGameId) map { gamesById =>
+  //         toSwissPairingGames(pairing.swissId, pairing, gamesById) map updateMicroMatchProgress
+  //       }
+  //     }
+  //   }
+  //   funit
+  // }
 
   private[swiss] def updateMultiMatchProgress(game: Game): Funit = {
     getSwissPairingForGame(game).flatMap {
@@ -550,14 +550,14 @@ final class SwissApi(
       }
     }
 
-  private[swiss] def updateMicroMatchProgress(game: SwissPairingGames): Funit =
-    (game.finishedOrAborted, game.isMicroMatch, game.microMatchGame) match {
-      case (true, _, _)           => finishGame(game)
-      case (false, true, None)    => rematch(game)
-      case (false, true, Some(_)) => funit // This will be called by checkOngoingGames
-      case (false, false, _) =>
-        sys.error("Why is this being called when the game isn't finished and not a micromatch!?")
-    }
+  // private[swiss] def updateMicroMatchProgress(game: SwissPairingGames): Funit =
+  //   (game.finishedOrAborted, game.isMicroMatch, game.microMatchGame) match {
+  //     case (true, _, _)           => finishGame(game)
+  //     case (false, true, None)    => rematch(game)
+  //     case (false, true, Some(_)) => funit // This will be called by checkOngoingGames
+  //     case (false, false, _) =>
+  //       sys.error("Why is this being called when the game isn't finished and not a micromatch!?")
+  //   }
 
   private[swiss] def updateMultiMatchProgress(game: SwissPairingGames): Funit =
     (

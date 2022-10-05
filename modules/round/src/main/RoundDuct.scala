@@ -18,7 +18,6 @@ import lila.hub.actorApi.round.{
   FishnetPlay,
   FishnetStart,
   IsOnGame,
-  MicroRematch,
   MultiMatchRematch,
   RematchNo,
   RematchYes,

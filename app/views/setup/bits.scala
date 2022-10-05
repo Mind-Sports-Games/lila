@@ -140,11 +140,6 @@ private object bits {
     renderLabel(field, labelContent)
   )
 
-  // def renderMicroMatch(form: Form[_])(implicit ctx: Context) =
-  //   div(cls := "micro_match", title := trans.microMatchDefinition.txt())(
-  //     renderCheckbox(form("microMatch"), trans.microMatch())
-  //   )
-
   def renderMultiMatch(form: Form[_])(implicit ctx: Context) =
     div(cls := "multi_match", title := trans.multiMatchDefinition.txt())(
       renderCheckbox(form("multiMatch"), trans.multiMatch())

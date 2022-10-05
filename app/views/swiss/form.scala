@@ -28,7 +28,6 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            //fields.microMatch,
             fields.xGamesChoice,
             form3.split(fields.useMatchScore, fields.nbGamesPerRound),
             form3.split(fields.drawTables, fields.perPairingDrawTables),
@@ -70,7 +69,6 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            //fields.microMatch,
             fields.xGamesChoice,
             form3.split(fields.useMatchScore, fields.nbGamesPerRound),
             form3.split(fields.drawTables, fields.perPairingDrawTables),
@@ -165,15 +163,6 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         help = raw("Games are rated and impact players ratings").some
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
-    )
-  def microMatch =
-    frag(
-      form3.checkbox(
-        form("microMatch"),
-        trans.microMatch(),
-        half = true,
-        help = raw(trans.microMatchDefinition.txt().replace("(", "<br>(")).some
-      )
     )
   def useMatchScore =
     frag(

@@ -274,7 +274,6 @@ package round {
   case class Abort(playerId: String)
   case class Resign(playerId: String)
   case class Mlat(micros: Int)
-  case object MicroRematch
   case object MultiMatchRematch
 }
 

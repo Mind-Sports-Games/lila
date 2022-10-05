@@ -52,10 +52,6 @@ object jsI18n {
     trans.viewTournament
   ).map(_.key)
 
-  // private val microMatchTranslations = Vector(
-  //   trans.microMatchRematchAwaiting
-  // ).map(_.key)
-
   private val multiMatchTranslations = Vector(
     trans.multiMatchRematchAwaiting
   ).map(_.key)
