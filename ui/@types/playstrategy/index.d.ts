@@ -262,6 +262,7 @@ interface Study {
 
 interface LightUserNoId {
   name: string;
+  country?: string;
   title?: string;
   patron?: boolean;
 }

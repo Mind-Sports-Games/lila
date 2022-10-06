@@ -37,11 +37,25 @@ export function player(p: BasePlayer, asLink: boolean, withRating: boolean) {
         destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
       },
     },
-    [
-      h('span.name', userName(p.user)),
-      withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
-    ]
+    [h('div.player-info', playerInfo(p, withRating))]
   );
+}
+
+export function playerInfo(p: BasePlayer, withRating: boolean) {
+  return [
+    p.user.country
+      ? h(
+          'span.country',
+          h('img.flag', {
+            attrs: {
+              src: playstrategy.assetUrl('images/flags/' + p.user.country + '.png'),
+            },
+          })
+        )
+      : null,
+    h('span.name', userName(p.user)),
+    withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
+  ];
 }
 
 export const ratio2percent = (r: number) => Math.round(100 * r) + '%';
