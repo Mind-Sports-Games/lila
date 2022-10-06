@@ -50,8 +50,11 @@ object LightUser {
     def apply(userId: UserID) = f(userId)
   }
 
-  //when adding an entry here will want to consider whether we want to add a default rating
-  //see modules/rating/src/main/Glicko.scala Glicko.defaultBots
+  //If adding a second bot to the list will need to consider the pairing algorithm in
+  //modules/tournament/src/main/arena/PairingSystem.scala
+  //as this will only use the first bot in this list that is in a tournament
+  //but the auto subscribeBotsToShields code will make all bots that are listed here
+  //join any shield tournaments
   val tourBots: List[LightUser] = List(
     LightUser("pst-rando", "PST-Rando", "BOT".some, false)
   )

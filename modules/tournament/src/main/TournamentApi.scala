@@ -361,7 +361,8 @@ final class TournamentApi(
       playerRepo.exists(tour.id, me.id) flatMap { playerExists =>
         import Tournament.JoinResult
         val fuResult: Fu[JoinResult] =
-          if (!playerExists && tour.password.exists(p => !password.has(p))) fuccess(JoinResult.WrongPassword)
+          if (!playerExists && tour.password.exists(p => !password.has(p)))
+            fuccess(JoinResult.WrongPassword)
           else if (!tour.botsAllowed && me.isBot) fuccess(JoinResult.NoBotsAllowed)
           else
             getVerdicts(tour, me.some, getUserTeamIds) flatMap { verdicts =>
@@ -410,7 +411,15 @@ final class TournamentApi(
       isLeader: Boolean
   ): Fu[Tournament.JoinResult] = {
     val promise = Promise[Tournament.JoinResult]()
-    join(tourId, me, password, teamId, getUserTeamIds, isLeader, promise.some)
+    join(
+      tourId,
+      me,
+      password,
+      teamId,
+      getUserTeamIds,
+      isLeader,
+      promise.some
+    )
     promise.future.withTimeoutDefault(5.seconds, Tournament.JoinResult.Nope)
   }
 
@@ -849,6 +858,26 @@ final class TournamentApi(
           cooldown = 15.seconds
         )
   }
+
+  private[tournament] def subscribeBotsToShields: Funit =
+    fuccess(
+      for {
+        botUsers    <- userRepo.byIds(LightUser.tourBotsIDs)
+        shieldTours <- tournamentRepo.byScheduleCategory(Schedule.Freq.shields)
+      } for {
+        botUser <- botUsers
+        tour    <- shieldTours
+      } join(
+        tour.id,
+        botUser,
+        none,
+        none,
+        getUserTeamIds = _ => fuccess(TournamentShield.MedleyShield.medleyTeamIDs),
+        false,
+        none
+      )
+    )
+
 }
 
 private object TournamentApi {
