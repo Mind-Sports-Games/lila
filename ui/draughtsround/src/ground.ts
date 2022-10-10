@@ -23,7 +23,7 @@ export function makeConfig(ctrl: RoundController): Config {
     orientation: boardOrientation(data, ctrl.flip),
     boardSize: data.game.variant.board.size,
     turnPlayerIndex: (step.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'p1' : 'p2',
-    lastMove: util.uci2move(step.uci),
+    lastMove: util.uci2move(step.lidraughtsUci),
     captureLength: data.captureLength,
     coordinates: data.pref.coords, // TODO: When we get these as prefs we need to be able to change this.
     coordSystem: ctrl.coordSystem(),
