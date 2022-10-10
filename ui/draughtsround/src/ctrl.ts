@@ -209,7 +209,7 @@ export default class RoundController {
       ghosts = countGhosts(s.fen),
       config: CgConfig = {
         fen: s.fen,
-        lastMove: util.uci2move(s.uci),
+        lastMove: util.uci2move(s.lidraughtsUci),
         turnPlayerIndex: (this.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'p1' : 'p2',
       };
     if (this.replaying()) this.draughtsground.stop();
@@ -333,7 +333,6 @@ export default class RoundController {
     const d = this.data,
       playing = this.isPlaying(),
       ghosts = countGhosts(o.fen);
-
     d.game.turns = o.ply;
     d.game.player = o.ply % 2 === 0 ? 'p1' : 'p2';
     const playedPlayerIndex = o.ply % 2 === 0 ? 'p2' : 'p1',
@@ -349,7 +348,6 @@ export default class RoundController {
     if (!this.replaying()) {
       //Show next ply if we're following the head of the line (not replaying)
       this.ply = d.game.turns + (ghosts > 0 ? 1 : 0);
-
       if (o.role)
         this.draughtsground.newPiece(
           {
@@ -382,6 +380,7 @@ export default class RoundController {
         fen: o.fen,
         san: o.san,
         uci: o.uci,
+        lidraughtsUci: o.uci,
       },
       this.coordSystem()
     );
