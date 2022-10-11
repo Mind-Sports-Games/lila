@@ -58,7 +58,7 @@ private object LightUserApi {
     } yield LightUser(
       id = id,
       name = name,
-      country = doc.string(F.country),
+      country = ~doc.child(F.profile).flatMap(_.getAsOpt[String]("country")).some,
       title = doc.string(F.title),
       isPatron = ~doc.child(F.plan).flatMap(_.getAsOpt[Boolean]("active"))
     )
