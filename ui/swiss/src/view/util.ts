@@ -1,6 +1,7 @@
 import { Attrs, h, Hooks, VNode } from 'snabbdom';
-import { BasePlayer, PairingBase } from '../interfaces';
+import { BasePlayer } from '../interfaces';
 import { numberFormat } from 'common/number';
+import SwissCtrl from '../ctrl';
 
 export function bind(eventName: string, f: (e: Event) => any, redraw?: () => void): Hooks {
   return onInsert(el =>
@@ -72,10 +73,10 @@ export function spinner(): VNode {
   ]);
 }
 
-export function matchScoreDisplay(p: PairingBase): string {
+export function matchScoreDisplay(mp: string | undefined): string {
   const regex = /^[0-9]*$/g;
-  if (p.mp && regex.test(p.mp)) {
-    const score = parseInt(p.mp, 10);
+  if (mp && regex.test(mp)) {
+    const score = parseInt(mp, 10);
     const isOdd = score % 2 == 1;
     const oddPart = isOdd ? '½' : '';
     const base = Math.floor(score / 2);
@@ -87,4 +88,8 @@ export function matchScoreDisplay(p: PairingBase): string {
   } else {
     return '?';
   }
+}
+
+export function multiMatchByeScore(ctrl: SwissCtrl): string {
+  return (ctrl.data.isPlayX ? ctrl.data.nbGamesPerRound * 2 : ctrl.data.nbGamesPerRound + 2).toString();
 }

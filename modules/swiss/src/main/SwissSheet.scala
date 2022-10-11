@@ -73,9 +73,15 @@ private object SwissSheet {
                 else List(Loss)
             }
           case None if player.byes(round) =>
-            if (swiss.settings.isMatchScore && (swiss.settings.isBestOfX || swiss.settings.isPlayX))
-              List.fill(swiss.settings.nbGamesPerRound)(Bye)
-            else List(Bye)
+            if (swiss.settings.isMatchScore) {
+              if (swiss.settings.isBestOfX) {
+                List.fill(swiss.settings.nbGamesPerRound / 2 + 1)(
+                  Bye
+                ) // odd nbGamesPerRound not allowed in form for this setup...
+              } else {
+                List.fill(swiss.settings.nbGamesPerRound)(Bye)
+              }
+            } else List(Bye)
           case None => List(Absent)
         }
       }

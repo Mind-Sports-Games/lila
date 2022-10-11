@@ -1,5 +1,14 @@
 import { h, VNode } from 'snabbdom';
-import { spinner, bind, userName, dataIcon, player as renderPlayer, numberRow, matchScoreDisplay } from './util';
+import {
+  spinner,
+  bind,
+  userName,
+  dataIcon,
+  player as renderPlayer,
+  numberRow,
+  matchScoreDisplay,
+  multiMatchByeScore,
+} from './util';
 import { PairingExt, Outcome } from '../interfaces';
 import { isOutcome } from '../util';
 import SwissCtrl from '../ctrl';
@@ -44,8 +53,8 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
   const noarg = ctrl.trans.noarg;
   const tag = 'div.swiss__player-info.swiss__table';
   if (data?.user.id !== ctrl.playerInfoId) return h(tag, [h('div.stats', [h('h2', ctrl.playerInfoId), spinner()])]);
-  const games = data.sheet.filter((p: any) => p.g).length;
-  const wins = data.sheet.filter((p: any) => p.w).length;
+  const games = data.sheet.filter((p: any) => p.g).length; //todo change for multi match
+  const wins = data.sheet.filter((p: any) => p.w).length; //todo change for multi match
   const avgOp: number | undefined = games
     ? Math.round(data.sheet.reduce((r, p) => r + ((p as any).rating || 1), 0) / games)
     : undefined;
@@ -92,7 +101,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
           },
           multiMatchGames(data.sheet).map(p => {
             const round = ctrl.data.round - p.round + 1;
-            if (isMultiMatchOutcome(p))
+            if (isMultiMatchOutcome(p)) {
               return h(
                 'tr.' + p.outcome,
                 {
@@ -101,9 +110,19 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 [
                   h('th', '' + round),
                   h('td.outcome', { attrs: { colspan: 3 } }, p.outcome),
-                  h('td', p.outcome == 'absent' ? '-' : p.outcome == 'bye' ? (isMatchScore ? '2' : '1') : '½'), //todo change bye score for multi games?
+                  h(
+                    'td',
+                    p.outcome == 'absent'
+                      ? '-'
+                      : p.outcome == 'bye'
+                      ? isMatchScore
+                        ? matchScoreDisplay(multiMatchByeScore(ctrl))
+                        : '1'
+                      : '½'
+                  ),
                 ]
               );
+            }
             const res = result(p);
             return h(
               'tr.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
@@ -132,7 +151,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
 
 function result(p: MultiMatchPairing): string {
   if (p.ms) {
-    return matchScoreDisplay(p);
+    return matchScoreDisplay(p.mp);
   }
   switch (p.w) {
     case true:

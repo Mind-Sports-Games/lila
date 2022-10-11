@@ -1,10 +1,11 @@
 import { h, VNode } from 'snabbdom';
 import SwissCtrl from '../ctrl';
-import { player as renderPlayer, bind, onInsert } from './util';
+import { player as renderPlayer, bind, onInsert, matchScoreDisplay, multiMatchByeScore } from './util';
 import { MaybeVNodes, PairingBase, Player, Pager } from '../interfaces';
 
 function playerTr(ctrl: SwissCtrl, player: Player) {
   const userId = player.user.id;
+  const isMatchScore = ctrl.data.isMatchScore;
   return h(
     'tr',
     {
@@ -37,7 +38,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
               p == 'absent'
                 ? h(p, title('Absent'), '-')
                 : p == 'bye'
-                ? h(p, title('Bye'), '1')
+                ? h(p, title('Bye'), isMatchScore ? matchScoreDisplay(multiMatchByeScore(ctrl)) : '1')
                 : p == 'late'
                 ? h(p, title('Late'), '½')
                 : h(
