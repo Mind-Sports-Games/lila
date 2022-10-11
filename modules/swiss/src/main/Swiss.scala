@@ -144,7 +144,7 @@ object Swiss {
       nbRounds: Int,
       rated: Boolean,
       isMicroMatch: Boolean,
-      useMatchScore: Boolean,
+      isMatchScore: Boolean,
       isBestOfX: Boolean,
       isPlayX: Boolean,
       nbGamesPerRound: Int,

@@ -64,19 +64,19 @@ private object SwissSheet {
               case Left(_) => List(Ongoing)
               case Right(None) =>
                 if (
-                  swiss.settings.useMatchScore && (swiss.settings.isMicroMatch || swiss.settings.isBestOfX || swiss.settings.isPlayX)
+                  swiss.settings.isMatchScore && (swiss.settings.isMicroMatch || swiss.settings.isBestOfX || swiss.settings.isPlayX)
                 )
                   outcomeListFromMultiMatch(player, pairing)
                 else List(Draw)
               case Right(Some(playerIndex)) =>
-                if (swiss.settings.useMatchScore) {
+                if (swiss.settings.isMatchScore) {
                   outcomeListFromMultiMatch(player, pairing)
                 } else if (pairing(playerIndex) == player.userId) List(Win)
                 else List(Loss)
             }
           case None if player.byes(round) =>
-            if (swiss.settings.useMatchScore && swiss.settings.isMicroMatch) List(Bye, Bye)
-            else if (swiss.settings.useMatchScore && (swiss.settings.isBestOfX || swiss.settings.isPlayX))
+            if (swiss.settings.isMatchScore && swiss.settings.isMicroMatch) List(Bye, Bye)
+            else if (swiss.settings.isMatchScore && (swiss.settings.isBestOfX || swiss.settings.isPlayX))
               List.fill(swiss.settings.nbGamesPerRound)(Bye)
             else List(Bye)
           case None => List(Absent)

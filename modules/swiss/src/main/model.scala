@@ -30,12 +30,13 @@ case class FeaturedSwisses(
 case class SwissFinish(id: Swiss.Id, ranking: Ranking)
 
 object SwissBounds {
-  val maxRounds           = 100
-  val maxGamesPerRound    = 9
-  val maxScore            = maxRounds * 2
-  val maxBuchholz         = maxRounds * maxScore
-  val maxSonnenbornBerger = maxRounds * maxScore * 2
-  val maxPerformance      = 5000
+  val maxRounds            = 100
+  val maxGamesPerRound     = 9 //assume single digit in other parts of the code.
+  val defaultGamesPerRound = 1
+  val maxScore             = maxRounds * 2
+  val maxBuchholz          = maxRounds * maxScore
+  val maxSonnenbornBerger  = maxRounds * maxScore * 2
+  val maxPerformance       = 5000
 
   // TODO: these are a candidates to be moved elsewhere
   case class WithBounds(value: Long, totalValues: Long)

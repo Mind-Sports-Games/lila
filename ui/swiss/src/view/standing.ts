@@ -5,7 +5,7 @@ import { MaybeVNodes, PairingBase, Player, Pager } from '../interfaces';
 
 function playerTr(ctrl: SwissCtrl, player: Player) {
   const isMM = ctrl.data.isMicroMatch;
-  const useMatchScore = ctrl.data.useMatchScore;
+  const isMatchScore = ctrl.data.isMatchScore;
   const userId = player.user.id;
   return h(
     'tr',
@@ -63,7 +63,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
             .concat([...Array(Math.max(0, ctrl.data.nbRounds - player.sheet.length))].map(_ => h('r')))
         )
       ),
-      h('td.points', title('Points'), '' + (isMM && !useMatchScore ? player.points * 2 : player.points)),
+      h('td.points', title('Points'), '' + (isMM && !isMatchScore ? player.points * 2 : player.points)),
       h('td.tieBreak', title('Tiebreak'), '' + player.tieBreak),
     ]
   );

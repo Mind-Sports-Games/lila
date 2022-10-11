@@ -93,7 +93,7 @@ final class SwissJson(
                       f.isMicroMatch      -> true,
                       f.microMatchGameId  -> true,
                       f.multiMatchGameIds -> true,
-                      f.useMatchScore     -> true,
+                      f.isMatchScore      -> true,
                       f.isBestOfX         -> true,
                       f.isPlayX           -> true,
                       f.nbGamesPerRound   -> true
@@ -199,7 +199,7 @@ object SwissJson {
         "trophy2nd"        -> swiss.trophy2nd,
         "trophy3rd"        -> swiss.trophy3rd,
         "isMicroMatch"     -> swiss.settings.isMicroMatch,
-        "useMatchScore"    -> swiss.settings.useMatchScore,
+        "isMatchScore"     -> swiss.settings.isMatchScore,
         "isBestOfX"        -> swiss.settings.isBestOfX,
         "isPlayX"          -> swiss.settings.isPlayX,
         "nbGamesPerRound"  -> swiss.settings.nbGamesPerRound,
@@ -282,9 +282,9 @@ object SwissJson {
       if (pairing.isOngoing) "o"
       else pairing.resultFor(player.userId).fold("d") { r => if (r) "w" else "l" }
     val multiMatchIds = pairing.multiMatchGameIds.fold("")(l => "_" + l.mkString("_"))
-    val useMatchScore = if (pairing.useMatchScore) "s" else ""
+    val useMatchScore = if (pairing.isMatchScore) "s" else ""
     val matchScore =
-      pairing.matchScoreFor(player.userId) // "" if useMatchScore is false, otherwise 2 digit string number
+      pairing.matchScoreFor(player.userId) // "" if isMatchScore is false, otherwise 2 digit string number
     val bestOfX    = if (pairing.isBestOfX) "x" else ""
     val playX      = if (pairing.isPlayX) "px" else ""
     val openingFEN = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
@@ -301,7 +301,7 @@ object SwissJson {
         "x"     -> pairing.isBestOfX,
         "px"    -> pairing.isPlayX,
         "gpr"   -> pairing.nbGamesPerRound,
-        "ms"    -> pairing.useMatchScore,
+        "ms"    -> pairing.isMatchScore,
         "mp"    -> pairing.matchScoreFor(player.userId),
         "of"    -> pairing.openingFEN.map(_.value)
       )
@@ -325,7 +325,7 @@ object SwissJson {
         "isMicroMatch"      -> i.gameIds.map(_.isMicroMatch),
         "microMatchGameId"  -> i.gameIds.flatMap(_.microMatchGameId),
         "multiMatchGameIds" -> i.gameIds.map(_.multiMatchGameIds),
-        "useMatchScore"     -> i.gameIds.map(_.useMatchScore),
+        "isMatchScore"      -> i.gameIds.map(_.isMatchScore),
         "isBestOfX"         -> i.gameIds.map(_.isBestOfX),
         "isPlayX"           -> i.gameIds.map(_.isPlayX),
         "nbGamesPerRound"   -> i.gameIds.map(_.nbGamesPerRound),

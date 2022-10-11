@@ -28,8 +28,8 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            fields.xGamesChoice,
-            form3.split(fields.useMatchScore, fields.nbGamesPerRound),
+            fields.xGamesChoiceRow1,
+            fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
             fields.medleyDefaults,
@@ -69,8 +69,8 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            fields.xGamesChoice,
-            form3.split(fields.useMatchScore, fields.nbGamesPerRound),
+            fields.xGamesChoiceRow1,
+            fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
             fields.medleyDefaults,
@@ -164,20 +164,19 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
-  def useMatchScore =
+  def matchScore =
     frag(
       form3.checkbox(
-        form("useMatchScore"),
-        trans.useMatchScore(),
+        form("xGamesChoice.matchScore"),
+        trans.isMatchScore(),
         half = true,
-        help = raw(trans.useMatchScoreDefinition.txt().replace("(", "<br>(")).some
+        help = raw(trans.isMatchScoreDefinition.txt().replace("(", "<br>(")).some
       )
     )
-  def xGamesChoice =
-    form3.split(
-      bestOfX,
-      playX
-    )
+  def xGamesChoiceRow1 =
+    form3.split(bestOfX, playX)
+  def xGamesChoiceRow2 =
+    form3.split(matchScore, nbGamesPerRound)
   def bestOfX =
     frag(
       form3.checkbox(
@@ -200,7 +199,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     )
   def nbGamesPerRound =
     form3.group(
-      form("nbGamesPerRound"),
+      form("xGamesChoice.nbGamesPerRound"),
       "Number of games per round",
       help = raw("An odd number is best (2 is a micro-match)").some,
       half = true

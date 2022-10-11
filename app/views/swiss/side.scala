@@ -44,25 +44,26 @@ object side {
                 )
               } else s.perfType.trans,
               separator,
-              if (s.settings.rated) trans.ratedTournament() else trans.casualTournament()
+              if (s.settings.rated) trans.ratedTournament() else trans.casualTournament(),
+              separator,
+              a(href := routes.Swiss.home)("Swiss")
             ),
             p(
               span(cls := "swiss__meta__round")(
                 s"${s.round}/${s.settings.nbRounds}"
               ),
               span(cls := "swiss__meta__rounds")(
-                if (s.settings.isMicroMatch) { (title := trans.microMatchDefinition.txt()) },
-                if (s.settings.isMicroMatch) {
-                  " micro-match rounds"
-                } else if (s.settings.isBestOfX) {
-                  s" (best of ${s.settings.nbGamesPerRound}) rounds"
+                " rounds",
+                if (s.settings.isBestOfX) {
+                  s" (best of ${s.settings.nbGamesPerRound} games"
                 } else if (s.settings.isPlayX) {
-                  s" (${s.settings.nbGamesPerRound} games) rounds Swiss"
-                } else " rounds",
-                if (s.settings.useMatchScore) " (match score)" else ""
+                  s" (${s.settings.nbGamesPerRound} games per round"
+                },
+                if (s.settings.isMatchScore)
+                  a(href := "https://playstrategy.org/swiss#faqMatchScore")(" using match score"),
+                if (s.settings.isBestOfX || s.settings.isPlayX) ")"
+                else ""
               ),
-              separator,
-              a(href := routes.Swiss.home)("Swiss"),
               (isGranted(_.ManageTournament) || (ctx.userId.has(s.createdBy) && !s.isFinished)) option frag(
                 " ",
                 a(href := routes.Swiss.edit(s.id.value), title := "Edit tournament")(iconTag("%"))

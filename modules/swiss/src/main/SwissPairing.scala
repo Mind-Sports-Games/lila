@@ -17,7 +17,7 @@ case class SwissPairing(
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
     multiMatchGameIds: Option[List[Game.ID]],
-    useMatchScore: Boolean,
+    isMatchScore: Boolean,
     isBestOfX: Boolean,
     isPlayX: Boolean,
     nbGamesPerRound: Int,
@@ -36,9 +36,10 @@ case class SwissPairing(
   def p1Wins                         = status == Right(Some(PlayerIndex.P1))
   def p2Wins                         = status == Right(Some(PlayerIndex.P2))
   def isDraw                         = status == Right(None)
+
   // matchScoreFor returns a two digit score (or empty string)
   def matchScoreFor(userId: User.ID) =
-    if (useMatchScore)
+    if (isMatchScore)
       matchStatus match {
         case Left(_) => "00"
         case Right(l) =>
@@ -61,7 +62,8 @@ case class SwissPairing(
       }
     else ""
   def strResultOf(playerIndex: PlayerIndex) =
-    if (nbGamesPerRound == 1) status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
+    if (nbGamesPerRound == 1)
+      status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
     else {
       matchStatus
         .fold(
@@ -84,7 +86,7 @@ case class SwissPairingGameIds(
     isMicroMatch: Boolean,
     microMatchGameId: Option[Game.ID],
     multiMatchGameIds: Option[List[Game.ID]],
-    useMatchScore: Boolean,
+    isMatchScore: Boolean,
     isBestOfX: Boolean,
     isPlayX: Boolean,
     nbGamesPerRound: Int,
@@ -97,7 +99,7 @@ case class SwissPairingGames(
     isMicroMatch: Boolean,
     microMatchGame: Option[Game],
     multiMatchGames: Option[List[Game]],
-    useMatchScore: Boolean,
+    isMatchScore: Boolean,
     isBestOfX: Boolean,
     isPlayX: Boolean,
     nbGamesPerRound: Int,
@@ -187,7 +189,7 @@ case class SwissPairingGames(
     multiMatchGames.fold(game.createdAt)(_.last.createdAt)
   } else game.createdAt
   def matchOutcome: List[Option[PlayerIndex]] =
-    if (useMatchScore && isMicroMatch) {
+    if (isMatchScore && isMicroMatch) {
       microMatchGame match {
         case Some(g2) => List(game.winnerPlayerIndex, g2.winnerPlayerIndex)
         case None     => List(game.winnerPlayerIndex, None)
@@ -205,7 +207,7 @@ object SwissPairing {
       swissPairing.isMicroMatch,
       swissPairing.microMatchGameId,
       swissPairing.multiMatchGameIds,
-      swissPairing.useMatchScore,
+      swissPairing.isMatchScore,
       swissPairing.isBestOfX,
       swissPairing.isPlayX,
       swissPairing.nbGamesPerRound,
@@ -243,7 +245,7 @@ object SwissPairing {
     val isMicroMatch      = "mm"
     val microMatchGameId  = "mmid"
     val multiMatchGameIds = "mmids"
-    val useMatchScore     = "ms"
+    val isMatchScore      = "ms"
     val isBestOfX         = "x"
     val isPlayX           = "px"
     val nbGamesPerRound   = "gpr"

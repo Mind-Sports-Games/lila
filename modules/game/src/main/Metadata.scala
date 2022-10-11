@@ -21,6 +21,11 @@ private[game] case class Metadata(
     isLastMultiMatchGame: Boolean = true
 ) {
 
+  /*
+    This function is used within the round context to check if another game is required.
+    i.e. it will get used for challenged when they are supported. Within Swiss tournaments
+    new games are setup from the SwissDirecter and dont use this system.
+   */
   def needsMultiMatchRematch =
     multiMatch.fold(false)(x => x.contains("challengeMultiMatch"))
 

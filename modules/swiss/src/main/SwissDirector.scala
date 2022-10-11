@@ -66,7 +66,7 @@ final private class SwissDirector(
                 isMicroMatch = swiss.settings.isMicroMatch,
                 None,
                 None,
-                useMatchScore = swiss.settings.useMatchScore,
+                isMatchScore = swiss.settings.isMatchScore,
                 isBestOfX = swiss.settings.isBestOfX,
                 isPlayX = swiss.settings.isPlayX,
                 nbGamesPerRound = swiss.settings.nbGamesPerRound,
