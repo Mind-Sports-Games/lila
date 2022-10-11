@@ -4,8 +4,6 @@ import { player as renderPlayer, bind, onInsert } from './util';
 import { MaybeVNodes, PairingBase, Player, Pager } from '../interfaces';
 
 function playerTr(ctrl: SwissCtrl, player: Player) {
-  const isMM = ctrl.data.isMicroMatch;
-  const isMatchScore = ctrl.data.isMatchScore;
   const userId = player.user.id;
   return h(
     'tr',
@@ -39,15 +37,9 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
               p == 'absent'
                 ? h(p, title('Absent'), '-')
                 : p == 'bye'
-                ? h(p, title('Bye'), isMM ? '2' : '1')
+                ? h(p, title('Bye'), '1')
                 : p == 'late'
-                ? h(p, title('Late'), isMM ? '1' : '½')
-                : isMM
-                ? h(
-                    'span.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
-                    { attrs: { key: p.g } },
-                    result(p)
-                  )
+                ? h(p, title('Late'), '½')
                 : h(
                     'a.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
                     {
@@ -63,7 +55,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
             .concat([...Array(Math.max(0, ctrl.data.nbRounds - player.sheet.length))].map(_ => h('r')))
         )
       ),
-      h('td.points', title('Points'), '' + (isMM && !isMatchScore ? player.points * 2 : player.points)),
+      h('td.points', title('Points'), '' + player.points),
       h('td.tieBreak', title('Tiebreak'), '' + player.tieBreak),
     ]
   );
@@ -84,11 +76,11 @@ const result = (p: PairingBase): string => {
   }
   switch (p.w) {
     case true:
-      return p.m ? '2' : '1';
+      return '1';
     case false:
       return '0';
     default:
-      return p.o ? '*' : p.m ? '1' : '½';
+      return p.o ? '*' : '½';
   }
 };
 

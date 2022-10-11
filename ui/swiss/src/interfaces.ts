@@ -40,8 +40,6 @@ export interface SwissData {
   trophy1st: string;
   trophy2nd: string;
   trophy3rd: string;
-  isMicroMatch: boolean;
-  microMatchGameId?: string;
   multiMatchGameIds?: string[];
   isMatchScore: boolean;
   isBestOfX: boolean;
@@ -78,8 +76,6 @@ export interface MyInfo {
   rank: number;
   absent: boolean;
   gameId?: string;
-  isMicroMatch: boolean;
-  microMatchGameId?: string;
   multiMatchGameIds?: string[];
   isMatchScore: boolean;
   isBestOfX: boolean;
@@ -91,8 +87,6 @@ export interface PairingBase {
   g: string; // game
   o?: boolean; // ongoing
   w?: boolean; // won
-  m?: boolean; // isMicroMatch
-  mmid?: string; // isMicroMatch
   mmids?: string[]; //multimatch gameids
   ms: boolean; // isMatchScore
   x: boolean; // isBestOfX
@@ -155,9 +149,6 @@ export interface Board {
   orientation: PlayerIndex;
   p1: BoardPlayer;
   p2: BoardPlayer;
-  isMicroMatch: boolean;
-  microMatchGameId?: string;
-  microMatchGame?: Board;
   multiMatchGameIds?: string[];
   multiMatchGames?: Board[];
   isBestOfX: boolean;

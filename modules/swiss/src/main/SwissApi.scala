@@ -82,7 +82,6 @@ final class SwissApi(
       settings = Swiss.Settings(
         nbRounds = data.nbRounds,
         rated = data.realPosition.isEmpty && data.isRated,
-        isMicroMatch = data.isMicroMatch,
         isMatchScore = data.isMatchScore,
         isBestOfX = data.isBestOfX,
         isPlayX = data.isPlayX,
@@ -121,7 +120,6 @@ final class SwissApi(
           settings = old.settings.copy(
             nbRounds = data.nbRounds,
             rated = position.isEmpty && (data.rated | old.settings.rated),
-            isMicroMatch = data.isMicroMatch,
             isMatchScore = data.isMatchScore,
             isBestOfX = data.isBestOfX,
             isPlayX = data.isPlayX,
@@ -423,8 +421,6 @@ final class SwissApi(
         SwissPairingGames(
           swissId,
           g,
-          ids.isMicroMatch,
-          ids.microMatchGameId.flatMap(gamesById.get),
           ids.multiMatchGameIds.fold[Option[List[Game]]](None)(l => Some(l.flatMap(gamesById.get))),
           ids.isMatchScore,
           ids.isBestOfX,
@@ -435,7 +431,7 @@ final class SwissApi(
       )
 
   private[swiss] def toGameIds(ids: List[SwissPairingGameIds]): List[Game.ID] =
-    ids.flatMap(g => g.multiMatchGameIds.foldLeft(List(g.id) ++ g.microMatchGameId)(_ ++ _))
+    ids.flatMap(g => g.multiMatchGameIds.foldLeft(List(g.id))(_ ++ _))
 
   private[swiss] def toSwissPairingGames(
       swissId: Swiss.Id,
@@ -451,23 +447,11 @@ final class SwissApi(
         .find(
           $or(
             $doc(f.id                -> game.id),
-            $doc(f.microMatchGameId  -> game.id),
             $doc(f.multiMatchGameIds -> game.id)
           )
         )
         .one[SwissPairing]
     }
-
-  // private[swiss] def updateMicroMatchProgress(game: Game): Funit = {
-  //   getSwissPairingForGame(game).flatMap {
-  //     _ ?? { pairing =>
-  //       getGamesMap(List(pairing.id) ++ pairing.microMatchGameId) map { gamesById =>
-  //         toSwissPairingGames(pairing.swissId, pairing, gamesById) map updateMicroMatchProgress
-  //       }
-  //     }
-  //   }
-  //   funit
-  // }
 
   private[swiss] def updateMultiMatchProgress(game: Game): Funit = {
     getSwissPairingForGame(game).flatMap {
@@ -479,35 +463,6 @@ final class SwissApi(
     }
     funit
   }
-
-  private[swiss] def rematch(game: SwissPairingGames): Funit =
-    getSwissPairingForGame(game.game) map { pairing =>
-      {
-        pairing.map { pairing =>
-          SwissPlayer.fields { f =>
-            colls.player.list[SwissPlayer]($doc(f.swissId -> pairing.swissId)) map { players =>
-              val playerMap = SwissPlayer.toMap(players)
-              byId(game.swissId).map(
-                _.map(swiss =>
-                  idGenerator.game.map(rematchId =>
-                    SwissPairing.fields { f2 =>
-                      colls.pairing.update
-                        .one($doc(f2.id -> pairing.id), $set(f2.microMatchGameId -> rematchId)) >> {
-                        val pairingUpdated = pairing.copy(microMatchGameId = Some(rematchId))
-                        val game           = director.makeGame(swiss, playerMap, true)(pairingUpdated)
-                        gameRepo.insertDenormalized(game) >> recomputeAndUpdateAll(
-                          pairing.swissId
-                        ) >>- onStart(game.id)
-                      }
-                    }
-                  )
-                )
-              )
-            }
-          }
-        }.unit
-      }
-    }
 
   private[swiss] def rematchForMultiGame(game: SwissPairingGames): Funit =
     getSwissPairingForGame(game.game) map { pairing =>
@@ -549,15 +504,6 @@ final class SwissApi(
         }.unit
       }
     }
-
-  // private[swiss] def updateMicroMatchProgress(game: SwissPairingGames): Funit =
-  //   (game.finishedOrAborted, game.isMicroMatch, game.microMatchGame) match {
-  //     case (true, _, _)           => finishGame(game)
-  //     case (false, true, None)    => rematch(game)
-  //     case (false, true, Some(_)) => funit // This will be called by checkOngoingGames
-  //     case (false, false, _) =>
-  //       sys.error("Why is this being called when the game isn't finished and not a micromatch!?")
-  //   }
 
   private[swiss] def updateMultiMatchProgress(game: SwissPairingGames): Funit =
     (
@@ -822,8 +768,6 @@ final class SwissApi(
                 "ids" -> Push(
                   $doc(
                     "id"                -> f.id,
-                    "isMicroMatch"      -> f.isMicroMatch,
-                    "microMatchGameId"  -> f.microMatchGameId,
                     "multiMatchGameIds" -> f.multiMatchGameIds,
                     "isMatchScore"      -> f.isMatchScore,
                     "isBestOfX"         -> f.isBestOfX,
@@ -859,7 +803,6 @@ final class SwissApi(
               lila.mon.swiss.games("missing").record(missingIds.size)
               if (flagged.nonEmpty)
                 Bus.publish(lila.hub.actorApi.map.TellMany(flagged.map(_.id), QuietFlag), "roundSocket")
-              //ongoing.foreach(updateMicroMatchProgress)
               ongoing.foreach(updateMultiMatchProgress)
               if (missingIds.nonEmpty)
                 colls.pairing.delete.one($inIds(missingIds))

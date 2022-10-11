@@ -288,7 +288,6 @@ final private[api] class RoundApi(
         .obj(
           "id"              -> s.swiss.id.value,
           "running"         -> s.swiss.isStarted,
-          "isMicroMatch"    -> s.swiss.settings.isMicroMatch,
           "isBestOfX"       -> s.swiss.settings.isBestOfX,
           "isPlayX"         -> s.swiss.settings.isPlayX,
           "nbGamesPerRound" -> s.swiss.settings.nbGamesPerRound

@@ -115,9 +115,7 @@ object BsonHandlers {
             status = r.getO[SwissPairing.Status](status) | Right(none),
             matchStatus = r.getO[SwissPairing.MatchStatus](matchStatus) | Right(List(none)),
             // TODO: long term we may want to skip storing both of these fields
-            //       in the case that it's not a micromatch to save on storage
-            isMicroMatch = r.getD[Boolean](isMicroMatch),
-            microMatchGameId = r.getO[String](microMatchGameId),
+            //       in the case that it's not a multimatch to save on storage
             multiMatchGameIds = r.getsO[String](multiMatchGameIds),
             isMatchScore = r.getD[Boolean](isMatchScore),
             isBestOfX = r.getD[Boolean](isBestOfX),
@@ -137,9 +135,7 @@ object BsonHandlers {
         status      -> o.status,
         matchStatus -> o.matchStatus,
         // TODO: long term we may want to skip storing both of these fields
-        //       in the case that it's not a micromatch to save on storage
-        isMicroMatch      -> o.isMicroMatch,
-        microMatchGameId  -> o.microMatchGameId,
+        //       in the case that it's not a multimatch to save on storage
         multiMatchGameIds -> o.multiMatchGameIds,
         isMatchScore      -> o.isMatchScore,
         isBestOfX         -> o.isBestOfX,
@@ -153,8 +149,6 @@ object BsonHandlers {
     def reads(r: BSON.Reader) =
       SwissPairingGameIds(
         id = r str id,
-        isMicroMatch = r.get[Boolean](isMicroMatch),
-        microMatchGameId = r.getO[String](microMatchGameId),
         multiMatchGameIds = r.getsO[String](multiMatchGameIds),
         isMatchScore = r.get[Boolean](isMatchScore),
         isBestOfX = r.get[Boolean](isBestOfX),
@@ -166,8 +160,6 @@ object BsonHandlers {
     def writes(w: BSON.Writer, o: SwissPairingGameIds) =
       $doc(
         id                -> o.id,
-        isMicroMatch      -> o.isMicroMatch,
-        microMatchGameId  -> o.microMatchGameId,
         multiMatchGameIds -> o.multiMatchGameIds,
         isMatchScore      -> o.isMatchScore,
         isBestOfX         -> o.isBestOfX,
@@ -184,7 +176,6 @@ object BsonHandlers {
       Swiss.Settings(
         nbRounds = r.get[Int]("n"),
         rated = r.boolO("r") | true,
-        isMicroMatch = r.boolO("m") | false,
         isMatchScore = r.boolO("ms") | false,
         isBestOfX = r.boolO("x") | false,
         isPlayX = r.boolO("px") | false,
@@ -204,7 +195,6 @@ object BsonHandlers {
       $doc(
         "n"   -> s.nbRounds,
         "r"   -> (!s.rated).option(false),
-        "m"   -> s.isMicroMatch,
         "ms"  -> s.isMatchScore,
         "x"   -> s.isBestOfX,
         "px"  -> s.isPlayX,

@@ -90,8 +90,6 @@ final class SwissJson(
                     $doc(f.swissId -> swiss.id, f.players -> player.userId, f.status -> SwissPairing.ongoing),
                     $doc(
                       f.id                -> true,
-                      f.isMicroMatch      -> true,
-                      f.microMatchGameId  -> true,
                       f.multiMatchGameIds -> true,
                       f.isMatchScore      -> true,
                       f.isBestOfX         -> true,
@@ -198,7 +196,6 @@ object SwissJson {
         "trophy1st"        -> swiss.trophy1st,
         "trophy2nd"        -> swiss.trophy2nd,
         "trophy3rd"        -> swiss.trophy3rd,
-        "isMicroMatch"     -> swiss.settings.isMicroMatch,
         "isMatchScore"     -> swiss.settings.isMatchScore,
         "isBestOfX"        -> swiss.settings.isBestOfX,
         "isPlayX"          -> swiss.settings.isPlayX,
@@ -295,8 +292,6 @@ object SwissJson {
     Json
       .obj(
         "g"     -> pairing.gameId,
-        "m"     -> pairing.isMicroMatch,
-        "mmid"  -> pairing.microMatchGameId,
         "mmids" -> pairing.multiMatchGameIds,
         "x"     -> pairing.isBestOfX,
         "px"    -> pairing.isPlayX,
@@ -322,8 +317,6 @@ object SwissJson {
       .obj(
         "rank"              -> i.rank,
         "gameId"            -> i.gameIds.map(_.id),
-        "isMicroMatch"      -> i.gameIds.map(_.isMicroMatch),
-        "microMatchGameId"  -> i.gameIds.flatMap(_.microMatchGameId),
         "multiMatchGameIds" -> i.gameIds.map(_.multiMatchGameIds),
         "isMatchScore"      -> i.gameIds.map(_.isMatchScore),
         "isBestOfX"         -> i.gameIds.map(_.isBestOfX),
@@ -371,9 +364,6 @@ object SwissJson {
     boardGameJson(b.game, b.board.p1, b.board.p2)
       .add("winner" -> b.game.winnerPlayerIndex.map(_.name))
       .add("boardSize" -> boardSizeJson(b.game.variant))
-      .add("isMicroMatch" -> b.board.isMicroMatch)
-      .add("microMatchGameId" -> b.board.microMatchGameId)
-      .add("microMatchGame" -> b.microMatchGame.map(g => boardGameJson(g, b.board.p2, b.board.p1)))
       .add("isBestOfX" -> b.board.isBestOfX)
       .add("isPlayX" -> b.board.isPlayX)
       .add("multiMatchGameIds" -> b.board.multiMatchGameIds)
@@ -391,10 +381,6 @@ object SwissJson {
   implicit private val roundNumberWriter: Writes[SwissRound.Number] = Writes[SwissRound.Number] { n =>
     JsNumber(n.value)
   }
-  // implicit private val gamesPerRoundNumberWriter: Writes[SwissRound.GamesPerRound] =
-  //   Writes[SwissRound.GamesPerRound] { n =>
-  //     JsNumber(n.value)
-  //   }
   implicit private val pointsWriter: Writes[Swiss.Points] = Writes[Swiss.Points] { p =>
     JsNumber(p.value)
   }

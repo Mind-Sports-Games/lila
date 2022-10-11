@@ -102,7 +102,6 @@ final class JsonView(
     trans.decline,
     trans.viewInFullSize,
     trans.cancel,
-    trans.microMatch,
     trans.multiMatch
   ).map(_.key)
 }

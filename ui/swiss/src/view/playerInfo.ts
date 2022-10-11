@@ -24,9 +24,6 @@ const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | 
   sheet.forEach(v => {
     if (isOutcome(v)) {
       newSheet.push({ t: 'o', round, outcome: v });
-    } else if (v.m && v.mmid) {
-      newSheet.push({ t: 'p', round: round, isFinalGame: false, ...v });
-      newSheet.push({ t: 'p', round: round, isFinalGame: true, ...v, g: v.mmid });
     } else if ((v.x || v.px) && v.mmids) {
       newSheet.push({ t: 'p', round: round, isFinalGame: false, ...v });
       v.mmids.forEach(gid =>
@@ -42,7 +39,6 @@ const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | 
 
 export default function (ctrl: SwissCtrl): VNode | undefined {
   if (!ctrl.playerInfoId) return;
-  const isMM = ctrl.data.isMicroMatch;
   const isMatchScore = ctrl.data.isMatchScore;
   const data = ctrl.data.playerInfo;
   const noarg = ctrl.trans.noarg;
@@ -71,7 +67,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
       h('div.stats', [
         h('h2', [h('span.rank', data.rank + '. '), renderPlayer(data, true, !ctrl.data.isMedley)]),
         h('table', [
-          numberRow('Points', isMM && !isMatchScore ? data.points * 2 : data.points, 'raw'),
+          numberRow('Points', data.points, 'raw'),
           numberRow('Tiebreak' + (data.tieBreak2 ? ' [BH]' : ' [SB]'), data.tieBreak, 'raw'),
           data.tieBreak2 ? numberRow('Tiebreak [SB]', data.tieBreak2, 'raw') : null,
           ...(games
@@ -105,7 +101,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 [
                   h('th', '' + round),
                   h('td.outcome', { attrs: { colspan: 3 } }, p.outcome),
-                  h('td', p.outcome == 'absent' ? '-' : p.outcome == 'bye' ? (isMatchScore && isMM ? '2' : '1') : '½'),
+                  h('td', p.outcome == 'absent' ? '-' : p.outcome == 'bye' ? (isMatchScore ? '2' : '1') : '½'), //todo change bye score for multi games?
                 ]
               );
             const res = result(p);
@@ -140,11 +136,11 @@ function result(p: MultiMatchPairing): string {
   }
   switch (p.w) {
     case true:
-      return p.m ? '2' : '1';
+      return '1';
     case false:
       return '0';
     default:
-      return p.o ? '*' : p.m ? '1' : '½';
+      return p.o ? '*' : '½';
   }
 }
 

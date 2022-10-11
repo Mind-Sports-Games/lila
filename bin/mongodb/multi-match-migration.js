@@ -16,6 +16,7 @@ db.swiss_pairing.find({ mm: true }).forEach(sp => {
       },
       $unset: {
         mmid: true,
+        mm: true,
       },
     }
   );
@@ -56,7 +57,39 @@ db.swiss.find({ 'settings.m': true }).forEach(s => {
         'settings.px': true,
         'settings.gpr': 2,
       },
+      $unset: {
+        'settings.m': true,
+      },
     }
   );
   print(s._id + ' swiss updated');
+});
+
+///////////////////////////////////////////////
+//PART 2 UNSETTNG MICRO MATCH FROM DB COLLECTIONS
+///////////////////////////////////////////////
+
+//unset micro match field in swiss post migration
+db.swiss.find({ 'settings.m': false }).forEach(s => {
+  db.swiss.update(
+    { _id: s._id },
+    {
+      $unset: {
+        'settings.m': true,
+      },
+    }
+  );
+});
+
+//unset micromatch in swiss settings collection
+db.swiss_pairing.find({ mm: false }).forEach(sp => {
+  db.swiss_pairing.update(
+    { _id: sp._id },
+    {
+      $unset: {
+        mmid: true,
+        mm: true,
+      },
+    }
+  );
 });

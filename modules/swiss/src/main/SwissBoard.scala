@@ -11,9 +11,6 @@ private case class SwissBoard(
     gameId: Game.ID,
     p1: SwissBoard.Player,
     p2: SwissBoard.Player,
-    // TODO: This interface seems ugly, but I guess it's fine.
-    isMicroMatch: Boolean,
-    microMatchGameId: Option[Game.ID],
     isBestOfX: Boolean,
     isPlayX: Boolean,
     multiMatchGameIds: Option[List[Game.ID]]
@@ -24,7 +21,6 @@ private object SwissBoard {
   case class WithGame(
       board: SwissBoard,
       game: Game,
-      microMatchGame: Option[Game],
       multiMatchGames: Option[List[Game]]
   )
 }
@@ -45,20 +41,12 @@ final private class SwissBoardApi(
   def apply(id: Swiss.Id): Fu[List[SwissBoard.WithGame]] =
     boardsCache.getIfPresent(id) ?? {
       _.map { board =>
-        (gameProxyRepo.game(board.gameId) zip board.microMatchGameId
-          .traverse(
-            gameProxyRepo.game
-          )
-          .map(_.flatten) zip (
+        (gameProxyRepo.game(board.gameId) zip (
           board.multiMatchGameIds
             .traverse(l => l.traverse(gid => gameProxyRepo.game(gid)).map(_.flatten))
         ))
-          .map {
-            case (
-                  (game: Option[Game], microMatchGame: Option[Game]),
-                  multiMatchGames: Option[List[Game]]
-                ) =>
-              game.map(g => SwissBoard.WithGame(board, g, microMatchGame, multiMatchGames))
+          .map { case (game: Option[Game], multiMatchGames: Option[List[Game]]) =>
+            game.map(g => SwissBoard.WithGame(board, g, multiMatchGames))
           }
       }.sequenceFu
         .dmap(_.flatten)
@@ -95,8 +83,6 @@ final private class SwissBoardApi(
                     pairing.gameId,
                     p1 = SwissBoard.Player(u1, r1, p1.rating),
                     p2 = SwissBoard.Player(u2, r2, p2.rating),
-                    isMicroMatch = pairing.isMicroMatch,
-                    microMatchGameId = pairing.microMatchGameId,
                     isBestOfX = pairing.isBestOfX,
                     isPlayX = pairing.isPlayX,
                     multiMatchGameIds = pairing.multiMatchGameIds

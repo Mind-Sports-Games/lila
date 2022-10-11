@@ -46,8 +46,7 @@ final class SwissForm(implicit mode: Mode) {
           "flipello" -> optional(boolean),
           "mancala"  -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
-        "rated"      -> optional(boolean),
-        "microMatch" -> optional(boolean),
+        "rated" -> optional(boolean),
         "xGamesChoice" -> mapping(
           "bestOfX"    -> optional(boolean),
           "playX"      -> optional(boolean),
@@ -107,7 +106,6 @@ final class SwissForm(implicit mode: Mode) {
         mancala = true.some
       ),
       rated = true.some,
-      microMatch = false.some,
       xGamesChoice = XGamesChoice(
         bestOfX = false.some,
         playX = false.some,
@@ -148,7 +146,6 @@ final class SwissForm(implicit mode: Mode) {
         mancala = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Mancala()).some
       ),
       rated = s.settings.rated.some,
-      microMatch = s.settings.isMicroMatch.some,
       xGamesChoice = XGamesChoice(
         bestOfX = s.settings.isBestOfX.some,
         playX = s.settings.isPlayX.some,
@@ -256,7 +253,6 @@ object SwissForm {
       medleyDefaults: MedleyDefaults,
       medleyGameFamilies: MedleyGameFamilies,
       rated: Option[Boolean],
-      microMatch: Option[Boolean],
       xGamesChoice: XGamesChoice,
       nbRounds: Int,
       description: Option[String],
@@ -298,7 +294,6 @@ object SwissForm {
     def realPosition            = position ifTrue realVariant.standardVariant
 
     def isRated         = rated | true
-    def isMicroMatch    = microMatch | false
     def isMatchScore    = xGamesChoice.matchScore | false
     def isBestOfX       = xGamesChoice.bestOfX | false
     def isPlayX         = xGamesChoice.playX | false

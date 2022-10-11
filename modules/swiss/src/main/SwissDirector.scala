@@ -63,8 +63,6 @@ final private class SwissDirector(
                 p2 = b,
                 status = Left(SwissPairing.Ongoing),
                 matchStatus = Left(SwissPairing.Ongoing),
-                isMicroMatch = swiss.settings.isMicroMatch,
-                None,
                 None,
                 isMatchScore = swiss.settings.isMatchScore,
                 isBestOfX = swiss.settings.isBestOfX,
@@ -157,7 +155,6 @@ final private class SwissDirector(
           else if (swiss.settings.isBestOfX || swiss.settings.isPlayX) "multiMatch".some
           else none
       )
-      //.withId(if (rematch) pairing.microMatchGameId.getOrElse(pairing.gameId) else pairing.id)
       .withId(if (rematch) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id)
       .withSwissId(swiss.id.value)
       .start

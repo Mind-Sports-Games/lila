@@ -141,7 +141,7 @@ object TournamentShield {
           "shieldChessMedley",
           "Chess Variants",
           chessVariantOptions,
-          s"5 round Swiss using micro-match rounds (each pairing plays twice, once each as the start player). 5 from the ${chessVariantOptions.length} listed chess variants will be picked."
+          s"5 round Swiss (each pairing plays twice, once each as the start player). 5 from the ${chessVariantOptions.length} listed chess variants will be picked."
         )
 
     private val draughtsVariantOptions =

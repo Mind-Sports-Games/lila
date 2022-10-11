@@ -147,7 +147,6 @@ export interface Simul {
 export interface Swiss {
   id: string;
   running?: boolean;
-  isMicroMatch?: boolean;
   isBestOfX?: boolean;
   isPlayX?: boolean;
   ranks?: TournamentRanks;
