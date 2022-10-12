@@ -147,12 +147,8 @@ final private class SwissDirector(
         pgnImport = None,
         multiMatch =
           if (rematch)
-            pairing.multiMatchGameIds
-              .fold("multiMatch".some) { ids =>
-                val previousGameId = if (ids.size <= 1) pairing.id else ids(ids.size - 2)
-                (s"${ids.size}:$previousGameId".some)
-              } // link to previous mm game while playing, gets overridden to next game if available during rematch
-          else if (swiss.settings.isBestOfX || swiss.settings.isPlayX) "multiMatch".some
+            s"${pairing.multiMatchGameIds.fold(1)(ids => ids.size + 1)}:${pairing.id}".some // link to first mm game
+          else if (swiss.settings.nbGamesPerRound > 1) s"1:${pairing.id}".some
           else none
       )
       .withId(if (rematch) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id)

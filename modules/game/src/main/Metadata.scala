@@ -17,8 +17,7 @@ private[game] case class Metadata(
     simulPairing: Option[Int] = None,
     timeOutUntil: Option[DateTime] = None,
     drawLimit: Option[Int] = None,
-    multiMatch: Option[String] = None,
-    isLastMultiMatchGame: Boolean = true
+    multiMatch: Option[String] = None
 ) {
 
   /*
@@ -29,13 +28,9 @@ private[game] case class Metadata(
   def needsMultiMatchRematch =
     multiMatch.fold(false)(x => x.contains("challengeMultiMatch"))
 
-  def multiMatchGameDisplayNr: Option[Int] = multiMatch.fold[Option[Int]](None) { mm =>
-    if (isLastMultiMatchGame) toInt(mm.take(1)).map(x => x + 1) else toInt(mm.take(1)).map(x => x - 1)
-  }
-
   def multiMatchGameNr = multiMatch ?? { mm =>
     if (mm == "multiMatch") 1.some
-    else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1)).map(x => x + 1)
+    else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1))
     else none
   }
 

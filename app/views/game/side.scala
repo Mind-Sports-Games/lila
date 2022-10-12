@@ -159,18 +159,17 @@ object side {
         game.metadata.multiMatch map { m =>
           st.section(cls := "game__multi-match")(
             if (m.matches("[1-9]:.*")) {
-              val gamenb        = m.take(1).toInt;
-              val nbGames       = if (game.metadata.isLastMultiMatchGame) gamenb + 1 else gamenb;
-              val currentGameNb = if (game.metadata.isLastMultiMatchGame) gamenb + 1 else gamenb - 1;
+              val gamenb  = m.take(1).toInt;
+              val nbGames = gamenb //all we know about...
               frag(
                 trans.multiMatch(),
                 ": ",
                 (1 to nbGames).map(i =>
-                  if (i == gamenb) {
+                  if (i == 1) {
                     a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
-                      trans.gameNumberX(gamenb)
+                      trans.gameNumberX(1)
                     )
-                  } else if (i == currentGameNb) {
+                  } else if (i == gamenb) {
                     span(cls := "current")(trans.gameNumberX(i))
                   } else {
                     span(cls := "")(trans.gameNumberX(i))

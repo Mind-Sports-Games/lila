@@ -809,7 +809,6 @@ object Game {
       swissId = none,
       simulId = none,
       analysed = false,
-      isLastMultiMatchGame = true,
       drawOffers = GameDrawOffers.empty
     )
 
@@ -859,11 +858,10 @@ object Game {
     val perfType          = "pt" // only set on student games for aggregation
     val drawOffers        = "do"
     //draughts
-    val simulPairing         = "sp"
-    val timeOutUntil         = "to"
-    val multiMatch           = "mm"
-    val isLastMultiMatchGame = "lmm"
-    val drawLimit            = "dl"
+    val simulPairing = "sp"
+    val timeOutUntil = "to"
+    val multiMatch   = "mm"
+    val drawLimit    = "dl"
   }
 }
 

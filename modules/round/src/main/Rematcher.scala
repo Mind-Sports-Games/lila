@@ -119,14 +119,14 @@ final private class Rematcher(
       (Pos.Chess(pos), Piece.Chess(piece))
     }
 
-  //this actually returns the previous multi match game - for display link purposes?
-  private def previousMultiMatch(g: Game): Option[String] =
+  //<game number>:<first game id in set>
+  private def multiMatchEntry(g: Game): Option[String] =
     if (!g.aborted) {
       g.metadata.multiMatch.fold(g.metadata.multiMatch.isDefined option "multiMatch") { s =>
         if (s.contains("multiMatch")) {
-          s"1:${g.id}".some
+          s"2:${g.id}".some
         } else if (s.substring(1, 2) == ":") {
-          s"${s.take(1).toInt - 1}:${g.id}".some
+          s"${s.take(1).toInt + 1}:${s.drop(2)}".some
         } else "multiMatch".some
       }
     } else g.metadata.multiMatch.isDefined option "multiMatch"
@@ -177,7 +177,7 @@ final private class Rematcher(
         source = game.source | Source.Lobby,
         daysPerTurn = game.daysPerTurn,
         pgnImport = None,
-        multiMatch = previousMultiMatch(game)
+        multiMatch = multiMatchEntry(game)
       ) withUniqueId idGenerator
     } yield game
   }

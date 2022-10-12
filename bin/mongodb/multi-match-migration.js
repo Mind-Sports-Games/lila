@@ -21,13 +21,12 @@ db.swiss_pairing.find({ mm: true }).forEach(sp => {
     }
   );
   print('updating game 1/2 ' + sp._id);
-  var game1mm = `2:${sp.mmid}`;
-  var game2mm = `1:${sp._id}`;
+  var game1mm = `1:${sp._id}`;
+  var game2mm = `2:${sp._id}`;
   db.game5.update(
     { _id: sp._id },
     {
       $set: {
-        lmm: false,
         mm: game1mm,
       },
     }
@@ -37,7 +36,6 @@ db.swiss_pairing.find({ mm: true }).forEach(sp => {
     { _id: sp.mmid },
     {
       $set: {
-        lmm: true,
         mm: game2mm,
       },
     }

@@ -59,7 +59,6 @@ final class JsonView(rematches: Rematches) {
         Json
           .obj("index" -> index)
           .add("gameId" -> game.metadata.multiMatchGameId.filter("*" !=))
-          .add("isLastMultiMatchGame" -> game.metadata.isLastMultiMatchGame)
       })
 }
 

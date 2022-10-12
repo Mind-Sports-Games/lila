@@ -486,11 +486,10 @@ final class SwissApi(
                         val pairingUpdated = pairing.copy(multiMatchGameIds = Some(gameIds))
                         val nextGame =
                           director.makeGame(swiss, playerMap, true)(pairingUpdated)
-                        val previousGameId =
-                          if (gameIds.size <= 1) game.game.id else gameIds((gameIds.size - 2))
-                        val multiMatch = s"${gameIds.size + 1}:${nextGame.id}"
-                        gameRepo.setMultiMatch(previousGameId, multiMatch)
-                        gameRepo.setIsLastMultiMatchGame(previousGameId, false)
+                        // val previousGameId =
+                        //   if (gameIds.size <= 1) game.game.id else gameIds((gameIds.size - 2))
+                        //val multiMatch = s"${gameIds.size + 1}:${nextGame.id}"
+                        //gameRepo.setMultiMatch(previousGameId, multiMatch)
                         gameRepo.insertDenormalized(nextGame) >> recomputeAndUpdateAll(
                           pairing.swissId
                         ) >>- onStart(nextGame.id)
