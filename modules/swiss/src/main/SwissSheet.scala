@@ -63,7 +63,7 @@ private object SwissSheet {
             pairing.status match {
               case Left(_) => List(Ongoing)
               case Right(None) =>
-                if (swiss.settings.isMatchScore && (swiss.settings.isBestOfX || swiss.settings.isPlayX))
+                if (swiss.settings.isMatchScore)
                   outcomeListFromMultiMatch(player, pairing)
                 else List(Draw)
               case Right(Some(playerIndex)) =>

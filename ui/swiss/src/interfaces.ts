@@ -87,6 +87,7 @@ export interface PairingBase {
   g: string; // game
   o?: boolean; // ongoing
   w?: boolean; // won
+  mw?: boolean[]; //mulitmatch wins
   mmids?: string[]; //multimatch gameids
   ms: boolean; // isMatchScore
   x: boolean; // isBestOfX

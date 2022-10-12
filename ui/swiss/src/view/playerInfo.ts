@@ -49,14 +49,20 @@ const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | 
 export default function (ctrl: SwissCtrl): VNode | undefined {
   if (!ctrl.playerInfoId) return;
   const isMatchScore = ctrl.data.isMatchScore;
+  const isMultiMatch = ctrl.data.nbGamesPerRound > 1;
   const data = ctrl.data.playerInfo;
   const noarg = ctrl.trans.noarg;
   const tag = 'div.swiss__player-info.swiss__table';
   if (data?.user.id !== ctrl.playerInfoId) return h(tag, [h('div.stats', [h('h2', ctrl.playerInfoId), spinner()])]);
-  const games = data.sheet.filter((p: any) => p.g).length; //todo change for multi match
-  const wins = data.sheet.filter((p: any) => p.w).length; //todo change for multi match
-  const avgOp: number | undefined = games
-    ? Math.round(data.sheet.reduce((r, p) => r + ((p as any).rating || 1), 0) / games)
+  const games = isMultiMatch
+    ? data.sheet.reduce((r, p) => r + ((p as any).mw || []).length, 0)
+    : data.sheet.filter((p: any) => p.g).length;
+  const wins = isMultiMatch
+    ? data.sheet.reduce((r, p) => r + ((p as any).mw || []).filter((a: any) => a).length, 0)
+    : data.sheet.filter((p: any) => p.w).length;
+  const pairings = data.sheet.filter((p: any) => p.g).length;
+  const avgOp: number | undefined = pairings
+    ? Math.round(data.sheet.reduce((r, p) => r + ((p as any).rating || 1), 0) / pairings)
     : undefined;
   return h(
     tag,

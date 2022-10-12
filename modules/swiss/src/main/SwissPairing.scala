@@ -35,6 +35,42 @@ case class SwissPairing(
   def p2Wins                         = status == Right(Some(PlayerIndex.P2))
   def isDraw                         = status == Right(None)
 
+  def numFirstPlayerWins = matchStatus match {
+    case Left(_)  => 0
+    case Right(l) => l.count(_ == Some(PlayerIndex.P1))
+  }
+  def numSecondPlayerWins = matchStatus match {
+    case Left(_)  => 0
+    case Right(l) => l.count(_ == Some(PlayerIndex.P2))
+  }
+  def numDraws = matchStatus match {
+    case Left(_)  => 0
+    case Right(l) => l.count(_ == None)
+  }
+  def numGames = matchStatus match {
+    case Left(_)  => 0
+    case Right(l) => l.length
+  }
+
+  def multiMatchWinsFor(userId: User.ID): Option[List[Boolean]] = {
+    if (nbGamesPerRound > 1)
+      matchStatus match {
+        case Left(_) => None
+        case Right(l) =>
+          l.zipWithIndex.map { case (outcome, index) =>
+            outcome.fold(false)(c =>
+              if ( //players swap playerindex each game of multi match
+                (c == playerIndexOf(userId) && (index % 2 == 0)) || (c != playerIndexOf(
+                  userId
+                ) && (index % 2 == 1))
+              ) true
+              else false
+            )
+          }.some
+      }
+    else None
+  }
+
   // matchScoreFor returns a two digit score (or empty string)
   def matchScoreFor(userId: User.ID) =
     if (isMatchScore)

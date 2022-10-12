@@ -302,6 +302,7 @@ object SwissJson {
       )
       .add("o" -> pairing.isOngoing)
       .add("w" -> pairing.resultFor(player.userId))
+      .add("mw" -> pairing.multiMatchWinsFor(player.userId))
       .add("c" -> (pairing.p1 == player.userId))
       .add("vi" -> pairing.variant.map(_.perfIcon.toString))
 
