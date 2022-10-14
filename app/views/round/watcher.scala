@@ -21,7 +21,8 @@ object watcher {
       cross: Option[lila.game.Crosstable.WithMatchup],
       userTv: Option[lila.user.User] = None,
       chatOption: Option[lila.chat.UserChat.Mine],
-      bookmarked: Boolean
+      bookmarked: Boolean,
+      swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context) = {
 
     val gameLogic = pov.game.variant.gameLogic
@@ -57,7 +58,7 @@ object watcher {
     )(
       main(cls := "round")(
         st.aside(cls := "round__side")(
-          bits.side(pov, data, tour, simul, userTv, bookmarked),
+          bits.side(pov, data, tour, simul, userTv, bookmarked, swissPairingGames),
           chatOption.map(_ => chat.frag)
         ),
         bits.roundAppPreload(pov, controls = false),
@@ -79,7 +80,15 @@ object watcher {
       frag(
         main(cls := "round")(
           st.aside(cls := "round__side")(
-            game.side(pov, initialFen, none, simul = none, userTv = none, bookmarked = false),
+            game.side(
+              pov,
+              initialFen,
+              none,
+              simul = none,
+              userTv = none,
+              bookmarked = false,
+              swissPairingGames = none
+            ),
             div(cls := "for-crawler")(
               h1(titleGame(pov.game)),
               p(describePov(pov)),

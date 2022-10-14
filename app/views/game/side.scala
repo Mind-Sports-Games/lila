@@ -1,6 +1,7 @@
 package views.html
 package game
 
+import strategygames.{ P1, P2 }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 
@@ -23,10 +24,11 @@ object side {
       tour: Option[lila.tournament.TourAndTeamVs],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
-      bookmarked: Boolean
+      bookmarked: Boolean,
+      swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context): Option[Frag] =
     ctx.noBlind option frag(
-      meta(pov, initialFen, tour, simul, userTv, bookmarked),
+      meta(pov, initialFen, tour, simul, userTv, bookmarked, swissPairingGames),
       pov.game.userIds.filter(isStreaming) map views.html.streamer.bits.contextual
     )
 
@@ -36,7 +38,8 @@ object side {
       tour: Option[lila.tournament.TourAndTeamVs],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
-      bookmarked: Boolean
+      bookmarked: Boolean,
+      swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context): Option[Frag] =
     ctx.noBlind option {
       import pov._
@@ -156,27 +159,27 @@ object side {
             a(href := routes.Simul.show(sim.id))(sim.fullName)
           )
         },
-        game.metadata.multiMatch map { m =>
+        swissPairingGames.map { spg =>
           st.section(cls := "game__multi-match")(
-            if (m.matches("[1-9]:.*")) {
-              val gamenb  = m.take(1).toInt;
-              val nbGames = gamenb //all we know about...
-              frag(
-                trans.multiMatch(),
-                ": ",
-                (1 to nbGames).map(i =>
-                  if (i == 1) {
-                    a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
-                      trans.gameNumberX(1)
+            frag(
+              trans.multiMatch(),
+              s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
+                .getOrElse("?")} (${spg.strResultOf(P2)}) :",
+              spg.multiMatchGames
+                .foldLeft(List(spg.game))(_ ++ _)
+                .zipWithIndex
+                .map {
+                  case (mmGame, index) => {
+                    val current = if (mmGame.id == game.id) " current" else ""
+                    a(
+                      cls := s"text glpt${current}",
+                      href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)
+                    )(
+                      trans.gameNumberX(index + 1)
                     )
-                  } else if (i == gamenb) {
-                    span(cls := "current")(trans.gameNumberX(i))
-                  } else {
-                    span(cls := "")(trans.gameNumberX(i))
                   }
-                )
-              )
-            } else trans.multiMatchGameX(1)
+                }
+            )
           )
         }
       )

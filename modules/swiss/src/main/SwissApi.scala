@@ -441,6 +441,15 @@ final class SwissApi(
       ids.flatMap(ids => toSwissPairingGames(swissId, ids, gamesById))
     }
 
+  def getSwissPairingGamesForGame(game: Game): Fu[Option[SwissPairingGames]] =
+    getSwissPairingForGame(game).flatMap {
+      _ ?? { pairing =>
+        getGamesMap(pairing.multiMatchGameIds.foldLeft(List(pairing.id))(_ ++ _)) map { gamesById =>
+          toSwissPairingGames(pairing.swissId, pairing, gamesById).head.some
+        }
+      }
+    }
+
   private[swiss] def getSwissPairingForGame(game: Game): Fu[Option[SwissPairing]] =
     SwissPairing.fields { f =>
       colls.pairing
