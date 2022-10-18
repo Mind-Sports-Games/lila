@@ -318,7 +318,7 @@ export function backToTournament(ctrl: RoundController): VNode | undefined {
 
 export function backToSwiss(ctrl: RoundController): VNode | undefined {
   const d = ctrl.data;
-  if (d.swiss?.isBestOfX || d.swiss?.isPlayX) {
+  if (d.swiss?.running && (d.swiss?.isBestOfX || d.swiss?.isPlayX)) {
     ctrl.setRedirecting();
     location.href = '/swiss/' + d.swiss?.id;
     return undefined;

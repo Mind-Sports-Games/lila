@@ -53,9 +53,9 @@ case class SwissPairing(
     }
   }
 
-  def multiMatchWinsFor(userId: User.ID): Option[List[Boolean]] = {
+  def multiMatchResultsFor(userId: User.ID): Option[List[String]] = {
     if (nbGamesPerRound > 1)
-      matchStatus.fold(_ => None, matchResultsMap(false, true, false)(playerIndexOf(userId))(_).some)
+      matchStatus.fold(_ => None, matchResultsMap("draw", "win", "loss")(playerIndexOf(userId))(_).some)
     else None
   }
 
@@ -178,14 +178,17 @@ case class SwissPairingGames(
     } else List(game.winnerPlayerIndex)
 
   def strResultOf(playerIndex: PlayerIndex) =
-    matchResultsMap(0.5, 1, 0)(playerIndex)(
+    matchResultsMap(1, 2, 0)(playerIndex)(
       multiMatchGames
         .foldLeft(List(game))(_ ++ _)
         .filter(g => g.finished)
         .map(g => g.winnerPlayerIndex)
     )
-      .foldLeft(0.0)(_ + _)
-      .toString()
+      .foldLeft(0)(_ + _) match {
+      case x if x % 2 == 0 => s"${(x / 2)}"
+      case x if x % 2 == 1 => s"${(x / 2)}.5"
+      case _ => "*"
+    }
 
 }
 

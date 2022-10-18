@@ -163,6 +163,9 @@ object side {
           st.section(cls := "game__multi-match")(
             frag(
               trans.multiMatch(),
+              if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
+              else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
+              else "",
               s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
                 .getOrElse("?")} (${spg.strResultOf(P2)}) :",
               spg.multiMatchGames

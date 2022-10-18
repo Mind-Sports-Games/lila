@@ -22,6 +22,9 @@ interface MultiMatchOutcome {
 interface MultiMatchPairing extends PairingExt {
   t: 'p';
   round: number;
+  ismm: boolean;
+  mmGameNb: number;
+  mmGameRes?: string;
   isFinalGame: boolean;
 }
 
@@ -31,15 +34,34 @@ const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | 
   const newSheet: (MultiMatchPairing | MultiMatchOutcome)[] = [];
   let round = 1;
   sheet.forEach(v => {
+    let gameNb = 1;
     if (isOutcome(v)) {
       newSheet.push({ t: 'o', round, outcome: v });
     } else if ((v.x || v.px) && v.mmids) {
-      newSheet.push({ t: 'p', round: round, isFinalGame: false, ...v });
-      v.mmids.forEach(gid =>
-        newSheet.push({ t: 'p', round: round, isFinalGame: gid == v.mmids![v.mmids!.length - 1], ...v, g: gid })
-      );
+      newSheet.push({
+        t: 'p',
+        round: round,
+        ismm: true,
+        mmGameRes: v.mr ? v.mr[0] : undefined,
+        mmGameNb: 1,
+        isFinalGame: false,
+        ...v,
+      });
+      v.mmids.forEach(gid => {
+        gameNb += 1;
+        newSheet.push({
+          t: 'p',
+          round: round,
+          ismm: true,
+          mmGameRes: v.mr ? v.mr![gameNb - 1] : undefined,
+          mmGameNb: gameNb,
+          isFinalGame: gid == v.mmids![v.mmids!.length - 1],
+          ...v,
+          g: gid,
+        });
+      });
     } else {
-      newSheet.push({ t: 'p', round: round, isFinalGame: true, ...v });
+      newSheet.push({ t: 'p', round: round, ismm: false, isFinalGame: true, mmGameNb: 1, ...v });
     }
     round += 1;
   });
@@ -55,10 +77,10 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
   const tag = 'div.swiss__player-info.swiss__table';
   if (data?.user.id !== ctrl.playerInfoId) return h(tag, [h('div.stats', [h('h2', ctrl.playerInfoId), spinner()])]);
   const games = isMultiMatch
-    ? data.sheet.reduce((r, p) => r + ((p as any).mw || []).length, 0)
+    ? data.sheet.reduce((r, p) => r + ((p as any).mr || []).length, 0)
     : data.sheet.filter((p: any) => p.g).length;
   const wins = isMultiMatch
-    ? data.sheet.reduce((r, p) => r + ((p as any).mw || []).filter((a: any) => a).length, 0)
+    ? data.sheet.reduce((r, p) => r + ((p as any).mr || []).filter((a: any) => a == 'win').length, 0)
     : data.sheet.filter((p: any) => p.w).length;
   const pairings = data.sheet.filter((p: any) => p.g).length;
   const avgOp: number | undefined = pairings
@@ -140,12 +162,12 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 },
               },
               [
-                h('th', p.isFinalGame ? '' + round : ''),
+                h('th', p.ismm ? '' + round + '.' + p.mmGameNb : '' + round),
                 ctrl.data.isMedley && p.vi ? h('td', { attrs: { 'data-icon': p.vi } }, '') : null,
                 h('td', userName(p.user)),
                 h('td', ctrl.data.isMedley ? '' : '' + p.rating),
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
-                h('td', p.isFinalGame ? res : ''),
+                h('td', gameResult(p) + (p.ismm && p.isFinalGame ? res : '')),
               ]
             );
           })
@@ -153,6 +175,23 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
       ]),
     ]
   );
+}
+
+function gameResult(p: MultiMatchPairing): string {
+  if (p.ismm) {
+    switch (p.mmGameRes) {
+      case 'win':
+        return '(1) ';
+      case 'loss':
+        return '(0) ';
+      case 'draw':
+        return '(½) ';
+      default:
+        return '(*) ';
+    }
+  } else {
+    return result(p);
+  }
 }
 
 function result(p: MultiMatchPairing): string {
