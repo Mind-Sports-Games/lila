@@ -1,25 +1,19 @@
 //Convert micro match records in mongo to multimatch games and apporpiate swiss/game objects)
 
+function convertMatchResult(r) {
+  if (r.w == true) {
+    return parseInt('1');
+  } else if (r.w == false) {
+    return parseInt('2');
+  } else {
+    return parseInt('0');
+  }
+}
+
 //count swiss_pairing changes //105 on dev, 1476 on live
 db.swiss_pairing.count({ mm: true });
 //update swisspairing collection
 db.swiss_pairing.find({ mm: true }).forEach(sp => {
-  print(sp.s + ' swiss updating');
-  db.swiss_pairing.update(
-    { _id: sp._id },
-    {
-      $set: {
-        mm: false,
-        px: true,
-        gpr: 2,
-        mmids: [sp.mmid],
-      },
-      $unset: {
-        mmid: true,
-        mm: true,
-      },
-    }
-  );
   print('updating game 1/2 ' + sp._id);
   var game1mm = `1:${sp._id}`;
   var game2mm = `2:${sp._id}`;
@@ -40,6 +34,34 @@ db.swiss_pairing.find({ mm: true }).forEach(sp => {
       },
     }
   );
+  //update mt in swiss paring
+  var res1 = 0;
+  db.game5.find({ _id: sp._id }, { w: 1, _id: 0 }).forEach(r => {
+    res1 = convertMatchResult(r);
+  });
+  var res2 = 0;
+  db.game5.find({ _id: sp.mmid }, { w: 1, _id: 0 }).forEach(r => {
+    res2 = convertMatchResult(r);
+  });
+  var matchRes = [NumberInt(res1), NumberInt(res2)];
+
+  print(sp.s + ' swiss pairing updating');
+  db.swiss_pairing.update(
+    { _id: sp._id },
+    {
+      $set: {
+        mm: false,
+        px: true,
+        gpr: 2,
+        mmids: [sp.mmid],
+        mt: matchRes,
+      },
+      // $unset: {
+      //   mmid: true,
+      //   mm: true,
+      // },
+    }
+  );
 });
 
 //count swiss changes
@@ -55,9 +77,9 @@ db.swiss.find({ 'settings.m': true }).forEach(s => {
         'settings.px': true,
         'settings.gpr': 2,
       },
-      $unset: {
-        'settings.m': true,
-      },
+      // $unset: {
+      //   'settings.m': true,
+      // },
     }
   );
   print(s._id + ' swiss updated');

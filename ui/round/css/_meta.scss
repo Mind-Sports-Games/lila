@@ -79,6 +79,10 @@
     &:first-child {
       margin-left: 0.6em;
     }
+    &.mm_game_link {
+      white-space: nowrap;
+      display: inline-block;
+    }
   }
   .current {
     font-weight: bold;

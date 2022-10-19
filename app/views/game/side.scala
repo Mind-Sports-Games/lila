@@ -167,7 +167,7 @@ object side {
               else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
               else "",
               s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
-                .getOrElse("?")} (${spg.strResultOf(P2)}) :",
+                .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
               spg.multiMatchGames
                 .foldLeft(List(spg.game))(_ ++ _)
                 .zipWithIndex
@@ -175,7 +175,7 @@ object side {
                   case (mmGame, index) => {
                     val current = if (mmGame.id == game.id) " current" else ""
                     a(
-                      cls := s"text glpt${current}",
+                      cls := s"text glpt${current} mm_game_link",
                       href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)
                     )(
                       trans.gameNumberX(index + 1)

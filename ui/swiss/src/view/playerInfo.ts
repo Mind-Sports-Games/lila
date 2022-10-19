@@ -36,7 +36,7 @@ const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | 
   sheet.forEach(v => {
     let gameNb = 1;
     if (isOutcome(v)) {
-      newSheet.push({ t: 'o', round, outcome: v });
+      newSheet.push({ t: 'o', round: round, outcome: v });
     } else if ((v.x || v.px) && v.mmids) {
       newSheet.push({
         t: 'p',
@@ -65,7 +65,7 @@ const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | 
     }
     round += 1;
   });
-  return newSheet;
+  return newSheet.sort(gameOrder);
 };
 
 export default function (ctrl: SwissCtrl): VNode | undefined {
@@ -137,7 +137,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 },
                 [
                   h('th', '' + round),
-                  h('td.outcome', { attrs: { colspan: 3 } }, p.outcome),
+                  h('td.outcome', { attrs: { colspan: 4 } }, p.outcome),
                   h(
                     'td',
                     p.outcome == 'absent'
@@ -167,7 +167,8 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('td', userName(p.user)),
                 h('td', ctrl.data.isMedley ? '' : '' + p.rating),
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
-                h('td', gameResult(p) + (p.ismm && p.isFinalGame ? res : '')),
+                h('td', p.ismm ? gameResult(p) : ''),
+                p.ismm && p.isFinalGame ? h('td', { attrs: { rowSpan: p.mmGameNb } }, res) : h('td', p.ismm ? '' : res),
               ]
             );
           })
@@ -206,6 +207,25 @@ function result(p: MultiMatchPairing): string {
     default:
       return p.o ? '*' : '½';
   }
+}
+
+function gameOrder(p1: MultiMatchPairing | MultiMatchOutcome, p2: MultiMatchPairing | MultiMatchOutcome): number {
+  let n1 = p1.round * 100;
+  let n2 = p2.round * 100;
+  if (!isMultiMatchOutcome(p1)) {
+    n1 -= p1.mmGameNb;
+  }
+  if (!isMultiMatchOutcome(p2)) {
+    n2 -= p2.mmGameNb;
+  }
+
+  if (n1 > n2) {
+    return 1;
+  }
+  if (n1 < n2) {
+    return -1;
+  }
+  return 0;
 }
 
 function setup(vnode: VNode) {
