@@ -26,7 +26,7 @@ export const perf = {
     frisian: '',
     frysk: '',
     shogi: '',
-    xiangqi: 't',
+    xiangqi: '',
     minishogi: '',
     minixiangqi: '',
     flipello: 'l',
