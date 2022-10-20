@@ -55,10 +55,10 @@ final class JsonView(rematches: Rematches) {
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedPlies))
-      .add("microMatch" -> game.metadata.microMatchGameNr.map { index =>
+      .add("multiMatch" -> game.metadata.multiMatchGameNr.map { index =>
         Json
           .obj("index" -> index)
-          .add("gameId" -> game.metadata.microMatchGameId.filter("*" !=))
+          .add("gameId" -> game.metadata.multiMatchGameId.filter("*" !=))
       })
 }
 
@@ -148,7 +148,7 @@ object JsonView {
           "name"      -> VariantKeys.variantName(v),
           "short"     -> VariantKeys.variantShortName(v),
           "lib"       -> v.gameLogic.id,
-          "boardSize" -> fairyVariant.boardSize,
+          "boardSize" -> fairyVariant.boardSize
         )
       case Variant.Mancala(mancalaVariant) =>
         Json.obj(
@@ -179,7 +179,7 @@ object JsonView {
         "height" -> b.height
       )
     }
-  
+
   implicit val boardSizeMancalaWriter: Writes[strategygames.mancala.Board.BoardSize] =
     Writes[strategygames.mancala.Board.BoardSize] { b =>
       Json.obj(
@@ -191,10 +191,10 @@ object JsonView {
   implicit val boardSizeWriter: Writes[strategygames.draughts.Board.BoardSize] =
     Writes[strategygames.draughts.Board.BoardSize] { b =>
       Json.obj(
-        "key"  -> b.key,
-        "size" -> b.sizes,
-        "width" -> b.width,
-        "height" -> b.height,
+        "key"    -> b.key,
+        "size"   -> b.sizes,
+        "width"  -> b.width,
+        "height" -> b.height
       )
     }
 

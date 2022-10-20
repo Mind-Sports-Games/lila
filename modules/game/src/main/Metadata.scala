@@ -17,20 +17,34 @@ private[game] case class Metadata(
     simulPairing: Option[Int] = None,
     timeOutUntil: Option[DateTime] = None,
     drawLimit: Option[Int] = None,
-    microMatch: Option[String] = None,
+    multiMatch: Option[String] = None
 ) {
 
-  def needsMicroRematch = microMatch.contains("micromatch")
+  /*
+    This function is used within the round context to check if another game is required.
+    i.e. it will get used for challenged when they are supported. Within Swiss tournaments
+    new games are setup from the SwissDirecter and dont use this system.
+   */
+  def needsMultiMatchRematch =
+    multiMatch.fold(false)(x => x.contains("challengeMultiMatch"))
 
-  def microMatchGameNr = microMatch ?? { mm =>
-    if (mm == "micromatch" || mm.startsWith("2:")) 1.some
-    else if (mm.startsWith("1:")) 2.some
+  def multiMatchGameNr = multiMatch ?? { mm =>
+    if (mm == "multiMatch") 1.some
+    else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1))
     else none
-    }
+  }
 
-  def microMatchGameId = microMatch.map { mm =>
-    if (mm.startsWith("2:") || mm.startsWith("1:")) mm.drop(2)
+  def multiMatchGameId = multiMatch.map { mm =>
+    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2)
     else "*"
+  }
+
+  private def toInt(s: String): Option[Int] = {
+    try {
+      Some(s.toInt)
+    } catch {
+      case _: Exception => None
+    }
   }
 
   def pgnDate = pgnImport flatMap (_.date)

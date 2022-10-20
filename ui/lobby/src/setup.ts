@@ -139,7 +139,7 @@ export default class Setup {
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
-      $microMatch = $form.find('.micro_match'),
+      $multiMatch = $form.find('.multi_match'),
       $timeInput = $form.find('.time_choice [name=time]'),
       $incrementInput = $form.find('.increment_choice [name=increment]'),
       $daysInput = $form.find('.days_choice [name=days]'),
@@ -553,7 +553,7 @@ export default class Setup {
         let ground = 'chessground';
         if (variantId[0] == '1') ground = 'draughtsground';
         ground += '.resize';
-        $microMatch.toggle(isFen && variantId[0] == '1');
+        $multiMatch.toggle(isFen && variantId[0] == '1');
         $fenPosition.toggle(isFen);
         $modeChoicesWrap.toggle(!isFen);
         if (isFen) {

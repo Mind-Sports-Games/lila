@@ -24,7 +24,8 @@ object replayBot {
     ) {
       main(cls := "analyse")(
         st.aside(cls := "analyse__side")(
-          views.html.game.side(pov, initialFen, none, simul = simul, bookmarked = false)
+          views.html.game
+            .side(pov, initialFen, none, simul = simul, bookmarked = false, swissPairingGames = None)
         ),
         div(cls := "analyse__board main-board")(chessgroundBoard),
         div(cls := "analyse__tools")(div(cls := "ceval")),

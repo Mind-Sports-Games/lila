@@ -1,11 +1,16 @@
 package lila.swiss
 
-private case class SwissSheet(outcomes: List[SwissSheet.Outcome]) {
+private case class SwissSheet(outcomes: List[List[SwissSheet.Outcome]]) {
   import SwissSheet._
 
   def points =
     Swiss.Points {
       outcomes.foldLeft(0) { case (acc, out) => acc + pointsFor(out) }
+    }
+
+  def pointsTrf =
+    Swiss.Points {
+      outcomes.foldLeft(0) { case (acc, out) => acc + pointsForTrf(out) }
     }
 }
 
@@ -19,11 +24,22 @@ private object SwissSheet {
   case object Loss    extends Outcome
   case object Draw    extends Outcome
 
-  def pointsFor(outcome: Outcome) =
+  def pointsFor(outcome: Outcome): Int =
     outcome match {
       case Win | Bye => 2
       case Draw      => 1
       case _         => 0
+    }
+
+  def pointsFor(outcome: List[Outcome]): Int =
+    outcome.foldLeft(0) { case (acc, out) => acc + pointsFor(out) }
+
+  //BBpairings can only handle the same points for a win, loss or draw therefore we have to lie to it
+  def pointsForTrf(outcome: List[Outcome]): Int =
+    pointsFor(outcome) match {
+      case score if score > outcome.length  => 2
+      case score if score == outcome.length => 1
+      case _                                => 0
     }
 
   def many(
@@ -45,14 +61,47 @@ private object SwissSheet {
         pairingMap get round match {
           case Some(pairing) =>
             pairing.status match {
-              case Left(_)                  => Ongoing
-              case Right(None)              => Draw
-              case Right(Some(playerIndex)) => if (pairing(playerIndex) == player.userId) Win else Loss
+              case Left(_) => List(Ongoing)
+              case Right(None) =>
+                if (swiss.settings.isMatchScore)
+                  outcomeListFromMultiMatch(player, pairing)
+                else List(Draw)
+              case Right(Some(playerIndex)) =>
+                if (swiss.settings.isMatchScore) {
+                  outcomeListFromMultiMatch(player, pairing)
+                } else if (pairing(playerIndex) == player.userId) List(Win)
+                else List(Loss)
             }
-          case None if player.byes(round) => Bye
-          case None                       => Absent
+          case None if player.byes(round) =>
+            if (swiss.settings.isMatchScore) {
+              if (swiss.settings.isBestOfX) {
+                List.fill(swiss.settings.nbGamesPerRound / 2 + 1)(
+                  Bye
+                ) // odd nbGamesPerRound not allowed in form for this setup...
+              } else {
+                List.fill(swiss.settings.nbGamesPerRound)(Bye)
+              }
+            } else List(Bye)
+          case None => List(Absent)
         }
       }
+    }
+
+  def outcomeListFromMultiMatch(player: SwissPlayer, pairing: SwissPairing): List[Outcome] =
+    pairing.matchStatus match {
+      case Left(_) => List(Ongoing)
+      case Right(l) =>
+        l.zipWithIndex
+          .map { case (outcome, index) =>
+            outcome.fold[Outcome](Draw)(c =>
+              if (
+                (pairing(c) == player.userId && index % 2 == 0) || (pairing(
+                  c
+                ) != player.userId && index % 2 == 1)
+              ) Win
+              else Loss
+            )
+          }
     }
 
 }

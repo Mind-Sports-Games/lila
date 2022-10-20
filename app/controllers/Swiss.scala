@@ -196,7 +196,10 @@ final class Swiss(
           .bindFromRequest()
           .fold(
             err => BadRequest(html.swiss.form.edit(swiss, err)).fuccess,
-            data => env.swiss.api.update(swiss, data) inject Redirect(routes.Swiss.show(id))
+            data =>
+              env.swiss.api.update(swiss, data) inject Redirect(
+                routes.Swiss.show(id)
+              )
           )
       }
     }
