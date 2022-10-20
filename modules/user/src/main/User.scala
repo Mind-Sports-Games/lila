@@ -41,7 +41,13 @@ case class User(
   override def toString =
     s"User $username(${perfs.bestRating}) games:${count.game}${marks.troll ?? " troll"}${marks.engine ?? " engine"}${!enabled ?? " closed"}"
 
-  def light = LightUser(id = id, name = username, title = title.map(_.value), isPatron = isPatron)
+  def light = LightUser(
+    id = id,
+    name = username,
+    country = profile.flatMap(_.country),
+    title = title.map(_.value),
+    isPatron = isPatron
+  )
 
   def realNameOrUsername = profileOrDefault.nonEmptyRealName | username
 
@@ -132,6 +138,9 @@ case class User(
   def isSuperAdmin = roles.exists(_ contains "ROLE_SUPER_ADMIN")
   def isAdmin      = roles.exists(_ contains "ROLE_ADMIN") || isSuperAdmin
   def isApiHog     = roles.exists(_ contains "ROLE_API_HOG")
+
+  def isPlayStrategyTourBot = roles.exists(_ contains "ROLE_PSTBOT")
+  def isUserBot             = isBot && !isPlayStrategyTourBot
 }
 
 object User {
@@ -164,11 +173,12 @@ object User {
     case object InvalidTotpToken          extends Result(none)
   }
 
-  val anonymous                    = "Anonymous"
-  val playstrategyId                    = "playstrategy"
-  val broadcasterId                = "broadcaster"
-  val ghostId                      = "ghost"
-  def isOfficial(username: String) = normalize(username) == playstrategyId || normalize(username) == broadcasterId
+  val anonymous      = "Anonymous"
+  val playstrategyId = "playstrategy"
+  val broadcasterId  = "broadcaster"
+  val ghostId        = "ghost"
+  def isOfficial(username: String) =
+    normalize(username) == playstrategyId || normalize(username) == broadcasterId
 
   val seenRecently = 2.minutes
 
@@ -250,6 +260,7 @@ object User {
     val enabled               = "enabled"
     val roles                 = "roles"
     val profile               = "profile"
+    val country               = s"$profile.country"
     val toints                = "toints"
     val playTime              = "time"
     val createdAt             = "createdAt"
@@ -263,7 +274,7 @@ object User {
     val verbatimEmail         = "verbatimEmail"
     val mustConfirmEmail      = "mustConfirmEmail"
     val prevEmail             = "prevEmail"
-    val playerIndexIt               = "playerIndexIt"
+    val playerIndexIt         = "playerIndexIt"
     val plan                  = "plan"
     val salt                  = "salt"
     val bpass                 = "bpass"
@@ -348,10 +359,12 @@ object User {
 
   private val secondRow: List[PerfType] =
     PerfType.all.filter(_.key == "ultraBullet") :::
-    PerfType.variants.filter(p => (p.category match {
-      case Left(Right(v)) => v.gameLogic
-      case _              => GameLogic.Chess()
-    }) == GameLogic.Chess())
+      PerfType.variants.filter(p =>
+        (p.category match {
+          case Left(Right(v)) => v.gameLogic
+          case _              => GameLogic.Chess()
+        }) == GameLogic.Chess()
+      )
 
   val topPerfTrophiesEnabled = false
 }

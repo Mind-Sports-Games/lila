@@ -1,8 +1,9 @@
 package lila.tournament
 
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, Weeks }
 import reactivemongo.api.ReadPreference
 import scala.concurrent.duration._
+import scala.util.Random
 
 import lila.db.dsl._
 import lila.user.User
@@ -101,7 +102,7 @@ object TournamentShield {
   case class History(value: Map[Category, List[Award]]) {
 
     def sorted: List[(Category, List[Award])] =
-      Category.all map { categ =>
+      Category.all.sortBy(_.dayOfMonth) map { categ =>
         categ -> ~(value get categ)
       }
 
@@ -118,41 +119,91 @@ object TournamentShield {
   sealed abstract class MedleyShield(
       val key: String,
       val name: String,
+      val teamOwner: Condition.TeamMember,
       val eligibleVariants: List[Variant],
-      val formatStr: String
+      val generateVariants: List[Variant] => List[Variant],
+      val dayOfWeek: Int,
+      val hour: Int,
+      val arenaMinutes: Int,
+      val arenaMedleyMinutes: Int,
+      val swissFormat: String,
+      val arenaFormat: String,
+      val arenaDescription: String
   ) {
-    def hasAllVariants = eligibleVariants == Variant.all
+    def hasAllVariants  = eligibleVariants == Variant.all
+    def medleyName      = s"${name} Medley Shield"
+    def url             = s"https://playstrategy.org/tournament/medley-shield/${key}"
+    def arenaFormatFull = s"${arenaFormat} Each variant is active for ${arenaMedleyMinutes} minutes."
+    def arenaDescriptionFull =
+      s"${arenaDescription}\r\n\r\nWin the tournament, win the shield... until next week!\r\n\r\nMore info here: ${url}"
   }
 
   object MedleyShield {
+
+    private def playStrategyMedleyGeneration(variants: List[Variant]) = {
+      val thisOrder =
+        Random.shuffle(variants)
+      val onePerGameFamily =
+        Random.shuffle(GameFamily.all.map(gf => thisOrder.filter(_.gameFamily == gf).head))
+      onePerGameFamily ::: thisOrder.filterNot(onePerGameFamily.contains(_))
+    }
+    private val playStrategyRounds = 7
 
     case object PlayStrategyMedley
         extends MedleyShield(
           "shieldPlayStrategyMedley",
           "PlayStrategy",
-          Variant.all,
-          s"7 round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
+          Condition.TeamMember("playstrategy-medleys", "PlayStrategy Medleys"),
+          Variant.all.filterNot(_.fromPositionVariant),
+          playStrategyMedleyGeneration,
+          7,
+          19,
+          105,
+          15,
+          s"${playStrategyRounds} round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
+          s"${playStrategyRounds} variant Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
+          s"PlayStrategy Medley Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
         )
 
+    private def randomVariantOrder(variants: List[Variant]) = Random.shuffle(variants)
+
     private val chessVariantOptions = Variant.all.filter(_.exoticChessVariant)
+    private val chessVariantRounds  = 5
 
     case object ChessVariantsMedley
         extends MedleyShield(
           "shieldChessMedley",
           "Chess Variants",
+          Condition.TeamMember("playstrategy-chess-variants", "PlayStrategy Chess Variants"),
           chessVariantOptions,
-          s"5 round Swiss (each pairing plays twice, once each as the start player). 5 from the ${chessVariantOptions.length} listed chess variants will be picked."
+          randomVariantOrder,
+          6,
+          19,
+          100,
+          20,
+          s"${chessVariantRounds} round Swiss using micro-match rounds (each pairing plays twice, once each as the start player). ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants will be picked.",
+          s"${chessVariantRounds} variant Arena where ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants are picked.",
+          s"Chess Variants Medley Arena, where ${chessVariantRounds} from the following ${chessVariantOptions.length} chess variants are picked: ${chessVariantOptions.map(VariantKeys.variantName).mkString(", ")}."
         )
 
     private val draughtsVariantOptions =
       Variant.all.filter(_.gameFamily == GameFamily.Draughts()).filterNot(_.fromPositionVariant)
+    private val draughtsRounds = 7
 
     case object DraughtsMedley
         extends MedleyShield(
           "shieldDraughtsMedley",
           "Draughts",
+          Condition.TeamMember("playstrategy-draughts", "PlayStrategy Draughts"),
           draughtsVariantOptions,
-          s"7 round Swiss where 7 from the ${draughtsVariantOptions.length} listed draughts variants will be picked."
+          randomVariantOrder,
+          6,
+          13,
+          105,
+          15,
+          s"${draughtsRounds} round Swiss where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants will be picked.",
+          s"${draughtsRounds} variant Arena where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants are picked.",
+          s"Draughts Medley Arena, where ${draughtsRounds} from the following ${draughtsVariantOptions.length} Draughts variants are picked: ${draughtsVariantOptions.map(VariantKeys.variantName).mkString(", ")}."
         )
 
     val all = List(
@@ -161,169 +212,237 @@ object TournamentShield {
       DraughtsMedley
     )
 
+    val medleyTeamIDs = all.map(_.teamOwner.teamId)
+
     def byKey(k: String): Option[MedleyShield] = all.find(_.key == k)
 
+    private val medleyStartDate = new DateTime(2022, 6, 11, 0, 0)
+    val arenaMedleyStartDate    = new DateTime(2022, 8, 7, 22, 0)
+
+    def weeksSinceStart(startsAt: DateTime) =
+      Weeks.weeksBetween(medleyStartDate, startsAt).getWeeks()
+
+    def makeName(baseName: String, startsAt: DateTime) =
+      s"${baseName} ${weeksSinceStart(startsAt) + 1}"
   }
 
   sealed abstract class Category(
-      val variant: Variant
+      val variant: Variant,
+      val speed: Schedule.Speed,
+      val dayOfMonth: Int,
+      val offsetHour: Int = 0
   ) {
     def key                       = variant.key
     def name                      = VariantKeys.variantName(variant)
     def iconChar                  = variant.perfIcon
     def matches(tour: Tournament) = Some(variant).has(tour.variant)
+    def scheduleHour              = TournamentShield.defaultShieldHour - offsetHour
   }
 
   object Category {
 
+    import Schedule.Speed._
+
     case object Chess
         extends Category(
-          Variant.Chess(strategygames.chess.variant.Standard)
+          Variant.Chess(strategygames.chess.variant.Standard),
+          Blitz32,
+          18
         )
 
     case object Chess960
         extends Category(
-          Variant.Chess(strategygames.chess.variant.Chess960)
+          Variant.Chess(strategygames.chess.variant.Chess960),
+          Blitz32,
+          2
         )
 
     case object KingOfTheHill
         extends Category(
-          Variant.Chess(strategygames.chess.variant.KingOfTheHill)
+          Variant.Chess(strategygames.chess.variant.KingOfTheHill),
+          Blitz32,
+          14
         )
 
     case object Antichess
         extends Category(
-          Variant.Chess(strategygames.chess.variant.Antichess)
+          Variant.Chess(strategygames.chess.variant.Antichess),
+          Blitz32,
+          24
         )
 
     case object Atomic
         extends Category(
-          Variant.Chess(strategygames.chess.variant.Atomic)
+          Variant.Chess(strategygames.chess.variant.Atomic),
+          Blitz32,
+          8
         )
 
     case object ThreeCheck
         extends Category(
-          Variant.Chess(strategygames.chess.variant.ThreeCheck)
+          Variant.Chess(strategygames.chess.variant.ThreeCheck),
+          Blitz32,
+          11
         )
 
     case object FiveCheck
         extends Category(
-          Variant.Chess(strategygames.chess.variant.FiveCheck)
+          Variant.Chess(strategygames.chess.variant.FiveCheck),
+          Blitz32,
+          28
         )
 
     case object Horde
         extends Category(
-          Variant.Chess(strategygames.chess.variant.Horde)
+          Variant.Chess(strategygames.chess.variant.Horde),
+          Blitz32,
+          16
         )
 
     case object RacingKings
         extends Category(
-          Variant.Chess(strategygames.chess.variant.RacingKings)
+          Variant.Chess(strategygames.chess.variant.RacingKings),
+          Blitz32,
+          5
         )
 
     case object Crazyhouse
         extends Category(
-          Variant.Chess(strategygames.chess.variant.Crazyhouse)
+          Variant.Chess(strategygames.chess.variant.Crazyhouse),
+          Blitz32,
+          21
         )
 
     case object NoCastling
         extends Category(
-          Variant.Chess(strategygames.chess.variant.NoCastling)
+          Variant.Chess(strategygames.chess.variant.NoCastling),
+          Blitz32,
+          26
         )
 
     case object LinesOfAction
         extends Category(
-          Variant.Chess(strategygames.chess.variant.LinesOfAction)
+          Variant.Chess(strategygames.chess.variant.LinesOfAction),
+          Blitz32,
+          1
         )
 
     case object ScrambledEggs
         extends Category(
-          Variant.Chess(strategygames.chess.variant.ScrambledEggs)
+          Variant.Chess(strategygames.chess.variant.ScrambledEggs),
+          Blitz32,
+          17
         )
 
     case object International
         extends Category(
-          Variant.Draughts(strategygames.draughts.variant.Standard)
+          Variant.Draughts(strategygames.draughts.variant.Standard),
+          Blitz32,
+          3
         )
 
     case object Frisian
         extends Category(
-          Variant.Draughts(strategygames.draughts.variant.Frisian)
+          Variant.Draughts(strategygames.draughts.variant.Frisian),
+          Blitz32,
+          12
         )
 
     case object Frysk
         extends Category(
-          Variant.Draughts(strategygames.draughts.variant.Frysk)
+          Variant.Draughts(strategygames.draughts.variant.Frysk),
+          Blitz32,
+          22
         )
 
     case object Antidraughts
         extends Category(
-          Variant.Draughts(strategygames.draughts.variant.Antidraughts)
+          Variant.Draughts(strategygames.draughts.variant.Antidraughts),
+          Blitz32,
+          9
         )
 
     case object Breakthrough
         extends Category(
-          Variant.Draughts(strategygames.draughts.variant.Breakthrough)
+          Variant.Draughts(strategygames.draughts.variant.Breakthrough),
+          Blitz32,
+          19
         )
 
     case object Russian
         extends Category(
-          Variant.Draughts(strategygames.draughts.variant.Russian)
+          Variant.Draughts(strategygames.draughts.variant.Russian),
+          Blitz32,
+          6
         )
 
     case object Brazilian
         extends Category(
-          Variant.Draughts(strategygames.draughts.variant.Brazilian)
+          Variant.Draughts(strategygames.draughts.variant.Brazilian),
+          Blitz32,
+          15
         )
 
     case object Pool
         extends Category(
-          Variant.Draughts(strategygames.draughts.variant.Pool)
-        )
-
-    case object Portuguese
-        extends Category(
-          Variant.Draughts(strategygames.draughts.variant.Portuguese)
+          Variant.Draughts(strategygames.draughts.variant.Pool),
+          Blitz32,
+          25
         )
 
     case object Shogi
         extends Category(
-          Variant.FairySF(strategygames.fairysf.variant.Shogi)
+          Variant.FairySF(strategygames.fairysf.variant.Shogi),
+          Blitz53,
+          4
         )
 
     case object Xiangqi
         extends Category(
-          Variant.FairySF(strategygames.fairysf.variant.Xiangqi)
+          Variant.FairySF(strategygames.fairysf.variant.Xiangqi),
+          Blitz53,
+          23
         )
 
     case object MiniShogi
         extends Category(
-          Variant.FairySF(strategygames.fairysf.variant.MiniShogi)
+          Variant.FairySF(strategygames.fairysf.variant.MiniShogi),
+          Blitz32,
+          13
         )
 
     case object MiniXiangqi
         extends Category(
-          Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)
+          Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi),
+          Blitz32,
+          7
         )
 
     case object Flipello
         extends Category(
-          Variant.FairySF(strategygames.fairysf.variant.Flipello)
+          Variant.FairySF(strategygames.fairysf.variant.Flipello),
+          Blitz32,
+          10
         )
 
     case object Flipello10
         extends Category(
-          Variant.FairySF(strategygames.fairysf.variant.Flipello10)
+          Variant.FairySF(strategygames.fairysf.variant.Flipello10),
+          Blitz32,
+          27
         )
 
     case object Oware
         extends Category(
-          Variant.Mancala(strategygames.mancala.variant.Oware)
+          Variant.Mancala(strategygames.mancala.variant.Oware),
+          Blitz32,
+          20
         )
 
     val all: List[Category] = List(
       Chess,
       Chess960,
+      Crazyhouse,
       KingOfTheHill,
       ThreeCheck,
       FiveCheck,
@@ -342,7 +461,6 @@ object TournamentShield {
       Russian,
       Brazilian,
       Pool,
-      Portuguese,
       Shogi,
       Xiangqi,
       MiniShogi,
@@ -357,13 +475,14 @@ object TournamentShield {
     def byKey(k: String): Option[Category] = all.find(_.key == k)
   }
 
-  def spotlight(name: String) =
+  val defaultShieldHour = 18 //UTC
+
+  def spotlight(name: String, icon: Char) =
     Spotlight(
-      iconFont = "5".some,
-      headline = s"Battle for the $name Shield",
-      description = s"""This [Shield trophy] is unique.
-The winner keeps it for one month,
-then must defend it during the next $name Shield tournament!""",
-      homepageHours = 6.some
+      iconFont = icon.toString.some,
+      headline = "Monthly battle for the variant shield",
+      description =
+        s"The winner keeps the shield trophy for one month, and then must defend it during the next $name Shield tournament!",
+      homepageHours = 168.some
     )
 }

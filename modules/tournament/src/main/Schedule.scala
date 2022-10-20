@@ -2,6 +2,7 @@ package lila.tournament
 
 import strategygames.format.FEN
 import strategygames.variant.Variant
+import strategygames.GameLogic
 import strategygames.Clock
 import org.joda.time.DateTime
 import play.api.i18n.Lang
@@ -16,6 +17,7 @@ case class Schedule(
     position: Option[FEN],
     at: DateTime,
     duration: Option[Int] = None,
+    medleyShield: Option[TournamentShield.MedleyShield] = None,
     conditions: Condition.All = Condition.All.empty
 ) {
 
@@ -111,7 +113,8 @@ case class Schedule(
 
   def similarSpeed(other: Schedule) = Schedule.Speed.similar(speed, other.speed)
 
-  def sameVariant(other: Schedule) = variant.id == other.variant.id
+  def sameVariant(other: Schedule) =
+    (variant.id == other.variant.id) && (variant.gameLogic.id == other.variant.gameLogic.id)
 
   def sameVariantAndSpeed(other: Schedule) = sameVariant(other) && sameSpeed(other)
 
@@ -177,11 +180,12 @@ object Schedule {
     case object Hourly extends Freq(10, 10)
     case object Daily  extends Freq(20, 20)
     //case object Eastern  extends Freq(30, 15)
-    case object Weekly   extends Freq(40, 40)
-    case object Weekend  extends Freq(41, 41)
-    case object Monthly  extends Freq(50, 50)
-    case object Shield   extends Freq(51, 51)
-    case object Marathon extends Freq(60, 60)
+    case object Weekly       extends Freq(40, 40)
+    case object Weekend      extends Freq(41, 41)
+    case object Monthly      extends Freq(50, 50)
+    case object Shield       extends Freq(51, 51)
+    case object MedleyShield extends Freq(52, 52)
+    case object Marathon     extends Freq(60, 60)
     case object ExperimentalMarathon extends Freq(61, 55) { // for DB BC
       override val display = "Experimental Marathon"
     }
@@ -206,6 +210,7 @@ object Schedule {
       Weekend,
       Monthly,
       Shield,
+      MedleyShield,
       Marathon,
       ExperimentalMarathon,
       Yearly,
@@ -215,6 +220,8 @@ object Schedule {
       MSO21,
       MSOGP
     )
+    val shields: List[Freq] = List(Shield, MedleyShield)
+
     def apply(name: String) = all.find(_.name == name)
     def byId(id: Int)       = all.find(_.id == id)
   }
@@ -235,6 +242,7 @@ object Schedule {
     case object Blitz32     extends Speed(70)
     case object Blitz35     extends Speed(75)
     case object Blitz51     extends Speed(80)
+    case object Blitz53     extends Speed(85)
     val all: List[Speed] =
       List(
         UltraBullet,
@@ -246,6 +254,7 @@ object Schedule {
         Blitz32,
         Blitz35,
         Blitz51,
+        Blitz53,
         Rapid,
         Classical
       )
@@ -273,7 +282,7 @@ object Schedule {
       speed match {
         case UltraBullet                        => PerfType.orDefaultSpeed("ultraBullet")
         case HyperBullet | Bullet | HippoBullet => PerfType.orDefaultSpeed("bullet")
-        case SuperBlitz | Blitz | Blitz32 | Blitz35 | Blitz51 =>
+        case SuperBlitz | Blitz | Blitz32 | Blitz35 | Blitz51 | Blitz53 =>
           PerfType.orDefaultSpeed("blitz")
         case Rapid     => PerfType.orDefaultSpeed("rapid")
         case Classical => PerfType.orDefaultSpeed("classical")
@@ -288,7 +297,7 @@ object Schedule {
     case object Winter extends Season
   }
 
-  private val defaultDuration: Int = 57
+  private val defaultDuration: Int = 55
 
   private[tournament] def durationFor(s: Schedule): Int = s.duration match {
     case Some(duration) => duration
@@ -301,45 +310,45 @@ object Schedule {
     (s.freq, s.variant, s.speed) match {
 
       case (Hourly, _, UltraBullet | HyperBullet | Bullet)                   => 27
-      case (Hourly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz51) => 57
+      case (Hourly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz51 | Blitz53) => 57
       case (Hourly, _, Rapid) if s.hasMaxRating                              => 57
       case (Hourly, _, Rapid | Classical)                                    => 117
 
       case (Daily | Eastern, Standard, SuperBlitz)                => 90
-      case (Daily | Eastern, Standard, Blitz | Blitz32 | Blitz51) => 120
+      case (Daily | Eastern, Standard, Blitz | Blitz32 | Blitz51 | Blitz53) => 120
       case (Daily | Eastern, _, Blitz | Blitz32 | Blitz51)        => 90
       case (Daily | Eastern, _, Rapid | Classical)                => 150
       case (Daily | Eastern, _, _)                                => 60
 
       case (Weekly, _, UltraBullet | HyperBullet | Bullet)                   => 60 * 2
-      case (Weekly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz51) => 60 * 3
+      case (Weekly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz51 | Blitz53) => 60 * 3
       case (Weekly, _, Rapid)                                                => 60 * 4
       case (Weekly, _, Classical)                                            => 60 * 5
 
       case (Weekend, Crazyhouse, _)                         => 60 * 2
       case (Weekend, _, UltraBullet | HyperBullet | Bullet) => 90
       case (Weekend, _, HippoBullet | SuperBlitz)           => 60 * 2
-      case (Weekend, _, Blitz | Blitz32 | Blitz51)          => 60 * 3
+      case (Weekend, _, Blitz | Blitz32 | Blitz51 | Blitz53)          => 60 * 3
       case (Weekend, _, Rapid)                              => 60 * 4
       case (Weekend, _, Classical)                          => 60 * 5
 
       case (Monthly, _, UltraBullet)               => 60 * 2
       case (Monthly, _, HyperBullet | Bullet)      => 60 * 3
       case (Monthly, _, HippoBullet | SuperBlitz)  => 60 * 3 + 30
-      case (Monthly, _, Blitz | Blitz32 | Blitz51) => 60 * 4
+      case (Monthly, _, Blitz | Blitz32 | Blitz51 | Blitz53) => 60 * 4
       case (Monthly, _, Rapid)                     => 60 * 5
       case (Monthly, _, Classical)                 => 60 * 6
 
       case (Shield, _, UltraBullet)               => 60 * 3
       case (Shield, _, HyperBullet | Bullet)      => 60 * 4
       case (Shield, _, HippoBullet | SuperBlitz)  => 60 * 5
-      case (Shield, _, Blitz | Blitz32 | Blitz51) => 60 * 6
+      case (Shield, _, Blitz | Blitz32 | Blitz51 | Blitz53) => 60 * 6
       case (Shield, _, Rapid)                     => 60 * 8
       case (Shield, _, Classical)                 => 60 * 10
 
       case (Yearly, _, UltraBullet | HyperBullet | Bullet) => 60 * 4
       case (Yearly, _, HippoBullet | SuperBlitz)           => 60 * 5
-      case (Yearly, _, Blitz | Blitz32 | Blitz51)          => 60 * 6
+      case (Yearly, _, Blitz | Blitz32 | Blitz51 | Blitz53)          => 60 * 6
       case (Yearly, _, Rapid)                              => 60 * 8
       case (Yearly, _, Classical)                          => 60 * 10
 
@@ -389,6 +398,7 @@ object Schedule {
       case (_, _, Blitz32)     => TC(3 * 60, 2)
       case (_, _, Blitz35)     => TC(3 * 60, 5)
       case (_, _, Blitz51)     => TC(5 * 60, 1)
+      case (_, _, Blitz53)     => TC(5 * 60, 3)
       case (_, _, Rapid)       => TC(10 * 60, 0)
       case (_, _, Classical)   => TC(20 * 60, 10)
     }

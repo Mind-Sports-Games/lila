@@ -15,6 +15,7 @@
   <string name="linesOfAction">LOA</string>
   <string name="scrambledEggs">SEggs</string>
   <string name="international">Int</string>
+  <string name="draughtsFromPosition">FEN</string>
   <string name="antidraughts">AntiD</string>
   <string name="brazilian">Brazil</string>
   <string name="breakthrough">BreakT</string>
@@ -22,7 +23,6 @@
   <string name="frysk">Frysk</string>
   <string name="pool">Pool</string>
   <string name="russian">Russia</string>
-  <string name="portuguese">Portuguese</string>
   <string name="shogi">Shogi</string>
   <string name="xiangqi">Xiangqi</string>
   <string name="minishogi">MShogi</string>

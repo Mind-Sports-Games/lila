@@ -43,15 +43,29 @@ export function player(p, asLink: boolean, withRating: boolean, defender = false
         destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
       },
     },
-    [
-      h(
-        'span.name' + (defender ? '.defender' : leader ? '.leader' : ''),
-        defender ? { attrs: dataIcon('5') } : leader ? { attrs: dataIcon('8') } : {},
-        playerName(p)
-      ),
-      withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
-    ]
+    [h('div.player-info', playerInfo(p, withRating, defender, leader))]
   );
+}
+
+export function playerInfo(p, withRating: boolean, defender = false, leader = false) {
+  return [
+    p.country
+      ? h(
+          'span.country',
+          h('img.flag', {
+            attrs: {
+              src: playstrategy.assetUrl('images/flags/' + p.country + '.png'),
+            },
+          })
+        )
+      : null,
+    h(
+      'span.name' + (defender ? '.defender' : leader ? '.leader' : ''),
+      defender ? { attrs: dataIcon('5') } : leader ? { attrs: dataIcon('8') } : {},
+      playerName(p)
+    ),
+    withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
+  ];
 }
 
 export function numberRow(name: string, value: any, typ?: string) {
@@ -81,35 +95,23 @@ export function spinner(): VNode {
 }
 
 export function medleyVariantsHoriz(ctrl: TournamentController) {
-  return h(
-    'div.medley-variants-horiz',
+  return h('div.medley-variants-horiz', [
     h(
-      'table',
+      'div.medley-horiz-icon',
+      {
+        attrs: { 'data-icon': 5 },
+        hook: bind('click', _ => ctrl.showMedleyVariants(!ctrl.showingMedleyVariants), ctrl.redraw),
+      },
+      ''
+    ),
+    h(
+      'div.medley-variants-wide',
       h(
-        'tbody',
-        h('tr', [
-          h(
-            'td',
-            h(
-              'div.medley-horiz-icon',
-              {
-                attrs: { 'data-icon': 5 },
-                hook: bind('click', _ => ctrl.showMedleyVariants(true), ctrl.redraw),
-              },
-              ''
-            )
-          ),
-          h(
-            'td',
-            h(
-              'div.medley-variants-scrollable',
-              medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, false)
-            )
-          ),
-        ])
+        'div.medley-variants-scrollable',
+        medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, ctrl.data.isFinished)
       )
-    )
-  );
+    ),
+  ]);
 }
 
 export function medleyVariantListItems(variants: Variant[], medleyRound: number, displayCompleted: boolean) {

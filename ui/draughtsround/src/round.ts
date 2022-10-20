@@ -38,11 +38,11 @@ export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: Draug
       const originalStep = steps[i];
       for (let m = 0; m < step.captLen - 1 && i + 1 < steps.length; m++) {
         if (m === 0) {
-          originalStep.uci = originalStep.uci.substr(0, 4);
+          originalStep.lidraughtsUci = originalStep.lidraughtsUci.substr(0, 4);
         } else if (
           choiceOfCaptureVariants.includes(varaintKey) &&
           steps[i].ply != steps[i + 1].ply &&
-          steps[i].uci.slice(-2) != steps[i + 1].uci.slice(-2)
+          steps[i].lidraughtsUci.slice(-2) != steps[i + 1].lidraughtsUci.slice(-2)
         ) {
           // hack for pool/russian multi choice capture, stop merging if the final move is next and the dests do not match (they should normally)
           break;
@@ -69,7 +69,7 @@ function mergeStep(originalStep: Step, mergeStep: Step) {
   originalStep.fen = mergeStep.fen;
   originalStep.san =
     originalStep.san.slice(0, originalStep.san.indexOf('x') + 1) + mergeStep.san.substr(mergeStep.san.indexOf('x') + 1);
-  originalStep.uci = originalStep.uci + mergeStep.uci.substr(2, 2);
+  originalStep.lidraughtsUci = originalStep.lidraughtsUci + mergeStep.lidraughtsUci.substr(2, 2);
 }
 
 export function addStep(steps: Step[], newStep: Step, coordSystem: number): Step {

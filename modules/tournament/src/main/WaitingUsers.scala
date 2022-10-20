@@ -5,6 +5,7 @@ import scala.concurrent.Promise
 
 import strategygames.Clock.{ Config => TournamentClock }
 import lila.user.User
+import lila.common.LightUser
 
 private[tournament] case class WaitingUsers(
     hash: Map[User.ID, DateTime],
@@ -22,10 +23,11 @@ private[tournament] case class WaitingUsers(
     if (clock.estimateTotalSeconds < 30) 8
     else if (clock.estimateTotalSeconds < 60) 10
     else {
-      clock.estimateTotalSeconds / 10 + 6
-    } atMost 50 atLeast 15
+      clock.estimateTotalSeconds / 20 + 6
+    } atMost 30 atLeast 15
 
-  lazy val all  = hash.keySet
+  lazy val all = hash.keySet
+
   lazy val size = hash.size
 
   def isOdd = size % 2 == 1
@@ -36,10 +38,10 @@ private[tournament] case class WaitingUsers(
     else all
   }
 
-  lazy val haveWaitedEnough: Boolean =
+  def haveWaitedEnough(minWaiters: Int): Boolean =
     size > 100 || {
       val since = date minusSeconds waitSeconds
-      hash.count { case (_, d) => d.isBefore(since) } > 1
+      hash.count { case (_, d) => d.isBefore(since) } >= minWaiters
     }
 
   def update(us: Set[User.ID]) = {
@@ -49,6 +51,16 @@ private[tournament] case class WaitingUsers(
       hash = {
         hash.view.filterKeys(us.contains) ++
           us.filterNot(hash.contains).map { _ -> newDate }
+      }.toMap
+    )
+  }
+
+  def addBotUsers(bots: Set[User.ID]) = {
+    val newDate = DateTime.now
+    copy(
+      date = newDate,
+      hash = {
+        hash ++ bots.filterNot(hash.contains).map { _ -> newDate }
       }.toMap
     )
   }
@@ -63,4 +75,5 @@ private[tournament] object WaitingUsers {
   case class WithNext(waiting: WaitingUsers, next: Option[Promise[WaitingUsers]])
 
   def emptyWithNext(clock: TournamentClock) = WithNext(empty(clock), none)
+
 }

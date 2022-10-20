@@ -42,7 +42,7 @@ final class LightUserApi(
         repo.coll.find($id(id), projection).one[LightUser] recover {
           case _: reactivemongo.api.bson.exceptions.BSONValueNotFoundException => LightUser.ghost.some
         },
-    default = id => LightUser(id, id, None, isPatron = false).some,
+    default = id => LightUser(id, id, None, None, isPatron = false).some,
     strategy = Syncache.WaitAfterUptime(8 millis),
     expireAfter = Syncache.ExpireAfterWrite(20 minutes)
   )
@@ -58,10 +58,17 @@ private object LightUserApi {
     } yield LightUser(
       id = id,
       name = name,
+      country = ~doc.child(F.profile).flatMap(_.getAsOpt[String]("country")).some,
       title = doc.string(F.title),
       isPatron = ~doc.child(F.plan).flatMap(_.getAsOpt[Boolean]("active"))
     )
   }
 
-  val projection = $doc(F.username -> true, F.title -> true, s"${F.plan}.active" -> true).some
+  val projection =
+    $doc(
+      F.username          -> true,
+      F.country           -> true,
+      F.title             -> true,
+      s"${F.plan}.active" -> true
+    ).some
 }

@@ -52,7 +52,7 @@ const renderDrawOffer = () =>
   );
 
 function renderMove(
-  step: Step,
+  step: Step | null,
   notation: NotationStyle,
   variant: Variant,
   prevFen: string,
@@ -116,10 +116,11 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     variant = ctrl.data.game.variant,
     firstPly = round.firstPly(ctrl.data),
     lastPly = round.lastPly(ctrl.data),
-    drawPlies = new Set(ctrl.data.game.drawOffers || []);
+    drawPlies = new Set(ctrl.data.game.drawOffers || []),
+    initialFen = ctrl.data.game.initialFen || '';
   if (typeof lastPly === 'undefined') return [];
 
-  const pairs: Array<Array<any>> = [];
+  const pairs: Array<Array<Step | null>> = [];
   let startAt = 1;
   if (firstPly % 2 === 1) {
     pairs.push([null, steps[1]]);
@@ -127,12 +128,20 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
   }
   for (let i = startAt; i < steps.length; i += 2) pairs.push([steps[i], steps[i + 1]]);
 
+  const prevFen = (i: number, pairI: number) => {
+    if (i === 0 && pairI === 0) {
+      return initialFen;
+    }
+    const step = pairI === 1 ? pairs[i][0] : pairs[i - 1][1];
+    return step !== null ? step.fen : initialFen;
+  };
+
   const els: MaybeVNodes = [],
     curPly = ctrl.ply;
   for (let i = 0; i < pairs.length; i++) {
     els.push(h(indexTag, i + 1 + ''));
-    els.push(renderMove(pairs[i][0], notation, variant, steps[i * 2].fen, curPly, true, drawPlies));
-    els.push(renderMove(pairs[i][1], notation, variant, pairs[i][0].fen, curPly, false, drawPlies));
+    els.push(renderMove(pairs[i][0], notation, variant, prevFen(i, 0), curPly, true, drawPlies));
+    els.push(renderMove(pairs[i][1], notation, variant, prevFen(i, 1), curPly, false, drawPlies));
   }
   els.push(renderResult(ctrl));
 

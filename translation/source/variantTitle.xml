@@ -15,6 +15,7 @@
   <string name="linesOfAction">Connect all of your checkers to win</string>
   <string name="scrambledEggs">Connect all of your scrambled checkers to win</string>
   <string name="international">Standard rules of international draughts (FMJD)</string>
+  <string name="draughtsFromPosition">Custom starting position</string>
   <string name="antidraughts">Lose all your pieces (or run out of moves) to win</string>
   <string name="brazilian">Same rules as international draughts, played on an 8x8 board</string>
   <string name="breakthrough">The first player who makes a king wins</string>
@@ -22,7 +23,6 @@
   <string name="frysk">Frisian draughts starting with 5 pieces each</string>
   <string name="pool">The same rules as Russian Draughts, but with no promotion during a capture chain</string>
   <string name="russian">Choice of capture, promotion during a multi-capture</string>
-  <string name="portuguese">Similar rules to International, played on an 8x8 board, but men cant jump backwards</string>
   <string name="shogi">Shogi (Japanese Chess)</string>
   <string name="xiangqi">Xiangqi (Chinese Chess)</string>
   <string name="minishogi">Mini Shogi (Japanese Chess on a smaller board)</string>

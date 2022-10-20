@@ -42,6 +42,8 @@ case class Tournament(
     trophy1st: Option[String] = None,
     trophy2nd: Option[String] = None,
     trophy3rd: Option[String] = None,
+    trophyExpiryDays: Option[Int] = None,
+    botsAllowed: Boolean = false,
     hasChat: Boolean = true
 ) {
 
@@ -151,6 +153,8 @@ case class Tournament(
 
   def perfType: PerfType = PerfType(variant, speed)
 
+  def iconChar = if (isMedley) '5' else perfType.iconChar
+
   def durationString =
     if (minutes < 60) s"${minutes}m"
     else s"${minutes / 60}h" + (if (minutes % 60 != 0) s" ${minutes % 60}m" else "")
@@ -189,6 +193,8 @@ case class Tournament(
 
   def medleyGameFamiliesString: Option[String] =
     medleyGameFamilies.map(_.map(_.name).mkString(", "))
+
+  val minWaitingUsersForPairings: Int = if (botsAllowed) 1 else 2
 
   override def toString = s"$id $startsAt ${name()(defaultLang)} $minutes minutes, $clock, $nbPlayers players"
 }
@@ -254,7 +260,9 @@ object Tournament {
   def scheduleAs(sched: Schedule, minutes: Int) =
     Tournament(
       id = makeId,
-      name = sched.name(full = false)(defaultLang),
+      name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
+        TournamentShield.MedleyShield.makeName(ms.medleyName, sched.at)
+      ),
       status = Status.Created,
       clock = Schedule clockFor sched,
       minutes = minutes,
@@ -262,11 +270,18 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = sched.variant,
+      medleyVariants = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
+      medleyMinutes = sched.medleyShield.map(_.arenaMedleyMinutes),
       position = sched.position,
       mode = Mode.Rated,
       conditions = sched.conditions,
       schedule = Some(sched),
-      startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60)
+      startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60),
+      description = sched.medleyShield.map(_.arenaDescriptionFull),
+      trophy1st = sched.medleyShield.map(_.key),
+      trophyExpiryDays = if (sched.medleyShield.isDefined) 7.some else none,
+      //we've scheduled this tour so make bots allowed for any of our tours
+      botsAllowed = true
     )
 
   def tournamentUrl(tourId: String): String = s"https://playstrategy.org/tournament/$tourId"
@@ -284,6 +299,7 @@ object Tournament {
     case object Paused        extends JoinResult("Your pause is not over yet".some)
     case object Verdicts      extends JoinResult("Tournament restrictions".some)
     case object MissingTeam   extends JoinResult("Missing team".some)
+    case object NoBotsAllowed extends JoinResult("No bots allowed".some)
     case object Nope          extends JoinResult("Couldn't join for some reason?".some)
   }
 }

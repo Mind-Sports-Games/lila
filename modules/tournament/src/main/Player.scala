@@ -11,6 +11,7 @@ private[tournament] case class Player(
     userId: User.ID,
     rating: Int,
     provisional: Boolean,
+    isBot: Boolean = false,
     withdraw: Boolean = false,
     score: Int = 0,
     fire: Boolean = false,
@@ -54,6 +55,7 @@ private[tournament] object Player {
       userId = user.id,
       rating = user.perfs(perfType).intRating,
       provisional = user.perfs(perfType).provisional,
+      isBot = user.isBot,
       team = team
     )
 }

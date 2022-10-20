@@ -28,6 +28,8 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
 
   def byId(id: Tournament.ID): Fu[Option[Pairing]] = coll.find($id(id)).one[Pairing]
 
+  private val defaultLastOpponentsCap = 300
+
   private[tournament] def lastOpponents(
       tourId: Tournament.ID,
       userIds: Set[User.ID],
@@ -43,7 +45,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
         .sort(recentSort)
         .batchSize(20)
         .cursor[Bdoc]()
-        .documentSource(max)
+        .documentSource(Math.min(max, defaultLastOpponentsCap))
         .mapConcat(_.getAsOpt[List[User.ID]]("u").toList)
         .scan(Map.empty[User.ID, User.ID]) {
           case (acc, List(u1, u2)) =>

@@ -49,14 +49,24 @@ final private class TournamentScheduler(
     val thisMonth = new OfMonth(0)
     val nextMonth = new OfMonth(1)
 
-    def nextDayOfWeek(number: Int) = today.plusDays((number + 7 - today.getDayOfWeek) % 7)
-    val nextMonday                 = nextDayOfWeek(1)
-    val nextTuesday                = nextDayOfWeek(2)
-    val nextWednesday              = nextDayOfWeek(3)
-    val nextThursday               = nextDayOfWeek(4)
-    val nextFriday                 = nextDayOfWeek(5)
-    val nextSaturday               = nextDayOfWeek(6)
-    val nextSunday                 = nextDayOfWeek(7)
+    def xMonthWithDay(fromNowMonths: Int)(dayOfMonth: Int) =
+      new DateTime().plusMonths(fromNowMonths).withDayOfMonth(dayOfMonth).withTimeAtStartOfDay
+    def thisMonthWithDay(dayOfMonth: Int) =
+      xMonthWithDay(0)(dayOfMonth)
+    def nextMonthWithDay(dayOfMonth: Int) =
+      xMonthWithDay(1)(dayOfMonth)
+
+    def nextDayOfWeeks(dayNumber: Int, weekNumber: Int) =
+      today.plusDays((dayNumber + 7 * weekNumber - today.getDayOfWeek) % (7 * weekNumber))
+    def nextDayOfWeek(number: Int)      = nextDayOfWeeks(number, 1)
+    def nextDayOfFortnight(number: Int) = nextDayOfWeeks(number, 2)
+    val nextMonday                      = nextDayOfWeek(1)
+    val nextTuesday                     = nextDayOfWeek(2)
+    val nextWednesday                   = nextDayOfWeek(3)
+    val nextThursday                    = nextDayOfWeek(4)
+    val nextFriday                      = nextDayOfWeek(5)
+    val nextSaturday                    = nextDayOfWeek(6)
+    val nextSunday                      = nextDayOfWeek(7)
 
     def secondWeekOf(month: Int) = {
       val start = orNextYear(startOfYear.withMonthOfYear(month))
@@ -76,7 +86,7 @@ final private class TournamentScheduler(
 
     val farFuture = today plusMonths 7
 
-    val birthday = new DateTime(2021, 7, 29, 12, 0, 0)
+    val birthday = new DateTime(2021, 7, 21, 12, 0, 0)
 
     val fss  = List(nextFriday, nextSaturday, nextSunday)
     val mwfs = List(nextMonday, nextWednesday, nextFriday, nextSunday)
@@ -97,12 +107,132 @@ final private class TournamentScheduler(
         Schedule(Weekly, Blitz51, v, none, date).plan
       }
 
-    def scheduleUnique(hour: Int, speed: Schedule.Speed, variant: Variant, duration: Int)(day: DateTime) =
+    def scheduleUnique(hour: Int, speed: Schedule.Speed, variant: Variant, duration: Int)(
+        day: DateTime
+    ) =
       at(day, hour) map { date =>
         Schedule(Unique, speed, variant, none, date, Some(duration)).plan
       }
 
-    // all dates UTC
+    def scheduleMedleyShield(speed: Schedule.Speed, medleyShield: TournamentShield.MedleyShield)(
+        day: DateTime
+    ) =
+      at(day, medleyShield.hour) map { date =>
+        Schedule(
+          MedleyShield,
+          speed,
+          medleyShield.eligibleVariants.head,
+          none,
+          date,
+          Some(medleyShield.arenaMinutes),
+          Some(medleyShield),
+          Condition.All(
+            nbRatedGame = none,
+            maxRating = none,
+            minRating = none,
+            titled = none,
+            teamMember = medleyShield.teamOwner.some
+          )
+        ).plan
+      }
+
+    //schedule this week
+    val thisWeekMedleyShields = TournamentShield.MedleyShield.all
+      .map(ms =>
+        scheduleMedleyShield(Blitz53, ms)(
+          nextDayOfWeek(ms.dayOfWeek)
+        )
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    //and schedule two weeks in advance
+    val nextWeekMedleyShields = TournamentShield.MedleyShield.all
+      .map(ms =>
+        scheduleMedleyShield(Blitz53, ms)(
+          nextDayOfFortnight(ms.dayOfWeek + 7)
+        )
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    //schedule this months shields
+    val thisMonthShields = TournamentShield.Category.all
+      .map(shield =>
+        at(thisMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
+          Schedule(Shield, shield.speed, shield.variant, none, date) plan {
+            _.copy(
+              name = s"${VariantKeys.variantName(shield.variant)} Shield",
+              spotlight = Some(
+                TournamentShield.spotlight(
+                  VariantKeys.variantName(shield.variant),
+                  shield.variant.perfIcon
+                )
+              )
+            )
+          }
+        }
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    //and schedule next month
+    val nextMonthShields = TournamentShield.Category.all
+      .map(shield =>
+        at(nextMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
+          Schedule(Shield, shield.speed, shield.variant, none, date) plan {
+            _.copy(
+              name = s"${VariantKeys.variantName(shield.variant)} Shield",
+              spotlight = Some(
+                TournamentShield.spotlight(
+                  VariantKeys.variantName(shield.variant),
+                  shield.variant.perfIcon
+                )
+              )
+            )
+          }
+        }
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    thisWeekMedleyShields ::: nextWeekMedleyShields ::: thisMonthShields ::: nextMonthShields
+
+//          List( // shield tournaments!
+//            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,
+//            month.firstWeek.withDayOfWeek(TUESDAY)   -> SuperBlitz,
+//            month.firstWeek.withDayOfWeek(WEDNESDAY) -> Blitz,
+//            month.firstWeek.withDayOfWeek(THURSDAY)  -> Rapid,
+//            month.firstWeek.withDayOfWeek(FRIDAY)    -> Classical,
+//            month.firstWeek.withDayOfWeek(SATURDAY)  -> HyperBullet,
+//            month.firstWeek.withDayOfWeek(SUNDAY)    -> UltraBullet
+//          ).flatMap { case (day, speed) =>
+//            at(day, 16) map { date =>
+//              Schedule(Shield, speed, Standard, none, date) plan {
+//                _.copy(
+//                  name = s"${speed.toString} Shield",
+//                  spotlight = Some(TournamentShield spotlight speed.toString)
+//                )
+//              }
+//            }
+//          },
+//          List( // shield variant tournaments!
+//            month.secondWeek.withDayOfWeek(SUNDAY)   -> Chess960,
+//            month.thirdWeek.withDayOfWeek(MONDAY)    -> Crazyhouse,
+//            month.thirdWeek.withDayOfWeek(TUESDAY)   -> KingOfTheHill,
+//            month.thirdWeek.withDayOfWeek(WEDNESDAY) -> RacingKings,
+//            month.thirdWeek.withDayOfWeek(THURSDAY)  -> Antichess,
+//            month.thirdWeek.withDayOfWeek(FRIDAY)    -> Atomic,
+//            month.thirdWeek.withDayOfWeek(SATURDAY)  -> Horde,
+//            month.thirdWeek.withDayOfWeek(SUNDAY)    -> ThreeCheck
+//          ).flatMap { case (day, variant) =>
+//            at(day, 16) map { date =>
+//              Schedule(Shield, Blitz, variant, none, date) plan {
+//                _.copy(
+//                  name = s"${VariantKeys.variantName(variant)} Shield",
+//                  spotlight = Some(TournamentShield spotlight VariantKeys.variantName(variant))
+//                )
+//              }
+//            }
+//          }
+
+    /*// all dates UTC
     List(
       //Pre MSO schedule
       scheduleUnique(13, Blitz32, Variant.Chess(strategygames.chess.variant.Horde), 30)(
@@ -191,7 +321,7 @@ final private class TournamentScheduler(
         new DateTime(2021, 8, 30, 0, 0)
       )
 
-      /*//Pre UKGE schedule
+      //Pre UKGE schedule
       mwfs.flatMap(schedule32(16, KingOfTheHill)), // MWFS KoTH @ 17:00 UK
       mwfs.flatMap(schedule32(17, Antichess)),     // MWFS Anti @ 18:00 UK
       mwfs.flatMap(schedule32(18, Standard)),      // MWFS Chess @ 19:00 UK
@@ -211,9 +341,9 @@ final private class TournamentScheduler(
       fss.flatMap(schedule51(13, LinesOfAction)),  // FSS LOA @ 14:00 UK
       fss.flatMap(schedule32(14, Standard)),       // FSS Chess @ 15:00 UK
       fss.flatMap(schedule32(15, Chess960))        // FSS 960 @ 16:00 UK
-       */
+     */
 
-      /*List( // legendary tournaments!
+    /*List( // legendary tournaments!
         at(birthday.withYear(today.getYear), 12) map orNextYear map { date =>
           val yo = date.getYear - 2021
           Schedule(Unique, Rapid, Standard, none, date) plan {
@@ -231,7 +361,7 @@ Thank you all, you rock!"""
           }
         }
       ).flatten,*/
-      /*List( // yearly tournaments!
+    /*List( // yearly tournaments!
         secondWeekOf(JANUARY).withDayOfWeek(MONDAY)      -> Bullet,
         secondWeekOf(FEBRUARY).withDayOfWeek(TUESDAY)    -> SuperBlitz,
         secondWeekOf(MARCH).withDayOfWeek(WEDNESDAY)     -> Blitz,
@@ -249,7 +379,7 @@ Thank you all, you rock!"""
           Schedule(Yearly, speed, Standard, none, date).plan
         }
       },*/
-      /*List( // yearly variant tournaments!
+    /*List( // yearly variant tournaments!
         secondWeekOf(JANUARY).withDayOfWeek(WEDNESDAY) -> Chess960,
         secondWeekOf(FEBRUARY).withDayOfWeek(THURSDAY) -> Crazyhouse,
         secondWeekOf(MARCH).withDayOfWeek(FRIDAY)      -> KingOfTheHill,
@@ -263,7 +393,7 @@ Thank you all, you rock!"""
           Schedule(Yearly, SuperBlitz, variant, none, date).plan
         }
       },*/
-      /*List(thisMonth, nextMonth).flatMap { month =>
+    /*List(thisMonth, nextMonth).flatMap { month =>
         List(
           List( // monthly standard tournaments!
             month.lastWeek.withDayOfWeek(MONDAY)    -> Bullet,
@@ -336,7 +466,7 @@ Thank you all, you rock!"""
           }
         ).flatten
       },*/
-      /*List( // weekly standard tournaments!
+    /*List( // weekly standard tournaments!
         nextMonday    -> Bullet,
         nextTuesday   -> SuperBlitz,
         nextWednesday -> Blitz,
@@ -348,7 +478,7 @@ Thank you all, you rock!"""
           Schedule(Weekly, speed, Standard, none, date pipe orNextWeek).plan
         }
       },*/
-      /*List( // weekly variant tournaments!
+    /*List( // weekly variant tournaments!
         nextMonday    -> ThreeCheck,
         nextTuesday   -> Crazyhouse,
         nextWednesday -> KingOfTheHill,
@@ -368,7 +498,7 @@ Thank you all, you rock!"""
           ).plan
         }
       },*/
-      /*List( // week-end elite tournaments!
+    /*List( // week-end elite tournaments!
         nextSaturday -> SuperBlitz,
         nextSunday   -> Bullet
       ).flatMap { case (day, speed) =>
@@ -376,7 +506,7 @@ Thank you all, you rock!"""
           Schedule(Weekend, speed, Standard, none, date pipe orNextWeek).plan
         }
       },*/
-      /*List( // daily tournaments!
+    /*List( // daily tournaments!
         at(today, 16) map { date =>
           Schedule(Daily, Bullet, Standard, none, date pipe orTomorrow).plan
         },
@@ -396,7 +526,7 @@ Thank you all, you rock!"""
           Schedule(Daily, UltraBullet, Standard, none, date pipe orTomorrow).plan
         }
       ).flatten,*/
-      /*List( // daily variant tournaments!
+    /*List( // daily variant tournaments!
         at(today, 20) map { date =>
           Schedule(Daily, Blitz, Crazyhouse, none, date pipe orTomorrow).plan
         },
@@ -422,7 +552,7 @@ Thank you all, you rock!"""
           Schedule(Daily, SuperBlitz, RacingKings, none, date).plan
         }
       ).flatten,*/
-      /*List( // eastern tournaments!
+    /*List( // eastern tournaments!
         at(today, 4) map { date =>
           Schedule(Eastern, Bullet, Standard, none, date pipe orTomorrow).plan
         },
@@ -436,7 +566,7 @@ Thank you all, you rock!"""
           Schedule(Eastern, Rapid, Standard, none, date pipe orTomorrow).plan
         }
       ).flatten,*/
-      /*(if (isHalloween) // replace more thematic tournaments on halloween
+    /*(if (isHalloween) // replace more thematic tournaments on halloween
          List(
            1  -> StartingPosition.presets.halloween,
            5  -> StartingPosition.presets.frankenstein,
@@ -466,7 +596,7 @@ Thank you all, you rock!"""
           }
         ).flatten
       },*/
-      /*// hourly standard tournaments!
+    /*// hourly standard tournaments!
       (-1 to 6).toList.flatMap { hourDelta =>
         val date = rightNow plusHours hourDelta
         val hour = date.getHourOfDay
@@ -494,7 +624,7 @@ Thank you all, you rock!"""
           }
         ).flatten
       },*/
-      /*// hourly limited tournaments!
+    /*// hourly limited tournaments!
       (-1 to 6).toList
         .flatMap { hourDelta =>
           val date = rightNow plusHours hourDelta
@@ -605,7 +735,7 @@ Thank you all, you rock!"""
           }
         ).flatten
       }*/
-    ).flatten filter { _.schedule.at isAfter rightNow }
+    //).flatten filter { _.schedule.at isAfter rightNow }
   }
 
   private[tournament] def pruneConflicts(scheds: List[Tournament], newTourns: List[Tournament]) =
@@ -653,10 +783,10 @@ Thank you all, you rock!"""
       try {
         val newTourns = allWithConflicts(DateTime.now).map(_.build)
         val pruned    = pruneConflicts(dbScheds, newTourns)
-        tournamentRepo
+        (tournamentRepo
           .insert(pruned)
-          .logFailure(logger)
-          .unit
+          .logFailure(logger) >>
+          api.subscribeBotsToShields).unit
       } catch {
         case e: org.joda.time.IllegalInstantException =>
           logger.error(s"failed to schedule all: ${e.getMessage}")

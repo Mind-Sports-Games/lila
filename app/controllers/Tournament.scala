@@ -16,6 +16,7 @@ import lila.hub.LightTeam._
 import lila.memo.CacheApi._
 import lila.tournament.TournamentForm
 import lila.tournament.{ VisibleTournaments, Tournament => Tour }
+import lila.swiss.{ Swiss => LSwiss }
 import lila.user.{ User => UserModel }
 
 final class Tournament(
@@ -208,7 +209,7 @@ final class Tournament(
 
   def join(id: String) =
     AuthBody(parse.json) { implicit ctx => implicit me =>
-      NoLameOrBot {
+      NoLameOrUserBot {
         NoPlayban {
           val data = TournamentForm.TournamentJoin(
             password = ctx.body.body.\("p").asOpt[String],
@@ -538,14 +539,41 @@ final class Tournament(
       }
     }
 
+  def nextMedleyShield(
+      nextArena: Option[Tour],
+      nextSwiss: Option[LSwiss]
+  ): Option[Either[Tour, LSwiss]] =
+    nextArena match {
+      case Some(arena) => Some(Left(arena));
+      case None =>
+        nextSwiss match {
+          case Some(swiss) => Some(Right(swiss));
+          case None        => None;
+        };
+    }
+
+  def winnersMedleyShield(
+      winnersArena: List[Tour],
+      winnersSwiss: List[LSwiss]
+  ): List[Either[Tour, LSwiss]] =
+    (winnersArena.map(Left[Tour, LSwiss]) ::: winnersSwiss.map(Right[Tour, LSwiss])).sortBy {
+      case Left(arena) => arena.startsAt; case Right(swiss) => swiss.startsAt;
+    }.reverse
+
   def medleyShield(k: String) =
     Open { implicit ctx =>
       env.tournament.shieldApi.byMedleyKey(k) match {
         case Some(medley) =>
           for {
-            winners <- env.swiss.api.winnersByTrophy(k)
-            next    <- env.swiss.api.nextByTrophy(k)
-          } yield html.tournament.shields.medley(medley, next, winners)
+            winnersSwiss <- env.swiss.api.winnersByTrophy(k)
+            nextSwiss    <- env.swiss.api.nextByTrophy(k)
+            winnersArena <- repo.winnersByTrophy(k)
+            nextArena    <- repo.nextByTrophy(k)
+          } yield html.tournament.shields.medley(
+            medley,
+            nextMedleyShield(nextArena, nextSwiss),
+            winnersMedleyShield(winnersArena, winnersSwiss)
+          )
         case None => notFound
       }
     }

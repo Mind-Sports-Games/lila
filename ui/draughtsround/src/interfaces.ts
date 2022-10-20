@@ -109,6 +109,7 @@ export interface Step {
   fen: Fen;
   san: San;
   uci: Uci;
+  lidraughtsUci: Uci;
   alg?: string;
   captLen?: number;
 }

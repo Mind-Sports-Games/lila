@@ -35,7 +35,7 @@ object bots {
                   h1("Community bots"),
                   a(
                     cls := "bots__about",
-                    href := "https://lichess.org/blog/WvDNticAAMu_mHKP/welcome-lichess-bots"
+                    href := "https://playstrategy.org/blog/YvJkQxAAACIApTnD/welcome-playstrategy-bots"
                   )(
                     "About PlayStrategy Bots"
                   )
