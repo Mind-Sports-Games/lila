@@ -40,22 +40,12 @@ case class SwissPairing(
   def numDraws            = matchStatus.fold(_ => 0, l => l.count(None.==))
   def numGames            = matchStatus.fold(_ => 0, l => l.length)
 
-  def matchResultsMap[A](draw: A, win: A, loss: A)(
-      playerIndex: PlayerIndex
-  )(l: List[Option[PlayerIndex]]): List[A] = {
-    l.zipWithIndex.map { case (outcome, index) =>
-      outcome.fold(draw)(c =>
-        if ( //players swap playerindex each game of multi match
-          (c == playerIndex && (index % 2 == 0)) || (c != playerIndex && (index % 2 == 1))
-        ) win
-        else loss
-      )
-    }
-  }
-
   def multiMatchResultsFor(userId: User.ID): Option[List[String]] = {
     if (nbGamesPerRound > 1)
-      matchStatus.fold(_ => None, matchResultsMap("draw", "win", "loss")(playerIndexOf(userId))(_).some)
+      matchStatus.fold(
+        _ => None,
+        SwissPairing.matchResultsMap("draw", "win", "loss")(playerIndexOf(userId))(_).some
+      )
     else None
   }
 
@@ -64,7 +54,8 @@ case class SwissPairing(
     if (isMatchScore)
       matchStatus.fold(
         _ => "00",
-        matchResultsMap(1, 2, 0)(playerIndexOf(userId))(_)
+        SwissPairing
+          .matchResultsMap(1, 2, 0)(playerIndexOf(userId))(_)
           .foldLeft(0)(_ + _)
           .toString()
           .reverse
@@ -80,7 +71,8 @@ case class SwissPairing(
       matchStatus
         .fold(
           _ => "*",
-          matchResultsMap(1, 2, 0)(playerIndex)(_)
+          SwissPairing
+            .matchResultsMap(1, 2, 0)(playerIndex)(_)
             .foldLeft(0)(_ + _)
             .toString()
         )
@@ -110,19 +102,6 @@ case class SwissPairingGames(
 ) {
   def finishedOrAborted =
     game.finishedOrAborted && (!isBestOfX || !requireMoreGamesInBestOfX) && (!isPlayX || !requireMoreGamesInPlayX)
-
-  def matchResultsMap[A](draw: A, win: A, loss: A)(
-      playerIndex: PlayerIndex
-  )(l: List[Option[PlayerIndex]]): List[A] = {
-    l.zipWithIndex.map { case (outcome, index) =>
-      outcome.fold(draw)(c =>
-        if ( //players swap playerindex each game of multi match
-          (c == playerIndex && (index % 2 == 0)) || (c != playerIndex && (index % 2 == 1))
-        ) win
-        else loss
-      )
-    }
-  }
 
   def multiMatchGamesScoreDiff: Int =
     multiMatchGames
@@ -178,12 +157,13 @@ case class SwissPairingGames(
     } else List(game.winnerPlayerIndex)
 
   def strResultOf(playerIndex: PlayerIndex) =
-    matchResultsMap(1, 2, 0)(playerIndex)(
-      multiMatchGames
-        .foldLeft(List(game))(_ ++ _)
-        .filter(g => g.finished)
-        .map(g => g.winnerPlayerIndex)
-    )
+    SwissPairing
+      .matchResultsMap(1, 2, 0)(playerIndex)(
+        multiMatchGames
+          .foldLeft(List(game))(_ ++ _)
+          .filter(g => g.finished)
+          .map(g => g.winnerPlayerIndex)
+      )
       .foldLeft(0)(_ + _) match {
       case x if x % 2 == 0 => s"${(x / 2)}"
       case x if x % 2 == 1 => s"${(x / 2)}.5"
@@ -204,6 +184,19 @@ object SwissPairing {
       swissPairing.nbGamesPerRound,
       swissPairing.openingFEN
     )
+
+  def matchResultsMap[A](draw: A, win: A, loss: A)(
+      playerIndex: PlayerIndex
+  )(l: List[Option[PlayerIndex]]): List[A] = {
+    l.zipWithIndex.map { case (outcome, index) =>
+      outcome.fold(draw)(c =>
+        if ( //players swap playerindex each game of multi match
+          (c == playerIndex && (index % 2 == 0)) || (c != playerIndex && (index % 2 == 1))
+        ) win
+        else loss
+      )
+    }
+  }
 
   sealed trait Ongoing
   case object Ongoing extends Ongoing

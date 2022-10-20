@@ -50,7 +50,6 @@ db.swiss_pairing.find({ mm: true }).forEach(sp => {
     { _id: sp._id },
     {
       $set: {
-        mm: false,
         px: true,
         gpr: 2,
         mmids: [sp.mmid],
@@ -77,7 +76,6 @@ db.swiss.find({ 'settings.m': true }).forEach(s => {
     { _id: s._id },
     {
       $set: {
-        'settings.m': false,
         'settings.px': true,
         'settings.gpr': 2,
       },
@@ -94,7 +92,7 @@ db.swiss.find({ 'settings.m': true }).forEach(s => {
 ///////////////////////////////////////////////
 
 //unset micro match field in swiss post migration
-db.swiss.find({ 'settings.m': false }).forEach(s => {
+db.swiss.find({ 'settings.m': { $exists: true } }).forEach(s => {
   db.swiss.update(
     { _id: s._id },
     {
@@ -106,7 +104,7 @@ db.swiss.find({ 'settings.m': false }).forEach(s => {
 });
 
 //unset micromatch in swiss settings collection
-db.swiss_pairing.find({ mm: false }).forEach(sp => {
+db.swiss_pairing.find({ mm: { $exists: true } }).forEach(sp => {
   db.swiss_pairing.update(
     { _id: sp._id },
     {

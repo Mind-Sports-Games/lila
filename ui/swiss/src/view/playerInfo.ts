@@ -139,7 +139,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                   h('th', '' + round),
                   h('td.outcome', { attrs: { colspan: 4 } }, p.outcome),
                   h(
-                    'td',
+                    'td.matchscore',
                     p.outcome == 'absent'
                       ? '-'
                       : p.outcome == 'bye'
@@ -167,8 +167,12 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('td', userName(p.user)),
                 h('td', ctrl.data.isMedley ? '' : '' + p.rating),
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
-                h('td', p.ismm ? gameResult(p) : ''),
-                p.ismm && p.isFinalGame ? h('td', { attrs: { rowSpan: p.mmGameNb } }, res) : h('td', p.ismm ? '' : res),
+                h('td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''), p.ismm ? gameResult(p) : ''),
+                p.ismm && p.isFinalGame
+                  ? h('td.matchscore', { attrs: { rowSpan: p.mmGameNb } }, res)
+                  : p.ismm
+                  ? ''
+                  : h('td.matchscore', res),
               ]
             );
           })
@@ -182,13 +186,13 @@ function gameResult(p: MultiMatchPairing): string {
   if (p.ismm) {
     switch (p.mmGameRes) {
       case 'win':
-        return '(1) ';
+        return '(1)';
       case 'loss':
-        return '(0) ';
+        return '(0)';
       case 'draw':
-        return '(½) ';
+        return '(½)';
       default:
-        return '(*) ';
+        return '(*)';
     }
   } else {
     return result(p);
