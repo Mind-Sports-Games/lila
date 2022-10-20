@@ -62,6 +62,10 @@ db.swiss_pairing.find({ mm: true }).forEach(sp => {
       // },
     }
   );
+
+  var stat_cache = `swiss:stats:${sp.s}`; 
+  print("delete cache for swiss stats")
+  db.cache.deleteOne({"_id": stat_cache})
 });
 
 //count swiss changes
