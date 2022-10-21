@@ -98,6 +98,7 @@ final class JsonView(
               .obj(
                 "animationDuration" -> animationMillis(pov, pref),
                 "coords"            -> pref.coords,
+                "coordSystem"       -> pref.coordSystem,
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
                 "autoQueen" -> (if (pov.game.variant == strategygames.chess.variant.Antichess)
