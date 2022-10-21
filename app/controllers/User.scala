@@ -307,6 +307,7 @@ final class User(
                   "brazilian"     -> leaderboards.brazilian,
                   "pool"          -> leaderboards.pool,
                   "portuguese"    -> leaderboards.portuguese,
+                  "english"       -> leaderboards.english,
                   "shogi"         -> leaderboards.shogi,
                   "xiangqi"       -> leaderboards.xiangqi,
                   "minishogi"     -> leaderboards.minishogi,

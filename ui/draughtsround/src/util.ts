@@ -97,6 +97,7 @@ const noAnalysisVariants = [
   'brazilian',
   'pool',
   'portuguese',
+  'english',
   'fromPositionDraughts',
   'frisian',
   'frysk',

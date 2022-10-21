@@ -305,6 +305,7 @@ declare type DraughtsVariantKey =
   | 'brazilian'
   | 'pool'
   | 'portuguese'
+  | 'english'
   | 'fromPositionDraughts'
   | 'frisian'
   | 'frysk';
@@ -336,6 +337,7 @@ declare type Perf =
   | 'brazilian'
   | 'pool'
   | 'portuguese'
+  | 'english'
   | 'fromPositionDraughts'
   | 'frisian'
   | 'frysk'

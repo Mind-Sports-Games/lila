@@ -38,3 +38,7 @@
 .is2d .variant-portuguese .king.p1 {background-image:url('/assets/piece/draughts/check_yb/wK.png')}
 .is2d .variant-portuguese .man.p2 {background-image:url('/assets/piece/draughts/check_yb/bM.png')}
 .is2d .variant-portuguese .king.p2 {background-image:url('/assets/piece/draughts/check_yb/bK.png')}
+.is2d .variant-english .man.p1 {background-image:url('/assets/piece/draughts/check_yb/bM.png')}
+.is2d .variant-english .king.p1 {background-image:url('/assets/piece/draughts/check_yb/bK.png')}
+.is2d .variant-english .man.p2 {background-image:url('/assets/piece/draughts/check_yb/wM.png')}
+.is2d .variant-english .king.p2 {background-image:url('/assets/piece/draughts/check_yb/wK.png')}

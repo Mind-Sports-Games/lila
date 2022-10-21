@@ -8,6 +8,7 @@ const noCevalVariants = [
   'brazilian',
   'pool',
   'portuguese',
+  'english',
   'fromPositionDraughts',
   'frisian',
   'frysk',

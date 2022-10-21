@@ -75,6 +75,7 @@ object list {
               userTopPerf(leaderboards.brazilian, PerfType.orDefault("brazilian")),
               userTopPerf(leaderboards.pool, PerfType.orDefault("pool")),
               userTopPerf(leaderboards.portuguese, PerfType.orDefault("portuguese")),
+              userTopPerf(leaderboards.english, PerfType.orDefault("english")),
               userTopPerf(leaderboards.shogi, PerfType.orDefault("shogi")),
               userTopPerf(leaderboards.xiangqi, PerfType.orDefault("xiangqi")),
               userTopPerf(leaderboards.minishogi, PerfType.orDefault("minishogi")),

@@ -419,6 +419,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "draughts"
         )
+    case object English
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(DV.English)),
+          icon = DV.English.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(DV.English)), noBot),
+          familyChannel = false,
+          gameFamily = "draughts"
+        )
     case object Shogi
         extends Channel(
           name = VariantKeys.variantName(Variant.wrap(FV.Shogi)),

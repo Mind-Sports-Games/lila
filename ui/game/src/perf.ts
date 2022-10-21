@@ -23,6 +23,7 @@ export const perf = {
     brazilian: 'K',
     pool: 'K',
     portuguese: 'K',
+    english: 'K',
     fromPositionDraughts: 'K',
     frisian: 'K',
     frysk: 'K',
