@@ -266,8 +266,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def setTv(id: ID) = coll.updateFieldUnchecked($id(id), F.tvAt, DateTime.now)
 
-  def setMicroMatch(id: ID, microMatch: String) =
-    coll.updateField($id(id), F.microMatch, microMatch)
+  def setMultiMatch(id: ID, multiMatch: String) =
+    coll.updateField($id(id), F.multiMatch, multiMatch)
 
   def setAnalysed(id: ID): Unit   = coll.updateFieldUnchecked($id(id), F.analysed, true)
   def setUnanalysed(id: ID): Unit = coll.updateFieldUnchecked($id(id), F.analysed, false)
@@ -303,7 +303,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       holdAlertField(P2) -> true
     )
     private def holdAlertOf(doc: Bdoc, playerIndex: PlayerIndex): Option[Player.HoldAlert] =
-      doc.child(playerIndex.fold("p0", "p1")).flatMap(_.getAsOpt[Player.HoldAlert](Player.BSONFields.holdAlert))
+      doc
+        .child(playerIndex.fold("p0", "p1"))
+        .flatMap(_.getAsOpt[Player.HoldAlert](Player.BSONFields.holdAlert))
 
     def game(game: Game): Fu[Player.HoldAlert.Map] =
       coll.one[Bdoc](
@@ -327,10 +329,10 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           p.gameId -> p.playerIndex
         }.toMap
         val holds = for {
-          doc   <- docs
-          id    <- doc string "_id"
+          doc         <- docs
+          id          <- doc string "_id"
           playerIndex <- idPlayerIndexs get id
-          holds <- holdAlertOf(doc, playerIndex)
+          holds       <- holdAlertOf(doc, playerIndex)
         } yield id -> holds
         holds.toMap
       }
@@ -344,7 +346,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       )
     )
 
-  private def holdAlertField(playerIndex: PlayerIndex) = s"p${playerIndex.fold(0, 1)}.${Player.BSONFields.holdAlert}"
+  private def holdAlertField(playerIndex: PlayerIndex) =
+    s"p${playerIndex.fold(0, 1)}.${Player.BSONFields.holdAlert}"
 
   private val finishUnsets = $doc(
     F.positionHashes                              -> true,
@@ -367,9 +370,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       nonEmptyMod(
         "$set",
         $doc(
-          F.winnerId    -> winnerId,
+          F.winnerId          -> winnerId,
           F.winnerPlayerIndex -> winnerPlayerIndex.map(_.p1),
-          F.status      -> status
+          F.status            -> status
         )
       ) ++ $doc(
         "$unset" -> finishUnsets.++ {
@@ -406,6 +409,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       else if (g2.hasClock) 1.some
       else if (g2.hasAi) (Game.aiAbandonedHours + 1).some
       else (24 * 10).some
+    val isMultiMatch = g.metadata.multiMatch
     val bson = (gameBSONHandler write g2) ++ $doc(
       F.initialFen  -> fen,
       F.checkAt     -> checkInHours.map(DateTime.now.plusHours),
@@ -440,8 +444,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def initialFen(game: Game): Fu[Option[FEN]] =
     if (game.imported || !game.variant.standardInitialPosition) initialFen(game.id) dmap {
-      case None if game.variant == Variant.Chess(strategygames.chess.variant.Chess960) => Forsyth.initial(game.variant.gameLogic).some
-      case fen                                            => fen
+      case None if game.variant == Variant.Chess(strategygames.chess.variant.Chess960) =>
+        Forsyth.initial(game.variant.gameLogic).some
+      case fen => fen
     }
     else fuccess(none)
 

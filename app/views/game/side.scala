@@ -1,6 +1,7 @@
 package views.html
 package game
 
+import strategygames.{ P1, P2 }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 
@@ -23,10 +24,11 @@ object side {
       tour: Option[lila.tournament.TourAndTeamVs],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
-      bookmarked: Boolean
+      bookmarked: Boolean,
+      swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context): Option[Frag] =
     ctx.noBlind option frag(
-      meta(pov, initialFen, tour, simul, userTv, bookmarked),
+      meta(pov, initialFen, tour, simul, userTv, bookmarked, swissPairingGames),
       pov.game.userIds.filter(isStreaming) map views.html.streamer.bits.contextual
     )
 
@@ -36,7 +38,8 @@ object side {
       tour: Option[lila.tournament.TourAndTeamVs],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
-      bookmarked: Boolean
+      bookmarked: Boolean,
+      swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context): Option[Frag] =
     ctx.noBlind option {
       import pov._
@@ -156,29 +159,30 @@ object side {
             a(href := routes.Simul.show(sim.id))(sim.fullName)
           )
         },
-        game.metadata.microMatch map { m =>
-          st.section(cls := "game__micro-match")(
-            if (m.startsWith("1:") && m.length == 10)
-              frag(
-                trans.microMatch(),
-                ": ",
-                a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
-                  trans.gameNumberX(1)
-                ),
-                " ",
-                span(cls := "current")(trans.gameNumberX(2))
-              )
-            else if (m.startsWith("2:") && m.length == 10)
-              frag(
-                trans.microMatch(),
-                ": ",
-                span(cls := "current")(trans.gameNumberX(1)),
-                " ",
-                a(cls := "text", href := routes.Round.watcher(m.drop(2), (!pov.playerIndex).name))(
-                  trans.gameNumberX(2)
-                )
-              )
-            else trans.microMatchGameX(1)
+        swissPairingGames.map { spg =>
+          st.section(cls := "game__multi-match")(
+            frag(
+              trans.multiMatch(),
+              if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
+              else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
+              else "",
+              s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
+                .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
+              spg.multiMatchGames
+                .foldLeft(List(spg.game))(_ ++ _)
+                .zipWithIndex
+                .map {
+                  case (mmGame, index) => {
+                    val current = if (mmGame.id == game.id) " current" else ""
+                    a(
+                      cls := s"text glpt${current} mm_game_link",
+                      href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)
+                    )(
+                      trans.gameNumberX(index + 1)
+                    )
+                  }
+                }
+            )
           )
         }
       )

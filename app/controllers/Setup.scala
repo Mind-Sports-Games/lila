@@ -121,7 +121,7 @@ final class Setup(
                       },
                       destUser = destUser,
                       rematchOf = none,
-                      microMatch = config.microMatch
+                      multiMatch = config.multiMatch
                     )
                     (env.challenge.api create challenge) flatMap {
                       case true =>

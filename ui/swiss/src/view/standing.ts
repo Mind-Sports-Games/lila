@@ -1,12 +1,11 @@
 import { h, VNode } from 'snabbdom';
 import SwissCtrl from '../ctrl';
-import { player as renderPlayer, bind, onInsert } from './util';
+import { player as renderPlayer, bind, onInsert, matchScoreDisplay, multiMatchByeScore } from './util';
 import { MaybeVNodes, PairingBase, Player, Pager } from '../interfaces';
 
 function playerTr(ctrl: SwissCtrl, player: Player) {
-  const isMM = ctrl.data.isMicroMatch;
-  console.log(isMM);
   const userId = player.user.id;
+  const isMatchScore = ctrl.data.isMatchScore;
   return h(
     'tr',
     {
@@ -39,15 +38,9 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
               p == 'absent'
                 ? h(p, title('Absent'), '-')
                 : p == 'bye'
-                ? h(p, title('Bye'), isMM ? '2' : '1')
+                ? h(p, title('Bye'), isMatchScore ? matchScoreDisplay(multiMatchByeScore(ctrl)) : '1')
                 : p == 'late'
-                ? h(p, title('Late'), isMM ? '1' : '½')
-                : isMM
-                ? h(
-                    'span.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
-                    { attrs: { key: p.g } },
-                    result(p)
-                  )
+                ? h(p, title('Late'), '½')
                 : h(
                     'a.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
                     {
@@ -63,20 +56,32 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
             .concat([...Array(Math.max(0, ctrl.data.nbRounds - player.sheet.length))].map(_ => h('r')))
         )
       ),
-      h('td.points', title('Points'), '' + (isMM ? player.points * 2 : player.points)),
+      h('td.points', title('Points'), '' + player.points),
       h('td.tieBreak', title('Tiebreak'), '' + player.tieBreak),
     ]
   );
 }
 
 const result = (p: PairingBase): string => {
+  if (p.ms) {
+    if (!p.mp) return '?';
+    const score = parseInt(p.mp, 10);
+    const isOdd = score % 2 == 1;
+    const oddPart = isOdd ? '½' : '';
+    const base = Math.floor(score / 2);
+    if (score == 1) {
+      return '½';
+    } else {
+      return `${base}${oddPart}`;
+    }
+  }
   switch (p.w) {
     case true:
-      return p.m ? '2' : '1';
+      return '1';
     case false:
       return '0';
     default:
-      return p.o ? '*' : p.m ? '1' : '½';
+      return p.o ? '*' : '½';
   }
 };
 

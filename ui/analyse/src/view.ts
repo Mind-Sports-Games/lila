@@ -367,6 +367,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     {
       hook: {
         insert: vn => {
+          playstrategy.miniGame.initAll();
           forceInnerCoords(ctrl, needsInnerCoords);
           if (!!playerBars != $('body').hasClass('header-margin')) {
             requestAnimationFrame(() => {
@@ -382,6 +383,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
         postpatch(old, vnode) {
           if (old.data!.gaugeOn !== gaugeOn) document.body.dispatchEvent(new Event('chessground.resize'));
           vnode.data!.gaugeOn = gaugeOn;
+          playstrategy.miniGame.initAll();
         },
       },
       class: {

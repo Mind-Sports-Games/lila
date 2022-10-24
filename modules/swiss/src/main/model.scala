@@ -30,11 +30,13 @@ case class FeaturedSwisses(
 case class SwissFinish(id: Swiss.Id, ranking: Ranking)
 
 object SwissBounds {
-  val maxRounds           = 100
-  val maxScore            = maxRounds * 2
-  val maxBuchholz         = maxRounds * maxScore
-  val maxSonnenbornBerger = maxRounds * maxScore * 2
-  val maxPerformance      = 5000
+  val maxRounds            = 100
+  val maxGamesPerRound     = 9 //assume single digit in other parts of the code.
+  val defaultGamesPerRound = 1
+  val maxScore             = maxRounds * 2
+  val maxBuchholz          = maxRounds * maxScore
+  val maxSonnenbornBerger  = maxRounds * maxScore * 2
+  val maxPerformance       = 5000
 
   // TODO: these are a candidates to be moved elsewhere
   case class WithBounds(value: Long, totalValues: Long)
@@ -43,8 +45,8 @@ object SwissBounds {
     //       in order to be used as the totalValues here, because 0
     //       is also one of the valid values.
     def score(value: Double)            = WithBounds(value.toLong, maxScore + 1)
-    def buchholz(value: Double)         = WithBounds((value*2).toLong, maxBuchholz + 1)
-    def sonnenbornBerger(value: Double) = WithBounds((value*4).toLong, maxSonnenbornBerger + 1)
+    def buchholz(value: Double)         = WithBounds((value * 2).toLong, maxBuchholz + 1)
+    def sonnenbornBerger(value: Double) = WithBounds((value * 4).toLong, maxSonnenbornBerger + 1)
     // Although not in this case, because this is already
     // an overestimated upper bound
     def performance(value: Double) = WithBounds(value.toLong, maxPerformance)

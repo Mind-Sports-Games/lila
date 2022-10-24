@@ -19,7 +19,8 @@ object player {
       cross: Option[lila.game.Crosstable.WithMatchup],
       playing: List[Pov],
       chatOption: Option[lila.chat.Chat.GameOrEvent],
-      bookmarked: Boolean
+      bookmarked: Boolean,
+      swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context) = {
 
     val gameLogic = pov.game.variant.gameLogic
@@ -67,7 +68,14 @@ object player {
     )(
       main(cls := "round")(
         st.aside(cls := "round__side")(
-          bits.side(pov, data, tour.map(_.tourAndTeamVs), simul, bookmarked = bookmarked),
+          bits.side(
+            pov,
+            data,
+            tour.map(_.tourAndTeamVs),
+            simul,
+            bookmarked = bookmarked,
+            swissPairingGames = swissPairingGames
+          ),
           chatOption.map(_ => chat.frag)
         ),
         bits.roundAppPreload(pov, controls = true),

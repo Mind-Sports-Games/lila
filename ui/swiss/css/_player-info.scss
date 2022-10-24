@@ -128,17 +128,21 @@
       max-width: 200px;
     }
 
-    td:last-child {
+    td.gamescore,
+    td.matchscore {
       font-weight: bold;
       opacity: 0.8;
+      text-align: center;
     }
 
-    tr.win td:last-child {
+    tr.win td.matchscore,
+    td.gamescore.win {
       color: $c-good;
       opacity: 1;
     }
 
-    tr.loss td:last-child {
+    tr.loss td.matchscore,
+    td.gamescore.loss {
       color: $c-bad;
       opacity: 1;
     }

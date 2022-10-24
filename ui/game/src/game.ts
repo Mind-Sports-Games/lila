@@ -17,7 +17,11 @@ export const playedTurns = (data: BaseGameData): number => data.game.turns - (da
 export const bothPlayersHavePlayed = (data: BaseGameData): boolean => playedTurns(data) > 1;
 
 export const abortable = (data: BaseGameData): boolean =>
-  playable(data) && !bothPlayersHavePlayed(data) && !mandatory(data) && data.game.microMatch?.index !== 2;
+  playable(data) &&
+  !bothPlayersHavePlayed(data) &&
+  !mandatory(data) &&
+  ((data.game.multiMatch?.index !== undefined && data.game.multiMatch?.index < 2) ||
+    data.game.multiMatch?.index === undefined);
 
 export const takebackable = (data: BaseGameData): boolean =>
   playable(data) &&

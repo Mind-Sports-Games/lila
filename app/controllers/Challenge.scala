@@ -65,7 +65,9 @@ final class Challenge(
           }
           else
             (c.challengerUserId ?? env.user.repo.named) map { user =>
-              Ok(html.challenge.theirs(c, json, user, get("playerIndex") flatMap strategygames.Player.fromName))
+              Ok(
+                html.challenge.theirs(c, json, user, get("playerIndex") flatMap strategygames.Player.fromName)
+              )
             },
         api = _ => Ok(json).fuccess
       ) flatMap withChallengeAnonCookie(mine && c.challengerIsAnon, c, owner = true)
@@ -90,7 +92,9 @@ final class Challenge(
           .flatMap {
             case Some(pov) =>
               negotiate(
-                html = Redirect(routes.Round.watcher(pov.gameId, cc.fold(pov.game.variant.startPlayer.name)(_.name))).fuccess,
+                html = Redirect(
+                  routes.Round.watcher(pov.gameId, cc.fold(pov.game.variant.startPlayer.name)(_.name))
+                ).fuccess,
                 api = apiVersion => env.api.roundApi.player(pov, none, apiVersion) map { Ok(_) }
               ) flatMap withChallengeAnonCookie(ctx.isAnon, c, owner = false)
             case None =>
@@ -348,7 +352,7 @@ final class Challenge(
         challenger = ChallengeModel.toRegistered(config.variant, timeControl)(orig),
         destUser = dest,
         rematchOf = none,
-        microMatch = config.microMatch
+        multiMatch = config.multiMatch
       )
   }
 
