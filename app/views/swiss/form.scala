@@ -170,7 +170,11 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         form("xGamesChoice.matchScore"),
         trans.isMatchScore(),
         half = true,
-        help = raw(trans.isMatchScoreDefinition.txt().replace("(", "<br>(")).some
+        help = frag(
+          trans.isMatchScoreDefinition.txt(),
+          br,
+          a(href := s"${routes.Swiss.home}#faqMatchScore", target := "_blank")("More detail here")
+        ).some
       )
     )
   def xGamesChoiceRow1 =

@@ -32,7 +32,7 @@
   <string name="multiMatchGameX">Multi-match game %s</string>
   <string name="multiMatchDefinition">Play multiple games in succession with opponents (swapping first player each game)</string>
   <string name="isMatchScore">Use Match Score</string>
-  <string name="isMatchScoreDefinition">Use score of entire match against opponent as tournament points (instead of overall result 1/0.5/0 win/draw/loss)</string>
+  <string name="isMatchScoreDefinition">Use score of entire match against opponent as tournament points</string>
   <string name="createAGame">Create a game</string>
   <string name="playerIndexIsVictorious">%s is victorious</string>
   <string name="whiteIsVictorious">White is victorious</string>

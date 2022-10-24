@@ -187,7 +187,7 @@ object home {
       i("?"),
       p(
         strong("In a Swiss tournament what does it mean by using match score?"),
-        "In a swiss tournamnet, if there is more than 1 game per round (see above), then the match score between the players is used instead of the usual scoring system.",
+        "In a swiss tournament, if there is more than 1 game per round (see above), then the match score between the players is used instead of the usual scoring system.",
         br,
         "For example, if you won 2.5-1.5 (in a best of 4), you would score 2.5 (and opponent 1.5) instead of the usual 1 (and opponent 0)",
         br,
