@@ -66,7 +66,7 @@ object Event {
         .obj(
           "fen"         -> fen,
           "ply"         -> state.turns,
-          "dests"       -> PossibleMoves.oldJson(possibleMoves.pp("possibleMoves")),
+          "dests"       -> PossibleMoves.oldJson(possibleMoves),
           "captLen"     -> ~captLen,
           "gf"          -> gf.id,
           "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty))
