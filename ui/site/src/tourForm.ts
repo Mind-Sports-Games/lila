@@ -10,6 +10,7 @@ playstrategy.load.then(() => {
     $draughts64Variants = $('#form3-medleyDefaults_draughts64Variants'),
     $bestOfX = $('#form3-xGamesChoice_bestOfX'),
     $playX = $('#form3-xGamesChoice_playX'),
+    $useMatchScore = $('#form3-xGamesChoice_matchScore'),
     showPosition = () =>
       $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string) && !$medley.is(':checked')),
     showDrawTables = () =>
@@ -23,6 +24,15 @@ playstrategy.load.then(() => {
       $('.form3 .variant').toggle(!$medley.is(':checked'));
       showPosition();
       showDrawTables();
+    },
+    matchSelectors = (selector1: Selector, selector2: Selector) => {
+      const $sel1 = $(selector1);
+      const $sel2 = $(selector2);
+      if ($sel1.is(':checked')) {
+        $sel2.prop('checked', true);
+      } else {
+        $sel2.prop('checked', false);
+      }
     },
     toggleOff = (selector: Selector) => {
       const $other = $(selector);
@@ -60,8 +70,12 @@ playstrategy.load.then(() => {
   $draughts64Variants.on('change', toggleDraughts64Variants);
   showMedleySettings();
 
-  $bestOfX.on('change', () => toggleOff($playX));
+  $bestOfX.on('change', () => {
+    toggleOff($playX);
+    toggleOff($useMatchScore);
+  });
   $playX.on('change', () => toggleOff($bestOfX));
+  $playX.on('change', () => matchSelectors($playX, $useMatchScore));
 
   $('form .conditions a.show').on('click', function (this: HTMLAnchorElement) {
     $(this).remove();

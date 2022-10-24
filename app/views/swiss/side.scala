@@ -60,7 +60,7 @@ object side {
                   s" (${s.settings.nbGamesPerRound} games per round"
                 },
                 if (s.settings.isMatchScore)
-                  a(href := "https://playstrategy.org/swiss#faqMatchScore")(" using match score"),
+                  a(href := s"${routes.Swiss.home}#faqMatchScore")(" using match score"),
                 if (s.settings.isBestOfX || s.settings.isPlayX) ")"
                 else ""
               ),

@@ -73,11 +73,11 @@ final class SwissForm(implicit mode: Mode) {
           _.validXGamesSetup
         )
         .verifying(
-          "Cannot have matchScore with an odd number of games per round in best of X",
+          "Cannot have Match Score with an odd number of games per round in best of X",
           _.validMatchScoreSetup
         )
         .verifying(
-          "Best of x or Play x and MatchScore can only be used if number of games per round is greater than 1",
+          "Best of x or Play x and Match Score can only be used if number of games per round is greater than 1",
           _.validNumberofGames
         )
     )
