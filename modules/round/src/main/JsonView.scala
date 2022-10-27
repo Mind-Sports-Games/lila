@@ -34,6 +34,14 @@ final class JsonView(
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
+  private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
+    if (prefCoordSystem == 1) prefCoordSystem
+    else
+      gameVariant match {
+        case Variant.Draughts(v) if v.invertNumericCoords => 2
+        case _                                            => 0
+      }
+
   private def commonPlayerJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json
       //.obj("color" -> g.variant.playerNames(p.playerIndex), "playerIndex" -> p.playerIndex.name)
@@ -98,7 +106,7 @@ final class JsonView(
               .obj(
                 "animationDuration" -> animationMillis(pov, pref),
                 "coords"            -> pref.coords,
-                "coordSystem"       -> pref.coordSystem,
+                "coordSystem"       -> coordSystemForVariant(pref.coordSystem, pov.game.variant),
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
                 "autoQueen" -> (if (pov.game.variant == strategygames.chess.variant.Antichess)
@@ -214,6 +222,7 @@ final class JsonView(
               .obj(
                 "animationDuration" -> animationMillis(pov, pref),
                 "coords"            -> pref.coords,
+                "coordSystem"       -> coordSystemForVariant(pref.coordSystem, game.variant),
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
                 "clockTenths"       -> pref.clockTenths,
@@ -290,6 +299,7 @@ final class JsonView(
           .obj(
             "animationDuration" -> animationMillis(pov, pref),
             "coords"            -> pref.coords,
+            "coordSystem"       -> coordSystemForVariant(pref.coordSystem, game.variant),
             "moveEvent"         -> pref.moveEvent,
             "mancalaMove"       -> (pref.mancalaMove == Pref.MancalaMove.SINGLE_CLICK),
             "pieceSet"          -> pref.pieceSet.map(p => Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName))
