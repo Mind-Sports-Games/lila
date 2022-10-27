@@ -58,25 +58,31 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
         const klasses = 'is64' + (s.orientation === 'p2' ? ' p2' : ' p1');
         container.appendChild(renderCoords(allRanks, 'ranks ' + klasses));
         container.appendChild(renderCoords(allFiles, 'files ' + klasses));
-      } else if ((s.orientation === 'p2' && s.coordSystem === 0) || (s.orientation === 'p1' && s.coordSystem === 2)){
-        const filesP2: number[] = [],
-          ranksP2: number[] = [],
-          rankBase = s.boardSize[0] / 2,
-          fileSteps = s.boardSize[1] / 2,
-          klasses = 'is' + (s.boardSize[0]*s.boardSize[1]) + (s.orientation === 'p2' ? ' p2' : '');
-        for (let i = 1; i <= rankBase; i++) filesP2.push(i);
-        for (let i = 0; i < fileSteps; i++) ranksP2.push(rankBase + s.boardSize[0] * i + 1);
-        container.appendChild(renderCoords(ranksP2, 'ranks ' + klasses));
-        container.appendChild(renderCoords(filesP2, 'files ' + klasses));
       } else {
         const files: number[] = [],
           ranks: number[] = [],
           rankBase = s.boardSize[0] / 2,
           fields = (s.boardSize[0] * s.boardSize[1]) / 2,
           fileSteps = s.boardSize[1] / 2,
-          klasses = 'is' + (s.boardSize[0]*s.boardSize[1]) + (s.orientation === 'p2' ? ' p2' : '');
-        for (let i = fields - rankBase + 1; i <= fields; i++) files.push(i);
-        for (let i = 0; i < fileSteps; i++) ranks.push(rankBase + s.boardSize[0] * i);
+          klasses = 'is' + (fields * 2) + (s.orientation === 'p2' ? ' p2' : '');
+        if (s.coordSystem === 0) {
+          if (s.orientation === 'p2') {
+            for (let i = 1; i <= rankBase; i++) files.push(i);
+            for (let i = fileSteps-1; i >= 0; i--) ranks.push(rankBase + s.boardSize[0] * i + 1);
+          } else {
+            for (let i = fields - rankBase + 1; i <= fields; i++) files.push(i);
+            for (let i = 0; i < fileSteps; i++) ranks.push(rankBase + s.boardSize[0] * i);
+          }
+        } else {
+          //coordSystem === 2 therefore inverted numbers
+          if (s.orientation === 'p2') {
+            for (let i = fields; i > fields - rankBase; i--) files.push(i);
+            for (let i = 0; i < fileSteps; i++) ranks.push(rankBase + s.boardSize[0] * i);
+          } else {
+            for (let i = rankBase; i > 0; i--) files.push(i);
+            for (let i = fileSteps; i > 0; i--) ranks.push(s.boardSize[0] * i - rankBase + 1);
+          }
+        }
         container.appendChild(renderCoords(ranks, 'ranks ' + klasses));
         container.appendChild(renderCoords(files, 'files ' + klasses));
       }
