@@ -1,6 +1,6 @@
 import { RoundData, Step } from './interfaces';
 import { countGhosts } from 'draughtsground/fen';
-import { san2alg } from 'draughts';
+import { san2alg, invertSan } from 'draughts';
 
 export const firstPly = (d: RoundData): number => d.steps[0].ply;
 
@@ -58,8 +58,10 @@ export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: Draug
 }
 
 function addNotation(step: Step, coordSystem: number): Step {
-  if (coordSystem) {
+  if (coordSystem === 1) {
     step.alg = san2alg(step.san);
+  } else if (coordSystem === 2 && step.san) {
+    step.san = invertSan(step.san);
   }
   return step;
 }

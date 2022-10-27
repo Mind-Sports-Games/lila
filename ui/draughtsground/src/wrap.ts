@@ -8,6 +8,7 @@ import {
   createEl,
   allKeys,
   san2alg,
+  invertCoord,
   ranksRev as allRanks,
   files as allFiles,
 } from './util';
@@ -53,33 +54,32 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 
   if (s.coordinates) {
     if (s.coordinates === 2) {
-      if (s.boardSize[0] === 8 && s.boardSize[1] === 8) {
-        // TODO: restore this once we have a prefernce. s.coordSystem === 1) {
-        container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'p2' ? ' p2' : ' p1')));
-        container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'p2' ? ' p2' : ' p1')));
-      } else if (s.orientation === 'p2') {
+      if (s.coordSystem === 1) {
+        const klasses = 'is64' + (s.orientation === 'p2' ? ' p2' : ' p1');
+        container.appendChild(renderCoords(allRanks, 'ranks ' + klasses));
+        container.appendChild(renderCoords(allFiles, 'files ' + klasses));
+      } else if ((s.orientation === 'p2' && s.coordSystem === 0) || (s.orientation === 'p1' && s.coordSystem === 2)){
         const filesP2: number[] = [],
           ranksP2: number[] = [],
           rankBase = s.boardSize[0] / 2,
-          fileSteps = s.boardSize[1] / 2;
+          fileSteps = s.boardSize[1] / 2,
+          klasses = 'is' + (s.boardSize[0]*s.boardSize[1]) + (s.orientation === 'p2' ? ' p2' : '');
         for (let i = 1; i <= rankBase; i++) filesP2.push(i);
         for (let i = 0; i < fileSteps; i++) ranksP2.push(rankBase + s.boardSize[0] * i + 1);
-        container.appendChild(renderCoords(ranksP2, 'ranks is100 p2'));
-        container.appendChild(renderCoords(filesP2, 'files is100 p2'));
+        container.appendChild(renderCoords(ranksP2, 'ranks ' + klasses));
+        container.appendChild(renderCoords(filesP2, 'files ' + klasses));
       } else {
         const files: number[] = [],
           ranks: number[] = [],
           rankBase = s.boardSize[0] / 2,
           fields = (s.boardSize[0] * s.boardSize[1]) / 2,
-          fileSteps = s.boardSize[1] / 2;
+          fileSteps = s.boardSize[1] / 2,
+          klasses = 'is' + (s.boardSize[0]*s.boardSize[1]) + (s.orientation === 'p2' ? ' p2' : '');
         for (let i = fields - rankBase + 1; i <= fields; i++) files.push(i);
         for (let i = 0; i < fileSteps; i++) ranks.push(rankBase + s.boardSize[0] * i);
-        container.appendChild(renderCoords(ranks, 'ranks is100'));
-        container.appendChild(renderCoords(files, 'files is100'));
+        container.appendChild(renderCoords(ranks, 'ranks ' + klasses));
+        container.appendChild(renderCoords(files, 'files ' + klasses));
       }
-    } else if (s.boardSize[0] === 8 && s.boardSize[1] === 8) {
-      container.appendChild(renderCoords(allRanks, 'ranks is64' + (s.orientation === 'p2' ? ' p2' : ' p1')));
-      container.appendChild(renderCoords(allFiles, 'files is64' + (s.orientation === 'p2' ? ' p2' : ' p1')));
     } else if (!relative && s.coordinates === 1) {
       renderFieldnumbers(board, s, board.getBoundingClientRect());
     }
@@ -100,6 +100,16 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
   };
 }
 
+function coordText(coordSystem: number | undefined, san: string): string {
+  if (coordSystem === 1) {
+    return san2alg[san];
+  } else if (coordSystem === 2){
+    return invertCoord(san);
+  } else {
+    return san;
+  }
+}
+
 function renderFieldnumbers(element: HTMLElement, s: State, bounds: ClientRect) {
   const asP1 = s.orientation !== 'p2',
     count = boardFields(s);
@@ -107,7 +117,7 @@ function renderFieldnumbers(element: HTMLElement, s: State, bounds: ClientRect) 
     const field = createEl('fieldnumber', 'p2') as FieldNumber,
       san = f.toString(),
       k = allKeys[f - 1];
-    field.textContent = s.coordSystem === 1 ? san2alg[san] : san;
+    field.textContent = coordText(s.coordSystem, san);
     field.cgKey = k;
     const coords = posToTranslateAbs(bounds, s.boardSize)(key2pos(k, s.boardSize), asP1, 0);
     translateAbs(field, [coords['0'], coords['1']]);

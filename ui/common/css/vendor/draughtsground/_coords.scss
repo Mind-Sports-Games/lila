@@ -18,7 +18,7 @@ fieldnumber {
 }
 
 .is100,
-.i64 {
+.is64 {
   coords {
     display: flex;
 
@@ -27,6 +27,7 @@ fieldnumber {
       top: 1px;
       right: 0; // a negative value creates empty space on the right side in mobile browsers
       height: 100%;
+      width: 1.4em;
       text-align: right;
       &.black {
         flex-flow: column-reverse;
@@ -97,7 +98,7 @@ fieldnumber {
       width: 12px;
       text-align: left;
       &.is64 coord {
-        transform: translateY(36%);
+        transform: translateY(18%);
       }
     }
     &.files {
@@ -105,7 +106,7 @@ fieldnumber {
       left: 0;
       text-align: center;
       &.is64 coord {
-        transform: translateX(-4%);
+        transform: translateX(-26%);
       }
     }
     coord {

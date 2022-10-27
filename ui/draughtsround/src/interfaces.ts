@@ -164,7 +164,7 @@ export interface Pref {
   clockTenths: Prefs.ShowClockTenths;
   confirmResign: boolean;
   coords: Prefs.Coords;
-  coordSystem: 0 | 1;
+  coordSystem: 0 | 1 | 2;
   destination: boolean;
   enablePremove: boolean;
   highlight: boolean;

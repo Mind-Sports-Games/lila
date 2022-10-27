@@ -68,6 +68,16 @@ export function san2alg(san?: string): string | undefined {
   return san2algMap[san.slice(0, split)] + (capture === -1 ? '-' : ':') + san2algMap[san.slice(split + 1)];
 }
 
+function invertCoord(coord: string): string {
+  return (33 - +coord).toString()
+}
+
+export function invertSan(san: string): string {
+  const capture = san.indexOf('x'),
+    split = capture === -1 ? san.indexOf('-') : capture;
+  return invertCoord(san.slice(0, split)) + (capture === -1 ? '-' : 'x') + invertCoord(san.slice(split + 1));
+}
+
 export function renderEval(e: number): string {
   e = Math.max(Math.min(Math.round(e / 10) / 10, 99), -99);
   return (e > 0 ? '+' : '') + e;
