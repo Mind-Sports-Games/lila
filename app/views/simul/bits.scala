@@ -71,6 +71,10 @@ object bits {
     trans.nbLosses,
     trans.by,
     trans.signIn,
-    trans.mustBeInTeam
+    trans.mustBeInTeam,
+    trans.p1,
+    trans.p2,
+    trans.randomColor,
+    trans.absentSimulApplicants
   ).map(_.key)
 }

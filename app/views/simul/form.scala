@@ -83,12 +83,10 @@ object form {
             views.html.setup.filter.renderCheckboxes(
               form,
               "variants",
-              //currently we only offer chess simuls
-              //would need to change simul module to accept non Chess simuls
-              translatedVariantChoicesWithVariantsByGameFamily(GameFamily.Chess()),
+              translatedAllVariantChoicesWithVariants(v => s"${v.gameFamily.id}_${v.id}"),
               checks = form.value
                 .map(_.variants.map(_.toString))
-                .getOrElse(simul.??(_.variants.map(_.id.toString)))
+                .getOrElse(simul.??(_.variants.map(v => s"${v.gameFamily.id}_${v.id}")))
                 .toSet
             )
           ),
@@ -115,7 +113,7 @@ object form {
         )(
           form3.select(_, clockExtraChoices)
         ),
-        form3.group(form("playerIndex"), raw("Host playerIndex for each game"), half = true)(
+        form3.group(form("playerIndex"), raw("Host player number for each game (who starts)"), half = true)(
           form3.select(_, playerIndexChoices)
         )
       ),
@@ -136,13 +134,13 @@ object form {
         form("estimatedStartAt"),
         frag("Estimated start time"),
         half = true
-        )(form3.flatpickr(_)),
+      )(form3.flatpickr(_)),
       form3.group(
         form("text"),
         raw("Simul description"),
         help = frag("Anything you want to tell the participants?").some
       )(form3.textarea(_)(rows := 10)),
-      ctx.me.exists(_.canBeFeatured) option form3.checkbox(
+      ctx.me.exists(_.isSimulFeatured) option form3.checkbox(
         form("featured"),
         frag("Feature on playstrategy.org/simul"),
         help = frag("Show your simul to everyone on playstrategy.org/simul. Disable for private simuls.").some
