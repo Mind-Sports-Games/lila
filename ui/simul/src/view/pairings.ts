@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import SimulCtrl from '../ctrl';
-import { Pairing } from '../interfaces';
+import { Pairing, Game } from '../interfaces';
 import { onInsert } from './util';
 import { opposite } from 'chessground/util';
 
@@ -16,6 +16,11 @@ const renderClock = (playerIndex: PlayerIndex, time: number) =>
     },
   });
 
+const renderBoardState = (game: Game): string =>
+  game.gameLogic === 'draughts' && !!game.boardSize
+    ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orient}|${game.lastMove}`
+    : `${game.fen},${game.orient},${game.lastMove}`;
+
 const miniPairing = (ctrl: SimulCtrl) => (pairing: Pairing) => {
   const game = pairing.game,
     player = pairing.player,
@@ -29,7 +34,7 @@ const miniPairing = (ctrl: SimulCtrl) => (pairing: Pairing) => {
         host: ctrl.data.host.gameId === game.id,
       },
       attrs: {
-        'data-state': `${game.fen},${game.orient},${game.lastMove}`,
+        'data-state': renderBoardState(game),
         'data-live': game.clock ? game.id : '',
       },
       hook: onInsert(playstrategy.powertip.manualUserIn),
