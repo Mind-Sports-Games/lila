@@ -1,5 +1,7 @@
 import { init, VNode, classModule, attributesModule } from 'snabbdom';
 import { SimulOpts } from './interfaces';
+import { Draughtsground } from 'draughtsground';
+import { Chessground } from 'chessground';
 import SimulCtrl from './ctrl';
 import PlayStrategyChat from 'chat';
 
@@ -34,3 +36,5 @@ export function start(opts: SimulOpts) {
 
 // that's for the rest of playstrategy to access the chat
 window.PlayStrategyChat = PlayStrategyChat;
+window.Chessground = Chessground;
+window.Draughtsground = Draughtsground;

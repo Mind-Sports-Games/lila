@@ -20,8 +20,10 @@ const miniPairing = (ctrl: SimulCtrl) => (pairing: Pairing) => {
   const game = pairing.game,
     player = pairing.player,
     variant = pairing.variant;
+  const draughtsClasses =
+    game.gameLogic === 'draughts' && !!game.boardSize ? `${game.gameLogic}.is${game.boardSize.key}.` : '';
   return h(
-    `span.mini-game.mini-game-${game.id}.mini-game--init.is2d.${variant}.variant-${variant}`,
+    `span.mini-game.mini-game-${game.id}.mini-game--init.is2d.${draughtsClasses}${variant}.variant-${variant}`,
     {
       class: {
         host: ctrl.data.host.gameId === game.id,
