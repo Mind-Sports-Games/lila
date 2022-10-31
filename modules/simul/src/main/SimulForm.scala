@@ -30,9 +30,9 @@ object SimulForm {
 
   val playerIndexs = List("p1", "random", "p2")
   val playerIndexChoices = List(
-    "p1"  -> "P1",
-    "random" -> "Random",
-    "p2"  -> "P2"
+    "p1"     -> "Player 1",
+    "random" -> "Random Side",
+    "p2"     -> "Player 2"
   )
   val playerIndexDefault = "p1"
 
@@ -64,13 +64,13 @@ object SimulForm {
       clockTime = clockTimeDefault,
       clockIncrement = clockIncrementDefault,
       clockExtra = clockExtraDefault,
-      variants = List(strategygames.chess.variant.Standard.id),
+      variants = List(s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}"),
       position = none,
       playerIndex = playerIndexDefault,
       text = "",
       estimatedStartAt = none,
       team = none,
-      featured = host.hasTitle.some
+      featured = host.isSimulFeatured.some // it was: host.hasTitle.some
     )
 
   def edit(host: User, teams: List[LeaderTeam], simul: Simul) =
@@ -79,7 +79,7 @@ object SimulForm {
       clockTime = simul.clock.config.limitInMinutes.toInt,
       clockIncrement = simul.clock.config.increment.roundSeconds,
       clockExtra = simul.clock.hostExtraMinutes,
-      variants = simul.variants.map(_.id),
+      variants = simul.variants.map(v => s"${v.gameFamily.id}_${v.id}"),
       position = simul.position,
       playerIndex = simul.playerIndex | "random",
       text = simul.text,
@@ -95,21 +95,23 @@ object SimulForm {
         "clockTime"      -> numberIn(clockTimeChoices),
         "clockIncrement" -> numberIn(clockIncrementChoices),
         "clockExtra"     -> numberIn(clockExtraChoices),
-        //only chess variants (not LOA) that arent FromPosition
+        //only variants that arent FromPosition
         "variants" -> list {
-          number.verifying(
-            Variant.all(GameLogic.Chess()).filter(
-              v => !v.fromPositionVariant && v.gameFamily == GameFamily.Chess()
-            ).map(_.id).toSet contains _
+          nonEmptyText.verifying(g =>
+            Variant.all
+              .filter(v => !v.fromPositionVariant)
+              .map(v => s"${v.gameFamily.id}_${v.id}")
+              .toSet contains g
           )
         }.verifying("At least one variant", _.nonEmpty),
-        "position" -> optional(lila.common.Form.fen.playableStrict),
-        "playerIndex"    -> stringIn(playerIndexChoices),
-        "text"     -> cleanText,
+        "position"         -> optional(lila.common.Form.fen.playableStrict),
+        "playerIndex"      -> stringIn(playerIndexChoices),
+        "text"             -> cleanText,
         "estimatedStartAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
-        "team"     -> optional(nonEmptyText.verifying(id => teams.exists(_.id == id))),
-        "featured" -> optional(boolean)
+        "team"             -> optional(nonEmptyText.verifying(id => teams.exists(_.id == id))),
+        "featured"         -> optional(boolean)
       )(Setup.apply)(Setup.unapply)
+        .verifying("Only allowed a different starting fen if only playing standard chess", _.validUsePosition)
     )
 
   val positions = StartingPosition.allWithInitial.map(_.fen)
@@ -125,7 +127,7 @@ object SimulForm {
       clockTime: Int,
       clockIncrement: Int,
       clockExtra: Int,
-      variants: List[Int],
+      variants: List[String],
       position: Option[FEN],
       playerIndex: String,
       text: String,
@@ -139,8 +141,17 @@ object SimulForm {
         hostExtraTime = clockExtra * 60
       )
 
-    def actualVariants = variants.flatMap { id => strategygames.chess.variant.Variant(id).map(Variant.wrap) }
+    def actualVariants: List[Variant] = variants map { v =>
+      Variant
+        .orDefault(
+          GameFamily(v.split("_")(0).toInt).gameLogic,
+          v.split("_")(1).toInt
+        )
+    }
 
     def realPosition = position.filterNot(_.initial)
+
+    def validUsePosition: Boolean =
+      position.fold(true)(_ => variants.size == 1 && variants(0) == "0_1")
   }
 }

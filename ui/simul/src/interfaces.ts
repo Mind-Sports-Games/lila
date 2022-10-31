@@ -73,6 +73,8 @@ export interface Game {
   id: string;
   status: number;
   fen: string;
+  boardSize?: BoardSize;
+  gameLogic: string;
   lastMove: string;
   orient: PlayerIndex;
   clock?: {
@@ -80,4 +82,9 @@ export interface Game {
     p2: number;
   };
   winner?: PlayerIndex;
+}
+
+export interface BoardSize {
+  size: number[];
+  key: string;
 }

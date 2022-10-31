@@ -473,19 +473,19 @@ export default class Setup {
 
         $minInput
           .attr({
-            min: '-500',
+            min: '-1000',
             max: '0',
-            step: '50',
-            value: minStorage.get() || '-500',
+            step: '100',
+            value: minStorage.get() || '-1000',
           })
           .on('input', update);
 
         $maxInput
           .attr({
             min: '0',
-            max: '500',
-            step: '50',
-            value: maxStorage.get() || '500',
+            max: '1000',
+            step: '100',
+            value: maxStorage.get() || '1000',
           })
           .on('input', update);
 

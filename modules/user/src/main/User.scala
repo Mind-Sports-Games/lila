@@ -92,6 +92,8 @@ case class User(
 
   def canBeFeatured = hasTitle && !lameOrTroll
 
+  def isSimulFeatured = roles.exists(_ contains "FEATURED_SIMUL")
+
   def canFullyLogin = enabled || !lameOrTrollOrAlt
 
   def withMarks(f: UserMarks => UserMarks) = copy(marks = f(marks))
