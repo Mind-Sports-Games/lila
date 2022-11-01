@@ -2,6 +2,7 @@ package views.html
 package game
 
 import strategygames.format.FEN
+import strategygames.GameFamily
 import strategygames.variant.Variant
 
 import lila.api.Context
@@ -122,17 +123,25 @@ object side {
           )
         },
         initialFen
-          .ifTrue(game.variant.chess960)
+          .ifTrue(game.variant.chess960 || game.variant.gameFamily == GameFamily.Draughts())
           .flatMap { fen =>
-            fen match {
-              case FEN.Chess(fen) => strategygames.chess.variant.Chess960.positionNumber(fen)
+            (fen, game.variant) match {
+              case (FEN.Chess(fen), _)                            => strategygames.chess.variant.Chess960.positionNumber(fen).map(_.toString)
+              case (FEN.Draughts(fen), Variant.Draughts(variant)) => variant.drawTableInfo(fen.pp("fen"))
               case _              => sys.error("Mismatched fen gamelogic")
             }
           }
-          .map { number =>
-            st.section(
-              "Chess960 start position: ",
-              strong(number)
+          .map { info =>
+            st.section(cls := "starting-position")(
+              game.variant match {
+                case Variant.Chess(_)    => "Chess960 start position: "
+                case Variant.Draughts(_) => info
+                case _                   => ""
+              },
+              game.variant match {
+                case Variant.Chess(_) => strong(info)
+                case _                => ""
+              }
             )
           },
         userTv.map { u =>

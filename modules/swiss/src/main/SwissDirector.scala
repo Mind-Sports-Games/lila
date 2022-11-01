@@ -26,7 +26,7 @@ final private class SwissDirector(
   private def availableDrawTables(variant: Variant) =
     variant match {
       case Variant.Draughts(variant) =>
-        strategygames.draughts.OpeningTable.tablesForVariant(variant).map(FEN.Draughts)
+        strategygames.draughts.OpeningTable.fensForVariant(variant).map(FEN.Draughts)
       case _ => List()
     }
 
