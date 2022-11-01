@@ -127,7 +127,7 @@ object side {
           .flatMap { fen =>
             (fen, game.variant) match {
               case (FEN.Chess(fen), _)                            => strategygames.chess.variant.Chess960.positionNumber(fen).map(_.toString)
-              case (FEN.Draughts(fen), Variant.Draughts(variant)) => variant.drawTableInfo(fen.pp("fen"))
+              case (FEN.Draughts(fen), Variant.Draughts(variant)) => variant.drawTableInfo(fen)
               case _              => sys.error("Mismatched fen gamelogic")
             }
           }
