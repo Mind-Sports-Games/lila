@@ -15,12 +15,16 @@ object String {
   def lcfirst(str: String) = s"${str(0).toLower}${str.drop(1)}"
 
   def slugify(input: String) = {
-    val nop1space = input.trim.replace(' ', '-')
+    val nop1space    = input.trim.replace(' ', '-')
     val singleDashes = slugMultiDashRegex.replaceAllIn(nop1space, "-")
     val normalized   = Normalizer.normalize(singleDashes, Normalizer.Form.NFD)
     val slug         = slugR.replaceAllIn(normalized, "")
     slug.toLowerCase
   }
+
+  // https://www.compart.com/en/unicode/block/U+1F300
+  private val multibyteSymbolsRegex               = "\\p{So}+".r
+  def removeMultibyteSymbols(str: String): String = multibyteSymbolsRegex.replaceAllIn(str, "")
 
   def decodeUriPath(input: String): Option[String] = {
     try {
