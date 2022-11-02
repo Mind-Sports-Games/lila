@@ -538,6 +538,7 @@ object Tv {
       Brazilian,
       Pool,
       Portuguese,
+      English,
       LinesOfActionFamily,
       LinesOfAction,
       ScrambledEggs,

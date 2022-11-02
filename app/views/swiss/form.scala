@@ -335,7 +335,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         klass = "drawTables",
         half = true,
         help = raw(
-          "Each round of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant."
+          "Each round of the tournament uses a randomly selected starting position from the list of IDF/ACF Draw Tables for this variant."
         ).some,
         displayed = false
       )
@@ -348,7 +348,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         klass = "perPairingDrawTables",
         half = true,
         help = raw(
-          "Each pairing of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant."
+          "Each pairing of the tournament uses a randomly selected starting position from the list of IDF/ACF Draw Tables for this variant."
         ).some,
         displayed = false
       )

@@ -53,7 +53,7 @@ final class HistoryApi(coll: Coll, userRepo: UserRepo, cacheApi: lila.memo.Cache
       game.ratingVariant.brazilian.option("brazilian"                       -> perfs.brazilian),
       game.ratingVariant.pool.option("pool"                                 -> perfs.pool),
       game.ratingVariant.portuguese.option("portuguese"                     -> perfs.portuguese),
-      game.ratingVariant.portuguese.option("english"                        -> perfs.english),
+      game.ratingVariant.english.option("english"                           -> perfs.english),
       game.ratingVariant.shogi.option("shogi"                               -> perfs.shogi),
       game.ratingVariant.xiangqi.option("xiangqi"                           -> perfs.xiangqi),
       game.ratingVariant.minishogi.option("minishogi"                       -> perfs.minishogi),

@@ -300,6 +300,7 @@ final class PerfsUpdater(
           brazilian = r(PT.orDefault("brazilian"), perfs.brazilian, perfs1.brazilian),
           pool = r(PT.orDefault("pool"), perfs.pool, perfs1.pool),
           portuguese = r(PT.orDefault("portuguese"), perfs.portuguese, perfs1.portuguese),
+          english = r(PT.orDefault("english"), perfs.english, perfs1.english),
           shogi = r(PT.orDefault("shogi"), perfs.shogi, perfs1.shogi),
           xiangqi = r(PT.orDefault("xiangqi"), perfs.xiangqi, perfs1.xiangqi),
           minishogi = r(PT.orDefault("minishogi"), perfs.minishogi, perfs1.minishogi),
