@@ -97,7 +97,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
         // hits partial index hostSeenAt_-1
         createdSelect ++ featurableSelect ++ $doc(
           //"hostSeenAt" $gte DateTime.now.minusSeconds(12),
-          "createdAt" $gte DateTime.now.minusDays(14)
+          "createdAt" $gte DateTime.now.minusDays(30)
         )
       )
       .sort(createdSort)
@@ -114,7 +114,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     coll
       .find(
         createdSelect ++ $doc(
-          "createdAt" $gte DateTime.now.minusDays(14)
+          "createdAt" $gte DateTime.now.minusDays(30)
         )
       )
       .sort(createdSort)
