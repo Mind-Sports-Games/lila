@@ -192,7 +192,8 @@ draughts_themes.map { |theme|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
           playerIndex = (color == 'w' && !draughts_invert_colors.include?(variant)) || (color == 'b' && draughts_invert_colors.include?(variant)) ? 'p1' : 'p2'
-          '.is2d .variant-' + variant + ' .' + role + '.' + playerIndex + ' {' +
+          '.is2d .variant-' + variant + ' .' + role + '.' + playerIndex +
+            ', .is2d.variant-' + variant + ' .' + role + '.' + playerIndex + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -216,7 +217,8 @@ draughts_themes.map { |theme|
       draughts_roles.map { |role|
         piece = color[0] + role.upcase[0]
         playerIndex = (color == 'w' && !draughts_invert_colors.include?(variant)) || (color == 'b' && draughts_invert_colors.include?(variant)) ? 'p1' : 'p2'
-        '.is2d .variant-' + variant + ' .' + role + '.' + playerIndex + ' {' +
+        '.is2d .variant-' + variant + ' .' + role + '.' + playerIndex +
+          ', .is2d.variant-' + variant + ' .' + role + '.' + playerIndex + ' {' +
           "background-image:url('/assets/piece/" + 'draughts/' + name + "/" + piece + "." + ext + "')}"
       }
     }
