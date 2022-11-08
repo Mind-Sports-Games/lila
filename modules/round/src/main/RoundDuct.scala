@@ -18,7 +18,7 @@ import lila.hub.actorApi.round.{
   FishnetPlay,
   FishnetStart,
   IsOnGame,
-  MicroRematch,
+  MultiMatchRematch,
   RematchNo,
   RematchYes,
   Resign
@@ -349,20 +349,23 @@ final private[round] class RoundDuct(
     case RematchYes(playerId) => handle(PlayerId(playerId))(rematcher.yes)
     case RematchNo(playerId)  => handle(PlayerId(playerId))(rematcher.no)
 
-    //TODO: microMatch: This almost certainly doesnt work as wanted (port issues)
-    case MicroRematch => handle { game =>
-      rematcher.microMatch(game) map { events =>
-        events.foreach {
-          case Event.RematchTaken(gameId) =>
-            val microMatch = s"2:$gameId"
-            gameRepo.setMicroMatch(game.id, microMatch).void andThen {
-              case _ => updateGame(game => game.copy(metadata = (game.metadata.copy(microMatch = microMatch.some))))
+    //TODO: challengeMultiMatch: check this works for non-swiss MulitMatch, currently disabled in ui
+    case MultiMatchRematch =>
+      handle { game =>
+        rematcher.multiMatch(game) map { events =>
+          events.foreach {
+            case Event.RematchTaken(_) => {
+              val gameNb     = game.metadata.multiMatchGameNr.getOrElse(1)
+              val multiMatch = s"$gameNb:${game.id}}"
+              gameRepo.setMultiMatch(game.id, multiMatch).void andThen { case _ =>
+                updateGame(game => game.copy(metadata = (game.metadata.copy(multiMatch = multiMatch.some))))
+              }
             }
-          case _ =>
+            case _ =>
+          }
+          events
         }
-        events
       }
-    }
 
     case TakebackYes(playerId) =>
       handle(playerId) { pov =>
@@ -391,10 +394,15 @@ final private[round] class RoundDuct(
     case ForecastPlay(lastMove) =>
       handle { game =>
         val nextMove = lastMove match {
-          case Move.Draughts(lastMove) => lastMove.situationBefore.captureLengthFrom(lastMove.orig) match {
-            case Some(captLen) if captLen > 1 => forecastApi.moveOpponent(game, Move.Draughts(lastMove)) >> forecastApi.nextMove(game, Move.Draughts(lastMove))
-            case _ => forecastApi.nextMove(game, Move.Draughts(lastMove))
-          }
+          case Move.Draughts(lastMove) =>
+            lastMove.situationBefore.captureLengthFrom(lastMove.orig) match {
+              case Some(captLen) if captLen > 1 =>
+                forecastApi.moveOpponent(game, Move.Draughts(lastMove)) >> forecastApi.nextMove(
+                  game,
+                  Move.Draughts(lastMove)
+                )
+              case _ => forecastApi.nextMove(game, Move.Draughts(lastMove))
+            }
           case _ => forecastApi.nextMove(game, lastMove)
         }
         nextMove map { mOpt =>

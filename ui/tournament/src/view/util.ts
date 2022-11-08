@@ -43,15 +43,29 @@ export function player(p, asLink: boolean, withRating: boolean, defender = false
         destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
       },
     },
-    [
-      h(
-        'span.name' + (defender ? '.defender' : leader ? '.leader' : ''),
-        defender ? { attrs: dataIcon('5') } : leader ? { attrs: dataIcon('8') } : {},
-        playerName(p)
-      ),
-      withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
-    ]
+    [h('div.player-info', playerInfo(p, withRating, defender, leader))]
   );
+}
+
+export function playerInfo(p, withRating: boolean, defender = false, leader = false) {
+  return [
+    p.country
+      ? h(
+          'span.country',
+          h('img.flag', {
+            attrs: {
+              src: playstrategy.assetUrl('images/flags/' + p.country + '.png'),
+            },
+          })
+        )
+      : null,
+    h(
+      'span.name' + (defender ? '.defender' : leader ? '.leader' : ''),
+      defender ? { attrs: dataIcon('5') } : leader ? { attrs: dataIcon('8') } : {},
+      playerName(p)
+    ),
+    withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
+  ];
 }
 
 export function numberRow(name: string, value: any, typ?: string) {

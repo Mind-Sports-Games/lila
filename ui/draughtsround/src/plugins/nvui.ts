@@ -155,7 +155,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                 'aria-atomic': true,
               },
             },
-            renderSan(step.san, step.uci, style)
+            renderSan(step.san, step.lidraughtsUci, style)
           ),
           ...(ctrl.isPlaying()
             ? [
@@ -410,7 +410,7 @@ function renderMoves(steps: Step[], style: Style) {
   const res: Array<string | VNode> = [];
   steps.forEach(s => {
     if (s.ply & 1) res.push(Math.ceil(s.ply / 2) + ' ');
-    res.push(renderSan(s.san, s.uci, style) + ', ');
+    res.push(renderSan(s.san, s.lidraughtsUci, style) + ', ');
     if (s.ply % 2 === 0) res.push(h('br'));
   });
   return res;

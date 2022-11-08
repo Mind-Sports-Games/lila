@@ -89,9 +89,12 @@ final class SwissJson(
                   .find(
                     $doc(f.swissId -> swiss.id, f.players -> player.userId, f.status -> SwissPairing.ongoing),
                     $doc(
-                      f.id               -> true,
-                      f.isMicroMatch     -> true,
-                      f.microMatchGameId -> true
+                      f.id                -> true,
+                      f.multiMatchGameIds -> true,
+                      f.isMatchScore      -> true,
+                      f.isBestOfX         -> true,
+                      f.isPlayX           -> true,
+                      f.nbGamesPerRound   -> true
                     ).some
                   )
                   .one[SwissPairingGameIds]
@@ -193,7 +196,10 @@ object SwissJson {
         "trophy1st"        -> swiss.trophy1st,
         "trophy2nd"        -> swiss.trophy2nd,
         "trophy3rd"        -> swiss.trophy3rd,
-        "isMicroMatch"     -> swiss.settings.isMicroMatch,
+        "isMatchScore"     -> swiss.settings.isMatchScore,
+        "isBestOfX"        -> swiss.settings.isBestOfX,
+        "isPlayX"          -> swiss.settings.isPlayX,
+        "nbGamesPerRound"  -> swiss.settings.nbGamesPerRound,
         "status" -> {
           if (swiss.isStarted) "started"
           else if (swiss.isFinished) "finished"
@@ -221,20 +227,21 @@ object SwissJson {
       )
 
   def playerJsonExt(swiss: Swiss, view: SwissPlayer.ViewExt): JsObject =
-    playerJsonBase(view, performance = true) ++ Json.obj(
-      "sheet" -> swiss.allRounds
-        .zip(view.sheet.outcomes)
-        .reverse
-        .map { case (round, outcome) =>
-          view.pairings.get(round).fold[JsValue](JsString(outcomeJson(outcome))) { p =>
-            pairingJson(view.player, p.pairing) ++
-              Json.obj(
-                "user"   -> p.player.user,
-                "rating" -> p.player.player.rating
-              )
+    playerJsonBase(view, performance = true) ++ Json
+      .obj(
+        "sheet" -> swiss.allRounds
+          .zip(view.sheet.outcomes)
+          .reverse
+          .map { case (round, outcome) =>
+            view.pairings.get(round).fold[JsValue](JsString(outcomeJson(outcome))) { p =>
+              pairingJson(view.player, p.pairing) ++
+                Json.obj(
+                  "user"   -> p.player.user,
+                  "rating" -> p.player.player.rating
+                )
+            }
           }
-        }
-    )
+      )
 
   private def playerJsonBase(
       view: SwissPlayer.Viewish,
@@ -260,8 +267,8 @@ object SwissJson {
       .add("provisional" -> p.provisional)
       .add("absent" -> p.absent)
 
-  private def outcomeJson(outcome: SwissSheet.Outcome): String =
-    outcome match {
+  private def outcomeJson(outcome: List[SwissSheet.Outcome]): String =
+    outcome.head match {
       case SwissSheet.Absent => "absent"
       case SwissSheet.Bye    => "bye"
       case _                 => ""
@@ -271,28 +278,37 @@ object SwissJson {
     val status =
       if (pairing.isOngoing) "o"
       else pairing.resultFor(player.userId).fold("d") { r => if (r) "w" else "l" }
-    val microMatch   = if (pairing.isMicroMatch) "m" else ""
-    val microMatchId = pairing.microMatchGameId.fold("")(g => s"_${g}")
-    val openingFEN   = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
-    s"${pairing.gameId}$status$microMatch$microMatchId$openingFEN"
+    val multiMatchIds = pairing.multiMatchGameIds.fold("")(l => "_" + l.mkString("_"))
+    val useMatchScore = if (pairing.isMatchScore) "s" else ""
+    val matchScore =
+      pairing.matchScoreFor(player.userId) // "" if isMatchScore is false, otherwise 2 digit string number
+    val bestOfX    = if (pairing.isBestOfX) "x" else ""
+    val playX      = if (pairing.isPlayX) "px" else ""
+    val openingFEN = pairing.openingFEN.map(_.value).fold("")(f => s"=${f}")
+    s"${pairing.gameId}$status${pairing.nbGamesPerRound}$bestOfX$playX$useMatchScore$matchScore$multiMatchIds$openingFEN"
   }
 
   private def pairingJson(player: SwissPlayer, pairing: SwissPairing) =
     Json
       .obj(
-        "g"    -> pairing.gameId,
-        "m"    -> pairing.isMicroMatch,
-        "mmid" -> pairing.microMatchGameId,
-        "of"   -> pairing.openingFEN.map(_.value)
+        "g"     -> pairing.gameId,
+        "mmids" -> pairing.multiMatchGameIds,
+        "x"     -> pairing.isBestOfX,
+        "px"    -> pairing.isPlayX,
+        "gpr"   -> pairing.nbGamesPerRound,
+        "ms"    -> pairing.isMatchScore,
+        "mp"    -> pairing.matchScoreFor(player.userId),
+        "of"    -> pairing.openingFEN.map(_.value)
       )
       .add("o" -> pairing.isOngoing)
       .add("w" -> pairing.resultFor(player.userId))
+      .add("mr" -> pairing.multiMatchResultsFor(player.userId))
       .add("c" -> (pairing.p1 == player.userId))
       .add("vi" -> pairing.variant.map(_.perfIcon.toString))
 
   private def pairingJsonOrOutcome(
       player: SwissPlayer
-  ): ((Option[SwissPairing], SwissSheet.Outcome)) => String = {
+  ): ((Option[SwissPairing], List[SwissSheet.Outcome])) => String = {
     case (Some(pairing), _) => pairingJsonMin(player, pairing)
     case (_, outcome)       => outcomeJson(outcome)
   }
@@ -300,13 +316,16 @@ object SwissJson {
   private def myInfoJson(i: MyInfo) =
     Json
       .obj(
-        "rank"             -> i.rank,
-        "gameId"           -> i.gameIds.map(_.id),
-        "isMicroMatch"     -> i.gameIds.map(_.isMicroMatch),
-        "microMatchGameId" -> i.gameIds.flatMap(_.microMatchGameId),
-        "id"               -> i.user.id,
-        "name"             -> i.user.username,
-        "absent"           -> i.player.absent
+        "rank"              -> i.rank,
+        "gameId"            -> i.gameIds.map(_.id),
+        "multiMatchGameIds" -> i.gameIds.map(_.multiMatchGameIds),
+        "isMatchScore"      -> i.gameIds.map(_.isMatchScore),
+        "isBestOfX"         -> i.gameIds.map(_.isBestOfX),
+        "isPlayX"           -> i.gameIds.map(_.isPlayX),
+        "nbGamesPerRound"   -> i.gameIds.map(_.nbGamesPerRound),
+        "id"                -> i.user.id,
+        "name"              -> i.user.username,
+        "absent"            -> i.player.absent
       )
 
   private[swiss] def boardSizeJson(v: Variant) = v match {
@@ -346,9 +365,12 @@ object SwissJson {
     boardGameJson(b.game, b.board.p1, b.board.p2)
       .add("winner" -> b.game.winnerPlayerIndex.map(_.name))
       .add("boardSize" -> boardSizeJson(b.game.variant))
-      .add("isMicroMatch" -> b.board.isMicroMatch)
-      .add("microMatchGameId" -> b.board.microMatchGameId)
-      .add("microMatchGame" -> b.microMatchGame.map(g => boardGameJson(g, b.board.p2, b.board.p1)))
+      .add("isBestOfX" -> b.board.isBestOfX)
+      .add("isPlayX" -> b.board.isPlayX)
+      .add("multiMatchGameIds" -> b.board.multiMatchGameIds)
+      .add(
+        "multiMatchGames" -> b.multiMatchGames.map(l => l.map(g => boardGameJson(g, b.board.p2, b.board.p1)))
+      )
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(

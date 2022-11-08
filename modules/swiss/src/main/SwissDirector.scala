@@ -62,8 +62,12 @@ final private class SwissDirector(
                 p1 = w,
                 p2 = b,
                 status = Left(SwissPairing.Ongoing),
-                isMicroMatch = swiss.settings.isMicroMatch,
+                matchStatus = Left(SwissPairing.Ongoing),
                 None,
+                isMatchScore = swiss.settings.isMatchScore,
+                isBestOfX = swiss.settings.isBestOfX,
+                isPlayX = swiss.settings.isPlayX,
+                nbGamesPerRound = swiss.settings.nbGamesPerRound,
                 if (randomPairingPos) randomPos().orElse(perRoundPos) else perRoundPos,
                 swiss.roundVariant.some
               )
@@ -126,17 +130,28 @@ final private class SwissDirector(
         },
         p1Player = makePlayer(
           P1,
-          players.get(if (rematch) pairing.p2 else pairing.p1) err s"Missing pairing p1 $pairing"
+          players.get(
+            if (rematch && pairing.multiMatchGameIds.fold(false)(ids => ids.size % 2 == 1)) pairing.p2
+            else pairing.p1
+          ) err s"Missing pairing p1 $pairing"
         ),
         p2Player = makePlayer(
           P2,
-          players.get(if (rematch) pairing.p1 else pairing.p2) err s"Missing pairing p2 $pairing"
+          players.get(
+            if (rematch && pairing.multiMatchGameIds.fold(false)(ids => ids.size % 2 == 1)) pairing.p1
+            else pairing.p2
+          ) err s"Missing pairing p2 $pairing"
         ),
         mode = strategygames.Mode(swiss.settings.rated),
         source = lila.game.Source.Swiss,
-        pgnImport = None
+        pgnImport = None,
+        multiMatch =
+          if (rematch)
+            s"${pairing.multiMatchGameIds.fold(1)(ids => ids.size + 1)}:${pairing.id}".some // link to first mm game
+          else if (swiss.settings.nbGamesPerRound > 1) s"1:${pairing.id}".some
+          else none
       )
-      .withId(if (rematch) pairing.microMatchGameId.getOrElse(pairing.gameId) else pairing.id)
+      .withId(if (rematch) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id)
       .withSwissId(swiss.id.value)
       .start
 

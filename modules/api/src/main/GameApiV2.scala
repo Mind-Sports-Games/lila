@@ -304,7 +304,7 @@ final class GameApiV2(
         })
       )
       .add("initialFen" -> initialFen)
-      .add("microMatch" -> g.metadata.microMatchGameId)
+      .add("multiMatch" -> g.metadata.multiMatchGameId)
       .add("winner" -> g.winnerPlayerIndex.map(_.name))
       .add("opening" -> g.opening.ifTrue(withFlags.opening))
       .add("moves" -> withFlags.moves.option {

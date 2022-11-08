@@ -783,10 +783,10 @@ Thank you all, you rock!"""
       try {
         val newTourns = allWithConflicts(DateTime.now).map(_.build)
         val pruned    = pruneConflicts(dbScheds, newTourns)
-        tournamentRepo
+        (tournamentRepo
           .insert(pruned)
-          .logFailure(logger)
-          .unit
+          .logFailure(logger) >>
+          api.subscribeBotsToShields).unit
       } catch {
         case e: org.joda.time.IllegalInstantException =>
           logger.error(s"failed to schedule all: ${e.getMessage}")

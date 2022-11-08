@@ -29,7 +29,8 @@ object replay {
       cross: Option[lila.game.Crosstable.WithMatchup],
       userTv: Option[lila.user.User],
       chatOption: Option[lila.chat.UserChat.Mine],
-      bookmarked: Boolean
+      bookmarked: Boolean,
+      swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context) = {
 
     import pov._
@@ -118,7 +119,8 @@ object replay {
                 none,
                 simul = simul,
                 userTv = userTv,
-                bookmarked = bookmarked
+                bookmarked = bookmarked,
+                swissPairingGames = swissPairingGames
               )
           ),
           chatOption.map(_ => views.html.chat.frag),

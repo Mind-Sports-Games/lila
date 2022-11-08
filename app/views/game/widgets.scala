@@ -58,8 +58,8 @@ object widgets {
                 g.swissId.map { swissId =>
                   frag(separator, views.html.swiss.bits.link(lila.swiss.Swiss.Id(swissId)))
                 },
-              g.metadata.microMatchGameNr map { gameNr =>
-                frag(separator, trans.microMatchGameX(gameNr))
+              g.metadata.multiMatchGameNr map { gameNr =>
+                frag(separator, trans.multiMatchGameX(gameNr))
               }
             )
           ),

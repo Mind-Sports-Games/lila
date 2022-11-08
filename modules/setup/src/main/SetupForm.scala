@@ -60,7 +60,7 @@ object SetupForm {
         "mode"        -> mode(withRated = ctx.isAuth),
         "playerIndex" -> playerIndex,
         "fen"         -> fenField,
-        "microMatch"  -> boolean
+        "multiMatch"  -> boolean
       )(FriendConfig.from)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Invalid speed", _.validSpeed(ctx.me.exists(_.isBot)))
@@ -155,7 +155,7 @@ object SetupForm {
         "fen"           -> fenField,
         "acceptByToken" -> optional(nonEmptyText),
         "message"       -> message,
-        "microMatch"    -> optional(boolean)
+        "multiMatch"    -> optional(boolean)
       )(ApiConfig.from)(_ => none)
         .verifying("invalidFen", _.validFen)
         .verifying("can't be rated", _.validRated)

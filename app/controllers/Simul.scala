@@ -38,7 +38,7 @@ final class Simul(env: Env) extends LilaController(env) {
     me.?? { u =>
       env.simul.repo.findPending(u.id)
     } zip
-      env.simul.allCreatedFeaturable.get {} zip
+      env.simul.repo.allCreatedRecently zip
       env.simul.repo.allStarted zip
       env.simul.repo.allFinishedFeaturable(20)
 
@@ -92,7 +92,7 @@ final class Simul(env: Env) extends LilaController(env) {
   def start(simulId: String) =
     Open { implicit ctx =>
       AsHost(simulId) { simul =>
-        env.simul.api start simul.id inject jsonOkResult
+        env.simul.api start simul inject jsonOkResult
       }
     }
 
@@ -168,9 +168,11 @@ final class Simul(env: Env) extends LilaController(env) {
   def join(id: String, variant: String) =
     Auth { implicit ctx => implicit me =>
       NoLameOrBot {
-        env.simul.api.addApplicant(id, me, variant) inject {
-          if (HTTPRequest isXhr ctx.req) jsonOkResult
-          else Redirect(routes.Simul.show(id))
+        env.team.cached.teamIds(me.id) flatMap { teamIds =>
+          env.simul.api.addApplicant(id, me, teamIds.contains, variant) inject {
+            if (HTTPRequest isXhr ctx.req) jsonOkResult
+            else Redirect(routes.Simul.show(id))
+          }
         }
       }
     }

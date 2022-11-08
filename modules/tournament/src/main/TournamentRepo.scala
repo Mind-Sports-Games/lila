@@ -317,6 +317,12 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           .reverse
     }
 
+  private[tournament] def byScheduleCategory(cats: List[Schedule.Freq]): Fu[List[Tournament]] =
+    coll
+      .find(createdSelect ++ $doc("schedule.freq" $in cats.map(_.name)))
+      .cursor[Tournament]()
+      .list()
+
   def uniques(max: Int): Fu[List[Tournament]] =
     coll
       .find(selectUnique)

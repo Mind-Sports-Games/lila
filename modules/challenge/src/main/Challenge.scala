@@ -29,7 +29,7 @@ case class Challenge(
     open: Option[Boolean] = None,
     name: Option[String] = None,
     declineReason: Option[Challenge.DeclineReason] = None,
-    microMatch: Option[Boolean] = None
+    multiMatch: Option[Boolean] = None
 ) {
 
   import Challenge._
@@ -92,20 +92,19 @@ case class Challenge(
   def notableInitialFen: Option[FEN] =
     variant match {
       case Variant.Chess(variant) => if (variant.standardInitialPosition) none else initialFen
-      case Variant.Draughts(_) => customStartingPosition ?? initialFen
-      case _ => none
+      case Variant.Draughts(_)    => customStartingPosition ?? initialFen
+      case _                      => none
     }
 
   def customStartingPosition: Boolean =
     variant.draughtsFromPosition ||
       (draughtsFenVariants(variant) &&
         initialFen.isDefined &&
-        !initialFen.exists(_.value == variant.initialFen.value)
-      )
+        !initialFen.exists(_.value == variant.initialFen.value))
 
   def isOpen = ~open
 
-  def isMicroMatch = ~microMatch
+  def isMultiMatch = ~multiMatch
 
   lazy val perfType = perfTypeOf(variant, timeControl)
 
@@ -188,8 +187,8 @@ object Challenge {
   sealed trait PlayerIndexChoice
   object PlayerIndexChoice {
     case object Random extends PlayerIndexChoice
-    case object P1  extends PlayerIndexChoice
-    case object P2  extends PlayerIndexChoice
+    case object P1     extends PlayerIndexChoice
+    case object P2     extends PlayerIndexChoice
     def apply(c: PlayerIndex) = c.fold[PlayerIndexChoice](P1, P2)
   }
 
@@ -210,7 +209,10 @@ object Challenge {
         }
       )
       .orElse {
-        (variant == Variant.libFromPosition(variant.gameLogic)) option perfTypeOf(Variant.libStandard(variant.gameLogic), timeControl)
+        (variant == Variant.libFromPosition(variant.gameLogic)) option perfTypeOf(
+          Variant.libStandard(variant.gameLogic),
+          timeControl
+        )
       }
       .|(PerfType.orDefaultSpeed("correspondence"))
 
@@ -225,9 +227,7 @@ object Challenge {
 
   // NOTE: Only variants with standardInitialPosition = false!
   private val draughtsFenVariants: Set[Variant] =
-    GameFamily.Draughts().variants.filter(
-      v => v.fenVariant || v.fromPositionVariant
-    ).toSet
+    GameFamily.Draughts().variants.filter(v => v.fenVariant || v.fromPositionVariant).toSet
 
   def make(
       variant: Variant,
@@ -240,12 +240,12 @@ object Challenge {
       destUser: Option[User],
       rematchOf: Option[Game.ID],
       name: Option[String] = None,
-      microMatch: Boolean = false
+      multiMatch: Boolean = false
   ): Challenge = {
     val (playerIndexChoice, finalPlayerIndex) = playerIndex match {
-      case "p1" => PlayerIndexChoice.P1  -> P1
-      case "p2" => PlayerIndexChoice.P2  -> P2
-      case _       => PlayerIndexChoice.Random -> randomPlayerIndex
+      case "p1" => PlayerIndexChoice.P1     -> P1
+      case "p2" => PlayerIndexChoice.P2     -> P2
+      case _    => PlayerIndexChoice.Random -> randomPlayerIndex
     }
     val finalVariant = fenVariant match {
       case Some(v) if draughtsFenVariants(variant) =>
@@ -265,9 +265,8 @@ object Challenge {
     //    }
     //}
     val finalMode = timeControl match {
-      case TimeControl.Clock(clock) if !lila.game.Game.allowRated(variant, clock.some)
-        => Mode.Casual
-      case _ => mode
+      case TimeControl.Clock(clock) if !lila.game.Game.allowRated(variant, clock.some) => Mode.Casual
+      case _                                                                           => mode
     }
     val isOpen = challenger == Challenge.Challenger.Open
     var challenge = new Challenge(
@@ -292,11 +291,11 @@ object Challenge {
       expiresAt = if (isOpen) DateTime.now.plusDays(1) else inTwoWeeks,
       open = isOpen option true,
       name = name,
-      microMatch = microMatch option true
+      multiMatch = multiMatch option true
     )
-    if (microMatch && !challenge.customStartingPosition)
-      challenge = challenge.copy(microMatch = none)
-    if (challenge.mode.rated && !challenge.isMicroMatch && challenge.customStartingPosition)
+    if (multiMatch && !challenge.customStartingPosition)
+      challenge = challenge.copy(multiMatch = none)
+    if (challenge.mode.rated && !challenge.isMultiMatch && challenge.customStartingPosition)
       challenge = challenge.copy(mode = Mode.Casual)
     challenge
   }

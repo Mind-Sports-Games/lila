@@ -2,6 +2,7 @@ package lila.simul
 
 import play.api.libs.json._
 
+import scala.util.Random
 import lila.common.LightUser
 import lila.game.{ Game, GameRepo }
 import lila.user.User
@@ -9,6 +10,7 @@ import lila.i18n.VariantKeys
 import lila.quote.Quote
 
 import strategygames.GameFamily
+import strategygames.variant.Variant
 
 final class JsonView(
     gameRepo: GameRepo,
@@ -43,7 +45,10 @@ final class JsonView(
         "pairings"   -> pairings
       )
       .add("team", team)
-      .add("quote" -> simul.isCreated.option(Quote.one(simul.id, GameFamily.Chess().some)))
+      .add(
+        "quote" -> simul.isCreated
+          .option(Quote.one(simul.id, Some(simul.variants(Random.nextInt(simul.variants.size)).gameFamily)))
+      )
 
   def api(simul: Simul): Fu[JsObject] =
     getLightUser(simul.hostId) map { lightHost =>
@@ -126,6 +131,17 @@ final class JsonView(
       )
     }
 
+  private def boardSizeJson(v: Variant) = v match {
+    case Variant.Draughts(v) =>
+      Some(
+        Json.obj(
+          "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+          "key"  -> v.boardSize.key
+        )
+      )
+    case _ => None
+  }
+
   private def gameJson(hostId: User.ID, g: Game) =
     Json
       .obj(
@@ -135,8 +151,10 @@ final class JsonView(
           g.situation.board.variant.gameLogic,
           g.situation
         )),
-        "lastMove" -> ~g.lastMoveKeys,
-        "orient"   -> g.playerByUserId(hostId).map(_.playerIndex)
+        "gameLogic" -> g.situation.board.variant.gameLogic.name.toLowerCase(),
+        "boardSize" -> boardSizeJson(g.situation.board.variant),
+        "lastMove"  -> ~g.lastMoveKeys,
+        "orient"    -> g.playerByUserId(hostId).map(_.playerIndex)
       )
       .add(
         "clock" -> g.clock.ifTrue(g.isBeingPlayed).map { c =>

@@ -136,7 +136,8 @@ object bits {
       tour: Option[lila.tournament.TourAndTeamVs],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
-      bookmarked: Boolean
+      bookmarked: Boolean,
+      swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context) =
     views.html.game.side(
       pov,
@@ -144,7 +145,8 @@ object bits {
       tour,
       simul = simul,
       userTv = userTv,
-      bookmarked = bookmarked
+      bookmarked = bookmarked,
+      swissPairingGames
     )
 
   def roundAppPreload(pov: Pov, controls: Boolean)(implicit ctx: Context) =

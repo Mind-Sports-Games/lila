@@ -53,7 +53,7 @@ final class SwissTrf(
       8                    -> playerIds.getOrElse(p.userId, 0).toString,
       (15 + p.userId.size) -> p.userId,
       52                   -> p.rating.toString,
-      84                   -> f"${sheet.points.value}%1.1f"
+      84                   -> f"${sheet.pointsTrf.value}%1.1f"
     ) ::: {
       swiss.allRounds.zip(sheet.outcomes).flatMap { case (rn, outcome) =>
         val pairing = pairings get rn
@@ -63,12 +63,22 @@ final class SwissTrf(
           99 -> {
             import SwissSheet._
             outcome match {
-              case Absent  => "-"
-              case Bye     => "U"
-              case Draw    => "="
-              case Win     => "1"
-              case Loss    => "0"
-              case Ongoing => "Z"
+              case res if outcome.length == 1 =>
+                res(0) match {
+                  case Absent  => "-"
+                  case Bye     => "U"
+                  case Draw    => "="
+                  case Win     => "1"
+                  case Loss    => "0"
+                  case Ongoing => "Z"
+                }
+              case _ if outcome(0) == Bye => "U"
+              case l =>
+                pointsForTrf(l) match {
+                  case 2 => "1"
+                  case 1 => "="
+                  case _ => "0"
+                }
             }
           }
         ).map { case (l, s) => (l + (rn.value - 1) * 10, s) }

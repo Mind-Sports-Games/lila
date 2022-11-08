@@ -35,6 +35,8 @@ object bits {
         span(cls := "more")(
           trans.nbPlayers.plural(s.applicants.size, s.applicants.size.localize),
           " • ",
+          s.estimatedStartAt.map(momentFromNow(_)),
+          s.estimatedStartAt.fold("")(_ => " • "),
           trans.join()
         )
       )
@@ -46,6 +48,7 @@ object bits {
         tr(
           td(cls := "name")(a(href := routes.Simul.show(simul.id))(simul.fullName)),
           td(userIdLink(simul.hostId.some)),
+          td(simul.estimatedStartAt.map(momentFromNow(_))),
           td(cls := "text", dataIcon := "p")(simul.clock.config.show),
           td(cls := "text", dataIcon := "r")(simul.applicants.size)
         )
@@ -71,6 +74,10 @@ object bits {
     trans.nbLosses,
     trans.by,
     trans.signIn,
-    trans.mustBeInTeam
+    trans.mustBeInTeam,
+    trans.p1,
+    trans.p2,
+    trans.randomColor,
+    trans.absentSimulApplicants
   ).map(_.key)
 }
