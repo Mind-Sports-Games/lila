@@ -86,11 +86,7 @@ export default class RoundController {
   private music?: any;
 
   constructor(readonly opts: RoundOpts, readonly redraw: Redraw) {
-    opts.data.steps = round.mergeSteps(
-      opts.data.steps,
-      this.coordSystem(opts.data),
-      opts.data.game.variant.key
-    );
+    opts.data.steps = round.mergeSteps(opts.data.steps, this.coordSystem(opts.data), opts.data.game.variant.key);
     round.massage(opts.data);
 
     const d = (this.data = opts.data);

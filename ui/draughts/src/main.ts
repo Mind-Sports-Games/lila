@@ -69,7 +69,7 @@ export function san2alg(san?: string): string | undefined {
 }
 
 function invertCoord(coord: string): string {
-  return (33 - +coord).toString()
+  return (33 - +coord).toString();
 }
 
 export function invertSan(san: string): string {

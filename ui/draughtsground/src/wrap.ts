@@ -64,11 +64,11 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
           rankBase = s.boardSize[0] / 2,
           fields = (s.boardSize[0] * s.boardSize[1]) / 2,
           fileSteps = s.boardSize[1] / 2,
-          klasses = 'is' + (fields * 2) + (s.orientation === 'p2' ? ' p2' : '');
+          klasses = 'is' + fields * 2 + (s.orientation === 'p2' ? ' p2' : '');
         if (s.coordSystem === 0) {
           if (s.orientation === 'p2') {
             for (let i = 1; i <= rankBase; i++) files.push(i);
-            for (let i = fileSteps-1; i >= 0; i--) ranks.push(rankBase + s.boardSize[0] * i + 1);
+            for (let i = fileSteps - 1; i >= 0; i--) ranks.push(rankBase + s.boardSize[0] * i + 1);
           } else {
             for (let i = fields - rankBase + 1; i <= fields; i++) files.push(i);
             for (let i = 0; i < fileSteps; i++) ranks.push(rankBase + s.boardSize[0] * i);
@@ -109,7 +109,7 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
 function coordText(coordSystem: number | undefined, san: string): string {
   if (coordSystem === 1) {
     return san2alg[san];
-  } else if (coordSystem === 2){
+  } else if (coordSystem === 2) {
     return invertCoord(san);
   } else {
     return san;
