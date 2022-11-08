@@ -22,6 +22,8 @@ export const perf = {
     russian: '',
     brazilian: '',
     pool: '',
+    portuguese: 'K',
+    english: 'K',
     fromPositionDraughts: 'K',
     frisian: '',
     frysk: '',

@@ -1,6 +1,6 @@
 import { RoundData, Step } from './interfaces';
 import { countGhosts } from 'draughtsground/fen';
-import { san2alg } from 'draughts';
+import { san2alg, invertSan } from 'draughts';
 
 export const firstPly = (d: RoundData): number => d.steps[0].ply;
 
@@ -23,7 +23,7 @@ export const massage = (d: RoundData): void => {
 
 export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: DraughtsVariantKey): Step[] {
   const mergedSteps: Step[] = new Array<Step>();
-  const choiceOfCaptureVariants: DraughtsVariantKey[] = ['pool', 'russian'];
+  const choiceOfCaptureVariants: DraughtsVariantKey[] = ['pool', 'russian', 'english'];
   if (steps.length == 0) return mergedSteps;
   else mergedSteps.push(addNotation(steps[0], coordSystem));
 
@@ -44,7 +44,7 @@ export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: Draug
           steps[i].ply != steps[i + 1].ply &&
           steps[i].lidraughtsUci.slice(-2) != steps[i + 1].lidraughtsUci.slice(-2)
         ) {
-          // hack for pool/russian multi choice capture, stop merging if the final move is next and the dests do not match (they should normally)
+          // hack for pool/russian/english multi choice capture, stop merging if the final move is next and the dests do not match (they should normally)
           break;
         }
         i++;
@@ -58,8 +58,10 @@ export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: Draug
 }
 
 function addNotation(step: Step, coordSystem: number): Step {
-  if (coordSystem) {
+  if (coordSystem === 1) {
     step.alg = san2alg(step.san);
+  } else if (coordSystem === 2 && step.san) {
+    step.san = invertSan(step.san);
   }
   return step;
 }

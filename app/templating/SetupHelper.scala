@@ -260,6 +260,12 @@ trait SetupHelper { self: I18nHelper =>
       (Pref.Coords.OUTSIDE, trans.outsideTheBoard.txt())
     )
 
+  def translatedCoordinateSystemChoices(implicit lang: Lang) =
+    List(
+      (Pref.DraughtsCoordSystem.FIELDNUMBERS, trans.fieldnumbers8x8.txt()),
+      (Pref.DraughtsCoordSystem.ALGEBRAIC, trans.algebraic8x8.txt())
+    )
+
   def translatedMoveListWhilePlayingChoices(implicit lang: Lang) =
     List(
       (Pref.Replay.NEVER, trans.never.txt()),

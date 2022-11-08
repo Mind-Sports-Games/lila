@@ -23,6 +23,8 @@
   <string name="frysk">Frisian draughts starting with 5 pieces each</string>
   <string name="pool">The same rules as Russian Draughts, but with no promotion during a capture chain</string>
   <string name="russian">Choice of capture, promotion during a multi-capture</string>
+  <string name="portuguese">Similar rules to International, played on an 8x8 board, but men cant jump backwards</string>
+  <string name="english">English draughts, also known as American checkers, played on an 8x8 board. Men cannot jump backwards, and Kings are not flying</string>
   <string name="shogi">Shogi (Japanese Chess)</string>
   <string name="xiangqi">Xiangqi (Chinese Chess)</string>
   <string name="minishogi">Mini Shogi (Japanese Chess on a smaller board)</string>

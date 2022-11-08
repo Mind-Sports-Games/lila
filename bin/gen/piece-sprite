@@ -73,8 +73,9 @@ roles = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece', 'k-piece']
 colors = ['w', 'b']
 chess_variants = ['standard','chess960', 'fromPosition', 'kingOfTheHill', 'threeCheck', 'fiveCheck', 'antichess', 'atomic',
 'horde', 'racingKings', 'crazyhouse', 'noCastling']
-draughts_variants = ['international','frisian','frysk','antidraughts','breakthrough','russian','brazilian','pool']
+draughts_variants = ['international','frisian','frysk','antidraughts','breakthrough','russian','brazilian','pool', 'portuguese', 'english']
 draughts_roles = ['man','king']
+draughts_invert_colors = ['pool', 'english']
 lines_of_action_variants= ['linesOfAction', 'scrambledEggs']
 lines_of_action_roles = ['l-piece']
 flipello_roles = ['p-piece']
@@ -190,7 +191,9 @@ draughts_themes.map { |theme|
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+          playerIndex = (color == 'w' && !draughts_invert_colors.include?(variant)) || (color == 'b' && draughts_invert_colors.include?(variant)) ? 'p1' : 'p2'
+          '.is2d .variant-' + variant + ' .' + role + '.' + playerIndex +
+            ', .is2d.variant-' + variant + ' .' + role + '.' + playerIndex + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -213,7 +216,9 @@ draughts_themes.map { |theme|
     colors.map { |color|
       draughts_roles.map { |role|
         piece = color[0] + role.upcase[0]
-        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+        playerIndex = (color == 'w' && !draughts_invert_colors.include?(variant)) || (color == 'b' && draughts_invert_colors.include?(variant)) ? 'p1' : 'p2'
+        '.is2d .variant-' + variant + ' .' + role + '.' + playerIndex +
+          ', .is2d.variant-' + variant + ' .' + role + '.' + playerIndex + ' {' +
           "background-image:url('/assets/piece/" + 'draughts/' + name + "/" + piece + "." + ext + "')}"
       }
     }

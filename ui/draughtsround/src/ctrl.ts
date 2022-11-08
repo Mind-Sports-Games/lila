@@ -86,11 +86,7 @@ export default class RoundController {
   private music?: any;
 
   constructor(readonly opts: RoundOpts, readonly redraw: Redraw) {
-    opts.data.steps = round.mergeSteps(
-      opts.data.steps,
-      this.isAlgebraic(opts.data) ? 1 : 0,
-      opts.data.game.variant.key
-    );
+    opts.data.steps = round.mergeSteps(opts.data.steps, this.coordSystem(opts.data), opts.data.game.variant.key);
     round.massage(opts.data);
 
     const d = (this.data = opts.data);
@@ -241,12 +237,11 @@ export default class RoundController {
   };
 
   isAlgebraic = (d: RoundData): boolean => {
-    if (d.game.variant.board.key === '64') return true;
     return d.pref.coordSystem === 1 && d.game.variant.board.key === '64';
   };
 
-  coordSystem = (): number => {
-    return this.isAlgebraic(this.data) ? 1 : 0;
+  coordSystem = (d: RoundData): number => {
+    return this.isAlgebraic(d) ? 1 : d.pref.coordSystem;
   };
 
   isLate = () => this.replaying() && status.playing(this.data);
@@ -382,7 +377,7 @@ export default class RoundController {
         uci: o.uci,
         lidraughtsUci: o.uci,
       },
-      this.coordSystem()
+      this.coordSystem(d)
     );
 
     this.justDropped = undefined;
@@ -431,7 +426,7 @@ export default class RoundController {
   }
 
   reload = (d: RoundData): void => {
-    d.steps = round.mergeSteps(d.steps, this.coordSystem(), d.game.variant.key);
+    d.steps = round.mergeSteps(d.steps, this.coordSystem(d), d.game.variant.key);
     if (d.steps.length !== this.data.steps.length) this.ply = d.steps[d.steps.length - 1].ply;
     round.massage(d);
     this.data = d;

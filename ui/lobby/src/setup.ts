@@ -268,6 +268,12 @@ export default class Setup {
             case '13':
               key = 'pool';
               break;
+            case '14':
+              key = 'portuguese';
+              break;
+            case '15':
+              key = 'english';
+              break;
           }
           break;
         case '2':

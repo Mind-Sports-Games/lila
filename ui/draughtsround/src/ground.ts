@@ -26,7 +26,7 @@ export function makeConfig(ctrl: RoundController): Config {
     lastMove: util.uci2move(step.lidraughtsUci),
     captureLength: data.captureLength,
     coordinates: data.pref.coords, // TODO: When we get these as prefs we need to be able to change this.
-    coordSystem: ctrl.coordSystem(),
+    coordSystem: ctrl.coordSystem(data),
     addPieceZIndex: ctrl.data.pref.is3d,
     highlight: {
       lastMove: data.pref.highlight,
@@ -58,6 +58,7 @@ export function makeConfig(ctrl: RoundController): Config {
       enabled: data.pref.enablePremove,
       showDests: data.pref.destination,
       castle: false,
+      variant: data.game.variant.key,
       //events: {
       //set: hooks.onPremove,
       //unset: hooks.onCancelPremove,
