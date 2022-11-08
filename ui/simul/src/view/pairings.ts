@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import SimulCtrl from '../ctrl';
-import { Pairing } from '../interfaces';
+import { Pairing, Game } from '../interfaces';
 import { onInsert } from './util';
 import { opposite } from 'chessground/util';
 
@@ -16,18 +16,25 @@ const renderClock = (playerIndex: PlayerIndex, time: number) =>
     },
   });
 
+const renderBoardState = (game: Game): string =>
+  game.gameLogic === 'draughts' && !!game.boardSize
+    ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orient}|${game.lastMove}`
+    : `${game.fen},${game.orient},${game.lastMove}`;
+
 const miniPairing = (ctrl: SimulCtrl) => (pairing: Pairing) => {
   const game = pairing.game,
     player = pairing.player,
     variant = pairing.variant;
+  const draughtsClasses =
+    game.gameLogic === 'draughts' && !!game.boardSize ? `${game.gameLogic}.is${game.boardSize.key}.` : '';
   return h(
-    `span.mini-game.mini-game-${game.id}.mini-game--init.is2d.${variant}.variant-${variant}`,
+    `span.mini-game.mini-game-${game.id}.mini-game--init.is2d.${draughtsClasses}${variant}.variant-${variant}`,
     {
       class: {
         host: ctrl.data.host.gameId === game.id,
       },
       attrs: {
-        'data-state': `${game.fen},${game.orient},${game.lastMove}`,
+        'data-state': renderBoardState(game),
         'data-live': game.clock ? game.id : '',
       },
       hook: onInsert(playstrategy.powertip.manualUserIn),

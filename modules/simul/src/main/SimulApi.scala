@@ -61,7 +61,7 @@ final class SimulApi(
       text = setup.text,
       estimatedStartAt = setup.estimatedStartAt,
       team = setup.team,
-      featurable = some(~setup.featured && me.canBeFeatured)
+      featurable = some(~setup.featured && me.isSimulFeatured)
     )
     repo.create(simul) >>- publish() >>- {
       timeline ! (Propagate(SimulCreate(me.id, simul.id, simul.fullName)) toFollowersOf me.id)
@@ -78,17 +78,16 @@ final class SimulApi(
       text = setup.text,
       estimatedStartAt = setup.estimatedStartAt,
       team = setup.team,
-      featurable = some(~setup.featured && me.canBeFeatured)
+      featurable = some(~setup.featured && me.isSimulFeatured)
     )
     repo.update(simul) >>- publish() inject simul
   }
 
-  def addApplicant(simulId: Simul.ID, user: User, variantKey: String): Funit =
+  def addApplicant(simulId: Simul.ID, user: User, isInTeam: TeamID => Boolean, variantKey: String): Funit =
     WithSimul(repo.findCreated, simulId) { simul =>
-      if (simul.nbAccepted >= Game.maxPlayingRealtime) simul
-      else {
+      if (simul.nbAccepted < Game.maxPlayingRealtime && simul.team.forall(isInTeam)) {
         timeline ! (Propagate(SimulJoin(user.id, simul.id, simul.fullName)) toFollowersOf user.id)
-        Variant(GameLogic.Chess(), variantKey).filter(simul.variants.contains).fold(simul) { variant =>
+        Variant(variantKey).filter(simul.variants.contains).fold(simul) { variant =>
           simul addApplicant SimulApplicant.make(
             SimulPlayer.make(
               user,
@@ -101,7 +100,7 @@ final class SimulApi(
             )
           )
         }
-      }
+      } else simul
     }
 
   def removeApplicant(simulId: Simul.ID, user: User): Funit =
@@ -114,28 +113,31 @@ final class SimulApi(
       }
     }
 
-  def start(simulId: Simul.ID): Funit =
-    workQueue(simulId) {
-      repo.findCreated(simulId) flatMap {
-        _ ?? { simul =>
-          simul.start ?? { started =>
-            userRepo byId started.hostId orFail s"No such host: ${simul.hostId}" flatMap { host =>
-              started.pairings.zipWithIndex.map(makeGame(started, host)).sequenceFu map { games =>
-                games.headOption foreach { case (game, _) =>
-                  socket.startSimul(simul, game)
+  def start(simul: Simul): Funit =
+    simul.isCreated ?? {
+      removeApplicantsNotOnline(simul)
+    } >>
+      workQueue(simul.id) {
+        repo.findCreated(simul.id) flatMap {
+          _ ?? { simul =>
+            simul.start ?? { started =>
+              userRepo byId started.hostId orFail s"No such host: ${simul.hostId}" flatMap { host =>
+                started.pairings.zipWithIndex.map(makeGame(started, host)).sequenceFu map { games =>
+                  games.headOption foreach { case (game, _) =>
+                    socket.startSimul(simul, game)
+                  }
+                  games.foldLeft(started) { case (s, (g, hostPlayerIndex)) =>
+                    s.setPairingHostPlayerIndex(g.id, hostPlayerIndex)
+                  }
                 }
-                games.foldLeft(started) { case (s, (g, hostPlayerIndex)) =>
-                  s.setPairingHostPlayerIndex(g.id, hostPlayerIndex)
-                }
+              } flatMap { s =>
+                Bus.publish(Simul.OnStart(s), "startSimul")
+                update(s) >>- currentHostIdsCache.invalidateUnit()
               }
-            } flatMap { s =>
-              Bus.publish(Simul.OnStart(s), "startSimul")
-              update(s) >>- currentHostIdsCache.invalidateUnit()
             }
           }
         }
       }
-    }
 
   def onPlayerConnection(game: Game, user: Option[User])(simul: Simul): Unit =
     if (user.exists(simul.isHost) && simul.isRunning) {
@@ -212,17 +214,19 @@ final class SimulApi(
 
   def hostPing(simul: Simul): Funit =
     simul.isCreated ?? {
-      repo.setHostSeenNow(simul) >> {
-        val applicantIds = simul.applicants.view.map(_.player.user).toSet
-        socket.filterPresent(simul, applicantIds) flatMap { online =>
-          val leaving = applicantIds diff online.toSet
-          leaving.nonEmpty ??
-            WithSimul(repo.findCreated, simul.id) {
-              _.copy(applicants = simul.applicants.filterNot(a => leaving(a.player.user)))
-            }
-        }
-      }
+      repo.setHostSeenNow(simul)
     }
+
+  def removeApplicantsNotOnline(simul: Simul): Funit = {
+    val applicantIds = simul.applicants.view.map(_.player.user).toSet
+    socket.filterPresent(simul, applicantIds) flatMap { online =>
+      val leaving = applicantIds diff online.toSet
+      leaving.nonEmpty ??
+        WithSimul(repo.findCreated, simul.id) {
+          _.copy(applicants = simul.applicants.filterNot(a => leaving(a.player.user)))
+        }
+    }
+  }
 
   def byTeamLeaders = repo.byTeamLeaders _
 
@@ -240,14 +244,19 @@ final class SimulApi(
         for {
           user <- userRepo byId pairing.player.user orFail s"No user with id ${pairing.player.user}"
           hostPlayerIndex = simul.hostPlayerIndex | PlayerIndex.fromP1(number % 2 == 0)
-          p1User = hostPlayerIndex.fold(host, user)
-          p2User = hostPlayerIndex.fold(user, host)
-          clock     = simul.clock.chessClockOf(hostPlayerIndex)
+          p1User          = hostPlayerIndex.fold(host, user)
+          p2User          = hostPlayerIndex.fold(user, host)
+          clock           = simul.clock.chessClockOf(hostPlayerIndex)
           perfPicker =
-            lila.game.PerfPicker.mainOrDefault(strategygames.Speed(clock.config), pairing.player.variant, none)
+            lila.game.PerfPicker.mainOrDefault(
+              strategygames.Speed(clock.config),
+              pairing.player.variant,
+              none
+            )
           game1 = Game.make(
-            chess = strategygames.Game(
-                GameLogic.Chess(),
+            chess = strategygames
+              .Game(
+                pairing.player.variant.gameLogic,
                 variant = Some {
                   if (simul.position.isEmpty) pairing.player.variant
                   else Variant.libFromPosition(GameLogic.Chess())

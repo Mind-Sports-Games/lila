@@ -46,8 +46,12 @@ final class Round(
                   .withMatchup(pov.game)) zip
                 (pov.game.isSwitchable ?? otherPovs(pov.game)) zip
                 env.bookmark.api.exists(pov.game, ctx.me) zip
+                env.swiss.api.getSwissPairingGamesForGame(pov.game) zip
                 env.api.roundApi.player(pov, tour, lila.api.Mobile.Api.currentVersion) map {
-                  case ((((((_, simul), chatOption), crosstable), playing), bookmarked), data) =>
+                  case (
+                        ((((((_, simul), chatOption), crosstable), playing), bookmarked), swissPairingGames),
+                        data
+                      ) =>
                     simul foreach env.simul.api.onPlayerConnection(pov.game, ctx.me)
                     Ok(
                       html.round.player(
@@ -58,7 +62,8 @@ final class Round(
                         cross = crosstable,
                         playing = playing,
                         chatOption = chatOption,
-                        bookmarked = bookmarked
+                        bookmarked = bookmarked,
+                        swissPairingGames = swissPairingGames
                       )
                     )
                 }
@@ -175,7 +180,8 @@ final class Round(
       case _ =>
         negotiate(
           html = {
-            val canAnalyse = forceAnalysis || pov.game.variant.aiVariant && pov.game.variant.gameFamily.aiEnabled
+            val canAnalyse =
+              forceAnalysis || pov.game.variant.aiVariant && pov.game.variant.gameFamily.aiEnabled
             if (pov.game.replayable && canAnalyse)
               analyseC.replay(pov, userTv = userTv)
             else if (HTTPRequest.isHuman(ctx.req))
@@ -183,8 +189,9 @@ final class Round(
                 (pov.game.simulId ?? env.simul.repo.find) zip
                 getWatcherChat(pov.game) zip
                 (ctx.noBlind ?? env.game.crosstableApi.withMatchup(pov.game)) zip
-                env.bookmark.api.exists(pov.game, ctx.me) flatMap {
-                  case ((((tour, simul), chat), crosstable), bookmarked) =>
+                env.bookmark.api.exists(pov.game, ctx.me) zip
+                env.swiss.api.getSwissPairingGamesForGame(pov.game) flatMap {
+                  case (((((tour, simul), chat), crosstable), bookmarked), swissPairingGames) =>
                     env.api.roundApi.watcher(
                       pov,
                       tour,
@@ -202,7 +209,8 @@ final class Round(
                           crosstable,
                           userTv = userTv,
                           chatOption = chat,
-                          bookmarked = bookmarked
+                          bookmarked = bookmarked,
+                          swissPairingGames = swissPairingGames
                         )
                       )
                     }
@@ -299,9 +307,21 @@ final class Round(
           (pov.game.simulId ?? env.simul.repo.find) zip
           env.game.gameRepo.initialFen(pov.game) zip
           env.game.crosstableApi.withMatchup(pov.game) zip
-          env.bookmark.api.exists(pov.game, ctx.me) map {
-            case ((((tour, simul), initialFen), crosstable), bookmarked) =>
-              Ok(html.game.bits.sides(pov, initialFen, tour, crosstable, simul, bookmarked = bookmarked))
+          env.bookmark.api.exists(pov.game, ctx.me) zip
+          env.swiss.api.getSwissPairingGamesForGame(pov.game) map {
+            case (((((tour, simul), initialFen), crosstable), bookmarked), swissPairingGames) =>
+              Ok(
+                html.game.bits
+                  .sides(
+                    pov,
+                    initialFen,
+                    tour,
+                    crosstable,
+                    simul,
+                    bookmarked = bookmarked,
+                    swissPairingGames = swissPairingGames
+                  )
+              )
           }
       }
     }

@@ -329,6 +329,9 @@ final class JsonView(
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
+      //TODO: The Draughts specific logic should be pushed into strategygames
+      //and should be ready to go now validMoves handles this ghosts logic internally
+      //see Situation.Draughts.destinations
       case (Situation.Chess(_), Variant.Chess(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)

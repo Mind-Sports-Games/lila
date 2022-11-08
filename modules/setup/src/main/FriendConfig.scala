@@ -17,13 +17,24 @@ case class FriendConfig(
     mode: Mode,
     playerIndex: PlayerIndex,
     fen: Option[FEN] = None,
-    microMatch: Boolean = false
+    multiMatch: Boolean = false
 ) extends HumanConfig
     with Positional {
 
   val strictFen = false
 
-  def >> = (s"{$variant.gameFamily.id}_{$variant.id}", fenVariant.map(_.id), timeMode.id, time, increment, days, mode.id.some, playerIndex.name, fen.map(_.value), microMatch).some
+  def >> = (
+    s"{$variant.gameFamily.id}_{$variant.id}",
+    fenVariant.map(_.id),
+    timeMode.id,
+    time,
+    increment,
+    days,
+    mode.id.some,
+    playerIndex.name,
+    fen.map(_.value),
+    multiMatch
+  ).some
 
   def isPersistent = timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
 
@@ -32,7 +43,18 @@ case class FriendConfig(
 
 object FriendConfig extends BaseHumanConfig {
 
-  def from(v: String, v2: Option[Int], tm: Int, t: Double, i: Int, d: Int, m: Option[Int], c: String, fen: Option[String], mm: Boolean) = {
+  def from(
+      v: String,
+      v2: Option[Int],
+      tm: Int,
+      t: Double,
+      i: Int,
+      d: Int,
+      m: Option[Int],
+      c: String,
+      fen: Option[String],
+      mm: Boolean
+  ) = {
     val gameLogic = GameFamily(v.split("_")(0).toInt).gameLogic
     val variantId = v.split("_")(1).toInt
     new FriendConfig(
@@ -49,7 +71,7 @@ object FriendConfig extends BaseHumanConfig {
       mode = m.fold(Mode.default)(Mode.orDefault),
       playerIndex = PlayerIndex(c) err "Invalid playerIndex " + c,
       fen = fen.map(f => FEN.apply(gameLogic, f)),
-      microMatch = mm
+      multiMatch = mm
     )
   }
 
@@ -83,7 +105,7 @@ object FriendConfig extends BaseHumanConfig {
         mode = Mode orDefault (r int "m"),
         playerIndex = PlayerIndex.P1,
         fen = r.getO[FEN]("f") filter (_.value.nonEmpty),
-        microMatch = ~r.boolO("mm")
+        multiMatch = ~r.boolO("mm")
       )
 
     def writes(w: BSON.Writer, o: FriendConfig) =
@@ -97,7 +119,7 @@ object FriendConfig extends BaseHumanConfig {
         "d"  -> o.days,
         "m"  -> o.mode.id,
         "f"  -> o.fen,
-        "mm" -> o.microMatch
+        "mm" -> o.multiMatch
       )
   }
 }

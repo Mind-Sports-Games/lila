@@ -212,6 +212,8 @@ object TournamentShield {
       DraughtsMedley
     )
 
+    val medleyTeamIDs = all.map(_.teamOwner.teamId)
+
     def byKey(k: String): Option[MedleyShield] = all.find(_.key == k)
 
     private val medleyStartDate = new DateTime(2022, 6, 11, 0, 0)

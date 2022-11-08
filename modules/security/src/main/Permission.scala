@@ -69,6 +69,7 @@ object Permission {
   case object StudyAdmin            extends Permission("STUDY_ADMIN", "Study admin")
   case object ApiHog                extends Permission("API_HOG", "API hog")
   case object ApiChallengeAdmin     extends Permission("API_CHALLENGE_ADMIN", "API Challenge admin")
+  case object FeaturedSimul         extends Permission("FEATURED_SIMUL", "Simuls are featured")
 
   case object PlayStrategyTeam
       extends Permission(
@@ -239,7 +240,8 @@ object Permission {
       Coach,
       Teacher,
       ApiHog,
-      ApiChallengeAdmin
+      ApiChallengeAdmin,
+      FeaturedSimul
     ),
     "Badge" -> List(
       Developer,

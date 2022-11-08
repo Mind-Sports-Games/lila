@@ -38,7 +38,7 @@ function allChallenges(ctrl: Ctrl, d: ChallengeData, nb: number): VNode {
 function challenge(ctrl: Ctrl, dir: ChallengeDirection) {
   return (c: Challenge) => {
     const descItems = [ctrl.trans()(c.rated ? 'rated' : 'casual'), timeControl(c.timeControl), c.variant.name];
-    if (c.microMatch) descItems.push(ctrl.trans()('microMatch'));
+    if (c.multiMatch) descItems.push(ctrl.trans()('multiMatch'));
     const descStr = descItems.join(' • ');
     return h(
       'div.challenge.' + dir + '.c-' + c.id,

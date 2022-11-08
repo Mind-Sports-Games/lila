@@ -46,13 +46,20 @@ final class Analyse(
             roundC.getWatcherChat(pov.game) zip
             (ctx.noBlind ?? env.game.crosstableApi.withMatchup(pov.game)) zip
             env.bookmark.api.exists(pov.game, ctx.me) zip
+            env.swiss.api.getSwissPairingGamesForGame(pov.game) zip
             env.api.pgnDump(
               pov.game,
               initialFen,
               analysis = none,
               PgnDump.WithFlags(clocks = false)
             ) flatMap {
-              case ((((((analysis, analysisInProgress), simul), chat), crosstable), bookmarked), pgn) =>
+              case (
+                    (
+                      (((((analysis, analysisInProgress), simul), chat), crosstable), bookmarked),
+                      swissPairingGames
+                    ),
+                    pgn
+                  ) =>
                 env.api.roundApi.review(
                   pov,
                   lila.api.Mobile.Api.currentVersion,
@@ -81,7 +88,8 @@ final class Analyse(
                         crosstable,
                         userTv,
                         chat,
-                        bookmarked = bookmarked
+                        bookmarked = bookmarked,
+                        swissPairingGames = swissPairingGames
                       )
                     )
                   )

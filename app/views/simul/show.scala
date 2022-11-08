@@ -70,8 +70,8 @@ object show {
               pluralize("minute", sim.clock.hostExtraMinutes),
               br,
               trans.hostPlayerIndexX(sim.playerIndex match {
-                case Some("p1") => trans.white()
-                case Some("p2") => trans.black()
+                case Some("p1") => trans.p1()
+                case Some("p2") => trans.p2()
                 case _          => trans.randomColor()
               }),
               sim.position.flatMap(lila.tournament.Thematic.byFen) map { pos =>

@@ -301,7 +301,7 @@ final class Study(
       env.study.api.byIdAndOwner(id, me) flatMap {
         _ ?? { study =>
           env.study.api.delete(study) >> env.relay.api.deleteRound(lila.relay.RelayRound.Id(id)).map {
-            case _       => Redirect(routes.Study.mine("hot"))
+            case _ => Redirect(routes.Study.mine("hot"))
             //case Some(tour) => Redirect(routes.RelayTour.redirect(tour.slug, tour.id.value))
           }
         }

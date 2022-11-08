@@ -41,7 +41,13 @@ case class User(
   override def toString =
     s"User $username(${perfs.bestRating}) games:${count.game}${marks.troll ?? " troll"}${marks.engine ?? " engine"}${!enabled ?? " closed"}"
 
-  def light = LightUser(id = id, name = username, title = title.map(_.value), isPatron = isPatron)
+  def light = LightUser(
+    id = id,
+    name = username,
+    country = profile.flatMap(_.country),
+    title = title.map(_.value),
+    isPatron = isPatron
+  )
 
   def realNameOrUsername = profileOrDefault.nonEmptyRealName | username
 
@@ -85,6 +91,8 @@ case class User(
   def lameOrTrollOrAlt = lameOrTroll || marks.alt
 
   def canBeFeatured = hasTitle && !lameOrTroll
+
+  def isSimulFeatured = roles.exists(_ contains "FEATURED_SIMUL")
 
   def canFullyLogin = enabled || !lameOrTrollOrAlt
 
@@ -254,6 +262,7 @@ object User {
     val enabled               = "enabled"
     val roles                 = "roles"
     val profile               = "profile"
+    val country               = s"$profile.country"
     val toints                = "toints"
     val playTime              = "time"
     val createdAt             = "createdAt"

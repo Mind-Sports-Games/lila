@@ -3,7 +3,20 @@ package lila.round
 import strategygames.format.Forsyth
 import strategygames.chess.variant._
 import strategygames.variant.Variant
-import strategygames.{ P2, Clock, Player => PlayerIndex, Game => ChessGame, Board, Situation, History, P1, Mode, Piece, PieceMap, Pos }
+import strategygames.{
+  P2,
+  Clock,
+  Player => PlayerIndex,
+  Game => ChessGame,
+  Board,
+  Situation,
+  History,
+  P1,
+  Mode,
+  Piece,
+  PieceMap,
+  Pos
+}
 import strategygames.chess.Castles
 import com.github.blemale.scaffeine.Cache
 import lila.memo.CacheApi
@@ -66,7 +79,7 @@ final private class Rematcher(
     fuccess(List(Event.RematchOffer(by = none)))
   }
 
-  def microMatch(game: Game): Fu[Events] = rematchJoin(game)
+  def multiMatch(game: Game): Fu[Events] = rematchJoin(game)
 
   private def rematchExists(pov: Pov)(nextId: Game.ID): Fu[Events] =
     gameRepo game nextId flatMap {
@@ -83,8 +96,8 @@ final private class Rematcher(
           _ = if (game.variant == Variant.Chess(Chess960) && !chess960.get(game.id)) chess960.put(nextGame.id)
           _ <- gameRepo insertDenormalized nextGame
         } yield {
-          if (nextGame.metadata.microMatchGameNr.contains(2))
-            messenger.system(game, trans.microMatchRematchStarted.txt())
+          if (nextGame.metadata.multiMatchGameNr.fold(false)(x => x >= 2))
+            messenger.system(game, trans.multiMatchRematchStarted.txt())
           else messenger.system(game, trans.rematchOfferAccepted.txt())
           onStart(nextGame.id)
           redirectEvents(nextGame)
@@ -102,24 +115,33 @@ final private class Rematcher(
   }
 
   private def chessPieceMap(pieces: strategygames.chess.PieceMap): PieceMap =
-    pieces.map{
-      case(pos, piece) => (Pos.Chess(pos), Piece.Chess(piece))
+    pieces.map { case (pos, piece) =>
+      (Pos.Chess(pos), Piece.Chess(piece))
     }
 
-  private def nextMicroMatch(g: Game) =
-    if (!g.aborted && g.metadata.microMatch.contains("micromatch")) s"1:${g.id}".some
-    else g.metadata.microMatch.isDefined option "micromatch"
+  //<game number>:<first game id in set>
+  private def multiMatchEntry(g: Game): Option[String] =
+    if (!g.aborted) {
+      g.metadata.multiMatch.fold(g.metadata.multiMatch.isDefined option "multiMatch") { s =>
+        if (s.contains("multiMatch")) {
+          s"2:${g.id}".some
+        } else if (s.substring(1, 2) == ":") {
+          s"${s.take(1).toInt + 1}:${s.drop(2)}".some
+        } else "multiMatch".some
+      }
+    } else g.metadata.multiMatch.isDefined option "multiMatch"
 
   private def returnGame(game: Game): Fu[Game] = {
     for {
       initialFen <- gameRepo initialFen game
-      situation = initialFen.flatMap{fen => Forsyth.<<<(game.variant.gameLogic, fen)}
+      situation = initialFen.flatMap { fen => Forsyth.<<<(game.variant.gameLogic, fen) }
       pieces: PieceMap = game.variant match {
         case Variant.Chess(Chess960) =>
           if (chess960 get game.id) chessPieceMap(Chess960.pieces)
-          else situation.fold(
-            chessPieceMap(Chess960.pieces)
-          )(_.situation.board.pieces)
+          else
+            situation.fold(
+              chessPieceMap(Chess960.pieces)
+            )(_.situation.board.pieces)
         case Variant.Chess(FromPosition) =>
           situation.fold(
             Variant.libStandard(game.variant.gameLogic).pieces
@@ -155,7 +177,7 @@ final private class Rematcher(
         source = game.source | Source.Lobby,
         daysPerTurn = game.daysPerTurn,
         pgnImport = None,
-        microMatch = nextMicroMatch(game)
+        multiMatch = multiMatchEntry(game)
       ) withUniqueId idGenerator
     } yield game
   }

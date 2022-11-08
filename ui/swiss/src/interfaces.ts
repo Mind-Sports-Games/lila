@@ -40,8 +40,11 @@ export interface SwissData {
   trophy1st: string;
   trophy2nd: string;
   trophy3rd: string;
-  isMicroMatch: boolean;
-  microMatchGameId?: string;
+  multiMatchGameIds?: string[];
+  isMatchScore: boolean;
+  isBestOfX: boolean;
+  isPlayX: boolean;
+  nbGamesPerRound: number;
   status: Status;
   standing: Standing;
   boards: Board[];
@@ -73,16 +76,24 @@ export interface MyInfo {
   rank: number;
   absent: boolean;
   gameId?: string;
-  isMicroMatch: boolean;
-  microMatchGameId?: string;
+  multiMatchGameIds?: string[];
+  isMatchScore: boolean;
+  isBestOfX: boolean;
+  isPlayX: boolean;
+  nbGamesPerRound: number;
 }
 
 export interface PairingBase {
   g: string; // game
   o?: boolean; // ongoing
   w?: boolean; // won
-  m: boolean; // isMicroMatch
-  mmid?: string; // isMicroMatch
+  mr?: string[]; //mulitmatch results
+  mmids?: string[]; //multimatch gameids
+  ms: boolean; // isMatchScore
+  x: boolean; // isBestOfX
+  px: boolean; // isPlayX
+  gpr: string; //nbGamesPerRound
+  mp?: string; //match points for player if using matchScore
   vi?: string; //variant icon
 }
 
@@ -139,9 +150,10 @@ export interface Board {
   orientation: PlayerIndex;
   p1: BoardPlayer;
   p2: BoardPlayer;
-  isMicroMatch: boolean;
-  microMatchGameId?: string;
-  microMatchGame?: Board;
+  multiMatchGameIds?: string[];
+  multiMatchGames?: Board[];
+  isBestOfX: boolean;
+  isPlayX: boolean;
   clock?: {
     p1: number;
     p2: number;
