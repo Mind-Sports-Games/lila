@@ -27,7 +27,6 @@ fieldnumber {
       top: 1px;
       right: 0; // a negative value creates empty space on the right side in mobile browsers
       height: 100%;
-      width: 1.4em;
       text-align: right;
       &.black {
         flex-flow: column-reverse;
@@ -97,7 +96,10 @@ fieldnumber {
       top: 0;
       width: 12px;
       text-align: left;
-      &.is64 coord {
+      &.is64.algebraic coord {
+        transform: translateY(36%);
+      }
+      &.is64.fieldnumbers coord {
         transform: translateY(18%);
       }
     }
@@ -105,7 +107,10 @@ fieldnumber {
       bottom: -15px;
       left: 0;
       text-align: center;
-      &.is64 coord {
+      &.is64.algebraic coord {
+        transform: translateX(-4%);
+      }
+      &.is64.fieldnumbers coord {
         transform: translateX(-26%);
       }
     }

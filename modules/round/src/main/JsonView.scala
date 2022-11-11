@@ -35,12 +35,14 @@ final class JsonView(
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
-    if (prefCoordSystem == 1) prefCoordSystem
-    else
-      gameVariant match {
-        case Variant.Draughts(v) if v.invertNumericCoords => 2
-        case _                                            => 0
+    gameVariant match {
+      case Variant.Draughts(v) => {
+        if (v.invertNumericCoords && prefCoordSystem == 0) 2
+        else if (!v.draughts64Variant && prefCoordSystem == 1) 0
+        else prefCoordSystem
       }
+      case _ => prefCoordSystem
+    }
 
   private def commonPlayerJson(g: Game, p: GamePlayer, user: Option[User], withFlags: WithFlags): JsObject =
     Json

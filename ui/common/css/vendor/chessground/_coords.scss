@@ -25,10 +25,6 @@ coords {
       // a negative value creates empty space on the right side in mobile browsers
       height: 100%;
       width: 0.8em;
-      // draughts seems to use this file which is unexpected
-      &.is64 {
-        width: 1.4em;
-      }
     }
     &.p1 {
       flex-flow: column-reverse;
