@@ -9,7 +9,7 @@ import {
   allKeys,
   san2alg,
   invertCoord,
-  ranksRev as allRanks,
+  ranks as allRanks,
   files as allFiles,
 } from './util';
 import { createElement as createSVG } from './svg';
@@ -56,8 +56,8 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
     if (s.coordinates === 2) {
       if (s.coordSystem === 1) {
         const klasses = 'is64' + (s.orientation === 'p2' ? ' p2' : ' p1');
-        container.appendChild(renderCoords(allRanks, 'ranks ' + klasses));
-        container.appendChild(renderCoords(allFiles, 'files ' + klasses));
+        container.appendChild(renderCoords(allRanks, 'ranks algebraic ' + klasses));
+        container.appendChild(renderCoords(allFiles, 'files algebraic ' + klasses));
       } else {
         const files: number[] = [],
           ranks: number[] = [],
@@ -83,8 +83,8 @@ export default function wrap(element: HTMLElement, s: State, relative: boolean):
             for (let i = fileSteps; i > 0; i--) ranks.push(s.boardSize[0] * i - rankBase + 1);
           }
         }
-        container.appendChild(renderCoords(ranks, 'ranks ' + klasses));
-        container.appendChild(renderCoords(files, 'files ' + klasses));
+        container.appendChild(renderCoords(ranks, 'ranks fieldnumbers ' + klasses));
+        container.appendChild(renderCoords(files, 'files fieldnumbers ' + klasses));
       }
     } else if (!relative && s.coordinates === 1) {
       renderFieldnumbers(board, s, board.getBoundingClientRect());

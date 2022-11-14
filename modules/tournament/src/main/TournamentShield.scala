@@ -236,7 +236,7 @@ object TournamentShield {
     def name                      = VariantKeys.variantName(variant)
     def iconChar                  = variant.perfIcon
     def matches(tour: Tournament) = Some(variant).has(tour.variant)
-    def scheduleHour              = TournamentShield.defaultShieldHour - offsetHour
+    def scheduleHour              = TournamentShield.defaultShieldHour + offsetHour
   }
 
   object Category {
@@ -390,12 +390,21 @@ object TournamentShield {
           25
         )
 
-    //case object Portuguese
-    //    extends Category(
-    //      Variant.Draughts(strategygames.draughts.variant.Portuguese),
-    //      Blitz32,
-    //      29
-    //    )
+    case object Portuguese
+        extends Category(
+          Variant.Draughts(strategygames.draughts.variant.Portuguese),
+          Blitz32,
+          27,
+          -1
+        )
+
+    case object English
+        extends Category(
+          Variant.Draughts(strategygames.draughts.variant.English),
+          Blitz32,
+          28,
+          -1
+        )
 
     case object Shogi
         extends Category(
@@ -468,7 +477,8 @@ object TournamentShield {
       Russian,
       Brazilian,
       Pool,
-      //Portuguese,
+      Portuguese,
+      English,
       Shogi,
       Xiangqi,
       MiniShogi,

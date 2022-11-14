@@ -38,13 +38,8 @@ export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: Draug
       const originalStep = steps[i];
       for (let m = 0; m < step.captLen - 1 && i + 1 < steps.length; m++) {
         if (m === 0) {
-          originalStep.lidraughtsUci = originalStep.lidraughtsUci.substr(0, 4);
-        } else if (
-          choiceOfCaptureVariants.includes(varaintKey) &&
-          steps[i].ply != steps[i + 1].ply &&
-          steps[i].lidraughtsUci.slice(-2) != steps[i + 1].lidraughtsUci.slice(-2)
-        ) {
-          // hack for pool/russian/english multi choice capture, stop merging if the final move is next and the dests do not match (they should normally)
+          originalStep.lidraughtsUci = originalStep.uci.slice(0, 4);
+        } else if (steps[i].uci.slice(-2) != steps[i + 1].uci.slice(0, 2)) {
           break;
         }
         i++;
