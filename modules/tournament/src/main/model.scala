@@ -43,8 +43,8 @@ case class VisibleTournaments(
 
   def add(tours: List[Tournament]) =
     copy(
-      created = tours.filter(_.isCreated) ++ created,
-      started = tours.filter(_.isStarted) ++ started
+      created = (tours.filter(_.isCreated) ++ created).distinct,
+      started = (tours.filter(_.isStarted) ++ started).distinct
     )
 }
 

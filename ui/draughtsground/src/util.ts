@@ -122,6 +122,9 @@ export const san2alg: { [key: string]: string } = {
   '31': 'e1',
   '32': 'g1',
 };
+export function invertCoord(coord: string): string {
+  return (33 - +coord).toString();
+}
 export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8'],
   ranksRev = ['8', '7', '6', '5', '4', '3', '2', '1'];
 export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],

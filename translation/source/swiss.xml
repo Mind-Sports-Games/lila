@@ -5,6 +5,7 @@
   <string name="onePerGameFamily">Ensure one game per game family is selected, where possible</string>
   <string name="exoticChessVariants">Use only exotic chess variants</string>
   <string name="draughts64Variants">Only use draughts 64 variants</string>
+  <string name="usingDrawTables">Using Draw Tables</string>
   <string name="firstRound">First Round</string>
   <plurals name="viewAllXRounds">
     <item quantity="one">View the round</item>

@@ -578,6 +578,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="slow">Slow</string>
   <string name="insideTheBoard">Inside the board</string>
   <string name="outsideTheBoard">Outside the board</string>
+  <string name="fieldnumbers8x8">Fieldnumbers (1-32)</string>
+  <string name="algebraic8x8">Algebraic (a-h, 1-8)</string>
   <string name="onSlowGames">On slow games</string>
   <string name="always">Always</string>
   <string name="never">Never</string>

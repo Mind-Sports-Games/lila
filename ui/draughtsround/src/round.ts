@@ -1,6 +1,6 @@
 import { RoundData, Step } from './interfaces';
 import { countGhosts } from 'draughtsground/fen';
-import { san2alg } from 'draughts';
+import { san2alg, invertSan } from 'draughts';
 
 export const firstPly = (d: RoundData): number => d.steps[0].ply;
 
@@ -23,7 +23,7 @@ export const massage = (d: RoundData): void => {
 
 export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: DraughtsVariantKey): Step[] {
   const mergedSteps: Step[] = new Array<Step>();
-  const choiceOfCaptureVariants: DraughtsVariantKey[] = ['pool', 'russian'];
+  const choiceOfCaptureVariants: DraughtsVariantKey[] = ['pool', 'russian', 'english'];
   if (steps.length == 0) return mergedSteps;
   else mergedSteps.push(addNotation(steps[0], coordSystem));
 
@@ -38,13 +38,8 @@ export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: Draug
       const originalStep = steps[i];
       for (let m = 0; m < step.captLen - 1 && i + 1 < steps.length; m++) {
         if (m === 0) {
-          originalStep.lidraughtsUci = originalStep.lidraughtsUci.substr(0, 4);
-        } else if (
-          choiceOfCaptureVariants.includes(varaintKey) &&
-          steps[i].ply != steps[i + 1].ply &&
-          steps[i].lidraughtsUci.slice(-2) != steps[i + 1].lidraughtsUci.slice(-2)
-        ) {
-          // hack for pool/russian multi choice capture, stop merging if the final move is next and the dests do not match (they should normally)
+          originalStep.lidraughtsUci = originalStep.uci.slice(0, 4);
+        } else if (steps[i].uci.slice(-2) != steps[i + 1].uci.slice(0, 2)) {
           break;
         }
         i++;
@@ -58,8 +53,10 @@ export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: Draug
 }
 
 function addNotation(step: Step, coordSystem: number): Step {
-  if (coordSystem) {
+  if (coordSystem === 1) {
     step.alg = san2alg(step.san);
+  } else if (coordSystem === 2 && step.san) {
+    step.san = invertSan(step.san);
   }
   return step;
 }

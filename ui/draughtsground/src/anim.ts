@@ -185,7 +185,7 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
                 isPromotablePos(newP.piece.playerIndex, newP.pos, bs)) ||
               (p.piece.role === 'king' && newP.piece.role === 'man' && isPromotablePos(p.piece.playerIndex, p.pos, bs)))
         );
-      if (!filteredMissings.length && (variant === 'russian' || variant === 'pool')) {
+      if (!filteredMissings.length && (variant === 'russian' || variant === 'pool' || variant === 'english')) {
         maybePromote = true;
         filteredMissings = missings.filter(
           p =>
