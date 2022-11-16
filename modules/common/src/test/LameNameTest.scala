@@ -30,6 +30,13 @@ class LameNameTest extends Specification {
       test("BrianMatthewsNM") must beTrue
       test("TheGMBrianMatthews") must beTrue
     }
+    "impersonating us" in {
+      test("PlayStrategy") must beTrue
+      test("P1ayStrategy") must beTrue
+      test("Play-Strategy") must beTrue
+      test("P_L_A_Y_S_T_R_A_T_E_G_Y") must beTrue
+      test("P1ay-Strategy") must beTrue
+    }
     "gross" in {
       test("Shit") must beTrue
       test("Sh1t") must beTrue

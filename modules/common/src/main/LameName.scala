@@ -5,7 +5,7 @@ import scala.util.matching.Regex
 object LameName {
 
   def username(name: String): Boolean =
-    usernameRegex.find(name.replaceIf('_', "")) || containsTitleRegex.matches(name)
+    usernameRegex.find(name.replaceIf('_', "")) || containsTitleRegex.matches(name) || containsUsRegex.matches(name)
 
   def tournament(name: String): Boolean = tournamentRegex find name
 
@@ -50,6 +50,7 @@ object LameName {
     "fuck",
     "golam",
     "hitler",
+    "idiot",
     "jerk",
     "kanker",
     "kunt",
@@ -67,10 +68,12 @@ object LameName {
     "poop",
     "poxyu",
     "pussy",
+    "putin",
     "resign",
     "retard",
     "shit",
     "slut",
+    "suicid",
     "trump",
     "vagin",
     "wanker",
@@ -80,13 +83,22 @@ object LameName {
     "xyuta"
   )
 
-  private val usernameRegex = lameWords(
-    baseWords ::: List("playstrategy", "playstrat", "lichess", "mindsportsolympiad", "mind-sports-olympiad", "lidraughts", "lishogi", "pychess")
+  private val organisations = List(
+    "playstrat",
+    "lichess",
+    "mindsportsolympiad",
+    "lidraughts",
+    "lishogi",
+    "pychess"
   )
+
+  private val usernameRegex = lameWords(baseWords)
 
   private val tournamentRegex = lameWords(baseWords)
 
-  private def lameWords(list: List[String]): Regex = {
+  private val containsUsRegex = lameWords(organisations, ".*")
+
+  private def lameWords(list: List[String], interspersed: String = "+"): Regex = {
     val extras = Map(
       'a' -> "4",
       'e' -> "38",
@@ -105,7 +117,7 @@ object LameName {
 
     list
       .map {
-        _.map(l => subs.getOrElse(l, l)).iterator.map(l => s"$l+").mkString
+        _.map(l => subs.getOrElse(l, l)).iterator.map(l => s"$l$interspersed").mkString
       }
       .mkString("|")
       .r
