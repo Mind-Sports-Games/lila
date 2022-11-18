@@ -26,7 +26,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   def cdnUrl(path: String) = s"$assetBaseUrl$path"
 
-  def dbImageUrl(path: String) = s"$assetBaseUrl/image/$path"
+  def dbImageUrl(path: String) = s"$netDomain/image/$path"
 
   def cssTag(name: String)(implicit ctx: Context): Frag =
     cssTagWithTheme(name, ctx.currentBg)
@@ -52,11 +52,11 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   def roundTag(lib: GameLogic) = lib match {
     case GameLogic.Draughts() => jsModule("draughtsround")
-    case _                  => jsModule("round")
+    case _                    => jsModule("round")
   }
   def roundPlayStrategyTag(lib: GameLogic) = lib match {
     case GameLogic.Draughts() => "PlayStrategyDraughtsRound"
-    case _                  => "PlayStrategyRound"
+    case _                    => "PlayStrategyRound"
   }
   def roundNvuiTag(implicit ctx: Context) = ctx.blind option jsModule("round.nvui")
 
