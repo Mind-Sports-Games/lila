@@ -14,6 +14,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   private lazy val netDomain      = env.net.domain
   private lazy val assetDomain    = env.net.assetDomain
   private lazy val assetBaseUrl   = env.net.assetBaseUrl
+  private lazy val baseUrl        = env.net.baseUrl
   private lazy val socketDomains  = env.net.socketDomains
   private lazy val minifiedAssets = env.net.minifiedAssets
   lazy val vapidPublicKey         = env.push.vapidPublicKey
@@ -26,7 +27,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   def cdnUrl(path: String) = s"$assetBaseUrl$path"
 
-  def dbImageUrl(path: String) = s"$netDomain/image/$path"
+  def dbImageUrl(path: String) = s"$baseUrl/image/$path"
 
   def cssTag(name: String)(implicit ctx: Context): Frag =
     cssTagWithTheme(name, ctx.currentBg)
