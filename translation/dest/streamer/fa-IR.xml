@@ -13,7 +13,7 @@
   <string name="yourPage">ویرایش صفحه استریم</string>
   <string name="downloadKit">دانلود کیت استریمر</string>
   <string name="rules">قونین استریم</string>
-  <string name="rule1">Twitch این گروه را \"شطرنج\" در همه زبانها می نامد: https://www.twitch.tv/directory/game/Chess - بنابراین توصیه می کنیم متن انگلیسی را در اینجا نگه دارید.</string>
+  <string name="rule1">Twitch این گروه را \"شطرنج\" در همه زبانها می نامد: https://www.twitch.tv/directory/game/Board%20Games - بنابراین توصیه می کنیم متن انگلیسی را در اینجا نگه دارید.</string>
   <string name="rule2">هنگام پخش چیزهای غیر مجوز ، کلمه کلیدی را حذف کنید.</string>
   <string name="rule3">لیچس جریان شما را به صورت خودکار تشخیص داده و قدرت پردازش زیر را فعال می کند:</string>
   <string name="perks">مزایای جریان با کلمه کلیدی</string>

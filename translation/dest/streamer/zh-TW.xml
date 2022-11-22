@@ -15,7 +15,7 @@
   <string name="downloadKit">下載實況工具</string>
   <string name="xIsStreaming">%s正在實況</string>
   <string name="rules">實況規則</string>
-  <string name="rule1">當您在PlayStrategy直播時,請在您的直播關鍵詞上標記\"PlayStrategy\"和分類\"Chess\"</string>
+  <string name="rule1">當您在PlayStrategy直播時,請在您的直播關鍵詞上標記\"PlayStrategy\"和分類\"Board Games\"</string>
   <string name="rule2">當您在直播與PlayStrategy不相關的東西時,請移除這些關鍵詞</string>
   <string name="rule3">PlayStrategy將會自動檢測您的直播並啟用以下特權：</string>
   <string name="perks">使用關鍵詞直播的好處</string>

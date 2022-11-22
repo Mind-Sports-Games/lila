@@ -15,7 +15,7 @@
   <string name="downloadKit">Κατέβασμα πακέτου μετάδοσης</string>
   <string name="xIsStreaming">%s μεταδίδει</string>
   <string name="rules">Κανόνες μετάδοσης</string>
-  <string name="rule1">Συμπεριλάβετε την λέξη-κλειδί \"playstrategy.org\" στο τίτλο μετάδοσης και χρησιμοποιήστε την κατηγορία \"Chess\" όταν μεταδίδετε στο PlayStrategy.</string>
+  <string name="rule1">Συμπεριλάβετε την λέξη-κλειδί \"playstrategy.org\" στο τίτλο μετάδοσης και χρησιμοποιήστε την κατηγορία \"Board Games\" όταν μεταδίδετε στο PlayStrategy.</string>
   <string name="rule2">Διαγράψτε τη λέξη-κλειδί αυτή όταν σταματήσετε να μεταδίδετε θέματα σχετικά με το PlayStrategy.</string>
   <string name="rule3">Το PlayStrategy θα ανιχνεύσει την μετάδοσή σας αυτόματα και θα έχετε τα ακόλουθα πλεονεκτήματα:</string>
   <string name="perks">Πλεονεκτήματα μετάδοσης με τη λέξη-κλειδί</string>

@@ -15,7 +15,7 @@
   <string name="downloadKit">Atsisiųsti transliuotojo rinkinį</string>
   <string name="xIsStreaming">%s transliuoja</string>
   <string name="rules">Transliacijų taisyklės</string>
-  <string name="rule1">Transliuodami PlayStrategy transliacijos pavadinime įterpkite \"playstrategy.org\" ir naudokite kategoriją \"Šachmatai\" (Chess).</string>
+  <string name="rule1">Transliuodami PlayStrategy transliacijos pavadinime įterpkite \"playstrategy.org\" ir naudokite kategoriją \"Stalo žaidimai\" (Board Games).</string>
   <string name="rule2">Pašalinkite raktinį žodį kai transliuojate ne PlayStrategy dalykus.</string>
   <string name="rule3">PlayStrategy jūsų transliaciją aptiks automatiškai ir suteiks jums šiuos privalumus:</string>
   <string name="perks">Pranašumai transliuojant su raktiniu žodžiu</string>
