@@ -94,7 +94,7 @@ object bits extends Context.ToLang {
       )(
         strong(cls := "text", dataIcon := "")(l titleName s),
         " ",
-        s.status
+        s.cleanStatus
       )
     }
 

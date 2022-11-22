@@ -15,7 +15,7 @@
   <string name="downloadKit">Завантажити набір інструментів стрімера</string>
   <string name="xIsStreaming">%s транслює</string>
   <string name="rules">Правила трансляцій</string>
-  <string name="rule1">Додайте ключове слово \"playstrategy.org\" у заголовку Вашої трансляції і використовуйте категорію \"Chess\" під час трансляції на PlayStrategy.</string>
+  <string name="rule1">Додайте ключове слово \"playstrategy.org\" у заголовку Вашої трансляції і використовуйте категорію \"Board Games\" під час трансляції на PlayStrategy.</string>
   <string name="rule2">Видаліть ключове слово, коли транслюєте щось не пов\'язане з PlayStrategy.</string>
   <string name="rule3">PlayStrategy буде автоматично виявляти Вашу трансляцію і включати наступні переваги:</string>
   <string name="perks">Переваги трансляції з ключовим словом</string>

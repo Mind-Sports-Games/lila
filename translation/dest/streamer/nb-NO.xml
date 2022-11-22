@@ -15,7 +15,7 @@
   <string name="downloadKit">Last ned strømmer-pakken</string>
   <string name="xIsStreaming">%s strømmer nå</string>
   <string name="rules">Strømmeregler</string>
-  <string name="rule1">Du må inkludere nøkkelordet «playstrategy.org» i tittelen på strømmen og bruke kategorien «Chess» når du strømmer på PlayStrategy.</string>
+  <string name="rule1">Du må inkludere nøkkelordet «playstrategy.org» i tittelen på strømmen og bruke kategorien «Board Games» når du strømmer på PlayStrategy.</string>
   <string name="rule2">Fjern \"playstrategy.org\" fra tittelen på strømmen når du strømmer noe annet enn PlayStrategy.</string>
   <string name="rule3">PlayStrategy oppdager strømmen din automatisk og gir deg følgende fordeler:</string>
   <string name="perks">Fordeler ved å inkludere \"playstrategy.org\" i tittelen på strømmen</string>
