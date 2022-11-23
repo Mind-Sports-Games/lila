@@ -15,7 +15,7 @@
   <string name="downloadKit">Lade das Streamerpaket herunter</string>
   <string name="xIsStreaming">%s streamt gerade</string>
   <string name="rules">Streaming-Regeln</string>
-  <string name="rule1">Füge das Stichwort \"playstrategy.org\" in deinen Streamtitel ein und verwende die Kategorie \"Chess\", wenn du auf PlayStrategy streamst.</string>
+  <string name="rule1">Füge das Stichwort \"playstrategy.org\" in deinen Streamtitel ein und verwende die Kategorie \"Board Games\", wenn du auf PlayStrategy streamst.</string>
   <string name="rule2">Entferne das Stichwort, wenn du gerade nicht PlayStrategy-bezogen streamst.</string>
   <string name="rule3">PlayStrategy wird automatisch deinen Stream erkennen und folgende Zusatzdienste aktivieren:</string>
   <string name="perks">Vorteile für das Streamen mit dem Schlüsselwort</string>

@@ -15,7 +15,7 @@
   <string name="downloadKit">Стример құралдарын жүктеп алу</string>
   <string name="xIsStreaming">%s стрим жүргізіп отыр</string>
   <string name="rules">Стрим жүргізудің ережелері</string>
-  <string name="rule1">Личестің стримін жүргізгенде, \"playstrategy.org\" кілтсөзін стрим тақырыбына қосып, \"Chess\" санатын таңдаңыз.</string>
+  <string name="rule1">Личестің стримін жүргізгенде, \"playstrategy.org\" кілтсөзін стрим тақырыбына қосып, \"Board Games\" санатын таңдаңыз.</string>
   <string name="rule2">Личестен басқа нәрсенің стримін жүргізсеңіз, кілтсөзді алып тастаңыз.</string>
   <string name="rule3">Личес стриміңізді автоматты түрде анықтап, келесі жеңілдіктерге жол ашады:</string>
   <string name="perks">Стримді кілтсөзбен жүргізудің артықшылығы</string>

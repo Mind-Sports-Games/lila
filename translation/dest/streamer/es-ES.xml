@@ -15,7 +15,7 @@
   <string name="downloadKit">Descargar kit de presentador</string>
   <string name="xIsStreaming">%s está transmitiendo</string>
   <string name="rules">Reglas de transmisión</string>
-  <string name="rule1">Incluye la palabra clave \"playstrategy.org\" en el título de tu transmisión y usa la categoría \"Chess\" cuando transmitas en PlayStrategy.</string>
+  <string name="rule1">Incluye la palabra clave \"playstrategy.org\" en el título de tu transmisión y usa la categoría \"Board Games\" cuando transmitas en PlayStrategy.</string>
   <string name="rule2">Elimina la palabra clave cuando transmitas contenido que no esté relacionado a PlayStrategy.</string>
   <string name="rule3">PlayStrategy detectará tu transmisión automáticamente y habilitará los siguientes beneficios:</string>
   <string name="perks">Beneficios de transmitir con la palabra clave</string>
