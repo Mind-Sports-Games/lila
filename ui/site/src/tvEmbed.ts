@@ -1,8 +1,10 @@
 import { Chessground } from 'chessground';
+import { Draughtsground } from 'draughtsground';
 import * as miniGame from './component/mini-game';
 import loadClockWidget from './component/clock-widget';
 
 window.Chessground = Chessground;
+window.Draughtsground = Draughtsground;
 
 function resize() {
   const el = document.querySelector('#featured-game') as HTMLElement;

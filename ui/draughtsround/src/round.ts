@@ -21,9 +21,9 @@ export const massage = (d: RoundData): void => {
   if (d.expiration) d.expiration.movedAt = Date.now() - d.expiration.idleMillis;
 };
 
-export function mergeSteps(steps: Step[], coordSystem: number, varaintKey: DraughtsVariantKey): Step[] {
+export function mergeSteps(steps: Step[], coordSystem: number): Step[] {
   const mergedSteps: Step[] = new Array<Step>();
-  const choiceOfCaptureVariants: DraughtsVariantKey[] = ['pool', 'russian', 'english'];
+  //const choiceOfCaptureVariants: DraughtsVariantKey[] = ['pool', 'russian', 'english'];
   if (steps.length == 0) return mergedSteps;
   else mergedSteps.push(addNotation(steps[0], coordSystem));
 
