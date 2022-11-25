@@ -13,10 +13,11 @@
 
   display: grid;
   grid-template-columns: minmax(200px, calc(100vh - 2.5rem)) minmax(200px, 1fr);
-  grid-template-rows: auto 2.5rem;
+  grid-template-rows: auto 3rem;
   grid-template-areas: 'board tools' 'board controls';
 }
 
+//for games with pockets
 .pocket {
   &-top {
     grid-area: pocket-top;
@@ -32,12 +33,83 @@
   border-radius: 0;
 }
 
-.analyse.variant-crazyhouse {
-  grid-template-rows: 60px auto 2.5rem 60px;
+@each $variant in ('crazyhouse', 'minishogi') {
+  .analyse.variant-#{$variant} {
+    grid-template-rows: 50px auto 3rem 50px;
+    grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
+  }
+}
+.analyse.variant-shogi {
+  grid-template-rows: 35px auto 3rem 35px;
+  grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
+}
 
-  body.supports-max-content & {
-    grid-template-rows: max-content auto 2.5rem max-content;
+//score for games
+$score-variants: ('flipello', 'flipello10', 'oware');
+
+body.mancala-light-wood .variant-oware .game-score {
+  background: url(../images/board/mancala/oware_light_wood_house.png);
+  background-size: cover;
+}
+
+body.mancala-dark-wood .variant-oware .game-score {
+  background: url(../images/board/mancala/oware_dark_wood_house.png);
+  background-size: cover;
+}
+
+$pocket-col1-size: 5rem;
+@each $variant in $score-variants {
+  .analyse.variant-#{$variant} {
+    grid-template-rows: $pocket-col1-size auto 3rem;
+    grid-template-areas: 'board pocket-top' 'board tools' 'board controls';
   }
 
-  grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
+  .variant-#{$variant} .game-score {
+    @extend %box-radius;
+    display: block;
+    width: $pocket-col1-size;
+    height: $pocket-col1-size;
+    background-color: #aaa;
+
+    piece {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      position: relative;
+    }
+
+    &-top {
+      grid-area: pocket-top;
+    }
+
+    &-bottom {
+      grid-area: pocket-top;
+      margin-left: calc(100% - #{$pocket-col1-size});
+    }
+  }
+}
+
+.variant-flipello .game-score,
+.variant-flipello10 .game-score {
+  piece::after {
+    @extend %active, %box-radius;
+
+    content: attr(data-score);
+    top: 0;
+    right: 0;
+    position: absolute;
+    line-height: 0.9em;
+    padding: 3px 0.3em;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+}
+
+//taller than wider board (e.g. xiangqi) undo some css
+
+.analyse.variant-xiangqi {
+  margin-right: unset;
+  width: unset;
+
+  grid-template-columns: minmax(200px, calc(100vh - 3rem - 2.5rem)) minmax(200px, 1fr);
 }
