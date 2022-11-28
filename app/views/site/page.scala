@@ -5,6 +5,7 @@ import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import strategygames.{ GameFamily }
 
 object page {
 
@@ -90,8 +91,22 @@ $('#asset-version-message').text(playstrategy.info.message);"""
     val parameters = frag(
       p("Parameters:"),
       ul(
-        li(strong("theme"), ": ", lila.pref.Theme.all.map(_.name).mkString(", ")),
-        li(strong("bg"), ": light, dark")
+        li(strong("bg"), ": light, dark"),
+        li(strong("gf"), ": ", GameFamily.all.map(gf => s"${gf.id} (${gf.key})").mkString(", ")),
+        li(
+          strong("theme"),
+          ": ",
+          GameFamily.all
+            .map(gf => s"(${gf.key}) " + lila.pref.Theme.allOfFamily(gf).map(_.name).mkString(", "))
+            .mkString("; ")
+        ),
+        li(
+          strong("pieceSet"),
+          ": ",
+          GameFamily.all
+            .map(gf => s"(${gf.key}) " + lila.pref.PieceSet.allOfFamily(gf).map(_.name).mkString(", "))
+            .mkString("; ")
+        )
       )
     )
     layout(
@@ -107,7 +122,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
             raw(
               """PlayStrategy exposes a RESTish HTTP/JSON API that you are welcome to use. Read the <a href="/api" class="blue">HTTP API documentation</a>.
               <br/>
-              <strong>Note</strong> - Embed only supports chess games at the moment..."""
+              <strong>Note</strong> - Game embed not working for draughts"""
             )
           )
         ),
@@ -116,13 +131,13 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           val args = """style="width: 400px; height: 444px;" allowtransparency="true" frameborder="0""""
           frag(
             h1(id := "embed-tv")("Embed PlayStrategy TV in your site"),
-            div(cls := "center")(raw(s"""<iframe src="/tv/frame?theme=brown&bg=dark" $args></iframe>""")),
+            div(cls := "center")(raw(s"""<iframe src="/tv/frame?theme=auto&bg=auto" $args></iframe>""")),
             p("Add the following HTML to your site:"),
             p(cls := "copy-zone")(
               input(
                 id := "tv-embed-src",
                 cls := "copyable autoselect",
-                value := s"""<iframe src="$netBaseUrl/tv/frame?theme=brown&bg=dark" $args></iframe>"""
+                value := s"""<iframe src="$netBaseUrl/tv/frame?theme=auto&bg=auto" $args></iframe>"""
               ),
               button(title := "Copy code", cls := "copy button", dataRel := "tv-embed-src", dataIcon := "\"")
             ),
@@ -182,7 +197,9 @@ $('#asset-version-message').text(playstrategy.info.message);"""
             h1("Embed a game in your site"),
             raw(s"""<iframe src="/embed/0kpSHmXZ?bg=auto&theme=auto" $args></iframe>"""),
             p(
-              raw("""On a game analysis page, click the <em>"FEN &amp; PGN"</em> tab at the bottom, then """),
+              raw(
+                """On a game analysis page, click the <em>"FEN &amp; PGN"</em> tab at the bottom, then """
+              ),
               "\"",
               em(trans.embedInYourWebsite(), "\".")
             ),
@@ -223,7 +240,7 @@ $('#asset-version-message').text(playstrategy.info.message);"""
           a(activeCls("changelog"), href := routes.Page.menuBookmark("changelog"))("Changelog"),
           a(activeCls("thanks"), href := "/thanks")(trans.thankYou()),
           sep,
-          //a(activeCls("webmasters"), href := routes.Main.webmasters)(trans.webmasters()),
+          a(activeCls("webmasters"), href := routes.Main.webmasters)(trans.webmasters()),
           //a(activeCls("database"), href := "https://database.playstrategy.org")(trans.database(), external),
           a(activeCls("api"), href := routes.Api.index)("API", external),
           sep,
