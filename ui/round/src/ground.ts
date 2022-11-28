@@ -81,6 +81,9 @@ export function makeConfig(ctrl: RoundController): Config {
         data.onlyDropsVariant && playing
           ? util.onlyDropsVariantPiece(data.game.variant.key, turnPlayerIndex)
           : undefined,
+      events: {
+        cancel: hooks.onCancelDropMode,
+      },
     },
     draggable: {
       enabled: data.pref.moveEvent !== Prefs.MoveEvent.Click,
