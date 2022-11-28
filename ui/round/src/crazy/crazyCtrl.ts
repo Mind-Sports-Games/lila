@@ -18,9 +18,39 @@ export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
     playerIndex = el.getAttribute('data-playerindex') as cg.PlayerIndex,
     number = el.getAttribute('data-nb');
   if (!role || !playerIndex || number === '0') return;
+  const dropMode = ctrl.chessground?.state.dropmode;
+  const dropPiece = ctrl.chessground?.state.dropmode.piece;
+  if (!dropMode.active || dropPiece?.role !== role) {
+    cancelDropMode(ctrl.chessground.state);
+  }
+  if (ctrl.chessground?.state.selected) {
+    ctrl.cancelMove();
+    ctrl.chessground.selectSquare(null);
+    ctrl.redraw();
+  }
   e.stopPropagation();
   e.preventDefault();
   dragNewPiece(ctrl.chessground.state, { playerIndex, role }, e);
+}
+
+export function selectToDrop(ctrl: RoundController, e: cg.MouchEvent): void {
+  if (e.button !== undefined && e.button !== 0) return; // only touch or left click
+  if (ctrl.replaying() || !ctrl.isPlaying()) return;
+  const el = e.target as HTMLElement,
+    role = el.getAttribute('data-role') as cg.Role,
+    playerIndex = el.getAttribute('data-playerindex') as cg.PlayerIndex,
+    number = el.getAttribute('data-nb');
+  if (!role || !playerIndex || number === '0') return;
+  const dropMode = ctrl.chessground?.state.dropmode;
+  const dropPiece = ctrl.chessground?.state.dropmode.piece;
+  if (!dropMode.active || dropPiece?.role !== role) {
+    setDropMode(ctrl.chessground.state, { playerIndex, role });
+  } else {
+    cancelDropMode(ctrl.chessground.state);
+  }
+  e.stopPropagation();
+  e.preventDefault();
+  ctrl.redraw();
 }
 
 let dropWithKey = false;

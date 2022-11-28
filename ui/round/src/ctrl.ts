@@ -179,6 +179,10 @@ export default class RoundController {
         this.redraw();
       }
     } else this.jump(this.ply);
+    if (!this.data.onlyDropsVariant) {
+      cancelDropMode(this.chessground.state);
+      this.redraw();
+    }
   };
 
   private onMove = (orig: cg.Key, dest: cg.Key, captured?: cg.Piece) => {
@@ -197,6 +201,7 @@ export default class RoundController {
       oware.updateBoardFromMove(this, orig, dest);
       sound.capture();
     } else sound.move();
+    if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
   };
 
   private onPremove = (orig: cg.Key, dest: cg.Key, meta: cg.MoveMetadata) => {
@@ -210,6 +215,13 @@ export default class RoundController {
   private onPredrop = (role: cg.Role | undefined, _?: Key) => {
     this.preDrop = role;
     this.redraw();
+  };
+
+  private onCancelDropMode = () => {
+    //redraw pocket - due to possible selection in CG and dropmode cancelled
+    if (['crazyhouse', 'shogi', 'minishogi'].includes(this.data.game.variant.key)) {
+      this.redraw();
+    }
   };
 
   private isSimulHost = () => {
@@ -251,6 +263,7 @@ export default class RoundController {
     onPremove: this.onPremove,
     onCancelPremove: this.onCancelPremove,
     onPredrop: this.onPredrop,
+    onCancelDropMode: this.onCancelDropMode,
   });
 
   replaying = (): boolean => this.ply !== this.lastPly();
