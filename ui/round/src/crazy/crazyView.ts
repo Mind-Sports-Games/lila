@@ -6,7 +6,7 @@ import RoundController from '../ctrl';
 import { onInsert } from '../util';
 import { Position } from '../interfaces';
 
-const eventNames1 = ['mousedown', 'touchstart'];
+const eventNames1 = ['mousedown', 'touchmove'];
 const eventNames2 = ['click'];
 
 export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, position: Position) {
