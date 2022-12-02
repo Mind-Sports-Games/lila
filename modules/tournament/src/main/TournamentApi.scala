@@ -70,14 +70,16 @@ final class TournamentApi(
       by = Right(me),
       name = setup.name,
       clock = setup.clockConfig,
-      minutes = setup.minutes,
+      minutes = if (setup.isMedley) setup.medleyDuration else setup.minutes,
       waitMinutes = setup.waitMinutes | TournamentForm.waitMinuteDefault,
       startDate = setup.startDate,
       mode = setup.realMode,
       password = setup.password,
       variant = setup.realVariant,
       medleyVariants = setup.medleyVariants,
-      medleyMinutes = setup.medleyMinutes,
+      medleyMinutes = setup.medleyIntervalOptions.medleyMinutes,
+      medleyNumIntervals = setup.medleyIntervalOptions.numIntervals,
+      medleyBalanceIntervals = setup.medleyIntervalOptions.balanceIntervals | false,
       position = setup.realPosition,
       berserkable = setup.berserkable | true,
       streakable = setup.streakable | true,
@@ -255,15 +257,13 @@ final class TournamentApi(
     }
 
   private[tournament] def newMedleyRound(tour: Tournament)(implicit lang: Lang = defaultLang) = {
+    val balanceText = if (tour.medleyBalanceIntervals) s" (for ${tour.currentIntervalTime} minutes)" else ""
     tournamentRepo.setMedleyVariant(tour.id, tour.currentVariant)
     socket.systemChat(
       tour.id,
-      trans.nowPairingX.txt(VariantKeys.variantName(tour.currentVariant))
+      trans.nowPairingX.txt(VariantKeys.variantName(tour.currentVariant)) + balanceText
     )
     socket.newMedleyVariant(tour.id, apiJsonView.variantJson(tour.currentVariant))
-    //socket.newMedleyVariant(tour.id, VariantKeys.variantName(tour.currentVariant))
-    //socket.reload(tour.id)
-    //publish()
   }
 
   def kill(tour: Tournament): Funit = {

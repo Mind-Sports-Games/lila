@@ -32,6 +32,7 @@ object form {
             fields.name,
             form3.split(fields.rated, fields.variant),
             fields.medleyControls,
+            fields.medleyIntervalOptions,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clock,
@@ -70,11 +71,12 @@ object form {
             form3.split(fields.name, tour.isCreated option fields.startDate),
             form3.split(fields.rated, fields.variant),
             fields.medleyControls,
+            fields.medleyIntervalOptions,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clock,
             form3.split(
-              if (TournamentForm.minutes contains tour.minutes) form3.split(fields.minutes)
+              if ((TournamentForm.minutes contains tour.minutes) || tour.isMedley) form3.split(fields.minutes)
               else
                 form3.group(form("minutes"), trans.duration(), half = true)(
                   form3.input(_)(tpe := "number")
@@ -263,20 +265,53 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       )
     )
   def medleyMinutes =
-    form3.group(
-      form("medleyMinutes"),
-      trans.medleyInterval(),
-      klass = "medleyMinutes",
-      half = true,
-      help = trans.medleyIntervalDefinition().some,
-      displayed = false
-    )(
-      form3.select(_, TournamentForm.medleyMinuteChoices)
+    frag(
+      form3.group(
+        form("medleyIntervalOptions.medleyMinutes"),
+        "Medley Interval Time", //todo change translations
+        klass = "medleyMinutes",
+        help = trans.medleyIntervalDefinition().some,
+        half = true,
+        displayed = false
+      )(
+        form3.select(_, TournamentForm.medleyMinuteChoices)
+      )
+    )
+  def numIntervals =
+    frag(
+      form3.group(
+        form("medleyIntervalOptions.numIntervals"),
+        "Medley Intervals",
+        klass = "medleyIntervalOptions",
+        help = raw("Duration approx. (Interval Time * Intervals)").some,
+        half = true,
+        displayed = false
+      )(
+        form3.input(_, typ = "number")
+      )
+    )
+  def balanceIntervals =
+    frag(
+      form3.checkbox(
+        form("medleyIntervalOptions.balanceIntervals"),
+        "Balance Interval Times", //todo add to translations
+        klass = "medleyIntervalOptions",
+        help = raw(
+          "Quicker/slower variants have shorter/longer interval times<br>Duration is still approx. (Interval Time * Intervals)"
+        ).some,
+        half = true,
+        displayed = false
+      )
     )
   def medleyControls =
     form3.split(
       medley,
-      medleyMinutes
+      balanceIntervals
+    )
+  def medleyIntervalOptions =
+    form3.split(
+      medleyMinutes,
+      numIntervals
     )
   def medleyDefaults =
     form3.split(
@@ -404,7 +439,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       )
     )
   def minutes =
-    form3.group(form("minutes"), trans.duration(), half = true)(
+    form3.group(form("minutes"), trans.duration(), klass = "duration", half = true)(
       form3.select(_, TournamentForm.minuteChoices)
     )
   def waitMinutes =

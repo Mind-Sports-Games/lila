@@ -111,19 +111,21 @@ final class JsonView(
       full.?? {
         Json
           .obj(
-            "id"            -> tour.id,
-            "createdBy"     -> tour.createdBy,
-            "startsAt"      -> formatDate(tour.startsAt),
-            "system"        -> "arena", // BC
-            "fullName"      -> tour.name(),
-            "minutes"       -> tour.minutes,
-            "medley"        -> tour.isMedley,
-            "medleyMinutes" -> tour.medleyMinutes,
-            "medleyRound"   -> full.option(tour.medleyRound.getOrElse(-1)),
-            "perf"          -> full.option(tour.currentPerfType),
-            "clock"         -> full.option(tour.clock),
-            "lib"           -> full.option(tour.currentVariant.gameLogic.id),
-            "variant"       -> full.option(variantJson(tour.currentVariant)),
+            "id"                     -> tour.id,
+            "createdBy"              -> tour.createdBy,
+            "startsAt"               -> formatDate(tour.startsAt),
+            "system"                 -> "arena", // BC
+            "fullName"               -> tour.name(),
+            "minutes"                -> tour.minutes,
+            "medley"                 -> tour.isMedley,
+            "medleyMinutes"          -> tour.medleyMinutes,
+            "medleyIntervalSeconds"  -> tour.medleyIntervalSeconds,
+            "medleyBalanceIntervals" -> tour.medleyBalanceIntervals,
+            "medleyRound"            -> full.option(tour.medleyRound.getOrElse(-1)),
+            "perf"                   -> full.option(tour.currentPerfType),
+            "clock"                  -> full.option(tour.clock),
+            "lib"                    -> full.option(tour.currentVariant.gameLogic.id),
+            "variant"                -> full.option(variantJson(tour.currentVariant)),
             "p1Name" -> full.option(
               if (tour.isMedley) trans.p1.txt()
               else tour.variant.playerNames(P1)

@@ -126,6 +126,8 @@ object TournamentShield {
       val hour: Int,
       val arenaMinutes: Int,
       val arenaMedleyMinutes: Int,
+      val arenaMedleyNumIntervals: Int,
+      val arenaMedleyBalanceIntervals: Boolean,
       val swissFormat: String,
       val arenaFormat: String,
       val arenaDescription: String
@@ -160,6 +162,8 @@ object TournamentShield {
           19,
           105,
           15,
+          playStrategyRounds,
+          true,
           s"${playStrategyRounds} round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
           s"${playStrategyRounds} variant Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
           s"PlayStrategy Medley Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
@@ -181,6 +185,8 @@ object TournamentShield {
           19,
           100,
           20,
+          chessVariantRounds,
+          true,
           s"${chessVariantRounds} round Swiss using micro-match rounds (each pairing plays twice, once each as the start player). ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants will be picked.",
           s"${chessVariantRounds} variant Arena where ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants are picked.",
           s"Chess Variants Medley Arena, where ${chessVariantRounds} from the following ${chessVariantOptions.length} chess variants are picked: ${chessVariantOptions.map(VariantKeys.variantName).mkString(", ")}."
@@ -201,6 +207,8 @@ object TournamentShield {
           13,
           105,
           15,
+          draughtsRounds,
+          true,
           s"${draughtsRounds} round Swiss where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants will be picked.",
           s"${draughtsRounds} variant Arena where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants are picked.",
           s"Draughts Medley Arena, where ${draughtsRounds} from the following ${draughtsVariantOptions.length} Draughts variants are picked: ${draughtsVariantOptions.map(VariantKeys.variantName).mkString(", ")}."

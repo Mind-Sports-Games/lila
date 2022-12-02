@@ -30,7 +30,11 @@ final class TournamentForm {
       startDate = none,
       variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
       medley = false.some,
-      medleyMinutes = medleyMinutesDefault.some,
+      medleyIntervalOptions = MedleyIntervalOptions(
+        medleyMinutes = medleyMinutesDefault.some,
+        balanceIntervals = true.some,
+        numIntervals = Some(5)
+      ),
       medleyDefaults = MedleyDefaults(
         onePerGameFamily = false.some,
         exoticChessVariants = false.some,
@@ -67,7 +71,11 @@ final class TournamentForm {
       startDate = tour.startsAt.some,
       variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
       medley = tour.isMedley.some,
-      medleyMinutes = tour.medleyMinutes,
+      medleyIntervalOptions = MedleyIntervalOptions(
+        medleyMinutes = tour.medleyMinutes,
+        balanceIntervals = tour.medleyBalanceIntervals.some,
+        numIntervals = tour.medleyNumIntervals
+      ),
       medleyDefaults = MedleyDefaults(
         onePerGameFamily = onePerGameFamilyInMedley(tour.medleyVariants).some,
         exoticChessVariants = exoticChessVariants(tour.medleyVariants).some,
@@ -139,8 +147,12 @@ final class TournamentForm {
             Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined
           )
         ),
-        "medley"        -> optional(boolean),
-        "medleyMinutes" -> optional(numberIn(medleyMinutes)),
+        "medley" -> optional(boolean),
+        "medleyIntervalOptions" -> mapping(
+          "medleyMinutes"    -> optional(numberIn(medleyMinutes)),
+          "balanceIntervals" -> optional(boolean),
+          "numIntervals"     -> optional(number(min = 2, max = maxMedleyIntervals))
+        )(MedleyIntervalOptions.apply)(MedleyIntervalOptions.unapply),
         "medleyDefaults" -> mapping(
           "onePerGameFamily"    -> optional(boolean),
           "exoticChessVariants" -> optional(boolean),
@@ -197,6 +209,8 @@ object TournamentForm {
   val medleyMinuteChoices  = options(medleyMinutes, "%d minute{s}")
   val medleyMinutesDefault = 10
 
+  val maxMedleyIntervals: Int = Variant.all.size
+
   val waitMinutes       = Seq(1, 2, 3, 5, 10, 15, 20, 30, 45, 60)
   val waitMinuteChoices = options(waitMinutes, "%d minute{s}")
   val waitMinuteDefault = 5
@@ -234,7 +248,7 @@ private[tournament] case class TournamentSetup(
     startDate: Option[DateTime],
     variant: Option[String],
     medley: Option[Boolean],
-    medleyMinutes: Option[Int],
+    medleyIntervalOptions: MedleyIntervalOptions,
     medleyDefaults: MedleyDefaults,
     medleyGameFamilies: MedleyGameFamilies,
     position: Option[FEN],
@@ -292,10 +306,12 @@ private[tournament] case class TournamentSetup(
           if (
             old.medleyGameFamilies != medleyGameFamilies.gfList
               .sortWith(_.name < _.name)
-              .some || old.medleyMinutes != medleyMinutes || old.minutes != minutes
+              .some || old.medleyMinutes != medleyIntervalOptions.medleyMinutes || old.minutes != minutes
           ) medleyVariants
           else old.medleyVariants,
-        medleyMinutes = medleyMinutes,
+        medleyMinutes = medleyIntervalOptions.medleyMinutes,
+        medleyNumIntervals = medleyIntervalOptions.numIntervals,
+        medleyBalanceIntervals = medleyIntervalOptions.balanceIntervals getOrElse false,
         startsAt = startDate | old.startsAt,
         password = password,
         position = newVariant.standardVariant ?? {
@@ -345,7 +361,13 @@ private[tournament] case class TournamentSetup(
 
   def isMedley = (medley | false) && medleyGameFamilies.gfList.nonEmpty
 
-  def maxMedleyRounds = medleyMinutes.map(mm => Math.ceil(minutes.toDouble / mm).toInt)
+  def medleyDuration: Int =
+    medleyIntervalOptions.medleyMinutes.getOrElse(0) * medleyIntervalOptions.numIntervals.getOrElse(0)
+
+  //We have to account for old medleys and their setup
+  def maxMedleyRounds = medleyIntervalOptions.numIntervals.fold(
+    medleyIntervalOptions.medleyMinutes.map(mm => Math.ceil(minutes.toDouble / mm).toInt)
+  )(Some(_))
 
   //shuffle all variants from the selected game families
   private lazy val generateNoDefaultsMedleyVariants: List[Variant] =
@@ -378,6 +400,12 @@ private[tournament] case class TournamentSetup(
       fullMedleyList.some
     } else None
 }
+
+case class MedleyIntervalOptions(
+    medleyMinutes: Option[Int],
+    balanceIntervals: Option[Boolean],
+    numIntervals: Option[Int]
+)
 
 case class MedleyDefaults(
     onePerGameFamily: Option[Boolean],

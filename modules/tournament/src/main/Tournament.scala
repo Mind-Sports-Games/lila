@@ -23,6 +23,8 @@ case class Tournament(
     variant: Variant,
     medleyVariants: Option[List[Variant]] = None,
     medleyMinutes: Option[Int] = None,
+    medleyNumIntervals: Option[Int] = None,
+    medleyBalanceIntervals: Boolean = false,
     position: Option[FEN],
     mode: Mode,
     password: Option[String] = None,
@@ -102,27 +104,135 @@ case class Tournament(
 
   def pairingsClosed = secondsToFinish < pairingsClosedSeconds
 
+  //start at 0 as it's actaully an index for medley variants in front end
   def medleyRound: Option[Int] =
-    if (isStarted) medleyMinutes.map(_ * 60).map((nowSeconds - startsAt.getSeconds).toInt / _)
-    else None
+    if (isStarted) {
+      medleyIntervalSeconds
+        .map(
+          _.map { var s = 0; t => { s += t; s } }
+            .filter(_ <= ((nowSeconds - startsAt.getSeconds).toInt))
+            .size
+        )
+    } else None
+
+  def medleyIntervalSeconds: Option[List[Int]] =
+    if (medleyBalanceIntervals) {
+      val times: Option[List[Int]] =
+        medleySpeedFactors.map(f => f.map(s => (s * (minutes / f.sum) * 60).toInt))
+      val extra               = times.map(minutes * 60 - _.sum).getOrElse(0)
+      val firstLastBonus: Int = math.min(clock.limitSeconds / 3, 120)
+      // take time from first variant and give to last
+
+      times.map(t =>
+        t.take(1).map(v => v - firstLastBonus) ::: t.drop(1).take(t.size - 2) :::
+          t.drop(t.size - 1).map(v => v + extra + firstLastBonus)
+      )
+    } else {
+      medleyNumIntervals.map(List.fill(_)(medleyMinutes.getOrElse(0) * 60))
+    }
+
+  def medleySpeedFactors: Option[List[Double]] =
+    medleyVariantsInTournament.map(s => s.flatMap(v => medleySpeedChoice.get(v.key)))
+
+  def medleySpeedChoice: Map[String, Double] = medleyVariants.fold(medleyVariantSpeeds)(v =>
+    v match {
+      case x if isMedleyChessShieldStyle(x)    => medleyChessShieldSpeeds
+      case x if isMedleyDraughtsShieldStyle(x) => medleyDraughtShieldSpeeds
+      case _                                   => medleyVariantSpeeds
+    }
+  )
+
+  def isMedleyChessShieldStyle(variants: List[Variant]): Boolean =
+    id == "shieldChessMedley" || variants.forall(v => medleyChessShieldSpeeds.keys.exists(v.==))
+
+  def isMedleyDraughtsShieldStyle(variants: List[Variant]): Boolean =
+    id == "shieldDraughtsMedley" || variants.forall(v => medleyDraughtShieldSpeeds.keys.exists(v.==))
+
+  def medleyVariantSpeeds: Map[String, Double] = {
+    val slow    = 1.25
+    val medium  = 1.1
+    val quick   = 0.9
+    val fastest = 0.75
+    Map(
+      "chess960"      -> medium,
+      "kingOfTheHill" -> quick,
+      "threeCheck"    -> fastest,
+      "fiveCheck"     -> quick,
+      "antichess"     -> quick,
+      "atomic"        -> fastest,
+      "horde"         -> slow,
+      "racingKings"   -> fastest,
+      "crazyhouse"    -> quick,
+      "noCastling"    -> medium,
+      "linesOfAction" -> fastest,
+      "scrambledEggs" -> fastest,
+      "frisian"       -> medium,
+      "frysk"         -> quick,
+      "international" -> slow,
+      "antidraughts"  -> slow,
+      "breakthrough"  -> slow,
+      "russian"       -> medium,
+      "brazilian"     -> medium,
+      "pool"          -> medium,
+      "portuguese"    -> medium,
+      "english"       -> medium,
+      "shogi"         -> slow,
+      "xiangqi"       -> medium,
+      "minishogi"     -> fastest,
+      "minixiangqi"   -> quick,
+      "flipello"      -> medium,
+      "flipello10"    -> slow,
+      "oware"         -> slow
+    )
+  }
+
+  def medleyChessShieldSpeeds: Map[String, Double] = {
+    val slow    = 1.25
+    val medium  = 1
+    val fastest = 0.75
+    Map(
+      "kingOfTheHill" -> medium,
+      "threeCheck"    -> fastest,
+      "antichess"     -> medium,
+      "atomic"        -> fastest,
+      "horde"         -> slow,
+      "racingKings"   -> fastest,
+      "crazyhouse"    -> medium
+    )
+  }
+
+  def medleyDraughtShieldSpeeds: Map[String, Double] = {
+    val slow   = 1.25
+    val medium = 1
+    val quick  = 0.75
+    Map(
+      "frisian"       -> medium,
+      "frysk"         -> quick,
+      "international" -> slow,
+      "antidraughts"  -> slow,
+      "breakthrough"  -> slow,
+      "russian"       -> medium,
+      "brazilian"     -> medium,
+      "pool"          -> medium,
+      "portuguese"    -> medium,
+      "english"       -> medium
+    )
+  }
+
+  def currentIntervalTime =
+    medleyIntervalSeconds.getOrElse(List()).lift(medleyRound.getOrElse(0)).fold(0)(t => (t / 60).toInt)
 
   def currentVariant =
     medleyVariants.getOrElse(List()).lift(medleyRound.getOrElse(0)).getOrElse(variant)
 
   def currentPerfType: PerfType = PerfType(currentVariant, speed)
 
+  def medleyVariantsInTournament: Option[List[Variant]] =
+    medleyVariants.map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
+
   //essentially take medleyVariants and discard ones not to display
   def medleyRounds: Option[List[Variant]] =
-    medleyRoundsWithMinsRemaining.map(_.map { case (_, v) => v })
-
-  //might want to make this public for something at some point
-  private def medleyRoundsWithMinsRemaining: Option[List[(Int, Variant)]] =
-    medleyMinutes.map(mm =>
-      List
-        .tabulate((minutes / mm) + 1)(n => minutes - (n * mm))
-        .filter(_ > (pairingsClosedSeconds.toDouble / 60))
-        .zip(medleyVariants.getOrElse(List()))
-    )
+    medleyVariantsInTournament.map(_.drop(medleyRound.getOrElse(0)))
 
   def isStillWorthEntering =
     isPlayStrategyHeadline || isMarathonOrUnique || {
@@ -215,6 +325,8 @@ object Tournament {
       variant: Variant,
       medleyVariants: Option[List[Variant]] = None,
       medleyMinutes: Option[Int] = None,
+      medleyNumIntervals: Option[Int] = None,
+      medleyBalanceIntervals: Boolean = false,
       position: Option[FEN],
       mode: Mode,
       password: Option[String],
@@ -241,6 +353,8 @@ object Tournament {
       variant = variant,
       medleyVariants = medleyVariants,
       medleyMinutes = medleyMinutes,
+      medleyNumIntervals = medleyNumIntervals,
+      medleyBalanceIntervals = medleyBalanceIntervals,
       position = position,
       mode = mode,
       password = password,
@@ -272,6 +386,8 @@ object Tournament {
       variant = sched.variant,
       medleyVariants = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
       medleyMinutes = sched.medleyShield.map(_.arenaMedleyMinutes),
+      medleyNumIntervals = sched.medleyShield.map(_.arenaMedleyNumIntervals),
+      medleyBalanceIntervals = sched.medleyShield.map(_.arenaMedleyBalanceIntervals) getOrElse false,
       position = sched.position,
       mode = Mode.Rated,
       conditions = sched.conditions,
