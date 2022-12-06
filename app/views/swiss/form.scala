@@ -28,7 +28,8 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            fields.microMatch,
+            fields.xGamesChoiceRow1,
+            fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
             fields.medleyDefaults,
@@ -68,7 +69,8 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
-            fields.microMatch,
+            fields.xGamesChoiceRow1,
+            fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
             fields.medley,
             fields.medleyDefaults,
@@ -162,13 +164,51 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
-  def microMatch =
+  def matchScore =
     frag(
       form3.checkbox(
-        form("microMatch"),
-        trans.microMatch(),
-        help = raw(trans.microMatchDefinition.txt().replace("(", "<br>(")).some
+        form("xGamesChoice.matchScore"),
+        trans.isMatchScore(),
+        half = true,
+        help = frag(
+          trans.isMatchScoreDefinition.txt(),
+          br,
+          a(href := s"${routes.Swiss.home}#faqMatchScore", target := "_blank")("More detail here")
+        ).some
       )
+    )
+  def xGamesChoiceRow1 =
+    form3.split(bestOfX, playX)
+  def xGamesChoiceRow2 =
+    form3.split(matchScore, nbGamesPerRound)
+  def bestOfX =
+    frag(
+      form3.checkbox(
+        form("xGamesChoice.bestOfX"),
+        "Best of X",
+        klass = "xGamesChoice",
+        half = true,
+        help = raw("Each round, play best of X games with opponent").some
+      )
+    )
+  def playX =
+    frag(
+      form3.checkbox(
+        form("xGamesChoice.playX"),
+        "Play X Games",
+        klass = "xGamesChoice",
+        half = true,
+        help = raw("Each round, play X games with opponent").some
+      )
+    )
+  def nbGamesPerRound =
+    form3.group(
+      form("xGamesChoice.nbGamesPerRound"),
+      "Number of games per round",
+      help = raw("An odd number is best (2 is a micro-match)").some,
+      half = true
+    )(
+      form3.input(_, typ = "number")
     )
   def medley =
     frag(
@@ -335,7 +375,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         klass = "drawTables",
         half = true,
         help = raw(
-          "Each round of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant."
+          "Each round of the tournament uses a randomly selected starting position from the list of IDF/ACF Draw Tables for this variant."
         ).some,
         displayed = false
       )
@@ -348,7 +388,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         klass = "perPairingDrawTables",
         half = true,
         help = raw(
-          "Each pairing of the tournament uses a randomly selected starting position from the list of IDF Draw Tables for this variant."
+          "Each pairing of the tournament uses a randomly selected starting position from the list of IDF/ACF Draw Tables for this variant."
         ).some,
         displayed = false
       )

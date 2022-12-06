@@ -30,10 +30,11 @@ object bits {
       cross: Option[lila.game.Crosstable.WithMatchup],
       simul: Option[lila.simul.Simul],
       userTv: Option[lila.user.User] = None,
-      bookmarked: Boolean
+      bookmarked: Boolean,
+      swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context) =
     div(
-      side.meta(pov, initialFen, tour, simul, userTv, bookmarked = bookmarked),
+      side.meta(pov, initialFen, tour, simul, userTv, bookmarked = bookmarked, swissPairingGames),
       cross.map { c =>
         div(cls := "crosstable")(crosstable(ctx.userId.fold(c)(c.fromPov), pov.gameId.some))
       }

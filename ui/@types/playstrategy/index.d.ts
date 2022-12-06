@@ -262,6 +262,7 @@ interface Study {
 
 interface LightUserNoId {
   name: string;
+  country?: string;
   title?: string;
   patron?: boolean;
 }
@@ -304,6 +305,8 @@ declare type DraughtsVariantKey =
   | 'russian'
   | 'brazilian'
   | 'pool'
+  | 'portuguese'
+  | 'english'
   | 'fromPositionDraughts'
   | 'frisian'
   | 'frysk';
@@ -334,6 +337,8 @@ declare type Perf =
   | 'russian'
   | 'brazilian'
   | 'pool'
+  | 'portuguese'
+  | 'english'
   | 'fromPositionDraughts'
   | 'frisian'
   | 'frysk'

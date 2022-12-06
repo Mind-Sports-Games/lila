@@ -164,7 +164,7 @@ export function baseMove(state: State, orig: cg.Key, dest: cg.Key, finishCapture
       (variant === 'russian' ||
         !state.movable.captLen ||
         state.movable.captLen <= captured ||
-        (variant === 'pool' && finishCapture)) &&
+        ((variant === 'pool' || variant === 'english') && finishCapture)) &&
       origPiece.role === 'man' &&
       ((origPiece.playerIndex === 'p1' && finalDest[1] === 1) ||
         (origPiece.playerIndex === 'p2' && finalDest[1] === state.boardSize[1]));

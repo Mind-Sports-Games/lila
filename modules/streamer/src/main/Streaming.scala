@@ -69,17 +69,21 @@ final private class Streaming(
       _ <- api.setLiveNow(streamers.withFilter(streams.has).map(_.id))
     } yield publishStreams(streamers, streams)
 
+  private val streamStartMemo = new lila.memo.ExpireSetMemo(2 hour)
+
   def publishStreams(streamers: List[Streamer], newStreams: LiveStreams) = {
     if (newStreams != liveStreams) {
       newStreams.streams filterNot { s =>
         liveStreams has s.streamer
       } foreach { s =>
+        import s.streamer.userId
+        streamStartMemo.put(userId)
         timeline ! {
           import lila.hub.actorApi.timeline.{ Propagate, StreamStart }
-          Propagate(StreamStart(s.streamer.userId, s.streamer.name.value)) toFollowersOf s.streamer.userId
+          Propagate(StreamStart(userId, s.streamer.name.value)) toFollowersOf userId
         }
         Bus.publish(
-          lila.hub.actorApi.streamer.StreamStart(s.streamer.userId),
+          lila.hub.actorApi.streamer.StreamStart(userId),
           "streamStart"
         )
       }
@@ -104,9 +108,7 @@ final private class Streaming(
     (youtubeStreamers.nonEmpty && googleApiKey.value.nonEmpty) ?? {
       val now = DateTime.now
       val res =
-        if (prevYouTubeStreams.list.isEmpty && prevYouTubeStreams.at.isAfter(now minusMinutes 3))
-          fuccess(prevYouTubeStreams)
-        else if (prevYouTubeStreams.at.isAfter(now minusMinutes 1))
+        if (prevYouTubeStreams.at.isAfter(now minusMinutes 15))
           fuccess(prevYouTubeStreams)
         else {
           ws.url("https://www.googleapis.com/youtube/v3/search")
@@ -123,7 +125,7 @@ final private class Streaming(
                 case JsSuccess(data, _) =>
                   fuccess(YouTube.StreamsFetched(data.streams(keyword, youtubeStreamers), now))
                 case JsError(err) =>
-                  fufail(s"youtube ${res.status} $err ${res.body.take(500)}")
+                  fufail(s"youtube ${res.status} $err ${res.body.take(200)}")
               }
             }
             .monSuccess(_.tv.streamer.youTube)
@@ -133,6 +135,7 @@ final private class Streaming(
             }
         }
       res dmap { r =>
+        logger.info(s"Fetched ${r.list.size} youtube streamers.")
         prevYouTubeStreams = r
         r.list
       }

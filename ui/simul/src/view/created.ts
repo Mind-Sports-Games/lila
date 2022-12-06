@@ -77,8 +77,11 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
       ctrl.acceptedContainsMe()
         ? h('p.instructions', 'You have been selected! Hold still, the simul is about to begin.')
         : isHost && ctrl.data.applicants.length < 6
-        ? h('p.instructions', 'Share this page URL to let people enter the simul!')
-        : null,
+        ? h(
+            'p.instructions',
+            'Share this page URL to let people enter the simul! ' + ctrl.trans('absentSimulApplicants')
+          )
+        : h('p.instructions', ctrl.trans('absentSimulApplicants')),
       h(
         'div.halves',
         {

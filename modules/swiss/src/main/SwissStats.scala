@@ -51,17 +51,17 @@ final class SwissStatsApi(
           .toMat(Sink.fold(SwissStats()) { case (stats, (player, pairings, sheet)) =>
             pairings.values.foldLeft((0, 0, 0, 0)) { case ((games, p1Wins, p2Wins, draws), pairing) =>
               (
-                games + 1,
-                p1Wins + pairing.p1Wins.??(1),
-                p2Wins + pairing.p2Wins.??(1),
-                draws + pairing.isDraw.??(1)
+                games + pairing.numGames,
+                p1Wins + pairing.numFirstPlayerWins,
+                p2Wins + pairing.numSecondPlayerWins,
+                draws + pairing.numDraws
               )
             } match {
               case (games, p1Wins, p2Wins, draws) =>
                 sheet.outcomes.foldLeft((0, 0)) { case ((byes, absences), outcome) =>
                   (
-                    byes + (outcome == SwissSheet.Bye).??(1),
-                    absences + (outcome == SwissSheet.Absent).??(1)
+                    byes + (outcome.head == SwissSheet.Bye).??(1),
+                    absences + (outcome.head == SwissSheet.Absent).??(1)
                   )
                 } match {
                   case (byes, absences) =>
@@ -78,7 +78,15 @@ final class SwissStatsApi(
             }
           })(Keep.right)
           .run()
-          .dmap { s => s.copy(games = s.games / 2, averageRating = s.averageRating / swiss.nbPlayers) }
+          .dmap { s =>
+            s.copy(
+              games = s.games / 2,
+              p1Wins = s.p1Wins / 2,
+              p2Wins = s.p2Wins / 2,
+              draws = s.draws / 2,
+              averageRating = s.averageRating / swiss.nbPlayers
+            )
+          }
       }
     }
 }

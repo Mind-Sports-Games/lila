@@ -46,7 +46,8 @@ export default class SwissCtrl {
   isStarted = () => this.data.status == 'started';
   isFinished = () => this.data.status == 'finished';
 
-  myGameId = () => (this.data.me?.microMatchGameId ? this.data.me?.microMatchGameId : this.data.me?.gameId);
+  myGameId = () =>
+    this.data.me?.multiMatchGameIds ? this.data.me?.multiMatchGameIds.slice(-1)[0] : this.data.me?.gameId;
 
   join = (password?: string) => {
     xhr.join(this, password);

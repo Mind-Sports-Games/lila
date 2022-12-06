@@ -44,4 +44,12 @@ class StringTest extends Specification {
     }
   }
 
+  "remove garbage chars" should {
+    val rms = String.removeMultibyteSymbols _
+    "remove multibyte garbage" in {
+      rms(
+        """🚌🚎🚐🚑🚒🚓🚕🚗🚙🚚🚛🚜🚲🛴🛵🛺🦼🦽 with new and better !pizzes on lichess.org"""
+      ) must_== " with new and better !pizzes on lichess.org"
+    }
+  }
 }

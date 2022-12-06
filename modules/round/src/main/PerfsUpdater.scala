@@ -69,6 +69,10 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.brazilian, ratingsB.brazilian, game)
               case Variant.Draughts(strategygames.draughts.variant.Pool) =>
                 updateRatings(ratingsW.pool, ratingsB.pool, game)
+              case Variant.Draughts(strategygames.draughts.variant.Portuguese) =>
+                updateRatings(ratingsW.portuguese, ratingsB.portuguese, game)
+              case Variant.Draughts(strategygames.draughts.variant.English) =>
+                updateRatings(ratingsW.english, ratingsB.english, game)
               case Variant.FairySF(strategygames.fairysf.variant.Shogi) =>
                 updateRatings(ratingsW.shogi, ratingsB.shogi, game)
               case Variant.FairySF(strategygames.fairysf.variant.Xiangqi) =>
@@ -139,6 +143,8 @@ final class PerfsUpdater(
       russian: Rating,
       brazilian: Rating,
       pool: Rating,
+      portuguese: Rating,
+      english: Rating,
       shogi: Rating,
       xiangqi: Rating,
       minishogi: Rating,
@@ -176,6 +182,8 @@ final class PerfsUpdater(
       russian = perfs.russian.toRating,
       brazilian = perfs.brazilian.toRating,
       pool = perfs.pool.toRating,
+      portuguese = perfs.portuguese.toRating,
+      english = perfs.english.toRating,
       shogi = perfs.shogi.toRating,
       xiangqi = perfs.xiangqi.toRating,
       minishogi = perfs.minishogi.toRating,
@@ -251,6 +259,8 @@ final class PerfsUpdater(
           russian = addRatingIf(game.ratingVariant.russian, perfs.russian, ratings.russian),
           brazilian = addRatingIf(game.ratingVariant.brazilian, perfs.brazilian, ratings.brazilian),
           pool = addRatingIf(game.ratingVariant.pool, perfs.pool, ratings.pool),
+          portuguese = addRatingIf(game.ratingVariant.portuguese, perfs.portuguese, ratings.portuguese),
+          english = addRatingIf(game.ratingVariant.english, perfs.english, ratings.english),
           shogi = addRatingIf(game.ratingVariant.shogi, perfs.shogi, ratings.shogi),
           xiangqi = addRatingIf(game.ratingVariant.xiangqi, perfs.xiangqi, ratings.xiangqi),
           minishogi = addRatingIf(game.ratingVariant.minishogi, perfs.minishogi, ratings.minishogi),
@@ -289,6 +299,8 @@ final class PerfsUpdater(
           russian = r(PT.orDefault("russian"), perfs.russian, perfs1.russian),
           brazilian = r(PT.orDefault("brazilian"), perfs.brazilian, perfs1.brazilian),
           pool = r(PT.orDefault("pool"), perfs.pool, perfs1.pool),
+          portuguese = r(PT.orDefault("portuguese"), perfs.portuguese, perfs1.portuguese),
+          english = r(PT.orDefault("english"), perfs.english, perfs1.english),
           shogi = r(PT.orDefault("shogi"), perfs.shogi, perfs1.shogi),
           xiangqi = r(PT.orDefault("xiangqi"), perfs.xiangqi, perfs1.xiangqi),
           minishogi = r(PT.orDefault("minishogi"), perfs.minishogi, perfs1.minishogi),

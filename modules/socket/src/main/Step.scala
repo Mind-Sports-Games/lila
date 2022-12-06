@@ -25,7 +25,7 @@ case class Step(
 object Step {
 
   case class Move(uci: Uci, san: String) {
-    def uciString = uci.uci
+    def uciString      = uci.uci
     def shortUciString = uci.shortUci
   }
 
@@ -33,18 +33,21 @@ object Step {
   // put all that shit somewhere else
   implicit private val pocketWriter: OWrites[Pocket] = OWrites { v =>
     JsObject(
-      Role.storable(v.roles.headOption match {
-        case Some(r) => r match {
-          case Role.ChessRole(_)   => GameLogic.Chess()
-          case Role.FairySFRole(_) => GameLogic.FairySF()
-          case _ => sys.error("Pocket not implemented for GameLogic")
+      Role
+        .storable(v.roles.headOption match {
+          case Some(r) =>
+            r match {
+              case Role.ChessRole(_)   => GameLogic.Chess()
+              case Role.FairySFRole(_) => GameLogic.FairySF()
+              case _                   => sys.error("Pocket not implemented for GameLogic")
+            }
+          case None => GameLogic.Chess()
+        })
+        .flatMap { role =>
+          Some(v.roles.count(role ==)).filter(0 <).map { count =>
+            role.groundName -> JsNumber(count)
+          }
         }
-        case None => GameLogic.Chess()
-      }).flatMap { role =>
-        Some(v.roles.count(role ==)).filter(0 <).map { count =>
-          role.groundName -> JsNumber(count)
-        }
-      }
     )
   }
   implicit private val pocketDataWriter: OWrites[PocketData] = OWrites { v =>
@@ -56,11 +59,12 @@ object Step {
     import step._
     Json
       .obj(
-        "ply" -> ply,
-        "uci" -> move.map(_.shortUciString),
-        "san" -> move.map(_.san),
-        "fen" -> fen.value,
-        "captLen" -> ~captLen
+        "ply"           -> ply,
+        "uci"           -> move.map(_.shortUciString),
+        "lidraughtsUci" -> move.map(_.uciString),
+        "san"           -> move.map(_.san),
+        "fen"           -> fen.value,
+        "captLen"       -> ~captLen
       )
       .add("check", check)
       .add(

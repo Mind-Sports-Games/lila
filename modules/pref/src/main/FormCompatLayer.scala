@@ -21,6 +21,7 @@ object FormCompatLayer {
         )
       ) pipe
       addMissing("clock.moretime", pref.moretime.toString) pipe
+      addMissing("display.coordSystem", pref.coordSystem.toString) pipe
       moveTo(
         "behavior",
         List(
@@ -44,6 +45,7 @@ object FormCompatLayer {
           "destination",
           "playerTurnIndicator",
           "coords",
+          "coordSystem",
           "replay",
           "pieceNotation",
           "blindfold"

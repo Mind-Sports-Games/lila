@@ -44,7 +44,7 @@ object Streamer {
       approval = Approval(
         requested = false,
         granted = false,
-        ignored = false,
+        ignored = user.marks.troll,
         tier = 0,
         chatEnabled = true,
         lastGrantedAt = none
@@ -93,8 +93,8 @@ object Streamer {
   }
 
   case class YouTube(channelId: String) {
-    def fullUrl = s"https://www.youtube.com/channel/$channelId"
-    def minUrl  = s"youtube.com/channel/$channelId"
+    def fullUrl = s"https://www.youtube.com/channel/$channelId/live"
+    def minUrl  = s"youtube.com/channel/$channelId/live"
   }
   object YouTube {
     private val ChannelIdRegex = """^([\w-]{24})$""".r

@@ -139,7 +139,7 @@ export default class Setup {
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
-      $microMatch = $form.find('.micro_match'),
+      $multiMatch = $form.find('.multi_match'),
       $timeInput = $form.find('.time_choice [name=time]'),
       $incrementInput = $form.find('.increment_choice [name=increment]'),
       $daysInput = $form.find('.days_choice [name=days]'),
@@ -267,6 +267,12 @@ export default class Setup {
               break;
             case '13':
               key = 'pool';
+              break;
+            case '14':
+              key = 'portuguese';
+              break;
+            case '15':
+              key = 'english';
               break;
           }
           break;
@@ -473,19 +479,19 @@ export default class Setup {
 
         $minInput
           .attr({
-            min: '-500',
+            min: '-1000',
             max: '0',
-            step: '50',
-            value: minStorage.get() || '-500',
+            step: '100',
+            value: minStorage.get() || '-1000',
           })
           .on('input', update);
 
         $maxInput
           .attr({
             min: '0',
-            max: '500',
-            step: '50',
-            value: maxStorage.get() || '500',
+            max: '1000',
+            step: '100',
+            value: maxStorage.get() || '1000',
           })
           .on('input', update);
 
@@ -553,7 +559,7 @@ export default class Setup {
         let ground = 'chessground';
         if (variantId[0] == '1') ground = 'draughtsground';
         ground += '.resize';
-        $microMatch.toggle(isFen && variantId[0] == '1');
+        $multiMatch.toggle(isFen && variantId[0] == '1');
         $fenPosition.toggle(isFen);
         $modeChoicesWrap.toggle(!isFen);
         if (isFen) {

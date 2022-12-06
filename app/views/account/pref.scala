@@ -72,6 +72,10 @@ object pref {
               radios(form("display.coords"), translatedBoardCoordinateChoices)
             ),
             setting(
+              coordinateSystemDraughts8x8(),
+              radios(form("display.coordSystem"), translatedCoordinateSystemChoices)
+            ),
+            setting(
               moveListWhilePlaying(),
               radios(form("display.replay"), translatedMoveListWhilePlayingChoices)
             ),

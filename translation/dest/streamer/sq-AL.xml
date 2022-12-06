@@ -15,7 +15,7 @@
   <string name="downloadKit">Shkarkoni paketën e transmetimit</string>
   <string name="xIsStreaming">%s po transmeton</string>
   <string name="rules">Rregullat e transmetimit</string>
-  <string name="rule1">Përfshini fjalën kyçe \"playstrategy.org\" në titullin tuaj të rrymës dhe përdorni kategorinë \"Shah\" kur transmetoni PlayStrategy.</string>
+  <string name="rule1">Përfshini fjalën kyçe \"playstrategy.org\" në titullin tuaj të rrymës dhe përdorni kategorinë \"Board Games\" kur transmetoni PlayStrategy.</string>
   <string name="rule2">Hiqni fjalën kyçe kur transmetoni gjëra jo-playstrategy.</string>
   <string name="rule3">PlayStrategy do të zbulojë transmetimin tuaj automatikisht dhe do të mundësojë përfitimet e mëposhtme:</string>
   <string name="perks">Përfitimet e transmetimit me fjalën kyçe</string>

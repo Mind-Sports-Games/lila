@@ -88,7 +88,7 @@ final class JsonView(
       .add("direction" -> direction.map(_.name))
       .add("initialFen" -> c.initialFen)
       .add("declineReason" -> c.declineReason.map(_.trans.txt()))
-      .add("microMatch" -> c.microMatch)
+      .add("multiMatch" -> c.multiMatch)
 
   private def iconChar(c: Challenge) =
     if (c.variant == Variant.libFromPosition(c.variant.gameLogic)) '*'
@@ -102,6 +102,6 @@ final class JsonView(
     trans.decline,
     trans.viewInFullSize,
     trans.cancel,
-    trans.microMatch
+    trans.multiMatch
   ).map(_.key)
 }

@@ -1,6 +1,7 @@
 import { Attrs, h, Hooks, VNode } from 'snabbdom';
 import { BasePlayer } from '../interfaces';
 import { numberFormat } from 'common/number';
+import SwissCtrl from '../ctrl';
 
 export function bind(eventName: string, f: (e: Event) => any, redraw?: () => void): Hooks {
   return onInsert(el =>
@@ -37,11 +38,25 @@ export function player(p: BasePlayer, asLink: boolean, withRating: boolean) {
         destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
       },
     },
-    [
-      h('span.name', userName(p.user)),
-      withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
-    ]
+    [h('div.player-info', playerInfo(p, withRating))]
   );
+}
+
+export function playerInfo(p: BasePlayer, withRating: boolean) {
+  return [
+    p.user.country
+      ? h(
+          'span.country',
+          h('img.flag', {
+            attrs: {
+              src: playstrategy.assetUrl('images/flags/' + p.user.country + '.png'),
+            },
+          })
+        )
+      : null,
+    h('span.name', userName(p.user)),
+    withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
+  ];
 }
 
 export const ratio2percent = (r: number) => Math.round(100 * r) + '%';
@@ -70,4 +85,25 @@ export function spinner(): VNode {
       }),
     ]),
   ]);
+}
+
+export function matchScoreDisplay(mp: string | undefined): string {
+  const regex = /^[0-9]*$/g;
+  if (mp && regex.test(mp)) {
+    const score = parseInt(mp, 10);
+    const isOdd = score % 2 == 1;
+    const oddPart = isOdd ? '½' : '';
+    const base = Math.floor(score / 2);
+    if (score == 1) {
+      return '½';
+    } else {
+      return `${base}${oddPart}`;
+    }
+  } else {
+    return '?';
+  }
+}
+
+export function multiMatchByeScore(ctrl: SwissCtrl): string {
+  return (ctrl.data.isPlayX ? ctrl.data.nbGamesPerRound * 2 : ctrl.data.nbGamesPerRound + 2).toString();
 }

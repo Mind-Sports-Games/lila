@@ -212,6 +212,8 @@ object TournamentShield {
       DraughtsMedley
     )
 
+    val medleyTeamIDs = all.map(_.teamOwner.teamId)
+
     def byKey(k: String): Option[MedleyShield] = all.find(_.key == k)
 
     private val medleyStartDate = new DateTime(2022, 6, 11, 0, 0)
@@ -234,7 +236,7 @@ object TournamentShield {
     def name                      = VariantKeys.variantName(variant)
     def iconChar                  = variant.perfIcon
     def matches(tour: Tournament) = Some(variant).has(tour.variant)
-    def scheduleHour              = TournamentShield.defaultShieldHour - offsetHour
+    def scheduleHour              = TournamentShield.defaultShieldHour + offsetHour
   }
 
   object Category {
@@ -388,6 +390,22 @@ object TournamentShield {
           25
         )
 
+    case object Portuguese
+        extends Category(
+          Variant.Draughts(strategygames.draughts.variant.Portuguese),
+          Blitz32,
+          27,
+          -1
+        )
+
+    case object English
+        extends Category(
+          Variant.Draughts(strategygames.draughts.variant.English),
+          Blitz32,
+          28,
+          -1
+        )
+
     case object Shogi
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.Shogi),
@@ -459,6 +477,8 @@ object TournamentShield {
       Russian,
       Brazilian,
       Pool,
+      Portuguese,
+      English,
       Shogi,
       Xiangqi,
       MiniShogi,

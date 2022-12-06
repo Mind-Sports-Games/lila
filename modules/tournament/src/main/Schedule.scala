@@ -220,6 +220,8 @@ object Schedule {
       MSO21,
       MSOGP
     )
+    val shields: List[Freq] = List(Shield, MedleyShield)
+
     def apply(name: String) = all.find(_.name == name)
     def byId(id: Int)       = all.find(_.id == id)
   }

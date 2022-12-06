@@ -61,6 +61,13 @@ object forms {
   ) =
     layout("ai", trans.playWithTheMachine(), routes.Setup.ai) {
       frag(
+        div(cls := "botInfo")(
+          a(href := routes.PlayApi.botOnline)(trans.seeOurListOfBots()),
+          br,
+          span(s"- ${trans.orUpper.txt()} -"),
+          br,
+          span(trans.playAgainstX("Stockfish"))
+        ),
         renderVariant(form, translatedAiVariantChoices),
         fenInput(form("fen"), strict = true, validFen),
         renderTimeMode(form, allowAnon = true),
@@ -107,7 +114,7 @@ object forms {
         renderVariant(form, translatedVariantChoicesWithVariantsAndFen),
         fenInput(form("fen"), strict = false, validFen),
         renderTimeMode(form, allowAnon = true),
-        renderMicroMatch(form),
+        renderMultiMatch(form),
         ctx.isAuth option div(cls := "mode_choice buttons")(
           renderRadios(form("mode"), translatedModeChoices)
         ),

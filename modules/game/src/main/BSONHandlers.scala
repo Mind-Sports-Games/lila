@@ -226,6 +226,7 @@ object BSONHandlers {
           tournamentId = r strO F.tournamentId,
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
+          multiMatch = r strO F.multiMatch,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
@@ -328,7 +329,7 @@ object BSONHandlers {
           simulId = r strO F.simulId,
           simulPairing = r intO F.simulPairing,
           timeOutUntil = r dateO F.timeOutUntil,
-          microMatch = r strO F.microMatch,
+          multiMatch = r strO F.multiMatch,
           drawLimit = r intO F.drawLimit,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty) //should be empty for draughts
@@ -425,6 +426,7 @@ object BSONHandlers {
           tournamentId = r strO F.tournamentId,
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
+          multiMatch = r strO F.multiMatch,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
@@ -506,6 +508,7 @@ object BSONHandlers {
           tournamentId = r strO F.tournamentId,
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
+          multiMatch = r strO F.multiMatch,
           analysed = r boolD F.analysed,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
@@ -562,7 +565,7 @@ object BSONHandlers {
         F.tournamentId   -> o.metadata.tournamentId,
         F.swissId        -> o.metadata.swissId,
         F.simulId        -> o.metadata.simulId,
-        F.microMatch     -> o.metadata.microMatch,
+        F.multiMatch     -> o.metadata.multiMatch,
         F.drawLimit      -> o.metadata.drawLimit,
         F.analysed       -> w.boolO(o.metadata.analysed)
       ) ++ {

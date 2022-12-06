@@ -25,12 +25,15 @@
   <string name="p1">Player 1</string>
   <string name="p2">Player 2</string>
   <string name="randomColor">Random side</string>
-  <string name="microMatch">Micro-match</string>
-  <string name="microMatchChallenge">This challenge is a micro-match!</string>
-  <string name="microMatchRematchStarted">Started second game of micro-match</string>
-  <string name="microMatchRematchAwaiting">Awaiting second game of micro-match</string>
-  <string name="microMatchGameX">Micro-match game %s</string>
-  <string name="microMatchDefinition">Play 2 games in succession with opponents (one as first player, one as second player)</string>
+  <string name="absentSimulApplicants">Games will not get created for users not present (i.e. not in spectators)</string>
+  <string name="multiMatch">Multi-match</string>
+  <string name="multiMatchChallenge">This challenge is a multi-match!</string>
+  <string name="multiMatchRematchStarted">Started next game of multi-match</string>
+  <string name="multiMatchRematchAwaiting">Awaiting next game of multi-match</string>
+  <string name="multiMatchGameX">Multi-match game %s</string>
+  <string name="multiMatchDefinition">Play multiple games in succession with opponents (swapping first player each game)</string>
+  <string name="isMatchScore">Use Match Score</string>
+  <string name="isMatchScoreDefinition">Use score of entire match against opponent as tournament points</string>
   <string name="createAGame">Create a game</string>
   <string name="playerIndexIsVictorious">%s is victorious</string>
   <string name="whiteIsVictorious">White is victorious</string>
@@ -575,6 +578,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="slow">Slow</string>
   <string name="insideTheBoard">Inside the board</string>
   <string name="outsideTheBoard">Outside the board</string>
+  <string name="fieldnumbers8x8">Fieldnumbers (1-32)</string>
+  <string name="algebraic8x8">Algebraic (a-h, 1-8)</string>
   <string name="onSlowGames">On slow games</string>
   <string name="always">Always</string>
   <string name="never">Never</string>
@@ -661,6 +666,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="simultaneousExhibitions">Simultaneous exhibitions</string>
   <string name="host">Host</string>
   <string name="hostColorX">Host colour: %s</string>
+  <string name="hostPlayerIndexX">Host Player: %s</string>
   <string name="createdSimuls">Newly created simuls</string>
   <string name="hostANewSimul">Host a new simul</string>
   <string name="noSimulFound">Simul not found</string>
@@ -920,4 +926,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="refundXpointsTimeControlY">Refund: %1$s %2$s rating points.</string>
   <string name="timeAlmostUp">Time is almost up!</string>
   <string name="clickToRevealEmailAddress">[Click to reveal email address]</string>
+  <string name="seeOurListOfBots">See our list of bots</string>
+  <string name="orUpper">OR</string>
+  <string name="playAgainstX">Play against %1$s</string>
 </resources>

@@ -21,6 +21,7 @@ export default class MoveOn {
 
   next = (force?: boolean): void => {
     const d = this.ctrl.data;
+    if (d.simul) this.storage.set(true);
     if (d.player.spectator || !game.isSwitchable(d) || game.isPlayerTurn(d) || !this.get()) return;
     if (force) this.redirect('/round-next/' + d.game.id);
     else if (d.simul) {

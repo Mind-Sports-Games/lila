@@ -12,7 +12,6 @@ import lila.db.dsl._
 import lila.user.User
 
 final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
-  val lib = GameLogic.Chess()
 
   implicit private val SimulStatusBSONHandler = tryHandler[SimulStatus](
     { case BSONInteger(v) => SimulStatus(v) toTry s"No such simul status: $v" },
@@ -23,7 +22,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
   implicit val VariantBSONHandler = new BSON[Variant] {
     def reads(r: Reader) = Variant(GameLogic(r.intD("gl")), r.int("v")) match {
       case Some(v) => v
-      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
+      case None    => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
     }
     def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLogic.id, "v" -> v.id)
   }
@@ -44,10 +43,10 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
       )
     def writes(w: BSON.Writer, o: SimulPairing) =
       $doc(
-        "player"    -> o.player,
-        "gameId"    -> o.gameId,
-        "status"    -> o.status,
-        "wins"      -> o.wins,
+        "player"          -> o.player,
+        "gameId"          -> o.gameId,
+        "status"          -> o.status,
+        "wins"            -> o.wins,
         "hostPlayerIndex" -> o.hostPlayerIndex.name
       )
   }
@@ -97,8 +96,8 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
       .find(
         // hits partial index hostSeenAt_-1
         createdSelect ++ featurableSelect ++ $doc(
-          "hostSeenAt" $gte DateTime.now.minusSeconds(12),
-          "createdAt" $gte DateTime.now.minusHours(1)
+          //"hostSeenAt" $gte DateTime.now.minusSeconds(12),
+          "createdAt" $gte DateTime.now.minusDays(30)
         )
       )
       .sort(createdSort)
@@ -110,6 +109,17 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
         case (acc, sim)                                       => sim :: acc
       }.reverse
     }
+
+  def allCreatedRecently: Fu[List[Simul]] =
+    coll
+      .find(
+        createdSelect ++ $doc(
+          "createdAt" $gte DateTime.now.minusDays(30)
+        )
+      )
+      .sort(createdSort)
+      .cursor[Simul]()
+      .list()
 
   def allStarted: Fu[List[Simul]] =
     coll
@@ -138,7 +148,7 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
       .one(
         $id(simul.id),
         $set(SimulBSONHandler writeTry simul get) ++
-          simul.estimatedStartAt.isEmpty??($unset("estimatedStartAt"))
+          simul.estimatedStartAt.isEmpty ?? ($unset("estimatedStartAt"))
       )
       .void
 

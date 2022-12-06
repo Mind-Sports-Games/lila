@@ -18,7 +18,7 @@ fieldnumber {
 }
 
 .is100,
-.i64 {
+.is64 {
   coords {
     display: flex;
 
@@ -96,16 +96,22 @@ fieldnumber {
       top: 0;
       width: 12px;
       text-align: left;
-      &.is64 coord {
+      &.is64.algebraic coord {
         transform: translateY(36%);
+      }
+      &.is64.fieldnumbers coord {
+        transform: translateY(18%);
       }
     }
     &.files {
       bottom: -15px;
       left: 0;
       text-align: center;
-      &.is64 coord {
+      &.is64.algebraic coord {
         transform: translateX(-4%);
+      }
+      &.is64.fieldnumbers coord {
+        transform: translateX(-26%);
       }
     }
     coord {

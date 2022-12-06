@@ -58,6 +58,11 @@
     &.premove {
       background-color: #555;
     }
+
+    &.selected-square {
+      background-color: #14551e80 !important;
+      @extend %box-radius;
+    }
   }
 
   &.usable {

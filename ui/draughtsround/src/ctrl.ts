@@ -86,11 +86,7 @@ export default class RoundController {
   private music?: any;
 
   constructor(readonly opts: RoundOpts, readonly redraw: Redraw) {
-    opts.data.steps = round.mergeSteps(
-      opts.data.steps,
-      this.isAlgebraic(opts.data) ? 1 : 0,
-      opts.data.game.variant.key
-    );
+    opts.data.steps = round.mergeSteps(opts.data.steps, this.coordSystem(opts.data));
     round.massage(opts.data);
 
     const d = (this.data = opts.data);
@@ -209,7 +205,7 @@ export default class RoundController {
       ghosts = countGhosts(s.fen),
       config: CgConfig = {
         fen: s.fen,
-        lastMove: util.uci2move(s.uci),
+        lastMove: util.uci2move(s.lidraughtsUci),
         turnPlayerIndex: (this.ply - (ghosts == 0 ? 0 : 1)) % 2 === 0 ? 'p1' : 'p2',
       };
     if (this.replaying()) this.draughtsground.stop();
@@ -241,12 +237,11 @@ export default class RoundController {
   };
 
   isAlgebraic = (d: RoundData): boolean => {
-    if (d.game.variant.board.key === '64') return true;
     return d.pref.coordSystem === 1 && d.game.variant.board.key === '64';
   };
 
-  coordSystem = (): number => {
-    return this.isAlgebraic(this.data) ? 1 : 0;
+  coordSystem = (d: RoundData): number => {
+    return this.isAlgebraic(d) ? 1 : d.pref.coordSystem;
   };
 
   isLate = () => this.replaying() && status.playing(this.data);
@@ -333,7 +328,6 @@ export default class RoundController {
     const d = this.data,
       playing = this.isPlaying(),
       ghosts = countGhosts(o.fen);
-
     d.game.turns = o.ply;
     d.game.player = o.ply % 2 === 0 ? 'p1' : 'p2';
     const playedPlayerIndex = o.ply % 2 === 0 ? 'p2' : 'p1',
@@ -349,7 +343,6 @@ export default class RoundController {
     if (!this.replaying()) {
       //Show next ply if we're following the head of the line (not replaying)
       this.ply = d.game.turns + (ghosts > 0 ? 1 : 0);
-
       if (o.role)
         this.draughtsground.newPiece(
           {
@@ -382,8 +375,9 @@ export default class RoundController {
         fen: o.fen,
         san: o.san,
         uci: o.uci,
+        lidraughtsUci: o.uci,
       },
-      this.coordSystem()
+      this.coordSystem(d)
     );
 
     this.justDropped = undefined;
@@ -432,7 +426,7 @@ export default class RoundController {
   }
 
   reload = (d: RoundData): void => {
-    d.steps = round.mergeSteps(d.steps, this.coordSystem(), d.game.variant.key);
+    d.steps = round.mergeSteps(d.steps, this.coordSystem(d));
     if (d.steps.length !== this.data.steps.length) this.ply = d.steps[d.steps.length - 1].ply;
     round.massage(d);
     this.data = d;
