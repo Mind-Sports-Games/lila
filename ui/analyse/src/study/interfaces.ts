@@ -262,15 +262,18 @@ export interface AnaMove {
   dest: string;
   fen: Fen;
   path: string;
-  variant?: VariantKey;
+  variant: VariantKey;
+  lib: number;
   ch?: string;
   promotion?: cg.Role;
 }
 
+
 export interface AnaDrop {
   role: cg.Role;
   pos: Key;
-  variant?: VariantKey;
+  variant: VariantKey;
+  lib: number;
   fen: Fen;
   path: string;
   ch?: string;

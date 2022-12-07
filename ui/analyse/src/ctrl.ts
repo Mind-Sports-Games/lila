@@ -279,6 +279,7 @@ export default class AnalyseCtrl {
     if (!this.embed && !defined(this.node.dests))
       this.socket.sendAnaDests({
         variant: this.data.game.variant.key,
+        lib: this.data.game.variant.lib,
         fen: this.node.fen,
         path: this.path,
       });
@@ -296,12 +297,11 @@ export default class AnalyseCtrl {
         : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length)
         ? playerIndex
         : undefined,
-      isChessOpsEnabled = util.isChessOpsEnabled(this.data.game.variant.key),
       config: ChessgroundConfig = {
         fen: node.fen,
         turnPlayerIndex: playerIndex,
         movable:
-          this.embed || !isChessOpsEnabled
+          this.embed
             ? {
                 playerIndex: undefined,
                 dests: new Map(),
@@ -470,6 +470,7 @@ export default class AnalyseCtrl {
         role: piece.role,
         pos,
         variant: this.data.game.variant.key,
+        lib: this.data.game.variant.lib,
         fen: this.node.fen,
         path: this.path,
       };
@@ -493,6 +494,7 @@ export default class AnalyseCtrl {
       orig,
       dest,
       variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
       fen: this.node.fen,
       path: this.path,
     };
@@ -532,7 +534,6 @@ export default class AnalyseCtrl {
   }
 
   addDests(dests: string, path: Tree.Path): void {
-    if (!util.isChessOpsEnabled(this.data.game.variant.key)) return;
     this.tree.addDests(dests, path);
     if (path === this.path) {
       this.showGround();
@@ -625,7 +626,7 @@ export default class AnalyseCtrl {
       variant: this.data.game.variant,
       standardMaterial:
         !this.data.game.initialFen ||
-        parseFen(this.data.game.initialFen).unwrap(
+        parseFen(util.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
           setup =>
             PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
@@ -634,8 +635,8 @@ export default class AnalyseCtrl {
                 Math.max(board['q-piece'].intersect(pieces).size() - 1, 0) +
                 Math.max(board['r-piece'].intersect(pieces).size() - 2, 0) +
                 Math.max(board['n-piece'].intersect(pieces).size() - 2, 0) +
-                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.lightSquares()).size() - 1, 0) +
-                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.darkSquares()).size() - 1, 0);
+                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.lightSquares64()).size() - 1, 0) +
+                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.darkSquares64()).size() - 1, 0);
               return board['p-piece'].intersect(pieces).size() + promotedPieces <= 8;
             }),
           _ => false
@@ -666,7 +667,7 @@ export default class AnalyseCtrl {
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    const setup = parseFen(node.fen).unwrap();
+    const setup = parseFen(util.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
     return setupPosition(playstrategyRules(this.data.game.variant.key), setup);
   }
 

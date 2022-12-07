@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { parseFen } from 'chessops/fen';
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
-import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore, getOwareScore } from './util';
+import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore, getOwareScore, variantToRules } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import { playable } from 'game';
@@ -115,7 +115,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             });
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
-              el.setCustomValidity(parseFen(el.value.trim()).isOk ? '' : 'Invalid FEN');
+              el.setCustomValidity(parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN');
             });
           },
           postpatch: (_, vnode) => {
