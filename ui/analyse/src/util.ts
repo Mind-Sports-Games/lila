@@ -81,7 +81,7 @@ export function onInsert<A extends HTMLElement>(f: (element: A) => void): Hooks 
 }
 
 export function readOnlyProp<A>(value: A): () => A {
-  return function (): A {
+  return function(): A {
     return value;
   };
 }
@@ -299,7 +299,7 @@ export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
 };
 
 export const variantToRules = (v: VariantKey): Rules => {
-  switch(v) {
+  switch (v) {
     case 'standard':
       return 'chess';
     case 'chess960':

@@ -294,23 +294,23 @@ export default class AnalyseCtrl {
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
-        ? this.bottomPlayerIndex()
-        : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
-        ? playerIndex
-        : undefined,
+          ? this.bottomPlayerIndex()
+          : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
+            ? playerIndex
+            : undefined,
       config: ChessgroundConfig = {
         fen: node.fen,
         turnPlayerIndex: playerIndex,
         movable:
           this.embed
             ? {
-                playerIndex: undefined,
-                dests: new Map(),
-              }
+              playerIndex: undefined,
+              dests: new Map(),
+            }
             : {
-                playerIndex: movablePlayerIndex,
-                dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
-              },
+              playerIndex: movablePlayerIndex,
+              dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
+            },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
       };
@@ -551,9 +551,9 @@ export default class AnalyseCtrl {
       (count.nodes >= 10 || count.comments > 0) &&
       !confirm(
         'Delete ' +
-          util.plural('move', count.nodes) +
-          (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
-          '?'
+        util.plural('move', count.nodes) +
+        (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
+        '?'
       )
     )
       return;
