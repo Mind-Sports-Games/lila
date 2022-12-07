@@ -21,6 +21,7 @@ export function valid(
   chessground: ChessgroundApi,
   data: AnalyseData,
   possibleDrops: string | undefined | null,
+  possibleDropsByRole: string | undefined | null,
   piece: cg.Piece,
   pos: Key
 ): boolean {
@@ -35,7 +36,7 @@ export function valid(
     return drops.includes(pos);
   } else {
     //otherwise shogi and use the newer dropsByRole data
-    const dropsByRole = readDropsByRole(data.possibleDropsByRole);
+    const dropsByRole = readDropsByRole(possibleDropsByRole);
     return dropsByRole.get(piece.role)?.includes(pos) || false;
   }
 }

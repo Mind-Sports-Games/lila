@@ -290,11 +290,12 @@ export default class AnalyseCtrl {
       playerIndex = this.turnPlayerIndex(),
       dests = chessUtil.readDests(this.node.dests),
       drops = chessUtil.readDrops(this.node.drops),
+      dropsByRole = chessUtil.readDrops(this.node.dropsByRole),
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
         ? this.bottomPlayerIndex()
-        : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length)
+        : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
         ? playerIndex
         : undefined,
       config: ChessgroundConfig = {
@@ -461,7 +462,7 @@ export default class AnalyseCtrl {
   }
 
   userNewPiece = (piece: cg.Piece, pos: Key): void => {
-    if (crazyValid(this.chessground, this.data, this.node.drops, piece, pos)) {
+    if (crazyValid(this.chessground, this.data, this.node.drops, this.node.dropsByRole, piece, pos)) {
       this.justPlayed = roleToChar(piece.role).toUpperCase() + '@' + pos;
       this.justDropped = piece.role;
       this.justCaptured = undefined;

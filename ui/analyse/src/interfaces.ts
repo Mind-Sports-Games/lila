@@ -51,7 +51,6 @@ export interface AnalyseData {
   };
   onlyDropsVariant: boolean;
   hasGameScore: boolean;
-  possibleDropsByRole?: string;
 }
 
 export interface AnalysePref {
