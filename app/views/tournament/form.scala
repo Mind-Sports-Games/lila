@@ -268,7 +268,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
     frag(
       form3.group(
         form("medleyIntervalOptions.medleyMinutes"),
-        "Medley Interval Time", //todo change translations
+        trans.medleyInterval(),
         klass = "medleyMinutes",
         help = trans.medleyIntervalDefinition().some,
         half = true,
@@ -294,7 +294,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
     frag(
       form3.checkbox(
         form("medleyIntervalOptions.balanceIntervals"),
-        "Balance Interval Times", //todo add to translations
+        trans.medleyBalanceIntervalTimes(),
         klass = "medleyIntervalOptions",
         help = raw(
           "Quicker/slower variants have shorter/longer interval times<br>Duration is still approx. (Interval Time * Intervals)"

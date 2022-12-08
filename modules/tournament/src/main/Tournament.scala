@@ -94,6 +94,8 @@ case class Tournament(
 
   def isMedley = medleyVariants.nonEmpty
 
+  def medleyDurationMinutes = medleyMinutes.getOrElse(0) * medleyNumIntervals.getOrElse(0)
+
   def finishesAt = startsAt plusMinutes minutes
 
   def secondsToStart = (startsAt.getSeconds - nowSeconds).toInt atLeast 0
@@ -154,6 +156,7 @@ case class Tournament(
     val quick   = 0.9
     val fastest = 0.75
     Map(
+      "standard"      -> medium,
       "chess960"      -> medium,
       "kingOfTheHill" -> quick,
       "threeCheck"    -> fastest,
@@ -228,7 +231,8 @@ case class Tournament(
   def currentPerfType: PerfType = PerfType(currentVariant, speed)
 
   def medleyVariantsInTournament: Option[List[Variant]] =
-    medleyVariants.map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
+    medleyVariants
+      .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
 
   //essentially take medleyVariants and discard ones not to display
   def medleyRounds: Option[List[Variant]] =

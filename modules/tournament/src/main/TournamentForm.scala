@@ -66,7 +66,7 @@ final class TournamentForm {
       name = tour.name.some,
       clockTime = tour.clock.limitInMinutes,
       clockIncrement = tour.clock.incrementSeconds,
-      minutes = tour.minutes,
+      minutes = if (tour.isMedley) tour.medleyDurationMinutes else tour.minutes,
       waitMinutes = none,
       startDate = tour.startsAt.some,
       variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
@@ -182,6 +182,7 @@ final class TournamentForm {
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
         .verifying("Increase tournament duration, or decrease game clock", _.sufficientDuration)
         .verifying("Reduce tournament duration, or increase game clock", _.excessiveDuration)
+        .verifying("Must have more than 1 game type for medley tournaments", _.validMedleySetup)
     )
 }
 
@@ -209,8 +210,6 @@ object TournamentForm {
   val medleyMinuteChoices  = options(medleyMinutes, "%d minute{s}")
   val medleyMinutesDefault = 10
 
-  val maxMedleyIntervals: Int = Variant.all.size
-
   val waitMinutes       = Seq(1, 2, 3, 5, 10, 15, 20, 30, 45, 60)
   val waitMinuteChoices = options(waitMinutes, "%d minute{s}")
   val waitMinuteDefault = 5
@@ -222,6 +221,8 @@ object TournamentForm {
   val positionDefault = StartingPosition.initial.fen
 
   val validVariants = Variant.all.filter(!_.fromPositionVariant)
+
+  val maxMedleyIntervals: Int = validVariants.size
 
   def guessVariant(from: String): Option[Variant] =
     validVariants.find { v =>
@@ -289,6 +290,8 @@ private[tournament] case class TournamentSetup(
   def sufficientDuration = estimateNumberOfGamesOneCanPlay >= 3
   def excessiveDuration  = estimateNumberOfGamesOneCanPlay <= 150
 
+  def validMedleySetup = !isMedley || generateMedleyVariants.size > 1
+
   def isPrivate = password.isDefined || conditions.teamMember.isDefined
 
   // update all fields and use default values for missing fields
@@ -299,7 +302,7 @@ private[tournament] case class TournamentSetup(
       .copy(
         name = name | old.name,
         clock = if (old.isCreated) clockConfig else old.clock,
-        minutes = minutes,
+        minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
         variant = newVariant,
         medleyVariants =
