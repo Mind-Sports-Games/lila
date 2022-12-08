@@ -247,7 +247,7 @@ export default class RoundController {
     s: State
   ): void => {
     if (activePlayerIndex) {
-      return setDropMode(s, util.onlyDropsVariantPiece(s.variant as VariantKey, currentPlayerIndex));
+      return setDropMode(s, chessUtil.onlyDropsVariantPiece(s.variant as VariantKey, currentPlayerIndex));
     } else {
       return cancelDropMode(s);
     }

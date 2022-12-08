@@ -79,7 +79,7 @@ export function makeConfig(ctrl: RoundController): Config {
       active: data.onlyDropsVariant && playing ? true : false,
       piece:
         data.onlyDropsVariant && playing
-          ? util.onlyDropsVariantPiece(data.game.variant.key, turnPlayerIndex)
+          ? chessUtil.onlyDropsVariantPiece(data.game.variant.key, turnPlayerIndex)
           : undefined,
       events: {
         cancel: hooks.onCancelDropMode,

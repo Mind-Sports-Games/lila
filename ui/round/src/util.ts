@@ -183,16 +183,6 @@ export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisVariants.indexOf(variant) == -1;
 }
 
-export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): cg.Piece | undefined {
-  switch (variant) {
-    case 'flipello10':
-    case 'flipello':
-      return { playerIndex: turnPlayerIndex, role: 'p-piece' };
-    default:
-      return undefined;
-  }
-}
-
 export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {
   if (onlyDropsVariant) {
     if (uci && uci[1] === '@') {

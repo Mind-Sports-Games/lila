@@ -18,6 +18,7 @@ import { Autoplay, AutoplayDelay } from './autoplay';
 import { build as makeTree, path as treePath, ops as treeOps, TreeWrapper } from 'tree';
 import { compute as computeAutoShapes } from './autoShape';
 import { Config as ChessgroundConfig } from 'chessground/config';
+import { setDropMode/*, cancelDropMode */} from 'chessground/drop';
 import { ActionMenuCtrl } from './actionMenu';
 import { ctrl as cevalCtrl, isEvalBetter, sanIrreversible, CevalCtrl, Work as CevalWork, CevalOpts } from 'ceval';
 import { ctrl as treeViewCtrl, TreeView } from './treeView/treeView';
@@ -271,6 +272,17 @@ export default class AnalyseCtrl {
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
       this.setAutoShapes();
+      let playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
+      setDropMode(
+        cg.state,
+        chessUtil.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex)
+      );
+      cg.set({
+        dropmode: {
+          showDropDests: true,
+          dropDests: chessUtil.readDropsByRole(this.node.dropsByRole)
+        },
+      });
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
     });
   }
