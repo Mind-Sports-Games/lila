@@ -1,4 +1,4 @@
-import { altCastles } from 'chess';
+import { altCastles } from 'stratutils';
 import { parseUci } from 'chessops/util';
 import { path as pathOps } from 'tree';
 import { Vm, Puzzle, MoveTest } from './interfaces';

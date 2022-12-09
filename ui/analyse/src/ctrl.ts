@@ -1,6 +1,6 @@
 import * as cg from 'chessground/types';
 import { oppositeOrientation, oppositeOrientationForLOA, orientationForLOA } from 'chessground/util';
-import * as chessUtil from 'chess';
+import * as stratUtils from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
 import * as promotion from './promotion';
@@ -18,7 +18,7 @@ import { Autoplay, AutoplayDelay } from './autoplay';
 import { build as makeTree, path as treePath, ops as treeOps, TreeWrapper } from 'tree';
 import { compute as computeAutoShapes } from './autoShape';
 import { Config as ChessgroundConfig } from 'chessground/config';
-import { setDropMode/*, cancelDropMode */} from 'chessground/drop';
+import { setDropMode } from 'chessground/drop';
 import { ActionMenuCtrl } from './actionMenu';
 import { ctrl as cevalCtrl, isEvalBetter, sanIrreversible, CevalCtrl, Work as CevalWork, CevalOpts } from 'ceval';
 import { ctrl as treeViewCtrl, TreeView } from './treeView/treeView';
@@ -275,12 +275,12 @@ export default class AnalyseCtrl {
       let playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
       setDropMode(
         cg.state,
-        chessUtil.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex)
+        stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex)
       );
       cg.set({
         dropmode: {
           showDropDests: true,
-          dropDests: chessUtil.readDropsByRole(this.node.dropsByRole)
+          dropDests: stratUtils.readDropsByRole(this.node.dropsByRole)
         },
       });
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
@@ -300,9 +300,9 @@ export default class AnalyseCtrl {
   makeCgOpts(): ChessgroundConfig {
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
-      dests = chessUtil.readDests(this.node.dests),
-      drops = chessUtil.readDrops(this.node.drops),
-      dropsByRole = chessUtil.readDrops(this.node.dropsByRole),
+      dests = stratUtils.readDests(this.node.dests),
+      drops = stratUtils.readDrops(this.node.drops),
+      dropsByRole = stratUtils.readDrops(this.node.dropsByRole),
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice

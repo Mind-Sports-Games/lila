@@ -1,5 +1,5 @@
 import { dragNewPiece } from 'chessground/drag';
-import { readDrops, readDropsByRole } from 'chess';
+import { readDrops, readDropsByRole } from 'stratutils';
 import AnalyseCtrl from '../ctrl';
 import * as cg from 'chessground/types';
 import { Api as ChessgroundApi } from 'chessground/api';

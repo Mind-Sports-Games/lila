@@ -177,10 +177,10 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction', 'scrambledEggs', 'flipello', 'flipello10', 'oware'];
+const noAnalysisBoardVariants: VariantKey[] = [];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
-  return noAnalysisVariants.indexOf(variant) == -1;
+  return noAnalysisBoardVariants.indexOf(variant) == -1;
 }
 
 export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {

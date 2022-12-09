@@ -1,4 +1,4 @@
-import { NotationStyle } from 'chess';
+import { NotationStyle } from 'stratutils';
 
 interface ExtendedMoveInfo {
   san: string;

@@ -97,3 +97,7 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
   }
 }
 
+const noFishnetVariants: VariantKey[] = ['linesOfAction', 'scrambledEggs', 'flipello', 'flipello10', 'oware'];
+export function allowFishnetForVariant(variant: VariantKey) {
+  return noFishnetVariants.indexOf(variant) == -1;
+}

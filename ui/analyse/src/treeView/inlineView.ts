@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { fixCrazySan, notationStyle } from 'chess';
+import { fixCrazySan, notationStyle } from 'stratutils';
 import { path as treePath, ops as treeOps } from 'tree';
 import * as moveView from '../moveView';
 import AnalyseCtrl from '../ctrl';

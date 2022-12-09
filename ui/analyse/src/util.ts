@@ -1,5 +1,5 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
-import { fixCrazySan } from 'chess';
+import { fixCrazySan } from 'stratutils';
 import * as cg from 'chessground/types';
 import { Rules } from 'chessops/types';
 
