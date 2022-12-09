@@ -146,8 +146,8 @@ trait BaseConfig {
   ).map(_.id))).toMap
 
   //concat ensures ordering that FromPosition is the last element
-  val aiVariants = GameFamily.all.map(gf => (gf.id, (
-    gf.variants.filter(v => v.aiVariant && !v.fromPositionVariant) :::
+  val fishnetVariants = GameFamily.all.map(gf => (gf.id, (
+    gf.variants.filter(v => v.hasFishnet && !v.fromPositionVariant) :::
     gf.variants.filter(_.fromPositionVariant)
   ).map(_.id))).toMap
 
