@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { parseFen } from 'chessops/fen';
+import { parseFen } from 'stratops/fen';
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
 import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore, getOwareScore, variantToRules } from './util';

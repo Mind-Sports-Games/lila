@@ -1,7 +1,7 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
 import { fixCrazySan } from 'stratutils';
 import * as cg from 'chessground/types';
-import { Rules } from 'chessops/types';
+import { Rules } from 'stratops/types';
 
 export { autolink, innerHTML, enrichText, richHTML, toYouTubeEmbed, toTwitchEmbed } from 'common/richText';
 
@@ -261,8 +261,8 @@ export function allowCevalForVariant(variant: VariantKey) {
   return noCevalVariants.indexOf(variant) == -1;
 }
 
-// TODO: Right now chessops can't parse the fens for the above variants.
-export const isChessOpsEnabled = allowCevalForVariant;
+// TODO: Right now stratops can't parse the fens for the above variants.
+export const isStratOpsEnabled = allowCevalForVariant;
 
 export type LexicalUci = {
   from: cg.Key;
