@@ -62,6 +62,7 @@ export interface AnalysePref {
   destination?: boolean;
   highlight?: boolean;
   animationDuration?: number;
+  mancalaMove: boolean;
 }
 
 type Piece = {

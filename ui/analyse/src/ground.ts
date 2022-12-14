@@ -85,23 +85,23 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
         baseUrl:
           variantKey === 'shogi' || variantKey === 'minishogi'
             ? 'https://playstrategy.org/assets/piece/shogi/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
-              '/'
+            d.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
+            '/'
             : variantKey === 'flipello' || variantKey === 'flipello10'
-            ? 'https://playstrategy.org/assets/piece/flipello/' +
+              ? 'https://playstrategy.org/assets/piece/flipello/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
               '/'
-            : variantKey === 'oware'
-            ? 'https://playstrategy.org/assets/piece/mancala/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'mancala')[0].name +
-              '/'
-            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
-            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
-              '/'
-            : 'https://playstrategy.org/assets/piece/chess/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-              '/',
+              : variantKey === 'oware'
+                ? 'https://playstrategy.org/assets/piece/mancala/' +
+                d.pref.pieceSet.filter(ps => ps.gameFamily === 'mancala')[0].name +
+                '/'
+                : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
+                  ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                  d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                  '/'
+                  : 'https://playstrategy.org/assets/piece/chess/' +
+                  d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                  '/',
       },
     },
     highlight: {
@@ -115,6 +115,8 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     dimensions: d.game.variant.boardSize,
     variant: variantKey,
     chess960: variantKey == 'chess960',
+    onlyDropsVariant: d.onlyDropsVariant,
+    singleClickMoveVariant: d.game.variant.key === 'oware' && d.pref.mancalaMove,
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
   return config;
