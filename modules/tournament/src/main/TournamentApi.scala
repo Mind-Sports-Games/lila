@@ -257,7 +257,7 @@ final class TournamentApi(
     }
 
   private[tournament] def newMedleyRound(tour: Tournament)(implicit lang: Lang = defaultLang) = {
-    val balanceText = if (tour.medleyBalanceIntervals) s" (for ${tour.currentIntervalTime} minutes)" else ""
+    val balanceText = if (tour.isMedley) s" (for ${tour.currentIntervalTime} minutes)" else ""
     tournamentRepo.setMedleyVariant(tour.id, tour.currentVariant)
     socket.systemChat(
       tour.id,

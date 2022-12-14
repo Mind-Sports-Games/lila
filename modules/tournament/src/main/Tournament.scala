@@ -96,6 +96,11 @@ case class Tournament(
 
   def medleyDurationMinutes = medleyMinutes.getOrElse(0) * medleyNumIntervals.getOrElse(0)
 
+  def meldeySecondsToFinishInterval =
+    medleyIntervalSeconds.fold(0)(
+      (secondsToFinish - _.drop(medleyRound.getOrElse(0) + 1).sum)
+    )
+
   def finishesAt = startsAt plusMinutes minutes
 
   def secondsToStart = (startsAt.getSeconds - nowSeconds).toInt atLeast 0
@@ -116,6 +121,8 @@ case class Tournament(
             .size
         )
     } else None
+
+  def finalMedleyVariant: Boolean = medleyRound.getOrElse(-99) == medleyNumIntervals.getOrElse(0) - 1
 
   def medleyIntervalSeconds: Option[List[Int]] =
     if (medleyBalanceIntervals) {
@@ -234,10 +241,6 @@ case class Tournament(
     medleyVariants
       .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
 
-  //essentially take medleyVariants and discard ones not to display
-  def medleyRounds: Option[List[Variant]] =
-    medleyVariantsInTournament.map(_.drop(medleyRound.getOrElse(0)))
-
   def isStillWorthEntering =
     isPlayStrategyHeadline || isMarathonOrUnique || {
       secondsToFinish > (minutes * 60 / 3).atMost(20 * 60)
@@ -278,6 +281,11 @@ case class Tournament(
 
   def clockStatus =
     secondsToFinish pipe { s =>
+      "%02d:%02d".format(s / 60, s % 60)
+    }
+
+  def medleyClockStatus =
+    meldeySecondsToFinishInterval pipe { s =>
       "%02d:%02d".format(s / 60, s % 60)
     }
 

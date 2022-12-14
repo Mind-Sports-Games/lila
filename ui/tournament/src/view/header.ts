@@ -17,11 +17,26 @@ function hasFreq(freq, d) {
 function clock(d): VNode | undefined {
   if (d.isFinished) return;
   if (d.secondsToFinish)
-    return h('div.clock', [
-      h('div.time', {
-        hook: startClock(d.secondsToFinish),
-      }),
-    ]);
+    if (d.medley && d.secondsToFinish != d.secondsToFinishInterval) {
+      return h('div.clock', [
+        h('div.time.medley-interval', {
+          hook: startClock(d.secondsToFinish),
+        }),
+        h('div.medley-interval.medley-extra-clock', [
+          h('span.time', '('),
+          h('span.time.medley-interval-time', {
+            hook: startClock(d.secondsToFinishInterval),
+          }),
+          h('span.time', ')'),
+        ]),
+      ]);
+    } else {
+      return h('div.clock', [
+        h('div.time', {
+          hook: startClock(d.secondsToFinish),
+        }),
+      ]);
+    }
   if (d.secondsToStart) {
     if (d.secondsToStart > oneDayInSeconds)
       return h('div.clock', [
