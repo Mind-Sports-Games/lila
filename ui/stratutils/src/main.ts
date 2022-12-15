@@ -82,9 +82,9 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
 }
 
 interface Piece {
-    role: Role;
-    playerIndex: PlayerIndex;
-    promoted?: boolean;
+  role: Role;
+  playerIndex: PlayerIndex;
+  promoted?: boolean;
 }
 
 export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): Piece | undefined {
