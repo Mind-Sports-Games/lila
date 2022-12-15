@@ -268,7 +268,6 @@ export interface AnaMove {
   promotion?: cg.Role;
 }
 
-
 export interface AnaDrop {
   role: cg.Role;
   pos: Key;

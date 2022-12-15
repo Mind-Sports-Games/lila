@@ -2,7 +2,7 @@ import type Highcharts from 'highcharts';
 
 import AnalyseCtrl from './ctrl';
 import { baseUrl } from './util';
-import { allowFishnetForVariant } from 'stratutils'
+import { allowFishnetForVariant } from 'stratutils';
 import { defined } from 'common';
 import modal from 'common/modal';
 import { formToXhr } from 'common/xhr';

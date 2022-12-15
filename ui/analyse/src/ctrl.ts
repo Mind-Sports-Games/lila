@@ -273,14 +273,11 @@ export default class AnalyseCtrl {
       cg.set(this.makeCgOpts());
       this.setAutoShapes();
       const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
-      setDropMode(
-        cg.state,
-        stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex)
-      );
+      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
       cg.set({
         dropmode: {
           showDropDests: true,
-          dropDests: stratUtils.readDropsByRole(this.node.dropsByRole)
+          dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
         },
       });
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
@@ -306,20 +303,20 @@ export default class AnalyseCtrl {
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
-          ? this.bottomPlayerIndex()
-          : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
-            ? playerIndex
-            : undefined,
+        ? this.bottomPlayerIndex()
+        : !this.embed &&
+          ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
+        ? playerIndex
+        : undefined,
       config: ChessgroundConfig = {
         fen: node.fen,
         turnPlayerIndex: playerIndex,
-        movable:
-          this.embed
-            ? {
+        movable: this.embed
+          ? {
               playerIndex: undefined,
               dests: new Map(),
             }
-            : {
+          : {
               playerIndex: movablePlayerIndex,
               dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
             },
@@ -563,9 +560,9 @@ export default class AnalyseCtrl {
       (count.nodes >= 10 || count.comments > 0) &&
       !confirm(
         'Delete ' +
-        util.plural('move', count.nodes) +
-        (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
-        '?'
+          util.plural('move', count.nodes) +
+          (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
+          '?'
       )
     )
       return;

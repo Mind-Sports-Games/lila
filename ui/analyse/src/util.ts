@@ -81,7 +81,7 @@ export function onInsert<A extends HTMLElement>(f: (element: A) => void): Hooks 
 }
 
 export function readOnlyProp<A>(value: A): () => A {
-  return function(): A {
+  return function (): A {
     return value;
   };
 }
@@ -343,4 +343,4 @@ export const variantToRules = (v: VariantKey): Rules => {
     case 'oware':
       return 'oware';
   }
-}
+};
