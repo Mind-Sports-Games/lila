@@ -272,7 +272,7 @@ export default class AnalyseCtrl {
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
       this.setAutoShapes();
-      let playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
+      const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
       setDropMode(
         cg.state,
         stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex)
