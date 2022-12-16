@@ -80,3 +80,24 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
     ? 'man'
     : 'san';
 }
+
+interface Piece {
+  role: Role;
+  playerIndex: PlayerIndex;
+  promoted?: boolean;
+}
+
+export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): Piece | undefined {
+  switch (variant) {
+    case 'flipello10':
+    case 'flipello':
+      return { playerIndex: turnPlayerIndex, role: 'p-piece' };
+    default:
+      return undefined;
+  }
+}
+
+const noFishnetVariants: VariantKey[] = ['linesOfAction', 'scrambledEggs', 'flipello', 'flipello10', 'oware'];
+export function allowFishnetForVariant(variant: VariantKey) {
+  return noFishnetVariants.indexOf(variant) == -1;
+}

@@ -1,9 +1,9 @@
-import { Chess } from 'chessops/chess';
-import { INITIAL_FEN, makeFen, parseFen } from 'chessops/fen';
-import { makeSan, parseSan } from 'chessops/san';
-import { NormalMove } from 'chessops/types';
-import { board } from 'chessops/debug';
-import { defaultSetup, fen, makeUci, parseUci } from 'chessops';
+import { Chess } from 'stratops/chess';
+import { INITIAL_FEN, makeFen, parseFen } from 'stratops/fen';
+import { makeSan, parseSan } from 'stratops/san';
+import { NormalMove } from 'stratops/types';
+import { board } from 'stratops/debug';
+import { defaultSetup, fen, makeUci, parseUci } from 'stratops';
 
 export default function (token: string) {
   const root = document.getElementById('dgt-play-zone') as HTMLDivElement;
@@ -63,7 +63,7 @@ export default function (token: string) {
   const gameInfoMap = new Map(); //A collection of key values to store game immutable information of all open games
   const gameStateMap = new Map(); //A collection of key values to store the changing state of all open games
   const gameConnectionMap = new Map<string, { connected: boolean; lastEvent: number }>(); //A collection of key values to store the network status of a game
-  const gameChessBoardMap = new Map<string, Chess>(); //A collection of chessops Boards representing the current board of the games
+  const gameChessBoardMap = new Map<string, Chess>(); //A collection of stratops Boards representing the current board of the games
   let eventSteamStatus = { connected: false, lastEvent: time.getTime() }; //An object to store network status of the main eventStream
   const keywordsBase = [
     'p1',
@@ -350,7 +350,7 @@ export default function (token: string) {
               gameStateMap.set(gameId, data.state);
               //Update the ChessBoard to the ChessBoard Map
               initializeChessBoard(gameId, data);
-              //Log the state. Note that we are doing this after storing the state and initializing the chessops board
+              //Log the state. Note that we are doing this after storing the state and initializing the stratops board
               logGameState(gameId);
               //Call chooseCurrentGame to determine if this stream will be the new current game
               chooseCurrentGame();
@@ -360,7 +360,7 @@ export default function (token: string) {
               updateChessBoard(gameId, gameStateMap.get(gameId), data);
               //Update game state with most recent state
               gameStateMap.set(gameId, data);
-              //Log the state. Note that we are doing this after storing the state and updating the chessops board
+              //Log the state. Note that we are doing this after storing the state and updating the stratops board
               //Update for Multiple Game Support. Log only current game
               if (gameId == currentGameId) {
                 logGameState(gameId);
@@ -468,7 +468,7 @@ export default function (token: string) {
       let index = -1;
       for (let i = 0; i < playableGames.length; i++) {
         //makeBoardFen return only the board, ideal for comparison
-        const tmpFEN = fen.makeBoardFen(gameChessBoardMap.get(playableGames[i].gameId)!.board);
+        const tmpFEN = fen.makeBoardFen('chess')(gameChessBoardMap.get(playableGames[i].gameId)!.board);
         if (verbose) console.log(`GameId: ${playableGames[i].gameId} FEN: ${tmpFEN}`);
         if (tmpFEN == lastLiveChessBoard) {
           index = i;
@@ -523,14 +523,14 @@ export default function (token: string) {
     try {
       let initialFen: string = INITIAL_FEN;
       if (data.initialFen != 'startpos') initialFen = data.initialFen;
-      const setup = parseFen(initialFen).unwrap();
+      const setup = parseFen('chess')(initialFen).unwrap();
       const chess: Chess = Chess.fromSetup(setup).unwrap();
       const moves = data.state.moves.split(' ');
       for (let i = 0; i < moves.length; i++) {
         if (moves[i] != '') {
           //Make any move that may have been already played on the ChessBoard. Useful when reconnecting
           const uciMove = <NormalMove>parseUci(moves[i]);
-          const normalizedMove = chess.normalizeMove(uciMove); //This is because chessops uses UCI_960
+          const normalizedMove = chess.normalizeMove(uciMove); //This is because stratops uses UCI_960
           if (normalizedMove && chess.isLegal(normalizedMove)) chess.play(normalizedMove);
         }
       }
@@ -568,7 +568,7 @@ export default function (token: string) {
           if (moves[i] != '') {
             //Make the new move
             const uciMove = <NormalMove>parseUci(moves[i]);
-            const normalizedMove = chess.normalizeMove(uciMove); //This is because chessops uses UCI_960
+            const normalizedMove = chess.normalizeMove(uciMove); //This is because stratops uses UCI_960
             if (normalizedMove && chess.isLegal(normalizedMove)) {
               //This is a good chance to get the move in SAN format
               if (chess.turn == 'p2')
@@ -749,7 +749,7 @@ export default function (token: string) {
     if (gameStateMap.has(gameId) && gameInfoMap.has(gameId)) {
       const gameInfo = gameInfoMap.get(gameId);
       const gameState = gameStateMap.get(gameId);
-      //This is the original code that does not used chessops objects and can be used to get the UCI move but not SAN.
+      //This is the original code that does not used stratops objects and can be used to get the UCI move but not SAN.
       if (String(gameState.moves).length > 1) {
         const moves = gameState.moves.split(' ');
         if (verbose)
@@ -931,7 +931,7 @@ export default function (token: string) {
             SANMove = String(message.param.san[message.param.san.length - i]).trim();
             if (verbose) console.info('onmessage - SANMove = ' + SANMove);
             const moveObject = <NormalMove | undefined>parseSan(localBoard, SANMove); //get move from DGT LiveChess
-            //if valid move on local chessops
+            //if valid move on local stratops
             if (moveObject && localBoard.isLegal(moveObject)) {
               if (verbose) console.info('onmessage - Move is legal');
               //if received move.playerIndex == this.currentGamePlayerIndex
@@ -1023,10 +1023,10 @@ export default function (token: string) {
   /**
    * Synchronizes the position on PlayStrategy with the position on the board
    * If the position does not match, no moves will be received from LiveChess
-   * @param chess - The chessops Chess object with the position on PlayStrategy
+   * @param chess - The stratops Chess object with the position on PlayStrategy
    */
   async function sendBoardToLiveChess(chess: Chess) {
-    const fen = makeFen(chess.toSetup());
+    const fen = makeFen('chess')(chess.toSetup());
     const setupMessage = {
       id: 3,
       call: 'call',
@@ -1061,7 +1061,7 @@ export default function (token: string) {
    * If more than one game is being played, it will ask which game to connect to,
    * waiting for user input. This block causes the method to become async
    *
-   * @param {Object} boardMove - The move in chessops format or string if in playstrategy format
+   * @param {Object} boardMove - The move in stratops format or string if in playstrategy format
    */
   async function validateAndSendBoardMove(boardMove: NormalMove) {
     //While there is not an active game, keep trying to find one so the move is not lost
@@ -1184,9 +1184,9 @@ export default function (token: string) {
 
   /**
    * Compare moves in different formats.
-   * Fixes issue in which chessops return UCI_960 for castling instead of plain UCI
+   * Fixes issue in which stratops return UCI_960 for castling instead of plain UCI
    * @param lastMove - the move a string received from playstrategy
-   * @param moveObject - the move in chessops format after applyng the SAN to localBoard
+   * @param moveObject - the move in stratops format after applyng the SAN to localBoard
    * @returns {Boolean} - True if the moves are the same
    */
   function compareMoves(lastMove: string, moveObject: NormalMove): boolean {

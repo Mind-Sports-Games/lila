@@ -2,10 +2,10 @@ import { h, VNode } from 'snabbdom';
 import { Pieces, Rank, File, files } from 'chessground/types';
 import { invRanks, allKeys } from 'chessground/util';
 import { Setting, makeSetting } from './setting';
-import { parseFen } from 'chessops/fen';
-import { Chess } from 'chessops/chess';
-import { chessgroundDests } from 'chessops/compat';
-import { SquareName } from 'chessops/types';
+import { parseFen } from 'stratops/fen';
+import { Chess } from 'stratops/chess';
+import { chessgroundDests } from 'stratops/compat';
+import { SquareName } from 'stratops/types';
 
 export type Style = 'uci' | 'san' | 'literate' | 'nato' | 'anna';
 export type PieceStyle = 'letter' | 'white uppercase letter' | 'name' | 'white uppercase name';
@@ -622,7 +622,9 @@ export function possibleMovesHandler(playerIndex: PlayerIndex, fen: () => string
 
     // possible ineffecient to reparse fen; but seems to work when it is AND when it is not the users' turn.
     const possibleMoves = chessgroundDests(
-      Chess.fromSetup(parseFen(fen().replace(' ' + opponentTurnFen + ' ', ' ' + myTurnFen + ' ')).unwrap()).unwrap()
+      Chess.fromSetup(
+        parseFen('chess')(fen().replace(' ' + opponentTurnFen + ' ', ' ' + myTurnFen + ' ')).unwrap()
+      ).unwrap()
     )
       .get($pos)
       ?.map(i => {

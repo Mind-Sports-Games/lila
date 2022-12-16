@@ -188,13 +188,13 @@ trait SetupHelper { self: I18nHelper =>
       lang: Lang
   ): List[(SelectChoice, List[SelectChoice])] =
     GameFamily.all
-      .filter(_.aiEnabled)
+      .filter(_.hasFishnet)
       .map(gf =>
         (
           translatedGameFamilyChoice(gf),
           translatedVariantChoicesByGameFamily(gf, encodeId) :::
             gf.variants
-              .filter(v => v != gf.defaultVariant && !v.fromPositionVariant && v.aiVariant)
+              .filter(v => v != gf.defaultVariant && !v.fromPositionVariant && v.hasFishnet)
               .map(variantTupleId) ::: gf.variants
               .filter(
                 _.fromPositionVariant

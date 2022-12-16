@@ -13,7 +13,8 @@ interface AnaDestsReq {
   fen: Fen;
   path: string;
   ch?: string;
-  variant?: VariantKey;
+  variant: VariantKey;
+  lib: number;
 }
 
 interface MoveOpts {

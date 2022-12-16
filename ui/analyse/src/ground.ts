@@ -115,6 +115,8 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     dimensions: d.game.variant.boardSize,
     variant: variantKey,
     chess960: variantKey == 'chess960',
+    onlyDropsVariant: d.onlyDropsVariant,
+    singleClickMoveVariant: d.game.variant.key === 'oware' && d.pref.mancalaMove,
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
   return config;

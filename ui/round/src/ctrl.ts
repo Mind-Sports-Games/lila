@@ -31,7 +31,7 @@ import { ctrl as makeKeyboardMove, KeyboardMove } from './keyboardMove';
 import * as renderUser from './view/user';
 import * as cevalSub from './cevalSub';
 import * as keyboard from './keyboard';
-import * as chessUtil from 'chess';
+import * as stratUtils from 'stratutils';
 
 import {
   RoundOpts,
@@ -247,7 +247,7 @@ export default class RoundController {
     s: State
   ): void => {
     if (activePlayerIndex) {
-      return setDropMode(s, util.onlyDropsVariantPiece(s.variant as VariantKey, currentPlayerIndex));
+      return setDropMode(s, stratUtils.onlyDropsVariantPiece(s.variant as VariantKey, currentPlayerIndex));
     } else {
       return cancelDropMode(s);
     }
@@ -299,7 +299,7 @@ export default class RoundController {
         dests: util.parsePossibleMoves(this.data.possibleMoves),
       };
     (config.dropmode = {
-      dropDests: this.isPlaying() ? chessUtil.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
+      dropDests: this.isPlaying() ? stratUtils.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
     }),
       this.chessground.set(config);
     if (this.data.onlyDropsVariant) {
@@ -490,7 +490,7 @@ export default class RoundController {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves) : new Map(),
         },
         dropmode: {
-          dropDests: playing ? chessUtil.readDropsByRole(d.possibleDropsByRole) : new Map(),
+          dropDests: playing ? stratUtils.readDropsByRole(d.possibleDropsByRole) : new Map(),
         },
         check: !!o.check,
       });

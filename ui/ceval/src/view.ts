@@ -2,13 +2,13 @@ import * as winningChances from './winningChances';
 import { defined } from 'common';
 import { Eval, CevalCtrl, ParentCtrl, NodeEvals } from './types';
 import { h, VNode } from 'snabbdom';
-import { Position } from 'chessops/chess';
-import { playstrategyRules } from 'chessops/compat';
-import { makeSanAndPlay } from 'chessops/san';
-import { opposite, parseUci } from 'chessops/util';
-import { parseFen, makeBoardFen } from 'chessops/fen';
+import { Position } from 'stratops/chess';
+import { playstrategyRules } from 'stratops/compat';
+import { makeSanAndPlay } from 'stratops/san';
+import { opposite, parseUci } from 'stratops/util';
+import { parseFen, makeBoardFen } from 'stratops/fen';
 import { renderEval } from './util';
-import { setupPosition } from 'chessops/variant';
+import { setupPosition } from 'stratops/variant';
 
 let gaugeLast = 0;
 const gaugeTicks: VNode[] = [...Array(8).keys()].map(i =>
@@ -288,7 +288,7 @@ export function renderPvs(ctrl: ParentCtrl): VNode | undefined {
   if (!instance.allowed() || !instance.possible || !instance.enabled()) return;
   const multiPv = parseInt(instance.multiPv()),
     node = ctrl.getNode(),
-    setup = parseFen(node.fen).unwrap();
+    setup = parseFen('chess')(node.fen).unwrap();
   let pvs: Tree.PvData[],
     threat = false,
     pvMoves: (string | null)[],
@@ -398,7 +398,7 @@ function renderPvWrapToggle(): VNode {
 
 function renderPvMoves(pos: Position, pv: Uci[]): VNode[] {
   const vnodes: VNode[] = [];
-  let key = makeBoardFen(pos.board);
+  let key = makeBoardFen('chess')(pos.board);
   for (let i = 0; i < pv.length; i++) {
     let text;
     if (pos.turn === 'p1') {
@@ -411,7 +411,7 @@ function renderPvMoves(pos: Position, pv: Uci[]): VNode[] {
     }
     const uci = pv[i];
     const san = makeSanAndPlay(pos, parseUci(uci)!);
-    const fen = makeBoardFen(pos.board); // Chessground uses only board fen
+    const fen = makeBoardFen('chess')(pos.board); // Chessground uses only board fen
     if (san === '--') {
       break;
     }

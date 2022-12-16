@@ -177,20 +177,10 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction', 'scrambledEggs', 'flipello', 'flipello10', 'oware'];
+const noAnalysisBoardVariants: VariantKey[] = [];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
-  return noAnalysisVariants.indexOf(variant) == -1;
-}
-
-export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): cg.Piece | undefined {
-  switch (variant) {
-    case 'flipello10':
-    case 'flipello':
-      return { playerIndex: turnPlayerIndex, role: 'p-piece' };
-    default:
-      return undefined;
-  }
+  return noAnalysisBoardVariants.indexOf(variant) == -1;
 }
 
 export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {

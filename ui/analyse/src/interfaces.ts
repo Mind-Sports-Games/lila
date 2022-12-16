@@ -51,7 +51,6 @@ export interface AnalyseData {
   };
   onlyDropsVariant: boolean;
   hasGameScore: boolean;
-  possibleDropsByRole?: string;
 }
 
 export interface AnalysePref {
@@ -63,6 +62,7 @@ export interface AnalysePref {
   destination?: boolean;
   highlight?: boolean;
   animationDuration?: number;
+  mancalaMove: boolean;
 }
 
 type Piece = {

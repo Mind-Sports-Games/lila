@@ -18,6 +18,7 @@ sealed trait Node {
   def destsUci: Option[List[String]]
   def captureLength: Option[Int]
   def drops: Option[List[Pos]]
+  def dropsByRole: Option[Map[Role, List[Pos]]]
   def eval: Option[Eval]
   def shapes: Node.Shapes
   def comments: Node.Comments
@@ -52,6 +53,7 @@ case class Root(
     destsUci: Option[List[String]] = None,
     captureLength: Option[Int] = None,
     drops: Option[List[Pos]] = None,
+    dropsByRole: Option[Map[Role, List[Pos]]] = None,
     eval: Option[Eval] = None,
     shapes: Node.Shapes = Node.Shapes(Nil),
     comments: Node.Comments = Node.Comments(Nil),
@@ -84,6 +86,7 @@ case class Branch(
     destsUci: Option[List[String]] = None,
     captureLength: Option[Int] = None,
     drops: Option[List[Pos]] = None,
+    dropsByRole: Option[Map[Role, List[Pos]]] = None,
     eval: Option[Eval] = None,
     shapes: Node.Shapes = Node.Shapes(Nil),
     comments: Node.Comments = Node.Comments(Nil),
@@ -105,6 +108,25 @@ case class Branch(
   def dropFirstChild               = copy(children = if (children.isEmpty) children else children.tail)
 
   def setComp = copy(comp = true)
+}
+
+// TODO: this should be refactored it's in a bunch of places.
+private object DropsByRole {
+
+  def json(drops: Map[Role, List[Pos]]) =
+    if (drops.isEmpty) JsNull
+    else {
+      val sb    = new java.lang.StringBuilder(128)
+      var first = true
+      drops foreach { case (orig, dests) =>
+        if (first) first = false
+        else sb append " "
+        sb append orig.forsyth
+        dests foreach { sb append _.key }
+      }
+      JsString(sb.toString)
+    }
+
 }
 
 object Node {
@@ -285,7 +307,8 @@ object Node {
         Json
           .obj(
             "ply" -> ply,
-            "fen" -> fen.value
+            "fen" -> fen.value,
+            "dropsByRole" -> DropsByRole.json(dropsByRole.getOrElse(Map.empty))
           )
           .add("id", idOption.map(_.toString))
           .add("uci", moveOption.map(_.uci.uci))

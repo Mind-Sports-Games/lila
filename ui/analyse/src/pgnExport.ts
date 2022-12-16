@@ -1,6 +1,6 @@
 import AnalyseCtrl from './ctrl';
 import { h } from 'snabbdom';
-import { initialFen, fixCrazySan } from 'chess';
+import { initialFen, fixCrazySan } from 'stratutils';
 import { MaybeVNodes } from './interfaces';
 
 interface PgnNode {

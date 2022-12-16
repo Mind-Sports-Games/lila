@@ -9,18 +9,18 @@ import PuzzleStreak from './streak';
 import throttle from 'common/throttle';
 import { Api as CgApi } from 'chessground/api';
 import { build as treeBuild, ops as treeOps, path as treePath, TreeWrapper } from 'tree';
-import { Chess } from 'chessops/chess';
-import { chessgroundDests, scalachessCharPair } from 'chessops/compat';
+import { Chess } from 'stratops/chess';
+import { chessgroundDests, scalachessCharPair } from 'stratops/compat';
 import { Config as CgConfig } from 'chessground/config';
 import { ctrl as cevalCtrl, CevalCtrl } from 'ceval';
 import { defer } from 'common/defer';
 import { defined, prop, Prop } from 'common';
-import { makeSanAndPlay } from 'chessops/san';
-import { parseFen, makeFen } from 'chessops/fen';
-import { parseSquare, parseUci, makeSquare, makeUci } from 'chessops/util';
+import { makeSanAndPlay } from 'stratops/san';
+import { parseFen, makeFen } from 'stratops/fen';
+import { parseSquare, parseUci, makeSquare, makeUci } from 'stratops/util';
 import { pgnToTree, mergeSolution } from './moveTree';
 import { Redraw, Vm, Controller, PuzzleOpts, PuzzleData, PuzzleResult, MoveTest, ThemeKey } from './interfaces';
-import { Role, Move, Outcome } from 'chessops/types';
+import { Role, Move, Outcome } from 'stratops/types';
 import { storedProp } from 'common/storage';
 
 export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
@@ -109,7 +109,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   }
 
   function position(): Chess {
-    const setup = parseFen(vm.node.fen).unwrap();
+    const setup = parseFen('chess')(vm.node.fen).unwrap();
     return Chess.fromSetup(setup).unwrap();
   }
 
@@ -185,7 +185,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     addNode(
       {
         ply: 2 * (pos.fullmoves - 1) + (pos.turn == 'p1' ? 0 : 1),
-        fen: makeFen(pos.toSetup()),
+        fen: makeFen('chess')(pos.toSetup()),
         id: scalachessCharPair(move),
         uci: makeUci(move),
         san,
@@ -258,7 +258,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     } else if (progress) {
       vm.lastFeedback = 'good';
       setTimeout(() => {
-        const pos = Chess.fromSetup(parseFen(progress.fen).unwrap()).unwrap();
+        const pos = Chess.fromSetup(parseFen('chess')(progress.fen).unwrap()).unwrap();
         sendMoveAt(progress.path, pos, progress.move);
       }, opts.pref.animation.duration * (autoNext() ? 1 : 1.5));
     }
