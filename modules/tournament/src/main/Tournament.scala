@@ -141,7 +141,7 @@ case class Tournament(
     }
 
   def medleySpeedFactors: Option[List[Double]] =
-    medleyVariantsInTournament.map(s => s.flatMap(v => medleySpeedChoice.get(v.key).getOrElse(1)))
+    medleyVariantsInTournament.map(_.map(v => medleySpeedChoice.get(v.key).getOrElse(1.0)))
 
   def medleySpeedChoice: Map[String, Double] = medleyVariants.fold(medleyVariantSpeeds)(v =>
     v match {
