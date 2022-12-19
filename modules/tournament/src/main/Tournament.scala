@@ -122,7 +122,7 @@ case class Tournament(
         )
     } else None
 
-  def finalMedleyVariant: Boolean = medleyRound.getOrElse(-99) == medleyNumIntervals.getOrElse(0) - 1
+  def finalMedleyVariant: Boolean = medleyRound.nonEmpty && medleyRound == medleyNumIntervals.map(_ - 1)
 
   def medleyIntervalSeconds: Option[List[Int]] =
     if (medleyBalanceIntervals) {
@@ -143,7 +143,7 @@ case class Tournament(
   def medleySpeedFactors: Option[List[Double]] =
     medleyVariantsInTournament.map(_.map(v => medleySpeedChoice.get(v.key).getOrElse(1.0)))
 
-  def medleySpeedChoice: Map[String, Double] = medleyVariants.fold(medleyVariantSpeeds)(v =>
+  lazy val medleySpeedChoice: Map[String, Double] = medleyVariants.fold(medleyVariantSpeeds)(v =>
     v match {
       case x if isMedleyChessShieldStyle(x)    => medleyChessShieldSpeeds
       case x if isMedleyDraughtsShieldStyle(x) => medleyDraughtShieldSpeeds
@@ -152,10 +152,11 @@ case class Tournament(
   )
 
   def isMedleyChessShieldStyle(variants: List[Variant]): Boolean =
-    id == "shieldChessMedley" || variants.forall(v => medleyChessShieldSpeeds.keys.exists(v.==))
+    variants.filterNot(_.exoticChessVariant).isEmpty
 
   def isMedleyDraughtsShieldStyle(variants: List[Variant]): Boolean =
-    id == "shieldDraughtsMedley" || variants.forall(v => medleyDraughtShieldSpeeds.keys.exists(v.==))
+    variants.filterNot(_.gameFamily == GameFamily.Draughts()).isEmpty &&
+      variants.filter(_.fromPositionVariant).isEmpty
 
   def medleyVariantSpeeds: Map[String, Double] = {
     val slow    = 1.25
@@ -197,16 +198,16 @@ case class Tournament(
   }
 
   def medleyChessShieldSpeeds: Map[String, Double] = {
-    val slow    = 1.25
-    val medium  = 1
-    val fastest = 0.75
+    val slow   = 1.25
+    val medium = 1
+    val quick  = 0.75
     Map(
       "kingOfTheHill" -> medium,
-      "threeCheck"    -> fastest,
+      "threeCheck"    -> quick,
       "antichess"     -> medium,
-      "atomic"        -> fastest,
+      "atomic"        -> quick,
       "horde"         -> slow,
-      "racingKings"   -> fastest,
+      "racingKings"   -> quick,
       "crazyhouse"    -> medium
     )
   }

@@ -283,7 +283,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyIntervalOptions.numIntervals"),
         "Medley Intervals",
         klass = "medleyIntervalOptions",
-        help = raw("Duration approx. (Interval Time * Intervals)").some,
+        help = trans.medleyIntervalOptionDefn().some,
         half = true,
         displayed = false
       )(
@@ -296,9 +296,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyIntervalOptions.balanceIntervals"),
         trans.medleyBalanceIntervalTimes(),
         klass = "medleyIntervalOptions",
-        help = raw(
-          "Quicker/slower variants have shorter/longer interval times<br>Duration is still approx. (Interval Time * Intervals)"
-        ).some,
+        help = trans.medleyBalanceIntervalDefn().some,
         half = true,
         displayed = false
       )
