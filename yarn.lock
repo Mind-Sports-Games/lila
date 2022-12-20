@@ -7350,9 +7350,9 @@ stockfish.wasm@^0.10.0:
   resolved "https://registry.yarnpkg.com/stockfish.wasm/-/stockfish.wasm-0.10.0.tgz#dc3ef4d98a2a79724c29510d39d89e4a5f0f1888"
   integrity sha512-OTvOlz0ijCSmIb/YvOZ1Dn6vwZVS4Ge3N+RcV0d2b6LXUtCJ9UwmBHypRW3DZ+VXf8WNm7E3P+6jMTVvb3QaBg==
 
-"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#213-enable-analysis-for-fairy-loa-oware":
-  version "0.8.1-pstrat3.15"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#2dbfbd56ee8b47af83fd83f20d5fedec2ca2ea43"
+"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat3.16":
+  version "0.8.1-pstrat3.16"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#887f5e85a761d648d3154dbae8e94b6ffe24d004"
   dependencies:
     "@badrap/result" "^0.2.8"
 
