@@ -17,10 +17,16 @@ import controllers.routes
 object userAnalysis {
 
   def noAnalysisVariants = List(
-    Variant.Chess(strategygames.chess.variant.FromPosition),
-    Variant.Chess(strategygames.chess.variant.LinesOfAction),
-    Variant.Chess(strategygames.chess.variant.ScrambledEggs)
+    Variant.Chess(strategygames.chess.variant.FromPosition)
   )
+
+  def analysisVariants =
+    (
+      Variant.all(GameLogic.Chess()) ++
+        Variant.all(GameLogic.FairySF()) ++
+        Variant.all(GameLogic.Mancala())
+    )
+      .filterNot(noAnalysisVariants.contains(_))
 
   def apply(data: JsObject, pov: lila.game.Pov, withForecast: Boolean = false)(implicit ctx: Context) =
     views.html.base.layout(
@@ -51,7 +57,8 @@ object userAnalysis {
         .OpenGraph(
           title = "Chess analysis board", // TODO: wrong name
           url = s"$netBaseUrl${routes.UserAnalysis.index.url}",
-          description = "Analyse chess positions and variations on an interactive chess board" // TODO: wrong description
+          description =
+            "Analyse chess positions and variations on an interactive chess board" // TODO: wrong description
         )
         .some,
       zoomable = true
@@ -63,7 +70,7 @@ object userAnalysis {
             span(cls := "text", dataIcon := iconByVariant(pov.game.variant))(
               VariantKeys.variantName(pov.game.variant)
             ),
-            Variant.all(GameLogic.Chess()).filterNot(noAnalysisVariants.contains(_)).map { v =>
+            analysisVariants.map { v =>
               a(
                 dataIcon := iconByVariant(v),
                 cls := (pov.game.variant == v).option("current"),

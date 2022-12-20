@@ -25,12 +25,13 @@ final class UserAnalysis(
 
   def parseArg(arg: String) =
     arg.split("/", 2) match {
-      case Array(key) => load("", Variant.orDefault(GameLogic.Chess(), key))
+      case Array(key) => load("", Variant.orDefault(key))
       case Array(key, fen) =>
-        Variant.byKey(GameLogic.Chess()) get key match {
-          case Some(variant)                              => load(fen, variant)
-          case _ if FEN.clean(GameLogic.Chess(), fen) == Variant.libStandard(GameLogic.Chess()).initialFen => load(arg, Variant.libStandard(GameLogic.Chess()))
-          case _                                          => load(arg, Variant.libFromPosition(GameLogic.Chess()))
+        Variant.byKey get key match {
+          case Some(variant) => load(fen, variant)
+          case _ if FEN.clean(GameLogic.Chess(), fen) == Variant.libStandard(GameLogic.Chess()).initialFen =>
+            load(arg, Variant.libStandard(GameLogic.Chess()))
+          case _ => load(arg, Variant.libFromPosition(GameLogic.Chess()))
         }
       case _ => load("", Variant.libStandard(GameLogic.Chess()))
     }
@@ -40,7 +41,7 @@ final class UserAnalysis(
       val decodedFen: Option[FEN] = lila.common.String
         .decodeUriPath(urlFen)
         .filter(_.trim.nonEmpty)
-        .orElse(get("fen")) map(s => FEN.clean(variant.gameLogic, s))
+        .orElse(get("fen")) map (s => FEN.clean(variant.gameLogic, s))
       val pov         = makePov(decodedFen, variant)
       val orientation = get("playerIndex").flatMap(PlayerIndex.fromName) | pov.playerIndex
       env.api.roundApi
@@ -89,7 +90,14 @@ final class UserAnalysis(
                   initialFen <- env.game.gameRepo initialFen game.id
                   data <-
                     env.api.roundApi
-                      .userAnalysisJson(pov, ctx.pref, initialFen, pov.playerIndex, owner = owner, me = ctx.me)
+                      .userAnalysisJson(
+                        pov,
+                        ctx.pref,
+                        initialFen,
+                        pov.playerIndex,
+                        owner = owner,
+                        me = ctx.me
+                      )
                 } yield NoCache(
                   Ok(
                     html.board
