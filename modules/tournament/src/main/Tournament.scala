@@ -21,10 +21,8 @@ case class Tournament(
     clock: ClockConfig,
     minutes: Int,
     variant: Variant,
-    medleyVariants: Option[List[Variant]] = None,
+    medleyVariantsAndSpeeds: Option[List[(Variant, Int)]] = None,
     medleyMinutes: Option[Int] = None,
-    medleyNumIntervals: Option[Int] = None,
-    medleyBalanceIntervals: Boolean = false,
     position: Option[FEN],
     mode: Mode,
     password: Option[String] = None,
@@ -92,7 +90,15 @@ case class Tournament(
 
   def isRated = mode == Mode.Rated
 
+  def medleyVariants: Option[List[Variant]] = medleyVariantsAndSpeeds.map(_.map(_._1))
+
+  def medleyIntervalSeconds: Option[List[Int]] = medleyVariantsAndSpeeds.map(_.map(_._2).filter(_ != 0))
+
   def isMedley = medleyVariants.nonEmpty
+
+  def medleyNumIntervals: Option[Int] = medleyIntervalSeconds.map(_.length)
+
+  def medleyisBalanced: Option[Boolean] = medleyIntervalSeconds.map(v => v.toSet.size != 1)
 
   def medleyDurationMinutes = medleyMinutes.getOrElse(0) * medleyNumIntervals.getOrElse(0)
 
@@ -123,112 +129,6 @@ case class Tournament(
     } else None
 
   def finalMedleyVariant: Boolean = medleyRound.nonEmpty && medleyRound == medleyNumIntervals.map(_ - 1)
-
-  def medleyIntervalSeconds: Option[List[Int]] =
-    if (medleyBalanceIntervals) {
-      val times: Option[List[Int]] =
-        medleySpeedFactors.map(f => f.map(s => (s * (minutes / f.sum) * 60).toInt))
-      val extra               = times.map(minutes * 60 - _.sum).getOrElse(0)
-      val firstLastBonus: Int = math.min(clock.limitSeconds / 3, 120)
-      // take time from first variant and give to last
-
-      times.map(t =>
-        t.take(1).map(v => v - firstLastBonus) ::: t.drop(1).take(t.size - 2) :::
-          t.drop(t.size - 1).map(v => v + extra + firstLastBonus)
-      )
-    } else {
-      medleyNumIntervals.map(List.fill(_)(medleyMinutes.getOrElse(0) * 60))
-    }
-
-  def medleySpeedFactors: Option[List[Double]] =
-    medleyVariantsInTournament.map(_.map(v => medleySpeedChoice.get(v.key).getOrElse(1.0)))
-
-  lazy val medleySpeedChoice: Map[String, Double] = medleyVariants.fold(medleyVariantSpeeds)(v =>
-    v match {
-      case x if isMedleyChessShieldStyle(x)    => medleyChessShieldSpeeds
-      case x if isMedleyDraughtsShieldStyle(x) => medleyDraughtShieldSpeeds
-      case _                                   => medleyVariantSpeeds
-    }
-  )
-
-  def isMedleyChessShieldStyle(variants: List[Variant]): Boolean =
-    variants.filterNot(_.exoticChessVariant).isEmpty
-
-  def isMedleyDraughtsShieldStyle(variants: List[Variant]): Boolean =
-    variants.filterNot(_.gameFamily == GameFamily.Draughts()).isEmpty &&
-      variants.filter(_.fromPositionVariant).isEmpty
-
-  def medleyVariantSpeeds: Map[String, Double] = {
-    val slow    = 1.25
-    val medium  = 1.1
-    val quick   = 0.9
-    val fastest = 0.75
-    Map(
-      "standard"      -> medium,
-      "chess960"      -> medium,
-      "kingOfTheHill" -> quick,
-      "threeCheck"    -> fastest,
-      "fiveCheck"     -> quick,
-      "antichess"     -> quick,
-      "atomic"        -> fastest,
-      "horde"         -> slow,
-      "racingKings"   -> fastest,
-      "crazyhouse"    -> quick,
-      "noCastling"    -> medium,
-      "linesOfAction" -> fastest,
-      "scrambledEggs" -> fastest,
-      "frisian"       -> medium,
-      "frysk"         -> quick,
-      "international" -> slow,
-      "antidraughts"  -> slow,
-      "breakthrough"  -> slow,
-      "russian"       -> medium,
-      "brazilian"     -> medium,
-      "pool"          -> medium,
-      "portuguese"    -> medium,
-      "english"       -> medium,
-      "shogi"         -> slow,
-      "xiangqi"       -> medium,
-      "minishogi"     -> fastest,
-      "minixiangqi"   -> quick,
-      "flipello"      -> medium,
-      "flipello10"    -> slow,
-      "oware"         -> slow
-    )
-  }
-
-  def medleyChessShieldSpeeds: Map[String, Double] = {
-    val slow   = 1.25
-    val medium = 1
-    val quick  = 0.75
-    Map(
-      "kingOfTheHill" -> medium,
-      "threeCheck"    -> quick,
-      "antichess"     -> medium,
-      "atomic"        -> quick,
-      "horde"         -> slow,
-      "racingKings"   -> quick,
-      "crazyhouse"    -> medium
-    )
-  }
-
-  def medleyDraughtShieldSpeeds: Map[String, Double] = {
-    val slow   = 1.25
-    val medium = 1
-    val quick  = 0.75
-    Map(
-      "frisian"       -> medium,
-      "frysk"         -> quick,
-      "international" -> slow,
-      "antidraughts"  -> slow,
-      "breakthrough"  -> slow,
-      "russian"       -> medium,
-      "brazilian"     -> medium,
-      "pool"          -> medium,
-      "portuguese"    -> medium,
-      "english"       -> medium
-    )
-  }
 
   def currentIntervalTime =
     medleyIntervalSeconds.getOrElse(List()).lift(medleyRound.getOrElse(0)).fold(0)(t => (t / 60).toInt)
@@ -336,10 +236,8 @@ object Tournament {
       clock: ClockConfig,
       minutes: Int,
       variant: Variant,
-      medleyVariants: Option[List[Variant]] = None,
+      medleyVariantsAndSpeeds: Option[List[(Variant, Int)]] = None,
       medleyMinutes: Option[Int] = None,
-      medleyNumIntervals: Option[Int] = None,
-      medleyBalanceIntervals: Boolean = false,
       position: Option[FEN],
       mode: Mode,
       password: Option[String],
@@ -364,10 +262,8 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = variant,
-      medleyVariants = medleyVariants,
+      medleyVariantsAndSpeeds = medleyVariantsAndSpeeds,
       medleyMinutes = medleyMinutes,
-      medleyNumIntervals = medleyNumIntervals,
-      medleyBalanceIntervals = medleyBalanceIntervals,
       position = position,
       mode = mode,
       password = password,
@@ -397,10 +293,8 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = sched.variant,
-      medleyVariants = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
+      medleyVariantsAndSpeeds = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
       medleyMinutes = sched.medleyShield.map(_.arenaMedleyMinutes),
-      medleyNumIntervals = sched.medleyShield.map(_.arenaMedleyNumIntervals),
-      medleyBalanceIntervals = sched.medleyShield.map(_.arenaMedleyBalanceIntervals) getOrElse false,
       position = sched.position,
       mode = Mode.Rated,
       conditions = sched.conditions,

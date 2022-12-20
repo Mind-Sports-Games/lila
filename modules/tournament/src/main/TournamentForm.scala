@@ -73,7 +73,7 @@ final class TournamentForm {
       medley = tour.isMedley.some,
       medleyIntervalOptions = MedleyIntervalOptions(
         medleyMinutes = tour.medleyMinutes,
-        balanceIntervals = tour.medleyBalanceIntervals.some,
+        balanceIntervals = tour.medleyisBalanced,
         numIntervals = tour.medleyNumIntervals
       ),
       medleyDefaults = MedleyDefaults(
@@ -305,16 +305,18 @@ private[tournament] case class TournamentSetup(
         minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
         variant = newVariant,
-        medleyVariants =
+        medleyVariantsAndSpeeds =
           if (
             old.medleyGameFamilies != medleyGameFamilies.gfList
               .sortWith(_.name < _.name)
-              .some || old.medleyMinutes != medleyIntervalOptions.medleyMinutes || old.minutes != minutes
-          ) medleyVariants
-          else old.medleyVariants,
+              .some
+            || old.medleyMinutes != medleyIntervalOptions.medleyMinutes
+            || old.minutes != minutes
+            || old.medleyisBalanced != medleyIntervalOptions.balanceIntervals
+            || old.medleyNumIntervals != medleyIntervalOptions.numIntervals
+          ) medleyVariantsAndSpeeds
+          else old.medleyVariantsAndSpeeds,
         medleyMinutes = medleyIntervalOptions.medleyMinutes,
-        medleyNumIntervals = medleyIntervalOptions.numIntervals,
-        medleyBalanceIntervals = medleyIntervalOptions.balanceIntervals getOrElse false,
         startsAt = startDate | old.startsAt,
         password = password,
         position = newVariant.standardVariant ?? {
@@ -394,14 +396,24 @@ private[tournament] case class TournamentSetup(
       scala.util.Random.shuffle(Variant.all.filter(_.draughts64Variant))
     else generateNoDefaultsMedleyVariants
 
-  def medleyVariants: Option[List[Variant]] =
+  def medleyVariantsAndSpeeds: Option[List[(Variant, Int)]] =
     if (isMedley) {
       val medleyList     = generateMedleyVariants
       var fullMedleyList = medleyList
       while (fullMedleyList.size < maxMedleyRounds.getOrElse(0))
         fullMedleyList = fullMedleyList ::: medleyList
-      fullMedleyList.some
+      TournamentMedleyUtil
+        .medleyVariantsAndSpeeds(
+          fullMedleyList,
+          clockConfig.limitSeconds,
+          medleyDuration,
+          medleyIntervalOptions.medleyMinutes.getOrElse(0),
+          medleyIntervalOptions.numIntervals.getOrElse(fullMedleyList.length),
+          medleyIntervalOptions.balanceIntervals.getOrElse(false)
+        )
+        .some
     } else None
+
 }
 
 case class MedleyIntervalOptions(

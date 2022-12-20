@@ -72,6 +72,12 @@ object BSONHandlers {
           r.strO("eco").flatMap(Thematic.byEco).map(f => FEN.wrap(f.fen)) // for BC
       val startsAt   = r date "startsAt"
       val conditions = r.getO[Condition.All]("conditions") getOrElse Condition.All.empty
+      val mVariants  = r.getO[List[Variant]]("mVariants")
+      val mSpeeds    = r.getO[List[Int]]("mIntervals")
+      val medleyVariantsAndSpeeds: Option[List[(Variant, Int)]] = mVariants.map(_.zipWithIndex.map {
+        case (v, i) =>
+          (v, mSpeeds.fold(0)(_.lift(i).getOrElse(0)))
+      })
       Tournament(
         id = r str "_id",
         name = r str "name",
@@ -79,10 +85,8 @@ object BSONHandlers {
         clock = r.get[strategygames.Clock.Config]("clock"),
         minutes = r int "minutes",
         variant = variant,
-        medleyVariants = r.getO[List[Variant]]("mVariants"),
+        medleyVariantsAndSpeeds = medleyVariantsAndSpeeds,
         medleyMinutes = r.intO("mMinutes"),
-        medleyNumIntervals = r.intO("mIntervals"),
-        medleyBalanceIntervals = r boolD "mBalanced",
         position = position,
         mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,
         password = r.strO("password"),
@@ -122,8 +126,7 @@ object BSONHandlers {
         "variant"          -> o.variant.some.filterNot(_.standard).map(_.id),
         "mVariants"        -> o.medleyVariants,
         "mMinutes"         -> o.medleyMinutes,
-        "mIntervals"       -> o.medleyNumIntervals,
-        "mBalanced"        -> o.medleyBalanceIntervals,
+        "mIntervals"       -> o.medleyIntervalSeconds,
         "fen"              -> o.position.map(_.value),
         "mode"             -> o.mode.some.filterNot(_.rated).map(_.id),
         "password"         -> o.password,

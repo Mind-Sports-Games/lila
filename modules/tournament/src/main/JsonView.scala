@@ -121,7 +121,7 @@ final class JsonView(
             "medleyMinutes"           -> tour.medleyMinutes,
             "medleyIntervalSeconds"   -> tour.medleyIntervalSeconds,
             "secondsToFinishInterval" -> tour.isStarted.option(tour.meldeySecondsToFinishInterval),
-            "medleyBalanceIntervals"  -> tour.medleyBalanceIntervals,
+            "medleyBalanceIntervals"  -> tour.medleyisBalanced,
             "medleyRound"             -> full.option(tour.medleyRound.getOrElse(-1)),
             "perf"                    -> full.option(tour.currentPerfType),
             "clock"                   -> full.option(tour.clock),

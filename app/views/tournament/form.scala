@@ -261,7 +261,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
           br,
           a(href := routes.Page.loneBookmark("medley"), target := "_blank")("More detail here")
         ).some,
-        half = true
+        half = true,
+        disabled = disabledAfterStart
       )
     )
   def medleyMinutes =
@@ -274,7 +275,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         half = true,
         displayed = false
       )(
-        form3.select(_, TournamentForm.medleyMinuteChoices)
+        form3.select(_, TournamentForm.medleyMinuteChoices, disabled = disabledAfterStart)
       )
     )
   def numIntervals =
@@ -298,7 +299,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         klass = "medleyIntervalOptions",
         help = trans.medleyBalanceIntervalDefn().some,
         half = true,
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   def medleyControls =
@@ -333,7 +335,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyDefaults.onePerGameFamily"),
         "Where possible, use one game per game family",
         klass = "medleyDefaults",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def chessVariants =
@@ -342,7 +345,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyDefaults.exoticChessVariants"),
         "Only exotic chess variants",
         klass = "medleyDefaults",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def draughts64 =
@@ -351,7 +355,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyDefaults.draughts64Variants"),
         "Only draughts 64 variants",
         klass = "medleyDefaults",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def chess =
@@ -360,7 +365,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.chess"),
         VariantKeys.gameFamilyName(GameFamily.Chess()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def draughts =
@@ -369,7 +375,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.draughts"),
         VariantKeys.gameFamilyName(GameFamily.Draughts()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def loa =
@@ -378,7 +385,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.loa"),
         VariantKeys.gameFamilyName(GameFamily.LinesOfAction()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def shogi =
@@ -387,7 +395,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.shogi"),
         VariantKeys.gameFamilyName(GameFamily.Shogi()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def xiangqi =
@@ -396,7 +405,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.xiangqi"),
         VariantKeys.gameFamilyName(GameFamily.Xiangqi()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def flipello =
@@ -405,7 +415,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.flipello"),
         VariantKeys.gameFamilyName(GameFamily.Flipello()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def mancala =
@@ -414,7 +425,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.mancala"),
         VariantKeys.gameFamilyName(GameFamily.Mancala()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   def startPosition =

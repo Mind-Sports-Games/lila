@@ -121,13 +121,11 @@ object TournamentShield {
       val name: String,
       val teamOwner: Condition.TeamMember,
       val eligibleVariants: List[Variant],
-      val generateVariants: List[Variant] => List[Variant],
+      val generateVariants: List[Variant] => List[(Variant, Int)],
       val dayOfWeek: Int,
       val hour: Int,
       val arenaMinutes: Int,
       val arenaMedleyMinutes: Int,
-      val arenaMedleyNumIntervals: Int,
-      val arenaMedleyBalanceIntervals: Boolean,
       val swissFormat: String,
       val arenaFormat: String,
       val arenaDescription: String
@@ -147,9 +145,19 @@ object TournamentShield {
         Random.shuffle(variants)
       val onePerGameFamily =
         Random.shuffle(GameFamily.all.map(gf => thisOrder.filter(_.gameFamily == gf).head))
-      onePerGameFamily ::: thisOrder.filterNot(onePerGameFamily.contains(_))
+      val newOrder = onePerGameFamily ::: thisOrder.filterNot(onePerGameFamily.contains(_))
+      TournamentMedleyUtil.medleyVariantsAndSpeeds(
+        newOrder,
+        5 * 60,
+        playStrategyMinutes,
+        playStrategymMinutes,
+        7,
+        true
+      )
     }
-    private val playStrategyRounds = 7
+    private val playStrategyMinutes  = 105
+    private val playStrategymMinutes = 15
+    private val playStrategyRounds   = 7
 
     case object PlayStrategyMedley
         extends MedleyShield(
@@ -160,16 +168,24 @@ object TournamentShield {
           playStrategyMedleyGeneration,
           7,
           19,
-          105,
-          15,
-          playStrategyRounds,
-          true,
+          playStrategyMinutes,
+          playStrategymMinutes,
           s"${playStrategyRounds} round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
           s"${playStrategyRounds} variant Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
           s"PlayStrategy Medley Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
         )
 
-    private def randomVariantOrder(variants: List[Variant]) = Random.shuffle(variants)
+    private def randomChessVariantOrder(variants: List[Variant]) = {
+      val orderedVariants = Random.shuffle(variants)
+      TournamentMedleyUtil.medleyVariantsAndSpeeds(
+        orderedVariants,
+        5 * 60,
+        100,
+        20,
+        5,
+        true
+      )
+    }
 
     private val chessVariantOptions = Variant.all.filter(_.exoticChessVariant)
     private val chessVariantRounds  = 5
@@ -180,18 +196,27 @@ object TournamentShield {
           "Chess Variants",
           Condition.TeamMember("playstrategy-chess-variants", "PlayStrategy Chess Variants"),
           chessVariantOptions,
-          randomVariantOrder,
+          randomChessVariantOrder,
           6,
           19,
           100,
           20,
-          chessVariantRounds,
-          true,
           s"${chessVariantRounds} round Swiss using micro-match rounds (each pairing plays twice, once each as the start player). ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants will be picked.",
           s"${chessVariantRounds} variant Arena where ${chessVariantRounds} from the ${chessVariantOptions.length} listed chess variants are picked.",
           s"Chess Variants Medley Arena, where ${chessVariantRounds} from the following ${chessVariantOptions.length} chess variants are picked: ${chessVariantOptions.map(VariantKeys.variantName).mkString(", ")}."
         )
 
+    private def randomDraughtsVariantOrder(variants: List[Variant]) = {
+      val orderedVariants = Random.shuffle(variants)
+      TournamentMedleyUtil.medleyVariantsAndSpeeds(
+        orderedVariants,
+        5 * 60,
+        105,
+        15,
+        7,
+        true
+      )
+    }
     private val draughtsVariantOptions =
       Variant.all.filter(_.gameFamily == GameFamily.Draughts()).filterNot(_.fromPositionVariant)
     private val draughtsRounds = 7
@@ -202,13 +227,11 @@ object TournamentShield {
           "Draughts",
           Condition.TeamMember("playstrategy-draughts", "PlayStrategy Draughts"),
           draughtsVariantOptions,
-          randomVariantOrder,
+          randomDraughtsVariantOrder,
           6,
           13,
           105,
           15,
-          draughtsRounds,
-          true,
           s"${draughtsRounds} round Swiss where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants will be picked.",
           s"${draughtsRounds} variant Arena where ${draughtsRounds} from the ${draughtsVariantOptions.length} listed draughts variants are picked.",
           s"Draughts Medley Arena, where ${draughtsRounds} from the following ${draughtsVariantOptions.length} Draughts variants are picked: ${draughtsVariantOptions.map(VariantKeys.variantName).mkString(", ")}."
