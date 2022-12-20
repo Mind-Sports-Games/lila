@@ -228,6 +228,7 @@ final class JsonView(
                 "resizeHandle"      -> pref.resizeHandle,
                 "replay"            -> pref.replay,
                 "clockTenths"       -> pref.clockTenths,
+                "mancalaMove"       -> (pref.mancalaMove == Pref.MancalaMove.SINGLE_CLICK),
                 "pieceSet" -> pref.pieceSet.map(p =>
                   Json.obj("name" -> p.name, "gameFamily" -> p.gameFamilyName)
                 )
