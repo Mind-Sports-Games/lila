@@ -55,10 +55,10 @@ object userAnalysis {
       chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Chess analysis board", // TODO: wrong name
+          title = "Strategy games analysis board",
           url = s"$netBaseUrl${routes.UserAnalysis.index.url}",
           description =
-            "Analyse chess positions and variations on an interactive chess board" // TODO: wrong description
+            "Analyse strategy game positions and variations on an interactive board"
         )
         .some,
       zoomable = true
