@@ -21,6 +21,11 @@ export default function loadClockWidget() {
       if (!opts.pause) this.interval = setInterval(this.render.bind(this), 1000);
     },
 
+    addSeconds: function (x: number) {
+      this.target = this.target + x * 1000;
+      this.render();
+    },
+
     render: function () {
       if (document.body.contains(this.element[0])) {
         this.element.text(this.formatMs(this.target - Date.now()));

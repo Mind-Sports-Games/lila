@@ -32,6 +32,7 @@ object form {
             fields.name,
             form3.split(fields.rated, fields.variant),
             fields.medleyControls,
+            fields.medleyIntervalOptions,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clock,
@@ -70,11 +71,12 @@ object form {
             form3.split(fields.name, tour.isCreated option fields.startDate),
             form3.split(fields.rated, fields.variant),
             fields.medleyControls,
+            fields.medleyIntervalOptions,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clock,
             form3.split(
-              if (TournamentForm.minutes contains tour.minutes) form3.split(fields.minutes)
+              if ((TournamentForm.minutes contains tour.minutes) || tour.isMedley) form3.split(fields.minutes)
               else
                 form3.group(form("minutes"), trans.duration(), half = true)(
                   form3.input(_)(tpe := "number")
@@ -259,24 +261,57 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
           br,
           a(href := routes.Page.loneBookmark("medley"), target := "_blank")("More detail here")
         ).some,
-        half = true
+        half = true,
+        disabled = disabledAfterStart
       )
     )
   def medleyMinutes =
-    form3.group(
-      form("medleyMinutes"),
-      trans.medleyInterval(),
-      klass = "medleyMinutes",
-      half = true,
-      help = trans.medleyIntervalDefinition().some,
-      displayed = false
-    )(
-      form3.select(_, TournamentForm.medleyMinuteChoices)
+    frag(
+      form3.group(
+        form("medleyIntervalOptions.medleyMinutes"),
+        trans.medleyInterval(),
+        klass = "medleyMinutes",
+        help = trans.medleyIntervalDefinition().some,
+        half = true,
+        displayed = false
+      )(
+        form3.select(_, TournamentForm.medleyMinuteChoices, disabled = disabledAfterStart)
+      )
+    )
+  def numIntervals =
+    frag(
+      form3.group(
+        form("medleyIntervalOptions.numIntervals"),
+        "Medley Intervals",
+        klass = "medleyIntervalOptions",
+        help = trans.medleyIntervalOptionDefn().some,
+        half = true,
+        displayed = false
+      )(
+        form3.input(_, typ = "number")
+      )
+    )
+  def balanceIntervals =
+    frag(
+      form3.checkbox(
+        form("medleyIntervalOptions.balanceIntervals"),
+        trans.medleyBalanceIntervalTimes(),
+        klass = "medleyIntervalOptions",
+        help = trans.medleyBalanceIntervalDefn().some,
+        half = true,
+        displayed = false,
+        disabled = disabledAfterStart
+      )
     )
   def medleyControls =
     form3.split(
       medley,
-      medleyMinutes
+      balanceIntervals
+    )
+  def medleyIntervalOptions =
+    form3.split(
+      medleyMinutes,
+      numIntervals
     )
   def medleyDefaults =
     form3.split(
@@ -300,7 +335,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyDefaults.onePerGameFamily"),
         "Where possible, use one game per game family",
         klass = "medleyDefaults",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def chessVariants =
@@ -309,7 +345,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyDefaults.exoticChessVariants"),
         "Only exotic chess variants",
         klass = "medleyDefaults",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def draughts64 =
@@ -318,7 +355,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyDefaults.draughts64Variants"),
         "Only draughts 64 variants",
         klass = "medleyDefaults",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def chess =
@@ -327,7 +365,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.chess"),
         VariantKeys.gameFamilyName(GameFamily.Chess()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def draughts =
@@ -336,7 +375,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.draughts"),
         VariantKeys.gameFamilyName(GameFamily.Draughts()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def loa =
@@ -345,7 +385,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.loa"),
         VariantKeys.gameFamilyName(GameFamily.LinesOfAction()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def shogi =
@@ -354,7 +395,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.shogi"),
         VariantKeys.gameFamilyName(GameFamily.Shogi()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def xiangqi =
@@ -363,7 +405,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.xiangqi"),
         VariantKeys.gameFamilyName(GameFamily.Xiangqi()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def flipello =
@@ -372,7 +415,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.flipello"),
         VariantKeys.gameFamilyName(GameFamily.Flipello()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   private def mancala =
@@ -381,7 +425,8 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         form("medleyGameFamilies.mancala"),
         VariantKeys.gameFamilyName(GameFamily.Mancala()),
         klass = "medleyGameFamily",
-        displayed = false
+        displayed = false,
+        disabled = disabledAfterStart
       )
     )
   def startPosition =
@@ -404,7 +449,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       )
     )
   def minutes =
-    form3.group(form("minutes"), trans.duration(), half = true)(
+    form3.group(form("minutes"), trans.duration(), klass = "duration", half = true)(
       form3.select(_, TournamentForm.minuteChoices)
     )
   def waitMinutes =
