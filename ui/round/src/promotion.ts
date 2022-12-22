@@ -7,6 +7,7 @@ import { key2pos } from 'chessground/util';
 import { bind, onInsert } from './util';
 import RoundController from './ctrl';
 import { MaybeVNode } from './interfaces';
+import { promotion } from 'stratutils';
 
 interface Promoting {
   move: [cg.Key, cg.Key];
@@ -82,34 +83,6 @@ function possiblePromotion(
   }
 }
 
-// forced promotion for shogi Knight in last two ranks, and lance or pawn in last rank
-// assumes possible promotion is passed through (therefore no checks for drops etc).
-function forcedShogiPromotion(ctrl: RoundController, orig: cg.Key, dest: cg.Key): boolean | undefined {
-  const d = ctrl.data,
-    piece = ctrl.chessground.state.pieces.get(dest),
-    premovePiece = ctrl.chessground.state.pieces.get(orig);
-  return (
-    (((piece && (piece.role === 'l-piece' || piece.role === 'p-piece') && !premovePiece) ||
-      (premovePiece && (premovePiece.role === 'l-piece' || premovePiece.role === 'p-piece'))) &&
-      ((dest[1] === '9' && d.player.playerIndex === 'p1') || (dest[1] == '1' && d.player.playerIndex === 'p2'))) ||
-    (((piece && piece.role === 'n-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'n-piece')) &&
-      ((['8', '9'].includes(dest[1]) && d.player.playerIndex === 'p1') ||
-        (['1', '2'].includes(dest[1]) && d.player.playerIndex === 'p2')))
-  );
-}
-
-// forced promotion for shogi pawn in last rank
-// assumes possible promotion is passed through (therefore no checks for drops etc).
-function forcedMiniShogiPromotion(ctrl: RoundController, orig: cg.Key, dest: cg.Key): boolean | undefined {
-  const d = ctrl.data,
-    piece = ctrl.chessground.state.pieces.get(dest),
-    premovePiece = ctrl.chessground.state.pieces.get(orig);
-  return (
-    ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
-    ((dest[1] === '5' && d.player.playerIndex === 'p1') || (dest[1] == '1' && d.player.playerIndex === 'p2'))
-  );
-}
-
 export function start(
   ctrl: RoundController,
   orig: cg.Key,
@@ -121,11 +94,11 @@ export function start(
     piece = ctrl.chessground.state.pieces.get(dest),
     variantKey = ctrl.data.game.variant.key;
   if (possiblePromotion(ctrl, orig, dest, variantKey)) {
-    if (variantKey === 'shogi' && forcedShogiPromotion(ctrl, orig, dest)) {
+    if (variantKey === 'shogi' && promotion.forcedShogiPromotion(ctrl.chessground, orig, dest)) {
       const role = premovePiece ? premovePiece.role : piece!.role;
       return sendPromotion(ctrl, orig, dest, ('p' + role) as cg.Role, meta);
     }
-    if (variantKey === 'minishogi' && forcedMiniShogiPromotion(ctrl, orig, dest)) {
+    if (variantKey === 'minishogi' && promotion.forcedMiniShogiPromotion(ctrl.chessground, orig, dest)) {
       const role = premovePiece ? premovePiece.role : piece!.role;
       return sendPromotion(ctrl, orig, dest, ('p' + role) as cg.Role, meta);
     }

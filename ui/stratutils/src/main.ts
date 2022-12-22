@@ -1,5 +1,9 @@
 import { piotr } from './piotr';
 
+// TODO: For some reason we can't import this like:
+// import * from 'stratutils/promotion'
+// you have to use
+// import { promotion } from 'stratutils'
 export * as promotion from './promotion';
 
 export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
