@@ -17,6 +17,35 @@ type Callback = (orig: Key, dest: Key, capture: JustCaptured | undefined, role: 
 
 let promoting: Promoting | undefined;
 
+function forcedShogiPromotion(ctrl: AnalyseCtrl, orig: Key, dest: Key): boolean | undefined {
+  const piece = ctrl.chessground.state.pieces.get(dest),
+    premovePiece = ctrl.chessground.state.pieces.get(orig);
+  const isP1 = piece && piece.playerIndex == 'p1'
+  const isP2 = piece && piece.playerIndex == 'p2'
+  return (
+    (((piece && (piece.role === 'l-piece' || piece.role === 'p-piece') && !premovePiece) ||
+      (premovePiece && (premovePiece.role === 'l-piece' || premovePiece.role === 'p-piece'))) &&
+      ((dest[1] === '9' && isP1) || (dest[1] == '1' && isP2))) ||
+    (((piece && piece.role === 'n-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'n-piece')) &&
+      ((['8', '9'].includes(dest[1]) && isP1) ||
+        (['1', '2'].includes(dest[1]) && isP2)))
+  );
+}
+
+// forced promotion for shogi pawn in last rank
+// assumes possible promotion is passed through (therefore no checks for drops etc).
+function forcedMiniShogiPromotion(ctrl: AnalyseCtrl, orig: Key, dest: Key): boolean | undefined {
+  const piece = ctrl.chessground.state.pieces.get(dest),
+    premovePiece = ctrl.chessground.state.pieces.get(orig);
+  const isP1 = piece && piece.playerIndex == 'p1'
+  const isP2 = piece && piece.playerIndex == 'p2'
+  return (
+    ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
+    ((dest[1] === '5' && isP1) || (dest[1] == '1' && isP2))
+  );
+}
+
+
 export function start(
   ctrl: AnalyseCtrl,
   orig: Key,
@@ -25,18 +54,27 @@ export function start(
   callback: Callback
 ): boolean {
   const s = ctrl.chessground.state;
+  const premovePiece = s.pieces.get(orig);
   const piece = s.pieces.get(dest);
-  if (
-    piece &&
-    piece.role == 'p-piece' &&
-    ((dest[1] == '8' && s.turnPlayerIndex == 'p2') || (dest[1] == '1' && s.turnPlayerIndex == 'p1'))
-  ) {
+  const variantKey = ctrl.data.game.variant.key;
+
+  if (possiblePromotion(ctrl, orig, dest, variantKey)) {
     promoting = {
       orig,
       dest,
       capture,
       callback,
     };
+    if (variantKey === 'shogi' && forcedShogiPromotion(ctrl, orig, dest)) {
+      const role = premovePiece ? premovePiece.role : piece!.role;
+      finish(ctrl, role);
+      return true;
+    }
+    if (variantKey === 'minishogi' && forcedMiniShogiPromotion(ctrl, orig, dest)) {
+      const role = premovePiece ? premovePiece.role : piece!.role;
+      finish(ctrl, role);
+      return true;
+    }
     ctrl.redraw();
     return true;
   }
@@ -51,6 +89,54 @@ function finish(ctrl: AnalyseCtrl, role: Role): void {
   promoting = undefined;
 }
 
+function possiblePromotion(
+  ctrl: AnalyseCtrl,
+  orig: Key,
+  dest: Key,
+  variant: VariantKey
+): boolean | undefined {
+  const piece = ctrl.chessground.state.pieces.get(dest),
+    premovePiece = ctrl.chessground.state.pieces.get(orig);
+  const isP1 = piece && piece.playerIndex == 'p1'
+  const isP2 = piece && piece.playerIndex == 'p2'
+  switch (variant) {
+    case 'oware':
+    case 'minixiangqi':
+    case 'xiangqi':
+    case 'flipello10':
+    case 'flipello':
+      return false;
+    case 'shogi':
+      return (
+        ((piece && !piece.promoted && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
+          (premovePiece &&
+            !premovePiece.promoted &&
+            premovePiece.role !== 'k-piece' &&
+            premovePiece.role !== 'g-piece')) &&
+        ((isP1 && (['7', '8', '9'].includes(dest[1]) || ['7', '8', '9'].includes(orig[1]))) ||
+          (isP2 &&
+            (['1', '2', '3'].includes(dest[1]) || ['1', '2', '3'].includes(orig[1])))) &&
+        orig != 'a0' // cant promote from a drop
+      );
+    case 'minishogi':
+      return (
+        ((piece && !piece.promoted && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
+          (premovePiece &&
+            !premovePiece.promoted &&
+            premovePiece.role !== 'k-piece' &&
+            premovePiece.role !== 'g-piece')) &&
+        ((isP1 && (['5'].includes(dest[1]) || ['5'].includes(orig[1]))) ||
+          (isP2 && (['1'].includes(dest[1]) || ['1'].includes(orig[1])))) &&
+        orig != 'a0' // cant promote from a drop
+      );
+    default:
+      return (
+        ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
+        ((dest[1] === '8' && piece && piece.playerIndex === 'p1') || (dest[1] === '1' && piece && piece.playerIndex === 'p2'))
+      );
+  }
+}
+
 export function cancel(ctrl: AnalyseCtrl): void {
   if (promoting) {
     promoting = undefined;
@@ -62,15 +148,17 @@ export function cancel(ctrl: AnalyseCtrl): void {
 function renderPromotion(
   ctrl: AnalyseCtrl,
   dest: Key,
-  pieces: string[],
+  roles: Role[],
   playerIndex: PlayerIndex,
   orientation: Orientation
 ): MaybeVNode {
   if (!promoting) return;
 
-  let left = (7 - util.key2pos(dest)[0]) * 12.5;
-  if (orientation === 'p1') left = 87.5 - left;
+  const rows = ctrl.chessground.state.dimensions.height;
+  const columns = ctrl.chessground.state.dimensions.width;
 
+  let left = (columns - util.key2pos(dest)[0]) * (100 / columns);
+  if (orientation === 'p1') left = 100 - 100 / columns - left;
   const vertical = playerIndex === orientation ? 'top' : 'bottom';
 
   return h(
@@ -81,8 +169,21 @@ function renderPromotion(
         el.oncontextmenu = () => false;
       }),
     },
-    pieces.map(function (serverRole: Role, i) {
-      const top = (playerIndex === orientation ? i : 7 - i) * 12.5;
+    roles.map(function(serverRole: Role, i) {
+      let top = 0;
+      if (playerIndex === orientation) {
+        if (playerIndex === 'p1') {
+          top = (rows - util.key2pos(dest)[1] + i) * (100 / rows);
+        } else {
+          top = (util.key2pos(dest)[1] - 1 + i) * (100 / rows);
+        }
+      } else {
+        if (playerIndex === 'p1') {
+          top = (util.key2pos(dest)[1] - 1 - i) * (100 / rows);
+        } else {
+          top = (rows - util.key2pos(dest)[1] - i) * (100 / rows);
+        }
+      }
       return h(
         'square',
         {
@@ -94,7 +195,7 @@ function renderPromotion(
             finish(ctrl, serverRole);
           }),
         },
-        [h(`piece.${serverRole}.${playerIndex}`)]
+        [h(`piece.${serverRole}.${playerIndex}.ally`)]
       );
     })
   );
@@ -105,11 +206,21 @@ const roles: Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
 export function view(ctrl: AnalyseCtrl): MaybeVNode {
   if (!promoting) return;
 
+  const piece = ctrl.chessground.state.pieces.get(promoting.dest);
+  if (!piece) return;
+  const variantKey = ctrl.data.game.variant.key,
+    rolesToChoose =
+      variantKey === 'shogi' || variantKey === 'minishogi'
+        ? (['p' + piece.role, piece.role] as Role[])
+        : variantKey === 'antichess'
+          ? roles.concat('k-piece')
+          : roles;
+
   return renderPromotion(
     ctrl,
     promoting.dest,
-    ctrl.data.game.variant.key === 'antichess' ? roles.concat('k-piece') : roles,
-    promoting.dest[1] === '8' ? 'p1' : 'p2',
+    rolesToChoose,
+    piece.playerIndex,
     ctrl.chessground.state.orientation
   );
 }
