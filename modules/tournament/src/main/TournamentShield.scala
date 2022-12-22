@@ -146,7 +146,7 @@ object TournamentShield {
       val onePerGameFamily =
         Random.shuffle(GameFamily.all.map(gf => thisOrder.filter(_.gameFamily == gf).head))
       val newOrder = onePerGameFamily ::: thisOrder.filterNot(onePerGameFamily.contains(_))
-      TournamentMedleyUtil.medleyVariantsAndSpeeds(
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
         newOrder,
         5 * 60,
         playStrategyMinutes,
@@ -177,7 +177,7 @@ object TournamentShield {
 
     private def randomChessVariantOrder(variants: List[Variant]) = {
       val orderedVariants = Random.shuffle(variants)
-      TournamentMedleyUtil.medleyVariantsAndSpeeds(
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
         orderedVariants,
         5 * 60,
         100,
@@ -208,7 +208,7 @@ object TournamentShield {
 
     private def randomDraughtsVariantOrder(variants: List[Variant]) = {
       val orderedVariants = Random.shuffle(variants)
-      TournamentMedleyUtil.medleyVariantsAndSpeeds(
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
         orderedVariants,
         5 * 60,
         105,

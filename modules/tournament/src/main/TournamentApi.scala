@@ -76,7 +76,7 @@ final class TournamentApi(
       mode = setup.realMode,
       password = setup.password,
       variant = setup.realVariant,
-      medleyVariantsAndSpeeds = setup.medleyVariantsAndSpeeds,
+      medleyVariantsAndIntervals = setup.medleyVariantsAndIntervals,
       medleyMinutes = setup.medleyIntervalOptions.medleyMinutes,
       position = setup.realPosition,
       berserkable = setup.berserkable | true,

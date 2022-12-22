@@ -73,7 +73,7 @@ final class TournamentForm {
       medley = tour.isMedley.some,
       medleyIntervalOptions = MedleyIntervalOptions(
         medleyMinutes = tour.medleyMinutes,
-        balanceIntervals = tour.medleyisBalanced,
+        balanceIntervals = tour.medleyIsBalanced,
         numIntervals = tour.medleyNumIntervals
       ),
       medleyDefaults = MedleyDefaults(
@@ -104,7 +104,7 @@ final class TournamentForm {
 
   private val blockList = List("playstrategy", "lichess")
 
-  private def nameType(user: User) = eventName(2, 30).verifying(
+  private def nameType(user: User) = eventName(2, 32).verifying(
     Constraint[String] { (t: String) =>
       if (blockList.exists(t.toLowerCase.contains) && !user.isVerified && !user.isAdmin)
         validation.Invalid(validation.ValidationError("Must not contain \"playstrategy\""))
@@ -305,17 +305,17 @@ private[tournament] case class TournamentSetup(
         minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
         variant = newVariant,
-        medleyVariantsAndSpeeds =
+        medleyVariantsAndIntervals =
           if (
             old.medleyGameFamilies != medleyGameFamilies.gfList
               .sortWith(_.name < _.name)
               .some
             || old.medleyMinutes != medleyIntervalOptions.medleyMinutes
             || old.minutes != minutes
-            || old.medleyisBalanced != medleyIntervalOptions.balanceIntervals
+            || old.medleyIsBalanced != medleyIntervalOptions.balanceIntervals
             || old.medleyNumIntervals != medleyIntervalOptions.numIntervals
-          ) medleyVariantsAndSpeeds
-          else old.medleyVariantsAndSpeeds,
+          ) medleyVariantsAndIntervals
+          else old.medleyVariantsAndIntervals,
         medleyMinutes = medleyIntervalOptions.medleyMinutes,
         startsAt = startDate | old.startsAt,
         password = password,
@@ -356,7 +356,8 @@ private[tournament] case class TournamentSetup(
       )
   }
 
-  private def estimateNumberOfGamesOneCanPlay: Double = (minutes * 60) / estimatedGameSeconds
+  private def estimateNumberOfGamesOneCanPlay: Double =
+    ((if (isMedley) medleyDuration else minutes) * 60) / estimatedGameSeconds
 
   // There are 2 players, and they don't always use all their time (0.8)
   // add 15 seconds for pairing delay
@@ -396,14 +397,14 @@ private[tournament] case class TournamentSetup(
       scala.util.Random.shuffle(Variant.all.filter(_.draughts64Variant))
     else generateNoDefaultsMedleyVariants
 
-  def medleyVariantsAndSpeeds: Option[List[(Variant, Int)]] =
+  def medleyVariantsAndIntervals: Option[List[(Variant, Int)]] =
     if (isMedley) {
       val medleyList     = generateMedleyVariants
       var fullMedleyList = medleyList
       while (fullMedleyList.size < maxMedleyRounds.getOrElse(0))
         fullMedleyList = fullMedleyList ::: medleyList
       TournamentMedleyUtil
-        .medleyVariantsAndSpeeds(
+        .medleyVariantsAndIntervals(
           fullMedleyList,
           clockConfig.limitSeconds,
           medleyDuration,

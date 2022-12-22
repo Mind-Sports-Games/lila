@@ -5,7 +5,7 @@ import strategygames.GameFamily
 
 object TournamentMedleyUtil {
 
-  def medleyVariantsAndSpeeds(
+  def medleyVariantsAndIntervals(
       orderedMedleyList: List[Variant],
       gameClockSeconds: Int,
       minutes: Int,

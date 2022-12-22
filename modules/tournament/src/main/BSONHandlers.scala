@@ -73,10 +73,10 @@ object BSONHandlers {
       val startsAt   = r date "startsAt"
       val conditions = r.getO[Condition.All]("conditions") getOrElse Condition.All.empty
       val mVariants  = r.getO[List[Variant]]("mVariants")
-      val mSpeeds    = r.getO[List[Int]]("mIntervals")
-      val medleyVariantsAndSpeeds: Option[List[(Variant, Int)]] = mVariants.map(_.zipWithIndex.map {
+      val mIntervals = r.getO[List[Int]]("mIntervals")
+      val medleyVariantsAndIntervals: Option[List[(Variant, Int)]] = mVariants.map(_.zipWithIndex.map {
         case (v, i) =>
-          (v, mSpeeds.fold(0)(_.lift(i).getOrElse(0)))
+          (v, mIntervals.fold(0)(_.lift(i).getOrElse(0)))
       })
       Tournament(
         id = r str "_id",
@@ -85,7 +85,7 @@ object BSONHandlers {
         clock = r.get[strategygames.Clock.Config]("clock"),
         minutes = r int "minutes",
         variant = variant,
-        medleyVariantsAndSpeeds = medleyVariantsAndSpeeds,
+        medleyVariantsAndIntervals = medleyVariantsAndIntervals,
         medleyMinutes = r.intO("mMinutes"),
         position = position,
         mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,

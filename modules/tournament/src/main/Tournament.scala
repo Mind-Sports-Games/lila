@@ -21,7 +21,7 @@ case class Tournament(
     clock: ClockConfig,
     minutes: Int,
     variant: Variant,
-    medleyVariantsAndSpeeds: Option[List[(Variant, Int)]] = None,
+    medleyVariantsAndIntervals: Option[List[(Variant, Int)]] = None,
     medleyMinutes: Option[Int] = None,
     position: Option[FEN],
     mode: Mode,
@@ -90,15 +90,15 @@ case class Tournament(
 
   def isRated = mode == Mode.Rated
 
-  def medleyVariants: Option[List[Variant]] = medleyVariantsAndSpeeds.map(_.map(_._1))
+  def medleyVariants: Option[List[Variant]] = medleyVariantsAndIntervals.map(_.map(_._1))
 
-  def medleyIntervalSeconds: Option[List[Int]] = medleyVariantsAndSpeeds.map(_.map(_._2).filter(_ != 0))
+  def medleyIntervalSeconds: Option[List[Int]] = medleyVariantsAndIntervals.map(_.map(_._2).filter(_ != 0))
 
   def isMedley = medleyVariants.nonEmpty
 
   def medleyNumIntervals: Option[Int] = medleyIntervalSeconds.map(_.length)
 
-  def medleyisBalanced: Option[Boolean] = medleyIntervalSeconds.map(v => v.toSet.size != 1)
+  def medleyIsBalanced: Option[Boolean] = medleyIntervalSeconds.map(v => v.toSet.size != 1)
 
   def medleyDurationMinutes = medleyMinutes.getOrElse(0) * medleyNumIntervals.getOrElse(0)
 
@@ -236,7 +236,7 @@ object Tournament {
       clock: ClockConfig,
       minutes: Int,
       variant: Variant,
-      medleyVariantsAndSpeeds: Option[List[(Variant, Int)]] = None,
+      medleyVariantsAndIntervals: Option[List[(Variant, Int)]] = None,
       medleyMinutes: Option[Int] = None,
       position: Option[FEN],
       mode: Mode,
@@ -262,7 +262,7 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = variant,
-      medleyVariantsAndSpeeds = medleyVariantsAndSpeeds,
+      medleyVariantsAndIntervals = medleyVariantsAndIntervals,
       medleyMinutes = medleyMinutes,
       position = position,
       mode = mode,
@@ -293,7 +293,7 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = sched.variant,
-      medleyVariantsAndSpeeds = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
+      medleyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
       medleyMinutes = sched.medleyShield.map(_.arenaMedleyMinutes),
       position = sched.position,
       mode = Mode.Rated,

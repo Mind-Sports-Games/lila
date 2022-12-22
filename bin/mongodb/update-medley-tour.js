@@ -4,9 +4,9 @@ db.tournament2
   .forEach(t => {
     print('updating medley tournament ' + t._id + '; ' + t.name);
     var intervals = Math.ceil(t.minutes / t.mMinutes);
-    var remainder = intervals * t.mMinutes - t.minutes;
+    var remainder = intervals * t.mMinutes * 60 - t.minutes * 60;
     var speeds = Array.from({ length: intervals }, (_, i) =>
-      i !== intervals - 1 ? NumberInt(t.mMinutes) : NumberInt(t.mMinutes - remainder)
+      i !== intervals - 1 ? NumberInt(t.mMinutes * 60) : NumberInt(t.mMinutes * 60 - remainder)
     );
     db.tournament2.update(
       { _id: t._id },
