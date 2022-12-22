@@ -259,11 +259,11 @@ const roles: cg.Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
 export function view(ctrl: RoundController): MaybeVNode {
   if (!promoting) return;
   const piece = ctrl.chessground.state.pieces.get(promoting.move[1]),
-    varaintKey = ctrl.data.game.variant.key,
+    variantKey = ctrl.data.game.variant.key,
     rolesToChoose =
-      varaintKey === 'shogi' || varaintKey === 'minishogi'
+      variantKey === 'shogi' || variantKey === 'minishogi'
         ? (['p' + piece?.role, piece?.role] as cg.Role[])
-        : varaintKey === 'antichess'
+        : variantKey === 'antichess'
         ? roles.concat('k-piece')
         : roles;
   return renderPromotion(
