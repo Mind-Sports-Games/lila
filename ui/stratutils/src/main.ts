@@ -1,5 +1,7 @@
 import { piotr } from './piotr';
 
+export * as promotion from './promotion';
+
 export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
 export function fixCrazySan(san: San): San {
