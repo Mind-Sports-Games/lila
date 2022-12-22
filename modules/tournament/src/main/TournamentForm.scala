@@ -104,7 +104,7 @@ final class TournamentForm {
 
   private val blockList = List("playstrategy", "lichess")
 
-  private def nameType(user: User) = eventName(2, 32).verifying(
+  private def nameType(user: User) = eventName(2, 36).verifying(
     Constraint[String] { (t: String) =>
       if (blockList.exists(t.toLowerCase.contains) && !user.isVerified && !user.isAdmin)
         validation.Invalid(validation.ValidationError("Must not contain \"playstrategy\""))
