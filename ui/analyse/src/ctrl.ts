@@ -541,6 +541,8 @@ export default class AnalyseCtrl {
     this.jump(newPath);
     this.redraw();
     this.chessground.playPremove();
+    const parsedDests = stratUtils.readDests(node.dests);
+    if (parsedDests) this.maybeForceMove(parsedDests);
   }
 
   addDests(dests: string, path: Tree.Path): void {
@@ -550,6 +552,20 @@ export default class AnalyseCtrl {
       if (this.outcome()) this.ceval.stop();
     }
     this.withCg(cg => cg.playPremove());
+  }
+
+  private maybeForceMove(possibleMoves: cg.Dests) {
+    if (
+      (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') &&
+      possibleMoves.size == 1
+    ) {
+      const passOrig = possibleMoves.keys().next().value;
+      const passDests = possibleMoves.get(passOrig);
+      if (passDests && passDests.length == 1) {
+        const passDest = passDests[0];
+        this.sendMove(passOrig, passDest, undefined, undefined);
+      }
+    }
   }
 
   deleteNode(path: Tree.Path): void {

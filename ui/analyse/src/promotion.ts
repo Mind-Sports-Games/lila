@@ -5,7 +5,7 @@ import * as util from 'chessground/util';
 import { Role } from 'chessground/types';
 import AnalyseCtrl from './ctrl';
 import { MaybeVNode, JustCaptured } from './interfaces';
-import { promotion } from 'stratutils'
+import { promotion } from 'stratutils';
 
 interface Promoting {
   orig: Key;
@@ -61,16 +61,11 @@ function finish(ctrl: AnalyseCtrl, role: Role): void {
   promoting = undefined;
 }
 
-function possiblePromotion(
-  ctrl: AnalyseCtrl,
-  orig: Key,
-  dest: Key,
-  variant: VariantKey
-): boolean | undefined {
+function possiblePromotion(ctrl: AnalyseCtrl, orig: Key, dest: Key, variant: VariantKey): boolean | undefined {
   const piece = ctrl.chessground.state.pieces.get(dest),
     premovePiece = ctrl.chessground.state.pieces.get(orig);
-  const isP1 = piece && piece.playerIndex == 'p1'
-  const isP2 = piece && piece.playerIndex == 'p2'
+  const isP1 = piece && piece.playerIndex == 'p1';
+  const isP2 = piece && piece.playerIndex == 'p2';
   switch (variant) {
     case 'oware':
     case 'minixiangqi':
@@ -86,8 +81,7 @@ function possiblePromotion(
             premovePiece.role !== 'k-piece' &&
             premovePiece.role !== 'g-piece')) &&
         ((isP1 && (['7', '8', '9'].includes(dest[1]) || ['7', '8', '9'].includes(orig[1]))) ||
-          (isP2 &&
-            (['1', '2', '3'].includes(dest[1]) || ['1', '2', '3'].includes(orig[1])))) &&
+          (isP2 && (['1', '2', '3'].includes(dest[1]) || ['1', '2', '3'].includes(orig[1])))) &&
         orig != 'a0' // cant promote from a drop
       );
     case 'minishogi':
@@ -104,7 +98,8 @@ function possiblePromotion(
     default:
       return (
         ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
-        ((dest[1] === '8' && piece && piece.playerIndex === 'p1') || (dest[1] === '1' && piece && piece.playerIndex === 'p2'))
+        ((dest[1] === '8' && piece && piece.playerIndex === 'p1') ||
+          (dest[1] === '1' && piece && piece.playerIndex === 'p2'))
       );
   }
 }
@@ -141,7 +136,7 @@ function renderPromotion(
         el.oncontextmenu = () => false;
       }),
     },
-    roles.map(function(serverRole: Role, i) {
+    roles.map(function (serverRole: Role, i) {
       let top = 0;
       if (playerIndex === orientation) {
         if (playerIndex === 'p1') {
@@ -185,14 +180,8 @@ export function view(ctrl: AnalyseCtrl): MaybeVNode {
       variantKey === 'shogi' || variantKey === 'minishogi'
         ? (['p' + piece.role, piece.role] as Role[])
         : variantKey === 'antichess'
-          ? roles.concat('k-piece')
-          : roles;
+        ? roles.concat('k-piece')
+        : roles;
 
-  return renderPromotion(
-    ctrl,
-    promoting.dest,
-    rolesToChoose,
-    piece.playerIndex,
-    ctrl.chessground.state.orientation
-  );
+  return renderPromotion(ctrl, promoting.dest, rolesToChoose, piece.playerIndex, ctrl.chessground.state.orientation);
 }
