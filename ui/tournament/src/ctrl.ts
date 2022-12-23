@@ -164,7 +164,8 @@ export default class TournamentController {
     const mClock = $('.medley-interval-time').clock();
     mClock.clock('addSeconds', d.secondsToFinishInterval);
 
-    if (finalVariant) $('.medley-extra-clock').remove();
+    const medleyClockElement = $('.medley-extra-clock');
+    if (finalVariant) medleyClockElement.addClass('hidden');
 
     this.redraw();
   };
