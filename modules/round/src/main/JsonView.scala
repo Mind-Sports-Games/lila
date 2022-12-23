@@ -277,7 +277,8 @@ final class JsonView(
             "fen"        -> fen,
             "turns"      -> game.turns,
             "player"     -> game.turnPlayerIndex.name,
-            "status"     -> game.status
+            "status"     -> game.status,
+            "gameFamily" -> game.variant.gameFamily.key
           )
           .add("division", division)
           .add("winner", game.winner.map(w => game.variant.playerNames(w.playerIndex))),

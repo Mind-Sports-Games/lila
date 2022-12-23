@@ -261,9 +261,6 @@ export function allowCevalForVariant(variant: VariantKey) {
   return noCevalVariants.indexOf(variant) == -1;
 }
 
-// TODO: Right now stratops can't parse the fens for the above variants.
-export const isStratOpsEnabled = allowCevalForVariant;
-
 export type LexicalUci = {
   from: cg.Key;
   to: cg.Key;
