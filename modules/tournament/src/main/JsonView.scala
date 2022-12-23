@@ -107,23 +107,26 @@ final class JsonView(
       .add("socketVersion" -> socketVersion.map(_.value))
       .add("teamStanding" -> teamStanding)
       .add("myTeam" -> myTeam)
-      .add("duelTeams" -> data.duelTeams) ++
+      .add("duelTeams" -> data.duelTeams)
+      .add("secondsToFinishInterval" -> tour.isStarted.option(tour.meldeySecondsToFinishInterval))
+      .add("medleyRound" -> full.option(tour.medleyRound.getOrElse(-1))) ++
       full.?? {
         Json
           .obj(
-            "id"            -> tour.id,
-            "createdBy"     -> tour.createdBy,
-            "startsAt"      -> formatDate(tour.startsAt),
-            "system"        -> "arena", // BC
-            "fullName"      -> tour.name(),
-            "minutes"       -> tour.minutes,
-            "medley"        -> tour.isMedley,
-            "medleyMinutes" -> tour.medleyMinutes,
-            "medleyRound"   -> full.option(tour.medleyRound.getOrElse(-1)),
-            "perf"          -> full.option(tour.currentPerfType),
-            "clock"         -> full.option(tour.clock),
-            "lib"           -> full.option(tour.currentVariant.gameLogic.id),
-            "variant"       -> full.option(variantJson(tour.currentVariant)),
+            "id"                     -> tour.id,
+            "createdBy"              -> tour.createdBy,
+            "startsAt"               -> formatDate(tour.startsAt),
+            "system"                 -> "arena", // BC
+            "fullName"               -> tour.name(),
+            "minutes"                -> tour.minutes,
+            "medley"                 -> tour.isMedley,
+            "medleyMinutes"          -> tour.medleyMinutes,
+            "medleyIntervalSeconds"  -> tour.medleyIntervalSeconds,
+            "medleyBalanceIntervals" -> tour.medleyIsBalanced,
+            "perf"                   -> full.option(tour.currentPerfType),
+            "clock"                  -> full.option(tour.clock),
+            "lib"                    -> full.option(tour.currentVariant.gameLogic.id),
+            "variant"                -> full.option(variantJson(tour.currentVariant)),
             "p1Name" -> full.option(
               if (tour.isMedley) trans.p1.txt()
               else tour.variant.playerNames(P1)
@@ -141,7 +144,7 @@ final class JsonView(
           .add("trophy1st" -> tour.trophy1st)
           .add("trophy2nd" -> tour.trophy2nd)
           .add("trophy3rd" -> tour.trophy3rd)
-          .add("medleyVariants" -> tour.medleyRounds.map(_.map(variantJson)))
+          .add("medleyVariants" -> tour.medleyVariantsInTournament.map(_.map(variantJson)))
           .add("private" -> tour.isPrivate)
           .add("quote" -> tour.isCreated.option(Quote.one(tour.id, tour.variant.gameFamily.some)))
           .add("defender" -> shieldOwner.map(_.value))

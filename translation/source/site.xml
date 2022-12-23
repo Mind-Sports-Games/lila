@@ -199,9 +199,12 @@
   <string name="medleyTournaments">Medley Tournaments</string>
   <string name="medleyDefinition">A different game/variant in every round of the Swiss</string>
   <string name="medleyArenaDefinition">The game/variant changes at regular intervals in the tournament</string>
-  <string name="medleyInterval">Medley Interval</string>
+  <string name="medleyInterval">Medley Interval Time</string>
   <string name="medleyIntervalDefinition">How long each game/variant gets in the medley tournament</string>
   <string name="medleyVariantsXMinutesEach">Medley Variants: %s minutes each</string>
+  <string name="medleyBalanceIntervalTimes">Balance Interval Times</string>
+  <string name="medleyIntervalOptionDefn">Duration approx. (Interval Time * Intervals)</string>
+  <string name="medleyBalanceIntervalDefn">Quicker/slower variants have shorter/longer interval times. Duration is still approx. (Interval Time * Intervals)</string>
   <string name="timeControl">Time control</string>
   <string name="realTime">Real time</string>
   <string name="correspondence">Correspondence</string>
