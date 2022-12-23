@@ -107,26 +107,26 @@ final class JsonView(
       .add("socketVersion" -> socketVersion.map(_.value))
       .add("teamStanding" -> teamStanding)
       .add("myTeam" -> myTeam)
-      .add("duelTeams" -> data.duelTeams) ++
+      .add("duelTeams" -> data.duelTeams)
+      .add("secondsToFinishInterval" -> tour.isStarted.option(tour.meldeySecondsToFinishInterval))
+      .add("medleyRound" -> full.option(tour.medleyRound.getOrElse(-1))) ++
       full.?? {
         Json
           .obj(
-            "id"                      -> tour.id,
-            "createdBy"               -> tour.createdBy,
-            "startsAt"                -> formatDate(tour.startsAt),
-            "system"                  -> "arena", // BC
-            "fullName"                -> tour.name(),
-            "minutes"                 -> tour.minutes,
-            "medley"                  -> tour.isMedley,
-            "medleyMinutes"           -> tour.medleyMinutes,
-            "medleyIntervalSeconds"   -> tour.medleyIntervalSeconds,
-            "secondsToFinishInterval" -> tour.isStarted.option(tour.meldeySecondsToFinishInterval),
-            "medleyBalanceIntervals"  -> tour.medleyIsBalanced,
-            "medleyRound"             -> full.option(tour.medleyRound.getOrElse(-1)),
-            "perf"                    -> full.option(tour.currentPerfType),
-            "clock"                   -> full.option(tour.clock),
-            "lib"                     -> full.option(tour.currentVariant.gameLogic.id),
-            "variant"                 -> full.option(variantJson(tour.currentVariant)),
+            "id"                     -> tour.id,
+            "createdBy"              -> tour.createdBy,
+            "startsAt"               -> formatDate(tour.startsAt),
+            "system"                 -> "arena", // BC
+            "fullName"               -> tour.name(),
+            "minutes"                -> tour.minutes,
+            "medley"                 -> tour.isMedley,
+            "medleyMinutes"          -> tour.medleyMinutes,
+            "medleyIntervalSeconds"  -> tour.medleyIntervalSeconds,
+            "medleyBalanceIntervals" -> tour.medleyIsBalanced,
+            "perf"                   -> full.option(tour.currentPerfType),
+            "clock"                  -> full.option(tour.clock),
+            "lib"                    -> full.option(tour.currentVariant.gameLogic.id),
+            "variant"                -> full.option(variantJson(tour.currentVariant)),
             "p1Name" -> full.option(
               if (tour.isMedley) trans.p1.txt()
               else tour.variant.playerNames(P1)
