@@ -30,7 +30,7 @@ export function start(
   const piece = s.pieces.get(dest);
   const variantKey = ctrl.data.game.variant.key;
 
-  if (possiblePromotion(ctrl, orig, dest, variantKey)) {
+  if (promotion.possiblePromotion(ctrl.chessground, orig, dest, variantKey)) {
     promoting = {
       orig,
       dest,
@@ -61,48 +61,6 @@ function finish(ctrl: AnalyseCtrl, role: Role): void {
   promoting = undefined;
 }
 
-function possiblePromotion(ctrl: AnalyseCtrl, orig: Key, dest: Key, variant: VariantKey): boolean | undefined {
-  const piece = ctrl.chessground.state.pieces.get(dest),
-    premovePiece = ctrl.chessground.state.pieces.get(orig);
-  const isP1 = piece && piece.playerIndex == 'p1';
-  const isP2 = piece && piece.playerIndex == 'p2';
-  switch (variant) {
-    case 'oware':
-    case 'minixiangqi':
-    case 'xiangqi':
-    case 'flipello10':
-    case 'flipello':
-      return false;
-    case 'shogi':
-      return (
-        ((piece && !piece.promoted && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
-          (premovePiece &&
-            !premovePiece.promoted &&
-            premovePiece.role !== 'k-piece' &&
-            premovePiece.role !== 'g-piece')) &&
-        ((isP1 && (['7', '8', '9'].includes(dest[1]) || ['7', '8', '9'].includes(orig[1]))) ||
-          (isP2 && (['1', '2', '3'].includes(dest[1]) || ['1', '2', '3'].includes(orig[1])))) &&
-        orig != 'a0' // cant promote from a drop
-      );
-    case 'minishogi':
-      return (
-        ((piece && !piece.promoted && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
-          (premovePiece &&
-            !premovePiece.promoted &&
-            premovePiece.role !== 'k-piece' &&
-            premovePiece.role !== 'g-piece')) &&
-        ((isP1 && (['5'].includes(dest[1]) || ['5'].includes(orig[1]))) ||
-          (isP2 && (['1'].includes(dest[1]) || ['1'].includes(orig[1])))) &&
-        orig != 'a0' // cant promote from a drop
-      );
-    default:
-      return (
-        ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
-        ((dest[1] === '8' && piece && piece.playerIndex === 'p1') ||
-          (dest[1] === '1' && piece && piece.playerIndex === 'p2'))
-      );
-  }
-}
 
 export function cancel(ctrl: AnalyseCtrl): void {
   if (promoting) {

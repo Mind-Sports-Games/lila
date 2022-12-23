@@ -27,3 +27,46 @@ export const forcedMiniShogiPromotion = (chessground: ChessgroundApi, orig: Key,
     ((dest[1] === '5' && isP1) || (dest[1] == '1' && isP2))
   );
 }
+
+export const possiblePromotion = (chessground: ChessgroundApi, orig: Key, dest: Key, variant: VariantKey): boolean | undefined => {
+  const piece = chessground.state.pieces.get(dest),
+    premovePiece = chessground.state.pieces.get(orig);
+  const isP1 = piece && piece.playerIndex == 'p1';
+  const isP2 = piece && piece.playerIndex == 'p2';
+  switch (variant) {
+    case 'oware':
+    case 'minixiangqi':
+    case 'xiangqi':
+    case 'flipello10':
+    case 'flipello':
+      return false;
+    case 'shogi':
+      return (
+        ((piece && !piece.promoted && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
+          (premovePiece &&
+            !premovePiece.promoted &&
+            premovePiece.role !== 'k-piece' &&
+            premovePiece.role !== 'g-piece')) &&
+        ((isP1 && (['7', '8', '9'].includes(dest[1]) || ['7', '8', '9'].includes(orig[1]))) ||
+          (isP2 && (['1', '2', '3'].includes(dest[1]) || ['1', '2', '3'].includes(orig[1])))) &&
+        orig != 'a0' // cant promote from a drop
+      );
+    case 'minishogi':
+      return (
+        ((piece && !piece.promoted && piece.role !== 'k-piece' && piece.role !== 'g-piece' && !premovePiece) ||
+          (premovePiece &&
+            !premovePiece.promoted &&
+            premovePiece.role !== 'k-piece' &&
+            premovePiece.role !== 'g-piece')) &&
+        ((isP1 && (['5'].includes(dest[1]) || ['5'].includes(orig[1]))) ||
+          (isP2 && (['1'].includes(dest[1]) || ['1'].includes(orig[1])))) &&
+        orig != 'a0' // cant promote from a drop
+      );
+    default:
+      return (
+        ((piece && piece.role === 'p-piece' && !premovePiece) || (premovePiece && premovePiece.role === 'p-piece')) &&
+        ((dest[1] === '8' && piece && piece.playerIndex === 'p1') ||
+          (dest[1] === '1' && piece && piece.playerIndex === 'p2'))
+      );
+  }
+}
