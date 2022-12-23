@@ -61,7 +61,6 @@ function finish(ctrl: AnalyseCtrl, role: Role): void {
   promoting = undefined;
 }
 
-
 export function cancel(ctrl: AnalyseCtrl): void {
   if (promoting) {
     promoting = undefined;
