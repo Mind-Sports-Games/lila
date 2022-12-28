@@ -6,30 +6,43 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
   const diff: cg.PiecesDiff = new Map();
   const boardFen = newFen.split(' ')[0];
 
-  let top = true;
-  let colNum = 0;
+  let col = 0;
+  let row = 2;
+  let num = 0;
   const emptySquares: cg.Key[] = [];
-  for (let i = 0; i < boardFen.length; i++) {
-    if (boardFen.charAt(i) == '/') {
-      top = false;
-      colNum = 0;
-      continue;
-    }
-    if (['1', '2', '3', '4', '5', '6'].includes(boardFen.charAt(i))) {
-      for (let j = 0; j < Number(boardFen.charAt(i)); j++) {
-        emptySquares.push(util.pos2key([colNum + j + 1, top ? 2 : 1]));
+
+  //TODO this is very similar to chessground.fen.read but also calcs the empty squares
+  for (const r of boardFen.split('/')) {
+    for (const f of r.split(',')) {
+      if (isNaN(+f)) {
+        col += 1 + num;
+        num = 0;
+        const count = f.slice(0, -1);
+        //const role = f.substring(f.length-1);
+        const letter = (+count <= 26)
+          ? String.fromCharCode(64 + +count)
+          : String.fromCharCode(96-26 + +count);
+        const playerIndex = row === 1 ? 'p1' : 'p2' as cg.PlayerIndex;
+        const piece = {
+          role: `${letter}-piece`,
+          playerIndex: playerIndex,
+        } as cg.Piece;
+        diff.set(util.pos2key([col, row]), piece);
+      } else {
+        num = num + +f;
+        for (let j = 0; j < Number(+f); j++) {
+          emptySquares.push(util.pos2key([col + j + 1, row]));
+        }
       }
-      colNum += Number(boardFen.charAt(i));
-      continue;
     }
-    const playerIndex: 'p1' | 'p2' = top ? 'p2' : 'p1';
-    const piece: cg.Piece = { role: `${boardFen.charAt(i)}-piece` as cg.Role, playerIndex: playerIndex };
-    const pos: cg.Pos = [colNum + 1, top ? 2 : 1] as cg.Pos;
-    const k: cg.Key = util.pos2key(pos);
-    diff.set(k, piece);
-    colNum++;
+    --row;
+    if (row === 0) break;
+    col = 0;
+    num = 0;
   }
+
   //update empty squares as there could have been captures, which are not currently calculated in chessground
+
   emptySquares.forEach(x => diff.set(x, undefined));
 
   ctrl.chessground.setPiecesNoAnim(diff);
@@ -38,8 +51,7 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
 export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: cg.Key) {
   const boardWidth = ctrl.data.game.variant.boardSize.width;
   const currentFen = ctrl.data.steps[ctrl.data.steps.length - 1].fen;
-  const boardFen = currentFen.split(' ')[0];
-  const boardArray = createBoardArrayFromBoardFen(boardFen, boardWidth);
+  const boardArray = createBoardArrayFromBoardFen(currentFen.split(' ')[0], boardWidth);
   const origBoardIndex = boardIndexFromUci(orig, boardWidth);
   const destBoardIndex = boardIndexFromUci(dest, boardWidth);
   const stones = boardArray[origBoardIndex];
@@ -53,11 +65,11 @@ export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: c
   }
 
   //remove piece that is moving
-  const BoardArrayRemovedMovingPiece = boardArray.slice(0, boardArray.length);
-  BoardArrayRemovedMovingPiece[origBoardIndex] = 0;
+  const boardArrayRemovedMovingPiece = boardArray.slice(0, boardArray.length);
+  boardArrayRemovedMovingPiece[origBoardIndex] = 0;
 
   //add moving stones to board
-  const finalBoardArray = BoardArrayRemovedMovingPiece.map((v, i) => v + extraStoneArray[i]);
+  const finalBoardArray = boardArrayRemovedMovingPiece.map((v, i) => v + extraStoneArray[i]);
 
   //remove any captured pieces (must check for grandslam!)
   if (dest[1] !== orig[1] && !isGrandSlam(finalBoardArray, destBoardIndex, boardWidth)) {
@@ -95,32 +107,23 @@ export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: c
 function createBoardArrayFromBoardFen(boardFen: string, boardWidth: number): number[] {
   const boardArrayFenOrder: number[] = [];
 
-  for (let i = 0; i < boardFen.length; i++) {
-    if (boardFen.charAt(i) == '/') {
-      continue;
-    }
-    if (['1', '2', '3', '4', '5', '6'].includes(boardFen.charAt(i))) {
-      for (let j = 0; j < Number(boardFen.charAt(i)); j++) {
-        boardArrayFenOrder.push(0);
+  //TODO this is similar to chessground.fen.read but doesnt make pieces
+  for (const r of boardFen.split('/')) {
+    for (const f of r.split(',')) {
+      if (isNaN(+f)) {
+        boardArrayFenOrder.push(+f.slice(0, -1));
+      } else {
+        for (let j = 0; j < Number(+f); j++) {
+          boardArrayFenOrder.push(0);
+        }
       }
-      continue;
     }
-    boardArrayFenOrder.push(owarePieceToNumberOfStones(`${boardFen.charAt(i)}`));
   }
 
   const boardArray: number[] = boardArrayFenOrder
     .splice(boardWidth, boardWidth)
     .concat(boardArrayFenOrder.splice(0, boardWidth).reverse());
   return boardArray;
-}
-
-function owarePieceToNumberOfStones(letter: string): number {
-  const num = letter.charCodeAt(0);
-  if (num < 91) {
-    return num - 64;
-  } else {
-    return num - 70;
-  }
 }
 
 function stoneNumberToPieceLetter(num: number): string {

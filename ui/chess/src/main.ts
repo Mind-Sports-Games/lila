@@ -63,7 +63,7 @@ export function variantUsesDestPosOnlyNotation(key: VariantKey | DraughtsVariant
   return ['flipello', 'flipello10'].includes(key);
 }
 
-export function varaintUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
+export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
   return ['oware'].includes(key);
 }
 
@@ -76,7 +76,7 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
     ? 'wxf'
     : variantUsesDestPosOnlyNotation(key)
     ? 'dpo'
-    : varaintUsesMancalaNotation(key)
+    : variantUsesMancalaNotation(key)
     ? 'man'
     : 'san';
 }
