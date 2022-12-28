@@ -294,17 +294,18 @@ object BinaryFormat {
 
     def writeMancala(pieces: mancala.PieceMap): ByteArray = {
       def posInt(pos: mancala.Pos): Int =
-        (pieces get pos).fold(0) { piece =>
-          piece.player.fold(0, 128) + piece.role.binaryInt
+        (pieces get pos).fold(0) { case (piece, count) =>
+          piece.player.fold(0, 128) + count
         }
       ByteArray(mancala.Pos.all.map(posInt(_).toByte).toArray)
     }
 
     def readMancala(ba: ByteArray, variant: mancala.variant.Variant): mancala.PieceMap = {
-      def intPiece(int: Int): Option[mancala.Piece] =
-        mancala.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map {
-          role => mancala.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
-        }
+      def intPiece(int: Int): Option[(mancala.Piece, Int)] =
+        Some((
+          mancala.Piece(PlayerIndex.fromP1((int & 128) == 0), variant.defaultRole),
+          int & 127
+        ))
       (mancala.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
