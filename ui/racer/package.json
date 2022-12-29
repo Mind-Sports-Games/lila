@@ -17,10 +17,10 @@
   },
   "dependencies": {
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#325-togy-piecemap-count",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat3.16",
     "common": "2.0.0",
     "puz": "2.0.0",
-    "snabbdom": "^3.0.1"
+    "snabbdom": "^3.0.1",
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#325-togy-piecemap-count"
   },
   "scripts": {
     "dev": "rollup --config",

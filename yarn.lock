@@ -7350,9 +7350,9 @@ stockfish.wasm@^0.10.0:
   resolved "https://registry.yarnpkg.com/stockfish.wasm/-/stockfish.wasm-0.10.0.tgz#dc3ef4d98a2a79724c29510d39d89e4a5f0f1888"
   integrity sha512-OTvOlz0ijCSmIb/YvOZ1Dn6vwZVS4Ge3N+RcV0d2b6LXUtCJ9UwmBHypRW3DZ+VXf8WNm7E3P+6jMTVvb3QaBg==
 
-"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat3.16":
+"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#325-togy-piecemap-count":
   version "0.8.1-pstrat3.16"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#887f5e85a761d648d3154dbae8e94b6ffe24d004"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#74907f64aa97618d37eccde96d2c3111c4dc485a"
   dependencies:
     "@badrap/result" "^0.2.8"
 
