@@ -18,7 +18,7 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
         col += 1 + num;
         num = 0;
         const count = f.slice(0, -1);
-        const role = f.substring(f.length-1).toLowerCase();
+        const role = f.substring(f.length - 1).toLowerCase();
         //const letter = +count <= 26 ? String.fromCharCode(64 + +count) : String.fromCharCode(96 - 26 + +count);
         const playerIndex = row === 1 ? 'p1' : ('p2' as cg.PlayerIndex);
         const piece = {
