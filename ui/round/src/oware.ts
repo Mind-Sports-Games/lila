@@ -18,11 +18,11 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
         col += 1 + num;
         num = 0;
         const count = f.slice(0, -1);
-        //const role = f.substring(f.length-1);
-        const letter = +count <= 26 ? String.fromCharCode(64 + +count) : String.fromCharCode(96 - 26 + +count);
+        const role = f.substring(f.length-1).toLowerCase();
+        //const letter = +count <= 26 ? String.fromCharCode(64 + +count) : String.fromCharCode(96 - 26 + +count);
         const playerIndex = row === 1 ? 'p1' : ('p2' as cg.PlayerIndex);
         const piece = {
-          role: `${letter}-piece`,
+          role: `${role}${count}-piece`,
           playerIndex: playerIndex,
         } as cg.Piece;
         diff.set(util.pos2key([col, row]), piece);
@@ -83,6 +83,7 @@ export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: c
 
   //calculate the new pieces of the board to update chessground with
   const pieces: cg.PiecesDiff = new Map();
+  const defaultPieceLetter = 's';
   for (let i = 0; i < finalBoardArray.length; i++) {
     const playerIndex: 'p1' | 'p2' = i < boardWidth ? 'p1' : 'p2';
     const numStones = finalBoardArray[i];
@@ -92,7 +93,7 @@ export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: c
       pieces.set(k, undefined);
     } else {
       const piece: cg.Piece = {
-        role: `${stoneNumberToPieceLetter(finalBoardArray[i])}-piece` as cg.Role,
+        role: `${defaultPieceLetter}${finalBoardArray[i]}-piece` as cg.Role,
         playerIndex: playerIndex,
       };
       pieces.set(k, piece);
@@ -122,14 +123,6 @@ function createBoardArrayFromBoardFen(boardFen: string, boardWidth: number): num
     .splice(boardWidth, boardWidth)
     .concat(boardArrayFenOrder.splice(0, boardWidth).reverse());
   return boardArray;
-}
-
-function stoneNumberToPieceLetter(num: number): string {
-  if (num < 27) {
-    return String.fromCharCode(num + 64);
-  } else {
-    return String.fromCharCode(num + 70);
-  }
 }
 
 function boardIndexFromUci(uci: cg.Key, boardWidth: number): number {

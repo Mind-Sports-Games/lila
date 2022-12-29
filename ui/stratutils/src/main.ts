@@ -1,4 +1,5 @@
 import { piotr } from './piotr';
+import * as cg from 'chessground/types';
 
 // TODO: For some reason we can't import this like:
 // import * from 'stratutils/promotion'
@@ -37,12 +38,12 @@ export function readDrops(line?: string | null): Key[] | null {
   return (line.match(/[a-z][1-9]0?/g) as Key[]) || [];
 }
 
-export function readDropsByRole(line?: string | null): Map<Role, Key[]> {
+export function readDropsByRole(line?: string | null): Map<cg.Role, Key[]> {
   if (typeof line === 'undefined' || line === null) return new Map();
   const roledrops = new Map();
   line
     .split(' ')
-    .forEach(d => roledrops.set((d[0].toLowerCase() + '-piece') as Role, d.slice(1).match(/[a-z][1-9]0?/g) as Key[]));
+    .forEach(d => roledrops.set((d[0].toLowerCase() + '-piece'), d.slice(1).match(/[a-z][1-9]0?/g) as Key[]));
   return roledrops;
 }
 
@@ -88,7 +89,7 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
 }
 
 interface Piece {
-  role: Role;
+  role: cg.Role;
   playerIndex: PlayerIndex;
   promoted?: boolean;
 }
