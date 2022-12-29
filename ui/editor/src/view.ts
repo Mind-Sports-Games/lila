@@ -2,8 +2,8 @@ import { h, VNode } from 'snabbdom';
 import { MouchEvent, NumberPair } from 'chessground/types';
 import { dragNewPiece } from 'chessground/drag';
 import { eventPosition, opposite } from 'chessground/util';
-import { Rules } from 'chessops/types';
-import { parseFen, EMPTY_FEN } from 'chessops/fen';
+import { Rules } from 'stratops/types';
+import { parseFen, EMPTY_FEN } from 'stratops/fen';
 import modal from 'common/modal';
 import EditorCtrl from './ctrl';
 import chessground from './chessground';
@@ -325,7 +325,7 @@ function inputs(ctrl: EditorCtrl, fen: string): VNode | undefined {
           },
           input(e) {
             const el = e.target as HTMLInputElement;
-            const valid = parseFen(el.value.trim()).isOk;
+            const valid = parseFen('chess')(el.value.trim()).isOk;
             el.setCustomValidity(valid ? '' : 'Invalid FEN');
           },
           blur(e) {

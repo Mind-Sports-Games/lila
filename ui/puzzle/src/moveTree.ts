@@ -1,10 +1,10 @@
-import { Chess } from 'chessops/chess';
-import { INITIAL_FEN, makeFen, parseFen } from 'chessops/fen';
-import { makeSan, parseSan } from 'chessops/san';
-import { makeSquare, makeUci, parseUci } from 'chessops/util';
-import { scalachessCharPair } from 'chessops/compat';
+import { Chess } from 'stratops/chess';
+import { INITIAL_FEN, makeFen, parseFen } from 'stratops/fen';
+import { makeSan, parseSan } from 'stratops/san';
+import { makeSquare, makeUci, parseUci } from 'stratops/util';
+import { scalachessCharPair } from 'stratops/compat';
 import { TreeWrapper } from 'tree';
-import { Move } from 'chessops/types';
+import { Move } from 'stratops/types';
 
 export function pgnToTree(pgn: San[]): Tree.Node {
   const pos = Chess.default();
@@ -27,7 +27,7 @@ export function pgnToTree(pgn: San[]): Tree.Node {
 
 export function mergeSolution(root: TreeWrapper, initialPath: Tree.Path, solution: Uci[], pov: PlayerIndex): void {
   const initialNode = root.nodeAtPath(initialPath);
-  const pos = Chess.fromSetup(parseFen(initialNode.fen).unwrap()).unwrap();
+  const pos = Chess.fromSetup(parseFen('chess')(initialNode.fen).unwrap()).unwrap();
   const fromPly = initialNode.ply;
   const nodes = solution.map((uci, i) => {
     const move = parseUci(uci)!;
@@ -43,7 +43,7 @@ export function mergeSolution(root: TreeWrapper, initialPath: Tree.Path, solutio
 const makeNode = (pos: Chess, move: Move, ply: number, san: San): Tree.Node => ({
   ply,
   san,
-  fen: makeFen(pos.toSetup()),
+  fen: makeFen('chess')(pos.toSetup()),
   id: scalachessCharPair(move),
   uci: makeUci(move),
   check: pos.isCheck() ? makeSquare(pos.toSetup().board.kingOf(pos.turn)!) : undefined,

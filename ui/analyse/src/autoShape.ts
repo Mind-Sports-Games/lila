@@ -23,7 +23,7 @@ export function makeShapesFromUci(
   brush: string,
   modifiers?: DrawModifiers
 ): DrawShape[] {
-  // TODO: add this in chessops
+  // TODO: add this in stratops
   const move = parseLexicalUci(uci);
   if (move === undefined) return [];
 

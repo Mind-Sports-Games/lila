@@ -1,8 +1,8 @@
 {
-  "name": "chess",
+  "name": "stratutils",
   "version": "2.0.0",
   "private": true,
-  "description": "playstrategy.org chess utils",
+  "description": "playstrategy.org strategy game utils",
   "type": "module",
   "module": "dist/main.js",
   "types": "dist/main.d.ts",

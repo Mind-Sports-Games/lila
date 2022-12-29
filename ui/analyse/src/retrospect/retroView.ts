@@ -1,5 +1,5 @@
 import { renderIndexAndMove } from '../moveView';
-import { notationStyle } from 'chess';
+import { notationStyle } from 'stratutils';
 import { RetroCtrl } from './retroCtrl';
 import AnalyseCtrl from '../ctrl';
 import { bind, dataIcon, spinner, parentedNode } from '../util';

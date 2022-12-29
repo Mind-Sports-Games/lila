@@ -1,11 +1,11 @@
 import * as miniBoard from 'common/mini-board';
 import StormCtrl from '../ctrl';
-import { Chess } from 'chessops/chess';
+import { Chess } from 'stratops/chess';
 import { getNow, onInsert } from 'puz/util';
 import { h, VNode } from 'snabbdom';
 import { numberSpread } from 'common/number';
-import { parseFen, makeFen } from 'chessops/fen';
-import { parseUci } from 'chessops/util';
+import { parseFen, makeFen } from 'stratops/fen';
+import { parseUci } from 'stratops/util';
 
 const renderEnd = (ctrl: StormCtrl): VNode[] => [...renderSummary(ctrl), renderHistory(ctrl)];
 
@@ -118,10 +118,10 @@ const renderHistory = (ctrl: StormCtrl): VNode => {
                   target: '_blank',
                 },
                 hook: onInsert(e => {
-                  const pos = Chess.fromSetup(parseFen(round.puzzle.fen).unwrap()).unwrap();
+                  const pos = Chess.fromSetup(parseFen('chess')(round.puzzle.fen).unwrap()).unwrap();
                   const uci = round.puzzle.line.split(' ')[0];
                   pos.play(parseUci(uci)!);
-                  miniBoard.initWith(e, makeFen(pos.toSetup()), pos.turn, uci);
+                  miniBoard.initWith(e, makeFen('chess')(pos.toSetup()), pos.turn, uci);
                 }),
               }),
               h('span.storm--end__history__round__meta', [

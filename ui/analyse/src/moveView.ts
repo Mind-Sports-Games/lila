@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { fixCrazySan, NotationStyle } from 'chess';
+import { fixCrazySan, NotationStyle } from 'stratutils';
 import { moveFromNotationStyle } from 'common/notation';
 import { defined } from 'common';
 import { view as cevalView, renderEval as normalizeEval } from 'ceval';

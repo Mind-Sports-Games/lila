@@ -703,7 +703,7 @@ object Game {
 
   val maxPlies = 600 // unlimited can cause StackOverflowError
 
-  val analysableVariants: Set[Variant] = Variant.all.filter(_.aiVariant).toSet
+  val analysableVariants: Set[Variant] = Variant.all.filter(_.hasFishnet).toSet
 
   //not used anywhere
   //val unanalysableVariants: Set[Variant] =

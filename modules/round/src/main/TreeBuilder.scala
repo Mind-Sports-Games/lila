@@ -65,7 +65,12 @@ object TreeBuilder {
           opening = openingOf(fen),
           clock = withClocks.flatMap(_.headOption),
           pocketData = init.situation.board.pocketData,
-          eval = infos lift 0 map makeEval
+          eval = infos lift 0 map makeEval,
+          dropsByRole = init.situation match {
+            case (Situation.FairySF(_)) =>
+              init.situation.dropsByRole
+            case _ => None
+          },
         )
         def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
           val fen    = Forsyth.>>(g.situation.board.variant.gameLogic, g)
@@ -88,6 +93,11 @@ object TreeBuilder {
             pocketData = g.situation.board.pocketData,
             eval = info map makeEval,
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
+            dropsByRole = g.situation match {
+              case (Situation.FairySF(_)) =>
+                g.situation.dropsByRole
+              case _ => None
+            },
             comments = Node.Comments {
               drawOfferPlies(g.turns)
                 .option(
@@ -148,6 +158,11 @@ object TreeBuilder {
         check = g.situation.check,
         opening = openingOf(fen),
         pocketData = g.situation.board.pocketData,
+        dropsByRole = g.situation match {
+          case (Situation.FairySF(_)) =>
+            g.situation.dropsByRole
+          case _ => None
+        },
         eval = none
       )
     }

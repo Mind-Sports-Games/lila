@@ -1,5 +1,11 @@
 import { piotr } from './piotr';
 
+// TODO: For some reason we can't import this like:
+// import * from 'stratutils/promotion'
+// you have to use
+// import { promotion } from 'stratutils'
+export * as promotion from './promotion';
+
 export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
 export function fixCrazySan(san: San): San {
@@ -79,4 +85,25 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
     : variantUsesMancalaNotation(key)
     ? 'man'
     : 'san';
+}
+
+interface Piece {
+  role: Role;
+  playerIndex: PlayerIndex;
+  promoted?: boolean;
+}
+
+export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): Piece | undefined {
+  switch (variant) {
+    case 'flipello10':
+    case 'flipello':
+      return { playerIndex: turnPlayerIndex, role: 'p-piece' };
+    default:
+      return undefined;
+  }
+}
+
+const noFishnetVariants: VariantKey[] = ['linesOfAction', 'scrambledEggs', 'flipello', 'flipello10', 'oware'];
+export function allowFishnetForVariant(variant: VariantKey) {
+  return noFishnetVariants.indexOf(variant) == -1;
 }
