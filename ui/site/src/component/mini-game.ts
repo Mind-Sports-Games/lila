@@ -41,7 +41,7 @@ export const init = (node: HTMLElement) => {
         })
       );
     } else {
-      const [fen, orientation, lm] = node.getAttribute('data-state')!.split(','),
+      const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|'),
         config = {
           coordinates: false,
           viewOnly: true,

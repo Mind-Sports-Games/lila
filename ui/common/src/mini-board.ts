@@ -1,7 +1,7 @@
 import * as domData from './data';
 
 export const init = (node: HTMLElement): void => {
-  const [fen, orientation, lm] = node.getAttribute('data-state')!.split(',');
+  const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|');
   initWith(node, fen, orientation as PlayerIndex, lm);
 };
 
@@ -29,7 +29,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
         })
       );
     } else {
-      const [_, myPlayerIndex, __] = $el.data('state').split(',');
+      const [_, myPlayerIndex, __] = $el.data('state').split('|');
       domData.set(
         node,
         'chessground',

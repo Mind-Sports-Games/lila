@@ -26,7 +26,7 @@ private object PmnStorage {
       }
   }
 
-  //is Huffman used/needed anywhere for PfnStorage?
+  //is Huffman used/needed anywhere for PmnStorage?
   //we default to Oware in here
   case object Huffman extends PmnStorage {
 
@@ -54,11 +54,11 @@ private object PmnStorage {
       }
 
     private def mancalaPos(sq: Integer): Option[Pos] = Pos(sq)
-    private def mancalaRole(role: JavaRole): Role =
-      Role.javaSymbolToRole(role.symbol)
+    private def mancalaCount(role: JavaRole): Int =
+      Role.javaSymbolToInt(role.symbol)
 
-    private def mancalaPiece(piece: JavaPiece): Piece =
-      Piece(PlayerIndex.fromP1(piece.white), mancalaRole(piece.role))
+    private def mancalaPiece(piece: JavaPiece): (Piece, Int) =
+      (Piece(PlayerIndex.fromP1(piece.white), Role.defaultRole), mancalaCount(piece.role))
   }
 
   case class Decoded(

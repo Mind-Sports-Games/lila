@@ -9,7 +9,7 @@ function miniGame(game) {
     },
     [
       m('span.mini-board.is2d', {
-        'data-state': `${game.fen},${game.color},${game.lastMove}`,
+        'data-state': `${game.fen}|${game.color}|${game.lastMove}`,
         config(el, isUpdate) {
           if (!isUpdate) playstrategy.miniBoard.init(el);
         },

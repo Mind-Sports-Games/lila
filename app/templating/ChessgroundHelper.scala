@@ -43,11 +43,14 @@ trait ChessgroundHelper {
             val pieces =
               if (ctx.pref.isBlindfold) ""
               else
-                  board.pieces.map {
-                    case (pos, piece) =>
-                      val klass = s"${piece.player.name} ${piece.role.name}"
-                      s"""<piece class="$klass" style="top:${top(pos)}%;left:${left(pos)}%"></piece>"""
-                  } mkString ""
+                //note this doesnt seem to be used although it is passed through on round creation
+                board.pieces.map {
+                  case (pos, (piece, count)) =>
+                    val klass =
+                      if (count > 1) s"${piece.player.name} ${piece.role.name}${count}"
+                      else s"${piece.player.name} ${piece.role.name}"
+                    s"""<piece class="$klass" style="top:${top(pos)}%;left:${left(pos)}%"></piece>"""
+                } mkString ""
             s"$highlights$pieces"
           }
         }

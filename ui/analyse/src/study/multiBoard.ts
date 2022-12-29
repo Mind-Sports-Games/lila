@@ -161,7 +161,7 @@ function makePlayer(player: ChapterPreviewPlayer): VNode {
 function makeCg(preview: ChapterPreview): VNode {
   return h('span.mini-board.cg-wrap.is2d', {
     attrs: {
-      'data-state': `${preview.fen},${preview.orientation},${preview.lastMove}`,
+      'data-state': `${preview.fen}|${preview.orientation}|${preview.lastMove}`,
     },
     hook: {
       insert(vnode) {

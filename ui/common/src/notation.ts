@@ -372,8 +372,5 @@ function nextAsciiLetter(letter: string, n: number): string {
 }
 
 export function getOwareScore(fen: string, playerIndex: string): number {
-  const pIndex = playerIndex === 'p1' ? 1 : 2;
-  const asciiNum = fen.split(' ')[pIndex].charCodeAt(0);
-  if (asciiNum == 48) return 0;
-  return asciiNum > 90 ? asciiNum - 70 : asciiNum - 64;
+  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }
