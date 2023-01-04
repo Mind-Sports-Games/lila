@@ -250,14 +250,15 @@ object header {
                     }
                   )
                 )
-              ),
-              info.insightVisible option
-                a(cls := "insight", href := routes.Insight.index(u.username), dataIcon := "7")(
-                  span(
-                    strong("Chess Insights"),
-                    em("Analytics from ", if (ctx.is(u)) "your" else s"${u.username}'s", " games")
-                  )
-                )
+              )
+              // TODO Change insights to be about all games not just chess
+              // info.insightVisible option
+              //   a(cls := "insight", href := routes.Insight.index(u.username), dataIcon := "7")(
+              //     span(
+              //       strong("Chess Insights"),
+              //       em("Analytics from ", if (ctx.is(u)) "your" else s"${u.username}'s", " games")
+              //     )
+              //   )
             )
           )
       },
