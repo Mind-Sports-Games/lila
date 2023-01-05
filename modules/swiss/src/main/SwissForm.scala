@@ -143,7 +143,7 @@ final class SwissForm(implicit mode: Mode) {
         xiangqi = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Xiangqi()).some,
         loa = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.LinesOfAction()).some,
         flipello = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Flipello()).some,
-        mancala = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Mancala()).some
+        mancala = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Oware()).some
       ),
       rated = s.settings.rated.some,
       xGamesChoice = XGamesChoice(
@@ -373,7 +373,7 @@ object SwissForm {
       .filterNot(gf => if (!xiangqi.getOrElse(false)) gf == GameFamily.Xiangqi() else false)
       .filterNot(gf => if (!loa.getOrElse(false)) gf == GameFamily.LinesOfAction() else false)
       .filterNot(gf => if (!flipello.getOrElse(false)) gf == GameFamily.Flipello() else false)
-      .filterNot(gf => if (!mancala.getOrElse(false)) gf == GameFamily.Mancala() else false)
+      .filterNot(gf => if (!mancala.getOrElse(false)) gf == GameFamily.Oware() else false)
 
   }
 }

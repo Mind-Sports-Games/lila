@@ -146,10 +146,11 @@ object Event {
         orig = move.orig,
         dest = move.dest,
         san = move match {
-          case StratMove.Chess(move)    => strategygames.chess.format.pgn.Dumper(move)
-          case StratMove.Draughts(move) => strategygames.draughts.format.pdn.Dumper(move)
-          case StratMove.FairySF(move)  => strategygames.fairysf.format.pgn.Dumper(move)
-          case StratMove.Mancala(move)  => strategygames.mancala.format.pgn.Dumper(move)
+          case StratMove.Chess(move)        => strategygames.chess.format.pgn.Dumper(move)
+          case StratMove.Draughts(move)     => strategygames.draughts.format.pdn.Dumper(move)
+          case StratMove.FairySF(move)      => strategygames.fairysf.format.pgn.Dumper(move)
+          case StratMove.Samurai(move)      => strategygames.samurai.format.pgn.Dumper(move)
+          case StratMove.Togyzkumalak(move) => strategygames.togyzkumalak.format.pgn.Dumper(move)
         },
         fen =
           if (
@@ -365,10 +366,11 @@ object Event {
 
   case class Promotion(role: PromotableRole, pos: Pos) extends Event {
     private val lib = pos match {
-      case Pos.Chess(_)    => GameLogic.Chess().id
-      case Pos.Draughts(_) => GameLogic.Draughts().id
-      case Pos.FairySF(_)  => GameLogic.FairySF().id
-      case Pos.Mancala(_)  => GameLogic.Mancala().id
+      case Pos.Chess(_)        => GameLogic.Chess().id
+      case Pos.Draughts(_)     => GameLogic.Draughts().id
+      case Pos.FairySF(_)      => GameLogic.FairySF().id
+      case Pos.Samurai(_)      => GameLogic.Samurai().id
+      case Pos.Togyzkumalak(_) => GameLogic.Togyzkumalak().id
     }
     def typ = "promotion"
     def data =

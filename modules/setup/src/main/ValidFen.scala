@@ -15,7 +15,8 @@ object ValidFen {
       case FEN.Chess(_) => GameLogic.Chess()
       case FEN.Draughts(_) => GameLogic.Draughts()
       case FEN.FairySF(_) => GameLogic.FairySF()
-      case FEN.Mancala(_) => GameLogic.Mancala()
+      case FEN.Samurai(_) => GameLogic.Samurai()
+      case FEN.Togyzkumalak(_) => GameLogic.Togyzkumalak()
     }
     for {
       parsed <- strategygames.format.Forsyth.<<<(lib, fen)

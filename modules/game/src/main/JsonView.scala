@@ -150,13 +150,21 @@ object JsonView {
           "lib"       -> v.gameLogic.id,
           "boardSize" -> fairyVariant.boardSize
         )
-      case Variant.Mancala(mancalaVariant) =>
+      case Variant.Samurai(samuraiVariant) =>
         Json.obj(
           "key"       -> v.key,
           "name"      -> VariantKeys.variantName(v),
           "short"     -> VariantKeys.variantShortName(v),
           "lib"       -> v.gameLogic.id,
-          "boardSize" -> mancalaVariant.boardSize
+          "boardSize" -> samuraiVariant.boardSize
+        )
+      case Variant.Togyzkumalak(togyzkumalakVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> togyzkumalakVariant.boardSize
         )
       case _ =>
         Json.obj(
@@ -180,8 +188,16 @@ object JsonView {
       )
     }
 
-  implicit val boardSizeMancalaWriter: Writes[strategygames.mancala.Board.BoardSize] =
-    Writes[strategygames.mancala.Board.BoardSize] { b =>
+  implicit val boardSizeSamuraiWriter: Writes[strategygames.samurai.Board.BoardSize] =
+    Writes[strategygames.samurai.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
+
+  implicit val boardSizeTogyzkumalakWriter: Writes[strategygames.togyzkumalak.Board.BoardSize] =
+    Writes[strategygames.togyzkumalak.Board.BoardSize] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

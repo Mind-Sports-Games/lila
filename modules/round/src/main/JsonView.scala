@@ -370,7 +370,10 @@ final class JsonView(
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
-      case (Situation.Mancala(_), Variant.Mancala(_)) =>
+      case (Situation.Samurai(_), Variant.Samurai(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
@@ -382,9 +385,10 @@ final class JsonView(
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
-      case (Situation.Mancala(_), Variant.Mancala(_))   => None
-      case (Situation.Draughts(_), Variant.Draughts(_)) => None
-      case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
+      case (Situation.Samurai(_), Variant.Samurai(_))           => None
+      case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) => None
+      case (Situation.Draughts(_), Variant.Draughts(_))         => None
+      case _                                                    => sys.error("Mismatch of types for possibleDropsByrole")
     }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =

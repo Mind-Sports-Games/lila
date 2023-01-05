@@ -324,7 +324,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     frag(
       form3.checkbox(
         form("medleyGameFamilies.mancala"),
-        VariantKeys.gameFamilyName(GameFamily.Mancala()),
+        VariantKeys.gameFamilyName(GameFamily.Oware()),
         klass = "medleyGameFamily",
         displayed = false
       )

@@ -423,7 +423,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
     frag(
       form3.checkbox(
         form("medleyGameFamilies.mancala"),
-        VariantKeys.gameFamilyName(GameFamily.Mancala()),
+        VariantKeys.gameFamilyName(GameFamily.Oware()),
         klass = "medleyGameFamily",
         displayed = false,
         disabled = disabledAfterStart

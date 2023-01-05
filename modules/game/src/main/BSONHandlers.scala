@@ -24,13 +24,15 @@ import strategygames.{
 import strategygames.chess
 import strategygames.draughts
 import strategygames.fairysf
-import strategygames.mancala
+import strategygames.samurai
+import strategygames.togyzkumalak
 import strategygames.format.Uci
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard }
 import strategygames.draughts.variant.{ Variant => DraughtsVariant, Standard => DraughtsStandard }
 import strategygames.fairysf.variant.{ Variant => FairySFVariant, Shogi => FairySFStandard }
-import strategygames.mancala.variant.{ Variant => MancalaVariant, Oware => MancalaStandard }
+import strategygames.samurai.variant.{ Variant => SamuraiVariant, Oware => SamuraiStandard }
+import strategygames.togyzkumalak.variant.{ Variant => TogyzkumalakVariant, Togyzkumalak => TogyzkumalakStandard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
@@ -433,7 +435,7 @@ object BSONHandlers {
       )
     }
 
-    def readMancalaGame(r: BSON.Reader): Game = {
+    def readSamuraiGame(r: BSON.Reader): Game = {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn   = r intD F.startedAtTurn
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
@@ -441,13 +443,13 @@ object BSONHandlers {
       val createdAt       = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
-      val gameVariant = MancalaVariant(r intD F.variant) | MancalaStandard
+      val gameVariant = SamuraiVariant(r intD F.variant) | SamuraiStandard
 
       val decoded = r.bytesO(F.huffmanPgn).map { PmnStorage.Huffman.decode(_, playedPlies) } | {
         val pgnMoves = PmnStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies)
         PmnStorage.Decoded(
           pgnMoves = pgnMoves,
-          pieces = BinaryFormat.piece.readMancala(r bytes F.binaryPieces, gameVariant),
+          pieces = BinaryFormat.piece.readSamurai(r bytes F.binaryPieces, gameVariant),
           positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
           lastMove = None,
           halfMoveClock = pgnMoves.reverse.indexWhere(san =>
@@ -456,17 +458,17 @@ object BSONHandlers {
         )
       }
 
-      val mancalaGame = mancala.Game(
-        situation = mancala.Situation(
-          mancala.Board(
+      val samuraiGame = samurai.Game(
+        situation = samurai.Situation(
+          samurai.Board(
             pieces = decoded.pieces,
-            history = mancala.History(
+            history = samurai.History(
               lastMove = decoded.lastMove,
               halfMoveClock = decoded.halfMoveClock,
               positionHashes = decoded.positionHashes
             ),
             variant = gameVariant,
-            uciMoves = strategygames.mancala.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
+            uciMoves = strategygames.samurai.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
           ),
           player = turnPlayerIndex
         ),
@@ -485,7 +487,89 @@ object BSONHandlers {
         id = light.id,
         p1Player = light.p1Player,
         p2Player = light.p2Player,
-        chess = StratGame.Mancala(mancalaGame),
+        chess = StratGame.Samurai(samuraiGame),
+        loadClockHistory = clk =>
+          for {
+            bw <- p1ClockHistory
+            bb <- p2ClockHistory
+            history <-
+              BinaryFormat.clockHistory
+                .read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+            _ = lila.mon.game.loadClockHistory.increment()
+          } yield history,
+        status = light.status,
+        daysPerTurn = r intO F.daysPerTurn,
+        binaryMoveTimes = r bytesO F.moveTimes,
+        mode = Mode(r boolD F.rated),
+        bookmarks = r intD F.bookmarks,
+        createdAt = createdAt,
+        movedAt = r.dateD(F.movedAt, createdAt),
+        metadata = Metadata(
+          source = r intO F.source flatMap Source.apply,
+          pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
+          tournamentId = r strO F.tournamentId,
+          swissId = r strO F.swissId,
+          simulId = r strO F.simulId,
+          multiMatch = r strO F.multiMatch,
+          analysed = r boolD F.analysed,
+          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
+        )
+      )
+    }
+
+    def readTogyzkumalakGame(r: BSON.Reader): Game = {
+      val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val startedAtTurn   = r intD F.startedAtTurn
+      val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
+      val turnPlayerIndex = PlayerIndex.fromPly(plies)
+      val createdAt       = r date F.createdAt
+
+      val playedPlies = plies - startedAtTurn
+      val gameVariant = TogyzkumalakVariant(r intD F.variant) | TogyzkumalakStandard
+
+      val decoded = r.bytesO(F.huffmanPgn).map { PtnStorage.Huffman.decode(_, playedPlies) } | {
+        val pgnMoves = PtnStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies)
+        PtnStorage.Decoded(
+          pgnMoves = pgnMoves,
+          pieces = BinaryFormat.piece.readTogyzkumalak(r bytes F.binaryPieces, gameVariant),
+          positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+          lastMove = None,
+          halfMoveClock = pgnMoves.reverse.indexWhere(san =>
+            san.contains("x") || san.headOption.exists(_.isLower)
+          ) atLeast 0
+        )
+      }
+
+      val togyzkumalakGame = togyzkumalak.Game(
+        situation = togyzkumalak.Situation(
+          togyzkumalak.Board(
+            pieces = decoded.pieces,
+            history = togyzkumalak.History(
+              lastMove = decoded.lastMove,
+              halfMoveClock = decoded.halfMoveClock,
+              positionHashes = decoded.positionHashes
+            ),
+            variant = gameVariant,
+            uciMoves = strategygames.togyzkumalak.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
+          ),
+          player = turnPlayerIndex
+        ),
+        pgnMoves = decoded.pgnMoves,
+        clock = r.getO[PlayerIndex => Clock](F.clock) {
+          clockBSONReader(createdAt, light.p1Player.berserk, light.p2Player.berserk)
+        } map (_(turnPlayerIndex)),
+        turns = plies,
+        startedAtTurn = startedAtTurn
+      )
+
+      val p1ClockHistory = r bytesO F.p1ClockHistory
+      val p2ClockHistory = r bytesO F.p2ClockHistory
+
+      Game(
+        id = light.id,
+        p1Player = light.p1Player,
+        p2Player = light.p2Player,
+        chess = StratGame.Togyzkumalak(togyzkumalakGame),
         loadClockHistory = clk =>
           for {
             bw <- p1ClockHistory
@@ -524,7 +608,8 @@ object BSONHandlers {
         case 0 => readChessGame(r)
         case 1 => readDraughtsGame(r)
         case 2 => readFairySFGame(r)
-        case 3 => readMancalaGame(r)
+        case 3 => readSamuraiGame(r)
+        case 4 => readTogyzkumalakGame(r)
         case _ => sys.error("Invalid game in the database")
       }
     }
@@ -600,12 +685,21 @@ object BSONHandlers {
               F.positionHashes -> o.history.positionHashes,
               F.pocketData     -> o.board.pocketData
             )
-          case GameLogic.Mancala() =>
+          case GameLogic.Samurai() =>
             $doc(
               F.oldPgn -> PmnStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
-              F.binaryPieces -> BinaryFormat.piece.writeMancala(o.board match {
-                case Board.Mancala(board) => board.pieces
-                case _                    => sys.error("invalid mancala board")
+              F.binaryPieces -> BinaryFormat.piece.writeSamurai(o.board match {
+                case Board.Samurai(board) => board.pieces
+                case _                    => sys.error("invalid samurai board")
+              }),
+              F.positionHashes -> o.history.positionHashes
+            )
+          case GameLogic.Togyzkumalak() =>
+            $doc(
+              F.oldPgn -> PtnStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.binaryPieces -> BinaryFormat.piece.writeTogyzkumalak(o.board match {
+                case Board.Togyzkumalak(board) => board.pieces
+                case _                         => sys.error("invalid togyzkumalak board")
               }),
               F.positionHashes -> o.history.positionHashes
             )

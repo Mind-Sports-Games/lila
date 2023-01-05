@@ -88,7 +88,7 @@ final class TournamentForm {
         xiangqi = gameFamilyInMedley(tour.medleyVariants, GameFamily.Xiangqi()).some,
         loa = gameFamilyInMedley(tour.medleyVariants, GameFamily.LinesOfAction()).some,
         flipello = gameFamilyInMedley(tour.medleyVariants, GameFamily.Flipello()).some,
-        mancala = gameFamilyInMedley(tour.medleyVariants, GameFamily.Mancala()).some
+        mancala = gameFamilyInMedley(tour.medleyVariants, GameFamily.Oware()).some
       ),
       position = tour.position,
       mode = none,
@@ -446,6 +446,6 @@ case class MedleyGameFamilies(
     .filterNot(gf => if (!xiangqi.getOrElse(false)) gf == GameFamily.Xiangqi() else false)
     .filterNot(gf => if (!loa.getOrElse(false)) gf == GameFamily.LinesOfAction() else false)
     .filterNot(gf => if (!flipello.getOrElse(false)) gf == GameFamily.Flipello() else false)
-    .filterNot(gf => if (!mancala.getOrElse(false)) gf == GameFamily.Mancala() else false)
+    .filterNot(gf => if (!mancala.getOrElse(false)) gf == GameFamily.Oware() else false)
 
 }

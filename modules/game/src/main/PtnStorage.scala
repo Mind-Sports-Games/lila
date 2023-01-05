@@ -1,17 +1,17 @@
 package lila.game
 
-import strategygames.samurai
-import strategygames.samurai.format
-import strategygames.samurai.{ Piece, PieceMap, Pos, PositionHash, Role }
+import strategygames.togyzkumalak
+import strategygames.togyzkumalak.format
+import strategygames.togyzkumalak.{ Piece, PieceMap, Pos, PositionHash, Role }
 import strategygames.{ Player => PlayerIndex, GameFamily }
 
 import lila.db.ByteArray
 
-sealed trait PmnStorage
+sealed trait PtnStorage
 
-private object PmnStorage {
+private object PtnStorage {
 
-  case object OldBin extends PmnStorage {
+  case object OldBin extends PtnStorage {
 
     def encode(gf: GameFamily, pgnMoves: PgnMoves) =
       ByteArray {
@@ -26,9 +26,9 @@ private object PmnStorage {
       }
   }
 
-  //is Huffman used/needed anywhere for PmnStorage?
+  //is Huffman used/needed anywhere for PtnStorage?
   //we default to Oware in here
-  case object Huffman extends PmnStorage {
+  case object Huffman extends PtnStorage {
 
     import org.lichess.compression.game.{ Encoder, Piece => JavaPiece, Role => JavaRole }
     import scala.jdk.CollectionConverters._
@@ -45,7 +45,7 @@ private object PmnStorage {
         Decoded(
           pgnMoves = decoded.pgnMoves.toVector,
           pieces = decoded.pieces.asScala.view.flatMap { case (k, v) =>
-            samuraiPos(k).map(_ -> samuraiPiece(v))
+            togyzkumalakPos(k).map(_ -> togyzkumalakPiece(v))
           }.toMap,
           positionHashes = decoded.positionHashes,
           lastMove = Option(decoded.lastUci) flatMap (format.Uci.apply),
@@ -53,12 +53,12 @@ private object PmnStorage {
         )
       }
 
-    private def samuraiPos(sq: Integer): Option[Pos] = Pos(sq)
-    private def samuraiCount(role: JavaRole): Int =
+    private def togyzkumalakPos(sq: Integer): Option[Pos] = Pos(sq)
+    private def togyzkumalakCount(role: JavaRole): Int =
       Role.javaSymbolToInt(role.symbol)
 
-    private def samuraiPiece(piece: JavaPiece): (Piece, Int) =
-      (Piece(PlayerIndex.fromP1(piece.white), Role.defaultRole), samuraiCount(piece.role))
+    private def togyzkumalakPiece(piece: JavaPiece): (Piece, Int) =
+      (Piece(PlayerIndex.fromP1(piece.white), Role.defaultRole), togyzkumalakCount(piece.role))
   }
 
   case class Decoded(
