@@ -18,7 +18,7 @@ import { Autoplay, AutoplayDelay } from './autoplay';
 import { build as makeTree, path as treePath, ops as treeOps, TreeWrapper } from 'tree';
 import { compute as computeAutoShapes } from './autoShape';
 import { Config as ChessgroundConfig } from 'chessground/config';
-import { setDropMode } from 'chessground/drop';
+import { setDropMode, cancelDropMode } from 'chessground/drop';
 import { ActionMenuCtrl } from './actionMenu';
 import { ctrl as cevalCtrl, isEvalBetter, sanIrreversible, CevalCtrl, Work as CevalWork, CevalOpts } from 'ceval';
 import { ctrl as treeViewCtrl, TreeView } from './treeView/treeView';
@@ -358,6 +358,17 @@ export default class AnalyseCtrl {
 
   playedLastMoveMyself = () => !!this.justPlayed && !!this.node.uci && this.node.uci.startsWith(this.justPlayed);
 
+  private onCancelDropMode = () => {
+    //redraw pocket - due to possible selection in CG and dropmode cancelled
+    if (['crazyhouse', 'shogi', 'minishogi'].includes(this.data.game.variant.key)) {
+      this.redraw();
+    }
+  };
+
+  makeCgHooks = () => ({
+    onCancelDropMode: this.onCancelDropMode,
+  });
+
   jump(path: Tree.Path): void {
     const pathChanged = path !== this.path,
       isForwardStep = pathChanged && path.length == this.path.length + 2;
@@ -488,6 +499,10 @@ export default class AnalyseCtrl {
       this.preparePremoving();
       this.redraw();
     } else this.jump(this.path);
+    if (!this.data.onlyDropsVariant) {
+      cancelDropMode(this.chessground.state);
+      this.redraw();
+    }
   };
 
   userMove = (orig: Key, dest: Key, capture?: JustCaptured): void => {
@@ -497,6 +512,7 @@ export default class AnalyseCtrl {
     const isCapture = capture || (piece && piece.role == 'p-piece' && orig[0] != dest[0]);
     this.sound[isCapture ? 'capture' : 'move']();
     if (!promotion.start(this, orig, dest, capture, this.sendMove)) this.sendMove(orig, dest, capture);
+    if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
   };
 
   sendMove = (orig: Key, dest: Key, capture?: JustCaptured, prom?: cg.Role): void => {
@@ -514,6 +530,10 @@ export default class AnalyseCtrl {
     this.socket.sendAnaMove(move);
     this.preparePremoving();
     this.redraw();
+  };
+
+  cancelMove = (): void => {
+    this.reset();
   };
 
   private preparePremoving(): void {
