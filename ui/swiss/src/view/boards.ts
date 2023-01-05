@@ -19,7 +19,7 @@ const renderBoardClasses = (board: Board): string =>
 const renderBoardState = (board: Board): string =>
   board.gameLogic === 'draughts' && !!board.boardSize
     ? `${board.fen}|${board.boardSize.size[0]}x${board.boardSize.size[1]}|${board.orientation}|${board.lastMove}`
-    : `${board.fen},${board.orientation},${board.lastMove}`;
+    : `${board.fen}|${board.orientation}|${board.lastMove}`;
 
 const renderBoard = (incomingBoard: Board): VNode => {
   const board =

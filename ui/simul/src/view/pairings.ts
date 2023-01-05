@@ -19,7 +19,7 @@ const renderClock = (playerIndex: PlayerIndex, time: number) =>
 const renderBoardState = (game: Game): string =>
   game.gameLogic === 'draughts' && !!game.boardSize
     ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orient}|${game.lastMove}`
-    : `${game.fen},${game.orient},${game.lastMove}`;
+    : `${game.fen}|${game.orient}|${game.lastMove}`;
 
 const miniPairing = (ctrl: SimulCtrl) => (pairing: Pairing) => {
   const game = pairing.game,
