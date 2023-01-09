@@ -77,7 +77,7 @@ object bits {
     val data = if (libName == "Draughts") {
       s"${fen.value}|${boardSize.width}x${boardSize.height}|${orient}|$lastMove"
     } else {
-      s"${fen.value},${orient},$lastMove"
+      s"${fen.value}|${orient}|$lastMove"
     }
     val extra = if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}" else s"${libName.toLowerCase()}"
     tag(

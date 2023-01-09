@@ -9,7 +9,7 @@ import viewStatus from 'game/view/status';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes, RoundData } from '../interfaces';
-import { NotationStyle, notationStyle } from 'chess';
+import { NotationStyle, notationStyle } from 'stratutils';
 import { moveFromNotationStyle } from 'common/notation';
 
 const scrollMax = 99999,

@@ -7,6 +7,7 @@ import { DrawShape } from 'chessground/draw';
 import changeColorHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
 import AnalyseCtrl from './ctrl';
+import * as stratUtils from 'stratutils';
 
 export function render(ctrl: AnalyseCtrl): VNode {
   return h('div.cg-wrap.cgv' + ctrl.cgVersion.js, {
@@ -42,6 +43,7 @@ export function promote(ground: CgApi, key: Key, role: cg.Role) {
 
 export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
   const d = ctrl.data,
+    hooks = ctrl.makeCgHooks(),
     pref = d.pref,
     opts = ctrl.makeCgOpts(),
     variantKey = d.game.variant.key as cg.Variant;
@@ -111,10 +113,19 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     animation: {
       duration: pref.animationDuration,
     },
+    dropmode: {
+      showDropDests: true,
+      dropDests: stratUtils.readDropsByRole(ctrl.node.dropsByRole),
+      events: {
+        cancel: hooks.onCancelDropMode,
+      },
+    },
     disableContextMenu: true,
     dimensions: d.game.variant.boardSize,
     variant: variantKey,
     chess960: variantKey == 'chess960',
+    onlyDropsVariant: d.onlyDropsVariant,
+    singleClickMoveVariant: d.game.variant.key === 'oware' && d.pref.mancalaMove,
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
   return config;

@@ -1,6 +1,6 @@
 import { h } from 'snabbdom';
 import { renderIndexAndMove } from './moveView';
-import { notationStyle } from 'chess';
+import { notationStyle } from 'stratutils';
 import { defined } from 'common';
 import { ConcealOf } from './interfaces';
 import { onInsert, parentedNode } from './util';

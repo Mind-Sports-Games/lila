@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { isEmpty } from 'common';
-import { fixCrazySan, notationStyle } from 'chess';
+import { fixCrazySan, notationStyle } from 'stratutils';
 import { moveFromNotationStyle } from 'common/notation';
 import { path as treePath, ops as treeOps } from 'tree';
 import * as moveView from '../moveView';

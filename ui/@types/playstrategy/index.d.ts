@@ -520,6 +520,7 @@ declare namespace Tree {
     gamebook?: Gamebook;
     dests?: string;
     drops?: string | null;
+    dropsByRole?: string | null;
     check?: Key;
     threat?: ClientEval;
     ceval?: ClientEval;

@@ -13,7 +13,7 @@ const renderGameClasses = (game: FeaturedGame): string =>
 const renderGameState = (game: FeaturedGame): string =>
   game.gameLogic === 'draughts' && !!game.boardSize
     ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orientation}|${game.lastMove}`
-    : `${game.fen},${game.orientation},${game.lastMove}`;
+    : `${game.fen}|${game.orientation}|${game.lastMove}`;
 
 function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating: boolean) {
   const player = game[playerIndex];

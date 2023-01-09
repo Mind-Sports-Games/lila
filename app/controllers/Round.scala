@@ -181,7 +181,7 @@ final class Round(
         negotiate(
           html = {
             val canAnalyse =
-              forceAnalysis || pov.game.variant.aiVariant && pov.game.variant.gameFamily.aiEnabled
+              forceAnalysis || pov.game.variant.hasAnalysisBoard
             if (pov.game.replayable && canAnalyse)
               analyseC.replay(pov, userTv = userTv)
             else if (HTTPRequest.isHuman(ctx.req))

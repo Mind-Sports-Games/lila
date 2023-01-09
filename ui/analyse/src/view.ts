@@ -1,8 +1,17 @@
 import { h, VNode } from 'snabbdom';
-import { parseFen } from 'chessops/fen';
+import { parseFen } from 'stratops/fen';
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
-import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore, getOwareScore } from './util';
+import {
+  bind,
+  onInsert,
+  dataIcon,
+  spinner,
+  bindMobileMousedown,
+  getPlayerScore,
+  getOwareScore,
+  variantToRules,
+} from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import { playable } from 'game';
@@ -115,7 +124,9 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             });
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
-              el.setCustomValidity(parseFen(el.value.trim()).isOk ? '' : 'Invalid FEN');
+              el.setCustomValidity(
+                parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN'
+              );
             });
           },
           postpatch: (_, vnode) => {
@@ -300,9 +311,9 @@ function renderPlayerScore(
   playerIndex: string,
   variantKey: VariantKey
 ): VNode | undefined {
-  const owareLetterFromScore =
-    score <= 0 ? 'empty' : score < 27 ? String.fromCharCode(score + 64) : String.fromCharCode(score + 70);
-  const pieceClass = variantKey === 'oware' ? `piece.${owareLetterFromScore}-piece.` : 'piece.p-piece.';
+  const defaultMancalaRole = 's';
+  const pieceClass =
+    variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
   const children: VNode[] = [];
   children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
   return h('div.game-score.game-score-' + position, children);

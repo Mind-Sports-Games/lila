@@ -3,7 +3,7 @@ import { Api as CgApi } from 'chessground/api';
 import { CevalCtrl, NodeEvals } from 'ceval';
 import { Config as CgConfig } from 'chessground/config';
 import { Deferred } from 'common/defer';
-import { Outcome, Role, Move } from 'chessops/types';
+import { Outcome, Role, Move } from 'stratops/types';
 import { Prop } from 'common';
 import { StoredBooleanProp } from 'common/storage';
 import { TreeWrapper } from 'tree';

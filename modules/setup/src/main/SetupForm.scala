@@ -23,7 +23,7 @@ object SetupForm {
 
   lazy val ai = Form(
     mapping(
-      "variant"     -> variant(Config.aiVariants),
+      "variant"     -> variant(Config.fishnetVariants),
       "timeMode"    -> timeMode,
       "time"        -> time,
       "increment"   -> increment,

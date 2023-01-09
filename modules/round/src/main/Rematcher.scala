@@ -114,11 +114,6 @@ final private class Rematcher(
     List(Event.RematchOffer(by = pov.playerIndex.some))
   }
 
-  private def chessPieceMap(pieces: strategygames.chess.PieceMap): PieceMap =
-    pieces.map { case (pos, piece) =>
-      (Pos.Chess(pos), Piece.Chess(piece))
-    }
-
   //<game number>:<first game id in set>
   private def multiMatchEntry(g: Game): Option[String] =
     if (!g.aborted) {
@@ -137,10 +132,10 @@ final private class Rematcher(
       situation = initialFen.flatMap { fen => Forsyth.<<<(game.variant.gameLogic, fen) }
       pieces: PieceMap = game.variant match {
         case Variant.Chess(Chess960) =>
-          if (chess960 get game.id) chessPieceMap(Chess960.pieces)
+          if (chess960 get game.id) Piece.pieceMapForChess(Chess960.pieces)
           else
             situation.fold(
-              chessPieceMap(Chess960.pieces)
+              Piece.pieceMapForChess(Chess960.pieces)
             )(_.situation.board.pieces)
         case Variant.Chess(FromPosition) =>
           situation.fold(

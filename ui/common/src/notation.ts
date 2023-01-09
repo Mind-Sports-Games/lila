@@ -1,4 +1,4 @@
-import { NotationStyle } from 'chess';
+import { NotationStyle } from 'stratutils';
 
 interface ExtendedMoveInfo {
   san: string;
@@ -94,7 +94,7 @@ function shogiNotation(move: ExtendedMoveInfo, variant: Variant): string {
     connector = isCapture(prevBoard, board) ? 'x' : isDrop(prevBoard, board) ? '*' : '-',
     role = board.pieces[dest],
     piece = role[0] === '+' ? role[0] + role[1].toUpperCase() : role[0].toUpperCase(),
-    origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '', //ToDo ideally calculate this from SAN or in Chessops as currently doesn't include illegal moves like piece being pinned or obstruction
+    origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '', //ToDo ideally calculate this from SAN or in stratops as currently doesn't include illegal moves like piece being pinned or obstruction
     promotion = promotionSymbol(prevBoard, board, parsed);
 
   if (promotion == '+') return `${piece.slice(1)}${origin}${connector}${dest}${promotion}`;
@@ -372,8 +372,5 @@ function nextAsciiLetter(letter: string, n: number): string {
 }
 
 export function getOwareScore(fen: string, playerIndex: string): number {
-  const pIndex = playerIndex === 'p1' ? 1 : 2;
-  const asciiNum = fen.split(' ')[pIndex].charCodeAt(0);
-  if (asciiNum == 48) return 0;
-  return asciiNum > 90 ? asciiNum - 70 : asciiNum - 64;
+  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }
