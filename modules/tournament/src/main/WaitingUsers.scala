@@ -3,7 +3,7 @@ package lila.tournament
 import org.joda.time.DateTime
 import scala.concurrent.Promise
 
-import strategygames.Clock.{ Config => TournamentClock }
+import strategygames.{ ClockConfig => TournamentClock }
 import lila.user.User
 import lila.common.LightUser
 

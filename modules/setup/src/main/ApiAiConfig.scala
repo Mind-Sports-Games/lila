@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ Clock, GameFamily, Mode, Speed, P1, P2 }
+import strategygames.{ ClockConfig, GameFamily, Mode, Speed, P1, P2 }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition }
@@ -12,7 +12,7 @@ import lila.user.User
 final case class ApiAiConfig(
     variant: Variant,
     fenVariant: Option[Variant],
-    clock: Option[Clock.Config],
+    clock: Option[ClockConfig],
     daysO: Option[Int],
     playerIndex: PlayerIndex,
     level: Int,
@@ -70,7 +70,7 @@ object ApiAiConfig extends BaseConfig {
   def from(
       l: Int,
       v: Option[String],
-      cl: Option[Clock.Config],
+      cl: Option[ClockConfig],
       d: Option[Int],
       c: Option[String],
       pos: Option[String]

@@ -8,6 +8,7 @@ import strategygames.{
   P2,
   Centis,
   Clock,
+  ClockConfig,
   Player => PlayerIndex,
   Game => StratGame,
   GameLogic,
@@ -507,7 +508,7 @@ case class Game(
     clock ?? { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
         c.outOfTime(turnPlayerIndex, withGrace) || {
-          !c.isRunning && c.players.exists(_.elapsed.centis > 0)
+          !c.isRunning && c.clockPlayerExists(_.elapsed.centis > 0)
         }
       }
     }
@@ -721,7 +722,7 @@ object Game {
   //  game.variant == strategygames.chess.variant.Horde &&
   //    game.createdAt.isBefore(Game.hordeP1PawnsSince)
 
-  def allowRated(variant: Variant, clock: Option[Clock.Config]) =
+  def allowRated(variant: Variant, clock: Option[ClockConfig]) =
     variant.standard || {
       clock ?? { c =>
         c.estimateTotalTime >= Centis(3000) &&
@@ -754,7 +755,7 @@ object Game {
       isBoardCompatible(c.config)
     }
 
-  def isBoardCompatible(clock: Clock.Config): Boolean =
+  def isBoardCompatible(clock: ClockConfig): Boolean =
     Speed(clock) >= Speed.Rapid
 
   def isBotCompatible(game: Game): Boolean = {

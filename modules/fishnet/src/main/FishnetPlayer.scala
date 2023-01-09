@@ -2,7 +2,7 @@ package lila.fishnet
 
 import scala.concurrent.duration._
 
-import strategygames.{ P2, Clock, P1 }
+import strategygames.{ P2, FischerClock, P1 }
 import strategygames.format.Uci
 
 import lila.common.Future
@@ -29,7 +29,7 @@ final class FishnetPlayer(
     }
 
   private val delayFactor  = 0.011f
-  private val defaultClock = Clock(300, 0)
+  private val defaultClock = FischerClock(300, 0)
 
   private def delayFor(g: Game): Option[FiniteDuration] =
     if (!g.bothPlayersHaveMoved) 2.seconds.some

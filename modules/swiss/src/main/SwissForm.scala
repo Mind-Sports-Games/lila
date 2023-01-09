@@ -1,6 +1,7 @@
 package lila.swiss
 
-import strategygames.Clock.{ Config => ClockConfig }
+// TODO: byoyomi the clock neesd to be supported here.
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameLogic }
@@ -20,10 +21,16 @@ final class SwissForm(implicit mode: Mode) {
     Form(
       mapping(
         "name" -> optional(eventName(2, 36)),
-        "clock" -> mapping(
+        "clock" -> mapping[ClockConfig, Int, Int](
           "limit"     -> number.verifying(clockLimits.contains _),
           "increment" -> number(min = 0, max = 120)
-        )(ClockConfig.apply)(ClockConfig.unapply)
+        )(FischerClock.Config.apply)(c =>
+          // TODO: byoyomi - need to handle this.
+          c match {
+            case c: FischerClock.Config => FischerClock.Config.unapply(c)
+            case _: ByoyomiClock.Config => sys.error("Needs implementation")
+          }
+        )
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
         "variant" -> optional(
@@ -85,7 +92,7 @@ final class SwissForm(implicit mode: Mode) {
   def create =
     form() fill SwissData(
       name = none,
-      clock = ClockConfig(180, 0),
+      clock = FischerClock.Config(180, 0),
       startsAt = Some(DateTime.now plusSeconds {
         if (mode == Mode.Prod) 60 * 10 else 20
       }),
@@ -197,9 +204,10 @@ object SwissForm {
     (120 to 420 by 60) ++ (600 to 1800 by 300) ++ (2400 to 10800 by 600)
   }
 
+  // TODO: byoyomi clocks need to work here.
   val clockLimitChoices = options(
     clockLimits,
-    l => s"${strategygames.Clock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
+    l => s"${strategygames.FischerClock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
   )
 
   val roundIntervals: Seq[Int] =

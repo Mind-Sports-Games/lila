@@ -2,7 +2,8 @@ package lila.swiss
 
 import ornicar.scalalib.Zero
 
-import strategygames.Clock.{ Config => ClockConfig }
+// TODO: byoyomi support needed here.
+import strategygames.ClockConfig
 import strategygames.format.FEN
 import strategygames.{ GameFamily, Speed }
 import strategygames.variant.Variant

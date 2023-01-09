@@ -173,7 +173,8 @@ private object bits {
             trans.minutesPerSide(),
             ": ",
             span(
-              strategygames.Clock.Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0).limitString
+              // TODO: byoyomi also goes here.
+              strategygames.FischerClock.Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0).limitString
             ),
             renderDissociatedRange(form("time"))
           ),

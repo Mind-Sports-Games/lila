@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ Clock, Game => StratGame, GameFamily, GameLogic, Situation, Speed }
+import strategygames.{ FischerClock, Game => StratGame, GameFamily, GameLogic, Situation, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 
@@ -47,8 +47,9 @@ private[setup] trait Config {
 
   def makeClock = hasClock option justMakeClock
 
+  // TODO: byoyomi needs to be handled here.
   protected def justMakeClock =
-    Clock.Config((time * 60).toInt, if (clockHasTime) increment else 1)
+    FischerClock.Config((time * 60).toInt, if (clockHasTime) increment else 1)
 
   def makeDaysPerTurn: Option[Int] = (timeMode == TimeMode.Correspondence) option days
 }

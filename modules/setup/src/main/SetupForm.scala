@@ -121,11 +121,12 @@ object SetupForm {
 
   object api {
 
+    // TDOO: byoyomi need to handle both byoyomi and fischer here.
     lazy val clockMapping =
       mapping(
         "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
         "increment" -> increment
-      )(strategygames.Clock.Config.apply)(strategygames.Clock.Config.unapply)
+      )(strategygames.FischerClock.Config.apply)(strategygames.FischerClock.Config.unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
 
     lazy val clock = "clock" -> optional(clockMapping)

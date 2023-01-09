@@ -172,12 +172,19 @@ trait Handlers {
     v => BSONString(s"${v.gameLogic.id}:${v.key}")
   )
 
-  val clockConfigHandler = tryHandler[strategygames.Clock.Config](
-    { case doc: BSONDocument =>
-      for {
-        limit <- doc.getAsTry[Int]("limit")
-        inc   <- doc.getAsTry[Int]("increment")
-      } yield strategygames.Clock.Config(limit, inc)
+  val clockConfigHandler = tryHandler[strategygames.ClockConfig](
+    {
+      case doc: BSONDocument => {
+        val clockType = doc.getAsOpt[String]("t").getOrElse("fischer")
+        clockType match {
+          case "fischer" =>
+            for {
+              limit     <- doc.getAsTry[Int]("limit")
+              inc       <- doc.getAsTry[Int]("increment")
+            } yield strategygames.FischerClock.Config(limit, inc)
+          case "byoyomi" => sys.error("TODO: byoyomi clock db implementation")
+        }
+      }
     },
     c =>
       BSONDocument(

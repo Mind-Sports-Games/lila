@@ -1,6 +1,6 @@
 package lila.lobby
 
-import strategygames.{ Clock, GameLogic, Mode, Speed }
+import strategygames.{ ClockConfig, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.i18n.Lang
@@ -18,7 +18,7 @@ case class Hook(
     sid: Option[String], // owner cookie (used to prevent multiple hooks)
     lib: GameLogic,
     variant: Int,
-    clock: Clock.Config,
+    clock: ClockConfig,
     mode: Int,
     playerIndex: String,
     user: Option[LobbyUser],
@@ -88,7 +88,7 @@ case class Hook(
     realMode.rated && realVariant.standard && randomPlayerIndex &&
       lila.pool.PoolList.clockStringSet.contains(clock.show)
 
-  def compatibleWithPool(poolClock: strategygames.Clock.Config) =
+  def compatibleWithPool(poolClock: strategygames.ClockConfig) =
     compatibleWithPools && clock == poolClock
 
   def toPool =
@@ -115,7 +115,7 @@ object Hook {
   def make(
       sri: Sri,
       variant: strategygames.variant.Variant,
-      clock: Clock.Config,
+      clock: ClockConfig,
       mode: Mode,
       playerIndex: String,
       user: Option[User],

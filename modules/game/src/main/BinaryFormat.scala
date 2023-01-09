@@ -1,6 +1,22 @@
 package lila.game
 
-import strategygames.{ P2, Board, Centis, Clock, ClockPlayer, Player => PlayerIndex, GameLogic, Piece, PieceMap, Pos, Role, Timestamp, P1 }
+import strategygames.{
+  P2,
+  Board,
+  Centis,
+  Clock,
+  ClockConfig,
+  FischerClockPlayer,
+  FischerClock,
+  Player => PlayerIndex,
+  GameLogic,
+  Piece,
+  PieceMap,
+  Pos,
+  Role,
+  Timestamp,
+  P1
+}
 import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.draughts
@@ -92,9 +108,9 @@ object BinaryFormat {
   case class clock(start: Timestamp) {
 
     def legacyElapsed(clock: Clock, playerIndex: PlayerIndex) =
-      clock.limit - clock.players(playerIndex).remaining
+      clock.limit - clock.clockPlayer(playerIndex).remaining
 
-    def computeRemaining(config: Clock.Config, legacyElapsed: Centis) =
+    def computeRemaining(config: ClockConfig, legacyElapsed: Centis) =
       config.limit - legacyElapsed
 
     def write(clock: Clock): ByteArray = {
@@ -118,18 +134,18 @@ object BinaryFormat {
 
         ia match {
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, _*) =>
-            val config      = Clock.Config(readClockLimit(b1), b2)
+            val config   = FischerClock.Config(readClockLimit(b1), b2)
             val legacyP1 = Centis(readSignedInt24(b3, b4, b5))
             val legacyP2 = Centis(readSignedInt24(b6, b7, b8))
-            Clock(
+            FischerClock(
               config = config,
               player = playerIndex,
               players = PlayerIndex.Map(
-                ClockPlayer
+                FischerClockPlayer
                   .withConfig(config)
                   .copy(berserk = p1Berserk)
                   .setRemaining(computeRemaining(config, legacyP1)),
-                ClockPlayer
+                FischerClockPlayer
                   .withConfig(config)
                   .copy(berserk = p2Berserk)
                   .setRemaining(computeRemaining(config, legacyP2))
@@ -224,8 +240,8 @@ object BinaryFormat {
         Array(int >> 4, int & 0x0f)
       }
       def intPiece(int: Int): Option[chess.Piece] =
-        chess.Role.binaryInt(int & 127) map {
-          role => chess.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
+        chess.Role.binaryInt(int & 127) map { role =>
+          chess.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
         }
       (chess.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
@@ -234,9 +250,12 @@ object BinaryFormat {
         .to(Map)
     }
 
-    private val groupedPos: Map[draughts.Board.BoardSize, Array[(draughts.PosMotion, draughts.PosMotion)]] = draughts.Board.BoardSize.all.map { size =>
-      size -> getGroupedPos(size)
-    }.to(Map)
+    private val groupedPos: Map[draughts.Board.BoardSize, Array[(draughts.PosMotion, draughts.PosMotion)]] =
+      draughts.Board.BoardSize.all
+        .map { size =>
+          size -> getGroupedPos(size)
+        }
+        .to(Map)
 
     private def getGroupedPos(size: draughts.Board.BoardSize) = size.pos.all grouped 2 collect {
       case List(p1, p2) => (p1, p2)
@@ -246,8 +265,8 @@ object BinaryFormat {
       def posInt(pos: draughts.Pos): Int = (pieces get pos).fold(0) { piece =>
         piece.player.fold(0, 8) + piece.role.binaryInt
       }
-      ByteArray(groupedPos(variant.boardSize) map {
-        case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
+      ByteArray(groupedPos(variant.boardSize) map { case (p1, p2) =>
+        ((posInt(p1) << 4) + posInt(p2)).toByte
       })
     }
 
@@ -256,16 +275,18 @@ object BinaryFormat {
     def readDraughts(ba: ByteArray, variant: draughts.variant.Variant): draughts.PieceMap = {
       def splitInts(b: Byte) = {
         val int = b.toInt
-        Array(int >> 4, int & 0x0F)
+        Array(int >> 4, int & 0x0f)
       }
       def intPiece(int: Int): Option[draughts.Piece] =
-        draughts.Role.binaryInt(int & 7) map {
-          role => draughts.Piece(PlayerIndex((int & 8) == 0), role)
+        draughts.Role.binaryInt(int & 7) map { role =>
+          draughts.Piece(PlayerIndex((int & 8) == 0), role)
         }
       val pieceInts = ba.value flatMap splitInts
-      (variant.boardSize.pos.all zip pieceInts).flatMap {
-        case (pos, int) => intPiece(int) map (pos -> _)
-      }.to(Map)
+      (variant.boardSize.pos.all zip pieceInts)
+        .flatMap { case (pos, int) =>
+          intPiece(int) map (pos -> _)
+        }
+        .to(Map)
     }
 
     def writeFairySF(pieces: fairysf.PieceMap): ByteArray = {
@@ -282,8 +303,8 @@ object BinaryFormat {
       //  Array(int >> 4, int & 0x0f)
       //}
       def intPiece(int: Int): Option[fairysf.Piece] =
-        fairysf.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map {
-          role => fairysf.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
+        fairysf.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map { role =>
+          fairysf.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
         }
       (fairysf.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
@@ -302,10 +323,12 @@ object BinaryFormat {
 
     def readMancala(ba: ByteArray, variant: mancala.variant.Variant): mancala.PieceMap = {
       def intPiece(int: Int): Option[(mancala.Piece, Int)] =
-        Some((
-          mancala.Piece(PlayerIndex.fromP1((int & 128) == 0), variant.defaultRole),
-          int & 127
-        ))
+        Some(
+          (
+            mancala.Piece(PlayerIndex.fromP1((int & 128) == 0), variant.defaultRole),
+            int & 127
+          )
+        )
       (mancala.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
@@ -316,12 +339,13 @@ object BinaryFormat {
     // cache standard start position
     def standard(lib: GameLogic) = lib match {
       case GameLogic.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
-      case GameLogic.Draughts() => writeDraughts(
-        draughts.Board.init(draughts.variant.Standard).pieces,
-        draughts.variant.Standard
-      )
+      case GameLogic.Draughts() =>
+        writeDraughts(
+          draughts.Board.init(draughts.variant.Standard).pieces,
+          draughts.variant.Standard
+        )
       case GameLogic.Mancala() => writeMancala(mancala.Board.init(mancala.variant.Oware).pieces)
-      case _ => sys.error("Cant write to binary for lib")
+      case _                   => sys.error("Cant write to binary for lib")
     }
 
   }
@@ -347,8 +371,8 @@ object BinaryFormat {
 
     private val arrIndexes = 0 to 1
     private val bitIndexes = 0 to 7
-    private val p1Std   = Set(chess.Pos.A1, chess.Pos.H1)
-    private val p2Std   = Set(chess.Pos.A8, chess.Pos.H8)
+    private val p1Std      = Set(chess.Pos.A1, chess.Pos.H1)
+    private val p2Std      = Set(chess.Pos.A8, chess.Pos.H8)
 
     def read(ba: ByteArray) =
       UnmovedRooks {

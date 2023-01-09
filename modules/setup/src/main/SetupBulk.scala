@@ -7,7 +7,7 @@ import play.api.data.Forms._
 import play.api.libs.json.Json
 import scala.concurrent.duration._
 
-import strategygames.{ Clock, GameLogic, Mode }
+import strategygames.{ ClockConfig, GameLogic, Mode }
 import strategygames.variant.Variant
 
 import lila.game.Game
@@ -25,7 +25,7 @@ object SetupBulk {
   case class BulkFormData(
       tokens: String,
       variant: Variant,
-      clock: Clock.Config,
+      clock: ClockConfig,
       rated: Boolean,
       pairAt: Option[DateTime],
       startClocksAt: Option[DateTime],
@@ -59,7 +59,7 @@ object SetupBulk {
       (
           tokens: String,
           variant: Option[String],
-          clock: Clock.Config,
+          clock: ClockConfig,
           rated: Boolean,
           pairTs: Option[Long],
           clockTs: Option[Long],
@@ -99,7 +99,7 @@ object SetupBulk {
       by: User.ID,
       games: List[ScheduledGame],
       variant: Variant,
-      clock: Clock.Config,
+      clock: ClockConfig,
       mode: Mode,
       pairAt: DateTime,
       startClocksAt: Option[DateTime],

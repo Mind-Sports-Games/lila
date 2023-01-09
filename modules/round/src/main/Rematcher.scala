@@ -6,6 +6,7 @@ import strategygames.variant.Variant
 import strategygames.{
   P2,
   Clock,
+  FischerClock,
   Player => PlayerIndex,
   Game => ChessGame,
   Board,
@@ -161,7 +162,7 @@ final private class Rematcher(
             player = situation.fold[PlayerIndex](P1)(_.situation.player)
           ),
           clock = game.clock map { c =>
-            Clock(c.config)
+            c.config.toClock
           },
           turns = situation ?? (_.turns),
           startedAtTurn = situation ?? (_.turns)

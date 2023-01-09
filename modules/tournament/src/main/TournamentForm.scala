@@ -3,7 +3,7 @@ package lila.tournament
 import cats.implicits._
 import strategygames.format.FEN
 import strategygames.chess.{ StartingPosition }
-import strategygames.{ Clock, GameFamily, GameLogic, Mode }
+import strategygames.{ FischerClock, GameFamily, GameLogic, Mode }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.data._
@@ -193,7 +193,7 @@ object TournamentForm {
   }.map(_.toDouble)
   val clockTimeDefault = 2d
   private def formatLimit(l: Double) =
-    Clock.Config(l * 60 toInt, 0).limitString + {
+    FischerClock.Config(l * 60 toInt, 0).limitString + {
       if (l <= 1) " minute" else " minutes"
     }
   val clockTimeChoices = optionsDouble(clockTimes, formatLimit)
@@ -281,7 +281,7 @@ private[tournament] case class TournamentSetup(
 
   def realPosition = position ifTrue realVariant.standardVariant
 
-  def clockConfig = Clock.Config((clockTime * 60).toInt, clockIncrement)
+  def clockConfig = FischerClock.Config((clockTime * 60).toInt, clockIncrement)
 
   def validRatedVariant =
     realMode == Mode.Casual ||

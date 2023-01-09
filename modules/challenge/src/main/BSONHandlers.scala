@@ -27,16 +27,18 @@ private object BSONHandlers {
       case PlayerIndexChoice.Random => 0
     }
   )
+  // TODO: needs to handle byoyomi here.
   implicit val TimeControlBSONHandler = new BSON[TimeControl] {
     def reads(r: Reader) =
       (r.intO("l"), r.intO("i")) mapN { (limit, inc) =>
-        TimeControl.Clock(strategygames.Clock.Config(limit, inc))
+        TimeControl.Clock(strategygames.FischerClock.Config(limit, inc))
       } orElse {
         r intO "d" map TimeControl.Correspondence.apply
       } getOrElse TimeControl.Unlimited
     def writes(w: Writer, t: TimeControl) =
       t match {
-        case TimeControl.Clock(strategygames.Clock.Config(l, i)) => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.FischerClock.Config(l, i)) => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.ByoyomiClock.Config(l, i, b, p)) => $doc("l" -> l, "i" -> i, "b" -> b, "p" -> p)
         case TimeControl.Correspondence(d)               => $doc("d" -> d)
         case TimeControl.Unlimited                       => $empty
       }

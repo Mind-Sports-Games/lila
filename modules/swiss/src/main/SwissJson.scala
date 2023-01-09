@@ -389,7 +389,8 @@ object SwissJson {
     JsNumber(t.value.toInt)
   }
 
-  implicit private val clockWrites: OWrites[strategygames.Clock.Config] = OWrites { clock =>
+  // TODO: byoyomi clocks need to be handled here.
+  implicit private val clockWrites: OWrites[strategygames.ClockConfig] = OWrites { clock =>
     Json.obj(
       "limit"     -> clock.limitSeconds,
       "increment" -> clock.incrementSeconds
