@@ -369,7 +369,9 @@ object SwissJson {
       .add("isPlayX" -> b.board.isPlayX)
       .add("multiMatchGameIds" -> b.board.multiMatchGameIds)
       .add(
-        "multiMatchGames" -> b.multiMatchGames.map(l => l.map(g => boardGameJson(g, b.board.p2, b.board.p1)))
+        "multiMatchGames" -> b.multiMatchGames.map(l =>
+          l.map(g => boardGameJson(g, b.board.p2, b.board.p1).add("boardSize" -> boardSizeJson(g.variant)))
+        )
       )
 
   private def boardPlayerJson(player: SwissBoard.Player) =
