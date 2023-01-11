@@ -311,8 +311,7 @@ private[tournament] case class TournamentSetup(
               .sortWith(_.name < _.name)
               .some
             || old.medleyMinutes != medleyIntervalOptions.medleyMinutes
-            || old.minutes != minutes
-            || old.medleyIsBalanced != medleyIntervalOptions.balanceIntervals
+            || old.medleyIsBalanced != medleyIntervalOptions.balanceIntervals.fold(Some(false))(x => Some(x))
             || old.medleyNumIntervals != medleyIntervalOptions.numIntervals
           ) medleyVariantsAndIntervals
           else old.medleyVariantsAndIntervals,
