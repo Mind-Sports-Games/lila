@@ -591,7 +591,7 @@ object Tv {
       FlipelloFamily,
       Flipello,
       Flipello10,
-      //MancalaFamily,
+      MancalaFamily,
       Oware,
       Bot,
       Computer
