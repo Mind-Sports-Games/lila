@@ -57,8 +57,17 @@ final class Tv(
     }
   }
 
-  def getCorrespondenceGamesOfChannel(channel: Tv.Channel, games: List[Game], max: Int): List[Game] = {
-    games.filter(g => channel.filter(Candidate(g, false))).sortBy(g => -(~g.averageUsersRating)).take(max)
+  def getNonLiveCorrespondenceGamesOfChannel(
+      channel: Tv.Channel,
+      cGames: List[Game],
+      max: Int,
+      lGames: List[Game]
+  ): List[Game] = {
+    cGames
+      .filter(g => channel.filter(Candidate(g, false)))
+      .filter(g => !lGames.map(_.id).contains(g.id))
+      .sortBy(g => -(~g.averageUsersRating))
+      .take(max)
   }
 
   def getCorrespondenceChampions(games: List[Game]): Champions = {

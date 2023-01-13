@@ -70,7 +70,7 @@ final class Tv(
               Ok(
                 html.tv.games(
                   channel,
-                  (lGames ++ env.tv.tv.getCorrespondenceGamesOfChannel(channel, cGames, 15)).distinct
+                  (lGames ++ env.tv.tv.getNonLiveCorrespondenceGamesOfChannel(channel, cGames, 15, lGames))
                     .take(15) map Pov.naturalOrientation,
                   env.tv.tv.getCorrespondenceChampions(cGames) combineWithAndFavour champs
                 )
