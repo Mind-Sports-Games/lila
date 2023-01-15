@@ -50,7 +50,7 @@ object SetupBulk {
           }
         ),
       SetupForm.api.variant,
-      "clock"         -> SetupForm.api.clockMapping,
+      "clock"         -> SetupForm.api.fischerClockMapping,
       "rated"         -> boolean,
       "pairAt"        -> optional(timestampInNearFuture),
       "startClocksAt" -> optional(timestampInNearFuture),

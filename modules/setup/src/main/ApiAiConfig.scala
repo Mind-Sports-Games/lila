@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ClockConfig, GameFamily, Mode, Speed, P1, P2 }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, Mode, P1, P2, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition }
@@ -9,6 +9,7 @@ import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.PlayerIndex
 import lila.user.User
 
+// TODO: deal with byoyomi here.
 final case class ApiAiConfig(
     variant: Variant,
     fenVariant: Option[Variant],
@@ -25,8 +26,18 @@ final case class ApiAiConfig(
   val days      = ~daysO
   val increment = clock.??(_.increment.roundSeconds)
   val time      = clock.??(_.limit.roundSeconds / 60)
+  val byoyomi = clock match {
+    case Some(c: ByoyomiClock.Config) => c.byoyomi.roundSeconds
+    case _                            => 0
+  }
+
+  val periods = clock match {
+    case Some(c: ByoyomiClock.Config) => c.periodsTotal
+    case _                            => 0
+  }
+
   val timeMode =
-    if (clock.isDefined) TimeMode.RealTime
+    if (clock.isDefined) TimeMode.FischerClock
     else if (daysO.isDefined) TimeMode.Correspondence
     else TimeMode.Unlimited
 
