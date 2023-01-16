@@ -10,6 +10,8 @@ case class Event(
     title: String,
     headline: String,
     description: Option[String],
+    beforeMessage: Option[String],
+    duringMessage: Option[String],
     homepageHours: Double,
     url: String,
     lang: Lang,

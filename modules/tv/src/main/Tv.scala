@@ -6,11 +6,13 @@ import lila.hub.Trouper
 import lila.i18n.VariantKeys
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameLogic }
+import cats.implicits._
 
 final class Tv(
     gameRepo: GameRepo,
     trouper: Trouper,
-    gameProxyRepo: lila.round.GameProxyRepo
+    gameProxyRepo: lila.round.GameProxyRepo,
+    lightUserSync: LightUser.GetterSync
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   import Tv._
@@ -48,6 +50,41 @@ final class Tv(
 
   def getChampions: Fu[Champions] =
     trouper.ask[Champions](TvTrouper.GetChampions.apply)
+
+  def getCorrespondenceGames: Fu[List[Game]] = {
+    gameRepo.playingCorrespondenceNoAi flatMap {
+      _.map(gameRepo.game(_)).sequenceFu.map(_.flatten)
+    }
+  }
+
+  def getNonLiveCorrespondenceGamesOfChannel(
+      channel: Tv.Channel,
+      cGames: List[Game],
+      max: Int,
+      lGames: List[Game]
+  ): List[Game] = {
+    cGames
+      .filter(g => channel.filter(Candidate(g, false)))
+      .filter(g => !lGames.map(_.id).contains(g.id))
+      .sortBy(g => -(~g.averageUsersRating))
+      .take(max)
+  }
+
+  def getCorrespondenceChampions(games: List[Game]): Champions = {
+    var champions = Map[Channel, Champion]()
+    Tv.Channel.all.map(channel => {
+      games.filter(g => channel.filter(Candidate(g, false))).map { game =>
+        val player = game.players.sortBy { p =>
+          ~p.rating + ~p.userId.flatMap(lightUserSync).flatMap(_.title).flatMap(Tv.titleScores.get)
+        }.lastOption | game.player(game.naturalOrientation)
+        val user = player.userId flatMap lightUserSync
+        (user, player.rating) mapN { (u, r) =>
+          champions += (channel -> Champion(u, r, game.id))
+        }
+      }
+    })
+    Champions(champions)
+  }
 }
 
 object Tv {
@@ -60,6 +97,9 @@ object Tv {
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
   case class Champions(channels: Map[Channel, Champion]) {
     def get = channels.get _
+    def combineWithAndFavour(overWritingChampions: Champions) = {
+      Champions(channels ++ overWritingChampions.channels)
+    }
   }
 
   private[tv] case class Candidate(game: Game, hasBot: Boolean)
@@ -551,7 +591,7 @@ object Tv {
       FlipelloFamily,
       Flipello,
       Flipello10,
-      //MancalaFamily,
+      MancalaFamily,
       Oware,
       Bot,
       Computer

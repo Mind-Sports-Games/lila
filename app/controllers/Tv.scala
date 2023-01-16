@@ -64,10 +64,18 @@ final class Tv(
   def gamesChannel(chanKey: String) =
     Open { implicit ctx =>
       (lila.tv.Tv.Channel.byKey get chanKey) ?? { channel =>
-        env.tv.tv.getChampions zip env.tv.tv.getGames(channel, 15) map { case (champs, games) =>
-          NoCache {
-            Ok(html.tv.games(channel, games map Pov.naturalOrientation, champs))
-          }
+        env.tv.tv.getChampions zip env.tv.tv.getGames(channel, 15) zip env.tv.tv.getCorrespondenceGames map {
+          case ((champs, lGames), cGames) =>
+            NoCache {
+              Ok(
+                html.tv.games(
+                  channel,
+                  (lGames ++ env.tv.tv.getNonLiveCorrespondenceGamesOfChannel(channel, cGames, 15, lGames))
+                    .take(15) map Pov.naturalOrientation,
+                  env.tv.tv.getCorrespondenceChampions(cGames) combineWithAndFavour champs
+                )
+              )
+            }
         }
       }
     }
