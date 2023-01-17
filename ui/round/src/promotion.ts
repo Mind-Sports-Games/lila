@@ -59,7 +59,7 @@ export function start(
     if (
       !meta.ctrlKey &&
       !promoting &&
-      (d.pref.autoQueen === Prefs.AutoQueen.Always ||
+      ((d.pref.autoQueen === Prefs.AutoQueen.Always && d.game.variant.lib == 0) ||
         (d.pref.autoQueen === Prefs.AutoQueen.OnPremove && premovePiece) ||
         ctrl.keyboardMove?.justSelected())
     ) {
