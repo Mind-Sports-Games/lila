@@ -359,10 +359,10 @@ function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {
       : nextAsciiLetter(orig[0], (96 - orig.charCodeAt(0)) * 2 + variant.boardSize.width + 1);
   //captured number of stones
   const scoreDiff =
-    getOwareScore(move.fen, 'p1') +
-    getOwareScore(move.fen, 'p2') -
-    getOwareScore(move.prevFen!, 'p1') -
-    getOwareScore(move.prevFen!, 'p2');
+    getMancalaScore(move.fen, 'p1') +
+    getMancalaScore(move.fen, 'p2') -
+    getMancalaScore(move.prevFen!, 'p1') -
+    getMancalaScore(move.prevFen!, 'p2');
   const scoreText = scoreDiff <= 0 ? '' : ` + ${scoreDiff}`;
   return `${origLetter}${scoreText}`;
 }
@@ -371,6 +371,6 @@ function nextAsciiLetter(letter: string, n: number): string {
   return String.fromCharCode(letter.charCodeAt(0) + n);
 }
 
-export function getOwareScore(fen: string, playerIndex: string): number {
+export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }

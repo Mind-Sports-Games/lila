@@ -36,6 +36,7 @@ function renderMaterial(
 
 function renderPlayerScore(score: number, position: Position, playerIndex: string, variantKey: VariantKey): VNode {
   const defaultMancalaRole = 's';
+  //TODO Something here for Togyzkumalak
   const pieceClass =
     variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
   const children: VNode[] = [];
@@ -78,10 +79,11 @@ export function main(ctrl: RoundController): VNode {
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'oware': {
+      case 'oware':
+      case 'togyzkumalak': {
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
-        const p1Score = util.getOwareScore(fen, 'p1');
-        const p2Score = util.getOwareScore(fen, 'p2');
+        const p1Score = util.getMancalaScore(fen, 'p1');
+        const p2Score = util.getMancalaScore(fen, 'p2');
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
@@ -105,14 +107,14 @@ export function main(ctrl: RoundController): VNode {
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
 
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(variantKey)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware', 'togyzkumalak'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware', 'togyzkumalak'].includes(variantKey)
     ? '.piece-letter'
     : '';
 

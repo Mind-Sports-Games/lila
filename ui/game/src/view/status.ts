@@ -58,6 +58,8 @@ export default function status(ctrl: Ctrl): string {
           return noarg('gameFinished');
         case 'oware':
           return noarg('gameFinished');
+        case 'togyzkumalak':
+          return noarg('gameFinished');
       }
       return noarg('variantEnding');
     case 'unknownFinish':

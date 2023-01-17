@@ -82,11 +82,18 @@ $alternate-board-highlights: (
 );
 $alternate-color: rgba(20, 30, 85, 0.5);
 
-$mancala-light-board-highlights: (
-  'mancala-light-wood': 'mancala',
+$oware-light-board-highlights: (
+  'oware-light-wood': 'oware',
 );
-$mancala-dark-board-highlights: (
-  'mancala-dark-wood': 'mancala',
+$oware-dark-board-highlights: (
+  'oware-dark-wood': 'oware',
+);
+
+$togyzkumalak-blue-board-highlights: (
+  'togyzkumalak-blue': 'togyzkumalak',
+);
+$togyzkumalak-wood-board-highlights: (
+  'togyzkumalak-wood': 'togyzkumalak',
 );
 
 square {
@@ -105,44 +112,86 @@ square {
       }
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/mancala/highlights/dashed.svg);
+        background: url(../images/board/oware/highlights/dashed.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background: url(../images/board/oware/highlights/dashed_lighter.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.from {
-        background: url(../images/board/mancala/highlights/dashed.svg);
+        background: url(../images/board/oware/highlights/dashed.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.from {
-        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background: url(../images/board/oware/highlights/dashed_lighter.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/mancala/highlights/dashed.svg);
+        background: url(../images/board/oware/highlights/dashed.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background: url(../images/board/oware/highlights/dashed_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/togyzkumalak/highlights/dashed.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/togyzkumalak/highlights/dashed_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.from {
+        background: url(../images/board/togyzkumalak/highlights/dashed.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.from {
+        background: url(../images/board/togyzkumalak/highlights/dashed_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/dashed.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/dashed_lighter.svg);
         background-size: cover;
       }
     }
@@ -167,26 +216,50 @@ square {
     }
   }
 
-  @each $color, $gameFamily in $mancala-light-board-highlights {
+  @each $color, $gameFamily in $oware-light-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move.from {
-      background: url(../images/board/mancala/highlights/solid_darker.svg);
+      background: url(../images/board/oware/highlights/solid_darker.svg);
       background-size: cover;
     }
 
     body.#{$color} .#{$gameFamily} &.last-move.to {
-      background: url(../images/board/mancala/highlights/dashed_darker.svg);
+      background: url(../images/board/oware/highlights/dashed_darker.svg);
       background-size: cover;
     }
   }
 
-  @each $color, $gameFamily in $mancala-dark-board-highlights {
+  @each $color, $gameFamily in $oware-dark-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move.from {
-      background: url(../images/board/mancala/highlights/solid_lighter.svg);
+      background: url(../images/board/oware/highlights/solid_lighter.svg);
       background-size: cover;
     }
 
     body.#{$color} .#{$gameFamily} &.last-move.to {
-      background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+      background: url(../images/board/oware/highlights/dashed_lighter.svg);
+      background-size: cover;
+    }
+  }
+
+  @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+    body.#{$color} .#{$gameFamily} &.last-move.from {
+      background: url(../images/board/togyzkumalak/highlights/solid_darker.svg);
+      background-size: cover;
+    }
+
+    body.#{$color} .#{$gameFamily} &.last-move.to {
+      background: url(../images/board/togyzkumalak/highlights/dashed_darker.svg);
+      background-size: cover;
+    }
+  }
+
+  @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+    body.#{$color} .#{$gameFamily} &.last-move.from {
+      background: url(../images/board/togyzkumalak/highlights/solid_lighter.svg);
+      background-size: cover;
+    }
+
+    body.#{$color} .#{$gameFamily} &.last-move.to {
+      background: url(../images/board/togyzkumalak/highlights/dashed_lighter.svg);
       background-size: cover;
     }
   }
@@ -221,30 +294,58 @@ square {
       background-size: cover;
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/mancala/highlights/solid.svg);
+        background: url(../images/board/oware/highlights/solid.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/mancala/highlights/solid_lighter.svg);
+        background: url(../images/board/oware/highlights/solid_lighter.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/mancala/highlights/solid.svg);
+        background: url(../images/board/oware/highlights/solid.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/mancala/highlights/solid_lighter.svg);
+        background: url(../images/board/oware/highlights/solid_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/togyzkumalak/highlights/solid.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} & {
+        background: url(../images/board/togyzkumalak/highlights/solid_lighter.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/solid.svg);
+        background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/solid_lighter.svg);
         background-size: cover;
       }
     }

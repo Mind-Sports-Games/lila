@@ -3,7 +3,7 @@
 $pocket-col1-height: auto;
 $pocket-height: 7em;
 
-$score-variants: ('flipello', 'flipello10', 'oware');
+$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak');
 
 .variant-flipello .game-score,
 .variant-flipello10 .game-score {
@@ -21,13 +21,23 @@ $score-variants: ('flipello', 'flipello10', 'oware');
   }
 }
 
-body.mancala-light-wood .variant-oware .game-score {
-  background: url(../images/board/mancala/oware_light_wood_house.png);
+body.oware-light-wood .variant-oware .game-score {
+  background: url(../images/board/oware/oware_light_wood_house.png);
   background-size: cover;
 }
 
-body.mancala-dark-wood .variant-oware .game-score {
-  background: url(../images/board/mancala/oware_dark_wood_house.png);
+body.oware-dark-wood .variant-oware .game-score {
+  background: url(../images/board/oware/oware_dark_wood_house.png);
+  background-size: cover;
+}
+
+body.togyzkumalak-blue .variant-togyzkumalak .game-score {
+  background: url(../images/board/togyzkumalak/togyzkumalak_blue_house.png);
+  background-size: cover;
+}
+
+body.togyzkumalak-wood .variant-togyzkumalak .game-score {
+  background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
   background-size: cover;
 }
 

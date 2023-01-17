@@ -9,7 +9,7 @@ import {
   spinner,
   bindMobileMousedown,
   getPlayerScore,
-  getOwareScore,
+  getMancalaScore,
   variantToRules,
 } from './util';
 import { defined } from 'common';
@@ -312,6 +312,7 @@ function renderPlayerScore(
   variantKey: VariantKey
 ): VNode | undefined {
   const defaultMancalaRole = 's';
+  //TODO Something here for Togyzkumalak
   const pieceClass =
     variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
   const children: VNode[] = [];
@@ -349,10 +350,11 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'oware': {
+      case 'oware':
+      case 'togyzkumalak': {
         const fen = ctrl.node.fen;
-        const p1Score = getOwareScore(fen, 'p1');
-        const p2Score = getOwareScore(fen, 'p2');
+        const p1Score = getMancalaScore(fen, 'p1');
+        const p2Score = getMancalaScore(fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
@@ -363,14 +365,14 @@ export default function (ctrl: AnalyseCtrl): VNode {
     }
   }
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(variantKey)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware', 'togyzkumalak'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware', 'togyzkumalak'].includes(variantKey)
     ? '.piece-letter'
     : '';
   return h(

@@ -138,7 +138,7 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
   return score;
 }
 
-export function getOwareScore(fen: string, playerIndex: string): number {
+export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }
 
