@@ -58,7 +58,7 @@ object GameDiff {
         clk     <- g.clock
         history <- g.clockHistory
         curPlayerIndex = g.turnPlayerIndex
-        times    = history(playerIndex)
+        times          = history(playerIndex)
       } yield (clk.limit, times, g.flagged has playerIndex)
 
     def clockHistoryToBytes(o: Option[ClockHistorySide]) =
@@ -68,7 +68,7 @@ object GameDiff {
 
     def pfnStorageWriter(pgnMoves: PgnMoves) =
       PfnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
-    
+
     def pmnStorageWriter(pgnMoves: PgnMoves) =
       PmnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
 
@@ -80,18 +80,22 @@ object GameDiff {
         a.pdnStorage match {
           case Some(PdnStorage.OldBin) => {
             dTry(oldPgn, _.pgnMoves, writeBytes compose PdnStorage.OldBin.encode)
-            dTry(binaryPieces, _.board match {
-              case Board.Draughts(b) => b.pieces
-              case _ => sys.error("Wrong board type")
-            }, writeBytes compose {
-              m: strategygames.draughts.PieceMap => BinaryFormat.piece.writeDraughts(
-                m,
-                a.variant match {
-                  case strategygames.variant.Variant.Draughts(v) => v
-                  case _ => sys.error("Wrong variant type")
-                }
-              )
-            })
+            dTry(
+              binaryPieces,
+              _.board match {
+                case Board.Draughts(b) => b.pieces
+                case _                 => sys.error("Wrong board type")
+              },
+              writeBytes compose { m: strategygames.draughts.PieceMap =>
+                BinaryFormat.piece.writeDraughts(
+                  m,
+                  a.variant match {
+                    case strategygames.variant.Variant.Draughts(v) => v
+                    case _                                         => sys.error("Wrong variant type")
+                  }
+                )
+              }
+            )
             d(positionHashes, _.history.positionHashes, w.bytes)
             d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
             // since variants are always OldBin
@@ -99,7 +103,7 @@ object GameDiff {
               dOptTry(
                 kingMoves,
                 _.history.kingMoves,
-                (o: KingMoves) => o.nonEmpty option {BSONHandlers.kingMovesWriter writeTry o}
+                (o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o }
               )
           }
           case Some(PdnStorage.Huffman) => {
@@ -112,10 +116,14 @@ object GameDiff {
           dTry(huffmanPgn, _.pgnMoves, writeBytes compose PgnStorage.Huffman.encode)
         else {
           dTry(oldPgn, _.pgnMoves, writeBytes compose PgnStorage.OldBin.encode)
-          dTry(binaryPieces, _.board match {
-            case Board.Chess(b) => b.pieces
-            case _ => sys.error("Wrong board type")
-          }, writeBytes compose BinaryFormat.piece.writeChess)
+          dTry(
+            binaryPieces,
+            _.board match {
+              case Board.Chess(b) => b.pieces
+              case _              => sys.error("Wrong board type")
+            },
+            writeBytes compose BinaryFormat.piece.writeChess
+          )
           d(positionHashes, _.history.positionHashes, w.bytes)
           dTry(
             unmovedRooks,
@@ -142,14 +150,22 @@ object GameDiff {
             )
         }
       case GameLogic.FairySF() => {
-        dTry(oldPgn, _.board match {
-          case Board.FairySF(b) => b.uciMoves.toVector
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose pfnStorageWriter)
-        dTry(binaryPieces, _.board match {
-          case Board.FairySF(b) => b.pieces
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose BinaryFormat.piece.writeFairySF)
+        dTry(
+          oldPgn,
+          _.board match {
+            case Board.FairySF(b) => b.uciMoves.toVector
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose pfnStorageWriter
+        )
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.FairySF(b) => b.pieces
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeFairySF
+        )
         d(positionHashes, _.history.positionHashes, w.bytes)
         if (a.variant.dropsVariant)
           dOpt(
@@ -159,25 +175,41 @@ object GameDiff {
           )
       }
       case GameLogic.Samurai() => {
-        dTry(oldPgn, _.board match {
-          case Board.Samurai(b) => b.uciMoves.toVector
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose pmnStorageWriter)
-        dTry(binaryPieces, _.board match {
-          case Board.Samurai(b) => b.pieces
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose BinaryFormat.piece.writeSamurai)
+        dTry(
+          oldPgn,
+          _.board match {
+            case Board.Samurai(b) => b.uciMoves.toVector
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose pmnStorageWriter
+        )
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Samurai(b) => b.pieces
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeSamurai
+        )
         d(positionHashes, _.history.positionHashes, w.bytes)
       }
       case GameLogic.Togyzkumalak() => {
-        dTry(oldPgn, _.board match {
-          case Board.Togyzkumalak(b) => b.uciMoves.toVector
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose ptnStorageWriter)
-        dTry(binaryPieces, _.board match {
-          case Board.Togyzkumalak(b) => b.pieces
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose BinaryFormat.piece.writeTogyzkumalak)
+        dTry(
+          oldPgn,
+          _.board match {
+            case Board.Togyzkumalak(_) => sys.error("Not implemented for Togyzkumalak")
+            case _                     => sys.error("Wrong board type")
+          },
+          writeBytes compose ptnStorageWriter
+        )
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Togyzkumalak(b) => b.pieces
+            case _                     => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeTogyzkumalak
+        )
         d(positionHashes, _.history.positionHashes, w.bytes)
       }
     }
@@ -216,7 +248,7 @@ object GameDiff {
     CastleLastMove(
       lastMove = g.history match {
         case History.Chess(h) => h.lastMove
-        case _ => sys.error("Wrong history type")
+        case _                => sys.error("Wrong history type")
       },
       castles = g.history.castles
     )

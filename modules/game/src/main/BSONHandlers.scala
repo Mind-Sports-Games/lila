@@ -549,8 +549,7 @@ object BSONHandlers {
               halfMoveClock = decoded.halfMoveClock,
               positionHashes = decoded.positionHashes
             ),
-            variant = gameVariant,
-            uciMoves = strategygames.togyzkumalak.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
+            variant = gameVariant
           ),
           player = turnPlayerIndex
         ),
