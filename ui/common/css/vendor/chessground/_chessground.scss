@@ -17,7 +17,8 @@ cg-board {
 }
 
 //no background shadow for board as its has rounded corners.
-.variant-oware cg-board {
+.variant-oware cg-board,
+.variant-togyzkumalak cg-board {
   box-shadow: none;
 }
 
@@ -31,11 +32,20 @@ cg-board {
   padding-top: calc(213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
 }
+.mini-board.variant-togyzkumalak.is2d {
+  padding-bottom: calc(256 * 100% / 640);
+  padding-top: calc(256 * 100% / 640);
+  margin-bottom: calc(256 * 100% / 640);
+}
 
 //only add for fixed mini-games, not the popup which create an <a>
 span.mini-game.variant-oware.is2d {
   margin-top: calc(-213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
+}
+span.mini-game.variant-togyzkumalak.is2d {
+  margin-top: calc(-256 * 100% / 640);
+  margin-bottom: calc(256 * 100% / 640);
 }
 
 //main board - alter non-square boards
@@ -72,6 +82,11 @@ span.mini-game.variant-oware.is2d {
 
 .variant-oware square {
   width: calc(100% / 6);
+  height: calc(100% / 2);
+}
+
+.variant-togyzkumalak square {
+  width: calc(100% / 9);
   height: calc(100% / 2);
 }
 
@@ -420,6 +435,31 @@ square {
   height: calc(100% / 2);
 }
 
+.variant-togyzkumalak {
+  piece {
+    width: calc(100% / 9);
+    height: calc(100% / 3);
+  }
+
+  .orientation-p2 piece {
+    &.p2 {
+      margin-top: 5.5%;
+    }
+    &.p1 {
+      margin-top: 4.5%;
+    }
+  }
+
+  .orientation-p1 piece {
+    &.p2 {
+      margin-top: 4.5%;
+    }
+    &.p1 {
+      margin-top: 5.5%;
+    }
+  }
+}
+
 piece {
   position: absolute;
   top: 0;
@@ -480,6 +520,11 @@ piece {
   padding-bottom: calc(100% / 6);
 }
 
+.variant-togyzkumalak cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 9);
+}
+
 cg-helper {
   position: absolute;
   width: 12.5%;
@@ -516,6 +561,11 @@ cg-helper {
 .variant-oware cg-container {
   width: calc(100% * 6);
   height: calc(100% * 2);
+}
+
+.variant-togyzkumalak cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 5.1);
 }
 
 cg-container {
@@ -585,6 +635,27 @@ cg-container .cg-custom-svgs svg {
   }
 }
 
+.swiss__board,
+.tour__featured {
+  &.variant-togyzkumalak .cg-wrap {
+    padding-bottom: calc(365.555 * 100% / 640);
+    margin-top: calc(106.666 * 100% / 640);
+    margin-bottom: calc(106.666 * 100% / 640);
+  }
+}
+
+.variant-togyzkumalak .round__app__board {
+  padding-bottom: calc(444 * 100% / 640);
+  margin-top: calc(106.666 * 100% / 640);
+  margin-bottom: calc(106.666 * 100% / 640);
+
+  @include breakpoint($mq-col1-uniboard) {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-bottom: calc(355.555 * 100% / 640);
+  }
+}
+
 .variant-xiangqi .analyse__board {
   padding-bottom: calc(640 * 100% / 576);
 }
@@ -593,6 +664,17 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(213.333 * 100% / 640);
   margin-top: calc(213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
+
+  @include breakpoint($mq-col1-uniboard) {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+}
+
+.variant-togyzkumalak .analyse__board {
+  padding-bottom: calc(365.555 * 100% / 640);
+  margin-top: calc(106.666 * 100% / 640);
+  margin-bottom: calc(106.666 * 100% / 640);
 
   @include breakpoint($mq-col1-uniboard) {
     margin-top: 5px;

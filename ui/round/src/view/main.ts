@@ -36,13 +36,36 @@ function renderMaterial(
 
 function renderPlayerScore(score: number, position: Position, playerIndex: string, variantKey: VariantKey): VNode {
   const defaultMancalaRole = 's';
-  //TODO Something here for Togyzkumalak
-  const pieceClass =
-    variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
   const children: VNode[] = [];
-  children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
+  if (variantKey === 'togyzkumalak') {
+    let part1Score = 0;
+    let part2Score = 0;
 
-  return h('div.game-score.game-score-' + position, children);
+    if (score <= 10) {
+      part1Score = score;
+      part2Score = 0;
+    } else if (score <= 20) {
+      part1Score = 10;
+      part2Score = score - 10;
+    } else {
+      part1Score = Math.min((score % 20) + 10, 20);
+      part2Score = Math.max(score % 20, 10);
+    }
+
+    const pieceClassPart1 = `piece.${defaultMancalaRole}${part1Score.toString()}-piece.part1.`;
+    const pieceClassPart2 = `piece.${defaultMancalaRole}${part2Score.toString()}-piece.part2.`;
+
+    children.push(h(pieceClassPart1 + playerIndex));
+    if (score > 10) {
+      children.push(h(pieceClassPart2 + playerIndex));
+    }
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else {
+    const pieceClass =
+      variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
+    children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-' + position, children);
+  }
 }
 
 function wheel(ctrl: RoundController, e: WheelEvent): void {
@@ -107,9 +130,15 @@ export function main(ctrl: RoundController): VNode {
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
 
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware', 'togyzkumalak'].includes(variantKey)) {
+  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
+    }
+  }
+  //Togyzkumalak board always has coodinates on the inside
+  if (['togyzkumalak'].includes(variantKey)) {
+    if (!$('body').hasClass('coords-no')) {
+      $('body').removeClass('coords-out').addClass('coords-in');
     }
   }
 

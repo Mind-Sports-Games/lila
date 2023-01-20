@@ -4,7 +4,16 @@ $c-slider: $c-setup;
 // these must all be the same size as we iterate through them...
 $game-family: ('chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello', 'oware', 'togyzkumalak');
 
-$game-family-random-pieces: ('wbK.svg', 'wbK.png', 'bwL.png', 'bwK.png', 'rbK.png', 'bwP.png', 'mixed.svg', 'mixed.svg');
+$game-family-random-pieces: (
+  'wbK.svg',
+  'wbK.png',
+  'bwL.png',
+  'bwK.png',
+  'rbK.png',
+  'bwP.png',
+  'mixed.svg',
+  'mixed.svg'
+);
 
 $game-family-p1-pieces: (
   'chess/cburnett/wK.svg',

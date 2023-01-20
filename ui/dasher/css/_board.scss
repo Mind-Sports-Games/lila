@@ -21,7 +21,11 @@
       height: 125px;
     }
 
-    &.mancala {
+    &.oware {
+      height: 125px;
+    }
+
+    &.togyzkumalak {
       height: 125px;
     }
 
@@ -58,10 +62,16 @@
     height: 100px;
   }
 
-  .list a.mancala span {
+  .list a.oware span {
     display: block;
     width: 100px;
     height: 33.33px;
+  }
+
+  .list a.togyzkumalak span {
+    display: block;
+    width: 100px;
+    height: 55.55px;
   }
 
   &.d3 .list span {

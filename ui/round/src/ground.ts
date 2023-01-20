@@ -56,7 +56,11 @@ export function makeConfig(ctrl: RoundController): Config {
       duration: data.pref.animationDuration,
     },
     premovable: {
-      enabled: data.pref.enablePremove && !data.onlyDropsVariant && data.game.variant.key !== 'oware' && data.game.variant.key !== 'togyzkumalak',
+      enabled:
+        data.pref.enablePremove &&
+        !data.onlyDropsVariant &&
+        data.game.variant.key !== 'oware' &&
+        data.game.variant.key !== 'togyzkumalak',
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {
@@ -127,7 +131,8 @@ export function makeConfig(ctrl: RoundController): Config {
     variant: variantKey,
     chess960: data.game.variant.key === 'chess960',
     onlyDropsVariant: data.onlyDropsVariant,
-    singleClickMoveVariant: (data.game.variant.key === 'oware' || data.game.variant.key === 'togyzkumalak') && data.pref.mancalaMove,
+    singleClickMoveVariant:
+      (data.game.variant.key === 'oware' || data.game.variant.key === 'togyzkumalak') && data.pref.mancalaMove,
   };
 }
 
