@@ -27,6 +27,7 @@ export function makeConfig(ctrl: RoundController): Config {
     lastMove: util.lastMove(data.onlyDropsVariant, step.uci),
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
+    boardScores: data.game.variant.key == 'togyzkumalak',
     addPieceZIndex: ctrl.data.pref.is3d,
     highlight: {
       lastMove: data.pref.highlight,

@@ -127,8 +127,9 @@ togyzkumalak_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-p
 's131-piece','s132-piece','s133-piece','s134-piece','s135-piece','s136-piece','s137-piece','s138-piece','s139-piece','s140-piece',
 's141-piece','s142-piece','s143-piece','s144-piece','s145-piece','s146-piece','s147-piece','s148-piece','s149-piece','s150-piece',
 's151-piece','s152-piece','s153-piece','s154-piece','s155-piece','s156-piece','s157-piece','s158-piece','s159-piece','s160-piece',
-'s161-piece','s162-piece'
+'s161-piece','s162-piece', 't-piece', 's10f-piece'
 ]
+togyzkumalak_extra_pieces = ['t-piece', 's10f-piece']
 togyzkumalak_variants = ['togyzkumalak']
 
 
@@ -532,9 +533,13 @@ togyzkumalak_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
   classes_togyzkumalak_game = togyzkumalak_roles.map { |role|
-    count = role.split('-')[0][1..-1].to_i
-    if count > 20
-      count = (count % 10) + 10
+    if togyzkumalak_extra_pieces.include?(role)
+      count = role.split('-')[0]
+    else
+      count = role.split('-')[0][1..-1].to_i
+      if count > 20
+        count = (count % 10) + 10
+      end
     end
     file = source_dir + 'togyzkumalak/' + name + '/' + count.to_s + '.' + ext
       File.open(file, 'r') do|image_file|
@@ -546,9 +551,13 @@ togyzkumalak_themes.map { |theme|
   }.flatten
   classes_togyzkumalak_variant = togyzkumalak_variants.map{ |variant|
       togyzkumalak_roles.map { |role|
-        count = role.split('-')[0][1..-1].to_i
-        if count > 20
-          count = (count % 10) + 10
+        if togyzkumalak_extra_pieces.include?(role)
+          count = role.split('-')[0]
+        else
+          count = role.split('-')[0][1..-1].to_i
+          if count > 20
+            count = (count % 10) + 10
+          end
         end
         file = source_dir + 'togyzkumalak/' + name + '/' + count.to_s + '.' + ext
         File.open(file, 'r') do|image_file|
@@ -566,18 +575,26 @@ togyzkumalak_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
   classes_togyzkumalak_game = togyzkumalak_roles.map { |role|
-    count = role.split('-')[0][1..-1].to_i
-    if count > 20
-      count = (count % 10) + 10
+    if togyzkumalak_extra_pieces.include?(role)
+      count = role.split('-')[0]
+    else
+      count = role.split('-')[0][1..-1].to_i
+      if count > 20
+        count = (count % 10) + 10
+      end
     end
       '.togyzkumalak.is2d .' + role + ' {' +
         "background-image:url('/assets/piece/" + 'togyzkumalak/' + name + "/" + count.to_s + "." + ext + "')}"
   }.flatten
   classes_togyzkumalak_variant = togyzkumalak_variants.map { |variant|
       togyzkumalak_roles.map { |role|
-        count = role.split('-')[0][1..-1].to_i
-        if count > 20
-          count = (count % 10) + 10
+        if togyzkumalak_extra_pieces.include?(role)
+          count = role.split('-')[0]
+        else
+          count = role.split('-')[0][1..-1].to_i
+          if count > 20
+            count = (count % 10) + 10
+          end
         end
         '.is2d .variant-' + variant + ' .' + role + ' {' +
           "background-image:url('/assets/piece/" + 'togyzkumalak/' + name + "/" + count.to_s + "." + ext + "')}"

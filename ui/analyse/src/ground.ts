@@ -55,6 +55,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     orientation: ctrl.getOrientation(),
     myPlayerIndex: ctrl.data.player.playerIndex,
     coordinates: pref.coords !== Prefs.Coords.Hidden && !ctrl.embed,
+    boardScores: d.game.variant.key == 'togyzkumalak',
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,
     movable: {

@@ -26,8 +26,8 @@ $score-variants-square: ('flipello', 'flipello10', 'oware');
   @extend %active, %box-radius;
 
   content: attr(data-score);
-  top: -3.8em;
-  right: -9.9em;
+  top: -5.5em;
+  right: -10.7em;
   position: relative;
   line-height: 0.9em;
   padding: 3px 0.3em;
@@ -83,27 +83,27 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
 .variant-togyzkumalak .game-score {
   @extend %box-radius;
   display: block;
-  width: 18em;
+  width: 17.8em;
   height: 4.5em;
   background-color: #aaa;
 
   piece.part1 {
     display: block;
-    width: 4.5em !important;
-    height: 9em !important;
+    width: 5em !important;
+    height: 10em !important;
     position: relative;
-    margin-top: -1.77em !important;
-    margin-left: 2em !important;
+    margin-top: -2.2em !important;
+    margin-left: 2.5em !important;
     transform: rotate(270deg);
   }
 
   piece.part2 {
     display: block;
-    width: 4.5em !important;
-    height: 9em !important;
+    width: 5em !important;
+    height: 10em !important;
     position: relative;
-    margin-top: -9em !important;
-    margin-left: 8.85em !important;
+    margin-top: -10em !important;
+    margin-left: 10.1em !important;
     transform: rotate(270deg);
   }
 

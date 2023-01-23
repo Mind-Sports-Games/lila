@@ -40,7 +40,7 @@ function renderPlayerScore(score: number, position: Position, playerIndex: strin
   if (variantKey === 'togyzkumalak') {
     let part1Score = 0;
     let part2Score = 0;
-
+    let part2Faded = false;
     if (score <= 10) {
       part1Score = score;
       part2Score = 0;
@@ -50,10 +50,11 @@ function renderPlayerScore(score: number, position: Position, playerIndex: strin
     } else {
       part1Score = Math.min((score % 20) + 10, 20);
       part2Score = Math.max(score % 20, 10);
+      if (part2Score === 10) part2Faded = true;
     }
 
     const pieceClassPart1 = `piece.${defaultMancalaRole}${part1Score.toString()}-piece.part1.`;
-    const pieceClassPart2 = `piece.${defaultMancalaRole}${part2Score.toString()}-piece.part2.`;
+    const pieceClassPart2 = `piece.${defaultMancalaRole}${part2Score.toString()}${part2Faded ? 'f' : ''}-piece.part2.`;
 
     children.push(h(pieceClassPart1 + playerIndex));
     if (score > 10) {
