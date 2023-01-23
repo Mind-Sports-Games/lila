@@ -351,6 +351,35 @@ function destPosOnlyNotation(move: ExtendedMoveInfo, variant: Variant): string {
 }
 
 function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  switch (variant.key) {
+    case 'togyzkumalak':
+      return togyzkumalakNotation(move, variant);
+    default:
+      return owareNotation(move, variant);
+  }
+}
+
+function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  const reg = move.uci.match(/[a-z][1-2]/g) as string[];
+  const orig = reg[0];
+  const dest = reg[1];
+  const origNumber = orig[1] === '1' ? orig.charCodeAt(0) - 96 : 97 - orig.charCodeAt(0) + variant.boardSize.width;
+  const destNumber = dest[1] === '1' ? dest.charCodeAt(0) - 96 : 97 - dest.charCodeAt(0) + variant.boardSize.width;
+  //captured number of stones
+  const scoreDiff =
+    getMancalaScore(move.fen, 'p1') +
+    getMancalaScore(move.fen, 'p2') -
+    getMancalaScore(move.prevFen!, 'p1') -
+    getMancalaScore(move.prevFen!, 'p2');
+  let scoreText = scoreDiff <= 0 ? '' : ` (${scoreDiff})`;
+
+  //TODO add in Tuzdik correctly (X)
+  if (scoreDiff === 3) scoreText = ' X';
+
+  return `${origNumber}${destNumber}${scoreText}`;
+}
+
+function owareNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const reg = move.uci.match(/[a-z][1-2]/g) as string[];
   const orig = reg[0];
   const origLetter =
