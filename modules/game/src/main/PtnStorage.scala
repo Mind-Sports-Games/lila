@@ -27,7 +27,7 @@ private object PtnStorage {
   }
 
   //is Huffman used/needed anywhere for PtnStorage?
-  //we default to Oware in here
+  //we default to Togyzkumalak in here
   case object Huffman extends PtnStorage {
 
     import org.lichess.compression.game.{ Encoder, Piece => JavaPiece, Role => JavaRole }
@@ -41,7 +41,7 @@ private object PtnStorage {
       }
     def decode(bytes: ByteArray, plies: Int): Decoded =
       monitor(_.game.pgn.decode("huffman")) {
-        val decoded      = Encoder.decode(bytes.value, plies)
+        val decoded = Encoder.decode(bytes.value, plies)
         Decoded(
           pgnMoves = decoded.pgnMoves.toVector,
           pieces = decoded.pieces.asScala.view.flatMap { case (k, v) =>
