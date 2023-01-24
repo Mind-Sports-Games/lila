@@ -16,6 +16,10 @@ cg-board {
   }
 }
 
+$togyzkumalak-highlight-height: calc(104% / 3);
+$togyzkumalak-margin-top-same: 4.7%;
+$togyzkumalak-margin-top-opposite: 3.7%;
+
 //no background shadow for board as its has rounded corners.
 .variant-oware cg-board,
 .variant-togyzkumalak cg-board {
@@ -35,7 +39,7 @@ cg-board {
 .mini-board.variant-togyzkumalak.is2d {
   padding-bottom: calc(256 * 100% / 640);
   padding-top: calc(256 * 100% / 640);
-  margin-bottom: calc(256 * 100% / 640);
+  margin-bottom: calc(128 * 100% / 640);
 }
 
 //only add for fixed mini-games, not the popup which create an <a>
@@ -170,62 +174,164 @@ square {
     }
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
-      body.#{$color} .#{$gameFamily} & {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &,
+      body.#{$color} .#{$gameFamily}.orientation-p1 & {
         background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &,
+      body.#{$color} .#{$gameFamily}.orientation-p2 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .#{$gameFamily} & {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &,
+      body.#{$color} .#{$gameFamily}.orientation-p1 & {
         background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &,
+      body.#{$color} .#{$gameFamily}.orientation-p2 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.from {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.from,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.from {
         background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.from,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.from {
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.from {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.from,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.from {
         background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.from,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.from {
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.to {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
         background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.to {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
         background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
   }
@@ -274,38 +380,106 @@ square {
   }
 
   @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
-    body.#{$color} .#{$gameFamily} &.last-move.from {
+    body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.from,
+    body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.from {
       background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
       background-size: cover;
-      height: calc(103% / 3);
-      margin-top: 4%;
-      //TODO refactor and add in top/bot togy board
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+    }
+    body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.from,
+    body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.from {
+      background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
     }
 
-    body.#{$color} .#{$gameFamily} &.last-move.to {
+    body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+    body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
       background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
       background-size: cover;
-      height: calc(103% / 3);
-      margin-top: 4%;
-      //TODO refactor and add in top/bot togy board
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+    }
+    body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+    body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+      background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
     }
   }
 
   @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
-    body.#{$color} .#{$gameFamily} &.last-move.from {
+    body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.from,
+    body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.from {
       background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
       background-size: cover;
-      height: calc(103% / 3);
-      margin-top: 4%;
-      //TODO refactor and add in top/bot togy board
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+    }
+    body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.from,
+    body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.from {
+      background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
     }
 
-    body.#{$color} .#{$gameFamily} &.last-move.to {
+    body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+    body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
       background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
       background-size: cover;
-      height: calc(103% / 3);
-      margin-top: 4%;
-      //TODO refactor and add in top/bot togy board
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+    }
+    body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+    body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+      background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
     }
   }
 
@@ -368,42 +542,110 @@ square {
     }
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
-      body.#{$color} .#{$gameFamily} & {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &,
+      body.#{$color} .#{$gameFamily}.orientation-p1 & {
         background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &,
+      body.#{$color} .#{$gameFamily}.orientation-p2 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .#{$gameFamily} & {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &,
+      body.#{$color} .#{$gameFamily}.orientation-p1 & {
         background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &,
+      body.#{$color} .#{$gameFamily}.orientation-p2 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.to {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
         background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.to {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
         background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
         background-size: cover;
-        height: calc(103% / 3);
-        margin-top: 4%;
-        //TODO refactor and add in top/bot togy board
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
   }
@@ -483,7 +725,8 @@ square {
     height: calc(100% / 3);
   }
 
-  .orientation-p2 piece {
+  .orientation-p2 piece,
+  &.orientation-p2 piece {
     &.p2 {
       margin-top: 5.15%;
     }
@@ -492,7 +735,8 @@ square {
     }
   }
 
-  .orientation-p1 piece {
+  .orientation-p1 piece,
+  &.orientation-p1 piece {
     &.p2 {
       margin-top: 4.15%;
     }
@@ -564,7 +808,7 @@ piece {
 
 .variant-togyzkumalak cg-helper {
   width: calc(100% / 9);
-  padding-bottom: calc(100% / 9);
+  padding-bottom: calc(100% / 3.527);
 }
 
 cg-helper {
@@ -607,7 +851,7 @@ cg-helper {
 
 .variant-togyzkumalak cg-container {
   width: calc(100% * 9);
-  height: calc(100% * 5.1);
+  height: calc(100% * 2);
 }
 
 cg-container {
@@ -677,6 +921,7 @@ cg-container .cg-custom-svgs svg {
   }
 }
 
+//TODO check fix?
 .swiss__board,
 .tour__featured {
   &.variant-togyzkumalak .cg-wrap {

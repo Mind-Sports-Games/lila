@@ -35,6 +35,10 @@ board-scores {
     &.tuzdik {
       background: white;
     }
+
+    &.empty {
+      background: unset;
+    }
   }
 
   .variant-togyzkumalak .orientation-p1 & {
