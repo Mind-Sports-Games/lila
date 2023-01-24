@@ -371,12 +371,18 @@ function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string 
     getMancalaScore(move.fen, 'p2') -
     getMancalaScore(move.prevFen!, 'p1') -
     getMancalaScore(move.prevFen!, 'p2');
-  let scoreText = scoreDiff <= 0 ? '' : ` (${scoreDiff})`;
+  const isCapture =
+    orig[1] === '1'
+      ? getMancalaScore(move.fen, 'p1') > getMancalaScore(move.prevFen!, 'p1')
+      : getMancalaScore(move.fen, 'p2') > getMancalaScore(move.prevFen!, 'p2');
 
-  //TODO add in Tuzdik correctly (X)
-  if (scoreDiff === 3) scoreText = ' X';
+  const score = orig[1] === '1' ? getMancalaScore(move.fen, 'p1') : getMancalaScore(move.fen, 'p2');
+  const scoreText = isCapture ? `(${score})` : '';
 
-  return `${origNumber}${destNumber}${scoreText}`;
+  //TODO add in Tuzdik correctly (from fen?)
+  const tuzdik = scoreDiff === 3 ? 'X' : '';
+
+  return `${origNumber}${destNumber}${tuzdik}${scoreText}`;
 }
 
 function owareNotation(move: ExtendedMoveInfo, variant: Variant): string {

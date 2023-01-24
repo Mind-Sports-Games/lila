@@ -171,43 +171,61 @@ square {
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/togyzkumalak/highlights/dashed.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/togyzkumalak/highlights/dashed_lighter.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/dashed.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/dashed_lighter.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/dashed.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/dashed_lighter.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
   }
@@ -257,25 +275,37 @@ square {
 
   @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/solid_darker.svg);
+      background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
       background-size: cover;
+      height: calc(103% / 3);
+      margin-top: 4%;
+      //TODO refactor and add in top/bot togy board
     }
 
     body.#{$color} .#{$gameFamily} &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/dashed_darker.svg);
+      background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
       background-size: cover;
+      height: calc(103% / 3);
+      margin-top: 4%;
+      //TODO refactor and add in top/bot togy board
     }
   }
 
   @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/solid_lighter.svg);
+      background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
       background-size: cover;
+      height: calc(103% / 3);
+      margin-top: 4%;
+      //TODO refactor and add in top/bot togy board
     }
 
     body.#{$color} .#{$gameFamily} &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/dashed_lighter.svg);
+      background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
       background-size: cover;
+      height: calc(103% / 3);
+      margin-top: 4%;
+      //TODO refactor and add in top/bot togy board
     }
   }
 
@@ -339,29 +369,41 @@ square {
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/togyzkumalak/highlights/solid.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/togyzkumalak/highlights/solid_lighter.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/solid.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
 
     @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/solid_lighter.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
         background-size: cover;
+        height: calc(103% / 3);
+        margin-top: 4%;
+        //TODO refactor and add in top/bot togy board
       }
     }
   }
