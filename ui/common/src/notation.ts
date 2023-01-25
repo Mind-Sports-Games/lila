@@ -365,12 +365,6 @@ function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string 
   const dest = reg[1];
   const origNumber = orig[1] === '1' ? orig.charCodeAt(0) - 96 : 97 - orig.charCodeAt(0) + variant.boardSize.width;
   const destNumber = dest[1] === '1' ? dest.charCodeAt(0) - 96 : 97 - dest.charCodeAt(0) + variant.boardSize.width;
-  //captured number of stones
-  const scoreDiff =
-    getMancalaScore(move.fen, 'p1') +
-    getMancalaScore(move.fen, 'p2') -
-    getMancalaScore(move.prevFen!, 'p1') -
-    getMancalaScore(move.prevFen!, 'p2');
   const isCapture =
     orig[1] === '1'
       ? getMancalaScore(move.fen, 'p1') > getMancalaScore(move.prevFen!, 'p1')
@@ -379,10 +373,16 @@ function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string 
   const score = orig[1] === '1' ? getMancalaScore(move.fen, 'p1') : getMancalaScore(move.fen, 'p2');
   const scoreText = isCapture ? `(${score})` : '';
 
-  //TODO add in Tuzdik correctly (from fen?)
-  const tuzdik = scoreDiff === 3 ? 'X' : '';
+  const createdTuzdik =
+    orig[1] === '1'
+      ? hasTuzdik(move.fen, 'p1') && !hasTuzdik(move.prevFen!, 'p1')
+      : hasTuzdik(move.fen, 'p2') && !hasTuzdik(move.prevFen!, 'p2');
 
-  return `${origNumber}${destNumber}${tuzdik}${scoreText}`;
+  return `${origNumber}${destNumber}${createdTuzdik ? 'X' : ''}${scoreText}`;
+}
+
+function hasTuzdik(fen: string, playerIndex: string): boolean {
+  return ['T', 't'].some(t => fen.split(' ')[0].split('/')[playerIndex === 'p1' ? 0 : 1].includes(t));
 }
 
 function owareNotation(move: ExtendedMoveInfo, variant: Variant): string {
