@@ -46,7 +46,7 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
   ctrl.chessground.setPiecesNoAnim(diff);
 }
 
-export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: cg.Key) {
+export function updateBoardFromOwareMove(ctrl: RoundController, orig: cg.Key, dest: cg.Key) {
   const boardWidth = ctrl.data.game.variant.boardSize.width;
   const currentFen = ctrl.data.steps[ctrl.data.steps.length - 1].fen;
   const boardArray = createBoardArrayFromBoardFen(currentFen.split(' ')[0], boardWidth);
@@ -91,6 +91,100 @@ export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: c
     const k: cg.Key = util.pos2key(pos);
     if (numStones == 0) {
       pieces.set(k, undefined);
+    } else {
+      const piece: cg.Piece = {
+        role: `${defaultPieceLetter}${finalBoardArray[i]}-piece` as cg.Role,
+        playerIndex: playerIndex,
+      };
+      pieces.set(k, piece);
+    }
+  }
+
+  ctrl.chessground.setPiecesNoAnim(pieces);
+}
+
+export function updateBoardFromTogyzkumalakMove(ctrl: RoundController, orig: cg.Key, dest: cg.Key) {
+  const boardWidth = ctrl.data.game.variant.boardSize.width;
+  const currentFen = ctrl.data.steps[ctrl.data.steps.length - 1].fen;
+  const boardArray = createBoardArrayFromBoardFen(currentFen.split(' ')[0], boardWidth);
+  const origBoardIndex = boardIndexFromUci(orig, boardWidth);
+  const destBoardIndex = boardIndexFromUci(dest, boardWidth);
+  const stones = boardArray[origBoardIndex];
+  const extraStoneArray = Array<number>(boardWidth * 2).fill(0);
+
+  //calculate where the stones from moving piece will land
+  if (stones === 1) {
+    extraStoneArray[(origBoardIndex + 1) % (boardWidth * 2)];
+  } else {
+    for (let i = 0; i < stones; i++) {
+      const indexToAdd = (origBoardIndex + i) % (boardWidth * 2);
+      extraStoneArray[indexToAdd] += 1;
+    }
+  }
+  //remove piece that is moving (it will most likely get replaced by a new piece)
+  const boardArrayRemovedMovingPiece = boardArray.slice(0, boardArray.length);
+  boardArrayRemovedMovingPiece[origBoardIndex] = 0;
+
+  //add moving stones to board
+  const finalBoardArray = boardArrayRemovedMovingPiece.map((v, i) => v + extraStoneArray[i]);
+
+  //remove any captured pieces from dest
+  if (dest[1] !== orig[1] && finalBoardArray[destBoardIndex] % 2 === 0) {
+    finalBoardArray[destBoardIndex] = 0;
+  }
+
+  // get current board array index of tuzdik from fen
+  const existingTuzdik: number[] = [];
+  let indexCount = 0;
+  for (const r of currentFen.split(' ')[0].split('/')) {
+    for (const f of r.split(',')) {
+      if (isNaN(+f)) {
+        if (f.includes('T') || f.includes('t')) {
+          const boardIndex = indexCount < boardWidth ? boardWidth * 2 - 1 - indexCount : indexCount - boardWidth;
+          existingTuzdik.push(boardIndex);
+        }
+        indexCount++;
+      } else {
+        for (let j = 0; j < Number(+f); j++) {
+          indexCount++;
+        }
+      }
+    }
+  }
+
+  //is tuzdik created
+  const createdTuzdik =
+    existingTuzdik.length !== 2 &&
+    destBoardIndex !== boardWidth - 1 &&
+    destBoardIndex !== boardWidth * 2 - 1 &&
+    finalBoardArray[destBoardIndex] == 3 &&
+    (existingTuzdik.length === 0 ||
+      (existingTuzdik.length === 1 &&
+        existingTuzdik[0] % boardWidth != destBoardIndex % boardWidth &&
+        Math.floor(existingTuzdik[0] / boardWidth) != Math.floor(destBoardIndex / boardWidth)));
+
+  //remove potential stones where there is a tuzdik
+  if (createdTuzdik) finalBoardArray[destBoardIndex] = 0;
+  existingTuzdik.map(i => (finalBoardArray[i] = 0));
+
+  //calculate the new pieces of the board to update chessground with
+  const pieces: cg.PiecesDiff = new Map();
+  const defaultPieceLetter = 's';
+  for (let i = 0; i < finalBoardArray.length; i++) {
+    const playerIndex: 'p1' | 'p2' = i < boardWidth ? 'p1' : 'p2';
+    const numStones = finalBoardArray[i];
+    const pos: cg.Pos = [i < boardWidth ? i + 1 : boardWidth * 2 - i, i < boardWidth ? 1 : 2] as cg.Pos;
+    const k: cg.Key = util.pos2key(pos);
+    if (numStones == 0) {
+      if (createdTuzdik || existingTuzdik.includes(i)) {
+        const piece: cg.Piece = {
+          role: `T-piece` as cg.Role,
+          playerIndex: playerIndex, //who owns this?
+        };
+        pieces.set(k, piece);
+      } else {
+        pieces.set(k, undefined);
+      }
     } else {
       const piece: cg.Piece = {
         role: `${defaultPieceLetter}${finalBoardArray[i]}-piece` as cg.Role,

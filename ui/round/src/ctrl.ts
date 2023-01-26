@@ -190,15 +190,22 @@ export default class RoundController {
       if (this.data.game.variant.key === 'atomic') {
         sound.explode();
         atomic.capture(this, dest);
-      } else if (this.data.game.variant.key === 'oware' || this.data.game.variant.key === 'togyzkumalak') {
-        mancala.updateBoardFromMove(this, orig, dest);
+      } else if (this.data.game.variant.key === 'oware') {
+        mancala.updateBoardFromOwareMove(this, orig, dest);
+        sound.capture();
+      } else if (this.data.game.variant.key === 'togyzkumalak') {
+        mancala.updateBoardFromTogyzkumalakMove(this, orig, dest);
         sound.capture();
       } else sound.capture();
     } else if (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') {
       flipello.flip(this, dest, this.data.player.playerIndex);
-    } else if (this.data.game.variant.key === 'oware' || this.data.game.variant.key === 'togyzkumalak') {
+    } else if (this.data.game.variant.key === 'oware') {
       //always play the capture sound regardless of move TODO change depending on number of stones?
-      mancala.updateBoardFromMove(this, orig, dest);
+      mancala.updateBoardFromOwareMove(this, orig, dest);
+      sound.capture();
+    } else if (this.data.game.variant.key === 'togyzkumalak') {
+      //always play the capture sound regardless of move TODO change depending on number of stones?
+      mancala.updateBoardFromTogyzkumalakMove(this, orig, dest);
       sound.capture();
     } else sound.move();
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
