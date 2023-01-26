@@ -337,8 +337,12 @@ object BinaryFormat {
 
     def writeTogyzkumalak(pieces: togyzkumalak.PieceMap): ByteArray = {
       def posInt(pos: togyzkumalak.Pos): Int =
-        (pieces get pos).fold(0) { case (piece, count) =>
-          piece.role.binaryInt + count
+        (pieces get pos).fold(0) {
+          case (piece, count) if piece.role == togyzkumalak.Role.defaultRole =>
+            count
+          case (piece, _) =>
+            piece.role.binaryInt
+
         }
       ByteArray(togyzkumalak.Pos.all.map(posInt(_).toByte).toArray)
     }
@@ -359,9 +363,10 @@ object BinaryFormat {
               1
             )
           )
+      def unsignInt(int: Int) = if (int < 0) 256 + int else int
       (togyzkumalak.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
-          intPiece(pos.player, int) map (pos -> _)
+          intPiece(pos.player, unsignInt(int)) map (pos -> _)
         }
         .to(Map)
     }

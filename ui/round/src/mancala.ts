@@ -17,15 +17,23 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
       if (isNaN(+f)) {
         col += 1 + num;
         num = 0;
-        const count = f.slice(0, -1);
-        const role = f.substring(f.length - 1).toLowerCase();
-        //const letter = +count <= 26 ? String.fromCharCode(64 + +count) : String.fromCharCode(96 - 26 + +count);
         const playerIndex = row === 1 ? 'p1' : ('p2' as cg.PlayerIndex);
-        const piece = {
-          role: `${role}${count}-piece`,
-          playerIndex: playerIndex,
-        } as cg.Piece;
-        diff.set(util.pos2key([col, row]), piece);
+        if (f.length === 1) {
+          const role = f.toLowerCase();
+          const piece = {
+            role: `${role}-piece`,
+            playerIndex: playerIndex,
+          } as cg.Piece;
+          diff.set(util.pos2key([col, row]), piece);
+        } else {
+          const count = f.slice(0, -1);
+          const role = f.substring(f.length - 1).toLowerCase();
+          const piece = {
+            role: `${role}${count}-piece`,
+            playerIndex: playerIndex,
+          } as cg.Piece;
+          diff.set(util.pos2key([col, row]), piece);
+        }
       } else {
         num = num + +f;
         for (let j = 0; j < Number(+f); j++) {

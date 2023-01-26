@@ -194,14 +194,7 @@ object GameDiff {
         d(positionHashes, _.history.positionHashes, w.bytes)
       }
       case GameLogic.Togyzkumalak() => {
-        dTry(
-          oldPgn,
-          _.board match {
-            case Board.Togyzkumalak(_) => sys.error("Not implemented for Togyzkumalak")
-            case _                     => sys.error("Wrong board type")
-          },
-          writeBytes compose ptnStorageWriter
-        )
+        dTry(oldPgn, _.pgnMoves, writeBytes compose ptnStorageWriter)
         dTry(
           binaryPieces,
           _.board match {
