@@ -3,7 +3,7 @@ package lila.i18n
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
-import strategygames.GameFamily
+import strategygames.{ GameFamily, GameGroup }
 
 object VariantKeys {
 
@@ -18,6 +18,12 @@ object VariantKeys {
 
   def gameFamilyName(gameFamily: GameFamily)(implicit lang: Lang = defaultLang) =
     new I18nKey(s"variantName:${gameFamily.key match {
+      case "loa" => "linesOfAction"
+      case key   => key
+    }}").txt()
+
+  def gameGroupName(gameGroup: GameGroup)(implicit lang: Lang = defaultLang) =
+    new I18nKey(s"variantName:${gameGroup.key match {
       case "loa" => "linesOfAction"
       case key   => key
     }}").txt()

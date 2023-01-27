@@ -5,7 +5,7 @@ import lila.game.{ Game, GameRepo, Pov }
 import lila.hub.Trouper
 import lila.i18n.VariantKeys
 import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.{ GameFamily, GameGroup, GameLogic }
 
 final class Tv(
     gameRepo: GameRepo,
@@ -169,30 +169,18 @@ object Tv {
           familyChannel = true,
           gameFamily = "flipello"
         )
-    // case object OwareFamily
-    //     extends Channel(
-    //       name = s"All ${VariantKeys.gameFamilyName(GameFamily.Oware())}",
-    //       icon = MSV.Oware.perfIcon.toString,
-    //       secondsSinceLastMove = freshBlitz,
-    //       filters = Seq(
-    //         anyVariant(Variant.all(GameLogic.Samurai()).filter(v => v.gameFamily == GameFamily.Oware())),
-    //         noBot
-    //       ),
-    //       familyChannel = true,
-    //       gameFamily = "oware"
-    //     )
-    // case object TogyzkumalakFamily
-    //     extends Channel(
-    //       name = s"All ${VariantKeys.gameFamilyName(GameFamily.Togyzkumalak())}",
-    //       icon = MTV.Togyzkumalak.perfIcon.toString,
-    //       secondsSinceLastMove = freshBlitz,
-    //       filters = Seq(
-    //         anyVariant(Variant.all(GameLogic.Togyzkumalak()).filter(v => v.gameFamily == GameFamily.Togyzkumalak())),
-    //         noBot
-    //       ),
-    //       familyChannel = true,
-    //       gameFamily = "togyzkumalak"
-    //     )
+    case object MancalaFamily
+        extends Channel(
+          name = s"All ${GameGroup(7).name}",
+          icon = MSV.Oware.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(
+            anyVariant(GameGroup(7).variants),
+            noBot
+          ),
+          familyChannel = true,
+          gameFamily = "mancala"
+        )
     case object Bullet
         extends Channel(
           name = S.Bullet.name,
@@ -501,8 +489,8 @@ object Tv {
           icon = MSV.Oware.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(MSV.Oware)), noBot),
-          familyChannel = true,
-          gameFamily = "oware"
+          familyChannel = false,
+          gameFamily = "mancala"
         )
     case object Togyzkumalak
         extends Channel(
@@ -510,8 +498,8 @@ object Tv {
           icon = MTV.Togyzkumalak.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(MTV.Togyzkumalak)), noBot),
-          familyChannel = true,
-          gameFamily = "togyzkumalak"
+          familyChannel = false,
+          gameFamily = "mancala"
         )
     case object Bot
         extends Channel(
@@ -573,9 +561,8 @@ object Tv {
       FlipelloFamily,
       Flipello,
       Flipello10,
-      //OwareFamily,
+      MancalaFamily,
       Oware,
-      //TogyzkumalakFamily,
       Togyzkumalak,
       Bot,
       Computer

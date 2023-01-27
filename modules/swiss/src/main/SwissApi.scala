@@ -137,8 +137,8 @@ final class SwissApi(
             forbiddenPairings = ~data.forbiddenPairings,
             medleyVariants =
               if (
-                old.medleyGameFamilies != Some(
-                  data.medleyGameFamilies.gfList.sortWith(_.name < _.name)
+                old.medleyGameGroups != Some(
+                  data.medleyGameFamilies.ggList.sortWith(_.name < _.name)
                 ) || old.settings.nbRounds < data.nbRounds
               )
                 data.medleyVariants
