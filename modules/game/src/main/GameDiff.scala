@@ -1,6 +1,18 @@
 package lila.game
 
-import strategygames.{ P2, Board, Centis, Clock, Player => PlayerIndex, GameLogic, History, PocketData, P1 }
+import strategygames.{
+  P2,
+  Board,
+  ByoyomiClock,
+  Centis,
+  Clock,
+  FischerClock,
+  Player => PlayerIndex,
+  GameLogic,
+  History,
+  PocketData,
+  P1
+}
 import strategygames.chess.CheckCount
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
@@ -16,7 +28,10 @@ object GameDiff {
   private type Set   = (String, BSONValue)
   private type Unset = (String, BSONValue)
 
-  private type ClockHistorySide = (Centis, Vector[Centis], Boolean)
+  private sealed trait ClockType
+  private case class FischerClockType() extends ClockType
+  private case class ByoyomiClockType() extends ClockType
+  private type ClockHistorySide = (ClockType, Centis, Vector[Centis], Boolean)
 
   type Diff = (List[Set], List[Unset])
 
@@ -58,17 +73,30 @@ object GameDiff {
         clk     <- g.clock
         history <- g.clockHistory
         curPlayerIndex = g.turnPlayerIndex
-        times    = history(playerIndex)
-      } yield (clk.limit, times, g.flagged has playerIndex)
+        times          = history(playerIndex)
+      } yield (
+        clk match {
+          case _: FischerClock => FischerClockType()
+          case _: ByoyomiClock => ByoyomiClockType()
+        },
+        clk.limit,
+        times,
+        g.flagged has playerIndex
+      )
 
     def clockHistoryToBytes(o: Option[ClockHistorySide]) =
-      o.flatMap { case (x, y, z) =>
-        ByteArrayBSONHandler.writeOpt(BinaryFormat.clockHistory.writeSide(x, y, z))
+      o.flatMap { case (clockType, x, y, z) =>
+        clockType match {
+          case _: FischerClockType =>
+            ByteArrayBSONHandler.writeOpt(BinaryFormat.fischerClockHistory.writeSide(x, y, z))
+          case _: ByoyomiClockType =>
+            ByteArrayBSONHandler.writeOpt(BinaryFormat.byoyomiClockHistory.writeSide(x, y, z))
+        }
       }
 
     def pfnStorageWriter(pgnMoves: PgnMoves) =
       PfnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
-    
+
     def pmnStorageWriter(pgnMoves: PgnMoves) =
       PmnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
 
@@ -77,18 +105,22 @@ object GameDiff {
         a.pdnStorage match {
           case Some(PdnStorage.OldBin) => {
             dTry(oldPgn, _.pgnMoves, writeBytes compose PdnStorage.OldBin.encode)
-            dTry(binaryPieces, _.board match {
-              case Board.Draughts(b) => b.pieces
-              case _ => sys.error("Wrong board type")
-            }, writeBytes compose {
-              m: strategygames.draughts.PieceMap => BinaryFormat.piece.writeDraughts(
-                m,
-                a.variant match {
-                  case strategygames.variant.Variant.Draughts(v) => v
-                  case _ => sys.error("Wrong variant type")
-                }
-              )
-            })
+            dTry(
+              binaryPieces,
+              _.board match {
+                case Board.Draughts(b) => b.pieces
+                case _                 => sys.error("Wrong board type")
+              },
+              writeBytes compose { m: strategygames.draughts.PieceMap =>
+                BinaryFormat.piece.writeDraughts(
+                  m,
+                  a.variant match {
+                    case strategygames.variant.Variant.Draughts(v) => v
+                    case _                                         => sys.error("Wrong variant type")
+                  }
+                )
+              }
+            )
             d(positionHashes, _.history.positionHashes, w.bytes)
             d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
             // since variants are always OldBin
@@ -96,7 +128,7 @@ object GameDiff {
               dOptTry(
                 kingMoves,
                 _.history.kingMoves,
-                (o: KingMoves) => o.nonEmpty option {BSONHandlers.kingMovesWriter writeTry o}
+                (o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o }
               )
           }
           case Some(PdnStorage.Huffman) => {
@@ -109,10 +141,14 @@ object GameDiff {
           dTry(huffmanPgn, _.pgnMoves, writeBytes compose PgnStorage.Huffman.encode)
         else {
           dTry(oldPgn, _.pgnMoves, writeBytes compose PgnStorage.OldBin.encode)
-          dTry(binaryPieces, _.board match {
-            case Board.Chess(b) => b.pieces
-            case _ => sys.error("Wrong board type")
-          }, writeBytes compose BinaryFormat.piece.writeChess)
+          dTry(
+            binaryPieces,
+            _.board match {
+              case Board.Chess(b) => b.pieces
+              case _              => sys.error("Wrong board type")
+            },
+            writeBytes compose BinaryFormat.piece.writeChess
+          )
           d(positionHashes, _.history.positionHashes, w.bytes)
           dTry(
             unmovedRooks,
@@ -139,14 +175,22 @@ object GameDiff {
             )
         }
       case GameLogic.FairySF() => {
-        dTry(oldPgn, _.board match {
-          case Board.FairySF(b) => b.uciMoves.toVector
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose pfnStorageWriter)
-        dTry(binaryPieces, _.board match {
-          case Board.FairySF(b) => b.pieces
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose BinaryFormat.piece.writeFairySF)
+        dTry(
+          oldPgn,
+          _.board match {
+            case Board.FairySF(b) => b.uciMoves.toVector
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose pfnStorageWriter
+        )
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.FairySF(b) => b.pieces
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeFairySF
+        )
         d(positionHashes, _.history.positionHashes, w.bytes)
         if (a.variant.dropsVariant)
           dOpt(
@@ -156,14 +200,22 @@ object GameDiff {
           )
       }
       case GameLogic.Mancala() => {
-        dTry(oldPgn, _.board match {
-          case Board.Mancala(b) => b.uciMoves.toVector
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose pmnStorageWriter)
-        dTry(binaryPieces, _.board match {
-          case Board.Mancala(b) => b.pieces
-          case _ => sys.error("Wrong board type")
-        }, writeBytes compose BinaryFormat.piece.writeMancala)
+        dTry(
+          oldPgn,
+          _.board match {
+            case Board.Mancala(b) => b.uciMoves.toVector
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose pmnStorageWriter
+        )
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Mancala(b) => b.pieces
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeMancala
+        )
         d(positionHashes, _.history.positionHashes, w.bytes)
       }
     }
@@ -202,7 +254,7 @@ object GameDiff {
     CastleLastMove(
       lastMove = g.history match {
         case History.Chess(h) => h.lastMove
-        case _ => sys.error("Wrong history type")
+        case _                => sys.error("Wrong history type")
       },
       castles = g.history.castles
     )

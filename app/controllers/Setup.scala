@@ -147,7 +147,7 @@ final class Setup(
     Open { implicit ctx =>
       NoBot {
         if (HTTPRequest isXhr ctx.req) NoPlaybanOrCurrent {
-          fuccess(forms.hookFilled(timeModeString = get("time"))) map { html.setup.forms.hook(_) }
+          fuccess(forms.hookFilled(timeModeString = get("time"))).map(html.setup.forms.hook(_))
         }
         else
           fuccess {

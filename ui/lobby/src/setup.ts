@@ -144,7 +144,7 @@ export default class Setup {
       $incrementInput = $form.find('.increment_choice [name=increment]'),
       $byoyomiInput = $form.find('.byoyomi_choice [name=byoyomi]'),
       $periods = $form.find('.periods'),
-      $periodsInput = $periods.find('.periods [name=periods]'),
+      $periodsInput = $periods.find('.byoyomi_periods [name=periods]'),
       $advancedTimeSetup = $form.find('.advanced_setup'),
       $advancedTimeToggle = $form.find('.advanced_toggle'),
       $daysInput = $form.find('.days_choice [name=days]'),
@@ -479,6 +479,27 @@ export default class Setup {
           const days = self.sliderDays(parseInt($range.val() as string));
           $value.text('' + days);
           $input.val('' + days);
+          save();
+        });
+      });
+      $byoyomiInput.each(function (this: HTMLInputElement) {
+        const $input = $(this),
+          $value = $input.siblings('span'),
+          $range = $input.siblings('.range');
+        $value.text($input.val() as string);
+        // 0-20 1 increment
+        // 20-45 5 increment
+        // 45-60 15 increment
+        // 60-180 30 increment
+        $range.attr({
+          min: '0',
+          max: '38',
+          value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderIncrement, 20),
+        });
+        $range.on('input', () => {
+          const byoyomi = self.sliderIncrement(parseInt($range.val() as string));
+          $value.text('' + byoyomi);
+          $input.val('' + byoyomi);
           save();
         });
       });
