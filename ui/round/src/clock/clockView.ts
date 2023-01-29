@@ -6,6 +6,14 @@ import { ClockElements, ClockController, Millis } from './clockCtrl';
 import { h, Hooks } from 'snabbdom';
 import { Position } from '../interfaces';
 
+const fischerEmerg = (millis: Millis, clock: ClockController) => millis < clock.emergMs;
+const byoyomiEmerg = (millis: Millis, clock: ClockController, playerIndex: PlayerIndex) =>
+  !!clock.byoyomiData &&
+  ((millis < clock.emergMs && clock.byoyomiData.byoyomi === 0) ||
+    (clock.isUsingByo(playerIndex) && millis < clock.byoyomiData.byoEmergeS * 1000));
+const isEmerg = (millis: Millis, clock: ClockController, playerIndex: PlayerIndex) =>
+  clock.byoyomiData ? byoyomiEmerg(millis, clock, playerIndex) : fischerEmerg(millis, clock);
+
 export function renderClock(ctrl: RoundController, player: game.Player, position: Position) {
   const clock = ctrl.clock!,
     millis = clock.millisOf(player.playerIndex),
@@ -29,12 +37,13 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       class: {
         outoftime: millis <= 0,
         running: isRunning,
-        emerg: millis < clock.emergMs,
+        emerg: isEmerg(millis, clock, player.playerIndex),
       },
     },
     clock.opts.nvui
       ? [
           h('div.time', {
+            // TODO: byoyomi get the classes / design going
             attrs: { role: 'timer' },
             hook: timeHook,
           }),
@@ -47,6 +56,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
             },
             hook: timeHook,
           }),
+          renderByoyomiTime(clock, player.playerIndex, ctrl.goneBerserk[player.playerIndex]),
           renderBerserk(ctrl, player.playerIndex, position),
           isPlayer ? goBerserk(ctrl) : button.moretime(ctrl),
           tourRank(ctrl, player.playerIndex, position),
@@ -57,6 +67,18 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
 const pad2 = (num: number): string => (num < 10 ? '0' : '') + num;
 const sepHigh = '<sep>:</sep>';
 const sepLow = '<sep class="low">:</sep>';
+
+const renderByoyomiTime = (clock: ClockController, playerIndex: PlayerIndex, berserk = false) => {
+  if (!clock.byoyomiData) return null;
+  const byoyomi = clock.byoyomiData.byoyomi;
+  const periods = clock.byoyomiData.totalPeriods - clock.byoyomiData.curPeriods[playerIndex];
+  const perStr = periods > 1 ? `(${periods}x)` : '';
+  return h(
+    `div.byoyomi.per${periods}`,
+    { berserk: berserk },
+    !berserk && byoyomi && periods ? `|${byoyomi}s${perStr}` : ''
+  );
+};
 
 function formatClockTime(time: Millis, showTenths: boolean, isRunning: boolean, nvui: boolean) {
   const date = new Date(time);
@@ -118,12 +140,12 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
   });
 }
 
-export function updateElements(clock: ClockController, els: ClockElements, millis: Millis) {
+export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, playerIndex: PlayerIndex) {
   if (els.time) els.time.innerHTML = formatClockTime(millis, clock.showTenths(millis), true, clock.opts.nvui);
   if (els.bar) els.bar.style.transform = 'scale(' + clock.timeRatio(millis) + ',1)';
   if (els.clock) {
     const cl = els.clock.classList;
-    if (millis < clock.emergMs) cl.add('emerg');
+    if (isEmerg(millis, clock, playerIndex)) cl.add('emerg');
     else if (cl.contains('emerg')) cl.remove('emerg');
   }
 }
@@ -137,11 +159,13 @@ function renderBerserk(ctrl: RoundController, playerIndex: PlayerIndex, position
 }
 
 function goBerserk(ctrl: RoundController) {
+  const clock = ctrl.clock!;
+  const isByoyomi = !!clock.byoyomiData;
   if (!game.berserkableBy(ctrl.data)) return;
   if (ctrl.goneBerserk[ctrl.data.player.playerIndex]) return;
   return h('button.fbt.go-berserk', {
     attrs: {
-      title: 'GO BERSERK! Half the time, no increment, bonus point',
+      title: `GO BERSERK! Half the time, no increment,${isByoyomi ? 'no byoyomi,' : ''} bonus point`,
       'data-icon': '`',
     },
     hook: bind('click', ctrl.goBerserk),
