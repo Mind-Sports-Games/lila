@@ -186,7 +186,7 @@ export function updateBoardFromTogyzkumalakMove(ctrl: RoundController, orig: cg.
     if (numStones == 0) {
       if (createdTuzdik || existingTuzdik.includes(i)) {
         const piece: cg.Piece = {
-          role: `T-piece` as cg.Role,
+          role: `t-piece` as cg.Role,
           playerIndex: playerIndex, //who owns this?
         };
         pieces.set(k, piece);

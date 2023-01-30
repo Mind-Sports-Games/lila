@@ -2482,7 +2482,7 @@ chartjs-color@^2.1.0:
 
 "chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#220-togyzkumalak":
   version "7.11.1-pstrat2.24"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#fc2785a8e0eb393ee65eb500104b675c11f540ea"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#f47cbcd8e4ccf78c7d1811f4579c09d66bb22ed3"
 
 chokidar@^2.0.0:
   version "2.1.8"
@@ -7352,7 +7352,7 @@ stockfish.wasm@^0.10.0:
 
 "stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#220-togyzkumalak":
   version "0.8.1-pstrat3.18"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#ada482794f6bc73ec0bef84ad12ee8dd164b86da"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#c5eb2671b147d2117158f3183c45f84a3b3e8d61"
   dependencies:
     "@badrap/result" "^0.2.8"
 
