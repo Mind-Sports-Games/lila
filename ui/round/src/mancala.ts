@@ -52,6 +52,7 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
   emptySquares.forEach(x => diff.set(x, undefined));
 
   ctrl.chessground.setPiecesNoAnim(diff);
+  ctrl.chessground.redrawAll();
 }
 
 export function updateBoardFromOwareMove(ctrl: RoundController, orig: cg.Key, dest: cg.Key) {
