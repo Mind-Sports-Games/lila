@@ -2,6 +2,7 @@ package lila.game
 
 import strategygames.{ P2, Board, Centis, Clock, Player => PlayerIndex, GameLogic, History, PocketData, P1 }
 import strategygames.chess.CheckCount
+import strategygames.togyzkumalak.Score
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
 import reactivemongo.api.bson._
@@ -204,6 +205,11 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeTogyzkumalak
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
+        dOpt(
+          score,
+          _.history.score,
+          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+        )
       }
     }
 

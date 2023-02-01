@@ -102,10 +102,12 @@ object mini {
         "(" + pov.game.history
           .checkCount(pov.game.opponent(pov.playerIndex).playerIndex)
           .toString() + ")"
-      case "oware" | "togyzkumalak" =>
+      case "oware" =>
         val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
         val score = if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score
         "(" + score.toString() + ")"
+      case "togyzkumalak" =>
+        "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
       case _ => ""
     }
 

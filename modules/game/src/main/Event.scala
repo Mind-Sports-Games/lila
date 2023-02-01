@@ -163,8 +163,17 @@ object Event {
                   strategygames.draughts.format.Forsyth.exportKingMoves(board)
               case _ => sys.error("mismatched board lib types")
             }
+          else if (situation.board.variant.gameLogic == GameLogic.Togyzkumalak())
+            situation match {
+              case Situation.Togyzkumalak(situation) =>
+                strategygames.togyzkumalak.format.Forsyth
+                  .boardAndScore(situation)
+                  .toString() //we require the score from the fen
+              case _ => sys.error("mismatched board lib types")
+            }
           else
-            Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+            Forsyth
+              .exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -501,6 +510,15 @@ object Event {
 
   case class CheckCount(p1: Int, p2: Int) extends Event {
     def typ = "checkCount"
+    def data =
+      Json.obj(
+        "p1" -> p1,
+        "p2" -> p2
+      )
+  }
+
+  case class Score(p1: Int, p2: Int) extends Event {
+    def typ = "score"
     def data =
       Json.obj(
         "p1" -> p1,

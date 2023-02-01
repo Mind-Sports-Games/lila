@@ -32,7 +32,10 @@ import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessS
 import strategygames.draughts.variant.{ Variant => DraughtsVariant, Standard => DraughtsStandard }
 import strategygames.fairysf.variant.{ Variant => FairySFVariant, Shogi => FairySFStandard }
 import strategygames.samurai.variant.{ Variant => SamuraiVariant, Oware => SamuraiStandard }
-import strategygames.togyzkumalak.variant.{ Variant => TogyzkumalakVariant, Togyzkumalak => TogyzkumalakStandard }
+import strategygames.togyzkumalak.variant.{
+  Variant => TogyzkumalakVariant,
+  Togyzkumalak => TogyzkumalakStandard
+}
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
@@ -46,6 +49,10 @@ object BSONHandlers {
 
   implicit private[game] val checkCountWriter = new BSONWriter[chess.CheckCount] {
     def writeTry(cc: chess.CheckCount) = Success(BSONArray(cc.p1, cc.p2))
+  }
+
+  implicit private[game] val scoreWriter = new BSONWriter[togyzkumalak.Score] {
+    def writeTry(sc: togyzkumalak.Score) = Success(BSONArray(sc.p1, sc.p2))
   }
 
   implicit val StatusBSONHandler = tryHandler[Status](
@@ -547,7 +554,11 @@ object BSONHandlers {
             history = togyzkumalak.History(
               lastMove = decoded.lastMove,
               halfMoveClock = decoded.halfMoveClock,
-              positionHashes = decoded.positionHashes
+              positionHashes = decoded.positionHashes,
+              score = {
+                val counts = r.intsD(F.score)
+                togyzkumalak.Score(~counts.headOption, ~counts.lastOption)
+              }
             ),
             variant = gameVariant
           ),
@@ -700,7 +711,8 @@ object BSONHandlers {
                 case Board.Togyzkumalak(board) => board.pieces
                 case _                         => sys.error("invalid togyzkumalak board")
               }),
-              F.positionHashes -> o.history.positionHashes
+              F.positionHashes -> o.history.positionHashes,
+              F.score          -> o.history.score.nonEmpty.option(o.history.score)
             )
           case _ => //chess or fail
             if (o.variant.standard)
@@ -726,6 +738,7 @@ object BSONHandlers {
                   )
                   .toOption,
                 F.checkCount -> o.history.checkCount.nonEmpty.option(o.history.checkCount),
+                F.score      -> o.history.score.nonEmpty.option(o.history.score),
                 F.pocketData -> o.board.pocketData
               )
             }

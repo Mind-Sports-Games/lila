@@ -55,12 +55,12 @@ object Chart {
     def games =
       povs.map { pov =>
         Json.obj(
-          "id"       -> pov.gameId,
-          "fen"      -> (Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board)),
-          "playerIndex"    -> pov.player.playerIndex.name,
-          "lastMove" -> ~pov.game.lastMoveKeys,
-          "user1"    -> gameUserJson(pov.player),
-          "user2"    -> gameUserJson(pov.opponent)
+          "id"          -> pov.gameId,
+          "fen"         -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
+          "playerIndex" -> pov.player.playerIndex.name,
+          "lastMove"    -> ~pov.game.lastMoveKeys,
+          "user1"       -> gameUserJson(pov.player),
+          "user2"       -> gameUserJson(pov.opponent)
         )
       }
 

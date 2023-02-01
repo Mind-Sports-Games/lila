@@ -31,6 +31,10 @@ final class JsonView(
     (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.history
       .checkCount(playerIndex)
 
+  private def score(game: Game, playerIndex: PlayerIndex) =
+    (game.variant == strategygames.togyzkumalak.variant.Togyzkumalak) option game.history
+      .score(playerIndex)
+
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
@@ -61,6 +65,7 @@ final class JsonView(
       .add("offeringDraw" -> p.isOfferingDraw)
       .add("proposingTakeback" -> p.isProposingTakeback)
       .add("checks" -> checkCount(g, p.playerIndex))
+      .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
@@ -178,6 +183,7 @@ final class JsonView(
       .add("ratingDiff" -> p.ratingDiff)
       .add("provisional" -> p.provisional)
       .add("checks" -> checkCount(g, p.playerIndex))
+      .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
