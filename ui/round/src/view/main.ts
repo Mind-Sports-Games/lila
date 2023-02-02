@@ -103,7 +103,8 @@ export function main(ctrl: RoundController): VNode {
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'oware': {
+      case 'oware':
+      case 'togyzkumalak': {
         //oware stores the score in the board fen so we can do this instead
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
         const p1Score = util.getMancalaScore(fen, 'p1');
@@ -112,16 +113,16 @@ export function main(ctrl: RoundController): VNode {
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'togyzkumalak': {
-        //togy uses game history to store the score (its also in the full fen)
-        const playerScore = d.player.score ? d.player.score : 0;
-        const opponentScore = d.opponent.score ? d.opponent.score : 0;
-        const p1Score = d.player.playerIndex === 'p1' ? playerScore : opponentScore;
-        const p2Score = d.player.playerIndex === 'p2' ? playerScore : opponentScore;
-        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
-        break;
-      }
+      // case 'togyzkumalak': {
+      // //togy uses game history to store the score while playing (its also in the full fen)
+      // const playerScore = d.player.score ? d.player.score : 0;
+      // const opponentScore = d.opponent.score ? d.opponent.score : 0;
+      // const p1Score = d.player.playerIndex === 'p1' ? playerScore : opponentScore;
+      // const p2Score = d.player.playerIndex === 'p2' ? playerScore : opponentScore;
+      // topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+      // bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+      // break;
+      // }
       default: {
         break;
       }
