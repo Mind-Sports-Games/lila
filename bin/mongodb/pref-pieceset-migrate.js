@@ -35,21 +35,28 @@ function oware_rename(oldName) {
   }
 }
 
-//Oware change of names ( and new togy to account for)
+//Oware change of names ( and new togy to account for, and existing othello and oware coudl be unset)
 db.pref.find().forEach(c => {
-  print(c._id + ' oware pieceSet change: ' + c.pieceSet[6].name + ' -> ' + oware_rename(c.pieceSet[6].name));
+  const chessPS = c.pieceSet[0] ? c.pieceSet[0].name : 'staunty';
+  const draughtsPS = c.pieceSet[1] ? c.pieceSet[1].name : 'wide_crown';
+  const loaPS = c.pieceSet[2] ? c.pieceSet[2].name : 'check_yb_loa';
+  const shogiPS = c.pieceSet[3] ? c.pieceSet[3].name : '2kanji';
+  const xiangqiPS = c.pieceSet[4] ? c.pieceSet[4].name : '2dhanzi';
+  const othelloPS = c.pieceSet[5] ? c.pieceSet[5].name : 'fabirovsky_flipello';
+  const owarePS = c.pieceSet[6] ? c.pieceSet[6].name : 'unset';
+  print(c._id + ' oware pieceSet change: ' + owarePS + ' -> ' + oware_rename(owarePS));
   db.pref.update(
     { _id: c._id },
     {
       $set: {
         pieceSet: [
-          { name: c.pieceSet[0].name, gameFamily: 0 },
-          { name: c.pieceSet[1].name, gameFamily: 1 },
-          { name: c.pieceSet[2].name, gameFamily: 2 },
-          { name: c.pieceSet[3].name, gameFamily: 3 },
-          { name: c.pieceSet[4].name, gameFamily: 4 },
-          { name: c.pieceSet[5].name, gameFamily: 5 },
-          { name: oware_rename(c.pieceSet[6].name), gameFamily: 6 },
+          { name: chessPS, gameFamily: 0 },
+          { name: draughtsPS, gameFamily: 1 },
+          { name: loaPS, gameFamily: 2 },
+          { name: shogiPS, gameFamily: 3 },
+          { name: xiangqiPS, gameFamily: 4 },
+          { name: othelloPS, gameFamily: 5 },
+          { name: oware_rename(owarePS), gameFamily: 6 },
           { name: 'black_gloss', gameFamily: 7 },
         ],
       },
