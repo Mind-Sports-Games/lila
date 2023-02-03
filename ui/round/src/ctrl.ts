@@ -602,6 +602,7 @@ export default class RoundController {
     this.onChange();
     this.setLoading(false);
     if (this.keyboardMove) this.keyboardMove.update(d.steps[d.steps.length - 1]);
+    if (this.data.game.variant.key === 'togyzkumalak') this.chessground.redrawAll(); //redraw board scores
   };
 
   endWithData = (o: ApiEnd): void => {

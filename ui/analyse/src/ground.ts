@@ -130,7 +130,9 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     variant: variantKey,
     chess960: variantKey == 'chess960',
     onlyDropsVariant: d.onlyDropsVariant,
-    singleClickMoveVariant: stratUtils.variantUsesMancalaNotation(d.game.variant.key) && d.pref.mancalaMove,
+    singleClickMoveVariant:
+      variantKey === 'togyzkumalak' ||
+      (stratUtils.variantUsesMancalaNotation(d.game.variant.key) && d.pref.mancalaMove),
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
   return config;

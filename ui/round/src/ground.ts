@@ -133,7 +133,7 @@ export function makeConfig(ctrl: RoundController): Config {
     chess960: data.game.variant.key === 'chess960',
     onlyDropsVariant: data.onlyDropsVariant,
     singleClickMoveVariant:
-      (data.game.variant.key === 'oware' || data.game.variant.key === 'togyzkumalak') && data.pref.mancalaMove,
+      data.game.variant.key === 'togyzkumalak' || (data.game.variant.key === 'oware' && data.pref.mancalaMove),
   };
 }
 
