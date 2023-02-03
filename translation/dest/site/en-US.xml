@@ -501,6 +501,14 @@ computer analysis, game chat and shareable URL.</string>
     <item quantity="one">%s game in play</item>
     <item quantity="other">%s games in play</item>
   </plurals>
+  <plurals name="nbLiveGamesInPlay">
+    <item quantity="one">%s live game in play</item>
+    <item quantity="other">%s live games in play</item>
+  </plurals>
+  <plurals name="nbCorrespondenceGamesInPlay">
+    <item quantity="one">%s correspondence game</item>
+    <item quantity="other">%s correspondence games</item>
+  </plurals>
   <string name="automaticallyProceedToNextGameAfterMoving">Automatically proceed to next game after moving</string>
   <string name="autoSwitch">Auto switch</string>
   <string name="puzzles">Puzzles</string>

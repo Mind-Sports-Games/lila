@@ -116,7 +116,7 @@ object home {
               id := "nb_games_in_play",
               href := ctx.noBlind.option(routes.Tv.games.url)
             )(
-              trans.nbGamesInPlay(
+              trans.nbLiveGamesInPlay(
                 strong(dataCount := homepage.counters.rounds)(homepage.counters.rounds.localize)
               )
             )
@@ -223,6 +223,7 @@ object home {
     trans.realTime,
     trans.correspondence,
     trans.nbGamesInPlay,
+    trans.nbLiveGamesInPlay,
     trans.player,
     trans.time,
     trans.joinTheGame,

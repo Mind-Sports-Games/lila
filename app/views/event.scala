@@ -66,13 +66,18 @@ object event {
           div(cls := "desc")(views.html.base.markdown(d))
         },
         if (e.isFinished) p(cls := "desc")("The event is finished.")
-        else if (e.isNow) a(href := e.url, cls := "button button-fat")(trans.eventInProgress())
-        else
-          ul(cls := "countdown", dataSeconds := (~e.secondsToStart + 1))(
-            List("Days", "Hours", "Minutes", "Seconds") map { t =>
-              li(span(cls := t.toLowerCase), t)
-            }
+        else if (e.isNow)
+          a(href := e.url, cls := "button button-fat")(
+            e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
           )
+        else
+          e.beforeMessage.fold(
+            ul(cls := "countdown", dataSeconds := (~e.secondsToStart + 1))(
+              List("Days", "Hours", "Minutes", "Seconds") map { t =>
+                li(span(cls := t.toLowerCase), t)
+              }
+            )
+          )(m => span(m))
       )
     }
 
@@ -150,6 +155,20 @@ object event {
         raw("Short headline"),
         help = raw("Keep it VERY short, so it fits on homepage").some
       )(form3.input(_)),
+      form3.split(
+        form3.group(
+          form("beforeMessage"),
+          raw("Message before event"),
+          half = true,
+          help = raw("Keep it VERY short, so it fits on homepage").some
+        )(form3.input(_)),
+        form3.group(
+          form("duringMessage"),
+          raw("Message during event"),
+          half = true,
+          help = raw("Keep it VERY short, so it fits on homepage").some
+        )(form3.input(_))
+      ),
       form3
         .group(form("description"), raw("Possibly long description"), help = raw("Markdown enabled").some)(
           form3.textarea(_)(rows := 15)
