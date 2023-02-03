@@ -11,7 +11,7 @@ import lila.hub.LeaderTeam
 import lila.tournament.{ Condition, Tournament, TournamentForm }
 import lila.i18n.VariantKeys
 
-import strategygames.GameFamily
+import strategygames.{ GameFamily, GameGroup }
 
 object form {
 
@@ -333,7 +333,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
     frag(
       form3.checkbox(
         form("medleyDefaults.onePerGameFamily"),
-        "Where possible, use one game per game family",
+        "Where possible, use one game per game group",
         klass = "medleyDefaults",
         displayed = false,
         disabled = disabledAfterStart
@@ -423,7 +423,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
     frag(
       form3.checkbox(
         form("medleyGameFamilies.mancala"),
-        VariantKeys.gameFamilyName(GameFamily.Mancala()),
+        VariantKeys.gameGroupName(GameGroup.Mancala()),
         klass = "medleyGameFamily",
         displayed = false,
         disabled = disabledAfterStart

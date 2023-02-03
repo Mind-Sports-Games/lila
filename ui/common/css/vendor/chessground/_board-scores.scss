@@ -1,0 +1,89 @@
+board-scores {
+  position: absolute;
+  display: flex;
+  pointer-events: none;
+
+  @include fluid-size('font-size', 8px, 12px);
+
+  user-select: none;
+  color: #fff;
+  text-shadow: 0 1px 2px #000;
+  font-weight: bold;
+
+  &.p1,
+  &.p2 {
+    bottom: 0px;
+    left: 0;
+    text-align: center;
+    flex-flow: row;
+    width: 100%;
+    height: 2em;
+  }
+
+  score {
+    display: inline-block;
+    height: 2em;
+    width: 2em;
+    border-radius: 50%;
+    background: black;
+    padding: 0.3em 0;
+
+    &.abundance {
+      color: yellow;
+    }
+
+    &.tuzdik {
+      background: white;
+    }
+
+    &.empty {
+      background: unset;
+    }
+  }
+
+  .variant-togyzkumalak .orientation-p1 & {
+    &.p1 {
+      left: 0;
+      bottom: 42%;
+    }
+    &.p2 {
+      left: 0;
+      top: 42%;
+    }
+  }
+
+  .variant-togyzkumalak .orientation-p2 & {
+    &.p1 {
+      left: 0;
+      top: 42%;
+    }
+    &.p2 {
+      left: 0;
+      bottom: 42%;
+    }
+  }
+
+  .variant-togyzkumalak & position-score {
+    flex: 1 1 calc(100% / 9);
+  }
+
+  position-score {
+    flex: 1 1 auto;
+  }
+}
+
+//for single colmun/mobiles
+@include breakpoint($mq-col1-uniboard) {
+  board-scores {
+    &.p1,
+    &.p2 {
+      height: 1.6em;
+    }
+
+    score {
+      height: 1.6em;
+      width: 1.6em;
+      padding: 0;
+    }
+  }
+}

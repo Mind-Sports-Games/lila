@@ -351,6 +351,41 @@ function destPosOnlyNotation(move: ExtendedMoveInfo, variant: Variant): string {
 }
 
 function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  switch (variant.key) {
+    case 'togyzkumalak':
+      return togyzkumalakNotation(move, variant);
+    default:
+      return owareNotation(move, variant);
+  }
+}
+
+function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  const reg = move.uci.match(/[a-z][1-2]/g) as string[];
+  const orig = reg[0];
+  const dest = reg[1];
+  const origNumber = orig[1] === '1' ? orig.charCodeAt(0) - 96 : 97 - orig.charCodeAt(0) + variant.boardSize.width;
+  const destNumber = dest[1] === '1' ? dest.charCodeAt(0) - 96 : 97 - dest.charCodeAt(0) + variant.boardSize.width;
+  const isCapture =
+    orig[1] === '1'
+      ? getMancalaScore(move.fen, 'p1') > getMancalaScore(move.prevFen!, 'p1')
+      : getMancalaScore(move.fen, 'p2') > getMancalaScore(move.prevFen!, 'p2');
+
+  const score = orig[1] === '1' ? getMancalaScore(move.fen, 'p1') : getMancalaScore(move.fen, 'p2');
+  const scoreText = isCapture ? `(${score})` : '';
+
+  const createdTuzdik =
+    orig[1] === '1'
+      ? hasTuzdik(move.fen, 'p1') && !hasTuzdik(move.prevFen!, 'p1')
+      : hasTuzdik(move.fen, 'p2') && !hasTuzdik(move.prevFen!, 'p2');
+
+  return `${origNumber}${destNumber}${createdTuzdik ? 'X' : ''}${scoreText}`;
+}
+
+function hasTuzdik(fen: string, playerIndex: string): boolean {
+  return ['T', 't'].some(t => fen.split(' ')[0].split('/')[playerIndex === 'p1' ? 0 : 1].includes(t));
+}
+
+function owareNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const reg = move.uci.match(/[a-z][1-2]/g) as string[];
   const orig = reg[0];
   const origLetter =
@@ -359,10 +394,10 @@ function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {
       : nextAsciiLetter(orig[0], (96 - orig.charCodeAt(0)) * 2 + variant.boardSize.width + 1);
   //captured number of stones
   const scoreDiff =
-    getOwareScore(move.fen, 'p1') +
-    getOwareScore(move.fen, 'p2') -
-    getOwareScore(move.prevFen!, 'p1') -
-    getOwareScore(move.prevFen!, 'p2');
+    getMancalaScore(move.fen, 'p1') +
+    getMancalaScore(move.fen, 'p2') -
+    getMancalaScore(move.prevFen!, 'p1') -
+    getMancalaScore(move.prevFen!, 'p2');
   const scoreText = scoreDiff <= 0 ? '' : ` + ${scoreDiff}`;
   return `${origLetter}${scoreText}`;
 }
@@ -371,6 +406,6 @@ function nextAsciiLetter(letter: string, n: number): string {
   return String.fromCharCode(letter.charCodeAt(0) + n);
 }
 
-export function getOwareScore(fen: string, playerIndex: string): number {
+export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }

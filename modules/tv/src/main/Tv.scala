@@ -5,8 +5,9 @@ import lila.game.{ Game, GameRepo, Pov }
 import lila.hub.Trouper
 import lila.i18n.VariantKeys
 import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.{ GameFamily, GameGroup, GameLogic }
 import cats.implicits._
+
 
 final class Tv(
     gameRepo: GameRepo,
@@ -91,7 +92,8 @@ object Tv {
   import strategygames.chess.{ variant => CV }
   import strategygames.draughts.{ variant => DV }
   import strategygames.fairysf.{ variant => FV }
-  import strategygames.mancala.{ variant => MV }
+  import strategygames.samurai.{ variant => MSV }
+  import strategygames.togyzkumalak.{ variant => MTV }
   import strategygames.{ Speed => S, GameFamily }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
@@ -210,11 +212,11 @@ object Tv {
         )
     case object MancalaFamily
         extends Channel(
-          name = s"All ${VariantKeys.gameFamilyName(GameFamily.Mancala())}",
-          icon = MV.Oware.perfIcon.toString,
+          name = s"All ${GameGroup(7).name}",
+          icon = MSV.Oware.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(
-            anyVariant(Variant.all(GameLogic.Mancala()).filter(v => v.gameFamily == GameFamily.Mancala())),
+            anyVariant(GameGroup(7).variants),
             noBot
           ),
           familyChannel = true,
@@ -524,10 +526,19 @@ object Tv {
         )
     case object Oware
         extends Channel(
-          name = VariantKeys.variantName(Variant.wrap(MV.Oware)),
-          icon = MV.Oware.perfIcon.toString,
+          name = VariantKeys.variantName(Variant.wrap(MSV.Oware)),
+          icon = MSV.Oware.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(variant(Variant.wrap(MV.Oware)), noBot),
+          filters = Seq(variant(Variant.wrap(MSV.Oware)), noBot),
+          familyChannel = false,
+          gameFamily = "mancala"
+        )
+    case object Togyzkumalak
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(MTV.Togyzkumalak)),
+          icon = MTV.Togyzkumalak.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(MTV.Togyzkumalak)), noBot),
           familyChannel = false,
           gameFamily = "mancala"
         )
@@ -593,6 +604,7 @@ object Tv {
       Flipello10,
       MancalaFamily,
       Oware,
+      Togyzkumalak,
       Bot,
       Computer
     )

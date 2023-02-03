@@ -66,6 +66,8 @@ export const init = (node: HTMLElement) => {
             ? { width: 10, height: 10 }
             : $el.hasClass('variant-oware')
             ? { width: 6, height: 2 }
+            : $el.hasClass('variant-togyzkumalak')
+            ? { width: 9, height: 2 }
             : { width: 8, height: 8 },
           variant: $el.hasClass('variant-shogi')
             ? 'shogi'
@@ -79,6 +81,8 @@ export const init = (node: HTMLElement) => {
             ? 'flipello10'
             : $el.hasClass('variant-oware')
             ? 'oware'
+            : $el.hasClass('variant-togyzkumalak')
+            ? 'togyzkumalak'
             : 'standard',
         },
         $cg = $el.find('.cg-wrap'),

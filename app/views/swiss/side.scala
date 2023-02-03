@@ -75,7 +75,7 @@ object side {
           )
         ),
         s.isMedley option views.html.swiss.bits.medleyGames(
-          s.medleyGameFamiliesString.getOrElse(""),
+          s.medleyGameGroupsString.getOrElse(""),
           s.settings.medleyVariants.getOrElse(List[Variant]()),
           s.isCreated,
           s.isFinished,

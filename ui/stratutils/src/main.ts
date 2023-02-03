@@ -71,7 +71,7 @@ export function variantUsesDestPosOnlyNotation(key: VariantKey | DraughtsVariant
 }
 
 export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['oware'].includes(key);
+  return ['oware', 'togyzkumalak'].includes(key);
 }
 
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
@@ -104,7 +104,14 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
   }
 }
 
-const noFishnetVariants: VariantKey[] = ['linesOfAction', 'scrambledEggs', 'flipello', 'flipello10', 'oware'];
+const noFishnetVariants: VariantKey[] = [
+  'linesOfAction',
+  'scrambledEggs',
+  'flipello',
+  'flipello10',
+  'oware',
+  'togyzkumalak',
+];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
 }

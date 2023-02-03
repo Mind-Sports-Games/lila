@@ -65,4 +65,5 @@ export const perfIcons = {
   Flipello: '',
   Flipello10: '',
   Oware: '',
+  Togyzkumalak: '',
 };

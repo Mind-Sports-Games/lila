@@ -2,7 +2,9 @@
 <resources>
   <string name="swissTournaments">Swiss tournaments</string>
   <string name="medleyGameFamilies">Game families that could appear in this Medley</string>
+  <string name="medleyGameGroups">Game groups that could appear in this Medley</string>
   <string name="onePerGameFamily">Ensure one game per game family is selected, where possible</string>
+  <string name="onePerGameGroup">Ensure one game per game group is selected, where possible</string>
   <string name="exoticChessVariants">Use only exotic chess variants</string>
   <string name="draughts64Variants">Only use draughts 64 variants</string>
   <string name="usingDrawTables">Using Draw Tables</string>
