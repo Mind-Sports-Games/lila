@@ -42,14 +42,33 @@ $togyzkumalak-margin-top-opposite: 3.7%;
   margin-bottom: calc(128 * 100% / 640);
 }
 
-//only add for fixed mini-games, not the popup which create an <a>
+//only add for fixed mini-games (active game below board), not the popup which create an <a>
+//simul has different setup so adjust for it
 span.mini-game.variant-oware.is2d {
   margin-top: calc(-213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
+  .simul & {
+    margin-top: unset;
+    margin-bottom: unset;
+    .cg-wrap {
+      padding-bottom: calc(213.333 * 100% / 640);
+      padding-top: calc(213.333 * 100% / 640);
+      margin-bottom: calc(213.333 * 100% / 640);
+    }
+  }
 }
 span.mini-game.variant-togyzkumalak.is2d {
-  margin-top: calc(-256 * 100% / 640);
-  margin-bottom: calc(256 * 100% / 640);
+  margin-top: calc(-138.666 * 100% / 640);
+  margin-bottom: calc(138.666 * 100% / 640);
+  .simul & {
+    margin-top: unset;
+    margin-bottom: unset;
+    .cg-wrap {
+      padding-bottom: calc(256 * 100% / 640);
+      padding-top: calc(256 * 100% / 640);
+      margin-bottom: calc(128 * 100% / 640);
+    }
+  }
 }
 
 //main board - alter non-square boards
