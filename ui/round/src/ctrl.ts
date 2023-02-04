@@ -110,6 +110,7 @@ export default class RoundController {
     if (d.clock)
       this.clock = new ClockController(d, {
         onFlag: this.socket.outoftime,
+        redraw: this.redraw,
         soundPlayerIndex: d.simul || d.player.spectator || !d.pref.clockSound ? undefined : d.player.playerIndex,
         nvui: !!this.nvui,
       });

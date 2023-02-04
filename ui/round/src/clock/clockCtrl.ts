@@ -1,5 +1,5 @@
 import { updateElements } from './clockView';
-import { RoundData } from '../interfaces';
+import { Redraw, RoundData } from '../interfaces';
 import * as game from 'game';
 
 export type Seconds = number;
@@ -8,6 +8,7 @@ export type Millis = number;
 
 interface ClockOpts {
   onFlag(): void;
+  redraw: Redraw;
   soundPlayerIndex?: PlayerIndex;
   nvui: boolean;
 }
@@ -246,7 +247,7 @@ export class ClockController {
       this.byoyomiData.curPeriods[playerIndex] < this.byoyomiData.totalPeriods
     ) {
       this.nextPeriod(playerIndex);
-      // this.opts.redraw();
+      this.opts.redraw();
     } else if (millis === 0) this.opts.onFlag();
     else updateElements(this, this.elements[playerIndex], millis, playerIndex);
 
