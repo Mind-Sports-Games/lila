@@ -149,8 +149,8 @@ export interface ApiEnd {
   };
   boosted: boolean;
   clock?: {
-    wc: Centis;
-    bc: Centis;
+    p1: Centis;
+    p2: Centis;
   };
 }
 
