@@ -7,8 +7,10 @@ import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
   P2,
   Centis,
+  ByoyomiClock,
   Clock,
   ClockConfig,
+  FischerClock,
   Player => PlayerIndex,
   Game => StratGame,
   GameLogic,
@@ -35,7 +37,7 @@ case class Game(
     p1Player: Player,
     p2Player: Player,
     chess: StratGame,
-    loadClockHistory: Clock => Option[ClockHistory] = _ => Game.someEmptyClockHistory,
+    loadClockHistory: Clock => Option[ClockHistory] = Game.someEmptyClockHistory,
     status: Status,
     daysPerTurn: Option[Int],
     binaryMoveTimes: Option[ByteArray] = None,
@@ -47,7 +49,7 @@ case class Game(
     pdnStorage: Option[PdnStorage] = None
 ) {
 
-  lazy val clockHistory = chess.clock flatMap loadClockHistory
+  lazy val clockHistory = chess.clock.flatMap(loadClockHistory)
 
   def situation = chess.situation
   def board     = chess.situation.board
@@ -766,7 +768,12 @@ object Game {
 
   private[game] val emptyCheckCount = CheckCount(0, 0)
 
-  private[game] val someEmptyClockHistory = Some(FischerClockHistory())
+  private[game] val someEmptyFischerClockHistory = Some(FischerClockHistory())
+  private[game] val someEmptyByoyomiClockHistory = Some(ByoyomiClockHistory())
+  private[game] def someEmptyClockHistory(c: Clock) = c match {
+    case _: FischerClock => someEmptyFischerClockHistory
+    case _: ByoyomiClock => someEmptyByoyomiClockHistory
+  }
 
   def make(
       chess: StratGame,
