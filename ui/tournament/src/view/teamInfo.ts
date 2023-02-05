@@ -70,7 +70,7 @@ export default function (ctrl: TournamentController): VNode | undefined {
               },
               [
                 h('th', '' + (i + 1)),
-                h('td', renderPlayer(p, false, !ctrl.data.medley, false, i < nbLeaders)),
+                h('td', renderPlayer(p, false, !ctrl.data.medley, true, false, i < nbLeaders)),
                 h('td.total', [
                   p.fire && !ctrl.data.isFinished
                     ? h('strong.is-gold', { attrs: dataIcon('Q') }, '' + p.score)

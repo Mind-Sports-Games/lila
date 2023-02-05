@@ -29,7 +29,7 @@ export function dataIcon(icon: string): Attrs {
 
 export const userName = (u: LightUser) => (u.title ? [h('span.utitle', u.title), ' ' + u.name] : [u.name]);
 
-export function player(p: BasePlayer, asLink: boolean, withRating: boolean) {
+export function player(p: BasePlayer, asLink: boolean, withRating: boolean, withFlag: boolean) {
   return h(
     'a.ulpt.user-link' + (((p.user.title || '') + p.user.name).length > 15 ? '.long' : ''),
     {
@@ -38,13 +38,13 @@ export function player(p: BasePlayer, asLink: boolean, withRating: boolean) {
         destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
       },
     },
-    [h('div.player-info', playerInfo(p, withRating))]
+    [h('div.player-info', playerInfo(p, withRating, withFlag))]
   );
 }
 
-export function playerInfo(p: BasePlayer, withRating: boolean) {
+export function playerInfo(p: BasePlayer, withRating: boolean, withFlag: boolean) {
   return [
-    p.user.country
+    withFlag && p.user.country
       ? h(
           'span.country',
           h('img.flag', {
