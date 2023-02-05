@@ -210,6 +210,7 @@ final class JsonView(
               "nb"     -> sheetNbs(sheet)
             )
             .add("title" -> user.title)
+            .add("country" -> user.profile.map(_.country))
             .add("performance" -> player.performanceOption)
             .add("rank" -> ranking.get(user.id).map(1 +))
             .add("provisional" -> player.provisional)

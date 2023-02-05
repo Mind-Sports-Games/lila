@@ -28,7 +28,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
             })
           : [player.rank]
       ),
-      h('td.player', renderPlayer(player, false, !ctrl.data.isMedley)),
+      h('td.player', renderPlayer(player, false, !ctrl.data.isMedley, true)),
       h(
         'td.pairings',
         h(

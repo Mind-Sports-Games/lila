@@ -34,7 +34,7 @@ export function playerName(p) {
   return p.title ? [h('span.utitle', p.title), ' ' + p.name] : p.name;
 }
 
-export function player(p, asLink: boolean, withRating: boolean, defender = false, leader = false) {
+export function player(p, asLink: boolean, withRating: boolean, withFlag: boolean, defender = false, leader = false) {
   return h(
     'a.ulpt.user-link' + (((p.title || '') + p.name).length > 15 ? '.long' : ''),
     {
@@ -43,13 +43,13 @@ export function player(p, asLink: boolean, withRating: boolean, defender = false
         destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
       },
     },
-    [h('div.player-info', playerInfo(p, withRating, defender, leader))]
+    [h('div.player-info', playerInfo(p, withRating, withFlag, defender, leader))]
   );
 }
 
-export function playerInfo(p, withRating: boolean, defender = false, leader = false) {
+export function playerInfo(p, withRating: boolean, withFlag: boolean, defender = false, leader = false) {
   return [
-    p.country
+    (withFlag && p.country)
       ? h(
           'span.country',
           h('img.flag', {
