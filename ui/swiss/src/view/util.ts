@@ -44,7 +44,7 @@ export function player(p: BasePlayer, asLink: boolean, withRating: boolean, with
 
 export function playerInfo(p: BasePlayer, withRating: boolean, withFlag: boolean) {
   return [
-    (withFlag && p.user.country)
+    withFlag && p.user.country
       ? h(
           'span.country',
           h('img.flag', {

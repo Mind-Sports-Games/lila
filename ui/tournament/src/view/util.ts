@@ -49,7 +49,7 @@ export function player(p, asLink: boolean, withRating: boolean, withFlag: boolea
 
 export function playerInfo(p, withRating: boolean, withFlag: boolean, defender = false, leader = false) {
   return [
-    (withFlag && p.country)
+    withFlag && p.country
       ? h(
           'span.country',
           h('img.flag', {
