@@ -23,7 +23,7 @@ export const perf = {
     brazilian: '',
     pool: '',
     portuguese: '',
-    english: '',
+    english: '‹',
     fromPositionDraughts: 'K',
     frisian: '',
     frysk: '',
@@ -34,6 +34,6 @@ export const perf = {
     flipello: '',
     flipello10: '',
     oware: '',
-    togyzkumalak: '',
+    togyzkumalak: '›',
   },
 };
