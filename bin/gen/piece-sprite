@@ -127,9 +127,9 @@ togyzkumalak_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-p
 's131-piece','s132-piece','s133-piece','s134-piece','s135-piece','s136-piece','s137-piece','s138-piece','s139-piece','s140-piece',
 's141-piece','s142-piece','s143-piece','s144-piece','s145-piece','s146-piece','s147-piece','s148-piece','s149-piece','s150-piece',
 's151-piece','s152-piece','s153-piece','s154-piece','s155-piece','s156-piece','s157-piece','s158-piece','s159-piece','s160-piece',
-'s161-piece','s162-piece', 't-piece', 's10f-piece'
+'s161-piece','s162-piece', 't-piece', 's10o-piece'
 ]
-togyzkumalak_extra_pieces = ['t-piece', 's10f-piece']
+togyzkumalak_extra_pieces = ['t-piece', 's10o-piece']
 togyzkumalak_variants = ['togyzkumalak']
 
 
