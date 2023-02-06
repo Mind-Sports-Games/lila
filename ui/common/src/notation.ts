@@ -365,10 +365,12 @@ function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string 
   const dest = reg[1];
   const origNumber = orig[1] === '1' ? orig.charCodeAt(0) - 96 : 97 - orig.charCodeAt(0) + variant.boardSize.width;
   const destNumber = dest[1] === '1' ? dest.charCodeAt(0) - 96 : 97 - dest.charCodeAt(0) + variant.boardSize.width;
-  const isCapture =
+  const gainedStones =
     orig[1] === '1'
       ? getMancalaScore(move.fen, 'p1') > getMancalaScore(move.prevFen!, 'p1')
       : getMancalaScore(move.fen, 'p2') > getMancalaScore(move.prevFen!, 'p2');
+  const destEmpty = isDestEmptyInTogyFen(dest, destNumber, move.fen, variant.boardSize.width);
+  const isCapture = gainedStones && orig[1] !== dest[1] && destEmpty;
 
   const score = orig[1] === '1' ? getMancalaScore(move.fen, 'p1') : getMancalaScore(move.fen, 'p2');
   const scoreText = isCapture ? `(${score})` : '';
@@ -383,6 +385,24 @@ function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string 
 
 function hasTuzdik(fen: string, playerIndex: string): boolean {
   return ['T', 't'].some(t => fen.split(' ')[0].split('/')[playerIndex === 'p1' ? 0 : 1].includes(t));
+}
+
+function isDestEmptyInTogyFen(dest: string, destNumber: number, fen: string, width: number): boolean {
+  const fenOpponentPart = fen.split(' ')[0].split('/')[dest[1] === '1' ? 1 : 0];
+  const destIndex = dest[1] === '1' ? destNumber - 1 : width - destNumber;
+  let currentIndex = 0;
+  for (const f of fenOpponentPart.split(',')) {
+    if (isNaN(+f)) {
+      if (currentIndex >= destIndex) return false;
+      currentIndex++;
+    } else {
+      for (let j = 0; j < Number(+f); j++) {
+        if (currentIndex === destIndex) return true;
+        currentIndex++;
+      }
+    }
+  }
+  return false;
 }
 
 function owareNotation(move: ExtendedMoveInfo, variant: Variant): string {
