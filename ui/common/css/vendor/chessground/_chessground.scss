@@ -19,6 +19,7 @@ cg-board {
 $togyzkumalak-highlight-height: calc(104% / 3);
 $togyzkumalak-margin-top-same: 4.7%;
 $togyzkumalak-margin-top-opposite: 3.7%;
+$togyzkumalak-margin-mini-game: 3.7%;
 
 //no background shadow for board as its has rounded corners.
 .variant-oware cg-board,
@@ -498,6 +499,26 @@ square {
       }
       &.p1 {
         margin-top: $togyzkumalak-margin-top-opposite;
+      }
+    }
+  }
+
+  $togyzkumalak-highlights: (
+    ('togyzkumalak-blue', 'from', url(../images/board/togyzkumalak/highlights/marker-start.svg)),
+    ('togyzkumalak-blue', 'to', url(../images/board/togyzkumalak/highlights/marker-end.svg)),
+    ('togyzkumalak-wood', 'from', url(../images/board/togyzkumalak/highlights/marker-start-wood.svg)),
+    ('togyzkumalak-wood', 'to', url(../images/board/togyzkumalak/highlights/marker-end-wood.svg))
+  );
+
+  //also ammend mini-game as the margins need to be different/look nice.....
+  @each $color, $from-or-to, $url-svg in $togyzkumalak-highlights {
+    body.#{$color} .mini-game.togyzkumalak &.last-move.#{$from-or-to} {
+      background: #{$url-svg};
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2,
+      &.p1 {
+        margin-top: $togyzkumalak-margin-mini-game;
       }
     }
   }
