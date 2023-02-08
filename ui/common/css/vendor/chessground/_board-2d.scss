@@ -60,6 +60,12 @@ $flipello10-board-files: (
   'wood': 'flipello10_wood_board.svg',
 );
 
+$amazons-board-files: (
+  'blue': 'svg/blue.svg',
+  'brown': 'svg/brown.svg',
+  'grey': 'grey.jpg',
+);
+
 $oware-board-files: (
   'light-wood': 'oware_light_wood_board.png',
   'dark-wood': 'oware_dark_wood_board.png',
@@ -142,6 +148,12 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
   }
 }
 
+@each $color, $file in $amazons-board-files {
+  .amazons-#{$color} .variant-amazons.is2d cg-board {
+    background-image: url(../images/board/amazons/#{$file});
+  }
+}
+
 @each $color, $file in $oware-board-files {
   .oware-#{$color} .variant-oware.is2d cg-board {
     background-image: url(../images/board/oware/#{$file});
@@ -209,6 +221,12 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 @each $color, $file in $flipello10-board-files {
   .flipello-#{$color} .is2d .variant-flipello10 cg-board {
     background-image: url(../images/board/flipello/#{$file});
+  }
+}
+
+@each $color, $file in $amazons-board-files {
+  .amazons-#{$color} .is2d .variant-amazons cg-board {
+    background-image: url(../images/board/amazons/#{$file});
   }
 }
 

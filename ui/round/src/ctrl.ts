@@ -230,9 +230,17 @@ export default class RoundController {
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
     if (
-      ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware', 'togyzkumalak'].includes(
-        this.data.game.variant.key
-      )
+      [
+        'xiangqi',
+        'shogi',
+        'minixiangqi',
+        'minishogi',
+        'flipello',
+        'flipello10',
+        'oware',
+        'togyzkumalak',
+        'amazons',
+      ].includes(this.data.game.variant.key)
     )
       return false;
     if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'p-piece') return false;

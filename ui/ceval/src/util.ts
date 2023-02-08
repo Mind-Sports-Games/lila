@@ -18,6 +18,7 @@ const noCevalVariants = [
   'minixiangqi',
   'flipello',
   'flipello10',
+  'amazons',
   'oware',
   'togyzkumalak',
 ];

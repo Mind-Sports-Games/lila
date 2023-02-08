@@ -55,7 +55,7 @@ export const altCastles = {
 };
 
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs'].includes(key);
+  return ['linesOfAction', 'scrambledEggs', 'amazons'].includes(key);
 }
 
 export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
@@ -109,6 +109,7 @@ const noFishnetVariants: VariantKey[] = [
   'scrambledEggs',
   'flipello',
   'flipello10',
+  'amazons',
   'oware',
   'togyzkumalak',
 ];

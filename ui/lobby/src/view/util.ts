@@ -64,6 +64,7 @@ export const perfIcons = {
   'Mini Xiangqi': '',
   Flipello: '',
   Flipello10: '',
+  amazons: '',
   Oware: '',
   Togyzkumalak: '›',
 };

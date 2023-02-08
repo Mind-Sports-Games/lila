@@ -251,6 +251,7 @@ const noCevalVariants = [
   'minixiangqi',
   'flipello',
   'flipello10',
+  'amazons',
   'oware',
   'togyzkumalak',
 ];
@@ -335,6 +336,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'flipello';
     case 'flipello10':
       return 'flipello10';
+    case 'amazons':
+      return 'amazons';
     case 'oware':
       return 'oware';
     case 'togyzkumalak':

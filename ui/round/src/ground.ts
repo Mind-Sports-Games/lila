@@ -110,6 +110,10 @@ export function makeConfig(ctrl: RoundController): Config {
             ? 'https://playstrategy.org/assets/piece/flipello/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
               '/'
+            : variantKey === 'amazons'
+            ? 'https://playstrategy.org/assets/piece/amazons/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
+              '/'
             : variantKey === 'oware'
             ? 'https://playstrategy.org/assets/piece/oware/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +

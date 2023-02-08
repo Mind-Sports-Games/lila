@@ -479,6 +479,14 @@ object TournamentShield {
           27
         )
 
+    case object Amazons
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.Amazons),
+          Blitz32,
+          25,
+          -1
+        )
+
     case object Oware
         extends Category(
           Variant.Samurai(strategygames.samurai.variant.Oware),
@@ -524,6 +532,7 @@ object TournamentShield {
       MiniXiangqi,
       Flipello,
       Flipello10,
+      Amazons,
       Oware,
       Togyzkumalak
     )

@@ -64,6 +64,8 @@ export const init = (node: HTMLElement) => {
             ? { width: 7, height: 7 }
             : $el.hasClass('variant-flipello10')
             ? { width: 10, height: 10 }
+            : $el.hasClass('variant-amazons')
+            ? { width: 10, height: 10 }
             : $el.hasClass('variant-oware')
             ? { width: 6, height: 2 }
             : $el.hasClass('variant-togyzkumalak')
@@ -79,6 +81,8 @@ export const init = (node: HTMLElement) => {
             ? 'minixiangqi'
             : $el.hasClass('variant-flipello10')
             ? 'flipello10'
+            : $el.hasClass('variant-amazons')
+            ? 'amazons'
             : $el.hasClass('variant-oware')
             ? 'oware'
             : $el.hasClass('variant-togyzkumalak')

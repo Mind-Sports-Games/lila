@@ -57,6 +57,9 @@ flipello_themes = [
   ['marble_bw_flipello', 'png'],
   ['fabirovsky_flipello', 'svg']
 ]
+amazons_themes = [
+  ['queen', 'svg']
+]
 oware_themes = [
   ['red', 'svg'],
   ['green', 'svg'],
@@ -82,6 +85,7 @@ draughts_invert_colors = ['english']
 lines_of_action_variants= ['linesOfAction', 'scrambledEggs']
 lines_of_action_roles = ['l-piece']
 flipello_roles = ['p-piece']
+amazons_roles = ['q-piece', 'p-piece']
 shogi_roles_to_imageprefix = [
     ['p-piece','FU'],
     ['l-piece','KY'],
@@ -105,6 +109,7 @@ xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece'
 xiangqi_colors = ['B','R']
 xiangqi_variants = ['xiangqi', 'minixiangqi']
 flipello_variants = ['flipello', 'flipello10']
+amazons_variants = ['amazons']
 oware_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-piece','s7-piece','s8-piece','s9-piece','s10-piece',
 's11-piece','s12-piece','s13-piece','s14-piece','s15-piece','s16-piece','s17-piece','s18-piece','s19-piece','s20-piece',
 's21-piece','s22-piece','s23-piece','s24-piece','s25-piece','s26-piece','s27-piece','s28-piece','s29-piece','s30-piece',
@@ -479,6 +484,61 @@ flipello_themes.map { |theme|
     }
   }.flatten
   File.open(dest_dir + 'flipello-' + name + '.external.css', 'w') { |f| f.puts (classes_flipello_game + classes_flipello_variant).join("\n") }
+}
+
+# inline SVG amazons
+amazons_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_amazons_game = colors.map { |color|
+    amazons_roles.map { |role|
+      piece = (role[0] == 'q' ? color[0] : '') + role.upcase[0]
+      file = source_dir + 'amazons/' + name + '/' + piece + '.' + ext
+      File.open(file, 'r') do|image_file|
+        image = image_file.read
+        base64 = Base64.strict_encode64(image)
+        '.amazons.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+      end
+    }
+  }.flatten
+  classes_amazons_variant = amazons_variants.map{ |variant|
+    colors.map { |color|
+      amazons_roles.map { |role|
+        piece = (role[0] == 'q' ? color[0] : '') + role.upcase[0]
+        file = source_dir + 'amazons/' + name + '/' + piece + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'amazons-' + name + '.css', 'w') { |f| f.puts (classes_amazons_game + classes_amazons_variant).join("\n") }
+}
+# external SVG amazons
+amazons_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_amazons_game = colors.map { |color|
+    amazons_roles.map { |role|
+      piece = (role[0] == 'q' ? color[0] : '') + role.upcase[0]
+      '.amazons.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+        "background-image:url('/assets/piece/" + 'amazons/' + name + "/" + piece + "." + ext + "')}"
+    }
+  }.flatten
+  classes_amazons_variant = amazons_variants.map { |variant|
+    colors.map { |color|
+      amazons_roles.map { |role|
+        piece = (role[0] == 'q' ? color[0] : '') + role.upcase[0]
+        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+          "background-image:url('/assets/piece/" + 'amazons/' + name + "/" + piece + "." + ext + "')}"
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'amazons-' + name + '.external.css', 'w') { |f| f.puts (classes_amazons_game + classes_amazons_variant).join("\n") }
 }
 
 # inline SVG oware
