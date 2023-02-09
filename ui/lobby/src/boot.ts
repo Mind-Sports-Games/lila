@@ -10,6 +10,15 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   opts.pools = [
     // mirrors modules/pool/src/main/PoolList.scala (ids)
     {
+      id: '1+0-standard',
+      lim: 1,
+      inc: 0,
+      perf: 'Blitz',
+      variant: 'standard',
+      variantDisplayName: 'Chess',
+      variantId: '0_1',
+    },
+    {
       id: '3+2-standard',
       lim: 3,
       inc: 2,
@@ -54,6 +63,15 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variant: 'flipello',
       variantDisplayName: 'Othello',
       variantId: '5_6',
+    },
+    {
+      id: '3+2-amazons',
+      lim: 3,
+      inc: 2,
+      perf: 'Amazons',
+      variant: 'amazons',
+      variantDisplayName: 'Amazons',
+      variantId: '8_1',
     },
     { id: '3+2-oware', lim: 3, inc: 2, perf: 'Oware', variant: 'oware', variantDisplayName: 'Oware', variantId: '6_1' },
     {

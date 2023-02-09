@@ -18,7 +18,7 @@
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.26",
     "common": "2.0.0",
     "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat3.19"
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#221-amazons"
   },
   "scripts": {
     "dev": "rollup --config",
