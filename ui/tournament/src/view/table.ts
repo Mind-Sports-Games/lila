@@ -21,7 +21,7 @@ function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating
   return h('span.mini-game__player', [
     h('span.mini-game__user', [
       h('strong', '#' + player.rank),
-      renderPlayer(player, true, withRating, false),
+      renderPlayer(player, true, withRating, true, false),
       player.berserk
         ? h('i', {
             attrs: {
