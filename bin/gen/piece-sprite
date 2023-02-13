@@ -58,7 +58,8 @@ flipello_themes = [
   ['fabirovsky_flipello', 'svg']
 ]
 amazons_themes = [
-  ['queen', 'svg']
+  ['queen', 'svg'],
+  ['arrow', 'svg']
 ]
 oware_themes = [
   ['red', 'svg'],
