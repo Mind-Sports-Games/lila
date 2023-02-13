@@ -17,7 +17,7 @@ object StepBuilder {
       variant: Variant,
       initialFen: FEN
   ): JsArray = {
-    val logMoves = if (id == "Es2nGwAE") pgnMoves.pp("pgnMoves") else pgnMoves
+    val logMoves = if (id == "6A5dmaRK") pgnMoves.pp("pgnMoves") else pgnMoves
     Replay.gameMoveWhileValid(variant.gameLogic, pgnMoves, initialFen, variant) match {
       case (init, games, error) =>
         error foreach logChessError(id)
