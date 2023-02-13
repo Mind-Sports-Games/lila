@@ -57,6 +57,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? { width: 10, height: 10 }
             : $el.hasClass('variant-oware')
             ? { width: 6, height: 2 }
+            : $el.hasClass('variant-togyzkumalak')
+            ? { width: 9, height: 2 }
             : { width: 8, height: 8 },
           variant: $el.hasClass('variant-shogi')
             ? 'shogi'
@@ -70,6 +72,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? 'flipello10'
             : $el.hasClass('variant-oware')
             ? 'oware'
+            : $el.hasClass('variant-togyzkumalak')
+            ? 'togyzkumalak'
             : 'standard',
         })
       );

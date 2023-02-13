@@ -82,7 +82,8 @@ object list {
               userTopPerf(leaderboards.minixiangqi, PerfType.orDefault("minixiangqi")),
               userTopPerf(leaderboards.flipello, PerfType.orDefault("flipello")),
               userTopPerf(leaderboards.flipello10, PerfType.orDefault("flipello10")),
-              userTopPerf(leaderboards.oware, PerfType.orDefault("oware"))
+              userTopPerf(leaderboards.oware, PerfType.orDefault("oware")),
+              userTopPerf(leaderboards.togyzkumalak, PerfType.orDefault("togyzkumalak"))
             )
           )
         )

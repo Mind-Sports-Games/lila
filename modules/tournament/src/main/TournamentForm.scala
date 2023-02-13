@@ -3,7 +3,7 @@ package lila.tournament
 import cats.implicits._
 import strategygames.format.FEN
 import strategygames.chess.{ StartingPosition }
-import strategygames.{ Clock, GameFamily, GameLogic, Mode }
+import strategygames.{ Clock, GameFamily, GameGroup, GameLogic, Mode }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.data._
@@ -77,18 +77,18 @@ final class TournamentForm {
         numIntervals = tour.medleyNumIntervals
       ),
       medleyDefaults = MedleyDefaults(
-        onePerGameFamily = onePerGameFamilyInMedley(tour.medleyVariants).some,
+        onePerGameFamily = onePerGameGroupInMedley(tour.medleyVariants).some,
         exoticChessVariants = exoticChessVariants(tour.medleyVariants).some,
         draughts64Variants = draughts64Variants(tour.medleyVariants).some
       ),
       medleyGameFamilies = MedleyGameFamilies(
-        chess = gameFamilyInMedley(tour.medleyVariants, GameFamily.Chess()).some,
-        draughts = gameFamilyInMedley(tour.medleyVariants, GameFamily.Draughts()).some,
-        shogi = gameFamilyInMedley(tour.medleyVariants, GameFamily.Shogi()).some,
-        xiangqi = gameFamilyInMedley(tour.medleyVariants, GameFamily.Xiangqi()).some,
-        loa = gameFamilyInMedley(tour.medleyVariants, GameFamily.LinesOfAction()).some,
-        flipello = gameFamilyInMedley(tour.medleyVariants, GameFamily.Flipello()).some,
-        mancala = gameFamilyInMedley(tour.medleyVariants, GameFamily.Mancala()).some
+        chess = gameGroupInMedley(tour.medleyVariants, GameGroup.Chess()).some,
+        draughts = gameGroupInMedley(tour.medleyVariants, GameGroup.Draughts()).some,
+        shogi = gameGroupInMedley(tour.medleyVariants, GameGroup.Shogi()).some,
+        xiangqi = gameGroupInMedley(tour.medleyVariants, GameGroup.Xiangqi()).some,
+        loa = gameGroupInMedley(tour.medleyVariants, GameGroup.LinesOfAction()).some,
+        flipello = gameGroupInMedley(tour.medleyVariants, GameGroup.Flipello()).some,
+        mancala = gameGroupInMedley(tour.medleyVariants, GameGroup.Mancala()).some
       ),
       position = tour.position,
       mode = none,
@@ -115,13 +115,15 @@ final class TournamentForm {
   private def medleyVariantsList(medleyVariants: Option[List[Variant]]) =
     medleyVariants.getOrElse(List[Variant]())
 
-  private def gameFamilyInMedley(medleyVariants: Option[List[Variant]], gf: GameFamily) =
-    medleyVariantsList(medleyVariants).map(v => v.gameFamily).contains(gf)
+  private def gameGroupInMedley(medleyVariants: Option[List[Variant]], gg: GameGroup) =
+    gg.variants.exists(medleyVariantsList(medleyVariants).contains(_))
 
-  private def onePerGameFamilyInMedley(medleyVariants: Option[List[Variant]]) = {
-    val mvList       = medleyVariantsList(medleyVariants)
-    val gameFamilies = mvList.map(_.gameFamily).distinct
-    mvList.map(_.gameFamily).take(gameFamilies.size) == gameFamilies && gameFamilies.size > 1
+  private def onePerGameGroupInMedley(medleyVariants: Option[List[Variant]]) = {
+    val mvList               = medleyVariantsList(medleyVariants)
+    val gameGroups           = GameGroup.medley.filter(gg => gg.variants.exists(mvList.contains(_)))
+    val selectedMVList       = mvList.take(gameGroups.size)
+    val gameGroupsInSelected = gameGroups.filter(gg => gg.variants.exists(selectedMVList.contains(_)))
+    gameGroups.size > 1 && gameGroups.size == gameGroupsInSelected.size
   }
 
   private def exoticChessVariants(medleyVariants: Option[List[Variant]]) =
@@ -307,7 +309,7 @@ private[tournament] case class TournamentSetup(
         variant = newVariant,
         medleyVariantsAndIntervals =
           if (
-            old.medleyGameFamilies != medleyGameFamilies.gfList
+            old.medleyGameGroups != medleyGameFamilies.ggList
               .sortWith(_.name < _.name)
               .some
             || old.medleyMinutes != medleyIntervalOptions.medleyMinutes
@@ -364,7 +366,7 @@ private[tournament] case class TournamentSetup(
     (60 * clockTime + 30 * clockIncrement) * 2 * 0.8
   } + 15
 
-  def isMedley = (medley | false) && medleyGameFamilies.gfList.nonEmpty
+  def isMedley = (medley | false) && medleyGameFamilies.ggList.nonEmpty
 
   def medleyDuration: Int =
     medleyIntervalOptions.medleyMinutes.getOrElse(0) * medleyIntervalOptions.numIntervals.getOrElse(0)
@@ -378,17 +380,17 @@ private[tournament] case class TournamentSetup(
   private lazy val generateNoDefaultsMedleyVariants: List[Variant] =
     scala.util.Random
       .shuffle(
-        Variant.all.filter(v => medleyGameFamilies.gfList.contains(v.gameFamily) && !v.fromPositionVariant)
+        medleyGameFamilies.ggList.flatMap(_.variants).filter(v => !v.fromPositionVariant)
       )
 
   private def generateMedleyVariants: List[Variant] =
     if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
       //take a shuffled list of all variants and pull the first for each game family to the front
-      val onePerGameFamilyVariantList = scala.util.Random.shuffle(
-        medleyGameFamilies.gfList.map(gf => generateNoDefaultsMedleyVariants.filter(_.gameFamily == gf).head)
+      val onePerGameGroupVariantList = scala.util.Random.shuffle(
+        medleyGameFamilies.ggList.map(gg => scala.util.Random.shuffle(gg.variants).head)
       )
-      onePerGameFamilyVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
-        onePerGameFamilyVariantList.contains(_)
+      onePerGameGroupVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
+        onePerGameGroupVariantList.contains(_)
       )
     } else if (medleyDefaults.exoticChessVariants.getOrElse(false))
       scala.util.Random.shuffle(Variant.all.filter(_.exoticChessVariant))
@@ -438,13 +440,13 @@ case class MedleyGameFamilies(
     mancala: Option[Boolean]
 ) {
 
-  lazy val gfList: List[GameFamily] = GameFamily.all
-    .filterNot(gf => if (!chess.getOrElse(false)) gf == GameFamily.Chess() else false)
-    .filterNot(gf => if (!draughts.getOrElse(false)) gf == GameFamily.Draughts() else false)
-    .filterNot(gf => if (!shogi.getOrElse(false)) gf == GameFamily.Shogi() else false)
-    .filterNot(gf => if (!xiangqi.getOrElse(false)) gf == GameFamily.Xiangqi() else false)
-    .filterNot(gf => if (!loa.getOrElse(false)) gf == GameFamily.LinesOfAction() else false)
-    .filterNot(gf => if (!flipello.getOrElse(false)) gf == GameFamily.Flipello() else false)
-    .filterNot(gf => if (!mancala.getOrElse(false)) gf == GameFamily.Mancala() else false)
+  lazy val ggList: List[GameGroup] = GameGroup.medley
+    .filterNot(gg => if (!chess.getOrElse(false)) gg == GameGroup.Chess() else false)
+    .filterNot(gg => if (!draughts.getOrElse(false)) gg == GameGroup.Draughts() else false)
+    .filterNot(gg => if (!shogi.getOrElse(false)) gg == GameGroup.Shogi() else false)
+    .filterNot(gg => if (!xiangqi.getOrElse(false)) gg == GameGroup.Xiangqi() else false)
+    .filterNot(gg => if (!loa.getOrElse(false)) gg == GameGroup.LinesOfAction() else false)
+    .filterNot(gg => if (!flipello.getOrElse(false)) gg == GameGroup.Flipello() else false)
+    .filterNot(gg => if (!mancala.getOrElse(false)) gg == GameGroup.Mancala() else false)
 
 }

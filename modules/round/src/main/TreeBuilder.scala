@@ -23,10 +23,11 @@ object TreeBuilder {
 
   def fullOpeningOf(fen: FEN): Option[FullOpening] =
     fen match {
-      case FEN.Chess(fen)    => FullOpeningDB.findByFen(GameLogic.Chess(), FEN.Chess(fen))
-      case FEN.Draughts(fen) => FullOpeningDB.findByFen(GameLogic.Draughts(), FEN.Draughts(fen))
-      case FEN.FairySF(fen)  => FullOpeningDB.findByFen(GameLogic.FairySF(), FEN.FairySF(fen))
-      case FEN.Mancala(fen)  => FullOpeningDB.findByFen(GameLogic.Mancala(), FEN.Mancala(fen))
+      case FEN.Chess(fen)        => FullOpeningDB.findByFen(GameLogic.Chess(), FEN.Chess(fen))
+      case FEN.Draughts(fen)     => FullOpeningDB.findByFen(GameLogic.Draughts(), FEN.Draughts(fen))
+      case FEN.FairySF(fen)      => FullOpeningDB.findByFen(GameLogic.FairySF(), FEN.FairySF(fen))
+      case FEN.Samurai(fen)      => FullOpeningDB.findByFen(GameLogic.Samurai(), FEN.Samurai(fen))
+      case FEN.Togyzkumalak(fen) => FullOpeningDB.findByFen(GameLogic.Togyzkumalak(), FEN.Togyzkumalak(fen))
     }
 
   def apply(

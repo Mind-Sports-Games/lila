@@ -1,4 +1,5 @@
-$score-variants: ('flipello', 'flipello10', 'oware');
+$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak');
+$score-variants-square: ('flipello', 'flipello10', 'oware');
 
 .variant-flipello .game-score,
 .variant-flipello10 .game-score {
@@ -16,17 +17,40 @@ $score-variants: ('flipello', 'flipello10', 'oware');
   }
 }
 
-body.mancala-light-wood .variant-oware .game-score {
-  background: url(../images/board/mancala/oware_light_wood_house.png);
+.variant-togyzkumalak .game-score::after {
+  @extend %active, %box-radius;
+
+  content: attr(data-score);
+  top: -5.5em;
+  right: -10.7em;
+  position: relative;
+  line-height: 0.9em;
+  padding: 3px 0.3em;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+body.oware-light-wood .variant-oware .game-score {
+  background: url(../images/board/oware/oware_light_wood_house.png);
   background-size: cover;
 }
 
-body.mancala-dark-wood .variant-oware .game-score {
-  background: url(../images/board/mancala/oware_dark_wood_house.png);
+body.oware-dark-wood .variant-oware .game-score {
+  background: url(../images/board/oware/oware_dark_wood_house.png);
   background-size: cover;
 }
 
-@each $variant in $score-variants {
+body.togyzkumalak-blue .variant-togyzkumalak .game-score {
+  background: url(../images/board/togyzkumalak/togyzkumalak_blue_house.png);
+  background-size: cover;
+}
+
+body.togyzkumalak-wood .variant-togyzkumalak .game-score {
+  background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
+  background-size: cover;
+}
+
+@each $variant in $score-variants-square {
   .variant-#{$variant} .game-score {
     @extend %box-radius;
     display: block;
@@ -79,6 +103,71 @@ body.mancala-dark-wood .variant-oware .game-score {
       &-bottom {
         margin-top: $block-gap;
       }
+    }
+  }
+}
+
+.variant-togyzkumalak .game-score {
+  @extend %box-radius;
+  display: block;
+  width: 17.8em;
+  height: 4.5em;
+  background-color: #aaa;
+
+  piece.part1 {
+    display: block;
+    width: 5em !important;
+    height: 10em !important;
+    position: relative;
+    margin-top: -2.2em !important;
+    margin-left: 2.5em !important;
+    transform: rotate(270deg);
+  }
+
+  piece.part2 {
+    display: block;
+    width: 5em !important;
+    height: 10em !important;
+    position: relative;
+    margin-top: -10em !important;
+    margin-left: 10.1em !important;
+    transform: rotate(270deg);
+  }
+
+  &-top {
+    grid-area: mat-top;
+    margin-top: 2.5em;
+  }
+
+  &-bottom {
+    grid-area: mat-bot;
+  }
+
+  @include breakpoint($mq-col1) {
+    &-top {
+      grid-area: pocket-top;
+      margin-bottom: 0;
+      margin-top: 0;
+      margin-left: 1%;
+    }
+
+    &-bottom {
+      grid-area: pocket-top;
+      margin-top: 0;
+      margin-left: 43%;
+    }
+
+    //todo how to only affect phone screen?
+    transform: scale(0.65); //to fit large scores on phone screen
+  }
+
+  @include breakpoint($mq-col2-uniboard) {
+    &-top {
+      margin-bottom: $block-gap;
+    }
+
+    &-bottom {
+      margin-top: $block-gap;
     }
   }
 }

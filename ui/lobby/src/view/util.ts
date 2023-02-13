@@ -57,7 +57,7 @@ export const perfIcons = {
   Brazilian: '',
   Pool: '',
   Portuguese: '',
-  English: '',
+  English: '‹',
   Shogi: '',
   Xiangqi: '',
   'Mini Shogi': '',
@@ -65,4 +65,5 @@ export const perfIcons = {
   Flipello: '',
   Flipello10: '',
   Oware: '',
+  Togyzkumalak: '›',
 };

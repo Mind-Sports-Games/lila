@@ -41,10 +41,11 @@ final private class Player(
                   proxy.save(progress) >>
                     postHumanOrBotPlay(round, pov, progress, moveOrDrop)
               }
-          case Pov(game, _) if game.finished           => fufail(ClientError(s"$pov game is finished"))
-          case Pov(game, _) if game.aborted            => fufail(ClientError(s"$pov game is aborted"))
-          case Pov(game, playerIndex) if !game.turnOf(playerIndex) => fufail(ClientError(s"$pov not your turn"))
-          case _                                       => fufail(ClientError(s"$pov move refused for some reason"))
+          case Pov(game, _) if game.finished => fufail(ClientError(s"$pov game is finished"))
+          case Pov(game, _) if game.aborted  => fufail(ClientError(s"$pov game is aborted"))
+          case Pov(game, playerIndex) if !game.turnOf(playerIndex) =>
+            fufail(ClientError(s"$pov not your turn"))
+          case _ => fufail(ClientError(s"$pov move refused for some reason"))
         }
     }
 
@@ -61,10 +62,10 @@ final private class Player(
             case MoveApplied(progress, moveOrDrop) =>
               proxy.save(progress) >> postHumanOrBotPlay(round, pov, progress, moveOrDrop)
           }
-      case Pov(game, _) if game.finished           => fufail(GameIsFinishedError(pov))
-      case Pov(game, _) if game.aborted            => fufail(ClientError(s"$pov game is aborted"))
+      case Pov(game, _) if game.finished                       => fufail(GameIsFinishedError(pov))
+      case Pov(game, _) if game.aborted                        => fufail(ClientError(s"$pov game is aborted"))
       case Pov(game, playerIndex) if !game.turnOf(playerIndex) => fufail(ClientError(s"$pov not your turn"))
-      case _                                       => fufail(ClientError(s"$pov move refused for some reason"))
+      case _                                                   => fufail(ClientError(s"$pov move refused for some reason"))
     }
 
   private def postHumanOrBotPlay(
@@ -175,16 +176,12 @@ final private class Player(
 
   private def moveFinish(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     game.status match {
-      case Status.Mate
-        => finisher.other(game, _.Mate, game.situation.winner)
-      case Status.PerpetualCheck
-        => finisher.other(game, _.PerpetualCheck, game.situation.winner)
-      case Status.VariantEnd
-        => finisher.other(game, _.VariantEnd, game.situation.winner)
-      case Status.Stalemate if !game.variant.stalemateIsDraw
-        => finisher.other(game, _.Stalemate, game.situation.winner)
-      case status @ (Status.Stalemate | Status.Draw)
-        => finisher.other(game, _ => status, None)
-      case _ => fuccess(Nil)
+      case Status.Mate           => finisher.other(game, _.Mate, game.situation.winner)
+      case Status.PerpetualCheck => finisher.other(game, _.PerpetualCheck, game.situation.winner)
+      case Status.VariantEnd     => finisher.other(game, _.VariantEnd, game.situation.winner)
+      case Status.Stalemate if !game.variant.stalemateIsDraw =>
+        finisher.other(game, _.Stalemate, game.situation.winner)
+      case status @ (Status.Stalemate | Status.Draw) => finisher.other(game, _ => status, None)
+      case _                                         => fuccess(Nil)
     }
 }

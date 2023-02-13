@@ -61,6 +61,7 @@ final class HistoryApi(coll: Coll, userRepo: UserRepo, cacheApi: lila.memo.Cache
       game.ratingVariant.flipello.option("flipello"                         -> perfs.flipello),
       game.ratingVariant.flipello10.option("flipello10"                     -> perfs.flipello10),
       game.ratingVariant.oware.option("oware"                               -> perfs.oware),
+      game.ratingVariant.togyzkumalak.option("togyzkumalak"                 -> perfs.togyzkumalak),
       (isStd && game.speed == Speed.UltraBullet).option("ultraBullet"       -> perfs.ultraBullet),
       (isStd && game.speed == Speed.Bullet).option("bullet"                 -> perfs.bullet),
       (isStd && game.speed == Speed.Blitz).option("blitz"                   -> perfs.blitz),

@@ -22,7 +22,7 @@ import MoveOn from './moveOn';
 import TransientMove from './transientMove';
 import * as atomic from './atomic';
 import * as flipello from './flipello';
-import * as oware from './oware';
+import * as mancala from './mancala';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -191,14 +191,14 @@ export default class RoundController {
         sound.explode();
         atomic.capture(this, dest);
       } else if (this.data.game.variant.key === 'oware') {
-        oware.updateBoardFromMove(this, orig, dest);
+        mancala.updateBoardFromOwareMove(this, orig, dest);
         sound.capture();
       } else sound.capture();
     } else if (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') {
       flipello.flip(this, dest, this.data.player.playerIndex);
     } else if (this.data.game.variant.key === 'oware') {
       //always play the capture sound regardless of move TODO change depending on number of stones?
-      oware.updateBoardFromMove(this, orig, dest);
+      mancala.updateBoardFromOwareMove(this, orig, dest);
       sound.capture();
     } else sound.move();
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
@@ -230,7 +230,7 @@ export default class RoundController {
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
     if (
-      ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(
+      ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware', 'togyzkumalak'].includes(
         this.data.game.variant.key
       )
     )
@@ -302,6 +302,9 @@ export default class RoundController {
       dropDests: this.isPlaying() ? stratUtils.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
     }),
       this.chessground.set(config);
+    if (this.data.game.variant.key === 'togyzkumalak') {
+      this.chessground.redrawAll(); //redraw board scores
+    }
     if (this.data.onlyDropsVariant) {
       if (ply == this.lastPly()) {
         this.setDropOnlyVariantDropMode(
@@ -469,16 +472,16 @@ export default class RoundController {
           !o.castle ||
           (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
         ) {
-          if (d.game.variant.key === 'oware') {
+          if (d.game.variant.key === 'oware' || d.game.variant.key === 'togyzkumalak') {
             this.chessground.moveNoAnim(keys[0], keys[1]);
           } else {
             this.chessground.move(keys[0], keys[1]);
           }
         }
       }
-      if (d.game.variant.key === 'oware') {
+      if (d.game.variant.key === 'oware' || d.game.variant.key === 'togyzkumalak') {
         // a lot of pieces can change from 1 move so update them all
-        oware.updateBoardFromFen(this, o.fen);
+        mancala.updateBoardFromFen(this, o.fen);
       }
       if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
@@ -599,6 +602,7 @@ export default class RoundController {
     this.onChange();
     this.setLoading(false);
     if (this.keyboardMove) this.keyboardMove.update(d.steps[d.steps.length - 1]);
+    if (this.data.game.variant.key === 'togyzkumalak') this.chessground.redrawAll(); //redraw board scores
   };
 
   endWithData = (o: ApiEnd): void => {
