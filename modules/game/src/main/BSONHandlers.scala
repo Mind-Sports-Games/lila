@@ -538,7 +538,9 @@ object BSONHandlers {
         val pgnMoves = PtnStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies)
         PtnStorage.Decoded(
           pgnMoves = pgnMoves,
-          pieces = BinaryFormat.piece.readTogyzkumalak(r bytes F.binaryPieces, gameVariant),
+          pieces = BinaryFormat.piece
+            .readTogyzkumalak(r bytes F.binaryPieces, gameVariant)
+            .filterNot { case (_, posInfo) => posInfo._2 == 0 },
           positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
           lastMove = None,
           halfMoveClock = pgnMoves.reverse.indexWhere(san =>
