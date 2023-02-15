@@ -113,6 +113,8 @@ export function updateBoardFromOwareMove(ctrl: RoundController, orig: cg.Key, de
 }
 
 export function updateBoardFromTogyzkumalakMove(ctrl: RoundController, orig: cg.Key, dest: cg.Key) {
+  const alreadyUpdatedFromFen = ctrl.data.steps[ctrl.data.steps.length - 1].uci === orig + dest;
+  if (alreadyUpdatedFromFen) return;
   const boardWidth = ctrl.data.game.variant.boardSize.width;
   const currentFen = ctrl.data.steps[ctrl.data.steps.length - 1].fen;
   const boardArray = createBoardArrayFromBoardFen(currentFen.split(' ')[0], boardWidth);
@@ -185,7 +187,7 @@ export function updateBoardFromTogyzkumalakMove(ctrl: RoundController, orig: cg.
     const pos: cg.Pos = [i < boardWidth ? i + 1 : boardWidth * 2 - i, i < boardWidth ? 1 : 2] as cg.Pos;
     const k: cg.Key = util.pos2key(pos);
     if (numStones == 0) {
-      if (createdTuzdik || existingTuzdik.includes(i)) {
+      if ((createdTuzdik && destBoardIndex === i) || existingTuzdik.includes(i)) {
         const piece: cg.Piece = {
           role: `t-piece` as cg.Role,
           playerIndex: playerIndex, //who owns this?
@@ -204,6 +206,7 @@ export function updateBoardFromTogyzkumalakMove(ctrl: RoundController, orig: cg.
   }
 
   ctrl.chessground.setPiecesNoAnim(pieces);
+  ctrl.chessground.redrawAll();
 }
 
 function createBoardArrayFromBoardFen(boardFen: string, boardWidth: number): number[] {
