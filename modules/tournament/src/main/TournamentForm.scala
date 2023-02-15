@@ -149,9 +149,9 @@ final class TournamentForm {
   ): ClockConfig =
     (useByoyomi, byoyomi, periods) match {
       case (true, Some(byoyomi), Some(periods)) =>
-        ByoyomiClock.Config((limit*4).toInt, increment, byoyomi, periods)
+        ByoyomiClock.Config((limit*60).toInt, increment, byoyomi, periods)
       case _ =>
-        FischerClock.Config((limit*4).toInt, increment)
+        FischerClock.Config((limit*60).toInt, increment)
     }
 
   private def form(user: User, leaderTeams: List[LeaderTeam]) =
