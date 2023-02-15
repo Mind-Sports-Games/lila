@@ -403,11 +403,11 @@ private[tournament] case class TournamentSetup(
   private def estimatedGameSeconds: Double = clock match {
     case bc: ByoyomiClock.Config =>
       {
-        (60 * bc.limitSeconds + 30 * bc.incrementSeconds + bc.byoyomiSeconds * 20 * bc.periodsTotal) * 2 * 0.8
+        (bc.limitSeconds + 30 * bc.incrementSeconds + bc.byoyomiSeconds * 20 * bc.periodsTotal) * 2 * 0.8
       } + 15
     case fc: FischerClock.Config =>
       {
-        (60 * fc.limitSeconds + 30 * fc.incrementSeconds) * 2 * 0.8
+        (fc.limitSeconds + 30 * fc.incrementSeconds) * 2 * 0.8
       } + 15
   }
 
