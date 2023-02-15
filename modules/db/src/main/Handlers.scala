@@ -8,7 +8,7 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import strategygames.{ Player => PlayerIndex, GameLogic }
+import strategygames.{ Player => PlayerIndex, GameLogic, ByoyomiClock, FischerClock }
 import strategygames.format.{ FEN => StratFEN }
 import strategygames.variant.{ Variant => StratVariant }
 import strategygames.chess.format.FEN
@@ -179,18 +179,36 @@ trait Handlers {
         clockType match {
           case "fischer" =>
             for {
-              limit     <- doc.getAsTry[Int]("limit")
-              inc       <- doc.getAsTry[Int]("increment")
+              limit <- doc.getAsTry[Int]("limit")
+              inc   <- doc.getAsTry[Int]("increment")
             } yield strategygames.FischerClock.Config(limit, inc)
-          case "byoyomi" => sys.error("TODO: byoyomi clock db implementation")
+          case "byoyomi" =>
+            for {
+              limit   <- doc.getAsTry[Int]("limit")
+              inc     <- doc.getAsTry[Int]("increment")
+              byoyomi <- doc.getAsTry[Int]("byoyomi")
+              periods <- doc.getAsTry[Int]("periods")
+            } yield strategygames.ByoyomiClock.Config(limit, inc, byoyomi, periods)
         }
       }
     },
     c =>
-      BSONDocument(
-        "limit"     -> c.limitSeconds,
-        "increment" -> c.incrementSeconds
-      )
+      c match {
+        case fc: FischerClock.Config =>
+          BSONDocument(
+            "t" -> "fischer",
+            "limit"     -> fc.limitSeconds,
+            "increment" -> fc.incrementSeconds
+          )
+        case bc: ByoyomiClock.Config =>
+          BSONDocument(
+            "t" -> "byoyomi",
+            "limit"     -> bc.limitSeconds,
+            "increment" -> bc.incrementSeconds,
+            "byoyomi"   -> bc.byoyomiSeconds,
+            "periods"   -> bc.periodsTotal
+          )
+      }
   )
 
   implicit val absoluteUrlHandler = tryHandler[AbsoluteUrl](

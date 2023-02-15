@@ -66,10 +66,12 @@ case class Swiss(
 
   def perfType: PerfType = PerfType(variant, speed)
 
+  // TODO: byoyomi these need to be updated by the clock type
   def estimatedDuration: FiniteDuration = {
     (clock.limit.toSeconds + clock.increment.toSeconds * 80 + 10) * settings.nbRounds
   }.toInt.seconds
 
+  // TODO: byoyomi these need to be updated by the clock type
   def estimatedDurationString = {
     val minutes = estimatedDuration.toMinutes
     if (minutes < 60) s"${minutes}m"

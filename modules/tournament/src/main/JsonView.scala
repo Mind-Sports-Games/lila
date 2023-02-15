@@ -580,15 +580,22 @@ object JsonView {
       "speed" -> s.speed.key
     )
 
-  // TODO: byoyomi needed here.
-  implicit val clockWrites: OWrites[ClockConfig] = OWrites { clock =>
+  implicit private[tournament] val clockWrites: OWrites[strategygames.ClockConfig] = OWrites { clock =>
     clock match {
-      case clock: FischerClock.Config =>
+      case fc: FischerClock.Config => {
         Json.obj(
-          "limit"     -> clock.limitSeconds,
-          "increment" -> clock.incrementSeconds
+          "limit"     -> fc.limitSeconds,
+          "increment" -> fc.incrementSeconds
         )
-      case _: ByoyomiClock.Config => sys.error("Support byoyomi")
+      }
+      case bc: ByoyomiClock.Config => {
+        Json.obj(
+          "limit"     -> bc.limitSeconds,
+          "increment" -> bc.incrementSeconds,
+          "byoyomi"   -> bc.byoyomiSeconds,
+          "periods"   -> bc.periodsTotal
+        )
+      }
     }
   }
 

@@ -35,7 +35,8 @@ object form {
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
-            fields.clock,
+            fields.clockRow1,
+            fields.clockRow2,
             form3.split(fields.minutes, fields.waitMinutes),
             form3.split(fields.description(true), fields.startPosition),
             form3.globalError(form),
@@ -74,7 +75,8 @@ object form {
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
-            fields.clock,
+            fields.clockRow1,
+            fields.clockRow2,
             form3.split(
               if ((TournamentForm.minutes contains tour.minutes) || tour.isMedley) form3.split(fields.minutes)
               else
@@ -439,13 +441,22 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
     )(
       views.html.tournament.form.startingPosition(_, tour)
     )
-  def clock =
+  def clockRow1 =
     form3.split(
-      form3.group(form("clockTime"), trans.clockInitialTime(), half = true)(
+      form3.group(form("clock.limit"), trans.clockInitialTime(), half = true)(
         form3.select(_, TournamentForm.clockTimeChoices, disabled = disabledAfterStart)
       ),
-      form3.group(form("clockIncrement"), trans.clockIncrement(), half = true)(
+      form3.group(form("clock.increment"), trans.clockIncrement(), half = true)(
         form3.select(_, TournamentForm.clockIncrementChoices, disabled = disabledAfterStart)
+      )
+    )
+  def clockRow2 =
+    form3.split(
+      form3.group(form("clock.byoyomi"), trans.clockByoyomi(), half = true)(
+        form3.select(_, TournamentForm.clockByoyomiChoices, disabled = disabledAfterStart)
+      ),
+      form3.group(form("clock.periods"), trans.numberOfPeriods(), half = true)(
+        form3.select(_, TournamentForm.periodsChoices, disabled = disabledAfterStart)
       )
     )
   def minutes =

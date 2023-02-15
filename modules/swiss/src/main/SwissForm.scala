@@ -17,20 +17,43 @@ final class SwissForm(implicit mode: Mode) {
 
   import SwissForm._
 
+  // Yes, I know this is kinda gross. :'(
+  private def valuesFromClockConfig(c: ClockConfig): Option[(Boolean, Int, Int, Option[Int], Option[Int])] =
+    c match {
+      case fc: FischerClock.Config => {
+        FischerClock.Config.unapply(fc).map(t => (false, t._1, t._2, None, None))
+      }
+      case bc: ByoyomiClock.Config => {
+        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1, t._2, Some(t._3), Some(t._4)))
+      }
+    }
+
+  // Yes, I know this is kinda gross. :'(
+  private def clockConfigFromValues(
+      useByoyomi: Boolean,
+      limit: Int,
+      increment: Int,
+      byoyomi: Option[Int],
+      periods: Option[Int]
+  ): ClockConfig =
+    (useByoyomi, byoyomi, periods) match {
+      case (true, Some(byoyomi), Some(periods)) =>
+        ByoyomiClock.Config(limit, increment, byoyomi, periods)
+      case _ =>
+        FischerClock.Config(limit, increment)
+    }
+
   def form(minRounds: Int = 3) =
     Form(
       mapping(
         "name" -> optional(eventName(2, 36)),
-        "clock" -> mapping[ClockConfig, Int, Int](
-          "limit"     -> number.verifying(clockLimits.contains _),
-          "increment" -> number(min = 0, max = 120)
-        )(FischerClock.Config.apply)(c =>
-          // TODO: byoyomi - need to handle this.
-          c match {
-            case c: FischerClock.Config => FischerClock.Config.unapply(c)
-            case _: ByoyomiClock.Config => sys.error("Needs implementation")
-          }
-        )
+        "clock" -> mapping[ClockConfig, Boolean, Int, Int, Option[Int], Option[Int]](
+          "useByoyomi" -> boolean,
+          "limit"      -> number.verifying(clockLimits.contains _),
+          "increment"  -> number(min = 0, max = 120),
+          "byoyomi"    -> optional(number.verifying(byoyomiLimits.contains _)),
+          "periods"    -> optional(number(min = 0, max = 5))
+        )(clockConfigFromValues)(valuesFromClockConfig)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
         "variant" -> optional(
@@ -203,6 +226,9 @@ object SwissForm {
   val clockLimits: Seq[Int] = Seq(0, 15, 30, 45, 60, 90) ++ {
     (120 to 420 by 60) ++ (600 to 1800 by 300) ++ (2400 to 10800 by 600)
   }
+
+  // TODO: byoyomi limits need to make sense.
+  val byoyomiLimits: Seq[Int] = (0 to 7 by 1) ++ (10 to 30 by 5) ++ (30 to 60 by 10)
 
   // TODO: byoyomi clocks need to work here.
   val clockLimitChoices = options(
