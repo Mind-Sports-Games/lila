@@ -90,7 +90,7 @@ export class ByoyomiCtrlData {
 export class ClockController {
   emergSound: EmergSound = {
     lowtime: () => playstrategy.sound.play('lowTime'),
-    nextPeriod: () => playstrategy.sound.play('nextPeriod'),
+    nextPeriod: () => playstrategy.sound.play('period'),
     tick: () => playstrategy.sound.play('tick'),
     delay: 20000,
     playable: {
