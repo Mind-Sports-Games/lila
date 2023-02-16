@@ -2,10 +2,8 @@ package lila.swiss
 
 import ornicar.scalalib.Zero
 
-// TODO: byoyomi support needed here.
-import strategygames.ClockConfig
 import strategygames.format.FEN
-import strategygames.{ GameFamily, Speed }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import scala.concurrent.duration._
@@ -66,12 +64,15 @@ case class Swiss(
 
   def perfType: PerfType = PerfType(variant, speed)
 
-  // TODO: byoyomi these need to be updated by the clock type
-  def estimatedDuration: FiniteDuration = {
-    (clock.limit.toSeconds + clock.increment.toSeconds * 80 + 10) * settings.nbRounds
-  }.toInt.seconds
+  def estimatedDuration: FiniteDuration = clock match {
+    case bc: ByoyomiClock.Config => {
+      ((bc.limitSeconds + bc.incrementSeconds * 80 + bc.byoyomiSeconds * 20 * bc.periodsTotal + 10) * settings.nbRounds).toInt.seconds
+    }
+    case fc: FischerClock.Config => {
+      ((fc.limitSeconds + fc.incrementSeconds * 80 + 10) * settings.nbRounds).toInt.seconds
+    }
+  }
 
-  // TODO: byoyomi these need to be updated by the clock type
   def estimatedDurationString = {
     val minutes = estimatedDuration.toMinutes
     if (minutes < 60) s"${minutes}m"

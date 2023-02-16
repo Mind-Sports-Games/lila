@@ -146,9 +146,8 @@ export class ClockController {
 
       this.byoyomiData.goneBerserk[d.player.playerIndex] = !!d.player.berserk;
       this.byoyomiData.goneBerserk[d.opponent.playerIndex] = !!d.opponent.berserk;
-      // TODO: this byoyomi countdown should be configurable ir based on the size of the byoyomi,
-      //       not hard coded like this.
-      this.byoyomiData.byoEmergeS = 3;
+
+      this.byoyomiData.byoEmergeS = Math.max(3, this.byoyomiData.byoyomi * 0.1);
     }
 
     this.showBar = cdata.showBar && !this.opts.nvui;

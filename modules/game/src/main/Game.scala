@@ -524,6 +524,16 @@ case class Game(
 
   def hasClock = clock.isDefined
 
+  def hasFisherClock = hasClock && clock match {
+    case _: FisherClock.Config => true
+    case _                     => false
+  }
+
+  def hasByoyomiClock = hasClock && clock match {
+    case _: ByoyomiClock.Config => true
+    case _                      => false
+  }
+
   def hasCorrespondenceClock = daysPerTurn.isDefined
 
   def isUnlimited = !hasClock && !hasCorrespondenceClock

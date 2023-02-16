@@ -119,6 +119,8 @@ export interface ApiMove extends Step {
   clock?: {
     p1: Seconds;
     p2: Seconds;
+    p1Periods: number;
+    p2Periods: number;
     lag?: Centis;
   };
   status: Status;
@@ -151,6 +153,8 @@ export interface ApiEnd {
   clock?: {
     p1: Centis;
     p2: Centis;
+    p1Periods: number;
+    p2Periods: number;
   };
 }
 

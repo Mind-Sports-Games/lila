@@ -129,7 +129,9 @@ final class TournamentForm {
     medleyVariantsList(medleyVariants).filterNot(_.draughts64Variant).isEmpty
 
   // Yes, I know this is kinda gross. :'(
-  private def valuesFromClockConfig(c: ClockConfig): Option[(Boolean, Double, Int, Option[Int], Option[Int])] =
+  private def valuesFromClockConfig(
+      c: ClockConfig
+  ): Option[(Boolean, Double, Int, Option[Int], Option[Int])] =
     c match {
       case fc: FischerClock.Config => {
         FischerClock.Config.unapply(fc).map(t => (false, t._1 / 4d, t._2, None, None))
@@ -149,9 +151,9 @@ final class TournamentForm {
   ): ClockConfig =
     (useByoyomi, byoyomi, periods) match {
       case (true, Some(byoyomi), Some(periods)) =>
-        ByoyomiClock.Config((limit*60).toInt, increment, byoyomi, periods)
+        ByoyomiClock.Config((limit * 60).toInt, increment, byoyomi, periods)
       case _ =>
-        FischerClock.Config((limit*60).toInt, increment)
+        FischerClock.Config((limit * 60).toInt, increment)
     }
 
   private def form(user: User, leaderTeams: List[LeaderTeam]) =
@@ -163,7 +165,7 @@ final class TournamentForm {
           "limit"      -> numberInDouble(clockTimeChoices),
           "increment"  -> numberIn(clockIncrementChoices),
           "byoyomi"    -> optional(numberIn(clockByoyomiChoices)),
-          "periods"    -> optional(numberIn(periodsChoices)),
+          "periods"    -> optional(numberIn(periodsChoices))
         )(clockConfigFromValues)(valuesFromClockConfig)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "minutes" -> {
@@ -232,8 +234,8 @@ object TournamentForm {
   val clockIncrementDefault = 0
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
 
-  val clockByoyomi        = (0 to 2 by 1) ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
-  val clockByoyomiDefault = 0
+  val clockByoyomi        = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
+  val clockByoyomiDefault = 10
   val clockByoyomiChoices = options(clockByoyomi, "%d second{s}")
 
   val periods        = 1 to 5

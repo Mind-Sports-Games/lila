@@ -1,6 +1,5 @@
 package lila.swiss
 
-// TODO: byoyomi the clock neesd to be supported here.
 import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
 import strategygames.format.FEN
 import strategygames.variant.Variant
@@ -227,10 +226,10 @@ object SwissForm {
     (120 to 420 by 60) ++ (600 to 1800 by 300) ++ (2400 to 10800 by 600)
   }
 
-  // TODO: byoyomi limits need to make sense.
-  val byoyomiLimits: Seq[Int] = (0 to 7 by 1) ++ (10 to 30 by 5) ++ (30 to 60 by 10)
+  val byoyomiLimits: Seq[Int] = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (30 to 60 by 10)
 
-  // TODO: byoyomi clocks need to work here.
+  val clockByoyomiChoices = options(byoyomiLimits, "%d second{s}")
+
   val clockLimitChoices = options(
     clockLimits,
     l => s"${strategygames.FischerClock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
