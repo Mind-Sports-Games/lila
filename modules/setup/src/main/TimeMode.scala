@@ -24,7 +24,7 @@ object TimeMode {
   def orDefault(id: Int) = apply(id) | default
 
   def ofGame(game: lila.game.Game) =
-    if (game.hasFisherClock) FischerClock
+    if (game.hasFischerClock) FischerClock
     else if (game.hasByoyomiClock) ByoyomiClock
     else if (game.hasCorrespondenceClock) Correspondence
     else Unlimited

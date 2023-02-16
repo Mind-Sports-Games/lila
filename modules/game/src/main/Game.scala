@@ -524,15 +524,19 @@ case class Game(
 
   def hasClock = clock.isDefined
 
-  def hasFisherClock = hasClock && clock match {
-    case _: FisherClock.Config => true
-    case _                     => false
-  }
+  def hasFischerClock = clock.fold(false)(c =>
+    c match {
+      case _: FischerClock => true
+      case _               => false
+    }
+  )
 
-  def hasByoyomiClock = hasClock && clock match {
-    case _: ByoyomiClock.Config => true
-    case _                      => false
-  }
+  def hasByoyomiClock = clock.fold(false)(c =>
+    c match {
+      case _: ByoyomiClock => true
+      case _               => false
+    }
+  )
 
   def hasCorrespondenceClock = daysPerTurn.isDefined
 
