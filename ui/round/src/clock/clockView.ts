@@ -113,22 +113,27 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
   const update = (el: HTMLElement) => {
     if (el.animate !== undefined) {
       let anim = clock.elements[playerIndex].barAnim;
-      if (anim === undefined || !anim.effect || (anim.effect as KeyframeEffect).target !== el) {
+      if (
+        (playerIndex === clock.times.activePlayerIndex && clock.isUsingByo(playerIndex)) ||
+        anim === undefined ||
+        !anim.effect ||
+        (anim.effect as KeyframeEffect).target !== el
+      ) {
         anim = el.animate([{ transform: 'scale(1)' }, { transform: 'scale(0, 1)' }], {
-          duration: clock.barTime,
+          duration: clock.barTime[playerIndex],
           fill: 'both',
         });
         clock.elements[playerIndex].barAnim = anim;
       }
       const remaining = clock.millisOf(playerIndex);
-      anim.currentTime = clock.barTime - remaining;
+      anim.currentTime = clock.barTime[playerIndex] - remaining;
       if (playerIndex === clock.times.activePlayerIndex) {
         // Calling play after animations finishes restarts anim
         if (remaining > 0) anim.play();
       } else anim.pause();
     } else {
       clock.elements[playerIndex].bar = el;
-      el.style.transform = 'scale(' + clock.timeRatio(clock.millisOf(playerIndex)) + ',1)';
+      el.style.transform = 'scale(' + clock.timeRatio(clock.millisOf(playerIndex), playerIndex) + ',1)';
     }
   };
   return h('div.bar', {
@@ -142,7 +147,7 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
 
 export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, playerIndex: PlayerIndex) {
   if (els.time) els.time.innerHTML = formatClockTime(millis, clock.showTenths(millis), true, clock.opts.nvui);
-  if (els.bar) els.bar.style.transform = 'scale(' + clock.timeRatio(millis) + ',1)';
+  if (els.bar) els.bar.style.transform = 'scale(' + clock.timeRatio(millis, playerIndex) + ',1)';
   if (els.clock) {
     const cl = els.clock.classList;
     if (isEmerg(millis, clock, playerIndex)) cl.add('emerg');

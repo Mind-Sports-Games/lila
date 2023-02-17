@@ -103,8 +103,8 @@ export class ClockController {
   showBar: boolean;
   times: Times;
 
-  barTime: number;
-  timeRatioDivisor: number;
+  barTime: PlayerIndexMap<number>;
+  timeRatioDivisor: PlayerIndexMap<number>;
   emergMs: Millis;
 
   elements = {
@@ -151,8 +151,20 @@ export class ClockController {
     }
 
     this.showBar = cdata.showBar && !this.opts.nvui;
-    this.barTime = 1000 * (Math.max(cdata.initial, 2) + 5 * cdata.increment);
-    this.timeRatioDivisor = 1 / this.barTime;
+    this.barTime = {
+      p1: 1000 * (Math.max(cdata.initial, 2) + 5 * cdata.increment),
+      p2: 1000 * (Math.max(cdata.initial, 2) + 5 * cdata.increment),
+    };
+    if (isByoyomi(cdata) && this.isUsingByo(d.player.playerIndex)) {
+      this.barTime[d.player.playerIndex] = 1000 * cdata.byoyomi;
+    }
+    if (isByoyomi(cdata) && this.isUsingByo(d.opponent.playerIndex)) {
+      this.barTime[d.opponent.playerIndex] = 1000 * cdata.byoyomi;
+    }
+    this.timeRatioDivisor = {
+      p1: 1 / this.barTime['p1'],
+      p2: 1 / this.barTime['p1'],
+    };
 
     this.emergMs = 1000 * Math.min(60, Math.max(10, cdata.initial * 0.125));
 
@@ -170,7 +182,8 @@ export class ClockController {
     );
   };
 
-  timeRatio = (millis: number): number => Math.min(1, millis * this.timeRatioDivisor);
+  timeRatio = (millis: number, playerIndex: PlayerIndex): number =>
+    Math.min(1, millis * this.timeRatioDivisor[playerIndex]);
 
   //setClock = (d: RoundData, p1: Seconds, p2: Seconds, delay: Centis = 0) => {
   setClock = (d: RoundData, p1: Seconds, p2: Seconds, p1Per = 0, p2Per = 0, delay: Centis = 0) => {
@@ -245,6 +258,8 @@ export class ClockController {
       this.byoyomiData.byoyomi > 0 &&
       this.byoyomiData.curPeriods[playerIndex] < this.byoyomiData.totalPeriods
     ) {
+      this.barTime[playerIndex] = 1000 * this.byoyomiData.byoyomi;
+      this.timeRatioDivisor[playerIndex] = 1 / this.barTime[playerIndex];
       this.nextPeriod(playerIndex);
       this.opts.redraw();
     } else if (millis === 0) this.opts.onFlag();
