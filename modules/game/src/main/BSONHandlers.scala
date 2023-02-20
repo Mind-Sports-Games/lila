@@ -457,7 +457,6 @@ object BSONHandlers {
         )
       }
 
-
       val periodEntries = readPeriodEntries(r)
 
       val samuraiGame = samurai.Game(
@@ -476,29 +475,24 @@ object BSONHandlers {
         ),
         pgnMoves = decoded.pgnMoves,
         clock = r.getO[PlayerIndex => Clock](F.clock) {
-          clockBSONReader(createdAt, light.p1Player.berserk, light.p2Player.berserk)
+          clockBSONReader(
+            r.intO(F.clockType),
+            createdAt,
+            periodEntries,
+            light.p1Player.berserk,
+            light.p2Player.berserk
+          )
         } map (_(turnPlayerIndex)),
         turns = plies,
         startedAtTurn = startedAtTurn
       )
-
-      val p1ClockHistory = r bytesO F.p1ClockHistory
-      val p2ClockHistory = r bytesO F.p2ClockHistory
 
       Game(
         id = light.id,
         p1Player = light.p1Player,
         p2Player = light.p2Player,
         chess = StratGame.Samurai(samuraiGame),
-        loadClockHistory = clk =>
-          for {
-            bw <- p1ClockHistory
-            bb <- p2ClockHistory
-            history <-
-              BinaryFormat.clockHistory
-                .read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
-            _ = lila.mon.game.loadClockHistory.increment()
-          } yield history,
+        readClockHistory(r, light, turnPlayerIndex, periodEntries),
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
         binaryMoveTimes = r bytesO F.moveTimes,
@@ -543,6 +537,8 @@ object BSONHandlers {
           ) atLeast 0
         )
       }
+
+      val periodEntries = readPeriodEntries(r)
 
       val togyzkumalakGame = togyzkumalak.Game(
         situation = togyzkumalak.Situation(
