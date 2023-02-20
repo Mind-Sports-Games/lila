@@ -3,7 +3,7 @@ package lila.swiss
 import ornicar.scalalib.Zero
 
 import strategygames.format.FEN
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, Speed }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, GameGroup, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import scala.concurrent.duration._
