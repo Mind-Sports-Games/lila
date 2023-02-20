@@ -152,7 +152,8 @@
   &.outoftime .time {
     background-color: mix($c-bad, $c-bg-box, 25%);
   }
-  &.emerg.running .time {
+  &.emerg.running .time,
+  &.running .emerg .time {
     background-color: mix($c-bad, $c-bg-box, 50%);
     color: $c-font-clearer;
   }

@@ -9,7 +9,7 @@ import { Position } from '../interfaces';
 const fischerEmerg = (millis: Millis, clock: ClockController) => millis < clock.emergMs;
 const byoyomiEmerg = (millis: Millis, clock: ClockController, playerIndex: PlayerIndex) =>
   !!clock.byoyomiData &&
-  ((millis < clock.emergMs && clock.byoyomiData.byoyomi === 0) ||
+  ((millis < clock.emergMs && !clock.isUsingByo(playerIndex)) ||
     (clock.isUsingByo(playerIndex) && millis < clock.byoyomiData.byoEmergeS * 1000));
 const isEmerg = (millis: Millis, clock: ClockController, playerIndex: PlayerIndex) =>
   clock.byoyomiData ? byoyomiEmerg(millis, clock, playerIndex) : fischerEmerg(millis, clock);
@@ -42,21 +42,24 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
     },
     clock.opts.nvui
       ? [
-          h('div.time', {
-            // TODO: byoyomi get the classes / design going
-            attrs: { role: 'timer' },
-            hook: timeHook,
-          }),
+          h('div.clock-byo', [
+            h('div.time', {
+              attrs: { role: 'timer' },
+              hook: timeHook,
+            }),
+          ]),
         ]
       : [
           clock.showBar && game.bothPlayersHavePlayed(ctrl.data) ? showBar(ctrl, player.playerIndex) : undefined,
-          h('div.time', {
-            class: {
-              hour: millis > 3600 * 1000,
-            },
-            hook: timeHook,
-          }),
-          renderByoyomiTime(clock, player.playerIndex, ctrl.goneBerserk[player.playerIndex]),
+          h('div.clock-byo', [
+            h('div.time', {
+              class: {
+                hour: millis > 3600 * 1000,
+              },
+              hook: timeHook,
+            }),
+            renderByoyomiTime(clock, player.playerIndex, ctrl.goneBerserk[player.playerIndex]),
+          ]),
           renderBerserk(ctrl, player.playerIndex, position),
           isPlayer ? goBerserk(ctrl) : button.moretime(ctrl),
           tourRank(ctrl, player.playerIndex, position),

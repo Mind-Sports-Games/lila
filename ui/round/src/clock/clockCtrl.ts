@@ -122,17 +122,7 @@ export class ClockController {
     if (cdata.showTenths === Prefs.ShowClockTenths.Never) this.showTenths = () => false;
     else {
       const cutoff = cdata.showTenths === Prefs.ShowClockTenths.Below10Secs ? 10000 : 3600000;
-
-      const fischerShowTenths = (time: Millis): boolean => time < cutoff;
-      const byoyomiShowTenths = (time: Millis): boolean =>
-        time < cutoff &&
-        !!this.byoyomiData &&
-        (this.byoyomiData.byoyomi === 0 ||
-          time <= 1000 ||
-          this.isUsingByo(d.player.playerIndex) ||
-          cdata.showTenths === Prefs.ShowClockTenths.Always);
-      this.showTenths = d.clock && isFischer(cdata) ? fischerShowTenths : byoyomiShowTenths;
-      // TODO: I don't fully understand the above if statement and suspect it's not quite right for byoyomi
+      this.showTenths = time => time < cutoff;
     }
 
     if (isByoyomi(cdata)) {
@@ -270,10 +260,8 @@ export class ClockController {
         if (
           millis < this.emergMs &&
           !(now < this.emergSound.next!) &&
-          // TODO: test this out,
           (!this.byoyomiData || (this.byoyomiData && this.byoyomiData.curPeriods[playerIndex] === 0))
         ) {
-          //if (millis < this.emergMs && !(now < this.emergSound.next!)) {
           this.emergSound.lowtime();
           this.emergSound.next = now + this.emergSound.delay;
           this.emergSound.playable[playerIndex] = false;
