@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ P2, Centis, Clock, P1 }
+import strategygames.{ ByoyomiClock, Centis, Clock, FischerClock, P1, P2 }
 import org.specs2.mutable._
 import scala.util.chaining._
 
@@ -8,18 +8,18 @@ import lila.db.ByteArray
 
 class BinaryClockTest extends Specification {
 
-  val _0_                  = "00000000"
-  val since                = org.joda.time.DateTime.now.minusHours(1)
-  def writeBytes(c: Clock) = BinaryFormat.clock(since) write c
-  def readBytes(bytes: ByteArray, berserk: Boolean = false): Clock =
-    (BinaryFormat.clock(since).read(bytes, berserk, false))(P1)
-  def isomorphism(c: Clock): Clock = readBytes(writeBytes(c))
+  val _0_                         = "00000000"
+  val since                       = org.joda.time.DateTime.now.minusHours(1)
+  def writeBytes(c: FischerClock) = BinaryFormat.fischerClock(since) write c
+  def readBytes(bytes: ByteArray, berserk: Boolean = false): FischerClock =
+    (BinaryFormat.fischerClock(since).read(bytes, berserk, false))(P1)
+  def isomorphism(c: FischerClock): FischerClock = readBytes(writeBytes(c))
 
-  def write(c: Clock): List[String] = writeBytes(c).showBytes.split(',').toList
-  def read(bytes: List[String])     = readBytes(ByteArray.parseBytes(bytes))
+  def write(c: FischerClock): List[String] = writeBytes(c).showBytes.split(',').toList
+  def read(bytes: List[String])            = readBytes(ByteArray.parseBytes(bytes))
 
-  "binary Clock" should {
-    val clock  = Clock(120, 2)
+  "binary Fischer Clock" should {
+    val clock  = FischerClock(120, 2)
     val bits22 = List("00000010", "00000010")
     "write" in {
       write(clock) must_== {
@@ -31,7 +31,7 @@ class BinaryClockTest extends Specification {
       write(clock.giveTime(P1, Centis(-3))) must_== {
         bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(3)(_0_)
       }
-      write(Clock(0, 3)) must_== {
+      write(FischerClock(0, 3)) must_== {
         List("00000000", "00000011", "10000000", "00000001", "00101100", "10000000", "00000001", "00101100")
       }
     }
@@ -73,7 +73,7 @@ class BinaryClockTest extends Specification {
         val c4 = clock.start
         isomorphism(c4).timer.get.value must beCloseTo(c4.timer.get.value, 10)
 
-        Clock(120, 60) pipe { c =>
+        FischerClock(120, 60) pipe { c =>
           isomorphism(c) must_== c
         }
       }
@@ -85,7 +85,7 @@ class BinaryClockTest extends Specification {
         val b2 = clock.giveTime(P1, Centis(15)).goBerserk(P1)
         readBytes(writeBytes(b2), true) must_== b2
 
-        val b3 = Clock(60, 2).goBerserk(P1)
+        val b3 = FischerClock(60, 2).goBerserk(P1)
         readBytes(writeBytes(b3), true) must_== b3
       }
     }
