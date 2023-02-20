@@ -137,6 +137,11 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       ctrl.data.opponent.checks = ctrl.data.opponent.playerIndex == 'p1' ? e.p1 : e.p2;
       ctrl.redraw();
     },
+    score(e) {
+      ctrl.data.player.score = ctrl.data.player.playerIndex == 'p1' ? e.p1 : e.p2;
+      ctrl.data.opponent.score = ctrl.data.opponent.playerIndex == 'p1' ? e.p1 : e.p2;
+      ctrl.redraw();
+    },
     simulPlayerMove(gameId: string) {
       if (
         ctrl.opts.userId &&

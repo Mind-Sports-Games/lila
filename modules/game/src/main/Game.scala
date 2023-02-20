@@ -3,6 +3,7 @@ package lila.game
 import strategygames.format.{ FEN, Uci }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.{ Castles, CheckCount }
+import strategygames.togyzkumalak.Score
 import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
   P2,
@@ -261,6 +262,10 @@ case class Game(
             p1King = updated.history.kingMoves.p1King.map(Pos.Draughts),
             p2King = updated.history.kingMoves.p2King.map(Pos.Draughts)
           )
+        )
+      else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
+        (updated.board.variant.togyzkumalak) ?? List(
+          Event.Score(p1 = updated.history.score.p1, updated.history.score.p2)
         )
       else //chess
         ((updated.board.variant.threeCheck || updated.board.variant.fiveCheck) && game.situation.check) ?? List(
@@ -781,6 +786,7 @@ object Game {
   def isBotCompatible(speed: Speed): Boolean = speed >= Speed.Bullet
 
   private[game] val emptyCheckCount = CheckCount(0, 0)
+  private[game] val emptyScore      = Score(0, 0)
 
   private[game] val someEmptyFischerClockHistory = Some(FischerClockHistory())
   private[game] val someEmptyByoyomiClockHistory = Some(ByoyomiClockHistory())
@@ -854,6 +860,7 @@ object Game {
     val clockType         = "ct"
     val positionHashes    = "ph"
     val checkCount        = "cc"
+    val score             = "sc"
     val castleLastMove    = "cl"
     val kingMoves         = "km"
     val historyLastMove   = "hlm"

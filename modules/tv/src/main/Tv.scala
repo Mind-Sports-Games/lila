@@ -5,12 +5,15 @@ import lila.game.{ Game, GameRepo, Pov }
 import lila.hub.Trouper
 import lila.i18n.VariantKeys
 import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.{ GameFamily, GameGroup, GameLogic }
+import cats.implicits._
+
 
 final class Tv(
     gameRepo: GameRepo,
     trouper: Trouper,
-    gameProxyRepo: lila.round.GameProxyRepo
+    gameProxyRepo: lila.round.GameProxyRepo,
+    lightUserSync: LightUser.GetterSync
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   import Tv._
@@ -48,18 +51,57 @@ final class Tv(
 
   def getChampions: Fu[Champions] =
     trouper.ask[Champions](TvTrouper.GetChampions.apply)
+
+  def getCorrespondenceGames: Fu[List[Game]] = {
+    gameRepo.playingCorrespondenceNoAi flatMap {
+      _.map(gameRepo.game(_)).sequenceFu.map(_.flatten)
+    }
+  }
+
+  def getNonLiveCorrespondenceGamesOfChannel(
+      channel: Tv.Channel,
+      cGames: List[Game],
+      max: Int,
+      lGames: List[Game]
+  ): List[Game] = {
+    cGames
+      .filter(g => channel.filter(Candidate(g, false)))
+      .filter(g => !lGames.map(_.id).contains(g.id))
+      .sortBy(g => -(~g.averageUsersRating))
+      .take(max)
+  }
+
+  def getCorrespondenceChampions(games: List[Game]): Champions = {
+    var champions = Map[Channel, Champion]()
+    Tv.Channel.all.map(channel => {
+      games.filter(g => channel.filter(Candidate(g, false))).map { game =>
+        val player = game.players.sortBy { p =>
+          ~p.rating + ~p.userId.flatMap(lightUserSync).flatMap(_.title).flatMap(Tv.titleScores.get)
+        }.lastOption | game.player(game.naturalOrientation)
+        val user = player.userId flatMap lightUserSync
+        (user, player.rating) mapN { (u, r) =>
+          champions += (channel -> Champion(u, r, game.id))
+        }
+      }
+    })
+    Champions(champions)
+  }
 }
 
 object Tv {
   import strategygames.chess.{ variant => CV }
   import strategygames.draughts.{ variant => DV }
   import strategygames.fairysf.{ variant => FV }
-  import strategygames.mancala.{ variant => MV }
+  import strategygames.samurai.{ variant => MSV }
+  import strategygames.togyzkumalak.{ variant => MTV }
   import strategygames.{ Speed => S, GameFamily }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
   case class Champions(channels: Map[Channel, Champion]) {
     def get = channels.get _
+    def combineWithAndFavour(overWritingChampions: Champions) = {
+      Champions(channels ++ overWritingChampions.channels)
+    }
   }
 
   private[tv] case class Candidate(game: Game, hasBot: Boolean)
@@ -170,11 +212,11 @@ object Tv {
         )
     case object MancalaFamily
         extends Channel(
-          name = s"All ${VariantKeys.gameFamilyName(GameFamily.Mancala())}",
-          icon = MV.Oware.perfIcon.toString,
+          name = s"All ${GameGroup(7).name}",
+          icon = MSV.Oware.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(
-            anyVariant(Variant.all(GameLogic.Mancala()).filter(v => v.gameFamily == GameFamily.Mancala())),
+            anyVariant(GameGroup(7).variants),
             noBot
           ),
           familyChannel = true,
@@ -484,10 +526,19 @@ object Tv {
         )
     case object Oware
         extends Channel(
-          name = VariantKeys.variantName(Variant.wrap(MV.Oware)),
-          icon = MV.Oware.perfIcon.toString,
+          name = VariantKeys.variantName(Variant.wrap(MSV.Oware)),
+          icon = MSV.Oware.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(variant(Variant.wrap(MV.Oware)), noBot),
+          filters = Seq(variant(Variant.wrap(MSV.Oware)), noBot),
+          familyChannel = false,
+          gameFamily = "mancala"
+        )
+    case object Togyzkumalak
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(MTV.Togyzkumalak)),
+          icon = MTV.Togyzkumalak.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(MTV.Togyzkumalak)), noBot),
           familyChannel = false,
           gameFamily = "mancala"
         )
@@ -551,8 +602,9 @@ object Tv {
       FlipelloFamily,
       Flipello,
       Flipello10,
-      //MancalaFamily,
+      MancalaFamily,
       Oware,
+      Togyzkumalak,
       Bot,
       Computer
     )

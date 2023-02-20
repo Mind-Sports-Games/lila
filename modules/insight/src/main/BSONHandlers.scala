@@ -46,7 +46,8 @@ private object BSONHandlers {
       case Role.DraughtsPromotableRole(r) => BSONString(s"1:${r.forsyth.toString}")
       case Role.FairySFRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
       case Role.FairySFPromotableRole(r)  => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-      case Role.MancalaRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
+      case Role.SamuraiRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
+      case Role.TogyzkumalakRole(r)       => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
     }
   )
   implicit val TerminationBSONHandler = tryHandler[Termination](

@@ -10,15 +10,6 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   opts.pools = [
     // mirrors modules/pool/src/main/PoolList.scala (ids)
     {
-      id: '1+0-standard',
-      lim: 1,
-      inc: 0,
-      perf: 'Bullet',
-      variant: 'standard',
-      variantDisplayName: 'Chess',
-      variantId: '0_1',
-    },
-    {
       id: '3+2-standard',
       lim: 3,
       inc: 2,
@@ -65,6 +56,15 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variantId: '5_6',
     },
     { id: '3+2-oware', lim: 3, inc: 2, perf: 'Oware', variant: 'oware', variantDisplayName: 'Oware', variantId: '6_1' },
+    {
+      id: '3+2-togyzkumalak',
+      lim: 3,
+      inc: 2,
+      perf: 'Togyzkumalak',
+      variant: 'togyzkumalak',
+      variantDisplayName: 'Togyzkumalak',
+      variantId: '7_1',
+    },
   ];
   const nbRoundSpread = spreadNumber('#nb_games_in_play > strong', 8),
     nbUserSpread = spreadNumber('#nb_connected_players > strong', 10),

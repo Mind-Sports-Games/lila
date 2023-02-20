@@ -220,3 +220,8 @@ export interface CheckCount {
   p1: number;
   p2: number;
 }
+
+export interface Score {
+  p1: number;
+  p2: number;
+}

@@ -55,6 +55,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     orientation: ctrl.getOrientation(),
     myPlayerIndex: ctrl.data.player.playerIndex,
     coordinates: pref.coords !== Prefs.Coords.Hidden && !ctrl.embed,
+    boardScores: d.game.variant.key == 'togyzkumalak',
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,
     movable: {
@@ -94,8 +95,12 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
               '/'
             : variantKey === 'oware'
-            ? 'https://playstrategy.org/assets/piece/mancala/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'mancala')[0].name +
+            ? 'https://playstrategy.org/assets/piece/oware/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
+              '/'
+            : variantKey === 'togyzkumalak'
+            ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
               '/'
             : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
@@ -125,7 +130,9 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     variant: variantKey,
     chess960: variantKey == 'chess960',
     onlyDropsVariant: d.onlyDropsVariant,
-    singleClickMoveVariant: d.game.variant.key === 'oware' && d.pref.mancalaMove,
+    singleClickMoveVariant:
+      variantKey === 'togyzkumalak' ||
+      (stratUtils.variantUsesMancalaNotation(d.game.variant.key) && d.pref.mancalaMove),
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
   return config;

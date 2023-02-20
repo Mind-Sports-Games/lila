@@ -28,13 +28,15 @@ trait ChessgroundHelper {
             def top(p: Pos) = p match {
               case Pos.Chess(p)   => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.FairySF(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
-              case Pos.Mancala(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
+              case Pos.Samurai(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
+              case Pos.Togyzkumalak(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case _ => sys.error("Invalid Pos type")
             }
             def left(p: Pos) = p match {
               case Pos.Chess(p)   => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.FairySF(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
-              case Pos.Mancala(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
+              case Pos.Samurai(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
+              case Pos.Togyzkumalak(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case _ => sys.error("Invalid Pos type")
             }
             val highlights = ctx.pref.highlight ?? lastMove.distinct.map { pos =>
@@ -99,7 +101,15 @@ trait ChessgroundHelper {
             case (orig, dest) => List(orig, dest)
           }
         )
-      case (board: Board.Mancala, history: History.Mancala) =>
+      case (board: Board.Samurai, history: History.Samurai) =>
+        chessground(
+          board = board,
+          orient = pov.playerIndex,
+          lastMove = history.lastMove.map(_.origDest) ?? {
+            case (orig, dest) => List(orig, dest)
+          }
+        )
+      case (board: Board.Togyzkumalak, history: History.Togyzkumalak) =>
         chessground(
           board = board,
           orient = pov.playerIndex,

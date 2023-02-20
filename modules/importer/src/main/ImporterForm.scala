@@ -53,14 +53,16 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
   private def evenIncomplete(result: Reader.Result): Replay =
     result match {
-      case Reader.Result.ChessComplete(replay)         => Replay.Chess(replay)
-      case Reader.Result.ChessIncomplete(replay, _)    => Replay.Chess(replay)
-      case Reader.Result.DraughtsComplete(replay)      => Replay.Draughts(replay)
-      case Reader.Result.DraughtsIncomplete(replay, _) => Replay.Draughts(replay)
-      case Reader.Result.FairySFComplete(replay)       => Replay.FairySF(replay)
-      case Reader.Result.FairySFIncomplete(replay, _)  => Replay.FairySF(replay)
-      case Reader.Result.MancalaComplete(replay)       => Replay.Mancala(replay)
-      case Reader.Result.MancalaIncomplete(replay, _)  => Replay.Mancala(replay)
+      case Reader.Result.ChessComplete(replay)             => Replay.Chess(replay)
+      case Reader.Result.ChessIncomplete(replay, _)        => Replay.Chess(replay)
+      case Reader.Result.DraughtsComplete(replay)          => Replay.Draughts(replay)
+      case Reader.Result.DraughtsIncomplete(replay, _)     => Replay.Draughts(replay)
+      case Reader.Result.FairySFComplete(replay)           => Replay.FairySF(replay)
+      case Reader.Result.FairySFIncomplete(replay, _)      => Replay.FairySF(replay)
+      case Reader.Result.SamuraiComplete(replay)           => Replay.Samurai(replay)
+      case Reader.Result.SamuraiIncomplete(replay, _)      => Replay.Samurai(replay)
+      case Reader.Result.TogyzkumalakComplete(replay)      => Replay.Togyzkumalak(replay)
+      case Reader.Result.TogyzkumalakIncomplete(replay, _) => Replay.Togyzkumalak(replay)
     }
 
   def preprocess(user: Option[String]): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>

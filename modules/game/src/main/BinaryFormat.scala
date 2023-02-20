@@ -23,7 +23,8 @@ import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
 import strategygames.draughts
 import strategygames.fairysf
-import strategygames.mancala
+import strategygames.samurai
+import strategygames.togyzkumalak
 import strategygames.format
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -476,25 +477,61 @@ object BinaryFormat {
         .to(Map)
     }
 
-    def writeMancala(pieces: mancala.PieceMap): ByteArray = {
-      def posInt(pos: mancala.Pos): Int =
+    def writeSamurai(pieces: samurai.PieceMap): ByteArray = {
+      def posInt(pos: samurai.Pos): Int =
         (pieces get pos).fold(0) { case (piece, count) =>
           piece.player.fold(0, 128) + count
         }
-      ByteArray(mancala.Pos.all.map(posInt(_).toByte).toArray)
+      ByteArray(samurai.Pos.all.map(posInt(_).toByte).toArray)
     }
 
-    def readMancala(ba: ByteArray, variant: mancala.variant.Variant): mancala.PieceMap = {
-      def intPiece(int: Int): Option[(mancala.Piece, Int)] =
+    def readSamurai(ba: ByteArray, variant: samurai.variant.Variant): samurai.PieceMap = {
+      def intPiece(int: Int): Option[(samurai.Piece, Int)] =
         Some(
           (
-            mancala.Piece(PlayerIndex.fromP1((int & 128) == 0), variant.defaultRole),
+            samurai.Piece(PlayerIndex.fromP1((int & 128) == 0), variant.defaultRole),
             int & 127
           )
         )
-      (mancala.Pos.all zip ba.value).view
+      (samurai.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
+        }
+        .to(Map)
+    }
+
+    def writeTogyzkumalak(pieces: togyzkumalak.PieceMap): ByteArray = {
+      def posInt(pos: togyzkumalak.Pos): Int =
+        (pieces get pos).fold(0) {
+          case (piece, count) if piece.role == togyzkumalak.Role.defaultRole =>
+            count
+          case (piece, _) =>
+            piece.role.binaryInt
+
+        }
+      ByteArray(togyzkumalak.Pos.all.map(posInt(_).toByte).toArray)
+    }
+
+    def readTogyzkumalak(ba: ByteArray, variant: togyzkumalak.variant.Variant): togyzkumalak.PieceMap = {
+      def intPiece(player: PlayerIndex, int: Int): Option[(togyzkumalak.Piece, Int)] =
+        if (int <= 162)
+          Some(
+            (togyzkumalak.Piece(player, variant.defaultRole), int)
+          )
+        else
+          Some(
+            (
+              togyzkumalak.Piece(
+                player,
+                togyzkumalak.Role.binaryInt(int).getOrElse(variant.defaultRole)
+              ),
+              1
+            )
+          )
+      def unsignInt(int: Int) = if (int < 0) 256 + int else int
+      (togyzkumalak.Pos.all zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(pos.player, unsignInt(int)) map (pos -> _)
         }
         .to(Map)
     }
@@ -507,8 +544,10 @@ object BinaryFormat {
           draughts.Board.init(draughts.variant.Standard).pieces,
           draughts.variant.Standard
         )
-      case GameLogic.Mancala() => writeMancala(mancala.Board.init(mancala.variant.Oware).pieces)
-      case _                   => sys.error("Cant write to binary for lib")
+      case GameLogic.Samurai() => writeSamurai(samurai.Board.init(samurai.variant.Oware).pieces)
+      case GameLogic.Togyzkumalak() =>
+        writeTogyzkumalak(togyzkumalak.Board.init(togyzkumalak.variant.Togyzkumalak).pieces)
+      case _ => sys.error("Cant write to binary for lib")
     }
 
   }

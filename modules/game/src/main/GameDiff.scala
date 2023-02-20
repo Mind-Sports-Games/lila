@@ -14,6 +14,7 @@ import strategygames.{
   P1
 }
 import strategygames.chess.CheckCount
+import strategygames.togyzkumalak.Score
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
 import reactivemongo.api.bson._
@@ -99,6 +100,9 @@ object GameDiff {
 
     def pmnStorageWriter(pgnMoves: PgnMoves) =
       PmnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
+
+    def ptnStorageWriter(pgnMoves: PgnMoves) =
+      PtnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
 
     a.variant.gameLogic match {
       case GameLogic.Draughts() =>
@@ -199,11 +203,11 @@ object GameDiff {
             (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
           )
       }
-      case GameLogic.Mancala() => {
+      case GameLogic.Samurai() => {
         dTry(
           oldPgn,
           _.board match {
-            case Board.Mancala(b) => b.uciMoves.toVector
+            case Board.Samurai(b) => b.uciMoves.toVector
             case _                => sys.error("Wrong board type")
           },
           writeBytes compose pmnStorageWriter
@@ -211,12 +215,29 @@ object GameDiff {
         dTry(
           binaryPieces,
           _.board match {
-            case Board.Mancala(b) => b.pieces
+            case Board.Samurai(b) => b.pieces
             case _                => sys.error("Wrong board type")
           },
-          writeBytes compose BinaryFormat.piece.writeMancala
+          writeBytes compose BinaryFormat.piece.writeSamurai
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
+      }
+      case GameLogic.Togyzkumalak() => {
+        dTry(oldPgn, _.pgnMoves, writeBytes compose ptnStorageWriter)
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Togyzkumalak(b) => b.pieces
+            case _                     => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeTogyzkumalak
+        )
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        dOpt(
+          score,
+          _.history.score,
+          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+        )
       }
     }
 

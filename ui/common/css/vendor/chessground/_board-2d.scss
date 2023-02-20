@@ -65,6 +65,11 @@ $oware-board-files: (
   'dark-wood': 'oware_dark_wood_board.png',
 );
 
+$togyzkumalak-board-files: (
+  'blue': 'togyzkumalak_blue_board.png',
+  'wood': 'togyzkumalak_wood_board.png',
+);
+
 $chess-variants: (
   'standard',
   'chess960',
@@ -89,7 +94,9 @@ $xiangqi-variants: ('xiangqi'); // must use same board
 
 $flipello-variants: ('flipello'); // must use same board
 
-$mancala-variants: ('oware'); // must use same board
+$oware-variants: ('oware'); // must use same board
+
+$togyzkumalak-variants: ('togyzkumalak'); // must use same board
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
@@ -136,8 +143,14 @@ $mancala-variants: ('oware'); // must use same board
 }
 
 @each $color, $file in $oware-board-files {
-  .mancala-#{$color} .variant-oware.is2d cg-board {
-    background-image: url(../images/board/mancala/#{$file});
+  .oware-#{$color} .variant-oware.is2d cg-board {
+    background-image: url(../images/board/oware/#{$file});
+  }
+}
+
+@each $color, $file in $togyzkumalak-board-files {
+  .togyzkumalak-#{$color} .variant-togyzkumalak.is2d cg-board {
+    background-image: url(../images/board/togyzkumalak/#{$file});
   }
 }
 
@@ -200,7 +213,13 @@ $mancala-variants: ('oware'); // must use same board
 }
 
 @each $color, $file in $oware-board-files {
-  .mancala-#{$color} .is2d .variant-oware cg-board {
-    background-image: url(../images/board/mancala/#{$file});
+  .oware-#{$color} .is2d .variant-oware cg-board {
+    background-image: url(../images/board/oware/#{$file});
+  }
+}
+
+@each $color, $file in $togyzkumalak-board-files {
+  .togyzkumalak-#{$color} .is2d .variant-togyzkumalak cg-board {
+    background-image: url(../images/board/togyzkumalak/#{$file});
   }
 }

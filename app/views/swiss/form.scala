@@ -11,7 +11,7 @@ import lila.swiss.{ Swiss, SwissCondition, SwissForm }
 import lila.tournament.TournamentForm
 import lila.i18n.VariantKeys
 
-import strategygames.GameFamily
+import strategygames.{ GameFamily, GameGroup }
 
 object form {
 
@@ -247,7 +247,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     frag(
       form3.checkbox(
         form("medleyDefaults.onePerGameFamily"),
-        "Where possible, use one game per game family",
+        "Where possible, use one game per game group",
         klass = "medleyDefaults",
         displayed = false
       )
@@ -328,7 +328,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     frag(
       form3.checkbox(
         form("medleyGameFamilies.mancala"),
-        VariantKeys.gameFamilyName(GameFamily.Mancala()),
+        VariantKeys.gameGroupName(GameGroup.Mancala()),
         klass = "medleyGameFamily",
         displayed = false
       )

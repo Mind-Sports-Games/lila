@@ -24,6 +24,23 @@
     }
   }
 
+  .player-title {
+    display: flex;
+  }
+
+  .country {
+    margin-left: 0.5em;
+  }
+
+  .player-info {
+    display: flex;
+  }
+
+  .name {
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+  }
+
   .stats {
     @extend %flex-column;
 

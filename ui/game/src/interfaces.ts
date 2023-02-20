@@ -102,6 +102,7 @@ export interface Player {
   hold?: Hold;
   ratingDiff?: number;
   checks?: number;
+  score?: number;
   rating?: number;
   provisional?: string;
   engine?: boolean;

@@ -2,7 +2,7 @@ package lila.tournament
 
 import strategygames.ClockConfig
 import strategygames.format.FEN
-import strategygames.{ GameFamily, Mode, Speed }
+import strategygames.{ GameFamily, GameGroup, Mode, Speed }
 import strategygames.variant.Variant
 import org.joda.time.{ DateTime, Duration, Interval }
 import play.api.i18n.Lang
@@ -13,6 +13,7 @@ import lila.common.ThreadLocalRandom
 import lila.i18n.defaultLang
 import lila.rating.PerfType
 import lila.user.User
+import lila.i18n.VariantKeys
 
 case class Tournament(
     id: Tournament.ID,
@@ -210,12 +211,12 @@ case class Tournament(
 
   lazy val looksLikePrize = !isScheduled && lila.common.String.looksLikePrize(s"$name $description")
 
-  def medleyGameFamilies: Option[List[GameFamily]] = medleyVariants.map(
-    _.map(_.gameFamily).distinct.sortWith(_.name < _.name)
+  def medleyGameGroups: Option[List[GameGroup]] = medleyVariants.map(mvList =>
+    GameGroup.medley.filter(gg => gg.variants.exists(mvList.contains(_))).distinct.sortWith(_.name < _.name)
   )
 
-  def medleyGameFamiliesString: Option[String] =
-    medleyGameFamilies.map(_.map(_.name).mkString(", "))
+  def medleyGameGroupsString: Option[String] =
+    medleyGameGroups.map(_.map(VariantKeys.gameGroupName).mkString(", "))
 
   val minWaitingUsersForPairings: Int = if (botsAllowed) 1 else 2
 
