@@ -498,7 +498,7 @@ amazons_themes.map { |theme|
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.amazons.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+        '.amazons.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
@@ -511,7 +511,7 @@ amazons_themes.map { |theme|
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
             "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
       }
@@ -526,7 +526,7 @@ amazons_themes.map { |theme|
   classes_amazons_game = colors.map { |color|
     amazons_roles.map { |role|
       piece = (role[0] == 'q' ? color[0] : '') + role.upcase[0]
-      '.amazons.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+      '.amazons.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
         "background-image:url('/assets/piece/" + 'amazons/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
@@ -534,7 +534,7 @@ amazons_themes.map { |theme|
     colors.map { |color|
       amazons_roles.map { |role|
         piece = (role[0] == 'q' ? color[0] : '') + role.upcase[0]
-        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
           "background-image:url('/assets/piece/" + 'amazons/' + name + "/" + piece + "." + ext + "')}"
       }
     }

@@ -1,8 +1,8 @@
-.amazons.is2d .q-piece.p2 {background-image:url('/assets/piece/amazons/arrow/wQ.svg')}
-.amazons.is2d .p-piece.p2 {background-image:url('/assets/piece/amazons/arrow/P.svg')}
-.amazons.is2d .q-piece.p1 {background-image:url('/assets/piece/amazons/arrow/bQ.svg')}
+.amazons.is2d .q-piece.p1 {background-image:url('/assets/piece/amazons/arrow/wQ.svg')}
 .amazons.is2d .p-piece.p1 {background-image:url('/assets/piece/amazons/arrow/P.svg')}
-.is2d .variant-amazons .q-piece.p2 {background-image:url('/assets/piece/amazons/arrow/wQ.svg')}
-.is2d .variant-amazons .p-piece.p2 {background-image:url('/assets/piece/amazons/arrow/P.svg')}
-.is2d .variant-amazons .q-piece.p1 {background-image:url('/assets/piece/amazons/arrow/bQ.svg')}
+.amazons.is2d .q-piece.p2 {background-image:url('/assets/piece/amazons/arrow/bQ.svg')}
+.amazons.is2d .p-piece.p2 {background-image:url('/assets/piece/amazons/arrow/P.svg')}
+.is2d .variant-amazons .q-piece.p1 {background-image:url('/assets/piece/amazons/arrow/wQ.svg')}
 .is2d .variant-amazons .p-piece.p1 {background-image:url('/assets/piece/amazons/arrow/P.svg')}
+.is2d .variant-amazons .q-piece.p2 {background-image:url('/assets/piece/amazons/arrow/bQ.svg')}
+.is2d .variant-amazons .p-piece.p2 {background-image:url('/assets/piece/amazons/arrow/P.svg')}
