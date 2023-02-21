@@ -8,15 +8,15 @@ import lila.db.ByteArray
 
 class BinaryClockTest extends Specification {
 
-  val _0_                         = "00000000"
-  val since                       = org.joda.time.DateTime.now.minusHours(1)
-  def writeBytes(c: FischerClock) = BinaryFormat.fischerClock(since) write c
+  val _0_                  = "00000000"
+  val since                = org.joda.time.DateTime.now.minusHours(1)
+  def writeBytes(c: Clock) = BinaryFormat.fischerClock(since) write c
   def readBytes(bytes: ByteArray, berserk: Boolean = false): FischerClock =
     (BinaryFormat.fischerClock(since).read(bytes, berserk, false))(P1)
-  def isomorphism(c: FischerClock): FischerClock = readBytes(writeBytes(c))
+  def isomorphism(c: Clock): FischerClock = readBytes(writeBytes(c))
 
-  def write(c: FischerClock): List[String] = writeBytes(c).showBytes.split(',').toList
-  def read(bytes: List[String])            = readBytes(ByteArray.parseBytes(bytes))
+  def write(c: Clock): List[String] = writeBytes(c).showBytes.split(',').toList
+  def read(bytes: List[String])     = readBytes(ByteArray.parseBytes(bytes))
 
   "binary Fischer Clock" should {
     val clock  = FischerClock(120, 2)
