@@ -522,7 +522,7 @@ object BinaryFormat {
           Some(
             (
               togyzkumalak.Piece(
-                player,
+                !player,
                 togyzkumalak.Role.binaryInt(int).getOrElse(variant.defaultRole)
               ),
               1
