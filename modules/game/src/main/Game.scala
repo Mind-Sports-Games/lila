@@ -8,7 +8,10 @@ import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
   P2,
   Centis,
+  ByoyomiClock,
   Clock,
+  ClockConfig,
+  FischerClock,
   Player => PlayerIndex,
   Game => StratGame,
   GameLogic,
@@ -35,7 +38,7 @@ case class Game(
     p1Player: Player,
     p2Player: Player,
     chess: StratGame,
-    loadClockHistory: Clock => Option[ClockHistory] = _ => Game.someEmptyClockHistory,
+    loadClockHistory: Clock => Option[ClockHistory] = Game.someEmptyClockHistory,
     status: Status,
     daysPerTurn: Option[Int],
     binaryMoveTimes: Option[ByteArray] = None,
@@ -47,7 +50,7 @@ case class Game(
     pdnStorage: Option[PdnStorage] = None
 ) {
 
-  lazy val clockHistory = chess.clock flatMap loadClockHistory
+  lazy val clockHistory = chess.clock.flatMap(loadClockHistory)
 
   def situation = chess.situation
   def board     = chess.situation.board
@@ -512,7 +515,7 @@ case class Game(
     clock ?? { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
         c.outOfTime(turnPlayerIndex, withGrace) || {
-          !c.isRunning && c.players.exists(_.elapsed.centis > 0)
+          !c.isRunning && c.clockPlayerExists(_.elapsed.centis > 0)
         }
       }
     }
@@ -525,6 +528,20 @@ case class Game(
   def isSwitchable = nonAi && (isCorrespondence || isSimul)
 
   def hasClock = clock.isDefined
+
+  def hasFischerClock = clock.fold(false)(c =>
+    c match {
+      case _: FischerClock => true
+      case _               => false
+    }
+  )
+
+  def hasByoyomiClock = clock.fold(false)(c =>
+    c match {
+      case _: ByoyomiClock => true
+      case _               => false
+    }
+  )
 
   def hasCorrespondenceClock = daysPerTurn.isDefined
 
@@ -726,7 +743,7 @@ object Game {
   //  game.variant == strategygames.chess.variant.Horde &&
   //    game.createdAt.isBefore(Game.hordeP1PawnsSince)
 
-  def allowRated(variant: Variant, clock: Option[Clock.Config]) =
+  def allowRated(variant: Variant, clock: Option[ClockConfig]) =
     variant.standard || {
       clock ?? { c =>
         c.estimateTotalTime >= Centis(3000) &&
@@ -759,7 +776,7 @@ object Game {
       isBoardCompatible(c.config)
     }
 
-  def isBoardCompatible(clock: Clock.Config): Boolean =
+  def isBoardCompatible(clock: ClockConfig): Boolean =
     Speed(clock) >= Speed.Rapid
 
   def isBotCompatible(game: Game): Boolean = {
@@ -771,7 +788,12 @@ object Game {
   private[game] val emptyCheckCount = CheckCount(0, 0)
   private[game] val emptyScore      = Score(0, 0)
 
-  private[game] val someEmptyClockHistory = Some(ClockHistory())
+  private[game] val someEmptyFischerClockHistory = Some(FischerClockHistory())
+  private[game] val someEmptyByoyomiClockHistory = Some(ByoyomiClockHistory())
+  private[game] def someEmptyClockHistory(c: Clock) = c match {
+    case _: FischerClock => someEmptyFischerClockHistory
+    case _: ByoyomiClock => someEmptyByoyomiClockHistory
+  }
 
   def make(
       chess: StratGame,
@@ -835,6 +857,7 @@ object Game {
     val turns             = "t"
     val startedAtTurn     = "st"
     val clock             = "c"
+    val clockType         = "ct"
     val positionHashes    = "ph"
     val checkCount        = "cc"
     val score             = "sc"
@@ -846,6 +869,8 @@ object Game {
     val moveTimes         = "mt"
     val p1ClockHistory    = "cw"
     val p2ClockHistory    = "cb"
+    val periodsP1         = "pp0"
+    val periodsP2         = "pp1"
     val rated             = "ra"
     val analysed          = "an"
     val lib               = "l"
@@ -896,10 +921,41 @@ object CastleLastMove {
   }
 }
 
-case class ClockHistory(
+// At what turns we entered a new period
+case class PeriodEntries(
+    p1: Vector[Int],
+    p2: Vector[Int]
+) {
+
+  def apply(player: PlayerIndex) =
+    player.fold(p1, p2)
+
+  def update(player: PlayerIndex, f: Vector[Int] => Vector[Int]) =
+    player.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
+
+}
+
+object PeriodEntries {
+  val default    = PeriodEntries(Vector(), Vector())
+  val maxPeriods = 5
+}
+
+sealed trait ClockHistory {
+  val p1: Vector[Centis]
+  val p2: Vector[Centis]
+  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
+  def record(playerIndex: PlayerIndex, clock: Clock): ClockHistory
+  def reset(playerIndex: PlayerIndex): ClockHistory
+  def apply(playerIndex: PlayerIndex): Vector[Centis]
+  def last(playerIndex: PlayerIndex): Option[Centis]
+  def size: Int
+  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis]
+}
+
+case class FischerClockHistory(
     p1: Vector[Centis] = Vector.empty,
     p2: Vector[Centis] = Vector.empty
-) {
+) extends ClockHistory {
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
@@ -921,4 +977,76 @@ case class ClockHistory(
       firstMoveBy.fold(p1, p2),
       firstMoveBy.fold(p2, p1)
     )
+}
+
+case class ByoyomiClockHistory(
+    p1: Vector[Centis] = Vector.empty,
+    p2: Vector[Centis] = Vector.empty,
+    periodEntries: PeriodEntries = PeriodEntries.default
+) extends ClockHistory {
+
+  def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
+
+  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
+    updateInternal(playerIndex, f)
+
+  def updateInternal(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ByoyomiClockHistory =
+    playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
+
+  def updatePeriods(playerIndex: PlayerIndex, f: Vector[Int] => Vector[Int]): ClockHistory =
+    copy(periodEntries = periodEntries.update(playerIndex, f))
+
+  def record(playerIndex: PlayerIndex, clock: Clock): ClockHistory =
+    // TODO: it is very unlikely that this is correct.
+    record(playerIndex, clock, 0)
+
+  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory = {
+    val curClock        = clock currentClockFor playerIndex
+    val initiatePeriods = clock.config.startsAtZero && periodEntries(playerIndex).isEmpty
+    val isUsingByoyomi  = curClock.periods > 0 && !initiatePeriods
+
+    val timeToStore = if (isUsingByoyomi) clock.lastMoveTimeOf(playerIndex) else curClock.time
+
+    updateInternal(playerIndex, _ :+ timeToStore)
+      .updatePeriods(
+        playerIndex,
+        _.padTo(initiatePeriods ?? 1, 0).padTo(curClock.periods atMost PeriodEntries.maxPeriods, turn)
+      )
+  }
+
+  def reset(playerIndex: PlayerIndex) =
+    updateInternal(playerIndex, _ => Vector.empty).updatePeriods(playerIndex, _ => Vector.empty)
+
+  def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
+
+  def size = p1.size + p2.size
+
+  def firstEnteredPeriod(playerIndex: PlayerIndex): Option[Int] =
+    periodEntries(playerIndex).headOption
+
+  def countSpentPeriods(playerIndex: PlayerIndex, turn: Int) =
+    periodEntries(playerIndex).count(_ == turn)
+
+  def refundSpentPeriods(playerIndex: PlayerIndex, turn: Int) =
+    updatePeriods(playerIndex, _.filterNot(_ == turn))
+
+  private def padWithByo(playerIndex: PlayerIndex, byo: Centis): Vector[Centis] = {
+    val times = apply(playerIndex)
+    times.take(firstEnteredPeriod(playerIndex).fold(times.size)(_ - 1)).padTo(times.size, byo)
+  }
+
+  // first state is of the playerIndex that moved first.
+  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
+    // TODO: it is very unlikely that this is the correct implementation
+    bothClockStates(firstMoveBy, Centis(0))
+
+  // first state is of the playerIndex that moved first.
+  def bothClockStates(firstMoveBy: PlayerIndex, byo: Centis): Vector[Centis] = {
+    val p1Times = padWithByo(PlayerIndex.P1, byo)
+    val p2Times = padWithByo(PlayerIndex.P2, byo)
+    Sequence.interleave(
+      firstMoveBy.fold(p1Times, p2Times),
+      firstMoveBy.fold(p2Times, p1Times)
+    )
+  }
 }

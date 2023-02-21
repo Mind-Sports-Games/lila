@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.{ Status => S, Clock, Mode, Player => PlayerIndex, P2, P1, GameLogic }
+import strategygames.{ Status => S, ClockConfig, Mode, Player => PlayerIndex, P2, P1, GameLogic }
 import strategygames.variant.Variant
 import controllers.routes
 import play.api.i18n.Lang
@@ -73,10 +73,10 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
 
   def variantNameNoCtx(variant: Variant) = variantName(variant)(defaultLang)
 
-  def shortClockName(clock: Option[Clock.Config])(implicit lang: Lang): Frag =
+  def shortClockName(clock: Option[ClockConfig])(implicit lang: Lang): Frag =
     clock.fold[Frag](trans.unlimited())(shortClockName)
 
-  def shortClockName(clock: Clock.Config): Frag = raw(clock.show)
+  def shortClockName(clock: ClockConfig): Frag = raw(clock.show)
 
   def shortClockName(game: Game)(implicit lang: Lang): Frag =
     game.correspondenceClock

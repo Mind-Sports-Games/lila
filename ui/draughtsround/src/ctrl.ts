@@ -14,7 +14,7 @@ import * as cg from 'draughtsground/types';
 import { Config as CgConfig } from 'draughtsground/config';
 import { Api as DgApi } from 'draughtsground/api';
 import { countGhosts } from 'draughtsground/fen';
-import { ClockController } from './clock/clockCtrl';
+import { ClockController, isByoyomi } from './clock/clockCtrl';
 import { CorresClockController, ctrl as makeCorresClock } from './corresClock/corresClockCtrl';
 import MoveOn from './moveOn';
 import TransientMove from './transientMove';
@@ -107,6 +107,7 @@ export default class RoundController {
     if (d.clock)
       this.clock = new ClockController(d, {
         onFlag: this.socket.outoftime,
+        redraw: this.redraw,
         soundPlayerIndex: d.simul || d.player.spectator || !d.pref.clockSound ? undefined : d.player.playerIndex,
         nvui: !!this.nvui,
       });
@@ -388,7 +389,10 @@ export default class RoundController {
       this.shouldSendMoveTime = true;
       const oc = o.clock,
         delay = playing && activePlayerIndex ? 0 : oc.lag || 1;
-      if (this.clock) this.clock.setClock(d, oc.p1, oc.p2, delay);
+      if (this.clock && this.clock.byoyomiData) {
+        console.log('apiMove setClock');
+        this.clock.setClock(d, oc.p1, oc.p2, oc.p1Periods, oc.p2Periods, delay);
+      } else if (this.clock) this.clock.setClock(d, oc.p1, oc.p2, delay);
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
     if (this.data.expiration) {
@@ -432,7 +436,11 @@ export default class RoundController {
     this.data = d;
     this.clearJust();
     this.shouldSendMoveTime = false;
-    if (this.clock) this.clock.setClock(d, d.clock!.p1, d.clock!.p2);
+    const clock = d.clock;
+    if (this.clock && clock && isByoyomi(clock)) {
+      console.log('reload setClock');
+      this.clock.setClock(d, clock.p1, clock.p2, clock.p1Periods, clock.p2Periods);
+    } else if (this.clock) this.clock.setClock(d, d.clock!.p1, d.clock!.p2);
     if (this.corresClock) this.corresClock.update(d.correspondence.p1, d.correspondence.p2);
     if (!this.replaying()) ground.reload(this);
     this.setTitle();
@@ -475,7 +483,11 @@ export default class RoundController {
     this.moveOn.next();
     this.setQuietMode();
     this.setLoading(false);
-    if (this.clock && o.clock) this.clock.setClock(d, o.clock.wc * 0.01, o.clock.bc * 0.01);
+    if (this.clock && o.clock && this.clock.byoyomiData) {
+      console.log('endWithData setClock');
+      this.clock.setClock(d, o.clock.p1 * 0.01, o.clock.p2 * 0.01, o.clock.p1Periods, o.clock.p2Periods);
+    }
+    if (this.clock && o.clock) this.clock.setClock(d, o.clock.p1 * 0.01, o.clock.p2 * 0.01);
     this.redraw();
     this.autoScroll();
     this.onChange();

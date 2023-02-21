@@ -1,6 +1,18 @@
 package lila.game
 
-import strategygames.{ P2, Board, Centis, Clock, Player => PlayerIndex, GameLogic, History, PocketData, P1 }
+import strategygames.{
+  P2,
+  Board,
+  ByoyomiClock,
+  Centis,
+  Clock,
+  FischerClock,
+  Player => PlayerIndex,
+  GameLogic,
+  History,
+  PocketData,
+  P1
+}
 import strategygames.chess.CheckCount
 import strategygames.togyzkumalak.Score
 import strategygames.draughts.KingMoves
@@ -17,7 +29,10 @@ object GameDiff {
   private type Set   = (String, BSONValue)
   private type Unset = (String, BSONValue)
 
-  private type ClockHistorySide = (Centis, Vector[Centis], Boolean)
+  private sealed trait ClockType
+  private case class FischerClockType() extends ClockType
+  private case class ByoyomiClockType() extends ClockType
+  private type ClockHistorySide = (ClockType, Centis, Vector[Centis], Boolean)
 
   type Diff = (List[Set], List[Unset])
 
@@ -60,11 +75,24 @@ object GameDiff {
         history <- g.clockHistory
         curPlayerIndex = g.turnPlayerIndex
         times          = history(playerIndex)
-      } yield (clk.limit, times, g.flagged has playerIndex)
+      } yield (
+        clk match {
+          case _: FischerClock => FischerClockType()
+          case _: ByoyomiClock => ByoyomiClockType()
+        },
+        clk.limit,
+        times,
+        g.flagged has playerIndex
+      )
 
     def clockHistoryToBytes(o: Option[ClockHistorySide]) =
-      o.flatMap { case (x, y, z) =>
-        ByteArrayBSONHandler.writeOpt(BinaryFormat.clockHistory.writeSide(x, y, z))
+      o.flatMap { case (clockType, x, y, z) =>
+        clockType match {
+          case _: FischerClockType =>
+            ByteArrayBSONHandler.writeOpt(BinaryFormat.fischerClockHistory.writeSide(x, y, z))
+          case _: ByoyomiClockType =>
+            ByteArrayBSONHandler.writeOpt(BinaryFormat.byoyomiClockHistory.writeSide(x, y, z))
+        }
       }
 
     def pfnStorageWriter(pgnMoves: PgnMoves) =

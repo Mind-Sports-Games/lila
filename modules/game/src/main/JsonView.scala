@@ -6,9 +6,11 @@ import strategygames.format.{ FEN, Forsyth }
 import strategygames.opening.FullOpening
 import strategygames.{
   P2,
+  ByoyomiClock,
   Clock,
   Player => PlayerIndex,
   Division,
+  FischerClock,
   GameLogic,
   Pocket,
   PocketData,
@@ -215,14 +217,33 @@ object JsonView {
     }
 
   implicit val clockWriter: OWrites[Clock] = OWrites { c =>
-    Json.obj(
-      "running"   -> c.isRunning,
-      "initial"   -> c.limitSeconds,
-      "increment" -> c.incrementSeconds,
-      "p1"        -> c.remainingTime(P1).toSeconds,
-      "p2"        -> c.remainingTime(P2).toSeconds,
-      "emerg"     -> c.config.emergSeconds
-    )
+    c match {
+      case fc: FischerClock =>
+        Json.obj(
+          "running"   -> fc.isRunning,
+          "initial"   -> fc.limitSeconds,
+          "increment" -> fc.incrementSeconds,
+          "p1"        -> fc.remainingTime(P1).toSeconds,
+          "p2"        -> fc.remainingTime(P2).toSeconds,
+          "emerg"     -> fc.config.emergSeconds
+        )
+      case bc: ByoyomiClock => {
+        val p1Clock = bc.currentClockFor(P1)
+        val p2Clock  = bc.currentClockFor(P2)
+        Json.obj(
+          "running"   -> bc.isRunning,
+          "initial"   -> bc.limitSeconds,
+          "increment" -> bc.incrementSeconds,
+          "p1"        -> p1Clock.time.toSeconds,
+          "p2"        -> p2Clock.time.toSeconds,
+          "emerg"     -> bc.config.emergSeconds,
+          "byoyomi"   -> bc.byoyomiSeconds,
+          "periods"   -> bc.periodsTotal,
+          "p1Periods" -> p1Clock.periods,
+          "p2Periods" -> p2Clock.periods
+        )
+      }
+    }
   }
 
   implicit val correspondenceWriter: OWrites[CorrespondenceClock] = OWrites { c =>

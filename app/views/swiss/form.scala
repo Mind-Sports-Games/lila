@@ -34,7 +34,9 @@ object form {
             fields.medley,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
-            fields.clock,
+            fields.clockRow1,
+            fields.useByoyomi,
+            fields.clockRow2,
             form3.split(fields.description, fields.position),
             form3.split(
               fields.roundInterval,
@@ -75,7 +77,9 @@ object form {
             fields.medley,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
-            fields.clock,
+            fields.clockRow1,
+            fields.useByoyomi,
+            fields.clockRow2,
             form3.split(fields.description, fields.position),
             form3.split(
               fields.roundInterval,
@@ -337,7 +341,11 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         disabled = disabledAfterStart
       )
     )
-  def clock =
+
+  def useByoyomi =
+    frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()))
+
+  def clockRow1 =
     form3.split(
       form3.group(form("clock.limit"), trans.clockInitialTime(), half = true)(
         form3.select(_, SwissForm.clockLimitChoices, disabled = disabledAfterStart)
@@ -346,6 +354,16 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         form3.select(_, TournamentForm.clockIncrementChoices, disabled = disabledAfterStart)
       )
     )
+  def clockRow2 =
+    form3.split(
+      form3.group(form("clock.byoyomi"), trans.clockByoyomi(), half = true)(
+        form3.select(_, SwissForm.clockByoyomiChoices, disabled = disabledAfterStart)
+      ),
+      form3.group(form("clock.periods"), trans.numberOfPeriods(), half = true)(
+        form3.select(_, TournamentForm.periodsChoices, disabled = disabledAfterStart)
+      )
+    )
+
   def roundInterval =
     form3.group(form("roundInterval"), frag("Interval between rounds"), half = true)(
       form3.select(_, SwissForm.roundIntervalChoices)
