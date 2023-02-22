@@ -744,6 +744,7 @@ export default class RoundController {
   };
 
   setBerserk = (playerIndex: PlayerIndex): void => {
+    if (this.clock) this.clock.setBerserk(playerIndex);
     if (this.goneBerserk[playerIndex]) return;
     this.goneBerserk[playerIndex] = true;
     if (playerIndex !== this.data.player.playerIndex) playstrategy.sound.play('berserk');

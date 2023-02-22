@@ -356,10 +356,10 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     )
   def clockRow2 =
     form3.split(
-      form3.group(form("clock.byoyomi"), trans.clockByoyomi(), half = true)(
+      form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
         form3.select(_, SwissForm.clockByoyomiChoices, disabled = disabledAfterStart)
       ),
-      form3.group(form("clock.periods"), trans.numberOfPeriods(), half = true)(
+      form3.group(form("clock.periods"), trans.numberOfPeriods(), klass = "byoyomiPeriods", half = true)(
         form3.select(_, TournamentForm.periodsChoices, disabled = disabledAfterStart)
       )
     )
