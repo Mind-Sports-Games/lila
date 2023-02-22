@@ -81,8 +81,6 @@ export class ByoyomiCtrlData {
 
   totalPeriods: number;
   curPeriods: PlayerIndexMap<number> = { p1: 0, p2: 0 };
-  // TODO: byoyomi Why is this duplicated between here and the controller?
-  goneBerserk: PlayerIndexMap<boolean> = { p1: false, p2: false };
 
   byoEmergeS: Seconds;
 }
@@ -113,6 +111,7 @@ export class ClockController {
   } as PlayerIndexMap<ClockElements>;
 
   byoyomiData?: ByoyomiCtrlData;
+  goneBerserk: PlayerIndexMap<boolean> = { p1: false, p2: false };
 
   private tickCallback?: number;
 
@@ -134,11 +133,11 @@ export class ClockController {
       this.byoyomiData.curPeriods['p1'] = cdata.p1Periods ?? 0;
       this.byoyomiData.curPeriods['p2'] = cdata.p2Periods ?? 0;
 
-      this.byoyomiData.goneBerserk[d.player.playerIndex] = !!d.player.berserk;
-      this.byoyomiData.goneBerserk[d.opponent.playerIndex] = !!d.opponent.berserk;
-
       this.byoyomiData.byoEmergeS = Math.max(3, this.byoyomiData.byoyomi * 0.1);
     }
+
+    this.goneBerserk[d.player.playerIndex] = !!d.player.berserk;
+    this.goneBerserk[d.opponent.playerIndex] = !!d.opponent.berserk;
 
     this.showBar = cdata.showBar && !this.opts.nvui;
     this.barTime = {
@@ -176,7 +175,6 @@ export class ClockController {
   timeRatio = (millis: number, playerIndex: PlayerIndex): number =>
     Math.min(1, millis * this.timeRatioDivisor[playerIndex]);
 
-  //setClock = (d: RoundData, p1: Seconds, p2: Seconds, delay: Centis = 0) => {
   setClock = (d: RoundData, p1: Seconds, p2: Seconds, p1Per = 0, p2Per = 0, delay: Centis = 0) => {
     const isClockRunning = game.playable(d) && (game.playedTurns(d) > 1 || d.clock!.running),
       delayMs = delay * 10;
@@ -193,6 +191,10 @@ export class ClockController {
     }
 
     if (isClockRunning) this.scheduleTick(this.times[d.game.player], delayMs);
+  };
+
+  setBerserk = (playerIndex: PlayerIndex): void => {
+    this.goneBerserk[playerIndex] = true;
   };
 
   addTime = (playerIndex: PlayerIndex, time: Centis): void => {
@@ -245,7 +247,7 @@ export class ClockController {
     if (
       millis === 0 &&
       this.byoyomiData &&
-      !this.byoyomiData.goneBerserk[playerIndex] &&
+      !this.goneBerserk[playerIndex] &&
       this.byoyomiData.byoyomi > 0 &&
       this.byoyomiData.curPeriods[playerIndex] < this.byoyomiData.totalPeriods
     ) {
