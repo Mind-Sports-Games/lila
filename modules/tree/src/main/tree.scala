@@ -2,7 +2,7 @@ package lila.tree
 
 import strategygames.Centis
 import strategygames.format.pgn.{ Glyph, Glyphs }
-import strategygames.format.{ FEN, UciCharPair, Uci }
+import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.opening.FullOpening
 import strategygames.{ GameLogic, Pocket, PocketData, Pos, Role }
 import play.api.libs.json._
@@ -38,6 +38,7 @@ sealed trait Node {
   def moveOption: Option[Uci.WithSan]
 
   // who's playerIndex plays next
+  // TODO: Wrong for Amazons
   def playerIndex = strategygames.Player.fromPly(ply)
 
   def mainlineNodeList: List[Node] =
@@ -171,7 +172,7 @@ object Node {
     object Author {
       case class User(id: String, titleName: String) extends Author
       case class External(name: String)              extends Author
-      case object PlayStrategy                            extends Author
+      case object PlayStrategy                       extends Author
       case object Unknown                            extends Author
     }
     def sanitize(text: String) =
@@ -224,18 +225,21 @@ object Node {
   // put all that shit somewhere else
   implicit private val pocketWriter: OWrites[Pocket] = OWrites { v =>
     JsObject(
-      Role.storable(v.roles.headOption match {
-        case Some(r) => r match {
-          case Role.ChessRole(_)   => GameLogic.Chess()
-          case Role.FairySFRole(_) => GameLogic.FairySF()
-          case _ => sys.error("Pocket not implemented for GameLogic")
+      Role
+        .storable(v.roles.headOption match {
+          case Some(r) =>
+            r match {
+              case Role.ChessRole(_)   => GameLogic.Chess()
+              case Role.FairySFRole(_) => GameLogic.FairySF()
+              case _                   => sys.error("Pocket not implemented for GameLogic")
+            }
+          case None => GameLogic.Chess()
+        })
+        .flatMap { role =>
+          Some(v.roles.count(role ==)).filter(0 <).map { count =>
+            role.groundName -> JsNumber(count)
+          }
         }
-        case None => GameLogic.Chess()
-      }).flatMap { role =>
-        Some(v.roles.count(role ==)).filter(0 <).map { count =>
-          role.groundName -> JsNumber(count)
-        }
-      }
     )
   }
   implicit private val pocketDataWriter: OWrites[PocketData] = OWrites { v =>
@@ -278,7 +282,7 @@ object Node {
   implicit val commentAuthorWrites: Writes[Comment.Author] = Writes[Comment.Author] {
     case Comment.Author.User(id, name) => Json.obj("id" -> id, "name" -> name)
     case Comment.Author.External(name) => JsString(s"${name.trim}")
-    case Comment.Author.PlayStrategy        => JsString("playstrategy")
+    case Comment.Author.PlayStrategy   => JsString("playstrategy")
     case Comment.Author.Unknown        => JsNull
   }
   implicit val commentWriter  = Json.writes[Node.Comment]
@@ -306,8 +310,8 @@ object Node {
         val comments = node.comments.list.flatMap(_.removeMeta)
         Json
           .obj(
-            "ply" -> ply,
-            "fen" -> fen.value,
+            "ply"         -> ply,
+            "fen"         -> fen.value,
             "dropsByRole" -> DropsByRole.json(dropsByRole.getOrElse(Map.empty))
           )
           .add("id", idOption.map(_.toString))
@@ -320,12 +324,15 @@ object Node {
           .add("glyphs", glyphs.nonEmpty)
           .add("shapes", if (shapes.list.nonEmpty) Some(shapes.list) else None)
           .add("opening", opening)
-          .add("dests", dests.map { dst =>
-            captureLength match {
-              case Some(capts) => "#" + capts.toString + " " + destString(dst)
-              case _ => destString(dst)
+          .add(
+            "dests",
+            dests.map { dst =>
+              captureLength match {
+                case Some(capts) => "#" + capts.toString + " " + destString(dst)
+                case _           => destString(dst)
+              }
             }
-          })
+          )
           .add("destsUci", destsUci)
           .add("captLen", captureLength)
           .add(

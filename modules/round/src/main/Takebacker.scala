@@ -25,7 +25,8 @@ final private class Takebacker(
           {
             if (
               pov.opponent.proposeTakebackAt == pov.game.turns && playerIndex == PlayerIndex.fromPly(
-                pov.opponent.proposeTakebackAt
+                pov.opponent.proposeTakebackAt,
+                pov.game.variant.plysPerTurn
               )
             ) single(game)
             else double(game)

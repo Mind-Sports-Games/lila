@@ -585,7 +585,7 @@ case class Game(
   def onePlayerHasMoved    = playedTurns > 0
   def bothPlayersHaveMoved = playedTurns > 1
 
-  def startPlayerIndex = PlayerIndex.fromPly(chess.startedAtTurn)
+  def startPlayerIndex = PlayerIndex.fromPly(chess.startedAtTurn, variant.plysPerTurn)
 
   def playerMoves(playerIndex: PlayerIndex): Int =
     if (playerIndex == startPlayerIndex) (playedTurns + 1) / 2

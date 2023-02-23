@@ -17,6 +17,7 @@ case class Step(
 ) {
 
   // who's playerIndex plays next
+  // TODO: wrong for Amazons
   def playerIndex = PlayerIndex.fromPly(ply)
 
   def toJson = Step.stepJsonWriter writes this

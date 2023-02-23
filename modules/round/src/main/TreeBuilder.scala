@@ -71,12 +71,13 @@ object TreeBuilder {
             case (Situation.FairySF(_)) =>
               init.situation.dropsByRole
             case _ => None
-          },
+          }
         )
         def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
           val fen    = Forsyth.>>(g.situation.board.variant.gameLogic, g)
           val info   = infos lift (index - 1)
           val advice = advices get g.turns
+          val player = !PlayerIndex.fromPly(g.turns, g.situation.board.variant.plysPerTurn)
           val branch = Branch(
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.turns,
@@ -103,7 +104,7 @@ object TreeBuilder {
               drawOfferPlies(g.turns)
                 .option(
                   makePlayStrategyComment(
-                    s"${g.situation.board.variant.playerNames(!PlayerIndex.fromPly(g.turns))} offers draw"
+                    s"${g.situation.board.variant.playerNames(player)} offers draw"
                   )
                 )
                 .toList :::

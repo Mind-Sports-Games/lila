@@ -168,6 +168,7 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeFairySF
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
         if (a.variant.dropsVariant)
           dOpt(
             pocketData,
@@ -193,6 +194,7 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeSamurai
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
       }
       case GameLogic.Togyzkumalak() => {
         dTry(oldPgn, _.pgnMoves, writeBytes compose ptnStorageWriter)
@@ -205,6 +207,7 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeTogyzkumalak
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
         dOpt(
           score,
           _.history.score,

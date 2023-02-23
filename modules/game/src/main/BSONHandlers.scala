@@ -349,12 +349,12 @@ object BSONHandlers {
     def readFairySFGame(r: BSON.Reader): Game = {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn   = r intD F.startedAtTurn
+      val gameVariant     = FairySFVariant(r intD F.variant) | FairySFStandard
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex.fromPly(plies)
+      val turnPlayerIndex = PlayerIndex.fromPly(plies, gameVariant.plysPerTurn)
       val createdAt       = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
-      val gameVariant = FairySFVariant(r intD F.variant) | FairySFStandard
 
       val decoded = r.bytesO(F.huffmanPgn).map { PfnStorage.Huffman.decode(_, playedPlies) } | {
         //val clm      = r.get[CastleLastMove](F.castleLastMove)
@@ -364,7 +364,8 @@ object BSONHandlers {
           pieces = BinaryFormat.piece.readFairySF(r bytes F.binaryPieces, gameVariant),
           positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
           //unmovedRooks = chess.UnmovedRooks.default,
-          lastMove = None,
+          lastMove =
+            (r strO F.historyLastMove) flatMap (uci => fairysf.format.Uci.apply(gameVariant.gameFamily, uci)),
           //castles = Castles.none,
           halfMoveClock = pgnMoves.reverse.indexWhere(san =>
             san.contains("x") || san.headOption.exists(_.isLower)
@@ -458,7 +459,7 @@ object BSONHandlers {
           pgnMoves = pgnMoves,
           pieces = BinaryFormat.piece.readSamurai(r bytes F.binaryPieces, gameVariant),
           positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
-          lastMove = None,
+          lastMove = (r strO F.historyLastMove) flatMap (samurai.format.Uci.apply),
           halfMoveClock = pgnMoves.reverse.indexWhere(san =>
             san.contains("x") || san.headOption.exists(_.isLower)
           ) atLeast 0
@@ -540,7 +541,7 @@ object BSONHandlers {
           pgnMoves = pgnMoves,
           pieces = BinaryFormat.piece.readTogyzkumalak(r bytes F.binaryPieces, gameVariant),
           positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
-          lastMove = None,
+          lastMove = (r strO F.historyLastMove) flatMap (togyzkumalak.format.Uci.apply),
           halfMoveClock = pgnMoves.reverse.indexWhere(san =>
             san.contains("x") || san.headOption.exists(_.isLower)
           ) atLeast 0
@@ -687,13 +688,15 @@ object BSONHandlers {
             }
           case GameLogic.FairySF() =>
             $doc(
-              F.oldPgn -> PfnStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.oldPgn -> PfnStorage.OldBin
+                .encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
               F.binaryPieces -> BinaryFormat.piece.writeFairySF(o.board match {
                 case Board.FairySF(board) => board.pieces
                 case _                    => sys.error("invalid fairysf board")
               }),
-              F.positionHashes -> o.history.positionHashes,
-              F.pocketData     -> o.board.pocketData
+              F.positionHashes  -> o.history.positionHashes,
+              F.historyLastMove -> o.history.lastMove.map(_.uci),
+              F.pocketData      -> o.board.pocketData
             )
           case GameLogic.Samurai() =>
             $doc(
@@ -702,7 +705,8 @@ object BSONHandlers {
                 case Board.Samurai(board) => board.pieces
                 case _                    => sys.error("invalid samurai board")
               }),
-              F.positionHashes -> o.history.positionHashes
+              F.positionHashes  -> o.history.positionHashes,
+              F.historyLastMove -> o.history.lastMove.map(_.uci)
             )
           case GameLogic.Togyzkumalak() =>
             $doc(
@@ -711,8 +715,9 @@ object BSONHandlers {
                 case Board.Togyzkumalak(board) => board.pieces
                 case _                         => sys.error("invalid togyzkumalak board")
               }),
-              F.positionHashes -> o.history.positionHashes,
-              F.score          -> o.history.score.nonEmpty.option(o.history.score)
+              F.positionHashes  -> o.history.positionHashes,
+              F.historyLastMove -> o.history.lastMove.map(_.uci),
+              F.score           -> o.history.score.nonEmpty.option(o.history.score)
             )
           case _ => //chess or fail
             if (o.variant.standard)
