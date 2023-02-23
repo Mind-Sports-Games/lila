@@ -11,6 +11,7 @@ import lila.common.Json._
 
 sealed trait Node {
   def ply: Int
+  def plysPerTurn: Int
   def fen: FEN
   def check: Boolean
   // None when not computed yet
@@ -38,8 +39,7 @@ sealed trait Node {
   def moveOption: Option[Uci.WithSan]
 
   // who's playerIndex plays next
-  // TODO: Wrong for Amazons
-  def playerIndex = strategygames.Player.fromPly(ply)
+  def playerIndex = strategygames.Player.fromPly(ply, plysPerTurn)
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
@@ -47,6 +47,7 @@ sealed trait Node {
 
 case class Root(
     ply: Int,
+    plysPerTurn: Int,
     fen: FEN,
     check: Boolean,
     // None when not computed yet
@@ -79,6 +80,7 @@ case class Root(
 case class Branch(
     id: UciCharPair,
     ply: Int,
+    plysPerTurn: Int,
     move: Uci.WithSan,
     fen: FEN,
     check: Boolean,

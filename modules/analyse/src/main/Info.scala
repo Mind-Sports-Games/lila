@@ -78,6 +78,7 @@ object Info {
       case Array(cp, ma, va, be) =>
         Info(
           ply,
+          //TODO Wrong for non Chess
           Eval(strCp(cp), strMate(ma), Uci.Move.piotr(GameLogic.Chess(), GameFamily.Chess(), be)),
           va.split(' ').toList
         ).some

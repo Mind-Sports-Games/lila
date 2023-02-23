@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, GameLogic, Replay, P1 }
+import strategygames.{ Division, Game, GameLogic, P1, Replay }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -39,23 +39,25 @@ object ServerEval {
               chapterId = chapter.id.value,
               initialFen = chapter.root.fen.some,
               variant = chapter.setup.variant,
-              moves =
-                UciDump(
-                  lib = chapter.setup.variant.gameLogic,
-                  moves = chapter.root.mainline.map(_.move.san),
-                  initialFen = chapter.root.fen.some,
-                  variant = chapter.setup.variant,
-                  finalSquare = chapter.setup.variant.gameLogic match {
-                    case GameLogic.Draughts() => true
-                    case _ => false
-                  }
-                )
-                .toOption
-                .map(_.flatMap(m => Uci.apply(
-                  chapter.setup.variant.gameLogic,
-                  chapter.setup.variant.gameFamily,
-                  m
-                ))) | List.empty,
+              moves = UciDump(
+                lib = chapter.setup.variant.gameLogic,
+                moves = chapter.root.mainline.map(_.move.san),
+                initialFen = chapter.root.fen.some,
+                variant = chapter.setup.variant,
+                finalSquare = chapter.setup.variant.gameLogic match {
+                  case GameLogic.Draughts() => true
+                  case _                    => false
+                }
+              ).toOption
+                .map(
+                  _.flatMap(m =>
+                    Uci.apply(
+                      chapter.setup.variant.gameLogic,
+                      chapter.setup.variant.gameFamily,
+                      m
+                    )
+                  )
+                ) | List.empty,
               userId = userId,
               unlimited = unlimited
             )
@@ -97,7 +99,9 @@ object ServerEval {
                               F.score -> info.eval.score
                                 .ifTrue {
                                   node.score.isEmpty ||
-                                  advOpt.isDefined && node.comments.findBy(Comment.Author.PlayStrategy).isEmpty
+                                  advOpt.isDefined && node.comments
+                                    .findBy(Comment.Author.PlayStrategy)
+                                    .isEmpty
                                 }
                                 .flatMap(EvalScoreBSONHandler.writeOpt),
                               F.comments -> advOpt
@@ -162,6 +166,7 @@ object ServerEval {
       Node(
         id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
         ply = g.turns,
+        plysPerTurn = g.situation.board.variant.plysPerTurn,
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),
         check = g.situation.check,
