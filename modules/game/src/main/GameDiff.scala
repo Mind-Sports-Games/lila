@@ -29,10 +29,12 @@ object GameDiff {
   private type Set   = (String, BSONValue)
   private type Unset = (String, BSONValue)
 
-  private sealed trait ClockType
+  sealed private trait ClockType
   private case class FischerClockType() extends ClockType
   private case class ByoyomiClockType() extends ClockType
   private type ClockHistorySide = (ClockType, Centis, Vector[Centis], Boolean)
+
+  private type PeriodEntriesSide = Vector[Int]
 
   type Diff = (List[Set], List[Unset])
 
@@ -93,6 +95,19 @@ object GameDiff {
           case _: ByoyomiClockType =>
             ByteArrayBSONHandler.writeOpt(BinaryFormat.byoyomiClockHistory.writeSide(x, y, z))
         }
+      }
+
+    def getPeriodEntries(playerIndex: PlayerIndex)(g: Game): Option[Vector[Int]] =
+      g.clockHistory.flatMap(ch =>
+        ch match {
+          case bch: ByoyomiClockHistory => Some(bch.periodEntries(playerIndex))
+          case _                        => None
+        }
+      )
+
+    def periodEntriesToBytes(o: Option[PeriodEntriesSide]) =
+      o.flatMap { x =>
+        ByteArrayBSONHandler.writeOpt(BinaryFormat.periodEntries.writeSide(x))
       }
 
     def pfnStorageWriter(pgnMoves: PgnMoves) =
@@ -245,6 +260,8 @@ object GameDiff {
     dOpt(moveTimes, _.binaryMoveTimes, (o: Option[ByteArray]) => o flatMap ByteArrayBSONHandler.writeOpt)
     dOpt(p1ClockHistory, getClockHistory(P1), clockHistoryToBytes)
     dOpt(p2ClockHistory, getClockHistory(P2), clockHistoryToBytes)
+    dOpt(periodsP1, getPeriodEntries(P1), periodEntriesToBytes)
+    dOpt(periodsP2, getPeriodEntries(P2), periodEntriesToBytes)
     dOpt(
       clock,
       _.clock,

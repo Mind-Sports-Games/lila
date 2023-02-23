@@ -158,7 +158,7 @@ export class ClockController {
     this.emergMs = 1000 * Math.min(60, Math.max(10, cdata.initial * 0.125));
 
     if (isByoyomi(cdata)) {
-      this.setClock(d, cdata.p1, cdata.p1, cdata.p1Periods, cdata.p1Periods);
+      this.setClock(d, cdata.p1, cdata.p2, cdata.p1Periods, cdata.p2Periods);
     } else {
       this.setClock(d, cdata.p1, cdata.p2);
     }

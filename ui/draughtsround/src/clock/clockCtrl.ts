@@ -159,7 +159,7 @@ export class ClockController {
 
     this.setClock(d, cdata.p1, cdata.p2);
     if (isByoyomi(cdata)) {
-      this.setClock(d, cdata.p1, cdata.p1, cdata.p1Periods, cdata.p1Periods);
+      this.setClock(d, cdata.p1, cdata.p2, cdata.p1Periods, cdata.p2Periods);
     } else {
       this.setClock(d, cdata.p1, cdata.p2);
     }
