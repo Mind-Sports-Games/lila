@@ -144,6 +144,10 @@ case class Game(
     for {
       clk <- clock
       inc = clk.incrementOf(playerIndex)
+      byo = clk match {
+        case bc: ByoyomiClock => bc.byoyomiOf(playerIndex)
+        case _                => Centis(0)
+      }
       history <- clockHistory
       clocks = history(playerIndex)
     } yield Centis(0) :: {
@@ -160,10 +164,36 @@ case class Game(
       // the last recorded time is in the history for turnPlayerIndex.
       val noLastInc = finished && (history.size <= playedTurns) == (playerIndex != turnPlayerIndex)
 
-      pairs map { case (first, second) =>
+      // Also if we timed out over a period or periods, we need to
+      // multiply byoyomi by number of periods entered that turn and add
+      // previous remaining time, which could either be byoyomi or
+      // remaining time
+      val byoyomiStart = history match {
+        case bch: ByoyomiClockHistory => bch.firstEnteredPeriod(playerIndex)
+        case _                        => None
+      }
+      val byoyomiTimeout =
+        byoyomiStart.isDefined && (status == Status.Outoftime) && (playerIndex == turnPlayerIndex)
+
+      val byoyomiHistory: Option[ByoyomiClockHistory] = history match {
+        case bch: ByoyomiClockHistory => Some(bch)
+        case _                        => None
+      }
+
+      pairs.zipWithIndex.map { case ((first, second), index) =>
         {
-          val d = first - second
-          if (pairs.hasNext || !noLastInc) d + inc else d
+          val turn         = index + 2 + chess.startedAtTurn / 2
+          val afterByoyomi = byoyomiStart ?? (_ <= turn)
+          // after byoyomi we store movetimes directly, not remaining time
+          val mt   = if (afterByoyomi) second else first - second
+          val cInc = (!afterByoyomi && (pairs.hasNext || !noLastInc)) ?? inc
+
+          if (!pairs.hasNext && byoyomiTimeout) {
+            val prevTurnByoyomi = byoyomiStart ?? (_ < turn)
+            (if (prevTurnByoyomi) byo else first) + byo * byoyomiHistory.fold(0)(
+              _.countSpentPeriods(playerIndex, turn)
+            )
+          } else mt + cInc
         } nonNeg
       } toList
     }
@@ -180,7 +210,22 @@ case class Game(
       b <- moveTimes(!startPlayerIndex)
     } yield Sequence.interleave(a, b)
 
-  def bothClockStates: Option[Vector[Centis]] = clockHistory.map(_ bothClockStates startPlayerIndex)
+  def bothClockStates: Option[Vector[Centis]] =
+    clockHistory.map(ch =>
+      ch match {
+        case fch: FischerClockHistory => fch.bothClockStates(startPlayerIndex)
+        case bch: ByoyomiClockHistory =>
+          bch.bothClockStates(
+            startPlayerIndex,
+            clock ?? (c =>
+              c match {
+                case bc: ByoyomiClock => bc.byoyomi
+                case _                => Centis(0)
+              }
+            )
+          )
+      }
+    )
 
   def pdnMovesConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
     chess match {
@@ -218,7 +263,7 @@ case class Game(
     val newClockHistory = for {
       clk <- game.clock
       ch  <- clockHistory
-    } yield ch.record(turnPlayerIndex, clk)
+    } yield ch.record(turnPlayerIndex, clk, chess.fullMoveNumber)
 
     val updated = copy(
       p1Player = copyPlayer(p1Player),
@@ -424,7 +469,7 @@ case class Game(
           loadClockHistory = _ =>
             clockHistory.map(history => {
               if (history(playerIndex).isEmpty) history
-              else history.reset(playerIndex).record(playerIndex, newClock)
+              else history.reset(playerIndex).record(playerIndex, newClock, chess.fullMoveNumber)
             })
         ).updatePlayer(playerIndex, _.goBerserk)
       ) ++
@@ -456,7 +501,7 @@ case class Game(
             // for the active playerIndex. This ensures the end time in
             // clockHistory always matches the final clock time on
             // the board.
-            if (!finished) history.record(turnPlayerIndex, clk)
+            if (!finished) history.record(turnPlayerIndex, clk, chess.fullMoveNumber)
             else history
           }
       ),
@@ -944,12 +989,11 @@ sealed trait ClockHistory {
   val p1: Vector[Centis]
   val p2: Vector[Centis]
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
-  def record(playerIndex: PlayerIndex, clock: Clock): ClockHistory
+  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory
   def reset(playerIndex: PlayerIndex): ClockHistory
   def apply(playerIndex: PlayerIndex): Vector[Centis]
   def last(playerIndex: PlayerIndex): Option[Centis]
   def size: Int
-  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis]
 }
 
 case class FischerClockHistory(
@@ -960,7 +1004,7 @@ case class FischerClockHistory(
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
 
-  def record(playerIndex: PlayerIndex, clock: Clock): ClockHistory =
+  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory =
     update(playerIndex, _ :+ clock.remainingTime(playerIndex))
 
   def reset(playerIndex: PlayerIndex) = update(playerIndex, _ => Vector.empty)
@@ -996,10 +1040,6 @@ case class ByoyomiClockHistory(
   def updatePeriods(playerIndex: PlayerIndex, f: Vector[Int] => Vector[Int]): ClockHistory =
     copy(periodEntries = periodEntries.update(playerIndex, f))
 
-  def record(playerIndex: PlayerIndex, clock: Clock): ClockHistory =
-    // TODO: it is very unlikely that this is correct.
-    record(playerIndex, clock, 0)
-
   def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory = {
     val curClock        = clock currentClockFor playerIndex
     val initiatePeriods = clock.config.startsAtZero && periodEntries(playerIndex).isEmpty
@@ -1034,11 +1074,6 @@ case class ByoyomiClockHistory(
     val times = apply(playerIndex)
     times.take(firstEnteredPeriod(playerIndex).fold(times.size)(_ - 1)).padTo(times.size, byo)
   }
-
-  // first state is of the playerIndex that moved first.
-  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
-    // TODO: it is very unlikely that this is the correct implementation
-    bothClockStates(firstMoveBy, Centis(0))
 
   // first state is of the playerIndex that moved first.
   def bothClockStates(firstMoveBy: PlayerIndex, byo: Centis): Vector[Centis] = {
