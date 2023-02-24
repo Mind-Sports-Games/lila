@@ -589,8 +589,8 @@ interface GameUpdate {
   id: string;
   fen: Fen;
   lm: Uci;
-  wc?: number;
-  bc?: number;
+  p1?: number;
+  p2?: number;
 }
 
 interface CashStatic {

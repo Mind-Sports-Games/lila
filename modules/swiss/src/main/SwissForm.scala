@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.Clock.{ Config => ClockConfig }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameGroup, GameLogic }
@@ -16,14 +16,43 @@ final class SwissForm(implicit mode: Mode) {
 
   import SwissForm._
 
+  // Yes, I know this is kinda gross. :'(
+  private def valuesFromClockConfig(c: ClockConfig): Option[(Boolean, Int, Int, Option[Int], Option[Int])] =
+    c match {
+      case fc: FischerClock.Config => {
+        FischerClock.Config.unapply(fc).map(t => (false, t._1, t._2, None, None))
+      }
+      case bc: ByoyomiClock.Config => {
+        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1, t._2, Some(t._3), Some(t._4)))
+      }
+    }
+
+  // Yes, I know this is kinda gross. :'(
+  private def clockConfigFromValues(
+      useByoyomi: Boolean,
+      limit: Int,
+      increment: Int,
+      byoyomi: Option[Int],
+      periods: Option[Int]
+  ): ClockConfig =
+    (useByoyomi, byoyomi, periods) match {
+      case (true, Some(byoyomi), Some(periods)) =>
+        ByoyomiClock.Config(limit, increment, byoyomi, periods)
+      case _ =>
+        FischerClock.Config(limit, increment)
+    }
+
   def form(minRounds: Int = 3) =
     Form(
       mapping(
         "name" -> optional(eventName(2, 36)),
-        "clock" -> mapping(
-          "limit"     -> number.verifying(clockLimits.contains _),
-          "increment" -> number(min = 0, max = 120)
-        )(ClockConfig.apply)(ClockConfig.unapply)
+        "clock" -> mapping[ClockConfig, Boolean, Int, Int, Option[Int], Option[Int]](
+          "useByoyomi" -> boolean,
+          "limit"      -> number.verifying(clockLimits.contains _),
+          "increment"  -> number(min = 0, max = 120),
+          "byoyomi"    -> optional(number.verifying(byoyomiLimits.contains _)),
+          "periods"    -> optional(number(min = 0, max = 5))
+        )(clockConfigFromValues)(valuesFromClockConfig)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
         "variant" -> optional(
@@ -85,7 +114,7 @@ final class SwissForm(implicit mode: Mode) {
   def create =
     form() fill SwissData(
       name = none,
-      clock = ClockConfig(180, 0),
+      clock = FischerClock.Config(180, 0),
       startsAt = Some(DateTime.now plusSeconds {
         if (mode == Mode.Prod) 60 * 10 else 20
       }),
@@ -199,9 +228,13 @@ object SwissForm {
     (120 to 420 by 60) ++ (600 to 1800 by 300) ++ (2400 to 10800 by 600)
   }
 
+  val byoyomiLimits: Seq[Int] = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (30 to 60 by 10)
+
+  val clockByoyomiChoices = options(byoyomiLimits, "%d second{s}")
+
   val clockLimitChoices = options(
     clockLimits,
-    l => s"${strategygames.Clock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
+    l => s"${strategygames.FischerClock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
   )
 
   val roundIntervals: Seq[Int] =

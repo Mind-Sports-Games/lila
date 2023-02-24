@@ -73,7 +73,7 @@ final private class Finisher(
   private def recordLagStats(game: Game): Unit =
     for {
       clock  <- game.clock
-      player <- clock.players.all
+      player <- clock.allClockPlayers
       lt    = player.lag
       stats = lt.lagStats
       moves = lt.moves if moves > 4

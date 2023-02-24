@@ -142,6 +142,11 @@ export default class Setup {
       $multiMatch = $form.find('.multi_match'),
       $timeInput = $form.find('.time_choice [name=time]'),
       $incrementInput = $form.find('.increment_choice [name=increment]'),
+      $byoyomiInput = $form.find('.byoyomi_choice [name=byoyomi]'),
+      $periods = $form.find('.periods'),
+      $periodsInput = $periods.find('.byoyomi_periods [name=periods]'),
+      $advancedTimeSetup = $form.find('.advanced_setup'),
+      $advancedTimeToggle = $form.find('.advanced_toggle'),
       $daysInput = $form.find('.days_choice [name=days]'),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
@@ -154,6 +159,8 @@ export default class Setup {
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
           inc = parseFloat($incrementInput.val() as string),
+          byo = parseFloat($byoyomiInput.val() as string),
+          per = parseFloat($periodsInput.filter(':checked').val() as string),
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
@@ -163,11 +170,12 @@ export default class Setup {
           return toggleButtons();
         }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
+        const byoOk = timeMode !== '3' || ((limit > 0 || inc > 0 || byo > 0) && (byo || per === 1));
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
           ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
           aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
           posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk;
-        if (timeOk && ratedOk && aiOk && posOk) {
+        if (byoOk && timeOk && ratedOk && aiOk && posOk) {
           $submits.toggleClass('nope', false);
           $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
@@ -364,7 +372,20 @@ export default class Setup {
       $form.find('.playerIndex-submits').addClass(key);
       save();
     };
-    if (typ == 'hook') {
+
+    const resetIncSlider = (): void => {
+      $incrementInput.val('0');
+      $('.increment_choice .ui-slider').val('0');
+      $('.increment_choice input').siblings('span').text('0');
+    };
+
+    const resetPeriods = (): void => {
+      $periodsInput.eq(0).trigger('click');
+    };
+
+    const isRealTime = () => $timeModeSelect.val() === '1' || $timeModeSelect.val() == '3';
+
+    if (typ === 'hook') {
       if ($form.data('anon')) {
         $timeModeSelect
           .val('1')
@@ -386,7 +407,7 @@ export default class Setup {
         if (poolMember) {
           this.root.enterPool(poolMember);
         } else {
-          this.root.setTab($timeModeSelect.val() === '1' ? 'real_time' : 'seeks');
+          this.root.setTab(isRealTime() ? 'real_time' : 'seeks');
           xhr.text($form.attr('action')!.replace(/sri-placeholder/, playstrategy.sri), {
             method: 'post',
             body: (() => {
@@ -467,6 +488,27 @@ export default class Setup {
           save();
         });
       });
+      $byoyomiInput.each(function (this: HTMLInputElement) {
+        const $input = $(this),
+          $value = $input.siblings('span'),
+          $range = $input.siblings('.range');
+        $value.text($input.val() as string);
+        // 0-20 1 increment
+        // 20-45 5 increment
+        // 45-60 15 increment
+        // 60-180 30 increment
+        $range.attr({
+          min: '0',
+          max: '38',
+          value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderIncrement, 20),
+        });
+        $range.on('input', () => {
+          const byoyomi = self.sliderIncrement(parseInt($range.val() as string));
+          $value.text('' + byoyomi);
+          $input.val('' + byoyomi);
+          save();
+        });
+      });
       $form.find('.rating-range').each(function (this: HTMLDivElement) {
         const $this = $(this),
           $minInput = $this.find('.rating-range__min'),
@@ -507,8 +549,11 @@ export default class Setup {
     $timeModeSelect
       .on('change', function (this: HTMLElement) {
         const timeMode = $(this).val();
-        $form.find('.time_choice, .increment_choice').toggle(timeMode == '1');
-        $form.find('.days_choice').toggle(timeMode == '2');
+        const isFischer = timeMode === '1';
+        const isByoyomi = timeMode === '3';
+        $form.find('.time_choice, .increment_choice').toggle(isFischer || isByoyomi);
+        $form.find('.days_choice').toggle(timeMode === '2');
+        $form.find('.byoyomi_choice, .byoyomi_periods').toggle(isByoyomi);
         toggleButtons();
         showRating();
       })
@@ -579,6 +624,19 @@ export default class Setup {
       .trigger('change');
 
     $modeChoices.on('change', save);
+
+    $advancedTimeToggle.on('click', function (this: HTMLElement) {
+      if ($advancedTimeToggle.hasClass('active')) {
+        $advancedTimeToggle.removeClass('active');
+        $advancedTimeSetup.hide();
+        resetIncSlider();
+        resetPeriods();
+        toggleButtons();
+      } else {
+        $advancedTimeToggle.addClass('active');
+        $advancedTimeSetup.show();
+      }
+    });
 
     $form.find('div.level').each(function (this: HTMLElement) {
       const $infos = $(this).find('.ai_info > div');
