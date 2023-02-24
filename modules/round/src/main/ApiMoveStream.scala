@@ -98,7 +98,6 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
         .obj("fen" -> s"$boardFen ${turnPlayerIndex.letter}")
         .add("lm" -> lastMoveUci)
     ) { case (js, clk) =>
-      // TODO: this has the potential to introduce bugs, but is consistent with our rename
-      js ++ Json.obj("p1" -> clk._1.roundSeconds, "p2" -> clk._2.roundSeconds)
+      js ++ Json.obj("wc" -> clk._1.roundSeconds, "bc" -> clk._2.roundSeconds)
     }
 }

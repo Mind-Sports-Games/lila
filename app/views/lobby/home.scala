@@ -221,9 +221,6 @@ object home {
 
   private val i18nKeys = List(
     trans.realTime,
-    trans.byoyomiTime,
-    trans.periods,
-    trans.byoyomiInSeconds,
     trans.correspondence,
     trans.nbGamesInPlay,
     trans.nbLiveGamesInPlay,

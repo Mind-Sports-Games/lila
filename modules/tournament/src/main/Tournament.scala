@@ -1,6 +1,6 @@
 package lila.tournament
 
-import strategygames.ClockConfig
+import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
 import strategygames.{ GameFamily, GameGroup, Mode, Speed }
 import strategygames.variant.Variant

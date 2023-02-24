@@ -95,20 +95,10 @@ final class BotJsonView(
       .orElse(pov.game.correspondenceClock.map(_.remainingTime(pov.playerIndex).toInt * 1000))
       .getOrElse(Int.MaxValue)
 
-  implicit private val clockConfigWriter: OWrites[strategygames.ClockConfig] = OWrites { c =>
-    c match {
-      case c: strategygames.FischerClock.Config =>
-        Json.obj(
-          "initial"   -> c.limit.millis,
-          "increment" -> c.increment.millis
-        )
-      case c: strategygames.ByoyomiClock.Config =>
-        Json.obj(
-          "initial"   -> c.limit.millis,
-          "increment" -> c.increment.millis,
-          "byoyomi"   -> c.byoyomi.millis,
-          "periods"   -> c.periodsTotal
-        )
-    }
+  implicit private val clockConfigWriter: OWrites[strategygames.Clock.Config] = OWrites { c =>
+    Json.obj(
+      "initial"   -> c.limit.millis,
+      "increment" -> c.increment.millis
+    )
   }
 }

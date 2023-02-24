@@ -69,25 +69,7 @@
       top: -4px;
     }
   }
-  .clock-byo {
-    display: flex;
-    flex-direction: row-reverse;
-    min-width: 3em;
-    z-index: -1;
-    @include breakpoint($mq-xx-small) {
-      flex-direction: row;
-    }
-  }
-  .byoyomi {
-    display: flex;
-    align-items: center;
-    font-size: 1.2rem;
-    @include breakpoint($mq-xx-small) {
-      font-size: 1.5rem;
-    }
-    padding: 0 0.35rem;
-    opacity: 0.8;
-  }
+
   .time {
     @extend %roboto, %box-shadow;
 
@@ -184,8 +166,7 @@
     background-color: mix($c-bad, $c-bg-box, 25%);
   }
 
-  &.emerg.running .time,
-  &.running .emerg .time {
+  &.emerg.running .time {
     background-color: mix($c-bad, $c-bg-box, 50%);
     color: $c-font-clearer;
   }

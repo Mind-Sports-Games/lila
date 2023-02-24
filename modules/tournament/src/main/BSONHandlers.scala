@@ -1,5 +1,6 @@
 package lila.tournament
 
+import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ GameLogic, Mode }
@@ -36,7 +37,19 @@ object BSONHandlers {
     )
   )
 
-  implicit val tournamentClockBSONHandler = clockConfigHandler
+  implicit val tournamentClockBSONHandler = tryHandler[ClockConfig](
+    { case doc: BSONDocument =>
+      for {
+        limit <- doc.getAsTry[Int]("limit")
+        inc   <- doc.getAsTry[Int]("increment")
+      } yield ClockConfig(limit, inc)
+    },
+    c =>
+      BSONDocument(
+        "limit"     -> c.limitSeconds,
+        "increment" -> c.incrementSeconds
+      )
+  )
 
   implicit private val spotlightBSONHandler = Macros.handler[Spotlight]
 
@@ -69,7 +82,7 @@ object BSONHandlers {
         id = r str "_id",
         name = r str "name",
         status = r.get[Status]("status"),
-        clock = r.get[strategygames.ClockConfig]("clock"),
+        clock = r.get[strategygames.Clock.Config]("clock"),
         minutes = r int "minutes",
         variant = variant,
         medleyVariantsAndIntervals = medleyVariantsAndIntervals,

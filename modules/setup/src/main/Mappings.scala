@@ -31,8 +31,6 @@ private object Mappings {
 
   val time                     = of[Double].verifying(HookConfig validateTime _)
   val increment                = number.verifying(HookConfig validateIncrement _)
-  val byoyomi                  = number.verifying(HookConfig validateByoyomi _)
-  val periods                  = number.verifying(HookConfig validatePeriods _)
   val days                     = number(min = 1, max = 14)
   def timeMode                 = number.verifying(TimeMode.ids contains _)
   def mode(withRated: Boolean) = optional(rawMode(withRated))

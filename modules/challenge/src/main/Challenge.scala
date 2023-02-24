@@ -176,7 +176,7 @@ object Challenge {
   object TimeControl {
     case object Unlimited                extends TimeControl
     case class Correspondence(days: Int) extends TimeControl
-    case class Clock(config: strategygames.ClockConfig) extends TimeControl {
+    case class Clock(config: strategygames.Clock.Config) extends TimeControl {
       // All durations are expressed in seconds
       def limit     = config.limit
       def increment = config.increment

@@ -137,8 +137,7 @@ object SimulForm {
   ) {
     def clock =
       SimulClock(
-        // TODO: needs to handle Byoyomi and Fischer clocks here.
-        config = strategygames.FischerClock.Config(clockTime * 60, clockIncrement),
+        config = strategygames.Clock.Config(clockTime * 60, clockIncrement),
         hostExtraTime = clockExtra * 60
       )
 

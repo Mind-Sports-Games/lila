@@ -3,8 +3,6 @@ package lila.game
 import strategygames.{
   Player => PlayerIndex,
   Clock,
-  FischerClock,
-  ByoyomiClock,
   P1,
   P2,
   Game => StratGame,
@@ -175,7 +173,6 @@ object BSONHandlers {
         )
       }
 
-      val periodEntries = readPeriodEntries(r)
       val chessGame = chess.Game(
         situation = chess.Situation(
           chess.Board(
@@ -202,24 +199,29 @@ object BSONHandlers {
         ),
         pgnMoves = decoded.pgnMoves,
         clock = r.getO[PlayerIndex => Clock](F.clock) {
-          clockBSONReader(
-            r.intO(F.clockType),
-            createdAt,
-            periodEntries,
-            light.p1Player.berserk,
-            light.p2Player.berserk
-          )
+          clockBSONReader(createdAt, light.p1Player.berserk, light.p2Player.berserk)
         } map (_(turnPlayerIndex)),
         turns = plies,
         startedAtTurn = startedAtTurn
       )
+
+      val p1ClockHistory = r bytesO F.p1ClockHistory
+      val p2ClockHistory = r bytesO F.p2ClockHistory
 
       Game(
         id = light.id,
         p1Player = light.p1Player,
         p2Player = light.p2Player,
         chess = StratGame.Chess(chessGame),
-        readClockHistory(r, light, turnPlayerIndex, periodEntries),
+        loadClockHistory = clk =>
+          for {
+            bw <- p1ClockHistory
+            bb <- p2ClockHistory
+            history <-
+              BinaryFormat.clockHistory
+                .read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+            _ = lila.mon.game.loadClockHistory.increment()
+          } yield history,
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
         binaryMoveTimes = r bytesO F.moveTimes,
@@ -294,30 +296,32 @@ object BSONHandlers {
 
       val createdAt = r date F.createdAt
 
-      val periodEntries = readPeriodEntries(r)
-
       val draughtsGame = draughts.DraughtsGame(
         situation = decodedSituation,
         pdnMoves = decoded.pdnMoves,
         clock = r.getO[PlayerIndex => Clock](F.clock) {
-          clockBSONReader(
-            r.intO(F.clockType),
-            createdAt,
-            periodEntries,
-            light.p1Player.berserk,
-            light.p2Player.berserk
-          )
+          clockBSONReader(createdAt, light.p1Player.berserk, light.p2Player.berserk)
         } map (_(decodedSituation.player)),
         turns = currentPly,
         startedAtTurn = startedAtTurn
       )
+
+      val p1ClockHistory = r bytesO F.p1ClockHistory
+      val p2ClockHistory = r bytesO F.p2ClockHistory
 
       Game(
         id = light.id,
         p1Player = light.p1Player,
         p2Player = light.p2Player,
         chess = StratGame.Draughts(draughtsGame),
-        readClockHistory(r, light, turnPlayerIndex, periodEntries),
+        loadClockHistory = clk =>
+          for {
+            bw <- p1ClockHistory
+            bb <- p2ClockHistory
+            history <- BinaryFormat.clockHistory
+              .read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(decodedSituation.player))
+            _ = lila.mon.game.loadClockHistory.increment()
+          } yield history,
         pdnStorage = Some(decoded.format),
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
@@ -367,7 +371,6 @@ object BSONHandlers {
           ) atLeast 0
         )
       }
-      val periodEntries = readPeriodEntries(r)
 
       val fairysfGame = fairysf.Game(
         situation = fairysf.Situation(
@@ -396,24 +399,29 @@ object BSONHandlers {
         ),
         pgnMoves = decoded.pgnMoves,
         clock = r.getO[PlayerIndex => Clock](F.clock) {
-          clockBSONReader(
-            r.intO(F.clockType),
-            createdAt,
-            periodEntries,
-            light.p1Player.berserk,
-            light.p2Player.berserk
-          )
+          clockBSONReader(createdAt, light.p1Player.berserk, light.p2Player.berserk)
         } map (_(turnPlayerIndex)),
         turns = plies,
         startedAtTurn = startedAtTurn
       )
+
+      val p1ClockHistory = r bytesO F.p1ClockHistory
+      val p2ClockHistory = r bytesO F.p2ClockHistory
 
       Game(
         id = light.id,
         p1Player = light.p1Player,
         p2Player = light.p2Player,
         chess = StratGame.FairySF(fairysfGame),
-        readClockHistory(r, light, turnPlayerIndex, periodEntries),
+        loadClockHistory = clk =>
+          for {
+            bw <- p1ClockHistory
+            bb <- p2ClockHistory
+            history <-
+              BinaryFormat.clockHistory
+                .read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+            _ = lila.mon.game.loadClockHistory.increment()
+          } yield history,
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
         binaryMoveTimes = r bytesO F.moveTimes,
@@ -457,8 +465,6 @@ object BSONHandlers {
         )
       }
 
-      val periodEntries = readPeriodEntries(r)
-
       val samuraiGame = samurai.Game(
         situation = samurai.Situation(
           samurai.Board(
@@ -475,24 +481,29 @@ object BSONHandlers {
         ),
         pgnMoves = decoded.pgnMoves,
         clock = r.getO[PlayerIndex => Clock](F.clock) {
-          clockBSONReader(
-            r.intO(F.clockType),
-            createdAt,
-            periodEntries,
-            light.p1Player.berserk,
-            light.p2Player.berserk
-          )
+          clockBSONReader(createdAt, light.p1Player.berserk, light.p2Player.berserk)
         } map (_(turnPlayerIndex)),
         turns = plies,
         startedAtTurn = startedAtTurn
       )
+
+      val p1ClockHistory = r bytesO F.p1ClockHistory
+      val p2ClockHistory = r bytesO F.p2ClockHistory
 
       Game(
         id = light.id,
         p1Player = light.p1Player,
         p2Player = light.p2Player,
         chess = StratGame.Samurai(samuraiGame),
-        readClockHistory(r, light, turnPlayerIndex, periodEntries),
+        loadClockHistory = clk =>
+          for {
+            bw <- p1ClockHistory
+            bb <- p2ClockHistory
+            history <-
+              BinaryFormat.clockHistory
+                .read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+            _ = lila.mon.game.loadClockHistory.increment()
+          } yield history,
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
         binaryMoveTimes = r bytesO F.moveTimes,
@@ -538,8 +549,6 @@ object BSONHandlers {
         )
       }
 
-      val periodEntries = readPeriodEntries(r)
-
       val togyzkumalakGame = togyzkumalak.Game(
         situation = togyzkumalak.Situation(
           togyzkumalak.Board(
@@ -559,24 +568,29 @@ object BSONHandlers {
         ),
         pgnMoves = decoded.pgnMoves,
         clock = r.getO[PlayerIndex => Clock](F.clock) {
-          clockBSONReader(
-            r.intO(F.clockType),
-            createdAt,
-            periodEntries,
-            light.p1Player.berserk,
-            light.p2Player.berserk
-          )
+          clockBSONReader(createdAt, light.p1Player.berserk, light.p2Player.berserk)
         } map (_(turnPlayerIndex)),
         turns = plies,
         startedAtTurn = startedAtTurn
       )
+
+      val p1ClockHistory = r bytesO F.p1ClockHistory
+      val p2ClockHistory = r bytesO F.p2ClockHistory
 
       Game(
         id = light.id,
         p1Player = light.p1Player,
         p2Player = light.p2Player,
         chess = StratGame.Togyzkumalak(togyzkumalakGame),
-        readClockHistory(r, light, turnPlayerIndex, periodEntries),
+        loadClockHistory = clk =>
+          for {
+            bw <- p1ClockHistory
+            bb <- p2ClockHistory
+            history <-
+              BinaryFormat.clockHistory
+                .read(clk.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+            _ = lila.mon.game.loadClockHistory.increment()
+          } yield history,
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
         binaryMoveTimes = r bytesO F.moveTimes,
@@ -630,7 +644,6 @@ object BSONHandlers {
         F.status        -> o.status,
         F.turns         -> o.chess.turns,
         F.startedAtTurn -> w.intO(o.chess.startedAtTurn),
-        F.clockType     -> o.chess.clock.map(clockTypeBSONWrite),
         F.clock -> (o.chess.clock flatMap { c =>
           clockBSONWrite(o.createdAt, c).toOption
         }),
@@ -732,17 +745,6 @@ object BSONHandlers {
               )
             }
         }
-      } ++ {
-        o.clockHistory.fold($doc())(ch =>
-          ch match {
-            case ch: ByoyomiClockHistory =>
-              $doc(
-                F.periodsP1 -> writePeriodEntriesForPlayer(P1, Some(ch)),
-                F.periodsP2 -> writePeriodEntriesForPlayer(P2, Some(ch))
-              )
-            case _ => $doc()
-          }
-        )
       }
   }
 
@@ -776,22 +778,6 @@ object BSONHandlers {
     }
   }
 
-  //------------------------------------------------------------------------------
-  // General API
-  //------------------------------------------------------------------------------
-  private[game] def clockTypeBSONWrite(clock: Clock) =
-    // NOTE: If you're changing this, the read below also needs to be changed.
-    clock match {
-      case _: FischerClock => 1
-      case _: ByoyomiClock => 2
-    }
-
-  private[game] def clockBSONWrite(since: DateTime, clock: Clock) =
-    clock match {
-      case f: FischerClock => fischerClockBSONWrite(since, f)
-      case b: ByoyomiClock => byoyomiClockBSONWrite(since, b)
-    }
-
   private def clockHistory(
       playerIndex: PlayerIndex,
       clockHistory: Option[ClockHistory],
@@ -802,121 +788,22 @@ object BSONHandlers {
       clk     <- clock
       history <- clockHistory
       times = history(playerIndex)
-    } yield clk match {
-      case fc: FischerClock =>
-        BinaryFormat.fischerClockHistory.writeSide(fc.limit, times, flagged has playerIndex)
-      case bc: ByoyomiClock =>
-        BinaryFormat.byoyomiClockHistory.writeSide(bc.limit, times, flagged has playerIndex)
-    }
+    } yield BinaryFormat.clockHistory.writeSide(clk.limit, times, flagged has playerIndex)
 
-  private[game] def clockBSONReader(
-      clockType: Option[Int],
-      since: DateTime,
-      periodEntries: Option[PeriodEntries],
-      p1Berserk: Boolean,
-      p2Berserk: Boolean
-  ) =
-    clockType match {
-      case Some(2) =>
-        byoyomiClockBSONReader(since, periodEntries.getOrElse(PeriodEntries.default), p1Berserk, p2Berserk)
-      case _ => fischerClockBSONReader(since, p1Berserk, p2Berserk)
-    }
-
-  def readClockHistory(
-      r: BSON.Reader,
-      light: LightGame,
-      turnPlayerIndex: PlayerIndex,
-      periodEntries: Option[PeriodEntries]
-  ) = {
-    import Game.{ BSONFields => F }
-    val p1ClockHistory = r bytesO F.p1ClockHistory
-    val p2ClockHistory = r bytesO F.p2ClockHistory
-    (clk: Clock) =>
-      for {
-        bw <- p1ClockHistory
-        bb <- p2ClockHistory
-        history <-
-          clk match {
-            case fc: FischerClock =>
-              BinaryFormat.fischerClockHistory
-                .read(fc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
-            case bc: ByoyomiClock =>
-              BinaryFormat.byoyomiClockHistory
-                .read(
-                  bc.limit,
-                  bw,
-                  bb,
-                  periodEntries.getOrElse(PeriodEntries.default),
-                  (light.status == Status.Outoftime).option(turnPlayerIndex)
-                )
-          }
-        _ = lila.mon.game.loadClockHistory.increment()
-      } yield history
-    // TODO: does draughts really need this version?
-    // (light.status == Status.Outoftime).option(decodedSituation.player)
-    //                                           ^^^^^^^^^^^^^^^^^^^^^^^
-    //                                           rather than turnPlayerIndex?
-  }
-
-  //------------------------------------------------------------------------------
-  // FischerClock stuff
-  //------------------------------------------------------------------------------
-  private[game] def fischerClockBSONReader(since: DateTime, p1Berserk: Boolean, p2Berserk: Boolean) =
+  private[game] def clockBSONReader(since: DateTime, p1Berserk: Boolean, p2Berserk: Boolean) =
     new BSONReader[PlayerIndex => Clock] {
-      def readTry(bson: BSONValue): Try[PlayerIndex => FischerClock] =
+      def readTry(bson: BSONValue): Try[PlayerIndex => Clock] =
         bson match {
           case bin: BSONBinary =>
             ByteArrayBSONHandler readTry bin map { cl =>
-              BinaryFormat.fischerClock(since).read(cl, p1Berserk, p2Berserk)
+              BinaryFormat.clock(since).read(cl, p1Berserk, p2Berserk)
             }
           case b => lila.db.BSON.handlerBadType(b)
         }
     }
 
-  private[game] def fischerClockBSONWrite(since: DateTime, clock: FischerClock) =
+  private[game] def clockBSONWrite(since: DateTime, clock: Clock) =
     ByteArrayBSONHandler writeTry {
-      BinaryFormat.fischerClock(since).write(clock)
-    }
-
-  //------------------------------------------------------------------------------
-  // ByoyomiClock  stuff
-  //------------------------------------------------------------------------------
-  def readPeriodEntries(r: BSON.Reader) = {
-    import Game.{ BSONFields => F }
-    BinaryFormat.periodEntries
-      .read(
-        r bytesD F.periodsP1,
-        r bytesD F.periodsP2
-      )
-  }
-
-  private def writePeriodEntriesForPlayer(
-      playerIndex: PlayerIndex,
-      clockHistory: Option[ByoyomiClockHistory]
-  ) =
-    for {
-      history <- clockHistory
-    } yield BinaryFormat.periodEntries.writeSide(history.periodEntries(playerIndex))
-
-  private[game] def byoyomiClockBSONReader(
-      since: DateTime,
-      periodEntries: PeriodEntries,
-      p1Berserk: Boolean,
-      p2Berserk: Boolean
-  ) =
-    new BSONReader[PlayerIndex => Clock] {
-      def readTry(bson: BSONValue): Try[PlayerIndex => ByoyomiClock] =
-        bson match {
-          case bin: BSONBinary =>
-            ByteArrayBSONHandler readTry bin map { cl =>
-              BinaryFormat.byoyomiClock(since).read(cl, periodEntries, p1Berserk, p2Berserk)
-            }
-          case b => lila.db.BSON.handlerBadType(b)
-        }
-    }
-
-  private[game] def byoyomiClockBSONWrite(since: DateTime, clock: ByoyomiClock) =
-    ByteArrayBSONHandler writeTry {
-      BinaryFormat.byoyomiClock(since).write(clock)
+      BinaryFormat clock since write clock
     }
 }

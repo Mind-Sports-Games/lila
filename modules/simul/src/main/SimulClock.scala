@@ -1,10 +1,10 @@
 package lila.simul
 
-import strategygames.{ Centis, ClockConfig, Player => PlayerIndex }
+import strategygames.{ Centis, Clock, Player => PlayerIndex }
 
 // All durations are expressed in seconds
 case class SimulClock(
-    config: ClockConfig,
+    config: Clock.Config,
     hostExtraTime: Int
 ) {
 

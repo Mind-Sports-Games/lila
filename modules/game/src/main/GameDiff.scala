@@ -1,18 +1,6 @@
 package lila.game
 
-import strategygames.{
-  P2,
-  Board,
-  ByoyomiClock,
-  Centis,
-  Clock,
-  FischerClock,
-  Player => PlayerIndex,
-  GameLogic,
-  History,
-  PocketData,
-  P1
-}
+import strategygames.{ P2, Board, Centis, Clock, Player => PlayerIndex, GameLogic, History, PocketData, P1 }
 import strategygames.chess.CheckCount
 import strategygames.togyzkumalak.Score
 import strategygames.draughts.KingMoves
@@ -29,12 +17,7 @@ object GameDiff {
   private type Set   = (String, BSONValue)
   private type Unset = (String, BSONValue)
 
-  sealed private trait ClockType
-  private case class FischerClockType() extends ClockType
-  private case class ByoyomiClockType() extends ClockType
-  private type ClockHistorySide = (ClockType, Centis, Vector[Centis], Boolean)
-
-  private type PeriodEntriesSide = Vector[Int]
+  private type ClockHistorySide = (Centis, Vector[Centis], Boolean)
 
   type Diff = (List[Set], List[Unset])
 
@@ -77,37 +60,11 @@ object GameDiff {
         history <- g.clockHistory
         curPlayerIndex = g.turnPlayerIndex
         times          = history(playerIndex)
-      } yield (
-        clk match {
-          case _: FischerClock => FischerClockType()
-          case _: ByoyomiClock => ByoyomiClockType()
-        },
-        clk.limit,
-        times,
-        g.flagged has playerIndex
-      )
+      } yield (clk.limit, times, g.flagged has playerIndex)
 
     def clockHistoryToBytes(o: Option[ClockHistorySide]) =
-      o.flatMap { case (clockType, x, y, z) =>
-        clockType match {
-          case _: FischerClockType =>
-            ByteArrayBSONHandler.writeOpt(BinaryFormat.fischerClockHistory.writeSide(x, y, z))
-          case _: ByoyomiClockType =>
-            ByteArrayBSONHandler.writeOpt(BinaryFormat.byoyomiClockHistory.writeSide(x, y, z))
-        }
-      }
-
-    def getPeriodEntries(playerIndex: PlayerIndex)(g: Game): Option[Vector[Int]] =
-      g.clockHistory.flatMap(ch =>
-        ch match {
-          case bch: ByoyomiClockHistory => Some(bch.periodEntries(playerIndex))
-          case _                        => None
-        }
-      )
-
-    def periodEntriesToBytes(o: Option[PeriodEntriesSide]) =
-      o.flatMap { x =>
-        ByteArrayBSONHandler.writeOpt(BinaryFormat.periodEntries.writeSide(x))
+      o.flatMap { case (x, y, z) =>
+        ByteArrayBSONHandler.writeOpt(BinaryFormat.clockHistory.writeSide(x, y, z))
       }
 
     def pfnStorageWriter(pgnMoves: PgnMoves) =
@@ -260,8 +217,6 @@ object GameDiff {
     dOpt(moveTimes, _.binaryMoveTimes, (o: Option[ByteArray]) => o flatMap ByteArrayBSONHandler.writeOpt)
     dOpt(p1ClockHistory, getClockHistory(P1), clockHistoryToBytes)
     dOpt(p2ClockHistory, getClockHistory(P2), clockHistoryToBytes)
-    dOpt(periodsP1, getPeriodEntries(P1), periodEntriesToBytes)
-    dOpt(periodsP2, getPeriodEntries(P2), periodEntriesToBytes)
     dOpt(
       clock,
       _.clock,

@@ -3,8 +3,8 @@ import * as domData from 'common/data';
 interface UpdateData {
   lm: string;
   fen: string;
-  p1?: number;
-  p2?: number;
+  wc?: number;
+  bc?: number;
 }
 
 const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
@@ -131,8 +131,8 @@ export const update = (node: HTMLElement, data: UpdateData) => {
         pause: playerIndex != turnPlayerIndex,
       });
   };
-  renderClock(data.p1, 'p1');
-  renderClock(data.p2, 'p2');
+  renderClock(data.wc, 'p1');
+  renderClock(data.bc, 'p2');
 };
 
 export const finish = (node: HTMLElement, win?: string) =>

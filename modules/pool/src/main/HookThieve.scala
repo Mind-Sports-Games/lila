@@ -11,7 +11,7 @@ final private class HookThieve()(implicit
 
   import HookThieve._
 
-  def candidates(clock: strategygames.ClockConfig): Fu[PoolHooks] =
+  def candidates(clock: strategygames.Clock.Config): Fu[PoolHooks] =
     Bus
       .ask[PoolHooks]("lobbyTrouper")(GetCandidates(clock, _))
       .logFailure(logger)
@@ -25,7 +25,7 @@ final private class HookThieve()(implicit
 
 object HookThieve {
 
-  case class GetCandidates(clock: strategygames.ClockConfig, promise: Promise[PoolHooks])
+  case class GetCandidates(clock: strategygames.Clock.Config, promise: Promise[PoolHooks])
   case class StolenHookIds(ids: Vector[String])
 
   case class PoolHook(hookId: String, member: PoolMember) {

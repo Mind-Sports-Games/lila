@@ -8,7 +8,7 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import strategygames.{ Player => PlayerIndex, GameLogic, ByoyomiClock, FischerClock }
+import strategygames.{ Player => PlayerIndex, GameLogic }
 import strategygames.format.{ FEN => StratFEN }
 import strategygames.variant.{ Variant => StratVariant }
 import strategygames.chess.format.FEN
@@ -173,43 +173,18 @@ trait Handlers {
     v => BSONString(s"${v.gameLogic.id}:${v.key}")
   )
 
-  val clockConfigHandler = tryHandler[strategygames.ClockConfig](
-    {
-      case doc: BSONDocument => {
-        val clockType = doc.getAsOpt[String]("t").getOrElse("fischer")
-        clockType match {
-          case "fischer" =>
-            for {
-              limit <- doc.getAsTry[Int]("limit")
-              inc   <- doc.getAsTry[Int]("increment")
-            } yield strategygames.FischerClock.Config(limit, inc)
-          case "byoyomi" =>
-            for {
-              limit   <- doc.getAsTry[Int]("limit")
-              inc     <- doc.getAsTry[Int]("increment")
-              byoyomi <- doc.getAsTry[Int]("byoyomi")
-              periods <- doc.getAsTry[Int]("periods")
-            } yield strategygames.ByoyomiClock.Config(limit, inc, byoyomi, periods)
-        }
-      }
+  val clockConfigHandler = tryHandler[strategygames.Clock.Config](
+    { case doc: BSONDocument =>
+      for {
+        limit <- doc.getAsTry[Int]("limit")
+        inc   <- doc.getAsTry[Int]("increment")
+      } yield strategygames.Clock.Config(limit, inc)
     },
     c =>
-      c match {
-        case fc: FischerClock.Config =>
-          BSONDocument(
-            "t" -> "fischer",
-            "limit"     -> fc.limitSeconds,
-            "increment" -> fc.incrementSeconds
-          )
-        case bc: ByoyomiClock.Config =>
-          BSONDocument(
-            "t" -> "byoyomi",
-            "limit"     -> bc.limitSeconds,
-            "increment" -> bc.incrementSeconds,
-            "byoyomi"   -> bc.byoyomiSeconds,
-            "periods"   -> bc.periodsTotal
-          )
-      }
+      BSONDocument(
+        "limit"     -> c.limitSeconds,
+        "increment" -> c.incrementSeconds
+      )
   )
 
   implicit val absoluteUrlHandler = tryHandler[AbsoluteUrl](

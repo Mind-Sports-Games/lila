@@ -69,7 +69,7 @@ final class TournamentApi(
     val tour = Tournament.make(
       by = Right(me),
       name = setup.name,
-      clock = setup.clock,
+      clock = setup.clockConfig,
       minutes = if (setup.isMedley) setup.medleyDuration else setup.minutes,
       waitMinutes = setup.waitMinutes | TournamentForm.waitMinuteDefault,
       startDate = setup.startDate,

@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ByoyomiClock, FischerClock, GameFamily, GameLogic, Mode, Speed }
+import strategygames.{ GameFamily, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import lila.lobby.PlayerIndex
 import lila.lobby.{ Hook, Seek }
@@ -12,8 +12,6 @@ case class HookConfig(
     timeMode: TimeMode,
     time: Double,
     increment: Int,
-    byoyomi: Int,
-    periods: Int,
     days: Int,
     mode: Mode,
     playerIndex: PlayerIndex,
@@ -48,23 +46,11 @@ case class HookConfig(
     )
 
   def >> =
-    (
-      s"{$variant.gameLogic.id}_{$variant.id}",
-      timeMode.id,
-      time,
-      increment,
-      byoyomi,
-      periods,
-      days,
-      mode.id.some,
-      ratingRange.toString.some,
-      playerIndex.name
-    ).some
+    (s"{$variant.gameLogic.id}_{$variant.id}", timeMode.id, time, increment, days, mode.id.some, ratingRange.toString.some, playerIndex.name).some
 
   def withTimeModeString(tc: Option[String]) =
     tc match {
-      case Some("fischerClock")   => copy(timeMode = TimeMode.FischerClock)
-      case Some("byoyomiClock")   => copy(timeMode = TimeMode.ByoyomiClock)
+      case Some("realTime")       => copy(timeMode = TimeMode.RealTime)
       case Some("correspondence") => copy(timeMode = TimeMode.Correspondence)
       case Some("unlimited")      => copy(timeMode = TimeMode.Unlimited)
       case _                      => this
@@ -77,7 +63,7 @@ case class HookConfig(
       blocking: Set[String]
   ): Either[Hook, Option[Seek]] =
     timeMode match {
-      case TimeMode.FischerClock =>
+      case TimeMode.RealTime =>
         val clock = justMakeClock
         Left(
           Hook.make(
@@ -109,49 +95,22 @@ case class HookConfig(
   def noRatedUnlimited = mode.casual || hasClock || makeDaysPerTurn.isDefined
 
   def updateFrom(game: lila.game.Game) =
-    game.clock match {
-      case Some(c: ByoyomiClock) =>
-        copy(
-          variant = game.variant,
-          timeMode = TimeMode ofGame game,
-          time = c.limitInMinutes,
-          increment = c.incrementSeconds,
-          byoyomi = c.byoyomiSeconds,
-          periods = c.periodsTotal,
-          days = game.daysPerTurn | days,
-          mode = game.mode
-        )
-      case _ =>
-        copy(
-          variant = game.variant,
-          timeMode = TimeMode ofGame game,
-          time = game.clock.map(_.limitInMinutes) | time,
-          increment = game.clock.map(_.incrementSeconds) | increment,
-          byoyomi = 0,
-          periods = 0,
-          days = game.daysPerTurn | days,
-          mode = game.mode
-        )
-    }
+    copy(
+      variant = game.variant,
+      timeMode = TimeMode ofGame game,
+      time = game.clock.map(_.limitInMinutes) | time,
+      increment = game.clock.map(_.incrementSeconds) | increment,
+      days = game.daysPerTurn | days,
+      mode = game.mode
+    )
 
   def withRatingRange(str: Option[String]) = copy(ratingRange = RatingRange orDefault str)
 }
 
 object HookConfig extends BaseHumanConfig {
 
-  def from(
-      v: String,
-      tm: Int,
-      t: Double,
-      i: Int,
-      b: Int,
-      p: Int,
-      d: Int,
-      m: Option[Int],
-      e: Option[String],
-      c: String
-  ) = {
-    val realMode   = m.fold(Mode.default)(Mode.orDefault)
+  def from(v: String, tm: Int, t: Double, i: Int, d: Int, m: Option[Int], e: Option[String], c: String) = {
+    val realMode = m.fold(Mode.default)(Mode.orDefault)
     val gameFamily = GameFamily(v.split("_")(0).toInt)
     val variantId  = v.split("_")(1).toInt
     new HookConfig(
@@ -159,8 +118,6 @@ object HookConfig extends BaseHumanConfig {
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
       increment = i,
-      byoyomi = b,
-      periods = p,
       days = d,
       mode = realMode,
       ratingRange = e.fold(RatingRange.default)(RatingRange.orDefault),
@@ -172,11 +129,9 @@ object HookConfig extends BaseHumanConfig {
 
   private val default = HookConfig(
     variant = variantDefaultStrat,
-    timeMode = TimeMode.FischerClock,
+    timeMode = TimeMode.RealTime,
     time = 5d,
     increment = 3,
-    byoyomi = 10,
-    periods = 1,
     days = 2,
     mode = Mode.default,
     ratingRange = RatingRange.default,
@@ -194,8 +149,6 @@ object HookConfig extends BaseHumanConfig {
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",
         increment = r int "i",
-        byoyomi = r intD "b",
-        periods = r intD "p",
         days = r int "d",
         mode = Mode orDefault (r int "m"),
         playerIndex = PlayerIndex.Random,
@@ -209,8 +162,6 @@ object HookConfig extends BaseHumanConfig {
         "tm" -> o.timeMode.id,
         "t"  -> o.time,
         "i"  -> o.increment,
-        "b"  -> o.byoyomi,
-        "p"  -> o.periods,
         "d"  -> o.days,
         "m"  -> o.mode.id,
         "e"  -> o.ratingRange.toString

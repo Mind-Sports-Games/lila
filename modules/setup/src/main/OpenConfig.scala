@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ClockConfig, GameFamily, Speed }
+import strategygames.{ Clock, GameFamily, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.FromPosition
@@ -11,7 +11,7 @@ import lila.rating.PerfType
 final case class OpenConfig(
     name: Option[String],
     variant: Variant,
-    clock: Option[ClockConfig],
+    clock: Option[Clock.Config],
     rated: Boolean,
     position: Option[FEN] = None
 ) {
@@ -30,7 +30,7 @@ object OpenConfig {
   def from(
       n: Option[String],
       v: Option[String],
-      cl: Option[ClockConfig],
+      cl: Option[Clock.Config],
       rated: Boolean,
       pos: Option[String]
   ) = {

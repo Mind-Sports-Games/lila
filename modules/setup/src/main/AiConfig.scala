@@ -1,21 +1,18 @@
 package lila.setup
 
-import strategygames.{ GameFamily, GameLogic, Mode, P1, P2, Speed }
+import strategygames.{ GameFamily, GameLogic, Mode, Speed, P1, P2 }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.PlayerIndex
 import lila.user.User
 
-// TODO: deal with byoyomi here.
 case class AiConfig(
     variant: Variant,
     fenVariant: Option[Variant],
     timeMode: TimeMode,
     time: Double,
     increment: Int,
-    byoyomi: Int,
-    periods: Int,
     days: Int,
     level: Int,
     playerIndex: PlayerIndex,
@@ -25,18 +22,7 @@ case class AiConfig(
 
   val strictFen = true
 
-  def >> = (
-    s"{$variant.gameFamily.id}_{$variant.id}",
-    timeMode.id,
-    time,
-    increment,
-    byoyomi,
-    periods,
-    days,
-    level,
-    playerIndex.name,
-    fen.map(_.value)
-  ).some
+  def >> = (s"{$variant.gameFamily.id}_{$variant.id}", timeMode.id, time, increment, days, level, playerIndex.name, fen.map(_.value)).some
 
   def game(user: Option[User]) =
     fenGame { chessGame =>
@@ -71,18 +57,7 @@ case class AiConfig(
 
 object AiConfig extends BaseConfig {
 
-  def from(
-      v: String,
-      tm: Int,
-      t: Double,
-      i: Int,
-      b: Int,
-      p: Int,
-      d: Int,
-      level: Int,
-      c: String,
-      fen: Option[String]
-  ) = {
+  def from(v: String, tm: Int, t: Double, i: Int, d: Int, level: Int, c: String, fen: Option[String]) = {
     val gameLogic = GameFamily(v.split("_")(0).toInt).gameLogic
     val variantId = v.split("_")(1).toInt
     new AiConfig(
@@ -91,8 +66,6 @@ object AiConfig extends BaseConfig {
       timeMode = TimeMode(tm) err s"Invalid time mode $tm",
       time = t,
       increment = i,
-      byoyomi = b,
-      periods = p,
       days = d,
       level = level,
       playerIndex = PlayerIndex(c) err "Invalid playerIndex " + c,
@@ -105,9 +78,7 @@ object AiConfig extends BaseConfig {
     fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,
-    increment = 8, // TODO: byoyomi, in lishogi this defaults to 0
-    byoyomi = 10,
-    periods = 1,
+    increment = 8,
     days = 2,
     level = 1,
     playerIndex = PlayerIndex.default
@@ -131,8 +102,6 @@ object AiConfig extends BaseConfig {
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",
         increment = r int "i",
-        byoyomi = r intD "b",
-        periods = r intD "p",
         days = r int "d",
         level = r int "l",
         playerIndex = PlayerIndex.P1,
@@ -145,8 +114,6 @@ object AiConfig extends BaseConfig {
         "tm" -> o.timeMode.id,
         "t"  -> o.time,
         "i"  -> o.increment,
-        "b"  -> o.byoyomi,
-        "p"  -> o.periods,
         "d"  -> o.days,
         "l"  -> o.level,
         "f"  -> o.fen

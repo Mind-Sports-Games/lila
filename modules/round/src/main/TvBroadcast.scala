@@ -85,8 +85,8 @@ final private class TvBroadcast(
             "fen" -> s"$fen ${game.turnPlayerIndex.letter}",
             "lm"  -> move
           )
-          .add("p1" -> game.clock.map(_.remainingTime(strategygames.P1).roundSeconds))
-          .add("p2" -> game.clock.map(_.remainingTime(strategygames.P2).roundSeconds)) // TODO: byoyomi periods here?!
+          .add("wc" -> game.clock.map(_.remainingTime(strategygames.P1).roundSeconds))
+          .add("bc" -> game.clock.map(_.remainingTime(strategygames.P2).roundSeconds))
       )
       clients.foreach(_.queue offer msg)
       featured foreach { f =>

@@ -165,12 +165,7 @@ private object bits {
           div(cls := "increment_choice")(
             renderLabel(form("increment"), trans.incrementInSeconds()),
             renderSelect(form("increment"), clockIncrementChoices)
-          ),
-          div(cls := "byoyomi_choice")(
-            renderLabel(form("byoyomi"), trans.byoyomiInSeconds()),
-            renderSelect(form("byoyomi"), clockByoyomiChoices)
-          ),
-          renderRadios(form("periods"), periodsChoices)
+          )
         )
       else
         frag(
@@ -178,28 +173,9 @@ private object bits {
             trans.minutesPerSide(),
             ": ",
             span(
-              // NOTE:: I believe that the byoyomi and fischer calculations here will be
-              //        the same.
-              //strategygames.ByoyomiClock
-              //  .Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0, 0, 1)
-              //  .limitString
-              strategygames.FischerClock
-                .Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0)
-                .limitString
+              strategygames.Clock.Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0).limitString
             ),
             renderDissociatedRange(form("time"))
-          ),
-          div(cls := "byoyomi_choice range")(
-            trans.byoyomiInSeconds(),
-            ": ",
-            span(form("byoyomi").value),
-            renderDissociatedRange(form("byoyomi"))
-          ),
-          div(cls := "byoyomi_periods buttons")(
-            trans.periods(),
-            div(id := "config_periods")(
-              renderRadios(form("periods"), periodsChoices)
-            )
           ),
           div(cls := "increment_choice range")(
             trans.incrementInSeconds(),
