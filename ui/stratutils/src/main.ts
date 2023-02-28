@@ -98,6 +98,7 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
   switch (variant) {
     case 'flipello10':
     case 'flipello':
+    case 'amazons':
       return { playerIndex: turnPlayerIndex, role: 'p-piece' };
     default:
       return undefined;

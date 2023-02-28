@@ -38,6 +38,10 @@ final class JsonView(
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
+  private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
+    pov.game.variant.onlyDropsVariant || (pov.game.variant.key == "amazons" && pov.game.situation.destinations.size == 0)
+  }
+
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
     gameVariant match {
       case Variant.Draughts(v) => {
@@ -154,7 +158,7 @@ final class JsonView(
           .add("takebackable" -> takebackable)
           .add("moretimeable" -> moretimeable)
           .add("crazyhouse" -> pov.game.board.pocketData)
-          .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
           .add("hasGameScore" -> pov.game.variant.hasGameScore)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
@@ -255,7 +259,7 @@ final class JsonView(
           .add("userTv" -> tv.collect { case OnUserTv(userId) =>
             Json.obj("id" -> userId)
           })
-          .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
           .add("hasGameScore" -> pov.game.variant.hasGameScore)
 
       }
@@ -324,7 +328,7 @@ final class JsonView(
       )
       .add("evalPut" -> me.??(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
-      .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+      .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
       .add("hasGameScore" -> pov.game.variant.hasGameScore)
   }
 

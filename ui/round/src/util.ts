@@ -191,3 +191,11 @@ export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | und
     return uci2move(uci);
   }
 }
+
+export function turnPlayerIndexFromLastPly(ply: Ply, variantKey: VariantKey): PlayerIndex {
+  if (variantKey === 'amazons') {
+    return Math.floor(ply / 2) % 2 === 0 ? 'p1' : 'p2';
+  } else {
+    return ply % 2 === 0 ? 'p1' : 'p2';
+  }
+}

@@ -252,7 +252,7 @@ export default class AnalyseCtrl {
   }
 
   turnPlayerIndex(): PlayerIndex {
-    return util.plyPlayerIndex(this.node.ply);
+    return util.plyPlayerIndex(this.node.ply, this.data.game.variant.key);
   }
 
   togglePlay(delay: AutoplayDelay): void {

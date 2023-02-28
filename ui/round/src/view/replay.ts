@@ -136,6 +136,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     return step !== null ? step.fen : initialFen;
   };
 
+  //TODO support amazons each action is a ply (combine double moves into 1 line)
   const els: MaybeVNodes = [],
     curPly = ctrl.ply;
   for (let i = 0; i < pairs.length; i++) {
