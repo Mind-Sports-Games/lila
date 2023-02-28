@@ -64,6 +64,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
         )
       }
 
+  //TODO This is probably wrong for Amazons
   private def makeVariation(turn: Turn, advice: Advice): List[Turn] =
     Turn.fromMoves(
       advice.info.variation take 20 map { san =>

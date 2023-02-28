@@ -1,6 +1,17 @@
 package lila.game
 
-import strategygames.{ P2, Board, Centis, Clock, Player => PlayerIndex, GameLogic, History, PocketData, P1 }
+import strategygames.{
+  Board,
+  Centis,
+  Clock,
+  GameFamily,
+  GameLogic,
+  History,
+  Player => PlayerIndex,
+  PocketData,
+  P1,
+  P2
+}
 import strategygames.chess.CheckCount
 import strategygames.togyzkumalak.Score
 import strategygames.draughts.KingMoves
@@ -153,9 +164,17 @@ object GameDiff {
       case GameLogic.FairySF() => {
         dTry(
           oldPgn,
-          _.board match {
-            case Board.FairySF(b) => b.uciMoves.toVector
-            case _                => sys.error("Wrong board type")
+          { g =>
+            g.board match {
+              case Board.FairySF(b) =>
+                b.variant.gameFamily match {
+                  //in the case of Amazons we want to store our moves and drops as individuals
+                  case GameFamily.Amazons() => g.pgnMoves
+                  //in other cases we want to store the fairysf format (difference in promotion notation)
+                  case _ => b.uciMoves.toVector
+                }
+              case _ => sys.error("Wrong board type")
+            }
           },
           writeBytes compose pfnStorageWriter
         )
