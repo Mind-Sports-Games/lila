@@ -51,7 +51,6 @@ final private class Cleaner(
   }
 }
 
-
 object Cleaner {
-  val timeoutPerPly = 7.seconds
+  val timeoutPerPly = 120.seconds
 }
