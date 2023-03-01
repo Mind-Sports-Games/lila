@@ -454,9 +454,8 @@ export default class RoundController {
     d.game.turns = o.ply; //todo update for amazons?
     d.game.player = util.turnPlayerIndexFromLastPly(o.ply, d.game.variant.key);
 
-    const amazonTurnToDrop = d.game.variant.key == 'amazons' && o.drops;
-    if (amazonTurnToDrop) {
-      d.onlyDropsVariant = true;
+    if (d.game.variant.key == 'amazons') {
+      d.onlyDropsVariant = o.drops ? true : false;
     }
 
     const playedPlayerIndex = opposite(d.game.player),
@@ -515,6 +514,7 @@ export default class RoundController {
           dropDests: playing ? stratUtils.readDropsByRole(d.possibleDropsByRole) : new Map(),
         },
         check: !!o.check,
+        onlyDropsVariant: this.data.onlyDropsVariant, //need to update every move (amazons)
       });
       if (o.check) sound.check();
       blur.onMove();
