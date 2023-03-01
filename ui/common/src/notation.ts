@@ -23,7 +23,7 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
     case 'san':
       return move => (move.san[0] === 'P' ? move.san.slice(1) : move.san);
     case 'uci':
-      return move => move.uci;
+      return (move, variant) => (variant.key === 'amazons' && move.uci[0] === 'P' ? move.uci.slice(1) : move.uci);
     case 'dpo':
       return destPosOnlyNotation;
     case 'man':

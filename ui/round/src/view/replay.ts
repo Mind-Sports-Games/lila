@@ -312,7 +312,10 @@ export function render(ctrl: RoundController): VNode | undefined {
               while ((node = node.previousSibling as HTMLElement)) {
                 offset++;
                 if (node.tagName === indexTagUC) {
-                  ctrl.userJump((d.game.variant.key === 'amazons' ? 4 : 2) * parseInt(node.textContent || '') + offset);
+                  ctrl.userJump(
+                    (d.game.variant.key === 'amazons' ? 4 : 2) * parseInt(node.textContent || '') +
+                      offset * (d.game.variant.key === 'amazons' ? 2 : 1)
+                  );
                   ctrl.redraw();
                   break;
                 }
