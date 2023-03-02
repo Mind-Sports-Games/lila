@@ -23,11 +23,13 @@ final private class Takebacker(
       pov match {
         case Pov(game, playerIndex) if pov.opponent.isProposingTakeback =>
           {
+            val proposeTakebackAt = pov.opponent.proposeTakebackAt
+            val turns             = pov.game.turns
+            val plysPerTurn       = pov.game.variant.plysPerTurn
+            val povTurn           = playerIndex == PlayerIndex.fromPly(turns, plysPerTurn)
             if (
-              pov.opponent.proposeTakebackAt == pov.game.turns && playerIndex == PlayerIndex.fromPly(
-                pov.opponent.proposeTakebackAt,
-                pov.game.variant.plysPerTurn
-              )
+              proposeTakebackAt == turns &&
+              ((plysPerTurn == 1 && povTurn) || (turns % plysPerTurn > 0 && !povTurn))
             ) single(game)
             else double(game)
           } dmap (_ -> situation.reset)
