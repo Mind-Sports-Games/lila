@@ -3,9 +3,13 @@ package lila.game
 import strategygames.{
   P2,
   Board,
+  ByoyomiClock,
+  ByoyomiClockPlayer,
   Centis,
   Clock,
-  ClockPlayer,
+  ClockConfig,
+  FischerClockPlayer,
+  FischerClock,
   Player => PlayerIndex,
   GameLogic,
   Piece,
@@ -45,7 +49,7 @@ object BinaryFormat {
       chess.format.pgn.Binary.readMoves(ba.value.toList, nb).get.toVector
   }
 
-  object clockHistory {
+  object fischerClockHistory {
     private val logger = lila.log("clockHistory")
 
     def writeSide(start: Centis, times: Vector[Centis], flagged: Boolean) = {
@@ -61,9 +65,36 @@ object BinaryFormat {
 
     def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
       Try {
-        ClockHistory(
+        FischerClockHistory(
           readSide(start, bw, flagged has P1),
           readSide(start, bb, flagged has P2)
+        )
+      }.fold(
+        e => { logger.warn(s"Exception decoding history", e); none },
+        some
+      )
+  }
+
+  object byoyomiClockHistory {
+    private val logger = lila.log("clockHistory")
+
+    def writeSide(start: Centis, times: Vector[Centis], flagged: Boolean) = {
+      val timesToWrite = if (flagged) times.dropRight(1) else times
+      ByteArray(ClockEncoder.encode(timesToWrite.view.map(_.centis).to(Array), start.centis))
+    }
+
+    def readSide(start: Centis, ba: ByteArray, flagged: Boolean) = {
+      val decoded: Vector[Centis] =
+        ClockEncoder.decode(ba.value, start.centis).view.map(Centis.apply).to(Vector)
+      if (flagged) decoded :+ Centis(0) else decoded
+    }
+
+    def read(start: Centis, bs: ByteArray, bg: ByteArray, pe: PeriodEntries, flagged: Option[PlayerIndex]) =
+      Try {
+        ByoyomiClockHistory(
+          readSide(start, bs, flagged has P1),
+          readSide(start, bg, flagged has P2),
+          pe
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },
@@ -104,12 +135,12 @@ object BinaryFormat {
     }.view.take(turns).map(Centis.apply).toVector
   }
 
-  case class clock(start: Timestamp) {
+  case class fischerClock(start: Timestamp) {
 
     def legacyElapsed(clock: Clock, playerIndex: PlayerIndex) =
-      clock.limit - clock.players(playerIndex).remaining
+      clock.limit - clock.clockPlayer(playerIndex).remaining
 
-    def computeRemaining(config: Clock.Config, legacyElapsed: Centis) =
+    def computeRemaining(config: ClockConfig, legacyElapsed: Centis) =
       config.limit - legacyElapsed
 
     def write(clock: Clock): ByteArray = {
@@ -119,7 +150,7 @@ object BinaryFormat {
         clock.timer.fold(Array.empty[Byte])(writeTimer)
     }
 
-    def read(ba: ByteArray, p1Berserk: Boolean, p2Berserk: Boolean): PlayerIndex => Clock =
+    def read(ba: ByteArray, p1Berserk: Boolean, p2Berserk: Boolean): PlayerIndex => FischerClock =
       playerIndex => {
         val ia = ba.value map toInt
 
@@ -133,18 +164,18 @@ object BinaryFormat {
 
         ia match {
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, _*) =>
-            val config   = Clock.Config(readClockLimit(b1), b2)
+            val config   = FischerClock.Config(readClockLimit(b1), b2)
             val legacyP1 = Centis(readSignedInt24(b3, b4, b5))
             val legacyP2 = Centis(readSignedInt24(b6, b7, b8))
-            Clock(
+            FischerClock(
               config = config,
               player = playerIndex,
               players = PlayerIndex.Map(
-                ClockPlayer
+                FischerClockPlayer
                   .withConfig(config)
                   .copy(berserk = p1Berserk)
                   .setRemaining(computeRemaining(config, legacyP1)),
-                ClockPlayer
+                FischerClockPlayer
                   .withConfig(config)
                   .copy(berserk = p2Berserk)
                   .setRemaining(computeRemaining(config, legacyP2))
@@ -186,8 +217,142 @@ object BinaryFormat {
     }
   }
 
-  object clock {
-    def apply(start: DateTime) = new clock(Timestamp(start.getMillis))
+  object fischerClock {
+    def apply(start: DateTime) = new fischerClock(Timestamp(start.getMillis))
+  }
+
+  case class byoyomiClock(start: Timestamp) {
+
+    def legacyElapsed(clock: ByoyomiClock, playerIndex: PlayerIndex) =
+      clock.limit - clock.players(playerIndex).remaining
+
+    def computeRemaining(config: ByoyomiClock.Config, legacyElapsed: Centis) =
+      config.limit - legacyElapsed
+
+    def write(clock: ByoyomiClock): ByteArray = {
+      Array(writeClockLimit(clock.limitSeconds), clock.incrementSeconds.toByte) ++
+        writeSignedInt24(legacyElapsed(clock, P1).centis) ++
+        writeSignedInt24(legacyElapsed(clock, P2).centis) ++
+        clock.timer.fold(Array.empty[Byte])(writeTimer) ++ Array(
+          clock.byoyomiSeconds.toByte,
+          clock.periodsTotal.toByte
+        )
+    }
+
+    def read(
+        ba: ByteArray,
+        periodEntries: PeriodEntries,
+        p1Berserk: Boolean,
+        p2Berserk: Boolean
+    ): PlayerIndex => ByoyomiClock =
+      playerIndex => {
+        val ia = ba.value map toInt
+
+        // ba.size might be greater than 12 with 5 bytes timers
+        // ba.size might be 8 if there was no timer.
+        // #TODO remove 5 byte timer case! But fix the DB first!
+        val timer = {
+          if (ia.size >= 12) readTimer(readInt(ia(8), ia(9), ia(10), ia(11)))
+          else None
+        }
+
+        val byo = {
+          if (ia.size == 14) ia(12)
+          else if (ia.size == 10) ia(8)
+          else 0
+        }
+
+        val per = {
+          if (ia.size == 14) ia(13)
+          else if (ia.size == 10) ia(9)
+          else 1
+        }
+
+        ia match {
+          case Array(b1, b2, b3, b4, b5, b6, b7, b8, _*) => {
+            val config      = ByoyomiClock.Config(readClockLimit(b1), b2, byo, per)
+            val legacyP1 = Centis(readSignedInt24(b3, b4, b5))
+            val legacyP2  = Centis(readSignedInt24(b6, b7, b8))
+            ByoyomiClock(
+              config = config,
+              player = playerIndex,
+              players = PlayerIndex.Map(
+                ByoyomiClockPlayer
+                  .withConfig(config)
+                  .copy(berserk = p1Berserk)
+                  .setRemaining(computeRemaining(config, legacyP1))
+                  .setPeriods(periodEntries(P1).size atLeast config.initPeriod),
+                ByoyomiClockPlayer
+                  .withConfig(config)
+                  .copy(berserk = p2Berserk)
+                  .setRemaining(computeRemaining(config, legacyP2))
+                  .setPeriods(periodEntries(P2).size atLeast config.initPeriod)
+              ),
+              timer = timer
+            )
+          }
+          case _ => sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
+        }
+      }
+
+    private def writeTimer(timer: Timestamp) = {
+      val centis = (timer - start).centis
+      /*
+       * A zero timer is resolved by `readTimer` as the absence of a timer.
+       * As a result, a clock that is started with a timer = 0
+       * resolves as a clock that is not started.
+       * This can happen when the clock was started at the same time as the game
+       * For instance in simuls
+       */
+      val nonZero = centis atLeast 1
+      writeInt(nonZero)
+    }
+
+    private def readTimer(l: Int) =
+      if (l != 0) Some(start + Centis(l)) else None
+
+    private def writeClockLimit(limit: Int): Byte = {
+      // The database expects a byte for a limit, and this is limit / 60.
+      // For 0.5+0, this does not give a round number, so there needs to be
+      // an alternative way to describe 0.5.
+      // The max limit where limit % 60 == 0, returns 180 for limit / 60
+      // So, for the limits where limit % 30 == 0, we can use the space
+      // from 181-255, where 181 represents 0.25 and 182 represents 0.50...
+      (if (limit % 60 == 0) limit / 60 else limit / 15 + 180).toByte
+    }
+
+    private def readClockLimit(i: Int) = {
+      if (i < 181) i * 60 else (i - 180) * 15
+    }
+  }
+
+  object byoyomiClock {
+    def apply(start: DateTime) = new byoyomiClock(Timestamp(start.getMillis))
+  }
+
+  object periodEntries {
+    private val logger = lila.log("periodEntries")
+
+    def writeSide(v: Vector[Int]): ByteArray = {
+      def intToShort(i: Int): Array[Byte] = Array((i >> 8).toByte, i.toByte)
+      (v.flatMap(intToShort _)).toArray
+    }
+    def readSide(ba: ByteArray): Vector[Int] = {
+      def backToInt(b: Array[Byte]): Int =
+        b map toInt match {
+          case Array(b1, b2) => (b1 << 8) + b2
+          case _             => 0
+        }
+      val pairs = ba.value.grouped(2)
+      (pairs map (backToInt _)).toVector
+    }
+    def read(bs: ByteArray, bg: ByteArray): Option[PeriodEntries] =
+      Try {
+        PeriodEntries(readSide(bs), readSide(bg))
+      }.fold(
+        e => { logger.warn(s"Exception decoding period entries", e); none },
+        some
+      )
   }
 
   // This class is chess only for the time being.
@@ -357,7 +522,7 @@ object BinaryFormat {
           Some(
             (
               togyzkumalak.Piece(
-                player,
+                !player,
                 togyzkumalak.Role.binaryInt(int).getOrElse(variant.defaultRole)
               ),
               1

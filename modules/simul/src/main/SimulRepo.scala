@@ -27,8 +27,8 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
     def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLogic.id, "v" -> v.id)
   }
 
-  import strategygames.Clock.Config
-  implicit private val clockHandler         = Macros.handler[Config]
+  import strategygames.ClockConfig
+  implicit private val clockHandler         = clockConfigHandler
   implicit private val ClockBSONHandler     = Macros.handler[SimulClock]
   implicit private val PlayerBSONHandler    = Macros.handler[SimulPlayer]
   implicit private val ApplicantBSONHandler = Macros.handler[SimulApplicant]

@@ -3,7 +3,7 @@ package lila.setup
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Chess960, FromPosition }
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, GameFamily, Mode, Speed }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, Mode, Speed }
 
 import lila.game.PerfPicker
 import lila.lobby.PlayerIndex
@@ -12,7 +12,7 @@ import lila.common.Template
 
 final case class ApiConfig(
     variant: Variant,
-    clock: Option[Clock.Config],
+    clock: Option[ClockConfig],
     days: Option[Int],
     rated: Boolean,
     playerIndex: PlayerIndex,
@@ -46,7 +46,8 @@ object ApiConfig extends BaseHumanConfig {
 
   def from(
       v: Option[String],
-      cl: Option[Clock.Config],
+      fcl: Option[FischerClock.Config],
+      bcl: Option[ByoyomiClock.Config],
       d: Option[Int],
       r: Boolean,
       c: Option[String],
@@ -58,7 +59,7 @@ object ApiConfig extends BaseHumanConfig {
     val variant = Variant.orDefault(~v)
     new ApiConfig(
       variant = variant,
-      clock = cl,
+      clock = bcl.orElse(fcl),
       days = d,
       rated = r,
       playerIndex = PlayerIndex.orDefault(~c),

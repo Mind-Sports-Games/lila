@@ -11,7 +11,7 @@ import lila.db.dsl._
 import lila.db.paginator.Adapter
 import lila.user.User
 
-import strategygames.{ Clock, GameLogic, Mode }
+import strategygames.{ FischerClock, GameLogic, Mode }
 import strategygames.variant.Variant
 
 final class CrudApi(tournamentRepo: TournamentRepo) {
@@ -68,11 +68,12 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       maxPerPage = MaxPerPage(20)
     )
 
+  // TODO: byoyomi needs updating here
   private def empty =
     Tournament.make(
       by = Left(User.playstrategyId),
       name = none,
-      clock = Clock.Config(0, 0),
+      clock = FischerClock.Config(0, 0),
       minutes = 0,
       variant = Variant.libStandard(GameLogic.Chess()),
       position = none,
@@ -87,9 +88,10 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       hasChat = true
     )
 
+  // TODO: byoyomi needs updating here
   private def updateTour(tour: Tournament, data: CrudForm.Data) = {
     import data._
-    val clock = Clock.Config((clockTime * 60).toInt, clockIncrement)
+    val clock = FischerClock.Config((clockTime * 60).toInt, clockIncrement)
     tour.copy(
       name = name,
       clock = clock,

@@ -22,30 +22,44 @@ private object BSONHandlers {
       case _ => PlayerIndexChoice.Random
     },
     {
-      case PlayerIndexChoice.P1  => 1
-      case PlayerIndexChoice.P2  => 2
+      case PlayerIndexChoice.P1     => 1
+      case PlayerIndexChoice.P2     => 2
       case PlayerIndexChoice.Random => 0
     }
   )
+  // NOTE: the following works because all of our clock type representations are different enough
+  //       from each other that we can distinguish between them by the existence of their attributes
+  //       New clock types will need to continue this pattern.
   implicit val TimeControlBSONHandler = new BSON[TimeControl] {
     def reads(r: Reader) =
-      (r.intO("l"), r.intO("i")) mapN { (limit, inc) =>
-        TimeControl.Clock(strategygames.Clock.Config(limit, inc))
-      } orElse {
-        r intO "d" map TimeControl.Correspondence.apply
-      } getOrElse TimeControl.Unlimited
+      (r.intO("l"), r.intO("i"), r.intO("b"), r.intO("p"))
+        .mapN((limit, inc, byoyomi, periods) =>
+          TimeControl.Clock(strategygames.ByoyomiClock.Config(limit, inc, byoyomi, periods))
+        )
+        .getOrElse(
+          (r.intO("l"), r.intO("i"))
+            .mapN { (limit, inc) =>
+              TimeControl.Clock(strategygames.FischerClock.Config(limit, inc))
+            }
+            .orElse(
+              r intO "d" map TimeControl.Correspondence.apply
+            )
+            .getOrElse(TimeControl.Unlimited)
+        )
     def writes(w: Writer, t: TimeControl) =
       t match {
-        case TimeControl.Clock(strategygames.Clock.Config(l, i)) => $doc("l" -> l, "i" -> i)
-        case TimeControl.Correspondence(d)               => $doc("d" -> d)
-        case TimeControl.Unlimited                       => $empty
+        case TimeControl.Clock(strategygames.FischerClock.Config(l, i)) => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.ByoyomiClock.Config(l, i, b, p)) =>
+          $doc("l" -> l, "i" -> i, "b" -> b, "p" -> p)
+        case TimeControl.Correspondence(d) => $doc("d" -> d)
+        case TimeControl.Unlimited         => $empty
       }
   }
 
   implicit val VariantBSONHandler = new BSON[Variant] {
     def reads(r: Reader) = Variant(GameLogic(r.intD("gl")), r.int("v")) match {
       case Some(v) => v
-      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
+      case None    => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
     }
     def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLogic.id, "v" -> v.id)
   }

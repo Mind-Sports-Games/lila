@@ -6,10 +6,10 @@ import strategygames.chess.variant.Standard
 import lila.i18n.VariantKeys
 import lila.rating.PerfType
 
-import strategygames.{ Clock, Speed }
+import strategygames.{ ClockConfig, Speed }
 
 case class PoolConfig(
-    clock: Clock.Config,
+    clock: ClockConfig,
     wave: PoolConfig.Wave,
     variant: Variant
 ) {
@@ -35,7 +35,7 @@ object PoolConfig {
 
   //def clockToId(clock: Clock.Config) = Id(clock.show)
 
-  def clockAndVariantToId(clock: Clock.Config, variant: Variant) = Id(clock.show + "-" + variant.key)
+  def clockAndVariantToId(clock: ClockConfig, variant: Variant) = Id(clock.show + "-" + variant.key)
 
   import play.api.libs.json._
   implicit val poolConfigJsonWriter = OWrites[PoolConfig] { p =>

@@ -970,4 +970,18 @@ export default class AnalyseCtrl {
     if (this.chessground && this.cgVersion.js === this.cgVersion.dom) return f(this.chessground);
     return undefined;
   }
+
+  // FROM LISHOGI TO HELP TO BYOYOMI CLOCKS
+  // Ideally we would just use node.clock
+  // but we store remaining times for lishogi games as node.clock
+  // for imports we store movetime as node.clock, because
+  // that's what's provided next to each move
+  getMovetime = (node: Tree.Node): number | undefined => {
+    const offset = this.mainline[0].ply;
+    if (defined(node.clock) && !this.study) {
+      if (defined(this.data.game.moveCentis)) return this.data.game.moveCentis[node.ply - 1 - offset];
+      //if (this.imported) return node.clock;
+    }
+    return;
+  };
 }

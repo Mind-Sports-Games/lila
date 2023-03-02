@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.variant.Variant
-import strategygames.{ Clock, GameLogic }
+import strategygames.{ ClockConfig, GameLogic }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.ReadPreference
@@ -151,8 +151,8 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
   def isUnfinished(tourId: Tournament.ID): Fu[Boolean] =
     coll.exists($id(tourId) ++ unfinishedSelect)
 
-  def clockById(id: Tournament.ID): Fu[Option[Clock.Config]] =
-    coll.primitiveOne[Clock.Config]($id(id), "clock")
+  def clockById(id: Tournament.ID): Fu[Option[ClockConfig]] =
+    coll.primitiveOne[ClockConfig]($id(id), "clock")
 
   def byTeamCursor(teamId: TeamID) =
     coll

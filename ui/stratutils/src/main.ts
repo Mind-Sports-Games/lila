@@ -105,15 +105,8 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
   }
 }
 
-const noFishnetVariants: VariantKey[] = [
-  'linesOfAction',
-  'scrambledEggs',
-  'flipello',
-  'flipello10',
-  'amazons',
-  'oware',
-  'togyzkumalak',
-];
+
+const noFishnetVariants: VariantKey[] = ['linesOfAction', 'scrambledEggs', 'oware', 'togyzkumalak'];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
 }
