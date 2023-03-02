@@ -7,6 +7,7 @@ import strategygames.{
   Centis,
   Clock,
   FischerClock,
+  GameFamily,
   Player => PlayerIndex,
   GameLogic,
   History,
