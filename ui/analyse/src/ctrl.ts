@@ -322,6 +322,7 @@ export default class AnalyseCtrl {
             },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
+        onlyDropsVariant: this.data.onlyDropsVariant,
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
