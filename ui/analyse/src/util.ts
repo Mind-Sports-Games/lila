@@ -13,8 +13,12 @@ export function clearSelection() {
   window.getSelection()?.removeAllRanges();
 }
 
-export function plyPlayerIndex(ply: number): PlayerIndex {
-  return ply % 2 === 0 ? 'p1' : 'p2';
+export function plyPlayerIndex(ply: number, variantKey: VariantKey): PlayerIndex {
+  if (variantKey === 'amazons') {
+    return Math.floor(ply / 2) % 2 === 0 ? 'p1' : 'p2';
+  } else {
+    return ply % 2 === 0 ? 'p1' : 'p2';
+  }
 }
 
 export function bindMobileMousedown(el: HTMLElement, f: (e: Event) => unknown, redraw?: () => void) {
@@ -251,6 +255,7 @@ const noCevalVariants = [
   'minixiangqi',
   'flipello',
   'flipello10',
+  'amazons',
   'oware',
   'togyzkumalak',
 ];
@@ -335,6 +340,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'flipello';
     case 'flipello10':
       return 'flipello10';
+    case 'amazons':
+      return 'amazons';
     case 'oware':
       return 'oware';
     case 'togyzkumalak':

@@ -34,6 +34,7 @@ case class History(
     minixiangqi: RatingsMap,
     flipello: RatingsMap,
     flipello10: RatingsMap,
+    amazons: RatingsMap,
     oware: RatingsMap,
     togyzkumalak: RatingsMap,
     ultraBullet: RatingsMap,
@@ -81,6 +82,7 @@ case class History(
       case "minixiangqi"    => minixiangqi
       case "flipello"       => flipello
       case "flipello10"     => flipello10
+      case "amazons"        => amazons
       case "oware"          => oware
       case "togyzkumalak"   => togyzkumalak
       case "puzzle"         => puzzle
@@ -140,6 +142,7 @@ object History {
           minixiangqi = ratingsMap("minixiangqi"),
           flipello = ratingsMap("flipello"),
           flipello10 = ratingsMap("flipello10"),
+          amazons = ratingsMap("amazons"),
           oware = ratingsMap("oware"),
           togyzkumalak = ratingsMap("togyzkumalak"),
           ultraBullet = ratingsMap("ultraBullet"),

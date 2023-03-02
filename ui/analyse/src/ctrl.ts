@@ -252,7 +252,7 @@ export default class AnalyseCtrl {
   }
 
   turnPlayerIndex(): PlayerIndex {
-    return util.plyPlayerIndex(this.node.ply);
+    return util.plyPlayerIndex(this.node.ply, this.data.game.variant.key);
   }
 
   togglePlay(delay: AutoplayDelay): void {
@@ -322,6 +322,7 @@ export default class AnalyseCtrl {
             },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
+        onlyDropsVariant: this.data.onlyDropsVariant,
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server

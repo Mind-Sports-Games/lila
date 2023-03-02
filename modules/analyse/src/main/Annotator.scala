@@ -15,7 +15,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
     annotateStatus(game.winnerPlayerIndex, game.status, game.variant) {
       annotateOpening(game.opening) {
         annotateTurns(
-          annotateDrawOffers(p, game.drawOffers),
+          annotateDrawOffers(p, game.drawOffers, game.variant),
           analysis.??(_.advices)
         )
       }.copy(
@@ -51,19 +51,20 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       )
     }
 
-  private def annotateDrawOffers(pgn: Pgn, drawOffers: GameDrawOffers): Pgn =
+  private def annotateDrawOffers(pgn: Pgn, drawOffers: GameDrawOffers, variant: Variant): Pgn =
     if (drawOffers.isEmpty) pgn
     else
       drawOffers.normalizedPlies.foldLeft(pgn) { case (pgn, ply) =>
         pgn.updatePly(
           ply,
           move => {
-            val playerIndex = !PlayerIndex.fromPly(ply)
+            val playerIndex = !PlayerIndex.fromPly(ply, variant.plysPerTurn)
             move.copy(comments = s"$playerIndex offers draw" :: move.comments)
           }
         )
       }
 
+  //TODO This is probably wrong for Amazons
   private def makeVariation(turn: Turn, advice: Advice): List[Turn] =
     Turn.fromMoves(
       advice.info.variation take 20 map { san =>

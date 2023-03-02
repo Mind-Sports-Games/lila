@@ -18,7 +18,7 @@ export function makeConfig(ctrl: RoundController): Config {
     step = plyStep(data, ctrl.ply),
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
-    turnPlayerIndex = step.ply % 2 === 0 ? 'p1' : 'p2';
+    turnPlayerIndex = util.turnPlayerIndexFromLastPly(step.ply, data.game.variant.key);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -109,6 +109,10 @@ export function makeConfig(ctrl: RoundController): Config {
             : variantKey === 'flipello' || variantKey === 'flipello10'
             ? 'https://playstrategy.org/assets/piece/flipello/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
+              '/'
+            : variantKey === 'amazons'
+            ? 'https://playstrategy.org/assets/piece/amazons/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
               '/'
             : variantKey === 'oware'
             ? 'https://playstrategy.org/assets/piece/oware/' +

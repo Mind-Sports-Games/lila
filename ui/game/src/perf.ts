@@ -33,6 +33,7 @@ export const perf = {
     minixiangqi: '',
     flipello: '',
     flipello10: '',
+    amazons: '€',
     oware: '',
     togyzkumalak: '›',
   },

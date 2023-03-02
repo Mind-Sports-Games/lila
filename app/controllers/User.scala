@@ -314,6 +314,7 @@ final class User(
                   "minixiangqi"   -> leaderboards.minixiangqi,
                   "flipello"      -> leaderboards.flipello,
                   "flipello10"    -> leaderboards.flipello10,
+                  "amazons"       -> leaderboards.amazons,
                   "oware"         -> leaderboards.oware,
                   "togyzkumalak"  -> leaderboards.togyzkumalak
                 )

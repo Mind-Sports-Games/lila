@@ -120,7 +120,7 @@ function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const notation = notationStyle(variant.key);
   const path = opts.parentPath + node.id,
     content: MaybeVNodes = [
-      opts.withIndex || node.ply & 1 ? moveView.renderIndex(node.ply, true) : null,
+      opts.withIndex || node.ply & 1 ? moveView.renderIndex(node.ply, variant.key, true) : null,
       // TODO: the || '' are probably not correct
       moveFromNotationStyle(notation)(
         {

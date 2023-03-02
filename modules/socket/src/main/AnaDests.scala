@@ -10,6 +10,9 @@ import strategygames.opening.FullOpeningDB
 import strategygames.{ Board, Game, GameLogic, Move, Pos, Situation }
 import lila.tree.Node.{ destString, openingWriter }
 
+//We think this code is deprecated and never used!
+//Look in lila-ws for the new version (Chess.scala)
+//Check to see if the pp has ever been called
 case class AnaDests(
     variant: Variant,
     fen: FEN,
@@ -19,15 +22,15 @@ case class AnaDests(
     fullCapture: Option[Boolean] = None
 ) {
 
-  def isInitial = (variant.standard || variant.draughtsStandard ) && fen.initial && path == ""
+  def isInitial = (variant.standard || variant.draughtsStandard) && fen.initial && path == ""
 
   private lazy val sit = Game(variant.gameLogic, variant.some, fen.some).situation
 
   //draughts
   private val orig: Option[strategygames.draughts.Pos] =
     (sit, variant) match {
-      case (Situation.Draughts(sit), Variant.Draughts(variant))
-        => (lastUci.exists(_.length >= 4) && sit.ghosts > 0) ?? lastUci.flatMap { uci =>
+      case (Situation.Draughts(sit), Variant.Draughts(variant)) =>
+        (lastUci.exists(_.length >= 4) && sit.ghosts > 0) ?? lastUci.flatMap { uci =>
           variant.boardSize.pos.posAt(uci.substring(uci.length - 2))
         }
       case _ => None
@@ -39,13 +42,13 @@ case class AnaDests(
 
   //draughts
   lazy val captureLength: Int = sit match {
-    case Situation.Draughts(sit) => 
+    case Situation.Draughts(sit) =>
       orig.fold(sit.allMovesCaptureLength)(~sit.captureLengthFrom(_))
     case _ => 0
   }
 
   //draughts
-  private val truncatedMoves: Option[MapView[strategygames.draughts.Pos,List[String]]] =
+  private val truncatedMoves: Option[MapView[strategygames.draughts.Pos, List[String]]] =
     (!isInitial && ~fullCapture && captureLength > 1) option AnaDests.truncateMoves(validMoves)
 
   val dests: String = variant match {
@@ -54,30 +57,33 @@ case class AnaDests(
       else sit.playable(false) ?? destString(sit.destinations)
     case Variant.Draughts(variant) =>
       if (isInitial) AnaDests.initialDraughtsDests
-      else sit.playable(false) ?? {
-        val truncatedDests = truncatedMoves.map { _ mapValues { _ flatMap (
-          uci => variant.boardSize.pos.posAt(uci.takeRight(2))
-        ) } }
-        val destsToConvert: Map[Pos, List[Pos]] =
-          truncatedDests.getOrElse(validMoves.view.mapValues{ _ map (_.dest) }).to(Map)
-            .map{case(p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts))}
-        val destStr = destString(destsToConvert)
-        if (captureLength > 0) s"#$captureLength $destStr"
-        else destStr
-      }
+      else
+        sit.playable(false) ?? {
+          val truncatedDests = truncatedMoves.map {
+            _ mapValues { _ flatMap (uci => variant.boardSize.pos.posAt(uci.takeRight(2))) }
+          }
+          val destsToConvert: Map[Pos, List[Pos]] =
+            truncatedDests
+              .getOrElse(validMoves.view.mapValues { _ map (_.dest) })
+              .to(Map)
+              .map { case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts)) }
+          val destStr = destString(destsToConvert)
+          if (captureLength > 0) s"#$captureLength $destStr"
+          else destStr
+        }
   }
 
   //draughts
   val destsUci: Option[List[String]] = truncatedMoves.map(_.values.toList.flatten)
 
   lazy val opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? {
-      FullOpeningDB.findByFen(variant.gameLogic, fen)
+    FullOpeningDB.findByFen(variant.gameLogic, fen)
   }
 
   def json =
     Json
       .obj(
-        "dests" -> dests,
+        "dests" -> dests.pp("AnaDestsBeingUsed"),
         "path"  -> path
       )
       .add("opening" -> opening)
@@ -95,7 +101,7 @@ object AnaDests {
 
   //draughts
   private def uniqueUci(otherUcis: List[BoardWithUci], uci: BoardWithUci) = {
-    var i = 2
+    var i      = 2
     var unique = uci._2.slice(0, i)
     while (i + 2 <= uci._2.length && otherUcis.exists(_._2.startsWith(unique))) {
       i += 2
@@ -107,7 +113,11 @@ object AnaDests {
   }
 
   //draughts
-  def validMoves(sit: Situation, from: Option[strategygames.draughts.Pos], fullCapture: Boolean): Map[strategygames.draughts.Pos, List[strategygames.draughts.Move]] = sit match {
+  def validMoves(
+      sit: Situation,
+      from: Option[strategygames.draughts.Pos],
+      fullCapture: Boolean
+  ): Map[strategygames.draughts.Pos, List[strategygames.draughts.Move]] = sit match {
     case Situation.Draughts(sit) =>
       from.fold(if (fullCapture) sit.validMovesFinal else sit.validMoves) { pos =>
         Map(pos -> sit.movesFrom(pos, fullCapture))
@@ -116,15 +126,20 @@ object AnaDests {
   }
 
   //draughts
-  def truncateMoves(validMoves: Map[strategygames.draughts.Pos, List[strategygames.draughts.Move]]): MapView[strategygames.draughts.Pos,List[String]] = {
+  def truncateMoves(
+      validMoves: Map[strategygames.draughts.Pos, List[strategygames.draughts.Move]]
+  ): MapView[strategygames.draughts.Pos, List[String]] = {
     var truncated = false
-    val truncatedMoves = validMoves map {
-      case (pos, moves) =>
-        if (moves.size <= 1) pos -> moves.map(m => (m.after.some, m.toUci.uci))
-        else pos -> moves.foldLeft(List[BoardWithUci]()) { (acc, move) =>
-          val sameDestUcis = moves.filter(m => m != move && m.dest == move.dest && (m.orig == m.dest || m.after != move.after)).map(m => (m.after.some, m.toUci.uci))
+    val truncatedMoves = validMoves map { case (pos, moves) =>
+      if (moves.size <= 1) pos -> moves.map(m => (m.after.some, m.toUci.uci))
+      else
+        pos -> moves.foldLeft(List[BoardWithUci]()) { (acc, move) =>
+          val sameDestUcis = moves
+            .filter(m => m != move && m.dest == move.dest && (m.orig == m.dest || m.after != move.after))
+            .map(m => (m.after.some, m.toUci.uci))
           val uci = (move.after.some, move.toUci.uci)
-          val newUci = if (sameDestUcis.isEmpty && move.orig != move.dest) uci else uniqueUci(sameDestUcis, uci)
+          val newUci =
+            if (sameDestUcis.isEmpty && move.orig != move.dest) uci else uniqueUci(sameDestUcis, uci)
           if (!acc.contains(newUci)) {
             if (newUci._2.length != uci._2.length) truncated = true
             newUci :: acc
@@ -134,19 +149,25 @@ object AnaDests {
           }
         }
     }
-    (if (truncated) truncateUcis(truncatedMoves) else truncatedMoves).view.mapValues{ _ map { _._2 } }
+    (if (truncated) truncateUcis(truncatedMoves) else truncatedMoves).view.mapValues { _ map { _._2 } }
   }
 
   //draughts
   @scala.annotation.tailrec
-  private def truncateUcis(validUcis: Map[strategygames.draughts.Pos, List[BoardWithUci]]): Map[strategygames.draughts.Pos, List[BoardWithUci]] = {
+  private def truncateUcis(
+      validUcis: Map[strategygames.draughts.Pos, List[BoardWithUci]]
+  ): Map[strategygames.draughts.Pos, List[BoardWithUci]] = {
     var truncated = false
-    val truncatedUcis = validUcis map {
-      case (pos, uciList) =>
-        if (uciList.size <= 1) pos -> uciList
-        else pos -> uciList.foldLeft(List[BoardWithUci]()) { (acc, uci) =>
+    val truncatedUcis = validUcis map { case (pos, uciList) =>
+      if (uciList.size <= 1) pos -> uciList
+      else
+        pos -> uciList.foldLeft(List[BoardWithUci]()) { (acc, uci) =>
           val dest = uci._2.takeRight(2)
-          val sameDestUcis = uciList.filter(u => u != uci && u._2.takeRight(2) == dest && (u._2.startsWith(dest) || (u._1.isEmpty && uci._1.isEmpty) || u._1 != uci._1))
+          val sameDestUcis = uciList.filter(u =>
+            u != uci && u._2.takeRight(2) == dest && (u._2.startsWith(
+              dest
+            ) || (u._1.isEmpty && uci._1.isEmpty) || u._1 != uci._1)
+          )
           val newUci = if (sameDestUcis.isEmpty) uci else uniqueUci(sameDestUcis, uci)
           if (!acc.contains(newUci)) {
             if (newUci._2.length != uci._2.length) truncated = true
@@ -163,8 +184,8 @@ object AnaDests {
 
   def parse(o: JsObject) =
     for {
-      d <- o obj "d"
-      lib  <- d int "lib"
+      d   <- o obj "d"
+      lib <- d int "lib"
       variant = Variant.orDefault(GameLogic(lib), ~d.str("variant"))
       fen  <- d str "fen"
       path <- d str "path"

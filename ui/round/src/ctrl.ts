@@ -16,6 +16,7 @@ import { Config as CgConfig } from 'chessground/config';
 import { Api as CgApi } from 'chessground/api';
 import { setDropMode, cancelDropMode } from 'chessground/drop';
 import { State } from 'chessground/state';
+import { opposite } from 'chessground/util';
 import { ClockController, isByoyomi } from './clock/clockCtrl';
 import { CorresClockController, ctrl as makeCorresClock } from './corresClock/corresClockCtrl';
 import MoveOn from './moveOn';
@@ -238,9 +239,17 @@ export default class RoundController {
 
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
     if (
-      ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware', 'togyzkumalak'].includes(
-        this.data.game.variant.key
-      )
+      [
+        'xiangqi',
+        'shogi',
+        'minixiangqi',
+        'minishogi',
+        'flipello',
+        'flipello10',
+        'oware',
+        'togyzkumalak',
+        'amazons',
+      ].includes(this.data.game.variant.key)
     )
       return false;
     if (orig[0] === dest[0] || this.chessground.state.pieces.get(dest)?.role !== 'p-piece') return false;
@@ -296,7 +305,7 @@ export default class RoundController {
         fen: s.fen,
         lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
         check: !!s.check,
-        turnPlayerIndex: this.ply % 2 === 0 ? 'p1' : 'p2',
+        turnPlayerIndex: util.turnPlayerIndexFromLastPly(this.ply, this.data.game.variant.key),
       };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -313,8 +322,12 @@ export default class RoundController {
     if (this.data.game.variant.key === 'togyzkumalak') {
       this.chessground.redrawAll(); //redraw board scores
     }
+    const amazonTurnToDrop =
+      this.data.game.variant.key === 'amazons' &&
+      this.data.possibleDropsByRole &&
+      this.data.possibleDropsByRole.length > 0;
     if (this.data.onlyDropsVariant) {
-      if (ply == this.lastPly()) {
+      if (ply == this.lastPly() && (this.data.game.variant.key !== 'amazons' || amazonTurnToDrop)) {
         this.setDropOnlyVariantDropMode(
           this.data.player.playerIndex === this.data.game.player,
           this.data.player.playerIndex,
@@ -432,7 +445,7 @@ export default class RoundController {
         else {
           let move = d.steps[d.steps.length - 1].san;
           const turn = Math.floor((this.ply - 1) / 2) + 1;
-          move = `${turn}${this.ply % 2 === 1 ? '.' : '...'} ${move}`;
+          move = `${turn}${this.ply % 2 === 1 ? '.' : '...'} ${move}`; //todo amazons
           txt = `${opponent}\nplayed ${move}.\n${txt}`;
         }
         return txt;
@@ -446,9 +459,14 @@ export default class RoundController {
   apiMove = (o: ApiMove): true => {
     const d = this.data,
       playing = this.isPlaying();
-    d.game.turns = o.ply;
-    d.game.player = o.ply % 2 === 0 ? 'p1' : 'p2';
-    const playedPlayerIndex = o.ply % 2 === 0 ? 'p2' : 'p1',
+    d.game.turns = o.ply; //todo update for amazons?
+    d.game.player = util.turnPlayerIndexFromLastPly(o.ply, d.game.variant.key);
+
+    if (d.game.variant.key == 'amazons') {
+      d.onlyDropsVariant = o.drops ? true : false;
+    }
+
+    const playedPlayerIndex = opposite(d.game.player),
       activePlayerIndex = d.player.playerIndex === d.game.player;
     if (o.status) d.game.status = o.status;
     if (o.winner) d.game.winner = o.winner;
@@ -504,6 +522,7 @@ export default class RoundController {
           dropDests: playing ? stratUtils.readDropsByRole(d.possibleDropsByRole) : new Map(),
         },
         check: !!o.check,
+        onlyDropsVariant: this.data.onlyDropsVariant, //need to update every move (amazons)
       });
       if (o.check) sound.check();
       blur.onMove();

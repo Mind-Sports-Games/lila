@@ -326,7 +326,7 @@ case class Game(
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
-      case d: Uci.Drop => s"${d.role}${d.role}"
+      case d: Uci.Drop => s"${d.pos}${d.pos}"
       case m: Uci.Move => m.keys
       case _           => sys.error("Type Error")
     }
@@ -647,7 +647,7 @@ case class Game(
   def onePlayerHasMoved    = playedTurns > 0
   def bothPlayersHaveMoved = playedTurns > 1
 
-  def startPlayerIndex = PlayerIndex.fromPly(chess.startedAtTurn)
+  def startPlayerIndex = PlayerIndex.fromPly(chess.startedAtTurn, variant.plysPerTurn)
 
   def playerMoves(playerIndex: PlayerIndex): Int =
     if (playerIndex == startPlayerIndex) (playedTurns + 1) / 2

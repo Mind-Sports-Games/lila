@@ -89,6 +89,7 @@ const gameFamily: GameFamilyKey[] = [
   'shogi',
   'xiangqi',
   'flipello',
+  'amazons',
   'oware',
   'togyzkumalak',
 ];
