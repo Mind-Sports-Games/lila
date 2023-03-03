@@ -35,9 +35,10 @@ object Rewind {
             tags = createTags(initialFen, game)
           )
     }).flatMap(_.valid) map { replay =>
-      val playerIndex  = game.turnPlayerIndex
+      val switchPlayer = game.pgnMoves.size % game.variant.plysPerTurn == 0
+      val playerIndex  = if (switchPlayer) game.turnPlayerIndex else !game.turnPlayerIndex
       val rewindedGame = replay.state
-      val newClock = game.clock.map(_.takeback) map { clk =>
+      val newClock = game.clock.map(_.takeback(switchPlayer)) map { clk =>
         game.clockHistory.flatMap(_.last(playerIndex)).fold(clk) { t =>
           clk.setRemainingTime(playerIndex, t)
         }
