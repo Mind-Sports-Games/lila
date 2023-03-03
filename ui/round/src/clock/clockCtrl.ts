@@ -175,7 +175,8 @@ export class ClockController {
     Math.min(1, millis * this.timeRatioDivisor[playerIndex]);
 
   setClock = (d: RoundData, p1: Seconds, p2: Seconds, p1Per = 0, p2Per = 0, delay: Centis = 0) => {
-    const isClockRunning = game.playable(d) && (game.playedTurns(d) > 1 || d.clock!.running),
+    const bothPlayersHavePlayed = game.playedTurns(d) > (d.game.variant.key === 'amazons' ? 3 : 1); //also an attribute on game but need changing
+    const isClockRunning = game.playable(d) && (bothPlayersHavePlayed || d.clock!.running),
       delayMs = delay * 10;
 
     this.times = {
