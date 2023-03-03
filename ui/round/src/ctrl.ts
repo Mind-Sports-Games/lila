@@ -553,8 +553,9 @@ export default class RoundController {
       } else if (this.clock) this.clock.setClock(d, oc.p1, oc.p2, delay);
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
+    const bothPlayerMovedPlyCount = d.game.variant.key == 'amazons' ? 4 : 2;
     if (this.data.expiration) {
-      if (this.data.steps.length > 2 && !this.data.pref.playerTurnIndicator) {
+      if (this.data.steps.length > bothPlayerMovedPlyCount && !this.data.pref.playerTurnIndicator) {
         this.data.expiration = undefined;
       } else this.data.expiration.movedAt = Date.now();
     }

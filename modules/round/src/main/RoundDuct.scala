@@ -491,7 +491,10 @@ final private[round] class RoundDuct(
   private def getPlayer(playerIndex: PlayerIndex): Player = playerIndex.fold(p1Player, p2Player)
 
   private def recordLag(pov: Pov): Unit =
-    if ((pov.game.playedTurns & 30) == 10) {
+    if (
+      (pov.game.variant.plysPerTurn == 1 && (pov.game.playedTurns & 30) == 10) || (pov.game.variant.plysPerTurn == 2 && ((pov.game.playedTurns & 30) == 10) || (pov.game.playedTurns & 30) == 12)
+    ) {
+      // todo does this actualy work for amazons?
       // Triggers every 32 moves starting on ply 10.
       // i.e. 10, 11, 42, 43, 74, 75, ...
       for {
