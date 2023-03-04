@@ -13,7 +13,8 @@ case class Pairing(
     winner: Option[User.ID],
     turns: Option[Int],
     berserk1: Boolean,
-    berserk2: Boolean
+    berserk2: Boolean,
+    plysPerTurn: Option[Int]
 ) {
 
   def gameId = id
@@ -32,10 +33,10 @@ case class Pairing(
   def finished = status >= strategygames.Status.Mate
   def playing  = !finished
 
-  def quickFinish      = finished && turns.exists(20 >)
-  def quickDraw        = draw && turns.exists(20 >)
-  def notSoQuickFinish = finished && turns.exists(14 <=)
-  def longGame         = turns.exists(60 <=)
+  def quickFinish      = finished && turns.exists((20 * plysPerTurn.getOrElse(1)) >)
+  def quickDraw        = draw && turns.exists((20 * plysPerTurn.getOrElse(1)) >)
+  def notSoQuickFinish = finished && turns.exists((14 * plysPerTurn.getOrElse(1)) <=)
+  def longGame         = turns.exists((60 * plysPerTurn.getOrElse(1)) <=)
 
   def wonBy(user: User.ID): Boolean     = winner.has(user)
   def lostBy(user: User.ID): Boolean    = winner.exists(user !=)
@@ -80,7 +81,8 @@ private[tournament] object Pairing {
       winner = none,
       turns = none,
       berserk1 = false,
-      berserk2 = false
+      berserk2 = false,
+      plysPerTurn = none
     )
 
   case class Prep(tourId: Tournament.ID, user1: User.ID, user2: User.ID) {
@@ -88,8 +90,16 @@ private[tournament] object Pairing {
       make(gameId, tourId, user1, user2)
   }
 
-  def prepWithPlayerIndex(tour: Tournament, p1: RankedPlayerWithPlayerIndexHistory, p2: RankedPlayerWithPlayerIndexHistory) =
-    if (p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() => lila.common.ThreadLocalRandom.nextBoolean()))
+  def prepWithPlayerIndex(
+      tour: Tournament,
+      p1: RankedPlayerWithPlayerIndexHistory,
+      p2: RankedPlayerWithPlayerIndexHistory
+  ) =
+    if (
+      p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() =>
+        lila.common.ThreadLocalRandom.nextBoolean()
+      )
+    )
       Prep(tour.id, p1.player.userId, p2.player.userId)
     else Prep(tour.id, p2.player.userId, p1.player.userId)
 }
