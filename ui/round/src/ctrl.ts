@@ -653,12 +653,12 @@ export default class RoundController {
       d.player.ratingDiff = o.ratingDiff[d.player.playerIndex];
       d.opponent.ratingDiff = o.ratingDiff[d.opponent.playerIndex];
     }
-    if (!d.player.spectator && d.game.turns > 1) {
+    if (!d.player.spectator && d.game.turns > (d.game.variant.key === 'amazons' ? 2 : 1)) {
       const key = o.winner ? (d.player.playerIndex === o.winner ? 'victory' : 'defeat') : 'draw';
       playstrategy.sound.play(key);
       if (
         key != 'victory' &&
-        d.game.turns > 6 &&
+        d.game.turns > (d.game.variant.key === 'amazons' ? 12 : 6) &&
         !d.tournament &&
         !d.swiss &&
         playstrategy.storage.get('courtesy') == '1'
@@ -884,7 +884,7 @@ export default class RoundController {
     playstrategy.requestIdleCallback(() => {
       const d = this.data;
       if (this.isPlaying()) {
-        if (!d.simul) blur.init(d.steps.length > 2);
+        if (!d.simul) blur.init(d.steps.length > (d.game.variant.key === 'amazons' ? 4 : 2));
 
         title.init();
         this.setTitle();
