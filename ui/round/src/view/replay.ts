@@ -107,7 +107,9 @@ function renderMultiActionMove(
                 : ''
             )
             .join(' '),
-          drawOffers.has(step[0] ? step[0].ply : -1) ? renderDrawOffer() : undefined,
+          drawOffers.has(step[0] ? step[0].ply : -1) || drawOffers.has(step[1] ? step[1].ply : -1)
+            ? renderDrawOffer()
+            : undefined,
         ]
       )
     : orEmpty
