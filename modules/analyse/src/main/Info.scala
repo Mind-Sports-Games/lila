@@ -19,6 +19,7 @@ case class Info(
 
   def turn = 1 + (ply - 1) / 2
 
+  //TODO Wrong for Amazons
   def playerIndex = PlayerIndex.fromPly(ply - 1)
 
   def encode: String =
@@ -75,7 +76,12 @@ object Info {
       case Array(cp, ma)     => Info(ply, Eval(strCp(cp), strMate(ma), None)).some
       case Array(cp, ma, va) => Info(ply, Eval(strCp(cp), strMate(ma), None), va.split(' ').toList).some
       case Array(cp, ma, va, be) =>
-        Info(ply, Eval(strCp(cp), strMate(ma), Uci.Move.piotr(GameLogic.Chess(), GameFamily.Chess(), be)), va.split(' ').toList).some
+        Info(
+          ply,
+          //TODO Wrong for non Chess
+          Eval(strCp(cp), strMate(ma), Uci.Move.piotr(GameLogic.Chess(), GameFamily.Chess(), be)),
+          va.split(' ').toList
+        ).some
       case _ => none
     }
 

@@ -7,6 +7,7 @@ import strategygames.{
   Centis,
   Clock,
   FischerClock,
+  GameFamily,
   Player => PlayerIndex,
   GameLogic,
   History,
@@ -196,9 +197,17 @@ object GameDiff {
       case GameLogic.FairySF() => {
         dTry(
           oldPgn,
-          _.board match {
-            case Board.FairySF(b) => b.uciMoves.toVector
-            case _                => sys.error("Wrong board type")
+          { g =>
+            g.board match {
+              case Board.FairySF(b) =>
+                b.variant.gameFamily match {
+                  //in the case of Amazons we want to store our moves and drops as individuals
+                  case GameFamily.Amazons() => g.pgnMoves
+                  //in other cases we want to store the fairysf format (difference in promotion notation)
+                  case _ => b.uciMoves.toVector
+                }
+              case _ => sys.error("Wrong board type")
+            }
           },
           writeBytes compose pfnStorageWriter
         )
@@ -211,6 +220,7 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeFairySF
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
         if (a.variant.dropsVariant)
           dOpt(
             pocketData,
@@ -236,6 +246,7 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeSamurai
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
       }
       case GameLogic.Togyzkumalak() => {
         dTry(oldPgn, _.pgnMoves, writeBytes compose ptnStorageWriter)
@@ -248,6 +259,7 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeTogyzkumalak
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
         dOpt(
           score,
           _.history.score,

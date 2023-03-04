@@ -72,7 +72,7 @@ export function valid(data: RoundData, role: cg.Role, key: cg.Key): boolean {
   if (data.game.variant.key === 'crazyhouse') {
     if (role === 'p-piece' && (key[1] === '1' || key[1] === '8')) return false;
 
-    const drops = dropStr.match(/.{2}/g) || [];
+    const drops: string[] = dropStr.match(/.{2}/g) || [];
     return drops.includes(key);
   } else {
     //otherwise shogi and use the newer dropsByRole data

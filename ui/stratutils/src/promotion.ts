@@ -44,6 +44,7 @@ export const possiblePromotion = (
     case 'xiangqi':
     case 'flipello10':
     case 'flipello':
+    case 'amazons':
       return false;
     case 'shogi':
       return (

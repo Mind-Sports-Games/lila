@@ -55,7 +55,7 @@ export const altCastles = {
 };
 
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs'].includes(key);
+  return ['linesOfAction', 'scrambledEggs', 'amazons'].includes(key);
 }
 
 export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
@@ -98,20 +98,14 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
   switch (variant) {
     case 'flipello10':
     case 'flipello':
+    case 'amazons':
       return { playerIndex: turnPlayerIndex, role: 'p-piece' };
     default:
       return undefined;
   }
 }
 
-const noFishnetVariants: VariantKey[] = [
-  'linesOfAction',
-  'scrambledEggs',
-  'flipello',
-  'flipello10',
-  'oware',
-  'togyzkumalak',
-];
+const noFishnetVariants: VariantKey[] = ['linesOfAction', 'scrambledEggs', 'oware', 'togyzkumalak'];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
 }

@@ -94,6 +94,10 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             ? 'https://playstrategy.org/assets/piece/flipello/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
               '/'
+            : variantKey === 'amazons'
+            ? 'https://playstrategy.org/assets/piece/amazons/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
+              '/'
             : variantKey === 'oware'
             ? 'https://playstrategy.org/assets/piece/oware/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +

@@ -8,7 +8,6 @@ import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameGroup, GameLogic }
 import cats.implicits._
 
-
 final class Tv(
     gameRepo: GameRepo,
     trouper: Trouper,
@@ -524,6 +523,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "flipello"
         )
+    case object Amazons
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(FV.Amazons)),
+          icon = FV.Amazons.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(FV.Amazons)), noBot),
+          familyChannel = true,
+          gameFamily = "amazons"
+        )
     case object Oware
         extends Channel(
           name = VariantKeys.variantName(Variant.wrap(MSV.Oware)),
@@ -602,6 +610,7 @@ object Tv {
       FlipelloFamily,
       Flipello,
       Flipello10,
+      Amazons,
       MancalaFamily,
       Oware,
       Togyzkumalak,

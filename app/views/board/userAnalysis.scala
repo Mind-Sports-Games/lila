@@ -17,7 +17,8 @@ import controllers.routes
 object userAnalysis {
 
   def noAnalysisVariants = List(
-    Variant.Chess(strategygames.chess.variant.FromPosition)
+    Variant.Chess(strategygames.chess.variant.FromPosition),
+    Variant.FairySF(strategygames.fairysf.variant.Amazons)
   )
 
   def analysisVariants =
@@ -58,8 +59,7 @@ object userAnalysis {
         .OpenGraph(
           title = "Strategy games analysis board",
           url = s"$netBaseUrl${routes.UserAnalysis.index.url}",
-          description =
-            "Analyse strategy game positions and variations on an interactive board"
+          description = "Analyse strategy game positions and variations on an interactive board"
         )
         .some,
       zoomable = true

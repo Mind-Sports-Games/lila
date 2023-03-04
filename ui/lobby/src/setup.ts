@@ -324,6 +324,9 @@ export default class Setup {
               break;
           }
           break;
+        case '8':
+          key = 'amazons';
+          break;
         case '6':
           key = 'oware';
           break;
@@ -340,7 +343,7 @@ export default class Setup {
     };
     const showStartingImages = () => {
       const variantId = ($variantSelect.val() as string).split('_');
-      const class_list = 'chess draughts loa shogi xiangqi flipello oware togyzkumalak';
+      const class_list = 'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':
@@ -360,6 +363,9 @@ export default class Setup {
           break;
         case '5':
           key = 'flipello';
+          break;
+        case '8':
+          key = 'amazons';
           break;
         case '6':
           key = 'oware';

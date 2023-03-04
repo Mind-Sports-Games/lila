@@ -6,6 +6,10 @@
   --cg-coord-color-loa-p1: #fff;
   --cg-coord-color-loa-p2: #fff;
   --cg-coord-shadow-loa: 0 1px 2px #000;
+
+  --cg-coord-color-amazons-p1: #fff;
+  --cg-coord-color-amazons-p2: #fff;
+  --cg-coord-shadow-amazons: 0 1px 2px #000;
 }
 
 coords {
@@ -60,5 +64,33 @@ coords {
   .orientation-left .files coord:nth-child(2n),
   .orientation-left .ranks coord:nth-child(2n) {
     color: var(--cg-coord-color-loa-p2);
+  }
+}
+
+.variant-amazons {
+  coords {
+    text-shadow: var(--cg-coord-shadow-amazons);
+  }
+
+  .orientation-p1 .files coord:nth-child(2n + 1),
+  .orientation-p1 .ranks coord:nth-child(2n),
+  .orientation-p2 .files coord:nth-child(2n),
+  .orientation-p2 .ranks coord:nth-child(2n + 1),
+  .orientation-right .files coord:nth-child(2n + 1),
+  .orientation-right .ranks coord:nth-child(2n + 1),
+  .orientation-left .files coord:nth-child(2n + 1),
+  .orientation-left .ranks coord:nth-child(2n + 1) {
+    color: var(--cg-coord-color-amazons-p1);
+  }
+
+  .orientation-p1 .files coord:nth-child(2n),
+  .orientation-p1 .ranks coord:nth-child(2n + 1),
+  .orientation-p2 .files coord:nth-child(2n + 1),
+  .orientation-p2 .ranks coord:nth-child(2n),
+  .orientation-right .files coord:nth-child(2n),
+  .orientation-right .ranks coord:nth-child(2n),
+  .orientation-left .files coord:nth-child(2n),
+  .orientation-left .ranks coord:nth-child(2n) {
+    color: var(--cg-coord-color-amazons-p2);
   }
 }

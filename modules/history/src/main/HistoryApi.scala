@@ -60,6 +60,7 @@ final class HistoryApi(coll: Coll, userRepo: UserRepo, cacheApi: lila.memo.Cache
       game.ratingVariant.minixiangqi.option("minixiangqi"                   -> perfs.minixiangqi),
       game.ratingVariant.flipello.option("flipello"                         -> perfs.flipello),
       game.ratingVariant.flipello10.option("flipello10"                     -> perfs.flipello10),
+      game.ratingVariant.amazons.option("amazons"                           -> perfs.amazons),
       game.ratingVariant.oware.option("oware"                               -> perfs.oware),
       game.ratingVariant.togyzkumalak.option("togyzkumalak"                 -> perfs.togyzkumalak),
       (isStd && game.speed == Speed.UltraBullet).option("ultraBullet"       -> perfs.ultraBullet),

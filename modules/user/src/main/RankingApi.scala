@@ -120,6 +120,7 @@ final class RankingApi(
       minixiangqi   <- topPerf(PerfType.orDefault("minixiangqi").id, nb)
       flipello      <- topPerf(PerfType.orDefault("flipello").id, nb)
       flipello10    <- topPerf(PerfType.orDefault("flipello10").id, nb)
+      amazons       <- topPerf(PerfType.orDefault("amazons").id, nb)
       oware         <- topPerf(PerfType.orDefault("oware").id, nb)
       togyzkumalak  <- topPerf(PerfType.orDefault("togyzkumalak").id, nb)
     } yield Perfs.Leaderboards(
@@ -156,6 +157,7 @@ final class RankingApi(
       minixiangqi = minixiangqi,
       flipello = flipello,
       flipello10 = flipello10,
+      amazons = amazons,
       oware = oware,
       togyzkumalak = togyzkumalak
     )

@@ -174,7 +174,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisBoardVariants: VariantKey[] = [];
+const noAnalysisBoardVariants: VariantKey[] = ['amazons'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisBoardVariants.indexOf(variant) == -1;
@@ -189,5 +189,13 @@ export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | und
     }
   } else {
     return uci2move(uci);
+  }
+}
+
+export function turnPlayerIndexFromLastPly(ply: Ply, variantKey: VariantKey): PlayerIndex {
+  if (variantKey === 'amazons') {
+    return Math.floor(ply / 2) % 2 === 0 ? 'p1' : 'p2';
+  } else {
+    return ply % 2 === 0 ? 'p1' : 'p2';
   }
 }

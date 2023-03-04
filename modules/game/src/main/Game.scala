@@ -162,6 +162,7 @@ case class Game(
       // On the other hand, if history.size is more than playedTurns,
       // then the game ended during a players turn by async event, and
       // the last recorded time is in the history for turnPlayerIndex.
+      // todo check this works for amazons?
       val noLastInc = finished && (history.size <= playedTurns) == (playerIndex != turnPlayerIndex)
 
       // Also if we timed out over a period or periods, we need to
@@ -326,7 +327,7 @@ case class Game(
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
-      case d: Uci.Drop => s"${d.role}${d.role}"
+      case d: Uci.Drop => s"${d.pos}${d.pos}"
       case m: Uci.Move => m.keys
       case _           => sys.error("Type Error")
     }
@@ -446,7 +447,7 @@ case class Game(
       !player(playerIndex).isProposingTakeback &&
       !opponent(playerIndex).isProposingTakeback
 
-  def boosted = rated && finished && bothPlayersHaveMoved && playedTurns < 10
+  def boosted = rated && finished && bothPlayersHaveMoved && playedTurns < (10 * variant.plysPerTurn)
 
   def moretimeable(playerIndex: PlayerIndex) =
     playable && nonMandatory && {
@@ -454,10 +455,11 @@ case class Game(
     }
 
   def abortable =
-    status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory &&
+    status == Status.Started && playedTurns < (2 * variant.plysPerTurn) && nonMandatory && nonMandatory &&
       metadata.multiMatchGameNr.fold(true)(x => x < 2)
 
-  def berserkable = clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
+  def berserkable =
+    clock.??(_.config.berserkable) && status == Status.Started && playedTurns < (2 * variant.plysPerTurn)
 
   def goBerserk(playerIndex: PlayerIndex): Option[Progress] =
     clock.ifTrue(berserkable && !player(playerIndex).berserk).map { c =>
@@ -517,12 +519,12 @@ case class Game(
 
   def finishedOrAborted = finished || aborted
 
-  def accountable = playedTurns >= 2 || isTournament
+  def accountable = playedTurns >= (2 * variant.plysPerTurn) || isTournament
 
   def replayable = isPgnImport || finished || (aborted && bothPlayersHaveMoved)
 
   def analysable =
-    replayable && playedTurns > 4 && Game.analysableVariants(variant)
+    replayable && playedTurns > (4 * variant.plysPerTurn) && Game.analysableVariants(variant)
 
   def ratingVariant =
     if (isTournament && variant.fromPosition) Variant.libStandard(variant.gameLogic)
@@ -638,25 +640,43 @@ case class Game(
     }
 
   def playerWhoDidNotMove: Option[Player] =
-    playedTurns match {
-      case 0 => player(startPlayerIndex).some
-      case 1 => player(!startPlayerIndex).some
-      case _ => none
+    (playedTurns, variant.plysPerTurn) match {
+      case (0, 1) => player(startPlayerIndex).some
+      case (1, 1) => player(!startPlayerIndex).some
+      case (0, 2) => player(startPlayerIndex).some
+      case (1, 2) => player(startPlayerIndex).some
+      case (2, 2) => player(!startPlayerIndex).some
+      case (3, 2) => player(!startPlayerIndex).some
+      case (_, _) => none
     }
 
-  def onePlayerHasMoved    = playedTurns > 0
-  def bothPlayersHaveMoved = playedTurns > 1
+  def onePlayerHasMoved    = playedTurns > variant.plysPerTurn - 1     // 0
+  def bothPlayersHaveMoved = playedTurns > 2 * variant.plysPerTurn - 1 // 1
 
-  def startPlayerIndex = PlayerIndex.fromPly(chess.startedAtTurn)
+  def startPlayerIndex = PlayerIndex.fromPly(chess.startedAtTurn, variant.plysPerTurn)
 
+  //the number of ply a player has played
   def playerMoves(playerIndex: PlayerIndex): Int =
-    if (playerIndex == startPlayerIndex) (playedTurns + 1) / 2
-    else playedTurns / 2
+    variant.plysPerTurn * (playedTurns / (variant.plysPerTurn * 2)) + (if (playerIndex == startPlayerIndex)
+                                                                         Math.min(
+                                                                           variant.plysPerTurn,
+                                                                           playedTurns % (variant.plysPerTurn * 2)
+                                                                         )
+                                                                       else
+                                                                         Math.max(
+                                                                           0,
+                                                                           (playedTurns % (variant.plysPerTurn * 2)) - variant.plysPerTurn
+                                                                         ))
 
-  def playerHasMoved(playerIndex: PlayerIndex) = playerMoves(playerIndex) > 0
+  // def playerMoves(playerIndex: PlayerIndex): Int =
+  //   if (playerIndex == startPlayerIndex) (playedTurns + 1) / 2 else playedTurns / 2
+
+  // if a player has completed their first full turn
+  def playerHasMoved(playerIndex: PlayerIndex) = playerMoves(playerIndex) > (variant.plysPerTurn - 1) // 0
 
   def playerBlurPercent(playerIndex: PlayerIndex): Int =
-    if (playedTurns > 5) (player(playerIndex).blurs.nb * 100) / playerMoves(playerIndex)
+    if (playedTurns > (5 * variant.plysPerTurn))
+      (player(playerIndex).blurs.nb * 100) / playerMoves(playerIndex)
     else 0
 
   def isBeingPlayed = !isPgnImport && !finishedOrAborted

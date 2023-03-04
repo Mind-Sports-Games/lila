@@ -167,14 +167,14 @@ final class JsonView(
     )
 
     private def puzzleJson(puzzle: Puzzle) = Json.obj(
-      "id"         -> Puzzle.numericalId(puzzle.id),
-      "realId"     -> puzzle.id,
-      "rating"     -> puzzle.glicko.intRating,
-      "attempts"   -> puzzle.plays,
-      "fen"        -> puzzle.fen.value,
+      "id"          -> Puzzle.numericalId(puzzle.id),
+      "realId"      -> puzzle.id,
+      "rating"      -> puzzle.glicko.intRating,
+      "attempts"    -> puzzle.plays,
+      "fen"         -> puzzle.fen.value,
       "playerIndex" -> puzzle.playerIndex.name,
-      "initialPly" -> (puzzle.initialPly + 1),
-      "gameId"     -> puzzle.gameId,
+      "initialPly"  -> (puzzle.initialPly + 1),
+      "gameId"      -> puzzle.gameId,
       "lines" -> puzzle.line.tail.reverse.foldLeft[JsValue](JsString("win")) { case (acc, move) =>
         Json.obj(move.uci -> acc)
       },
@@ -184,7 +184,8 @@ final class JsonView(
 
     private def makeBranch(puzzle: Puzzle): Option[tree.Branch] = {
       import strategygames.format._
-      val init = Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
+      val init =
+        Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
       val (_, branchList) = puzzle.line.tail.foldLeft[(Game, List[tree.Branch])]((init, Nil)) {
         case ((prev, branches), uci) =>
           val (game, move) =
@@ -193,6 +194,7 @@ final class JsonView(
           val branch = tree.Branch(
             id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
             ply = game.turns,
+            plysPerTurn = game.situation.board.variant.plysPerTurn,
             move = Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.pgnMoves.last),
             fen = Forsyth.>>(game.situation.board.variant.gameLogic, game),
             check = game.situation.check,
