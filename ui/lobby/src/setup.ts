@@ -499,12 +499,12 @@ export default class Setup {
           $value = $input.siblings('span'),
           $range = $input.siblings('.range');
         $value.text($input.val() as string);
-        // 0-20 1 increment
+        // 1-20 1 increment
         // 20-45 5 increment
         // 45-60 15 increment
         // 60-180 30 increment
         $range.attr({
-          min: '0',
+          min: '1',
           max: '38',
           value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderIncrement, 20),
         });
