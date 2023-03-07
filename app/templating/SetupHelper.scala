@@ -66,7 +66,7 @@ trait SetupHelper { self: I18nHelper =>
   }
 
   val clockByoyomiChoices: List[SelectChoice] = {
-    (0 to 20).toList ::: List(25, 30, 35, 40, 45, 60, 90, 120, 150, 180)
+    (1 to 20).toList ::: List(25, 30, 35, 40, 45, 60, 90, 120, 150, 180)
   } map { s =>
     (s.toString, s.toString, none)
   }
