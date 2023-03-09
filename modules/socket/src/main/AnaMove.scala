@@ -45,10 +45,14 @@ case class AnaMove(
   def branch: Validated[String, Branch] =
     newGame flatMap { case (game, move) =>
       game.pgnMoves.lastOption toValid "Moved but no last move!" map { san =>
-        val uci     = Uci(lib, move, lib match {
-          case GameLogic.Draughts() => fullCaptureFields.isDefined
-          case _                  => false
-        })
+        val uci = Uci(
+          lib,
+          move,
+          lib match {
+            case GameLogic.Draughts() => fullCaptureFields.isDefined
+            case _                    => false
+          }
+        )
         val sit     = game.situation
         val movable = sit playable false
         val fen     = Forsyth.>>(lib, game)
@@ -60,11 +64,12 @@ case class AnaMove(
         }
         val validMoves: Map[strategygames.draughts.Pos, List[strategygames.draughts.Move]] =
           (sit, dest) match {
-            case (Situation.Draughts(sit), Pos.Draughts(dest)) => AnaDests.validMoves(
-              Situation.Draughts(sit),
-              sit.ghosts > 0 option dest,
-              ~fullCapture
-            )
+            case (Situation.Draughts(sit), Pos.Draughts(dest)) =>
+              AnaDests.validMoves(
+                Situation.Draughts(sit),
+                sit.ghosts > 0 option dest,
+                ~fullCapture
+              )
             case _ => Map.empty[strategygames.draughts.Pos, List[strategygames.draughts.Move]]
           }
         val truncatedMoves =
@@ -72,24 +77,27 @@ case class AnaMove(
         Branch(
           id = UciCharPair(lib, uci),
           ply = game.turns,
+          plysPerTurn = variant.plysPerTurn,
           move = Uci.WithSan(lib, uci, san),
           fen = fen,
           check = game.situation.check,
           dests = variant match {
-            case Variant.Chess(_)          => Some(movable ?? game.situation.destinations)
+            case Variant.Chess(_) => Some(movable ?? game.situation.destinations)
             case Variant.Draughts(variant) => {
-              val truncatedDests = truncatedMoves.map { _ mapValues { _ flatMap (
-                uci => variant.boardSize.pos.posAt(uci.takeRight(2))
-              ) } }
-              val draughtsDests: Map[strategygames.Pos,List[strategygames.Pos]] =
-                truncatedDests.getOrElse(validMoves.view.mapValues{ _ map (_.dest) })
-                  .to(Map).map{case(p, m) => (Pos.Draughts(p), m.map(Pos.Draughts))}
+              val truncatedDests = truncatedMoves.map {
+                _ mapValues { _ flatMap (uci => variant.boardSize.pos.posAt(uci.takeRight(2))) }
+              }
+              val draughtsDests: Map[strategygames.Pos, List[strategygames.Pos]] =
+                truncatedDests
+                  .getOrElse(validMoves.view.mapValues { _ map (_.dest) })
+                  .to(Map)
+                  .map { case (p, m) => (Pos.Draughts(p), m.map(Pos.Draughts)) }
               movable option draughtsDests
             }
           },
           destsUci = lib match {
             case GameLogic.Draughts() => movable ?? truncatedMoves.map(_.values.toList.flatten)
-            case _                  => None
+            case _                    => None
           },
           captureLength = movable ?? captLen,
           opening = (game.turns <= 30 && Variant.openingSensibleVariants(lib)(variant)) ?? {
@@ -106,14 +114,14 @@ object AnaMove {
 
   def parse(o: JsObject) =
     for {
-      d    <- o obj "d"
-      lib  <- d int "lib"
-      gl   = GameLogic(lib)
-      orig <- d str "orig" flatMap {pos => Pos.fromKey(gl, pos)}
-      dest <- d str "dest" flatMap {pos => Pos.fromKey(gl, pos)}
-      fen  <- d str "fen" map {fen => FEN.apply(gl, fen)}
+      d   <- o obj "d"
+      lib <- d int "lib"
+      gl = GameLogic(lib)
+      orig <- d str "orig" flatMap { pos => Pos.fromKey(gl, pos) }
+      dest <- d str "dest" flatMap { pos => Pos.fromKey(gl, pos) }
+      fen  <- d str "fen" map { fen => FEN.apply(gl, fen) }
       path <- d str "path"
-      v    = Variant.orDefault(gl, ~d.str("variant"))
+      v = Variant.orDefault(gl, ~d.str("variant"))
     } yield AnaMove(
       orig = orig,
       dest = dest,
@@ -121,7 +129,7 @@ object AnaMove {
       fen = fen,
       path = path,
       chapterId = d str "ch",
-      promotion = d str "promotion" flatMap {p => Role.promotable(gl, v.gameFamily, p)},
+      promotion = d str "promotion" flatMap { p => Role.promotable(gl, v.gameFamily, p) },
       uci = d str "uci",
       fullCapture = d boolean "fullCapture"
     )

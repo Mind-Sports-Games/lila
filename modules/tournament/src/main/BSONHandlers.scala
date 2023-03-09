@@ -1,6 +1,5 @@
 package lila.tournament
 
-import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ GameLogic, Mode }
@@ -37,19 +36,7 @@ object BSONHandlers {
     )
   )
 
-  implicit val tournamentClockBSONHandler = tryHandler[ClockConfig](
-    { case doc: BSONDocument =>
-      for {
-        limit <- doc.getAsTry[Int]("limit")
-        inc   <- doc.getAsTry[Int]("increment")
-      } yield ClockConfig(limit, inc)
-    },
-    c =>
-      BSONDocument(
-        "limit"     -> c.limitSeconds,
-        "increment" -> c.incrementSeconds
-      )
-  )
+  implicit val tournamentClockBSONHandler = clockConfigHandler
 
   implicit private val spotlightBSONHandler = Macros.handler[Spotlight]
 
@@ -82,7 +69,7 @@ object BSONHandlers {
         id = r str "_id",
         name = r str "name",
         status = r.get[Status]("status"),
-        clock = r.get[strategygames.Clock.Config]("clock"),
+        clock = r.get[strategygames.ClockConfig]("clock"),
         minutes = r int "minutes",
         variant = variant,
         medleyVariantsAndIntervals = medleyVariantsAndIntervals,
@@ -202,7 +189,8 @@ object BSONHandlers {
         },
         turns = r intO "t",
         berserk1 = r.intO("b1").fold(r.boolD("b1"))(1 ==), // it used to be int = 0/1
-        berserk2 = r.intO("b2").fold(r.boolD("b2"))(1 ==)
+        berserk2 = r.intO("b2").fold(r.boolD("b2"))(1 ==),
+        plysPerTurn = r.intO("ppt")
       )
     }
     def writes(w: BSON.Writer, o: Pairing) =
@@ -214,7 +202,8 @@ object BSONHandlers {
         "w"   -> o.winner.map(o.user1 ==),
         "t"   -> o.turns,
         "b1"  -> w.boolO(o.berserk1),
-        "b2"  -> w.boolO(o.berserk2)
+        "b2"  -> w.boolO(o.berserk2),
+        "ppt" -> o.plysPerTurn
       )
   }
 

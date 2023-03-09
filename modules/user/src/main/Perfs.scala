@@ -38,7 +38,9 @@ case class Perfs(
     minixiangqi: Perf,
     flipello: Perf,
     flipello10: Perf,
+    amazons: Perf,
     oware: Perf,
+    togyzkumalak: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -82,7 +84,9 @@ case class Perfs(
       "minixiangqi"    -> minixiangqi,
       "flipello"       -> flipello,
       "flipello10"     -> flipello10,
+      "amazons"        -> amazons,
       "oware"          -> oware,
+      "togyzkumalak"   -> togyzkumalak,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -182,7 +186,9 @@ case class Perfs(
     "minixiangqi"    -> minixiangqi,
     "flipello"       -> flipello,
     "flipello10"     -> flipello10,
+    "amazons"        -> amazons,
     "oware"          -> oware,
+    "togyzkumalak"   -> togyzkumalak,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
     "blitz"          -> blitz,
@@ -281,6 +287,8 @@ case object Perfs {
       p,
       p,
       p,
+      p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -303,37 +311,39 @@ case object Perfs {
 
   def variantLens(variant: Variant): Option[Perfs => Perf] =
     variant match {
-      case Variant.Chess(strategygames.chess.variant.Standard)           => Some(_.standard)
-      case Variant.Chess(strategygames.chess.variant.Chess960)           => Some(_.chess960)
-      case Variant.Chess(strategygames.chess.variant.KingOfTheHill)      => Some(_.kingOfTheHill)
-      case Variant.Chess(strategygames.chess.variant.ThreeCheck)         => Some(_.threeCheck)
-      case Variant.Chess(strategygames.chess.variant.FiveCheck)          => Some(_.fiveCheck)
-      case Variant.Chess(strategygames.chess.variant.Antichess)          => Some(_.antichess)
-      case Variant.Chess(strategygames.chess.variant.Atomic)             => Some(_.atomic)
-      case Variant.Chess(strategygames.chess.variant.Crazyhouse)         => Some(_.crazyhouse)
-      case Variant.Chess(strategygames.chess.variant.Horde)              => Some(_.horde)
-      case Variant.Chess(strategygames.chess.variant.RacingKings)        => Some(_.racingKings)
-      case Variant.Chess(strategygames.chess.variant.NoCastling)         => Some(_.noCastling)
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction)      => Some(_.linesOfAction)
-      case Variant.Chess(strategygames.chess.variant.ScrambledEggs)      => Some(_.scrambledEggs)
-      case Variant.Draughts(strategygames.draughts.variant.Standard)     => Some(_.international)
-      case Variant.Draughts(strategygames.draughts.variant.Frysk)        => Some(_.frysk)
-      case Variant.Draughts(strategygames.draughts.variant.Frisian)      => Some(_.frisian)
-      case Variant.Draughts(strategygames.draughts.variant.Antidraughts) => Some(_.antidraughts)
-      case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => Some(_.breakthrough)
-      case Variant.Draughts(strategygames.draughts.variant.Russian)      => Some(_.russian)
-      case Variant.Draughts(strategygames.draughts.variant.Brazilian)    => Some(_.brazilian)
-      case Variant.Draughts(strategygames.draughts.variant.Pool)         => Some(_.pool)
-      case Variant.Draughts(strategygames.draughts.variant.Portuguese)   => Some(_.portuguese)
-      case Variant.Draughts(strategygames.draughts.variant.English)      => Some(_.english)
-      case Variant.FairySF(strategygames.fairysf.variant.Shogi)          => Some(_.shogi)
-      case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)        => Some(_.xiangqi)
-      case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)      => Some(_.minishogi)
-      case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)    => Some(_.minixiangqi)
-      case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => Some(_.flipello)
-      case Variant.FairySF(strategygames.fairysf.variant.Flipello10)     => Some(_.flipello10)
-      case Variant.Mancala(strategygames.mancala.variant.Oware)          => Some(_.oware)
-      case _                                                             => none
+      case Variant.Chess(strategygames.chess.variant.Standard)                   => Some(_.standard)
+      case Variant.Chess(strategygames.chess.variant.Chess960)                   => Some(_.chess960)
+      case Variant.Chess(strategygames.chess.variant.KingOfTheHill)              => Some(_.kingOfTheHill)
+      case Variant.Chess(strategygames.chess.variant.ThreeCheck)                 => Some(_.threeCheck)
+      case Variant.Chess(strategygames.chess.variant.FiveCheck)                  => Some(_.fiveCheck)
+      case Variant.Chess(strategygames.chess.variant.Antichess)                  => Some(_.antichess)
+      case Variant.Chess(strategygames.chess.variant.Atomic)                     => Some(_.atomic)
+      case Variant.Chess(strategygames.chess.variant.Crazyhouse)                 => Some(_.crazyhouse)
+      case Variant.Chess(strategygames.chess.variant.Horde)                      => Some(_.horde)
+      case Variant.Chess(strategygames.chess.variant.RacingKings)                => Some(_.racingKings)
+      case Variant.Chess(strategygames.chess.variant.NoCastling)                 => Some(_.noCastling)
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction)              => Some(_.linesOfAction)
+      case Variant.Chess(strategygames.chess.variant.ScrambledEggs)              => Some(_.scrambledEggs)
+      case Variant.Draughts(strategygames.draughts.variant.Standard)             => Some(_.international)
+      case Variant.Draughts(strategygames.draughts.variant.Frysk)                => Some(_.frysk)
+      case Variant.Draughts(strategygames.draughts.variant.Frisian)              => Some(_.frisian)
+      case Variant.Draughts(strategygames.draughts.variant.Antidraughts)         => Some(_.antidraughts)
+      case Variant.Draughts(strategygames.draughts.variant.Breakthrough)         => Some(_.breakthrough)
+      case Variant.Draughts(strategygames.draughts.variant.Russian)              => Some(_.russian)
+      case Variant.Draughts(strategygames.draughts.variant.Brazilian)            => Some(_.brazilian)
+      case Variant.Draughts(strategygames.draughts.variant.Pool)                 => Some(_.pool)
+      case Variant.Draughts(strategygames.draughts.variant.Portuguese)           => Some(_.portuguese)
+      case Variant.Draughts(strategygames.draughts.variant.English)              => Some(_.english)
+      case Variant.FairySF(strategygames.fairysf.variant.Shogi)                  => Some(_.shogi)
+      case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)                => Some(_.xiangqi)
+      case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)              => Some(_.minishogi)
+      case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)            => Some(_.minixiangqi)
+      case Variant.FairySF(strategygames.fairysf.variant.Flipello)               => Some(_.flipello)
+      case Variant.FairySF(strategygames.fairysf.variant.Flipello10)             => Some(_.flipello10)
+      case Variant.FairySF(strategygames.fairysf.variant.Amazons)                => Some(_.amazons)
+      case Variant.Samurai(strategygames.samurai.variant.Oware)                  => Some(_.oware)
+      case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) => Some(_.togyzkumalak)
+      case _                                                                     => none
     }
 
   def speedLens(speed: Speed): Perfs => Perf =
@@ -382,7 +392,9 @@ case object Perfs {
         minixiangqi = perf("minixiangqi"),
         flipello = perf("flipello"),
         flipello10 = perf("flipello10"),
+        amazons = perf("amazons"),
         oware = perf("oware"),
+        togyzkumalak = perf("togyzkumalak"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -429,7 +441,9 @@ case object Perfs {
         "minixiangqi"    -> notNew(o.minixiangqi),
         "flipello"       -> notNew(o.flipello),
         "flipello10"     -> notNew(o.flipello10),
+        "amazons"        -> notNew(o.amazons),
         "oware"          -> notNew(o.oware),
+        "togyzkumalak"   -> notNew(o.togyzkumalak),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
         "blitz"          -> notNew(o.blitz),
@@ -477,10 +491,14 @@ case object Perfs {
       minixiangqi: List[User.LightPerf],
       flipello: List[User.LightPerf],
       flipello10: List[User.LightPerf],
-      oware: List[User.LightPerf]
+      amazons: List[User.LightPerf],
+      oware: List[User.LightPerf],
+      togyzkumalak: List[User.LightPerf]
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
+    Nil,
     Nil,
     Nil,
     Nil,

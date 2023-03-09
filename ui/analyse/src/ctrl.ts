@@ -252,7 +252,7 @@ export default class AnalyseCtrl {
   }
 
   turnPlayerIndex(): PlayerIndex {
-    return util.plyPlayerIndex(this.node.ply);
+    return util.plyPlayerIndex(this.node.ply, this.data.game.variant.key);
   }
 
   togglePlay(delay: AutoplayDelay): void {
@@ -322,6 +322,7 @@ export default class AnalyseCtrl {
             },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
+        onlyDropsVariant: this.data.onlyDropsVariant,
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
@@ -374,6 +375,9 @@ export default class AnalyseCtrl {
       isForwardStep = pathChanged && path.length == this.path.length + 2;
     this.setPath(path);
     this.showGround();
+    if (this.data.game.variant.key === 'togyzkumalak') {
+      this.chessground.redrawAll(); //redraw board scores
+    }
     if (pathChanged) {
       const playedMyself = this.playedLastMoveMyself();
       if (this.study) this.study.setPath(path, this.node, playedMyself);
@@ -966,4 +970,18 @@ export default class AnalyseCtrl {
     if (this.chessground && this.cgVersion.js === this.cgVersion.dom) return f(this.chessground);
     return undefined;
   }
+
+  // FROM LISHOGI TO HELP TO BYOYOMI CLOCKS
+  // Ideally we would just use node.clock
+  // but we store remaining times for lishogi games as node.clock
+  // for imports we store movetime as node.clock, because
+  // that's what's provided next to each move
+  getMovetime = (node: Tree.Node): number | undefined => {
+    const offset = this.mainline[0].ply;
+    if (defined(node.clock) && !this.study) {
+      if (defined(this.data.game.moveCentis)) return this.data.game.moveCentis[node.ply - 1 - offset];
+      //if (this.imported) return node.clock;
+    }
+    return;
+  };
 }

@@ -21,7 +21,11 @@
       height: 125px;
     }
 
-    &.mancala {
+    &.oware {
+      height: 125px;
+    }
+
+    &.togyzkumalak {
       height: 125px;
     }
 
@@ -58,10 +62,16 @@
     height: 100px;
   }
 
-  .list a.mancala span {
+  .list a.oware span {
     display: block;
     width: 100px;
     height: 33.33px;
+  }
+
+  .list a.togyzkumalak span {
+    display: block;
+    width: 100px;
+    height: 55.55px;
   }
 
   &.d3 .list span {
@@ -111,7 +121,7 @@
     'horsey': 'horsey.thumbnail.jpg',
   );
 
-  @each $gameFamily in ('chess', 'draughts', 'loa') {
+  @each $gameFamily in ('chess', 'draughts', 'loa', 'amazons') {
     @each $color, $file in $chess-board-files {
       &.d2 .#{$gameFamily}-#{$color} {
         background-image: url(../images/board/#{$gameFamily}/#{$file});
@@ -158,13 +168,23 @@
       background-size: 100px;
     }
 
-    .mancala-light-wood {
-      background-image: url(../images/board/mancala/oware_light_wood_board.png);
+    .oware-light-wood {
+      background-image: url(../images/board/oware/oware_light_wood_board.png);
       background-size: 100px;
     }
 
-    .mancala-dark-wood {
-      background-image: url(../images/board/mancala/oware_dark_wood_board.png);
+    .oware-dark-wood {
+      background-image: url(../images/board/oware/oware_dark_wood_board.png);
+      background-size: 100px;
+    }
+
+    .togyzkumalak-blue {
+      background-image: url(../images/board/togyzkumalak/togyzkumalak_blue_board.png);
+      background-size: 100px;
+    }
+
+    .togyzkumalak-wood {
+      background-image: url(../images/board/togyzkumalak/togyzkumalak_wood_board.png);
       background-size: 100px;
     }
   }

@@ -78,7 +78,13 @@ final class Dasher(env: Env) extends LilaController(env) {
                 "theme" -> Json.obj(
                   "d2" -> GameFamily.all.map { gf =>
                     Json.obj(
-                      "current" -> Json.obj("name" -> ctx.currentTheme(gf.id).name, "gameFamily" -> gf.key),
+                      "current" -> Json.obj(
+                        "name" -> ctx.currentTheme
+                          .filter(ps => ps.gameFamily == gf.id)
+                          .map(_.name)
+                          .headOption,
+                        "gameFamily" -> gf.key
+                      ),
                       "list" -> lila.pref.Theme
                         .allOfFamily(gf)
                         .map(t => Json.obj("name" -> t.name, "gameFamily" -> t.gameFamilyName))
@@ -97,9 +103,15 @@ final class Dasher(env: Env) extends LilaController(env) {
                   "d2" -> GameFamily.all.map { gf =>
                     Json.obj(
                       "current" -> Json.obj(
-                        "name"         -> ctx.currentPieceSet(gf.id).name,
-                        "gameFamily"   -> gf.key,
-                        "displayPiece" -> ctx.currentPieceSet(gf.id).displayPiece
+                        "name" -> ctx.currentPieceSet
+                          .filter(ps => ps.gameFamily == gf.id)
+                          .map(_.name)
+                          .headOption,
+                        "gameFamily" -> gf.key,
+                        "displayPiece" -> ctx.currentPieceSet
+                          .filter(ps => ps.gameFamily == gf.id)
+                          .map(_.displayPiece)
+                          .headOption
                       ),
                       "list" -> lila.pref.PieceSet
                         .allOfFamily(gf)

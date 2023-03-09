@@ -37,6 +37,7 @@ object PgnImport {
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.turns,
+              plysPerTurn = game.variant.plysPerTurn,
               fen = initialFen.getOrElse(game.variant.initialFen),
               check = replay.setup.situation.check,
               shapes = shapes,
@@ -113,7 +114,11 @@ object PgnImport {
             (str.trim match {
               case "" => comments
               case com =>
-                comments + Comment(Comment.Id.make, Comment.Text(com), annotator | Comment.Author.PlayStrategy)
+                comments + Comment(
+                  Comment.Id.make,
+                  Comment.Text(com),
+                  annotator | Comment.Author.PlayStrategy
+                )
             })
           )
       }
@@ -135,6 +140,7 @@ object PgnImport {
                   Node(
                     id = UciCharPair(GameLogic.Chess(), uci),
                     ply = game.turns,
+                    plysPerTurn = game.situation.board.variant.plysPerTurn,
                     move = Uci.WithSan(GameLogic.Chess(), uci, sanStr),
                     fen = Forsyth.>>(GameLogic.Chess(), game),
                     check = game.situation.check,

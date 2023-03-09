@@ -55,8 +55,12 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? { width: 7, height: 7 }
             : $el.hasClass('variant-flipello10')
             ? { width: 10, height: 10 }
+            : $el.hasClass('variant-amazons')
+            ? { width: 10, height: 10 }
             : $el.hasClass('variant-oware')
             ? { width: 6, height: 2 }
+            : $el.hasClass('variant-togyzkumalak')
+            ? { width: 9, height: 2 }
             : { width: 8, height: 8 },
           variant: $el.hasClass('variant-shogi')
             ? 'shogi'
@@ -68,8 +72,12 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? 'minixiangqi'
             : $el.hasClass('variant-flipello10')
             ? 'flipello10'
+            : $el.hasClass('variant-amazons')
+            ? 'amazons'
             : $el.hasClass('variant-oware')
             ? 'oware'
+            : $el.hasClass('variant-togyzkumalak')
+            ? 'togyzkumalak'
             : 'standard',
         })
       );

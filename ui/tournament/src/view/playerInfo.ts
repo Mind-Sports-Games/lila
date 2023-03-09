@@ -16,7 +16,7 @@ function result(win, stat): string {
 }
 
 function playerTitle(player) {
-  return h('h2', [h('span.rank', player.rank + '. '), renderPlayer(player, true, false, false)]);
+  return h('h2.player-title', [h('span.rank', player.rank + '. '), renderPlayer(player, true, false, true, false)]);
 }
 
 function setup(vnode: VNode) {

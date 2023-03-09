@@ -7,6 +7,7 @@ import * as sound from './sound';
 import RoundController from './ctrl';
 import { Untyped } from './interfaces';
 import { defined } from 'common';
+import * as util from './util';
 
 export interface RoundSocket extends Untyped {
   send: SocketSend;
@@ -122,7 +123,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       }
       if (by) {
         let ply = ctrl.lastPly();
-        if ((by == 'p1') == (ply % 2 == 0)) ply++;
+        if ((by == 'p1') == (util.turnPlayerIndexFromLastPly(ply, ctrl.data.game.variant.key) == 'p1')) ply++;
         ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([ply]);
       }
       ctrl.redraw();
@@ -135,6 +136,11 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     checkCount(e) {
       ctrl.data.player.checks = ctrl.data.player.playerIndex == 'p1' ? e.p1 : e.p2;
       ctrl.data.opponent.checks = ctrl.data.opponent.playerIndex == 'p1' ? e.p1 : e.p2;
+      ctrl.redraw();
+    },
+    score(e) {
+      ctrl.data.player.score = ctrl.data.player.playerIndex == 'p1' ? e.p1 : e.p2;
+      ctrl.data.opponent.score = ctrl.data.opponent.playerIndex == 'p1' ? e.p1 : e.p2;
       ctrl.redraw();
     },
     simulPlayerMove(gameId: string) {

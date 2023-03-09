@@ -3,7 +3,18 @@ package lila.study
 import strategygames.format.pgn.{ Glyph, Glyphs, Tag, Tags }
 import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Centis, Player => PlayerIndex, GameFamily, GameLogic, Pocket, PocketData, Pockets, Pos, PromotableRole, Role }
+import strategygames.{
+  Centis,
+  Player => PlayerIndex,
+  GameFamily,
+  GameLogic,
+  Pocket,
+  PocketData,
+  Pockets,
+  Pos,
+  PromotableRole,
+  Role
+}
 import strategygames.chess.{ Pos => ChessPos }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
@@ -55,12 +66,20 @@ object BSONHandlers {
   }
 
   implicit val PromotableRoleHandler = tryHandler[PromotableRole](
-    { case BSONString(v) => v.headOption flatMap Role.allPromotableByForsyth(GameLogic.Chess(), GameFamily.Chess()).get toTry s"No such role: $v" },
+    { case BSONString(v) =>
+      v.headOption flatMap Role
+        .allPromotableByForsyth(GameLogic.Chess(), GameFamily.Chess())
+        .get toTry s"No such role: $v"
+    },
     x => BSONString(x.forsyth.toString)
   )
 
   implicit val RoleHandler = tryHandler[Role](
-    { case BSONString(v) => v.headOption flatMap Role.allByForsyth(GameLogic.Chess(), GameFamily.Chess()).get toTry s"No such role: $v" },
+    { case BSONString(v) =>
+      v.headOption flatMap Role
+        .allByForsyth(GameLogic.Chess(), GameFamily.Chess())
+        .get toTry s"No such role: $v"
+    },
     x => BSONString(x.forsyth.toString)
   )
 
@@ -92,7 +111,7 @@ object BSONHandlers {
   implicit val CommentAuthorBSONHandler = quickHandler[Comment.Author](
     {
       case BSONString(lila.user.User.playstrategyId | "l") => Comment.Author.PlayStrategy
-      case BSONString(name)                           => Comment.Author.External(name)
+      case BSONString(name)                                => Comment.Author.External(name)
       case doc: Bdoc =>
         {
           for {
@@ -105,7 +124,7 @@ object BSONHandlers {
     {
       case Comment.Author.User(id, name) => $doc("id" -> id, "name" -> name)
       case Comment.Author.External(name) => BSONString(s"${name.trim}")
-      case Comment.Author.PlayStrategy        => BSONString("l")
+      case Comment.Author.PlayStrategy   => BSONString("l")
       case Comment.Author.Unknown        => BSONString("")
     }
   )
@@ -120,15 +139,19 @@ object BSONHandlers {
     new BSON[PocketData] {
       private def writePocket(p: Pocket) = p.roles.map(_.forsyth).mkString
       //will need to be updated for different GameFamilys
-      private def readPocket(p: String)  = Pocket(p.view.flatMap(r => Role.forsyth(GameLogic.Chess(), r)).toList)
+      private def readPocket(p: String) = Pocket(
+        p.view.flatMap(r => Role.forsyth(GameLogic.Chess(), r)).toList
+      )
       def reads(r: Reader) =
-        PocketData.Chess(strategygames.chess.PocketData(
-          promoted = r.getsD[strategygames.chess.Pos]("o").toSet,
-          pockets = Pockets(
-            p1 = readPocket(r.strD("w")),
-            p2 = readPocket(r.strD("b"))
+        PocketData.Chess(
+          strategygames.chess.PocketData(
+            promoted = r.getsD[strategygames.chess.Pos]("o").toSet,
+            pockets = Pockets(
+              p1 = readPocket(r.strD("w")),
+              p2 = readPocket(r.strD("b"))
+            )
           )
-        ))
+        )
       def writes(w: Writer, s: PocketData) =
         $doc(
           "o" -> w.listO(s.promoted.toList),
@@ -168,6 +191,7 @@ object BSONHandlers {
     import Node.{ BsonFields => F }
     for {
       ply <- doc.getAsOpt[Int](F.ply)
+      ppt <- doc.getAsOpt[Int](F.ppt)
       uci <- doc.getAsOpt[Uci](F.uci)
       san <- doc.getAsOpt[String](F.san)
       fen <- doc.getAsOpt[FEN](F.fen)
@@ -183,6 +207,7 @@ object BSONHandlers {
     } yield Node(
       id,
       ply,
+      ppt,
       WithSan(GameLogic.Chess(), uci, san),
       fen,
       check,
@@ -203,6 +228,7 @@ object BSONHandlers {
     val w = new Writer
     $doc(
       ply            -> n.ply,
+      ppt            -> n.plysPerTurn,
       uci            -> n.move.uci,
       san            -> n.move.san,
       fen            -> n.fen,
@@ -229,6 +255,7 @@ object BSONHandlers {
       val r        = new Reader(rootNode)
       Root(
         ply = r int ply,
+        plysPerTurn = r int ppt,
         fen = r.get[FEN](fen),
         check = r boolD check,
         shapes = r.getO[Shapes](shapes) | Shapes.empty,
@@ -245,6 +272,7 @@ object BSONHandlers {
       StudyFlatTree.writer.rootChildren(r) appended {
         Path.rootDbKey -> $doc(
           ply      -> r.ply,
+          ppt      -> r.plysPerTurn,
           fen      -> r.fen,
           check    -> r.check.some.filter(identity),
           shapes   -> r.shapes.value.nonEmpty.option(r.shapes),
@@ -264,7 +292,7 @@ object BSONHandlers {
   implicit val VariantBSONHandler = new BSON[Variant] {
     def reads(r: Reader) = Variant(GameLogic(r.intD("gl")), r.int("v")) match {
       case Some(v) => v
-      case None => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
+      case None    => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
     }
     def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLogic.id, "v" -> v.id)
   }

@@ -16,8 +16,14 @@ cg-board {
   }
 }
 
+$togyzkumalak-highlight-height: calc(104% / 3);
+$togyzkumalak-margin-top-same: 4.7%;
+$togyzkumalak-margin-top-opposite: 3.7%;
+$togyzkumalak-margin-mini-game: 3.7%;
+
 //no background shadow for board as its has rounded corners.
-.variant-oware cg-board {
+.variant-oware cg-board,
+.variant-togyzkumalak cg-board {
   box-shadow: none;
 }
 
@@ -31,11 +37,39 @@ cg-board {
   padding-top: calc(213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
 }
+.mini-board.variant-togyzkumalak.is2d {
+  padding-bottom: calc(256 * 100% / 640);
+  padding-top: calc(256 * 100% / 640);
+  margin-bottom: calc(128 * 100% / 640);
+}
 
-//only add for fixed mini-games, not the popup which create an <a>
+//only add for fixed mini-games (active game below board), not the popup which create an <a>
+//simul has different setup so adjust for it
 span.mini-game.variant-oware.is2d {
   margin-top: calc(-213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
+  .simul & {
+    margin-top: unset;
+    margin-bottom: unset;
+    .cg-wrap {
+      padding-bottom: calc(213.333 * 100% / 640);
+      padding-top: calc(213.333 * 100% / 640);
+      margin-bottom: calc(213.333 * 100% / 640);
+    }
+  }
+}
+span.mini-game.variant-togyzkumalak.is2d {
+  margin-top: calc(-138.666 * 100% / 640);
+  margin-bottom: calc(138.666 * 100% / 640);
+  .simul & {
+    margin-top: unset;
+    margin-bottom: unset;
+    .cg-wrap {
+      padding-bottom: calc(256 * 100% / 640);
+      padding-top: calc(256 * 100% / 640);
+      margin-bottom: calc(128 * 100% / 640);
+    }
+  }
 }
 
 //main board - alter non-square boards
@@ -70,8 +104,18 @@ span.mini-game.variant-oware.is2d {
   height: calc(100% / 10);
 }
 
+.variant-amazons square {
+  width: calc(100% / 10);
+  height: calc(100% / 10);
+}
+
 .variant-oware square {
   width: calc(100% / 6);
+  height: calc(100% / 2);
+}
+
+.variant-togyzkumalak square {
+  width: calc(100% / 9);
   height: calc(100% / 2);
 }
 
@@ -82,11 +126,18 @@ $alternate-board-highlights: (
 );
 $alternate-color: rgba(20, 30, 85, 0.5);
 
-$mancala-light-board-highlights: (
-  'mancala-light-wood': 'mancala',
+$oware-light-board-highlights: (
+  'oware-light-wood': 'oware',
 );
-$mancala-dark-board-highlights: (
-  'mancala-dark-wood': 'mancala',
+$oware-dark-board-highlights: (
+  'oware-dark-wood': 'oware',
+);
+
+$togyzkumalak-blue-board-highlights: (
+  'togyzkumalak-blue': 'togyzkumalak',
+);
+$togyzkumalak-wood-board-highlights: (
+  'togyzkumalak-wood': 'togyzkumalak',
 );
 
 square {
@@ -105,45 +156,207 @@ square {
       }
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/mancala/highlights/dashed.svg);
+        background: url(../images/board/oware/highlights/dashed.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background: url(../images/board/oware/highlights/dashed_lighter.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.from {
-        background: url(../images/board/mancala/highlights/dashed.svg);
+        background: url(../images/board/oware/highlights/dashed.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.from {
-        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background: url(../images/board/oware/highlights/dashed_lighter.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/mancala/highlights/dashed.svg);
+        background: url(../images/board/oware/highlights/dashed.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+        background: url(../images/board/oware/highlights/dashed_lighter.svg);
         background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &,
+      body.#{$color} .#{$gameFamily}.orientation-p1 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &,
+      body.#{$color} .#{$gameFamily}.orientation-p2 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &,
+      body.#{$color} .#{$gameFamily}.orientation-p1 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &,
+      body.#{$color} .#{$gameFamily}.orientation-p2 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.from,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.from {
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.from,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.from {
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.from,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.from {
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.from,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.from {
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
   }
@@ -167,27 +380,151 @@ square {
     }
   }
 
-  @each $color, $gameFamily in $mancala-light-board-highlights {
+  @each $color, $gameFamily in $oware-light-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move.from {
-      background: url(../images/board/mancala/highlights/solid_darker.svg);
+      background: url(../images/board/oware/highlights/solid_darker.svg);
       background-size: cover;
     }
 
     body.#{$color} .#{$gameFamily} &.last-move.to {
-      background: url(../images/board/mancala/highlights/dashed_darker.svg);
+      background: url(../images/board/oware/highlights/dashed_darker.svg);
       background-size: cover;
     }
   }
 
-  @each $color, $gameFamily in $mancala-dark-board-highlights {
+  @each $color, $gameFamily in $oware-dark-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move.from {
-      background: url(../images/board/mancala/highlights/solid_lighter.svg);
+      background: url(../images/board/oware/highlights/solid_lighter.svg);
       background-size: cover;
     }
 
     body.#{$color} .#{$gameFamily} &.last-move.to {
-      background: url(../images/board/mancala/highlights/dashed_lighter.svg);
+      background: url(../images/board/oware/highlights/dashed_lighter.svg);
       background-size: cover;
+    }
+  }
+
+  @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+    body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.from,
+    body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.from {
+      background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+    }
+    body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.from,
+    body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.from {
+      background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+    }
+
+    body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+    body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
+      background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+    }
+    body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+    body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+      background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+    }
+  }
+
+  @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+    body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.from,
+    body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.from {
+      background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+    }
+    body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.from,
+    body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.from {
+      background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+    }
+
+    body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+    body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
+      background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+    }
+    body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+    body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+      background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2 {
+        margin-top: $togyzkumalak-margin-top-same;
+      }
+      &.p1 {
+        margin-top: $togyzkumalak-margin-top-opposite;
+      }
+    }
+  }
+
+  $togyzkumalak-highlights: (
+    ('togyzkumalak-blue', 'from', url(../images/board/togyzkumalak/highlights/marker-start.svg)),
+    ('togyzkumalak-blue', 'to', url(../images/board/togyzkumalak/highlights/marker-end.svg)),
+    ('togyzkumalak-wood', 'from', url(../images/board/togyzkumalak/highlights/marker-start-wood.svg)),
+    ('togyzkumalak-wood', 'to', url(../images/board/togyzkumalak/highlights/marker-end-wood.svg))
+  );
+
+  //also ammend mini-game as the margins need to be different/look nice.....
+  @each $color, $from-or-to, $url-svg in $togyzkumalak-highlights {
+    body.#{$color} .mini-game.togyzkumalak &.last-move.#{$from-or-to} {
+      background: #{$url-svg};
+      background-size: cover;
+      height: $togyzkumalak-highlight-height;
+      &.p2,
+      &.p1 {
+        margin-top: $togyzkumalak-margin-mini-game;
+      }
     }
   }
 
@@ -221,31 +558,139 @@ square {
       background-size: cover;
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/mancala/highlights/solid.svg);
+        background: url(../images/board/oware/highlights/solid.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/mancala/highlights/solid_lighter.svg);
+        background: url(../images/board/oware/highlights/solid_lighter.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-light-board-highlights {
+    @each $color, $gameFamily in $oware-light-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/mancala/highlights/solid.svg);
+        background: url(../images/board/oware/highlights/solid.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $mancala-dark-board-highlights {
+    @each $color, $gameFamily in $oware-dark-board-highlights {
       body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/mancala/highlights/solid_lighter.svg);
+        background: url(../images/board/oware/highlights/solid_lighter.svg);
         background-size: cover;
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &,
+      body.#{$color} .#{$gameFamily}.orientation-p1 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &,
+      body.#{$color} .#{$gameFamily}.orientation-p2 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &,
+      body.#{$color} .#{$gameFamily}.orientation-p1 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &,
+      body.#{$color} .#{$gameFamily}.orientation-p2 & {
+        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+      }
+    }
+
+    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
+      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+      }
+      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
+      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
+        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
+        background-size: cover;
+        height: $togyzkumalak-highlight-height;
+        &.p2 {
+          margin-top: $togyzkumalak-margin-top-same;
+        }
+        &.p1 {
+          margin-top: $togyzkumalak-margin-top-opposite;
+        }
       }
     }
   }
@@ -314,9 +759,41 @@ square {
   height: calc(100% / 10);
 }
 
+.variant-amazons piece {
+  width: calc(100% / 10);
+  height: calc(100% / 10);
+}
+
 .variant-oware piece {
   width: calc(100% / 6);
   height: calc(100% / 2);
+}
+
+.variant-togyzkumalak {
+  piece {
+    width: calc(100% / 9);
+    height: calc(100% / 3);
+  }
+
+  .orientation-p2 piece,
+  &.orientation-p2 piece {
+    &.p2 {
+      margin-top: 5.15%;
+    }
+    &.p1 {
+      margin-top: 4.15%;
+    }
+  }
+
+  .orientation-p1 piece,
+  &.orientation-p1 piece {
+    &.p2 {
+      margin-top: 4.15%;
+    }
+    &.p1 {
+      margin-top: 5.15%;
+    }
+  }
 }
 
 piece {
@@ -374,9 +851,19 @@ piece {
   padding-bottom: calc(100% / 10);
 }
 
+.variant-amazons cg-helper {
+  width: calc(100% / 10);
+  padding-bottom: calc(100% / 10);
+}
+
 .variant-oware cg-helper {
   width: calc(100% / 6);
   padding-bottom: calc(100% / 6);
+}
+
+.variant-togyzkumalak cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 3.527);
 }
 
 cg-helper {
@@ -412,8 +899,18 @@ cg-helper {
   height: calc(100% * 10);
 }
 
+.variant-amazons cg-container {
+  width: calc(100% * 10);
+  height: calc(100% * 10);
+}
+
 .variant-oware cg-container {
   width: calc(100% * 6);
+  height: calc(100% * 2);
+}
+
+.variant-togyzkumalak cg-container {
+  width: calc(100% * 9);
   height: calc(100% * 2);
 }
 
@@ -484,6 +981,28 @@ cg-container .cg-custom-svgs svg {
   }
 }
 
+//TODO check fix?
+.swiss__board,
+.tour__featured {
+  &.variant-togyzkumalak .cg-wrap {
+    padding-bottom: calc(365.555 * 100% / 640);
+    margin-top: calc(106.666 * 100% / 640);
+    margin-bottom: calc(106.666 * 100% / 640);
+  }
+}
+
+.variant-togyzkumalak .round__app__board {
+  padding-bottom: calc(444 * 100% / 640);
+  margin-top: calc(106.666 * 100% / 640);
+  margin-bottom: calc(106.666 * 100% / 640);
+
+  @include breakpoint($mq-col1-uniboard) {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-bottom: calc(355.555 * 100% / 640);
+  }
+}
+
 .variant-xiangqi .analyse__board {
   padding-bottom: calc(640 * 100% / 576);
 }
@@ -492,6 +1011,17 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(213.333 * 100% / 640);
   margin-top: calc(213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640);
+
+  @include breakpoint($mq-col1-uniboard) {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+}
+
+.variant-togyzkumalak .analyse__board {
+  padding-bottom: calc(365.555 * 100% / 640);
+  margin-top: calc(106.666 * 100% / 640);
+  margin-bottom: calc(106.666 * 100% / 640);
 
   @include breakpoint($mq-col1-uniboard) {
     margin-top: 5px;

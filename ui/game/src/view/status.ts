@@ -56,7 +56,11 @@ export default function status(ctrl: Ctrl): string {
         case 'flipello10':
         case 'flipello':
           return noarg('gameFinished');
+        case 'amazons':
+          return noarg('gameFinished');
         case 'oware':
+          return noarg('gameFinished');
+        case 'togyzkumalak':
           return noarg('gameFinished');
       }
       return noarg('variantEnding');

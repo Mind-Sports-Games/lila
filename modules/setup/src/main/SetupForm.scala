@@ -27,6 +27,8 @@ object SetupForm {
       "timeMode"    -> timeMode,
       "time"        -> time,
       "increment"   -> increment,
+      "byoyomi"     -> byoyomi,
+      "periods"     -> periods,
       "days"        -> days,
       "level"       -> level,
       "playerIndex" -> playerIndex,
@@ -56,6 +58,8 @@ object SetupForm {
         "timeMode"    -> timeMode,
         "time"        -> time,
         "increment"   -> increment,
+        "byoyomi"     -> byoyomi,
+        "periods"     -> periods,
         "days"        -> days,
         "mode"        -> mode(withRated = ctx.isAuth),
         "playerIndex" -> playerIndex,
@@ -68,7 +72,7 @@ object SetupForm {
     )
 
   def hookFilled(timeModeString: Option[String])(implicit ctx: UserContext): Form[HookConfig] =
-    hook fill HookConfig.default(ctx.isAuth).withTimeModeString(timeModeString)
+    hook.fill(HookConfig.default(ctx.isAuth).withTimeModeString(timeModeString))
 
   def hook(implicit ctx: UserContext) =
     Form(
@@ -77,6 +81,8 @@ object SetupForm {
         "timeMode"    -> timeMode,
         "time"        -> time,
         "increment"   -> increment,
+        "byoyomi"     -> byoyomi,
+        "periods"     -> periods,
         "days"        -> days,
         "mode"        -> mode(ctx.isAuth),
         "ratingRange" -> optional(ratingRange),
@@ -91,10 +97,12 @@ object SetupForm {
       "variant"     -> optional(boardApiVariantKeys),
       "time"        -> time,
       "increment"   -> increment,
+      "byoyomi"     -> byoyomi,
+      "periods"     -> periods,
       "rated"       -> optional(boolean),
       "playerIndex" -> optional(playerIndex),
       "ratingRange" -> optional(ratingRange)
-    )((v, t, i, r, c, g) =>
+    )((v, t, i, b, p, r, c, g) =>
       HookConfig(
         variant = v match {
           case Some(v) =>
@@ -103,9 +111,11 @@ object SetupForm {
             )
           case None => Variant.default(GameLogic.Chess())
         },
-        timeMode = TimeMode.RealTime,
+        timeMode = TimeMode.FischerClock,
         time = t,
         increment = i,
+        byoyomi = b,
+        periods = p,
         days = 1,
         mode = strategygames.Mode(~r),
         playerIndex = lila.lobby.PlayerIndex.orDefault(c),
@@ -121,14 +131,26 @@ object SetupForm {
 
   object api {
 
-    lazy val clockMapping =
+    // TDOO: byoyomi need to handle both byoyomi and fischer here.
+    lazy val fischerClockMapping =
       mapping(
         "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
         "increment" -> increment
-      )(strategygames.Clock.Config.apply)(strategygames.Clock.Config.unapply)
+      )(strategygames.FischerClock.Config.apply)(strategygames.FischerClock.Config.unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
 
-    lazy val clock = "clock" -> optional(clockMapping)
+    lazy val fischerClock = "clock" -> optional(fischerClockMapping)
+
+    lazy val byoyomiClockMapping =
+      mapping(
+        "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "increment" -> increment,
+        "byoyomi"   -> byoyomi,
+        "periods"   -> periods
+      )(strategygames.ByoyomiClock.Config.apply)(strategygames.ByoyomiClock.Config.unapply)
+        .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
+
+    lazy val byoyomiClock = "clock" -> optional(byoyomiClockMapping)
 
     lazy val variant =
       "variant" -> optional(text.verifying(Variant.byKey.contains _))
@@ -148,7 +170,8 @@ object SetupForm {
     private val challengeMapping =
       mapping(
         variant,
-        clock,
+        fischerClock,
+        byoyomiClock,
         "days"          -> optional(days),
         "rated"         -> boolean,
         "playerIndex"   -> optional(playerIndex),
@@ -164,7 +187,8 @@ object SetupForm {
       mapping(
         "level" -> level,
         variant,
-        clock,
+        fischerClock,
+        //byoyomiClock, TODO: byoyomi
         "days"        -> optional(days),
         "playerIndex" -> optional(playerIndex),
         "fen"         -> fenField
@@ -175,7 +199,8 @@ object SetupForm {
       mapping(
         "name" -> optional(lila.common.Form.cleanNonEmptyText(maxLength = 200)),
         variant,
-        clock,
+        fischerClock,
+        // byoyomiClock, TODO: byoyomi
         "rated" -> boolean,
         "fen"   -> fenField
       )(OpenConfig.from)(_ => none)

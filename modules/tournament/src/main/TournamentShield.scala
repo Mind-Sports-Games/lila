@@ -11,7 +11,7 @@ import lila.memo.CacheApi._
 import lila.i18n.VariantKeys
 
 import strategygames.variant.Variant
-import strategygames.GameFamily
+import strategygames.{ GameFamily, GameGroup }
 
 final class TournamentShieldApi(
     tournamentRepo: TournamentRepo,
@@ -143,9 +143,9 @@ object TournamentShield {
     private def playStrategyMedleyGeneration(variants: List[Variant]) = {
       val thisOrder =
         Random.shuffle(variants)
-      val onePerGameFamily =
-        Random.shuffle(GameFamily.all.map(gf => thisOrder.filter(_.gameFamily == gf).head))
-      val newOrder = onePerGameFamily ::: thisOrder.filterNot(onePerGameFamily.contains(_))
+      val gameGroups      = GameGroup.medley.filter(gg => gg.variants.exists(thisOrder.contains(_)))
+      val onePerGameGroup = Random.shuffle(gameGroups.map(gg => Random.shuffle(gg.variants).head))
+      val newOrder        = onePerGameGroup ::: thisOrder.filterNot(onePerGameGroup.contains(_))
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         newOrder,
         5 * 60,
@@ -479,11 +479,27 @@ object TournamentShield {
           27
         )
 
+    case object Amazons
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.Amazons),
+          Blitz32,
+          25,
+          -1
+        )
+
     case object Oware
         extends Category(
-          Variant.Mancala(strategygames.mancala.variant.Oware),
+          Variant.Samurai(strategygames.samurai.variant.Oware),
           Blitz32,
           20
+        )
+
+    case object Togyzkumalak
+        extends Category(
+          Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak),
+          Blitz53,
+          26,
+          -1
         )
 
     val all: List[Category] = List(
@@ -516,7 +532,9 @@ object TournamentShield {
       MiniXiangqi,
       Flipello,
       Flipello10,
-      Oware
+      Amazons,
+      Oware,
+      Togyzkumalak
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, P1, P2 }
+import strategygames.{ ClockConfig, FischerClock, ByoyomiClock, P1, P2 }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -210,6 +210,7 @@ final class JsonView(
               "nb"     -> sheetNbs(sheet)
             )
             .add("title" -> user.title)
+            .add("country" -> user.profile.map(_.country))
             .add("performance" -> player.performanceOption)
             .add("rank" -> ranking.get(user.id).map(1 +))
             .add("provisional" -> player.provisional)
@@ -580,11 +581,23 @@ object JsonView {
       "speed" -> s.speed.key
     )
 
-  implicit val clockWrites: OWrites[Clock.Config] = OWrites { clock =>
-    Json.obj(
-      "limit"     -> clock.limitSeconds,
-      "increment" -> clock.incrementSeconds
-    )
+  implicit private[tournament] val clockWrites: OWrites[strategygames.ClockConfig] = OWrites { clock =>
+    clock match {
+      case fc: FischerClock.Config => {
+        Json.obj(
+          "limit"     -> fc.limitSeconds,
+          "increment" -> fc.incrementSeconds
+        )
+      }
+      case bc: ByoyomiClock.Config => {
+        Json.obj(
+          "limit"     -> bc.limitSeconds,
+          "increment" -> bc.incrementSeconds,
+          "byoyomi"   -> bc.byoyomiSeconds,
+          "periods"   -> bc.periodsTotal
+        )
+      }
+    }
   }
 
   private[tournament] def positionJson(fen: FEN): JsObject =

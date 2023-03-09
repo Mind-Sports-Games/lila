@@ -2,9 +2,8 @@ package lila.swiss
 
 import ornicar.scalalib.Zero
 
-import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
-import strategygames.{ GameFamily, Speed }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, GameGroup, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import scala.concurrent.duration._
@@ -65,9 +64,14 @@ case class Swiss(
 
   def perfType: PerfType = PerfType(variant, speed)
 
-  def estimatedDuration: FiniteDuration = {
-    (clock.limit.toSeconds + clock.increment.toSeconds * 80 + 10) * settings.nbRounds
-  }.toInt.seconds
+  def estimatedDuration: FiniteDuration = clock match {
+    case bc: ByoyomiClock.Config => {
+      ((bc.limitSeconds + bc.incrementSeconds * 80 + bc.byoyomiSeconds * 20 * bc.periodsTotal + 10) * settings.nbRounds).toInt.seconds
+    }
+    case fc: FischerClock.Config => {
+      ((fc.limitSeconds + fc.incrementSeconds * 80 + 10) * settings.nbRounds).toInt.seconds
+    }
+  }
 
   def estimatedDurationString = {
     val minutes = estimatedDuration.toMinutes
@@ -86,12 +90,18 @@ case class Swiss(
 
   def roundPerfType: PerfType = PerfType(roundVariant, speed)
 
-  def medleyGameFamilies: Option[List[GameFamily]] = settings.medleyVariants.map(
-    _.map(_.gameFamily).distinct.sortWith(_.name < _.name)
-  )
+  def medleyGameGroups: Option[List[GameGroup]] =
+    settings.medleyVariants.map(mvList =>
+      GameGroup.medley.filter(gg => gg.variants.exists(mvList.contains(_))).distinct.sortWith(_.name < _.name)
+    )
 
-  def medleyGameFamiliesString: Option[String] =
-    medleyGameFamilies.map(_.map(VariantKeys.gameFamilyName).mkString(", "))
+  def medleyGameFamilies: Option[List[GameFamily]] =
+    settings.medleyVariants.map(
+      _.map(_.gameFamily).distinct.sortWith(_.name < _.name)
+    )
+
+  def medleyGameGroupsString: Option[String] =
+    medleyGameGroups.map(_.map(VariantKeys.gameGroupName).mkString(", "))
 
   def mainGameFamily: Option[GameFamily] =
     if (isMedley) {

@@ -2,6 +2,7 @@ package lila.simul
 
 import cats.implicits._
 import strategygames.{ GameFamily, GameLogic }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.StartingPosition
@@ -24,6 +25,13 @@ object SimulForm {
   val clockIncrementDefault = 60
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
 
+  val byoyomiLimits: Seq[Int] = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (30 to 60 by 10)
+  val clockByoyomiChoices     = options(byoyomiLimits, "%d second{s}")
+
+  val periods        = 1 to 5
+  val periodsDefault = 1
+  val periodsChoices = options(periods, "%d period{s}")
+
   val clockExtras       = (0 to 15 by 5) ++ (20 to 60 by 10) ++ (90 to 120 by 30)
   val clockExtraChoices = options(clockExtras, "%d minute{s}")
   val clockExtraDefault = 0
@@ -35,6 +43,30 @@ object SimulForm {
     "p2"     -> "Player 2"
   )
   val playerIndexDefault = "p1"
+
+  private def valuesFromClockConfig(c: ClockConfig): Option[(Boolean, Int, Int, Option[Int], Option[Int])] =
+    c match {
+      case fc: FischerClock.Config => {
+        FischerClock.Config.unapply(fc).map(t => (false, t._1, t._2, None, None))
+      }
+      case bc: ByoyomiClock.Config => {
+        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1, t._2, Some(t._3), Some(t._4)))
+      }
+    }
+
+  private def clockConfigFromValues(
+      useByoyomi: Boolean,
+      limit: Int,
+      increment: Int,
+      byoyomi: Option[Int],
+      periods: Option[Int]
+  ): ClockConfig =
+    (useByoyomi, byoyomi, periods) match {
+      case (true, Some(byoyomi), Some(periods)) =>
+        ByoyomiClock.Config(limit, increment, byoyomi, periods)
+      case _ =>
+        FischerClock.Config(limit, increment)
+    }
 
   private def nameType(host: User) =
     eventName(2, 40).verifying(
@@ -61,8 +93,7 @@ object SimulForm {
   def create(host: User, teams: List[LeaderTeam]) =
     baseForm(host, teams) fill Setup(
       name = host.titleUsername,
-      clockTime = clockTimeDefault,
-      clockIncrement = clockIncrementDefault,
+      clockConfig = FischerClock.Config(15, 0),
       clockExtra = clockExtraDefault,
       variants = List(s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}"),
       position = none,
@@ -76,8 +107,7 @@ object SimulForm {
   def edit(host: User, teams: List[LeaderTeam], simul: Simul) =
     baseForm(host, teams) fill Setup(
       name = simul.name,
-      clockTime = simul.clock.config.limitInMinutes.toInt,
-      clockIncrement = simul.clock.config.increment.roundSeconds,
+      clockConfig = simul.clock.config,
       clockExtra = simul.clock.hostExtraMinutes,
       variants = simul.variants.map(v => s"${v.gameFamily.id}_${v.id}"),
       position = simul.position,
@@ -91,10 +121,15 @@ object SimulForm {
   private def baseForm(host: User, teams: List[LeaderTeam]) =
     Form(
       mapping(
-        "name"           -> nameType(host),
-        "clockTime"      -> numberIn(clockTimeChoices),
-        "clockIncrement" -> numberIn(clockIncrementChoices),
-        "clockExtra"     -> numberIn(clockExtraChoices),
+        "name" -> nameType(host),
+        "clock" -> mapping[ClockConfig, Boolean, Int, Int, Option[Int], Option[Int]](
+          "useByoyomi" -> boolean,
+          "limit"      -> number.verifying(clockTimes.contains _),
+          "increment"  -> number(min = 0, max = 120),
+          "byoyomi"    -> optional(number.verifying(byoyomiLimits.contains _)),
+          "periods"    -> optional(number(min = 0, max = 5))
+        )(clockConfigFromValues)(valuesFromClockConfig),
+        "clockExtra" -> numberIn(clockExtraChoices),
         //only variants that arent FromPosition
         "variants" -> list {
           nonEmptyText.verifying(g =>
@@ -124,8 +159,7 @@ object SimulForm {
 
   case class Setup(
       name: String,
-      clockTime: Int,
-      clockIncrement: Int,
+      clockConfig: ClockConfig,
       clockExtra: Int,
       variants: List[String],
       position: Option[FEN],
@@ -137,7 +171,13 @@ object SimulForm {
   ) {
     def clock =
       SimulClock(
-        config = strategygames.Clock.Config(clockTime * 60, clockIncrement),
+        config = clockConfig match {
+          case fc: FischerClock.Config =>
+            strategygames.FischerClock.Config(fc.limitSeconds * 60, fc.incrementSeconds)
+          case bc: ByoyomiClock.Config =>
+            strategygames.ByoyomiClock
+              .Config(bc.limitSeconds * 60, bc.incrementSeconds, bc.byoyomiSeconds, bc.periods)
+        },
         hostExtraTime = clockExtra * 60
       )
 

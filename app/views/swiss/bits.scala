@@ -85,7 +85,7 @@ object bits {
     }
 
   def medleyGames(
-      gameFamilies: String,
+      gameGroups: String,
       variants: List[Variant],
       displayFirstRound: Boolean,
       displayAllRounds: Boolean,
@@ -93,7 +93,7 @@ object bits {
   )(implicit ctx: Context) =
     div(cls := "medley__info")(
       div(
-        s"${trans.swiss.medleyGameFamilies.txt()}: ${gameFamilies}."
+        s"${trans.swiss.medleyGameGroups.txt()}: ${gameGroups}."
       ),
       if (displayFirstRound)
         variants.headOption.map { v =>
@@ -133,7 +133,7 @@ object bits {
     trans.averageOpponent,
     trans.tournamentComplete,
     trans.password,
-    trans.swiss.medleyGameFamilies,
+    trans.swiss.medleyGameGroups,
     trans.swiss.firstRound,
     trans.swiss.viewAllXRounds
   ).map(_.key)

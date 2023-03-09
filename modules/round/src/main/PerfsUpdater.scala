@@ -85,8 +85,12 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.flipello, ratingsB.flipello, game)
               case Variant.FairySF(strategygames.fairysf.variant.Flipello10) =>
                 updateRatings(ratingsW.flipello10, ratingsB.flipello10, game)
-              case Variant.Mancala(strategygames.mancala.variant.Oware) =>
+              case Variant.FairySF(strategygames.fairysf.variant.Amazons) =>
+                updateRatings(ratingsW.amazons, ratingsB.amazons, game)
+              case Variant.Samurai(strategygames.samurai.variant.Oware) =>
                 updateRatings(ratingsW.oware, ratingsB.oware, game)
+              case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
+                updateRatings(ratingsW.togyzkumalak, ratingsB.togyzkumalak, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -151,7 +155,9 @@ final class PerfsUpdater(
       minixiangqi: Rating,
       flipello: Rating,
       flipello10: Rating,
+      amazons: Rating,
       oware: Rating,
+      togyzkumalak: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -190,7 +196,9 @@ final class PerfsUpdater(
       minixiangqi = perfs.minixiangqi.toRating,
       flipello = perfs.flipello.toRating,
       flipello10 = perfs.flipello10.toRating,
+      amazons = perfs.amazons.toRating,
       oware = perfs.oware.toRating,
+      togyzkumalak = perfs.togyzkumalak.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -267,7 +275,10 @@ final class PerfsUpdater(
           minixiangqi = addRatingIf(game.ratingVariant.minixiangqi, perfs.minixiangqi, ratings.minixiangqi),
           flipello = addRatingIf(game.ratingVariant.flipello, perfs.flipello, ratings.flipello),
           flipello10 = addRatingIf(game.ratingVariant.flipello10, perfs.flipello10, ratings.flipello10),
+          amazons = addRatingIf(game.ratingVariant.amazons, perfs.amazons, ratings.amazons),
           oware = addRatingIf(game.ratingVariant.oware, perfs.oware, ratings.oware),
+          togyzkumalak =
+            addRatingIf(game.ratingVariant.togyzkumalak, perfs.togyzkumalak, ratings.togyzkumalak),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -307,7 +318,9 @@ final class PerfsUpdater(
           minixiangqi = r(PT.orDefault("minixiangqi"), perfs.minixiangqi, perfs1.minixiangqi),
           flipello = r(PT.orDefault("flipello"), perfs.flipello, perfs1.flipello),
           flipello10 = r(PT.orDefault("flipello10"), perfs.flipello10, perfs1.flipello10),
+          amazons = r(PT.orDefault("amazons"), perfs.amazons, perfs1.amazons),
           oware = r(PT.orDefault("oware"), perfs.oware, perfs1.oware),
+          togyzkumalak = r(PT.orDefault("togyzkumalak"), perfs.togyzkumalak, perfs1.togyzkumalak),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

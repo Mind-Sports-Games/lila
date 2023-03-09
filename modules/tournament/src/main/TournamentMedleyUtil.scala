@@ -81,7 +81,9 @@ object TournamentMedleyUtil {
       "minixiangqi"   -> quick,
       "flipello"      -> medium,
       "flipello10"    -> slow,
-      "oware"         -> slow
+      "amazons"       -> medium,
+      "oware"         -> slow,
+      "togyzkumalak"  -> slow
     )
   }
 

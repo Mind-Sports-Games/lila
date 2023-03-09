@@ -31,8 +31,16 @@ final class JsonView(
     (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.history
       .checkCount(playerIndex)
 
+  private def score(game: Game, playerIndex: PlayerIndex) =
+    (game.variant == strategygames.togyzkumalak.variant.Togyzkumalak) option game.history
+      .score(playerIndex)
+
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
+
+  private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
+    pov.game.variant.onlyDropsVariant || (pov.game.variant.key == "amazons" && pov.game.situation.destinations.size == 0)
+  }
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
     gameVariant match {
@@ -61,6 +69,7 @@ final class JsonView(
       .add("offeringDraw" -> p.isOfferingDraw)
       .add("proposingTakeback" -> p.isProposingTakeback)
       .add("checks" -> checkCount(g, p.playerIndex))
+      .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
@@ -149,7 +158,7 @@ final class JsonView(
           .add("takebackable" -> takebackable)
           .add("moretimeable" -> moretimeable)
           .add("crazyhouse" -> pov.game.board.pocketData)
-          .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
           .add("hasGameScore" -> pov.game.variant.hasGameScore)
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
@@ -178,6 +187,7 @@ final class JsonView(
       .add("ratingDiff" -> p.ratingDiff)
       .add("provisional" -> p.provisional)
       .add("checks" -> checkCount(g, p.playerIndex))
+      .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
       .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
@@ -249,7 +259,7 @@ final class JsonView(
           .add("userTv" -> tv.collect { case OnUserTv(userId) =>
             Json.obj("id" -> userId)
           })
-          .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+          .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
           .add("hasGameScore" -> pov.game.variant.hasGameScore)
 
       }
@@ -318,7 +328,7 @@ final class JsonView(
       )
       .add("evalPut" -> me.??(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
-      .add("onlyDropsVariant" -> pov.game.variant.onlyDropsVariant)
+      .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
       .add("hasGameScore" -> pov.game.variant.hasGameScore)
   }
 
@@ -370,7 +380,10 @@ final class JsonView(
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
-      case (Situation.Mancala(_), Variant.Mancala(_)) =>
+      case (Situation.Samurai(_), Variant.Samurai(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
@@ -382,9 +395,10 @@ final class JsonView(
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
-      case (Situation.Mancala(_), Variant.Mancala(_))   => None
-      case (Situation.Draughts(_), Variant.Draughts(_)) => None
-      case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
+      case (Situation.Samurai(_), Variant.Samurai(_))           => None
+      case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) => None
+      case (Situation.Draughts(_), Variant.Draughts(_))         => None
+      case _                                                    => sys.error("Mismatch of types for possibleDropsByrole")
     }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =

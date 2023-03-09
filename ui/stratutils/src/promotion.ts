@@ -39,10 +39,12 @@ export const possiblePromotion = (
   const isP2 = piece && piece.playerIndex == 'p2';
   switch (variant) {
     case 'oware':
+    case 'togyzkumalak':
     case 'minixiangqi':
     case 'xiangqi':
     case 'flipello10':
     case 'flipello':
+    case 'amazons':
       return false;
     case 'shogi':
       return (

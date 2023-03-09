@@ -171,6 +171,10 @@ export default rollupProject({
     input: 'src/tourForm.ts',
     output: 'tourForm',
   },
+  simulForm: {
+    input: 'src/simulForm.ts',
+    output: 'simulForm',
+  },
   gameSearch: {
     input: 'src/gameSearch.ts',
     output: 'gameSearch',

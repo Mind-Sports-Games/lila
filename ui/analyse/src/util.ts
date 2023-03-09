@@ -13,8 +13,12 @@ export function clearSelection() {
   window.getSelection()?.removeAllRanges();
 }
 
-export function plyPlayerIndex(ply: number): PlayerIndex {
-  return ply % 2 === 0 ? 'p1' : 'p2';
+export function plyPlayerIndex(ply: number, variantKey: VariantKey): PlayerIndex {
+  if (variantKey === 'amazons') {
+    return Math.floor(ply / 2) % 2 === 0 ? 'p1' : 'p2';
+  } else {
+    return ply % 2 === 0 ? 'p1' : 'p2';
+  }
 }
 
 export function bindMobileMousedown(el: HTMLElement, f: (e: Event) => unknown, redraw?: () => void) {
@@ -238,7 +242,7 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
   return score;
 }
 
-export function getOwareScore(fen: string, playerIndex: string): number {
+export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }
 
@@ -251,7 +255,9 @@ const noCevalVariants = [
   'minixiangqi',
   'flipello',
   'flipello10',
+  'amazons',
   'oware',
+  'togyzkumalak',
 ];
 
 export function allowCevalForVariant(variant: VariantKey) {
@@ -334,7 +340,11 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'flipello';
     case 'flipello10':
       return 'flipello10';
+    case 'amazons':
+      return 'amazons';
     case 'oware':
       return 'oware';
+    case 'togyzkumalak':
+      return 'togyzkumalak';
   }
 };
