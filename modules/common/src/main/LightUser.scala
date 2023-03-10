@@ -63,6 +63,18 @@ object LightUser {
     LightUser("pst-greedy-tom", "PST-Greedy-Tom", "_playstrategy".some, "BOT".some, false)
   )
 
+  //TODO add stockfish bots when available
+  val poolBots: List[LightUser] = List(
+    LightUser("ps-greedy-one-move", "PS-Greedy-One-Move", "_playstrategy".some, "BOT".some, false),
+    LightUser("ps-greedy-two-move", "PS-Greedy-Two-Move", "_playstrategy".some, "BOT".some, false),
+    LightUser("ps-greedy-four-move", "PS-Greedy-Four-Move", "_playstrategy".some, "BOT".some, false)
+    //LightUser("bot1", "bot1", "_playstrategy".some, "BOT".some, false)
+  )
+
   val tourBotsIDs: List[UserID] = tourBots.map(_.id)
+
+  val poolBotsIDs: List[UserID] = poolBots.map(_.id)
+
+  val psBotsIDs = tourBotsIDs ++ poolBotsIDs
 
 }

@@ -84,26 +84,6 @@ final private class PoolActor(
       members = members.diff(pairedMembers).map(_.incMisses)
 
       if (pairings.nonEmpty) gameStarter(config, pairings)
-      else if (candidates.size == 1 && candidates.head.misses >= 0) {
-        //check for bans etc those using engines shouldn't be able to play?
-        //move this to matchmaking
-        val x              = config.pp("config")
-        val userPoolMember = candidates.head
-        val appropiateBot  = "bot1"
-        val botPoolMember =
-          PoolMember(
-            appropiateBot,
-            userPoolMember.sri,
-            userPoolMember.rating,
-            None,
-            false,
-            PoolMember.BlockedUsers(Set()),
-            0,
-            0
-          )
-        val botpairing = (Vector(MatchMaking.Couple(userPoolMember, botPoolMember))).pp("bot pairing")
-        gameStarter(config, botpairing)
-      }
 
       monitor.candidates(monId).record(candidates.size)
       monitor.paired(monId).record(pairedMembers.size)
