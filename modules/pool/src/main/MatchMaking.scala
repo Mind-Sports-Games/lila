@@ -14,8 +14,7 @@ object MatchMaking {
 
   def apply(members: Vector[PoolMember]): Vector[Couple] =
     members.partition(_.lame) match {
-      case (lames, fairs) =>
-        naive(lames) ++ (botMatching(fairs) | (wmMatching(fairs) | naive(fairs)))
+      case (lames, fairs) => naive(lames) ++ (wmMatching(fairs) | naive(fairs))
     }
 
   private def naive(members: Vector[PoolMember]): Vector[Couple] =
@@ -88,37 +87,6 @@ object MatchMaking {
           }
       )
     }
-  }
-
-  private object botMatching {
-
-    //TODO select available bots from stockfish and/or PS depending on game (add to input) and player rating
-    // make sure they are not at capacity etc.
-    val appropriateBot = "ps-greedy-two-move"
-
-    def botPoolMember(userPoolMember: PoolMember) =
-      PoolMember(
-        appropriateBot,
-        userPoolMember.sri,
-        userPoolMember.rating,
-        None,
-        false,
-        PoolMember.BlockedUsers(Set()),
-        0,
-        0
-      )
-
-    // Match to a bot if we are the only member in the queue and waited a wave
-    def apply(members: Vector[PoolMember]): Option[Vector[Couple]] = {
-      if (members.size == 1 && members.head.misses >= 1) {
-        Some {
-          members.map { p1 =>
-            Couple(p1, botPoolMember(p1))
-          } to Vector
-        }
-      } else none
-    }
-
   }
 
 }

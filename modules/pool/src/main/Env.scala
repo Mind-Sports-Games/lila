@@ -20,7 +20,8 @@ final class Env(
 
   private val onStart = (gameId: Game.Id) => Bus.publish(gameId, "gameStartId")
 
-  private lazy val gameStarter = wire[GameStarter]
+  private lazy val gameStarter    = wire[GameStarter]
+  private lazy val botGameStarter = wire[BotGameStarter]
 
   lazy val api = wire[PoolApi]
 

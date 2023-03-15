@@ -11,6 +11,7 @@ final class PoolApi(
     val configs: List[PoolConfig],
     hookThieve: HookThieve,
     gameStarter: GameStarter,
+    botGameStarter: BotGameStarter,
     playbanApi: lila.playban.PlaybanApi,
     system: ActorSystem
 ) {
@@ -20,7 +21,7 @@ final class PoolApi(
 
   private val actors: Map[PoolConfig.Id, ActorRef] = configs.map { config =>
     config.id -> system.actorOf(
-      Props(new PoolActor(config, hookThieve, gameStarter)),
+      Props(new PoolActor(config, hookThieve, gameStarter, botGameStarter)),
       name = s"pool-${config.id.value}"
     )
   }.toMap
