@@ -75,6 +75,8 @@ object LightUser {
 
   val poolBotsIDs: List[UserID] = poolBots.map(_.id)
 
+  val easiestPoolBotId: UserID = "ps-greedy-one-move"
+
   val psBotsIDs = tourBotsIDs ++ poolBotsIDs
 
 }
