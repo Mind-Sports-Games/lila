@@ -34,7 +34,7 @@ case class Player(
 
   def isHuman = !isAi
 
-  def isPSBot = userId ?? LightUser.tourBotsIDs.contains
+  def isPSBot = userId ?? LightUser.psBotsIDs.contains
 
   def hasUser = userId.isDefined
 
