@@ -1,9 +1,9 @@
 package lila.swiss
 
-import strategygames.Clock.{ Config => ClockConfig }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.{ GameFamily, GameGroup, GameLogic }
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -16,14 +16,43 @@ final class SwissForm(implicit mode: Mode) {
 
   import SwissForm._
 
+  // Yes, I know this is kinda gross. :'(
+  private def valuesFromClockConfig(c: ClockConfig): Option[(Boolean, Int, Int, Option[Int], Option[Int])] =
+    c match {
+      case fc: FischerClock.Config => {
+        FischerClock.Config.unapply(fc).map(t => (false, t._1, t._2, None, None))
+      }
+      case bc: ByoyomiClock.Config => {
+        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1, t._2, Some(t._3), Some(t._4)))
+      }
+    }
+
+  // Yes, I know this is kinda gross. :'(
+  private def clockConfigFromValues(
+      useByoyomi: Boolean,
+      limit: Int,
+      increment: Int,
+      byoyomi: Option[Int],
+      periods: Option[Int]
+  ): ClockConfig =
+    (useByoyomi, byoyomi, periods) match {
+      case (true, Some(byoyomi), Some(periods)) =>
+        ByoyomiClock.Config(limit, increment, byoyomi, periods)
+      case _ =>
+        FischerClock.Config(limit, increment)
+    }
+
   def form(minRounds: Int = 3) =
     Form(
       mapping(
-        "name" -> optional(eventName(2, 30)),
-        "clock" -> mapping(
-          "limit"     -> number.verifying(clockLimits.contains _),
-          "increment" -> number(min = 0, max = 120)
-        )(ClockConfig.apply)(ClockConfig.unapply)
+        "name" -> optional(eventName(2, 36)),
+        "clock" -> mapping[ClockConfig, Boolean, Int, Int, Option[Int], Option[Int]](
+          "useByoyomi" -> boolean,
+          "limit"      -> number.verifying(clockLimits.contains _),
+          "increment"  -> number(min = 0, max = 120),
+          "byoyomi"    -> optional(number.verifying(byoyomiLimits.contains _)),
+          "periods"    -> optional(number(min = 0, max = 5))
+        )(clockConfigFromValues)(valuesFromClockConfig)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "startsAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
         "variant" -> optional(
@@ -85,7 +114,7 @@ final class SwissForm(implicit mode: Mode) {
   def create =
     form() fill SwissData(
       name = none,
-      clock = ClockConfig(180, 0),
+      clock = FischerClock.Config(180, 0),
       startsAt = Some(DateTime.now plusSeconds {
         if (mode == Mode.Prod) 60 * 10 else 20
       }),
@@ -132,18 +161,18 @@ final class SwissForm(implicit mode: Mode) {
       variant = s"${s.variant.gameFamily.id}_${s.variant.id}".some,
       medley = s.isMedley.some,
       medleyDefaults = MedleyDefaults(
-        onePerGameFamily = onePerGameFamilyInMedley(s.settings.medleyVariants).some,
+        onePerGameFamily = onePerGameGroupInMedley(s.settings.medleyVariants).some,
         exoticChessVariants = exoticChessVariants(s.settings.medleyVariants).some,
         draughts64Variants = draughts64Variants(s.settings.medleyVariants).some
       ),
       medleyGameFamilies = MedleyGameFamilies(
-        chess = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Chess()).some,
-        draughts = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Draughts()).some,
-        shogi = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Shogi()).some,
-        xiangqi = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Xiangqi()).some,
-        loa = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.LinesOfAction()).some,
-        flipello = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Flipello()).some,
-        mancala = gameFamilyInMedley(s.settings.medleyVariants, GameFamily.Mancala()).some
+        chess = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Chess()).some,
+        draughts = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Draughts()).some,
+        shogi = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Shogi()).some,
+        xiangqi = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Xiangqi()).some,
+        loa = gameGroupInMedley(s.settings.medleyVariants, GameGroup.LinesOfAction()).some,
+        flipello = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Flipello()).some,
+        mancala = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Mancala()).some
       ),
       rated = s.settings.rated.some,
       xGamesChoice = XGamesChoice(
@@ -174,13 +203,15 @@ final class SwissForm(implicit mode: Mode) {
   private def medleyVariantsList(medleyVariants: Option[List[Variant]]) =
     medleyVariants.getOrElse(List[Variant]())
 
-  private def gameFamilyInMedley(medleyVariants: Option[List[Variant]], gf: GameFamily) =
-    medleyVariantsList(medleyVariants).map(v => v.gameFamily).contains(gf)
+  private def gameGroupInMedley(medleyVariants: Option[List[Variant]], gg: GameGroup) =
+    gg.variants.exists(medleyVariantsList(medleyVariants).contains(_))
 
-  private def onePerGameFamilyInMedley(medleyVariants: Option[List[Variant]]) = {
-    val mvList       = medleyVariantsList(medleyVariants)
-    val gameFamilies = mvList.map(_.gameFamily).distinct
-    mvList.map(_.gameFamily).take(gameFamilies.size) == gameFamilies && gameFamilies.size > 1
+  private def onePerGameGroupInMedley(medleyVariants: Option[List[Variant]]) = {
+    val mvList               = medleyVariantsList(medleyVariants)
+    val gameGroups           = GameGroup.medley.filter(gg => gg.variants.exists(mvList.contains(_)))
+    val selectedMVList       = mvList.take(gameGroups.size)
+    val gameGroupsInSelected = gameGroups.filter(gg => gg.variants.exists(selectedMVList.contains(_)))
+    gameGroups.size > 1 && gameGroups.size == gameGroupsInSelected.size
   }
 
   private def exoticChessVariants(medleyVariants: Option[List[Variant]]) =
@@ -197,9 +228,13 @@ object SwissForm {
     (120 to 420 by 60) ++ (600 to 1800 by 300) ++ (2400 to 10800 by 600)
   }
 
+  val byoyomiLimits: Seq[Int] = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (30 to 60 by 10)
+
+  val clockByoyomiChoices = options(byoyomiLimits, "%d second{s}")
+
   val clockLimitChoices = options(
     clockLimits,
-    l => s"${strategygames.Clock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
+    l => s"${strategygames.FischerClock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
   )
 
   val roundIntervals: Seq[Int] =
@@ -307,25 +342,24 @@ object SwissForm {
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
 
-    def isMedley = (medley | false) && medleyGameFamilies.gfList.nonEmpty
+    def isMedley = (medley | false) && medleyGameFamilies.ggList.nonEmpty
 
-    //shuffle all variants from the selected game families
+    //shuffle all variants from the selected game groups
     private lazy val generateNoDefaultsMedleyVariants: List[Variant] =
       scala.util.Random
         .shuffle(
-          Variant.all.filter(v => medleyGameFamilies.gfList.contains(v.gameFamily) && !v.fromPositionVariant)
+          medleyGameFamilies.ggList.flatMap(_.variants).filter(v => !v.fromPositionVariant)
         )
 
     private def generateMedleyVariants: List[Variant] =
       if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
-        //take a shuffled list of all variants and pull the first for each game family to the front
-        val onePerGameFamilyVariantList = scala.util.Random.shuffle(
-          medleyGameFamilies.gfList.map(gf =>
-            generateNoDefaultsMedleyVariants.filter(_.gameFamily == gf).head
-          )
+        //take a shuffled list of all variants and pull the first for each game group to the front
+        val onePerGameGroupVariantList = scala.util.Random.shuffle(
+          medleyGameFamilies.ggList
+            .map(gg => scala.util.Random.shuffle(gg.variants).head)
         )
-        onePerGameFamilyVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
-          onePerGameFamilyVariantList.contains(_)
+        onePerGameGroupVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
+          onePerGameGroupVariantList.contains(_)
         )
       } else if (medleyDefaults.exoticChessVariants.getOrElse(false))
         scala.util.Random.shuffle(Variant.all.filter(_.exoticChessVariant))
@@ -366,14 +400,13 @@ object SwissForm {
       mancala: Option[Boolean]
   ) {
 
-    lazy val gfList: List[GameFamily] = GameFamily.all
-      .filterNot(gf => if (!chess.getOrElse(false)) gf == GameFamily.Chess() else false)
-      .filterNot(gf => if (!draughts.getOrElse(false)) gf == GameFamily.Draughts() else false)
-      .filterNot(gf => if (!shogi.getOrElse(false)) gf == GameFamily.Shogi() else false)
-      .filterNot(gf => if (!xiangqi.getOrElse(false)) gf == GameFamily.Xiangqi() else false)
-      .filterNot(gf => if (!loa.getOrElse(false)) gf == GameFamily.LinesOfAction() else false)
-      .filterNot(gf => if (!flipello.getOrElse(false)) gf == GameFamily.Flipello() else false)
-      .filterNot(gf => if (!mancala.getOrElse(false)) gf == GameFamily.Mancala() else false)
-
+    lazy val ggList: List[GameGroup] = GameGroup.medley
+      .filterNot(gg => if (!chess.getOrElse(false)) gg == GameGroup.Chess() else false)
+      .filterNot(gg => if (!draughts.getOrElse(false)) gg == GameGroup.Draughts() else false)
+      .filterNot(gg => if (!shogi.getOrElse(false)) gg == GameGroup.Shogi() else false)
+      .filterNot(gg => if (!xiangqi.getOrElse(false)) gg == GameGroup.Xiangqi() else false)
+      .filterNot(gg => if (!loa.getOrElse(false)) gg == GameGroup.LinesOfAction() else false)
+      .filterNot(gg => if (!flipello.getOrElse(false)) gg == GameGroup.Flipello() else false)
+      .filterNot(gg => if (!mancala.getOrElse(false)) gg == GameGroup.Mancala() else false)
   }
 }

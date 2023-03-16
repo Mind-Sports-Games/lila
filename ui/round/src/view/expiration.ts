@@ -27,7 +27,10 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
     h('strong', '' + secondsLeft)
   );
 
-  if (moveIndicator && (ctrl.data.steps.length > 2 || !ctrl.data.expiration)) {
+  if (
+    moveIndicator &&
+    (ctrl.data.steps.length > (ctrl.data.game.variant.key === 'amazons' ? 4 : 2) || !ctrl.data.expiration)
+  ) {
     emerg =
       ctrl.clock !== undefined &&
       ctrl.clock.times.activePlayerIndex !== undefined &&

@@ -1,8 +1,17 @@
 import { h, VNode } from 'snabbdom';
-import { parseFen } from 'chessops/fen';
+import { parseFen } from 'stratops/fen';
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
-import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getPlayerScore, getOwareScore } from './util';
+import {
+  bind,
+  onInsert,
+  dataIcon,
+  spinner,
+  bindMobileMousedown,
+  getPlayerScore,
+  getMancalaScore,
+  variantToRules,
+} from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import { playable } from 'game';
@@ -115,7 +124,9 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             });
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
-              el.setCustomValidity(parseFen(el.value.trim()).isOk ? '' : 'Invalid FEN');
+              el.setCustomValidity(
+                parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN'
+              );
             });
           },
           postpatch: (_, vnode) => {
@@ -300,12 +311,38 @@ function renderPlayerScore(
   playerIndex: string,
   variantKey: VariantKey
 ): VNode | undefined {
-  const owareLetterFromScore =
-    score <= 0 ? 'empty' : score < 27 ? String.fromCharCode(score + 64) : String.fromCharCode(score + 70);
-  const pieceClass = variantKey === 'oware' ? `piece.${owareLetterFromScore}-piece.` : 'piece.p-piece.';
+  const defaultMancalaRole = 's';
   const children: VNode[] = [];
-  children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
-  return h('div.game-score.game-score-' + position, children);
+  if (variantKey === 'togyzkumalak') {
+    let part1Score = 0;
+    let part2Score = 0;
+    let part2Offset = false;
+    if (score <= 10) {
+      part1Score = score;
+      part2Score = 0;
+    } else if (score <= 20) {
+      part1Score = 10;
+      part2Score = score - 10;
+    } else {
+      part1Score = Math.min((score % 20) + 10, 20);
+      part2Score = Math.max(score % 20, 10);
+      if (part2Score === 10) part2Offset = true;
+    }
+
+    const pieceClassPart1 = `piece.${defaultMancalaRole}${part1Score.toString()}-piece.part1.`;
+    const pieceClassPart2 = `piece.${defaultMancalaRole}${part2Score.toString()}${part2Offset ? 'o' : ''}-piece.part2.`;
+
+    children.push(h(pieceClassPart1 + playerIndex));
+    if (score > 10) {
+      children.push(h(pieceClassPart2 + playerIndex));
+    }
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else {
+    const pieceClass =
+      variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
+    children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-' + position, children);
+  }
 }
 
 export default function (ctrl: AnalyseCtrl): VNode {
@@ -338,10 +375,11 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'oware': {
+      case 'oware':
+      case 'togyzkumalak': {
         const fen = ctrl.node.fen;
-        const p1Score = getOwareScore(fen, 'p1');
-        const p2Score = getOwareScore(fen, 'p2');
+        const p1Score = getMancalaScore(fen, 'p1');
+        const p2Score = getMancalaScore(fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
@@ -357,9 +395,15 @@ export default function (ctrl: AnalyseCtrl): VNode {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
+  //Togyzkumalak board always has coodinates on the inside
+  if (['togyzkumalak'].includes(variantKey)) {
+    if (!$('body').hasClass('coords-no')) {
+      $('body').removeClass('coords-out').addClass('coords-in');
+    }
+  }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)
+  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware', 'togyzkumalak'].includes(variantKey)
     ? '.piece-letter'
     : '';
   return h(

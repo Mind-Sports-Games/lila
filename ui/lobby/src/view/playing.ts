@@ -46,7 +46,7 @@ export default function (ctrl: LobbyController) {
                     'data-state': `${pov.fen}|${boardSize(pov.variant.boardSize)}|${pov.playerIndex}|${pov.lastMove}`,
                   }
                 : {
-                    'data-state': `${pov.fen},${pov.playerIndex},${pov.lastMove}`,
+                    'data-state': `${pov.fen}|${pov.playerIndex}|${pov.lastMove}`,
                   },
             hook: {
               insert(vnode) {

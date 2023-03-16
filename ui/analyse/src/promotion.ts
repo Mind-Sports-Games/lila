@@ -5,6 +5,7 @@ import * as util from 'chessground/util';
 import { Role } from 'chessground/types';
 import AnalyseCtrl from './ctrl';
 import { MaybeVNode, JustCaptured } from './interfaces';
+import { promotion } from 'stratutils';
 
 interface Promoting {
   orig: Key;
@@ -25,18 +26,27 @@ export function start(
   callback: Callback
 ): boolean {
   const s = ctrl.chessground.state;
+  const premovePiece = s.pieces.get(orig);
   const piece = s.pieces.get(dest);
-  if (
-    piece &&
-    piece.role == 'p-piece' &&
-    ((dest[1] == '8' && s.turnPlayerIndex == 'p2') || (dest[1] == '1' && s.turnPlayerIndex == 'p1'))
-  ) {
+  const variantKey = ctrl.data.game.variant.key;
+
+  if (promotion.possiblePromotion(ctrl.chessground, orig, dest, variantKey)) {
     promoting = {
       orig,
       dest,
       capture,
       callback,
     };
+    if (variantKey === 'shogi' && promotion.forcedShogiPromotion(ctrl.chessground, orig, dest)) {
+      const role = premovePiece ? premovePiece.role : piece!.role;
+      finish(ctrl, ('p' + role) as Role);
+      return true;
+    }
+    if (variantKey === 'minishogi' && promotion.forcedMiniShogiPromotion(ctrl.chessground, orig, dest)) {
+      const role = premovePiece ? premovePiece.role : piece!.role;
+      finish(ctrl, ('p' + role) as Role);
+      return true;
+    }
     ctrl.redraw();
     return true;
   }
@@ -62,15 +72,17 @@ export function cancel(ctrl: AnalyseCtrl): void {
 function renderPromotion(
   ctrl: AnalyseCtrl,
   dest: Key,
-  pieces: string[],
+  roles: Role[],
   playerIndex: PlayerIndex,
   orientation: Orientation
 ): MaybeVNode {
   if (!promoting) return;
 
-  let left = (7 - util.key2pos(dest)[0]) * 12.5;
-  if (orientation === 'p1') left = 87.5 - left;
+  const rows = ctrl.chessground.state.dimensions.height;
+  const columns = ctrl.chessground.state.dimensions.width;
 
+  let left = (columns - util.key2pos(dest)[0]) * (100 / columns);
+  if (orientation === 'p1') left = 100 - 100 / columns - left;
   const vertical = playerIndex === orientation ? 'top' : 'bottom';
 
   return h(
@@ -81,8 +93,21 @@ function renderPromotion(
         el.oncontextmenu = () => false;
       }),
     },
-    pieces.map(function (serverRole: Role, i) {
-      const top = (playerIndex === orientation ? i : 7 - i) * 12.5;
+    roles.map(function (serverRole: Role, i) {
+      let top = 0;
+      if (playerIndex === orientation) {
+        if (playerIndex === 'p1') {
+          top = (rows - util.key2pos(dest)[1] + i) * (100 / rows);
+        } else {
+          top = (util.key2pos(dest)[1] - 1 + i) * (100 / rows);
+        }
+      } else {
+        if (playerIndex === 'p1') {
+          top = (util.key2pos(dest)[1] - 1 - i) * (100 / rows);
+        } else {
+          top = (rows - util.key2pos(dest)[1] - i) * (100 / rows);
+        }
+      }
       return h(
         'square',
         {
@@ -94,7 +119,7 @@ function renderPromotion(
             finish(ctrl, serverRole);
           }),
         },
-        [h(`piece.${serverRole}.${playerIndex}`)]
+        [h(`piece.${serverRole}.${playerIndex}.ally`)]
       );
     })
   );
@@ -105,11 +130,15 @@ const roles: Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
 export function view(ctrl: AnalyseCtrl): MaybeVNode {
   if (!promoting) return;
 
-  return renderPromotion(
-    ctrl,
-    promoting.dest,
-    ctrl.data.game.variant.key === 'antichess' ? roles.concat('k-piece') : roles,
-    promoting.dest[1] === '8' ? 'p1' : 'p2',
-    ctrl.chessground.state.orientation
-  );
+  const piece = ctrl.chessground.state.pieces.get(promoting.dest);
+  if (!piece) return;
+  const variantKey = ctrl.data.game.variant.key,
+    rolesToChoose =
+      variantKey === 'shogi' || variantKey === 'minishogi'
+        ? (['p' + piece.role, piece.role] as Role[])
+        : variantKey === 'antichess'
+        ? roles.concat('k-piece')
+        : roles;
+
+  return renderPromotion(ctrl, promoting.dest, rolesToChoose, piece.playerIndex, ctrl.chessground.state.orientation);
 }

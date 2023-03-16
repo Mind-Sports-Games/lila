@@ -18,7 +18,9 @@ const noCevalVariants = [
   'minixiangqi',
   'flipello',
   'flipello10',
+  'amazons',
   'oware',
+  'togyzkumalak',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {

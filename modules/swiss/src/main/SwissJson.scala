@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ P1, P2 }
+import strategygames.{ P1, P2, ByoyomiClock, FischerClock }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -369,7 +369,9 @@ object SwissJson {
       .add("isPlayX" -> b.board.isPlayX)
       .add("multiMatchGameIds" -> b.board.multiMatchGameIds)
       .add(
-        "multiMatchGames" -> b.multiMatchGames.map(l => l.map(g => boardGameJson(g, b.board.p2, b.board.p1)))
+        "multiMatchGames" -> b.multiMatchGames.map(l =>
+          l.map(g => boardGameJson(g, b.board.p2, b.board.p1).add("boardSize" -> boardSizeJson(g.variant)))
+        )
       )
 
   private def boardPlayerJson(player: SwissBoard.Player) =
@@ -389,11 +391,23 @@ object SwissJson {
     JsNumber(t.value.toInt)
   }
 
-  implicit private val clockWrites: OWrites[strategygames.Clock.Config] = OWrites { clock =>
-    Json.obj(
-      "limit"     -> clock.limitSeconds,
-      "increment" -> clock.incrementSeconds
-    )
+  implicit private val clockWrites: OWrites[strategygames.ClockConfig] = OWrites { clock =>
+    clock match {
+      case fc: FischerClock.Config => {
+        Json.obj(
+          "limit"     -> fc.limitSeconds,
+          "increment" -> fc.incrementSeconds
+        )
+      }
+      case bc: ByoyomiClock.Config => {
+        Json.obj(
+          "limit"     -> bc.limitSeconds,
+          "increment" -> bc.incrementSeconds,
+          "byoyomi"   -> bc.byoyomiSeconds,
+          "periods"   -> bc.periodsTotal
+        )
+      }
+    }
   }
 
   implicit private val statsWrites: Writes[SwissStats] = Json.writes[SwissStats]

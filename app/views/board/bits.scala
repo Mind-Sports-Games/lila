@@ -19,24 +19,26 @@ object bits {
   sealed abstract class Orientation extends Product
 
   object Orientation {
-    final case object P1 extends Orientation
-    final case object P2 extends Orientation
-    final case object Left extends Orientation
+    final case object P1    extends Orientation
+    final case object P2    extends Orientation
+    final case object Left  extends Orientation
     final case object Right extends Orientation
   }
 
   def playerIndexToOrientation(c: PlayerIndex): Orientation =
     c match {
-        case P1 => Orientation.P1
-        case P2 => Orientation.P2
+      case P1 => Orientation.P1
+      case P2 => Orientation.P2
     }
 
   private val dataState = attr("data-state")
 
   private def boardOrientation(variant: Variant, c: PlayerIndex): Orientation =
     variant match {
-      case Variant.Chess(strategygames.chess.variant.RacingKings)   => Orientation.P1
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction) | Variant.Chess(strategygames.chess.variant.ScrambledEggs) => c match {
+      case Variant.Chess(strategygames.chess.variant.RacingKings) => Orientation.P1
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction) |
+          Variant.Chess(strategygames.chess.variant.ScrambledEggs) =>
+        c match {
           case P1 => Orientation.P1
           case P2 => Orientation.Right
         }
@@ -47,11 +49,14 @@ object bits {
 
   private def boardSize(pov: Pov): Option[Board.BoardSize] = pov.game.variant match {
     case Variant.Draughts(v) => Some(v.boardSize)
-    case _ => None
+    case _                   => None
   }
   def mini(pov: Pov): Tag => Tag =
     miniWithOrientation(
-      FEN(pov.game.variant.gameLogic, Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)),
+      FEN(
+        pov.game.variant.gameLogic,
+        Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)
+      ),
       boardOrientation(pov),
       ~pov.game.lastMoveKeys,
       boardSize(pov),
@@ -59,47 +64,57 @@ object bits {
     ) _
 
   def miniWithOrientation(
-    fen: FEN,
-    orientation: Orientation = Orientation.P1,
-    lastMove: String = "",
-    boardSizeOpt: Option[Board.BoardSize],
-    variantKey: String = "standard"
+      fen: FEN,
+      orientation: Orientation = Orientation.P1,
+      lastMove: String = "",
+      boardSizeOpt: Option[Board.BoardSize],
+      variantKey: String = "standard"
   )(tag: Tag): Tag = {
     // TODO: this is an excellent candidate for refactoring.
     val libName = fen match {
-      case FEN.Chess(_) => GameLogic.Chess().name
-      case FEN.Draughts(_) => GameLogic.Draughts().name
-      case FEN.FairySF(_) => GameLogic.FairySF().name
-      case FEN.Mancala(_) => GameLogic.Mancala().name
+      case FEN.Chess(_)        => GameLogic.Chess().name
+      case FEN.Draughts(_)     => GameLogic.Draughts().name
+      case FEN.FairySF(_)      => GameLogic.FairySF().name
+      case FEN.Samurai(_)      => GameLogic.Samurai().name
+      case FEN.Togyzkumalak(_) => GameLogic.Togyzkumalak().name
     }
-    val orient = orientation.toString().toLowerCase()
+    val orient    = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)
     val data = if (libName == "Draughts") {
       s"${fen.value}|${boardSize.width}x${boardSize.height}|${orient}|$lastMove"
     } else {
-      s"${fen.value},${orient},$lastMove"
+      s"${fen.value}|${orient}|$lastMove"
     }
-    val extra = if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}" else s"${libName.toLowerCase()}"
+    val extra =
+      if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}"
+      else s"${libName.toLowerCase()}"
     tag(
       cls := s"mini-board mini-board--init cg-wrap is2d variant-${variantKey} ${extra}",
       dataState := data
     )(cgWrapContent)
   }
 
-  def mini(fen: FEN, playerIndex: PlayerIndex = P1, variantKey: String, lastMove: String = "")(tag: Tag): Tag =
+  def mini(fen: FEN, playerIndex: PlayerIndex = P1, variantKey: String, lastMove: String = "")(
+      tag: Tag
+  ): Tag =
     miniWithOrientation(fen, playerIndexToOrientation(playerIndex), lastMove, None, variantKey)(tag)
 
-  def miniForVariant(fen: FEN, variant: Variant, playerIndex: PlayerIndex = P1, lastMove: String = "")(tag: Tag): Tag =
+  def miniForVariant(fen: FEN, variant: Variant, playerIndex: PlayerIndex = P1, lastMove: String = "")(
+      tag: Tag
+  ): Tag =
     miniWithOrientation(fen, boardOrientation(variant, playerIndex), lastMove, None, variant.key)(tag)
-
 
   def miniSpan(fen: FEN, playerIndex: PlayerIndex = P1, variantKey: String, lastMove: String = "") =
     mini(fen, playerIndex, variantKey, lastMove)(span)
 
-  private def sitCanCastle(sit: Situation, playerIndex: PlayerIndex, side: strategygames.chess.Side): Boolean =
+  private def sitCanCastle(
+      sit: Situation,
+      playerIndex: PlayerIndex,
+      side: strategygames.chess.Side
+  ): Boolean =
     sit match {
       case Situation.Chess(sit) => sit canCastle playerIndex on side
-      case _ => false
+      case _                    => false
     }
 
   def jsData(
@@ -107,9 +122,9 @@ object bits {
       fen: FEN
   )(implicit ctx: Context) =
     Json.obj(
-      "fen"     -> fen.value.split(" ").take(4).mkString(" "),
-      "baseUrl" -> s"$netBaseUrl${routes.Editor.load("")}",
-      "playerIndex"   -> sit.player.letter.toString,
+      "fen"         -> fen.value.split(" ").take(4).mkString(" "),
+      "baseUrl"     -> s"$netBaseUrl${routes.Editor.load("")}",
+      "playerIndex" -> sit.player.letter.toString,
       "castles" -> Json.obj(
         "K" -> sitCanCastle(sit, P1, strategygames.chess.KingSide),
         "Q" -> sitCanCastle(sit, P1, strategygames.chess.QueenSide),

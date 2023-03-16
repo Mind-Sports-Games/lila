@@ -69,19 +69,25 @@ final private class ChapterMaker(
       conceal = data.isConceal option Chapter.Ply(parsed.root.ply)
     )
 
-  private def resolveOrientation(orientation: Orientation, root: Node.Root, tags: Tags = Tags.empty): PlayerIndex =
+  private def resolveOrientation(
+      orientation: Orientation,
+      root: Node.Root,
+      tags: Tags = Tags.empty
+  ): PlayerIndex =
     orientation match {
-      case Orientation.Fixed(playerIndex)        => playerIndex
+      case Orientation.Fixed(playerIndex)   => playerIndex
       case _ if tags.resultPlayer.isDefined => PlayerIndex.p1
-      case _                               => root.lastMainlineNode.playerIndex
+      case _                                => root.lastMainlineNode.playerIndex
     }
 
   private def fromFenOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Chapter = {
-    val variant = data.variant.flatMap(v => Variant.apply(GameLogic.Chess(), v)) | Variant.default(GameLogic.Chess())
+    val variant =
+      data.variant.flatMap(v => Variant.apply(GameLogic.Chess(), v)) | Variant.default(GameLogic.Chess())
     (data.fen.filterNot(_.initial).flatMap { Forsyth.<<<@(variant.gameLogic, variant, _) } match {
       case Some(sit) =>
         Node.Root(
           ply = sit.turns,
+          plysPerTurn = sit.situation.board.variant.plysPerTurn,
           fen = Forsyth.>>(sit.situation.board.variant.gameLogic, sit),
           check = sit.situation.check,
           clock = none,
@@ -91,6 +97,7 @@ final private class ChapterMaker(
       case None =>
         Node.Root(
           ply = 0,
+          plysPerTurn = variant.plysPerTurn,
           fen = variant.initialFen,
           check = false,
           clock = none,
@@ -143,7 +150,7 @@ final private class ChapterMaker(
         !game.synthetic option game.id,
         game.variant,
         data.realOrientation match {
-          case Orientation.Auto         => PlayerIndex.p1
+          case Orientation.Auto               => PlayerIndex.p1
           case Orientation.Fixed(playerIndex) => playerIndex
         }
       ),
@@ -207,16 +214,17 @@ private[study] object ChapterMaker {
   trait ChapterData {
     def orientation: String
     def mode: String
-    def realOrientation = PlayerIndex.fromName(orientation).fold[Orientation](Orientation.Auto)(Orientation.Fixed)
-    def isPractice      = mode == Mode.Practice.key
-    def isGamebook      = mode == Mode.Gamebook.key
-    def isConceal       = mode == Mode.Conceal.key
+    def realOrientation =
+      PlayerIndex.fromName(orientation).fold[Orientation](Orientation.Auto)(Orientation.Fixed)
+    def isPractice = mode == Mode.Practice.key
+    def isGamebook = mode == Mode.Gamebook.key
+    def isConceal  = mode == Mode.Conceal.key
   }
 
   sealed trait Orientation
   object Orientation {
     case class Fixed(playerIndex: PlayerIndex) extends Orientation
-    case object Auto               extends Orientation
+    case object Auto                           extends Orientation
   }
 
   case class Data(

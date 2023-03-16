@@ -20,7 +20,8 @@ object form {
     views.html.base.layout(
       title = trans.hostANewSimul.txt(),
       moreCss = cssTag("simul.form"),
-      moreJs = jsModule("flatpickr")
+      //moreJs = jsModule("flatpickr")
+      moreJs = jsModule("simulForm")
     ) {
       main(cls := "box box-pad page-small simul-form")(
         h1(trans.hostANewSimul()),
@@ -44,7 +45,8 @@ object form {
     views.html.base.layout(
       title = s"Edit ${simul.fullName}",
       moreCss = cssTag("simul.form"),
-      moreJs = jsModule("flatpickr")
+      //moreJs = jsModule("flatpickr")
+      moreJs = jsModule("simulForm")
     ) {
       main(cls := "box box-pad page-small simul-form")(
         h1(s"Edit ${simul.fullName}"),
@@ -95,13 +97,22 @@ object form {
       },
       form3.split(
         form3.group(
-          form("clockTime"),
+          form("clock.limit"),
           raw("Clock initial time"),
           help = trans.simulClockHint().some,
           half = true
         )(form3.select(_, clockTimeChoices)),
-        form3.group(form("clockIncrement"), raw("Clock increment"), half = true)(
+        form3.group(form("clock.increment"), raw("Clock increment"), half = true)(
           form3.select(_, clockIncrementChoices)
+        )
+      ),
+      form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()),
+      form3.split(
+        form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
+          form3.select(_, SimulForm.clockByoyomiChoices)
+        ),
+        form3.group(form("clock.periods"), trans.numberOfPeriods(), klass = "byoyomiPeriods", half = true)(
+          form3.select(_, SimulForm.periodsChoices)
         )
       ),
       form3.split(

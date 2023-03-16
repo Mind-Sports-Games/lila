@@ -13,7 +13,7 @@ const renderGameClasses = (game: FeaturedGame): string =>
 const renderGameState = (game: FeaturedGame): string =>
   game.gameLogic === 'draughts' && !!game.boardSize
     ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orientation}|${game.lastMove}`
-    : `${game.fen},${game.orientation},${game.lastMove}`;
+    : `${game.fen}|${game.orientation}|${game.lastMove}`;
 
 function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating: boolean) {
   const player = game[playerIndex];
@@ -21,7 +21,7 @@ function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating
   return h('span.mini-game__player', [
     h('span.mini-game__user', [
       h('strong', '#' + player.rank),
-      renderPlayer(player, true, withRating, false),
+      renderPlayer(player, true, withRating, true, false),
       player.berserk
         ? h('i', {
             attrs: {

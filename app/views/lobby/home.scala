@@ -116,7 +116,7 @@ object home {
               id := "nb_games_in_play",
               href := ctx.noBlind.option(routes.Tv.games.url)
             )(
-              trans.nbGamesInPlay(
+              trans.nbLiveGamesInPlay(
                 strong(dataCount := homepage.counters.rounds)(homepage.counters.rounds.localize)
               )
             )
@@ -221,8 +221,12 @@ object home {
 
   private val i18nKeys = List(
     trans.realTime,
+    trans.byoyomiTime,
+    trans.periods,
+    trans.byoyomiInSeconds,
     trans.correspondence,
     trans.nbGamesInPlay,
+    trans.nbLiveGamesInPlay,
     trans.player,
     trans.time,
     trans.joinTheGame,

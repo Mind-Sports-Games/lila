@@ -30,5 +30,7 @@
   <string name="minixiangqi">Mini Xiangqi (Chinese Chess on a smaller board)</string>
   <string name="flipello">Flip pieces between your color to get the most board area</string>
   <string name="flipello10">Flip pieces between your color to get the most board area</string>
+  <string name="amazons">Immobilize all the enemy pieces</string>
   <string name="oware">Capture the most stones to win</string>
+  <string name="togyzkumalak">Capture the most stones to win</string>
 </resources>

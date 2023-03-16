@@ -24,6 +24,10 @@
       width: 75px;
       height: 75px;
       position: relative;
+
+      &.togyzkumalak {
+        height: 150px;
+      }
     }
 
     .no-square:hover {
@@ -44,7 +48,11 @@
       transform: scale(0.9);
     }
 
-    .mancala piece {
+    .oware piece {
+      background-position: center center;
+    }
+
+    .togyzkumalak piece {
       background-position: center center;
     }
 

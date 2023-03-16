@@ -3,7 +3,7 @@ import RacerCtrl from '../ctrl';
 import { makeCgOpts } from 'puz/run';
 import { makeConfig as makeCgConfig } from 'puz/view/chessground';
 import { h, VNode } from 'snabbdom';
-import { INITIAL_BOARD_FEN } from 'chessops/fen';
+import { INITIAL_BOARD_FEN } from 'stratops/fen';
 
 export const renderBoard = (ctrl: RacerCtrl) =>
   h('div.puz-board.main-board', [

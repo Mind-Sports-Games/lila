@@ -44,7 +44,7 @@
     "ui/ceval",
     "ui/challenge",
     "ui/chat",
-    "ui/chess",
+    "ui/stratutils",
     "ui/cli",
     "ui/common",
     "ui/dasher",

@@ -1,6 +1,5 @@
 package lila.tournament
 
-import strategygames.Clock.{ Config => ClockConfig }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ GameLogic, Mode }
@@ -37,19 +36,7 @@ object BSONHandlers {
     )
   )
 
-  implicit val tournamentClockBSONHandler = tryHandler[ClockConfig](
-    { case doc: BSONDocument =>
-      for {
-        limit <- doc.getAsTry[Int]("limit")
-        inc   <- doc.getAsTry[Int]("increment")
-      } yield ClockConfig(limit, inc)
-    },
-    c =>
-      BSONDocument(
-        "limit"     -> c.limitSeconds,
-        "increment" -> c.incrementSeconds
-      )
-  )
+  implicit val tournamentClockBSONHandler = clockConfigHandler
 
   implicit private val spotlightBSONHandler = Macros.handler[Spotlight]
 
@@ -72,14 +59,20 @@ object BSONHandlers {
           r.strO("eco").flatMap(Thematic.byEco).map(f => FEN.wrap(f.fen)) // for BC
       val startsAt   = r date "startsAt"
       val conditions = r.getO[Condition.All]("conditions") getOrElse Condition.All.empty
+      val mVariants  = r.getO[List[Variant]]("mVariants")
+      val mIntervals = r.getO[List[Int]]("mIntervals")
+      val medleyVariantsAndIntervals: Option[List[(Variant, Int)]] = mVariants.map(_.zipWithIndex.map {
+        case (v, i) =>
+          (v, mIntervals.fold(0)(_.lift(i).getOrElse(0)))
+      })
       Tournament(
         id = r str "_id",
         name = r str "name",
         status = r.get[Status]("status"),
-        clock = r.get[strategygames.Clock.Config]("clock"),
+        clock = r.get[strategygames.ClockConfig]("clock"),
         minutes = r int "minutes",
         variant = variant,
-        medleyVariants = r.getO[List[Variant]]("mVariants"),
+        medleyVariantsAndIntervals = medleyVariantsAndIntervals,
         medleyMinutes = r.intO("mMinutes"),
         position = position,
         mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,
@@ -120,6 +113,7 @@ object BSONHandlers {
         "variant"          -> o.variant.some.filterNot(_.standard).map(_.id),
         "mVariants"        -> o.medleyVariants,
         "mMinutes"         -> o.medleyMinutes,
+        "mIntervals"       -> o.medleyIntervalSeconds,
         "fen"              -> o.position.map(_.value),
         "mode"             -> o.mode.some.filterNot(_.rated).map(_.id),
         "password"         -> o.password,
@@ -195,7 +189,8 @@ object BSONHandlers {
         },
         turns = r intO "t",
         berserk1 = r.intO("b1").fold(r.boolD("b1"))(1 ==), // it used to be int = 0/1
-        berserk2 = r.intO("b2").fold(r.boolD("b2"))(1 ==)
+        berserk2 = r.intO("b2").fold(r.boolD("b2"))(1 ==),
+        plysPerTurn = r.intO("ppt")
       )
     }
     def writes(w: BSON.Writer, o: Pairing) =
@@ -207,7 +202,8 @@ object BSONHandlers {
         "w"   -> o.winner.map(o.user1 ==),
         "t"   -> o.turns,
         "b1"  -> w.boolO(o.berserk1),
-        "b2"  -> w.boolO(o.berserk2)
+        "b2"  -> w.boolO(o.berserk2),
+        "ppt" -> o.plysPerTurn
       )
   }
 

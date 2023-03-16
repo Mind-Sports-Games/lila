@@ -4,7 +4,7 @@ import { setDropMode, cancelDropMode } from 'chessground/drop';
 import RoundController from '../ctrl';
 import * as cg from 'chessground/types';
 import { RoundData } from '../interfaces';
-import * as chessUtil from 'chess';
+import * as stratUtils from 'stratutils';
 
 export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
 export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
@@ -72,11 +72,11 @@ export function valid(data: RoundData, role: cg.Role, key: cg.Key): boolean {
   if (data.game.variant.key === 'crazyhouse') {
     if (role === 'p-piece' && (key[1] === '1' || key[1] === '8')) return false;
 
-    const drops = dropStr.match(/.{2}/g) || [];
+    const drops: string[] = dropStr.match(/.{2}/g) || [];
     return drops.includes(key);
   } else {
     //otherwise shogi and use the newer dropsByRole data
-    const dropsByRole = chessUtil.readDropsByRole(data.possibleDropsByRole);
+    const dropsByRole = stratUtils.readDropsByRole(data.possibleDropsByRole);
     return dropsByRole.get(role)?.includes(key) || false;
   }
 }

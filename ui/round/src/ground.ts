@@ -10,7 +10,7 @@ import * as util from './util';
 import { plyStep } from './round';
 import RoundController from './ctrl';
 import { RoundData } from './interfaces';
-import * as chessUtil from 'chess';
+import * as stratUtils from 'stratutils';
 
 export function makeConfig(ctrl: RoundController): Config {
   const data = ctrl.data,
@@ -18,7 +18,7 @@ export function makeConfig(ctrl: RoundController): Config {
     step = plyStep(data, ctrl.ply),
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
-    turnPlayerIndex = step.ply % 2 === 0 ? 'p1' : 'p2';
+    turnPlayerIndex = util.turnPlayerIndexFromLastPly(step.ply, data.game.variant.key);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -27,6 +27,7 @@ export function makeConfig(ctrl: RoundController): Config {
     lastMove: util.lastMove(data.onlyDropsVariant, step.uci),
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
+    boardScores: data.game.variant.key == 'togyzkumalak',
     addPieceZIndex: ctrl.data.pref.is3d,
     highlight: {
       lastMove: data.pref.highlight,
@@ -56,7 +57,11 @@ export function makeConfig(ctrl: RoundController): Config {
       duration: data.pref.animationDuration,
     },
     premovable: {
-      enabled: data.pref.enablePremove && !data.onlyDropsVariant && data.game.variant.key !== 'oware',
+      enabled:
+        data.pref.enablePremove &&
+        !data.onlyDropsVariant &&
+        data.game.variant.key !== 'oware' &&
+        data.game.variant.key !== 'togyzkumalak',
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {
@@ -75,11 +80,11 @@ export function makeConfig(ctrl: RoundController): Config {
     },
     dropmode: {
       showDropDests: true,
-      dropDests: playing ? chessUtil.readDropsByRole(data.possibleDropsByRole) : new Map(),
+      dropDests: playing ? stratUtils.readDropsByRole(data.possibleDropsByRole) : new Map(),
       active: data.onlyDropsVariant && playing ? true : false,
       piece:
         data.onlyDropsVariant && playing
-          ? util.onlyDropsVariantPiece(data.game.variant.key, turnPlayerIndex)
+          ? stratUtils.onlyDropsVariantPiece(data.game.variant.key, turnPlayerIndex)
           : undefined,
       events: {
         cancel: hooks.onCancelDropMode,
@@ -105,9 +110,17 @@ export function makeConfig(ctrl: RoundController): Config {
             ? 'https://playstrategy.org/assets/piece/flipello/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
               '/'
+            : variantKey === 'amazons'
+            ? 'https://playstrategy.org/assets/piece/amazons/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
+              '/'
             : variantKey === 'oware'
-            ? 'https://playstrategy.org/assets/piece/mancala/' +
-              data.pref.pieceSet.filter(ps => ps.gameFamily === 'mancala')[0].name +
+            ? 'https://playstrategy.org/assets/piece/oware/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
+              '/'
+            : variantKey === 'togyzkumalak'
+            ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
               '/'
             : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
@@ -123,7 +136,8 @@ export function makeConfig(ctrl: RoundController): Config {
     variant: variantKey,
     chess960: data.game.variant.key === 'chess960',
     onlyDropsVariant: data.onlyDropsVariant,
-    singleClickMoveVariant: data.game.variant.key === 'oware' && data.pref.mancalaMove,
+    singleClickMoveVariant:
+      data.game.variant.key === 'togyzkumalak' || (data.game.variant.key === 'oware' && data.pref.mancalaMove),
   };
 }
 

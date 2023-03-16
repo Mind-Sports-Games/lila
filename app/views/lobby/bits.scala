@@ -175,7 +175,8 @@ object bits {
         span(cls := "name")(e.title),
         span(cls := "headline")(e.headline),
         span(cls := "more")(
-          if (e.isNow) trans.eventInProgress() else momentFromNow(e.startsAt)
+          if (e.isNow) e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
+          else e.beforeMessage.fold[Frag](momentFromNow(e.startsAt))(m => raw(m))
         )
       )
     )

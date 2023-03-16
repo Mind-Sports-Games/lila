@@ -19,7 +19,7 @@ const renderBoardClasses = (board: Board): string =>
 const renderBoardState = (board: Board): string =>
   board.gameLogic === 'draughts' && !!board.boardSize
     ? `${board.fen}|${board.boardSize.size[0]}x${board.boardSize.size[1]}|${board.orientation}|${board.lastMove}`
-    : `${board.fen},${board.orientation},${board.lastMove}`;
+    : `${board.fen}|${board.orientation}|${board.lastMove}`;
 
 const renderBoard = (incomingBoard: Board): VNode => {
   const board =
@@ -55,7 +55,7 @@ const renderBoard = (incomingBoard: Board): VNode => {
 function boardPlayer(board: Board, playerIndex: PlayerIndex) {
   const player = board[playerIndex];
   return h('span.mini-game__player', [
-    h('span.mini-game__user', [h('strong', '#' + player.rank), renderPlayer(player, true, true)]),
+    h('span.mini-game__user', [h('strong', '#' + player.rank), renderPlayer(player, true, true, false)]),
     board.clock
       ? h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
           attrs: {

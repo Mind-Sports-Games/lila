@@ -1,7 +1,7 @@
 import { Hooks } from 'snabbdom';
 import { Puzzle } from './interfaces';
-import { opposite } from 'chessops';
-import { parseFen } from 'chessops/fen';
+import { opposite } from 'stratops';
+import { parseFen } from 'stratops/fen';
 
 export function bind(eventName: string, f: (e: Event) => any, redraw?: () => void): Hooks {
   return onInsert(el =>
@@ -23,7 +23,7 @@ export const getNow = (): number => Math.round(performance.now());
 
 export const uciToLastMove = (uci: string): [Key, Key] => [uci.substr(0, 2) as Key, uci.substr(2, 2) as Key];
 
-export const puzzlePov = (puzzle: Puzzle) => opposite(parseFen(puzzle.fen).unwrap().turn);
+export const puzzlePov = (puzzle: Puzzle) => opposite(parseFen('chess')(puzzle.fen).unwrap().turn);
 
 export const loadSound = (file: string, volume?: number, delay?: number) => {
   setTimeout(() => playstrategy.sound.loadOggOrMp3(file, `${playstrategy.sound.baseUrl}/${file}`), delay || 1000);

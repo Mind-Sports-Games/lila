@@ -3,8 +3,8 @@ import * as domData from 'common/data';
 interface UpdateData {
   lm: string;
   fen: string;
-  wc?: number;
-  bc?: number;
+  p1?: number;
+  p2?: number;
 }
 
 const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
@@ -41,7 +41,7 @@ export const init = (node: HTMLElement) => {
         })
       );
     } else {
-      const [fen, orientation, lm] = node.getAttribute('data-state')!.split(','),
+      const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|'),
         config = {
           coordinates: false,
           viewOnly: true,
@@ -64,8 +64,12 @@ export const init = (node: HTMLElement) => {
             ? { width: 7, height: 7 }
             : $el.hasClass('variant-flipello10')
             ? { width: 10, height: 10 }
+            : $el.hasClass('variant-amazons')
+            ? { width: 10, height: 10 }
             : $el.hasClass('variant-oware')
             ? { width: 6, height: 2 }
+            : $el.hasClass('variant-togyzkumalak')
+            ? { width: 9, height: 2 }
             : { width: 8, height: 8 },
           variant: $el.hasClass('variant-shogi')
             ? 'shogi'
@@ -77,8 +81,12 @@ export const init = (node: HTMLElement) => {
             ? 'minixiangqi'
             : $el.hasClass('variant-flipello10')
             ? 'flipello10'
+            : $el.hasClass('variant-amazons')
+            ? 'amazons'
             : $el.hasClass('variant-oware')
             ? 'oware'
+            : $el.hasClass('variant-togyzkumalak')
+            ? 'togyzkumalak'
             : 'standard',
         },
         $cg = $el.find('.cg-wrap'),
@@ -127,8 +135,8 @@ export const update = (node: HTMLElement, data: UpdateData) => {
         pause: playerIndex != turnPlayerIndex,
       });
   };
-  renderClock(data.wc, 'p1');
-  renderClock(data.bc, 'p2');
+  renderClock(data.p1, 'p1');
+  renderClock(data.p2, 'p2');
 };
 
 export const finish = (node: HTMLElement, win?: string) =>

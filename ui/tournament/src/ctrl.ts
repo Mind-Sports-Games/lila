@@ -151,12 +151,22 @@ export default class TournamentController {
   };
 
   newVariant = (variant: Variant) => {
-    this.data.variant = variant;
-    this.data.medleyRound += 1;
-    $('.tour__notice').html(this.trans('standByXForY', this.data.me.username, variant.name));
-    //$('.medley-variants-horiz').find('.current-variant').remove();
+    const d = this.data;
+    d.variant = variant;
+    d.medleyRound += 1;
+    const finalVariant = d.medleyRound == d.medleyIntervalSeconds.length - 1;
+    if (d.me) $('.tour__notice').html(this.trans('standByXForY', d.me.username, variant.name));
     $('.current-variant').removeClass('current-variant');
-    $('.medley-round-' + this.data.medleyRound).addClass('current-variant');
+    $('.medley-round-' + d.medleyRound).addClass('current-variant');
+
+    //also update clock for interval times
+    d.secondsToFinishInterval = d.medleyIntervalSeconds[d.medleyRound];
+    const mClock = $('.medley-interval-time').clock();
+    mClock.clock('addSeconds', d.secondsToFinishInterval);
+
+    const medleyClockElement = $('.medley-extra-clock');
+    if (finalVariant) medleyClockElement.addClass('hidden');
+
     this.redraw();
   };
 

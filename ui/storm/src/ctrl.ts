@@ -5,7 +5,7 @@ import sign from 'puz/sign';
 import { Api as CgApi } from 'chessground/api';
 import { getNow, puzzlePov, sound } from 'puz/util';
 import { makeCgOpts } from 'puz/run';
-import { parseUci } from 'chessops/util';
+import { parseUci } from 'stratops/util';
 import { prop, Prop } from 'common';
 import { Role } from 'chessground/types';
 import { StormOpts, StormData, StormVm, StormRecap, StormPrefs } from './interfaces';

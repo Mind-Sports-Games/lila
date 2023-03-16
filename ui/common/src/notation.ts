@@ -1,4 +1,4 @@
-import { NotationStyle } from 'chess';
+import { NotationStyle } from 'stratutils';
 
 interface ExtendedMoveInfo {
   san: string;
@@ -23,7 +23,7 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
     case 'san':
       return move => (move.san[0] === 'P' ? move.san.slice(1) : move.san);
     case 'uci':
-      return move => move.uci;
+      return (move, variant) => (variant.key === 'amazons' && move.uci[0] === 'P' ? move.uci.slice(1) : move.uci);
     case 'dpo':
       return destPosOnlyNotation;
     case 'man':
@@ -94,7 +94,7 @@ function shogiNotation(move: ExtendedMoveInfo, variant: Variant): string {
     connector = isCapture(prevBoard, board) ? 'x' : isDrop(prevBoard, board) ? '*' : '-',
     role = board.pieces[dest],
     piece = role[0] === '+' ? role[0] + role[1].toUpperCase() : role[0].toUpperCase(),
-    origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '', //ToDo ideally calculate this from SAN or in Chessops as currently doesn't include illegal moves like piece being pinned or obstruction
+    origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '', //ToDo ideally calculate this from SAN or in stratops as currently doesn't include illegal moves like piece being pinned or obstruction
     promotion = promotionSymbol(prevBoard, board, parsed);
 
   if (promotion == '+') return `${piece.slice(1)}${origin}${connector}${dest}${promotion}`;
@@ -351,6 +351,61 @@ function destPosOnlyNotation(move: ExtendedMoveInfo, variant: Variant): string {
 }
 
 function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  switch (variant.key) {
+    case 'togyzkumalak':
+      return togyzkumalakNotation(move, variant);
+    default:
+      return owareNotation(move, variant);
+  }
+}
+
+function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  const reg = move.uci.match(/[a-z][1-2]/g) as string[];
+  const orig = reg[0];
+  const dest = reg[1];
+  const origNumber = orig[1] === '1' ? orig.charCodeAt(0) - 96 : 97 - orig.charCodeAt(0) + variant.boardSize.width;
+  const destNumber = dest[1] === '1' ? dest.charCodeAt(0) - 96 : 97 - dest.charCodeAt(0) + variant.boardSize.width;
+  const gainedStones =
+    orig[1] === '1'
+      ? getMancalaScore(move.fen, 'p1') > getMancalaScore(move.prevFen!, 'p1')
+      : getMancalaScore(move.fen, 'p2') > getMancalaScore(move.prevFen!, 'p2');
+  const destEmpty = isDestEmptyInTogyFen(dest, destNumber, move.fen, variant.boardSize.width);
+  const isCapture = gainedStones && orig[1] !== dest[1] && destEmpty;
+
+  const score = orig[1] === '1' ? getMancalaScore(move.fen, 'p1') : getMancalaScore(move.fen, 'p2');
+  const scoreText = isCapture ? `(${score})` : '';
+
+  const createdTuzdik =
+    orig[1] === '1'
+      ? hasTuzdik(move.fen, 'p1') && !hasTuzdik(move.prevFen!, 'p1')
+      : hasTuzdik(move.fen, 'p2') && !hasTuzdik(move.prevFen!, 'p2');
+
+  return `${origNumber}${destNumber}${createdTuzdik ? 'X' : ''}${scoreText}`;
+}
+
+function hasTuzdik(fen: string, playerIndex: string): boolean {
+  return ['T', 't'].some(t => fen.split(' ')[0].split('/')[playerIndex === 'p1' ? 0 : 1].includes(t));
+}
+
+function isDestEmptyInTogyFen(dest: string, destNumber: number, fen: string, width: number): boolean {
+  const fenOpponentPart = fen.split(' ')[0].split('/')[dest[1] === '1' ? 1 : 0];
+  const destIndex = dest[1] === '1' ? destNumber - 1 : width - destNumber;
+  let currentIndex = 0;
+  for (const f of fenOpponentPart.split(',')) {
+    if (isNaN(+f)) {
+      if (currentIndex >= destIndex) return false;
+      currentIndex++;
+    } else {
+      for (let j = 0; j < Number(+f); j++) {
+        if (currentIndex === destIndex) return true;
+        currentIndex++;
+      }
+    }
+  }
+  return false;
+}
+
+function owareNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const reg = move.uci.match(/[a-z][1-2]/g) as string[];
   const orig = reg[0];
   const origLetter =
@@ -359,10 +414,10 @@ function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {
       : nextAsciiLetter(orig[0], (96 - orig.charCodeAt(0)) * 2 + variant.boardSize.width + 1);
   //captured number of stones
   const scoreDiff =
-    getOwareScore(move.fen, 'p1') +
-    getOwareScore(move.fen, 'p2') -
-    getOwareScore(move.prevFen!, 'p1') -
-    getOwareScore(move.prevFen!, 'p2');
+    getMancalaScore(move.fen, 'p1') +
+    getMancalaScore(move.fen, 'p2') -
+    getMancalaScore(move.prevFen!, 'p1') -
+    getMancalaScore(move.prevFen!, 'p2');
   const scoreText = scoreDiff <= 0 ? '' : ` + ${scoreDiff}`;
   return `${origLetter}${scoreText}`;
 }
@@ -371,9 +426,6 @@ function nextAsciiLetter(letter: string, n: number): string {
   return String.fromCharCode(letter.charCodeAt(0) + n);
 }
 
-export function getOwareScore(fen: string, playerIndex: string): number {
-  const pIndex = playerIndex === 'p1' ? 1 : 2;
-  const asciiNum = fen.split(' ')[pIndex].charCodeAt(0);
-  if (asciiNum == 48) return 0;
-  return asciiNum > 90 ? asciiNum - 70 : asciiNum - 64;
+export function getMancalaScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }

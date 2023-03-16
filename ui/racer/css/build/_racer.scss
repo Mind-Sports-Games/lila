@@ -2,7 +2,8 @@
 @import '../../../common/css/layout/uniboard';
 @import '../../../common/css/component/board-resize';
 @import '../../../common/css/vendor/chessground/_coords';
-@import '../../../chess/css/promotion';
+@import '../../../common/css/vendor/chessground/_board-scores';
+@import '../../../stratutils/css/promotion';
 @import '../../../puz/css/puz';
 
 @import '../racer';

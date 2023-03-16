@@ -1,6 +1,6 @@
 import * as cg from 'chessground/types';
 import { oppositeOrientation, oppositeOrientationForLOA, orientationForLOA } from 'chessground/util';
-import * as chessUtil from 'chess';
+import * as stratUtils from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
 import * as promotion from './promotion';
@@ -18,6 +18,7 @@ import { Autoplay, AutoplayDelay } from './autoplay';
 import { build as makeTree, path as treePath, ops as treeOps, TreeWrapper } from 'tree';
 import { compute as computeAutoShapes } from './autoShape';
 import { Config as ChessgroundConfig } from 'chessground/config';
+import { setDropMode, cancelDropMode } from 'chessground/drop';
 import { ActionMenuCtrl } from './actionMenu';
 import { ctrl as cevalCtrl, isEvalBetter, sanIrreversible, CevalCtrl, Work as CevalWork, CevalOpts } from 'ceval';
 import { ctrl as treeViewCtrl, TreeView } from './treeView/treeView';
@@ -25,7 +26,7 @@ import { defined, prop, Prop } from 'common';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { playstrategyRules } from 'chessops/compat';
+import { playstrategyRules } from 'stratops/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -33,13 +34,13 @@ import { make as makePractice, PracticeCtrl } from './practice/practiceCtrl';
 import { make as makeRetro, RetroCtrl } from './retrospect/retroCtrl';
 import { make as makeSocket, Socket } from './socket';
 import { nextGlyphSymbol } from './nodeFinder';
-import { opposite, parseUci, makeSquare, roleToChar } from 'chessops/util';
-import { PLAYERINDEXES, Outcome, isNormal } from 'chessops/types';
-import { SquareSet } from 'chessops/squareSet';
-import { parseFen } from 'chessops/fen';
-import { Position, PositionError } from 'chessops/chess';
+import { opposite, parseUci, makeSquare, roleToChar } from 'stratops/util';
+import { PLAYERINDEXES, Outcome, isNormal } from 'stratops/types';
+import { SquareSet } from 'stratops/squareSet';
+import { parseFen } from 'stratops/fen';
+import { Position, PositionError } from 'stratops/chess';
 import { Result } from '@badrap/result';
-import { setupPosition } from 'chessops/variant';
+import { setupPosition } from 'stratops/variant';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
@@ -251,7 +252,7 @@ export default class AnalyseCtrl {
   }
 
   turnPlayerIndex(): PlayerIndex {
-    return util.plyPlayerIndex(this.node.ply);
+    return util.plyPlayerIndex(this.node.ply, this.data.game.variant.key);
   }
 
   togglePlay(delay: AutoplayDelay): void {
@@ -271,6 +272,14 @@ export default class AnalyseCtrl {
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
       this.setAutoShapes();
+      const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
+      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
+      cg.set({
+        dropmode: {
+          showDropDests: true,
+          dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
+        },
+      });
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
     });
   }
@@ -279,6 +288,7 @@ export default class AnalyseCtrl {
     if (!this.embed && !defined(this.node.dests))
       this.socket.sendAnaDests({
         variant: this.data.game.variant.key,
+        lib: this.data.game.variant.lib,
         fen: this.node.fen,
         path: this.path,
       });
@@ -287,31 +297,32 @@ export default class AnalyseCtrl {
   makeCgOpts(): ChessgroundConfig {
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
-      dests = chessUtil.readDests(this.node.dests),
-      drops = chessUtil.readDrops(this.node.drops),
+      dests = stratUtils.readDests(this.node.dests),
+      drops = stratUtils.readDrops(this.node.drops),
+      dropsByRole = stratUtils.readDrops(this.node.dropsByRole),
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
         ? this.bottomPlayerIndex()
-        : !this.embed && ((dests && dests.size > 0) || drops === null || drops.length)
+        : !this.embed &&
+          ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
         ? playerIndex
         : undefined,
-      isChessOpsEnabled = util.isChessOpsEnabled(this.data.game.variant.key),
       config: ChessgroundConfig = {
         fen: node.fen,
         turnPlayerIndex: playerIndex,
-        movable:
-          this.embed || !isChessOpsEnabled
-            ? {
-                playerIndex: undefined,
-                dests: new Map(),
-              }
-            : {
-                playerIndex: movablePlayerIndex,
-                dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
-              },
+        movable: this.embed
+          ? {
+              playerIndex: undefined,
+              dests: new Map(),
+            }
+          : {
+              playerIndex: movablePlayerIndex,
+              dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
+            },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
+        onlyDropsVariant: this.data.onlyDropsVariant,
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
@@ -348,11 +359,25 @@ export default class AnalyseCtrl {
 
   playedLastMoveMyself = () => !!this.justPlayed && !!this.node.uci && this.node.uci.startsWith(this.justPlayed);
 
+  private onCancelDropMode = () => {
+    //redraw pocket - due to possible selection in CG and dropmode cancelled
+    if (['crazyhouse', 'shogi', 'minishogi'].includes(this.data.game.variant.key)) {
+      this.redraw();
+    }
+  };
+
+  makeCgHooks = () => ({
+    onCancelDropMode: this.onCancelDropMode,
+  });
+
   jump(path: Tree.Path): void {
     const pathChanged = path !== this.path,
       isForwardStep = pathChanged && path.length == this.path.length + 2;
     this.setPath(path);
     this.showGround();
+    if (this.data.game.variant.key === 'togyzkumalak') {
+      this.chessground.redrawAll(); //redraw board scores
+    }
     if (pathChanged) {
       const playedMyself = this.playedLastMoveMyself();
       if (this.study) this.study.setPath(path, this.node, playedMyself);
@@ -461,7 +486,7 @@ export default class AnalyseCtrl {
   }
 
   userNewPiece = (piece: cg.Piece, pos: Key): void => {
-    if (crazyValid(this.chessground, this.data, this.node.drops, piece, pos)) {
+    if (crazyValid(this.chessground, this.data, this.node.drops, this.node.dropsByRole, piece, pos)) {
       this.justPlayed = roleToChar(piece.role).toUpperCase() + '@' + pos;
       this.justDropped = piece.role;
       this.justCaptured = undefined;
@@ -470,6 +495,7 @@ export default class AnalyseCtrl {
         role: piece.role,
         pos,
         variant: this.data.game.variant.key,
+        lib: this.data.game.variant.lib,
         fen: this.node.fen,
         path: this.path,
       };
@@ -477,6 +503,10 @@ export default class AnalyseCtrl {
       this.preparePremoving();
       this.redraw();
     } else this.jump(this.path);
+    if (!this.data.onlyDropsVariant) {
+      cancelDropMode(this.chessground.state);
+      this.redraw();
+    }
   };
 
   userMove = (orig: Key, dest: Key, capture?: JustCaptured): void => {
@@ -486,6 +516,7 @@ export default class AnalyseCtrl {
     const isCapture = capture || (piece && piece.role == 'p-piece' && orig[0] != dest[0]);
     this.sound[isCapture ? 'capture' : 'move']();
     if (!promotion.start(this, orig, dest, capture, this.sendMove)) this.sendMove(orig, dest, capture);
+    if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
   };
 
   sendMove = (orig: Key, dest: Key, capture?: JustCaptured, prom?: cg.Role): void => {
@@ -493,6 +524,7 @@ export default class AnalyseCtrl {
       orig,
       dest,
       variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
       fen: this.node.fen,
       path: this.path,
     };
@@ -502,6 +534,10 @@ export default class AnalyseCtrl {
     this.socket.sendAnaMove(move);
     this.preparePremoving();
     this.redraw();
+  };
+
+  cancelMove = (): void => {
+    this.reset();
   };
 
   private preparePremoving(): void {
@@ -529,16 +565,31 @@ export default class AnalyseCtrl {
     this.jump(newPath);
     this.redraw();
     this.chessground.playPremove();
+    const parsedDests = stratUtils.readDests(node.dests);
+    if (parsedDests) this.maybeForceMove(parsedDests);
   }
 
   addDests(dests: string, path: Tree.Path): void {
-    if (!util.isChessOpsEnabled(this.data.game.variant.key)) return;
     this.tree.addDests(dests, path);
     if (path === this.path) {
       this.showGround();
       if (this.outcome()) this.ceval.stop();
     }
     this.withCg(cg => cg.playPremove());
+  }
+
+  private maybeForceMove(possibleMoves: cg.Dests) {
+    if (
+      (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') &&
+      possibleMoves.size == 1
+    ) {
+      const passOrig = possibleMoves.keys().next().value;
+      const passDests = possibleMoves.get(passOrig);
+      if (passDests && passDests.length == 1) {
+        const passDest = passDests[0];
+        this.sendMove(passOrig, passDest, undefined, undefined);
+      }
+    }
   }
 
   deleteNode(path: Tree.Path): void {
@@ -625,7 +676,7 @@ export default class AnalyseCtrl {
       variant: this.data.game.variant,
       standardMaterial:
         !this.data.game.initialFen ||
-        parseFen(this.data.game.initialFen).unwrap(
+        parseFen(util.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
           setup =>
             PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
@@ -634,8 +685,8 @@ export default class AnalyseCtrl {
                 Math.max(board['q-piece'].intersect(pieces).size() - 1, 0) +
                 Math.max(board['r-piece'].intersect(pieces).size() - 2, 0) +
                 Math.max(board['n-piece'].intersect(pieces).size() - 2, 0) +
-                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.lightSquares()).size() - 1, 0) +
-                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.darkSquares()).size() - 1, 0);
+                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.lightSquares64()).size() - 1, 0) +
+                Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.darkSquares64()).size() - 1, 0);
               return board['p-piece'].intersect(pieces).size() + promotedPieces <= 8;
             }),
           _ => false
@@ -666,7 +717,7 @@ export default class AnalyseCtrl {
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    const setup = parseFen(node.fen).unwrap();
+    const setup = parseFen(util.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
     return setupPosition(playstrategyRules(this.data.game.variant.key), setup);
   }
 
@@ -919,4 +970,18 @@ export default class AnalyseCtrl {
     if (this.chessground && this.cgVersion.js === this.cgVersion.dom) return f(this.chessground);
     return undefined;
   }
+
+  // FROM LISHOGI TO HELP TO BYOYOMI CLOCKS
+  // Ideally we would just use node.clock
+  // but we store remaining times for lishogi games as node.clock
+  // for imports we store movetime as node.clock, because
+  // that's what's provided next to each move
+  getMovetime = (node: Tree.Node): number | undefined => {
+    const offset = this.mainline[0].ply;
+    if (defined(node.clock) && !this.study) {
+      if (defined(this.data.game.moveCentis)) return this.data.game.moveCentis[node.ply - 1 - offset];
+      //if (this.imported) return node.clock;
+    }
+    return;
+  };
 }

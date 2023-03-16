@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.{ Status => S, Clock, Mode, Player => PlayerIndex, P2, P1, GameLogic }
+import strategygames.{ Status => S, ClockConfig, Mode, Player => PlayerIndex, P2, P1, GameLogic }
 import strategygames.variant.Variant
 import controllers.routes
 import play.api.i18n.Lang
@@ -49,7 +49,12 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       else game.variant.gameLogic.name.toLowerCase()
     import strategygames.Status._
     val result = (game.winner, game.loser, game.status, game.variant.gameLogic) match {
-      case (Some(w), _, Mate, GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Mancala()) =>
+      case (
+            Some(w),
+            _,
+            Mate,
+            GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak()
+          ) =>
         s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate | PerpetualCheck, _) =>
         s"${playerText(w)} won by opponent perpetually checking"
@@ -73,10 +78,10 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
 
   def variantNameNoCtx(variant: Variant) = variantName(variant)(defaultLang)
 
-  def shortClockName(clock: Option[Clock.Config])(implicit lang: Lang): Frag =
+  def shortClockName(clock: Option[ClockConfig])(implicit lang: Lang): Frag =
     clock.fold[Frag](trans.unlimited())(shortClockName)
 
-  def shortClockName(clock: Clock.Config): Frag = raw(clock.show)
+  def shortClockName(clock: ClockConfig): Frag = raw(clock.show)
 
   def shortClockName(game: Game)(implicit lang: Lang): Frag =
     game.correspondenceClock
@@ -165,8 +170,9 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Aborted => trans.gameAborted.txt()
       case S.Mate =>
         game.variant.gameLogic match {
-          case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Mancala() => trans.checkmate.txt()
-          case _                                                             => ""
+          case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() =>
+            trans.checkmate.txt()
+          case _ => ""
         }
       case S.PerpetualCheck => trans.perpetualCheck.txt()
       case S.Resign =>
@@ -205,8 +211,11 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => trans.promotion.txt()
           case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => trans.gameFinished.txt()
           case Variant.FairySF(strategygames.fairysf.variant.Flipello10)     => trans.gameFinished.txt()
-          case Variant.Mancala(strategygames.mancala.variant.Oware)          => trans.gameFinished.txt()
-          case _                                                             => trans.variantEnding.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Amazons)        => trans.gameFinished.txt()
+          case Variant.Samurai(strategygames.samurai.variant.Oware)          => trans.gameFinished.txt()
+          case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
+            trans.gameFinished.txt()
+          case _ => trans.variantEnding.txt()
         }
       case _ => ""
     }

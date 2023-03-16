@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { isEmpty } from 'common';
-import { fixCrazySan, notationStyle } from 'chess';
+import { fixCrazySan, notationStyle } from 'stratutils';
 import { moveFromNotationStyle } from 'common/notation';
 import { path as treePath, ops as treeOps } from 'tree';
 import * as moveView from '../moveView';
@@ -42,6 +42,7 @@ function emptyMove(conceal?: Conceal): VNode {
 
 function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes | undefined {
   const cs = parentedNodes(node.children, node),
+    variant = ctx.ctrl.data.game.variant,
     main = cs[0];
   if (!main) return;
   const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + main.id, main);
@@ -50,7 +51,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
     const isP1 = main.ply % 2 === 1,
       commentTags = renderMainlineCommentsOf(ctx, main, conceal, true).filter(nonEmpty);
     if (!cs[1] && isEmpty(commentTags) && !main.forceVariation)
-      return ((isP1 ? [moveView.renderIndex(main.ply, false)] : []) as MaybeVNodes).concat(
+      return ((isP1 ? [moveView.renderIndex(main.ply, variant.key, false)] : []) as MaybeVNodes).concat(
         renderMoveAndChildrenOf(ctx, main, {
           parentPath: opts.parentPath,
           isMainline: true,
@@ -69,7 +70,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
       isMainline: !main.forceVariation,
       conceal,
     };
-    return (isP1 ? [moveView.renderIndex(main.ply, false)] : ([] as MaybeVNodes))
+    return (isP1 ? [moveView.renderIndex(main.ply, variant.key, false)] : ([] as MaybeVNodes))
       .concat(main.forceVariation ? [] : [renderMoveOf(ctx, main, passOpts), isP1 ? emptyMove(passOpts.conceal) : null])
       .concat([
         h(
@@ -84,7 +85,9 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
           )
         ),
       ] as MaybeVNodes)
-      .concat(isP1 && mainChildren ? [moveView.renderIndex(main.ply, false), emptyMove(passOpts.conceal)] : [])
+      .concat(
+        isP1 && mainChildren ? [moveView.renderIndex(main.ply, variant.key, false), emptyMove(passOpts.conceal)] : []
+      )
       .concat(mainChildren || []);
   }
   if (!cs[1]) return renderMoveAndChildrenOf(ctx, main, opts);
@@ -156,7 +159,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): V
   const withIndex = opts.withIndex || node.ply % 2 === 1,
     path = opts.parentPath + node.id,
     content: MaybeVNodes = [
-      withIndex ? moveView.renderIndex(node.ply, true) : null,
+      withIndex ? moveView.renderIndex(node.ply, variant.key, true) : null,
       // TODO: the || '' are probably not correct
       moveFromNotationStyle(notation)(
         {
@@ -264,7 +267,7 @@ export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
     },
     ([
       isEmpty(commentTags) ? null : h('interrupt', commentTags),
-      root.ply & 1 ? moveView.renderIndex(root.ply, false) : null,
+      root.ply & 1 ? moveView.renderIndex(root.ply, ctrl.data.game.variant.key, false) : null,
       root.ply & 1 ? emptyMove() : null,
     ] as MaybeVNodes).concat(
       renderChildrenOf(ctx, root, {

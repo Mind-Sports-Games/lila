@@ -11,7 +11,7 @@ import lila.memo.CacheApi._
 import lila.i18n.VariantKeys
 
 import strategygames.variant.Variant
-import strategygames.GameFamily
+import strategygames.{ GameFamily, GameGroup }
 
 final class TournamentShieldApi(
     tournamentRepo: TournamentRepo,
@@ -121,7 +121,7 @@ object TournamentShield {
       val name: String,
       val teamOwner: Condition.TeamMember,
       val eligibleVariants: List[Variant],
-      val generateVariants: List[Variant] => List[Variant],
+      val generateVariants: List[Variant] => List[(Variant, Int)],
       val dayOfWeek: Int,
       val hour: Int,
       val arenaMinutes: Int,
@@ -143,11 +143,21 @@ object TournamentShield {
     private def playStrategyMedleyGeneration(variants: List[Variant]) = {
       val thisOrder =
         Random.shuffle(variants)
-      val onePerGameFamily =
-        Random.shuffle(GameFamily.all.map(gf => thisOrder.filter(_.gameFamily == gf).head))
-      onePerGameFamily ::: thisOrder.filterNot(onePerGameFamily.contains(_))
+      val gameGroups      = GameGroup.medley.filter(gg => gg.variants.exists(thisOrder.contains(_)))
+      val onePerGameGroup = Random.shuffle(gameGroups.map(gg => Random.shuffle(gg.variants).head))
+      val newOrder        = onePerGameGroup ::: thisOrder.filterNot(onePerGameGroup.contains(_))
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        newOrder,
+        5 * 60,
+        playStrategyMinutes,
+        playStrategymMinutes,
+        7,
+        true
+      )
     }
-    private val playStrategyRounds = 7
+    private val playStrategyMinutes  = 105
+    private val playStrategymMinutes = 15
+    private val playStrategyRounds   = 7
 
     case object PlayStrategyMedley
         extends MedleyShield(
@@ -158,14 +168,24 @@ object TournamentShield {
           playStrategyMedleyGeneration,
           7,
           19,
-          105,
-          15,
+          playStrategyMinutes,
+          playStrategymMinutes,
           s"${playStrategyRounds} round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
           s"${playStrategyRounds} variant Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
           s"PlayStrategy Medley Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
         )
 
-    private def randomVariantOrder(variants: List[Variant]) = Random.shuffle(variants)
+    private def randomChessVariantOrder(variants: List[Variant]) = {
+      val orderedVariants = Random.shuffle(variants)
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        orderedVariants,
+        5 * 60,
+        100,
+        20,
+        5,
+        true
+      )
+    }
 
     private val chessVariantOptions = Variant.all.filter(_.exoticChessVariant)
     private val chessVariantRounds  = 5
@@ -176,7 +196,7 @@ object TournamentShield {
           "Chess Variants",
           Condition.TeamMember("playstrategy-chess-variants", "PlayStrategy Chess Variants"),
           chessVariantOptions,
-          randomVariantOrder,
+          randomChessVariantOrder,
           6,
           19,
           100,
@@ -186,6 +206,17 @@ object TournamentShield {
           s"Chess Variants Medley Arena, where ${chessVariantRounds} from the following ${chessVariantOptions.length} chess variants are picked: ${chessVariantOptions.map(VariantKeys.variantName).mkString(", ")}."
         )
 
+    private def randomDraughtsVariantOrder(variants: List[Variant]) = {
+      val orderedVariants = Random.shuffle(variants)
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        orderedVariants,
+        5 * 60,
+        105,
+        15,
+        7,
+        true
+      )
+    }
     private val draughtsVariantOptions =
       Variant.all.filter(_.gameFamily == GameFamily.Draughts()).filterNot(_.fromPositionVariant)
     private val draughtsRounds = 7
@@ -196,7 +227,7 @@ object TournamentShield {
           "Draughts",
           Condition.TeamMember("playstrategy-draughts", "PlayStrategy Draughts"),
           draughtsVariantOptions,
-          randomVariantOrder,
+          randomDraughtsVariantOrder,
           6,
           13,
           105,
@@ -448,11 +479,27 @@ object TournamentShield {
           27
         )
 
+    case object Amazons
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.Amazons),
+          Blitz32,
+          25,
+          -1
+        )
+
     case object Oware
         extends Category(
-          Variant.Mancala(strategygames.mancala.variant.Oware),
+          Variant.Samurai(strategygames.samurai.variant.Oware),
           Blitz32,
           20
+        )
+
+    case object Togyzkumalak
+        extends Category(
+          Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak),
+          Blitz53,
+          26,
+          -1
         )
 
     val all: List[Category] = List(
@@ -485,7 +532,9 @@ object TournamentShield {
       MiniXiangqi,
       Flipello,
       Flipello10,
-      Oware
+      Amazons,
+      Oware,
+      Togyzkumalak
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

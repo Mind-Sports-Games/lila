@@ -5,3 +5,5 @@ db.challenge.createIndex(
 
 db.simul.createIndex({ hostId: 1 }, { partialFilterExpression: { status: 10 } });
 db.simul.createIndex({ hostSeenAt: -1 }, { partialFilterExpression: { status: 10, featurable: true } });
+
+db.cache.createIndex({ e: 1 }, { expireAfterSeconds: 0 });

@@ -15,6 +15,11 @@ $pocket-height: 60px;
   &-c1 {
     max-width: $pocket-height;
   }
+
+  piece.selected-square {
+    background-color: #14551e80 !important;
+    @extend %box-radius;
+  }
 }
 
 @each $variant in ('crazyhouse', 'shogi', 'minishogi') {

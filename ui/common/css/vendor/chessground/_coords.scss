@@ -20,11 +20,12 @@ coords {
     &.p1,
     &.p2 {
       top: 1px;
-      right: 0;
+      right: 3px; //better support double digits
 
       // a negative value creates empty space on the right side in mobile browsers
       height: 100%;
-      width: 0.8em;
+      width: 1.4em;
+      text-align: right;
     }
     &.p1 {
       flex-flow: column-reverse;
@@ -88,6 +89,43 @@ coords {
     }
   }
 
+  //Handle togy corrds as they are always inside the board
+  .variant-togyzkumalak & {
+    text-shadow: 0.5px -1px 0px rgba(0, 0, 0, 0.25), -0.5px 1px 0px rgba(255, 255, 255, 0.6);
+    .togyzkumalak-wood & coord {
+      color: #000000 !important;
+    }
+    .togyzkumalak-blue & coord {
+      color: #0a8299 !important;
+    }
+  }
+
+  .variant-togyzkumalak .orientation-p1 &.files {
+    &.p1 {
+      left: 0;
+      bottom: 5px;
+      text-align: center;
+    }
+    &.p2 {
+      left: 0;
+      top: 5px;
+      text-align: center;
+    }
+  }
+
+  .variant-togyzkumalak .orientation-p2 &.files {
+    &.p1 {
+      left: 0;
+      top: 5px;
+      text-align: center;
+    }
+    &.p2 {
+      left: 0;
+      bottom: 5px;
+      text-align: center;
+    }
+  }
+
   coord {
     flex: 1 1 auto;
   }
@@ -138,6 +176,28 @@ coords {
   .coords-out .variant-oware coords {
     display: none;
   }
+
+  .coords-out .variant-togyzkumalak coords {
+    display: none;
+  }
+
+  //always show for Togy and make smaller
+  .variant-togyzkumalak .orientation-p1 coords.files {
+    &.p1 {
+      bottom: 3px;
+    }
+    &.p2 {
+      top: 3px;
+    }
+  }
+  .variant-togyzkumalak .orientation-p2 coords.files {
+    &.p1 {
+      top: 3px;
+    }
+    &.p2 {
+      bottom: 3px;
+    }
+  }
 }
 
 /* handle outer coords */
@@ -146,7 +206,7 @@ coords {
     text-shadow: none;
 
     &.ranks {
-      right: -15px;
+      right: -13px;
       top: 0;
       width: 12px;
 

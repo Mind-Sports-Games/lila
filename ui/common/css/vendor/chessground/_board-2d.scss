@@ -60,9 +60,33 @@ $flipello10-board-files: (
   'wood': 'flipello10_wood_board.svg',
 );
 
+$amazons-board-files: (
+  'blue': 'svg/blue_100.svg',
+  'blue2': 'blue2_100.jpg',
+  'wood2': 'wood2_100.jpg',
+  'wood3': 'wood3_100.jpg',
+  'blue3': 'blue3_100.jpg',
+  'marble': 'marble_100.jpg',
+  'brown': 'svg/brown_100.svg',
+  'green': 'svg/green_100.svg',
+  'olive': 'olive_100.jpg',
+  'purple': 'svg/purple_100.svg',
+  'grey': 'grey_100.jpg',
+  'wood': 'wood-1024_100.jpg',
+  'canvas': 'canvas2-1024_100.jpg',
+  'leather': 'leather-1024_100.jpg',
+  'metal': 'metal-1024_100.jpg',
+  'maple': 'maple_100.jpg',
+);
+
 $oware-board-files: (
   'light-wood': 'oware_light_wood_board.png',
   'dark-wood': 'oware_dark_wood_board.png',
+);
+
+$togyzkumalak-board-files: (
+  'blue': 'togyzkumalak_blue_board.png',
+  'wood': 'togyzkumalak_wood_board.png',
 );
 
 $chess-variants: (
@@ -89,7 +113,9 @@ $xiangqi-variants: ('xiangqi'); // must use same board
 
 $flipello-variants: ('flipello'); // must use same board
 
-$mancala-variants: ('oware'); // must use same board
+$oware-variants: ('oware'); // must use same board
+
+$togyzkumalak-variants: ('togyzkumalak'); // must use same board
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
@@ -135,9 +161,21 @@ $mancala-variants: ('oware'); // must use same board
   }
 }
 
+@each $color, $file in $amazons-board-files {
+  .amazons-#{$color} .variant-amazons.is2d cg-board {
+    background-image: url(../images/board/amazons/#{$file});
+  }
+}
+
 @each $color, $file in $oware-board-files {
-  .mancala-#{$color} .variant-oware.is2d cg-board {
-    background-image: url(../images/board/mancala/#{$file});
+  .oware-#{$color} .variant-oware.is2d cg-board {
+    background-image: url(../images/board/oware/#{$file});
+  }
+}
+
+@each $color, $file in $togyzkumalak-board-files {
+  .togyzkumalak-#{$color} .variant-togyzkumalak.is2d cg-board {
+    background-image: url(../images/board/togyzkumalak/#{$file});
   }
 }
 
@@ -199,8 +237,20 @@ $mancala-variants: ('oware'); // must use same board
   }
 }
 
+@each $color, $file in $amazons-board-files {
+  .amazons-#{$color} .is2d .variant-amazons cg-board {
+    background-image: url(../images/board/amazons/#{$file});
+  }
+}
+
 @each $color, $file in $oware-board-files {
-  .mancala-#{$color} .is2d .variant-oware cg-board {
-    background-image: url(../images/board/mancala/#{$file});
+  .oware-#{$color} .is2d .variant-oware cg-board {
+    background-image: url(../images/board/oware/#{$file});
+  }
+}
+
+@each $color, $file in $togyzkumalak-board-files {
+  .togyzkumalak-#{$color} .is2d .variant-togyzkumalak cg-board {
+    background-image: url(../images/board/togyzkumalak/#{$file});
   }
 }

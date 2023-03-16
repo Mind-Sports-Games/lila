@@ -6,6 +6,7 @@ import play.api.libs.json._
 
 case class Step(
     ply: Int,
+    plysPerTurn: Int,
     move: Option[Step.Move],
     fen: FEN,
     check: Boolean,
@@ -17,7 +18,7 @@ case class Step(
 ) {
 
   // who's playerIndex plays next
-  def playerIndex = PlayerIndex.fromPly(ply)
+  def playerIndex = PlayerIndex.fromPly(ply, plysPerTurn)
 
   def toJson = Step.stepJsonWriter writes this
 }

@@ -1,8 +1,9 @@
 import { h, VNode } from 'snabbdom';
-import { fixCrazySan, NotationStyle } from 'chess';
+import { fixCrazySan, NotationStyle } from 'stratutils';
 import { moveFromNotationStyle } from 'common/notation';
 import { defined } from 'common';
 import { view as cevalView, renderEval as normalizeEval } from 'ceval';
+import * as util from './util';
 
 export interface Ctx {
   withDots?: boolean;
@@ -11,7 +12,8 @@ export interface Ctx {
   variant: Variant;
 }
 
-export const plyToTurn = (ply: Ply): number => Math.floor((ply - 1) / 2) + 1;
+export const plyToTurn = (ply: Ply, variantKey: VariantKey = 'standard'): number =>
+  variantKey === 'amazons' ? Math.floor((ply - 1) / 4) + 1 : Math.floor((ply - 1) / 2) + 1;
 
 export const renderGlyph = (glyph: Tree.Glyph): VNode =>
   h(
@@ -24,12 +26,12 @@ export const renderGlyph = (glyph: Tree.Glyph): VNode =>
 
 const renderEval = (e: string): VNode => h('eval', e.replace('-', '−'));
 
-export function renderIndexText(ply: Ply, withDots?: boolean): string {
-  return plyToTurn(ply) + (withDots ? (ply % 2 === 1 ? '.' : '...') : '');
+export function renderIndexText(ply: Ply, variantKey: VariantKey, withDots?: boolean): string {
+  return plyToTurn(ply, variantKey) + (withDots ? (util.plyPlayerIndex(ply, variantKey) === 'p2' ? '.' : '...') : '');
 }
 
-export function renderIndex(ply: Ply, withDots?: boolean): VNode {
-  return h('index', renderIndexText(ply, withDots));
+export function renderIndex(ply: Ply, variantKey: VariantKey, withDots?: boolean): VNode {
+  return h('index', renderIndexText(ply, variantKey, withDots));
 }
 
 export function renderMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationStyle): VNode[] {
@@ -61,5 +63,5 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationSty
 
 export function renderIndexAndMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationStyle): VNode[] | undefined {
   if (!node.san) return; // initial position
-  return [renderIndex(node.ply, ctx.withDots), ...renderMove(ctx, node, style)];
+  return [renderIndex(node.ply, ctx.variant.key, ctx.withDots), ...renderMove(ctx, node, style)];
 }

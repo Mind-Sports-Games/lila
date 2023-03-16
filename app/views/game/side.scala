@@ -129,9 +129,10 @@ object side {
           .ifTrue(game.variant.chess960 || game.variant.gameFamily == GameFamily.Draughts())
           .flatMap { fen =>
             (fen, game.variant) match {
-              case (FEN.Chess(fen), _)                            => strategygames.chess.variant.Chess960.positionNumber(fen).map(_.toString)
+              case (FEN.Chess(fen), _) =>
+                strategygames.chess.variant.Chess960.positionNumber(fen).map(_.toString)
               case (FEN.Draughts(fen), Variant.Draughts(variant)) => variant.drawTableInfo(fen)
-              case _              => sys.error("Mismatched fen gamelogic")
+              case _                                              => sys.error("Mismatched fen gamelogic")
             }
           }
           .map { info =>
@@ -155,7 +156,16 @@ object side {
         tour.map { t =>
           st.section(cls := "game__tournament")(
             a(cls := "text", dataIcon := "g", href := routes.Tournament.show(t.tour.id))(t.tour.name()),
-            div(cls := "clock", dataTime := t.tour.secondsToFinish)(t.tour.clockStatus)
+            if (t.tour.isMedley && !t.tour.finalMedleyVariant) {
+              div(cls := "medley-interval")(
+                span(cls := "clock", dataTime := t.tour.secondsToFinish)(t.tour.clockStatus),
+                span(cls := "text medley-text")(" ("),
+                span(cls := "clock", dataTime := t.tour.meldeySecondsToFinishInterval)(
+                  t.tour.medleyClockStatus
+                ),
+                span(cls := "text medley-text")(")")
+              )
+            } else { div(cls := "clock", dataTime := t.tour.secondsToFinish)(t.tour.clockStatus) }
           )
         } orElse game.tournamentId.map { tourId =>
           st.section(cls := "game__tournament-link")(tournamentLink(tourId))

@@ -110,11 +110,12 @@ case class User(
       -(perfs(pt).nb * PerfType.totalTimeRoughEstimation(pt).roundSeconds)
     } take nb
 
-  def best8Perfs: List[PerfType] = bestOf(User.firstRow, 4) ::: bestOf(User.secondRow, 4)
+  // TODO once ratings for all games have been decided, change grouping in rating/src/main/PerfType
+  def best8Perfs: List[PerfType] = bestOf(PerfType.nonPuzzle, 8)
 
-  def best6Perfs: List[PerfType] = bestOf(User.firstRow ::: User.secondRow, 6)
+  def best6Perfs: List[PerfType] = bestOf(PerfType.nonPuzzle, 6)
 
-  def best3Perfs: List[PerfType] = bestOf(User.firstRow, 3)
+  def best3Perfs: List[PerfType] = bestOf(PerfType.nonPuzzle, 3)
 
   def hasEstablishedRating(pt: PerfType) = perfs(pt).established
 

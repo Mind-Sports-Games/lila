@@ -47,12 +47,12 @@ object list {
           div(cls := "community__leaders")(
             h2(trans.leaderboard()),
             div(cls := "leaderboards")(
+              userTopActive(nbAllTime, trans.activePlayers(), icon = 'U'.some),
               userTopPerf(leaderboards.bullet, PerfType.orDefault("bullet")),
               userTopPerf(leaderboards.blitz, PerfType.orDefault("blitz")),
               userTopPerf(leaderboards.rapid, PerfType.orDefault("rapid")),
               userTopPerf(leaderboards.classical, PerfType.orDefault("classical")),
               userTopPerf(leaderboards.ultraBullet, PerfType.orDefault("ultraBullet")),
-              //userTopActive(nbAllTime, trans.activePlayers(), icon = 'U'.some),
               //tournamentWinners(tourneyWinners),
               userTopPerf(leaderboards.crazyhouse, PerfType.orDefault("crazyhouse")),
               userTopPerf(leaderboards.chess960, PerfType.orDefault("chess960")),
@@ -82,7 +82,9 @@ object list {
               userTopPerf(leaderboards.minixiangqi, PerfType.orDefault("minixiangqi")),
               userTopPerf(leaderboards.flipello, PerfType.orDefault("flipello")),
               userTopPerf(leaderboards.flipello10, PerfType.orDefault("flipello10")),
-              userTopPerf(leaderboards.oware, PerfType.orDefault("oware"))
+              userTopPerf(leaderboards.amazons, PerfType.orDefault("amazons")),
+              userTopPerf(leaderboards.oware, PerfType.orDefault("oware")),
+              userTopPerf(leaderboards.togyzkumalak, PerfType.orDefault("togyzkumalak"))
             )
           )
         )
@@ -126,7 +128,7 @@ object list {
       ol(users map { u =>
         li(
           lightUserLink(u.user),
-          span(title := trans.gamesPlayed.txt())(s"#${u.count.localize}")
+          span(title := trans.gamesPlayed.txt())(s"#${u.count}")
         )
       })
     )

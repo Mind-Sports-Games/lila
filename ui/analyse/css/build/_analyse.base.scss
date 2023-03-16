@@ -1,5 +1,6 @@
 @import '../../../common/css/plugin';
 @import '../../../common/css/vendor/chessground/coords';
+@import '../../../common/css/vendor/chessground/board-scores';
 @import '../../../common/css/vendor/draughtsground/coords';
 @import '../../../common/css/layout/uniboard';
 @import '../../../common/css/base/scrollbar';
@@ -14,6 +15,6 @@
 @import '../../../tree/css/tree';
 @import '../../../ceval/css/ceval';
 @import '../../../ceval/css/eval-gauge';
-@import '../../../chess/css/control';
-@import '../../../chess/css/promotion';
-@import '../../../chess/css/variant-style';
+@import '../../../stratutils/css/control';
+@import '../../../stratutils/css/promotion';
+@import '../../../stratutils/css/variant-style';

@@ -9,7 +9,7 @@ import viewStatus from 'game/view/status';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes, RoundData } from '../interfaces';
-import { NotationStyle, notationStyle } from 'chess';
+import { NotationStyle, notationStyle } from 'stratutils';
 import { moveFromNotationStyle } from 'common/notation';
 
 const scrollMax = 99999,
@@ -78,6 +78,45 @@ function renderMove(
     : undefined;
 }
 
+function renderMultiActionMove(
+  step: (Step | null)[],
+  notation: NotationStyle,
+  variant: Variant,
+  prevFen: string, //not used for amazons move notation therefore doesn't need to be the exact one
+  curPly: number,
+  orEmpty: boolean,
+  drawOffers: Set<number>
+) {
+  return step
+    ? h(
+        moveTag,
+        {
+          class: {
+            a1t: step[0]
+              ? step[1]
+                ? step[0].ply === curPly || step[1].ply === curPly
+                : step[0].ply === curPly
+              : false,
+          },
+        },
+        [
+          step
+            .map(s =>
+              s
+                ? moveFromNotationStyle(notation)({ san: s.san, uci: s.uci, fen: s.fen, prevFen: prevFen }, variant)
+                : ''
+            )
+            .join(' '),
+          drawOffers.has(step[0] ? step[0].ply : -1) || drawOffers.has(step[1] ? step[1].ply : -1)
+            ? renderDrawOffer()
+            : undefined,
+        ]
+      )
+    : orEmpty
+    ? h(moveTag, '…')
+    : undefined;
+}
+
 export function renderResult(ctrl: RoundController): VNode | undefined {
   let result: string | undefined;
   if (status.finished(ctrl.data))
@@ -133,15 +172,23 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
       return initialFen;
     }
     const step = pairI === 1 ? pairs[i][0] : pairs[i - 1][1];
-    return step !== null ? step.fen : initialFen;
+    return step ? step.fen : initialFen;
   };
 
   const els: MaybeVNodes = [],
     curPly = ctrl.ply;
-  for (let i = 0; i < pairs.length; i++) {
-    els.push(h(indexTag, i + 1 + ''));
-    els.push(renderMove(pairs[i][0], notation, variant, prevFen(i, 0), curPly, true, drawPlies));
-    els.push(renderMove(pairs[i][1], notation, variant, prevFen(i, 1), curPly, false, drawPlies));
+  if (variant.key === 'amazons') {
+    for (let i = 0; i < pairs.length; i = i + 2) {
+      els.push(h(indexTag, Math.floor(i / 2) + 1 + ''));
+      els.push(renderMultiActionMove(pairs[i], notation, variant, prevFen(i, 0), curPly, true, drawPlies));
+      els.push(renderMultiActionMove(pairs[i + 1], notation, variant, prevFen(i + 1, 0), curPly, false, drawPlies));
+    }
+  } else {
+    for (let i = 0; i < pairs.length; i++) {
+      els.push(h(indexTag, i + 1 + ''));
+      els.push(renderMove(pairs[i][0], notation, variant, prevFen(i, 0), curPly, true, drawPlies));
+      els.push(renderMove(pairs[i][1], notation, variant, prevFen(i, 1), curPly, false, drawPlies));
+    }
   }
   els.push(renderResult(ctrl));
 
@@ -267,7 +314,10 @@ export function render(ctrl: RoundController): VNode | undefined {
               while ((node = node.previousSibling as HTMLElement)) {
                 offset++;
                 if (node.tagName === indexTagUC) {
-                  ctrl.userJump(2 * parseInt(node.textContent || '') + offset);
+                  ctrl.userJump(
+                    (d.game.variant.key === 'amazons' ? 4 : 2) * parseInt(node.textContent || '') +
+                      offset * (d.game.variant.key === 'amazons' ? 2 : 1)
+                  );
                   ctrl.redraw();
                   break;
                 }

@@ -1,8 +1,8 @@
 package lila.game
 
-import strategygames.mancala
-import strategygames.mancala.format
-import strategygames.mancala.{ Piece, PieceMap, Pos, PositionHash, Role }
+import strategygames.samurai
+import strategygames.samurai.format
+import strategygames.samurai.{ Piece, PieceMap, Pos, PositionHash, Role }
 import strategygames.{ Player => PlayerIndex, GameFamily }
 
 import lila.db.ByteArray
@@ -26,7 +26,7 @@ private object PmnStorage {
       }
   }
 
-  //is Huffman used/needed anywhere for PfnStorage?
+  //is Huffman used/needed anywhere for PmnStorage?
   //we default to Oware in here
   case object Huffman extends PmnStorage {
 
@@ -45,7 +45,7 @@ private object PmnStorage {
         Decoded(
           pgnMoves = decoded.pgnMoves.toVector,
           pieces = decoded.pieces.asScala.view.flatMap { case (k, v) =>
-            mancalaPos(k).map(_ -> mancalaPiece(v))
+            samuraiPos(k).map(_ -> samuraiPiece(v))
           }.toMap,
           positionHashes = decoded.positionHashes,
           lastMove = Option(decoded.lastUci) flatMap (format.Uci.apply),
@@ -53,12 +53,12 @@ private object PmnStorage {
         )
       }
 
-    private def mancalaPos(sq: Integer): Option[Pos] = Pos(sq)
-    private def mancalaRole(role: JavaRole): Role =
-      Role.javaSymbolToRole(role.symbol)
+    private def samuraiPos(sq: Integer): Option[Pos] = Pos(sq)
+    private def samuraiCount(role: JavaRole): Int =
+      Role.javaSymbolToInt(role.symbol)
 
-    private def mancalaPiece(piece: JavaPiece): Piece =
-      Piece(PlayerIndex.fromP1(piece.white), mancalaRole(piece.role))
+    private def samuraiPiece(piece: JavaPiece): (Piece, Int) =
+      (Piece(PlayerIndex.fromP1(piece.white), Role.defaultRole), samuraiCount(piece.role))
   }
 
   case class Decoded(

@@ -11,6 +11,7 @@ playstrategy.load.then(() => {
     $bestOfX = $('#form3-xGamesChoice_bestOfX'),
     $playX = $('#form3-xGamesChoice_playX'),
     $useMatchScore = $('#form3-xGamesChoice_matchScore'),
+    $useByoyomi = $('#form3-clock_useByoyomi'),
     showPosition = () =>
       $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string) && !$medley.is(':checked')),
     showDrawTables = () =>
@@ -19,11 +20,17 @@ playstrategy.load.then(() => {
         .toggle(($variant.val() as string).startsWith('1_') && !$medley.is(':checked')),
     showMedleySettings = () => {
       $('.form3 .medleyMinutes').toggle($medley.is(':checked'));
+      $('.form3 .medleyIntervalOptions').toggle($medley.is(':checked'));
       $('.form3 .medleyDefaults').toggle($medley.is(':checked'));
       $('.form3 .medleyGameFamily').toggle($medley.is(':checked'));
+      $('.form3 .duration').toggle(!$medley.is(':checked'));
       $('.form3 .variant').toggle(!$medley.is(':checked'));
       showPosition();
       showDrawTables();
+    },
+    showByoyomiSettings = () => {
+      $('.form3 .byoyomiClock').toggle($useByoyomi.is(':checked'));
+      $('.form3 .byoyomiPeriods').toggle($useByoyomi.is(':checked'));
     },
     matchSelectors = (selector1: Selector, selector2: Selector) => {
       const $sel1 = $(selector1);
@@ -76,6 +83,9 @@ playstrategy.load.then(() => {
   });
   $playX.on('change', () => toggleOff($bestOfX));
   $playX.on('change', () => matchSelectors($playX, $useMatchScore));
+
+  $useByoyomi.on('change', showByoyomiSettings);
+  showByoyomiSettings();
 
   $('form .conditions a.show').on('click', function (this: HTMLAnchorElement) {
     $(this).remove();

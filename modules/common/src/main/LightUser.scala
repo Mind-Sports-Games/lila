@@ -59,7 +59,8 @@ object LightUser {
   //but the auto subscribeBotsToShields code will make all bots that are listed here
   //join any shield tournaments
   val tourBots: List[LightUser] = List(
-    LightUser("pst-rando", "PST-Rando", "_playstrategy".some, "BOT".some, false)
+    //LightUser("pst-rando", "PST-Rando", "_playstrategy".some, "BOT".some, false)
+    LightUser("pst-greedy-tom", "PST-Greedy-Tom", "_playstrategy".some, "BOT".some, false)
   )
 
   val tourBotsIDs: List[UserID] = tourBots.map(_.id)

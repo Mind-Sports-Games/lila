@@ -19,6 +19,7 @@ final class Cached(
   def nbTotal: Fu[Long] = nbTotalCache.get {}
 
   def nbPlaying = nbPlayingCache.get _
+  //def nbCorrespondencePlaying = nbCorrespondencePlayingCache.get {}
 
   def lastPlayedPlayingId(userId: User.ID): Fu[Option[Game.ID]] = lastPlayedPlayingIdCache get userId
 
@@ -37,6 +38,18 @@ final class Cached(
         gameRepo.coll.countSel(Query nowPlaying userId)
       }
   }
+
+  // private val nbCorrespondencePlayingCache = mongoCache.unit[Int](
+  //   "game.nbCorrespondingPlaying",
+  //   1.minutes
+  // ) { loader =>
+  //   _.refreshAfterWrite(2.minutes)
+  //     .buildAsyncFuture {
+  //       loader { _ =>
+  //         gameRepo.nbOngoingCorrespondenceGames
+  //       }
+  //     }
+  // }
 
   private val nbImportedCache = mongoCache[User.ID, Int](
     4096,

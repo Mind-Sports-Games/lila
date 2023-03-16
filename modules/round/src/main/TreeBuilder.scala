@@ -23,10 +23,11 @@ object TreeBuilder {
 
   def fullOpeningOf(fen: FEN): Option[FullOpening] =
     fen match {
-      case FEN.Chess(fen)    => FullOpeningDB.findByFen(GameLogic.Chess(), FEN.Chess(fen))
-      case FEN.Draughts(fen) => FullOpeningDB.findByFen(GameLogic.Draughts(), FEN.Draughts(fen))
-      case FEN.FairySF(fen)  => FullOpeningDB.findByFen(GameLogic.FairySF(), FEN.FairySF(fen))
-      case FEN.Mancala(fen)  => FullOpeningDB.findByFen(GameLogic.Mancala(), FEN.Mancala(fen))
+      case FEN.Chess(fen)        => FullOpeningDB.findByFen(GameLogic.Chess(), FEN.Chess(fen))
+      case FEN.Draughts(fen)     => FullOpeningDB.findByFen(GameLogic.Draughts(), FEN.Draughts(fen))
+      case FEN.FairySF(fen)      => FullOpeningDB.findByFen(GameLogic.FairySF(), FEN.FairySF(fen))
+      case FEN.Samurai(fen)      => FullOpeningDB.findByFen(GameLogic.Samurai(), FEN.Samurai(fen))
+      case FEN.Togyzkumalak(fen) => FullOpeningDB.findByFen(GameLogic.Togyzkumalak(), FEN.Togyzkumalak(fen))
     }
 
   def apply(
@@ -56,6 +57,7 @@ object TreeBuilder {
         }.toMap)
         val root = Root(
           ply = init.turns,
+          plysPerTurn = game.variant.plysPerTurn,
           fen = fen,
           check = init.situation.check,
           captureLength = init.situation match {
@@ -65,15 +67,22 @@ object TreeBuilder {
           opening = openingOf(fen),
           clock = withClocks.flatMap(_.headOption),
           pocketData = init.situation.board.pocketData,
-          eval = infos lift 0 map makeEval
+          eval = infos lift 0 map makeEval,
+          dropsByRole = init.situation match {
+            case (Situation.FairySF(_)) =>
+              init.situation.dropsByRole
+            case _ => None
+          }
         )
         def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
           val fen    = Forsyth.>>(g.situation.board.variant.gameLogic, g)
           val info   = infos lift (index - 1)
           val advice = advices get g.turns
+          val player = !PlayerIndex.fromPly(g.turns, g.situation.board.variant.plysPerTurn)
           val branch = Branch(
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.turns,
+            plysPerTurn = g.situation.board.variant.plysPerTurn,
             move = m,
             fen = fen,
             captureLength = (g.situation, m.uci.origDest._2) match {
@@ -88,11 +97,16 @@ object TreeBuilder {
             pocketData = g.situation.board.pocketData,
             eval = info map makeEval,
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
+            dropsByRole = g.situation match {
+              case (Situation.FairySF(_)) =>
+                g.situation.dropsByRole
+              case _ => None
+            },
             comments = Node.Comments {
               drawOfferPlies(g.turns)
                 .option(
                   makePlayStrategyComment(
-                    s"${g.situation.board.variant.playerNames(!PlayerIndex.fromPly(g.turns))} offers draw"
+                    s"${g.situation.board.variant.playerNames(player)} offers draw"
                   )
                 )
                 .toList :::
@@ -143,11 +157,17 @@ object TreeBuilder {
       Branch(
         id = UciCharPair(variant.gameLogic, m.uci),
         ply = g.turns,
+        plysPerTurn = variant.plysPerTurn,
         move = m,
         fen = fen,
         check = g.situation.check,
         opening = openingOf(fen),
         pocketData = g.situation.board.pocketData,
+        dropsByRole = g.situation match {
+          case (Situation.FairySF(_)) =>
+            g.situation.dropsByRole
+          case _ => None
+        },
         eval = none
       )
     }

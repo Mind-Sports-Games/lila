@@ -28,6 +28,8 @@ object EventForm {
     mapping(
       "title"         -> text(minLength = 3, maxLength = 40),
       "headline"      -> text(minLength = 5, maxLength = 30),
+      "beforeMessage" -> optional(text(minLength = 5, maxLength = 30)),
+      "duringMessage" -> optional(text(minLength = 5, maxLength = 30)),
       "description"   -> optional(text(minLength = 5, maxLength = 4000)),
       "homepageHours" -> bigDecimal(10, 2).verifying(d => d >= 0 && d <= 24),
       "url"           -> nonEmptyText,
@@ -45,6 +47,8 @@ object EventForm {
   ) fill Data(
     title = "",
     headline = "",
+    beforeMessage = none,
+    duringMessage = none,
     description = none,
     homepageHours = 0,
     url = "",
@@ -58,6 +62,8 @@ object EventForm {
   case class Data(
       title: String,
       headline: String,
+      beforeMessage: Option[String],
+      duringMessage: Option[String],
       description: Option[String],
       homepageHours: BigDecimal,
       url: String,
@@ -74,6 +80,8 @@ object EventForm {
       event.copy(
         title = title,
         headline = headline,
+        beforeMessage = beforeMessage,
+        duringMessage = duringMessage,
         description = description,
         homepageHours = homepageHours.toDouble,
         url = url,
@@ -93,6 +101,8 @@ object EventForm {
         _id = Event.makeId,
         title = title,
         headline = headline,
+        beforeMessage = beforeMessage,
+        duringMessage = duringMessage,
         description = description,
         homepageHours = homepageHours.toDouble,
         url = url,
@@ -116,6 +126,8 @@ object EventForm {
       Data(
         title = event.title,
         headline = event.headline,
+        beforeMessage = event.beforeMessage,
+        duringMessage = event.duringMessage,
         description = event.description,
         homepageHours = event.homepageHours,
         url = event.url,

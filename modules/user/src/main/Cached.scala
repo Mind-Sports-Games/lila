@@ -69,14 +69,16 @@ final class Cached(
 
   val top10NbGame = mongoCache.unit[List[User.LightCount]](
     "user:top:nbGame",
-    74 minutes
+    74.minutes
   ) { loader =>
-    _.refreshAfterWrite(75 minutes)
-      .buildAsyncFuture {
-        loader { _ =>
-          userRepo topNbGame 10 dmap (_.map(_.lightCount))
-        }
-      }
+    {
+      _.refreshAfterWrite(75.minutes)
+        .buildAsyncFuture(
+          loader { _ =>
+            userRepo.topNbGame(10).dmap(_.map(_.lightCount))
+          }
+        )
+    }
   }
 
   private val first50OnlineCache = cacheApi.unit[List[User]] {

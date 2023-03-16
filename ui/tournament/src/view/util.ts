@@ -34,7 +34,7 @@ export function playerName(p) {
   return p.title ? [h('span.utitle', p.title), ' ' + p.name] : p.name;
 }
 
-export function player(p, asLink: boolean, withRating: boolean, defender = false, leader = false) {
+export function player(p, asLink: boolean, withRating: boolean, withFlag: boolean, defender = false, leader = false) {
   return h(
     'a.ulpt.user-link' + (((p.title || '') + p.name).length > 15 ? '.long' : ''),
     {
@@ -43,13 +43,13 @@ export function player(p, asLink: boolean, withRating: boolean, defender = false
         destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
       },
     },
-    [h('div.player-info', playerInfo(p, withRating, defender, leader))]
+    [h('div.player-info', playerInfo(p, withRating, withFlag, defender, leader))]
   );
 }
 
-export function playerInfo(p, withRating: boolean, defender = false, leader = false) {
+export function playerInfo(p, withRating: boolean, withFlag: boolean, defender = false, leader = false) {
   return [
-    p.country
+    withFlag && p.country
       ? h(
           'span.country',
           h('img.flag', {
@@ -108,13 +108,25 @@ export function medleyVariantsHoriz(ctrl: TournamentController) {
       'div.medley-variants-wide',
       h(
         'div.medley-variants-scrollable',
-        medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, ctrl.data.isFinished)
+        medleyVariantListItems(
+          ctrl.data.medleyVariants,
+          ctrl.data.medleyRound,
+          ctrl.data.isFinished,
+          ctrl.data.medleyBalanceIntervals,
+          ctrl.data.medleyIntervalSeconds
+        )
       )
     ),
   ]);
 }
 
-export function medleyVariantListItems(variants: Variant[], medleyRound: number, displayCompleted: boolean) {
+export function medleyVariantListItems(
+  variants: Variant[],
+  medleyRound: number,
+  displayCompleted: boolean,
+  showIntervalTimes: boolean,
+  IntervalSeconds: number[]
+) {
   const variantsH = [] as (string | VNode)[];
   variants.forEach((v, index) => {
     displayCompleted || index >= medleyRound
@@ -131,7 +143,10 @@ export function medleyVariantListItems(variants: Variant[], medleyRound: number,
                     'data-icon': typeof v.iconChar == 'undefined' ? '' : v.iconChar,
                   },
                 },
-                h('span.medley-variant-name', v.name)
+                h(
+                  'span.medley-variant-name',
+                  v.name + (showIntervalTimes ? ` (${Math.floor(IntervalSeconds[index] / 60)})` : '')
+                )
               )
             )
           )
@@ -149,7 +164,21 @@ export function medleyVariantsList(ctrl: TournamentController, withClose: boolea
           hook: bind('click', () => ctrl.showMedleyVariants(false), ctrl.redraw),
         })
       : null,
-    h('h1', ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes)),
-    h('div.medley-variants-list', medleyVariantListItems(ctrl.data.medleyVariants, ctrl.data.medleyRound, true)),
+    h(
+      'h1',
+      ctrl.data.medleyBalanceIntervals
+        ? 'Medley Variants: Balanced Intervals (minutes)'
+        : ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes)
+    ),
+    h(
+      'div.medley-variants-list',
+      medleyVariantListItems(
+        ctrl.data.medleyVariants,
+        ctrl.data.medleyRound,
+        true,
+        ctrl.data.medleyBalanceIntervals,
+        ctrl.data.medleyIntervalSeconds
+      )
+    ),
   ]);
 }

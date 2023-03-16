@@ -9,7 +9,7 @@ import { Combo } from 'puz/combo';
 import { Countdown } from './countdown';
 import { getNow, puzzlePov, sound } from 'puz/util';
 import { makeCgOpts } from 'puz/run';
-import { parseUci } from 'chessops/util';
+import { parseUci } from 'stratops/util';
 import { Promotion, Run } from 'puz/interfaces';
 import { prop, Prop } from 'common';
 import { RacerOpts, RacerData, RacerVm, RacerPrefs, Race, UpdatableData, RaceStatus, WithGround } from './interfaces';

@@ -1,0 +1,24 @@
+{
+  "name": "stratutils",
+  "version": "2.0.0",
+  "private": true,
+  "description": "playstrategy.org strategy game utils",
+  "type": "module",
+  "module": "dist/main.js",
+  "types": "dist/main.d.ts",
+  "keywords": [
+    "chess",
+    "playstrategy"
+  ],
+  "author": "Thibault Duplessis",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "compile": "../../node_modules/typescript/bin/tsc --incremental",
+    "dev": "yarn run compile",
+    "prod": "yarn run compile"
+  },
+  "devDependencies": {
+    "@types/playstrategy": "2.0.0",
+    "typescript": "^4.1.3"
+  }
+}

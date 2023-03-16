@@ -2,6 +2,7 @@ import type Highcharts from 'highcharts';
 
 import AnalyseCtrl from './ctrl';
 import { baseUrl } from './util';
+import { allowFishnetForVariant } from 'stratutils';
 import { defined } from 'common';
 import modal from 'common/modal';
 import { formToXhr } from 'common/xhr';
@@ -123,7 +124,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     const $menuCt = $menu.children('[data-panel="ctable"]');
     ($menuCt.length ? $menuCt : $menu.children(':first-child')).trigger('mousedown');
   }
-  if (!data.analysis) {
+  if (!data.analysis && allowFishnetForVariant(data.game.variant.key)) {
     $panels.find('form.future-game-analysis').on('submit', function (this: HTMLFormElement) {
       if ($(this).hasClass('must-login')) {
         if (confirm(ctrl.trans('youNeedAnAccountToDoThat'))) location.href = '/signup';

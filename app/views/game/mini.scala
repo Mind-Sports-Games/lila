@@ -71,8 +71,8 @@ object mini {
 
   def renderState(pov: Pov) =
     pov.game.variant match {
-      case Variant.Chess(_) | Variant.FairySF(_) | Variant.Mancala(_) =>
-        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)},${pov.playerIndex.name},${~pov.game.lastMoveKeys}"
+      case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) =>
+        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
           pov.game.variant.gameLogic,
@@ -94,7 +94,7 @@ object mini {
     pov.game.variant.key match {
       case "flipello" | "flipello10" =>
         "(" + pov.game.board.pieces
-          .map { case (_, piece) => piece.player.name }
+          .map { case (_, (piece, _)) => piece.player.name }
           .filter(p => p == pov.playerIndex.name)
           .size
           .toString() + ")"
@@ -106,6 +106,8 @@ object mini {
         val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
         val score = if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score
         "(" + score.toString() + ")"
+      case "togyzkumalak" =>
+        "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
       case _ => ""
     }
 

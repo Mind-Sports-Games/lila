@@ -28,13 +28,15 @@ trait ChessgroundHelper {
             def top(p: Pos) = p match {
               case Pos.Chess(p)   => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.FairySF(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
-              case Pos.Mancala(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
+              case Pos.Samurai(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
+              case Pos.Togyzkumalak(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case _ => sys.error("Invalid Pos type")
             }
             def left(p: Pos) = p match {
               case Pos.Chess(p)   => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.FairySF(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
-              case Pos.Mancala(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
+              case Pos.Samurai(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
+              case Pos.Togyzkumalak(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case _ => sys.error("Invalid Pos type")
             }
             val highlights = ctx.pref.highlight ?? lastMove.distinct.map { pos =>
@@ -43,11 +45,14 @@ trait ChessgroundHelper {
             val pieces =
               if (ctx.pref.isBlindfold) ""
               else
-                  board.pieces.map {
-                    case (pos, piece) =>
-                      val klass = s"${piece.player.name} ${piece.role.name}"
-                      s"""<piece class="$klass" style="top:${top(pos)}%;left:${left(pos)}%"></piece>"""
-                  } mkString ""
+                //note this doesnt seem to be used although it is passed through on round creation
+                board.pieces.map {
+                  case (pos, (piece, count)) =>
+                    val klass =
+                      if (count > 1) s"${piece.player.name} ${piece.role.name}${count}"
+                      else s"${piece.player.name} ${piece.role.name}"
+                    s"""<piece class="$klass" style="top:${top(pos)}%;left:${left(pos)}%"></piece>"""
+                } mkString ""
             s"$highlights$pieces"
           }
         }
@@ -96,7 +101,15 @@ trait ChessgroundHelper {
             case (orig, dest) => List(orig, dest)
           }
         )
-      case (board: Board.Mancala, history: History.Mancala) =>
+      case (board: Board.Samurai, history: History.Samurai) =>
+        chessground(
+          board = board,
+          orient = pov.playerIndex,
+          lastMove = history.lastMove.map(_.origDest) ?? {
+            case (orig, dest) => List(orig, dest)
+          }
+        )
+      case (board: Board.Togyzkumalak, history: History.Togyzkumalak) =>
         chessground(
           board = board,
           orient = pov.playerIndex,

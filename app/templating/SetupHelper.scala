@@ -65,6 +65,18 @@ trait SetupHelper { self: I18nHelper =>
     (s.toString, s.toString, none)
   }
 
+  val clockByoyomiChoices: List[SelectChoice] = {
+    (1 to 20).toList ::: List(25, 30, 35, 40, 45, 60, 90, 120, 150, 180)
+  } map { s =>
+    (s.toString, s.toString, none)
+  }
+
+  val periodsChoices: List[SelectChoice] = {
+    (1 to 5).toList map { s =>
+      (s.toString, s.toString, none)
+    }
+  }
+
   val corresDaysChoices: List[SelectChoice] =
     ("1", "One day", none) :: List(2, 3, 5, 7, 10, 14).map { d =>
       (d.toString, s"$d days", none)
@@ -72,7 +84,8 @@ trait SetupHelper { self: I18nHelper =>
 
   def translatedTimeModeChoices(implicit lang: Lang) =
     List(
-      (TimeMode.RealTime.id.toString, trans.realTime.txt(), none),
+      (TimeMode.FischerClock.id.toString, trans.realTime.txt(), none),
+      (TimeMode.ByoyomiClock.id.toString, trans.byoyomiTime.txt(), none),
       (TimeMode.Correspondence.id.toString, trans.correspondence.txt(), none),
       (TimeMode.Unlimited.id.toString, trans.unlimited.txt(), none)
     )
@@ -188,13 +201,13 @@ trait SetupHelper { self: I18nHelper =>
       lang: Lang
   ): List[(SelectChoice, List[SelectChoice])] =
     GameFamily.all
-      .filter(_.aiEnabled)
+      .filter(_.hasFishnet)
       .map(gf =>
         (
           translatedGameFamilyChoice(gf),
           translatedVariantChoicesByGameFamily(gf, encodeId) :::
             gf.variants
-              .filter(v => v != gf.defaultVariant && !v.fromPositionVariant && v.aiVariant)
+              .filter(v => v != gf.defaultVariant && !v.fromPositionVariant && v.hasFishnet)
               .map(variantTupleId) ::: gf.variants
               .filter(
                 _.fromPositionVariant

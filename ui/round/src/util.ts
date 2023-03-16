@@ -138,11 +138,8 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
   return score;
 }
 
-export function getOwareScore(fen: string, playerIndex: string): number {
-  const pIndex = playerIndex === 'p1' ? 1 : 2;
-  const asciiNum = fen.split(' ')[pIndex].charCodeAt(0);
-  if (asciiNum == 48) return 0;
-  return asciiNum > 90 ? asciiNum - 70 : asciiNum - 64;
+export function getMancalaScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }
 
 export const noChecks: CheckCount = {
@@ -177,20 +174,10 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisVariants = ['linesOfAction', 'scrambledEggs', 'flipello', 'flipello10', 'oware'];
+const noAnalysisBoardVariants: VariantKey[] = ['amazons'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
-  return noAnalysisVariants.indexOf(variant) == -1;
-}
-
-export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): cg.Piece | undefined {
-  switch (variant) {
-    case 'flipello10':
-    case 'flipello':
-      return { playerIndex: turnPlayerIndex, role: 'p-piece' };
-    default:
-      return undefined;
-  }
+  return noAnalysisBoardVariants.indexOf(variant) == -1;
 }
 
 export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {
@@ -202,5 +189,13 @@ export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | und
     }
   } else {
     return uci2move(uci);
+  }
+}
+
+export function turnPlayerIndexFromLastPly(ply: Ply, variantKey: VariantKey): PlayerIndex {
+  if (variantKey === 'amazons') {
+    return Math.floor(ply / 2) % 2 === 0 ? 'p1' : 'p2';
+  } else {
+    return ply % 2 === 0 ? 'p1' : 'p2';
   }
 }

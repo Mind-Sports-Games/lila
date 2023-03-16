@@ -2,9 +2,19 @@ $c-setup: $c-secondary;
 $c-slider: $c-setup;
 
 // these must all be the same size as we iterate through them...
-$game-family: ('chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello', 'mancala');
+$game-family: ('chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello', 'amazons', 'oware', 'togyzkumalak');
 
-$game-family-random-pieces: ('wbK.svg', 'wbK.png', 'bwL.png', 'bwK.png', 'rbK.png', 'bwP.png', 'mixed.svg');
+$game-family-random-pieces: (
+  'wbK.svg',
+  'wbK.png',
+  'bwL.png',
+  'bwK.png',
+  'rbK.png',
+  'bwP.png',
+  'wbQ.svg',
+  'mixed.svg',
+  'mixed.svg'
+);
 
 $game-family-p1-pieces: (
   'chess/cburnett/wK.svg',
@@ -13,7 +23,9 @@ $game-family-p1-pieces: (
   'shogi/ctw/0GY.svg',
   'xiangqi/ka/RK.svg',
   'flipello/classic_flipello/bP.png',
-  'mancala/south.svg'
+  'amazons/arrow/wQ.svg',
+  'oware/south.svg',
+  'togyzkumalak/south.svg'
 );
 
 $game-family-p2-pieces: (
@@ -23,7 +35,9 @@ $game-family-p2-pieces: (
   'shogi/ctw/0OU.svg',
   'xiangqi/ka/BK.svg',
   'flipello/classic_flipello/wP.png',
-  'mancala/north.svg'
+  'amazons/arrow/bQ.svg',
+  'oware/north.svg',
+  'togyzkumalak/north.svg'
 );
 
 .game-setup {
@@ -159,8 +173,8 @@ $game-family-p2-pieces: (
       margin: 1em auto;
       text-align: center;
 
-      $padding_button: if($gf == 'mancala', 0px, 7px);
-      $padding_random: if($gf == 'mancala', 0px, 10px);
+      $padding_button: if($gf == 'oware', 0px, 7px);
+      $padding_random: if($gf == 'oware', 0px, 10px);
 
       .playerIndex-submits__button {
         margin: 0 0.5em;

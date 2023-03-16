@@ -223,6 +223,17 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       ReadPreference.secondaryPreferred
     )
 
+  def playingCorrespondenceNoAi: Fu[List[Game.ID]] =
+    coll.distinctEasy[Game.ID, List](
+      F.id,
+      Query.notFinished ++ Query.noAi ++ Query.clock(false),
+      ReadPreference.secondaryPreferred
+    )
+
+  // def nbOngoingCorrespondenceGames: Fu[Int] = {
+  //   coll.countSel(Query.notFinished ++ Query.noAi ++ Query.clock(false)).dmap(_.toInt)
+  // }
+
   def lastPlayedPlayingId(userId: User.ID): Fu[Option[Game.ID]] =
     coll
       .find(Query recentlyPlaying userId, $id(true).some)

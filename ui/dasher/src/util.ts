@@ -82,8 +82,12 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'flipello':
     case 'flipello10':
       return 'flipello';
+    case 'amazons':
+      return 'amazons';
     case 'oware':
-      return 'mancala';
+      return 'oware';
+    case 'togyzkumalak':
+      return 'togyzkumalak';
     case 'russian':
     case 'brazilian':
     case 'breakthrough':

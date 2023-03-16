@@ -1,8 +1,8 @@
 package lila.tournament
 
-import strategygames.Clock.{ Config => ClockConfig }
+import strategygames.ClockConfig
 import strategygames.format.FEN
-import strategygames.{ GameFamily, Mode, Speed }
+import strategygames.{ GameFamily, GameGroup, Mode, Speed }
 import strategygames.variant.Variant
 import org.joda.time.{ DateTime, Duration, Interval }
 import play.api.i18n.Lang
@@ -13,6 +13,7 @@ import lila.common.ThreadLocalRandom
 import lila.i18n.defaultLang
 import lila.rating.PerfType
 import lila.user.User
+import lila.i18n.VariantKeys
 
 case class Tournament(
     id: Tournament.ID,
@@ -21,7 +22,7 @@ case class Tournament(
     clock: ClockConfig,
     minutes: Int,
     variant: Variant,
-    medleyVariants: Option[List[Variant]] = None,
+    medleyVariantsAndIntervals: Option[List[(Variant, Int)]] = None,
     medleyMinutes: Option[Int] = None,
     position: Option[FEN],
     mode: Mode,
@@ -90,7 +91,22 @@ case class Tournament(
 
   def isRated = mode == Mode.Rated
 
+  def medleyVariants: Option[List[Variant]] = medleyVariantsAndIntervals.map(_.map(_._1))
+
+  def medleyIntervalSeconds: Option[List[Int]] = medleyVariantsAndIntervals.map(_.map(_._2).filter(_ != 0))
+
   def isMedley = medleyVariants.nonEmpty
+
+  def medleyNumIntervals: Option[Int] = medleyIntervalSeconds.map(_.length)
+
+  def medleyIsBalanced: Option[Boolean] = medleyIntervalSeconds.map(v => v.toSet.size != 1)
+
+  def medleyDurationMinutes = medleyMinutes.getOrElse(0) * medleyNumIntervals.getOrElse(0)
+
+  def meldeySecondsToFinishInterval =
+    medleyIntervalSeconds.fold(0)(
+      (secondsToFinish - _.drop(medleyRound.getOrElse(0) + 1).sum)
+    )
 
   def finishesAt = startsAt plusMinutes minutes
 
@@ -102,27 +118,30 @@ case class Tournament(
 
   def pairingsClosed = secondsToFinish < pairingsClosedSeconds
 
+  //start at 0 as it's actaully an index for medley variants in front end
   def medleyRound: Option[Int] =
-    if (isStarted) medleyMinutes.map(_ * 60).map((nowSeconds - startsAt.getSeconds).toInt / _)
-    else None
+    if (isStarted) {
+      medleyIntervalSeconds
+        .map(
+          _.map { var s = 0; t => { s += t; s } }
+            .filter(_ <= ((nowSeconds - startsAt.getSeconds).toInt))
+            .size
+        )
+    } else None
+
+  def finalMedleyVariant: Boolean = medleyRound.nonEmpty && medleyRound == medleyNumIntervals.map(_ - 1)
+
+  def currentIntervalTime =
+    medleyIntervalSeconds.getOrElse(List()).lift(medleyRound.getOrElse(0)).fold(0)(t => (t / 60).toInt)
 
   def currentVariant =
     medleyVariants.getOrElse(List()).lift(medleyRound.getOrElse(0)).getOrElse(variant)
 
   def currentPerfType: PerfType = PerfType(currentVariant, speed)
 
-  //essentially take medleyVariants and discard ones not to display
-  def medleyRounds: Option[List[Variant]] =
-    medleyRoundsWithMinsRemaining.map(_.map { case (_, v) => v })
-
-  //might want to make this public for something at some point
-  private def medleyRoundsWithMinsRemaining: Option[List[(Int, Variant)]] =
-    medleyMinutes.map(mm =>
-      List
-        .tabulate((minutes / mm) + 1)(n => minutes - (n * mm))
-        .filter(_ > (pairingsClosedSeconds.toDouble / 60))
-        .zip(medleyVariants.getOrElse(List()))
-    )
+  def medleyVariantsInTournament: Option[List[Variant]] =
+    medleyVariants
+      .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
 
   def isStillWorthEntering =
     isPlayStrategyHeadline || isMarathonOrUnique || {
@@ -167,6 +186,11 @@ case class Tournament(
       "%02d:%02d".format(s / 60, s % 60)
     }
 
+  def medleyClockStatus =
+    meldeySecondsToFinishInterval pipe { s =>
+      "%02d:%02d".format(s / 60, s % 60)
+    }
+
   def schedulePair = schedule map { this -> _ }
 
   def winner =
@@ -187,12 +211,12 @@ case class Tournament(
 
   lazy val looksLikePrize = !isScheduled && lila.common.String.looksLikePrize(s"$name $description")
 
-  def medleyGameFamilies: Option[List[GameFamily]] = medleyVariants.map(
-    _.map(_.gameFamily).distinct.sortWith(_.name < _.name)
+  def medleyGameGroups: Option[List[GameGroup]] = medleyVariants.map(mvList =>
+    GameGroup.medley.filter(gg => gg.variants.exists(mvList.contains(_))).distinct.sortWith(_.name < _.name)
   )
 
-  def medleyGameFamiliesString: Option[String] =
-    medleyGameFamilies.map(_.map(_.name).mkString(", "))
+  def medleyGameGroupsString: Option[String] =
+    medleyGameGroups.map(_.map(VariantKeys.gameGroupName).mkString(", "))
 
   val minWaitingUsersForPairings: Int = if (botsAllowed) 1 else 2
 
@@ -213,7 +237,7 @@ object Tournament {
       clock: ClockConfig,
       minutes: Int,
       variant: Variant,
-      medleyVariants: Option[List[Variant]] = None,
+      medleyVariantsAndIntervals: Option[List[(Variant, Int)]] = None,
       medleyMinutes: Option[Int] = None,
       position: Option[FEN],
       mode: Mode,
@@ -239,7 +263,7 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = variant,
-      medleyVariants = medleyVariants,
+      medleyVariantsAndIntervals = medleyVariantsAndIntervals,
       medleyMinutes = medleyMinutes,
       position = position,
       mode = mode,
@@ -270,7 +294,7 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = sched.variant,
-      medleyVariants = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
+      medleyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
       medleyMinutes = sched.medleyShield.map(_.arenaMedleyMinutes),
       position = sched.position,
       mode = Mode.Rated,

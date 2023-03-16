@@ -50,6 +50,22 @@ const changeColorHandle = (): void => {
     'loa-purple-diag': '#E5DAF0 #957AB0',
     'loa-ic': '#ececec #c1c18e',
     'loa-horsey': '#F0D9B5 #946f51',
+    'amazons-blue': '#DEE3E6 #788a94',
+    'amazons-blue2': '#97b2c7 #546f82',
+    'amazons-blue3': '#d9e0e6 #315991',
+    'amazons-canvas': '#d7daeb #547388',
+    'amazons-wood': '#d8a45b #9b4d0f',
+    'amazons-wood2': '#a38b5d #6c5017',
+    'amazons-wood3': '#d0ceca #755839',
+    'amazons-maple': '#e8ceab #bc7944',
+    'amazons-leather': '#d1d1c9 #c28e16',
+    'amazons-green': '#FFFFDD #6d8753',
+    'amazons-brown': '#F0D9B5 #946f51',
+    'amazons-marble': '#93ab91 #4f644e',
+    'amazons-grey': '#b8b8b8 #7d7d7d',
+    'amazons-metal': '#c9c9c9 #727272',
+    'amazons-olive': '#b8b19f #6d6655',
+    'amazons-purple': '#9f90b0 #7d4a8d',
   };
 
   for (const theme of document.body.className.split(' ')) {

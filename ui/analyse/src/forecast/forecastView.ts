@@ -3,7 +3,7 @@ import { ForecastCtrl, ForecastStep } from './interfaces';
 import AnalyseCtrl from '../ctrl';
 import { renderNodesHtml } from '../pgnExport';
 import { bind, dataIcon, spinner } from '../util';
-import { fixCrazySan } from 'chess';
+import { fixCrazySan } from 'stratutils';
 
 function onMyTurn(ctrl: AnalyseCtrl, fctrl: ForecastCtrl, cNodes: ForecastStep[]): VNode | undefined {
   const firstNode = cNodes[0];
