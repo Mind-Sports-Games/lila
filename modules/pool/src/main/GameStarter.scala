@@ -151,8 +151,8 @@ final private class BotGameStarter(
         onStart(Game.Id(game.id))
         Pairing(
           game,
-          p1Sri = p1Member.sri.pp("p1 sri"),
-          p2Sri = p2Member.sri.pp("p2 sri")
+          p1Sri = p1Member.sri,
+          p2Sri = p2Member.sri
         ).some
       }
     }
