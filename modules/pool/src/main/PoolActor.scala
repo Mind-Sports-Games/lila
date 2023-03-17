@@ -91,7 +91,7 @@ final private class PoolActor(
           .size == 1
       )
         candidates
-          .filter(c => !c.lame && c.misses >= 0)
+          .filter(c => !c.lame && c.misses >= 1)
           .headOption
           .map(
             botGameStarter(config, _)

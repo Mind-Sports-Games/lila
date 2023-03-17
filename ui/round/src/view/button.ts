@@ -361,7 +361,8 @@ export function followUp(ctrl: RoundController): VNode {
       !d.tournament &&
       !d.simul &&
       !d.swiss &&
-      !d.game.boosted,
+      !d.game.boosted &&
+      !((d.game.source === 'lobby' || d.game.source === 'pool') && d.opponent.user && d.opponent.user.title == 'BOT'),
     newable = (status.finished(d) || status.aborted(d)) && (d.game.source === 'lobby' || d.game.source === 'pool'),
     rematchZone = ctrl.challengeRematched
       ? [
@@ -403,7 +404,11 @@ export function followUp(ctrl: RoundController): VNode {
             attrs: {
               href:
                 d.game.source === 'pool'
-                  ? poolUrl(d.clock!, d.game.variant.key, d.opponent.user)
+                  ? poolUrl(
+                      d.clock!,
+                      d.game.variant.key,
+                      d.opponent.user && d.opponent.user.title == 'BOT' ? undefined : d.opponent.user
+                    )
                   : '/?hook_like=' + d.game.id,
             },
           },
