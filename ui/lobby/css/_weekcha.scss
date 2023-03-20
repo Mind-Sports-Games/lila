@@ -1,7 +1,6 @@
 .lobby__weekcha {
-  background: $c-bg-box;
-
   .current_week {
+    background: $c-bg-box;
     font-size: 1.8em;
     border-bottom: 1px $c-bg-zebra solid;
 
@@ -9,7 +8,6 @@
       display: flex;
       padding-top: 0.5em;
       padding-bottom: 0.5em;
-      justify-content: center;
       align-items: center;
       color: $c-font-dim;
 
@@ -28,14 +26,15 @@
   }
 
   .previous_week {
+    background: $c-bg-box;
     font-size: 1.3em;
     border-bottom: 1px $c-bg-zebra solid;
 
-    .last_weeks_winner {
+    .last_week {
       display: flex;
       padding-top: 0.2em;
+      padding-left: 0.5em;
       padding-bottom: 0.2em;
-      justify-content: center;
       align-items: center;
       color: $c-font-dim;
 
@@ -45,21 +44,18 @@
         color: $c-link;
         background-color: $c-bg-zebra;
       }
-    }
 
-    .winner {
-      display: block;
-      width: 100%;
-      text-align: center;
+      i {
+        padding-left: 0.2em;
+        padding-right: 0.2em;
+      }
     }
 
     .user-link {
-      display: flex;
-      justify-content: center;
-      align-items: center;
       padding-top: 0.2em;
       padding-bottom: 0.2em;
-      margin-left: -0.5em;
+      padding-left: 0.7em;
+      display: block;
 
       &:hover {
         background-color: $c-bg-zebra;

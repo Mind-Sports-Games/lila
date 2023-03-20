@@ -189,16 +189,16 @@ object bits {
       ),
       div(cls := "current_week")(
         a(href := s"/forum/weekly-challenges/${weekCha.currentKey}")(
-          iconTag(weekCha.iconChar),
+          iconTag(weekCha.currentIconChar),
           weekCha.currentName
         )
       ),
       div(cls := "previous_week")(
-        a(cls := "last_weeks_winner", href := s"/forum/weekly-challenges/${weekCha.previousKey}")(
-          s"${trans.lastWeek.txt()}: ${weekCha.previousName}"
+        a(cls := "last_week", href := s"/forum/weekly-challenges/${weekCha.previousKey}")(
+          iconTag(weekCha.previousIconChar),
+          weekCha.previousName
         ),
-        span(cls := "winner")(s"${trans.winner.txt()}:"),
-        userIdLink(weekCha.winner.some)
+        userIdLink(weekCha.winner.some, dataIcon = 'g'.some)
       )
     )
 
