@@ -30,6 +30,15 @@ final class Env(
 
   private lazy val maxPlaying = appConfig.get[Max]("setup.max_playing")
 
+  lazy val weeklyChallenge =
+    WeeklyChallenge(
+      appConfig.get[String]("weekly_challenge.current_key"),
+      appConfig.get[String]("weekly_challenge.current_name"),
+      appConfig.get[String]("weekly_challenge.icon").headOption,
+      appConfig.get[String]("weekly_challenge.previous_key"),
+      appConfig.get[String]("weekly_challenge.winner")
+    )
+
   private lazy val seekApiConfig = new SeekApi.Config(
     coll = db(CollName("seek")),
     archiveColl = db(CollName("seek_archive")),
@@ -54,9 +63,10 @@ final class Env(
 
   val socket = wire[LobbySocket]
 
-  def version(id:String = "lobbyhome") = socket.rooms.ask[SocketVersion](id)(GetVersion)
+  def version(id: String = "lobbyhome") = socket.rooms.ask[SocketVersion](id)(GetVersion)
 
   lila.common.Bus.subscribeFun("abortGame") { case lila.game.actorApi.AbortedBy(pov) =>
     abortListener(pov).unit
   }
+
 }

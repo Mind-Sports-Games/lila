@@ -947,4 +947,6 @@ computer analysis, game chat and shareable URL.</string>
   <string name="seeOurListOfBots">See our list of bots</string>
   <string name="orUpper">OR</string>
   <string name="playAgainstX">Play against %1$s</string>
+  <string name="weeklyChallenge">Weekly Challenge</string>
+  <string name="lastWeeksWinner">Last Week's Winner</string>
 </resources>
