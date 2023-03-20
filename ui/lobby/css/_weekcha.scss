@@ -2,41 +2,65 @@
   background: $c-bg-box;
 
   .current_week {
-    height: 55%;
     font-size: 1.8em;
+    border-bottom: 1px $c-bg-zebra solid;
+
     a {
       display: flex;
-      height: 100%;
+      padding-top: 0.5em;
+      padding-bottom: 0.5em;
       justify-content: center;
       align-items: center;
       color: $c-font-dim;
+
       @include transition;
+
       &:hover {
         color: $c-link;
         background-color: $c-bg-zebra;
+      }
+
+      i {
+        padding-left: 0.25em;
+        padding-right: 0.25em;
       }
     }
   }
 
   .previous_week {
     font-size: 1.3em;
+    border-bottom: 1px $c-bg-zebra solid;
+
     .last_weeks_winner {
       display: flex;
-      height: 100%;
+      padding-top: 0.2em;
+      padding-bottom: 0.2em;
       justify-content: center;
       align-items: center;
       color: $c-font-dim;
+
       @include transition;
+
       &:hover {
         color: $c-link;
         background-color: $c-bg-zebra;
       }
     }
+
+    .winner {
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+
     .user-link {
       display: flex;
       justify-content: center;
       align-items: center;
       padding-top: 0.2em;
+      padding-bottom: 0.2em;
+      margin-left: -0.5em;
+
       &:hover {
         background-color: $c-bg-zebra;
       }

@@ -36,6 +36,7 @@ final class Env(
       appConfig.get[String]("weekly_challenge.current_name"),
       appConfig.get[String]("weekly_challenge.icon").headOption,
       appConfig.get[String]("weekly_challenge.previous_key"),
+      appConfig.get[String]("weekly_challenge.previous_name"),
       appConfig.get[String]("weekly_challenge.winner")
     )
 

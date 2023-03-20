@@ -5,6 +5,7 @@ case class WeeklyChallenge(
     currentName: String,
     currentIcon: Option[Char],
     previousKey: String,
+    previousName: String,
     winner: String
 ) {
 
