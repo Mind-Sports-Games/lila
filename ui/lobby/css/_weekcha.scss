@@ -1,0 +1,45 @@
+.lobby__weekcha {
+  background: $c-bg-box;
+
+  .current_week {
+    height: 55%;
+    font-size: 1.8em;
+    a {
+      display: flex;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+      color: $c-font-dim;
+      @include transition;
+      &:hover {
+        color: $c-link;
+        background-color: $c-bg-zebra;
+      }
+    }
+  }
+
+  .previous_week {
+    font-size: 1.3em;
+    .last_weeks_winner {
+      display: flex;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+      color: $c-font-dim;
+      @include transition;
+      &:hover {
+        color: $c-link;
+        background-color: $c-bg-zebra;
+      }
+    }
+    .user-link {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 0.2em;
+      &:hover {
+        background-color: $c-bg-zebra;
+      }
+    }
+  }
+}

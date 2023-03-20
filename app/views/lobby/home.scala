@@ -187,33 +187,36 @@ object home {
           )
         ),
         bits.lastPosts(lastPost),
-        div(cls := "lobby__support")(
-          a(href := routes.Plan.index)(
-            iconTag(patronIconChar),
-            span(cls := "lobby__support__text")(
-              strong(trans.patron.donate()),
-              span(trans.patron.becomePatron())
+        ctx.noKid option bits.weeklyChallenge(weeklyChallenge),
+        div(cls := "lobby__info")(
+          div(cls := "lobby__support")(
+            a(href := routes.Plan.index)(
+              iconTag(patronIconChar),
+              span(cls := "lobby__support__text")(
+                strong(trans.patron.donate()),
+                span(trans.patron.becomePatron())
+              )
+            ),
+            a(href := "https://shop.msoworld.com/wp/shop/")(
+              iconTag(""),
+              span(cls := "lobby__support__text")(
+                strong("Swag Store"),
+                span(trans.playInStyle())
+              )
             )
           ),
-          a(href := "https://shop.msoworld.com/wp/shop/")(
-            iconTag(""),
-            span(cls := "lobby__support__text")(
-              strong("Swag Store"),
-              span(trans.playInStyle())
-            )
+          div(cls := "lobby__about")(
+            ctx.blind option h2("About"),
+            a(href := "/about")(trans.aboutX("PlayStrategy")),
+            a(href := "/faq")(trans.faq.faqAbbreviation()),
+            a(href := "/contact")(trans.contact.contact()),
+            //a(href := "/mobile")(trans.mobileApp()),
+            a(href := routes.Page.tos)(trans.termsOfService()),
+            a(href := "/privacy")(trans.privacy()),
+            a(href := "/source")(trans.sourceCode()),
+            //a(href := "/ads")("Ads"),
+            views.html.base.bits.connectLinks
           )
-        ),
-        div(cls := "lobby__about")(
-          ctx.blind option h2("About"),
-          a(href := "/about")(trans.aboutX("PlayStrategy")),
-          a(href := "/faq")(trans.faq.faqAbbreviation()),
-          a(href := "/contact")(trans.contact.contact()),
-          //a(href := "/mobile")(trans.mobileApp()),
-          a(href := routes.Page.tos)(trans.termsOfService()),
-          a(href := "/privacy")(trans.privacy()),
-          a(href := "/source")(trans.sourceCode()),
-          //a(href := "/ads")("Ads"),
-          views.html.base.bits.connectLinks
         )
       )
     }
