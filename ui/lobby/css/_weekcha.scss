@@ -1,0 +1,65 @@
+.lobby__weekcha {
+  .current_week {
+    background: $c-bg-box;
+    font-size: 1.8em;
+    border-bottom: 1px $c-bg-zebra solid;
+
+    a {
+      display: flex;
+      padding-top: 0.5em;
+      padding-bottom: 0.5em;
+      align-items: center;
+      color: $c-font-dim;
+
+      @include transition;
+
+      &:hover {
+        color: $c-link;
+        background-color: $c-bg-zebra;
+      }
+
+      i {
+        padding-left: 0.25em;
+        padding-right: 0.25em;
+      }
+    }
+  }
+
+  .previous_week {
+    background: $c-bg-box;
+    font-size: 1.3em;
+    border-bottom: 1px $c-bg-zebra solid;
+
+    .last_week {
+      display: flex;
+      padding-top: 0.2em;
+      padding-left: 0.5em;
+      padding-bottom: 0.2em;
+      align-items: center;
+      color: $c-font-dim;
+
+      @include transition;
+
+      &:hover {
+        color: $c-link;
+        background-color: $c-bg-zebra;
+      }
+
+      i {
+        padding-left: 0.2em;
+        padding-right: 0.2em;
+      }
+    }
+
+    .user-link {
+      padding-top: 0.2em;
+      padding-bottom: 0.2em;
+      padding-left: 0.7em;
+      display: block;
+
+      &:hover {
+        background-color: $c-bg-zebra;
+      }
+    }
+  }
+}

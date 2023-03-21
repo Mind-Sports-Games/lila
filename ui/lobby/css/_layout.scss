@@ -20,7 +20,7 @@ $mq-not-col3: $mq-not-small;
 .lobby {
   grid-area: main;
   display: grid;
-  grid-template-areas: 'app' 'table' 'side' 'chat' 'blog' 'tv' 'puzzle' 'tours' 'leader' 'winner' 'simuls' 'forum' 'support' 'about' '.';
+  grid-template-areas: 'app' 'table' 'side' 'chat' 'blog' 'tv' 'puzzle' 'tours' 'leader' 'winner' 'simuls' 'forum' 'weekcha' 'info' '.';
   grid-gap: $block-gap;
 
   &__counters {
@@ -30,13 +30,13 @@ $mq-not-col3: $mq-not-small;
   @include breakpoint($mq-col2) {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: auto repeat(3, fit-content(0));
-    grid-template-areas: 'blog   blog' 'table  table' 'app    app' 'side   chat' 'tv   puzzle' 'tours tours' 'winner  winner' 'simuls simuls' 'forum  forum' 'about  support';
+    grid-template-areas: 'blog   blog' 'table  table' 'app    app' 'side   chat' 'tv   puzzle' 'tours tours' 'winner  winner' 'simuls simuls' 'forum  forum' 'weekcha  info';
   }
 
   @include breakpoint($mq-col3) {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto repeat(2, fit-content(0));
-    grid-template-areas: 'side    blog    blog' 'table   app     app' 'chat    app     app' 'tv      tours  tours' 'support  winner   winner' 'puzzle   simuls  simuls' 'about forum forum ';
+    grid-template-areas: 'side    blog    blog' 'table   app     app' 'chat    app     app' 'tv      tours  tours' 'weekcha  winner   winner' 'puzzle   simuls  simuls' 'info  forum forum ';
 
     &__start {
       flex-flow: column;
@@ -56,7 +56,7 @@ $mq-not-col3: $mq-not-small;
   @include breakpoint($mq-col4) {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, fit-content(0));
-    grid-template-areas: 'side    blog    blog    table' 'side   app     app    chat' 'tv     tours  tours winner' '.      .       .      puzzle' '.      simuls  simuls .' 'about    forum    forum    support';
+    grid-template-areas: 'side    blog    blog    table' 'side   app     app    chat' 'tv     tours  tours winner' '.      .       .      puzzle' '.      simuls  simuls .' 'weekcha  forum    forum    info';
 
     &__simuls {
       max-height: 20em;
@@ -130,11 +130,11 @@ $mq-not-col3: $mq-not-small;
     grid-area: blog;
   }
 
-  &__support {
-    grid-area: support;
+  &__weekcha {
+    grid-area: weekcha;
   }
 
-  &__about {
-    grid-area: about;
+  &__info {
+    grid-area: info;
   }
 }

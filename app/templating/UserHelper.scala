@@ -82,7 +82,8 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       withTitle: Boolean = true,
       truncate: Option[Int] = None,
       params: String = "",
-      modIcon: Boolean = false
+      modIcon: Boolean = false,
+      dataIcon: Option[Char] = None
   )(implicit lang: Lang): Frag =
     userIdOption.flatMap(lightUser).fold[Frag](User.anonymous) { user =>
       userIdNameLink(
@@ -94,7 +95,8 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
         withOnline = withOnline,
         truncate = truncate,
         params = params,
-        modIcon = modIcon
+        modIcon = modIcon,
+        dataIcon = dataIcon
       )
     }
 
@@ -115,7 +117,8 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       withOnline = withOnline,
       truncate = truncate,
       params = params,
-      modIcon = false
+      modIcon = false,
+      dataIcon = none
     )
 
   def titleTag(title: Option[Title]): Option[Frag] =
@@ -133,12 +136,14 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       truncate: Option[Int],
       title: Option[Title],
       params: String,
-      modIcon: Boolean
+      modIcon: Boolean,
+      dataIcon: Option[Char],
   )(implicit lang: Lang): Tag =
     a(
       cls := userClass(userId, cssClass, withOnline),
-      href := userUrl(username, params = params)
+      href := userUrl(username, params = params),
     )(
+      dataIcon.map(iconTag),
       withOnline ?? (if (modIcon) moderatorIcon else lineIcon(isPatron)),
       titleTag(title),
       truncate.fold(username)(username.take)
