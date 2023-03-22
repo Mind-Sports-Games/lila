@@ -42,7 +42,7 @@ object PoolConfig {
   import play.api.libs.json._
   implicit val poolConfigJsonWriter = OWrites[PoolConfig] { p =>
     p.clock match {
-      case fc: FischerClock =>
+      case fc: FischerClock.Config =>
         Json.obj(
           "id"         -> p.id.value,
           "lim"        -> fc.limitInMinutes,
@@ -50,21 +50,13 @@ object PoolConfig {
           "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
           "variantKey" -> VariantKeys.variantName(p.variant)
         )
-      case bc: ByoyomiClock =>
+      case bc: ByoyomiClock.Config =>
         Json.obj(
           "id"         -> p.id.value,
           "lim"        -> bc.limitInMinutes,
           "inc"        -> bc.incrementSeconds,
           "byoyomi"    -> bc.byoyomiSeconds,
           "periods"    -> bc.periodsTotal,
-          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
-          "variantKey" -> VariantKeys.variantName(p.variant)
-        )
-      case _ =>
-        Json.obj(
-          "id"         -> p.id.value,
-          "lim"        -> p.clock.limitInMinutes,
-          "inc"        -> p.clock.incrementSeconds,
           "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
           "variantKey" -> VariantKeys.variantName(p.variant)
         )
