@@ -6,7 +6,7 @@ import strategygames.chess.variant.Standard
 import lila.i18n.VariantKeys
 import lila.rating.PerfType
 
-import strategygames.{ ClockConfig, Speed }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, Speed }
 
 case class PoolConfig(
     clock: ClockConfig,
@@ -23,7 +23,7 @@ case class PoolConfig(
       case variantKey => PerfType.orDefault(variantKey)
     }
 
-  val id = PoolConfig clockAndVariantToId (clock, variant)
+  val id = PoolConfig.clockAndVariantToId(clock, variant)
 }
 
 object PoolConfig {
@@ -35,16 +35,39 @@ object PoolConfig {
 
   //def clockToId(clock: Clock.Config) = Id(clock.show)
 
-  def clockAndVariantToId(clock: ClockConfig, variant: Variant) = Id(clock.show + "-" + variant.key)
+  def clockAndVariantToId(clock: ClockConfig, variant: Variant) = Id(
+    clock.show.replace("|", "-") + "-" + variant.key
+  )
 
   import play.api.libs.json._
   implicit val poolConfigJsonWriter = OWrites[PoolConfig] { p =>
-    Json.obj(
-      "id"         -> p.id.value,
-      "lim"        -> p.clock.limitInMinutes,
-      "inc"        -> p.clock.incrementSeconds,
-      "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
-      "variantKey" -> VariantKeys.variantName(p.variant)
-    )
+    p.clock match {
+      case fc: FischerClock =>
+        Json.obj(
+          "id"         -> p.id.value,
+          "lim"        -> fc.limitInMinutes,
+          "inc"        -> fc.incrementSeconds,
+          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "variantKey" -> VariantKeys.variantName(p.variant)
+        )
+      case bc: ByoyomiClock =>
+        Json.obj(
+          "id"         -> p.id.value,
+          "lim"        -> bc.limitInMinutes,
+          "inc"        -> bc.incrementSeconds,
+          "byoyomi"    -> bc.byoyomiSeconds,
+          "periods"    -> bc.periodsTotal,
+          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "variantKey" -> VariantKeys.variantName(p.variant)
+        )
+      case _ =>
+        Json.obj(
+          "id"         -> p.id.value,
+          "lim"        -> p.clock.limitInMinutes,
+          "inc"        -> p.clock.incrementSeconds,
+          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "variantKey" -> VariantKeys.variantName(p.variant)
+        )
+    }
   }
 }

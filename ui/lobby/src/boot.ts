@@ -45,7 +45,17 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variantDisplayName: 'Lines Of Action',
       variantId: '2_11',
     },
-    { id: '5+3-shogi', lim: 5, inc: 3, perf: 'Shogi', variant: 'shogi', variantDisplayName: 'Shogi', variantId: '3_1' },
+    {
+      id: '5-10-shogi',
+      lim: 5,
+      inc: 0,
+      byoyomi: 10,
+      periods: 1,
+      perf: 'Shogi',
+      variant: 'shogi',
+      variantDisplayName: 'Shogi',
+      variantId: '3_1',
+    },
     {
       id: '3+2-xiangqi',
       lim: 3,

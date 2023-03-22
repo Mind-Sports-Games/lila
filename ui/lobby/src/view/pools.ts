@@ -1,6 +1,7 @@
 import { h, Hooks } from 'snabbdom';
 import LobbyController from '../ctrl';
 import { bind, spinner, perfIcons } from './util';
+import { Pool } from '../interfaces';
 
 function renderRange(range: string) {
   return h('div.range', range.replace('-', '–'));
@@ -18,6 +19,12 @@ export function hooks(ctrl: LobbyController): Hooks {
     },
     ctrl.redraw
   );
+}
+
+function byoyomiDisplay(pool: Pool) {
+  const base = pool.inc === 0 ? pool.lim : pool.lim + '+' + pool.inc;
+  const periodsString = pool.periods && pool.periods > 1 ? '(' + pool.periods + 'x)' : '';
+  return pool.byoyomi && pool.byoyomi > 0 ? base + '|' + pool.byoyomi + periodsString : base;
 }
 
 export function render(ctrl: LobbyController) {
@@ -40,7 +47,7 @@ export function render(ctrl: LobbyController) {
           active && member!.range
             ? renderRange(member!.range!)
             : h('div.logo', { attrs: { 'data-icon': perfIcons[pool.perf] } }),
-          h('div.clock', pool.lim + '+' + pool.inc),
+          h('div.clock', pool.byoyomi ? byoyomiDisplay(pool) : pool.lim + '+' + pool.inc),
           active ? spinner() : null,
         ]
       );
