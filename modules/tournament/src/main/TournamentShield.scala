@@ -454,7 +454,7 @@ object TournamentShield {
     case object MiniShogi
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.MiniShogi),
-          Byoyomi510,
+          Byoyomi35,
           13
         )
 
