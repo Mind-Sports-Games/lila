@@ -68,7 +68,9 @@ object crud {
       )
     }
 
-  private def inForm(form: Form[_], tour: Option[Tournament])(implicit ctx: Context) =
+  private def inForm(form: Form[_], tour: Option[Tournament])(implicit ctx: Context) = {
+    def disabledAfterStart = tour.exists(!_.isCreated)
+
     frag(
       form3.split(
         form3.group(form("date"), frag("Start date ", strong(utcLink)), half = true)(
@@ -112,6 +114,15 @@ object crud {
           form3.select(_, TournamentForm.clockIncrementChoices)
         )
       ),
+      frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi())),
+      form3.split(
+        form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
+          form3.select(_, TournamentForm.clockByoyomiChoices, disabled = disabledAfterStart)
+        ),
+        form3.group(form("clock.periods"), trans.numberOfPeriods(), klass = "byoyomiPeriods", half = true)(
+          form3.select(_, TournamentForm.periodsChoices, disabled = disabledAfterStart)
+        )
+      ),
       form3.split(
         form3.group(form("position"), trans.startPosition(), half = true)(
           tournament.form.startingPosition(_, tour)
@@ -126,6 +137,7 @@ object crud {
       tournament.form.condition(form, new TourFields(form, tour), auto = false, Nil, tour),
       form3.action(form3.submit(trans.apply()))
     )
+  }
 
   def index(tours: Paginator[Tournament])(implicit ctx: Context) =
     layout(

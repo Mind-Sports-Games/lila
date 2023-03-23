@@ -9,7 +9,6 @@ import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.PlayerIndex
 import lila.user.User
 
-// TODO: deal with byoyomi here.
 final case class ApiAiConfig(
     variant: Variant,
     fenVariant: Option[Variant],
@@ -81,7 +80,8 @@ object ApiAiConfig extends BaseConfig {
   def from(
       l: Int,
       v: Option[String],
-      cl: Option[ClockConfig],
+      fcl: Option[FischerClock.Config],
+      bcl: Option[ByoyomiClock.Config],
       d: Option[Int],
       c: Option[String],
       pos: Option[String]
@@ -90,7 +90,7 @@ object ApiAiConfig extends BaseConfig {
     new ApiAiConfig(
       variant = variant,
       fenVariant = none,
-      clock = cl,
+      clock = bcl.orElse(fcl),
       daysO = d,
       playerIndex = PlayerIndex.orDefault(~c),
       level = l,

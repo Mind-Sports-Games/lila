@@ -20,6 +20,8 @@ export interface Pool {
   id: PoolId;
   lim: number;
   inc: number;
+  byoyomi?: number;
+  periods?: number;
   perf: string;
   variant: DraughtsVariantKey | VariantKey;
   variantDisplayName: string;

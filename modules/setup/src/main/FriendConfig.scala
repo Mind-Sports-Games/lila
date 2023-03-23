@@ -88,7 +88,7 @@ object FriendConfig extends BaseHumanConfig {
     fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,
-    increment = 8, // TODO: byoyomi - lishogi defaults this to zero here.
+    increment = 8,
     byoyomi = 10,
     periods = 1,
     days = 2,

@@ -3,7 +3,7 @@ package lila.tournament
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.GameLogic
-import strategygames.{ ClockConfig, FischerClock }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
 import org.joda.time.DateTime
 import play.api.i18n.Lang
 
@@ -243,6 +243,7 @@ object Schedule {
     case object Blitz35     extends Speed(75)
     case object Blitz51     extends Speed(80)
     case object Blitz53     extends Speed(85)
+    case object Byoyomi510  extends Speed(510)
     val all: List[Speed] =
       List(
         UltraBullet,
@@ -255,6 +256,7 @@ object Schedule {
         Blitz35,
         Blitz51,
         Blitz53,
+        Byoyomi510,
         Rapid,
         Classical
       )
@@ -269,6 +271,19 @@ object Schedule {
         case _                                                       => false
       }
     def fromClock(clock: ClockConfig) = {
+      clock match {
+        case _: FischerClock.Config => {
+          val time = clock.estimateTotalSeconds
+          if (time < 30) UltraBullet
+          else if (time < 60) HyperBullet
+          else if (time < 120) Bullet
+          else if (time < 180) HippoBullet
+          else if (time < 480) Blitz
+          else if (time < 1500) Rapid
+          else Classical
+        }
+        case _: ByoyomiClock.Config => Byoyomi510 //TODO add other options if we want to support them
+      }
       val time = clock.estimateTotalSeconds
       if (time < 30) UltraBullet
       else if (time < 60) HyperBullet
@@ -286,6 +301,7 @@ object Schedule {
           PerfType.orDefaultSpeed("blitz")
         case Rapid     => PerfType.orDefaultSpeed("rapid")
         case Classical => PerfType.orDefaultSpeed("classical")
+        case _         => PerfType.orDefaultSpeed("standard")
       }
   }
 
@@ -364,7 +380,6 @@ object Schedule {
   private def zhInc(s: Schedule)       = s.at.getHourOfDay % 2 == 0
 
   private def zhEliteTc(s: Schedule) = {
-    // TODO: byoyomi also support byoyomi here?
     val TC = FischerClock.Config
     s.at.getDayOfMonth / 7 match {
       case 0 => TC(3 * 60, 0)
@@ -379,8 +394,8 @@ object Schedule {
     import Freq._, Speed._
     import strategygames.chess.variant._
 
-    // TODO: byoyomi also support byoyomi here?
     val TC = FischerClock.Config
+    val BC = ByoyomiClock.Config
 
     (s.freq, s.variant, s.speed) match {
       // Special cases.
@@ -401,6 +416,7 @@ object Schedule {
       case (_, _, Blitz35)     => TC(3 * 60, 5)
       case (_, _, Blitz51)     => TC(5 * 60, 1)
       case (_, _, Blitz53)     => TC(5 * 60, 3)
+      case (_, _, Byoyomi510)  => BC(5 * 60, 0, 10, 1)
       case (_, _, Rapid)       => TC(10 * 60, 0)
       case (_, _, Classical)   => TC(20 * 60, 10)
     }

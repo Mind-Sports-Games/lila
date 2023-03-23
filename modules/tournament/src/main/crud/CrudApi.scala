@@ -24,8 +24,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
     CrudForm.apply fill CrudForm.Data(
       name = tour.name,
       homepageHours = ~tour.spotlight.flatMap(_.homepageHours),
-      clockTime = tour.clock.limitInMinutes,
-      clockIncrement = tour.clock.incrementSeconds,
+      clock = tour.clock,
       minutes = tour.minutes,
       variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
       position = tour.position,
@@ -68,7 +67,6 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       maxPerPage = MaxPerPage(20)
     )
 
-  // TODO: byoyomi needs updating here
   private def empty =
     Tournament.make(
       by = Left(User.playstrategyId),
@@ -88,13 +86,11 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       hasChat = true
     )
 
-  // TODO: byoyomi needs updating here
   private def updateTour(tour: Tournament, data: CrudForm.Data) = {
     import data._
-    val clock = FischerClock.Config((clockTime * 60).toInt, clockIncrement)
     tour.copy(
       name = name,
-      clock = clock,
+      clock = if (tour.isCreated) clock else tour.clock,
       minutes = minutes,
       variant = realVariant,
       startsAt = date,
