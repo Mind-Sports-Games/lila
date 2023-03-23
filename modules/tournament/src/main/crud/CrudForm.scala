@@ -8,7 +8,7 @@ import play.api.data.Forms._
 import strategygames.variant.Variant
 import lila.common.Form._
 import strategygames.format.FEN
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, GameLogic }
 
 object CrudForm {
 
@@ -17,13 +17,47 @@ object CrudForm {
 
   val maxHomepageHours = 168
 
+  // Yes, I know this is kinda gross. :'(
+  private def valuesFromClockConfig(
+      c: ClockConfig
+  ): Option[(Boolean, Double, Int, Option[Int], Option[Int])] =
+    c match {
+      case fc: FischerClock.Config => {
+        FischerClock.Config.unapply(fc).map(t => (false, t._1 / 4d, t._2, None, None))
+      }
+      case bc: ByoyomiClock.Config => {
+        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 4d, t._2, Some(t._3), Some(t._4)))
+      }
+    }
+
+  // Yes, I know this is kinda gross. :'(
+  private def clockConfigFromValues(
+      useByoyomi: Boolean,
+      limit: Double,
+      increment: Int,
+      byoyomi: Option[Int],
+      periods: Option[Int]
+  ): ClockConfig =
+    (useByoyomi, byoyomi, periods) match {
+      case (true, Some(byoyomi), Some(periods)) =>
+        ByoyomiClock.Config((limit * 60).toInt, increment, byoyomi, periods)
+      case _ =>
+        FischerClock.Config((limit * 60).toInt, increment)
+    }
+
   lazy val apply = Form(
     mapping(
-      "name"           -> text(minLength = 3, maxLength = 40),
-      "homepageHours"  -> number(min = 0, max = maxHomepageHours),
-      "clockTime"      -> numberInDouble(clockTimeChoices),
-      "clockIncrement" -> numberIn(clockIncrementChoices),
-      "minutes"        -> number(min = 20, max = 1440),
+      "name"          -> text(minLength = 3, maxLength = 40),
+      "homepageHours" -> number(min = 0, max = maxHomepageHours),
+      "clock" -> mapping[ClockConfig, Boolean, Double, Int, Option[Int], Option[Int]](
+        "useByoyomi" -> boolean,
+        "limit"      -> numberInDouble(clockTimeChoices),
+        "increment"  -> numberIn(clockIncrementChoices),
+        "byoyomi"    -> optional(numberIn(clockByoyomiChoices)),
+        "periods"    -> optional(numberIn(periodsChoices))
+      )(clockConfigFromValues)(valuesFromClockConfig)
+        .verifying("Invalid clock", _.estimateTotalSeconds > 0),
+      "minutes" -> number(min = 20, max = 1440),
       "variant" -> optional(
         nonEmptyText.verifying(v =>
           Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined
@@ -45,8 +79,7 @@ object CrudForm {
   ) fill CrudForm.Data(
     name = "",
     homepageHours = 0,
-    clockTime = clockTimeDefault,
-    clockIncrement = clockIncrementDefault,
+    clock = FischerClock.Config(180, 0),
     minutes = minuteDefault,
     variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
     position = none,
@@ -64,8 +97,7 @@ object CrudForm {
   case class Data(
       name: String,
       homepageHours: Int,
-      clockTime: Double,
-      clockIncrement: Int,
+      clock: ClockConfig,
       minutes: Int,
       variant: Option[String],
       position: Option[FEN],
@@ -91,11 +123,11 @@ object CrudForm {
 
     def realPosition = position ifTrue realVariant.standard
 
-    def validClock = (clockTime + clockIncrement) > 0
+    def validClock = (clock.limitSeconds + clock.incrementSeconds) > 0
 
     def validTiming = (minutes * 60) >= (3 * estimatedGameDuration)
 
-    private def estimatedGameDuration = 60 * clockTime + 30 * clockIncrement
+    private def estimatedGameDuration = 60 * clock.limitSeconds + 30 * clock.incrementSeconds
   }
 
   val imageChoices = List(

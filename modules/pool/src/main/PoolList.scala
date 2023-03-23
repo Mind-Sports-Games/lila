@@ -21,7 +21,11 @@ object PoolList {
       Wave(22 seconds, 30 players),
       Variant.Chess(strategygames.chess.variant.LinesOfAction)
     ),
-    PoolConfig(5 ++ 3, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Shogi)),
+    PoolConfig(
+      strategygames.ByoyomiClock.Config(5 * 60, 0, 10, 1),
+      Wave(22 seconds, 30 players),
+      Variant.FairySF(strategygames.fairysf.variant.Shogi)
+    ),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Xiangqi)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Flipello)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Amazons)),
@@ -38,7 +42,6 @@ object PoolList {
   val json = Json toJson all
 
   implicit private class PimpedInt(self: Int) {
-    // TODO: byoyomi, we need to support byoyomi clocks here.
     def ++(increment: Int) = strategygames.FischerClock.Config(self * 60, increment)
     def players            = NbPlayers(self)
   }

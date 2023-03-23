@@ -77,7 +77,7 @@ case class HookConfig(
       blocking: Set[String]
   ): Either[Hook, Option[Seek]] =
     timeMode match {
-      case TimeMode.FischerClock =>
+      case TimeMode.FischerClock | TimeMode.ByoyomiClock =>
         val clock = justMakeClock
         Left(
           Hook.make(
