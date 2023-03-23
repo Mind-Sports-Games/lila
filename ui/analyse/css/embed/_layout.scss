@@ -35,12 +35,12 @@
 
 @each $variant in ('crazyhouse', 'minishogi') {
   .analyse.variant-#{$variant} {
-    grid-template-rows: 50px auto 3rem 50px;
+    grid-template-rows: 9.5vw auto 3rem 9.5vw;
     grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
   }
 }
 .analyse.variant-shogi {
-  grid-template-rows: 35px auto 3rem 35px;
+  grid-template-rows: 7vw auto 3rem 7vw;
   grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
 }
 
