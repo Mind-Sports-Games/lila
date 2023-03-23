@@ -12,7 +12,8 @@ import lila.user.User
 final private class PoolActor(
     config: PoolConfig,
     hookThieve: HookThieve,
-    gameStarter: GameStarter
+    gameStarter: GameStarter,
+    botGameStarter: BotGameStarter
 ) extends Actor {
 
   import PoolActor._
@@ -84,6 +85,17 @@ final private class PoolActor(
       members = members.diff(pairedMembers).map(_.incMisses)
 
       if (pairings.nonEmpty) gameStarter(config, pairings)
+      else if (
+        candidates
+          .filter(!_.lame)
+          .size == 1
+      )
+        candidates
+          .filter(c => !c.lame && c.misses >= 1)
+          .headOption
+          .map(
+            botGameStarter(config, _)
+          )
 
       monitor.candidates(monId).record(candidates.size)
       monitor.paired(monId).record(pairedMembers.size)

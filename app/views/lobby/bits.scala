@@ -180,4 +180,26 @@ object bits {
         )
       )
     )
+
+  def weeklyChallenge(weekCha: lila.lobby.WeeklyChallenge)(implicit ctx: Context) =
+    div(cls := "lobby__weekcha lobby__box")(
+      div(cls := "lobby__box__top")(
+        h2(cls := "title text", dataIcon := '')(trans.weeklyChallenge()),
+        a(cls := "more", href := "/blog/ZAthlBAAACMA7gGg/weekly-challenges")(trans.more(), " »")
+      ),
+      div(cls := "current_week")(
+        a(href := s"/forum/weekly-challenges/${weekCha.currentKey}")(
+          iconTag(weekCha.currentIconChar),
+          weekCha.currentName
+        )
+      ),
+      div(cls := "previous_week")(
+        a(cls := "last_week", href := s"/forum/weekly-challenges/${weekCha.previousKey}")(
+          iconTag(weekCha.previousIconChar),
+          weekCha.previousName
+        ),
+        userIdLink(weekCha.winner.some, dataIcon = 'g'.some)
+      )
+    )
+
 }

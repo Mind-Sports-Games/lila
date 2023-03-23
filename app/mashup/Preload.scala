@@ -5,6 +5,7 @@ import lila.api.Context
 import lila.event.Event
 import lila.forum.MiniForumPost
 import lila.game.{ Game, Pov }
+import lila.lobby.WeeklyChallenge
 import lila.playban.TempBan
 import lila.simul.{ Simul, SimulIsFeaturable }
 import lila.streamer.LiveStreams
@@ -40,6 +41,7 @@ final class Preload(
       events: Fu[List[Event]],
       simuls: Fu[List[Simul]],
       streamerSpots: Int,
+      weeklyChallenge: WeeklyChallenge,
       chatOption: Fu[Option[lila.chat.UserChat.Mine]],
       chatVersion: Fu[Option[lila.socket.Socket.SocketVersion]]
   )(implicit ctx: Context): Fu[Homepage] =
@@ -88,7 +90,8 @@ final class Preload(
               blindGames,
               lobbySocket.counters,
               chatOption,
-              chatVersion
+              chatVersion,
+              weeklyChallenge
             )
           }
       }
@@ -133,7 +136,8 @@ object Preload {
       blindGames: List[Pov],
       counters: lila.lobby.LobbyCounters,
       chatOption: Option[lila.chat.UserChat.Mine],
-      chatVersion: Option[lila.socket.Socket.SocketVersion]
+      chatVersion: Option[lila.socket.Socket.SocketVersion],
+      weeklyChallenge: WeeklyChallenge
   )
 
   case class CurrentGame(pov: Pov, opponent: String)
