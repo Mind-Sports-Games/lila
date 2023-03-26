@@ -65,12 +65,23 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
     }
   }
 
+  private def duplicateValsForMultiMoveGames(
+      work: Work.Analysis,
+      evals: List[Option[Evaluation.OrSkipped[Uci]]]
+  ): List[Option[Evaluation.OrSkipped[Uci]]] = {
+    work.game.variant.plysPerTurn match {
+      case 2 => evals.flatMap(e => List(e, e))
+      case 1 => evals
+      case _ => sys.error("More work needs to be done for variants that have more than 2 plys per turn")
+    }
+  }
+
   private def mergeEvalsAndCached(
       work: Work.Analysis,
       evals: List[Option[Evaluation.OrSkipped[Uci]]],
       cached: Map[Int, Evaluation[Uci]]
   ): List[Option[Evaluation[Uci]]] =
-    evals.zipWithIndex.map {
+    duplicateValsForMultiMoveGames(work, evals).zipWithIndex.map {
       case (None, i)              => cached get i
       case (Some(Right(eval)), i) => cached.getOrElse(i, eval).some
       case (_, i) =>
