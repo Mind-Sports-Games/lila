@@ -236,7 +236,7 @@ object JsonApi {
     implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g =>
       Json.obj(
         "game_id"  -> g.game_id,
-        "position" -> FEN.fishnetFen(g.variant)(g.position)
+        "position" -> FEN.fishnetFen(g.variant)(g.position),
         "variant"  -> g.variant,
         "moves"    -> UciDump.fishnetUci(g.variant)(g.moves)
       )
