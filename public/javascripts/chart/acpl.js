@@ -25,18 +25,18 @@ playstrategy.advantageChart = function (data, trans, el) {
         }
 
         var makeSerieData = function (d) {
-        var twoPlysPerTurnVariants = ['amazons'];
-        var colorForPly = function(ply) {
-          if (
-            twoPlysPerTurnVariants.find(function(k) {
-              return k === data.game.variant.key;
-            })
-          ) {
-            return (ply / 2) & 1;
-          } else {
-            return ply & 1;
-          }
-        };
+          var twoPlysPerTurnVariants = ['amazons'];
+          var colorForPly = function (ply) {
+            if (
+              twoPlysPerTurnVariants.find(function (k) {
+                return k === data.game.variant.key;
+              })
+            ) {
+              return (ply / 2) & 1;
+            } else {
+              return ply & 1;
+            }
+          };
 
           var partial = !d.analysis || d.analysis.partial;
           return d.treeParts.slice(1).map(function (node) {
