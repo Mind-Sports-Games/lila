@@ -23,7 +23,16 @@ case class Schedule(
 
   // Simpler naming for now.
   def name(full: Boolean = true)(implicit lang: Lang): String = {
-    s"${VariantKeys.variantName(variant)} Mind Sports Olympiad Warm-up"
+    import Schedule.Freq._
+    import Schedule.Speed._
+    import lila.i18n.I18nKeys.tourname._
+
+    freq match {
+      case Weekly if full => weeklyXArena.txt(VariantKeys.variantName(variant))
+      case Weekly =>
+        weeklyX.txt(VariantKeys.variantName(variant))
+      case _ => s"${VariantKeys.variantName(variant)} Mind Sports Olympiad Warm-up"
+    }
     /*
     import Schedule.Freq._
     import Schedule.Speed._
@@ -243,6 +252,7 @@ object Schedule {
     case object Blitz35     extends Speed(75)
     case object Blitz51     extends Speed(80)
     case object Blitz53     extends Speed(85)
+    case object Byoyomi35   extends Speed(305)
     case object Byoyomi510  extends Speed(510)
     val all: List[Speed] =
       List(
@@ -256,6 +266,7 @@ object Schedule {
         Blitz35,
         Blitz51,
         Blitz53,
+        Byoyomi35,
         Byoyomi510,
         Rapid,
         Classical
@@ -270,7 +281,7 @@ object Schedule {
         case (HyperBullet, UltraBullet) | (UltraBullet, HyperBullet) => true
         case _                                                       => false
       }
-    def fromClock(clock: ClockConfig) = {
+    def fromClock(clock: ClockConfig) =
       clock match {
         case _: FischerClock.Config => {
           val time = clock.estimateTotalSeconds
@@ -282,17 +293,12 @@ object Schedule {
           else if (time < 1500) Rapid
           else Classical
         }
-        case _: ByoyomiClock.Config => Byoyomi510 //TODO add other options if we want to support them
+        case _: ByoyomiClock.Config => {
+          val time = clock.estimateTotalSeconds
+          if (time <= (180 + 5 * 25)) Byoyomi35
+          else Byoyomi510
+        }
       }
-      val time = clock.estimateTotalSeconds
-      if (time < 30) UltraBullet
-      else if (time < 60) HyperBullet
-      else if (time < 120) Bullet
-      else if (time < 180) HippoBullet
-      else if (time < 480) Blitz
-      else if (time < 1500) Rapid
-      else Classical
-    }
     def toPerfType(speed: Speed) =
       speed match {
         case UltraBullet                        => PerfType.orDefaultSpeed("ultraBullet")
@@ -417,6 +423,7 @@ object Schedule {
       case (_, _, Blitz51)     => TC(5 * 60, 1)
       case (_, _, Blitz53)     => TC(5 * 60, 3)
       case (_, _, Byoyomi510)  => BC(5 * 60, 0, 10, 1)
+      case (_, _, Byoyomi35)   => BC(3 * 60, 0, 5, 1)
       case (_, _, Rapid)       => TC(10 * 60, 0)
       case (_, _, Classical)   => TC(20 * 60, 10)
     }

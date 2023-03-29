@@ -857,20 +857,23 @@ final class TournamentApi(
         )
   }
 
-  private[tournament] def subscribeBotsToShields: Funit =
+  private[tournament] def subscribeBotsToArenas: Funit =
+    subscribeBots(Schedule.Freq.Weekly :: Schedule.Freq.shields, TournamentShield.MedleyShield.medleyTeamIDs)
+
+  private[tournament] def subscribeBots(freq: List[Schedule.Freq], teamIds: List[TeamID]): Funit =
     fuccess(
       for {
-        botUsers    <- userRepo.byIds(LightUser.tourBotsIDs)
-        shieldTours <- tournamentRepo.byScheduleCategory(Schedule.Freq.shields)
+        botUsers <- userRepo.byIds(LightUser.tourBotsIDs)
+        tours    <- tournamentRepo.byScheduleCategory(freq)
       } for {
         botUser <- botUsers
-        tour    <- shieldTours
+        tour    <- tours
       } join(
         tour.id,
         botUser,
         none,
         none,
-        getUserTeamIds = _ => fuccess(TournamentShield.MedleyShield.medleyTeamIDs),
+        getUserTeamIds = _ => fuccess(teamIds),
         false,
         none
       )
