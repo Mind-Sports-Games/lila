@@ -252,6 +252,8 @@ final private class TournamentScheduler(
       (nextSunday, 22)
     )
 
+    val nextWeeklySchedule = weeklySchedule.map { case (day, hour) => (day.plusDays(7), hour) }
+
     // also add appropiate time slot,  be careful to slot in correctly otherwise, additional
     // weekly tournaments will be created!
     // Option 1 (preferred): Look at the current schedule on live and slot the variant in to match the timeslot (for release)
@@ -301,7 +303,7 @@ final private class TournamentScheduler(
     }
 
     // weekly tournaments
-    val weeklyTourmaments = weeklySchedule.zipWithIndex.map {
+    val weeklyTourmaments = (weeklySchedule.zipWithIndex ++ nextWeeklySchedule.zipWithIndex).map {
       case (date, i) => {
         val rotatedVaraints = rotate(weeklyVariants, date._1.weekOfWeekyear().get())
         (date, rotatedVaraints.lift(i).getOrElse(weeklyVariantDefault))
