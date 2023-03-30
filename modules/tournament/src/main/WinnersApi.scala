@@ -25,6 +25,7 @@ case class FreqWinners(
     introductory: Option[Winner],
     yearly: Option[Winner],
     monthly: Option[Winner],
+    shield: Option[Winner],
     weekly: Option[Winner],
     daily: Option[Winner]
 ) {
@@ -33,14 +34,15 @@ case class FreqWinners(
     daily.filter(_.date isAfter DateTime.now.minusHours(2)) orElse
       weekly.filter(_.date isAfter DateTime.now.minusDays(1)) orElse
       monthly.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
+      shield.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
       yearly.filter(_.date isAfter DateTime.now.minusDays(28)) orElse
       mso21.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
       msoGP.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
       msoWarmUp.filter(_.date isAfter DateTime.now.minusDays(14)) orElse
-      introductory orElse msoGP orElse mso21 orElse msoWarmUp orElse yearly orElse monthly orElse weekly orElse daily
+      introductory orElse msoGP orElse mso21 orElse msoWarmUp orElse yearly orElse monthly orElse shield orElse weekly orElse daily
 
   def userIds =
-    List(mso21, msoGP, msoWarmUp, introductory, yearly, monthly, weekly, daily).flatten.map(_.userId)
+    List(mso21, msoGP, msoWarmUp, introductory, yearly, monthly, shield, weekly, daily).flatten.map(_.userId)
 }
 
 case class AllWinners(
@@ -106,6 +108,7 @@ final class WinnersApi(
     for {
       yearlies     <- fetchLastFreq(Freq.Yearly, DateTime.now.minusYears(1))
       monthlies    <- fetchLastFreq(Freq.Monthly, DateTime.now.minusMonths(2))
+      shields      <- fetchLastFreq(Freq.Shield, DateTime.now.minusMonths(2))
       weeklies     <- fetchLastFreq(Freq.Weekly, DateTime.now.minusWeeks(2))
       dailies      <- fetchLastFreq(Freq.Daily, DateTime.now.minusDays(2))
       mso21        <- fetchLastFreq(Freq.MSO21, DateTime.now.minusMonths(8))
@@ -134,6 +137,7 @@ final class WinnersApi(
           v.key -> FreqWinners(
             yearly = firstVariantWinner(yearlies, v),
             monthly = firstVariantWinner(monthlies, v),
+            shield = firstVariantWinner(shields, v),
             weekly = firstVariantWinner(weeklies, v),
             daily = firstVariantWinner(dailies, v),
             mso21 = firstVariantWinner(mso21, v),
