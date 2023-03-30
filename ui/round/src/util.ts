@@ -174,7 +174,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisBoardVariants: VariantKey[] = ['amazons'];
+const noAnalysisBoardVariants: VariantKey[] = [];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisBoardVariants.indexOf(variant) == -1;

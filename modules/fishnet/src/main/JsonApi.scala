@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import strategygames.format.{ FEN, LexicalUci, Uci }
+import strategygames.format.{ FEN, LexicalUci, Uci, UciDump }
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameLogic }
 import org.joda.time.DateTime
@@ -236,9 +236,9 @@ object JsonApi {
     implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g =>
       Json.obj(
         "game_id"  -> g.game_id,
-        "position" -> g.position,
+        "position" -> FEN.fishnetFen(g.variant)(g.position),
         "variant"  -> g.variant,
-        "moves"    -> g.moves.map(_.fishnetUci).mkString(" ")
+        "moves"    -> UciDump.fishnetUci(g.variant)(g.moves)
       )
     }
     implicit val WorkIdWrites = Writes[Work.Id] { id =>
