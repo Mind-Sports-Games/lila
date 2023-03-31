@@ -15,7 +15,7 @@ import lila.common.HTTPRequest
 import lila.hub.LightTeam._
 import lila.memo.CacheApi._
 import lila.tournament.TournamentForm
-import lila.tournament.{ VisibleTournaments, Tournament => Tour }
+import lila.tournament.{ VisibleTournaments, Tournament => Tour, ShieldTableApi }
 import lila.swiss.{ Swiss => LSwiss }
 import lila.user.{ User => UserModel }
 
@@ -543,7 +543,11 @@ final class Tournament(
     Open { implicit ctx =>
       env.tournament.shieldTableApi.byCategoryId(id).flatMap { case (userPoints) =>
         env.user.lightUserApi preloadMany userPoints.map(_.userId) inject
-          html.tournament.shields.leaderboardByCateg(userPoints)
+          html.tournament.shields.leaderboardByCateg(
+            userPoints,
+            ShieldTableApi.Category.titleFromId(id),
+            ShieldTableApi.Category.restrictionGameFamily(id)
+          )
       }
     }
 

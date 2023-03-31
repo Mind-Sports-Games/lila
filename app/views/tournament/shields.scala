@@ -3,8 +3,7 @@ package views.html.tournament
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.tournament.{ Tournament, TournamentShield }
-import lila.tournament.ShieldTableApi.ShieldTableEntry
+import lila.tournament.{ ShieldTableApi, Tournament, TournamentShield }
 import lila.swiss.Swiss
 import lila.i18n.VariantKeys
 
@@ -16,14 +15,26 @@ object shields {
 
   def apply(history: TournamentShield.History)(implicit ctx: Context) =
     views.html.base.layout(
-      title = "Tournament shields",
+      title = "Tournament Shields",
       moreCss = cssTag("tournament.leaderboard"),
       wrapClass = "full-screen-force"
     ) {
       main(cls := "page-menu")(
         views.html.user.bits.communityMenu("shield"),
         div(cls := "page-menu__content box box-pad")(
-          h1("Tournament shields"),
+          h1("Tournament Shields"),
+          h2("Shield Leaderboards:"),
+          div(cls := "shield-leaderboards")(
+            ShieldTableApi.Category.all.map { category =>
+              section(
+                h2(
+                  a(href := routes.Tournament.shieldLeaderboard(category.id))(
+                    category.name
+                  )
+                )
+              )
+            }
+          ),
           h2("Medley Shields:"),
           div(cls := "medley-shields")(
             TournamentShield.MedleyShield.all.map { medley =>
@@ -86,20 +97,46 @@ object shields {
       )
     }
 
-  def leaderboardByCateg(userPoints: List[ShieldTableEntry])(implicit ctx: Context) =
+  def leaderboardByCateg(
+      userPoints: List[ShieldTableApi.ShieldTableEntry],
+      title: String,
+      restrictionGameFamily: String
+  )(implicit
+      ctx: Context
+  ) =
     views.html.base.layout(
       title = "Shield Leaderboard",
       moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist"))
     ) {
-      main(cls := "page-menu page-small tournament-categ-shields")(
-        views.html.user.bits.communityMenu("shieldLeaderboard"),
-        div(cls := "page-menu__content box")(
-          ol(userPoints.map { up =>
-            li(
-              userIdLink(up.userId.some),
-              span(cls := "points")(up.points)
+      main(cls := "page-small box tournament-categ-shields")(
+        h1(a(href := routes.Tournament.shields, dataIcon := "I"), title),
+        table(cls := "slist slist-pad")(
+          tbody(
+            userPoints.zipWithIndex.map { case (u, i) =>
+              tr(
+                td(i + 1),
+                td(userIdLink(u.userId.some)),
+                td(cls := "row-num")(u.points)
+              )
+            }
+          )
+        ),
+        div(cls := "shield-leaderboard-faq")(
+          h2(trans.faq.howDoesTheSheildLeaderboardWork.txt()),
+          p(
+            trans.faq.shieldLeaderboardOverview(
+              a(href := routes.Tournament.shields)(s"${restrictionGameFamily}Shield")
             )
-          })
+          ),
+          ol(
+            li(trans.faq.firstPlaceShield()),
+            li(trans.faq.secondPlaceShield()),
+            li(trans.faq.thirdPlaceShield()),
+            li(trans.faq.playedAtLeastOneGameShield())
+          ),
+          p(
+            trans.faq.otherShieldLeaderboardRestrictons()
+          )
         )
       )
     }

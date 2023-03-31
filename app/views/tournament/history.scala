@@ -46,13 +46,13 @@ object history {
     Freq.MSOGP,
     Freq.MSO21,
     Freq.MSOWarmUp,
-    Freq.Unique
+    Freq.Unique,
     //Freq.Marathon,
     //Freq.Shield,
     //Freq.Yearly,
     //Freq.Monthly,
     //Freq.Weekend,
-    //Freq.Weekly,
+    Freq.Weekly
     //Freq.Daily,
     //Freq.Hourly
   )

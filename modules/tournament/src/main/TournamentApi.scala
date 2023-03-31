@@ -286,8 +286,20 @@ final class TournamentApi(
         }.sequenceFu.void
       }
     }
-    tour.schedule.??(_.freq == Schedule.Freq.Shield) ?? {
+    tour.schedule.??(s => List(Schedule.Freq.Shield, Schedule.Freq.MedleyShield).contains(s.freq)) ?? {
       shieldTableApi.recalculate(ShieldTableApi.Category.Overall)
+    }
+    tour.trophy1st.??(_ == "shieldChessMedley") ?? {
+      shieldTableApi.recalculate(ShieldTableApi.Category.Chess)
+    }
+    tour.trophy1st.??(_ == "shieldDraughtsMedley") ?? {
+      shieldTableApi.recalculate(ShieldTableApi.Category.Draughts)
+    }
+    tour.schedule.??(_.freq == Schedule.Freq.Shield && tour.variant.gameFamily.id == 0) ?? {
+      shieldTableApi.recalculate(ShieldTableApi.Category.Chess)
+    }
+    tour.schedule.??(_.freq == Schedule.Freq.Shield && tour.variant.gameFamily.id == 1) ?? {
+      shieldTableApi.recalculate(ShieldTableApi.Category.Draughts)
     }
     tour.trophy1st ?? { trophyKind =>
       playerRepo.bestByTourWithRank(tour.id, 1).flatMap {
@@ -861,20 +873,23 @@ final class TournamentApi(
         )
   }
 
-  private[tournament] def subscribeBotsToShields: Funit =
+  private[tournament] def subscribeBotsToArenas: Funit =
+    subscribeBots(Schedule.Freq.Weekly :: Schedule.Freq.shields, TournamentShield.MedleyShield.medleyTeamIDs)
+
+  private[tournament] def subscribeBots(freq: List[Schedule.Freq], teamIds: List[TeamID]): Funit =
     fuccess(
       for {
-        botUsers    <- userRepo.byIds(LightUser.tourBotsIDs)
-        shieldTours <- tournamentRepo.byScheduleCategory(Schedule.Freq.shields)
+        botUsers <- userRepo.byIds(LightUser.tourBotsIDs)
+        tours    <- tournamentRepo.byScheduleCategory(freq)
       } for {
         botUser <- botUsers
-        tour    <- shieldTours
+        tour    <- tours
       } join(
         tour.id,
         botUser,
         none,
         none,
-        getUserTeamIds = _ => fuccess(TournamentShield.MedleyShield.medleyTeamIDs),
+        getUserTeamIds = _ => fuccess(teamIds),
         false,
         none
       )

@@ -23,7 +23,16 @@ case class Schedule(
 
   // Simpler naming for now.
   def name(full: Boolean = true)(implicit lang: Lang): String = {
-    s"${VariantKeys.variantName(variant)} Mind Sports Olympiad Warm-up"
+    import Schedule.Freq._
+    import Schedule.Speed._
+    import lila.i18n.I18nKeys.tourname._
+
+    freq match {
+      case Weekly if full => weeklyXArena.txt(VariantKeys.variantName(variant))
+      case Weekly =>
+        weeklyX.txt(VariantKeys.variantName(variant))
+      case _ => s"${VariantKeys.variantName(variant)} Mind Sports Olympiad Warm-up"
+    }
     /*
     import Schedule.Freq._
     import Schedule.Speed._

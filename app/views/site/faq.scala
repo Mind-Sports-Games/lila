@@ -34,14 +34,14 @@ object faq {
           "what",
           whatIsPlayStrategy.txt(),
           playstrategyAboutSummary(
-            a(href := "/about")("PlayStrategy"),
+            a(href := "/about")("PlayStrategy")
           )
         ),
         question(
           "donating",
           canIDonateToPlayStrategy.txt(),
           playstrategyFundedByDonations(
-            a(href := "/patron")("patron"),
+            a(href := "/patron")("patron")
           )
         ),
         question(
@@ -49,7 +49,7 @@ object faq {
           howAreWeDifferentFromLichess.txt(),
           playstrategySupportsDifferentAbstractGames(
             a(href := "https://lichess.org")("lichess.org"),
-            a(href := "https://mindsportsolympiad.com/")("Mind Sports Olympiad"),
+            a(href := "https://mindsportsolympiad.com/")("Mind Sports Olympiad")
           )
         ),
         h2(gameplay()),
@@ -207,6 +207,24 @@ object faq {
           ),
           p(
             secondRequirementToStopOldPlayersTrustingLeaderboards()
+          )
+        ),
+        question(
+          "shield-leaderboards",
+          howDoesTheSheildLeaderboardWork.txt(),
+          p(
+            shieldLeaderboardOverview(
+              a(href := routes.Tournament.shields)("Shield")
+            )
+          ),
+          ol(
+            li(firstPlaceShield()),
+            li(secondPlaceShield()),
+            li(thirdPlaceShield()),
+            li(playedAtLeastOneGameShield())
+          ),
+          p(
+            otherShieldLeaderboardRestrictons()
           )
         ),
         question(

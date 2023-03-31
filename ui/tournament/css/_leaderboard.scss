@@ -3,6 +3,7 @@ $narrow-user-list-width: 30ch;
 
 .tournament-leaderboards,
 .tournament-shields,
+.shield-leaderboards,
 .medley-shields,
 .medley-variants {
   @extend %box-radius;
@@ -100,6 +101,7 @@ $narrow-user-list-width: 30ch;
   }
 }
 
+.shield-leaderboards,
 .medley-shields {
   h2 {
     font-size: 3em;
@@ -108,6 +110,7 @@ $narrow-user-list-width: 30ch;
 }
 
 @media (min-width: 1700px) {
+  .shield-leaderboards,
   .medley-shields {
     grid-template-columns: repeat(auto-fit, minmax($user-list-width, 1fr));
   }
@@ -120,6 +123,7 @@ $narrow-user-list-width: 30ch;
 }
 
 .tournament-shields,
+.shield-leaderboards,
 .medley-shields {
   h2 {
     position: relative;
@@ -130,6 +134,12 @@ $narrow-user-list-width: 30ch;
 .tournament-shields {
   h2 {
     padding-left: 95px;
+  }
+}
+
+.shield-leaderboards {
+  h2 {
+    text-align: center;
   }
 }
 
@@ -211,6 +221,19 @@ $narrow-user-list-width: 30ch;
     &:nth-child(odd) {
       background: $c-bg-zebra;
     }
+  }
+}
+
+.shield-leaderboard-faq {
+  padding-left: 4em;
+  padding-right: 4em;
+  padding-top: 4em;
+  padding-bottom: 3em;
+  p {
+    margin-top: 2em;
+  }
+  ol {
+    border-bottom: 2px solid $c-bg-zebra;
   }
 }
 
