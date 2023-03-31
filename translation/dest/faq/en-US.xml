@@ -130,6 +130,13 @@ Another point to note is that, as time passes, the confidence interval will incr
   <string name="ratingDeviationLowerThanXinChessYinVariants">have a rating deviation lower than %1$s, in standard chess, and lower than %2$s in variants,</string>
   <string name="beInTopTen">be in the top 10 in this rating.</string>
   <string name="secondRequirementToStopOldPlayersTrustingLeaderboards">The 2nd requirement is so that players who no longer use their accounts stop populating leaderboards.</string>
+  <string name="howDoesTheSheildLeaderboardWork">How does the shield leaderboard work?</string>
+  <string name="shieldLeaderboardOverview">Every %1$s tournament that has been played in the last 2 months counts towards the Shield Leaderboard. This includes both Variant Shields and Medley Shields. The following points are awarded from each Shield:</string>
+  <string name="firstPlaceShield">1st Place: 5 points</string>
+  <string name="secondPlaceShield">2nd Place: 3 points</string>
+  <string name="thirdPlaceShield">3rd Place: 2 points</string>
+  <string name="playedAtLeastOneGameShield">Played at least one game: 1 point</string>
+  <string name="otherShieldLeaderboardRestrictons">The only other restriction is that a player can only use their best score from the same shield in their leaderboard score. For example if a player comes 2nd in the most recent Lines of Action shield but came 1st in the previous Lines of Action shield, then they will only have 5 points (for the 1st place) counting towards their total score.</string>
   <string name="whyAreRatingHigher">Why are ratings higher compared to other sites and organisations?</string>
   <string name="whyAreRatingHigherExplanation">It is not useful to think of ratings as absolute numbers, or compare them against other organisations. Different organisations have different levels of players, different rating systems (Elo, Glicko, Glicko-2, or a modified version of the aforementioned). These factors can drastically affect the absolute numbers (ratings).
 
