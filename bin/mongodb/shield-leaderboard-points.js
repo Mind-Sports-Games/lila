@@ -1,7 +1,3 @@
-db.tournament_leaderboard.updateMany({ r: 1 }, { $set: { mp: 3 } });
-db.tournament_leaderboard.updateMany({ r: 2 }, { $set: { mp: 1 } });
-db.tournament_leaderboard.updateMany({ r: { $gt: 2 } }, { $set: { mp: 0 } });
-
 db.tournament2.find({ trophy1st: 'shieldPlayStrategyMedley' }).forEach(t => {
   db.tournament_leaderboard.updateMany({ t: t._id }, { $set: { k: 'spm' } });
 });
@@ -16,4 +12,10 @@ db.tournament2.find({ 'schedule.freq': 'shield', variant: { $exists: true } }).f
 });
 db.tournament2.find({ 'schedule.freq': 'shield', variant: { $exists: false } }).forEach(t => {
   db.tournament_leaderboard.updateMany({ t: t._id }, { $set: { k: '0_1' } });
+});
+
+db.tournament2.find({ 'schedule.freq': {$in: ['shield', 'medleyshield'] }}).forEach(t => {
+  db.tournament_leaderboard.updateMany({ t: t._id, r: 1 }, { $set: { mp: 3 } });
+  db.tournament_leaderboard.updateMany({ t: t._id, r: 2 }, { $set: { mp: 1 } });
+  db.tournament_leaderboard.updateMany({ t: t._id, r: { $gt: 2 } }, { $set: { mp: 0 } });
 });
