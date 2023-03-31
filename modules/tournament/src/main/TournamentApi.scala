@@ -27,6 +27,7 @@ final class TournamentApi(
     playerRepo: PlayerRepo,
     pairingRepo: PairingRepo,
     tournamentRepo: TournamentRepo,
+    shieldTableApi: ShieldTableApi,
     apiJsonView: ApiJsonView,
     autoPairing: AutoPairing,
     pairingSystem: arena.PairingSystem,
@@ -284,6 +285,9 @@ final class TournamentApi(
           case rp => trophyApi.award(tournamentUrl(tour.id), rp.player.userId, marathonTopHundred)
         }.sequenceFu.void
       }
+    }
+    tour.schedule.??(_.freq == Schedule.Freq.Shield) ?? {
+      shieldTableApi.recalculate(ShieldTableApi.Category.Overall)
     }
     tour.trophy1st ?? { trophyKind =>
       playerRepo.bestByTourWithRank(tour.id, 1).flatMap {
