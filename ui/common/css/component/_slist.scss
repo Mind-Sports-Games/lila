@@ -25,6 +25,10 @@
     }
   }
 
+  td.row-num {
+    text-align: right;
+  }
+
   tbody tr:nth-child(even) {
     background: $c-bg-zebra;
   }

@@ -97,6 +97,9 @@ object ShieldTableApi {
 
     def getFromId(id: Int) = allById.getOrElse(id, Overall)
 
+    def titleFromId(id: Int) = s"${getFromId(id).name} Shield Leaderboard"
+
+    def restrictionGameFamily(id: Int) = if (id == 0) "" else s"${getFromId(id).name} "
   }
 
   case class ShieldTableEntry(
