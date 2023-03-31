@@ -278,6 +278,7 @@ GET   /tournament/leaderboard                 controllers.Tournament.leaderboard
 GET   /tournament/shields                     controllers.Tournament.shields
 GET   /tournament/shields/:categ              controllers.Tournament.categShields(categ: String)
 GET   /tournament/medley-shield/:categ        controllers.Tournament.medleyShield(categ: String)
+GET   /tournament/shield-leaderboard/:id      controllers.Tournament.shieldLeaderboard(id: Int)
 
 # Tournament CRUD
 GET   /tournament/manager                     controllers.TournamentCrud.index(page: Int ?= 1)

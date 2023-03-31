@@ -4,6 +4,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.tournament.{ Tournament, TournamentShield }
+import lila.tournament.ShieldTableApi.ShieldTableEntry
 import lila.swiss.Swiss
 import lila.i18n.VariantKeys
 
@@ -79,6 +80,24 @@ object shields {
               span(cls := "shield-trophy")(categ.iconChar.toString),
               userIdLink(aw.owner.value.some),
               a(href := routes.Tournament.show(aw.tourId))(showDate(aw.date))
+            )
+          })
+        )
+      )
+    }
+
+  def leaderboardByCateg(userPoints: List[ShieldTableEntry])(implicit ctx: Context) =
+    views.html.base.layout(
+      title = "Shield Leaderboard",
+      moreCss = frag(cssTag("tournament.leaderboard"), cssTag("slist"))
+    ) {
+      main(cls := "page-menu page-small tournament-categ-shields")(
+        views.html.user.bits.communityMenu("shieldLeaderboard"),
+        div(cls := "page-menu__content box")(
+          ol(userPoints.map { up =>
+            li(
+              userIdLink(up.userId.some),
+              span(cls := "points")(up.points)
             )
           })
         )

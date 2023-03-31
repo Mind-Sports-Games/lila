@@ -16,6 +16,7 @@ private class TournamentConfig(
     @ConfigName("collection.player") val playerColl: CollName,
     @ConfigName("collection.pairing") val pairingColl: CollName,
     @ConfigName("collection.leaderboard") val leaderboardColl: CollName,
+    @ConfigName("collection.shield_table") val shieldTableColl: CollName,
     @ConfigName("api_actor.name") val apiActorName: String
 )
 
@@ -56,6 +57,7 @@ final class Env(
   lazy val pairingRepo             = new PairingRepo(db(config.pairingColl))
   lazy val playerRepo              = new PlayerRepo(db(config.playerColl))
   private lazy val leaderboardRepo = new LeaderboardRepo(db(config.leaderboardColl))
+  private lazy val shieldTableRepo = new ShieldTableRepo(db(config.shieldTableColl))
 
   lazy val cached: Cached = wire[Cached]
 
@@ -100,6 +102,8 @@ final class Env(
 
   lazy val leaderboardApi = wire[LeaderboardApi]
 
+  lazy val shieldTableApi: ShieldTableApi = wire[ShieldTableApi]
+
   lazy val standingApi = wire[TournamentStandingApi]
 
   private lazy val leaderboardIndexer: LeaderboardIndexer = wire[LeaderboardIndexer]
@@ -140,6 +144,8 @@ final class Env(
           api.toggleFeaturing(id, true) inject "Done!"
         case "tournament" :: "unfeature" :: id :: Nil =>
           api.toggleFeaturing(id, false) inject "Done!"
+        case "shield-leaderboards" :: "recalc" :: Nil =>
+          shieldTableApi.recalculateAll inject "Done!"
       }
     }
 }
