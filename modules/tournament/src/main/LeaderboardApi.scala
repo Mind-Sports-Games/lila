@@ -98,6 +98,50 @@ final class LeaderboardApi(
         tours.find(_.id == entry.tourId).map { TourEntry(_, entry) }
       }
     }
+
+  private def findByCategory(lastXMonths: Int, category: ShieldTableApi.Category) =
+    $doc(
+      "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
+      "mp" $exists true,
+      "k" -> $doc(
+        "$regex" -> BSONRegex(s"^${category.id}_|${category.medleyShieldCode}", "")
+      )
+    )
+
+  private def findAll(lastXMonths: Int) =
+    $doc(
+      "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
+      "mp" $exists true,
+      "k" $exists true
+    )
+
+  def shieldLeaderboardMetaPoints(lastXMonths: Int, category: ShieldTableApi.Category) =
+    repo.coll
+      .find(
+        category match {
+          case ShieldTableApi.Category.Overall => findAll(lastXMonths)
+          case _                               => findByCategory(lastXMonths, category)
+        }
+      )
+      .cursor[Entry]()
+      .list()
+      .map { entries =>
+        entries
+          .map { e => (e.userId, e.shieldKey, e.metaPoints) }
+          .map { case (u, Some(k), Some(p)) => (u, k, p); case (u, _, _) => (u, "", 0) }
+          .groupBy(_._1)
+          .view
+          .mapValues(
+            _.map(v => (v._2, v._3))
+              .groupBy(_._1)
+              .view
+              .mapValues(_.map(_._2).max)
+              .toMap
+          )
+          .toMap
+          .map { case (u, v) => (u, v.map { case (_, p) => p }.sum) }
+      }
+
 }
 
 object LeaderboardApi {
@@ -118,6 +162,8 @@ object LeaderboardApi {
       score: Int,
       rank: Int,
       rankRatio: Ratio, // ratio * rankRatioMultiplier. function of rank and tour.nbPlayers. less is better.
+      metaPoints: Option[Int],
+      shieldKey: Option[String],
       freq: Option[Schedule.Freq],
       speed: Option[Schedule.Speed],
       perf: PerfType,

@@ -539,6 +539,14 @@ final class Tournament(
       }
     }
 
+  def shieldLeaderboard(id: Int) =
+    Open { implicit ctx =>
+      env.tournament.shieldTableApi.byCategoryId(id).flatMap { case (userPoints) =>
+        env.user.lightUserApi preloadMany userPoints.map(_.userId) inject
+          html.tournament.shields.leaderboardByCateg(userPoints)
+      }
+    }
+
   def nextMedleyShield(
       nextArena: Option[Tour],
       nextSwiss: Option[LSwiss]
