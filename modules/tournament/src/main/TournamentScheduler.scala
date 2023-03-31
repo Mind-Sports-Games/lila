@@ -45,6 +45,8 @@ final private class TournamentScheduler(
       val secondWeek = firstWeek plusDays 7
       val thirdWeek  = secondWeek plusDays 7
       val lastWeek   = lastDay.minusDays((lastDay.getDayOfWeek - 1) % 7)
+
+      val index = firstDay.getMonthOfYear()
     }
     val thisMonth = new OfMonth(0)
     val nextMonth = new OfMonth(1)
@@ -157,7 +159,7 @@ final private class TournamentScheduler(
     //schedule this months shields
     val thisMonthShields = TournamentShield.Category.all
       .map(shield =>
-        at(thisMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
+        at(thisMonthWithDay(shield.dayOfMonth), shield.scheduleHour(thisMonth.index)) map { date =>
           Schedule(Shield, shield.speed, shield.variant, none, date) plan {
             _.copy(
               name = s"${VariantKeys.variantName(shield.variant)} Shield",
@@ -176,7 +178,7 @@ final private class TournamentScheduler(
     //and schedule next month
     val nextMonthShields = TournamentShield.Category.all
       .map(shield =>
-        at(nextMonthWithDay(shield.dayOfMonth), shield.scheduleHour) map { date =>
+        at(nextMonthWithDay(shield.dayOfMonth), shield.scheduleHour(nextMonth.index)) map { date =>
           Schedule(Shield, shield.speed, shield.variant, none, date) plan {
             _.copy(
               name = s"${VariantKeys.variantName(shield.variant)} Shield",

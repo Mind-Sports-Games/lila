@@ -261,13 +261,19 @@ object TournamentShield {
       val variant: Variant,
       val speed: Schedule.Speed,
       val dayOfMonth: Int,
-      val offsetHour: Int = 0
+      val group: Int = 0
   ) {
     def key                       = variant.key
     def name                      = VariantKeys.variantName(variant)
     def iconChar                  = variant.perfIcon
     def matches(tour: Tournament) = Some(variant).has(tour.variant)
-    def scheduleHour              = TournamentShield.defaultShieldHour + offsetHour
+
+    private def hoursList(month: Int) =
+      if (month % 2 == 0) TournamentShield.defaultShieldHours
+      else TournamentShield.alternateShieldHours
+
+    def scheduleHour(month: Int) =
+      hoursList(month).lift(group).getOrElse(TournamentShield.defaultShieldHours(0))
   }
 
   object Category {
@@ -426,7 +432,7 @@ object TournamentShield {
           Variant.Draughts(strategygames.draughts.variant.Portuguese),
           Blitz32,
           27,
-          -1
+          1
         )
 
     case object English
@@ -434,7 +440,7 @@ object TournamentShield {
           Variant.Draughts(strategygames.draughts.variant.English),
           Blitz32,
           28,
-          -1
+          1
         )
 
     case object Shogi
@@ -484,7 +490,7 @@ object TournamentShield {
           Variant.FairySF(strategygames.fairysf.variant.Amazons),
           Blitz32,
           25,
-          -1
+          1
         )
 
     case object Oware
@@ -499,7 +505,7 @@ object TournamentShield {
           Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak),
           Blitz53,
           26,
-          -1
+          1
         )
 
     val all: List[Category] = List(
@@ -542,7 +548,8 @@ object TournamentShield {
     def byKey(k: String): Option[Category] = all.find(_.key == k)
   }
 
-  val defaultShieldHour = 18 //UTC
+  val defaultShieldHours   = List(18, 12) //UTC
+  val alternateShieldHours = defaultShieldHours.reverse
 
   def spotlight(name: String, icon: Char) =
     Spotlight(
