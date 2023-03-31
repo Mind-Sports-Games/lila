@@ -104,7 +104,7 @@ final class LeaderboardApi(
       "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
       "mp" $exists true,
       "k" -> $doc(
-        "$regex" -> BSONRegex(s"^${category.id}_|${category.medleyShieldCode}", "")
+        "$regex" -> BSONRegex(s"^${category.id - 1}_|${category.medleyShieldCode}", "")
       )
     )
 
