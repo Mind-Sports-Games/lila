@@ -1,4 +1,3 @@
-
 db.tournament2.find({ trophy1st: 'shieldPlayStrategyMedley' }).forEach(t => {
   db.tournament_leaderboard.updateMany({ t: t._id }, { $set: { k: 'spm' } });
 });
