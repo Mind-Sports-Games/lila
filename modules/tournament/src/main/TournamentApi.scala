@@ -286,8 +286,20 @@ final class TournamentApi(
         }.sequenceFu.void
       }
     }
-    tour.schedule.??(_.freq == Schedule.Freq.Shield) ?? {
+    tour.schedule.??(s => List(Schedule.Freq.Shield, Schedule.Freq.MedleyShield).contains(s.freq)) ?? {
       shieldTableApi.recalculate(ShieldTableApi.Category.Overall)
+    }
+    tour.trophy1st.??(_ == "shieldChessMedley") ?? {
+      shieldTableApi.recalculate(ShieldTableApi.Category.Chess)
+    }
+    tour.trophy1st.??(_ == "shieldDraughtsMedley") ?? {
+      shieldTableApi.recalculate(ShieldTableApi.Category.Draughts)
+    }
+    tour.schedule.??(_.freq == Schedule.Freq.Shield && tour.variant.gameFamily.id == 0) ?? {
+      shieldTableApi.recalculate(ShieldTableApi.Category.Chess)
+    }
+    tour.schedule.??(_.freq == Schedule.Freq.Shield && tour.variant.gameFamily.id == 1) ?? {
+      shieldTableApi.recalculate(ShieldTableApi.Category.Draughts)
     }
     tour.trophy1st ?? { trophyKind =>
       playerRepo.bestByTourWithRank(tour.id, 1).flatMap {
