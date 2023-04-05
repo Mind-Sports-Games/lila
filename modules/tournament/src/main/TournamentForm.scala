@@ -138,10 +138,10 @@ final class TournamentForm {
   ): Option[(Boolean, Double, Int, Option[Int], Option[Int])] =
     c match {
       case fc: FischerClock.Config => {
-        FischerClock.Config.unapply(fc).map(t => (false, t._1 / 4d, t._2, None, None))
+        FischerClock.Config.unapply(fc).map(t => (false, t._1 / 60d, t._2, None, None))
       }
       case bc: ByoyomiClock.Config => {
-        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 4d, t._2, Some(t._3), Some(t._4)))
+        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 60d, t._2, Some(t._3), Some(t._4)))
       }
     }
 
