@@ -130,7 +130,7 @@ object TournamentShield {
       val arenaFormat: String,
       val arenaDescription: String
   ) {
-    def hasAllVariants  = eligibleVariants == Variant.all
+    def hasAllVariants  = eligibleVariants == Variant.all.filterNot(_.fromPositionVariant)
     def medleyName      = s"${name} Medley Shield"
     def url             = s"https://playstrategy.org/tournament/medley-shield/${key}"
     def arenaFormatFull = s"${arenaFormat} Each variant is active for ${arenaMedleyMinutes} minutes."
@@ -140,24 +140,34 @@ object TournamentShield {
 
   object MedleyShield {
 
+    private def generateOnePerGameGroup(variants: List[Variant], gameGroups: List[GameGroup]) =
+      Random.shuffle(
+        gameGroups.map(gg =>
+          Random
+            .shuffle(
+              gg.variants.filter(v => variants.contains(v))
+            )
+            .head
+        )
+      )
+
     private def playStrategyMedleyGeneration(variants: List[Variant]) = {
-      val thisOrder =
-        Random.shuffle(variants)
+      val thisOrder       = Random.shuffle(variants)
       val gameGroups      = GameGroup.medley.filter(gg => gg.variants.exists(thisOrder.contains(_)))
-      val onePerGameGroup = Random.shuffle(gameGroups.map(gg => Random.shuffle(gg.variants).head))
+      val onePerGameGroup = generateOnePerGameGroup(thisOrder, gameGroups)
       val newOrder        = onePerGameGroup ::: thisOrder.filterNot(onePerGameGroup.contains(_))
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         newOrder,
         5 * 60,
         playStrategyMinutes,
         playStrategymMinutes,
-        7,
+        playStrategyRounds,
         true
       )
     }
-    private val playStrategyMinutes  = 105
+    private val playStrategyMinutes  = 120
     private val playStrategymMinutes = 15
-    private val playStrategyRounds   = 7
+    private val playStrategyRounds   = 8
 
     case object PlayStrategyMedley
         extends MedleyShield(
@@ -170,9 +180,9 @@ object TournamentShield {
           19,
           playStrategyMinutes,
           playStrategymMinutes,
-          s"${playStrategyRounds} round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
-          s"${playStrategyRounds} variant Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
-          s"PlayStrategy Medley Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
+          s"${playStrategyRounds} round Swiss with one game from each of the ${GameGroup.medley.length} Game Families picked: ${GameGroup.medley.map(VariantKeys.gameGroupName).sorted.mkString(", ")}.",
+          s"${playStrategyRounds} variant Arena with one game from each of the ${GameGroup.medley.length} Game Families picked: ${GameGroup.medley.map(VariantKeys.gameGroupName).sorted.mkString(", ")}.",
+          s"PlayStrategy Medley Arena with one game from each of the ${GameGroup.medley.length} Game Families picked: ${GameGroup.medley.map(VariantKeys.gameGroupName).sorted.mkString(", ")}."
         )
 
     private def randomChessVariantOrder(variants: List[Variant]) = {

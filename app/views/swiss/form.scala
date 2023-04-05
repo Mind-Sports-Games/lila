@@ -234,13 +234,14 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     )
   def medleyGameFamilies =
     form3.split(
-      chess,
-      draughts,
-      loa,
-      shogi,
-      xiangqi,
-      flipello,
-      mancala
+      medleyGameGroup(GameGroup.Chess()),
+      medleyGameGroup(GameGroup.Draughts()),
+      medleyGameGroup(GameGroup.LinesOfAction()),
+      medleyGameGroup(GameGroup.Shogi()),
+      medleyGameGroup(GameGroup.Xiangqi()),
+      medleyGameGroup(GameGroup.Flipello()),
+      medleyGameGroup(GameGroup.Mancala()),
+      medleyGameGroup(GameGroup.Amazons())
     )
 
   private def onePerGameFamily =
@@ -270,65 +271,11 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         displayed = false
       )
     )
-  private def chess =
+  private def medleyGameGroup(gameGroup: GameGroup) =
     frag(
       form3.checkbox(
-        form("medleyGameFamilies.chess"),
-        VariantKeys.gameFamilyName(GameFamily.Chess()),
-        klass = "medleyGameFamily",
-        displayed = false
-      )
-    )
-  private def draughts =
-    frag(
-      form3.checkbox(
-        form("medleyGameFamilies.draughts"),
-        VariantKeys.gameFamilyName(GameFamily.Draughts()),
-        klass = "medleyGameFamily",
-        displayed = false
-      )
-    )
-  private def loa =
-    frag(
-      form3.checkbox(
-        form("medleyGameFamilies.loa"),
-        VariantKeys.gameFamilyName(GameFamily.LinesOfAction()),
-        klass = "medleyGameFamily",
-        displayed = false
-      )
-    )
-  private def shogi =
-    frag(
-      form3.checkbox(
-        form("medleyGameFamilies.shogi"),
-        VariantKeys.gameFamilyName(GameFamily.Shogi()),
-        klass = "medleyGameFamily",
-        displayed = false
-      )
-    )
-  private def xiangqi =
-    frag(
-      form3.checkbox(
-        form("medleyGameFamilies.xiangqi"),
-        VariantKeys.gameFamilyName(GameFamily.Xiangqi()),
-        klass = "medleyGameFamily",
-        displayed = false
-      )
-    )
-  private def flipello =
-    frag(
-      form3.checkbox(
-        form("medleyGameFamilies.flipello"),
-        VariantKeys.gameFamilyName(GameFamily.Flipello()),
-        klass = "medleyGameFamily",
-        displayed = false
-      )
-    )
-  private def mancala =
-    frag(
-      form3.checkbox(
-        form("medleyGameFamilies.mancala"),
-        VariantKeys.gameGroupName(GameGroup.Mancala()),
+        form(s"medleyGameFamilies.${gameGroup.key}"),
+        VariantKeys.gameGroupName(gameGroup),
         klass = "medleyGameFamily",
         displayed = false
       )
