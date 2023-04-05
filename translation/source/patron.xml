@@ -68,7 +68,7 @@ Company Registration Address: Shepperton House Unit 11, 89 Shepperton Road, Lond
   <string name="decideHowMuch">Decide what PlayStrategy is worth to you:</string>
   <string name="stopPayments">Withdraw your credit card and stop payments:</string>
   <string name="noLongerSupport">No longer support PlayStrategy</string>
-  <string name="paymentHistory">Payment history</string>
+  <string name="paymentHistory">Recurring payment history</string>
   <string name="paid">Paid</string>
   <string name="viewOthers">View other PlayStrategy Patrons</string>
   <string name="date">Date</string>

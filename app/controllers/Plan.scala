@@ -129,7 +129,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
 
   def webhook =
     Action.async(parse.json) { req =>
-      env.plan.webhook(req.body) map { _ =>
+      env.plan.webhookHandler(req.body) map { _ =>
         Ok("kthxbye")
       }
     }
@@ -165,7 +165,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
     enforce = env.net.rateLimit.value
   )(
     ("fast", 6, 10.minute),
-    ("slow", 20, 1.day)
+    ("slow", 30, 1.day)
   )
 
   def stripeCheckout =

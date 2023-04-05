@@ -68,7 +68,7 @@ final class Env(
     monthlyGoalApi = monthlyGoalApi
   )
 
-  private lazy val webhookHandler = new WebhookHandler(api)
+  lazy val webhookHandler = new WebhookHandler(api)
 
   private lazy val expiration = new Expiration(
     userRepo,
@@ -79,8 +79,6 @@ final class Env(
   system.scheduler.scheduleWithFixedDelay(15 minutes, 15 minutes) { () =>
     expiration.run.unit
   }
-
-  def webhook = webhookHandler.apply _
 
   def cli =
     new lila.common.Cli {
