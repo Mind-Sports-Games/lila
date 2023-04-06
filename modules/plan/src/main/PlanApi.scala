@@ -76,7 +76,7 @@ final class PlanApi(
                 )
                 .levelUpIfPossible
               patronColl.update.one($id(patron.id), p2) >>
-                setDbUserPlanOnCharge(user, p2) >> {
+                setDbUserPlanOnCharge(user, patron.canLevelUp) >> {
                   stripeCharge.lifetimeWorthy ?? setLifetime(user)
                 }
             }
@@ -128,7 +128,7 @@ final class PlanApi(
                     lastLevelUp = Some(DateTime.now)
                   ).expireInOneMonth
                 ) >>
-                  setDbUserPlan(user, lila.user.Plan.start)
+                  setDbUserPlanOnCharge(user, levelUp = false)
               case Some(patron) =>
                 val p2 = patron
                   .copy(
@@ -138,7 +138,7 @@ final class PlanApi(
                   .levelUpIfPossible
                   .expireInOneMonth
                 patronColl.update.one($id(patron.id), p2) >>
-                  setDbUserPlanOnCharge(user, p2)
+                  setDbUserPlanOnCharge(user, patron.canLevelUp)
             } >> {
               charge.lifetimeWorthy ?? setLifetime(user)
             } >>- logger.info(s"Charged ${user.username} with paypal: $cents")
@@ -146,9 +146,9 @@ final class PlanApi(
         }
     }
 
-  private def setDbUserPlanOnCharge(user: User, patron: Patron): Funit = {
+  private def setDbUserPlanOnCharge(user: User, levelUp: Boolean): Funit = {
     val plan =
-      if (patron.canLevelUp) user.plan.incMonths
+      if (levelUp) user.plan.incMonths
       else user.plan.enable
     Bus.publish(lila.hub.actorApi.plan.MonthInc(user.id, plan.months), "plan")
     if (plan.months > 1) notifier.onRenew(user.copy(plan = plan))
@@ -247,14 +247,11 @@ final class PlanApi(
       _.exists(_.isLifetime)
     }
 
-  def setLifetime(user: User): Funit =
+  def setLifetime(user: User): Funit = {
+    if (user.plan.isEmpty) Bus.publish(lila.hub.actorApi.plan.MonthInc(user.id, 0), "plan")
     userRepo.setPlan(
       user,
-      lila.user.Plan(
-        months = user.plan.months | 1,
-        active = true,
-        since = user.plan.since orElse DateTime.now.some
-      )
+      user.plan.enable
     ) >> patronColl.update
       .one(
         $id(user.id),
@@ -266,16 +263,10 @@ final class PlanApi(
         upsert = true
       )
       .void >>- lightUserApi.invalidate(user.id)
+  }
 
   def giveMonth(user: User): Funit =
-    userRepo.setPlan(
-      user,
-      lila.user.Plan(
-        months = user.plan.months | 1,
-        active = true,
-        since = user.plan.since orElse DateTime.now.some
-      )
-    ) >> patronColl.update
+    patronColl.update
       .one(
         $id(user.id),
         $set(
@@ -286,7 +277,7 @@ final class PlanApi(
         ),
         upsert = true
       )
-      .void >>- lightUserApi.invalidate(user.id)
+      .void >> setDbUserPlanOnCharge(user, levelUp = false)
 
   def remove(user: User): Funit =
     userRepo.unsetPlan(user) >>
