@@ -33,7 +33,7 @@ object timeline {
       )
     )
 
-  private def filterBlogPosts(entries: Vector[lila.timeline.Entry]) = 
+  private def filterBlogPosts(entries: Vector[lila.timeline.Entry]) =
     entries.filter(e => e.typ != "blog-post")
 
   private def filterEntries(entries: Vector[lila.timeline.Entry])(implicit ctx: Context) =
@@ -108,6 +108,11 @@ object timeline {
         case PlanStart(userId) =>
           a(href := routes.Plan.index)(
             trans.patron.xBecamePatron(userIdLink(userId.some, withOnline = true))
+          )
+        case PlanRenew(userId, months) =>
+          a(href := routes.Plan.index)(
+            trans.patron.xIsPatronForNbMonths
+              .plural(months, userIdLink(userId.some, withOnline = true), months)
           )
         case BlogPost(id, slug, title) =>
           a(cls := "text", dataIcon := "6", href := routes.Blog.show(id, slug))(title)
