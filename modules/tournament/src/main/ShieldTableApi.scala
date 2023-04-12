@@ -51,6 +51,7 @@ final class ShieldTableApi(
             .filter { case (u, _) => !LightUser.tourBotsIDs.contains(u) }
             .map { case (u, p) => ShieldTableEntry(ShieldTableEntry.makeId, u, category, p) }
             .toSeq
+            .pp("insertmetapoints")
         )
       }
 
