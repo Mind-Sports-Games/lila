@@ -22,9 +22,26 @@ final class LeaderboardApi(
 
   private val maxPerPage = MaxPerPage(15)
 
-  def recentByUser(user: User, page: Int) = paginator(user, page, $sort desc "d")
+  private def userSelector(userId: User.ID) = $doc("u" -> userId)
 
-  def bestByUser(user: User, page: Int) = paginator(user, page, $sort asc "w")
+  def recentByUser(user: User, page: Int) =
+    paginator(user, page, userSelector(user.id), $sort desc "d")
+
+  def bestByUser(user: User, page: Int) =
+    paginator(user, page, userSelector(user.id), $sort asc "w")
+
+  def shieldLeaderboardByUser(user: User, page: Int, lastXMonths: Int = 2) =
+    paginator(
+      user,
+      page,
+      $doc(
+        "u" -> user.id,
+        "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
+        "mp" $exists true,
+        "k" $exists true
+      ),
+      $sort desc "d"
+    )
 
   def timeRange(userId: User.ID, range: (DateTime, DateTime)): Fu[List[Entry]] =
     repo.coll
@@ -79,11 +96,11 @@ final class LeaderboardApi(
       (entries.nonEmpty ?? repo.coll.delete.one($inIds(entries.map(_.id))).void) inject entries.map(_.tourId)
     }
 
-  private def paginator(user: User, page: Int, sort: Bdoc): Fu[Paginator[TourEntry]] =
+  private def paginator(user: User, page: Int, selector: Bdoc, sort: Bdoc): Fu[Paginator[TourEntry]] =
     Paginator(
       adapter = new Adapter[Entry](
         collection = repo.coll,
-        selector = $doc("u" -> user.id),
+        selector = selector,
         projection = none,
         sort = sort,
         readPreference = ReadPreference.secondaryPreferred
