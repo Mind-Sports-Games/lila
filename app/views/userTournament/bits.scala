@@ -31,6 +31,18 @@ object bits {
       views.html.userTournament.list(u, "recent", pager, pager.nbResults.toString)
     }
 
+  def shieldLeaderboard(u: User, pager: Paginator[lila.tournament.LeaderboardApi.TourEntry])(implicit
+      ctx: Context
+  ) =
+    layout(
+      u,
+      title = s"${u.username} shield leaderboard tournaments",
+      path = "shieldleaderboard",
+      moreJs = infiniteScrollTag
+    ) {
+      views.html.userTournament.list(u, "shieldleaderboard", pager, pager.nbResults.toString, true)
+    }
+
   def layout(u: User, title: String, path: String, moreJs: Frag = emptyFrag)(
       body: Frag
   )(implicit ctx: Context) =
@@ -48,6 +60,12 @@ object bits {
             a(cls := path.active("upcoming"), href := routes.UserTournament.path(u.username, "upcoming"))(
               "Upcoming"
             ),
+          a(
+            cls := path.active("shieldleaderboard"),
+            href := routes.UserTournament.path(u.username, "shieldleaderboard")
+          )(
+            "Shield Leaderboard"
+          ),
           a(cls := path.active("recent"), href := routes.UserTournament.path(u.username, "recent"))(
             "Recently played"
           ),

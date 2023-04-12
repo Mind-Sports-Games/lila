@@ -116,7 +116,9 @@ object shields {
               tr(
                 td(i + 1),
                 td(userIdLink(u.userId.some)),
-                td(cls := "row-num")(u.points)
+                td(cls := "row-num")(
+                  a(href := routes.UserTournament.path(u.userId, "shieldleaderboard"))(u.points)
+                )
               )
             }
           )
