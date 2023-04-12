@@ -142,20 +142,22 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
     badStripeSession("Stripe API call failed")
   }
 
-  private def createStripeSession(checkout: Checkout, customerId: CustomerId) =
-    env.plan.api
-      .createSession(
-        CreateStripeSession(
-          customerId,
-          checkout,
-          NextUrls(
-            cancel = s"${env.net.baseUrl}${routes.Plan.index}",
-            success = s"${env.net.baseUrl}${routes.Plan.thanks}"
+  private def createStripeSession(checkout: Checkout, customerId: CustomerId)(implicit ctx: Context) = {
+    for {
+      session <- env.plan.api
+        .createSession(
+          CreateStripeSession(
+            customerId,
+            checkout,
+            NextUrls(
+              cancel = s"${env.net.baseUrl}${routes.Plan.index}",
+              success = s"${env.net.baseUrl}${routes.Plan.thanks}"
+            ),
+            isLifetime = checkout.cents.value >= Cents.lifetime.value
           )
         )
-      )
-      .map(session => JsonOk(Json.obj("session" -> Json.obj("id" -> session.id.value))))
-      .recover(badStripeApiCall)
+    } yield JsonOk(Json.obj("session" -> Json.obj("id" -> session.id.value)))
+  }.recover(badStripeApiCall)
 
   def switchStripePlan(user: UserModel, cents: Cents) = {
     env.plan.api

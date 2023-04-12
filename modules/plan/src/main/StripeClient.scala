@@ -1,5 +1,6 @@
 package lila.plan
 
+import play.api.i18n.Lang
 import play.api.libs.json._
 import play.api.libs.ws.DefaultBodyWritables._
 import play.api.libs.ws.JsonBodyReadables._
@@ -7,6 +8,7 @@ import play.api.libs.ws.{ StandaloneWSClient, StandaloneWSResponse }
 
 import lila.common.config.Secret
 import lila.user.User
+import lila.common.EmailAddress
 
 final private class StripeClient(
     ws: StandaloneWSClient,
@@ -26,14 +28,19 @@ final private class StripeClient(
       "customer"               -> customerId.value
     )
 
-  def createOneTimeSession(data: CreateStripeSession): Fu[StripeSession] = {
+  def createOneTimeSession(data: CreateStripeSession)(implicit lang: Lang): Fu[StripeSession] = {
     val args = sessionArgs(data.customerId, data.urls) ++ List(
       "mode"                                   -> "payment",
       "line_items[0][price_data][product]"     -> config.products.onetime,
       "line_items[0][price_data][currency]"    -> "USD",
       "line_items[0][price_data][unit_amount]" -> data.checkout.amount.value,
       "line_items[0][quantity]"                -> 1
-    )
+    ) ::: data.isLifetime.?? {
+      List(
+        "line_items[0][description]" ->
+          lila.i18n.I18nKeys.patron.payLifetimeOnce.txt(data.checkout.amount.value)
+      )
+    }
     postOne[StripeSession]("checkout/sessions", args: _*)
   }
 
@@ -111,6 +118,9 @@ final private class StripeClient(
       s"customers/${customerId.value}",
       "invoice_settings[default_payment_method]" -> paymentMethod
     ).void
+
+  def setCustomerEmail(cus: StripeCustomer, email: EmailAddress): Funit =
+    postOne[JsObject](s"customers/${cus.id.value}", "email" -> email.value).void
 
   def setSubscriptionPaymentMethod(subscription: StripeSubscription, paymentMethod: String): Funit =
     postOne[JsObject](s"subscriptions/${subscription.id}", "default_payment_method" -> paymentMethod).void

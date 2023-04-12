@@ -20,6 +20,7 @@ final class WebhookHandler(api: PlanApi)(implicit ec: scala.concurrent.Execution
           name <- (event \ "type").asOpt[String]
           data <- (event \ "data" \ "object").asOpt[JsObject]
         } yield {
+          lila.mon.plan.webhook("stripe", name).increment()
           logger.debug(s"WebHook $name $id ${Json.stringify(data).take(100)}")
           name match {
             case "charge.succeeded" =>

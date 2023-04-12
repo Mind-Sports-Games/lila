@@ -1,14 +1,16 @@
 package lila.plan
 
 import org.joda.time.DateTime
+import play.api.i18n.Lang
 import reactivemongo.api._
 import scala.concurrent.duration._
 
 import lila.common.config.Secret
-import lila.common.Bus
+import lila.common.{ Bus, IpAddress }
 import lila.db.dsl._
 import lila.memo.CacheApi._
 import lila.user.{ User, UserRepo }
+import lila.common.EmailAddress
 
 final class PlanApi(
     stripeClient: StripeClient,
@@ -302,6 +304,17 @@ final class PlanApi(
   def recentChargesOf(user: User): Fu[List[Charge]] =
     chargeColl.find($doc("userId" -> user.id)).sort($doc("date" -> -1)).cursor[Charge]().list()
 
+  private[plan] def onEmailChange(userId: User.ID, email: EmailAddress): Funit =
+    userRepo enabledById userId flatMap {
+      _ ?? { user =>
+        userCustomer(user) flatMap {
+          _.filterNot(_.email.has(email.value)) ?? {
+            stripeClient.setCustomerEmail(_, email)
+          }
+        }
+      }
+    }
+
   private val topPatronUserIdsNb = 300
   private val topPatronUserIdsCache = mongoCache.unit[List[User.ID]](
     "patron:top",
@@ -412,7 +425,7 @@ final class PlanApi(
 
   def userPatron(user: User): Fu[Option[Patron]] = patronColl.one[Patron]($id(user.id))
 
-  def createSession(data: CreateStripeSession): Fu[StripeSession] =
+  def createSession(data: CreateStripeSession)(implicit lang: Lang): Fu[StripeSession] =
     data.checkout.freq match {
       case Freq.Onetime => stripeClient.createOneTimeSession(data)
       case Freq.Monthly => stripeClient.createMonthlySession(data)

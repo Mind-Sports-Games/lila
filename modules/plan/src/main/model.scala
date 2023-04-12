@@ -53,7 +53,12 @@ object StripePrice {
 case class NextUrls(cancel: String, success: String)
 
 case class StripeSession(id: SessionId)
-case class CreateStripeSession(customerId: CustomerId, checkout: Checkout, urls: NextUrls)
+case class CreateStripeSession(
+    customerId: CustomerId,
+    checkout: Checkout,
+    urls: NextUrls,
+    isLifetime: Boolean
+)
 
 case class StripeSubscription(
     id: String,

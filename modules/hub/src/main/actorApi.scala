@@ -238,9 +238,12 @@ package fishnet {
 }
 
 package user {
+
+  import lila.common.EmailAddress
   case class Note(from: String, to: String, text: String, mod: Boolean)
   case class KidId(id: String)
   case class NonKidId(id: String)
+  case class ChangeEmail(id: String, email: EmailAddress)
 }
 
 package round {
