@@ -153,7 +153,7 @@ object BSONHandlers {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn   = r intD F.startedAtTurn
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex.fromPly(plies)
+      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
@@ -285,7 +285,7 @@ object BSONHandlers {
       val midCapture =
         decoded.pdnMoves.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
       val currentPly      = if (midCapture) plies - 1 else plies
-      val turnPlayerIndex = PlayerIndex.fromPly(currentPly)
+      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
 
       val decodedSituation = draughts.Situation(
         board = decodedBoard,
@@ -347,7 +347,7 @@ object BSONHandlers {
       val startedAtTurn   = r intD F.startedAtTurn
       val gameVariant     = FairySFVariant(r intD F.variant) | FairySFStandard
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex.fromPly(plies, gameVariant.plysPerTurn)
+      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
@@ -440,7 +440,7 @@ object BSONHandlers {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn   = r intD F.startedAtTurn
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex.fromPly(plies)
+      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
@@ -519,7 +519,7 @@ object BSONHandlers {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn   = r intD F.startedAtTurn
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex.fromPly(plies)
+      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
 
       val playedPlies = plies - startedAtTurn
@@ -631,6 +631,7 @@ object BSONHandlers {
         ),
         F.status        -> o.status,
         F.turns         -> o.chess.turns,
+        F.activePlayer  -> o.chess.situation.player.hashCode,
         F.startedAtTurn -> w.intO(o.chess.startedAtTurn),
         F.clockType     -> o.chess.clock.map(clockTypeBSONWrite),
         F.clock -> (o.chess.clock flatMap { c =>

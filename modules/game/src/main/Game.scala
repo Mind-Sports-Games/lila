@@ -920,6 +920,7 @@ object Game {
     val huffmanPgn        = "hp"
     val status            = "s"
     val turns             = "t"
+    val activePlayer      = "ap"
     val startedAtTurn     = "st"
     val clock             = "c"
     val clockType         = "ct"

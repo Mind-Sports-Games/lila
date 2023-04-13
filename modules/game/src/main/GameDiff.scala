@@ -269,6 +269,7 @@ object GameDiff {
     }
 
     d(turns, _.turns, w.int)
+    d(activePlayer, _.situation.player.hashCode, w.int)
     dOpt(moveTimes, _.binaryMoveTimes, (o: Option[ByteArray]) => o flatMap ByteArrayBSONHandler.writeOpt)
     dOpt(p1ClockHistory, getClockHistory(P1), clockHistoryToBytes)
     dOpt(p2ClockHistory, getClockHistory(P2), clockHistoryToBytes)
