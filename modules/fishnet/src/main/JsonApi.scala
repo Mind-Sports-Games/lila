@@ -140,7 +140,7 @@ object JsonApi {
 
       def toUci(eval: Evaluation[LexicalUci], gl: GameLogic, gf: GameFamily): Evaluation[Uci] =
         Evaluation[Uci](
-          eval.pv.flatMap(u => Uci(gl, gf, u.uci)),
+          UciDump.fromFishnetUci(gl, gf)(eval.pv),
           eval.score,
           eval.time,
           eval.nodes,
