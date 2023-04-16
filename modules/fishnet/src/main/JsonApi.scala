@@ -48,13 +48,13 @@ object JsonApi {
     ) extends Request
         with Result {
 
-      def toUci(gl: GameLogic, gf: GameFamily) =
+      def toUci(variant: Variant) =
         PostAnalysisUci(
           fishnet,
           stockfish,
           analysis.map(o =>
             o.map({
-              case Right(e) => Right(Evaluation.toUci(e, gl, gf))
+              case Right(e) => Right(Evaluation.toUci(e, variant))
               case Left(s)  => Left(s)
             })
           )
@@ -138,9 +138,11 @@ object JsonApi {
       private val legacyDesiredNodes = 3_000_000
       val legacyAcceptableNodes      = legacyDesiredNodes * 0.9
 
-      def toUci(eval: Evaluation[LexicalUci], gl: GameLogic, gf: GameFamily): Evaluation[Uci] =
+      def toUci(eval: Evaluation[LexicalUci], variant: Variant): Evaluation[Uci] =
         Evaluation[Uci](
-          UciDump.fromFishnetUci(gl, gf)(eval.pv),
+          UciDump
+            .fromFishnetUci(variant, eval.pv)
+            .flatMap(lexicalUci => Uci(variant.gameLogic, variant.gameFamily, lexicalUci.uci)),
           eval.score,
           eval.time,
           eval.nodes,
@@ -238,7 +240,7 @@ object JsonApi {
         "game_id"  -> g.game_id,
         "position" -> FEN.fishnetFen(g.variant)(g.position),
         "variant"  -> g.variant,
-        "moves"    -> UciDump.fishnetUci(g.variant)(g.moves)
+        "moves"    -> UciDump.fishnetUci(g.variant, g.moves)
       )
     }
     implicit val WorkIdWrites = Writes[Work.Id] { id =>
