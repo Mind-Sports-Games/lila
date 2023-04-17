@@ -339,7 +339,7 @@ lazy val irc = smallModule("irc",
 )
 
 lazy val plan = module("plan",
-  Seq(common, user, notifyModule),
+  Seq(common, user),
   reactivemongo.bundle
 )
 
