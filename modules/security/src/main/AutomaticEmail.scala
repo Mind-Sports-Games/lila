@@ -169,12 +169,53 @@ ${Mailer.txt.serviceNote}
     }
   }
 
+  def onPatronNew(user: User): Funit =
+    sendAsPrivateMessageAndEmail(user)(
+      subject = _ => "Thank you for supporting PlayStrategy!",
+      body = _ =>
+        """Thank you for your donation to PlayStrategy - your patronage directly goes to keeping the site running and new features coming.
+As a small token of our thanks, your account now has the awesome patron wings!"""
+    )
+
+  def onPatronStop(user: User): Funit =
+    sendAsPrivateMessageAndEmail(user)(
+      subject = _ => "End of PlayStrategy Patron subscription",
+      body = _ => s"""
+Thank you for your support over the last month. We appreciate all donations.
+If you're still interested in supporting us in other ways, you can see non-financial ways of supporting us here $baseUrl/help/contribute.
+To make a new donation, head to $baseUrl/patron"""
+    )
+
   private def alsoSendAsPrivateMessage(user: User)(body: Lang => String): String = {
     implicit val lang = userLang(user)
     body(userLang(user)) tap { txt =>
       lila.common.Bus.publish(SystemMsg(user.id, txt), "msgSystemSend")
     }
   }
+
+  private def sendAsPrivateMessageAndEmail(user: User)(subject: Lang => String, body: Lang => String): Funit =
+    alsoSendAsPrivateMessage(user)(body) pipe { body =>
+      userRepo email user.id flatMap {
+        _ ?? { email =>
+          implicit val lang = userLang(user)
+          mailer send Mailer.Message(
+            to = email,
+            subject = subject(lang),
+            text = Mailer.txt.addServiceNote(body),
+            htmlBody = standardEmail(body).some
+          )
+        }
+      }
+    }
+
+  private def sendAsPrivateMessageAndEmail(
+      username: String
+  )(subject: Lang => String, body: Lang => String): Funit =
+    userRepo named username flatMap {
+      _ ?? { user =>
+        sendAsPrivateMessageAndEmail(user)(subject, body)
+      }
+    }
 
   private def userLang(user: User): Lang = user.realLang | lila.i18n.defaultLang
 }

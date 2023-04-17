@@ -21,7 +21,6 @@ final class Env(
     db: lila.db.Db,
     ws: StandaloneWSClient,
     timeline: lila.hub.actors.Timeline,
-    notifyApi: lila.notify.NotifyApi,
     cacheApi: lila.memo.CacheApi,
     mongoCache: lila.memo.MongoCache.Api,
     lightUserApi: lila.user.LightUserApi,
@@ -68,7 +67,7 @@ final class Env(
     monthlyGoalApi = monthlyGoalApi
   )
 
-  private lazy val webhookHandler = new WebhookHandler(api)
+  lazy val webhookHandler = new WebhookHandler(api)
 
   private lazy val expiration = new Expiration(
     userRepo,
@@ -80,16 +79,15 @@ final class Env(
     expiration.run.unit
   }
 
-  def webhook = webhookHandler.apply _
+  lila.common.Bus.subscribeFun("email") { case lila.hub.actorApi.user.ChangeEmail(userId, email) =>
+    api.onEmailChange(userId, email).unit
+  }
 
   def cli =
     new lila.common.Cli {
       def process = {
         case "patron" :: "lifetime" :: user :: Nil =>
           userRepo named user flatMap { _ ?? api.setLifetime } inject "ok"
-        // someone donated while logged off.
-        // we cannot bind the charge to the user so they get their precious wings.
-        // instead, give them a free month.
         case "patron" :: "month" :: user :: Nil =>
           userRepo named user flatMap { _ ?? api.giveMonth } inject "ok"
         case "patron" :: "remove" :: user :: Nil =>
