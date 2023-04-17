@@ -38,7 +38,7 @@ final private class StripeClient(
     ) ::: data.isLifetime.?? {
       List(
         "line_items[0][description]" ->
-          lila.i18n.I18nKeys.patron.payLifetimeOnce.txt(data.checkout.amount.value)
+          lila.i18n.I18nKeys.patron.payLifetimeOnce.txt(data.checkout.amount.usd.toString)
       )
     }
     postOne[StripeSession]("checkout/sessions", args: _*)
