@@ -5,6 +5,10 @@
   <string name="freeAccount">Free account</string>
   <string name="becomePatron">Become a PlayStrategy Patron</string>
   <string name="xBecamePatron">%s became a PlayStrategy Patron</string>
+  <plurals name="xIsPatronForNbMonths">
+    <item quantity="one">%1$s is a PlayStrategy Patron for %2$s month</item>
+    <item quantity="other">%1$s is a PlayStrategy Patron for %2$s months</item>
+  </plurals>
   <string name="newPatrons">New Patrons</string>
   <string name="freeGames">Free games for everyone!</string>
   <string name="freeChess">Free chess for everyone, forever!</string>
@@ -68,7 +72,7 @@ Company Registration Address: Shepperton House Unit 11, 89 Shepperton Road, Lond
   <string name="decideHowMuch">Decide what PlayStrategy is worth to you:</string>
   <string name="stopPayments">Withdraw your credit card and stop payments:</string>
   <string name="noLongerSupport">No longer support PlayStrategy</string>
-  <string name="paymentHistory">Payment history</string>
+  <string name="paymentHistory">Recurring payment history</string>
   <string name="paid">Paid</string>
   <string name="viewOthers">View other PlayStrategy Patrons</string>
   <string name="date">Date</string>

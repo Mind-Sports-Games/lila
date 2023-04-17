@@ -217,6 +217,8 @@ object BSONHandlers {
         score = r int "s",
         rank = r int "r",
         rankRatio = r.get[LeaderboardApi.Ratio]("w"),
+        metaPoints = r intO "mp",
+        shieldKey = r strO "k",
         freq = r intO "f" flatMap Schedule.Freq.byId,
         speed = r intO "p" flatMap Schedule.Speed.byId,
         perf = PerfType.byId get r.int("v") err "Invalid leaderboard perf",
@@ -232,6 +234,8 @@ object BSONHandlers {
         "s"   -> o.score,
         "r"   -> o.rank,
         "w"   -> o.rankRatio,
+        "mp"  -> o.metaPoints,
+        "k"   -> o.shieldKey,
         "f"   -> o.freq.map(_.id),
         "p"   -> o.speed.map(_.id),
         "v"   -> o.perf.id,
@@ -241,4 +245,23 @@ object BSONHandlers {
 
   import LeaderboardApi.ChartData.AggregationResult
   implicit val leaderboardAggregationResultBSONHandler = Macros.handler[AggregationResult]
+
+  implicit val shieldTableEntryHandler = new BSON[ShieldTableApi.ShieldTableEntry] {
+    def reads(r: BSON.Reader) =
+      ShieldTableApi.ShieldTableEntry(
+        id = r str "_id",
+        userId = r str "u",
+        category = ShieldTableApi.Category.getFromId(r int "c"),
+        points = r int "p"
+      )
+
+    def writes(w: BSON.Writer, o: ShieldTableApi.ShieldTableEntry) =
+      $doc(
+        "_id" -> o.id,
+        "u"   -> o.userId,
+        "c"   -> o.category.id,
+        "p"   -> o.points
+      )
+  }
+
 }

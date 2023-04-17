@@ -6,6 +6,8 @@ import lila.hub.LightTeam.TeamID
 
 final class LeaderboardRepo(val coll: lila.db.dsl.Coll)
 
+final class ShieldTableRepo(val coll: lila.db.dsl.Coll)
+
 case class TournamentTop(value: List[Player]) extends AnyVal
 
 case class TourMiniView(

@@ -7,7 +7,6 @@ import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.PlayerIndex
 import lila.user.User
 
-// TODO: deal with byoyomi here.
 case class AiConfig(
     variant: Variant,
     fenVariant: Option[Variant],
@@ -105,7 +104,7 @@ object AiConfig extends BaseConfig {
     fenVariant = none,
     timeMode = TimeMode.Unlimited,
     time = 5d,
-    increment = 8, // TODO: byoyomi, in lishogi this defaults to 0
+    increment = 8,
     byoyomi = 10,
     periods = 1,
     days = 2,

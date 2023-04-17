@@ -52,9 +52,12 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
       "Marathon"      -> icon('\\'),
       "HyperBullet"   -> s"H${icon(Speed.Bullet.perfIcon)}",
       "SuperBlitz"    -> s"S${icon(Speed.Blitz.perfIcon)}"
-    ) ::: PerfType.leaderboardable.filterNot(PerfType.translated.contains).map { pt =>
-      pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
-    }
+    ) ++ PerfType.leaderboardable
+      .filterNot(PerfType.translated.contains)
+      .map { pt =>
+        pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
+      }
+      .sortBy(-_._1.length) ++ List("Chess" -> s"${icon(Speed.Blitz.perfIcon)}")
 
     def apply(name: String): Frag =
       raw {
