@@ -48,10 +48,17 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
   object scheduledTournamentNameShortHtml {
     private def icon(c: Char) = s"""<span data-icon="$c"></span>"""
     private val replacements = List(
-      "PlayStrategy " -> "",
-      "Marathon"      -> icon('\\'),
-      "HyperBullet"   -> s"H${icon(Speed.Bullet.perfIcon)}",
-      "SuperBlitz"    -> s"S${icon(Speed.Blitz.perfIcon)}"
+      "PlayStrategy "   -> "",
+      "Marathon"        -> icon('\\'),
+      "HyperBullet"     -> s"H${icon(Speed.Bullet.perfIcon)}",
+      "SuperBlitz"      -> s"S${icon(Speed.Blitz.perfIcon)}",
+      "Grand Prix"      -> "GP",
+      " PREMIER"        -> "",
+      "Lines of Action" -> icon(strategygames.chess.variant.LinesOfAction.perfIcon),
+      "Draughts"        -> icon(strategygames.draughts.variant.Standard.perfIcon),
+      "Medley"          -> icon('5'),
+      "Variants Medley" -> icon('5'),
+      " -"              -> ""
     ) ++ PerfType.leaderboardable
       .filterNot(PerfType.translated.contains)
       .map { pt =>
