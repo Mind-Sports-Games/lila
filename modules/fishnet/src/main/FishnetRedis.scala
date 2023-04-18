@@ -39,8 +39,8 @@ final class FishnetRedis(
         case Array(familyId, gameId, plyS, uci) =>
           for {
             family <- allCatch.opt(familyId.toInt).map(GameFamily.apply)
-            move <- Uci(family.gameLogic, family, uci)
-            ply  <- plyS.toIntOption
+            move   <- Uci(family.gameLogic, family, uci)
+            ply    <- plyS.toIntOption
           } Bus.publish(Tell(gameId, FishnetPlay(move, ply)), "roundSocket")
         case _ =>
       }
