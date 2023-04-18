@@ -49,7 +49,7 @@ object history {
     Freq.Unique,
     //Freq.Marathon,
     //Freq.Shield,
-    //Freq.Yearly,
+    Freq.Yearly,
     //Freq.Monthly,
     //Freq.Weekend,
     Freq.Weekly
