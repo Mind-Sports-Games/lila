@@ -31,7 +31,9 @@ case class Schedule(
       case Weekly if full => weeklyXArena.txt(VariantKeys.variantName(variant))
       case Weekly =>
         weeklyX.txt(VariantKeys.variantName(variant))
-      case _ => s"${VariantKeys.variantName(variant)} Mind Sports Olympiad Warm-up"
+      case Yearly if full => s"Yearly ${VariantKeys.variantName(variant)} Arena"
+      case Yearly         => s"Yearly ${VariantKeys.variantName(variant)}"
+      case _              => s"${VariantKeys.variantName(variant)} Mind Sports Olympiad Warm-up"
     }
     /*
     import Schedule.Freq._
