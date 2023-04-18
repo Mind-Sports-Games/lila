@@ -165,7 +165,8 @@ final private class Rematcher(
             c.config.toClock
           },
           turns = situation ?? (_.turns),
-          startedAtTurn = situation ?? (_.turns)
+          startedAtTurn = situation ?? (_.turns),
+          startPlayer = situation.fold[PlayerIndex](P1)(_.situation.player)
         ),
         p1Player = returnPlayer(game, P1, users),
         p2Player = returnPlayer(game, P2, users),

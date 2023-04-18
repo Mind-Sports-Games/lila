@@ -653,7 +653,7 @@ case class Game(
   def onePlayerHasMoved    = playedTurns > variant.plysPerTurn - 1     // 0
   def bothPlayersHaveMoved = playedTurns > 2 * variant.plysPerTurn - 1 // 1
 
-  def startPlayerIndex = PlayerIndex.fromPly(chess.startedAtTurn, variant.plysPerTurn)
+  def startPlayerIndex = chess.startPlayer
 
   //the number of ply a player has played
   def playerMoves(playerIndex: PlayerIndex): Int =
@@ -733,7 +733,7 @@ case class Game(
 
   def resetTurns =
     copy(
-      chess = chess.copy(turns = 0, startedAtTurn = 0)
+      chess = chess.copy(turns = 0, startedAtTurn = 0, startPlayer = PlayerIndex.P1)
     )
 
   lazy val opening: Option[FullOpening.AtPly] =
@@ -922,6 +922,7 @@ object Game {
     val turns             = "t"
     val activePlayer      = "ap"
     val startedAtTurn     = "st"
+    val startPlayer       = "sp"
     val clock             = "c"
     val clockType         = "ct"
     val positionHashes    = "ph"
@@ -958,7 +959,7 @@ object Game {
     val perfType          = "pt" // only set on student games for aggregation
     val drawOffers        = "do"
     //draughts
-    val simulPairing = "sp"
+    val simulPairing = "sip"
     val timeOutUntil = "to"
     val multiMatch   = "mm"
     val drawLimit    = "dl"

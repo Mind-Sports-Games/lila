@@ -125,7 +125,8 @@ final private class SwissDirector(
           g.copy(
             clock = swiss.clock.toClock.some,
             turns = turns,
-            startedAtTurn = turns
+            startedAtTurn = turns,
+            startPlayer = g.player
           )
         },
         p1Player = makePlayer(

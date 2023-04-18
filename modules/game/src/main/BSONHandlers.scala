@@ -150,11 +150,14 @@ object BSONHandlers {
     import PgnImport.pgnImportBSONHandler
 
     def readChessGame(r: BSON.Reader): Game = {
-      val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val light     = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val createdAt = r date F.createdAt
+
       val startedAtTurn   = r intD F.startedAtTurn
+      val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
       val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
-      val createdAt       = r date F.createdAt
+
 
       val playedPlies = plies - startedAtTurn
       val gameVariant = ChessVariant(r intD F.variant) | ChessStandard
@@ -211,7 +214,8 @@ object BSONHandlers {
           )
         } map (_(turnPlayerIndex)),
         turns = plies,
-        startedAtTurn = startedAtTurn
+        startedAtTurn = startedAtTurn,
+        startPlayer = startPlayer
       )
 
       Game(
@@ -247,6 +251,7 @@ object BSONHandlers {
       val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val gameVariant   = DraughtsVariant(r intD F.variant) | DraughtsStandard
       val startedAtTurn = r intD F.startedAtTurn
+      val startPlayer   = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies         = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
       val playedPlies   = plies - startedAtTurn
 
@@ -309,7 +314,8 @@ object BSONHandlers {
           )
         } map (_(decodedSituation.player)),
         turns = currentPly,
-        startedAtTurn = startedAtTurn
+        startedAtTurn = startedAtTurn,
+        startPlayer = startPlayer
       )
 
       Game(
@@ -344,8 +350,9 @@ object BSONHandlers {
 
     def readFairySFGame(r: BSON.Reader): Game = {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val startedAtTurn   = r intD F.startedAtTurn
       val gameVariant     = FairySFVariant(r intD F.variant) | FairySFStandard
+      val startedAtTurn   = r intD F.startedAtTurn
+      val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
       val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
@@ -407,7 +414,8 @@ object BSONHandlers {
           )
         } map (_(turnPlayerIndex)),
         turns = plies,
-        startedAtTurn = startedAtTurn
+        startedAtTurn = startedAtTurn,
+        startPlayer = startPlayer
       )
 
       Game(
@@ -439,6 +447,7 @@ object BSONHandlers {
     def readSamuraiGame(r: BSON.Reader): Game = {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn   = r intD F.startedAtTurn
+      val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
       val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
@@ -486,7 +495,8 @@ object BSONHandlers {
           )
         } map (_(turnPlayerIndex)),
         turns = plies,
-        startedAtTurn = startedAtTurn
+        startedAtTurn = startedAtTurn,
+        startPlayer = startPlayer
       )
 
       Game(
@@ -518,6 +528,7 @@ object BSONHandlers {
     def readTogyzkumalakGame(r: BSON.Reader): Game = {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val startedAtTurn   = r intD F.startedAtTurn
+      val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
       val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
@@ -570,7 +581,8 @@ object BSONHandlers {
           )
         } map (_(turnPlayerIndex)),
         turns = plies,
-        startedAtTurn = startedAtTurn
+        startedAtTurn = startedAtTurn,
+        startPlayer = startPlayer
       )
 
       Game(
@@ -633,6 +645,7 @@ object BSONHandlers {
         F.turns         -> o.chess.turns,
         F.activePlayer  -> o.chess.situation.player.hashCode,
         F.startedAtTurn -> w.intO(o.chess.startedAtTurn),
+        F.startPlayer   -> w.intO(if (o.chess.startedAtTurn == 0) 0 else o.chess.startPlayer.hashCode),
         F.clockType     -> o.chess.clock.map(clockTypeBSONWrite),
         F.clock -> (o.chess.clock flatMap { c =>
           clockBSONWrite(o.createdAt, c).toOption

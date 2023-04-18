@@ -142,6 +142,7 @@ trait Positional { self: Config =>
           situation = s,
           turns = sit.turns,
           startedAtTurn = sit.turns,
+          startPlayer = s.player,
           clock = makeClock.map(_.toClock)
         )
         if (Forsyth.>>(s.gameLogic, game).initial)

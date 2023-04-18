@@ -52,6 +52,7 @@ private object ChallengeJoiner {
           situation = sit,
           turns = sp.turns,
           startedAtTurn = sp.turns,
+          startPlayer = sp.situation.player,
           clock = c.clock.map(_.config.toClock)
         )
         if (c.variant.fromPosition && Forsyth.>>(c.variant.gameLogic, game).initial)
