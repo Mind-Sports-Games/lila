@@ -874,7 +874,10 @@ final class TournamentApi(
   }
 
   private[tournament] def subscribeBotsToArenas: Funit =
-    subscribeBots(Schedule.Freq.Weekly :: Schedule.Freq.shields, TournamentShield.MedleyShield.medleyTeamIDs)
+    subscribeBots(
+      List(Schedule.Freq.Weekly, Schedule.Freq.Yearly) ::: Schedule.Freq.shields,
+      TournamentShield.MedleyShield.medleyTeamIDs
+    )
 
   private[tournament] def subscribeBots(freq: List[Schedule.Freq], teamIds: List[TeamID]): Funit =
     fuccess(
