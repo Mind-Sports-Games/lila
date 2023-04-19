@@ -178,31 +178,35 @@ object side {
             a(href := routes.Simul.show(sim.id))(sim.fullName)
           )
         },
-        swissPairingGames.map { spg =>
-          st.section(cls := "game__multi-match")(
-            frag(
-              trans.multiMatch(),
-              if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
-              else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
-              else "",
-              s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
-                .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
-              spg.multiMatchGames
-                .foldLeft(List(spg.game))(_ ++ _)
-                .zipWithIndex
-                .map {
-                  case (mmGame, index) => {
-                    val current = if (mmGame.id == game.id) " current" else ""
-                    a(
-                      cls := s"text glpt${current} mm_game_link",
-                      href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)
-                    )(
-                      trans.gameNumberX(index + 1)
-                    )
-                  }
-                }
+        swissPairingGames.flatMap { spg =>
+          if (spg.nbGamesPerRound > 1) {
+            Some(
+              st.section(cls := "game__multi-match")(
+                frag(
+                  trans.multiMatch(),
+                  if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
+                  else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
+                  else "",
+                  s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
+                    .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
+                  spg.multiMatchGames
+                    .foldLeft(List(spg.game))(_ ++ _)
+                    .zipWithIndex
+                    .map {
+                      case (mmGame, index) => {
+                        val current = if (mmGame.id == game.id) " current" else ""
+                        a(
+                          cls := s"text glpt${current} mm_game_link",
+                          href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)
+                        )(
+                          trans.gameNumberX(index + 1)
+                        )
+                      }
+                    }
+                )
+              )
             )
-          )
+          } else None
         }
       )
     }

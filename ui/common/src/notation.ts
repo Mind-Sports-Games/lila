@@ -235,6 +235,7 @@ function promotionSymbol(prevBoard: Board, board: Board, parsed: ParsedMove): st
   const prevRole = prevBoard.pieces[parsed.orig];
   const currentRole = board.pieces[parsed.dest];
 
+  if (!prevRole) return '';
   if (prevRole !== currentRole) return '+';
   if (prevRole.includes('+')) return '';
   if (
