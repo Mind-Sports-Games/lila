@@ -290,13 +290,16 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       tour.startsAt isBefore DateTime.now.plusMinutes {
         import Schedule.Freq._
         val base = schedule.freq match {
-          case Unique                     => tour.spotlight.flatMap(_.homepageHours).fold(24 * 60)(60 *)
-          case Unique | Yearly | Marathon => 24 * 60
-          case Monthly                    => 6 * 60
-          case Weekend                    => 3 * 60
-          case Weekly                     => 1 * 60 * 24
-          case Daily                      => 1 * 60
-          case Introductory | MSO21 | MSOGP | MSOWarmUp | MedleyShield | Shield =>
+          case Unique            => tour.spotlight.flatMap(_.homepageHours).fold(24 * 60)(60 *)
+          case Unique | Marathon => 24 * 60
+          case Yearly            => 1 * 60 * 24 * 7
+          case Monthly           => 6 * 60
+          case Weekend           => 3 * 60
+          case Weekly            => 1 * 60 * 12
+          case Daily             => 1 * 60
+          case Shield            => 1 * 60 * 24 * 4
+          case MedleyShield      => 1 * 60 * 24 * 7 // 7 days
+          case Introductory | MSO21 | MSOGP | MSOWarmUp =>
             tour.spotlight.flatMap(_.homepageHours).fold(crud.CrudForm.maxHomepageHours * 60)(60 *)
           case _ => 30
         }

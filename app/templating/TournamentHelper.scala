@@ -56,8 +56,8 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
       " PREMIER"        -> "",
       "Lines of Action" -> icon(strategygames.chess.variant.LinesOfAction.perfIcon),
       "Draughts"        -> icon(strategygames.draughts.variant.Standard.perfIcon),
-      "Medley"          -> icon('5'),
       "Variants Medley" -> icon('5'),
+      "Medley"          -> icon('5'),
       " -"              -> ""
     ) ++ PerfType.leaderboardable
       .filterNot(PerfType.translated.contains)
