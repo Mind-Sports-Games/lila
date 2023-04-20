@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ P1, P2, ByoyomiClock, FischerClock }
+import strategygames.{ ByoyomiClock, FischerClock, P1, P2 }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -350,7 +350,9 @@ object SwissJson {
         "lastMove"    -> ~g.lastMoveKeys,
         "orientation" -> g.naturalOrientation.name,
         "p1"          -> boardPlayerJson(p1),
-        "p2"          -> boardPlayerJson(p2)
+        "p2"          -> boardPlayerJson(p2),
+        "p1Color"     -> g.variant.playerColors(P1),
+        "p2Color"     -> g.variant.playerColors(P2)
       )
       .add(
         "clock" -> g.clock.ifTrue(g.isBeingPlayed).map { c =>

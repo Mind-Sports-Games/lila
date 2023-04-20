@@ -150,6 +150,8 @@ export interface Board {
   orientation: PlayerIndex;
   p1: BoardPlayer;
   p2: BoardPlayer;
+  p1Color: PlayerColor;
+  p2Color: PlayerColor;
   multiMatchGameIds?: string[];
   multiMatchGames?: Board[];
   isBestOfX: boolean;

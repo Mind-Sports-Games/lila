@@ -18,8 +18,9 @@ const renderGameState = (game: FeaturedGame): string =>
 function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating: boolean) {
   const player = game[playerIndex];
   const clock = game.c || game.clock; // temporary BC, remove me
+
   return h('span.mini-game__player', [
-    h('span.mini-game__user', [
+    h('span.mini-game__user.is.playerIndex-icon.text.' + (playerIndex == 'p1' ? game.p1Color : game.p2Color), [
       h('strong', '#' + player.rank),
       renderPlayer(player, true, withRating, true, false),
       player.berserk

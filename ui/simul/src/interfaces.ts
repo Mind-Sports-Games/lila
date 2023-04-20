@@ -67,6 +67,8 @@ export interface Pairing {
   variant: VariantKey;
   hostPlayerIndex: PlayerIndex;
   game: Game;
+  p1Color: PlayerColor;
+  p2Color: PlayerColor;
 }
 
 export interface Game {
