@@ -82,7 +82,9 @@ object mini {
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
     span(cls := "mini-game__player")(
-      span(cls := "mini-game__user")(
+      span(
+        cls := s"mini-game__user playerIndex-icon is ${pov.game.variant.playerColors(pov.player.playerIndex)} text"
+      )(
         playerUsername(pov.player, withRating = false),
         span(cls := "rating")(lila.game.Namer ratingString pov.player)
       ),

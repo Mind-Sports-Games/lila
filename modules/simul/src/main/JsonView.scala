@@ -8,8 +8,7 @@ import lila.game.{ Game, GameRepo }
 import lila.user.User
 import lila.i18n.VariantKeys
 import lila.quote.Quote
-
-import strategygames.GameFamily
+import strategygames.{ GameFamily, P1, P2 }
 import strategygames.variant.Variant
 
 final class JsonView(
@@ -174,7 +173,9 @@ final class JsonView(
             "player"          -> player,
             "variant"         -> p.player.variant.key,
             "hostPlayerIndex" -> p.hostPlayerIndex,
-            "game"            -> gameJson(hostId, game)
+            "game"            -> gameJson(hostId, game),
+            "p1Color"         -> p.player.variant.playerColors(P1),
+            "p2Color"         -> p.player.variant.playerColors(P2)
           )
           .some
       }

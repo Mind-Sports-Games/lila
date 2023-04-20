@@ -255,7 +255,7 @@ object BSONHandlers {
       val r        = new Reader(rootNode)
       Root(
         ply = r int ply,
-        plysPerTurn = r int ppt,
+        plysPerTurn = (r intO ppt) | 1,
         fen = r.get[FEN](fen),
         check = r boolD check,
         shapes = r.getO[Shapes](shapes) | Shapes.empty,
