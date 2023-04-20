@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ ClockConfig, FischerClock, ByoyomiClock, P1, P2 }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, P1, P2 }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -323,6 +323,8 @@ final class JsonView(
         "color" -> game.variant.playerNames(
           game.naturalOrientation
         ), // app BC https://github.com/ornicar/lila/issues/7195
+        "p1Color"  -> game.variant.playerColors(P1),
+        "p2Color"  -> game.variant.playerColors(P2),
         "lastMove" -> ~game.lastMoveKeys,
         "p1"       -> ofPlayer(featured.p1, game player P1),
         "p2"       -> ofPlayer(featured.p2, game player P2)

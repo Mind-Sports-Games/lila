@@ -43,6 +43,8 @@ export interface FeaturedGame {
   lastMove: string;
   p1: FeaturedPlayer;
   p2: FeaturedPlayer;
+  p1Color: PlayerColor;
+  p2Color: PlayerColor;
   c?: {
     p1: number;
     p2: number;
