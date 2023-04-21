@@ -166,7 +166,7 @@ object ServerEval {
       Node(
         id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
         ply = g.turns,
-        plysPerTurn = g.situation.board.variant.plysPerTurn,
+        playerIndex = g.situation.player,
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),
         check = g.situation.check,

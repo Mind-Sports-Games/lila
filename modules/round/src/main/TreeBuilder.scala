@@ -57,7 +57,7 @@ object TreeBuilder {
         }.toMap)
         val root = Root(
           ply = init.turns,
-          plysPerTurn = game.variant.plysPerTurn,
+          playerIndex = init.situation.player,
           fen = fen,
           check = init.situation.check,
           captureLength = init.situation match {
@@ -78,11 +78,11 @@ object TreeBuilder {
           val fen    = Forsyth.>>(g.situation.board.variant.gameLogic, g)
           val info   = infos lift (index - 1)
           val advice = advices get g.turns
-          val player = !PlayerIndex.fromPly(g.turns, g.situation.board.variant.plysPerTurn)
+          val player = !g.situation.player
           val branch = Branch(
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.turns,
-            plysPerTurn = g.situation.board.variant.plysPerTurn,
+            playerIndex = g.situation.player,
             move = m,
             fen = fen,
             captureLength = (g.situation, m.uci.origDest._2) match {
@@ -157,7 +157,7 @@ object TreeBuilder {
       Branch(
         id = UciCharPair(variant.gameLogic, m.uci),
         ply = g.turns,
-        plysPerTurn = variant.plysPerTurn,
+        playerIndex = g.situation.player,
         move = m,
         fen = fen,
         check = g.situation.check,

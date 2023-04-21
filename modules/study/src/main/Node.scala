@@ -4,15 +4,14 @@ import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.{ UciCharPair }
 import strategygames.variant.Variant
-import strategygames.PocketData
+import strategygames.{ Centis, Player => PlayerIndex, PocketData }
 
-import strategygames.Centis
 import lila.tree.Eval.Score
 import lila.tree.Node.{ Comment, Comments, Gamebook, Shapes }
 
 sealed trait RootOrNode {
   val ply: Int
-  val plysPerTurn: Int
+  val playerIndex: PlayerIndex
   val fen: FEN
   val check: Boolean
   val shapes: Shapes
@@ -26,14 +25,13 @@ sealed trait RootOrNode {
   def addChild(node: Node): RootOrNode
   def fullMoveNumber = 1 + ply / 2
   def mainline: Vector[Node]
-  def playerIndex = strategygames.Player.fromPly(ply, plysPerTurn)
   def moveOption: Option[Uci.WithSan]
 }
 
 case class Node(
     id: UciCharPair,
     ply: Int,
-    plysPerTurn: Int,
+    playerIndex: PlayerIndex,
     move: Uci.WithSan,
     fen: FEN,
     check: Boolean,
@@ -237,7 +235,7 @@ object Node {
 
   case class Root(
       ply: Int,
-      plysPerTurn: Int,
+      playerIndex: PlayerIndex,
       fen: FEN,
       check: Boolean,
       shapes: Shapes = Shapes(Nil),
@@ -331,7 +329,7 @@ object Node {
     def default(variant: Variant) =
       Root(
         ply = 0,
-        plysPerTurn = variant.plysPerTurn,
+        playerIndex = PlayerIndex.P1,
         fen = variant.initialFen,
         check = false,
         clock = none,
@@ -342,7 +340,7 @@ object Node {
     def fromRoot(b: lila.tree.Root): Root =
       Root(
         ply = b.ply,
-        plysPerTurn = b.plysPerTurn,
+        playerIndex = b.playerIndex,
         fen = b.fen,
         check = b.check,
         clock = b.clock,
@@ -355,7 +353,7 @@ object Node {
     Node(
       id = b.id,
       ply = b.ply,
-      plysPerTurn = b.plysPerTurn,
+      playerIndex = b.playerIndex,
       move = b.move,
       fen = b.fen,
       check = b.check,
@@ -367,6 +365,7 @@ object Node {
 
   object BsonFields {
     val ply            = "p"
+    val pi             = "pi"
     val ppt            = "pt"
     val uci            = "u"
     val san            = "s"

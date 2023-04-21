@@ -191,7 +191,7 @@ object BSONHandlers {
     import Node.{ BsonFields => F }
     for {
       ply <- doc.getAsOpt[Int](F.ply)
-      ppt <- doc.getAsOpt[Int](F.ppt)
+      pi  <- doc.getAsOpt[Int](F.pi)
       uci <- doc.getAsOpt[Uci](F.uci)
       san <- doc.getAsOpt[String](F.san)
       fen <- doc.getAsOpt[FEN](F.fen)
@@ -207,7 +207,7 @@ object BSONHandlers {
     } yield Node(
       id,
       ply,
-      ppt,
+      PlayerIndex.fromP1(pi == 1),
       WithSan(GameLogic.Chess(), uci, san),
       fen,
       check,
@@ -228,7 +228,7 @@ object BSONHandlers {
     val w = new Writer
     $doc(
       ply            -> n.ply,
-      ppt            -> n.plysPerTurn,
+      pi             -> n.playerIndex.hashCode,
       uci            -> n.move.uci,
       san            -> n.move.san,
       fen            -> n.fen,
@@ -253,9 +253,11 @@ object BSONHandlers {
     def reads(fullReader: Reader) = {
       val rootNode = fullReader.doc.getAsOpt[Bdoc](Path.rootDbKey) err "Missing root"
       val r        = new Reader(rootNode)
+      val p        = r int ply
       Root(
-        ply = r int ply,
-        plysPerTurn = r int ppt,
+        ply = p,
+        //if we haven't explicitly written the playerIndex for this study then its an old one ply per turn study and so we can deduce the playerIndex from the ply like the old days
+        playerIndex = (r intO pi).map(pi => PlayerIndex.fromP1(pi == 1)) | PlayerIndex.fromPly(p),
         fen = r.get[FEN](fen),
         check = r boolD check,
         shapes = r.getO[Shapes](shapes) | Shapes.empty,
@@ -272,7 +274,7 @@ object BSONHandlers {
       StudyFlatTree.writer.rootChildren(r) appended {
         Path.rootDbKey -> $doc(
           ply      -> r.ply,
-          ppt      -> r.plysPerTurn,
+          pi       -> r.playerIndex.hashCode,
           fen      -> r.fen,
           check    -> r.check.some.filter(identity),
           shapes   -> r.shapes.value.nonEmpty.option(r.shapes),

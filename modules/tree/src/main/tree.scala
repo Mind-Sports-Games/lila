@@ -4,14 +4,15 @@ import strategygames.Centis
 import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.opening.FullOpening
-import strategygames.{ GameLogic, Pocket, PocketData, Pos, Role }
+import strategygames.{ GameLogic, Player => PlayerIndex, Pocket, PocketData, Pos, Role }
 import play.api.libs.json._
 
 import lila.common.Json._
 
 sealed trait Node {
   def ply: Int
-  def plysPerTurn: Int
+  // who's playerIndex plays next
+  def playerIndex: PlayerIndex
   def fen: FEN
   def check: Boolean
   // None when not computed yet
@@ -38,16 +39,14 @@ sealed trait Node {
   def idOption: Option[UciCharPair]
   def moveOption: Option[Uci.WithSan]
 
-  // who's playerIndex plays next
-  def playerIndex = strategygames.Player.fromPly(ply, plysPerTurn)
-
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
 }
 
 case class Root(
     ply: Int,
-    plysPerTurn: Int,
+    // who's playerIndex plays next
+    playerIndex: PlayerIndex,
     fen: FEN,
     check: Boolean,
     // None when not computed yet
@@ -80,7 +79,8 @@ case class Root(
 case class Branch(
     id: UciCharPair,
     ply: Int,
-    plysPerTurn: Int,
+    // who's playerIndex plays next
+    playerIndex: PlayerIndex,
     move: Uci.WithSan,
     fen: FEN,
     check: Boolean,

@@ -23,7 +23,7 @@ object StepBuilder {
         JsArray {
           val initStep = Step(
             ply = init.turns,
-            plysPerTurn = variant.plysPerTurn,
+            playerIndex = init.situation.player,
             move = none,
             fen = Forsyth.>>(variant.gameLogic, init),
             check = init.situation.check,
@@ -38,7 +38,7 @@ object StepBuilder {
           val moveSteps = games.map { case (g, m) =>
             Step(
               ply = g.turns,
-              plysPerTurn = variant.plysPerTurn,
+              playerIndex = g.situation.player,
               move = Step.Move(m.uci, m.san).some,
               fen = Forsyth.>>(variant.gameLogic, g),
               check = g.situation.check,

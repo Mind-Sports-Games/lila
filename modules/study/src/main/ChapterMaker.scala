@@ -87,7 +87,7 @@ final private class ChapterMaker(
       case Some(sit) =>
         Node.Root(
           ply = sit.turns,
-          plysPerTurn = sit.situation.board.variant.plysPerTurn,
+          playerIndex = sit.situation.player,
           fen = Forsyth.>>(sit.situation.board.variant.gameLogic, sit),
           check = sit.situation.check,
           clock = none,
@@ -97,7 +97,7 @@ final private class ChapterMaker(
       case None =>
         Node.Root(
           ply = 0,
-          plysPerTurn = variant.plysPerTurn,
+          playerIndex = PlayerIndex.P1,
           fen = variant.initialFen,
           check = false,
           clock = none,
