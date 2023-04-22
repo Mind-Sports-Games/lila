@@ -61,7 +61,7 @@ object Info {
 
   val LineMaxPlies = 14
 
-  private val separator     = ","
+  private val separator     = "," // TODO: choose a separator that's not used for piotr
   private val listSeparator = ";"
 
   def start(ply: Int) = Info(ply, Eval.initial, Nil)
@@ -71,10 +71,11 @@ object Info {
 
   private def decode(ply: Int, str: String): Option[Info] =
     str.split(separator) match {
-      case Array()           => Info(ply, Eval.empty).some
-      case Array(cp)         => Info(ply, Eval(strCp(cp), None, None)).some
-      case Array(cp, ma)     => Info(ply, Eval(strCp(cp), strMate(ma), None)).some
-      case Array(cp, ma, va) => Info(ply, Eval(strCp(cp), strMate(ma), None), va.split(' ').toList).some
+      case Array()       => Info(ply, Eval.empty).some
+      case Array(cp)     => Info(ply, Eval(strCp(cp), None, None)).some
+      case Array(cp, ma) => Info(ply, Eval(strCp(cp), strMate(ma), None)).some
+      case Array(cp, ma, va) =>
+        Info(ply, Eval(strCp(cp), strMate(ma), None), va.split(' ').toList).some
       case Array(cp, ma, va, be) =>
         Info(
           ply,
@@ -82,6 +83,13 @@ object Info {
           Eval(strCp(cp), strMate(ma), Uci.Move.piotr(GameLogic.Chess(), GameFamily.Chess(), be)),
           va.split(' ').toList
         ).some
+      case Array(cp, ma, va, _, _) =>
+        // For https://github.com/Mind-Sports-Games/tasks/issues/380:
+        // there are some piotrs that use comma, which messes this up.
+        // if we end up with a 5th element when we split on comma, then it would have
+        // returned a none, and borked the entire load of analysis.
+        // Here, we detect this and assume that the eval didn't come with a best move.
+        Info(ply, Eval(strCp(cp), strMate(ma), none), va.split(' ').toList).some
       case _ => none
     }
 
