@@ -12,9 +12,9 @@ object embed {
 
   import EmbedConfig.implicits._
 
-  def apply(pov: lila.game.Pov, data: JsObject)(implicit config: EmbedConfig) =
+  def apply(pov: lila.game.Pov, data: JsObject)(config: EmbedConfig) =
     views.html.base.embed(
-      title = replay titleOf pov,
+      title = replay.titleOf(pov)(config.lang),
       cssModule = "analyse.embed"
     )(
       div(cls := "is2d")(
@@ -40,14 +40,14 @@ object embed {
           Json.obj(
             "data"  -> data,
             "embed" -> true,
-            "i18n"  -> views.html.board.userAnalysisI18n(withCeval = false, withExplorer = false)
+            "i18n"  -> views.html.board.userAnalysisI18n(withCeval = false, withExplorer = false)(config.lang)
           )
         )})""",
         config.nonce
       )
-    )
+    )(config)
 
-  def notFound(implicit config: EmbedConfig) =
+  def notFound(config: EmbedConfig) =
     views.html.base.embed(
       title = "404 - Game not found",
       cssModule = "analyse.embed"
@@ -55,5 +55,5 @@ object embed {
       div(cls := "not-found")(
         h1("Game not found")
       )
-    )
+    )(config)
 }
