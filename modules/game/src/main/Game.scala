@@ -100,7 +100,7 @@ case class Game(
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
 
-  def playedTurns = turns - chess.startedAtTurn
+  def playedTurns = if (chess.pgnMoves.size == turns - chess.startedAtTurn) turns - chess.startedAtTurn else turns.pp("turns") - chess.startedAtTurn.pp("startedAtTurn") + (0 * chess.pgnMoves.size.pp("pgnMovesSize"))
 
   def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
