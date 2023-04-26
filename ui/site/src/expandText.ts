@@ -149,39 +149,11 @@ playstrategy.load.then(() => {
     });
   }
 
-  const themes = [
-    'blue',
-    'blue2',
-    'blue3',
-    'blue-marble',
-    'canvas',
-    'wood',
-    'wood2',
-    'wood3',
-    'wood4',
-    'maple',
-    'maple2',
-    'brown',
-    'leather',
-    'green',
-    'marble',
-    'green-plastic',
-    'grey',
-    'metal',
-    'olive',
-    'newspaper',
-    'purple',
-    'purple-diag',
-    'pink',
-    'ic',
-    'horsey',
-  ];
-
   function configureSrc(url: string) {
     if (url.includes('://')) return url; // youtube, img, etc
     const parsed = new URL(url, window.location.href);
-    const theme = themes.find(theme => document.body.classList.contains(`chess-${theme}`));
-    if (theme) parsed.searchParams.append('theme', theme);
+    // We would need to know the gameFamilyId to correctly set some search params,
+    // therefore theme and pieceset are handled within the Embedconfig directly.
     parsed.searchParams.append('bg', document.body.getAttribute('data-theme')!);
     return parsed.href;
   }
