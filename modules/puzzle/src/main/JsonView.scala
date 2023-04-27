@@ -195,7 +195,8 @@ final class JsonView(
             id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
             ply = game.turns,
             playerIndex = game.situation.player,
-            move = Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.pgnMoves.last),
+            //we can flatten actions as we are dealing with just Chess
+            move = Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.actions.flatten.last),
             fen = Forsyth.>>(game.situation.board.variant.gameLogic, game),
             check = game.situation.check,
             pocketData = none

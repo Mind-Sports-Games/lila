@@ -46,8 +46,7 @@ case class Game(
     bookmarks: Int = 0,
     createdAt: DateTime = DateTime.now,
     movedAt: DateTime = DateTime.now,
-    metadata: Metadata,
-    pdnStorage: Option[PdnStorage] = None
+    metadata: Metadata
 ) {
 
   lazy val clockHistory = chess.clock.flatMap(loadClockHistory)
@@ -60,7 +59,7 @@ case class Game(
   def clock     = chess.clock
   // TODO: we really should rename pgnMoves to something more general,
   //       because only our chess games ae using PGN.
-  def pgnMoves = chess.pgnMoves
+  def pgnMoves = chess.actions.flatten
 
   val players = List(p1Player, p2Player)
 
@@ -101,6 +100,11 @@ case class Game(
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
 
   def playedTurns = turns - chess.startedAtTurn
+  //def playedTurns = if (chess.actions.flatten.size == turns - chess.startedAtTurn)
+  //  turns - chess.startedAtTurn
+  //else
+  //  turns.pp("turns") - chess.startedAtTurn
+  //    .pp("startedAtTurn") + (0 * chess.actions.flatten.size.pp("actionsSize"))
 
   def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
@@ -228,19 +232,19 @@ case class Game(
       }
     )
 
-  def pdnMovesConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
+  def draughtsActionsConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
     chess match {
-      case StratGame.Draughts(game) => game.pdnMovesConcat(fullCaptures, dropGhosts)
-      case _                        => sys.error("Cant call pdnMovesConcat for a gamelogic other than draughts")
+      case StratGame.Draughts(game) => game.actionsConcat(fullCaptures, dropGhosts).flatten
+      case _                        => sys.error("Cant call actionsConcat for a gamelogic other than draughts")
     }
 
   def pgnMoves(playerIndex: PlayerIndex): PgnMoves = {
     val pivot = if (playerIndex == startPlayerIndex) 0 else 1
-    val pgnMoves = variant.gameLogic match {
-      case GameLogic.Draughts() => pdnMovesConcat()
-      case _                    => chess.pgnMoves
+    val moves = variant.gameLogic match {
+      case GameLogic.Draughts() => draughtsActionsConcat()
+      case _                    => pgnMoves
     }
-    pgnMoves.zipWithIndex.collect {
+    moves.zipWithIndex.collect {
       case (e, i) if (i % 2) == pivot => e
     }
   }
@@ -888,10 +892,7 @@ object Game {
             multiMatch = multiMatch
           ),
         createdAt = createdAt,
-        movedAt = createdAt,
-        pdnStorage =
-          if (chess.situation.board.variant.gameLogic == GameLogic.Draughts()) Some(PdnStorage.OldBin)
-          else None
+        movedAt = createdAt
       )
     )
   }

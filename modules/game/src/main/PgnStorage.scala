@@ -20,9 +20,9 @@ private object PgnStorage {
         }
       }
 
-    def decode(bytes: ByteArray, plies: Int): PgnMoves =
+    def decode(bytes: ByteArray, plies: Int): Actions =
       monitor(_.game.pgn.decode("old")) {
-        format.pgn.Binary.readMoves(bytes.value.toList, plies).get.toVector
+        format.pgn.Binary.readMoves(bytes.value.toList, plies).get.toVector.map(Vector(_))
       }
   }
 
@@ -42,7 +42,7 @@ private object PgnStorage {
         val decoded      = Encoder.decode(bytes.value, plies)
         val unmovedRooks = decoded.unmovedRooks.asScala.view.flatMap(chessPos).to(Set)
         Decoded(
-          pgnMoves = decoded.pgnMoves.toVector,
+          actions = decoded.pgnMoves.toVector.map(Vector(_)),
           pieces = decoded.pieces.asScala.view.flatMap { case (k, v) =>
             chessPos(k).map(_ -> chessPiece(v))
           }.toMap,
@@ -68,7 +68,7 @@ private object PgnStorage {
   }
 
   case class Decoded(
-      pgnMoves: PgnMoves,
+      actions: Actions,
       pieces: PieceMap,
       positionHashes: PositionHash, // irrelevant after game ends
       unmovedRooks: UnmovedRooks,   // irrelevant after game ends

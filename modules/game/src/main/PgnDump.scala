@@ -55,7 +55,7 @@ final class PgnDump(
         makeTurns(
           game.variant match {
             case Variant.Draughts(variant) => {
-              val pdnMovesFull = game.pdnMovesConcat(true, true)
+              val pdnMovesFull = game.draughtsActionsConcat(true, true)
               val pdnMoves = strategygames.draughts.Replay
                 .unambiguousPdnMoves(
                   pdnMoves = pdnMovesFull,

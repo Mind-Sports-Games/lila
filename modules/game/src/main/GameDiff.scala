@@ -111,51 +111,10 @@ object GameDiff {
         ByteArrayBSONHandler.writeOpt(BinaryFormat.periodEntries.writeSide(x))
       }
 
-    def pfnStorageWriter(pgnMoves: PgnMoves) =
-      PfnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
-
-    def pmnStorageWriter(pgnMoves: PgnMoves) =
-      PmnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
-
-    def ptnStorageWriter(pgnMoves: PgnMoves) =
-      PtnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
+    def newLibStorageWriter(pgnMoves: PgnMoves) =
+      NewLibStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
 
     a.variant.gameLogic match {
-      case GameLogic.Draughts() =>
-        a.pdnStorage match {
-          case Some(PdnStorage.OldBin) => {
-            dTry(oldPgn, _.pgnMoves, writeBytes compose PdnStorage.OldBin.encode)
-            dTry(
-              binaryPieces,
-              _.board match {
-                case Board.Draughts(b) => b.pieces
-                case _                 => sys.error("Wrong board type")
-              },
-              writeBytes compose { m: strategygames.draughts.PieceMap =>
-                BinaryFormat.piece.writeDraughts(
-                  m,
-                  a.variant match {
-                    case strategygames.variant.Variant.Draughts(v) => v
-                    case _                                         => sys.error("Wrong variant type")
-                  }
-                )
-              }
-            )
-            d(positionHashes, _.history.positionHashes, w.bytes)
-            d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
-            // since variants are always OldBin
-            if (a.variant.frisianVariant || a.variant.draughts64Variant)
-              dOptTry(
-                kingMoves,
-                _.history.kingMoves,
-                (o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o }
-              )
-          }
-          case Some(PdnStorage.Huffman) => {
-            dTry(huffmanPgn, _.pgnMoves, writeBytes compose PdnStorage.Huffman.encode)
-          }
-          case _ => sys.error("invalid draughts storage")
-        }
       case GameLogic.Chess() =>
         if (a.variant.standard)
           dTry(huffmanPgn, _.pgnMoves, writeBytes compose PgnStorage.Huffman.encode)
@@ -194,6 +153,33 @@ object GameDiff {
               (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
             )
         }
+      case GameLogic.Draughts() => {
+        dTry(oldPgn, _.pgnMoves, writeBytes compose newLibStorageWriter)
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Draughts(b) => b.pieces
+            case _                 => sys.error("Wrong board type")
+          },
+          writeBytes compose { m: strategygames.draughts.PieceMap =>
+            BinaryFormat.piece.writeDraughts(
+              m,
+              a.variant match {
+                case strategygames.variant.Variant.Draughts(v) => v
+                case _                                         => sys.error("Wrong variant type")
+              }
+            )
+          }
+        )
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+        if (a.variant.frisianVariant || a.variant.draughts64Variant)
+          dOptTry(
+            kingMoves,
+            _.history.kingMoves,
+            (o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o }
+          )
+      }
       case GameLogic.FairySF() => {
         dTry(
           oldPgn,
@@ -209,7 +195,7 @@ object GameDiff {
               case _ => sys.error("Wrong board type")
             }
           },
-          writeBytes compose pfnStorageWriter
+          writeBytes compose newLibStorageWriter
         )
         dTry(
           binaryPieces,
@@ -235,7 +221,7 @@ object GameDiff {
             case Board.Samurai(b) => b.uciMoves.toVector
             case _                => sys.error("Wrong board type")
           },
-          writeBytes compose pmnStorageWriter
+          writeBytes compose newLibStorageWriter
         )
         dTry(
           binaryPieces,
@@ -249,7 +235,7 @@ object GameDiff {
         d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
       }
       case GameLogic.Togyzkumalak() => {
-        dTry(oldPgn, _.pgnMoves, writeBytes compose ptnStorageWriter)
+        dTry(oldPgn, _.pgnMoves, writeBytes compose newLibStorageWriter)
         dTry(
           binaryPieces,
           _.board match {

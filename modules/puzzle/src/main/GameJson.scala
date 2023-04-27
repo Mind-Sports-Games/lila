@@ -67,7 +67,7 @@ final private class GameJson(
         "perf"    -> perfJson(game),
         "rated"   -> game.rated,
         "players" -> playersJson(game),
-        "pgn"     -> game.chess.pgnMoves.take(plies + 1).mkString(" ")
+        "pgn"     -> game.pgnMoves.take(plies + 1).mkString(" ")
       )
       .add("clock", game.clock.map(_.config.show))
 
