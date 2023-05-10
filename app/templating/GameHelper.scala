@@ -212,7 +212,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => trans.gameFinished.txt()
           case Variant.FairySF(strategygames.fairysf.variant.Flipello10)     => trans.gameFinished.txt()
           case Variant.FairySF(strategygames.fairysf.variant.Amazons)        => trans.gameFinished.txt()
-          case Variant.Samurai(strategygames.samurai.variant.Oware)          => trans.gameFinished.txt()
+          case Variant.Samurai(strategygames.samurai.variant.Oware) =>
+            if (game.situation.isRepetition) trans.owareCycle.txt() else trans.gameFinished.txt()
           case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
             trans.gameFinished.txt()
           case _ => trans.variantEnding.txt()

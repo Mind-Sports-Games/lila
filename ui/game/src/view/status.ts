@@ -59,7 +59,11 @@ export default function status(ctrl: Ctrl): string {
         case 'amazons':
           return noarg('gameFinished');
         case 'oware':
-          return noarg('gameFinished');
+          if (d.game.isRepetition) {
+            return noarg('owareCycle');
+          } else {
+            return noarg('gameFinished');
+          }
         case 'togyzkumalak':
           return noarg('gameFinished');
       }
