@@ -51,6 +51,7 @@
   <string name="checkersConnected">All checkers connected</string>
   <string name="gameFinished">Game finished</string>
   <string name="variantEnding">Variant ending</string>
+  <string name="owareCycle">Game finished via repetition</string>
   <string name="newOpponent">New opponent</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Your opponent wants to play a new game with you</string>
   <string name="joinTheGame">Join the game</string>

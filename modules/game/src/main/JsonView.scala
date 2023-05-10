@@ -46,6 +46,7 @@ final class JsonView(rematches: Rematches) {
         "createdAt"     -> game.createdAt
       )
       .add("threefold" -> game.situation.threefoldRepetition)
+      .add("isRepetition" -> game.situation.isRepetition)
       .add("perpetualWarning" -> game.situation.perpetualPossible)
       .add("boosted" -> game.boosted)
       .add("tournamentId" -> game.tournamentId)
@@ -229,7 +230,7 @@ object JsonView {
         )
       case bc: ByoyomiClock => {
         val p1Clock = bc.currentClockFor(P1)
-        val p2Clock  = bc.currentClockFor(P2)
+        val p2Clock = bc.currentClockFor(P2)
         Json.obj(
           "running"   -> bc.isRunning,
           "initial"   -> bc.limitSeconds,

@@ -29,6 +29,7 @@ private object jsI18n {
     trans.checkersConnected,
     trans.gameFinished,
     trans.variantEnding,
+    trans.owareCycle,
     trans.analysis,
     trans.boardEditor,
     trans.continueFromHere,
