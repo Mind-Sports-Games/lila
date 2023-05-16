@@ -29,26 +29,31 @@ private object BSONHandlers {
     e => BSONInteger(e.id)
   )
   implicit val RoleBSONHandler = tryHandler[Role](
-    { case BSONString(r) => r.split(":") match {
-      case Array(lib, r) =>
-        //require gf for fairy as roles are different, all other gamelogic currently dont need this
-        if (lib.toInt == 2) Role.allByForsyth(
-          GameLogic.FairySF(),
-          GameFamily(lib.toInt)
-        ) get r.head toTry s"Invalid role $r"
-        else Role.allByForsyth(GameLogic(lib.toInt)) get r.head toTry s"Invalid role $r"
-      case _ => sys.error("role not correctly encoded")  
-    }},
-    e => e match {
-      case Role.ChessRole(r)              => BSONString(s"0:${r.forsyth.toString}")
-      case Role.ChessPromotableRole(r)    => BSONString(s"0:${r.forsyth.toString}")
-      case Role.DraughtsRole(r)           => BSONString(s"1:${r.forsyth.toString}")
-      case Role.DraughtsPromotableRole(r) => BSONString(s"1:${r.forsyth.toString}")
-      case Role.FairySFRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-      case Role.FairySFPromotableRole(r)  => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-      case Role.SamuraiRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-      case Role.TogyzkumalakRole(r)       => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-    }
+    { case BSONString(r) =>
+      r.split(":") match {
+        case Array(lib, r) =>
+          //require gf for fairy as roles are different, all other gamelogic currently dont need this
+          if (lib.toInt == 2)
+            Role.allByForsyth(
+              GameLogic.FairySF(),
+              GameFamily(lib.toInt)
+            ) get r.head toTry s"Invalid role $r"
+          else Role.allByForsyth(GameLogic(lib.toInt)) get r.head toTry s"Invalid role $r"
+        case _ => sys.error("role not correctly encoded")
+      }
+    },
+    e =>
+      e match {
+        case Role.ChessRole(r)              => BSONString(s"0:${r.forsyth.toString}")
+        case Role.ChessPromotableRole(r)    => BSONString(s"0:${r.forsyth.toString}")
+        case Role.DraughtsRole(r)           => BSONString(s"1:${r.forsyth.toString}")
+        case Role.DraughtsPromotableRole(r) => BSONString(s"1:${r.forsyth.toString}")
+        case Role.FairySFRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
+        case Role.FairySFPromotableRole(r)  => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
+        case Role.SamuraiRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
+        case Role.TogyzkumalakRole(r)       => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
+        case Role.GoRole(r)                 => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
+      }
   )
   implicit val TerminationBSONHandler = tryHandler[Termination](
     { case BSONInteger(v) => Termination.byId get v toTry s"Invalid termination $v" },
@@ -150,7 +155,7 @@ private object BSONHandlers {
           id               -> e.id,
           number           -> e.number,
           userId           -> e.userId,
-          playerIndex            -> e.playerIndex,
+          playerIndex      -> e.playerIndex,
           perf             -> e.perf,
           eco              -> e.eco,
           myCastling       -> e.myCastling,

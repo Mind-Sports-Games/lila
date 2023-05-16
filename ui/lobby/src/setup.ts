@@ -333,6 +333,19 @@ export default class Setup {
         case '7':
           key = 'togyzkumalak';
           break;
+        case '9':
+          switch (variantId[1]) {
+            case '1':
+              key = 'go9x9';
+              break;
+            case '2':
+              key = 'go13x13';
+              break;
+            case '4':
+              key = 'go19x19';
+              break;
+          }
+          break;
       }
       const $selected = $ratings
         .hide()
@@ -343,7 +356,7 @@ export default class Setup {
     };
     const showStartingImages = () => {
       const variantId = ($variantSelect.val() as string).split('_');
-      const class_list = 'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons';
+      const class_list = 'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':
@@ -372,6 +385,9 @@ export default class Setup {
           break;
         case '7':
           key = 'togyzkumalak';
+          break;
+        case '9':
+          key = 'go';
           break;
       }
       $form.find('.playerIndex-submits').removeClass(class_list);

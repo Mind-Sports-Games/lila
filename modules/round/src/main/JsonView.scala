@@ -32,7 +32,10 @@ final class JsonView(
       .checkCount(playerIndex)
 
   private def score(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.togyzkumalak.variant.Togyzkumalak) option game.history
+    (game.variant == strategygames.togyzkumalak.variant.Togyzkumalak ||
+      game.variant == strategygames.go.variant.Go9x9 ||
+      game.variant == strategygames.go.variant.Go13x13 ||
+      game.variant == strategygames.go.variant.Go19x19) option game.history
       .score(playerIndex)
 
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
@@ -386,7 +389,8 @@ final class JsonView(
       case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
-      case _ => sys.error("Mismatch of types for possibleMoves")
+      case (Situation.Go(_), Variant.Go(_)) => None
+      case _                                => sys.error("Mismatch of types for possibleMoves")
     }
 
   private def possibleDropsByrole(pov: Pov): Option[JsValue] =
@@ -397,8 +401,11 @@ final class JsonView(
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
       case (Situation.Samurai(_), Variant.Samurai(_))           => None
       case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) => None
-      case (Situation.Draughts(_), Variant.Draughts(_))         => None
-      case _                                                    => sys.error("Mismatch of types for possibleDropsByrole")
+      case (Situation.Go(_), Variant.Go(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Draughts(_), Variant.Draughts(_)) => None
+      case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
     }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =

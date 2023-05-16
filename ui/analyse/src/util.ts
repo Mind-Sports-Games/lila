@@ -246,6 +246,10 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }
 
+export function getGoScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4];
+}
+
 const noCevalVariants = [
   'linesOfAction',
   'scrambledEggs',
@@ -258,6 +262,9 @@ const noCevalVariants = [
   'amazons',
   'oware',
   'togyzkumalak',
+  'go9x9',
+  'go13x13',
+  'go19x19',
 ];
 
 export function allowCevalForVariant(variant: VariantKey) {
@@ -346,5 +353,11 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'oware';
     case 'togyzkumalak':
       return 'togyzkumalak';
+    case 'go9x9':
+      return 'go9x9';
+    case 'go13x13':
+      return 'go13x13';
+    case 'go19x19':
+      return 'go19x19';
   }
 };

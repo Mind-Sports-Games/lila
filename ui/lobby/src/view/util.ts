@@ -67,4 +67,7 @@ export const perfIcons = {
   Amazons: '€',
   Oware: '',
   Togyzkumalak: '›',
+  go9x9: '€',
+  go13x13: '€',
+  go19x19: '€',
 };

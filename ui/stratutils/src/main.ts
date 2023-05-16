@@ -67,7 +67,7 @@ export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
 }
 
 export function variantUsesDestPosOnlyNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['flipello', 'flipello10'].includes(key);
+  return ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(key);
 }
 
 export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
@@ -100,12 +100,24 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
     case 'flipello':
     case 'amazons':
       return { playerIndex: turnPlayerIndex, role: 'p-piece' };
+    case 'go9x9':
+    case 'go13x13':
+    case 'go19x19':
+      return { playerIndex: turnPlayerIndex, role: 's-piece' };
     default:
       return undefined;
   }
 }
 
-const noFishnetVariants: VariantKey[] = ['linesOfAction', 'scrambledEggs', 'oware', 'togyzkumalak'];
+const noFishnetVariants: VariantKey[] = [
+  'linesOfAction',
+  'scrambledEggs',
+  'oware',
+  'togyzkumalak',
+  'go9x9',
+  'go13x13',
+  'go19x19',
+];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
 }

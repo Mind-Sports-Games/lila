@@ -26,7 +26,7 @@ object Rewind {
             op = sans => Sans(sans.value.dropRight(1)),
             tags = createTags(initialFen, game)
           )
-      case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() =>
+      case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() | GameLogic.Go() =>
         Reader
           .movesWithPgns(
             game.variant.gameLogic,

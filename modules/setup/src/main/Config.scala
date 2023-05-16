@@ -111,6 +111,7 @@ trait Positional { self: Config =>
     case GameLogic.FairySF()      => true //no fromPosition yet
     case GameLogic.Samurai()      => true //no fromPosition yet
     case GameLogic.Togyzkumalak() => true //no fromPosition yet
+    case GameLogic.Go()           => true //no fromPosition yet
     case _ =>
       fen exists { f =>
         (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)

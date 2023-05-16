@@ -10,6 +10,7 @@ import {
   bindMobileMousedown,
   getPlayerScore,
   getMancalaScore,
+  getGoScore,
   variantToRules,
 } from './util';
 import { defined } from 'common';
@@ -384,6 +385,16 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
+      case 'go9x9':
+      case 'go13x13':
+      case 'go19x19': {
+        const fen = ctrl.node.fen;
+        const p1Score = getGoScore(fen, 'p1');
+        const p2Score = getGoScore(fen, 'p2');
+        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+        break;
+      }
       default: {
         break;
       }
@@ -403,7 +414,17 @@ export default function (ctrl: AnalyseCtrl): VNode {
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware', 'togyzkumalak'].includes(variantKey)
+  const notationBasic = [
+    'xiangqi',
+    'shogi',
+    'minixiangqi',
+    'minishogi',
+    'oware',
+    'togyzkumalak',
+    'go9x9',
+    'go13x13',
+    'go19x19',
+  ].includes(variantKey)
     ? '.piece-letter'
     : '';
   return h(

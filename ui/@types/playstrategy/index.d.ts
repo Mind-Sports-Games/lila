@@ -298,7 +298,10 @@ declare type VariantKey =
   | 'flipello10'
   | 'amazons'
   | 'oware'
-  | 'togyzkumalak';
+  | 'togyzkumalak'
+  | 'go9x9'
+  | 'go13x13'
+  | 'go19x19';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -352,7 +355,10 @@ declare type Perf =
   | 'flipello10'
   | 'amazons'
   | 'oware'
-  | 'togyzkumalak';
+  | 'togyzkumalak'
+  | 'go9x9'
+  | 'go13x13'
+  | 'go19x19';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red' | 'South' | 'North' | 'Bastaushi' | 'Kostaushi';
@@ -370,10 +376,49 @@ declare type GameFamilyKey =
   | 'flipello'
   | 'amazons'
   | 'oware'
-  | 'togyzkumalak';
+  | 'togyzkumalak'
+  | 'go';
 
-declare type Files = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j';
-declare type Ranks = '1' | '2' | '3' | '4' | '5' | '5' | '6' | '7' | '8' | '9' | '10';
+declare type Files =
+  | 'a'
+  | 'b'
+  | 'c'
+  | 'd'
+  | 'e'
+  | 'f'
+  | 'g'
+  | 'h'
+  | 'i'
+  | 'j'
+  | 'k'
+  | 'l'
+  | 'm'
+  | 'n'
+  | 'o'
+  | 'p'
+  | 'q'
+  | 'r'
+  | 's';
+declare type Ranks =
+  | '1'
+  | '2'
+  | '3'
+  | '4'
+  | '5'
+  | '6'
+  | '7'
+  | '8'
+  | '9'
+  | '10'
+  | '11'
+  | '12'
+  | '13'
+  | '14'
+  | '15'
+  | '16'
+  | '17'
+  | '18'
+  | '19';
 declare type Letter =
   | 'a'
   | 'b'

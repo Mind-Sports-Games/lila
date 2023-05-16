@@ -113,6 +113,16 @@ export function main(ctrl: RoundController): VNode {
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
       }
+      case 'go9x9':
+      case 'go13x13':
+      case 'go19x19': {
+        const fen = plyStep(ctrl.data, ctrl.ply).fen;
+        const p1Score = util.getGoScore(fen, 'p1');
+        const p2Score = util.getGoScore(fen, 'p2');
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        break;
+      }
       // case 'togyzkumalak': {
       // //togy uses game history to store the score while playing (its also in the full fen)
       // const playerScore = d.player.score ? d.player.score : 0;
@@ -155,7 +165,17 @@ export function main(ctrl: RoundController): VNode {
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware', 'togyzkumalak'].includes(variantKey)
+  const notationBasic = [
+    'xiangqi',
+    'shogi',
+    'minixiangqi',
+    'minishogi',
+    'oware',
+    'togyzkumalak',
+    'go9x9',
+    'go13x13',
+    'go19x19',
+  ].includes(variantKey)
     ? '.piece-letter'
     : '';
 

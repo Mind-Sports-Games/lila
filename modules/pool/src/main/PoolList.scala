@@ -34,7 +34,8 @@ object PoolList {
       3 ++ 2,
       Wave(22 seconds, 30 players),
       Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak)
-    )
+    ),
+    PoolConfig(5 ++ 3, Wave(22 seconds, 30 players), Variant.Go(strategygames.go.variant.Go19x19))
   )
 
   val clockStringSet: Set[String] = all.view.map(_.clock.show) to Set

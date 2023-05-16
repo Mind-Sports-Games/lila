@@ -41,6 +41,9 @@ case class Perfs(
     amazons: Perf,
     oware: Perf,
     togyzkumalak: Perf,
+    go9x9: Perf,
+    go13x13: Perf,
+    go19x19: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -87,6 +90,9 @@ case class Perfs(
       "amazons"        -> amazons,
       "oware"          -> oware,
       "togyzkumalak"   -> togyzkumalak,
+      "go9x9"          -> go9x9,
+      "go13x13"        -> go13x13,
+      "go19x19"        -> go19x19,
       "ultraBullet"    -> ultraBullet,
       "bullet"         -> bullet,
       "blitz"          -> blitz,
@@ -189,6 +195,9 @@ case class Perfs(
     "amazons"        -> amazons,
     "oware"          -> oware,
     "togyzkumalak"   -> togyzkumalak,
+    "go9x9"          -> go9x9,
+    "go13x13"        -> go13x13,
+    "go19x19"        -> go19x19,
     "ultraBullet"    -> ultraBullet,
     "bullet"         -> bullet,
     "blitz"          -> blitz,
@@ -289,6 +298,9 @@ case object Perfs {
       p,
       p,
       p,
+      p,
+      p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -343,6 +355,9 @@ case object Perfs {
       case Variant.FairySF(strategygames.fairysf.variant.Amazons)                => Some(_.amazons)
       case Variant.Samurai(strategygames.samurai.variant.Oware)                  => Some(_.oware)
       case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) => Some(_.togyzkumalak)
+      case Variant.Go(strategygames.go.variant.Go9x9)                            => Some(_.go9x9)
+      case Variant.Go(strategygames.go.variant.Go13x13)                          => Some(_.go13x13)
+      case Variant.Go(strategygames.go.variant.Go19x19)                          => Some(_.go19x19)
       case _                                                                     => none
     }
 
@@ -395,6 +410,9 @@ case object Perfs {
         amazons = perf("amazons"),
         oware = perf("oware"),
         togyzkumalak = perf("togyzkumalak"),
+        go9x9 = perf("go9x9"),
+        go13x13 = perf("go13x13"),
+        go19x19 = perf("go19x19"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -444,6 +462,9 @@ case object Perfs {
         "amazons"        -> notNew(o.amazons),
         "oware"          -> notNew(o.oware),
         "togyzkumalak"   -> notNew(o.togyzkumalak),
+        "go9x9"          -> notNew(o.go9x9),
+        "go13x13"        -> notNew(o.go13x13),
+        "go19x19"        -> notNew(o.go19x19),
         "ultraBullet"    -> notNew(o.ultraBullet),
         "bullet"         -> notNew(o.bullet),
         "blitz"          -> notNew(o.blitz),
@@ -493,10 +514,16 @@ case object Perfs {
       flipello10: List[User.LightPerf],
       amazons: List[User.LightPerf],
       oware: List[User.LightPerf],
-      togyzkumalak: List[User.LightPerf]
+      togyzkumalak: List[User.LightPerf],
+      go9x9: List[User.LightPerf],
+      go13x13: List[User.LightPerf],
+      go19x19: List[User.LightPerf]
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
+    Nil,
+    Nil,
     Nil,
     Nil,
     Nil,

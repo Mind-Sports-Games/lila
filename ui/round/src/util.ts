@@ -142,6 +142,10 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }
 
+export function getGoScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4];
+}
+
 export const noChecks: CheckCount = {
   p1: 0,
   p2: 0,

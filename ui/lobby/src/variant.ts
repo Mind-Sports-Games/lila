@@ -33,6 +33,9 @@ const variantConfirms = {
   amazons: 'This is an Amazons game!\n\nImmobilize all the enemy pieces to win.',
   oware: 'This is an Oware game!\n\nThe aim of the game is to capture the most stones.',
   togyzkumalak: 'This is an Togyzkumalak game!\n\nThe aim of the game is to capture the most stones.',
+  go9x9: 'This is a 9 by 9 Go game!\n\n The aim of the game is to surround the largest area(s) with your stones',
+  go13x13: 'This is a 13 by 13 Go game!\n\n The aim of the game is to surround the largest area(s) with your stones',
+  go19x19: 'This is a 19 by 19 Go game!\n\n The aim of the game is to surround the largest area(s) with your stones',
 };
 
 function storageKey(key) {

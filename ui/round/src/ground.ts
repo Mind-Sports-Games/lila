@@ -122,6 +122,10 @@ export function makeConfig(ctrl: RoundController): Config {
             ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
               '/'
+            : variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19'
+            ? 'https://playstrategy.org/assets/piece/go/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
+              '/'
             : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +

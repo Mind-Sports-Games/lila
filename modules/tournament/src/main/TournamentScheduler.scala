@@ -313,6 +313,9 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz32),
       (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz53),
+      // (Variant.Go(strategygames.go.variant.Go9x9), Blitz32),
+      // (Variant.Go(strategygames.go.variant.Go13x13), Blitz53), //todo also add 3 slots above when going live and mix these up
+      // (Variant.Go(strategygames.go.variant.Go19x19), Blitz53),
       (Variant.Chess(strategygames.chess.variant.Chess960), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.English), Blitz32),
       (Variant.Chess(strategygames.chess.variant.ScrambledEggs), Blitz32),
@@ -437,7 +440,10 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32)(
         new DateTime(2023, 12, 15, 0, 0)
-      )
+      ),
+      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go19x19), Blitz53)(
+        new DateTime(2023, 12, 22, 0, 0)
+      ) //todo also add 13x13 and 9x9
     ).flatten filter { _.schedule.at isAfter rightNow }
 
     //order matters for pruning weekly/yearly tournaments

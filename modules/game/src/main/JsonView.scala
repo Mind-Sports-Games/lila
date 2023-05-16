@@ -169,6 +169,14 @@ object JsonView {
           "lib"       -> v.gameLogic.id,
           "boardSize" -> togyzkumalakVariant.boardSize
         )
+      case Variant.Go(goVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> goVariant.boardSize
+        )
       case _ =>
         Json.obj(
           "key"   -> v.key,
@@ -201,6 +209,14 @@ object JsonView {
 
   implicit val boardSizeTogyzkumalakWriter: Writes[strategygames.togyzkumalak.Board.BoardSize] =
     Writes[strategygames.togyzkumalak.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
+
+  implicit val boardSizeGoWriter: Writes[strategygames.go.Board.BoardSize] =
+    Writes[strategygames.go.Board.BoardSize] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

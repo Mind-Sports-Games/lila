@@ -100,7 +100,9 @@ case class Game(
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
 
-  def playedTurns = if (chess.pgnMoves.size == turns - chess.startedAtTurn) turns - chess.startedAtTurn else turns.pp("turns") - chess.startedAtTurn.pp("startedAtTurn") + (0 * chess.pgnMoves.size.pp("pgnMovesSize"))
+  def playedTurns = if (chess.pgnMoves.size == turns - chess.startedAtTurn) turns - chess.startedAtTurn
+  else
+    turns.pp("turns") - chess.startedAtTurn.pp("startedAtTurn") + (0 * chess.pgnMoves.size.pp("pgnMovesSize"))
 
   def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
@@ -311,6 +313,10 @@ case class Game(
         )
       else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
         (updated.board.variant.togyzkumalak) ?? List(
+          Event.Score(p1 = updated.history.score.p1, updated.history.score.p2)
+        )
+      else if (updated.board.variant.gameLogic == GameLogic.Go())
+        (updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? List(
           Event.Score(p1 = updated.history.score.p1, updated.history.score.p2)
         )
       else //chess

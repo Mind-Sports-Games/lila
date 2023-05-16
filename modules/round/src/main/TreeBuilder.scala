@@ -28,6 +28,7 @@ object TreeBuilder {
       case FEN.FairySF(fen)      => FullOpeningDB.findByFen(GameLogic.FairySF(), FEN.FairySF(fen))
       case FEN.Samurai(fen)      => FullOpeningDB.findByFen(GameLogic.Samurai(), FEN.Samurai(fen))
       case FEN.Togyzkumalak(fen) => FullOpeningDB.findByFen(GameLogic.Togyzkumalak(), FEN.Togyzkumalak(fen))
+      case FEN.Go(fen)           => FullOpeningDB.findByFen(GameLogic.Go(), FEN.Go(fen))
     }
 
   def apply(

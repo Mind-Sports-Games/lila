@@ -249,6 +249,9 @@ export default class RoundController {
         'oware',
         'togyzkumalak',
         'amazons',
+        'go9x9',
+        'go13x13',
+        'go19x19',
       ].includes(this.data.game.variant.key)
     )
       return false;

@@ -29,6 +29,10 @@
       height: 125px;
     }
 
+    &.go {
+      height: 125px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -72,6 +76,12 @@
     display: block;
     width: 100px;
     height: 55.55px;
+  }
+
+  .list a.go span {
+    display: block;
+    width: 100px;
+    height: 100px;
   }
 
   &.d3 .list span {
@@ -185,6 +195,16 @@
 
     .togyzkumalak-wood {
       background-image: url(../images/board/togyzkumalak/togyzkumalak_wood_board.png);
+      background-size: 100px;
+    }
+
+    .go-light-wood {
+      background-image: url(../images/board/go/svg/go_board_light_9x9.svg);
+      background-size: 100px;
+    }
+
+    .go-dark-wood {
+      background-image: url(../images/board/go/svg/go_board_dark_9x9.svg);
       background-size: 100px;
     }
   }
