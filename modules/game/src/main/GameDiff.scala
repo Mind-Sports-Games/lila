@@ -286,6 +286,12 @@ object GameDiff {
           _.history.score,
           (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
         )
+        if (a.variant.dropsVariant)
+          dOpt(
+            pocketData,
+            _.board.pocketData,
+            (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
+          )
       }
     }
 

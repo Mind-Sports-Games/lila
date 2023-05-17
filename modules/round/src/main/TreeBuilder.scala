@@ -72,6 +72,8 @@ object TreeBuilder {
           dropsByRole = init.situation match {
             case (Situation.FairySF(_)) =>
               init.situation.dropsByRole
+            case (Situation.Go(_)) =>
+              init.situation.dropsByRole
             case _ => None
           }
         )
@@ -100,6 +102,8 @@ object TreeBuilder {
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
             dropsByRole = g.situation match {
               case (Situation.FairySF(_)) =>
+                g.situation.dropsByRole
+              case (Situation.Go(_)) =>
                 g.situation.dropsByRole
               case _ => None
             },
@@ -166,6 +170,8 @@ object TreeBuilder {
         pocketData = g.situation.board.pocketData,
         dropsByRole = g.situation match {
           case (Situation.FairySF(_)) =>
+            g.situation.dropsByRole
+          case (Situation.Go(_)) =>
             g.situation.dropsByRole
           case _ => None
         },

@@ -826,7 +826,8 @@ object BSONHandlers {
               }),
               F.positionHashes  -> o.history.positionHashes,
               F.historyLastMove -> o.history.lastMove.map(_.uci),
-              F.score           -> o.history.score.nonEmpty.option(o.history.score)
+              F.score           -> o.history.score.nonEmpty.option(o.history.score),
+              F.pocketData      -> o.board.pocketData
             )
           case _ => //chess or fail
             if (o.variant.standard)
