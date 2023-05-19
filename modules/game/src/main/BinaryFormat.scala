@@ -551,7 +551,7 @@ object BinaryFormat {
       //  Array(int >> 4, int & 0x0f)
       //}
       def intPiece(int: Int): Option[go.Piece] =
-        go.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map { role =>
+        go.Role.allByBinaryInt.get(int & 127) map { role =>
           go.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
         }
       (go.Pos.all zip ba.value).view

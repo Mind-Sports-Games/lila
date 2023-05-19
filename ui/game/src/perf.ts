@@ -36,8 +36,8 @@ export const perf = {
     amazons: '€',
     oware: '',
     togyzkumalak: '›',
-    go9x9: '€',
-    go13x13: '€',
-    go19x19: '€',
+    go9x9: '',
+    go13x13: '',
+    go19x19: '',
   },
 };

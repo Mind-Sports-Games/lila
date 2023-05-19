@@ -43,7 +43,7 @@ export function readDropsByRole(line?: string | null): Map<cg.Role, Key[]> {
   const roledrops = new Map();
   line
     .split(' ')
-    .forEach(d => roledrops.set(d[0].toLowerCase() + '-piece', d.slice(1).match(/[a-z][1-9]0?/g) as Key[]));
+    .forEach(d => roledrops.set(d[0].toLowerCase() + '-piece', d.slice(1).match(/[a-z][1-9][0-9]?/g) as Key[]));
   return roledrops;
 }
 

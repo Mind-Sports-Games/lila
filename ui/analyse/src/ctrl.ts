@@ -262,8 +262,8 @@ export default class AnalyseCtrl {
 
   private uciToLastMove(uci?: Uci): Key[] | undefined {
     if (!uci) return;
-    if (uci[1] === '@') return [uci.substr(2, 2), uci.substr(2, 2)] as Key[];
-    return [uci.substr(0, 2), uci.substr(2, 2)] as Key[];
+    if (uci[1] === '@') return [uci.substring(2), uci.substring(2)] as Key[];
+    return [uci.substring(0, 2), uci.substring(2, 2)] as Key[]; //todo fix for moves on 10x10 board
   }
 
   private showGround(): void {
