@@ -78,14 +78,14 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
   return variantUsesUCINotation(key)
     ? 'uci'
     : variantUsesUSINotation(key)
-    ? 'usi'
-    : variantUsesWXFNotation(key)
-    ? 'wxf'
-    : variantUsesDestPosOnlyNotation(key)
-    ? 'dpo'
-    : variantUsesMancalaNotation(key)
-    ? 'man'
-    : 'san';
+      ? 'usi'
+      : variantUsesWXFNotation(key)
+        ? 'wxf'
+        : variantUsesDestPosOnlyNotation(key)
+          ? 'dpo'
+          : variantUsesMancalaNotation(key)
+            ? 'man'
+            : 'san';
 }
 
 interface Piece {

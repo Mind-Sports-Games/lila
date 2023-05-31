@@ -8,6 +8,7 @@ import { defined, prop, Prop } from 'common';
 import { altCastles } from 'stratutils';
 import { parseUci } from 'stratops/util';
 import { makeSan } from 'stratops/san';
+import { variantToRules } from '../util'
 
 declare type Verdict = 'goodMove' | 'inaccuracy' | 'mistake' | 'blunder';
 
@@ -73,7 +74,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
     const ceval = node.ceval;
     return ceval
       ? ceval.depth >= Math.min(ceval.maxDepth || 99, playableDepth()) ||
-          (ceval.depth >= 15 && (ceval.cloud || ceval.millis > 5000))
+      (ceval.depth >= 15 && (ceval.cloud || ceval.millis > 5000))
       : false;
   }
 
@@ -82,8 +83,8 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
       hit &&
       (hit.winner
         ? {
-            mate: hit.winner === 'p1' ? 10 : -10,
-          }
+          mate: hit.winner === 'p1' ? 10 : -10,
+        }
         : { cp: 0 })
     );
   }
@@ -113,6 +114,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
       else verdict = 'blunder';
     }
 
+    const rules = variantToRules(variant);
     return {
       prev,
       node,
@@ -120,12 +122,12 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
       verdict,
       best: best
         ? {
-            uci: best,
-            san: root.position(prev).unwrap(
-              pos => makeSan(pos, parseUci(best!)!),
-              _ => '--'
-            ),
-          }
+          uci: best,
+          san: root.position(prev).unwrap(
+            pos => makeSan(rules)(pos, parseUci(rules)(best!)!),
+            _ => '--'
+          ),
+        }
         : undefined,
     };
   }

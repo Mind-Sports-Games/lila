@@ -7,6 +7,7 @@ import { DrawShape } from 'chessground/draw';
 import changeColorHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
 import AnalyseCtrl from './ctrl';
+import { isOnlyDropsPly } from './util';
 import * as stratUtils from 'stratutils';
 
 export function render(ctrl: AnalyseCtrl): VNode {
@@ -46,7 +47,8 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     hooks = ctrl.makeCgHooks(),
     pref = d.pref,
     opts = ctrl.makeCgOpts(),
-    variantKey = d.game.variant.key as cg.Variant;
+    variantKey = d.game.variant.key,
+    cgVariantKey = variantKey as cg.Variant;
   const config = {
     turnPlayerIndex: opts.turnPlayerIndex,
     fen: opts.fen,
@@ -86,33 +88,33 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
       pieces: {
         baseUrl:
-          variantKey === 'shogi' || variantKey === 'minishogi'
+          cgVariantKey === 'shogi' || cgVariantKey === 'minishogi'
             ? 'https://playstrategy.org/assets/piece/shogi/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
-              '/'
-            : variantKey === 'flipello' || variantKey === 'flipello10'
-            ? 'https://playstrategy.org/assets/piece/flipello/' +
+            d.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
+            '/'
+            : cgVariantKey === 'flipello' || cgVariantKey === 'flipello10'
+              ? 'https://playstrategy.org/assets/piece/flipello/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
               '/'
-            : variantKey === 'amazons'
-            ? 'https://playstrategy.org/assets/piece/amazons/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
-              '/'
-            : variantKey === 'oware'
-            ? 'https://playstrategy.org/assets/piece/oware/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
-              '/'
-            : variantKey === 'togyzkumalak'
-            ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
-              '/'
-            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
-            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
-              '/'
-            : 'https://playstrategy.org/assets/piece/chess/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-              '/',
+              : cgVariantKey === 'amazons'
+                ? 'https://playstrategy.org/assets/piece/amazons/' +
+                d.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
+                '/'
+                : cgVariantKey === 'oware'
+                  ? 'https://playstrategy.org/assets/piece/oware/' +
+                  d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
+                  '/'
+                  : cgVariantKey === 'togyzkumalak'
+                    ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
+                    d.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
+                    '/'
+                    : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
+                      ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                      d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                      '/'
+                      : 'https://playstrategy.org/assets/piece/chess/' +
+                      d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                      '/',
       },
     },
     highlight: {
@@ -131,11 +133,11 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     },
     disableContextMenu: true,
     dimensions: d.game.variant.boardSize,
-    variant: variantKey,
-    chess960: variantKey == 'chess960',
-    onlyDropsVariant: d.onlyDropsVariant,
+    variant: cgVariantKey,
+    chess960: cgVariantKey == 'chess960',
+    onlyDropsVariant: isOnlyDropsPly(ctrl.node, variantKey, d.onlyDropsVariant),
     singleClickMoveVariant:
-      variantKey === 'togyzkumalak' ||
+      cgVariantKey === 'togyzkumalak' ||
       (stratUtils.variantUsesMancalaNotation(d.game.variant.key) && d.pref.mancalaMove),
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
