@@ -13,10 +13,10 @@ private object PonStorage {
 
   case object OldBin extends PonStorage {
 
-    def encode(gf: GameFamily, pgnMoves: PgnMoves) =
+    def encode(pgnMoves: PgnMoves) =
       ByteArray {
         monitor(_.game.pgn.encode("old")) {
-          format.pgn.Binary.writeMoves(gf, pgnMoves).get
+          format.pgn.Binary.writeMoves(pgnMoves).get
         }
       }
 

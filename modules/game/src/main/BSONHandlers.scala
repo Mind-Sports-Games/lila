@@ -819,7 +819,7 @@ object BSONHandlers {
             )
           case GameLogic.Go() =>
             $doc(
-              F.oldPgn -> PonStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.oldPgn -> PonStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
               F.binaryPieces -> BinaryFormat.piece.writeGo(o.board match {
                 case Board.Go(board) => board.pieces
                 case _               => sys.error("invalid go board")

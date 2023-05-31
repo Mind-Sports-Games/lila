@@ -121,7 +121,7 @@ object GameDiff {
       PtnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
 
     def ponStorageWriter(pgnMoves: PgnMoves) =
-      PonStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
+      PonStorage.OldBin.encode(pgnMoves)
 
     a.variant.gameLogic match {
       case GameLogic.Draughts() =>
