@@ -59,7 +59,9 @@ flipello_themes = [
 ]
 amazons_themes = [
   ['queen', 'svg'],
-  ['arrow', 'svg']
+  ['arrow', 'svg'],
+  ['counter', 'svg'],
+  ['counter_arrow', 'svg']
 ]
 oware_themes = [
   ['red', 'svg'],
