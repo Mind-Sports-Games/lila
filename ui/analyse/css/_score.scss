@@ -60,23 +60,47 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
 }
 @each $variant in $go-variants {
   body.go-light-wood .variant-#{$variant} .game-score.game-score-top {
-    background: url(../images/board/go/svg/go_pot_white_light.svg);
-    background-size: cover;
+    &.p1 {
+      background: url(../images/board/go/svg/go_pot_black_light.svg);
+      background-size: cover;
+    }
+    &.p2 {
+      background: url(../images/board/go/svg/go_pot_white_light.svg);
+      background-size: cover;
+    }
   }
 
   body.go-light-wood .variant-#{$variant} .game-score.game-score-bottom {
-    background: url(../images/board/go/svg/go_pot_black_light.svg);
-    background-size: cover;
+    &.p1 {
+      background: url(../images/board/go/svg/go_pot_black_light.svg);
+      background-size: cover;
+    }
+    &.p2 {
+      background: url(../images/board/go/svg/go_pot_white_light.svg);
+      background-size: cover;
+    }
   }
 
   body.go-dark-wood .variant-#{$variant} .game-score.game-score-top {
-    background: url(../images/board/go/svg/go_pot_white_dark.svg);
-    background-size: cover;
+    &.p1 {
+      background: url(../images/board/go/svg/go_pot_black_dark.svg);
+      background-size: cover;
+    }
+    &.p2 {
+      background: url(../images/board/go/svg/go_pot_white_dark.svg);
+      background-size: cover;
+    }
   }
 
   body.go-dark-wood .variant-#{$variant} .game-score.game-score-bottom {
-    background: url(../images/board/go/svg/go_pot_black_dark.svg);
-    background-size: cover;
+    &.p1 {
+      background: url(../images/board/go/svg/go_pot_black_dark.svg);
+      background-size: cover;
+    }
+    &.p2 {
+      background: url(../images/board/go/svg/go_pot_white_dark.svg);
+      background-size: cover;
+    }
   }
 }
 

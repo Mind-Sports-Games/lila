@@ -338,6 +338,9 @@ function renderPlayerScore(
       children.push(h(pieceClassPart2 + playerIndex));
     }
     return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
+    children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
   } else {
     const pieceClass =
       variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
