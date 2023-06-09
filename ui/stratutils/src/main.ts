@@ -15,7 +15,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'man';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -35,7 +35,7 @@ export function readDests(lines?: string): Dests | null {
 
 export function readDrops(line?: string | null): Key[] | null {
   if (typeof line === 'undefined' || line === null) return null;
-  return (line.match(/[a-z][1-9]0?/g) as Key[]) || [];
+  return (line.match(/[a-z][1-9][0-9]?/g) as Key[]) || [];
 }
 
 export function readDropsByRole(line?: string | null): Map<cg.Role, Key[]> {
@@ -66,8 +66,12 @@ export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
   return ['xiangqi', 'minixiangqi'].includes(key);
 }
 
-export function variantUsesDestPosOnlyNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(key);
+export function variantUsesDestPosOthelloNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['flipello', 'flipello10'].includes(key);
+}
+
+export function variantUsesDestPosGoNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['go9x9', 'go13x13', 'go19x19'].includes(key);
 }
 
 export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
@@ -81,8 +85,10 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
     ? 'usi'
     : variantUsesWXFNotation(key)
     ? 'wxf'
-    : variantUsesDestPosOnlyNotation(key)
+    : variantUsesDestPosOthelloNotation(key)
     ? 'dpo'
+    : variantUsesDestPosGoNotation(key)
+    ? 'dpg'
     : variantUsesMancalaNotation(key)
     ? 'man'
     : 'san';

@@ -280,7 +280,7 @@ export type LexicalUci = {
 
 export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
   if (!uci) return undefined;
-  const pos = uci.match(/[a-z][1-9]0?/g) as cg.Key[];
+  const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
 
   if (uci[1] === '@') {
     return {

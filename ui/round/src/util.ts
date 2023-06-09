@@ -53,7 +53,7 @@ export const justIcon = (icon: string): VNodeData => ({
 // TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
   if (!uci) return undefined;
-  const pos = uci.match(/[a-z][1-9]0?/g) as cg.Key[];
+  const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
   return [pos[0], pos[1]] as cg.Key[];
 };
@@ -81,10 +81,10 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
   if (!dests) return dec;
   if (typeof dests == 'string')
     for (const ds of dests.split(' ')) {
-      const pos = ds.match(/[a-z][1-9]0?/g) as cg.Key[];
+      const pos = ds.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
       dec.set(pos[0], pos.slice(1));
     }
-  else for (const k in dests) dec.set(k, dests[k].match(/[a-z][1-9]0?/g) as cg.Key[]);
+  else for (const k in dests) dec.set(k, dests[k].match(/[a-z][1-9][0-9]?/g) as cg.Key[]);
   return dec;
 }
 
