@@ -14,7 +14,7 @@ export const makeCgOpts = (run: Run, canMove: boolean): CgConfig => {
     turnPlayerIndex: pos.turn,
     movable: {
       playerIndex: run.pov,
-      dests: canMove ? chessgroundDests(pos) : undefined,
+      dests: canMove ? chessgroundDests('chess')(pos) : undefined,
     },
     check: !!pos.isCheck(),
     lastMove: uciToLastMove(cur.lastMove()),
