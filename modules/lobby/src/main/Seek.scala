@@ -42,7 +42,8 @@ case class Seek(
       s.rating ?? range.contains
     }
 
-  private def compatibilityProperties = (variant, mode, daysPerTurn)
+  private def compatibilityProperties =
+    (gameLogic, variant, mode, daysPerTurn)
 
   lazy val realRatingRange: Option[RatingRange] = RatingRange noneIfDefault ratingRange
 
