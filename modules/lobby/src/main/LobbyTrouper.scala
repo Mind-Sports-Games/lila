@@ -43,7 +43,7 @@ final private class LobbyTrouper(
       hook.sid ?? { sid =>
         hookRepo bySid sid foreach remove
       }
-      !hook.compatibleWithPools ?? findCompatible(hook) match {
+      !hook.compatibleWithPools(hook.realVariant) ?? findCompatible(hook) match {
         case Some(h) => biteHook(h.id, hook.sri, hook.user)
         case None =>
           hookRepo save msg.hook
@@ -136,8 +136,8 @@ final private class LobbyTrouper(
     case HookSub(member, true) =>
       socket ! AllHooksFor(member, hookRepo.filter { biter.showHookTo(_, member) }.toSeq)
 
-    case lila.pool.HookThieve.GetCandidates(clock, promise) =>
-      promise success lila.pool.HookThieve.PoolHooks(hookRepo poolCandidates clock)
+    case lila.pool.HookThieve.GetCandidates(clock, variant, promise) =>
+      promise success lila.pool.HookThieve.PoolHooks(hookRepo.poolCandidates(clock, variant))
 
     case lila.pool.HookThieve.StolenHookIds(ids) =>
       hookRepo byIds ids.toSet foreach remove
