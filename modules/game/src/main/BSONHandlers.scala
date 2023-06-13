@@ -662,7 +662,8 @@ object BSONHandlers {
               case Some(PocketData.Go(pd)) => Some(pd)
               case None                    => None
               case _                       => sys.error("non go pocket data")
-            }
+            },
+            uciMoves = strategygames.go.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
           ),
           player = turnPlayerIndex
         ),
