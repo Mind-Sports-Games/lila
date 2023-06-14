@@ -6,7 +6,7 @@ import strategygames.chess.{ Castles, CheckCount }
 import strategygames.togyzkumalak.Score
 import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
-  P2,
+  Actions,
   Centis,
   ByoyomiClock,
   Clock,
@@ -21,7 +21,8 @@ import strategygames.{
   Pos,
   Speed,
   Status,
-  P1
+  P1,
+  P2
 }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -51,15 +52,14 @@ case class Game(
 
   lazy val clockHistory = chess.clock.flatMap(loadClockHistory)
 
-  def situation = chess.situation
-  def board     = chess.situation.board
-  def history   = chess.situation.board.history
-  def variant   = chess.situation.board.variant
-  def turns     = chess.turns
-  def clock     = chess.clock
-  // TODO: we really should rename pgnMoves to something more general,
-  //       because only our chess games ae using PGN.
-  def pgnMoves = chess.actions.flatten
+  def situation    = chess.situation
+  def board        = chess.situation.board
+  def history      = chess.situation.board.history
+  def variant      = chess.situation.board.variant
+  def turns        = chess.turns
+  def clock        = chess.clock
+  def actions      = chess.actions
+  def activePlayer = chess.situation.player
 
   val players = List(p1Player, p2Player)
 
@@ -99,12 +99,14 @@ case class Game(
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
 
-  def playedTurns = turns - chess.startedAtTurn
+  //def playedTurns = turns - chess.startedAtTurn
   //def playedTurns = if (chess.actions.flatten.size == turns - chess.startedAtTurn)
   //  turns - chess.startedAtTurn
   //else
   //  turns.pp("turns") - chess.startedAtTurn
   //    .pp("startedAtTurn") + (0 * chess.actions.flatten.size.pp("actionsSize"))
+  //TODO: multimove confirm dont need to use -1?
+  def playedTurns = actions.size
 
   def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
@@ -232,19 +234,19 @@ case class Game(
       }
     )
 
-  def draughtsActionsConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
+  def draughtsActionsConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): Actions =
     chess match {
-      case StratGame.Draughts(game) => game.actionsConcat(fullCaptures, dropGhosts).flatten
+      case StratGame.Draughts(game) => game.actionsConcat(fullCaptures, dropGhosts)
       case _                        => sys.error("Cant call actionsConcat for a gamelogic other than draughts")
     }
 
-  def pgnMoves(playerIndex: PlayerIndex): PgnMoves = {
+  def actions(playerIndex: PlayerIndex): Actions = {
     val pivot = if (playerIndex == startPlayerIndex) 0 else 1
-    val moves = variant.gameLogic match {
+    val plys = variant.gameLogic match {
       case GameLogic.Draughts() => draughtsActionsConcat()
-      case _                    => pgnMoves
+      case _                    => actions
     }
-    moves.zipWithIndex.collect {
+    plys.zipWithIndex.collect {
       case (e, i) if (i % 2) == pivot => e
     }
   }
@@ -451,7 +453,7 @@ case class Game(
       !player(playerIndex).isProposingTakeback &&
       !opponent(playerIndex).isProposingTakeback
 
-  def boosted = rated && finished && bothPlayersHaveMoved && playedTurns < (10 * variant.plysPerTurn)
+  def boosted = rated && finished && bothPlayersHaveMoved && playedTurns < 10
 
   def moretimeable(playerIndex: PlayerIndex) =
     playable && nonMandatory && {
@@ -459,11 +461,11 @@ case class Game(
     }
 
   def abortable =
-    status == Status.Started && playedTurns < (2 * variant.plysPerTurn) && nonMandatory && nonMandatory &&
+    status == Status.Started && playedTurns < 2 && nonMandatory && nonMandatory &&
       metadata.multiMatchGameNr.fold(true)(x => x < 2)
 
   def berserkable =
-    clock.??(_.config.berserkable) && status == Status.Started && playedTurns < (2 * variant.plysPerTurn)
+    clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
 
   def goBerserk(playerIndex: PlayerIndex): Option[Progress] =
     clock.ifTrue(berserkable && !player(playerIndex).berserk).map { c =>
@@ -523,12 +525,11 @@ case class Game(
 
   def finishedOrAborted = finished || aborted
 
-  def accountable = playedTurns >= (2 * variant.plysPerTurn) || isTournament
+  def accountable = playedTurns >= 2 || isTournament
 
   def replayable = isPgnImport || finished || (aborted && bothPlayersHaveMoved)
 
-  def analysable =
-    replayable && playedTurns > (4 * variant.plysPerTurn) && Game.analysableVariants(variant)
+  def analysable = replayable && playedTurns > 4 && Game.analysableVariants(variant)
 
   def ratingVariant =
     if (isTournament && variant.fromPosition) Variant.libStandard(variant.gameLogic)
@@ -644,42 +645,59 @@ case class Game(
     }
 
   def playerWhoDidNotMove: Option[Player] =
-    (playedTurns, variant.plysPerTurn) match {
-      case (0, 1) => player(startPlayerIndex).some
-      case (1, 1) => player(!startPlayerIndex).some
-      case (0, 2) => player(startPlayerIndex).some
-      case (1, 2) => player(startPlayerIndex).some
-      case (2, 2) => player(!startPlayerIndex).some
-      case (3, 2) => player(!startPlayerIndex).some
-      case (_, _) => none
-    }
+    if (!onePlayerHasMoved) player(startPlayerIndex).some
+    else if (!bothPlayersHaveMoved) player(!startPlayerIndex).some
+    else none
 
-  def onePlayerHasMoved    = playedTurns > variant.plysPerTurn - 1     // 0
-  def bothPlayersHaveMoved = playedTurns > 2 * variant.plysPerTurn - 1 // 1
+  //old
+  //def playerWhoDidNotMove: Option[Player] =
+  //  (playedTurns, variant.plysPerTurn) match {
+  //    case (0, 1) => player(startPlayerIndex).some
+  //    case (1, 1) => player(!startPlayerIndex).some
+  //    case (0, 2) => player(startPlayerIndex).some
+  //    case (1, 2) => player(startPlayerIndex).some
+  //    case (2, 2) => player(!startPlayerIndex).some
+  //    case (3, 2) => player(!startPlayerIndex).some
+  //    case (_, _) => none
+  //  }
 
-  def startPlayerIndex = chess.startPlayer
+  def onePlayerHasMoved    = playedTurns >= 1
+  def bothPlayersHaveMoved = playedTurns >= 2
+
+  def startPlayerIndex                     = chess.startPlayer
+  def startIndex(playerIndex: PlayerIndex) = if (playerIndex == startPlayerIndex) 0 else 1
 
   //the number of ply a player has played
   def playerMoves(playerIndex: PlayerIndex): Int =
-    variant.plysPerTurn * (playedTurns / (variant.plysPerTurn * 2)) + (if (playerIndex == startPlayerIndex)
-                                                                         Math.min(
-                                                                           variant.plysPerTurn,
-                                                                           playedTurns % (variant.plysPerTurn * 2)
-                                                                         )
-                                                                       else
-                                                                         Math.max(
-                                                                           0,
-                                                                           (playedTurns % (variant.plysPerTurn * 2)) - variant.plysPerTurn
-                                                                         ))
+    actions.zipWithIndex.filter(_._2 % 2 == startIndex(playerIndex)).map(_._1.size).sum
 
+  //old when using plysPerTurn
+  //def playerMoves(playerIndex: PlayerIndex): Int =
+  //  variant.plysPerTurn * (playedTurns / (variant.plysPerTurn * 2)) + (if (playerIndex == startPlayerIndex)
+  //                                                                       Math.min(
+  //                                                                         variant.plysPerTurn,
+  //                                                                         playedTurns % (variant.plysPerTurn * 2)
+  //                                                                       )
+  //                                                                     else
+  //                                                                       Math.max(
+  //                                                                         0,
+  //                                                                         (playedTurns % (variant.plysPerTurn * 2)) - variant.plysPerTurn
+  //                                                                       ))
+
+  //old pre-multimove
   // def playerMoves(playerIndex: PlayerIndex): Int =
   //   if (playerIndex == startPlayerIndex) (playedTurns + 1) / 2 else playedTurns / 2
 
   // if a player has completed their first full turn
-  def playerHasMoved(playerIndex: PlayerIndex) = playerMoves(playerIndex) > (variant.plysPerTurn - 1) // 0
+  def playerHasMoved(playerIndex: PlayerIndex) =
+    //does this actually confirm the full turn is completed?
+    if (startIndex(playerIndex) == 0) onePlayerHasMoved else bothPlayersHaveMoved
+
+  //old
+  //def playerHasMoved(playerIndex: PlayerIndex) = playerMoves(playerIndex) > (variant.plysPerTurn - 1) // 0
 
   def playerBlurPercent(playerIndex: PlayerIndex): Int =
-    if (playedTurns > (5 * variant.plysPerTurn))
+    if (playedTurns > 5)
       (player(playerIndex).blurs.nb * 100) / playerMoves(playerIndex)
     else 0
 
@@ -742,7 +760,7 @@ case class Game(
 
   lazy val opening: Option[FullOpening.AtPly] =
     if (fromPosition || !Variant.openingSensibleVariants(variant.gameLogic)(variant)) none
-    else FullOpeningDB.search(variant.gameLogic, pgnMoves)
+    else FullOpeningDB.search(variant.gameLogic, actions)
 
   def synthetic = id == Game.syntheticId
 
@@ -792,7 +810,8 @@ object Game {
 
   val maxPlayingRealtime = 100 // plus 200 correspondence games
 
-  val maxPlies = 600 // unlimited can cause StackOverflowError
+  val maxPlies = 600      // unlimited can cause StackOverflowError
+  val maxTurns = maxPlies // used for correct terminology where appropriate
 
   val analysableVariants: Set[Variant] = Variant.all.filter(_.hasFishnet).toSet
 
@@ -1009,13 +1028,15 @@ object PeriodEntries {
 }
 
 sealed trait ClockHistory {
+  //TODO: Multimove: Should p1 and p2 now be stored in a similar format to actions? Vector[Vector[Centis]]?
   val p1: Vector[Centis]
   val p2: Vector[Centis]
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
   def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory
   def reset(playerIndex: PlayerIndex): ClockHistory
   def apply(playerIndex: PlayerIndex): Vector[Centis]
-  def last(playerIndex: PlayerIndex): Option[Centis]
+  //def last(playerIndex: PlayerIndex): Option[Centis]
+  def lastX(playerIndex: PlayerIndex, plys: Int): Option[Centis]
   def size: Int
 }
 
@@ -1034,7 +1055,11 @@ case class FischerClockHistory(
 
   def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
 
-  def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
+  //def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
+
+  def lastX(playerIndex: PlayerIndex, plys: Int): Option[Centis] =
+    if (apply(playerIndex).size < plys) None
+    else apply(playerIndex).takeRight(plys).headOption
 
   def size = p1.size + p2.size
 
@@ -1080,7 +1105,11 @@ case class ByoyomiClockHistory(
   def reset(playerIndex: PlayerIndex) =
     updateInternal(playerIndex, _ => Vector.empty).updatePeriods(playerIndex, _ => Vector.empty)
 
-  def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
+  //def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
+
+  def lastX(playerIndex: PlayerIndex, plys: Int): Option[Centis] =
+    if (apply(playerIndex).size < plys) None
+    else apply(playerIndex).takeRight(plys).headOption
 
   def size = p1.size + p2.size
 

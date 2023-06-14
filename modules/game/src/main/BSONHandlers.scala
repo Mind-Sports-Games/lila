@@ -637,7 +637,7 @@ object BSONHandlers {
         o.board.variant.gameLogic match {
           case GameLogic.Draughts() =>
             $doc(
-              F.oldPgn -> NewLibStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.oldPgn -> NewLibStorage.OldBin.encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeDraughts(o.board match {
                 case Board.Draughts(board) => board
                 case _                     => sys.error("invalid draughts board")
@@ -648,7 +648,7 @@ object BSONHandlers {
             )
           case GameLogic.FairySF() =>
             $doc(
-              F.oldPgn -> NewLibStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.oldPgn -> NewLibStorage.OldBin.encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeFairySF(o.board match {
                 case Board.FairySF(board) => board.pieces
                 case _                    => sys.error("invalid fairysf board")
@@ -659,7 +659,7 @@ object BSONHandlers {
             )
           case GameLogic.Samurai() =>
             $doc(
-              F.oldPgn -> NewLibStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.oldPgn -> NewLibStorage.OldBin.encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeSamurai(o.board match {
                 case Board.Samurai(board) => board.pieces
                 case _                    => sys.error("invalid samurai board")
@@ -669,7 +669,7 @@ object BSONHandlers {
             )
           case GameLogic.Togyzkumalak() =>
             $doc(
-              F.oldPgn -> NewLibStorage.OldBin.encode(o.variant.gameFamily, o.pgnMoves take Game.maxPlies),
+              F.oldPgn -> NewLibStorage.OldBin.encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeTogyzkumalak(o.board match {
                 case Board.Togyzkumalak(board) => board.pieces
                 case _                         => sys.error("invalid togyzkumalak board")
@@ -680,10 +680,10 @@ object BSONHandlers {
             )
           case _ => //chess or fail
             if (o.variant.standard)
-              $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies))
+              $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.actions.flatten take Game.maxPlies))
             else {
               $doc(
-                F.oldPgn -> PgnStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
+                F.oldPgn -> PgnStorage.OldBin.encodeActions(o.actions take Game.maxTurns),
                 F.binaryPieces -> BinaryFormat.piece.writeChess(o.board match {
                   case Board.Chess(board) => board.pieces
                   case _                  => sys.error("invalid chess board")

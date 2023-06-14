@@ -5,7 +5,7 @@ import cats.data.Validated.valid
 import cats.implicits._
 import strategygames.format.pgn.Dumper
 import strategygames.format.Uci
-import strategygames.{ GameFamily, GameLogic, Drop, Move, Replay, Situation }
+import strategygames.{ Drop, GameFamily, GameLogic, Move, Replay, Situation }
 import strategygames.variant.Variant
 
 import lila.analyse.{ Analysis, Info, PgnMove }
@@ -27,7 +27,7 @@ private object UciToPgn {
       if (pliesWithAdviceAndVariation(info.ply)) info
       else info.dropVariation
     }
-    val logic = variant.gameLogic
+    val logic  = variant.gameLogic
     val family = variant.gameFamily
 
     def uciToPgn(ply: Int, variation: List[String]): Validated[String, List[PgnMove]] =
@@ -56,9 +56,9 @@ private object UciToPgn {
     onlyMeaningfulVariations.foldLeft[WithErrors[List[Info]]]((Nil, Nil)) {
       case ((infos, errs), info) if info.variation.isEmpty => (info :: infos, errs)
       case ((infos, errs), info) =>
-        uciToPgn(info.ply, info.variation).fold(
+        uciToPgn(info.ply, info.variation.flatten.toList).fold(
           err => (info.dropVariation :: infos, LilaException(err) :: errs),
-          pgn => (info.copy(variation = pgn) :: infos, errs)
+          pgn => (info.copy(variation = Vector(pgn)) :: infos, errs)
         )
     } match {
       case (infos, errors) => analysis.copy(infos = infos.reverse) -> errors

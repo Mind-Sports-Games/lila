@@ -1,7 +1,7 @@
 package lila.analyse
 
 import cats.implicits._
-import strategygames.{ Player => PlayerIndex, GameFamily, GameLogic }
+import strategygames.{ Actions, Player => PlayerIndex, GameFamily, GameLogic }
 import strategygames.format.Uci
 
 import lila.tree.Eval
@@ -10,7 +10,7 @@ case class Info(
     ply: Int,
     eval: Eval,
     // variation is first in UCI, then converted to PGN before storage
-    variation: List[String] = Nil
+    variation: Actions = Nil
 ) {
 
   def cp   = eval.cp
@@ -25,7 +25,8 @@ case class Info(
   def encode: String =
     List(
       best ?? (_.piotr),
-      variation take Info.LineMaxPlies mkString " ",
+      //TODO Wrong for multimove
+      (variation take Info.LineMaxTurns).flatten mkString " ",
       mate ?? (_.value.toString),
       cp ?? (_.value.toString)
     ).dropWhile(_.isEmpty).reverse mkString Info.separator
@@ -59,7 +60,7 @@ object Info {
 
   import Eval.{ Cp, Mate }
 
-  val LineMaxPlies = 14
+  val LineMaxTurns = 14
 
   private val separator     = ","
   private val listSeparator = ";"
@@ -69,18 +70,20 @@ object Info {
   private def strCp(s: String)   = s.toIntOption map Cp.apply
   private def strMate(s: String) = s.toIntOption map Mate.apply
 
+  //TODO change for multimove
   private def decode(ply: Int, str: String): Option[Info] =
     str.split(separator) match {
-      case Array()           => Info(ply, Eval.empty).some
-      case Array(cp)         => Info(ply, Eval(strCp(cp), None, None)).some
-      case Array(cp, ma)     => Info(ply, Eval(strCp(cp), strMate(ma), None)).some
-      case Array(cp, ma, va) => Info(ply, Eval(strCp(cp), strMate(ma), None), va.split(' ').toList).some
+      case Array()       => Info(ply, Eval.empty).some
+      case Array(cp)     => Info(ply, Eval(strCp(cp), None, None)).some
+      case Array(cp, ma) => Info(ply, Eval(strCp(cp), strMate(ma), None)).some
+      case Array(cp, ma, va) =>
+        Info(ply, Eval(strCp(cp), strMate(ma), None), va.split(' ').toVector.map(Vector(_))).some
       case Array(cp, ma, va, be) =>
         Info(
           ply,
           //TODO Wrong for non Chess
           Eval(strCp(cp), strMate(ma), Uci.Move.piotr(GameLogic.Chess(), GameFamily.Chess(), be)),
-          va.split(' ').toList
+          va.split(' ').toVector.map(Vector(_))
         ).some
       case _ => none
     }
@@ -93,6 +96,6 @@ object Info {
 
   def encodeList(infos: List[Info]): String = infos map (_.encode) mkString listSeparator
 
-  def apply(cp: Option[Cp], mate: Option[Mate], variation: List[String]): Int => Info =
+  def apply(cp: Option[Cp], mate: Option[Mate], variation: Actions): Int => Info =
     ply => Info(ply, Eval(cp, mate, None), variation)
 }

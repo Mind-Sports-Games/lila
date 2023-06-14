@@ -41,7 +41,8 @@ object ServerEval {
               variant = chapter.setup.variant,
               moves = UciDump(
                 lib = chapter.setup.variant.gameLogic,
-                moves = chapter.root.mainline.map(_.move.san),
+                //TODO upgrade for multimove
+                actions = chapter.root.mainline.map(_.move.san).map(Vector(_)),
                 initialFen = chapter.root.fen.some,
                 variant = chapter.setup.variant,
                 finalSquare = chapter.setup.variant.gameLogic match {
@@ -50,7 +51,8 @@ object ServerEval {
                 }
               ).toOption
                 .map(
-                  _.flatMap(m =>
+                  //TODO upgrade for multimove
+                  _.flatten.toList.flatMap(m =>
                     Uci.apply(
                       chapter.setup.variant.gameLogic,
                       chapter.setup.variant.gameFamily,
@@ -143,13 +145,14 @@ object ServerEval {
     def divisionOf(chapter: Chapter) =
       divider(
         id = chapter.id.value,
-        pgnMoves = chapter.root.mainline.map(_.move.san).toVector,
+        //TODO upgrade for multimove
+        actions = chapter.root.mainline.map(_.move.san).toVector.map(Vector(_)),
         variant = chapter.setup.variant,
         initialFen = chapter.root.fen.some
       )
 
     private def analysisLine(root: RootOrNode, variant: Variant, info: Info): Option[Node] =
-      Replay.gameMoveWhileValid(variant.gameLogic, info.variation take 20, root.fen, variant) match {
+      Replay.gamePlyWhileValid(variant.gameLogic, info.variation take 20, root.fen, variant) match {
         case (_, games, error) =>
           error foreach { logger.info(_) }
           games.reverse match {

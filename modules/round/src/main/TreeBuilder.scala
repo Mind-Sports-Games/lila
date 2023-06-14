@@ -37,10 +37,10 @@ object TreeBuilder {
       withFlags: WithFlags
   ): Root = {
     val withClocks: Option[Vector[Centis]] = withFlags.clocks ?? game.bothClockStates
-    val drawOfferPlies                     = game.drawOffers.normalizedPlies
-    Replay.gameMoveWhileValid(
+    val drawOfferPlies                     = game.drawOffers.normalizedTurns
+    Replay.gamePlyWhileValid(
       game.variant.gameLogic,
-      game.pgnMoves,
+      game.actions,
       initialFen,
       game.variant
     ) match {
@@ -171,7 +171,7 @@ object TreeBuilder {
         eval = none
       )
     }
-    Replay.gameMoveWhileValid(
+    Replay.gamePlyWhileValid(
       variant.gameLogic,
       info.variation take 20,
       fromFen,

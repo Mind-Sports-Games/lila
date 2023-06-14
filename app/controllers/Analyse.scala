@@ -120,7 +120,7 @@ final class Analyse(
       val url = routes.Round.watcher(pov.gameId, pov.playerIndex.name)
       fuccess {
         Replay
-          .plyAtFen(pov.game.variant.gameLogic, pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
+          .plyAtFen(pov.game.variant.gameLogic, pov.game.actions, initialFen, pov.game.variant, atFen)
           .fold(
             err => {
               lila.log("analyse").info(s"RedirectAtFen: ${pov.gameId} $atFen $err")

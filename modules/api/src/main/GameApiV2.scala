@@ -308,7 +308,7 @@ final class GameApiV2(
       .add("winner" -> g.winnerPlayerIndex.map(_.name))
       .add("opening" -> g.opening.ifTrue(withFlags.opening))
       .add("moves" -> withFlags.moves.option {
-        withFlags keepDelayIf g.playable applyDelay g.pgnMoves mkString " "
+        withFlags keepDelayIf g.playable applyDelay g.actions.map(_.mkString(",")) mkString " "
       })
       .add("pgn" -> pgn)
       .add("daysPerTurn" -> g.daysPerTurn)

@@ -13,8 +13,7 @@ case class Pairing(
     winner: Option[User.ID],
     turns: Option[Int],
     berserk1: Boolean,
-    berserk2: Boolean,
-    plysPerTurn: Option[Int]
+    berserk2: Boolean
 ) {
 
   def gameId = id
@@ -33,10 +32,10 @@ case class Pairing(
   def finished = status >= strategygames.Status.Mate
   def playing  = !finished
 
-  def quickFinish      = finished && turns.exists((20 * plysPerTurn.getOrElse(1)) >)
-  def quickDraw        = draw && turns.exists((20 * plysPerTurn.getOrElse(1)) >)
-  def notSoQuickFinish = finished && turns.exists((14 * plysPerTurn.getOrElse(1)) <=)
-  def longGame         = turns.exists((60 * plysPerTurn.getOrElse(1)) <=)
+  def quickFinish      = finished && turns.exists(20 >)
+  def quickDraw        = draw && turns.exists(20 >)
+  def notSoQuickFinish = finished && turns.exists(14 <=)
+  def longGame         = turns.exists(60 <=)
 
   def wonBy(user: User.ID): Boolean     = winner.has(user)
   def lostBy(user: User.ID): Boolean    = winner.exists(user !=)
@@ -81,8 +80,7 @@ private[tournament] object Pairing {
       winner = none,
       turns = none,
       berserk1 = false,
-      berserk2 = false,
-      plysPerTurn = none
+      berserk2 = false
     )
 
   case class Prep(tourId: Tournament.ID, user1: User.ID, user2: User.ID) {

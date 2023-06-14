@@ -1,7 +1,7 @@
 package lila.game
 
 import strategygames.{
-  P2,
+  Actions,
   Board,
   ByoyomiClock,
   Centis,
@@ -12,7 +12,8 @@ import strategygames.{
   GameLogic,
   History,
   PocketData,
-  P1
+  P1,
+  P2
 }
 import strategygames.chess.CheckCount
 import strategygames.togyzkumalak.Score
@@ -111,15 +112,15 @@ object GameDiff {
         ByteArrayBSONHandler.writeOpt(BinaryFormat.periodEntries.writeSide(x))
       }
 
-    def newLibStorageWriter(pgnMoves: PgnMoves) =
-      NewLibStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
+    def newLibStorageWriter(actions: Actions) =
+      NewLibStorage.OldBin.encodeActions(a.variant.gameFamily, actions)
 
     a.variant.gameLogic match {
       case GameLogic.Chess() =>
         if (a.variant.standard)
-          dTry(huffmanPgn, _.pgnMoves, writeBytes compose PgnStorage.Huffman.encode)
+          dTry(huffmanPgn, _.actions.flatten, writeBytes compose PgnStorage.Huffman.encode)
         else {
-          dTry(oldPgn, _.pgnMoves, writeBytes compose PgnStorage.OldBin.encode)
+          dTry(oldPgn, _.actions, writeBytes compose PgnStorage.OldBin.encodeActions)
           dTry(
             binaryPieces,
             _.board match {
@@ -154,7 +155,7 @@ object GameDiff {
             )
         }
       case GameLogic.Draughts() => {
-        dTry(oldPgn, _.pgnMoves, writeBytes compose newLibStorageWriter)
+        dTry(oldPgn, _.actions, writeBytes compose newLibStorageWriter)
         dTry(
           binaryPieces,
           _.board match {
@@ -188,9 +189,9 @@ object GameDiff {
               case Board.FairySF(b) =>
                 b.variant.gameFamily match {
                   //in the case of Amazons we want to store our moves and drops as individuals
-                  case GameFamily.Amazons() => g.pgnMoves
+                  case GameFamily.Amazons() => g.actions
                   //in other cases we want to store the fairysf format (difference in promotion notation)
-                  case _ => b.uciMoves.toVector
+                  case _ => b.uciMoves.toVector.map(Vector(_))
                 }
               case _ => sys.error("Wrong board type")
             }
@@ -218,7 +219,7 @@ object GameDiff {
         dTry(
           oldPgn,
           _.board match {
-            case Board.Samurai(b) => b.uciMoves.toVector
+            case Board.Samurai(b) => b.uciMoves.toVector.map(Vector(_))
             case _                => sys.error("Wrong board type")
           },
           writeBytes compose newLibStorageWriter
@@ -235,7 +236,7 @@ object GameDiff {
         d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
       }
       case GameLogic.Togyzkumalak() => {
-        dTry(oldPgn, _.pgnMoves, writeBytes compose newLibStorageWriter)
+        dTry(oldPgn, _.actions, writeBytes compose newLibStorageWriter)
         dTry(
           binaryPieces,
           _.board match {

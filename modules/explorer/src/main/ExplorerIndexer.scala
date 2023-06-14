@@ -174,7 +174,9 @@ final private class ExplorerIndexer(
           Tag(_.Date, pgnDateFormat.print(game.createdAt))
         )
         val allTags = fenTags ::: otherTags
-        s"${allTags.mkString("\n")}\n\n${game.pgnMoves.take(maxPlies).mkString(" ")}".some
+        //this uses maxPlies as maxTurns
+        val allActions = game.actions.map(_.mkString(",")).take(maxPlies).mkString(" ")
+        s"${allTags.mkString("\n")}\n\n${allActions}".some
       }
     })
 

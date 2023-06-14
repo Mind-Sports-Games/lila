@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.{ Actions, GameFamily, GameLogic, VActions }
 import strategygames.format.pgn.Binary
 
 import lila.db.ByteArray
@@ -18,11 +18,20 @@ private object NewLibStorage {
         }
       }
 
-    //def encodeActions(gf: GameFamily, actions: Actions) = encode(gf, actions.flatten)
+    def encodeActions(gf: GameFamily, actions: Actions) =
+      ByteArray {
+        monitor(_.game.pgn.encode("ngla")) {
+          Binary.writeActions(gf, actions).get
+        }
+      }
 
-    def decode(gl: GameLogic, bytes: ByteArray, plies: Int): Actions =
-      monitor(_.game.pgn.decode("ngl.old")) {
-        Binary.readMoves(gl, bytes.value.toList, plies).get.toVector.map(Vector(_))
+    def decode(gl: GameLogic, bytes: ByteArray, plies: Int): VActions =
+      monitor(_.game.pgn.decode("ngla")) {
+        Binary
+          .readActions(gl, bytes.value.toList, plies)
+          .get
+          .toVector
+          .map(_.toVector)
       }
 
   }

@@ -28,8 +28,8 @@ final class GifExport(
         .addHttpHeaders("Content-Type" -> "application/json")
         .withBody(
           Json.obj(
-            "p1"       -> Namer.playerTextBlocking(pov.game.p1Player, withRating = true)(lightUserApi.sync),
-            "p2"       -> Namer.playerTextBlocking(pov.game.p2Player, withRating = true)(lightUserApi.sync),
+            "p1"          -> Namer.playerTextBlocking(pov.game.p1Player, withRating = true)(lightUserApi.sync),
+            "p2"          -> Namer.playerTextBlocking(pov.game.p2Player, withRating = true)(lightUserApi.sync),
             "comment"     -> s"${baseUrl.value}/${pov.game.id} rendered with https://github.com/niklasf/lila-gif",
             "orientation" -> pov.playerIndex.name,
             "delay"       -> targetMedianTime.centis, // default delay for frames
@@ -47,8 +47,8 @@ final class GifExport(
   def gameThumbnail(game: Game): Fu[Source[ByteString, _]] = {
     val query = List(
       "fen"         -> (Forsyth.>>(game.variant.gameLogic, game.chess)).value,
-      "p1"       -> Namer.playerTextBlocking(game.p1Player, withRating = true)(lightUserApi.sync),
-      "p2"       -> Namer.playerTextBlocking(game.p2Player, withRating = true)(lightUserApi.sync),
+      "p1"          -> Namer.playerTextBlocking(game.p1Player, withRating = true)(lightUserApi.sync),
+      "p2"          -> Namer.playerTextBlocking(game.p2Player, withRating = true)(lightUserApi.sync),
       "orientation" -> game.naturalOrientation.name
     ) ::: List(
       game.lastMoveKeys.map { "lastMove" -> _ },
@@ -103,15 +103,16 @@ final class GifExport(
   }
 
   private def frames(game: Game, initialFen: Option[FEN]) = {
-    Replay.gameMoveWhileValid(
+    Replay.gamePlyWhileValid(
       game.variant.gameLogic,
-      game.pgnMoves,
+      game.actions,
       initialFen | game.variant.initialFen,
       game.variant
     ) match {
       case (init, games, _) =>
         val steps = (init, None) :: (games map {
-          case (g, Uci.ChessWithSan(strategygames.chess.format.Uci.WithSan(uci, _))) => (g, Uci.wrap(uci).some)
+          case (g, Uci.ChessWithSan(strategygames.chess.format.Uci.WithSan(uci, _))) =>
+            (g, Uci.wrap(uci).some)
           case _ => sys.error("Need to implement draughts version") // TODO: DRAUGHTS - implement this.
         })
         framesRec(

@@ -3,7 +3,7 @@ package lila.game
 import strategygames.chess
 import strategygames.chess.format
 import strategygames.chess.{ Castles, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks }
-import strategygames.{ Player => PlayerIndex }
+import strategygames.{ Actions, Player => PlayerIndex, VActions }
 
 import lila.db.ByteArray
 
@@ -20,9 +20,16 @@ private object PgnStorage {
         }
       }
 
-    def decode(bytes: ByteArray, plies: Int): Actions =
+    def encodeActions(actions: Actions) =
+      ByteArray {
+        monitor(_.game.pgn.encode("ngla")) {
+          format.pgn.Binary.writeActions(actions).get
+        }
+      }
+
+    def decode(bytes: ByteArray, plies: Int): VActions =
       monitor(_.game.pgn.decode("old")) {
-        format.pgn.Binary.readMoves(bytes.value.toList, plies).get.toVector.map(Vector(_))
+        format.pgn.Binary.readActions(bytes.value.toList, plies).get.toVector.map(_.toVector)
       }
   }
 
@@ -68,7 +75,7 @@ private object PgnStorage {
   }
 
   case class Decoded(
-      actions: Actions,
+      actions: VActions,
       pieces: PieceMap,
       positionHashes: PositionHash, // irrelevant after game ends
       unmovedRooks: UnmovedRooks,   // irrelevant after game ends

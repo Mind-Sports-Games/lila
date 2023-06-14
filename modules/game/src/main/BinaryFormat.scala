@@ -35,20 +35,6 @@ import lila.db.ByteArray
 
 object BinaryFormat {
 
-  object pgn {
-
-    def write(moves: PgnMoves): ByteArray =
-      ByteArray {
-        chess.format.pgn.Binary.writeMoves(moves).get
-      }
-
-    def read(ba: ByteArray): PgnMoves =
-      chess.format.pgn.Binary.readMoves(ba.value.toList).get.toVector
-
-    def read(ba: ByteArray, nb: Int): PgnMoves =
-      chess.format.pgn.Binary.readMoves(ba.value.toList, nb).get.toVector
-  }
-
   object fischerClockHistory {
     private val logger = lila.log("clockHistory")
 
@@ -270,9 +256,9 @@ object BinaryFormat {
 
         ia match {
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, _*) => {
-            val config      = ByoyomiClock.Config(readClockLimit(b1), b2, byo, per)
+            val config   = ByoyomiClock.Config(readClockLimit(b1), b2, byo, per)
             val legacyP1 = Centis(readSignedInt24(b3, b4, b5))
-            val legacyP2  = Centis(readSignedInt24(b6, b7, b8))
+            val legacyP2 = Centis(readSignedInt24(b6, b7, b8))
             ByoyomiClock(
               config = config,
               player = playerIndex,

@@ -54,20 +54,20 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
   private def annotateDrawOffers(pgn: Pgn, drawOffers: GameDrawOffers, variant: Variant): Pgn =
     if (drawOffers.isEmpty) pgn
     else
-      drawOffers.normalizedPlies.foldLeft(pgn) { case (pgn, ply) =>
+      drawOffers.normalizedTurns.foldLeft(pgn) { case (pgn, turn) =>
         pgn.updatePly(
-          ply,
+          turn,
           move => {
-            val playerIndex = !PlayerIndex.fromPly(ply, variant.plysPerTurn)
+            val playerIndex = !PlayerIndex.fromPly(turn)
             move.copy(comments = s"$playerIndex offers draw" :: move.comments)
           }
         )
       }
 
-  //TODO This is probably wrong for Amazons
+  //TODO This is wrong for Amazons/Multimove
   private def makeVariation(turn: Turn, advice: Advice): List[Turn] =
     Turn.fromMoves(
-      advice.info.variation take 20 map { san =>
+      advice.info.variation.take(20).flatten.toList map { san =>
         Move(san)
       },
       turn plyOf advice.playerIndex

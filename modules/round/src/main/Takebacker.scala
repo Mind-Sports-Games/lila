@@ -23,18 +23,16 @@ final private class Takebacker(
       pov match {
         case Pov(game, playerIndex) if pov.opponent.isProposingTakeback =>
           {
-            val proposeTakebackAt = pov.opponent.proposeTakebackAt
-            val turns             = pov.game.turns
-            val plysPerTurn       = pov.game.variant.plysPerTurn
-            val povTurn           = playerIndex == PlayerIndex.fromPly(turns, plysPerTurn)
-            if (
-              proposeTakebackAt == turns &&
-              ((plysPerTurn == 1 && povTurn) || (turns % plysPerTurn > 0 && !povTurn))
-            ) single(game)
-            else double(game)
+            val povTurn = playerIndex == pov.game.turnPlayerIndex
+            if (pov.opponent.proposeTakebackAt == pov.game.chess.plyCount && povTurn)
+              takebackSwitchPlayer(game) //go back until the playerindex switches
+            else
+              takebackRetainPlayer(
+                game
+              ) //go back one ply. if playerindex has not switched, continue going back
           } dmap (_ -> situation.reset)
-        case Pov(game, _) if pov.game.playableByAi => single(game) dmap (_ -> situation)
-        case Pov(game, _) if pov.opponent.isAi     => double(game) dmap (_ -> situation)
+        case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game) dmap (_ -> situation)
+        case Pov(game, _) if pov.opponent.isAi     => takebackRetainPlayer(game) dmap (_ -> situation)
         case Pov(game, playerIndex) if (game playerCanProposeTakeback playerIndex) && situation.offerable =>
           {
             messenger.system(game, trans.takebackPropositionSent.txt())
@@ -102,24 +100,47 @@ final private class Takebacker(
         case _    => fufail(ClientError("[takebacker] disallowed by preferences " + game.id))
       }
 
-  private def single(game: Game)(implicit proxy: GameProxy): Fu[Events] =
+  //Would be nice to test these methods with a multimove game that has > 2 plys in a turn
+  private def takebackSwitchPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
+    if (game.turnPlayerIndex == PlayerIndex.fromPly(game.actions.size))
+      rewindPly(game)
+    else
+      rewindTurnAndPly(game)
+  private def takebackRetainPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
+    if (game.turnPlayerIndex == PlayerIndex.fromPly(game.actions.size))
+      rewindTurnAndPly(game)
+    else
+      rewindPly(game)
+
+  private def rewindPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     for {
       fen      <- gameRepo initialFen game
-      progress <- Rewind(game, fen).toFuture
-      _        <- fuccess { uciMemo.drop(game, 1) }
+      progress <- Rewind(game, fen, true).toFuture
+      _        <- fuccess { uciMemo.set(progress.game) }
       events   <- saveAndNotify(progress)
     } yield events
 
-  private def double(game: Game)(implicit proxy: GameProxy): Fu[Events] =
+  private def rewindTurnAndPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     for {
       fen   <- gameRepo initialFen game
-      prog1 <- Rewind(game, fen).toFuture
-      prog2 <- Rewind(prog1.game, fen).toFuture dmap { progress =>
+      prog1 <- Rewind(game, fen, false).toFuture
+      prog2 <- Rewind(prog1.game, fen, true).toFuture dmap { progress =>
         prog1 withGame progress.game
       }
-      _      <- fuccess { uciMemo.drop(game, 2) }
+      _      <- fuccess { uciMemo.set(prog2.game) }
       events <- saveAndNotify(prog2)
     } yield events
+
+  //private def double(game: Game)(implicit proxy: GameProxy): Fu[Events] =
+  //  for {
+  //    fen   <- gameRepo initialFen game
+  //    prog1 <- Rewind(game, fen, true).toFuture
+  //    prog2 <- Rewind(prog1.game, fen, true).toFuture dmap { progress =>
+  //      prog1 withGame progress.game
+  //    }
+  //    _      <- fuccess { uciMemo.drop(game, 2) }
+  //    events <- saveAndNotify(prog2)
+  //  } yield events
 
   private def saveAndNotify(p1: Progress)(implicit proxy: GameProxy): Fu[Events] = {
     val p2 = p1 + Event.Reload

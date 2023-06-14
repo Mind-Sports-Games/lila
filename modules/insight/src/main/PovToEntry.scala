@@ -4,7 +4,17 @@ import scala.util.chaining._
 import cats.data.NonEmptyList
 
 import strategygames.format.FEN
-import strategygames.{ Board, Player => PlayerIndex, Divider, Division, GameFamily, GameLogic, Piece, Replay, Role }
+import strategygames.{
+  Board,
+  Player => PlayerIndex,
+  Divider,
+  Division,
+  GameFamily,
+  GameLogic,
+  Piece,
+  Replay,
+  Role
+}
 import strategygames.{ Centis, Stats }
 import lila.analyse.{ Accuracy, Advice }
 import lila.game.{ Game, Pov }
@@ -51,7 +61,7 @@ final private class PovToEntry(
                 Replay
                   .boards(
                     game.variant.gameLogic,
-                    moveStrs = game.pgnMoves,
+                    actions = game.actions,
                     initialFen = fen,
                     variant = game.variant
                   )
@@ -87,7 +97,11 @@ final private class PovToEntry(
       }
     }
     val movetimes = from.movetimes.toList
-    val roles     = from.pov.game.pgnMoves(from.pov.playerIndex).map(pgnMoveToRole(from.pov.game.variant.gameFamily, _))
+    //flatten until we support something other than chess
+    val roles = from.pov.game
+      .actions(from.pov.playerIndex)
+      .flatten
+      .map(pgnMoveToRole(from.pov.game.variant.gameFamily, _))
     val boards = {
       val pivot = if (from.pov.playerIndex == from.pov.game.startPlayerIndex) 0 else 1
       from.boards.toList.zipWithIndex.collect {
@@ -185,11 +199,13 @@ final private class PovToEntry(
       perf = perfType,
       eco =
         if (game.playable || game.turns < 4 || game.fromPosition || game.variant.exotic) none
-        else strategygames.chess.opening.Ecopening fromGame game.pgnMoves.toList,
-      myCastling = Castling.fromMoves(game pgnMoves pov.playerIndex),
+        else strategygames.chess.opening.Ecopening fromGame game.actions,
+      //flatten until insights support something other than chess
+      myCastling = Castling.fromMoves(game.actions(pov.playerIndex).flatten),
       opponentRating = opRating,
       opponentStrength = RelativeStrength(opRating - myRating),
-      opponentCastling = Castling.fromMoves(game pgnMoves !pov.playerIndex),
+      //flatten until insights support something other than chess
+      opponentCastling = Castling.fromMoves(game.actions(!pov.playerIndex).flatten),
       moves = makeMoves(from),
       queenTrade = queenTrade(from),
       result = game.winnerUserId match {

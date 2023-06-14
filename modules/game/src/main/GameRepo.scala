@@ -527,7 +527,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       $doc(s"${F.pgnImport}.h" -> PgnImport.hash(pgn))
     )
 
-  def getOptionPgn(id: ID): Fu[Option[PgnMoves]] = game(id) dmap2 { _.pgnMoves }
+  //this is only used by Captcha which is currently only for standard chess
+  //so not supported by multimove and so flatten is ok
+  def getOptionPgn(id: ID): Fu[Option[PgnMoves]] = game(id) dmap2 { _.actions.flatten }
 
   def lastGameBetween(u1: String, u2: String, since: DateTime): Fu[Option[Game]] =
     coll.one[Game](

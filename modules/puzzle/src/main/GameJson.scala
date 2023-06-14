@@ -67,7 +67,8 @@ final private class GameJson(
         "perf"    -> perfJson(game),
         "rated"   -> game.rated,
         "players" -> playersJson(game),
-        "pgn"     -> game.pgnMoves.take(plies + 1).mkString(" ")
+        //can flatten whilst puzzles are just chess
+        "pgn" -> game.actions.flatten.take(plies + 1).mkString(" ")
       )
       .add("clock", game.clock.map(_.config.show))
 
@@ -84,14 +85,14 @@ final private class GameJson(
     val user   = lightUserApi.syncFallback(userId)
     Json
       .obj(
-        "userId" -> userId,
-        "name"   -> s"${user.name}${p.rating.??(r => s" ($r)")}",
-        "playerIndex"  -> p.playerIndex.name
+        "userId"      -> userId,
+        "name"        -> s"${user.name}${p.rating.??(r => s" ($r)")}",
+        "playerIndex" -> p.playerIndex.name
       )
       .add("title" -> user.title)
   })
 
-  private def generateBc(game: Game, plies: Int): JsObject =
+  private def generateBc(game: Game, turns: Int): JsObject =
     Json
       .obj(
         "id"      -> game.id,
@@ -99,11 +100,11 @@ final private class GameJson(
         "players" -> playersJson(game),
         "rated"   -> game.rated,
         "treeParts" -> {
-          val pgnMoves = game.pgnMoves.take(plies + 1)
+          val actions = game.actions.take(turns + 1)
           for {
-            pgnMove <- pgnMoves.lastOption
+            lastPly <- actions.flatten.lastOption
             situation <- strategygames.Replay
-              .situations(chessLib, pgnMoves, None, game.variant)
+              .situations(chessLib, actions, None, game.variant)
               .valueOr { err =>
                 sys.error(s"GameJson.generateBc ${game.id} $err")
               }
@@ -111,8 +112,8 @@ final private class GameJson(
             uciMove <- situation.board.history.lastMove
           } yield Json.obj(
             "fen" -> Forsyth.>>(chessLib, situation).value,
-            "ply" -> (plies + 1),
-            "san" -> pgnMove,
+            "ply" -> (turns + 1),
+            "san" -> lastPly,
             "id"  -> UciCharPair(chessLib, uciMove).toString,
             "uci" -> uciMove.uci
           )

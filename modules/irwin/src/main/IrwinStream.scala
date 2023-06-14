@@ -45,11 +45,12 @@ final class IrwinStream {
       ),
       "games" -> req.games.map { case (game, analysis) =>
         Json.obj(
-          "id"    -> game.id,
+          "id" -> game.id,
           "p1" -> game.p1Player.userId,
           "p2" -> game.p2Player.userId,
-          "pgn"   -> game.pgnMoves.mkString(" "),
-          "emts"  -> game.clockHistory.isDefined ?? game.moveTimes.map(_.map(_.centis)),
+          //flatten until Irwin supports non chess
+          "pgn"  -> game.actions.flatten.mkString(" "),
+          "emts" -> game.clockHistory.isDefined ?? game.moveTimes.map(_.map(_.centis)),
           "analysis" -> analysis.map {
             _.infos.map { info =>
               info.cp.map { cp =>

@@ -59,7 +59,7 @@ private[game] object Metadata {
   val empty = Metadata(None, None, None, None, None, analysed = false, GameDrawOffers.empty)
 }
 
-// plies
+// turns
 case class GameDrawOffers(p1: Set[Int], p2: Set[Int]) {
 
   def lastBy(playerIndex: PlayerIndex): Option[Int] = playerIndex.fold(p1, p2).maxOption
@@ -72,10 +72,10 @@ case class GameDrawOffers(p1: Set[Int], p2: Set[Int]) {
   // playstrategy allows to offer draw on either turn,
   // normalize to pretend it was done on the opponent turn.
   def normalize(playerIndex: PlayerIndex): Set[Int] = playerIndex.fold(p1, p2) map {
-    case ply if (ply % 2 == 0) == playerIndex.p1 => ply + 1
-    case ply => ply
+    case turn if (turn % 2 == 0) == playerIndex.p1 => turn + 1
+    case turn => turn
   }
-  def normalizedPlies: Set[Int] = normalize(P1) ++ normalize(P2)
+  def normalizedTurns: Set[Int] = normalize(P1) ++ normalize(P2)
 }
 
 object GameDrawOffers {

@@ -39,7 +39,7 @@ final class JsonView(
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
   private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
-    pov.game.variant.onlyDropsVariant || (pov.game.variant.key == "amazons" && pov.game.situation.destinations.size == 0)
+    pov.game.variant.onlyDropsVariant || (pov.game.variant.dropsVariant && pov.game.situation.destinations.size == 0)
   }
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
@@ -352,7 +352,7 @@ final class JsonView(
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         (pov.game playableBy pov.player) option {
           if (situation.ghosts > 0) {
-            val move    = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+            val move    = pov.game.actions(pov.game.actions.length - 1)(0)
             val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
             destPos match {
               case Some(dest) =>
@@ -413,7 +413,7 @@ final class JsonView(
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         if (situation.ghosts > 0) {
-          val move    = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+          val move    = pov.game.actions(pov.game.actions.length - 1)(0)
           val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
           destPos match {
             case Some(dest) => ~situation.captureLengthFrom(dest)

@@ -4,7 +4,7 @@ import strategygames.chess.format.pgn.{ Parser, Pgn }
 import strategygames.format.pgn.{ ParsedPgn, Tag, TagType, Tags }
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.chess.format.{ pgn => chessPgn }
-import strategygames.{ Centis, Player => PlayerIndex, GameLogic, Status }
+import strategygames.{ Actions, Centis, Player => PlayerIndex, GameLogic, Status }
 import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
@@ -55,10 +55,10 @@ final class PgnDump(
         makeTurns(
           game.variant match {
             case Variant.Draughts(variant) => {
-              val pdnMovesFull = game.draughtsActionsConcat(true, true)
-              val pdnMoves = strategygames.draughts.Replay
+              val plysFull = game.draughtsActionsConcat(true, true).flatten
+              val plys = strategygames.draughts.Replay
                 .unambiguousPdnMoves(
-                  pdnMoves = pdnMovesFull,
+                  pdnMoves = plysFull,
                   initialFen = ts.fen match {
                     case Some(FEN.Draughts(fen)) => Some(fen)
                     case None                    => None
@@ -68,19 +68,21 @@ final class PgnDump(
                   //TODO: draughts, this used to be a Valid[List[String]] type
                   //and now we have lost the error. Perhaps we need to reconsider this
                 )
-                .fold(shortenMoves(pdnMovesFull))(moves => moves)
-              val moves = flags keepDelayIf game.playable applyDelay pdnMoves
-              val moves2 =
-                if (algebraic) san2alg(moves, variant.boardSize.pos)
-                else moves
-              if (fenSituation.exists(_.situation.player.p2)) ".." +: moves2
-              else moves2
+                .fold(shortenDraughtsMoves(plysFull))(moves => moves)
+              val delayedPlys = flags keepDelayIf game.playable applyDelay plys
+              val algPlys =
+                if (algebraic) san2alg(delayedPlys, variant.boardSize.pos)
+                else delayedPlys
+              val offsetPlys =
+                if (fenSituation.exists(_.situation.player.p2)) ".." +: algPlys
+                else algPlys
+              offsetPlys.toVector.map(Vector(_))
             }
             case _ =>
-              flags keepDelayIf game.playable applyDelay {
-                if (fenSituation.exists(_.situation.player.p2)) ".." +: game.pgnMoves
-                else game.pgnMoves
-              }
+              (flags keepDelayIf game.playable applyDelay {
+                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: game.actions
+                else game.actions
+              }).toVector
           },
           fenSituation.map(_.fullMoveNumber) | 1,
           flags.clocks ?? ~game.bothClockStates,
@@ -91,7 +93,7 @@ final class PgnDump(
     }
   }
 
-  private def shortenMoves(moves: Seq[String]) = moves map { move =>
+  private def shortenDraughtsMoves(moves: Seq[String]) = moves map { move =>
     val x1 = move.indexOf("x")
     if (x1 == -1) move
     else {
@@ -252,23 +254,24 @@ final class PgnDump(
       }
     }
 
+  //TODO: Consider multimove here
   private def makeTurns(
-      moves: Seq[String],
+      actions: Actions,
       from: Int,
       clocks: Vector[Centis],
       startPlayerIndex: PlayerIndex
   ): List[chessPgn.Turn] =
-    (moves grouped 2).zipWithIndex.toList map { case (moves, index) =>
+    (actions.flatten.toSeq grouped 2).zipWithIndex.toList map { case (actions, index) =>
       val clockOffset = startPlayerIndex.fold(0, 1)
       chessPgn.Turn(
         number = index + from,
-        p1 = moves.headOption filter (".." !=) map { san =>
+        p1 = actions.headOption filter (".." !=) map { san =>
           chessPgn.Move(
             san = san,
             secondsLeft = clocks lift (index * 2 - clockOffset) map (_.roundSeconds)
           )
         },
-        p2 = moves lift 1 map { san =>
+        p2 = actions lift 1 map { san =>
           chessPgn.Move(
             san = san,
             secondsLeft = clocks lift (index * 2 + 1 - clockOffset) map (_.roundSeconds)
