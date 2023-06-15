@@ -24,7 +24,7 @@ final private class Takebacker(
         case Pov(game, playerIndex) if pov.opponent.isProposingTakeback =>
           {
             val povTurn = playerIndex == pov.game.turnPlayerIndex
-            if (pov.opponent.proposeTakebackAt == pov.game.chess.plyCount && povTurn)
+            if (pov.opponent.proposeTakebackAt == pov.game.chess.turns && povTurn)
               takebackSwitchPlayer(game) //go back until the playerindex switches
             else
               takebackRetainPlayer(

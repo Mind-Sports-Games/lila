@@ -99,14 +99,12 @@ case class Game(
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
 
-  //def playedTurns = turns - chess.startedAtTurn
+  def playedTurns = turns - chess.startedAtTurn //chess.turnCount
   //def playedTurns = if (chess.actions.flatten.size == turns - chess.startedAtTurn)
-  //  turns - chess.startedAtTurn
+  //  turns.pp("ok") - chess.startedAtTurn
   //else
   //  turns.pp("turns") - chess.startedAtTurn
-  //    .pp("startedAtTurn") + (0 * chess.actions.flatten.size.pp("actionsSize"))
-  //TODO: multimove confirm dont need to use -1?
-  def playedTurns = actions.size
+  //    .pp("startedAtTurn") + (0 * chess.actions.pp("actions").flatten.size.pp("actionsSize"))
 
   def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
