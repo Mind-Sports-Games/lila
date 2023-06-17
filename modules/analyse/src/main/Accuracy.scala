@@ -19,18 +19,18 @@ object Accuracy {
   case class PovLike(
       playerIndex: PlayerIndex,
       startPlayerIndex: PlayerIndex,
-      startedAtTurn: Int
+      startedAtPly: Int
   )
 
   implicit def povToPovLike(pov: Pov): PovLike =
     PovLike(
       playerIndex = pov.playerIndex,
       startPlayerIndex = pov.game.startPlayerIndex,
-      startedAtTurn = pov.game.chess.startedAtTurn
+      startedAtPly = pov.game.chess.startedAtPly
     )
 
   def diffsList(pov: PovLike, analysis: Analysis): List[Int] = {
-    if (pov.playerIndex == pov.startPlayerIndex) Info.start(pov.startedAtTurn) :: analysis.infos
+    if (pov.playerIndex == pov.startPlayerIndex) Info.start(pov.startedAtPly) :: analysis.infos
     else analysis.infos
   }.grouped(2)
     .foldLeft(List[Int]()) {
@@ -43,7 +43,7 @@ object Accuracy {
     .reverse
 
   def prevPlayerIndexInfos(pov: PovLike, analysis: Analysis): List[Info] = {
-    if (pov.playerIndex == pov.startPlayerIndex) Info.start(pov.startedAtTurn) :: analysis.infos
+    if (pov.playerIndex == pov.startPlayerIndex) Info.start(pov.startedAtPly) :: analysis.infos
     else analysis.infos
   }.zipWithIndex.collect {
     case (e, i) if (i % 2) == 0 => e

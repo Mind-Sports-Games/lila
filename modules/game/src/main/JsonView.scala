@@ -40,7 +40,7 @@ final class JsonView(rematches: Rematches) {
         "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
         "player"        -> game.turnPlayerIndex,
         "turns"         -> game.turns,
-        "startedAtTurn" -> game.chess.startedAtTurn,
+        "startedAtPly"  -> game.chess.startedAtPly,
         "source"        -> game.source,
         "status"        -> game.status,
         "createdAt"     -> game.createdAt

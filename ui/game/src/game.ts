@@ -12,9 +12,9 @@ export const isPlayerTurn = (data: BaseGameData): boolean =>
 
 export const mandatory = (data: BaseGameData): boolean => !!data.tournament || !!data.simul || !!data.swiss;
 
-export const playedTurns = (data: BaseGameData): number => data.game.turns - (data.game.startedAtTurn || 0);
+export const playedTurns = (data: BaseGameData): number => data.game.turns - (data.game.startedAtPly || 0);
 
-export const bothPlayersHavePlayed = (data: BaseGameData): boolean =>
+export const bothPlayersHavePlayed = (data: BaseGameData): boolean => //playedTurns(data) > 1;
   playedTurns(data) > (data.game.variant.key === 'amazons' ? 3 : 1);
 
 export const abortable = (data: BaseGameData): boolean =>

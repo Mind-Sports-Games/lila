@@ -141,7 +141,7 @@ trait Positional { self: Config =>
           s.gameLogic,
           situation = s,
           turns = sit.turns,
-          startedAtTurn = sit.turns,
+          startedAtPly = sit.turns,
           startPlayer = s.player,
           clock = makeClock.map(_.toClock)
         )

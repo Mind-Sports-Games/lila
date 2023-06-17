@@ -51,7 +51,7 @@ private object ChallengeJoiner {
           lib = c.variant.gameLogic,
           situation = sit,
           turns = sp.turns,
-          startedAtTurn = sp.turns,
+          startedAtPly = sp.turns,
           startPlayer = sp.situation.player,
           clock = c.clock.map(_.config.toClock)
         )

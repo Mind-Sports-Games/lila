@@ -37,7 +37,7 @@ final class AutoPairing(
           g.copy(
             clock = clock.some,
             turns = turns,
-            startedAtTurn = turns,
+            startedAtPly = turns,
             startPlayer = g.player
           )
         },

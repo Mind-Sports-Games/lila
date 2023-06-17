@@ -99,12 +99,12 @@ case class Game(
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
 
-  def playedTurns = turns - chess.startedAtTurn //chess.turnCount
-  //def playedTurns = if (chess.actions.flatten.size == turns - chess.startedAtTurn)
-  //  turns.pp("ok") - chess.startedAtTurn
+  def playedTurns = turns - chess.startedAtPly //chess.turnCount
+  //def playedTurns = if (chess.actions.flatten.size == turns - chess.startedAtPly)
+  //  turns.pp("ok") - chess.startedAtPly
   //else
-  //  turns.pp("turns") - chess.startedAtTurn
-  //    .pp("startedAtTurn") + (0 * chess.actions.pp("actions").flatten.size.pp("actionsSize"))
+  //  turns.pp("turns") - chess.startedAtPly
+  //    .pp("startedAtPly") + (0 * chess.actions.pp("actions").flatten.size.pp("actionsSize"))
 
   def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
@@ -187,7 +187,7 @@ case class Game(
 
       pairs.zipWithIndex.map { case ((first, second), index) =>
         {
-          val turn         = index + 2 + chess.startedAtTurn / 2
+          val turn         = index + 2 + chess.startedAtPly / 2
           val afterByoyomi = byoyomiStart ?? (_ <= turn)
           // after byoyomi we store movetimes directly, not remaining time
           val mt   = if (afterByoyomi) second else first - second
@@ -753,7 +753,7 @@ case class Game(
 
   def resetTurns =
     copy(
-      chess = chess.copy(turns = 0, startedAtTurn = 0, startPlayer = PlayerIndex.P1)
+      chess = chess.copy(turns = 0, startedAtPly = 0, startPlayer = PlayerIndex.P1)
     )
 
   lazy val opening: Option[FullOpening.AtPly] =
@@ -939,7 +939,7 @@ object Game {
     val status            = "s"
     val turns             = "t"
     val activePlayer      = "ap"
-    val startedAtTurn     = "st"
+    val startedAtPly      = "st"
     val startPlayer       = "sp"
     val clock             = "c"
     val clockType         = "ct"

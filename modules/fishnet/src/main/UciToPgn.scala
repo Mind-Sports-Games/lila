@@ -33,7 +33,7 @@ private object UciToPgn {
     def uciToPgn(ply: Int, variation: List[String]): Validated[String, List[PgnMove]] =
       for {
         situation <-
-          if (ply == replay.setup.startedAtTurn + 1) valid(replay.setup.situation)
+          if (ply == replay.setup.startedAtPly + 1) valid(replay.setup.situation)
           else replay moveAtPly ply map (_.fold(_.situationBefore, _.situationBefore)) toValid "No move found"
         ucis <- variation.map(v => Uci(logic, family, v)).sequence toValid "Invalid UCI moves " + variation
         moves <-
