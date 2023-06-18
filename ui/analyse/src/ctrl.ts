@@ -254,6 +254,8 @@ export default class AnalyseCtrl {
   }
 
   turnPlayerIndex(): PlayerIndex {
+    console.log(`this.node.ply: ${this.node.ply}`);
+    console.log(`this.data.game.variant.key: ${this.data.game.variant.key} `);
     return util.plyPlayerIndex(this.node.ply, this.data.game.variant.key);
   }
 
@@ -272,7 +274,9 @@ export default class AnalyseCtrl {
     this.onChange();
     if (!defined(this.node.dests)) this.getDests();
     this.withCg(cg => {
+      console.log("HERE 2");
       cg.set(this.makeCgOpts());
+      console.log("HERE 3");
       this.setAutoShapes();
       const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
       setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
@@ -299,6 +303,10 @@ export default class AnalyseCtrl {
   });
 
   makeCgOpts(): ChessgroundConfig {
+    console.log(`this.gamebookPlay(): ${this.gamebookPlay()}`)
+    console.log(`this.practice: ${this.practice}`)
+    console.log(`this.bottomPlayerIndex(): ${this.bottomPlayerIndex()}`)
+    console.log(`this.embed: ${this.embed}`)
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
       dests = stratUtils.readDests(this.node.dests),
@@ -339,6 +347,11 @@ export default class AnalyseCtrl {
       enabled: false,
     };
     this.cgConfig = config;
+    console.log(dests);
+    console.log(this.embed);
+    console.log(playerIndex);
+    console.log(movablePlayerIndex);
+    console.log(movablePlayerIndex == playerIndex);
     return config;
   }
 
@@ -591,8 +604,9 @@ export default class AnalyseCtrl {
     this.chessground.playPremove();
     console.log(4);
     const parsedDests = stratUtils.readDests(node.dests);
-    console.log(`parsedDests: ${parsedDests}`);
-    if (parsedDests) this.maybeForceMove(parsedDests);
+    if (parsedDests) {
+      this.maybeForceMove(parsedDests);
+    }
   }
 
   addDests(dests: string, path: Tree.Path): void {
