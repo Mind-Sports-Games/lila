@@ -129,7 +129,7 @@ object AnaMove {
       fen = fen,
       path = path,
       chapterId = d str "ch",
-      promotion = d str "promotion" flatMap { p => Role.promotable(gl, v.gameFamily, p) },
+      promotion = d str "promotion" flatMap { p => Role.allPromotableByGroundName(gl, v.gameFamily).get(p) },
       uci = d str "uci",
       fullCapture = d boolean "fullCapture"
     )
