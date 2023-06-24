@@ -53,7 +53,7 @@ object AnaDrop {
     for {
       d <- o obj "d"
       variant = Variant.orDefault(GameLogic.Chess(), ~d.str("variant"))
-      role <- d str "role" flatMap Role.allByName(GameLogic.Chess(), variant.gameFamily).get
+      role <- d str "role" flatMap Role.allByGroundName(GameLogic.Chess(), variant.gameFamily).get
       pos  <- d str "pos" flatMap { pos => Pos.fromKey(GameLogic.Chess(), pos) }
       fen  <- d str "fen" map { fen => FEN.apply(GameLogic.Chess(), fen) }
       path <- d str "path"
