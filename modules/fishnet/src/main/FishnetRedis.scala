@@ -60,7 +60,7 @@ final class FishnetRedis(
       work.clock ?? writeClock,
       work.game.variant.some.filter(_.exotic).??(_.key),
       work.game.initialFen.??(_.value),
-      UciDump.fishnetUci(work.game.variant, work.game.moves).pp("whoops")
+      UciDump.fishnetUci(work.game.variant, work.game.moves)
     ) mkString ";"
 
   private def writeClock(clock: Work.Clock): String =
