@@ -32,7 +32,7 @@ const variantConfirms = {
     'This is a Grand Othello game!\n\nPlayers take it in turns to place counters, flipping all opposition counters between their placed counter and another counter on the edge. The winner is the player who has the most counters face up at the end.',
   amazons: 'This is an Amazons game!\n\nImmobilize all the enemy pieces to win.',
   oware: 'This is an Oware game!\n\nThe aim of the game is to capture the most stones.',
-  togyzkumalak: 'This is an Togyzkumalak game!\n\nThe aim of the game is to capture the most stones.',
+  togyzkumalak: 'This is an Togyzqumalaq game!\n\nThe aim of the game is to capture the most stones.',
 };
 
 function storageKey(key) {
