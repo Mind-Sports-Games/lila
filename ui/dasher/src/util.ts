@@ -63,6 +63,8 @@ export function displayGameFamily(gameFamilyKey: GameFamilyKey): string {
       return 'LinesOfAction';
     case 'flipello':
       return 'Othello';
+    case 'togyzkumalak':
+      return 'Togyzqumalaq';
     default:
       return gameFamilyKey.charAt(0).toUpperCase() + gameFamilyKey.slice(1);
   }
