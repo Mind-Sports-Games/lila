@@ -90,7 +90,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       perf: 'Oware',
       variant: 'oware',
       variantDisplayName: 'Oware',
-      variantId: '6_1'
+      variantId: '6_1',
     },
     {
       id: '3+2-togyzkumalak',
