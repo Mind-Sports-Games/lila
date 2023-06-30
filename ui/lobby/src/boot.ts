@@ -83,14 +83,22 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variantDisplayName: 'Amazons',
       variantId: '8_1',
     },
-    { id: '3+2-oware', lim: 3, inc: 2, perf: 'Oware', variant: 'oware', variantDisplayName: 'Oware', variantId: '6_1' },
+    {
+      id: '3+2-oware',
+      lim: 3,
+      inc: 2,
+      perf: 'Oware',
+      variant: 'oware',
+      variantDisplayName: 'Oware',
+      variantId: '6_1'
+    },
     {
       id: '3+2-togyzkumalak',
       lim: 3,
       inc: 2,
       perf: 'Togyzkumalak',
       variant: 'togyzkumalak',
-      variantDisplayName: 'Togyzkumalak',
+      variantDisplayName: 'Togyzqumalaq',
       variantId: '7_1',
     },
   ];
