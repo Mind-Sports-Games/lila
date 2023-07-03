@@ -256,8 +256,8 @@ object BSONHandlers {
       val p        = r int ply
       Root(
         ply = p,
-        //if we haven't explicitly written the playerIndex for this study then its an old one ply per turn study and so we can deduce the playerIndex from the ply like the old days
-        playerIndex = (r intO pi).map(pi => PlayerIndex.fromP1(pi == 1)) | PlayerIndex.fromPly(p),
+        //if we haven't explicitly written the playerIndex for this study then its an old one ply per turn study and so we can deduce the playerIndex from the ply (using fromTurnCount as if it were fromPly) like the old days
+        playerIndex = (r intO pi).map(pi => PlayerIndex.fromP1(pi == 1)) | PlayerIndex.fromTurnCount(p),
         fen = r.get[FEN](fen),
         check = r boolD check,
         shapes = r.getO[Shapes](shapes) | Shapes.empty,

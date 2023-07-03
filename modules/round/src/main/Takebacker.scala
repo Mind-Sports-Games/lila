@@ -100,17 +100,16 @@ final private class Takebacker(
         case _    => fufail(ClientError("[takebacker] disallowed by preferences " + game.id))
       }
 
+  private def currentPlayerTakingBack(g: Game) =
+    g.turnPlayerIndex == PlayerIndex.fromTurnCount(g.actions.size + g.startPlayerIndex.hashCode - 1)
+
   //Would be nice to test these methods with a multimove game that has > 2 plys in a turn
   private def takebackSwitchPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (game.turnPlayerIndex == PlayerIndex.fromPly(game.actions.size))
-      rewindPly(game)
-    else
-      rewindTurnAndPly(game)
+    if (currentPlayerTakingBack(game)) rewindPly(game)
+    else rewindTurnAndPly(game)
   private def takebackRetainPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (game.turnPlayerIndex == PlayerIndex.fromPly(game.actions.size))
-      rewindTurnAndPly(game)
-    else
-      rewindPly(game)
+    if (currentPlayerTakingBack(game)) rewindTurnAndPly(game)
+    else rewindPly(game)
 
   private def rewindPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     for {

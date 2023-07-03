@@ -19,8 +19,8 @@ case class Info(
 
   def turn = 1 + (ply - 1) / 2
 
-  //TODO Wrong for Amazons
-  def playerIndex = PlayerIndex.fromPly(ply - 1)
+  //TODO Wrong for Amazons / multiaction. Using fromTurnCount as fromPly
+  def playerIndex = PlayerIndex.fromTurnCount(ply - 1)
 
   def encode: String =
     List(

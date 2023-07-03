@@ -13,6 +13,7 @@ import lila.base.LilaException
 
 // convert variations from UCI to PGN.
 // also drops extra variations
+// This has not been upgraded to multiaction - should it be?
 private object UciToPgn {
 
   type WithErrors[A] = (A, List[Exception])

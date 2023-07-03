@@ -17,7 +17,8 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
   def add(game: Game, uciAction: String, playerIndex: Player): Unit = {
     val current = ~cache.getIfPresent(game.id)
     val newActions =
-      if (Player.fromPly(current.size) == playerIndex) current :+ List(uciAction)
+      if (Player.fromTurnCount(current.size + game.chess.startPlayer.hashCode - 1) == playerIndex)
+        current :+ List(uciAction)
       else current.dropRight(1) :+ (current.takeRight(1).flatten :+ uciAction)
     cache.put(game.id, newActions)
   }

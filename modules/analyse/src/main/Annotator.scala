@@ -58,7 +58,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
         pgn.updatePly(
           turn,
           move => {
-            val playerIndex = !PlayerIndex.fromPly(turn)
+            val playerIndex = !PlayerIndex.fromTurnCount(turn)
             move.copy(comments = s"$playerIndex offers draw" :: move.comments)
           }
         )
