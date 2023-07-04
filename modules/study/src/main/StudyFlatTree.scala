@@ -20,16 +20,17 @@ private object StudyFlatTree {
   object reader {
 
     def rootChildren(flatTree: Bdoc): Children =
-      Chronometer.syncMon(_.study.tree.read) {
-        traverse {
-          flatTree.elements.toList
-            .collect {
-              case el if el.name != Path.rootDbKey =>
-                FlatNode(Path.fromDbKey(el.name), el.value.asOpt[Bdoc].get)
-            }
-            .sortBy(-_.depth)
-        }
-      }
+      Chronometer
+        .syncMon(_.study.tree.read)(
+          traverse(
+            flatTree.elements.toList
+              .collect {
+                case el if el.name != Path.rootDbKey =>
+                  FlatNode(Path.fromDbKey(el.name), el.value.asOpt[Bdoc].get)
+              }
+              .sortBy(-_.depth)
+          )
+        )
 
     private def traverse(children: List[FlatNode]): Children =
       children
@@ -40,12 +41,16 @@ private object StudyFlatTree {
 
     // assumes that node has a greater depth than roots (sort beforehand)
     private def update(roots: Map[Path, Children], flat: FlatNode): Map[Path, Children] = {
-      flat.toNodeWithChildren(roots get flat.path).fold(roots) { node =>
-        roots.removed(flat.path).updatedWith(flat.path.parent) {
-          case None           => Children(Vector(node)).some
-          case Some(siblings) => siblings.addNode(node).some
+      flat
+        .toNodeWithChildren(roots.get(flat.path))
+        .fold(roots) { node =>
+          roots
+            .removed(flat.path)
+            .updatedWith(flat.path.parent) {
+              case None           => Children(Vector(node)).some
+              case Some(siblings) => siblings.addNode(node).some
+            }
         }
-      }
     }
   }
 

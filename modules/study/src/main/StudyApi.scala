@@ -69,9 +69,14 @@ final class StudyApi(
   def byIdWithChapter(id: Study.Id, chapterId: Chapter.Id): Fu[Option[Study.WithChapter]] =
     byId(id) flatMap {
       _ ?? { study =>
-        chapterRepo byId chapterId map {
-          _.filter(_.studyId == study.id) map { Study.WithChapter(study, _) }
-        } orElse byIdWithChapter(id)
+        chapterRepo
+          .byId(chapterId)
+          .map(
+            _.filter(_.studyId == study.id).map(
+              Study.WithChapter(study, _)
+            )
+          )
+          .orElse(byIdWithChapter(id))
       }
     }
 
@@ -663,7 +668,7 @@ final class StudyApi(
               setup = chapter.setup.copy(
                 orientation = data.realOrientation match {
                   case ChapterMaker.Orientation.Fixed(playerIndex) => playerIndex
-                  case _                                     => chapter.setup.orientation
+                  case _                                           => chapter.setup.orientation
                 }
               ),
               description = data.hasDescription option {
