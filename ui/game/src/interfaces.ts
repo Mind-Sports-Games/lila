@@ -28,7 +28,7 @@ export interface BaseGame {
   status: Status;
   player: PlayerIndex;
   turns: number;
-  startedAtPly?: number;
+  startedAtTurn?: number;
   source: Source;
   speed: Speed;
   variant: Variant | DraughtsVariant;

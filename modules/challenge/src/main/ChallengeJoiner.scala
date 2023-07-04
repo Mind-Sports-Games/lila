@@ -51,7 +51,8 @@ private object ChallengeJoiner {
           lib = c.variant.gameLogic,
           situation = sit,
           turns = sp.turns,
-          startedAtPly = sp.turns,
+          //TODO this only works for multiaction if turns is turns (not plies)
+          startedAtTurn = sp.turns,
           startPlayer = sp.situation.player,
           clock = c.clock.map(_.config.toClock)
         )

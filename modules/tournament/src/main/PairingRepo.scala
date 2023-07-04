@@ -177,7 +177,6 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
           $set(
             "s" -> g.status.id,
             "w" -> g.winnerPlayerIndex.map(_.p1),
-            //TODO: Check this for multimove. Other option is to do g.actions.size + g.startedAtPly
             "t" -> g.turns
           )
         )

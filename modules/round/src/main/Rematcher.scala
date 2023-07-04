@@ -165,7 +165,8 @@ final private class Rematcher(
             c.config.toClock
           },
           turns = situation ?? (_.turns),
-          startedAtPly = situation ?? (_.turns),
+          //TODO this only works for multiaction if turns is turns (not plies)
+          startedAtTurn = situation ?? (_.turns),
           startPlayer = situation.fold[PlayerIndex](P1)(_.situation.player)
         ),
         p1Player = returnPlayer(game, P1, users),

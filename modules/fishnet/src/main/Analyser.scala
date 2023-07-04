@@ -107,7 +107,8 @@ final class Analyser(
           variant = game.variant,
           moves = moves take maxPlies mkString " "
         ),
-        startPly = game.chess.startedAtPly,
+        //can use startedAtTurn as startedAtPly as fishnet doesnt deal with multiaction
+        startPly = game.chess.startedAtTurn,
         sender = sender
       )
     }

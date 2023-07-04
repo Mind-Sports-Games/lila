@@ -141,7 +141,8 @@ trait Positional { self: Config =>
           s.gameLogic,
           situation = s,
           turns = sit.turns,
-          startedAtPly = sit.turns,
+          //TODO this only works for multiaction if turns is turns (not plies)
+          startedAtTurn = sit.turns,
           startPlayer = s.player,
           clock = makeClock.map(_.toClock)
         )

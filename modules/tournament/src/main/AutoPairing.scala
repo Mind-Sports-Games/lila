@@ -37,7 +37,8 @@ final class AutoPairing(
           g.copy(
             clock = clock.some,
             turns = turns,
-            startedAtPly = turns,
+            //TODO this only works for multiaction if turns is turns (not plies)
+            startedAtTurn = turns,
             startPlayer = g.player
           )
         },

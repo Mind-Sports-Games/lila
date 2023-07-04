@@ -153,12 +153,13 @@ object BSONHandlers {
       val light     = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val createdAt = r date F.createdAt
 
-      val startedAtPly   = r intD F.startedAtPly
+      val startedAtTurn   = r intD F.startedAtTurn
       val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies           = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
       val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
 
-      val playedPlies = plies - startedAtPly
+      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
+      val playedPlies = plies - startedAtTurn
       val gameVariant = ChessVariant(r intD F.variant) | ChessStandard
 
       val decoded = r.bytesO(F.huffmanPgn).map { PgnStorage.Huffman.decode(_, playedPlies) } | {
@@ -214,7 +215,7 @@ object BSONHandlers {
           )
         } map (_(turnPlayerIndex)),
         turns = plies,
-        startedAtPly = startedAtPly,
+        startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
 
@@ -250,10 +251,11 @@ object BSONHandlers {
 
       val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val gameVariant   = DraughtsVariant(r intD F.variant) | DraughtsStandard
-      val startedAtPly = r intD F.startedAtPly
+      val startedAtTurn = r intD F.startedAtTurn
       val startPlayer   = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies         = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
-      val playedPlies   = plies - startedAtPly
+      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
+      val playedPlies   = plies - startedAtTurn
 
       val actions = NewLibStorage.OldBin.decode(GameLogic.Draughts(), r bytesD F.oldPgn, playedPlies)
 
@@ -306,7 +308,7 @@ object BSONHandlers {
           )
         } map (_(decodedSituation.player)),
         turns = currentPly,
-        startedAtPly = startedAtPly,
+        startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
 
@@ -342,13 +344,14 @@ object BSONHandlers {
     def readFairySFGame(r: BSON.Reader): Game = {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val gameVariant     = FairySFVariant(r intD F.variant) | FairySFStandard
-      val startedAtPly   = r intD F.startedAtPly
+      val startedAtTurn   = r intD F.startedAtTurn
       val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies           = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
       val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
 
-      val playedPlies = plies - startedAtPly
+      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
+      val playedPlies = plies - startedAtTurn
 
       val actions = NewLibStorage.OldBin.decode(GameLogic.FairySF(), r bytesD F.oldPgn, playedPlies)
 
@@ -392,7 +395,7 @@ object BSONHandlers {
           )
         } map (_(turnPlayerIndex)),
         turns = plies,
-        startedAtPly = startedAtPly,
+        startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
 
@@ -424,13 +427,14 @@ object BSONHandlers {
 
     def readSamuraiGame(r: BSON.Reader): Game = {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val startedAtPly   = r intD F.startedAtPly
+      val startedAtTurn   = r intD F.startedAtTurn
       val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies           = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
       val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
 
-      val playedPlies = plies - startedAtPly
+      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
+      val playedPlies = plies - startedAtTurn
       val gameVariant = SamuraiVariant(r intD F.variant) | SamuraiStandard
 
       val actions = NewLibStorage.OldBin.decode(GameLogic.Samurai(), r bytesD F.oldPgn, playedPlies)
@@ -467,7 +471,7 @@ object BSONHandlers {
           )
         } map (_(turnPlayerIndex)),
         turns = plies,
-        startedAtPly = startedAtPly,
+        startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
 
@@ -499,13 +503,14 @@ object BSONHandlers {
 
     def readTogyzkumalakGame(r: BSON.Reader): Game = {
       val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val startedAtPly   = r intD F.startedAtPly
+      val startedAtTurn   = r intD F.startedAtTurn
       val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
       val plies           = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
       val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
       val createdAt       = r date F.createdAt
 
-      val playedPlies = plies - startedAtPly
+      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
+      val playedPlies = plies - startedAtTurn
       val gameVariant = TogyzkumalakVariant(r intD F.variant) | TogyzkumalakStandard
 
       val actions = NewLibStorage.OldBin.decode(GameLogic.Togyzkumalak(), r bytesD F.oldPgn, playedPlies)
@@ -546,7 +551,7 @@ object BSONHandlers {
           )
         } map (_(turnPlayerIndex)),
         turns = plies,
-        startedAtPly = startedAtPly,
+        startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
 
@@ -609,8 +614,8 @@ object BSONHandlers {
         F.status        -> o.status,
         F.turns         -> o.chess.turns,
         F.activePlayer  -> o.chess.situation.player.hashCode,
-        F.startedAtPly -> w.intO(o.chess.startedAtPly),
-        F.startPlayer   -> w.intO(if (o.chess.startedAtPly == 0) 0 else o.chess.startPlayer.hashCode),
+        F.startedAtTurn -> w.intO(o.chess.startedAtTurn),
+        F.startPlayer   -> w.intO(if (o.chess.startedAtTurn == 0) 0 else o.chess.startPlayer.hashCode),
         F.clockType     -> o.chess.clock.map(clockTypeBSONWrite),
         F.clock -> (o.chess.clock flatMap { c =>
           clockBSONWrite(o.createdAt, c).toOption

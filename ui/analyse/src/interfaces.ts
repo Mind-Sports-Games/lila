@@ -93,7 +93,7 @@ export interface Game {
   playerName: PlayerName;
   playerIndex: PlayerIndex;
   turns: number;
-  startedAtPly: number;
+  startedAtTurn: number;
   source: Source;
   speed: Speed;
   variant: Variant;

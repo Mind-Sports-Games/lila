@@ -12,7 +12,8 @@ export const isPlayerTurn = (data: BaseGameData): boolean =>
 
 export const mandatory = (data: BaseGameData): boolean => !!data.tournament || !!data.simul || !!data.swiss;
 
-export const playedTurns = (data: BaseGameData): number => data.game.turns - (data.game.startedAtPly || 0);
+//TODO check this for multiaction
+export const playedTurns = (data: BaseGameData): number => data.game.turns - (data.game.startedAtTurn || 0);
 
 export const bothPlayersHavePlayed = (data: BaseGameData): boolean => //playedTurns(data) > 1;
   playedTurns(data) > (data.game.variant.key === 'amazons' ? 3 : 1);

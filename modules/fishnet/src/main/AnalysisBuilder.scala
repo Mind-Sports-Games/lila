@@ -89,7 +89,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
   private def makeInfos(
       evals: List[Option[Evaluation[Uci]]],
       moves: List[Uci],
-      startedAtPly: Int
+      startedAtTurn: Int
   ): List[Info] =
     (evals filterNot (_ ?? (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map {
       case ((List(Some(before), Some(after)), move), index) =>
@@ -99,7 +99,8 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
         }
         val best = variation.headOption
         val info = Info(
-          ply = index + 1 + startedAtPly,
+          //can use startedAtTurn as startedAtPly as fishnet doesnt deal with multiaction
+          ply = index + 1 + startedAtTurn,
           eval = Eval(
             after.score.cp,
             after.score.mate,
@@ -108,6 +109,6 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
           variation = variation.map(_.uci).map(Vector(_))
         )
         if (info.ply % 2 == 1) info.invert else info
-      case ((_, _), index) => Info(index + 1 + startedAtPly, Eval.empty)
+      case ((_, _), index) => Info(index + 1 + startedAtTurn, Eval.empty)
     }
 }
