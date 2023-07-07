@@ -145,6 +145,22 @@ private object bits {
       renderCheckbox(form("multiMatch"), trans.multiMatch())
     )
 
+  def renderGoOptions(form: Form[_])(implicit ctx: Context) =
+    div(cls := "go_config optional_config")(
+      div(cls := "go_handicap_choice range")(
+        trans.goHandicap(),
+        ": ",
+        span(form("goHandicap").value),
+        renderDissociatedRange(form("goHandicap"))
+      ),
+      div(cls := "go_komi_choice range")(
+        trans.goKomi(),
+        ": ",
+        span(form("goKomi").value),
+        renderDissociatedRange(form("goKomi"))
+      )
+    )
+
   def renderTimeMode(form: Form[_], allowAnon: Boolean)(implicit ctx: Context) =
     div(cls := "time_mode_config optional_config")(
       div(

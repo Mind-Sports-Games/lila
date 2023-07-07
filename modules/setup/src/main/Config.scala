@@ -111,7 +111,7 @@ trait Positional { self: Config =>
     case GameLogic.FairySF()      => true //no fromPosition yet
     case GameLogic.Samurai()      => true //no fromPosition yet
     case GameLogic.Togyzkumalak() => true //no fromPosition yet
-    case GameLogic.Go()           => true //no fromPosition yet
+    case GameLogic.Go()           => true //using handicap and komi to set fen instead
     case _ =>
       fen exists { f =>
         (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)
@@ -133,9 +133,14 @@ trait Positional { self: Config =>
   }
 
   def fenGame(builder: StratGame => Game): Game = {
-    val baseState = fen ifTrue (variant.fromPosition) flatMap {
-      Forsyth.<<<@(variant.gameLogic, Variant.libFromPosition(variant.gameLogic), _)
-    }
+    val baseState =
+      fen ifTrue (variant.fromPosition || variant.gameLogic == GameLogic.Go()) flatMap {
+        Forsyth.<<<@(
+          variant.gameLogic,
+          variant,
+          _
+        )
+      }
     val (chessGame, state) = baseState.fold(makeGame -> none[SituationPlus]) {
       case sit @ SituationPlus(s, _) =>
         val game = StratGame(
@@ -156,7 +161,7 @@ trait Positional { self: Config =>
           situation = game.situation.copy(
             board = game.board.copy(
               history = s.board.history,
-              variant = Variant.libFromPosition(s.board.variant.gameLogic)
+              variant = s.board.variant
             )
           ),
           turns = sit.turns
@@ -244,4 +249,13 @@ trait BaseConfig {
   private val periodsMin      = 0
   private val periodsMax      = 5
   def validatePeriods(i: Int) = i >= periodsMin && i <= periodsMax
+
+  private val handicapMin        = 0
+  private val handicapMax        = 9
+  def validateGoHandicap(i: Int) = i >= handicapMin && i <= handicapMax
+
+  //komi is multipled by 10 to allow int.
+  private val komiMin        = -100
+  private val komiMax        = 100
+  def validateGoKomi(i: Int) = i >= komiMin && i <= komiMax
 }

@@ -91,6 +91,10 @@ export default class Setup {
     }
   };
 
+  private sliderKomis = [...Array(41).keys()].map(i => -100 + i * 5);
+
+  private sliderKomi = (v: number) => (v < this.sliderKomis.length ? this.sliderKomis[v] : 65);
+
   private sliderDays = (v: number) => {
     if (v <= 3) return v;
     switch (v) {
@@ -145,6 +149,9 @@ export default class Setup {
       $byoyomiInput = $form.find('.byoyomi_choice [name=byoyomi]'),
       $periods = $form.find('.periods'),
       $periodsInput = $periods.find('.byoyomi_periods [name=periods]'),
+      $goConfig = $form.find('.go_config'),
+      $goHandicapInput = $form.find('.go_handicap_choice [name=goHandicap]'),
+      $goKomiInput = $form.find('.go_komi_choice [name=goKomi]'),
       $advancedTimeSetup = $form.find('.advanced_setup'),
       $advancedTimeToggle = $form.find('.advanced_toggle'),
       $daysInput = $form.find('.days_choice [name=days]'),
@@ -531,6 +538,44 @@ export default class Setup {
           save();
         });
       });
+      $goHandicapInput.each(function (this: HTMLInputElement) {
+        const $input = $(this),
+          $value = $input.siblings('span'),
+          $range = $input.siblings('.range');
+        $value.text($input.val() as string);
+        $range.attr({
+          min: '0',
+          max: '9',
+          value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderIncrement, 10),
+        });
+        $range.on('input', () => {
+          const goHandicap = self.sliderIncrement(parseInt($range.val() as string));
+          $value.text('' + goHandicap);
+          $input.val('' + goHandicap);
+          save();
+        });
+      });
+      $goKomiInput.each(function (this: HTMLInputElement) {
+        const $input = $(this),
+          $value = $input.siblings('span'),
+          $range = $input.siblings('.range'),
+          showKomi = (v: number) => {
+            return ('' + v / 10.0).replace('.0', '');
+          },
+          show = (komi: number) => $value.text(showKomi(komi));
+        show(parseInt($input.val() as string));
+        $range.attr({
+          min: '0',
+          max: '40',
+          value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderKomi, 40),
+        });
+        $range.on('input', () => {
+          const goKomi = self.sliderKomi(parseInt($range.val() as string));
+          show(goKomi);
+          $input.val('' + goKomi);
+          save();
+        });
+      });
       $form.find('.rating-range').each(function (this: HTMLDivElement) {
         const $this = $(this),
           $minInput = $this.find('.rating-range__min'),
@@ -584,9 +629,11 @@ export default class Setup {
     const validateFen = debounce(() => {
       $fenInput.removeClass('success failure');
       const fen = $fenInput.val() as string;
+      const variantId = ($variantSelect.val() as string).split('_');
+      const lib = variantId[0];
       if (fen) {
         const [path, params] = $fenInput.parent().data('validate-url').split('?'); // Separate "strict=1" for AI match
-        xhr.text(xhr.url(path, { fen }) + (params ? `&${params}` : '')).then(
+        xhr.text(xhr.url(path, { lib, fen }) + (params ? `&${params}` : '')).then(
           data => {
             $fenInput.addClass('success');
             $fenPosition.find('.preview').html(data);
@@ -617,7 +664,7 @@ export default class Setup {
         case '1':
           $variantSelect.val('1_3');
           break;
-        //TODO: Add LOA from position?
+        //TODO: Add all variants from position?
       }
     }
 
@@ -628,13 +675,14 @@ export default class Setup {
     $variantSelect
       .on('change', function (this: HTMLElement) {
         const variantId = ($variantSelect.val() as string).split('_'),
-          isFen = variantId[1] == '3'; //each gameFamily with id=3 assumed to be "From Position"
+          isFen = variantId[1] == '3';
         let ground = 'chessground';
         if (variantId[0] == '1') ground = 'draughtsground';
         ground += '.resize';
         $multiMatch.toggle(isFen && variantId[0] == '1');
         $fenPosition.toggle(isFen);
         $modeChoicesWrap.toggle(!isFen);
+        $goConfig.toggle(variantId[0] == '9');
         if (isFen) {
           $casual.trigger('click');
           requestAnimationFrame(() => document.body.dispatchEvent(new Event(ground)));

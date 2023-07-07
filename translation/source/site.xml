@@ -303,6 +303,8 @@
   <string name="send">Send</string>
   <string name="incrementInSeconds">Increment in seconds</string>
   <string name="byoyomiInSeconds">Byoyomi in seconds</string>
+  <string name="goHandicap">Handicap</string>
+  <string name="goKomi">Komi</string>
   <string name="freeOnlineChess">Free Online Chess</string>
   <plurals name="nbRated">
     <item quantity="one">%s rated</item>

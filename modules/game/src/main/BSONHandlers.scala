@@ -30,6 +30,7 @@ import strategygames.samurai
 import strategygames.togyzkumalak
 import strategygames.go
 import strategygames.format.Uci
+import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard }
 import strategygames.draughts.variant.{ Variant => DraughtsVariant, Standard => DraughtsStandard }
@@ -619,11 +620,12 @@ object BSONHandlers {
     }
 
     def readGoGame(r: BSON.Reader): Game = {
-      val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val startedAtTurn   = r intD F.startedAtTurn
-      val plies           = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex.fromPly(plies)
-      val createdAt       = r date F.createdAt
+      val light                   = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val startedAtTurn           = r intD F.startedAtTurn
+      val plies                   = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
+      val turnPlayerIndex         = PlayerIndex.fromPly(plies)
+      val createdAt               = r date F.createdAt
+      val initialFen: Option[FEN] = r.getO[FEN](F.initialFen)          //for handicapped games
 
       val playedPlies = plies - startedAtTurn
       val gameVariant = GoVariant(r intD F.variant) | GoStandard
@@ -642,7 +644,7 @@ object BSONHandlers {
       }
 
       val periodEntries = readPeriodEntries(r)
-
+      val uciMoves      = strategygames.go.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
       val goGame = go.Game(
         situation = go.Situation(
           go.Board(
@@ -663,7 +665,9 @@ object BSONHandlers {
               case None                    => None
               case _                       => sys.error("non go pocket data")
             },
-            uciMoves = strategygames.go.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
+            uciMoves = uciMoves,
+            position =
+              initialFen.map(f => strategygames.go.Api.positionFromStartingFenAndMoves(f.toGo, uciMoves))
           ),
           player = turnPlayerIndex
         ),

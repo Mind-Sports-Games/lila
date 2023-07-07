@@ -29,7 +29,10 @@ final class AutoPairing(
           tour.currentVariant.gameLogic,
           Some {
             if (tour.position.isEmpty) tour.currentVariant
-            else Variant.libFromPosition(tour.currentVariant.gameLogic)
+            else
+              Variant
+                .byName(tour.currentVariant.gameLogic, "From Position")
+                .getOrElse(Variant.orDefault(tour.currentVariant.gameLogic, 3))
           },
           tour.position
         ) pipe { g =>

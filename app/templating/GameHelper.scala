@@ -43,8 +43,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         }
     val mode = game.mode.name
     val variant =
-      if (game.variant == Variant.libFromPosition(game.variant.gameLogic))
-        s"position setup ${game.variant.gameLogic.name}"
+      if (game.variant.fromPositionVariant) s"position setup ${game.variant.gameLogic.name}"
       else if (game.variant.exotic) VariantKeys.variantName(game.variant)
       else game.variant.gameLogic.name.toLowerCase()
     import strategygames.Status._

@@ -60,6 +60,8 @@ object SetupForm {
         "increment"   -> increment,
         "byoyomi"     -> byoyomi,
         "periods"     -> periods,
+        "goHandicap"  -> goHandicap,
+        "goKomi"      -> goKomi,
         "days"        -> days,
         "mode"        -> mode(withRated = ctx.isAuth),
         "playerIndex" -> playerIndex,
