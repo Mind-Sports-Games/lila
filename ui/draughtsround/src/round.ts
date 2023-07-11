@@ -18,7 +18,7 @@ export const massage = (d: RoundData): void => {
 
   if (d.correspondence) d.correspondence.showBar = d.pref.clockBar;
 
-  if (d.expiration) d.expiration.movedAt = Date.now() - d.expiration.idleMillis;
+  if (d.expiration) d.expiration.updatedAt = Date.now() - d.expiration.idleMillis;
 };
 
 export function mergeSteps(steps: Step[], coordSystem: number): Step[] {

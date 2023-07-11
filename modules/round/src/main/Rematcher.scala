@@ -164,9 +164,9 @@ final private class Rematcher(
           clock = game.clock map { c =>
             c.config.toClock
           },
-          turns = situation ?? (_.turns),
-          //TODO this only works for multiaction if turns is turns (not plies)
-          startedAtTurn = situation ?? (_.turns),
+          turnCount = situation ?? (_.turnCount),
+          plies = situation ?? (_.plies),
+          startedAtTurn = situation ?? (_.currentTurnCount),
           startPlayer = situation.fold[PlayerIndex](P1)(_.situation.player)
         ),
         p1Player = returnPlayer(game, P1, users),

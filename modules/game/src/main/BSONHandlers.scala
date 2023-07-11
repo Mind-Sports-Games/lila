@@ -150,17 +150,23 @@ object BSONHandlers {
     import PgnImport.pgnImportBSONHandler
 
     def readChessGame(r: BSON.Reader): Game = {
-      val light     = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val createdAt = r date F.createdAt
-
-      val startedAtTurn   = r intD F.startedAtTurn
-      val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
-      val plies           = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
-
-      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
-      val playedPlies = plies - startedAtTurn
+      val light       = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val createdAt   = r date F.createdAt
       val gameVariant = ChessVariant(r intD F.variant) | ChessStandard
+
+      val startedAtTurn = r intD F.startedAtTurn
+      // defaults to 0 which is P1
+      val startPlayer = PlayerIndex((r intD F.startPlayer) != 2)
+      // do we need to cap turns on reading?
+      val turns = r int F.turns atMost Game.maxTurns
+      // capping because unlimited can cause StackOverflowError
+      val plies = ((r intO F.plies) | turns) atMost Game.maxPlies
+
+      // this is an upperbound. only used for capping reading actions.
+      // technically incorrect for multiaction games
+      val playedPlies = plies - startedAtTurn
+
+      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
 
       val decoded = r.bytesO(F.huffmanPgn).map { PgnStorage.Huffman.decode(_, playedPlies) } | {
         val clm     = r.get[CastleLastMove](F.castleLastMove)
@@ -214,7 +220,8 @@ object BSONHandlers {
             light.p2Player.berserk
           )
         } map (_(turnPlayerIndex)),
-        turns = plies,
+        plies = plies,
+        turnCount = turns,
         startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
@@ -227,11 +234,11 @@ object BSONHandlers {
         readClockHistory(r, light, turnPlayerIndex, periodEntries),
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
-        binaryMoveTimes = r bytesO F.moveTimes,
+        binaryPlyTimes = r bytesO F.plyTimes,
         mode = Mode(r boolD F.rated),
         bookmarks = r intD F.bookmarks,
         createdAt = createdAt,
-        movedAt = r.dateD(F.movedAt, createdAt),
+        updatedAt = r.dateD(F.updatedAt, createdAt),
         metadata = Metadata(
           source = r intO F.source flatMap Source.apply,
           pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
@@ -249,13 +256,20 @@ object BSONHandlers {
 
       //lila.mon.game.fetch()
 
-      val light         = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val gameVariant   = DraughtsVariant(r intD F.variant) | DraughtsStandard
+      val light       = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val gameVariant = DraughtsVariant(r intD F.variant) | DraughtsStandard
+
       val startedAtTurn = r intD F.startedAtTurn
-      val startPlayer   = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
-      val plies         = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
-      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
-      val playedPlies   = plies - startedAtTurn
+      // defaults to 0 which is P1
+      val startPlayer = PlayerIndex((r intD F.startPlayer) != 2)
+      // do we need to cap turns on reading?
+      val turns = r int F.turns atMost Game.maxTurns
+      // capping because unlimited can cause StackOverflowError
+      val plies = ((r intO F.plies) | turns) atMost Game.maxPlies
+
+      // this is an upperbound. only used for capping reading actions.
+      // technically incorrect for multiaction games
+      val playedPlies = plies - startedAtTurn
 
       val actions = NewLibStorage.OldBin.decode(GameLogic.Draughts(), r bytesD F.oldPgn, playedPlies)
 
@@ -307,7 +321,9 @@ object BSONHandlers {
             light.p2Player.berserk
           )
         } map (_(decodedSituation.player)),
-        turns = currentPly,
+        //whilst Draughts isnt upgraded to multiaction
+        turnCount = currentPly,
+        plies = currentPly,
         startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
@@ -320,11 +336,11 @@ object BSONHandlers {
         readClockHistory(r, light, turnPlayerIndex, periodEntries),
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
-        binaryMoveTimes = r bytesO F.moveTimes,
+        binaryPlyTimes = r bytesO F.plyTimes,
         mode = Mode(r boolD F.rated),
         bookmarks = r intD F.bookmarks,
         createdAt = createdAt,
-        movedAt = r.dateD(F.movedAt, createdAt),
+        updatedAt = r.dateD(F.updatedAt, createdAt),
         metadata = Metadata(
           source = r intO F.source flatMap Source.apply,
           pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
@@ -342,16 +358,24 @@ object BSONHandlers {
     }
 
     def readFairySFGame(r: BSON.Reader): Game = {
-      val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val gameVariant     = FairySFVariant(r intD F.variant) | FairySFStandard
-      val startedAtTurn   = r intD F.startedAtTurn
-      val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
-      val plies           = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
-      val createdAt       = r date F.createdAt
+      val light       = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val gameVariant = FairySFVariant(r intD F.variant) | FairySFStandard
 
-      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
+      val startedAtTurn = r intD F.startedAtTurn
+      // defaults to 0 which is P1
+      val startPlayer = PlayerIndex((r intD F.startPlayer) != 2)
+      // do we need to cap turns on reading?
+      val turns = r int F.turns atMost Game.maxTurns
+      // capping because unlimited can cause StackOverflowError
+      val plies = ((r intO F.plies) | turns) atMost Game.maxPlies
+
+      // this is an upperbound. only used for capping reading actions.
+      // technically incorrect for multiaction games
       val playedPlies = plies - startedAtTurn
+
+      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
+
+      val createdAt = r date F.createdAt
 
       val actions = NewLibStorage.OldBin.decode(GameLogic.FairySF(), r bytesD F.oldPgn, playedPlies)
 
@@ -394,7 +418,8 @@ object BSONHandlers {
             light.p2Player.berserk
           )
         } map (_(turnPlayerIndex)),
-        turns = plies,
+        plies = plies,
+        turnCount = turns,
         startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
@@ -407,11 +432,11 @@ object BSONHandlers {
         readClockHistory(r, light, turnPlayerIndex, periodEntries),
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
-        binaryMoveTimes = r bytesO F.moveTimes,
+        binaryPlyTimes = r bytesO F.plyTimes,
         mode = Mode(r boolD F.rated),
         bookmarks = r intD F.bookmarks,
         createdAt = createdAt,
-        movedAt = r.dateD(F.movedAt, createdAt),
+        updatedAt = r.dateD(F.updatedAt, createdAt),
         metadata = Metadata(
           source = r intO F.source flatMap Source.apply,
           pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
@@ -426,16 +451,24 @@ object BSONHandlers {
     }
 
     def readSamuraiGame(r: BSON.Reader): Game = {
-      val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val startedAtTurn   = r intD F.startedAtTurn
-      val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
-      val plies           = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
-      val createdAt       = r date F.createdAt
-
-      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
-      val playedPlies = plies - startedAtTurn
+      val light       = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val gameVariant = SamuraiVariant(r intD F.variant) | SamuraiStandard
+
+      val startedAtTurn = r intD F.startedAtTurn
+      // defaults to 0 which is P1
+      val startPlayer = PlayerIndex((r intD F.startPlayer) != 2)
+      // do we need to cap turns on reading?
+      val turns = r int F.turns atMost Game.maxTurns
+      // capping because unlimited can cause StackOverflowError
+      val plies = ((r intO F.plies) | turns) atMost Game.maxPlies
+
+      // this is an upperbound. only used for capping reading actions.
+      // technically incorrect for multiaction games
+      val playedPlies = plies - startedAtTurn
+
+      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
+
+      val createdAt = r date F.createdAt
 
       val actions = NewLibStorage.OldBin.decode(GameLogic.Samurai(), r bytesD F.oldPgn, playedPlies)
 
@@ -470,7 +503,8 @@ object BSONHandlers {
             light.p2Player.berserk
           )
         } map (_(turnPlayerIndex)),
-        turns = plies,
+        plies = plies,
+        turnCount = turns,
         startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
@@ -483,11 +517,11 @@ object BSONHandlers {
         readClockHistory(r, light, turnPlayerIndex, periodEntries),
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
-        binaryMoveTimes = r bytesO F.moveTimes,
+        binaryPlyTimes = r bytesO F.plyTimes,
         mode = Mode(r boolD F.rated),
         bookmarks = r intD F.bookmarks,
         createdAt = createdAt,
-        movedAt = r.dateD(F.movedAt, createdAt),
+        updatedAt = r.dateD(F.updatedAt, createdAt),
         metadata = Metadata(
           source = r intO F.source flatMap Source.apply,
           pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
@@ -502,16 +536,24 @@ object BSONHandlers {
     }
 
     def readTogyzkumalakGame(r: BSON.Reader): Game = {
-      val light           = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
-      val startedAtTurn   = r intD F.startedAtTurn
-      val startPlayer     = PlayerIndex((r intD F.startPlayer) != 2) //defaults to 0 which is P1
-      val plies           = r int F.turns atMost Game.maxPlies       // unlimited can cause StackOverflowError
-      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
-      val createdAt       = r date F.createdAt
-
-      //TODO should save playedPlies separately and not calculate it as startedAtTurn doesnt work here
-      val playedPlies = plies - startedAtTurn
+      val light       = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val gameVariant = TogyzkumalakVariant(r intD F.variant) | TogyzkumalakStandard
+
+      val startedAtTurn = r intD F.startedAtTurn
+      // defaults to 0 which is P1
+      val startPlayer = PlayerIndex((r intD F.startPlayer) != 2)
+      // do we need to cap turns on reading?
+      val turns = r int F.turns atMost Game.maxTurns
+      // capping because unlimited can cause StackOverflowError
+      val plies = ((r intO F.plies) | turns) atMost Game.maxPlies
+
+      // this is an upperbound. only used for capping reading actions.
+      // technically incorrect for multiaction games
+      val playedPlies = plies - startedAtTurn
+
+      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
+
+      val createdAt = r date F.createdAt
 
       val actions = NewLibStorage.OldBin.decode(GameLogic.Togyzkumalak(), r bytesD F.oldPgn, playedPlies)
 
@@ -550,7 +592,8 @@ object BSONHandlers {
             light.p2Player.berserk
           )
         } map (_(turnPlayerIndex)),
-        turns = plies,
+        plies = plies,
+        turnCount = turns,
         startedAtTurn = startedAtTurn,
         startPlayer = startPlayer
       )
@@ -563,11 +606,11 @@ object BSONHandlers {
         readClockHistory(r, light, turnPlayerIndex, periodEntries),
         status = light.status,
         daysPerTurn = r intO F.daysPerTurn,
-        binaryMoveTimes = r bytesO F.moveTimes,
+        binaryPlyTimes = r bytesO F.plyTimes,
         mode = Mode(r boolD F.rated),
         bookmarks = r intD F.bookmarks,
         createdAt = createdAt,
-        movedAt = r.dateD(F.movedAt, createdAt),
+        updatedAt = r.dateD(F.updatedAt, createdAt),
         metadata = Metadata(
           source = r intO F.source flatMap Source.apply,
           pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
@@ -612,7 +655,8 @@ object BSONHandlers {
           )
         ),
         F.status        -> o.status,
-        F.turns         -> o.chess.turns,
+        F.turns         -> o.chess.turnCount,
+        F.plies         -> w.intO(if (o.chess.plies == o.chess.turnCount) 0 else o.chess.plies),
         F.activePlayer  -> o.chess.situation.player.hashCode,
         F.startedAtTurn -> w.intO(o.chess.startedAtTurn),
         F.startPlayer   -> w.intO(if (o.chess.startedAtTurn == 0) 0 else o.chess.startPlayer.hashCode),
@@ -621,7 +665,7 @@ object BSONHandlers {
           clockBSONWrite(o.createdAt, c).toOption
         }),
         F.daysPerTurn    -> o.daysPerTurn,
-        F.moveTimes      -> o.binaryMoveTimes,
+        F.plyTimes       -> o.binaryPlyTimes,
         F.p1ClockHistory -> clockHistory(P1, o.clockHistory, o.chess.clock, o.flagged),
         F.p2ClockHistory -> clockHistory(P2, o.clockHistory, o.chess.clock, o.flagged),
         F.rated          -> w.boolO(o.mode.rated),
@@ -629,7 +673,7 @@ object BSONHandlers {
         F.variant        -> o.board.variant.exotic.option(w int o.board.variant.id),
         F.bookmarks      -> w.intO(o.bookmarks),
         F.createdAt      -> w.date(o.createdAt),
-        F.movedAt        -> w.date(o.movedAt),
+        F.updatedAt      -> w.date(o.updatedAt),
         F.source         -> o.metadata.source.map(_.id),
         F.pgnImport      -> o.metadata.pgnImport,
         F.tournamentId   -> o.metadata.tournamentId,
@@ -642,7 +686,8 @@ object BSONHandlers {
         o.board.variant.gameLogic match {
           case GameLogic.Draughts() =>
             $doc(
-              F.oldPgn -> NewLibStorage.OldBin.encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeDraughts(o.board match {
                 case Board.Draughts(board) => board
                 case _                     => sys.error("invalid draughts board")
@@ -653,7 +698,8 @@ object BSONHandlers {
             )
           case GameLogic.FairySF() =>
             $doc(
-              F.oldPgn -> NewLibStorage.OldBin.encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeFairySF(o.board match {
                 case Board.FairySF(board) => board.pieces
                 case _                    => sys.error("invalid fairysf board")
@@ -664,7 +710,8 @@ object BSONHandlers {
             )
           case GameLogic.Samurai() =>
             $doc(
-              F.oldPgn -> NewLibStorage.OldBin.encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeSamurai(o.board match {
                 case Board.Samurai(board) => board.pieces
                 case _                    => sys.error("invalid samurai board")
@@ -674,7 +721,8 @@ object BSONHandlers {
             )
           case GameLogic.Togyzkumalak() =>
             $doc(
-              F.oldPgn -> NewLibStorage.OldBin.encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeTogyzkumalak(o.board match {
                 case Board.Togyzkumalak(board) => board.pieces
                 case _                         => sys.error("invalid togyzkumalak board")

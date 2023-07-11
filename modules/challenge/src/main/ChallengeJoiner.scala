@@ -50,9 +50,9 @@ private object ChallengeJoiner {
         val game = strategygames.Game(
           lib = c.variant.gameLogic,
           situation = sit,
-          turns = sp.turns,
-          //TODO this only works for multiaction if turns is turns (not plies)
-          startedAtTurn = sp.turns,
+          plies = sp.plies,
+          turnCount = sp.turnCount,
+          startedAtTurn = sp.currentTurnCount,
           startPlayer = sp.situation.player,
           clock = c.clock.map(_.config.toClock)
         )
@@ -75,13 +75,14 @@ private object ChallengeJoiner {
       )
       .withId(c.id)
       .pipe { g =>
-        state.fold(g) { case sit @ SituationPlus(s, _) =>
+        state.fold(g) { case sp @ SituationPlus(sit, _) =>
           g.copy(
             chess = g.chess.copy(
               situation = g.situation.copy(
-                board = g.board.copy(history = s.board.history)
+                board = g.board.copy(history = sit.board.history)
               ),
-              turns = sit.turns
+              plies = sp.plies,
+              turnCount = sp.turnCount
             )
           )
         }

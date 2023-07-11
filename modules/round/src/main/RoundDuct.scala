@@ -186,11 +186,12 @@ final private[round] class RoundDuct(
           case false =>
             lila
               .log("cheat")
+              //TODO multiaction finalise meaning of gameid#ply / gameid#turn in url
               .info(
-                s"hold alert $ip https://playstrategy.org/${pov.gameId}/${pov.playerIndex.name}#${pov.game.turns} ${pov.player.userId | "anon"} mean: $mean SD: $sd"
+                s"hold alert $ip https://playstrategy.org/${pov.gameId}/${pov.playerIndex.name}#${pov.game.plies} ${pov.player.userId | "anon"} mean: $mean SD: $sd"
               )
             lila.mon.cheat.holdAlert.increment()
-            gameRepo.setHoldAlert(pov, GamePlayer.HoldAlert(ply = pov.game.turns, mean = mean, sd = sd)).void
+            gameRepo.setHoldAlert(pov, GamePlayer.HoldAlert(ply = pov.game.plies, mean = mean, sd = sd)).void
         } inject Nil
       }
 
@@ -491,7 +492,7 @@ final private[round] class RoundDuct(
   private def getPlayer(playerIndex: PlayerIndex): Player = playerIndex.fold(p1Player, p2Player)
 
   private def recordLag(pov: Pov): Unit =
-    if ((pov.game.playedTurns & 30) == 10) {
+    if ((pov.game.playedPlies & 30) == 10) {
       // TODO: Test for multimove, never checked for Amazons?
       // Triggers every 32 moves starting on ply 10.
       // i.e. 10, 11, 42, 43, 74, 75, ...

@@ -70,7 +70,7 @@ export interface RoundData extends GameData {
 
 export interface Expiration {
   idleMillis: number;
-  movedAt: number;
+  updatedAt: number;
   millisToMove: number;
 }
 

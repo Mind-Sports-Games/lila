@@ -86,7 +86,7 @@ final private class ChapterMaker(
     (data.fen.filterNot(_.initial).flatMap { Forsyth.<<<@(variant.gameLogic, variant, _) } match {
       case Some(sit) =>
         Node.Root(
-          ply = sit.turns,
+          ply = sit.plies,
           playerIndex = sit.situation.player,
           fen = Forsyth.>>(sit.situation.board.variant.gameLogic, sit),
           check = sit.situation.check,

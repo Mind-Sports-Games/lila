@@ -177,7 +177,9 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
           $set(
             "s" -> g.status.id,
             "w" -> g.winnerPlayerIndex.map(_.p1),
-            "t" -> g.turns
+            //TODO: multiaction consider whether this should be plies/turnCount
+            //Currently using plies to retain functionality
+            "t" -> g.plies
           )
         )
         .void

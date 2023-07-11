@@ -203,15 +203,17 @@ final private[api] class GameApi(
   ) =
     Json
       .obj(
-        "id"          -> g.id,
-        "initialFen"  -> initialFen,
-        "rated"       -> g.rated,
-        "variant"     -> g.variant.key,
-        "speed"       -> g.speed.key,
-        "perf"        -> PerfPicker.key(g),
-        "createdAt"   -> g.createdAt,
-        "lastMoveAt"  -> g.movedAt,
-        "turns"       -> g.turns,
+        "id"         -> g.id,
+        "initialFen" -> initialFen,
+        "rated"      -> g.rated,
+        "variant"    -> g.variant.key,
+        "speed"      -> g.speed.key,
+        "perf"       -> PerfPicker.key(g),
+        "createdAt"  -> g.createdAt,
+        "lastMoveAt" -> g.updatedAt,
+        //TODO: front end multiaction turns/plies changes
+        "turns"       -> g.turnCount,
+        "plies"       -> g.plies,
         "playerIndex" -> g.turnPlayerIndex.name,
         "status"      -> g.status.name,
         "clock" -> g.clock.map { clock =>
@@ -231,7 +233,7 @@ final private[api] class GameApi(
             )
             .add("name", p.name)
             .add("provisional" -> p.provisional)
-            .add("moveCentis" -> withFlags.moveTimes ?? g.moveTimes(p.playerIndex).map(_.map(_.centis)))
+            .add("plyCentis" -> withFlags.plyTimes ?? g.plyTimes(p.playerIndex).map(_.map(_.centis)))
             .add("blurs" -> withFlags.blurs.option(p.blurs.nb))
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
         }),
@@ -285,7 +287,7 @@ object GameApi {
       moves: Boolean = false,
       fens: Boolean = false,
       opening: Boolean = false,
-      moveTimes: Boolean = false,
+      plyTimes: Boolean = false,
       blurs: Boolean = false,
       token: Option[String] = none
   ) {

@@ -133,7 +133,7 @@ object communication {
                 )(
                   usernameOrAnon(pov.opponent.userId),
                   " – ",
-                  momentFromNowOnce(pov.game.movedAt)
+                  momentFromNowOnce(pov.game.updatedAt)
                 ),
                 div(cls := "chat")(
                   chat.lines.map { line =>

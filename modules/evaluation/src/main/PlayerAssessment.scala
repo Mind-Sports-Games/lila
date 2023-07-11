@@ -25,7 +25,7 @@ object PlayerAssessment {
 
   // when you don't have computer analysis
   case class Basics(
-      moveTimes: Statistics.IntAvgSd,
+      plyTimes: Statistics.IntAvgSd,
       hold: Boolean,
       blurs: Int,
       blurStreak: Option[Int],
@@ -47,7 +47,7 @@ object PlayerAssessment {
     import pov.{ playerIndex, game }
 
     Basics(
-      moveTimes = intAvgSd(~game.moveTimes(playerIndex) map (_.roundTenths)),
+      plyTimes = intAvgSd(~game.plyTimes(playerIndex) map (_.roundTenths)),
       blurs = game playerBlurPercent playerIndex,
       hold = holdAlerts.exists(_.suspicious),
       blurStreak = highestChunkBlursOf(pov).some.filter(0 <),
@@ -75,9 +75,9 @@ object PlayerAssessment {
 
     val moderateChunkBlurRate: Boolean = blursMatter && highestChunkBlurs >= 8
 
-    lazy val highlyConsistentMoveTimes: Boolean =
+    lazy val highlyConsistentPlyTimes: Boolean =
       game.clock.exists(_.estimateTotalSeconds > 60) && {
-        moveTimeCoefVariation(pov) ?? cvIndicatesHighlyFlatTimes
+        plyTimeCoefVariation(pov) ?? cvIndicatesHighlyFlatTimes
       }
 
     lazy val suspiciousErrorRate: Boolean =
@@ -101,9 +101,9 @@ object PlayerAssessment {
       alwaysHasAdvantage,
       highBlurRate || highChunkBlurRate,
       moderateBlurRate || moderateChunkBlurRate,
-      highlyConsistentMoveTimes || highlyConsistentMoveTimeStreaksOf(pov),
-      moderatelyConsistentMoveTimes(pov),
-      noFastMoves(pov),
+      highlyConsistentPlyTimes || highlyConsistentMoveTimeStreaksOf(pov),
+      moderatelyConsistentPlyTimes(pov),
+      noFastPlies(pov),
       basics.hold
     )
 

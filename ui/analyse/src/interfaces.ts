@@ -101,7 +101,7 @@ export interface Game {
   winner?: PlayerIndex;
   winnerPlayer: PlayerName;
   loserPlayer: PlayerName;
-  moveCentis?: number[];
+  plyCentis?: number[];
   initialFen?: string;
   importedBy?: string;
   division?: Division;

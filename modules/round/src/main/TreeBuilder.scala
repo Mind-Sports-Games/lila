@@ -56,7 +56,7 @@ object TreeBuilder {
           a.ply -> a
         }.toMap)
         val root = Root(
-          ply = init.turns,
+          ply = init.plies,
           playerIndex = init.situation.player,
           fen = fen,
           check = init.situation.check,
@@ -77,11 +77,11 @@ object TreeBuilder {
         def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
           val fen    = Forsyth.>>(g.situation.board.variant.gameLogic, g)
           val info   = infos lift (index - 1)
-          val advice = advices get g.turns
+          val advice = advices get g.plies
           val player = !g.situation.player
           val branch = Branch(
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
-            ply = g.turns,
+            ply = g.plies,
             playerIndex = g.situation.player,
             move = m,
             fen = fen,
@@ -93,7 +93,7 @@ object TreeBuilder {
             },
             check = g.situation.check,
             opening = openingOf(fen),
-            clock = withClocks flatMap (_ lift (g.turns - init.turns - 1)),
+            clock = withClocks flatMap (_ lift (g.plies - init.plies - 1)),
             pocketData = g.situation.board.pocketData,
             eval = info map makeEval,
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
@@ -103,7 +103,8 @@ object TreeBuilder {
               case _ => None
             },
             comments = Node.Comments {
-              drawOfferPlies(g.turns)
+              //TODO multiaction check we want to do drawOffers on plies
+              drawOfferPlies(g.plies)
                 .option(
                   makePlayStrategyComment(
                     s"${g.situation.board.variant.playerNames(player)} offers draw"
@@ -116,7 +117,7 @@ object TreeBuilder {
                   .map(makePlayStrategyComment)
             }
           )
-          advices.get(g.turns + 1).flatMap { adv =>
+          advices.get(g.plies + 1).flatMap { adv =>
             games.lift(index - 1).map { case (fromGame, _) =>
               withAnalysisChild(
                 game.id,
@@ -156,7 +157,7 @@ object TreeBuilder {
       val fen = Forsyth.>>(variant.gameLogic, g)
       Branch(
         id = UciCharPair(variant.gameLogic, m.uci),
-        ply = g.turns,
+        ply = g.plies,
         playerIndex = g.situation.player,
         move = m,
         fen = fen,

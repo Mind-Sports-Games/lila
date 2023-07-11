@@ -72,7 +72,7 @@ final class HistoryApi(coll: Coll, userRepo: UserRepo, cacheApi: lila.memo.Cache
     ).flatten.map { case (k, p) =>
       k -> p.intRating
     }
-    val days = daysBetween(user.createdAt, game.movedAt)
+    val days = daysBetween(user.createdAt, game.updatedAt)
     coll.update
       .one(
         $id(user.id),

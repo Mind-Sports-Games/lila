@@ -69,7 +69,7 @@ final class Analyse(
                   analysis,
                   initialFenO = initialFen.some,
                   withFlags = WithFlags(
-                    movetimes = true,
+                    plytimes = true,
                     clocks = true,
                     division = true,
                     opening = true
@@ -119,6 +119,7 @@ final class Analyse(
     get("fen").map(s => FEN.clean(pov.game.variant.gameLogic, s)).fold(or) { atFen =>
       val url = routes.Round.watcher(pov.gameId, pov.playerIndex.name)
       fuccess {
+        //TODO: This function (plyAtFen) wont work for non chess/draughts
         Replay
           .plyAtFen(pov.game.variant.gameLogic, pov.game.actions, initialFen, pov.game.variant, atFen)
           .fold(

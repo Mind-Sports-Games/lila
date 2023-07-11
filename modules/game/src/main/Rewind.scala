@@ -42,8 +42,7 @@ object Rewind {
       val switchPlayer = game.turnPlayerIndex != replay.state.player
       val playerIndex  = if (switchPlayer) game.turnPlayerIndex else !game.turnPlayerIndex
       val rewindedGame = replay.state
-      //This should be allowed to be plyCount but Draughts and turns is really plies still
-      val pliesRemoved = game.chess.turns - rewindedGame.turns
+      val pliesRemoved = game.chess.plies - rewindedGame.plies
       val newClock = game.clock.map(_.takeback(switchPlayer)) map { clk =>
         game.clockHistory
           .flatMap(_.lastX(playerIndex, pliesRemoved))
@@ -56,12 +55,12 @@ object Rewind {
         p1Player = rewindPlayer(game.p1Player),
         p2Player = rewindPlayer(game.p2Player),
         chess = rewindedGame.copy(clock = newClock),
-        binaryMoveTimes = game.binaryMoveTimes.map { binary =>
-          val moveTimes = BinaryFormat.moveTime.read(binary, game.chess.turns)
-          BinaryFormat.moveTime.write(moveTimes.take(rewindedGame.turns))
+        binaryPlyTimes = game.binaryPlyTimes.map { binary =>
+          val plyTimes = BinaryFormat.plyTime.read(binary, game.plies)
+          BinaryFormat.plyTime.write(plyTimes.take(rewindedGame.plies))
         },
         loadClockHistory = _ => game.clockHistory.map(_.update(!playerIndex, _.dropRight(pliesRemoved))),
-        movedAt = DateTime.now
+        updatedAt = DateTime.now
       )
       Progress(game, newGame)
     }

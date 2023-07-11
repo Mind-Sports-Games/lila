@@ -185,7 +185,12 @@ final class JsonView(
     private def makeBranch(puzzle: Puzzle): Option[tree.Branch] = {
       import strategygames.format._
       val init =
-        Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
+        //TODO: Do we need to set turns through withTurns can the fen not decode this?
+        Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurns(
+          //plies and turns are the same whilst puzzle deals with just standard chess
+          puzzle.initialPly + 1,
+          puzzle.initialPly + 1
+        )
       val (_, branchList) = puzzle.line.tail.foldLeft[(Game, List[tree.Branch])]((init, Nil)) {
         case ((prev, branches), uci) =>
           val (game, move) =
@@ -193,7 +198,7 @@ final class JsonView(
               .fold(err => sys error s"puzzle ${puzzle.id} $err", identity)
           val branch = tree.Branch(
             id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
-            ply = game.turns,
+            ply = game.plies,
             playerIndex = game.situation.player,
             //we can flatten actions as we are dealing with just Chess
             move = Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.actions.flatten.last),

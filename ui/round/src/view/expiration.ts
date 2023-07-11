@@ -11,7 +11,7 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   let timeLeft = 8000;
   if ((!d && !moveIndicator) || !playable(ctrl.data)) return;
   if (d) {
-    timeLeft = Math.max(0, d.movedAt - Date.now() + d.millisToMove);
+    timeLeft = Math.max(0, d.updatedAt - Date.now() + d.millisToMove);
   }
   const secondsLeft = Math.floor(timeLeft / 1000),
     myTurn = isPlayerTurn(ctrl.data);

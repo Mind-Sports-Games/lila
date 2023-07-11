@@ -36,7 +36,7 @@ object PgnImport {
         parseComments(parsedPgn.initialPosition.comments, annotator) match {
           case (shapes, _, comments) =>
             val root = Node.Root(
-              ply = replay.setup.turns,
+              ply = replay.setup.plies,
               playerIndex = replay.setup.situation.player,
               fen = initialFen.getOrElse(game.variant.initialFen),
               check = replay.setup.situation.check,
@@ -139,7 +139,7 @@ object PgnImport {
                 case (shapes, clock, comments) =>
                   Node(
                     id = UciCharPair(GameLogic.Chess(), uci),
-                    ply = game.turns,
+                    ply = game.plies,
                     playerIndex = game.situation.player,
                     move = Uci.WithSan(GameLogic.Chess(), uci, sanStr),
                     fen = Forsyth.>>(GameLogic.Chess(), game),

@@ -73,7 +73,7 @@ case class PlayerAggregateAssessment(
   def weightedAssessmentValue(assessment: GameAssessment): Double =
     playerAssessments map { pa =>
       if (pa.assessment != assessment) 0.0
-      else pa.tcFactor.getOrElse(1.0) * (if (pa.flags.highlyConsistentMoveTimes) 1.6 else 1.0)
+      else pa.tcFactor.getOrElse(1.0) * (if (pa.flags.highlyConsistentPlyTimes) 1.6 else 1.0)
     } sum
 
   val weightedCheatingSum       = weightedAssessmentValue(Cheating)
@@ -98,8 +98,8 @@ case class PlayerAggregateAssessment(
   val sfAvgNoBlurs = sfAvgGiven(_.basics.blurs <= 70)
 
   // Average SF Avg and CI given move time coef of variance
-  val sfAvgLowVar  = sfAvgGiven(a => a.basics.moveTimes.sd.toDouble / a.basics.moveTimes.avg < 0.5)
-  val sfAvgHighVar = sfAvgGiven(a => a.basics.moveTimes.sd.toDouble / a.basics.moveTimes.avg >= 0.5)
+  val sfAvgLowVar  = sfAvgGiven(a => a.basics.plyTimes.sd.toDouble / a.basics.plyTimes.avg < 0.5)
+  val sfAvgHighVar = sfAvgGiven(a => a.basics.plyTimes.sd.toDouble / a.basics.plyTimes.avg >= 0.5)
 
   // Average SF Avg and CI given bot
   val sfAvgHold   = sfAvgGiven(_.basics.hold)

@@ -140,9 +140,9 @@ trait Positional { self: Config =>
         val game = StratGame(
           s.gameLogic,
           situation = s,
-          turns = sit.turns,
-          //TODO this only works for multiaction if turns is turns (not plies)
-          startedAtTurn = sit.turns,
+          plies = sit.plies,
+          turnCount = sit.turnCount,
+          startedAtTurn = sit.currentTurnCount,
           startPlayer = s.player,
           clock = makeClock.map(_.toClock)
         )
@@ -160,7 +160,8 @@ trait Positional { self: Config =>
               variant = Variant.libFromPosition(s.board.variant.gameLogic)
             )
           ),
-          turns = sit.turns
+          plies = sit.plies,
+          turnCount = sit.turnCount
         )
       )
     }

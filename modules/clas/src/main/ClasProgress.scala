@@ -135,7 +135,7 @@ final class ClasProgressApi(
             $doc(
               F.playerUids -> true,
               F.winnerId   -> true,
-              "ms"         -> $doc("$subtract" -> $arr(s"$$${F.movedAt}", s"$$${F.createdAt}")),
+              "ms"         -> $doc("$subtract" -> $arr(s"$$${F.updatedAt}", s"$$${F.createdAt}")),
               F.id         -> false
             )
           ),

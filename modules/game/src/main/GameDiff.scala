@@ -255,9 +255,10 @@ object GameDiff {
       }
     }
 
-    d(turns, _.turns, w.int)
+    d(turns, _.turnCount, w.int)
+    dOpt(plies, { g => (if (g.plies == g.turnCount) 0 else g.plies) }, w.intO)
     d(activePlayer, _.situation.player.hashCode, w.int)
-    dOpt(moveTimes, _.binaryMoveTimes, (o: Option[ByteArray]) => o flatMap ByteArrayBSONHandler.writeOpt)
+    dOpt(plyTimes, _.binaryPlyTimes, (o: Option[ByteArray]) => o flatMap ByteArrayBSONHandler.writeOpt)
     dOpt(p1ClockHistory, getClockHistory(P1), clockHistoryToBytes)
     dOpt(p2ClockHistory, getClockHistory(P2), clockHistoryToBytes)
     dOpt(periodsP1, getPeriodEntries(P1), periodEntriesToBytes)
@@ -279,7 +280,7 @@ object GameDiff {
       dOpt(s"$name$proposeTakebackAt", player(_).proposeTakebackAt, w.intO)
       dTry(s"$name$blursBits", player(_).blurs, Blurs.BlursBSONHandler.writeTry)
     }
-    dTry(movedAt, _.movedAt, BSONJodaDateTimeHandler.writeTry)
+    dTry(updatedAt, _.updatedAt, BSONJodaDateTimeHandler.writeTry)
 
     (setBuilder.toList, unsetBuilder.toList)
   }

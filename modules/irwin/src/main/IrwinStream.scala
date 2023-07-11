@@ -50,7 +50,7 @@ final class IrwinStream {
           "p2" -> game.p2Player.userId,
           //flatten until Irwin supports non chess
           "pgn"  -> game.actions.flatten.mkString(" "),
-          "emts" -> game.clockHistory.isDefined ?? game.moveTimes.map(_.map(_.centis)),
+          "emts" -> game.clockHistory.isDefined ?? game.plyTimes.map(_.map(_.centis)),
           "analysis" -> analysis.map {
             _.infos.map { info =>
               info.cp.map { cp =>

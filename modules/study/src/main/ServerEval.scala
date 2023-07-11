@@ -168,7 +168,7 @@ object ServerEval {
     private def makeBranch(g: Game, m: Uci.WithSan) =
       Node(
         id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
-        ply = g.turns,
+        ply = g.plies,
         playerIndex = g.situation.player,
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),

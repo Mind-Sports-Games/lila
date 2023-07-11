@@ -39,7 +39,8 @@ final class JsonView(rematches: Rematches) {
         "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
         "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
         "player"        -> game.turnPlayerIndex,
-        "turns"         -> game.turns,
+        "plies"         -> game.plies, //TODO: front end multiaction turns/plies changes
+        "turns"         -> game.turnCount,
         "startedAtTurn" -> game.chess.startedAtTurn,
         "source"        -> game.source,
         "status"        -> game.status,
@@ -229,7 +230,7 @@ object JsonView {
         )
       case bc: ByoyomiClock => {
         val p1Clock = bc.currentClockFor(P1)
-        val p2Clock  = bc.currentClockFor(P2)
+        val p2Clock = bc.currentClockFor(P2)
         Json.obj(
           "running"   -> bc.isRunning,
           "initial"   -> bc.limitSeconds,

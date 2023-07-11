@@ -31,7 +31,7 @@ case class AnaDrop(
             val fen     = Forsyth.>>(variant.gameLogic, Game.Chess(game))
             Branch(
               id = UciCharPair(uci),
-              ply = game.turns,
+              ply = game.plies,
               playerIndex = game.situation.player,
               move = strategygames.format.Uci.ChessWithSan(Uci.WithSan(uci, san)),
               fen = fen,

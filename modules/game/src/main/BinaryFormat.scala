@@ -88,7 +88,7 @@ object BinaryFormat {
       )
   }
 
-  object moveTime {
+  object plyTime {
 
     private type MT = Int // centiseconds
     private val size = 16
@@ -107,18 +107,18 @@ object BinaryFormat {
         .map {
           case Vector(a, b) => (enc(a) << 4) + enc(b)
           case Vector(a)    => enc(a) << 4
-          case v            => sys error s"moveTime.write unexpected $v"
+          case v            => sys error s"plyTime.write unexpected $v"
         }
         .map(_.toByte)
         .toArray
     }
 
-    def read(ba: ByteArray, turns: Int): Vector[Centis] = {
+    def read(ba: ByteArray, plies: Int): Vector[Centis] = {
       def dec(x: Int) = decodeMap.getOrElse(x, decodeMap(size - 1))
       ba.value map toInt flatMap { k =>
         Array(dec(k >> 4), dec(k & 15))
       }
-    }.view.take(turns).map(Centis.apply).toVector
+    }.view.take(plies).map(Centis.apply).toVector
   }
 
   case class fischerClock(start: Timestamp) {

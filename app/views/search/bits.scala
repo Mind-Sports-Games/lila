@@ -30,7 +30,11 @@ private object bits {
       def playerIndexs(hide: Boolean) =
         strategygames.Player.all.map { playerIndex =>
           tr(cls := List(s"${playerIndex.name}User user-row" -> true, "none" -> hide))(
-            th(label(`for` := form3.id(form("players")(playerIndex.name)))(playerIndex.fold(trans.p1, trans.p2)())),
+            th(
+              label(`for` := form3.id(form("players")(playerIndex.name)))(
+                playerIndex.fold(trans.p1, trans.p2)()
+              )
+            ),
             td(cls := "single")(
               st.select(
                 id := form3.id(form("players")(playerIndex.name)),
@@ -132,8 +136,8 @@ private object bits {
         tr(
           th(label(nbTurns())),
           td(
-            div(cls := "half")(from(), " ", form3.select(form("turnsMin"), Query.turns, "".some)),
-            div(cls := "half")(to(), " ", form3.select(form("turnsMax"), Query.turns, "".some))
+            div(cls := "half")(from(), " ", form3.select(form("turnsMin"), Query.fullTurnsCompleted, "".some)),
+            div(cls := "half")(to(), " ", form3.select(form("turnsMax"), Query.fullTurnsCompleted, "".some))
           )
         )
 

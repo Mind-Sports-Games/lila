@@ -124,8 +124,9 @@ final private class SwissDirector(
           val turns = g.player.fold(0, 1)
           g.copy(
             clock = swiss.clock.toClock.some,
-            turns = turns,
-            //TODO this only works for multiaction if turns is turns (not plies)
+            //TODO multiaction review this. think this is ok
+            plies = turns,
+            turnCount = turns,
             startedAtTurn = turns,
             startPlayer = g.player
           )

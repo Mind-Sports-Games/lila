@@ -24,12 +24,12 @@ final private class Takebacker(
         case Pov(game, playerIndex) if pov.opponent.isProposingTakeback =>
           {
             val povTurn = playerIndex == pov.game.turnPlayerIndex
-            if (pov.opponent.proposeTakebackAt == pov.game.chess.turns && povTurn)
-              takebackSwitchPlayer(game) //go back until the playerindex switches
+            if (pov.opponent.proposeTakebackAt == pov.game.chess.plies && povTurn)
+              //go back until the playerindex switches
+              takebackSwitchPlayer(game)
             else
-              takebackRetainPlayer(
-                game
-              ) //go back one ply. if playerindex has not switched, continue going back
+              //go back one ply. if playerindex has not switched, continue going back
+              takebackRetainPlayer(game)
           } dmap (_ -> situation.reset)
         case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game) dmap (_ -> situation)
         case Pov(game, _) if pov.opponent.isAi     => takebackRetainPlayer(game) dmap (_ -> situation)
@@ -37,7 +37,7 @@ final private class Takebacker(
           {
             messenger.system(game, trans.takebackPropositionSent.txt())
             val progress = Progress(game) map { g =>
-              g.updatePlayer(playerIndex, _ proposeTakeback g.turns)
+              g.updatePlayer(playerIndex, _ proposeTakeback g.plies)
             }
             proxy.save(progress) >>- publishTakebackOffer(pov) inject
               List(Event.TakebackOffers(playerIndex.p1, playerIndex.p2))

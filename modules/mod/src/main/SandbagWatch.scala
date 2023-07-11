@@ -73,6 +73,7 @@ final private class SandbagWatch(
         else game.loserUserId.fold[Outcome](Good)(Boost.apply)
       }
 
+  //TODO extract this variable number of turns into strategygames
   private def isSandbag(game: Game): Boolean =
     game.playedTurns <= {
       if (game.variant == strategygames.chess.variant.Atomic) 3

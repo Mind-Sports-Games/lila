@@ -979,7 +979,7 @@ export default class AnalyseCtrl {
   getMovetime = (node: Tree.Node): number | undefined => {
     const offset = this.mainline[0].ply;
     if (defined(node.clock) && !this.study) {
-      if (defined(this.data.game.moveCentis)) return this.data.game.moveCentis[node.ply - 1 - offset];
+      if (defined(this.data.game.plyCentis)) return this.data.game.plyCentis[node.ply - 1 - offset];
       //if (this.imported) return node.clock;
     }
     return;

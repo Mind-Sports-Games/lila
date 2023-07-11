@@ -42,11 +42,11 @@ case class Game(
     loadClockHistory: Clock => Option[ClockHistory] = Game.someEmptyClockHistory,
     status: Status,
     daysPerTurn: Option[Int],
-    binaryMoveTimes: Option[ByteArray] = None,
+    binaryPlyTimes: Option[ByteArray] = None,
     mode: Mode = Mode.default,
     bookmarks: Int = 0,
     createdAt: DateTime = DateTime.now,
-    movedAt: DateTime = DateTime.now,
+    updatedAt: DateTime = DateTime.now,
     metadata: Metadata
 ) {
 
@@ -56,7 +56,8 @@ case class Game(
   def board        = chess.situation.board
   def history      = chess.situation.board.history
   def variant      = chess.situation.board.variant
-  def turns        = chess.turns
+  def turnCount    = chess.turnCount
+  def plies        = chess.plies
   def clock        = chess.clock
   def actions      = chess.actions
   def activePlayer = chess.situation.player
@@ -99,8 +100,11 @@ case class Game(
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
 
-  //TODO check this for multiaction
-  def playedTurns = turns - chess.startedAtTurn //chess.turnCount
+  def playedTurns = turnCount - chess.startedAtTurn
+  //this is a bit messy.
+  //the check on plies == turnCount ensures the logic for non multiaction games is unchanged
+  //once draughts is converted we should be able to use actions.flatten.size everywhere
+  def playedPlies = if (plies == turnCount) playedTurns else actions.flatten.size
 
   def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
@@ -129,7 +133,7 @@ case class Game(
   // because if moretime was given,
   // elapsed time is no longer representing the game duration
   def durationSeconds: Option[Int] =
-    movedAt.getSeconds - createdAt.getSeconds match {
+    updatedAt.getSeconds - createdAt.getSeconds match {
       case seconds if seconds > 60 * 60 * 12 => none // no way it lasted more than 12 hours, come on.
       case seconds                           => seconds.toInt.some
     }
@@ -140,7 +144,7 @@ case class Game(
       case _              => l
     }
 
-  def moveTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
+  def plyTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
       clk <- clock
       inc = clk.incrementOf(playerIndex)
@@ -154,16 +158,15 @@ case class Game(
       val pairs = clocks.iterator zip clocks.iterator.drop(1)
 
       // We need to determine if this playerIndex's last clock had inc applied.
-      // if finished and history.size == playedTurns then game was ended
-      // by a players move, such as with mate or autodraw. In this case,
-      // the last move of the game, and the only one without inc, is the
+      // if finished and history.size == playedPlies then game was ended
+      // by a players ply, such as with mate or autodraw. In this case,
+      // the last ply of the game, and the only one without inc, is the
       // last entry of the clock history for !turnPlayerIndex.
       //
-      // On the other hand, if history.size is more than playedTurns,
+      // On the other hand, if history.size is more than playedPlies,
       // then the game ended during a players turn by async event, and
       // the last recorded time is in the history for turnPlayerIndex.
-      // todo check this works for amazons?
-      val noLastInc = finished && (history.size <= playedTurns) == (playerIndex != turnPlayerIndex)
+      val noLastInc = finished && (history.size <= playedPlies) == (playerIndex != turnPlayerIndex)
 
       // Also if we timed out over a period or periods, we need to
       // multiply byoyomi by number of periods entered that turn and add
@@ -199,17 +202,17 @@ case class Game(
         } nonNeg
       } toList
     }
-  } orElse binaryMoveTimes.map { binary =>
-    // TODO: make movetime.read return List after writes are disabled.
-    val base = BinaryFormat.moveTime.read(binary, playedTurns)
+  } orElse binaryPlyTimes.map { binary =>
+    // Thibault TODO: make plyTime.read return List after writes are disabled.
+    val base = BinaryFormat.plyTime.read(binary, playedPlies)
     val mts  = if (playerIndex == startPlayerIndex) base else base.drop(1)
     everyOther(mts.toList)
   }
 
-  def moveTimes: Option[Vector[Centis]] =
+  def plyTimes: Option[Vector[Centis]] =
     for {
-      a <- moveTimes(startPlayerIndex)
-      b <- moveTimes(!startPlayerIndex)
+      a <- plyTimes(startPlayerIndex)
+      b <- plyTimes(!startPlayerIndex)
     } yield Sequence.interleave(a, b)
 
   def bothClockStates: Option[Vector[Centis]] =
@@ -246,7 +249,7 @@ case class Game(
     }
   }
 
-  // apply a move
+  // apply an action
   def update(
       game: StratGame, // new chess position
       moveOrDrop: MoveOrDrop,
@@ -265,27 +268,28 @@ case class Game(
     val newClockHistory = for {
       clk <- game.clock
       ch  <- clockHistory
-    } yield ch.record(turnPlayerIndex, clk, chess.fullMoveNumber)
+    } yield ch.record(turnPlayerIndex, clk, chess.fullTurnCount)
 
     val updated = copy(
       p1Player = copyPlayer(p1Player),
       p2Player = copyPlayer(p2Player),
       chess = game,
-      binaryMoveTimes = (!isPgnImport && chess.clock.isEmpty).option {
-        BinaryFormat.moveTime.write {
-          binaryMoveTimes.?? { t =>
-            BinaryFormat.moveTime.read(t, playedTurns)
-          } :+ Centis(nowCentis - movedAt.getCentis).nonNeg
+      binaryPlyTimes = (!isPgnImport && chess.clock.isEmpty).option {
+        BinaryFormat.plyTime.write {
+          binaryPlyTimes.?? { t =>
+            BinaryFormat.plyTime.read(t, playedPlies)
+          } :+ Centis(nowCentis - updatedAt.getCentis).nonNeg
         }
       },
       loadClockHistory = _ => newClockHistory,
       status = game.situation.status | status,
-      movedAt = DateTime.now
+      updatedAt = DateTime.now
     )
 
     val state = Event.State(
       playerIndex = game.situation.player,
-      turns = game.turns,
+      turnCount = game.turnCount,
+      plies = game.plies,
       status = (status != updated.status) option updated.status,
       winner = game.situation.winner,
       p1OffersDraw = p1Player.isOfferingDraw,
@@ -361,7 +365,7 @@ case class Game(
   def correspondenceClock: Option[CorrespondenceClock] =
     daysPerTurn map { days =>
       val increment   = days * 24 * 60 * 60
-      val secondsLeft = (movedAt.getSeconds + increment - nowSeconds).toInt max 0
+      val secondsLeft = (updatedAt.getSeconds + increment - nowSeconds).toInt max 0
       CorrespondenceClock(
         increment = increment,
         p1Time = turnPlayerIndex.fold(secondsLeft, increment).toFloat,
@@ -421,18 +425,19 @@ case class Game(
 
   def drawOffers = metadata.drawOffers
 
+  //TODO multiaction: review if we want to consider draw offers in plies or turns (currently migrating to turnCount)
   def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&
-      turns >= 2 &&
+      turnCount >= 2 &&
       !player(playerIndex).isOfferingDraw &&
       !opponent(playerIndex).isAi &&
       !playerHasOfferedDrawRecently(playerIndex)
 
   def playerHasOfferedDrawRecently(playerIndex: PlayerIndex) =
-    drawOffers.lastBy(playerIndex) ?? (_ >= turns - 20)
+    drawOffers.lastBy(playerIndex) ?? (_ >= turnCount - 20)
 
   def offerDraw(playerIndex: PlayerIndex) = copy(
-    metadata = metadata.copy(drawOffers = drawOffers.add(playerIndex, turns))
+    metadata = metadata.copy(drawOffers = drawOffers.add(playerIndex, turnCount))
   ).updatePlayer(playerIndex, _.offerDraw)
 
   def playerCouldRematch =
@@ -472,7 +477,7 @@ case class Game(
           loadClockHistory = _ =>
             clockHistory.map(history => {
               if (history(playerIndex).isEmpty) history
-              else history.reset(playerIndex).record(playerIndex, newClock, chess.fullMoveNumber)
+              else history.reset(playerIndex).record(playerIndex, newClock, chess.fullTurnCount)
             })
         ).updatePlayer(playerIndex, _.goBerserk)
       ) ++
@@ -504,7 +509,7 @@ case class Game(
             // for the active playerIndex. This ensures the end time in
             // clockHistory always matches the final clock time on
             // the board.
-            if (!finished) history.record(turnPlayerIndex, clk, chess.fullMoveNumber)
+            if (!finished) history.record(turnPlayerIndex, clk, chess.fullTurnCount)
             else history
           }
       ),
@@ -598,7 +603,7 @@ case class Game(
 
   def withClock(c: Clock) = Progress(this, copy(chess = chess.copy(clock = Some(c))))
 
-  def correspondenceGiveTime = Progress(this, copy(movedAt = DateTime.now))
+  def correspondenceGiveTime = Progress(this, copy(updatedAt = DateTime.now))
 
   def estimateClockTotalTime = clock.map(_.estimateTotalSeconds)
 
@@ -636,7 +641,7 @@ case class Game(
 
   def timeBeforeExpiration: Option[Centis] =
     expirable option {
-      Centis.ofMillis(movedAt.getMillis - nowMillis + timeForFirstMove.millis).nonNeg
+      Centis.ofMillis(updatedAt.getMillis - nowMillis + timeForFirstMove.millis).nonNeg
     }
 
   def playerWhoDidNotMove: Option[Player] =
@@ -698,7 +703,7 @@ case class Game(
 
   def isBeingPlayed = !isPgnImport && !finishedOrAborted
 
-  def olderThan(seconds: Int) = movedAt isBefore DateTime.now.minusSeconds(seconds)
+  def olderThan(seconds: Int) = updatedAt isBefore DateTime.now.minusSeconds(seconds)
 
   def justCreated = createdAt isAfter DateTime.now.minusSeconds(1)
 
@@ -706,7 +711,7 @@ case class Game(
 
   def abandoned =
     (status <= Status.Started) && {
-      movedAt isBefore {
+      updatedAt isBefore {
         if (hasAi && !hasCorrespondenceClock) Game.aiAbandonedDate
         else Game.abandonedDate
       }
@@ -748,10 +753,9 @@ case class Game(
   def pgnImport   = metadata.pgnImport
   def isPgnImport = pgnImport.isDefined
 
-  //TODO: check this usage for multiaction
   def resetTurns =
     copy(
-      chess = chess.copy(turns = 0, startedAtTurn = 0, startPlayer = PlayerIndex.P1)
+      chess = chess.copy(turnCount = 0, plies = 0, startedAtTurn = 0, startPlayer = PlayerIndex.P1)
     )
 
   lazy val opening: Option[FullOpening.AtPly] =
@@ -907,7 +911,7 @@ object Game {
             multiMatch = multiMatch
           ),
         createdAt = createdAt,
-        movedAt = createdAt
+        updatedAt = createdAt
       )
     )
   }
@@ -936,6 +940,7 @@ object Game {
     val huffmanPgn        = "hp"
     val status            = "s"
     val turns             = "t"
+    val plies             = "p"
     val activePlayer      = "ap"
     val startedAtTurn     = "st"
     val startPlayer       = "sp"
@@ -949,7 +954,7 @@ object Game {
     val historyLastMove   = "hlm"
     val unmovedRooks      = "ur"
     val daysPerTurn       = "cd"
-    val moveTimes         = "mt"
+    val plyTimes          = "mt" // was called moveTimes hence mt
     val p1ClockHistory    = "cw"
     val p2ClockHistory    = "cb"
     val periodsP1         = "pp0"
@@ -961,7 +966,7 @@ object Game {
     val pocketData        = "chd"
     val bookmarks         = "bm"
     val createdAt         = "ca"
-    val movedAt           = "ua" // ua = updatedAt (bc)
+    val updatedAt         = "ua"
     val source            = "so"
     val pgnImport         = "pgni"
     val tournamentId      = "tid"
@@ -1028,7 +1033,7 @@ sealed trait ClockHistory {
   val p1: Vector[Centis]
   val p2: Vector[Centis]
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
-  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory
+  def record(playerIndex: PlayerIndex, clock: Clock, fullTurnCount: Int): ClockHistory
   def reset(playerIndex: PlayerIndex): ClockHistory
   def apply(playerIndex: PlayerIndex): Vector[Centis]
   //def last(playerIndex: PlayerIndex): Option[Centis]
@@ -1044,7 +1049,7 @@ case class FischerClockHistory(
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
 
-  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory =
+  def record(playerIndex: PlayerIndex, clock: Clock, fullTurnCount: Int): ClockHistory =
     update(playerIndex, _ :+ clock.remainingTime(playerIndex))
 
   def reset(playerIndex: PlayerIndex) = update(playerIndex, _ => Vector.empty)
@@ -1084,7 +1089,7 @@ case class ByoyomiClockHistory(
   def updatePeriods(playerIndex: PlayerIndex, f: Vector[Int] => Vector[Int]): ClockHistory =
     copy(periodEntries = periodEntries.update(playerIndex, f))
 
-  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory = {
+  def record(playerIndex: PlayerIndex, clock: Clock, fullTurnCount: Int): ClockHistory = {
     val curClock        = clock currentClockFor playerIndex
     val initiatePeriods = clock.config.startsAtZero && periodEntries(playerIndex).isEmpty
     val isUsingByoyomi  = curClock.periods > 0 && !initiatePeriods
@@ -1094,7 +1099,11 @@ case class ByoyomiClockHistory(
     updateInternal(playerIndex, _ :+ timeToStore)
       .updatePeriods(
         playerIndex,
-        _.padTo(initiatePeriods ?? 1, 0).padTo(curClock.periods atMost PeriodEntries.maxPeriods, turn)
+        _.padTo(initiatePeriods ?? 1, 0)
+        //TODO discuss whether using fullTurnCount is correct now
+        //most clock stuff deals in plies but we dont necessarily have a fixed number of plies each
+        //what are we padding out here?
+          .padTo(curClock.periods atMost PeriodEntries.maxPeriods, fullTurnCount)
       )
   }
 

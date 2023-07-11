@@ -2,7 +2,7 @@ function toBlurArray(player) {
   return player.blurs && player.blurs.bits ? player.blurs.bits.split('') : [];
 }
 playstrategy.movetimeChart = function (data, trans) {
-  if (!data.game.moveCentis) return; // imported games
+  if (!data.game.plyCentis) return; // imported games
   playstrategy.loadScript('javascripts/chart/common.js').then(function () {
     playstrategy.loadScript('javascripts/chart/division.js').then(function () {
       playstrategy.chartCommon('highchart').then(function () {
@@ -36,7 +36,7 @@ playstrategy.movetimeChart = function (data, trans) {
             var blurs = [toBlurArray(data.player), toBlurArray(data.opponent)];
             if (data.player.playerIndex === 'p1') blurs.reverse();
 
-            data.game.moveCentis.forEach(function (time, i) {
+            data.game.plyCentis.forEach(function (time, i) {
               var node = tree[i + 1];
               ply = node ? node.ply : ply + 1;
               var san = node ? node.san : '-';
@@ -94,7 +94,7 @@ playstrategy.movetimeChart = function (data, trans) {
               },
               tooltip: {
                 formatter: function () {
-                  var seconds = data.game.moveCentis[this.x] / 100;
+                  var seconds = data.game.plyCentis[this.x] / 100;
                   if (seconds) seconds = seconds.toFixed(seconds >= 2 ? 1 : 2);
                   return this.point.name + '<br />' + trans('nbSeconds', '<strong>' + seconds + '</strong>');
                 },

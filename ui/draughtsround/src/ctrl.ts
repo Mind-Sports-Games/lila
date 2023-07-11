@@ -397,7 +397,7 @@ export default class RoundController {
     }
     if (this.data.expiration) {
       if (this.data.steps.length > 2) this.data.expiration = undefined;
-      else this.data.expiration.movedAt = Date.now();
+      else this.data.expiration.updatedAt = Date.now();
     }
     this.redraw();
     if (playing && playedPlayerIndex == d.player.playerIndex) {

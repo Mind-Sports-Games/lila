@@ -84,7 +84,7 @@ final class PgnDump(
                 else game.actions
               }).toVector
           },
-          fenSituation.map(_.fullMoveNumber) | 1,
+          fenSituation.map(_.fullTurnCount) | 1,
           flags.clocks ?? ~game.bothClockStates,
           game.startPlayerIndex
         )
@@ -254,12 +254,13 @@ final class PgnDump(
       }
     }
 
-  //TODO: Consider multimove here
+  //TODO: Convert to multiaction here. Rename nomenclature
   private def makeTurns(
       actions: Actions,
       from: Int,
       clocks: Vector[Centis],
       startPlayerIndex: PlayerIndex
+      //TODO: Wrap Pgn in strategygames (move Pgn out of chess gamelogic and into the wrapper layer
   ): List[chessPgn.Turn] =
     (actions.flatten.toSeq grouped 2).zipWithIndex.toList map { case (actions, index) =>
       val clockOffset = startPlayerIndex.fold(0, 1)

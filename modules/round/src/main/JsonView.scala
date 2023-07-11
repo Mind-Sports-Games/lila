@@ -165,7 +165,7 @@ final class JsonView(
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
           .add("expiration" -> pov.game.expirable.option {
             Json.obj(
-              "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
+              "idleMillis"   -> (nowMillis - pov.game.updatedAt.getMillis),
               "millisToMove" -> pov.game.timeForFirstMove.millis
             )
           })
@@ -207,7 +207,7 @@ final class JsonView(
         Json
           .obj(
             "game" -> gameJsonView(game, initialFen)
-              .add("moveCentis" -> (withFlags.movetimes ?? game.moveTimes.map(_.map(_.centis))))
+              .add("plyCentis" -> (withFlags.plytimes ?? game.plyTimes.map(_.map(_.centis))))
               .add("division" -> withFlags.division.option(divider(game, initialFen)))
               .add("opening" -> game.opening)
               .add("importedBy" -> game.pgnImport.flatMap(_.user)),
@@ -285,7 +285,9 @@ final class JsonView(
             "opening"    -> game.opening,
             "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
             "fen"        -> fen,
-            "turns"      -> game.turns,
+            //TODO: front end multiaction turns/plies changes
+            "plies"      -> game.plies,
+            "turns"      -> game.turnCount,
             "player"     -> game.turnPlayerIndex.name,
             "status"     -> game.status,
             "gameFamily" -> game.variant.gameFamily.key
@@ -293,16 +295,12 @@ final class JsonView(
           .add("division", division)
           .add("winner", game.winner.map(w => game.variant.playerNames(w.playerIndex))),
         "player" -> Json.obj(
-          "id" -> owner.option(pov.playerId),
-          //"color" -> game.variant.playerNames(playerIndex),
-          //"color" -> playerIndex.classicName,
+          "id"          -> owner.option(pov.playerId),
           "playerName"  -> game.variant.playerNames(playerIndex),
           "playerIndex" -> playerIndex.name,
           "playerColor" -> game.variant.playerColors(playerIndex)
         ),
         "opponent" -> Json.obj(
-          //"color" -> game.variant.playerNames(opponent.playerIndex),
-          //"color" -> playerIndex.classicName,
           "playerName"  -> game.variant.playerNames(opponent.playerIndex),
           "playerIndex" -> opponent.playerIndex.name,
           "playerColor" -> game.variant.playerColors(opponent.playerIndex),
@@ -323,7 +321,8 @@ final class JsonView(
           .add("highlight" -> pref.highlight)
           .add("destination" -> (pref.destination && !pref.isBlindfold))
           .add("playerTurnIndicator" -> false),
-        "path"         -> pov.game.turns,
+        //TODO multiaction work out what is using this
+        "path"         -> pov.game.plies,
         "userAnalysis" -> true
       )
       .add("evalPut" -> me.??(evalCache.shouldPut))
@@ -435,7 +434,7 @@ object JsonView {
 
   case class WithFlags(
       opening: Boolean = false,
-      movetimes: Boolean = false,
+      plytimes: Boolean = false,
       division: Boolean = false,
       clocks: Boolean = false,
       blurs: Boolean = false

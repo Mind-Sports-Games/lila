@@ -78,7 +78,7 @@ case class AnaMove(
           (~fullCapture && ~captLen > 1) option AnaDests.truncateMoves(validMoves)
         Branch(
           id = UciCharPair(lib, uci),
-          ply = game.turns,
+          ply = game.plies,
           playerIndex = game.situation.player,
           move = Uci.WithSan(lib, uci, san),
           fen = fen,
@@ -102,7 +102,7 @@ case class AnaMove(
             case _                    => None
           },
           captureLength = movable ?? captLen,
-          opening = (game.turns <= 30 && Variant.openingSensibleVariants(lib)(variant)) ?? {
+          opening = (game.turnCount <= 30 && Variant.openingSensibleVariants(lib)(variant)) ?? {
             FullOpeningDB.findByFen(lib, fen)
           },
           drops = if (movable) game.situation.drops else Some(Nil),

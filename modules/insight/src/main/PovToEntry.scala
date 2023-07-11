@@ -34,7 +34,7 @@ final private class PovToEntry(
       division: Division,
       moveAccuracy: Option[List[Int]],
       boards: NonEmptyList[Board],
-      movetimes: NonEmptyList[Centis],
+      plytimes: NonEmptyList[Centis],
       advices: Map[Ply, Advice]
   )
 
@@ -67,7 +67,7 @@ final private class PovToEntry(
                   )
                   .toOption
                   .flatMap(_.toNel)
-              movetimes <- game.moveTimes(pov.playerIndex).flatMap(_.toNel)
+              plytimes <- game.plyTimes(pov.playerIndex).flatMap(_.toNel)
             } yield RichPov(
               pov = pov,
               provisional = provisional,
@@ -76,7 +76,7 @@ final private class PovToEntry(
               division = Divider(pov.game.variant.gameLogic, boards.toList),
               moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
               boards = boards,
-              movetimes = movetimes,
+              plytimes = plytimes,
               advices = an.?? {
                 _.advices.view.map { a =>
                   a.info.ply -> a
@@ -96,7 +96,7 @@ final private class PovToEntry(
         from.pov.playerIndex.fold(is, is.map(_.invert))
       }
     }
-    val movetimes = from.movetimes.toList
+    val plytimes = from.plytimes.toList
     //flatten until we support something other than chess
     val roles = from.pov.game
       .actions(from.pov.playerIndex)
@@ -110,10 +110,10 @@ final private class PovToEntry(
     }
     val blurs = {
       val bools = from.pov.player.blurs.booleans
-      bools ++ Array.fill(movetimes.size - bools.length)(false)
+      bools ++ Array.fill(plytimes.size - bools.length)(false)
     }
-    val timeCvs = slidingMoveTimesCvs(movetimes)
-    movetimes.zip(roles).zip(boards).zip(blurs).zip(timeCvs).zipWithIndex.map {
+    val timeCvs = slidingPlyTimesCvs(plytimes)
+    plytimes.zip(roles).zip(boards).zip(blurs).zip(timeCvs).zipWithIndex.map {
       case (((((movetime, role), board), blur), timeCv), i) =>
         val ply      = i * 2 + from.pov.playerIndex.fold(1, 2)
         val prevInfo = prevInfos lift i
@@ -149,13 +149,13 @@ final private class PovToEntry(
     }
   }
 
-  private def slidingMoveTimesCvs(movetimes: Seq[Centis]): Seq[Option[Float]] = {
+  private def slidingPlyTimesCvs(plytimes: Seq[Centis]): Seq[Option[Float]] = {
     val sliding = 13 // should be odd
-    val nb      = movetimes.size
+    val nb      = plytimes.size
     if (nb < sliding) Vector.fill(nb)(none[Float])
     else {
       val sides = Vector.fill(sliding / 2)(none[Float])
-      val cvs = movetimes
+      val cvs = plytimes
         .sliding(sliding)
         .map { a =>
           // drop outliers
@@ -198,7 +198,7 @@ final private class PovToEntry(
       playerIndex = pov.playerIndex,
       perf = perfType,
       eco =
-        if (game.playable || game.turns < 4 || game.fromPosition || game.variant.exotic) none
+        if (game.playable || game.turnCount < 4 || game.fromPosition || game.variant.exotic) none
         else strategygames.chess.opening.Ecopening fromGame game.actions,
       //flatten until insights support something other than chess
       myCastling = Castling.fromMoves(game.actions(pov.playerIndex).flatten),

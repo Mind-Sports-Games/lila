@@ -253,7 +253,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .cursor[Game]()
       .list(2)
       .dmap {
-        _.sortBy(_.movedAt).lastOption flatMap { Pov(_, user) }
+        _.sortBy(_.updatedAt).lastOption flatMap { Pov(_, user) }
       }
 
   def quickLastPlayedId(userId: User.ID): Fu[Option[Game.ID]] =

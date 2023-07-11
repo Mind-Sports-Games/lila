@@ -19,5 +19,5 @@ export const massage = (d: RoundData): void => {
   if (['horde', 'crazyhouse', 'shogi', 'minishogi', 'amazons'].includes(d.game.variant.key))
     d.pref.showCaptured = false;
 
-  if (d.expiration) d.expiration.movedAt = Date.now() - d.expiration.idleMillis;
+  if (d.expiration) d.expiration.updatedAt = Date.now() - d.expiration.idleMillis;
 };
