@@ -409,7 +409,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         g.copy(mode = Mode.Casual)
       else g
     val userIds = g2.userIds.distinct
-    // TODO: why does the initialFen get generated here?
+
     val fen: Option[FEN] = initialFen orElse {
       (!g2.variant.standardInitialPosition)
         .option(Forsyth.>>(g2.variant.gameLogic, g2.chess))
