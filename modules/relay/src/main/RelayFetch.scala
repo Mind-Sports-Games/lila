@@ -1,7 +1,7 @@
 package lila.relay
 
 import akka.actor._
-import strategygames.format.pgn.{ Tag, Tags }
+import strategygames.format.pgn.{ Move => PgnMove, Tag, Tags }
 import com.github.blemale.scaffeine.LoadingCache
 import io.lemonlabs.uri.Url
 import org.joda.time.DateTime
@@ -283,7 +283,7 @@ private object RelayFetch {
     case class GameJson(moves: List[String], result: Option[String]) {
       def toPgn(extraTags: Tags = Tags.empty) = {
         val strMoves = moves.map(_ split ' ') map { move =>
-          strategygames.chess.format.pgn.Move(
+          PgnMove(
             san = ~move.headOption,
             secondsLeft = move.lift(1).map(_.takeWhile(_.isDigit)) flatMap (_.toIntOption)
           )

@@ -1,7 +1,6 @@
 package lila.analyse
 
-import strategygames.chess.format.pgn.{ Move, Pgn, Turn }
-import strategygames.format.pgn.{ Glyphs, Tag }
+import strategygames.format.pgn.{ Glyphs, Move => PgnMove, Pgn, Tag, Turn }
 import strategygames.opening.FullOpening
 import strategygames.{ Player => PlayerIndex, Status }
 import strategygames.variant.Variant
@@ -68,7 +67,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
   private def makeVariation(turn: Turn, advice: Advice): List[Turn] =
     Turn.fromMoves(
       advice.info.variation.take(20).flatten.toList map { san =>
-        Move(san)
+        PgnMove(san)
       },
       turn plyOf advice.playerIndex
     )

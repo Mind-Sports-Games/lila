@@ -1,9 +1,7 @@
 package lila.study
 
 import akka.stream.scaladsl._
-import strategygames.chess.format.pgn.{ Initial, Pgn }
-import strategygames.format.pgn.{ Glyphs, Tag, Tags }
-import strategygames.chess.format.{ pgn => chessPgn }
+import strategygames.format.pgn.{ Glyphs, Initial, Move => PgnMove, Pgn, Tag, Tags, Turn }
 import org.joda.time.format.DateTimeFormat
 
 import lila.common.String.slugify
@@ -97,7 +95,7 @@ object PgnDump {
   private val noVariations: Variations = Vector.empty
 
   private def node2move(node: Node, variations: Variations)(implicit flags: WithFlags) =
-    chessPgn.Move(
+    PgnMove(
       san = node.move.san,
       glyphs = if (flags.comments) node.glyphs else Glyphs.empty,
       comments = flags.comments ?? {
@@ -134,23 +132,23 @@ object PgnDump {
   }
 
   def toTurn(first: Node, second: Option[Node], variations: Variations)(implicit flags: WithFlags) =
-    chessPgn.Turn(
+    Turn(
       number = first.fullMoveNumber,
       p1 = node2move(first, variations).some,
       p2 = second map { node2move(_, first.children.variations) }
     )
 
-  def toTurns(root: Node.Root)(implicit flags: WithFlags): Vector[chessPgn.Turn] =
+  def toTurns(root: Node.Root)(implicit flags: WithFlags): Vector[Turn] =
     toTurns(root.mainline, root.children.variations)
 
   def toTurns(
       line: Vector[Node],
       variations: Variations
-  )(implicit flags: WithFlags): Vector[chessPgn.Turn] = {
+  )(implicit flags: WithFlags): Vector[Turn] = {
     line match {
       case Vector() => Vector()
       case first +: rest if first.ply % 2 == 0 =>
-        chessPgn.Turn(
+        Turn(
           number = 1 + (first.ply - 1) / 2,
           p1 = none,
           p2 = node2move(first, variations).some
@@ -161,10 +159,10 @@ object PgnDump {
 
   def toTurnsFromP1(line: Vector[Node], variations: Variations)(implicit
       flags: WithFlags
-  ): Vector[chessPgn.Turn] =
+  ): Vector[Turn] =
     line
       .grouped(2)
-      .foldLeft(variations -> Vector.empty[chessPgn.Turn]) { case ((variations, turns), pair) =>
+      .foldLeft(variations -> Vector.empty[Turn]) { case ((variations, turns), pair) =>
         pair.headOption.fold(variations -> turns) { first =>
           pair
             .lift(1)

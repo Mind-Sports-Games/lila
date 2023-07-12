@@ -1,9 +1,8 @@
 package lila.game
 
-import strategygames.chess.format.pgn.{ Parser, Pgn }
-import strategygames.format.pgn.{ ParsedPgn, Tag, TagType, Tags }
+import strategygames.chess.format.pgn.{ Parser }
+import strategygames.format.pgn.{ Move => PgnMove, ParsedPgn, Pgn, Tag, TagType, Tags, Turn }
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.chess.format.{ pgn => chessPgn }
 import strategygames.{ Actions, Centis, Player => PlayerIndex, GameLogic, Status }
 import strategygames.variant.Variant
 
@@ -261,19 +260,19 @@ final class PgnDump(
       clocks: Vector[Centis],
       startPlayerIndex: PlayerIndex
       //TODO: Wrap Pgn in strategygames (move Pgn out of chess gamelogic and into the wrapper layer
-  ): List[chessPgn.Turn] =
+  ): List[Turn] =
     (actions.flatten.toSeq grouped 2).zipWithIndex.toList map { case (actions, index) =>
       val clockOffset = startPlayerIndex.fold(0, 1)
-      chessPgn.Turn(
+      Turn(
         number = index + from,
         p1 = actions.headOption filter (".." !=) map { san =>
-          chessPgn.Move(
+          PgnMove(
             san = san,
             secondsLeft = clocks lift (index * 2 - clockOffset) map (_.roundSeconds)
           )
         },
         p2 = actions lift 1 map { san =>
-          chessPgn.Move(
+          PgnMove(
             san = san,
             secondsLeft = clocks lift (index * 2 + 1 - clockOffset) map (_.roundSeconds)
           )
