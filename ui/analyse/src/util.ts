@@ -247,7 +247,7 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
 }
 
 export function getGoScore(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4];
+  return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
 }
 
 const noCevalVariants = [
