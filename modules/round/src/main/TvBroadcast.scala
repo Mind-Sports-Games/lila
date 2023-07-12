@@ -67,7 +67,7 @@ final private class TvBroadcast(
               .add("rating" -> p.rating)
           }
         ),
-        fen = Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.chess.board)
+        fen = Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board)
       )
       clients.foreach { client =>
         client.queue offer {
@@ -86,7 +86,9 @@ final private class TvBroadcast(
             "lm"  -> move
           )
           .add("p1" -> game.clock.map(_.remainingTime(strategygames.P1).roundSeconds))
-          .add("p2" -> game.clock.map(_.remainingTime(strategygames.P2).roundSeconds)) // TODO: byoyomi periods here?!
+          .add(
+            "p2" -> game.clock.map(_.remainingTime(strategygames.P2).roundSeconds)
+          ) // TODO: byoyomi periods here?!
       )
       clients.foreach(_.queue offer msg)
       featured foreach { f =>

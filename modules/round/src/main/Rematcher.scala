@@ -8,7 +8,7 @@ import strategygames.{
   Clock,
   FischerClock,
   Player => PlayerIndex,
-  Game => ChessGame,
+  Game => StratGame,
   Board,
   Situation,
   History,
@@ -154,7 +154,7 @@ final private class Rematcher(
         )
       )
       game <- Game.make(
-        chess = ChessGame(
+        stratGame = StratGame(
           game.variant.gameLogic,
           situation = Situation(
             game.variant.gameLogic,

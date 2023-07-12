@@ -274,7 +274,7 @@ final class JsonView(
       division: Option[strategygames.Division] = none
   ) = {
     import pov._
-    val fen = Forsyth.>>(game.variant.gameLogic, game.chess)
+    val fen = Forsyth.>>(game.variant.gameLogic, game.stratGame)
     Json
       .obj(
         "game" -> Json

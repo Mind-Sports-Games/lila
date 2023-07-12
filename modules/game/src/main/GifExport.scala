@@ -46,7 +46,7 @@ final class GifExport(
 
   def gameThumbnail(game: Game): Fu[Source[ByteString, _]] = {
     val query = List(
-      "fen"         -> (Forsyth.>>(game.variant.gameLogic, game.chess)).value,
+      "fen"         -> (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value,
       "p1"          -> Namer.playerTextBlocking(game.p1Player, withRating = true)(lightUserApi.sync),
       "p2"          -> Namer.playerTextBlocking(game.p2Player, withRating = true)(lightUserApi.sync),
       "orientation" -> game.naturalOrientation.name

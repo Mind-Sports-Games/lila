@@ -45,7 +45,7 @@ private object ChallengeJoiner {
     val baseState = c.initialFen.ifTrue(c.variant.fromPosition || c.variant.chess960) flatMap {
       Forsyth.<<<@(c.variant.gameLogic, c.variant, _)
     }
-    val (chessGame, state) = baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
+    val (stratGame, state) = baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
       case sp @ SituationPlus(sit, _) =>
         val game = strategygames.Game(
           lib = c.variant.gameLogic,
@@ -64,10 +64,10 @@ private object ChallengeJoiner {
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game
       .make(
-        chess = chessGame,
+        stratGame = stratGame,
         p1Player = Player.make(P1, c.finalPlayerIndex.fold(origUser, destUser), perfPicker),
         p2Player = Player.make(P2, c.finalPlayerIndex.fold(destUser, origUser), perfPicker),
-        mode = if (chessGame.board.variant.fromPosition) Mode.Casual else c.mode,
+        mode = if (stratGame.board.variant.fromPosition) Mode.Casual else c.mode,
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,
         pgnImport = None,
@@ -77,7 +77,7 @@ private object ChallengeJoiner {
       .pipe { g =>
         state.fold(g) { case sp @ SituationPlus(sit, _) =>
           g.copy(
-            chess = g.chess.copy(
+            stratGame = g.stratGame.copy(
               situation = g.situation.copy(
                 board = g.board.copy(history = sit.board.history)
               ),

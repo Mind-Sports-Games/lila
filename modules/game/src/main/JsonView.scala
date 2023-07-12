@@ -37,11 +37,11 @@ final class JsonView(rematches: Rematches) {
         "perf"          -> PerfPicker.key(game),
         "rated"         -> game.rated,
         "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
-        "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
+        "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.stratGame)),
         "player"        -> game.turnPlayerIndex,
         "plies"         -> game.plies, //TODO: front end multiaction turns/plies changes
         "turns"         -> game.turnCount,
-        "startedAtTurn" -> game.chess.startedAtTurn,
+        "startedAtTurn" -> game.stratGame.startedAtTurn,
         "source"        -> game.source,
         "status"        -> game.status,
         "createdAt"     -> game.createdAt

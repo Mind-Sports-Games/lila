@@ -25,7 +25,7 @@ final class AutoPairing(
     val clock   = tour.clock.toClock
     val game = Game
       .make(
-        chess = StratGame(
+        stratGame = StratGame(
           tour.currentVariant.gameLogic,
           Some {
             if (tour.position.isEmpty) tour.currentVariant

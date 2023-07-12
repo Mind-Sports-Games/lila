@@ -7,7 +7,7 @@ import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
 
 import strategygames.{ GameLogic, Situation, Speed }
-import strategygames.Player.{ P2, P1 }
+import strategygames.Player.{ P1, P2 }
 
 import lila.common.Bus
 import lila.common.LilaStream
@@ -105,12 +105,11 @@ final class ChallengeBulkApi(
       .map { case (id, p1, p2) =>
         val game = Game
           .make(
-            chess = strategygames
-              .Game(
-                bulk.variant.gameLogic,
-                situation = Situation(bulk.variant.gameLogic, bulk.variant),
-                clock = bulk.clock.toClock.some
-              ),
+            stratGame = strategygames.Game(
+              bulk.variant.gameLogic,
+              situation = Situation(bulk.variant.gameLogic, bulk.variant),
+              clock = bulk.clock.toClock.some
+            ),
             p1Player = Player.make(P1, p1.some, _(perfType)),
             p2Player = Player.make(P2, p2.some, _(perfType)),
             mode = bulk.mode,

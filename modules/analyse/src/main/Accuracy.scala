@@ -26,7 +26,7 @@ object Accuracy {
     PovLike(
       playerIndex = pov.playerIndex,
       startPlayerIndex = pov.game.startPlayerIndex,
-      startedAtTurn = pov.game.chess.startedAtTurn
+      startedAtTurn = pov.game.stratGame.startedAtTurn
     )
 
   def diffsList(pov: PovLike, analysis: Analysis): List[Int] = {

@@ -113,7 +113,7 @@ final private class SwissDirector(
   ): Game =
     Game
       .make(
-        chess = strategygames.Game(
+        stratGame = strategygames.Game(
           swiss.roundVariant.gameLogic,
           variant = Some {
             if (swiss.settings.position.isEmpty) swiss.roundVariant

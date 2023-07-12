@@ -42,7 +42,7 @@ object Rewind {
       val switchPlayer = game.turnPlayerIndex != replay.state.player
       val playerIndex  = if (switchPlayer) game.turnPlayerIndex else !game.turnPlayerIndex
       val rewindedGame = replay.state
-      val pliesRemoved = game.chess.plies - rewindedGame.plies
+      val pliesRemoved = game.stratGame.plies - rewindedGame.plies
       val newClock = game.clock.map(_.takeback(switchPlayer)) map { clk =>
         game.clockHistory
           .flatMap(_.lastX(playerIndex, pliesRemoved))
@@ -54,7 +54,7 @@ object Rewind {
       val newGame = game.copy(
         p1Player = rewindPlayer(game.p1Player),
         p2Player = rewindPlayer(game.p2Player),
-        chess = rewindedGame.copy(clock = newClock),
+        stratGame = rewindedGame.copy(clock = newClock),
         binaryPlyTimes = game.binaryPlyTimes.map { binary =>
           val plyTimes = BinaryFormat.plyTime.read(binary, game.plies)
           BinaryFormat.plyTime.write(plyTimes.take(rewindedGame.plies))

@@ -77,15 +77,15 @@ case class ImportData(pgn: String, analyse: Option[String]) {
         val state = replay.state
         val board = setup.board match {
           case Board.Chess(board) => board
-          case _ => sys.error("Importer doesn't support draughts yet")
+          case _                  => sys.error("Importer doesn't support draughts yet")
         }
         val initBoard    = parsed.tags.fen.map(fen => Forsyth.<<(GameLogic.Chess(), fen).map(_.board))
         val fromPosition = initBoard.nonEmpty && !parsed.tags.fen.exists(_.initial)
         val variant = StratVariant.wrap({
           val chessVariant = parsed.tags.variant match {
             case Some(strategygames.variant.Variant.Chess(variant)) => Some(variant)
-            case None => None
-            case _ => sys.error("Not implemented for draughts yet")
+            case None                                               => None
+            case _                                                  => sys.error("Not implemented for draughts yet")
           }
           chessVariant | {
             if (fromPosition) strategygames.chess.variant.FromPosition
@@ -94,9 +94,11 @@ case class ImportData(pgn: String, analyse: Option[String]) {
         } match {
           case strategygames.chess.variant.Chess960 if !Chess960.isStartPosition(board) =>
             strategygames.chess.variant.FromPosition
-          case strategygames.chess.variant.FromPosition if parsed.tags.fen.isEmpty => strategygames.chess.variant.Standard
-          case strategygames.chess.variant.Standard if fromPosition                => strategygames.chess.variant.FromPosition
-          case v                                                     => v
+          case strategygames.chess.variant.FromPosition if parsed.tags.fen.isEmpty =>
+            strategygames.chess.variant.Standard
+          case strategygames.chess.variant.Standard if fromPosition =>
+            strategygames.chess.variant.FromPosition
+          case v => v
         })
         val game = state.copy(situation = state.situation withVariant variant)
         val initialFen = parsed.tags.fen
@@ -116,7 +118,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
         val dbGame = Game
           .make(
-            chess = game,
+            stratGame = game,
             p1Player = Player.makeImported(
               PlayerIndex.P1,
               parsed.tags(_.P1),
@@ -139,10 +141,10 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             case None =>
               parsed.tags.resultPlayer
                 .map {
-                  case Some(playerIndex) => TagResult(status, playerIndex.some)
+                  case Some(playerIndex)                  => TagResult(status, playerIndex.some)
                   case None if status == Status.Outoftime => TagResult(status, none)
                   case None                               => TagResult(Status.Draw, none)
-                  case _ => sys.error("Not implemented for draughts yet")
+                  case _                                  => sys.error("Not implemented for draughts yet")
                 }
                 .filter(_.status > Status.Started)
                 .fold(dbGame) { res =>
@@ -151,7 +153,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           }
         }
 
-        Preprocessed(NewGame(dbGame), replay.copy(state=game), initialFen, parsed)
+        Preprocessed(NewGame(dbGame), replay.copy(state = game), initialFen, parsed)
       }
     }
   }

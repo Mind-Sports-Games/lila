@@ -25,8 +25,8 @@ final private class Biter(
 
   private def join(hook: Hook, sri: Sri, lobbyUserOption: Option[LobbyUser]): Fu[JoinHook] =
     for {
-      userOption   <- lobbyUserOption.map(_.id) ?? userRepo.byId
-      ownerOption  <- hook.userId ?? userRepo.byId
+      userOption         <- lobbyUserOption.map(_.id) ?? userRepo.byId
+      ownerOption        <- hook.userId ?? userRepo.byId
       creatorPlayerIndex <- assignCreatorPlayerIndex(ownerOption, userOption, hook.realPlayerIndex)
       game <- makeGame(
         hook,
@@ -41,8 +41,8 @@ final private class Biter(
 
   private def join(seek: Seek, lobbyUser: LobbyUser): Fu[JoinSeek] =
     for {
-      user         <- userRepo byId lobbyUser.id orFail s"No such user: ${lobbyUser.id}"
-      owner        <- userRepo byId seek.user.id orFail s"No such user: ${seek.user.id}"
+      user               <- userRepo byId lobbyUser.id orFail s"No such user: ${lobbyUser.id}"
+      owner              <- userRepo byId seek.user.id orFail s"No such user: ${seek.user.id}"
       creatorPlayerIndex <- assignCreatorPlayerIndex(owner.some, user.some, seek.realPlayerIndex)
       game <- makeGame(
         seek,
@@ -69,7 +69,7 @@ final private class Biter(
     val perfPicker = PerfPicker.mainOrDefault(strategygames.Speed(clock.config), hook.realVariant, none)
     Game
       .make(
-        chess = StratGame(
+        stratGame = StratGame(
           lib = hook.realVariant.gameLogic,
           situation = Situation(hook.realVariant.gameLogic, hook.realVariant),
           clock = clock.some
@@ -87,7 +87,7 @@ final private class Biter(
     val perfPicker = PerfPicker.mainOrDefault(strategygames.Speed(none), seek.realVariant, seek.daysPerTurn)
     Game
       .make(
-        chess = StratGame(
+        stratGame = StratGame(
           lib = seek.realVariant.gameLogic,
           situation = Situation(seek.realVariant.gameLogic, seek.realVariant),
           clock = none

@@ -61,7 +61,7 @@ final class UserAnalysis(
     Pov(
       lila.game.Game
         .make(
-          chess = strategygames.Game(
+          stratGame = strategygames.Game(
             lib = from.situation.board.variant.gameLogic,
             situation = from.situation,
             plies = from.plies,

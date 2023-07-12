@@ -412,7 +412,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     // TODO: why does the initialFen get generated here?
     val fen: Option[FEN] = initialFen orElse {
       (!g2.variant.standardInitialPosition)
-        .option(Forsyth.>>(g2.variant.gameLogic, g2.chess))
+        .option(Forsyth.>>(g2.variant.gameLogic, g2.stratGame))
         .filterNot(_.initial)
     }
     val checkInHours =

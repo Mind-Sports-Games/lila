@@ -69,7 +69,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (_, _, VariantEnd, _)                       => VariantKeys.variantTitle(game.variant)
       case _                                           => "Game is still being played"
     }
-    val turns = s"${game.chess.fullTurnCount} turns"
+    val turns = s"${game.stratGame.fullTurnCount} turns"
     s"$p1 plays $p2 in a $mode $speedAndClock game of $variant. $result after $turns. Click to replay, analyse, and discuss the game!"
   }
 
