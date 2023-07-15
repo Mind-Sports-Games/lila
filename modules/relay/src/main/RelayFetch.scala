@@ -10,6 +10,8 @@ import play.api.libs.ws.StandaloneWSClient
 import RelayRound.Sync.{ UpstreamIds, UpstreamUrl }
 import scala.concurrent.duration._
 
+import strategygames.variant.Variant
+import strategygames.chess.variant.{ Variant => ChessVariant }
 import lila.base.LilaException
 import lila.memo.CacheApi
 import lila.study.MultiPgn
@@ -317,7 +319,8 @@ private object RelayFetch {
       .maximumSize(512)
       .build(compute)
 
-    private def compute(pgn: String): Try[Int => RelayGame] =
+    private def compute(pgn: String): Try[Int => RelayGame] = {
+      implicit val variant = Variant.Chess(ChessVariant.default)
       lila.study
         .PgnImport(pgn, Nil)
         .fold(
@@ -336,5 +339,6 @@ private object RelayFetch {
               )
             )
         )
+    }
   }
 }

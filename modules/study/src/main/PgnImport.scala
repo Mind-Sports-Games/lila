@@ -27,7 +27,9 @@ object PgnImport {
       statusText: String
   )
 
-  def apply(pgn: String, contributors: List[LightUser]): Validated[String, Result] =
+  def apply(pgn: String, contributors: List[LightUser])(implicit
+      variant: Variant
+  ): Validated[String, Result] =
     ImportData(pgn, analyse = none).preprocess(user = none).map {
       case Preprocessed(game, replay, initialFen, parsedPgn) =>
         val annotator = findAnnotator(parsedPgn, contributors)
@@ -102,7 +104,7 @@ object PgnImport {
   private def parseComments(
       comments: List[String],
       annotator: Option[Comment.Author]
-  ): (Shapes, Option[Centis], Comments) =
+  )(implicit variant: Variant): (Shapes, Option[Centis], Comments) =
     comments.foldLeft((Shapes(Nil), none[Centis], Comments(Nil))) { case ((shapes, clock, comments), txt) =>
       CommentParser(txt) match {
         case CommentParser.ParsedComment(s, c, str) =>
@@ -137,12 +139,13 @@ object PgnImport {
                   m => Dumper.apply(prev.situation.gameLogic, m),
                   d => Dumper.apply(prev.situation.gameLogic, d)
                 )
+              implicit val variant = game.situation.board.variant
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(
                     id = UciCharPair(prev.situation.gameLogic, uci),
                     ply = game.turns,
-                    variant = game.situation.board.variant,
+                    variant = variant,
                     move = Uci.WithSan(game.situation.gameLogic, uci, sanStr),
                     fen = Forsyth.>>(game.situation.gameLogic, game),
                     check = game.situation.check,

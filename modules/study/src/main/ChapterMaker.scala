@@ -3,6 +3,7 @@ package lila.study
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
+import strategygames.chess.variant.{ Variant => ChessVariant }
 import strategygames.{ GameLogic, Player => PlayerIndex, PocketData }
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
@@ -37,7 +38,9 @@ final private class ChapterMaker(
       case None      => fuccess(fromFenOrBlank(study, data, order, userId))
     }
 
-  private def fromPgn(study: Study, pgn: String, data: Data, order: Int, userId: User.ID): Fu[Chapter] =
+  private def fromPgn(study: Study, pgn: String, data: Data, order: Int, userId: User.ID): Fu[Chapter] = {
+    implicit val variant = Variant.Chess(ChessVariant.default)
+    // TODO: support PGN parsing for other variants later.
     for {
       contributors <- lightUser.asyncMany(study.members.contributorIds.toList)
       parsed <- PgnImport(pgn, contributors.flatten).toFuture recoverWith { case e: Exception =>
@@ -68,6 +71,7 @@ final private class ChapterMaker(
       gamebook = data.isGamebook,
       conceal = data.isConceal option Chapter.Ply(parsed.root.ply)
     )
+  }
 
   private def resolveOrientation(
       orientation: Orientation,
