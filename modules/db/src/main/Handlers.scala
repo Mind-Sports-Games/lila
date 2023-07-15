@@ -197,13 +197,13 @@ trait Handlers {
       c match {
         case fc: FischerClock.Config =>
           BSONDocument(
-            "t" -> "fischer",
+            "t"         -> "fischer",
             "limit"     -> fc.limitSeconds,
             "increment" -> fc.incrementSeconds
           )
         case bc: ByoyomiClock.Config =>
           BSONDocument(
-            "t" -> "byoyomi",
+            "t"         -> "byoyomi",
             "limit"     -> bc.limitSeconds,
             "increment" -> bc.incrementSeconds,
             "byoyomi"   -> bc.byoyomiSeconds,

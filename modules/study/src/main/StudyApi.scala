@@ -4,6 +4,7 @@ import actorApi.Who
 import akka.stream.scaladsl._
 import strategygames.Centis
 import strategygames.format.pgn.{ Glyph, Tags }
+import strategygames.variant.Variant
 import scala.concurrent.duration._
 
 import lila.chat.{ Chat, ChatApi }
@@ -227,7 +228,7 @@ final class StudyApi(
   )(who: Who): Funit =
     sequenceStudyWithChapter(studyId, position.chapterId) { case Study.WithChapter(study, chapter) =>
       Contribute(who.u, study) {
-        doAddNode(study, Position(chapter, position.path), node, opts, relay)(who)
+        doAddNode(study, Position(chapter, position.path), node, opts, relay)(who)(chapter.root.variant)
       }
     } flatMap { _ ?? { _() } } // this one is for you, Lakin <3
 
@@ -237,7 +238,7 @@ final class StudyApi(
       rawNode: Node,
       opts: MoveOpts,
       relay: Option[Chapter.Relay]
-  )(who: Who): Fu[Option[() => Funit]] = {
+  )(who: Who)(implicit variant: Variant): Fu[Option[() => Funit]] = {
     val singleNode   = rawNode.withoutChildren
     def failReload() = reloadSriBecauseOf(study, who.sri, position.chapter.id)
     if (position.chapter.isOverweight) {
@@ -415,7 +416,9 @@ final class StudyApi(
     indexStudy(study)
   }
 
-  def setShapes(studyId: Study.Id, position: Position.Ref, shapes: Shapes)(who: Who) =
+  def setShapes(studyId: Study.Id, position: Position.Ref, shapes: Shapes)(
+      who: Who
+  ) =
     sequenceStudy(studyId) { study =>
       Contribute(who.u, study) {
         chapterRepo.byIdAndStudy(position.chapterId, study.id) flatMap {
@@ -423,7 +426,7 @@ final class StudyApi(
             chapter.setShapes(shapes, position.path) match {
               case Some(newChapter) =>
                 studyRepo.updateNow(study)
-                chapterRepo.setShapes(shapes)(newChapter, position.path) >>-
+                chapterRepo.setShapes(shapes)(newChapter.root.variant)(newChapter, position.path) >>-
                   sendTo(study.id)(_.setShapes(position, shapes, who))
               case None =>
                 fufail(s"Invalid setShapes $position $shapes") >>-
@@ -571,7 +574,7 @@ final class StudyApi(
             case Some((chapter, path)) =>
               studyRepo.updateNow(study)
               chapter.root.nodeAt(path) ?? { parent =>
-                chapterRepo.setChildren(parent.children)(chapter, path) >>-
+                chapterRepo.setChildren(parent.children)(chapter, path)(chapter.root.variant) >>-
                   sendTo(study.id)(_.reloadAll)
               }
           }
