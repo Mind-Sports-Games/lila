@@ -5,15 +5,13 @@ import strategygames.Centis
 import strategygames.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Player => PlayerIndex, Game, GameLogic, Status }
+import strategygames.{ Player => PlayerIndex, Game, Status }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
 import lila.tree.Node.{ Comment, Comments, Shapes }
 
 object PgnImport {
-
-  def lib = GameLogic.Chess()
 
   case class Result(
       root: Node.Root,
@@ -37,7 +35,7 @@ object PgnImport {
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.turns,
-              plysPerTurn = game.variant.plysPerTurn,
+              variant = game.variant,
               fen = initialFen.getOrElse(game.variant.initialFen),
               check = replay.setup.situation.check,
               shapes = shapes,
@@ -132,17 +130,21 @@ object PgnImport {
           san(prev.situation).fold(
             _ => none, // illegal move; stop here.
             moveOrDrop => {
-              val game   = prev.apply(moveOrDrop)
-              val uci    = moveOrDrop.fold(_.toUci, _.toUci)
-              val sanStr = moveOrDrop.fold(m => Dumper.apply(lib, m), d => Dumper.apply(lib, d))
+              val game = prev.apply(moveOrDrop)
+              val uci  = moveOrDrop.fold(_.toUci, _.toUci)
+              val sanStr =
+                moveOrDrop.fold(
+                  m => Dumper.apply(prev.situation.gameLogic, m),
+                  d => Dumper.apply(prev.situation.gameLogic, d)
+                )
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(
-                    id = UciCharPair(GameLogic.Chess(), uci),
+                    id = UciCharPair(prev.situation.gameLogic, uci),
                     ply = game.turns,
-                    plysPerTurn = game.situation.board.variant.plysPerTurn,
-                    move = Uci.WithSan(GameLogic.Chess(), uci, sanStr),
-                    fen = Forsyth.>>(GameLogic.Chess(), game),
+                    variant = game.situation.board.variant,
+                    move = Uci.WithSan(game.situation.gameLogic, uci, sanStr),
+                    fen = Forsyth.>>(game.situation.gameLogic, game),
                     check = game.situation.check,
                     shapes = shapes,
                     comments = comments,

@@ -1,5 +1,7 @@
 package lila.study
 
+import strategygames.variant.Variant
+
 import BSONHandlers._
 import Node.Children
 

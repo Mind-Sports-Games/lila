@@ -77,7 +77,7 @@ case class AnaMove(
         Branch(
           id = UciCharPair(lib, uci),
           ply = game.turns,
-          plysPerTurn = variant.plysPerTurn,
+          variant = variant,
           move = Uci.WithSan(lib, uci, san),
           fen = fen,
           check = game.situation.check,

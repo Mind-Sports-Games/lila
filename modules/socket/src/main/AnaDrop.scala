@@ -30,7 +30,7 @@ case class AnaDrop(
             Branch(
               id = UciCharPair(uci),
               ply = game.turns,
-              plysPerTurn = variant.plysPerTurn,
+              variant = variant,
               move = strategygames.format.Uci.ChessWithSan(Uci.WithSan(uci, san)),
               fen = fen,
               check = game.situation.check,

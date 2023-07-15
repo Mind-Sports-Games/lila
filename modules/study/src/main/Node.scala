@@ -12,7 +12,7 @@ import lila.tree.Node.{ Comment, Comments, Gamebook, Shapes }
 
 sealed trait RootOrNode {
   val ply: Int
-  val plysPerTurn: Int
+  val variant: Variant
   val fen: FEN
   val check: Boolean
   val shapes: Shapes
@@ -26,14 +26,15 @@ sealed trait RootOrNode {
   def addChild(node: Node): RootOrNode
   def fullMoveNumber = 1 + ply / 2
   def mainline: Vector[Node]
-  def playerIndex = strategygames.Player.fromPly(ply, plysPerTurn)
+  val plysPerTurn: Int = variant.plysPerTurn
+  def playerIndex      = strategygames.Player.fromPly(ply, plysPerTurn)
   def moveOption: Option[Uci.WithSan]
 }
 
 case class Node(
     id: UciCharPair,
     ply: Int,
-    plysPerTurn: Int,
+    variant: Variant,
     move: Uci.WithSan,
     fen: FEN,
     check: Boolean,
@@ -237,7 +238,7 @@ object Node {
 
   case class Root(
       ply: Int,
-      plysPerTurn: Int,
+      variant: Variant,
       fen: FEN,
       check: Boolean,
       shapes: Shapes = Shapes(Nil),
@@ -331,7 +332,7 @@ object Node {
     def default(variant: Variant) =
       Root(
         ply = 0,
-        plysPerTurn = variant.plysPerTurn,
+        variant = variant,
         fen = variant.initialFen,
         check = false,
         clock = none,
@@ -342,7 +343,7 @@ object Node {
     def fromRoot(b: lila.tree.Root): Root =
       Root(
         ply = b.ply,
-        plysPerTurn = b.plysPerTurn,
+        variant = b.variant,
         fen = b.fen,
         check = b.check,
         clock = b.clock,
@@ -355,7 +356,7 @@ object Node {
     Node(
       id = b.id,
       ply = b.ply,
-      plysPerTurn = b.plysPerTurn,
+      variant = b.variant,
       move = b.move,
       fen = b.fen,
       check = b.check,
@@ -367,7 +368,7 @@ object Node {
 
   object BsonFields {
     val ply            = "p"
-    val ppt            = "pt"
+    val variant        = "v"
     val uci            = "u"
     val san            = "s"
     val fen            = "f"
