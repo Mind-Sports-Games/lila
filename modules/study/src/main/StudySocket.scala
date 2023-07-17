@@ -6,7 +6,7 @@ import strategygames.{ Centis, GameLogic }
 import strategygames.format.pgn.{ Glyph, Glyphs, Tags }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Variant => ChessVariant }
+import strategygames.fairysf.variant.Flipello10
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -120,8 +120,8 @@ final private class StudySocket(
         case "shapes" =>
           reading[AtPosition](o) { position =>
             {
-              // TODO: this will only parse chess moves
-              val variantHandler = JsonView.VariantHandler()(Variant.Chess(ChessVariant.default))
+              // TODO: this will only parse up to a 10x10 board
+              val variantHandler = JsonView.VariantHandler()(Variant.FairySF(Flipello10))
               import variantHandler._
               (o \ "d" \ "shapes").asOpt[List[Shape]] foreach { shapes =>
                 who foreach api.setShapes(studyId, position.ref, Shapes(shapes take 32))
