@@ -18,7 +18,11 @@ object TreeBuilder {
         val sit = Game(variant.gameLogic, variant.some, root.fen.some).situation
         sit.playable(false) ?? sit.destinations
       }
-    makeRoot(root, variant).copy(dests = dests.some)
+    val dropsByRole = {
+      val sit = Game(variant.gameLogic, variant.some, root.fen.some).situation
+      sit.playable(false) ?? sit.dropsByRole
+    }
+    makeRoot(root, variant).copy(dests = dests.some, dropsByRole = dropsByRole)
   }
 
   def toBranch(node: Node, variant: Variant): tree.Branch =
