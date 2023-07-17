@@ -4,7 +4,7 @@ import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.format.{ Uci, UciCharPair }
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameLogic, Pos, Role }
+import strategygames.{ Game, GameLogic, Pos, Role, Situation }
 import strategygames.variant.Variant
 import play.api.libs.json.JsObject
 
@@ -39,7 +39,11 @@ case class AnaDrop(
           dests = Some(movable ?? game.situation.destinations),
           opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? FullOpeningDB
             .findByFen(variant.gameLogic, fen),
-          drops = (if (movable) game.situation.drops else Some(Nil)),
+          dropsByRole = game.situation match {
+            case (Situation.FairySF(_)) =>
+              game.situation.dropsByRole
+            case _ => None
+          },
           pocketData = game.situation.board.pocketData
         )
       }

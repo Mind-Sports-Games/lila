@@ -104,6 +104,11 @@ case class AnaMove(
             FullOpeningDB.findByFen(lib, fen)
           },
           drops = if (movable) game.situation.drops else Some(Nil),
+          dropsByRole = game.situation match {
+            case (Situation.FairySF(_)) =>
+              game.situation.dropsByRole
+            case _ => None
+          },
           pocketData = game.situation.board.pocketData
         )
       }
