@@ -85,7 +85,7 @@ export function onInsert<A extends HTMLElement>(f: (element: A) => void): Hooks 
 }
 
 export function readOnlyProp<A>(value: A): () => A {
-  return function (): A {
+  return function(): A {
     return value;
   };
 }
@@ -348,3 +348,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'togyzkumalak';
   }
 };
+
+export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultValue: boolean) => {
+  if (variantKey === 'amazons') return node.drops !== undefined && node.drops !== null && node.drops.length > 0;
+  else return defaultValue;
+}

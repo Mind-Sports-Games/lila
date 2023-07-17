@@ -104,7 +104,7 @@ export function build(root: Tree.Node): TreeWrapper {
   }
 
   function getNodeList(path: Tree.Path): Tree.Node[] {
-    return ops.collect(root, function (node: Tree.Node) {
+    return ops.collect(root, function(node: Tree.Node) {
       const id = treePath.head(path);
       if (id === '') return;
       path = treePath.tail(path);
@@ -123,15 +123,20 @@ export function build(root: Tree.Node): TreeWrapper {
 
   // returns new path
   function addNode(node: Tree.Node, path: Tree.Path): Tree.Path | undefined {
+    console.log(`43 path: ${path}`);
     const newPath = path + node.id,
       existing = nodeAtPathOrNull(newPath);
+
+    console.log(`newPath: ${newPath}`);
+    console.log(`existing: ${existing}`);
+
     if (existing) {
       (['dests', 'drops', 'clock'] as Array<keyof Tree.Node>).forEach(key => {
         if (defined(node[key]) && !defined(existing[key])) existing[key] = node[key] as never;
       });
       return newPath;
     }
-    return updateAt(path, function (parent: Tree.Node) {
+    return updateAt(path, function(parent: Tree.Node) {
       parent.children.push(node);
     })
       ? newPath
@@ -168,19 +173,19 @@ export function build(root: Tree.Node): TreeWrapper {
   function setCommentAt(comment: Tree.Comment, path: Tree.Path) {
     return !comment.text
       ? deleteCommentAt(comment.id, path)
-      : updateAt(path, function (node) {
-          node.comments = node.comments || [];
-          const existing = node.comments.find(function (c) {
-            return c.id === comment.id;
-          });
-          if (existing) existing.text = comment.text;
-          else node.comments.push(comment);
+      : updateAt(path, function(node) {
+        node.comments = node.comments || [];
+        const existing = node.comments.find(function(c) {
+          return c.id === comment.id;
         });
+        if (existing) existing.text = comment.text;
+        else node.comments.push(comment);
+      });
   }
 
   function deleteCommentAt(id: string, path: Tree.Path) {
-    return updateAt(path, function (node) {
-      const comments = (node.comments || []).filter(function (c) {
+    return updateAt(path, function(node) {
+      const comments = (node.comments || []).filter(function(c) {
         return c.id !== id;
       });
       node.comments = comments.length ? comments : undefined;
@@ -188,7 +193,7 @@ export function build(root: Tree.Node): TreeWrapper {
   }
 
   function setGlyphsAt(glyphs: Tree.Glyph[], path: Tree.Path) {
-    return updateAt(path, function (node) {
+    return updateAt(path, function(node) {
       node.glyphs = glyphs;
     });
   }
@@ -219,12 +224,12 @@ export function build(root: Tree.Node): TreeWrapper {
     addNode,
     addNodes,
     addDests(dests: string, path: Tree.Path) {
-      return updateAt(path, function (node: Tree.Node) {
+      return updateAt(path, function(node: Tree.Node) {
         node.dests = dests;
       });
     },
     setShapes(shapes: Tree.Shape[], path: Tree.Path) {
-      return updateAt(path, function (node: Tree.Node) {
+      return updateAt(path, function(node: Tree.Node) {
         node.shapes = shapes;
       });
     },
@@ -232,7 +237,7 @@ export function build(root: Tree.Node): TreeWrapper {
     deleteCommentAt,
     setGlyphsAt,
     setClockAt(clock: Tree.Clock | undefined, path: Tree.Path) {
-      return updateAt(path, function (node) {
+      return updateAt(path, function(node) {
         node.clock = clock;
       });
     },
@@ -245,7 +250,7 @@ export function build(root: Tree.Node): TreeWrapper {
     deleteNodeAt,
     promoteAt,
     forceVariationAt(path: Tree.Path, force: boolean) {
-      return updateAt(path, function (node) {
+      return updateAt(path, function(node) {
         node.forceVariation = force;
       });
     },
@@ -254,14 +259,14 @@ export function build(root: Tree.Node): TreeWrapper {
       ops.merge(root, tree);
     },
     removeCeval() {
-      ops.updateAll(root, function (n) {
+      ops.updateAll(root, function(n) {
         delete n.ceval;
         delete n.threat;
       });
     },
     removeComputerVariations() {
-      ops.mainlineNodeList(root).forEach(function (n) {
-        n.children = n.children.filter(function (c) {
+      ops.mainlineNodeList(root).forEach(function(n) {
+        n.children = n.children.filter(function(c) {
           return !c.comp;
         });
       });

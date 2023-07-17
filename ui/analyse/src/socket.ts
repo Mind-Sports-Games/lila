@@ -89,18 +89,18 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     anaDestsCache =
       ctrl.data.game.variant.key === 'standard' && ctrl.tree.root.fen.split(' ', 1)[0] === initialBoardFen
         ? {
-            '': {
-              path: '',
-              dests: 'iqy muC gvx ltB bqs pxF jrz nvD ksA owE',
-            },
-          }
+          '': {
+            path: '',
+            dests: 'iqy muC gvx ltB bqs pxF jrz nvD ksA owE',
+          },
+        }
         : {};
   }
   clearCache();
 
   // forecast mode: reload when opponent moves
   if (!ctrl.synthetic)
-    setTimeout(function () {
+    setTimeout(function() {
       send('startWatching', ctrl.data.game.id);
     }, 1000);
 
@@ -127,6 +127,7 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
       // no strict equality here!
       if (data.ch == currentChapterId()) ctrl.addNode(data.node, data.path);
       else console.log('socket handler node got wrong chapter id', data);
+      console.log(`data.node.fen: ${data.node.fen}`);
     },
     stepFailure() {
       clearTimeout(anaMoveTimeout);
@@ -163,14 +164,14 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
   function sendAnaDests(req: AnaDestsReq) {
     clearTimeout(anaDestsTimeout);
     if (anaDestsCache[req.path])
-      setTimeout(function () {
+      setTimeout(function() {
         handlers.dests(anaDestsCache[req.path]);
       }, 300);
     else {
       withoutStandardVariant(req);
       addStudyData(req);
       send('anaDests', req);
-      anaDestsTimeout = setTimeout(function () {
+      anaDestsTimeout = setTimeout(function() {
         sendAnaDests(req);
       }, 3000);
     }
