@@ -81,6 +81,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     },
     move: ctrl.apiMove,
     drop: ctrl.apiMove,
+    pass: ctrl.apiMove,
     reload,
     redirect: ctrl.setRedirecting,
     clockInc(o) {

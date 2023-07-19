@@ -13,7 +13,7 @@ import lila.common.Bus
 import lila.room.RoomSocket.{ Protocol => RP, _ }
 import lila.socket.RemoteSocket.{ Protocol => P, _ }
 import lila.socket.Socket.{ makeMessage, Sri }
-import lila.socket.{ AnaAny, AnaDests, AnaDrop, AnaMove }
+import lila.socket.{ AnaAny, AnaDests, AnaDrop, AnaMove, AnaPass }
 import lila.tree.Node.{ defaultNodeJsonWriter, Comment, Gamebook, Shape, Shapes }
 import lila.user.User
 
@@ -80,11 +80,15 @@ final private class StudySocket(
           }
         case "anaMove" =>
           AnaMove parse o foreach { move =>
-            who foreach moveOrDrop(studyId, move, MoveOpts parse o)
+            who foreach gameAction(studyId, move, MoveOpts parse o)
           }
         case "anaDrop" =>
           AnaDrop parse o foreach { drop =>
-            who foreach moveOrDrop(studyId, drop, MoveOpts parse o)
+            who foreach gameAction(studyId, drop, MoveOpts parse o)
+          }
+        case "anaPass" =>
+          AnaPass parse o foreach { pass =>
+            who foreach gameAction(studyId, pass, MoveOpts parse o)
           }
         case "deleteNode" =>
           reading[AtPosition](o) { position =>
@@ -232,7 +236,7 @@ final private class StudySocket(
     chatBusChan = _.Study
   )
 
-  private def moveOrDrop(studyId: Study.Id, m: AnaAny, opts: MoveOpts)(who: Who) =
+  private def gameAction(studyId: Study.Id, m: AnaAny, opts: MoveOpts)(who: Who) =
     m.branch match {
       case Validated.Valid(branch) if branch.ply < Node.MAX_PLIES =>
         m.chapterId.ifTrue(opts.write) foreach { chapterId =>

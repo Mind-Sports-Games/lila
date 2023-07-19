@@ -42,7 +42,7 @@ import { Position, PositionError } from 'stratops/chess';
 import { Result } from '@badrap/result';
 import { setupPosition } from 'stratops/variant';
 import { storedProp, StoredBooleanProp } from 'common/storage';
-import { AnaMove, StudyCtrl } from './study/interfaces';
+import { AnaMove, AnaPass, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
 
@@ -532,6 +532,19 @@ export default class AnalyseCtrl {
     if (prom) move.promotion = prom;
     if (this.practice) this.practice.onUserMove();
     this.socket.sendAnaMove(move);
+    this.preparePremoving();
+    this.redraw();
+  };
+
+  sendPass = (): void => {
+    const pass: AnaPass = {
+      variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
+      fen: this.node.fen,
+      path: this.path,
+    };
+    if (this.practice) this.practice.onUserMove();
+    this.socket.sendAnaPass(pass);
     this.preparePremoving();
     this.redraw();
   };

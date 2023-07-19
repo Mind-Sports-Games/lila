@@ -12,6 +12,7 @@ import strategygames.{
   GameLogic,
   Move => StratMove,
   Drop => StratDrop,
+  Pass => StratPass,
   PromotableRole,
   PocketData,
   Pos,
@@ -48,7 +49,7 @@ object Event {
     def typ = "start"
   }
 
-  object MoveOrDrop {
+  object Action {
 
     def data(
         gf: GameFamily,
@@ -110,7 +111,7 @@ object Event {
   ) extends Event {
     def typ = "move"
     def data =
-      MoveOrDrop.data(
+      Action.data(
         gf,
         fen,
         check,
@@ -232,7 +233,7 @@ object Event {
   ) extends Event {
     def typ = "drop"
     def data =
-      MoveOrDrop.data(
+      Action.data(
         gf,
         fen,
         check,
@@ -270,6 +271,75 @@ object Event {
           case StratDrop.FairySF(drop) => strategygames.fairysf.format.pgn.Dumper(drop)
           case StratDrop.Go(drop)      => strategygames.go.format.pgn.Dumper(drop)
         },
+        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        pocketData = pocketData
+      )
+  }
+
+  case class Pass(
+      gf: GameFamily,
+      // role: Role,
+      // pos: Pos,
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+  ) extends Event {
+    def typ = "pass"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        pocketData
+      ) {
+        Json.obj(
+          //"role" -> role.groundName,
+          "uci" -> "pass",
+          "san" -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+  object Pass {
+    def apply(
+        pass: StratPass,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): Pass =
+      Pass(
+        gf = situation.board.variant.gameFamily,
+        san = "pass",
         fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
