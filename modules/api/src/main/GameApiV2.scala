@@ -307,7 +307,7 @@ final class GameApiV2(
       .add("multiMatch" -> g.metadata.multiMatchGameId)
       .add("winner" -> g.winnerPlayerIndex.map(_.name))
       .add("opening" -> g.opening.ifTrue(withFlags.opening))
-      .add("moves" -> withFlags.moves.option {
+      .add("moves" -> withFlags.turns.option {
         withFlags keepDelayIf g.playable applyDelay g.actions.map(_.mkString(",")) mkString " "
       })
       .add("pgn" -> pgn)

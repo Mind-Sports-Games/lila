@@ -9,11 +9,12 @@ sealed trait Advice {
   def info: Info
   def prev: Info
 
-  def ply   = info.ply
-  def turn  = info.turn
-  def playerIndex = info.playerIndex
-  def cp    = info.cp
-  def mate  = info.mate
+  //TODO multiaction add turn to advice and info
+  def ply            = info.ply
+  def fullTurnNumber = info.fullTurnNumber
+  def playerIndex    = info.playerIndex
+  def cp             = info.cp
+  def mate           = info.mate
 
   def makeComment(withEval: Boolean, withBestMove: Boolean): String =
     withEval.??(evalComment ?? { c =>

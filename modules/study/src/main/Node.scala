@@ -23,7 +23,8 @@ sealed trait RootOrNode {
   val glyphs: Glyphs
   val score: Option[Score]
   def addChild(node: Node): RootOrNode
-  def fullMoveNumber = 1 + ply / 2
+  //TODO multiaction: this would be fullTurnCount if turn not ply was being used
+  def fullTurnCount = 1 + ply / 2
   def mainline: Vector[Node]
   def moveOption: Option[Uci.WithSan]
 }

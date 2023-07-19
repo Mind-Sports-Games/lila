@@ -1,7 +1,7 @@
 package lila.study
 
 import akka.stream.scaladsl._
-import strategygames.format.pgn.{ Glyphs, Initial, Move => PgnMove, Pgn, Tag, Tags, Turn }
+import strategygames.format.pgn.{ FullTurn, Glyphs, Initial, Pgn, Tag, Tags, Turn }
 import org.joda.time.format.DateTimeFormat
 
 import lila.common.String.slugify
@@ -26,7 +26,7 @@ final class PgnDump(
   def ofChapter(study: Study, flags: WithFlags)(chapter: Chapter) =
     Pgn(
       tags = makeTags(study, chapter),
-      turns = toTurns(chapter.root)(flags).toList,
+      fullTurns = toFullTurns(chapter.root)(flags).toList,
       initial = Initial(
         chapter.root.comments.list.map(_.text.value) ::: shapeComment(chapter.root.shapes).toList
       )
@@ -94,8 +94,9 @@ object PgnDump {
   private type Variations = Vector[Node]
   private val noVariations: Variations = Vector.empty
 
-  private def node2move(node: Node, variations: Variations)(implicit flags: WithFlags) =
-    PgnMove(
+  private def node2action(node: Node, variations: Variations)(implicit flags: WithFlags) =
+    Turn(
+      //TODO: Work out how to do nodes for multiaction. Do we need to mash the turn into one node?
       san = node.move.san,
       glyphs = if (flags.comments) node.glyphs else Glyphs.empty,
       comments = flags.comments ?? {
@@ -105,7 +106,7 @@ object PgnDump {
       result = none,
       variations = flags.variations ?? {
         variations.view.map { child =>
-          toTurns(child.mainline, noVariations).toList
+          toFullTurns(child.mainline, noVariations).toList
         }.toList
       },
       secondsLeft = flags.clocks ?? node.clock.map(_.roundSeconds)
@@ -131,44 +132,46 @@ object PgnDump {
     s"$circles$arrows".some.filter(_.nonEmpty)
   }
 
-  def toTurn(first: Node, second: Option[Node], variations: Variations)(implicit flags: WithFlags) =
-    Turn(
-      number = first.fullMoveNumber,
-      p1 = node2move(first, variations).some,
-      p2 = second map { node2move(_, first.children.variations) }
+  //TODO this wont work for multiaction if each node is a singular ply
+  def toFullTurn(first: Node, second: Option[Node], variations: Variations)(implicit flags: WithFlags) =
+    FullTurn(
+      fullTurnNumber = first.fullTurnCount,
+      p1 = node2action(first, variations).some,
+      p2 = second map { node2action(_, first.children.variations) }
     )
 
-  def toTurns(root: Node.Root)(implicit flags: WithFlags): Vector[Turn] =
-    toTurns(root.mainline, root.children.variations)
+  def toFullTurns(root: Node.Root)(implicit flags: WithFlags): Vector[FullTurn] =
+    toFullTurns(root.mainline, root.children.variations)
 
-  def toTurns(
+  def toFullTurns(
       line: Vector[Node],
       variations: Variations
-  )(implicit flags: WithFlags): Vector[Turn] = {
+  )(implicit flags: WithFlags): Vector[FullTurn] = {
     line match {
       case Vector() => Vector()
       case first +: rest if first.ply % 2 == 0 =>
-        Turn(
-          number = 1 + (first.ply - 1) / 2,
+        FullTurn(
+          //TODO: Multiaction this is correct if turn, not ply is being used here
+          fullTurnNumber = 1 + (first.ply - 1) / 2,
           p1 = none,
-          p2 = node2move(first, variations).some
-        ) +: toTurnsFromP1(rest, first.children.variations)
-      case l => toTurnsFromP1(l, variations)
+          p2 = node2action(first, variations).some
+        ) +: toFullTurnsFromP1(rest, first.children.variations)
+      case l => toFullTurnsFromP1(l, variations)
     }
   }.filterNot(_.isEmpty)
 
-  def toTurnsFromP1(line: Vector[Node], variations: Variations)(implicit
+  def toFullTurnsFromP1(line: Vector[Node], variations: Variations)(implicit
       flags: WithFlags
-  ): Vector[Turn] =
+  ): Vector[FullTurn] =
     line
       .grouped(2)
-      .foldLeft(variations -> Vector.empty[Turn]) { case ((variations, turns), pair) =>
+      .foldLeft(variations -> Vector.empty[FullTurn]) { case ((variations, turns), pair) =>
         pair.headOption.fold(variations -> turns) { first =>
           pair
             .lift(1)
             .getOrElse(first)
             .children
-            .variations -> (toTurn(first, pair lift 1, variations) +: turns)
+            .variations -> (toFullTurn(first, pair lift 1, variations) +: turns)
         }
       }
       ._2

@@ -7,6 +7,7 @@ import strategygames.format.Uci
 import lila.tree.Eval
 
 case class Info(
+    //TODO add turn for multiaction
     ply: Int,
     eval: Eval,
     // variation is first in UCI, then converted to PGN before storage
@@ -17,7 +18,8 @@ case class Info(
   def mate = eval.mate
   def best = eval.best
 
-  def turn = 1 + (ply - 1) / 2
+  //TODO Wrong for Amazons / multiaction
+  def fullTurnNumber = 1 + (ply - 1) / 2
 
   //TODO Wrong for Amazons / multiaction. Using fromTurnCount as fromPly
   def playerIndex = PlayerIndex.fromTurnCount(ply - 1)
