@@ -120,6 +120,9 @@ object GameDiff {
     def ptnStorageWriter(pgnMoves: PgnMoves) =
       PtnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
 
+    def ponStorageWriter(pgnMoves: PgnMoves) =
+      PonStorage.OldBin.encode(pgnMoves)
+
     a.variant.gameLogic match {
       case GameLogic.Draughts() =>
         a.pdnStorage match {
@@ -265,6 +268,30 @@ object GameDiff {
           _.history.score,
           (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
         )
+      }
+      case GameLogic.Go() => {
+        dTry(oldPgn, _.pgnMoves, writeBytes compose ponStorageWriter)
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Go(b) => b.pieces
+            case _           => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeGo
+        )
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+        dOpt(
+          score,
+          _.history.score,
+          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+        )
+        if (a.variant.dropsVariant)
+          dOpt(
+            pocketData,
+            _.board.pocketData,
+            (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
+          )
       }
     }
 

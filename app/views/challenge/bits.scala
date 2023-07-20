@@ -7,6 +7,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.challenge.Challenge
 import lila.common.String.html.safeJsonValue
+import strategygames.GameFamily
 
 import controllers.routes
 
@@ -40,6 +41,10 @@ object bits {
             views.html.game.bits.variantLink(c.variant, variantName(c.variant))
           else
             c.perfType.trans,
+          (c.initialFen, c.variant.gameFamily) match {
+            case (Some(f), GameFamily.Go()) => " " + c.variant.toGo.setupInfo(f.toGo).getOrElse("")
+            case _                          => ""
+          },
           br,
           span(cls := "clock")(
             c.daysPerTurn map { days =>

@@ -12,6 +12,7 @@ import strategygames.{
   GameLogic,
   Move => StratMove,
   Drop => StratDrop,
+  Pass => StratPass,
   PromotableRole,
   PocketData,
   Pos,
@@ -48,7 +49,7 @@ object Event {
     def typ = "start"
   }
 
-  object MoveOrDrop {
+  object Action {
 
     def data(
         gf: GameFamily,
@@ -110,7 +111,7 @@ object Event {
   ) extends Event {
     def typ = "move"
     def data =
-      MoveOrDrop.data(
+      Action.data(
         gf,
         fen,
         check,
@@ -232,7 +233,7 @@ object Event {
   ) extends Event {
     def typ = "drop"
     def data =
-      MoveOrDrop.data(
+      Action.data(
         gf,
         fen,
         check,
@@ -268,6 +269,7 @@ object Event {
         san = drop match {
           case StratDrop.Chess(drop)   => strategygames.chess.format.pgn.Dumper(drop)
           case StratDrop.FairySF(drop) => strategygames.fairysf.format.pgn.Dumper(drop)
+          case StratDrop.Go(drop)      => strategygames.go.format.pgn.Dumper(drop)
         },
         fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
@@ -279,6 +281,77 @@ object Event {
         possibleDrops = situation.drops,
         possibleDropsByRole = situation match {
           case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        pocketData = pocketData
+      )
+  }
+
+  case class Pass(
+      gf: GameFamily,
+      // role: Role,
+      // pos: Pos,
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+  ) extends Event {
+    def typ = "pass"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        pocketData
+      ) {
+        Json.obj(
+          //"role" -> role.groundName,
+          "uci" -> "pass",
+          "san" -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+  object Pass {
+    def apply(
+        pass: StratPass,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): Pass =
+      Pass(
+        gf = situation.board.variant.gameFamily,
+        san = "pass",
+        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
             situation.dropsByRole
           case _ => None
         },
@@ -374,6 +447,7 @@ object Event {
       case Pos.FairySF(_)      => GameLogic.FairySF().id
       case Pos.Samurai(_)      => GameLogic.Samurai().id
       case Pos.Togyzkumalak(_) => GameLogic.Togyzkumalak().id
+      case Pos.Go(_)           => GameLogic.Go().id
     }
     def typ = "promotion"
     def data =
@@ -417,16 +491,18 @@ object Event {
         )
         .add("clock" -> game.clock.map { c =>
           c match {
-            case fc: FischerClock => Json.obj(
-              "p1" -> fc.remainingTime(P1).centis,
-              "p2" -> fc.remainingTime(P2).centis
-            )
-            case bc: ByoyomiClock => Json.obj(
-              "p1" -> bc.remainingTime(P1).centis,
-              "p2" -> bc.remainingTime(P2).centis,
-              "p1Periods" -> bc.players(P1).periodsLeft,
-              "p2Periods" -> bc.players(P2).periodsLeft
-            )
+            case fc: FischerClock =>
+              Json.obj(
+                "p1" -> fc.remainingTime(P1).centis,
+                "p2" -> fc.remainingTime(P2).centis
+              )
+            case bc: ByoyomiClock =>
+              Json.obj(
+                "p1"        -> bc.remainingTime(P1).centis,
+                "p2"        -> bc.remainingTime(P2).centis,
+                "p1Periods" -> bc.players(P1).periodsLeft,
+                "p2Periods" -> bc.players(P2).periodsLeft
+              )
           }
         })
         .add("ratingDiff" -> ratingDiff.map { rds =>
@@ -477,33 +553,41 @@ object Event {
 
   sealed trait ClockEvent extends Event
 
-  case class Clock(p1: Centis, p2: Centis, p1Periods: Int = 0, p2Periods: Int = 0, nextLagComp: Option[Centis] = None) extends ClockEvent {
+  case class Clock(
+      p1: Centis,
+      p2: Centis,
+      p1Periods: Int = 0,
+      p2Periods: Int = 0,
+      nextLagComp: Option[Centis] = None
+  ) extends ClockEvent {
     def typ = "clock"
     def data =
       Json
         .obj(
-          "p1" -> p1.toSeconds,
-          "p2" -> p2.toSeconds,
+          "p1"        -> p1.toSeconds,
+          "p2"        -> p2.toSeconds,
           "p1Periods" -> p1Periods,
-          "p2Periods" -> p2Periods,
+          "p2Periods" -> p2Periods
         )
         .add("lag" -> nextLagComp.collect { case Centis(c) if c > 1 => c })
   }
   object Clock {
     def apply(clock: strategygames.Clock): Clock =
       clock match {
-        case fc: FischerClock => Clock(
-          fc.remainingTime(P1),
-          fc.remainingTime(P2),
-          nextLagComp=fc.lagCompEstimate(fc.player)
-        )
-        case bc: ByoyomiClock => Clock(
-          bc.remainingTime(P1),
-          bc.remainingTime(P2),
-          bc.players(P1).spentPeriods,
-          bc.players(P2).spentPeriods,
-          bc.lagCompEstimate(bc.player)
-        )
+        case fc: FischerClock =>
+          Clock(
+            fc.remainingTime(P1),
+            fc.remainingTime(P2),
+            nextLagComp = fc.lagCompEstimate(fc.player)
+          )
+        case bc: ByoyomiClock =>
+          Clock(
+            bc.remainingTime(P1),
+            bc.remainingTime(P2),
+            bc.players(P1).spentPeriods,
+            bc.players(P2).spentPeriods,
+            bc.lagCompEstimate(bc.player)
+          )
       }
   }
 

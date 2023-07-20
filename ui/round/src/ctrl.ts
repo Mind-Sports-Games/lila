@@ -24,6 +24,7 @@ import TransientMove from './transientMove';
 import * as atomic from './atomic';
 import * as flipello from './flipello';
 import * as mancala from './mancala';
+import * as go from './go';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -42,6 +43,7 @@ import {
   Redraw,
   SocketMove,
   SocketDrop,
+  SocketPass,
   SocketOpts,
   MoveMetadata,
   Position,
@@ -78,6 +80,7 @@ export default class RoundController {
   goneBerserk: GoneBerserk = {};
   resignConfirm?: Timeout = undefined;
   drawConfirm?: Timeout = undefined;
+  passConfirm?: Timeout = undefined;
   // will be replaced by view layer
   autoScroll: () => void = () => {};
   challengeRematched = false;
@@ -249,6 +252,9 @@ export default class RoundController {
         'oware',
         'togyzkumalak',
         'amazons',
+        'go9x9',
+        'go13x13',
+        'go19x19',
       ].includes(this.data.game.variant.key)
     )
       return false;
@@ -435,6 +441,15 @@ export default class RoundController {
     }
   };
 
+  sendPass = (variant: string): void => {
+    const pass: SocketPass = {
+      variant: variant,
+    };
+    if (blur.get()) pass.b = 1;
+    this.resign(false);
+    this.actualSendMove('pass', pass);
+  };
+
   showYourMoveNotification = () => {
     const d = this.data;
     if (game.isPlayerTurn(d))
@@ -492,16 +507,19 @@ export default class RoundController {
       } else {
         // This block needs to be idempotent, even for castling moves in
         // Chess960.
-        const keys = util.uci2move(o.uci)!,
-          pieces = this.chessground.state.pieces;
-        if (
-          !o.castle ||
-          (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
-        ) {
-          if (d.game.variant.key === 'oware' || d.game.variant.key === 'togyzkumalak') {
-            this.chessground.moveNoAnim(keys[0], keys[1]);
-          } else {
-            this.chessground.move(keys[0], keys[1]);
+        const keys = util.uci2move(o.uci);
+        if (keys !== undefined) {
+          // ignore a pass action
+          const pieces = this.chessground.state.pieces;
+          if (
+            !o.castle ||
+            (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
+          ) {
+            if (d.game.variant.key === 'oware' || d.game.variant.key === 'togyzkumalak') {
+              this.chessground.moveNoAnim(keys[0], keys[1]);
+            } else {
+              this.chessground.move(keys[0], keys[1]);
+            }
           }
         }
       }
@@ -509,6 +527,7 @@ export default class RoundController {
         // a lot of pieces can change from 1 move so update them all
         mancala.updateBoardFromFen(this, o.fen);
       }
+      if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) go.updateBoardFromFen(this, o.fen);
       if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
       }
@@ -856,6 +875,34 @@ export default class RoundController {
   private doOfferDraw = () => {
     this.lastDrawOfferAtPly = this.ply;
     this.socket.sendLoading('draw-yes', null);
+  };
+
+  canPassTurn = (): boolean =>
+    ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
+    this.isPlaying() &&
+    !this.replaying() &&
+    this.data.player.playerIndex === this.data.game.player;
+
+  passTurn = (v: boolean): void => {
+    if (this.canPassTurn()) {
+      if (this.passConfirm) {
+        if (v) this.doPassTurn();
+        clearTimeout(this.passConfirm);
+        this.passConfirm = undefined;
+      } else if (v) {
+        if (this.data.pref.confirmResign)
+          this.passConfirm = setTimeout(() => {
+            this.passTurn(false);
+          }, 3000);
+        else this.doPassTurn();
+      }
+    }
+    this.redraw();
+  };
+
+  private doPassTurn = () => {
+    this.setLoading(true);
+    this.sendPass(this.data.game.variant.key);
   };
 
   setChessground = (cg: CgApi) => {

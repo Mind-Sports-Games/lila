@@ -1,12 +1,15 @@
 package lila.round
 
 import strategygames.format.Forsyth
+import strategygames.format.FEN
 import strategygames.chess.variant._
 import strategygames.variant.Variant
 import strategygames.{
   P2,
   Clock,
   FischerClock,
+  GameFamily,
+  GameLogic,
   Player => PlayerIndex,
   Game => ChessGame,
   Board,
@@ -95,7 +98,11 @@ final private class Rematcher(
           _ = offers invalidate game.id
           _ = rematches.cache.put(game.id, nextGame.id)
           _ = if (game.variant == Variant.Chess(Chess960) && !chess960.get(game.id)) chess960.put(nextGame.id)
-          _ <- gameRepo insertDenormalized nextGame
+          initialFen =
+            if (game.variant.gameFamily == GameFamily.Go())
+              Some(FEN.Go(nextGame.board.toGo.apiPosition.initialFen))
+            else None
+          _ <- gameRepo.insertDenormalized(nextGame, initialFen)
         } yield {
           if (nextGame.metadata.multiMatchGameNr.fold(false)(x => x >= 2))
             messenger.system(game, trans.multiMatchRematchStarted.txt())
@@ -129,7 +136,7 @@ final private class Rematcher(
 
   private def returnGame(game: Game): Fu[Game] = {
     for {
-      initialFen <- gameRepo initialFen game
+      initialFen <- gameRepo.initialFen(game)
       situation = initialFen.flatMap { fen => Forsyth.<<<(game.variant.gameLogic, fen) }
       pieces: PieceMap = game.variant match {
         case Variant.Chess(Chess960) =>
@@ -142,17 +149,26 @@ final private class Rematcher(
           situation.fold(
             Variant.libStandard(game.variant.gameLogic).pieces
           )(_.situation.board.pieces)
-        case variant =>
-          variant.pieces
+        case variant => variant.pieces
       }
       users <- userRepo byIds game.userIds
-      board = Board(game.variant.gameLogic, pieces, variant = game.variant).withHistory(
-        History(
-          game.variant.gameLogic,
-          lastMove = situation.flatMap(_.situation.board.history.lastMove),
-          castles = situation.fold(Castles.init)(_.situation.board.history.castles)
-        )
-      )
+      //Support go from position, i.e. handicapped start pos.
+      board = (game.variant.gameLogic, game.variant, situation.map(_.situation)) match {
+        case (GameLogic.Go(), Variant.Go(variant), Some(strategygames.Situation.Go(sit))) =>
+          Board.Go(
+            strategygames.go
+              .Board(sit.board.pieces, variant)
+              .withPosition(sit.board.position)
+          )
+        case _ =>
+          Board(game.variant.gameLogic, pieces, variant = game.variant).withHistory(
+            History(
+              game.variant.gameLogic,
+              lastMove = situation.flatMap(_.situation.board.history.lastMove),
+              castles = situation.fold(Castles.init)(_.situation.board.history.castles)
+            )
+          )
+      }
       game <- Game.make(
         chess = ChessGame(
           game.variant.gameLogic,

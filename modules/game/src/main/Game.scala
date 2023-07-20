@@ -17,7 +17,9 @@ import strategygames.{
   GameLogic,
   Mode,
   Move,
-  MoveOrDrop,
+  Drop,
+  Pass,
+  Action,
   Pos,
   Speed,
   Status,
@@ -245,15 +247,15 @@ case class Game(
     }
   }
 
-  // apply a move
+  // apply a move (now called action)
   def update(
       game: StratGame, // new chess position
-      moveOrDrop: MoveOrDrop,
+      action: Action,
       blur: Boolean = false
   ): Progress = {
 
     def copyPlayer(player: Player) =
-      if (blur && moveOrDrop.fold(_.player, _.player) == player.playerIndex)
+      if (blur && action.player == player.playerIndex)
         player.copy(
           blurs = player.blurs.add(playerMoves(player.playerIndex))
         )
@@ -295,10 +297,13 @@ case class Game(
       updated.playableCorrespondenceClock map Event.CorrespondenceClock.apply
     }
 
-    val events = moveOrDrop.fold(
-      Event.Move(_, game.situation, state, clockEvent, updated.board.pocketData),
-      Event.Drop(_, game.situation, state, clockEvent, updated.board.pocketData)
-    ) :: {
+    val events = {
+      action match {
+        case m: Move => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
+        case d: Drop => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
+        case p: Pass => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
+      }
+    } :: {
       // abstraction leak, I know.
       if (updated.board.variant.gameLogic == GameLogic.Draughts())
         (updated.board.variant.frisianVariant || updated.board.variant.draughts64Variant) ?? List(
@@ -311,6 +316,10 @@ case class Game(
         )
       else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
         (updated.board.variant.togyzkumalak) ?? List(
+          Event.Score(p1 = updated.history.score.p1, updated.history.score.p2)
+        )
+      else if (updated.board.variant.gameLogic == GameLogic.Go())
+        (updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? List(
           Event.Score(p1 = updated.history.score.p1, updated.history.score.p2)
         )
       else //chess
@@ -329,6 +338,7 @@ case class Game(
     history.lastMove map {
       case d: Uci.Drop => s"${d.pos}${d.pos}"
       case m: Uci.Move => m.keys
+      case _: Uci.Pass => "pass"
       case _           => sys.error("Type Error")
     }
 

@@ -52,8 +52,8 @@ export const justIcon = (icon: string): VNodeData => ({
 
 // TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
-  if (!uci) return undefined;
-  const pos = uci.match(/[a-z][1-9]0?/g) as cg.Key[];
+  if (!uci || uci == 'pass') return undefined;
+  const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
   return [pos[0], pos[1]] as cg.Key[];
 };
@@ -81,10 +81,10 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
   if (!dests) return dec;
   if (typeof dests == 'string')
     for (const ds of dests.split(' ')) {
-      const pos = ds.match(/[a-z][1-9]0?/g) as cg.Key[];
+      const pos = ds.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
       dec.set(pos[0], pos.slice(1));
     }
-  else for (const k in dests) dec.set(k, dests[k].match(/[a-z][1-9]0?/g) as cg.Key[]);
+  else for (const k in dests) dec.set(k, dests[k].match(/[a-z][1-9][0-9]?/g) as cg.Key[]);
   return dec;
 }
 
@@ -140,6 +140,10 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
 
 export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
+}
+
+export function getGoScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
 }
 
 export const noChecks: CheckCount = {

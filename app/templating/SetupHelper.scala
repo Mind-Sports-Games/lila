@@ -90,6 +90,18 @@ trait SetupHelper { self: I18nHelper =>
       (TimeMode.Unlimited.id.toString, trans.unlimited.txt(), none)
     )
 
+  val goHandicapChoices: List[SelectChoice] = {
+    (0 to 9).toList map { s =>
+      (s.toString, s.toString, none)
+    }
+  }
+
+  val goKomiChoices: List[SelectChoice] = {
+    (-100 to 100 by 5).toList map { s =>
+      (s.toString, (s / 10.0).toString.replace(".0", ""), none)
+    }
+  }
+
   def translatedReasonChoices(implicit lang: Lang) =
     List(
       (Reason.Cheat.key, trans.cheat.txt()),

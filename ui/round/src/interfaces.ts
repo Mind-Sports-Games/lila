@@ -38,6 +38,11 @@ export interface SocketDrop {
   b?: 1;
 }
 
+export interface SocketPass {
+  variant: string;
+  b?: 1;
+}
+
 export type EncodedDests =
   | string
   | {

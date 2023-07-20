@@ -31,7 +31,13 @@ final class UserAnalysis(
           case Some(variant) => load(fen, variant)
           case _ if FEN.clean(GameLogic.Chess(), fen) == Variant.libStandard(GameLogic.Chess()).initialFen =>
             load(arg, Variant.libStandard(GameLogic.Chess()))
-          case _ => load(arg, Variant.libFromPosition(GameLogic.Chess()))
+          case _ =>
+            load(
+              arg,
+              Variant
+                .apply(GameLogic.Chess(), "fromPosition")
+                .getOrElse(Variant.orDefault(GameLogic.Chess(), 3))
+            )
         }
       case _ => load("", Variant.libStandard(GameLogic.Chess()))
     }

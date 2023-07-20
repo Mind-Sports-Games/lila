@@ -164,6 +164,15 @@ export const drawConfirm = (ctrl: RoundController): VNode =>
     fbtCancel(ctrl, ctrl.offerDraw),
   ]);
 
+export const passConfirm = (ctrl: RoundController): VNode =>
+  h('div.act-confirm', [
+    h('button.fbt.yes.pass-yes', {
+      attrs: { title: ctrl.noarg('passTurn'), 'data-icon': '' },
+      hook: util.bind('click', () => ctrl.passTurn(true)),
+    }),
+    fbtCancel(ctrl, ctrl.passTurn),
+  ]);
+
 export function threefoldClaimDraw(ctrl: RoundController) {
   return ctrl.data.game.threefold
     ? h('div.suggestion', [

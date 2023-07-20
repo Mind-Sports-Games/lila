@@ -517,6 +517,27 @@ object TournamentShield {
           26,
           1
         )
+    case object Go9x9
+        extends Category(
+          Variant.Go(strategygames.go.variant.Go9x9),
+          Blitz32,
+          24,
+          1
+        )
+    case object Go13x13
+        extends Category(
+          Variant.Go(strategygames.go.variant.Go13x13),
+          Blitz53,
+          12,
+          1
+        )
+    case object Go19x19
+        extends Category(
+          Variant.Go(strategygames.go.variant.Go19x19),
+          Blitz53,
+          1,
+          1
+        )
 
     val all: List[Category] = List(
       Chess,
@@ -550,7 +571,10 @@ object TournamentShield {
       Flipello10,
       Amazons,
       Oware,
-      Togyzkumalak
+      Togyzkumalak,
+      Go9x9,
+      Go13x13,
+      Go19x19
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

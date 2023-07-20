@@ -42,7 +42,7 @@ import { Position, PositionError } from 'stratops/chess';
 import { Result } from '@badrap/result';
 import { setupPosition } from 'stratops/variant';
 import { storedProp, StoredBooleanProp } from 'common/storage';
-import { AnaMove, StudyCtrl } from './study/interfaces';
+import { AnaMove, AnaPass, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
 
@@ -262,8 +262,8 @@ export default class AnalyseCtrl {
 
   private uciToLastMove(uci?: Uci): Key[] | undefined {
     if (!uci) return;
-    if (uci[1] === '@') return [uci.substr(2, 2), uci.substr(2, 2)] as Key[];
-    return [uci.substr(0, 2), uci.substr(2, 2)] as Key[];
+    if (uci[1] === '@') return [uci.substring(2), uci.substring(2)] as Key[];
+    return [uci.substring(0, 2), uci.substring(2, 2)] as Key[]; //todo fix for moves on 10x10 board
   }
 
   private showGround(): void {
@@ -532,6 +532,19 @@ export default class AnalyseCtrl {
     if (prom) move.promotion = prom;
     if (this.practice) this.practice.onUserMove();
     this.socket.sendAnaMove(move);
+    this.preparePremoving();
+    this.redraw();
+  };
+
+  sendPass = (): void => {
+    const pass: AnaPass = {
+      variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
+      fen: this.node.fen,
+      path: this.path,
+    };
+    if (this.practice) this.practice.onUserMove();
+    this.socket.sendAnaPass(pass);
     this.preparePremoving();
     this.redraw();
   };

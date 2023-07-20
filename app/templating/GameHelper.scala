@@ -43,8 +43,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         }
     val mode = game.mode.name
     val variant =
-      if (game.variant == Variant.libFromPosition(game.variant.gameLogic))
-        s"position setup ${game.variant.gameLogic.name}"
+      if (game.variant.fromPositionVariant) s"position setup ${game.variant.gameLogic.name}"
       else if (game.variant.exotic) VariantKeys.variantName(game.variant)
       else game.variant.gameLogic.name.toLowerCase()
     import strategygames.Status._
@@ -53,7 +52,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             Some(w),
             _,
             Mate,
-            GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak()
+            GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
+            GameLogic.Go()
           ) =>
         s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate | PerpetualCheck, _) =>
@@ -170,7 +170,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Aborted => trans.gameAborted.txt()
       case S.Mate =>
         game.variant.gameLogic match {
-          case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() =>
+          case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
+              GameLogic.Go() =>
             trans.checkmate.txt()
           case _ => ""
         }
@@ -216,7 +217,10 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             if (game.situation.isRepetition) trans.owareCycle.txt() else trans.gameFinished.txt()
           case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
             trans.gameFinished.txt()
-          case _ => trans.variantEnding.txt()
+          case Variant.Go(strategygames.go.variant.Go9x9)   => trans.gameFinished.txt()
+          case Variant.Go(strategygames.go.variant.Go13x13) => trans.gameFinished.txt()
+          case Variant.Go(strategygames.go.variant.Go19x19) => trans.gameFinished.txt()
+          case _                                            => trans.variantEnding.txt()
         }
       case _ => ""
     }
