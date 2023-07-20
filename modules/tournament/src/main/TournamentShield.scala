@@ -528,14 +528,14 @@ object TournamentShield {
         extends Category(
           Variant.Go(strategygames.go.variant.Go13x13),
           Blitz53,
-          23,
+          12,
           1
         )
     case object Go19x19
         extends Category(
           Variant.Go(strategygames.go.variant.Go19x19),
           Blitz53,
-          22,
+          1,
           1
         )
 
