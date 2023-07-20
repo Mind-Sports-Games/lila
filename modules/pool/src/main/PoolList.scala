@@ -40,6 +40,8 @@ object PoolList {
 
   val clockStringSet: Set[String] = all.view.map(_.clock.show) to Set
 
+  val variantSet: Set[Variant] = all.view.map(_.variant) to Set
+
   val json = Json toJson all
 
   implicit private class PimpedInt(self: Int) {

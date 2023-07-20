@@ -82,6 +82,7 @@ export function view(ctrl: PieceCtrl): VNode {
   ]);
 }
 
+// keep up to date with StrategyGames
 const gameFamily: GameFamilyKey[] = [
   'chess',
   'draughts',
