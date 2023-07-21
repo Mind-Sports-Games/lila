@@ -14,6 +14,8 @@ import { Combo } from 'puz/combo';
 import CurrentPuzzle from 'puz/current';
 import { Clock } from 'puz/clock';
 
+const parseUciChess = parseUci('chess');
+
 export default class StormCtrl {
   private data: StormData;
   private redraw: () => void;
@@ -91,7 +93,7 @@ export default class StormCtrl {
       this.promotion.cancel();
       const uci = `${orig}${dest}${promotion ? (promotion == 'n-piece' ? 'n' : promotion[0]) : ''}`;
       const pos = puzzle.position();
-      const move = parseUci(uci)!;
+      const move = parseUciChess(uci)!;
       let captureSound = pos.board.occupied.has(move.to);
       pos.play(move);
       const correct = pos.isCheckmate() || uci == puzzle.expectedMove();
@@ -109,7 +111,7 @@ export default class StormCtrl {
           if (!this.incPuzzle()) this.end();
         } else {
           puzzle.moveIndex++;
-          captureSound = captureSound || pos.board.occupied.has(parseUci(puzzle.line[puzzle.moveIndex]!)!.to);
+          captureSound = captureSound || pos.board.occupied.has(parseUciChess(puzzle.line[puzzle.moveIndex]!)!.to);
         }
         sound.move(captureSound);
       } else {

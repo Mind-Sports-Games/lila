@@ -46,7 +46,7 @@ import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
-import { isOnlyDropsPly, variantToRules } from './util';
+import { isOnlyDropsPly } from './util';
 
 export default class AnalyseCtrl {
   data: AnalyseData;
@@ -254,8 +254,6 @@ export default class AnalyseCtrl {
   }
 
   turnPlayerIndex(): PlayerIndex {
-    console.log(`this.node.ply: ${this.node.ply}`);
-    console.log(`this.data.game.variant.key: ${this.data.game.variant.key} `);
     return util.plyPlayerIndex(this.node.ply, this.data.game.variant.key);
   }
 
@@ -274,9 +272,7 @@ export default class AnalyseCtrl {
     this.onChange();
     if (!defined(this.node.dests)) this.getDests();
     this.withCg(cg => {
-      console.log("HERE 2");
       cg.set(this.makeCgOpts());
-      console.log("HERE 3");
       this.setAutoShapes();
       const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
       setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
@@ -292,7 +288,6 @@ export default class AnalyseCtrl {
 
   getDests: () => void = throttle(800, () => {
     if (!this.embed && !defined(this.node.dests)) {
-      console.log("requesting dests");
       this.socket.sendAnaDests({
         variant: this.data.game.variant.key,
         lib: this.data.game.variant.lib,
@@ -303,10 +298,6 @@ export default class AnalyseCtrl {
   });
 
   makeCgOpts(): ChessgroundConfig {
-    console.log(`this.gamebookPlay(): ${this.gamebookPlay()}`)
-    console.log(`this.practice: ${this.practice}`)
-    console.log(`this.bottomPlayerIndex(): ${this.bottomPlayerIndex()}`)
-    console.log(`this.embed: ${this.embed}`)
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
       dests = stratUtils.readDests(this.node.dests),
@@ -347,11 +338,6 @@ export default class AnalyseCtrl {
       enabled: false,
     };
     this.cgConfig = config;
-    console.log(dests);
-    console.log(this.embed);
-    console.log(playerIndex);
-    console.log(movablePlayerIndex);
-    console.log(movablePlayerIndex == playerIndex);
     return config;
   }
 
@@ -523,7 +509,6 @@ export default class AnalyseCtrl {
           dest: this.node.uci.substring(2, 4),
         }
         drop.fen = this.tree.parentNode(this.path).fen;
-        console.log(drop.fen);
         // Add in 
       }
       this.socket.sendAnaDrop(drop);
@@ -531,7 +516,6 @@ export default class AnalyseCtrl {
       this.redraw();
     } else this.jump(this.path);
     if (!this.data.onlyDropsVariant || this.data.game.variant.key === "amazons") {
-      console.log("cancel drops");
       cancelDropMode(this.chessground.state);
       this.redraw();
     }
@@ -540,18 +524,14 @@ export default class AnalyseCtrl {
   userMove = (orig: Key, dest: Key, capture?: JustCaptured): void => {
     this.justPlayed = orig;
     this.justDropped = undefined;
-    console.log("here");
     const piece = this.chessground.state.pieces.get(dest);
-    console.log(`piece: ${piece}`);
     const isCapture = capture || (piece && piece.role == 'p-piece' && orig[0] != dest[0]);
-    console.log(`isCapture: ${isCapture}`);
     this.sound[isCapture ? 'capture' : 'move']();
     if (!promotion.start(this, orig, dest, capture, this.sendMove)) this.sendMove(orig, dest, capture);
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
   };
 
   sendMove = (orig: Key, dest: Key, capture?: JustCaptured, prom?: cg.Role): void => {
-    console.log(`sendMove: this.node.fen: ${this.node.fen}`);
     const move: AnaMove = {
       orig,
       dest,
@@ -589,20 +569,13 @@ export default class AnalyseCtrl {
   };
 
   addNode(node: Tree.Node, path: Tree.Path) {
-    console.log(`wut: ${node}`);
     const newPath = this.tree.addNode(node, path);
-    console.log(`12 newPath: ${newPath}`);
     if (!newPath) {
-      console.log("Can't addNode", node, path);
       return this.redraw();
     }
-    console.log(1);
     this.jump(newPath);
-    console.log(2);
     this.redraw();
-    console.log(3);
     this.chessground.playPremove();
-    console.log(4);
     const parsedDests = stratUtils.readDests(node.dests);
     if (parsedDests) {
       this.maybeForceMove(parsedDests);
@@ -610,11 +583,7 @@ export default class AnalyseCtrl {
   }
 
   addDests(dests: string, path: Tree.Path): void {
-    console.log(`asdfasdfa`);
     this.tree.addDests(dests, path);
-    console.log(`path: ${path}`);
-    console.log(`this.path: ${this.path}`);
-    console.log(`path==this.path: ${path == this.path}`);
     if (path === this.path) {
       this.showGround();
       if (this.outcome()) this.ceval.stop();
@@ -720,7 +689,7 @@ export default class AnalyseCtrl {
       variant: this.data.game.variant,
       standardMaterial:
         !this.data.game.initialFen ||
-        parseFen(util.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
+        parseFen(stratUtils.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
           setup =>
             PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
@@ -754,7 +723,6 @@ export default class AnalyseCtrl {
   }
 
   outcome(node?: Tree.Node): Outcome | undefined {
-    console.log("outcome");
     return this.position(node || this.node).unwrap(
       pos => pos.outcome(),
       _ => undefined
@@ -762,9 +730,7 @@ export default class AnalyseCtrl {
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    console.log("parsing fen");
-    const setup = parseFen(util.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
-    console.log(`done parsing fen: ${setup}`);
+    const setup = parseFen(stratUtils.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
     return setupPosition(playstrategyRules(this.data.game.variant.key), setup);
   }
 
@@ -910,13 +876,13 @@ export default class AnalyseCtrl {
   }
 
   playUci(uci: Uci): void {
-    const move = parseUci(variantToRules(this.data.game.variant.key))(uci)!;
-    const to = makeSquare(variantToRules(this.data.game.variant.key))(move.to);
+    const move = parseUci(stratUtils.variantToRules(this.data.game.variant.key))(uci)!;
+    const to = makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.to);
     if (isNormal(move)) {
-      const piece = this.chessground.state.pieces.get(makeSquare(variantToRules(this.data.game.variant.key))(move.from));
+      const piece = this.chessground.state.pieces.get(makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from));
       const capture = this.chessground.state.pieces.get(to);
       this.sendMove(
-        makeSquare(variantToRules(this.data.game.variant.key))(move.from),
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
         to,
         capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
         move.promotion

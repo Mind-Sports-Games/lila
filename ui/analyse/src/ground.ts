@@ -2,6 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { Chessground } from 'chessground';
 import { Api as CgApi } from 'chessground/api';
 import { Config as CgConfig } from 'chessground/config';
+import { setDropMode } from 'chessground/drop';
 import * as cg from 'chessground/types';
 import { DrawShape } from 'chessground/draw';
 import changeColorHandle from 'common/coordsColor';
@@ -18,6 +19,15 @@ export function render(ctrl: AnalyseCtrl): VNode {
         ctrl.setAutoShapes();
         if (ctrl.node.shapes) ctrl.chessground.setShapes(ctrl.node.shapes as DrawShape[]);
         ctrl.cgVersion.dom = ctrl.cgVersion.js;
+        // TODO: this is now duplicated between here and showGround()
+        const playerIndex = ctrl.chessground.state.movable.playerIndex as cg.PlayerIndex;
+        setDropMode(ctrl.chessground.state, stratUtils.onlyDropsVariantPiece(ctrl.chessground.state.variant as VariantKey, playerIndex));
+        ctrl.chessground.set({
+          dropmode: {
+            showDropDests: true,
+            dropDests: stratUtils.readDropsByRole(ctrl.node.dropsByRole),
+          },
+        });
       },
       destroy: _ => ctrl.chessground.destroy(),
     },

@@ -1,7 +1,6 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
 import { fixCrazySan } from 'stratutils';
 import * as cg from 'chessground/types';
-import { Rules } from 'stratops/types';
 
 export { autolink, innerHTML, enrichText, richHTML, toYouTubeEmbed, toTwitchEmbed } from 'common/richText';
 
@@ -298,56 +297,6 @@ export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
   };
 };
 
-export const variantToRules = (v: VariantKey): Rules => {
-  switch (v) {
-    case 'standard':
-      return 'chess';
-    case 'chess960':
-      return 'chess';
-    case 'antichess':
-      return 'antichess';
-    case 'fromPosition':
-      return 'chess';
-    case 'kingOfTheHill':
-      return 'kingofthehill';
-    case 'threeCheck':
-      return '3check';
-    case 'fiveCheck':
-      return '5check';
-    case 'atomic':
-      return 'atomic';
-    case 'horde':
-      return 'horde';
-    case 'racingKings':
-      return 'racingkings';
-    case 'crazyhouse':
-      return 'crazyhouse';
-    case 'noCastling':
-      return 'nocastling';
-    case 'linesOfAction':
-      return 'linesofaction';
-    case 'scrambledEggs':
-      return 'scrambledeggs';
-    case 'shogi':
-      return 'shogi';
-    case 'xiangqi':
-      return 'xiangqi';
-    case 'minishogi':
-      return 'minishogi';
-    case 'minixiangqi':
-      return 'minixiangqi';
-    case 'flipello':
-      return 'flipello';
-    case 'flipello10':
-      return 'flipello10';
-    case 'amazons':
-      return 'amazons';
-    case 'oware':
-      return 'oware';
-    case 'togyzkumalak':
-      return 'togyzkumalak';
-  }
-};
 
 export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultValue: boolean) => {
   if (variantKey === 'amazons') return node.drops !== undefined && node.drops !== null && node.drops.length > 0;

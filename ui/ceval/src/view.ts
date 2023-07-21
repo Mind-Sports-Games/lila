@@ -9,6 +9,7 @@ import { opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
 import { renderEval } from './util';
 import { setupPosition } from 'stratops/variant';
+import { variantToRules } from "stratutils"
 
 let gaugeLast = 0;
 const gaugeTicks: VNode[] = [...Array(8).keys()].map(i =>
@@ -29,9 +30,9 @@ function localEvalInfo(ctrl: ParentCtrl, evs: NodeEvals): Array<VNode | string> 
 
   const t: Array<VNode | string> = evs.client.cloud
     ? [
-        trans('depthX', evs.client.depth || 0),
-        h('span.cloud', { attrs: { title: trans.noarg('cloudAnalysis') } }, 'Cloud'),
-      ]
+      trans('depthX', evs.client.depth || 0),
+      h('span.cloud', { attrs: { title: trans.noarg('cloudAnalysis') } }, 'Cloud'),
+    ]
     : [trans('depthX', (evs.client.depth || 0) + '/' + evs.client.maxDepth)];
   if (ceval.canGoDeeper())
     t.push(
@@ -87,21 +88,21 @@ function engineName(ctrl: CevalCtrl): VNode[] {
     ),
     ctrl.technology == 'nnue'
       ? h(
-          'span.technology.good',
-          {
-            attrs: { title: 'Multi-threaded WebAssembly with SIMD (efficiently updatable neural network, strongest)' },
-          },
-          'NNUE'
-        )
+        'span.technology.good',
+        {
+          attrs: { title: 'Multi-threaded WebAssembly with SIMD (efficiently updatable neural network, strongest)' },
+        },
+        'NNUE'
+      )
       : ctrl.technology == 'hce'
-      ? h(
+        ? h(
           'span.technology.good',
           { attrs: { title: 'Multi-threaded WebAssembly (classical hand crafted evaluation)' } },
           'HCE'
         )
-      : ctrl.technology == 'wasm'
-      ? h('span.technology', { attrs: { title: 'Single-threaded WebAssembly fallback (slow)' } }, 'WASM')
-      : h('span.technology', { attrs: { title: 'Single-threaded JavaScript fallback (very slow)' } }, 'ASMJS'),
+        : ctrl.technology == 'wasm'
+          ? h('span.technology', { attrs: { title: 'Single-threaded WebAssembly fallback (slow)' } }, 'WASM')
+          : h('span.technology', { attrs: { title: 'Single-threaded JavaScript fallback (very slow)' } }, 'ASMJS'),
   ];
 }
 
@@ -177,67 +178,67 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
 
   const progressBar: VNode | null = enabled
     ? h(
-        'div.bar',
-        h('span', {
-          class: { threat: threatMode },
-          attrs: { style: `width: ${percent}%` },
-          hook: {
-            postpatch: (old, vnode) => {
-              if (old.data!.percent > percent || !!old.data!.threatMode != threatMode) {
-                const el = vnode.elm as HTMLElement;
-                const p = el.parentNode as HTMLElement;
-                p.removeChild(el);
-                p.appendChild(el);
-              }
-              vnode.data!.percent = percent;
-              vnode.data!.threatMode = threatMode;
-            },
+      'div.bar',
+      h('span', {
+        class: { threat: threatMode },
+        attrs: { style: `width: ${percent}%` },
+        hook: {
+          postpatch: (old, vnode) => {
+            if (old.data!.percent > percent || !!old.data!.threatMode != threatMode) {
+              const el = vnode.elm as HTMLElement;
+              const p = el.parentNode as HTMLElement;
+              p.removeChild(el);
+              p.appendChild(el);
+            }
+            vnode.data!.percent = percent;
+            vnode.data!.threatMode = threatMode;
           },
-        })
-      )
+        },
+      })
+    )
     : null;
 
   const body: Array<VNode | null> = enabled
     ? [
-        h('pearl', [pearl]),
-        h('div.engine', [
-          ...(threatMode ? [trans.noarg('showThreat')] : engineName(instance)),
-          h(
-            'span.info',
-            ctrl.outcome()
-              ? [trans.noarg('gameOver')]
-              : threatMode
+      h('pearl', [pearl]),
+      h('div.engine', [
+        ...(threatMode ? [trans.noarg('showThreat')] : engineName(instance)),
+        h(
+          'span.info',
+          ctrl.outcome()
+            ? [trans.noarg('gameOver')]
+            : threatMode
               ? [threatInfo(ctrl, threat)]
               : localEvalInfo(ctrl, evs)
-          ),
-        ]),
-      ]
+        ),
+      ]),
+    ]
     : [
-        pearl ? h('pearl', [pearl]) : null,
-        h('help', [...engineName(instance), h('br'), trans.noarg('inLocalBrowser')]),
-      ];
+      pearl ? h('pearl', [pearl]) : null,
+      h('help', [...engineName(instance), h('br'), trans.noarg('inLocalBrowser')]),
+    ];
 
   const switchButton: VNode | null =
     ctrl.mandatoryCeval && ctrl.mandatoryCeval()
       ? null
       : h(
-          'div.switch',
-          {
-            attrs: { title: trans.noarg('toggleLocalEvaluation') + ' (l)' },
-          },
-          [
-            h('input#analyse-toggle-ceval.cmn-toggle.cmn-toggle--subtle', {
-              attrs: {
-                type: 'checkbox',
-                checked: enabled,
-              },
-              hook: {
-                insert: vnode => (vnode.elm as HTMLElement).addEventListener('change', ctrl.toggleCeval),
-              },
-            }),
-            h('label', { attrs: { for: 'analyse-toggle-ceval' } }),
-          ]
-        );
+        'div.switch',
+        {
+          attrs: { title: trans.noarg('toggleLocalEvaluation') + ' (l)' },
+        },
+        [
+          h('input#analyse-toggle-ceval.cmn-toggle.cmn-toggle--subtle', {
+            attrs: {
+              type: 'checkbox',
+              checked: enabled,
+            },
+            hook: {
+              insert: vnode => (vnode.elm as HTMLElement).addEventListener('change', ctrl.toggleCeval),
+            },
+          }),
+          h('label', { attrs: { for: 'analyse-toggle-ceval' } }),
+        ]
+      );
 
   return h(
     'div.ceval' + (enabled ? '.enabled' : ''),
@@ -269,7 +270,7 @@ function getElPvMoves(e: MouseEvent): (string | null)[] {
     .closest('div.pv')
     .children()
     .filter('span.pv-san')
-    .each(function () {
+    .each(function() {
       pvMoves.push($(this).attr('data-board'));
     });
 
@@ -283,12 +284,12 @@ function checkHover(el: HTMLElement, instance: CevalCtrl): void {
   );
 }
 
-export function renderPvs(ctrl: ParentCtrl): VNode | undefined {
+export const renderPvs = (variantKey: VariantKey) => (ctrl: ParentCtrl): VNode | undefined => {
   const instance = ctrl.getCeval();
   if (!instance.allowed() || !instance.possible || !instance.enabled()) return;
   const multiPv = parseInt(instance.multiPv()),
     node = ctrl.getNode(),
-    setup = parseFen('chess')(node.fen).unwrap();
+    setup = parseFen(variantToRules(variantKey))(node.fen).unwrap();
   let pvs: Tree.PvData[],
     threat = false,
     pvMoves: (string | null)[],

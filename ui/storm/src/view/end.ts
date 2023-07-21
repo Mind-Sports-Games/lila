@@ -7,6 +7,8 @@ import { numberSpread } from 'common/number';
 import { parseFen, makeFen } from 'stratops/fen';
 import { parseUci } from 'stratops/util';
 
+const parseUciChess = parseUci('chess');
+
 const renderEnd = (ctrl: StormCtrl): VNode[] => [...renderSummary(ctrl), renderHistory(ctrl)];
 
 const newHighI18n = {
@@ -25,16 +27,16 @@ const renderSummary = (ctrl: StormCtrl): VNode[] => {
   return [
     ...(high
       ? [
-          h(
-            'div.storm--end__high.storm--end__high-daily.bar-glider',
-            h('div.storm--end__high__content', [
-              h('div.storm--end__high__text', [
-                h('strong', noarg(newHighI18n[high.key])),
-                high.prev ? h('span', ctrl.trans('previousHighscoreWasX', high.prev)) : null,
-              ]),
-            ])
-          ),
-        ]
+        h(
+          'div.storm--end__high.storm--end__high-daily.bar-glider',
+          h('div.storm--end__high__content', [
+            h('div.storm--end__high__text', [
+              h('strong', noarg(newHighI18n[high.key])),
+              high.prev ? h('span', ctrl.trans('previousHighscoreWasX', high.prev)) : null,
+            ]),
+          ])
+        ),
+      ]
       : []),
     h('div.storm--end__score', [
       h(
@@ -120,7 +122,7 @@ const renderHistory = (ctrl: StormCtrl): VNode => {
                 hook: onInsert(e => {
                   const pos = Chess.fromSetup(parseFen('chess')(round.puzzle.fen).unwrap()).unwrap();
                   const uci = round.puzzle.line.split(' ')[0];
-                  pos.play(parseUci(uci)!);
+                  pos.play(parseUciChess(uci)!);
                   miniBoard.initWith(e, makeFen('chess')(pos.toSetup()), pos.turn, uci);
                 }),
               }),

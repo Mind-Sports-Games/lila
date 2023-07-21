@@ -3,7 +3,7 @@ package lila.study
 import strategygames.opening.FullOpeningDB
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ Game, GameLogic }
+import strategygames.{ Game, GameLogic, Situation }
 import lila.tree
 
 object TreeBuilder {
@@ -25,7 +25,8 @@ object TreeBuilder {
     makeRoot(root, variant).copy(dests = dests.some, dropsByRole = dropsByRole)
   }
 
-  def toBranch(node: Node, variant: Variant): tree.Branch =
+  def toBranch(node: Node, variant: Variant): tree.Branch = {
+    val g = Game(variant.gameLogic, variant.some, node.fen.some)
     tree.Branch(
       id = node.id,
       ply = node.ply,
@@ -44,10 +45,17 @@ object TreeBuilder {
       opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? (
         FullOpeningDB.findByFen(variant.gameLogic, node.fen)
       ),
-      forceVariation = node.forceVariation
+      forceVariation = node.forceVariation,
+      dropsByRole = g.situation match {
+        case (Situation.FairySF(_)) =>
+          g.situation.dropsByRole
+        case _ => None
+      }
     )
+  }
 
-  def makeRoot(root: Node.Root, variant: Variant): tree.Root =
+  def makeRoot(root: Node.Root, variant: Variant): tree.Root = {
+    val g = Game(variant.gameLogic, variant.some, root.fen.some)
     tree.Root(
       ply = root.ply,
       variant = variant,
@@ -63,8 +71,14 @@ object TreeBuilder {
       children = toBranches(root.children, variant),
       opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? (
         FullOpeningDB.findByFen(variant.gameLogic, root.fen)
-      )
+      ),
+      dropsByRole = g.situation match {
+        case (Situation.FairySF(_)) =>
+          g.situation.dropsByRole
+        case _ => None
+      }
     )
+  }
 
   private def toBranches(children: Node.Children, variant: Variant): List[tree.Branch] =
     children.nodes.view.map(toBranch(_, variant)).toList

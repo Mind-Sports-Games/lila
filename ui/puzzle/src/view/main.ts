@@ -73,7 +73,7 @@ function controls(ctrl: Controller): VNode {
 
 let cevalShown = false;
 
-export default function (ctrl: Controller): VNode {
+export default function(ctrl: Controller): VNode {
   const showCeval = ctrl.vm.showComputer(),
     gaugeOn = ctrl.showEvalGauge();
   if (cevalShown !== showCeval) {
@@ -121,7 +121,7 @@ export default function (ctrl: Controller): VNode {
           {
             class: { none: !showCeval },
           },
-          showCeval ? [cevalView.renderCeval(ctrl), cevalView.renderPvs(ctrl)] : []
+          showCeval ? [cevalView.renderCeval(ctrl), cevalView.renderPvs('standard')(ctrl)] : []
         ),
         renderAnalyse(ctrl),
         feedbackView(ctrl),
@@ -157,22 +157,22 @@ function session(ctrl: Controller) {
       ? ctrl.streak
         ? null
         : h('a.session-new', {
-            key: 'new',
-            attrs: {
-              href: `/training/${ctrl.session.theme}`,
-            },
-          })
-      : h(
-          'a.result-cursor.current',
-          {
-            key: current,
-            attrs: ctrl.streak
-              ? {}
-              : {
-                  href: `/training/${ctrl.session.theme}/${current}`,
-                },
+          key: 'new',
+          attrs: {
+            href: `/training/${ctrl.session.theme}`,
           },
-          ctrl.streak?.data.index
-        ),
+        })
+      : h(
+        'a.result-cursor.current',
+        {
+          key: current,
+          attrs: ctrl.streak
+            ? {}
+            : {
+              href: `/training/${ctrl.session.theme}/${current}`,
+            },
+        },
+        ctrl.streak?.data.index
+      ),
   ]);
 }

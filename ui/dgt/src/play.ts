@@ -5,7 +5,12 @@ import { NormalMove } from 'stratops/types';
 import { board } from 'stratops/debug';
 import { defaultSetup, fen, makeUci, parseUci } from 'stratops';
 
-export default function (token: string) {
+const makeSanChess = makeSan('chess');
+const parseSanChess = parseSan('chess');
+const makeUciChess = makeUci('chess');
+const parseUciChess = parseUci('chess');
+
+export default function(token: string) {
   const root = document.getElementById('dgt-play-zone') as HTMLDivElement;
   const consoleOutput = document.getElementById('dgt-play-zone-log') as HTMLPreElement;
 
@@ -118,7 +123,7 @@ export default function (token: string) {
     function fixLoggingFunc(name: string) {
       console['old' + name] = console[name];
       //Rewire function
-      console[name] = function () {
+      console[name] = function() {
         //Return a promise so execution is not delayed by string manipulation
         return new Promise<void>(resolve => {
           let output = '';
@@ -529,7 +534,7 @@ export default function (token: string) {
       for (let i = 0; i < moves.length; i++) {
         if (moves[i] != '') {
           //Make any move that may have been already played on the ChessBoard. Useful when reconnecting
-          const uciMove = <NormalMove>parseUci(moves[i]);
+          const uciMove = <NormalMove>parseUciChess(moves[i]);
           const normalizedMove = chess.normalizeMove(uciMove); //This is because stratops uses UCI_960
           if (normalizedMove && chess.isLegal(normalizedMove)) chess.play(normalizedMove);
         }
@@ -567,20 +572,20 @@ export default function (token: string) {
         for (let i = 0; i < moves.length; i++) {
           if (moves[i] != '') {
             //Make the new move
-            const uciMove = <NormalMove>parseUci(moves[i]);
+            const uciMove = <NormalMove>parseUciChess(moves[i]);
             const normalizedMove = chess.normalizeMove(uciMove); //This is because stratops uses UCI_960
             if (normalizedMove && chess.isLegal(normalizedMove)) {
               //This is a good chance to get the move in SAN format
               if (chess.turn == 'p2')
                 lastSanMove = {
                   player: 'p2',
-                  move: makeSan(chess, normalizedMove),
+                  move: makeSanChess(chess, normalizedMove),
                   by: gameInfoMap.get(currentGameId).p2.id,
                 };
               else
                 lastSanMove = {
                   player: 'p1',
-                  move: makeSan(chess, normalizedMove),
+                  move: makeSanChess(chess, normalizedMove),
                   by: gameInfoMap.get(currentGameId).p1.id,
                 };
               chess.play(normalizedMove);
@@ -684,21 +689,16 @@ export default function (token: string) {
       */
       const innerTable =
         `<table class="dgt-table"><tr><th> - </th><th>Title</th><th>Username</th><th>Rating</th><th>Timer</th><th>Last Move</th><th>gameId: ${gameInfo.id}</th></tr>` +
-        `<tr><td>White</td><td>${gameInfo.p1.title !== null ? gameInfo.p1.title : '@'}</td><td>${
-          gameInfo.p1.name
-        }</td><td>${gameInfo.p1.rating}</td><td>${formattedTimer(gameState.wtime)}</td><td>${
-          lastMove.player == 'p1' ? lastMove.move : '?'
-        }</td><td>${
-          gameInfo.speed +
-          ' ' +
-          (gameInfo.clock !== null
-            ? String(gameInfo.clock.initial / 60000) + "'+" + String(gameInfo.clock.increment / 1000) + "''"
-            : '∞')
+        `<tr><td>White</td><td>${gameInfo.p1.title !== null ? gameInfo.p1.title : '@'}</td><td>${gameInfo.p1.name
+        }</td><td>${gameInfo.p1.rating}</td><td>${formattedTimer(gameState.wtime)}</td><td>${lastMove.player == 'p1' ? lastMove.move : '?'
+        }</td><td>${gameInfo.speed +
+        ' ' +
+        (gameInfo.clock !== null
+          ? String(gameInfo.clock.initial / 60000) + "'+" + String(gameInfo.clock.increment / 1000) + "''"
+          : '∞')
         }</td></tr>` +
-        `<tr><td>Black</td><td>${gameInfo.p2.title !== null ? gameInfo.p2.title : '@'}</td><td>${
-          gameInfo.p2.name
-        }</td><td>${gameInfo.p2.rating}</td><td>${formattedTimer(gameState.btime)}</td><td>${
-          lastMove.player == 'p2' ? lastMove.move : '?'
+        `<tr><td>Black</td><td>${gameInfo.p2.title !== null ? gameInfo.p2.title : '@'}</td><td>${gameInfo.p2.name
+        }</td><td>${gameInfo.p2.rating}</td><td>${formattedTimer(gameState.btime)}</td><td>${lastMove.player == 'p2' ? lastMove.move : '?'
         }</td><td>Status: ${gameState.status}</td></tr>`;
       console.log(innerTable);
       switch (gameState.status) {
@@ -930,7 +930,7 @@ export default function (token: string) {
             //Get first move to process, usually the last since movesToProcess is usually 1
             SANMove = String(message.param.san[message.param.san.length - i]).trim();
             if (verbose) console.info('onmessage - SANMove = ' + SANMove);
-            const moveObject = <NormalMove | undefined>parseSan(localBoard, SANMove); //get move from DGT LiveChess
+            const moveObject = <NormalMove | undefined>parseSanChess(localBoard, SANMove); //get move from DGT LiveChess
             //if valid move on local stratops
             if (moveObject && localBoard.isLegal(moveObject)) {
               if (verbose) console.info('onmessage - Move is legal');
@@ -957,7 +957,7 @@ export default function (token: string) {
                   console.error('onmessage - Played move has not been received by PlayStrategy.');
                 } else {
                   console.error('onmessage - Expected:' + lastMove.move + ' by ' + lastMove.player);
-                  console.error('onmessage - Detected:' + makeUci(moveObject) + ' by ' + localBoard.turn);
+                  console.error('onmessage - Detected:' + makeUciChess(moveObject) + ' by ' + localBoard.turn);
                 }
                 announceInvalidMove();
                 await sleep(1000);
@@ -978,7 +978,7 @@ export default function (token: string) {
                 if (verbose)
                   console.error(
                     'onmessage - invalidMove - Position Mismatch between DGT Board and internal in-memory Board. SAN: ' +
-                      SANMove
+                    SANMove
                   );
                 announceInvalidMove();
                 console.info(board(localBoard.board));
@@ -1012,7 +1012,7 @@ export default function (token: string) {
         //Websocket is fine but still no board detected
         console.warn(
           'Connection to DGT Live Chess is Fine but no board is detected. Attempting re-connection. Attempt: ' +
-            attempts
+          attempts
         );
         liveChessConnection.send('{"id":1,"call":"eboards"}');
       }
@@ -1079,7 +1079,7 @@ export default function (token: string) {
       await chooseCurrentGame();
     }
     //Now send the move
-    const command = makeUci(boardMove);
+    const command = makeUciChess(boardMove);
     sendMove(currentGameId, command);
   }
 
@@ -1191,7 +1191,7 @@ export default function (token: string) {
    */
   function compareMoves(lastMove: string, moveObject: NormalMove): boolean {
     try {
-      const uciMove = makeUci(moveObject);
+      const uciMove = makeUciChess(moveObject);
       if (verbose) console.log(`Comparing ${lastMove} with ${uciMove}`);
       if (lastMove == uciMove) {
         //it's the same move

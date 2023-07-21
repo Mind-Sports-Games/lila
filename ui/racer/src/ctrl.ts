@@ -16,6 +16,8 @@ import { RacerOpts, RacerData, RacerVm, RacerPrefs, Race, UpdatableData, RaceSta
 import { Role } from 'chessground/types';
 import { storedProp } from 'common/storage';
 
+const parseUciChess = parseUci('chess');
+
 export default class StormCtrl {
   private data: RacerData;
   private redraw: () => void;
@@ -141,7 +143,7 @@ export default class StormCtrl {
       this.run.moves++;
       this.promotion.cancel();
       const pos = puzzle.position();
-      const move = parseUci(uci)!;
+      const move = parseUciChess(uci)!;
       let captureSound = pos.board.occupied.has(move.to);
       pos.play(move);
       if (pos.isCheckmate() || uci == puzzle.expectedMove()) {
@@ -159,7 +161,7 @@ export default class StormCtrl {
           if (!this.incPuzzle()) this.end();
         } else {
           puzzle.moveIndex++;
-          captureSound = captureSound || pos.board.occupied.has(parseUci(puzzle.line[puzzle.moveIndex]!)!.to);
+          captureSound = captureSound || pos.board.occupied.has(parseUciChess(puzzle.line[puzzle.moveIndex]!)!.to);
         }
         sound.move(captureSound);
       } else {
@@ -184,8 +186,8 @@ export default class StormCtrl {
     this.isPlayer()
       ? makeCgOpts(this.run, this.isRacing())
       : {
-          orientation: this.run.pov,
-        };
+        orientation: this.run.pov,
+      };
 
   private resetGround = () => this.withGround(g => g.set(this.cgOpts()));
 

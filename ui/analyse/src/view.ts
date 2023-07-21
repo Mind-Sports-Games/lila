@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
+import { variantToRules } from "stratutils"
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
 import {
@@ -10,7 +11,6 @@ import {
   bindMobileMousedown,
   getPlayerScore,
   getMancalaScore,
-  variantToRules,
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
@@ -74,9 +74,9 @@ function makeConcealOf(ctrl: AnalyseCtrl): ConcealOf | undefined {
   const conceal =
     ctrl.study && ctrl.study.data.chapter.conceal !== undefined
       ? {
-          owner: ctrl.study.isChapterOwner(),
-          ply: ctrl.study.data.chapter.conceal,
-        }
+        owner: ctrl.study.isChapterOwner(),
+        ply: ctrl.study.data.chapter.conceal,
+      }
       : null;
   if (conceal)
     return (isMainline: boolean) => (path: Tree.Path, node: Tree.Node) => {
@@ -191,7 +191,7 @@ function dataAct(e: Event): string | null {
 }
 
 function repeater(ctrl: AnalyseCtrl, action: 'prev' | 'next', e: Event) {
-  const repeat = function () {
+  const repeat = function() {
     control[action](ctrl);
     ctrl.redraw();
     delay = Math.max(100, delay - delay / 15);
@@ -232,48 +232,48 @@ function controls(ctrl: AnalyseCtrl) {
       ctrl.embed
         ? null
         : h(
-            'div.features',
-            ctrl.studyPractice
-              ? [
-                  h('a.fbt', {
-                    attrs: {
-                      title: noarg('analysis'),
-                      target: '_blank',
-                      rel: 'noopener',
-                      href: ctrl.studyPractice.analysisUrl(),
-                      'data-icon': 'A',
-                    },
-                  }),
-                ]
-              : [
-                  ctrl.ceval.allowed()
-                    ? h('button.fbt', {
-                        attrs: {
-                          title: noarg('openingExplorerAndTablebase'),
-                          'data-act': 'explorer',
-                          'data-icon': ']',
-                        },
-                        class: {
-                          hidden: menuIsOpen || !ctrl.explorer.allowed() || !!ctrl.retro,
-                          active: ctrl.explorer.enabled(),
-                        },
-                      })
-                    : null,
-                  ctrl.ceval.possible && ctrl.ceval.allowed() && !ctrl.isGamebook()
-                    ? h('button.fbt', {
-                        attrs: {
-                          title: noarg('practiceWithComputer'),
-                          'data-act': 'practice',
-                          'data-icon': '',
-                        },
-                        class: {
-                          hidden: menuIsOpen || !!ctrl.retro,
-                          active: !!ctrl.practice,
-                        },
-                      })
-                    : null,
-                ]
-          ),
+          'div.features',
+          ctrl.studyPractice
+            ? [
+              h('a.fbt', {
+                attrs: {
+                  title: noarg('analysis'),
+                  target: '_blank',
+                  rel: 'noopener',
+                  href: ctrl.studyPractice.analysisUrl(),
+                  'data-icon': 'A',
+                },
+              }),
+            ]
+            : [
+              ctrl.ceval.allowed()
+                ? h('button.fbt', {
+                  attrs: {
+                    title: noarg('openingExplorerAndTablebase'),
+                    'data-act': 'explorer',
+                    'data-icon': ']',
+                  },
+                  class: {
+                    hidden: menuIsOpen || !ctrl.explorer.allowed() || !!ctrl.retro,
+                    active: ctrl.explorer.enabled(),
+                  },
+                })
+                : null,
+              ctrl.ceval.possible && ctrl.ceval.allowed() && !ctrl.isGamebook()
+                ? h('button.fbt', {
+                  attrs: {
+                    title: noarg('practiceWithComputer'),
+                    'data-act': 'practice',
+                    'data-icon': '',
+                  },
+                  class: {
+                    hidden: menuIsOpen || !!ctrl.retro,
+                    active: !!ctrl.practice,
+                  },
+                })
+                : null,
+            ]
+        ),
       h('div.jumps', [
         jumpButton('W', 'first', canJumpPrev),
         jumpButton('Y', 'prev', canJumpPrev),
@@ -283,13 +283,13 @@ function controls(ctrl: AnalyseCtrl) {
       ctrl.studyPractice
         ? h('div.noop')
         : h('button.fbt', {
-            class: { active: menuIsOpen },
-            attrs: {
-              title: noarg('menu'),
-              'data-act': 'menu',
-              'data-icon': '[',
-            },
-          }),
+          class: { active: menuIsOpen },
+          attrs: {
+            title: noarg('menu'),
+            'data-act': 'menu',
+            'data-icon': '[',
+          },
+        }),
     ]
   );
 }
@@ -345,7 +345,7 @@ function renderPlayerScore(
   }
 }
 
-export default function (ctrl: AnalyseCtrl): VNode {
+export default function(ctrl: AnalyseCtrl): VNode {
   if (ctrl.nvui) return ctrl.nvui.render(ctrl);
   const concealOf = makeConcealOf(ctrl),
     study = ctrl.study,
@@ -443,41 +443,41 @@ export default function (ctrl: AnalyseCtrl): VNode {
       ctrl.keyboardHelp ? keyboardView(ctrl) : null,
       study ? studyView.overboard(study) : null,
       tour ||
-        h(
-          addChapterId(study, 'div.analyse__board.main-board'),
-          {
-            hook:
-              'ontouchstart' in window || ctrl.gamebookPlay()
-                ? undefined
-                : bind('wheel', (e: WheelEvent) => wheel(ctrl, e)),
-          },
-          [
-            ...(clocks || []),
-            playerBars ? playerBars[ctrl.bottomIsP1() ? 1 : 0] : null,
-            chessground.render(ctrl),
-            playerBars ? playerBars[ctrl.bottomIsP1() ? 0 : 1] : null,
-            renderPromotion(ctrl),
-          ]
-        ),
+      h(
+        addChapterId(study, 'div.analyse__board.main-board'),
+        {
+          hook:
+            'ontouchstart' in window || ctrl.gamebookPlay()
+              ? undefined
+              : bind('wheel', (e: WheelEvent) => wheel(ctrl, e)),
+        },
+        [
+          ...(clocks || []),
+          playerBars ? playerBars[ctrl.bottomIsP1() ? 1 : 0] : null,
+          chessground.render(ctrl),
+          playerBars ? playerBars[ctrl.bottomIsP1() ? 0 : 1] : null,
+          renderPromotion(ctrl),
+        ]
+      ),
       gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
       menuIsOpen || tour || !ctrl.data.hasGameScore
         ? null
         : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
       gamebookPlayView ||
-        (tour
-          ? null
-          : h(addChapterId(study, 'div.analyse__tools'), [
-              ...(menuIsOpen
-                ? [actionMenu(ctrl)]
-                : [
-                    cevalView.renderCeval(ctrl),
-                    showCevalPvs ? cevalView.renderPvs(ctrl) : null,
-                    renderAnalyse(ctrl, concealOf),
-                    gamebookEditView || forkView(ctrl, concealOf),
-                    retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
-                  ]),
-            ])),
+      (tour
+        ? null
+        : h(addChapterId(study, 'div.analyse__tools'), [
+          ...(menuIsOpen
+            ? [actionMenu(ctrl)]
+            : [
+              cevalView.renderCeval(ctrl),
+              showCevalPvs ? cevalView.renderPvs(variantKey)(ctrl) : null,
+              renderAnalyse(ctrl, concealOf),
+              gamebookEditView || forkView(ctrl, concealOf),
+              retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
+            ]),
+        ])),
       menuIsOpen || tour || !ctrl.data.hasGameScore
         ? null
         : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
@@ -486,19 +486,19 @@ export default function (ctrl: AnalyseCtrl): VNode {
       ctrl.embed || tour
         ? null
         : h(
-            'div.analyse__underboard',
-            {
-              hook:
-                ctrl.synthetic || playable(ctrl.data) ? undefined : onInsert(elm => serverSideUnderboard(elm, ctrl)),
-            },
-            study ? studyView.underboard(ctrl) : [inputs(ctrl)]
-          ),
+          'div.analyse__underboard',
+          {
+            hook:
+              ctrl.synthetic || playable(ctrl.data) ? undefined : onInsert(elm => serverSideUnderboard(elm, ctrl)),
+          },
+          study ? studyView.underboard(ctrl) : [inputs(ctrl)]
+        ),
       tour ? null : acplView(ctrl),
       ctrl.embed
         ? null
         : ctrl.studyPractice
-        ? studyPracticeView.side(study!)
-        : h(
+          ? studyPracticeView.side(study!)
+          : h(
             'aside.analyse__side',
             {
               hook: onInsert(elm => {
@@ -509,41 +509,41 @@ export default function (ctrl: AnalyseCtrl): VNode {
             ctrl.studyPractice
               ? [studyPracticeView.side(study!)]
               : study
-              ? [studyView.side(study)]
-              : [
+                ? [studyView.side(study)]
+                : [
                   ctrl.forecast ? forecastView(ctrl, ctrl.forecast) : null,
                   !ctrl.synthetic && playable(ctrl.data)
                     ? h(
-                        'div.back-to-game',
-                        h(
-                          'a.button.button-empty.text',
-                          {
-                            attrs: {
-                              href: router.game(ctrl.data, ctrl.data.player.playerIndex),
-                              'data-icon': 'i',
-                            },
+                      'div.back-to-game',
+                      h(
+                        'a.button.button-empty.text',
+                        {
+                          attrs: {
+                            href: router.game(ctrl.data, ctrl.data.player.playerIndex),
+                            'data-icon': 'i',
                           },
-                          ctrl.trans.noarg('backToGame')
-                        )
+                        },
+                        ctrl.trans.noarg('backToGame')
                       )
+                    )
                     : null,
                 ]
           ),
       study && study.relay && relayManager(study.relay),
       ctrl.opts.chat &&
-        h('section.mchat', {
-          hook: onInsert(_ => {
-            const chatOpts = ctrl.opts.chat;
-            chatOpts.instance?.then(c => c.destroy());
-            chatOpts.parseMoves = true;
-            chatOpts.instance = playstrategy.makeChat(chatOpts);
-          }),
+      h('section.mchat', {
+        hook: onInsert(_ => {
+          const chatOpts = ctrl.opts.chat;
+          chatOpts.instance?.then(c => c.destroy());
+          chatOpts.parseMoves = true;
+          chatOpts.instance = playstrategy.makeChat(chatOpts);
         }),
+      }),
       ctrl.embed
         ? null
         : h('div.chat__members.none', {
-            hook: onInsert(playstrategy.watchers),
-          }),
+          hook: onInsert(playstrategy.watchers),
+        }),
     ]
   );
 }

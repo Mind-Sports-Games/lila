@@ -5,10 +5,9 @@ import { tablebaseGuaranteed } from '../explorer/explorerCtrl';
 import AnalyseCtrl from '../ctrl';
 import { Redraw } from '../interfaces';
 import { defined, prop, Prop } from 'common';
-import { altCastles } from 'stratutils';
+import { altCastles, variantToRules } from 'stratutils';
 import { parseUci } from 'stratops/util';
 import { makeSan } from 'stratops/san';
-import { variantToRules } from '../util'
 
 declare type Verdict = 'goodMove' | 'inaccuracy' | 'mistake' | 'blunder';
 
