@@ -46,16 +46,11 @@ object TreeBuilder {
         FullOpeningDB.findByFen(variant.gameLogic, node.fen)
       ),
       forceVariation = node.forceVariation,
-      dropsByRole = g.situation match {
-        case (Situation.FairySF(_)) =>
-          g.situation.dropsByRole
-        case _ => None
-      }
+      dropsByRole = Game(variant.gameLogic, variant.some, node.fen.some).situation.dropsByRole
     )
   }
 
   def makeRoot(root: Node.Root, variant: Variant): tree.Root = {
-    val g = Game(variant.gameLogic, variant.some, root.fen.some)
     tree.Root(
       ply = root.ply,
       variant = variant,
@@ -72,11 +67,7 @@ object TreeBuilder {
       opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? (
         FullOpeningDB.findByFen(variant.gameLogic, root.fen)
       ),
-      dropsByRole = g.situation match {
-        case (Situation.FairySF(_)) =>
-          g.situation.dropsByRole
-        case _ => None
-      }
+      dropsByRole = Game(variant.gameLogic, variant.some, root.fen.some).situation.dropsByRole
     )
   }
 

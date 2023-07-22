@@ -39,11 +39,7 @@ case class AnaDrop(
           dests = Some(movable ?? game.situation.destinations),
           opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? FullOpeningDB
             .findByFen(variant.gameLogic, fen),
-          dropsByRole = game.situation match {
-            case (Situation.FairySF(_)) =>
-              game.situation.dropsByRole
-            case _ => None
-          },
+          dropsByRole = game.situation.dropsByRole,
           pocketData = game.situation.board.pocketData
         )
       }

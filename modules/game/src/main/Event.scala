@@ -197,11 +197,7 @@ object Event {
           case _ => situation.destinations
         },
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         pocketData = pocketData,
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
@@ -277,11 +273,7 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         pocketData = pocketData
       )
   }
@@ -417,16 +409,18 @@ object Event {
         )
         .add("clock" -> game.clock.map { c =>
           c match {
-            case fc: FischerClock => Json.obj(
-              "p1" -> fc.remainingTime(P1).centis,
-              "p2" -> fc.remainingTime(P2).centis
-            )
-            case bc: ByoyomiClock => Json.obj(
-              "p1" -> bc.remainingTime(P1).centis,
-              "p2" -> bc.remainingTime(P2).centis,
-              "p1Periods" -> bc.players(P1).periodsLeft,
-              "p2Periods" -> bc.players(P2).periodsLeft
-            )
+            case fc: FischerClock =>
+              Json.obj(
+                "p1" -> fc.remainingTime(P1).centis,
+                "p2" -> fc.remainingTime(P2).centis
+              )
+            case bc: ByoyomiClock =>
+              Json.obj(
+                "p1"        -> bc.remainingTime(P1).centis,
+                "p2"        -> bc.remainingTime(P2).centis,
+                "p1Periods" -> bc.players(P1).periodsLeft,
+                "p2Periods" -> bc.players(P2).periodsLeft
+              )
           }
         })
         .add("ratingDiff" -> ratingDiff.map { rds =>
@@ -477,33 +471,41 @@ object Event {
 
   sealed trait ClockEvent extends Event
 
-  case class Clock(p1: Centis, p2: Centis, p1Periods: Int = 0, p2Periods: Int = 0, nextLagComp: Option[Centis] = None) extends ClockEvent {
+  case class Clock(
+      p1: Centis,
+      p2: Centis,
+      p1Periods: Int = 0,
+      p2Periods: Int = 0,
+      nextLagComp: Option[Centis] = None
+  ) extends ClockEvent {
     def typ = "clock"
     def data =
       Json
         .obj(
-          "p1" -> p1.toSeconds,
-          "p2" -> p2.toSeconds,
+          "p1"        -> p1.toSeconds,
+          "p2"        -> p2.toSeconds,
           "p1Periods" -> p1Periods,
-          "p2Periods" -> p2Periods,
+          "p2Periods" -> p2Periods
         )
         .add("lag" -> nextLagComp.collect { case Centis(c) if c > 1 => c })
   }
   object Clock {
     def apply(clock: strategygames.Clock): Clock =
       clock match {
-        case fc: FischerClock => Clock(
-          fc.remainingTime(P1),
-          fc.remainingTime(P2),
-          nextLagComp=fc.lagCompEstimate(fc.player)
-        )
-        case bc: ByoyomiClock => Clock(
-          bc.remainingTime(P1),
-          bc.remainingTime(P2),
-          bc.players(P1).spentPeriods,
-          bc.players(P2).spentPeriods,
-          bc.lagCompEstimate(bc.player)
-        )
+        case fc: FischerClock =>
+          Clock(
+            fc.remainingTime(P1),
+            fc.remainingTime(P2),
+            nextLagComp = fc.lagCompEstimate(fc.player)
+          )
+        case bc: ByoyomiClock =>
+          Clock(
+            bc.remainingTime(P1),
+            bc.remainingTime(P2),
+            bc.players(P1).spentPeriods,
+            bc.players(P2).spentPeriods,
+            bc.lagCompEstimate(bc.player)
+          )
       }
   }
 
