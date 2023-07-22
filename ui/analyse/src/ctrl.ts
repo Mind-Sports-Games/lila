@@ -268,20 +268,25 @@ export default class AnalyseCtrl {
     return [uci.substr(0, 2), uci.substr(2, 2)] as Key[];
   }
 
+  setDropMode(cg: ChessgroundApi) {
+    const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
+    setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
+    cg.set({
+      dropmode: {
+        showDropDests: true,
+        dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
+      },
+    });
+
+  }
+
   private showGround(): void {
     this.onChange();
     if (!defined(this.node.dests)) this.getDests();
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
       this.setAutoShapes();
-      const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
-      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
-      cg.set({
-        dropmode: {
-          showDropDests: true,
-          dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
-        },
-      });
+      this.setDropMode(cg);
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
     });
   }
