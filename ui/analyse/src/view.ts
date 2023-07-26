@@ -404,7 +404,20 @@ export default function (ctrl: AnalyseCtrl): VNode {
     }
   }
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(variantKey)) {
+  if (
+    [
+      'xiangqi',
+      'shogi',
+      'minixiangqi',
+      'minishogi',
+      'flipello',
+      'flipello10',
+      'oware',
+      'go9x9',
+      'go13x13',
+      'go19x19',
+    ].includes(variantKey)
+  ) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }

@@ -114,7 +114,7 @@ object mini {
       case "go9x9" | "go13x13" | "go19x19" =>
         val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
         val score = (if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
-        "(" + score.toString() + ")"
+        "(" + score.toString().replace(".0", "") + ")"
       case _ => ""
     }
 

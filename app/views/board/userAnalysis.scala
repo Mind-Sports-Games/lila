@@ -18,7 +18,10 @@ object userAnalysis {
 
   def noAnalysisVariants = List(
     Variant.Chess(strategygames.chess.variant.FromPosition),
-    Variant.FairySF(strategygames.fairysf.variant.Amazons)
+    Variant.FairySF(strategygames.fairysf.variant.Amazons),
+    Variant.Go(strategygames.go.variant.Go9x9),
+    Variant.Go(strategygames.go.variant.Go13x13),
+    Variant.Go(strategygames.go.variant.Go19x19)
   )
 
   def analysisVariants =

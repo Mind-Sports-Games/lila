@@ -171,7 +171,9 @@ export default class Setup {
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
-            (variantId[1] != '1' && (timeMode != '1' || (limit < 0.5 && inc == 0) || (limit == 0 && inc < 2))) ||
+            (timeMode != '1' && timeMode != '3') ||
+            (limit < 0.5 && inc == 0) ||
+            (limit == 0 && inc < 2) ||
             (variantId[0] == '9' &&
               (($goHandicapInput.val() as string) != '0' || ($goKomiInput.val() as string) != '65'));
         if (cantBeRated && rated) {
@@ -193,6 +195,7 @@ export default class Setup {
         self.save($form[0] as HTMLFormElement);
       };
 
+    const clearFenInput = () => $fenInput.val('');
     const c = this.stores[typ].get();
     if (c) {
       Object.keys(c).forEach(k => {
@@ -555,6 +558,7 @@ export default class Setup {
           $value.text('' + goHandicap);
           $input.val('' + goHandicap);
           save();
+          clearFenInput();
           toggleButtons();
         });
       });
@@ -577,6 +581,7 @@ export default class Setup {
           show(goKomi);
           $input.val('' + goKomi);
           save();
+          clearFenInput();
           toggleButtons();
         });
       });
@@ -683,6 +688,7 @@ export default class Setup {
         let ground = 'chessground';
         if (variantId[0] == '1') ground = 'draughtsground';
         ground += '.resize';
+        if (variantId[0] == '9') clearFenInput();
         $multiMatch.toggle(isFen && variantId[0] == '1');
         $fenPosition.toggle(isFen);
         $modeChoicesWrap.toggle(!isFen);
