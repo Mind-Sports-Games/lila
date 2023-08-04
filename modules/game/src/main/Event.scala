@@ -13,6 +13,7 @@ import strategygames.{
   Move => StratMove,
   Drop => StratDrop,
   Pass => StratPass,
+  SelectSquares => StratSelectSquares,
   PromotableRole,
   PocketData,
   Pos,
@@ -294,6 +295,7 @@ object Event {
       gf: GameFamily,
       // role: Role,
       // pos: Pos,
+      canSelectSquares: Boolean,
       san: String,
       fen: String,
       check: Boolean,
@@ -323,8 +325,9 @@ object Event {
       ) {
         Json.obj(
           //"role" -> role.groundName,
-          "uci" -> "pass",
-          "san" -> san
+          "canSelectSquares" -> canSelectSquares,
+          "uci"              -> "pass",
+          "san"              -> san
         )
       }
     override def moveBy = Some(!state.playerIndex)
@@ -339,7 +342,81 @@ object Event {
     ): Pass =
       Pass(
         gf = situation.board.variant.gameFamily,
+        canSelectSquares = situation match {
+          case (Situation.Go(s)) => s.canSelectSquares
+          case _                 => false
+        },
         san = "pass",
+        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        pocketData = pocketData
+      )
+  }
+
+  case class SelectSquares(
+      gf: GameFamily,
+      squares: List[Pos],
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+  ) extends Event {
+    def typ = "selectSquares"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        pocketData
+      ) {
+        Json.obj(
+          "squares"          -> squares.mkString(","),
+          "canSelectSquares" -> false,
+          "uci"              -> s"ss:${squares.mkString(",")}",
+          "san"              -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+  object SelectSquares {
+    def apply(
+        ss: StratSelectSquares,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): SelectSquares =
+      SelectSquares(
+        gf = situation.board.variant.gameFamily,
+        squares = ss.squares,
+        san = s"ss:${ss.squares.mkString(",")}",
         fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,

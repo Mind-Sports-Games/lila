@@ -19,6 +19,7 @@ import strategygames.{
   Move,
   Drop,
   Pass,
+  SelectSquares,
   Action,
   Pos,
   Speed,
@@ -302,6 +303,8 @@ case class Game(
         case m: Move => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
         case d: Drop => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
         case p: Pass => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
+        case ss: SelectSquares =>
+          Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
       }
     } :: {
       // abstraction leak, I know.
@@ -336,10 +339,11 @@ case class Game(
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
-      case d: Uci.Drop => s"${d.pos}${d.pos}"
-      case m: Uci.Move => m.keys
-      case _: Uci.Pass => "pass"
-      case _           => sys.error("Type Error")
+      case d: Uci.Drop          => s"${d.pos}${d.pos}"
+      case m: Uci.Move          => m.keys
+      case _: Uci.Pass          => "pass"
+      case _: Uci.SelectSquares => "ss:"
+      case _                    => sys.error("Type Error")
     }
 
   def updatePlayer(playerIndex: PlayerIndex, f: Player => Player) =
@@ -966,6 +970,8 @@ object Game {
     val checkAt           = "ck"
     val perfType          = "pt" // only set on student games for aggregation
     val drawOffers        = "do"
+    // go
+    val selectedSquares = "ss" // the dead stones selected in go
     //draughts
     val simulPairing = "sp"
     val timeOutUntil = "to"

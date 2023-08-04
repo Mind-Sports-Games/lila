@@ -29,6 +29,7 @@ export function makeConfig(ctrl: RoundController): Config {
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: data.game.variant.key == 'togyzkumalak',
     addPieceZIndex: ctrl.data.pref.is3d,
+    selectOnly: data.selectMode,
     highlight: {
       lastMove: data.pref.highlight,
       check: data.pref.highlight,
@@ -40,6 +41,7 @@ export function makeConfig(ctrl: RoundController): Config {
         resizeHandle(elements, ctrl.data.pref.resizeHandle, ctrl.ply);
         if (data.pref.coords === Prefs.Coords.Inside) changeColorHandle();
       },
+      select: hooks.onSelect,
     },
     movable: {
       free: false,

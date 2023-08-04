@@ -111,6 +111,7 @@ object EvalCacheEntry {
       case Uci.TogyzkumalakMove(_) => GameLogic.Togyzkumalak()
       case Uci.GoDrop(_)           => GameLogic.Go()
       case Uci.GoPass(_)           => GameLogic.Go()
+      case Uci.GoSelectSquares(_)  => GameLogic.Go()
     }
   }
 

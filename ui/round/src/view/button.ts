@@ -173,6 +173,22 @@ export const passConfirm = (ctrl: RoundController): VNode =>
     fbtCancel(ctrl, ctrl.passTurn),
   ]);
 
+export const selectSquaresConfirm = (ctrl: RoundController): VNode =>
+  h('div.act-confirm', [
+    h('p', {}, `Select dead stones (${ctrl.chessground.state.selectedPieces.size} selected)`),
+    h('button.fbt.yes.select-squares-yes', {
+      attrs: { title: ctrl.noarg('selectSquares'), 'data-icon': '' },
+      hook: util.bind('click', () => ctrl.selectSquares(true)),
+    }),
+    fbtCancel(ctrl, ctrl.selectSquares),
+  ]);
+
+export const selectSquares = (ctrl: RoundController): VNode =>
+  h('div', [
+    h('div', {}, `Select dead stones`),
+    standard(ctrl, ctrl.canSelectSquares, '', 'selectSquares', 'select-squares-yes', () => ctrl.selectSquares(true)),
+  ]);
+
 export function threefoldClaimDraw(ctrl: RoundController) {
   return ctrl.data.game.threefold
     ? h('div.suggestion', [

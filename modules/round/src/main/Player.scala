@@ -10,7 +10,8 @@ import strategygames.{
   Status,
   Drop => StratDrop,
   Move => StratMove,
-  Pass => StratPass
+  Pass => StratPass,
+  SelectSquares => StratSelectSquares
 }
 import strategygames.chess
 
@@ -159,9 +160,10 @@ final private class Player(
       gameId = game.id,
       fen = Forsyth.exportBoard(game.board.variant.gameLogic, game.board),
       move = action match {
-        case m: StratMove => m.toUci.keys
-        case d: StratDrop => d.toUci.uci
-        case p: StratPass => p.toUci.uci
+        case m: StratMove           => m.toUci.keys
+        case d: StratDrop           => d.toUci.uci
+        case p: StratPass           => p.toUci.uci
+        case ss: StratSelectSquares => ss.toUci.uci
       }
     )
 

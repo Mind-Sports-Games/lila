@@ -44,6 +44,7 @@ import {
   SocketMove,
   SocketDrop,
   SocketPass,
+  SocketSelectSquares,
   SocketOpts,
   MoveMetadata,
   Position,
@@ -81,6 +82,7 @@ export default class RoundController {
   resignConfirm?: Timeout = undefined;
   drawConfirm?: Timeout = undefined;
   passConfirm?: Timeout = undefined;
+  selectSquaresConfirm?: Timeout = undefined;
   // will be replaced by view layer
   autoScroll: () => void = () => {};
   challengeRematched = false;
@@ -236,6 +238,11 @@ export default class RoundController {
     }
   };
 
+  private onSelect = (key: cg.Key) => {
+    console.log(`Square selected ${key}`);
+    console.log(`Selected pieces ${this.chessground.state.selectedPieces}`);
+  };
+
   private isSimulHost = () => {
     return this.data.simul && this.data.simul.hostId === this.opts.userId;
   };
@@ -287,6 +294,7 @@ export default class RoundController {
     onCancelPremove: this.onCancelPremove,
     onPredrop: this.onPredrop,
     onCancelDropMode: this.onCancelDropMode,
+    onSelect: this.onSelect,
   });
 
   replaying = (): boolean => this.ply !== this.lastPly();
@@ -450,6 +458,16 @@ export default class RoundController {
     this.actualSendMove('pass', pass);
   };
 
+  sendSelectSquares = (variant: string, squares: cg.Key[]): void => {
+    const ss: SocketSelectSquares = {
+      variant: variant,
+      s: squares.join(','),
+    };
+    if (blur.get()) ss.b = 1;
+    this.resign(false);
+    this.actualSendMove('selectSquares', ss);
+  };
+
   showYourMoveNotification = () => {
     const d = this.data;
     if (game.isPlayerTurn(d))
@@ -479,6 +497,10 @@ export default class RoundController {
 
     if (d.game.variant.key == 'amazons') {
       d.onlyDropsVariant = o.drops ? true : false;
+    }
+
+    if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
+      d.selectMode = o.canSelectSquares ? o.canSelectSquares : false;
     }
 
     const playedPlayerIndex = opposite(d.game.player),
@@ -542,6 +564,7 @@ export default class RoundController {
         },
         check: !!o.check,
         onlyDropsVariant: this.data.onlyDropsVariant, //need to update every move (amazons)
+        selectOnly: d.selectMode,
       });
       if (o.check) sound.check();
       blur.onMove();
@@ -881,7 +904,8 @@ export default class RoundController {
     ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
     this.isPlaying() &&
     !this.replaying() &&
-    this.data.player.playerIndex === this.data.game.player;
+    this.data.player.playerIndex === this.data.game.player &&
+    !this.data.selectMode;
 
   passTurn = (v: boolean): void => {
     if (this.canPassTurn()) {
@@ -903,6 +927,35 @@ export default class RoundController {
   private doPassTurn = () => {
     this.setLoading(true);
     this.sendPass(this.data.game.variant.key);
+  };
+
+  canSelectSquares = (): boolean =>
+    ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
+    this.isPlaying() &&
+    !this.replaying() &&
+    this.data.player.playerIndex === this.data.game.player &&
+    this.data.selectMode;
+
+  selectSquares = (v: boolean): void => {
+    if (this.canSelectSquares()) {
+      if (this.selectSquaresConfirm) {
+        if (v) this.doSelectSquares();
+        clearTimeout(this.selectSquaresConfirm);
+        this.selectSquaresConfirm = undefined;
+      } else if (v) {
+        if (this.data.pref.confirmResign)
+          this.selectSquaresConfirm = setTimeout(() => {
+            this.selectSquares(false);
+          }, 3000);
+        else this.doSelectSquares();
+      }
+    }
+    this.redraw();
+  };
+
+  private doSelectSquares = () => {
+    this.setLoading(true);
+    this.sendSelectSquares(this.data.game.variant.key, Array.from(this.chessground.state.selectedPieces.keys()));
   };
 
   setChessground = (cg: CgApi) => {

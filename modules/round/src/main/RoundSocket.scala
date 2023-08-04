@@ -114,7 +114,8 @@ final class RoundSocket(
         case "outoftime"    => tellRound(id.gameId, QuietFlag) // mobile app BC
         case t              => logger.warn(s"Unhandled round socket message: $t")
       }
-    case Protocol.In.Flag(gameId, playerIndex, fromPlayerId) => tellRound(gameId, ClientFlag(playerIndex, fromPlayerId))
+    case Protocol.In.Flag(gameId, playerIndex, fromPlayerId) =>
+      tellRound(gameId, ClientFlag(playerIndex, fromPlayerId))
     case Protocol.In.PlayerChatSay(id, Right(playerIndex), msg) =>
       gameIfPresent(id.value) foreach {
         _ foreach {
@@ -230,9 +231,9 @@ object RoundSocket {
       }
     } / {
       pov.game.chess.board.materialImbalance match {
-        case _ if pov.game.variant.materialImbalanceVariant                   => 1
+        case _ if pov.game.variant.materialImbalanceVariant                         => 1
         case i if (pov.playerIndex.p1 && i <= -4) || (pov.playerIndex.p2 && i >= 4) => 3
-        case _                                                                => 1
+        case _                                                                      => 1
       }
     } / {
       if (pov.player.hasUser) 1 else 2
@@ -245,12 +246,15 @@ object RoundSocket {
       case class PlayerOnlines(onlines: Iterable[(Game.Id, Option[RoomCrowd])])        extends P.In
       case class PlayerDo(fullId: FullId, tpe: String)                                 extends P.In
       case class PlayerMove(fullId: FullId, uci: Uci, blur: Boolean, lag: MoveMetrics) extends P.In
-      case class PlayerChatSay(gameId: Game.Id, userIdOrPlayerIndex: Either[User.ID, PlayerIndex], msg: String)
-          extends P.In
+      case class PlayerChatSay(
+          gameId: Game.Id,
+          userIdOrPlayerIndex: Either[User.ID, PlayerIndex],
+          msg: String
+      )                                                                                           extends P.In
       case class WatcherChatSay(gameId: Game.Id, userId: User.ID, msg: String)                    extends P.In
       case class Bye(fullId: FullId)                                                              extends P.In
       case class HoldAlert(fullId: FullId, ip: IpAddress, mean: Int, sd: Int)                     extends P.In
-      case class Flag(gameId: Game.Id, playerIndex: PlayerIndex, fromPlayerId: Option[PlayerId])              extends P.In
+      case class Flag(gameId: Game.Id, playerIndex: PlayerIndex, fromPlayerId: Option[PlayerId])  extends P.In
       case class Berserk(gameId: Game.Id, userId: User.ID)                                        extends P.In
       case class SelfReport(fullId: FullId, ip: IpAddress, userId: Option[User.ID], name: String) extends P.In
 
@@ -276,17 +280,19 @@ object RoundSocket {
               } yield PlayerDo(FullId(fullId), tpe)
             }
           case "r/move" =>
-            raw.get(6) { case Array(fullId, gfS, uciS, blurS, lagS, mtS) => {
-              val gf = GameFamily(gfS.toInt)
-              Uci(gf.gameLogic, gf, uciS) map { uci =>
-                PlayerMove(
-                  FullId(fullId),
-                  uci,
-                  P.In.boolean(blurS),
-                  MoveMetrics(centis(lagS), centis(mtS))
-                )
+            raw.get(6) {
+              case Array(fullId, gfS, uciS, blurS, lagS, mtS) => {
+                val gf = GameFamily(gfS.toInt)
+                Uci(gf.gameLogic, gf, uciS) map { uci =>
+                  PlayerMove(
+                    FullId(fullId),
+                    uci,
+                    P.In.boolean(blurS),
+                    MoveMetrics(centis(lagS), centis(mtS))
+                  )
+                }
               }
-            }}
+            }
           case "chat/say" =>
             raw.get(3) { case Array(roomId, author, msg) =>
               PlayerChatSay(Game.Id(roomId), readPlayerIndex(author).toRight(author), msg).some
