@@ -36,6 +36,7 @@ export interface BaseGame {
   winner?: PlayerIndex;
   winnerPlayer?: PlayerName;
   loserPlayer?: PlayerName;
+  canOfferDraw?: boolean;
   drawOffers?: number[];
   moveCentis?: number[];
   initialFen?: string;
