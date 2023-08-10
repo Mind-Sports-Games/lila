@@ -59,6 +59,7 @@ final class JsonView(rematches: Rematches) {
       .add("rematch" -> rematches.of(game.id))
       .add("canOfferDraw" -> game.variant.canOfferDraw)
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedPlies))
+      .add("canDoPassAction" -> (game.situation.passes.size > 0))
       .add("multiMatch" -> game.metadata.multiMatchGameNr.map { index =>
         Json
           .obj("index" -> index)

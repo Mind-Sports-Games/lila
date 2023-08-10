@@ -55,7 +55,8 @@ export const renderTablePlay = (ctrl: RoundController) => {
                 button.standard(ctrl, ctrl.canOfferDraw, '2', 'offerDraw', 'draw-yes', () => ctrl.offerDraw(true)) : null,
             ctrl.passConfirm
               ? button.passConfirm(ctrl)
-              : button.standard(ctrl, ctrl.canPassTurn, '', 'pass', 'pass-yes', () => ctrl.passTurn(true)),
+              : d.game.canDoPassAction ?
+                button.standard(ctrl, ctrl.canPassTurn, '', 'pass', 'pass-yes', () => ctrl.passTurn(true)) : null,
             ctrl.resignConfirm
               ? button.resignConfirm(ctrl)
               : button.standard(ctrl, game.resignable, 'b', 'resign', 'resign', () => ctrl.resign(true)),

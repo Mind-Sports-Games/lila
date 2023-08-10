@@ -38,6 +38,7 @@ export interface BaseGame {
   loserPlayer?: PlayerName;
   canOfferDraw?: boolean;
   drawOffers?: number[];
+  canDoPassAction?: boolean;
   moveCentis?: number[];
   initialFen?: string;
   importedBy?: string;
