@@ -324,7 +324,6 @@ object Event {
         pocketData
       ) {
         Json.obj(
-          //"role" -> role.groundName,
           "canSelectSquares" -> canSelectSquares,
           "uci"              -> "pass",
           "san"              -> san
@@ -619,6 +618,20 @@ object Event {
     def data = reloadOr("drawOffer", by)
   }
 
+  case class SelectSquaresOffer(
+      playerIndex: PlayerIndex,
+      squares: List[Pos],
+      accepted: Option[Boolean] = None
+  ) extends Event {
+    def typ = "selectSquaresOffer"
+
+    def data = Json.obj(
+      "playerIndex" -> playerIndex,
+      "squares"     -> squares.mkString(","),
+      "accepted"    -> accepted
+    )
+  }
+
   case class ClockInc(playerIndex: PlayerIndex, time: Centis) extends Event {
     def typ = "clockInc"
     def data =
@@ -716,7 +729,9 @@ object Event {
       status: Option[Status],
       winner: Option[PlayerIndex],
       p1OffersDraw: Boolean,
-      p2OffersDraw: Boolean
+      p2OffersDraw: Boolean,
+      p1OffersSelectSquares: Boolean,
+      p2OffersSelectSquares: Boolean
   ) extends Event {
     def typ = "state"
     def data =
@@ -729,6 +744,8 @@ object Event {
         .add("winner" -> winner)
         .add("wDraw" -> p1OffersDraw)
         .add("bDraw" -> p2OffersDraw)
+        .add("wSelectSquares" -> p1OffersSelectSquares)
+        .add("bSelectSquares" -> p2OffersSelectSquares)
   }
 
   case class TakebackOffers(

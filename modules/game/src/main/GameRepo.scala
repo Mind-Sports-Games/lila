@@ -361,13 +361,15 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     s"p${playerIndex.fold(0, 1)}.${Player.BSONFields.holdAlert}"
 
   private val finishUnsets = $doc(
-    F.positionHashes                              -> true,
-    F.playingUids                                 -> true,
-    F.unmovedRooks                                -> true,
-    ("p0." + Player.BSONFields.isOfferingDraw)    -> true,
-    ("p1." + Player.BSONFields.isOfferingDraw)    -> true,
-    ("p0." + Player.BSONFields.proposeTakebackAt) -> true,
-    ("p1." + Player.BSONFields.proposeTakebackAt) -> true
+    F.positionHashes                                    -> true,
+    F.playingUids                                       -> true,
+    F.unmovedRooks                                      -> true,
+    ("p0." + Player.BSONFields.isOfferingDraw)          -> true,
+    ("p1." + Player.BSONFields.isOfferingDraw)          -> true,
+    ("p0." + Player.BSONFields.isOfferingSelectSquares) -> true,
+    ("p1." + Player.BSONFields.isOfferingSelectSquares) -> true,
+    ("p0." + Player.BSONFields.proposeTakebackAt)       -> true,
+    ("p1." + Player.BSONFields.proposeTakebackAt)       -> true
   )
 
   def finish(

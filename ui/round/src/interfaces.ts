@@ -64,7 +64,9 @@ export interface RoundData extends GameData {
   possibleDrops?: string;
   possibleDropsByRole?: string;
   selectMode: boolean;
-  previousSelectedSquares?: cg.Key[];
+  selectedSquares?: cg.Key[];
+  currentSelectedSquares?: cg.Key[];
+  playerOfferingSelectedSquares?: PlayerIndex;
   forecastCount?: number;
   crazyhouse?: CrazyData;
   onlyDropsVariant: boolean;

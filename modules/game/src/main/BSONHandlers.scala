@@ -706,7 +706,9 @@ object BSONHandlers {
           simulId = r strO F.simulId,
           multiMatch = r strO F.multiMatch,
           analysed = r boolD F.analysed,
-          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
+          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty),
+          selectedSquares = (r bytesO F.selectedSquares).map(BinaryFormat.pos.readGo(_)),
+          playerOfferedSelectedSquares = (r boolO F.playerOfferedSelectedSquares).map(PlayerIndex(_))
         )
       )
     }
@@ -829,10 +831,12 @@ object BSONHandlers {
                 case Board.Go(board) => board.pieces
                 case _               => sys.error("invalid go board")
               }),
-              F.positionHashes  -> o.history.positionHashes,
-              F.historyLastMove -> o.history.lastMove.map(_.uci),
-              F.score           -> o.history.score.nonEmpty.option(o.history.score),
-              F.pocketData      -> o.board.pocketData
+              F.positionHashes               -> o.history.positionHashes,
+              F.historyLastMove              -> o.history.lastMove.map(_.uci),
+              F.score                        -> o.history.score.nonEmpty.option(o.history.score),
+              F.pocketData                   -> o.board.pocketData,
+              F.selectedSquares              -> o.metadata.selectedSquares.map(BinaryFormat.pos.writeGo),
+              F.playerOfferedSelectedSquares -> o.metadata.playerOfferedSelectedSquares.map(_.p1)
             )
           case _ => //chess or fail
             if (o.variant.standard)

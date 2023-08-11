@@ -12,7 +12,8 @@ import strategygames.{
   GameLogic,
   History,
   PocketData,
-  P1
+  P1,
+  Pos
 }
 import strategygames.chess.CheckCount
 import strategygames.togyzkumalak.Score
@@ -292,6 +293,19 @@ object GameDiff {
             _.board.pocketData,
             (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
           )
+        dOptTry(
+          selectedSquares,
+          _.metadata.selectedSquares,
+          //writeBytes compose BinaryFormat.pos.writeGo
+          //(o: Option[List[Pos]]) => o.nonEmpty option { writeBytes compose BinaryFormat.pos.writeGo }
+          (o: Option[List[Pos]]) => o.map { writeBytes compose BinaryFormat.pos.writeGo }
+          //(o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o }
+        )
+        dOpt(
+          playerOfferedSelectedSquares,
+          _.metadata.playerOfferedSelectedSquares.map(_.p1),
+          (o: Option[Boolean]) => o.map(w.bool)
+        )
       }
     }
 
@@ -315,6 +329,7 @@ object GameDiff {
       val name                   = s"p$i."
       val player: Game => Player = if (i == 0) (_.p1Player) else (_.p2Player)
       dOpt(s"$name$isOfferingDraw", player(_).isOfferingDraw, w.boolO)
+      dOpt(s"$name$isOfferingSelectSquares", player(_).isOfferingSelectSquares, w.boolO)
       dOpt(s"$name$proposeTakebackAt", player(_).proposeTakebackAt, w.intO)
       dTry(s"$name$blursBits", player(_).blurs, Blurs.BlursBSONHandler.writeTry)
     }

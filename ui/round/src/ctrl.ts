@@ -241,6 +241,8 @@ export default class RoundController {
   private onSelect = (key: cg.Key) => {
     console.log(`Square selected ${key}`);
     console.log(`Selected pieces ${this.chessground.state.selectedPieces}`);
+    this.data.currentSelectedSquares = Array.from(this.chessground.state.selectedPieces.keys());
+    this.redraw();
   };
 
   private isSimulHost = () => {
@@ -499,10 +501,6 @@ export default class RoundController {
       d.onlyDropsVariant = o.drops ? true : false;
     }
 
-    if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
-      d.selectMode = o.canSelectSquares ? o.canSelectSquares : false;
-    }
-
     const playedPlayerIndex = opposite(d.game.player),
       activePlayerIndex = d.player.playerIndex === d.game.player;
     if (o.status) d.game.status = o.status;
@@ -513,6 +511,11 @@ export default class RoundController {
     d.possibleDrops = activePlayerIndex ? o.drops : undefined;
     d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
     d.crazyhouse = o.crazyhouse;
+    //from pass move
+    if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
+      console.log('api move o.canSelectSquares', o.canSelectSquares);
+      d.selectMode = o.canSelectSquares ? o.canSelectSquares && activePlayerIndex : false;
+    }
     this.setTitle();
     if (!this.replaying()) {
       this.ply++;
@@ -900,6 +903,40 @@ export default class RoundController {
     this.socket.sendLoading('draw-yes', null);
   };
 
+  canOfferSelectSquares = (): boolean =>
+    ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
+    this.isPlaying() &&
+    !this.replaying() &&
+    (this.data.opponent.offeringSelectSquares || this.data.selectMode) &&
+    !this.data.player.offeringSelectSquares;
+
+  offerSelectSquares = (v: boolean): void => {
+    if (this.canOfferSelectSquares()) {
+      if (this.selectSquaresConfirm) {
+        if (v) this.doOfferSelectSquares();
+        clearTimeout(this.selectSquaresConfirm);
+        this.selectSquaresConfirm = undefined;
+      } else if (v) {
+        if (this.data.pref.confirmResign)
+          this.selectSquaresConfirm = setTimeout(() => {
+            this.offerSelectSquares(false);
+          }, 3000);
+        else this.doOfferSelectSquares();
+      }
+    }
+    this.redraw();
+  };
+
+  private doOfferSelectSquares = () => {
+    const squares = Array.from(this.chessground.state.selectedPieces.keys());
+    const data = {
+      variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
+      s: squares.join(','),
+    };
+    this.socket.sendLoading('select-squares-offer', data);
+  };
+
   canPassTurn = (): boolean =>
     ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
     this.isPlaying() &&
@@ -929,33 +966,10 @@ export default class RoundController {
     this.sendPass(this.data.game.variant.key);
   };
 
-  canSelectSquares = (): boolean =>
-    ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
-    this.isPlaying() &&
-    !this.replaying() &&
-    this.data.player.playerIndex === this.data.game.player &&
-    this.data.selectMode;
-
-  selectSquares = (v: boolean): void => {
-    if (this.canSelectSquares()) {
-      if (this.selectSquaresConfirm) {
-        if (v) this.doSelectSquares();
-        clearTimeout(this.selectSquaresConfirm);
-        this.selectSquaresConfirm = undefined;
-      } else if (v) {
-        if (this.data.pref.confirmResign)
-          this.selectSquaresConfirm = setTimeout(() => {
-            this.selectSquares(false);
-          }, 3000);
-        else this.doSelectSquares();
-      }
-    }
-    this.redraw();
-  };
-
-  private doSelectSquares = () => {
+  doSelectSquaresAction = () => {
     this.setLoading(true);
-    this.sendSelectSquares(this.data.game.variant.key, Array.from(this.chessground.state.selectedPieces.keys()));
+    console.log('ss action, stones', this.data.selectedSquares);
+    this.sendSelectSquares(this.data.game.variant.key, this.data.selectedSquares!);
   };
 
   setChessground = (cg: CgApi) => {

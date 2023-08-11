@@ -356,7 +356,8 @@ function destPosOthello(move: ExtendedMoveInfo, variant: Variant): string {
 function destPosGo(move: ExtendedMoveInfo): string {
   if (!move.uci.includes('@')) {
     if (move.uci == 'pass') return 'PASS';
-    else return `${move.uci.substring(3).split(',').length} DEAD`;
+    else if (move.uci == 'ss:') return 'O DS';
+    else return `${move.uci.substring(3).split(',').length} DS`;
   }
 
   const reg = move.uci.match(/([sS]@|[a-zA-Z][1-9][0-9]?)/g) as string[];

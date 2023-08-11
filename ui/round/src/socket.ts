@@ -8,6 +8,7 @@ import RoundController from './ctrl';
 import { Untyped } from './interfaces';
 import { defined } from 'common';
 import * as util from './util';
+import * as cg from 'chessground/types';
 
 export interface RoundSocket extends Untyped {
   send: SocketSend;
@@ -129,6 +130,52 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([ply]);
       }
       ctrl.redraw();
+    },
+    selectSquaresOffer(o) {
+      if (o.accepted != undefined) {
+        ctrl.chessground.set({ viewOnly: false });
+        //game will end after accepted dead stones
+        //todo notify player of decline
+        ctrl.data.selectMode = false;
+
+        ctrl.chessground.set({ selectOnly: ctrl.data.selectMode });
+        ctrl.data.player.offeringSelectSquares = false;
+        ctrl.data.opponent.offeringSelectSquares = false;
+        ctrl.data.selectedSquares = undefined;
+        console.log('Squares offer accepted/declined (data) ', o.accepted, ctrl.data);
+        ctrl.redraw();
+        if (o.accepted) {
+          ctrl.data.selectedSquares = o.squares.split(',') as Key[];
+          ctrl.doSelectSquaresAction();
+          ctrl.redraw();
+        }
+      } else {
+        //need to change player turn here?
+        console.log('o', o);
+        ctrl.data.player.offeringSelectSquares = o.playerIndex === ctrl.data.player.playerIndex;
+        ctrl.data.opponent.offeringSelectSquares = o.playerIndex === ctrl.data.opponent.playerIndex;
+
+        if (ctrl.data.opponent.offeringSelectSquares) {
+          ctrl.chessground.set({ viewOnly: false });
+          ctrl.chessground.set({ selectOnly: true });
+          //todo reset all not just current squares
+          if (ctrl.data.currentSelectedSquares) {
+            for (const prevSquare of ctrl.data.currentSelectedSquares) {
+              ctrl.chessground.selectSquare(prevSquare as cg.Key);
+            }
+          }
+          ctrl.data.selectedSquares = o.squares.split(',') as Key[];
+          for (const square of ctrl.data.selectedSquares) {
+            ctrl.chessground.selectSquare(square as cg.Key);
+          }
+        } else {
+          ctrl.data.selectedSquares = o.squares.split(',') as Key[];
+          ctrl.chessground.set({ viewOnly: true });
+        }
+
+        console.log('Squares selected (data) ', ctrl.data);
+        ctrl.redraw();
+      }
     },
     berserk(playerIndex: PlayerIndex) {
       ctrl.setBerserk(playerIndex);

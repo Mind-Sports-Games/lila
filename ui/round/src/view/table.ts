@@ -51,12 +51,14 @@ export const renderTablePlay = (ctrl: RoundController) => {
               : button.standard(ctrl, game.takebackable, 'i', 'proposeATakeback', 'takeback-yes', ctrl.takebackYes),
             ctrl.drawConfirm
               ? button.drawConfirm(ctrl)
-              : d.game.canOfferDraw ?
-                button.standard(ctrl, ctrl.canOfferDraw, '2', 'offerDraw', 'draw-yes', () => ctrl.offerDraw(true)) : null,
+              : d.game.canOfferDraw
+              ? button.standard(ctrl, ctrl.canOfferDraw, '2', 'offerDraw', 'draw-yes', () => ctrl.offerDraw(true))
+              : null,
             ctrl.passConfirm
               ? button.passConfirm(ctrl)
-              : d.game.canDoPassAction ?
-                button.standard(ctrl, ctrl.canPassTurn, '', 'pass', 'pass-yes', () => ctrl.passTurn(true)) : null,
+              : d.game.canDoPassAction
+              ? button.standard(ctrl, ctrl.canPassTurn, '', 'pass', 'pass-yes', () => ctrl.passTurn(true))
+              : null,
             ctrl.resignConfirm
               ? button.resignConfirm(ctrl)
               : button.standard(ctrl, game.resignable, 'b', 'resign', 'resign', () => ctrl.resign(true)),
@@ -74,7 +76,7 @@ export const renderTablePlay = (ctrl: RoundController) => {
           button.answerOpponentDrawOffer(ctrl),
           button.cancelTakebackProposition(ctrl),
           button.answerOpponentTakebackProposition(ctrl),
-          ctrl.selectSquaresConfirm ? button.selectSquaresConfirm(ctrl) : button.selectSquares(ctrl),
+          button.selectSquaresOfferOptions(ctrl),
         ];
   return [
     replay.render(ctrl),

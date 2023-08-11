@@ -253,6 +253,9 @@
   <string name="playerIndexTimeOut">%s time out</string>
   <string name="whiteTimeOut">White time out</string>
   <string name="blackTimeOut">Black time out</string>
+  <string name="playerIndexOffersSelectSquares">%s offers selected squares</string>
+  <string name="selectSquareOfferDeclined">Square selection declined </string>
+  <string name="selectSquareOfferAccepted">Square selection accepted</string>
   <string name="drawOfferSent">Draw offer sent</string>
   <string name="drawOfferDeclined">Draw offer declined</string>
   <string name="drawOfferAccepted">Draw offer accepted</string>

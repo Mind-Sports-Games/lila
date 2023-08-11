@@ -98,6 +98,7 @@ export interface Player {
   proposingTakeback?: boolean;
   offeringRematch?: boolean;
   offeringDraw?: boolean;
+  offeringSelectSquares?: boolean;
   ai: number | null;
   onGame: boolean;
   gone: number | boolean;
