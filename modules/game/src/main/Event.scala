@@ -58,6 +58,7 @@ object Event {
         check: Boolean,
         threefold: Boolean,
         perpetualWarning: Boolean,
+        takebackable: Boolean,
         state: State,
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
@@ -81,6 +82,7 @@ object Event {
         .add("check" -> check)
         .add("threefold" -> threefold)
         .add("perpetualWarning" -> perpetualWarning)
+        .add("takebackable" -> takebackable)
         .add("wDraw" -> state.p1OffersDraw)
         .add("bDraw" -> state.p2OffersDraw)
         .add("crazyhouse" -> pocketData)
@@ -102,6 +104,7 @@ object Event {
       promotion: Option[Promotion],
       enpassant: Option[Enpassant],
       castle: Option[Castling],
+      takebackable: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -118,6 +121,7 @@ object Event {
         check,
         threefold,
         perpetualWarning,
+        takebackable,
         state,
         clock,
         possibleMoves,
@@ -180,6 +184,7 @@ object Event {
         castle = move.castle.map { case (king, rook) =>
           Castling(king, rook, move.player)
         },
+        takebackable = situation.takebackable,
         state = state,
         clock = clock,
         possibleMoves = (situation, move.dest) match {
@@ -225,6 +230,7 @@ object Event {
       check: Boolean,
       threefold: Boolean,
       perpetualWarning: Boolean,
+      takebackable: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -240,6 +246,7 @@ object Event {
         check,
         threefold,
         perpetualWarning,
+        takebackable,
         state,
         clock,
         possibleMoves,
@@ -276,6 +283,7 @@ object Event {
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
@@ -301,6 +309,7 @@ object Event {
       check: Boolean,
       threefold: Boolean,
       perpetualWarning: Boolean,
+      takebackable: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -316,6 +325,7 @@ object Event {
         check,
         threefold,
         perpetualWarning,
+        takebackable,
         state,
         clock,
         possibleMoves,
@@ -350,6 +360,7 @@ object Event {
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
@@ -373,6 +384,7 @@ object Event {
       check: Boolean,
       threefold: Boolean,
       perpetualWarning: Boolean,
+      takebackable: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -388,6 +400,7 @@ object Event {
         check,
         threefold,
         perpetualWarning,
+        takebackable,
         state,
         clock,
         possibleMoves,
@@ -420,6 +433,7 @@ object Event {
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,

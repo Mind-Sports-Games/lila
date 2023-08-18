@@ -147,6 +147,7 @@ export interface ApiMove extends Step {
   check: boolean;
   threefold: boolean;
   perpetualWarning: boolean;
+  takebackable: boolean;
   wDraw: boolean;
   bDraw: boolean;
   crazyhouse?: CrazyData;
