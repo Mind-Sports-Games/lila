@@ -515,6 +515,7 @@ export default class RoundController {
     if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
       console.log('api move o.canSelectSquares', o.canSelectSquares);
       d.selectMode = o.canSelectSquares ? o.canSelectSquares && activePlayerIndex : false;
+      d.takebackable = (o.canSelectSquares === undefined) ? d.takebackable : d.takebackable && !o.canSelectSquares;
     }
     this.setTitle();
     if (!this.replaying()) {
