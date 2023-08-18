@@ -173,22 +173,29 @@ export const passConfirm = (ctrl: RoundController): VNode =>
     fbtCancel(ctrl, ctrl.passTurn),
   ]);
 
-export const offerSelectSquaresButton = (ctrl: RoundController): VNode =>
+export const offerSelectSquaresButton = (ctrl: RoundController, isNotSameOffer = true): VNode =>
   h('button.select-squares-offer.button', {
-    attrs: { title: 'selectSquares', 'data-icon': '' },
-    hook: util.bind('click', () => ctrl.offerSelectSquares(true)),
+    class: { disabled: !isNotSameOffer },
+    attrs: { disabled: !isNotSameOffer, title: 'send offer', 'data-icon': '' },
+    hook: util.bind('click', () => ctrl.offerSelectSquares()),
   });
 
 export function offerSelectSquares(ctrl: RoundController) {
+  const isNotSameOffer =
+    ctrl.data.selectedSquares === undefined ||
+    ctrl.data.currentSelectedSquares === undefined ||
+    ctrl.data.currentSelectedSquares.sort().join(',') !== ctrl.data.selectedSquares?.sort().join(',');
   return ctrl.canOfferSelectSquares()
     ? h('div.pending', [
         h(
           'p',
-          `Select dead stones (${ctrl.data.currentSelectedSquares ? ctrl.data.currentSelectedSquares.length : 0} DS)`
+          isNotSameOffer
+            ? `Select dead stones (${
+                ctrl.data.currentSelectedSquares ? ctrl.data.currentSelectedSquares.length : 0
+              } DS)`
+            : `Respond to offer below or select different dead stones`
         ),
-        ctrl.data.selectedSquares === undefined || ctrl.data.currentSelectedSquares !== ctrl.data.selectedSquares
-          ? offerSelectSquaresButton(ctrl)
-          : null,
+        isNotSameOffer ? offerSelectSquaresButton(ctrl) : offerSelectSquaresButton(ctrl, false),
       ])
     : null;
 }
@@ -198,7 +205,7 @@ export const selectSquaresOfferOptions = (ctrl: RoundController): VNode | null =
     ? h('div', [offerSelectSquares(ctrl), answerOpponentSelectSquaresOffer(ctrl)])
     : ctrl.data.player.offeringSelectSquares
     ? h(
-        'div',
+        'div.pending',
         {},
         `Offer sent to opponent (${ctrl.data.currentSelectedSquares ? ctrl.data.currentSelectedSquares.length : 0} DS)`
       )

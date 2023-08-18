@@ -16,7 +16,7 @@
     "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.28",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.29",
     "common": "2.0.0",
     "puz": "2.0.0",
     "snabbdom": "^3.0.1",

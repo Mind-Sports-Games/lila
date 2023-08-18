@@ -51,9 +51,28 @@ final private[round] class SelectSquarer(
           proxy.save {
             messenger.system(g, trans.playerIndexOffersSelectSquares(pov.game.playerTrans(playerIndex)).v)
             Progress(g) map { _.offerSelectSquares(playerIndex, squares) }
-          } inject List(Event.SelectSquaresOffer(playerIndex, squares))
+          } >>- publishSelectSquaresOffer(pov) inject List(Event.SelectSquaresOffer(playerIndex, squares))
         case _ => fuccess(List(Event.ReloadOwner))
       }
     }
+
+  private def publishSelectSquaresOffer(pov: Pov)(implicit proxy: GameProxy): Unit = {
+    if (pov.game.isCorrespondence && pov.game.nonAi)
+      Bus.publish(
+        lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(pov.gameId),
+        "offerEventCorres"
+      )
+    if (lila.game.Game.isBoardCompatible(pov.game))
+      proxy
+        .withPov(pov.playerIndex) { p =>
+          fuccess(
+            Bus.publish(
+              lila.game.actorApi.BoardSelectSquaresOffer(p),
+              s"boardSelectSquaresOffer:${pov.gameId}"
+            )
+          )
+        }
+        .unit
+  }
 
 }

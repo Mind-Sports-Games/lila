@@ -376,6 +376,13 @@ square {
     }
   }
 
+  &.area.p1 {
+    background: radial-gradient(rgba(0, 0, 0, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
+  }
+  &.area.p2 {
+    background: radial-gradient(rgba(255, 255, 255, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
+  }
+
   &.premove-dest {
     background: radial-gradient(rgba(20, 30, 85, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
     pointer-events: auto;

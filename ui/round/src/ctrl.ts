@@ -514,8 +514,7 @@ export default class RoundController {
     d.takebackable = o.takebackable;
     //from pass move
     if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
-      console.log('api move o.canSelectSquares', o.canSelectSquares);
-      d.selectMode = o.canSelectSquares ? o.canSelectSquares && activePlayerIndex : false;
+      d.selectMode = o.canSelectSquares ? activePlayerIndex : false;
     }
     this.setTitle();
     if (!this.replaying()) {
@@ -569,6 +568,9 @@ export default class RoundController {
         check: !!o.check,
         onlyDropsVariant: this.data.onlyDropsVariant, //need to update every move (amazons)
         selectOnly: d.selectMode,
+        highlight: {
+          lastMove: d.pref.highlight && !d.selectMode,
+        },
       });
       if (o.check) sound.check();
       blur.onMove();
@@ -911,22 +913,7 @@ export default class RoundController {
     (this.data.opponent.offeringSelectSquares || this.data.selectMode) &&
     !this.data.player.offeringSelectSquares;
 
-  offerSelectSquares = (v: boolean): void => {
-    if (this.canOfferSelectSquares()) {
-      if (this.selectSquaresConfirm) {
-        if (v) this.doOfferSelectSquares();
-        clearTimeout(this.selectSquaresConfirm);
-        this.selectSquaresConfirm = undefined;
-      } else if (v) {
-        if (this.data.pref.confirmResign)
-          this.selectSquaresConfirm = setTimeout(() => {
-            this.offerSelectSquares(false);
-          }, 3000);
-        else this.doOfferSelectSquares();
-      }
-    }
-    this.redraw();
-  };
+  offerSelectSquares = (): void => this.doOfferSelectSquares();
 
   private doOfferSelectSquares = () => {
     const squares = Array.from(this.chessground.state.selectedPieces.keys());

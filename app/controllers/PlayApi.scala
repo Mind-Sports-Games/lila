@@ -104,6 +104,10 @@ final class PlayApi(
           as(id, me) { pov =>
             fuccess(env.bot.player.setDraw(pov, lila.common.Form.trueish(bool))) pipe toResult
           }
+        case Array("game", id, "selectSquares", bool) =>
+          as(id, me) { pov =>
+            fuccess(env.bot.player.decideSelectSquares(pov, lila.common.Form.trueish(bool))) pipe toResult
+          }
         case _ => notFoundJson("No such command")
       }
   }

@@ -31,7 +31,7 @@ export function makeConfig(ctrl: RoundController): Config {
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {
-      lastMove: data.pref.highlight,
+      lastMove: data.pref.highlight && !data.selectMode,
       check: data.pref.highlight,
     },
     events: {
@@ -81,7 +81,7 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     dropmode: {
-      showDropDests: true,
+      showDropDests: !['go9x9', 'go13x13', 'go19x19'].includes(data.game.variant.key),
       dropDests: playing ? stratUtils.readDropsByRole(data.possibleDropsByRole) : new Map(),
       active: data.onlyDropsVariant && playing ? true : false,
       piece:
