@@ -52,7 +52,7 @@ export const justIcon = (icon: string): VNodeData => ({
 
 // TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
-  if (!uci || uci == 'pass') return undefined;
+  if (!uci || uci == 'pass' || uci.substring(0, 3) == 'ss:') return undefined;
   const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
   return [pos[0], pos[1]] as cg.Key[];
@@ -178,7 +178,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisBoardVariants: VariantKey[] = ['amazons'];
+const noAnalysisBoardVariants: VariantKey[] = ['amazons', 'go9x9', 'go13x13', 'go19x19'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisBoardVariants.indexOf(variant) == -1;

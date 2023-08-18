@@ -19,6 +19,7 @@ import strategygames.{
   Move,
   Drop,
   Pass,
+  SelectSquares,
   Action,
   Pos,
   Speed,
@@ -290,7 +291,9 @@ case class Game(
       status = (status != updated.status) option updated.status,
       winner = game.situation.winner,
       p1OffersDraw = p1Player.isOfferingDraw,
-      p2OffersDraw = p2Player.isOfferingDraw
+      p2OffersDraw = p2Player.isOfferingDraw,
+      p1OffersSelectSquares = p1Player.isOfferingSelectSquares,
+      p2OffersSelectSquares = p2Player.isOfferingSelectSquares
     )
 
     val clockEvent = updated.chess.clock map Event.Clock.apply orElse {
@@ -302,6 +305,8 @@ case class Game(
         case m: Move => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
         case d: Drop => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
         case p: Pass => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
+        case ss: SelectSquares =>
+          Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
       }
     } :: {
       // abstraction leak, I know.
@@ -336,10 +341,11 @@ case class Game(
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
-      case d: Uci.Drop => s"${d.pos}${d.pos}"
-      case m: Uci.Move => m.keys
-      case _: Uci.Pass => "pass"
-      case _           => sys.error("Type Error")
+      case d: Uci.Drop          => s"${d.pos}${d.pos}"
+      case m: Uci.Move          => m.keys
+      case _: Uci.Pass          => "pass"
+      case _: Uci.SelectSquares => "ss:"
+      case _                    => sys.error("Type Error")
     }
 
   def updatePlayer(playerIndex: PlayerIndex, f: Player => Player) =
@@ -428,7 +434,24 @@ case class Game(
       p2Player = f(p2Player)
     )
 
+  def playerCanOfferSelectSquares(playerIndex: PlayerIndex) =
+    started && playable && turns >= 2 && !player(playerIndex).isOfferingSelectSquares
+
   def drawOffers = metadata.drawOffers
+
+  def selectedSquares = metadata.selectedSquares
+
+  def offerSelectSquares(playerIndex: PlayerIndex, squares: List[Pos]) =
+    copy(metadata =
+      metadata.copy(selectedSquares = Some(squares), playerOfferedSelectedSquares = Some(playerIndex))
+    )
+      .updatePlayer(playerIndex, _.offerSelectSquares)
+      .updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
+
+  def resetSelectSquares(playerIndex: PlayerIndex) =
+    copy(metadata = metadata.copy(selectedSquares = None, playerOfferedSelectedSquares = None))
+      .updatePlayer(playerIndex, _.removeSelectSquaresOffer)
+      .updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
 
   def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&
@@ -966,6 +989,9 @@ object Game {
     val checkAt           = "ck"
     val perfType          = "pt" // only set on student games for aggregation
     val drawOffers        = "do"
+    // go
+    val selectedSquares              = "ss"  // the dead stones selected in go
+    val playerOfferedSelectedSquares = "pss" //the player who offered last
     //draughts
     val simulPairing = "sp"
     val timeOutUntil = "to"

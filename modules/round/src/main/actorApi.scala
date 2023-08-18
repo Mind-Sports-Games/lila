@@ -5,7 +5,7 @@ import scala.concurrent.Promise
 import scala.concurrent.duration._
 
 import strategygames.format.Uci
-import strategygames.{ Player => PlayerIndex, Move, MoveMetrics }
+import strategygames.{ Player => PlayerIndex, Move, MoveMetrics, Pos }
 
 import lila.common.IpAddress
 import lila.game.Game.PlayerId
@@ -40,6 +40,8 @@ package round {
 
   case class PlayResult(events: Events, fen: String, lastMove: Option[String])
 
+  case class PlayerSelectSquares(playerId: PlayerId, squares: List[Pos])
+
   case object AbortForce
   case object Threefold
   case object ResignAi
@@ -48,6 +50,8 @@ package round {
   case class DrawClaim(playerId: PlayerId)
   case class DrawYes(playerId: PlayerId)
   case class DrawNo(playerId: PlayerId)
+  case class SelectSquaresAccept(playerId: PlayerId)
+  case class SelectSquaresDecline(playerId: PlayerId)
   case class TakebackYes(playerId: PlayerId)
   case class TakebackNo(playerId: PlayerId)
   object Moretime { val defaultDuration = 15.seconds }

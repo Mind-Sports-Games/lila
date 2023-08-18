@@ -31,3 +31,5 @@ object MoveGameEvent {
 }
 
 case class BoardDrawOffer(pov: Pov)
+
+case class BoardSelectSquaresOffer(pov: Pov)

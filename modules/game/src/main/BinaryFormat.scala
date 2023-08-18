@@ -389,6 +389,18 @@ object BinaryFormat {
       )
   }
 
+  object pos {
+    def writeGo(squares: List[Pos]): ByteArray = {
+      ByteArray(squares.flatMap {
+        case Pos.Go(g) => Some(g.index.toByte)
+        case _         => None
+      }.toArray)
+    }
+    def readGo(ba: ByteArray): List[Pos] = {
+      ba.value.flatMap(p => go.Pos(p.toInt)).toList.map(Pos.Go(_))
+    }
+  }
+
   object piece {
 
     def writeChess(pieces: chess.PieceMap): ByteArray = {

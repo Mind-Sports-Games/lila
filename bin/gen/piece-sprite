@@ -75,7 +75,8 @@ togyzkumalak_themes = [
   ['black_gloss', 'svg'],
 ]
 go_themes = [
-  ['classic_stone', 'svg']
+  ['classic_stone', 'svg'],
+  ['cross', 'svg']
 ]
 types = {
   'svg' => 'svg+xml;base64,',

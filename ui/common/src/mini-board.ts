@@ -40,7 +40,10 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
           fen,
-          lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          lastMove: lm && (lm == 'pass' ? undefined : lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          highlight: {
+            lastMove: lm != undefined && lm! == 'pass',
+          },
           drawable: {
             enabled: false,
             visible: false,

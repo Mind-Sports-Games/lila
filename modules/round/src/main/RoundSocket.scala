@@ -4,7 +4,7 @@ import actorApi._
 import actorApi.round._
 import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
 import strategygames.format.Uci
-import strategygames.{ P2, Centis, Player => PlayerIndex, GameFamily, MoveMetrics, Speed, P1 }
+import strategygames.{ P2, Centis, Player => PlayerIndex, GameFamily, MoveMetrics, Speed, P1, Pos }
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.concurrent.duration._
@@ -99,22 +99,27 @@ final class RoundSocket(
       tellRound(fullId.gameId, HumanPlay(fullId.playerId, uci, blur, lag, none))
     case Protocol.In.PlayerDo(id, tpe) if !stopping =>
       tpe match {
-        case "moretime"     => tellRound(id.gameId, Moretime(id.playerId))
-        case "rematch-yes"  => tellRound(id.gameId, RematchYes(id.playerId.value))
-        case "rematch-no"   => tellRound(id.gameId, RematchNo(id.playerId.value))
-        case "takeback-yes" => tellRound(id.gameId, TakebackYes(id.playerId))
-        case "takeback-no"  => tellRound(id.gameId, TakebackNo(id.playerId))
-        case "draw-yes"     => tellRound(id.gameId, DrawYes(id.playerId))
-        case "draw-no"      => tellRound(id.gameId, DrawNo(id.playerId))
-        case "draw-claim"   => tellRound(id.gameId, DrawClaim(id.playerId))
-        case "resign"       => tellRound(id.gameId, Resign(id.playerId.value))
-        case "resign-force" => tellRound(id.gameId, ResignForce(id.playerId))
-        case "draw-force"   => tellRound(id.gameId, DrawForce(id.playerId))
-        case "abort"        => tellRound(id.gameId, Abort(id.playerId.value))
-        case "outoftime"    => tellRound(id.gameId, QuietFlag) // mobile app BC
-        case t              => logger.warn(s"Unhandled round socket message: $t")
+        case "moretime"               => tellRound(id.gameId, Moretime(id.playerId))
+        case "rematch-yes"            => tellRound(id.gameId, RematchYes(id.playerId.value))
+        case "rematch-no"             => tellRound(id.gameId, RematchNo(id.playerId.value))
+        case "takeback-yes"           => tellRound(id.gameId, TakebackYes(id.playerId))
+        case "takeback-no"            => tellRound(id.gameId, TakebackNo(id.playerId))
+        case "draw-yes"               => tellRound(id.gameId, DrawYes(id.playerId))
+        case "draw-no"                => tellRound(id.gameId, DrawNo(id.playerId))
+        case "draw-claim"             => tellRound(id.gameId, DrawClaim(id.playerId))
+        case "select-squares-accept"  => tellRound(id.gameId, SelectSquaresAccept(id.playerId))
+        case "select-squares-decline" => tellRound(id.gameId, SelectSquaresDecline(id.playerId))
+        case "resign"                 => tellRound(id.gameId, Resign(id.playerId.value))
+        case "resign-force"           => tellRound(id.gameId, ResignForce(id.playerId))
+        case "draw-force"             => tellRound(id.gameId, DrawForce(id.playerId))
+        case "abort"                  => tellRound(id.gameId, Abort(id.playerId.value))
+        case "outoftime"              => tellRound(id.gameId, QuietFlag) // mobile app BC
+        case t                        => logger.warn(s"Unhandled round socket message: $t")
       }
-    case Protocol.In.Flag(gameId, playerIndex, fromPlayerId) => tellRound(gameId, ClientFlag(playerIndex, fromPlayerId))
+    case Protocol.In.PlayerSelectSquares(fullId, squares) if !stopping =>
+      tellRound(fullId.gameId, PlayerSelectSquares(fullId.playerId, squares))
+    case Protocol.In.Flag(gameId, playerIndex, fromPlayerId) =>
+      tellRound(gameId, ClientFlag(playerIndex, fromPlayerId))
     case Protocol.In.PlayerChatSay(id, Right(playerIndex), msg) =>
       gameIfPresent(id.value) foreach {
         _ foreach {
@@ -230,9 +235,9 @@ object RoundSocket {
       }
     } / {
       pov.game.chess.board.materialImbalance match {
-        case _ if pov.game.variant.materialImbalanceVariant                   => 1
+        case _ if pov.game.variant.materialImbalanceVariant                         => 1
         case i if (pov.playerIndex.p1 && i <= -4) || (pov.playerIndex.p2 && i >= 4) => 3
-        case _                                                                => 1
+        case _                                                                      => 1
       }
     } / {
       if (pov.player.hasUser) 1 else 2
@@ -245,12 +250,16 @@ object RoundSocket {
       case class PlayerOnlines(onlines: Iterable[(Game.Id, Option[RoomCrowd])])        extends P.In
       case class PlayerDo(fullId: FullId, tpe: String)                                 extends P.In
       case class PlayerMove(fullId: FullId, uci: Uci, blur: Boolean, lag: MoveMetrics) extends P.In
-      case class PlayerChatSay(gameId: Game.Id, userIdOrPlayerIndex: Either[User.ID, PlayerIndex], msg: String)
-          extends P.In
+      case class PlayerSelectSquares(fullId: FullId, squares: List[Pos])               extends P.In
+      case class PlayerChatSay(
+          gameId: Game.Id,
+          userIdOrPlayerIndex: Either[User.ID, PlayerIndex],
+          msg: String
+      )                                                                                           extends P.In
       case class WatcherChatSay(gameId: Game.Id, userId: User.ID, msg: String)                    extends P.In
       case class Bye(fullId: FullId)                                                              extends P.In
       case class HoldAlert(fullId: FullId, ip: IpAddress, mean: Int, sd: Int)                     extends P.In
-      case class Flag(gameId: Game.Id, playerIndex: PlayerIndex, fromPlayerId: Option[PlayerId])              extends P.In
+      case class Flag(gameId: Game.Id, playerIndex: PlayerIndex, fromPlayerId: Option[PlayerId])  extends P.In
       case class Berserk(gameId: Game.Id, userId: User.ID)                                        extends P.In
       case class SelfReport(fullId: FullId, ip: IpAddress, userId: Option[User.ID], name: String) extends P.In
 
@@ -275,18 +284,28 @@ object RoundSocket {
                 tpe <- obj str "t"
               } yield PlayerDo(FullId(fullId), tpe)
             }
-          case "r/move" =>
-            raw.get(6) { case Array(fullId, gfS, uciS, blurS, lagS, mtS) => {
-              val gf = GameFamily(gfS.toInt)
-              Uci(gf.gameLogic, gf, uciS) map { uci =>
-                PlayerMove(
-                  FullId(fullId),
-                  uci,
-                  P.In.boolean(blurS),
-                  MoveMetrics(centis(lagS), centis(mtS))
-                )
+          case "r/select-squares" =>
+            raw.get(3) {
+              case Array(fullId, gfS, squaresS) => {
+                val gf      = GameFamily(gfS.toInt)
+                val squares = squaresS.split(",").toList.flatMap(p => Pos.fromKey(gf.gameLogic, p))
+                PlayerSelectSquares(FullId(fullId), squares).some
               }
-            }}
+            }
+          case "r/move" =>
+            raw.get(6) {
+              case Array(fullId, gfS, uciS, blurS, lagS, mtS) => {
+                val gf = GameFamily(gfS.toInt)
+                Uci(gf.gameLogic, gf, uciS) map { uci =>
+                  PlayerMove(
+                    FullId(fullId),
+                    uci,
+                    P.In.boolean(blurS),
+                    MoveMetrics(centis(lagS), centis(mtS))
+                  )
+                }
+              }
+            }
           case "chat/say" =>
             raw.get(3) { case Array(roomId, author, msg) =>
               PlayerChatSay(Game.Id(roomId), readPlayerIndex(author).toRight(author), msg).some

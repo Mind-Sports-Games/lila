@@ -83,6 +83,8 @@ final class Env(
       logUnit { pushApi takebackOffer gameId }
     case lila.hub.actorApi.round.CorresDrawOfferEvent(gameId) =>
       logUnit { pushApi drawOffer gameId }
+    case lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(gameId) =>
+      logUnit { pushApi selectSquaresOffer gameId }
     case lila.msg.MsgThread.Unread(t) =>
       logUnit { pushApi newMsg t }
     case lila.challenge.Event.Create(c) =>

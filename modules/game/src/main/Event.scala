@@ -13,6 +13,7 @@ import strategygames.{
   Move => StratMove,
   Drop => StratDrop,
   Pass => StratPass,
+  SelectSquares => StratSelectSquares,
   PromotableRole,
   PocketData,
   Pos,
@@ -57,6 +58,7 @@ object Event {
         check: Boolean,
         threefold: Boolean,
         perpetualWarning: Boolean,
+        takebackable: Boolean,
         state: State,
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
@@ -80,6 +82,7 @@ object Event {
         .add("check" -> check)
         .add("threefold" -> threefold)
         .add("perpetualWarning" -> perpetualWarning)
+        .add("takebackable" -> takebackable)
         .add("wDraw" -> state.p1OffersDraw)
         .add("bDraw" -> state.p2OffersDraw)
         .add("crazyhouse" -> pocketData)
@@ -101,6 +104,7 @@ object Event {
       promotion: Option[Promotion],
       enpassant: Option[Enpassant],
       castle: Option[Castling],
+      takebackable: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -117,6 +121,7 @@ object Event {
         check,
         threefold,
         perpetualWarning,
+        takebackable,
         state,
         clock,
         possibleMoves,
@@ -179,6 +184,7 @@ object Event {
         castle = move.castle.map { case (king, rook) =>
           Castling(king, rook, move.player)
         },
+        takebackable = situation.takebackable,
         state = state,
         clock = clock,
         possibleMoves = (situation, move.dest) match {
@@ -224,6 +230,7 @@ object Event {
       check: Boolean,
       threefold: Boolean,
       perpetualWarning: Boolean,
+      takebackable: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -239,6 +246,7 @@ object Event {
         check,
         threefold,
         perpetualWarning,
+        takebackable,
         state,
         clock,
         possibleMoves,
@@ -275,6 +283,7 @@ object Event {
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
@@ -294,11 +303,13 @@ object Event {
       gf: GameFamily,
       // role: Role,
       // pos: Pos,
+      canSelectSquares: Boolean,
       san: String,
       fen: String,
       check: Boolean,
       threefold: Boolean,
       perpetualWarning: Boolean,
+      takebackable: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -314,6 +325,7 @@ object Event {
         check,
         threefold,
         perpetualWarning,
+        takebackable,
         state,
         clock,
         possibleMoves,
@@ -322,9 +334,9 @@ object Event {
         pocketData
       ) {
         Json.obj(
-          //"role" -> role.groundName,
-          "uci" -> "pass",
-          "san" -> san
+          "canSelectSquares" -> canSelectSquares,
+          "uci"              -> "pass",
+          "san"              -> san
         )
       }
     override def moveBy = Some(!state.playerIndex)
@@ -339,11 +351,89 @@ object Event {
     ): Pass =
       Pass(
         gf = situation.board.variant.gameFamily,
+        canSelectSquares = situation match {
+          case (Situation.Go(s)) => s.canSelectSquares
+          case _                 => false
+        },
         san = "pass",
         fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        pocketData = pocketData
+      )
+  }
+
+  case class SelectSquares(
+      gf: GameFamily,
+      squares: List[Pos],
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      takebackable: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+  ) extends Event {
+    def typ = "selectSquares"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        takebackable,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        pocketData
+      ) {
+        Json.obj(
+          "squares"          -> squares.mkString(","),
+          "canSelectSquares" -> false,
+          "uci"              -> s"ss:${squares.mkString(",")}",
+          "san"              -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+  object SelectSquares {
+    def apply(
+        ss: StratSelectSquares,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): SelectSquares =
+      SelectSquares(
+        gf = situation.board.variant.gameFamily,
+        squares = ss.squares,
+        san = s"ss:${ss.squares.mkString(",")}",
+        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
@@ -542,6 +632,20 @@ object Event {
     def data = reloadOr("drawOffer", by)
   }
 
+  case class SelectSquaresOffer(
+      playerIndex: PlayerIndex,
+      squares: List[Pos],
+      accepted: Option[Boolean] = None
+  ) extends Event {
+    def typ = "selectSquaresOffer"
+
+    def data = Json.obj(
+      "playerIndex" -> playerIndex,
+      "squares"     -> squares.mkString(","),
+      "accepted"    -> accepted
+    )
+  }
+
   case class ClockInc(playerIndex: PlayerIndex, time: Centis) extends Event {
     def typ = "clockInc"
     def data =
@@ -639,7 +743,9 @@ object Event {
       status: Option[Status],
       winner: Option[PlayerIndex],
       p1OffersDraw: Boolean,
-      p2OffersDraw: Boolean
+      p2OffersDraw: Boolean,
+      p1OffersSelectSquares: Boolean,
+      p2OffersSelectSquares: Boolean
   ) extends Event {
     def typ = "state"
     def data =
@@ -652,6 +758,8 @@ object Event {
         .add("winner" -> winner)
         .add("wDraw" -> p1OffersDraw)
         .add("bDraw" -> p2OffersDraw)
+        .add("wSelectSquares" -> p1OffersSelectSquares)
+        .add("bSelectSquares" -> p2OffersSelectSquares)
   }
 
   case class TakebackOffers(

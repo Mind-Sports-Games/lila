@@ -70,6 +70,7 @@ final class JsonView(
       .add("provisional" -> p.provisional)
       .add("offeringRematch" -> isOfferingRematch(Pov(g, p)))
       .add("offeringDraw" -> p.isOfferingDraw)
+      .add("offeringSelectSquares" -> p.isOfferingSelectSquares)
       .add("proposingTakeback" -> p.isProposingTakeback)
       .add("checks" -> checkCount(g, p.playerIndex))
       .add("score" -> score(g, p.playerIndex))
@@ -166,6 +167,9 @@ final class JsonView(
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
+          .add("selectMode" -> selectMode(pov))
+          .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
+          .add("playerOfferingSelectedSquares" -> pov.game.metadata.playerOfferedSelectedSquares)
           .add("expiration" -> pov.game.expirable.option {
             Json.obj(
               "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
@@ -414,6 +418,18 @@ final class JsonView(
         JsString(drops.map(_.key).mkString)
       }
     }
+
+  private def selectMode(pov: Pov): Boolean = {
+    pov.game.situation match {
+      case Situation.Go(s) =>
+        s.canSelectSquares && (
+          (pov.game.turnOf(pov.player) && !pov.player.isOfferingSelectSquares)
+            ||
+              pov.opponent.isOfferingSelectSquares
+        )
+      case _ => false
+    }
+  }
 
   //draughts
   private def captureLength(pov: Pov): Int =
