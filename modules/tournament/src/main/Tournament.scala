@@ -118,7 +118,7 @@ case class Tournament(
 
   def pairingsClosed = secondsToFinish < pairingsClosedSeconds
 
-  //start at 0 as it's actaully an index for medley variants in front end
+  //start at 0 as it's actually an index for medley variants in front end
   def medleyRound: Option[Int] =
     if (isStarted) {
       medleyIntervalSeconds

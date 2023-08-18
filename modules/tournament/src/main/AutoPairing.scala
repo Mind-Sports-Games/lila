@@ -16,6 +16,7 @@ final class AutoPairing(
 
   def apply(
       tour: Tournament,
+      variant: Variant,
       pairing: Pairing,
       playersMap: Map[User.ID, Player],
       ranking: Ranking
@@ -26,10 +27,10 @@ final class AutoPairing(
     val game = Game
       .make(
         chess = StratGame(
-          tour.currentVariant.gameLogic,
+          variant.gameLogic,
           Some {
-            if (tour.position.isEmpty) tour.currentVariant
-            else Variant.libFromPosition(tour.currentVariant.gameLogic)
+            if (tour.position.isEmpty) variant
+            else Variant.libFromPosition(variant.gameLogic)
           },
           tour.position
         ) pipe { g =>
