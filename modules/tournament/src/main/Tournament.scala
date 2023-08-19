@@ -45,7 +45,8 @@ case class Tournament(
     trophy3rd: Option[String] = None,
     trophyExpiryDays: Option[Int] = None,
     botsAllowed: Boolean = false,
-    hasChat: Boolean = true
+    hasChat: Boolean = true,
+    medleyRound: Int = 0
 ) {
 
   def isCreated   = status == Status.Created
@@ -105,7 +106,7 @@ case class Tournament(
 
   def meldeySecondsToFinishInterval =
     medleyIntervalSeconds.fold(0)(
-      (secondsToFinish - _.drop(medleyRound.getOrElse(0) + 1).sum)
+      (secondsToFinish - _.drop(medleyRound + 1).sum)
     )
 
   def finishesAt = startsAt plusMinutes minutes
@@ -120,33 +121,19 @@ case class Tournament(
 
   def isOver = secondsToFinish <= 0
 
-  //start at 0 as it's actually an index for medley variants in front end
-  def medleyRound: Option[Int] = {
-    // NOTE: Although this should be fast, use a stable concept of time througout
-    val nowSecondsStable = nowSeconds
-    if (isStarted) {
-      medleyIntervalSeconds
-        .map(
-          _.map { var s = 0; t => { s += t; s } }
-            .filter(_ <= ((nowSecondsStable - startsAt.getSeconds).toInt))
-            .size
-        )
-    } else None
-  }
-
-  def finalMedleyVariant: Boolean = medleyRound.nonEmpty && medleyRound == medleyNumIntervals.map(_ - 1)
+  def finalMedleyVariant: Boolean = medleyRound.some == medleyNumIntervals.map(_ - 1)
 
   private def medleyVal[A, B](o: Option[List[A]]): Option[A] =
-    o.flatMap(l => medleyRound.flatMap(l.lift(_)))
+    o.flatMap(_.lift(medleyRound))
 
   def currentIntervalTime =
     medleyVal(medleyIntervalSeconds).fold(0)(t => (t / 60).toInt)
 
-  def withNextVariant =
-    copy(variant = medleyVal(medleyVariants).getOrElse(variant))
+  def withNextMedleyRound =
+    copy(variant = medleyVal(medleyVariants).getOrElse(variant), medleyRound = medleyRound + 1)
 
-  def needsNewVariant =
-    withNextVariant.variant != variant
+  def needsNewMedleyRound =
+    withNextMedleyRound.variant != variant
 
   def medleyVariantsInTournament: Option[List[Variant]] =
     medleyVariants

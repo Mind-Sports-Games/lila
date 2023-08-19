@@ -109,7 +109,7 @@ final class JsonView(
       .add("myTeam" -> myTeam)
       .add("duelTeams" -> data.duelTeams)
       .add("secondsToFinishInterval" -> tour.isStarted.option(tour.meldeySecondsToFinishInterval))
-      .add("medleyRound" -> full.option(tour.medleyRound.getOrElse(-1))) ++
+      .add("medleyRound" -> full.option(tour.medleyRound)) ++
       full.?? {
         Json
           .obj(

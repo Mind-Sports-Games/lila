@@ -55,8 +55,8 @@ final private class StartedOrganizer(
         .unit
   }
 
-  private def processMedleyVariantChange(tour: Tournament) =
-    if (tour.needsNewVariant) api.newMedleyRound(tour)
+  private def processMedleyRoundChange(tour: Tournament) =
+    if (tour.needsNewMedleyRound) api.newMedleyRound(tour)
     else tour
 
   private def processPairings(tour: Tournament) =
@@ -71,7 +71,7 @@ final private class StartedOrganizer(
       api.finish(tour).inject(0)
     else
       tour
-        .pipe(processMedleyVariantChange)
+        .pipe(processMedleyRoundChange)
         .pipe(processPairings)
 
   // returns number of users actively awaiting a pairing

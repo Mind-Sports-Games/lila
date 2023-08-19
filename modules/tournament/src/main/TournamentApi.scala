@@ -267,7 +267,7 @@ final class TournamentApi(
   private[tournament] def newMedleyRound(tour: Tournament)(implicit
       lang: Lang = defaultLang
   ): Tournament = {
-    val newTour     = tour.withNextVariant
+    val newTour     = tour.withNextMedleyRound
     val balanceText = if (tour.isMedley) s" (for ${tour.currentIntervalTime} minutes)" else ""
     tournamentRepo.setMedleyVariant(tour.id, newTour.variant)
     socket.systemChat(
@@ -275,7 +275,7 @@ final class TournamentApi(
       trans.nowPairingX.txt(VariantKeys.variantName(newTour.variant)) + balanceText
     )
     socket.newMedleyVariant(tour.id, apiJsonView.variantJson(newTour.variant))
-    tour.withNextVariant
+    tour.withNextMedleyRound
   }
 
   def kill(tour: Tournament): Funit = {
