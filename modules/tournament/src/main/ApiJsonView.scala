@@ -48,11 +48,11 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
         "rated"      -> tour.mode.rated,
         "fullName"   -> tour.name(),
         "nbPlayers"  -> tour.nbPlayers,
-        "variant"    -> variantJson(tour.currentVariant),
+        "variant"    -> variantJson(tour.variant),
         "startsAt"   -> tour.startsAt,
         "finishesAt" -> tour.finishesAt,
         "status"     -> tour.status.id,
-        "perf"       -> perfJson(tour.currentPerfType),
+        "perf"       -> perfJson(tour.perfType),
         "isMedley"   -> tour.isMedley
       )
       .add("secondsToStart", tour.secondsToStart.some.filter(0 <))

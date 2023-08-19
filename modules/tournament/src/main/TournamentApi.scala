@@ -160,11 +160,9 @@ final class TournamentApi(
 
   private[tournament] def makePairings(forTour: Tournament, users: WaitingUsers): Funit = {
     // TODO: Consider a cutoff? Don't pair people 10s before the medley is finished?
-    val variant =
-      forTour.currentVariant
     (users.size >= forTour.minWaitingUsersForPairings && usersReady(forTour, users)) ??
       Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
-        updatePlayerRatingsForMedley(tour, variant, users.all) >>
+        updatePlayerRatingsForMedley(tour, tour.variant, users.all) >>
           withdrawInactivePlayers(tour.id, users.all) >>
           cached
             .ranking(tour)
@@ -189,7 +187,7 @@ final class TournamentApi(
                         pairings
                           .map { pairing =>
                             pairingRepo.insert(pairing) >>
-                              autoPairing(tour, variant, pairing, playersMap, ranking)
+                              autoPairing(tour, tour.variant, pairing, playersMap, ranking)
                                 .mon(_.tournament.pairing.createAutoPairing)
                                 .map {
                                   socket.startGame(tour.id, _)
@@ -266,14 +264,18 @@ final class TournamentApi(
       }
     }
 
-  private[tournament] def newMedleyRound(tour: Tournament)(implicit lang: Lang = defaultLang) = {
+  private[tournament] def newMedleyRound(tour: Tournament)(implicit
+      lang: Lang = defaultLang
+  ): Tournament = {
+    val newTour     = tour.withNextVariant
     val balanceText = if (tour.isMedley) s" (for ${tour.currentIntervalTime} minutes)" else ""
-    tournamentRepo.setMedleyVariant(tour.id, tour.currentVariant)
+    tournamentRepo.setMedleyVariant(tour.id, newTour.variant)
     socket.systemChat(
       tour.id,
-      trans.nowPairingX.txt(VariantKeys.variantName(tour.currentVariant)) + balanceText
+      trans.nowPairingX.txt(VariantKeys.variantName(newTour.variant)) + balanceText
     )
-    socket.newMedleyVariant(tour.id, apiJsonView.variantJson(tour.currentVariant))
+    socket.newMedleyVariant(tour.id, apiJsonView.variantJson(newTour.variant))
+    tour.withNextVariant
   }
 
   def kill(tour: Tournament): Funit = {
@@ -398,7 +400,7 @@ final class TournamentApi(
                 //       if someone joins _just_ before the new medley round, but after the
                 //       updatePlayerRatingsForMedley, which rating will they have in their next game?
                 def proceedWithTeam(team: Option[String]): Fu[JoinResult] =
-                  playerRepo.join(tour.id, me, tour.currentPerfType, team) >>
+                  playerRepo.join(tour.id, me, tour.perfType, team) >>
                     updateNbPlayers(tour.id) >>- {
                       socket.reload(tour.id)
                       publish()
@@ -608,7 +610,7 @@ final class TournamentApi(
             }
           } >> pairingRepo.opponentsOf(tour.id, userId).flatMap { uids =>
             pairingRepo.forfeitByTourAndUserId(tour.id, userId) >>
-              lila.common.Future.applySequentially(uids.toList)(updatePlayer(tour, tour.currentVariant, none))
+              lila.common.Future.applySequentially(uids.toList)(updatePlayer(tour, tour.variant, none))
           }
         }
       } >>

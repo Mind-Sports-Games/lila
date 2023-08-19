@@ -123,10 +123,10 @@ final class JsonView(
             "medleyMinutes"          -> tour.medleyMinutes,
             "medleyIntervalSeconds"  -> tour.medleyIntervalSeconds,
             "medleyBalanceIntervals" -> tour.medleyIsBalanced,
-            "perf"                   -> full.option(tour.currentPerfType),
+            "perf"                   -> full.option(tour.perfType),
             "clock"                  -> full.option(tour.clock),
-            "lib"                    -> full.option(tour.currentVariant.gameLogic.id),
-            "variant"                -> full.option(variantJson(tour.currentVariant)),
+            "lib"                    -> full.option(tour.variant.gameLogic.id),
+            "variant"                -> full.option(variantJson(tour.variant)),
             "p1Name" -> full.option(
               if (tour.isMedley) trans.p1.txt()
               else tour.variant.playerNames(P1)

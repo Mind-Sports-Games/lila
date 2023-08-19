@@ -118,26 +118,35 @@ case class Tournament(
 
   def pairingsClosed = secondsToFinish < pairingsClosedSeconds
 
+  def isOver = secondsToFinish <= 0
+
   //start at 0 as it's actually an index for medley variants in front end
-  def medleyRound: Option[Int] =
+  def medleyRound: Option[Int] = {
+    // NOTE: Although this should be fast, use a stable concept of time througout
+    val nowSecondsStable = nowSeconds
     if (isStarted) {
       medleyIntervalSeconds
         .map(
           _.map { var s = 0; t => { s += t; s } }
-            .filter(_ <= ((nowSeconds - startsAt.getSeconds).toInt))
+            .filter(_ <= ((nowSecondsStable - startsAt.getSeconds).toInt))
             .size
         )
     } else None
+  }
 
   def finalMedleyVariant: Boolean = medleyRound.nonEmpty && medleyRound == medleyNumIntervals.map(_ - 1)
 
+  private def medleyVal[A, B](o: Option[List[A]]): Option[A] =
+    o.flatMap(l => medleyRound.flatMap(l.lift(_)))
+
   def currentIntervalTime =
-    medleyIntervalSeconds.getOrElse(List()).lift(medleyRound.getOrElse(0)).fold(0)(t => (t / 60).toInt)
+    medleyVal(medleyIntervalSeconds).fold(0)(t => (t / 60).toInt)
 
-  def currentVariant =
-    medleyVariants.getOrElse(List()).lift(medleyRound.getOrElse(0)).getOrElse(variant)
+  def withNextVariant =
+    copy(variant = medleyVal(medleyVariants).getOrElse(variant))
 
-  def currentPerfType: PerfType = PerfType(currentVariant, speed)
+  def needsNewVariant =
+    withNextVariant.variant != variant
 
   def medleyVariantsInTournament: Option[List[Variant]] =
     medleyVariants
