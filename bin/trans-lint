@@ -26,7 +26,7 @@ class Report:
 
 
 def short_lang(lang):
-    if lang in ["ne-NP", "la-LA", "nn-NO", "zh-CN", "ur-PK", "zh-TW", "tlh-AA"]:
+    if lang in ["ne-NP", "la-LA", "nn-NO", "zh-CN", "ur-PK", "zh-TW", "tlh-AA", "ml-IN", "pt-BR", "tt-RU", "gsw-CH", "br-FR"]:
         return lang.replace("-", "").lower()
     elif lang == "kab-DZ":
         return "kaby"
@@ -48,7 +48,7 @@ def ends_with_punctuation(text):
 
 
 def crowdin_q(text):
-    return urllib.parse.quote((text or "").replace("\\\"", "\""))
+    return urllib.parse.quote(text or "")
 
 
 class ReportContext:
@@ -57,7 +57,7 @@ class ReportContext:
         self.path = path
         self.el = el
         self.name = name
-        self.text = text
+        self.text = text.replace("\\\"", "\"").replace("\\'", "'")
 
     def lang(self):
         return self.path.stem
@@ -68,7 +68,7 @@ class ReportContext:
         elif level == "warning":
             self.report.warnings += 1
         lang = short_lang(self.lang())
-        url = f"https://crowdin.com/translate/playstrategy/all/en-{lang}#q={crowdin_q(self.text)}"
+        url = f"https://crowdin.com/translate/lichess/all/en-{lang}#q={crowdin_q(self.text)}"
         print(f"::{level} file={self.path},line={self.el.line},col={self.el.col}::{message} ({self.name}): {self.text!r} @ {url}")
 
     def error(self, message):
@@ -95,7 +95,7 @@ def lint(report, path):
 
         source_el = source.find(f".//{el.tag}[@name='{name}']")
         if source_el is None:
-            ctx.error(f"did not find source element for {el.tag}")
+            ctx.warning(f"Source is missing for {db}")
         elif el.tag == "string":
             lint_string(ctx, el.text, source_el.text)
         elif el.tag == "plurals":
@@ -109,6 +109,9 @@ def lint(report, path):
 
 
 def lint_string(ctx, dest, source, allow_missing=0):
+    dest = dest.replace("\\\"", "\"").replace("\\'", "'")
+    source = source.replace("\\\"", "\"").replace("\\'", "'")
+
     if not dest:
         ctx.error("empty translation")
         return
@@ -139,7 +142,7 @@ def lint_string(ctx, dest, source, allow_missing=0):
         for placeholder in re.findall(r"%\d+\$s", dest):
             ctx.error(f"mixing placeholder styles: {placeholder} and %s")
 
-    for pattern in ["O-O", "SAN", "FEN", "PGN", "K, Q, R, B, N"]:
+    for pattern in ["O-O", "SAN", "FEN", "PGN", "K, Q, R, B, N", "DTZ50''"]:
         m_source = source if pattern.isupper() else source.lower()
         m_dest = dest if pattern.isupper() else dest.lower()
         if pattern in m_source and pattern not in m_dest:
