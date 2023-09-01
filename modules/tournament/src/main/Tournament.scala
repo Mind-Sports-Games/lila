@@ -105,7 +105,7 @@ case class Tournament(
 
   def meldeySecondsToFinishInterval =
     medleyIntervalSeconds.fold(0)(
-      (secondsToFinish - _.drop(medleyRound.getOrElse(0) + 1).sum)
+      (secondsToFinish - _.drop(medleyRound + 1).sum)
     )
 
   def finishesAt = startsAt plusMinutes minutes
@@ -118,26 +118,31 @@ case class Tournament(
 
   def pairingsClosed = secondsToFinish < pairingsClosedSeconds
 
-  //start at 0 as it's actaully an index for medley variants in front end
-  def medleyRound: Option[Int] =
-    if (isStarted) {
-      medleyIntervalSeconds
-        .map(
-          _.map { var s = 0; t => { s += t; s } }
-            .filter(_ <= ((nowSeconds - startsAt.getSeconds).toInt))
-            .size
-        )
-    } else None
+  def isOver = secondsToFinish <= 0
 
-  def finalMedleyVariant: Boolean = medleyRound.nonEmpty && medleyRound == medleyNumIntervals.map(_ - 1)
+  def finalMedleyVariant: Boolean = medleyRound.some == medleyNumIntervals.map(_ - 1)
+
+  //start at 0 as it's actually an index for medley variants in front end
+  def medleyRound: Int = {
+    val cutoff = (nowSeconds - startsAt.getSeconds).toInt
+    medleyIntervalSeconds
+      .map(_.scanLeft(0)(_ + _).count(_ <= cutoff) - 1)
+      .getOrElse(0)
+  }
+
+  private def medleyVal[A, B](o: Option[List[A]]): Option[A] =
+    o.flatMap(_.lift(medleyRound))
 
   def currentIntervalTime =
-    medleyIntervalSeconds.getOrElse(List()).lift(medleyRound.getOrElse(0)).fold(0)(t => (t / 60).toInt)
+    medleyVal(medleyIntervalSeconds).fold(0)(t => (t / 60).toInt)
 
-  def currentVariant =
-    medleyVariants.getOrElse(List()).lift(medleyRound.getOrElse(0)).getOrElse(variant)
+  private def medleyVariantByTime =
+    medleyVariants.flatMap(_.lift(medleyRound)).getOrElse(variant)
 
-  def currentPerfType: PerfType = PerfType(currentVariant, speed)
+  def withNextMedleyRound =
+    copy(variant = medleyVariantByTime)
+
+  def needsNewMedleyRound = medleyVariantByTime != variant
 
   def medleyVariantsInTournament: Option[List[Variant]] =
     medleyVariants

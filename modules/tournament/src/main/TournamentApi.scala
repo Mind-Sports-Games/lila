@@ -1,5 +1,7 @@
 package lila.tournament
 
+import strategygames.variant.Variant
+
 import akka.actor.{ ActorSystem, Props }
 import akka.stream.scaladsl._
 import org.joda.time.DateTime
@@ -16,6 +18,7 @@ import lila.game.{ Game, GameRepo, LightPov, Pov }
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam._
 import lila.i18n.{ defaultLang, I18nKeys => trans, VariantKeys }
+import lila.rating.PerfType
 import lila.round.actorApi.round.{ AbortForce, GoBerserk }
 import lila.socket.Socket.SendToFlag
 import lila.user.{ User, UserRepo }
@@ -76,7 +79,9 @@ final class TournamentApi(
       startDate = setup.startDate,
       mode = setup.realMode,
       password = setup.password,
-      variant = setup.realVariant,
+      variant = setup.medleyVariantsAndIntervals
+        .flatMap(_.lift(0).map(_._1))
+        .getOrElse(setup.realVariant),
       medleyVariantsAndIntervals = setup.medleyVariantsAndIntervals,
       medleyMinutes = setup.medleyIntervalOptions.medleyMinutes,
       position = setup.realPosition,
@@ -138,8 +143,12 @@ final class TournamentApi(
 
   private val hadPairings = new lila.memo.ExpireSetMemo(1 hour)
 
-  private def updatePlayerRatingsForMedley(tour: Tournament, userIds: Set[User.ID]): Funit =
-    if (tour.isMedley) userIds.map(updatePlayer(tour, None)).sequenceFu.void else funit
+  private def updatePlayerRatingsForMedley(
+      tour: Tournament,
+      variant: Variant,
+      userIds: Set[User.ID]
+  ): Funit =
+    if (tour.isMedley) userIds.map(updatePlayer(tour, variant, None)).sequenceFu.void else funit
 
   private def usersReady(tour: Tournament, users: WaitingUsers): Boolean =
     !hadPairings.get(tour.id) || users.haveWaitedEnough(tour.minWaitingUsersForPairings)
@@ -151,10 +160,11 @@ final class TournamentApi(
         _.map(player => playerRepo.withdraw(tourId, player.userId).void).sequenceFu.void
       }
 
-  private[tournament] def makePairings(forTour: Tournament, users: WaitingUsers): Funit =
+  private[tournament] def makePairings(forTour: Tournament, users: WaitingUsers): Funit = {
+    // TODO: Consider a cutoff? Don't pair people 10s before the medley is finished?
     (users.size >= forTour.minWaitingUsersForPairings && usersReady(forTour, users)) ??
       Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
-        updatePlayerRatingsForMedley(tour, users.all) >>
+        updatePlayerRatingsForMedley(tour, tour.variant, users.all) >>
           withdrawInactivePlayers(tour.id, users.all) >>
           cached
             .ranking(tour)
@@ -179,7 +189,7 @@ final class TournamentApi(
                         pairings
                           .map { pairing =>
                             pairingRepo.insert(pairing) >>
-                              autoPairing(tour, pairing, playersMap, ranking)
+                              autoPairing(tour, tour.variant, pairing, playersMap, ranking)
                                 .mon(_.tournament.pairing.createAutoPairing)
                                 .map {
                                   socket.startGame(tour.id, _)
@@ -198,6 +208,7 @@ final class TournamentApi(
             .logIfSlow(100, logger)(_ => s"Pairings for https://playstrategy.org/tournament/${tour.id}")
             .result
       }
+  }
 
   private def featureOneOf(tour: Tournament, pairings: Pairings, ranking: Ranking): Funit = {
     import cats.implicits._
@@ -255,14 +266,18 @@ final class TournamentApi(
       }
     }
 
-  private[tournament] def newMedleyRound(tour: Tournament)(implicit lang: Lang = defaultLang) = {
-    val balanceText = if (tour.isMedley) s" (for ${tour.currentIntervalTime} minutes)" else ""
-    tournamentRepo.setMedleyVariant(tour.id, tour.currentVariant)
+  private[tournament] def newMedleyRound(tour: Tournament)(implicit
+      lang: Lang = defaultLang
+  ): Tournament = {
+    val newTour     = tour.withNextMedleyRound
+    val balanceText = if (newTour.isMedley) s" (for ${newTour.currentIntervalTime} minutes)" else ""
+    tournamentRepo.setMedleyVariant(newTour.id, newTour.variant)
     socket.systemChat(
-      tour.id,
-      trans.nowPairingX.txt(VariantKeys.variantName(tour.currentVariant)) + balanceText
+      newTour.id,
+      trans.nowPairingX.txt(VariantKeys.variantName(newTour.variant)) + balanceText
     )
-    socket.newMedleyVariant(tour.id, apiJsonView.variantJson(tour.currentVariant))
+    socket.newMedleyVariant(newTour.id, apiJsonView.variantJson(newTour.variant))
+    newTour
   }
 
   def kill(tour: Tournament): Funit = {
@@ -383,8 +398,11 @@ final class TournamentApi(
               if (!verdicts.accepted) fuccess(JoinResult.Verdicts)
               else if (!pause.canJoin(me.id, tour)) fuccess(JoinResult.Paused)
               else {
+                // TODO: the below tour.currentPerfType probably represents another race condition.
+                //       if someone joins _just_ before the new medley round, but after the
+                //       updatePlayerRatingsForMedley, which rating will they have in their next game?
                 def proceedWithTeam(team: Option[String]): Fu[JoinResult] =
-                  playerRepo.join(tour.id, me, tour.currentPerfType, team) >>
+                  playerRepo.join(tour.id, me, tour.perfType, team) >>
                     updateNbPlayers(tour.id) >>- {
                       socket.reload(tour.id)
                       publish()
@@ -504,7 +522,7 @@ final class TournamentApi(
     game.tournamentId ?? { tourId =>
       Sequencing(tourId)(tournamentRepo.startedById) { tour =>
         pairingRepo.finish(game) >>
-          game.userIds.map(updatePlayer(tour, game.some)).sequenceFu.void >>- {
+          game.userIds.map(updatePlayer(tour, game.variant, game.some)).sequenceFu.void >>- {
             duelStore.remove(game)
             socket.reload(tour.id)
             updateTournamentStanding(tour)
@@ -518,11 +536,14 @@ final class TournamentApi(
 
   private def updatePlayer(
       tour: Tournament,
+      variant: Variant,
       finishing: Option[
         Game
       ] // if set, update the player performance. Leave to none to just recompute the sheet.
   )(userId: User.ID): Funit =
-    tour.mode.rated ?? { userRepo.perfOf(userId, tour.currentPerfType) } flatMap { perf =>
+    tour.mode.rated ?? {
+      userRepo.perfOf(userId, PerfType(variant, tour.speed))
+    } flatMap { perf =>
       playerRepo.update(tour.id, userId) { player =>
         cached.sheet.update(tour, userId).map { sheet =>
           player.copy(
@@ -591,7 +612,7 @@ final class TournamentApi(
             }
           } >> pairingRepo.opponentsOf(tour.id, userId).flatMap { uids =>
             pairingRepo.forfeitByTourAndUserId(tour.id, userId) >>
-              lila.common.Future.applySequentially(uids.toList)(updatePlayer(tour, none))
+              lila.common.Future.applySequentially(uids.toList)(updatePlayer(tour, tour.variant, none))
           }
         }
       } >>
