@@ -143,12 +143,8 @@ final class TournamentApi(
 
   private val hadPairings = new lila.memo.ExpireSetMemo(1 hour)
 
-  private def updatePlayerRatingsForMedley(
-      tour: Tournament,
-      variant: Variant,
-      userIds: Set[User.ID]
-  ): Funit =
-    if (tour.isMedley) userIds.map(updatePlayer(tour, variant, None)).sequenceFu.void else funit
+  private def updatePlayerRatingCache(tour: Tournament, variant: Variant, userIds: Set[User.ID]): Funit =
+    userIds.map(updatePlayer(tour, variant, None)).sequenceFu.void
 
   private def usersReady(tour: Tournament, users: WaitingUsers): Boolean =
     !hadPairings.get(tour.id) || users.haveWaitedEnough(tour.minWaitingUsersForPairings)
@@ -164,7 +160,7 @@ final class TournamentApi(
     // TODO: Consider a cutoff? Don't pair people 10s before the medley is finished?
     (users.size >= forTour.minWaitingUsersForPairings && usersReady(forTour, users)) ??
       Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
-        updatePlayerRatingsForMedley(tour, tour.variant, users.all) >>
+        updatePlayerRatingCache(tour, tour.variant, users.all) >>
           withdrawInactivePlayers(tour.id, users.all) >>
           cached
             .ranking(tour)
@@ -400,7 +396,7 @@ final class TournamentApi(
               else {
                 // TODO: the below tour.currentPerfType probably represents another race condition.
                 //       if someone joins _just_ before the new medley round, but after the
-                //       updatePlayerRatingsForMedley, which rating will they have in their next game?
+                //       updatePlayerRatingCache, which rating will they have in their next game?
                 def proceedWithTeam(team: Option[String]): Fu[JoinResult] =
                   playerRepo.join(tour.id, me, tour.perfType, team) >>
                     updateNbPlayers(tour.id) >>- {
