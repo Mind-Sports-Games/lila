@@ -101,6 +101,15 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variantDisplayName: 'Togyzqumalaq',
       variantId: '7_1',
     },
+    {
+      id: '5+3-go19x19',
+      lim: 5,
+      inc: 3,
+      perf: 'Go19x19',
+      variant: 'go19x19',
+      variantDisplayName: 'Go 19x19',
+      variantId: '9_4',
+    },
   ];
   const nbRoundSpread = spreadNumber('#nb_games_in_play > strong', 8),
     nbUserSpread = spreadNumber('#nb_connected_players > strong', 10),

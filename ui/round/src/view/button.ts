@@ -164,6 +164,69 @@ export const drawConfirm = (ctrl: RoundController): VNode =>
     fbtCancel(ctrl, ctrl.offerDraw),
   ]);
 
+export const passConfirm = (ctrl: RoundController): VNode =>
+  h('div.act-confirm', [
+    h('button.fbt.yes.pass-yes', {
+      attrs: { title: ctrl.noarg('passTurn'), 'data-icon': '' },
+      hook: util.bind('click', () => ctrl.passTurn(true)),
+    }),
+    fbtCancel(ctrl, ctrl.passTurn),
+  ]);
+
+export const offerSelectSquaresButton = (ctrl: RoundController, isNotSameOffer = true): VNode =>
+  h('button.select-squares-offer.button', {
+    class: { disabled: !isNotSameOffer },
+    attrs: { disabled: !isNotSameOffer, title: 'send offer', 'data-icon': '' },
+    hook: util.bind('click', () => ctrl.offerSelectSquares()),
+  });
+
+export function offerSelectSquares(ctrl: RoundController) {
+  const isNotSameOffer =
+    ctrl.data.selectedSquares === undefined ||
+    ctrl.data.currentSelectedSquares === undefined ||
+    ctrl.data.currentSelectedSquares.sort().join(',') !== ctrl.data.selectedSquares?.sort().join(',');
+  return ctrl.canOfferSelectSquares()
+    ? h('div.pending', [
+        h(
+          'p',
+          isNotSameOffer
+            ? `Select dead stones (${
+                ctrl.data.currentSelectedSquares ? ctrl.data.currentSelectedSquares.length : 0
+              } DS)`
+            : `Respond to offer below or select different dead stones`
+        ),
+        isNotSameOffer ? offerSelectSquaresButton(ctrl) : offerSelectSquaresButton(ctrl, false),
+      ])
+    : null;
+}
+
+export const selectSquaresOfferOptions = (ctrl: RoundController): VNode | null => {
+  return ctrl.data.opponent.offeringSelectSquares
+    ? h('div', [offerSelectSquares(ctrl), answerOpponentSelectSquaresOffer(ctrl)])
+    : ctrl.data.player.offeringSelectSquares
+    ? h(
+        'div.pending',
+        {},
+        `Offer sent to opponent (${ctrl.data.currentSelectedSquares ? ctrl.data.currentSelectedSquares.length : 0} DS)`
+      )
+    : ctrl.canOfferSelectSquares()
+    ? h('div', [offerSelectSquares(ctrl)])
+    : null;
+};
+
+export function answerOpponentSelectSquaresOffer(ctrl: RoundController) {
+  return ctrl.data.opponent.offeringSelectSquares
+    ? h('div.negotiation.select-squares', [
+        declineButton(ctrl, () => ctrl.socket.sendLoading('select-squares-decline')),
+        h(
+          'p',
+          `Your opponent proposes ${ctrl.data.selectedSquares ? ctrl.data.selectedSquares.length : 0} dead stones`
+        ),
+        acceptButton(ctrl, 'select-squares-accept', () => ctrl.socket.sendLoading('select-squares-accept')),
+      ])
+    : null;
+}
+
 export function threefoldClaimDraw(ctrl: RoundController) {
   return ctrl.data.game.threefold
     ? h('div.suggestion', [

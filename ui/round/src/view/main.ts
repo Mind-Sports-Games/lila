@@ -61,6 +61,9 @@ function renderPlayerScore(score: number, position: Position, playerIndex: strin
       children.push(h(pieceClassPart2 + playerIndex));
     }
     return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
+    children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
   } else {
     const pieceClass =
       variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
@@ -113,6 +116,16 @@ export function main(ctrl: RoundController): VNode {
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
       }
+      case 'go9x9':
+      case 'go13x13':
+      case 'go19x19': {
+        const fen = plyStep(ctrl.data, ctrl.ply).fen;
+        const p1Score = util.getGoScore(fen, 'p1');
+        const p2Score = util.getGoScore(fen, 'p2');
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        break;
+      }
       // case 'togyzkumalak': {
       // //togy uses game history to store the score while playing (its also in the full fen)
       // const playerScore = d.player.score ? d.player.score : 0;
@@ -142,7 +155,20 @@ export function main(ctrl: RoundController): VNode {
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
 
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(variantKey)) {
+  if (
+    [
+      'xiangqi',
+      'shogi',
+      'minixiangqi',
+      'minishogi',
+      'flipello',
+      'flipello10',
+      'oware',
+      'go9x9',
+      'go13x13',
+      'go19x19',
+    ].includes(variantKey)
+  ) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
@@ -155,7 +181,17 @@ export function main(ctrl: RoundController): VNode {
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware', 'togyzkumalak'].includes(variantKey)
+  const notationBasic = [
+    'xiangqi',
+    'shogi',
+    'minixiangqi',
+    'minishogi',
+    'oware',
+    'togyzkumalak',
+    'go9x9',
+    'go13x13',
+    'go19x19',
+  ].includes(variantKey)
     ? '.piece-letter'
     : '';
 

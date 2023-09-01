@@ -8,6 +8,7 @@ import RoundController from './ctrl';
 import { Untyped } from './interfaces';
 import { defined } from 'common';
 import * as util from './util';
+import * as cg from 'chessground/types';
 
 export interface RoundSocket extends Untyped {
   send: SocketSend;
@@ -81,6 +82,8 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     },
     move: ctrl.apiMove,
     drop: ctrl.apiMove,
+    pass: ctrl.apiMove,
+    selectSquares: ctrl.apiMove,
     reload,
     redirect: ctrl.setRedirecting,
     clockInc(o) {
@@ -127,6 +130,52 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([ply]);
       }
       ctrl.redraw();
+    },
+    selectSquaresOffer(o) {
+      if (o.accepted != undefined) {
+        //game will end after accepted dead stones
+
+        ctrl.data.selectMode = false;
+        ctrl.chessground.set({
+          selectOnly: ctrl.data.selectMode,
+          viewOnly: false,
+        });
+
+        ctrl.data.player.offeringSelectSquares = false;
+        ctrl.data.opponent.offeringSelectSquares = false;
+        ctrl.data.selectedSquares = undefined;
+        ctrl.data.currentSelectedSquares = undefined;
+
+        ctrl.redraw();
+        if (o.accepted) {
+          ctrl.data.selectedSquares = o.squares.split(',') as Key[];
+          ctrl.doSelectSquaresAction();
+          ctrl.redraw();
+        } else {
+          ctrl.chessground.resetSelectedPieces();
+          ctrl.chessground.set({ highlight: { lastMove: ctrl.data.pref.highlight } });
+        }
+      } else {
+        ctrl.data.player.offeringSelectSquares = o.playerIndex === ctrl.data.player.playerIndex;
+        ctrl.data.opponent.offeringSelectSquares = o.playerIndex === ctrl.data.opponent.playerIndex;
+        ctrl.chessground.set({ highlight: { lastMove: false } });
+
+        if (ctrl.data.opponent.offeringSelectSquares) {
+          ctrl.chessground.set({ viewOnly: false, selectOnly: true });
+          ctrl.chessground.resetSelectedPieces();
+          ctrl.data.selectedSquares = o.squares.split(',') as Key[];
+          ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
+          for (const square of ctrl.data.selectedSquares) {
+            ctrl.chessground.selectSquare(square as cg.Key);
+          }
+        } else {
+          ctrl.data.selectedSquares = o.squares.split(',') as Key[];
+          ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
+          ctrl.chessground.set({ viewOnly: true });
+        }
+
+        ctrl.redraw();
+      }
     },
     berserk(playerIndex: PlayerIndex) {
       ctrl.setBerserk(playerIndex);

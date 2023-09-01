@@ -38,6 +38,17 @@ export interface SocketDrop {
   b?: 1;
 }
 
+export interface SocketPass {
+  variant: string;
+  b?: 1;
+}
+
+export interface SocketSelectSquares {
+  s: string;
+  variant: string;
+  b?: 1;
+}
+
 export type EncodedDests =
   | string
   | {
@@ -52,6 +63,10 @@ export interface RoundData extends GameData {
   possibleMoves?: EncodedDests;
   possibleDrops?: string;
   possibleDropsByRole?: string;
+  selectMode: boolean;
+  selectedSquares?: cg.Key[];
+  currentSelectedSquares?: cg.Key[];
+  playerOfferingSelectedSquares?: PlayerIndex;
   forecastCount?: number;
   crazyhouse?: CrazyData;
   onlyDropsVariant: boolean;
@@ -132,12 +147,15 @@ export interface ApiMove extends Step {
   check: boolean;
   threefold: boolean;
   perpetualWarning: boolean;
+  takebackable: boolean;
   wDraw: boolean;
   bDraw: boolean;
   crazyhouse?: CrazyData;
   role?: cg.Role;
   drops?: string;
   dropsByRole?: string;
+  canSelectSquares?: boolean;
+  squares?: string;
   promotion?: {
     key: cg.Key;
     pieceClass: cg.Role;

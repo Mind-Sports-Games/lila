@@ -15,6 +15,7 @@ case class Player(
     aiLevel: Option[Int],
     isWinner: Option[Boolean] = None,
     isOfferingDraw: Boolean = false,
+    isOfferingSelectSquares: Boolean = false,
     proposeTakebackAt: Int = 0, // ply when takeback was proposed
     userId: Player.UserId = None,
     rating: Option[Int] = None,
@@ -50,6 +51,10 @@ case class Player(
   def goBerserk = copy(berserk = true)
 
   def finish(winner: Boolean) = copy(isWinner = winner option true)
+
+  def offerSelectSquares = copy(isOfferingSelectSquares = true)
+
+  def removeSelectSquaresOffer = copy(isOfferingSelectSquares = false)
 
   def offerDraw = copy(isOfferingDraw = true)
 
@@ -161,16 +166,17 @@ object Player {
 
   object BSONFields {
 
-    val aiLevel           = "ai"
-    val isOfferingDraw    = "od"
-    val proposeTakebackAt = "ta"
-    val rating            = "e"
-    val ratingDiff        = "d"
-    val provisional       = "p"
-    val blursBits         = "l"
-    val holdAlert         = "h"
-    val berserk           = "be"
-    val name              = "na"
+    val aiLevel                 = "ai"
+    val isOfferingDraw          = "od"
+    val isOfferingSelectSquares = "os"
+    val proposeTakebackAt       = "ta"
+    val rating                  = "e"
+    val ratingDiff              = "d"
+    val provisional             = "p"
+    val blursBits               = "l"
+    val holdAlert               = "h"
+    val berserk                 = "be"
+    val name                    = "na"
   }
 
   import reactivemongo.api.bson._
@@ -203,6 +209,7 @@ object Player {
                 aiLevel = r intO aiLevel,
                 isWinner = win,
                 isOfferingDraw = r boolD isOfferingDraw,
+                isOfferingSelectSquares = r boolD isOfferingSelectSquares,
                 proposeTakebackAt = r intD proposeTakebackAt,
                 userId = userId,
                 rating = r intO rating flatMap ratingRange,
@@ -216,14 +223,15 @@ object Player {
     def writes(w: BSON.Writer, o: Builder) =
       o(P1)("0000")(none)(none) pipe { p =>
         BSONDocument(
-          aiLevel           -> p.aiLevel,
-          isOfferingDraw    -> w.boolO(p.isOfferingDraw),
-          proposeTakebackAt -> w.intO(p.proposeTakebackAt),
-          rating            -> p.rating,
-          ratingDiff        -> p.ratingDiff,
-          provisional       -> w.boolO(p.provisional),
-          blursBits         -> p.blurs.nonEmpty.??(BlursBSONHandler writeOpt p.blurs),
-          name              -> p.name
+          aiLevel                 -> p.aiLevel,
+          isOfferingDraw          -> w.boolO(p.isOfferingDraw),
+          isOfferingSelectSquares -> w.boolO(p.isOfferingSelectSquares),
+          proposeTakebackAt       -> w.intO(p.proposeTakebackAt),
+          rating                  -> p.rating,
+          ratingDiff              -> p.ratingDiff,
+          provisional             -> w.boolO(p.provisional),
+          blursBits               -> p.blurs.nonEmpty.??(BlursBSONHandler writeOpt p.blurs),
+          name                    -> p.name
         )
       }
   }

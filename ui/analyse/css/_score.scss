@@ -3,11 +3,15 @@
 $pocket-col1-height: auto;
 $pocket-height: 7em;
 
-$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak');
-$score-variants-square: ('flipello', 'flipello10', 'oware');
+$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak', 'go9x9', 'go13x13', 'go19x19');
+$score-variants-square: ('flipello', 'flipello10', 'oware', 'go9x9', 'go13x13', 'go19x19');
+$go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 .variant-flipello .game-score,
-.variant-flipello10 .game-score {
+.variant-flipello10 .game-score,
+.variant-go9x9 .game-score,
+.variant-go13x13 .game-score,
+.variant-go19x19 .game-score {
   piece::after {
     @extend %active, %box-radius;
 
@@ -53,6 +57,51 @@ body.togyzkumalak-blue .variant-togyzkumalak .game-score {
 body.togyzkumalak-wood .variant-togyzkumalak .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
   background-size: cover;
+}
+@each $variant in $go-variants {
+  body.go-light-wood .variant-#{$variant} .game-score.game-score-top {
+    &.p1 {
+      background: url(../images/board/go/svg/go_pot_black_light.svg);
+      background-size: cover;
+    }
+    &.p2 {
+      background: url(../images/board/go/svg/go_pot_white_light.svg);
+      background-size: cover;
+    }
+  }
+
+  body.go-light-wood .variant-#{$variant} .game-score.game-score-bottom {
+    &.p1 {
+      background: url(../images/board/go/svg/go_pot_black_light.svg);
+      background-size: cover;
+    }
+    &.p2 {
+      background: url(../images/board/go/svg/go_pot_white_light.svg);
+      background-size: cover;
+    }
+  }
+
+  body.go-dark-wood .variant-#{$variant} .game-score.game-score-top {
+    &.p1 {
+      background: url(../images/board/go/svg/go_pot_black_dark.svg);
+      background-size: cover;
+    }
+    &.p2 {
+      background: url(../images/board/go/svg/go_pot_white_dark.svg);
+      background-size: cover;
+    }
+  }
+
+  body.go-dark-wood .variant-#{$variant} .game-score.game-score-bottom {
+    &.p1 {
+      background: url(../images/board/go/svg/go_pot_black_dark.svg);
+      background-size: cover;
+    }
+    &.p2 {
+      background: url(../images/board/go/svg/go_pot_white_dark.svg);
+      background-size: cover;
+    }
+  }
 }
 
 @each $variant in $score-variants-square {

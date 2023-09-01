@@ -36,7 +36,9 @@ export interface BaseGame {
   winner?: PlayerIndex;
   winnerPlayer?: PlayerName;
   loserPlayer?: PlayerName;
+  canOfferDraw?: boolean;
   drawOffers?: number[];
+  canDoPassAction?: boolean;
   moveCentis?: number[];
   initialFen?: string;
   importedBy?: string;
@@ -96,6 +98,7 @@ export interface Player {
   proposingTakeback?: boolean;
   offeringRematch?: boolean;
   offeringDraw?: boolean;
+  offeringSelectSquares?: boolean;
   ai: number | null;
   onGame: boolean;
   gone: number | boolean;

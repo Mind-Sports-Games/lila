@@ -126,12 +126,16 @@ object side {
           )
         },
         initialFen
-          .ifTrue(game.variant.chess960 || game.variant.gameFamily == GameFamily.Draughts())
+          .ifTrue(
+            game.variant.chess960 || game.variant.gameFamily == GameFamily
+              .Draughts() || game.variant.gameFamily == GameFamily.Go()
+          )
           .flatMap { fen =>
             (fen, game.variant) match {
               case (FEN.Chess(fen), _) =>
                 strategygames.chess.variant.Chess960.positionNumber(fen).map(_.toString)
               case (FEN.Draughts(fen), Variant.Draughts(variant)) => variant.drawTableInfo(fen)
+              case (FEN.Go(fen), Variant.Go(variant))             => variant.setupInfo(fen)
               case _                                              => sys.error("Mismatched fen gamelogic")
             }
           }
@@ -140,6 +144,7 @@ object side {
               game.variant match {
                 case Variant.Chess(_)    => "Chess960 start position: "
                 case Variant.Draughts(_) => info
+                case Variant.Go(_)       => info
                 case _                   => ""
               },
               game.variant match {

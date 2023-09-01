@@ -40,7 +40,10 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
           fen,
-          lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          lastMove: lm && (lm == 'pass' ? undefined : lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          highlight: {
+            lastMove: lm != undefined && lm! == 'pass',
+          },
           drawable: {
             enabled: false,
             visible: false,
@@ -61,6 +64,12 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? { width: 6, height: 2 }
             : $el.hasClass('variant-togyzkumalak')
             ? { width: 9, height: 2 }
+            : $el.hasClass('variant-go9x9')
+            ? { width: 9, height: 9 }
+            : $el.hasClass('variant-go13x13')
+            ? { width: 13, height: 13 }
+            : $el.hasClass('variant-go19x19')
+            ? { width: 19, height: 19 }
             : { width: 8, height: 8 },
           variant: $el.hasClass('variant-shogi')
             ? 'shogi'
@@ -78,6 +87,12 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? 'oware'
             : $el.hasClass('variant-togyzkumalak')
             ? 'togyzkumalak'
+            : $el.hasClass('variant-go9x9')
+            ? 'go9x9'
+            : $el.hasClass('variant-go13x13')
+            ? 'go13x13'
+            : $el.hasClass('variant-go19x19')
+            ? 'go19x19'
             : 'standard',
         })
       );

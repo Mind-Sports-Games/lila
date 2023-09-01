@@ -10,6 +10,7 @@ import {
   bindMobileMousedown,
   getPlayerScore,
   getMancalaScore,
+  getGoScore,
   variantToRules,
 } from './util';
 import { defined } from 'common';
@@ -337,6 +338,9 @@ function renderPlayerScore(
       children.push(h(pieceClassPart2 + playerIndex));
     }
     return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
+    children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
   } else {
     const pieceClass =
       variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
@@ -384,13 +388,36 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
+      case 'go9x9':
+      case 'go13x13':
+      case 'go19x19': {
+        const fen = ctrl.node.fen;
+        const p1Score = getGoScore(fen, 'p1');
+        const p2Score = getGoScore(fen, 'p2');
+        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+        break;
+      }
       default: {
         break;
       }
     }
   }
   // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'flipello', 'flipello10', 'oware'].includes(variantKey)) {
+  if (
+    [
+      'xiangqi',
+      'shogi',
+      'minixiangqi',
+      'minishogi',
+      'flipello',
+      'flipello10',
+      'oware',
+      'go9x9',
+      'go13x13',
+      'go19x19',
+    ].includes(variantKey)
+  ) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
@@ -403,7 +430,17 @@ export default function (ctrl: AnalyseCtrl): VNode {
   }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
-  const notationBasic = ['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware', 'togyzkumalak'].includes(variantKey)
+  const notationBasic = [
+    'xiangqi',
+    'shogi',
+    'minixiangqi',
+    'minishogi',
+    'oware',
+    'togyzkumalak',
+    'go9x9',
+    'go13x13',
+    'go19x19',
+  ].includes(variantKey)
     ? '.piece-letter'
     : '';
   return h(

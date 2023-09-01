@@ -84,7 +84,10 @@ object list {
               userTopPerf(leaderboards.flipello10, PerfType.orDefault("flipello10")),
               userTopPerf(leaderboards.amazons, PerfType.orDefault("amazons")),
               userTopPerf(leaderboards.oware, PerfType.orDefault("oware")),
-              userTopPerf(leaderboards.togyzkumalak, PerfType.orDefault("togyzkumalak"))
+              userTopPerf(leaderboards.togyzkumalak, PerfType.orDefault("togyzkumalak")),
+              userTopPerf(leaderboards.go9x9, PerfType.orDefault("go9x9")),
+              userTopPerf(leaderboards.go13x13, PerfType.orDefault("go13x13")),
+              userTopPerf(leaderboards.go19x19, PerfType.orDefault("go19x19"))
             )
           )
         )

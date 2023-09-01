@@ -24,6 +24,7 @@ import TransientMove from './transientMove';
 import * as atomic from './atomic';
 import * as flipello from './flipello';
 import * as mancala from './mancala';
+import * as go from './go';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -42,6 +43,8 @@ import {
   Redraw,
   SocketMove,
   SocketDrop,
+  SocketPass,
+  SocketSelectSquares,
   SocketOpts,
   MoveMetadata,
   Position,
@@ -78,6 +81,8 @@ export default class RoundController {
   goneBerserk: GoneBerserk = {};
   resignConfirm?: Timeout = undefined;
   drawConfirm?: Timeout = undefined;
+  passConfirm?: Timeout = undefined;
+  selectSquaresConfirm?: Timeout = undefined;
   // will be replaced by view layer
   autoScroll: () => void = () => {};
   challengeRematched = false;
@@ -233,6 +238,13 @@ export default class RoundController {
     }
   };
 
+  private onSelect = (key: cg.Key) => {
+    console.log(`Square selected ${key}`);
+    console.log(`Selected pieces ${this.chessground.state.selectedPieces}`);
+    this.data.currentSelectedSquares = Array.from(this.chessground.state.selectedPieces.keys());
+    this.redraw();
+  };
+
   private isSimulHost = () => {
     return this.data.simul && this.data.simul.hostId === this.opts.userId;
   };
@@ -249,6 +261,9 @@ export default class RoundController {
         'oware',
         'togyzkumalak',
         'amazons',
+        'go9x9',
+        'go13x13',
+        'go19x19',
       ].includes(this.data.game.variant.key)
     )
       return false;
@@ -281,6 +296,7 @@ export default class RoundController {
     onCancelPremove: this.onCancelPremove,
     onPredrop: this.onPredrop,
     onCancelDropMode: this.onCancelDropMode,
+    onSelect: this.onSelect,
   });
 
   replaying = (): boolean => this.ply !== this.lastPly();
@@ -435,6 +451,25 @@ export default class RoundController {
     }
   };
 
+  sendPass = (variant: string): void => {
+    const pass: SocketPass = {
+      variant: variant,
+    };
+    if (blur.get()) pass.b = 1;
+    this.resign(false);
+    this.actualSendMove('pass', pass);
+  };
+
+  sendSelectSquares = (variant: string, squares: cg.Key[]): void => {
+    const ss: SocketSelectSquares = {
+      variant: variant,
+      s: squares.join(','),
+    };
+    if (blur.get()) ss.b = 1;
+    this.resign(false);
+    this.actualSendMove('selectSquares', ss);
+  };
+
   showYourMoveNotification = () => {
     const d = this.data;
     if (game.isPlayerTurn(d))
@@ -476,6 +511,11 @@ export default class RoundController {
     d.possibleDrops = activePlayerIndex ? o.drops : undefined;
     d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
     d.crazyhouse = o.crazyhouse;
+    d.takebackable = o.takebackable;
+    //from pass move
+    if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
+      d.selectMode = o.canSelectSquares ? activePlayerIndex : false;
+    }
     this.setTitle();
     if (!this.replaying()) {
       this.ply++;
@@ -492,16 +532,19 @@ export default class RoundController {
       } else {
         // This block needs to be idempotent, even for castling moves in
         // Chess960.
-        const keys = util.uci2move(o.uci)!,
-          pieces = this.chessground.state.pieces;
-        if (
-          !o.castle ||
-          (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
-        ) {
-          if (d.game.variant.key === 'oware' || d.game.variant.key === 'togyzkumalak') {
-            this.chessground.moveNoAnim(keys[0], keys[1]);
-          } else {
-            this.chessground.move(keys[0], keys[1]);
+        const keys = util.uci2move(o.uci);
+        if (keys !== undefined) {
+          // ignore a pass action
+          const pieces = this.chessground.state.pieces;
+          if (
+            !o.castle ||
+            (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
+          ) {
+            if (d.game.variant.key === 'oware' || d.game.variant.key === 'togyzkumalak') {
+              this.chessground.moveNoAnim(keys[0], keys[1]);
+            } else {
+              this.chessground.move(keys[0], keys[1]);
+            }
           }
         }
       }
@@ -509,6 +552,7 @@ export default class RoundController {
         // a lot of pieces can change from 1 move so update them all
         mancala.updateBoardFromFen(this, o.fen);
       }
+      if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) go.updateBoardFromFen(this, o.fen);
       if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
       }
@@ -523,6 +567,10 @@ export default class RoundController {
         },
         check: !!o.check,
         onlyDropsVariant: this.data.onlyDropsVariant, //need to update every move (amazons)
+        selectOnly: d.selectMode,
+        highlight: {
+          lastMove: d.pref.highlight && !d.selectMode,
+        },
       });
       if (o.check) sound.check();
       blur.onMove();
@@ -856,6 +904,60 @@ export default class RoundController {
   private doOfferDraw = () => {
     this.lastDrawOfferAtPly = this.ply;
     this.socket.sendLoading('draw-yes', null);
+  };
+
+  canOfferSelectSquares = (): boolean =>
+    ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
+    this.isPlaying() &&
+    !this.replaying() &&
+    (this.data.opponent.offeringSelectSquares || this.data.selectMode) &&
+    !this.data.player.offeringSelectSquares;
+
+  offerSelectSquares = (): void => this.doOfferSelectSquares();
+
+  private doOfferSelectSquares = () => {
+    const squares = Array.from(this.chessground.state.selectedPieces.keys());
+    const data = {
+      variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
+      s: squares.join(','),
+    };
+    this.socket.sendLoading('select-squares-offer', data);
+  };
+
+  canPassTurn = (): boolean =>
+    ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
+    this.isPlaying() &&
+    !this.replaying() &&
+    this.data.player.playerIndex === this.data.game.player &&
+    !this.data.selectMode;
+
+  passTurn = (v: boolean): void => {
+    if (this.canPassTurn()) {
+      if (this.passConfirm) {
+        if (v) this.doPassTurn();
+        clearTimeout(this.passConfirm);
+        this.passConfirm = undefined;
+      } else if (v) {
+        if (this.data.pref.confirmResign)
+          this.passConfirm = setTimeout(() => {
+            this.passTurn(false);
+          }, 3000);
+        else this.doPassTurn();
+      }
+    }
+    this.redraw();
+  };
+
+  private doPassTurn = () => {
+    this.setLoading(true);
+    this.sendPass(this.data.game.variant.key);
+  };
+
+  doSelectSquaresAction = () => {
+    this.setLoading(true);
+    console.log('ss action, stones', this.data.selectedSquares);
+    this.sendSelectSquares(this.data.game.variant.key, this.data.selectedSquares!);
   };
 
   setChessground = (cg: CgApi) => {

@@ -147,6 +147,7 @@ trait Handlers {
         case StratFEN.FairySF(f)      => BSONString(s"2~${f.value}")
         case StratFEN.Samurai(f)      => BSONString(s"3~${f.value}")
         case StratFEN.Togyzkumalak(f) => BSONString(s"4~${f.value}")
+        case StratFEN.Go(f)           => BSONString(s"5~${f.value}")
       }
   )
 
@@ -197,13 +198,13 @@ trait Handlers {
       c match {
         case fc: FischerClock.Config =>
           BSONDocument(
-            "t" -> "fischer",
+            "t"         -> "fischer",
             "limit"     -> fc.limitSeconds,
             "increment" -> fc.incrementSeconds
           )
         case bc: ByoyomiClock.Config =>
           BSONDocument(
-            "t" -> "byoyomi",
+            "t"         -> "byoyomi",
             "limit"     -> bc.limitSeconds,
             "increment" -> bc.incrementSeconds,
             "byoyomi"   -> bc.byoyomiSeconds,

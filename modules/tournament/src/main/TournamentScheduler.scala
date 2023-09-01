@@ -255,6 +255,7 @@ final private class TournamentScheduler(
       (nextTuesday, 14),
       (nextTuesday, 20),
       (nextWednesday, 1),
+      (nextWednesday, 4),
       (nextWednesday, 7),
       (nextWednesday, 10),
       (nextWednesday, 15),
@@ -270,10 +271,12 @@ final private class TournamentScheduler(
       (nextFriday, 15),
       (nextFriday, 21),
       (nextSaturday, 4),
+      (nextSaturday, 7),
       (nextSaturday, 10),
       (nextSaturday, 16),
       (nextSaturday, 22),
       (nextSunday, 4),
+      (nextSunday, 7),
       (nextSunday, 10),
       (nextSunday, 16),
       (nextSunday, 22)
@@ -294,6 +297,7 @@ final private class TournamentScheduler(
       (Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz32),
       (Variant.Chess(strategygames.chess.variant.Crazyhouse), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Pool), Blitz32),
+      (Variant.Go(strategygames.go.variant.Go9x9), Blitz32),
       (Variant.Chess(strategygames.chess.variant.LinesOfAction), Blitz32),
       (Variant.Chess(strategygames.chess.variant.FiveCheck), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Frysk), Blitz32),
@@ -308,10 +312,12 @@ final private class TournamentScheduler(
       (Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510),
       (Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32),
+      (Variant.Go(strategygames.go.variant.Go13x13), Blitz53),
       (Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Flipello10), Blitz32),
       (Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz32),
+      (Variant.Go(strategygames.go.variant.Go19x19), Blitz53),
       (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz53),
       (Variant.Chess(strategygames.chess.variant.Chess960), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.English), Blitz32),
@@ -437,7 +443,10 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32)(
         new DateTime(2023, 12, 15, 0, 0)
-      )
+      ),
+      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go19x19), Blitz53)(
+        new DateTime(2023, 12, 22, 0, 0)
+      ) //todo also add 13x13 and 9x9
     ).flatten filter { _.schedule.at isAfter rightNow }
 
     //order matters for pruning weekly/yearly tournaments

@@ -74,7 +74,8 @@ final class SwissForm(implicit mode: Mode) {
           "loa"      -> optional(boolean),
           "flipello" -> optional(boolean),
           "mancala"  -> optional(boolean),
-          "amazons"  -> optional(boolean)
+          "amazons"  -> optional(boolean),
+          "go"       -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "rated" -> optional(boolean),
         "xGamesChoice" -> mapping(
@@ -134,7 +135,8 @@ final class SwissForm(implicit mode: Mode) {
         loa = true.some,
         flipello = true.some,
         mancala = true.some,
-        amazons = true.some
+        amazons = true.some,
+        go = true.some
       ),
       rated = true.some,
       xGamesChoice = XGamesChoice(
@@ -175,7 +177,8 @@ final class SwissForm(implicit mode: Mode) {
         loa = gameGroupInMedley(s.settings.medleyVariants, GameGroup.LinesOfAction()).some,
         flipello = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Flipello()).some,
         mancala = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Mancala()).some,
-        amazons = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Amazons()).some
+        amazons = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Amazons()).some,
+        go = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Go()).some
       ),
       rated = s.settings.rated.some,
       xGamesChoice = XGamesChoice(
@@ -401,7 +404,8 @@ object SwissForm {
       loa: Option[Boolean],
       flipello: Option[Boolean],
       mancala: Option[Boolean],
-      amazons: Option[Boolean]
+      amazons: Option[Boolean],
+      go: Option[Boolean]
   ) {
 
     lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -413,5 +417,6 @@ object SwissForm {
       .filterNot(gg => if (!flipello.getOrElse(false)) gg == GameGroup.Flipello() else false)
       .filterNot(gg => if (!mancala.getOrElse(false)) gg == GameGroup.Mancala() else false)
       .filterNot(gg => if (!amazons.getOrElse(false)) gg == GameGroup.Amazons() else false)
+      .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
   }
 }

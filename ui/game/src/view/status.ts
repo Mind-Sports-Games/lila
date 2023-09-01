@@ -66,6 +66,10 @@ export default function status(ctrl: Ctrl): string {
           }
         case 'togyzkumalak':
           return noarg('gameFinished');
+        case 'go9x9':
+        case 'go13x13':
+        case 'go19x19':
+          return noarg('gameFinished');
       }
       return noarg('variantEnding');
     case 'unknownFinish':

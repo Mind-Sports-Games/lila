@@ -25,6 +25,7 @@ import strategygames.draughts
 import strategygames.fairysf
 import strategygames.samurai
 import strategygames.togyzkumalak
+import strategygames.go
 import strategygames.format
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -270,9 +271,9 @@ object BinaryFormat {
 
         ia match {
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, _*) => {
-            val config      = ByoyomiClock.Config(readClockLimit(b1), b2, byo, per)
+            val config   = ByoyomiClock.Config(readClockLimit(b1), b2, byo, per)
             val legacyP1 = Centis(readSignedInt24(b3, b4, b5))
-            val legacyP2  = Centis(readSignedInt24(b6, b7, b8))
+            val legacyP2 = Centis(readSignedInt24(b6, b7, b8))
             ByoyomiClock(
               config = config,
               player = playerIndex,
@@ -386,6 +387,18 @@ object BinaryFormat {
           if orig != chess.Pos.A1 || dest != chess.Pos.A1
         } yield chess.format.Uci.Move(orig, dest)
       )
+  }
+
+  object pos {
+    def writeGo(squares: List[Pos]): ByteArray = {
+      ByteArray(squares.flatMap {
+        case Pos.Go(g) => Some(g.index.toByte)
+        case _         => None
+      }.toArray)
+    }
+    def readGo(ba: ByteArray): List[Pos] = {
+      ba.value.flatMap(p => go.Pos(p.toInt)).toList.map(Pos.Go(_))
+    }
   }
 
   object piece {
@@ -536,6 +549,30 @@ object BinaryFormat {
         .to(Map)
     }
 
+    def writeGo(pieces: go.PieceMap): ByteArray = {
+      def posInt(pos: go.Pos): Int =
+        (pieces get pos).fold(0) { piece =>
+          piece.player.fold(0, 128) + piece.role.binaryInt
+        }
+      ByteArray(go.Pos.all.map(posInt(_).toByte).toArray)
+    }
+
+    def readGo(ba: ByteArray, variant: go.variant.Variant): go.PieceMap = {
+      //def splitInts(b: Byte) = {
+      //  val int = b.toInt
+      //  Array(int >> 4, int & 0x0f)
+      //}
+      def intPiece(int: Int): Option[go.Piece] =
+        go.Role.allByBinaryInt.get(int & 127) map { role =>
+          go.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
+        }
+      (go.Pos.all zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(int) map (pos -> _)
+        }
+        .to(Map)
+    }
+
     // cache standard start position
     def standard(lib: GameLogic) = lib match {
       case GameLogic.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
@@ -547,7 +584,8 @@ object BinaryFormat {
       case GameLogic.Samurai() => writeSamurai(samurai.Board.init(samurai.variant.Oware).pieces)
       case GameLogic.Togyzkumalak() =>
         writeTogyzkumalak(togyzkumalak.Board.init(togyzkumalak.variant.Togyzkumalak).pieces)
-      case _ => sys.error("Cant write to binary for lib")
+      case GameLogic.Go() => writeGo(go.Board.init(go.variant.Go19x19).pieces)
+      case _              => sys.error("Cant write to binary for lib")
     }
 
   }

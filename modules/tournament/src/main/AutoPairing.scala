@@ -30,7 +30,10 @@ final class AutoPairing(
           variant.gameLogic,
           Some {
             if (tour.position.isEmpty) variant
-            else Variant.libFromPosition(variant.gameLogic)
+            else
+              Variant
+                .byName(variant.gameLogic, "From Position")
+                .getOrElse(Variant.orDefault(variant.gameLogic, 3))
           },
           tour.position
         ) pipe { g =>

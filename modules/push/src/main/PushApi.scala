@@ -158,6 +158,37 @@ final private class PushApi(
       }
     }
 
+  def selectSquaresOffer(gameId: Game.ID): Funit =
+    Future.delay(1 seconds) {
+      proxyRepo.game(gameId) flatMap {
+        _.filter(_.playable).?? { game =>
+          game.players.collectFirst {
+            case p if p.isOfferingSelectSquares => Pov(game, game opponent p)
+          } ?? { pov => // the pov of the receiver
+            pov.player.userId ?? { userId =>
+              IfAway(pov) {
+                asyncOpponentName(pov) flatMap { opponent =>
+                  pushToAll(
+                    userId,
+                    _.takeback,
+                    PushApi.Data(
+                      title = "Select square offer",
+                      body = s"$opponent offers a selections of squares",
+                      stacking = Stacking.GameSelectSquareOffer,
+                      payload = Json.obj(
+                        "userId"   -> userId,
+                        "userData" -> corresGameJson(pov, "gameSelectSquareOffer")
+                      )
+                    )
+                  )
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
   def corresAlarm(pov: Pov): Funit =
     pov.player.userId ?? { userId =>
       asyncOpponentName(pov) flatMap { opponent =>

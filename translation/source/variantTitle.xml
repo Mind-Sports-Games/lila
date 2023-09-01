@@ -34,4 +34,7 @@
   <string name="amazons">Immobilize all the enemy pieces</string>
   <string name="oware">Capture the most stones to win</string>
   <string name="togyzkumalak">Capture the most stones to win</string>
+  <string name="go9x9">Surround the largest area(s) of the 9 by 9 board with your stones to win</string>
+  <string name="go13x13">Surround the largest area(s) of the 13 by 13 board with your stones to win</string>
+  <string name="go19x19">Surround the largest area(s) of the 19 by 19 board with your stones to win</string>
 </resources>
