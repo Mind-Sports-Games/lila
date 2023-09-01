@@ -143,6 +143,7 @@ final class TournamentApi(
 
   private val hadPairings = new lila.memo.ExpireSetMemo(1 hour)
 
+  //potentially slow and could cause problems in large tournaments?
   private def updatePlayerRatingCache(tour: Tournament, variant: Variant, userIds: Set[User.ID]): Funit =
     userIds.map(updatePlayer(tour, variant, None)).sequenceFu.void
 
