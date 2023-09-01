@@ -2,6 +2,7 @@ package lila.game
 package actorApi
 
 import lila.user.User
+import strategygames.Pos
 
 case class StartGame(game: Game)
 
@@ -32,4 +33,4 @@ object MoveGameEvent {
 
 case class BoardDrawOffer(pov: Pov)
 
-case class BoardSelectSquaresOffer(pov: Pov)
+case class BoardOfferSquares(pov: Pov)

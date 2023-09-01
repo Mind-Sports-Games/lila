@@ -3,6 +3,7 @@ package lila.push
 import akka.actor._
 import play.api.libs.json._
 import scala.concurrent.duration._
+import strategygames.Pos
 
 import lila.challenge.Challenge
 import lila.common.{ Future, LightUser }
@@ -178,6 +179,68 @@ final private class PushApi(
                       payload = Json.obj(
                         "userId"   -> userId,
                         "userData" -> corresGameJson(pov, "gameSelectSquareOffer")
+                      )
+                    )
+                  )
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  def acceptSquaresOffer(gameId: Game.ID): Funit =
+    Future.delay(1 seconds) {
+      proxyRepo.game(gameId) flatMap {
+        _.filter(_.playable).?? { game =>
+          game.players.collectFirst {
+            case p if p.isOfferingSelectSquares => Pov(game, game opponent p)
+          } ?? { pov => // the pov of the receiver
+            pov.player.userId ?? { userId =>
+              IfAway(pov) {
+                asyncOpponentName(pov) flatMap { opponent =>
+                  pushToAll(
+                    userId,
+                    _.takeback,
+                    PushApi.Data(
+                      title = "Square offer accepted",
+                      body = s"$opponent accepted your offer of squares",
+                      stacking = Stacking.GameSelectSquareOffer,
+                      payload = Json.obj(
+                        "userId"   -> userId,
+                        "userData" -> corresGameJson(pov, "gameAcceptSquareOffer")
+                      )
+                    )
+                  )
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  def declineSquaresOffer(gameId: Game.ID): Funit =
+    Future.delay(1 seconds) {
+      proxyRepo.game(gameId) flatMap {
+        _.filter(_.playable).?? { game =>
+          game.players.collectFirst {
+            case p if p.isOfferingSelectSquares => Pov(game, game opponent p)
+          } ?? { pov => // the pov of the receiver
+            pov.player.userId ?? { userId =>
+              IfAway(pov) {
+                asyncOpponentName(pov) flatMap { opponent =>
+                  pushToAll(
+                    userId,
+                    _.takeback,
+                    PushApi.Data(
+                      title = "Square offer declined",
+                      body = s"$opponent declined your offer of squares",
+                      stacking = Stacking.GameSelectSquareOffer,
+                      payload = Json.obj(
+                        "userId"   -> userId,
+                        "userData" -> corresGameJson(pov, "gameAcceptSquareOffer")
                       )
                     )
                   )

@@ -105,11 +105,18 @@ final class PlayApi(
           as(id, me) { pov =>
             fuccess(env.bot.player.setDraw(pov, lila.common.Form.trueish(bool))) pipe toResult
           }
-        case Array("game", id, "decideSelectSquares", bool) =>
+        case Array("game", id, "decide-select-squares", bool) =>
           as(id, me) { pov =>
             fuccess(env.bot.player.decideSelectSquares(pov, lila.common.Form.trueish(bool))) pipe toResult
           }
-        case Array("game", id, "selectSquares", squaresS) =>
+        case Array("game", id, "select-squares") =>
+          as(id, me) { pov =>
+            {
+              val gf = pov.game.variant.gameFamily
+              fuccess(env.bot.player.selectSquares(pov, List.empty)) pipe toResult
+            }
+          }
+        case Array("game", id, "select-squares", squaresS) =>
           as(id, me) { pov =>
             {
               val gf      = pov.game.variant.gameFamily
