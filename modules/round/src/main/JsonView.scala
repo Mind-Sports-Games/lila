@@ -9,7 +9,7 @@ import scala.math
 
 import lila.common.ApiVersion
 import lila.game.JsonView._
-import lila.game.{ Event, Pov, Game, Player => GamePlayer }
+import lila.game.{ Event, Pov, Game, Player => GamePlayer, DeadStoneOfferState }
 import lila.pref.Pref
 import lila.user.{ User, UserRepo }
 
@@ -169,7 +169,7 @@ final class JsonView(
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
           .add("selectMode" -> selectMode(pov))
           .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
-          .add("playerOfferingSelectedSquares" -> pov.game.metadata.playerOfferedSelectedSquares)
+          .add("deadStoneOfferState" -> pov.game.metadata.deadStoneOfferState.map(_.name))
           .add("expiration" -> pov.game.expirable.option {
             Json.obj(
               "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
@@ -426,7 +426,7 @@ final class JsonView(
           (pov.game.turnOf(pov.player) && !pov.player.isOfferingSelectSquares)
             ||
               pov.opponent.isOfferingSelectSquares
-        )
+        ) && !pov.game.deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
       case _ => false
     }
   }

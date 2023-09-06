@@ -38,7 +38,7 @@ final private[round] class SelectSquarer(
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
         proxy.save {
           messenger.system(g, trans.selectSquareOfferDeclined.txt())
-          Progress(g) map { _.resetSelectSquares(playerIndex) }
+          Progress(g) map { _.declineSelectSquares(playerIndex) }
         } inject List(Event.SelectSquaresOffer(playerIndex, squares, Some(false)))
       case _ => fuccess(List(Event.ReloadOwner))
     }

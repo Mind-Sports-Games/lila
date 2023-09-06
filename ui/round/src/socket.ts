@@ -148,10 +148,12 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
 
         ctrl.redraw();
         if (o.accepted) {
-          ctrl.data.selectedSquares = o.squares.split(',') as Key[];
+          ctrl.data.deadStoneOfferState = 'AcceptedOffer';
+          ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
           ctrl.doSelectSquaresAction();
           ctrl.redraw();
         } else {
+          ctrl.data.deadStoneOfferState = 'RejectedOffer';
           ctrl.chessground.resetSelectedPieces();
           ctrl.chessground.set({ highlight: { lastMove: ctrl.data.pref.highlight } });
         }
@@ -161,15 +163,17 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         ctrl.chessground.set({ highlight: { lastMove: false } });
 
         if (ctrl.data.opponent.offeringSelectSquares) {
+          ctrl.data.deadStoneOfferState = ctrl.data.player.playerIndex === 'p1' ? 'P2Offering' : 'P1Offering';
           ctrl.chessground.set({ viewOnly: false, selectOnly: true });
           ctrl.chessground.resetSelectedPieces();
-          ctrl.data.selectedSquares = o.squares.split(',') as Key[];
+          ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
           ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
           for (const square of ctrl.data.selectedSquares) {
             ctrl.chessground.selectSquare(square as cg.Key);
           }
         } else {
-          ctrl.data.selectedSquares = o.squares.split(',') as Key[];
+          ctrl.data.deadStoneOfferState = ctrl.data.player.playerIndex === 'p1' ? 'P1Offering' : 'P2Offering';
+          ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
           ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
           ctrl.chessground.set({ viewOnly: true });
         }

@@ -149,6 +149,22 @@ export function makeConfig(ctrl: RoundController): Config {
 
 export function reload(ctrl: RoundController) {
   ctrl.chessground.set(makeConfig(ctrl));
+  reSelectSelectedSquares(ctrl);
+}
+
+export function reSelectSelectedSquares(ctrl: RoundController) {
+  if (ctrl.data.selectedSquares) {
+    if (
+      ctrl.data.deadStoneOfferState &&
+      ((ctrl.data.deadStoneOfferState === 'P1Offering' && ctrl.data.player.playerIndex == 'p1') ||
+        (ctrl.data.deadStoneOfferState === 'P2Offering' && ctrl.data.player.playerIndex == 'p2'))
+    ) {
+      ctrl.chessground.set({ selectOnly: true, viewOnly: true });
+    }
+    for (const square of ctrl.data.selectedSquares) {
+      ctrl.chessground.selectSquare(square as cg.Key);
+    }
+  }
 }
 
 export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {

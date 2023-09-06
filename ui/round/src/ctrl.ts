@@ -512,9 +512,10 @@ export default class RoundController {
     d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
     d.crazyhouse = o.crazyhouse;
     d.takebackable = o.takebackable;
-    //from pass move
+    //from pass move (or drop)
     if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
       d.selectMode = o.canSelectSquares ? activePlayerIndex : false;
+      d.deadStoneOfferState = d.selectMode ? 'ChooseFirstOffer' : undefined;
     }
     this.setTitle();
     if (!this.replaying()) {
@@ -906,12 +907,16 @@ export default class RoundController {
     this.socket.sendLoading('draw-yes', null);
   };
 
-  canOfferSelectSquares = (): boolean =>
-    ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
-    this.isPlaying() &&
-    !this.replaying() &&
-    (this.data.opponent.offeringSelectSquares || this.data.selectMode) &&
-    !this.data.player.offeringSelectSquares;
+  canOfferSelectSquares = (): boolean => {
+    return (
+      ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key) &&
+      this.isPlaying() &&
+      !this.replaying() &&
+      (this.data.opponent.offeringSelectSquares || this.data.selectMode) &&
+      !this.data.player.offeringSelectSquares &&
+      !(this.data.deadStoneOfferState && this.data.deadStoneOfferState === 'RejectedOffer')
+    );
+  };
 
   offerSelectSquares = (): void => this.doOfferSelectSquares();
 
@@ -930,7 +935,9 @@ export default class RoundController {
     this.isPlaying() &&
     !this.replaying() &&
     this.data.player.playerIndex === this.data.game.player &&
-    !this.data.selectMode;
+    !this.data.selectMode &&
+    !this.data.opponent.offeringSelectSquares &&
+    !this.data.player.offeringSelectSquares;
 
   passTurn = (v: boolean): void => {
     if (this.canPassTurn()) {
@@ -966,6 +973,7 @@ export default class RoundController {
       this.keyboardMove = makeKeyboardMove(this, this.stepAt(this.ply), this.redraw);
       requestAnimationFrame(() => this.redraw());
     }
+    ground.reSelectSelectedSquares(this);
   };
 
   stepAt = (ply: Ply) => round.plyStep(this.data, ply);

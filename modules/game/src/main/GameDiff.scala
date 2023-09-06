@@ -302,9 +302,9 @@ object GameDiff {
           //(o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o }
         )
         dOpt(
-          playerOfferedSelectedSquares,
-          _.metadata.playerOfferedSelectedSquares.map(_.p1),
-          (o: Option[Boolean]) => o.map(w.bool)
+          deadStoneOfferState,
+          _.metadata.deadStoneOfferState.map(_.id),
+          (o: Option[Int]) => o.map(w.int)
         )
       }
     }

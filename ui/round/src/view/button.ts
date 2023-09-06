@@ -207,7 +207,13 @@ export const selectSquaresOfferOptions = (ctrl: RoundController): VNode | null =
     ? h(
         'div.pending',
         {},
-        `Offer sent to opponent (${ctrl.data.currentSelectedSquares ? ctrl.data.currentSelectedSquares.length : 0} DS)`
+        `Offer sent to opponent (${
+          ctrl.data.currentSelectedSquares
+            ? ctrl.data.currentSelectedSquares.length
+            : ctrl.data.selectedSquares
+            ? ctrl.data.selectedSquares.length
+            : 0
+        } DS)`
       )
     : ctrl.canOfferSelectSquares()
     ? h('div', [offerSelectSquares(ctrl)])

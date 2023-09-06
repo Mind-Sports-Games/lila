@@ -62,7 +62,12 @@ final class BotJsonView(
             "binc"   -> game.clock.??(_.config.increment.millis),
             "wdraw"  -> game.p1Player.isOfferingDraw,
             "bdraw"  -> game.p2Player.isOfferingDraw,
-            "status" -> game.status.name
+            "status" -> game.status.name,
+            "selectedSquares" -> Json
+              .obj(
+                "status"  -> game.deadStoneOfferState.map(_.name),
+                "squares" -> game.selectedSquares.map(_.map(_.toString))
+              )
           )
           .add("winner" -> game.winnerPlayerIndex)
           .add("rematch" -> rematches.of(game.id))
