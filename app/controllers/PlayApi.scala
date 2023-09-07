@@ -7,6 +7,7 @@ import scala.util.chaining._
 import lila.app._
 import lila.game.Pov
 import lila.user.{ User => UserModel }
+import strategygames.Pos
 
 // both bot & board APIs
 final class PlayApi(
@@ -104,9 +105,24 @@ final class PlayApi(
           as(id, me) { pov =>
             fuccess(env.bot.player.setDraw(pov, lila.common.Form.trueish(bool))) pipe toResult
           }
-        case Array("game", id, "selectSquares", bool) =>
+        case Array("game", id, "decide-select-squares", bool) =>
           as(id, me) { pov =>
             fuccess(env.bot.player.decideSelectSquares(pov, lila.common.Form.trueish(bool))) pipe toResult
+          }
+        case Array("game", id, "select-squares") =>
+          as(id, me) { pov =>
+            {
+              val gf = pov.game.variant.gameFamily
+              fuccess(env.bot.player.selectSquares(pov, List.empty)) pipe toResult
+            }
+          }
+        case Array("game", id, "select-squares", squaresS) =>
+          as(id, me) { pov =>
+            {
+              val gf      = pov.game.variant.gameFamily
+              val squares = squaresS.split(",").toList.flatMap(p => Pos.fromKey(gf.gameLogic, p))
+              fuccess(env.bot.player.selectSquares(pov, squares)) pipe toResult
+            }
           }
         case _ => notFoundJson("No such command")
       }

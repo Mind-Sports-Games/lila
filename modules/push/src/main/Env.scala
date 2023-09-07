@@ -76,7 +76,7 @@ final class Env(
     "offerEventCorres"
   ) {
     case lila.game.actorApi.FinishGame(game, _, _) =>
-      logUnit { pushApi finish game }
+      logUnit { pushApi.finish(game) }
     case lila.hub.actorApi.round.CorresMoveEvent(move, _, pushable, _, _) if pushable =>
       logUnit { pushApi move move }
     case lila.hub.actorApi.round.CorresTakebackOfferEvent(gameId) =>
@@ -84,7 +84,11 @@ final class Env(
     case lila.hub.actorApi.round.CorresDrawOfferEvent(gameId) =>
       logUnit { pushApi drawOffer gameId }
     case lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(gameId) =>
-      logUnit { pushApi selectSquaresOffer gameId }
+      logUnit { pushApi.selectSquaresOffer(gameId) }
+    case lila.hub.actorApi.round.CorresAcceptSquaresOfferEvent(gameId) =>
+      logUnit { pushApi.acceptSquaresOffer(gameId) }
+    case lila.hub.actorApi.round.CorresDeclineSquaresOfferEvent(gameId) =>
+      logUnit { pushApi.declineSquaresOffer(gameId) }
     case lila.msg.MsgThread.Unread(t) =>
       logUnit { pushApi newMsg t }
     case lila.challenge.Event.Create(c) =>
