@@ -175,7 +175,8 @@ export class ClockController {
     Math.min(1, millis * this.timeRatioDivisor[playerIndex]);
 
   setClock = (d: RoundData, p1: Seconds, p2: Seconds, p1Per = 0, p2Per = 0, delay: Centis = 0) => {
-    const paused = !!d.opponent.offeringSelectSquares ||
+    const paused =
+        !!d.opponent.offeringSelectSquares ||
         !!d.player.offeringSelectSquares ||
         !(!d.deadStoneOfferState || d.deadStoneOfferState === 'RejectedOffer'),
       isClockRunning = game.playable(d) && !paused && (game.bothPlayersHavePlayed(d) || d.clock!.running),
@@ -227,7 +228,7 @@ export class ClockController {
     this.times.activePlayerIndex = playerIndex;
     this.times.lastUpdate = performance.now() + delayMs;
     this.scheduleTick(this.times[playerIndex], delayMs);
-  }
+  };
 
   hardStopClock = (): void => (this.times.activePlayerIndex = undefined);
 
