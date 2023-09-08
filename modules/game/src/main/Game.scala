@@ -435,23 +435,48 @@ case class Game(
     )
 
   def playerCanOfferSelectSquares(playerIndex: PlayerIndex) =
-    started && playable && turns >= 2 && !player(playerIndex).isOfferingSelectSquares
+    started && playable && turns >= 2 && !player(
+      playerIndex
+    ).isOfferingSelectSquares && !deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
+
+  def deadStoneOfferState = metadata.deadStoneOfferState
 
   def drawOffers = metadata.drawOffers
+
+  def selectedSquaresOfferDoesNotMatchUci(uci: Uci): Boolean =
+    selectedSquares.fold(false)(p => ("ss:" + p.mkString(",")) != uci.uci)
 
   def selectedSquares = metadata.selectedSquares
 
   def offerSelectSquares(playerIndex: PlayerIndex, squares: List[Pos]) =
     copy(metadata =
-      metadata.copy(selectedSquares = Some(squares), playerOfferedSelectedSquares = Some(playerIndex))
+      metadata.copy(
+        selectedSquares = Some(squares),
+        deadStoneOfferState =
+          if (playerIndex == P1) Some(DeadStoneOfferState.P1Offering)
+          else Some(DeadStoneOfferState.P2Offering)
+      )
     )
       .updatePlayer(playerIndex, _.offerSelectSquares)
       .updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
 
-  def resetSelectSquares(playerIndex: PlayerIndex) =
-    copy(metadata = metadata.copy(selectedSquares = None, playerOfferedSelectedSquares = None))
+  def declineSelectSquares(playerIndex: PlayerIndex) =
+    copy(
+      chess = chess.copy(clock = clock.map(_.start)),
+      metadata = metadata.copy(
+        selectedSquares = None,
+        deadStoneOfferState = Some(DeadStoneOfferState.RejectedOffer)
+      )
+    )
       .updatePlayer(playerIndex, _.removeSelectSquaresOffer)
       .updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
+
+  def hasDeadStoneOfferState = deadStoneOfferState != None
+
+  def resetDeadStoneOfferState = copy(metadata = metadata.copy(deadStoneOfferState = None))
+
+  def setChooseFirstOffer =
+    copy(metadata = metadata.copy(deadStoneOfferState = DeadStoneOfferState.ChooseFirstOffer.some))
 
   def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&
@@ -990,14 +1015,33 @@ object Game {
     val perfType          = "pt" // only set on student games for aggregation
     val drawOffers        = "do"
     // go
-    val selectedSquares              = "ss"  // the dead stones selected in go
-    val playerOfferedSelectedSquares = "pss" //the player who offered last
+    val selectedSquares     = "ss" // the dead stones selected in go
+    val deadStoneOfferState = "os" //state of the dead stone offer
     //draughts
     val simulPairing = "sp"
     val timeOutUntil = "to"
     val multiMatch   = "mm"
     val drawLimit    = "dl"
   }
+}
+
+sealed abstract class DeadStoneOfferState(val id: Int) {
+  def name                                                            = toString
+  def is(s: DeadStoneOfferState): Boolean                             = this == s
+  def is(f: DeadStoneOfferState.type => DeadStoneOfferState): Boolean = is(f(DeadStoneOfferState))
+}
+object DeadStoneOfferState {
+  case object ChooseFirstOffer extends DeadStoneOfferState(0)
+  case object P1Offering       extends DeadStoneOfferState(1)
+  case object P2Offering       extends DeadStoneOfferState(2)
+  case object RejectedOffer    extends DeadStoneOfferState(3)
+  case object AcceptedOffer    extends DeadStoneOfferState(4)
+
+  val all = List(ChooseFirstOffer, P1Offering, P2Offering, RejectedOffer, AcceptedOffer)
+
+  val byId = all map { v => (v.id, v) } toMap
+
+  def apply(id: Int): Option[DeadStoneOfferState] = byId get id
 }
 
 case class CastleLastMove(castles: Castles, lastMove: Option[ChessUci])

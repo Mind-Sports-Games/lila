@@ -42,6 +42,10 @@ final private class Player(
           case Pov(game, _) if game.turns > Game.maxPlies =>
             round ! TooManyPlies
             fuccess(Nil)
+          case Pov(game, _) if game.selectedSquaresOfferDoesNotMatchUci(uci) =>
+            fufail(
+              ClientError(s"$pov game selected squares (${game.selectedSquares}) doesn't match uci ($uci)")
+            )
           case Pov(game, playerIndex) if game playableBy playerIndex =>
             applyUci(game, uci, blur, lag, finalSquare)
               .leftMap(e => s"$pov $e")
@@ -65,6 +69,8 @@ final private class Player(
       case Pov(game, _) if game.turns > Game.maxPlies =>
         round ! TooManyPlies
         fuccess(Nil)
+      case Pov(game, _) if game.selectedSquaresOfferDoesNotMatchUci(uci) =>
+        fufail(ClientError(s"$pov game selected squares (${game.selectedSquares}) doesn't match uci ($uci)"))
       case Pov(game, playerIndex) if game playableBy playerIndex =>
         applyUci(game, uci, blur = false, botLag)
           .fold(errs => fufail(ClientError(errs)), fuccess)
@@ -92,6 +98,9 @@ final private class Player(
       if (progress.game.playableByAi) requestFishnet(progress.game, round)
       if (pov.opponent.isOfferingDraw) round ! DrawNo(PlayerId(pov.player.id))
       if (pov.player.isProposingTakeback) round ! TakebackNo(PlayerId(pov.player.id))
+      if (progress.game.hasDeadStoneOfferState) resetDeadStoneOfferState(progress.game)
+      if (progress.game.playerCanOfferSelectSquares(progress.game.player.playerIndex))
+        setChooseFirstOffer(progress.game)
       if (progress.game.forecastable) {
         (action match {
           case m: StratMove => Some(m)
@@ -132,6 +141,16 @@ final private class Player(
     game.playableByAi ?? {
       if (game.turns <= fishnetPlayer.maxPlies) fishnetPlayer(game)
       else fuccess(round ! actorApi.round.ResignAi)
+    }
+
+  private[round] def resetDeadStoneOfferState(game: Game)(implicit proxy: GameProxy): Funit =
+    game.playable ?? {
+      proxy.save(Progress(game) map { _.resetDeadStoneOfferState })
+    }
+
+  private[round] def setChooseFirstOffer(game: Game)(implicit proxy: GameProxy): Funit =
+    game.playable ?? {
+      proxy.save(Progress(game) map { _.setChooseFirstOffer })
     }
 
   private val fishnetLag = MoveMetrics(clientLag = Centis(5).some)

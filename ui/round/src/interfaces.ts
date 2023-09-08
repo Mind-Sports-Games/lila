@@ -66,7 +66,7 @@ export interface RoundData extends GameData {
   selectMode: boolean;
   selectedSquares?: cg.Key[];
   currentSelectedSquares?: cg.Key[];
-  playerOfferingSelectedSquares?: PlayerIndex;
+  deadStoneOfferState?: string;
   forecastCount?: number;
   crazyhouse?: CrazyData;
   onlyDropsVariant: boolean;
@@ -155,6 +155,7 @@ export interface ApiMove extends Step {
   drops?: string;
   dropsByRole?: string;
   canSelectSquares?: boolean;
+  deadStoneOfferState?: string;
   squares?: string;
   promotion?: {
     key: cg.Key;

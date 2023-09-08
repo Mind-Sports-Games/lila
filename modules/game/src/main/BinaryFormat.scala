@@ -391,13 +391,26 @@ object BinaryFormat {
 
   object pos {
     def writeGo(squares: List[Pos]): ByteArray = {
-      ByteArray(squares.flatMap {
-        case Pos.Go(g) => Some(g.index.toByte)
-        case _         => None
-      }.toArray)
+      ByteArray(
+        squares
+          .flatMap {
+            case Pos.Go(g) => Some(writeSignedInt16(g.index))
+            case _         => None
+          }
+          .toArray
+          .flatten
+      )
     }
     def readGo(ba: ByteArray): List[Pos] = {
-      ba.value.flatMap(p => go.Pos(p.toInt)).toList.map(Pos.Go(_))
+      val ia = ba.value map toInt toList
+      def intPos(i: List[Int]): List[Option[go.Pos]] = {
+        i match {
+          case Nil                => Nil
+          case (b1 :: b2 :: rest) => go.Pos.apply(readSignedInt16(b1, b2)) :: intPos(rest)
+          case x                  => throw new Exception(s"Binary go reader failed: ${x map showByte mkString ","}")
+        }
+      }
+      intPos(ia).flatMap(p => p.map(Pos.Go(_)))
     }
   }
 
@@ -633,6 +646,24 @@ object BinaryFormat {
 
   @inline private def toInt(b: Byte): Int = b & 0xff
 
+  def writeInt16(int: Int) = {
+    val i = if (int < (1 << 16)) int else 0
+    Array((i >>> 8).toByte, i.toByte)
+  }
+
+  private val int15Max = 1 << 15
+  def writeSignedInt16(int: Int) = {
+    val i = if (int < 0) int15Max - int else math.min(int, int15Max)
+    writeInt16(i)
+  }
+
+  def readInt16(b1: Int, b2: Int) = (b1 << 8) | b2
+
+  def readSignedInt16(b1: Int, b2: Int) = {
+    val i = readInt16(b1, b2)
+    if (i > int15Max) int15Max - i else i
+  }
+
   def writeInt24(int: Int) = {
     val i = if (int < (1 << 24)) int else 0
     Array((i >>> 16).toByte, (i >>> 8).toByte, i.toByte)
@@ -662,4 +693,6 @@ object BinaryFormat {
   def readInt(b1: Int, b2: Int, b3: Int, b4: Int) = {
     (b1 << 24) | (b2 << 16) | (b3 << 8) | b4
   }
+
+  private def showByte(b: Int): String = "%08d" format (b.toBinaryString.toInt)
 }

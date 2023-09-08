@@ -334,13 +334,18 @@ object Event {
         pocketData
       ) {
         Json.obj(
-          "canSelectSquares" -> canSelectSquares,
-          "uci"              -> "pass",
-          "san"              -> san
+          "canSelectSquares"    -> canSelectSquares,
+          "deadStoneOfferState" -> deadStoneOfferStateJson(canSelectSquares),
+          "uci"                 -> "pass",
+          "san"                 -> san
         )
       }
     override def moveBy = Some(!state.playerIndex)
   }
+
+  def deadStoneOfferStateJson(canSelectSquares: Boolean): Option[String] =
+    if (canSelectSquares) Some("ChooseFirstOffer") else None
+
   object Pass {
     def apply(
         pass: StratPass,

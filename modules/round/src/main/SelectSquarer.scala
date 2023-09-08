@@ -25,7 +25,7 @@ final private[round] class SelectSquarer(
           Progress(g) map { g =>
             g.updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
           }
-        } inject List(
+        } >>- publishSquareOfferEvent(pov) inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(true))
         )
       case _ => fuccess(List(Event.ReloadOwner))
@@ -38,8 +38,10 @@ final private[round] class SelectSquarer(
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
         proxy.save {
           messenger.system(g, trans.selectSquareOfferDeclined.txt())
-          Progress(g) map { _.resetSelectSquares(playerIndex) }
-        } inject List(Event.SelectSquaresOffer(playerIndex, squares, Some(false)))
+          Progress(g) map { _.declineSelectSquares(playerIndex) }
+        } >>- publishSquareOfferEvent(pov) inject List(
+          Event.SelectSquaresOffer(playerIndex, squares, Some(false))
+        )
       case _ => fuccess(List(Event.ReloadOwner))
     }
   }
@@ -51,12 +53,19 @@ final private[round] class SelectSquarer(
           proxy.save {
             messenger.system(g, trans.playerIndexOffersSelectSquares(pov.game.playerTrans(playerIndex)).v)
             Progress(g) map { _.offerSelectSquares(playerIndex, squares) }
-          } >>- publishSelectSquaresOffer(pov) inject List(Event.SelectSquaresOffer(playerIndex, squares))
+          } >>- publishSquareOfferEvent(pov) inject List(
+            Event.SelectSquaresOffer(playerIndex, squares)
+          )
         case _ => fuccess(List(Event.ReloadOwner))
       }
     }
 
-  private def publishSelectSquaresOffer(pov: Pov)(implicit proxy: GameProxy): Unit = {
+  // NOTE: yes, I know, Any. But the Bus.publish takes an Any, and none of the events
+  //       we are publishing are of a particular type that we can depend on, so I guess
+  //       we use Any.
+  private def publishSquareOfferEvent(pov: Pov)(implicit
+      proxy: GameProxy
+  ) = {
     if (pov.game.isCorrespondence && pov.game.nonAi)
       Bus.publish(
         lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(pov.gameId),
@@ -66,10 +75,7 @@ final private[round] class SelectSquarer(
       proxy
         .withPov(pov.playerIndex) { p =>
           fuccess(
-            Bus.publish(
-              lila.game.actorApi.BoardSelectSquaresOffer(p),
-              s"boardSelectSquaresOffer:${pov.gameId}"
-            )
+            Bus.publish(lila.game.actorApi.BoardOfferSquares(p), s"boardSelectSquaresOffer:${pov.gameId}")
           )
         }
         .unit

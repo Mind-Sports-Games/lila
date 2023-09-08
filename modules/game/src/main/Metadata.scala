@@ -15,7 +15,7 @@ private[game] case class Metadata(
     drawOffers: GameDrawOffers,
     //go dead stones
     selectedSquares: Option[List[Pos]] = None,
-    playerOfferedSelectedSquares: Option[PlayerIndex] = None,
+    deadStoneOfferState: Option[DeadStoneOfferState] = None,
     //draughts options
     simulPairing: Option[Int] = None,
     timeOutUntil: Option[DateTime] = None,
