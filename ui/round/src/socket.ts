@@ -156,6 +156,10 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.data.deadStoneOfferState = 'RejectedOffer';
           ctrl.chessground.resetSelectedPieces();
           ctrl.chessground.set({ highlight: { lastMove: ctrl.data.pref.highlight } });
+          if (ctrl.clock){
+            ctrl.clock.unpauseClock(ctrl.data.game.player);
+          }
+          ctrl.redraw();
         }
       } else {
         ctrl.data.player.offeringSelectSquares = o.playerIndex === ctrl.data.player.playerIndex;

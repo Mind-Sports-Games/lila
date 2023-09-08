@@ -461,8 +461,9 @@ case class Game(
       .updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
 
   def declineSelectSquares(playerIndex: PlayerIndex) =
-    copy(metadata =
-      metadata.copy(
+    copy(
+      chess = chess.copy(clock = clock.map(_.start)),
+      metadata = metadata.copy(
         selectedSquares = None,
         deadStoneOfferState = Some(DeadStoneOfferState.RejectedOffer)
       )
@@ -473,6 +474,9 @@ case class Game(
   def hasDeadStoneOfferState = deadStoneOfferState != None
 
   def resetDeadStoneOfferState = copy(metadata = metadata.copy(deadStoneOfferState = None))
+
+  def setChooseFirstOffer =
+    copy(metadata = metadata.copy(deadStoneOfferState = DeadStoneOfferState.ChooseFirstOffer.some))
 
   def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&

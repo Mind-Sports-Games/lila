@@ -515,7 +515,7 @@ export default class RoundController {
     //from pass move (or drop)
     if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
       d.selectMode = o.canSelectSquares ? activePlayerIndex : false;
-      d.deadStoneOfferState = d.selectMode ? 'ChooseFirstOffer' : undefined;
+      d.deadStoneOfferState = o.canSelectSquares ? 'ChooseFirstOffer' : undefined;
     }
     this.setTitle();
     if (!this.replaying()) {
