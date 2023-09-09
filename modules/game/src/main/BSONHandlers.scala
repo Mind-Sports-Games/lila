@@ -978,6 +978,7 @@ object BSONHandlers {
             case bc: ByoyomiClock =>
               BinaryFormat.byoyomiClockHistory
                 .read(
+                  bc.config.byoyomi,
                   bc.limit,
                   bw,
                   bb,

@@ -90,16 +90,24 @@ object BinaryFormat {
       if (flagged) decoded :+ Centis(0) else decoded
     }
 
-    def read(start: Centis, bs: ByteArray, bg: ByteArray, pe: PeriodEntries, flagged: Option[PlayerIndex]) =
+    def read(
+        byoyomi: Centis,
+        start: Centis,
+        bs: ByteArray,
+        bg: ByteArray,
+        pe: PeriodEntries,
+        flagged: Option[PlayerIndex]
+    ) =
       Try {
         ByoyomiClockHistory(
+          byoyomi,
           readSide(start, bs, flagged has P1),
           readSide(start, bg, flagged has P2),
           pe
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },
-        some
+        _ => some(ByoyomiClockHistory(Centis(0)))
       )
   }
 

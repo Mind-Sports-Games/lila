@@ -215,21 +215,7 @@ case class Game(
     } yield Sequence.interleave(a, b)
 
   def bothClockStates: Option[Vector[Centis]] =
-    clockHistory.map(ch =>
-      ch match {
-        case fch: FischerClockHistory => fch.bothClockStates(startPlayerIndex)
-        case bch: ByoyomiClockHistory =>
-          bch.bothClockStates(
-            startPlayerIndex,
-            clock ?? (c =>
-              c match {
-                case bc: ByoyomiClock => bc.byoyomi
-                case _                => Centis(0)
-              }
-            )
-          )
-      }
-    )
+    clockHistory.map(_.bothClockStates(startPlayerIndex))
 
   def pdnMovesConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): PgnMoves =
     chess match {
@@ -912,10 +898,13 @@ object Game {
   private[game] val emptyScore      = Score(0, 0)
 
   private[game] val someEmptyFischerClockHistory = Some(FischerClockHistory())
-  private[game] val someEmptyByoyomiClockHistory = Some(ByoyomiClockHistory())
+  private[game] def someEmptyByoyomiClockHistory(c: Clock) = c match {
+    case bc: ByoyomiClock => Some(ByoyomiClockHistory(bc.config.byoyomi))
+    case _                => Some(ByoyomiClockHistory(Centis(0)))
+  }
   private[game] def someEmptyClockHistory(c: Clock) = c match {
     case _: FischerClock => someEmptyFischerClockHistory
-    case _: ByoyomiClock => someEmptyByoyomiClockHistory
+    case _: ByoyomiClock => someEmptyByoyomiClockHistory(c)
   }
 
   def make(
@@ -1089,31 +1078,13 @@ sealed trait ClockHistory {
   val p1: Vector[Centis]
   val p2: Vector[Centis]
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
-  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory
-  def reset(playerIndex: PlayerIndex): ClockHistory
-  def apply(playerIndex: PlayerIndex): Vector[Centis]
-  def last(playerIndex: PlayerIndex): Option[Centis]
-  def size: Int
-}
-
-case class FischerClockHistory(
-    p1: Vector[Centis] = Vector.empty,
-    p2: Vector[Centis] = Vector.empty
-) extends ClockHistory {
-
-  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
-    playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
 
   def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory =
     update(playerIndex, _ :+ clock.remainingTime(playerIndex))
-
-  def reset(playerIndex: PlayerIndex) = update(playerIndex, _ => Vector.empty)
-
+  def reset(playerIndex: PlayerIndex)                 = update(playerIndex, _ => Vector.empty)
   def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
-
-  def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
-
-  def size = p1.size + p2.size
+  def last(playerIndex: PlayerIndex)                  = apply(playerIndex).lastOption
+  def size                                            = p1.size + p2.size
 
   // first state is of the playerIndex that moved first.
   def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
@@ -1123,13 +1094,20 @@ case class FischerClockHistory(
     )
 }
 
+case class FischerClockHistory(
+    p1: Vector[Centis] = Vector.empty,
+    p2: Vector[Centis] = Vector.empty
+) extends ClockHistory {
+  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
+    playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
+}
+
 case class ByoyomiClockHistory(
+    byoyomi: Centis,
     p1: Vector[Centis] = Vector.empty,
     p2: Vector[Centis] = Vector.empty,
     periodEntries: PeriodEntries = PeriodEntries.default
 ) extends ClockHistory {
-
-  def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     updateInternal(playerIndex, f)
@@ -1140,7 +1118,7 @@ case class ByoyomiClockHistory(
   def updatePeriods(playerIndex: PlayerIndex, f: Vector[Int] => Vector[Int]): ClockHistory =
     copy(periodEntries = periodEntries.update(playerIndex, f))
 
-  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory = {
+  override def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory = {
     val curClock        = clock currentClockFor playerIndex
     val initiatePeriods = clock.config.startsAtZero && periodEntries(playerIndex).isEmpty
     val isUsingByoyomi  = curClock.periods > 0 && !initiatePeriods
@@ -1154,12 +1132,8 @@ case class ByoyomiClockHistory(
       )
   }
 
-  def reset(playerIndex: PlayerIndex) =
+  override def reset(playerIndex: PlayerIndex) =
     updateInternal(playerIndex, _ => Vector.empty).updatePeriods(playerIndex, _ => Vector.empty)
-
-  def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
-
-  def size = p1.size + p2.size
 
   def firstEnteredPeriod(playerIndex: PlayerIndex): Option[Int] =
     periodEntries(playerIndex).headOption
@@ -1176,9 +1150,9 @@ case class ByoyomiClockHistory(
   }
 
   // first state is of the playerIndex that moved first.
-  def bothClockStates(firstMoveBy: PlayerIndex, byo: Centis): Vector[Centis] = {
-    val p1Times = padWithByo(PlayerIndex.P1, byo)
-    val p2Times = padWithByo(PlayerIndex.P2, byo)
+  override def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] = {
+    val p1Times = padWithByo(PlayerIndex.P1, byoyomi)
+    val p2Times = padWithByo(PlayerIndex.P2, byoyomi)
     Sequence.interleave(
       firstMoveBy.fold(p1Times, p2Times),
       firstMoveBy.fold(p2Times, p1Times)
