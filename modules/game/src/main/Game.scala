@@ -24,7 +24,8 @@ import strategygames.{
   Pos,
   Speed,
   Status,
-  P1
+  P1,
+  Situation
 }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -269,6 +270,13 @@ case class Game(
       ch  <- clockHistory
     } yield ch.record(turnPlayerIndex, clk, chess.fullMoveNumber)
 
+    def deadStoneOfferStateAfterAction: Option[DeadStoneOfferState] = {
+      game.situation match {
+        case Situation.Go(s) if s.canSelectSquares => DeadStoneOfferState.ChooseFirstOffer.some
+        case _                                     => None
+      }
+    }
+
     val updated = copy(
       p1Player = copyPlayer(p1Player),
       p2Player = copyPlayer(p2Player),
@@ -282,7 +290,8 @@ case class Game(
       },
       loadClockHistory = _ => newClockHistory,
       status = game.situation.status | status,
-      movedAt = DateTime.now
+      movedAt = DateTime.now,
+      metadata = metadata.copy(deadStoneOfferState = deadStoneOfferStateAfterAction)
     )
 
     val state = Event.State(
@@ -435,7 +444,10 @@ case class Game(
     )
 
   def playerCanOfferSelectSquares(playerIndex: PlayerIndex) =
-    started && playable && turns >= 2 && !player(
+    started && playable && turns >= 2 && (situation match {
+      case Situation.Go(s) => s.canSelectSquares
+      case _               => false
+    }) && !player(
       playerIndex
     ).isOfferingSelectSquares && !deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
 

@@ -98,9 +98,6 @@ final private class Player(
       if (progress.game.playableByAi) requestFishnet(progress.game, round)
       if (pov.opponent.isOfferingDraw) round ! DrawNo(PlayerId(pov.player.id))
       if (pov.player.isProposingTakeback) round ! TakebackNo(PlayerId(pov.player.id))
-      if (progress.game.hasDeadStoneOfferState) resetDeadStoneOfferState(progress.game)
-      if (progress.game.playerCanOfferSelectSquares(progress.game.player.playerIndex))
-        setChooseFirstOffer(progress.game)
       if (progress.game.forecastable) {
         (action match {
           case m: StratMove => Some(m)
@@ -141,16 +138,6 @@ final private class Player(
     game.playableByAi ?? {
       if (game.turns <= fishnetPlayer.maxPlies) fishnetPlayer(game)
       else fuccess(round ! actorApi.round.ResignAi)
-    }
-
-  private[round] def resetDeadStoneOfferState(game: Game)(implicit proxy: GameProxy): Funit =
-    game.playable ?? {
-      proxy.save(Progress(game) map { _.resetDeadStoneOfferState })
-    }
-
-  private[round] def setChooseFirstOffer(game: Game)(implicit proxy: GameProxy): Funit =
-    game.playable ?? {
-      proxy.save(Progress(game) map { _.setChooseFirstOffer })
     }
 
   private val fishnetLag = MoveMetrics(clientLag = Centis(5).some)

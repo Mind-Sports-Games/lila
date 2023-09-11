@@ -78,6 +78,7 @@ final class BotJsonView(
       )
     )
 
+  //todo update to provide the player who offered?
   def ssStatus(game: Game): Option[String] =
     game.deadStoneOfferState
       .flatMap(s =>
