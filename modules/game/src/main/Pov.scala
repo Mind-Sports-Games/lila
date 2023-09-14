@@ -26,7 +26,7 @@ case class Pov(game: Game, playerIndex: PlayerIndex) {
   def withGame(g: Game)   = copy(game = g)
   def withPlayerIndex(c: PlayerIndex) = copy(playerIndex = c)
 
-  lazy val isMyTurn = game.started && game.playable && game.turnPlayerIndex == playerIndex
+  lazy val isMyTurn = game.started && game.playable && game.activePlayerIndex == playerIndex
 
   lazy val remainingSeconds: Option[Int] =
     game.clock.map(c => c.remainingTime(playerIndex).roundSeconds).orElse {

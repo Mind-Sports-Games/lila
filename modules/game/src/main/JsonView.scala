@@ -38,7 +38,7 @@ final class JsonView(rematches: Rematches) {
         "rated"         -> game.rated,
         "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
         "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
-        "player"        -> game.turnPlayerIndex,
+        "player"        -> game.activePlayerIndex,
         "turns"         -> game.turns,
         "startedAtTurn" -> game.chess.startedAtTurn,
         "source"        -> game.source,

@@ -293,7 +293,7 @@ final class JsonView(
             "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
             "fen"        -> fen,
             "turns"      -> game.turns,
-            "player"     -> game.turnPlayerIndex.name,
+            "player"     -> game.activePlayerIndex.name,
             "status"     -> game.status,
             "gameFamily" -> game.variant.gameFamily.key
           )

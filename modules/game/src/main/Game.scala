@@ -100,6 +100,9 @@ case class Game(
 
   def turnPlayerIndex = chess.player
 
+  //For the front end - whose 'turn' is it? (SG + Go select squares status)
+  def activePlayerIndex = playerToOfferSelectSquares.getOrElse(turnPlayerIndex)
+
   def turnOf(p: Player): Boolean      = p == player
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
@@ -388,8 +391,8 @@ case class Game(
       val secondsLeft = (movedAt.getSeconds + increment - nowSeconds).toInt max 0
       CorrespondenceClock(
         increment = increment,
-        p1Time = turnPlayerIndex.fold(secondsLeft, increment).toFloat,
-        p2Time = turnPlayerIndex.fold(increment, secondsLeft).toFloat
+        p1Time = activePlayerIndex.fold(secondsLeft, increment).toFloat,
+        p2Time = activePlayerIndex.fold(increment, secondsLeft).toFloat
       )
     }
 
@@ -443,13 +446,31 @@ case class Game(
       p2Player = f(p2Player)
     )
 
+  private def selectSquaresPossible =
+    started &&
+      playable &&
+      turns >= 2 &&
+      (situation match {
+        case Situation.Go(s) => s.canSelectSquares
+        case _               => false
+      }) &&
+      !deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
+
+  private def neitherPlayerHasMadeAnOffer =
+    !player(PlayerIndex.P1).isOfferingSelectSquares &&
+      !player(PlayerIndex.P2).isOfferingSelectSquares
+
+  //TODO should be able condense the next two functions into one, and only use the bottom one
   def playerCanOfferSelectSquares(playerIndex: PlayerIndex) =
-    started && playable && turns >= 2 && (situation match {
-      case Situation.Go(s) => s.canSelectSquares
-      case _               => false
-    }) && !player(
-      playerIndex
-    ).isOfferingSelectSquares && !deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
+    if (selectSquaresPossible)
+      if (neitherPlayerHasMadeAnOffer) playerIndex == turnPlayerIndex
+      else !player(playerIndex).isOfferingSelectSquares
+    else false
+
+  def playerToOfferSelectSquares: Option[PlayerIndex] =
+    if (playerCanOfferSelectSquares(PlayerIndex.P1)) PlayerIndex.P1.some
+    else if (playerCanOfferSelectSquares(PlayerIndex.P2)) PlayerIndex.P2.some
+    else none
 
   def deadStoneOfferState = metadata.deadStoneOfferState
 
@@ -461,8 +482,9 @@ case class Game(
   def selectedSquares = metadata.selectedSquares
 
   def offerSelectSquares(playerIndex: PlayerIndex, squares: List[Pos]) =
-    copy(metadata =
-      metadata.copy(
+    copy(
+      movedAt = DateTime.now,
+      metadata = metadata.copy(
         selectedSquares = Some(squares),
         deadStoneOfferState =
           if (playerIndex == P1) Some(DeadStoneOfferState.P1Offering)
@@ -475,6 +497,7 @@ case class Game(
   def declineSelectSquares(playerIndex: PlayerIndex) =
     copy(
       chess = chess.copy(clock = clock.map(_.start)),
+      movedAt = DateTime.now,
       metadata = metadata.copy(
         selectedSquares = None,
         deadStoneOfferState = Some(DeadStoneOfferState.RejectedOffer)
@@ -485,10 +508,19 @@ case class Game(
 
   def hasDeadStoneOfferState = deadStoneOfferState != None
 
-  def resetDeadStoneOfferState = copy(metadata = metadata.copy(deadStoneOfferState = None))
+  def resetDeadStoneOfferState =
+    copy(
+      movedAt = DateTime.now,
+      metadata = metadata.copy(deadStoneOfferState = None)
+    )
 
   def setChooseFirstOffer =
-    copy(metadata = metadata.copy(deadStoneOfferState = DeadStoneOfferState.ChooseFirstOffer.some))
+    copy(
+      movedAt = DateTime.now,
+      metadata = metadata.copy(
+        deadStoneOfferState = DeadStoneOfferState.ChooseFirstOffer.some
+      )
+    )
 
   def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&
@@ -632,13 +664,13 @@ case class Game(
     clock ?? { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
         c.outOfTime(turnPlayerIndex, withGrace) || {
-          !c.isRunning && c.clockPlayerExists(_.elapsed.centis > 0)
+          !c.isRunning && !c.isPaused && c.clockPlayerExists(_.elapsed.centis > 0)
         }
       }
     }
 
   private def outoftimeCorrespondence: Boolean =
-    playableCorrespondenceClock ?? { _ outoftime turnPlayerIndex }
+    playableCorrespondenceClock ?? { _ outoftime activePlayerIndex }
 
   def isCorrespondence = speed == Speed.Correspondence
 
