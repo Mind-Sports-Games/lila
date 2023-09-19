@@ -45,7 +45,7 @@ object jsI18n {
     trans.checkersConnected,
     trans.gameFinished,
     trans.variantEnding,
-    trans.owareCycle
+    trans.gameFinishedRepetition
   ).map(_.key)
 
   private val tournamentTranslations = Vector(
