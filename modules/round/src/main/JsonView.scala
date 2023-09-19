@@ -170,10 +170,17 @@ final class JsonView(
           .add("selectMode" -> selectMode(pov))
           .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
           .add("deadStoneOfferState" -> pov.game.metadata.deadStoneOfferState.map(_.name))
-          .add("expiration" -> pov.game.expirable.option {
+          .add("pauseSecs" -> pov.game.timeWhenPaused.millis.some)
+          .add("expirationAtStart" -> pov.game.expirableAtStart.option {
             Json.obj(
               "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
               "millisToMove" -> pov.game.timeForFirstMove.millis
+            )
+          })
+          .add("expirationOnPaused" -> pov.game.expirableOnPaused.option {
+            Json.obj(
+              "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
+              "millisToMove" -> pov.game.timeWhenPaused.millis
             )
           })
       }

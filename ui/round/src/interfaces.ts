@@ -67,6 +67,7 @@ export interface RoundData extends GameData {
   selectedSquares?: cg.Key[];
   currentSelectedSquares?: cg.Key[];
   deadStoneOfferState?: string;
+  pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
   onlyDropsVariant: boolean;
@@ -80,7 +81,8 @@ export interface RoundData extends GameData {
   userTv?: {
     id: string;
   };
-  expiration?: Expiration;
+  expirationAtStart?: Expiration;
+  expirationOnPaused?: Expiration;
 }
 
 export interface Expiration {

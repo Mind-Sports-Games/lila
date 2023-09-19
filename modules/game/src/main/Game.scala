@@ -731,15 +731,35 @@ case class Game(
       else base
     }
 
-  def expirable =
+  def expirableAtStart =
     !bothPlayersHaveMoved && source.exists(Source.expirable.contains) && playable && nonAi && clock.exists(
       !_.isRunning
     )
 
-  def timeBeforeExpiration: Option[Centis] =
-    expirable option {
+  def timeBeforeExpirationAtStart: Option[Centis] =
+    expirableAtStart option {
       Centis.ofMillis(movedAt.getMillis - nowMillis + timeForFirstMove.millis).nonNeg
     }
+
+  def timeWhenPaused: Centis =
+    Centis ofSeconds {
+      import Speed._
+      speed match {
+        case UltraBullet => 15
+        case Bullet      => 20
+        case Blitz       => if (isTournament) 30 else 60
+        case _           => 60
+      }
+    }
+
+  def expirableOnPaused = playable && nonAi && clock.exists(_.isPaused)
+
+  def timeBeforeExpirationOnPaused: Option[Centis] =
+    expirableOnPaused option {
+      Centis.ofMillis(movedAt.getMillis - nowMillis + timeWhenPaused.millis).nonNeg
+    }
+
+  def expirable = expirableAtStart || expirableOnPaused
 
   def playerWhoDidNotMove: Option[Player] =
     (playedTurns, variant.plysPerTurn) match {

@@ -29,8 +29,14 @@ object jsI18n {
     trans.nbHours
   ).map(_.key)
 
-  private val realtimeTranslations =
-    Vector(trans.nbSecondsToPlayTheFirstMove, trans.nbSecondsForOpponentToPlayTheFirstMove).map(_.key)
+  private val realtimeTranslations = Vector(
+    trans.nbSecondsToPlayTheFirstMove,
+    trans.nbSecondsForOpponentToPlayTheFirstMove,
+    trans.nbSecondsToOfferDeadStones,
+    trans.nbSecondsForOpponentToOfferDeadStones,
+    trans.nbSecondsToRespondToOffer,
+    trans.nbSecondsForOpponentToRespondToOffer
+  ).map(_.key)
 
   private val variantTranslations = Vector(
     trans.kingInTheCenter,

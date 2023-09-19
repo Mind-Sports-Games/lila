@@ -146,6 +146,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         ctrl.data.opponent.offeringSelectSquares = false;
         ctrl.data.selectedSquares = undefined;
         ctrl.data.currentSelectedSquares = undefined;
+        ctrl.data.expirationOnPaused = undefined;
 
         ctrl.redraw();
         if (o.accepted) {
@@ -189,7 +190,13 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.chessground.set({ viewOnly: true });
         }
 
-        if (ctrl.corresClock) {
+        if (ctrl.clock) {
+          ctrl.data.expirationOnPaused = {
+            idleMillis: 0,
+            movedAt: Date.now(),
+            millisToMove: ctrl.data.pauseSecs ? ctrl.data.pauseSecs : 60000,
+          };
+        } else if (ctrl.corresClock) {
           ctrl.corresClock.update(ctrl.corresClock.data.increment, ctrl.corresClock.data.increment);
         }
         game.setOnGame(ctrl.data, o.playerIndex, true);
