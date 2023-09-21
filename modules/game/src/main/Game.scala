@@ -3,7 +3,6 @@ package lila.game
 import strategygames.format.{ FEN, Uci }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.{ Castles, CheckCount }
-import strategygames.togyzkumalak.Score
 import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
   P2,
@@ -24,7 +23,9 @@ import strategygames.{
   Pos,
   Speed,
   Status,
-  P1
+  P1,
+  Score,
+  Situation
 }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -98,6 +99,9 @@ case class Game(
   }
 
   def turnPlayerIndex = chess.player
+
+  //For the front end - whose 'turn' is it? (SG + Go select squares status)
+  def activePlayerIndex = playerToOfferSelectSquares.getOrElse(turnPlayerIndex)
 
   def turnOf(p: Player): Boolean      = p == player
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
@@ -269,6 +273,13 @@ case class Game(
       ch  <- clockHistory
     } yield ch.record(turnPlayerIndex, clk, chess.fullMoveNumber)
 
+    def deadStoneOfferStateAfterAction: Option[DeadStoneOfferState] = {
+      game.situation match {
+        case Situation.Go(s) if s.canSelectSquares => DeadStoneOfferState.ChooseFirstOffer.some
+        case _                                     => None
+      }
+    }
+
     val updated = copy(
       p1Player = copyPlayer(p1Player),
       p2Player = copyPlayer(p2Player),
@@ -282,7 +293,8 @@ case class Game(
       },
       loadClockHistory = _ => newClockHistory,
       status = game.situation.status | status,
-      movedAt = DateTime.now
+      movedAt = DateTime.now,
+      metadata = metadata.copy(deadStoneOfferState = deadStoneOfferStateAfterAction)
     )
 
     val state = Event.State(
@@ -320,14 +332,20 @@ case class Game(
           )
         )
       else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
+        //Is this even necessary as score is in the fen?
         (updated.board.variant.togyzkumalak) ?? List(
-          Event.Score(p1 = updated.history.score.p1, updated.history.score.p2)
+          Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
-      else if (updated.board.variant.gameLogic == GameLogic.Go())
-        (updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? List(
-          Event.Score(p1 = updated.history.score.p1, updated.history.score.p2)
-        )
-      else //chess
+      //TODO: Review these extra pieces of info. This was determined unncecessary for Go
+      //after we put the captures info into the FEN
+      //else if (updated.board.variant.gameLogic == GameLogic.Go())
+      //  //(updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? List(
+      //  //  Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
+      //  //)
+      //  (updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? updated.displayScore
+      //    .map(s => Event.Score(p1 = s.p1, p2 = s.p2))
+      //    .toList
+      else //chess. Is this even necessary as checkCount is in the fen?
         ((updated.board.variant.threeCheck || updated.board.variant.fiveCheck) && game.situation.check) ?? List(
           Event.CheckCount(
             p1 = updated.history.checkCount.p1,
@@ -338,6 +356,13 @@ case class Game(
 
     Progress(this, updated, events)
   }
+
+  def displayScore: Option[Score] =
+    if (variant.gameLogic == GameLogic.Togyzkumalak()) history.score.some
+    else if (variant.gameLogic == GameLogic.Go()) {
+      if (finished || selectSquaresPossible) history.score.some
+      else history.captures.some
+    } else none
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
@@ -379,8 +404,8 @@ case class Game(
       val secondsLeft = (movedAt.getSeconds + increment - nowSeconds).toInt max 0
       CorrespondenceClock(
         increment = increment,
-        p1Time = turnPlayerIndex.fold(secondsLeft, increment).toFloat,
-        p2Time = turnPlayerIndex.fold(increment, secondsLeft).toFloat
+        p1Time = activePlayerIndex.fold(secondsLeft, increment).toFloat,
+        p2Time = activePlayerIndex.fold(increment, secondsLeft).toFloat
       )
     }
 
@@ -434,10 +459,31 @@ case class Game(
       p2Player = f(p2Player)
     )
 
+  private def selectSquaresPossible =
+    started &&
+      playable &&
+      turns >= 2 &&
+      (situation match {
+        case Situation.Go(s) => s.canSelectSquares
+        case _               => false
+      }) &&
+      !deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
+
+  private def neitherPlayerHasMadeAnOffer =
+    !player(PlayerIndex.P1).isOfferingSelectSquares &&
+      !player(PlayerIndex.P2).isOfferingSelectSquares
+
+  //TODO should be able condense the next two functions into one, and only use the bottom one
   def playerCanOfferSelectSquares(playerIndex: PlayerIndex) =
-    started && playable && turns >= 2 && !player(
-      playerIndex
-    ).isOfferingSelectSquares && !deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
+    if (selectSquaresPossible)
+      if (neitherPlayerHasMadeAnOffer) playerIndex == turnPlayerIndex
+      else !player(playerIndex).isOfferingSelectSquares
+    else false
+
+  def playerToOfferSelectSquares: Option[PlayerIndex] =
+    if (playerCanOfferSelectSquares(PlayerIndex.P1)) PlayerIndex.P1.some
+    else if (playerCanOfferSelectSquares(PlayerIndex.P2)) PlayerIndex.P2.some
+    else none
 
   def deadStoneOfferState = metadata.deadStoneOfferState
 
@@ -449,8 +495,9 @@ case class Game(
   def selectedSquares = metadata.selectedSquares
 
   def offerSelectSquares(playerIndex: PlayerIndex, squares: List[Pos]) =
-    copy(metadata =
-      metadata.copy(
+    copy(
+      movedAt = DateTime.now,
+      metadata = metadata.copy(
         selectedSquares = Some(squares),
         deadStoneOfferState =
           if (playerIndex == P1) Some(DeadStoneOfferState.P1Offering)
@@ -463,6 +510,7 @@ case class Game(
   def declineSelectSquares(playerIndex: PlayerIndex) =
     copy(
       chess = chess.copy(clock = clock.map(_.start)),
+      movedAt = DateTime.now,
       metadata = metadata.copy(
         selectedSquares = None,
         deadStoneOfferState = Some(DeadStoneOfferState.RejectedOffer)
@@ -473,10 +521,19 @@ case class Game(
 
   def hasDeadStoneOfferState = deadStoneOfferState != None
 
-  def resetDeadStoneOfferState = copy(metadata = metadata.copy(deadStoneOfferState = None))
+  def resetDeadStoneOfferState =
+    copy(
+      movedAt = DateTime.now,
+      metadata = metadata.copy(deadStoneOfferState = None)
+    )
 
   def setChooseFirstOffer =
-    copy(metadata = metadata.copy(deadStoneOfferState = DeadStoneOfferState.ChooseFirstOffer.some))
+    copy(
+      movedAt = DateTime.now,
+      metadata = metadata.copy(
+        deadStoneOfferState = DeadStoneOfferState.ChooseFirstOffer.some
+      )
+    )
 
   def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&
@@ -620,13 +677,13 @@ case class Game(
     clock ?? { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
         c.outOfTime(turnPlayerIndex, withGrace) || {
-          !c.isRunning && c.clockPlayerExists(_.elapsed.centis > 0)
+          !c.isRunning && !c.isPaused && c.clockPlayerExists(_.elapsed.centis > 0)
         }
       }
     }
 
   private def outoftimeCorrespondence: Boolean =
-    playableCorrespondenceClock ?? { _ outoftime turnPlayerIndex }
+    playableCorrespondenceClock ?? { _ outoftime activePlayerIndex }
 
   def isCorrespondence = speed == Speed.Correspondence
 
@@ -687,15 +744,35 @@ case class Game(
       else base
     }
 
-  def expirable =
+  def expirableAtStart =
     !bothPlayersHaveMoved && source.exists(Source.expirable.contains) && playable && nonAi && clock.exists(
       !_.isRunning
     )
 
-  def timeBeforeExpiration: Option[Centis] =
-    expirable option {
+  def timeBeforeExpirationAtStart: Option[Centis] =
+    expirableAtStart option {
       Centis.ofMillis(movedAt.getMillis - nowMillis + timeForFirstMove.millis).nonNeg
     }
+
+  def timeWhenPaused: Centis =
+    Centis ofSeconds {
+      import Speed._
+      speed match {
+        case UltraBullet => 15
+        case Bullet      => 20
+        case Blitz       => if (isTournament) 30 else 60
+        case _           => 60
+      }
+    }
+
+  def expirableOnPaused = playable && nonAi && clock.exists(_.isPaused)
+
+  def timeBeforeExpirationOnPaused: Option[Centis] =
+    expirableOnPaused option {
+      Centis.ofMillis(movedAt.getMillis - nowMillis + timeWhenPaused.millis).nonNeg
+    }
+
+  def expirable = expirableAtStart || expirableOnPaused
 
   def playerWhoDidNotMove: Option[Player] =
     (playedTurns, variant.plysPerTurn) match {
@@ -984,6 +1061,7 @@ object Game {
     val positionHashes    = "ph"
     val checkCount        = "cc"
     val score             = "sc"
+    val captures          = "cp"
     val castleLastMove    = "cl"
     val kingMoves         = "km"
     val historyLastMove   = "hlm"

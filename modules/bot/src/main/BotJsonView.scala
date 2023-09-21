@@ -70,14 +70,23 @@ final class BotJsonView(
     }
   }
 
+  def playerOffering(deadStoneOfferState: Option[DeadStoneOfferState]): Option[String] =
+    deadStoneOfferState match {
+      case Some(DeadStoneOfferState.P1Offering) => Some("p1")
+      case Some(DeadStoneOfferState.P2Offering) => Some("p2")
+      case _                                    => None
+    }
+
   def selectedSquaresJson(game: Game) =
     ssStatus(game).map(s =>
       Json.obj(
-        "status"  -> s,
-        "squares" -> game.selectedSquares.map(_.map(_.toString).mkString(" "))
+        "status"         -> s,
+        "squares"        -> game.selectedSquares.map(_.map(_.toString).mkString(" ")),
+        "playerOffering" -> playerOffering(game.deadStoneOfferState)
       )
     )
 
+  //todo update to provide the player who offered?
   def ssStatus(game: Game): Option[String] =
     game.deadStoneOfferState
       .flatMap(s =>

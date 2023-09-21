@@ -9,6 +9,7 @@ import { Untyped } from './interfaces';
 import { defined } from 'common';
 import * as util from './util';
 import * as cg from 'chessground/types';
+import { opposite } from 'chessground/util';
 
 export interface RoundSocket extends Untyped {
   send: SocketSend;
@@ -145,6 +146,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         ctrl.data.opponent.offeringSelectSquares = false;
         ctrl.data.selectedSquares = undefined;
         ctrl.data.currentSelectedSquares = undefined;
+        ctrl.data.expirationOnPaused = undefined;
 
         ctrl.redraw();
         if (o.accepted) {
@@ -156,14 +158,20 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.data.deadStoneOfferState = 'RejectedOffer';
           ctrl.chessground.resetSelectedPieces();
           ctrl.chessground.set({ highlight: { lastMove: ctrl.data.pref.highlight } });
+          //TODO when merging with multiaction this wont work
+          ctrl.data.game.player = util.turnPlayerIndexFromLastPly(ctrl.data.game.turns, ctrl.data.game.variant.key);
+          game.setOnGame(ctrl.data, o.playerIndex, true);
           if (ctrl.clock) {
             ctrl.clock.unpauseClock(ctrl.data.game.player);
+          } else if (ctrl.corresClock) {
+            ctrl.corresClock.update(ctrl.corresClock.data.increment, ctrl.corresClock.data.increment);
           }
           ctrl.redraw();
         }
       } else {
         ctrl.data.player.offeringSelectSquares = o.playerIndex === ctrl.data.player.playerIndex;
         ctrl.data.opponent.offeringSelectSquares = o.playerIndex === ctrl.data.opponent.playerIndex;
+        ctrl.data.game.player = opposite(o.playerIndex);
         ctrl.chessground.set({ highlight: { lastMove: false } });
 
         if (ctrl.data.opponent.offeringSelectSquares) {
@@ -172,7 +180,12 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.chessground.resetSelectedPieces();
           ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
           ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
-          for (const square of ctrl.data.selectedSquares) {
+          const goStonesToSelect = util.goStonesToSelect(
+            ctrl.data.selectedSquares,
+            ctrl.chessground.state.pieces,
+            ctrl.data.game.variant.boardSize
+          );
+          for (const square of goStonesToSelect) {
             ctrl.chessground.selectSquare(square as cg.Key);
           }
         } else {
@@ -182,6 +195,16 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.chessground.set({ viewOnly: true });
         }
 
+        if (ctrl.clock) {
+          ctrl.data.expirationOnPaused = {
+            idleMillis: 0,
+            movedAt: Date.now(),
+            millisToMove: ctrl.data.pauseSecs ? ctrl.data.pauseSecs : 60000,
+          };
+        } else if (ctrl.corresClock) {
+          ctrl.corresClock.update(ctrl.corresClock.data.increment, ctrl.corresClock.data.increment);
+        }
+        game.setOnGame(ctrl.data, o.playerIndex, true);
         ctrl.redraw();
       }
     },

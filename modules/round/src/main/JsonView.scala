@@ -32,11 +32,7 @@ final class JsonView(
       .checkCount(playerIndex)
 
   private def score(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.togyzkumalak.variant.Togyzkumalak ||
-      game.variant == strategygames.go.variant.Go9x9 ||
-      game.variant == strategygames.go.variant.Go13x13 ||
-      game.variant == strategygames.go.variant.Go19x19) option game.history
-      .score(playerIndex)
+    game.displayScore.map(_.apply(playerIndex))
 
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
@@ -170,10 +166,17 @@ final class JsonView(
           .add("selectMode" -> selectMode(pov))
           .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
           .add("deadStoneOfferState" -> pov.game.metadata.deadStoneOfferState.map(_.name))
-          .add("expiration" -> pov.game.expirable.option {
+          .add("pauseSecs" -> pov.game.timeWhenPaused.millis.some)
+          .add("expirationAtStart" -> pov.game.expirableAtStart.option {
             Json.obj(
               "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
               "millisToMove" -> pov.game.timeForFirstMove.millis
+            )
+          })
+          .add("expirationOnPaused" -> pov.game.expirableOnPaused.option {
+            Json.obj(
+              "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
+              "millisToMove" -> pov.game.timeWhenPaused.millis
             )
           })
       }
@@ -293,7 +296,7 @@ final class JsonView(
             "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
             "fen"        -> fen,
             "turns"      -> game.turns,
-            "player"     -> game.turnPlayerIndex.name,
+            "player"     -> game.activePlayerIndex.name,
             "status"     -> game.status,
             "gameFamily" -> game.variant.gameFamily.key
           )

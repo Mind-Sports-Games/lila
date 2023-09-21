@@ -166,7 +166,18 @@ export default class RoundController {
   }
 
   private showExpiration = () => {
-    if (!this.data.expiration) return;
+    if (!this.data.expirationAtStart && !this.data.expirationOnPaused) return;
+    if (this.data.expirationOnPaused) {
+      const eop = this.data.expirationOnPaused;
+      if (Math.max(0, eop.movedAt - Date.now() + eop.millisToMove) == 0 && this.data.selectMode) {
+        this.data.expirationOnPaused = undefined;
+        if (this.data.deadStoneOfferState == 'ChooseFirstOffer') {
+          this.doOfferSelectSquares();
+        } else {
+          this.doSelectSquaresAction();
+        }
+      }
+    }
     this.redraw();
     setTimeout(this.showExpiration, 250);
   };
@@ -238,10 +249,9 @@ export default class RoundController {
     }
   };
 
-  private onSelect = (key: cg.Key) => {
-    console.log(`Square selected ${key}`);
-    console.log(`Selected pieces ${this.chessground.state.selectedPieces}`);
+  private onSelect = (_: cg.Key) => {
     this.data.currentSelectedSquares = Array.from(this.chessground.state.selectedPieces.keys());
+    this.data.calculatedCGGoScores = this.chessground.state.simpleGoScores;
     this.redraw();
   };
 
@@ -516,6 +526,14 @@ export default class RoundController {
     if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
       d.selectMode = o.canSelectSquares ? activePlayerIndex : false;
       d.deadStoneOfferState = o.canSelectSquares ? 'ChooseFirstOffer' : undefined;
+      d.expirationOnPaused = o.canSelectSquares
+        ? {
+            idleMillis: 0,
+            movedAt: Date.now(),
+            millisToMove: d.pauseSecs ? d.pauseSecs : 60000,
+          }
+        : undefined;
+      setTimeout(this.showExpiration, 350);
     }
     this.setTitle();
     if (!this.replaying()) {
@@ -567,7 +585,7 @@ export default class RoundController {
           dropDests: playing ? stratUtils.readDropsByRole(d.possibleDropsByRole) : new Map(),
         },
         check: !!o.check,
-        onlyDropsVariant: this.data.onlyDropsVariant, //need to update every move (amazons)
+        onlyDropsVariant: d.onlyDropsVariant, //need to update every move (amazons)
         selectOnly: d.selectMode,
         highlight: {
           lastMove: d.pref.highlight && !d.selectMode,
@@ -591,7 +609,7 @@ export default class RoundController {
     this.justDropped = undefined;
     this.justCaptured = undefined;
     game.setOnGame(d, playedPlayerIndex, true);
-    this.data.forecastCount = undefined;
+    d.forecastCount = undefined;
     if (o.clock) {
       this.shouldSendMoveTime = true;
       const oc = o.clock,
@@ -603,10 +621,10 @@ export default class RoundController {
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
     const bothPlayerMovedPlyCount = d.game.variant.key == 'amazons' ? 4 : 2;
-    if (this.data.expiration) {
-      if (this.data.steps.length > bothPlayerMovedPlyCount && !this.data.pref.playerTurnIndicator) {
-        this.data.expiration = undefined;
-      } else this.data.expiration.movedAt = Date.now();
+    if (d.expirationAtStart) {
+      if (d.steps.length > bothPlayerMovedPlyCount && !d.pref.playerTurnIndicator) {
+        d.expirationAtStart = undefined;
+      } else d.expirationAtStart.movedAt = Date.now();
     }
     this.redraw();
     if (playing && playedPlayerIndex == d.player.playerIndex) {
@@ -957,12 +975,12 @@ export default class RoundController {
   };
 
   private doPassTurn = () => {
-    this.setLoading(true);
+    //this.setLoading(true);
     this.sendPass(this.data.game.variant.key);
   };
 
   doSelectSquaresAction = () => {
-    this.setLoading(true);
+    //this.setLoading(true);
     console.log('ss action, stones', this.data.selectedSquares);
     this.sendSelectSquares(this.data.game.variant.key, this.data.selectedSquares!);
   };
