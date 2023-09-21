@@ -180,7 +180,12 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.chessground.resetSelectedPieces();
           ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
           ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
-          for (const square of ctrl.data.selectedSquares) {
+          const goStonesToSelect = util.goStonesToSelect(
+            ctrl.data.selectedSquares,
+            ctrl.chessground.state.pieces,
+            ctrl.data.game.variant.boardSize
+          );
+          for (const square of goStonesToSelect) {
             ctrl.chessground.selectSquare(square as cg.Key);
           }
         } else {

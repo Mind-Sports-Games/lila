@@ -1,6 +1,6 @@
 import * as cg from 'chessground/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
-import { opposite } from 'chessground/util';
+import { opposite, calculatePieceGroup } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 
 function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
@@ -144,6 +144,22 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
 
 export function getGoScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
+}
+
+export function getGoKomi(fen: string): number {
+  return +fen.split(' ')[5] / 10.0;
+}
+
+export function goStonesToSelect(deadstones: cg.Key[], pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
+  const stonesToSelect: cg.Key[] = [];
+  if (deadstones.length > 0) {
+    const pieceGroups: cg.Key[][] = deadstones.map(s => calculatePieceGroup(s, pieces, bd).sort());
+    for (const group of pieceGroups) {
+      if (!stonesToSelect.includes(group[0])) stonesToSelect.push(group[0]);
+    }
+  }
+
+  return stonesToSelect;
 }
 
 export const noChecks: CheckCount = {
