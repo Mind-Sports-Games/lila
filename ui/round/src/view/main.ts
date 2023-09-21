@@ -137,7 +137,21 @@ export function main(ctrl: RoundController): VNode {
       case 'go13x13':
       case 'go19x19': {
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
-        if (ctrl.data.deadStoneOfferState || (finished(ctrl.data) && !ctrl.replaying())) {
+        if (
+          ctrl.data.deadStoneOfferState &&
+          ctrl.data.deadStoneOfferState !== 'RejectedOffer' &&
+          ctrl.data.currentSelectedSquares &&
+          ctrl.data.currentSelectedSquares.length > 0
+        ) {
+          const p1Score = ctrl.data.calculatedCGGoScores
+            ? ctrl.data.calculatedCGGoScores.p1
+            : util.getGoScore(fen, 'p1');
+          const p2Score = ctrl.data.calculatedCGGoScores
+            ? ctrl.data.calculatedCGGoScores.p2 + util.getGoKomi(fen)
+            : util.getGoScore(fen, 'p2');
+          topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+          bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        } else if (finished(ctrl.data) && !ctrl.replaying()) {
           const p1Score = util.getGoScore(fen, 'p1');
           const p2Score = util.getGoScore(fen, 'p2');
           topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;

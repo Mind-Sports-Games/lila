@@ -249,10 +249,9 @@ export default class RoundController {
     }
   };
 
-  private onSelect = (key: cg.Key) => {
-    console.log(`Square selected ${key}`);
-    console.log(`Selected pieces ${this.chessground.state.selectedPieces}`);
+  private onSelect = (_: cg.Key) => {
     this.data.currentSelectedSquares = Array.from(this.chessground.state.selectedPieces.keys());
+    this.data.calculatedCGGoScores = this.chessground.state.simpleGoScores;
     this.redraw();
   };
 
