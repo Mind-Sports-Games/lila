@@ -526,14 +526,16 @@ export default class RoundController {
     if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
       d.selectMode = o.canSelectSquares ? activePlayerIndex : false;
       d.deadStoneOfferState = o.canSelectSquares ? 'ChooseFirstOffer' : undefined;
-      d.expirationOnPaused = o.canSelectSquares
-        ? {
-            idleMillis: 0,
-            movedAt: Date.now(),
-            millisToMove: d.pauseSecs ? d.pauseSecs : 60000,
-          }
-        : undefined;
-      setTimeout(this.showExpiration, 350);
+      if (d.clock) {
+        d.expirationOnPaused = o.canSelectSquares
+          ? {
+              idleMillis: 0,
+              movedAt: Date.now(),
+              millisToMove: d.pauseSecs ? d.pauseSecs : 60000,
+            }
+          : undefined;
+        setTimeout(this.showExpiration, 350);
+      }
     }
     this.setTitle();
     if (!this.replaying()) {
