@@ -19,6 +19,7 @@ import strategygames.{
   Pockets,
   Pos,
   PositionHash,
+  Score,
   Situation,
   Board,
   Role
@@ -56,8 +57,8 @@ object BSONHandlers {
     def writeTry(cc: chess.CheckCount) = Success(BSONArray(cc.p1, cc.p2))
   }
 
-  implicit private[game] val scoreWriter = new BSONWriter[togyzkumalak.Score] {
-    def writeTry(sc: togyzkumalak.Score) = Success(BSONArray(sc.p1, sc.p2))
+  implicit private[game] val scoreWriter = new BSONWriter[Score] {
+    def writeTry(sc: Score) = Success(BSONArray(sc.p1, sc.p2))
   }
 
   implicit val StatusBSONHandler = tryHandler[Status](
@@ -572,7 +573,7 @@ object BSONHandlers {
               positionHashes = decoded.positionHashes,
               score = {
                 val counts = r.intsD(F.score)
-                togyzkumalak.Score(~counts.headOption, ~counts.lastOption)
+                Score(~counts.headOption, ~counts.lastOption)
               }
             ),
             variant = gameVariant
@@ -655,8 +656,11 @@ object BSONHandlers {
               positionHashes = decoded.positionHashes,
               score = {
                 val counts = r.intsD(F.score)
-                togyzkumalak
-                  .Score(~counts.headOption, ~counts.lastOption) //should make this score class more general?
+                Score(~counts.headOption, ~counts.lastOption)
+              },
+              captures = {
+                val counts = r.intsD(F.captures)
+                Score(~counts.headOption, ~counts.lastOption)
               }
             ),
             variant = gameVariant,
@@ -834,6 +838,7 @@ object BSONHandlers {
               F.positionHashes      -> o.history.positionHashes,
               F.historyLastMove     -> o.history.lastMove.map(_.uci),
               F.score               -> o.history.score.nonEmpty.option(o.history.score),
+              F.captures            -> o.history.captures.nonEmpty.option(o.history.captures),
               F.pocketData          -> o.board.pocketData,
               F.selectedSquares     -> o.metadata.selectedSquares.map(BinaryFormat.pos.writeGo),
               F.deadStoneOfferState -> o.metadata.deadStoneOfferState.map(_.id)
@@ -862,7 +867,7 @@ object BSONHandlers {
                   )
                   .toOption,
                 F.checkCount -> o.history.checkCount.nonEmpty.option(o.history.checkCount),
-                F.score      -> o.history.score.nonEmpty.option(o.history.score),
+                //F.score      -> o.history.score.nonEmpty.option(o.history.score),
                 F.pocketData -> o.board.pocketData
               )
             }

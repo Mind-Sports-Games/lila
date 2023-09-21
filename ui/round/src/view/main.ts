@@ -5,6 +5,7 @@ import crazyView from '../crazy/crazyView';
 import RoundController from '../ctrl';
 import { h, VNode } from 'snabbdom';
 import { plyStep } from '../round';
+import { finished } from 'game/status';
 import { Position, MaterialDiff, MaterialDiffSide, CheckCount } from '../interfaces';
 import { read as fenRead } from 'chessground/fen';
 import * as cg from 'chessground/types';
@@ -34,7 +35,13 @@ function renderMaterial(
   return h('div.material.material-' + position, children);
 }
 
-function renderPlayerScore(score: number, position: Position, playerIndex: string, variantKey: VariantKey): VNode {
+function renderPlayerScore(
+  score: number,
+  position: Position,
+  playerIndex: string,
+  variantKey: VariantKey,
+  captures: Boolean
+): VNode {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
   if (variantKey === 'togyzkumalak') {
@@ -63,7 +70,16 @@ function renderPlayerScore(score: number, position: Position, playerIndex: strin
     return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
-    return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
+    const capturesClass = captures ? '.captures' : '';
+    return h(
+      'div.game-score.game-score-' + position + '.' + playerIndex + capturesClass,
+      {
+        attrs: {
+          title: captures ? 'Captures' : 'Score',
+        },
+      },
+      children
+    );
   } else {
     const pieceClass =
       variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
@@ -94,7 +110,8 @@ export function main(ctrl: RoundController): VNode {
     boardSize = d.game.variant.boardSize,
     variantKey = d.game.variant.key;
   let topScore = 0,
-    bottomScore = 0;
+    bottomScore = 0,
+    captures = false;
   if (d.hasGameScore) {
     switch (variantKey) {
       case 'flipello10':
@@ -120,10 +137,18 @@ export function main(ctrl: RoundController): VNode {
       case 'go13x13':
       case 'go19x19': {
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
-        const p1Score = util.getGoScore(fen, 'p1');
-        const p2Score = util.getGoScore(fen, 'p2');
-        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        if (ctrl.data.deadStoneOfferState || (finished(ctrl.data) && !ctrl.replaying())) {
+          const p1Score = util.getGoScore(fen, 'p1');
+          const p2Score = util.getGoScore(fen, 'p2');
+          topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+          bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        } else {
+          const p1Score = util.getGoCaptures(fen, 'p1');
+          const p2Score = util.getGoCaptures(fen, 'p2');
+          topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+          bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+          captures = true;
+        }
         break;
       }
       // case 'togyzkumalak': {
@@ -213,13 +238,15 @@ export function main(ctrl: RoundController): VNode {
             },
             [renderGround(ctrl), promotion.view(ctrl)]
           ),
-          ctrl.data.hasGameScore ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey) : null,
+          ctrl.data.hasGameScore ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures) : null,
           crazyView(ctrl, topPlayerIndex, 'top') ||
             renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
           ...renderTable(ctrl),
           crazyView(ctrl, bottomPlayerIndex, 'bottom') ||
             renderMaterial(material[bottomPlayerIndex], score, 'bottom', d.hasGameScore, checks[bottomPlayerIndex]),
-          ctrl.data.hasGameScore ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey) : null,
+          ctrl.data.hasGameScore
+            ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures)
+            : null,
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
         ]
       );

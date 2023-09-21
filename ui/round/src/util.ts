@@ -146,6 +146,10 @@ export function getGoScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
 }
 
+export function getGoCaptures(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 5 : 6];
+}
+
 export const noChecks: CheckCount = {
   p1: 0,
   p2: 0,

@@ -13,10 +13,10 @@ import strategygames.{
   History,
   PocketData,
   P1,
-  Pos
+  Pos,
+  Score
 }
 import strategygames.chess.CheckCount
-import strategygames.togyzkumalak.Score
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
 import reactivemongo.api.bson._

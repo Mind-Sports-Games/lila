@@ -32,11 +32,7 @@ final class JsonView(
       .checkCount(playerIndex)
 
   private def score(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.togyzkumalak.variant.Togyzkumalak ||
-      game.variant == strategygames.go.variant.Go9x9 ||
-      game.variant == strategygames.go.variant.Go13x13 ||
-      game.variant == strategygames.go.variant.Go19x19) option game.history
-      .score(playerIndex)
+    game.displayScore.map(_.apply(playerIndex))
 
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)

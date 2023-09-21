@@ -3,7 +3,6 @@ package lila.game
 import strategygames.format.{ FEN, Uci }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.{ Castles, CheckCount }
-import strategygames.togyzkumalak.Score
 import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
   P2,
@@ -25,6 +24,7 @@ import strategygames.{
   Speed,
   Status,
   P1,
+  Score,
   Situation
 }
 import strategygames.variant.Variant
@@ -332,14 +332,20 @@ case class Game(
           )
         )
       else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
+        //Is this even necessary as score is in the fen?
         (updated.board.variant.togyzkumalak) ?? List(
-          Event.Score(p1 = updated.history.score.p1, updated.history.score.p2)
+          Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
-      else if (updated.board.variant.gameLogic == GameLogic.Go())
-        (updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? List(
-          Event.Score(p1 = updated.history.score.p1, updated.history.score.p2)
-        )
-      else //chess
+      //TODO: Review these extra pieces of info. This was determined unncecessary for Go
+      //after we put the captures info into the FEN
+      //else if (updated.board.variant.gameLogic == GameLogic.Go())
+      //  //(updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? List(
+      //  //  Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
+      //  //)
+      //  (updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? updated.displayScore
+      //    .map(s => Event.Score(p1 = s.p1, p2 = s.p2))
+      //    .toList
+      else //chess. Is this even necessary as checkCount is in the fen?
         ((updated.board.variant.threeCheck || updated.board.variant.fiveCheck) && game.situation.check) ?? List(
           Event.CheckCount(
             p1 = updated.history.checkCount.p1,
@@ -350,6 +356,13 @@ case class Game(
 
     Progress(this, updated, events)
   }
+
+  def displayScore: Option[Score] =
+    if (variant.gameLogic == GameLogic.Togyzkumalak()) history.score.some
+    else if (variant.gameLogic == GameLogic.Go()) {
+      if (finished || selectSquaresPossible) history.score.some
+      else history.captures.some
+    } else none
 
   def lastMoveKeys: Option[String] =
     history.lastMove map {
@@ -1048,6 +1061,7 @@ object Game {
     val positionHashes    = "ph"
     val checkCount        = "cc"
     val score             = "sc"
+    val captures          = "cp"
     val castleLastMove    = "cl"
     val kingMoves         = "km"
     val historyLastMove   = "hlm"
