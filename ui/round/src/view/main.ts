@@ -40,7 +40,7 @@ function renderPlayerScore(
   position: Position,
   playerIndex: string,
   variantKey: VariantKey,
-  captures: Boolean
+  captures: boolean
 ): VNode {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
