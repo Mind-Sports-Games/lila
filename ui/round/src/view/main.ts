@@ -151,7 +151,10 @@ export function main(ctrl: RoundController): VNode {
             : util.getGoScore(fen, 'p2');
           topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
           bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
-        } else if (finished(ctrl.data) && !ctrl.replaying()) {
+        } else if (
+          (finished(ctrl.data) && !ctrl.replaying()) ||
+          (ctrl.data.deadStoneOfferState && ctrl.data.deadStoneOfferState !== 'RejectedOffer')
+        ) {
           const p1Score = util.getGoScore(fen, 'p1');
           const p2Score = util.getGoScore(fen, 'p2');
           topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
