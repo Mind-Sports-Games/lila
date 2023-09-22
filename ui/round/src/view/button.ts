@@ -180,11 +180,7 @@ export const offerSelectSquaresButton = (ctrl: RoundController, isNotSameOffer =
     hook: util.bind('click', () => ctrl.offerSelectSquares()),
   });
 
-export function offerSelectSquares(ctrl: RoundController) {
-  const isNotSameOffer =
-    ctrl.data.selectedSquares === undefined ||
-    ctrl.data.currentSelectedSquares === undefined ||
-    ctrl.data.currentSelectedSquares.sort().join(',') !== ctrl.data.selectedSquares?.sort().join(',');
+export function offerSelectSquares(ctrl: RoundController, isNotSameOffer: boolean) {
   return ctrl.canOfferSelectSquares()
     ? h('div.pending', [
         h(
@@ -201,8 +197,12 @@ export function offerSelectSquares(ctrl: RoundController) {
 }
 
 export const selectSquaresOfferOptions = (ctrl: RoundController): VNode | null => {
+  const isNotSameOffer =
+    ctrl.data.selectedSquares === undefined ||
+    ctrl.data.currentSelectedSquares === undefined ||
+    ctrl.data.currentSelectedSquares.sort().join(',') !== ctrl.data.selectedSquares?.sort().join(',');
   return ctrl.data.opponent.offeringSelectSquares
-    ? h('div', [offerSelectSquares(ctrl), answerOpponentSelectSquaresOffer(ctrl)])
+    ? h('div', [offerSelectSquares(ctrl, isNotSameOffer), answerOpponentSelectSquaresOffer(ctrl, isNotSameOffer)])
     : ctrl.data.player.offeringSelectSquares
     ? h(
         'div.pending',
@@ -216,20 +216,45 @@ export const selectSquaresOfferOptions = (ctrl: RoundController): VNode | null =
         } DS)`
       )
     : ctrl.canOfferSelectSquares()
-    ? h('div', [offerSelectSquares(ctrl)])
+    ? h('div', [offerSelectSquares(ctrl, isNotSameOffer)])
     : null;
 };
 
-export function answerOpponentSelectSquaresOffer(ctrl: RoundController) {
+export function answerOpponentSelectSquaresOffer(ctrl: RoundController, isNotSameOffer: boolean) {
   return ctrl.data.opponent.offeringSelectSquares
-    ? h('div.negotiation.select-squares', [
-        declineButton(ctrl, () => ctrl.socket.sendLoading('select-squares-decline')),
-        h(
-          'p',
-          `Your opponent proposes ${ctrl.data.selectedSquares ? ctrl.data.selectedSquares.length : 0} dead stones`
-        ),
-        acceptButton(ctrl, 'select-squares-accept', () => ctrl.socket.sendLoading('select-squares-accept')),
-      ])
+    ? isNotSameOffer
+      ? h('div.negotiation', [
+          h('a.decline', {
+            class: { disabled: true },
+            attrs: {
+              disabled: true,
+              'data-icon': 'L',
+              title: ctrl.noarg('decline'),
+            },
+          }),
+          h(
+            'p',
+            `Your opponent proposes ${
+              ctrl.data.selectedSquares ? ctrl.data.selectedSquares.length : 0
+            } dead stones, reselect or refresh to enable accept/decline`
+          ),
+          h('a.accept', {
+            class: { disabled: true },
+            attrs: {
+              disabled: true,
+              'data-icon': 'E',
+              title: ctrl.noarg('accept'),
+            },
+          }),
+        ])
+      : h('div.negotiation.select-squares', [
+          declineButton(ctrl, () => ctrl.socket.sendLoading('select-squares-decline')),
+          h(
+            'p',
+            `Your opponent proposes ${ctrl.data.selectedSquares ? ctrl.data.selectedSquares.length : 0} dead stones`
+          ),
+          acceptButton(ctrl, 'select-squares-accept', () => ctrl.socket.sendLoading('select-squares-accept')),
+        ])
     : null;
 }
 

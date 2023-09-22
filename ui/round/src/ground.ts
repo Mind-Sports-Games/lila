@@ -169,6 +169,8 @@ export function reSelectSelectedSquares(ctrl: RoundController) {
     for (const square of goStonesToSelect) {
       ctrl.chessground.selectSquare(square as cg.Key);
     }
+    //also set currentSelectedSquares as this becomes undefined upon reload
+    ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
   }
 }
 
