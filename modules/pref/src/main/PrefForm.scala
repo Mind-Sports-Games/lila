@@ -19,13 +19,13 @@ object PrefForm {
   val pref = Form(
     mapping(
       "display" -> mapping(
-        "animation"   -> numberIn(Set(0, 1, 2, 3)),
-        "captured"    -> booleanNumber,
-        "highlight"   -> booleanNumber,
-        "destination" -> booleanNumber,
+        "animation"           -> numberIn(Set(0, 1, 2, 3)),
+        "captured"            -> booleanNumber,
+        "highlight"           -> booleanNumber,
+        "destination"         -> booleanNumber,
         "playerTurnIndicator" -> booleanNumber,
-        "coords"      -> checkedNumber(Pref.Coords.choices),
-        "replay"      -> checkedNumber(Pref.Replay.choices),
+        "coords"              -> checkedNumber(Pref.Coords.choices),
+        "replay"              -> checkedNumber(Pref.Replay.choices),
         //"gameResult"    -> checkedNumber(Pref.DraughtsGameResult.choices),
         "coordSystem"   -> checkedNumber(Pref.DraughtsCoordSystem.choices),
         "pieceNotation" -> optional(booleanNumber),
@@ -42,6 +42,7 @@ object PrefForm {
         "autoThreefold" -> checkedNumber(Pref.AutoThreefold.choices),
         "submitMove"    -> checkedNumber(Pref.SubmitMove.choices),
         "confirmResign" -> checkedNumber(Pref.ConfirmResign.choices),
+        "confirmPass"   -> checkedNumber(Pref.ConfirmPass.choices),
         "keyboardMove"  -> optional(booleanNumber),
         "rookCastle"    -> optional(booleanNumber)
       )(BehaviorData.apply)(BehaviorData.unapply),
@@ -84,6 +85,7 @@ object PrefForm {
       autoThreefold: Int,
       submitMove: Int,
       confirmResign: Int,
+      confirmPass: Int,
       keyboardMove: Option[Int],
       rookCastle: Option[Int]
   )
@@ -132,6 +134,7 @@ object PrefForm {
         submitMove = behavior.submitMove,
         insightShare = insightShare,
         confirmResign = behavior.confirmResign,
+        confirmPass = behavior.confirmPass,
         captured = display.captured == 1,
         keyboardMove = behavior.keyboardMove | pref.keyboardMove,
         zen = display.zen | pref.zen,
@@ -149,7 +152,7 @@ object PrefForm {
         display = DisplayData(
           highlight = if (pref.highlight) 1 else 0,
           destination = if (pref.destination) 1 else 0,
-          playerTurnIndicator = if(pref.playerTurnIndicator) 1 else 0,
+          playerTurnIndicator = if (pref.playerTurnIndicator) 1 else 0,
           animation = pref.animation,
           coords = pref.coords,
           replay = pref.replay,
@@ -170,6 +173,7 @@ object PrefForm {
           autoThreefold = pref.autoThreefold,
           submitMove = pref.submitMove,
           confirmResign = pref.confirmResign,
+          confirmPass = pref.confirmPass,
           keyboardMove = pref.keyboardMove.some,
           rookCastle = pref.rookCastle.some
         ),

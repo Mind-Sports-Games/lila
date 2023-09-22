@@ -366,6 +366,12 @@ trait SetupHelper { self: I18nHelper =>
       (Pref.ConfirmResign.YES, trans.yes.txt())
     )
 
+  def confirmPassChoices(implicit lang: Lang) =
+    List(
+      (Pref.ConfirmPass.NO, trans.no.txt()),
+      (Pref.ConfirmPass.YES, trans.yes.txt())
+    )
+
   def translatedRookCastleChoices(implicit lang: Lang) =
     List(
       (Pref.RookCastle.NO, trans.preferences.castleByMovingTwoSquares.txt()),

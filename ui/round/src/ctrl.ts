@@ -966,7 +966,7 @@ export default class RoundController {
         clearTimeout(this.passConfirm);
         this.passConfirm = undefined;
       } else if (v) {
-        if (this.data.pref.confirmResign)
+        if (this.data.pref.confirmPass)
           this.passConfirm = setTimeout(() => {
             this.passTurn(false);
           }, 3000);
