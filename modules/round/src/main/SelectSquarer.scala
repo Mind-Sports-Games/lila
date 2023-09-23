@@ -60,9 +60,6 @@ final private[round] class SelectSquarer(
       }
     }
 
-  // NOTE: yes, I know, Any. But the Bus.publish takes an Any, and none of the events
-  //       we are publishing are of a particular type that we can depend on, so I guess
-  //       we use Any.
   private def publishSquareOfferEvent(pov: Pov)(implicit
       proxy: GameProxy
   ) = {
