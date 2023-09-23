@@ -22,9 +22,7 @@ final private[round] class SelectSquarer(
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
         proxy.save {
           messenger.system(g, trans.selectSquareOfferAccepted.txt())
-          Progress(g) map { g =>
-            g.updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
-          }
+          Progress(g) map { _.acceptSelectSquares(playerIndex) }
         } >>- publishSquareOfferEvent(pov) inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(true))
         )

@@ -507,6 +507,23 @@ case class Game(
       .updatePlayer(playerIndex, _.offerSelectSquares)
       .updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
 
+  def acceptSelectSquares(playerIndex: PlayerIndex) =
+    copy(
+      chess = chess.copy(clock = clock.map(_.start)),
+      movedAt = DateTime.now,
+      metadata = metadata.copy(
+        deadStoneOfferState = metadata.deadStoneOfferState match {
+          // TODO: this is a mess, but the whole thing is a bit of a mess right now.
+          //       What do we do in the case where this method is called when in another state?
+          case Some(DeadStoneOfferState.P1Offering) => Some(DeadStoneOfferState.AcceptedP1Offer)
+          case Some(DeadStoneOfferState.P2Offering) => Some(DeadStoneOfferState.AcceptedP2Offer)
+          case _                                    => sys.error("Logic error, trying to accept a non-existant offer")
+        }
+      )
+    )
+      .updatePlayer(playerIndex, _.removeSelectSquaresOffer)
+      .updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
+
   def declineSelectSquares(playerIndex: PlayerIndex) =
     copy(
       chess = chess.copy(clock = clock.map(_.start)),
@@ -1113,9 +1130,10 @@ object DeadStoneOfferState {
   case object P1Offering       extends DeadStoneOfferState(1)
   case object P2Offering       extends DeadStoneOfferState(2)
   case object RejectedOffer    extends DeadStoneOfferState(3)
-  case object AcceptedOffer    extends DeadStoneOfferState(4)
+  case object AcceptedP1Offer  extends DeadStoneOfferState(4)
+  case object AcceptedP2Offer  extends DeadStoneOfferState(5)
 
-  val all = List(ChooseFirstOffer, P1Offering, P2Offering, RejectedOffer, AcceptedOffer)
+  val all = List(ChooseFirstOffer, P1Offering, P2Offering, RejectedOffer, AcceptedP1Offer, AcceptedP2Offer)
 
   val byId = all map { v => (v.id, v) } toMap
 
