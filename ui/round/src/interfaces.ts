@@ -201,6 +201,7 @@ export interface Pref {
   clockSound: boolean;
   clockTenths: Prefs.ShowClockTenths;
   confirmResign: boolean;
+  confirmPass: boolean;
   coords: Prefs.Coords;
   destination: boolean;
   playerTurnIndicator: boolean;
