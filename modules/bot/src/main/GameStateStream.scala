@@ -102,12 +102,10 @@ final class GameStateStream(
         case MoveGameEvent(g, _, _) if g.id == id && !g.finished => pushState(g).unit
         case lila.chat.actorApi.ChatLine(chatId, UserLine(username, _, text, false, false)) =>
           pushChatLine(username, text, chatId.value.lengthIs == Game.gameIdSize).unit
-        case FinishGame(g, _, _) if g.id == id  => onGameOver(g.some).unit
-        case AbortedBy(pov) if pov.gameId == id => onGameOver(pov.game.some).unit
-        case lila.game.actorApi.BoardDrawOffer(pov) if pov.gameId == id =>
-          pushState(pov.game.pp("receive BoardDrawOffer")).unit
-        case lila.game.actorApi.BoardOfferSquares(pov) if pov.gameId == id =>
-          pushState(pov.game.pp("receive BoardOfferSquares")).unit
+        case FinishGame(g, _, _) if g.id == id                             => onGameOver(g.some).unit
+        case AbortedBy(pov) if pov.gameId == id                            => onGameOver(pov.game.some).unit
+        case lila.game.actorApi.BoardDrawOffer(pov) if pov.gameId == id    => pushState(pov.game).unit
+        case lila.game.actorApi.BoardOfferSquares(pov) if pov.gameId == id => pushState(pov.game).unit
         case SetOnline =>
           onlineApiUsers.setOnline(user.id)
           context.system.scheduler
@@ -123,7 +121,6 @@ final class GameStateStream(
       def pushState(g: Game): Funit =
         jsonView
           .gameState(Game.WithInitialFen(g, init.fen))
-          .pp("pushState")
           .dmap(some)
           .flatMap(queue.offer)
           .void
