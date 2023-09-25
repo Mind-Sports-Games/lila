@@ -24,11 +24,7 @@ final private[round] class SelectSquarer(
           .save {
             messenger.system(g, trans.selectSquareOfferAccepted.txt())
             Progress(g) map { _.acceptSelectSquares(playerIndex) }
-          }
-          .map(s => {
-            println(f"s: ${s}")
-            s
-          }) >>- publishSquareOfferEvent(pov) inject List(
+          } >>- publishSquareOfferEvent(pov) inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(true))
         )
       case _ => fuccess(List(Event.ReloadOwner))
