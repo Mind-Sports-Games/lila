@@ -990,11 +990,11 @@ object Game {
 
   def isBoardCompatible(game: Game): Boolean =
     game.clock.fold(true) { c =>
-      isBoardCompatible(c.config)
+      isBoardCompatible(c.pp("c").config).pp("isBoardCompatible(c.config)")
     }
 
   def isBoardCompatible(clock: ClockConfig): Boolean =
-    Speed(clock) >= Speed.Rapid
+    (Speed(clock).pp("Speed") >= Speed.Rapid).pp("wut?")
 
   def isBotCompatible(game: Game): Boolean = {
     game.hasAi || game.fromFriend || game.fromApi || game.hasPSBot
