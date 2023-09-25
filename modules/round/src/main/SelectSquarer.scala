@@ -23,12 +23,12 @@ final private[round] class SelectSquarer(
         proxy
           .save {
             messenger.system(g, trans.selectSquareOfferAccepted.txt())
-            Progress(g) map { _.acceptSelectSquares(playerIndex).pp("acceptSelectSquares") }
+            Progress(g) map { _.acceptSelectSquares(playerIndex) }
           }
           .map(s => {
             println(f"s: ${s}")
             s
-          }) >>- publishSquareOfferEvent(pov).pp("publisSquareOfferEvent") inject List(
+          }) >>- publishSquareOfferEvent(pov) inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(true))
         )
       case _ => fuccess(List(Event.ReloadOwner))
@@ -66,17 +66,17 @@ final private[round] class SelectSquarer(
   private def publishSquareOfferEvent(pov: Pov)(implicit
       proxy: GameProxy
   ) = {
-    if (pov.game.isCorrespondence.pp("isCorrespondence") && pov.game.nonAi.pp("nonAi"))
+    if (pov.game.isCorrespondence && pov.game.nonAi)
       Bus.publish(
         lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(pov.gameId),
         "offerEventCorres"
       )
-    if (lila.game.Game.isBoardCompatible(pov.game).pp("isBoardCompatible(pov.game)"))
+    if (lila.game.Game.isBoardOrBotCompatible(pov.game))
       proxy
-        .withPov(pov.playerIndex.pp("pov.playerIndex")) { p =>
+        .withPov(pov.playerIndex) { p =>
           fuccess(
             Bus.publish(
-              lila.game.actorApi.BoardOfferSquares(p.pp("p")).pp("SelectSquarer: BoardOfferSquares"),
+              lila.game.actorApi.BoardOfferSquares(p),
               s"boardSelectSquaresOffer:${pov.gameId}"
             )
           )
