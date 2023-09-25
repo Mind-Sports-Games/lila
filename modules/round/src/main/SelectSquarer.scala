@@ -71,7 +71,7 @@ final private[round] class SelectSquarer(
         lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(pov.gameId),
         "offerEventCorres"
       )
-    if (lila.game.Game.isBoardCompatible(pov.game))
+    if (lila.game.Game.isBoardCompatible(pov.game).pp("isBoardCompatible(pov.game)"))
       proxy
         .withPov(pov.playerIndex.pp("pov.playerIndex")) { p =>
           fuccess(
