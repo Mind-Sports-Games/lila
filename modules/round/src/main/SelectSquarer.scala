@@ -20,11 +20,10 @@ final private[round] class SelectSquarer(
     val squares: List[Pos] = pov.game.selectedSquares.getOrElse(List[Pos]().empty)
     pov match {
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
-        proxy
-          .save {
-            messenger.system(g, trans.selectSquareOfferAccepted.txt())
-            Progress(g) map { _.acceptSelectSquares(playerIndex) }
-          } >>- publishSquareOfferEvent(pov) inject List(
+        proxy.save {
+          messenger.system(g, trans.selectSquareOfferAccepted.txt())
+          Progress(g) map { _.acceptSelectSquares(playerIndex) }
+        } >>- publishSquareOfferEvent(pov) inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(true))
         )
       case _ => fuccess(List(Event.ReloadOwner))
@@ -71,10 +70,7 @@ final private[round] class SelectSquarer(
       proxy
         .withPov(pov.playerIndex) { p =>
           fuccess(
-            Bus.publish(
-              lila.game.actorApi.BoardOfferSquares(p),
-              s"boardSelectSquaresOffer:${pov.gameId}"
-            )
+            Bus.publish(lila.game.actorApi.BoardOfferSquares(p), s"boardSelectSquaresOffer:${pov.gameId}")
           )
         }
         .unit
