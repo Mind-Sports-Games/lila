@@ -91,6 +91,12 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.oware, ratingsB.oware, game)
               case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
                 updateRatings(ratingsW.togyzkumalak, ratingsB.togyzkumalak, game)
+              case Variant.Go(strategygames.go.variant.Go9x9) =>
+                updateRatings(ratingsW.go9x9, ratingsB.go9x9, game)
+              case Variant.Go(strategygames.go.variant.Go13x13) =>
+                updateRatings(ratingsW.go13x13, ratingsB.go13x13, game)
+              case Variant.Go(strategygames.go.variant.Go19x19) =>
+                updateRatings(ratingsW.go19x19, ratingsB.go19x19, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -158,6 +164,9 @@ final class PerfsUpdater(
       amazons: Rating,
       oware: Rating,
       togyzkumalak: Rating,
+      go9x9: Rating,
+      go13x13: Rating,
+      go19x19: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -199,6 +208,9 @@ final class PerfsUpdater(
       amazons = perfs.amazons.toRating,
       oware = perfs.oware.toRating,
       togyzkumalak = perfs.togyzkumalak.toRating,
+      go9x9 = perfs.go9x9.toRating,
+      go13x13 = perfs.go13x13.toRating,
+      go19x19 = perfs.go19x19.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -279,6 +291,9 @@ final class PerfsUpdater(
           oware = addRatingIf(game.ratingVariant.oware, perfs.oware, ratings.oware),
           togyzkumalak =
             addRatingIf(game.ratingVariant.togyzkumalak, perfs.togyzkumalak, ratings.togyzkumalak),
+          go9x9 = addRatingIf(game.ratingVariant.go9x9, perfs.go9x9, ratings.go9x9),
+          go13x13 = addRatingIf(game.ratingVariant.go13x13, perfs.go13x13, ratings.go13x13),
+          go19x19 = addRatingIf(game.ratingVariant.go19x19, perfs.go19x19, ratings.go19x19),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),
@@ -321,6 +336,9 @@ final class PerfsUpdater(
           amazons = r(PT.orDefault("amazons"), perfs.amazons, perfs1.amazons),
           oware = r(PT.orDefault("oware"), perfs.oware, perfs1.oware),
           togyzkumalak = r(PT.orDefault("togyzkumalak"), perfs.togyzkumalak, perfs1.togyzkumalak),
+          go9x9 = r(PT.orDefault("go9x9"), perfs.go9x9, perfs1.go9x9),
+          go13x13 = r(PT.orDefault("go13x13"), perfs.go13x13, perfs1.go13x13),
+          go19x19 = r(PT.orDefault("go19x19"), perfs.go19x19, perfs1.go19x19),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

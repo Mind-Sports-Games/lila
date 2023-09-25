@@ -93,8 +93,12 @@ case class Challenge(
     variant match {
       case Variant.Chess(variant) => if (variant.standardInitialPosition) none else initialFen
       case Variant.Draughts(_)    => customStartingPosition ?? initialFen
+      case Variant.Go(_)          => customStartingGoPosition ?? initialFen
       case _                      => none
     }
+
+  def customStartingGoPosition: Boolean =
+    initialFen.isDefined && !initialFen.exists(_.value == variant.initialFen.value)
 
   def customStartingPosition: Boolean =
     variant.draughtsFromPosition ||
@@ -209,8 +213,10 @@ object Challenge {
         }
       )
       .orElse {
-        (variant == Variant.libFromPosition(variant.gameLogic)) option perfTypeOf(
-          Variant.libStandard(variant.gameLogic),
+        (variant.fromPositionVariant) option perfTypeOf(
+          Variant
+            .byName(variant.gameLogic, "From Position")
+            .getOrElse(Variant.orDefault(variant.gameLogic, 3)),
           timeControl
         )
       }
@@ -250,7 +256,9 @@ object Challenge {
     val finalVariant = fenVariant match {
       case Some(v) if draughtsFenVariants(variant) =>
         if (variant.draughtsFromPosition && v.draughtsStandard)
-          Variant.libFromPosition(GameLogic.Draughts())
+          Variant
+            .byName(GameLogic.Draughts(), "From Position")
+            .getOrElse(Variant.orDefault(GameLogic.Draughts(), 3))
         else v
       case _ => variant
     }
@@ -274,10 +282,11 @@ object Challenge {
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (variant == Variant.libFromPosition(variant.gameLogic)) initialFen
+        if (variant.fromPositionVariant) initialFen
         else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
           fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
         }
+        else if (variant.gameFamily == GameFamily.Go()) initialFen
         else !variant.standardInitialPosition option variant.initialFen,
       timeControl = timeControl,
       mode = finalMode,

@@ -259,7 +259,10 @@ final class SimulApi(
                 pairing.player.variant.gameLogic,
                 variant = Some {
                   if (simul.position.isEmpty) pairing.player.variant
-                  else Variant.libFromPosition(GameLogic.Chess())
+                  else
+                    Variant
+                      .byName(pairing.player.variant.gameLogic, "From Position")
+                      .getOrElse(Variant.orDefault(pairing.player.variant.gameLogic, 3))
                 },
                 fen = simul.position
               )

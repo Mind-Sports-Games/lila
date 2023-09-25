@@ -6,6 +6,8 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import scala.concurrent.Promise
 
+import strategygames.Pos
+
 // announce something to all clients
 case class Announce(msg: String, date: DateTime, json: JsObject)
 
@@ -262,6 +264,10 @@ package round {
   case class CorresTakebackOfferEvent(gameId: String)
   case class CorresDrawOfferEvent(gameId: String)
   case class BoardDrawEvent(gameId: String)
+  case class CorresSelectSquaresOfferEvent(gameId: String)
+  case class CorresDeclineSquaresOfferEvent(gameId: String)
+  case class CorresAcceptSquaresOfferEvent(gameId: String)
+  case class BoardSelectSquaresEvent(gameId: String)
   case class SimulMoveEvent(
       move: MoveEvent,
       simulId: String,

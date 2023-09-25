@@ -109,7 +109,7 @@ final class JsonView(
       .add("myTeam" -> myTeam)
       .add("duelTeams" -> data.duelTeams)
       .add("secondsToFinishInterval" -> tour.isStarted.option(tour.meldeySecondsToFinishInterval))
-      .add("medleyRound" -> full.option(tour.medleyRound.getOrElse(-1))) ++
+      .add("medleyRound" -> full.option(tour.medleyRound)) ++
       full.?? {
         Json
           .obj(
@@ -123,10 +123,10 @@ final class JsonView(
             "medleyMinutes"          -> tour.medleyMinutes,
             "medleyIntervalSeconds"  -> tour.medleyIntervalSeconds,
             "medleyBalanceIntervals" -> tour.medleyIsBalanced,
-            "perf"                   -> full.option(tour.currentPerfType),
+            "perf"                   -> full.option(tour.perfType),
             "clock"                  -> full.option(tour.clock),
-            "lib"                    -> full.option(tour.currentVariant.gameLogic.id),
-            "variant"                -> full.option(variantJson(tour.currentVariant)),
+            "lib"                    -> full.option(tour.variant.gameLogic.id),
+            "variant"                -> full.option(variantJson(tour.variant)),
             "p1Name" -> full.option(
               if (tour.isMedley) trans.p1.txt()
               else tour.variant.playerNames(P1)

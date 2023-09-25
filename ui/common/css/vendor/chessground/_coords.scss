@@ -1,3 +1,5 @@
+$go-variants: ('go9x9', 'go13x13', 'go19x19');
+
 coords {
   /* handle hidden coords */
   .coords-no & {
@@ -125,6 +127,20 @@ coords {
       text-align: center;
     }
   }
+  @each $variant in $go-variants {
+    .variant-#{$variant} &.files {
+      &.p1,
+      &.p2 {
+        text-align: center;
+      }
+    }
+    .variant-#{$variant} &.ranks {
+      &.p1,
+      &.p2 {
+        top: 10px;
+      }
+    }
+  }
 
   coord {
     flex: 1 1 auto;
@@ -147,7 +163,7 @@ coords {
 
 @import 'coords-colors';
 
-/* negate inner coords for shogi and xiangqi */
+/* negate inner coords for given games */
 @include breakpoint($mq-col1-uniboard) {
   .coords-out .variant-shogi coords {
     display: none;
@@ -179,6 +195,12 @@ coords {
 
   .coords-out .variant-togyzkumalak coords {
     display: none;
+  }
+
+  @each $variant in $go-variants {
+    .coords-out .variant-#{$variant} coords {
+      display: none;
+    }
   }
 
   //always show for Togy and make smaller
@@ -266,6 +288,15 @@ coords {
     }
     &.files.p1 {
       bottom: -15px;
+    }
+  }
+
+  @each $variant in $go-variants {
+    .coords-out .variant-#{$variant} &.ranks {
+      &.p1,
+      &.p2 {
+        top: -4px;
+      }
     }
   }
 }

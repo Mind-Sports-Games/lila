@@ -60,12 +60,20 @@ export default function status(ctrl: Ctrl): string {
           return noarg('gameFinished');
         case 'oware':
           if (d.game.isRepetition) {
-            return noarg('owareCycle');
+            return noarg('gameFinishedRepetition');
           } else {
             return noarg('gameFinished');
           }
         case 'togyzkumalak':
           return noarg('gameFinished');
+        case 'go9x9':
+        case 'go13x13':
+        case 'go19x19':
+          if (d.game.isRepetition) {
+            return noarg('gameFinishedRepetition');
+          } else {
+            return noarg('gameFinished');
+          }
       }
       return noarg('variantEnding');
     case 'unknownFinish':

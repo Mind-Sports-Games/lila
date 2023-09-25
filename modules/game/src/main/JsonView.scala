@@ -38,7 +38,7 @@ final class JsonView(rematches: Rematches) {
         "rated"         -> game.rated,
         "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
         "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
-        "player"        -> game.turnPlayerIndex,
+        "player"        -> game.activePlayerIndex,
         "turns"         -> game.turns,
         "startedAtTurn" -> game.chess.startedAtTurn,
         "source"        -> game.source,
@@ -57,7 +57,9 @@ final class JsonView(rematches: Rematches) {
       .add("lastMove" -> game.lastMoveKeys)
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
+      .add("canOfferDraw" -> game.variant.canOfferDraw)
       .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedPlies))
+      .add("canDoPassAction" -> (game.situation.passes.size > 0))
       .add("multiMatch" -> game.metadata.multiMatchGameNr.map { index =>
         Json
           .obj("index" -> index)
@@ -110,6 +112,7 @@ object JsonView {
             r match {
               case Role.ChessRole(_)   => GameLogic.Chess()
               case Role.FairySFRole(_) => GameLogic.FairySF()
+              case Role.GoRole(_)      => GameLogic.Go()
               case _                   => sys.error("Pocket not implemented for GameLogic")
             }
           case None => GameLogic.Chess()
@@ -169,6 +172,14 @@ object JsonView {
           "lib"       -> v.gameLogic.id,
           "boardSize" -> togyzkumalakVariant.boardSize
         )
+      case Variant.Go(goVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> goVariant.boardSize
+        )
       case _ =>
         Json.obj(
           "key"   -> v.key,
@@ -201,6 +212,14 @@ object JsonView {
 
   implicit val boardSizeTogyzkumalakWriter: Writes[strategygames.togyzkumalak.Board.BoardSize] =
     Writes[strategygames.togyzkumalak.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
+
+  implicit val boardSizeGoWriter: Writes[strategygames.go.Board.BoardSize] =
+    Writes[strategygames.go.Board.BoardSize] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

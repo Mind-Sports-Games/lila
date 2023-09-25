@@ -75,7 +75,7 @@ final class Env(
   )
 
   private val scheduleExpiration = new ScheduleExpiration(game => {
-    game.timeBeforeExpiration foreach { centis =>
+    game.timeBeforeExpirationAtStart foreach { centis =>
       scheduler.scheduleOnce((centis.millis + 1000).millis) {
         tellRound(game.id, actorApi.round.NoStart)
       }
@@ -162,6 +162,8 @@ final class Env(
   private lazy val player: Player = wire[Player]
 
   private lazy val drawer = wire[Drawer]
+
+  private lazy val selectSquarer = wire[SelectSquarer]
 
   lazy val messenger = wire[Messenger]
 

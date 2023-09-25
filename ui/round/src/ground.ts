@@ -29,8 +29,9 @@ export function makeConfig(ctrl: RoundController): Config {
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: data.game.variant.key == 'togyzkumalak',
     addPieceZIndex: ctrl.data.pref.is3d,
+    selectOnly: data.selectMode,
     highlight: {
-      lastMove: data.pref.highlight,
+      lastMove: data.pref.highlight && !data.selectMode,
       check: data.pref.highlight,
     },
     events: {
@@ -40,6 +41,7 @@ export function makeConfig(ctrl: RoundController): Config {
         resizeHandle(elements, ctrl.data.pref.resizeHandle, ctrl.ply);
         if (data.pref.coords === Prefs.Coords.Inside) changeColorHandle();
       },
+      select: hooks.onSelect,
     },
     movable: {
       free: false,
@@ -79,7 +81,7 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     dropmode: {
-      showDropDests: true,
+      showDropDests: !['go9x9', 'go13x13', 'go19x19'].includes(data.game.variant.key),
       dropDests: playing ? stratUtils.readDropsByRole(data.possibleDropsByRole) : new Map(),
       active: data.onlyDropsVariant && playing ? true : false,
       piece:
@@ -122,6 +124,10 @@ export function makeConfig(ctrl: RoundController): Config {
             ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
               '/'
+            : variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19'
+            ? 'https://playstrategy.org/assets/piece/go/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
+              '/'
             : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
@@ -143,6 +149,29 @@ export function makeConfig(ctrl: RoundController): Config {
 
 export function reload(ctrl: RoundController) {
   ctrl.chessground.set(makeConfig(ctrl));
+  reSelectSelectedSquares(ctrl);
+}
+
+export function reSelectSelectedSquares(ctrl: RoundController) {
+  if (ctrl.data.selectedSquares) {
+    if (
+      ctrl.data.deadStoneOfferState &&
+      ((ctrl.data.deadStoneOfferState === 'P1Offering' && ctrl.data.player.playerIndex == 'p1') ||
+        (ctrl.data.deadStoneOfferState === 'P2Offering' && ctrl.data.player.playerIndex == 'p2'))
+    ) {
+      ctrl.chessground.set({ selectOnly: true, viewOnly: true });
+    }
+    const goStonesToSelect = util.goStonesToSelect(
+      ctrl.data.selectedSquares,
+      ctrl.chessground.state.pieces,
+      ctrl.data.game.variant.boardSize
+    );
+    for (const square of goStonesToSelect) {
+      ctrl.chessground.selectSquare(square as cg.Key);
+    }
+    //also set currentSelectedSquares as this becomes undefined upon reload
+    ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
+  }
 }
 
 export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {

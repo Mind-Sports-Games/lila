@@ -15,7 +15,7 @@ import lila.hub.actorApi.map.Tell
 import lila.round.actorApi.BotConnected
 import lila.round.actorApi.round.QuietFlag
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.{ Player => PlayerIndex, Pos }
 
 final class GameStateStream(
     onlineApiUsers: OnlineApiUsers,
@@ -64,6 +64,7 @@ final class GameStateStream(
       private val classifiers = List(
         MoveGameEvent makeChan id,
         s"boardDrawOffer:$id",
+        s"boardSelectSquaresOffer:$id",
         "finishGame",
         "abortGame",
         uniqChan(init.game pov as),
@@ -101,9 +102,10 @@ final class GameStateStream(
         case MoveGameEvent(g, _, _) if g.id == id && !g.finished => pushState(g).unit
         case lila.chat.actorApi.ChatLine(chatId, UserLine(username, _, text, false, false)) =>
           pushChatLine(username, text, chatId.value.lengthIs == Game.gameIdSize).unit
-        case FinishGame(g, _, _) if g.id == id                          => onGameOver(g.some).unit
-        case AbortedBy(pov) if pov.gameId == id                         => onGameOver(pov.game.some).unit
-        case lila.game.actorApi.BoardDrawOffer(pov) if pov.gameId == id => pushState(pov.game).unit
+        case FinishGame(g, _, _) if g.id == id                             => onGameOver(g.some).unit
+        case AbortedBy(pov) if pov.gameId == id                            => onGameOver(pov.game.some).unit
+        case lila.game.actorApi.BoardDrawOffer(pov) if pov.gameId == id    => pushState(pov.game).unit
+        case lila.game.actorApi.BoardOfferSquares(pov) if pov.gameId == id => pushState(pov.game).unit
         case SetOnline =>
           onlineApiUsers.setOnline(user.id)
           context.system.scheduler
@@ -117,10 +119,10 @@ final class GameStateStream(
       }
 
       def pushState(g: Game): Funit =
-        jsonView gameState Game.WithInitialFen(g, init.fen) dmap some flatMap queue.offer void
+        jsonView.gameState(Game.WithInitialFen(g, init.fen)).dmap(some).flatMap(queue.offer).void
 
       def pushChatLine(username: String, text: String, player: Boolean): Funit =
-        queue offer jsonView.chatLine(username, text, player).some void
+        queue.offer(jsonView.chatLine(username, text, player).some).void
 
       def onGameOver(g: Option[Game]) =
         g ?? pushState >>- {

@@ -3,7 +3,7 @@ package lila.game
 import java.security.MessageDigest
 import lila.db.ByteArray
 import org.joda.time.DateTime
-import strategygames.{ P2, Player => PlayerIndex, P1 }
+import strategygames.{ P2, Player => PlayerIndex, P1, Pos }
 
 private[game] case class Metadata(
     source: Option[Source],
@@ -13,6 +13,9 @@ private[game] case class Metadata(
     simulId: Option[String],
     analysed: Boolean,
     drawOffers: GameDrawOffers,
+    //go dead stones
+    selectedSquares: Option[List[Pos]] = None,
+    deadStoneOfferState: Option[DeadStoneOfferState] = None,
     //draughts options
     simulPairing: Option[Int] = None,
     timeOutUntil: Option[DateTime] = None,

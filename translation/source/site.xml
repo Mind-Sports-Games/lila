@@ -51,7 +51,7 @@
   <string name="checkersConnected">All checkers connected</string>
   <string name="gameFinished">Game finished</string>
   <string name="variantEnding">Variant ending</string>
-  <string name="owareCycle">Game finished via repetition</string>
+  <string name="gameFinishedRepetition">Game finished via repetition</string>
   <string name="newOpponent">New opponent</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Your opponent wants to play a new game with you</string>
   <string name="joinTheGame">Join the game</string>
@@ -253,6 +253,9 @@
   <string name="playerIndexTimeOut">%s time out</string>
   <string name="whiteTimeOut">White time out</string>
   <string name="blackTimeOut">Black time out</string>
+  <string name="playerIndexOffersSelectSquares">%s offers selected squares</string>
+  <string name="selectSquareOfferDeclined">Square selection declined </string>
+  <string name="selectSquareOfferAccepted">Square selection accepted</string>
   <string name="drawOfferSent">Draw offer sent</string>
   <string name="drawOfferDeclined">Draw offer declined</string>
   <string name="drawOfferAccepted">Draw offer accepted</string>
@@ -303,6 +306,8 @@
   <string name="send">Send</string>
   <string name="incrementInSeconds">Increment in seconds</string>
   <string name="byoyomiInSeconds">Byoyomi in seconds</string>
+  <string name="goHandicap">Handicap</string>
+  <string name="goKomi">Komi</string>
   <string name="freeOnlineChess">Free Online Chess</string>
   <plurals name="nbRated">
     <item quantity="one">%s rated</item>
@@ -825,6 +830,22 @@ computer analysis, game chat and shareable URL.</string>
   <plurals name="nbSecondsForOpponentToPlayTheFirstMove">
     <item quantity="one">%s second for opponent to play first move</item>
     <item quantity="other">%s seconds for opponent to play first move</item>
+  </plurals>
+  <plurals name="nbSecondsToOfferDeadStones">
+    <item quantity="one">%s second to offer dead stones</item>
+    <item quantity="other">%s seconds to offer dead stones</item>
+  </plurals>
+  <plurals name="nbSecondsForOpponentToOfferDeadStones">
+    <item quantity="one">%s second for opponent to offer dead stones</item>
+    <item quantity="other">%s seconds for opponent to offer dead stones</item>
+  </plurals>
+  <plurals name="nbSecondsToRespondToOffer">
+    <item quantity="one">%s second to respond to offer</item>
+    <item quantity="other">%s seconds to respond to offer</item>
+  </plurals>
+  <plurals name="nbSecondsForOpponentToRespondToOffer">
+    <item quantity="one">%s second for opponent to respond to offer</item>
+    <item quantity="other">%s seconds for opponent to respond to offer</item>
   </plurals>
   <string name="practiceWithComputer">Practice with computer</string>
   <string name="anotherWasX">Another was %s</string>

@@ -326,6 +326,10 @@ final private[round] class RoundDuct(
         }
       }
 
+    case p: PlayerSelectSquares         => handle(p.playerId)(selectSquarer.selectSquares(p.squares))
+    case SelectSquaresAccept(playerId)  => handle(playerId)(selectSquarer.accept)
+    case SelectSquaresDecline(playerId) => handle(playerId)(selectSquarer.decline)
+
     case DrawYes(playerId)   => handle(playerId)(drawer.yes)
     case DrawNo(playerId)    => handle(playerId)(drawer.no)
     case DrawClaim(playerId) => handle(playerId)(drawer.claim)
@@ -449,7 +453,7 @@ final private[round] class RoundDuct(
 
     case NoStart =>
       handle { game =>
-        game.timeBeforeExpiration.exists(_.centis == 0) ?? {
+        game.timeBeforeExpirationAtStart.exists(_.centis == 0) ?? {
           if (game.isSwiss) game.startClock ?? { g =>
             proxy save g inject List(Event.Reload)
           }
@@ -611,6 +615,7 @@ object RoundDuct {
       val rematcher: Rematcher,
       val player: Player,
       val drawer: Drawer,
+      val selectSquarer: SelectSquarer,
       val forecastApi: ForecastApi,
       val isSimulHost: IsSimulHost
   )

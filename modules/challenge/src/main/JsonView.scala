@@ -91,7 +91,7 @@ final class JsonView(
       .add("multiMatch" -> c.multiMatch)
 
   private def iconChar(c: Challenge) =
-    if (c.variant == Variant.libFromPosition(c.variant.gameLogic)) '*'
+    if (c.variant.fromPositionVariant) '*'
     else c.perfType.iconChar
 
   private val i18nKeys = List(

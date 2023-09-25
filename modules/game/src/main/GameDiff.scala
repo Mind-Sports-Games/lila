@@ -12,10 +12,11 @@ import strategygames.{
   GameLogic,
   History,
   PocketData,
-  P1
+  P1,
+  Pos,
+  Score
 }
 import strategygames.chess.CheckCount
-import strategygames.togyzkumalak.Score
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
 import reactivemongo.api.bson._
@@ -119,6 +120,9 @@ object GameDiff {
 
     def ptnStorageWriter(pgnMoves: PgnMoves) =
       PtnStorage.OldBin.encode(a.variant.gameFamily, pgnMoves)
+
+    def ponStorageWriter(pgnMoves: PgnMoves) =
+      PonStorage.OldBin.encode(pgnMoves)
 
     a.variant.gameLogic match {
       case GameLogic.Draughts() =>
@@ -266,6 +270,43 @@ object GameDiff {
           (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
         )
       }
+      case GameLogic.Go() => {
+        dTry(oldPgn, _.pgnMoves, writeBytes compose ponStorageWriter)
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Go(b) => b.pieces
+            case _           => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeGo
+        )
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+        dOpt(
+          score,
+          _.history.score,
+          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+        )
+        if (a.variant.dropsVariant)
+          dOpt(
+            pocketData,
+            _.board.pocketData,
+            (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
+          )
+        dOptTry(
+          selectedSquares,
+          _.metadata.selectedSquares,
+          //writeBytes compose BinaryFormat.pos.writeGo
+          //(o: Option[List[Pos]]) => o.nonEmpty option { writeBytes compose BinaryFormat.pos.writeGo }
+          (o: Option[List[Pos]]) => o.map { writeBytes compose BinaryFormat.pos.writeGo }
+          //(o: KingMoves) => o.nonEmpty option { BSONHandlers.kingMovesWriter writeTry o }
+        )
+        dOpt(
+          deadStoneOfferState,
+          _.metadata.deadStoneOfferState.map(_.id),
+          (o: Option[Int]) => o.map(w.int)
+        )
+      }
     }
 
     d(turns, _.turns, w.int)
@@ -288,6 +329,7 @@ object GameDiff {
       val name                   = s"p$i."
       val player: Game => Player = if (i == 0) (_.p1Player) else (_.p2Player)
       dOpt(s"$name$isOfferingDraw", player(_).isOfferingDraw, w.boolO)
+      dOpt(s"$name$isOfferingSelectSquares", player(_).isOfferingSelectSquares, w.boolO)
       dOpt(s"$name$proposeTakebackAt", player(_).proposeTakebackAt, w.intO)
       dTry(s"$name$blursBits", player(_).blurs, Blurs.BlursBSONHandler.writeTry)
     }

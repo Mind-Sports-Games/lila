@@ -1,6 +1,7 @@
 package lila.bot
 
 import strategygames.format.Uci
+import strategygames.Pos
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 
@@ -9,7 +10,13 @@ import lila.game.Game.PlayerId
 import lila.game.{ Game, GameRepo, Pov }
 import lila.hub.actorApi.map.Tell
 import lila.hub.actorApi.round.{ Abort, BotPlay, RematchNo, RematchYes, Resign }
-import lila.round.actorApi.round.{ DrawNo, DrawYes }
+import lila.round.actorApi.round.{
+  DrawNo,
+  DrawYes,
+  PlayerSelectSquares,
+  SelectSquaresAccept,
+  SelectSquaresDecline
+}
 import lila.user.User
 
 final class BotPlayer(
@@ -102,4 +109,18 @@ final class BotPlayer(
 
   def setDraw(pov: Pov, v: Boolean): Unit =
     if (v) offerDraw(pov) else declineDraw(pov)
+
+  def declineSelectSquares(pov: Pov): Unit =
+    if (pov.opponent.isOfferingSelectSquares)
+      tellRound(pov.gameId, SelectSquaresDecline(PlayerId(pov.playerId)))
+
+  def acceptSelectSquares(pov: Pov): Unit =
+    if (pov.opponent.isOfferingSelectSquares)
+      tellRound(pov.gameId, SelectSquaresAccept(PlayerId(pov.playerId)))
+
+  def decideSelectSquares(pov: Pov, v: Boolean): Unit =
+    if (v) acceptSelectSquares(pov) else declineSelectSquares(pov)
+
+  def selectSquares(pov: Pov, squares: List[Pos]): Unit =
+    tellRound(pov.gameId, PlayerSelectSquares(PlayerId(pov.playerId), squares))
 }
