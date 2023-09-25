@@ -72,21 +72,23 @@ final class BotJsonView(
 
   def playerOffering(deadStoneOfferState: Option[DeadStoneOfferState]): Option[String] =
     deadStoneOfferState match {
-      case Some(DeadStoneOfferState.P1Offering) => Some("p1")
-      case Some(DeadStoneOfferState.P2Offering) => Some("p2")
-      case _                                    => None
+      case Some(DeadStoneOfferState.P1Offering)      => Some("p1")
+      case Some(DeadStoneOfferState.P2Offering)      => Some("p2")
+      case Some(DeadStoneOfferState.AcceptedP1Offer) => Some("p1")
+      case Some(DeadStoneOfferState.AcceptedP2Offer) => Some("p2")
+      case _                                         => None
     }
 
   def selectedSquaresJson(game: Game) =
     ssStatus(game).map(s =>
-      Json.obj(
-        "status"         -> s,
-        "squares"        -> game.selectedSquares.map(_.map(_.toString).mkString(" ")),
-        "playerOffering" -> playerOffering(game.deadStoneOfferState)
-      )
+      Json
+        .obj(
+          "status"         -> s,
+          "squares"        -> game.selectedSquares.map(_.map(_.toString).mkString(" ")),
+          "playerOffering" -> playerOffering(game.deadStoneOfferState)
+        )
     )
 
-  //todo update to provide the player who offered?
   def ssStatus(game: Game): Option[String] =
     game.deadStoneOfferState
       .flatMap(s =>
@@ -95,6 +97,8 @@ final class BotJsonView(
           case DeadStoneOfferState.P1Offering       => Some("offered")
           case DeadStoneOfferState.P2Offering       => Some("offered")
           case DeadStoneOfferState.ChooseFirstOffer => Some("pending")
+          case DeadStoneOfferState.AcceptedP1Offer  => Some("accepted")
+          case DeadStoneOfferState.AcceptedP2Offer  => Some("accepted")
           case _                                    => None
         }
       )
