@@ -20,10 +20,15 @@ final private[round] class SelectSquarer(
     val squares: List[Pos] = pov.game.selectedSquares.getOrElse(List[Pos]().empty)
     pov match {
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
-        proxy.save {
-          messenger.system(g, trans.selectSquareOfferAccepted.txt())
-          Progress(g) map { _.acceptSelectSquares(playerIndex) }
-        } >>- publishSquareOfferEvent(pov) inject List(
+        proxy
+          .save {
+            messenger.system(g, trans.selectSquareOfferAccepted.txt())
+            Progress(g) map { _.acceptSelectSquares(playerIndex).pp("acceptSelectSquares") }
+          }
+          .map(s => {
+            println(f"s: ${s}")
+            s
+          }) >>- publishSquareOfferEvent(pov).pp("publisSquareOfferEvent") inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(true))
         )
       case _ => fuccess(List(Event.ReloadOwner))
@@ -61,16 +66,19 @@ final private[round] class SelectSquarer(
   private def publishSquareOfferEvent(pov: Pov)(implicit
       proxy: GameProxy
   ) = {
-    if (pov.game.isCorrespondence && pov.game.nonAi)
+    if (pov.game.isCorrespondence.pp("isCorrespondence") && pov.game.nonAi.pp("nonAi"))
       Bus.publish(
         lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(pov.gameId),
         "offerEventCorres"
       )
     if (lila.game.Game.isBoardCompatible(pov.game))
       proxy
-        .withPov(pov.playerIndex) { p =>
+        .withPov(pov.playerIndex.pp("pov.playerIndex")) { p =>
           fuccess(
-            Bus.publish(lila.game.actorApi.BoardOfferSquares(p), s"boardSelectSquaresOffer:${pov.gameId}")
+            Bus.publish(
+              lila.game.actorApi.BoardOfferSquares(p.pp("p")).pp("SelectSquarer: BoardOfferSquares"),
+              s"boardSelectSquaresOffer:${pov.gameId}"
+            )
           )
         }
         .unit
