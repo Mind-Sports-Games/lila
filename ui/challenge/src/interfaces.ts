@@ -49,7 +49,8 @@ export interface Challenge {
   initialFen: FEN;
   rated: boolean;
   timeControl: TimeControl;
-  playerIndex: PlayerIndex;
+  playerIndex: PlayerIndex | 'random';
+  finalPlayerIndex: PlayerIndex;
   perf: {
     icon: string;
     name: string;
