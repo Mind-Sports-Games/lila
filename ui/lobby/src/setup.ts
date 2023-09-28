@@ -175,6 +175,7 @@ export default class Setup {
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
             (variantId[0] == '9' &&
+              $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' || ($goKomiInput.val() as string) != '65'));
         if (cantBeRated && rated) {
           $casual.trigger('click');
