@@ -93,7 +93,7 @@ export default class Setup {
 
   private sliderKomis = [...Array(41).keys()].map(i => -100 + i * 5);
 
-  private sliderKomi = (v: number) => (v < this.sliderKomis.length ? this.sliderKomis[v] : 65);
+  private sliderKomi = (v: number) => (v < this.sliderKomis.length ? this.sliderKomis[v] : 75);
 
   private sliderDays = (v: number) => {
     if (v <= 3) return v;
@@ -175,7 +175,8 @@ export default class Setup {
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
             (variantId[0] == '9' &&
-              (($goHandicapInput.val() as string) != '0' || ($goKomiInput.val() as string) != '65'));
+              $goConfig.val() !== undefined &&
+              (($goHandicapInput.val() as string) != '0' || ($goKomiInput.val() as string) != '75'));
         if (cantBeRated && rated) {
           $casual.trigger('click');
           return toggleButtons();
