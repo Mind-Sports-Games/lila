@@ -54,11 +54,11 @@ object bits {
           )
         )
       ),
-      div(cls := "mode")( //todo change playerIndexChoice to SG white/black term
+      div(cls := "mode")(
         c.open.fold(c.playerIndexChoice.some)(_ =>
           requestedPlayerIndex.map(Challenge.PlayerIndexChoice(_))
         ) map { playerIndexChoice =>
-          frag(playerIndexChoice.toString(), " • ")
+          frag(c.playerChoiceTrans(playerIndexChoice).toString(), " • ")
         },
         modeName(c.mode)
       )

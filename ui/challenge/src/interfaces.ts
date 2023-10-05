@@ -51,6 +51,9 @@ export interface Challenge {
   timeControl: TimeControl;
   playerIndex: PlayerIndex | 'random';
   finalPlayerIndex: PlayerIndex;
+  p1Color: PlayerColor;
+  p2Color: PlayerColor;
+  setupInfo: string;
   perf: {
     icon: string;
     name: string;

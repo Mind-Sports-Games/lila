@@ -903,7 +903,7 @@ case class Game(
   def playerPov(p: Player)                          = pov(p.playerIndex)
   def loserPov                                      = loser map playerPov
 
-  //When updating, also edit ui/@types/playstrategy/index.d.ts:declare type PlayerName
+  //When updating, also edit modules/challenge and ui/@types/playstrategy/index.d.ts:declare type PlayerName
   def playerTrans(p: PlayerIndex)(implicit lang: Lang) = chess.board.variant.playerNames(p) match {
     case "White" => trans.white.txt()
     case "Black" => trans.black.txt()
