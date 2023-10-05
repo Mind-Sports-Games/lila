@@ -33,7 +33,7 @@ object bits {
       )})""")
     )
 
-  def details(c: Challenge)(implicit ctx: Context) = frag(
+  def details(c: Challenge, requestedPlayerIndex: Option[strategygames.Player])(implicit ctx: Context) = frag(
     div(cls := "details")(
       div(cls := "variant", dataIcon := (if (c.initialFen.isDefined) '*' else c.perfType.iconChar))(
         div(
@@ -54,7 +54,14 @@ object bits {
           )
         )
       ),
-      div(cls := "mode")(modeName(c.mode))
+      div(cls := "mode")(
+        c.open.fold(c.playerIndexChoice.some)(_ =>
+          requestedPlayerIndex.map(Challenge.PlayerIndexChoice(_))
+        ) map { playerIndexChoice =>
+          frag(c.playerChoiceTrans(playerIndexChoice).toString(), " • ")
+        },
+        modeName(c.mode)
+      )
     ),
     c.isMultiMatch option div(cls := "multi-match")(
       trans.multiMatchChallenge(),
