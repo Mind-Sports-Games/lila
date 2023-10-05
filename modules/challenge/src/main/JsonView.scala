@@ -7,8 +7,8 @@ import lila.i18n.{ I18nKeys => trans }
 import lila.socket.Socket.SocketVersion
 import lila.socket.UserLagCache
 
-import strategygames.GameLogic
 import strategygames.variant.Variant
+import strategygames.{ GameFamily, GameLogic, P1, P2 }
 
 final class JsonView(
     baseUrl: lila.common.config.BaseUrl,
@@ -52,6 +52,13 @@ final class JsonView(
       "socketVersion" -> socketVersion
     )
 
+  private def setupInfoJson(c: Challenge): String = {
+    (c.initialFen, c.variant.gameFamily) match {
+      case (Some(f), GameFamily.Go()) => c.variant.toGo.setupInfo(f.toGo).getOrElse("")
+      case _                          => ""
+    }
+  }
+
   def apply(direction: Option[Direction])(c: Challenge)(implicit lang: Lang): JsObject =
     Json
       .obj(
@@ -79,7 +86,11 @@ final class JsonView(
             )
           case TimeControl.Unlimited => Json.obj("type" -> "unlimited")
         }),
-        "playerIndex" -> c.playerIndexChoice.toString.toLowerCase,
+        "playerIndex"      -> c.playerIndexChoice.toString.toLowerCase,
+        "finalPlayerIndex" -> c.finalPlayerIndex.toString.toLowerCase,
+        "p1Color"          -> c.variant.playerColors(P1),
+        "p2Color"          -> c.variant.playerColors(P2),
+        "setupInfo"        -> setupInfoJson(c),
         "perf" -> Json.obj(
           "icon" -> iconChar(c).toString,
           "name" -> c.perfType.trans
