@@ -48,6 +48,30 @@ final private class LeaderboardIndexer(
       )
       .void
 
+  private def metaPointsFromRank(category: Option[Schedule.Freq], rank: Int): Option[Int] =
+    category match {
+      case Some(c) if c == Schedule.Freq.Shield || c == Schedule.Freq.MedleyShield =>
+        if (rank == 1) Some(5)
+        else if (rank == 2) Some(3)
+        else if (rank == 3) Some(2)
+        else Some(1)
+      case _ => None
+    }
+
+  private def shieldKeyFromTour(tour: Tournament): Option[String] =
+    tour.schedule.map(_.freq) match {
+      case Some(c) if c == Schedule.Freq.Shield =>
+        s"${tour.variant.gameFamily.id}_${tour.variant.id}".some
+      case Some(c) if c == Schedule.Freq.MedleyShield =>
+        tour.trophy1st match {
+          case Some(t) if t == "shieldDraughtsMedley"     => "sdm".some
+          case Some(t) if t == "shieldChessMedley"        => "scm".some
+          case Some(t) if t == "shieldPlayStrategyMedley" => "spm".some
+          case _                                          => None
+        }
+      case _ => None
+    }
+
   private def generateTourEntries(tour: Tournament): Fu[List[Entry]] =
     for {
       nbGames <- pairingRepo.countByTourIdAndUserIds(tour.id)
@@ -62,6 +86,8 @@ final private class LeaderboardIndexer(
           score = player.score,
           rank = rank,
           rankRatio = Ratio(if (tour.nbPlayers > 0) rank.toDouble / tour.nbPlayers else 0),
+          metaPoints = metaPointsFromRank(tour.schedule.map(_.freq), rank),
+          shieldKey = shieldKeyFromTour(tour),
           freq = tour.schedule.map(_.freq),
           speed = tour.schedule.map(_.speed),
           perf = tour.perfType,

@@ -42,7 +42,8 @@ const miniPairing = (ctrl: SimulCtrl) => (pairing: Pairing) => {
     [
       h('span.mini-game__player', [
         h(
-          'a.mini-game__user.ulpt',
+          'a.mini-game__user.ulpt.is.playerIndex-icon.text.' +
+            (pairing.hostPlayerIndex == 'p1' ? pairing.p2Color : pairing.p1Color),
           {
             attrs: {
               href: `/@/${player.name}`,

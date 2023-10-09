@@ -99,7 +99,7 @@ final class Analyse(
       }
 
   def embed(gameId: String, playerIndex: String) =
-    Action.async { implicit req =>
+    Open { implicit ctx: Context =>
       env.game.gameRepo.gameWithInitialFen(gameId) flatMap {
         case Some((game, initialFen)) =>
           val pov = Pov(game, PlayerIndex.fromName(playerIndex) | P1)
@@ -109,9 +109,9 @@ final class Analyse(
             initialFenO = initialFen.some,
             withFlags = WithFlags(opening = true)
           ) map { data =>
-            Ok(html.analyse.embed(pov, data))
+            Ok(html.analyse.embed(pov, data)(ui.EmbedConfig.fromContext(ctx)))
           }
-        case _ => fuccess(NotFound(html.analyse.embed.notFound))
+        case _ => fuccess(NotFound(html.analyse.embed.notFound(ui.EmbedConfig.fromContext(ctx))))
       } dmap EnableSharedArrayBuffer
     }
 

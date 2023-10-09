@@ -90,8 +90,8 @@ final class FishnetApi(
           Monitor.notFound(workId, client)
           fufail(WorkNotFound)
         case Some(work) if work isAcquiredBy client => {
-          val v = work.game.variant
-          val data = lexicalData.toUci(v.gameLogic, v.gameFamily)
+          val v    = work.game.variant
+          val data = lexicalData.toUci(v)
           data.completeOrPartial match {
             case complete: CompleteAnalysis =>
               {

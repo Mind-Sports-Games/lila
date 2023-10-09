@@ -25,7 +25,9 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
     case 'uci':
       return (move, variant) => (variant.key === 'amazons' && move.uci[0] === 'P' ? move.uci.slice(1) : move.uci);
     case 'dpo':
-      return destPosOnlyNotation;
+      return destPosOthello;
+    case 'dpg':
+      return destPosGo;
     case 'man':
       return mancalaNotation;
   }
@@ -235,6 +237,7 @@ function promotionSymbol(prevBoard: Board, board: Board, parsed: ParsedMove): st
   const prevRole = prevBoard.pieces[parsed.orig];
   const currentRole = board.pieces[parsed.dest];
 
+  if (!prevRole) return '';
   if (prevRole !== currentRole) return '+';
   if (prevRole.includes('+')) return '';
   if (
@@ -337,7 +340,7 @@ function numFriendlyPawnsInColumn(
   return pawnRanks;
 }
 
-function destPosOnlyNotation(move: ExtendedMoveInfo, variant: Variant): string {
+function destPosOthello(move: ExtendedMoveInfo, variant: Variant): string {
   if (!move.uci.includes('@')) return 'PASS';
 
   const reg = move.uci.match(/[a-zA-Z][1-9@]0?/g) as string[];
@@ -348,6 +351,19 @@ function destPosOnlyNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const destPos = dest[0] + newRank;
 
   return `${destPos}`;
+}
+
+function destPosGo(move: ExtendedMoveInfo): string {
+  if (!move.uci.includes('@')) {
+    if (move.uci == 'pass') return 'PASS';
+    else if (move.uci == 'ss:') return 'O DS';
+    else return `${move.uci.substring(3).split(',').length} DS`;
+  }
+
+  const reg = move.uci.match(/([sS]@|[a-zA-Z][1-9][0-9]?)/g) as string[];
+  const dest = reg[1];
+
+  return `${dest}`;
 }
 
 function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {

@@ -8,6 +8,8 @@ import RoundController from './ctrl';
 import { Untyped } from './interfaces';
 import { defined } from 'common';
 import * as util from './util';
+import * as cg from 'chessground/types';
+import { opposite } from 'chessground/util';
 
 export interface RoundSocket extends Untyped {
   send: SocketSend;
@@ -81,6 +83,8 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     },
     move: ctrl.apiMove,
     drop: ctrl.apiMove,
+    pass: ctrl.apiMove,
+    selectSquares: ctrl.apiMove,
     reload,
     redirect: ctrl.setRedirecting,
     clockInc(o) {
@@ -127,6 +131,82 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([ply]);
       }
       ctrl.redraw();
+    },
+    selectSquaresOffer(o) {
+      if (o.accepted != undefined) {
+        //game will end after accepted dead stones
+
+        ctrl.data.selectMode = false;
+        ctrl.chessground.set({
+          selectOnly: ctrl.data.selectMode,
+          viewOnly: false,
+        });
+
+        ctrl.data.player.offeringSelectSquares = false;
+        ctrl.data.opponent.offeringSelectSquares = false;
+        ctrl.data.selectedSquares = undefined;
+        ctrl.data.currentSelectedSquares = undefined;
+        ctrl.data.expirationOnPaused = undefined;
+
+        ctrl.redraw();
+        if (o.accepted) {
+          ctrl.data.deadStoneOfferState = 'AcceptedOffer';
+          ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
+          ctrl.doSelectSquaresAction();
+          ctrl.redraw();
+        } else {
+          ctrl.data.deadStoneOfferState = 'RejectedOffer';
+          ctrl.chessground.resetSelectedPieces();
+          ctrl.chessground.set({ highlight: { lastMove: ctrl.data.pref.highlight } });
+          //TODO when merging with multiaction this wont work
+          ctrl.data.game.player = util.turnPlayerIndexFromLastPly(ctrl.data.game.turns, ctrl.data.game.variant.key);
+          game.setOnGame(ctrl.data, o.playerIndex, true);
+          if (ctrl.clock) {
+            ctrl.clock.unpauseClock(ctrl.data.game.player);
+          } else if (ctrl.corresClock) {
+            ctrl.corresClock.update(ctrl.corresClock.data.increment, ctrl.corresClock.data.increment);
+          }
+          ctrl.redraw();
+        }
+      } else {
+        ctrl.data.player.offeringSelectSquares = o.playerIndex === ctrl.data.player.playerIndex;
+        ctrl.data.opponent.offeringSelectSquares = o.playerIndex === ctrl.data.opponent.playerIndex;
+        ctrl.data.game.player = opposite(o.playerIndex);
+        ctrl.chessground.set({ highlight: { lastMove: false } });
+
+        if (ctrl.data.opponent.offeringSelectSquares) {
+          ctrl.data.deadStoneOfferState = ctrl.data.player.playerIndex === 'p1' ? 'P2Offering' : 'P1Offering';
+          ctrl.chessground.set({ viewOnly: false, selectOnly: true });
+          ctrl.chessground.resetSelectedPieces();
+          ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
+          ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
+          const goStonesToSelect = util.goStonesToSelect(
+            ctrl.data.selectedSquares,
+            ctrl.chessground.state.pieces,
+            ctrl.data.game.variant.boardSize
+          );
+          for (const square of goStonesToSelect) {
+            ctrl.chessground.selectSquare(square as cg.Key);
+          }
+        } else {
+          ctrl.data.deadStoneOfferState = ctrl.data.player.playerIndex === 'p1' ? 'P1Offering' : 'P2Offering';
+          ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
+          ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
+          ctrl.chessground.set({ viewOnly: true });
+        }
+
+        if (ctrl.clock) {
+          ctrl.data.expirationOnPaused = {
+            idleMillis: 0,
+            movedAt: Date.now(),
+            millisToMove: ctrl.data.pauseSecs ? ctrl.data.pauseSecs : 60000,
+          };
+        } else if (ctrl.corresClock) {
+          ctrl.corresClock.update(ctrl.corresClock.data.increment, ctrl.corresClock.data.increment);
+        }
+        game.setOnGame(ctrl.data, o.playerIndex, true);
+        ctrl.redraw();
+      }
     },
     berserk(playerIndex: PlayerIndex) {
       ctrl.setBerserk(playerIndex);

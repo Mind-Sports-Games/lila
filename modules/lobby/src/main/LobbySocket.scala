@@ -30,7 +30,7 @@ final class LobbySocket(
     poolApi: PoolApi,
     system: akka.actor.ActorSystem,
     chat: lila.chat.ChatApi
-)(implicit 
+)(implicit
     ec: scala.concurrent.ExecutionContext,
     mode: play.api.Mode
 ) {
@@ -118,7 +118,7 @@ final class LobbySocket(
           P.Out.tellSri(member.sri, makeMessage("hooks", JsArray(hooks.map(_.render(defaultLang)))))
         )
         hookSubscriberSris += member.sri.value
-      
+
       case m => sys.error(m.toString)
     }
 
@@ -149,7 +149,7 @@ final class LobbySocket(
     }
   }
 
-  // solve circular reference
+  // solve circular reference.
   lobby ! LobbyTrouper.SetSocket(trouper)
 
   private val poolLimitPerSri = new lila.memo.RateLimit[SriStr](
@@ -271,7 +271,7 @@ final class LobbySocket(
       logger.warn("Remote socket boot")
       lobby ! LeaveAll
       trouper ! LeaveAll
-    
+
   }
 
   lazy val rooms = makeRoomMap(send)
@@ -296,7 +296,6 @@ final class LobbySocket(
     lobbyHandler orElse chatHandler orElse remoteSocketApi.baseHandler
   ) >>- send(P.Out.boot)
 
-
 }
 
 private object LobbySocket {
@@ -312,7 +311,7 @@ private object LobbySocket {
   object Protocol {
     object In {
       case class Counters(members: Int, rounds: Int) extends P.In
-      
+
       val reader: P.In.Reader = raw => lobbyReader(raw) orElse RP.In.reader(raw)
 
       val lobbyReader: P.In.Reader = raw =>
@@ -328,8 +327,8 @@ private object LobbySocket {
     object Out {
       def pairings(pairings: List[PoolApi.Pairing]) = {
         val redirs = for {
-          pairing <- pairings
-          playerIndex   <- strategygames.Player.all
+          pairing     <- pairings
+          playerIndex <- strategygames.Player.all
           sri    = pairing sri playerIndex
           fullId = pairing.game fullIdOf playerIndex
         } yield s"$sri:$fullId"

@@ -38,6 +38,17 @@ export interface SocketDrop {
   b?: 1;
 }
 
+export interface SocketPass {
+  variant: string;
+  b?: 1;
+}
+
+export interface SocketSelectSquares {
+  s: string;
+  variant: string;
+  b?: 1;
+}
+
 export type EncodedDests =
   | string
   | {
@@ -52,6 +63,12 @@ export interface RoundData extends GameData {
   possibleMoves?: EncodedDests;
   possibleDrops?: string;
   possibleDropsByRole?: string;
+  selectMode: boolean;
+  selectedSquares?: cg.Key[];
+  currentSelectedSquares?: cg.Key[];
+  calculatedCGGoScores?: cg.SimpleGoScores;
+  deadStoneOfferState?: string;
+  pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
   onlyDropsVariant: boolean;
@@ -65,7 +82,8 @@ export interface RoundData extends GameData {
   userTv?: {
     id: string;
   };
-  expiration?: Expiration;
+  expirationAtStart?: Expiration;
+  expirationOnPaused?: Expiration;
 }
 
 export interface Expiration {
@@ -132,12 +150,16 @@ export interface ApiMove extends Step {
   check: boolean;
   threefold: boolean;
   perpetualWarning: boolean;
+  takebackable: boolean;
   wDraw: boolean;
   bDraw: boolean;
   crazyhouse?: CrazyData;
   role?: cg.Role;
   drops?: string;
   dropsByRole?: string;
+  canSelectSquares?: boolean;
+  deadStoneOfferState?: string;
+  squares?: string;
   promotion?: {
     key: cg.Key;
     pieceClass: cg.Role;
@@ -179,6 +201,7 @@ export interface Pref {
   clockSound: boolean;
   clockTenths: Prefs.ShowClockTenths;
   confirmResign: boolean;
+  confirmPass: boolean;
   coords: Prefs.Coords;
   destination: boolean;
   playerTurnIndicator: boolean;

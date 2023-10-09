@@ -22,9 +22,26 @@ final class LeaderboardApi(
 
   private val maxPerPage = MaxPerPage(15)
 
-  def recentByUser(user: User, page: Int) = paginator(user, page, $sort desc "d")
+  private def userSelector(userId: User.ID) = $doc("u" -> userId)
 
-  def bestByUser(user: User, page: Int) = paginator(user, page, $sort asc "w")
+  def recentByUser(user: User, page: Int) =
+    paginator(user, page, userSelector(user.id), $sort desc "d")
+
+  def bestByUser(user: User, page: Int) =
+    paginator(user, page, userSelector(user.id), $sort asc "w")
+
+  def shieldLeaderboardByUser(user: User, page: Int, lastXMonths: Int = 2) =
+    paginator(
+      user,
+      page,
+      $doc(
+        "u" -> user.id,
+        "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
+        "mp" $exists true,
+        "k" $exists true
+      ),
+      $sort desc "d"
+    )
 
   def timeRange(userId: User.ID, range: (DateTime, DateTime)): Fu[List[Entry]] =
     repo.coll
@@ -79,11 +96,11 @@ final class LeaderboardApi(
       (entries.nonEmpty ?? repo.coll.delete.one($inIds(entries.map(_.id))).void) inject entries.map(_.tourId)
     }
 
-  private def paginator(user: User, page: Int, sort: Bdoc): Fu[Paginator[TourEntry]] =
+  private def paginator(user: User, page: Int, selector: Bdoc, sort: Bdoc): Fu[Paginator[TourEntry]] =
     Paginator(
       adapter = new Adapter[Entry](
         collection = repo.coll,
-        selector = $doc("u" -> user.id),
+        selector = selector,
         projection = none,
         sort = sort,
         readPreference = ReadPreference.secondaryPreferred
@@ -98,6 +115,50 @@ final class LeaderboardApi(
         tours.find(_.id == entry.tourId).map { TourEntry(_, entry) }
       }
     }
+
+  private def findByCategory(lastXMonths: Int, category: ShieldTableApi.Category) =
+    $doc(
+      "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
+      "mp" $exists true,
+      "k" -> $doc(
+        "$regex" -> BSONRegex(s"^${category.id - 1}_|${category.medleyShieldCode}", "")
+      )
+    )
+
+  private def findAll(lastXMonths: Int) =
+    $doc(
+      "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
+      "mp" $exists true,
+      "k" $exists true
+    )
+
+  def shieldLeaderboardMetaPoints(lastXMonths: Int, category: ShieldTableApi.Category) =
+    repo.coll
+      .find(
+        category match {
+          case ShieldTableApi.Category.Overall => findAll(lastXMonths)
+          case _                               => findByCategory(lastXMonths, category)
+        }
+      )
+      .cursor[Entry]()
+      .list()
+      .map { entries =>
+        entries
+          .map { e => (e.userId, e.shieldKey, e.metaPoints) }
+          .map { case (u, Some(k), Some(p)) => (u, k, p); case (u, _, _) => (u, "", 0) }
+          .groupBy(_._1)
+          .view
+          .mapValues(
+            _.map(v => (v._2, v._3))
+              .groupBy(_._1)
+              .view
+              .mapValues(_.map(_._2).max)
+              .toMap
+          )
+          .toMap
+          .map { case (u, v) => (u, v.map { case (_, p) => p }.sum) }
+      }
+
 }
 
 object LeaderboardApi {
@@ -118,6 +179,8 @@ object LeaderboardApi {
       score: Int,
       rank: Int,
       rankRatio: Ratio, // ratio * rankRatioMultiplier. function of rank and tour.nbPlayers. less is better.
+      metaPoints: Option[Int],
+      shieldKey: Option[String],
       freq: Option[Schedule.Freq],
       speed: Option[Schedule.Speed],
       perf: PerfType,

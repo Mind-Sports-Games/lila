@@ -109,6 +109,9 @@ object EvalCacheEntry {
       case Uci.FairySFDrop(_)      => GameLogic.FairySF()
       case Uci.SamuraiMove(_)      => GameLogic.Samurai()
       case Uci.TogyzkumalakMove(_) => GameLogic.Togyzkumalak()
+      case Uci.GoDrop(_)           => GameLogic.Go()
+      case Uci.GoPass(_)           => GameLogic.Go()
+      case Uci.GoSelectSquares(_)  => GameLogic.Go()
     }
   }
 
@@ -128,11 +131,9 @@ object EvalCacheEntry {
         c != '/' && c != '-' && c != 'w'
       }
       val str = variant match {
-        case Variant.Chess(strategygames.chess.variant.ThreeCheck)
-          => base + ~fen.value.split(' ').lift(6)
-        case Variant.Chess(strategygames.chess.variant.FiveCheck)
-          => base + ~fen.value.split(' ').lift(6)
-        case _                         => base
+        case Variant.Chess(strategygames.chess.variant.ThreeCheck) => base + ~fen.value.split(' ').lift(6)
+        case Variant.Chess(strategygames.chess.variant.FiveCheck)  => base + ~fen.value.split(' ').lift(6)
+        case _                                                     => base
       }
       new SmallFen(str)
     }

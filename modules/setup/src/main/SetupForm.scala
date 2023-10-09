@@ -60,6 +60,8 @@ object SetupForm {
         "increment"   -> increment,
         "byoyomi"     -> byoyomi,
         "periods"     -> periods,
+        "goHandicap"  -> goHandicap,
+        "goKomi"      -> goKomi,
         "days"        -> days,
         "mode"        -> mode(withRated = ctx.isAuth),
         "playerIndex" -> playerIndex,
@@ -131,7 +133,6 @@ object SetupForm {
 
   object api {
 
-    // TDOO: byoyomi need to handle both byoyomi and fischer here.
     lazy val fischerClockMapping =
       mapping(
         "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
@@ -188,7 +189,7 @@ object SetupForm {
         "level" -> level,
         variant,
         fischerClock,
-        //byoyomiClock, TODO: byoyomi
+        byoyomiClock,
         "days"        -> optional(days),
         "playerIndex" -> optional(playerIndex),
         "fen"         -> fenField
@@ -200,7 +201,7 @@ object SetupForm {
         "name" -> optional(lila.common.Form.cleanNonEmptyText(maxLength = 200)),
         variant,
         fischerClock,
-        // byoyomiClock, TODO: byoyomi
+        byoyomiClock,
         "rated" -> boolean,
         "fen"   -> fenField
       )(OpenConfig.from)(_ => none)

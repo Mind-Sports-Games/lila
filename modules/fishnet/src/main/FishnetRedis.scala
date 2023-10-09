@@ -2,7 +2,7 @@ package lila.fishnet
 
 import scala.util.control.Exception._
 
-import strategygames.format.Uci
+import strategygames.format.{ Uci, UciDump }
 import strategygames.{ GameFamily, GameLogic }
 import io.lettuce.core._
 import io.lettuce.core.pubsub._
@@ -39,8 +39,8 @@ final class FishnetRedis(
         case Array(familyId, gameId, plyS, uci) =>
           for {
             family <- allCatch.opt(familyId.toInt).map(GameFamily.apply)
-            move <- Uci(family.gameLogic, family, uci)
-            ply  <- plyS.toIntOption
+            move   <- Uci(family.gameLogic, family, uci)
+            ply    <- plyS.toIntOption
           } Bus.publish(Tell(gameId, FishnetPlay(move, ply)), "roundSocket")
         case _ =>
       }
@@ -60,7 +60,7 @@ final class FishnetRedis(
       work.clock ?? writeClock,
       work.game.variant.some.filter(_.exotic).??(_.key),
       work.game.initialFen.??(_.value),
-      work.game.moves
+      UciDump.fishnetUci(work.game.variant, work.game.moves)
     ) mkString ";"
 
   private def writeClock(clock: Work.Clock): String =

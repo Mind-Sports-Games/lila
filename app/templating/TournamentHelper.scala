@@ -48,13 +48,23 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
   object scheduledTournamentNameShortHtml {
     private def icon(c: Char) = s"""<span data-icon="$c"></span>"""
     private val replacements = List(
-      "PlayStrategy " -> "",
-      "Marathon"      -> icon('\\'),
-      "HyperBullet"   -> s"H${icon(Speed.Bullet.perfIcon)}",
-      "SuperBlitz"    -> s"S${icon(Speed.Blitz.perfIcon)}"
-    ) ::: PerfType.leaderboardable.filterNot(PerfType.translated.contains).map { pt =>
-      pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
-    }
+      "PlayStrategy "   -> "",
+      "Marathon"        -> icon('\\'),
+      "HyperBullet"     -> s"H${icon(Speed.Bullet.perfIcon)}",
+      "SuperBlitz"      -> s"S${icon(Speed.Blitz.perfIcon)}",
+      "Grand Prix"      -> "GP",
+      " PREMIER"        -> "",
+      "Lines of Action" -> icon(strategygames.chess.variant.LinesOfAction.perfIcon),
+      "Draughts"        -> icon(strategygames.draughts.variant.Standard.perfIcon),
+      "Variants Medley" -> icon('5'),
+      "Medley"          -> icon('5'),
+      " -"              -> ""
+    ) ++ PerfType.leaderboardable
+      .filterNot(PerfType.translated.contains)
+      .map { pt =>
+        pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
+      }
+      .sortBy(-_._1.length) ++ List("Chess" -> s"${icon(Speed.Blitz.perfIcon)}")
 
     def apply(name: String): Frag =
       raw {

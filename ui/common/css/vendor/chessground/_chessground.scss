@@ -119,6 +119,21 @@ span.mini-game.variant-togyzkumalak.is2d {
   height: calc(100% / 2);
 }
 
+.variant-go9x9 square {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.variant-go13x13 square {
+  width: calc(100% / 13);
+  height: calc(100% / 13);
+}
+
+.variant-go19x19 square {
+  width: calc(100% / 19);
+  height: calc(100% / 19);
+}
+
 $alternate-board-highlights: (
   'flipello-green': 'flipello',
   'flipello-green-marble': 'flipello',
@@ -361,6 +376,13 @@ square {
     }
   }
 
+  &.area.p1 {
+    background: radial-gradient(rgba(0, 0, 0, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
+  }
+  &.area.p2 {
+    background: radial-gradient(rgba(255, 255, 255, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
+  }
+
   &.premove-dest {
     background: radial-gradient(rgba(20, 30, 85, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
     pointer-events: auto;
@@ -372,6 +394,16 @@ square {
 
   &.oc.premove-dest {
     background: radial-gradient(transparent 0%, transparent 79%, rgba(20, 30, 85, 0.2) 80%);
+  }
+
+  @each $variant in ('go9x9', 'go13x13', 'go19x19') {
+    body.go-light-wood .variant-#{$variant} &.last-move {
+      background: radial-gradient(transparent 0%, transparent 79%, rgba(20, 85, 0, 0.5) 80%);
+    }
+
+    body.go-dark-wood .variant-#{$variant} &.last-move {
+      background: radial-gradient(transparent 0%, transparent 79%, rgba(155, 199, 0, 0.5) 80%);
+    }
   }
 
   @each $color, $gameFamily in $alternate-board-highlights {
@@ -796,6 +828,21 @@ square {
   }
 }
 
+.variant-go9x9 piece {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
+.variant-go13x13 piece {
+  width: calc(100% / 13);
+  height: calc(100% / 13);
+}
+
+.variant-go19x19 piece {
+  width: calc(100% / 19);
+  height: calc(100% / 19);
+}
+
 piece {
   position: absolute;
   top: 0;
@@ -866,6 +913,21 @@ piece {
   padding-bottom: calc(100% / 3.527);
 }
 
+.variant-go9x9 cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 9);
+}
+
+.variant-go13x13 cg-helper {
+  width: calc(100% / 13);
+  padding-bottom: calc(100% / 13);
+}
+
+.variant-go19x19 cg-helper {
+  width: calc(100% / 19);
+  padding-bottom: calc(100% / 19);
+}
+
 cg-helper {
   position: absolute;
   width: 12.5%;
@@ -912,6 +974,21 @@ cg-helper {
 .variant-togyzkumalak cg-container {
   width: calc(100% * 9);
   height: calc(100% * 2);
+}
+
+.variant-go9x9 cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 9);
+}
+
+.variant-go13x13 cg-container {
+  width: calc(100% * 13);
+  height: calc(100% * 13);
+}
+
+.variant-go19x19 cg-container {
+  width: calc(100% * 19);
+  height: calc(100% * 19);
 }
 
 cg-container {

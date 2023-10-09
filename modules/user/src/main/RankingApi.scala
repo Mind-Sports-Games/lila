@@ -123,6 +123,9 @@ final class RankingApi(
       amazons       <- topPerf(PerfType.orDefault("amazons").id, nb)
       oware         <- topPerf(PerfType.orDefault("oware").id, nb)
       togyzkumalak  <- topPerf(PerfType.orDefault("togyzkumalak").id, nb)
+      go9x9         <- topPerf(PerfType.orDefault("go9x9").id, nb)
+      go13x13       <- topPerf(PerfType.orDefault("go13x13").id, nb)
+      go19x19       <- topPerf(PerfType.orDefault("go19x19").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -159,7 +162,10 @@ final class RankingApi(
       flipello10 = flipello10,
       amazons = amazons,
       oware = oware,
-      togyzkumalak = togyzkumalak
+      togyzkumalak = togyzkumalak,
+      go9x9 = go9x9,
+      go13x13 = go13x13,
+      go19x19 = go19x19
     )
 
   object weeklyStableRanking {

@@ -19,6 +19,7 @@ import strategygames.{
   Pockets,
   Pos,
   PositionHash,
+  Score,
   Situation,
   Board,
   Role
@@ -28,7 +29,9 @@ import strategygames.draughts
 import strategygames.fairysf
 import strategygames.samurai
 import strategygames.togyzkumalak
+import strategygames.go
 import strategygames.format.Uci
+import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard }
 import strategygames.draughts.variant.{ Variant => DraughtsVariant, Standard => DraughtsStandard }
@@ -38,6 +41,7 @@ import strategygames.togyzkumalak.variant.{
   Variant => TogyzkumalakVariant,
   Togyzkumalak => TogyzkumalakStandard
 }
+import strategygames.go.variant.{ Variant => GoVariant, Go19x19 => GoStandard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
@@ -53,8 +57,8 @@ object BSONHandlers {
     def writeTry(cc: chess.CheckCount) = Success(BSONArray(cc.p1, cc.p2))
   }
 
-  implicit private[game] val scoreWriter = new BSONWriter[togyzkumalak.Score] {
-    def writeTry(sc: togyzkumalak.Score) = Success(BSONArray(sc.p1, sc.p2))
+  implicit private[game] val scoreWriter = new BSONWriter[Score] {
+    def writeTry(sc: Score) = Success(BSONArray(sc.p1, sc.p2))
   }
 
   implicit val StatusBSONHandler = tryHandler[Status](
@@ -101,6 +105,21 @@ object BSONHandlers {
               promoted = r.str("t").view.flatMap(fairysf.Pos.piotr).to(Set)
             )
           )
+        case GameLogic.Go() =>
+          PocketData.Go(
+            go.PocketData(
+              pockets = {
+                val (p1, p2) = {
+                  r.str("p").view.flatMap(c => go.Piece.fromChar(c)).to(List)
+                }.partition(_ is P1)
+                Pockets(
+                  p1 = Pocket(p1.map(_.role).map(Role.GoRole)),
+                  p2 = Pocket(p2.map(_.role).map(Role.GoRole))
+                )
+              },
+              promoted = r.str("t").view.flatMap(go.Pos.piotr).to(Set)
+            )
+          )
         case _ => sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
       }
 
@@ -109,11 +128,13 @@ object BSONHandlers {
         "l" -> (o match {
           case PocketData.Chess(_)   => 0
           case PocketData.FairySF(_) => 2
+          case PocketData.Go(_)      => 5
           case _                     => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
         }),
         "f" -> (o match {
           case PocketData.Chess(_)    => 0
           case PocketData.FairySF(pd) => pd.gameFamily.getOrElse(GameFamily.Shogi()).id
+          case PocketData.Go(_)       => 9
         }),
         "p" -> {
           o.pockets.p1.roles.map(_.forsyth.toUpper).mkString +
@@ -552,7 +573,7 @@ object BSONHandlers {
               positionHashes = decoded.positionHashes,
               score = {
                 val counts = r.intsD(F.score)
-                togyzkumalak.Score(~counts.headOption, ~counts.lastOption)
+                Score(~counts.headOption, ~counts.lastOption)
               }
             ),
             variant = gameVariant
@@ -599,6 +620,103 @@ object BSONHandlers {
       )
     }
 
+    def readGoGame(r: BSON.Reader): Game = {
+      val light                   = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
+      val startedAtTurn           = r intD F.startedAtTurn
+      val plies                   = r int F.turns atMost Game.maxPlies // unlimited can cause StackOverflowError
+      val turnPlayerIndex         = PlayerIndex.fromPly(plies)
+      val createdAt               = r date F.createdAt
+      val initialFen: Option[FEN] = r.getO[FEN](F.initialFen)          //for handicapped games
+
+      val playedPlies = plies - startedAtTurn
+      val gameVariant = GoVariant(r intD F.variant) | GoStandard
+
+      val decoded = r.bytesO(F.huffmanPgn).map { PonStorage.Huffman.decode(_, playedPlies) } | {
+        val pgnMoves = PonStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies)
+        PonStorage.Decoded(
+          pgnMoves = pgnMoves,
+          pieces = BinaryFormat.piece.readGo(r bytes F.binaryPieces, gameVariant),
+          positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+          lastMove = (r strO F.historyLastMove) flatMap (go.format.Uci.apply),
+          halfMoveClock = pgnMoves.reverse.indexWhere(san =>
+            san.contains("x") || san.headOption.exists(_.isLower)
+          ) atLeast 0
+        )
+      }
+
+      val periodEntries = readPeriodEntries(r)
+      val uciMoves      = strategygames.go.format.pgn.Parser.pgnMovesToUciMoves(decoded.pgnMoves)
+      val goGame = go.Game(
+        situation = go.Situation(
+          go.Board(
+            pieces = decoded.pieces,
+            history = go.History(
+              lastMove = decoded.lastMove,
+              halfMoveClock = decoded.halfMoveClock,
+              positionHashes = decoded.positionHashes,
+              score = {
+                val counts = r.intsD(F.score)
+                Score(~counts.headOption, ~counts.lastOption)
+              },
+              captures = {
+                val counts = r.intsD(F.captures)
+                Score(~counts.headOption, ~counts.lastOption)
+              }
+            ),
+            variant = gameVariant,
+            pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
+              case Some(PocketData.Go(pd)) => Some(pd)
+              case None                    => None
+              case _                       => sys.error("non go pocket data")
+            },
+            uciMoves = uciMoves,
+            position =
+              initialFen.map(f => strategygames.go.Api.positionFromStartingFenAndMoves(f.toGo, uciMoves))
+          ),
+          player = turnPlayerIndex
+        ),
+        pgnMoves = decoded.pgnMoves,
+        clock = r.getO[PlayerIndex => Clock](F.clock) {
+          clockBSONReader(
+            r.intO(F.clockType),
+            createdAt,
+            periodEntries,
+            light.p1Player.berserk,
+            light.p2Player.berserk
+          )
+        } map (_(turnPlayerIndex)),
+        turns = plies,
+        startedAtTurn = startedAtTurn
+      )
+
+      Game(
+        id = light.id,
+        p1Player = light.p1Player,
+        p2Player = light.p2Player,
+        chess = StratGame.Go(goGame),
+        readClockHistory(r, light, turnPlayerIndex, periodEntries),
+        status = light.status,
+        daysPerTurn = r intO F.daysPerTurn,
+        binaryMoveTimes = r bytesO F.moveTimes,
+        mode = Mode(r boolD F.rated),
+        bookmarks = r intD F.bookmarks,
+        createdAt = createdAt,
+        movedAt = r.dateD(F.movedAt, createdAt),
+        metadata = Metadata(
+          source = r intO F.source flatMap Source.apply,
+          pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
+          tournamentId = r strO F.tournamentId,
+          swissId = r strO F.swissId,
+          simulId = r strO F.simulId,
+          multiMatch = r strO F.multiMatch,
+          analysed = r boolD F.analysed,
+          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty),
+          selectedSquares = (r bytesO F.selectedSquares).map(BinaryFormat.pos.readGo(_)),
+          deadStoneOfferState = (r intO F.deadStoneOfferState) flatMap DeadStoneOfferState.apply
+        )
+      )
+    }
+
     def reads(r: BSON.Reader): Game = {
 
       lila.mon.game.fetch.increment()
@@ -610,6 +728,7 @@ object BSONHandlers {
         case 2 => readFairySFGame(r)
         case 3 => readSamuraiGame(r)
         case 4 => readTogyzkumalakGame(r)
+        case 5 => readGoGame(r)
         case _ => sys.error("Invalid game in the database")
       }
     }
@@ -709,6 +828,21 @@ object BSONHandlers {
               F.historyLastMove -> o.history.lastMove.map(_.uci),
               F.score           -> o.history.score.nonEmpty.option(o.history.score)
             )
+          case GameLogic.Go() =>
+            $doc(
+              F.oldPgn -> PonStorage.OldBin.encode(o.pgnMoves take Game.maxPlies),
+              F.binaryPieces -> BinaryFormat.piece.writeGo(o.board match {
+                case Board.Go(board) => board.pieces
+                case _               => sys.error("invalid go board")
+              }),
+              F.positionHashes      -> o.history.positionHashes,
+              F.historyLastMove     -> o.history.lastMove.map(_.uci),
+              F.score               -> o.history.score.nonEmpty.option(o.history.score),
+              F.captures            -> o.history.captures.nonEmpty.option(o.history.captures),
+              F.pocketData          -> o.board.pocketData,
+              F.selectedSquares     -> o.metadata.selectedSquares.map(BinaryFormat.pos.writeGo),
+              F.deadStoneOfferState -> o.metadata.deadStoneOfferState.map(_.id)
+            )
           case _ => //chess or fail
             if (o.variant.standard)
               $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.pgnMoves take Game.maxPlies))
@@ -733,7 +867,7 @@ object BSONHandlers {
                   )
                   .toOption,
                 F.checkCount -> o.history.checkCount.nonEmpty.option(o.history.checkCount),
-                F.score      -> o.history.score.nonEmpty.option(o.history.score),
+                //F.score      -> o.history.score.nonEmpty.option(o.history.score),
                 F.pocketData -> o.board.pocketData
               )
             }

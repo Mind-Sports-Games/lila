@@ -8,6 +8,7 @@ import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
 import lila.i18n.{ I18nKey, I18nKeys }
+import play.api.i18n.Lang
 import lila.rating.PerfType
 import lila.user.User
 
@@ -93,14 +94,36 @@ case class Challenge(
     variant match {
       case Variant.Chess(variant) => if (variant.standardInitialPosition) none else initialFen
       case Variant.Draughts(_)    => customStartingPosition ?? initialFen
+      case Variant.Go(_)          => customStartingGoPosition ?? initialFen
       case _                      => none
     }
+
+  def customStartingGoPosition: Boolean =
+    initialFen.isDefined && !initialFen.exists(_.value == variant.initialFen.value)
 
   def customStartingPosition: Boolean =
     variant.draughtsFromPosition ||
       (draughtsFenVariants(variant) &&
         initialFen.isDefined &&
         !initialFen.exists(_.value == variant.initialFen.value))
+
+  //When updating, also edit modules/game and ui/@types/playstrategy/index.d.ts:declare type PlayerName
+  def playerTrans(p: PlayerIndex)(implicit lang: Lang): String =
+    variant.playerNames(p) match {
+      case "White" => I18nKeys.white.txt()
+      case "Black" => I18nKeys.black.txt()
+      //Xiangqi add back in when adding red as a colour for Xiangqi
+      //case "Red"   => I18nKeys.red.txt()
+      case "Sente"   => I18nKeys.sente.txt()
+      case "Gote"    => I18nKeys.gote.txt()
+      case s: String => s
+    }
+
+  def playerChoiceTrans(p: PlayerIndexChoice)(implicit lang: Lang): String = p match {
+    case PlayerIndexChoice.Random => "random"
+    case PlayerIndexChoice.P1     => playerTrans(P1)
+    case PlayerIndexChoice.P2     => playerTrans(P2)
+  }
 
   def isOpen = ~open
 
@@ -209,8 +232,10 @@ object Challenge {
         }
       )
       .orElse {
-        (variant == Variant.libFromPosition(variant.gameLogic)) option perfTypeOf(
-          Variant.libStandard(variant.gameLogic),
+        (variant.fromPositionVariant) option perfTypeOf(
+          Variant
+            .byName(variant.gameLogic, "From Position")
+            .getOrElse(Variant.orDefault(variant.gameLogic, 3)),
           timeControl
         )
       }
@@ -250,7 +275,9 @@ object Challenge {
     val finalVariant = fenVariant match {
       case Some(v) if draughtsFenVariants(variant) =>
         if (variant.draughtsFromPosition && v.draughtsStandard)
-          Variant.libFromPosition(GameLogic.Draughts())
+          Variant
+            .byName(GameLogic.Draughts(), "From Position")
+            .getOrElse(Variant.orDefault(GameLogic.Draughts(), 3))
         else v
       case _ => variant
     }
@@ -274,10 +301,11 @@ object Challenge {
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (variant == Variant.libFromPosition(variant.gameLogic)) initialFen
+        if (variant.fromPositionVariant) initialFen
         else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
           fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
         }
+        else if (variant.gameFamily == GameFamily.Go()) initialFen
         else !variant.standardInitialPosition option variant.initialFen,
       timeControl = timeControl,
       mode = finalMode,

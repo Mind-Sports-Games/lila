@@ -59,7 +59,9 @@ flipello_themes = [
 ]
 amazons_themes = [
   ['queen', 'svg'],
-  ['arrow', 'svg']
+  ['arrow', 'svg'],
+  ['counter', 'svg'],
+  ['counter_arrow', 'svg']
 ]
 oware_themes = [
   ['red', 'svg'],
@@ -71,6 +73,10 @@ oware_themes = [
 ]
 togyzkumalak_themes = [
   ['black_gloss', 'svg'],
+]
+go_themes = [
+  ['classic_stone', 'svg'],
+  ['cross', 'svg']
 ]
 types = {
   'svg' => 'svg+xml;base64,',
@@ -137,7 +143,8 @@ togyzkumalak_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-p
 ]
 togyzkumalak_extra_pieces = ['t-piece', 's10o-piece']
 togyzkumalak_variants = ['togyzkumalak']
-
+go_roles=['s-piece']
+go_variants=['go9x9', 'go13x13', 'go19x19']
 
 # inline SVG Chess
 chess_themes.map { |theme|
@@ -662,5 +669,60 @@ togyzkumalak_themes.map { |theme|
       }
   }.flatten
   File.open(dest_dir + 'togyzkumalak-' + name + '.external.css', 'w') { |f| f.puts (classes_togyzkumalak_game + classes_togyzkumalak_variant).join("\n") }
+}
+
+# inline SVG go
+go_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_go_game = colors.map { |color|
+      go_roles.map { |role|
+        piece = color[0] + role.upcase[0]
+        file = source_dir + 'go/' + name + '/' + piece + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          '.go.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }.flatten
+    classes_go_variant = go_variants.map{ |variant|
+      colors.map { |color|
+        go_roles.map { |role|
+          piece = color[0] + role.upcase[0]
+          file = source_dir + 'go/' + name + '/' + piece + '.' + ext
+          File.open(file, 'r') do|image_file|
+            image = image_file.read
+            base64 = Base64.strict_encode64(image)
+            '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+              "background-image:url('data:image/" + types[ext] + base64 + "')}"
+          end
+        }
+      }
+    }.flatten
+    File.open(dest_dir + 'go-' + name + '.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant).join("\n") }
+  }
+# external SVG loa
+go_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_go_game = colors.map { |color|
+    go_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      '.go.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+          "background-image:url('/assets/piece/" + 'go/' + name + "/" + piece + "." + ext + "')}"
+      }
+    }.flatten
+    classes_go_variant =  go_variants.map { |variant|
+      colors.map { |color|
+      go_roles.map { |role|
+          piece = color[0] + role.upcase[0]
+          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+            "background-image:url('/assets/piece/" + 'go/' + name + "/" + piece + "." + ext + "')}"
+        }
+      }
+    }.flatten
+    File.open(dest_dir + 'go-' + name + '.external.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant).join("\n") }
 }
 

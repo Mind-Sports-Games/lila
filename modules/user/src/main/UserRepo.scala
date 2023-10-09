@@ -469,7 +469,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         }
       )
       .void
-  }
+  } >>- lila.common.Bus.publish(lila.hub.actorApi.user.ChangeEmail(id, email), "email")
 
   private def anyEmail(doc: Bdoc): Option[EmailAddress] =
     doc.getAsOpt[EmailAddress](F.verbatimEmail) orElse doc.getAsOpt[EmailAddress](F.email)

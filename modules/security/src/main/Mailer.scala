@@ -96,6 +96,10 @@ object Mailer {
 ${trans.common_note("https://playstrategy.org").render}
 
 ${trans.common_contact("https://playstrategy.org/contact").render}"""
+
+    def addServiceNote(body: String)(implicit lang: Lang) = s"""$body
+
+$serviceNote"""
   }
 
   object html {

@@ -316,7 +316,10 @@ final class User(
                   "flipello10"    -> leaderboards.flipello10,
                   "amazons"       -> leaderboards.amazons,
                   "oware"         -> leaderboards.oware,
-                  "togyzkumalak"  -> leaderboards.togyzkumalak
+                  "togyzkumalak"  -> leaderboards.togyzkumalak,
+                  "go9x9"         -> leaderboards.go9x9,
+                  "go13x13"       -> leaderboards.go13x13,
+                  "go19x19"       -> leaderboards.go19x19
                 )
               )
             }

@@ -82,6 +82,7 @@ export function view(ctrl: PieceCtrl): VNode {
   ]);
 }
 
+// keep up to date with StrategyGames
 const gameFamily: GameFamilyKey[] = [
   'chess',
   'draughts',
@@ -92,6 +93,7 @@ const gameFamily: GameFamilyKey[] = [
   'amazons',
   'oware',
   'togyzkumalak',
+  'go',
 ];
 
 function gameFamilyOption(v: GameFamilyKey, sv: string) {

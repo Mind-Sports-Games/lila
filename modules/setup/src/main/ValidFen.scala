@@ -12,11 +12,12 @@ object ValidFen {
 
   def apply(strict: Boolean)(fen: FEN): Option[ValidFen] = {
     val lib = fen match {
-      case FEN.Chess(_) => GameLogic.Chess()
-      case FEN.Draughts(_) => GameLogic.Draughts()
-      case FEN.FairySF(_) => GameLogic.FairySF()
-      case FEN.Samurai(_) => GameLogic.Samurai()
+      case FEN.Chess(_)        => GameLogic.Chess()
+      case FEN.Draughts(_)     => GameLogic.Draughts()
+      case FEN.FairySF(_)      => GameLogic.FairySF()
+      case FEN.Samurai(_)      => GameLogic.Samurai()
       case FEN.Togyzkumalak(_) => GameLogic.Togyzkumalak()
+      case FEN.Go(_)           => GameLogic.Go()
     }
     for {
       parsed <- strategygames.format.Forsyth.<<<(lib, fen)

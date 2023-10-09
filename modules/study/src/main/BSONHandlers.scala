@@ -191,15 +191,15 @@ object BSONHandlers {
     import Node.{ BsonFields => F }
     for {
       ply <- doc.getAsOpt[Int](F.ply)
-      ppt <- doc.getAsOpt[Int](F.ppt)
+      ppt <- doc.getAsOpt[Int](F.ppt).orElse(Some(1))
       uci <- doc.getAsOpt[Uci](F.uci)
       san <- doc.getAsOpt[String](F.san)
       fen <- doc.getAsOpt[FEN](F.fen)
       check          = ~doc.getAsOpt[Boolean](F.check)
-      shapes         = doc.getAsOpt[Shapes](F.shapes) getOrElse Shapes.empty
-      comments       = doc.getAsOpt[Comments](F.comments) getOrElse Comments.empty
+      shapes         = doc.getAsOpt[Shapes](F.shapes).getOrElse(Shapes.empty)
+      comments       = doc.getAsOpt[Comments](F.comments).getOrElse(Comments.empty)
       gamebook       = doc.getAsOpt[Gamebook](F.gamebook)
-      glyphs         = doc.getAsOpt[Glyphs](F.glyphs) getOrElse Glyphs.empty
+      glyphs         = doc.getAsOpt[Glyphs](F.glyphs).getOrElse(Glyphs.empty)
       score          = doc.getAsOpt[Score](F.score)
       clock          = doc.getAsOpt[Centis](F.clock)
       crazy          = doc.getAsOpt[PocketData](F.crazy)
@@ -255,7 +255,7 @@ object BSONHandlers {
       val r        = new Reader(rootNode)
       Root(
         ply = r int ply,
-        plysPerTurn = r int ppt,
+        plysPerTurn = (r intO ppt) | 1,
         fen = r.get[FEN](fen),
         check = r boolD check,
         shapes = r.getO[Shapes](shapes) | Shapes.empty,

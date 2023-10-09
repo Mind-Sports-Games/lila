@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import strategygames.format.{ FEN, LexicalUci, Uci }
+import strategygames.format.{ FEN, LexicalUci, Uci, UciDump }
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameLogic }
 import org.joda.time.DateTime
@@ -48,13 +48,13 @@ object JsonApi {
     ) extends Request
         with Result {
 
-      def toUci(gl: GameLogic, gf: GameFamily) =
+      def toUci(variant: Variant) =
         PostAnalysisUci(
           fishnet,
           stockfish,
           analysis.map(o =>
             o.map({
-              case Right(e) => Right(Evaluation.toUci(e, gl, gf))
+              case Right(e) => Right(Evaluation.toUci(e, variant))
               case Left(s)  => Left(s)
             })
           )
@@ -138,9 +138,11 @@ object JsonApi {
       private val legacyDesiredNodes = 3_000_000
       val legacyAcceptableNodes      = legacyDesiredNodes * 0.9
 
-      def toUci(eval: Evaluation[LexicalUci], gl: GameLogic, gf: GameFamily): Evaluation[Uci] =
+      def toUci(eval: Evaluation[LexicalUci], variant: Variant): Evaluation[Uci] =
         Evaluation[Uci](
-          eval.pv.flatMap(u => Uci(gl, gf, u.uci)),
+          UciDump
+            .fromFishnetUci(variant, eval.pv)
+            .flatMap(lexicalUci => Uci(variant.gameLogic, variant.gameFamily, lexicalUci.uci)),
           eval.score,
           eval.time,
           eval.nodes,
@@ -236,9 +238,9 @@ object JsonApi {
     implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g =>
       Json.obj(
         "game_id"  -> g.game_id,
-        "position" -> g.position,
+        "position" -> FEN.fishnetFen(g.variant)(g.position),
         "variant"  -> g.variant,
-        "moves"    -> g.moves.map(_.fishnetUci).mkString(" ")
+        "moves"    -> UciDump.fishnetUci(g.variant, g.moves)
       )
     }
     implicit val WorkIdWrites = Writes[Work.Id] { id =>

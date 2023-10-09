@@ -126,12 +126,16 @@ object side {
           )
         },
         initialFen
-          .ifTrue(game.variant.chess960 || game.variant.gameFamily == GameFamily.Draughts())
+          .ifTrue(
+            game.variant.chess960 || game.variant.gameFamily == GameFamily
+              .Draughts() || game.variant.gameFamily == GameFamily.Go()
+          )
           .flatMap { fen =>
             (fen, game.variant) match {
               case (FEN.Chess(fen), _) =>
                 strategygames.chess.variant.Chess960.positionNumber(fen).map(_.toString)
               case (FEN.Draughts(fen), Variant.Draughts(variant)) => variant.drawTableInfo(fen)
+              case (FEN.Go(fen), Variant.Go(variant))             => variant.setupInfo(fen)
               case _                                              => sys.error("Mismatched fen gamelogic")
             }
           }
@@ -140,6 +144,7 @@ object side {
               game.variant match {
                 case Variant.Chess(_)    => "Chess960 start position: "
                 case Variant.Draughts(_) => info
+                case Variant.Go(_)       => info
                 case _                   => ""
               },
               game.variant match {
@@ -178,31 +183,35 @@ object side {
             a(href := routes.Simul.show(sim.id))(sim.fullName)
           )
         },
-        swissPairingGames.map { spg =>
-          st.section(cls := "game__multi-match")(
-            frag(
-              trans.multiMatch(),
-              if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
-              else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
-              else "",
-              s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
-                .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
-              spg.multiMatchGames
-                .foldLeft(List(spg.game))(_ ++ _)
-                .zipWithIndex
-                .map {
-                  case (mmGame, index) => {
-                    val current = if (mmGame.id == game.id) " current" else ""
-                    a(
-                      cls := s"text glpt${current} mm_game_link",
-                      href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)
-                    )(
-                      trans.gameNumberX(index + 1)
-                    )
-                  }
-                }
+        swissPairingGames.flatMap { spg =>
+          if (spg.nbGamesPerRound > 1) {
+            Some(
+              st.section(cls := "game__multi-match")(
+                frag(
+                  trans.multiMatch(),
+                  if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
+                  else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
+                  else "",
+                  s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
+                    .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
+                  spg.multiMatchGames
+                    .foldLeft(List(spg.game))(_ ++ _)
+                    .zipWithIndex
+                    .map {
+                      case (mmGame, index) => {
+                        val current = if (mmGame.id == game.id) " current" else ""
+                        a(
+                          cls := s"text glpt${current} mm_game_link",
+                          href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)
+                        )(
+                          trans.gameNumberX(index + 1)
+                        )
+                      }
+                    }
+                )
+              )
             )
-          )
+          } else None
         }
       )
     }

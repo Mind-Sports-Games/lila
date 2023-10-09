@@ -81,6 +81,7 @@ object BSON extends Handlers {
 
   final class Writer {
 
+    def bool(b: Boolean): BSONBoolean          = BSONBoolean(b)
     def boolO(b: Boolean): Option[BSONBoolean] = if (b) Some(BSONBoolean(true)) else None
     def str(s: String): BSONString             = BSONString(s)
     def strO(s: String): Option[BSONString]    = if (s.nonEmpty) Some(BSONString(s)) else None

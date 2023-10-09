@@ -35,17 +35,18 @@
 
 @each $variant in ('crazyhouse', 'minishogi') {
   .analyse.variant-#{$variant} {
-    grid-template-rows: 50px auto 3rem 50px;
+    grid-template-rows: 9.5vw auto 3rem 9.5vw;
     grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
   }
 }
 .analyse.variant-shogi {
-  grid-template-rows: 35px auto 3rem 35px;
+  grid-template-rows: 7vw auto 3rem 7vw;
   grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
 }
 
 //score for games (togyzkumalak has own layout below)
-$score-variants: ('flipello', 'flipello10', 'oware');
+$score-variants: ('flipello', 'flipello10', 'oware', 'go9x9', 'go13x13', 'go19x19');
+$go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 body.oware-light-wood .variant-oware .game-score {
   background: url(../images/board/oware/oware_light_wood_house.png);
@@ -65,6 +66,28 @@ body.togyzkumalak-blue .variant-togyzkumalak .game-score {
 body.togyzkumalak-wood .variant-togyzkumalak .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
   background-size: cover;
+}
+
+@each $variant in $go-variants {
+  body.go-light-wood .variant-#{$variant} .game-score.game-score-top {
+    background: url(../images/board/go/svg/go_pot_white_light.svg);
+    background-size: cover;
+  }
+
+  body.go-light-wood .variant-#{$variant} .game-score.game-score-bottom {
+    background: url(../images/board/go/svg/go_pot_black_light.svg);
+    background-size: cover;
+  }
+
+  body.go-dark-wood .variant-#{$variant} .game-score.game-score-top {
+    background: url(../images/board/go/svg/go_pot_white_dark.svg);
+    background-size: cover;
+  }
+
+  body.go-dark-wood .variant-#{$variant} .game-score.game-score-bottom {
+    background: url(../images/board/go/svg/go_pot_black_dark.svg);
+    background-size: cover;
+  }
 }
 
 $pocket-col1-size: 5rem;

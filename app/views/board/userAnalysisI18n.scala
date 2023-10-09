@@ -47,6 +47,7 @@ object userAnalysisI18n {
     trans.checkersConnected,
     trans.gameFinished,
     trans.variantEnding,
+    trans.gameFinishedRepetition,
     trans.playerIndexPlays,
     trans.gameOver,
     trans.importPgn,

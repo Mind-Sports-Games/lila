@@ -130,7 +130,7 @@ object TournamentShield {
       val arenaFormat: String,
       val arenaDescription: String
   ) {
-    def hasAllVariants  = eligibleVariants == Variant.all
+    def hasAllVariants  = eligibleVariants == Variant.all.filterNot(_.fromPositionVariant)
     def medleyName      = s"${name} Medley Shield"
     def url             = s"https://playstrategy.org/tournament/medley-shield/${key}"
     def arenaFormatFull = s"${arenaFormat} Each variant is active for ${arenaMedleyMinutes} minutes."
@@ -140,24 +140,34 @@ object TournamentShield {
 
   object MedleyShield {
 
+    private def generateOnePerGameGroup(variants: List[Variant], gameGroups: List[GameGroup]) =
+      Random.shuffle(
+        gameGroups.map(gg =>
+          Random
+            .shuffle(
+              gg.variants.filter(v => variants.contains(v))
+            )
+            .head
+        )
+      )
+
     private def playStrategyMedleyGeneration(variants: List[Variant]) = {
-      val thisOrder =
-        Random.shuffle(variants)
+      val thisOrder       = Random.shuffle(variants)
       val gameGroups      = GameGroup.medley.filter(gg => gg.variants.exists(thisOrder.contains(_)))
-      val onePerGameGroup = Random.shuffle(gameGroups.map(gg => Random.shuffle(gg.variants).head))
+      val onePerGameGroup = generateOnePerGameGroup(thisOrder, gameGroups)
       val newOrder        = onePerGameGroup ::: thisOrder.filterNot(onePerGameGroup.contains(_))
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         newOrder,
         5 * 60,
         playStrategyMinutes,
         playStrategymMinutes,
-        7,
+        playStrategyRounds,
         true
       )
     }
-    private val playStrategyMinutes  = 105
+    private val playStrategyMinutes  = 120
     private val playStrategymMinutes = 15
-    private val playStrategyRounds   = 7
+    private val playStrategyRounds   = 8
 
     case object PlayStrategyMedley
         extends MedleyShield(
@@ -170,9 +180,9 @@ object TournamentShield {
           19,
           playStrategyMinutes,
           playStrategymMinutes,
-          s"${playStrategyRounds} round Swiss with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
-          s"${playStrategyRounds} variant Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}.",
-          s"PlayStrategy Medley Arena with one game from each of the ${GameFamily.all.length} Game Families picked: ${GameFamily.all.map(VariantKeys.gameFamilyName).sorted.mkString(", ")}."
+          s"${playStrategyRounds} round Swiss with one game from each of the ${GameGroup.medley.length} Game Families picked: ${GameGroup.medley.map(VariantKeys.gameGroupName).sorted.mkString(", ")}.",
+          s"${playStrategyRounds} variant Arena with one game from each of the ${GameGroup.medley.length} Game Families picked: ${GameGroup.medley.map(VariantKeys.gameGroupName).sorted.mkString(", ")}.",
+          s"PlayStrategy Medley Arena with one game from each of the ${GameGroup.medley.length} Game Families picked: ${GameGroup.medley.map(VariantKeys.gameGroupName).sorted.mkString(", ")}."
         )
 
     private def randomChessVariantOrder(variants: List[Variant]) = {
@@ -261,13 +271,19 @@ object TournamentShield {
       val variant: Variant,
       val speed: Schedule.Speed,
       val dayOfMonth: Int,
-      val offsetHour: Int = 0
+      val group: Int = 0
   ) {
     def key                       = variant.key
     def name                      = VariantKeys.variantName(variant)
     def iconChar                  = variant.perfIcon
     def matches(tour: Tournament) = Some(variant).has(tour.variant)
-    def scheduleHour              = TournamentShield.defaultShieldHour + offsetHour
+
+    private def hoursList(month: Int) =
+      if (month % 2 == 0) TournamentShield.defaultShieldHours
+      else TournamentShield.alternateShieldHours
+
+    def scheduleHour(month: Int) =
+      hoursList(month).lift(group).getOrElse(TournamentShield.defaultShieldHours(0))
   }
 
   object Category {
@@ -426,7 +442,7 @@ object TournamentShield {
           Variant.Draughts(strategygames.draughts.variant.Portuguese),
           Blitz32,
           27,
-          -1
+          1
         )
 
     case object English
@@ -434,13 +450,13 @@ object TournamentShield {
           Variant.Draughts(strategygames.draughts.variant.English),
           Blitz32,
           28,
-          -1
+          1
         )
 
     case object Shogi
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.Shogi),
-          Blitz53,
+          Byoyomi510,
           4
         )
 
@@ -454,7 +470,7 @@ object TournamentShield {
     case object MiniShogi
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.MiniShogi),
-          Blitz32,
+          Byoyomi35,
           13
         )
 
@@ -484,7 +500,7 @@ object TournamentShield {
           Variant.FairySF(strategygames.fairysf.variant.Amazons),
           Blitz32,
           25,
-          -1
+          1
         )
 
     case object Oware
@@ -499,7 +515,28 @@ object TournamentShield {
           Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak),
           Blitz53,
           26,
-          -1
+          1
+        )
+    case object Go9x9
+        extends Category(
+          Variant.Go(strategygames.go.variant.Go9x9),
+          Blitz32,
+          24,
+          1
+        )
+    case object Go13x13
+        extends Category(
+          Variant.Go(strategygames.go.variant.Go13x13),
+          Blitz53,
+          12,
+          1
+        )
+    case object Go19x19
+        extends Category(
+          Variant.Go(strategygames.go.variant.Go19x19),
+          Blitz53,
+          1,
+          1
         )
 
     val all: List[Category] = List(
@@ -534,7 +571,10 @@ object TournamentShield {
       Flipello10,
       Amazons,
       Oware,
-      Togyzkumalak
+      Togyzkumalak,
+      Go9x9,
+      Go13x13,
+      Go19x19
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)
@@ -542,7 +582,8 @@ object TournamentShield {
     def byKey(k: String): Option[Category] = all.find(_.key == k)
   }
 
-  val defaultShieldHour = 18 //UTC
+  val defaultShieldHours   = List(18, 12) //UTC
+  val alternateShieldHours = defaultShieldHours.reverse
 
   def spotlight(name: String, icon: Char) =
     Spotlight(

@@ -42,19 +42,6 @@ object home {
     ) {
       main(cls := "tour-home")(
         st.aside(cls := "tour-home__side")(
-          h2(
-            a(href := routes.Tournament.leaderboard)(trans.leaderboard())
-          ),
-          ul(cls := "leaderboard")(
-            winners.top.map { w =>
-              li(
-                userIdLink(w.userId.some),
-                a(title := w.tourName, href := routes.Tournament.show(w.tourId))(
-                  scheduledTournamentNameShortHtml(w.tourName)
-                )
-              )
-            }
-          ),
           p(cls := "tour__links")(
             ctx.me map { me =>
               frag(
@@ -67,6 +54,19 @@ object home {
             a(href := routes.Tournament.history(Freq.Introductory.name))(trans.arena.history()),
             br,
             a(href := routes.Tournament.help("arena".some))(trans.tournamentFAQ())
+          ),
+          h2(
+            a(href := routes.Tournament.leaderboard)(trans.leaderboard())
+          ),
+          ul(cls := "leaderboard")(
+            winners.top.map { w =>
+              li(
+                userIdLink(w.userId.some),
+                a(title := w.tourName, href := routes.Tournament.show(w.tourId))(
+                  scheduledTournamentNameShortHtml(w.tourName)
+                )
+              )
+            }
           ),
           h2(trans.playstrategyTournaments()),
           div(cls := "scheduled")(

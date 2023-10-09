@@ -38,44 +38,35 @@ case class Country(code: String) extends AnyVal
 
 case class StripeSubscriptions(data: List[StripeSubscription])
 
-case class StripePlan(id: String, name: String, amount: Cents) {
-  def cents = amount
+case class StripeProducts(monthly: String, onetime: String)
+
+case class StripeItem(id: String, price: StripePrice)
+
+case class StripePrice(product: String, unit_amount: Cents) {
+  def cents = unit_amount
   def usd   = cents.usd
 }
-object StripePlan {
-  def make(cents: Cents, freq: Freq): StripePlan =
-    freq match {
-      case Freq.Monthly =>
-        StripePlan(
-          id = s"monthly_${cents.value}",
-          name = s"Monthly ${cents.usd}",
-          amount = cents
-        )
-      case Freq.Onetime =>
-        StripePlan(
-          id = s"onetime_${cents.value}",
-          name = s"One-time ${cents.usd}",
-          amount = cents
-        )
-    }
-
+object StripePrice {
   val defaultAmounts = List(5, 10, 20, 50).map(Usd.apply).map(_.cents)
 }
 
+case class NextUrls(cancel: String, success: String)
+
 case class StripeSession(id: SessionId)
 case class CreateStripeSession(
-    success_url: String,
-    cancel_url: String,
-    customer_id: CustomerId,
-    checkout: Checkout
+    customerId: CustomerId,
+    checkout: Checkout,
+    urls: NextUrls,
+    isLifetime: Boolean
 )
 
 case class StripeSubscription(
     id: String,
-    plan: StripePlan,
+    item: StripeItem,
     customer: CustomerId,
     cancel_at_period_end: Boolean,
-    status: String
+    status: String,
+    default_payment_method: Option[String]
 ) {
   def renew    = !cancel_at_period_end
   def isActive = status == "active"
@@ -88,10 +79,7 @@ case class StripeCustomer(
 ) {
 
   def firstSubscription = subscriptions.data.headOption
-
-  def plan = firstSubscription.map(_.plan)
-
-  def renew = firstSubscription ?? (_.renew)
+  def renew             = firstSubscription ?? (_.renew)
 }
 
 case class StripeCharge(
@@ -112,16 +100,22 @@ object StripeCharge {
 case class StripeInvoice(
     id: Option[String],
     amount_due: Int,
-    date: Long,
+    created: Long,
     paid: Boolean
 ) {
   def cents    = Cents(amount_due)
   def usd      = cents.usd
-  def dateTime = new DateTime(date * 1000)
+  def dateTime = new DateTime(created * 1000)
 }
 
-case class StripeCompletedSession(
-    customer: CustomerId,
-    mode: String,
-    subscription: Option[SubscriptionId]
-)
+case class StripePaymentMethod(card: Option[StripeCard])
+
+case class StripeCard(brand: String, last4: String, exp_year: Int, exp_month: Int)
+
+case class StripeCompletedSession(customer: CustomerId, mode: String) {
+  def freq = if (mode == "subscription") Freq.Monthly else Freq.Onetime
+}
+
+case class StripeSetupIntent(payment_method: String)
+
+case class StripeSessionWithIntent(setup_intent: StripeSetupIntent)
