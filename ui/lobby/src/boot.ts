@@ -209,6 +209,38 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     history.replaceState(null, '', '/');
   }
 
+  const $gamelist_button_right = $('#slideRight'),
+    $gamelist_button_left = $('#slideLeft');
+  $gamelist_button_right.on(clickEvent, () => {
+    const container = document.getElementById('game-icons-container');
+    if (container) sideScroll(container, 'right', 25, 100, 10);
+  });
+  $gamelist_button_left.on(clickEvent, () => {
+    const container = document.getElementById('game-icons-container');
+    if (container) sideScroll(container, 'left', 25, 100, 10);
+  });
+
+  function sideScroll(
+    element: HTMLElement,
+    direction: 'right' | 'left',
+    speed: number,
+    distance: number,
+    step: number
+  ) {
+    let scrollAmount = 0;
+    var slideTimer = setInterval(function () {
+      if (direction == 'left') {
+        element.scrollLeft -= step;
+      } else {
+        element.scrollLeft += step;
+      }
+      scrollAmount += step;
+      if (scrollAmount >= distance) {
+        window.clearInterval(slideTimer);
+      }
+    }, speed);
+  }
+
   suggestBgSwitch();
 
   const chatOpts = opts.chat;
