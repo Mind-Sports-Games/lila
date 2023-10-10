@@ -5,6 +5,8 @@ import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import strategygames.variant.Variant
+import lila.i18n.VariantKeys
 
 object bits {
 
@@ -199,6 +201,28 @@ object bits {
           weekCha.previousName
         ),
         userIdLink(weekCha.winner.some, dataIcon = 'g'.some)
+      )
+    )
+
+  def gameList(implicit ctx: Context) =
+    div(cls := "lobby__gamelist lobby__box")(
+      div(cls := "lobby__box__top")(
+        h2(cls := "title text")(trans.learnHowToPlay()),
+        a(cls := "more", href := "/variant")(trans.more(), " »")
+      ),
+      div(cls := "game-icon-area")(
+        div(cls := "arrow", title := "Prev", id := "slideLeft", dataIcon := "I")(),
+        div(cls := "game-icon-list", id := "game-icons-container")(
+          Variant.all
+            .filterNot(v => List("standard", "fromPosition").contains(v.key))
+            .map(v =>
+              a(cls := "game-icon", href := s"/variant/${v.key}")(
+                i(cls := "img", dataIcon := v.perfIcon),
+                p(cls := "text")(VariantKeys.variantName(v))
+              )
+            )
+        ),
+        div(cls := "arrow", title := "Next", id := "slideRight", dataIcon := "H")()
       )
     )
 
