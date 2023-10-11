@@ -232,7 +232,7 @@ object bits {
     val gameGroups      = GameGroup.medley.filter(gg => gg.variants.exists(randomOrder.contains(_)))
     val onePerGameGroup = generateOnePerGameGroup(randomOrder, gameGroups)
     val newOrder        = onePerGameGroup ::: randomOrder.filterNot(onePerGameGroup.contains(_))
-    newOrder
+    newOrder ::: newOrder ::: newOrder // 3 copies for infinte scroll
   }
 
   private def generateOnePerGameGroup(variants: List[Variant], gameGroups: List[GameGroup]) =
