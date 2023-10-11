@@ -210,15 +210,23 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   }
 
   const $gamelist_button_right = $('#slideRight'),
-    $gamelist_button_left = $('#slideLeft');
+    $gamelist_button_left = $('#slideLeft'),
+    container = document.getElementById('game-icons-container');
   $gamelist_button_right.on(clickEvent, () => {
-    const container = document.getElementById('game-icons-container');
     if (container) sideScroll(container, 'right', 25, 100, 10);
   });
   $gamelist_button_left.on(clickEvent, () => {
-    const container = document.getElementById('game-icons-container');
     if (container) sideScroll(container, 'left', 25, 100, 10);
   });
+  if (container) {
+    let fullElementWidth = 0;
+    container.childNodes.forEach(n => {
+      if (n instanceof HTMLElement) {
+        fullElementWidth += n.offsetWidth;
+      }
+    });
+    container.scrollLeft = fullElementWidth / 3;
+  }
 
   function sideScroll(
     element: HTMLElement,
@@ -227,6 +235,13 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     distance: number,
     step: number
   ) {
+    let fullElementWidth = 0;
+    element.childNodes.forEach(n => {
+      if (n instanceof HTMLElement) {
+        fullElementWidth += n.offsetWidth;
+      }
+    });
+
     let scrollAmount = 0;
     var slideTimer = setInterval(function () {
       if (direction == 'left') {
@@ -234,6 +249,8 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       } else {
         element.scrollLeft += step;
       }
+      if (element.scrollLeft <= 0) element.scrollLeft += fullElementWidth / 3;
+      if (element.scrollLeft >= fullElementWidth - element.offsetWidth) element.scrollLeft -= fullElementWidth / 3;
       scrollAmount += step;
       if (scrollAmount >= distance) {
         window.clearInterval(slideTimer);
