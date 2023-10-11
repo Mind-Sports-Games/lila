@@ -557,7 +557,8 @@ final class TournamentApi(
               } yield Math.round {
                 (player.performance * (nbGames - 1) + performance) / nbGames
               } toInt
-            } | player.performance
+            } | player.performance,
+            playedGames = sheet.scores.size > 0
           )
         } >>- finishing.flatMap(_.p1Player.userId).foreach { p1UserId =>
           playerIndexHistoryApi.inc(player.id, strategygames.Player.fromP1(player is p1UserId))
