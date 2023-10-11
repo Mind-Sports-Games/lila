@@ -61,9 +61,8 @@ final class Page(
         variant <- (Variant.all).map { v =>
           (v.key, v)
         }.toMap get key
-        perfType <- lila.rating.PerfType byVariant variant
       } yield OptionOk(prismicC getBookmark key) { case (doc, resolver) =>
-        views.html.site.variant.show(doc, resolver, variant, perfType)
+        views.html.site.variant.show(doc, resolver, variant)
       }) | notFound
     }
 }
