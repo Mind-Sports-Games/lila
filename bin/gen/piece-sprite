@@ -111,7 +111,6 @@ shogi_roles_to_imageprefix = [
     ['pb-piece','UM']
   ]
 shogi_colors = ['0','1']
-shogi_variants = ['shogi', 'minishogi']
 xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece', 'pp-piece']
 xiangqi_colors = ['B','R']
 xiangqi_variants = ['xiangqi', 'minixiangqi']
@@ -122,26 +121,9 @@ oware_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-piece','
 's21-piece','s22-piece','s23-piece','s24-piece','s25-piece','s26-piece','s27-piece','s28-piece','s29-piece','s30-piece',
 's31-piece','s32-piece','s33-piece','s34-piece','s35-piece','s36-piece','s37-piece','s38-piece','s39-piece','s40-piece',
 's41-piece','s42-piece','s43-piece','s44-piece','s45-piece','s46-piece','s47-piece','s48-piece']
-oware_variants = ['oware']
-togyzkumalak_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-piece','s7-piece','s8-piece','s9-piece','s10-piece',
-'s11-piece','s12-piece','s13-piece','s14-piece','s15-piece','s16-piece','s17-piece','s18-piece','s19-piece','s20-piece',
-'s21-piece','s22-piece','s23-piece','s24-piece','s25-piece','s26-piece','s27-piece','s28-piece','s29-piece','s30-piece',
-'s31-piece','s32-piece','s33-piece','s34-piece','s35-piece','s36-piece','s37-piece','s38-piece','s39-piece','s40-piece',
-'s41-piece','s42-piece','s43-piece','s44-piece','s45-piece','s46-piece','s47-piece','s48-piece','s49-piece','s50-piece',
-'s51-piece','s52-piece','s53-piece','s54-piece','s55-piece','s56-piece','s57-piece','s58-piece','s59-piece','s60-piece',
-'s61-piece','s62-piece','s63-piece','s64-piece','s65-piece','s66-piece','s67-piece','s68-piece','s69-piece','s70-piece',
-'s71-piece','s72-piece','s73-piece','s74-piece','s75-piece','s76-piece','s77-piece','s78-piece','s79-piece','s80-piece',
-'s81-piece','s82-piece','s83-piece','s84-piece','s85-piece','s86-piece','s87-piece','s88-piece','s89-piece','s90-piece',
-'s91-piece','s92-piece','s93-piece','s94-piece','s95-piece','s96-piece','s97-piece','s98-piece','s99-piece','s100-piece',
-'s101-piece','s102-piece','s103-piece','s104-piece','s105-piece','s106-piece','s107-piece','s108-piece','s109-piece','s110-piece',
-'s111-piece','s112-piece','s113-piece','s114-piece','s115-piece','s116-piece','s117-piece','s118-piece','s119-piece','s120-piece',
-'s121-piece','s122-piece','s123-piece','s124-piece','s125-piece','s126-piece','s127-piece','s128-piece','s129-piece','s130-piece',
-'s131-piece','s132-piece','s133-piece','s134-piece','s135-piece','s136-piece','s137-piece','s138-piece','s139-piece','s140-piece',
-'s141-piece','s142-piece','s143-piece','s144-piece','s145-piece','s146-piece','s147-piece','s148-piece','s149-piece','s150-piece',
-'s151-piece','s152-piece','s153-piece','s154-piece','s155-piece','s156-piece','s157-piece','s158-piece','s159-piece','s160-piece',
-'s161-piece','s162-piece', 't-piece', 's10o-piece'
-]
-togyzkumalak_extra_pieces = ['t-piece', 's10o-piece']
+togyzkumalak_base_image_names = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17',
+'18', '19', '20', 't', 's10o']
+togyzkumalak_extra_names = ['t', 's10o']
 togyzkumalak_variants = ['togyzkumalak']
 go_roles=['s-piece']
 go_variants=['go9x9', 'go13x13', 'go19x19']
@@ -321,7 +303,7 @@ loa_themes.map { |theme|
 shogi_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
-  classes_shogi_game = shogi_colors.map { |color|
+  classes_shogi_game_and_variant = shogi_colors.map { |color|
     shogi_roles_to_imageprefix.map { |role_image|
       role = role_image[0]
       role_piece_prefix = role_image[1]
@@ -331,57 +313,32 @@ shogi_themes.map { |theme|
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.shogi.is2d .' + role + '.' + color_class + ' {' +
+        '.shogi.is2d .' + role + '.' + color_class + 
+        ', ' + '.is2d .variant-shogi' + ' .' + role + '.' + color_class + 
+        ', ' + '.is2d .variant-minishogi' + ' .' + role + '.' + color_class + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
   }.flatten
-  classes_shogi_variant = shogi_variants.map { |variant|
-    shogi_colors.map { |color|
-      shogi_roles_to_imageprefix.map { |role_image|
-        role = role_image[0]
-        role_piece_prefix = role_image[1]
-        piece = color[0] + role_piece_prefix
-        file = source_dir + 'shogi/' + name + '/' + piece + '.' + ext
-        color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.p2' : '.p1') : '')
-        File.open(file, 'r') do|image_file|
-          image = image_file.read
-          base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .'  + role + '.' + color_class + ' {' +
-            "background-image:url('data:image/" + types[ext] + base64 + "')}"
-        end
-      }
-    }
-  }.flatten
-  File.open(dest_dir + 'shogi-' + name + '.css', 'w') { |f| f.puts (classes_shogi_game + classes_shogi_variant).join("\n") }
+  File.open(dest_dir + 'shogi-' + name + '.css', 'w') { |f| f.puts (classes_shogi_game_and_variant).join("\n") }
 }
 # external SVG shogi
 shogi_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
-  classes_shogi_game = shogi_colors.map { |color|
+  classes_shogi_game_and_variant = shogi_colors.map { |color|
     shogi_roles_to_imageprefix.map { |role_image|
       role = role_image[0]
       role_piece_prefix = role_image[1] 
       piece = color[0] + role_piece_prefix
       color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.p2' : '.p1') : '')
-      '.shogi.is2d .' + role + '.' + color_class + ' {' +
+      '.shogi.is2d .' + role + '.' + color_class +
+        ', ' + '.is2d .variant-shogi' + ' .' + role + '.' + color_class + 
+        ', ' + '.is2d .variant-minishogi' + ' .' + role + '.' + color_class + ' {' +
         "background-image:url('/assets/piece/" + 'shogi/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
-  classes_shogi_variant = shogi_variants.map { |variant|
-    shogi_colors.map { |color|
-      shogi_roles_to_imageprefix.map { |role_image|
-        role = role_image[0]
-        role_piece_prefix = role_image[1]
-        piece = color[0] + role_piece_prefix
-        color_class = (color == '0' ? 'ally' : 'enemy') + (role == 'k-piece' ? (role_piece_prefix == 'OU' ? '.p2' : '.p1') : '')
-        '.is2d .variant-' + variant + ' .' + role + '.' + color_class + ' {' +
-          "background-image:url('/assets/piece/" + 'shogi/' + name + "/" + piece + "." + ext + "')}"
-      }
-    }
-  }.flatten
-  File.open(dest_dir + 'shogi-' + name + '.external.css', 'w') { |f| f.puts (classes_shogi_game + classes_shogi_variant).join("\n") }
+  File.open(dest_dir + 'shogi-' + name + '.external.css', 'w') { |f| f.puts (classes_shogi_game_and_variant).join("\n") }
 }
 
 # inline SVG xiangqi
@@ -443,55 +400,36 @@ xiangqi_themes.map { |theme|
 flipello_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
-  classes_flipello_game = colors.map { |color|
+  classes_flipello = colors.map { |color|
     flipello_roles.map { |role|
       piece = color[0] + role.upcase[0]
       file = source_dir + 'flipello/' + name + '/' + piece + '.' + ext
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+        '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') +
+         ', ' + '.is2d .variant-flipello' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + 
+         ', ' + '.is2d .variant-flipello10' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
   }.flatten
-  classes_flipello_variant = flipello_variants.map{ |variant|
-    colors.map { |color|
-      flipello_roles.map { |role|
-        piece = color[0] + role.upcase[0]
-        file = source_dir + 'flipello/' + name + '/' + piece + '.' + ext
-        File.open(file, 'r') do|image_file|
-          image = image_file.read
-          base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
-            "background-image:url('data:image/" + types[ext] + base64 + "')}"
-        end
-      }
-    }
-  }.flatten
-  File.open(dest_dir + 'flipello-' + name + '.css', 'w') { |f| f.puts (classes_flipello_game + classes_flipello_variant).join("\n") }
+  File.open(dest_dir + 'flipello-' + name + '.css', 'w') { |f| f.puts (classes_flipello).join("\n") }
 }
 # external SVG flipello
 flipello_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
-  classes_flipello_game = colors.map { |color|
+  classes_flipello = colors.map { |color|
     flipello_roles.map { |role|
       piece = color[0] + role.upcase[0]
-      '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
+      '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + 
+      ', ' + '.is2d .variant-flipello' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + 
+      ', ' + '.is2d .variant-flipello10' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
         "background-image:url('/assets/piece/" + 'flipello/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
-  classes_flipello_variant = flipello_variants.map { |variant|
-    colors.map { |color|
-      flipello_roles.map { |role|
-        piece = color[0] + role.upcase[0]
-        '.is2d .variant-' + variant + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
-          "background-image:url('/assets/piece/" + 'flipello/' + name + "/" + piece + "." + ext + "')}"
-      }
-    }
-  }.flatten
-  File.open(dest_dir + 'flipello-' + name + '.external.css', 'w') { |f| f.puts (classes_flipello_game + classes_flipello_variant).join("\n") }
+  File.open(dest_dir + 'flipello-' + name + '.external.css', 'w') { |f| f.puts (classes_flipello).join("\n") }
 }
 
 # inline SVG amazons
@@ -553,122 +491,81 @@ amazons_themes.map { |theme|
 oware_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
-  classes_oware_game = oware_roles.map { |role|
+  classes_oware = oware_roles.map { |role|
     count = role.split('-')[0][1..-1]
       file = source_dir + 'oware/' + name + '/' + count + '.' + ext
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.oware.is2d .' + role + ' {' +
+        '.oware.is2d .' + role + ', ' + '.is2d .variant-oware' + ' .' + role + ' {' +
           "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
   }.flatten
-  classes_oware_variant = oware_variants.map{ |variant|
-      oware_roles.map { |role|
-        count = role.split('-')[0][1..-1]
-        file = source_dir + 'oware/' + name + '/' + count + '.' + ext
-        File.open(file, 'r') do|image_file|
-          image = image_file.read
-          base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + ' {' +
-            "background-image:url('data:image/" + types[ext] + base64 + "')}"
-        end
-      }
-  }.flatten
-  File.open(dest_dir + 'oware-' + name + '.css', 'w') { |f| f.puts (classes_oware_game + classes_oware_variant).join("\n") }
+  File.open(dest_dir + 'oware-' + name + '.css', 'w') { |f| f.puts (classes_oware).join("\n") }
 }
 # external SVG oware
 oware_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
-  classes_oware_game = oware_roles.map { |role|
+  classes_oware = oware_roles.map { |role|
     count = role.split('-')[0][1..-1]
-      '.oware.is2d .' + role + ' {' +
+      '.oware.is2d .' + role + ', ' + '.is2d .variant-oware' + ' .' + role + ' {' +
         "background-image:url('/assets/piece/" + 'oware/' + name + "/" + count + "." + ext + "')}"
   }.flatten
-  classes_oware_variant = oware_variants.map { |variant|
-      oware_roles.map { |role|
-        count = role.split('-')[0][1..-1]
-        '.is2d .variant-' + variant + ' .' + role + ' {' +
-          "background-image:url('/assets/piece/" + 'oware/' + name + "/" + count + "." + ext + "')}"
-      }
-  }.flatten
-  File.open(dest_dir + 'oware-' + name + '.external.css', 'w') { |f| f.puts (classes_oware_game + classes_oware_variant).join("\n") }
+  File.open(dest_dir + 'oware-' + name + '.external.css', 'w') { |f| f.puts (classes_oware).join("\n") }
 }
 
 # inline SVG togyzkumalak
 togyzkumalak_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
-  classes_togyzkumalak_game = togyzkumalak_roles.map { |role|
-    if togyzkumalak_extra_pieces.include?(role)
-      count = role.split('-')[0]
+  classes_togyzkumalak_game_and_variant = togyzkumalak_base_image_names.map { |image_name|
+    if togyzkumalak_extra_names.include?(image_name)
+      role = image_name + '-piece'
     else
-      count = role.split('-')[0][1..-1].to_i
-      if count > 20
-        count = (count % 10) + 10
+      role = 's' + image_name + '-piece'
+    end
+    initial_css = '.togyzkumalak.is2d .' + role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + role
+    if !togyzkumalak_extra_names.include?(image_name) && image_name.to_i > 9 && image_name.to_i < 20
+      for a in 1..15 do
+        extra_role = 's' + (image_name.to_i + a*10).to_s + '-piece'
+        if (image_name.to_i + a*10 <= 162 && !(a==1 && image_name=='10'))
+          initial_css = initial_css + ', .togyzkumalak.is2d .' + extra_role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + extra_role
+        end
       end
     end
-    file = source_dir + 'togyzkumalak/' + name + '/' + count.to_s + '.' + ext
+    file = source_dir + 'togyzkumalak/' + name + '/' + image_name + '.' + ext
       File.open(file, 'r') do|image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
-        '.togyzkumalak.is2d .' + role + ' {' +
-          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        initial_css + ' {' + "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
   }.flatten
-  classes_togyzkumalak_variant = togyzkumalak_variants.map{ |variant|
-      togyzkumalak_roles.map { |role|
-        if togyzkumalak_extra_pieces.include?(role)
-          count = role.split('-')[0]
-        else
-          count = role.split('-')[0][1..-1].to_i
-          if count > 20
-            count = (count % 10) + 10
-          end
-        end
-        file = source_dir + 'togyzkumalak/' + name + '/' + count.to_s + '.' + ext
-        File.open(file, 'r') do|image_file|
-          image = image_file.read
-          base64 = Base64.strict_encode64(image)
-          '.is2d .variant-' + variant + ' .' + role + ' {' +
-            "background-image:url('data:image/" + types[ext] + base64 + "')}"
-        end
-      }
-  }.flatten
-  File.open(dest_dir + 'togyzkumalak-' + name + '.css', 'w') { |f| f.puts (classes_togyzkumalak_game + classes_togyzkumalak_variant).join("\n") }
+  File.open(dest_dir + 'togyzkumalak-' + name + '.css', 'w') { |f| f.puts (classes_togyzkumalak_game_and_variant).join("\n") }
 }
 # external SVG togyzkumalak
 togyzkumalak_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
-  classes_togyzkumalak_game = togyzkumalak_roles.map { |role|
-    if togyzkumalak_extra_pieces.include?(role)
-      count = role.split('-')[0]
+  classes_togyzkumalak_game_and_variant = togyzkumalak_base_image_names.map { |image_name|
+    if togyzkumalak_extra_names.include?(image_name)
+      role = image_name + '-piece'
     else
-      count = role.split('-')[0][1..-1].to_i
-      if count > 20
-        count = (count % 10) + 10
-      end
+      role = 's' + image_name + '-piece'
     end
-      '.togyzkumalak.is2d .' + role + ' {' +
-        "background-image:url('/assets/piece/" + 'togyzkumalak/' + name + "/" + count.to_s + "." + ext + "')}"
-  }.flatten
-  classes_togyzkumalak_variant = togyzkumalak_variants.map { |variant|
-      togyzkumalak_roles.map { |role|
-        if togyzkumalak_extra_pieces.include?(role)
-          count = role.split('-')[0]
-        else
-          count = role.split('-')[0][1..-1].to_i
-          if count > 20
-            count = (count % 10) + 10
-          end
+    initial_css = '.togyzkumalak.is2d .' + role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + role
+    if !togyzkumalak_extra_names.include?(image_name) && image_name.to_i > 9 && image_name.to_i < 20
+      for a in 1..15 do
+        extra_role = 's' + (image_name.to_i + a*10).to_s + '-piece'
+        if (image_name.to_i + a*10 <= 162 && !(a==1 && image_name=='10'))
+          initial_css = initial_css + ', .togyzkumalak.is2d .' + extra_role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + extra_role
         end
-        '.is2d .variant-' + variant + ' .' + role + ' {' +
-          "background-image:url('/assets/piece/" + 'togyzkumalak/' + name + "/" + count.to_s + "." + ext + "')}"
-      }
+      end
+    end        
+      initial_css + ' {' +
+        "background-image:url('/assets/piece/" + 'togyzkumalak/' + name + "/" + image_name + "." + ext + "')}"
   }.flatten
-  File.open(dest_dir + 'togyzkumalak-' + name + '.external.css', 'w') { |f| f.puts (classes_togyzkumalak_game + classes_togyzkumalak_variant).join("\n") }
+  File.open(dest_dir + 'togyzkumalak-' + name + '.external.css', 'w') { |f| f.puts (classes_togyzkumalak_game_and_variant).join("\n") }
 }
 
 # inline SVG go
