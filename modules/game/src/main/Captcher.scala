@@ -6,13 +6,13 @@ import cats.data.NonEmptyList
 import strategygames.format.pgn.{ Sans, Tags }
 import strategygames.chess.format.pgn
 import strategygames.format.Forsyth
-import strategygames.{ Game => StratGame }
+import strategygames.{ Actions, Game => StratGame }
 import scala.util.Success
 
 import lila.common.Captcha
 import lila.hub.actorApi.captcha._
 
-// only works with standard chess (not chess960)
+// only works with standard chess
 final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext)
     extends Actor {
 
@@ -71,14 +71,13 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
       gameRepo game id flatMap { _ ?? fromGame }
 
     private def fromGame(game: Game): Fu[Option[Captcha]] =
-      gameRepo getOptionPgn game.id map {
+      gameRepo getOptionActions game.id map {
         _ flatMap { makeCaptcha(game, _) }
       }
 
-    // Captchas can remain as chess games IMO
-    private def makeCaptcha(game: Game, moves: PgnMoves): Option[Captcha] =
+    private def makeCaptcha(game: Game, actions: Actions): Option[Captcha] =
       for {
-        rewinded  <- rewind(moves)
+        rewinded  <- rewind(actions)
         solutions <- solve(rewinded)
         moves = rewinded.situation.destinations map { case (from, dests) =>
           from.key -> dests.mkString
@@ -96,10 +95,10 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
         s"${move.orig} ${move.dest}"
       } toNel
 
-    private def rewind(moves: PgnMoves): Option[StratGame] =
+    private def rewind(actions: Actions): Option[StratGame] =
       pgn.Reader
-        .movesWithSans(
-          moves,
+        .replayResultFromActionsUsingSan(
+          actions,
           sans => Sans(safeInit(sans.value)),
           tags = Tags.empty
         )

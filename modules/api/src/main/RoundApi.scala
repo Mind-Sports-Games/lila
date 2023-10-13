@@ -212,6 +212,8 @@ final private[api] class RoundApi(
     obj + ("steps" -> lila.round.StepBuilder(
       id = pov.gameId,
       actions = pov.game.actions,
+      startPlayer = pov.game.startPlayerIndex,
+      activePlayer = pov.game.activePlayer,
       variant = pov.game.variant,
       initialFen = initialFen | pov.game.variant.initialFen
     ))

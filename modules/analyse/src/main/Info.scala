@@ -6,8 +6,8 @@ import strategygames.format.Uci
 
 import lila.tree.Eval
 
+//TODO Info is limited to Chess and does not handle multiaction
 case class Info(
-    //TODO add turn for multiaction
     ply: Int,
     eval: Eval,
     // variation is first in UCI, then converted to PGN before storage
@@ -72,7 +72,6 @@ object Info {
   private def strCp(s: String)   = s.toIntOption map Cp.apply
   private def strMate(s: String) = s.toIntOption map Mate.apply
 
-  //TODO change for multimove
   private def decode(ply: Int, str: String): Option[Info] =
     str.split(separator) match {
       case Array()       => Info(ply, Eval.empty).some

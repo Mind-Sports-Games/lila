@@ -6,7 +6,7 @@ import play.api.libs.json._
 
 case class Step(
     ply: Int,
-    // who's playerIndex plays next
+    turnCount: Int,
     playerIndex: PlayerIndex,
     move: Option[Step.Move],
     fen: FEN,

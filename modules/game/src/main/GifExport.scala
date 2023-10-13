@@ -106,6 +106,8 @@ final class GifExport(
     Replay.gamePlyWhileValid(
       game.variant.gameLogic,
       game.actions,
+      game.startPlayerIndex,
+      game.activePlayer,
       initialFen | game.variant.initialFen,
       game.variant
     ) match {

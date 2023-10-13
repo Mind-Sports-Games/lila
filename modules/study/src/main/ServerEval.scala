@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, GameLogic, P1, Replay }
+import strategygames.{ Division, Game, GameLogic, Player => PlayerIndex, Replay }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -152,7 +152,15 @@ object ServerEval {
       )
 
     private def analysisLine(root: RootOrNode, variant: Variant, info: Info): Option[Node] =
-      Replay.gamePlyWhileValid(variant.gameLogic, info.variation take 20, root.fen, variant) match {
+      Replay.gamePlyWhileValid(
+        variant.gameLogic,
+        info.variation.take(20),
+        //TODO: multiaction doublecheck: Think this is ok to handle like this
+        PlayerIndex.P1,
+        PlayerIndex.fromTurnCount(info.variation.take(20).size),
+        root.fen,
+        variant
+      ) match {
         case (_, games, error) =>
           error foreach { logger.info(_) }
           games.reverse match {
@@ -184,7 +192,7 @@ object ServerEval {
 
   def toJson(chapter: Chapter, analysis: Analysis) =
     lila.analyse.JsonView.bothPlayers(
-      lila.analyse.Accuracy.PovLike(P1, chapter.root.playerIndex, chapter.root.ply),
+      lila.analyse.Accuracy.PovLike(PlayerIndex.P1, chapter.root.playerIndex, chapter.root.ply),
       analysis
     )
 }

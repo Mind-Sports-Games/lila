@@ -347,9 +347,8 @@ object BSONHandlers {
                   case None                         => None
                   case _                            => sys.error("non fairysf pocket data")
                 },
-                //TODO: Rewrite this with multimove compatability
                 uciMoves = strategygames.fairysf.format.pgn.Parser
-                  .pgnMovesToUciMoves(actions.flatten, !gameVariant.switchPlayerAfterMove)
+                  .pliesToFairyUciMoves(actions.flatten, !gameVariant.switchPlayerAfterMove)
               ),
               player = turnPlayerIndex
             ),
@@ -386,8 +385,7 @@ object BSONHandlers {
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty
                 ),
                 variant = gameVariant,
-                //we can flatten as samurai does not have any multimove games
-                uciMoves = strategygames.samurai.format.pgn.Parser.pgnMovesToUciMoves(actions.flatten)
+                uciMoves = actions.flatten.toList
               ),
               player = turnPlayerIndex
             ),

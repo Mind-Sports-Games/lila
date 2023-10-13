@@ -4,7 +4,7 @@ import scala.language.existentials
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ P2, Player => PlayerIndex, Mode, Status, P1 }
+import strategygames.{ Actions, Mode, Player => PlayerIndex, P1, P2, Status }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.commands.WriteResult
@@ -527,9 +527,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       $doc(s"${F.pgnImport}.h" -> PgnImport.hash(pgn))
     )
 
-  //this is only used by Captcha which is currently only for standard chess
-  //so not supported by multimove and so flatten is ok
-  def getOptionPgn(id: ID): Fu[Option[PgnMoves]] = game(id) dmap2 { _.actions.flatten }
+  def getOptionActions(id: ID): Fu[Option[Actions]] = game(id) dmap2 { _.actions }
 
   def lastGameBetween(u1: String, u2: String, since: DateTime): Fu[Option[Game]] =
     coll.one[Game](

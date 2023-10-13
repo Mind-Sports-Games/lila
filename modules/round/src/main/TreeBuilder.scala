@@ -41,6 +41,8 @@ object TreeBuilder {
     Replay.gamePlyWhileValid(
       game.variant.gameLogic,
       game.actions,
+      game.startPlayerIndex,
+      game.activePlayer,
       initialFen,
       game.variant
     ) match {
@@ -174,7 +176,10 @@ object TreeBuilder {
     }
     Replay.gamePlyWhileValid(
       variant.gameLogic,
-      info.variation take 20,
+      info.variation.take(20),
+      //TODO: Doublecheck: Think this is ok to handle like this
+      PlayerIndex.P1,
+      PlayerIndex.fromTurnCount(info.variation.take(20).size),
       fromFen,
       variant
     ) match {
