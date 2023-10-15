@@ -66,7 +66,9 @@ export interface RoundData extends GameData {
   selectMode: boolean;
   selectedSquares?: cg.Key[];
   currentSelectedSquares?: cg.Key[];
+  calculatedCGGoScores?: cg.SimpleGoScores;
   deadStoneOfferState?: string;
+  pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
   onlyDropsVariant: boolean;
@@ -80,7 +82,8 @@ export interface RoundData extends GameData {
   userTv?: {
     id: string;
   };
-  expiration?: Expiration;
+  expirationAtStart?: Expiration;
+  expirationOnPaused?: Expiration;
 }
 
 export interface Expiration {
@@ -198,6 +201,7 @@ export interface Pref {
   clockSound: boolean;
   clockTenths: Prefs.ShowClockTenths;
   confirmResign: boolean;
+  confirmPass: boolean;
   coords: Prefs.Coords;
   destination: boolean;
   playerTurnIndicator: boolean;

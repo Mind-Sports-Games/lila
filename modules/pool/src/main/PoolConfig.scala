@@ -6,7 +6,7 @@ import strategygames.chess.variant.Standard
 import lila.i18n.VariantKeys
 import lila.rating.PerfType
 
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, Speed }
 
 case class PoolConfig(
     clock: ClockConfig,
@@ -42,11 +42,29 @@ object PoolConfig {
   import play.api.libs.json._
   implicit val poolConfigJsonWriter = OWrites[PoolConfig] { p =>
     p.clock match {
-      case fc: FischerClock.Config =>
+      case fc: Clock.Config =>
         Json.obj(
           "id"         -> p.id.value,
           "lim"        -> fc.limitInMinutes,
           "inc"        -> fc.incrementSeconds,
+          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "variantKey" -> VariantKeys.variantName(p.variant)
+        )
+      case fc: Clock.BronsteinConfig =>
+        Json.obj(
+          "id"         -> p.id.value,
+          "lim"        -> fc.limitInMinutes,
+          "delay"      -> fc.delaySeconds,
+          "delayType"  -> "bronstein",
+          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "variantKey" -> VariantKeys.variantName(p.variant)
+        )
+      case udc: Clock.UsDelayConfig =>
+        Json.obj(
+          "id"         -> p.id.value,
+          "lim"        -> udc.limitInMinutes,
+          "delay"      -> udc.delaySeconds,
+          "delayType"  -> "usdelay",
           "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
           "variantKey" -> VariantKeys.variantName(p.variant)
         )

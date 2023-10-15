@@ -8,6 +8,7 @@ import org.joda.time.DateTime
 
 import lila.game.{ Game, PerfPicker }
 import lila.i18n.{ I18nKey, I18nKeys }
+import play.api.i18n.Lang
 import lila.rating.PerfType
 import lila.user.User
 
@@ -106,6 +107,24 @@ case class Challenge(
         initialFen.isDefined &&
         !initialFen.exists(_.value == variant.initialFen.value))
 
+  //When updating, also edit modules/game and ui/@types/playstrategy/index.d.ts:declare type PlayerName
+  def playerTrans(p: PlayerIndex)(implicit lang: Lang): String =
+    variant.playerNames(p) match {
+      case "White" => I18nKeys.white.txt()
+      case "Black" => I18nKeys.black.txt()
+      //Xiangqi add back in when adding red as a colour for Xiangqi
+      //case "Red"   => I18nKeys.red.txt()
+      case "Sente"   => I18nKeys.sente.txt()
+      case "Gote"    => I18nKeys.gote.txt()
+      case s: String => s
+    }
+
+  def playerChoiceTrans(p: PlayerIndexChoice)(implicit lang: Lang): String = p match {
+    case PlayerIndexChoice.Random => "random"
+    case PlayerIndexChoice.P1     => playerTrans(P1)
+    case PlayerIndexChoice.P2     => playerTrans(P2)
+  }
+
   def isOpen = ~open
 
   def isMultiMatch = ~multiMatch
@@ -182,8 +201,9 @@ object Challenge {
     case class Correspondence(days: Int) extends TimeControl
     case class Clock(config: strategygames.ClockConfig) extends TimeControl {
       // All durations are expressed in seconds
-      def limit     = config.limit
-      def increment = config.increment
+      def limit = config.limit
+      // TODO: should be updatede to deal with Bronstein and UsDelay
+      def increment = config.graceSeconds
       def show      = config.show
     }
   }

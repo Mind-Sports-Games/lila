@@ -22,9 +22,7 @@ final private[round] class SelectSquarer(
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
         proxy.save {
           messenger.system(g, trans.selectSquareOfferAccepted.txt())
-          Progress(g) map { g =>
-            g.updatePlayer(!playerIndex, _.removeSelectSquaresOffer)
-          }
+          Progress(g) map { _.acceptSelectSquares(playerIndex) }
         } >>- publishSquareOfferEvent(pov) inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(true))
         )
@@ -60,9 +58,6 @@ final private[round] class SelectSquarer(
       }
     }
 
-  // NOTE: yes, I know, Any. But the Bus.publish takes an Any, and none of the events
-  //       we are publishing are of a particular type that we can depend on, so I guess
-  //       we use Any.
   private def publishSquareOfferEvent(pov: Pov)(implicit
       proxy: GameProxy
   ) = {
@@ -71,7 +66,7 @@ final private[round] class SelectSquarer(
         lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(pov.gameId),
         "offerEventCorres"
       )
-    if (lila.game.Game.isBoardCompatible(pov.game))
+    if (lila.game.Game.isBoardOrBotCompatible(pov.game))
       proxy
         .withPov(pov.playerIndex) { p =>
           fuccess(

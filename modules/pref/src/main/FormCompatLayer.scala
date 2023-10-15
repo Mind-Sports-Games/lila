@@ -33,6 +33,7 @@ object FormCompatLayer {
           "autoThreefold",
           "submitMove",
           "confirmResign",
+          "confirmPass",
           "keyboardMove"
         )
       ) pipe

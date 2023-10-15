@@ -113,7 +113,9 @@ final class PlayApi(
           as(id, me) { pov =>
             {
               val gf = pov.game.variant.gameFamily
-              fuccess(env.bot.player.selectSquares(pov, List.empty)) pipe toResult
+              fuccess(
+                env.bot.player.selectSquares(pov, List.empty)
+              ).pipe(toResult)
             }
           }
         case Array("game", id, "select-squares", squaresS) =>
@@ -121,7 +123,7 @@ final class PlayApi(
             {
               val gf      = pov.game.variant.gameFamily
               val squares = squaresS.split(",").toList.flatMap(p => Pos.fromKey(gf.gameLogic, p))
-              fuccess(env.bot.player.selectSquares(pov, squares)) pipe toResult
+              fuccess(env.bot.player.selectSquares(pov, squares)).pipe(toResult)
             }
           }
         case _ => notFoundJson("No such command")

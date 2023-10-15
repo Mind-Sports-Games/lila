@@ -2,7 +2,7 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, Player => PlayerIndex, P1, P2, Pos, Situation }
+import strategygames.{ ClockBase, Player => PlayerIndex, P1, P2, Pos, Situation }
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.math
@@ -32,11 +32,7 @@ final class JsonView(
       .checkCount(playerIndex)
 
   private def score(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.togyzkumalak.variant.Togyzkumalak ||
-      game.variant == strategygames.go.variant.Go9x9 ||
-      game.variant == strategygames.go.variant.Go13x13 ||
-      game.variant == strategygames.go.variant.Go19x19) option game.history
-      .score(playerIndex)
+    game.displayScore.map(_.apply(playerIndex))
 
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
@@ -138,6 +134,7 @@ final class JsonView(
               .add("clockBar" -> pref.clockBar)
               .add("clockSound" -> pref.clockSound)
               .add("confirmResign" -> (!nvui && pref.confirmResign == Pref.ConfirmResign.YES))
+              .add("confirmPass" -> (!nvui && pref.confirmPass == Pref.ConfirmPass.YES))
               .add("keyboardMove" -> (!nvui && pref.keyboardMove == Pref.KeyboardMove.YES))
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("blindfold" -> pref.isBlindfold)
@@ -170,10 +167,17 @@ final class JsonView(
           .add("selectMode" -> selectMode(pov))
           .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
           .add("deadStoneOfferState" -> pov.game.metadata.deadStoneOfferState.map(_.name))
-          .add("expiration" -> pov.game.expirable.option {
+          .add("pauseSecs" -> pov.game.timeWhenPaused.millis.some)
+          .add("expirationAtStart" -> pov.game.expirableAtStart.option {
             Json.obj(
               "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
               "millisToMove" -> pov.game.timeForFirstMove.millis
+            )
+          })
+          .add("expirationOnPaused" -> pov.game.expirableOnPaused.option {
+            Json.obj(
+              "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
+              "millisToMove" -> pov.game.timeWhenPaused.millis
             )
           })
       }
@@ -293,7 +297,7 @@ final class JsonView(
             "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
             "fen"        -> fen,
             "turns"      -> game.turns,
-            "player"     -> game.turnPlayerIndex.name,
+            "player"     -> game.activePlayerIndex.name,
             "status"     -> game.status,
             "gameFamily" -> game.variant.gameFamily.key
           )
@@ -345,7 +349,7 @@ final class JsonView(
         ("percent" -> JsNumber(game.playerBlurPercent(player.playerIndex)))
     }
 
-  private def clockJson(clock: Clock): JsObject =
+  private def clockJson(clock: ClockBase): JsObject =
     clockWriter.writes(clock) + ("moretime" -> JsNumber(actorApi.round.Moretime.defaultDuration.toSeconds))
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =

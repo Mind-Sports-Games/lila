@@ -5,18 +5,18 @@ import strategygames.{
   Board,
   ByoyomiClock,
   Centis,
+  ClockBase,
   Clock,
-  FischerClock,
   GameFamily,
   Player => PlayerIndex,
   GameLogic,
   History,
   PocketData,
   P1,
-  Pos
+  Pos,
+  Score
 }
 import strategygames.chess.CheckCount
-import strategygames.togyzkumalak.Score
 import strategygames.draughts.KingMoves
 import Game.BSONFields._
 import reactivemongo.api.bson._
@@ -81,7 +81,7 @@ object GameDiff {
         times          = history(playerIndex)
       } yield (
         clk match {
-          case _: FischerClock => FischerClockType()
+          case _: Clock        => FischerClockType()
           case _: ByoyomiClock => ByoyomiClockType()
         },
         clk.limit,
@@ -318,7 +318,7 @@ object GameDiff {
     dOpt(
       clock,
       _.clock,
-      (o: Option[Clock]) =>
+      (o: Option[ClockBase]) =>
         o flatMap { c =>
           BSONHandlers.clockBSONWrite(a.createdAt, c).toOption
         }

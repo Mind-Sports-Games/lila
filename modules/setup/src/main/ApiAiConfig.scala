@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, Mode, P1, P2, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, Mode, P1, P2, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition }
@@ -22,8 +22,9 @@ final case class ApiAiConfig(
 
   val strictFen = false
 
-  val days      = ~daysO
-  val increment = clock.??(_.increment.roundSeconds)
+  val days = ~daysO
+  // TODO: this should be reconsidered for Bronstein and UsDelay
+  val increment = clock.??(_.graceSeconds)
   val time      = clock.??(_.limit.roundSeconds / 60)
   val byoyomi = clock match {
     case Some(c: ByoyomiClock.Config) => c.byoyomi.roundSeconds
@@ -80,7 +81,7 @@ object ApiAiConfig extends BaseConfig {
   def from(
       l: Int,
       v: Option[String],
-      fcl: Option[FischerClock.Config],
+      fcl: Option[Clock.Config],
       bcl: Option[ByoyomiClock.Config],
       d: Option[Int],
       c: Option[String],

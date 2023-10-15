@@ -7,10 +7,10 @@ import strategygames.opening.FullOpening
 import strategygames.{
   P2,
   ByoyomiClock,
-  Clock,
+  ClockBase,
   Player => PlayerIndex,
   Division,
-  FischerClock,
+  Clock,
   GameLogic,
   Pocket,
   PocketData,
@@ -38,7 +38,7 @@ final class JsonView(rematches: Rematches) {
         "rated"         -> game.rated,
         "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
         "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
-        "player"        -> game.turnPlayerIndex,
+        "player"        -> game.activePlayerIndex,
         "turns"         -> game.turns,
         "startedAtTurn" -> game.chess.startedAtTurn,
         "source"        -> game.source,
@@ -236,17 +236,41 @@ object JsonView {
       )
     }
 
-  implicit val clockWriter: OWrites[Clock] = OWrites { c =>
+  implicit val clockWriter: OWrites[ClockBase] = OWrites { c =>
     c match {
-      case fc: FischerClock =>
-        Json.obj(
-          "running"   -> fc.isRunning,
-          "initial"   -> fc.limitSeconds,
-          "increment" -> fc.incrementSeconds,
-          "p1"        -> fc.remainingTime(P1).toSeconds,
-          "p2"        -> fc.remainingTime(P2).toSeconds,
-          "emerg"     -> fc.config.emergSeconds
-        )
+      case fc: Clock =>
+        fc.config match {
+          case fConfig: Clock.Config =>
+            Json.obj(
+              "running"   -> fc.isRunning,
+              "initial"   -> fConfig.limitSeconds,
+              "increment" -> fConfig.incrementSeconds,
+              "p1"        -> fc.remainingTime(P1).toSeconds,
+              "p2"        -> fc.remainingTime(P2).toSeconds,
+              "emerg"     -> fc.config.emergSeconds
+            )
+          case bConfig: Clock.BronsteinConfig =>
+            Json.obj(
+              "running"   -> fc.isRunning,
+              "initial"   -> bConfig.limitSeconds,
+              "delay"     -> bConfig.delaySeconds,
+              "delayType" -> "bronstein",
+              "p1"        -> fc.remainingTime(P1).toSeconds,
+              "p2"        -> fc.remainingTime(P2).toSeconds,
+              "emerg"     -> fc.config.emergSeconds
+            )
+          case udConfig: Clock.UsDelayConfig =>
+            Json.obj(
+              "running"   -> fc.isRunning,
+              "initial"   -> udConfig.limitSeconds,
+              "delay"     -> udConfig.delaySeconds,
+              "delayType" -> "usdelay",
+              "p1"        -> fc.remainingTime(P1).toSeconds,
+              "p2"        -> fc.remainingTime(P2).toSeconds,
+              "emerg"     -> fc.config.emergSeconds
+            )
+          case _: ByoyomiClock.Config => Json.obj() // TODO: this is annoying
+        }
       case bc: ByoyomiClock => {
         val p1Clock = bc.currentClockFor(P1)
         val p2Clock = bc.currentClockFor(P2)

@@ -161,9 +161,16 @@ export function reSelectSelectedSquares(ctrl: RoundController) {
     ) {
       ctrl.chessground.set({ selectOnly: true, viewOnly: true });
     }
-    for (const square of ctrl.data.selectedSquares) {
+    const goStonesToSelect = util.goStonesToSelect(
+      ctrl.data.selectedSquares,
+      ctrl.chessground.state.pieces,
+      ctrl.data.game.variant.boardSize
+    );
+    for (const square of goStonesToSelect) {
       ctrl.chessground.selectSquare(square as cg.Key);
     }
+    //also set currentSelectedSquares as this becomes undefined upon reload
+    ctrl.data.currentSelectedSquares = ctrl.data.selectedSquares;
   }
 }
 

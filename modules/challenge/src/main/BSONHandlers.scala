@@ -37,18 +37,34 @@ private object BSONHandlers {
           TimeControl.Clock(strategygames.ByoyomiClock.Config(limit, inc, byoyomi, periods))
         )
         .getOrElse(
-          (r.intO("l"), r.intO("i"))
-            .mapN { (limit, inc) =>
-              TimeControl.Clock(strategygames.FischerClock.Config(limit, inc))
-            }
-            .orElse(
-              r intO "d" map TimeControl.Correspondence.apply
+          (r.strO("t").filter(_ == "bronstein"), r.intO("l"), r.intO("d"))
+            .mapN((_type, limit, delay) =>
+              TimeControl.Clock(strategygames.Clock.BronsteinConfig(limit, delay))
             )
-            .getOrElse(TimeControl.Unlimited)
+            .getOrElse(
+              (r.strO("t").filter(_ == "usdelay"), r.intO("l"), r.intO("d"))
+                .mapN((_type, limit, delay) =>
+                  TimeControl.Clock(strategygames.Clock.UsDelayConfig(limit, delay))
+                )
+                .getOrElse(
+                  (r.intO("l"), r.intO("i"))
+                    .mapN { (limit, inc) =>
+                      TimeControl.Clock(strategygames.Clock.Config(limit, inc))
+                    }
+                    .orElse(
+                      r intO "d" map TimeControl.Correspondence.apply
+                    )
+                    .getOrElse(TimeControl.Unlimited)
+                )
+            )
         )
     def writes(w: Writer, t: TimeControl) =
       t match {
-        case TimeControl.Clock(strategygames.FischerClock.Config(l, i)) => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.Clock.Config(l, i)) => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.Clock.BronsteinConfig(l, d)) =>
+          $doc("t" -> "bronstein", "l" -> l, "d" -> d)
+        case TimeControl.Clock(strategygames.Clock.UsDelayConfig(l, d)) =>
+          $doc("t" -> "usdelay", "l" -> l, "d" -> d)
         case TimeControl.Clock(strategygames.ByoyomiClock.Config(l, i, b, p)) =>
           $doc("l" -> l, "i" -> i, "b" -> b, "p" -> p)
         case TimeControl.Correspondence(d) => $doc("d" -> d)

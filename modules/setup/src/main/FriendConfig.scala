@@ -112,7 +112,7 @@ object FriendConfig extends BaseHumanConfig {
     byoyomi = 10,
     periods = 1,
     goHandicap = 0,
-    goKomi = 60, // value is *10 to provide int
+    goKomi = 75, // value is *10 to provide int
     days = 2,
     mode = Mode.default,
     playerIndex = PlayerIndex.default

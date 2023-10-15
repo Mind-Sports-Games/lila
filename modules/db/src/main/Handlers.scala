@@ -8,7 +8,7 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import strategygames.{ Player => PlayerIndex, GameLogic, ByoyomiClock, FischerClock }
+import strategygames.{ Player => PlayerIndex, GameLogic, ByoyomiClock, Clock }
 import strategygames.format.{ FEN => StratFEN }
 import strategygames.variant.{ Variant => StratVariant }
 import strategygames.chess.format.FEN
@@ -183,7 +183,17 @@ trait Handlers {
             for {
               limit <- doc.getAsTry[Int]("limit")
               inc   <- doc.getAsTry[Int]("increment")
-            } yield strategygames.FischerClock.Config(limit, inc)
+            } yield strategygames.Clock.Config(limit, inc)
+          case "bronstein" =>
+            for {
+              limit <- doc.getAsTry[Int]("limit")
+              delay <- doc.getAsTry[Int]("delay")
+            } yield strategygames.Clock.BronsteinConfig(limit, delay)
+          case "usdelay" =>
+            for {
+              limit <- doc.getAsTry[Int]("limit")
+              delay <- doc.getAsTry[Int]("delay")
+            } yield strategygames.Clock.UsDelayConfig(limit, delay)
           case "byoyomi" =>
             for {
               limit   <- doc.getAsTry[Int]("limit")
@@ -196,11 +206,23 @@ trait Handlers {
     },
     c =>
       c match {
-        case fc: FischerClock.Config =>
+        case fc: Clock.Config =>
           BSONDocument(
             "t"         -> "fischer",
             "limit"     -> fc.limitSeconds,
             "increment" -> fc.incrementSeconds
+          )
+        case fc: Clock.BronsteinConfig =>
+          BSONDocument(
+            "t"     -> "bronstein",
+            "limit" -> fc.limitSeconds,
+            "delay" -> fc.delaySeconds
+          )
+        case udc: Clock.UsDelayConfig =>
+          BSONDocument(
+            "t"     -> "usdelay",
+            "limit" -> udc.limitSeconds,
+            "delay" -> udc.delaySeconds
           )
         case bc: ByoyomiClock.Config =>
           BSONDocument(

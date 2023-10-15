@@ -3,7 +3,7 @@ package lila.setup
 import strategygames.{
   ByoyomiClock,
   ClockConfig,
-  FischerClock,
+  Clock,
   Game => StratGame,
   GameFamily,
   GameLogic,
@@ -75,7 +75,7 @@ private[setup] trait Config {
         periods
       )
     else
-      FischerClock.Config((time * 60).toInt, if (clockHasFischerTime) increment else 1)
+      Clock.Config((time * 60).toInt, if (clockHasFischerTime) increment else 1)
 
   def makeDaysPerTurn: Option[Int] = (timeMode == TimeMode.Correspondence) option days
 }

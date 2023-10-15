@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ ByoyomiClock, FischerClock, P1, P2 }
+import strategygames.{ ByoyomiClock, Clock, P1, P2 }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -395,20 +395,31 @@ object SwissJson {
 
   implicit private val clockWrites: OWrites[strategygames.ClockConfig] = OWrites { clock =>
     clock match {
-      case fc: FischerClock.Config => {
+      // TODO: this clock json should be universal
+      case fc: Clock.Config =>
         Json.obj(
           "limit"     -> fc.limitSeconds,
           "increment" -> fc.incrementSeconds
         )
-      }
-      case bc: ByoyomiClock.Config => {
+      case bc: Clock.BronsteinConfig =>
+        Json.obj(
+          "limit"     -> bc.limitSeconds,
+          "delay"     -> bc.delaySeconds,
+          "delayType" -> "bronstein"
+        )
+      case udc: Clock.UsDelayConfig =>
+        Json.obj(
+          "limit"     -> udc.limitSeconds,
+          "delay"     -> udc.delaySeconds,
+          "delayType" -> "usdelay"
+        )
+      case bc: ByoyomiClock.Config =>
         Json.obj(
           "limit"     -> bc.limitSeconds,
           "increment" -> bc.incrementSeconds,
           "byoyomi"   -> bc.byoyomiSeconds,
           "periods"   -> bc.periodsTotal
         )
-      }
     }
   }
 
