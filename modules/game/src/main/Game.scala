@@ -709,9 +709,23 @@ case class Game(
   def hasClock = clock.isDefined
 
   def hasFischerClock = clock.fold(false)(c =>
-    c match {
-      case _: Clock => true
-      case _        => false
+    c.config match {
+      case _: Clock.Config => true
+      case _               => false
+    }
+  )
+
+  def hasBronsteinClock = clock.fold(false)(c =>
+    c.config match {
+      case _: Clock.BronsteinConfig => true
+      case _                        => false
+    }
+  )
+
+  def hasUsDelayClock = clock.fold(false)(c =>
+    c.config match {
+      case _: Clock.UsDelayConfig => true
+      case _                      => false
     }
   )
 
@@ -964,7 +978,7 @@ object Game {
     variant.standard || {
       clock ?? { c =>
         c.estimateTotalTime >= Centis(3000) &&
-        c.limitSeconds > 0 || c.incrementSeconds > 1
+        c.limitSeconds > 0 || c.graceSeconds > 1
       }
     }
 

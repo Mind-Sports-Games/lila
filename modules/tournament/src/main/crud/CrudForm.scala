@@ -28,6 +28,9 @@ object CrudForm {
       case bc: Clock.BronsteinConfig => {
         Clock.BronsteinConfig.unapply(bc).map(t => (false, t._1 / 4d, t._2, None, None))
       }
+      case udc: Clock.UsDelayConfig => {
+        Clock.UsDelayConfig.unapply(udc).map(t => (false, t._1 / 4d, t._2, None, None))
+      }
       case bc: ByoyomiClock.Config => {
         ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 4d, t._2, Some(t._3), Some(t._4)))
       }
@@ -126,11 +129,11 @@ object CrudForm {
 
     def realPosition = position ifTrue realVariant.standard
 
-    def validClock = (clock.limitSeconds + clock.incrementSeconds) > 0
+    def validClock = (clock.limitSeconds + clock.graceSeconds) > 0
 
     def validTiming = (minutes * 60) >= (3 * estimatedGameDuration)
 
-    private def estimatedGameDuration = 60 * clock.limitSeconds + 30 * clock.incrementSeconds
+    private def estimatedGameDuration = 60 * clock.limitSeconds + 30 * clock.graceSeconds
   }
 
   val imageChoices = List(

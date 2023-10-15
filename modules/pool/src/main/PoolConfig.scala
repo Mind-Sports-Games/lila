@@ -55,6 +55,16 @@ object PoolConfig {
           "id"         -> p.id.value,
           "lim"        -> fc.limitInMinutes,
           "delay"      -> fc.delaySeconds,
+          "delayType"  -> "bronstein",
+          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "variantKey" -> VariantKeys.variantName(p.variant)
+        )
+      case udc: Clock.UsDelayConfig =>
+        Json.obj(
+          "id"         -> p.id.value,
+          "lim"        -> udc.limitInMinutes,
+          "delay"      -> udc.delaySeconds,
+          "delayType"  -> "usdelay",
           "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
           "variantKey" -> VariantKeys.variantName(p.variant)
         )

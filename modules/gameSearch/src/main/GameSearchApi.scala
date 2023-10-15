@@ -3,7 +3,7 @@ package lila.gameSearch
 import play.api.libs.json._
 import scala.concurrent.duration._
 
-import strategygames.{ByoyomiClock, Clock}
+import strategygames.{ ByoyomiClock, Clock }
 
 import lila.game.{ Game, GameRepo }
 import lila.search._
@@ -61,16 +61,17 @@ final class GameSearchApi(
         Fields.date              -> (lila.search.Date.formatter print game.movedAt),
         Fields.duration          -> game.durationSeconds, // for realtime games only
         Fields.clockInit         -> game.clock.map(_.limitSeconds),
-        Fields.clockInc          -> game.clock.map(_.config match {
-          case fc: Clock.Config => fc.incrementSeconds
+        Fields.clockInc -> game.clock.map(_.config match {
+          case fc: Clock.Config         => fc.incrementSeconds
           case _: Clock.BronsteinConfig => 0
-          case bc: ByoyomiClock.Config => bc.incrementSeconds
+          case _: Clock.UsDelayConfig   => 0
+          case bc: ByoyomiClock.Config  => bc.incrementSeconds
         }),
-        // TODO: add in delay and byoyomi here.
-        Fields.analysed          -> analysed,
-        Fields.p1User            -> game.p1Player.userId,
-        Fields.p2User            -> game.p2Player.userId,
-        Fields.source            -> game.source.map(_.id)
+        // TODO: add in bronstein delay and us delay and byoyomi here.
+        Fields.analysed -> analysed,
+        Fields.p1User   -> game.p1Player.userId,
+        Fields.p2User   -> game.p2Player.userId,
+        Fields.source   -> game.source.map(_.id)
       )
       .noNull
 }

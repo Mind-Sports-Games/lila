@@ -593,8 +593,16 @@ object JsonView {
       }
       case fc: Clock.BronsteinConfig => {
         Json.obj(
-          "limit" -> fc.limitSeconds,
-          "delay" -> fc.delaySeconds
+          "limit"     -> fc.limitSeconds,
+          "delay"     -> fc.delaySeconds,
+          "delayType" -> "bronstein"
+        )
+      }
+      case udc: Clock.UsDelayConfig => {
+        Json.obj(
+          "limit"     -> udc.limitSeconds,
+          "delay"     -> udc.delaySeconds,
+          "delayType" -> "usdelay"
         )
       }
       case bc: ByoyomiClock.Config => {

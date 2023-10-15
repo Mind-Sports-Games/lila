@@ -284,31 +284,22 @@ object Schedule {
         case _                                                       => false
       }
     def fromClock(clock: ClockConfig) =
-      clock match { // TODO: this seems a bit repetitive now
-        case _: Clock.Config => {
-          val time = clock.estimateTotalSeconds
-          if (time < 30) UltraBullet
-          else if (time < 60) HyperBullet
-          else if (time < 120) Bullet
-          else if (time < 180) HippoBullet
-          else if (time < 480) Blitz
-          else if (time < 1500) Rapid
-          else Classical
-        }
-        case _: Clock.BronsteinConfig => {
-          val time = clock.estimateTotalSeconds
-          if (time < 30) UltraBullet
-          else if (time < 60) HyperBullet
-          else if (time < 120) Bullet
-          else if (time < 180) HippoBullet
-          else if (time < 480) Blitz
-          else if (time < 1500) Rapid
-          else Classical
-        }
+      clock match {
         case _: ByoyomiClock.Config => {
           val time = clock.estimateTotalSeconds
           if (time <= (180 + 5 * 25)) Byoyomi35
           else Byoyomi510
+        }
+        // NOTE: not using case _ => here, because I want an error when a new clock is added.
+        case Clock.Config(_, _) | Clock.BronsteinConfig(_, _) | Clock.UsDelayConfig(_, _) => {
+          val time = clock.estimateTotalSeconds
+          if (time < 30) UltraBullet
+          else if (time < 60) HyperBullet
+          else if (time < 120) Bullet
+          else if (time < 180) HippoBullet
+          else if (time < 480) Blitz
+          else if (time < 1500) Rapid
+          else Classical
         }
       }
     def toPerfType(speed: Speed) =

@@ -126,7 +126,8 @@ case class HookConfig(
           variant = game.variant,
           timeMode = TimeMode ofGame game,
           time = game.clock.map(_.limitInMinutes) | time,
-          increment = game.clock.map(_.config.incrementSeconds ) | increment,
+          // TODO: this doesn't work with bronstein / UsDelay
+          increment = game.clock.map(_.config.graceSeconds) | increment,
           byoyomi = 0,
           periods = 0,
           days = game.daysPerTurn | days,
