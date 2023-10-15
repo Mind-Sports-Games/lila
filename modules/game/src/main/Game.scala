@@ -1008,7 +1008,7 @@ object Game {
     case _                => Some(ByoyomiClockHistory(Centis(0)))
   }
   private[game] def someEmptyClockHistory(c: ClockBase) = c match {
-    case _: Clock => someEmptyFischerClockHistory
+    case _: Clock        => someEmptyFischerClockHistory
     case _: ByoyomiClock => someEmptyByoyomiClockHistory(c)
   }
 
@@ -1185,6 +1185,23 @@ sealed trait ClockHistory {
   val p1: Vector[Centis]
   val p2: Vector[Centis]
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
+  def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory
+
+  def record(playerIndex: PlayerIndex, clock: ClockBase, turn: Int): ClockHistory
+  def reset(playerIndex: PlayerIndex): ClockHistory
+  def apply(playerIndex: PlayerIndex): Vector[Centis]
+  def last(playerIndex: PlayerIndex): Option[Centis]
+  def size: Int
+}
+
+case class FischerClockHistory(
+    p1: Vector[Centis] = Vector.empty,
+    p2: Vector[Centis] = Vector.empty
+) extends ClockHistory {
+
+  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
+    playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
+
   def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory =
     update(playerIndex, _ :+ clock.remainingTime(playerIndex))
   def reset(playerIndex: PlayerIndex)                 = update(playerIndex, _ => Vector.empty)
@@ -1193,31 +1210,16 @@ sealed trait ClockHistory {
     if (apply(playerIndex).size < plies) None
     else apply(playerIndex).takeRight(plies).headOption
   def size = p1.size + p2.size
+  def size                                            = p1.size + p2.size
 
   // first state is of the playerIndex that moved first.
-  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
+  override def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
     Sequence.interleave(
       firstMoveBy.fold(p1, p2),
       firstMoveBy.fold(p2, p1)
     )
 }
 
-case class FischerClockHistory(
-    p1: Vector[Centis] = Vector.empty,
-    p2: Vector[Centis] = Vector.empty
-) extends ClockHistory {
-
-  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
-    playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
-}
-
-case class FischerClockHistory(
-    p1: Vector[Centis] = Vector.empty,
-    p2: Vector[Centis] = Vector.empty
-) extends ClockHistory {
-  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
-    playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
-}
 
 case class ByoyomiClockHistory(
     byoyomi: Centis,
