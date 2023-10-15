@@ -269,7 +269,7 @@ object JsonView {
               "p2"        -> fc.remainingTime(P2).toSeconds,
               "emerg"     -> fc.config.emergSeconds
             )
-          case _: ByoyomiClock.Config => Json.obj()
+          case _: ByoyomiClock.Config => Json.obj() // TODO: this is annoying
         }
       case bc: ByoyomiClock => {
         val p1Clock = bc.currentClockFor(P1)
