@@ -1009,12 +1009,12 @@ object Game {
 
   private[game] val someEmptyFischerClockHistory = Some(FischerClockHistory())
 
-  private[game] def someEmptyByoyomiClockHistory(c: Clock) = c match {
+  private[game] def someEmptyByoyomiClockHistory(c: ClockBase) = c match {
     case bc: ByoyomiClock => Some(ByoyomiClockHistory(bc.config.byoyomi))
     case _                => Some(ByoyomiClockHistory(Centis(0)))
   }
-  private[game] def someEmptyClockHistory(c: Clock) = c match {
-    case _: FischerClock => someEmptyFischerClockHistory
+  private[game] def someEmptyClockHistory(c: ClockBase) = c match {
+    case _: Clock        => someEmptyFischerClockHistory
     case _: ByoyomiClock => someEmptyByoyomiClockHistory(c)
   }
 
@@ -1191,28 +1191,12 @@ sealed trait ClockHistory {
   val p1: Vector[Centis]
   val p2: Vector[Centis]
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
-<<<<<<< HEAD
-||||||| 926e0ca0e8
-  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory
-  def reset(playerIndex: PlayerIndex): ClockHistory
-  def apply(playerIndex: PlayerIndex): Vector[Centis]
-  def last(playerIndex: PlayerIndex): Option[Centis]
-  def size: Int
-}
-
-case class FischerClockHistory(
-    p1: Vector[Centis] = Vector.empty,
-    p2: Vector[Centis] = Vector.empty
-) extends ClockHistory {
-
-  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
-    playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
-=======
   def record(playerIndex: PlayerIndex, clock: ClockBase, turn: Int): ClockHistory
   def reset(playerIndex: PlayerIndex): ClockHistory
   def apply(playerIndex: PlayerIndex): Vector[Centis]
-  def last(playerIndex: PlayerIndex): Option[Centis]
+  def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
   def size: Int
+  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis]
 }
 
 case class FischerClockHistory(
@@ -1222,29 +1206,19 @@ case class FischerClockHistory(
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
->>>>>>> master
 
   def record(playerIndex: PlayerIndex, clock: ClockBase, turn: Int): ClockHistory =
     update(playerIndex, _ :+ clock.remainingTime(playerIndex))
   def reset(playerIndex: PlayerIndex)                 = update(playerIndex, _ => Vector.empty)
   def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
-  def last(playerIndex: PlayerIndex)                  = apply(playerIndex).lastOption
   def size                                            = p1.size + p2.size
 
   // first state is of the playerIndex that moved first.
-  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
+  override def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
     Sequence.interleave(
       firstMoveBy.fold(p1, p2),
       firstMoveBy.fold(p2, p1)
     )
-}
-
-case class FischerClockHistory(
-    p1: Vector[Centis] = Vector.empty,
-    p2: Vector[Centis] = Vector.empty
-) extends ClockHistory {
-  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
-    playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
 }
 
 case class ByoyomiClockHistory(
@@ -1263,13 +1237,11 @@ case class ByoyomiClockHistory(
   def updatePeriods(playerIndex: PlayerIndex, f: Vector[Int] => Vector[Int]): ClockHistory =
     copy(periodEntries = periodEntries.update(playerIndex, f))
 
-<<<<<<< HEAD
-  override def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory = {
-||||||| 926e0ca0e8
-  def record(playerIndex: PlayerIndex, clock: Clock, turn: Int): ClockHistory = {
-=======
-  def record(playerIndex: PlayerIndex, clock: ClockBase, turn: Int): ClockHistory = {
->>>>>>> master
+  def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
+
+  def size = p1.size + p2.size
+
+  override def record(playerIndex: PlayerIndex, clock: ClockBase, turn: Int): ClockHistory = {
     val curClock        = clock currentClockFor playerIndex
     val initiatePeriods = clock.config.startsAtZero && periodEntries(playerIndex).isEmpty
     val isUsingByoyomi  = curClock.periods > 0 && !initiatePeriods
