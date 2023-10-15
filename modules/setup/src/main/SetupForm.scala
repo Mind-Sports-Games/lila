@@ -137,7 +137,7 @@ object SetupForm {
       mapping(
         "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
         "increment" -> increment
-      )(strategygames.FischerClock.Config.apply)(strategygames.FischerClock.Config.unapply)
+      )(strategygames.Clock.Config.apply)(strategygames.Clock.Config.unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
 
     lazy val fischerClock = "clock" -> optional(fischerClockMapping)

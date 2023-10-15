@@ -5,8 +5,8 @@ import strategygames.{
   Board,
   ByoyomiClock,
   Centis,
+  ClockBase,
   Clock,
-  FischerClock,
   GameFamily,
   Player => PlayerIndex,
   GameLogic,
@@ -82,7 +82,7 @@ object GameDiff {
         times          = history(playerIndex)
       } yield (
         clk match {
-          case _: FischerClock => FischerClockType()
+          case _: Clock        => FischerClockType()
           case _: ByoyomiClock => ByoyomiClockType()
         },
         clk.limit,
@@ -304,7 +304,7 @@ object GameDiff {
     dOpt(
       clock,
       _.clock,
-      (o: Option[Clock]) =>
+      (o: Option[ClockBase]) =>
         o flatMap { c =>
           BSONHandlers.clockBSONWrite(a.createdAt, c).toOption
         }

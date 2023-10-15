@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameGroup, GameLogic }
@@ -19,8 +19,11 @@ final class SwissForm(implicit mode: Mode) {
   // Yes, I know this is kinda gross. :'(
   private def valuesFromClockConfig(c: ClockConfig): Option[(Boolean, Int, Int, Option[Int], Option[Int])] =
     c match {
-      case fc: FischerClock.Config => {
-        FischerClock.Config.unapply(fc).map(t => (false, t._1, t._2, None, None))
+      case fc: Clock.Config => {
+        Clock.Config.unapply(fc).map(t => (false, t._1, t._2, None, None))
+      }
+      case bc: Clock.BronsteinConfig => {
+        Clock.BronsteinConfig.unapply(bc).map(t => (false, t._1, t._2, None, None))
       }
       case bc: ByoyomiClock.Config => {
         ByoyomiClock.Config.unapply(bc).map(t => (true, t._1, t._2, Some(t._3), Some(t._4)))
@@ -34,12 +37,12 @@ final class SwissForm(implicit mode: Mode) {
       increment: Int,
       byoyomi: Option[Int],
       periods: Option[Int]
-  ): ClockConfig =
+  ): ClockConfig = // TODO: do this for Bronstein too
     (useByoyomi, byoyomi, periods) match {
       case (true, Some(byoyomi), Some(periods)) =>
         ByoyomiClock.Config(limit, increment, byoyomi, periods)
       case _ =>
-        FischerClock.Config(limit, increment)
+        Clock.Config(limit, increment)
     }
 
   def form(minRounds: Int = 3) =
@@ -116,7 +119,7 @@ final class SwissForm(implicit mode: Mode) {
   def create =
     form() fill SwissData(
       name = none,
-      clock = FischerClock.Config(180, 0),
+      clock = Clock.Config(180, 0),
       startsAt = Some(DateTime.now plusSeconds {
         if (mode == Mode.Prod) 60 * 10 else 20
       }),
@@ -240,7 +243,7 @@ object SwissForm {
 
   val clockLimitChoices = options(
     clockLimits,
-    l => s"${strategygames.FischerClock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
+    l => s"${strategygames.Clock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
   )
 
   val roundIntervals: Seq[Int] =

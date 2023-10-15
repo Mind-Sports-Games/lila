@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, Mode, P1, P2, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, Mode, P1, P2, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition }
@@ -80,7 +80,7 @@ object ApiAiConfig extends BaseConfig {
   def from(
       l: Int,
       v: Option[String],
-      fcl: Option[FischerClock.Config],
+      fcl: Option[Clock.Config],
       bcl: Option[ByoyomiClock.Config],
       d: Option[Int],
       c: Option[String],

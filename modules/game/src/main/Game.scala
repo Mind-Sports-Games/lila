@@ -10,7 +10,7 @@ import strategygames.{
   ByoyomiClock,
   Clock,
   ClockConfig,
-  FischerClock,
+  ClockBase,
   Player => PlayerIndex,
   Game => StratGame,
   GameLogic,
@@ -43,7 +43,7 @@ case class Game(
     p1Player: Player,
     p2Player: Player,
     stratGame: StratGame,
-    loadClockHistory: Clock => Option[ClockHistory] = Game.someEmptyClockHistory,
+    loadClockHistory: ClockBase => Option[ClockHistory] = Game.someEmptyClockHistory,
     status: Status,
     daysPerTurn: Option[Int],
     binaryPlyTimes: Option[ByteArray] = None,
@@ -699,7 +699,7 @@ case class Game(
 
   def hasFischerClock = clock.fold(false)(c =>
     c match {
-      case _: FischerClock => true
+      case _: Clock => true
       case _               => false
     }
   )
@@ -717,7 +717,7 @@ case class Game(
 
   def isClockRunning = clock ?? (_.isRunning)
 
-  def withClock(c: Clock) = Progress(this, copy(stratGame = stratGame.copy(clock = Some(c))))
+  def withClock(c: ClockBase) = Progress(this, copy(stratGame = stratGame.copy(clock = Some(c))))
 
   def correspondenceGiveTime = Progress(this, copy(updatedAt = DateTime.now))
 
@@ -989,12 +989,12 @@ object Game {
   private[game] val emptyScore      = Score(0, 0)
 
   private[game] val someEmptyFischerClockHistory = Some(FischerClockHistory())
-  private[game] def someEmptyByoyomiClockHistory(c: Clock) = c match {
+  private[game] def someEmptyByoyomiClockHistory(c: ClockBase) = c match {
     case bc: ByoyomiClock => Some(ByoyomiClockHistory(bc.config.byoyomi))
     case _                => Some(ByoyomiClockHistory(Centis(0)))
   }
-  private[game] def someEmptyClockHistory(c: Clock) = c match {
-    case _: FischerClock => someEmptyFischerClockHistory
+  private[game] def someEmptyClockHistory(c: ClockBase) = c match {
+    case _: Clock => someEmptyFischerClockHistory
     case _: ByoyomiClock => someEmptyByoyomiClockHistory(c)
   }
 
@@ -1171,7 +1171,7 @@ sealed trait ClockHistory {
   val p1: Vector[Centis]
   val p2: Vector[Centis]
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
-  def record(playerIndex: PlayerIndex, clock: Clock, fullTurnCount: Int): ClockHistory =
+  def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory =
     update(playerIndex, _ :+ clock.remainingTime(playerIndex))
   def reset(playerIndex: PlayerIndex)                 = update(playerIndex, _ => Vector.empty)
   def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
@@ -1221,7 +1221,7 @@ case class ByoyomiClockHistory(
   def updatePeriods(playerIndex: PlayerIndex, f: Vector[Int] => Vector[Int]): ClockHistory =
     copy(periodEntries = periodEntries.update(playerIndex, f))
 
-  override def record(playerIndex: PlayerIndex, clock: Clock, fullTurnCount: Int): ClockHistory = {
+  override def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory = {
     val curClock        = clock currentClockFor playerIndex
     val initiatePeriods = clock.config.startsAtZero && periodEntries(playerIndex).isEmpty
     val isUsingByoyomi  = curClock.periods > 0 && !initiatePeriods

@@ -3,7 +3,7 @@ package lila.game
 import strategygames.{
   Player => PlayerIndex,
   Clock,
-  FischerClock,
+  ClockBase,
   ByoyomiClock,
   P1,
   P2,
@@ -202,7 +202,7 @@ object BSONHandlers {
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
 
-      val clock = r.getO[PlayerIndex => Clock](F.clock) {
+      val clock = r.getO[PlayerIndex => ClockBase](F.clock) {
         clockBSONReader(
           r.intO(F.clockType),
           createdAt,
@@ -740,23 +740,23 @@ object BSONHandlers {
   //------------------------------------------------------------------------------
   // General API
   //------------------------------------------------------------------------------
-  private[game] def clockTypeBSONWrite(clock: Clock) =
+  private[game] def clockTypeBSONWrite(clock: ClockBase) =
     // NOTE: If you're changing this, the read below also needs to be changed.
     clock match {
-      case _: FischerClock => 1
+      case _: Clock => 1
       case _: ByoyomiClock => 2
     }
 
-  private[game] def clockBSONWrite(since: DateTime, clock: Clock) =
+  private[game] def clockBSONWrite(since: DateTime, clock: ClockBase) =
     clock match {
-      case f: FischerClock => fischerClockBSONWrite(since, f)
+      case f: Clock => fischerClockBSONWrite(since, f)
       case b: ByoyomiClock => byoyomiClockBSONWrite(since, b)
     }
 
   private def clockHistory(
       playerIndex: PlayerIndex,
       clockHistory: Option[ClockHistory],
-      clock: Option[Clock],
+      clock: Option[ClockBase],
       flagged: Option[PlayerIndex]
   ) =
     for {
@@ -764,7 +764,7 @@ object BSONHandlers {
       history <- clockHistory
       times = history(playerIndex)
     } yield clk match {
-      case fc: FischerClock =>
+      case fc: Clock =>
         BinaryFormat.fischerClockHistory.writeSide(fc.limit, times, flagged has playerIndex)
       case bc: ByoyomiClock =>
         BinaryFormat.byoyomiClockHistory.writeSide(bc.limit, times, flagged has playerIndex)
@@ -792,13 +792,13 @@ object BSONHandlers {
     import Game.{ BSONFields => F }
     val p1ClockHistory = r bytesO F.p1ClockHistory
     val p2ClockHistory = r bytesO F.p2ClockHistory
-    (clk: Clock) =>
+    (clk: ClockBase) =>
       for {
         bw <- p1ClockHistory
         bb <- p2ClockHistory
         history <-
           clk match {
-            case fc: FischerClock =>
+            case fc: Clock =>
               BinaryFormat.fischerClockHistory
                 .read(fc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
             case bc: ByoyomiClock =>
@@ -824,8 +824,8 @@ object BSONHandlers {
   // FischerClock stuff
   //------------------------------------------------------------------------------
   private[game] def fischerClockBSONReader(since: DateTime, p1Berserk: Boolean, p2Berserk: Boolean) =
-    new BSONReader[PlayerIndex => Clock] {
-      def readTry(bson: BSONValue): Try[PlayerIndex => FischerClock] =
+    new BSONReader[PlayerIndex => ClockBase] {
+      def readTry(bson: BSONValue): Try[PlayerIndex => Clock] =
         bson match {
           case bin: BSONBinary =>
             ByteArrayBSONHandler readTry bin map { cl =>
@@ -835,7 +835,7 @@ object BSONHandlers {
         }
     }
 
-  private[game] def fischerClockBSONWrite(since: DateTime, clock: FischerClock) =
+  private[game] def fischerClockBSONWrite(since: DateTime, clock: Clock) =
     ByteArrayBSONHandler writeTry {
       BinaryFormat.fischerClock(since).write(clock)
     }
@@ -866,7 +866,7 @@ object BSONHandlers {
       p1Berserk: Boolean,
       p2Berserk: Boolean
   ) =
-    new BSONReader[PlayerIndex => Clock] {
+    new BSONReader[PlayerIndex => ClockBase] {
       def readTry(bson: BSONValue): Try[PlayerIndex => ByoyomiClock] =
         bson match {
           case bin: BSONBinary =>

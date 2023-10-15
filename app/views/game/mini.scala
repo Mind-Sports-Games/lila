@@ -127,7 +127,7 @@ object mini {
           calculateScore(pov)
     )
 
-  private def renderClock(clock: strategygames.Clock, pov: Pov) = {
+  private def renderClock(clock: strategygames.ClockBase, pov: Pov) = {
     val s = clock.remainingTime(pov.playerIndex).roundSeconds
     span(
       cls := s"mini-game__clock mini-game__clock--${pov.playerIndex.name}",

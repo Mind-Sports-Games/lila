@@ -3,7 +3,7 @@ package lila.tournament
 import cats.implicits._
 import strategygames.format.FEN
 import strategygames.chess.{ StartingPosition }
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, GameGroup, GameLogic, Mode }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameGroup, GameLogic, Mode }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.data._
@@ -23,7 +23,7 @@ final class TournamentForm {
   def create(user: User, leaderTeams: List[LeaderTeam], teamBattleId: Option[TeamID] = None) =
     form(user, leaderTeams) fill TournamentSetup(
       name = teamBattleId.isEmpty option user.titleUsername,
-      clock = FischerClock.Config(180, 0),
+      clock = Clock.Config(180, 0),
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
       startDate = none,
@@ -139,8 +139,11 @@ final class TournamentForm {
       c: ClockConfig
   ): Option[(Boolean, Double, Int, Option[Int], Option[Int])] =
     c match {
-      case fc: FischerClock.Config => {
-        FischerClock.Config.unapply(fc).map(t => (false, t._1 / 60d, t._2, None, None))
+      case fc: Clock.Config => {
+        Clock.Config.unapply(fc).map(t => (false, t._1 / 60d, t._2, None, None))
+      }
+      case bc: Clock.BronsteinConfig => {
+        Clock.BronsteinConfig.unapply(bc).map(t => (false, t._1 / 60d, t._2, None, None))
       }
       case bc: ByoyomiClock.Config => {
         ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 60d, t._2, Some(t._3), Some(t._4)))
@@ -154,12 +157,12 @@ final class TournamentForm {
       increment: Int,
       byoyomi: Option[Int],
       periods: Option[Int]
-  ): ClockConfig =
+  ): ClockConfig = // TODO: Do it for bronstein too
     (useByoyomi, byoyomi, periods) match {
       case (true, Some(byoyomi), Some(periods)) =>
         ByoyomiClock.Config((limit * 60).toInt, increment, byoyomi, periods)
       case _ =>
-        FischerClock.Config((limit * 60).toInt, increment)
+        Clock.Config((limit * 60).toInt, increment)
     }
 
   private def form(user: User, leaderTeams: List[LeaderTeam]) =
@@ -233,7 +236,7 @@ object TournamentForm {
   }.map(_.toDouble)
   val clockTimeDefault = 2d
   private def formatLimit(l: Double) =
-    FischerClock.Config(l * 60 toInt, 0).limitString + {
+    Clock.Config(l * 60 toInt, 0).limitString + {
       if (l <= 1) " minute" else " minutes"
     }
   val clockTimeChoices = optionsDouble(clockTimes, formatLimit)
@@ -312,7 +315,8 @@ private[tournament] case class TournamentSetup(
 ) {
 
   def validClock = clock match {
-    case fc: FischerClock.Config => (fc.limitSeconds + fc.incrementSeconds) > 0
+    case fc: Clock.Config          => (fc.limitSeconds + fc.incrementSeconds) > 0
+    case bc: Clock.BronsteinConfig => (bc.limitSeconds + bc.delaySeconds) > 0
     case bc: ByoyomiClock.Config =>
       (bc.limitSeconds + bc.incrementSeconds) > 0 || (bc.limitSeconds + bc.byoyomiSeconds) > 0
   }
@@ -414,9 +418,13 @@ private[tournament] case class TournamentSetup(
       {
         (bc.limitSeconds + 30 * bc.incrementSeconds + bc.byoyomiSeconds * 20 * bc.periodsTotal) * 2 * 0.8
       } + 15
-    case fc: FischerClock.Config =>
+    case fc: Clock.Config =>
       {
         (fc.limitSeconds + 30 * fc.incrementSeconds) * 2 * 0.8
+      } + 15
+    case bc: Clock.BronsteinConfig =>
+      {
+        (bc.limitSeconds + 30 * bc.incrementSeconds) * 2 * 0.8
       } + 15
   }
 

@@ -199,7 +199,7 @@ private object bits {
               //strategygames.ByoyomiClock
               //  .Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0, 0, 1)
               //  .limitString
-              strategygames.FischerClock
+              strategygames.Clock
                 .Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0)
                 .limitString
             ),
