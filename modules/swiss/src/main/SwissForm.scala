@@ -25,6 +25,9 @@ final class SwissForm(implicit mode: Mode) {
       case bc: Clock.BronsteinConfig => {
         Clock.BronsteinConfig.unapply(bc).map(t => (false, t._1, t._2, None, None))
       }
+      case udc: Clock.UsDelayConfig => {
+        Clock.UsDelayConfig.unapply(udc).map(t => (false, t._1, t._2, None, None))
+      }
       case bc: ByoyomiClock.Config => {
         ByoyomiClock.Config.unapply(bc).map(t => (true, t._1, t._2, Some(t._3), Some(t._4)))
       }

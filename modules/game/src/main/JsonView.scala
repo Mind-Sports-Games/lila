@@ -240,14 +240,38 @@ object JsonView {
   implicit val clockWriter: OWrites[ClockBase] = OWrites { c =>
     c match {
       case fc: Clock =>
-        Json.obj(
-          "running"   -> fc.isRunning,
-          "initial"   -> fc.limitSeconds,
-          "increment" -> fc.incrementSeconds,
-          "p1"        -> fc.remainingTime(P1).toSeconds,
-          "p2"        -> fc.remainingTime(P2).toSeconds,
-          "emerg"     -> fc.config.emergSeconds
-        )
+        fc.config match {
+          case fConfig: Clock.Config =>
+            Json.obj(
+              "running"   -> fc.isRunning,
+              "initial"   -> fConfig.limitSeconds,
+              "increment" -> fConfig.incrementSeconds,
+              "p1"        -> fc.remainingTime(P1).toSeconds,
+              "p2"        -> fc.remainingTime(P2).toSeconds,
+              "emerg"     -> fc.config.emergSeconds
+            )
+          case bConfig: Clock.BronsteinConfig =>
+            Json.obj(
+              "running"   -> fc.isRunning,
+              "initial"   -> bConfig.limitSeconds,
+              "delay"     -> bConfig.delaySeconds,
+              "delayType" -> "bronstein",
+              "p1"        -> fc.remainingTime(P1).toSeconds,
+              "p2"        -> fc.remainingTime(P2).toSeconds,
+              "emerg"     -> fc.config.emergSeconds
+            )
+          case udConfig: Clock.UsDelayConfig =>
+            Json.obj(
+              "running"   -> fc.isRunning,
+              "initial"   -> udConfig.limitSeconds,
+              "delay"     -> udConfig.delaySeconds,
+              "delayType" -> "usdelay",
+              "p1"        -> fc.remainingTime(P1).toSeconds,
+              "p2"        -> fc.remainingTime(P2).toSeconds,
+              "emerg"     -> fc.config.emergSeconds
+            )
+          case _: ByoyomiClock.Config => Json.obj()
+        }
       case bc: ByoyomiClock => {
         val p1Clock = bc.currentClockFor(P1)
         val p2Clock = bc.currentClockFor(P2)

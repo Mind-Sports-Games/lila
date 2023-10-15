@@ -145,6 +145,9 @@ final class TournamentForm {
       case bc: Clock.BronsteinConfig => {
         Clock.BronsteinConfig.unapply(bc).map(t => (false, t._1 / 60d, t._2, None, None))
       }
+      case udc: Clock.UsDelayConfig => {
+        Clock.UsDelayConfig.unapply(udc).map(t => (false, t._1 / 60d, t._2, None, None))
+      }
       case bc: ByoyomiClock.Config => {
         ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 60d, t._2, Some(t._3), Some(t._4)))
       }
@@ -317,6 +320,7 @@ private[tournament] case class TournamentSetup(
   def validClock = clock match {
     case fc: Clock.Config          => (fc.limitSeconds + fc.incrementSeconds) > 0
     case bc: Clock.BronsteinConfig => (bc.limitSeconds + bc.delaySeconds) > 0
+    case udc: Clock.UsDelayConfig  => (udc.limitSeconds + udc.delaySeconds) > 0
     case bc: ByoyomiClock.Config =>
       (bc.limitSeconds + bc.incrementSeconds) > 0 || (bc.limitSeconds + bc.byoyomiSeconds) > 0
   }
@@ -424,7 +428,11 @@ private[tournament] case class TournamentSetup(
       } + 15
     case bc: Clock.BronsteinConfig =>
       {
-        (bc.limitSeconds + 30 * bc.incrementSeconds) * 2 * 0.8
+        (bc.limitSeconds + 30 * bc.delaySeconds) * 2 * 0.8
+      } + 15
+    case udc: Clock.UsDelayConfig =>
+      {
+        (udc.limitSeconds + 30 * udc.delaySeconds) * 2 * 0.8
       } + 15
   }
 

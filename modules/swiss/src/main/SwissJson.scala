@@ -401,12 +401,19 @@ object SwissJson {
           "limit"     -> fc.limitSeconds,
           "increment" -> fc.incrementSeconds
         )
-      case bc: Clock.BronsteinConfig => 
+      case bc: Clock.BronsteinConfig =>
         Json.obj(
-          "limit" -> bc.limitSeconds,
-          "delay" -> bc.delaySeconds
+          "limit"     -> bc.limitSeconds,
+          "delay"     -> bc.delaySeconds,
+          "delayType" -> "bronstein"
         )
-      case bc: ByoyomiClock.Config => 
+      case udc: Clock.UsDelayConfig =>
+        Json.obj(
+          "limit"     -> udc.limitSeconds,
+          "delay"     -> udc.delaySeconds,
+          "delayType" -> "usdelay"
+        )
+      case bc: ByoyomiClock.Config =>
         Json.obj(
           "limit"     -> bc.limitSeconds,
           "increment" -> bc.incrementSeconds,

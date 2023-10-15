@@ -59,8 +59,9 @@ final class BotJsonView(
             "activeplayer"    -> game.activePlayer.name,
             "wtime"           -> millisOf(game.p1Pov),
             "btime"           -> millisOf(game.p2Pov),
-            "winc"            -> game.clock.??(_.config.increment.millis),
-            "binc"            -> game.clock.??(_.config.increment.millis),
+            // TODO: these two fields need to be tested for Bronstein and UsDelay and Fischer now
+            "winc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),
+            "binc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),
             "wdraw"           -> game.p1Player.isOfferingDraw,
             "bdraw"           -> game.p2Player.isOfferingDraw,
             "status"          -> game.status.name,
@@ -139,8 +140,15 @@ final class BotJsonView(
         )
       case c: strategygames.Clock.BronsteinConfig =>
         Json.obj(
-          "initial" -> c.limit.millis,
-          "delay"   -> c.delay.millis
+          "initial"   -> c.limit.millis,
+          "delay"     -> c.delay.millis,
+          "delaytype" -> "bronstein"
+        )
+      case c: strategygames.Clock.UsDelayConfig =>
+        Json.obj(
+          "initial"   -> c.limit.millis,
+          "delay"     -> c.delay.millis,
+          "delayType" -> "usdelay"
         )
       case c: strategygames.ByoyomiClock.Config =>
         Json.obj(

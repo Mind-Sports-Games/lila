@@ -22,8 +22,9 @@ final case class ApiAiConfig(
 
   val strictFen = false
 
-  val days      = ~daysO
-  val increment = clock.??(_.increment.roundSeconds)
+  val days = ~daysO
+  // TODO: this should be reconsidered for Bronstein and UsDelay
+  val increment = clock.??(_.graceSeconds)
   val time      = clock.??(_.limit.roundSeconds / 60)
   val byoyomi = clock match {
     case Some(c: ByoyomiClock.Config) => c.byoyomi.roundSeconds

@@ -201,8 +201,9 @@ object Challenge {
     case class Correspondence(days: Int) extends TimeControl
     case class Clock(config: strategygames.ClockConfig) extends TimeControl {
       // All durations are expressed in seconds
-      def limit     = config.limit
-      def increment = config.increment
+      def limit = config.limit
+      // TODO: should be updatede to deal with Bronstein and UsDelay
+      def increment = config.graceSeconds
       def show      = config.show
     }
   }

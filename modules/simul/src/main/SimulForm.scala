@@ -52,6 +52,9 @@ object SimulForm {
       case bc: Clock.BronsteinConfig => {
         Clock.BronsteinConfig.unapply(bc).map(t => (false, t._1, t._2, None, None))
       }
+      case udc: Clock.UsDelayConfig => {
+        Clock.UsDelayConfig.unapply(udc).map(t => (false, t._1, t._2, None, None))
+      }
       case bc: ByoyomiClock.Config => {
         ByoyomiClock.Config.unapply(bc).map(t => (true, t._1, t._2, Some(t._3), Some(t._4)))
       }
@@ -174,11 +177,14 @@ object SimulForm {
   ) {
     def clock =
       SimulClock(
+        // TODO: this one is a bit odd, I feel like `copy` might just be enough.
         config = clockConfig match {
           case fc: Clock.Config =>
             strategygames.Clock.Config(fc.limitSeconds * 60, fc.incrementSeconds)
           case bc: Clock.BronsteinConfig =>
             strategygames.Clock.BronsteinConfig(bc.limitSeconds * 60, bc.delaySeconds)
+          case udc: Clock.UsDelayConfig =>
+            strategygames.Clock.UsDelayConfig(udc.limitSeconds * 60, udc.delaySeconds)
           case bc: ByoyomiClock.Config =>
             strategygames.ByoyomiClock
               .Config(bc.limitSeconds * 60, bc.incrementSeconds, bc.byoyomiSeconds, bc.periods)

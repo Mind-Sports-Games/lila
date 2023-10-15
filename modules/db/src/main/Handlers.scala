@@ -184,6 +184,16 @@ trait Handlers {
               limit <- doc.getAsTry[Int]("limit")
               inc   <- doc.getAsTry[Int]("increment")
             } yield strategygames.Clock.Config(limit, inc)
+          case "bronstein" =>
+            for {
+              limit <- doc.getAsTry[Int]("limit")
+              delay <- doc.getAsTry[Int]("delay")
+            } yield strategygames.Clock.BronsteinConfig(limit, delay)
+          case "usdelay" =>
+            for {
+              limit <- doc.getAsTry[Int]("limit")
+              delay <- doc.getAsTry[Int]("delay")
+            } yield strategygames.Clock.UsDelayConfig(limit, delay)
           case "byoyomi" =>
             for {
               limit   <- doc.getAsTry[Int]("limit")
@@ -207,6 +217,12 @@ trait Handlers {
             "t"     -> "bronstein",
             "limit" -> fc.limitSeconds,
             "delay" -> fc.delaySeconds
+          )
+        case udc: Clock.UsDelayConfig =>
+          BSONDocument(
+            "t"     -> "usdelay",
+            "limit" -> udc.limitSeconds,
+            "delay" -> udc.delaySeconds
           )
         case bc: ByoyomiClock.Config =>
           BSONDocument(
