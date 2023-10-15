@@ -3,7 +3,7 @@ package lila.swiss
 import ornicar.scalalib.Zero
 
 import strategygames.format.FEN
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, GameGroup, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameGroup, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import scala.concurrent.duration._
@@ -68,7 +68,10 @@ case class Swiss(
     case bc: ByoyomiClock.Config => {
       ((bc.limitSeconds + bc.incrementSeconds * 80 + bc.byoyomiSeconds * 20 * bc.periodsTotal + 10) * settings.nbRounds).toInt.seconds
     }
-    case fc: FischerClock.Config => {
+    case bc: Clock.BronsteinConfig => {
+      ((bc.limitSeconds + bc.delaySeconds * 80 + 10) * settings.nbRounds).toInt.seconds
+    }
+    case fc: Clock.Config => {
       ((fc.limitSeconds + fc.incrementSeconds * 80 + 10) * settings.nbRounds).toInt.seconds
     }
   }

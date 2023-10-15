@@ -11,7 +11,7 @@ import lila.db.dsl._
 import lila.db.paginator.Adapter
 import lila.user.User
 
-import strategygames.{ FischerClock, GameLogic, Mode }
+import strategygames.{ Clock, GameLogic, Mode }
 import strategygames.variant.Variant
 
 final class CrudApi(tournamentRepo: TournamentRepo) {
@@ -71,7 +71,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
     Tournament.make(
       by = Left(User.playstrategyId),
       name = none,
-      clock = FischerClock.Config(0, 0),
+      clock = Clock.Config(0, 0),
       minutes = 0,
       variant = Variant.libStandard(GameLogic.Chess()),
       position = none,

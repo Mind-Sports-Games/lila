@@ -6,10 +6,10 @@ import strategygames.{
   ByoyomiClock,
   ByoyomiClockPlayer,
   Centis,
-  Clock,
+  ClockBase,
   ClockConfig,
-  FischerClockPlayer,
-  FischerClock,
+  ClockPlayer,
+  Clock,
   Player => PlayerIndex,
   GameLogic,
   Piece,
@@ -138,57 +138,57 @@ object BinaryFormat {
 
   case class fischerClock(start: Timestamp) {
 
-    def legacyElapsed(clock: Clock, playerIndex: PlayerIndex) =
+    def legacyElapsed(clock: ClockBase, playerIndex: PlayerIndex) =
       clock.limit - clock.clockPlayer(playerIndex).remaining
 
     def computeRemaining(config: ClockConfig, legacyElapsed: Centis) =
       config.limit - legacyElapsed
 
     def write(clock: Clock): ByteArray = {
-      Array(writeClockLimit(clock.limitSeconds), clock.incrementSeconds.toByte) ++
+      Array(writeClockLimit(clock.limitSeconds), clock.config.incrementSeconds.toByte) ++
         writeSignedInt24(legacyElapsed(clock, P1).centis) ++
         writeSignedInt24(legacyElapsed(clock, P2).centis) ++
-        clock.timer.fold(Array.empty[Byte])(writeTimer)
+        clock.timestamp.fold(Array.empty[Byte])(writeTimestamp)
     }
 
-    def read(ba: ByteArray, p1Berserk: Boolean, p2Berserk: Boolean): PlayerIndex => FischerClock =
+    def read(ba: ByteArray, p1Berserk: Boolean, p2Berserk: Boolean): PlayerIndex => Clock =
       playerIndex => {
         val ia = ba.value map toInt
 
         // ba.size might be greater than 12 with 5 bytes timers
         // ba.size might be 8 if there was no timer.
         // #TODO remove 5 byte timer case! But fix the DB first!
-        val timer = {
+        val timestamp = {
           if (ia.lengthIs == 12) readTimer(readInt(ia(8), ia(9), ia(10), ia(11)))
           else None
         }
 
         ia match {
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, _*) =>
-            val config   = FischerClock.Config(readClockLimit(b1), b2)
+            val config   = Clock.Config(readClockLimit(b1), b2)
             val legacyP1 = Centis(readSignedInt24(b3, b4, b5))
             val legacyP2 = Centis(readSignedInt24(b6, b7, b8))
-            FischerClock(
+            Clock(
               config = config,
               player = playerIndex,
               players = PlayerIndex.Map(
-                FischerClockPlayer
+                ClockPlayer
                   .withConfig(config)
                   .copy(berserk = p1Berserk)
                   .setRemaining(computeRemaining(config, legacyP1)),
-                FischerClockPlayer
+                ClockPlayer
                   .withConfig(config)
                   .copy(berserk = p2Berserk)
                   .setRemaining(computeRemaining(config, legacyP2))
               ),
-              timer = timer
+              timestamp = timestamp
             )
           case _ => sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
         }
       }
 
-    private def writeTimer(timer: Timestamp) = {
-      val centis = (timer - start).centis
+    private def writeTimestamp(timestamp: Timestamp) = {
+      val centis = (timestamp - start).centis
       /*
        * A zero timer is resolved by `readTimer` as the absence of a timer.
        * As a result, a clock that is started with a timer = 0
@@ -231,10 +231,10 @@ object BinaryFormat {
       config.limit - legacyElapsed
 
     def write(clock: ByoyomiClock): ByteArray = {
-      Array(writeClockLimit(clock.limitSeconds), clock.incrementSeconds.toByte) ++
+      Array(writeClockLimit(clock.limitSeconds), clock.config.incrementSeconds.toByte) ++
         writeSignedInt24(legacyElapsed(clock, P1).centis) ++
         writeSignedInt24(legacyElapsed(clock, P2).centis) ++
-        clock.timer.fold(Array.empty[Byte])(writeTimer) ++ Array(
+        clock.timestamp.fold(Array.empty[Byte])(writeTimestamp) ++ Array(
           clock.byoyomiSeconds.toByte,
           clock.periodsTotal.toByte
         )
@@ -252,7 +252,7 @@ object BinaryFormat {
         // ba.size might be greater than 12 with 5 bytes timers
         // ba.size might be 8 if there was no timer.
         // #TODO remove 5 byte timer case! But fix the DB first!
-        val timer = {
+        val timestamp = {
           if (ia.size >= 12) readTimer(readInt(ia(8), ia(9), ia(10), ia(11)))
           else None
         }
@@ -289,15 +289,15 @@ object BinaryFormat {
                   .setRemaining(computeRemaining(config, legacyP2))
                   .setPeriods(periodEntries(P2).size atLeast config.initPeriod)
               ),
-              timer = timer
+              timestamp = timestamp
             )
           }
           case _ => sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
         }
       }
 
-    private def writeTimer(timer: Timestamp) = {
-      val centis = (timer - start).centis
+    private def writeTimestamp(timestamp: Timestamp) = {
+      val centis = (timestamp - start).centis
       /*
        * A zero timer is resolved by `readTimer` as the absence of a timer.
        * As a result, a clock that is started with a timer = 0

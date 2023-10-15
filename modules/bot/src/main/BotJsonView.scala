@@ -131,10 +131,15 @@ final class BotJsonView(
 
   implicit private val clockConfigWriter: OWrites[strategygames.ClockConfig] = OWrites { c =>
     c match {
-      case c: strategygames.FischerClock.Config =>
+      case c: strategygames.Clock.Config =>
         Json.obj(
           "initial"   -> c.limit.millis,
           "increment" -> c.increment.millis
+        )
+      case c: strategygames.Clock.BronsteinConfig =>
+        Json.obj(
+          "initial" -> c.limit.millis,
+          "delay"   -> c.delay.millis
         )
       case c: strategygames.ByoyomiClock.Config =>
         Json.obj(

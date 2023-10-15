@@ -31,7 +31,7 @@ private object BSONHandlers {
   //       from each other that we can distinguish between them by the existence of their attributes
   //       New clock types will need to continue this pattern.
   implicit val TimeControlBSONHandler = new BSON[TimeControl] {
-    def reads(r: Reader) =
+    def reads(r: Reader) = // TODO: need bronstein here too
       (r.intO("l"), r.intO("i"), r.intO("b"), r.intO("p"))
         .mapN((limit, inc, byoyomi, periods) =>
           TimeControl.Clock(strategygames.ByoyomiClock.Config(limit, inc, byoyomi, periods))
@@ -39,16 +39,17 @@ private object BSONHandlers {
         .getOrElse(
           (r.intO("l"), r.intO("i"))
             .mapN { (limit, inc) =>
-              TimeControl.Clock(strategygames.FischerClock.Config(limit, inc))
+              TimeControl.Clock(strategygames.Clock.Config(limit, inc))
             }
             .orElse(
               r intO "d" map TimeControl.Correspondence.apply
             )
             .getOrElse(TimeControl.Unlimited)
         )
-    def writes(w: Writer, t: TimeControl) =
+    def writes(w: Writer, t: TimeControl) = // TODO: need to handle Bronstein here too
       t match {
-        case TimeControl.Clock(strategygames.FischerClock.Config(l, i)) => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.Clock.Config(l, i))          => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.Clock.BronsteinConfig(l, d)) => $doc("l" -> l, "d" -> d)
         case TimeControl.Clock(strategygames.ByoyomiClock.Config(l, i, b, p)) =>
           $doc("l" -> l, "i" -> i, "b" -> b, "p" -> p)
         case TimeControl.Correspondence(d) => $doc("d" -> d)

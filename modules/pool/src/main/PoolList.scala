@@ -45,7 +45,7 @@ object PoolList {
   val json = Json toJson all
 
   implicit private class PimpedInt(self: Int) {
-    def ++(increment: Int) = strategygames.FischerClock.Config(self * 60, increment)
+    def ++(increment: Int) = strategygames.Clock.Config(self * 60, increment)
     def players            = NbPlayers(self)
   }
 }

@@ -7,10 +7,10 @@ import strategygames.opening.FullOpening
 import strategygames.{
   P2,
   ByoyomiClock,
-  Clock,
+  ClockBase,
   Player => PlayerIndex,
   Division,
-  FischerClock,
+  Clock,
   GameLogic,
   Pocket,
   PocketData,
@@ -236,9 +236,9 @@ object JsonView {
       )
     }
 
-  implicit val clockWriter: OWrites[Clock] = OWrites { c =>
+  implicit val clockWriter: OWrites[ClockBase] = OWrites { c =>
     c match {
-      case fc: FischerClock =>
+      case fc: Clock =>
         Json.obj(
           "running"   -> fc.isRunning,
           "initial"   -> fc.limitSeconds,

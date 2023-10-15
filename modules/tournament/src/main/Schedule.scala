@@ -3,7 +3,7 @@ package lila.tournament
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.GameLogic
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig }
 import org.joda.time.DateTime
 import play.api.i18n.Lang
 
@@ -284,8 +284,18 @@ object Schedule {
         case _                                                       => false
       }
     def fromClock(clock: ClockConfig) =
-      clock match {
-        case _: FischerClock.Config => {
+      clock match { // TODO: this seems a bit repetitive now
+        case _: Clock.Config => {
+          val time = clock.estimateTotalSeconds
+          if (time < 30) UltraBullet
+          else if (time < 60) HyperBullet
+          else if (time < 120) Bullet
+          else if (time < 180) HippoBullet
+          else if (time < 480) Blitz
+          else if (time < 1500) Rapid
+          else Classical
+        }
+        case _: Clock.BronsteinConfig => {
           val time = clock.estimateTotalSeconds
           if (time < 30) UltraBullet
           else if (time < 60) HyperBullet
@@ -388,7 +398,7 @@ object Schedule {
   private def zhInc(s: Schedule)       = s.at.getHourOfDay % 2 == 0
 
   private def zhEliteTc(s: Schedule) = {
-    val TC = FischerClock.Config
+    val TC = Clock.Config
     s.at.getDayOfMonth / 7 match {
       case 0 => TC(3 * 60, 0)
       case 1 => TC(1 * 60, 1)
@@ -402,7 +412,7 @@ object Schedule {
     import Freq._, Speed._
     import strategygames.chess.variant._
 
-    val TC = FischerClock.Config
+    val TC = Clock.Config
     val BC = ByoyomiClock.Config
 
     (s.freq, s.variant, s.speed) match {

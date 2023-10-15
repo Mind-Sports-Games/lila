@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ByoyomiClock, FischerClock, GameFamily, GameLogic, Mode, Speed }
+import strategygames.{ ByoyomiClock, Clock, GameFamily, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import lila.lobby.PlayerIndex
 import lila.lobby.{ Hook, Seek }
@@ -115,7 +115,7 @@ case class HookConfig(
           variant = game.variant,
           timeMode = TimeMode ofGame game,
           time = c.limitInMinutes,
-          increment = c.incrementSeconds,
+          increment = c.config.incrementSeconds,
           byoyomi = c.byoyomiSeconds,
           periods = c.periodsTotal,
           days = game.daysPerTurn | days,
@@ -126,7 +126,7 @@ case class HookConfig(
           variant = game.variant,
           timeMode = TimeMode ofGame game,
           time = game.clock.map(_.limitInMinutes) | time,
-          increment = game.clock.map(_.incrementSeconds) | increment,
+          increment = game.clock.map(_.config.incrementSeconds ) | increment,
           byoyomi = 0,
           periods = 0,
           days = game.daysPerTurn | days,

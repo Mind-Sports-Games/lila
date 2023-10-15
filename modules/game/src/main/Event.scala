@@ -6,7 +6,7 @@ import strategygames.{
   Board,
   ByoyomiClock,
   Centis,
-  FischerClock,
+  Clock => StratClock,
   Player => PlayerIndex,
   GameFamily,
   GameLogic,
@@ -586,7 +586,7 @@ object Event {
         )
         .add("clock" -> game.clock.map { c =>
           c match {
-            case fc: FischerClock =>
+            case fc: StratClock =>
               Json.obj(
                 "p1" -> fc.remainingTime(P1).centis,
                 "p2" -> fc.remainingTime(P2).centis
@@ -681,9 +681,9 @@ object Event {
         .add("lag" -> nextLagComp.collect { case Centis(c) if c > 1 => c })
   }
   object Clock {
-    def apply(clock: strategygames.Clock): Clock =
+    def apply(clock: strategygames.ClockBase): Clock =
       clock match {
-        case fc: FischerClock =>
+        case fc: StratClock =>
           Clock(
             fc.remainingTime(P1),
             fc.remainingTime(P2),
