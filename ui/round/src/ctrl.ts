@@ -1008,6 +1008,15 @@ export default class RoundController {
     ) {
       this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
     }
+    if (
+      this.isPlaying() &&
+      !this.replaying() &&
+      (d.game.variant.key === 'go9x9' || d.game.variant.key === 'go13x13' || d.game.variant.key === 'go19x19') &&
+      d.deadStoneOfferState &&
+      (d.deadStoneOfferState == 'AcceptedP1Offer' || d.deadStoneOfferState == 'AcceptedP2Offer')
+    ) {
+      this.doSelectSquaresAction();
+    }
     if (this.isPlaying() && game.nbMoves(d, d.player.playerIndex) === 0 && !this.isSimulHost()) {
       playstrategy.sound.play('genericNotify');
     }

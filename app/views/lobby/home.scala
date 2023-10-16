@@ -188,6 +188,7 @@ object home {
         ),
         bits.lastPosts(lastPost),
         ctx.noKid option bits.weeklyChallenge(weeklyChallenge),
+        bits.gameList,
         div(cls := "lobby__info")(
           div(cls := "lobby__support")(
             a(href := routes.Plan.index)(

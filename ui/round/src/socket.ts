@@ -150,7 +150,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
 
         ctrl.redraw();
         if (o.accepted) {
-          ctrl.data.deadStoneOfferState = 'AcceptedOffer';
+          ctrl.data.deadStoneOfferState = o.playerIndex == 'p1' ? 'AcceptedP2Offer' : 'AcceptedP1Offer';
           ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
           ctrl.doSelectSquaresAction();
           ctrl.redraw();

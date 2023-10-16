@@ -38,10 +38,11 @@ For instance, the estimated duration of a 5+3 game is 5 × 60 + 40 × 3 = 420 se
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$ss = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$ss = %2$s</string>
   <string name="whatGamesCanIplay">What games can I play on PlayStrategy?</string>
-  <string name="playstrategyGamesList">On PlayStrategy there is Chess and Lines of Action. More games on the way...</string>
+  <string name="playstrategyGamesList">On PlayStrategy there is Chess, Draughts, Othello, Go, Mancala, Shogi, Xiangqi, Lines of Action and Amazons. More games on the way...</string>
   <string name="whatVariantsCanIplay">What variants can I play on PlayStrategy?</string>
   <string name="playstrategySupportChessAnd">PlayStrategy supports %1$s.</string>
   <string name="eightVariants">8 chess variants</string>
+  <string name="variantList">There are over 30 different games/variants, including 10 chess variants and 10 draughts variants.</string>
   <string name="whatIsACPL">In chess, what is the average centipawn loss (ACPL)?</string>
   <string name="acplExplanation">The centipawn is the unit of measure used in chess as representation of the advantage. A centipawn is equal to 1/100th of a pawn. Therefore 100 centipawns = 1 pawn. These values play no formal role in the game but are useful to players, and essential in computer chess, for evaluating positions.
 

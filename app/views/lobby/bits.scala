@@ -5,6 +5,10 @@ import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import strategygames.variant.Variant
+import strategygames.GameGroup
+import lila.i18n.VariantKeys
+import scala.util.Random
 
 object bits {
 
@@ -199,6 +203,46 @@ object bits {
           weekCha.previousName
         ),
         userIdLink(weekCha.winner.some, dataIcon = 'g'.some)
+      )
+    )
+
+  def gameList(implicit ctx: Context) =
+    div(cls := "lobby__gamelist lobby__box")(
+      div(cls := "lobby__box__top")(
+        h2(cls := "title text")(trans.learnHowToPlay()),
+        a(cls := "more", href := "/variant")(trans.more(), " »")
+      ),
+      div(cls := "game-icon-area")(
+        div(cls := "arrow", title := "Prev", id := "slideLeft", dataIcon := "I")(),
+        div(cls := "game-icon-list", id := "game-icons-container")(
+          variantsOrdered
+            .map(v =>
+              a(cls := "game-icon", href := s"/variant/${v.key}")(
+                i(cls := "img", dataIcon := v.perfIcon),
+                p(cls := "text")(VariantKeys.variantName(v))
+              )
+            )
+        ),
+        div(cls := "arrow", title := "Next", id := "slideRight", dataIcon := "H")()
+      )
+    )
+
+  private def variantsOrdered: List[Variant] = {
+    val randomOrder     = Random.shuffle(Variant.all.filterNot(_.fromPosition))
+    val gameGroups      = GameGroup.medley.filter(gg => gg.variants.exists(randomOrder.contains(_)))
+    val onePerGameGroup = generateOnePerGameGroup(randomOrder, gameGroups)
+    val newOrder        = onePerGameGroup ::: randomOrder.filterNot(onePerGameGroup.contains(_))
+    newOrder ::: newOrder ::: newOrder // 3 copies for infinte scroll
+  }
+
+  private def generateOnePerGameGroup(variants: List[Variant], gameGroups: List[GameGroup]) =
+    Random.shuffle(
+      gameGroups.map(gg =>
+        Random
+          .shuffle(
+            gg.variants.filter(v => variants.contains(v))
+          )
+          .head
       )
     )
 

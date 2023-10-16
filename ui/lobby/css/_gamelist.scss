@@ -1,0 +1,36 @@
+.lobby__gamelist {
+  .game-icon-area {
+    display: flex;
+
+    .arrow {
+      font-size: 2em;
+      align-self: center;
+      padding: 0.25em;
+    }
+
+    .game-icon-list {
+      display: flex;
+      flex-flow: row nowrap;
+      overflow: auto;
+      outline: none;
+      overflow-y: hidden;
+      -ms-overflow-style: scroll; // IE 10+
+      scrollbar-width: none; // Firefox
+      text-align: center;
+    }
+
+    .game-icon-list::-webkit-scrollbar {
+      display: none; // safari and chrome
+    }
+
+    .game-icon {
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      padding: 0 15px 0 15px;
+      .img {
+        font-size: 4em;
+      }
+    }
+  }
+}
