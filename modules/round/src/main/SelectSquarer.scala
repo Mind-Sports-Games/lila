@@ -1,11 +1,16 @@
 package lila.round
 
 import strategygames.{ Centis, Pos }
+import strategygames.variant.Variant
+import strategygames.format.Uci
 
 import lila.common.Bus
-import lila.game.{ Event, Game, Pov, Progress }
+import lila.game.{ Event, Game, Pov, Progress, Player => GamePlayer }
 import lila.i18n.{ I18nKeys => trans, defaultLang }
 import lila.pref.{ Pref, PrefApi }
+import actorApi.round.HumanPlay
+import lila.hub.actorApi.round.BotPlay
+import lila.hub.actorApi.map.Tell
 
 final private[round] class SelectSquarer(
     messenger: Messenger,
@@ -23,7 +28,12 @@ final private[round] class SelectSquarer(
         proxy.save {
           messenger.system(g, trans.selectSquareOfferAccepted.txt())
           Progress(g) map { _.acceptSelectSquares(playerIndex) }
-        } >>- publishSquareOfferEvent(pov) inject List(
+        } >> submitSelectSquaresAction(
+          g.id,
+          g.player,
+          squares,
+          pov.game.variant
+        ) inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(true))
         )
       case _ => fuccess(List(Event.ReloadOwner))
@@ -57,6 +67,27 @@ final private[round] class SelectSquarer(
         case _ => fuccess(List(Event.ReloadOwner))
       }
     }
+
+  private def clientError[A](msg: String): Fu[A] = fufail(lila.round.ClientError(msg))
+
+  private def tellRound(id: String, msg: Any) =
+    Bus.publish(Tell(id, msg), "roundSocket")
+
+  private def submitSelectSquaresAction(
+      gameId: String,
+      player: GamePlayer,
+      squares: List[Pos],
+      variant: Variant
+  ): Funit = {
+    val uciStr = "ss:" + squares.mkString(",")
+    Uci(variant, uciStr).fold(clientError[Unit](s"Invalid UCI: $uciStr")) { uci =>
+      if (player.isAi || player.isPSBot) {
+        fuccess(tellRound(gameId, BotPlay(player.id, uci, None)))
+      } else {
+        fuccess(tellRound(gameId, HumanPlay(Game.PlayerId(player.id), uci, false)))
+      }
+    }
+  }
 
   private def publishSquareOfferEvent(pov: Pov)(implicit
       proxy: GameProxy
