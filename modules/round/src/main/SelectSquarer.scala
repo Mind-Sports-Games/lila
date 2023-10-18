@@ -28,7 +28,7 @@ final private[round] class SelectSquarer(
         proxy.save {
           messenger.system(g, trans.selectSquareOfferAccepted.txt())
           Progress(g) map { _.acceptSelectSquares(playerIndex) }
-        } >>- publishSquareOfferEvent(pov) >> submitSelectSquaresAction(
+        } >> submitSelectSquaresAction(
           g.id,
           g.player,
           squares,
