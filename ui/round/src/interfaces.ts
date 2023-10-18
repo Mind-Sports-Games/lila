@@ -43,12 +43,6 @@ export interface SocketPass {
   b?: 1;
 }
 
-export interface SocketSelectSquares {
-  s: string;
-  variant: string;
-  b?: 1;
-}
-
 export type EncodedDests =
   | string
   | {

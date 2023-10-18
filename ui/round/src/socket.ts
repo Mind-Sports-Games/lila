@@ -152,7 +152,6 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         if (o.accepted) {
           ctrl.data.deadStoneOfferState = o.playerIndex == 'p1' ? 'AcceptedP2Offer' : 'AcceptedP1Offer';
           ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
-          ctrl.doSelectSquaresAction();
           ctrl.redraw();
         } else {
           ctrl.data.deadStoneOfferState = 'RejectedOffer';

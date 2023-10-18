@@ -44,7 +44,6 @@ import {
   SocketMove,
   SocketDrop,
   SocketPass,
-  SocketSelectSquares,
   SocketOpts,
   MoveMetadata,
   Position,
@@ -174,7 +173,7 @@ export default class RoundController {
         if (this.data.deadStoneOfferState == 'ChooseFirstOffer') {
           this.doOfferSelectSquares();
         } else {
-          this.doSelectSquaresAction();
+          this.socket.sendLoading('select-squares-accept');
         }
       }
     }
@@ -468,16 +467,6 @@ export default class RoundController {
     if (blur.get()) pass.b = 1;
     this.resign(false);
     this.actualSendMove('pass', pass);
-  };
-
-  sendSelectSquares = (variant: string, squares: cg.Key[]): void => {
-    const ss: SocketSelectSquares = {
-      variant: variant,
-      s: squares.join(','),
-    };
-    if (blur.get()) ss.b = 1;
-    this.resign(false);
-    this.actualSendMove('selectSquares', ss);
   };
 
   showYourMoveNotification = () => {
@@ -981,12 +970,6 @@ export default class RoundController {
     this.sendPass(this.data.game.variant.key);
   };
 
-  doSelectSquaresAction = () => {
-    //this.setLoading(true);
-    console.log('ss action, stones', this.data.selectedSquares);
-    this.sendSelectSquares(this.data.game.variant.key, this.data.selectedSquares!);
-  };
-
   setChessground = (cg: CgApi) => {
     this.chessground = cg;
     if (this.data.pref.keyboardMove) {
@@ -1007,15 +990,6 @@ export default class RoundController {
       d.possibleMoves
     ) {
       this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
-    }
-    if (
-      this.isPlaying() &&
-      !this.replaying() &&
-      (d.game.variant.key === 'go9x9' || d.game.variant.key === 'go13x13' || d.game.variant.key === 'go19x19') &&
-      d.deadStoneOfferState &&
-      (d.deadStoneOfferState == 'AcceptedP1Offer' || d.deadStoneOfferState == 'AcceptedP2Offer')
-    ) {
-      this.doSelectSquaresAction();
     }
     if (this.isPlaying() && game.nbMoves(d, d.player.playerIndex) === 0 && !this.isSimulHost()) {
       playstrategy.sound.play('genericNotify');

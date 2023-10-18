@@ -490,7 +490,9 @@ case class Game(
   def drawOffers = metadata.drawOffers
 
   def selectedSquaresOfferDoesNotMatchUci(uci: Uci): Boolean =
-    selectedSquares.fold(false)(p => ("ss:" + p.mkString(",")) != uci.uci)
+    selectedSquares.fold(false)(p =>
+      p.map(_.toString).sorted.mkString != uci.uci.drop(3).split(",").sorted.mkString
+    )
 
   def selectedSquares = metadata.selectedSquares
 
