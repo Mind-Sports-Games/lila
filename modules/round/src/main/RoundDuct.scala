@@ -493,7 +493,7 @@ final private[round] class RoundDuct(
 
   private def recordLag(pov: Pov): Unit =
     if ((pov.game.playedPlies & 30) == 10) {
-      // TODO: Test for multimove, never checked for Amazons?
+      // TODO: Test for multiaction, never checked for Amazons?
       // Triggers every 32 moves starting on ply 10.
       // i.e. 10, 11, 42, 43, 74, 75, ...
       for {

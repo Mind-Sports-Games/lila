@@ -145,7 +145,7 @@ object ServerEval {
     def divisionOf(chapter: Chapter) =
       divider(
         id = chapter.id.value,
-        //TODO upgrade for multimove
+        //TODO upgrade for multiaction
         actions = chapter.root.mainline.map(_.move.san).toVector.map(Vector(_)),
         variant = chapter.setup.variant,
         initialFen = chapter.root.fen.some

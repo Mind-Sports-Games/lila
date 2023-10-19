@@ -27,7 +27,7 @@ case class Info(
   def encode: String =
     List(
       best ?? (_.piotr),
-      //TODO Wrong for multimove
+      //TODO Wrong for multiaction
       (variation take Info.LineMaxTurns).flatten mkString " ",
       mate ?? (_.value.toString),
       cp ?? (_.value.toString)

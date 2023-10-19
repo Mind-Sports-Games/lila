@@ -1034,7 +1034,6 @@ object PeriodEntries {
 }
 
 sealed trait ClockHistory {
-  //TODO: Multimove: Should p1 and p2 now be stored in a similar format to actions? Vector[Vector[Centis]]?
   val p1: Vector[Centis]
   val p2: Vector[Centis]
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
