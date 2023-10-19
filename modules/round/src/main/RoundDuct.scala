@@ -186,9 +186,9 @@ final private[round] class RoundDuct(
           case false =>
             lila
               .log("cheat")
-              //TODO multiaction finalise meaning of gameid#ply / gameid#turn in url
+              //TODO multiaction finalise meaning of gameid#ply / gameid#turn in url (all handled in frontend)
               .info(
-                s"hold alert $ip https://playstrategy.org/${pov.gameId}/${pov.playerIndex.name}#${pov.game.plies} ${pov.player.userId | "anon"} mean: $mean SD: $sd"
+                s"hold alert $ip https://playstrategy.org/${pov.gameId}/${pov.playerIndex.name}#${pov.game.turnCount} ${pov.player.userId | "anon"} mean: $mean SD: $sd"
               )
             lila.mon.cheat.holdAlert.increment()
             gameRepo.setHoldAlert(pov, GamePlayer.HoldAlert(ply = pov.game.plies, mean = mean, sd = sd)).void

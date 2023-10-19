@@ -11,6 +11,7 @@ import lila.common.Json._
 
 sealed trait Node {
   def ply: Int
+  def turnCount: Int
   // who's playerIndex plays next
   def playerIndex: PlayerIndex
   def fen: FEN
@@ -45,6 +46,7 @@ sealed trait Node {
 
 case class Root(
     ply: Int,
+    turnCount: Int,
     // who's playerIndex plays next
     playerIndex: PlayerIndex,
     fen: FEN,
@@ -79,6 +81,7 @@ case class Root(
 case class Branch(
     id: UciCharPair,
     ply: Int,
+    turnCount: Int,
     // who's playerIndex plays next
     playerIndex: PlayerIndex,
     move: Uci.WithSan,

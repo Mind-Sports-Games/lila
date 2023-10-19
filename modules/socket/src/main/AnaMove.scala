@@ -79,6 +79,7 @@ case class AnaMove(
         Branch(
           id = UciCharPair(lib, uci),
           ply = game.plies,
+          turnCount = game.turnCount,
           playerIndex = game.situation.player,
           move = Uci.WithSan(lib, uci, san),
           fen = fen,

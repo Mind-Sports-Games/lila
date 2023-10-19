@@ -11,6 +11,8 @@ import lila.tree.Node.{ Comment, Comments, Gamebook, Shapes }
 
 sealed trait RootOrNode {
   val ply: Int
+  //TODO multiaction review as turnCount and playerIndex always seem to be passed through as 'after' values (as in what these values are after this ply has been made)
+  val turnCount: Int
   val playerIndex: PlayerIndex
   val fen: FEN
   val check: Boolean
@@ -23,8 +25,7 @@ sealed trait RootOrNode {
   val glyphs: Glyphs
   val score: Option[Score]
   def addChild(node: Node): RootOrNode
-  //TODO multiaction: this would be fullTurnCount if turn not ply was being used
-  def fullTurnCount = 1 + ply / 2
+  def fullTurnCount = 1 + turnCount / 2
   def mainline: Vector[Node]
   def moveOption: Option[Uci.WithSan]
 }
@@ -32,6 +33,7 @@ sealed trait RootOrNode {
 case class Node(
     id: UciCharPair,
     ply: Int,
+    turnCount: Int,
     playerIndex: PlayerIndex,
     move: Uci.WithSan,
     fen: FEN,
@@ -236,6 +238,7 @@ object Node {
 
   case class Root(
       ply: Int,
+      turnCount: Int,
       playerIndex: PlayerIndex,
       fen: FEN,
       check: Boolean,
@@ -330,6 +333,7 @@ object Node {
     def default(variant: Variant) =
       Root(
         ply = 0,
+        turnCount = 0,
         playerIndex = PlayerIndex.P1,
         fen = variant.initialFen,
         check = false,
@@ -341,6 +345,7 @@ object Node {
     def fromRoot(b: lila.tree.Root): Root =
       Root(
         ply = b.ply,
+        turnCount = b.turnCount,
         playerIndex = b.playerIndex,
         fen = b.fen,
         check = b.check,
@@ -354,6 +359,7 @@ object Node {
     Node(
       id = b.id,
       ply = b.ply,
+      turnCount = b.turnCount,
       playerIndex = b.playerIndex,
       move = b.move,
       fen = b.fen,
@@ -366,6 +372,7 @@ object Node {
 
   object BsonFields {
     val ply            = "p"
+    val turnCount      = "t"
     val pi             = "pi"
     val ppt            = "pt"
     val uci            = "u"

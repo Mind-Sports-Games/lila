@@ -425,7 +425,6 @@ case class Game(
 
   def drawOffers = metadata.drawOffers
 
-  //TODO multiaction: review if we want to consider draw offers in plies or turns (currently migrating to turnCount)
   def playerCanOfferDraw(playerIndex: PlayerIndex) =
     started && playable &&
       turnCount >= 2 &&

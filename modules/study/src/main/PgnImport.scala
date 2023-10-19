@@ -37,6 +37,7 @@ object PgnImport {
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.plies,
+              turnCount = replay.setup.turnCount,
               playerIndex = replay.setup.situation.player,
               fen = initialFen.getOrElse(game.variant.initialFen),
               check = replay.setup.situation.check,
@@ -140,6 +141,7 @@ object PgnImport {
                   Node(
                     id = UciCharPair(GameLogic.Chess(), uci),
                     ply = game.plies,
+                    turnCount = game.turnCount,
                     playerIndex = game.situation.player,
                     move = Uci.WithSan(GameLogic.Chess(), uci, sanStr),
                     fen = Forsyth.>>(GameLogic.Chess(), game),

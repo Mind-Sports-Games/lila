@@ -199,6 +199,7 @@ final class JsonView(
           val branch = tree.Branch(
             id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
             ply = game.plies,
+            turnCount = game.turnCount,
             playerIndex = game.situation.player,
             //we can flatten actions as we are dealing with just Chess
             move = Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.actions.flatten.last),

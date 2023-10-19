@@ -37,7 +37,7 @@ object TreeBuilder {
       withFlags: WithFlags
   ): Root = {
     val withClocks: Option[Vector[Centis]] = withFlags.clocks ?? game.bothClockStates
-    val drawOfferPlies                     = game.drawOffers.normalizedTurns
+    val drawOfferTurnCount                 = game.drawOffers.normalizedTurns
     Replay.gamePlyWhileValid(
       game.variant.gameLogic,
       game.actions,
@@ -59,6 +59,7 @@ object TreeBuilder {
         }.toMap)
         val root = Root(
           ply = init.plies,
+          turnCount = init.turnCount,
           playerIndex = init.situation.player,
           fen = fen,
           check = init.situation.check,
@@ -84,6 +85,7 @@ object TreeBuilder {
           val branch = Branch(
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.plies,
+            turnCount = g.turnCount,
             playerIndex = g.situation.player,
             move = m,
             fen = fen,
@@ -105,8 +107,7 @@ object TreeBuilder {
               case _ => None
             },
             comments = Node.Comments {
-              //TODO multiaction check we want to do drawOffers on plies
-              drawOfferPlies(g.plies)
+              drawOfferTurnCount(g.turnCount)
                 .option(
                   makePlayStrategyComment(
                     s"${g.situation.board.variant.playerNames(player)} offers draw"
@@ -160,6 +161,7 @@ object TreeBuilder {
       Branch(
         id = UciCharPair(variant.gameLogic, m.uci),
         ply = g.plies,
+        turnCount = g.turnCount,
         playerIndex = g.situation.player,
         move = m,
         fen = fen,

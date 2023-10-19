@@ -41,7 +41,7 @@ object ServerEval {
               variant = chapter.setup.variant,
               moves = UciDump(
                 lib = chapter.setup.variant.gameLogic,
-                //TODO upgrade for multimove
+                //TODO upgrade for multiaction but fine for now as ServerEval only handles single action games
                 actions = chapter.root.mainline.map(_.move.san).map(Vector(_)),
                 initialFen = chapter.root.fen.some,
                 variant = chapter.setup.variant,
@@ -51,7 +51,7 @@ object ServerEval {
                 }
               ).toOption
                 .map(
-                  //TODO upgrade for multimove
+                  //TODO upgrade for multiaction but fine for now as ServerEval only handles single action games
                   _.flatten.toList.flatMap(m =>
                     Uci.apply(
                       chapter.setup.variant.gameLogic,
@@ -177,6 +177,7 @@ object ServerEval {
       Node(
         id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
         ply = g.plies,
+        turnCount = g.turnCount,
         playerIndex = g.situation.player,
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),

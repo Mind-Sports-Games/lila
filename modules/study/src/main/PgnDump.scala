@@ -96,7 +96,7 @@ object PgnDump {
 
   private def node2action(node: Node, variations: Variations)(implicit flags: WithFlags) =
     Turn(
-      //TODO: Work out how to do nodes for multiaction. Do we need to mash the turn into one node?
+      //TODO: Work out how to do nodes for multiaction.
       san = node.move.san,
       glyphs = if (flags.comments) node.glyphs else Glyphs.empty,
       comments = flags.comments ?? {
@@ -151,8 +151,7 @@ object PgnDump {
       case Vector() => Vector()
       case first +: rest if first.ply % 2 == 0 =>
         FullTurn(
-          //TODO: Multiaction this is correct if turn, not ply is being used here
-          fullTurnNumber = 1 + (first.ply - 1) / 2,
+          fullTurnNumber = 1 + (first.turnCount - 1) / 2,
           p1 = none,
           p2 = node2action(first, variations).some
         ) +: toFullTurnsFromP1(rest, first.children.variations)

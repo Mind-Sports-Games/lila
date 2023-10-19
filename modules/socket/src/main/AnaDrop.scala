@@ -32,6 +32,7 @@ case class AnaDrop(
             Branch(
               id = UciCharPair(uci),
               ply = game.plies,
+              turnCount = game.turnCount,
               playerIndex = game.situation.player,
               move = strategygames.format.Uci.ChessWithSan(Uci.WithSan(uci, san)),
               fen = fen,
