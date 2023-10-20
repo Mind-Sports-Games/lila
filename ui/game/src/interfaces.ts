@@ -10,6 +10,7 @@ export interface BaseGameData {
   tournament?: Tournament;
   simul?: Simul;
   swiss?: Swiss;
+  canTakeBack: boolean;
   takebackable: boolean;
   moretimeable: boolean;
   clock?: Clock;
