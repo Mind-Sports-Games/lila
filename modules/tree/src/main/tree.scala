@@ -11,9 +11,9 @@ import lila.common.Json._
 
 sealed trait Node {
   def ply: Int
-  def turnCount: Int
-  // who's playerIndex plays next
-  def playerIndex: PlayerIndex
+  //
+  //def turnCount: Int
+  //def playerIndex: PlayerIndex
   def fen: FEN
   def check: Boolean
   // None when not computed yet
@@ -40,15 +40,18 @@ sealed trait Node {
   def idOption: Option[UciCharPair]
   def moveOption: Option[Uci.WithSan]
 
+  // who's playerIndex plays next
+  // This was inherited from lichess but is the right?
+  // Should the node track who played on this node?
+  // TODO change for multiaction (use turnCount)
+  def playerIndex = PlayerIndex.fromTurnCount(ply)
+
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
 }
 
 case class Root(
     ply: Int,
-    turnCount: Int,
-    // who's playerIndex plays next
-    playerIndex: PlayerIndex,
     fen: FEN,
     check: Boolean,
     // None when not computed yet
@@ -81,9 +84,6 @@ case class Root(
 case class Branch(
     id: UciCharPair,
     ply: Int,
-    turnCount: Int,
-    // who's playerIndex plays next
-    playerIndex: PlayerIndex,
     move: Uci.WithSan,
     fen: FEN,
     check: Boolean,

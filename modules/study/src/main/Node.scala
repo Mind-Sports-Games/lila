@@ -11,9 +11,9 @@ import lila.tree.Node.{ Comment, Comments, Gamebook, Shapes }
 
 sealed trait RootOrNode {
   val ply: Int
-  //TODO multiaction review as turnCount and playerIndex always seem to be passed through as 'after' values (as in what these values are after this ply has been made)
-  val turnCount: Int
-  val playerIndex: PlayerIndex
+  //TODO multiaction will want turnCount, but atm Study won't be for multiaction variants.
+  //Will need to think what is stored here. Presumably turnCount is of the actual node (ply) and not the turnCount after this ply has been applied?
+  //val turnCount: Int
   val fen: FEN
   val check: Boolean
   val shapes: Shapes
@@ -25,16 +25,20 @@ sealed trait RootOrNode {
   val glyphs: Glyphs
   val score: Option[Score]
   def addChild(node: Node): RootOrNode
-  def fullTurnCount = 1 + turnCount / 2
+  //TODO multiaction will want to use turnCount, but we don't have that yet
+  //and as mentioned above we dont have any multiaction variants in Study
+  def fullTurnCount = 1 + ply / 2
   def mainline: Vector[Node]
+  //TODO multiaction - again this will need to be upgraded, but is fine for now, same reasons as above
+  //this stores who plays next. like tree/src/main/tree.scala
+  def playerIndex = PlayerIndex.fromTurnCount(ply)
   def moveOption: Option[Uci.WithSan]
 }
 
 case class Node(
     id: UciCharPair,
     ply: Int,
-    turnCount: Int,
-    playerIndex: PlayerIndex,
+    //turnCount: Int,
     move: Uci.WithSan,
     fen: FEN,
     check: Boolean,
@@ -238,8 +242,7 @@ object Node {
 
   case class Root(
       ply: Int,
-      turnCount: Int,
-      playerIndex: PlayerIndex,
+      //turnCount: Int,
       fen: FEN,
       check: Boolean,
       shapes: Shapes = Shapes(Nil),
@@ -333,8 +336,6 @@ object Node {
     def default(variant: Variant) =
       Root(
         ply = 0,
-        turnCount = 0,
-        playerIndex = PlayerIndex.P1,
         fen = variant.initialFen,
         check = false,
         clock = none,
@@ -345,8 +346,6 @@ object Node {
     def fromRoot(b: lila.tree.Root): Root =
       Root(
         ply = b.ply,
-        turnCount = b.turnCount,
-        playerIndex = b.playerIndex,
         fen = b.fen,
         check = b.check,
         clock = b.clock,
@@ -359,8 +358,6 @@ object Node {
     Node(
       id = b.id,
       ply = b.ply,
-      turnCount = b.turnCount,
-      playerIndex = b.playerIndex,
       move = b.move,
       fen = b.fen,
       check = b.check,
@@ -371,10 +368,9 @@ object Node {
     )
 
   object BsonFields {
-    val ply            = "p"
-    val turnCount      = "t"
-    val pi             = "pi"
-    val ppt            = "pt"
+    val ply = "p"
+    //no longer used (was plysPerTurn)
+    //val ppt            = "pt"
     val uci            = "u"
     val san            = "s"
     val fen            = "f"
@@ -389,4 +385,4 @@ object Node {
     val forceVariation = "fv"
     val order          = "o"
   }
-}
+ }

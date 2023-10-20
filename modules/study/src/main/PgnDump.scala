@@ -151,7 +151,8 @@ object PgnDump {
       case Vector() => Vector()
       case first +: rest if first.ply % 2 == 0 =>
         FullTurn(
-          fullTurnNumber = 1 + (first.turnCount - 1) / 2,
+          //TODO change to turnCount when multiaction supported in study
+          fullTurnNumber = 1 + (first.ply - 1) / 2,
           p1 = none,
           p2 = node2action(first, variations).some
         ) +: toFullTurnsFromP1(rest, first.children.variations)

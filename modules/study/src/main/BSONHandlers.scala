@@ -191,11 +191,9 @@ object BSONHandlers {
     import Node.{ BsonFields => F }
     for {
       ply <- doc.getAsOpt[Int](F.ply)
-      pi  <- doc.getAsOpt[Int](F.pi)
       uci <- doc.getAsOpt[Uci](F.uci)
       san <- doc.getAsOpt[String](F.san)
       fen <- doc.getAsOpt[FEN](F.fen)
-      turnCount      = doc.getAsOpt[Int](F.turnCount) getOrElse ply
       check          = ~doc.getAsOpt[Boolean](F.check)
       shapes         = doc.getAsOpt[Shapes](F.shapes) getOrElse Shapes.empty
       comments       = doc.getAsOpt[Comments](F.comments) getOrElse Comments.empty
@@ -208,8 +206,6 @@ object BSONHandlers {
     } yield Node(
       id,
       ply,
-      turnCount,
-      PlayerIndex.fromP1(pi == 1),
       WithSan(GameLogic.Chess(), uci, san),
       fen,
       check,
@@ -230,8 +226,6 @@ object BSONHandlers {
     val w = new Writer
     $doc(
       ply            -> n.ply,
-      turnCount      -> n.turnCount,
-      pi             -> n.playerIndex.hashCode,
       uci            -> n.move.uci,
       san            -> n.move.san,
       fen            -> n.fen,
@@ -259,9 +253,6 @@ object BSONHandlers {
       val p        = r int ply
       Root(
         ply = p,
-        turnCount = (r intO turnCount) | p,
-        //if we haven't explicitly written the playerIndex for this study then its an old one ply per turn study and so we can deduce the playerIndex from the ply (using fromTurnCount as if it were fromPly) like the old days
-        playerIndex = (r intO pi).map(pi => PlayerIndex.fromP1(pi == 1)) | PlayerIndex.fromTurnCount(p),
         fen = r.get[FEN](fen),
         check = r boolD check,
         shapes = r.getO[Shapes](shapes) | Shapes.empty,
@@ -277,18 +268,16 @@ object BSONHandlers {
     def writes(w: Writer, r: Root) = $doc(
       StudyFlatTree.writer.rootChildren(r) appended {
         Path.rootDbKey -> $doc(
-          ply       -> r.ply,
-          turnCount -> r.turnCount,
-          pi        -> r.playerIndex.hashCode,
-          fen       -> r.fen,
-          check     -> r.check.some.filter(identity),
-          shapes    -> r.shapes.value.nonEmpty.option(r.shapes),
-          comments  -> r.comments.value.nonEmpty.option(r.comments),
-          gamebook  -> r.gamebook,
-          glyphs    -> r.glyphs.nonEmpty,
-          score     -> r.score,
-          clock     -> r.clock,
-          crazy     -> r.pocketData
+          ply      -> r.ply,
+          fen      -> r.fen,
+          check    -> r.check.some.filter(identity),
+          shapes   -> r.shapes.value.nonEmpty.option(r.shapes),
+          comments -> r.comments.value.nonEmpty.option(r.comments),
+          gamebook -> r.gamebook,
+          glyphs   -> r.glyphs.nonEmpty,
+          score    -> r.score,
+          clock    -> r.clock,
+          crazy    -> r.pocketData
         )
       }
     )

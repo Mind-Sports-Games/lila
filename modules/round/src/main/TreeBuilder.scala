@@ -59,8 +59,6 @@ object TreeBuilder {
         }.toMap)
         val root = Root(
           ply = init.plies,
-          turnCount = init.turnCount,
-          playerIndex = init.situation.player,
           fen = fen,
           check = init.situation.check,
           captureLength = init.situation match {
@@ -85,8 +83,6 @@ object TreeBuilder {
           val branch = Branch(
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.plies,
-            turnCount = g.turnCount,
-            playerIndex = g.situation.player,
             move = m,
             fen = fen,
             captureLength = (g.situation, m.uci.origDest._2) match {
@@ -161,8 +157,6 @@ object TreeBuilder {
       Branch(
         id = UciCharPair(variant.gameLogic, m.uci),
         ply = g.plies,
-        turnCount = g.turnCount,
-        playerIndex = g.situation.player,
         move = m,
         fen = fen,
         check = g.situation.check,
