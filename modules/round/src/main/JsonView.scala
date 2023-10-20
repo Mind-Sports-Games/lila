@@ -156,6 +156,7 @@ final class JsonView(
           )
           .add("clock" -> pov.game.clock.map(clockJson))
           .add("correspondence" -> pov.game.correspondenceClock)
+          .add("canTakeBack" -> takebackable)
           .add("takebackable" -> takebackable)
           .add("moretimeable" -> moretimeable)
           .add("crazyhouse" -> pov.game.board.pocketData)
