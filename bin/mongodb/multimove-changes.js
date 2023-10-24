@@ -9,8 +9,21 @@ db.game5.updateMany({ ap: { $exists: false }, t: { $mod: [2, 1] } }, { $set: { a
 //db.game5.find({"ap": {$exists: false}}).count();
 
 //db.game5.find({"sp": {$exists: true}}).count(); //double check this is 0 as we are redefining sp
-db.game5.updateMany({ st: { $mod: [2, 0] } }, { $set: { sp: 1 } });
-db.game5.updateMany({ st: { $mod: [2, 1] } }, { $set: { sp: 2 } });
+//When sp meant startPlayer
+//db.game5.updateMany({ st: { $mod: [2, 0] } }, { $set: { sp: 1 } });
+//db.game5.updateMany({ st: { $mod: [2, 1] } }, { $set: { sp: 2 } });
+
+//With sp meaning startedAtPlies
+db.game5.find({ st: { $exists: true } }).forEach(g => {
+  db.game5.updateOne(
+    { _id: g._id },
+    {
+      $set: {
+        sp: g.st
+      }
+    }
+  );
+});
 
 db.game5.find({ l: 2, v: 8 }).forEach(g => {
   db.game5.updateOne(

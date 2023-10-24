@@ -39,8 +39,8 @@ final class AutoPairing(
             //TODO multiaction review this. think this is ok
             plies = turns,
             turnCount = turns,
-            startedAtTurn = turns,
-            startPlayer = g.player
+            startedAtPlies = turns,
+            startedAtTurn = turns
           )
         },
         p1Player = makePlayer(P1, player1),

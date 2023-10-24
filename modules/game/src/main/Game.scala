@@ -663,7 +663,7 @@ case class Game(
   def onePlayerHasMoved    = playedTurns >= 1
   def bothPlayersHaveMoved = playedTurns >= 2
 
-  def startPlayerIndex                     = stratGame.startPlayer
+  def startPlayerIndex                     = PlayerIndex.fromTurnCount(stratGame.startedAtTurn)
   def startIndex(playerIndex: PlayerIndex) = if (playerIndex == startPlayerIndex) 0 else 1
 
   //the number of ply a player has played
@@ -757,8 +757,8 @@ case class Game(
       stratGame = stratGame.copy(
         turnCount = 0,
         plies = 0,
-        startedAtTurn = 0,
-        startPlayer = PlayerIndex.P1
+        startedAtPlies = 0,
+        startedAtTurn = 0
       )
     )
 
@@ -947,8 +947,8 @@ object Game {
     val turns             = "t"
     val plies             = "p"
     val activePlayer      = "ap"
+    val startedAtPlies    = "sp"
     val startedAtTurn     = "st"
-    val startPlayer       = "sp"
     val clock             = "c"
     val clockType         = "ct"
     val positionHashes    = "ph"

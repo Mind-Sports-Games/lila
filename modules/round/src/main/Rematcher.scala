@@ -166,8 +166,8 @@ final private class Rematcher(
           },
           turnCount = situation ?? (_.turnCount),
           plies = situation ?? (_.plies),
-          startedAtTurn = situation ?? (_.currentTurnCount),
-          startPlayer = situation.fold[PlayerIndex](P1)(_.situation.player)
+          startedAtPlies = situation ?? (_.plies),
+          startedAtTurn = situation ?? (_.turnCount)
         ),
         p1Player = returnPlayer(game, P1, users),
         p2Player = returnPlayer(game, P2, users),
