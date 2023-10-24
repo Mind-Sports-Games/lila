@@ -177,7 +177,7 @@ final class JsonView(
           })
           .add("expirationOnPaused" -> pov.game.expirableOnPaused.option {
             Json.obj(
-              "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
+              "idleMillis"   -> (nowMillis - pov.game.updatedAt.getMillis),
               "millisToMove" -> pov.game.timeWhenPaused.millis
             )
           })

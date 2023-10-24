@@ -66,7 +66,7 @@ private object ChallengeJoiner {
           makeChess(Variant.libStandard(c.variant.gameLogic)) -> none
         else game                                             -> baseState
     }
-    val pieces     = chessGame.situation.board.pieces
+    val pieces     = stratGame.situation.board.pieces
     val multiMatch = c.isMultiMatch && c.customStartingPosition option "multiMatch"
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game

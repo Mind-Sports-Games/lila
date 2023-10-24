@@ -461,54 +461,56 @@ object BSONHandlers {
         (togyzkumalakGame, defaultMetaData)
       }
 
-    def readGoGame(r: BSON.Reader): Game = {
+    def readGoGame(r: BSON.Reader): (StratGame, Metadata) = {
 
         val gameVariant = GoVariant(r intD F.variant) | GoStandard
 
         val actions = NewLibStorage.OldBin.decode(GameLogic.Go(), r bytesD F.oldPgn, playedPlies)
+        val uciMoves = actions.flatten.toList
 
-      val goGame = StratGame.Go(
-        go.Game(
-        situation = go.Situation(
-          go.Board(
-            pieces = BinaryFormat.piece.readGo(r bytes F.binaryPieces, gameVariant),
-            history = go.History(
-              lastMove = (r strO F.historyLastMove) flatMap (go.format.Uci.apply),
+        val initialFen: Option[FEN] = r.getO[FEN](F.initialFen) //for handicapped games
+
+        val goGame = StratGame.Go(
+          go.Game(
+            situation = go.Situation(
+              go.Board(
+                pieces = BinaryFormat.piece.readGo(r bytes F.binaryPieces, gameVariant),
+                history = go.History(
+                  lastMove = (r strO F.historyLastMove) flatMap (go.format.Uci.apply),
                   //we can flatten as samurai does not have any multimove games
                   //TODO: Is halfMoveClock even doing anything for togyzkumalak?
                   halfMoveClock = actions.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)
                   ) atLeast 0,
-              positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
-              score = {
-                val counts = r.intsD(F.score)
-                Score(~counts.headOption, ~counts.lastOption)
-              },
-              captures = {
-                val counts = r.intsD(F.captures)
-                Score(~counts.headOption, ~counts.lastOption)
-              }
+                  positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+                  score = {
+                    val counts = r.intsD(F.score)
+                    Score(~counts.headOption, ~counts.lastOption)
+                  },
+                  captures = {
+                    val counts = r.intsD(F.captures)
+                    Score(~counts.headOption, ~counts.lastOption)
+                  }
+                ),
+                variant = gameVariant,
+                pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
+                  case Some(PocketData.Go(pd)) => Some(pd)
+                  case None                    => None
+                  case _                       => sys.error("non go pocket data")
+                },
+                uciMoves = uciMoves,
+                position = initialFen.map(f => strategygames.go.Api.positionFromStartingFenAndMoves(f.toGo, uciMoves))
+              ),
+              player = turnPlayerIndex
             ),
-            variant = gameVariant,
-            pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
-              case Some(PocketData.Go(pd)) => Some(pd)
-              case None                    => None
-              case _                       => sys.error("non go pocket data")
-            },
-            uciMoves = uciMoves,
-            position =
-              initialFen.map(f => strategygames.go.Api.positionFromStartingFenAndMoves(f.toGo, uciMoves))
-          ),
-          player = turnPlayerIndex
-        ),
             actions = actions,
             clock = clock,
             plies = plies,
             turnCount = turns,
             startedAtPlies = startedAtPlies,
             startedAtTurn = startedAtTurn
-      )
-)
+          )
+        )
         val metadata = Metadata(
           source = r intO F.source flatMap Source.apply,
           pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),

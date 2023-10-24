@@ -10,7 +10,7 @@ import play.api.libs.json.JsObject
 
 import lila.tree.Branch
 
-//We don't think AnaMove is used - think this has been ported to lila-ws
+//We don't think AnaDrop is used - think this has been ported to lila-ws
 
 case class AnaDrop(
     role: Role,

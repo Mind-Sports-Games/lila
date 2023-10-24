@@ -100,6 +100,9 @@ case class Game(
 
   def turnPlayerIndex = stratGame.player
 
+  //For the front end - whose 'turn' is it? (SG + Go select squares status)
+  def activePlayerIndex = playerToOfferSelectSquares.getOrElse(turnPlayerIndex)
+
   def turnOf(p: Player): Boolean      = p == player
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
@@ -464,7 +467,7 @@ case class Game(
   private def selectSquaresPossible =
     started &&
       playable &&
-      turns >= 2 &&
+      turnCount >= 2 &&
       (situation match {
         case Situation.Go(s) => s.canSelectSquares
         case _               => false
@@ -500,7 +503,7 @@ case class Game(
 
   def offerSelectSquares(playerIndex: PlayerIndex, squares: List[Pos]) =
     copy(
-      movedAt = DateTime.now,
+      updatedAt = DateTime.now,
       metadata = metadata.copy(
         selectedSquares = Some(squares),
         deadStoneOfferState =
@@ -513,8 +516,8 @@ case class Game(
 
   def acceptSelectSquares(playerIndex: PlayerIndex) =
     copy(
-      chess = chess.copy(clock = clock.map(_.start)),
-      movedAt = DateTime.now,
+      stratGame = stratGame.copy(clock = clock.map(_.start)),
+      updatedAt = DateTime.now,
       metadata = metadata.copy(
         deadStoneOfferState = metadata.deadStoneOfferState match {
           // TODO: this is a mess, but the whole thing is a bit of a mess right now.
@@ -530,8 +533,8 @@ case class Game(
 
   def declineSelectSquares(playerIndex: PlayerIndex) =
     copy(
-      chess = chess.copy(clock = clock.map(_.start)),
-      movedAt = DateTime.now,
+      stratGame = stratGame.copy(clock = clock.map(_.start)),
+      updatedAt = DateTime.now,
       metadata = metadata.copy(
         selectedSquares = None,
         deadStoneOfferState = Some(DeadStoneOfferState.RejectedOffer)
@@ -544,13 +547,13 @@ case class Game(
 
   def resetDeadStoneOfferState =
     copy(
-      movedAt = DateTime.now,
+      updatedAt = DateTime.now,
       metadata = metadata.copy(deadStoneOfferState = None)
     )
 
   def setChooseFirstOffer =
     copy(
-      movedAt = DateTime.now,
+      updatedAt = DateTime.now,
       metadata = metadata.copy(
         deadStoneOfferState = DeadStoneOfferState.ChooseFirstOffer.some
       )
@@ -789,7 +792,7 @@ case class Game(
 
   def timeBeforeExpirationOnPaused: Option[Centis] =
     expirableOnPaused option {
-      Centis.ofMillis(movedAt.getMillis - nowMillis + timeWhenPaused.millis).nonNeg
+      Centis.ofMillis(updatedAt.getMillis - nowMillis + timeWhenPaused.millis).nonNeg
     }
 
   def expirable = expirableAtStart || expirableOnPaused

@@ -27,7 +27,7 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
     add(
       game,
       UciDump.action(game.variant.gameLogic, game.variant)(action),
-      action.situationBefore.player
+      action.player
     )
 
   def set(game: Game, actions: Actions) =
