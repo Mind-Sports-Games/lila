@@ -83,15 +83,32 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variantDisplayName: 'Amazons',
       variantId: '8_1',
     },
-    { id: '3+2-oware', lim: 3, inc: 2, perf: 'Oware', variant: 'oware', variantDisplayName: 'Oware', variantId: '6_1' },
+    {
+      id: '3+2-oware',
+      lim: 3,
+      inc: 2,
+      perf: 'Oware',
+      variant: 'oware',
+      variantDisplayName: 'Oware',
+      variantId: '6_1',
+    },
     {
       id: '3+2-togyzkumalak',
       lim: 3,
       inc: 2,
       perf: 'Togyzkumalak',
       variant: 'togyzkumalak',
-      variantDisplayName: 'Togyzkumalak',
+      variantDisplayName: 'Togyzqumalaq',
       variantId: '7_1',
+    },
+    {
+      id: '5+3-go19x19',
+      lim: 5,
+      inc: 3,
+      perf: 'Go19x19',
+      variant: 'go19x19',
+      variantDisplayName: 'Go 19x19',
+      variantId: '9_4',
     },
   ];
   const nbRoundSpread = spreadNumber('#nb_games_in_play > strong', 8),
@@ -190,6 +207,55 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     }
 
     history.replaceState(null, '', '/');
+  }
+
+  const $gamelist_button_right = $('#slideRight'),
+    $gamelist_button_left = $('#slideLeft'),
+    container = document.getElementById('game-icons-container');
+  $gamelist_button_right.on(clickEvent, () => {
+    if (container) sideScroll(container, 'right', 25, 100, 10);
+  });
+  $gamelist_button_left.on(clickEvent, () => {
+    if (container) sideScroll(container, 'left', 25, 100, 10);
+  });
+  if (container) {
+    let fullElementWidth = 0;
+    container.childNodes.forEach(n => {
+      if (n instanceof HTMLElement) {
+        fullElementWidth += n.offsetWidth;
+      }
+    });
+    container.scrollLeft = fullElementWidth / 3;
+  }
+
+  function sideScroll(
+    element: HTMLElement,
+    direction: 'right' | 'left',
+    speed: number,
+    distance: number,
+    step: number
+  ) {
+    let fullElementWidth = 0;
+    element.childNodes.forEach(n => {
+      if (n instanceof HTMLElement) {
+        fullElementWidth += n.offsetWidth;
+      }
+    });
+
+    let scrollAmount = 0;
+    var slideTimer = setInterval(function () {
+      if (direction == 'left') {
+        element.scrollLeft -= step;
+      } else {
+        element.scrollLeft += step;
+      }
+      if (element.scrollLeft <= 0) element.scrollLeft += fullElementWidth / 3;
+      if (element.scrollLeft >= fullElementWidth - element.offsetWidth) element.scrollLeft -= fullElementWidth / 3;
+      scrollAmount += step;
+      if (scrollAmount >= distance) {
+        window.clearInterval(slideTimer);
+      }
+    }, speed);
   }
 
   suggestBgSwitch();

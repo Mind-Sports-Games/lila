@@ -65,12 +65,12 @@ private object BSONHandlers {
     { case BSONString(value) =>
       value split ':' match {
         case Array(lib, fen) =>
-          Success(Id(Variant.libStandard(GameLogic(lib.toInt)), SmallFen raw fen))
+          Success(Id(Variant.libStandard(GameLogic(lib.toInt)), SmallFen raw fen)) //legacy db entries
         case Array(lib, variantId, fen) =>
           Success(
             Id(
-              variantId.toIntOption flatMap {
-                id => Variant.apply(GameLogic(lib.toInt), id)
+              variantId.toIntOption flatMap { id =>
+                Variant.apply(GameLogic(lib.toInt), id)
               } err s"Invalid evalcache variant $variantId",
               SmallFen raw fen
             )
@@ -80,9 +80,14 @@ private object BSONHandlers {
     },
     x =>
       BSONString {
-        if (x.variant.standardVariant || x.variant == Variant.libFromPosition(GameLogic.Chess()) || x.variant == Variant.libFromPosition(GameLogic.Draughts()))
-          s"${x.variant.gameLogic.id}:${x.smallFen.value}"
-        else s"${x.variant.gameLogic.id}:${x.variant.id}:${x.smallFen.value}"
+        // if (
+        //   x.variant.standardVariant || x.variant == Variant
+        //     .libFromPosition(GameLogic.Chess()) || x.variant == Variant
+        //     .libFromPosition(GameLogic.Draughts()) || x.variant.gameLogic == GameLogic.Go()
+        // )
+        //   s"${x.variant.gameLogic.id}:${x.smallFen.value}"
+        // else
+        s"${x.variant.gameLogic.id}:${x.variant.id}:${x.smallFen.value}"
       }
   )
 

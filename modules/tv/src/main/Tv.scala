@@ -93,6 +93,7 @@ object Tv {
   import strategygames.fairysf.{ variant => FV }
   import strategygames.samurai.{ variant => MSV }
   import strategygames.togyzkumalak.{ variant => MTV }
+  import strategygames.go.{ variant => GV }
   import strategygames.{ Speed => S, GameFamily }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
@@ -220,6 +221,18 @@ object Tv {
           ),
           familyChannel = true,
           gameFamily = "mancala"
+        )
+    case object GoFamily
+        extends Channel(
+          name = s"All ${GameGroup(9).name}",
+          icon = GV.Go19x19.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(
+            anyVariant(GameGroup(9).variants),
+            noBot
+          ),
+          familyChannel = true,
+          gameFamily = "go"
         )
     case object Bullet
         extends Channel(
@@ -550,6 +563,33 @@ object Tv {
           familyChannel = false,
           gameFamily = "mancala"
         )
+    case object Go9x9
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(GV.Go9x9)),
+          icon = GV.Go9x9.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(GV.Go9x9)), noBot),
+          familyChannel = false,
+          gameFamily = "go"
+        )
+    case object Go13x13
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(GV.Go13x13)),
+          icon = GV.Go13x13.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(GV.Go13x13)), noBot),
+          familyChannel = false,
+          gameFamily = "go"
+        )
+    case object Go19x19
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(GV.Go19x19)),
+          icon = GV.Go19x19.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(GV.Go19x19)), noBot),
+          familyChannel = false,
+          gameFamily = "go"
+        )
     case object Bot
         extends Channel(
           name = "Bot",
@@ -614,6 +654,10 @@ object Tv {
       MancalaFamily,
       Oware,
       Togyzkumalak,
+      GoFamily,
+      Go19x19,
+      Go13x13,
+      Go9x9,
       Bot,
       Computer
     )

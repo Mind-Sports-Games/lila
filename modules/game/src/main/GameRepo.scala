@@ -361,13 +361,15 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     s"p${playerIndex.fold(0, 1)}.${Player.BSONFields.holdAlert}"
 
   private val finishUnsets = $doc(
-    F.positionHashes                              -> true,
-    F.playingUids                                 -> true,
-    F.unmovedRooks                                -> true,
-    ("p0." + Player.BSONFields.isOfferingDraw)    -> true,
-    ("p1." + Player.BSONFields.isOfferingDraw)    -> true,
-    ("p0." + Player.BSONFields.proposeTakebackAt) -> true,
-    ("p1." + Player.BSONFields.proposeTakebackAt) -> true
+    F.positionHashes                                    -> true,
+    F.playingUids                                       -> true,
+    F.unmovedRooks                                      -> true,
+    ("p0." + Player.BSONFields.isOfferingDraw)          -> true,
+    ("p1." + Player.BSONFields.isOfferingDraw)          -> true,
+    ("p0." + Player.BSONFields.isOfferingSelectSquares) -> true,
+    ("p1." + Player.BSONFields.isOfferingSelectSquares) -> true,
+    ("p0." + Player.BSONFields.proposeTakebackAt)       -> true,
+    ("p1." + Player.BSONFields.proposeTakebackAt)       -> true
   )
 
   def finish(
@@ -409,7 +411,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         g.copy(mode = Mode.Casual)
       else g
     val userIds = g2.userIds.distinct
-    // TODO: why does the initialFen get generated here?
+
     val fen: Option[FEN] = initialFen orElse {
       (!g2.variant.standardInitialPosition)
         .option(Forsyth.>>(g2.variant.gameLogic, g2.stratGame))

@@ -117,7 +117,10 @@ final private class SwissDirector(
           swiss.roundVariant.gameLogic,
           variant = Some {
             if (swiss.settings.position.isEmpty) swiss.roundVariant
-            else Variant.libFromPosition(swiss.roundVariant.gameLogic)
+            else
+              Variant
+                .byName(swiss.roundVariant.gameLogic, "From Position")
+                .getOrElse(Variant.orDefault(swiss.roundVariant.gameLogic, 3))
           },
           fen = pairing.openingFEN
         ) pipe { g =>

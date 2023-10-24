@@ -62,7 +62,7 @@ final class FishnetPlayer(
               //ok to flatten as fishnet doesnt handle multimove
               moves = moves.flatten
                 .flatMap(Uci(game.variant.gameLogic, game.variant.gameFamily, _))
-                .map(_.fishnetUci)
+                .map(_.uci)
                 .mkString(" ")
             ),
             level =

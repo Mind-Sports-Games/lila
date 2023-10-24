@@ -1,7 +1,18 @@
 package lila.round
 
 import strategygames.format.{ Forsyth, Uci }
-import strategygames.{ Centis, MoveMetrics, MoveOrDrop, Pos, Role, Status }
+import strategygames.{
+  Action,
+  Centis,
+  MoveMetrics,
+  Pos,
+  Role,
+  Status,
+  Drop => StratDrop,
+  Move => StratMove,
+  Pass => StratPass,
+  SelectSquares => StratSelectSquares
+}
 import strategygames.chess
 
 import actorApi.round.{ DrawNo, ForecastPlay, HumanPlay, TakebackNo, TooManyPlies }
@@ -18,9 +29,9 @@ final private class Player(
     uciMemo: UciMemo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  sealed private trait MoveResult
-  private case object Flagged                                          extends MoveResult
-  private case class MoveApplied(progress: Progress, move: MoveOrDrop) extends MoveResult
+  sealed private trait ActionResult
+  private case object Flagged                                          extends ActionResult
+  private case class ActionApplied(progress: Progress, action: Action) extends ActionResult
 
   private[round] def human(play: HumanPlay, round: RoundDuct)(
       pov: Pov
@@ -31,15 +42,19 @@ final private class Player(
           case Pov(game, _) if game.plies > Game.maxPlies =>
             round ! TooManyPlies
             fuccess(Nil)
+          case Pov(game, _) if game.selectedSquaresOfferDoesNotMatchUci(uci) =>
+            fufail(
+              ClientError(s"$pov game selected squares (${game.selectedSquares}) doesn't match uci ($uci)")
+            )
           case Pov(game, playerIndex) if game playableBy playerIndex =>
             applyUci(game, uci, blur, lag, finalSquare)
               .leftMap(e => s"$pov $e")
               .fold(errs => fufail(ClientError(errs)), fuccess)
               .flatMap {
                 case Flagged => finisher.outOfTime(game)
-                case MoveApplied(progress, moveOrDrop) =>
+                case ActionApplied(progress, action) =>
                   proxy.save(progress) >>
-                    postHumanOrBotPlay(round, pov, progress, moveOrDrop)
+                    postHumanOrBotPlay(round, pov, progress, action)
               }
           case Pov(game, _) if game.finished => fufail(ClientError(s"$pov game is finished"))
           case Pov(game, _) if game.aborted  => fufail(ClientError(s"$pov game is aborted"))
@@ -54,13 +69,15 @@ final private class Player(
       case Pov(game, _) if game.plies > Game.maxPlies =>
         round ! TooManyPlies
         fuccess(Nil)
+      case Pov(game, _) if game.selectedSquaresOfferDoesNotMatchUci(uci) =>
+        fufail(ClientError(s"$pov game selected squares (${game.selectedSquares}) doesn't match uci ($uci)"))
       case Pov(game, playerIndex) if game playableBy playerIndex =>
         applyUci(game, uci, blur = false, botLag)
           .fold(errs => fufail(ClientError(errs)), fuccess)
           .flatMap {
             case Flagged => finisher.outOfTime(game)
-            case MoveApplied(progress, moveOrDrop) =>
-              proxy.save(progress) >> postHumanOrBotPlay(round, pov, progress, moveOrDrop)
+            case ActionApplied(progress, action) =>
+              proxy.save(progress) >> postHumanOrBotPlay(round, pov, progress, action)
           }
       case Pov(game, _) if game.finished                       => fufail(GameIsFinishedError(pov))
       case Pov(game, _) if game.aborted                        => fufail(ClientError(s"$pov game is aborted"))
@@ -72,17 +89,22 @@ final private class Player(
       round: RoundDuct,
       pov: Pov,
       progress: Progress,
-      moveOrDrop: MoveOrDrop
+      action: Action
   )(implicit proxy: GameProxy): Fu[Events] = {
-    if (pov.game.hasAi) uciMemo.add(pov.game, moveOrDrop)
-    notifyMove(moveOrDrop, progress.game)
+    if (pov.game.hasAi) uciMemo.add(pov.game, action)
+    notifyMove(action, progress.game)
     if (progress.game.finished) moveFinish(progress.game) dmap { progress.events ::: _ }
     else {
       if (progress.game.playableByAi) requestFishnet(progress.game, round)
       if (pov.opponent.isOfferingDraw) round ! DrawNo(PlayerId(pov.player.id))
       if (pov.player.isProposingTakeback) round ! TakebackNo(PlayerId(pov.player.id))
-      if (progress.game.forecastable) moveOrDrop.left.toOption.foreach { move =>
-        round ! ForecastPlay(move)
+      if (progress.game.forecastable) {
+        (action match {
+          case m: StratMove => Some(m)
+          case _            => None
+        }).map { move =>
+          round ! ForecastPlay(move)
+        }
       }
       scheduleExpiration(progress.game)
       fuccess(progress.events)
@@ -95,11 +117,11 @@ final private class Player(
         .fold(errs => fufail(ClientError(errs)), fuccess)
         .flatMap {
           case Flagged => finisher.outOfTime(game)
-          case MoveApplied(progress, moveOrDrop) =>
+          case ActionApplied(progress, action) =>
             proxy.save(progress) >>-
-              uciMemo.add(progress.game, moveOrDrop) >>-
+              uciMemo.add(progress.game, action) >>-
               lila.mon.fishnet.move(~game.aiLevel).increment().unit >>-
-              notifyMove(moveOrDrop, progress.game) >> {
+              notifyMove(action, progress.game) >> {
                 if (progress.game.finished) moveFinish(progress.game) dmap { progress.events ::: _ }
                 else
                   fuccess(progress.events)
@@ -108,7 +130,7 @@ final private class Player(
     } else
       fufail(
         FishnetError(
-          s"Not AI turn move: $uci id: ${game.id} playable: ${game.playable} player: ${game.player}"
+          s"Not AI turn move: $uci id: ${game.id} playable: ${game.playable} player: ${game.player} hasAI: ${game.player.isAi} game.playedTurns: ${game.playedTurns} ply: $ply"
         )
       )
 
@@ -127,23 +149,28 @@ final private class Player(
       blur: Boolean,
       metrics: MoveMetrics,
       finalSquare: Boolean = false
-  ): Validated[String, MoveResult] =
+  ): Validated[String, ActionResult] =
     game.stratGame.applyUci(uci, metrics, finalSquare).map {
       case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
-      case (newChessGame, moveOrDrop) =>
-        MoveApplied(
-          game.update(newChessGame, moveOrDrop, blur),
-          moveOrDrop
+      case (newChessGame, action) =>
+        ActionApplied(
+          game.update(newChessGame, action, blur),
+          action
         )
     }
 
-  private def notifyMove(moveOrDrop: MoveOrDrop, game: Game): Unit = {
+  private def notifyMove(action: Action, game: Game): Unit = {
     import lila.hub.actorApi.round.{ CorresMoveEvent, MoveEvent, SimulMoveEvent }
-    val playerIndex = moveOrDrop.fold(_.player, _.player)
+    val playerIndex = action.player
     val moveEvent = MoveEvent(
       gameId = game.id,
       fen = Forsyth.exportBoard(game.board.variant.gameLogic, game.board),
-      move = moveOrDrop.fold(_.toUci.keys, _.toUci.uci)
+      move = action match {
+        case m: StratMove           => m.toUci.keys
+        case d: StratDrop           => d.toUci.uci
+        case p: StratPass           => p.toUci.uci
+        case ss: StratSelectSquares => ss.toUci.uci
+      }
     )
 
     // I checked and the bus doesn't do much if there's no subscriber for a classifier,

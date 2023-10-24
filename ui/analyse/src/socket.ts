@@ -2,7 +2,7 @@ import { initial as initialBoardFen } from 'chessground/fen';
 import { ops as treeOps } from 'tree';
 import AnalyseCtrl from './ctrl';
 import { CachedEval, EvalGetData, EvalPutData, ServerEvalData } from './interfaces';
-import { AnaDests, AnaDrop, AnaMove, ChapterData, EditChapterData } from './study/interfaces';
+import { AnaDests, AnaDrop, AnaMove, AnaPass, ChapterData, EditChapterData } from './study/interfaces';
 import { FormData as StudyFormData } from './study/studyForm';
 
 interface DestsCache {
@@ -50,6 +50,7 @@ export type StudySocketSendParams =
   | [t: 'setTag', d: { chapterId: string; name: string; value: string }]
   | [t: 'anaMove', d: AnaMove & MoveOpts]
   | [t: 'anaDrop', d: AnaDrop & MoveOpts]
+  | [t: 'anaPass', d: AnaPass & MoveOpts]
   | [t: 'anaDests', d: AnaDestsReq]
   | [t: 'like', d: { liked: boolean }]
   | [t: 'kick', username: string]
@@ -75,6 +76,7 @@ export interface Socket {
   receive(type: string, data: any): boolean;
   sendAnaMove(d: AnaMove): void;
   sendAnaDrop(d: AnaDrop): void;
+  sendAnaPass(d: AnaPass): void;
   sendAnaDests(d: AnaDestsReq): void;
   clearCache(): void;
 }
@@ -192,6 +194,14 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     anaMoveTimeout = setTimeout(() => sendAnaDrop(req), 3000);
   }
 
+  function sendAnaPass(req: AnaPass) {
+    clearTimeout(anaMoveTimeout);
+    withoutStandardVariant(req);
+    addStudyData(req, true);
+    send('anaPass', req);
+    anaMoveTimeout = setTimeout(() => sendAnaPass(req), 3000);
+  }
+
   return {
     receive(type, data) {
       const handler = (handlers as SocketHandlers)[type];
@@ -203,6 +213,7 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
     },
     sendAnaMove,
     sendAnaDrop,
+    sendAnaPass,
     sendAnaDests,
     clearCache,
     send,

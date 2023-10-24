@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ ClockConfig, FischerClock, ByoyomiClock, P1, P2 }
+import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, P1, P2 }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -109,7 +109,7 @@ final class JsonView(
       .add("myTeam" -> myTeam)
       .add("duelTeams" -> data.duelTeams)
       .add("secondsToFinishInterval" -> tour.isStarted.option(tour.meldeySecondsToFinishInterval))
-      .add("medleyRound" -> full.option(tour.medleyRound.getOrElse(-1))) ++
+      .add("medleyRound" -> full.option(tour.medleyRound)) ++
       full.?? {
         Json
           .obj(
@@ -123,10 +123,10 @@ final class JsonView(
             "medleyMinutes"          -> tour.medleyMinutes,
             "medleyIntervalSeconds"  -> tour.medleyIntervalSeconds,
             "medleyBalanceIntervals" -> tour.medleyIsBalanced,
-            "perf"                   -> full.option(tour.currentPerfType),
+            "perf"                   -> full.option(tour.perfType),
             "clock"                  -> full.option(tour.clock),
-            "lib"                    -> full.option(tour.currentVariant.gameLogic.id),
-            "variant"                -> full.option(variantJson(tour.currentVariant)),
+            "lib"                    -> full.option(tour.variant.gameLogic.id),
+            "variant"                -> full.option(variantJson(tour.variant)),
             "p1Name" -> full.option(
               if (tour.isMedley) trans.p1.txt()
               else tour.variant.playerNames(P1)
@@ -323,6 +323,8 @@ final class JsonView(
         "color" -> game.variant.playerNames(
           game.naturalOrientation
         ), // app BC https://github.com/ornicar/lila/issues/7195
+        "p1Color"  -> game.variant.playerColors(P1),
+        "p2Color"  -> game.variant.playerColors(P2),
         "lastMove" -> ~game.lastMoveKeys,
         "p1"       -> ofPlayer(featured.p1, game player P1),
         "p2"       -> ofPlayer(featured.p2, game player P2)

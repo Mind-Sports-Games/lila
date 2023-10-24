@@ -59,9 +59,21 @@ export default function status(ctrl: Ctrl): string {
         case 'amazons':
           return noarg('gameFinished');
         case 'oware':
-          return noarg('gameFinished');
+          if (d.game.isRepetition) {
+            return noarg('gameFinishedRepetition');
+          } else {
+            return noarg('gameFinished');
+          }
         case 'togyzkumalak':
           return noarg('gameFinished');
+        case 'go9x9':
+        case 'go13x13':
+        case 'go19x19':
+          if (d.game.isRepetition) {
+            return noarg('gameFinishedRepetition');
+          } else {
+            return noarg('gameFinished');
+          }
       }
       return noarg('variantEnding');
     case 'unknownFinish':

@@ -1,6 +1,6 @@
 package lila.challenge
 
-import strategygames.{ P2, Player => PlayerIndex, GameLogic, Mode, Situation, P1 }
+import strategygames.{ P2, Player => PlayerIndex, GameLogic, GameFamily, Mode, Situation, P1 }
 import strategygames.format.Forsyth
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.variant.Variant
@@ -22,7 +22,10 @@ final private class ChallengeJoiner(
       case _ =>
         c.challengerUserId.??(userRepo.byId) flatMap { origUser =>
           val game = ChallengeJoiner.createGame(c, origUser, destUser, playerIndex)
-          (gameRepo insertDenormalized game) >>- onStart(game.id) inject Pov(game, !c.finalPlayerIndex).some
+          (gameRepo.insertDenormalized(game, c.initialFen)) >>- onStart(game.id) inject Pov(
+            game,
+            !c.finalPlayerIndex
+          ).some
         }
     }
 }
@@ -42,7 +45,10 @@ private object ChallengeJoiner {
         clock = c.clock.map(_.config.toClock)
       )
 
-    val baseState = c.initialFen.ifTrue(c.variant.fromPosition || c.variant.chess960) flatMap {
+    val baseState = c.initialFen
+      .ifTrue(
+        c.variant.fromPosition || c.variant.chess960 || c.variant.gameFamily == GameFamily.Go()
+      ) flatMap {
       Forsyth.<<<@(c.variant.gameLogic, c.variant, _)
     }
     val (stratGame, state) = baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
@@ -60,6 +66,7 @@ private object ChallengeJoiner {
           makeChess(Variant.libStandard(c.variant.gameLogic)) -> none
         else game                                             -> baseState
     }
+    val pieces     = chessGame.situation.board.pieces
     val multiMatch = c.isMultiMatch && c.customStartingPosition option "multiMatch"
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game

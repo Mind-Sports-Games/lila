@@ -9,7 +9,7 @@ import scala.math
 
 import lila.common.ApiVersion
 import lila.game.JsonView._
-import lila.game.{ Event, Pov, Game, Player => GamePlayer }
+import lila.game.{ Event, Pov, Game, Player => GamePlayer, DeadStoneOfferState }
 import lila.pref.Pref
 import lila.user.{ User, UserRepo }
 
@@ -32,8 +32,7 @@ final class JsonView(
       .checkCount(playerIndex)
 
   private def score(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.togyzkumalak.variant.Togyzkumalak) option game.history
-      .score(playerIndex)
+    game.displayScore.map(_.apply(playerIndex))
 
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
@@ -67,6 +66,7 @@ final class JsonView(
       .add("provisional" -> p.provisional)
       .add("offeringRematch" -> isOfferingRematch(Pov(g, p)))
       .add("offeringDraw" -> p.isOfferingDraw)
+      .add("offeringSelectSquares" -> p.isOfferingSelectSquares)
       .add("proposingTakeback" -> p.isProposingTakeback)
       .add("checks" -> checkCount(g, p.playerIndex))
       .add("score" -> score(g, p.playerIndex))
@@ -134,6 +134,7 @@ final class JsonView(
               .add("clockBar" -> pref.clockBar)
               .add("clockSound" -> pref.clockSound)
               .add("confirmResign" -> (!nvui && pref.confirmResign == Pref.ConfirmResign.YES))
+              .add("confirmPass" -> (!nvui && pref.confirmPass == Pref.ConfirmPass.YES))
               .add("keyboardMove" -> (!nvui && pref.keyboardMove == Pref.KeyboardMove.YES))
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("blindfold" -> pref.isBlindfold)
@@ -155,6 +156,7 @@ final class JsonView(
           )
           .add("clock" -> pov.game.clock.map(clockJson))
           .add("correspondence" -> pov.game.correspondenceClock)
+          .add("canTakeBack" -> takebackable)
           .add("takebackable" -> takebackable)
           .add("moretimeable" -> moretimeable)
           .add("crazyhouse" -> pov.game.board.pocketData)
@@ -163,10 +165,20 @@ final class JsonView(
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
-          .add("expiration" -> pov.game.expirable.option {
+          .add("selectMode" -> selectMode(pov))
+          .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
+          .add("deadStoneOfferState" -> pov.game.metadata.deadStoneOfferState.map(_.name))
+          .add("pauseSecs" -> pov.game.timeWhenPaused.millis.some)
+          .add("expirationAtStart" -> pov.game.expirableAtStart.option {
             Json.obj(
               "idleMillis"   -> (nowMillis - pov.game.updatedAt.getMillis),
               "millisToMove" -> pov.game.timeForFirstMove.millis
+            )
+          })
+          .add("expirationOnPaused" -> pov.game.expirableOnPaused.option {
+            Json.obj(
+              "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
+              "millisToMove" -> pov.game.timeWhenPaused.millis
             )
           })
       }
@@ -288,7 +300,7 @@ final class JsonView(
             //TODO: front end multiaction turns/plies changes
             "plies"      -> game.plies,
             "turns"      -> game.turnCount,
-            "player"     -> game.turnPlayerIndex.name,
+            "player"     -> game.activePlayerIndex.name,
             "status"     -> game.status,
             "gameFamily" -> game.variant.gameFamily.key
           )
@@ -385,7 +397,8 @@ final class JsonView(
       case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
-      case _ => sys.error("Mismatch of types for possibleMoves")
+      case (Situation.Go(_), Variant.Go(_)) => None
+      case _                                => sys.error("Mismatch of types for possibleMoves")
     }
 
   private def possibleDropsByrole(pov: Pov): Option[JsValue] =
@@ -396,8 +409,11 @@ final class JsonView(
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
       case (Situation.Samurai(_), Variant.Samurai(_))           => None
       case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) => None
-      case (Situation.Draughts(_), Variant.Draughts(_))         => None
-      case _                                                    => sys.error("Mismatch of types for possibleDropsByrole")
+      case (Situation.Go(_), Variant.Go(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Draughts(_), Variant.Draughts(_)) => None
+      case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
     }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
@@ -406,6 +422,18 @@ final class JsonView(
         JsString(drops.map(_.key).mkString)
       }
     }
+
+  private def selectMode(pov: Pov): Boolean = {
+    pov.game.situation match {
+      case Situation.Go(s) =>
+        s.canSelectSquares && (
+          (pov.game.turnOf(pov.player) && !pov.player.isOfferingSelectSquares)
+            ||
+              pov.opponent.isOfferingSelectSquares
+        ) && !pov.game.deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
+      case _ => false
+    }
+  }
 
   //draughts
   private def captureLength(pov: Pov): Int =

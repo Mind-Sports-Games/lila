@@ -33,6 +33,7 @@ export interface AnalyseData {
   opponent: Player;
   orientation: Orientation;
   spectator?: boolean; // for compat with GameData, for game functions
+  canTakeBack: boolean;
   takebackable: boolean;
   moretimeable: boolean;
   analysis?: Analysis;

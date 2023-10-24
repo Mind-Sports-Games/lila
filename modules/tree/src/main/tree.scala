@@ -236,6 +236,7 @@ object Node {
             r match {
               case Role.ChessRole(_)   => GameLogic.Chess()
               case Role.FairySFRole(_) => GameLogic.FairySF()
+              case Role.GoRole(_)      => GameLogic.Go()
               case _                   => sys.error("Pocket not implemented for GameLogic")
             }
           case None => GameLogic.Chess()

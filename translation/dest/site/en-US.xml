@@ -36,6 +36,7 @@
   <string name="checkersConnected">All checkers connected</string>
   <string name="gameFinished">Game finished</string>
   <string name="variantEnding">Variant ending</string>
+  <string name="gameFinishedRepetition">Game finished via repetition</string>
   <string name="newOpponent">New opponent</string>
   <string name="yourOpponentWantsToPlayANewGameWithYou">Your opponent wants to play a new game with you</string>
   <string name="joinTheGame">Join the game</string>
@@ -234,6 +235,9 @@
   <string name="playerIndexTimeOut">%s time out</string>
   <string name="whiteTimeOut">White time out</string>
   <string name="blackTimeOut">Black time out</string>
+  <string name="playerIndexOffersSelectSquares">%s offers selected squares</string>
+  <string name="selectSquareOfferDeclined">Square selection declined </string>
+  <string name="selectSquareOfferAccepted">Square selection accepted</string>
   <string name="drawOfferSent">Draw offer sent</string>
   <string name="drawOfferDeclined">Draw offer declined</string>
   <string name="drawOfferAccepted">Draw offer accepted</string>
@@ -284,6 +288,8 @@
   <string name="send">Send</string>
   <string name="incrementInSeconds">Increment in seconds</string>
   <string name="freeOnlineChess">Free Online Chess</string>
+  <string name="goHandicap">Handicap</string>
+  <string name="goKomi">Komi</string>
   <plurals name="nbRated">
     <item quantity="one">%s rated</item>
     <item quantity="other">%s rated</item>
@@ -650,7 +656,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="webmasters">Webmasters</string>
   <string name="about">About</string>
   <string name="aboutX">About %s</string>
-  <string name="xIsAFreeYLibreOpenSourceChessServer">%1$s is a free (%2$s), libre, no-ads, open source chess server.</string>
+  <string name="playstrategyAboutSummary">%1$s is a real-time platform to play two-player Mind Sports board games. Over 30 different games available including Chess, Go, Othello, Mancala, Draughts... on this free and open-source site.</string>
   <string name="really">really</string>
   <string name="contribute">Contribute</string>
   <string name="termsOfService">Terms of Service</string>
@@ -916,4 +922,5 @@ computer analysis, game chat and shareable URL.</string>
   <string name="orUpper">OR</string>
   <string name="playAgainstX">Play against %1$s</string>
   <string name="weeklyChallenge">Weekly Challenge</string>
+  <string name="learnHowToPlay">Learn how to play</string>
 </resources>

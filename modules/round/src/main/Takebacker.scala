@@ -70,7 +70,7 @@ final private class Takebacker(
     }
 
   def isAllowedIn(game: Game): Fu[Boolean] =
-    if (game.isMandatory) fuFalse
+    if (game.isMandatory || !game.situation.takebackable) fuFalse
     else isAllowedByPrefs(game)
 
   private def isAllowedByPrefs(game: Game): Fu[Boolean] =

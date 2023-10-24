@@ -48,7 +48,7 @@ case class PlayerAggregateAssessment(
 
     if (actionable) {
       if (markable && bannable) EngineAndBan
-      else if (markable) Engine
+      else if (markable) reportVariousReasons //Engine
       else if (reportable) reportVariousReasons
       else Nothing
     } else {

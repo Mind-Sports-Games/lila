@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "chess.js": "github:ornicar/chess.js#learn",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.27",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.32",
     "common": "2.0.0",
     "mithril": "github:ornicar/mithril.js#lila-1"
   },

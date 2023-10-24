@@ -55,7 +55,10 @@ const renderBoard = (incomingBoard: Board): VNode => {
 function boardPlayer(board: Board, playerIndex: PlayerIndex) {
   const player = board[playerIndex];
   return h('span.mini-game__player', [
-    h('span.mini-game__user', [h('strong', '#' + player.rank), renderPlayer(player, true, true, false)]),
+    h('span.mini-game__user.is.playerIndex-icon.text.' + (playerIndex == 'p1' ? board.p1Color : board.p2Color), [
+      h('strong', '#' + player.rank),
+      renderPlayer(player, true, true, false),
+    ]),
     board.clock
       ? h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
           attrs: {

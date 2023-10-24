@@ -71,7 +71,8 @@ object mini {
 
   def renderState(pov: Pov) =
     pov.game.variant match {
-      case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) =>
+      case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
+          Variant.Go(_) =>
         dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
@@ -82,7 +83,9 @@ object mini {
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
     span(cls := "mini-game__player")(
-      span(cls := "mini-game__user")(
+      span(
+        cls := s"mini-game__user playerIndex-icon is ${pov.game.variant.playerColors(pov.player.playerIndex)} text"
+      )(
         playerUsername(pov.player, withRating = false),
         span(cls := "rating")(lila.game.Namer ratingString pov.player)
       ),
@@ -108,6 +111,10 @@ object mini {
         "(" + score.toString() + ")"
       case "togyzkumalak" =>
         "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
+      case "go9x9" | "go13x13" | "go19x19" =>
+        val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
+        val score = (if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
+        "(" + score.toString().replace(".0", "") + ")"
       case _ => ""
     }
 

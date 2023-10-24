@@ -110,7 +110,7 @@ final class Setup(
                       variant = config.variant,
                       //TODO: draughts: need to have two variants stored in the config?
                       fenVariant = config.variant.some,
-                      initialFen = config.fen,
+                      initialFen = config.actualFen,
                       timeControl = timeControl,
                       mode = config.mode,
                       playerIndex = config.playerIndex.name,

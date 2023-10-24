@@ -4,7 +4,7 @@ import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 
 import strategygames.format.UciDump
-import strategygames.{ Actions, MoveOrDrop, Player }
+import strategygames.{ Action, Actions, Player }
 
 final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -23,11 +23,11 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
     cache.put(game.id, newActions)
   }
 
-  def add(game: Game, action: MoveOrDrop): Unit =
+  def add(game: Game, action: Action): Unit =
     add(
       game,
       UciDump.action(game.variant.gameLogic, game.variant)(action),
-      action.fold(_.situationBefore.player, _.situationBefore.player)
+      action.situationBefore.player
     )
 
   def set(game: Game, actions: Actions) =

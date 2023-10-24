@@ -1,5 +1,6 @@
 import { Ctrl, Challenge, ChallengeData, ChallengeDirection, ChallengeUser, TimeControl } from './interfaces';
 import { h, VNode } from 'snabbdom';
+import { opposite } from 'chessground/util';
 
 export function loaded(ctrl: Ctrl): VNode {
   return ctrl.redirecting()
@@ -40,6 +41,13 @@ function challenge(ctrl: Ctrl, dir: ChallengeDirection) {
     const descItems = [ctrl.trans()(c.rated ? 'rated' : 'casual'), timeControl(c.timeControl), c.variant.name];
     if (c.multiMatch) descItems.push(ctrl.trans()('multiMatch'));
     const descStr = descItems.join(' • ');
+    const titleDescStr = c.setupInfo == '' ? descStr : c.setupInfo;
+    const fromPosition = c.variant.key == 'fromPosition';
+    const origPlayerIndex =
+      c.playerIndex == 'random' ? (fromPosition ? c.finalPlayerIndex : 'random') : c.finalPlayerIndex;
+    const myPlayerIndex =
+      dir == 'out' ? origPlayerIndex : origPlayerIndex == 'random' ? 'random' : opposite(origPlayerIndex);
+    const myColor = myPlayerIndex == 'random' ? 'random' : myPlayerIndex == 'p1' ? c.p1Color : c.p2Color;
     return h(
       'div.challenge.' + dir + '.c-' + c.id,
       {
@@ -50,7 +58,11 @@ function challenge(ctrl: Ctrl, dir: ChallengeDirection) {
       [
         h('div.content', [
           h('span.head', renderUser(dir === 'in' ? c.challenger : c.destUser)),
-          h('span.desc', { attrs: { title: descStr } }, descStr),
+          h('span.desc', { attrs: { title: titleDescStr } }, [
+            h('span.is.is2.playerIndex-icon.' + myColor),
+            ' • ',
+            descStr,
+          ]),
         ]),
         h('i', {
           attrs: { 'data-icon': c.perf.icon },

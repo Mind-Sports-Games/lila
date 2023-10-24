@@ -84,12 +84,13 @@ case class Hook(
 
   def randomPlayerIndex = playerIndex == "random"
 
-  lazy val compatibleWithPools =
-    realMode.rated && realVariant.standard && randomPlayerIndex &&
+  def compatibleWithPools(poolVariant: Variant) =
+    realMode.rated && lila.pool.PoolList.variantSet
+      .contains(realVariant) && realVariant == poolVariant && randomPlayerIndex &&
       lila.pool.PoolList.clockStringSet.contains(clock.show)
 
-  def compatibleWithPool(poolClock: strategygames.ClockConfig) =
-    compatibleWithPools && clock == poolClock
+  def compatibleWithPool(poolClock: strategygames.ClockConfig, poolVariant: Variant) =
+    compatibleWithPools(poolVariant) && clock == poolClock
 
   def toPool =
     lila.pool.HookThieve.PoolHook(

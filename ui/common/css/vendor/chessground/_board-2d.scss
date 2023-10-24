@@ -89,6 +89,21 @@ $togyzkumalak-board-files: (
   'wood': 'togyzkumalak_wood_board.png',
 );
 
+$go9x9-board-files: (
+  'light-wood': 'svg/go_board_light_9x9.svg',
+  'dark-wood': 'svg/go_board_dark_9x9.svg',
+);
+
+$go13x13-board-files: (
+  'light-wood': 'svg/go_board_light_13x13.svg',
+  'dark-wood': 'svg/go_board_dark_13x13.svg',
+);
+
+$go19x19-board-files: (
+  'light-wood': 'svg/go_board_light_19x19.svg',
+  'dark-wood': 'svg/go_board_dark_19x19.svg',
+);
+
 $chess-variants: (
   'standard',
   'chess960',
@@ -179,6 +194,24 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
   }
 }
 
+@each $color, $file in $go9x9-board-files {
+  .go-#{$color} .variant-go9x9.is2d cg-board {
+    background-image: url(../images/board/go/#{$file});
+  }
+}
+
+@each $color, $file in $go13x13-board-files {
+  .go-#{$color} .variant-go13x13.is2d cg-board {
+    background-image: url(../images/board/go/#{$file});
+  }
+}
+
+@each $color, $file in $go19x19-board-files {
+  .go-#{$color} .variant-go19x19.is2d cg-board {
+    background-image: url(../images/board/go/#{$file});
+  }
+}
+
 //other type of css required below
 
 @each $variant in $chess-variants {
@@ -252,5 +285,23 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 @each $color, $file in $togyzkumalak-board-files {
   .togyzkumalak-#{$color} .is2d .variant-togyzkumalak cg-board {
     background-image: url(../images/board/togyzkumalak/#{$file});
+  }
+}
+
+@each $color, $file in $go9x9-board-files {
+  .go-#{$color} .is2d .variant-go9x9 cg-board {
+    background-image: url(../images/board/go/#{$file});
+  }
+}
+
+@each $color, $file in $go13x13-board-files {
+  .go-#{$color} .is2d .variant-go13x13 cg-board {
+    background-image: url(../images/board/go/#{$file});
+  }
+}
+
+@each $color, $file in $go19x19-board-files {
+  .go-#{$color} .is2d .variant-go19x19 cg-board {
+    background-image: url(../images/board/go/#{$file});
   }
 }

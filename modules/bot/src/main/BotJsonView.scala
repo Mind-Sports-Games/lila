@@ -5,7 +5,7 @@ import play.api.libs.json._
 
 import lila.common.Json.jodaWrites
 import lila.game.JsonView._
-import lila.game.{ Game, GameRepo, Pov }
+import lila.game.{ DeadStoneOfferState, Game, GameRepo, Pov }
 
 import strategygames.GameLogic
 
@@ -54,20 +54,54 @@ final class BotJsonView(
       uciMoves =>
         Json
           .obj(
-            "type"   -> "gameState",
-            "moves"  -> uciMoves.mkString(" "),
-            "wtime"  -> millisOf(game.p1Pov),
-            "btime"  -> millisOf(game.p2Pov),
-            "winc"   -> game.clock.??(_.config.increment.millis),
-            "binc"   -> game.clock.??(_.config.increment.millis),
-            "wdraw"  -> game.p1Player.isOfferingDraw,
-            "bdraw"  -> game.p2Player.isOfferingDraw,
-            "status" -> game.status.name
+            "type"            -> "gameState",
+            "moves"           -> uciMoves.mkString(" "),
+            "wtime"           -> millisOf(game.p1Pov),
+            "btime"           -> millisOf(game.p2Pov),
+            "winc"            -> game.clock.??(_.config.increment.millis),
+            "binc"            -> game.clock.??(_.config.increment.millis),
+            "wdraw"           -> game.p1Player.isOfferingDraw,
+            "bdraw"           -> game.p2Player.isOfferingDraw,
+            "status"          -> game.status.name,
+            "selectedsquares" -> selectedSquaresJson(game)
           )
           .add("winner" -> game.winnerPlayerIndex)
           .add("rematch" -> rematches.of(game.id))
     }
   }
+
+  def playerOffering(deadStoneOfferState: Option[DeadStoneOfferState]): Option[String] =
+    deadStoneOfferState match {
+      case Some(DeadStoneOfferState.P1Offering)      => Some("p1")
+      case Some(DeadStoneOfferState.P2Offering)      => Some("p2")
+      case Some(DeadStoneOfferState.AcceptedP1Offer) => Some("p1")
+      case Some(DeadStoneOfferState.AcceptedP2Offer) => Some("p2")
+      case _                                         => None
+    }
+
+  def selectedSquaresJson(game: Game) =
+    ssStatus(game).map(s =>
+      Json
+        .obj(
+          "status"         -> s,
+          "squares"        -> game.selectedSquares.map(_.map(_.toString).mkString(" ")),
+          "playerOffering" -> playerOffering(game.deadStoneOfferState)
+        )
+    )
+
+  def ssStatus(game: Game): Option[String] =
+    game.deadStoneOfferState
+      .flatMap(s =>
+        s match {
+          case DeadStoneOfferState.RejectedOffer    => Some("rejected")
+          case DeadStoneOfferState.P1Offering       => Some("offered")
+          case DeadStoneOfferState.P2Offering       => Some("offered")
+          case DeadStoneOfferState.ChooseFirstOffer => Some("pending")
+          case DeadStoneOfferState.AcceptedP1Offer  => Some("accepted")
+          case DeadStoneOfferState.AcceptedP2Offer  => Some("accepted")
+          case _                                    => None
+        }
+      )
 
   def chatLine(username: String, text: String, player: Boolean) =
     Json.obj(

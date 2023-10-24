@@ -130,10 +130,10 @@ object PgnImport {
         case san :: rest =>
           san(prev.situation).fold(
             _ => none, // illegal move; stop here.
-            moveOrDrop => {
-              val game   = prev.apply(moveOrDrop)
-              val uci    = moveOrDrop.fold(_.toUci, _.toUci)
-              val sanStr = moveOrDrop.fold(m => Dumper.apply(lib, m), d => Dumper.apply(lib, d))
+            action => {
+              val game   = prev.apply(action)
+              val uci    = action.toUci
+              val sanStr = Dumper.apply(lib, action)
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(

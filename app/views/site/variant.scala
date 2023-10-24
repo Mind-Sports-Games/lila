@@ -14,15 +14,14 @@ object variant {
   def show(
       doc: io.prismic.Document,
       resolver: io.prismic.DocumentLinkResolver,
-      variant: Variant,
-      perfType: lila.rating.PerfType
+      variant: Variant
   )(implicit ctx: Context) =
     layout(
-      active = perfType.some,
+      active = variant.some,
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
       klass = "box-pad page variant"
     )(
-      h1(cls := "text", dataIcon := perfType.iconChar)(VariantKeys.variantName(variant)),
+      h1(cls := "text", dataIcon := variant.perfIcon)(VariantKeys.variantName(variant)),
       h2(cls := "headline")(VariantKeys.variantTitle(variant)),
       div(cls := "body")(raw(~doc.getHtml("pages.content", resolver)))
     )
@@ -38,12 +37,11 @@ object variant {
       h1("PlayStrategy Games"),
       div(cls := "body box__pad")(raw(~doc.getHtml("pages.content", resolver))),
       div(cls := "variants")(
-        lila.rating.PerfType.variants map { pt =>
-          val variant = lila.rating.PerfType variantOf pt
-          a(cls := "variant text box__pad", href := routes.Page.variant(pt.key), dataIcon := pt.iconChar)(
+        Variant.all.filterNot(_.fromPosition) map { v =>
+          a(cls := "variant text box__pad", href := routes.Page.variant(v.key), dataIcon := v.perfIcon)(
             span(
-              h2(VariantKeys.variantName(variant)),
-              h3(cls := "headline")(VariantKeys.variantTitle(variant))
+              h2(VariantKeys.variantName(v)),
+              h3(cls := "headline")(VariantKeys.variantTitle(v))
             )
           )
         }
@@ -53,7 +51,7 @@ object variant {
   private def layout(
       title: String,
       klass: String,
-      active: Option[lila.rating.PerfType] = None,
+      active: Option[Variant] = None,
       openGraph: Option[lila.app.ui.OpenGraph] = None
   )(body: Modifier*)(implicit ctx: Context) =
     views.html.base.layout(
@@ -63,12 +61,12 @@ object variant {
     )(
       main(cls := "page-menu")(
         st.aside(cls := "page-menu__menu subnav")(
-          lila.rating.PerfType.variants map { pt =>
+          Variant.all.filterNot(_.fromPosition) map { v =>
             a(
-              cls := List("text" -> true, "active" -> active.has(pt)),
-              href := routes.Page.variant(pt.key),
-              dataIcon := pt.iconChar
-            )(pt.trans)
+              cls := List("text" -> true, "active" -> active.has(v)),
+              href := routes.Page.variant(v.key),
+              dataIcon := v.perfIcon
+            )(v.name)
           }
         ),
         div(cls := s"page-menu__content box $klass")(body)
