@@ -160,10 +160,7 @@ object home {
           else
             div(cls := "about-side")(
               ctx.blind option h2("About"),
-              trans.xIsAFreeYLibreOpenSourceChessServer(
-                "PlayStrategy",
-                a(cls := "blue", href := routes.Plan.features)(trans.really.txt())
-              ),
+              trans.playstrategyAboutSummary("PlayStrategy"),
               " ",
               a(href := "/about")(trans.aboutX("PlayStrategy"), "...")
             )
