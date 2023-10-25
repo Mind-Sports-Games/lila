@@ -40,7 +40,6 @@ final class AutoPairing(
           val turns = g.player.fold(0, 1)
           g.copy(
             clock = clock.some,
-            //TODO multiaction review this. think this is ok
             plies = turns,
             turnCount = turns,
             startedAtPly = turns,
