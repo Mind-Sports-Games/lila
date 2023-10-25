@@ -177,14 +177,14 @@ object BSONHandlers {
       val light     = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val createdAt = r date F.createdAt
 
-      val startedAtTurn  = r intD F.startedAtTurn
-      val startedAtPlies = r intD F.startedAtPlies
+      val startedAtTurn = r intD F.startedAtTurn
+      val startedAtPly  = r intD F.startedAtPly
       // do we need to cap turns on reading?
       val turns = r int F.turns atMost Game.maxTurns
       // capping because unlimited can cause StackOverflowError
       val plies = ((r intO F.plies) | turns) atMost Game.maxPlies
 
-      val playedPlies = plies - startedAtPlies
+      val playedPlies = plies - startedAtPly
 
       val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
 
@@ -262,7 +262,7 @@ object BSONHandlers {
             clock = clock,
             plies = plies,
             turnCount = turns,
-            startedAtPlies = startedAtPlies,
+            startedAtPly = startedAtPly,
             startedAtTurn = startedAtTurn
           )
         )
@@ -315,7 +315,7 @@ object BSONHandlers {
             //whilst Draughts isnt upgraded to multiaction
             plies = currentPly,
             turnCount = currentPly,
-            startedAtPlies = startedAtPlies,
+            startedAtPly = startedAtPly,
             startedAtTurn = startedAtTurn
           )
         )
@@ -374,7 +374,7 @@ object BSONHandlers {
             clock = clock,
             plies = plies,
             turnCount = turns,
-            startedAtPlies = startedAtPlies,
+            startedAtPly = startedAtPly,
             startedAtTurn = startedAtTurn
           )
         )
@@ -411,7 +411,7 @@ object BSONHandlers {
             clock = clock,
             plies = plies,
             turnCount = turns,
-            startedAtPlies = startedAtPlies,
+            startedAtPly = startedAtPly,
             startedAtTurn = startedAtTurn
           )
         )
@@ -453,7 +453,7 @@ object BSONHandlers {
             clock = clock,
             plies = plies,
             turnCount = turns,
-            startedAtPlies = startedAtPlies,
+            startedAtPly = startedAtPly,
             startedAtTurn = startedAtTurn
           )
         )
@@ -508,7 +508,7 @@ object BSONHandlers {
             clock = clock,
             plies = plies,
             turnCount = turns,
-            startedAtPlies = startedAtPlies,
+            startedAtPly = startedAtPly,
             startedAtTurn = startedAtTurn
           )
         )
@@ -575,7 +575,7 @@ object BSONHandlers {
         F.turns          -> o.stratGame.turnCount,
         F.plies          -> w.intO(if (o.stratGame.plies == o.stratGame.turnCount) 0 else o.stratGame.plies),
         F.activePlayer   -> o.stratGame.situation.player.hashCode,
-        F.startedAtPlies -> w.intO(o.stratGame.startedAtPlies),
+        F.startedAtPly   -> w.intO(o.stratGame.startedAtPly),
         F.startedAtTurn  -> w.intO(o.stratGame.startedAtTurn),
         F.clockType      -> o.stratGame.clock.map(clockTypeBSONWrite),
         F.clock -> (o.stratGame.clock flatMap { c =>

@@ -148,7 +148,7 @@ trait Positional { self: Config =>
           situation = s,
           plies = sit.plies,
           turnCount = sit.turnCount,
-          startedAtPlies = sit.plies,
+          startedAtPly = sit.plies,
           startedAtTurn = sit.turnCount,
           clock = makeClock.map(_.toClock)
         )

@@ -13,7 +13,7 @@ db.game5.updateMany({ ap: { $exists: false }, t: { $mod: [2, 1] } }, { $set: { a
 //db.game5.updateMany({ st: { $mod: [2, 0] } }, { $set: { sp: 1 } });
 //db.game5.updateMany({ st: { $mod: [2, 1] } }, { $set: { sp: 2 } });
 
-//With sp meaning startedAtPlies
+//With sp meaning startedAtPly
 db.game5.find({ st: { $exists: true } }).forEach(g => {
   db.game5.updateOne(
     { _id: g._id },

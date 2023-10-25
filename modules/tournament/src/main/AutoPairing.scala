@@ -43,7 +43,7 @@ final class AutoPairing(
             //TODO multiaction review this. think this is ok
             plies = turns,
             turnCount = turns,
-            startedAtPlies = turns,
+            startedAtPly = turns,
             startedAtTurn = turns
           )
         },

@@ -58,7 +58,7 @@ private object ChallengeJoiner {
           situation = sit,
           plies = sp.plies,
           turnCount = sp.turnCount,
-          startedAtPlies = sp.plies,
+          startedAtPly = sp.plies,
           startedAtTurn = sp.turnCount,
           clock = c.clock.map(_.config.toClock)
         )

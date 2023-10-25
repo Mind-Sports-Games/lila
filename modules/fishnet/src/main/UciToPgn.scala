@@ -34,7 +34,7 @@ private object UciToPgn {
     def uciToPgn(ply: Int, variation: List[String]): Validated[String, List[PgnMove]] =
       for {
         situation <-
-          if (ply == replay.setup.startedAtPlies + 1) valid(replay.setup.situation)
+          if (ply == replay.setup.startedAtPly + 1) valid(replay.setup.situation)
           else
             replay
               .moveAtPly(ply)

@@ -911,7 +911,7 @@ case class Game(
       stratGame = stratGame.copy(
         turnCount = 0,
         plies = 0,
-        startedAtPlies = 0,
+        startedAtPly = 0,
         startedAtTurn = 0
       )
     )
@@ -1103,7 +1103,7 @@ object Game {
     val turns             = "t"
     val plies             = "p"
     val activePlayer      = "ap"
-    val startedAtPlies    = "sp"
+    val startedAtPly      = "sp"
     val startedAtTurn     = "st"
     val clock             = "c"
     val clockType         = "ct"

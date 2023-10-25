@@ -182,7 +182,7 @@ final private class Rematcher(
           },
           turnCount = situation ?? (_.turnCount),
           plies = situation ?? (_.plies),
-          startedAtPlies = situation ?? (_.plies),
+          startedAtPly = situation ?? (_.plies),
           startedAtTurn = situation ?? (_.turnCount)
         ),
         p1Player = returnPlayer(game, P1, users),
