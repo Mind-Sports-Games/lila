@@ -59,6 +59,7 @@ object Step {
     Json
       .obj(
         "ply"           -> ply,
+        "turnCount"     -> turnCount,
         "uci"           -> move.map(_.shortUciString),
         "lidraughtsUci" -> move.map(_.uciString),
         "san"           -> move.map(_.san),

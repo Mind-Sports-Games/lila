@@ -35,11 +35,7 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   const side = myTurn != ctrl.flip ? 'bottom' : 'top';
   let moveIndicatorText = ctrl.trans.vdomPlural(transStr, secondsLeft, h('strong', '' + secondsLeft));
 
-  if (
-    moveIndicator &&
-    (ctrl.data.steps.length > (ctrl.data.game.variant.key === 'amazons' ? 4 : 2) || !ctrl.data.expirationAtStart) &&
-    !ctrl.data.expirationOnPaused
-  ) {
+  if (moveIndicator && (ctrl.data.game.turns > 1 || !ctrl.data.expirationAtStart) && !ctrl.data.expirationOnPaused) {
     emerg =
       ctrl.clock !== undefined &&
       ctrl.clock.times.activePlayerIndex !== undefined &&

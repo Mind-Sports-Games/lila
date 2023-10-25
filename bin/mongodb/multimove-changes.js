@@ -1,4 +1,3 @@
-
 db.game5.updateMany({ l: 2, v: 8, t: { $mod: [4, 0] } }, { $set: { ap: 1 } });
 db.game5.updateMany({ l: 2, v: 8, t: { $mod: [4, 1] } }, { $set: { ap: 1 } });
 db.game5.updateMany({ l: 2, v: 8, t: { $mod: [4, 2] } }, { $set: { ap: 2 } });
@@ -19,8 +18,8 @@ db.game5.find({ st: { $exists: true } }).forEach(g => {
     { _id: g._id },
     {
       $set: {
-        sp: g.st
-      }
+        sp: g.st,
+      },
     }
   );
 });
@@ -30,8 +29,8 @@ db.game5.find({ l: 2, v: 8 }).forEach(g => {
     { _id: g._id },
     {
       $set: {
-        p: g.t
-      }
+        p: g.t,
+      },
     }
   );
 });
@@ -41,9 +40,8 @@ db.game5.find({ l: 2, v: 8 }).forEach(g => {
     { _id: g._id },
     {
       $set: {
-        t: NumberInt(g.t / 2)
-      }
+        t: NumberInt(g.t / 2),
+      },
     }
   );
 });
-

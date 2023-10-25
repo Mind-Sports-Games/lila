@@ -71,6 +71,7 @@ object Event {
         .obj(
           "fen"         -> fen,
           "ply"         -> state.plies,
+          "turnCount"   -> state.turnCount,
           "dests"       -> PossibleMoves.oldJson(possibleMoves),
           "captLen"     -> ~captLen,
           "gf"          -> gf.id,

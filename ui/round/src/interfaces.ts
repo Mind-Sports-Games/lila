@@ -123,6 +123,7 @@ export interface ChatOpts {
 
 export interface Step {
   ply: Ply;
+  turnCount: number;
   fen: Fen;
   san: San;
   uci: Uci;

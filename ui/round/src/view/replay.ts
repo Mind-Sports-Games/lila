@@ -177,6 +177,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
 
   const els: MaybeVNodes = [],
     curPly = ctrl.ply;
+  //TODO generalise for all games? fix with monsterchess?
   if (variant.key === 'amazons') {
     for (let i = 0; i < pairs.length; i = i + 2) {
       els.push(h(indexTag, Math.floor(i / 2) + 1 + ''));
@@ -314,6 +315,7 @@ export function render(ctrl: RoundController): VNode | undefined {
               while ((node = node.previousSibling as HTMLElement)) {
                 offset++;
                 if (node.tagName === indexTagUC) {
+                  //TODO fix for monsterchess multimove (create jump to turn instead?)
                   ctrl.userJump(
                     (d.game.variant.key === 'amazons' ? 4 : 2) * parseInt(node.textContent || '') +
                       offset * (d.game.variant.key === 'amazons' ? 2 : 1)

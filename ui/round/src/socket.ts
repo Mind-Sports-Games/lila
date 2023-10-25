@@ -127,7 +127,8 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       }
       if (by) {
         let ply = ctrl.lastPly();
-        if ((by == 'p1') == (util.turnPlayerIndexFromLastPly(ply, ctrl.data.game.variant.key) == 'p1')) ply++;
+        const turnCount = ctrl.lastTurn();
+        if ((by == 'p1') == (util.turnPlayerIndexFromLastTurn(turnCount) == 'p1')) ply++;
         ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([ply]);
       }
       ctrl.redraw();
@@ -157,8 +158,8 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.data.deadStoneOfferState = 'RejectedOffer';
           ctrl.chessground.resetSelectedPieces();
           ctrl.chessground.set({ highlight: { lastMove: ctrl.data.pref.highlight } });
-          //TODO when merging with multiaction this wont work
-          ctrl.data.game.player = util.turnPlayerIndexFromLastPly(ctrl.data.game.turns, ctrl.data.game.variant.key);
+          // TODO check this works for go
+          ctrl.data.game.player = util.turnPlayerIndexFromLastTurn(ctrl.data.game.turns);
           game.setOnGame(ctrl.data, o.playerIndex, true);
           if (ctrl.clock) {
             ctrl.clock.unpauseClock(ctrl.data.game.player);
@@ -197,7 +198,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         if (ctrl.clock) {
           ctrl.data.expirationOnPaused = {
             idleMillis: 0,
-            movedAt: Date.now(),
+            updatedAt: Date.now(),
             millisToMove: ctrl.data.pauseSecs ? ctrl.data.pauseSecs : 60000,
           };
         } else if (ctrl.corresClock) {

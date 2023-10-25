@@ -4,6 +4,8 @@ export const firstPly = (d: RoundData): number => d.steps[0].ply;
 
 export const lastPly = (d: RoundData): number => lastStep(d).ply;
 
+export const lastTurn = (d: RoundData): number => lastStep(d).turnCount;
+
 export const lastStep = (d: RoundData): Step => d.steps[d.steps.length - 1];
 
 export const plyStep = (d: RoundData, ply: number): Step => d.steps[ply - firstPly(d)];

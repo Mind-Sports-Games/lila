@@ -177,6 +177,7 @@ object BSONHandlers {
       val light     = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val createdAt = r date F.createdAt
 
+      //TODO does this work for all games in progress? e.g. from position or go handicap?
       val startedAtTurn = r intD F.startedAtTurn
       val startedAtPly  = r intD F.startedAtPly
       // do we need to cap turns on reading?
@@ -186,7 +187,8 @@ object BSONHandlers {
 
       val playedPlies = plies - startedAtPly
 
-      val turnPlayerIndex = PlayerIndex((r int F.activePlayer) == 1)
+      //TODO does this work for all games in progress?
+      val turnPlayerIndex = PlayerIndex(((r intO F.activePlayer) | (turns % 2 + 1)) == 1)
 
       val periodEntries = readPeriodEntries(r)
 
@@ -571,13 +573,13 @@ object BSONHandlers {
             (_: Player.ID) => (_: Player.UserId) => (_: Player.Win) => o.p2Player
           )
         ),
-        F.status         -> o.status,
-        F.turns          -> o.stratGame.turnCount,
-        F.plies          -> w.intO(if (o.stratGame.plies == o.stratGame.turnCount) 0 else o.stratGame.plies),
-        F.activePlayer   -> o.stratGame.situation.player.hashCode,
-        F.startedAtPly   -> w.intO(o.stratGame.startedAtPly),
-        F.startedAtTurn  -> w.intO(o.stratGame.startedAtTurn),
-        F.clockType      -> o.stratGame.clock.map(clockTypeBSONWrite),
+        F.status        -> o.status,
+        F.turns         -> o.stratGame.turnCount,
+        F.plies         -> w.intO(if (o.stratGame.plies == o.stratGame.turnCount) 0 else o.stratGame.plies),
+        F.activePlayer  -> o.stratGame.situation.player.hashCode,
+        F.startedAtPly  -> w.intO(o.stratGame.startedAtPly),
+        F.startedAtTurn -> w.intO(o.stratGame.startedAtTurn),
+        F.clockType     -> o.stratGame.clock.map(clockTypeBSONWrite),
         F.clock -> (o.stratGame.clock flatMap { c =>
           clockBSONWrite(o.createdAt, c).toOption
         }),

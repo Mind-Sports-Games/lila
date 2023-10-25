@@ -18,7 +18,7 @@ export function makeConfig(ctrl: RoundController): Config {
     step = plyStep(data, ctrl.ply),
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
-    turnPlayerIndex = util.turnPlayerIndexFromLastPly(step.ply, data.game.variant.key);
+    turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),

@@ -69,6 +69,7 @@ export default class RoundController {
   moveOn: MoveOn;
 
   ply: number;
+  turnCount: number;
   firstSeconds = true;
   flip = false;
   loading = false;
@@ -100,6 +101,7 @@ export default class RoundController {
     const d = (this.data = opts.data);
 
     this.ply = round.lastPly(d);
+    this.turnCount = round.lastTurn(d);
     this.goneBerserk[d.player.playerIndex] = d.player.berserk;
     this.goneBerserk[d.opponent.playerIndex] = d.opponent.berserk;
 
@@ -168,7 +170,7 @@ export default class RoundController {
     if (!this.data.expirationAtStart && !this.data.expirationOnPaused) return;
     if (this.data.expirationOnPaused) {
       const eop = this.data.expirationOnPaused;
-      if (Math.max(0, eop.movedAt - Date.now() + eop.millisToMove) == 0 && this.data.selectMode) {
+      if (Math.max(0, eop.updatedAt - Date.now() + eop.millisToMove) == 0 && this.data.selectMode) {
         this.data.expirationOnPaused = undefined;
         if (this.data.deadStoneOfferState == 'ChooseFirstOffer') {
           this.doOfferSelectSquares();
@@ -295,6 +297,7 @@ export default class RoundController {
   };
 
   lastPly = () => round.lastPly(this.data);
+  lastTurn = () => round.lastTurn(this.data);
 
   makeCgHooks = () => ({
     onUserMove: this.onUserMove,
@@ -325,13 +328,14 @@ export default class RoundController {
     this.ply = ply;
     this.justDropped = undefined;
     this.preDrop = undefined;
-    const s = this.stepAt(ply),
-      config: CgConfig = {
-        fen: s.fen,
-        lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
-        check: !!s.check,
-        turnPlayerIndex: util.turnPlayerIndexFromLastPly(this.ply, this.data.game.variant.key),
-      };
+    const s = this.stepAt(ply);
+    this.turnCount = s.turnCount;
+    const config: CgConfig = {
+      fen: s.fen,
+      lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
+      check: !!s.check,
+      turnPlayerIndex: util.turnPlayerIndexFromLastTurn(this.turnCount),
+    };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
       this.chessground.stop();
@@ -475,16 +479,16 @@ export default class RoundController {
       notify(() => {
         let txt = this.noarg('yourTurn');
         const opponent = renderUser.userTxt(this, d.opponent);
-        if (this.ply < 1) txt = `${opponent}\njoined the game.\n${txt}`;
+        if (this.turnCount < 1) txt = `${opponent}\njoined the game.\n${txt}`;
         else {
           let move = d.steps[d.steps.length - 1].san;
-          const turn = Math.floor((this.ply - 1) / 2) + 1;
-          move = `${turn}${this.ply % 2 === 1 ? '.' : '...'} ${move}`; //todo amazons
+          const turn = Math.floor((this.turnCount - 1) / 2) + 1;
+          move = `${turn}${this.turnCount % 2 === 1 ? '.' : '...'} ${move}`;
           txt = `${opponent}\nplayed ${move}.\n${txt}`;
         }
         return txt;
       });
-    else if (this.isPlaying() && this.ply < 1)
+    else if (this.isPlaying() && this.turnCount < 1)
       notify(() => renderUser.userTxt(this, d.opponent) + '\njoined the game.');
   };
 
@@ -493,8 +497,8 @@ export default class RoundController {
   apiMove = (o: ApiMove): true => {
     const d = this.data,
       playing = this.isPlaying();
-    d.game.turns = o.ply; //todo update for amazons?
-    d.game.player = util.turnPlayerIndexFromLastPly(o.ply, d.game.variant.key);
+    d.game.turns = o.turnCount;
+    d.game.player = util.turnPlayerIndexFromLastTurn(o.turnCount);
 
     if (d.game.variant.key == 'amazons') {
       d.onlyDropsVariant = o.drops ? true : false;
@@ -519,7 +523,7 @@ export default class RoundController {
         d.expirationOnPaused = o.canSelectSquares
           ? {
               idleMillis: 0,
-              movedAt: Date.now(),
+              updatedAt: Date.now(),
               millisToMove: d.pauseSecs ? d.pauseSecs : 60000,
             }
           : undefined;
@@ -590,6 +594,7 @@ export default class RoundController {
     d.game.perpetualWarning = !!o.perpetualWarning;
     const step = {
       ply: this.lastPly() + 1,
+      turnCount: o.turnCount,
       fen: o.fen,
       san: o.san,
       uci: o.uci,
@@ -611,9 +616,8 @@ export default class RoundController {
       } else if (this.clock) this.clock.setClock(d, oc.p1, oc.p2, delay);
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
-    const bothPlayerMovedPlyCount = d.game.variant.key == 'amazons' ? 4 : 2;
     if (d.expirationAtStart) {
-      if (d.steps.length > bothPlayerMovedPlyCount && !d.pref.playerTurnIndicator) {
+      if (d.game.turns > 1 && !d.pref.playerTurnIndicator) {
         d.expirationAtStart = undefined;
       } else d.expirationAtStart.updatedAt = Date.now();
     }
@@ -711,12 +715,12 @@ export default class RoundController {
       d.player.ratingDiff = o.ratingDiff[d.player.playerIndex];
       d.opponent.ratingDiff = o.ratingDiff[d.opponent.playerIndex];
     }
-    if (!d.player.spectator && d.game.turns > (d.game.variant.key === 'amazons' ? 2 : 1)) {
+    if (!d.player.spectator && d.game.turns > 1) {
       const key = o.winner ? (d.player.playerIndex === o.winner ? 'victory' : 'defeat') : 'draw';
       playstrategy.sound.play(key);
       if (
         key != 'victory' &&
-        d.game.turns > (d.game.variant.key === 'amazons' ? 12 : 6) &&
+        d.game.turns > 6 &&
         !d.tournament &&
         !d.swiss &&
         playstrategy.storage.get('courtesy') == '1'
@@ -997,7 +1001,7 @@ export default class RoundController {
     playstrategy.requestIdleCallback(() => {
       const d = this.data;
       if (this.isPlaying()) {
-        if (!d.simul) blur.init(d.steps.length > (d.game.variant.key === 'amazons' ? 4 : 2));
+        if (!d.simul) blur.init(d.game.turns > 1);
 
         title.init();
         this.setTitle();
