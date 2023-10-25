@@ -177,7 +177,6 @@ object BSONHandlers {
       val light     = lightGameBSONHandler.readsWithPlayerIds(r, r str F.playerIds)
       val createdAt = r date F.createdAt
 
-      //TODO does this work for all games in progress? e.g. from position or go handicap?
       val startedAtTurn = r intD F.startedAtTurn
       val startedAtPly  = r intD F.startedAtPly
       // do we need to cap turns on reading?
@@ -187,7 +186,6 @@ object BSONHandlers {
 
       val playedPlies = plies - startedAtPly
 
-      //TODO does this work for all games in progress?
       val turnPlayerIndex = PlayerIndex(((r intO F.activePlayer) | (turns % 2 + 1)) == 1)
 
       val periodEntries = readPeriodEntries(r)
