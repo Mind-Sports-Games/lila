@@ -1,7 +1,7 @@
 package lila.game
 
 import strategygames.{
-  Actions,
+  ActionStrs,
   Board,
   ByoyomiClock,
   Centis,
@@ -113,15 +113,15 @@ object GameDiff {
         ByteArrayBSONHandler.writeOpt(BinaryFormat.periodEntries.writeSide(x))
       }
 
-    def newLibStorageWriter(actions: Actions) =
-      NewLibStorage.OldBin.encodeActions(a.variant.gameFamily, actions)
+    def newLibStorageWriter(actionStrs: ActionStrs) =
+      NewLibStorage.OldBin.encodeActionStrs(a.variant.gameFamily, actionStrs)
 
     a.variant.gameLogic match {
       case GameLogic.Chess() =>
         if (a.variant.standard)
-          dTry(huffmanPgn, _.actions.flatten, writeBytes compose PgnStorage.Huffman.encode)
+          dTry(huffmanPgn, _.actionStrs.flatten, writeBytes compose PgnStorage.Huffman.encode)
         else {
-          dTry(oldPgn, _.actions, writeBytes compose PgnStorage.OldBin.encodeActions)
+          dTry(oldPgn, _.actionStrs, writeBytes compose PgnStorage.OldBin.encodeActionStrs)
           dTry(
             binaryPieces,
             _.board match {
@@ -156,7 +156,7 @@ object GameDiff {
             )
         }
       case GameLogic.Draughts() => {
-        dTry(oldPgn, _.actions, writeBytes compose newLibStorageWriter)
+        dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
         dTry(
           binaryPieces,
           _.board match {
@@ -190,7 +190,7 @@ object GameDiff {
               case Board.FairySF(b) =>
                 b.variant.gameFamily match {
                   //in the case of Amazons we want to store our moves and drops as individuals
-                  case GameFamily.Amazons() => g.actions
+                  case GameFamily.Amazons() => g.actionStrs
                   //in other cases we want to store the fairysf format (difference in promotion notation)
                   case _ => b.uciMoves.toVector.map(Vector(_))
                 }
@@ -237,7 +237,7 @@ object GameDiff {
         d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
       }
       case GameLogic.Togyzkumalak() => {
-        dTry(oldPgn, _.actions, writeBytes compose newLibStorageWriter)
+        dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
         dTry(
           binaryPieces,
           _.board match {
@@ -255,7 +255,7 @@ object GameDiff {
         )
       }
       case GameLogic.Go() => {
-        dTry(oldPgn, _.actions, writeBytes compose newLibStorageWriter)
+        dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
         dTry(
           binaryPieces,
           _.board match {

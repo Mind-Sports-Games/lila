@@ -199,8 +199,9 @@ final class JsonView(
           val branch = tree.Branch(
             id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
             ply = game.plies,
-            //we can flatten actions as we are dealing with just Chess
-            move = Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.actions.flatten.last),
+            //TODO multiaction. For now we can flatten actionStrs as we are dealing with just Chess
+            move =
+              Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.actionStrs.flatten.last),
             fen = Forsyth.>>(game.situation.board.variant.gameLogic, game),
             check = game.situation.check,
             pocketData = none

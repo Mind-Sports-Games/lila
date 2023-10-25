@@ -41,7 +41,7 @@ object TreeBuilder {
     val drawOfferTurnCount                 = game.drawOffers.normalizedTurns
     Replay.gamePlyWhileValid(
       game.variant.gameLogic,
-      game.actions,
+      game.actionStrs,
       game.startPlayerIndex,
       game.activePlayer,
       initialFen,

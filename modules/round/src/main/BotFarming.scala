@@ -24,7 +24,7 @@ final private class BotFarming(
           gameRepo.gamesFromSecondary(ct.results.reverse.take(PREV_GAMES).map(_.gameId)) map {
             _ exists { prev =>
               g.winnerUserId == prev.winnerUserId &&
-              g.actions.take(SAME_TURNS) == prev.actions.take(SAME_TURNS)
+              g.actionStrs.take(SAME_TURNS) == prev.actionStrs.take(SAME_TURNS)
             }
           }
         }

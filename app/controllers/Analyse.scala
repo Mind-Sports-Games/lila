@@ -121,7 +121,7 @@ final class Analyse(
       fuccess {
         //TODO: This function (plyAtFen) wont work for non chess/draughts
         Replay
-          .plyAtFen(pov.game.variant.gameLogic, pov.game.actions, initialFen, pov.game.variant, atFen)
+          .plyAtFen(pov.game.variant.gameLogic, pov.game.actionStrs, initialFen, pov.game.variant, atFen)
           .fold(
             err => {
               lila.log("analyse").info(s"redirectAtFen: ${pov.gameId} $atFen $err")

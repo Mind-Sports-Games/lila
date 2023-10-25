@@ -68,7 +68,7 @@ final private class GameJson(
         "rated"   -> game.rated,
         "players" -> playersJson(game),
         //can flatten whilst puzzles are just chess
-        "pgn" -> game.actions.flatten.take(plies + 1).mkString(" ")
+        "pgn" -> game.actionStrs.flatten.take(plies + 1).mkString(" ")
       )
       .add("clock", game.clock.map(_.config.show))
 
@@ -100,11 +100,12 @@ final private class GameJson(
         "players" -> playersJson(game),
         "rated"   -> game.rated,
         "treeParts" -> {
-          val actions = game.actions.take(turns + 1)
+          val actionStrs = game.actionStrs.take(turns + 1)
           for {
-            lastPly <- actions.flatten.lastOption
+            //TODO: multiaction ok for now as just chess puzzles
+            lastPly <- actionStrs.flatten.lastOption
             situation <- strategygames.Replay
-              .situations(chessLib, actions, None, game.variant)
+              .situations(chessLib, actionStrs, None, game.variant)
               .valueOr { err =>
                 sys.error(s"GameJson.generateBc ${game.id} $err")
               }

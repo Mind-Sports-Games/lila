@@ -42,7 +42,7 @@ object ServerEval {
               moves = UciDump(
                 lib = chapter.setup.variant.gameLogic,
                 //TODO upgrade for multiaction but fine for now as ServerEval only handles single action games
-                actions = chapter.root.mainline.map(_.move.san).map(Vector(_)),
+                actionStrs = chapter.root.mainline.map(_.move.san).map(Vector(_)),
                 initialFen = chapter.root.fen.some,
                 variant = chapter.setup.variant,
                 finalSquare = chapter.setup.variant.gameLogic match {
@@ -146,7 +146,7 @@ object ServerEval {
       divider(
         id = chapter.id.value,
         //TODO upgrade for multiaction
-        actions = chapter.root.mainline.map(_.move.san).toVector.map(Vector(_)),
+        actionStrs = chapter.root.mainline.map(_.move.san).toVector.map(Vector(_)),
         variant = chapter.setup.variant,
         initialFen = chapter.root.fen.some
       )

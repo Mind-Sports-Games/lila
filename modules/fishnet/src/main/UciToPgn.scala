@@ -34,8 +34,7 @@ private object UciToPgn {
     def uciToPgn(ply: Int, variation: List[String]): Validated[String, List[PgnMove]] =
       for {
         situation <-
-          //TODO multiaction: can use startedAtTurn as startedAtPly as fishnet doesnt deal with multiaction
-          if (ply == replay.setup.startedAtTurn + 1) valid(replay.setup.situation)
+          if (ply == replay.setup.startedAtPlies + 1) valid(replay.setup.situation)
           else
             replay
               .moveAtPly(ply)

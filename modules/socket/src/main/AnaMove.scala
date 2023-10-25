@@ -46,7 +46,7 @@ case class AnaMove(
 
   def branch: Validated[String, Branch] =
     newGame flatMap { case (game, move) =>
-      game.actions.flatten.lastOption toValid "Moved but no last move!" map { san =>
+      game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { san =>
         val uci = Uci(
           lib,
           move,

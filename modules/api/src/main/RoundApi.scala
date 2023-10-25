@@ -211,7 +211,7 @@ final private[api] class RoundApi(
   private def withSteps(pov: Pov, initialFen: Option[FEN])(obj: JsObject) =
     obj + ("steps" -> lila.round.StepBuilder(
       id = pov.gameId,
-      actions = pov.game.actions,
+      actionStrs = pov.game.actionStrs,
       startPlayer = pov.game.startPlayerIndex,
       activePlayer = pov.game.activePlayer,
       variant = pov.game.variant,

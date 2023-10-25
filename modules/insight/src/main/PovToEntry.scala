@@ -61,7 +61,7 @@ final private class PovToEntry(
                 Replay
                   .boards(
                     game.variant.gameLogic,
-                    actions = game.actions,
+                    actionStrs = game.actionStrs,
                     initialFen = fen,
                     variant = game.variant
                   )
@@ -99,7 +99,7 @@ final private class PovToEntry(
     val plytimes = from.plytimes.toList
     //flatten until we support something other than chess
     val roles = from.pov.game
-      .actions(from.pov.playerIndex)
+      .actionStrs(from.pov.playerIndex)
       .flatten
       .map(pgnMoveToRole(from.pov.game.variant.gameFamily, _))
     val boards = {
@@ -199,13 +199,13 @@ final private class PovToEntry(
       perf = perfType,
       eco =
         if (game.playable || game.turnCount < 4 || game.fromPosition || game.variant.exotic) none
-        else strategygames.chess.opening.Ecopening fromGame game.actions,
+        else strategygames.chess.opening.Ecopening fromGame game.actionStrs,
       //flatten until insights support something other than chess
-      myCastling = Castling.fromMoves(game.actions(pov.playerIndex).flatten),
+      myCastling = Castling.fromMoves(game.actionStrs(pov.playerIndex).flatten),
       opponentRating = opRating,
       opponentStrength = RelativeStrength(opRating - myRating),
       //flatten until insights support something other than chess
-      opponentCastling = Castling.fromMoves(game.actions(!pov.playerIndex).flatten),
+      opponentCastling = Castling.fromMoves(game.actionStrs(!pov.playerIndex).flatten),
       moves = makeMoves(from),
       queenTrade = queenTrade(from),
       result = game.winnerUserId match {

@@ -1,7 +1,7 @@
 package lila.analyse
 
 import cats.implicits._
-import strategygames.{ Actions, Player => PlayerIndex, GameFamily, GameLogic }
+import strategygames.{ ActionStrs, Player => PlayerIndex, GameFamily, GameLogic }
 import strategygames.format.Uci
 
 import lila.tree.Eval
@@ -11,7 +11,7 @@ case class Info(
     ply: Int,
     eval: Eval,
     // variation is first in UCI, then converted to PGN before storage
-    variation: Actions = Nil
+    variation: ActionStrs = Nil
 ) {
 
   def cp   = eval.cp
@@ -97,6 +97,6 @@ object Info {
 
   def encodeList(infos: List[Info]): String = infos map (_.encode) mkString listSeparator
 
-  def apply(cp: Option[Cp], mate: Option[Mate], variation: Actions): Int => Info =
+  def apply(cp: Option[Cp], mate: Option[Mate], variation: ActionStrs): Int => Info =
     ply => Info(ply, Eval(cp, mate, None), variation)
 }

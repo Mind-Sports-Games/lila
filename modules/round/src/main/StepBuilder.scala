@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Actions, Player, Replay, Situation }
+import strategygames.{ ActionStrs, Player, Replay, Situation }
 import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.variant.Variant
 import play.api.libs.json._
@@ -13,7 +13,7 @@ object StepBuilder {
 
   def apply(
       id: String,
-      actions: Actions,
+      actionStrs: ActionStrs,
       startPlayer: Player,
       activePlayer: Player,
       variant: Variant,
@@ -21,7 +21,7 @@ object StepBuilder {
   ): JsArray = {
     Replay.gamePlyWhileValid(
       variant.gameLogic,
-      actions,
+      actionStrs,
       startPlayer,
       activePlayer,
       initialFen,

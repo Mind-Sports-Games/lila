@@ -217,17 +217,17 @@ object BSONHandlers {
         val gameVariant = ChessVariant(r intD F.variant) | ChessStandard
 
         val decoded = r.bytesO(F.huffmanPgn).map { PgnStorage.Huffman.decode(_, playedPlies) } | {
-          val clm     = r.get[CastleLastMove](F.castleLastMove)
-          val actions = PgnStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies)
+          val clm        = r.get[CastleLastMove](F.castleLastMove)
+          val actionStrs = PgnStorage.OldBin.decode(r bytesD F.oldPgn, playedPlies)
           PgnStorage.Decoded(
-            actions = actions,
+            actionStrs = actionStrs,
             pieces = BinaryFormat.piece.readChess(r bytes F.binaryPieces, gameVariant),
             positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
             unmovedRooks = r.getO[chess.UnmovedRooks](F.unmovedRooks) | chess.UnmovedRooks.default,
             lastMove = clm.lastMove,
             castles = clm.castles,
             //we can flatten as chess does not have any multimove games (yet)
-            halfMoveClock = actions.flatten.reverse.indexWhere(san =>
+            halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
               san.contains("x") || san.headOption.exists(_.isLower)
             ) atLeast 0
           )
@@ -258,7 +258,7 @@ object BSONHandlers {
               ),
               player = turnPlayerIndex
             ),
-            actions = decoded.actions,
+            actionStrs = decoded.actionStrs,
             clock = clock,
             plies = plies,
             turnCount = turns,
@@ -274,7 +274,7 @@ object BSONHandlers {
 
         val gameVariant = DraughtsVariant(r intD F.variant) | DraughtsStandard
 
-        val actions = NewLibStorage.OldBin.decode(GameLogic.Draughts(), r bytesD F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Draughts(), r bytesD F.oldPgn, playedPlies)
 
         val decodedBoard = draughts.Board(
           pieces = BinaryFormat.piece.readDraughts(r bytes F.binaryPieces, gameVariant),
@@ -299,7 +299,7 @@ object BSONHandlers {
 
         //we can flatten as draughts does not have any multimove games (yet)
         val midCapture =
-          actions.flatten.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
+          actionStrs.flatten.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
         val currentPly = if (midCapture) plies - 1 else plies
 
         val decodedSituation = draughts.Situation(
@@ -310,7 +310,7 @@ object BSONHandlers {
         val draughtsGame = StratGame.Draughts(
           draughts.DraughtsGame(
             situation = decodedSituation,
-            actions = actions,
+            actionStrs = actionStrs,
             clock = clock,
             //whilst Draughts isnt upgraded to multiaction
             plies = currentPly,
@@ -341,7 +341,7 @@ object BSONHandlers {
 
         val gameVariant = FairySFVariant(r intD F.variant) | FairySFStandard
 
-        val actions = NewLibStorage.OldBin.decode(GameLogic.FairySF(), r bytesD F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.FairySF(), r bytesD F.oldPgn, playedPlies)
 
         val fairysfGame = StratGame.FairySF(
           fairysf.Game(
@@ -354,7 +354,7 @@ object BSONHandlers {
                   ),
                   //we can flatten as fairysf does not have any true multimove games (yet)
                   //TODO: Is halfMoveClock even doing anything for fairysf?
-                  halfMoveClock = actions.flatten.reverse.indexWhere(san =>
+                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)
                   ) atLeast 0,
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty
@@ -366,11 +366,11 @@ object BSONHandlers {
                   case _                            => sys.error("non fairysf pocket data")
                 },
                 uciMoves = strategygames.fairysf.format.pgn.Parser
-                  .pliesToFairyUciMoves(actions.flatten, !gameVariant.switchPlayerAfterMove)
+                  .pliesToFairyUciMoves(actionStrs.flatten, !gameVariant.switchPlayerAfterMove)
               ),
               player = turnPlayerIndex
             ),
-            actions = actions,
+            actionStrs = actionStrs,
             clock = clock,
             plies = plies,
             turnCount = turns,
@@ -386,7 +386,7 @@ object BSONHandlers {
 
         val gameVariant = SamuraiVariant(r intD F.variant) | SamuraiStandard
 
-        val actions = NewLibStorage.OldBin.decode(GameLogic.Samurai(), r bytesD F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Samurai(), r bytesD F.oldPgn, playedPlies)
 
         val samuraiGame = StratGame.Samurai(
           samurai.Game(
@@ -397,17 +397,17 @@ object BSONHandlers {
                   lastMove = (r strO F.historyLastMove) flatMap (samurai.format.Uci.apply),
                   //we can flatten as samurai does not have any multimove games
                   //TODO: Is halfMoveClock even doing anything for samurai?
-                  halfMoveClock = actions.flatten.reverse.indexWhere(san =>
+                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)
                   ) atLeast 0,
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty
                 ),
                 variant = gameVariant,
-                uciMoves = actions.flatten.toList
+                uciMoves = actionStrs.flatten.toList
               ),
               player = turnPlayerIndex
             ),
-            actions = actions,
+            actionStrs = actionStrs,
             clock = clock,
             plies = plies,
             turnCount = turns,
@@ -423,7 +423,7 @@ object BSONHandlers {
 
         val gameVariant = TogyzkumalakVariant(r intD F.variant) | TogyzkumalakStandard
 
-        val actions = NewLibStorage.OldBin.decode(GameLogic.Togyzkumalak(), r bytesD F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Togyzkumalak(), r bytesD F.oldPgn, playedPlies)
 
         val togyzkumalakGame = StratGame.Togyzkumalak(
           togyzkumalak.Game(
@@ -436,7 +436,7 @@ object BSONHandlers {
                   lastMove = (r strO F.historyLastMove) flatMap (togyzkumalak.format.Uci.apply),
                   //we can flatten as samurai does not have any multimove games
                   //TODO: Is halfMoveClock even doing anything for togyzkumalak?
-                  halfMoveClock = actions.flatten.reverse.indexWhere(san =>
+                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)
                   ) atLeast 0,
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
@@ -449,7 +449,7 @@ object BSONHandlers {
               ),
               player = turnPlayerIndex
             ),
-            actions = actions,
+            actionStrs = actionStrs,
             clock = clock,
             plies = plies,
             turnCount = turns,
@@ -461,12 +461,12 @@ object BSONHandlers {
         (togyzkumalakGame, defaultMetaData)
       }
 
-    def readGoGame(r: BSON.Reader): (StratGame, Metadata) = {
+      def readGoGame(r: BSON.Reader): (StratGame, Metadata) = {
 
         val gameVariant = GoVariant(r intD F.variant) | GoStandard
 
-        val actions = NewLibStorage.OldBin.decode(GameLogic.Go(), r bytesD F.oldPgn, playedPlies)
-        val uciMoves = actions.flatten.toList
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Go(), r bytesD F.oldPgn, playedPlies)
+        val uciMoves   = actionStrs.flatten.toList
 
         val initialFen: Option[FEN] = r.getO[FEN](F.initialFen) //for handicapped games
 
@@ -479,7 +479,7 @@ object BSONHandlers {
                   lastMove = (r strO F.historyLastMove) flatMap (go.format.Uci.apply),
                   //we can flatten as samurai does not have any multimove games
                   //TODO: Is halfMoveClock even doing anything for togyzkumalak?
-                  halfMoveClock = actions.flatten.reverse.indexWhere(san =>
+                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)
                   ) atLeast 0,
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
@@ -499,11 +499,12 @@ object BSONHandlers {
                   case _                       => sys.error("non go pocket data")
                 },
                 uciMoves = uciMoves,
-                position = initialFen.map(f => strategygames.go.Api.positionFromStartingFenAndMoves(f.toGo, uciMoves))
+                position =
+                  initialFen.map(f => strategygames.go.Api.positionFromStartingFenAndMoves(f.toGo, uciMoves))
               ),
               player = turnPlayerIndex
             ),
-            actions = actions,
+            actionStrs = actionStrs,
             clock = clock,
             plies = plies,
             turnCount = turns,
@@ -525,7 +526,7 @@ object BSONHandlers {
         )
         (goGame, metadata)
 
-    }
+      }
 
       val libId = r intD F.lib
       val (stratGame, metadata) = libId match {
@@ -603,7 +604,7 @@ object BSONHandlers {
           case GameLogic.Draughts() =>
             $doc(
               F.oldPgn -> NewLibStorage.OldBin
-                .encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeDraughts(o.board match {
                 case Board.Draughts(board) => board
                 case _                     => sys.error("invalid draughts board")
@@ -615,7 +616,7 @@ object BSONHandlers {
           case GameLogic.FairySF() =>
             $doc(
               F.oldPgn -> NewLibStorage.OldBin
-                .encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeFairySF(o.board match {
                 case Board.FairySF(board) => board.pieces
                 case _                    => sys.error("invalid fairysf board")
@@ -627,7 +628,7 @@ object BSONHandlers {
           case GameLogic.Samurai() =>
             $doc(
               F.oldPgn -> NewLibStorage.OldBin
-                .encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeSamurai(o.board match {
                 case Board.Samurai(board) => board.pieces
                 case _                    => sys.error("invalid samurai board")
@@ -638,7 +639,7 @@ object BSONHandlers {
           case GameLogic.Togyzkumalak() =>
             $doc(
               F.oldPgn -> NewLibStorage.OldBin
-                .encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeTogyzkumalak(o.board match {
                 case Board.Togyzkumalak(board) => board.pieces
                 case _                         => sys.error("invalid togyzkumalak board")
@@ -650,7 +651,7 @@ object BSONHandlers {
           case GameLogic.Go() =>
             $doc(
               F.oldPgn -> NewLibStorage.OldBin
-                .encodeActions(o.variant.gameFamily, o.actions take Game.maxTurns),
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
               F.binaryPieces -> BinaryFormat.piece.writeGo(o.board match {
                 case Board.Go(board) => board.pieces
                 case _               => sys.error("invalid go board")
@@ -665,10 +666,10 @@ object BSONHandlers {
             )
           case _ => //chess or fail
             if (o.variant.standard)
-              $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.actions.flatten take Game.maxPlies))
+              $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.actionStrs.flatten take Game.maxPlies))
             else {
               $doc(
-                F.oldPgn -> PgnStorage.OldBin.encodeActions(o.actions take Game.maxTurns),
+                F.oldPgn -> PgnStorage.OldBin.encodeActionStrs(o.actionStrs take Game.maxTurns),
                 F.binaryPieces -> BinaryFormat.piece.writeChess(o.board match {
                   case Board.Chess(board) => board.pieces
                   case _                  => sys.error("invalid chess board")

@@ -4,7 +4,7 @@ import scala.language.existentials
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ Actions, Mode, Player => PlayerIndex, P1, P2, Status }
+import strategygames.{ ActionStrs, Mode, Player => PlayerIndex, P1, P2, Status }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.commands.WriteResult
@@ -529,7 +529,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       $doc(s"${F.pgnImport}.h" -> PgnImport.hash(pgn))
     )
 
-  def getOptionActions(id: ID): Fu[Option[Actions]] = game(id) dmap2 { _.actions }
+  def getOptionActionStrs(id: ID): Fu[Option[ActionStrs]] = game(id) dmap2 { _.actionStrs }
 
   def lastGameBetween(u1: String, u2: String, since: DateTime): Fu[Option[Game]] =
     coll.one[Game](

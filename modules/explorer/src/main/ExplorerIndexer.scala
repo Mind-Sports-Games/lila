@@ -175,8 +175,8 @@ final private class ExplorerIndexer(
         )
         val allTags = fenTags ::: otherTags
         //this uses maxPlies as maxTurns
-        val allActions = game.actions.map(_.mkString(",")).take(maxPlies).mkString(" ")
-        s"${allTags.mkString("\n")}\n\n${allActions}".some
+        val allActionStrs = game.actionStrs.map(_.mkString(",")).take(maxPlies).mkString(" ")
+        s"${allTags.mkString("\n")}\n\n${allActionStrs}".some
       }
     })
 

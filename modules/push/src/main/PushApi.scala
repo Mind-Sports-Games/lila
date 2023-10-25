@@ -73,7 +73,7 @@ final private class PushApi(
             IfAway(pov) {
               gameRepo.countWhereUserTurn(userId) flatMap { nbMyTurn =>
                 asyncOpponentName(pov) flatMap { opponent =>
-                  game.actions.filter(_.size > 0).map(_.mkString(",")).lastOption ?? { turn =>
+                  game.actionStrs.filter(_.size > 0).map(_.mkString(",")).lastOption ?? { turn =>
                     pushToAll(
                       userId,
                       _.move,

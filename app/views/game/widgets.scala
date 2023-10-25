@@ -84,18 +84,18 @@ object widgets {
               else trans.playerIndexPlays(g.playerTrans(g.turnPlayerIndex))
             }
           ),
-          if (g.actions.length > 0)
+          if (g.actionStrs.length > 0)
             div(cls := "opening")(
               (!g.fromPosition ?? g.opening) map { opening =>
                 strong(opening.opening.toString())
               },
               div(cls := "pgn")(
-                g.actions.take(6).map(_.mkString(",")).grouped(2).zipWithIndex map {
+                g.actionStrs.take(6).map(_.mkString(",")).grouped(2).zipWithIndex map {
                   case (Vector(p1, p2), i) => s"${i + 1}. $p1 $p2"
                   case (Vector(p1), i)     => s"${i + 1}. $p1"
                   case _                   => ""
                 } mkString " ",
-                g.actions.length > 6 option s" ... ${1 + (g.actions.length - 1) / 2} turns "
+                g.actionStrs.length > 6 option s" ... ${1 + (g.actionStrs.length - 1) / 2} turns "
               )
             )
           else frag(br, br),

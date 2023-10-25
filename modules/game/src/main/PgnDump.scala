@@ -3,7 +3,7 @@ package lila.game
 import strategygames.chess.format.pgn.{ Parser }
 import strategygames.format.pgn.{ FullTurn, ParsedPgn, Pgn, Tag, TagType, Tags, Turn }
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Actions, Centis, Player => PlayerIndex, GameLogic, Status }
+import strategygames.{ ActionStrs, Centis, Player => PlayerIndex, GameLogic, Status }
 import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
@@ -54,7 +54,7 @@ final class PgnDump(
         makeFullTurns(
           game.variant match {
             case Variant.Draughts(variant) => {
-              val plysFull = game.draughtsActionsConcat(true, true).flatten
+              val plysFull = game.draughtsActionStrsConcat(true, true).flatten
               val plys = strategygames.draughts.Replay
                 .unambiguousPdnMoves(
                   pdnMoves = plysFull,
@@ -79,8 +79,8 @@ final class PgnDump(
             }
             case _ =>
               (flags keepDelayIf game.playable applyDelay {
-                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: game.actions
-                else game.actions
+                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: game.actionStrs
+                else game.actionStrs
               }).toVector
           },
           fenSituation.map(_.fullTurnCount) | 1,
@@ -254,21 +254,21 @@ final class PgnDump(
     }
 
   private def makeFullTurns(
-      actions: Actions,
+      actionStrs: ActionStrs,
       from: Int,
       clocks: Vector[Centis],
       startPlayerIndex: PlayerIndex
   ): List[FullTurn] =
     Centis
-      .withActions(clocks, actions, startPlayerIndex.fold(0, 1))
+      .withActionStrs(clocks, actionStrs, startPlayerIndex.fold(0, 1))
       .toSeq
       .grouped(2)
       .toList
       .zipWithIndex
       .map {
-        case (actionsWithClock, index) => {
-          val p1 = actionsWithClock.headOption
-          val p2 = actionsWithClock.lift(1)
+        case (actionStrsWithClock, index) => {
+          val p1 = actionStrsWithClock.headOption
+          val p2 = actionStrsWithClock.lift(1)
           FullTurn(
             fullTurnNumber = index + from,
             p1 = p1.map(_._1.mkString(",")).filter(".." !=).map { san =>
@@ -303,9 +303,9 @@ object PgnDump {
       pgnInJson: Boolean = false,
       delayTurns: Boolean = false
   ) {
-    def applyDelay[M](actions: Seq[M]): Seq[M] =
-      if (!delayTurns) actions
-      else actions.take((actions.size - delayTurnsBy) atLeast delayKeepsFirstTurns)
+    def applyDelay[M](actionStrs: Seq[M]): Seq[M] =
+      if (!delayTurns) actionStrs
+      else actionStrs.take((actionStrs.size - delayTurnsBy) atLeast delayKeepsFirstTurns)
 
     def keepDelayIf(cond: Boolean) = copy(delayTurns = delayTurns && cond)
   }

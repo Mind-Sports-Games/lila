@@ -6,7 +6,7 @@ import cats.data.NonEmptyList
 import strategygames.format.pgn.{ Sans, Tags }
 import strategygames.chess.format.pgn
 import strategygames.format.Forsyth
-import strategygames.{ Actions, Game => StratGame }
+import strategygames.{ ActionStrs, Game => StratGame }
 import scala.util.Success
 
 import lila.common.Captcha
@@ -71,13 +71,13 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
       gameRepo game id flatMap { _ ?? fromGame }
 
     private def fromGame(game: Game): Fu[Option[Captcha]] =
-      gameRepo getOptionActions game.id map {
+      gameRepo getOptionActionStrs game.id map {
         _ flatMap { makeCaptcha(game, _) }
       }
 
-    private def makeCaptcha(game: Game, actions: Actions): Option[Captcha] =
+    private def makeCaptcha(game: Game, actionStrs: ActionStrs): Option[Captcha] =
       for {
-        rewinded  <- rewind(actions)
+        rewinded  <- rewind(actionStrs)
         solutions <- solve(rewinded)
         moves = rewinded.situation.destinations map { case (from, dests) =>
           from.key -> dests.mkString
@@ -95,10 +95,10 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
         s"${move.orig} ${move.dest}"
       } toNel
 
-    private def rewind(actions: Actions): Option[StratGame] =
+    private def rewind(actionStrs: ActionStrs): Option[StratGame] =
       pgn.Reader
-        .replayResultFromActionsUsingSan(
-          actions,
+        .replayResultFromActionStrsUsingSan(
+          actionStrs,
           sans => Sans(safeInit(sans.value)),
           tags = Tags.empty
         )

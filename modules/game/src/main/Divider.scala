@@ -3,7 +3,7 @@ package lila.game
 import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 
-import strategygames.{ Actions, Divider, Division, Replay }
+import strategygames.{ ActionStrs, Divider, Division, Replay }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 
@@ -14,9 +14,9 @@ final class Divider {
     .build[Game.ID, Division]()
 
   def apply(game: Game, initialFen: Option[FEN]): Division =
-    apply(game.id, game.actions, game.variant, initialFen)
+    apply(game.id, game.actionStrs, game.variant, initialFen)
 
-  def apply(id: Game.ID, actions: => Actions, variant: Variant, initialFen: Option[FEN]) =
+  def apply(id: Game.ID, actionStrs: => ActionStrs, variant: Variant, initialFen: Option[FEN]) =
     if (!Variant.divisionSensibleVariants(variant.gameLogic)(variant))
       Division.empty
     else
@@ -26,7 +26,7 @@ final class Divider {
           Replay
             .boards(
               lib = variant.gameLogic,
-              actions = actions,
+              actionStrs = actionStrs,
               initialFen = initialFen,
               variant = variant
             )

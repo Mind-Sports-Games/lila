@@ -5,7 +5,7 @@ import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.{ Castles, CheckCount }
 import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
-  Actions,
+  ActionStrs,
   Centis,
   ByoyomiClock,
   Clock,
@@ -63,7 +63,7 @@ case class Game(
   def turnCount    = stratGame.turnCount
   def plies        = stratGame.plies
   def clock        = stratGame.clock
-  def actions      = stratGame.actions
+  def actionStrs   = stratGame.actionStrs
   def activePlayer = stratGame.situation.player
 
   val players = List(p1Player, p2Player)
@@ -110,8 +110,8 @@ case class Game(
   def playedTurns = turnCount - stratGame.startedAtTurn
   //this is a bit messy.
   //the check on plies == turnCount ensures the logic for non multiaction games is unchanged
-  //once draughts is converted we should be able to use actions.flatten.size everywhere
-  def playedPlies = if (plies == turnCount) playedTurns else actions.flatten.size
+  //once draughts is converted we should be able to use actionStrs.flatten.size everywhere
+  def playedPlies = if (plies == turnCount) playedTurns else actionStrs.flatten.size
 
   def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
@@ -239,17 +239,17 @@ case class Game(
       }
     )
 
-  def draughtsActionsConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): Actions =
+  def draughtsActionStrsConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): ActionStrs =
     stratGame match {
-      case StratGame.Draughts(game) => game.actionsConcat(fullCaptures, dropGhosts)
-      case _                        => sys.error("Cant call actionsConcat for a gamelogic other than draughts")
+      case StratGame.Draughts(game) => game.actionStrsConcat(fullCaptures, dropGhosts)
+      case _                        => sys.error("Cant call actionStrsConcat for a gamelogic other than draughts")
     }
 
-  def actions(playerIndex: PlayerIndex): Actions = {
+  def actionStrs(playerIndex: PlayerIndex): ActionStrs = {
     val pivot = if (playerIndex == startPlayerIndex) 0 else 1
     val plys = variant.gameLogic match {
-      case GameLogic.Draughts() => draughtsActionsConcat()
-      case _                    => actions
+      case GameLogic.Draughts() => draughtsActionStrsConcat()
+      case _                    => actionStrs
     }
     plys.zipWithIndex.collect {
       case (e, i) if (i % 2) == pivot => e
@@ -822,7 +822,7 @@ case class Game(
 
   //the number of ply a player has played
   def playerMoves(playerIndex: PlayerIndex): Int =
-    actions.zipWithIndex.filter(_._2 % 2 == startIndex(playerIndex)).map(_._1.size).sum
+    actionStrs.zipWithIndex.filter(_._2 % 2 == startIndex(playerIndex)).map(_._1.size).sum
 
   //old when using plysPerTurn
   //def playerMoves(playerIndex: PlayerIndex): Int =
@@ -918,7 +918,7 @@ case class Game(
 
   lazy val opening: Option[FullOpening.AtPly] =
     if (fromPosition || !Variant.openingSensibleVariants(variant.gameLogic)(variant)) none
-    else FullOpeningDB.search(variant.gameLogic, actions)
+    else FullOpeningDB.search(variant.gameLogic, actionStrs)
 
   def synthetic = id == Game.syntheticId
 

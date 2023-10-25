@@ -20,25 +20,25 @@ object Rewind {
     (game.variant.gameLogic match {
       case GameLogic.Chess() | GameLogic.Draughts() =>
         Reader
-          .replayResultFromActionsUsingSan(
+          .replayResultFromActionStrsUsingSan(
             game.variant.gameLogic,
-            actions = game.actions,
-            //this is ok as sans uses a flattened version of actions safely
+            actionStrs = game.actionStrs,
+            //this is ok as sans uses a flattened version of actionStrs safely
             op = sans => Sans(sans.value.dropRight(1)),
             tags = createTags(initialFen, game)
           )
       case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() | GameLogic.Go() =>
         Reader
-          .replayResultFromActions(
+          .replayResultFromActionStrs(
             game.variant.gameLogic,
-            actions = game.actions,
-            op = actions => {
+            actionStrs = game.actionStrs,
+            op = actionStrs => {
               //rewindTurn (which might just be one ply)
-              if (actions.takeRight(1).flatten.size <= 1 || !rewindPly)
-                //adding empty Vector enables actions to tell that the previous turn was complete
-                actions.dropRight(1) :+ Vector()
+              if (actionStrs.takeRight(1).flatten.size <= 1 || !rewindPly)
+                //adding empty Vector enables actionStrs to tell that the previous turn was complete
+                actionStrs.dropRight(1) :+ Vector()
               //rewindPly - keeps the same turn
-              else actions.dropRight(1) :+ actions.takeRight(1).flatten.dropRight(1)
+              else actionStrs.dropRight(1) :+ actionStrs.takeRight(1).flatten.dropRight(1)
             },
             tags = createTags(initialFen, game)
           )

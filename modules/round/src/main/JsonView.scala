@@ -363,7 +363,7 @@ final class JsonView(
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         (pov.game playableBy pov.player) option {
           if (situation.ghosts > 0) {
-            val move    = pov.game.actions(pov.game.actions.length - 1)(0)
+            val move    = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
             val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
             destPos match {
               case Some(dest) =>
@@ -440,7 +440,7 @@ final class JsonView(
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         if (situation.ghosts > 0) {
-          val move    = pov.game.actions(pov.game.actions.length - 1)(0)
+          val move    = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
           val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
           destPos match {
             case Some(dest) => ~situation.captureLengthFrom(dest)

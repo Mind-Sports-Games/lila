@@ -241,7 +241,7 @@ final private[api] class GameApi(
         "moves" -> withFlags.moves.option(g.variant match {
           case Variant.Draughts(variant) =>
             strategygames.draughts.Replay.unambiguousPdnMoves(
-              pdnMoves = g.draughtsActionsConcat(true, true).flatten,
+              pdnMoves = g.draughtsActionStrsConcat(true, true).flatten,
               initialFen = initialFen match {
                 case Some(FEN.Draughts(fen)) => Some(fen)
                 case None                    => None
@@ -252,16 +252,16 @@ final private[api] class GameApi(
               case Some(moves) => moves mkString " "
               case None        => ""
             }
-          case _ => g.actions.map(_.mkString(",")).mkString(" ")
+          case _ => g.actionStrs.map(_.mkString(",")).mkString(" ")
         }),
         "opening" -> withFlags.opening.??(g.opening),
         "fens" -> (withFlags.fens && g.finished) ?? {
           Replay
             .boards(
               lib = g.variant.gameLogic,
-              actions = g.variant.gameLogic match {
-                case GameLogic.Draughts() => g.draughtsActionsConcat(true, true)
-                case _                    => g.actions
+              actionStrs = g.variant.gameLogic match {
+                case GameLogic.Draughts() => g.draughtsActionStrsConcat(true, true)
+                case _                    => g.actionStrs
               },
               initialFen = initialFen,
               variant = g.variant,

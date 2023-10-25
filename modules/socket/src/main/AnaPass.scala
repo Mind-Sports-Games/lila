@@ -23,7 +23,7 @@ case class AnaPass(
     (Game(variant.gameLogic, variant.some, fen.some)) match {
       case (Game.Go(game)) =>
         game.pass() flatMap { case (game, pass) =>
-          game.actions.flatten.lastOption toValid "Passed but no last move!" map { san =>
+          game.actionStrs.flatten.lastOption toValid "Passed but no last move!" map { san =>
             val uci     = Uci(pass)
             val movable = !game.situation.end
             val fen     = Forsyth.>>(variant.gameLogic, Game.Go(game))
