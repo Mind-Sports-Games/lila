@@ -247,11 +247,10 @@ case class Game(
 
   def actionStrs(playerIndex: PlayerIndex): ActionStrs = {
     val pivot = if (playerIndex == startPlayerIndex) 0 else 1
-    val plys = variant.gameLogic match {
+    (variant.gameLogic match {
       case GameLogic.Draughts() => draughtsActionStrsConcat()
       case _                    => actionStrs
-    }
-    plys.zipWithIndex.collect {
+    }).zipWithIndex.collect {
       case (e, i) if (i % 2) == pivot => e
     }
   }
@@ -1221,7 +1220,7 @@ sealed trait ClockHistory {
   def reset(playerIndex: PlayerIndex): ClockHistory
   def apply(playerIndex: PlayerIndex): Vector[Centis]
   //def last(playerIndex: PlayerIndex): Option[Centis]
-  def lastX(playerIndex: PlayerIndex, plys: Int): Option[Centis]
+  def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis]
   def size: Int
 }
 
@@ -1242,9 +1241,9 @@ case class FischerClockHistory(
 
   //def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
 
-  def lastX(playerIndex: PlayerIndex, plys: Int): Option[Centis] =
-    if (apply(playerIndex).size < plys) None
-    else apply(playerIndex).takeRight(plys).headOption
+  def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
+    if (apply(playerIndex).size < plies) None
+    else apply(playerIndex).takeRight(plies).headOption
 
   def size = p1.size + p2.size
 
@@ -1284,7 +1283,7 @@ case class ByoyomiClockHistory(
       .updatePeriods(
         playerIndex,
         _.padTo(initiatePeriods ?? 1, 0)
-        //TODO discuss whether using fullTurnCount is correct now
+        //TODO multiaction discuss whether using fullTurnCount is correct now
         //most clock stuff deals in plies but we dont necessarily have a fixed number of plies each
         //what are we padding out here?
           .padTo(curClock.periods atMost PeriodEntries.maxPeriods, fullTurnCount)
@@ -1296,9 +1295,9 @@ case class ByoyomiClockHistory(
 
   //def last(playerIndex: PlayerIndex) = apply(playerIndex).lastOption
 
-  def lastX(playerIndex: PlayerIndex, plys: Int): Option[Centis] =
-    if (apply(playerIndex).size < plys) None
-    else apply(playerIndex).takeRight(plys).headOption
+  def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
+    if (apply(playerIndex).size < plies) None
+    else apply(playerIndex).takeRight(plies).headOption
 
   def size = p1.size + p2.size
 

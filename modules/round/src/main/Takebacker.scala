@@ -103,7 +103,7 @@ final private class Takebacker(
   private def currentPlayerTakingBack(g: Game) =
     g.turnPlayerIndex == PlayerIndex.fromTurnCount(g.actionStrs.size + g.startPlayerIndex.hashCode - 1)
 
-  //Would be nice to test these methods with a multimove game that has > 2 plys in a turn
+  //Would be nice to test these methods with a multimove game that has > 2 plies in a turn
   private def takebackSwitchPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     if (currentPlayerTakingBack(game)) rewindPly(game)
     else rewindTurnAndPly(game)

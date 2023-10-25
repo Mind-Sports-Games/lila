@@ -54,10 +54,10 @@ final class PgnDump(
         makeFullTurns(
           game.variant match {
             case Variant.Draughts(variant) => {
-              val plysFull = game.draughtsActionStrsConcat(true, true).flatten
-              val plys = strategygames.draughts.Replay
+              val pliesFull = game.draughtsActionStrsConcat(true, true).flatten
+              val plies = strategygames.draughts.Replay
                 .unambiguousPdnMoves(
-                  pdnMoves = plysFull,
+                  pdnMoves = pliesFull,
                   initialFen = tags.fen match {
                     case Some(FEN.Draughts(fen)) => Some(fen)
                     case None                    => None
@@ -67,15 +67,15 @@ final class PgnDump(
                   //TODO: draughts, this used to be a Valid[List[String]] type
                   //and now we have lost the error. Perhaps we need to reconsider this
                 )
-                .fold(shortenDraughtsMoves(plysFull))(moves => moves)
-              val delayedPlys = flags keepDelayIf game.playable applyDelay plys
-              val algPlys =
-                if (algebraic) san2alg(delayedPlys, variant.boardSize.pos)
-                else delayedPlys
-              val offsetPlys =
-                if (fenSituation.exists(_.situation.player.p2)) ".." +: algPlys
-                else algPlys
-              offsetPlys.toVector.map(Vector(_))
+                .fold(shortenDraughtsMoves(pliesFull))(moves => moves)
+              val delayedPlies = flags keepDelayIf game.playable applyDelay plies
+              val algPlies =
+                if (algebraic) san2alg(delayedPlies, variant.boardSize.pos)
+                else delayedPlies
+              val offsetPlies =
+                if (fenSituation.exists(_.situation.player.p2)) ".." +: algPlies
+                else algPlies
+              offsetPlies.toVector.map(Vector(_))
             }
             case _ =>
               (flags keepDelayIf game.playable applyDelay {
