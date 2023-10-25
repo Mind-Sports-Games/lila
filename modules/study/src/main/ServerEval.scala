@@ -152,7 +152,7 @@ object ServerEval {
       )
 
     private def analysisLine(root: RootOrNode, variant: Variant, info: Info): Option[Node] =
-      Replay.gamePlyWhileValid(
+      Replay.gameWithUciWhileValid(
         variant.gameLogic,
         info.variation.take(20),
         //TODO: multiaction doublecheck: Think this is ok to handle like this

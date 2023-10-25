@@ -37,7 +37,7 @@ private object UciToPgn {
           if (ply == replay.setup.startedAtPly + 1) valid(replay.setup.situation)
           else
             replay
-              .moveAtPly(ply)
+              .actionAtPly(ply)
               .map(action => {
                 action match {
                   case m: Move           => m.situationBefore

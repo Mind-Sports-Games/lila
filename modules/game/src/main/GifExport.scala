@@ -103,7 +103,7 @@ final class GifExport(
   }
 
   private def frames(game: Game, initialFen: Option[FEN]) = {
-    Replay.gamePlyWhileValid(
+    Replay.gameWithUciWhileValid(
       game.variant.gameLogic,
       game.actionStrs,
       game.startPlayerIndex,

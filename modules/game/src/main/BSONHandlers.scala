@@ -368,7 +368,7 @@ object BSONHandlers {
                   case _                            => sys.error("non fairysf pocket data")
                 },
                 uciMoves = strategygames.fairysf.format.pgn.Parser
-                  .pliesToFairyUciMoves(actionStrs.flatten, !gameVariant.switchPlayerAfterMove)
+                  .flatActionStrsToFairyUciMoves(actionStrs.flatten, !gameVariant.switchPlayerAfterMove)
               ),
               player = turnPlayerIndex
             ),

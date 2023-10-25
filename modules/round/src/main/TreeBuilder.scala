@@ -39,7 +39,7 @@ object TreeBuilder {
   ): Root = {
     val withClocks: Option[Vector[Centis]] = withFlags.clocks ?? game.bothClockStates
     val drawOfferTurnCount                 = game.drawOffers.normalizedTurns
-    Replay.gamePlyWhileValid(
+    Replay.gameWithUciWhileValid(
       game.variant.gameLogic,
       game.actionStrs,
       game.startPlayerIndex,
@@ -177,7 +177,7 @@ object TreeBuilder {
         eval = none
       )
     }
-    Replay.gamePlyWhileValid(
+    Replay.gameWithUciWhileValid(
       variant.gameLogic,
       info.variation.take(20),
       //TODO: Doublecheck: Think this is ok to handle like this

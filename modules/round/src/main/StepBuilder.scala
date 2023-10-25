@@ -19,7 +19,7 @@ object StepBuilder {
       variant: Variant,
       initialFen: FEN
   ): JsArray = {
-    Replay.gamePlyWhileValid(
+    Replay.gameWithUciWhileValid(
       variant.gameLogic,
       actionStrs,
       startPlayer,
