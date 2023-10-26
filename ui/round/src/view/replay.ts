@@ -177,7 +177,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
 
   const els: MaybeVNodes = [],
     curPly = ctrl.ply;
-  //TODO generalise for all games? fix with monsterchess?
+  //TODO multiaction generalise for all games? fix with monsterchess?
   if (variant.key === 'amazons') {
     for (let i = 0; i < pairs.length; i = i + 2) {
       els.push(h(indexTag, Math.floor(i / 2) + 1 + ''));
@@ -207,7 +207,7 @@ export function analysisButton(ctrl: RoundController): VNode | undefined {
           },
           attrs: {
             title: ctrl.noarg('analysis'),
-            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + ctrl.ply,
+            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + ctrl.turnCount,
             'data-icon': 'A',
           },
         },
@@ -257,7 +257,7 @@ function renderButtons(ctrl: RoundController) {
         ['X', ctrl.ply + 1],
         ['V', lastPly],
       ].map((b, i) => {
-        const enabled = ctrl.ply !== b[1] && b[1] >= firstPly && b[1] <= lastPly;
+        const enabled = ctrl.ply !== b[1] && (b[1] as number) >= firstPly && (b[1] as number) <= lastPly;
         return h('button.fbt', {
           class: { glowing: i === 3 && ctrl.isLate() },
           attrs: {
@@ -315,7 +315,7 @@ export function render(ctrl: RoundController): VNode | undefined {
               while ((node = node.previousSibling as HTMLElement)) {
                 offset++;
                 if (node.tagName === indexTagUC) {
-                  //TODO fix for monsterchess multimove (create jump to turn instead?)
+                  //TODO multiaction fix for monsterchess (create jump to turn instead?)
                   ctrl.userJump(
                     (d.game.variant.key === 'amazons' ? 4 : 2) * parseInt(node.textContent || '') +
                       offset * (d.game.variant.key === 'amazons' ? 2 : 1)

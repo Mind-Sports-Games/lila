@@ -1,6 +1,7 @@
 import { h } from 'snabbdom';
 import { MaybeVNode, Position } from '../interfaces';
 import RoundController from '../ctrl';
+import * as round from '../round';
 import { isPlayerTurn, playable } from 'game';
 
 let rang = false;
@@ -35,7 +36,11 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   const side = myTurn != ctrl.flip ? 'bottom' : 'top';
   let moveIndicatorText = ctrl.trans.vdomPlural(transStr, secondsLeft, h('strong', '' + secondsLeft));
 
-  if (moveIndicator && (ctrl.data.game.turns > 1 || !ctrl.data.expirationAtStart) && !ctrl.data.expirationOnPaused) {
+  if (
+    moveIndicator &&
+    (round.turnsTaken(ctrl.data) > 1 || !ctrl.data.expirationAtStart) &&
+    !ctrl.data.expirationOnPaused
+  ) {
     emerg =
       ctrl.clock !== undefined &&
       ctrl.clock.times.activePlayerIndex !== undefined &&
