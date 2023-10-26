@@ -320,6 +320,14 @@ export default class RoundController {
     else this.redraw();
   };
 
+  userJumpToTurn = (turn: number): void => {
+    this.cancelMove();
+    this.chessground.selectSquare(null);
+    const ply = this.StepAtTurn(turn).ply;
+    if (ply != this.ply && this.jump(ply)) speech.userJump(this, this.ply);
+    else this.redraw();
+  };
+
   isPlaying = () => game.isPlayerPlaying(this.data);
 
   jump = (ply: Ply): boolean => {
@@ -533,6 +541,7 @@ export default class RoundController {
     this.setTitle();
     if (!this.replaying()) {
       this.ply++;
+      this.turnCount = o.turnCount;
       if (o.role) {
         this.chessground.newPiece(
           {
@@ -987,6 +996,7 @@ export default class RoundController {
   };
 
   stepAt = (ply: Ply) => round.plyStep(this.data, ply);
+  StepAtTurn = (turn: number) => round.turnStep(this.data, turn);
 
   private delayedInit = () => {
     const d = this.data;

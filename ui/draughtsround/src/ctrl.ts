@@ -348,6 +348,7 @@ export default class RoundController {
     if (!this.replaying()) {
       //Show next ply if we're following the head of the line (not replaying)
       this.ply = d.game.turns + (ghosts > 0 ? 1 : 0);
+      this.turnCount = o.turnCount;
       if (o.role)
         this.draughtsground.newPiece(
           {

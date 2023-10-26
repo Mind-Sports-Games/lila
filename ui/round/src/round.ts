@@ -14,6 +14,9 @@ export const lastStep = (d: RoundData): Step => d.steps[d.steps.length - 1];
 
 export const plyStep = (d: RoundData, ply: number): Step => d.steps[ply - firstPly(d)];
 
+export const turnStep = (d: RoundData, turn: number): Step =>
+  turn <= lastTurn(d) && turn >= firstTurn(d) ? d.steps.filter(s => s.turnCount === turn)[0] : d.steps[0];
+
 export const massage = (d: RoundData): void => {
   if (d.clock) {
     d.clock.showTenths = d.pref.clockTenths;

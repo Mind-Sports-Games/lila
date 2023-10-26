@@ -51,8 +51,8 @@ const renderDrawOffer = () =>
     '½?'
   );
 
-function renderMove(
-  step: Step | null,
+function renderMultiActionMove(
+  step: (Step | null)[],
   notation: NotationStyle,
   variant: Variant,
   prevFen: string,
@@ -65,38 +65,7 @@ function renderMove(
         moveTag,
         {
           class: {
-            a1t: step.ply === curPly,
-          },
-        },
-        [
-          moveFromNotationStyle(notation)({ san: step.san, uci: step.uci, fen: step.fen, prevFen: prevFen }, variant),
-          drawOffers.has(step.ply) ? renderDrawOffer() : undefined,
-        ]
-      )
-    : orEmpty
-    ? h(moveTag, '…')
-    : undefined;
-}
-
-function renderMultiActionMove(
-  step: (Step | null)[],
-  notation: NotationStyle,
-  variant: Variant,
-  prevFen: string, //not used for amazons move notation therefore doesn't need to be the exact one
-  curPly: number,
-  orEmpty: boolean,
-  drawOffers: Set<number>
-) {
-  return step
-    ? h(
-        moveTag,
-        {
-          class: {
-            a1t: step[0]
-              ? step[1]
-                ? step[0].ply === curPly || step[1].ply === curPly
-                : step[0].ply === curPly
-              : false,
+            a1t: step.map(s => s && s.ply === curPly).includes(true),
           },
         },
         [
@@ -107,9 +76,7 @@ function renderMultiActionMove(
                 : ''
             )
             .join(' '),
-          drawOffers.has(step[0] ? step[0].ply : -1) || drawOffers.has(step[1] ? step[1].ply : -1)
-            ? renderDrawOffer()
-            : undefined,
+          step.map(s => drawOffers.has(s ? s.ply : -1)).includes(true) ? renderDrawOffer() : undefined,
         ]
       )
     : orEmpty
@@ -153,43 +120,44 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
   const steps = ctrl.data.steps,
     notation = notationStyle(ctrl.data.game.variant.key),
     variant = ctrl.data.game.variant,
-    firstPly = round.firstPly(ctrl.data),
+    firstTurn = round.firstTurn(ctrl.data),
     lastPly = round.lastPly(ctrl.data),
     drawPlies = new Set(ctrl.data.game.drawOffers || []),
     initialFen = ctrl.data.game.initialFen || '';
   if (typeof lastPly === 'undefined') return [];
 
-  const pairs: Array<Array<Step | null>> = [];
-  let startAt = 1;
-  if (firstPly % 2 === 1) {
-    pairs.push([null, steps[1]]);
-    startAt = 2;
+  const moveTurns: Array<Array<Step | null>> = [];
+  if (firstTurn % 2 === 1) {
+    moveTurns.push([null]);
   }
-  for (let i = startAt; i < steps.length; i += 2) pairs.push([steps[i], steps[i + 1]]);
-
-  const prevFen = (i: number, pairI: number) => {
-    if (i === 0 && pairI === 0) {
-      return initialFen;
+  var currentTurn: Array<Step | null> = [];
+  let turn = firstTurn + 1;
+  for (let i = 1; i < steps.length; i++) {
+    if (steps[i].turnCount === turn) {
+      currentTurn.push(steps[i]);
+      moveTurns.push(currentTurn);
+      turn++;
+      currentTurn = [];
+    } else {
+      currentTurn.push(steps[i]);
+      if (i === steps.length - 1) {
+        moveTurns.push(currentTurn);
+      }
     }
-    const step = pairI === 1 ? pairs[i][0] : pairs[i - 1][1];
-    return step ? step.fen : initialFen;
+  }
+
+  const prevFen = (i: number) => {
+    if (i === 0) return initialFen;
+    const step = moveTurns[i];
+    return step && step[0] ? step[0].fen : initialFen;
   };
 
   const els: MaybeVNodes = [],
     curPly = ctrl.ply;
-  //TODO multiaction generalise for all games? fix with monsterchess?
-  if (variant.key === 'amazons') {
-    for (let i = 0; i < pairs.length; i = i + 2) {
-      els.push(h(indexTag, Math.floor(i / 2) + 1 + ''));
-      els.push(renderMultiActionMove(pairs[i], notation, variant, prevFen(i, 0), curPly, true, drawPlies));
-      els.push(renderMultiActionMove(pairs[i + 1], notation, variant, prevFen(i + 1, 0), curPly, false, drawPlies));
-    }
-  } else {
-    for (let i = 0; i < pairs.length; i++) {
-      els.push(h(indexTag, i + 1 + ''));
-      els.push(renderMove(pairs[i][0], notation, variant, prevFen(i, 0), curPly, true, drawPlies));
-      els.push(renderMove(pairs[i][1], notation, variant, prevFen(i, 1), curPly, false, drawPlies));
-    }
+  for (let i = 0; i < moveTurns.length; i = i + 2) {
+    els.push(h(indexTag, Math.floor(i / 2) + 1 + ''));
+    els.push(renderMultiActionMove(moveTurns[i], notation, variant, prevFen(i), curPly, true, drawPlies));
+    els.push(renderMultiActionMove(moveTurns[i + 1], notation, variant, prevFen(i + 1), curPly, false, drawPlies));
   }
   els.push(renderResult(ctrl));
 
@@ -315,11 +283,7 @@ export function render(ctrl: RoundController): VNode | undefined {
               while ((node = node.previousSibling as HTMLElement)) {
                 offset++;
                 if (node.tagName === indexTagUC) {
-                  //TODO multiaction fix for monsterchess (create jump to turn instead?)
-                  ctrl.userJump(
-                    (d.game.variant.key === 'amazons' ? 4 : 2) * parseInt(node.textContent || '') +
-                      offset * (d.game.variant.key === 'amazons' ? 2 : 1)
-                  );
+                  ctrl.userJumpToTurn(2 * parseInt(node.textContent || '') + offset);
                   ctrl.redraw();
                   break;
                 }
