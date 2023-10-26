@@ -2,9 +2,13 @@ import { RoundData, Step } from './interfaces';
 
 export const firstPly = (d: RoundData): number => d.steps[0].ply;
 
+export const firstTurn = (d: RoundData): number => d.steps[0].turnCount;
+
 export const lastPly = (d: RoundData): number => lastStep(d).ply;
 
 export const lastTurn = (d: RoundData): number => lastStep(d).turnCount;
+
+export const turnsTaken = (d: RoundData): number => lastTurn(d) - firstTurn(d);
 
 export const lastStep = (d: RoundData): Step => d.steps[d.steps.length - 1];
 

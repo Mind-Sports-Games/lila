@@ -63,6 +63,7 @@ export default class RoundController {
    * Rewrite what variable is used and/or updated where necessary, so that we can safely add "virtual plies" to this.ply
    */
   ply: number;
+  turnCount: number;
   firstSeconds = true;
   flip = false;
   loading = false;
@@ -92,6 +93,7 @@ export default class RoundController {
     const d = (this.data = opts.data);
 
     this.ply = round.lastPly(d);
+    this.turnCount = round.lastTurn(d);
     this.goneBerserk[d.player.playerIndex] = d.player.berserk;
     this.goneBerserk[d.opponent.playerIndex] = d.opponent.berserk;
 
@@ -177,6 +179,7 @@ export default class RoundController {
   };
 
   lastPly = () => round.lastPly(this.data);
+  lastTurn = () => round.lastTurn(this.data);
 
   makeCgHooks = () => ({
     onUserMove: this.onUserMove,
@@ -202,8 +205,9 @@ export default class RoundController {
     const plyDiff = Math.abs(ply - this.ply);
     this.ply = ply;
     this.justDropped = undefined;
-    const s = this.stepAt(ply),
-      ghosts = countGhosts(s.fen),
+    const s = this.stepAt(ply);
+    this.turnCount = s.turnCount;
+    const ghosts = countGhosts(s.fen),
       config: CgConfig = {
         fen: s.fen,
         lastMove: util.uci2move(s.lidraughtsUci),
@@ -310,16 +314,16 @@ export default class RoundController {
       notify(() => {
         let txt = this.noarg('yourTurn');
         const opponent = renderUser.userTxt(this, d.opponent);
-        if (this.ply < 1) txt = `${opponent}\njoined the game.\n${txt}`;
+        if (this.turnCount < 1) txt = `${opponent}\njoined the game.\n${txt}`;
         else {
           let move = d.steps[d.steps.length - 1].san;
-          const turn = Math.floor((this.ply - 1) / 2) + 1;
-          move = `${turn}${this.ply % 2 === 1 ? '.' : '...'} ${move}`;
+          const turn = Math.floor((this.turnCount - 1) / 2) + 1;
+          move = `${turn}${this.turnCount % 2 === 1 ? '.' : '...'} ${move}`;
           txt = `${opponent}\nplayed ${move}.\n${txt}`;
         }
         return txt;
       });
-    else if (this.isPlaying() && this.ply < 1)
+    else if (this.isPlaying() && this.turnCount < 1)
       notify(() => renderUser.userTxt(this, d.opponent) + '\njoined the game.');
   };
 
@@ -329,8 +333,8 @@ export default class RoundController {
     const d = this.data,
       playing = this.isPlaying(),
       ghosts = countGhosts(o.fen);
-    d.game.turns = o.ply;
-    d.game.player = o.ply % 2 === 0 ? 'p1' : 'p2';
+    d.game.turns = o.turnCount;
+    d.game.player = o.turnCount % 2 === 0 ? 'p1' : 'p2';
     const playedPlayerIndex = o.ply % 2 === 0 ? 'p2' : 'p1',
       activePlayerIndex = d.player.playerIndex === d.game.player;
     if (o.status) d.game.status = o.status;
@@ -373,6 +377,7 @@ export default class RoundController {
       d.steps,
       {
         ply: d.game.turns,
+        turnCount: o.turnCount,
         fen: o.fen,
         san: o.san,
         uci: o.uci,
@@ -396,7 +401,7 @@ export default class RoundController {
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
     if (this.data.expiration) {
-      if (this.data.steps.length > 2) this.data.expiration = undefined;
+      if (round.turnsTaken(this.data) > 1) this.data.expiration = undefined;
       else this.data.expiration.updatedAt = Date.now();
     }
     this.redraw();
@@ -431,7 +436,10 @@ export default class RoundController {
 
   reload = (d: RoundData): void => {
     d.steps = round.mergeSteps(d.steps, this.coordSystem(d));
-    if (d.steps.length !== this.data.steps.length) this.ply = d.steps[d.steps.length - 1].ply;
+    if (d.steps.length !== this.data.steps.length) {
+      this.ply = d.steps[d.steps.length - 1].ply;
+      this.turnCount = d.steps[d.steps.length - 1].turnCount;
+    }
     round.massage(d);
     this.data = d;
     this.clearJust();
@@ -466,7 +474,7 @@ export default class RoundController {
       d.player.ratingDiff = o.ratingDiff[d.player.playerIndex];
       d.opponent.ratingDiff = o.ratingDiff[d.opponent.playerIndex];
     }
-    if (!d.player.spectator && d.game.turns > 1) {
+    if (!d.player.spectator && round.turnsTaken(d) > 1) {
       const key = o.winner ? (d.player.playerIndex === o.winner ? 'victory' : 'defeat') : 'draw';
       playstrategy.sound.play(key);
       if (
@@ -688,7 +696,7 @@ export default class RoundController {
     playstrategy.requestIdleCallback(() => {
       const d = this.data;
       if (this.isPlaying()) {
-        if (!d.simul) blur.init(d.steps.length > 2);
+        if (!d.simul) blur.init(round.turnsTaken(d) > 1);
 
         title.init();
         this.setTitle();

@@ -617,7 +617,7 @@ export default class RoundController {
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
     if (d.expirationAtStart) {
-      if (d.game.turns > 1 && !d.pref.playerTurnIndicator) {
+      if (round.turnsTaken(d) > 1 && !d.pref.playerTurnIndicator) {
         d.expirationAtStart = undefined;
       } else d.expirationAtStart.updatedAt = Date.now();
     }
@@ -679,7 +679,10 @@ export default class RoundController {
   }
 
   reload = (d: RoundData): void => {
-    if (d.steps.length !== this.data.steps.length) this.ply = d.steps[d.steps.length - 1].ply;
+    if (d.steps.length !== this.data.steps.length) {
+      this.ply = d.steps[d.steps.length - 1].ply;
+      this.turnCount = d.steps[d.steps.length - 1].turnCount;
+    }
     round.massage(d);
     this.data = d;
     this.clearJust();
@@ -1001,7 +1004,7 @@ export default class RoundController {
     playstrategy.requestIdleCallback(() => {
       const d = this.data;
       if (this.isPlaying()) {
-        if (!d.simul) blur.init(d.game.turns > 1);
+        if (!d.simul) blur.init(round.turnsTaken(d) > 1);
 
         title.init();
         this.setTitle();
