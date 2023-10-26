@@ -679,7 +679,10 @@ export default class RoundController {
   }
 
   reload = (d: RoundData): void => {
-    if (d.steps.length !== this.data.steps.length) this.ply = d.steps[d.steps.length - 1].ply;
+    if (d.steps.length !== this.data.steps.length) {
+      this.ply = d.steps[d.steps.length - 1].ply;
+      this.turnCount = d.steps[d.steps.length - 1].turnCount;
+    }
     round.massage(d);
     this.data = d;
     this.clearJust();

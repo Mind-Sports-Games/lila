@@ -186,7 +186,7 @@ final private[round] class RoundDuct(
           case false =>
             lila
               .log("cheat")
-              //TODO multiaction use gameid#turnCounr in url (study and draughtsround to fix)
+              //TODO multiaction use gameid#turnCounr in url (study/analysis to fix)
               .info(
                 s"hold alert $ip https://playstrategy.org/${pov.gameId}/${pov.playerIndex.name}#${pov.game.turnCount} ${pov.player.userId | "anon"} mean: $mean SD: $sd"
               )

@@ -138,7 +138,7 @@ export function analysisButton(ctrl: RoundController): VNode | undefined {
           },
           attrs: {
             title: ctrl.noarg('analysis'),
-            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + ctrl.ply,
+            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + ctrl.turnCount,
             'data-icon': 'A',
           },
         },
@@ -188,7 +188,7 @@ function renderButtons(ctrl: RoundController) {
         ['X', ctrl.ply + 1],
         ['V', lastPly],
       ].map((b, i) => {
-        const enabled = ctrl.ply !== b[1] && b[1] >= firstPly && b[1] <= lastPly;
+        const enabled = ctrl.ply !== b[1] && (b[1] as number) >= firstPly && (b[1] as number) <= lastPly;
         return h('button.fbt', {
           class: { glowing: i === 3 && ctrl.isLate() },
           attrs: {
