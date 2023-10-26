@@ -126,10 +126,9 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         if (fromOp) notify(ctrl.noarg('yourOpponentOffersADraw'));
       }
       if (by) {
-        let ply = ctrl.lastPly();
-        const turnCount = ctrl.lastTurn();
-        if ((by == 'p1') == (util.turnPlayerIndexFromLastTurn(turnCount) == 'p1')) ply++;
-        ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([ply]);
+        let turnCount = ctrl.lastTurn();
+        if ((by == 'p1') == (util.turnPlayerIndexFromLastTurn(turnCount) == 'p1')) turnCount++;
+        ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([turnCount]);
       }
       ctrl.redraw();
     },

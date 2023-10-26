@@ -76,7 +76,7 @@ function renderMultiActionMove(
                 : ''
             )
             .join(' '),
-          step.map(s => drawOffers.has(s ? s.ply : -1)).includes(true) ? renderDrawOffer() : undefined,
+          step.map(s => drawOffers.has(s ? s.turnCount : -1)).includes(true) ? renderDrawOffer() : undefined,
         ]
       )
     : orEmpty
@@ -122,7 +122,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     variant = ctrl.data.game.variant,
     firstTurn = round.firstTurn(ctrl.data),
     lastPly = round.lastPly(ctrl.data),
-    drawPlies = new Set(ctrl.data.game.drawOffers || []),
+    drawTurns = new Set(ctrl.data.game.drawOffers || []),
     initialFen = ctrl.data.game.initialFen || '';
   if (typeof lastPly === 'undefined') return [];
 
@@ -156,8 +156,8 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     curPly = ctrl.ply;
   for (let i = 0; i < moveTurns.length; i = i + 2) {
     els.push(h(indexTag, Math.floor(i / 2) + 1 + ''));
-    els.push(renderMultiActionMove(moveTurns[i], notation, variant, prevFen(i), curPly, true, drawPlies));
-    els.push(renderMultiActionMove(moveTurns[i + 1], notation, variant, prevFen(i + 1), curPly, false, drawPlies));
+    els.push(renderMultiActionMove(moveTurns[i], notation, variant, prevFen(i), curPly, true, drawTurns));
+    els.push(renderMultiActionMove(moveTurns[i + 1], notation, variant, prevFen(i + 1), curPly, false, drawTurns));
   }
   els.push(renderResult(ctrl));
 
