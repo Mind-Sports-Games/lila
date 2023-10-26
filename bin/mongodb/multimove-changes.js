@@ -46,3 +46,25 @@ db.game5.find({ l: 2, v: 8 }).forEach(g => {
     }
   );
 });
+
+db.tournament_pairing.find({"ppt": 2}).forEach(p => {
+  db.tournament_pairing.updateOne(
+    { _id: p._id },
+    {
+      $set: {
+        t: NumberInt(p.t / 2),
+      },
+    }
+  );
+});
+
+db.tournament_pairing.updateMany({"ppt": {$exists: true}}, { $unset: {"ppt": ''} });
+
+//alternative way of doing above
+//db.tournament_pairing.find({"d": {$gte: ISODate("2023-03-01")}}).forEach(p => {
+//  var t = db.tournament2.findOne({ "_id": p.tid, "lib": 2, "variant": 8 }, { name: 1 });
+//  if (t != null) {
+//    p.t = NumberInt(p.t / 2);
+//    db.tournament_pairing.save(p);
+//  }
+//});
