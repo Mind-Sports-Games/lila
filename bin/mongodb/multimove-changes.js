@@ -68,3 +68,16 @@ db.tournament_pairing.updateMany({ ppt: { $exists: true } }, { $unset: { ppt: ''
 //    db.tournament_pairing.save(p);
 //  }
 //});
+
+db.game5.find({ l: 2, v: 8, do: { $exists: true } }).forEach(g => {
+  db.game5.updateOne(
+    { _id: g._id },
+    {
+      $set: {
+        do: g.do.map(function (d) {
+          return NumberInt(d / 2);
+        }),
+      },
+    }
+  );
+});
