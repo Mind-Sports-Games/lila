@@ -12,6 +12,7 @@ export interface Ctx {
   variant: Variant;
 }
 
+//TODO: multiaction this will need changing
 export const plyToTurn = (ply: Ply, variantKey: VariantKey = 'standard'): number =>
   variantKey === 'amazons' ? Math.floor((ply - 1) / 4) + 1 : Math.floor((ply - 1) / 2) + 1;
 
@@ -27,6 +28,7 @@ export const renderGlyph = (glyph: Tree.Glyph): VNode =>
 const renderEval = (e: string): VNode => h('eval', e.replace('-', '−'));
 
 export function renderIndexText(ply: Ply, variantKey: VariantKey, withDots?: boolean): string {
+  //TODO: multiaction will want to remove the call to plyPlayerIndex and have access to playerIndex on the 'ply' (step)
   return plyToTurn(ply, variantKey) + (withDots ? (util.plyPlayerIndex(ply, variantKey) === 'p2' ? '.' : '...') : '');
 }
 

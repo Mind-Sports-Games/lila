@@ -251,6 +251,7 @@ export default class AnalyseCtrl {
     return this.node;
   }
 
+  //TODO multiaction this is probably wrong (mixing ply and turn) want to deprecate plyPlayerIndex by having playerIndex available on the node
   turnPlayerIndex(): PlayerIndex {
     return util.plyPlayerIndex(this.node.ply, this.data.game.variant.key);
   }

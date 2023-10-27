@@ -13,6 +13,7 @@ export function clearSelection() {
   window.getSelection()?.removeAllRanges();
 }
 
+//TODO multiaction remove this function
 export function plyPlayerIndex(ply: number, variantKey: VariantKey): PlayerIndex {
   if (variantKey === 'amazons') {
     return Math.floor(ply / 2) % 2 === 0 ? 'p1' : 'p2';
