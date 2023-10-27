@@ -64,8 +64,8 @@ final class JoinerTest extends Specification {
       )
       ChallengeJoiner.createGame(challenge, None, None, Some(challenge.finalPlayerIndex)) must beLike {
         case g: Game =>
-          g.chess.startedAtTurn must_== 1
-          g.chess.situation.dropsAsDrops.size must_== 79
+          g.stratGame.startedAtTurn must_== 1
+          g.stratGame.situation.dropsAsDrops.size must_== 79
       }
     }
   }
