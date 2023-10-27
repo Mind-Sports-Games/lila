@@ -39,7 +39,7 @@ final class JsonView(rematches: Rematches) {
         "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
         "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.stratGame)),
         "player"        -> game.activePlayerIndex,
-        "plies"         -> game.plies, //TODO: front end multiaction turns/plies changes
+        "plies"         -> game.plies,
         "turns"         -> game.turnCount,
         "startedAtTurn" -> game.stratGame.startedAtTurn,
         "source"        -> game.source,

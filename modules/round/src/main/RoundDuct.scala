@@ -186,7 +186,7 @@ final private[round] class RoundDuct(
           case false =>
             lila
               .log("cheat")
-              //TODO multiaction use gameid#turnCounr in url (study/analysis to fix)
+              //TODO multiaction use gameid#turnCount in url (study/analysis to fix)
               .info(
                 s"hold alert $ip https://playstrategy.org/${pov.gameId}/${pov.playerIndex.name}#${pov.game.turnCount} ${pov.player.userId | "anon"} mean: $mean SD: $sd"
               )
@@ -496,10 +496,9 @@ final private[round] class RoundDuct(
   private def getPlayer(playerIndex: PlayerIndex): Player = playerIndex.fold(p1Player, p2Player)
 
   private def recordLag(pov: Pov): Unit =
-    if ((pov.game.playedPlies & 30) == 10) {
-      // TODO: Test for multiaction, never checked for Amazons?
-      // Triggers every 32 moves starting on ply 10.
-      // i.e. 10, 11, 42, 43, 74, 75, ...
+    if (((pov.game.playedTurns & 30) == 10) && pov.game.actionStrs.lastOption.map(_.size) == Some(1)) {
+      // Triggers on the first action of every 32 turns, starting on turn 10.
+      // i.e. if single action per turn, then this triggers on ply: 10, 11, 42, 43, 74, 75, ...
       for {
         user  <- pov.player.userId
         clock <- pov.game.clock

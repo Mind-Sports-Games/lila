@@ -211,7 +211,6 @@ final private[api] class GameApi(
         "perf"       -> PerfPicker.key(g),
         "createdAt"  -> g.createdAt,
         "lastMoveAt" -> g.updatedAt,
-        //TODO: front end multiaction turns/plies changes
         "turns"       -> g.turnCount,
         "plies"       -> g.plies,
         "playerIndex" -> g.turnPlayerIndex.name,

@@ -759,7 +759,6 @@ object Event {
       Json
         .obj(
           "playerIndex" -> playerIndex,
-          //TODO: front end multiaction turns/plies changes
           "plies" -> plies,
           "turns" -> turnCount
         )

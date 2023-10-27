@@ -43,11 +43,10 @@ final class UserGameApi(
         "speed"     -> g.speed.key,
         "perf"      -> PerfPicker.key(g),
         "timestamp" -> g.createdAt,
-        //TODO: front end multiaction turns/plies changes
-        "plies"  -> g.plies,
-        "turns"  -> g.turnCount,
-        "status" -> g.status,
-        "source" -> g.source.map(_.name),
+        "plies"     -> g.plies,
+        "turns"     -> g.turnCount,
+        "status"    -> g.status,
+        "source"    -> g.source.map(_.name),
         "players" -> JsObject(g.players map { p =>
           p.playerIndex.name -> Json
             .obj(

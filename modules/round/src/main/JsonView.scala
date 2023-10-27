@@ -297,7 +297,6 @@ final class JsonView(
             "opening"    -> game.opening,
             "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
             "fen"        -> fen,
-            //TODO: front end multiaction turns/plies changes
             "plies"      -> game.plies,
             "turns"      -> game.turnCount,
             "player"     -> game.activePlayerIndex.name,
@@ -333,7 +332,7 @@ final class JsonView(
           .add("highlight" -> pref.highlight)
           .add("destination" -> (pref.destination && !pref.isBlindfold))
           .add("playerTurnIndicator" -> false),
-        //TODO multiaction work out what is using this
+        //TODO multiaction we think this correct to use plies (not turnCount) but analysis needs testing
         "path"         -> pov.game.plies,
         "userAnalysis" -> true
       )
