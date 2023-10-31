@@ -175,6 +175,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
 
         if (ctrl.data.opponent.offeringSelectSquares) {
           ctrl.data.deadStoneOfferState = ctrl.data.player.playerIndex === 'p1' ? 'P2Offering' : 'P1Offering';
+          ctrl.data.selectMode = true;
           ctrl.chessground.set({ viewOnly: false, selectOnly: true });
           ctrl.chessground.resetSelectedPieces();
           ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
