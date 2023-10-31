@@ -151,6 +151,7 @@ case class Game(
       case _              => l
     }
 
+  //TODO multiaction this does not produce correct times for amazons
   def plyTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
       clk <- clock
@@ -193,17 +194,17 @@ case class Game(
 
       pairs.zipWithIndex.map { case ((first, second), index) =>
         {
-          //TODO review 'turn' for multiaction
-          val turn         = index + 2 + stratGame.startedAtTurn / 2
-          val afterByoyomi = byoyomiStart ?? (_ <= turn)
+          //TODO multiaction need to calculcate fullTurncount (expand on pairs to get an actual full turn of times)
+          val fullTurnCount = index + 2 + stratGame.startedAtTurn / 2
+          val afterByoyomi  = byoyomiStart ?? (_ <= fullTurnCount)
           // after byoyomi we store movetimes directly, not remaining time
           val mt   = if (afterByoyomi) second else first - second
           val cInc = (!afterByoyomi && (pairs.hasNext || !noLastInc)) ?? inc
 
           if (!pairs.hasNext && byoyomiTimeout) {
-            val prevTurnByoyomi = byoyomiStart ?? (_ < turn)
+            val prevTurnByoyomi = byoyomiStart ?? (_ < fullTurnCount)
             (if (prevTurnByoyomi) byo else first) + byo * byoyomiHistory.fold(0)(
-              _.countSpentPeriods(playerIndex, turn)
+              _.countSpentPeriods(playerIndex, fullTurnCount)
             )
           } else mt + cInc
         } nonNeg
@@ -1283,9 +1284,6 @@ case class ByoyomiClockHistory(
       .updatePeriods(
         playerIndex,
         _.padTo(initiatePeriods ?? 1, 0)
-        //TODO multiaction discuss whether using fullTurnCount is correct now
-        //most clock stuff deals in plies but we dont necessarily have a fixed number of plies each
-        //what are we padding out here?
           .padTo(curClock.periods atMost PeriodEntries.maxPeriods, fullTurnCount)
       )
   }
@@ -1304,8 +1302,8 @@ case class ByoyomiClockHistory(
   def firstEnteredPeriod(playerIndex: PlayerIndex): Option[Int] =
     periodEntries(playerIndex).headOption
 
-  def countSpentPeriods(playerIndex: PlayerIndex, turn: Int) =
-    periodEntries(playerIndex).count(_ == turn)
+  def countSpentPeriods(playerIndex: PlayerIndex, fullTurnCount: Int) =
+    periodEntries(playerIndex).count(_ == fullTurnCount)
 
   def refundSpentPeriods(playerIndex: PlayerIndex, turn: Int) =
     updatePeriods(playerIndex, _.filterNot(_ == turn))
