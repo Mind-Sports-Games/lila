@@ -55,7 +55,8 @@ final class BotJsonView(
         Json
           .obj(
             "type"            -> "gameState",
-            "moves"           -> uciMoves.mkString(" "),
+            "moves"           -> uciMoves.map(_.mkString(",")).mkString(" "),
+            "activeplayer"    -> game.activePlayer.name,
             "wtime"           -> millisOf(game.p1Pov),
             "btime"           -> millisOf(game.p2Pov),
             "winc"            -> game.clock.??(_.config.increment.millis),
