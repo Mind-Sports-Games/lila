@@ -120,7 +120,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
         val dbGame = Game
           .make(
-            chess = game,
+            stratGame = game,
             p1Player = Player.makeImported(
               PlayerIndex.P1,
               parsed.tags(_.P1),

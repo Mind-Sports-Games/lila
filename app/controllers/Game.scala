@@ -103,7 +103,9 @@ final class Game(
             .GlobalConcurrencyLimitPerIpAndUserOption(req, me)(env.api.gameApiV2.exportByUser(config)) {
               source =>
                 Ok.chunked(source)
-                  .pipe(asAttachmentStream(s"playstrategy_${user.username}_$date.${format.toString.toLowerCase}"))
+                  .pipe(
+                    asAttachmentStream(s"playstrategy_${user.username}_$date.${format.toString.toLowerCase}")
+                  )
                   .as(gameContentType(config))
             }
             .fuccess
@@ -145,14 +147,14 @@ final class Game(
 
   private[controllers] def requestPgnFlags(req: RequestHeader, extended: Boolean) =
     lila.game.PgnDump.WithFlags(
-      moves = getBoolOpt("moves", req) | true,
+      turns = getBoolOpt("moves", req) | true,
       tags = getBoolOpt("tags", req) | true,
       clocks = getBoolOpt("clocks", req) | extended,
       evals = getBoolOpt("evals", req) | extended,
       opening = getBoolOpt("opening", req) | extended,
       literate = getBoolOpt("literate", req) | false,
       pgnInJson = getBoolOpt("pgnInJson", req) | false,
-      delayMoves = !get("key", req).exists(env.noDelaySecretSetting.get().value.contains)
+      delayTurns = !get("key", req).exists(env.noDelaySecretSetting.get().value.contains)
     )
 
   private[controllers] def gameContentType(config: GameApiV2.Config) =

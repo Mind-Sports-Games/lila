@@ -9,6 +9,8 @@ import play.api.libs.json._
 
 import lila.tree.Branch
 
+//We don't think AnaMove is used - think this has been ported to lila-ws
+
 trait AnaAny {
 
   def branch: Validated[String, Branch]
@@ -44,7 +46,7 @@ case class AnaMove(
 
   def branch: Validated[String, Branch] =
     newGame flatMap { case (game, move) =>
-      game.pgnMoves.lastOption toValid "Moved but no last move!" map { san =>
+      game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { san =>
         val uci = Uci(
           lib,
           move,
@@ -76,8 +78,7 @@ case class AnaMove(
           (~fullCapture && ~captLen > 1) option AnaDests.truncateMoves(validMoves)
         Branch(
           id = UciCharPair(lib, uci),
-          ply = game.turns,
-          plysPerTurn = variant.plysPerTurn,
+          ply = game.plies,
           move = Uci.WithSan(lib, uci, san),
           fen = fen,
           check = game.situation.check,
@@ -100,7 +101,7 @@ case class AnaMove(
             case _                    => None
           },
           captureLength = movable ?? captLen,
-          opening = (game.turns <= 30 && Variant.openingSensibleVariants(lib)(variant)) ?? {
+          opening = (game.turnCount <= 30 && Variant.openingSensibleVariants(lib)(variant)) ?? {
             FullOpeningDB.findByFen(lib, fen)
           },
           drops = if (movable) game.situation.drops else Some(Nil),

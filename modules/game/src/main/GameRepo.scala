@@ -4,7 +4,7 @@ import scala.language.existentials
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ P2, Player => PlayerIndex, Mode, Status, P1 }
+import strategygames.{ ActionStrs, Mode, Player => PlayerIndex, P1, P2, Status }
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.commands.WriteResult
@@ -253,7 +253,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .cursor[Game]()
       .list(2)
       .dmap {
-        _.sortBy(_.movedAt).lastOption flatMap { Pov(_, user) }
+        _.sortBy(_.updatedAt).lastOption flatMap { Pov(_, user) }
       }
 
   def quickLastPlayedId(userId: User.ID): Fu[Option[Game.ID]] =
@@ -414,7 +414,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
     val fen: Option[FEN] = initialFen orElse {
       (!g2.variant.standardInitialPosition)
-        .option(Forsyth.>>(g2.variant.gameLogic, g2.chess))
+        .option(Forsyth.>>(g2.variant.gameLogic, g2.stratGame))
         .filterNot(_.initial)
     }
     val checkInHours =
@@ -529,7 +529,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       $doc(s"${F.pgnImport}.h" -> PgnImport.hash(pgn))
     )
 
-  def getOptionPgn(id: ID): Fu[Option[PgnMoves]] = game(id) dmap2 { _.pgnMoves }
+  def getOptionActionStrs(id: ID): Fu[Option[ActionStrs]] = game(id) dmap2 { _.actionStrs }
 
   def lastGameBetween(u1: String, u2: String, since: DateTime): Fu[Option[Game]] =
     coll.one[Game](

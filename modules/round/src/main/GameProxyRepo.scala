@@ -53,7 +53,7 @@ final class GameProxyRepo(
       }.sequenceFu map { povs =>
         try {
           povs sortWith Pov.priority
-        } catch { case _: IllegalArgumentException => povs.sortBy(-_.game.movedAt.getSeconds) }
+        } catch { case _: IllegalArgumentException => povs.sortBy(-_.game.updatedAt.getSeconds) }
       }
     }
 }

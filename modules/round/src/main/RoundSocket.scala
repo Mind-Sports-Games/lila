@@ -234,7 +234,7 @@ object RoundSocket {
         case _               => 1
       }
     } / {
-      pov.game.chess.board.materialImbalance match {
+      pov.game.board.materialImbalance match {
         case _ if pov.game.variant.materialImbalanceVariant                         => 1
         case i if (pov.playerIndex.p1 && i <= -4) || (pov.playerIndex.p2 && i >= 4) => 3
         case _                                                                      => 1

@@ -191,7 +191,6 @@ object BSONHandlers {
     import Node.{ BsonFields => F }
     for {
       ply <- doc.getAsOpt[Int](F.ply)
-      ppt <- doc.getAsOpt[Int](F.ppt).orElse(Some(1))
       uci <- doc.getAsOpt[Uci](F.uci)
       san <- doc.getAsOpt[String](F.san)
       fen <- doc.getAsOpt[FEN](F.fen)
@@ -207,7 +206,6 @@ object BSONHandlers {
     } yield Node(
       id,
       ply,
-      ppt,
       WithSan(GameLogic.Chess(), uci, san),
       fen,
       check,
@@ -228,7 +226,6 @@ object BSONHandlers {
     val w = new Writer
     $doc(
       ply            -> n.ply,
-      ppt            -> n.plysPerTurn,
       uci            -> n.move.uci,
       san            -> n.move.san,
       fen            -> n.fen,
@@ -253,9 +250,9 @@ object BSONHandlers {
     def reads(fullReader: Reader) = {
       val rootNode = fullReader.doc.getAsOpt[Bdoc](Path.rootDbKey) err "Missing root"
       val r        = new Reader(rootNode)
+      val p        = r int ply
       Root(
-        ply = r int ply,
-        plysPerTurn = (r intO ppt) | 1,
+        ply = p,
         fen = r.get[FEN](fen),
         check = r boolD check,
         shapes = r.getO[Shapes](shapes) | Shapes.empty,
@@ -272,7 +269,6 @@ object BSONHandlers {
       StudyFlatTree.writer.rootChildren(r) appended {
         Path.rootDbKey -> $doc(
           ply      -> r.ply,
-          ppt      -> r.plysPerTurn,
           fen      -> r.fen,
           check    -> r.check.some.filter(identity),
           shapes   -> r.shapes.value.nonEmpty.option(r.shapes),

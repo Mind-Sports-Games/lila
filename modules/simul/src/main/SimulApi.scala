@@ -254,7 +254,7 @@ final class SimulApi(
               none
             )
           game1 = Game.make(
-            chess = strategygames
+            stratGame = strategygames
               .Game(
                 pairing.player.variant.gameLogic,
                 variant = Some {

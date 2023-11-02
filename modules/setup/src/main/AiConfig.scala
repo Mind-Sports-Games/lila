@@ -38,15 +38,15 @@ case class AiConfig(
   ).some
 
   def game(user: Option[User]) =
-    fenGame { chessGame =>
+    fenGame { stratGame =>
       val perfPicker = lila.game.PerfPicker.mainOrDefault(
-        Speed(chessGame.clock.map(_.config)),
-        chessGame.situation.board.variant,
+        Speed(stratGame.clock.map(_.config)),
+        stratGame.situation.board.variant,
         makeDaysPerTurn
       )
       Game
         .make(
-          chess = chessGame,
+          stratGame = stratGame,
           p1Player = creatorPlayerIndex.fold(
             Player.make(P1, user, perfPicker),
             Player.make(P1, level.some)
@@ -56,7 +56,7 @@ case class AiConfig(
             Player.make(P2, user, perfPicker)
           ),
           mode = Mode.Casual,
-          source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
+          source = if (stratGame.board.variant.fromPosition) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
         )

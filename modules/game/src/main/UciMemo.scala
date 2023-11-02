@@ -4,44 +4,59 @@ import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 
 import strategygames.format.UciDump
-import strategygames.Action
+import strategygames.{ Action, ActionStrs, Player }
 
 final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  type UciVector = Vector[String]
-
-  private val cache: Cache[Game.ID, UciVector] = lila.memo.CacheApi.scaffeineNoScheduler
+  private val cache: Cache[Game.ID, ActionStrs] = lila.memo.CacheApi.scaffeineNoScheduler
     .expireAfterAccess(5 minutes)
-    .build[Game.ID, UciVector]()
+    .build[Game.ID, ActionStrs]()
 
-  private val hardLimit = 300
+  private val maxTurns = 300
 
-  def add(game: Game, uciMove: String): Unit = {
+  def add(game: Game, uci: String, playerIndex: Player): Unit = {
     val current = ~cache.getIfPresent(game.id)
-    cache.put(game.id, current :+ uciMove)
+    val newActionStrs =
+      if (Player.fromTurnCount(current.size + game.stratGame.startedAtTurn) == playerIndex)
+        current :+ List(uci)
+      else current.dropRight(1) :+ (current.takeRight(1).flatten :+ uci)
+    cache.put(game.id, newActionStrs)
   }
+
   def add(game: Game, action: Action): Unit =
-    add(game, UciDump.move(game.variant.gameLogic, game.variant)(action))
+    add(
+      game,
+      UciDump.action(game.variant.gameLogic, game.variant)(action),
+      action.player
+    )
 
-  def set(game: Game, uciMoves: Seq[String]) =
-    cache.put(game.id, uciMoves.toVector)
+  def set(game: Game, actionStrs: ActionStrs) =
+    cache.put(game.id, actionStrs)
 
-  def get(game: Game, max: Int = hardLimit): Fu[UciVector] =
-    cache getIfPresent game.id filter { moves =>
-      moves.size.min(max) == game.pgnMoves.size.min(max)
+  def set(game: Game) =
+    cache.put(game.id, game.actionStrs)
+
+  def get(game: Game, max: Int = maxTurns): Fu[ActionStrs] =
+    cache getIfPresent game.id filter { actionStrs =>
+      actionStrs.size.min(max) == game.actionStrs.size.min(max)
     } match {
-      case Some(moves) => fuccess(moves)
-      case _           => compute(game, max) addEffect { set(game, _) }
+      case Some(actionStrs) => fuccess(actionStrs)
+      case _                => compute(game, max) addEffect { set(game, _) }
     }
 
-  def drop(game: Game, nb: Int) = {
-    val current = ~cache.getIfPresent(game.id)
-    cache.put(game.id, current.take(current.size - nb))
-  }
+  //def drop(game: Game, nb: Int) = {
+  //  val current = ~cache.getIfPresent(game.id)
+  //  cache.put(game.id, current.take(current.size - nb))
+  //}
 
-  private def compute(game: Game, max: Int): Fu[UciVector] =
+  private def compute(game: Game, max: Int): Fu[ActionStrs] =
     for {
-      fen      <- gameRepo initialFen game
-      uciMoves <- UciDump(game.variant.gameLogic, game.pgnMoves take max, fen, game.variant).toFuture
-    } yield uciMoves.toVector
+      fen <- gameRepo initialFen game
+      actionStrs <- UciDump(
+        game.variant.gameLogic,
+        game.actionStrs take maxTurns,
+        fen,
+        game.variant
+      ).toFuture
+    } yield actionStrs.toVector.map(_.toVector)
 }

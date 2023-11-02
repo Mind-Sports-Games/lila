@@ -484,8 +484,8 @@ object mod {
                   s" ${result.analysis}"
                 ),
                 td(
-                  span(cls := s"sig sig_${Display.moveTimeSig(result)}", dataIcon := "J"),
-                  s" ${result.basics.moveTimes / 10}",
+                  span(cls := s"sig sig_${Display.plyTimeSig(result)}", dataIcon := "J"),
+                  s" ${result.basics.plyTimes / 10}",
                   result.basics.mtStreak ?? frag(br, "streak")
                 ),
                 td(

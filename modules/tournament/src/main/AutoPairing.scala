@@ -26,7 +26,7 @@ final class AutoPairing(
     val clock   = tour.clock.toClock
     val game = Game
       .make(
-        chess = StratGame(
+        stratGame = StratGame(
           variant.gameLogic,
           Some {
             if (tour.position.isEmpty) variant
@@ -40,7 +40,12 @@ final class AutoPairing(
           val turns = g.player.fold(0, 1)
           g.copy(
             clock = clock.some,
-            turns = turns,
+            //Its ok to set all of these to turns - we're just saying we're starting at a non standard
+            //place (if 1) and its all normal if 0. We don't necessarily know about how many turns/plies
+            //made up the history of a position but it doesnt really matter
+            plies = turns,
+            turnCount = turns,
+            startedAtPly = turns,
             startedAtTurn = turns
           )
         },

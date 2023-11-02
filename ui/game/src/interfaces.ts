@@ -40,7 +40,7 @@ export interface BaseGame {
   canOfferDraw?: boolean;
   drawOffers?: number[];
   canDoPassAction?: boolean;
-  moveCentis?: number[];
+  plyCentis?: number[];
   initialFen?: string;
   importedBy?: string;
   threefold?: boolean;

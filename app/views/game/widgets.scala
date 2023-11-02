@@ -84,22 +84,21 @@ object widgets {
               else trans.playerIndexPlays(g.playerTrans(g.turnPlayerIndex))
             }
           ),
-          if (g.turns > 0) {
-            val pgnMoves = g.pgnMoves take 20
+          if (g.actionStrs.length > 0)
             div(cls := "opening")(
               (!g.fromPosition ?? g.opening) map { opening =>
                 strong(opening.opening.toString())
               },
               div(cls := "pgn")(
-                pgnMoves.take(6).grouped(2).zipWithIndex map {
-                  case (Vector(w, b), i) => s"${i + 1}. $w $b"
-                  case (Vector(w), i)    => s"${i + 1}. $w"
-                  case _                 => ""
+                g.actionStrs.take(6).map(_.mkString(",")).grouped(2).zipWithIndex map {
+                  case (Vector(p1, p2), i) => s"${i + 1}. $p1 $p2"
+                  case (Vector(p1), i)     => s"${i + 1}. $p1"
+                  case _                   => ""
                 } mkString " ",
-                g.turns > 6 option s" ... ${1 + (g.turns - 1) / 2} moves "
+                g.actionStrs.length > 6 option s" ... ${1 + (g.actionStrs.length - 1) / 2} turns "
               )
             )
-          } else frag(br, br),
+          else frag(br, br),
           g.metadata.analysed option
             div(cls := "metadata text", dataIcon := "")(trans.computerAnalysisAvailable()),
           g.pgnImport.flatMap(_.user).map { user =>

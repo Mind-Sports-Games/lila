@@ -121,9 +121,9 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         if (fromOp) notify(ctrl.noarg('yourOpponentOffersADraw'));
       }
       if (by) {
-        let ply = ctrl.lastPly();
-        if ((by == 'p1') == (ply % 2 == 0)) ply++;
-        ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([ply]);
+        let turnCount = ctrl.lastTurn();
+        if ((by == 'p1') == (turnCount % 2 == 0)) turnCount++;
+        ctrl.data.game.drawOffers = (ctrl.data.game.drawOffers || []).concat([turnCount]);
       }
       ctrl.redraw();
     },

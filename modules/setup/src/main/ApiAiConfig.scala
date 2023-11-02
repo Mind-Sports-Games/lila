@@ -41,15 +41,15 @@ final case class ApiAiConfig(
     else TimeMode.Unlimited
 
   def game(user: Option[User]) =
-    fenGame { chessGame =>
+    fenGame { stratGame =>
       val perfPicker = lila.game.PerfPicker.mainOrDefault(
-        Speed(chessGame.clock.map(_.config)),
-        chessGame.situation.board.variant,
+        Speed(stratGame.clock.map(_.config)),
+        stratGame.situation.board.variant,
         makeDaysPerTurn
       )
       Game
         .make(
-          chess = chessGame,
+          stratGame = stratGame,
           p1Player = creatorPlayerIndex.fold(
             Player.make(P1, user, perfPicker),
             Player.make(P1, level.some)
@@ -59,7 +59,7 @@ final case class ApiAiConfig(
             Player.make(P2, user, perfPicker)
           ),
           mode = Mode.Casual,
-          source = if (chessGame.board.variant.fromPosition) Source.Position else Source.Ai,
+          source = if (stratGame.board.variant.fromPosition) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
         )

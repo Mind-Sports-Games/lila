@@ -61,27 +61,29 @@ final class AssessApi(
 
   private def buildMissing(povs: List[Pov]): Funit =
     assessRepo.coll
-      .distinctEasy[Game.ID, Set]("gameId", $inIds(povs.map(p => s"${p.gameId}/${p.playerIndex.name}"))) flatMap {
-      existingIds =>
-        val missing = povs collect {
-          case pov if pov.game.metadata.analysed && !existingIds.contains(pov.gameId) => pov.gameId
-        }
-        missing.nonEmpty ??
-          analysisRepo.coll
-            .idsMap[Analysis, Game.ID](missing)(_.id)
-            .flatMap { ans =>
-              povs
-                .flatMap { pov =>
-                  ans get pov.gameId map { pov -> _ }
+      .distinctEasy[Game.ID, Set](
+        "gameId",
+        $inIds(povs.map(p => s"${p.gameId}/${p.playerIndex.name}"))
+      ) flatMap { existingIds =>
+      val missing = povs collect {
+        case pov if pov.game.metadata.analysed && !existingIds.contains(pov.gameId) => pov.gameId
+      }
+      missing.nonEmpty ??
+        analysisRepo.coll
+          .idsMap[Analysis, Game.ID](missing)(_.id)
+          .flatMap { ans =>
+            povs
+              .flatMap { pov =>
+                ans get pov.gameId map { pov -> _ }
+              }
+              .map { case (pov, analysis) =>
+                gameRepo.holdAlert game pov.game flatMap { holdAlerts =>
+                  createPlayerAssessment(PlayerAssessment.make(pov, analysis, holdAlerts(pov.playerIndex)))
                 }
-                .map { case (pov, analysis) =>
-                  gameRepo.holdAlert game pov.game flatMap { holdAlerts =>
-                    createPlayerAssessment(PlayerAssessment.make(pov, analysis, holdAlerts(pov.playerIndex)))
-                  }
-                }
-                .sequenceFu
-                .void
-            }
+              }
+              .sequenceFu
+              .void
+          }
     }
 
   def makeAndGetFullOrBasicsFor(
@@ -130,7 +132,7 @@ final class AssessApi(
   def onAnalysisReady(game: Game, analysis: Analysis, thenAssessUser: Boolean = true): Funit =
     gameRepo.holdAlert game game flatMap { holdAlerts =>
       def consistentMoveTimes(game: Game)(player: Player) =
-        Statistics.moderatelyConsistentMoveTimes(Pov(game, player))
+        Statistics.moderatelyConsistentPlyTimes(Pov(game, player))
       val shouldAssess =
         if (!game.source.exists(assessableSources.contains)) false
         else if (game.mode.casual) false
@@ -194,7 +196,7 @@ final class AssessApi(
       }
 
     def noFastCoefVariation(player: Player): Option[Float] =
-      Statistics.noFastMoves(Pov(game, player)) ?? Statistics.moveTimeCoefVariation(Pov(game, player))
+      Statistics.noFastPlies(Pov(game, player)) ?? Statistics.plyTimeCoefVariation(Pov(game, player))
 
     def winnerUserOption = game.winnerPlayerIndex.map(_.fold(p1, p2))
     def loserUserOption  = game.winnerPlayerIndex.map(_.fold(p2, p1))

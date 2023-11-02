@@ -1,10 +1,9 @@
 package lila.game
 
-import strategygames.chess.format.pgn.{ Parser, Pgn }
-import strategygames.format.pgn.{ ParsedPgn, Tag, TagType, Tags }
+import strategygames.chess.format.pgn.{ Parser }
+import strategygames.format.pgn.{ FullTurn, ParsedPgn, Pgn, Tag, TagType, Tags, Turn }
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.chess.format.{ pgn => chessPgn }
-import strategygames.{ Centis, Player => PlayerIndex, GameLogic, Status }
+import strategygames.{ ActionStrs, Centis, Player => PlayerIndex, GameLogic, Status }
 import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
@@ -49,17 +48,17 @@ final class PgnDump(
           teams = teams
         )
       else fuccess(Tags(Nil))
-    tagsFuture map { ts =>
-      val turns = flags.moves ?? {
-        val fenSituation = ts.fen.flatMap { fen => Forsyth.<<<(game.variant.gameLogic, fen) }
-        makeTurns(
+    tagsFuture map { tags =>
+      val fullTurns = flags.turns ?? {
+        val fenSituation = tags.fen.flatMap { fen => Forsyth.<<<(game.variant.gameLogic, fen) }
+        makeFullTurns(
           game.variant match {
             case Variant.Draughts(variant) => {
-              val pdnMovesFull = game.pdnMovesConcat(true, true)
-              val pdnMoves = strategygames.draughts.Replay
+              val pliesFull = game.draughtsActionStrsConcat(true, true).flatten
+              val plies = strategygames.draughts.Replay
                 .unambiguousPdnMoves(
-                  pdnMoves = pdnMovesFull,
-                  initialFen = ts.fen match {
+                  pdnMoves = pliesFull,
+                  initialFen = tags.fen match {
                     case Some(FEN.Draughts(fen)) => Some(fen)
                     case None                    => None
                     case _                       => sys.error("invalid draughts fen in pgnDump")
@@ -68,30 +67,32 @@ final class PgnDump(
                   //TODO: draughts, this used to be a Valid[List[String]] type
                   //and now we have lost the error. Perhaps we need to reconsider this
                 )
-                .fold(shortenMoves(pdnMovesFull))(moves => moves)
-              val moves = flags keepDelayIf game.playable applyDelay pdnMoves
-              val moves2 =
-                if (algebraic) san2alg(moves, variant.boardSize.pos)
-                else moves
-              if (fenSituation.exists(_.situation.player.p2)) ".." +: moves2
-              else moves2
+                .fold(shortenDraughtsMoves(pliesFull))(moves => moves)
+              val delayedPlies = flags keepDelayIf game.playable applyDelay plies
+              val algPlies =
+                if (algebraic) san2alg(delayedPlies, variant.boardSize.pos)
+                else delayedPlies
+              val offsetPlies =
+                if (fenSituation.exists(_.situation.player.p2)) ".." +: algPlies
+                else algPlies
+              offsetPlies.toVector.map(Vector(_))
             }
             case _ =>
-              flags keepDelayIf game.playable applyDelay {
-                if (fenSituation.exists(_.situation.player.p2)) ".." +: game.pgnMoves
-                else game.pgnMoves
-              }
+              (flags keepDelayIf game.playable applyDelay {
+                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: game.actionStrs
+                else game.actionStrs
+              }).toVector
           },
-          fenSituation.map(_.fullMoveNumber) | 1,
+          fenSituation.map(_.fullTurnCount) | 1,
           flags.clocks ?? ~game.bothClockStates,
           game.startPlayerIndex
         )
       }
-      Pgn(ts, turns)
+      Pgn(tags, fullTurns)
     }
   }
 
-  private def shortenMoves(moves: Seq[String]) = moves map { move =>
+  private def shortenDraughtsMoves(moves: Seq[String]) = moves map { move =>
     val x1 = move.indexOf("x")
     if (x1 == -1) move
     else {
@@ -252,52 +253,61 @@ final class PgnDump(
       }
     }
 
-  private def makeTurns(
-      moves: Seq[String],
+  private def makeFullTurns(
+      actionStrs: ActionStrs,
       from: Int,
       clocks: Vector[Centis],
       startPlayerIndex: PlayerIndex
-  ): List[chessPgn.Turn] =
-    (moves grouped 2).zipWithIndex.toList map { case (moves, index) =>
-      val clockOffset = startPlayerIndex.fold(0, 1)
-      chessPgn.Turn(
-        number = index + from,
-        p1 = moves.headOption filter (".." !=) map { san =>
-          chessPgn.Move(
-            san = san,
-            secondsLeft = clocks lift (index * 2 - clockOffset) map (_.roundSeconds)
-          )
-        },
-        p2 = moves lift 1 map { san =>
-          chessPgn.Move(
-            san = san,
-            secondsLeft = clocks lift (index * 2 + 1 - clockOffset) map (_.roundSeconds)
+  ): List[FullTurn] =
+    Centis
+      .withActionStrs(clocks, actionStrs, startPlayerIndex)
+      .toSeq
+      .grouped(2)
+      .toList
+      .zipWithIndex
+      .map {
+        case (actionStrsWithClock, index) => {
+          val p1 = actionStrsWithClock.headOption
+          val p2 = actionStrsWithClock.lift(1)
+          FullTurn(
+            fullTurnNumber = index + from,
+            p1 = p1.map(_._1.mkString(",")).filter(".." !=).map { san =>
+              Turn(
+                san = san,
+                secondsLeft = p1.flatMap(_._2).map(_.roundSeconds)
+              )
+            },
+            p2 = p2.map(_._1.mkString(",")).map { san =>
+              Turn(
+                san = san,
+                secondsLeft = p2.flatMap(_._2).map(_.roundSeconds)
+              )
+            }
           )
         }
-      )
-    } filterNot (_.isEmpty)
+      } filterNot (_.isEmpty)
 }
 
 object PgnDump {
 
-  private val delayMovesBy         = 3
-  private val delayKeepsFirstMoves = 5
+  private val delayTurnsBy         = 3
+  private val delayKeepsFirstTurns = 5
 
   case class WithFlags(
       clocks: Boolean = true,
-      moves: Boolean = true,
+      turns: Boolean = true,
       tags: Boolean = true,
       evals: Boolean = true,
       opening: Boolean = true,
       literate: Boolean = false,
       pgnInJson: Boolean = false,
-      delayMoves: Boolean = false
+      delayTurns: Boolean = false
   ) {
-    def applyDelay[M](moves: Seq[M]): Seq[M] =
-      if (!delayMoves) moves
-      else moves.take((moves.size - delayMovesBy) atLeast delayKeepsFirstMoves)
+    def applyDelay[M](actionStrs: Seq[M]): Seq[M] =
+      if (!delayTurns) actionStrs
+      else actionStrs.take((actionStrs.size - delayTurnsBy) atLeast delayKeepsFirstTurns)
 
-    def keepDelayIf(cond: Boolean) = copy(delayMoves = delayMoves && cond)
+    def keepDelayIf(cond: Boolean) = copy(delayTurns = delayTurns && cond)
   }
 
   def result(game: Game, draughtsResult: Boolean) =

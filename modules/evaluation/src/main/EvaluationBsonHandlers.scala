@@ -17,9 +17,9 @@ object EvaluationBsonHandlers {
         alwaysHasAdvantage = r boolD "aha",
         highBlurRate = r boolD "hbr",
         moderateBlurRate = r boolD "mbr",
-        highlyConsistentMoveTimes = r boolD "hcmt",
-        moderatelyConsistentMoveTimes = r boolD "cmt",
-        noFastMoves = r boolD "nfm",
+        highlyConsistentPlyTimes = r boolD "hcmt",
+        moderatelyConsistentPlyTimes = r boolD "cmt",
+        noFastPlies = r boolD "nfm",
         suspiciousHoldAlert = r boolD "sha"
       )
 
@@ -29,9 +29,9 @@ object EvaluationBsonHandlers {
         "aha"  -> w.boolO(o.alwaysHasAdvantage),
         "hbr"  -> w.boolO(o.highBlurRate),
         "mbr"  -> w.boolO(o.moderateBlurRate),
-        "hcmt" -> w.boolO(o.highlyConsistentMoveTimes),
-        "cmt"  -> w.boolO(o.moderatelyConsistentMoveTimes),
-        "nfm"  -> w.boolO(o.noFastMoves),
+        "hcmt" -> w.boolO(o.highlyConsistentPlyTimes),
+        "cmt"  -> w.boolO(o.moderatelyConsistentPlyTimes),
+        "nfm"  -> w.boolO(o.noFastPlies),
         "sha"  -> w.boolO(o.suspiciousHoldAlert)
       )
   }
@@ -49,7 +49,7 @@ object EvaluationBsonHandlers {
       assessment = r.get[GameAssessment]("assessment"),
       date = r date "date",
       basics = PlayerAssessment.Basics(
-        moveTimes = Statistics.IntAvgSd(
+        plyTimes = Statistics.IntAvgSd(
           avg = r int "mtAvg",
           sd = r int "mtSd"
         ),
@@ -77,8 +77,8 @@ object EvaluationBsonHandlers {
         "flags"      -> o.flags,
         "sfAvg"      -> o.analysis.avg,
         "sfSd"       -> o.analysis.sd,
-        "mtAvg"      -> o.basics.moveTimes.avg,
-        "mtSd"       -> o.basics.moveTimes.sd,
+        "mtAvg"      -> o.basics.plyTimes.avg,
+        "mtSd"       -> o.basics.plyTimes.sd,
         "blurs"      -> o.basics.blurs,
         "hold"       -> o.basics.hold,
         "blurStreak" -> o.basics.blurStreak,

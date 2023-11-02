@@ -43,7 +43,8 @@ final class UserGameApi(
         "speed"     -> g.speed.key,
         "perf"      -> PerfPicker.key(g),
         "timestamp" -> g.createdAt,
-        "turns"     -> g.turns,
+        "plies"     -> g.plies,
+        "turns"     -> g.turnCount,
         "status"    -> g.status,
         "source"    -> g.source.map(_.name),
         "players" -> JsObject(g.players map { p =>

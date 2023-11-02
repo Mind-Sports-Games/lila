@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Replay, Situation }
+import strategygames.{ ActionStrs, Player, Replay, Situation }
 import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.variant.Variant
 import play.api.libs.json._
@@ -13,17 +13,27 @@ object StepBuilder {
 
   def apply(
       id: String,
-      pgnMoves: Vector[String],
+      actionStrs: ActionStrs,
+      startPlayer: Player,
+      activePlayer: Player,
       variant: Variant,
       initialFen: FEN
   ): JsArray = {
-    Replay.gameMoveWhileValid(variant.gameLogic, pgnMoves, initialFen, variant) match {
+    Replay.gameWithUciWhileValid(
+      variant.gameLogic,
+      actionStrs,
+      startPlayer,
+      activePlayer,
+      initialFen,
+      variant
+    ) match {
       case (init, games, error) =>
         error foreach logChessError(id)
         JsArray {
           val initStep = Step(
-            ply = init.turns,
-            plysPerTurn = variant.plysPerTurn,
+            ply = init.plies,
+            turnCount = init.turnCount,
+            playerIndex = init.situation.player,
             move = none,
             fen = Forsyth.>>(variant.gameLogic, init),
             check = init.situation.check,
@@ -37,8 +47,9 @@ object StepBuilder {
           )
           val moveSteps = games.map { case (g, m) =>
             Step(
-              ply = g.turns,
-              plysPerTurn = variant.plysPerTurn,
+              ply = g.plies,
+              turnCount = g.turnCount,
+              playerIndex = g.situation.player,
               move = Step.Move(m.uci, m.san).some,
               fen = Forsyth.>>(variant.gameLogic, g),
               check = g.situation.check,

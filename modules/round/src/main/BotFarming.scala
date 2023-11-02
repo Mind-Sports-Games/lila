@@ -9,7 +9,7 @@ final private class BotFarming(
     isBotSync: IsBotSync
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  val SAME_PLIES = 20
+  val SAME_TURNS = 20
   val PREV_GAMES = 2
 
   /* true if
@@ -24,7 +24,7 @@ final private class BotFarming(
           gameRepo.gamesFromSecondary(ct.results.reverse.take(PREV_GAMES).map(_.gameId)) map {
             _ exists { prev =>
               g.winnerUserId == prev.winnerUserId &&
-              g.pgnMoves.take(SAME_PLIES) == prev.pgnMoves.take(SAME_PLIES)
+              g.actionStrs.take(SAME_TURNS) == prev.actionStrs.take(SAME_TURNS)
             }
           }
         }

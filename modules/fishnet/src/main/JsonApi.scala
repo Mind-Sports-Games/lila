@@ -115,7 +115,7 @@ object JsonApi {
     ) {
       val cappedNps = nps.map(_ min Evaluation.npsCeil)
 
-      val cappedPv = pv take lila.analyse.Info.LineMaxPlies
+      val cappedPv = pv take lila.analyse.Info.LineMaxTurns
 
       def isCheckmate = score.mate has Mate(0)
       def mateFound   = score.mate.isDefined

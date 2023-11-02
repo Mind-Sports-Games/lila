@@ -47,7 +47,8 @@ final class GameSearchApi(
           case s if s.is(_.NoStart) => strategygames.Status.Resign
           case _                    => game.status
         }).id,
-        Fields.turns         -> (game.turns + 1) / 2,
+        //The calculation here is subtely different to fullTurnCount/fullMoveNumber
+        Fields.fullTurnsCompleted -> (game.turnCount + 1) / 2,
         Fields.rated         -> game.rated,
         Fields.perf          -> game.perfType.map(_.id),
         Fields.uids          -> game.userIds.toArray.some.filterNot(_.isEmpty),
@@ -56,7 +57,7 @@ final class GameSearchApi(
         Fields.winnerPlayerIndex   -> game.winner.fold(3)(_.playerIndex.fold(1, 2)),
         Fields.averageRating -> game.averageUsersRating,
         Fields.ai            -> game.aiLevel,
-        Fields.date          -> (lila.search.Date.formatter print game.movedAt),
+        Fields.date          -> (lila.search.Date.formatter print game.updatedAt),
         Fields.duration      -> game.durationSeconds, // for realtime games only
         Fields.clockInit     -> game.clock.map(_.limitSeconds),
         Fields.clockInc      -> game.clock.map(_.incrementSeconds),

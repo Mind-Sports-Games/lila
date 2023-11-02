@@ -287,7 +287,7 @@ final class GameApiV2(
         "speed"      -> g.speed.key,
         "perf"       -> PerfPicker.key(g),
         "createdAt"  -> g.createdAt,
-        "lastMoveAt" -> g.movedAt,
+        "lastMoveAt" -> g.updatedAt,
         "status"     -> g.status.name,
         "players" -> JsObject(g.players zip lightUsers map { case (p, user) =>
           p.playerIndex.name -> Json
@@ -300,15 +300,15 @@ final class GameApiV2(
             .add("aiLevel" -> p.aiLevel)
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
             .add("team" -> teams.map(_(p.playerIndex)))
-        // .add("moveCentis" -> withFlags.moveTimes ?? g.moveTimes(p.playerIndex).map(_.map(_.centis)))
+        // .add("plyCentis" -> withFlags.plyTimes ?? g.plyTimes(p.playerIndex).map(_.map(_.centis)))
         })
       )
       .add("initialFen" -> initialFen)
       .add("multiMatch" -> g.metadata.multiMatchGameId)
       .add("winner" -> g.winnerPlayerIndex.map(_.name))
       .add("opening" -> g.opening.ifTrue(withFlags.opening))
-      .add("moves" -> withFlags.moves.option {
-        withFlags keepDelayIf g.playable applyDelay g.pgnMoves mkString " "
+      .add("moves" -> withFlags.turns.option {
+        withFlags keepDelayIf g.playable applyDelay g.actionStrs.map(_.mkString(",")) mkString " "
       })
       .add("pgn" -> pgn)
       .add("daysPerTurn" -> g.daysPerTurn)

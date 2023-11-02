@@ -102,7 +102,7 @@ final private class ExplorerIndexer(
   private def valid(game: Game) =
     game.finished &&
       game.rated &&
-      game.turns >= 10 &&
+      game.turnCount >= 10 &&
       game.variant != strategygames.chess.variant.FromPosition
 
   private def stableRating(player: Player) = player.rating ifFalse player.provisional
@@ -174,7 +174,9 @@ final private class ExplorerIndexer(
           Tag(_.Date, pgnDateFormat.print(game.createdAt))
         )
         val allTags = fenTags ::: otherTags
-        s"${allTags.mkString("\n")}\n\n${game.pgnMoves.take(maxPlies).mkString(" ")}".some
+        //this uses maxPlies as maxTurns
+        val allActionStrs = game.actionStrs.map(_.mkString(",")).take(maxPlies).mkString(" ")
+        s"${allTags.mkString("\n")}\n\n${allActionStrs}".some
       }
     })
 

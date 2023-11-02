@@ -209,6 +209,7 @@ export function build(root: Tree.Node): TreeWrapper {
 
   return {
     root,
+    //TODO multiaction: probably want to add lastTurn here when upgrading
     lastPly(): number {
       return lastNode()?.ply || root.ply;
     },

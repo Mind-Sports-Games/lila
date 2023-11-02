@@ -4,16 +4,17 @@ import strategygames.format.pgn.Glyph
 import lila.tree.Eval._
 import scala.util.chaining._
 
+//TODO to work for multiaction we need add turnCount to advice from Info
 sealed trait Advice {
   def judgment: Advice.Judgement
   def info: Info
   def prev: Info
 
-  def ply   = info.ply
-  def turn  = info.turn
-  def playerIndex = info.playerIndex
-  def cp    = info.cp
-  def mate  = info.mate
+  def ply            = info.ply
+  def fullTurnNumber = info.fullTurnNumber
+  def playerIndex    = info.playerIndex
+  def cp             = info.cp
+  def mate           = info.mate
 
   def makeComment(withEval: Boolean, withBestMove: Boolean): String =
     withEval.??(evalComment ?? { c =>

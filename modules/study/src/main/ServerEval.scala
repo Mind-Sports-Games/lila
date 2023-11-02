@@ -3,7 +3,7 @@ package lila.study
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, GameLogic, P1, Replay }
+import strategygames.{ Division, Game, GameLogic, Player => PlayerIndex, Replay }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -41,7 +41,8 @@ object ServerEval {
               variant = chapter.setup.variant,
               moves = UciDump(
                 lib = chapter.setup.variant.gameLogic,
-                moves = chapter.root.mainline.map(_.move.san),
+                //TODO upgrade for multiaction but fine for now as ServerEval only handles single action games
+                actionStrs = chapter.root.mainline.map(_.move.san).map(Vector(_)),
                 initialFen = chapter.root.fen.some,
                 variant = chapter.setup.variant,
                 finalSquare = chapter.setup.variant.gameLogic match {
@@ -50,7 +51,8 @@ object ServerEval {
                 }
               ).toOption
                 .map(
-                  _.flatMap(m =>
+                  //TODO upgrade for multiaction but fine for now as ServerEval only handles single action games
+                  _.flatten.toList.flatMap(m =>
                     Uci.apply(
                       chapter.setup.variant.gameLogic,
                       chapter.setup.variant.gameFamily,
@@ -143,13 +145,22 @@ object ServerEval {
     def divisionOf(chapter: Chapter) =
       divider(
         id = chapter.id.value,
-        pgnMoves = chapter.root.mainline.map(_.move.san).toVector,
+        //TODO upgrade for multiaction
+        actionStrs = chapter.root.mainline.map(_.move.san).toVector.map(Vector(_)),
         variant = chapter.setup.variant,
         initialFen = chapter.root.fen.some
       )
 
     private def analysisLine(root: RootOrNode, variant: Variant, info: Info): Option[Node] =
-      Replay.gameMoveWhileValid(variant.gameLogic, info.variation take 20, root.fen, variant) match {
+      Replay.gameWithUciWhileValid(
+        variant.gameLogic,
+        info.variation.take(20),
+        //TODO: multiaction doublecheck: Think this is ok to handle like this
+        PlayerIndex.P1,
+        PlayerIndex.fromTurnCount(info.variation.take(20).size),
+        root.fen,
+        variant
+      ) match {
         case (_, games, error) =>
           error foreach { logger.info(_) }
           games.reverse match {
@@ -165,8 +176,7 @@ object ServerEval {
     private def makeBranch(g: Game, m: Uci.WithSan) =
       Node(
         id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
-        ply = g.turns,
-        plysPerTurn = g.situation.board.variant.plysPerTurn,
+        ply = g.plies,
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),
         check = g.situation.check,
@@ -181,7 +191,7 @@ object ServerEval {
 
   def toJson(chapter: Chapter, analysis: Analysis) =
     lila.analyse.JsonView.bothPlayers(
-      lila.analyse.Accuracy.PovLike(P1, chapter.root.playerIndex, chapter.root.ply),
+      lila.analyse.Accuracy.PovLike(PlayerIndex.P1, chapter.root.playerIndex, chapter.root.ply),
       analysis
     )
 }

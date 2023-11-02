@@ -175,10 +175,9 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
         .one(
           $id(g.id),
           $set(
-            "s"   -> g.status.id,
-            "w"   -> g.winnerPlayerIndex.map(_.p1),
-            "t"   -> g.turns,
-            "ppt" -> g.variant.plysPerTurn
+            "s" -> g.status.id,
+            "w" -> g.winnerPlayerIndex.map(_.p1),
+            "t" -> g.turnCount
           )
         )
         .void

@@ -75,12 +75,11 @@ final private class GameStarter(
   ) =
     Game
       .make(
-        chess = strategygames
-          .Game(
-            pool.variant.gameLogic,
-            situation = Situation(pool.variant.gameLogic, pool.variant),
-            clock = pool.clock.toClock.some
-          ),
+        stratGame = strategygames.Game(
+          pool.variant.gameLogic,
+          situation = Situation(pool.variant.gameLogic, pool.variant),
+          clock = pool.clock.toClock.some
+        ),
         p1Player = Player.make(P1, p1User),
         p2Player = Player.make(P2, p2User),
         mode = strategygames.Mode.Rated,
@@ -166,12 +165,11 @@ final private class BotGameStarter(
   ) =
     Game
       .make(
-        chess = strategygames
-          .Game(
-            pool.variant.gameLogic,
-            situation = Situation(pool.variant.gameLogic, pool.variant),
-            clock = pool.clock.toClock.some
-          ),
+        stratGame = strategygames.Game(
+          pool.variant.gameLogic,
+          situation = Situation(pool.variant.gameLogic, pool.variant),
+          clock = pool.clock.toClock.some
+        ),
         p1Player = Player.make(P1, p1User),
         p2Player = Player.make(P2, p2User),
         mode = strategygames.Mode.Rated,

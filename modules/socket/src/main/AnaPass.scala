@@ -10,6 +10,8 @@ import play.api.libs.json.JsObject
 
 import lila.tree.Branch
 
+//We don't think AnaPass is used - think this has been ported to lila-ws
+
 case class AnaPass(
     variant: Variant,
     fen: FEN,
@@ -21,14 +23,13 @@ case class AnaPass(
     (Game(variant.gameLogic, variant.some, fen.some)) match {
       case (Game.Go(game)) =>
         game.pass() flatMap { case (game, pass) =>
-          game.pgnMoves.lastOption toValid "Passed but no last move!" map { san =>
+          game.actionStrs.flatten.lastOption toValid "Passed but no last move!" map { san =>
             val uci     = Uci(pass)
             val movable = !game.situation.end
             val fen     = Forsyth.>>(variant.gameLogic, Game.Go(game))
             Branch(
               id = UciCharPair(uci),
-              ply = game.turns,
-              plysPerTurn = variant.plysPerTurn,
+              ply = game.plies,
               move = strategygames.format.Uci.GoWithSan(Uci.WithSan(uci, san)),
               fen = fen,
               check = false,

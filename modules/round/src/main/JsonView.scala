@@ -38,7 +38,7 @@ final class JsonView(
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
   private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
-    pov.game.variant.onlyDropsVariant || (pov.game.variant.key == "amazons" && pov.game.situation.destinations.size == 0)
+    pov.game.variant.onlyDropsVariant || (pov.game.variant.dropsVariant && pov.game.situation.destinations.size == 0)
   }
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
@@ -171,13 +171,13 @@ final class JsonView(
           .add("pauseSecs" -> pov.game.timeWhenPaused.millis.some)
           .add("expirationAtStart" -> pov.game.expirableAtStart.option {
             Json.obj(
-              "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
+              "idleMillis"   -> (nowMillis - pov.game.updatedAt.getMillis),
               "millisToMove" -> pov.game.timeForFirstMove.millis
             )
           })
           .add("expirationOnPaused" -> pov.game.expirableOnPaused.option {
             Json.obj(
-              "idleMillis"   -> (nowMillis - pov.game.movedAt.getMillis),
+              "idleMillis"   -> (nowMillis - pov.game.updatedAt.getMillis),
               "millisToMove" -> pov.game.timeWhenPaused.millis
             )
           })
@@ -219,7 +219,7 @@ final class JsonView(
         Json
           .obj(
             "game" -> gameJsonView(game, initialFen)
-              .add("moveCentis" -> (withFlags.movetimes ?? game.moveTimes.map(_.map(_.centis))))
+              .add("plyCentis" -> (withFlags.plytimes ?? game.plyTimes.map(_.map(_.centis))))
               .add("division" -> withFlags.division.option(divider(game, initialFen)))
               .add("opening" -> game.opening)
               .add("importedBy" -> game.pgnImport.flatMap(_.user)),
@@ -286,7 +286,7 @@ final class JsonView(
       division: Option[strategygames.Division] = none
   ) = {
     import pov._
-    val fen = Forsyth.>>(game.variant.gameLogic, game.chess)
+    val fen = Forsyth.>>(game.variant.gameLogic, game.stratGame)
     Json
       .obj(
         "game" -> Json
@@ -297,7 +297,8 @@ final class JsonView(
             "opening"    -> game.opening,
             "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
             "fen"        -> fen,
-            "turns"      -> game.turns,
+            "plies"      -> game.plies,
+            "turns"      -> game.turnCount,
             "player"     -> game.activePlayerIndex.name,
             "status"     -> game.status,
             "gameFamily" -> game.variant.gameFamily.key
@@ -305,16 +306,12 @@ final class JsonView(
           .add("division", division)
           .add("winner", game.winner.map(w => game.variant.playerNames(w.playerIndex))),
         "player" -> Json.obj(
-          "id" -> owner.option(pov.playerId),
-          //"color" -> game.variant.playerNames(playerIndex),
-          //"color" -> playerIndex.classicName,
+          "id"          -> owner.option(pov.playerId),
           "playerName"  -> game.variant.playerNames(playerIndex),
           "playerIndex" -> playerIndex.name,
           "playerColor" -> game.variant.playerColors(playerIndex)
         ),
         "opponent" -> Json.obj(
-          //"color" -> game.variant.playerNames(opponent.playerIndex),
-          //"color" -> playerIndex.classicName,
           "playerName"  -> game.variant.playerNames(opponent.playerIndex),
           "playerIndex" -> opponent.playerIndex.name,
           "playerColor" -> game.variant.playerColors(opponent.playerIndex),
@@ -335,7 +332,8 @@ final class JsonView(
           .add("highlight" -> pref.highlight)
           .add("destination" -> (pref.destination && !pref.isBlindfold))
           .add("playerTurnIndicator" -> false),
-        "path"         -> pov.game.turns,
+        //TODO multiaction we think this correct to use plies (not turnCount) but analysis needs testing
+        "path"         -> pov.game.plies,
         "userAnalysis" -> true
       )
       .add("evalPut" -> me.??(evalCache.shouldPut))
@@ -364,7 +362,7 @@ final class JsonView(
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         (pov.game playableBy pov.player) option {
           if (situation.ghosts > 0) {
-            val move    = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+            val move    = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
             val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
             destPos match {
               case Some(dest) =>
@@ -441,7 +439,7 @@ final class JsonView(
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         if (situation.ghosts > 0) {
-          val move    = pov.game.pgnMoves(pov.game.pgnMoves.length - 1)
+          val move    = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
           val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
           destPos match {
             case Some(dest) => ~situation.captureLengthFrom(dest)
@@ -463,7 +461,7 @@ object JsonView {
 
   case class WithFlags(
       opening: Boolean = false,
-      movetimes: Boolean = false,
+      plytimes: Boolean = false,
       division: Boolean = false,
       clocks: Boolean = false,
       blurs: Boolean = false

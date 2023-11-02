@@ -11,7 +11,7 @@ import strategygames.{
   GameFamily,
   GameLogic,
   Player => PlayerIndex,
-  Game => ChessGame,
+  Game => StratGame,
   Board,
   Situation,
   History,
@@ -170,7 +170,7 @@ final private class Rematcher(
           )
       }
       game <- Game.make(
-        chess = ChessGame(
+        stratGame = StratGame(
           game.variant.gameLogic,
           situation = Situation(
             game.variant.gameLogic,
@@ -180,8 +180,10 @@ final private class Rematcher(
           clock = game.clock map { c =>
             c.config.toClock
           },
-          turns = situation ?? (_.turns),
-          startedAtTurn = situation ?? (_.turns)
+          turnCount = situation ?? (_.turnCount),
+          plies = situation ?? (_.plies),
+          startedAtPly = situation ?? (_.plies),
+          startedAtTurn = situation ?? (_.turnCount)
         ),
         p1Player = returnPlayer(game, P1, users),
         p2Player = returnPlayer(game, P2, users),

@@ -113,7 +113,7 @@ final private class SwissDirector(
   ): Game =
     Game
       .make(
-        chess = strategygames.Game(
+        stratGame = strategygames.Game(
           swiss.roundVariant.gameLogic,
           variant = Some {
             if (swiss.settings.position.isEmpty) swiss.roundVariant
@@ -127,7 +127,12 @@ final private class SwissDirector(
           val turns = g.player.fold(0, 1)
           g.copy(
             clock = swiss.clock.toClock.some,
-            turns = turns,
+            //Its ok to set all of these to turns - we're just saying we're starting at a non standard
+            //place (if 1) and its all normal if 0. We don't necessarily know about how many turns/plies
+            //made up the history of a position but it doesnt really matter
+            plies = turns,
+            turnCount = turns,
+            startedAtPly = turns,
             startedAtTurn = turns
           )
         },

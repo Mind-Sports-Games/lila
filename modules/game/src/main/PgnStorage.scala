@@ -3,7 +3,7 @@ package lila.game
 import strategygames.chess
 import strategygames.chess.format
 import strategygames.chess.{ Castles, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks }
-import strategygames.{ Player => PlayerIndex }
+import strategygames.{ ActionStrs, Player => PlayerIndex, VActionStrs }
 
 import lila.db.ByteArray
 
@@ -20,9 +20,16 @@ private object PgnStorage {
         }
       }
 
-    def decode(bytes: ByteArray, plies: Int): PgnMoves =
+    def encodeActionStrs(actionStrs: ActionStrs) =
+      ByteArray {
+        monitor(_.game.pgn.encode("ngla")) {
+          format.pgn.Binary.writeActionStrs(actionStrs).get
+        }
+      }
+
+    def decode(bytes: ByteArray, plies: Int): VActionStrs =
       monitor(_.game.pgn.decode("old")) {
-        format.pgn.Binary.readMoves(bytes.value.toList, plies).get.toVector
+        format.pgn.Binary.readActionStrs(bytes.value.toList, plies).get.toVector.map(_.toVector)
       }
   }
 
@@ -42,7 +49,7 @@ private object PgnStorage {
         val decoded      = Encoder.decode(bytes.value, plies)
         val unmovedRooks = decoded.unmovedRooks.asScala.view.flatMap(chessPos).to(Set)
         Decoded(
-          pgnMoves = decoded.pgnMoves.toVector,
+          actionStrs = decoded.pgnMoves.toVector.map(Vector(_)),
           pieces = decoded.pieces.asScala.view.flatMap { case (k, v) =>
             chessPos(k).map(_ -> chessPiece(v))
           }.toMap,
@@ -68,7 +75,7 @@ private object PgnStorage {
   }
 
   case class Decoded(
-      pgnMoves: PgnMoves,
+      actionStrs: VActionStrs,
       pieces: PieceMap,
       positionHashes: PositionHash, // irrelevant after game ends
       unmovedRooks: UnmovedRooks,   // irrelevant after game ends

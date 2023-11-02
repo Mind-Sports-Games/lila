@@ -42,7 +42,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
                 times <- game.bothClockStates
               } yield Vector(clk.config.initTime, clk.config.initTime) ++ times)
               val clockOffset = game.startPlayerIndex.fold(0, 1)
-              Replay.situations(game.variant.gameLogic, game.pgnMoves, initialFen, game.variant) foreach {
+              Replay.situations(game.variant.gameLogic, game.actionStrs, initialFen, game.variant) foreach {
                 _.zipWithIndex foreach { case (s, index) =>
                   val clk = for {
                     p1 <- clocks.lift(index + 1 - clockOffset)
