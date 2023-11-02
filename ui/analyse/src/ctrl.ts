@@ -262,9 +262,10 @@ export default class AnalyseCtrl {
   }
 
   private uciToLastMove(uci?: Uci): Key[] | undefined {
-    if (!uci) return;
-    if (uci[1] === '@') return [uci.substring(2), uci.substring(2)] as Key[];
-    return [uci.substring(0, 2), uci.substring(2, 2)] as Key[]; //todo fix for moves on 10x10 board
+    if (!uci || uci == 'pass' || uci.substring(0, 3) == 'ss:') return;
+    const pos = uci.match(/[a-z][1-9][0-9]?/g) as Key[];
+    if (uci[1] === '@') return [pos[0], pos[0]] as Key[];
+    return [pos[0], pos[1]] as Key[];
   }
 
   private showGround(): void {
