@@ -157,7 +157,6 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.data.deadStoneOfferState = 'RejectedOffer';
           ctrl.chessground.resetSelectedPieces();
           ctrl.chessground.set({ highlight: { lastMove: ctrl.data.pref.highlight } });
-          // TODO check this works for go
           ctrl.data.game.player = util.turnPlayerIndexFromLastTurn(ctrl.data.game.turns);
           game.setOnGame(ctrl.data, o.playerIndex, true);
           if (ctrl.clock) {

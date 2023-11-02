@@ -226,7 +226,7 @@ object BSONHandlers {
             unmovedRooks = r.getO[chess.UnmovedRooks](F.unmovedRooks) | chess.UnmovedRooks.default,
             lastMove = clm.lastMove,
             castles = clm.castles,
-            //we can flatten as chess does not have any multimove games (yet)
+            //TODO monster chess. Currently we can flatten as chess does not have any multiaction games (yet)
             halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
               san.contains("x") || san.headOption.exists(_.isLower)
             ) atLeast 0
@@ -297,7 +297,7 @@ object BSONHandlers {
           variant = gameVariant
         )
 
-        //we can flatten as draughts does not have any multimove games (yet)
+        //we can flatten as draughts does not have any multiaction games (yet)
         val midCapture =
           actionStrs.flatten.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
         val currentPly = if (midCapture) plies - 1 else plies
@@ -352,7 +352,7 @@ object BSONHandlers {
                   lastMove = (r strO F.historyLastMove) flatMap (uci =>
                     fairysf.format.Uci.apply(gameVariant.gameFamily, uci)
                   ),
-                  //we can flatten as fairysf does not have any true multimove games (yet)
+                  //we can flatten as fairysf does not have any true multiaction games (yet)
                   //TODO: Is halfMoveClock even doing anything for fairysf?
                   halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)
@@ -395,7 +395,7 @@ object BSONHandlers {
                 pieces = BinaryFormat.piece.readSamurai(r bytes F.binaryPieces, gameVariant),
                 history = samurai.History(
                   lastMove = (r strO F.historyLastMove) flatMap (samurai.format.Uci.apply),
-                  //we can flatten as samurai does not have any multimove games
+                  //we can flatten as samurai does not have any multiaction games
                   //TODO: Is halfMoveClock even doing anything for samurai?
                   halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)
@@ -434,7 +434,7 @@ object BSONHandlers {
                   .filterNot { case (_, posInfo) => posInfo._2 == 0 },
                 history = togyzkumalak.History(
                   lastMove = (r strO F.historyLastMove) flatMap (togyzkumalak.format.Uci.apply),
-                  //we can flatten as samurai does not have any multimove games
+                  //we can flatten as togyzkumalak does not have any multiaction games
                   //TODO: Is halfMoveClock even doing anything for togyzkumalak?
                   halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)
@@ -477,7 +477,7 @@ object BSONHandlers {
                 pieces = BinaryFormat.piece.readGo(r bytes F.binaryPieces, gameVariant),
                 history = go.History(
                   lastMove = (r strO F.historyLastMove) flatMap (go.format.Uci.apply),
-                  //we can flatten as samurai does not have any multimove games
+                  //we can flatten as go does not have any multiaction games
                   //TODO: Is halfMoveClock even doing anything for togyzkumalak?
                   halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)

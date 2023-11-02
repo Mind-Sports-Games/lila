@@ -4,7 +4,7 @@ import strategygames.format.pgn.Glyph
 import lila.tree.Eval._
 import scala.util.chaining._
 
-//TODO to work for multiaction we need add turn to advice from Info
+//TODO to work for multiaction we need add turnCount to advice from Info
 sealed trait Advice {
   def judgment: Advice.Judgement
   def info: Info

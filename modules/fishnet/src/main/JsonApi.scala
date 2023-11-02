@@ -115,7 +115,6 @@ object JsonApi {
     ) {
       val cappedNps = nps.map(_ min Evaluation.npsCeil)
 
-      //TODO: Check how this integrates with Lakin's changes
       val cappedPv = pv take lila.analyse.Info.LineMaxTurns
 
       def isCheckmate = score.mate has Mate(0)

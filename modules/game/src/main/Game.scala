@@ -108,10 +108,8 @@ case class Game(
   def turnOf(u: User): Boolean        = player(u) ?? turnOf
 
   def playedTurns = turnCount - stratGame.startedAtTurn
-  //this is a bit messy.
-  //the check on plies == turnCount ensures the logic for non multiaction games is unchanged
-  //once draughts is converted we should be able to use actionStrs.flatten.size everywhere
-  def playedPlies = if (plies == turnCount) playedTurns else actionStrs.flatten.size
+  //once draughts is converted to multiaction we should be able to use actionStrs.flatten.size
+  def playedPlies = plies - stratGame.startedAtPly
 
   def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
 
@@ -136,8 +134,7 @@ case class Game(
 
   def hasChat = !isTournament && !isSimul && nonAi
 
-  // we can't rely on the clock,
-  // because if moretime was given,
+  // we can't rely on the clock, because if moretime was given,
   // elapsed time is no longer representing the game duration
   def durationSeconds: Option[Int] =
     updatedAt.getSeconds - createdAt.getSeconds match {
@@ -802,18 +799,6 @@ case class Game(
     else if (!bothPlayersHaveMoved) player(!startPlayerIndex).some
     else none
 
-  //old
-  //def playerWhoDidNotMove: Option[Player] =
-  //  (playedTurns, variant.plysPerTurn) match {
-  //    case (0, 1) => player(startPlayerIndex).some
-  //    case (1, 1) => player(!startPlayerIndex).some
-  //    case (0, 2) => player(startPlayerIndex).some
-  //    case (1, 2) => player(startPlayerIndex).some
-  //    case (2, 2) => player(!startPlayerIndex).some
-  //    case (3, 2) => player(!startPlayerIndex).some
-  //    case (_, _) => none
-  //  }
-
   def onePlayerHasMoved    = playedTurns >= 1
   def bothPlayersHaveMoved = playedTurns >= 2
 
@@ -824,30 +809,10 @@ case class Game(
   def playerMoves(playerIndex: PlayerIndex): Int =
     actionStrs.zipWithIndex.filter(_._2 % 2 == startIndex(playerIndex)).map(_._1.size).sum
 
-  //old when using plysPerTurn
-  //def playerMoves(playerIndex: PlayerIndex): Int =
-  //  variant.plysPerTurn * (playedTurns / (variant.plysPerTurn * 2)) + (if (playerIndex == startPlayerIndex)
-  //                                                                       Math.min(
-  //                                                                         variant.plysPerTurn,
-  //                                                                         playedTurns % (variant.plysPerTurn * 2)
-  //                                                                       )
-  //                                                                     else
-  //                                                                       Math.max(
-  //                                                                         0,
-  //                                                                         (playedTurns % (variant.plysPerTurn * 2)) - variant.plysPerTurn
-  //                                                                       ))
-
-  //old pre-multimove
-  // def playerMoves(playerIndex: PlayerIndex): Int =
-  //   if (playerIndex == startPlayerIndex) (playedTurns + 1) / 2 else playedTurns / 2
-
   // if a player has completed their first full turn
   def playerHasMoved(playerIndex: PlayerIndex) =
     //does this actually confirm the full turn is completed?
     if (startIndex(playerIndex) == 0) onePlayerHasMoved else bothPlayersHaveMoved
-
-  //old
-  //def playerHasMoved(playerIndex: PlayerIndex) = playerMoves(playerIndex) > (variant.plysPerTurn - 1) // 0
 
   def playerBlurPercent(playerIndex: PlayerIndex): Int =
     if (playedTurns > 5)

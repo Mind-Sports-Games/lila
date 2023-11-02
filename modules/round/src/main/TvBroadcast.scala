@@ -86,9 +86,8 @@ final private class TvBroadcast(
             "lm"  -> move
           )
           .add("p1" -> game.clock.map(_.remainingTime(strategygames.P1).roundSeconds))
-          .add(
-            "p2" -> game.clock.map(_.remainingTime(strategygames.P2).roundSeconds)
-          ) // TODO: byoyomi periods here?!
+          .add("p2" -> game.clock.map(_.remainingTime(strategygames.P2).roundSeconds))
+        // TODO: byoyomi periods here?!
       )
       clients.foreach(_.queue offer msg)
       featured foreach { f =>
