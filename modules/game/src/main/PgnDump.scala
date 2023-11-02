@@ -260,7 +260,7 @@ final class PgnDump(
       startPlayerIndex: PlayerIndex
   ): List[FullTurn] =
     Centis
-      .withActionStrs(clocks, actionStrs, startPlayerIndex.fold(0, 1))
+      .withActionStrs(clocks, actionStrs, startPlayerIndex)
       .toSeq
       .grouped(2)
       .toList

@@ -185,9 +185,9 @@ final class JsonView(
     private def makeBranch(puzzle: Puzzle): Option[tree.Branch] = {
       import strategygames.format._
       val init =
-        //TODO: Do we need to set turns through withTurns can the fen not decode this?
-        Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurns(
-          //plies and turns are the same whilst puzzle deals with just standard chess
+        //TODO: Do we need to set turns through withTurnsAndPlies can the fen not decode this?
+        Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurnsAndPlies(
+          //TODO multiaction. For now plies and turns are the same whilst puzzle deals with just standard chess
           puzzle.initialPly + 1,
           puzzle.initialPly + 1
         )
