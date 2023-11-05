@@ -82,6 +82,8 @@ object ApiAiConfig extends BaseConfig {
       l: Int,
       v: Option[String],
       fcl: Option[Clock.Config],
+      sdc: Option[Clock.UsDelayConfig],
+      bdc: Option[Clock.BronsteinConfig],
       bcl: Option[ByoyomiClock.Config],
       d: Option[Int],
       c: Option[String],
@@ -91,7 +93,7 @@ object ApiAiConfig extends BaseConfig {
     new ApiAiConfig(
       variant = variant,
       fenVariant = none,
-      clock = bcl.orElse(fcl),
+      clock = bcl.orElse(sdc).orElse(bdc).orElse(fcl),
       daysO = d,
       playerIndex = PlayerIndex.orDefault(~c),
       level = l,

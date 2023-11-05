@@ -209,6 +209,8 @@
   <string name="timeControl">Time control</string>
   <string name="realTime">Fischer Clock</string>
   <string name="byoyomiTime">Byoyomi Clock</string>
+  <string name="bronsteinDelay">Bronstein Delay</string>
+  <string name="simpleDelay">Simple Delay</string>
   <string name="correspondence">Correspondence</string>
   <string name="daysPerTurn">Days per turn</string>
   <string name="oneDay">One day</string>

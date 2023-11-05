@@ -350,7 +350,9 @@ final class JsonView(
     }
 
   private def clockJson(clock: ClockBase): JsObject =
-    clockWriter.writes(clock) + ("moretime" -> JsNumber(actorApi.round.Moretime.defaultDuration.toSeconds))
+    clockWriter.writes(clock) + ("moretime" -> JsNumber(
+      actorApi.round.Moretime.defaultDuration.toSeconds
+    ))
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {

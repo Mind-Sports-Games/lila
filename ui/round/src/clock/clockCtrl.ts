@@ -14,9 +14,12 @@ interface ClockOpts {
 }
 
 export type BaseClockData = {
+  byoyomi: undefined | Seconds;
   running: boolean;
   initial: Seconds;
   increment: Seconds;
+  delay: undefined | Seconds;
+  delayType: undefined | string;
   p1: Seconds;
   p2: Seconds;
   emerg: Seconds;
@@ -26,7 +29,6 @@ export type BaseClockData = {
 };
 
 export type FischerClockData = BaseClockData & {
-  byoyomi: undefined;
 };
 
 export type ByoyomiClockData = BaseClockData & {
@@ -36,7 +38,17 @@ export type ByoyomiClockData = BaseClockData & {
   p2Periods: number;
 };
 
-export type ClockData = FischerClockData | ByoyomiClockData;
+export type BronsteinDelayData = BaseClockData & {
+  delay: Seconds;
+  delayType: "bronstein";
+};
+
+export type SimpleDelayData = BaseClockData & {
+  delay: Seconds;
+  delayType: "usdelay";
+};
+
+export type ClockData = FischerClockData | ByoyomiClockData | BronsteinDelayData | SimpleDelayData;
 
 export const isByoyomi = (clock: ClockData): clock is ByoyomiClockData => {
   return clock.byoyomi !== undefined;
@@ -44,6 +56,14 @@ export const isByoyomi = (clock: ClockData): clock is ByoyomiClockData => {
 
 export const isFischer = (clock: ClockData): clock is FischerClockData => {
   return clock.byoyomi === undefined;
+};
+
+export const isBronstein = (clock: ClockData): clock is BronsteinDelayData => {
+  return clock.delayType === "bronstein";
+};
+
+export const isSimpleDelay = (clock: ClockData): clock is SimpleDelayData => {
+  return clock.delayType === "usdelay";
 };
 
 interface Times {
@@ -111,6 +131,7 @@ export class ClockController {
   } as PlayerIndexMap<ClockElements>;
 
   byoyomiData?: ByoyomiCtrlData;
+  countdownDelay?: Millis;
   goneBerserk: PlayerIndexMap<boolean> = { p1: false, p2: false };
 
   private tickCallback?: number;
@@ -124,6 +145,9 @@ export class ClockController {
       this.showTenths = time => time < cutoff;
     }
 
+    if (isSimpleDelay(cdata)) {
+      this.countdownDelay = cdata.delay;
+    }
     if (isByoyomi(cdata)) {
       this.byoyomiData = new ByoyomiCtrlData();
       this.byoyomiData.byoyomi = cdata.byoyomi;
@@ -140,9 +164,10 @@ export class ClockController {
     this.goneBerserk[d.opponent.playerIndex] = !!d.opponent.berserk;
 
     this.showBar = cdata.showBar && !this.opts.nvui;
+    const delayOrIncrement = cdata.increment || cdata.delay || 0;
     this.barTime = {
-      p1: 1000 * (Math.max(cdata.initial, 2) + 5 * cdata.increment),
-      p2: 1000 * (Math.max(cdata.initial, 2) + 5 * cdata.increment),
+      p1: 1000 * (Math.max(cdata.initial, 2) + 5 * delayOrIncrement),
+      p2: 1000 * (Math.max(cdata.initial, 2) + 5 * delayOrIncrement),
     };
     if (isByoyomi(cdata) && this.isUsingByo(d.player.playerIndex)) {
       this.barTime[d.player.playerIndex] = 1000 * cdata.byoyomi;
@@ -176,9 +201,9 @@ export class ClockController {
 
   setClock = (d: RoundData, p1: Seconds, p2: Seconds, p1Per = 0, p2Per = 0, delay: Centis = 0) => {
     const paused =
-        !!d.opponent.offeringSelectSquares ||
-        !!d.player.offeringSelectSquares ||
-        !(!d.deadStoneOfferState || d.deadStoneOfferState === 'RejectedOffer'),
+      !!d.opponent.offeringSelectSquares ||
+      !!d.player.offeringSelectSquares ||
+      !(!d.deadStoneOfferState || d.deadStoneOfferState === 'RejectedOffer'),
       isClockRunning = game.playable(d) && !paused && (game.bothPlayersHavePlayed(d) || d.clock!.running),
       delayMs = delay * 10;
 
@@ -302,6 +327,13 @@ export class ClockController {
     this.times.activePlayerIndex === playerIndex
       ? Math.max(0, this.times[playerIndex] - this.elapsed())
       : this.times[playerIndex];
+
+  delayMillisOf = (playerIndex: PlayerIndex): Millis => {
+    const delayMillis = 1000 * (this.countdownDelay ?? 0);
+    return this.times.activePlayerIndex === playerIndex
+      ? Math.max(0, delayMillis - this.elapsed())
+      : delayMillis;
+  }
 
   isRunning = () => this.times.activePlayerIndex !== undefined;
 }

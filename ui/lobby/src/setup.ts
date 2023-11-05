@@ -124,11 +124,13 @@ export default class Setup {
       id = parseFloat(hash.time) + '+' + parseInt(hash.increment);
     return valid && this.root.pools.find(p => p.id === id)
       ? {
-          id,
-          range: hash.ratingRange,
-        }
+        id,
+        range: hash.ratingRange,
+      }
       : undefined;
   };
+
+  private ratedTimeModes = ['1', '3', '4', '5'];
 
   prepareForm = ($modal: Cash) => {
     let fenOk = false;
@@ -162,7 +164,7 @@ export default class Setup {
       toggleButtons = () => {
         randomPlayerIndexVariants;
         const variantId = ($variantSelect.val() as string).split('_'),
-          timeMode = $timeModeSelect.val(),
+          timeMode = <string>$timeModeSelect.val(),
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
           inc = parseFloat($incrementInput.val() as string),
@@ -171,7 +173,7 @@ export default class Setup {
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
-            (timeMode != '1' && timeMode != '3') ||
+            (this.ratedTimeModes.indexOf(timeMode) != -1) ||
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
             (variantId[0] == '9' &&
@@ -192,7 +194,7 @@ export default class Setup {
           $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
       },
-      save = function () {
+      save = function() {
         self.save($form[0] as HTMLFormElement);
       };
 
@@ -200,7 +202,7 @@ export default class Setup {
     const c = this.stores[typ].get();
     if (c) {
       Object.keys(c).forEach(k => {
-        $form.find(`[name="${k}"]`).each(function (this: HTMLInputElement) {
+        $form.find(`[name="${k}"]`).each(function(this: HTMLInputElement) {
           if (k === 'timeMode' && this.value !== '1') return;
           if (this.type == 'checkbox') this.checked = true;
           else if (this.type == 'radio') this.checked = this.value == c[k];
@@ -418,7 +420,7 @@ export default class Setup {
       $periodsInput.eq(0).trigger('click');
     };
 
-    const isRealTime = () => $timeModeSelect.val() === '1' || $timeModeSelect.val() == '3';
+    const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1
 
     if (typ === 'hook') {
       if ($form.data('anon')) {
@@ -456,7 +458,7 @@ export default class Setup {
         return false;
       };
       $submits
-        .on('click', function (this: HTMLElement) {
+        .on('click', function(this: HTMLElement) {
           return ajaxSubmit($(this).val() as string);
         })
         .prop('disabled', false);
@@ -473,7 +475,7 @@ export default class Setup {
         showRating();
       });
     } else {
-      $timeInput.add($incrementInput).each(function (this: HTMLInputElement) {
+      $timeInput.add($incrementInput).each(function(this: HTMLInputElement) {
         const $input = $(this),
           $value = $input.siblings('span'),
           $range = $input.siblings('.range'),
@@ -506,7 +508,7 @@ export default class Setup {
           toggleButtons();
         });
       });
-      $daysInput.each(function (this: HTMLInputElement) {
+      $daysInput.each(function(this: HTMLInputElement) {
         const $input = $(this),
           $value = $input.siblings('span'),
           $range = $input.siblings('.range');
@@ -523,7 +525,7 @@ export default class Setup {
           save();
         });
       });
-      $byoyomiInput.each(function (this: HTMLInputElement) {
+      $byoyomiInput.each(function(this: HTMLInputElement) {
         const $input = $(this),
           $value = $input.siblings('span'),
           $range = $input.siblings('.range');
@@ -544,7 +546,7 @@ export default class Setup {
           save();
         });
       });
-      $goHandicapInput.each(function (this: HTMLInputElement) {
+      $goHandicapInput.each(function(this: HTMLInputElement) {
         const $input = $(this),
           $value = $input.siblings('span'),
           $range = $input.siblings('.range');
@@ -563,7 +565,7 @@ export default class Setup {
           toggleButtons();
         });
       });
-      $goKomiInput.each(function (this: HTMLInputElement) {
+      $goKomiInput.each(function(this: HTMLInputElement) {
         const $input = $(this),
           $value = $input.siblings('span'),
           $range = $input.siblings('.range'),
@@ -586,7 +588,7 @@ export default class Setup {
           toggleButtons();
         });
       });
-      $form.find('.rating-range').each(function (this: HTMLDivElement) {
+      $form.find('.rating-range').each(function(this: HTMLDivElement) {
         const $this = $(this),
           $minInput = $this.find('.rating-range__min'),
           $maxInput = $this.find('.rating-range__max'),
@@ -624,11 +626,13 @@ export default class Setup {
       });
     }
     $timeModeSelect
-      .on('change', function (this: HTMLElement) {
+      .on('change', function(this: HTMLElement) {
         const timeMode = $(this).val();
         const isFischer = timeMode === '1';
         const isByoyomi = timeMode === '3';
-        $form.find('.time_choice, .increment_choice').toggle(isFischer || isByoyomi);
+        const isBronstein = timeMode === '4';
+        const isSimple = timeMode === '5';
+        $form.find('.time_choice, .increment_choice').toggle(isFischer || isByoyomi || isBronstein || isSimple);
         $form.find('.days_choice').toggle(timeMode === '2');
         $form.find('.byoyomi_choice, .byoyomi_periods').toggle(isByoyomi);
         toggleButtons();
@@ -647,7 +651,7 @@ export default class Setup {
           data => {
             $fenInput.addClass('success');
             $fenPosition.find('.preview').html(data);
-            $fenPosition.find('a.board_editor').each(function (this: HTMLAnchorElement) {
+            $fenPosition.find('a.board_editor').each(function(this: HTMLAnchorElement) {
               this.href = this.href.replace(/editor\/.+$/, 'editor/' + fen);
             });
             $submits.removeClass('nope');
@@ -683,7 +687,7 @@ export default class Setup {
     });
 
     $variantSelect
-      .on('change', function (this: HTMLElement) {
+      .on('change', function(this: HTMLElement) {
         const variantId = ($variantSelect.val() as string).split('_'),
           isFen = variantId[1] == '3';
         let ground = 'chessground';
@@ -706,7 +710,7 @@ export default class Setup {
 
     $modeChoices.on('change', save);
 
-    $advancedTimeToggle.on('click', function (this: HTMLElement) {
+    $advancedTimeToggle.on('click', function(this: HTMLElement) {
       if ($advancedTimeToggle.hasClass('active')) {
         $advancedTimeToggle.removeClass('active');
         $advancedTimeSetup.hide();
@@ -719,11 +723,11 @@ export default class Setup {
       }
     });
 
-    $form.find('div.level').each(function (this: HTMLElement) {
+    $form.find('div.level').each(function(this: HTMLElement) {
       const $infos = $(this).find('.ai_info > div');
       $(this)
         .find('label')
-        .on('mouseenter', function (this: HTMLElement) {
+        .on('mouseenter', function(this: HTMLElement) {
           $infos
             .hide()
             .filter('.' + $(this).attr('for'))
@@ -731,7 +735,7 @@ export default class Setup {
         });
       $(this)
         .find('#config_level')
-        .on('mouseleave', function (this: HTMLElement) {
+        .on('mouseleave', function(this: HTMLElement) {
           const level = $(this).find('input:checked').val();
           $infos
             .hide()

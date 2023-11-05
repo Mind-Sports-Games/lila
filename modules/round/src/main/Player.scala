@@ -151,7 +151,8 @@ final private class Player(
       finalSquare: Boolean = false
   ): Validated[String, ActionResult] =
     game.chess.applyUci(uci, metrics, finalSquare).map {
-      case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
+      case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) =>
+        Flagged
       case (newChessGame, action) =>
         ActionApplied(
           game.update(newChessGame, action, blur),

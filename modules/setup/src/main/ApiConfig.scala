@@ -47,6 +47,8 @@ object ApiConfig extends BaseHumanConfig {
   def from(
       v: Option[String],
       fcl: Option[Clock.Config],
+      sdc: Option[Clock.UsDelayConfig],
+      bdc: Option[Clock.BronsteinConfig],
       bcl: Option[ByoyomiClock.Config],
       d: Option[Int],
       r: Boolean,
@@ -59,7 +61,7 @@ object ApiConfig extends BaseHumanConfig {
     val variant = Variant.orDefault(~v)
     new ApiConfig(
       variant = variant,
-      clock = bcl.orElse(fcl),
+      clock = bcl.orElse(sdc).orElse(bdc).orElse(fcl),
       days = d,
       rated = r,
       playerIndex = PlayerIndex.orDefault(~c),

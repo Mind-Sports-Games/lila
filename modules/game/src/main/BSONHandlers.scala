@@ -3,6 +3,7 @@ package lila.game
 import strategygames.{
   Player => PlayerIndex,
   ClockBase,
+  ClockConfig,
   Clock,
   ByoyomiClock,
   P1,
@@ -921,14 +922,16 @@ object BSONHandlers {
   //------------------------------------------------------------------------------
   private[game] def clockTypeBSONWrite(clock: ClockBase) =
     // NOTE: If you're changing this, the read below also needs to be changed.
-    clock match {
-      case _: Clock        => 1
-      case _: ByoyomiClock => 2
+    clock.config match {
+      case Clock.Config(_, _)              => 1
+      case ByoyomiClock.Config(_, _, _, _) => 2
+      case Clock.BronsteinConfig(_, _)     => 3
+      case Clock.UsDelayConfig(_, _)       => 4
     }
 
   private[game] def clockBSONWrite(since: DateTime, clock: ClockBase) =
     clock match {
-      case f: Clock        => fischerClockBSONWrite(since, f)
+      case f: Clock        => otherClockBSONWrite(since, f)
       case b: ByoyomiClock => byoyomiClockBSONWrite(since, b)
     }
 
@@ -959,7 +962,9 @@ object BSONHandlers {
     clockType match {
       case Some(2) =>
         byoyomiClockBSONReader(since, periodEntries.getOrElse(PeriodEntries.default), p1Berserk, p2Berserk)
-      case _ => fischerClockBSONReader(since, p1Berserk, p2Berserk)
+      case Some(3) => otherClockBSONReader(Clock.BronsteinConfig, since, p1Berserk, p2Berserk)
+      case Some(4) => otherClockBSONReader(Clock.UsDelayConfig, since, p1Berserk, p2Berserk)
+      case _       => otherClockBSONReader(Clock.Config, since, p1Berserk, p2Berserk)
     }
 
   def readClockHistory(
@@ -1002,19 +1007,26 @@ object BSONHandlers {
   //------------------------------------------------------------------------------
   // Clock stuff
   //------------------------------------------------------------------------------
-  private[game] def fischerClockBSONReader(since: DateTime, p1Berserk: Boolean, p2Berserk: Boolean) =
+  private[game] def otherClockBSONReader(
+      configConstructor: (Int, Int) => ClockConfig,
+      since: DateTime,
+      p1Berserk: Boolean,
+      p2Berserk: Boolean
+  ) =
     new BSONReader[PlayerIndex => ClockBase] {
       def readTry(bson: BSONValue): Try[PlayerIndex => ClockBase] =
         bson match {
           case bin: BSONBinary =>
-            ByteArrayBSONHandler readTry bin map { cl =>
-              BinaryFormat.fischerClock(since).read(cl, p1Berserk, p2Berserk)
+            ByteArrayBSONHandler.readTry(bin).map { cl =>
+              BinaryFormat
+                .fischerClock(since)
+                .read(configConstructor, cl, p1Berserk, p2Berserk)
             }
           case b => lila.db.BSON.handlerBadType(b)
         }
     }
 
-  private[game] def fischerClockBSONWrite(since: DateTime, clock: Clock) =
+  private[game] def otherClockBSONWrite(since: DateTime, clock: Clock) =
     ByteArrayBSONHandler writeTry {
       BinaryFormat.fischerClock(since).write(clock)
     }
