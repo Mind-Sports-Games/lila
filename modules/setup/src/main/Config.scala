@@ -42,9 +42,11 @@ private[setup] trait Config {
   // Creator player playerIndex
   val playerIndex: PlayerIndex
 
-  def isFischer = timeMode == TimeMode.FischerClock
-  def isByoyomi = timeMode == TimeMode.ByoyomiClock
-  def hasClock  = isFischer || isByoyomi
+  def isFischer     = timeMode == TimeMode.FischerClock
+  def isSimpleDelay = timeMode == TimeMode.UsDelayClock
+  def isBronstein   = timeMode == TimeMode.BronsteinDelayClock
+  def isByoyomi     = timeMode == TimeMode.ByoyomiClock
+  def hasClock      = isFischer || isSimpleDelay || isBronstein || isByoyomi
 
   lazy val creatorPlayerIndex = playerIndex.resolve
 
@@ -60,22 +62,34 @@ private[setup] trait Config {
       Speed(c) >= Speed.Bullet
     }
 
-  def clockHasFischerTime = isFischer && time + increment > 0
-  def clockHasByoyomiTime = isByoyomi && time + increment + byoyomi > 0
-  def clockHasTime        = clockHasFischerTime || clockHasByoyomiTime
+  def clockHasFischerTime        = isFischer && time + increment > 0
+  def clockHasSimpleDelayTime    = isSimpleDelay && time + increment > 0
+  def clockHasBronsteinDelayTime = isBronstein && time + increment > 0
+  def clockHasByoyomiTime        = isByoyomi && time + increment + byoyomi > 0
+  def clockHasTime =
+    clockHasFischerTime || clockHasSimpleDelayTime || clockHasBronsteinDelayTime || clockHasByoyomiTime
 
   def makeClock = hasClock option justMakeClock
 
   protected def justMakeClock: ClockConfig =
-    if (isByoyomi)
-      ByoyomiClock.Config(
-        (time * 60).toInt,
-        if (clockHasByoyomiTime) increment else 0,
-        if (clockHasByoyomiTime) byoyomi else 10,
-        periods
-      )
-    else
-      Clock.Config((time * 60).toInt, if (clockHasFischerTime) increment else 1)
+    timeMode match {
+      case TimeMode.ByoyomiClock =>
+        ByoyomiClock.Config(
+          (time * 60).toInt,
+          if (clockHasByoyomiTime) increment else 0,
+          if (clockHasByoyomiTime) byoyomi else 10,
+          periods
+        )
+      case TimeMode.UsDelayClock =>
+        Clock.UsDelayConfig((time * 60).toInt, if (clockHasSimpleDelayTime) increment else 1)
+      case TimeMode.BronsteinDelayClock =>
+        Clock.BronsteinConfig((time * 60).toInt, if (clockHasBronsteinDelayTime) increment else 1)
+      // NOTE: This could would have always returned a Clock.Config before. The reason
+      //       why I'm not using the default clause, is I want this code to not compile
+      //       when we add new clocks in the future.
+      case TimeMode.Correspondence | TimeMode.FischerClock | TimeMode.Unlimited =>
+        Clock.Config((time * 60).toInt, if (clockHasFischerTime) increment else 1)
+    }
 
   def makeDaysPerTurn: Option[Int] = (timeMode == TimeMode.Correspondence) option days
 }

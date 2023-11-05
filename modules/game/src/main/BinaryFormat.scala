@@ -140,16 +140,20 @@ object BinaryFormat {
 
     // TODO: deal with bronstein / us delay
     def write(clock: Clock): ByteArray = {
-      Array(
-        writeClockLimit(clock.limitSeconds),
-        0.toByte
-      ) ++ // TODO: Deal with this. clock.config.incrementSeconds.toByte) ++
+      Array(writeClockLimit(clock.limitSeconds), clock.config.graceSeconds.toByte) ++
         writeSignedInt24(legacyElapsed(clock, P1).centis) ++
         writeSignedInt24(legacyElapsed(clock, P2).centis) ++
         clock.timestamp.fold(Array.empty[Byte])(writeTimestamp)
     }
 
-    def read(ba: ByteArray, p1Berserk: Boolean, p2Berserk: Boolean): PlayerIndex => Clock =
+    // TODO: if we ever need to do things _besides_ the ones we have, this API
+    //       will need to change.
+    def read(
+        configConstructor: (Int, Int) => ClockConfig,
+        ba: ByteArray,
+        p1Berserk: Boolean,
+        p2Berserk: Boolean
+    ): PlayerIndex => Clock =
       playerIndex => {
         val ia = ba.value map toInt
 
@@ -163,7 +167,7 @@ object BinaryFormat {
 
         ia match {
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, _*) =>
-            val config   = Clock.Config(readClockLimit(b1), b2)
+            val config   = configConstructor(readClockLimit(b1), b2)
             val legacyP1 = Centis(readSignedInt24(b3, b4, b5))
             val legacyP2 = Centis(readSignedInt24(b6, b7, b8))
             Clock(

@@ -83,7 +83,7 @@ case class AnaDests(
   def json =
     Json
       .obj(
-        "dests" -> dests.pp("AnaDestsBeingUsed"),
+        "dests" -> dests,
         "path"  -> path
       )
       .add("opening" -> opening)

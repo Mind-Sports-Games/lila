@@ -31,6 +31,8 @@ object OpenConfig {
       n: Option[String],
       v: Option[String],
       fcl: Option[Clock.Config],
+      sdc: Option[Clock.UsDelayConfig],
+      bdc: Option[Clock.BronsteinConfig],
       bcl: Option[ByoyomiClock.Config],
       rated: Boolean,
       pos: Option[String]
@@ -39,7 +41,7 @@ object OpenConfig {
     new OpenConfig(
       name = n.map(_.trim).filter(_.nonEmpty),
       variant = variant,
-      clock = bcl.orElse(fcl),
+      clock = bcl.orElse(sdc).orElse(bdc).orElse(fcl),
       rated = rated,
       position = pos.map(f => FEN.apply(variant.gameLogic, f))
     ).autoVariant
