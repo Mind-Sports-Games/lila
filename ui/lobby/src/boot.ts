@@ -164,7 +164,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     clickEvent = opts.blindMode ? 'click' : 'mousedown';
 
   $startButtons
-    .find('a:not(.disabled)')
+    .find('a:not(.disabled, .just-a-link)')
     .on(clickEvent, function (this: HTMLAnchorElement) {
       $(this).addClass('active').siblings().removeClass('active');
       playstrategy.loadCssPath('lobby.setup');
