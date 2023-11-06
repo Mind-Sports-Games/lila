@@ -52,9 +52,6 @@ case class AnaDests(
     (!isInitial && ~fullCapture && captureLength > 1) option AnaDests.truncateMoves(validMoves)
 
   val dests: String = variant match {
-    case Variant.Chess(_) =>
-      if (isInitial) AnaDests.initialChessDests
-      else sit.playable(false) ?? destString(sit.destinations)
     case Variant.Draughts(variant) =>
       if (isInitial) AnaDests.initialDraughtsDests
       else
@@ -71,6 +68,9 @@ case class AnaDests(
           if (captureLength > 0) s"#$captureLength $destStr"
           else destStr
         }
+    case _ =>
+      if (isInitial) AnaDests.initialChessDests
+      else sit.playable(false) ?? destString(sit.destinations)
   }
 
   //draughts

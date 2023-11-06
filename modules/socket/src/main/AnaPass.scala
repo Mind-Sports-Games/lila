@@ -30,6 +30,7 @@ case class AnaPass(
             Branch(
               id = UciCharPair(uci),
               ply = game.plies,
+              variant: Variant,
               move = strategygames.format.Uci.GoWithSan(Uci.WithSan(uci, san)),
               fen = fen,
               check = false,

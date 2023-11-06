@@ -205,11 +205,7 @@ object Event {
           case _ => situation.destinations
         },
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         pocketData = pocketData,
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
@@ -289,13 +285,7 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case (Situation.Go(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         pocketData = pocketData
       )
   }
@@ -371,13 +361,7 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case (Situation.Go(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         pocketData = pocketData
       )
   }
@@ -444,13 +428,7 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case (Situation.Go(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         pocketData = pocketData
       )
   }
@@ -759,8 +737,8 @@ object Event {
       Json
         .obj(
           "playerIndex" -> playerIndex,
-          "plies" -> plies,
-          "turns" -> turnCount
+          "plies"       -> plies,
+          "turns"       -> turnCount
         )
         .add("status" -> status)
         .add("winner" -> winner)

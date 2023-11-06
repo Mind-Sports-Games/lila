@@ -1,6 +1,7 @@
 package lila.study
 
 import strategygames.{ Centis, GameLogic, Pos }
+import strategygames.variant.Variant
 import lila.common.Maths
 import lila.tree.Node.{ Shape, Shapes }
 
@@ -21,7 +22,7 @@ private[study] object CommentParser {
       comment: String
   )
 
-  def apply(comment: String): ParsedComment =
+  def apply(comment: String)(implicit variant: Variant): ParsedComment =
     parseShapes(comment) match {
       case (shapes, c2) =>
         parseClock(c2) match {
@@ -63,7 +64,7 @@ private[study] object CommentParser {
 
   private type ShapesAndComment = (Shapes, String)
 
-  private def parseShapes(comment: String): ShapesAndComment =
+  private def parseShapes(comment: String)(implicit variant: Variant): ShapesAndComment =
     parseCircles(comment) match {
       case (circles, comment) =>
         parseArrows(comment) match {
@@ -71,27 +72,27 @@ private[study] object CommentParser {
         }
     }
 
-  private def parseCircles(comment: String): ShapesAndComment =
+  private def parseCircles(comment: String)(implicit variant: Variant): ShapesAndComment =
     comment match {
       case circlesRegex(str) =>
         val circles = str.split(',').toList.map(_.trim).flatMap { c =>
           for {
             playerIndex <- c.headOption
-            pos   <- Pos.fromKey(GameLogic.Chess(), c.drop(1))
+            pos         <- Pos.fromKey(variant.gameLogic, c.drop(1))
           } yield Shape.Circle(toBrush(playerIndex), pos)
         }
         Shapes(circles) -> circlesRemoveRegex.replaceAllIn(comment, "").trim
       case _ => Shapes(Nil) -> comment
     }
 
-  private def parseArrows(comment: String): ShapesAndComment =
+  private def parseArrows(comment: String)(implicit variant: Variant): ShapesAndComment =
     comment match {
       case arrowsRegex(str) =>
         val arrows = str.split(',').toList.flatMap { c =>
           for {
             playerIndex <- c.headOption
-            orig  <- Pos.fromKey(GameLogic.Chess(), c.slice(1, 3))
-            dest  <- Pos.fromKey(GameLogic.Chess(), c.slice(3, 5))
+            orig        <- Pos.fromKey(variant.gameLogic, c.slice(1, 3))
+            dest        <- Pos.fromKey(variant.gameLogic, c.slice(3, 5))
           } yield Shape.Arrow(toBrush(playerIndex), orig, dest)
         }
         Shapes(arrows) -> arrowsRemoveRegex.replaceAllIn(comment, "").trim

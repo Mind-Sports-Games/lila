@@ -4,6 +4,7 @@ import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
 import strategygames.{ GameLogic, Player => PlayerIndex, PocketData }
+import strategygames.chess.variant.{ Variant => ChessVariant }
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
 import lila.user.User
@@ -37,7 +38,9 @@ final private class ChapterMaker(
       case None      => fuccess(fromFenOrBlank(study, data, order, userId))
     }
 
-  private def fromPgn(study: Study, pgn: String, data: Data, order: Int, userId: User.ID): Fu[Chapter] =
+  private def fromPgn(study: Study, pgn: String, data: Data, order: Int, userId: User.ID): Fu[Chapter] = {
+    implicit val variant = Variant.Chess(ChessVariant.default)
+    // TODO: support PGN parsing for other variants later.
     for {
       contributors <- lightUser.asyncMany(study.members.contributorIds.toList)
       parsed <- PgnImport(pgn, contributors.flatten).toFuture recoverWith { case e: Exception =>
@@ -68,6 +71,7 @@ final private class ChapterMaker(
       gamebook = data.isGamebook,
       conceal = data.isConceal option Chapter.Ply(parsed.root.ply)
     )
+  }
 
   private def resolveOrientation(
       orientation: Orientation,
@@ -82,11 +86,12 @@ final private class ChapterMaker(
 
   private def fromFenOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Chapter = {
     val variant =
-      data.variant.flatMap(v => Variant.apply(GameLogic.Chess(), v)) | Variant.default(GameLogic.Chess())
+      data.variant.flatMap(v => Variant.apply(v)) | Variant.default(GameLogic.Chess())
     (data.fen.filterNot(_.initial).flatMap { Forsyth.<<<@(variant.gameLogic, variant, _) } match {
       case Some(sit) =>
         Node.Root(
           ply = sit.plies,
+          variant = sit.situation.board.variant,
           fen = Forsyth.>>(sit.situation.board.variant.gameLogic, sit),
           check = sit.situation.check,
           clock = none,
@@ -96,6 +101,7 @@ final private class ChapterMaker(
       case None =>
         Node.Root(
           ply = 0,
+          variant = variant,
           fen = variant.initialFen,
           check = false,
           clock = none,

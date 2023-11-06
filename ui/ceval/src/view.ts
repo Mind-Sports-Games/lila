@@ -9,6 +9,7 @@ import { opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
 import { renderEval } from './util';
 import { setupPosition } from 'stratops/variant';
+import { variantToRules } from 'stratutils';
 
 let gaugeLast = 0;
 const gaugeTicks: VNode[] = [...Array(8).keys()].map(i =>
@@ -283,12 +284,12 @@ function checkHover(el: HTMLElement, instance: CevalCtrl): void {
   );
 }
 
-export function renderPvs(ctrl: ParentCtrl): VNode | undefined {
+export const renderPvs = (variantKey: VariantKey) => (ctrl: ParentCtrl): VNode | undefined => {
   const instance = ctrl.getCeval();
   if (!instance.allowed() || !instance.possible || !instance.enabled()) return;
   const multiPv = parseInt(instance.multiPv()),
     node = ctrl.getNode(),
-    setup = parseFen('chess')(node.fen).unwrap();
+    setup = parseFen(variantToRules(variantKey))(node.fen).unwrap();
   let pvs: Tree.PvData[],
     threat = false,
     pvMoves: (string | null)[],
@@ -358,7 +359,7 @@ export function renderPvs(ctrl: ParentCtrl): VNode | undefined {
       renderPvBoard(ctrl),
     ]
   );
-}
+};
 
 const MAX_NUM_MOVES = 16;
 
@@ -410,7 +411,7 @@ function renderPvMoves(pos: Position, pv: Uci[]): VNode[] {
       vnodes.push(h('span', { key: text }, text));
     }
     const uci = pv[i];
-    const san = makeSanAndPlay(pos, parseUci(uci)!);
+    const san = makeSanAndPlay('chess')(pos, parseUci('chess')(uci)!);
     const fen = makeBoardFen('chess')(pos.board); // Chessground uses only board fen
     if (san === '--') {
       break;

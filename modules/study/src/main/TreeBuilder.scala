@@ -3,7 +3,7 @@ package lila.study
 import strategygames.opening.FullOpeningDB
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.{ Game, GameLogic }
+import strategygames.{ Game, GameLogic, Situation }
 import lila.tree
 
 object TreeBuilder {
@@ -18,13 +18,19 @@ object TreeBuilder {
         val sit = Game(variant.gameLogic, variant.some, root.fen.some).situation
         sit.playable(false) ?? sit.destinations
       }
-    makeRoot(root, variant).copy(dests = dests.some)
+    val dropsByRole = {
+      val sit = Game(variant.gameLogic, variant.some, root.fen.some).situation
+      sit.playable(false) ?? sit.dropsByRole
+    }
+    makeRoot(root, variant).copy(dests = dests.some, dropsByRole = dropsByRole)
   }
 
-  def toBranch(node: Node, variant: Variant): tree.Branch =
+  def toBranch(node: Node, variant: Variant): tree.Branch = {
+    val g = Game(variant.gameLogic, variant.some, node.fen.some)
     tree.Branch(
       id = node.id,
       ply = node.ply,
+      variant = variant,
       move = node.move,
       fen = node.fen,
       check = node.check,
@@ -39,12 +45,15 @@ object TreeBuilder {
       opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? (
         FullOpeningDB.findByFen(variant.gameLogic, node.fen)
       ),
-      forceVariation = node.forceVariation
+      forceVariation = node.forceVariation,
+      dropsByRole = Game(variant.gameLogic, variant.some, node.fen.some).situation.dropsByRole
     )
+  }
 
-  def makeRoot(root: Node.Root, variant: Variant): tree.Root =
+  def makeRoot(root: Node.Root, variant: Variant): tree.Root = {
     tree.Root(
       ply = root.ply,
+      variant = variant,
       fen = root.fen,
       check = root.check,
       shapes = root.shapes,
@@ -57,8 +66,10 @@ object TreeBuilder {
       children = toBranches(root.children, variant),
       opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? (
         FullOpeningDB.findByFen(variant.gameLogic, root.fen)
-      )
+      ),
+      dropsByRole = Game(variant.gameLogic, variant.some, root.fen.some).situation.dropsByRole
     )
+  }
 
   private def toBranches(children: Node.Children, variant: Variant): List[tree.Branch] =
     children.nodes.view.map(toBranch(_, variant)).toList

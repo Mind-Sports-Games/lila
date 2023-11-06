@@ -84,23 +84,9 @@ final class StudyMultiBoard(
         }
         .map { r =>
           for {
-            doc  <- r
-            id   <- doc.getAsOpt[Chapter.Id]("_id")
-            name <- doc.getAsOpt[Chapter.Name]("name")
-            comp <- doc.getAsOpt[Bdoc]("comp")
-            node <- comp.getAsOpt[Bdoc]("node")
-            fen  <- node.getAsOpt[FEN]("fen")
-            lastMove = node.getAsOpt[Uci]("uci")
-            tags     = comp.getAsOpt[Tags]("tags")
-          } yield ChapterPreview(
-            id = id,
-            name = name,
-            players = tags flatMap ChapterPreview.players,
-            orientation = doc.getAsOpt[PlayerIndex]("orientation") | PlayerIndex.P1,
-            fen = fen,
-            lastMove = lastMove,
-            playing = lastMove.isDefined && tags.flatMap(_(_.Result)).has("*")
-          )
+            doc     <- r
+            preview <- chapterPreview(doc)
+          } yield preview
         }
   }
 

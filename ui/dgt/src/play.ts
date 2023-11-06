@@ -5,6 +5,11 @@ import { NormalMove } from 'stratops/types';
 import { board } from 'stratops/debug';
 import { defaultSetup, fen, makeUci, parseUci } from 'stratops';
 
+const makeSanChess = makeSan('chess');
+const parseSanChess = parseSan('chess');
+const makeUciChess = makeUci('chess');
+const parseUciChess = parseUci('chess');
+
 export default function (token: string) {
   const root = document.getElementById('dgt-play-zone') as HTMLDivElement;
   const consoleOutput = document.getElementById('dgt-play-zone-log') as HTMLPreElement;
@@ -529,7 +534,7 @@ export default function (token: string) {
       for (let i = 0; i < moves.length; i++) {
         if (moves[i] != '') {
           //Make any move that may have been already played on the ChessBoard. Useful when reconnecting
-          const uciMove = <NormalMove>parseUci(moves[i]);
+          const uciMove = <NormalMove>parseUciChess(moves[i]);
           const normalizedMove = chess.normalizeMove(uciMove); //This is because stratops uses UCI_960
           if (normalizedMove && chess.isLegal(normalizedMove)) chess.play(normalizedMove);
         }
@@ -567,20 +572,20 @@ export default function (token: string) {
         for (let i = 0; i < moves.length; i++) {
           if (moves[i] != '') {
             //Make the new move
-            const uciMove = <NormalMove>parseUci(moves[i]);
+            const uciMove = <NormalMove>parseUciChess(moves[i]);
             const normalizedMove = chess.normalizeMove(uciMove); //This is because stratops uses UCI_960
             if (normalizedMove && chess.isLegal(normalizedMove)) {
               //This is a good chance to get the move in SAN format
               if (chess.turn == 'p2')
                 lastSanMove = {
                   player: 'p2',
-                  move: makeSan(chess, normalizedMove),
+                  move: makeSanChess(chess, normalizedMove),
                   by: gameInfoMap.get(currentGameId).p2.id,
                 };
               else
                 lastSanMove = {
                   player: 'p1',
-                  move: makeSan(chess, normalizedMove),
+                  move: makeSanChess(chess, normalizedMove),
                   by: gameInfoMap.get(currentGameId).p1.id,
                 };
               chess.play(normalizedMove);
@@ -930,7 +935,7 @@ export default function (token: string) {
             //Get first move to process, usually the last since movesToProcess is usually 1
             SANMove = String(message.param.san[message.param.san.length - i]).trim();
             if (verbose) console.info('onmessage - SANMove = ' + SANMove);
-            const moveObject = <NormalMove | undefined>parseSan(localBoard, SANMove); //get move from DGT LiveChess
+            const moveObject = <NormalMove | undefined>parseSanChess(localBoard, SANMove); //get move from DGT LiveChess
             //if valid move on local stratops
             if (moveObject && localBoard.isLegal(moveObject)) {
               if (verbose) console.info('onmessage - Move is legal');
@@ -957,7 +962,7 @@ export default function (token: string) {
                   console.error('onmessage - Played move has not been received by PlayStrategy.');
                 } else {
                   console.error('onmessage - Expected:' + lastMove.move + ' by ' + lastMove.player);
-                  console.error('onmessage - Detected:' + makeUci(moveObject) + ' by ' + localBoard.turn);
+                  console.error('onmessage - Detected:' + makeUciChess(moveObject) + ' by ' + localBoard.turn);
                 }
                 announceInvalidMove();
                 await sleep(1000);
@@ -1079,7 +1084,7 @@ export default function (token: string) {
       await chooseCurrentGame();
     }
     //Now send the move
-    const command = makeUci(boardMove);
+    const command = makeUciChess(boardMove);
     sendMove(currentGameId, command);
   }
 
@@ -1191,7 +1196,7 @@ export default function (token: string) {
    */
   function compareMoves(lastMove: string, moveObject: NormalMove): boolean {
     try {
-      const uciMove = makeUci(moveObject);
+      const uciMove = makeUciChess(moveObject);
       if (verbose) console.log(`Comparing ${lastMove} with ${uciMove}`);
       if (lastMove == uciMove) {
         //it's the same move

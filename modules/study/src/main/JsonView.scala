@@ -133,10 +133,6 @@ object JsonView {
   implicit private[study] val uciWrites: Writes[Uci] = Writes[Uci] { u =>
     JsString(u.uci)
   }
-  implicit private val posReader: Reads[Pos] = Reads[Pos] { v =>
-    (v.asOpt[String] flatMap { p => Pos.fromKey(GameLogic.Chess(), p) })
-      .fold[JsResult[Pos]](JsError(Nil))(JsSuccess(_))
-  }
   implicit private[study] val pathWrites: Writes[Path] = Writes[Path] { p =>
     JsString(p.toString)
   }
@@ -163,19 +159,6 @@ object JsonView {
   }
   implicit private[study] val settingsWriter: Writes[Settings] = Json.writes[Settings]
 
-  implicit private[study] val shapeReader: Reads[Shape] = Reads[Shape] { js =>
-    js.asOpt[JsObject]
-      .flatMap { o =>
-        for {
-          brush <- o str "brush"
-          orig  <- o.get[Pos]("orig")
-        } yield o.get[Pos]("dest") match {
-          case Some(dest) => Shape.Arrow(brush, orig, dest)
-          case _          => Shape.Circle(brush, orig)
-        }
-      }
-      .fold[JsResult[Shape]](JsError(Nil))(JsSuccess(_))
-  }
   implicit private val plyWrites = Writes[Chapter.Ply] { p =>
     JsNumber(p.value)
   }
@@ -220,4 +203,26 @@ object JsonView {
   implicit val topicsWrites: Writes[StudyTopics] = Writes[StudyTopics] { topics =>
     JsArray(topics.value map topicWrites.writes)
   }
+
+  case class VariantHandler()(implicit variant: Variant) {
+    implicit private val posReader: Reads[Pos] = Reads[Pos] { v =>
+      (v.asOpt[String] flatMap { p => Pos.fromKey(variant.gameLogic, p) })
+        .fold[JsResult[Pos]](JsError(Nil))(JsSuccess(_))
+    }
+
+    implicit private[study] val shapeReader: Reads[Shape] = Reads[Shape] { js =>
+      js.asOpt[JsObject]
+        .flatMap { o =>
+          for {
+            brush <- o str "brush"
+            orig  <- o.get[Pos]("orig")
+          } yield o.get[Pos]("dest") match {
+            case Some(dest) => Shape.Arrow(brush, orig, dest)
+            case _          => Shape.Circle(brush, orig)
+          }
+        }
+        .fold[JsResult[Shape]](JsError(Nil))(JsSuccess(_))
+    }
+  }
+
 }

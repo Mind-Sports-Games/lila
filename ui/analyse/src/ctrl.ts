@@ -26,7 +26,7 @@ import { defined, prop, Prop } from 'common';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { playstrategyRules } from 'stratops/compat';
+import { playstrategyRules, amazonsChessGroundFen } from 'stratops/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -42,9 +42,10 @@ import { Position, PositionError } from 'stratops/chess';
 import { Result } from '@badrap/result';
 import { setupPosition } from 'stratops/variant';
 import { storedProp, StoredBooleanProp } from 'common/storage';
-import { AnaMove, AnaPass, StudyCtrl } from './study/interfaces';
+import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
+import { isOnlyDropsPly } from './util';
 
 export default class AnalyseCtrl {
   data: AnalyseData;
@@ -268,20 +269,24 @@ export default class AnalyseCtrl {
     return [pos[0], pos[1]] as Key[];
   }
 
+  setDropMode(cg: ChessgroundApi) {
+    const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
+    setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
+    cg.set({
+      dropmode: {
+        showDropDests: true,
+        dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
+      },
+    });
+  }
+
   private showGround(): void {
     this.onChange();
     if (!defined(this.node.dests)) this.getDests();
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
       this.setAutoShapes();
-      const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
-      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
-      cg.set({
-        dropmode: {
-          showDropDests: true,
-          dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
-        },
-      });
+      this.setDropMode(cg);
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
     });
   }
@@ -302,6 +307,7 @@ export default class AnalyseCtrl {
       dests = stratUtils.readDests(this.node.dests),
       drops = stratUtils.readDrops(this.node.drops),
       dropsByRole = stratUtils.readDrops(this.node.dropsByRole),
+      variantKey = this.data.game.variant.key,
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
@@ -311,7 +317,7 @@ export default class AnalyseCtrl {
         ? playerIndex
         : undefined,
       config: ChessgroundConfig = {
-        fen: node.fen,
+        fen: this.data.game.variant.key == 'amazons' ? amazonsChessGroundFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
         movable: this.embed
           ? {
@@ -324,7 +330,7 @@ export default class AnalyseCtrl {
             },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
-        onlyDropsVariant: this.data.onlyDropsVariant,
+        onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
@@ -493,7 +499,7 @@ export default class AnalyseCtrl {
       this.justDropped = piece.role;
       this.justCaptured = undefined;
       this.sound.move();
-      const drop = {
+      const drop: AnaDrop = {
         role: piece.role,
         pos,
         variant: this.data.game.variant.key,
@@ -501,11 +507,19 @@ export default class AnalyseCtrl {
         fen: this.node.fen,
         path: this.path,
       };
+      if (this.data.game.variant.key == 'amazons' && this.node.uci !== undefined) {
+        drop.halfMove = {
+          orig: this.node.uci.substring(0, 2),
+          dest: this.node.uci.substring(2, 4),
+        };
+        drop.fen = this.tree.parentNode(this.path).fen;
+        // Add in
+      }
       this.socket.sendAnaDrop(drop);
       this.preparePremoving();
       this.redraw();
     } else this.jump(this.path);
-    if (!this.data.onlyDropsVariant) {
+    if (!this.data.onlyDropsVariant || this.data.game.variant.key === 'amazons') {
       cancelDropMode(this.chessground.state);
       this.redraw();
     }
@@ -574,7 +588,6 @@ export default class AnalyseCtrl {
   addNode(node: Tree.Node, path: Tree.Path) {
     const newPath = this.tree.addNode(node, path);
     if (!newPath) {
-      console.log("Can't addNode", node, path);
       return this.redraw();
     }
     this.jump(newPath);
@@ -691,7 +704,7 @@ export default class AnalyseCtrl {
       variant: this.data.game.variant,
       standardMaterial:
         !this.data.game.initialFen ||
-        parseFen(util.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
+        parseFen(stratUtils.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
           setup =>
             PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
@@ -732,7 +745,7 @@ export default class AnalyseCtrl {
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    const setup = parseFen(util.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
+    const setup = parseFen(stratUtils.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
     return setupPosition(playstrategyRules(this.data.game.variant.key), setup);
   }
 
@@ -878,13 +891,15 @@ export default class AnalyseCtrl {
   }
 
   playUci(uci: Uci): void {
-    const move = parseUci(uci)!;
-    const to = makeSquare(move.to);
+    const move = parseUci(stratUtils.variantToRules(this.data.game.variant.key))(uci)!;
+    const to = makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.to);
     if (isNormal(move)) {
-      const piece = this.chessground.state.pieces.get(makeSquare(move.from));
+      const piece = this.chessground.state.pieces.get(
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from)
+      );
       const capture = this.chessground.state.pieces.get(to);
       this.sendMove(
-        makeSquare(move.from),
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
         to,
         capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
         move.promotion
