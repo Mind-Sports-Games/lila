@@ -230,6 +230,13 @@ export default class Setup {
         });
       });
     }
+    //default options for playing against ps-bots
+    if (vsPSBot) {
+      $timeModeSelect.val('1');
+      $timeInput.val('3');
+      $incrementInput.val('2');
+      $casual.trigger('click');
+    }
 
     const showRating = () => {
       const variantId = ($variantSelect.val() as string).split('_'),
