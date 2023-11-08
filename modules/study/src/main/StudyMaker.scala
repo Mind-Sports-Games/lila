@@ -28,7 +28,7 @@ final private class StudyMaker(
         game = none,
         name = Chapter.Name("Chapter 1"),
         variant = data.form.variantStr,
-        fen = data.form.fen,
+        fen = data.form.actualFen,
         pgn = data.form.pgnStr,
         orientation = data.form.orientation.name,
         mode = ChapterMaker.Mode.Normal.key,

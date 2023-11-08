@@ -20,14 +20,14 @@ object create {
     views.html.site.message(
       title = trans.toStudy.txt(),
       icon = Some("4"),
-      back = data.fen.map(f => routes.Editor.load(f.value).url),
+      back = data.actualFen.map(f => routes.Editor.load(f.value).url),
       moreCss = cssTag("study.create").some
     ) {
       div(cls := "study-create")(
         postForm(action := routes.Study.create)(
           input(tpe := "hidden", name := "gameId", value := data.gameId),
           input(tpe := "hidden", name := "orientation", value := data.orientationStr),
-          input(tpe := "hidden", name := "fen", value := data.fen.map(_.value)),
+          input(tpe := "hidden", name := "fen", value := data.actualFen.map(_.value)),
           input(tpe := "hidden", name := "pgn", value := data.pgnStr),
           input(tpe := "hidden", name := "variant", value := data.variantStr),
           h2(trans.study.whereDoYouWantToStudyThat()),
