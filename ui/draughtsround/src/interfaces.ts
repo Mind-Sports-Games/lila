@@ -60,7 +60,7 @@ export interface RoundData extends DraughtsGameData {
   userTv?: {
     id: string;
   };
-  expiration?: Expiration;
+  expirationAtStart?: Expiration;
 }
 
 export interface Expiration {
