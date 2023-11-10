@@ -332,6 +332,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'crazyhouse';
     case 'noCastling':
       return 'nocastling';
+    case 'monster':
+      return 'monster';
     case 'linesOfAction':
       return 'linesofaction';
     case 'scrambledEggs':

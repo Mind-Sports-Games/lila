@@ -258,6 +258,9 @@ export default class Setup {
             case '13':
               key = 'noCastling';
               break;
+            case '15':
+              key = 'monster';
+              break;
             default:
               key = 'standard';
               break;

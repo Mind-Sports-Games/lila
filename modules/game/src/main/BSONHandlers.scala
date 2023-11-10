@@ -244,7 +244,7 @@ object BSONHandlers {
                   halfMoveClock = decoded.halfMoveClock,
                   positionHashes = decoded.positionHashes,
                   unmovedRooks = decoded.unmovedRooks,
-                  checkCount = if (gameVariant.threeCheck || gameVariant.fiveCheck) {
+                  checkCount = if (gameVariant.key == "threeCheck" || gameVariant.key == "fiveCheck") {
                     val counts = r.intsD(F.checkCount)
                     chess.CheckCount(~counts.headOption, ~counts.lastOption)
                   } else Game.emptyCheckCount
@@ -665,7 +665,7 @@ object BSONHandlers {
               F.deadStoneOfferState -> o.metadata.deadStoneOfferState.map(_.id)
             )
           case _ => //chess or fail
-            if (o.variant.standard)
+            if (o.variant.key == "standard")
               $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.actionStrs.flatten take Game.maxPlies))
             else {
               $doc(

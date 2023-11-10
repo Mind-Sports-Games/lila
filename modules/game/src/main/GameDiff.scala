@@ -118,7 +118,7 @@ object GameDiff {
 
     a.variant.gameLogic match {
       case GameLogic.Chess() =>
-        if (a.variant.standard)
+        if (a.variant.key == "standard")
           dTry(huffmanPgn, _.actionStrs.flatten, writeBytes compose PgnStorage.Huffman.encode)
         else {
           dTry(oldPgn, _.actionStrs, writeBytes compose PgnStorage.OldBin.encodeActionStrs)
@@ -142,7 +142,7 @@ object GameDiff {
             CastleLastMove.castleLastMoveBSONHandler.writeTry
           )
           // since variants are always OldBin
-          if (a.variant.threeCheck || a.variant.fiveCheck)
+          if (a.variant.key == "threeCheck" || a.variant.key == "fiveCheck")
             dOpt(
               checkCount,
               _.history.checkCount,

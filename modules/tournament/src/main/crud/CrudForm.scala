@@ -121,7 +121,7 @@ object CrudForm {
       Variant.apply(gameLogic, v.split("_")(1).toInt)
     } getOrElse Variant.default(gameLogic)
 
-    def realPosition = position ifTrue realVariant.standard
+    def realPosition = position ifTrue realVariant.key == "standard"
 
     def validClock = (clock.limitSeconds + clock.incrementSeconds) > 0
 

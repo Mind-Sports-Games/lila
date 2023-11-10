@@ -3,7 +3,7 @@ package lila.setup
 import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.chess.variant.FromPosition
+import strategygames.chess.variant.{ FromPosition, Standard }
 
 import lila.game.PerfPicker
 import lila.rating.PerfType
@@ -21,7 +21,8 @@ final case class OpenConfig(
   def validFen = ApiConfig.validFen(variant, position)
 
   def autoVariant =
-    if (variant.standard && position.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
+    if (variant == Variant.Chess(Standard) && position.exists(!_.initial))
+      copy(variant = Variant.wrap(FromPosition))
     else this
 }
 

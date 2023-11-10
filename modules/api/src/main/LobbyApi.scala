@@ -50,7 +50,7 @@ final class LobbyApi(
         "fullId"      -> pov.fullId,
         "gameId"      -> pov.gameId,
         "fen"         -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
-        "playerIndex" -> (if (pov.game.variant.racingKings) P1 else pov.playerIndex).name,
+        "playerIndex" -> (if (pov.game.variant.key == "racingKings") P1 else pov.playerIndex).name,
         "lastMove"    -> ~pov.game.lastMoveKeys,
         "variant" -> Json.obj(
           "gameLogic" -> Json.obj(

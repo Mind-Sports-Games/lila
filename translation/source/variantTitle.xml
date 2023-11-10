@@ -9,6 +9,8 @@
   <string name="fiveCheck">Check your opponent 5 times to win</string>
   <string name="horde">Destroy the horde to win</string>
   <string name="kingOfTheHill">Bring your King to the center to win</string>
+  <string name="horde">White gets two moves every turn to compensate for their starting disadvantage</string>
+  <string name="monster">White gets two moves every turn to compensate for their starting disadvantage</string>
   <string name="noCastling">Standard chess but no castling</string>
   <string name="racingKings">Race your King to the eighth rank to win</string>
   <string name="threeCheck">Check your opponent 3 times to win</string>
