@@ -13,7 +13,8 @@ const variantConfirms = {
   crazyhouse:
     'This is a Crazyhouse game!\n\nEvery time a piece is captured, the capturing player gets a piece of the same type and of their color in their pocket.',
   noCastling: 'This is a No Castling game!\n\nThe game is played the same as standard chess but you cannot castle.',
-  monster: 'This is a Monster chess game!\nWhite gets two moves every turn to compensate for their starting disadvantage.',
+  monster:
+    'This is a Monster chess game!\nWhite gets two moves every turn to compensate for their starting disadvantage.',
   linesOfAction:
     "This is Lines Of Action, a separate game from chess. The aim of the game is to connect all of one's pieces, with movement variable on the number of pieces in a line.",
   scrambledEggs:
