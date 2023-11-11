@@ -12,6 +12,7 @@ import play.api.data.validation
 import play.api.data.validation.Constraint
 
 import lila.common.Form._
+import lila.common.Clock._
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam._
 import lila.user.User
@@ -134,51 +135,11 @@ final class TournamentForm {
   private def draughts64Variants(medleyVariants: Option[List[Variant]]) =
     medleyVariantsList(medleyVariants).filterNot(_.draughts64Variant).isEmpty
 
-  // Yes, I know this is kinda gross. :'(
-  private def valuesFromClockConfig(
-      c: ClockConfig
-  ): Option[(Boolean, Double, Int, Option[Int], Option[Int])] =
-    c match {
-      case fc: Clock.Config => {
-        Clock.Config.unapply(fc).map(t => (false, t._1 / 60d, t._2, None, None))
-      }
-      case bc: Clock.BronsteinConfig => {
-        Clock.BronsteinConfig.unapply(bc).map(t => (false, t._1 / 60d, t._2, None, None))
-      }
-      case udc: Clock.UsDelayConfig => {
-        Clock.UsDelayConfig.unapply(udc).map(t => (false, t._1 / 60d, t._2, None, None))
-      }
-      case bc: ByoyomiClock.Config => {
-        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 60d, t._2, Some(t._3), Some(t._4)))
-      }
-    }
-
-  // Yes, I know this is kinda gross. :'(
-  private def clockConfigFromValues(
-      useByoyomi: Boolean,
-      limit: Double,
-      increment: Int,
-      byoyomi: Option[Int],
-      periods: Option[Int]
-  ): ClockConfig = // TODO: Do it for bronstein too
-    (useByoyomi, byoyomi, periods) match {
-      case (true, Some(byoyomi), Some(periods)) =>
-        ByoyomiClock.Config((limit * 60).toInt, increment, byoyomi, periods)
-      case _ =>
-        Clock.Config((limit * 60).toInt, increment)
-    }
-
   private def form(user: User, leaderTeams: List[LeaderTeam]) =
     Form(
       mapping(
         "name" -> optional(nameType(user)),
-        "clock" -> mapping[ClockConfig, Boolean, Double, Int, Option[Int], Option[Int]](
-          "useByoyomi" -> boolean,
-          "limit"      -> numberInDouble(clockTimeChoices),
-          "increment"  -> numberIn(clockIncrementChoices),
-          "byoyomi"    -> optional(numberIn(clockByoyomiChoices)),
-          "periods"    -> optional(numberIn(periodsChoices))
-        )(clockConfigFromValues)(valuesFromClockConfig)
+        "clock" -> clockConfigMappings(clockTimes, clockByoyomi)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "minutes" -> {
           if (lila.security.Granter(_.ManageTournament)(user)) number
