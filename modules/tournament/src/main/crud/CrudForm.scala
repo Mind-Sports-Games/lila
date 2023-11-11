@@ -6,9 +6,11 @@ import play.api.data._
 import play.api.data.Forms._
 
 import strategygames.variant.Variant
-import lila.common.Form._
 import strategygames.format.FEN
 import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameLogic }
+
+import lila.common.Form._
+import lila.common.Clock._
 
 object CrudForm {
 
@@ -17,51 +19,11 @@ object CrudForm {
 
   val maxHomepageHours = 168
 
-  // Yes, I know this is kinda gross. :'(
-  private def valuesFromClockConfig(
-      c: ClockConfig
-  ): Option[(Boolean, Double, Int, Option[Int], Option[Int])] =
-    c match {
-      case fc: Clock.Config => {
-        Clock.Config.unapply(fc).map(t => (false, t._1 / 4d, t._2, None, None))
-      }
-      case bc: Clock.BronsteinConfig => {
-        Clock.BronsteinConfig.unapply(bc).map(t => (false, t._1 / 4d, t._2, None, None))
-      }
-      case udc: Clock.UsDelayConfig => {
-        Clock.UsDelayConfig.unapply(udc).map(t => (false, t._1 / 4d, t._2, None, None))
-      }
-      case bc: ByoyomiClock.Config => {
-        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 4d, t._2, Some(t._3), Some(t._4)))
-      }
-    }
-
-  // Yes, I know this is kinda gross. :'(
-  private def clockConfigFromValues(
-      useByoyomi: Boolean,
-      limit: Double,
-      increment: Int,
-      byoyomi: Option[Int],
-      periods: Option[Int]
-  ): ClockConfig = // TODO: deal with Bronstein as well
-    (useByoyomi, byoyomi, periods) match {
-      case (true, Some(byoyomi), Some(periods)) =>
-        ByoyomiClock.Config((limit * 60).toInt, increment, byoyomi, periods)
-      case _ =>
-        Clock.Config((limit * 60).toInt, increment)
-    }
-
   lazy val apply = Form(
     mapping(
       "name"          -> text(minLength = 3, maxLength = 40),
       "homepageHours" -> number(min = 0, max = maxHomepageHours),
-      "clock" -> mapping[ClockConfig, Boolean, Double, Int, Option[Int], Option[Int]](
-        "useByoyomi" -> boolean,
-        "limit"      -> numberInDouble(clockTimeChoices),
-        "increment"  -> numberIn(clockIncrementChoices),
-        "byoyomi"    -> optional(numberIn(clockByoyomiChoices)),
-        "periods"    -> optional(numberIn(periodsChoices))
-      )(clockConfigFromValues)(valuesFromClockConfig)
+      "clock" -> clockConfigMappings(clockTimes, clockByoyomi)
         .verifying("Invalid clock", _.estimateTotalSeconds > 0),
       "minutes" -> number(min = 20, max = 1440),
       "variant" -> optional(

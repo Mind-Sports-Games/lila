@@ -35,7 +35,11 @@ object form {
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clockRow1,
-            fields.useByoyomi,
+            form3.split(
+              fields.useByoyomi,
+              fields.useBronsteinDelay,
+              fields.useSimpleDelay
+            ),
             fields.clockRow2,
             form3.split(fields.description, fields.position),
             form3.split(
@@ -292,6 +296,12 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
 
   def useByoyomi =
     frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()))
+
+  def useBronsteinDelay =
+    frag(form3.checkbox(form("clock.useBronsteinDelay"), trans.useBronsteinDelay()))
+
+  def useSimpleDelay =
+    frag(form3.checkbox(form("clock.useSimpleDelay"), trans.useSimpleDelay()))
 
   def clockRow1 =
     form3.split(

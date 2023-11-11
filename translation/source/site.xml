@@ -590,6 +590,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="clockByoyomi">Clock Byoyomi</string>
   <string name="numberOfPeriods">Number of periods</string>
   <string name="useByoyomi">Use Byoyomi Clock</string>
+  <string name="useBronsteinDelay">Use Bronstein Delay</string>
+  <string name="useSimpleDelay">Use Simple Delay</string>
   <string name="privacy">Privacy</string>
   <string name="privacyPolicy">Privacy policy</string>
   <string name="letOtherPlayersFollowYou">Let other players follow you</string>

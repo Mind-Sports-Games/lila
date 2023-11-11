@@ -12,6 +12,7 @@ import play.api.data.Forms._
 import play.api.data.validation.Constraint
 
 import lila.common.Form._
+import lila.common.Clock._
 import lila.hub.LeaderTeam
 import lila.user.User
 
@@ -43,36 +44,6 @@ object SimulForm {
     "p2"     -> "Player 2"
   )
   val playerIndexDefault = "p1"
-
-  private def valuesFromClockConfig(c: ClockConfig): Option[(Boolean, Int, Int, Option[Int], Option[Int])] =
-    c match {
-      case fc: Clock.Config => {
-        Clock.Config.unapply(fc).map(t => (false, t._1, t._2, None, None))
-      }
-      case bc: Clock.BronsteinConfig => {
-        Clock.BronsteinConfig.unapply(bc).map(t => (false, t._1, t._2, None, None))
-      }
-      case udc: Clock.UsDelayConfig => {
-        Clock.UsDelayConfig.unapply(udc).map(t => (false, t._1, t._2, None, None))
-      }
-      case bc: ByoyomiClock.Config => {
-        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1, t._2, Some(t._3), Some(t._4)))
-      }
-    }
-
-  private def clockConfigFromValues(
-      useByoyomi: Boolean,
-      limit: Int,
-      increment: Int,
-      byoyomi: Option[Int],
-      periods: Option[Int]
-  ): ClockConfig = // TODO: this needs to deal with Bronstein
-    (useByoyomi, byoyomi, periods) match {
-      case (true, Some(byoyomi), Some(periods)) =>
-        ByoyomiClock.Config(limit, increment, byoyomi, periods)
-      case _ =>
-        Clock.Config(limit, increment)
-    }
 
   private def nameType(host: User) =
     eventName(2, 40).verifying(
@@ -127,14 +98,8 @@ object SimulForm {
   private def baseForm(host: User, teams: List[LeaderTeam]) =
     Form(
       mapping(
-        "name" -> nameType(host),
-        "clock" -> mapping[ClockConfig, Boolean, Int, Int, Option[Int], Option[Int]](
-          "useByoyomi" -> boolean,
-          "limit"      -> number.verifying(clockTimes.contains _),
-          "increment"  -> number(min = 0, max = 120),
-          "byoyomi"    -> optional(number.verifying(byoyomiLimits.contains _)),
-          "periods"    -> optional(number(min = 0, max = 5))
-        )(clockConfigFromValues)(valuesFromClockConfig),
+        "name"       -> nameType(host),
+        "clock"      -> clockConfigMappingsFromMinutes(clockTimes, byoyomiLimits),
         "clockExtra" -> numberIn(clockExtraChoices),
         //only variants that arent FromPosition
         "variants" -> list {

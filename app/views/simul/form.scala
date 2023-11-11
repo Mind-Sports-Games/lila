@@ -106,7 +106,11 @@ object form {
           form3.select(_, clockIncrementChoices)
         )
       ),
-      form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()),
+      form3.split(
+        form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()),
+        form3.checkbox(form("clock.useBronsteinDelay"), trans.useBronsteinDelay()),
+        form3.checkbox(form("clock.useSimpleDelay"), trans.useSimpleDelay())
+      ),
       form3.split(
         form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
           form3.select(_, SimulForm.clockByoyomiChoices)
