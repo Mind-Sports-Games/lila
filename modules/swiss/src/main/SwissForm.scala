@@ -21,7 +21,7 @@ final class SwissForm(implicit mode: Mode) {
     Form(
       mapping(
         "name" -> optional(eventName(2, 36)),
-        "clock" -> clockConfigMappingsFromMinutes(clockLimits, byoyomiLimits).verifying(
+        "clock" -> clockConfigMappingsSeconds(clockLimits, byoyomiLimits).verifying(
           "Invalid clock",
           _.estimateTotalSeconds > 0
         ),
@@ -204,15 +204,11 @@ object SwissForm {
   val clockLimits: Seq[Int] = Seq(0, 15, 30, 45, 60, 90) ++ {
     (120 to 420 by 60) ++ (600 to 1800 by 300) ++ (2400 to 10800 by 600)
   }
+  val clockLimitChoices = clockTimeChoicesFromSeconds(clockLimits)
 
   val byoyomiLimits: Seq[Int] = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (30 to 60 by 10)
 
   val clockByoyomiChoices = options(byoyomiLimits, "%d second{s}")
-
-  val clockLimitChoices = options(
-    clockLimits,
-    l => s"${strategygames.Clock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
-  )
 
   val roundIntervals: Seq[Int] =
     Seq(
