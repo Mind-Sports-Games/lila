@@ -20,7 +20,7 @@ object SimulForm {
 
   val clockTimes       = (5 to 15 by 5) ++ (20 to 90 by 10) ++ (120 to 180 by 20)
   val clockTimeDefault = 20
-  val clockTimeChoices = options(clockTimes, "%d minute{s}")
+  val clockTimeChoices = clockTimeChoicesFromMinutes(clockTimes.map(_.toDouble))
 
   val clockIncrements       = (0 to 2 by 1) ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10) ++ (90 to 180 by 30)
   val clockIncrementDefault = 60
@@ -145,14 +145,14 @@ object SimulForm {
         // TODO: this one is a bit odd, I feel like `copy` might just be enough.
         config = clockConfig match {
           case fc: Clock.Config =>
-            strategygames.Clock.Config(fc.limitSeconds * 60, fc.incrementSeconds)
+            strategygames.Clock.Config(fc.limitSeconds, fc.incrementSeconds)
           case bc: Clock.BronsteinConfig =>
-            strategygames.Clock.BronsteinConfig(bc.limitSeconds * 60, bc.delaySeconds)
+            strategygames.Clock.BronsteinConfig(bc.limitSeconds, bc.delaySeconds)
           case udc: Clock.UsDelayConfig =>
-            strategygames.Clock.UsDelayConfig(udc.limitSeconds * 60, udc.delaySeconds)
+            strategygames.Clock.UsDelayConfig(udc.limitSeconds, udc.delaySeconds)
           case bc: ByoyomiClock.Config =>
             strategygames.ByoyomiClock
-              .Config(bc.limitSeconds * 60, bc.incrementSeconds, bc.byoyomiSeconds, bc.periods)
+              .Config(bc.limitSeconds, bc.incrementSeconds, bc.byoyomiSeconds, bc.periods)
         },
         hostExtraTime = clockExtra * 60
       )

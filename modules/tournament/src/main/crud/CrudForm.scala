@@ -23,7 +23,7 @@ object CrudForm {
     mapping(
       "name"          -> text(minLength = 3, maxLength = 40),
       "homepageHours" -> number(min = 0, max = maxHomepageHours),
-      "clock" -> clockConfigMappings(clockTimes, clockByoyomi)
+      "clock" -> clockConfigMappingsMinutes(clockTimes, clockByoyomi)
         .verifying("Invalid clock", _.estimateTotalSeconds > 0),
       "minutes" -> number(min = 20, max = 1440),
       "variant" -> optional(

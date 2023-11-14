@@ -139,7 +139,7 @@ final class TournamentForm {
     Form(
       mapping(
         "name" -> optional(nameType(user)),
-        "clock" -> clockConfigMappings(clockTimes, clockByoyomi)
+        "clock" -> clockConfigMappingsMinutes(clockTimes, clockByoyomi)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "minutes" -> {
           if (lila.security.Granter(_.ManageTournament)(user)) number
@@ -199,11 +199,7 @@ object TournamentForm {
     (2 to 7 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   }.map(_.toDouble)
   val clockTimeDefault = 2d
-  private def formatLimit(l: Double) =
-    Clock.Config(l * 60 toInt, 0).limitString + {
-      if (l <= 1) " minute" else " minutes"
-    }
-  val clockTimeChoices = optionsDouble(clockTimes, formatLimit)
+  val clockTimeChoices = clockTimeChoicesFromMinutes(clockTimes)
 
   val clockIncrements       = (0 to 2 by 1) ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   val clockIncrementDefault = 0

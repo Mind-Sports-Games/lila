@@ -144,7 +144,6 @@ export class ClockController {
             const cutoff = cdata.showTenths === Prefs.ShowClockTenths.Below10Secs ? 10000 : 3600000;
             this.showTenths = time => time < cutoff;
         }
-
         if (isSimpleDelay(cdata)) {
             this.countdownDelay = cdata.delay;
         }
