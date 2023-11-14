@@ -159,7 +159,7 @@ export default class RoundController {
   }
 
   private showExpiration = () => {
-    if (!this.data.expiration) return;
+    if (!this.data.expirationAtStart) return;
     this.redraw();
     setTimeout(this.showExpiration, 250);
   };
@@ -401,9 +401,9 @@ export default class RoundController {
       } else if (this.clock) this.clock.setClock(d, oc.p1, oc.p2, delay);
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
-    if (this.data.expiration) {
-      if (round.turnsTaken(this.data) > 1) this.data.expiration = undefined;
-      else this.data.expiration.updatedAt = Date.now();
+    if (this.data.expirationAtStart) {
+      if (round.turnsTaken(this.data) > 1) this.data.expirationAtStart = undefined;
+      else this.data.expirationAtStart.updatedAt = Date.now();
     }
     this.redraw();
     if (playing && playedPlayerIndex == d.player.playerIndex) {
