@@ -291,7 +291,7 @@ object Schedule {
           else Byoyomi510
         }
         // NOTE: not using case _ => here, because I want an error when a new clock is added.
-        case Clock.Config(_, _) | Clock.BronsteinConfig(_, _) | Clock.UsDelayConfig(_, _) => {
+        case Clock.Config(_, _) | Clock.BronsteinConfig(_, _) | Clock.SimpleDelayConfig(_, _) => {
           val time = clock.estimateTotalSeconds
           if (time < 30) UltraBullet
           else if (time < 60) HyperBullet

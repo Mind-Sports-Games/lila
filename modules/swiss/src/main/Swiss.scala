@@ -71,7 +71,7 @@ case class Swiss(
     case bc: Clock.BronsteinConfig => {
       ((bc.limitSeconds + bc.delaySeconds * 80 + 10) * settings.nbRounds).toInt.seconds
     }
-    case udc: Clock.UsDelayConfig => {
+    case udc: Clock.SimpleDelayConfig => {
       ((udc.limitSeconds + udc.delaySeconds * 80 + 10) * settings.nbRounds).toInt.seconds
     }
     case fc: Clock.Config => {

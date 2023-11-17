@@ -43,7 +43,7 @@ private[setup] trait Config {
   val playerIndex: PlayerIndex
 
   def isFischer     = timeMode == TimeMode.FischerClock
-  def isSimpleDelay = timeMode == TimeMode.UsDelayClock
+  def isSimpleDelay = timeMode == TimeMode.SimpleDelayClock
   def isBronstein   = timeMode == TimeMode.BronsteinDelayClock
   def isByoyomi     = timeMode == TimeMode.ByoyomiClock
   def hasClock      = isFischer || isSimpleDelay || isBronstein || isByoyomi
@@ -80,8 +80,8 @@ private[setup] trait Config {
           if (clockHasByoyomiTime) byoyomi else 10,
           periods
         )
-      case TimeMode.UsDelayClock =>
-        Clock.UsDelayConfig((time * 60).toInt, if (clockHasSimpleDelayTime) increment else 1)
+      case TimeMode.SimpleDelayClock =>
+        Clock.SimpleDelayConfig((time * 60).toInt, if (clockHasSimpleDelayTime) increment else 1)
       case TimeMode.BronsteinDelayClock =>
         Clock.BronsteinConfig((time * 60).toInt, if (clockHasBronsteinDelayTime) increment else 1)
       // NOTE: This could would have always returned a Clock.Config before. The reason

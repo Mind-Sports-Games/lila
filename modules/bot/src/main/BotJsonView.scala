@@ -57,9 +57,9 @@ final class BotJsonView(
             "type"            -> "gameState",
             "moves"           -> uciMoves.map(_.mkString(",")).mkString(" "),
             "activeplayer"    -> game.activePlayer.name,
-            "wtime"           -> millisOf(game.p1Pov),
-            "btime"           -> millisOf(game.p2Pov),
-            // TODO: these two fields need to be tested for Bronstein and UsDelay and Fischer now
+            "wtime" -> millisOf(game.p1Pov),
+            "btime" -> millisOf(game.p2Pov),
+            // TODO: these two fields need to be tested for Bronstein and SimpleDelay and Fischer now
             "winc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),
             "binc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),
             "wdraw"           -> game.p1Player.isOfferingDraw,
@@ -144,7 +144,7 @@ final class BotJsonView(
           "delay"     -> c.delay.millis,
           "delaytype" -> "bronstein"
         )
-      case c: strategygames.Clock.UsDelayConfig =>
+      case c: strategygames.Clock.SimpleDelayConfig =>
         Json.obj(
           "initial"   -> c.limit.millis,
           "delay"     -> c.delay.millis,

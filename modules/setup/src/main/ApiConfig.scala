@@ -47,7 +47,7 @@ object ApiConfig extends BaseHumanConfig {
   def from(
       v: Option[String],
       fcl: Option[Clock.Config],
-      sdc: Option[Clock.UsDelayConfig],
+      sdc: Option[Clock.SimpleDelayConfig],
       bdc: Option[Clock.BronsteinConfig],
       bcl: Option[ByoyomiClock.Config],
       d: Option[Int],

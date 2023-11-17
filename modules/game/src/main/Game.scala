@@ -711,10 +711,10 @@ case class Game(
     }
   )
 
-  def hasUsDelayClock = clock.fold(false)(c =>
+  def hasSimpleDelayClock = clock.fold(false)(c =>
     c.config match {
-      case _: Clock.UsDelayConfig => true
-      case _                      => false
+      case _: Clock.SimpleDelayConfig => true
+      case _                          => false
     }
   )
 
