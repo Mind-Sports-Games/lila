@@ -9,11 +9,11 @@ object TimeMode {
   case object Correspondence      extends TimeMode(2)
   case object ByoyomiClock        extends TimeMode(3)
   case object BronsteinDelayClock extends TimeMode(4)
-  case object UsDelayClock        extends TimeMode(5)
+  case object SimpleDelayClock    extends TimeMode(5)
 
   val default = FischerClock
 
-  val all = List(Unlimited, FischerClock, ByoyomiClock, BronsteinDelayClock, UsDelayClock, Correspondence)
+  val all = List(Unlimited, FischerClock, ByoyomiClock, BronsteinDelayClock, SimpleDelayClock, Correspondence)
 
   val ids = all map (_.id)
 
@@ -29,7 +29,7 @@ object TimeMode {
     if (game.hasFischerClock) FischerClock
     else if (game.hasByoyomiClock) ByoyomiClock
     else if (game.hasBronsteinClock) BronsteinDelayClock
-    else if (game.hasUsDelayClock) UsDelayClock
+    else if (game.hasSimpleDelayClock) SimpleDelayClock
     else if (game.hasCorrespondenceClock) Correspondence
     else Unlimited
 }

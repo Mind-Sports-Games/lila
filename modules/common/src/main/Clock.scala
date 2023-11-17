@@ -21,8 +21,8 @@ object Clock {
       case bc: StratClock.BronsteinConfig => {
         StratClock.BronsteinConfig.unapply(bc).map(t => (false, true, false, t._1, t._2, None, None))
       }
-      case udc: StratClock.UsDelayConfig => {
-        StratClock.UsDelayConfig.unapply(udc).map(t => (false, false, true, t._1, t._2, None, None))
+      case udc: StratClock.SimpleDelayConfig => {
+        StratClock.SimpleDelayConfig.unapply(udc).map(t => (false, false, true, t._1, t._2, None, None))
       }
       case bc: ByoyomiClock.Config => {
         ByoyomiClock.Config
@@ -47,7 +47,7 @@ object Clock {
       case (false, true, false, _, _) =>
         StratClock.BronsteinConfig(limit, increment)
       case (false, false, true, _, _) =>
-        StratClock.UsDelayConfig(limit.pp("limitSeconds"), increment.pp("delay"))
+        StratClock.SimpleDelayConfig(limit.pp("limitSeconds"), increment.pp("delay"))
       case _ =>
         StratClock.Config(limit, increment)
     }

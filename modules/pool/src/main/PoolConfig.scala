@@ -59,7 +59,7 @@ object PoolConfig {
           "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
           "variantKey" -> VariantKeys.variantName(p.variant)
         )
-      case udc: Clock.UsDelayConfig =>
+      case udc: Clock.SimpleDelayConfig =>
         Json.obj(
           "id"         -> p.id.value,
           "lim"        -> udc.limitInMinutes,

@@ -155,7 +155,7 @@ object SetupForm {
       mapping(
         "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
         "delay" -> increment // TODO: maybe consider changing the name of this parameter in the HTTP POST
-      )(strategygames.Clock.UsDelayConfig.apply)(strategygames.Clock.UsDelayConfig.unapply)
+      )(strategygames.Clock.SimpleDelayConfig.apply)(strategygames.Clock.SimpleDelayConfig.unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val simpleDelayClock = "clock" -> optional(simpleDelayMapping)
 

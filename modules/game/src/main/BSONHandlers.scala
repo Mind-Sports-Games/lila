@@ -926,7 +926,7 @@ object BSONHandlers {
       case Clock.Config(_, _)              => 1
       case ByoyomiClock.Config(_, _, _, _) => 2
       case Clock.BronsteinConfig(_, _)     => 3
-      case Clock.UsDelayConfig(_, _)       => 4
+      case Clock.SimpleDelayConfig(_, _)   => 4
     }
 
   private[game] def clockBSONWrite(since: DateTime, clock: ClockBase) =
@@ -963,7 +963,7 @@ object BSONHandlers {
       case Some(2) =>
         byoyomiClockBSONReader(since, periodEntries.getOrElse(PeriodEntries.default), p1Berserk, p2Berserk)
       case Some(3) => otherClockBSONReader(Clock.BronsteinConfig, since, p1Berserk, p2Berserk)
-      case Some(4) => otherClockBSONReader(Clock.UsDelayConfig, since, p1Berserk, p2Berserk)
+      case Some(4) => otherClockBSONReader(Clock.SimpleDelayConfig, since, p1Berserk, p2Berserk)
       case _       => otherClockBSONReader(Clock.Config, since, p1Berserk, p2Berserk)
     }
 

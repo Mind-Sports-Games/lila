@@ -148,8 +148,8 @@ object SimulForm {
             strategygames.Clock.Config(fc.limitSeconds, fc.incrementSeconds)
           case bc: Clock.BronsteinConfig =>
             strategygames.Clock.BronsteinConfig(bc.limitSeconds, bc.delaySeconds)
-          case udc: Clock.UsDelayConfig =>
-            strategygames.Clock.UsDelayConfig(udc.limitSeconds, udc.delaySeconds)
+          case udc: Clock.SimpleDelayConfig =>
+            strategygames.Clock.SimpleDelayConfig(udc.limitSeconds, udc.delaySeconds)
           case bc: ByoyomiClock.Config =>
             strategygames.ByoyomiClock
               .Config(bc.limitSeconds, bc.incrementSeconds, bc.byoyomiSeconds, bc.periods)

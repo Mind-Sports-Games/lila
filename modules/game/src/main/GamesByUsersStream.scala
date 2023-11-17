@@ -78,7 +78,7 @@ final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
                 "delay"     -> bc.delaySeconds,
                 "delayType" -> "bronstein"
               )
-            case udc: Clock.UsDelayConfig =>
+            case udc: Clock.SimpleDelayConfig =>
               Json.obj(
                 "initial"   -> udc.limitSeconds,
                 "delay"     -> udc.delaySeconds,

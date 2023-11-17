@@ -31,7 +31,7 @@ object OpenConfig {
       n: Option[String],
       v: Option[String],
       fcl: Option[Clock.Config],
-      sdc: Option[Clock.UsDelayConfig],
+      sdc: Option[Clock.SimpleDelayConfig],
       bdc: Option[Clock.BronsteinConfig],
       bcl: Option[ByoyomiClock.Config],
       rated: Boolean,

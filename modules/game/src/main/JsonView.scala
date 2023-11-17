@@ -259,7 +259,7 @@ object JsonView {
               "p2"        -> fc.remainingTime(P2).toSeconds,
               "emerg"     -> fc.config.emergSeconds
             )
-          case udConfig: Clock.UsDelayConfig =>
+          case udConfig: Clock.SimpleDelayConfig =>
             Json.obj(
               "running"   -> fc.isRunning,
               "initial"   -> udConfig.limitSeconds,

@@ -598,7 +598,7 @@ object JsonView {
           "delayType" -> "bronstein"
         )
       }
-      case udc: Clock.UsDelayConfig => {
+      case udc: Clock.SimpleDelayConfig => {
         Json.obj(
           "limit"     -> udc.limitSeconds,
           "delay"     -> udc.delaySeconds,

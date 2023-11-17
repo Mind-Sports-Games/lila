@@ -23,7 +23,7 @@ final case class ApiAiConfig(
   val strictFen = false
 
   val days = ~daysO
-  // TODO: this should be reconsidered for Bronstein and UsDelay
+  // TODO: this should be reconsidered for Bronstein and SimpleDelay
   val increment = clock.??(_.graceSeconds)
   val time      = clock.??(_.limit.roundSeconds / 60)
   val byoyomi = clock match {
@@ -82,7 +82,7 @@ object ApiAiConfig extends BaseConfig {
       l: Int,
       v: Option[String],
       fcl: Option[Clock.Config],
-      sdc: Option[Clock.UsDelayConfig],
+      sdc: Option[Clock.SimpleDelayConfig],
       bdc: Option[Clock.BronsteinConfig],
       bcl: Option[ByoyomiClock.Config],
       d: Option[Int],

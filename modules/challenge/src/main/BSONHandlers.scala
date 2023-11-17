@@ -44,7 +44,7 @@ private object BSONHandlers {
             .getOrElse(
               (r.strO("t").filter(_ == "usdelay"), r.intO("l"), r.intO("d"))
                 .mapN((_type, limit, delay) =>
-                  TimeControl.Clock(strategygames.Clock.UsDelayConfig(limit, delay))
+                  TimeControl.Clock(strategygames.Clock.SimpleDelayConfig(limit, delay))
                 )
                 .getOrElse(
                   (r.intO("l"), r.intO("i"))
@@ -63,7 +63,7 @@ private object BSONHandlers {
         case TimeControl.Clock(strategygames.Clock.Config(l, i)) => $doc("l" -> l, "i" -> i)
         case TimeControl.Clock(strategygames.Clock.BronsteinConfig(l, d)) =>
           $doc("t" -> "bronstein", "l" -> l, "d" -> d)
-        case TimeControl.Clock(strategygames.Clock.UsDelayConfig(l, d)) =>
+        case TimeControl.Clock(strategygames.Clock.SimpleDelayConfig(l, d)) =>
           $doc("t" -> "usdelay", "l" -> l, "d" -> d)
         case TimeControl.Clock(strategygames.ByoyomiClock.Config(l, i, b, p)) =>
           $doc("l" -> l, "i" -> i, "b" -> b, "p" -> p)

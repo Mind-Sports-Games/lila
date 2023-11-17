@@ -87,7 +87,7 @@ trait SetupHelper { self: I18nHelper =>
       (TimeMode.FischerClock.id.toString, trans.realTime.txt(), none),
       (TimeMode.ByoyomiClock.id.toString, trans.byoyomiTime.txt(), none),
       (TimeMode.BronsteinDelayClock.id.toString, trans.bronsteinDelay.txt(), none),
-      (TimeMode.UsDelayClock.id.toString, trans.simpleDelay.txt(), none),
+      (TimeMode.SimpleDelayClock.id.toString, trans.simpleDelay.txt(), none),
       (TimeMode.Correspondence.id.toString, trans.correspondence.txt(), none),
       (TimeMode.Unlimited.id.toString, trans.unlimited.txt(), none)
     )

@@ -193,7 +193,7 @@ trait Handlers {
             for {
               limit <- doc.getAsTry[Int]("limit")
               delay <- doc.getAsTry[Int]("delay")
-            } yield strategygames.Clock.UsDelayConfig(limit, delay)
+            } yield strategygames.Clock.SimpleDelayConfig(limit, delay)
           case "byoyomi" =>
             for {
               limit   <- doc.getAsTry[Int]("limit")
@@ -218,7 +218,7 @@ trait Handlers {
             "limit" -> fc.limitSeconds,
             "delay" -> fc.delaySeconds
           )
-        case udc: Clock.UsDelayConfig =>
+        case udc: Clock.SimpleDelayConfig =>
           BSONDocument(
             "t"     -> "usdelay",
             "limit" -> udc.limitSeconds,

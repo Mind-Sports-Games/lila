@@ -62,10 +62,10 @@ final class GameSearchApi(
         Fields.duration          -> game.durationSeconds, // for realtime games only
         Fields.clockInit         -> game.clock.map(_.limitSeconds),
         Fields.clockInc -> game.clock.map(_.config match {
-          case fc: Clock.Config         => fc.incrementSeconds
-          case _: Clock.BronsteinConfig => 0
-          case _: Clock.UsDelayConfig   => 0
-          case bc: ByoyomiClock.Config  => bc.incrementSeconds
+          case fc: Clock.Config           => fc.incrementSeconds
+          case _: Clock.BronsteinConfig   => 0
+          case _: Clock.SimpleDelayConfig => 0
+          case bc: ByoyomiClock.Config    => bc.incrementSeconds
         }),
         // TODO: add in bronstein delay and us delay and byoyomi here.
         Fields.analysed -> analysed,
