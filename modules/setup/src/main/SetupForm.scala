@@ -146,7 +146,7 @@ object SetupForm {
     lazy val bronsteinDelayClockMapping =
       mapping(
         "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
-        "delay" -> increment // TODO: maybe consider changing the name of this parameter in the HTTP POST
+        "delay" -> increment
       )(strategygames.Clock.BronsteinConfig.apply)(strategygames.Clock.BronsteinConfig.unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val bronsteinDelayClock = "clock" -> optional(bronsteinDelayClockMapping)
@@ -154,7 +154,7 @@ object SetupForm {
     lazy val simpleDelayMapping =
       mapping(
         "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
-        "delay" -> increment // TODO: maybe consider changing the name of this parameter in the HTTP POST
+        "delay" -> increment
       )(strategygames.Clock.SimpleDelayConfig.apply)(strategygames.Clock.SimpleDelayConfig.unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val simpleDelayClock = "clock" -> optional(simpleDelayMapping)

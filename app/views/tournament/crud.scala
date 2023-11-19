@@ -115,9 +115,13 @@ object crud {
         )
       ),
       form3.split(
-        form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()),
-        form3.checkbox(form("clock.useBronsteinDelay"), trans.useBronsteinDelay()),
-        form3.checkbox(form("clock.useSimpleDelay"), trans.useSimpleDelay())
+        form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi(), disabled = disabledAfterStart),
+        form3.checkbox(
+          form("clock.useBronsteinDelay"),
+          trans.useBronsteinDelay(),
+          disabled = disabledAfterStart
+        ),
+        form3.checkbox(form("clock.useSimpleDelay"), trans.useSimpleDelay(), disabled = disabledAfterStart)
       ),
       form3.split(
         form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
