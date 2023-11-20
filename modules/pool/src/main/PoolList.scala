@@ -9,6 +9,7 @@ object PoolList {
   import PoolConfig._
 
   val all: List[PoolConfig] = List(
+    //TODO Add Backgammon?
     PoolConfig(1 ++ 0, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(

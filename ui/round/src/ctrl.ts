@@ -275,6 +275,7 @@ export default class RoundController {
         'go9x9',
         'go13x13',
         'go19x19',
+        'backgammon',
       ].includes(this.data.game.variant.key)
     )
       return false;

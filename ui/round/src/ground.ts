@@ -128,6 +128,10 @@ export function makeConfig(ctrl: RoundController): Config {
             ? 'https://playstrategy.org/assets/piece/go/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
               '/'
+            : variantKey === 'backgammon'
+            ? 'https://playstrategy.org/assets/piece/backgammon/' +
+              data.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
+              '/'
             : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +

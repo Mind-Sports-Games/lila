@@ -26,6 +26,7 @@ import strategygames.fairysf
 import strategygames.samurai
 import strategygames.togyzkumalak
 import strategygames.go
+import strategygames.backgammon
 import strategygames.format
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -572,6 +573,42 @@ object BinaryFormat {
         .to(Map)
     }
 
+    def writeBackgammon(pieces: backgammon.PieceMap): ByteArray = {
+      def posInt(pos: backgammon.Pos): Int =
+        (pieces get pos).fold(0) {
+          case (piece, count) if piece.role == backgammon.Role.defaultRole =>
+            count
+          case (piece, _) =>
+            piece.role.binaryInt
+
+        }
+      ByteArray(backgammon.Pos.all.map(posInt(_).toByte).toArray)
+    }
+
+    def readBackgammon(ba: ByteArray, variant: backgammon.variant.Variant): backgammon.PieceMap = {
+      def intPiece(player: PlayerIndex, int: Int): Option[(backgammon.Piece, Int)] =
+        if (int <= 162)
+          Some(
+            (backgammon.Piece(player, variant.defaultRole), int)
+          )
+        else
+          Some(
+            (
+              backgammon.Piece(
+                !player,
+                backgammon.Role.binaryInt(int).getOrElse(variant.defaultRole)
+              ),
+              1
+            )
+          )
+      def unsignInt(int: Int) = if (int < 0) 256 + int else int
+      (backgammon.Pos.all zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(pos.player, unsignInt(int)) map (pos -> _)
+        }
+        .to(Map)
+    }
+
     // cache standard start position
     def standard(lib: GameLogic) = lib match {
       case GameLogic.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
@@ -584,7 +621,9 @@ object BinaryFormat {
       case GameLogic.Togyzkumalak() =>
         writeTogyzkumalak(togyzkumalak.Board.init(togyzkumalak.variant.Togyzkumalak).pieces)
       case GameLogic.Go() => writeGo(go.Board.init(go.variant.Go19x19).pieces)
-      case _              => sys.error("Cant write to binary for lib")
+      case GameLogic.Backgammon() =>
+        writeBackgammon(backgammon.Board.init(backgammon.variant.Backgammon).pieces)
+      case _ => sys.error("Cant write to binary for lib")
     }
 
   }

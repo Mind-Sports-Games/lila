@@ -291,6 +291,24 @@ object GameDiff {
           (o: Option[Int]) => o.map(w.int)
         )
       }
+      case GameLogic.Backgammon() => {
+        dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Backgammon(b) => b.pieces
+            case _                   => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeBackgammon
+        )
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+        dOpt(
+          score,
+          _.history.score,
+          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+        )
+      }
     }
 
     d(turns, _.turnCount, w.int)

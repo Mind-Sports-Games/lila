@@ -160,6 +160,7 @@ object Event {
           case StratMove.FairySF(move)      => strategygames.fairysf.format.pgn.Dumper(move)
           case StratMove.Samurai(move)      => strategygames.samurai.format.pgn.Dumper(move)
           case StratMove.Togyzkumalak(move) => strategygames.togyzkumalak.format.pgn.Dumper(move)
+          case StratMove.Backgammon(move)   => strategygames.backgammon.format.pgn.Dumper(move)
         },
         fen =
           if (
@@ -544,6 +545,7 @@ object Event {
       case Pos.Samurai(_)      => GameLogic.Samurai().id
       case Pos.Togyzkumalak(_) => GameLogic.Togyzkumalak().id
       case Pos.Go(_)           => GameLogic.Go().id
+      case Pos.Backgammon(_)   => GameLogic.Backgammon().id
     }
     def typ = "promotion"
     def data =
@@ -759,8 +761,8 @@ object Event {
       Json
         .obj(
           "playerIndex" -> playerIndex,
-          "plies" -> plies,
-          "turns" -> turnCount
+          "plies"       -> plies,
+          "turns"       -> turnCount
         )
         .add("status" -> status)
         .add("winner" -> winner)

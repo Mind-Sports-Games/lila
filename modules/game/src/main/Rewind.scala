@@ -27,7 +27,8 @@ object Rewind {
             op = sans => Sans(sans.value.dropRight(1)),
             tags = createTags(initialFen, game)
           )
-      case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() | GameLogic.Go() =>
+      case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() | GameLogic.Go() |
+          GameLogic.Backgammon() =>
         Reader
           .replayResultFromActionStrs(
             game.variant.gameLogic,

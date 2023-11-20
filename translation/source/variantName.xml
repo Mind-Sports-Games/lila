@@ -42,4 +42,5 @@
   <string name="go9x9">Go 9x9</string>
   <string name="go13x13">Go 13x13</string>
   <string name="go19x19">Go 19x19</string>
+  <string name="backgammon">Backgammon</string>
 </resources>

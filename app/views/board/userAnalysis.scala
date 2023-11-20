@@ -21,7 +21,8 @@ object userAnalysis {
     Variant.FairySF(strategygames.fairysf.variant.Amazons),
     Variant.Go(strategygames.go.variant.Go9x9),
     Variant.Go(strategygames.go.variant.Go13x13),
-    Variant.Go(strategygames.go.variant.Go19x19)
+    Variant.Go(strategygames.go.variant.Go19x19),
+    Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
   )
 
   def analysisVariants =

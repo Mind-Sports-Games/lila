@@ -48,6 +48,7 @@ export const possiblePromotion = (
     case 'go9x9':
     case 'go13x13':
     case 'go19x19':
+    case 'backgammon':
       return false;
     case 'shogi':
       return (

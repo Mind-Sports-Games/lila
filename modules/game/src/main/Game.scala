@@ -347,6 +347,12 @@ case class Game(
       //  (updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? updated.displayScore
       //    .map(s => Event.Score(p1 = s.p1, p2 = s.p2))
       //    .toList
+      // TODO Backgammon how do we want to represent score?
+      else if (updated.board.variant.gameLogic == GameLogic.Backgammon())
+        //Is this even necessary as score is in the fen?
+        (updated.board.variant.key == "backgammon") ?? List(
+          Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
+        )
       else //chess. Is this even necessary as checkCount is in the fen?
         ((updated.board.variant.key == "threeCheck" || updated.board.variant.key == "fiveCheck") && game.situation.check) ?? List(
           Event.CheckCount(
@@ -360,7 +366,8 @@ case class Game(
   }
 
   def displayScore: Option[Score] =
-    if (variant.gameLogic == GameLogic.Togyzkumalak()) history.score.some
+    if (variant.gameLogic == GameLogic.Togyzkumalak() || variant.gameLogic == GameLogic.Backgammon())
+      history.score.some
     else if (variant.gameLogic == GameLogic.Go()) {
       if (finished || selectSquaresPossible) history.score.some
       else history.captures.some
