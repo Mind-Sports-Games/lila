@@ -27,8 +27,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.3
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d49085b3313eb5594f9851255910a664b0ac70b0(@babel/core@7.26.0)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.0))
+        specifier: file:../chessground
+        version: file:../chessground(@babel/core@7.26.0)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.0))
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
@@ -42,8 +42,8 @@ importers:
         specifier: ^3.2.5
         version: 3.3.3
       stratops:
-        specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat5.3
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/85ee38537cf4ff1c511296f6596dee7b59596d40
+        specifier: file:../stratops
+        version: file:../stratops
       typescript:
         specifier: ^5.6
         version: 5.6.3
@@ -1759,8 +1759,8 @@ packages:
     resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
     engines: {node: '>=10'}
 
-  caniuse-lite@1.0.30001680:
-    resolution: {integrity: sha512-rPQy70G6AGUMnbwS1z6Xg+RkHYPAi18ihs47GH0jcxIG7wArmPgY3XbS2sRdBbxJljp3thdT8BIqv9ccCypiPA==}
+  caniuse-lite@1.0.30001683:
+    resolution: {integrity: sha512-iqmNnThZ0n70mNwvxpEC2nBJ037ZHZUoBI5Gorh1Mw6IlEAZujEoU1tXA628iZfzm7R9FvFzxbfdgml82a3k8Q==}
 
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
@@ -1787,9 +1787,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d49085b3313eb5594f9851255910a664b0ac70b0:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d49085b3313eb5594f9851255910a664b0ac70b0}
-    version: 7.11.1-pstrat3.3
+  chessground@file:../chessground:
+    resolution: {directory: ../chessground, type: directory}
     engines: {node: '>=20', pnpm: ^9}
 
   chokidar@3.6.0:
@@ -2866,9 +2865,8 @@ packages:
   stockfish.wasm@0.10.0:
     resolution: {integrity: sha512-OTvOlz0ijCSmIb/YvOZ1Dn6vwZVS4Ge3N+RcV0d2b6LXUtCJ9UwmBHypRW3DZ+VXf8WNm7E3P+6jMTVvb3QaBg==}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/85ee38537cf4ff1c511296f6596dee7b59596d40:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/85ee38537cf4ff1c511296f6596dee7b59596d40}
-    version: 0.8.1-pstrat5.3
+  stratops@file:../stratops:
+    resolution: {directory: ../stratops, type: directory}
     engines: {node: '>=20', pnpm: ^9}
 
   string-argv@0.3.2:
@@ -4513,7 +4511,7 @@ snapshots:
 
   browserslist@4.24.2:
     dependencies:
-      caniuse-lite: 1.0.30001680
+      caniuse-lite: 1.0.30001683
       electron-to-chromium: 1.5.63
       node-releases: 2.0.18
       update-browserslist-db: 1.1.1(browserslist@4.24.2)
@@ -4534,7 +4532,7 @@ snapshots:
 
   camelcase@6.3.0: {}
 
-  caniuse-lite@1.0.30001680: {}
+  caniuse-lite@1.0.30001683: {}
 
   chalk@4.1.2:
     dependencies:
@@ -4561,7 +4559,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d49085b3313eb5594f9851255910a664b0ac70b0(@babel/core@7.26.0)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.0)):
+  chessground@file:../chessground(@babel/core@7.26.0)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.0)):
     dependencies:
       '@jest/globals': 29.7.0
       '@types/node': 20.12.2
@@ -5817,7 +5815,7 @@ snapshots:
 
   stockfish.wasm@0.10.0: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/85ee38537cf4ff1c511296f6596dee7b59596d40:
+  stratops@file:../stratops:
     dependencies:
       '@badrap/result': 0.2.8
 

@@ -996,6 +996,13 @@ object TournamentShield {
           7,
           1
         )
+    case object Abalone
+        extends Category(
+          Variant.Abalone(strategygames.abalone.variant.Abalone),
+          Blitz53,
+          21, // @TODO: same as BreakthroughTroyka
+          1
+        )
 
     val all: List[Category] = List(
       Chess,
@@ -1039,7 +1046,8 @@ object TournamentShield {
       Go19x19,
       Backgammon,
       Hyper,
-      Nackgammon
+      Nackgammon,
+      Abalone
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

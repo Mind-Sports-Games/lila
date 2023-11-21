@@ -32,6 +32,7 @@ import strategygames.samurai
 import strategygames.togyzkumalak
 import strategygames.go
 import strategygames.backgammon
+import strategygames.abalone
 import strategygames.format.Uci
 import strategygames.format.FEN
 import strategygames.variant.Variant
@@ -45,6 +46,7 @@ import strategygames.togyzkumalak.variant.{
 }
 import strategygames.go.variant.{ Variant => GoVariant, Go19x19 => GoStandard }
 import strategygames.backgammon.variant.{ Variant => BackgammonVariant, Backgammon => BackgammonStandard }
+import strategygames.abalone.variant.{ Variant => AbaloneVariant, Abalone => AbaloneStandard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
@@ -624,6 +626,54 @@ object BSONHandlers {
         (backgammonGame, defaultMetaData)
       }
 
+      def readAbaloneGame(r: BSON.Reader): (StratGame, Metadata) = {
+
+        val gameVariant = AbaloneVariant(r intD F.variant) | AbaloneStandard
+
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Abalone(), r bytesD F.oldPgn, playedPlies)
+
+        // def turnUcis(turnStr: Option[String]) = turnStr
+        //     .map(_.split(",").toList.flatMap(uci => abalone.format.Uci.apply(uci)))
+        //     .getOrElse(List.empty)
+
+        def turnUcis(turnStr: Option[String]) =
+          turnStr.map(_.split(",").toList.flatMap(abalone.format.Uci.apply)).getOrElse(List.empty)
+
+        val abaloneGame = StratGame.Abalone(
+          abalone.Game(
+            situation = abalone.Situation(
+              abalone.Board(
+                pieces = BinaryFormat.piece.readAbalone(r bytes F.binaryPieces, gameVariant),
+                history = abalone.History(
+                  lastTurn = turnUcis(r strO F.historyLastTurn),
+                  currentTurn = turnUcis(r strO F.historyCurrentTurn),
+                  //we can flatten as abalone does not have any multiaction games
+                  //TODO: Is halfMoveClock even doing anything for abalone?
+                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
+                    san.contains("x") || san.headOption.exists(_.isLower)
+                  ) atLeast 0,
+                  positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+                  score = {
+                    val counts = r.intsD(F.score)
+                    Score(~counts.headOption, ~counts.lastOption)
+                  }
+                ),
+                variant = gameVariant
+              ),
+              player = turnPlayerIndex
+            ),
+            actionStrs = actionStrs,
+            clock = clock,
+            plies = plies,
+            turnCount = turns,
+            startedAtPly = startedAtPly,
+            startedAtTurn = startedAtTurn
+          )
+        )
+
+        (abaloneGame, defaultMetaData)
+      }
+
       val libId = r intD F.lib
       val (stratGame, metadata) = libId match {
         case 0 => readChessGame(r)
@@ -633,6 +683,7 @@ object BSONHandlers {
         case 4 => readTogyzkumalakGame(r)
         case 5 => readGoGame(r)
         case 6 => readBackgammonGame(r)
+        case 7 => readAbaloneGame(r)
         case _ => sys.error("Invalid game in the database")
       }
 
@@ -781,6 +832,19 @@ object BSONHandlers {
               F.historyCurrentTurn -> o.history.currentTurnUciString,
               F.pocketData         -> o.board.pocketData,
               F.unusedDice         -> o.board.unusedDice.nonEmpty.option(o.board.unusedDice),
+              F.score              -> o.history.score.nonEmpty.option(o.history.score)
+            )
+          case GameLogic.Abalone() =>
+            $doc(
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
+              F.binaryPieces -> BinaryFormat.piece.writeAbalone(o.board match {
+                case Board.Abalone(board) => board.pieces
+                case _                    => sys.error("invalid abalone board")
+              }),
+              F.positionHashes     -> o.history.positionHashes,
+              F.historyLastTurn    -> o.history.lastTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString,
               F.score              -> o.history.score.nonEmpty.option(o.history.score)
             )
           case _ => //chess or fail

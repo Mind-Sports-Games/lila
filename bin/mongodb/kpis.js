@@ -147,6 +147,7 @@ db.user4.find().forEach(function (user) {
     oware_games: games.count({ us: uid, l: { $eq: 3 }, v: { $eq: 1 } }),
     togyzkumalak_games: games.count({ us: uid, l: { $eq: 4 }, v: { $eq: 1 } }),
     backgammon_games: games.count({ us: uid, l: { $eq: 6 }, v: { $eq: 1 } }),
+    abalone_games: games.count({ us: uid, l: { $eq: 7 }, v: { $eq: 1 } }),
     win: games.count({ wid: uid }),
     loss: games.count({ us: uid, s: { $in: [30, 31, 35, 33] }, wid: { $ne: uid } }),
     draw: games.count({ us: uid, s: { $in: [34, 32] } }),

@@ -232,6 +232,14 @@ object JsonView {
           "lib"       -> v.gameLogic.id,
           "boardSize" -> backgammonVariant.boardSize
         )
+      case Variant.Abalone(abaloneVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> abaloneVariant.boardSize
+        )
       case _ =>
         Json.obj(
           "key"   -> v.key,
@@ -280,6 +288,15 @@ object JsonView {
 
   implicit val boardSizeBackgammonWriter: Writes[strategygames.backgammon.Board.BoardSize] =
     Writes[strategygames.backgammon.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
+
+  //TODO: Abalone do we need to do anything different because of Hex boards here?
+  implicit val boardSizeAbaloneWriter: Writes[strategygames.abalone.Board.BoardSize] =
+    Writes[strategygames.abalone.Board.BoardSize] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

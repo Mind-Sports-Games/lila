@@ -46,5 +46,7 @@ export const perf = {
     backgammon: '',
     hyper: '',
     nackgammon: '',
+    //TODO Abalone set icon inline with SG
+    abalone: '›',
   },
 };

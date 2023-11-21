@@ -29,7 +29,8 @@ object userAnalysis {
         Variant.all(GameLogic.FairySF()) ++
         Variant.all(GameLogic.Samurai()) ++
         Variant.all(GameLogic.Togyzkumalak()) ++
-        Variant.all(GameLogic.Go())
+        Variant.all(GameLogic.Go()) ++
+        Variant.all(GameLogic.Abalone())
     )
       .filterNot(noAnalysisVariants.contains(_))
 

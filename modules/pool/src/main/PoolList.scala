@@ -33,7 +33,7 @@ object PoolList {
     PoolConfig(
       3 ++ 2,
       Wave(22 seconds, 30 players),
-      Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak)
+      Variant.Abalone(strategygames.abalone.variant.Abalone)
     ),
     PoolConfig(
       3 ++ 2,
