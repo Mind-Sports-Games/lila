@@ -95,6 +95,7 @@ const gameFamily: GameFamilyKey[] = [
   'togyzkumalak',
   'go',
   'backgammon',
+  'abalone',
 ];
 
 function gameFamilyOption(v: GameFamilyKey, sv: string) {

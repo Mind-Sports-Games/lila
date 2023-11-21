@@ -22,7 +22,8 @@ object userAnalysis {
     Variant.Go(strategygames.go.variant.Go9x9),
     Variant.Go(strategygames.go.variant.Go13x13),
     Variant.Go(strategygames.go.variant.Go19x19),
-    Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
+    Variant.Backgammon(strategygames.backgammon.variant.Backgammon),
+    Variant.Abalone(strategygames.abalone.variant.Abalone)
   )
 
   def analysisVariants =

@@ -113,6 +113,7 @@ object EvalCacheEntry {
       case Uci.GoPass(_)           => GameLogic.Go()
       case Uci.GoSelectSquares(_)  => GameLogic.Go()
       case Uci.BackgammonMove(_)   => GameLogic.Backgammon()
+      case Uci.AbaloneMove(_)      => GameLogic.Abalone()
     }
   }
 

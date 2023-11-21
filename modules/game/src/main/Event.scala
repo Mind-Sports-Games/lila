@@ -161,6 +161,7 @@ object Event {
           case StratMove.Samurai(move)      => strategygames.samurai.format.pgn.Dumper(move)
           case StratMove.Togyzkumalak(move) => strategygames.togyzkumalak.format.pgn.Dumper(move)
           case StratMove.Backgammon(move)   => strategygames.backgammon.format.pgn.Dumper(move)
+          case StratMove.Abalone(move)      => strategygames.abalone.format.pgn.Dumper(move)
         },
         fen =
           if (
@@ -546,6 +547,7 @@ object Event {
       case Pos.Togyzkumalak(_) => GameLogic.Togyzkumalak().id
       case Pos.Go(_)           => GameLogic.Go().id
       case Pos.Backgammon(_)   => GameLogic.Backgammon().id
+      case Pos.Abalone(_)      => GameLogic.Abalone().id
     }
     def typ = "promotion"
     def data =

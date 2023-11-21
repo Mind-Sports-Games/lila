@@ -72,7 +72,7 @@ object mini {
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
-          Variant.Go(_) | Variant.Backgammon(_) =>
+          Variant.Go(_) | Variant.Backgammon(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
@@ -116,6 +116,8 @@ object mini {
         val score = (if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
         "(" + score.toString().replace(".0", "") + ")"
       case "backgammon" =>
+        "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
+      case "abalone" =>
         "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
       case _ => ""
     }

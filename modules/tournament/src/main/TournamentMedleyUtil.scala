@@ -88,7 +88,8 @@ object TournamentMedleyUtil {
       "go9x9"         -> medium,
       "go13x13"       -> slow,
       "go19x19"       -> slow,
-      "backgammon"    -> medium
+      "backgammon"    -> medium,
+      "abalone"       -> medium
     )
   }
 

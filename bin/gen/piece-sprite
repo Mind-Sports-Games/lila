@@ -5,6 +5,7 @@ require 'base64'
 include FileUtils
 
 #TODO Add Backgammon
+#TODO Add Abalone. James can help here
 
 lila_dir = pwd()
 source_dir = lila_dir + '/public/piece/'

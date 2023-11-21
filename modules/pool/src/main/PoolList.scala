@@ -10,6 +10,7 @@ object PoolList {
 
   val all: List[PoolConfig] = List(
     //TODO Add Backgammon?
+    //TODO Add Abalone? Need to decide what we want in the lobby boxes as we are running out of space
     PoolConfig(1 ++ 0, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(

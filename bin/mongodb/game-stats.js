@@ -52,3 +52,4 @@ db.game5.aggregate([
 //src/main/scala/samurai/variant/Oware.scala:      id = 1,
 //src/main/scala/togyzkumalak/variant/Togyzkumalak.scala:      id = 1,
 //src/main/scala/backgammon/variant/Backgammon.scala:      id = 1,
+//src/main/scala/backgammon/variant/Abalone.scala:      id = 1,

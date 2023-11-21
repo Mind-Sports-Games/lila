@@ -148,7 +148,8 @@ trait Handlers {
         case StratFEN.Samurai(f)      => BSONString(s"3~${f.value}")
         case StratFEN.Togyzkumalak(f) => BSONString(s"4~${f.value}")
         case StratFEN.Go(f)           => BSONString(s"5~${f.value}")
-        case StratFEN.Backgammon(f) => BSONString(s"6~${f.value}")
+        case StratFEN.Backgammon(f)   => BSONString(s"6~${f.value}")
+        case StratFEN.Abalone(f)      => BSONString(s"7~${f.value}")
       }
   )
 
