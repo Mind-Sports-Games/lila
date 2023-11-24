@@ -366,8 +366,8 @@ case class Game(
       else history.captures.some
     } else none
 
-  def lastMoveKeys: Option[String] =
-    history.lastMove map {
+  def lastActionKeys: Option[String] =
+    history.lastAction map {
       case d: Uci.Drop          => s"${d.pos}${d.pos}"
       case m: Uci.Move          => m.keys
       case _: Uci.Pass          => "pass"
@@ -1078,7 +1078,8 @@ object Game {
     val captures          = "cp"
     val castleLastMove    = "cl"
     val kingMoves         = "km"
-    val historyLastMove   = "hlm"
+    val historyLastTurn   = "hlm" // was called historyLastMove hence hlm
+    val historyCurrentTurn= "hct"
     val unmovedRooks      = "ur"
     val daysPerTurn       = "cd"
     val plyTimes          = "mt" // was called moveTimes hence mt

@@ -130,6 +130,8 @@ object GameDiff {
             },
             writeBytes compose BinaryFormat.piece.writeChess
           )
+          d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+          d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
           d(positionHashes, _.history.positionHashes, w.bytes)
           dTry(
             unmovedRooks,
@@ -174,7 +176,8 @@ object GameDiff {
           }
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
-        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
         if (a.variant.frisianVariant || a.variant.draughts64Variant)
           dOptTry(
             kingMoves,
@@ -208,7 +211,8 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeFairySF
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
-        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
         if (a.variant.dropsVariant)
           dOpt(
             pocketData,
@@ -234,7 +238,8 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeSamurai
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
-        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
       }
       case GameLogic.Togyzkumalak() => {
         dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
@@ -247,7 +252,8 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeTogyzkumalak
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
-        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
         dOpt(
           score,
           _.history.score,
@@ -265,7 +271,8 @@ object GameDiff {
           writeBytes compose BinaryFormat.piece.writeGo
         )
         d(positionHashes, _.history.positionHashes, w.bytes)
-        d(historyLastMove, _.history.lastMove.map(_.uci) | "", w.str)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
         dOpt(
           score,
           _.history.score,
@@ -331,7 +338,7 @@ object GameDiff {
   private def makeCastleLastMove(g: Game) =
     CastleLastMove(
       lastMove = g.history match {
-        case History.Chess(h) => h.lastMove
+        case History.Chess(h) => h.lastAction
         case _                => sys.error("Wrong history type")
       },
       castles = g.history.castles

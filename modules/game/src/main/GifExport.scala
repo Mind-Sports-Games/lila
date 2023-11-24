@@ -51,7 +51,7 @@ final class GifExport(
       "p2"          -> Namer.playerTextBlocking(game.p2Player, withRating = true)(lightUserApi.sync),
       "orientation" -> game.naturalOrientation.name
     ) ::: List(
-      game.lastMoveKeys.map { "lastMove" -> _ },
+      game.lastActionKeys.map { "lastMove" -> _ },
       game.situation.checkSquare.map { "check" -> _.key }
     ).flatten
 

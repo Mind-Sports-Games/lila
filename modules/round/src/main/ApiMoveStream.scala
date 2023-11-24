@@ -51,7 +51,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
                   queue offer toJson(
                     Forsyth.exportBoard(s.board.variant.gameLogic, s.board),
                     s.player,
-                    s.board.history.lastMove.map(_.uci),
+                    s.board.history.lastAction.map(_.uci),
                     clk
                   )
                 }

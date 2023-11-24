@@ -325,7 +325,7 @@ final class JsonView(
         ), // app BC https://github.com/ornicar/lila/issues/7195
         "p1Color"  -> game.variant.playerColors(P1),
         "p2Color"  -> game.variant.playerColors(P2),
-        "lastMove" -> ~game.lastMoveKeys,
+        "lastMove" -> ~game.lastActionKeys,
         "p1"       -> ofPlayer(featured.p1, game player P1),
         "p2"       -> ofPlayer(featured.p2, game player P2)
       )
