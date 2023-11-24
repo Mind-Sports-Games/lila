@@ -134,7 +134,7 @@ object SetupBulk {
         "variant" -> variant.key,
         "clock" -> Json.obj(
           "limit" -> clock.limitSeconds,
-          // TODO: this doesn't work with Bronstein / USDelay
+          // TODO: the name of this field is no longer correct for all clocks (Bronstein/ Simple Delay) should we change it?
           "increment" -> clock.graceSeconds
         ),
         "rated"         -> mode.rated,

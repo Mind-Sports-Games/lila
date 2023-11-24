@@ -138,7 +138,8 @@ object BinaryFormat {
     def computeRemaining(config: ClockConfig, legacyElapsed: Centis) =
       config.limit - legacyElapsed
 
-    // TODO: deal with bronstein / us delay
+    // TODO: (Bronstein / SimpleDelay): Should we have a more explicit way of dealing with this?
+    //       For now, we're just re-using the increment field.
     def write(clock: Clock): ByteArray = {
       Array(writeClockLimit(clock.limitSeconds), clock.config.graceSeconds.toByte) ++
         writeSignedInt24(legacyElapsed(clock, P1).centis) ++

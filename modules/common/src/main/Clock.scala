@@ -40,7 +40,7 @@ object Clock {
       increment: Int,
       byoyomi: Option[Int],
       periods: Option[Int]
-  ): ClockConfig = // TODO: deal with Bronstein as well
+  ): ClockConfig =
     (useByoyomi, useBronsteinDelay, useSimpleDelay, byoyomi, periods) match {
       case (true, false, false, Some(byoyomi), Some(periods)) =>
         ByoyomiClock.Config(limit, increment, byoyomi, periods)
