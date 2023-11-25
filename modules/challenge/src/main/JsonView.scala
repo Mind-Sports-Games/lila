@@ -76,7 +76,8 @@ final class JsonView(
             Json.obj(
               "type"  -> "clock",
               "limit" -> clock.limitSeconds,
-              // TODO: this should be different for Bronstein/Byoyomi/SimpleDelay
+              // TODO: this should be renamed to better reflect that it also
+              //       represents Bronstein/Byoyomi/SimpleDelay
               "increment" -> clock.graceSeconds,
               "show"      -> clock.show
             )
