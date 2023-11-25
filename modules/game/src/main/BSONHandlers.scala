@@ -2,7 +2,6 @@ package lila.game
 
 import strategygames.{
   Player => PlayerIndex,
-  ClockBase,
   ClockConfig,
   Clock,
   ClockBase,

@@ -1,5 +1,6 @@
 package lila.bot
 
+import scala.concurrent.duration._
 import play.api.i18n.Lang
 import play.api.libs.json._
 
@@ -54,11 +55,11 @@ final class BotJsonView(
       uciMoves =>
         Json
           .obj(
-            "type"            -> "gameState",
-            "moves"           -> uciMoves.map(_.mkString(",")).mkString(" "),
-            "activeplayer"    -> game.activePlayer.name,
-            "wtime" -> millisOf(game.p1Pov),
-            "btime" -> millisOf(game.p2Pov),
+            "type"         -> "gameState",
+            "moves"        -> uciMoves.map(_.mkString(",")).mkString(" "),
+            "activeplayer" -> game.activePlayer.name,
+            "wtime"        -> millisOf(game.p1Pov),
+            "btime"        -> millisOf(game.p2Pov),
             // TODO: these two fields need to be tested for Bronstein and SimpleDelay and Fischer now
             "winc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),
             "binc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),

@@ -51,17 +51,17 @@ final class GameSearchApi(
         }).id,
         //The calculation here is subtely different to fullTurnCount/fullMoveNumber
         Fields.fullTurnsCompleted -> (game.turnCount + 1) / 2,
-        Fields.rated             -> game.rated,
-        Fields.perf              -> game.perfType.map(_.id),
-        Fields.uids              -> game.userIds.toArray.some.filterNot(_.isEmpty),
-        Fields.winner            -> game.winner.flatMap(_.userId),
-        Fields.loser             -> game.loser.flatMap(_.userId),
-        Fields.winnerPlayerIndex -> game.winner.fold(3)(_.playerIndex.fold(1, 2)),
-        Fields.averageRating     -> game.averageUsersRating,
-        Fields.ai                -> game.aiLevel,
-        Fields.date              -> (lila.search.Date.formatter print game.movedAt),
-        Fields.duration          -> game.durationSeconds, // for realtime games only
-        Fields.clockInit         -> game.clock.map(_.limitSeconds),
+        Fields.rated              -> game.rated,
+        Fields.perf               -> game.perfType.map(_.id),
+        Fields.uids               -> game.userIds.toArray.some.filterNot(_.isEmpty),
+        Fields.winner             -> game.winner.flatMap(_.userId),
+        Fields.loser              -> game.loser.flatMap(_.userId),
+        Fields.winnerPlayerIndex  -> game.winner.fold(3)(_.playerIndex.fold(1, 2)),
+        Fields.averageRating      -> game.averageUsersRating,
+        Fields.ai                 -> game.aiLevel,
+        Fields.date               -> (lila.search.Date.formatter print game.updatedAt),
+        Fields.duration           -> game.durationSeconds, // for realtime games only
+        Fields.clockInit          -> game.clock.map(_.limitSeconds),
         Fields.clockInc -> game.clock.map(_.config match {
           case fc: Clock.Config           => fc.incrementSeconds
           case _: Clock.BronsteinConfig   => 0

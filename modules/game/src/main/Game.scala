@@ -152,7 +152,7 @@ case class Game(
   def plyTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
       clk <- clock
-      inc = clk.incrementOf(playerIndex)
+      inc = Centis(clk.graceSeconds) // TODO: bronstein, this is probably wrong?
       byo = clk match {
         case bc: ByoyomiClock => bc.byoyomiOf(playerIndex)
         case _                => Centis(0)
@@ -1186,12 +1186,11 @@ sealed trait ClockHistory {
   val p2: Vector[Centis]
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory
   def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory
-
-  def record(playerIndex: PlayerIndex, clock: ClockBase, turn: Int): ClockHistory
   def reset(playerIndex: PlayerIndex): ClockHistory
   def apply(playerIndex: PlayerIndex): Vector[Centis]
-  def last(playerIndex: PlayerIndex): Option[Centis]
+  def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis]
   def size: Int
+  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis]
 }
 
 case class FischerClockHistory(
@@ -1202,15 +1201,14 @@ case class FischerClockHistory(
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     playerIndex.fold(copy(p1 = f(p1)), copy(p2 = f(p2)))
 
-  def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory =
+  override def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory =
     update(playerIndex, _ :+ clock.remainingTime(playerIndex))
   def reset(playerIndex: PlayerIndex)                 = update(playerIndex, _ => Vector.empty)
   def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
-  def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
+  override def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
     if (apply(playerIndex).size < plies) None
     else apply(playerIndex).takeRight(plies).headOption
   def size = p1.size + p2.size
-  def size                                            = p1.size + p2.size
 
   // first state is of the playerIndex that moved first.
   override def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
@@ -1220,13 +1218,14 @@ case class FischerClockHistory(
     )
 }
 
-
 case class ByoyomiClockHistory(
     byoyomi: Centis,
     p1: Vector[Centis] = Vector.empty,
     p2: Vector[Centis] = Vector.empty,
     periodEntries: PeriodEntries = PeriodEntries.default
 ) extends ClockHistory {
+
+  def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     updateInternal(playerIndex, f)
@@ -1254,6 +1253,12 @@ case class ByoyomiClockHistory(
 
   override def reset(playerIndex: PlayerIndex) =
     updateInternal(playerIndex, _ => Vector.empty).updatePeriods(playerIndex, _ => Vector.empty)
+
+  def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
+    if (apply(playerIndex).size < plies) None
+    else apply(playerIndex).takeRight(plies).headOption
+
+  def size = p1.size + p2.size
 
   def firstEnteredPeriod(playerIndex: PlayerIndex): Option[Int] =
     periodEntries(playerIndex).headOption
