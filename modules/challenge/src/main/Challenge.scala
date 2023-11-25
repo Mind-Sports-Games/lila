@@ -202,7 +202,8 @@ object Challenge {
     case class Clock(config: strategygames.ClockConfig) extends TimeControl {
       // All durations are expressed in seconds
       def limit = config.limit
-      // TODO: should be updatede to deal with Bronstein and SimpleDelay
+      // TODO: This should be renamed to properly reflect that it also
+      //       represents Bronstein and SimpleDelay and not just increment
       def increment = config.graceSeconds
       def show      = config.show
     }
