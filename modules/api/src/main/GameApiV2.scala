@@ -316,8 +316,9 @@ final class GameApiV2(
       .add("tournament" -> g.tournamentId)
       .add("clock" -> g.clock.map { clock =>
         Json.obj(
-          "initial"   -> clock.limitSeconds,
-          "increment" -> 0, // TODO: fix :'( clock.incrementSeconds,
+          "initial" -> clock.limitSeconds,
+          // TODO: We are reusing the 'increment' field for both increment and delay here which may be confusing in the future. [Bronstein]
+          "increment" -> clock.graceSeconds,
           "totalTime" -> clock.estimateTotalSeconds
         )
       })
