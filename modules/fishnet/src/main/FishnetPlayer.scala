@@ -72,7 +72,8 @@ final class FishnetPlayer(
               Work.Clock(
                 wtime = clk.remainingTime(P1).centis,
                 btime = clk.remainingTime(P2).centis,
-                inc = 0 /*TODO:clk.incrementSeconds*/
+                // TODO: this field should be renamed to better indicate that it also represents bronstein delay and simple delay
+                inc = clk.graceSeconds
               )
             }
           )
