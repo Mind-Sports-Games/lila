@@ -104,6 +104,11 @@ $go19x19-board-files: (
   'dark-wood': 'svg/go_board_dark_19x19.svg',
 );
 
+$backgammon-board-files: (
+  'classic': 'svg/backgammon_classic_board.svg',
+  'contemporary': 'svg/backgammon_contemporary_board.svg',
+);
+
 $chess-variants: (
   'standard',
   'chess960',
@@ -132,6 +137,8 @@ $flipello-variants: ('flipello'); // must use same board
 $oware-variants: ('oware'); // must use same board
 
 $togyzkumalak-variants: ('togyzkumalak'); // must use same board
+
+$backgammon-variants: ('backgammon'); // must use same board
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
@@ -210,6 +217,12 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 @each $color, $file in $go19x19-board-files {
   .go-#{$color} .variant-go19x19.is2d cg-board {
     background-image: url(../images/board/go/#{$file});
+  }
+}
+
+@each $color, $file in $backgammon-board-files {
+  .backgammon-#{$color} .variant-backgammon.is2d cg-board {
+    background-image: url(../images/board/backgammon/#{$file});
   }
 }
 
@@ -304,5 +317,13 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 @each $color, $file in $go19x19-board-files {
   .go-#{$color} .is2d .variant-go19x19 cg-board {
     background-image: url(../images/board/go/#{$file});
+  }
+}
+
+@each $variant in $backgammon-variants {
+  @each $color, $file in $backgammon-board-files {
+    .backgammon-#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/backgammon/#{$file});
+    }
   }
 }

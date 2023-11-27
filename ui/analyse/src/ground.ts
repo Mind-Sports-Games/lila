@@ -110,6 +110,10 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             ? 'https://playstrategy.org/assets/piece/go/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
               '/'
+            : variantKey === 'backgammon'
+            ? 'https://playstrategy.org/assets/piece/backgammon/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
+              '/'
             : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
@@ -133,10 +137,14 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
         cancel: hooks.onCancelDropMode,
       },
     },
+    draggable: {
+      enabled: pref.moveEvent !== Prefs.MoveEvent.Click && !['oware', 'backgammon'].includes(d.game.variant.key),
+      showGhost: pref.highlight,
+    },
     disableContextMenu: true,
     dimensions: d.game.variant.boardSize,
     variant: variantKey,
-    chess960: variantKey == 'chess960',
+    chess960: variantKey === 'chess960',
     onlyDropsVariant: d.onlyDropsVariant,
     singleClickMoveVariant:
       variantKey === 'togyzkumalak' ||

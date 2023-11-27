@@ -15,10 +15,10 @@
     "@build/rollupProject": "2.0.0"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#222-monsterchess",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#442-backgammon",
     "common": "2.0.0",
     "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#222-monsterchess"
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#442-backgammon"
   },
   "scripts": {
     "dev": "rollup --config",

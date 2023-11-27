@@ -127,6 +127,60 @@ coords {
       text-align: center;
     }
   }
+
+  .variant-backgammon & {
+    text-shadow: 0.5px -1px 0px rgba(0, 0, 0, 0.25), -0.5px 1px 0px rgba(255, 255, 255, 0.6);
+    .backgammon-classic & coord {
+      color: #edc966 !important;
+      padding-left: 0px;
+    }
+    .backgammon-contemporary & coord {
+      color: #0a8299 !important;
+      padding-left: 0px;
+    }
+    coord {
+      flex: 1 1;
+    }
+  }
+
+  .variant-backgammon .orientation-p1 &.files {
+    &.p1 {
+      left: 0;
+      padding-left: 6.66%;
+      padding-right: 6.66%;
+      bottom: 1.4em;
+      text-align: center;
+      flex-flow: row;
+    }
+    &.p2 {
+      left: 0;
+      padding-left: 6.66%;
+      padding-right: 6.66%;
+      top: 1.4em;
+      text-align: center;
+      flex-flow: row;
+    }
+  }
+
+  .variant-backgammon .orientation-p2 &.files {
+    &.p1 {
+      left: 0;
+      padding-left: 6.66%;
+      padding-right: 6.66%;
+      top: 1.4em;
+      text-align: center;
+      flex-flow: row;
+    }
+    &.p2 {
+      left: 0;
+      padding-left: 6.66%;
+      padding-right: 6.66%;
+      bottom: 1.4em;
+      text-align: center;
+      flex-flow: row;
+    }
+  }
+
   @each $variant in $go-variants {
     .variant-#{$variant} &.files {
       &.p1,
@@ -193,6 +247,10 @@ coords {
     display: none;
   }
 
+  .coords-out .variant-backgammon coords {
+    display: none;
+  }
+
   .coords-out .variant-togyzkumalak coords {
     display: none;
   }
@@ -218,6 +276,24 @@ coords {
     }
     &.p2 {
       bottom: 3px;
+    }
+  }
+
+  //always show for backgammon single column and make smaller
+  .variant-backgammon .orientation-p1 coords.files {
+    &.p1 {
+      bottom: 0.7em;
+    }
+    &.p2 {
+      top: 0.7em;
+    }
+  }
+  .variant-backgammon .orientation-p2 coords.files {
+    &.p1 {
+      top: 0.7em;
+    }
+    &.p2 {
+      bottom: 0.7em;
     }
   }
 }

@@ -93,7 +93,8 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     draggable: {
-      enabled: data.pref.moveEvent !== Prefs.MoveEvent.Click,
+      enabled:
+        data.pref.moveEvent !== Prefs.MoveEvent.Click && !['oware', 'backgammon'].includes(data.game.variant.key),
       showGhost: data.pref.highlight,
     },
     selectable: {

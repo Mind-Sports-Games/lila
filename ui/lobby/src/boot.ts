@@ -9,15 +9,15 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   opts.element = document.querySelector('.lobby__app') as HTMLElement;
   opts.pools = [
     // mirrors modules/pool/src/main/PoolList.scala (ids)
-    {
-      id: '1+0-standard',
-      lim: 1,
-      inc: 0,
-      perf: 'Blitz',
-      variant: 'standard',
-      variantDisplayName: 'Chess',
-      variantId: '0_1',
-    },
+    // {
+    //   id: '1+0-standard',
+    //   lim: 1,
+    //   inc: 0,
+    //   perf: 'Blitz',
+    //   variant: 'standard',
+    //   variantDisplayName: 'Chess',
+    //   variantId: '0_1',
+    // },
     {
       id: '3+2-standard',
       lim: 3,
@@ -109,6 +109,15 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variant: 'go19x19',
       variantDisplayName: 'Go 19x19',
       variantId: '9_4',
+    },
+    {
+      id: '5+3-backgammon',
+      lim: 5,
+      inc: 3,
+      perf: 'Backgammon',
+      variant: 'backgammon',
+      variantDisplayName: 'Backgammon',
+      variantId: '10_1',
     },
   ];
   const nbRoundSpread = spreadNumber('#nb_games_in_play > strong', 8),

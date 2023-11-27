@@ -422,8 +422,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
-  //Togyzkumalak board always has coodinates on the inside
-  if (['togyzkumalak'].includes(variantKey)) {
+  //Togyzkumalak and backgammon board always has coodinates on the inside
+  if (['togyzkumalak', 'backgammon'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-out').addClass('coords-in');
     }
@@ -440,6 +440,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'go9x9',
     'go13x13',
     'go19x19',
+    'backgammon',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

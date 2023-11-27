@@ -15,7 +15,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -78,6 +78,10 @@ export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey)
   return ['oware', 'togyzkumalak'].includes(key);
 }
 
+export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['backgammon'].includes(key);
+}
+
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
   return variantUsesUCINotation(key)
     ? 'uci'
@@ -91,6 +95,8 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
     ? 'dpg'
     : variantUsesMancalaNotation(key)
     ? 'man'
+    : variantUsesBackgammonNotation(key)
+    ? 'bkg'
     : 'san';
 }
 
@@ -123,6 +129,7 @@ const noFishnetVariants: VariantKey[] = [
   'go9x9',
   'go13x13',
   'go19x19',
+  'backgammon',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;

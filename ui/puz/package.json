@@ -14,10 +14,10 @@
     "prod": "yarn run compile"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#222-monsterchess",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#442-backgammon",
     "common": "2.0.0",
     "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#222-monsterchess"
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#442-backgammon"
   },
   "devDependencies": {
     "@types/cash": "8.0.0",

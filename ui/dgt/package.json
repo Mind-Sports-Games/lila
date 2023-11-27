@@ -10,7 +10,7 @@
     "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#222-monsterchess"
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#442-backgammon"
   },
   "scripts": {
     "dev": "rollup --config",

@@ -70,6 +70,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? { width: 13, height: 13 }
             : $el.hasClass('variant-go19x19')
             ? { width: 19, height: 19 }
+            : $el.hasClass('variant-backgammon')
+            ? { width: 12, height: 2 }
             : { width: 8, height: 8 },
           variant: $el.hasClass('variant-shogi')
             ? 'shogi'
@@ -93,6 +95,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? 'go13x13'
             : $el.hasClass('variant-go19x19')
             ? 'go19x19'
+            : $el.hasClass('variant-backgammon')
+            ? 'backgammon'
             : 'standard',
         })
       );

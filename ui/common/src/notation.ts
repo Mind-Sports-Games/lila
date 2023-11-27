@@ -30,6 +30,8 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
       return destPosGo;
     case 'man':
       return mancalaNotation;
+    case 'bkg':
+      return backgammonNotation;
   }
 }
 
@@ -444,4 +446,12 @@ function nextAsciiLetter(letter: string, n: number): string {
 
 export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
+}
+
+function backgammonNotation(move: ExtendedMoveInfo, _: Variant): string {
+  //TODO complete backgammon notation (will need full list of actions for turn)
+  const reg = move.uci.match(/[a-lsA-LS][1-2@]/g) as string[];
+  const orig = reg[0];
+  const dest = reg[1];
+  return `${orig}${dest}`;
 }

@@ -235,6 +235,15 @@ object Tv {
           familyChannel = true,
           gameFamily = "go"
         )
+    case object BackgammonFamily
+        extends Channel(
+          name = s"All ${GameGroup(10).name}",
+          icon = BV.Backgammon.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(anyVariant(GameGroup(10).variants), noBot),
+          familyChannel = true,
+          gameFamily = "backgammon"
+        )
     case object Bullet
         extends Channel(
           name = S.Bullet.name,
@@ -678,6 +687,7 @@ object Tv {
       Go19x19,
       Go13x13,
       Go9x9,
+      BackgammonFamily,
       Backgammon,
       Bot,
       Computer

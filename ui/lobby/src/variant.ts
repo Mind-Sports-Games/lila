@@ -38,7 +38,8 @@ const variantConfirms = {
   go9x9: 'This is a 9 by 9 Go game!\n\n The aim of the game is to surround the largest area(s) with your stones',
   go13x13: 'This is a 13 by 13 Go game!\n\n The aim of the game is to surround the largest area(s) with your stones',
   go19x19: 'This is a 19 by 19 Go game!\n\n The aim of the game is to surround the largest area(s) with your stones',
-  backgammon: 'This is a Backgammon game!\n\nThe aim of the game is to get all your pieces into the end zone first.',
+  backgammon:
+    'This is a Backgammon game!\n\nThe aim of the game is to get all your pieces into the end zone, and then take them all off the board first.',
 };
 
 function storageKey(key) {
