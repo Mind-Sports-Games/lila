@@ -127,7 +127,7 @@ case class HookConfig(
           variant = game.variant,
           timeMode = TimeMode ofGame game,
           time = game.clock.map(_.limitInMinutes) | time,
-          // TODO: this doesn't work with bronstein / SimpleDelay
+          // TODO: We are reusing the name 'increment' even for Bronstein and Simple Delay. This should probably be renamed
           increment = game.clock.map(_.config.graceSeconds) | increment,
           byoyomi = 0,
           periods = 0,
