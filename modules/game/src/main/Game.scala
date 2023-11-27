@@ -220,6 +220,8 @@ case class Game(
       b <- plyTimes(!startPlayerIndex)
     } yield Sequence.interleave(a, b)
 
+  // TODO: I admit I haven't tested this change as much as I would have liked
+  //       We should probably test it.
   def bothClockStates: Option[Vector[Centis]] =
     clockHistory.map(_.bothClockStates(startPlayerIndex))
 
