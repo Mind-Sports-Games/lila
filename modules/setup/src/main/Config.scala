@@ -84,8 +84,8 @@ private[setup] trait Config {
         Clock.SimpleDelayConfig((time * 60).toInt, if (clockHasSimpleDelayTime) increment else 1)
       case TimeMode.BronsteinDelayClock =>
         Clock.BronsteinConfig((time * 60).toInt, if (clockHasBronsteinDelayTime) increment else 1)
-      // NOTE: This could would have always returned a Clock.Config before. The reason
-      //       why I'm not using the default clause, is I want this code to not compile
+      // NOTE: This would have always returned a Clock.Config before anywys. The reason
+      //       why I'm not using the case _ => clause, is I want this code to not compile
       //       when we add new clocks in the future.
       case TimeMode.Correspondence | TimeMode.FischerClock | TimeMode.Unlimited =>
         Clock.Config((time * 60).toInt, if (clockHasFischerTime) increment else 1)
