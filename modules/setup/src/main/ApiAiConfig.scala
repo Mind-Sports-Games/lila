@@ -23,7 +23,7 @@ final case class ApiAiConfig(
   val strictFen = false
 
   val days = ~daysO
-  // TODO: this should be reconsidered for Bronstein and SimpleDelay
+  // TODO: We are reusing the increment field for the Bronstein Delay and Simple Delay. This should probably be renamed
   val increment = clock.??(_.graceSeconds)
   val time      = clock.??(_.limit.roundSeconds / 60)
   val byoyomi = clock match {
