@@ -152,7 +152,7 @@ case class Game(
   def plyTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
       clk <- clock
-      inc = Centis(clk.graceSeconds) // TODO: bronstein, this is probably wrong?
+      grace = Centis(clk.graceOf(playerIndex))
       byo = clk match {
         case bc: ByoyomiClock => bc.byoyomiOf(playerIndex)
         case _                => Centis(0)
@@ -162,10 +162,10 @@ case class Game(
     } yield Centis(0) :: {
       val pairs = clocks.iterator zip clocks.iterator.drop(1)
 
-      // We need to determine if this playerIndex's last clock had inc applied.
+      // We need to determine if this playerIndex's last clock had grace applied.
       // if finished and history.size == playedPlies then game was ended
       // by a players ply, such as with mate or autodraw. In this case,
-      // the last ply of the game, and the only one without inc, is the
+      // the last ply of the game, and the only one without grace, is the
       // last entry of the clock history for !turnPlayerIndex.
       //
       // On the other hand, if history.size is more than playedPlies,
@@ -195,15 +195,15 @@ case class Game(
           val fullTurnCount = index + 2 + stratGame.startedAtTurn / 2
           val afterByoyomi  = byoyomiStart ?? (_ <= fullTurnCount)
           // after byoyomi we store movetimes directly, not remaining time
-          val mt   = if (afterByoyomi) second else first - second
-          val cInc = (!afterByoyomi && (pairs.hasNext || !noLastInc)) ?? inc
+          val mt     = if (afterByoyomi) second else first - second
+          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc)) ?? grace
 
           if (!pairs.hasNext && byoyomiTimeout) {
             val prevTurnByoyomi = byoyomiStart ?? (_ < fullTurnCount)
             (if (prevTurnByoyomi) byo else first) + byo * byoyomiHistory.fold(0)(
               _.countSpentPeriods(playerIndex, fullTurnCount)
             )
-          } else mt + cInc
+          } else mt + cGrace
         } nonNeg
       } toList
     }
