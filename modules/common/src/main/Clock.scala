@@ -47,7 +47,7 @@ object Clock {
       case (false, true, false, _, _) =>
         StratClock.BronsteinConfig(limit, increment)
       case (false, false, true, _, _) =>
-        StratClock.SimpleDelayConfig(limit.pp("limitSeconds"), increment.pp("delay"))
+        StratClock.SimpleDelayConfig(limit, increment)
       case _ =>
         StratClock.Config(limit, increment)
     }

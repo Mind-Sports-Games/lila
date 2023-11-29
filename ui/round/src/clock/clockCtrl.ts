@@ -28,8 +28,7 @@ export type BaseClockData = {
   moretime: number;
 };
 
-export type FischerClockData = BaseClockData & {
-};
+export type FischerClockData = BaseClockData;
 
 export type ByoyomiClockData = BaseClockData & {
   byoyomi: Seconds;
@@ -40,12 +39,12 @@ export type ByoyomiClockData = BaseClockData & {
 
 export type BronsteinDelayData = BaseClockData & {
   delay: Seconds;
-  delayType: "bronstein";
+  delayType: 'bronstein';
 };
 
 export type SimpleDelayData = BaseClockData & {
   delay: Seconds;
-  delayType: "usdelay";
+  delayType: 'usdelay';
 };
 
 export type ClockData = FischerClockData | ByoyomiClockData | BronsteinDelayData | SimpleDelayData;
@@ -59,11 +58,11 @@ export const isFischer = (clock: ClockData): clock is FischerClockData => {
 };
 
 export const isBronstein = (clock: ClockData): clock is BronsteinDelayData => {
-  return clock.delayType === "bronstein";
+  return clock.delayType === 'bronstein';
 };
 
 export const isSimpleDelay = (clock: ClockData): clock is SimpleDelayData => {
-  return clock.delayType === "usdelay";
+  return clock.delayType === 'usdelay';
 };
 
 interface Times {
@@ -132,6 +131,7 @@ export class ClockController {
 
   byoyomiData?: ByoyomiCtrlData;
   countdownDelay?: Millis;
+  delay?: Millis;
   goneBerserk: PlayerIndexMap<boolean> = { p1: false, p2: false };
 
   private tickCallback?: number;
@@ -146,6 +146,9 @@ export class ClockController {
     }
     if (isSimpleDelay(cdata)) {
       this.countdownDelay = cdata.delay;
+    }
+    if (isSimpleDelay(cdata) || isBronstein(cdata)) {
+      this.delay = cdata.delay;
     }
     if (isByoyomi(cdata)) {
       this.byoyomiData = new ByoyomiCtrlData();
@@ -200,9 +203,9 @@ export class ClockController {
 
   setClock = (d: RoundData, p1: Seconds, p2: Seconds, p1Per = 0, p2Per = 0, delay: Centis = 0) => {
     const paused =
-      !!d.opponent.offeringSelectSquares ||
-      !!d.player.offeringSelectSquares ||
-      !(!d.deadStoneOfferState || d.deadStoneOfferState === 'RejectedOffer'),
+        !!d.opponent.offeringSelectSquares ||
+        !!d.player.offeringSelectSquares ||
+        !(!d.deadStoneOfferState || d.deadStoneOfferState === 'RejectedOffer'),
       isClockRunning = game.playable(d) && !paused && (game.bothPlayersHavePlayed(d) || d.clock!.running),
       delayMs = delay * 10;
 
@@ -330,12 +333,16 @@ export class ClockController {
   delayMillisOf = (playerIndex: PlayerIndex): Millis => {
     // TODO: We need to take into account berserk.
     const isBerserk = this.goneBerserk[playerIndex];
-    const countDownMillis = isBerserk ? 0 : (this.countdownDelay ?? 0);
-    const delayMillis = 1000 * countDownMillis;
-    return this.times.activePlayerIndex === playerIndex
-      ? Math.max(0, delayMillis - this.elapsed())
-      : delayMillis;
-  }
+    const countDown = isBerserk ? 0 : this.countdownDelay ?? 0;
+    const delayMillis = 1000 * countDown;
+    return this.times.activePlayerIndex === playerIndex ? Math.max(0, delayMillis - this.elapsed()) : delayMillis;
+  };
+
+  isInDelay = (playerIndex: PlayerIndex): boolean => {
+    if (this.delay) {
+      return this.isRunning() && this.elapsed() <= 1000 * this.delay && !this.goneBerserk[playerIndex];
+    } else return false;
+  };
 
   isRunning = () => this.times.activePlayerIndex !== undefined;
 }

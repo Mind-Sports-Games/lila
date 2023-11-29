@@ -18,7 +18,8 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   const clock = ctrl.clock!,
     millis = clock.millisOf(player.playerIndex),
     isPlayer = ctrl.data.player.playerIndex === player.playerIndex,
-    isRunning = player.playerIndex === clock.times.activePlayerIndex;
+    isRunning = player.playerIndex === clock.times.activePlayerIndex,
+    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[player.playerIndex];
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
       millis = clock.millisOf(player.playerIndex),
@@ -26,7 +27,23 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       isRunning = player.playerIndex === clock.times.activePlayerIndex;
     els.time = el;
     els.clock = el.parentElement!;
-    el.innerHTML = formatClockTime(millis, delayMillis, clock.showTenths(millis), isRunning, clock.opts.nvui);
+    el.innerHTML = formatClockTime(
+      millis,
+      delayMillis,
+      clock.showTenths(millis),
+      isRunning,
+      showDelayTime,
+      clock.opts.nvui
+    );
+    const cl = els.time.classList;
+    if (clock.isInDelay(player.playerIndex) && isRunning) {
+      cl.remove('notindelay');
+      cl.add('indelay');
+    } else if (cl.contains('indelay') && isRunning) {
+      clock.emergSound.lowtime(); //move to ctrl?
+      cl.remove('indelay');
+      cl.add('notindelay');
+    } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
   };
   const timeHook: Hooks = {
     insert: vnode => update(vnode.elm as HTMLElement),
@@ -43,28 +60,28 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
     },
     clock.opts.nvui
       ? [
-        h('div.clock-byo', [
-          h('div.time', {
-            attrs: { role: 'timer' },
-            hook: timeHook,
-          }),
-        ]),
-      ]
+          h('div.clock-byo', [
+            h('div.time', {
+              attrs: { role: 'timer' },
+              hook: timeHook,
+            }),
+          ]),
+        ]
       : [
-        clock.showBar && game.bothPlayersHavePlayed(ctrl.data) ? showBar(ctrl, player.playerIndex) : undefined,
-        h('div.clock-byo', [
-          h('div.time', {
-            class: {
-              hour: millis > 3600 * 1000,
-            },
-            hook: timeHook,
-          }),
-          renderByoyomiTime(clock, player.playerIndex, ctrl.goneBerserk[player.playerIndex]),
-        ]),
-        renderBerserk(ctrl, player.playerIndex, position),
-        isPlayer ? goBerserk(ctrl) : button.moretime(ctrl),
-        tourRank(ctrl, player.playerIndex, position),
-      ]
+          clock.showBar && game.bothPlayersHavePlayed(ctrl.data) ? showBar(ctrl, player.playerIndex) : undefined,
+          h('div.clock-byo', [
+            h('div.time', {
+              class: {
+                hour: millis > 3600 * 1000,
+              },
+              hook: timeHook,
+            }),
+            renderByoyomiTime(clock, player.playerIndex, ctrl.goneBerserk[player.playerIndex]),
+          ]),
+          renderBerserk(ctrl, player.playerIndex, position),
+          isPlayer ? goBerserk(ctrl) : button.moretime(ctrl),
+          tourRank(ctrl, player.playerIndex, position),
+        ]
   );
 }
 
@@ -84,7 +101,14 @@ const renderByoyomiTime = (clock: ClockController, playerIndex: PlayerIndex, ber
   );
 };
 
-function formatClockTime(time: Millis, delay: Millis, showTenths: boolean, isRunning: boolean, nvui: boolean) {
+function formatClockTime(
+  time: Millis,
+  delay: Millis,
+  showTenths: boolean,
+  isRunning: boolean,
+  showDelayTime: boolean,
+  nvui: boolean
+) {
   const displayDate = new Date(Math.max(0, time - delay));
   const tickDate = new Date(time);
   if (nvui)
@@ -98,7 +122,9 @@ function formatClockTime(time: Millis, delay: Millis, showTenths: boolean, isRun
   const displayMillis = displayDate.getUTCMilliseconds(),
     tickMillis = tickDate.getUTCMilliseconds(),
     sep = isRunning && tickMillis < 500 ? sepLow : sepHigh,
-    baseStr = pad2(displayDate.getUTCMinutes()) + sep + pad2(displayDate.getUTCSeconds());
+    baseStr = pad2(displayDate.getUTCMinutes()) + sep + pad2(displayDate.getUTCSeconds()),
+    delayString = '<delay>' + pad2(Math.ceil(delay / 1000)) + '</delay>';
+
   if (time >= 3600000) {
     const hours = pad2(Math.floor(time / 3600000));
     return hours + sepHigh + baseStr;
@@ -107,8 +133,11 @@ function formatClockTime(time: Millis, delay: Millis, showTenths: boolean, isRun
     if (!isRunning && time < 1000) {
       tenthsStr += '<huns>' + (Math.floor(displayMillis / 10) % 10) + '</huns>';
     }
-
-    return baseStr + '<tenths><sep>.</sep>' + tenthsStr + '</tenths>';
+    let delayStr = '';
+    if (showDelayTime) delayStr += delayString;
+    return baseStr + '<tenths><sep>.</sep>' + tenthsStr + '</tenths>' + delayStr;
+  } else if (showDelayTime) {
+    return baseStr + delayString;
   } else {
     return baseStr;
   }
@@ -152,8 +181,28 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
 }
 
 export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, playerIndex: PlayerIndex) {
-  const delayMillis = clock.delayMillisOf(playerIndex);
-  if (els.time) els.time.innerHTML = formatClockTime(millis, delayMillis, clock.showTenths(millis), true, clock.opts.nvui);
+  const delayMillis = clock.delayMillisOf(playerIndex),
+    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[playerIndex],
+    isRunning = playerIndex === clock.times.activePlayerIndex;
+  if (els.time) {
+    els.time.innerHTML = formatClockTime(
+      millis,
+      delayMillis,
+      clock.showTenths(millis),
+      true,
+      showDelayTime,
+      clock.opts.nvui
+    );
+    const cl = els.time.classList;
+    if (clock.isInDelay(playerIndex) && isRunning) {
+      cl.remove('notindelay');
+      cl.add('indelay');
+    } else if (cl.contains('indelay') && isRunning) {
+      clock.emergSound.lowtime(); //move to ctrl?
+      cl.remove('indelay');
+      cl.add('notindelay');
+    } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
+  }
   if (els.bar) els.bar.style.transform = 'scale(' + clock.timeRatio(millis, playerIndex) + ',1)';
   if (els.clock) {
     const cl = els.clock.classList;
@@ -189,11 +238,11 @@ function tourRank(ctrl: RoundController, playerIndex: PlayerIndex, position: Pos
     ranks = d.tournament?.ranks || d.swiss?.ranks;
   return ranks && !showBerserk(ctrl, playerIndex)
     ? h(
-      'div.tour-rank.' + position,
-      {
-        attrs: { title: 'Current tournament rank' },
-      },
-      '#' + ranks[playerIndex]
-    )
+        'div.tour-rank.' + position,
+        {
+          attrs: { title: 'Current tournament rank' },
+        },
+        '#' + ranks[playerIndex]
+      )
     : null;
 }
