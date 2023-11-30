@@ -2,7 +2,7 @@ package lila.game
 
 import strategygames.Status
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Standard, FromPosition }
+import strategygames.chess.variant.{ FromPosition, Standard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 
@@ -108,7 +108,7 @@ object Query {
   def checkableOld = F.checkAt $lt DateTime.now.minusHours(1)
 
   def variant(v: Variant) =
-    $doc(F.variant -> (if (v.standard) $exists(false) else $int(v.id)))
+    $doc(F.variant -> (if (v == Variant.Chess(Standard)) $exists(false) else $int(v.id)))
 
   lazy val variantStandard = variant(Variant.Chess(Standard))
 

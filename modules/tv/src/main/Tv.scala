@@ -364,6 +364,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "chess"
         )
+    case object Monster
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(CV.Monster)),
+          icon = CV.Monster.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(CV.Monster)), noBot),
+          familyChannel = false,
+          gameFamily = "chess"
+        )
     case object UltraBullet
         extends Channel(
           name = S.UltraBullet.name,
@@ -626,6 +635,7 @@ object Tv {
       Horde,
       RacingKings,
       NoCastling,
+      Monster,
       UltraBullet,
       DraughtsFamily,
       International,

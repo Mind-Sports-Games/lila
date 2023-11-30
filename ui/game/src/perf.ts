@@ -14,6 +14,7 @@ export const perf = {
     atomic: '>',
     horde: '_',
     noCastling: '',
+    monster: '',
     linesOfAction: '',
     scrambledEggs: '',
     international: '',

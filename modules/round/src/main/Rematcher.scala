@@ -2,6 +2,7 @@ package lila.round
 
 import strategygames.format.Forsyth
 import strategygames.format.FEN
+import strategygames.format.Uci
 import strategygames.chess.variant._
 import strategygames.variant.Variant
 import strategygames.{
@@ -164,7 +165,8 @@ final private class Rematcher(
           Board(game.variant.gameLogic, pieces, variant = game.variant).withHistory(
             History(
               game.variant.gameLogic,
-              lastMove = situation.flatMap(_.situation.board.history.lastMove),
+              lastTurn = situation.fold[List[Uci]](List.empty)(_.situation.board.history.lastTurn),
+              currentTurn = situation.fold[List[Uci]](List.empty)(_.situation.board.history.currentTurn),
               castles = situation.fold(Castles.init)(_.situation.board.history.castles)
             )
           )

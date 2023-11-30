@@ -63,6 +63,7 @@ object TournamentMedleyUtil {
       "racingKings"   -> fastest,
       "crazyhouse"    -> quick,
       "noCastling"    -> medium,
+      "monster"       -> medium,
       "linesOfAction" -> fastest,
       "scrambledEggs" -> fastest,
       "frisian"       -> medium,
@@ -101,7 +102,8 @@ object TournamentMedleyUtil {
       "atomic"        -> quick,
       "horde"         -> slow,
       "racingKings"   -> quick,
-      "crazyhouse"    -> medium
+      "crazyhouse"    -> medium,
+      "monster"       -> medium
     )
   }
 

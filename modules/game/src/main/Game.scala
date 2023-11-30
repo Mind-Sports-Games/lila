@@ -94,8 +94,8 @@ case class Game(
   def opponent(c: PlayerIndex): Player = player(!c)
 
   lazy val naturalOrientation = variant match {
-    case Variant.Chess(v) if v.racingKings => P1
-    case _                                 => PlayerIndex.fromP1(p1Player before p2Player)
+    case Variant.Chess(strategygames.chess.variant.RacingKings) => P1
+    case _                                                      => PlayerIndex.fromP1(p1Player before p2Player)
   }
 
   def turnPlayerIndex = stratGame.player
@@ -335,7 +335,7 @@ case class Game(
         )
       else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.togyzkumalak) ?? List(
+        (updated.board.variant.key == "togyzkumalak") ?? List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       //TODO: Review these extra pieces of info. This was determined unncecessary for Go
@@ -348,7 +348,7 @@ case class Game(
       //    .map(s => Event.Score(p1 = s.p1, p2 = s.p2))
       //    .toList
       else //chess. Is this even necessary as checkCount is in the fen?
-        ((updated.board.variant.threeCheck || updated.board.variant.fiveCheck) && game.situation.check) ?? List(
+        ((updated.board.variant.key == "threeCheck" || updated.board.variant.key == "fiveCheck") && game.situation.check) ?? List(
           Event.CheckCount(
             p1 = updated.history.checkCount.p1,
             p2 = updated.history.checkCount.p2
@@ -366,8 +366,8 @@ case class Game(
       else history.captures.some
     } else none
 
-  def lastMoveKeys: Option[String] =
-    history.lastMove map {
+  def lastActionKeys: Option[String] =
+    history.lastAction map {
       case d: Uci.Drop          => s"${d.pos}${d.pos}"
       case m: Uci.Move          => m.keys
       case _: Uci.Pass          => "pass"
@@ -662,10 +662,10 @@ case class Game(
   def analysable = replayable && playedTurns > 4 && Game.analysableVariants(variant)
 
   def ratingVariant =
-    if (isTournament && variant.fromPosition) Variant.libStandard(variant.gameLogic)
+    if (isTournament && variant.fromPositionVariant) Variant.libStandard(variant.gameLogic)
     else variant
 
-  def fromPosition = variant.fromPosition || source.??(Source.Position ==)
+  def fromPosition = variant.fromPositionVariant || source.??(Source.Position ==)
 
   def imported = source contains Source.Import
 
@@ -759,7 +759,7 @@ case class Game(
           case Rapid       => 30
           case _           => 35
         }
-      if (variant.chess960) base * 2
+      if (variant.key == "chess960") base * 2
       else if (isTournament && (variant.draughts64Variant) && metadata.simulPairing.isDefined) base + 10
       else base
     }
@@ -956,7 +956,7 @@ object Game {
   //    game.createdAt.isBefore(Game.hordeP1PawnsSince)
 
   def allowRated(variant: Variant, clock: Option[ClockConfig]) =
-    variant.standard || {
+    variant.key == "standard" || {
       clock ?? { c =>
         c.estimateTotalTime >= Centis(3000) &&
         c.limitSeconds > 0 || c.incrementSeconds > 1
@@ -1078,7 +1078,8 @@ object Game {
     val captures          = "cp"
     val castleLastMove    = "cl"
     val kingMoves         = "km"
-    val historyLastMove   = "hlm"
+    val historyLastTurn   = "hlm" // was called historyLastMove hence hlm
+    val historyCurrentTurn= "hct"
     val unmovedRooks      = "ur"
     val daysPerTurn       = "cd"
     val plyTimes          = "mt" // was called moveTimes hence mt
