@@ -28,6 +28,7 @@ export function makeConfig(ctrl: RoundController): Config {
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: data.game.variant.key == 'togyzkumalak',
+    dice: data.game.variant.key == 'backgammon' ? [6, 3] : [], //todo get from data when available
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {

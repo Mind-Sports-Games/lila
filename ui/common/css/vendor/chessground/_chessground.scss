@@ -1153,3 +1153,76 @@ cg-container .cg-custom-svgs svg {
     margin-bottom: 5px;
   }
 }
+
+.variant-backgammon {
+  cg-dice {
+    width: calc(100% * 6 / 15);
+    top: 45.5%;
+    height: 9%;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-evenly;
+    position: absolute;
+    dice {
+      width: calc(100% * 15 * 9 / 600);
+    }
+    &.p1 {
+      left: calc(100% * 8 / 15);
+      dice {
+        &.one {
+          background: url(../images/board/backgammon/svg/dice/red1.svg);
+          background-size: cover;
+        }
+        &.two {
+          background: url(../images/board/backgammon/svg/dice/red2.svg);
+          background-size: cover;
+        }
+        &.three {
+          background: url(../images/board/backgammon/svg/dice/red3.svg);
+          background-size: cover;
+        }
+        &.four {
+          background: url(../images/board/backgammon/svg/dice/red4.svg);
+          background-size: cover;
+        }
+        &.five {
+          background: url(../images/board/backgammon/svg/dice/red5.svg);
+          background-size: cover;
+        }
+        &.six {
+          background: url(../images/board/backgammon/svg/dice/red6.svg);
+          background-size: cover;
+        }
+      }
+    }
+    &.p2 {
+      left: calc(100% * 1 / 15);
+      dice {
+        &.one {
+          background: url(../images/board/backgammon/svg/dice/yellow1.svg);
+          background-size: cover;
+        }
+        &.two {
+          background: url(../images/board/backgammon/svg/dice/yellow2.svg);
+          background-size: cover;
+        }
+        &.three {
+          background: url(../images/board/backgammon/svg/dice/yellow3.svg);
+          background-size: cover;
+        }
+        &.four {
+          background: url(../images/board/backgammon/svg/dice/yellow4.svg);
+          background-size: cover;
+        }
+        &.five {
+          background: url(../images/board/backgammon/svg/dice/yellow5.svg);
+          background-size: cover;
+        }
+        &.six {
+          background: url(../images/board/backgammon/svg/dice/yellow6.svg);
+          background-size: cover;
+        }
+      }
+    }
+  }
+}
