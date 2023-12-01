@@ -489,8 +489,9 @@ object BSONHandlers {
         val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Go(), r bytesD F.oldPgn, playedPlies)
         val uciMoves   = actionStrs.flatten.toList
 
-        def turnUcis(turnStr: Option[String]) =
-          turnStr.map(_.split(",").toList.flatMap(go.format.Uci.apply)).getOrElse(List.empty)
+        //This is different for Go because select squares uci uses commas
+        //When we change ss to a proper multiaction sequence we will need to change this
+        def turnUcis(turnStr: Option[String]) = turnStr.flatMap(go.format.Uci.apply).toList
 
         val initialFen: Option[FEN] = r.getO[FEN](F.initialFen) //for handicapped games
 
