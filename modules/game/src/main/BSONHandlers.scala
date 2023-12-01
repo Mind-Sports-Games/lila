@@ -765,11 +765,15 @@ object BSONHandlers {
     for {
       clk     <- clock
       history <- clockHistory
-      times = history(playerIndex)
-    } yield clk match {
-      case fc: Clock =>
+      times = history.dbTimes(playerIndex)
+    } yield clk.config match {
+      case fc: Clock.Config =>
         BinaryFormat.fischerClockHistory.writeSide(fc.limit, times, flagged has playerIndex)
-      case bc: ByoyomiClock =>
+      case bdc: Clock.BronsteinConfig =>
+        BinaryFormat.delayClockHistory.writeSide(bdc.limit, times, flagged has playerIndex)
+      case sdc: Clock.SimpleDelayConfig =>
+        BinaryFormat.delayClockHistory.writeSide(sdc.limit, times, flagged has playerIndex)
+      case bc: ByoyomiClock.Config =>
         BinaryFormat.byoyomiClockHistory.writeSide(bc.limit, times, flagged has playerIndex)
     }
 
@@ -802,14 +806,20 @@ object BSONHandlers {
         bw <- p1ClockHistory
         bb <- p2ClockHistory
         history <-
-          clk match {
-            case fc: Clock =>
+          clk.config match {
+            case fc: Clock.Config =>
               BinaryFormat.fischerClockHistory
                 .read(fc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
-            case bc: ByoyomiClock =>
+            case bdc: Clock.BronsteinConfig =>
+              BinaryFormat.delayClockHistory
+                .read(bdc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+            case sdc: Clock.SimpleDelayConfig =>
+              BinaryFormat.delayClockHistory
+                .read(sdc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+            case bc: ByoyomiClock.Config =>
               BinaryFormat.byoyomiClockHistory
                 .read(
-                  bc.config.byoyomi,
+                  bc.byoyomi,
                   bc.limit,
                   bw,
                   bb,

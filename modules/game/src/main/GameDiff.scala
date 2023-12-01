@@ -79,7 +79,7 @@ object GameDiff {
         clk     <- g.clock
         history <- g.clockHistory
         curPlayerIndex = g.turnPlayerIndex
-        times          = history(playerIndex)
+        times          = history.dbTimes(playerIndex)
       } yield (
         clk match {
           case _: Clock        => FischerClockType()

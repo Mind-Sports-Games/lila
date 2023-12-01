@@ -62,6 +62,27 @@ object BinaryFormat {
       )
   }
 
+  object delayClockHistory {
+    private val logger = lila.log("clockHistory")
+
+    def writeSide(start: Centis, times: Vector[Centis], flagged: Boolean) =
+      fischerClockHistory.writeSide(start, times, flagged)
+
+    def readSide(start: Centis, ba: ByteArray, flagged: Boolean) =
+      fischerClockHistory.readSide(start, ba, flagged)
+
+    def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
+      Try {
+        DelayClockHistory( // NOTE: this is the only difference from the above fischerClockHistory
+          readSide(start, bw, flagged has P1),
+          readSide(start, bb, flagged has P2)
+        )
+      }.fold(
+        e => { logger.warn(s"Exception decoding history", e); none },
+        some
+      )
+  }
+
   object byoyomiClockHistory {
     private val logger = lila.log("clockHistory")
 

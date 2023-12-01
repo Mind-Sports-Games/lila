@@ -1005,13 +1005,16 @@ object Game {
   private[game] val emptyScore      = Score(0, 0)
 
   private[game] val someEmptyFischerClockHistory = Some(FischerClockHistory())
+  private[game] val someEmptyDelayClockHistory   = Some(DelayClockHistory())
   private[game] def someEmptyByoyomiClockHistory(c: ClockBase) = c match {
     case bc: ByoyomiClock => Some(ByoyomiClockHistory(bc.config.byoyomi))
     case _                => Some(ByoyomiClockHistory(Centis(0)))
   }
-  private[game] def someEmptyClockHistory(c: ClockBase) = c match {
-    case _: Clock        => someEmptyFischerClockHistory
-    case _: ByoyomiClock => someEmptyByoyomiClockHistory(c)
+  private[game] def someEmptyClockHistory(c: ClockBase) = c.config match {
+    case _: Clock.Config            => someEmptyFischerClockHistory
+    case _: Clock.BronsteinConfig   => someEmptyDelayClockHistory
+    case _: Clock.SimpleDelayConfig => someEmptyDelayClockHistory
+    case _: ByoyomiClock.Config     => someEmptyByoyomiClockHistory(c)
   }
 
   def make(
@@ -1190,6 +1193,7 @@ sealed trait ClockHistory {
   def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory
   def reset(playerIndex: PlayerIndex): ClockHistory
   def apply(playerIndex: PlayerIndex): Vector[Centis]
+  def dbTimes(playerIndex: PlayerIndex): Vector[Centis]
   def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis]
   def size: Int
   def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis]
@@ -1205,8 +1209,50 @@ case class FischerClockHistory(
 
   override def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory =
     update(playerIndex, _ :+ clock.remainingTime(playerIndex))
+  def reset(playerIndex: PlayerIndex)                   = update(playerIndex, _ => Vector.empty)
+  def apply(playerIndex: PlayerIndex): Vector[Centis]   = playerIndex.fold(p1, p2)
+  def dbTimes(playerIndex: PlayerIndex): Vector[Centis] = apply(playerIndex)
+  override def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
+    if (apply(playerIndex).size < plies) None
+    else apply(playerIndex).takeRight(plies).headOption
+  def size = p1.size + p2.size
+
+  // first state is of the playerIndex that moved first.
+  override def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
+    Sequence.interleave(
+      firstMoveBy.fold(p1, p2),
+      firstMoveBy.fold(p2, p1)
+    )
+}
+
+case class DelayClockHistory(
+    p1MoveTimes: Vector[Centis] = Vector.empty,
+    p2MoveTimes: Vector[Centis] = Vector.empty,
+    prevRemainingTime: Option[Centis] = None
+) extends ClockHistory {
+  // In this case, our case class stores the time moves took as the primary
+  // attribue but, we need to produce the time remaining after each move.
+  // We do this by working backwards from the prevsRemainingTime and adding in the move times
+  // and then reversing it.
+  private def timeRemaining(moveTimes: Vector[Centis]): Vector[Centis] =
+    moveTimes.reverse.scanLeft(prevRemainingTime.getOrElse(Centis(0)))(_ + _).reverse
+  lazy val p1: Vector[Centis] = timeRemaining(p1MoveTimes)
+  lazy val p2: Vector[Centis] = timeRemaining(p2MoveTimes)
+
+  def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
+    playerIndex.fold(copy(p1MoveTimes = f(p1MoveTimes)), copy(p2MoveTimes = f(p2MoveTimes)))
+
+  override def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory = {
+    val remainingTime = clock.remainingTime(playerIndex)
+    copy(prevRemainingTime = Some(remainingTime)).update(
+      playerIndex,
+      prev => prev :+ clock.lastMoveTime(playerIndex)
+    )
+  }
   def reset(playerIndex: PlayerIndex)                 = update(playerIndex, _ => Vector.empty)
   def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
+  def dbTimes(playerIndex: PlayerIndex): Vector[Centis] =
+    playerIndex.fold(p1MoveTimes, p2MoveTimes)
   override def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
     if (apply(playerIndex).size < plies) None
     else apply(playerIndex).takeRight(plies).headOption
@@ -1227,7 +1273,8 @@ case class ByoyomiClockHistory(
     periodEntries: PeriodEntries = PeriodEntries.default
 ) extends ClockHistory {
 
-  def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
+  def apply(playerIndex: PlayerIndex): Vector[Centis]   = playerIndex.fold(p1, p2)
+  def dbTimes(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     updateInternal(playerIndex, f)
