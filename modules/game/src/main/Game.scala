@@ -587,7 +587,7 @@ case class Game(
 
   def goBerserk(playerIndex: PlayerIndex): Option[Progress] =
     clock.ifTrue(berserkable && !player(playerIndex).berserk).map { c =>
-      val newClock = c goBerserk playerIndex
+      val newClock = c.goBerserk(playerIndex)
       Progress(
         this,
         copy(
@@ -600,6 +600,7 @@ case class Game(
         ).updatePlayer(playerIndex, _.goBerserk)
       ) ++
         List(
+          // TODO: berserk penalty may need to be here.
           Event.ClockInc(playerIndex, -c.config.berserkPenalty),
           Event.Clock(newClock), // BC
           Event.Berserk(playerIndex)
