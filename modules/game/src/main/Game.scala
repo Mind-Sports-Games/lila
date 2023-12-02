@@ -1226,25 +1226,29 @@ case class FischerClockHistory(
 }
 
 case class DelayClockHistory(
-    p1MoveTimes: Vector[Centis] = Vector.empty,
-    p2MoveTimes: Vector[Centis] = Vector.empty,
-    prevRemainingTime: Option[Centis] = None
+    p1ActionTimes: Vector[Centis] = Vector.empty,
+    p2ActionTimes: Vector[Centis] = Vector.empty,
+    p1RemainingTime: Option[Centis] = None,
+    p2RemainingTime: Option[Centis] = None
 ) extends ClockHistory {
   // In this case, our case class stores the time moves took as the primary
   // attribue but, we need to produce the time remaining after each move.
   // We do this by working backwards from the prevsRemainingTime and adding in the move times
   // and then reversing it.
-  private def timeRemaining(moveTimes: Vector[Centis]): Vector[Centis] =
-    moveTimes.reverse.scanLeft(prevRemainingTime.getOrElse(Centis(0)))(_ + _).reverse
-  lazy val p1: Vector[Centis] = timeRemaining(p1MoveTimes)
-  lazy val p2: Vector[Centis] = timeRemaining(p2MoveTimes)
+  private def timeRemaining(moveTimes: Vector[Centis], remainingTime: Option[Centis]): Vector[Centis] =
+    moveTimes.reverse.scanLeft(remainingTime.getOrElse(Centis(0)))(_ + _).reverse
+  lazy val p1: Vector[Centis] = timeRemaining(p1ActionTimes, p1RemainingTime)
+  lazy val p2: Vector[Centis] = timeRemaining(p2ActionTimes, p2RemainingTime)
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
-    playerIndex.fold(copy(p1MoveTimes = f(p1MoveTimes)), copy(p2MoveTimes = f(p2MoveTimes)))
+    playerIndex.fold(copy(p1ActionTimes = f(p1ActionTimes)), copy(p2ActionTimes = f(p2ActionTimes)))
+
+  def updateRemainingTime(playerIndex: PlayerIndex, f: Option[Centis] => Option[Centis]): DelayClockHistory =
+    playerIndex.fold(copy(p1RemainingTime = f(p1RemainingTime)), copy(p2RemainingTime = f(p2RemainingTime)))
 
   override def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory = {
     val remainingTime = clock.remainingTime(playerIndex)
-    copy(prevRemainingTime = Some(remainingTime)).update(
+    updateRemainingTime(playerIndex, _ => Some(remainingTime)).update(
       playerIndex,
       prev => prev :+ clock.lastMoveTime(playerIndex)
     )
@@ -1252,7 +1256,7 @@ case class DelayClockHistory(
   def reset(playerIndex: PlayerIndex)                 = update(playerIndex, _ => Vector.empty)
   def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
   def dbTimes(playerIndex: PlayerIndex): Vector[Centis] =
-    playerIndex.fold(p1MoveTimes, p2MoveTimes)
+    playerIndex.fold(p1ActionTimes, p2ActionTimes)
   override def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
     if (apply(playerIndex).size < plies) None
     else apply(playerIndex).takeRight(plies).headOption
