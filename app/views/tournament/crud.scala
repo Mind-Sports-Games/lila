@@ -110,8 +110,11 @@ object crud {
         form3.group(form("clockTime"), raw("Clock time"), half = true)(
           form3.select(_, TournamentForm.clockTimeChoices)
         ),
-        form3.group(form("clockIncrement"), raw("Clock increment"), half = true)(
+        form3.group(form("clockIncrement"), trans.clockIncrement(), half = true)(
           form3.select(_, TournamentForm.clockIncrementChoices)
+        ),
+        form3.group(form("clockDelay"), trans.clockDelay(), half = true)(
+          form3.select(_, TournamentForm.clockDelayChoices)
         )
       ),
       form3.split(

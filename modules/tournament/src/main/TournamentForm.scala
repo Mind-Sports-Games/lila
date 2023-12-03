@@ -204,6 +204,7 @@ object TournamentForm {
   val clockIncrements       = (0 to 2 by 1) ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   val clockIncrementDefault = 0
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
+  val clockDelayChoices     = clockIncrementChoices
 
   val clockByoyomi        = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   val clockByoyomiDefault = 10

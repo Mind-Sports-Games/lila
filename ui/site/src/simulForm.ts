@@ -29,12 +29,12 @@ playstrategy.load.then(() => {
   $useSimpleDelay.on('change', toggleSimpleDelay);
   hideByoyomiSettings();
 
-  $('form .conditions a.show').on('click', function (this: HTMLAnchorElement) {
+  $('form .conditions a.show').on('click', function(this: HTMLAnchorElement) {
     $(this).remove();
     $('form .conditions').addClass('visible');
   });
 
-  $('.flatpickr').each(function (this: HTMLInputElement) {
+  $('.flatpickr').each(function(this: HTMLInputElement) {
     flatpickr(this, {
       minDate: 'today',
       maxDate: new Date(Date.now() + 1000 * 3600 * 24 * 31 * 3),

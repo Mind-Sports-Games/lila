@@ -98,11 +98,11 @@ object form {
       form3.split(
         form3.group(
           form("clock.limit"),
-          raw("Clock initial time"),
+          trans.clockIncrement(),
           help = trans.simulClockHint().some,
           half = true
         )(form3.select(_, clockTimeChoices)),
-        form3.group(form("clock.increment"), raw("Clock increment"), half = true)(
+        form3.group(form("clock.increment"), trans.clockIncrement(), half = true)(
           form3.select(_, clockIncrementChoices)
         )
       ),

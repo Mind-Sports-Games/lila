@@ -13,21 +13,21 @@ object Clock {
   // TODO: this is basically a case classes "unapply" and "apply" method
   def valuesFromClockConfig(
       c: ClockConfig
-  ): Option[(Boolean, Boolean, Boolean, Int, Int, Option[Int], Option[Int])] =
+  ): Option[(Boolean, Boolean, Boolean, Int, Int, Int, Option[Int], Option[Int])] =
     c match {
       case fc: StratClock.Config => {
-        StratClock.Config.unapply(fc).map(t => (false, false, false, t._1, t._2, None, None))
+        StratClock.Config.unapply(fc).map(t => (false, false, false, t._1, t._2, 0, None, None))
       }
       case bc: StratClock.BronsteinConfig => {
-        StratClock.BronsteinConfig.unapply(bc).map(t => (false, true, false, t._1, t._2, None, None))
+        StratClock.BronsteinConfig.unapply(bc).map(t => (false, true, false, t._1, 0, t._2, None, None))
       }
       case udc: StratClock.SimpleDelayConfig => {
-        StratClock.SimpleDelayConfig.unapply(udc).map(t => (false, false, true, t._1, t._2, None, None))
+        StratClock.SimpleDelayConfig.unapply(udc).map(t => (false, false, true, t._1, 0, t._2, None, None))
       }
       case bc: ByoyomiClock.Config => {
         ByoyomiClock.Config
           .unapply(bc)
-          .map(t => (true, false, false, t._1, t._2, Some(t._3), Some(t._4)))
+          .map(t => (true, false, false, t._1, t._2, 0, Some(t._3), Some(t._4)))
       }
     }
 
@@ -38,6 +38,7 @@ object Clock {
       useSimpleDelay: Boolean,
       limit: Int,
       increment: Int,
+      delay: Int,
       byoyomi: Option[Int],
       periods: Option[Int]
   ): ClockConfig =
@@ -45,9 +46,9 @@ object Clock {
       case (true, false, false, Some(byoyomi), Some(periods)) =>
         ByoyomiClock.Config(limit, increment, byoyomi, periods)
       case (false, true, false, _, _) =>
-        StratClock.BronsteinConfig(limit, increment)
+        StratClock.BronsteinConfig(limit, delay)
       case (false, false, true, _, _) =>
-        StratClock.SimpleDelayConfig(limit, increment)
+        StratClock.SimpleDelayConfig(limit, delay)
       case _ =>
         StratClock.Config(limit, increment)
     }
@@ -63,12 +64,13 @@ object Clock {
   def clockConfigMappingsSeconds(clockTimes: Seq[Int], byoyomiLimits: Seq[Int]): Mapping[ClockConfig] = {
     val clockTimeChoices = options(clockTimes, format = formatLimit)
 
-    mapping[ClockConfig, Boolean, Boolean, Boolean, Int, Int, Option[Int], Option[Int]](
+    mapping[ClockConfig, Boolean, Boolean, Boolean, Int, Int, Int, Option[Int], Option[Int]](
       "useByoyomi"        -> boolean,
       "useBronsteinDelay" -> boolean,
       "useSimpleDelay"    -> boolean,
       "limit"             -> numberIn(clockTimeChoices),
       "increment"         -> number(min = 0, max = 120),
+      "delay"             -> number(min = 0, max = 120),
       "byoyomi"           -> optional(number.verifying(byoyomiLimits.contains _)),
       "periods"           -> optional(number(min = 0, max = 5))
     )(clockConfigFromValues)(valuesFromClockConfig)

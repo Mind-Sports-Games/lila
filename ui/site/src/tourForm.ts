@@ -34,17 +34,25 @@ playstrategy.load.then(() => {
       $('.form3 .byoyomiClock').toggle($useByoyomi.is(':checked'));
       $('.form3 .byoyomiPeriods').toggle($useByoyomi.is(':checked'));
     },
+    toggleDelayIncrement = () => {
+      const useDelay = $useBronsteinDelay.is(':checked') || $useSimpleDelay.is(':checked');
+      $('.form3 .clockDelay').toggle(useDelay);
+      $('.form3 .clockIncrement').toggle(!useDelay);
+    },
     toggleByoyomiSettings = () => {
+      toggleDelayIncrement();
       $useBronsteinDelay.prop('checked', false);
       $useSimpleDelay.prop('checked', false);
       hideByoyomiSettings();
     },
     toggleBronstein = () => {
+      toggleDelayIncrement();
       $useByoyomi.prop('checked', false);
       hideByoyomiSettings();
       $useSimpleDelay.prop('checked', false);
     },
     toggleSimpleDelay = () => {
+      toggleDelayIncrement();
       $useByoyomi.prop('checked', false);
       hideByoyomiSettings();
       $useBronsteinDelay.prop('checked', false);
@@ -105,6 +113,7 @@ playstrategy.load.then(() => {
   $useBronsteinDelay.on('change', toggleBronstein);
   $useSimpleDelay.on('change', toggleSimpleDelay);
   hideByoyomiSettings();
+  toggleDelayIncrement();
 
   $('form .conditions a.show').on('click', function (this: HTMLAnchorElement) {
     $(this).remove();
