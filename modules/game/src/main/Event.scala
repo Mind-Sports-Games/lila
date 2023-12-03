@@ -670,6 +670,10 @@ object Event {
   case class Clock(
       p1: Centis,
       p2: Centis,
+      p1Pending: Centis,
+      p2Pending: Centis,
+      p1Delay: Int,
+      p2Delay: Int,
       p1Periods: Int = 0,
       p2Periods: Int = 0,
       nextLagComp: Option[Centis] = None
@@ -680,6 +684,10 @@ object Event {
         .obj(
           "p1"        -> p1.toSeconds,
           "p2"        -> p2.toSeconds,
+          "p1Pending" -> p1Pending.toSeconds,
+          "p2Pending" -> p2Pending.toSeconds,
+          "p1Delay"   -> p1Delay,
+          "p2Delay"   -> p2Delay,
           "p1Periods" -> p1Periods,
           "p2Periods" -> p2Periods
         )
@@ -692,12 +700,20 @@ object Event {
           Clock(
             fc.remainingTime(P1),
             fc.remainingTime(P2),
+            fc.pending(P1),
+            fc.pending(P2),
+            fc.graceSeconds,
+            fc.graceSeconds,
             nextLagComp = fc.lagCompEstimate(fc.player)
           )
         case bc: ByoyomiClock =>
           Clock(
             bc.remainingTime(P1),
             bc.remainingTime(P2),
+            bc.pending(P1),
+            bc.pending(P2),
+            0,
+            0,
             bc.players(P1).spentPeriods,
             bc.players(P2).spentPeriods,
             bc.lagCompEstimate(bc.player)

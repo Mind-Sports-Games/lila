@@ -2,6 +2,7 @@ package views.html.game
 
 import strategygames.format.Forsyth
 import strategygames.variant.Variant
+import strategygames.{ ByoyomiClock, Clock }
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -13,10 +14,12 @@ import lila.i18n.defaultLang
 
 object mini {
 
-  private val dataLive  = attr("data-live")
-  private val dataState = attr("data-state")
-  private val dataTime  = attr("data-time")
-  val cgWrap            = span(cls := "cg-wrap")(cgWrapContent)
+  private val dataLive        = attr("data-live")
+  private val dataState       = attr("data-state")
+  private val dataTime        = attr("data-time")
+  private val dataTimePending = attr("data-time-pending")
+  private val dataTimeDelay   = attr("data-time-delay")
+  val cgWrap                  = span(cls := "cg-wrap")(cgWrapContent)
 
   def extraClasses(variant: Variant) = {
     val gameLogic  = variant.gameLogic.name.toLowerCase()
@@ -129,9 +132,18 @@ object mini {
 
   private def renderClock(clock: strategygames.ClockBase, pov: Pov) = {
     val s = clock.remainingTime(pov.playerIndex).roundSeconds
+    val p = clock.pending(pov.playerIndex).roundSeconds
+    val d = clock.config match {
+      case _: Clock.Config             => 0
+      case bc: Clock.BronsteinConfig   => bc.graceSeconds
+      case dc: Clock.SimpleDelayConfig => dc.graceSeconds
+      case _: ByoyomiClock.Config      => 0
+    }
     span(
       cls := s"mini-game__clock mini-game__clock--${pov.playerIndex.name}",
-      dataTime := s
+      dataTime := s,
+      dataTimePending := p,
+      dataTimeDelay := d
     )(
       f"${s / 60}:${s % 60}%02d"
         +
