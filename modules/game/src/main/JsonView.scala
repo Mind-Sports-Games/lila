@@ -237,39 +237,37 @@ object JsonView {
       )
     }
 
+  private def baseClockJson(fc: Clock) =
+    Json.obj(
+      "running"   -> fc.isRunning,
+      "p1"        -> fc.remainingTime(P1).toSeconds,
+      "p2"        -> fc.remainingTime(P2).toSeconds,
+      "p1Pending" -> fc.pending(P1).toSeconds.pp("Pending P1"),
+      "p2Pending" -> fc.pending(P2).toSeconds.pp("Pending P2"),
+      "emerg"     -> fc.config.emergSeconds
+    )
+
   implicit val clockWriter: OWrites[ClockBase] = OWrites { c =>
     c match {
       case fc: Clock =>
         fc.config match {
           case fConfig: Clock.Config =>
             Json.obj(
-              "running"   -> fc.isRunning,
               "initial"   -> fConfig.limitSeconds,
-              "increment" -> fConfig.incrementSeconds,
-              "p1"        -> fc.remainingTime(P1).toSeconds,
-              "p2"        -> fc.remainingTime(P2).toSeconds,
-              "emerg"     -> fc.config.emergSeconds
-            )
+              "increment" -> fConfig.incrementSeconds
+            ) ++ baseClockJson(fc)
           case bConfig: Clock.BronsteinConfig =>
             Json.obj(
-              "running"   -> fc.isRunning,
               "initial"   -> bConfig.limitSeconds,
               "delay"     -> bConfig.delaySeconds,
-              "delayType" -> "bronstein",
-              "p1"        -> fc.remainingTime(P1).toSeconds,
-              "p2"        -> fc.remainingTime(P2).toSeconds,
-              "emerg"     -> fc.config.emergSeconds
-            )
+              "delayType" -> "bronstein"
+            ) ++ baseClockJson(fc)
           case udConfig: Clock.SimpleDelayConfig =>
             Json.obj(
-              "running"   -> fc.isRunning,
               "initial"   -> udConfig.limitSeconds,
               "delay"     -> udConfig.delaySeconds,
-              "delayType" -> "usdelay",
-              "p1"        -> fc.remainingTime(P1).toSeconds,
-              "p2"        -> fc.remainingTime(P2).toSeconds,
-              "emerg"     -> fc.config.emergSeconds
-            )
+              "delayType" -> "usdelay"
+            ) ++ baseClockJson(fc)
           case _: ByoyomiClock.Config => Json.obj() // TODO: this is annoying
         }
       case bc: ByoyomiClock => {

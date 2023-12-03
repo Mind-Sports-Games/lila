@@ -22,6 +22,8 @@ export type BaseClockData = {
   delayType: undefined | string;
   p1: Seconds;
   p2: Seconds;
+  p1Pending: Seconds;
+  p2Pending: Seconds;
   emerg: Seconds;
   showTenths: Prefs.ShowClockTenths;
   showBar: boolean;
@@ -131,6 +133,7 @@ export class ClockController {
 
   byoyomiData?: ByoyomiCtrlData;
   countdownDelay?: Millis;
+  pendingTime: PlayerIndexMap<Millis> = { p1: 0, p2: 0 };
   delay?: Millis;
   goneBerserk: PlayerIndexMap<boolean> = { p1: false, p2: false };
 
@@ -188,9 +191,9 @@ export class ClockController {
     this.emergMs = 1000 * Math.min(60, Math.max(10, cdata.initial * 0.125));
 
     if (isByoyomi(cdata)) {
-      this.setClock(d, cdata.p1, cdata.p2, cdata.p1Periods, cdata.p2Periods);
+      this.setClock(d, cdata.p1, cdata.p2, cdata.p1Pending, cdata.p2Pending, cdata.p1Periods, cdata.p2Periods);
     } else {
-      this.setClock(d, cdata.p1, cdata.p2);
+      this.setClock(d, cdata.p1, cdata.p2, cdata.p1Pending, cdata.p2Pending);
     }
   }
 
@@ -204,7 +207,16 @@ export class ClockController {
   timeRatio = (millis: number, playerIndex: PlayerIndex): number =>
     Math.min(1, millis * this.timeRatioDivisor[playerIndex]);
 
-  setClock = (d: RoundData, p1: Seconds, p2: Seconds, p1Per = 0, p2Per = 0, delay: Centis = 0) => {
+  setClock = (
+    d: RoundData,
+    p1: Seconds,
+    p2: Seconds,
+    p1Pending: Seconds,
+    p2Pending: Seconds,
+    p1Per = 0,
+    p2Per = 0,
+    delay: Centis = 0,
+  ) => {
     const paused =
         !!d.opponent.offeringSelectSquares ||
         !!d.player.offeringSelectSquares ||
@@ -218,6 +230,8 @@ export class ClockController {
       activePlayerIndex: isClockRunning ? d.game.player : undefined,
       lastUpdate: performance.now() + delayMs,
     };
+    this.pendingTime['p1'] = p1Pending;
+    this.pendingTime['p2'] = p2Pending;
     if (this.byoyomiData) {
       this.byoyomiData.curPeriods['p1'] = p1Per;
       this.byoyomiData.curPeriods['p2'] = p2Per;
@@ -334,18 +348,23 @@ export class ClockController {
       : this.times[playerIndex];
 
   delayMillisOf = (playerIndex: PlayerIndex): Millis => {
-    // TODO: We need to take into account berserk.
     const isBerserk = this.goneBerserk[playerIndex];
     const countDown = isBerserk ? 0 : this.countdownDelay ?? 0;
     const delayMillis = 1000 * countDown;
-    return this.times.activePlayerIndex === playerIndex ? Math.max(0, delayMillis - this.elapsed()) : delayMillis;
+    return this.times.activePlayerIndex === playerIndex
+      ? Math.max(0, delayMillis - (this.elapsed() + this.pendingMillisOf(playerIndex)))
+      : delayMillis;
   };
 
-  isInDelay = (playerIndex: PlayerIndex): boolean => {
-    if (this.delay) {
-      return this.isRunning() && this.elapsed() <= 1000 * this.delay && !this.goneBerserk[playerIndex];
-    } else return false;
+  pendingMillisOf = (playerIndex: PlayerIndex): Millis => {
+    const pendingSeconds = this.pendingTime[playerIndex] ?? 0;
+    return 1000 * pendingSeconds;
   };
 
+  isInDelay = (playerIndex: PlayerIndex): boolean =>
+    !!this.delay &&
+    this.isRunning() &&
+    this.elapsed() + this.pendingMillisOf(playerIndex) <= 1000 * this.delay &&
+    !this.goneBerserk[playerIndex];
   isRunning = () => this.times.activePlayerIndex !== undefined;
 }

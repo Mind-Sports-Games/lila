@@ -589,13 +589,17 @@ object Event {
           c match {
             case fc: StratClock =>
               Json.obj(
-                "p1" -> fc.remainingTime(P1).centis,
-                "p2" -> fc.remainingTime(P2).centis
+                "p1"        -> fc.remainingTime(P1).centis,
+                "p2"        -> fc.remainingTime(P2).centis,
+                "p1Pending" -> fc.pending(P1).centis,
+                "p2Pending" -> fc.pending(P2).centis
               )
             case bc: ByoyomiClock =>
               Json.obj(
                 "p1"        -> bc.remainingTime(P1).centis,
                 "p2"        -> bc.remainingTime(P2).centis,
+                "p1Pending" -> bc.pending(P1).centis,
+                "p2Pending" -> bc.pending(P2).centis,
                 "p1Periods" -> bc.players(P1).periodsLeft,
                 "p2Periods" -> bc.players(P2).periodsLeft
               )
@@ -759,8 +763,8 @@ object Event {
       Json
         .obj(
           "playerIndex" -> playerIndex,
-          "plies" -> plies,
-          "turns" -> turnCount
+          "plies"       -> plies,
+          "turns"       -> turnCount
         )
         .add("status" -> status)
         .add("winner" -> winner)
