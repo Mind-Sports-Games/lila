@@ -102,8 +102,11 @@ object form {
           help = trans.simulClockHint().some,
           half = true
         )(form3.select(_, clockTimeChoices)),
-        form3.group(form("clock.increment"), trans.clockIncrement(), half = true)(
+        form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
           form3.select(_, clockIncrementChoices)
+        ),
+        form3.group(form("clock.delay"), trans.clockDelay(), klass = "clockDelay", half = true)(
+          form3.select(_, clockDelayChoices)
         )
       ),
       form3.split(

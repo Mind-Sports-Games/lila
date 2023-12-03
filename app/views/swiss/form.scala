@@ -310,8 +310,11 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.group(form("clock.limit"), trans.clockInitialTime(), half = true)(
         form3.select(_, SwissForm.clockLimitChoices, disabled = disabledAfterStart)
       ),
-      form3.group(form("clock.increment"), trans.clockIncrement(), half = true)(
+      form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
         form3.select(_, TournamentForm.clockIncrementChoices, disabled = disabledAfterStart)
+      ),
+      form3.group(form("clock.delay"), trans.clockDelay(), klass = "clockDelay", half = true)(
+        form3.select(_, TournamentForm.clockDelayChoices, disabled = disabledAfterStart)
       )
     )
   def clockRow2 =

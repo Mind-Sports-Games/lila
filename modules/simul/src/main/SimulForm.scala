@@ -25,6 +25,7 @@ object SimulForm {
   val clockIncrements       = (0 to 2 by 1) ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10) ++ (90 to 180 by 30)
   val clockIncrementDefault = 60
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
+  val clockDelayChoices     = clockIncrementChoices
 
   val byoyomiLimits: Seq[Int] = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (30 to 60 by 10)
   val clockByoyomiChoices     = options(byoyomiLimits, "%d second{s}")
