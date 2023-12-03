@@ -600,7 +600,6 @@ case class Game(
         ).updatePlayer(playerIndex, _.goBerserk)
       ) ++
         List(
-          // TODO: berserk penalty may need to be here.
           Event.ClockInc(playerIndex, -c.config.berserkPenalty),
           Event.Clock(newClock), // BC
           Event.Berserk(playerIndex)
