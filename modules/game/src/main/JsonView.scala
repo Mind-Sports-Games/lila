@@ -242,8 +242,8 @@ object JsonView {
       "running"   -> fc.isRunning,
       "p1"        -> fc.remainingTime(P1).toSeconds,
       "p2"        -> fc.remainingTime(P2).toSeconds,
-      "p1Pending" -> fc.pending(P1).toSeconds.pp("Pending P1"),
-      "p2Pending" -> fc.pending(P2).toSeconds.pp("Pending P2"),
+      "p1Pending" -> fc.pending(P1).toSeconds,
+      "p2Pending" -> fc.pending(P2).toSeconds,
       "emerg"     -> fc.config.emergSeconds
     )
 

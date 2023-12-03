@@ -67,7 +67,7 @@ object Clock {
       "useByoyomi"        -> boolean,
       "useBronsteinDelay" -> boolean,
       "useSimpleDelay"    -> boolean,
-      "limit"             -> numberIn(clockTimeChoices.pp("clockTimeChoices")),
+      "limit"             -> numberIn(clockTimeChoices),
       "increment"         -> number(min = 0, max = 120),
       "byoyomi"           -> optional(number.verifying(byoyomiLimits.contains _)),
       "periods"           -> optional(number(min = 0, max = 5))
