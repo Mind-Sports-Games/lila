@@ -95,7 +95,7 @@ object CrudForm {
 
     def validTiming = (minutes * 60) >= (3 * estimatedGameDuration)
 
-    private def estimatedGameDuration = 60 * clock.limitSeconds + 30 * clock.graceSeconds
+    private def estimatedGameDuration = clock.limitSeconds + 30 * clock.graceSeconds
   }
 
   val imageChoices = List(

@@ -107,13 +107,13 @@ object crud {
         form3.group(form("minutes"), raw("Duration in minutes"), half = true)(form3.input(_, typ = "number"))
       ),
       form3.split(
-        form3.group(form("clockTime"), raw("Clock time"), half = true)(
+        form3.group(form("clock.limit"), raw("Clock time"), half = true)(
           form3.select(_, TournamentForm.clockTimeChoices)
         ),
-        form3.group(form("clockIncrement"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
+        form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
           form3.select(_, TournamentForm.clockIncrementChoices)
         ),
-        form3.group(form("clockDelay"), trans.clockDelay(), klass = "clockDelay", half = true)(
+        form3.group(form("clock.delay"), trans.clockDelay(), klass = "clockDelay", half = true)(
           form3.select(_, TournamentForm.clockDelayChoices)
         )
       ),
