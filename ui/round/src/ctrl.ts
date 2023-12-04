@@ -95,10 +95,7 @@ export default class RoundController {
   sign: string = Math.random().toString(36);
   private music?: any;
 
-  constructor(
-    readonly opts: RoundOpts,
-    readonly redraw: Redraw,
-  ) {
+  constructor(readonly opts: RoundOpts, readonly redraw: Redraw) {
     round.massage(opts.data);
 
     const d = (this.data = opts.data);
@@ -290,7 +287,7 @@ export default class RoundController {
   private setDropOnlyVariantDropMode = (
     activePlayerIndex: boolean,
     currentPlayerIndex: 'p1' | 'p2',
-    s: State,
+    s: State
   ): void => {
     if (activePlayerIndex) {
       return setDropMode(s, stratUtils.onlyDropsVariantPiece(s.variant as VariantKey, currentPlayerIndex));
@@ -371,7 +368,7 @@ export default class RoundController {
         this.setDropOnlyVariantDropMode(
           this.data.player.playerIndex === this.data.game.player,
           this.data.player.playerIndex,
-          this.chessground.state,
+          this.chessground.state
         );
       } else {
         cancelDropMode(this.chessground.state);
@@ -551,7 +548,7 @@ export default class RoundController {
             role: o.role,
             playerIndex: playedPlayerIndex,
           },
-          util.uci2move(o.uci)![1] as cg.Key,
+          util.uci2move(o.uci)![1] as cg.Key
         );
         if (d.game.variant.key == 'flipello' || d.game.variant.key == 'flipello10')
           flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
@@ -755,7 +752,7 @@ export default class RoundController {
         o.clock.p1Pending * 0.01,
         o.clock.p2Pending * 0.01,
         o.clock.p1Periods,
-        o.clock.p2Periods,
+        o.clock.p2Periods
       );
     }
     if (this.clock && o.clock)
@@ -796,7 +793,7 @@ export default class RoundController {
       },
       _ => {
         this.challengeRematched = false;
-      },
+      }
     );
   };
 

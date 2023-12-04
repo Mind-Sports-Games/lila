@@ -16,8 +16,8 @@ export default function loadClockWidget() {
       this.render();
     },
 
-    updateCountdownDelay: function(delay: number, pending: number) {
-      this.countdownDelayTarget = (((delay ?? 0) - (pending ?? 0)) * 1000) + Date.now();
+    updateCountdownDelay: function (delay: number, pending: number) {
+      this.countdownDelayTarget = ((delay ?? 0) - (pending ?? 0)) * 1000 + Date.now();
     },
 
     set: function (opts: Opts) {

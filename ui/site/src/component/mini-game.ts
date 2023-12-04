@@ -44,7 +44,7 @@ export const init = (node: HTMLElement) => {
             pending: parseInt(this.getAttribute('data-time-pending')!),
             pause: playerIndex != turnPlayerIndex,
           });
-        }),
+        })
       );
     } else {
       const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|'),
@@ -63,49 +63,49 @@ export const init = (node: HTMLElement) => {
           dimensions: $el.hasClass('variant-shogi')
             ? { width: 9, height: 9 }
             : $el.hasClass('variant-xiangqi')
-              ? { width: 9, height: 10 }
-              : $el.hasClass('variant-minishogi')
-                ? { width: 5, height: 5 }
-                : $el.hasClass('variant-minixiangqi')
-                  ? { width: 7, height: 7 }
-                  : $el.hasClass('variant-flipello10')
-                    ? { width: 10, height: 10 }
-                    : $el.hasClass('variant-amazons')
-                      ? { width: 10, height: 10 }
-                      : $el.hasClass('variant-oware')
-                        ? { width: 6, height: 2 }
-                        : $el.hasClass('variant-togyzkumalak')
-                          ? { width: 9, height: 2 }
-                          : $el.hasClass('variant-go9x9')
-                            ? { width: 9, height: 9 }
-                            : $el.hasClass('variant-go13x13')
-                              ? { width: 13, height: 13 }
-                              : $el.hasClass('variant-go19x19')
-                                ? { width: 19, height: 19 }
-                                : { width: 8, height: 8 },
+            ? { width: 9, height: 10 }
+            : $el.hasClass('variant-minishogi')
+            ? { width: 5, height: 5 }
+            : $el.hasClass('variant-minixiangqi')
+            ? { width: 7, height: 7 }
+            : $el.hasClass('variant-flipello10')
+            ? { width: 10, height: 10 }
+            : $el.hasClass('variant-amazons')
+            ? { width: 10, height: 10 }
+            : $el.hasClass('variant-oware')
+            ? { width: 6, height: 2 }
+            : $el.hasClass('variant-togyzkumalak')
+            ? { width: 9, height: 2 }
+            : $el.hasClass('variant-go9x9')
+            ? { width: 9, height: 9 }
+            : $el.hasClass('variant-go13x13')
+            ? { width: 13, height: 13 }
+            : $el.hasClass('variant-go19x19')
+            ? { width: 19, height: 19 }
+            : { width: 8, height: 8 },
           variant: $el.hasClass('variant-shogi')
             ? 'shogi'
             : $el.hasClass('variant-xiangqi')
-              ? 'xiangqi'
-              : $el.hasClass('variant-minishogi')
-                ? 'minishogi'
-                : $el.hasClass('variant-minixiangqi')
-                  ? 'minixiangqi'
-                  : $el.hasClass('variant-flipello10')
-                    ? 'flipello10'
-                    : $el.hasClass('variant-amazons')
-                      ? 'amazons'
-                      : $el.hasClass('variant-oware')
-                        ? 'oware'
-                        : $el.hasClass('variant-togyzkumalak')
-                          ? 'togyzkumalak'
-                          : $el.hasClass('variant-go9x9')
-                            ? 'go9x9'
-                            : $el.hasClass('variant-go13x13')
-                              ? 'go13x13'
-                              : $el.hasClass('variant-go19x19')
-                                ? 'go19x19'
-                                : 'standard',
+            ? 'xiangqi'
+            : $el.hasClass('variant-minishogi')
+            ? 'minishogi'
+            : $el.hasClass('variant-minixiangqi')
+            ? 'minixiangqi'
+            : $el.hasClass('variant-flipello10')
+            ? 'flipello10'
+            : $el.hasClass('variant-amazons')
+            ? 'amazons'
+            : $el.hasClass('variant-oware')
+            ? 'oware'
+            : $el.hasClass('variant-togyzkumalak')
+            ? 'togyzkumalak'
+            : $el.hasClass('variant-go9x9')
+            ? 'go9x9'
+            : $el.hasClass('variant-go13x13')
+            ? 'go13x13'
+            : $el.hasClass('variant-go19x19')
+            ? 'go19x19'
+            : 'standard',
         },
         $cg = $el.find('.cg-wrap'),
         turnPlayerIndex = fenPlayerIndex(fen);
@@ -118,7 +118,7 @@ export const init = (node: HTMLElement) => {
             pending: parseInt(this.getAttribute('data-time-pending')!),
             pause: playerIndex != turnPlayerIndex,
           });
-        }),
+        })
       );
     }
   }
@@ -152,7 +152,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
     time: number | undefined,
     delay: number | undefined,
     pending: number | undefined,
-    playerIndex: string,
+    playerIndex: string
   ) => {
     if (!isNaN(time!))
       $el.find('.mini-game__clock--' + playerIndex).clock('set', {
