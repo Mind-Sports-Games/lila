@@ -76,12 +76,12 @@ object mini {
     pov.game.variant match {
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) =>
-        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
+        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${pov.playerIndex.name}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
           pov.game.variant.gameLogic,
           pov.game.situation
-        )}|${v.boardSize.width}x${v.boardSize.height}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
+        )}|${v.boardSize.width}x${v.boardSize.height}|${pov.playerIndex.name}|${~pov.game.lastActionKeys}"
     }
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =

@@ -234,18 +234,26 @@ object BSONHandlers {
           )
         }
 
+        def turnUcis(turnStr: Option[String]) =
+          turnStr.map(_.split(",").toList.flatMap(chess.format.Uci.apply))
+
+        //Need to store lastTurn differently in case of multiaction
+        val lastTurnUcis    = turnUcis(r strO F.historyLastTurn).getOrElse(decoded.lastMove.toList)
+        val currentTurnUcis = turnUcis(r strO F.historyCurrentTurn).getOrElse(List.empty)
+
         val chessGame = StratGame.Chess(
           chess.Game(
             situation = chess.Situation(
               chess.Board(
                 pieces = decoded.pieces,
                 history = chess.History(
-                  lastMove = decoded.lastMove,
+                  lastTurn = lastTurnUcis,
+                  currentTurn = currentTurnUcis,
                   castles = decoded.castles,
                   halfMoveClock = decoded.halfMoveClock,
                   positionHashes = decoded.positionHashes,
                   unmovedRooks = decoded.unmovedRooks,
-                  checkCount = if (gameVariant.threeCheck || gameVariant.fiveCheck) {
+                  checkCount = if (gameVariant.key == "threeCheck" || gameVariant.key == "fiveCheck") {
                     val counts = r.intsD(F.checkCount)
                     chess.CheckCount(~counts.headOption, ~counts.lastOption)
                   } else Game.emptyCheckCount
@@ -280,7 +288,8 @@ object BSONHandlers {
         val decodedBoard = draughts.Board(
           pieces = BinaryFormat.piece.readDraughts(r bytes F.binaryPieces, gameVariant),
           history = draughts.DraughtsHistory(
-            lastMove = r strO F.historyLastMove flatMap (draughts.format.Uci.apply),
+            //whilst Draughts isnt upgraded to multiaction
+            lastMove = r strO F.historyLastTurn flatMap (draughts.format.Uci.apply),
             positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
             kingMoves = if (gameVariant.frisianVariant || gameVariant.draughts64Variant) {
               val counts = r.intsD(F.kingMoves)
@@ -344,15 +353,19 @@ object BSONHandlers {
 
         val actionStrs = NewLibStorage.OldBin.decode(GameLogic.FairySF(), r bytesD F.oldPgn, playedPlies)
 
+        def turnUcis(turnStr: Option[String]) =
+          turnStr
+            .map(_.split(",").toList.flatMap(uci => fairysf.format.Uci.apply(gameVariant.gameFamily, uci)))
+            .getOrElse(List.empty)
+
         val fairysfGame = StratGame.FairySF(
           fairysf.Game(
             situation = fairysf.Situation(
               fairysf.Board(
                 pieces = BinaryFormat.piece.readFairySF(r bytes F.binaryPieces, gameVariant),
                 history = fairysf.History(
-                  lastMove = (r strO F.historyLastMove) flatMap (uci =>
-                    fairysf.format.Uci.apply(gameVariant.gameFamily, uci)
-                  ),
+                  lastTurn = turnUcis(r strO F.historyLastTurn),
+                  currentTurn = turnUcis(r strO F.historyCurrentTurn),
                   //we can flatten as fairysf does not have any true multiaction games (yet)
                   //TODO: Is halfMoveClock even doing anything for fairysf?
                   halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
@@ -389,13 +402,17 @@ object BSONHandlers {
 
         val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Samurai(), r bytesD F.oldPgn, playedPlies)
 
+        def turnUcis(turnStr: Option[String]) =
+          turnStr.map(_.split(",").toList.flatMap(samurai.format.Uci.apply)).getOrElse(List.empty)
+
         val samuraiGame = StratGame.Samurai(
           samurai.Game(
             situation = samurai.Situation(
               samurai.Board(
                 pieces = BinaryFormat.piece.readSamurai(r bytes F.binaryPieces, gameVariant),
                 history = samurai.History(
-                  lastMove = (r strO F.historyLastMove) flatMap (samurai.format.Uci.apply),
+                  lastTurn = turnUcis(r strO F.historyLastTurn),
+                  currentTurn = turnUcis(r strO F.historyCurrentTurn),
                   //we can flatten as samurai does not have any multiaction games
                   //TODO: Is halfMoveClock even doing anything for samurai?
                   halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
@@ -426,6 +443,9 @@ object BSONHandlers {
 
         val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Togyzkumalak(), r bytesD F.oldPgn, playedPlies)
 
+        def turnUcis(turnStr: Option[String]) =
+          turnStr.map(_.split(",").toList.flatMap(togyzkumalak.format.Uci.apply)).getOrElse(List.empty)
+
         val togyzkumalakGame = StratGame.Togyzkumalak(
           togyzkumalak.Game(
             situation = togyzkumalak.Situation(
@@ -434,7 +454,8 @@ object BSONHandlers {
                   .readTogyzkumalak(r bytes F.binaryPieces, gameVariant)
                   .filterNot { case (_, posInfo) => posInfo._2 == 0 },
                 history = togyzkumalak.History(
-                  lastMove = (r strO F.historyLastMove) flatMap (togyzkumalak.format.Uci.apply),
+                  lastTurn = turnUcis(r strO F.historyLastTurn),
+                  currentTurn = turnUcis(r strO F.historyCurrentTurn),
                   //we can flatten as togyzkumalak does not have any multiaction games
                   //TODO: Is halfMoveClock even doing anything for togyzkumalak?
                   halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
@@ -469,6 +490,10 @@ object BSONHandlers {
         val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Go(), r bytesD F.oldPgn, playedPlies)
         val uciMoves   = actionStrs.flatten.toList
 
+        //This is different for Go because select squares uci uses commas
+        //When we change ss to a proper multiaction sequence we will need to change this
+        def turnUcis(turnStr: Option[String]) = turnStr.flatMap(go.format.Uci.apply).toList
+
         val initialFen: Option[FEN] = r.getO[FEN](F.initialFen) //for handicapped games
 
         val goGame = StratGame.Go(
@@ -477,7 +502,8 @@ object BSONHandlers {
               go.Board(
                 pieces = BinaryFormat.piece.readGo(r bytes F.binaryPieces, gameVariant),
                 history = go.History(
-                  lastMove = (r strO F.historyLastMove) flatMap (go.format.Uci.apply),
+                  lastTurn = turnUcis(r strO F.historyLastTurn),
+                  currentTurn = turnUcis(r strO F.historyCurrentTurn),
                   //we can flatten as go does not have any multiaction games
                   //TODO: Is halfMoveClock even doing anything for togyzkumalak?
                   halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
@@ -611,7 +637,7 @@ object BSONHandlers {
                 case _                     => sys.error("invalid draughts board")
               }),
               F.positionHashes  -> o.history.positionHashes,
-              F.historyLastMove -> o.history.lastMove.map(_.uci),
+              F.historyLastTurn -> o.history.lastAction.map(_.uci),
               F.kingMoves       -> o.history.kingMoves.nonEmpty.option(o.history.kingMoves)
             )
           case GameLogic.FairySF() =>
@@ -622,9 +648,10 @@ object BSONHandlers {
                 case Board.FairySF(board) => board.pieces
                 case _                    => sys.error("invalid fairysf board")
               }),
-              F.positionHashes  -> o.history.positionHashes,
-              F.historyLastMove -> o.history.lastMove.map(_.uci),
-              F.pocketData      -> o.board.pocketData
+              F.positionHashes     -> o.history.positionHashes,
+              F.historyLastTurn    -> o.history.lastTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString,
+              F.pocketData         -> o.board.pocketData
             )
           case GameLogic.Samurai() =>
             $doc(
@@ -634,8 +661,9 @@ object BSONHandlers {
                 case Board.Samurai(board) => board.pieces
                 case _                    => sys.error("invalid samurai board")
               }),
-              F.positionHashes  -> o.history.positionHashes,
-              F.historyLastMove -> o.history.lastMove.map(_.uci)
+              F.positionHashes     -> o.history.positionHashes,
+              F.historyLastTurn    -> o.history.lastTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString
             )
           case GameLogic.Togyzkumalak() =>
             $doc(
@@ -645,9 +673,10 @@ object BSONHandlers {
                 case Board.Togyzkumalak(board) => board.pieces
                 case _                         => sys.error("invalid togyzkumalak board")
               }),
-              F.positionHashes  -> o.history.positionHashes,
-              F.historyLastMove -> o.history.lastMove.map(_.uci),
-              F.score           -> o.history.score.nonEmpty.option(o.history.score)
+              F.positionHashes     -> o.history.positionHashes,
+              F.historyLastTurn    -> o.history.lastTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString,
+              F.score              -> o.history.score.nonEmpty.option(o.history.score)
             )
           case GameLogic.Go() =>
             $doc(
@@ -658,7 +687,8 @@ object BSONHandlers {
                 case _               => sys.error("invalid go board")
               }),
               F.positionHashes      -> o.history.positionHashes,
-              F.historyLastMove     -> o.history.lastMove.map(_.uci),
+              F.historyLastTurn     -> o.history.lastTurnUciString,
+              F.historyCurrentTurn  -> o.history.currentTurnUciString,
               F.score               -> o.history.score.nonEmpty.option(o.history.score),
               F.captures            -> o.history.captures.nonEmpty.option(o.history.captures),
               F.pocketData          -> o.board.pocketData,
@@ -666,7 +696,7 @@ object BSONHandlers {
               F.deadStoneOfferState -> o.metadata.deadStoneOfferState.map(_.id)
             )
           case _ => //chess or fail
-            if (o.variant.standard)
+            if (o.variant.key == "standard")
               $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.actionStrs.flatten take Game.maxPlies))
             else {
               $doc(
@@ -677,12 +707,17 @@ object BSONHandlers {
                 }),
                 F.positionHashes -> o.history.positionHashes,
                 F.unmovedRooks   -> o.history.unmovedRooks,
+                //need to store this for multiaction variants. Going to be essentially
+                //storing 'lastMove' twice, once in lastTurn and once in castleLastMove
+                //but want to retain old functionality, and this is only for chess variants
+                F.historyLastTurn    -> o.history.lastTurnUciString,
+                F.historyCurrentTurn -> o.history.currentTurnUciString,
                 F.castleLastMove -> CastleLastMove.castleLastMoveBSONHandler
                   .writeTry(
                     CastleLastMove(
                       castles = o.history.castles,
                       lastMove = o.history match {
-                        case History.Chess(h) => h.lastMove
+                        case History.Chess(h) => h.lastAction
                         case _                => sys.error("Invalid history")
                       }
                     )

@@ -41,7 +41,7 @@ object features {
             ),
             tr(check)(
               "Standard chess and ",
-              a(href := routes.Page.variantHome)("8 chess variants (Crazyhouse, Chess960, Horde, ...)")
+              a(href := routes.Page.variantHome)("10 chess variants (Chess960, Crazyhouse, ...)")
             ),
             tr(unlimited)(
               "Lines Of Action"
@@ -89,7 +89,7 @@ object features {
               a(href := routes.Racer.home)("Chess Puzzle Racer")
             ),
             tr(unlimited)(
-              a(href := s"${routes.UserAnalysis.index}#explorer")("Chess Opening Explorer"),
+              a(href := s"${routes.UserAnalysis.index}#explorer")("Chess Opening Explorer")
             ),
             tr(unlimited)(
               a(href := s"${routes.UserAnalysis.parseArg("QN4n1/6r1/3k4/8/b2K4/8/8/8_b_-_-")}#explorer")(
@@ -127,7 +127,7 @@ object features {
               strong("New features to come!")
             )
           ),
-        /*header(h1(dataIcon := "")("Mobile")),
+          /*header(h1(dataIcon := "")("Mobile")),
           tbody(
             tr(unlimited)(
               "Online and offline games, with 8 variants"

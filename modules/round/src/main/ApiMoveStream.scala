@@ -37,7 +37,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
               }
             }
             .mapMaterializedValue { queue =>
-              val clocks      = ~(for {
+              val clocks = ~(for {
                 clk   <- game.clock
                 times <- game.bothClockStates
               } yield Vector(
@@ -57,7 +57,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
                     toJson(
                       Forsyth.exportBoard(s.board.variant.gameLogic, s.board),
                       s.player,
-                      s.board.history.lastMove.map(_.uci),
+                      s.board.history.lastAction.map(_.uci),
                       clkValues
                     )
                   )
@@ -68,8 +68,8 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
                 queue.complete()
               } else {
                 val chans = List(MoveGameEvent makeChan game.id, "finishGame")
-                val sub   = Bus.subscribeFun(chans: _*) {
-                  case MoveGameEvent(g, fen, move)            =>
+                val sub = Bus.subscribeFun(chans: _*) {
+                  case MoveGameEvent(g, fen, move) =>
                     queue.offer(toJson(g, fen, move.some)).unit
                   case FinishGame(g, _, _) if g.id == game.id =>
                     queue offer gameJsonView(g, initialFen)

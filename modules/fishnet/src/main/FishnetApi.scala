@@ -95,7 +95,7 @@ final class FishnetApi(
           data.completeOrPartial match {
             case complete: CompleteAnalysis =>
               {
-                if (complete.weak && work.game.variant.standard) {
+                if (complete.weak && work.game.variant.key == "standard") {
                   Monitor.weak(work, client, complete)
                   repo.updateOrGiveUpAnalysis(work.weak) >> fufail(WeakAnalysis(client))
                 } else

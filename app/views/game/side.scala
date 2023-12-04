@@ -127,7 +127,7 @@ object side {
         },
         initialFen
           .ifTrue(
-            game.variant.chess960 || game.variant.gameFamily == GameFamily
+            game.variant.key == "chess960" || game.variant.gameFamily == GameFamily
               .Draughts() || game.variant.gameFamily == GameFamily.Go()
           )
           .flatMap { fen =>

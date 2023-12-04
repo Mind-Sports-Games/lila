@@ -251,6 +251,7 @@ final private class TournamentScheduler(
       (nextMonday, 15),
       (nextMonday, 21),
       (nextTuesday, 2),
+      (nextTuesday, 5),
       (nextTuesday, 8),
       (nextTuesday, 14),
       (nextTuesday, 20),
@@ -284,12 +285,16 @@ final private class TournamentScheduler(
 
     val nextWeeklySchedule = weeklySchedule.map { case (day, hour) => (day.plusDays(7), hour) }
 
-    // also add appropiate time slot,  be careful to slot in correctly otherwise, additional
-    // weekly tournaments will be created!
-    // Option 1 (preferred): Look at the current schedule on live and slot the variant in to match the timeslot (for release)
-    // Option 2: Add timeslot and variant anywhere, upon release remove the weekly tournaments after now and they will all get refreshed
+    // How to add a new variant and slot without breaking the current schedule:
+    // Decide on a new timeslot and add to `weeklySchedule`
+    // Look at the current schedule on the site, and work out when that new slot is next going to be used
+    // Add the new variant to the list below between the two variants it would be between when that slot is first used
+    // Work out how many full cycles of weeklys there have been in the year
+    // This is basically 0 if the week number of the year is less than the number of different variants, or 1 if it's greater than
+    // Shuffle that many variants (0 or 1) from the start of the list to the bottom
+    // Because we create two weeks in advance we will then need to delete one tournament in the second week where the new variant has cycled into. It should just be one, if not its gone wrong
+    // Practise locally, can always delete any newly created tournaments and try again
     val weeklyVariants: List[(Variant, Schedule.Speed)] = List(
-      (Variant.Chess(strategygames.chess.variant.Standard), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35),
       (Variant.Chess(strategygames.chess.variant.Atomic), Blitz32),
@@ -309,6 +314,7 @@ final private class TournamentScheduler(
       (Variant.Draughts(strategygames.draughts.variant.Standard), Blitz32),
       (Variant.Go(strategygames.go.variant.Go9x9), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Xiangqi), Blitz53),
+      (Variant.Chess(strategygames.chess.variant.Monster), Blitz32),
       (Variant.Chess(strategygames.chess.variant.KingOfTheHill), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510),
@@ -323,7 +329,8 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.ScrambledEggs), Blitz32),
       (Variant.Chess(strategygames.chess.variant.ThreeCheck), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32),
-      (Variant.Go(strategygames.go.variant.Go13x13), Blitz53)
+      (Variant.Go(strategygames.go.variant.Go13x13), Blitz53),
+      (Variant.Chess(strategygames.chess.variant.Standard), Blitz32)
     )
 
     val weeklyVariantDefault: (Variant, Schedule.Speed) =
@@ -338,8 +345,8 @@ final private class TournamentScheduler(
     // weekly tournaments
     val weeklyTourmaments = (weeklySchedule.zipWithIndex ++ nextWeeklySchedule.zipWithIndex).map {
       case (date, i) => {
-        val rotatedVaraints = rotate(weeklyVariants, date._1.weekOfWeekyear().get())
-        (date, rotatedVaraints.lift(i).getOrElse(weeklyVariantDefault))
+        val rotatedVariants = rotate(weeklyVariants, date._1.weekOfWeekyear().get())
+        (date, rotatedVariants.lift(i).getOrElse(weeklyVariantDefault))
       }
     } flatMap { case ((day, hour), (variant, speed)) =>
       scheduleWeekly(speed, variant)(day, hour)
@@ -446,7 +453,17 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go19x19), Blitz53)(
         new DateTime(2023, 12, 22, 0, 0)
-      ) //todo also add 13x13 and 9x9
+      ),
+      //use Weds 27th and Thurs 28th for final yearlys that we want to fit in
+      //Fri 29th is the end of year medley
+      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Monster), Blitz32)(
+        new DateTime(2023, 12, 27, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
+        new DateTime(2023, 12, 28, 0, 0)
+      )
+      //Go13x13 doesnt make the 2023 yearly schedule, we should put it towards the start of
+      //2024 yearly schedule (but not first to allow for some Go spread)
     ).flatten filter { _.schedule.at isAfter rightNow }
 
     //order matters for pruning weekly/yearly tournaments

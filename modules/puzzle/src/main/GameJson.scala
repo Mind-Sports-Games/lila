@@ -110,7 +110,7 @@ final private class GameJson(
                 sys.error(s"GameJson.generateBc ${game.id} $err")
               }
               .lastOption
-            uciMove <- situation.board.history.lastMove
+            uciMove <- situation.board.history.lastAction
           } yield Json.obj(
             "fen" -> Forsyth.>>(chessLib, situation).value,
             "ply" -> (turns + 1),

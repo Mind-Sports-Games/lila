@@ -5,7 +5,6 @@ import reactivemongo.api.ReadPreference
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 
-import strategygames.Speed
 import lila.db.dsl._
 import lila.game.Game
 import lila.rating.{ Perf, PerfType }
@@ -29,49 +28,13 @@ final class HistoryApi(coll: Coll, userRepo: UserRepo, cacheApi: lila.memo.Cache
   }
 
   def add(user: User, game: Game, perfs: Perfs): Funit = {
-    val isStd = game.ratingVariant.standard
+    val variantPerf = Perfs.variantLens(game.ratingVariant).map(_(perfs))
+    val speedPerf =
+      if (variantPerf == Some(perfs.standard)) Some(Perfs.speedLens(game.speed)(perfs))
+      else None
     val changes = List(
-      isStd.option("standard"                                               -> perfs.standard),
-      game.ratingVariant.chess960.option("chess960"                         -> perfs.chess960),
-      game.ratingVariant.kingOfTheHill.option("kingOfTheHill"               -> perfs.kingOfTheHill),
-      game.ratingVariant.threeCheck.option("threeCheck"                     -> perfs.threeCheck),
-      game.ratingVariant.fiveCheck.option("fiveCheck"                       -> perfs.fiveCheck),
-      game.ratingVariant.antichess.option("antichess"                       -> perfs.antichess),
-      game.ratingVariant.atomic.option("atomic"                             -> perfs.atomic),
-      game.ratingVariant.horde.option("horde"                               -> perfs.horde),
-      game.ratingVariant.racingKings.option("racingKings"                   -> perfs.racingKings),
-      game.ratingVariant.crazyhouse.option("crazyhouse"                     -> perfs.crazyhouse),
-      game.ratingVariant.noCastling.option("noCastling"                     -> perfs.noCastling),
-      game.ratingVariant.linesOfAction.option("linesOfAction"               -> perfs.linesOfAction),
-      game.ratingVariant.scrambledEggs.option("scrambledEggs"               -> perfs.scrambledEggs),
-      game.ratingVariant.draughtsStandard.option("international"            -> perfs.international),
-      game.ratingVariant.frisian.option("frisian"                           -> perfs.frisian),
-      game.ratingVariant.frysk.option("frysk"                               -> perfs.frysk),
-      game.ratingVariant.antidraughts.option("antidraughts"                 -> perfs.antidraughts),
-      game.ratingVariant.breakthrough.option("breakthrough"                 -> perfs.breakthrough),
-      game.ratingVariant.russian.option("russian"                           -> perfs.russian),
-      game.ratingVariant.brazilian.option("brazilian"                       -> perfs.brazilian),
-      game.ratingVariant.pool.option("pool"                                 -> perfs.pool),
-      game.ratingVariant.portuguese.option("portuguese"                     -> perfs.portuguese),
-      game.ratingVariant.english.option("english"                           -> perfs.english),
-      game.ratingVariant.shogi.option("shogi"                               -> perfs.shogi),
-      game.ratingVariant.xiangqi.option("xiangqi"                           -> perfs.xiangqi),
-      game.ratingVariant.minishogi.option("minishogi"                       -> perfs.minishogi),
-      game.ratingVariant.minixiangqi.option("minixiangqi"                   -> perfs.minixiangqi),
-      game.ratingVariant.flipello.option("flipello"                         -> perfs.flipello),
-      game.ratingVariant.flipello10.option("flipello10"                     -> perfs.flipello10),
-      game.ratingVariant.amazons.option("amazons"                           -> perfs.amazons),
-      game.ratingVariant.oware.option("oware"                               -> perfs.oware),
-      game.ratingVariant.togyzkumalak.option("togyzkumalak"                 -> perfs.togyzkumalak),
-      game.ratingVariant.go9x9.option("go9x9"                               -> perfs.go9x9),
-      game.ratingVariant.go13x13.option("go13x13"                           -> perfs.go13x13),
-      game.ratingVariant.go19x19.option("go19x19"                           -> perfs.go19x19),
-      (isStd && game.speed == Speed.UltraBullet).option("ultraBullet"       -> perfs.ultraBullet),
-      (isStd && game.speed == Speed.Bullet).option("bullet"                 -> perfs.bullet),
-      (isStd && game.speed == Speed.Blitz).option("blitz"                   -> perfs.blitz),
-      (isStd && game.speed == Speed.Rapid).option("rapid"                   -> perfs.rapid),
-      (isStd && game.speed == Speed.Classical).option("classical"           -> perfs.classical),
-      (isStd && game.speed == Speed.Correspondence).option("correspondence" -> perfs.correspondence)
+      variantPerf.map(game.ratingVariant.key -> _),
+      speedPerf.map(game.speed.key           -> _)
     ).flatten.map { case (k, p) =>
       k -> p.intRating
     }

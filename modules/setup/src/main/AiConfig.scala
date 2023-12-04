@@ -56,7 +56,7 @@ case class AiConfig(
             Player.make(P2, user, perfPicker)
           ),
           mode = Mode.Casual,
-          source = if (stratGame.board.variant.fromPosition) Source.Position else Source.Ai,
+          source = if (stratGame.board.variant.fromPositionVariant) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
         )

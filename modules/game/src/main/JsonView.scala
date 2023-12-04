@@ -55,7 +55,7 @@ final class JsonView(rematches: Rematches) {
       .add("winner" -> game.winnerPlayerIndex)
       .add("winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames))
       .add("loserPlayer" -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)))
-      .add("lastMove" -> game.lastMoveKeys)
+      .add("lastMove" -> game.lastActionKeys)
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("canOfferDraw" -> game.variant.canOfferDraw)

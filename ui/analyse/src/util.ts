@@ -252,6 +252,7 @@ export function getGoScore(fen: string, playerIndex: string): number {
 }
 
 const noCevalVariants = [
+  'monster',
   'linesOfAction',
   'scrambledEggs',
   'shogi',
@@ -332,6 +333,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'crazyhouse';
     case 'noCastling':
       return 'nocastling';
+    case 'monster':
+      return 'monster';
     case 'linesOfAction':
       return 'linesofaction';
     case 'scrambledEggs':

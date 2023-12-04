@@ -85,7 +85,7 @@ types = {
 roles = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece', 'k-piece']
 colors = ['w', 'b']
 chess_variants = ['standard','chess960', 'fromPosition', 'kingOfTheHill', 'threeCheck', 'fiveCheck', 'antichess', 'atomic',
-'horde', 'racingKings', 'crazyhouse', 'noCastling']
+'horde', 'racingKings', 'crazyhouse', 'noCastling', 'monster']
 draughts_variants = ['international','frisian','frysk','antidraughts','breakthrough','russian','brazilian','pool', 'portuguese', 'english']
 draughts_roles = ['man','king']
 draughts_invert_colors = ['english']

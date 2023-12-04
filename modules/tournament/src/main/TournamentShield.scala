@@ -367,6 +367,14 @@ object TournamentShield {
           26
         )
 
+    case object Monster
+        extends Category(
+          Variant.Chess(strategygames.chess.variant.Monster),
+          Blitz32,
+          23,
+          1
+        )
+
     case object LinesOfAction
         extends Category(
           Variant.Chess(strategygames.chess.variant.LinesOfAction),
@@ -551,6 +559,7 @@ object TournamentShield {
       Horde,
       RacingKings,
       NoCastling,
+      Monster,
       LinesOfAction,
       ScrambledEggs,
       International,

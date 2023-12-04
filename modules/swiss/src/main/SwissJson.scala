@@ -347,7 +347,7 @@ object SwissJson {
         "gameFamily"  -> g.variant.gameFamily.key,
         "variantKey"  -> g.variant.key,
         "fen"         -> Forsyth.boardAndPlayer(g.variant.gameLogic, g.situation),
-        "lastMove"    -> ~g.lastMoveKeys,
+        "lastMove"    -> ~g.lastActionKeys,
         "orientation" -> g.naturalOrientation.name,
         "p1"          -> boardPlayerJson(p1),
         "p2"          -> boardPlayerJson(p2),
