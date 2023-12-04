@@ -180,6 +180,7 @@
   <string name="minutesPerSide">Minutes per side</string>
   <string name="variant">Variant</string>
   <string name="variants">Variants</string>
+  <string name="clockTypes">Clock Types</string>
   <string name="medley">Medley</string>
   <string name="medleyTournaments">Medley Tournaments</string>
   <string name="medleyDefinition">A different game in every round of the Swiss</string>
