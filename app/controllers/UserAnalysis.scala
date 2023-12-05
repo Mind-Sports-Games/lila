@@ -67,10 +67,11 @@ final class UserAnalysis(
     Pov(
       lila.game.Game
         .make(
-          chess = strategygames.Game(
+          stratGame = strategygames.Game(
             lib = from.situation.board.variant.gameLogic,
             situation = from.situation,
-            turns = from.turns
+            plies = from.plies,
+            turnCount = from.turnCount
           ),
           p1Player = lila.game.Player.make(P1, none),
           p2Player = lila.game.Player.make(P2, none),
@@ -136,7 +137,7 @@ final class UserAnalysis(
             tv = none,
             analysis,
             initialFenO = initialFen.some,
-            withFlags = WithFlags(division = true, opening = true, clocks = true, movetimes = true),
+            withFlags = WithFlags(division = true, opening = true, clocks = true, plytimes = true),
             owner = owner
           ) map { data =>
             Ok(data.add("crosstable", crosstable))

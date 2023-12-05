@@ -16,44 +16,55 @@ object Rewind {
     Tags(List(variantTag, fenTag).flatten)
   }
 
-  def apply(game: Game, initialFen: Option[FEN]): Validated[String, Progress] =
+  def apply(game: Game, initialFen: Option[FEN], rewindPly: Boolean): Validated[String, Progress] =
     (game.variant.gameLogic match {
       case GameLogic.Chess() | GameLogic.Draughts() =>
         Reader
-          .movesWithSans(
+          .replayResultFromActionStrsUsingSan(
             game.variant.gameLogic,
-            moveStrs = game.pgnMoves,
+            actionStrs = game.actionStrs,
+            //this is ok as sans uses a flattened version of actionStrs safely
             op = sans => Sans(sans.value.dropRight(1)),
             tags = createTags(initialFen, game)
           )
       case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() | GameLogic.Go() =>
         Reader
-          .movesWithPgns(
+          .replayResultFromActionStrs(
             game.variant.gameLogic,
-            moveStrs = game.pgnMoves,
-            op = ucis => ucis.dropRight(1),
+            actionStrs = game.actionStrs,
+            op = actionStrs => {
+              //rewindTurn (which might just be one ply)
+              if (actionStrs.takeRight(1).flatten.size <= 1 || !rewindPly)
+                //adding empty Vector enables actionStrs to tell that the previous turn was complete
+                actionStrs.dropRight(1) :+ Vector()
+              //rewindPly - keeps the same turn
+              else actionStrs.dropRight(1) :+ actionStrs.takeRight(1).flatten.dropRight(1)
+            },
             tags = createTags(initialFen, game)
           )
     }).flatMap(_.valid) map { replay =>
-      val switchPlayer = game.pgnMoves.size % game.variant.plysPerTurn == 0
+      val switchPlayer = game.turnPlayerIndex != replay.state.player
       val playerIndex  = if (switchPlayer) game.turnPlayerIndex else !game.turnPlayerIndex
       val rewindedGame = replay.state
+      val pliesRemoved = game.stratGame.plies - rewindedGame.plies
       val newClock = game.clock.map(_.takeback(switchPlayer)) map { clk =>
-        game.clockHistory.flatMap(_.last(playerIndex)).fold(clk) { t =>
-          clk.setRemainingTime(playerIndex, t)
-        }
+        game.clockHistory
+          .flatMap(_.lastX(playerIndex, pliesRemoved))
+          .fold(clk) { t =>
+            clk.setRemainingTime(playerIndex, t)
+          }
       }
       def rewindPlayer(player: Player) = player.copy(proposeTakebackAt = 0)
       val newGame = game.copy(
         p1Player = rewindPlayer(game.p1Player),
         p2Player = rewindPlayer(game.p2Player),
-        chess = rewindedGame.copy(clock = newClock),
-        binaryMoveTimes = game.binaryMoveTimes.map { binary =>
-          val moveTimes = BinaryFormat.moveTime.read(binary, game.playedTurns)
-          BinaryFormat.moveTime.write(moveTimes.dropRight(1))
+        stratGame = rewindedGame.copy(clock = newClock),
+        binaryPlyTimes = game.binaryPlyTimes.map { binary =>
+          val plyTimes = BinaryFormat.plyTime.read(binary, game.plies)
+          BinaryFormat.plyTime.write(plyTimes.take(rewindedGame.plies))
         },
-        loadClockHistory = _ => game.clockHistory.map(_.update(!playerIndex, _.dropRight(1))),
-        movedAt = DateTime.now
+        loadClockHistory = _ => game.clockHistory.map(_.update(!playerIndex, _.dropRight(pliesRemoved))),
+        updatedAt = DateTime.now
       )
       Progress(game, newGame)
     }

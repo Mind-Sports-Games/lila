@@ -73,13 +73,13 @@ final private class PushApi(
             IfAway(pov) {
               gameRepo.countWhereUserTurn(userId) flatMap { nbMyTurn =>
                 asyncOpponentName(pov) flatMap { opponent =>
-                  game.pgnMoves.lastOption ?? { sanMove =>
+                  game.actionStrs.filter(_.size > 0).map(_.mkString(",")).lastOption ?? { turn =>
                     pushToAll(
                       userId,
                       _.move,
                       PushApi.Data(
                         title = "It's your turn!",
-                        body = s"$opponent played $sanMove",
+                        body = s"$opponent played $turn",
                         stacking = Stacking.GameMove,
                         payload = Json.obj(
                           "userId"   -> userId,

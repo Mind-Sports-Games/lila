@@ -20,6 +20,7 @@ case class Perfs(
     racingKings: Perf,
     crazyhouse: Perf,
     noCastling: Perf,
+    monster: Perf,
     linesOfAction: Perf,
     scrambledEggs: Perf,
     international: Perf,
@@ -69,6 +70,7 @@ case class Perfs(
       "racingKings"    -> racingKings,
       "crazyhouse"     -> crazyhouse,
       "noCastling"     -> noCastling,
+      "monster"        -> monster,
       "linesOfAction"  -> linesOfAction,
       "scrambledEggs"  -> scrambledEggs,
       "international"  -> international,
@@ -174,6 +176,7 @@ case class Perfs(
     "racingKings"    -> racingKings,
     "crazyhouse"     -> crazyhouse,
     "noCastling"     -> noCastling,
+    "monster"        -> monster,
     "linesOfAction"  -> linesOfAction,
     "scrambledEggs"  -> scrambledEggs,
     "frisian"        -> frisian,
@@ -301,6 +304,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -334,6 +338,7 @@ case object Perfs {
       case Variant.Chess(strategygames.chess.variant.Horde)                      => Some(_.horde)
       case Variant.Chess(strategygames.chess.variant.RacingKings)                => Some(_.racingKings)
       case Variant.Chess(strategygames.chess.variant.NoCastling)                 => Some(_.noCastling)
+      case Variant.Chess(strategygames.chess.variant.Monster)                    => Some(_.monster)
       case Variant.Chess(strategygames.chess.variant.LinesOfAction)              => Some(_.linesOfAction)
       case Variant.Chess(strategygames.chess.variant.ScrambledEggs)              => Some(_.scrambledEggs)
       case Variant.Draughts(strategygames.draughts.variant.Standard)             => Some(_.international)
@@ -389,6 +394,7 @@ case object Perfs {
         racingKings = perf("racingKings"),
         crazyhouse = perf("crazyhouse"),
         noCastling = perf("noCastling"),
+        monster = perf("monster"),
         linesOfAction = perf("linesOfAction"),
         scrambledEggs = perf("scrambledEggs"),
         international = perf("international"),
@@ -441,6 +447,7 @@ case object Perfs {
         "racingKings"    -> notNew(o.racingKings),
         "crazyhouse"     -> notNew(o.crazyhouse),
         "noCastling"     -> notNew(o.noCastling),
+        "monster"        -> notNew(o.monster),
         "linesOfAction"  -> notNew(o.linesOfAction),
         "scrambledEggs"  -> notNew(o.scrambledEggs),
         "international"  -> notNew(o.international),
@@ -494,6 +501,7 @@ case object Perfs {
       horde: List[User.LightPerf],
       racingKings: List[User.LightPerf],
       noCastling: List[User.LightPerf],
+      monster: List[User.LightPerf],
       linesOfAction: List[User.LightPerf],
       scrambledEggs: List[User.LightPerf],
       international: List[User.LightPerf],
@@ -521,6 +529,7 @@ case object Perfs {
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
     Nil,
     Nil,
     Nil,

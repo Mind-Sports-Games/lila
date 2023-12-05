@@ -2,7 +2,7 @@ package lila.game
 
 import strategygames.Status
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Standard, FromPosition }
+import strategygames.chess.variant.{ FromPosition, Standard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 
@@ -61,7 +61,7 @@ object Query {
   def nowPlaying(u: String) = $doc(F.playingUids -> u)
 
   def recentlyPlaying(u: String) =
-    nowPlaying(u) ++ $doc(F.movedAt $gt DateTime.now.minusMinutes(5))
+    nowPlaying(u) ++ $doc(F.updatedAt $gt DateTime.now.minusMinutes(5))
 
   def nowPlayingVs(u1: String, u2: String) = $doc(F.playingUids $all List(u1, u2))
 
@@ -108,7 +108,7 @@ object Query {
   def checkableOld = F.checkAt $lt DateTime.now.minusHours(1)
 
   def variant(v: Variant) =
-    $doc(F.variant -> (if (v.standard) $exists(false) else $int(v.id)))
+    $doc(F.variant -> (if (v == Variant.Chess(Standard)) $exists(false) else $int(v.id)))
 
   lazy val variantStandard = variant(Variant.Chess(Standard))
 
@@ -139,5 +139,5 @@ object Query {
   val sortCreated: Bdoc           = $sort desc F.createdAt
   val sortChronological: Bdoc     = $sort asc F.createdAt
   val sortAntiChronological: Bdoc = $sort desc F.createdAt
-  val sortMovedAtNoIndex: Bdoc    = $sort desc F.movedAt
+  val sortMovedAtNoIndex: Bdoc    = $sort desc F.updatedAt
 }

@@ -102,6 +102,7 @@ final class RankingApi(
       racingKings   <- topPerf(PerfType.orDefault("racingKings").id, nb)
       crazyhouse    <- topPerf(PerfType.orDefault("crazyhouse").id, nb)
       noCastling    <- topPerf(PerfType.orDefault("noCastling").id, nb)
+      monster       <- topPerf(PerfType.orDefault("monster").id, nb)
       linesOfAction <- topPerf(PerfType.orDefault("linesOfAction").id, nb)
       scrambledEggs <- topPerf(PerfType.orDefault("scrambledEggs").id, nb)
       international <- topPerf(PerfType.orDefault("international").id, nb)
@@ -142,6 +143,7 @@ final class RankingApi(
       horde = horde,
       racingKings = racingKings,
       noCastling = noCastling,
+      monster = monster,
       linesOfAction = linesOfAction,
       scrambledEggs = scrambledEggs,
       international = international,

@@ -38,7 +38,7 @@ private object ChallengeJoiner {
       destUser: Option[User],
       playerIndex: Option[PlayerIndex]
   ): Game = {
-    def makeChess(variant: Variant): strategygames.Game =
+    def makeStratGame(variant: Variant): strategygames.Game =
       strategygames.Game(
         variant.gameLogic,
         situation = Situation(variant.gameLogic, variant),
@@ -47,32 +47,35 @@ private object ChallengeJoiner {
 
     val baseState = c.initialFen
       .ifTrue(
-        c.variant.fromPosition || c.variant.chess960 || c.variant.gameFamily == GameFamily.Go()
+        c.variant.fromPositionVariant || c.variant.key == "chess960" || c.variant.gameFamily == GameFamily
+          .Go()
       ) flatMap {
       Forsyth.<<<@(c.variant.gameLogic, c.variant, _)
     }
-    val (chessGame, state) = baseState.fold(makeChess(c.variant) -> none[SituationPlus]) {
+    val (stratGame, state) = baseState.fold(makeStratGame(c.variant) -> none[SituationPlus]) {
       case sp @ SituationPlus(sit, _) =>
         val game = strategygames.Game(
           lib = c.variant.gameLogic,
           situation = sit,
-          turns = sp.turns,
-          startedAtTurn = sp.turns,
+          plies = sp.plies,
+          turnCount = sp.turnCount,
+          startedAtPly = sp.plies,
+          startedAtTurn = sp.turnCount,
           clock = c.clock.map(_.config.toClock)
         )
-        if (c.variant.fromPosition && Forsyth.>>(c.variant.gameLogic, game).initial)
-          makeChess(Variant.libStandard(c.variant.gameLogic)) -> none
-        else game                                             -> baseState
+        if (c.variant.fromPositionVariant && Forsyth.>>(c.variant.gameLogic, game).initial)
+          makeStratGame(Variant.libStandard(c.variant.gameLogic)) -> none
+        else game                                                 -> baseState
     }
-    val pieces     = chessGame.situation.board.pieces
+    val pieces     = stratGame.situation.board.pieces
     val multiMatch = c.isMultiMatch && c.customStartingPosition option "multiMatch"
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game
       .make(
-        chess = chessGame,
+        stratGame = stratGame,
         p1Player = Player.make(P1, c.finalPlayerIndex.fold(origUser, destUser), perfPicker),
         p2Player = Player.make(P2, c.finalPlayerIndex.fold(destUser, origUser), perfPicker),
-        mode = if (chessGame.board.variant.fromPosition) Mode.Casual else c.mode,
+        mode = if (stratGame.board.variant.fromPositionVariant) Mode.Casual else c.mode,
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,
         pgnImport = None,
@@ -80,13 +83,14 @@ private object ChallengeJoiner {
       )
       .withId(c.id)
       .pipe { g =>
-        state.fold(g) { case sit @ SituationPlus(s, _) =>
+        state.fold(g) { case sp @ SituationPlus(sit, _) =>
           g.copy(
-            chess = g.chess.copy(
+            stratGame = g.stratGame.copy(
               situation = g.situation.copy(
-                board = g.board.copy(history = s.board.history)
+                board = g.board.copy(history = sit.board.history)
               ),
-              turns = sit.turns
+              plies = sp.plies,
+              turnCount = sp.turnCount
             )
           )
         }

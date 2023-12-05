@@ -47,6 +47,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
           if (mainlinePly != chart.lastPly) {
             if (mainlinePly === false) unselect(chart);
             else {
+              //TODO check this for multiaction
               const point = chart.series[0].data[mainlinePly - 1 - data.game.startedAtTurn];
               if (defined(point)) point.select();
               else unselect(chart);
@@ -63,6 +64,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
             else {
               const p1 = mainlinePly % 2 !== 0;
               const serie = p1 ? 0 : 1;
+              //TODO check this for multiaction
               const turn = Math.floor((mainlinePly - 1 - data.game.startedAtTurn) / 2);
               const point = chart.series[serie].data[turn];
               if (defined(point)) point.select();

@@ -75,7 +75,7 @@ case class PlayStreak(nb: Streaks, time: Streaks, lastDate: Option[DateTime]) {
       copy(
         nb = nb(cont, pov)(1),
         time = time(cont, pov)(seconds),
-        lastDate = pov.game.movedAt.some
+        lastDate = pov.game.updatedAt.some
       )
     }
   def checkCurrent =
@@ -107,7 +107,7 @@ case class Streak(v: Int, from: Option[GameAt], to: Option[GameAt]) {
     copy(
       v = v + by,
       from = from orElse GameAt(pov.game.createdAt, pov.gameId).some,
-      to = GameAt(pov.game.movedAt, pov.gameId).some
+      to = GameAt(pov.game.updatedAt, pov.gameId).some
     )
   def period = new Period(v * 1000L)
 }
@@ -172,7 +172,7 @@ case class Avg(avg: Double, pop: Int) {
 
 case class GameAt(at: DateTime, gameId: String)
 object GameAt {
-  def agg(pov: Pov) = GameAt(pov.game.movedAt, pov.gameId)
+  def agg(pov: Pov) = GameAt(pov.game.updatedAt, pov.gameId)
 }
 
 case class RatingAt(int: Int, at: DateTime, gameId: String)
@@ -185,7 +185,7 @@ object RatingAt {
         }
       }
       .map {
-        RatingAt(_, pov.game.movedAt, pov.gameId)
+        RatingAt(_, pov.game.updatedAt, pov.gameId)
       } orElse cur
 }
 
@@ -202,7 +202,7 @@ case class Results(results: List[Result]) extends AnyVal {
             Result(
               opInt,
               UserId(~pov.opponent.userId),
-              pov.game.movedAt,
+              pov.game.updatedAt,
               pov.gameId
             ) :: results,
             Results.nb,

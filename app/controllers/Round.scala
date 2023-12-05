@@ -350,7 +350,7 @@ final class Round(
         Redirect(
           "%s?fen=%s#%s".format(
             routes.Lobby.home,
-            get("fen") | (Forsyth.>>(game.variant.gameLogic, game.chess)).value,
+            get("fen") | (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value,
             mode
           )
         )

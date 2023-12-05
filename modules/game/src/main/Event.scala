@@ -70,7 +70,8 @@ object Event {
       extra ++ Json
         .obj(
           "fen"         -> fen,
-          "ply"         -> state.turns,
+          "ply"         -> state.plies,
+          "turnCount"   -> state.turnCount,
           "dests"       -> PossibleMoves.oldJson(possibleMoves),
           "captLen"     -> ~captLen,
           "gf"          -> gf.id,
@@ -744,7 +745,8 @@ object Event {
 
   case class State(
       playerIndex: PlayerIndex,
-      turns: Int,
+      turnCount: Int,
+      plies: Int,
       status: Option[Status],
       winner: Option[PlayerIndex],
       p1OffersDraw: Boolean,
@@ -757,7 +759,8 @@ object Event {
       Json
         .obj(
           "playerIndex" -> playerIndex,
-          "turns"       -> turns
+          "plies" -> plies,
+          "turns" -> turnCount
         )
         .add("status" -> status)
         .add("winner" -> winner)

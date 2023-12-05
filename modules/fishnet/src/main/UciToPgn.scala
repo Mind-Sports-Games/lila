@@ -13,6 +13,7 @@ import lila.base.LilaException
 
 // convert variations from UCI to PGN.
 // also drops extra variations
+// This has not been upgraded to multiaction - should it be?
 private object UciToPgn {
 
   type WithErrors[A] = (A, List[Exception])
@@ -33,10 +34,10 @@ private object UciToPgn {
     def uciToPgn(ply: Int, variation: List[String]): Validated[String, List[PgnMove]] =
       for {
         situation <-
-          if (ply == replay.setup.startedAtTurn + 1) valid(replay.setup.situation)
+          if (ply == replay.setup.startedAtPly + 1) valid(replay.setup.situation)
           else
             replay
-              .moveAtPly(ply)
+              .actionAtPly(ply)
               .map(action => {
                 action match {
                   case m: Move           => m.situationBefore
@@ -71,9 +72,9 @@ private object UciToPgn {
     onlyMeaningfulVariations.foldLeft[WithErrors[List[Info]]]((Nil, Nil)) {
       case ((infos, errs), info) if info.variation.isEmpty => (info :: infos, errs)
       case ((infos, errs), info) =>
-        uciToPgn(info.ply, info.variation).fold(
+        uciToPgn(info.ply, info.variation.flatten.toList).fold(
           err => (info.dropVariation :: infos, LilaException(err) :: errs),
-          pgn => (info.copy(variation = pgn) :: infos, errs)
+          pgn => (info.copy(variation = Vector(pgn)) :: infos, errs)
         )
     } match {
       case (infos, errors) => analysis.copy(infos = infos.reverse) -> errors

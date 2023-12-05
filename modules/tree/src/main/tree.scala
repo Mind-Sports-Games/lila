@@ -4,14 +4,16 @@ import strategygames.Centis
 import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.opening.FullOpening
-import strategygames.{ GameLogic, Pocket, PocketData, Pos, Role }
+import strategygames.{ GameLogic, Player => PlayerIndex, Pocket, PocketData, Pos, Role }
 import play.api.libs.json._
 
 import lila.common.Json._
 
 sealed trait Node {
   def ply: Int
-  def plysPerTurn: Int
+  //
+  //def turnCount: Int
+  //def playerIndex: PlayerIndex
   def fen: FEN
   def check: Boolean
   // None when not computed yet
@@ -39,7 +41,10 @@ sealed trait Node {
   def moveOption: Option[Uci.WithSan]
 
   // who's playerIndex plays next
-  def playerIndex = strategygames.Player.fromPly(ply, plysPerTurn)
+  // This was inherited from lichess but is the right?
+  // Should the node track who played on this node?
+  // TODO change for multiaction (use turnCount)
+  def playerIndex = PlayerIndex.fromTurnCount(ply)
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
@@ -47,7 +52,6 @@ sealed trait Node {
 
 case class Root(
     ply: Int,
-    plysPerTurn: Int,
     fen: FEN,
     check: Boolean,
     // None when not computed yet
@@ -80,7 +84,6 @@ case class Root(
 case class Branch(
     id: UciCharPair,
     ply: Int,
-    plysPerTurn: Int,
     move: Uci.WithSan,
     fen: FEN,
     check: Boolean,

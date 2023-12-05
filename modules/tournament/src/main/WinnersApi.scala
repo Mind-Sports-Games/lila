@@ -97,7 +97,7 @@ final class WinnersApi(
   private def firstStandardWinner(tours: List[Tournament], speed: Speed): Option[Winner] =
     tours
       .find { t =>
-        t.variant.standard && t.schedule.exists(_.speed == speed)
+        t.variant.key == "standard" && t.schedule.exists(_.speed == speed)
       }
       .flatMap(_.winner)
 

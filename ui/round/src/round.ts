@@ -2,11 +2,20 @@ import { RoundData, Step } from './interfaces';
 
 export const firstPly = (d: RoundData): number => d.steps[0].ply;
 
+export const firstTurn = (d: RoundData): number => d.steps[0].turnCount;
+
 export const lastPly = (d: RoundData): number => lastStep(d).ply;
+
+export const lastTurn = (d: RoundData): number => lastStep(d).turnCount;
+
+export const turnsTaken = (d: RoundData): number => lastTurn(d) - firstTurn(d);
 
 export const lastStep = (d: RoundData): Step => d.steps[d.steps.length - 1];
 
 export const plyStep = (d: RoundData, ply: number): Step => d.steps[ply - firstPly(d)];
+
+export const turnStep = (d: RoundData, turn: number): Step =>
+  turn <= lastTurn(d) && turn >= firstTurn(d) ? d.steps.filter(s => s.turnCount === turn)[0] : d.steps[0];
 
 export const massage = (d: RoundData): void => {
   if (d.clock) {
@@ -16,9 +25,9 @@ export const massage = (d: RoundData): void => {
 
   if (d.correspondence) d.correspondence.showBar = d.pref.clockBar;
 
-  if (['horde', 'crazyhouse', 'shogi', 'minishogi', 'amazons'].includes(d.game.variant.key))
+  if (['horde', 'monster', 'crazyhouse', 'shogi', 'minishogi', 'amazons'].includes(d.game.variant.key))
     d.pref.showCaptured = false;
 
-  if (d.expirationAtStart) d.expirationAtStart.movedAt = Date.now() - d.expirationAtStart.idleMillis;
-  if (d.expirationOnPaused) d.expirationOnPaused.movedAt = Date.now() - d.expirationOnPaused.idleMillis;
+  if (d.expirationAtStart) d.expirationAtStart.updatedAt = Date.now() - d.expirationAtStart.idleMillis;
+  if (d.expirationOnPaused) d.expirationOnPaused.updatedAt = Date.now() - d.expirationOnPaused.idleMillis;
 };

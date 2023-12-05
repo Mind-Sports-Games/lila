@@ -68,13 +68,8 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
   private def duplicateValsForMultiMoveGames(
       work: Work.Analysis,
       evals: List[Option[Evaluation.OrSkipped[Uci]]]
-  ): List[Option[Evaluation.OrSkipped[Uci]]] = {
-    work.game.variant.plysPerTurn match {
-      case 2 => evals.flatMap(e => List(e, e))
-      case 1 => evals
-      case _ => sys.error("More work needs to be done for variants that have more than 2 plys per turn")
-    }
-  }
+  ): List[Option[Evaluation.OrSkipped[Uci]]] =
+    if (work.game.variant.key == "amazons") evals.flatMap(e => List(e, e)) else evals
 
   private def mergeEvalsAndCached(
       work: Work.Analysis,
@@ -94,7 +89,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
   private def makeInfos(
       evals: List[Option[Evaluation[Uci]]],
       moves: List[Uci],
-      startedAtPly: Int
+      startedAtTurn: Int
   ): List[Info] =
     (evals filterNot (_ ?? (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map {
       case ((List(Some(before), Some(after)), move), index) =>
@@ -104,15 +99,16 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
         }
         val best = variation.headOption
         val info = Info(
-          ply = index + 1 + startedAtPly,
+          //can use startedAtTurn as startedAtPly as fishnet doesnt deal with multiaction
+          ply = index + 1 + startedAtTurn,
           eval = Eval(
             after.score.cp,
             after.score.mate,
             best
           ),
-          variation = variation.map(_.uci)
+          variation = variation.map(_.uci).map(Vector(_))
         )
         if (info.ply % 2 == 1) info.invert else info
-      case ((_, _), index) => Info(index + 1 + startedAtPly, Eval.empty)
+      case ((_, _), index) => Info(index + 1 + startedAtTurn, Eval.empty)
     }
 }

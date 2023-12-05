@@ -10,6 +10,8 @@ import play.api.libs.json.JsObject
 
 import lila.tree.Branch
 
+//We don't think AnaDrop is used - think this has been ported to lila-ws
+
 case class AnaDrop(
     role: Role,
     pos: Pos,
@@ -23,14 +25,13 @@ case class AnaDrop(
     (Game(variant.gameLogic, variant.some, fen.some), role, pos) match {
       case (Game.Chess(game), Role.ChessRole(role), Pos.Chess(pos)) =>
         game.drop(role, pos) flatMap { case (game, drop) =>
-          game.pgnMoves.lastOption toValid "Dropped but no last move!" map { san =>
+          game.actionStrs.flatten.lastOption toValid "Dropped but no last move!" map { san =>
             val uci     = Uci(drop)
             val movable = !game.situation.end
             val fen     = Forsyth.>>(variant.gameLogic, Game.Chess(game))
             Branch(
               id = UciCharPair(uci),
-              ply = game.turns,
-              plysPerTurn = variant.plysPerTurn,
+              ply = game.plies,
               move = strategygames.format.Uci.ChessWithSan(Uci.WithSan(uci, san)),
               fen = fen,
               check = game.situation.check,

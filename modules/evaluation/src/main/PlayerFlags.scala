@@ -5,8 +5,8 @@ case class PlayerFlags(
     alwaysHasAdvantage: Boolean,
     highBlurRate: Boolean,
     moderateBlurRate: Boolean,
-    highlyConsistentMoveTimes: Boolean,
-    moderatelyConsistentMoveTimes: Boolean,
-    noFastMoves: Boolean,
+    highlyConsistentPlyTimes: Boolean,
+    moderatelyConsistentPlyTimes: Boolean,
+    noFastPlies: Boolean,
     suspiciousHoldAlert: Boolean
 )

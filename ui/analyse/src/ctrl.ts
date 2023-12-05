@@ -251,6 +251,7 @@ export default class AnalyseCtrl {
     return this.node;
   }
 
+  //TODO multiaction this is probably wrong (mixing ply and turn) want to deprecate plyPlayerIndex by having playerIndex available on the node
   turnPlayerIndex(): PlayerIndex {
     return util.plyPlayerIndex(this.node.ply, this.data.game.variant.key);
   }
@@ -261,9 +262,10 @@ export default class AnalyseCtrl {
   }
 
   private uciToLastMove(uci?: Uci): Key[] | undefined {
-    if (!uci) return;
-    if (uci[1] === '@') return [uci.substring(2), uci.substring(2)] as Key[];
-    return [uci.substring(0, 2), uci.substring(2, 2)] as Key[]; //todo fix for moves on 10x10 board
+    if (!uci || uci == 'pass' || uci.substring(0, 3) == 'ss:') return;
+    const pos = uci.match(/[a-z][1-9][0-9]?/g) as Key[];
+    if (uci[1] === '@') return [pos[0], pos[0]] as Key[];
+    return [pos[0], pos[1]] as Key[];
   }
 
   private showGround(): void {
@@ -992,7 +994,7 @@ export default class AnalyseCtrl {
   getMovetime = (node: Tree.Node): number | undefined => {
     const offset = this.mainline[0].ply;
     if (defined(node.clock) && !this.study) {
-      if (defined(this.data.game.moveCentis)) return this.data.game.moveCentis[node.ply - 1 - offset];
+      if (defined(this.data.game.plyCentis)) return this.data.game.plyCentis[node.ply - 1 - offset];
       //if (this.imported) return node.clock;
     }
     return;

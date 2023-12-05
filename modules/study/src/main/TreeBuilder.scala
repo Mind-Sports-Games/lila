@@ -13,7 +13,7 @@ object TreeBuilder {
 
   def apply(root: Node.Root, variant: Variant): tree.Root = {
     val dests =
-      if (variant.standard && root.fen.initial) initialStandardDests(variant.gameLogic)
+      if (variant.key == "standard" && root.fen.initial) initialStandardDests(variant.gameLogic)
       else {
         val sit = Game(variant.gameLogic, variant.some, root.fen.some).situation
         sit.playable(false) ?? sit.destinations
@@ -25,7 +25,6 @@ object TreeBuilder {
     tree.Branch(
       id = node.id,
       ply = node.ply,
-      plysPerTurn = variant.plysPerTurn,
       move = node.move,
       fen = node.fen,
       check = node.check,
@@ -46,7 +45,6 @@ object TreeBuilder {
   def makeRoot(root: Node.Root, variant: Variant): tree.Root =
     tree.Root(
       ply = root.ply,
-      plysPerTurn = variant.plysPerTurn,
       fen = root.fen,
       check = root.check,
       shapes = root.shapes,

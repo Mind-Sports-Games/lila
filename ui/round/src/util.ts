@@ -176,7 +176,7 @@ export function countChecks(steps: Step[], ply: Ply): CheckCount {
   for (const step of steps) {
     if (ply < step.ply) break;
     if (step.check) {
-      if (step.ply % 2 === 1) checks.p1++;
+      if (step.turnCount % 2 === 1) checks.p1++;
       else checks.p2++;
     }
   }
@@ -198,7 +198,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisBoardVariants: VariantKey[] = ['amazons', 'go9x9', 'go13x13', 'go19x19'];
+const noAnalysisBoardVariants: VariantKey[] = ['monster', 'amazons', 'go9x9', 'go13x13', 'go19x19'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisBoardVariants.indexOf(variant) == -1;
@@ -216,10 +216,6 @@ export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | und
   }
 }
 
-export function turnPlayerIndexFromLastPly(ply: Ply, variantKey: VariantKey): PlayerIndex {
-  if (variantKey === 'amazons') {
-    return Math.floor(ply / 2) % 2 === 0 ? 'p1' : 'p2';
-  } else {
-    return ply % 2 === 0 ? 'p1' : 'p2';
-  }
+export function turnPlayerIndexFromLastTurn(turn: number): PlayerIndex {
+  return turn % 2 === 0 ? 'p1' : 'p2';
 }

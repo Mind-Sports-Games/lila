@@ -37,10 +37,11 @@ final class JsonView(rematches: Rematches) {
         "perf"          -> PerfPicker.key(game),
         "rated"         -> game.rated,
         "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
-        "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.chess)),
+        "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.stratGame)),
         "player"        -> game.activePlayerIndex,
-        "turns"         -> game.turns,
-        "startedAtTurn" -> game.chess.startedAtTurn,
+        "plies"         -> game.plies,
+        "turns"         -> game.turnCount,
+        "startedAtTurn" -> game.stratGame.startedAtTurn,
         "source"        -> game.source,
         "status"        -> game.status,
         "createdAt"     -> game.createdAt
@@ -54,11 +55,11 @@ final class JsonView(rematches: Rematches) {
       .add("winner" -> game.winnerPlayerIndex)
       .add("winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames))
       .add("loserPlayer" -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)))
-      .add("lastMove" -> game.lastMoveKeys)
+      .add("lastMove" -> game.lastActionKeys)
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("canOfferDraw" -> game.variant.canOfferDraw)
-      .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedPlies))
+      .add("drawOffers" -> (!game.drawOffers.isEmpty).option(game.drawOffers.normalizedTurns))
       .add("canDoPassAction" -> (game.situation.passes.size > 0))
       .add("multiMatch" -> game.metadata.multiMatchGameNr.map { index =>
         Json

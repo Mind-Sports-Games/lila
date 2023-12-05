@@ -22,7 +22,7 @@ function analysisButton(ctrl: RoundController): VNode | null {
     mm = d.game.multiMatch,
     awaitingAutoRematch =
       !d.game.rematch && !d.player.spectator && mm && mm.index === 1 && !mm.gameId && !status.aborted(d),
-    url = gameRoute(d, analysisBoardOrientation(d)) + '#' + ctrl.ply;
+    url = gameRoute(d, analysisBoardOrientation(d)) + '#' + ctrl.turnCount;
   return !awaitingAutoRematch && game.replayable(d) && util.allowAnalysisForVariant(ctrl.data.game.variant.key)
     ? h(
         'a.fbt',

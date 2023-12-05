@@ -4,7 +4,17 @@ import scala.util.chaining._
 import cats.data.NonEmptyList
 
 import strategygames.format.FEN
-import strategygames.{ Board, Player => PlayerIndex, Divider, Division, GameFamily, GameLogic, Piece, Replay, Role }
+import strategygames.{
+  Board,
+  Player => PlayerIndex,
+  Divider,
+  Division,
+  GameFamily,
+  GameLogic,
+  Piece,
+  Replay,
+  Role
+}
 import strategygames.{ Centis, Stats }
 import lila.analyse.{ Accuracy, Advice }
 import lila.game.{ Game, Pov }
@@ -24,7 +34,7 @@ final private class PovToEntry(
       division: Division,
       moveAccuracy: Option[List[Int]],
       boards: NonEmptyList[Board],
-      movetimes: NonEmptyList[Centis],
+      plytimes: NonEmptyList[Centis],
       advices: Map[Ply, Advice]
   )
 
@@ -51,13 +61,13 @@ final private class PovToEntry(
                 Replay
                   .boards(
                     game.variant.gameLogic,
-                    moveStrs = game.pgnMoves,
+                    actionStrs = game.actionStrs,
                     initialFen = fen,
                     variant = game.variant
                   )
                   .toOption
                   .flatMap(_.toNel)
-              movetimes <- game.moveTimes(pov.playerIndex).flatMap(_.toNel)
+              plytimes <- game.plyTimes(pov.playerIndex).flatMap(_.toNel)
             } yield RichPov(
               pov = pov,
               provisional = provisional,
@@ -66,7 +76,7 @@ final private class PovToEntry(
               division = Divider(pov.game.variant.gameLogic, boards.toList),
               moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
               boards = boards,
-              movetimes = movetimes,
+              plytimes = plytimes,
               advices = an.?? {
                 _.advices.view.map { a =>
                   a.info.ply -> a
@@ -86,8 +96,12 @@ final private class PovToEntry(
         from.pov.playerIndex.fold(is, is.map(_.invert))
       }
     }
-    val movetimes = from.movetimes.toList
-    val roles     = from.pov.game.pgnMoves(from.pov.playerIndex).map(pgnMoveToRole(from.pov.game.variant.gameFamily, _))
+    val plytimes = from.plytimes.toList
+    //flatten until we support something other than chess
+    val roles = from.pov.game
+      .actionStrs(from.pov.playerIndex)
+      .flatten
+      .map(pgnMoveToRole(from.pov.game.variant.gameFamily, _))
     val boards = {
       val pivot = if (from.pov.playerIndex == from.pov.game.startPlayerIndex) 0 else 1
       from.boards.toList.zipWithIndex.collect {
@@ -96,10 +110,10 @@ final private class PovToEntry(
     }
     val blurs = {
       val bools = from.pov.player.blurs.booleans
-      bools ++ Array.fill(movetimes.size - bools.length)(false)
+      bools ++ Array.fill(plytimes.size - bools.length)(false)
     }
-    val timeCvs = slidingMoveTimesCvs(movetimes)
-    movetimes.zip(roles).zip(boards).zip(blurs).zip(timeCvs).zipWithIndex.map {
+    val timeCvs = slidingPlyTimesCvs(plytimes)
+    plytimes.zip(roles).zip(boards).zip(blurs).zip(timeCvs).zipWithIndex.map {
       case (((((movetime, role), board), blur), timeCv), i) =>
         val ply      = i * 2 + from.pov.playerIndex.fold(1, 2)
         val prevInfo = prevInfos lift i
@@ -135,13 +149,13 @@ final private class PovToEntry(
     }
   }
 
-  private def slidingMoveTimesCvs(movetimes: Seq[Centis]): Seq[Option[Float]] = {
+  private def slidingPlyTimesCvs(plytimes: Seq[Centis]): Seq[Option[Float]] = {
     val sliding = 13 // should be odd
-    val nb      = movetimes.size
+    val nb      = plytimes.size
     if (nb < sliding) Vector.fill(nb)(none[Float])
     else {
       val sides = Vector.fill(sliding / 2)(none[Float])
-      val cvs = movetimes
+      val cvs = plytimes
         .sliding(sliding)
         .map { a =>
           // drop outliers
@@ -184,12 +198,14 @@ final private class PovToEntry(
       playerIndex = pov.playerIndex,
       perf = perfType,
       eco =
-        if (game.playable || game.turns < 4 || game.fromPosition || game.variant.exotic) none
-        else strategygames.chess.opening.Ecopening fromGame game.pgnMoves.toList,
-      myCastling = Castling.fromMoves(game pgnMoves pov.playerIndex),
+        if (game.playable || game.turnCount < 4 || game.fromPosition || game.variant.exotic) none
+        else strategygames.chess.opening.Ecopening fromGame game.actionStrs,
+      //flatten until insights support something other than chess
+      myCastling = Castling.fromMoves(game.actionStrs(pov.playerIndex).flatten),
       opponentRating = opRating,
       opponentStrength = RelativeStrength(opRating - myRating),
-      opponentCastling = Castling.fromMoves(game pgnMoves !pov.playerIndex),
+      //flatten until insights support something other than chess
+      opponentCastling = Castling.fromMoves(game.actionStrs(!pov.playerIndex).flatten),
       moves = makeMoves(from),
       queenTrade = queenTrade(from),
       result = game.winnerUserId match {

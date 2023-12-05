@@ -13,6 +13,7 @@ export function clearSelection() {
   window.getSelection()?.removeAllRanges();
 }
 
+//TODO multiaction remove this function
 export function plyPlayerIndex(ply: number, variantKey: VariantKey): PlayerIndex {
   if (variantKey === 'amazons') {
     return Math.floor(ply / 2) % 2 === 0 ? 'p1' : 'p2';
@@ -251,6 +252,7 @@ export function getGoScore(fen: string, playerIndex: string): number {
 }
 
 const noCevalVariants = [
+  'monster',
   'linesOfAction',
   'scrambledEggs',
   'shogi',
@@ -331,6 +333,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'crazyhouse';
     case 'noCastling':
       return 'nocastling';
+    case 'monster':
+      return 'monster';
     case 'linesOfAction':
       return 'linesofaction';
     case 'scrambledEggs':

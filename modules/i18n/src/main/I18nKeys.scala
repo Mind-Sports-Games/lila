@@ -6,6 +6,7 @@ object I18nKeys {
 
 val `playWithAFriend` = new I18nKey("playWithAFriend")
 val `playWithTheMachine` = new I18nKey("playWithTheMachine")
+val `playWithBots` = new I18nKey("playWithBots")
 val `toInviteSomeoneToPlayGiveThisUrl` = new I18nKey("toInviteSomeoneToPlayGiveThisUrl")
 val `gameOver` = new I18nKey("gameOver")
 val `waitingForOpponent` = new I18nKey("waitingForOpponent")

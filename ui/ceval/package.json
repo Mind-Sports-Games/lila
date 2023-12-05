@@ -27,6 +27,6 @@
     "common": "2.0.0",
     "idb-keyval": "^5.0.4",
     "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat3.22"
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat3.23"
   }
 }

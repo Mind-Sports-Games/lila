@@ -2,6 +2,7 @@ package lila.round
 
 import strategygames.format.Forsyth
 import strategygames.format.FEN
+import strategygames.format.Uci
 import strategygames.chess.variant._
 import strategygames.variant.Variant
 import strategygames.{
@@ -11,7 +12,7 @@ import strategygames.{
   GameFamily,
   GameLogic,
   Player => PlayerIndex,
-  Game => ChessGame,
+  Game => StratGame,
   Board,
   Situation,
   History,
@@ -164,13 +165,14 @@ final private class Rematcher(
           Board(game.variant.gameLogic, pieces, variant = game.variant).withHistory(
             History(
               game.variant.gameLogic,
-              lastMove = situation.flatMap(_.situation.board.history.lastMove),
+              lastTurn = situation.fold[List[Uci]](List.empty)(_.situation.board.history.lastTurn),
+              currentTurn = situation.fold[List[Uci]](List.empty)(_.situation.board.history.currentTurn),
               castles = situation.fold(Castles.init)(_.situation.board.history.castles)
             )
           )
       }
       game <- Game.make(
-        chess = ChessGame(
+        stratGame = StratGame(
           game.variant.gameLogic,
           situation = Situation(
             game.variant.gameLogic,
@@ -180,8 +182,10 @@ final private class Rematcher(
           clock = game.clock map { c =>
             c.config.toClock
           },
-          turns = situation ?? (_.turns),
-          startedAtTurn = situation ?? (_.turns)
+          turnCount = situation ?? (_.turnCount),
+          plies = situation ?? (_.plies),
+          startedAtPly = situation ?? (_.plies),
+          startedAtTurn = situation ?? (_.turnCount)
         ),
         p1Player = returnPlayer(game, P1, users),
         p2Player = returnPlayer(game, P2, users),

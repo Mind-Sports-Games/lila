@@ -185,7 +185,12 @@ final class JsonView(
     private def makeBranch(puzzle: Puzzle): Option[tree.Branch] = {
       import strategygames.format._
       val init =
-        Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurns(puzzle.initialPly + 1)
+        //TODO: Do we need to set turns through withTurnsAndPlies can the fen not decode this?
+        Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurnsAndPlies(
+          //TODO multiaction. For now plies and turns are the same whilst puzzle deals with just standard chess
+          puzzle.initialPly + 1,
+          puzzle.initialPly + 1
+        )
       val (_, branchList) = puzzle.line.tail.foldLeft[(Game, List[tree.Branch])]((init, Nil)) {
         case ((prev, branches), uci) =>
           val (game, move) =
@@ -193,9 +198,10 @@ final class JsonView(
               .fold(err => sys error s"puzzle ${puzzle.id} $err", identity)
           val branch = tree.Branch(
             id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
-            ply = game.turns,
-            plysPerTurn = game.situation.board.variant.plysPerTurn,
-            move = Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.pgnMoves.last),
+            ply = game.plies,
+            //TODO multiaction. For now we can flatten actionStrs as we are dealing with just Chess
+            move =
+              Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.actionStrs.flatten.last),
             fen = Forsyth.>>(game.situation.board.variant.gameLogic, game),
             check = game.situation.check,
             pocketData = none

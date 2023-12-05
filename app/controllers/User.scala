@@ -296,6 +296,7 @@ final class User(
                   "horde"         -> leaderboards.horde,
                   "racingKings"   -> leaderboards.racingKings,
                   "noCastling"    -> leaderboards.noCastling,
+                  "monster"       -> leaderboards.monster,
                   "linesOfAction" -> leaderboards.linesOfAction,
                   "scrambledEggs" -> leaderboards.scrambledEggs,
                   "international" -> leaderboards.international,

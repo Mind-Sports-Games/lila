@@ -39,7 +39,7 @@ final private class Player(
     play match {
       case HumanPlay(_, uci, blur, lag, _, finalSquare) =>
         pov match {
-          case Pov(game, _) if game.turns > Game.maxPlies =>
+          case Pov(game, _) if game.plies > Game.maxPlies =>
             round ! TooManyPlies
             fuccess(Nil)
           case Pov(game, _) if game.selectedSquaresOfferDoesNotMatchUci(uci) =>
@@ -66,7 +66,7 @@ final private class Player(
 
   private[round] def bot(uci: Uci, round: RoundDuct)(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
     pov match {
-      case Pov(game, _) if game.turns > Game.maxPlies =>
+      case Pov(game, _) if game.plies > Game.maxPlies =>
         round ! TooManyPlies
         fuccess(Nil)
       case Pov(game, _) if game.selectedSquaresOfferDoesNotMatchUci(uci) =>
@@ -112,7 +112,7 @@ final private class Player(
   }
 
   private[round] def fishnet(game: Game, ply: Int, uci: Uci)(implicit proxy: GameProxy): Fu[Events] =
-    if (game.playable && game.player.isAi && game.playedTurns == ply) {
+    if (game.playable && game.player.isAi && game.playedPlies == ply) {
       applyUci(game, uci, blur = false, metrics = fishnetLag)
         .fold(errs => fufail(ClientError(errs)), fuccess)
         .flatMap {
@@ -136,7 +136,7 @@ final private class Player(
 
   private[round] def requestFishnet(game: Game, round: RoundDuct): Funit =
     game.playableByAi ?? {
-      if (game.turns <= fishnetPlayer.maxPlies) fishnetPlayer(game)
+      if (game.turnCount <= fishnetPlayer.maxTurns) fishnetPlayer(game)
       else fuccess(round ! actorApi.round.ResignAi)
     }
 
@@ -150,7 +150,7 @@ final private class Player(
       metrics: MoveMetrics,
       finalSquare: Boolean = false
   ): Validated[String, ActionResult] =
-    game.chess.applyUci(uci, metrics, finalSquare).map {
+    game.stratGame.applyUci(uci, metrics, finalSquare).map {
       case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
       case (newChessGame, action) =>
         ActionApplied(

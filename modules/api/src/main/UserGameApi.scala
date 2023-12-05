@@ -43,7 +43,8 @@ final class UserGameApi(
         "speed"     -> g.speed.key,
         "perf"      -> PerfPicker.key(g),
         "timestamp" -> g.createdAt,
-        "turns"     -> g.turns,
+        "plies"     -> g.plies,
+        "turns"     -> g.turnCount,
         "status"    -> g.status,
         "source"    -> g.source.map(_.name),
         "players" -> JsObject(g.players map { p =>
@@ -65,7 +66,7 @@ final class UserGameApi(
       .add("bookmarked" -> bookmarked)
       .add("analysed" -> g.metadata.analysed)
       .add("opening" -> g.opening)
-      .add("lastMove" -> g.lastMoveKeys)
+      .add("lastMove" -> g.lastActionKeys)
       .add("clock" -> g.clock)
       .add("correspondence" -> g.daysPerTurn.map { d =>
         Json.obj("daysPerTurn" -> d)

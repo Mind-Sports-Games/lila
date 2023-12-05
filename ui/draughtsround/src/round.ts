@@ -4,9 +4,15 @@ import { san2alg, invertSan } from 'draughts';
 
 export const firstPly = (d: RoundData): number => d.steps[0].ply;
 
+export const firstTurn = (d: RoundData): number => d.steps[0].turnCount;
+
 export const lastPly = (d: RoundData): number => lastStep(d).ply;
 
 export const lastStep = (d: RoundData): Step => d.steps[d.steps.length - 1];
+
+export const lastTurn = (d: RoundData): number => lastStep(d).turnCount;
+
+export const turnsTaken = (d: RoundData): number => lastTurn(d) - firstTurn(d);
 
 export const plyStep = (d: RoundData, ply: number): Step => d.steps[ply - firstPly(d)];
 
@@ -18,7 +24,7 @@ export const massage = (d: RoundData): void => {
 
   if (d.correspondence) d.correspondence.showBar = d.pref.clockBar;
 
-  if (d.expiration) d.expiration.movedAt = Date.now() - d.expiration.idleMillis;
+  if (d.expirationAtStart) d.expirationAtStart.updatedAt = Date.now() - d.expirationAtStart.idleMillis;
 };
 
 export function mergeSteps(steps: Step[], coordSystem: number): Step[] {

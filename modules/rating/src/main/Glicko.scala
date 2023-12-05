@@ -23,7 +23,7 @@ case class Glicko(
 
   def rankable(variant: Variant) =
     deviation <= {
-      if (variant.standard) Glicko.standardRankableDeviation
+      if (variant.key == "standard") Glicko.standardRankableDeviation
       else Glicko.variantRankableDeviation
     }
   def provisional          = deviation >= Glicko.provisionalDeviation

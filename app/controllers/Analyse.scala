@@ -39,7 +39,7 @@ final class Analyse(
     if (HTTPRequest isCrawler ctx.req) replayBot(pov)
     else
       env.game.gameRepo initialFen pov.gameId flatMap { initialFen =>
-        gameC.preloadUsers(pov.game) >> RedirectAtFen(pov, initialFen) {
+        gameC.preloadUsers(pov.game) >> redirectAtFen(pov, initialFen) {
           (env.analyse.analyser get pov.game) zip
             (!pov.game.metadata.analysed ?? env.fishnet.api.userAnalysisExists(pov.gameId)) zip
             (pov.game.simulId ?? env.simul.repo.find) zip
@@ -69,7 +69,7 @@ final class Analyse(
                   analysis,
                   initialFenO = initialFen.some,
                   withFlags = WithFlags(
-                    movetimes = true,
+                    plytimes = true,
                     clocks = true,
                     division = true,
                     opening = true
@@ -115,15 +115,16 @@ final class Analyse(
       } dmap EnableSharedArrayBuffer
     }
 
-  private def RedirectAtFen(pov: Pov, initialFen: Option[FEN])(or: => Fu[Result])(implicit ctx: Context) =
+  private def redirectAtFen(pov: Pov, initialFen: Option[FEN])(or: => Fu[Result])(implicit ctx: Context) =
     get("fen").map(s => FEN.clean(pov.game.variant.gameLogic, s)).fold(or) { atFen =>
       val url = routes.Round.watcher(pov.gameId, pov.playerIndex.name)
       fuccess {
+        //TODO: This function (plyAtFen) wont work for non chess/draughts
         Replay
-          .plyAtFen(pov.game.variant.gameLogic, pov.game.pgnMoves, initialFen, pov.game.variant, atFen)
+          .plyAtFen(pov.game.variant.gameLogic, pov.game.actionStrs, initialFen, pov.game.variant, atFen)
           .fold(
             err => {
-              lila.log("analyse").info(s"RedirectAtFen: ${pov.gameId} $atFen $err")
+              lila.log("analyse").info(s"redirectAtFen: ${pov.gameId} $atFen $err")
               Redirect(url)
             },
             ply => Redirect(s"$url#$ply")

@@ -28,7 +28,7 @@ object RageSit {
   def imbalanceInc(game: Game, loser: PlayerIndex) =
     Inc {
       {
-        game.chess.board.materialImbalance match {
+        game.board.materialImbalance match {
           case _ if game.variant.materialImbalanceVariant => 0
           case a if a >= 4                                => 1
           case a if a <= -4                               => -1

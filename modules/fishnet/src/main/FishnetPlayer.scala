@@ -13,7 +13,7 @@ final class FishnetPlayer(
     redis: FishnetRedis,
     gameRepo: GameRepo,
     uciMemo: UciMemo,
-    val maxPlies: Int
+    val maxTurns: Int
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: akka.actor.ActorSystem
@@ -40,17 +40,17 @@ final class FishnetPlayer(
         totalTime = clock.estimateTotalTime.centis
         if totalTime > 20 * 100
         delay = (clock.remainingTime(pov.playerIndex).centis atMost totalTime) * delayFactor
-        accel = 1 - ((g.turns - 20) atLeast 0 atMost 100) / 150f
+        accel = 1 - ((g.turnCount - 20) atLeast 0 atMost 100) / 150f
         sleep = (delay * accel) atMost 500
         if sleep > 25
         millis     = sleep * 10
         randomized = approximately(0.5f)(millis)
-        divided    = randomized / (if (g.turns > 9) 1 else 2)
+        divided    = randomized / (if (g.turnCount > 9) 1 else 2)
       } yield divided.millis
 
   private def makeWork(game: Game, level: Int): Fu[Work.Move] =
     if (game.situation playable true)
-      if (game.turns <= maxPlies) gameRepo.initialFen(game) zip uciMemo.get(game) map {
+      if (game.turnCount <= maxTurns) gameRepo.initialFen(game) zip uciMemo.get(game) map {
         case (initialFen, moves) =>
           Work.Move(
             _id = Work.makeId,
@@ -59,7 +59,8 @@ final class FishnetPlayer(
               initialFen = initialFen,
               studyId = none,
               variant = game.variant,
-              moves = moves
+              //ok to flatten as fishnet doesnt handle multimove
+              moves = moves.flatten
                 .flatMap(Uci(game.variant.gameLogic, game.variant.gameFamily, _))
                 .map(_.uci)
                 .mkString(" ")
@@ -76,6 +77,6 @@ final class FishnetPlayer(
             }
           )
       }
-      else fufail(s"[fishnet] Too many moves (${game.turns}), won't play ${game.id}")
+      else fufail(s"[fishnet] Too many turns (${game.turnCount}), won't play ${game.id}")
     else fufail(s"[fishnet] invalid position on ${game.id}")
 }

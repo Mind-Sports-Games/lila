@@ -81,22 +81,22 @@ final class PlaybanApi(
     def sitting: Option[Funit] =
       for {
         userId <- game.player(flaggerPlayerIndex).userId
-        seconds = nowSeconds - game.movedAt.getSeconds
+        seconds = nowSeconds - game.updatedAt.getSeconds
         if unreasonableTime.exists(seconds >= _)
       } yield save(Outcome.Sitting, userId, RageSit.imbalanceInc(game, flaggerPlayerIndex)) >>-
         feedback.sitting(Pov(game, flaggerPlayerIndex)) >>
         propagateSitting(game, userId)
 
     // flagged after waiting a short time;
-    // but the previous move used a long time.
+    // but the previous ply used a long time.
     // assumes game was already checked for sitting
     def sitMoving: Option[Funit] =
       game.player(flaggerPlayerIndex).userId.ifTrue {
         ~(for {
-          movetimes    <- game moveTimes flaggerPlayerIndex
-          lastMovetime <- movetimes.lastOption
-          limit        <- unreasonableTime
-        } yield lastMovetime.toSeconds >= limit)
+          plytimes    <- game plyTimes flaggerPlayerIndex
+          lastPlytime <- plytimes.lastOption
+          limit       <- unreasonableTime
+        } yield lastPlytime.toSeconds >= limit)
       } map { userId =>
         save(Outcome.SitMoving, userId, RageSit.imbalanceInc(game, flaggerPlayerIndex)) >>-
           feedback.sitting(Pov(game, flaggerPlayerIndex)) >>
@@ -136,7 +136,7 @@ final class PlaybanApi(
             .map { c =>
               (c.estimateTotalSeconds / 10) atLeast 15 atMost (3 * 60)
             }
-            .exists(_ < nowSeconds - game.movedAt.getSeconds)
+            .exists(_ < nowSeconds - game.updatedAt.getSeconds)
             .option {
               save(Outcome.SitResign, loserId, RageSit.imbalanceInc(game, loser.playerIndex)) >>-
                 feedback.sitting(Pov(game, loser.playerIndex)) >>

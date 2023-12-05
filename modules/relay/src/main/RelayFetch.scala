@@ -1,7 +1,7 @@
 package lila.relay
 
 import akka.actor._
-import strategygames.format.pgn.{ Tag, Tags }
+import strategygames.format.pgn.{ Tag, Tags, Turn }
 import com.github.blemale.scaffeine.LoadingCache
 import io.lemonlabs.uri.Url
 import org.joda.time.DateTime
@@ -138,13 +138,13 @@ final private class RelayFetch(
 
   private val gameIdsUpstreamPgnFlags = PgnDump.WithFlags(
     clocks = true,
-    moves = true,
+    turns = true,
     tags = true,
     evals = false,
     opening = false,
     literate = false,
     pgnInJson = false,
-    delayMoves = true
+    delayTurns = true
   )
 
   private def fetchGames(rt: RelayRound.WithTour): Fu[RelayGames] =
@@ -280,15 +280,16 @@ private object RelayFetch {
     implicit val roundPairingReads  = Json.reads[RoundJsonPairing]
     implicit val roundReads         = Json.reads[RoundJson]
 
-    case class GameJson(moves: List[String], result: Option[String]) {
+    //This is compatible with multiaction if turns include comma separated actions
+    case class GameJson(turns: List[String], result: Option[String]) {
       def toPgn(extraTags: Tags = Tags.empty) = {
-        val strMoves = moves.map(_ split ' ') map { move =>
-          strategygames.chess.format.pgn.Move(
-            san = ~move.headOption,
-            secondsLeft = move.lift(1).map(_.takeWhile(_.isDigit)) flatMap (_.toIntOption)
+        val strTurns = turns.map(_ split ' ') map { turn =>
+          Turn(
+            san = ~turn.headOption,
+            secondsLeft = turn.lift(1).map(_.takeWhile(_.isDigit)) flatMap (_.toIntOption)
           )
         } mkString " "
-        s"$extraTags\n\n$strMoves"
+        s"$extraTags\n\n$strTurns"
       }
     }
     implicit val gameReads = Json.reads[GameJson]

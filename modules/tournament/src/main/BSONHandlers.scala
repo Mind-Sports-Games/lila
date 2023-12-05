@@ -110,7 +110,7 @@ object BSONHandlers {
         "clock"            -> o.clock,
         "minutes"          -> o.minutes,
         "lib"              -> o.variant.gameLogic.id,
-        "variant"          -> o.variant.some.filterNot(_.standard).map(_.id),
+        "variant"          -> o.variant.some.filterNot(_.key == "standard").map(_.id),
         "mVariants"        -> o.medleyVariants,
         "mMinutes"         -> o.medleyMinutes,
         "mIntervals"       -> o.medleyIntervalSeconds,
@@ -189,8 +189,7 @@ object BSONHandlers {
         },
         turns = r intO "t",
         berserk1 = r.intO("b1").fold(r.boolD("b1"))(1 ==), // it used to be int = 0/1
-        berserk2 = r.intO("b2").fold(r.boolD("b2"))(1 ==),
-        plysPerTurn = r.intO("ppt")
+        berserk2 = r.intO("b2").fold(r.boolD("b2"))(1 ==)
       )
     }
     def writes(w: BSON.Writer, o: Pairing) =
@@ -202,8 +201,7 @@ object BSONHandlers {
         "w"   -> o.winner.map(o.user1 ==),
         "t"   -> o.turns,
         "b1"  -> w.boolO(o.berserk1),
-        "b2"  -> w.boolO(o.berserk2),
-        "ppt" -> o.plysPerTurn
+        "b2"  -> w.boolO(o.berserk2)
       )
   }
 

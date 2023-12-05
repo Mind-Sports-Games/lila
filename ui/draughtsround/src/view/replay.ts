@@ -58,7 +58,7 @@ function renderMove(step: Step, curPly: number, orEmpty: boolean, drawOffers: Se
             a1t: step.ply === curPly,
           },
         },
-        [step.alg || step.san, drawOffers.has(step.ply) ? renderDrawOffer() : undefined]
+        [step.alg || step.san, drawOffers.has(step.turnCount) ? renderDrawOffer() : undefined]
       )
     : orEmpty
     ? h(moveTag, '…')
@@ -104,7 +104,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
   const steps = ctrl.data.steps,
     firstPly = round.firstPly(ctrl.data),
     lastPly = round.lastPly(ctrl.data),
-    drawPlies = new Set(ctrl.data.game.drawOffers || []);
+    drawTurns = new Set(ctrl.data.game.drawOffers || []);
   if (typeof lastPly === 'undefined') return [];
 
   const pairs: Array<Array<any>> = [];
@@ -119,8 +119,8 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     curPly = ctrl.ply;
   for (let i = 0; i < pairs.length; i++) {
     els.push(h(indexTag, i + 1 + ''));
-    els.push(renderMove(pairs[i][0], curPly, true, drawPlies));
-    els.push(renderMove(pairs[i][1], curPly, false, drawPlies));
+    els.push(renderMove(pairs[i][0], curPly, true, drawTurns));
+    els.push(renderMove(pairs[i][1], curPly, false, drawTurns));
   }
   els.push(renderResult(ctrl));
 
@@ -138,7 +138,7 @@ export function analysisButton(ctrl: RoundController): VNode | undefined {
           },
           attrs: {
             title: ctrl.noarg('analysis'),
-            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + ctrl.ply,
+            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + ctrl.turnCount,
             'data-icon': 'A',
           },
         },
@@ -188,7 +188,7 @@ function renderButtons(ctrl: RoundController) {
         ['X', ctrl.ply + 1],
         ['V', lastPly],
       ].map((b, i) => {
-        const enabled = ctrl.ply !== b[1] && b[1] >= firstPly && b[1] <= lastPly;
+        const enabled = ctrl.ply !== b[1] && (b[1] as number) >= firstPly && (b[1] as number) <= lastPly;
         return h('button.fbt', {
           class: { glowing: i === 3 && ctrl.isLate() },
           attrs: {

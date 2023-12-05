@@ -100,6 +100,14 @@ object home {
                 "disabled"                      -> currentGame.isDefined
               ),
               trans.playWithTheMachine()
+            ),
+            a(
+              href := routes.PlayApi.botOnline,
+              cls := List(
+                "button button-metal config_bot just-a-link" -> true,
+                "disabled"                                   -> currentGame.isDefined
+              ),
+              trans.playWithBots()
             )
           ),
           div(cls := "lobby__counters")(

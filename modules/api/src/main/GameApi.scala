@@ -203,15 +203,16 @@ final private[api] class GameApi(
   ) =
     Json
       .obj(
-        "id"          -> g.id,
-        "initialFen"  -> initialFen,
-        "rated"       -> g.rated,
-        "variant"     -> g.variant.key,
-        "speed"       -> g.speed.key,
-        "perf"        -> PerfPicker.key(g),
-        "createdAt"   -> g.createdAt,
-        "lastMoveAt"  -> g.movedAt,
-        "turns"       -> g.turns,
+        "id"         -> g.id,
+        "initialFen" -> initialFen,
+        "rated"      -> g.rated,
+        "variant"    -> g.variant.key,
+        "speed"      -> g.speed.key,
+        "perf"       -> PerfPicker.key(g),
+        "createdAt"  -> g.createdAt,
+        "lastMoveAt" -> g.updatedAt,
+        "turns"       -> g.turnCount,
+        "plies"       -> g.plies,
         "playerIndex" -> g.turnPlayerIndex.name,
         "status"      -> g.status.name,
         "clock" -> g.clock.map { clock =>
@@ -231,7 +232,7 @@ final private[api] class GameApi(
             )
             .add("name", p.name)
             .add("provisional" -> p.provisional)
-            .add("moveCentis" -> withFlags.moveTimes ?? g.moveTimes(p.playerIndex).map(_.map(_.centis)))
+            .add("plyCentis" -> withFlags.plyTimes ?? g.plyTimes(p.playerIndex).map(_.map(_.centis)))
             .add("blurs" -> withFlags.blurs.option(p.blurs.nb))
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
         }),
@@ -239,7 +240,7 @@ final private[api] class GameApi(
         "moves" -> withFlags.moves.option(g.variant match {
           case Variant.Draughts(variant) =>
             strategygames.draughts.Replay.unambiguousPdnMoves(
-              pdnMoves = g.pdnMovesConcat(true, true),
+              pdnMoves = g.draughtsActionStrsConcat(true, true).flatten,
               initialFen = initialFen match {
                 case Some(FEN.Draughts(fen)) => Some(fen)
                 case None                    => None
@@ -250,16 +251,16 @@ final private[api] class GameApi(
               case Some(moves) => moves mkString " "
               case None        => ""
             }
-          case _ => g.pgnMoves mkString " "
+          case _ => g.actionStrs.map(_.mkString(",")).mkString(" ")
         }),
         "opening" -> withFlags.opening.??(g.opening),
         "fens" -> (withFlags.fens && g.finished) ?? {
           Replay
             .boards(
               lib = g.variant.gameLogic,
-              moveStrs = g.variant.gameLogic match {
-                case GameLogic.Draughts() => g.pdnMovesConcat(true, true)
-                case _                    => g.pgnMoves
+              actionStrs = g.variant.gameLogic match {
+                case GameLogic.Draughts() => g.draughtsActionStrsConcat(true, true)
+                case _                    => g.actionStrs
               },
               initialFen = initialFen,
               variant = g.variant,
@@ -285,7 +286,7 @@ object GameApi {
       moves: Boolean = false,
       fens: Boolean = false,
       opening: Boolean = false,
-      moveTimes: Boolean = false,
+      plyTimes: Boolean = false,
       blurs: Boolean = false,
       token: Option[String] = none
   ) {

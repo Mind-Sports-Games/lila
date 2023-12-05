@@ -30,8 +30,9 @@ export class Autoplay {
   private nextDelay(): number {
     if (typeof this.delay === 'string' && !this.ctrl.onMainline) return 1500;
     else if (this.delay === 'realtime') {
+      //TODO multiaction, think this wants to be turn not ply
       if (this.ctrl.node.ply < 2) return 1000;
-      const centis = this.ctrl.data.game.moveCentis;
+      const centis = this.ctrl.data.game.plyCentis;
       if (!centis) return 1500;
       const time = centis[this.ctrl.node.ply - this.ctrl.tree.root.ply];
       // estimate 130ms of lag to improve playback.

@@ -130,6 +130,8 @@ export default class Setup {
       : undefined;
   };
 
+  private psBots = ['ps-greedy-two-move', 'ps-greedy-one-move', 'ps-greedy-four-move', 'ps-random-mover'];
+
   prepareForm = ($modal: Cash) => {
     let fenOk = false;
     const self = this,
@@ -155,6 +157,9 @@ export default class Setup {
       $advancedTimeSetup = $form.find('.advanced_setup'),
       $advancedTimeToggle = $form.find('.advanced_toggle'),
       $daysInput = $form.find('.days_choice [name=days]'),
+      userDetails = $form.attr('action')?.split('user='),
+      user = userDetails && userDetails[1] ? userDetails[1].toLowerCase() : '',
+      vsPSBot = this.psBots.includes(user),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
       randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
@@ -174,6 +179,7 @@ export default class Setup {
             (timeMode != '1' && timeMode != '3') ||
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
+            (vsPSBot && user == 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' || ($goKomiInput.val() as string) != '75'));
@@ -186,8 +192,9 @@ export default class Setup {
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
           ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
           aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
-          posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk;
-        if (byoOk && timeOk && ratedOk && aiOk && posOk) {
+          posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk,
+          botOK = !vsPSBot || psBotCanPlay(user, limit, inc);
+        if (byoOk && timeOk && ratedOk && aiOk && posOk && botOK) {
           $submits.toggleClass('nope', false);
           $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
@@ -196,6 +203,21 @@ export default class Setup {
         self.save($form[0] as HTMLFormElement);
       };
 
+    const psBotCanPlay = (user: string, limit: number, inc: number) => {
+      if (isRealTime()) {
+        switch (user) {
+          case 'ps-random-mover': {
+            return limit >= 0.5;
+          }
+          case 'ps-greedy-one-move': {
+            return limit >= 1 && inc >= 1;
+          }
+          default: {
+            return limit >= 3 && inc >= 2;
+          }
+        }
+      } else return false;
+    };
     const clearFenInput = () => $fenInput.val('');
     const c = this.stores[typ].get();
     if (c) {
@@ -207,6 +229,13 @@ export default class Setup {
           else if (k != 'fen' || !this.value) this.value = c[k];
         });
       });
+    }
+    //default options for playing against ps-bots
+    if (vsPSBot) {
+      $timeModeSelect.val('1');
+      $timeInput.val('3');
+      $incrementInput.val('2');
+      $casual.trigger('click');
     }
 
     const showRating = () => {
@@ -257,6 +286,9 @@ export default class Setup {
               break;
             case '13':
               key = 'noCastling';
+              break;
+            case '15':
+              key = 'monster';
               break;
             default:
               key = 'standard';

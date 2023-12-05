@@ -82,7 +82,7 @@ export interface RoundData extends GameData {
 
 export interface Expiration {
   idleMillis: number;
-  movedAt: number;
+  updatedAt: number;
   millisToMove: number;
 }
 
@@ -123,6 +123,7 @@ export interface ChatOpts {
 
 export interface Step {
   ply: Ply;
+  turnCount: number;
   fen: Fen;
   san: San;
   uci: Uci;

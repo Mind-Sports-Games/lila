@@ -186,11 +186,12 @@ final private[round] class RoundDuct(
           case false =>
             lila
               .log("cheat")
+              //TODO multiaction use gameid#turnCount in url (study/analysis to fix)
               .info(
-                s"hold alert $ip https://playstrategy.org/${pov.gameId}/${pov.playerIndex.name}#${pov.game.turns} ${pov.player.userId | "anon"} mean: $mean SD: $sd"
+                s"hold alert $ip https://playstrategy.org/${pov.gameId}/${pov.playerIndex.name}#${pov.game.turnCount} ${pov.player.userId | "anon"} mean: $mean SD: $sd"
               )
             lila.mon.cheat.holdAlert.increment()
-            gameRepo.setHoldAlert(pov, GamePlayer.HoldAlert(ply = pov.game.turns, mean = mean, sd = sd)).void
+            gameRepo.setHoldAlert(pov, GamePlayer.HoldAlert(ply = pov.game.plies, mean = mean, sd = sd)).void
         } inject Nil
       }
 
@@ -495,12 +496,9 @@ final private[round] class RoundDuct(
   private def getPlayer(playerIndex: PlayerIndex): Player = playerIndex.fold(p1Player, p2Player)
 
   private def recordLag(pov: Pov): Unit =
-    if (
-      (pov.game.variant.plysPerTurn == 1 && (pov.game.playedTurns & 30) == 10) || (pov.game.variant.plysPerTurn == 2 && ((pov.game.playedTurns & 30) == 10) || (pov.game.playedTurns & 30) == 12)
-    ) {
-      // todo does this actualy work for amazons?
-      // Triggers every 32 moves starting on ply 10.
-      // i.e. 10, 11, 42, 43, 74, 75, ...
+    if (((pov.game.playedTurns & 30) == 10) && pov.game.actionStrs.lastOption.map(_.size) == Some(1)) {
+      // Triggers on the first action of every 32 turns, starting on turn 10.
+      // i.e. if single action per turn, then this triggers on ply: 10, 11, 42, 43, 74, 75, ...
       for {
         user  <- pov.player.userId
         clock <- pov.game.clock
