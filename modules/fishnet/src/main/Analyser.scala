@@ -105,7 +105,7 @@ final class Analyser(
           initialFen = initialFen,
           studyId = none,
           variant = game.variant,
-          moves = moves take maxPlies mkString " "
+          moves = moves.take(maxPlies).map(_.mkString(",")).mkString(" ")
         ),
         startPly = game.stratGame.startedAtPly,
         sender = sender
