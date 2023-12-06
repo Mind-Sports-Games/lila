@@ -881,6 +881,29 @@ square {
   }
 }
 
+.variant-backgammon {
+  .orientation-p1 piece.pocket {
+    &.p1 {
+      margin-top: 6.66%;
+      margin-left: calc(100% * 7 / 15);
+    }
+    &.p2 {
+      margin-top: 50%;
+      margin-left: calc(100% * 7 / 15);
+    }
+  }
+  .orientation-p2 piece.pocket {
+    &.p1 {
+      margin-top: 50%;
+      margin-left: calc(100% * 7 / 15);
+    }
+    &.p2 {
+      margin-top: 6.66%;
+      margin-left: calc(100% * 7 / 15);
+    }
+  }
+}
+
 piece {
   position: absolute;
   top: 0;
