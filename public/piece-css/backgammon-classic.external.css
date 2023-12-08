@@ -28,3 +28,7 @@
 .backgammon.is2d .s14-piece.p2, .is2d .variant-backgammon .s14-piece.p2 {background-image:url('/assets/piece/backgammon/classic/b14.svg')}
 .backgammon.is2d .s15-piece.p1, .is2d .variant-backgammon .s15-piece.p1 {background-image:url('/assets/piece/backgammon/classic/w15.svg')}
 .backgammon.is2d .s15-piece.p2, .is2d .variant-backgammon .s15-piece.p2 {background-image:url('/assets/piece/backgammon/classic/b15.svg')}
+.backgammon.is2d .flat-piece.p1, .is2d .variant-backgammon .flat-piece.p1 {background-image:url('/assets/piece/backgammon/classic/wflat.svg')}
+.backgammon.is2d .flat-piece.p2, .is2d .variant-backgammon .flat-piece.p2 {background-image:url('/assets/piece/backgammon/classic/bflat.svg')}
+.backgammon.is2d .side-piece.p1, .is2d .variant-backgammon .side-piece.p1 {background-image:url('/assets/piece/backgammon/classic/wside.svg')}
+.backgammon.is2d .side-piece.p2, .is2d .variant-backgammon .side-piece.p2 {background-image:url('/assets/piece/backgammon/classic/bside.svg')}

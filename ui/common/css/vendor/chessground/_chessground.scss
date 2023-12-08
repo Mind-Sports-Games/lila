@@ -884,21 +884,21 @@ square {
 .variant-backgammon {
   .orientation-p1 piece.pocket {
     &.p1 {
-      margin-top: 6.66%;
+      margin-top: 6%;
       margin-left: calc(100% * 7 / 15);
     }
     &.p2 {
-      margin-top: 50%;
+      margin-top: 50.66%;
       margin-left: calc(100% * 7 / 15);
     }
   }
   .orientation-p2 piece.pocket {
     &.p1 {
-      margin-top: 50%;
+      margin-top: 50.66%;
       margin-left: calc(100% * 7 / 15);
     }
     &.p2 {
-      margin-top: 6.66%;
+      margin-top: 6%;
       margin-left: calc(100% * 7 / 15);
     }
   }
@@ -1188,6 +1188,9 @@ cg-container .cg-custom-svgs svg {
     position: absolute;
     dice {
       width: calc(100% * 15 * 9 / 600);
+      &.unavailable {
+        opacity: 0.35;
+      }
     }
     &.p1 {
       left: calc(100% * 8 / 15);

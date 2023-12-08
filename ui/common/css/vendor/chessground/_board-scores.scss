@@ -43,6 +43,10 @@ board-scores {
 
   board-score {
     width: 100%;
+    font-size: 130%;
+    .backgammon-contemporary & {
+      color: #a9ad7d;
+    }
   }
 
   .variant-togyzkumalak .orientation-p1 & {
@@ -77,7 +81,7 @@ board-scores {
 
   .variant-backgammon .orientation-p1 & {
     &.p1 {
-      bottom: 5%;
+      bottom: 6%;
     }
     &.p2 {
       top: 6%;
@@ -88,7 +92,7 @@ board-scores {
       top: 6%;
     }
     &.p2 {
-      bottom: 5%;
+      bottom: 6%;
     }
   }
 }
