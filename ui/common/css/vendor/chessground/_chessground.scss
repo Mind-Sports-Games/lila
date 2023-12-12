@@ -137,18 +137,13 @@ span.mini-game.variant-togyzkumalak.is2d {
 .variant-backgammon square {
   width: calc(100% / 15);
   height: calc(100% * 6.5 / 15);
-  &.top-left {
+  &.top {
     margin-top: 6.66%;
+  }
+  &.left {
     margin-left: 6.66%;
   }
-  &.top-right {
-    margin-top: 6.66%;
-    margin-left: 13.33%;
-  }
-  &.bottom-left {
-    margin-left: 6.66%;
-  }
-  &.bottom-right {
+  &.right {
     margin-left: 13.33%;
   }
 }
@@ -865,18 +860,13 @@ square {
 .variant-backgammon piece {
   width: calc(100% / 15);
   height: calc(100% * 6.5 / 15);
-  &.top-left {
+  &.top {
     margin-top: 6.66%;
+  }
+  &.left {
     margin-left: 6.66%;
   }
-  &.top-right {
-    margin-top: 6.66%;
-    margin-left: 13.33%;
-  }
-  &.bottom-left {
-    margin-left: 6.66%;
-  }
-  &.bottom-right {
+  &.right {
     margin-left: 13.33%;
   }
 }

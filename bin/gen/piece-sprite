@@ -136,6 +136,7 @@ go_roles=['s-piece']
 go_variants=['go9x9', 'go13x13', 'go19x19']
 backgammon_base_image_names = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'flat','side']
 backgammon_extra_names = ['flat', 'side']
+backgammon_directions = ['top', 'bottom']
 
 # inline SVG Chess
 chess_themes.map { |theme|
@@ -638,19 +639,25 @@ backgammon_themes.map { |theme|
   ext = theme[1]
   classes_backgammon_game_and_variant = backgammon_base_image_names.map { |image_name|
    colors.map { |color|
+    backgammon_directions.map { |direction|
       if backgammon_extra_names.include?(image_name)
         role = image_name + '-piece'
+        image_pos = ''
+        pos_class = ''
       else
         role = 's' + image_name + '-piece'
+        image_pos = direction[0]
+        pos_class = '.' + direction
       end
-      initial_css = '.backgammon.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ', ' + '.is2d .variant-backgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2')
-      file = source_dir + 'backgammon/' + name + '/' + color + image_name + '.' + ext
+      initial_css = '.backgammon.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + ', ' + '.is2d .variant-backgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+      file = source_dir + 'backgammon/' + name + '/' + color + image_name + image_pos + '.' + ext
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
           initial_css + ' {' + "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
     }
+  }
   }.flatten
   File.open(dest_dir + 'backgammon-' + name + '.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant).join("\n") }
 }
@@ -660,14 +667,20 @@ backgammon_themes.map { |theme|
   ext = theme[1]
   classes_backgammon_game_and_variant = backgammon_base_image_names.map { |image_name|
    colors.map { |color|
-      if backgammon_extra_names.include?(image_name)
-        role = image_name + '-piece'
-      else
-        role = 's' + image_name + '-piece'
-      end
-      initial_css = '.backgammon.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ', ' + '.is2d .variant-backgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2')    
-      initial_css + ' {' +
-        "background-image:url('/assets/piece/" + 'backgammon/' + name + "/" + color + image_name + "." + ext + "')}"
+    backgammon_directions.map { |direction|
+        if backgammon_extra_names.include?(image_name)
+          role = image_name + '-piece'
+          image_pos = ''
+          pos_class = ''
+        else
+          role = 's' + image_name + '-piece'
+          image_pos = direction[0]
+          pos_class = '.' + direction
+        end
+        initial_css = '.backgammon.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + ', ' + '.is2d .variant-backgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+        initial_css + ' {' +
+          "background-image:url('/assets/piece/" + 'backgammon/' + name + "/" + color + image_name + image_pos + "." + ext + "')}"
+    }
   }
   }.flatten
   File.open(dest_dir + 'backgammon-' + name + '.external.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant).join("\n") }
