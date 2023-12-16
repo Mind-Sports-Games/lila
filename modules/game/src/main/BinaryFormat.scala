@@ -1,23 +1,23 @@
 package lila.game
 
 import strategygames.{
-  P2,
   Board,
   ByoyomiClock,
   ByoyomiClockPlayer,
   Centis,
+  Clock,
   ClockBase,
   ClockConfig,
   ClockPlayer,
-  Clock,
-  Player => PlayerIndex,
   GameLogic,
+  P1,
+  P2,
   Piece,
   PieceMap,
+  Player => PlayerIndex,
   Pos,
   Role,
-  Timestamp,
-  P1
+  Timestamp
 }
 import strategygames.chess.{ Castles, Rank, UnmovedRooks }
 import strategygames.chess
@@ -121,8 +121,8 @@ object BinaryFormat {
   object plyTime {
 
     private type MT = Int // centiseconds
-    private val size = 16
-    private val buckets =
+    private val size          = 16
+    private val buckets       =
       List(10, 50, 100, 150, 200, 300, 400, 500, 600, 800, 1000, 1500, 2000, 3000, 4000, 6000)
     private val encodeCutoffs = buckets zip buckets.tail map { case (i1, i2) =>
       (i1 + i2) / 2
@@ -208,12 +208,12 @@ object BinaryFormat {
               ),
               timestamp = timestamp
             )
-          case _ => sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
+          case _                                         => sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
         }
       }
 
     private def writeTimestamp(timestamp: Timestamp) = {
-      val centis = (timestamp - start).centis
+      val centis  = (timestamp - start).centis
       /*
        * A zero timer is resolved by `readTimer` as the absence of a timer.
        * As a result, a clock that is started with a timer = 0
@@ -317,12 +317,12 @@ object BinaryFormat {
               timestamp = timestamp
             )
           }
-          case _ => sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
+          case _                                         => sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
         }
       }
 
     private def writeTimestamp(timestamp: Timestamp) = {
-      val centis = (timestamp - start).centis
+      val centis  = (timestamp - start).centis
       /*
        * A zero timer is resolved by `readTimer` as the absence of a timer.
        * As a result, a clock that is started with a timer = 0
@@ -359,17 +359,17 @@ object BinaryFormat {
   object periodEntries {
     private val logger = lila.log("periodEntries")
 
-    def writeSide(v: Vector[Int]): ByteArray = {
+    def writeSide(v: Vector[Int]): ByteArray                      = {
       def intToShort(i: Int): Array[Byte] = Array((i >> 8).toByte, i.toByte)
       (v.flatMap(intToShort _)).toArray
     }
-    def readSide(ba: ByteArray): Vector[Int] = {
+    def readSide(ba: ByteArray): Vector[Int]                      = {
       def backToInt(b: Array[Byte]): Int =
         b map toInt match {
           case Array(b1, b2) => (b1 << 8) + b2
           case _             => 0
         }
-      val pairs = ba.value.grouped(2)
+      val pairs                          = ba.value.grouped(2)
       (pairs map (backToInt _)).toVector
     }
     def read(bs: ByteArray, bg: ByteArray): Option[PeriodEntries] =
@@ -392,7 +392,7 @@ object BinaryFormat {
       }
 
       def posInt(pos: Pos): Int = pos.toInt
-      val lastMoveInt = clmt.lastMove.map(_.origDest).fold(0) { case (o, d) =>
+      val lastMoveInt           = clmt.lastMove.map(_.origDest).fold(0) { case (o, d) =>
         (posInt(Pos.Chess(o)) << 6) + posInt(Pos.Chess(d))
       }
       Array((castleInt << 4) + (lastMoveInt >> 8) toByte, lastMoveInt.toByte)
@@ -426,8 +426,8 @@ object BinaryFormat {
           .flatten
       )
     }
-    def readGo(ba: ByteArray): List[Pos] = {
-      val ia = ba.value map toInt toList
+    def readGo(ba: ByteArray): List[Pos]       = {
+      val ia                                         = ba.value map toInt toList
       def intPos(i: List[Int]): List[Option[go.Pos]] = {
         i match {
           case Nil                => Nil
@@ -450,7 +450,7 @@ object BinaryFormat {
     }
 
     def readChess(ba: ByteArray, variant: chess.variant.Variant): chess.PieceMap = {
-      def splitInts(b: Byte) = {
+      def splitInts(b: Byte)                      = {
         val int = b.toInt
         Array(int >> 4, int & 0x0f)
       }
@@ -488,7 +488,7 @@ object BinaryFormat {
     def writeDraughts(board: draughts.Board): ByteArray = writeDraughts(board.pieces, board.variant)
 
     def readDraughts(ba: ByteArray, variant: draughts.variant.Variant): draughts.PieceMap = {
-      def splitInts(b: Byte) = {
+      def splitInts(b: Byte)                         = {
         val int = b.toInt
         Array(int >> 4, int & 0x0f)
       }
@@ -496,7 +496,7 @@ object BinaryFormat {
         draughts.Role.binaryInt(int & 7) map { role =>
           draughts.Piece(PlayerIndex((int & 8) == 0), role)
         }
-      val pieceInts = ba.value flatMap splitInts
+      val pieceInts                                  = ba.value flatMap splitInts
       (variant.boardSize.pos.all zip pieceInts)
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
@@ -513,10 +513,10 @@ object BinaryFormat {
     }
 
     def readFairySF(ba: ByteArray, variant: fairysf.variant.Variant): fairysf.PieceMap = {
-      //def splitInts(b: Byte) = {
+      // def splitInts(b: Byte) = {
       //  val int = b.toInt
       //  Array(int >> 4, int & 0x0f)
-      //}
+      // }
       def intPiece(int: Int): Option[fairysf.Piece] =
         fairysf.Role.allByBinaryInt(variant.gameFamily).get(int & 127) map { role =>
           fairysf.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
@@ -556,7 +556,7 @@ object BinaryFormat {
         (pieces get pos).fold(0) {
           case (piece, count) if piece.role == togyzkumalak.Role.defaultRole =>
             count
-          case (piece, _) =>
+          case (piece, _)                                                    =>
             piece.role.binaryInt
 
         }
@@ -579,7 +579,7 @@ object BinaryFormat {
               1
             )
           )
-      def unsignInt(int: Int) = if (int < 0) 256 + int else int
+      def unsignInt(int: Int)                                                        = if (int < 0) 256 + int else int
       (togyzkumalak.Pos.all zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(pos.player, unsignInt(int)) map (pos -> _)
@@ -596,10 +596,10 @@ object BinaryFormat {
     }
 
     def readGo(ba: ByteArray, variant: go.variant.Variant): go.PieceMap = {
-      //def splitInts(b: Byte) = {
+      // def splitInts(b: Byte) = {
       //  val int = b.toInt
       //  Array(int >> 4, int & 0x0f)
-      //}
+      // }
       def intPiece(int: Int): Option[go.Piece] =
         go.Role.allByBinaryInt.get(int & 127) map { role =>
           go.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
@@ -613,17 +613,17 @@ object BinaryFormat {
 
     // cache standard start position
     def standard(lib: GameLogic) = lib match {
-      case GameLogic.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
-      case GameLogic.Draughts() =>
+      case GameLogic.Chess()        => writeChess(chess.Board.init(chess.variant.Standard).pieces)
+      case GameLogic.Draughts()     =>
         writeDraughts(
           draughts.Board.init(draughts.variant.Standard).pieces,
           draughts.variant.Standard
         )
-      case GameLogic.Samurai() => writeSamurai(samurai.Board.init(samurai.variant.Oware).pieces)
+      case GameLogic.Samurai()      => writeSamurai(samurai.Board.init(samurai.variant.Oware).pieces)
       case GameLogic.Togyzkumalak() =>
         writeTogyzkumalak(togyzkumalak.Board.init(togyzkumalak.variant.Togyzkumalak).pieces)
-      case GameLogic.Go() => writeGo(go.Board.init(go.variant.Go19x19).pieces)
-      case _              => sys.error("Cant write to binary for lib")
+      case GameLogic.Go()           => writeGo(go.Board.init(go.variant.Go19x19).pieces)
+      case _                        => sys.error("Cant write to binary for lib")
     }
 
   }
@@ -676,7 +676,7 @@ object BinaryFormat {
     Array((i >>> 8).toByte, i.toByte)
   }
 
-  private val int15Max = 1 << 15
+  private val int15Max           = 1 << 15
   def writeSignedInt16(int: Int) = {
     val i = if (int < 0) int15Max - int else math.min(int, int15Max)
     writeInt16(i)
@@ -694,7 +694,7 @@ object BinaryFormat {
     Array((i >>> 16).toByte, (i >>> 8).toByte, i.toByte)
   }
 
-  private val int23Max = 1 << 23
+  private val int23Max           = 1 << 23
   def writeSignedInt24(int: Int) = {
     val i = if (int < 0) int23Max - int else math.min(int, int23Max)
     writeInt24(i)
