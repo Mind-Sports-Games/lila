@@ -102,7 +102,7 @@ case class Challenge(
     initialFen.isDefined && !initialFen.exists(_.value == variant.initialFen.value)
 
   def customStartingPosition: Boolean =
-    variant.draughtsFromPosition ||
+    variant == Variant.Draughts(strategygames.draughts.variant.FromPosition) ||
       (draughtsFenVariants(variant) &&
         initialFen.isDefined &&
         !initialFen.exists(_.value == variant.initialFen.value))
@@ -276,7 +276,7 @@ object Challenge {
     }
     val finalVariant = fenVariant match {
       case Some(v) if draughtsFenVariants(variant) =>
-        if (variant.draughtsFromPosition && v.draughtsStandard)
+        if (variant.fromPositionVariant && v.standardVariant)
           Variant
             .byName(GameLogic.Draughts(), "From Position")
             .getOrElse(Variant.orDefault(GameLogic.Draughts(), 3))

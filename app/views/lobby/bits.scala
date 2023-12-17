@@ -228,7 +228,7 @@ object bits {
     )
 
   private def variantsOrdered: List[Variant] = {
-    val randomOrder     = Random.shuffle(Variant.all.filterNot(_.fromPosition))
+    val randomOrder     = Random.shuffle(Variant.all.filterNot(_.fromPositionVariant))
     val gameGroups      = GameGroup.medley.filter(gg => gg.variants.exists(randomOrder.contains(_)))
     val onePerGameGroup = generateOnePerGameGroup(randomOrder, gameGroups)
     val newOrder        = onePerGameGroup ::: randomOrder.filterNot(onePerGameGroup.contains(_))

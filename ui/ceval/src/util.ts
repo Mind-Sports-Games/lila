@@ -1,4 +1,5 @@
 const noCevalVariants = [
+  'monster',
   'linesOfAction',
   'scrambledEggs',
   'international',

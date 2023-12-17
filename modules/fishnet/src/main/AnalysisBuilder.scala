@@ -69,7 +69,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       work: Work.Analysis,
       evals: List[Option[Evaluation.OrSkipped[Uci]]]
   ): List[Option[Evaluation.OrSkipped[Uci]]] =
-    if (work.game.variant.amazons) evals.flatMap(e => List(e, e)) else evals
+    if (work.game.variant.key == "amazons") evals.flatMap(e => List(e, e)) else evals
 
   private def mergeEvalsAndCached(
       work: Work.Analysis,

@@ -81,6 +81,7 @@ object side {
         showNonEmptyPerf(u.perfs.horde, PerfType.orDefault("horde")),
         showNonEmptyPerf(u.perfs.racingKings, PerfType.orDefault("racingKings")),
         showNonEmptyPerf(u.perfs.noCastling, PerfType.orDefault("noCastling")),
+        showNonEmptyPerf(u.perfs.monster, PerfType.orDefault("monster")),
         showNonEmptyPerf(u.perfs.linesOfAction, PerfType.orDefault("linesOfAction")),
         showNonEmptyPerf(u.perfs.scrambledEggs, PerfType.orDefault("scrambledEggs")),
         showNonEmptyPerf(u.perfs.international, PerfType.orDefault("international")),

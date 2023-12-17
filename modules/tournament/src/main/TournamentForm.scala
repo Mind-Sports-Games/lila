@@ -277,8 +277,8 @@ private[tournament] case class TournamentSetup(
 
   def validClock = clock match {
     case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0
-    case bc: Clock.BronsteinConfig    => (bc.limitSeconds + bc.delaySeconds) > 0
-    case udc: Clock.SimpleDelayConfig => (udc.limitSeconds + udc.delaySeconds) > 0
+    case bc: Clock.BronsteinConfig    => (bc.limitSeconds + bc.delaySeconds) > 0 && bc.delaySeconds > 0
+    case udc: Clock.SimpleDelayConfig => (udc.limitSeconds + udc.delaySeconds) > 0 && udc.delaySeconds > 0
     case bc: ByoyomiClock.Config =>
       (bc.limitSeconds + bc.incrementSeconds) > 0 || (bc.limitSeconds + bc.byoyomiSeconds) > 0
   }

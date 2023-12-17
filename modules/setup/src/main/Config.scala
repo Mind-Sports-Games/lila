@@ -107,13 +107,13 @@ trait Positional { self: Config =>
   lazy val validFen = variant.gameLogic match {
     //TODO: LOA defaults here, perhaps want to add LOA fromPosition
     case GameLogic.Chess() =>
-      variant != strategygames.chess.variant.FromPosition || {
+      !variant.fromPositionVariant || {
         fen exists { f =>
           (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)
         }
       }
     case GameLogic.Draughts() =>
-      !(variant.fromPosition && Config
+      !(variant.fromPositionVariant && Config
         .fenVariants(GameFamily.Draughts().id)
         .contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
         fen ?? { f =>
@@ -134,7 +134,7 @@ trait Positional { self: Config =>
 
   lazy val validKingCount = variant.gameLogic match {
     case GameLogic.Draughts() =>
-      !(variant.fromPosition && Config
+      !(variant.fromPositionVariant && Config
         .fenVariants(GameFamily.Draughts().id)
         .contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
         fen ?? { f =>
@@ -148,7 +148,7 @@ trait Positional { self: Config =>
 
   def fenGame(builder: StratGame => Game): Game = {
     val baseState =
-      fen ifTrue (variant.fromPosition || variant.gameLogic == GameLogic.Go()) flatMap {
+      fen ifTrue (variant.fromPositionVariant || variant.gameLogic == GameLogic.Go()) flatMap {
         Forsyth.<<<@(
           variant.gameLogic,
           variant,

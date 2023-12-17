@@ -152,7 +152,7 @@ final class JsonView(
         )),
         "gameLogic" -> g.situation.board.variant.gameLogic.name.toLowerCase(),
         "boardSize" -> boardSizeJson(g.situation.board.variant),
-        "lastMove"  -> ~g.lastMoveKeys,
+        "lastMove"  -> ~g.lastActionKeys,
         "orient"    -> g.playerByUserId(hostId).map(_.playerIndex)
       )
       .add(

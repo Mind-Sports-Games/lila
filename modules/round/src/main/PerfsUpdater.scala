@@ -49,6 +49,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.crazyhouse, ratingsB.crazyhouse, game)
               case Variant.Chess(NoCastling) =>
                 updateRatings(ratingsW.noCastling, ratingsB.noCastling, game)
+              case Variant.Chess(Monster) =>
+                updateRatings(ratingsW.monster, ratingsB.monster, game)
               case Variant.Chess(LinesOfAction) =>
                 updateRatings(ratingsW.linesOfAction, ratingsB.linesOfAction, game)
               case Variant.Chess(ScrambledEggs) =>
@@ -143,6 +145,7 @@ final class PerfsUpdater(
       racingKings: Rating,
       crazyhouse: Rating,
       noCastling: Rating,
+      monster: Rating,
       linesOfAction: Rating,
       scrambledEggs: Rating,
       international: Rating,
@@ -187,6 +190,7 @@ final class PerfsUpdater(
       racingKings = perfs.racingKings.toRating,
       crazyhouse = perfs.crazyhouse.toRating,
       noCastling = perfs.noCastling.toRating,
+      monster = perfs.monster.toRating,
       linesOfAction = perfs.linesOfAction.toRating,
       scrambledEggs = perfs.scrambledEggs.toRating,
       international = perfs.international.toRating,
@@ -243,7 +247,7 @@ final class PerfsUpdater(
       case (player, opponent) =>
         val perfs            = player.perfs
         val speed            = game.speed
-        val isStd            = game.ratingVariant.standard
+        val isStd            = game.ratingVariant.key == "standard"
         val isHumanVsMachine = player.noBot && opponent.isBot
         def addRatingIf(cond: Boolean, perf: Perf, rating: Rating) =
           if (cond) {
@@ -252,48 +256,184 @@ final class PerfsUpdater(
               p.copy(glicko = p.glicko average perf.glicko) // halve rating diffs for human
             else p
           } else perf
+        def addRatingVariant(variant: Variant, perf: Perf, rating: Rating) =
+          addRatingIf(game.ratingVariant == variant, perf, rating)
         val perfs1 = perfs.copy(
-          chess960 = addRatingIf(game.ratingVariant.chess960, perfs.chess960, ratings.chess960),
-          kingOfTheHill =
-            addRatingIf(game.ratingVariant.kingOfTheHill, perfs.kingOfTheHill, ratings.kingOfTheHill),
-          threeCheck = addRatingIf(game.ratingVariant.threeCheck, perfs.threeCheck, ratings.threeCheck),
-          fiveCheck = addRatingIf(game.ratingVariant.fiveCheck, perfs.fiveCheck, ratings.fiveCheck),
-          antichess = addRatingIf(game.ratingVariant.antichess, perfs.antichess, ratings.antichess),
-          atomic = addRatingIf(game.ratingVariant.atomic, perfs.atomic, ratings.atomic),
-          horde = addRatingIf(game.ratingVariant.horde, perfs.horde, ratings.horde),
-          racingKings = addRatingIf(game.ratingVariant.racingKings, perfs.racingKings, ratings.racingKings),
-          crazyhouse = addRatingIf(game.ratingVariant.crazyhouse, perfs.crazyhouse, ratings.crazyhouse),
-          noCastling = addRatingIf(game.ratingVariant.noCastling, perfs.noCastling, ratings.noCastling),
-          linesOfAction =
-            addRatingIf(game.ratingVariant.linesOfAction, perfs.linesOfAction, ratings.linesOfAction),
-          scrambledEggs =
-            addRatingIf(game.ratingVariant.scrambledEggs, perfs.scrambledEggs, ratings.scrambledEggs),
-          international =
-            addRatingIf(game.ratingVariant.draughtsStandard, perfs.international, ratings.international),
-          frisian = addRatingIf(game.ratingVariant.frisian, perfs.frisian, ratings.frisian),
-          frysk = addRatingIf(game.ratingVariant.frysk, perfs.frysk, ratings.frysk),
-          antidraughts =
-            addRatingIf(game.ratingVariant.antidraughts, perfs.antidraughts, ratings.antidraughts),
-          breakthrough =
-            addRatingIf(game.ratingVariant.breakthrough, perfs.breakthrough, ratings.breakthrough),
-          russian = addRatingIf(game.ratingVariant.russian, perfs.russian, ratings.russian),
-          brazilian = addRatingIf(game.ratingVariant.brazilian, perfs.brazilian, ratings.brazilian),
-          pool = addRatingIf(game.ratingVariant.pool, perfs.pool, ratings.pool),
-          portuguese = addRatingIf(game.ratingVariant.portuguese, perfs.portuguese, ratings.portuguese),
-          english = addRatingIf(game.ratingVariant.english, perfs.english, ratings.english),
-          shogi = addRatingIf(game.ratingVariant.shogi, perfs.shogi, ratings.shogi),
-          xiangqi = addRatingIf(game.ratingVariant.xiangqi, perfs.xiangqi, ratings.xiangqi),
-          minishogi = addRatingIf(game.ratingVariant.minishogi, perfs.minishogi, ratings.minishogi),
-          minixiangqi = addRatingIf(game.ratingVariant.minixiangqi, perfs.minixiangqi, ratings.minixiangqi),
-          flipello = addRatingIf(game.ratingVariant.flipello, perfs.flipello, ratings.flipello),
-          flipello10 = addRatingIf(game.ratingVariant.flipello10, perfs.flipello10, ratings.flipello10),
-          amazons = addRatingIf(game.ratingVariant.amazons, perfs.amazons, ratings.amazons),
-          oware = addRatingIf(game.ratingVariant.oware, perfs.oware, ratings.oware),
-          togyzkumalak =
-            addRatingIf(game.ratingVariant.togyzkumalak, perfs.togyzkumalak, ratings.togyzkumalak),
-          go9x9 = addRatingIf(game.ratingVariant.go9x9, perfs.go9x9, ratings.go9x9),
-          go13x13 = addRatingIf(game.ratingVariant.go13x13, perfs.go13x13, ratings.go13x13),
-          go19x19 = addRatingIf(game.ratingVariant.go19x19, perfs.go19x19, ratings.go19x19),
+          chess960 = addRatingVariant(
+            Variant.Chess(Chess960),
+            perfs.chess960,
+            ratings.chess960
+          ),
+          kingOfTheHill = addRatingVariant(
+            Variant.Chess(KingOfTheHill),
+            perfs.kingOfTheHill,
+            ratings.kingOfTheHill
+          ),
+          threeCheck = addRatingVariant(
+            Variant.Chess(ThreeCheck),
+            perfs.threeCheck,
+            ratings.threeCheck
+          ),
+          fiveCheck = addRatingVariant(
+            Variant.Chess(FiveCheck),
+            perfs.fiveCheck,
+            ratings.fiveCheck
+          ),
+          antichess = addRatingVariant(
+            Variant.Chess(Antichess),
+            perfs.antichess,
+            ratings.antichess
+          ),
+          atomic = addRatingVariant(
+            Variant.Chess(Atomic),
+            perfs.atomic,
+            ratings.atomic
+          ),
+          horde = addRatingVariant(
+            Variant.Chess(Horde),
+            perfs.horde,
+            ratings.horde
+          ),
+          racingKings = addRatingVariant(
+            Variant.Chess(RacingKings),
+            perfs.racingKings,
+            ratings.racingKings
+          ),
+          crazyhouse = addRatingVariant(
+            Variant.Chess(Crazyhouse),
+            perfs.crazyhouse,
+            ratings.crazyhouse
+          ),
+          noCastling = addRatingVariant(
+            Variant.Chess(NoCastling),
+            perfs.noCastling,
+            ratings.noCastling
+          ),
+          monster = addRatingVariant(
+            Variant.Chess(Monster),
+            perfs.monster,
+            ratings.monster
+          ),
+          linesOfAction = addRatingVariant(
+            Variant.Chess(LinesOfAction),
+            perfs.linesOfAction,
+            ratings.linesOfAction
+          ),
+          scrambledEggs = addRatingVariant(
+            Variant.Chess(ScrambledEggs),
+            perfs.scrambledEggs,
+            ratings.scrambledEggs
+          ),
+          international = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.Standard),
+            perfs.international,
+            ratings.international
+          ),
+          frisian = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.Frisian),
+            perfs.frisian,
+            ratings.frisian
+          ),
+          frysk = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.Frysk),
+            perfs.frysk,
+            ratings.frysk
+          ),
+          antidraughts = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.Antidraughts),
+            perfs.antidraughts,
+            ratings.antidraughts
+          ),
+          breakthrough = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.Breakthrough),
+            perfs.breakthrough,
+            ratings.breakthrough
+          ),
+          russian = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.Russian),
+            perfs.russian,
+            ratings.russian
+          ),
+          brazilian = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.Brazilian),
+            perfs.brazilian,
+            ratings.brazilian
+          ),
+          pool = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.Pool),
+            perfs.pool,
+            ratings.pool
+          ),
+          portuguese = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.Portuguese),
+            perfs.portuguese,
+            ratings.portuguese
+          ),
+          english = addRatingVariant(
+            Variant.Draughts(strategygames.draughts.variant.English),
+            perfs.english,
+            ratings.english
+          ),
+          shogi = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.Shogi),
+            perfs.shogi,
+            ratings.shogi
+          ),
+          xiangqi = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.Xiangqi),
+            perfs.xiangqi,
+            ratings.xiangqi
+          ),
+          minishogi = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.MiniShogi),
+            perfs.minishogi,
+            ratings.minishogi
+          ),
+          minixiangqi = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi),
+            perfs.minixiangqi,
+            ratings.minixiangqi
+          ),
+          flipello = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.Flipello),
+            perfs.flipello,
+            ratings.flipello
+          ),
+          flipello10 = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.Flipello10),
+            perfs.flipello10,
+            ratings.flipello10
+          ),
+          amazons = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.Amazons),
+            perfs.amazons,
+            ratings.amazons
+          ),
+          oware = addRatingVariant(
+            Variant.Samurai(strategygames.samurai.variant.Oware),
+            perfs.oware,
+            ratings.oware
+          ),
+          togyzkumalak = addRatingVariant(
+            Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak),
+            perfs.togyzkumalak,
+            ratings.togyzkumalak
+          ),
+          go9x9 = addRatingVariant(
+            Variant.Go(strategygames.go.variant.Go9x9),
+            perfs.go9x9,
+            ratings.go9x9
+          ),
+          go13x13 = addRatingVariant(
+            Variant.Go(strategygames.go.variant.Go13x13),
+            perfs.go13x13,
+            ratings.go13x13
+          ),
+          go19x19 = addRatingVariant(
+            Variant.Go(strategygames.go.variant.Go19x19),
+            perfs.go19x19,
+            ratings.go19x19
+          ),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),
           bullet = addRatingIf(isStd && speed == Speed.Bullet, perfs.bullet, ratings.bullet),

@@ -3,7 +3,7 @@ package lila.setup
 import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, Mode, P1, P2, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.chess.variant.{ FromPosition }
+import strategygames.chess.variant.{ FromPosition, Standard }
 
 import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.PlayerIndex
@@ -60,7 +60,7 @@ final case class ApiAiConfig(
             Player.make(P2, user, perfPicker)
           ),
           mode = Mode.Casual,
-          source = if (stratGame.board.variant.fromPosition) Source.Position else Source.Ai,
+          source = if (stratGame.board.variant.fromPositionVariant) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
         )
@@ -70,7 +70,8 @@ final case class ApiAiConfig(
   def pov(user: Option[User]) = Pov(game(user), creatorPlayerIndex)
 
   def autoVariant =
-    if (variant.standard && fen.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
+    if (variant == Variant.Chess(Standard) && fen.exists(!_.initial))
+      copy(variant = Variant.wrap(FromPosition))
     else this
 }
 

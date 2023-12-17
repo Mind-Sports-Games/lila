@@ -37,7 +37,7 @@ object variant {
       h1("PlayStrategy Games"),
       div(cls := "body box__pad")(raw(~doc.getHtml("pages.content", resolver))),
       div(cls := "variants")(
-        Variant.all.filterNot(_.fromPosition) map { v =>
+        Variant.all.filterNot(_.fromPositionVariant) map { v =>
           a(cls := "variant text box__pad", href := routes.Page.variant(v.key), dataIcon := v.perfIcon)(
             span(
               h2(VariantKeys.variantName(v)),
@@ -61,7 +61,7 @@ object variant {
     )(
       main(cls := "page-menu")(
         st.aside(cls := "page-menu__menu subnav")(
-          Variant.all.filterNot(_.fromPosition) map { v =>
+          Variant.all.filterNot(_.fromPositionVariant) map { v =>
             a(
               cls := List("text" -> true, "active" -> active.has(v)),
               href := routes.Page.variant(v.key),

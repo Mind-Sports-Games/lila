@@ -139,10 +139,7 @@ export class ClockController {
 
   private tickCallback?: number;
 
-  constructor(
-    d: RoundData,
-    readonly opts: ClockOpts,
-  ) {
+  constructor(d: RoundData, readonly opts: ClockOpts) {
     const cdata = d.clock!;
 
     if (cdata.showTenths === Prefs.ShowClockTenths.Never) this.showTenths = () => false;
@@ -215,7 +212,7 @@ export class ClockController {
     p2Pending: Seconds,
     p1Per = 0,
     p2Per = 0,
-    delay: Centis = 0,
+    delay: Centis = 0
   ) => {
     const paused =
         !!d.opponent.offeringSelectSquares ||
@@ -282,7 +279,7 @@ export class ClockController {
       this.tick,
       // changing the value of active node confuses the chromevox screen reader
       // so update the clock less often
-      this.opts.nvui ? 1000 : (time % (this.showTenths(time) ? 100 : 500)) + 1 + extraDelay,
+      this.opts.nvui ? 1000 : (time % (this.showTenths(time) ? 100 : 500)) + 1 + extraDelay
     );
   };
 
@@ -366,5 +363,12 @@ export class ClockController {
     this.isRunning() &&
     this.elapsed() + this.pendingMillisOf(playerIndex) <= 1000 * this.delay &&
     !this.goneBerserk[playerIndex];
+
+  isNotInDelay = (playerIndex: PlayerIndex): boolean =>
+    !!this.delay &&
+    this.isRunning() &&
+    this.elapsed() + this.pendingMillisOf(playerIndex) > 1000 * this.delay &&
+    !this.goneBerserk[playerIndex];
+
   isRunning = () => this.times.activePlayerIndex !== undefined;
 }
