@@ -163,7 +163,7 @@ object BinaryFormat {
     //       This works, but should be reconsidered if we add more clock types, or when we refactor to the more general
     //       system.
     def write(clock: Clock): ByteArray = {
-      Array(writeClockLimit(clock.limitSeconds), clock.config.graceSeconds.toByte) ++
+      Array(writeClockLimit(clock.limitSeconds), clock.graceSeconds.toByte) ++
         writeSignedInt24(legacyElapsed(clock, P1).centis) ++
         writeSignedInt24(legacyElapsed(clock, P2).centis) ++
         clock.timestamp.fold(Array.empty[Byte])(writeTimestamp)
@@ -199,11 +199,11 @@ object BinaryFormat {
               players = PlayerIndex.Map(
                 ClockPlayer
                   .withConfig(config)
-                  .copy(berserk = p1Berserk)
+                  .withBerserk(p1Berserk)
                   .setRemaining(computeRemaining(config, legacyP1)),
                 ClockPlayer
                   .withConfig(config)
-                  .copy(berserk = p2Berserk)
+                  .withBerserk(p2Berserk)
                   .setRemaining(computeRemaining(config, legacyP2))
               ),
               timestamp = timestamp
