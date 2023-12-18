@@ -21,7 +21,7 @@ final private class Takebacker(
   )(pov: Pov)(implicit proxy: GameProxy): Fu[(Events, TakebackSituation)] =
     IfAllowed(pov.game) {
       pov match {
-        case Pov(game, playerIndex) if pov.opponent.isProposingTakeback                                   =>
+        case Pov(game, playerIndex) if pov.opponent.isProposingTakeback =>
           {
             val povTurn = playerIndex == pov.game.turnPlayerIndex
             if (pov.opponent.proposeTakebackAt == pov.game.plies && povTurn)
@@ -31,8 +31,8 @@ final private class Takebacker(
               // go back one ply. if playerindex has not switched, continue going back
               takebackRetainPlayer(game)
           } dmap (_ -> situation.reset)
-        case Pov(game, _) if pov.game.playableByAi                                                        => takebackSwitchPlayer(game) dmap (_ -> situation)
-        case Pov(game, _) if pov.opponent.isAi                                                            => takebackRetainPlayer(game) dmap (_ -> situation)
+        case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game) dmap (_ -> situation)
+        case Pov(game, _) if pov.opponent.isAi     => takebackRetainPlayer(game) dmap (_ -> situation)
         case Pov(game, playerIndex) if (game playerCanProposeTakeback playerIndex) && situation.offerable =>
           {
             messenger.system(game, trans.takebackPropositionSent.txt())
@@ -42,13 +42,13 @@ final private class Takebacker(
             proxy.save(progress) >>- publishTakebackOffer(pov) inject
               List(Event.TakebackOffers(playerIndex.p1, playerIndex.p2))
           } dmap (_ -> situation)
-        case _                                                                                            => fufail(ClientError("[takebacker] invalid yes " + pov))
+        case _ => fufail(ClientError("[takebacker] invalid yes " + pov))
       }
     }
 
   def no(situation: TakebackSituation)(pov: Pov)(implicit proxy: GameProxy): Fu[(Events, TakebackSituation)] =
     pov match {
-      case Pov(game, playerIndex) if pov.player.isProposingTakeback   =>
+      case Pov(game, playerIndex) if pov.player.isProposingTakeback =>
         proxy.save {
           messenger.system(game, trans.takebackPropositionCanceled.txt())
           Progress(game) map { g =>
@@ -66,7 +66,7 @@ final private class Takebacker(
         } inject {
           List(Event.TakebackOffers(p1 = false, p2 = false)) -> situation.decline
         }
-      case _                                                          => fufail(ClientError("[takebacker] invalid no " + pov))
+      case _ => fufail(ClientError("[takebacker] invalid no " + pov))
     }
 
   def isAllowedIn(game: Game): Fu[Boolean] =
@@ -121,11 +121,11 @@ final private class Takebacker(
 
   private def rewindTurnAndPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     for {
-      fen    <- gameRepo.initialFen(game)
-      prog1  <- Rewind(game, fen, false).toFuture
-      prog2  <- Rewind(prog1.game, fen, true).toFuture dmap { progress =>
-                  prog1.withGame(progress.game)
-                }
+      fen   <- gameRepo.initialFen(game)
+      prog1 <- Rewind(game, fen, false).toFuture
+      prog2 <- Rewind(prog1.game, fen, true).toFuture dmap { progress =>
+        prog1.withGame(progress.game)
+      }
       _      <- uciMemo.set(prog2.game, fen)
       events <- saveAndNotify(prog2)
     } yield events
