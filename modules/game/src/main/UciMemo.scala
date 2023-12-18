@@ -30,38 +30,30 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
       action.player
     )
 
-  private def set(game: Game, uciStrs: ActionStrs) =
-    cache.put(game.id, uciStrs)
-
-  def set(game: Game, fen: Option[FEN]) =
-    for {
-      uciStrs <- uciStrsFromGame(game, maxTurns, fen)
-    } yield cache.put(game.id, uciStrs)
-
-  def set(game: Game) =
-    for {
-      uciStrs <- uciStrsFromGame(game, maxTurns)
-    } yield cache.put(game.id, uciStrs)
-
   def get(game: Game, max: Int = maxTurns): Fu[ActionStrs] =
-    cache.getIfPresent(game.id).filter { uciStrs =>
-      uciStrs.size.min(max) == game.actionStrs.size.min(max)
-    } match {
-      case Some(uciStrs) => fuccess(uciStrs)
-      case _             => uciStrsFromGame(game, max).addEffect { set(game, _) }
-    }
+    cache
+      .getIfPresent(game.id)
+      .filter(_.size.min(max) == game.actionStrs.size.min(max))
+      .fold(uciStrsFromGame(game, max).addEffect(cache.put(game.id, _)))(uciStrs => fuccess(uciStrs))
+
+  // These API methods assume you already have the initial fen and doesn't query for it
+  def set(game: Game, fen: Option[FEN]): Fu[Unit] =
+    uciStrsFromGame(game, maxTurns, fen)
+      .map(cache.put(game.id, _))
 
   private def uciStrsFromGame(game: Game, max: Int, fen: Option[FEN]): Fu[ActionStrs] =
-    UciDump(
-      game.variant.gameLogic,
-      game.actionStrs take maxTurns,
-      fen,
-      game.variant
-    ).map(_.toVector.map(_.toVector)).toFuture
+    UciDump(game.variant.gameLogic, game.actionStrs take maxTurns, fen, game.variant)
+      .map(_.toVector.map(_.toVector))
+      .toFuture
+
+  // These API methods will query for the initial fen and then use it.
+  def set(game: Game): Fu[Unit] =
+    gameRepo
+      .initialFen(game)
+      .flatMap(set(game, _))
 
   private def uciStrsFromGame(game: Game, max: Int): Fu[ActionStrs] =
-    for {
-      fen        <- gameRepo initialFen game
-      actionStrs <- uciStrsFromGame(game, max, fen)
-    } yield actionStrs
+    gameRepo
+      .initialFen(game)
+      .flatMap(uciStrsFromGame(game, max, _))
 }
