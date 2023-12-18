@@ -35,12 +35,12 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
 
   def set(game: Game, fen: Option[FEN]) =
     for {
-      uciStrs <- compute(game, maxTurns, fen).toFuture
+      uciStrs <- uciStrsFromGame(game, maxTurns, fen)
     } yield cache.put(game.id, uciStrs)
 
   def set(game: Game) =
     for {
-      uciStrs <- compute(game, maxTurns)
+      uciStrs <- uciStrsFromGame(game, maxTurns)
     } yield cache.put(game.id, uciStrs)
 
   def get(game: Game, max: Int = maxTurns): Fu[ActionStrs] =
@@ -48,20 +48,20 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
       uciStrs.size.min(max) == game.actionStrs.size.min(max)
     } match {
       case Some(uciStrs) => fuccess(uciStrs)
-      case _             => compute(game, max).addEffect { set(game, _) }
+      case _             => uciStrsFromGame(game, max).addEffect { set(game, _) }
     }
 
-  private def compute(game: Game, max: Int, fen: Option[FEN]): cats.data.Validated[String, ActionStrs] =
+  private def uciStrsFromGame(game: Game, max: Int, fen: Option[FEN]): Fu[ActionStrs] =
     UciDump(
       game.variant.gameLogic,
       game.actionStrs take maxTurns,
       fen,
       game.variant
-    ).map(_.toVector.map(_.toVector))
+    ).map(_.toVector.map(_.toVector)).toFuture
 
-  private def compute(game: Game, max: Int): Fu[ActionStrs] =
+  private def uciStrsFromGame(game: Game, max: Int): Fu[ActionStrs] =
     for {
       fen        <- gameRepo initialFen game
-      actionStrs <- compute(game, max, fen).toFuture
+      actionStrs <- uciStrsFromGame(game, max, fen)
     } yield actionStrs
 }
