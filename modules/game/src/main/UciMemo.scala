@@ -15,7 +15,7 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
   private val maxTurns = 300
 
   def add(game: Game, uci: String, playerIndex: Player): Unit = {
-    val current       = ~cache.getIfPresent(game.id)
+    val current = ~cache.getIfPresent(game.id)
     val newActionStrs =
       if (Player.fromTurnCount(current.size + game.stratGame.startedAtTurn) == playerIndex)
         current :+ List(uci)
