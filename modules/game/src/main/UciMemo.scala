@@ -3,7 +3,7 @@ package lila.game
 import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 
-import strategygames.format.UciDump
+import strategygames.format.{ FEN, UciDump }
 import strategygames.{ Action, ActionStrs, Player }
 
 final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -15,7 +15,7 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
   private val maxTurns = 300
 
   def add(game: Game, uci: String, playerIndex: Player): Unit = {
-    val current = ~cache.getIfPresent(game.id)
+    val current       = ~cache.getIfPresent(game.id)
     val newActionStrs =
       if (Player.fromTurnCount(current.size + game.stratGame.startedAtTurn) == playerIndex)
         current :+ List(uci)
@@ -30,33 +30,38 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
       action.player
     )
 
-  def set(game: Game, actionStrs: ActionStrs) =
-    cache.put(game.id, actionStrs)
+  private def set(game: Game, uciStrs: ActionStrs) =
+    cache.put(game.id, uciStrs)
+
+  def set(game: Game, fen: Option[FEN]) =
+    for {
+      uciStrs <- compute(game, maxTurns, fen).toFuture
+    } yield cache.put(game.id, uciStrs)
 
   def set(game: Game) =
-    cache.put(game.id, game.actionStrs)
+    for {
+      uciStrs <- compute(game, maxTurns)
+    } yield cache.put(game.id, uciStrs)
 
   def get(game: Game, max: Int = maxTurns): Fu[ActionStrs] =
-    cache getIfPresent game.id filter { actionStrs =>
-      actionStrs.size.min(max) == game.actionStrs.size.min(max)
+    cache.getIfPresent(game.id).filter { uciStrs =>
+      uciStrs.size.min(max) == game.actionStrs.size.min(max)
     } match {
-      case Some(actionStrs) => fuccess(actionStrs)
-      case _                => compute(game, max) addEffect { set(game, _) }
+      case Some(uciStrs) => fuccess(uciStrs)
+      case _             => compute(game, max).addEffect { set(game, _) }
     }
 
-  //def drop(game: Game, nb: Int) = {
-  //  val current = ~cache.getIfPresent(game.id)
-  //  cache.put(game.id, current.take(current.size - nb))
-  //}
+  private def compute(game: Game, max: Int, fen: Option[FEN]): cats.data.Validated[String, ActionStrs] =
+    UciDump(
+      game.variant.gameLogic,
+      game.actionStrs take maxTurns,
+      fen,
+      game.variant
+    ).map(_.toVector.map(_.toVector))
 
   private def compute(game: Game, max: Int): Fu[ActionStrs] =
     for {
-      fen <- gameRepo initialFen game
-      actionStrs <- UciDump(
-        game.variant.gameLogic,
-        game.actionStrs take maxTurns,
-        fen,
-        game.variant
-      ).toFuture
-    } yield actionStrs.toVector.map(_.toVector)
+      fen        <- gameRepo initialFen game
+      actionStrs <- compute(game, max, fen).toFuture
+    } yield actionStrs
 }
