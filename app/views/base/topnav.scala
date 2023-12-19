@@ -89,7 +89,7 @@ object topnav {
           //a(href := s"${routes.UserAnalysis.index}#explorer")(trans.openingExplorer()),
           a(href := routes.Editor.index)(s"Chess ${trans.boardEditor.txt()}"),
           //a(href := routes.Importer.importGame)(trans.importGame()),
-          a(href := routes.Search.index())(trans.search.advancedSearch())
+          //a(href := routes.Search.index())(trans.search.advancedSearch())
         )
       )
     )
