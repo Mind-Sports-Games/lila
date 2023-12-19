@@ -3,8 +3,8 @@
   <string name="search">Search</string>
   <string name="advancedSearch">Advanced search</string>
   <plurals name="searchInXGames">
-    <item quantity="one">Search in %s chess game</item>
-    <item quantity="other">Search in %s chess games</item>
+    <item quantity="one">Search in %s game</item>
+    <item quantity="other">Search in %s games</item>
   </plurals>
   <plurals name="xGamesFound">
     <item quantity="one">One game found</item>

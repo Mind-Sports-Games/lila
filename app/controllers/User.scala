@@ -123,10 +123,11 @@ final class User(
                     info   <- env.userInfo(u, nbs, ctx)
                     _      <- env.team.cached.nameCache preloadMany info.teamIds
                     social <- env.socialInfo(u, ctx)
-                    searchForm =
-                      (filters.current == GameFilter.Search) option
-                        GameFilterMenu.searchForm(userGameSearch, filters.current)(ctx.body, formBinding)
-                  } yield html.user.show.page.games(u, info, pag, filters, searchForm, social)
+                    //searchForm =
+                    //  (filters.current == GameFilter.Search) option
+                    //    GameFilterMenu.searchForm(userGameSearch, filters.current)(ctx.body, formBinding)
+                  } yield html.user.show.page.games(u, info, pag, filters, None, social)
+                  //} yield html.user.show.page.games(u, info, pag, filters, searchForm, social)
                   else fuccess(html.user.show.gamesContent(u, nbs, pag, filters, filter))
               } yield res,
               api = _ => apiGames(u, filter, page)
