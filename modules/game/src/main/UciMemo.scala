@@ -3,7 +3,7 @@ package lila.game
 import com.github.blemale.scaffeine.Cache
 import scala.concurrent.duration._
 
-import strategygames.format.UciDump
+import strategygames.format.{ FEN, UciDump }
 import strategygames.{ Action, ActionStrs, Player }
 
 final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -30,33 +30,30 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
       action.player
     )
 
-  def set(game: Game, actionStrs: ActionStrs) =
-    cache.put(game.id, actionStrs)
-
-  def set(game: Game) =
-    cache.put(game.id, game.actionStrs)
-
   def get(game: Game, max: Int = maxTurns): Fu[ActionStrs] =
-    cache getIfPresent game.id filter { actionStrs =>
-      actionStrs.size.min(max) == game.actionStrs.size.min(max)
-    } match {
-      case Some(actionStrs) => fuccess(actionStrs)
-      case _                => compute(game, max) addEffect { set(game, _) }
-    }
+    cache
+      .getIfPresent(game.id)
+      .filter(_.size.min(max) == game.actionStrs.size.min(max))
+      .fold(uciStrsFromGame(game, max).addEffect(cache.put(game.id, _)))(uciStrs => fuccess(uciStrs))
 
-  //def drop(game: Game, nb: Int) = {
-  //  val current = ~cache.getIfPresent(game.id)
-  //  cache.put(game.id, current.take(current.size - nb))
-  //}
+  // These API methods assume you already have the initial fen and doesn't query for it
+  def set(game: Game, fen: Option[FEN]): Fu[Unit] =
+    uciStrsFromGame(game, maxTurns, fen)
+      .map(cache.put(game.id, _))
 
-  private def compute(game: Game, max: Int): Fu[ActionStrs] =
-    for {
-      fen <- gameRepo initialFen game
-      actionStrs <- UciDump(
-        game.variant.gameLogic,
-        game.actionStrs take maxTurns,
-        fen,
-        game.variant
-      ).toFuture
-    } yield actionStrs.toVector.map(_.toVector)
+  private def uciStrsFromGame(game: Game, max: Int, fen: Option[FEN]): Fu[ActionStrs] =
+    UciDump(game.variant.gameLogic, game.actionStrs take maxTurns, fen, game.variant)
+      .map(_.toVector.map(_.toVector))
+      .toFuture
+
+  // These API methods will query for the initial fen and then use it.
+  def set(game: Game): Fu[Unit] =
+    gameRepo
+      .initialFen(game)
+      .flatMap(set(game, _))
+
+  private def uciStrsFromGame(game: Game, max: Int): Fu[ActionStrs] =
+    gameRepo
+      .initialFen(game)
+      .flatMap(uciStrsFromGame(game, max, _))
 }
