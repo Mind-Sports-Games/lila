@@ -174,9 +174,18 @@
     }
   }
 
+  delay {
+    font-size: 70%;
+    margin-bottom: -0.18em;
+  }
+
   &.running .time {
     background: mix($c-secondary, $c-bg-box, 30%);
     color: $c-font-clearer;
+  }
+
+  &.running .time.notindelay {
+    background: mix($c-accent, $c-bg-box, 30%);
   }
 
   &.emerg .time,

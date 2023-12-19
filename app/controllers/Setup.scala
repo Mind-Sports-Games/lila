@@ -60,7 +60,7 @@ final class Setup(
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
         val lib = gameLogic(getInt("lib"))
-        fuccess(forms friendFilled (lib, get("fen").map(s => FEN.clean(lib, s)))) flatMap { form =>
+        fuccess(forms.friendFilled(lib, get("fen").map(s => FEN.clean(lib, s)))) flatMap { form =>
           val validFen = form("fen").value map (s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
           userId ?? env.user.repo.named flatMap {
             case None => Ok(html.setup.forms.friend(form, none, none, validFen)).fuccess
@@ -123,7 +123,7 @@ final class Setup(
                       rematchOf = none,
                       multiMatch = config.multiMatch
                     )
-                    (env.challenge.api create challenge) flatMap {
+                    env.challenge.api.create(challenge).flatMap {
                       case true =>
                         negotiate(
                           html = fuccess(

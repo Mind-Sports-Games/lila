@@ -218,7 +218,7 @@ final private[api] class GameApi(
         "clock" -> g.clock.map { clock =>
           Json.obj(
             "initial"   -> clock.limitSeconds,
-            "increment" -> clock.incrementSeconds,
+            "increment" -> 0, // TODO: fix :'( clock.incrementSeconds,
             "totalTime" -> clock.estimateTotalSeconds
           )
         },

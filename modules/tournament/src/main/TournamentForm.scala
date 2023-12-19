@@ -3,7 +3,7 @@ package lila.tournament
 import cats.implicits._
 import strategygames.format.FEN
 import strategygames.chess.{ StartingPosition }
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, GameGroup, GameLogic, Mode }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameGroup, GameLogic, Mode }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.data._
@@ -12,6 +12,7 @@ import play.api.data.validation
 import play.api.data.validation.Constraint
 
 import lila.common.Form._
+import lila.common.Clock._
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam._
 import lila.user.User
@@ -23,7 +24,7 @@ final class TournamentForm {
   def create(user: User, leaderTeams: List[LeaderTeam], teamBattleId: Option[TeamID] = None) =
     form(user, leaderTeams) fill TournamentSetup(
       name = teamBattleId.isEmpty option user.titleUsername,
-      clock = FischerClock.Config(180, 0),
+      clock = Clock.Config(180, 0),
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
       startDate = none,
@@ -134,45 +135,11 @@ final class TournamentForm {
   private def draughts64Variants(medleyVariants: Option[List[Variant]]) =
     medleyVariantsList(medleyVariants).filterNot(_.draughts64Variant).isEmpty
 
-  // Yes, I know this is kinda gross. :'(
-  private def valuesFromClockConfig(
-      c: ClockConfig
-  ): Option[(Boolean, Double, Int, Option[Int], Option[Int])] =
-    c match {
-      case fc: FischerClock.Config => {
-        FischerClock.Config.unapply(fc).map(t => (false, t._1 / 60d, t._2, None, None))
-      }
-      case bc: ByoyomiClock.Config => {
-        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 60d, t._2, Some(t._3), Some(t._4)))
-      }
-    }
-
-  // Yes, I know this is kinda gross. :'(
-  private def clockConfigFromValues(
-      useByoyomi: Boolean,
-      limit: Double,
-      increment: Int,
-      byoyomi: Option[Int],
-      periods: Option[Int]
-  ): ClockConfig =
-    (useByoyomi, byoyomi, periods) match {
-      case (true, Some(byoyomi), Some(periods)) =>
-        ByoyomiClock.Config((limit * 60).toInt, increment, byoyomi, periods)
-      case _ =>
-        FischerClock.Config((limit * 60).toInt, increment)
-    }
-
   private def form(user: User, leaderTeams: List[LeaderTeam]) =
     Form(
       mapping(
         "name" -> optional(nameType(user)),
-        "clock" -> mapping[ClockConfig, Boolean, Double, Int, Option[Int], Option[Int]](
-          "useByoyomi" -> boolean,
-          "limit"      -> numberInDouble(clockTimeChoices),
-          "increment"  -> numberIn(clockIncrementChoices),
-          "byoyomi"    -> optional(numberIn(clockByoyomiChoices)),
-          "periods"    -> optional(numberIn(periodsChoices))
-        )(clockConfigFromValues)(valuesFromClockConfig)
+        "clock" -> clockConfigMappingsMinutes(clockTimes, clockByoyomi)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "minutes" -> {
           if (lila.security.Granter(_.ManageTournament)(user)) number
@@ -232,15 +199,12 @@ object TournamentForm {
     (2 to 7 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   }.map(_.toDouble)
   val clockTimeDefault = 2d
-  private def formatLimit(l: Double) =
-    FischerClock.Config(l * 60 toInt, 0).limitString + {
-      if (l <= 1) " minute" else " minutes"
-    }
-  val clockTimeChoices = optionsDouble(clockTimes, formatLimit)
+  val clockTimeChoices = clockTimeChoicesFromMinutes(clockTimes)
 
   val clockIncrements       = (0 to 2 by 1) ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   val clockIncrementDefault = 0
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
+  val clockDelayChoices     = clockIncrementChoices
 
   val clockByoyomi        = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   val clockByoyomiDefault = 10
@@ -312,7 +276,9 @@ private[tournament] case class TournamentSetup(
 ) {
 
   def validClock = clock match {
-    case fc: FischerClock.Config => (fc.limitSeconds + fc.incrementSeconds) > 0
+    case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0
+    case bc: Clock.BronsteinConfig    => (bc.limitSeconds + bc.delaySeconds) > 0 && bc.delaySeconds > 0
+    case udc: Clock.SimpleDelayConfig => (udc.limitSeconds + udc.delaySeconds) > 0 && udc.delaySeconds > 0
     case bc: ByoyomiClock.Config =>
       (bc.limitSeconds + bc.incrementSeconds) > 0 || (bc.limitSeconds + bc.byoyomiSeconds) > 0
   }
@@ -414,9 +380,17 @@ private[tournament] case class TournamentSetup(
       {
         (bc.limitSeconds + 30 * bc.incrementSeconds + bc.byoyomiSeconds * 20 * bc.periodsTotal) * 2 * 0.8
       } + 15
-    case fc: FischerClock.Config =>
+    case fc: Clock.Config =>
       {
         (fc.limitSeconds + 30 * fc.incrementSeconds) * 2 * 0.8
+      } + 15
+    case bc: Clock.BronsteinConfig =>
+      {
+        (bc.limitSeconds + 30 * bc.delaySeconds) * 2 * 0.8
+      } + 15
+    case udc: Clock.SimpleDelayConfig =>
+      {
+        (udc.limitSeconds + 30 * udc.delaySeconds) * 2 * 0.8
       } + 15
   }
 

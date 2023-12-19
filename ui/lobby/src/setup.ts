@@ -131,6 +131,7 @@ export default class Setup {
   };
 
   private psBots = ['ps-greedy-two-move', 'ps-greedy-one-move', 'ps-greedy-four-move', 'ps-random-mover'];
+  private ratedTimeModes = ['1', '3', '4', '5'];
 
   prepareForm = ($modal: Cash) => {
     let fenOk = false;
@@ -167,7 +168,7 @@ export default class Setup {
       toggleButtons = () => {
         randomPlayerIndexVariants;
         const variantId = ($variantSelect.val() as string).split('_'),
-          timeMode = $timeModeSelect.val(),
+          timeMode = <string>$timeModeSelect.val(),
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
           inc = parseFloat($incrementInput.val() as string),
@@ -176,7 +177,7 @@ export default class Setup {
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
-            (timeMode != '1' && timeMode != '3') ||
+            this.ratedTimeModes.indexOf(timeMode) != -1 ||
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
             (vsPSBot && user == 'ps-random-mover') ||
@@ -450,7 +451,7 @@ export default class Setup {
       $periodsInput.eq(0).trigger('click');
     };
 
-    const isRealTime = () => $timeModeSelect.val() === '1' || $timeModeSelect.val() == '3';
+    const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
 
     if (typ === 'hook') {
       if ($form.data('anon')) {
@@ -660,7 +661,9 @@ export default class Setup {
         const timeMode = $(this).val();
         const isFischer = timeMode === '1';
         const isByoyomi = timeMode === '3';
-        $form.find('.time_choice, .increment_choice').toggle(isFischer || isByoyomi);
+        const isBronstein = timeMode === '4';
+        const isSimple = timeMode === '5';
+        $form.find('.time_choice, .increment_choice').toggle(isFischer || isByoyomi || isBronstein || isSimple);
         $form.find('.days_choice').toggle(timeMode === '2');
         $form.find('.byoyomi_choice, .byoyomi_periods').toggle(isByoyomi);
         toggleButtons();

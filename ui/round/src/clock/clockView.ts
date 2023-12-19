@@ -6,26 +6,48 @@ import { ClockElements, ClockController, Millis } from './clockCtrl';
 import { h, Hooks } from 'snabbdom';
 import { Position } from '../interfaces';
 
-const fischerEmerg = (millis: Millis, clock: ClockController) => millis < clock.emergMs;
+const otherEmerg = (millis: Millis, clock: ClockController) => millis < clock.emergMs;
 const byoyomiEmerg = (millis: Millis, clock: ClockController, playerIndex: PlayerIndex) =>
   !!clock.byoyomiData &&
   ((millis < clock.emergMs && !clock.isUsingByo(playerIndex)) ||
     (clock.isUsingByo(playerIndex) && millis < clock.byoyomiData.byoEmergeS * 1000));
 const isEmerg = (millis: Millis, clock: ClockController, playerIndex: PlayerIndex) =>
-  clock.byoyomiData ? byoyomiEmerg(millis, clock, playerIndex) : fischerEmerg(millis, clock);
+  clock.byoyomiData ? byoyomiEmerg(millis, clock, playerIndex) : otherEmerg(millis, clock);
 
 export function renderClock(ctrl: RoundController, player: game.Player, position: Position) {
   const clock = ctrl.clock!,
     millis = clock.millisOf(player.playerIndex),
     isPlayer = ctrl.data.player.playerIndex === player.playerIndex,
-    isRunning = player.playerIndex === clock.times.activePlayerIndex;
+    isRunning = player.playerIndex === clock.times.activePlayerIndex,
+    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[player.playerIndex];
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
       millis = clock.millisOf(player.playerIndex),
+      delayMillis = clock.delayMillisOf(player.playerIndex),
       isRunning = player.playerIndex === clock.times.activePlayerIndex;
     els.time = el;
     els.clock = el.parentElement!;
-    el.innerHTML = formatClockTime(millis, clock.showTenths(millis), isRunning, clock.opts.nvui);
+    el.innerHTML = formatClockTime(
+      millis,
+      delayMillis,
+      clock.showTenths(millis),
+      isRunning,
+      showDelayTime,
+      clock.opts.nvui
+    );
+    const cl = els.time.classList;
+    if (clock.isInDelay(player.playerIndex) && isRunning) {
+      cl.remove('notindelay');
+      cl.add('indelay');
+    } else if (
+      clock.isNotInDelay(player.playerIndex) &&
+      (cl.contains('indelay') || !cl.contains('notindelay')) &&
+      isRunning
+    ) {
+      clock.emergSound.lowtime();
+      cl.remove('indelay');
+      cl.add('notindelay');
+    } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
   };
   const timeHook: Hooks = {
     insert: vnode => update(vnode.elm as HTMLElement),
@@ -83,29 +105,43 @@ const renderByoyomiTime = (clock: ClockController, playerIndex: PlayerIndex, ber
   );
 };
 
-function formatClockTime(time: Millis, showTenths: boolean, isRunning: boolean, nvui: boolean) {
-  const date = new Date(time);
+function formatClockTime(
+  time: Millis,
+  delay: Millis,
+  showTenths: boolean,
+  isRunning: boolean,
+  showDelayTime: boolean,
+  nvui: boolean
+) {
+  const displayDate = new Date(Math.max(0, time - delay));
+  const tickDate = new Date(time);
   if (nvui)
     return (
       (time >= 3600000 ? Math.floor(time / 3600000) + 'H:' : '') +
-      date.getUTCMinutes() +
+      displayDate.getUTCMinutes() +
       'M:' +
-      date.getUTCSeconds() +
+      displayDate.getUTCSeconds() +
       'S'
     );
-  const millis = date.getUTCMilliseconds(),
-    sep = isRunning && millis < 500 ? sepLow : sepHigh,
-    baseStr = pad2(date.getUTCMinutes()) + sep + pad2(date.getUTCSeconds());
+  const displayMillis = displayDate.getUTCMilliseconds(),
+    tickMillis = tickDate.getUTCMilliseconds(),
+    sep = isRunning && tickMillis < 500 ? sepLow : sepHigh,
+    baseStr = pad2(displayDate.getUTCMinutes()) + sep + pad2(displayDate.getUTCSeconds()),
+    delayString = '<delay>' + pad2(Math.ceil(delay / 1000)) + '</delay>';
+
   if (time >= 3600000) {
     const hours = pad2(Math.floor(time / 3600000));
     return hours + sepHigh + baseStr;
   } else if (showTenths) {
-    let tenthsStr = Math.floor(millis / 100).toString();
+    let tenthsStr = Math.floor(displayMillis / 100).toString();
     if (!isRunning && time < 1000) {
-      tenthsStr += '<huns>' + (Math.floor(millis / 10) % 10) + '</huns>';
+      tenthsStr += '<huns>' + (Math.floor(displayMillis / 10) % 10) + '</huns>';
     }
-
-    return baseStr + '<tenths><sep>.</sep>' + tenthsStr + '</tenths>';
+    let delayStr = '';
+    if (showDelayTime) delayStr += delayString;
+    return baseStr + '<tenths><sep>.</sep>' + tenthsStr + '</tenths>' + delayStr;
+  } else if (showDelayTime) {
+    return baseStr + delayString;
   } else {
     return baseStr;
   }
@@ -149,7 +185,28 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
 }
 
 export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, playerIndex: PlayerIndex) {
-  if (els.time) els.time.innerHTML = formatClockTime(millis, clock.showTenths(millis), true, clock.opts.nvui);
+  const delayMillis = clock.delayMillisOf(playerIndex),
+    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[playerIndex],
+    isRunning = playerIndex === clock.times.activePlayerIndex;
+  if (els.time) {
+    els.time.innerHTML = formatClockTime(
+      millis,
+      delayMillis,
+      clock.showTenths(millis),
+      true,
+      showDelayTime,
+      clock.opts.nvui
+    );
+    const cl = els.time.classList;
+    if (clock.isInDelay(playerIndex) && isRunning) {
+      cl.remove('notindelay');
+      cl.add('indelay');
+    } else if (clock.isNotInDelay(playerIndex) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
+      clock.emergSound.lowtime();
+      cl.remove('indelay');
+      cl.add('notindelay');
+    } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
+  }
   if (els.bar) els.bar.style.transform = 'scale(' + clock.timeRatio(millis, playerIndex) + ',1)';
   if (els.clock) {
     const cl = els.clock.classList;
@@ -173,7 +230,7 @@ function goBerserk(ctrl: RoundController) {
   if (ctrl.goneBerserk[ctrl.data.player.playerIndex]) return;
   return h('button.fbt.go-berserk', {
     attrs: {
-      title: `GO BERSERK! Half the time, no increment,${isByoyomi ? 'no byoyomi,' : ''} bonus point`,
+      title: `GO BERSERK! Half the time, no increment/delay,${isByoyomi ? ' no byoyomi,' : ''} bonus point`,
       'data-icon': '`',
     },
     hook: bind('click', ctrl.goBerserk),
