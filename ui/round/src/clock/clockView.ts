@@ -131,17 +131,17 @@ function formatClockTime(
 
   if (time >= 3600000) {
     const hours = pad2(Math.floor(time / 3600000));
-    return hours + sepHigh + baseStr;
+    let delayStr = '';
+    if (showDelayTime) delayStr += delayString;
+    return hours + sepHigh + baseStr + delayStr;
+  } else if (showDelayTime) {
+    return baseStr + delayString;
   } else if (showTenths) {
     let tenthsStr = Math.floor(displayMillis / 100).toString();
     if (!isRunning && time < 1000) {
       tenthsStr += '<huns>' + (Math.floor(displayMillis / 10) % 10) + '</huns>';
     }
-    let delayStr = '';
-    if (showDelayTime) delayStr += delayString;
-    return baseStr + '<tenths><sep>.</sep>' + tenthsStr + '</tenths>' + delayStr;
-  } else if (showDelayTime) {
-    return baseStr + delayString;
+    return baseStr + '<tenths><sep>.</sep>' + tenthsStr + '</tenths>';
   } else {
     return baseStr;
   }
