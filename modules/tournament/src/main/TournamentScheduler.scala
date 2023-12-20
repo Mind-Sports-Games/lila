@@ -408,7 +408,7 @@ final private class TournamentScheduler(
         new DateTime(2024, 3, 22, 0, 0)
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Amazons), Blitz32)(
-        new DateTime(2024, 2, 29, 0, 0)
+        new DateTime(2024, 3, 29, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Horde), Blitz32)(
         new DateTime(2024, 4, 5, 0, 0)
