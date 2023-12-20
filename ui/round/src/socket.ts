@@ -95,7 +95,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     },
     clock(o) {
       if (ctrl.clock) {
-        ctrl.clock.setClock(ctrl.data, o.p1, o.p2, o.p1Periods, o.p2Periods);
+        ctrl.clock.setClock(ctrl.data, o.p1, o.p2, o.p1Pending, o.p2Pending, o.p1Periods, o.p2Periods);
         ctrl.redraw();
       }
     },

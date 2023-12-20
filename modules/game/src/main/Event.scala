@@ -591,15 +591,15 @@ object Event {
               Json.obj(
                 "p1"        -> fc.remainingTime(P1).centis,
                 "p2"        -> fc.remainingTime(P2).centis,
-                "p1Pending" -> fc.pending(P1).centis,
-                "p2Pending" -> fc.pending(P2).centis
+                "p1Pending" -> (fc.pending(P1) + fc.completedActionsOfTurnTime(P1)).centis,
+                "p2Pending" -> (fc.pending(P2) + fc.completedActionsOfTurnTime(P2)).centis
               )
             case bc: ByoyomiClock =>
               Json.obj(
                 "p1"        -> bc.remainingTime(P1).centis,
                 "p2"        -> bc.remainingTime(P2).centis,
-                "p1Pending" -> bc.pending(P1).centis,
-                "p2Pending" -> bc.pending(P2).centis,
+                "p1Pending" -> (bc.pending(P1) + bc.completedActionsOfTurnTime(P1)).centis,
+                "p2Pending" -> (bc.pending(P2) + bc.completedActionsOfTurnTime(P2)).centis,
                 "p1Periods" -> bc.players(P1).periodsLeft,
                 "p2Periods" -> bc.players(P2).periodsLeft
               )
@@ -700,8 +700,8 @@ object Event {
           Clock(
             fc.remainingTime(P1),
             fc.remainingTime(P2),
-            fc.pending(P1),
-            fc.pending(P2),
+            fc.pending(P1) + fc.completedActionsOfTurnTime(P1),
+            fc.pending(P2) + fc.completedActionsOfTurnTime(P2),
             fc.graceSeconds,
             fc.graceSeconds,
             nextLagComp = fc.lagCompEstimate(fc.player)
@@ -710,8 +710,8 @@ object Event {
           Clock(
             bc.remainingTime(P1),
             bc.remainingTime(P2),
-            bc.pending(P1),
-            bc.pending(P2),
+            bc.pending(P1) + bc.completedActionsOfTurnTime(P1),
+            bc.pending(P2) + bc.completedActionsOfTurnTime(P2),
             0,
             0,
             bc.players(P1).spentPeriods,

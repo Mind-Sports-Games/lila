@@ -358,11 +358,15 @@ export class ClockController {
     return 1000 * pendingSeconds;
   };
 
-  isInDelay = (playerIndex: PlayerIndex): boolean =>
-    !!this.delay &&
+  isInDelay = (playerIndex: PlayerIndex): boolean => {
+    console.log("delay", this.delay);
+    console.log("elasped", this.elapsed());
+    console.log("pending", this.pendingMillisOf(playerIndex));
+    return !!this.delay &&
     this.isRunning() &&
     this.elapsed() + this.pendingMillisOf(playerIndex) <= 1000 * this.delay &&
     !this.goneBerserk[playerIndex];
+  }
 
   isNotInDelay = (playerIndex: PlayerIndex): boolean =>
     !!this.delay &&
