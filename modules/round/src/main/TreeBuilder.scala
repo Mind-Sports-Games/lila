@@ -89,9 +89,9 @@ object TreeBuilder {
             ply = g.plies,
             move = m,
             fen = fen,
-            captureLength = (g.situation, m.uci.origDest._2) match {
-              case (Situation.Draughts(situation), Pos.Draughts(pos)) =>
-                if (situation.ghosts > 0) situation.captureLengthFrom(pos)
+            captureLength = (g.situation, m) match {
+              case (Situation.Draughts(situation), Uci.DraughtsWithSan(uciMove)) =>
+                if (situation.ghosts > 0) situation.captureLengthFrom(uciMove.uci.dest)
                 else situation.allMovesCaptureLength.some
               case _ => None
             },

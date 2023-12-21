@@ -354,7 +354,7 @@ object BinaryFormat {
       }
 
       def posInt(pos: Pos): Int = pos.toInt
-      val lastMoveInt = clmt.lastMove.map(_.origDest).fold(0) { case (o, d) =>
+      val lastMoveInt = clmt.lastMove.flatMap(_.origDest).fold(0) { case (o, d) =>
         (posInt(Pos.Chess(o)) << 6) + posInt(Pos.Chess(d))
       }
       Array((castleInt << 4) + (lastMoveInt >> 8) toByte, lastMoveInt.toByte)

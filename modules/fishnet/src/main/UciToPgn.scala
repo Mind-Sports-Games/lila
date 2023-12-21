@@ -5,7 +5,18 @@ import cats.data.Validated.valid
 import cats.implicits._
 import strategygames.format.pgn.Dumper
 import strategygames.format.Uci
-import strategygames.{ Action, Drop, GameFamily, GameLogic, Move, Pass, Replay, SelectSquares, Situation }
+import strategygames.{
+  Action,
+  DiceRoll,
+  Drop,
+  GameFamily,
+  GameLogic,
+  Move,
+  Pass,
+  Replay,
+  SelectSquares,
+  Situation
+}
 import strategygames.variant.Variant
 
 import lila.analyse.{ Analysis, Info, PgnMove }
@@ -44,6 +55,7 @@ private object UciToPgn {
                   case d: Drop           => d.situationBefore
                   case p: Pass           => p.situationBefore
                   case ss: SelectSquares => ss.situationBefore
+                  case dr: DiceRoll      => dr.situationBefore
                 }
               }) toValid "No move found"
         ucis <- variation.map(v => Uci(logic, family, v)).sequence toValid "Invalid UCI moves " + variation
@@ -64,6 +76,10 @@ private object UciToPgn {
             case (Validated.Valid((sit, moves)), uci: Uci.SelectSquares) =>
               sit.selectSquares(uci.squares).leftMap(e => s"ply $ply $e") map { ss =>
                 ss.situationAfter -> (ss :: moves)
+              }
+            case (Validated.Valid((sit, moves)), uci: Uci.DiceRoll) =>
+              sit.diceRoll(uci.dice).leftMap(e => s"ply $ply $e") map { dr =>
+                dr.situationAfter -> (dr :: moves)
               }
             case (failure, _) => failure
           }

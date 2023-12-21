@@ -101,18 +101,22 @@ object EvalCacheEntry {
 
     def truncate = copy(value = NonEmptyList(value.head, value.tail.take(MAX_PV_SIZE - 1)))
 
+    //TODO move this into strategygames
     def gameLogic: GameLogic = value.head match {
-      case Uci.ChessMove(_)        => GameLogic.Chess()
-      case Uci.ChessDrop(_)        => GameLogic.Chess()
-      case Uci.DraughtsMove(_)     => GameLogic.Draughts()
-      case Uci.FairySFMove(_)      => GameLogic.FairySF()
-      case Uci.FairySFDrop(_)      => GameLogic.FairySF()
-      case Uci.SamuraiMove(_)      => GameLogic.Samurai()
-      case Uci.TogyzkumalakMove(_) => GameLogic.Togyzkumalak()
-      case Uci.GoDrop(_)           => GameLogic.Go()
-      case Uci.GoPass(_)           => GameLogic.Go()
-      case Uci.GoSelectSquares(_)  => GameLogic.Go()
-      case Uci.BackgammonMove(_)   => GameLogic.Backgammon()
+      case Uci.ChessMove(_)          => GameLogic.Chess()
+      case Uci.ChessDrop(_)          => GameLogic.Chess()
+      case Uci.ChessDiceRoll(_)      => GameLogic.Chess()
+      case Uci.DraughtsMove(_)       => GameLogic.Draughts()
+      case Uci.FairySFMove(_)        => GameLogic.FairySF()
+      case Uci.FairySFDrop(_)        => GameLogic.FairySF()
+      case Uci.SamuraiMove(_)        => GameLogic.Samurai()
+      case Uci.TogyzkumalakMove(_)   => GameLogic.Togyzkumalak()
+      case Uci.GoDrop(_)             => GameLogic.Go()
+      case Uci.GoPass(_)             => GameLogic.Go()
+      case Uci.GoSelectSquares(_)    => GameLogic.Go()
+      case Uci.BackgammonMove(_)     => GameLogic.Backgammon()
+      case Uci.BackgammonDrop(_)     => GameLogic.Backgammon()
+      case Uci.BackgammonDiceRoll(_) => GameLogic.Backgammon()
     }
   }
 
