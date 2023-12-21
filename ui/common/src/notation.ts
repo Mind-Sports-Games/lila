@@ -448,10 +448,28 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
 }
 
-function backgammonNotation(move: ExtendedMoveInfo, _: Variant): string {
-  //TODO complete backgammon notation (will need full list of actions for turn)
+function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  //TODO complete backgammon notation (will need full list of actions for turn) and add dice rolls
   const reg = move.uci.match(/[a-lsA-LS][1-2@]/g) as string[];
   const orig = reg[0];
   const dest = reg[1];
-  return `${orig}${dest}`;
+
+  //use previous fen to calculate a capture
+
+  //TODO handle drops
+  const origFile = 1 + Math.abs(orig.charCodeAt(0) - 'a'.charCodeAt(0));
+  const origRank = parseInt(orig.slice(1), 10);
+  const destFile = 1 + Math.abs(dest.charCodeAt(0) - 'a'.charCodeAt(0));
+  const destRank = parseInt(dest.slice(1), 10);
+
+  const origBoardPosNumber =
+    origRank === 1 ? variant.boardSize.width + origFile : variant.boardSize.width + 1 - origFile;
+  const destBoardPosNumber =
+    destRank === 1 ? variant.boardSize.width + destFile : variant.boardSize.width + 1 - destFile;
+
+  // examples:
+  // 43: 8/4 8/5
+  // 55: 16/21(3) bar/5
+  // 21: 8/7* 13/11
+  return `${origBoardPosNumber}/${destBoardPosNumber}`;
 }

@@ -80,6 +80,11 @@ function renderPlayerScore(
       },
       children
     );
+  } else if (variantKey === 'backgammon') {
+    for (let i = 0; i < score; i++) {
+      children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
+    }
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else {
     const pieceClass =
       variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
@@ -168,16 +173,16 @@ export function main(ctrl: RoundController): VNode {
         }
         break;
       }
-      // case 'togyzkumalak': {
-      // //togy uses game history to store the score while playing (its also in the full fen)
-      // const playerScore = d.player.score ? d.player.score : 0;
-      // const opponentScore = d.opponent.score ? d.opponent.score : 0;
-      // const p1Score = d.player.playerIndex === 'p1' ? playerScore : opponentScore;
-      // const p2Score = d.player.playerIndex === 'p2' ? playerScore : opponentScore;
-      // topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-      // bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
-      // break;
-      // }
+      case 'backgammon': {
+        //TODO calculate pieces off board from fen
+        const p1PiecesOffBoard = 2;
+        const p2PiecesOffBoard = 1;
+        const p1Score = p1PiecesOffBoard;
+        const p2Score = p2PiecesOffBoard;
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        break;
+      }
       default: {
         break;
       }

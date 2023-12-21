@@ -153,7 +153,7 @@ final class JsonView(
                   case (CORRESPONDENCE_ONLY, _) if pov.game.hasCorrespondenceClock => true
                   case (_, _)                                                      => false
                 }
-              }) //todo add pref for backgammon move confirm?
+              }) //todo add pref for backgammon move confirm and only require at end of actions?
           )
           .add("clock" -> pov.game.clock.map(clockJson))
           .add("correspondence" -> pov.game.correspondenceClock)

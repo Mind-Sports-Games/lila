@@ -27,8 +27,8 @@ export function makeConfig(ctrl: RoundController): Config {
     lastMove: util.lastMove(data.onlyDropsVariant, step.uci),
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
-    boardScores: data.game.variant.key == 'togyzkumalak',
-    dice: data.game.variant.key == 'backgammon' ? [6, 3] : [], //todo get from data when available
+    boardScores: ['togyzkumalak', 'backgammon'].includes(data.game.variant.key),
+    dice: data.game.variant.key == 'backgammon' ? util.getBackgammonDice(step.fen) : [],
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {

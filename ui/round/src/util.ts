@@ -154,6 +154,15 @@ export function getGoKomi(fen: string): number {
   return +fen.split(' ')[7] / 10.0;
 }
 
+export function getBackgammonDice(fen: string): cg.Dice[] {
+  //TODO backgammon get dice values from fen
+  console.log(fen);
+  return [
+    { value: 6, isAvailable: true },
+    { value: 3, isAvailable: false },
+  ];
+}
+
 export function goStonesToSelect(deadstones: cg.Key[], pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
   const stonesToSelect: cg.Key[] = [];
   if (deadstones.length > 0) {
