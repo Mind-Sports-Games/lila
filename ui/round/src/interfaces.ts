@@ -62,6 +62,7 @@ export interface RoundData extends GameData {
   currentSelectedSquares?: cg.Key[];
   calculatedCGGoScores?: cg.SimpleGoScores;
   deadStoneOfferState?: string;
+  dice?: cg.Dice[];
   pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;

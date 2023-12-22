@@ -25,6 +25,7 @@ import * as atomic from './atomic';
 import * as flipello from './flipello';
 import * as mancala from './mancala';
 import * as go from './go';
+import * as backgammon from './backgammon';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -256,6 +257,11 @@ export default class RoundController {
     this.redraw();
   };
 
+  private onSelectDice = (dice: cg.Dice[]) => {
+    this.data.dice = dice;
+    this.chessground.redrawAll(); //redraw dice
+  };
+
   private isSimulHost = () => {
     return this.data.simul && this.data.simul.hostId === this.opts.userId;
   };
@@ -310,6 +316,7 @@ export default class RoundController {
     onPredrop: this.onPredrop,
     onCancelDropMode: this.onCancelDropMode,
     onSelect: this.onSelect,
+    onSelectDice: this.onSelectDice,
   });
 
   replaying = (): boolean => this.ply !== this.lastPly();
@@ -576,6 +583,7 @@ export default class RoundController {
         // a lot of pieces can change from 1 move so update them all
         mancala.updateBoardFromFen(this, o.fen);
       }
+      if (['backgammon'].includes(d.game.variant.key)) backgammon.updateBoardFromFen(this, o.fen);
       if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) go.updateBoardFromFen(this, o.fen);
       if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);

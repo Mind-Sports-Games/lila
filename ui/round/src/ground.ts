@@ -28,12 +28,12 @@ export function makeConfig(ctrl: RoundController): Config {
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: ['togyzkumalak', 'backgammon'].includes(data.game.variant.key),
-    dice: data.game.variant.key == 'backgammon' ? util.getBackgammonDice(step.fen) : [],
+    dice: data.game.variant.key == 'backgammon' ? (data.dice ? data.dice : util.getBackgammonDice(step.fen)) : [],
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {
-      lastMove: data.pref.highlight && !data.selectMode,
-      check: data.pref.highlight,
+      lastMove: data.pref.highlight && !data.selectMode && !['backgammon'].includes(data.game.variant.key),
+      check: data.pref.highlight && !['backgammon'].includes(data.game.variant.key),
     },
     events: {
       move: hooks.onMove,
@@ -43,6 +43,7 @@ export function makeConfig(ctrl: RoundController): Config {
         if (data.pref.coords === Prefs.Coords.Inside) changeColorHandle();
       },
       select: hooks.onSelect,
+      selectDice: hooks.onSelectDice,
     },
     movable: {
       free: false,
@@ -63,8 +64,7 @@ export function makeConfig(ctrl: RoundController): Config {
       enabled:
         data.pref.enablePremove &&
         !data.onlyDropsVariant &&
-        data.game.variant.key !== 'oware' &&
-        data.game.variant.key !== 'togyzkumalak',
+        !['oware', 'togyzkumalak', 'backgammon'].includes(data.game.variant.key),
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {
@@ -149,7 +149,8 @@ export function makeConfig(ctrl: RoundController): Config {
     chess960: data.game.variant.key === 'chess960',
     onlyDropsVariant: data.onlyDropsVariant,
     singleClickMoveVariant:
-      data.game.variant.key === 'togyzkumalak' || (data.game.variant.key === 'oware' && data.pref.mancalaMove),
+      ['togyzkumalak', 'backgammon'].includes(data.game.variant.key) ||
+      (data.game.variant.key === 'oware' && data.pref.mancalaMove),
   };
 }
 

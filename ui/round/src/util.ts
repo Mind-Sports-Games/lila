@@ -159,7 +159,7 @@ export function getBackgammonDice(fen: string): cg.Dice[] {
   console.log(fen);
   return [
     { value: 6, isAvailable: true },
-    { value: 3, isAvailable: false },
+    { value: 3, isAvailable: true },
   ];
 }
 

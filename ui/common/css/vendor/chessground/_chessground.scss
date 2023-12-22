@@ -1176,6 +1176,7 @@ cg-container .cg-custom-svgs svg {
     flex-flow: row;
     justify-content: space-evenly;
     position: absolute;
+    pointer-events: none;
     dice {
       width: calc(100% * 15 * 9 / 600);
       &.unavailable {
