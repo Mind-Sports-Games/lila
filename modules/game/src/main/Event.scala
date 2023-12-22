@@ -14,6 +14,7 @@ import strategygames.{
   Drop => StratDrop,
   Pass => StratPass,
   SelectSquares => StratSelectSquares,
+  DiceRoll => StratDiceRoll,
   PromotableRole,
   PocketData,
   Pos,
@@ -209,6 +210,10 @@ object Event {
         possibleDropsByRole = situation match {
           case (Situation.FairySF(_)) =>
             situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
           case _ => None
         },
         pocketData = pocketData,
@@ -277,9 +282,10 @@ object Event {
         role = drop.piece.role,
         pos = drop.pos,
         san = drop match {
-          case StratDrop.Chess(drop)   => strategygames.chess.format.pgn.Dumper(drop)
-          case StratDrop.FairySF(drop) => strategygames.fairysf.format.pgn.Dumper(drop)
-          case StratDrop.Go(drop)      => strategygames.go.format.pgn.Dumper(drop)
+          case StratDrop.Chess(drop)      => strategygames.chess.format.pgn.Dumper(drop)
+          case StratDrop.FairySF(drop)    => strategygames.fairysf.format.pgn.Dumper(drop)
+          case StratDrop.Go(drop)         => strategygames.go.format.pgn.Dumper(drop)
+          case StratDrop.Backgammon(drop) => strategygames.backgammon.format.pgn.Dumper(drop)
         },
         fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
@@ -294,6 +300,8 @@ object Event {
           case (Situation.FairySF(_)) =>
             situation.dropsByRole
           case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
             situation.dropsByRole
           case _ => None
         },
@@ -377,6 +385,8 @@ object Event {
             situation.dropsByRole
           case (Situation.Go(_)) =>
             situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
           case _ => None
         },
         pocketData = pocketData
@@ -449,6 +459,82 @@ object Event {
           case (Situation.FairySF(_)) =>
             situation.dropsByRole
           case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        pocketData = pocketData
+      )
+  }
+
+  case class DiceRoll(
+      gf: GameFamily,
+      dice: List[Int],
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      takebackable: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+  ) extends Event {
+    def typ = "diceroll"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        takebackable,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        pocketData
+      ) {
+        Json.obj(
+          "dice" -> dice.mkString("|"),
+          "uci"  -> dice.mkString("|"),
+          "san"  -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+  object DiceRoll {
+    def apply(
+        dr: StratDiceRoll,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): DiceRoll =
+      DiceRoll(
+        gf = situation.board.variant.gameFamily,
+        dice = dr.dice,
+        san = dr.dice.mkString("|"),
+        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
             situation.dropsByRole
           case _ => None
         },
