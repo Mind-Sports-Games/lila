@@ -152,7 +152,7 @@ case class Game(
   def plyTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
       clk <- clock
-      grace = Centis(clk.graceOf(playerIndex))
+      grace = Centis(clk.graceOf(playerIndex) * 100)
       byo = clk match {
         case bc: ByoyomiClock => bc.byoyomiOf(playerIndex)
         case _                => Centis(0)
