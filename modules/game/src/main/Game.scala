@@ -1,5 +1,7 @@
 package lila.game
 
+import scala.annotation.nowarn
+
 import strategygames.format.{ FEN, Uci }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.{ Castles, CheckCount }
@@ -158,55 +160,18 @@ case class Game(
         case _                => Centis(0)
       }
       history <- clockHistory
-      clocks = history(playerIndex)
-    } yield Centis(0) :: {
-      val pairs = clocks.iterator zip clocks.iterator.drop(1)
-
-      // We need to determine if this playerIndex's last clock had grace applied.
-      // if finished and history.size == playedPlies then game was ended
-      // by a players ply, such as with mate or autodraw. In this case,
-      // the last ply of the game, and the only one without grace, is the
-      // last entry of the clock history for !turnPlayerIndex.
-      //
-      // On the other hand, if history.size is more than playedPlies,
-      // then the game ended during a players turn by async event, and
-      // the last recorded time is in the history for turnPlayerIndex.
-      val noLastInc = finished && (history.size <= playedPlies) == (playerIndex != turnPlayerIndex)
-
-      // Also if we timed out over a period or periods, we need to
-      // multiply byoyomi by number of periods entered that turn and add
-      // previous remaining time, which could either be byoyomi or
-      // remaining time
-      val byoyomiStart = history match {
-        case bch: ByoyomiClockHistory => bch.firstEnteredPeriod(playerIndex)
-        case _                        => None
-      }
-      val byoyomiTimeout =
-        byoyomiStart.isDefined && (status == Status.Outoftime) && (playerIndex == turnPlayerIndex)
-
-      val byoyomiHistory: Option[ByoyomiClockHistory] = history match {
-        case bch: ByoyomiClockHistory => Some(bch)
-        case _                        => None
-      }
-
-      pairs.zipWithIndex.map { case ((first, second), index) =>
-        {
-          //TODO multiaction need to calculcate fullTurncount (expand on pairs to get an actual full turn of times)
-          val fullTurnCount = index + 2 + stratGame.startedAtTurn / 2
-          val afterByoyomi  = byoyomiStart ?? (_ <= fullTurnCount)
-          // after byoyomi we store movetimes directly, not remaining time
-          val mt     = if (afterByoyomi) second else first - second
-          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc)) ?? grace
-
-          if (!pairs.hasNext && byoyomiTimeout) {
-            val prevTurnByoyomi = byoyomiStart ?? (_ < fullTurnCount)
-            (if (prevTurnByoyomi) byo else first) + byo * byoyomiHistory.fold(0)(
-              _.countSpentPeriods(playerIndex, fullTurnCount)
-            )
-          } else mt + cGrace
-        } nonNeg
-      } toList
-    }
+      plyTimes = history
+        .plyTimes(
+          playerIndex,
+          turnPlayerIndex,
+          playedPlies,
+          stratGame.startedAtTurn,
+          finished,
+          status,
+          grace,
+          byo
+        )
+    } yield plyTimes
   } orElse binaryPlyTimes.map { binary =>
     // Thibault TODO: make plyTime.read return List after writes are disabled.
     val base = BinaryFormat.plyTime.read(binary, playedPlies)
@@ -1063,58 +1028,58 @@ object Game {
 
   object BSONFields {
 
-    val id                = "_id"
-    val p1Player          = "p0"
-    val p2Player          = "p1"
-    val playerIds         = "is"
-    val playerUids        = "us"
-    val playingUids       = "pl"
-    val binaryPieces      = "ps"
-    val oldPgn            = "pg"
-    val huffmanPgn        = "hp"
-    val status            = "s"
-    val turns             = "t"
-    val plies             = "p"
-    val activePlayer      = "ap"
-    val startedAtPly      = "sp"
-    val startedAtTurn     = "st"
-    val clock             = "c"
-    val clockType         = "ct"
-    val positionHashes    = "ph"
-    val checkCount        = "cc"
-    val score             = "sc"
-    val captures          = "cp"
-    val castleLastMove    = "cl"
-    val kingMoves         = "km"
-    val historyLastTurn   = "hlm" // was called historyLastMove hence hlm
-    val historyCurrentTurn= "hct"
-    val unmovedRooks      = "ur"
-    val daysPerTurn       = "cd"
-    val plyTimes          = "mt" // was called moveTimes hence mt
-    val p1ClockHistory    = "cw"
-    val p2ClockHistory    = "cb"
-    val periodsP1         = "pp0"
-    val periodsP2         = "pp1"
-    val rated             = "ra"
-    val analysed          = "an"
-    val lib               = "l"
-    val variant           = "v"
-    val pocketData        = "chd"
-    val bookmarks         = "bm"
-    val createdAt         = "ca"
-    val updatedAt         = "ua"
-    val source            = "so"
-    val pgnImport         = "pgni"
-    val tournamentId      = "tid"
-    val swissId           = "iid"
-    val simulId           = "sid"
-    val tvAt              = "tv"
-    val winnerPlayerIndex = "w"
-    val winnerId          = "wid"
-    val initialFen        = "if"
-    val checkAt           = "ck"
-    val perfType          = "pt" // only set on student games for aggregation
-    val drawOffers        = "do"
+    val id                 = "_id"
+    val p1Player           = "p0"
+    val p2Player           = "p1"
+    val playerIds          = "is"
+    val playerUids         = "us"
+    val playingUids        = "pl"
+    val binaryPieces       = "ps"
+    val oldPgn             = "pg"
+    val huffmanPgn         = "hp"
+    val status             = "s"
+    val turns              = "t"
+    val plies              = "p"
+    val activePlayer       = "ap"
+    val startedAtPly       = "sp"
+    val startedAtTurn      = "st"
+    val clock              = "c"
+    val clockType          = "ct"
+    val positionHashes     = "ph"
+    val checkCount         = "cc"
+    val score              = "sc"
+    val captures           = "cp"
+    val castleLastMove     = "cl"
+    val kingMoves          = "km"
+    val historyLastTurn    = "hlm" // was called historyLastMove hence hlm
+    val historyCurrentTurn = "hct"
+    val unmovedRooks       = "ur"
+    val daysPerTurn        = "cd"
+    val plyTimes           = "mt"  // was called moveTimes hence mt
+    val p1ClockHistory     = "cw"
+    val p2ClockHistory     = "cb"
+    val periodsP1          = "pp0"
+    val periodsP2          = "pp1"
+    val rated              = "ra"
+    val analysed           = "an"
+    val lib                = "l"
+    val variant            = "v"
+    val pocketData         = "chd"
+    val bookmarks          = "bm"
+    val createdAt          = "ca"
+    val updatedAt          = "ua"
+    val source             = "so"
+    val pgnImport          = "pgni"
+    val tournamentId       = "tid"
+    val swissId            = "iid"
+    val simulId            = "sid"
+    val tvAt               = "tv"
+    val winnerPlayerIndex  = "w"
+    val winnerId           = "wid"
+    val initialFen         = "if"
+    val checkAt            = "ck"
+    val perfType           = "pt"  // only set on student games for aggregation
+    val drawOffers         = "do"
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" //state of the dead stone offer
@@ -1195,6 +1160,16 @@ sealed trait ClockHistory {
   def reset(playerIndex: PlayerIndex): ClockHistory
   def apply(playerIndex: PlayerIndex): Vector[Centis]
   def dbTimes(playerIndex: PlayerIndex): Vector[Centis]
+  def plyTimes(
+      playerIndex: PlayerIndex,
+      turnPlayerIndex: PlayerIndex,
+      playedPlies: Int,
+      startedAtTurn: Int,
+      finished: Boolean,
+      status: Status,
+      grace: Centis = Centis(0),
+      byo: Centis = Centis(0)
+  ): List[Centis]
   def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis]
   def size: Int
   def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis]
@@ -1217,6 +1192,44 @@ case class FischerClockHistory(
     if (apply(playerIndex).size < plies) None
     else apply(playerIndex).takeRight(plies).headOption
   def size = p1.size + p2.size
+
+  // TODO: the parameters of this function may need a rethinking later on
+  override def plyTimes(
+      playerIndex: PlayerIndex,
+      turnPlayerIndex: PlayerIndex,
+      playedPlies: Int,
+      startedAtTurn: Int,
+      finished: Boolean,
+      status: Status,
+      grace: Centis = Centis(0),
+      byo: Centis = Centis(0)
+  ): List[Centis] = {
+    val clocks = dbTimes(playerIndex)
+    Centis(0) :: {
+      val pairs = clocks.iterator zip clocks.iterator.drop(1)
+
+      // We need to determine if this playerIndex's last clock had grace applied.
+      // if finished and history.size == playedPlies then game was ended
+      // by a players ply, such as with mate or autodraw. In this case,
+      // the last ply of the game, and the only one without grace, is the
+      // last entry of the clock history for !turnPlayerIndex.
+      //
+      // On the other hand, if history.size is more than playedPlies,
+      // then the game ended during a players turn by async event, and
+      // the last recorded time is in the history for turnPlayerIndex.
+      val noLastInc =
+        finished && (size <= playedPlies) == (playerIndex != turnPlayerIndex)
+
+      (pairs.map { case (first, second) =>
+        ({
+          val mt     = first - second
+          val cGrace = (pairs.hasNext || !noLastInc) ?? grace
+
+          (mt + cGrace)
+        } nonNeg)
+      } toList)
+    }
+  }
 
   // first state is of the playerIndex that moved first.
   override def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
@@ -1258,6 +1271,21 @@ case class DelayClockHistory(
   def apply(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
   def dbTimes(playerIndex: PlayerIndex): Vector[Centis] =
     playerIndex.fold(p1ActionTimes, p2ActionTimes)
+
+  // TODO: the parameters of this function may need a rethinking later on
+  // NOTE: This implementation doesn't need any of the extra params, illustrating the benefit
+  //       of storing the ply times directly. :heart:
+  override def plyTimes(
+      playerIndex: PlayerIndex,
+      @nowarn turnPlayerIndex: PlayerIndex,
+      @nowarn playedPlies: Int,
+      @nowarn startedAtTurn: Int,
+      @nowarn finished: Boolean,
+      @nowarn status: Status,
+      @nowarn grace: Centis = Centis(0),
+      @nowarn byo: Centis = Centis(0)
+  ): List[Centis] = dbTimes(playerIndex).toList
+
   override def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
     if (apply(playerIndex).size < plies) None
     else apply(playerIndex).takeRight(plies).headOption
@@ -1280,6 +1308,59 @@ case class ByoyomiClockHistory(
 
   def apply(playerIndex: PlayerIndex): Vector[Centis]   = playerIndex.fold(p1, p2)
   def dbTimes(playerIndex: PlayerIndex): Vector[Centis] = playerIndex.fold(p1, p2)
+
+  // TODO: the parameters of this function may need a rethinking later on
+  override def plyTimes(
+      playerIndex: PlayerIndex,
+      turnPlayerIndex: PlayerIndex,
+      playedPlies: Int,
+      startedAtTurn: Int,
+      finished: Boolean,
+      status: Status,
+      grace: Centis = Centis(0),
+      byo: Centis = Centis(0)
+  ): List[Centis] = {
+    val clocks = dbTimes(playerIndex)
+    Centis(0) :: {
+      val pairs = clocks.iterator zip clocks.iterator.drop(1)
+
+      // We need to determine if this playerIndex's last clock had grace applied.
+      // if finished and history.size == playedPlies then game was ended
+      // by a players ply, such as with mate or autodraw. In this case,
+      // the last ply of the game, and the only one without grace, is the
+      // last entry of the clock history for !turnPlayerIndex.
+      //
+      // On the other hand, if history.size is more than playedPlies,
+      // then the game ended during a players turn by async event, and
+      // the last recorded time is in the history for turnPlayerIndex.
+      val noLastInc =
+        finished && (size <= playedPlies) == (playerIndex != turnPlayerIndex)
+
+      // Also if we timed out over a period or periods, we need to
+      // multiply byoyomi by number of periods entered that turn and add
+      // previous remaining time, which could either be byoyomi or
+      // remaining time
+      val byoyomiStart = firstEnteredPeriod(playerIndex)
+      val byoyomiTimeout =
+        byoyomiStart.isDefined && (status == Status.Outoftime) && (playerIndex == turnPlayerIndex)
+
+      (pairs.zipWithIndex.map { case ((first, second), index) =>
+        ({
+          //TODO multiaction need to calculate fullTurncount (expand on pairs to get an actual full turn of times)
+          val fullTurnCount = index + 2 + startedAtTurn / 2
+          val afterByoyomi  = byoyomiStart ?? (_ <= fullTurnCount)
+          // after byoyomi we store movetimes directly, not remaining time
+          val mt     = if (afterByoyomi) second else first - second
+          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc)) ?? grace
+
+          (if (!pairs.hasNext && byoyomiTimeout) {
+             val prevTurnByoyomi = byoyomiStart ?? (_ < fullTurnCount)
+             (if (prevTurnByoyomi) byo else first) + byo * countSpentPeriods(playerIndex, fullTurnCount)
+           } else mt + cGrace)
+        } nonNeg)
+      } toList)
+    }
+  }
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     updateInternal(playerIndex, f)
