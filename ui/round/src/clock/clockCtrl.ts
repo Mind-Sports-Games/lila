@@ -348,7 +348,7 @@ export class ClockController {
     const isBerserk = this.goneBerserk[playerIndex];
     const countDown = isBerserk ? 0 : this.countdownDelay ?? 0;
     const delayMillis = 1000 * countDown;
-    return this.times.activePlayerIndex === playerIndex
+    return this.isNotOpponentsTurn(playerIndex)
       ? Math.max(0, delayMillis - (this.elapsed() + this.pendingMillisOf(playerIndex)))
       : delayMillis;
   };
@@ -374,4 +374,6 @@ export class ClockController {
     !this.goneBerserk[playerIndex];
 
   isRunning = () => this.times.activePlayerIndex !== undefined;
+  isNotOpponentsTurn = (playerIndex: PlayerIndex) =>
+    this.times.activePlayerIndex === undefined || this.times.activePlayerIndex === playerIndex;
 }
