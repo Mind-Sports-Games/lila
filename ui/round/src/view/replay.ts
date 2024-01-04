@@ -10,7 +10,7 @@ import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes, RoundData } from '../interfaces';
 import { NotationStyle, notationStyle } from 'stratutils';
-import { moveFromNotationStyle } from 'common/notation';
+import { moveFromNotationStyle, combinedNotationForBackgammonActions } from 'common/notation';
 
 const scrollMax = 99999,
   moveTag = 'u8t',
@@ -69,19 +69,24 @@ function renderMultiActionMove(
           },
         },
         [
-          step
-            .map(s =>
+          combinedNotationOfTurn(
+            step.map(s =>
               s
                 ? moveFromNotationStyle(notation)({ san: s.san, uci: s.uci, fen: s.fen, prevFen: prevFen }, variant)
                 : ''
-            )
-            .join(' '),
+            ),
+            notation
+          ),
           step.map(s => drawOffers.has(s ? s.turnCount : -1)).includes(true) ? renderDrawOffer() : undefined,
         ]
       )
     : orEmpty
     ? h(moveTag, '…')
     : undefined;
+}
+
+function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
+  return notation === 'bkg' ? combinedNotationForBackgammonActions(actionNotations) : actionNotations.join(' ');
 }
 
 export function renderResult(ctrl: RoundController): VNode | undefined {

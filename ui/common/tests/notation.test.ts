@@ -1,4 +1,9 @@
-import { parseUCISquareToUSI, readFen, moveFromNotationStyle } from '../src/notation';
+import {
+  parseUCISquareToUSI,
+  readFen,
+  moveFromNotationStyle,
+  combinedNotationForBackgammonActions,
+} from '../src/notation';
 
 const shogiVariant = {
   key: 'shogi' as VariantKey,
@@ -22,6 +27,14 @@ const owareVariant = {
   short: 'oware',
   lib: 1,
   boardSize: { height: 2, width: 6 },
+};
+
+const backgammonVariant = {
+  key: 'backgammon' as VariantKey,
+  name: 'backgammon',
+  short: 'backgammon',
+  lib: 6,
+  boardSize: { height: 2, width: 12 },
 };
 
 test('testing e4 maps to 56', () => {
@@ -397,15 +410,78 @@ test('moveFromNotationStyle xiangqi 4 pawns in column p2 sideways move', () => {
 
 //Oware
 test('moveFromNotationStyle oware c1 pos stone from starting', () => {
-  const move = { san: '', uci: 'c1f2', fen: 'DDDDDD/DDDDDD 0 0 S' };
+  const move = { san: '', uci: 'c1f2', fen: 'DDDDDD/DDDDDD 0 0 S', prevFen: 'DDDDDD/DDDDDD 0 0 S' };
 
   const notation = moveFromNotationStyle('man')(move, owareVariant);
   expect(notation).toBe('C');
 });
 
 test('moveFromNotationStyle oware b2 pos stone', () => {
-  const move = { san: '', uci: 'b2c1', fen: 'DDDCDD/DDEDDD 0 0 N' };
+  const move = { san: '', uci: 'b2c1', fen: 'DDDCDD/DDEDDD 0 0 N', prevFen: 'DDDDDD/DDDDDD 0 0 S' };
 
   const notation = moveFromNotationStyle('man')(move, owareVariant);
   expect(notation).toBe('e');
+});
+
+//Backgammon
+test('moveFromNotationStyle backgammon a2c1 from starting', () => {
+  const move = {
+    san: '',
+    uci: 'a2c1',
+    fen: '4S,3,3s,1,5s,4,2S/5s,1,S,1,3S,1,5S,4,2s[] w - - 1',
+    prevFen: '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] w - - 1',
+  };
+
+  const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
+  expect(notation).toBe('43: 13/10');
+});
+
+test('moveFromNotationStyle backgammon a1f2 p2 from starting', () => {
+  const move = {
+    san: '',
+    uci: 'a1f2',
+    fen: '5S,3,3s,s,5s,4,2S/4s,3,3S,1,5S,4,2s[] b - - 1',
+    prevFen: '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] b - - 1',
+  };
+
+  const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
+  expect(notation).toBe('43: 13/7');
+});
+
+test('moveFromNotationStyle backgammon testing drop S@i2', () => {
+  const move = {
+    san: '',
+    uci: 'S@i2',
+    fen: '4S,3,3s,1,5s,1,S,2,2S/5s,3,3S,1,5S,4,2s[] w - - 1',
+    prevFen: '4S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[1S] w - - 1',
+  };
+
+  const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
+  expect(notation).toBe('43: bar/21');
+});
+
+test('moveFromNotationStyle backgammon testing captures', () => {
+  const move = {
+    san: '',
+    uci: 'a2c1',
+    fen: '4S,3,3s,1,5s,4,2S/5s,1,S,1,3S,1,5S,4,2s[1s] w - - 1',
+    prevFen: '5S,3,3s,1,5s,4,2S/4s,1,s,1,3S,1,5S,4,2s[] w - - 1',
+  };
+
+  const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
+  expect(notation).toBe('43: 13/10*');
+});
+
+test('combinedNotationForBackgammonActions with 2 same actions', () => {
+  const actions = ['43: 8/4', '43: 8/4'];
+
+  const notation = combinedNotationForBackgammonActions(actions);
+  expect(notation).toBe('43: 8/4(2)');
+});
+
+test('combinedNotationForBackgammonActions with 4 actions and captures', () => {
+  const actions = ['43: 8/4*', '43: bar/20*', '43: 8/4', '43: 8/7'];
+
+  const notation = combinedNotationForBackgammonActions(actions);
+  expect(notation).toBe('43: 8/4(2)* bar/20* 8/7');
 });
