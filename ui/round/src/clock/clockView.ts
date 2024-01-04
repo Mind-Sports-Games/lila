@@ -19,11 +19,33 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
     millis = clock.millisOf(player.playerIndex),
     isPlayer = ctrl.data.player.playerIndex === player.playerIndex,
     isRunning = player.playerIndex === clock.times.activePlayerIndex,
-    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[player.playerIndex];
+    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[player.playerIndex],
+    paused =
+      !!ctrl.data.opponent.offeringSelectSquares ||
+      !!ctrl.data.player.offeringSelectSquares ||
+      !(!ctrl.data.deadStoneOfferState || ctrl.data.deadStoneOfferState === 'RejectedOffer'),
+    isClockRunning =
+      game.playable(ctrl.data) && !paused && (game.bothPlayersHavePlayed(ctrl.data) || ctrl.data.clock!.running),
+    playerTurnDuringMultiActions =
+      ctrl.data.game.player === player.playerIndex &&
+      ['monster', 'amazons'].includes(ctrl.data.game.variant.key) &&
+      isClockRunning;
+
+  //TODO in multication render clock gets called as the move is played while it's sent, and then during apimove update, the
+  // state of ctrl.data is different here and therefore hard to obtain the correct class in all states.
+  // This causes the green/orange flicker on the clock. The delayClass is an attempt to fix this which is only paritally working.
+  const delayClass =
+    clock.isInDelay(player.playerIndex, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
+    ctrl.data.game.player === player.playerIndex
+      ? '.indelay'
+      : clock.isNotInDelay(player.playerIndex, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
+        ctrl.data.game.player === player.playerIndex
+      ? '.notindelay'
+      : '';
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
       millis = clock.millisOf(player.playerIndex),
-      delayMillis = clock.delayMillisOf(player.playerIndex),
+      delayMillis = clock.delayMillisOf(player.playerIndex, ctrl.data.game.player),
       isRunning = player.playerIndex === clock.times.activePlayerIndex;
     els.time = el;
     els.clock = el.parentElement!;
@@ -51,21 +73,23 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   };
   const timeHook: Hooks = {
     insert: vnode => update(vnode.elm as HTMLElement),
-    postpatch: (_, vnode) => update(vnode.elm as HTMLElement),
+    postpatch: (_, vnode) => {
+      if (isClockRunning) update(vnode.elm as HTMLElement);
+    },
   };
   return h(
     'div.rclock.rclock-' + position,
     {
       class: {
         outoftime: millis <= 0,
-        running: isRunning,
+        running: isRunning || playerTurnDuringMultiActions,
         emerg: isEmerg(millis, clock, player.playerIndex),
       },
     },
     clock.opts.nvui
       ? [
           h('div.clock-byo', [
-            h('div.time', {
+            h('div.time' + delayClass, {
               attrs: { role: 'timer' },
               hook: timeHook,
             }),
@@ -74,7 +98,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       : [
           clock.showBar && game.bothPlayersHavePlayed(ctrl.data) ? showBar(ctrl, player.playerIndex) : undefined,
           h('div.clock-byo', [
-            h('div.time', {
+            h('div.time' + delayClass, {
               class: {
                 hour: millis > 3600 * 1000,
               },
@@ -185,7 +209,7 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
 }
 
 export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, playerIndex: PlayerIndex) {
-  const delayMillis = clock.delayMillisOf(playerIndex),
+  const delayMillis = clock.delayMillisOf(playerIndex, playerIndex),
     showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[playerIndex],
     isRunning = playerIndex === clock.times.activePlayerIndex;
   if (els.time) {

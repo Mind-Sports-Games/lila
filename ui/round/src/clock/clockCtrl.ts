@@ -344,11 +344,11 @@ export class ClockController {
       ? Math.max(0, this.times[playerIndex] - this.elapsed())
       : this.times[playerIndex];
 
-  delayMillisOf = (playerIndex: PlayerIndex): Millis => {
+  delayMillisOf = (playerIndex: PlayerIndex, activePlayerInGame: PlayerIndex): Millis => {
     const isBerserk = this.goneBerserk[playerIndex];
     const countDown = isBerserk ? 0 : this.countdownDelay ?? 0;
     const delayMillis = 1000 * countDown;
-    return this.isNotOpponentsTurn(playerIndex)
+    return this.isNotOpponentsTurn(playerIndex) && playerIndex === activePlayerInGame
       ? Math.max(0, delayMillis - (this.elapsed() + this.pendingMillisOf(playerIndex)))
       : delayMillis;
   };
@@ -358,18 +358,18 @@ export class ClockController {
     return 1000 * pendingSeconds;
   };
 
-  isInDelay = (playerIndex: PlayerIndex): boolean => {
+  isInDelay = (playerIndex: PlayerIndex, isStoppedBetweenPlayerActions = false): boolean => {
     return (
       !!this.delay &&
-      this.isRunning() &&
+      (this.isRunning() || isStoppedBetweenPlayerActions) &&
       this.elapsed() + this.pendingMillisOf(playerIndex) <= 1000 * this.delay &&
       !this.goneBerserk[playerIndex]
     );
   };
 
-  isNotInDelay = (playerIndex: PlayerIndex): boolean =>
+  isNotInDelay = (playerIndex: PlayerIndex, isStoppedBetweenPlayerActions = false): boolean =>
     !!this.delay &&
-    this.isRunning() &&
+    (this.isRunning() || isStoppedBetweenPlayerActions) &&
     this.elapsed() + this.pendingMillisOf(playerIndex) > 1000 * this.delay &&
     !this.goneBerserk[playerIndex];
 
