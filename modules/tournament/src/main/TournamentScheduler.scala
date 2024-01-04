@@ -352,122 +352,122 @@ final private class TournamentScheduler(
       scheduleWeekly(speed, variant)(day, hour)
     } filter { _.schedule.at isAfter rightNow }
 
-    //yearly tournaments
-    val yearly2023Tournaments = List(
-      //2023 list - redo for 2024 as more months will be available
+    //yearly tournaments 2024
+    val yearly2024Tournaments = List(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Standard), Blitz32)(
-        new DateTime(2023, 5, 5, 0, 0)
+        new DateTime(2024, 1, 5, 0, 0)
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz32)(
-        new DateTime(2023, 5, 12, 0, 0)
+        new DateTime(2024, 1, 12, 0, 0)
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35)(
-        new DateTime(2023, 5, 19, 0, 0)
+        new DateTime(2024, 1, 19, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Atomic), Blitz32)(
-        new DateTime(2023, 5, 26, 0, 0)
+        new DateTime(2024, 1, 26, 0, 0)
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz32)(
-        new DateTime(2023, 6, 2, 0, 0)
+        new DateTime(2024, 2, 2, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go13x13), Blitz53)(
+        new DateTime(2024, 2, 9, 0, 0)
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz32)(
-        new DateTime(2023, 6, 9, 0, 0)
+        new DateTime(2024, 2, 16, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Crazyhouse), Blitz32)(
-        new DateTime(2023, 6, 16, 0, 0)
+        new DateTime(2024, 2, 23, 0, 0)
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Pool), Blitz32)(
-        new DateTime(2023, 6, 23, 0, 0)
+        new DateTime(2024, 3, 1, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.LinesOfAction), Blitz32)(
-        new DateTime(2023, 6, 30, 0, 0)
+        new DateTime(2024, 3, 8, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.FiveCheck), Blitz32)(
-        new DateTime(2023, 7, 7, 0, 0)
+        new DateTime(2024, 3, 15, 0, 0)
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Frysk), Blitz32)(
-        new DateTime(2023, 7, 14, 0, 0)
-      ), //skip 21st July 2023 for Birthday tournament...
+        new DateTime(2024, 3, 22, 0, 0)
+      ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Amazons), Blitz32)(
-        new DateTime(2023, 7, 28, 0, 0)
+        new DateTime(2024, 3, 29, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Horde), Blitz32)(
-        new DateTime(2023, 8, 4, 0, 0)
+        new DateTime(2024, 4, 5, 0, 0)
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Portuguese), Blitz32)(
-        new DateTime(2023, 8, 11, 0, 0)
+        new DateTime(2024, 4, 12, 0, 0)
       ),
       scheduleYearly24hr(Variant.Samurai(strategygames.samurai.variant.Oware), Blitz32)(
-        new DateTime(2023, 8, 18, 0, 0)
+        new DateTime(2024, 4, 19, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Antichess), Blitz32)(
-        new DateTime(2023, 8, 25, 0, 0)
+        new DateTime(2024, 4, 26, 0, 0)
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Standard), Blitz32)(
-        new DateTime(2023, 9, 1, 0, 0)
+        new DateTime(2024, 5, 3, 0, 0)
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Xiangqi), Blitz53)(
-        new DateTime(2023, 9, 8, 0, 0)
+        new DateTime(2024, 5, 10, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.KingOfTheHill), Blitz32)(
-        new DateTime(2023, 9, 15, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
-        new DateTime(2023, 9, 22, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510)(
-        new DateTime(2023, 9, 29, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32)(
-        new DateTime(2023, 10, 6, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32)(
-        new DateTime(2023, 10, 13, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Flipello10), Blitz32)(
-        new DateTime(2023, 10, 20, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32)(
-        new DateTime(2023, 10, 27, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz32)(
-        new DateTime(2023, 11, 3, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz53)(
-        new DateTime(2023, 11, 10, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Chess960), Blitz32)(
-        new DateTime(2023, 11, 17, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.English), Blitz32)(
-        new DateTime(2023, 11, 24, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.ScrambledEggs), Blitz32)(
-        new DateTime(2023, 12, 1, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.ThreeCheck), Blitz32)(
-        new DateTime(2023, 12, 8, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32)(
-        new DateTime(2023, 12, 15, 0, 0)
+        new DateTime(2024, 5, 17, 0, 0)
       ),
       scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go19x19), Blitz53)(
-        new DateTime(2023, 12, 22, 0, 0)
+        new DateTime(2024, 5, 24, 0, 0)
       ),
-      //use Weds 27th and Thurs 28th for final yearlys that we want to fit in
-      //Fri 29th is the end of year medley
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
+        new DateTime(2024, 5, 31, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510)(
+        new DateTime(2024, 6, 7, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32)(
+        new DateTime(2024, 6, 14, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32)(
+        new DateTime(2024, 6, 21, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Flipello10), Blitz32)(
+        new DateTime(2024, 6, 28, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32)(
+        new DateTime(2024, 7, 5, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz32)(
+        new DateTime(2024, 7, 12, 0, 0)
+      ),
+      //skip 19th July 2024 for Birthday tournament...
+      scheduleYearly24hr(Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz53)(
+        new DateTime(2024, 7, 26, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Chess960), Blitz32)(
+        new DateTime(2024, 8, 2, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.English), Blitz32)(
+        new DateTime(2024, 8, 9, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.ScrambledEggs), Blitz32)(
+        new DateTime(2024, 8, 16, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.ThreeCheck), Blitz32)(
+        new DateTime(2024, 8, 23, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32)(
+        new DateTime(2024, 8, 30, 0, 0)
+      ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Monster), Blitz32)(
-        new DateTime(2023, 12, 27, 0, 0)
+        new DateTime(2024, 9, 6, 0, 0)
       ),
       scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
-        new DateTime(2023, 12, 28, 0, 0)
+        new DateTime(2024, 9, 13, 0, 0)
       )
-      //Go13x13 doesnt make the 2023 yearly schedule, we should put it towards the start of
-      //2024 yearly schedule (but not first to allow for some Go spread)
+      //Fri 27th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }
 
     //order matters for pruning weekly/yearly tournaments
-    yearly2023Tournaments ::: thisWeekMedleyShields ::: nextWeekMedleyShields ::: thisMonthShields ::: nextMonthShields ::: weeklyTourmaments
+    yearly2024Tournaments ::: thisWeekMedleyShields ::: nextWeekMedleyShields ::: thisMonthShields ::: nextMonthShields ::: weeklyTourmaments
 
 //          List( // shield tournaments!
 //            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,
