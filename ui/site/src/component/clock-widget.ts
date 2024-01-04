@@ -3,19 +3,27 @@ import widget from './widget';
 interface Opts {
   pause?: boolean;
   time: number;
+  delay: number;
+  pending: number;
 }
 
 export default function loadClockWidget() {
   widget('clock', {
     _create: function () {
       this.target = this.options.time * 1000 + Date.now();
+      this.updateCountdownDelay(this.options.delay, this.options.pending);
       if (!this.options.pause) this.interval = setInterval(this.render.bind(this), 1000);
       this.render();
+    },
+
+    updateCountdownDelay: function (delay: number, pending: number) {
+      this.countdownDelayTarget = ((delay ?? 0) - (pending ?? 0)) * 1000 + Date.now();
     },
 
     set: function (opts: Opts) {
       this.options = opts;
       this.target = this.options.time * 1000 + Date.now();
+      this.updateCountdownDelay(this.options.delay, this.options.pending);
       this.render();
       clearInterval(this.interval);
       if (!opts.pause) this.interval = setInterval(this.render.bind(this), 1000);
@@ -28,7 +36,8 @@ export default function loadClockWidget() {
 
     render: function () {
       if (document.body.contains(this.element[0])) {
-        this.element.text(this.formatMs(this.target - Date.now()));
+        const countDownTarget = Math.max(Date.now(), this.countdownDelayTarget);
+        this.element.text(this.formatMs(this.target - countDownTarget));
         this.element.toggleClass('clock--run', !this.options.pause);
       } else clearInterval(this.interval);
     },

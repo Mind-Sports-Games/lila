@@ -251,7 +251,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     });
 
     let scrollAmount = 0;
-    var slideTimer = setInterval(function () {
+    const slideTimer = setInterval(function () {
       if (direction == 'left') {
         element.scrollLeft -= step;
       } else {

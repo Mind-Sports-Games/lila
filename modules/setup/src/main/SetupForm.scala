@@ -133,14 +133,31 @@ object SetupForm {
 
   object api {
 
+    // TODO: There has to be a way to reduce this code.
     lazy val fischerClockMapping =
       mapping(
         "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
         "increment" -> increment
-      )(strategygames.FischerClock.Config.apply)(strategygames.FischerClock.Config.unapply)
+      )(strategygames.Clock.Config.apply)(strategygames.Clock.Config.unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
 
     lazy val fischerClock = "clock" -> optional(fischerClockMapping)
+
+    lazy val bronsteinDelayClockMapping =
+      mapping(
+        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "delay" -> increment
+      )(strategygames.Clock.BronsteinConfig.apply)(strategygames.Clock.BronsteinConfig.unapply)
+        .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
+    lazy val bronsteinDelayClock = "clock" -> optional(bronsteinDelayClockMapping)
+
+    lazy val simpleDelayMapping =
+      mapping(
+        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "delay" -> increment
+      )(strategygames.Clock.SimpleDelayConfig.apply)(strategygames.Clock.SimpleDelayConfig.unapply)
+        .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
+    lazy val simpleDelayClock = "clock" -> optional(simpleDelayMapping)
 
     lazy val byoyomiClockMapping =
       mapping(
@@ -150,7 +167,6 @@ object SetupForm {
         "periods"   -> periods
       )(strategygames.ByoyomiClock.Config.apply)(strategygames.ByoyomiClock.Config.unapply)
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
-
     lazy val byoyomiClock = "clock" -> optional(byoyomiClockMapping)
 
     lazy val variant =
@@ -172,6 +188,8 @@ object SetupForm {
       mapping(
         variant,
         fischerClock,
+        simpleDelayClock,
+        bronsteinDelayClock,
         byoyomiClock,
         "days"          -> optional(days),
         "rated"         -> boolean,
@@ -189,6 +207,8 @@ object SetupForm {
         "level" -> level,
         variant,
         fischerClock,
+        simpleDelayClock,
+        bronsteinDelayClock,
         byoyomiClock,
         "days"        -> optional(days),
         "playerIndex" -> optional(playerIndex),
@@ -201,6 +221,8 @@ object SetupForm {
         "name" -> optional(lila.common.Form.cleanNonEmptyText(maxLength = 200)),
         variant,
         fischerClock,
+        simpleDelayClock,
+        bronsteinDelayClock,
         byoyomiClock,
         "rated" -> boolean,
         "fen"   -> fenField

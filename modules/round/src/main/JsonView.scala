@@ -2,7 +2,7 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, Player => PlayerIndex, P1, P2, Pos, Situation }
+import strategygames.{ ClockBase, Player => PlayerIndex, P1, P2, Pos, Situation }
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.math
@@ -348,8 +348,10 @@ final class JsonView(
         ("percent" -> JsNumber(game.playerBlurPercent(player.playerIndex)))
     }
 
-  private def clockJson(clock: Clock): JsObject =
-    clockWriter.writes(clock) + ("moretime" -> JsNumber(actorApi.round.Moretime.defaultDuration.toSeconds))
+  private def clockJson(clock: ClockBase): JsObject =
+    clockWriter.writes(clock) + ("moretime" -> JsNumber(
+      actorApi.round.Moretime.defaultDuration.toSeconds
+    ))
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {

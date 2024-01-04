@@ -87,6 +87,10 @@ final private class TvBroadcast(
           )
           .add("p1" -> game.clock.map(_.remainingTime(strategygames.P1).roundSeconds))
           .add("p2" -> game.clock.map(_.remainingTime(strategygames.P2).roundSeconds))
+          .add("p1Pending" -> game.clock.map(_.pending(strategygames.P1).roundSeconds))
+          .add("p2Pending" -> game.clock.map(_.pending(strategygames.P2).roundSeconds))
+          .add("p1Delay" -> game.clock.map(_.graceSeconds))
+          .add("p2Delay" -> game.clock.map(_.graceSeconds))
         // TODO: byoyomi periods here?!
       )
       clients.foreach(_.queue offer msg)

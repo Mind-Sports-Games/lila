@@ -1,5 +1,6 @@
 package lila.bot
 
+import scala.concurrent.duration._
 import play.api.i18n.Lang
 import play.api.libs.json._
 
@@ -54,13 +55,14 @@ final class BotJsonView(
       uciMoves =>
         Json
           .obj(
-            "type"            -> "gameState",
-            "moves"           -> uciMoves.map(_.mkString(",")).mkString(" "),
-            "activeplayer"    -> game.activePlayer.name,
-            "wtime"           -> millisOf(game.p1Pov),
-            "btime"           -> millisOf(game.p2Pov),
-            "winc"            -> game.clock.??(_.config.increment.millis),
-            "binc"            -> game.clock.??(_.config.increment.millis),
+            "type"         -> "gameState",
+            "moves"        -> uciMoves.map(_.mkString(",")).mkString(" "),
+            "activeplayer" -> game.activePlayer.name,
+            "wtime"        -> millisOf(game.p1Pov),
+            "btime"        -> millisOf(game.p2Pov),
+            // TODO: these two fields need to be tested for Bronstein and SimpleDelay and Fischer now
+            "winc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),
+            "binc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),
             "wdraw"           -> game.p1Player.isOfferingDraw,
             "bdraw"           -> game.p2Player.isOfferingDraw,
             "status"          -> game.status.name,
@@ -132,10 +134,22 @@ final class BotJsonView(
 
   implicit private val clockConfigWriter: OWrites[strategygames.ClockConfig] = OWrites { c =>
     c match {
-      case c: strategygames.FischerClock.Config =>
+      case c: strategygames.Clock.Config =>
         Json.obj(
           "initial"   -> c.limit.millis,
           "increment" -> c.increment.millis
+        )
+      case c: strategygames.Clock.BronsteinConfig =>
+        Json.obj(
+          "initial"   -> c.limit.millis,
+          "delay"     -> c.delay.millis,
+          "delaytype" -> "bronstein"
+        )
+      case c: strategygames.Clock.SimpleDelayConfig =>
+        Json.obj(
+          "initial"   -> c.limit.millis,
+          "delay"     -> c.delay.millis,
+          "delayType" -> "usdelay"
         )
       case c: strategygames.ByoyomiClock.Config =>
         Json.obj(

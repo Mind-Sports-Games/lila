@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, P1, P2 }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, P1, P2 }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -585,10 +585,24 @@ object JsonView {
 
   implicit private[tournament] val clockWrites: OWrites[strategygames.ClockConfig] = OWrites { clock =>
     clock match {
-      case fc: FischerClock.Config => {
+      case fc: Clock.Config => {
         Json.obj(
           "limit"     -> fc.limitSeconds,
           "increment" -> fc.incrementSeconds
+        )
+      }
+      case fc: Clock.BronsteinConfig => {
+        Json.obj(
+          "limit"     -> fc.limitSeconds,
+          "delay"     -> fc.delaySeconds,
+          "delayType" -> "bronstein"
+        )
+      }
+      case udc: Clock.SimpleDelayConfig => {
+        Json.obj(
+          "limit"     -> udc.limitSeconds,
+          "delay"     -> udc.delaySeconds,
+          "delayType" -> "usdelay"
         )
       }
       case bc: ByoyomiClock.Config => {

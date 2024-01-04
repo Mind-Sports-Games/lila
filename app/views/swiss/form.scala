@@ -35,8 +35,8 @@ object form {
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clockRow1,
-            fields.useByoyomi,
             fields.clockRow2,
+            fields.clockRow3,
             form3.split(fields.description, fields.position),
             form3.split(
               fields.roundInterval,
@@ -78,8 +78,8 @@ object form {
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clockRow1,
-            fields.useByoyomi,
             fields.clockRow2,
+            fields.clockRow3,
             form3.split(fields.description, fields.position),
             form3.split(
               fields.roundInterval,
@@ -291,18 +291,39 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     )
 
   def useByoyomi =
-    frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()))
+    frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi(), disabled = disabledAfterStart))
+
+  def useBronsteinDelay =
+    frag(
+      form3.checkbox(
+        form("clock.useBronsteinDelay"),
+        trans.useBronsteinDelay(),
+        disabled = disabledAfterStart
+      )
+    )
+
+  def useSimpleDelay =
+    frag(form3.checkbox(form("clock.useSimpleDelay"), trans.useSimpleDelay(), disabled = disabledAfterStart))
 
   def clockRow1 =
     form3.split(
       form3.group(form("clock.limit"), trans.clockInitialTime(), half = true)(
         form3.select(_, SwissForm.clockLimitChoices, disabled = disabledAfterStart)
       ),
-      form3.group(form("clock.increment"), trans.clockIncrement(), half = true)(
+      form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
         form3.select(_, TournamentForm.clockIncrementChoices, disabled = disabledAfterStart)
+      ),
+      form3.group(form("clock.delay"), trans.clockDelay(), klass = "clockDelay", half = true)(
+        form3.select(_, TournamentForm.clockDelayChoices, disabled = disabledAfterStart)
       )
     )
   def clockRow2 =
+    form3.split(
+      useByoyomi,
+      useBronsteinDelay,
+      useSimpleDelay
+    )
+  def clockRow3 =
     form3.split(
       form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
         form3.select(_, SwissForm.clockByoyomiChoices, disabled = disabledAfterStart)
