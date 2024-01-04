@@ -352,23 +352,6 @@ final private class TournamentScheduler(
       scheduleWeekly(speed, variant)(day, hour)
     } filter { _.schedule.at isAfter rightNow }
 
-    //yearly tournaments
-    val yearly2023Tournaments = List(
-      //2023 list left after release
-      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go19x19), Blitz53)(
-        new DateTime(2023, 12, 22, 0, 0)
-      ),
-      //use Weds 27th and Thurs 28th for final yearlys that we want to fit in
-      //Fri 29th is the end of year medley
-      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Monster), Blitz32)(
-        new DateTime(2023, 12, 27, 0, 0)
-      ),
-      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
-        new DateTime(2023, 12, 28, 0, 0)
-      )
-      //Go13x13 doesnt make the 2023 yearly schedule, we should put it towards the start of
-    ).flatten filter { _.schedule.at isAfter rightNow }
-
     //yearly tournaments 2024
     val yearly2024Tournaments = List(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Standard), Blitz32)(
@@ -484,7 +467,7 @@ final private class TournamentScheduler(
     ).flatten filter { _.schedule.at isAfter rightNow }
 
     //order matters for pruning weekly/yearly tournaments
-    yearly2024Tournaments ::: yearly2023Tournaments ::: thisWeekMedleyShields ::: nextWeekMedleyShields ::: thisMonthShields ::: nextMonthShields ::: weeklyTourmaments
+    yearly2024Tournaments ::: thisWeekMedleyShields ::: nextWeekMedleyShields ::: thisMonthShields ::: nextMonthShields ::: weeklyTourmaments
 
 //          List( // shield tournaments!
 //            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,
