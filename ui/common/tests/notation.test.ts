@@ -284,7 +284,12 @@ test('moveFromNotationStyle shogi Knight ambiguous', () => {
 // xiangqi
 
 test('moveFromNotationStyle xiangqi Pawn move', () => {
-  const move = { san: '', uci: 'e4e5', fen: 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/4P4/P1P3P1P/1C5C1/9/RNBAKABNR b - - 1 1' };
+  const move = {
+    san: '',
+    uci: 'e4e5',
+    fen: 'rnbakabnr/9/1c5c1/p1p1p1p1p/9/4P4/P1P3P1P/1C5C1/9/RNBAKABNR b - - 1 1',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('P5+1');
@@ -295,6 +300,7 @@ test('moveFromNotationStyle xiangqi knight move', () => {
     san: '',
     uci: 'b10c8',
     fen: 'r1bakabnr/9/1cn4c1/p1p1p1p1p/9/9/P1P1P1P1P/1C4NC1/9/RNBAKAB1R w - - 2 2',
+    prevFen: '',
   };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
@@ -306,6 +312,7 @@ test('moveFromNotationStyle xiangqi Elephant move', () => {
     san: '',
     uci: 'g1e3',
     fen: 'r1bakabnr/9/1cn4c1/p1p1p1p1p/9/9/P1P1P1P1P/1C2B1NC1/9/RNBAKA2R b - - 3 2',
+    prevFen: '',
   };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
@@ -317,6 +324,7 @@ test('moveFromNotationStyle xiangqi Advisor move', () => {
     san: '',
     uci: 'f10e9',
     fen: 'rnbak1bnr/4a4/1c5c1/p1p1p1p1p/9/4P4/P1P3P1P/1C5C1/9/RNBAKABNR w - - 2 2',
+    prevFen: '',
   };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
@@ -328,6 +336,7 @@ test('moveFromNotationStyle xiangqi King move', () => {
     san: '',
     uci: 'e9f9',
     fen: 'rnba1abnr/5k3/1c5c1/p1p1p1p1p/9/4P4/P1P3P1P/1C5C1/4K4/RNBA1ABNR w - - 4 3',
+    prevFen: '',
   };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
@@ -339,6 +348,7 @@ test('moveFromNotationStyle xiangqi Rook move', () => {
     san: '',
     uci: 'i1i3',
     fen: 'rnba1abnr/5k3/1c5c1/p1p1p1p1p/9/4P4/P1P3P1P/1C5CR/4K4/RNBA1ABN1 b - - 5 3',
+    prevFen: '',
   };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
@@ -346,63 +356,108 @@ test('moveFromNotationStyle xiangqi Rook move', () => {
 });
 
 test('moveFromNotationStyle xiangqi Cannon move', () => {
-  const move = { san: '', uci: 'b8b1', fen: 'rnba1abnr/5k3/7c1/p1p1p1p1p/9/4P4/P1P3P1P/1C5CR/4K4/RcBA1ABN1 w - - 0 4' };
+  const move = {
+    san: '',
+    uci: 'b8b1',
+    fen: 'rnba1abnr/5k3/7c1/p1p1p1p1p/9/4P4/P1P3P1P/1C5CR/4K4/RcBA1ABN1 w - - 0 4',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('C2+7');
 });
 
 test('moveFromNotationStyle xiangqi Promoted pawn move', () => {
-  const move = { san: '', uci: 'e7d7', fen: 'rnba1abnr/5k3/7c1/3P2p1p/p1p6/9/P1P3P1P/1C5CR/4K4/RcBA1ABN1 b - - 2 6' };
+  const move = {
+    san: '',
+    uci: 'e7d7',
+    fen: 'rnba1abnr/5k3/7c1/3P2p1p/p1p6/9/P1P3P1P/1C5CR/4K4/RcBA1ABN1 b - - 2 6',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('P5=6');
 });
 
 test('moveFromNotationStyle xiangqi 2 pawns in column move', () => {
-  const move = { san: '', uci: 'c7d7', fen: 'rnb2abnr/4ak3/7c1/3P2p1p/9/p1P6/P5P1P/1C5CR/4K4/RcBA1ABN1 b - - 4 9' };
+  const move = {
+    san: '',
+    uci: 'c7d7',
+    fen: 'rnb2abnr/4ak3/7c1/3P2p1p/9/p1P6/P5P1P/1C5CR/4K4/RcBA1ABN1 b - - 4 9',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('P+=6');
 });
 
 test('moveFromNotationStyle xiangqi 3 pawns in column move', () => {
-  const move = { san: '', uci: 'c7c8', fen: 'rnb2abnr/4ak3/2P4c1/6p1p/2P6/2P6/6P1P/1C5CR/4K4/RcBA1ABN1 b - - 10 15' };
+  const move = {
+    san: '',
+    uci: 'c7c8',
+    fen: 'rnb2abnr/4ak3/2P4c1/6p1p/2P6/2P6/6P1P/1C5CR/4K4/RcBA1ABN1 b - - 10 15',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('17+1');
 });
 
 test('moveFromNotationStyle xiangqi 3 pawns in column sideways move', () => {
-  const move = { san: '', uci: 'c6d6', fen: '1nb2abnr/4ak3/r1P4c1/6p1p/3P5/2P6/6P1P/1C5CR/4K4/RcBA1ABN1 b - - 12 16' };
+  const move = {
+    san: '',
+    uci: 'c6d6',
+    fen: '1nb2abnr/4ak3/r1P4c1/6p1p/3P5/2P6/6P1P/1C5CR/4K4/RcBA1ABN1 b - - 12 16',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('27=6');
 });
 
 test('moveFromNotationStyle xiangqi 3 pawns in column p2 move', () => {
-  const move = { san: '', uci: 'g3g2', fen: 'rnbakabnr/9/1c5c1/p1P6/6p2/P5p2/8P/1C5C1/4A1p2/RNB1KABNR w - - 11 13' };
+  const move = {
+    san: '',
+    uci: 'g3g2',
+    fen: 'rnbakabnr/9/1c5c1/p1P6/6p2/P5p2/8P/1C5C1/4A1p2/RNB1KABNR w - - 11 13',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('17+1');
 });
 
 test('moveFromNotationStyle xiangqi 3 pawns in column p2 sideways move', () => {
-  const move = { san: '', uci: 'g5f5', fen: 'rnbakabnr/9/1c5c1/p1P6/6p2/P4p3/8P/1CN4C1/4A1p2/R1B1KABNR w - - 13 14' };
+  const move = {
+    san: '',
+    uci: 'g5f5',
+    fen: 'rnbakabnr/9/1c5c1/p1P6/6p2/P4p3/8P/1CN4C1/4A1p2/R1B1KABNR w - - 13 14',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('27=6');
 });
 
 test('moveFromNotationStyle xiangqi 4 pawns in column p2 move', () => {
-  const move = { san: '', uci: 'g6g5', fen: 'rnbakabnr/9/1c5c1/1CP6/9/6p2/R5p1P/2N3pC1/4A4/2B1KApNR w - - 6 26' };
+  const move = {
+    san: '',
+    uci: 'g6g5',
+    fen: 'rnbakabnr/9/1c5c1/1CP6/9/6p2/R5p1P/2N3pC1/4A4/2B1KApNR w - - 6 26',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('47+1');
 });
 
 test('moveFromNotationStyle xiangqi 4 pawns in column p2 sideways move', () => {
-  const move = { san: '', uci: 'g4f4', fen: 'rnbakabnr/9/1c5c1/1CP6/9/1N4p2/R4p2P/6pC1/4A4/2B1KApNR w - - 8 27' };
+  const move = {
+    san: '',
+    uci: 'g4f4',
+    fen: 'rnbakabnr/9/1c5c1/1CP6/9/1N4p2/R4p2P/6pC1/4A4/2B1KApNR w - - 8 27',
+    prevFen: '',
+  };
 
   const notation = moveFromNotationStyle('wxf')(move, xiangqiVariant);
   expect(notation).toBe('37=6');

@@ -4,7 +4,7 @@ interface ExtendedMoveInfo {
   san: string;
   uci: string;
   fen: string;
-  prevFen?: string; //todo make this mandatory as its already always passed in?
+  prevFen: string;
 }
 
 interface ParsedMove {
@@ -92,7 +92,7 @@ export function parseUCISquareToUSI(str: string, files: number, ranks: number): 
 function shogiNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const parsed = parseUciToUsi(move.uci, variant.boardSize.width, variant.boardSize.height),
     board = readFen(move.fen, variant.boardSize.height, variant.boardSize.width),
-    prevBoard = readFen(move.prevFen!, variant.boardSize.height, variant.boardSize.width),
+    prevBoard = readFen(move.prevFen, variant.boardSize.height, variant.boardSize.width),
     prevrole = prevBoard.pieces[parsed.orig],
     dest = parsed.dest,
     connector = isCapture(prevBoard, board) ? 'x' : isDrop(prevBoard, board) ? '*' : '-',
@@ -385,8 +385,8 @@ function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string 
   const destNumber = dest[1] === '1' ? dest.charCodeAt(0) - 96 : 97 - dest.charCodeAt(0) + variant.boardSize.width;
   const gainedStones =
     orig[1] === '1'
-      ? getMancalaScore(move.fen, 'p1') > getMancalaScore(move.prevFen!, 'p1')
-      : getMancalaScore(move.fen, 'p2') > getMancalaScore(move.prevFen!, 'p2');
+      ? getMancalaScore(move.fen, 'p1') > getMancalaScore(move.prevFen, 'p1')
+      : getMancalaScore(move.fen, 'p2') > getMancalaScore(move.prevFen, 'p2');
   const destEmpty = isDestEmptyInTogyFen(dest, destNumber, move.fen, variant.boardSize.width);
   const isCapture = gainedStones && orig[1] !== dest[1] && destEmpty;
 
@@ -395,8 +395,8 @@ function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string 
 
   const createdTuzdik =
     orig[1] === '1'
-      ? hasTuzdik(move.fen, 'p1') && !hasTuzdik(move.prevFen!, 'p1')
-      : hasTuzdik(move.fen, 'p2') && !hasTuzdik(move.prevFen!, 'p2');
+      ? hasTuzdik(move.fen, 'p1') && !hasTuzdik(move.prevFen, 'p1')
+      : hasTuzdik(move.fen, 'p2') && !hasTuzdik(move.prevFen, 'p2');
 
   return `${origNumber}${destNumber}${createdTuzdik ? 'X' : ''}${scoreText}`;
 }
@@ -434,8 +434,8 @@ function owareNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const scoreDiff =
     getMancalaScore(move.fen, 'p1') +
     getMancalaScore(move.fen, 'p2') -
-    getMancalaScore(move.prevFen!, 'p1') -
-    getMancalaScore(move.prevFen!, 'p2');
+    getMancalaScore(move.prevFen, 'p1') -
+    getMancalaScore(move.prevFen, 'p2');
   const scoreText = scoreDiff <= 0 ? '' : ` + ${scoreDiff}`;
   return `${origLetter}${scoreText}`;
 }
@@ -453,13 +453,13 @@ function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const orig = reg[0];
   const dest = reg[1];
   const isDrop = reg[0].includes('@');
-  const movePlayer = move.prevFen!.split(' ')[1] === 'w' ? 'p1' : 'p2';
-  const moveOpponent = move.prevFen!.split(' ')[1] === 'w' ? 'p2' : 'p1';
+  const movePlayer = move.prevFen.split(' ')[1] === 'w' ? 'p1' : 'p2';
+  const moveOpponent = move.prevFen.split(' ')[1] === 'w' ? 'p2' : 'p1';
   //TODO get this from the fen when it exists?
   const diceRoll = '43';
 
   //captures
-  const capturedPiecesBefore = numberofCapturedPiecesOfPlayer(moveOpponent, move.prevFen!);
+  const capturedPiecesBefore = numberofCapturedPiecesOfPlayer(moveOpponent, move.prevFen);
   const capturedPiecesAfter = numberofCapturedPiecesOfPlayer(moveOpponent, move.fen);
   const isCapture = capturedPiecesBefore !== capturedPiecesAfter;
   const isCaptureNotation = isCapture ? '*' : '';

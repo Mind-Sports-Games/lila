@@ -167,7 +167,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): V
           san: fixCrazySan(node.san || ''),
           uci: node.uci || '',
           fen: node.fen,
-          prevFen: node.parent?.fen,
+          prevFen: node.parent?.fen || '',
         },
         variant
       ),
