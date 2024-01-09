@@ -227,6 +227,8 @@ export default class RoundController {
       //always play the capture sound regardless of move TODO change depending on number of stones?
       mancala.updateBoardFromTogyzkumalakMove(this, orig, dest);
       sound.capture();
+    } else if (this.data.game.variant.key === 'backgammon') {
+      backgammon.updateBoardFromMove(this, orig, dest);
     } else sound.move();
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
   };
