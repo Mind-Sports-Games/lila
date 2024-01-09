@@ -65,17 +65,19 @@ object Event {
         possibleDrops: Option[List[Pos]],
         possibleDropsByRole: Option[Map[Role, List[Pos]]],
         pocketData: Option[PocketData],
+        couldNextActionEndTurn: Option[Boolean] = None,
         captLen: Option[Int] = None
     )(extra: JsObject) = {
       extra ++ Json
         .obj(
-          "fen"         -> fen,
-          "ply"         -> state.plies,
-          "turnCount"   -> state.turnCount,
-          "dests"       -> PossibleMoves.oldJson(possibleMoves),
-          "captLen"     -> ~captLen,
-          "gf"          -> gf.id,
-          "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty))
+          "fen"                 -> fen,
+          "ply"                 -> state.plies,
+          "turnCount"           -> state.turnCount,
+          "dests"               -> PossibleMoves.oldJson(possibleMoves),
+          "captLen"             -> ~captLen,
+          "gf"                  -> gf.id,
+          "dropsByRole"         -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty)),
+          "multiActionMetaData" -> couldNextActionEndTurn.map(b => Json.obj("couldNextActionEndTurn" -> b))
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -112,6 +114,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       pocketData: Option[PocketData],
+      couldNextActionEndTurn: Option[Boolean],
       captLen: Option[Int]
   ) extends Event {
     def typ = "move"
@@ -129,6 +132,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         pocketData,
+        couldNextActionEndTurn,
         captLen
       ) {
         Json
@@ -211,6 +215,12 @@ object Event {
           case _ => None
         },
         pocketData = pocketData,
+        //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
+        couldNextActionEndTurn = situation.actions.headOption.map(_ match {
+          case m: StratMove => m.autoEndTurn
+          case d: StratDrop => d.autoEndTurn
+          case _            => true
+        }),
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
             if (situation.ghosts > 0)
@@ -237,7 +247,8 @@ object Event {
       possibleMoves: Map[Pos, List[Pos]],
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
-      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      couldNextActionEndTurn: Option[Boolean]
   ) extends Event {
     def typ = "drop"
     def data =
@@ -253,7 +264,8 @@ object Event {
         possibleMoves,
         possibleDrops,
         possibleDropsByRole,
-        pocketData
+        pocketData,
+        couldNextActionEndTurn
       ) {
         Json.obj(
           "role" -> role.groundName,
@@ -296,7 +308,13 @@ object Event {
             situation.dropsByRole
           case _ => None
         },
-        pocketData = pocketData
+        pocketData = pocketData,
+        //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
+        couldNextActionEndTurn = situation.actions.headOption.map(_ match {
+          case m: StratMove => m.autoEndTurn
+          case d: StratDrop => d.autoEndTurn
+          case _            => true
+        })
       )
   }
 
@@ -591,15 +609,15 @@ object Event {
               Json.obj(
                 "p1"        -> fc.remainingTime(P1).centis,
                 "p2"        -> fc.remainingTime(P2).centis,
-                "p1Pending" -> fc.pending(P1).centis,
-                "p2Pending" -> fc.pending(P2).centis
+                "p1Pending" -> (fc.pending(P1) + fc.completedActionsOfTurnTime(P1)).centis,
+                "p2Pending" -> (fc.pending(P2) + fc.completedActionsOfTurnTime(P2)).centis
               )
             case bc: ByoyomiClock =>
               Json.obj(
                 "p1"        -> bc.remainingTime(P1).centis,
                 "p2"        -> bc.remainingTime(P2).centis,
-                "p1Pending" -> bc.pending(P1).centis,
-                "p2Pending" -> bc.pending(P2).centis,
+                "p1Pending" -> (bc.pending(P1) + bc.completedActionsOfTurnTime(P1)).centis,
+                "p2Pending" -> (bc.pending(P2) + bc.completedActionsOfTurnTime(P2)).centis,
                 "p1Periods" -> bc.players(P1).periodsLeft,
                 "p2Periods" -> bc.players(P2).periodsLeft
               )
@@ -700,8 +718,8 @@ object Event {
           Clock(
             fc.remainingTime(P1),
             fc.remainingTime(P2),
-            fc.pending(P1),
-            fc.pending(P2),
+            fc.pending(P1) + fc.completedActionsOfTurnTime(P1),
+            fc.pending(P2) + fc.completedActionsOfTurnTime(P2),
             fc.graceSeconds,
             fc.graceSeconds,
             nextLagComp = fc.lagCompEstimate(fc.player)
@@ -710,8 +728,8 @@ object Event {
           Clock(
             bc.remainingTime(P1),
             bc.remainingTime(P2),
-            bc.pending(P1),
-            bc.pending(P2),
+            bc.pending(P1) + bc.completedActionsOfTurnTime(P1),
+            bc.pending(P2) + bc.completedActionsOfTurnTime(P2),
             0,
             0,
             bc.players(P1).spentPeriods,

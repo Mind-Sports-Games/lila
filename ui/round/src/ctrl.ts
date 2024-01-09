@@ -511,6 +511,7 @@ export default class RoundController {
     if (d.game.variant.key == 'amazons') {
       d.onlyDropsVariant = o.drops ? true : false;
     }
+    d.multiActionMetaData = o.multiActionMetaData;
 
     const playedPlayerIndex = opposite(d.game.player),
       activePlayerIndex = d.player.playerIndex === d.game.player;
