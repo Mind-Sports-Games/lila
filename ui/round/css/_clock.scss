@@ -99,6 +99,10 @@
     padding: 0 $block-gap;
     white-space: nowrap;
 
+    &:has(delay) {
+      padding: 0 $block-gap-half;
+    }
+
     /* ensure updates don't redraw other parts of the document */
     will-change: transform;
     z-index: -1;
@@ -177,6 +181,12 @@
   delay {
     font-size: 70%;
     margin-bottom: -0.18em;
+    padding-left: $block-gap-half;
+
+    @include breakpoint($mq-col1) {
+      margin-bottom: 0em;
+      padding-top: 0.18em;
+    }
   }
 
   &.running .time {

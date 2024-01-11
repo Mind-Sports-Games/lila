@@ -403,8 +403,19 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
 
   def clockRow1 =
     form3.split(
-      form3.group(form("clock.limit"), trans.clockInitialTime(), half = true)(
-        form3.select(_, TournamentForm.clockTimeChoices, disabled = disabledAfterStart)
+      form3.group(
+        form("clock.limit"),
+        trans.clockInitialTime(),
+        half = true,
+        help = frag(
+          a(href := s"${routes.Page.loneBookmark("clocks")}", target := "_blank")("Clock details here")
+        ).some
+      )(
+        form3.select(
+          _,
+          TournamentForm.clockTimeChoices,
+          disabled = disabledAfterStart
+        )
       ),
       form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
         form3.select(

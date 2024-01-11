@@ -1249,6 +1249,8 @@ case class DelayClockHistory(
   // attribue but, we need to produce the time remaining after each move.
   // We do this by working backwards from the prevsRemainingTime and adding in the move times
   // and then reversing it.
+  //TODO this doesn't work as remaingtime is always None, would need clock details to work out remaining time?
+  // Issues seen in analysis clock times (not correct for delay)
   private def timeRemaining(moveTimes: Vector[Centis], remainingTime: Option[Centis]): Vector[Centis] =
     moveTimes.reverse.scanLeft(remainingTime.getOrElse(Centis(0)))(_ + _).reverse
   lazy val p1: Vector[Centis] = timeRemaining(p1ActionTimes, p1RemainingTime)
