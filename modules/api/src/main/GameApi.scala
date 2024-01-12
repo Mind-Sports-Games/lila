@@ -203,14 +203,14 @@ final private[api] class GameApi(
   ) =
     Json
       .obj(
-        "id"         -> g.id,
-        "initialFen" -> initialFen,
-        "rated"      -> g.rated,
-        "variant"    -> g.variant.key,
-        "speed"      -> g.speed.key,
-        "perf"       -> PerfPicker.key(g),
-        "createdAt"  -> g.createdAt,
-        "lastMoveAt" -> g.updatedAt,
+        "id"          -> g.id,
+        "initialFen"  -> initialFen,
+        "rated"       -> g.rated,
+        "variant"     -> g.variant.key,
+        "speed"       -> g.speed.key,
+        "perf"        -> PerfPicker.key(g),
+        "createdAt"   -> g.createdAt,
+        "lastMoveAt"  -> g.updatedAt,
         "turns"       -> g.turnCount,
         "plies"       -> g.plies,
         "playerIndex" -> g.turnPlayerIndex.name,
@@ -218,7 +218,7 @@ final private[api] class GameApi(
         "clock" -> g.clock.map { clock =>
           Json.obj(
             "initial"   -> clock.limitSeconds,
-            "increment" -> 0, // TODO: fix :'( clock.incrementSeconds,
+            "increment" -> clock.graceSeconds,
             "totalTime" -> clock.estimateTotalSeconds
           )
         },

@@ -99,7 +99,10 @@ object form {
         form3.group(
           form("clock.limit"),
           trans.clockIncrement(),
-          help = trans.simulClockHint().some,
+          help = frag(
+            trans.simulClockHint().some,
+            a(href := s"${routes.Page.loneBookmark("clocks")}", target := "_blank")("Clock details here")
+          ).some,
           half = true
         )(form3.select(_, clockTimeChoices)),
         form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(

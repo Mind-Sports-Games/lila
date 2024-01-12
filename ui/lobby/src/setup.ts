@@ -190,12 +190,13 @@ export default class Setup {
         }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
         const byoOk = timeMode !== '3' || ((limit > 0 || inc > 0 || byo > 0) && (byo || per === 1));
+        const delayOk = (timeMode !== '4' && timeMode !== '5') || inc > 0;
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
           ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
           aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
           posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk,
           botOK = !vsPSBot || psBotCanPlay(user, limit, inc);
-        if (byoOk && timeOk && ratedOk && aiOk && posOk && botOK) {
+        if (byoOk && delayOk && timeOk && ratedOk && aiOk && posOk && botOK) {
           $submits.toggleClass('nope', false);
           $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);

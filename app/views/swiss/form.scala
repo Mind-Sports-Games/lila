@@ -291,7 +291,13 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     )
 
   def useByoyomi =
-    frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi(), disabled = disabledAfterStart))
+    frag(
+      form3.checkbox(
+        form("clock.useByoyomi"),
+        trans.useByoyomi(),
+        disabled = disabledAfterStart
+      )
+    )
 
   def useBronsteinDelay =
     frag(
@@ -307,7 +313,14 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
 
   def clockRow1 =
     form3.split(
-      form3.group(form("clock.limit"), trans.clockInitialTime(), half = true)(
+      form3.group(
+        form("clock.limit"),
+        trans.clockInitialTime(),
+        half = true,
+        help = frag(
+          a(href := s"${routes.Page.loneBookmark("clocks")}", target := "_blank")("Clock details here")
+        ).some
+      )(
         form3.select(_, SwissForm.clockLimitChoices, disabled = disabledAfterStart)
       ),
       form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
