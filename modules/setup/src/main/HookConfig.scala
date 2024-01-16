@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ByoyomiClock, FischerClock, GameFamily, GameLogic, Mode, Speed }
+import strategygames.{ ByoyomiClock, Clock, GameFamily, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import lila.lobby.PlayerIndex
 import lila.lobby.{ Hook, Seek }
@@ -77,7 +77,8 @@ case class HookConfig(
       blocking: Set[String]
   ): Either[Hook, Option[Seek]] =
     timeMode match {
-      case TimeMode.FischerClock | TimeMode.ByoyomiClock =>
+      case TimeMode.FischerClock | TimeMode.ByoyomiClock | TimeMode.BronsteinDelayClock |
+          TimeMode.SimpleDelayClock =>
         val clock = justMakeClock
         Left(
           Hook.make(
@@ -115,7 +116,7 @@ case class HookConfig(
           variant = game.variant,
           timeMode = TimeMode ofGame game,
           time = c.limitInMinutes,
-          increment = c.incrementSeconds,
+          increment = c.config.incrementSeconds,
           byoyomi = c.byoyomiSeconds,
           periods = c.periodsTotal,
           days = game.daysPerTurn | days,
@@ -126,7 +127,8 @@ case class HookConfig(
           variant = game.variant,
           timeMode = TimeMode ofGame game,
           time = game.clock.map(_.limitInMinutes) | time,
-          increment = game.clock.map(_.incrementSeconds) | increment,
+          // TODO: We are reusing the name 'increment' even for Bronstein and Simple Delay. This should probably be renamed
+          increment = game.clock.map(_.config.graceSeconds) | increment,
           byoyomi = 0,
           periods = 0,
           days = game.daysPerTurn | days,

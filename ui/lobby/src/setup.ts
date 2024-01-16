@@ -130,6 +130,9 @@ export default class Setup {
       : undefined;
   };
 
+  private psBots = ['ps-greedy-two-move', 'ps-greedy-one-move', 'ps-greedy-four-move', 'ps-random-mover'];
+  private ratedTimeModes = ['1', '3', '4', '5'];
+
   prepareForm = ($modal: Cash) => {
     let fenOk = false;
     const self = this,
@@ -155,6 +158,9 @@ export default class Setup {
       $advancedTimeSetup = $form.find('.advanced_setup'),
       $advancedTimeToggle = $form.find('.advanced_toggle'),
       $daysInput = $form.find('.days_choice [name=days]'),
+      userDetails = $form.attr('action')?.split('user='),
+      user = userDetails && userDetails[1] ? userDetails[1].toLowerCase() : '',
+      vsPSBot = this.psBots.includes(user),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
       randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
@@ -162,7 +168,7 @@ export default class Setup {
       toggleButtons = () => {
         randomPlayerIndexVariants;
         const variantId = ($variantSelect.val() as string).split('_'),
-          timeMode = $timeModeSelect.val(),
+          timeMode = <string>$timeModeSelect.val(),
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
           inc = parseFloat($incrementInput.val() as string),
@@ -171,9 +177,10 @@ export default class Setup {
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
-            (timeMode != '1' && timeMode != '3') ||
+            this.ratedTimeModes.indexOf(timeMode) != -1 ||
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
+            (vsPSBot && user == 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' || ($goKomiInput.val() as string) != '75'));
@@ -183,11 +190,13 @@ export default class Setup {
         }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
         const byoOk = timeMode !== '3' || ((limit > 0 || inc > 0 || byo > 0) && (byo || per === 1));
+        const delayOk = (timeMode !== '4' && timeMode !== '5') || inc > 0;
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
           ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
           aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
-          posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk;
-        if (byoOk && timeOk && ratedOk && aiOk && posOk) {
+          posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk,
+          botOK = !vsPSBot || psBotCanPlay(user, limit, inc);
+        if (byoOk && delayOk && timeOk && ratedOk && aiOk && posOk && botOK) {
           $submits.toggleClass('nope', false);
           $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
@@ -196,6 +205,21 @@ export default class Setup {
         self.save($form[0] as HTMLFormElement);
       };
 
+    const psBotCanPlay = (user: string, limit: number, inc: number) => {
+      if (isRealTime()) {
+        switch (user) {
+          case 'ps-random-mover': {
+            return limit >= 0.5;
+          }
+          case 'ps-greedy-one-move': {
+            return limit >= 1 && inc >= 1;
+          }
+          default: {
+            return limit >= 3 && inc >= 2;
+          }
+        }
+      } else return false;
+    };
     const clearFenInput = () => $fenInput.val('');
     const c = this.stores[typ].get();
     if (c) {
@@ -207,6 +231,13 @@ export default class Setup {
           else if (k != 'fen' || !this.value) this.value = c[k];
         });
       });
+    }
+    //default options for playing against ps-bots
+    if (vsPSBot) {
+      $timeModeSelect.val('1');
+      $timeInput.val('3');
+      $incrementInput.val('2');
+      $casual.trigger('click');
     }
 
     const showRating = () => {
@@ -427,7 +458,7 @@ export default class Setup {
       $periodsInput.eq(0).trigger('click');
     };
 
-    const isRealTime = () => $timeModeSelect.val() === '1' || $timeModeSelect.val() == '3';
+    const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
 
     if (typ === 'hook') {
       if ($form.data('anon')) {
@@ -637,7 +668,9 @@ export default class Setup {
         const timeMode = $(this).val();
         const isFischer = timeMode === '1';
         const isByoyomi = timeMode === '3';
-        $form.find('.time_choice, .increment_choice').toggle(isFischer || isByoyomi);
+        const isBronstein = timeMode === '4';
+        const isSimple = timeMode === '5';
+        $form.find('.time_choice, .increment_choice').toggle(isFischer || isByoyomi || isBronstein || isSimple);
         $form.find('.days_choice').toggle(timeMode === '2');
         $form.find('.byoyomi_choice, .byoyomi_periods').toggle(isByoyomi);
         toggleButtons();

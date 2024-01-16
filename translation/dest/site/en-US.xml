@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="playWithAFriend">Play with a friend</string>
-  <string name="playWithTheMachine">Play with the computer</string>
+  <string name="playWithTheMachine">Play with Stockfish</string>
+  <string name="playWithBots">Play with a bot</string>
   <string name="toInviteSomeoneToPlayGiveThisUrl">To invite someone to play, give this URL</string>
   <string name="gameOver">Game Over</string>
   <string name="waitingForOpponent">Waiting for opponent</string>
@@ -179,6 +180,7 @@
   <string name="minutesPerSide">Minutes per side</string>
   <string name="variant">Variant</string>
   <string name="variants">Variants</string>
+  <string name="clockTypes">Clock Types</string>
   <string name="medley">Medley</string>
   <string name="medleyTournaments">Medley Tournaments</string>
   <string name="medleyDefinition">A different game in every round of the Swiss</string>

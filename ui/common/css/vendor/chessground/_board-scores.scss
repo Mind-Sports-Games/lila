@@ -3,7 +3,7 @@ board-scores {
   display: flex;
   pointer-events: none;
 
-  @include fluid-size('font-size', 8px, 12px);
+  @include fluid-size('font-size', 6px, 14px);
 
   user-select: none;
   color: #fff;
@@ -110,5 +110,12 @@ board-scores {
       width: 1.6em;
       padding: 0;
     }
+    @include fluid-size('font-size', 10px, 18px);
+  }
+}
+
+@include breakpoint($mq-col1-phone) {
+  board-scores {
+    @include fluid-size('font-size', 9px, 11px);
   }
 }

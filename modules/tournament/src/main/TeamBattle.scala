@@ -42,7 +42,7 @@ object TeamBattle {
   }
 
   case class TeamLeader(userId: User.ID, magicScore: Int) {
-    def score: Int = magicScore / 10000
+    def score: Int = magicScore / 100000
   }
 
   case class TeamInfo(

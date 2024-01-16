@@ -7353,6 +7353,7 @@ stockfish.wasm@^0.10.0:
 "stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#442-backgammon":
   version "0.8.1-pstrat3.22"
   resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#dba42a852bcb187f6cc6eb013fe9a0f6d58bfaae"
+
   dependencies:
     "@badrap/result" "^0.2.8"
 

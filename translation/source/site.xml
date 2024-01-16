@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
   <string name="playWithAFriend">Play with a friend</string>
-  <string name="playWithTheMachine">Play with the computer</string>
+  <string name="playWithTheMachine">Play with Stockfish</string>
+  <string name="playWithBots">Play with a bot</string>
   <string name="toInviteSomeoneToPlayGiveThisUrl">To invite someone to play, give this URL</string>
   <string name="gameOver">Game Over</string>
   <string name="waitingForOpponent">Waiting for opponent</string>
@@ -196,6 +197,7 @@
   <string name="variant">Variant</string>
   <string name="variants">Variants</string>
   <string name="rulesVariants">Rules &amp; Variants</string>
+  <string name="clockTypes">Clock Types</string>
   <string name="medley">Medley</string>
   <string name="medleyTournaments">Medley Tournaments</string>
   <string name="medleyDefinition">A different game/variant in every round of the Swiss</string>
@@ -209,6 +211,8 @@
   <string name="timeControl">Time control</string>
   <string name="realTime">Fischer Clock</string>
   <string name="byoyomiTime">Byoyomi Clock</string>
+  <string name="bronsteinDelay">Bronstein Delay</string>
+  <string name="simpleDelay">Simple Delay</string>
   <string name="correspondence">Correspondence</string>
   <string name="daysPerTurn">Days per turn</string>
   <string name="oneDay">One day</string>
@@ -585,9 +589,12 @@ computer analysis, game chat and shareable URL.</string>
   <string name="newPasswordStrength">Password strength</string>
   <string name="clockInitialTime">Clock initial time</string>
   <string name="clockIncrement">Clock increment</string>
+  <string name="clockDelay">Clock delay</string>
   <string name="clockByoyomi">Clock Byoyomi</string>
   <string name="numberOfPeriods">Number of periods</string>
   <string name="useByoyomi">Use Byoyomi Clock</string>
+  <string name="useBronsteinDelay">Use Bronstein Delay</string>
+  <string name="useSimpleDelay">Use Simple Delay</string>
   <string name="privacy">Privacy</string>
   <string name="privacyPolicy">Privacy policy</string>
   <string name="letOtherPlayersFollowYou">Let other players follow you</string>

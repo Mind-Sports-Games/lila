@@ -40,19 +40,26 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
               val clocks = ~(for {
                 clk   <- game.clock
                 times <- game.bothClockStates
-              } yield Vector(clk.config.initTime, clk.config.initTime) ++ times)
+              } yield Vector(
+                Centis(clk.graceSeconds * 100),
+                clk.config.initTime,
+                clk.config.initTime
+              ) ++ times)
               val clockOffset = game.startPlayerIndex.fold(0, 1)
               Replay.situations(game.variant.gameLogic, game.actionStrs, initialFen, game.variant) foreach {
                 _.zipWithIndex foreach { case (s, index) =>
-                  val clk = for {
-                    p1 <- clocks.lift(index + 1 - clockOffset)
-                    p2 <- clocks.lift(index - clockOffset)
-                  } yield (p1, p2)
-                  queue offer toJson(
-                    Forsyth.exportBoard(s.board.variant.gameLogic, s.board),
-                    s.player,
-                    s.board.history.lastMove.map(_.uci),
-                    clk
+                  val clkValues = for {
+                    p1           <- clocks.lift(index + 2 - clockOffset)
+                    p2           <- clocks.lift(index + 1 - clockOffset)
+                    graceSeconds <- clocks.lift(index)
+                  } yield (p1, p2, Centis(0), Centis(0), graceSeconds, graceSeconds)
+                  queue.offer(
+                    toJson(
+                      Forsyth.exportBoard(s.board.variant.gameLogic, s.board),
+                      s.player,
+                      s.board.history.lastAction.map(_.uci),
+                      clkValues
+                    )
                   )
                 }
               }
@@ -83,7 +90,14 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
       game.turnPlayerIndex,
       lastMoveUci,
       game.clock.map { clk =>
-        (clk.remainingTime(strategygames.P1), clk.remainingTime(strategygames.P2))
+        (
+          clk.remainingTime(strategygames.P1),
+          clk.remainingTime(strategygames.P2),
+          clk.pending(strategygames.P1),
+          clk.pending(strategygames.P2),
+          Centis(clk.graceSeconds * 100),
+          Centis(clk.graceSeconds * 100)
+        )
       }
     )
 
@@ -91,7 +105,7 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
       boardFen: String,
       turnPlayerIndex: PlayerIndex,
       lastMoveUci: Option[String],
-      clock: Option[(Centis, Centis)]
+      clock: Option[(Centis, Centis, Centis, Centis, Centis, Centis)]
   ): JsObject =
     clock.foldLeft(
       Json
@@ -99,6 +113,13 @@ final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(
         .add("lm" -> lastMoveUci)
     ) { case (js, clk) =>
       // TODO: this has the potential to introduce bugs, but is consistent with our rename
-      js ++ Json.obj("p1" -> clk._1.roundSeconds, "p2" -> clk._2.roundSeconds)
+      js ++ Json.obj(
+        "p1"        -> clk._1.roundSeconds,
+        "p2"        -> clk._2.roundSeconds,
+        "p1Pending" -> clk._3.roundSeconds,
+        "p2Pending" -> clk._4.roundSeconds,
+        "p1Delay"   -> clk._5.roundSeconds,
+        "p2Delay"   -> clk._6.roundSeconds
+      )
     }
 }

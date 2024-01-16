@@ -107,14 +107,25 @@ object crud {
         form3.group(form("minutes"), raw("Duration in minutes"), half = true)(form3.input(_, typ = "number"))
       ),
       form3.split(
-        form3.group(form("clockTime"), raw("Clock time"), half = true)(
+        form3.group(form("clock.limit"), raw("Clock time"), half = true)(
           form3.select(_, TournamentForm.clockTimeChoices)
         ),
-        form3.group(form("clockIncrement"), raw("Clock increment"), half = true)(
+        form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
           form3.select(_, TournamentForm.clockIncrementChoices)
+        ),
+        form3.group(form("clock.delay"), trans.clockDelay(), klass = "clockDelay", half = true)(
+          form3.select(_, TournamentForm.clockDelayChoices)
         )
       ),
-      frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi())),
+      form3.split(
+        form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi(), disabled = disabledAfterStart),
+        form3.checkbox(
+          form("clock.useBronsteinDelay"),
+          trans.useBronsteinDelay(),
+          disabled = disabledAfterStart
+        ),
+        form3.checkbox(form("clock.useSimpleDelay"), trans.useSimpleDelay(), disabled = disabledAfterStart)
+      ),
       form3.split(
         form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
           form3.select(_, TournamentForm.clockByoyomiChoices, disabled = disabledAfterStart)

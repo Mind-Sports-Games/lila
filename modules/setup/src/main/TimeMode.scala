@@ -4,14 +4,16 @@ sealed abstract class TimeMode(val id: Int)
 
 object TimeMode {
 
-  case object Unlimited      extends TimeMode(0)
-  case object FischerClock   extends TimeMode(1)
-  case object Correspondence extends TimeMode(2)
-  case object ByoyomiClock   extends TimeMode(3)
+  case object Unlimited           extends TimeMode(0)
+  case object FischerClock        extends TimeMode(1)
+  case object Correspondence      extends TimeMode(2)
+  case object ByoyomiClock        extends TimeMode(3)
+  case object BronsteinDelayClock extends TimeMode(4)
+  case object SimpleDelayClock    extends TimeMode(5)
 
   val default = FischerClock
 
-  val all = List(Unlimited, FischerClock, ByoyomiClock, Correspondence)
+  val all = List(Unlimited, FischerClock, ByoyomiClock, BronsteinDelayClock, SimpleDelayClock, Correspondence)
 
   val ids = all map (_.id)
 
@@ -26,6 +28,8 @@ object TimeMode {
   def ofGame(game: lila.game.Game) =
     if (game.hasFischerClock) FischerClock
     else if (game.hasByoyomiClock) ByoyomiClock
+    else if (game.hasBronsteinClock) BronsteinDelayClock
+    else if (game.hasSimpleDelayClock) SimpleDelayClock
     else if (game.hasCorrespondenceClock) Correspondence
     else Unlimited
 }

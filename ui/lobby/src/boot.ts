@@ -173,7 +173,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     clickEvent = opts.blindMode ? 'click' : 'mousedown';
 
   $startButtons
-    .find('a:not(.disabled)')
+    .find('a:not(.disabled, .just-a-link)')
     .on(clickEvent, function (this: HTMLAnchorElement) {
       $(this).addClass('active').siblings().removeClass('active');
       playstrategy.loadCssPath('lobby.setup');
@@ -216,6 +216,14 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     }
 
     history.replaceState(null, '', '/');
+  } else if (location.hash == '#bot') {
+    $startButtons
+      .find('.config_friend')
+      .each(function (this: HTMLElement) {
+        this.dataset.hrefAddon = location.search;
+      })
+      .trigger(clickEvent);
+    $startButtons.find('.config_bot').addClass('active').siblings().removeClass('active');
   }
 
   const $gamelist_button_right = $('#slideRight'),
@@ -252,7 +260,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     });
 
     let scrollAmount = 0;
-    var slideTimer = setInterval(function () {
+    const slideTimer = setInterval(function () {
       if (direction == 'left') {
         element.scrollLeft -= step;
       } else {

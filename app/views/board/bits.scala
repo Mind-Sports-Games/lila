@@ -58,7 +58,7 @@ object bits {
         Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)
       ),
       boardOrientation(pov),
-      ~pov.game.lastMoveKeys,
+      ~pov.game.lastActionKeys,
       boardSize(pov),
       pov.game.variant.key
     ) _

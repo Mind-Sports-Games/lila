@@ -252,6 +252,7 @@ export function getGoScore(fen: string, playerIndex: string): number {
 }
 
 const noCevalVariants = [
+  'monster',
   'linesOfAction',
   'scrambledEggs',
   'shogi',

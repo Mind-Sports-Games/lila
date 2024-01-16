@@ -16,17 +16,18 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   }
   const secondsLeft = Math.floor(timeLeft / 1000),
     myTurn = isPlayerTurn(ctrl.data),
-    transStr = ctrl.data.expirationAtStart
-      ? myTurn
+    transStr =
+      ctrl.data.expirationOnPaused && ctrl.data.deadStoneOfferState == 'ChooseFirstOffer'
+        ? myTurn
+          ? 'nbSecondsToOfferDeadStones'
+          : 'nbSecondsForOpponentToOfferDeadStones'
+        : ctrl.data.expirationOnPaused
+        ? myTurn
+          ? 'nbSecondsToRespondToOffer'
+          : 'nbSecondsForOpponentToRespondToOffer'
+        : myTurn
         ? 'nbSecondsToPlayTheFirstMove'
-        : 'nbSecondsForOpponentToPlayTheFirstMove'
-      : ctrl.data.deadStoneOfferState == 'ChooseFirstOffer'
-      ? myTurn
-        ? 'nbSecondsToOfferDeadStones'
-        : 'nbSecondsForOpponentToOfferDeadStones'
-      : myTurn
-      ? 'nbSecondsToRespondToOffer'
-      : 'nbSecondsForOpponentToRespondToOffer';
+        : 'nbSecondsForOpponentToPlayTheFirstMove';
 
   let emerg = myTurn && timeLeft < 8000;
   if (!rang && emerg) {

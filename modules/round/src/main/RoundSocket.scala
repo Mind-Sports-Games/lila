@@ -50,7 +50,7 @@ final class RoundSocket(
   }
 
   def getGame(gameId: Game.ID): Fu[Option[Game]] =
-    rounds.getOrMake(gameId).getGame addEffect { g =>
+    rounds.getOrMake(gameId).getGame.addEffect { g =>
       if (g.isEmpty) finishRound(Game.Id(gameId))
     }
   def getGames(gameIds: List[Game.ID]): Fu[List[(Game.ID, Option[Game])]] =

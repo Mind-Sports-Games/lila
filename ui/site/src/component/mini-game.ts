@@ -4,7 +4,11 @@ interface UpdateData {
   lm: string;
   fen: string;
   p1?: number;
+  p1Pending?: number;
+  p1Delay?: number;
   p2?: number;
+  p2Pending?: number;
+  p2Delay?: number;
 }
 
 const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
@@ -36,6 +40,8 @@ export const init = (node: HTMLElement) => {
         $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
           $(this).clock({
             time: parseInt(this.getAttribute('data-time')!),
+            delay: parseInt(this.getAttribute('data-time-delay')!),
+            pending: parseInt(this.getAttribute('data-time-pending')!),
             pause: playerIndex != turnPlayerIndex,
           });
         })
@@ -112,6 +118,8 @@ export const init = (node: HTMLElement) => {
         $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
           $(this).clock({
             time: parseInt(this.getAttribute('data-time')!),
+            delay: parseInt(this.getAttribute('data-time-delay')!),
+            pending: parseInt(this.getAttribute('data-time-pending')!),
             pause: playerIndex != turnPlayerIndex,
           });
         })
@@ -144,15 +152,23 @@ export const update = (node: HTMLElement, data: UpdateData) => {
       lastMove,
     });
   const turnPlayerIndex = fenPlayerIndex(data.fen);
-  const renderClock = (time: number | undefined, playerIndex: string) => {
+  const renderClock = (
+    time: number | undefined,
+    delay: number | undefined,
+    pending: number | undefined,
+    playerIndex: string
+  ) => {
     if (!isNaN(time!))
       $el.find('.mini-game__clock--' + playerIndex).clock('set', {
         time,
+        delay,
+        pending,
         pause: playerIndex != turnPlayerIndex,
       });
   };
-  renderClock(data.p1, 'p1');
-  renderClock(data.p2, 'p2');
+  console.log(data);
+  renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
+  renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
 };
 
 export const finish = (node: HTMLElement, win?: string) =>
