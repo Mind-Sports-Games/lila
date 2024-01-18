@@ -52,7 +52,8 @@ export const justIcon = (icon: string): VNodeData => ({
 
 // TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
-  if (!uci || uci == 'pass' || uci.substring(0, 3) == 'ss:') return undefined;
+  if (!uci || uci == 'pass' || uci == 'roll' || uci.includes('|') || uci.substring(0, 3) == 'ss:') return undefined;
+  //TODO support dice roll here or undefined?
   const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
   return [pos[0], pos[1]] as cg.Key[];
@@ -76,9 +77,13 @@ export const bind = (eventName: string, f: (e: Event) => void, redraw?: Redraw, 
     );
   });
 
-export function parsePossibleMoves(dests?: EncodedDests): Dests {
+export function parsePossibleMoves(dests?: EncodedDests, activeDiceValue?: number): Dests {
   const dec = new Map();
   if (!dests) return dec;
+  if (activeDiceValue) {
+    //TODO filter out move not using the ative dice value
+    console.log('activeDiceValue', activeDiceValue);
+  }
   if (typeof dests == 'string')
     for (const ds of dests.split(' ')) {
       const pos = ds.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
@@ -155,12 +160,25 @@ export function getGoKomi(fen: string): number {
 }
 
 export function getBackgammonDice(fen: string): cg.Dice[] {
-  //TODO backgammon get dice values from fen
-  console.log(fen);
-  return [
-    { value: 6, isAvailable: true },
-    { value: 3, isAvailable: true },
-  ];
+  const unusedDice = fen.split(' ')[4].replace('-', '').split('|');
+  const usedDice = fen.split(' ')[5].replace('-', '').split('|');
+  const dice = [];
+  for (const d of unusedDice) {
+    if (+d) dice.push({ value: +d, isAvailable: true });
+  }
+  for (const d of usedDice) {
+    if (+d) dice.push({ value: +d, isAvailable: false });
+  }
+  return dice;
+}
+
+export function parseDiceRoll(dice: string | undefined): cg.Dice[] {
+  if (dice === undefined) return [];
+  const diceRoll = [];
+  for (const d of dice.split('|')) {
+    if (+d) diceRoll.push({ value: +d, isAvailable: true });
+  }
+  return diceRoll;
 }
 
 export function goStonesToSelect(deadstones: cg.Key[], pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {

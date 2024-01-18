@@ -48,7 +48,9 @@ export function makeConfig(ctrl: RoundController): Config {
     movable: {
       free: false,
       playerIndex: playing ? data.player.playerIndex : undefined,
-      dests: playing ? util.parsePossibleMoves(data.possibleMoves) : new Map(),
+      dests: playing
+        ? util.parsePossibleMoves(data.possibleMoves, data.dice ? data.dice[0].value : undefined)
+        : new Map(),
       showDests: data.pref.destination,
       rookCastle: data.pref.rookCastle,
       events: {

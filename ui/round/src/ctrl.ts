@@ -45,6 +45,8 @@ import {
   SocketMove,
   SocketDrop,
   SocketPass,
+  SocketRoll,
+  SocketEndTurn,
   SocketOpts,
   MoveMetadata,
   Position,
@@ -261,7 +263,7 @@ export default class RoundController {
 
   private onSelectDice = (dice: cg.Dice[]) => {
     this.data.dice = dice;
-    this.chessground.redrawAll(); //redraw dice
+    this.chessground.redrawAll(); //redraw dice + possible moves/drops
   };
 
   private isSimulHost = () => {
@@ -360,7 +362,7 @@ export default class RoundController {
     } else
       config.movable = {
         playerIndex: this.isPlaying() ? this.data.player.playerIndex : undefined,
-        dests: util.parsePossibleMoves(this.data.possibleMoves),
+        dests: util.parsePossibleMoves(this.data.possibleMoves, this.data.dice ? this.data.dice[0].value : undefined),
       };
     (config.dropmode = {
       dropDests: this.isPlaying() ? stratUtils.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
@@ -532,6 +534,15 @@ export default class RoundController {
     d.possibleMoves = activePlayerIndex ? o.dests : undefined;
     d.possibleDrops = activePlayerIndex ? o.drops : undefined;
     d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
+
+    //TODO set the right data from all backgammon actions
+    d.canRollDice = activePlayerIndex ? o.canRollDice : undefined;
+    if (o.dice) {
+      d.dice = util.parseDiceRoll(o.dice);
+    } else {
+      d.dice = util.getBackgammonDice(o.fen);
+    }
+
     d.crazyhouse = o.crazyhouse;
     d.takebackable = d.canTakeBack ? o.takebackable : false;
     //from pass move (or drop)
@@ -595,7 +606,7 @@ export default class RoundController {
       this.chessground.set({
         turnPlayerIndex: d.game.player,
         movable: {
-          dests: playing ? util.parsePossibleMoves(d.possibleMoves) : new Map(),
+          dests: playing ? util.parsePossibleMoves(d.possibleMoves, d.dice ? d.dice[0].value : undefined) : new Map(),
         },
         dropmode: {
           dropDests: playing ? stratUtils.readDropsByRole(d.possibleDropsByRole) : new Map(),
@@ -673,6 +684,9 @@ export default class RoundController {
     ) {
       this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
     }
+    if (playing && !this.replaying() && d.game.variant.key === 'backgammon' && d.canRollDice) {
+      this.forceRollDice(d.game.variant.key);
+    }
     return true; // prevents default socket pubsub
   };
 
@@ -686,6 +700,29 @@ export default class RoundController {
       }
     }
   }
+
+  private forceRollDice(variantKey: VariantKey) {
+    console.log('forceDiceRoll');
+    this.sendRollDice(variantKey);
+  }
+
+  sendRollDice = (variant: VariantKey): void => {
+    const roll: SocketRoll = {
+      variant: variant,
+    };
+    if (blur.get()) roll.b = 1;
+    this.resign(false);
+    this.actualSendMove('diceroll', roll);
+  };
+
+  sendEndTurn = (variant: VariantKey): void => {
+    const endTurn: SocketEndTurn = {
+      variant: variant,
+    };
+    if (blur.get()) endTurn.b = 1;
+    this.resign(false);
+    this.actualSendMove('endTurn', endTurn);
+  };
 
   private playPredrop = () => {
     return this.chessground.playPredrop(drop => {
@@ -1026,6 +1063,9 @@ export default class RoundController {
       d.possibleMoves
     ) {
       this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
+    }
+    if (this.isPlaying() && !this.replaying() && d.game.variant.key === 'backgammon' && d.canRollDice) {
+      this.forceRollDice(d.game.variant.key);
     }
     if (this.isPlaying() && game.nbMoves(d, d.player.playerIndex) === 0 && !this.isSimulHost()) {
       playstrategy.sound.play('genericNotify');

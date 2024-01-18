@@ -116,6 +116,8 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
     case 'go13x13':
     case 'go19x19':
       return { playerIndex: turnPlayerIndex, role: 's-piece' };
+    case 'backgammon':
+      return { playerIndex: turnPlayerIndex, role: 's-piece' };
     default:
       return undefined;
   }

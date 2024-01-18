@@ -43,6 +43,16 @@ export interface SocketPass {
   b?: 1;
 }
 
+export interface SocketRoll {
+  variant: string;
+  b?: 1;
+}
+
+export interface SocketEndTurn {
+  variant: string;
+  b?: 1;
+}
+
 export type EncodedDests =
   | string
   | {
@@ -68,6 +78,7 @@ export interface RoundData extends GameData {
   calculatedCGGoScores?: cg.SimpleGoScores;
   deadStoneOfferState?: string;
   dice?: cg.Dice[];
+  canRollDice?: boolean;
   pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
@@ -160,6 +171,8 @@ export interface ApiMove extends Step {
   role?: cg.Role;
   drops?: string;
   dropsByRole?: string;
+  canRollDice?: boolean;
+  dice?: string;
   multiActionMetaData?: MultiActionMetaData;
   canSelectSquares?: boolean;
   deadStoneOfferState?: string;

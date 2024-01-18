@@ -519,9 +519,10 @@ object Event {
         pocketData
       ) {
         Json.obj(
-          "dice" -> dice.mkString("|"),
-          "uci"  -> dice.mkString("|"),
-          "san"  -> san
+          "dice"        -> dice.mkString("|"),
+          "uci"         -> dice.mkString("|"),
+          "san"         -> san,
+          "canRollDice" -> false //todo add this to other actions?
         )
       }
     override def moveBy = Some(!state.playerIndex)

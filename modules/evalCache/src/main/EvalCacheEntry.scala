@@ -106,6 +106,7 @@ object EvalCacheEntry {
       case Uci.ChessMove(_)          => GameLogic.Chess()
       case Uci.ChessDrop(_)          => GameLogic.Chess()
       case Uci.ChessDiceRoll(_)      => GameLogic.Chess()
+      case Uci.ChessDoRoll(_)        => GameLogic.Chess()
       case Uci.DraughtsMove(_)       => GameLogic.Draughts()
       case Uci.FairySFMove(_)        => GameLogic.FairySF()
       case Uci.FairySFDrop(_)        => GameLogic.FairySF()
@@ -117,6 +118,7 @@ object EvalCacheEntry {
       case Uci.BackgammonMove(_)     => GameLogic.Backgammon()
       case Uci.BackgammonDrop(_)     => GameLogic.Backgammon()
       case Uci.BackgammonDiceRoll(_) => GameLogic.Backgammon()
+      case Uci.BackgammonDoRoll(_)   => GameLogic.Backgammon()
     }
   }
 

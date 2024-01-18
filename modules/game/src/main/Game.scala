@@ -20,6 +20,7 @@ import strategygames.{
   Move,
   Drop,
   Pass,
+  DiceRoll,
   SelectSquares,
   Action,
   Pos,
@@ -269,9 +270,10 @@ case class Game(
 
     val events = {
       action match {
-        case m: Move => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
-        case d: Drop => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
-        case p: Pass => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
+        case m: Move     => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
+        case d: Drop     => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
+        case p: Pass     => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
+        case r: DiceRoll => Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
       }
@@ -331,6 +333,7 @@ case class Game(
       case d: Uci.Drop          => s"${d.pos}${d.pos}"
       case m: Uci.Move          => m.keys
       case _: Uci.Pass          => "pass"
+      case _: Uci.DiceRoll      => "roll"
       case _: Uci.SelectSquares => "ss:"
       case _                    => sys.error("Type Error")
     }

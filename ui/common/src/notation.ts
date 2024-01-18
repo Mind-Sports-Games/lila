@@ -449,13 +449,18 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
 }
 
 function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  //TODO support all uci from actions
+  console.log(move.uci);
+  if (move.uci === 'roll') return '';
+  if (move.uci.includes('|')) return `${move.uci.replace('|', '')}:  `;
+
   const reg = move.uci.match(/[a-lsA-LS][1-2@]/g) as string[];
   const orig = reg[0];
   const dest = reg[1];
   const isDrop = reg[0].includes('@');
   const movePlayer = move.prevFen.split(' ')[1] === 'w' ? 'p1' : 'p2';
   const moveOpponent = move.prevFen.split(' ')[1] === 'w' ? 'p2' : 'p1';
-  //TODO get this from the fen when it exists?
+  //TODO get this from the fen when it exists and fix test
   const diceRoll = '43';
 
   //captures
