@@ -383,7 +383,7 @@ export default class AnalyseCtrl {
       isForwardStep = pathChanged && path.length == this.path.length + 2;
     this.setPath(path);
     this.showGround();
-    if (this.data.game.variant.key === 'togyzkumalak') {
+    if (this.data.game.variant.key === 'togyzkumalak' && this.chessground) {
       this.chessground.redrawAll(); //redraw board scores
     }
     if (pathChanged) {
