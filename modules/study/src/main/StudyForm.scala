@@ -43,8 +43,8 @@ object StudyForm {
       def validFen: Boolean = actualFen
         .fold(true) { f =>
           (Forsyth
-            .<<<(variant.gameLogic, f))
-            .exists(_.situation playable false)
+            .<<<@(variant.gameLogic, variant, f))
+            .exists(_.situation.playable(false))
         }
 
       def as: As =
