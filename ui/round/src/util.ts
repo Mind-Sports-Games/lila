@@ -198,12 +198,6 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisBoardVariants: VariantKey[] = ['amazons', 'go9x9', 'go13x13', 'go19x19'];
-
-export function allowAnalysisForVariant(variant: VariantKey) {
-  return noAnalysisBoardVariants.indexOf(variant) == -1;
-}
-
 export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {
   if (onlyDropsVariant) {
     if (uci && uci[1] === '@') {
