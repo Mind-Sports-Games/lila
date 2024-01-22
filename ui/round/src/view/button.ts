@@ -173,6 +173,15 @@ export const passConfirm = (ctrl: RoundController): VNode =>
     fbtCancel(ctrl, ctrl.passTurn),
   ]);
 
+export const endTurnConfirm = (ctrl: RoundController): VNode =>
+  h('div.act-confirm', [
+    h('button.fbt.yes.endturn-yes', {
+      attrs: { title: ctrl.noarg('endTurn'), 'data-icon': '' },
+      hook: util.bind('click', () => ctrl.endTurnAction()),
+    }),
+    fbtCancel(ctrl, ctrl.undoAction),
+  ]);
+
 export const offerSelectSquaresButton = (ctrl: RoundController, isNotSameOffer = true): VNode =>
   h('button.select-squares-offer.button', {
     class: { disabled: !isNotSameOffer },

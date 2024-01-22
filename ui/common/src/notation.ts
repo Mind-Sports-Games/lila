@@ -450,9 +450,9 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
 
 function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   //TODO support all uci from actions
-  console.log(move.uci);
+  console.log('notation move.uci', move.uci);
   if (move.uci === 'roll') return '';
-  if (move.uci.includes('|')) return `${move.uci.replace('|', '')}:  `;
+  if (move.uci.includes('|')) return `${move.uci.replace('|', '')}: ?`;
 
   const reg = move.uci.match(/[a-lsA-LS][1-2@]/g) as string[];
   const orig = reg[0];

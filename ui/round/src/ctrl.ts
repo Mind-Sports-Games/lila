@@ -45,7 +45,9 @@ import {
   SocketMove,
   SocketDrop,
   SocketPass,
-  SocketRoll,
+  SocketDoRoll,
+  SocketLift,
+  SocketUndo,
   SocketEndTurn,
   SocketOpts,
   MoveMetadata,
@@ -81,6 +83,7 @@ export default class RoundController {
   transientMove: TransientMove;
   moveToSubmit?: SocketMove;
   dropToSubmit?: SocketDrop;
+  liftToSubmit?: SocketLift;
   goneBerserk: GoneBerserk = {};
   resignConfirm?: Timeout = undefined;
   drawConfirm?: Timeout = undefined;
@@ -536,15 +539,18 @@ export default class RoundController {
     d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
 
     //TODO set the right data from all backgammon actions
-    d.canRollDice = activePlayerIndex ? o.canRollDice : undefined;
+    d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
     if (o.dice) {
       d.dice = util.parseDiceRoll(o.dice);
     } else {
-      d.dice = util.getBackgammonDice(o.fen);
+      //TODO add dice to backgammon board gen?
+      //d.dice = util.getBackgammonDice(o.fen);
     }
 
     d.crazyhouse = o.crazyhouse;
     d.takebackable = d.canTakeBack ? o.takebackable : false;
+    d.canUndo = activePlayerIndex ? o.canUndo : false;
+    d.canEndTurn = activePlayerIndex ? o.canEndTurn : false;
     //from pass move (or drop)
     if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) {
       d.selectMode = o.canSelectSquares ? activePlayerIndex : false;
@@ -684,7 +690,7 @@ export default class RoundController {
     ) {
       this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
     }
-    if (playing && !this.replaying() && d.game.variant.key === 'backgammon' && d.canRollDice) {
+    if (playing && !this.replaying() && d.game.variant.key === 'backgammon' && d.canOnlyRollDice) {
       this.forceRollDice(d.game.variant.key);
     }
     return true; // prevents default socket pubsub
@@ -707,12 +713,38 @@ export default class RoundController {
   }
 
   sendRollDice = (variant: VariantKey): void => {
-    const roll: SocketRoll = {
+    const roll: SocketDoRoll = {
       variant: variant,
     };
     if (blur.get()) roll.b = 1;
     this.resign(false);
     this.actualSendMove('diceroll', roll);
+  };
+
+  sendLift = (variant: VariantKey, role: cg.Role, key: cg.Key): void => {
+    const lift: SocketLift = {
+      role: role,
+      pos: key,
+      variant: variant,
+    };
+    if (blur.get()) lift.b = 1;
+    this.resign(false);
+    this.actualSendMove('lift', lift);
+  };
+
+  sendUndo = (variant: VariantKey): void => {
+    //TODO decide on which strucutre to use
+
+    //action style
+    const undo: SocketUndo = {
+      variant: variant,
+    };
+    if (blur.get()) undo.b = 1;
+    this.resign(false);
+    this.actualSendMove('undo', undo);
+
+    //event/takeback style
+    //this.socket.sendLoading('undo');
   };
 
   sendEndTurn = (variant: VariantKey): void => {
@@ -928,10 +960,11 @@ export default class RoundController {
   };
 
   submitMove = (v: boolean): void => {
-    const toSubmit = this.moveToSubmit || this.dropToSubmit;
+    const toSubmit = this.moveToSubmit || this.dropToSubmit || this.liftToSubmit;
     if (v && toSubmit) {
       if (this.moveToSubmit) this.actualSendMove('move', this.moveToSubmit);
-      else this.actualSendMove('drop', this.dropToSubmit);
+      else if (this.dropToSubmit) this.actualSendMove('drop', this.dropToSubmit);
+      else this.actualSendMove('lift', this.liftToSubmit);
       playstrategy.sound.play('confirmation');
     } else this.jump(this.ply);
     this.cancelMove();
@@ -941,6 +974,7 @@ export default class RoundController {
   cancelMove = (): void => {
     this.moveToSubmit = undefined;
     this.dropToSubmit = undefined;
+    this.liftToSubmit = undefined;
   };
 
   private onChange = () => {
@@ -1042,6 +1076,22 @@ export default class RoundController {
     this.sendPass(this.data.game.variant.key);
   };
 
+  undoAction = (): void => {
+    console.log('undoAction called');
+    if (this.data.canUndo) {
+      this.sendUndo(this.data.game.variant.key);
+    }
+    this.redraw();
+  };
+
+  endTurnAction = (): void => {
+    console.log('endTurnAction called');
+    if (this.data.canEndTurn) {
+      this.sendEndTurn(this.data.game.variant.key);
+    }
+    this.redraw();
+  };
+
   setChessground = (cg: CgApi) => {
     this.chessground = cg;
     if (this.data.pref.keyboardMove) {
@@ -1064,7 +1114,7 @@ export default class RoundController {
     ) {
       this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
     }
-    if (this.isPlaying() && !this.replaying() && d.game.variant.key === 'backgammon' && d.canRollDice) {
+    if (this.isPlaying() && !this.replaying() && d.game.variant.key === 'backgammon' && d.canOnlyRollDice) {
       this.forceRollDice(d.game.variant.key);
     }
     if (this.isPlaying() && game.nbMoves(d, d.player.playerIndex) === 0 && !this.isSimulHost()) {

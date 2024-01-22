@@ -60,6 +60,9 @@ object Event {
         threefold: Boolean,
         perpetualWarning: Boolean,
         takebackable: Boolean,
+        canOnlyRollDice: Boolean,
+        canEndTurn: Boolean,
+        canUndo: Boolean,
         state: State,
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
@@ -89,6 +92,9 @@ object Event {
         .add("takebackable" -> takebackable)
         .add("wDraw" -> state.p1OffersDraw)
         .add("bDraw" -> state.p2OffersDraw)
+        .add("canOnlyRollDice" -> canOnlyRollDice)
+        .add("canEndTurn" -> canEndTurn)
+        .add("canUndo" -> canUndo)
         .add("crazyhouse" -> pocketData)
         .add("drops" -> possibleDrops.map { squares =>
           JsString(squares.map(_.key).mkString)
@@ -109,6 +115,9 @@ object Event {
       enpassant: Option[Enpassant],
       castle: Option[Castling],
       takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -127,6 +136,9 @@ object Event {
         threefold,
         perpetualWarning,
         takebackable,
+        canOnlyRollDice: Boolean,
+        canEndTurn: Boolean,
+        canUndo: Boolean,
         state,
         clock,
         possibleMoves,
@@ -192,6 +204,9 @@ object Event {
           Castling(king, rook, move.player)
         },
         takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
         state = state,
         clock = clock,
         possibleMoves = (situation, move.dest) match {
@@ -248,6 +263,9 @@ object Event {
       threefold: Boolean,
       perpetualWarning: Boolean,
       takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -265,6 +283,9 @@ object Event {
         threefold,
         perpetualWarning,
         takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
         state,
         clock,
         possibleMoves,
@@ -304,6 +325,9 @@ object Event {
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
         takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
@@ -338,6 +362,9 @@ object Event {
       threefold: Boolean,
       perpetualWarning: Boolean,
       takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -354,6 +381,9 @@ object Event {
         threefold,
         perpetualWarning,
         takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
         state,
         clock,
         possibleMoves,
@@ -394,6 +424,9 @@ object Event {
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
         takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
@@ -420,6 +453,9 @@ object Event {
       threefold: Boolean,
       perpetualWarning: Boolean,
       takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -436,6 +472,9 @@ object Event {
         threefold,
         perpetualWarning,
         takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
         state,
         clock,
         possibleMoves,
@@ -469,6 +508,9 @@ object Event {
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
         takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
@@ -495,6 +537,9 @@ object Event {
       threefold: Boolean,
       perpetualWarning: Boolean,
       takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
@@ -511,6 +556,9 @@ object Event {
         threefold,
         perpetualWarning,
         takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
         state,
         clock,
         possibleMoves,
@@ -519,10 +567,9 @@ object Event {
         pocketData
       ) {
         Json.obj(
-          "dice"        -> dice.mkString("|"),
-          "uci"         -> dice.mkString("|"),
-          "san"         -> san,
-          "canRollDice" -> false //todo add this to other actions?
+          "dice" -> dice.mkString("|"),
+          "uci"  -> dice.mkString("|"),
+          "san"  -> san
         )
       }
     override def moveBy = Some(!state.playerIndex)
@@ -544,6 +591,9 @@ object Event {
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
         takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
@@ -605,6 +655,23 @@ object Event {
         moves.foldLeft(JsObject(Nil)) { case (res, (o, d)) =>
           res + (o.key -> JsString(d map (_.key) mkString))
         }
+  }
+
+  //TODO decide on the json format for dice moves (and drops)
+  object PossibleMovesByDice {
+    def json(moves: Map[Int, List[Pos]]) =
+      if (moves.isEmpty) JsNull
+      else {
+        val sb    = new java.lang.StringBuilder(128)
+        var first = true
+        moves foreach { case (orig, dests) =>
+          if (first) first = false
+          else sb append " "
+          sb append orig.toString
+          dests foreach { sb append _.key }
+        }
+        JsString(sb.toString)
+      }
   }
 
   case class Enpassant(pos: Pos, playerIndex: PlayerIndex) extends Event {

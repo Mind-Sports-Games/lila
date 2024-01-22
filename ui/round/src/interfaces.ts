@@ -37,17 +37,24 @@ export interface SocketDrop {
   variant: string;
   b?: 1;
 }
-
 export interface SocketPass {
   variant: string;
   b?: 1;
 }
-
-export interface SocketRoll {
+export interface SocketDoRoll {
   variant: string;
   b?: 1;
 }
-
+export interface SocketLift {
+  role: cg.Role;
+  pos: cg.Key;
+  variant: string;
+  b?: 1;
+}
+export interface SocketUndo {
+  variant: string;
+  b?: 1;
+}
 export interface SocketEndTurn {
   variant: string;
   b?: 1;
@@ -78,7 +85,9 @@ export interface RoundData extends GameData {
   calculatedCGGoScores?: cg.SimpleGoScores;
   deadStoneOfferState?: string;
   dice?: cg.Dice[];
-  canRollDice?: boolean;
+  canOnlyRollDice: boolean;
+  canUndo: boolean;
+  canEndTurn: boolean;
   pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
@@ -171,7 +180,9 @@ export interface ApiMove extends Step {
   role?: cg.Role;
   drops?: string;
   dropsByRole?: string;
-  canRollDice?: boolean;
+  canOnlyRollDice: boolean;
+  canUndo: boolean;
+  canEndTurn: boolean;
   dice?: string;
   multiActionMetaData?: MultiActionMetaData;
   canSelectSquares?: boolean;

@@ -154,15 +154,14 @@ final class JsonView(
               .add("showCaptured" -> pref.captured)
               .add("submitMove" -> {
                 import Pref.SubmitMove._
-                (pref.submitMove, pov.game.variant.gameLogic.name == "Backgammon") match {
-                  case (_, true)                                                   => true
-                  case (_, _) if pov.game.hasAi || nvui                            => false
-                  case (ALWAYS, _)                                                 => true
-                  case (CORRESPONDENCE_UNLIMITED, _) if pov.game.isCorrespondence  => true
-                  case (CORRESPONDENCE_ONLY, _) if pov.game.hasCorrespondenceClock => true
-                  case (_, _)                                                      => false
+                pref.submitMove match {
+                  case _ if pov.game.hasAi || nvui                            => false
+                  case ALWAYS                                                 => true
+                  case CORRESPONDENCE_UNLIMITED if pov.game.isCorrespondence  => true
+                  case CORRESPONDENCE_ONLY if pov.game.hasCorrespondenceClock => true
+                  case _                                                      => false
                 }
-              }) //todo add pref for backgammon move confirm and only require at end of actions?
+              })
           )
           .add("clock" -> pov.game.clock.map(clockJson))
           .add("correspondence" -> pov.game.correspondenceClock)
@@ -179,7 +178,9 @@ final class JsonView(
           .add("selectMode" -> selectMode(pov))
           .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
           .add("deadStoneOfferState" -> pov.game.metadata.deadStoneOfferState.map(_.name))
-          .add("canRollDice" -> pov.game.situation.canRollDice)
+          .add("canOnlyRollDice" -> pov.game.situation.canOnlyRollDice)
+          .add("canEndTurn" -> pov.game.situation.canEndTurn)
+          .add("canUndo" -> pov.game.situation.canUndo)
           .add("pauseSecs" -> pov.game.timeWhenPaused.millis.some)
           .add("expirationAtStart" -> pov.game.expirableAtStart.option {
             Json.obj(

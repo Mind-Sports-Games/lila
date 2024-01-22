@@ -83,9 +83,11 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
     },
     move: ctrl.apiMove,
     drop: ctrl.apiMove,
+    lift: ctrl.apiMove,
     pass: ctrl.apiMove,
+    //undo: ctrl.apiMove, //todo handle this event/action and reload data etc.
     diceroll: ctrl.apiMove,
-    endturn: ctrl.apiMove,
+    endTurn: ctrl.apiMove,
     selectSquares: ctrl.apiMove,
     reload,
     redirect: ctrl.setRedirecting,
