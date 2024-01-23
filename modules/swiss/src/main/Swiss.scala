@@ -48,8 +48,8 @@ case class Swiss(
         DateTime.now
           .isAfter(startsAt minusMinutes mbs)
       )
-
-  def isMedley = settings.medleyVariants.nonEmpty
+  def isHalfway = round.value == (settings.nbRounds + 1) / 2
+  def isMedley  = settings.medleyVariants.nonEmpty
 
   def allRounds: List[SwissRound.Number]      = (1 to round.value).toList.map(SwissRound.Number.apply)
   def finishedRounds: List[SwissRound.Number] = (1 until round.value).toList.map(SwissRound.Number.apply)
@@ -176,6 +176,7 @@ object Swiss {
       password: Option[String] = None,
       conditions: SwissCondition.All,
       roundInterval: FiniteDuration,
+      halfwayBreak: FiniteDuration,
       forbiddenPairings: String,
       medleyVariants: Option[List[Variant]] = None,
       minutesBeforeStartToJoin: Option[Int] = None
@@ -186,9 +187,17 @@ object Swiss {
       else if (m < 24 * 60) s"${m / 60} hour${if (m == 60) "" else "s"}"
       else s"${m / 24 / 60} day${if (m == 24 * 60) "" else "s"}"
     )
-    def manualRounds    = intervalSeconds == Swiss.RoundInterval.manual
-    def dailyInterval   = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
-    def usingDrawTables = useDrawTables || usePerPairingDrawTables
+    lazy val halfwayBreakText: Option[String] = (halfwayBreak.toSeconds.toInt match {
+      case 0                  => None
+      case s if s < 60        => Some(s"$s seconds")
+      case s if s < 3600      => Some(s"${s / 60} minute${if (s == 60) "" else "s"}")
+      case s if s < 24 * 3600 => Some(s"${s / 3600} hour${if (s == 60 * 60) "" else "s"}")
+      case s                  => Some(s"${s / 24 / 3600} day${if (s == 24 * 60 * 60) "" else "s"}")
+    }).map(s => s"${s} break after r${halfwayBreakRound}")
+    lazy val halfwayBreakRound = (nbRounds + 1) / 2
+    def manualRounds           = intervalSeconds == Swiss.RoundInterval.manual
+    def dailyInterval          = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
+    def usingDrawTables        = useDrawTables || usePerPairingDrawTables
   }
 
   type ChatFor = Int

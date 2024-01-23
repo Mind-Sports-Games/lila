@@ -84,6 +84,13 @@ object bits {
         )
     }
 
+  def showHalfwayBreak(s: Swiss): Frag =
+    s.settings.dailyInterval match {
+      case Some(_)                         => frag("")
+      case None if s.settings.manualRounds => frag("")
+      case None                            => s.settings.halfwayBreakText.fold(frag(""))(t => frag(t))
+    }
+
   def medleyGames(
       gameGroups: String,
       variants: List[Variant],
