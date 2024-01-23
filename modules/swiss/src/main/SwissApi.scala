@@ -95,7 +95,8 @@ final class SwissApi(
         password = data.password,
         conditions = data.conditions.all,
         forbiddenPairings = ~data.forbiddenPairings,
-        medleyVariants = data.medleyVariants
+        medleyVariants = data.medleyVariants,
+        minutesBeforeStartToJoin = data.realMinutesBeforeStartToJoin
       )
     )
     colls.swiss.insert.one(addFeaturable(swiss)) >>-
@@ -135,6 +136,7 @@ final class SwissApi(
             password = data.password,
             conditions = data.conditions.all,
             forbiddenPairings = ~data.forbiddenPairings,
+            minutesBeforeStartToJoin = data.realMinutesBeforeStartToJoin,
             medleyVariants =
               if (
                 old.medleyGameGroups != Some(

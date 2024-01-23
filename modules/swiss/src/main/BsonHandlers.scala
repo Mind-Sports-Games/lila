@@ -189,7 +189,8 @@ object BsonHandlers {
         password = r.strO("p"),
         conditions = r.getO[SwissCondition.All]("o") getOrElse SwissCondition.All.empty,
         forbiddenPairings = r.getD[String]("fp"),
-        medleyVariants = r.getO[List[Variant]]("mv")
+        medleyVariants = r.getO[List[Variant]]("mv"),
+        minutesBeforeStartToJoin = r.intO("mbs")
       )
     def writes(w: BSON.Writer, s: Swiss.Settings) =
       $doc(
@@ -208,7 +209,8 @@ object BsonHandlers {
         "p"   -> s.password,
         "o"   -> s.conditions.ifNonEmpty,
         "fp"  -> s.forbiddenPairings.some.filter(_.nonEmpty),
-        "mv"  -> s.medleyVariants
+        "mv"  -> s.medleyVariants,
+        "mbs" -> s.minutesBeforeStartToJoin
       )
   }
 

@@ -43,7 +43,12 @@ case class Swiss(
   def isNowOrSoon        = startsAt.isBefore(DateTime.now plusMinutes 15) && !isFinished
   def isRecentlyFinished = finishedAt.exists(f => (nowSeconds - f.getSeconds) < 30 * 60)
   def isEnterable =
-    isNotFinished && round.value <= settings.nbRounds / 2 && nbPlayers < Swiss.maxPlayers
+    isNotFinished && round.value <= settings.nbRounds / 2 && nbPlayers < Swiss.maxPlayers && settings.minutesBeforeStartToJoin
+      .fold(true)(mbs =>
+        DateTime.now
+          .isAfter(startsAt minusMinutes mbs)
+      )
+
   def isMedley = settings.medleyVariants.nonEmpty
 
   def allRounds: List[SwissRound.Number]      = (1 to round.value).toList.map(SwissRound.Number.apply)
@@ -172,12 +177,18 @@ object Swiss {
       conditions: SwissCondition.All,
       roundInterval: FiniteDuration,
       forbiddenPairings: String,
-      medleyVariants: Option[List[Variant]] = None
+      medleyVariants: Option[List[Variant]] = None,
+      minutesBeforeStartToJoin: Option[Int] = None
   ) {
     lazy val intervalSeconds = roundInterval.toSeconds.toInt
-    def manualRounds         = intervalSeconds == Swiss.RoundInterval.manual
-    def dailyInterval        = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
-    def usingDrawTables      = useDrawTables || usePerPairingDrawTables
+    lazy val timeBeforeStartToJoin: Option[String] = minutesBeforeStartToJoin.map(m =>
+      if (m < 60) s"$m minutes"
+      else if (m < 24 * 60) s"${m / 60} hour${if (m == 60) "" else "s"}"
+      else s"${m / 24 / 60} day${if (m == 24 * 60) "" else "s"}"
+    )
+    def manualRounds    = intervalSeconds == Swiss.RoundInterval.manual
+    def dailyInterval   = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
+    def usingDrawTables = useDrawTables || usePerPairingDrawTables
   }
 
   type ChatFor = Int
@@ -192,6 +203,10 @@ object Swiss {
   object RoundInterval {
     val auto   = -1
     val manual = 99999999
+  }
+
+  object TimeBeforeStartToJoin {
+    val nolimit = -1
   }
 
   def makeScore(
