@@ -232,9 +232,11 @@ export default class Setup {
         switch (user) {
           case 'ps-random-mover': {
             clockCompatible = limit >= 0.5;
+            break;
           }
           case 'ps-greedy-one-move': {
             clockCompatible = limit >= 1 && inc >= 1;
+            break;
           }
           default: {
             clockCompatible = limit >= 3 && inc >= 2;
