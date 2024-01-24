@@ -11,6 +11,7 @@ const noAnalysisBoardVariants: string[] = [
   'go19x19',
   'go9x9',
   'international',
+  'monster',
   'oware',
   'pool',
   'portuguese',
