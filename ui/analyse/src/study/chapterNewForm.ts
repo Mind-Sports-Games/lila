@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { defined, prop, Prop } from 'common';
 import { storedProp, StoredProp } from 'common/storage';
 import * as xhr from 'common/xhr';
-import { allowAnalysisForVariant, isChess, hasFishnet } from 'common/analysis';
+import { allowAnalysisForVariant, isChess } from 'common/analysis';
 import { bind, bindSubmit, spinner, option, onInsert } from '../util';
 import { variants as xhrVariants, importPgn } from './studyXhr';
 import * as modal from '../modal';
@@ -323,7 +323,9 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 },
                 gameOrPgn
                   ? [h('option', noarg('automatic'))]
-                  : ctrl.vm.variants.map(v => option(v.key, currentChapter.setup.variant.key, v.name))
+                  : ctrl.vm.variants
+                    .filter(v => allowAnalysisForVariant(v.key))
+                    .map(v => option(v.key, currentChapter.setup.variant.key, v.name))
               ),
             ]),
             h('div.form-group.form-half', [
