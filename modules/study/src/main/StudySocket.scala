@@ -133,9 +133,9 @@ final private class StudySocket(
             }
           }
         case "addChapter" =>
-          reading[ChapterMaker.SocketData](o) { socketData =>
+          reading[ChapterMaker.Data](o) { data =>
             val sticky = o.obj("d").flatMap(_.boolean("sticky")) | true
-            who foreach api.addChapter(studyId, socketData.data, sticky = sticky)
+            who foreach api.addChapter(studyId, data, sticky = sticky)
           }
         case "setChapter" =>
           o.get[Chapter.Id]("d") foreach { chapterId =>
@@ -456,7 +456,7 @@ object StudySocket {
         )(AtPosition.apply _)
         case class SetRole(userId: String, role: String)
         implicit val SetRoleReader: Reads[SetRole]                       = Json.reads[SetRole]
-        implicit val ChapterDataReader: Reads[ChapterMaker.SocketData]   = Json.reads[ChapterMaker.SocketData]
+        implicit val ChapterDataReader: Reads[ChapterMaker.Data]         = Json.reads[ChapterMaker.Data]
         implicit val ChapterEditDataReader: Reads[ChapterMaker.EditData] = Json.reads[ChapterMaker.EditData]
         implicit val ChapterDescDataReader: Reads[ChapterMaker.DescData] = Json.reads[ChapterMaker.DescData]
         implicit val StudyDataReader: Reads[Study.Data]                  = Json.reads[Study.Data]

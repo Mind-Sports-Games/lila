@@ -14,7 +14,6 @@ const chessOnly: VariantKey[] = [
   'fromPosition',
   'kingOfTheHill',
   'threeCheck',
-  'fiveCheck',
   'atomic',
   'horde',
   'racingKings',

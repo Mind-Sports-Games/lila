@@ -19,6 +19,8 @@ export const modeChoices = [
   ['gamebook', 'interactiveLesson'],
 ];
 
+export const nonBrowserAnalysisModeChoices = [['normal', 'normalAnalysis']];
+
 export const fieldValue = (e: Event, id: string) =>
   ((e.target as HTMLElement).querySelector('#chapter-' + id) as HTMLInputElement)?.value;
 
@@ -49,7 +51,7 @@ export function ctrl(
   send: StudySocketSend,
   chapters: Prop<StudyChapterMeta[]>,
   setTab: () => void,
-  root: AnalyseCtrl,
+  root: AnalyseCtrl
 ): StudyChapterNewFormCtrl {
   const multiPgnMax = 20;
 
@@ -143,7 +145,7 @@ function edittab(ctrl: StudyChapterNewFormCtrl): VNode {
         },
       },
     },
-    [spinner()],
+    [spinner()]
   );
 }
 function gametab(ctrl: StudyChapterNewFormCtrl): VNode {
@@ -155,7 +157,7 @@ function gametab(ctrl: StudyChapterNewFormCtrl): VNode {
       {
         attrs: { for: 'chapter-game' },
       },
-      trans('loadAGameFromXOrY', 'playstrategy.org', 'chessgames.com'),
+      trans('loadAGameFromXOrY', 'playstrategy.org', 'chessgames.com')
     ),
     h('textarea#chapter-game.form-control', {
       attrs: { placeholder: noarg('urlOfTheGame') },
@@ -183,20 +185,20 @@ function pgntab(ctrl: StudyChapterNewFormCtrl): VNode {
     }),
     window.FileReader
       ? h('input#chapter-pgn-file.form-control', {
-          attrs: {
-            type: 'file',
-            accept: '.pgn',
-          },
-          hook: bind('change', e => {
-            const file = (e.target as HTMLInputElement).files![0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function () {
-              (document.getElementById('chapter-pgn') as HTMLTextAreaElement).value = reader.result as string;
-            };
-            reader.readAsText(file);
-          }),
-        })
+        attrs: {
+          type: 'file',
+          accept: '.pgn',
+        },
+        hook: bind('change', e => {
+          const file = (e.target as HTMLInputElement).files![0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function () {
+            (document.getElementById('chapter-pgn') as HTMLTextAreaElement).value = reader.result as string;
+          };
+          reader.readAsText(file);
+        }),
+      })
       : null,
   ]);
 }
@@ -212,7 +214,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
         attrs: { title },
         hook: bind('click', () => ctrl.vm.tab(key), ctrl.root.redraw),
       },
-      name,
+      name
     );
   };
   const gameOrPgn = activeTab === 'game' || activeTab === 'pgn';
@@ -229,8 +231,6 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
     allowAnalysisForVariant(ctrl.vm.variantKey() ?? 'standard') ? node : null;
   const onlyForChessVariants = (node: VNode | null): VNode | null =>
     isChess(ctrl.vm.variantKey() ?? 'standard') ? node : null;
-  const onlyForFishnetVariants = (node: VNode | null): VNode | null =>
-    hasFishnet(ctrl.vm.variantKey() ?? 'standard') ? node : null;
 
   return modal.modal({
     class: 'chapter-new',
@@ -243,12 +243,12 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
       activeTab === 'edit'
         ? null
         : h('h2', [
-            noarg('newChapter'),
-            h('i.help', {
-              attrs: { 'data-icon': '' },
-              hook: bind('click', ctrl.startTour),
-            }),
-          ]),
+          noarg('newChapter'),
+          h('i.help', {
+            attrs: { 'data-icon': '' },
+            hook: bind('click', ctrl.startTour),
+          }),
+        ]),
       h(
         'form.form3',
         {
@@ -272,7 +272,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
               {
                 attrs: { for: 'chapter-name' },
               },
-              noarg('name'),
+              noarg('name')
             ),
             h('input#chapter-name.form-control', {
               attrs: {
@@ -309,7 +309,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 {
                   attrs: { for: 'chapter-variant' },
                 },
-                noarg('Variant'),
+                noarg('Variant')
               ),
               h(
                 'select#chapter-variant.form-control',
@@ -323,7 +323,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 },
                 gameOrPgn
                   ? [h('option', noarg('automatic'))]
-                  : ctrl.vm.variants.map(v => option(v.key, currentChapter.setup.variant.key, v.name)),
+                  : ctrl.vm.variants.map(v => option(v.key, currentChapter.setup.variant.key, v.name))
               ),
             ]),
             h('div.form-group.form-half', [
@@ -332,7 +332,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 {
                   attrs: { for: 'chapter-orientation' },
                 },
-                noarg('orientation'),
+                noarg('orientation')
               ),
               h(
                 'select#chapter-orientation.form-control',
@@ -344,27 +344,27 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 },
                 ['p1', 'p2'].map(function (playerIndex) {
                   return option(playerIndex, currentChapter.setup.orientation, noarg(playerIndex));
-                }),
+                })
               ),
             ]),
           ]),
-          onlyForFishnetVariants(
-            h('div.form-group', [
-              h(
-                'label.form-label',
-                {
-                  attrs: { for: 'chapter-mode' },
-                },
-                noarg('analysisMode'),
-              ),
-              h(
-                'select#chapter-mode.form-control',
-                modeChoices.map(c => option(c[0], mode, noarg(c[1]))),
-              ),
-            ]),
-          ),
+          h('div.form-group', [
+            h(
+              'label.form-label',
+              {
+                attrs: { for: 'chapter-mode' },
+              },
+              noarg('analysisMode')
+            ),
+            h(
+              'select#chapter-mode.form-control',
+              (isChess(ctrl.vm.variantKey() ?? 'standard') ? modeChoices : nonBrowserAnalysisModeChoices).map(c =>
+                option(c[0], mode, noarg(c[1]))
+              )
+            ),
+          ]),
           modal.button(noarg('createChapter')),
-        ],
+        ]
       ),
     ],
   });

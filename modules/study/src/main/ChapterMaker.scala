@@ -253,36 +253,6 @@ private[study] object ChapterMaker {
         .filter(_.sizeIs > 1)
   }
 
-  // This whole case class just allows us to take an optional mode
-  // then we turn it into the default later. I feel like there must
-  // be a better way to do this in Scala.
-  // TODO: simplify this
-  case class SocketData(
-      name: Chapter.Name,
-      game: Option[String] = None,
-      variant: Option[String] = None,
-      fen: Option[String] = None,
-      pgn: Option[String] = None,
-      orientation: String = "p1", // can be "auto"
-      mode: Option[String] = None,
-      initial: Boolean = false,
-      isDefaultName: Boolean = true
-    ) {
-      def data: Data =
-        Data(
-          name = name,
-          game = game,
-          variant = variant,
-          fen = fen,
-          pgn = pgn,
-          orientation = orientation,
-          mode = mode.fold(ChapterMaker.Mode.Normal.key)(identity),
-          initial = initial,
-          isDefaultName = isDefaultName
-        )
-
-    }
-
   case class EditData(
       id: Chapter.Id,
       name: Chapter.Name,
