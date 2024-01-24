@@ -31,7 +31,7 @@ final private class StudyMaker(
         fen = data.form.actualFen.map(_.value),
         pgn = data.form.pgnStr,
         orientation = data.form.orientation.name,
-        mode = Some(ChapterMaker.Mode.Normal.key),
+        mode = ChapterMaker.Mode.Normal.key,
         initial = true
       ),
       order = 1,
