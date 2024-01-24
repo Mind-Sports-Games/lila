@@ -270,7 +270,7 @@ object SwissForm {
   val halfwayBreakChoices = options(
     halfwayBreakOptions,
     s =>
-      if (s == 0) "No additional break"
+      if (s == 0) "No additional interval"
       else if (s < 60) s"$s seconds"
       else if (s < 3600) s"${s / 60} minute${if (s == 60) "" else "s"}"
       else if (s < 24 * 3600) s"${s / 3600} hour${if (s == 60 * 60) "" else "s"}"

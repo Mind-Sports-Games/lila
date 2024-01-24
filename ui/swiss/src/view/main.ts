@@ -158,7 +158,7 @@ function joinButton(ctrl: SwissCtrl): VNode | undefined {
       'a.fbt.text',
       {
         attrs: {
-          title: `Join ${d.timeBeforeStartToJoin} before start`,
+          title: `Join ${d.timeBeforeStartToJoin} before start (please refresh)`,
           'data-icon': 'p',
         },
       },
