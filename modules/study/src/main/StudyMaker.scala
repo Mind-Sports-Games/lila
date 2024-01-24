@@ -28,10 +28,10 @@ final private class StudyMaker(
         game = none,
         name = Chapter.Name("Chapter 1"),
         variant = data.form.variantStr,
-        fen = data.form.actualFen,
+        fen = data.form.actualFen.map(_.value),
         pgn = data.form.pgnStr,
         orientation = data.form.orientation.name,
-        mode = ChapterMaker.Mode.Normal.key,
+        mode = Some(ChapterMaker.Mode.Normal.key),
         initial = true
       ),
       order = 1,

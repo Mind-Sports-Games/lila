@@ -87,7 +87,7 @@ final private class ChapterMaker(
   private def fromFenOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Chapter = {
     val variant =
       data.variant.flatMap(v => Variant.apply(v)) | Variant.default(GameLogic.Chess())
-    (data.fen.filterNot(_.initial).flatMap { Forsyth.<<<@(variant.gameLogic, variant, _) } match {
+    (data.fen.map(FEN(variant, _)).flatMap { Forsyth.<<<@(variant.gameLogic, variant, _) } match {
       case Some(sit) =>
         Node.Root(
           ply = sit.plies,
@@ -217,12 +217,12 @@ private[study] object ChapterMaker {
 
   trait ChapterData {
     def orientation: String
-    def mode: String
+    def actualMode: String
     def realOrientation =
       PlayerIndex.fromName(orientation).fold[Orientation](Orientation.Auto)(Orientation.Fixed)
-    def isPractice = mode == Mode.Practice.key
-    def isGamebook = mode == Mode.Gamebook.key
-    def isConceal  = mode == Mode.Conceal.key
+    def isPractice = actualMode == Mode.Practice.key
+    def isGamebook = actualMode == Mode.Gamebook.key
+    def isConceal  = actualMode == Mode.Conceal.key
   }
 
   sealed trait Orientation
@@ -235,13 +235,15 @@ private[study] object ChapterMaker {
       name: Chapter.Name,
       game: Option[String] = None,
       variant: Option[String] = None,
-      fen: Option[FEN] = None,
+      fen: Option[String] = None,
       pgn: Option[String] = None,
       orientation: String = "p1", // can be "auto"
-      mode: String = ChapterMaker.Mode.Normal.key,
+      mode: Option[String] = None,
       initial: Boolean = false,
       isDefaultName: Boolean = true
   ) extends ChapterData {
+
+    def actualMode: String = mode.fold(ChapterMaker.Mode.Normal.key)(identity)
 
     def manyGames =
       game
@@ -257,7 +259,7 @@ private[study] object ChapterMaker {
       id: Chapter.Id,
       name: Chapter.Name,
       orientation: String,
-      mode: String,
+      actualMode: String,
       description: String // boolean
   ) extends ChapterData {
     def hasDescription = description.nonEmpty

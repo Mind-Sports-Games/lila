@@ -58,10 +58,10 @@ object StudyForm {
           name = Chapter.Name(""),
           game = gameId,
           variant = variantStr,
-          fen = actualFen,
+          fen = actualFen.map(_.value),
           pgn = pgnStr,
           orientation = orientation.name,
-          mode = ChapterMaker.Mode.Normal.key,
+          mode = some(ChapterMaker.Mode.Normal.key),
           initial = false
         )
     }
@@ -106,7 +106,7 @@ object StudyForm {
             orientation =
               if (pgns.sizeIs > 1) "auto"
               else (orientationStr.flatMap(PlayerIndex.fromName) | P1).name,
-            mode = mode,
+            mode = Some(mode),
             initial = initial && index == 0
           )
         }
