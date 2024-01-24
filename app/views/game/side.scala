@@ -68,7 +68,12 @@ object side {
                     )
                   else
                     frag(
-                      widgets showClock game,
+                      a(
+                        cls := "remove_color",
+                        title := "Clock info",
+                        href := s"${routes.Page.loneBookmark("clocks")}",
+                        target := "_blank"
+                      )(widgets showClock game),
                       separator,
                       (if (game.rated) trans.rated else trans.casual).txt(),
                       separator,

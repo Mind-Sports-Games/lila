@@ -603,6 +603,9 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         _.flatMap { docPerf(_, perfType) }
       }
 
+  def perfOfWithDefault(id: ID, perfType: PerfType): Fu[Perf] =
+    perfOf(id, perfType).map(_.getOrElse(Perf.default))
+
   def perfOf(ids: Iterable[ID], perfType: PerfType): Fu[Map[ID, Perf]] =
     coll
       .find(

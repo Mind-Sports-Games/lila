@@ -32,6 +32,11 @@ a {
   &:focus {
     color: $c-link-hover;
   }
+
+  &.remove_color {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 p {

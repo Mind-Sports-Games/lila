@@ -93,6 +93,12 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
         ctrl.redraw();
       }
     },
+    clock(o) {
+      if (ctrl.clock) {
+        ctrl.clock.setClock(ctrl.data, o.p1, o.p2, o.p1Pending, o.p2Pending, o.p1Periods, o.p2Periods);
+        ctrl.redraw();
+      }
+    },
     cclock(o) {
       if (ctrl.corresClock) {
         ctrl.data.correspondence.p1 = o.p1;

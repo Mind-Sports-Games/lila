@@ -50,6 +50,10 @@ export type EncodedDests =
     };
 export type Dests = cg.Dests;
 
+export interface MultiActionMetaData {
+  couldNextActionEndTurn: boolean;
+}
+
 export interface RoundData extends GameData {
   clock?: ClockData;
   pref: Pref;
@@ -57,6 +61,7 @@ export interface RoundData extends GameData {
   possibleMoves?: EncodedDests;
   possibleDrops?: string;
   possibleDropsByRole?: string;
+  multiActionMetaData?: MultiActionMetaData;
   selectMode: boolean;
   selectedSquares?: cg.Key[];
   currentSelectedSquares?: cg.Key[];
@@ -136,6 +141,8 @@ export interface ApiMove extends Step {
   clock?: {
     p1: Seconds;
     p2: Seconds;
+    p1Pending: Seconds;
+    p2Pending: Seconds;
     p1Periods: number;
     p2Periods: number;
     lag?: Centis;
@@ -152,6 +159,7 @@ export interface ApiMove extends Step {
   role?: cg.Role;
   drops?: string;
   dropsByRole?: string;
+  multiActionMetaData?: MultiActionMetaData;
   canSelectSquares?: boolean;
   deadStoneOfferState?: string;
   squares?: string;
@@ -181,6 +189,8 @@ export interface ApiEnd {
   clock?: {
     p1: Centis;
     p2: Centis;
+    p1Pending: Centis;
+    p2Pending: Centis;
     p1Periods: number;
     p2Periods: number;
   };

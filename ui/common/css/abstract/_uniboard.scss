@@ -1,6 +1,7 @@
 /* Uniboard: keep the same page layout across pages */
 
 $mq-board-resizable: $mq-small;
+$mq-col1-phone: $mq-not-xx-small $mq-portrait;
 $mq-col1-uniboard: $mq-not-small $mq-portrait;
 $mq-col2-uniboard: $mq-small, $mq-landscape;
 $mq-col3-uniboard: $mq-x-large;

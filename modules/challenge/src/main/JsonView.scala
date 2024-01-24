@@ -74,9 +74,11 @@ final class JsonView(
         "timeControl" -> (c.timeControl match {
           case TimeControl.Clock(clock) =>
             Json.obj(
-              "type"      -> "clock",
-              "limit"     -> clock.limitSeconds,
-              "increment" -> clock.incrementSeconds,
+              "type"  -> "clock",
+              "limit" -> clock.limitSeconds,
+              // TODO: this should be renamed to better reflect that it also
+              //       represents Bronstein/Byoyomi/SimpleDelay
+              "increment" -> clock.graceSeconds,
               "show"      -> clock.show
             )
           case TimeControl.Correspondence(d) =>

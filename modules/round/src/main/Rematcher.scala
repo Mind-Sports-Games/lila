@@ -7,8 +7,6 @@ import strategygames.chess.variant._
 import strategygames.variant.Variant
 import strategygames.{
   P2,
-  Clock,
-  FischerClock,
   GameFamily,
   GameLogic,
   Player => PlayerIndex,
