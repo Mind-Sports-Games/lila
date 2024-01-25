@@ -538,33 +538,37 @@ final class TournamentApi(
         Game
       ] // if set, update the player performance. Leave to none to just recompute the sheet.
   )(userId: User.ID): Funit =
-    if (tour.mode.rated)
-      userRepo.perfOfWithDefault(userId, PerfType(variant, tour.speed)).flatMap { perf =>
-        playerRepo.update(tour.id, userId) { player =>
-          cached.sheet.update(tour, userId).map { sheet =>
-            player.copy(
-              score = sheet.total,
-              fire = tour.streakable && sheet.onFire,
-              rating = perf.intRating,
-              provisional = perf.provisional,
-              performance = {
-                for {
-                  g           <- finishing
-                  performance <- performanceOf(g, userId).map(_.toDouble)
-                  nbGames = sheet.scores.size
-                  if nbGames > 0
-                } yield Math.round {
-                  (player.performance * (nbGames - 1) + performance) / nbGames
-                } toInt
-              } | player.performance,
-              playedGames = sheet.scores.size > 0
-            )
-          } >>- finishing.flatMap(_.p1Player.userId).foreach { p1UserId =>
-            playerIndexHistoryApi.inc(player.id, strategygames.Player.fromP1(player is p1UserId))
-          }
+    tour.mode.rated ?? {
+      //mapping to some here makes ?? work as previous:
+      //still execute this code block even if tournament is casual.
+      //WithDefault ensures for medleys that a new user gets a starting
+      //rating if the medley switches into a variant they havent played before
+      userRepo.perfOfWithDefault(userId, PerfType(variant, tour.speed)).map(some)
+    } flatMap { perf =>
+      playerRepo.update(tour.id, userId) { player =>
+        cached.sheet.update(tour, userId).map { sheet =>
+          player.copy(
+            score = sheet.total,
+            fire = tour.streakable && sheet.onFire,
+            rating = perf.fold(player.rating)(_.intRating),
+            provisional = perf.fold(player.provisional)(_.provisional),
+            performance = {
+              for {
+                g           <- finishing
+                performance <- performanceOf(g, userId).map(_.toDouble)
+                nbGames = sheet.scores.size
+                if nbGames > 0
+              } yield Math.round {
+                (player.performance * (nbGames - 1) + performance) / nbGames
+              } toInt
+            } | player.performance,
+            playedGames = sheet.scores.size > 0
+          )
+        } >>- finishing.flatMap(_.p1Player.userId).foreach { p1UserId =>
+          playerIndexHistoryApi.inc(player.id, strategygames.Player.fromP1(player is p1UserId))
         }
       }
-    else funit
+    }
 
   private def performanceOf(g: Game, userId: String): Option[Int] =
     for {
