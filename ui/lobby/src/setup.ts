@@ -209,15 +209,6 @@ export default class Setup {
       //TODO remove hard coded options and improve bot api flow
       let variantCompatible = true;
       switch (user) {
-        case 'ps-greedy-two-move': {
-          //not (monster, go13x13, go19x19)
-          variantCompatible = !(
-            (variantId[0] === '0' && variantId[1] === '15') ||
-            (variantId[0] === '9' && variantId[1] === '2') ||
-            (variantId[0] === '9' && variantId[1] === '4')
-          );
-          break;
-        }
         case 'ps-greedy-four-move': {
           //in (draughts, oware, togy)
           variantCompatible = ['1', '6', '7'].includes(variantId[0]);
