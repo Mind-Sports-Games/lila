@@ -177,7 +177,7 @@ export default class Setup {
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
-            this.ratedTimeModes.indexOf(timeMode) != -1 ||
+            this.ratedTimeModes.indexOf(timeMode) === -1 ||
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
             (vsPSBot && user == 'ps-random-mover') ||
