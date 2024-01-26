@@ -22,8 +22,8 @@ case class AnaDrop(
   def branch: Validated[String, Branch] =
     (Game(variant.gameLogic, variant.some, fen.some), role, pos) match {
       case (Game.Chess(game), Role.ChessRole(role), Pos.Chess(pos)) =>
-        game.drop(role, pos) flatMap { case (game, drop) =>
-          game.pgnMoves.lastOption toValid "Dropped but no last move!" map { san =>
+        game.drop(role, pos).flatMap { case (game, drop) =>
+          game.pgnMoves.lastOption.toValid("Dropped but no last move!").map { san =>
             val uci     = Uci(drop)
             val movable = !game.situation.end
             val fen     = Forsyth.>>(variant.gameLogic, Game.Chess(game))
@@ -34,10 +34,9 @@ case class AnaDrop(
               move = strategygames.format.Uci.ChessWithSan(Uci.WithSan(uci, san)),
               fen = fen,
               check = game.situation.check,
-              dests = Some(movable ?? Game.Chess(game).situation.destinations),
-              opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? FullOpeningDB
-                .findByFen(variant.gameLogic, fen),
-              drops = if (movable) Game.Chess(game).situation.drops else Some(Nil),
+              dests = Some(movable && Game.Chess(game).situation.destinations),
+              opening = Variant.openingSensibleVariants(variant.gameLogic)(variant).flatMap(FullOpeningDB.findByFen),
+              drops = Some(Nil).filter(_ => movable).orElse(Game.Chess(game).situation.drops),
               pocketData = Game.Chess(game).situation.board.pocketData
             )
           }
@@ -49,20 +48,20 @@ case class AnaDrop(
 
 object AnaDrop {
 
-  def parse(o: JsObject) =
+  def parse(o: JsObject): Option[AnaDrop] =
     for {
       d <- o obj "d"
       variant = Variant.orDefault(GameLogic.Chess(), ~d.str("variant"))
-      role <- d str "role" flatMap Role.allByName(GameLogic.Chess(), variant.gameFamily).get
-      pos  <- d str "pos" flatMap { pos => Pos.fromKey(GameLogic.Chess(), pos) }
-      fen  <- d str "fen" map { fen => FEN.apply(GameLogic.Chess(), fen) }
-      path <- d str "path"
+      role <- d.str("role").flatMap(Role.allByName(GameLogic.Chess(), variant.gameFamily).get)
+      pos  <- d.str("pos").flatMap(pos => Pos.fromKey(GameLogic.Chess(), pos))
+      fen  <- d.str("fen").map(fen => FEN.apply(GameLogic.Chess(), fen))
+      path <- d.str("path")
     } yield AnaDrop(
       role = role,
       pos = pos,
       variant = variant,
       fen = fen,
       path = path,
-      chapterId = d str "ch"
+      chapterId = d.str("ch")
     )
 }
