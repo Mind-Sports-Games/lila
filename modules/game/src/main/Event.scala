@@ -567,8 +567,8 @@ object Event {
         pocketData
       ) {
         Json.obj(
-          "dice" -> dice.mkString("|"),
-          "uci"  -> dice.mkString("|"),
+          "dice" -> dice.mkString("/"),
+          "uci"  -> dice.mkString("/"),
           "san"  -> san
         )
       }
@@ -585,7 +585,7 @@ object Event {
       DiceRoll(
         gf = situation.board.variant.gameFamily,
         dice = dr.dice,
-        san = dr.dice.mkString("|"),
+        san = dr.dice.mkString("/"),
         fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
         check = situation.check,
         threefold = situation.threefoldRepetition,
@@ -655,23 +655,6 @@ object Event {
         moves.foldLeft(JsObject(Nil)) { case (res, (o, d)) =>
           res + (o.key -> JsString(d map (_.key) mkString))
         }
-  }
-
-  //TODO decide on the json format for dice moves (and drops)
-  object PossibleMovesByDice {
-    def json(moves: Map[Int, List[Pos]]) =
-      if (moves.isEmpty) JsNull
-      else {
-        val sb    = new java.lang.StringBuilder(128)
-        var first = true
-        moves foreach { case (orig, dests) =>
-          if (first) first = false
-          else sb append " "
-          sb append orig.toString
-          dests foreach { sb append _.key }
-        }
-        JsString(sb.toString)
-      }
   }
 
   case class Enpassant(pos: Pos, playerIndex: PlayerIndex) extends Event {

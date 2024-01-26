@@ -110,6 +110,9 @@ export default class RoundController {
     this.turnCount = round.lastTurn(d);
     this.goneBerserk[d.player.playerIndex] = d.player.berserk;
     this.goneBerserk[d.opponent.playerIndex] = d.opponent.berserk;
+    //TODO get dice from fen and refactor where necessary (also set active dice value attribute)
+    d.dice = d.game.variant.key === 'backgammon' ? util.getBackgammonDice(round.plyStep(d, this.ply).fen) : undefined;
+    d.activeDiceValue = d.dice && d.dice.length >= 2 ? d.dice[0].value : undefined;
 
     setTimeout(() => {
       this.firstSeconds = false;
@@ -211,6 +214,7 @@ export default class RoundController {
   };
 
   private onMove = (orig: cg.Key, dest: cg.Key, captured?: cg.Piece) => {
+    console.log('onMove called');
     if (captured || this.enpassant(orig, dest)) {
       if (this.data.game.variant.key === 'atomic') {
         sound.explode();
@@ -266,7 +270,9 @@ export default class RoundController {
 
   private onSelectDice = (dice: cg.Dice[]) => {
     this.data.dice = dice;
-    this.chessground.redrawAll(); //redraw dice + possible moves/drops
+    this.data.activeDiceValue = this.data.dice && this.data.dice.length >= 2 ? this.data.dice[0].value : undefined;
+    ground.reload(this); //update possible actions from new 'active' (be more restrictive?)
+    this.chessground.redrawAll(); //redraw dice
   };
 
   private isSimulHost = () => {
@@ -358,21 +364,24 @@ export default class RoundController {
       lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
       check: !!s.check,
       turnPlayerIndex: util.turnPlayerIndexFromLastTurn(this.turnCount),
+      dice: util.getBackgammonDice(s.fen),
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
       this.chessground.stop();
-    } else
+    } else {
       config.movable = {
         playerIndex: this.isPlaying() ? this.data.player.playerIndex : undefined,
-        dests: util.parsePossibleMoves(this.data.possibleMoves, this.data.dice ? this.data.dice[0].value : undefined),
+        dests: util.parsePossibleMoves(this.data.possibleMoves, this.data.activeDiceValue),
       };
-    (config.dropmode = {
+    }
+    config.dropmode = {
       dropDests: this.isPlaying() ? stratUtils.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
-    }),
-      this.chessground.set(config);
-    if (this.data.game.variant.key === 'togyzkumalak') {
-      this.chessground.redrawAll(); //redraw board scores
+    };
+    this.chessground.set(config);
+
+    if (['togyzkumalak', 'backgammon'].includes(this.data.game.variant.key)) {
+      this.chessground.redrawAll(); //redraw board scores or coordinates
     }
     const amazonTurnToDrop =
       this.data.game.variant.key === 'amazons' &&
@@ -542,9 +551,11 @@ export default class RoundController {
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
     if (o.dice) {
       d.dice = util.parseDiceRoll(o.dice);
+      d.activeDiceValue = d.dice && d.dice.length >= 2 ? d.dice[0].value : undefined;
     } else {
-      //TODO add dice to backgammon board gen?
+      //TODO add dice from backgammon board fen?
       //d.dice = util.getBackgammonDice(o.fen);
+      //d.activeDiceValue = ?
     }
 
     d.crazyhouse = o.crazyhouse;
@@ -591,7 +602,7 @@ export default class RoundController {
             !o.castle ||
             (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
           ) {
-            if (d.game.variant.key === 'oware' || d.game.variant.key === 'togyzkumalak') {
+            if (['oware', 'togyzkumalak', 'backgammon'].includes(d.game.variant.key)) {
               this.chessground.moveNoAnim(keys[0], keys[1]);
             } else {
               this.chessground.move(keys[0], keys[1]);
@@ -603,7 +614,10 @@ export default class RoundController {
         // a lot of pieces can change from 1 move so update them all
         mancala.updateBoardFromFen(this, o.fen);
       }
-      if (['backgammon'].includes(d.game.variant.key)) backgammon.updateBoardFromFen(this, o.fen);
+      if (['backgammon'].includes(d.game.variant.key)) {
+        this.chessground.set({ dice: d.dice ? d.dice : [] });
+        backgammon.updateBoardFromFen(this, o.fen);
+      }
       if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) go.updateBoardFromFen(this, o.fen);
       if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
@@ -612,7 +626,7 @@ export default class RoundController {
       this.chessground.set({
         turnPlayerIndex: d.game.player,
         movable: {
-          dests: playing ? util.parsePossibleMoves(d.possibleMoves, d.dice ? d.dice[0].value : undefined) : new Map(),
+          dests: playing ? util.parsePossibleMoves(d.possibleMoves, d.activeDiceValue) : new Map(),
         },
         dropmode: {
           dropDests: playing ? stratUtils.readDropsByRole(d.possibleDropsByRole) : new Map(),

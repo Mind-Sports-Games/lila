@@ -174,9 +174,10 @@ export function main(ctrl: RoundController): VNode {
         break;
       }
       case 'backgammon': {
-        //TODO calculate pieces off board from fen
-        const p1PiecesOffBoard = 2;
-        const p2PiecesOffBoard = 1;
+        const fen = plyStep(ctrl.data, ctrl.ply).fen;
+        //TODO get score another away as not in board fen
+        const p1PiecesOffBoard = util.getBackgammonScore(fen, 'p1');
+        const p2PiecesOffBoard = util.getBackgammonScore(fen, 'p2');
         const p1Score = p1PiecesOffBoard;
         const p2Score = p2PiecesOffBoard;
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;

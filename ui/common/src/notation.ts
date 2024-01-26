@@ -450,18 +450,17 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
 
 function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   //TODO support all uci from actions
-  console.log('notation move.uci', move.uci);
   if (move.uci === 'roll') return '';
-  if (move.uci.includes('|')) return `${move.uci.replace('|', '')}: ?`;
+  if (move.uci.includes('/')) return `${move.uci.replace('/', '')}:`;
 
   const reg = move.uci.match(/[a-lsA-LS][1-2@]/g) as string[];
   const orig = reg[0];
   const dest = reg[1];
   const isDrop = reg[0].includes('@');
-  const movePlayer = move.prevFen.split(' ')[1] === 'w' ? 'p1' : 'p2';
-  const moveOpponent = move.prevFen.split(' ')[1] === 'w' ? 'p2' : 'p1';
+  const movePlayer = move.prevFen.split(' ')[3] === 'w' ? 'p1' : 'p2';
+  const moveOpponent = move.prevFen.split(' ')[3] === 'w' ? 'p2' : 'p1';
   //TODO get this from the fen when it exists and fix test
-  const diceRoll = '43';
+  const diceRoll = '43'; //unused - design different output?
 
   //captures
   const capturedPiecesBefore = numberofCapturedPiecesOfPlayer(moveOpponent, move.prevFen);
@@ -525,23 +524,26 @@ export function combinedNotationForBackgammonActions(actionNotations: string[]):
   const captures: boolean[] = [];
   const occurances: number[] = [];
   for (const notation of actionNotations) {
-    const movePart = notation.split(' ')[1].replace('*', '');
-    const isCapture = notation.split(' ')[1].includes('*');
-    if (actions.includes(movePart)) {
-      const duplicateIndex = actions.indexOf(movePart);
-      occurances[duplicateIndex] += 1;
-      captures[duplicateIndex] = captures[duplicateIndex] || isCapture;
-    } else {
-      actions.push(movePart);
-      occurances.push(1);
-      if (isCapture) {
-        captures.push(true);
+    if (notation.split(' ').length === 2) {
+      const movePart = notation.split(' ')[1].replace('*', '');
+      const isCapture = notation.split(' ')[1].includes('*');
+      if (actions.includes(movePart)) {
+        const duplicateIndex = actions.indexOf(movePart);
+        occurances[duplicateIndex] += 1;
+        captures[duplicateIndex] = captures[duplicateIndex] || isCapture;
       } else {
-        captures.push(false);
+        actions.push(movePart);
+        occurances.push(1);
+        if (isCapture) {
+          captures.push(true);
+        } else {
+          captures.push(false);
+        }
       }
     }
   }
 
+  //dice roll is always first action - check this assumption in multipoint games
   const dice = actionNotations[0].split(' ')[0];
   let output = dice;
 

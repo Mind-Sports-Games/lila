@@ -483,8 +483,8 @@ test('moveFromNotationStyle backgammon a2c1 from starting', () => {
   const move = {
     san: '',
     uci: 'a2c1',
-    fen: '4S,3,3s,1,5s,4,2S/5s,1,S,1,3S,1,5S,4,2s[] w - - 1',
-    prevFen: '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] w - - 1',
+    fen: '4S,3,3s,1,5s,4,2S/5s,1,S,1,3S,1,5S,4,2s[] 0 0 w - - 1',
+    prevFen: '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] 0 0 w - - 1',
   };
 
   const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
@@ -495,8 +495,8 @@ test('moveFromNotationStyle backgammon a1f2 p2 from starting', () => {
   const move = {
     san: '',
     uci: 'a1f2',
-    fen: '5S,3,3s,s,5s,4,2S/4s,3,3S,1,5S,4,2s[] b - - 1',
-    prevFen: '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] b - - 1',
+    fen: '5S,3,3s,s,5s,4,2S/4s,3,3S,1,5S,4,2s[] 0 0 b - - 1',
+    prevFen: '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] 0 0 b - - 1',
   };
 
   const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
@@ -507,8 +507,8 @@ test('moveFromNotationStyle backgammon testing drop S@i2', () => {
   const move = {
     san: '',
     uci: 'S@i2',
-    fen: '4S,3,3s,1,5s,1,S,2,2S/5s,3,3S,1,5S,4,2s[] w - - 1',
-    prevFen: '4S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[1S] w - - 1',
+    fen: '4S,3,3s,1,5s,1,S,2,2S/5s,3,3S,1,5S,4,2s[] 0 0 w - - 1',
+    prevFen: '4S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[1S] 0 0 w - - 1',
   };
 
   const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
@@ -519,8 +519,8 @@ test('moveFromNotationStyle backgammon testing captures', () => {
   const move = {
     san: '',
     uci: 'a2c1',
-    fen: '4S,3,3s,1,5s,4,2S/5s,1,S,1,3S,1,5S,4,2s[1s] w - - 1',
-    prevFen: '5S,3,3s,1,5s,4,2S/4s,1,s,1,3S,1,5S,4,2s[] w - - 1',
+    fen: '4S,3,3s,1,5s,4,2S/5s,1,S,1,3S,1,5S,4,2s[1s] 0 0 w - - 1',
+    prevFen: '5S,3,3s,1,5s,4,2S/4s,1,s,1,3S,1,5S,4,2s[] 1 0 w - - 1',
   };
 
   const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
@@ -528,15 +528,15 @@ test('moveFromNotationStyle backgammon testing captures', () => {
 });
 
 test('combinedNotationForBackgammonActions with 2 same actions', () => {
-  const actions = ['43: 8/4', '43: 8/4'];
+  const actions = ['44:', '43: 8/4', '43: 8/4'];
 
   const notation = combinedNotationForBackgammonActions(actions);
-  expect(notation).toBe('43: 8/4(2)');
+  expect(notation).toBe('44: 8/4(2)');
 });
 
 test('combinedNotationForBackgammonActions with 4 actions and captures', () => {
-  const actions = ['43: 8/4*', '43: bar/20*', '43: 8/4', '43: 8/7'];
+  const actions = ['33:', '43: 8/4*', '43: bar/20*', '43: 8/4', '43: 8/7'];
 
   const notation = combinedNotationForBackgammonActions(actions);
-  expect(notation).toBe('43: 8/4(2)* bar/20* 8/7');
+  expect(notation).toBe('33: 8/4(2)* bar/20* 8/7');
 });

@@ -42,6 +42,11 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
 }
 
 export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: cg.Key) {
+  //todo how to detect the same move as last move (i.e. from a double)?
+  // const alreadyUpdatedFromFen = ctrl.data.steps[ctrl.data.steps.length - 1].uci === orig + dest;
+  // console.log("alreadyUpdatedFromFen", alreadyUpdatedFromFen);
+  // if (alreadyUpdatedFromFen) return;
+
   //TODO also manage the pocket and captures (as well as undo action?)
 
   //assumption this is the fen before the move (check this?)

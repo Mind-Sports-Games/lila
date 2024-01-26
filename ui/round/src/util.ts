@@ -1,6 +1,6 @@
 import * as cg from 'chessground/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
-import { opposite, calculatePieceGroup } from 'chessground/util';
+import { opposite, calculatePieceGroup, key2pos } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 
 function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
@@ -52,7 +52,7 @@ export const justIcon = (icon: string): VNodeData => ({
 
 // TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
-  if (!uci || uci == 'pass' || uci == 'roll' || uci.includes('|') || uci.substring(0, 3) == 'ss:') return undefined;
+  if (!uci || uci == 'pass' || uci == 'roll' || uci.includes('/') || uci.substring(0, 3) == 'ss:') return undefined;
   //TODO support dice roll here or undefined?
   const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
@@ -80,17 +80,39 @@ export const bind = (eventName: string, f: (e: Event) => void, redraw?: Redraw, 
 export function parsePossibleMoves(dests?: EncodedDests, activeDiceValue?: number): Dests {
   const dec = new Map();
   if (!dests) return dec;
-  if (activeDiceValue) {
-    //TODO filter out move not using the ative dice value
-    console.log('activeDiceValue', activeDiceValue);
-  }
   if (typeof dests == 'string')
     for (const ds of dests.split(' ')) {
       const pos = ds.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
       dec.set(pos[0], pos.slice(1));
     }
   else for (const k in dests) dec.set(k, dests[k].match(/[a-z][1-9][0-9]?/g) as cg.Key[]);
+
+  //filter backgammon moves based on active dice value
+  if (activeDiceValue) {
+    const filtered = new Map();
+    dec.forEach((value: cg.Key[], key: cg.Key) => {
+      for (const v of value) {
+        if (backgammonPosDiff(key, v) === activeDiceValue) {
+          filtered.set(key, [v]);
+        }
+      }
+    });
+    return filtered;
+  }
+
   return dec;
+}
+
+function backgammonPosDiff(orig: cg.Key, dest: cg.Key): number {
+  const origFile = key2pos(orig)[0];
+  const origRank = key2pos(orig)[1];
+  const destFile = key2pos(dest)[0];
+  const destRank = key2pos(dest)[1];
+  if (origRank === destRank) {
+    return Math.abs(origFile - destFile);
+  } else {
+    return origFile + destFile - 1;
+  }
 }
 
 // {p1: {'p-piece': 3 'q-piece': 1}, p2: {'b-piece': 2}}
@@ -159,9 +181,14 @@ export function getGoKomi(fen: string): number {
   return +fen.split(' ')[7] / 10.0;
 }
 
+export function getBackgammonScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
+}
+
 export function getBackgammonDice(fen: string): cg.Dice[] {
-  const unusedDice = fen.split(' ')[4].replace('-', '').split('|');
-  const usedDice = fen.split(' ')[5].replace('-', '').split('|');
+  if (fen.split(' ').length < 2) return [];
+  const unusedDice = fen.split(' ')[1].replace('-', '').split('/');
+  const usedDice = fen.split(' ')[2].replace('-', '').split('/');
   const dice = [];
   for (const d of unusedDice) {
     if (+d) dice.push({ value: +d, isAvailable: true });
@@ -175,7 +202,7 @@ export function getBackgammonDice(fen: string): cg.Dice[] {
 export function parseDiceRoll(dice: string | undefined): cg.Dice[] {
   if (dice === undefined) return [];
   const diceRoll = [];
-  for (const d of dice.split('|')) {
+  for (const d of dice.split('/')) {
     if (+d) diceRoll.push({ value: +d, isAvailable: true });
   }
   return diceRoll;

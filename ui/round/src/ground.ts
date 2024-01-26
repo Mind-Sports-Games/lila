@@ -19,6 +19,11 @@ export function makeConfig(ctrl: RoundController): Config {
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
     turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount);
+  console.log('step.fen', step.fen);
+  console.log('data.dice', data.dice);
+  console.log('data.possibleDrops', data.possibleDrops);
+  console.log('data.possibleDropsByRole', data.possibleDropsByRole);
+  console.log('util.getBackgammonDice(step.fen)', util.getBackgammonDice(step.fen));
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -48,9 +53,7 @@ export function makeConfig(ctrl: RoundController): Config {
     movable: {
       free: false,
       playerIndex: playing ? data.player.playerIndex : undefined,
-      dests: playing
-        ? util.parsePossibleMoves(data.possibleMoves, data.dice ? data.dice[0].value : undefined)
-        : new Map(),
+      dests: playing ? util.parsePossibleMoves(data.possibleMoves, data.activeDiceValue) : new Map(),
       showDests: data.pref.destination,
       rookCastle: data.pref.rookCastle,
       events: {
@@ -84,7 +87,7 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     dropmode: {
-      showDropDests: !['go9x9', 'go13x13', 'go19x19'].includes(data.game.variant.key),
+      showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon'].includes(data.game.variant.key),
       dropDests: playing ? stratUtils.readDropsByRole(data.possibleDropsByRole) : new Map(),
       active: data.onlyDropsVariant && playing ? true : false,
       piece:
