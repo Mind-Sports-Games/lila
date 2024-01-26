@@ -29,7 +29,7 @@ case class AnaMove(
 ) extends AnaAny {
 
   private lazy val lib = variant.gameLogic
-  //draughts
+
   private lazy val fullCaptureFields =
     uci.flatMap(m => Uci.Move.apply(lib, variant.gameFamily, m)).flatMap(_.capture)
 
@@ -43,18 +43,14 @@ case class AnaMove(
   )
 
   def branch: Validated[String, Branch] =
-    newGame flatMap { case (game, move) =>
-      game.pgnMoves.lastOption toValid "Moved but no last move!" map { san =>
-        val uci = Uci(
-          lib,
-          move,
-          lib match {
-            case GameLogic.Draughts() => fullCaptureFields.isDefined
-            case _                    => false
-          }
-        )
+    newGame.flatMap { case (game, move) =>
+      game.pgnMoves.lastOption.toValid("Moved but no last move!").map { san =>
+        val uci = Uci(lib, move, lib match {
+          case GameLogic.Draughts() => fullCaptureFields.isDefined
+          case _                    => false
+        })
         val sit     = game.situation
-        val movable = sit playable false
+        val movable = sit.playable(false)
         val fen     = Forsyth.>>(lib, game)
         val captLen = (sit, dest) match {
           case (Situation.Draughts(sit), Pos.Draughts(dest)) =>
@@ -112,15 +108,15 @@ case class AnaMove(
 
 object AnaMove {
 
-  def parse(o: JsObject) =
+  def parse(o: JsObject): Option[AnaMove] =
     for {
       d   <- o obj "d"
       lib <- d int "lib"
       gl = GameLogic(lib)
-      orig <- d str "orig" flatMap { pos => Pos.fromKey(gl, pos) }
-      dest <- d str "dest" flatMap { pos => Pos.fromKey(gl, pos) }
-      fen  <- d str "fen" map { fen => FEN.apply(gl, fen) }
-      path <- d str "path"
+      orig <- d.str("orig").flatMap(pos => Pos.fromKey(gl, pos))
+      dest <- d.str("dest").flatMap(pos => Pos.fromKey(gl, pos))
+      fen  <- d.str("fen").map(fen => FEN.apply(gl, fen))
+      path <- d.str("path")
       v = Variant.orDefault(gl, ~d.str("variant"))
     } yield AnaMove(
       orig = orig,
@@ -128,9 +124,9 @@ object AnaMove {
       variant = v,
       fen = fen,
       path = path,
-      chapterId = d str "ch",
-      promotion = d str "promotion" flatMap { p => Role.promotable(gl, v.gameFamily, p) },
-      uci = d str "uci",
-      fullCapture = d boolean "fullCapture"
+      chapterId = d.str("ch"),
+      promotion = d.str("promotion").flatMap(p => Role.promotable(gl, v.gameFamily, p)),
+      uci = d.str("uci"),
+      fullCapture = d.boolean("fullCapture")
     )
 }
