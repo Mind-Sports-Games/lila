@@ -136,3 +136,18 @@ const noFishnetVariants: VariantKey[] = [
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
 }
+
+export function readDice(fen: string, variant: VariantKey): cg.Dice[] {
+  if (!['backgammon'].includes(variant)) return [];
+  if (fen.split(' ').length < 2) return [];
+  const unusedDice = fen.split(' ')[1].replace('-', '').split('/');
+  const usedDice = fen.split(' ')[2].replace('-', '').split('/');
+  const dice = [];
+  for (const d of unusedDice) {
+    if (+d) dice.push({ value: +d, isAvailable: true });
+  }
+  for (const d of usedDice) {
+    if (+d) dice.push({ value: +d, isAvailable: false });
+  }
+  return dice;
+}

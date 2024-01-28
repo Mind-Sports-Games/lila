@@ -23,7 +23,7 @@ export function makeConfig(ctrl: RoundController): Config {
   console.log('data.dice', data.dice);
   console.log('data.possibleDrops', data.possibleDrops);
   console.log('data.possibleDropsByRole', data.possibleDropsByRole);
-  console.log('util.getBackgammonDice(step.fen)', util.getBackgammonDice(step.fen));
+  console.log('read dice from fen', stratUtils.readDice(step.fen, data.game.variant.key));
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -33,7 +33,7 @@ export function makeConfig(ctrl: RoundController): Config {
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: ['togyzkumalak', 'backgammon'].includes(data.game.variant.key),
-    dice: data.game.variant.key == 'backgammon' ? (data.dice ? data.dice : util.getBackgammonDice(step.fen)) : [],
+    dice: data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key),
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {

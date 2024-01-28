@@ -111,7 +111,7 @@ export default class RoundController {
     this.goneBerserk[d.player.playerIndex] = d.player.berserk;
     this.goneBerserk[d.opponent.playerIndex] = d.opponent.berserk;
     //TODO get dice from fen and refactor where necessary (also set active dice value attribute)
-    d.dice = d.game.variant.key === 'backgammon' ? util.getBackgammonDice(round.plyStep(d, this.ply).fen) : undefined;
+    d.dice = stratUtils.readDice(round.plyStep(d, this.ply).fen, d.game.variant.key);
     d.activeDiceValue = d.dice && d.dice.length >= 2 ? d.dice[0].value : undefined;
 
     setTimeout(() => {
@@ -364,7 +364,7 @@ export default class RoundController {
       lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
       check: !!s.check,
       turnPlayerIndex: util.turnPlayerIndexFromLastTurn(this.turnCount),
-      dice: util.getBackgammonDice(s.fen),
+      dice: stratUtils.readDice(s.fen, this.data.game.variant.key),
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -554,7 +554,7 @@ export default class RoundController {
       d.activeDiceValue = d.dice && d.dice.length >= 2 ? d.dice[0].value : undefined;
     } else {
       //TODO add dice from backgammon board fen?
-      //d.dice = util.getBackgammonDice(o.fen);
+      //d.dice = stratUtils.readDice(s.fen, this.data.game.variant.key);
       //d.activeDiceValue = ?
     }
 

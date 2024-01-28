@@ -185,20 +185,6 @@ export function getBackgammonScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
 }
 
-export function getBackgammonDice(fen: string): cg.Dice[] {
-  if (fen.split(' ').length < 2) return [];
-  const unusedDice = fen.split(' ')[1].replace('-', '').split('/');
-  const usedDice = fen.split(' ')[2].replace('-', '').split('/');
-  const dice = [];
-  for (const d of unusedDice) {
-    if (+d) dice.push({ value: +d, isAvailable: true });
-  }
-  for (const d of usedDice) {
-    if (+d) dice.push({ value: +d, isAvailable: false });
-  }
-  return dice;
-}
-
 export function parseDiceRoll(dice: string | undefined): cg.Dice[] {
   if (dice === undefined) return [];
   //TODO add extra dice for doubles, dice moves are also not always available....

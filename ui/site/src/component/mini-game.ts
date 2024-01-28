@@ -1,4 +1,6 @@
 import * as domData from 'common/data';
+import { variantFromElement } from 'common/mini-board';
+import { readDice } from 'stratutils';
 
 interface UpdateData {
   lm: string;
@@ -54,6 +56,7 @@ export const init = (node: HTMLElement) => {
           myPlayerIndex: orientation,
           resizable: false,
           fen,
+          dice: readDice(fen, variantFromElement($el) as VariantKey),
           orientation,
           lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
           drawable: {
@@ -85,31 +88,7 @@ export const init = (node: HTMLElement) => {
             : $el.hasClass('variant-backgammon')
             ? { width: 12, height: 2 }
             : { width: 8, height: 8 },
-          variant: $el.hasClass('variant-shogi')
-            ? 'shogi'
-            : $el.hasClass('variant-xiangqi')
-            ? 'xiangqi'
-            : $el.hasClass('variant-minishogi')
-            ? 'minishogi'
-            : $el.hasClass('variant-minixiangqi')
-            ? 'minixiangqi'
-            : $el.hasClass('variant-flipello10')
-            ? 'flipello10'
-            : $el.hasClass('variant-amazons')
-            ? 'amazons'
-            : $el.hasClass('variant-oware')
-            ? 'oware'
-            : $el.hasClass('variant-togyzkumalak')
-            ? 'togyzkumalak'
-            : $el.hasClass('variant-go9x9')
-            ? 'go9x9'
-            : $el.hasClass('variant-go13x13')
-            ? 'go13x13'
-            : $el.hasClass('variant-go19x19')
-            ? 'go19x19'
-            : $el.hasClass('variant-backgammon')
-            ? 'backgammon'
-            : 'standard',
+          variant: variantFromElement($el),
         },
         $cg = $el.find('.cg-wrap'),
         turnPlayerIndex = fenPlayerIndex(fen);
@@ -144,6 +123,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   if (cg)
     cg.set({
       fen: data.fen,
+      dice: readDice(data.fen, variantFromElement($el) as VariantKey),
       lastMove,
     });
   if (dg)
