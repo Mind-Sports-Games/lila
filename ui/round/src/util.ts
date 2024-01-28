@@ -201,6 +201,7 @@ export function getBackgammonDice(fen: string): cg.Dice[] {
 
 export function parseDiceRoll(dice: string | undefined): cg.Dice[] {
   if (dice === undefined) return [];
+  //TODO add extra dice for doubles, dice moves are also not always available....
   const diceRoll = [];
   for (const d of dice.split('/')) {
     if (+d) diceRoll.push({ value: +d, isAvailable: true });

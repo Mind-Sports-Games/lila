@@ -449,18 +449,21 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
 }
 
 function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
-  //TODO support all uci from actions
+  //TODO support all uci from actions, current missing
+  //end turn - need to skip this ''
+  //cant move - 'no-play'
   if (move.uci === 'roll') return '';
   if (move.uci.includes('/')) return `${move.uci.replace('/', '')}:`;
 
-  const reg = move.uci.match(/[a-lsA-LS][1-2@]/g) as string[];
+  const reg = move.uci.match(/[a-lsA-LS][1-2@^]/g) as string[];
   const orig = reg[0];
   const dest = reg[1];
   const isDrop = reg[0].includes('@');
+  const isLift = reg[0].includes('^');
   const movePlayer = move.prevFen.split(' ')[3] === 'w' ? 'p1' : 'p2';
   const moveOpponent = move.prevFen.split(' ')[3] === 'w' ? 'p2' : 'p1';
-  //TODO get this from the fen when it exists and fix test
-  const diceRoll = '43'; //unused - design different output?
+
+  const diceRoll = getDice(move.prevFen); //this is not really used but for completeness
 
   //captures
   const capturedPiecesBefore = numberofCapturedPiecesOfPlayer(moveOpponent, move.prevFen);
@@ -496,7 +499,17 @@ function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   // 43: 8/4 8/5
   // 55: 16/21(3) bar/5
   // 21: 8/7* 13/11
+  if (isLift) return `${diceRoll}: ${destBoardPosNumber}/off`;
   return `${diceRoll}: ${origBoardPosNumber}/${destBoardPosNumber}${isCaptureNotation}`;
+}
+
+export function getDice(fen: string): string {
+  if (fen.split(' ').length < 2) return '';
+  const unusedDice = fen.split(' ')[1].replace('-', '').split('/');
+  const usedDice = fen.split(' ')[2].replace('-', '').split('/');
+  const dice = unusedDice.concat(usedDice).join('');
+  if (dice.length === 4) return dice.slice(2); // handles doubles
+  return dice;
 }
 
 function numberofCapturedPiecesOfPlayer(player: 'p1' | 'p2', fen: string): number {
