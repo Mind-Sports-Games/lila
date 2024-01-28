@@ -1170,15 +1170,16 @@ cg-container .cg-custom-svgs svg {
 .variant-backgammon {
   cg-dice {
     width: calc(100% * 6 / 15);
-    top: 45.5%;
-    height: 9%;
+    top: 46.5%;
+    height: 7%;
     display: flex;
     flex-flow: row;
-    justify-content: space-evenly;
+    justify-content: center;
     position: absolute;
     pointer-events: none;
     dice {
-      width: calc(100% * 15 * 9 / 600);
+      width: calc(100% * 15 * 7 / 600);
+      margin: 0vw 0.25vw;
       &.unavailable {
         opacity: 0.35;
       }
