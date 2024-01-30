@@ -111,6 +111,7 @@ export default class RoundController {
     this.goneBerserk[d.player.playerIndex] = d.player.berserk;
     this.goneBerserk[d.opponent.playerIndex] = d.opponent.berserk;
     //TODO get dice from fen and refactor where necessary (also set active dice value attribute)
+    //To remove from here, probably need to add to round data json view.
     d.dice = stratUtils.readDice(round.plyStep(d, this.ply).fen, d.game.variant.key);
     d.activeDiceValue = d.dice && d.dice.length >= 2 ? d.dice[0].value : undefined;
 
@@ -224,6 +225,9 @@ export default class RoundController {
         sound.capture();
       } else if (this.data.game.variant.key === 'togyzkumalak') {
         mancala.updateBoardFromTogyzkumalakMove(this, orig, dest);
+        sound.capture();
+      } else if (this.data.game.variant.key === 'backgammon') {
+        backgammon.updateBoardFromMove(this, orig, dest);
         sound.capture();
       } else sound.capture();
     } else if (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') {
@@ -549,14 +553,8 @@ export default class RoundController {
 
     //TODO set the right data from all backgammon actions
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
-    if (o.dice) {
-      d.dice = util.parseDiceRoll(o.dice);
-      d.activeDiceValue = d.dice && d.dice.length >= 2 ? d.dice[0].value : undefined;
-    } else {
-      //TODO add dice from backgammon board fen?
-      //d.dice = stratUtils.readDice(s.fen, this.data.game.variant.key);
-      //d.activeDiceValue = ?
-    }
+    d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key);
+    d.activeDiceValue = d.dice && d.dice.length >= 2 ? d.dice[0].value : undefined;
 
     d.crazyhouse = o.crazyhouse;
     d.takebackable = d.canTakeBack ? o.takebackable : false;
@@ -599,8 +597,9 @@ export default class RoundController {
           // ignore a pass action
           const pieces = this.chessground.state.pieces;
           if (
-            !o.castle ||
-            (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')
+            (!o.castle ||
+              (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')) &&
+            !['backgammon'].includes(d.game.variant.key)
           ) {
             if (['oware', 'togyzkumalak', 'backgammon'].includes(d.game.variant.key)) {
               this.chessground.moveNoAnim(keys[0], keys[1]);
@@ -635,7 +634,8 @@ export default class RoundController {
         onlyDropsVariant: d.onlyDropsVariant, //need to update every move (amazons)
         selectOnly: d.selectMode,
         highlight: {
-          lastMove: d.pref.highlight && !d.selectMode,
+          //TODO do we want a different highlight for backgammon?
+          lastMove: d.pref.highlight && !d.selectMode && !['backgammon'].includes(d.game.variant.key),
         },
       });
       if (o.check) sound.check();

@@ -497,7 +497,7 @@ function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
 
   // examples:
   // 43: 8/4 8/5
-  // 55: 16/21(3) bar/5
+  // 55: 21/16(3) bar/5
   // 21: 8/7* 13/11
   if (isLift) return `${diceRoll}: ${destBoardPosNumber}/off`;
   return `${diceRoll}: ${origBoardPosNumber}/${destBoardPosNumber}${isCaptureNotation}`;

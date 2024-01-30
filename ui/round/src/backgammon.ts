@@ -6,7 +6,7 @@ import RoundController from './ctrl';
 export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
   const diff: cg.PiecesDiff = new Map();
   let boardFen = newFen.split(' ')[0];
-  //TODO also managed the pocket?
+  //TODO do we also need to manage the pocket?
   if (boardFen.indexOf('[') !== -1) boardFen = boardFen.slice(0, boardFen.indexOf('['));
 
   let col = 0;
@@ -42,11 +42,6 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
 }
 
 export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: cg.Key) {
-  //todo how to detect the same move as last move (i.e. from a double)?
-  // const alreadyUpdatedFromFen = ctrl.data.steps[ctrl.data.steps.length - 1].uci === orig + dest;
-  // console.log("alreadyUpdatedFromFen", alreadyUpdatedFromFen);
-  // if (alreadyUpdatedFromFen) return;
-
   //TODO also manage the pocket and captures (as well as undo action?)
 
   //assumption this is the fen before the move (check this?)
@@ -99,6 +94,7 @@ export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: c
     }
   }
 
+  ctrl.chessground.set({ turnPlayerIndex: ctrl.data.game.player }); //move in chessground swaps player index
   ctrl.chessground.setPiecesNoAnim(diff);
   ctrl.chessground.redrawAll();
 }

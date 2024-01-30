@@ -7,7 +7,7 @@ import { h, VNode } from 'snabbdom';
 import { plyStep } from '../round';
 import { finished } from 'game/status';
 import { Position, MaterialDiff, MaterialDiffSide, CheckCount } from '../interfaces';
-import { read as fenRead } from 'chessground/fen';
+import { read as fenRead, readPocket as pocketRead } from 'chessground/fen';
 import * as cg from 'chessground/types';
 import { render as keyboardMove } from '../keyboardMove';
 import { render as renderGround } from '../ground';
@@ -174,10 +174,20 @@ export function main(ctrl: RoundController): VNode {
         break;
       }
       case 'backgammon': {
+        const startingNumberOfPieces = 15;
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
-        //TODO get score another away as not in board fen
-        const p1PiecesOffBoard = util.getBackgammonScore(fen, 'p1');
-        const p2PiecesOffBoard = util.getBackgammonScore(fen, 'p2');
+        const pieces = cgState ? cgState.pieces : fenRead(fen, boardSize, variantKey);
+        const pocketPieces = pocketRead(fen, 'backgammon');
+
+        const p1PiecesOffBoard: number =
+          fen.split(' ').length > 5
+            ? util.getBackgammonScoreFromFen(fen, 'p1')
+            : startingNumberOfPieces - util.getBackgammonScoreFromPieces(pieces, pocketPieces, 'p1');
+        const p2PiecesOffBoard: number =
+          fen.split(' ').length > 5
+            ? util.getBackgammonScoreFromFen(fen, 'p2')
+            : startingNumberOfPieces - util.getBackgammonScoreFromPieces(pieces, pocketPieces, 'p2');
+
         const p1Score = p1PiecesOffBoard;
         const p2Score = p2PiecesOffBoard;
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;

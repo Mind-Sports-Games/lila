@@ -181,18 +181,19 @@ export function getGoKomi(fen: string): number {
   return +fen.split(' ')[7] / 10.0;
 }
 
-export function getBackgammonScore(fen: string, playerIndex: string): number {
+export function getBackgammonScoreFromFen(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
 }
 
-export function parseDiceRoll(dice: string | undefined): cg.Dice[] {
-  if (dice === undefined) return [];
-  //TODO add extra dice for doubles, dice moves are also not always available....
-  const diceRoll = [];
-  for (const d of dice.split('/')) {
-    if (+d) diceRoll.push({ value: +d, isAvailable: true });
+export function getBackgammonScoreFromPieces(pieces: cg.Pieces, pocketPieces: cg.Piece[], playerIndex: string): number {
+  let score = 0;
+  for (const p of pieces.values()) {
+    score += +p.role.split('-')[0].substring(1) * (p.playerIndex === playerIndex ? 1 : 0);
   }
-  return diceRoll;
+  for (const p of pocketPieces) {
+    score += +p.role.split('-')[0].substring(1) * (p.playerIndex === playerIndex ? 1 : 0);
+  }
+  return score;
 }
 
 export function goStonesToSelect(deadstones: cg.Key[], pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {

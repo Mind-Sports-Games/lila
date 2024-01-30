@@ -192,7 +192,7 @@ object Event {
             }
           else
             Forsyth
-              .exportBoard(situation.board.variant.gameLogic, situation.board),
+              .boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -320,7 +320,7 @@ object Event {
           case StratDrop.Go(drop)         => strategygames.go.format.pgn.Dumper(drop)
           case StratDrop.Backgammon(drop) => strategygames.backgammon.format.pgn.Dumper(drop)
         },
-        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -419,7 +419,7 @@ object Event {
           case _                 => false
         },
         san = "pass",
-        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -503,7 +503,7 @@ object Event {
         gf = situation.board.variant.gameFamily,
         squares = ss.squares,
         san = s"ss:${ss.squares.mkString(",")}",
-        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -567,9 +567,8 @@ object Event {
         pocketData
       ) {
         Json.obj(
-          "dice" -> dice.mkString("/"),
-          "uci"  -> dice.mkString("/"),
-          "san"  -> san
+          "uci" -> dice.mkString("/"),
+          "san" -> san
         )
       }
     override def moveBy = Some(!state.playerIndex)
@@ -586,7 +585,7 @@ object Event {
         gf = situation.board.variant.gameFamily,
         dice = dr.dice,
         san = dr.dice.mkString("/"),
-        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,

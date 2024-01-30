@@ -6,6 +6,8 @@ export const init = (node: HTMLElement): void => {
   initWith(node, fen, orientation as PlayerIndex, lm);
 };
 
+const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
+
 export const initWith = (node: HTMLElement, fen: string, orientation: PlayerIndex, lm?: string): void => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 500);
   else {
@@ -38,13 +40,14 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
           orientation,
           coordinates: false,
           myPlayerIndex: myPlayerIndex,
+          turnPlayerIndex: fenPlayerIndex(fen),
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
           fen,
           dice: readDice(fen, variantFromElement($el) as VariantKey),
           lastMove: lm && (lm == 'pass' ? undefined : lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
           highlight: {
-            lastMove: lm != undefined && lm! == 'pass',
+            lastMove: lm != undefined && lm! == 'pass' && variantFromElement($el) != 'backgammon',
           },
           drawable: {
             enabled: false,

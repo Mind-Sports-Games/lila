@@ -27,6 +27,9 @@ const boardClasses = (variant: Variant): string =>
       }.variant-${variant.key}`
     : `${variant.gameFamily}.${variant.key}.variant-${variant.key}`;
 
+const activePlayerLetter = (pov: NowPlaying): string =>
+  (pov.isMyTurn && pov.playerIndex === 'p1') || (!pov.isMyTurn && pov.playerIndex === 'p2') ? 'w' : 'b';
+
 export default function (ctrl: LobbyController) {
   return h(
     'div.now-playing',
@@ -46,7 +49,7 @@ export default function (ctrl: LobbyController) {
                     'data-state': `${pov.fen}|${boardSize(pov.variant.boardSize)}|${pov.playerIndex}|${pov.lastMove}`,
                   }
                 : {
-                    'data-state': `${pov.fen}|${pov.playerIndex}|${pov.lastMove}`,
+                    'data-state': `${pov.fen} ${activePlayerLetter(pov)}|${pov.playerIndex}|${pov.lastMove}`,
                   },
             hook: {
               insert(vnode) {

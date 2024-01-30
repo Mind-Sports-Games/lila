@@ -54,11 +54,15 @@ export const init = (node: HTMLElement) => {
           coordinates: false,
           viewOnly: true,
           myPlayerIndex: orientation,
+          turnPlayerIndex: fenPlayerIndex(fen),
           resizable: false,
           fen,
           dice: readDice(fen, variantFromElement($el) as VariantKey),
           orientation,
           lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          highlight: {
+            lastMove: variantFromElement($el) != 'backgammon',
+          },
           drawable: {
             enabled: false,
             visible: false,
@@ -123,6 +127,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   if (cg)
     cg.set({
       fen: data.fen,
+      turnPlayerIndex: fenPlayerIndex(data.fen),
       dice: readDice(data.fen, variantFromElement($el) as VariantKey),
       lastMove,
     });
