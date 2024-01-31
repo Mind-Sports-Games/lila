@@ -110,10 +110,6 @@ export default class RoundController {
     this.turnCount = round.lastTurn(d);
     this.goneBerserk[d.player.playerIndex] = d.player.berserk;
     this.goneBerserk[d.opponent.playerIndex] = d.opponent.berserk;
-    //TODO get dice from fen and refactor where necessary (also set active dice value attribute)
-    //To remove from here, probably need to add to round data json view.
-    d.dice = stratUtils.readDice(round.plyStep(d, this.ply).fen, d.game.variant.key);
-    d.activeDiceValue = d.dice && d.dice.length >= 2 ? d.dice[0].value : undefined;
 
     setTimeout(() => {
       this.firstSeconds = false;
@@ -233,11 +229,9 @@ export default class RoundController {
     } else if (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') {
       flipello.flip(this, dest, this.data.player.playerIndex);
     } else if (this.data.game.variant.key === 'oware') {
-      //always play the capture sound regardless of move TODO change depending on number of stones?
       mancala.updateBoardFromOwareMove(this, orig, dest);
       sound.capture();
     } else if (this.data.game.variant.key === 'togyzkumalak') {
-      //always play the capture sound regardless of move TODO change depending on number of stones?
       mancala.updateBoardFromTogyzkumalakMove(this, orig, dest);
       sound.capture();
     } else if (this.data.game.variant.key === 'backgammon') {
@@ -274,7 +268,7 @@ export default class RoundController {
 
   private onSelectDice = (dice: cg.Dice[]) => {
     this.data.dice = dice;
-    this.data.activeDiceValue = this.data.dice && this.data.dice.length >= 2 ? this.data.dice[0].value : undefined;
+    this.data.activeDiceValue = this.activeDiceValue(dice);
     ground.reload(this); //update possible actions from new 'active' (be more restrictive?)
     this.chessground.redrawAll(); //redraw dice
   };
@@ -363,12 +357,13 @@ export default class RoundController {
     this.preDrop = undefined;
     const s = this.stepAt(ply);
     this.turnCount = s.turnCount;
+    const dice = stratUtils.readDice(s.fen, this.data.game.variant.key);
     const config: CgConfig = {
       fen: s.fen,
       lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
       check: !!s.check,
       turnPlayerIndex: util.turnPlayerIndexFromLastTurn(this.turnCount),
-      dice: stratUtils.readDice(s.fen, this.data.game.variant.key),
+      dice: dice,
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -376,7 +371,7 @@ export default class RoundController {
     } else {
       config.movable = {
         playerIndex: this.isPlaying() ? this.data.player.playerIndex : undefined,
-        dests: util.parsePossibleMoves(this.data.possibleMoves, this.data.activeDiceValue),
+        dests: util.parsePossibleMoves(this.data.possibleMoves, this.activeDiceValue(dice)),
       };
     }
     config.dropmode = {
@@ -420,6 +415,10 @@ export default class RoundController {
       (d.pref.replay === Prefs.Replay.OnlySlowGames &&
         (d.game.speed === 'classical' || d.game.speed === 'unlimited' || d.game.speed === 'correspondence'))
     );
+  };
+
+  activeDiceValue = (dice: cg.Dice[]): number | undefined => {
+    return dice && dice.length >= 2 ? dice[0].value : undefined;
   };
 
   isLate = () => this.replaying() && status.playing(this.data);
@@ -536,6 +535,9 @@ export default class RoundController {
     d.game.turns = o.turnCount;
     d.game.player = util.turnPlayerIndexFromLastTurn(o.turnCount);
 
+    console.log('api move');
+    console.log('uci', o.uci);
+
     if (d.game.variant.key == 'amazons') {
       d.onlyDropsVariant = o.drops ? true : false;
     }
@@ -554,7 +556,7 @@ export default class RoundController {
     //TODO set the right data from all backgammon actions
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
     d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key);
-    d.activeDiceValue = d.dice && d.dice.length >= 2 ? d.dice[0].value : undefined;
+    d.activeDiceValue = this.activeDiceValue(d.dice);
 
     d.crazyhouse = o.crazyhouse;
     d.takebackable = d.canTakeBack ? o.takebackable : false;

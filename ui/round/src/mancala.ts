@@ -11,7 +11,7 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
   let num = 0;
   const emptySquares: cg.Key[] = [];
 
-  //TODO this is very similar to chessground.fen.read but also calcs the empty squares
+  //This is very similar to chessground.fen.read but also calcs the empty squares
   for (const r of boardFen.split('/')) {
     for (const f of r.split(',')) {
       if (isNaN(+f)) {
@@ -212,7 +212,7 @@ export function updateBoardFromTogyzkumalakMove(ctrl: RoundController, orig: cg.
 function createBoardArrayFromBoardFen(boardFen: string, boardWidth: number): number[] {
   const boardArrayFenOrder: number[] = [];
 
-  //TODO this is similar to chessground.fen.read but doesnt make pieces
+  //This is similar to chessground.fen.read but doesnt make pieces
   for (const r of boardFen.split('/')) {
     for (const f of r.split(',')) {
       if (isNaN(+f)) {

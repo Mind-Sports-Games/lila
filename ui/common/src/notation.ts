@@ -98,7 +98,7 @@ function shogiNotation(move: ExtendedMoveInfo, variant: Variant): string {
     connector = isCapture(prevBoard, board) ? 'x' : isDrop(prevBoard, board) ? '*' : '-',
     role = board.pieces[dest],
     piece = role[0] === '+' ? role[0] + role[1].toUpperCase() : role[0].toUpperCase(),
-    origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '', //ToDo ideally calculate this from SAN or in stratops as currently doesn't include illegal moves like piece being pinned or obstruction
+    origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '',
     promotion = promotionSymbol(prevBoard, board, parsed);
 
   if (promotion == '+') return `${piece.slice(1)}${origin}${connector}${dest}${promotion}`;

@@ -53,7 +53,6 @@ export const justIcon = (icon: string): VNodeData => ({
 // TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
   if (!uci || uci == 'pass' || uci == 'roll' || uci.includes('/') || uci.substring(0, 3) == 'ss:') return undefined;
-  //TODO support dice roll here or undefined?
   const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
   return [pos[0], pos[1]] as cg.Key[];

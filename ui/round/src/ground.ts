@@ -18,12 +18,11 @@ export function makeConfig(ctrl: RoundController): Config {
     step = plyStep(data, ctrl.ply),
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
-    turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount);
+    turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount),
+    dice = data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key);
   console.log('step.fen', step.fen);
-  console.log('data.dice', data.dice);
   console.log('data.possibleDrops', data.possibleDrops);
   console.log('data.possibleDropsByRole', data.possibleDropsByRole);
-  console.log('read dice from fen', stratUtils.readDice(step.fen, data.game.variant.key));
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -33,7 +32,7 @@ export function makeConfig(ctrl: RoundController): Config {
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: ['togyzkumalak', 'backgammon'].includes(data.game.variant.key),
-    dice: data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key),
+    dice: dice,
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {
@@ -53,7 +52,7 @@ export function makeConfig(ctrl: RoundController): Config {
     movable: {
       free: false,
       playerIndex: playing ? data.player.playerIndex : undefined,
-      dests: playing ? util.parsePossibleMoves(data.possibleMoves, data.activeDiceValue) : new Map(),
+      dests: playing ? util.parsePossibleMoves(data.possibleMoves, ctrl.activeDiceValue(dice)) : new Map(),
       showDests: data.pref.destination,
       rookCastle: data.pref.rookCastle,
       events: {
