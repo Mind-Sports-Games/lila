@@ -12,6 +12,7 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
   let col = 0;
   let row = 2;
   let num = 0;
+  const emptySquares: cg.Key[] = [];
 
   //This is very similar to chessground.fen.read
   for (const r of boardFen.split('/')) {
@@ -29,6 +30,9 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
         diff.set(util.pos2key([col, row]), piece);
       } else {
         num = num + +f;
+        for (let j = 0; j < Number(+f); j++) {
+          emptySquares.push(util.pos2key([col + j + 1, row]));
+        }
       }
     }
     --row;
@@ -36,6 +40,9 @@ export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
     col = 0;
     num = 0;
   }
+
+  //also need to check for an empty space left by the piece that just moved (just set them all to undefined)
+  emptySquares.forEach(x => diff.set(x, undefined));
 
   ctrl.chessground.setPiecesNoAnim(diff);
   ctrl.chessground.redrawAll();
