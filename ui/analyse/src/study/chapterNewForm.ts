@@ -185,20 +185,20 @@ function pgntab(ctrl: StudyChapterNewFormCtrl): VNode {
     }),
     window.FileReader
       ? h('input#chapter-pgn-file.form-control', {
-        attrs: {
-          type: 'file',
-          accept: '.pgn',
-        },
-        hook: bind('change', e => {
-          const file = (e.target as HTMLInputElement).files![0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = function () {
-            (document.getElementById('chapter-pgn') as HTMLTextAreaElement).value = reader.result as string;
-          };
-          reader.readAsText(file);
-        }),
-      })
+          attrs: {
+            type: 'file',
+            accept: '.pgn',
+          },
+          hook: bind('change', e => {
+            const file = (e.target as HTMLInputElement).files![0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function () {
+              (document.getElementById('chapter-pgn') as HTMLTextAreaElement).value = reader.result as string;
+            };
+            reader.readAsText(file);
+          }),
+        })
       : null,
   ]);
 }
@@ -222,10 +222,10 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
   const mode = currentChapter.practice
     ? 'practice'
     : defined(currentChapter.conceal)
-      ? 'conceal'
-      : currentChapter.gamebook
-        ? 'gamebook'
-        : 'normal';
+    ? 'conceal'
+    : currentChapter.gamebook
+    ? 'gamebook'
+    : 'normal';
   const noarg = trans.noarg;
   const onlyForAnalysisVariants = (node: VNode | null): VNode | null =>
     allowAnalysisForVariant(ctrl.vm.variantKey() ?? 'standard') ? node : null;
@@ -243,12 +243,12 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
       activeTab === 'edit'
         ? null
         : h('h2', [
-          noarg('newChapter'),
-          h('i.help', {
-            attrs: { 'data-icon': '' },
-            hook: bind('click', ctrl.startTour),
-          }),
-        ]),
+            noarg('newChapter'),
+            h('i.help', {
+              attrs: { 'data-icon': '' },
+              hook: bind('click', ctrl.startTour),
+            }),
+          ]),
       h(
         'form.form3',
         {
@@ -315,17 +315,20 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 'select#chapter-variant.form-control',
                 {
                   attrs: { disabled: gameOrPgn },
-                  hook: bind('change', e => {
-                    const select = e.target as HTMLInputElement;
-                    ctrl.vm.variantKey(select.value as VariantKey);
-                    ctrl.redraw();
-                  }),
+                  hook: {
+                    init: () => ctrl.vm.variantKey(currentChapter.setup.variant.key),
+                    ...bind('change', e => {
+                      const select = e.target as HTMLInputElement;
+                      ctrl.vm.variantKey(select.value as VariantKey);
+                      ctrl.redraw();
+                    }),
+                  },
                 },
                 gameOrPgn
                   ? [h('option', noarg('automatic'))]
                   : ctrl.vm.variants
-                    .filter(v => allowAnalysisForVariant(v.key))
-                    .map(v => option(v.key, currentChapter.setup.variant.key, v.name))
+                      .filter(v => allowAnalysisForVariant(v.key))
+                      .map(v => option(v.key, currentChapter.setup.variant.key, v.name))
               ),
             ]),
             h('div.form-group.form-half', [
