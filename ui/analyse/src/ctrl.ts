@@ -231,7 +231,8 @@ export default class AnalyseCtrl {
   }
 
   bottomPlayerIndex(): PlayerIndex {
-    return this.flipped ? opposite(this.data.player.playerIndex) : this.data.player.playerIndex;
+    const playerIndex = this.getOrientation() === 'p1' ? 'p1' : 'p2';
+    return this.flipped ? opposite(playerIndex) : playerIndex;
   }
 
   bottomIsP1 = () => this.bottomPlayerIndex() === 'p1';
@@ -311,23 +312,23 @@ export default class AnalyseCtrl {
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
-          ? this.bottomPlayerIndex()
-          : !this.embed &&
-            ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
-            ? playerIndex
-            : undefined,
+        ? this.bottomPlayerIndex()
+        : !this.embed &&
+          ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
+        ? playerIndex
+        : undefined,
       config: ChessgroundConfig = {
         fen: this.data.game.variant.key == 'amazons' ? amazonsChessgroundFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
         movable: this.embed
           ? {
-            playerIndex: undefined,
-            dests: new Map(),
-          }
+              playerIndex: undefined,
+              dests: new Map(),
+            }
           : {
-            playerIndex: movablePlayerIndex,
-            dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
-          },
+              playerIndex: movablePlayerIndex,
+              dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
+            },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
         onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
@@ -628,9 +629,9 @@ export default class AnalyseCtrl {
       (count.nodes >= 10 || count.comments > 0) &&
       !confirm(
         'Delete ' +
-        util.plural('move', count.nodes) +
-        (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
-        '?'
+          util.plural('move', count.nodes) +
+          (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
+          '?'
       )
     )
       return;
