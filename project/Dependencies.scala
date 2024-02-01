@@ -3,7 +3,7 @@ import sbt._, Keys._
 
 object Dependencies {
 
-  val lilaMaven = "lila-maven" at "https://raw.githubusercontent.com/Mind-Sports-Games/lila-maven/master"
+  val lilaMaven  = "lila-maven" at "https://raw.githubusercontent.com/Mind-Sports-Games/lila-maven/master"
   val localMaven = sys.env
     .get("LILA_MAVEN_RESOLVERS")
     .map(_.split(",").zipWithIndex.map { case (x, i) => s"local-maven-$i" at x })
@@ -14,7 +14,7 @@ object Dependencies {
   val hasher        = "com.roundeights"            %% "hasher"                          % "1.2.1"
   val jodaTime      = "joda-time"                   % "joda-time"                       % "2.10.10"
   val compression   = "org.lichess"                %% "compression"                     % "1.6"
-  val strategyGames = "org.playstrategy"           %% "strategygames"                   % "10.2.1-pstrat114"
+  val strategyGames = "org.playstrategy"           %% "strategygames"                   % "10.2.1-pstrat114.20240131.2"
   val maxmind       = "com.sanoma.cda"             %% "maxmind-geoip2-scala"            % "1.3.1-THIB"
   val prismic       = "io.prismic"                 %% "scala-kit"                       % "1.2.19-THIB213"
   val scrimage      = "com.sksamuel.scrimage"       % "scrimage-core"                   % "4.0.18"
@@ -33,7 +33,7 @@ object Dependencies {
 
   object flexmark {
     val version = "0.50.50"
-    val bundle =
+    val bundle  =
       ("com.vladsch.flexmark" % "flexmark" % version) ::
         List("formatter", "ext-tables", "ext-autolink", "ext-gfm-strikethrough").map { ext =>
           "com.vladsch.flexmark" % s"flexmark-$ext" % version
@@ -78,7 +78,7 @@ object Dependencies {
     val metrics    = "io.kamon" %% "kamon-system-metrics" % version
     val prometheus = "io.kamon" %% "kamon-prometheus"     % version
   }
-  object akka {
+  object akka  {
     val version    = "2.6.8"
     val akka       = "com.typesafe.akka" %% "akka-actor"       % version
     val akkaTyped  = "com.typesafe.akka" %% "akka-actor-typed" % version
