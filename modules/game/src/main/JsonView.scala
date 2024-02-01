@@ -7,10 +7,10 @@ import strategygames.opening.FullOpening
 import strategygames.{
   P2,
   ByoyomiClock,
-  Clock,
+  ClockBase,
   Player => PlayerIndex,
   Division,
-  FischerClock,
+  Clock,
   GameLogic,
   Pocket,
   PocketData,
@@ -55,7 +55,7 @@ final class JsonView(rematches: Rematches) {
       .add("winner" -> game.winnerPlayerIndex)
       .add("winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames))
       .add("loserPlayer" -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)))
-      .add("lastMove" -> game.lastMoveKeys)
+      .add("lastMove" -> game.lastActionKeys)
       .add("check" -> game.situation.checkSquare.map(_.key))
       .add("rematch" -> rematches.of(game.id))
       .add("canOfferDraw" -> game.variant.canOfferDraw)
@@ -237,17 +237,39 @@ object JsonView {
       )
     }
 
-  implicit val clockWriter: OWrites[Clock] = OWrites { c =>
+  private def baseClockJson(fc: Clock) =
+    Json.obj(
+      "running"   -> fc.isRunning,
+      "p1"        -> fc.remainingTime(P1).toSeconds,
+      "p2"        -> fc.remainingTime(P2).toSeconds,
+      "p1Pending" -> (fc.pending(P1) + fc.completedActionsOfTurnTime(P1)).toSeconds,
+      "p2Pending" -> (fc.pending(P2) + fc.completedActionsOfTurnTime(P2)).toSeconds,
+      "emerg"     -> fc.config.emergSeconds
+    )
+
+  implicit val clockWriter: OWrites[ClockBase] = OWrites { c =>
     c match {
-      case fc: FischerClock =>
-        Json.obj(
-          "running"   -> fc.isRunning,
-          "initial"   -> fc.limitSeconds,
-          "increment" -> fc.incrementSeconds,
-          "p1"        -> fc.remainingTime(P1).toSeconds,
-          "p2"        -> fc.remainingTime(P2).toSeconds,
-          "emerg"     -> fc.config.emergSeconds
-        )
+      case fc: Clock =>
+        fc.config match {
+          case fConfig: Clock.Config =>
+            Json.obj(
+              "initial"   -> fConfig.limitSeconds,
+              "increment" -> fConfig.incrementSeconds
+            ) ++ baseClockJson(fc)
+          case bConfig: Clock.BronsteinConfig =>
+            Json.obj(
+              "initial"   -> bConfig.limitSeconds,
+              "delay"     -> bConfig.delaySeconds,
+              "delayType" -> "bronstein"
+            ) ++ baseClockJson(fc)
+          case udConfig: Clock.SimpleDelayConfig =>
+            Json.obj(
+              "initial"   -> udConfig.limitSeconds,
+              "delay"     -> udConfig.delaySeconds,
+              "delayType" -> "usdelay"
+            ) ++ baseClockJson(fc)
+          case _: ByoyomiClock.Config => Json.obj() // TODO: this is annoying
+        }
       case bc: ByoyomiClock => {
         val p1Clock = bc.currentClockFor(P1)
         val p2Clock = bc.currentClockFor(P2)

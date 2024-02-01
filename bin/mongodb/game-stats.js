@@ -26,6 +26,7 @@ db.game5.aggregate([
 //src/main/scala/chess/variant/Horde.scala:      id = 8,
 //src/main/scala/chess/variant/KingOfTheHill.scala:      id = 4,
 //src/main/scala/chess/variant/LinesOfAction.scala:      id = 11,
+//src/main/scala/chess/variant/Monster.scala:      id = 15,
 //src/main/scala/chess/variant/NoCastling.scala:      id = 13,
 //src/main/scala/chess/variant/RacingKings.scala:      id = 9,
 //src/main/scala/chess/variant/ScrambledEggs.scala:      id = 14,

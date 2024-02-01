@@ -127,6 +127,7 @@ db.user4.find().forEach(function (user) {
     chess_5check_games: games.count({ us: uid, l: { $eq: 0 }, v: { $eq: 12 } }),
     chess_nocastling_games: games.count({ us: uid, l: { $eq: 0 }, v: { $eq: 13 } }),
     chess_scrambledEggs_games: games.count({ us: uid, l: { $eq: 0 }, v: { $eq: 14 } }),
+    chess_monster_games: games.count({ us: uid, l: { $eq: 0 }, v: { $eq: 15 } }),
     draughts_games: games.count({ us: uid, l: { $eq: 1 } }),
     draughts_standard_games: games.count({ us: uid, l: { $eq: 1 }, v: { $eq: 1 } }),
     draughts_frompos_games: games.count({ us: uid, l: { $eq: 1 }, v: { $eq: 3 } }),

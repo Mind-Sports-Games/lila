@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ ByoyomiClock, FischerClock, P1, P2 }
+import strategygames.{ ByoyomiClock, Clock, P1, P2 }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -178,28 +178,29 @@ object SwissJson {
   private def swissJsonBase(swiss: Swiss) =
     Json
       .obj(
-        "id"               -> swiss.id.value,
-        "createdBy"        -> swiss.createdBy,
-        "startsAt"         -> formatDate(swiss.startsAt),
-        "name"             -> swiss.name,
-        "clock"            -> swiss.clock,
-        "variant"          -> swiss.variant.key,
-        "isMedley"         -> swiss.isMedley,
-        "p1Name"           -> swiss.variant.playerNames(P1),
-        "p2Name"           -> swiss.variant.playerNames(P2),
-        "round"            -> swiss.round,
-        "roundVariant"     -> swiss.roundVariant.key,
-        "roundVariantName" -> VariantKeys.variantName(swiss.roundVariant),
-        "nbRounds"         -> swiss.actualNbRounds,
-        "nbPlayers"        -> swiss.nbPlayers,
-        "nbOngoing"        -> swiss.nbOngoing,
-        "trophy1st"        -> swiss.trophy1st,
-        "trophy2nd"        -> swiss.trophy2nd,
-        "trophy3rd"        -> swiss.trophy3rd,
-        "isMatchScore"     -> swiss.settings.isMatchScore,
-        "isBestOfX"        -> swiss.settings.isBestOfX,
-        "isPlayX"          -> swiss.settings.isPlayX,
-        "nbGamesPerRound"  -> swiss.settings.nbGamesPerRound,
+        "id"                    -> swiss.id.value,
+        "createdBy"             -> swiss.createdBy,
+        "startsAt"              -> formatDate(swiss.startsAt),
+        "name"                  -> swiss.name,
+        "clock"                 -> swiss.clock,
+        "variant"               -> swiss.variant.key,
+        "isMedley"              -> swiss.isMedley,
+        "p1Name"                -> swiss.variant.playerNames(P1),
+        "p2Name"                -> swiss.variant.playerNames(P2),
+        "round"                 -> swiss.round,
+        "roundVariant"          -> swiss.roundVariant.key,
+        "roundVariantName"      -> VariantKeys.variantName(swiss.roundVariant),
+        "nbRounds"              -> swiss.actualNbRounds,
+        "nbPlayers"             -> swiss.nbPlayers,
+        "nbOngoing"             -> swiss.nbOngoing,
+        "trophy1st"             -> swiss.trophy1st,
+        "trophy2nd"             -> swiss.trophy2nd,
+        "trophy3rd"             -> swiss.trophy3rd,
+        "isMatchScore"          -> swiss.settings.isMatchScore,
+        "isBestOfX"             -> swiss.settings.isBestOfX,
+        "isPlayX"               -> swiss.settings.isPlayX,
+        "nbGamesPerRound"       -> swiss.settings.nbGamesPerRound,
+        "timeBeforeStartToJoin" -> swiss.settings.timeBeforeStartToJoin,
         "status" -> {
           if (swiss.isStarted) "started"
           else if (swiss.isFinished) "finished"
@@ -347,7 +348,7 @@ object SwissJson {
         "gameFamily"  -> g.variant.gameFamily.key,
         "variantKey"  -> g.variant.key,
         "fen"         -> Forsyth.boardAndPlayer(g.variant.gameLogic, g.situation),
-        "lastMove"    -> ~g.lastMoveKeys,
+        "lastMove"    -> ~g.lastActionKeys,
         "orientation" -> g.naturalOrientation.name,
         "p1"          -> boardPlayerJson(p1),
         "p2"          -> boardPlayerJson(p2),
@@ -395,20 +396,31 @@ object SwissJson {
 
   implicit private val clockWrites: OWrites[strategygames.ClockConfig] = OWrites { clock =>
     clock match {
-      case fc: FischerClock.Config => {
+      // TODO: this clock json should be universal
+      case fc: Clock.Config =>
         Json.obj(
           "limit"     -> fc.limitSeconds,
           "increment" -> fc.incrementSeconds
         )
-      }
-      case bc: ByoyomiClock.Config => {
+      case bc: Clock.BronsteinConfig =>
+        Json.obj(
+          "limit"     -> bc.limitSeconds,
+          "delay"     -> bc.delaySeconds,
+          "delayType" -> "bronstein"
+        )
+      case udc: Clock.SimpleDelayConfig =>
+        Json.obj(
+          "limit"     -> udc.limitSeconds,
+          "delay"     -> udc.delaySeconds,
+          "delayType" -> "usdelay"
+        )
+      case bc: ByoyomiClock.Config =>
         Json.obj(
           "limit"     -> bc.limitSeconds,
           "increment" -> bc.incrementSeconds,
           "byoyomi"   -> bc.byoyomiSeconds,
           "periods"   -> bc.periodsTotal
         )
-      }
     }
   }
 

@@ -102,7 +102,7 @@ case class Challenge(
     initialFen.isDefined && !initialFen.exists(_.value == variant.initialFen.value)
 
   def customStartingPosition: Boolean =
-    variant.draughtsFromPosition ||
+    variant == Variant.Draughts(strategygames.draughts.variant.FromPosition) ||
       (draughtsFenVariants(variant) &&
         initialFen.isDefined &&
         !initialFen.exists(_.value == variant.initialFen.value))
@@ -201,8 +201,10 @@ object Challenge {
     case class Correspondence(days: Int) extends TimeControl
     case class Clock(config: strategygames.ClockConfig) extends TimeControl {
       // All durations are expressed in seconds
-      def limit     = config.limit
-      def increment = config.increment
+      def limit = config.limit
+      // TODO: This should be renamed to properly reflect that it also
+      //       represents Bronstein and SimpleDelay and not just increment
+      def increment = config.graceSeconds
       def show      = config.show
     }
   }
@@ -274,7 +276,7 @@ object Challenge {
     }
     val finalVariant = fenVariant match {
       case Some(v) if draughtsFenVariants(variant) =>
-        if (variant.draughtsFromPosition && v.draughtsStandard)
+        if (variant.fromPositionVariant && v.standardVariant)
           Variant
             .byName(GameLogic.Draughts(), "From Position")
             .getOrElse(Variant.orDefault(GameLogic.Draughts(), 3))

@@ -207,6 +207,14 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     }
 
     history.replaceState(null, '', '/');
+  } else if (location.hash == '#bot') {
+    $startButtons
+      .find('.config_friend')
+      .each(function (this: HTMLElement) {
+        this.dataset.hrefAddon = location.search;
+      })
+      .trigger(clickEvent);
+    $startButtons.find('.config_bot').addClass('active').siblings().removeClass('active');
   }
 
   const $gamelist_button_right = $('#slideRight'),
@@ -243,7 +251,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     });
 
     let scrollAmount = 0;
-    var slideTimer = setInterval(function () {
+    const slideTimer = setInterval(function () {
       if (direction == 'left') {
         element.scrollLeft -= step;
       } else {

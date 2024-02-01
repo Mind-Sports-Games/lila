@@ -6,22 +6,22 @@ import strategygames.{
   Board,
   ByoyomiClock,
   Centis,
-  FischerClock,
-  Player => PlayerIndex,
+  Clock => StratClock,
+  Drop => StratDrop,
   GameFamily,
   GameLogic,
   Move => StratMove,
-  Drop => StratDrop,
+  P1,
+  P2,
   Pass => StratPass,
-  SelectSquares => StratSelectSquares,
-  PromotableRole,
+  Player => PlayerIndex,
   PocketData,
   Pos,
-  Situation,
-  Status,
+  PromotableRole,
   Role,
-  P1,
-  P2
+  SelectSquares => StratSelectSquares,
+  Situation,
+  Status
 }
 import strategygames.chess
 import strategygames.variant.Variant
@@ -65,17 +65,19 @@ object Event {
         possibleDrops: Option[List[Pos]],
         possibleDropsByRole: Option[Map[Role, List[Pos]]],
         pocketData: Option[PocketData],
+        couldNextActionEndTurn: Option[Boolean] = None,
         captLen: Option[Int] = None
     )(extra: JsObject) = {
       extra ++ Json
         .obj(
-          "fen"         -> fen,
-          "ply"         -> state.plies,
-          "turnCount"   -> state.turnCount,
-          "dests"       -> PossibleMoves.oldJson(possibleMoves),
-          "captLen"     -> ~captLen,
-          "gf"          -> gf.id,
-          "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty))
+          "fen"                 -> fen,
+          "ply"                 -> state.plies,
+          "turnCount"           -> state.turnCount,
+          "dests"               -> PossibleMoves.oldJson(possibleMoves),
+          "captLen"             -> ~captLen,
+          "gf"                  -> gf.id,
+          "dropsByRole"         -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty)),
+          "multiActionMetaData" -> couldNextActionEndTurn.map(b => Json.obj("couldNextActionEndTurn" -> b))
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -112,10 +114,11 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       pocketData: Option[PocketData],
+      couldNextActionEndTurn: Option[Boolean],
       captLen: Option[Int]
   ) extends Event {
-    def typ = "move"
-    def data =
+    def typ             = "move"
+    def data            =
       Action.data(
         gf,
         fen,
@@ -129,6 +132,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         pocketData,
+        couldNextActionEndTurn,
         captLen
       ) {
         Json
@@ -170,7 +174,7 @@ object Event {
               case Board.Draughts(board) =>
                 Forsyth.exportBoard(GameLogic.Draughts(), situation.board) + ":" +
                   strategygames.draughts.format.Forsyth.exportKingMoves(board)
-              case _ => sys.error("mismatched board lib types")
+              case _                     => sys.error("mismatched board lib types")
             }
           else
             Forsyth
@@ -189,9 +193,9 @@ object Event {
         state = state,
         clock = clock,
         possibleMoves = (situation, move.dest) match {
-          //TODO: The Draughts specific logic should be pushed into strategygames
-          //and should be ready to go now validMoves handles this ghosts logic internally
-          //see Situation.Draughts.destinations
+          // TODO: The Draughts specific logic should be pushed into strategygames
+          // and should be ready to go now validMoves handles this ghosts logic internally
+          // see Situation.Draughts.destinations
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
             if (situation.ghosts > 0)
               Map(
@@ -202,18 +206,24 @@ object Event {
               situation.allDestinations.map { case (from, to) =>
                 (Pos.Draughts(from), to.map(Pos.Draughts))
               }
-          case _ => situation.destinations
+          case _                                                       => situation.destinations
         },
         possibleDrops = situation.drops,
         possibleDropsByRole = situation.dropsByRole,
         pocketData = pocketData,
+        // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
+        couldNextActionEndTurn = situation.actions.headOption.map(_ match {
+          case m: StratMove => m.autoEndTurn
+          case d: StratDrop => d.autoEndTurn
+          case _            => true
+        }),
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
             if (situation.ghosts > 0)
               situation.captureLengthFrom(moveDest)
             else
               situation.allMovesCaptureLength.some
-          case _ => None
+          case _                                                       => None
         }
       )
   }
@@ -233,10 +243,11 @@ object Event {
       possibleMoves: Map[Pos, List[Pos]],
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
-      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      couldNextActionEndTurn: Option[Boolean]
   ) extends Event {
-    def typ = "drop"
-    def data =
+    def typ             = "drop"
+    def data            =
       Action.data(
         gf,
         fen,
@@ -249,7 +260,8 @@ object Event {
         possibleMoves,
         possibleDrops,
         possibleDropsByRole,
-        pocketData
+        pocketData,
+        couldNextActionEndTurn
       ) {
         Json.obj(
           "role" -> role.groundName,
@@ -286,7 +298,13 @@ object Event {
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
         possibleDropsByRole = situation.dropsByRole,
-        pocketData = pocketData
+        pocketData = pocketData,
+        // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
+        couldNextActionEndTurn = situation.actions.headOption.map(_ match {
+          case m: StratMove => m.autoEndTurn
+          case d: StratDrop => d.autoEndTurn
+          case _            => true
+        })
       )
   }
 
@@ -308,8 +326,8 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]]
   ) extends Event {
-    def typ = "pass"
-    def data =
+    def typ             = "pass"
+    def data            =
       Action.data(
         gf,
         fen,
@@ -337,7 +355,7 @@ object Event {
   def deadStoneOfferStateJson(canSelectSquares: Boolean): Option[String] =
     if (canSelectSquares) Some("ChooseFirstOffer") else None
 
-  object Pass {
+  object Pass          {
     def apply(
         pass: StratPass,
         situation: Situation,
@@ -382,8 +400,8 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]]
   ) extends Event {
-    def typ = "selectSquares"
-    def data =
+    def typ             = "selectSquares"
+    def data            =
       Action.data(
         gf,
         fen,
@@ -480,7 +498,7 @@ object Event {
   }
 
   case class Enpassant(pos: Pos, playerIndex: PlayerIndex) extends Event {
-    def typ = "enpassant"
+    def typ  = "enpassant"
     def data =
       Json.obj(
         "key"         -> pos.key,
@@ -489,7 +507,7 @@ object Event {
   }
 
   case class Castling(king: (Pos, Pos), rook: (Pos, Pos), playerIndex: PlayerIndex) extends Event {
-    def typ = "castling"
+    def typ  = "castling"
     def data =
       Json.obj(
         "king"        -> Json.arr(king._1.key, king._2.key),
@@ -503,8 +521,8 @@ object Event {
       id: String,
       cookie: Option[JsObject]
   ) extends Event {
-    def typ = "redirect"
-    def data =
+    def typ           = "redirect"
+    def data          =
       Json
         .obj(
           "id"  -> id,
@@ -523,8 +541,8 @@ object Event {
       case Pos.Togyzkumalak(_) => GameLogic.Togyzkumalak().id
       case Pos.Go(_)           => GameLogic.Go().id
     }
-    def typ = "promotion"
-    def data =
+    def typ         = "promotion"
+    def data        =
       Json.obj(
         "key"        -> pos.key,
         "pieceClass" -> role.groundName,
@@ -554,7 +572,7 @@ object Event {
   }
 
   case class EndData(game: Game, ratingDiff: Option[RatingDiffs]) extends Event {
-    def typ = "endData"
+    def typ  = "endData"
     def data =
       Json
         .obj(
@@ -565,15 +583,19 @@ object Event {
         )
         .add("clock" -> game.clock.map { c =>
           c match {
-            case fc: FischerClock =>
+            case fc: StratClock   =>
               Json.obj(
-                "p1" -> fc.remainingTime(P1).centis,
-                "p2" -> fc.remainingTime(P2).centis
+                "p1"        -> fc.remainingTime(P1).centis,
+                "p2"        -> fc.remainingTime(P2).centis,
+                "p1Pending" -> (fc.pending(P1) + fc.completedActionsOfTurnTime(P1)).centis,
+                "p2Pending" -> (fc.pending(P2) + fc.completedActionsOfTurnTime(P2)).centis
               )
             case bc: ByoyomiClock =>
               Json.obj(
                 "p1"        -> bc.remainingTime(P1).centis,
                 "p2"        -> bc.remainingTime(P2).centis,
+                "p1Pending" -> (bc.pending(P1) + bc.completedActionsOfTurnTime(P1)).centis,
+                "p2Pending" -> (bc.pending(P2) + bc.completedActionsOfTurnTime(P2)).centis,
                 "p1Periods" -> bc.players(P1).periodsLeft,
                 "p2Periods" -> bc.players(P2).periodsLeft
               )
@@ -588,7 +610,7 @@ object Event {
         .add("boosted" -> game.boosted)
   }
 
-  case object Reload extends Empty {
+  case object Reload      extends Empty {
     def typ = "reload"
   }
   case object ReloadOwner extends Empty {
@@ -631,7 +653,7 @@ object Event {
   }
 
   case class ClockInc(playerIndex: PlayerIndex, time: Centis) extends Event {
-    def typ = "clockInc"
+    def typ  = "clockInc"
     def data =
       Json.obj(
         "playerIndex" -> playerIndex,
@@ -644,34 +666,50 @@ object Event {
   case class Clock(
       p1: Centis,
       p2: Centis,
+      p1Pending: Centis,
+      p2Pending: Centis,
+      p1Delay: Int,
+      p2Delay: Int,
       p1Periods: Int = 0,
       p2Periods: Int = 0,
       nextLagComp: Option[Centis] = None
   ) extends ClockEvent {
-    def typ = "clock"
+    def typ  = "clock"
     def data =
       Json
         .obj(
           "p1"        -> p1.toSeconds,
           "p2"        -> p2.toSeconds,
+          "p1Pending" -> p1Pending.toSeconds,
+          "p2Pending" -> p2Pending.toSeconds,
+          "p1Delay"   -> p1Delay,
+          "p2Delay"   -> p2Delay,
           "p1Periods" -> p1Periods,
           "p2Periods" -> p2Periods
         )
         .add("lag" -> nextLagComp.collect { case Centis(c) if c > 1 => c })
   }
   object Clock {
-    def apply(clock: strategygames.Clock): Clock =
+    def apply(clock: strategygames.ClockBase): Clock =
       clock match {
-        case fc: FischerClock =>
+        case fc: StratClock   =>
           Clock(
             fc.remainingTime(P1),
             fc.remainingTime(P2),
+            fc.pending(P1) + fc.completedActionsOfTurnTime(P1),
+            fc.pending(P2) + fc.completedActionsOfTurnTime(P2),
+            fc.graceSeconds,
+            fc.graceSeconds,
             nextLagComp = fc.lagCompEstimate(fc.player)
           )
         case bc: ByoyomiClock =>
           Clock(
             bc.remainingTime(P1),
             bc.remainingTime(P2),
+            bc.pending(P1) + bc.completedActionsOfTurnTime(P1),
+            bc.pending(P2) + bc.completedActionsOfTurnTime(P2),
+            0,
+            0,
             bc.players(P1).spentPeriods,
             bc.players(P2).spentPeriods,
             bc.lagCompEstimate(bc.player)
@@ -694,7 +732,7 @@ object Event {
   }
 
   case class CheckCount(p1: Int, p2: Int) extends Event {
-    def typ = "checkCount"
+    def typ  = "checkCount"
     def data =
       Json.obj(
         "p1" -> p1,
@@ -703,7 +741,7 @@ object Event {
   }
 
   case class Score(p1: Int, p2: Int) extends Event {
-    def typ = "score"
+    def typ  = "score"
     def data =
       Json.obj(
         "p1" -> p1,
@@ -712,7 +750,7 @@ object Event {
   }
 
   case class KingMoves(p1: Int, p2: Int, p1King: Option[Pos], p2King: Option[Pos]) extends Event {
-    def typ = "kingMoves"
+    def typ  = "kingMoves"
     def data = Json.obj(
       "p1"     -> p1,
       "p2"     -> p2,
@@ -732,7 +770,7 @@ object Event {
       p1OffersSelectSquares: Boolean,
       p2OffersSelectSquares: Boolean
   ) extends Event {
-    def typ = "state"
+    def typ  = "state"
     def data =
       Json
         .obj(
@@ -752,8 +790,8 @@ object Event {
       p1: Boolean,
       p2: Boolean
   ) extends Event {
-    def typ = "takebackOffers"
-    def data =
+    def typ            = "takebackOffers"
+    def data           =
       Json
         .obj()
         .add("p1" -> p1)
@@ -766,7 +804,7 @@ object Event {
       p2: Boolean,
       watchers: Option[JsValue]
   ) extends Event {
-    def typ = "crowd"
+    def typ  = "crowd"
     def data =
       Json
         .obj(

@@ -16,6 +16,7 @@ case class History(
     racingKings: RatingsMap,
     crazyhouse: RatingsMap,
     noCastling: RatingsMap,
+    monster: RatingsMap,
     linesOfAction: RatingsMap,
     scrambledEggs: RatingsMap,
     international: RatingsMap,
@@ -67,6 +68,7 @@ case class History(
       case "racingKings"    => racingKings
       case "crazyhouse"     => crazyhouse
       case "noCastling"     => noCastling
+      case "monster"        => monster
       case "linesOfAction"  => linesOfAction
       case "scrambledEggs"  => scrambledEggs
       case "international"  => international
@@ -130,6 +132,7 @@ object History {
           racingKings = ratingsMap("racingKings"),
           crazyhouse = ratingsMap("crazyhouse"),
           noCastling = ratingsMap("noCastling"),
+          monster = ratingsMap("monster"),
           linesOfAction = ratingsMap("linesOfAction"),
           scrambledEggs = ratingsMap("scrambledEggs"),
           international = ratingsMap("international"),

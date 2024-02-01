@@ -20,6 +20,8 @@ Going Berserk in time controls with an increment also cancels the increment (1+2
 
 Going Berserk in time controls which have byoyomi removes all byoyomi periods and any initial increment. The initial clock time is also halved unless either it's less than 60 * increment, or less than 25 * byoyomi seconds. For example: 3|10 gives just 3 min game, whereas 10|10 gives 5 min game and 3+2|5 gives 1.5 min game.
 
+Going Berserk in time controls which have delay removes the delay. The initial clock time is also halved unless it's less than 40 * delay seconds.
+
 Berserk is not available for games with zero initial time (0+1, 0+2, 0|10).
 
 Berserk only grants an extra point if you play at least 7 moves in the game.</string>

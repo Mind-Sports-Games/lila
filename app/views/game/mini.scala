@@ -2,6 +2,7 @@ package views.html.game
 
 import strategygames.format.Forsyth
 import strategygames.variant.Variant
+import strategygames.{ ByoyomiClock, Clock }
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -13,10 +14,12 @@ import lila.i18n.defaultLang
 
 object mini {
 
-  private val dataLive  = attr("data-live")
-  private val dataState = attr("data-state")
-  private val dataTime  = attr("data-time")
-  val cgWrap            = span(cls := "cg-wrap")(cgWrapContent)
+  private val dataLive        = attr("data-live")
+  private val dataState       = attr("data-state")
+  private val dataTime        = attr("data-time")
+  private val dataTimePending = attr("data-time-pending")
+  private val dataTimeDelay   = attr("data-time-delay")
+  val cgWrap                  = span(cls := "cg-wrap")(cgWrapContent)
 
   def extraClasses(variant: Variant) = {
     val gameLogic  = variant.gameLogic.name.toLowerCase()
@@ -73,12 +76,12 @@ object mini {
     pov.game.variant match {
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) =>
-        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
+        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${pov.playerIndex.name}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
           pov.game.variant.gameLogic,
           pov.game.situation
-        )}|${v.boardSize.width}x${v.boardSize.height}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
+        )}|${v.boardSize.width}x${v.boardSize.height}|${pov.playerIndex.name}|${~pov.game.lastActionKeys}"
     }
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
@@ -127,11 +130,20 @@ object mini {
           calculateScore(pov)
     )
 
-  private def renderClock(clock: strategygames.Clock, pov: Pov) = {
+  private def renderClock(clock: strategygames.ClockBase, pov: Pov) = {
     val s = clock.remainingTime(pov.playerIndex).roundSeconds
+    val p = clock.pending(pov.playerIndex).roundSeconds
+    val d = clock.config match {
+      case _: Clock.Config             => 0
+      case bc: Clock.BronsteinConfig   => bc.graceSeconds
+      case dc: Clock.SimpleDelayConfig => dc.graceSeconds
+      case _: ByoyomiClock.Config      => 0
+    }
     span(
       cls := s"mini-game__clock mini-game__clock--${pov.playerIndex.name}",
-      dataTime := s
+      dataTime := s,
+      dataTimePending := p,
+      dataTimeDelay := d
     )(
       f"${s / 60}:${s % 60}%02d"
         +

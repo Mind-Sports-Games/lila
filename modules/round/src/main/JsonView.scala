@@ -2,7 +2,16 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, Player => PlayerIndex, P1, P2, Pos, Situation }
+import strategygames.{
+  ClockBase,
+  Player => PlayerIndex,
+  P1,
+  P2,
+  Pos,
+  Situation,
+  Move => StratMove,
+  Drop => StratDrop
+}
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.math
@@ -167,6 +176,7 @@ final class JsonView(
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
+          .add("multiActionMetaData" -> multiActionMetaData(pov))
           .add("selectMode" -> selectMode(pov))
           .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
           .add("deadStoneOfferState" -> pov.game.metadata.deadStoneOfferState.map(_.name))
@@ -350,8 +360,10 @@ final class JsonView(
         ("percent" -> JsNumber(game.playerBlurPercent(player.playerIndex)))
     }
 
-  private def clockJson(clock: Clock): JsObject =
-    clockWriter.writes(clock) + ("moretime" -> JsNumber(actorApi.round.Moretime.defaultDuration.toSeconds))
+  private def clockJson(clock: ClockBase): JsObject =
+    clockWriter.writes(clock) + ("moretime" -> JsNumber(
+      actorApi.round.Moretime.defaultDuration.toSeconds
+    ))
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
@@ -423,6 +435,23 @@ final class JsonView(
         JsString(drops.map(_.key).mkString)
       }
     }
+
+  private def multiActionMetaData(pov: Pov): Option[JsObject] = {
+    pov.game.variant.key match {
+      case "monster" => multiActionMetaJson(pov)
+      case "amazons" => multiActionMetaJson(pov)
+      case _         => None
+    }
+  }
+
+  private def multiActionMetaJson(pov: Pov): Option[JsObject] = {
+    //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
+    pov.game.situation.actions.headOption.flatMap(_ match {
+      case m: StratMove => Some(Json.obj("couldNextActionEndTurn" -> m.autoEndTurn))
+      case d: StratDrop => Some(Json.obj("couldNextActionEndTurn" -> d.autoEndTurn))
+      case _            => None
+    })
+  }
 
   private def selectMode(pov: Pov): Boolean = {
     pov.game.situation match {

@@ -1,9 +1,9 @@
 package lila.setup
 
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, Mode, P1, P2, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, Mode, P1, P2, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.chess.variant.{ FromPosition }
+import strategygames.chess.variant.{ FromPosition, Standard }
 
 import lila.game.{ Game, Player, Pov, Source }
 import lila.lobby.PlayerIndex
@@ -22,8 +22,9 @@ final case class ApiAiConfig(
 
   val strictFen = false
 
-  val days      = ~daysO
-  val increment = clock.??(_.increment.roundSeconds)
+  val days = ~daysO
+  // TODO: We are reusing the increment field for the Bronstein Delay and Simple Delay. This should probably be renamed
+  val increment = clock.??(_.graceSeconds)
   val time      = clock.??(_.limit.roundSeconds / 60)
   val byoyomi = clock match {
     case Some(c: ByoyomiClock.Config) => c.byoyomi.roundSeconds
@@ -59,7 +60,7 @@ final case class ApiAiConfig(
             Player.make(P2, user, perfPicker)
           ),
           mode = Mode.Casual,
-          source = if (stratGame.board.variant.fromPosition) Source.Position else Source.Ai,
+          source = if (stratGame.board.variant.fromPositionVariant) Source.Position else Source.Ai,
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None
         )
@@ -69,7 +70,8 @@ final case class ApiAiConfig(
   def pov(user: Option[User]) = Pov(game(user), creatorPlayerIndex)
 
   def autoVariant =
-    if (variant.standard && fen.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
+    if (variant == Variant.Chess(Standard) && fen.exists(!_.initial))
+      copy(variant = Variant.wrap(FromPosition))
     else this
 }
 
@@ -80,7 +82,9 @@ object ApiAiConfig extends BaseConfig {
   def from(
       l: Int,
       v: Option[String],
-      fcl: Option[FischerClock.Config],
+      fcl: Option[Clock.Config],
+      sdc: Option[Clock.SimpleDelayConfig],
+      bdc: Option[Clock.BronsteinConfig],
       bcl: Option[ByoyomiClock.Config],
       d: Option[Int],
       c: Option[String],
@@ -90,7 +94,7 @@ object ApiAiConfig extends BaseConfig {
     new ApiAiConfig(
       variant = variant,
       fenVariant = none,
-      clock = bcl.orElse(fcl),
+      clock = bcl.orElse(sdc).orElse(bdc).orElse(fcl),
       daysO = d,
       playerIndex = PlayerIndex.orDefault(~c),
       level = l,

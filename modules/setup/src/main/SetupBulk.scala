@@ -126,15 +126,16 @@ object SetupBulk {
         "id" -> _id,
         "games" -> games.map { g =>
           Json.obj(
-            "id"    -> g.id,
+            "id" -> g.id,
             "p1" -> g.p1,
             "p2" -> g.p2
           )
         },
         "variant" -> variant.key,
         "clock" -> Json.obj(
-          "limit"     -> clock.limitSeconds,
-          "increment" -> clock.incrementSeconds
+          "limit" -> clock.limitSeconds,
+          // TODO: the name of this field is no longer correct for all clocks (Bronstein/ Simple Delay) should we change it?
+          "increment" -> clock.graceSeconds
         ),
         "rated"         -> mode.rated,
         "pairAt"        -> pairAt,

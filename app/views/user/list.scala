@@ -64,6 +64,7 @@ object list {
               userTopPerf(leaderboards.horde, PerfType.orDefault("horde")),
               userTopPerf(leaderboards.racingKings, PerfType.orDefault("racingKings")),
               userTopPerf(leaderboards.noCastling, PerfType.orDefault("noCastling")),
+              userTopPerf(leaderboards.monster, PerfType.orDefault("monster")),
               userTopPerf(leaderboards.linesOfAction, PerfType.orDefault("linesOfAction")),
               userTopPerf(leaderboards.scrambledEggs, PerfType.orDefault("scrambledEggs")),
               userTopPerf(leaderboards.international, PerfType.orDefault("international")),

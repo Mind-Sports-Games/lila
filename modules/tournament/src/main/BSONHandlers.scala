@@ -110,7 +110,7 @@ object BSONHandlers {
         "clock"            -> o.clock,
         "minutes"          -> o.minutes,
         "lib"              -> o.variant.gameLogic.id,
-        "variant"          -> o.variant.some.filterNot(_.standard).map(_.id),
+        "variant"          -> o.variant.some.filterNot(_.key == "standard").map(_.id),
         "mVariants"        -> o.medleyVariants,
         "mMinutes"         -> o.medleyMinutes,
         "mIntervals"       -> o.medleyIntervalSeconds,

@@ -539,7 +539,11 @@ final class TournamentApi(
       ] // if set, update the player performance. Leave to none to just recompute the sheet.
   )(userId: User.ID): Funit =
     tour.mode.rated ?? {
-      userRepo.perfOf(userId, PerfType(variant, tour.speed))
+      //mapping to some here makes ?? work as previous:
+      //still execute this code block even if tournament is casual.
+      //WithDefault ensures for medleys that a new user gets a starting
+      //rating if the medley switches into a variant they havent played before
+      userRepo.perfOfWithDefault(userId, PerfType(variant, tour.speed)).map(some)
     } flatMap { perf =>
       playerRepo.update(tour.id, userId) { player =>
         cached.sheet.update(tour, userId).map { sheet =>

@@ -131,7 +131,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
   if (firstTurn % 2 === 1) {
     moveTurns.push([null]);
   }
-  var currentTurn: Array<Step | null> = [];
+  let currentTurn: Array<Step | null> = [];
   let turn = firstTurn + 1;
   for (let i = 1; i < steps.length; i++) {
     if (steps[i].turnCount === turn) {

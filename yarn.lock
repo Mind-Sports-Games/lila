@@ -2480,9 +2480,9 @@ chartjs-color@^2.1.0:
   version "0.10.2"
   resolved "https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249"
 
-"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.32":
-  version "7.11.1-pstrat2.32"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#bd5019f2adec49b7638ada66d06b47e0fda2fadc"
+"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.33":
+  version "7.11.1-pstrat2.33"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#07fff95457dfaaaf81ca307c8e3ed1ad0d1a9127"
 
 chokidar@^2.0.0:
   version "2.1.8"
@@ -7350,9 +7350,9 @@ stockfish.wasm@^0.10.0:
   resolved "https://registry.yarnpkg.com/stockfish.wasm/-/stockfish.wasm-0.10.0.tgz#dc3ef4d98a2a79724c29510d39d89e4a5f0f1888"
   integrity sha512-OTvOlz0ijCSmIb/YvOZ1Dn6vwZVS4Ge3N+RcV0d2b6LXUtCJ9UwmBHypRW3DZ+VXf8WNm7E3P+6jMTVvb3QaBg==
 
-"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat3.22":
-  version "0.8.1-pstrat3.22"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#72c1ea40e28315873f3fff7447b470471652cc61"
+"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat3.23":
+  version "0.8.1-pstrat3.23"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#ba003f302b57845615b96731782047e3010ba898"
   dependencies:
     "@badrap/result" "^0.2.8"
 

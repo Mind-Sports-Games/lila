@@ -1,9 +1,9 @@
 package lila.setup
 
 import strategygames.variant.Variant
-import strategygames.chess.variant.{ Chess960, FromPosition }
+import strategygames.chess.variant.{ Chess960, FromPosition, Standard }
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, Mode, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, Mode, Speed }
 
 import lila.game.PerfPicker
 import lila.lobby.PlayerIndex
@@ -31,12 +31,13 @@ final case class ApiConfig(
       Speed(c) >= Speed.Bullet
     }
 
-  def validRated = mode.casual || clock.isDefined || variant.standard
+  def validRated = mode.casual || clock.isDefined || variant == Variant.Chess(Standard)
 
   def mode = Mode(rated)
 
   def autoVariant =
-    if (variant.standard && position.exists(!_.initial)) copy(variant = Variant.wrap(FromPosition))
+    if (variant == Variant.Chess(Standard) && position.exists(!_.initial))
+      copy(variant = Variant.wrap(FromPosition))
     else this
 }
 
@@ -46,7 +47,9 @@ object ApiConfig extends BaseHumanConfig {
 
   def from(
       v: Option[String],
-      fcl: Option[FischerClock.Config],
+      fcl: Option[Clock.Config],
+      sdc: Option[Clock.SimpleDelayConfig],
+      bdc: Option[Clock.BronsteinConfig],
       bcl: Option[ByoyomiClock.Config],
       d: Option[Int],
       r: Boolean,
@@ -59,7 +62,7 @@ object ApiConfig extends BaseHumanConfig {
     val variant = Variant.orDefault(~v)
     new ApiConfig(
       variant = variant,
-      clock = bcl.orElse(fcl),
+      clock = bcl.orElse(sdc).orElse(bdc).orElse(fcl),
       days = d,
       rated = r,
       playerIndex = PlayerIndex.orDefault(~c),
@@ -72,8 +75,8 @@ object ApiConfig extends BaseHumanConfig {
 
   def validFen(variant: Variant, fen: Option[FEN]) =
     // TODO: This .get is unsafe
-    if (variant.chess960) fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
-    else if (variant.fromPosition)
+    if (variant == Variant.Chess(Chess960)) fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
+    else if (variant.fromPositionVariant)
       fen exists { f =>
         (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable false)
       }

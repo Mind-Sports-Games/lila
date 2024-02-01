@@ -22,7 +22,7 @@ case class AnaDests(
     fullCapture: Option[Boolean] = None
 ) {
 
-  def isInitial = (variant.standard || variant.draughtsStandard) && fen.initial && path == ""
+  def isInitial = variant.standardVariant && fen.initial && path == ""
 
   private lazy val sit = Game(variant.gameLogic, variant.some, fen.some).situation
 
@@ -83,7 +83,7 @@ case class AnaDests(
   def json =
     Json
       .obj(
-        "dests" -> dests.pp("AnaDestsBeingUsed"),
+        "dests" -> dests,
         "path"  -> path
       )
       .add("opening" -> opening)

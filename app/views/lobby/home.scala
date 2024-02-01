@@ -104,8 +104,8 @@ object home {
             a(
               href := routes.PlayApi.botOnline,
               cls := List(
-                "button button-metal just-a-link" -> true,
-                "disabled"                        -> currentGame.isDefined
+                "button button-metal config_bot just-a-link" -> true,
+                "disabled"                                   -> currentGame.isDefined
               ),
               trans.playWithBots()
             )

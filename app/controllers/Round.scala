@@ -47,7 +47,8 @@ final class Round(
                 (pov.game.isSwitchable ?? otherPovs(pov.game)) zip
                 env.bookmark.api.exists(pov.game, ctx.me) zip
                 env.swiss.api.getSwissPairingGamesForGame(pov.game) zip
-                env.api.roundApi.player(pov, tour, lila.api.Mobile.Api.currentVersion) map {
+                env.api.roundApi
+                  .player(pov, tour, lila.api.Mobile.Api.currentVersion) map {
                   case (
                         ((((((_, simul), chatOption), crosstable), playing), bookmarked), swissPairingGames),
                         data
@@ -142,7 +143,7 @@ final class Round(
 
   def watcher(gameId: String, playerIndex: String, forceAnalysis: Boolean = false) =
     Open { implicit ctx =>
-      proxyPov(gameId, playerIndex) flatMap {
+      proxyPov(gameId, playerIndex).flatMap {
         case Some(pov) =>
           get("pov") match {
             case Some(requestedPov) =>
@@ -170,7 +171,8 @@ final class Round(
       implicit ctx: Context
   ): Fu[Result] = {
     playablePovForReq(pov.game) match {
-      case Some(player) if userTv.isEmpty => renderPlayer(pov withPlayerIndex player.playerIndex)
+      case Some(player) if userTv.isEmpty =>
+        renderPlayer(pov.withPlayerIndex(player.playerIndex))
       case _
           if pov.game.variant == Variant.Chess(
             strategygames.chess.variant.RacingKings

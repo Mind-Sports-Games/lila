@@ -85,6 +85,7 @@ const allVariants: Array<[Rules, string]> = [
   ['racingkings', 'Racing Kings'],
   ['3check', 'Three-check'],
   ['5check', 'Five-check'],
+  ['monster', 'Monster'],
 ];
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {
