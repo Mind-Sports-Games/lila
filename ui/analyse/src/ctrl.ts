@@ -26,7 +26,7 @@ import { defined, prop, Prop } from 'common';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { playstrategyRules, amazonsChessGroundFen } from 'stratops/compat';
+import { playstrategyRules, amazonsChessgroundFen } from 'stratops/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -311,23 +311,23 @@ export default class AnalyseCtrl {
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
-        ? this.bottomPlayerIndex()
-        : !this.embed &&
-          ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
-        ? playerIndex
-        : undefined,
+          ? this.bottomPlayerIndex()
+          : !this.embed &&
+            ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
+            ? playerIndex
+            : undefined,
       config: ChessgroundConfig = {
-        fen: this.data.game.variant.key == 'amazons' ? amazonsChessGroundFen(node.fen) : node.fen,
+        fen: this.data.game.variant.key == 'amazons' ? amazonsChessgroundFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
         movable: this.embed
           ? {
-              playerIndex: undefined,
-              dests: new Map(),
-            }
+            playerIndex: undefined,
+            dests: new Map(),
+          }
           : {
-              playerIndex: movablePlayerIndex,
-              dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
-            },
+            playerIndex: movablePlayerIndex,
+            dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
+          },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
         onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
@@ -628,9 +628,9 @@ export default class AnalyseCtrl {
       (count.nodes >= 10 || count.comments > 0) &&
       !confirm(
         'Delete ' +
-          util.plural('move', count.nodes) +
-          (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
-          '?'
+        util.plural('move', count.nodes) +
+        (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
+        '?'
       )
     )
       return;
