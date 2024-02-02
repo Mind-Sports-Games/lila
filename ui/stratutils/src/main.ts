@@ -117,7 +117,7 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
     case 'go19x19':
       return { playerIndex: turnPlayerIndex, role: 's-piece' };
     case 'backgammon':
-      return { playerIndex: turnPlayerIndex, role: 's1-piece' };
+      return { playerIndex: turnPlayerIndex, role: 's-piece' }; //needs to match role from readdropsbyrole and SG role
     default:
       return undefined;
   }

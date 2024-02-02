@@ -612,7 +612,13 @@ object BSONHandlers {
                     Score(~counts.headOption, ~counts.lastOption)
                   }
                 ),
-                variant = gameVariant
+                variant = gameVariant,
+                pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
+                  case Some(PocketData.Backgammon(pd)) => Some(pd)
+                  case None                            => None
+                  case _                               => sys.error("non backgammon pocket data")
+                },
+                unusedDice = r.getO[List[Int]](F.unusedDice).getOrElse(List.empty)
               ),
               player = turnPlayerIndex
             ),
@@ -781,6 +787,7 @@ object BSONHandlers {
               F.historyLastTurn    -> o.history.lastTurnUciString,
               F.historyCurrentTurn -> o.history.currentTurnUciString,
               F.pocketData         -> o.board.pocketData,
+              F.unusedDice         -> o.board.unusedDice.nonEmpty.option(o.board.unusedDice),
               F.score              -> o.history.score.nonEmpty.option(o.history.score)
             )
           case _ => //chess or fail

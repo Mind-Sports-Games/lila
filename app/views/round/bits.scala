@@ -31,7 +31,10 @@ object bits {
       openGraph = openGraph,
       moreJs = moreJs,
       moreCss = frag(
-        cssTag { if (variant.dropsVariant && !variant.onlyDropsVariant) "round.zh" else "round" },
+        cssTag {
+          if (variant.dropsVariant && !variant.onlyDropsVariant && variant.key != "backgammon") "round.zh"
+          else "round"
+        },
         ctx.blind option cssTag("round.nvui"),
         moreCss
       ),

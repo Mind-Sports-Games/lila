@@ -311,6 +311,13 @@ object GameDiff {
         d(positionHashes, _.history.positionHashes, w.bytes)
         d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
         d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
+        if (a.variant.dropsVariant)
+          dOpt(
+            pocketData,
+            _.board.pocketData,
+            (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
+          )
+        //TODO backgammon add unusedDice here?
         dOpt(
           score,
           _.history.score,

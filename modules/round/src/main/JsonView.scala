@@ -47,7 +47,7 @@ final class JsonView(
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
   private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
-    pov.game.variant.onlyDropsVariant || (pov.game.variant.dropsVariant && pov.game.situation.destinations.size == 0)
+    pov.game.variant.onlyDropsVariant || pov.game.situation.canOnlyDrop
   }
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
@@ -429,9 +429,11 @@ final class JsonView(
       case (Situation.Go(_), Variant.Go(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
-      case (Situation.Backgammon(_), Variant.Backgammon(_)) => None
-      case (Situation.Draughts(_), Variant.Draughts(_))     => None
-      case _                                                => sys.error("Mismatch of types for possibleDropsByrole")
+      case (Situation.Backgammon(_), Variant.Backgammon(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Draughts(_), Variant.Draughts(_)) => None
+      case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
     }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =

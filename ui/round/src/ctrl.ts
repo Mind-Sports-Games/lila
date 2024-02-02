@@ -203,6 +203,10 @@ export default class RoundController {
         flipello.flip(this, key, this.data.player.playerIndex);
         this.redraw();
       }
+      if (this.data.game.variant.key === 'backgammon') {
+        backgammon.updateBoardFromDrop(this, key, this.data.player.playerIndex);
+        this.redraw();
+      }
     } else this.jump(this.ply);
     if (!this.data.onlyDropsVariant) {
       cancelDropMode(this.chessground.state);
@@ -382,12 +386,15 @@ export default class RoundController {
     if (['togyzkumalak', 'backgammon'].includes(this.data.game.variant.key)) {
       this.chessground.redrawAll(); //redraw board scores or coordinates
     }
-    const amazonTurnToDrop =
-      this.data.game.variant.key === 'amazons' &&
+    const variantActionToEnforceDrop =
+      ['amazons', 'backgammon'].includes(this.data.game.variant.key) &&
       this.data.possibleDropsByRole &&
       this.data.possibleDropsByRole.length > 0;
     if (this.data.onlyDropsVariant) {
-      if (ply == this.lastPly() && (this.data.game.variant.key !== 'amazons' || amazonTurnToDrop)) {
+      if (
+        ply == this.lastPly() &&
+        (!['amazons', 'backgammon'].includes(this.data.game.variant.key) || variantActionToEnforceDrop)
+      ) {
         this.setDropOnlyVariantDropMode(
           this.data.player.playerIndex === this.data.game.player,
           this.data.player.playerIndex,
@@ -537,8 +544,9 @@ export default class RoundController {
 
     console.log('api move');
     console.log('uci', o.uci);
+    console.log('fen', o.fen);
 
-    if (d.game.variant.key == 'amazons') {
+    if (['amazons', 'backgammon'].includes(d.game.variant.key)) {
       d.onlyDropsVariant = o.drops ? true : false;
     }
     d.multiActionMetaData = o.multiActionMetaData;
@@ -581,7 +589,8 @@ export default class RoundController {
     if (!this.replaying()) {
       this.ply++;
       this.turnCount = o.turnCount;
-      if (o.role) {
+      //TODO backgammon actually support drops and moves in chessground for backgammon
+      if (o.role && !['backgammon'].includes(d.game.variant.key)) {
         this.chessground.newPiece(
           {
             role: o.role,
@@ -603,7 +612,7 @@ export default class RoundController {
               (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')) &&
             !['backgammon'].includes(d.game.variant.key)
           ) {
-            if (['oware', 'togyzkumalak', 'backgammon'].includes(d.game.variant.key)) {
+            if (['oware', 'togyzkumalak'].includes(d.game.variant.key)) {
               this.chessground.moveNoAnim(keys[0], keys[1]);
             } else {
               this.chessground.move(keys[0], keys[1]);
@@ -633,7 +642,7 @@ export default class RoundController {
           dropDests: playing ? stratUtils.readDropsByRole(d.possibleDropsByRole) : new Map(),
         },
         check: !!o.check,
-        onlyDropsVariant: d.onlyDropsVariant, //need to update every move (amazons)
+        onlyDropsVariant: d.onlyDropsVariant, //need to update every move (amazons, backgammon)
         selectOnly: d.selectMode,
         highlight: {
           //TODO do we want a different highlight for backgammon?

@@ -1,56 +1,58 @@
-import * as util from 'chessground/util';
 import * as cg from 'chessground/types';
 import * as cgFen from 'chessground/fen';
 import RoundController from './ctrl';
 
 export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
+  ctrl.chessground.set({ fen: newFen });
+  ctrl.chessground.redrawAll();
+}
+
+export function updateBoardFromDrop(ctrl: RoundController, key: cg.Key, playedPlayerIndex: 'p1' | 'p2') {
   const diff: cg.PiecesDiff = new Map();
-  let boardFen = newFen.split(' ')[0];
-  //TODO do we also need to manage the pocket?
-  if (boardFen.indexOf('[') !== -1) boardFen = boardFen.slice(0, boardFen.indexOf('['));
 
-  let col = 0;
-  let row = 2;
-  let num = 0;
-  const emptySquares: cg.Key[] = [];
+  //assumption this is the fen before the drop (check this?)
+  const currentFen = ctrl.data.steps[ctrl.data.steps.length - 1].fen;
+  const pieces = cgFen.read(currentFen, ctrl.data.game.variant.boardSize, ctrl.data.game.variant.key as cg.Variant);
+  const destPiece = pieces.get(key);
+  const roleLetter = 's';
+  let capture = false;
 
-  //This is very similar to chessground.fen.read
-  for (const r of boardFen.split('/')) {
-    for (const f of r.split(',')) {
-      if (isNaN(+f)) {
-        col += 1 + num;
-        num = 0;
-        const count = f.slice(0, -1);
-        const role = f.substring(f.length - 1).toLowerCase();
-        const playerIndex = f.substring(f.length - 1) === role ? 'p2' : 'p1';
-        const piece = {
-          role: `${role}${count}-piece`,
-          playerIndex: playerIndex,
-        } as cg.Piece;
-        diff.set(util.pos2key([col, row]), piece);
-      } else {
-        num = num + +f;
-        for (let j = 0; j < Number(+f); j++) {
-          emptySquares.push(util.pos2key([col + j + 1, row]));
-        }
-      }
+  if (destPiece) {
+    const dCount = +destPiece.role.split('-')[0].substring(1);
+    const dPlayerIndex = destPiece.playerIndex;
+    if (dPlayerIndex === playedPlayerIndex) {
+      const piece = {
+        role: `${roleLetter}${dCount + 1}-piece`,
+        playerIndex: playedPlayerIndex,
+      } as cg.Piece;
+      diff.set(key, piece);
+    } else {
+      capture = true;
+      const piece = {
+        role: `${roleLetter}1-piece`,
+        playerIndex: playedPlayerIndex,
+      } as cg.Piece;
+      diff.set(key, piece);
     }
-    --row;
-    if (row === 0) break;
-    col = 0;
-    num = 0;
+  } else {
+    //empty space
+    const piece = {
+      role: `${roleLetter}1-piece`,
+      playerIndex: playedPlayerIndex,
+    } as cg.Piece;
+    diff.set(key, piece);
   }
 
-  //also need to check for an empty space left by the piece that just moved (just set them all to undefined)
-  emptySquares.forEach(x => diff.set(x, undefined));
+  if (capture) {
+    updatePocketPieces(ctrl, playedPlayerIndex === 'p1' ? 'p2' : 'p1', true, capture);
+  }
 
+  ctrl.chessground.set({ turnPlayerIndex: playedPlayerIndex }); //drop in chessground swaps player index
   ctrl.chessground.setPiecesNoAnim(diff);
   ctrl.chessground.redrawAll();
 }
 
 export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: cg.Key) {
-  //TODO also manage the pocket and captures (as well as undo action?)
-
   //assumption this is the fen before the move (check this?)
   const currentFen = ctrl.data.steps[ctrl.data.steps.length - 1].fen;
   const pieces = cgFen.read(currentFen, ctrl.data.game.variant.boardSize, ctrl.data.game.variant.key as cg.Variant);
@@ -58,7 +60,7 @@ export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: c
   const destPiece = pieces.get(dest);
 
   const diff: cg.PiecesDiff = new Map();
-
+  let capture = false;
   //Update orig and dest squares as they may have changed
   if (origPiece) {
     const oCount = +origPiece.role.split('-')[0].substring(1);
@@ -84,7 +86,7 @@ export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: c
         } as cg.Piece;
         diff.set(dest, piece);
       } else {
-        //capture
+        capture = true;
         const piece = {
           role: `${oRoleLetter}1-piece`,
           playerIndex: oPlayerIndex,
@@ -99,9 +101,52 @@ export function updateBoardFromMove(ctrl: RoundController, orig: cg.Key, dest: c
       } as cg.Piece;
       diff.set(dest, piece);
     }
-  }
 
+    if (capture) {
+      updatePocketPieces(ctrl, oPlayerIndex === 'p1' ? 'p2' : 'p1', false, capture);
+    }
+  }
   ctrl.chessground.set({ turnPlayerIndex: ctrl.data.game.player }); //move in chessground swaps player index
   ctrl.chessground.setPiecesNoAnim(diff);
   ctrl.chessground.redrawAll();
+}
+
+function updatePocketPieces(
+  ctrl: RoundController,
+  capturedPiecePlayerIndex: PlayerIndex,
+  isDrop: boolean,
+  isCapture: boolean
+): void {
+  const currentFen = ctrl.data.steps[ctrl.data.steps.length - 1].fen;
+  const pocketPieces = cgFen.readPocket(currentFen, 'backgammon');
+
+  let playerCount = 0;
+  let enemyCount = 0;
+
+  pocketPieces.forEach(p => {
+    const pCount = +p.role.split('-')[0].substring(1);
+    if (p.playerIndex === capturedPiecePlayerIndex) {
+      enemyCount = pCount;
+    } else {
+      playerCount = pCount;
+    }
+  });
+
+  const newPocketPieces: cg.Piece[] = [];
+  if (enemyCount > 0 || isCapture) {
+    const piece = {
+      role: `s${enemyCount + (isCapture ? 1 : 0)}-piece`,
+      playerIndex: capturedPiecePlayerIndex,
+    } as cg.Piece;
+    newPocketPieces.push(piece);
+  }
+  if ((playerCount > 0 && !isDrop) || (isDrop && playerCount > 1)) {
+    const piece = {
+      role: `s${playerCount - (isDrop ? 1 : 0)}-piece`,
+      playerIndex: capturedPiecePlayerIndex === 'p1' ? 'p2' : 'p1',
+    } as cg.Piece;
+    newPocketPieces.push(piece);
+  }
+
+  ctrl.chessground.setPocketPieces(newPocketPieces);
 }

@@ -1090,6 +1090,8 @@ object Game {
     val checkAt            = "ck"
     val perfType           = "pt"  // only set on student games for aggregation
     val drawOffers         = "do"
+    //backgammon
+    val unusedDice = "ud"
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" //state of the dead stone offer

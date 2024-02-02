@@ -20,9 +20,6 @@ export function makeConfig(ctrl: RoundController): Config {
     variantKey = data.game.variant.key as cg.Variant,
     turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount),
     dice = data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key);
-  console.log('step.fen', step.fen);
-  console.log('data.possibleDrops', data.possibleDrops);
-  console.log('data.possibleDropsByRole', data.possibleDropsByRole);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
