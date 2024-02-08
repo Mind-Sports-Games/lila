@@ -542,13 +542,25 @@ test('moveFromNotationStyle backgammon testing captures 2', () => {
 test('moveFromNotationStyle backgammon testing lift', () => {
   const move = {
     san: '',
-    uci: 's^g1',
+    uci: '^g1',
     fen: '6,15s,5/6,S,2S,2S,3S,3S,3S[] 3 6 w 1 0 10',
     prevFen: '6,15s,5/6,2S,2S,2S,3S,3S,3S[] 3/6 - w 0 0 10',
   };
 
   const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
   expect(notation).toBe('36: 6/off');
+});
+
+test('moveFromNotationStyle backgammon testing capture', () => {
+  const move = {
+    san: '',
+    uci: 'g2h2',
+    fen: '3S,3,3s,1S,3s,1s,2,2s,1S/3s,1S,2,3S,1S,4S,1s,3,2s[1S] 1 1/1/1 b 0 0 1',
+    prevFen: '3S,3,3s,1S,4s,3,2s,1S/3s,1S,2,3S,1S,4S,1s,3,2s[1S] 1/1 1/1 b 0 0 1',
+  };
+
+  const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
+  expect(notation).toBe('11: 6/5');
 });
 
 test('combinedNotationForBackgammonActions with 2 same actions', () => {
@@ -571,6 +583,13 @@ test('combinedNotationForBackgammonActions with 4 actions and captures', () => {
 
   const notation = combinedNotationForBackgammonActions(actions);
   expect(notation).toBe('33: 8/4(2)* bar/20* 3/off');
+});
+
+test('combinedNotationForBackgammonActions with 1 capture and 1 non capture', () => {
+  const actions = ['34:', '34: 8/4*', '34: 10/7'];
+
+  const notation = combinedNotationForBackgammonActions(actions);
+  expect(notation).toBe('34: 8/4* 10/7');
 });
 
 //Hit and move (https://backgammon-hub.com/how-to-read-and-use-backgammon-notation/)

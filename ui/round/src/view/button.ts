@@ -173,14 +173,15 @@ export const passConfirm = (ctrl: RoundController): VNode =>
     fbtCancel(ctrl, ctrl.passTurn),
   ]);
 
-export const endTurnConfirm = (ctrl: RoundController): VNode =>
-  h('div.act-confirm', [
-    h('button.fbt.yes.endturn-yes', {
-      attrs: { title: ctrl.noarg('endTurn'), 'data-icon': '' },
-      hook: util.bind('click', () => ctrl.endTurnAction()),
-    }),
-    fbtCancel(ctrl, ctrl.undoAction),
-  ]);
+export function endTurnConfirm(ctrl: RoundController) {
+  return ctrl.data.canEndTurn && ctrl.data.player.playerIndex === ctrl.data.game.player
+    ? h('div.negotiation.endturn', [
+        declineButton(ctrl, ctrl.undoAction),
+        h('p', ctrl.noarg('End the Turn')),
+        acceptButton(ctrl, 'endturn-yes', () => ctrl.endTurnAction()),
+      ])
+    : null;
+}
 
 export const offerSelectSquaresButton = (ctrl: RoundController, isNotSameOffer = true): VNode =>
   h('button.select-squares-offer.button', {

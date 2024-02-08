@@ -11,6 +11,8 @@ import strategygames.{
   Drop => StratDrop,
   Move => StratMove,
   Pass => StratPass,
+  Lift => StratLift,
+  EndTurn => StratEndTurn,
   DiceRoll => StratRollDice,
   SelectSquares => StratSelectSquares
 }
@@ -170,6 +172,8 @@ final private class Player(
         case m: StratMove           => m.toUci.keys
         case d: StratDrop           => d.toUci.uci
         case p: StratPass           => p.toUci.uci
+        case l: StratLift           => l.toUci.uci
+        case et: StratEndTurn       => et.toUci.uci
         case r: StratRollDice       => r.toUci.uci
         case ss: StratSelectSquares => ss.toUci.uci
       }

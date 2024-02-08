@@ -43,9 +43,7 @@ export function updateBoardFromDrop(ctrl: RoundController, key: cg.Key, playedPl
     diff.set(key, piece);
   }
 
-  if (capture) {
-    updatePocketPieces(ctrl, playedPlayerIndex === 'p1' ? 'p2' : 'p1', true, capture);
-  }
+  updatePocketPieces(ctrl, playedPlayerIndex === 'p1' ? 'p2' : 'p1', true, capture);
 
   ctrl.chessground.set({ turnPlayerIndex: playedPlayerIndex }); //drop in chessground swaps player index
   ctrl.chessground.setPiecesNoAnim(diff);

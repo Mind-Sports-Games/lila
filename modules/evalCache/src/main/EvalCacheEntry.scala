@@ -119,6 +119,8 @@ object EvalCacheEntry {
       case Uci.BackgammonDrop(_)     => GameLogic.Backgammon()
       case Uci.BackgammonDiceRoll(_) => GameLogic.Backgammon()
       case Uci.BackgammonDoRoll(_)   => GameLogic.Backgammon()
+      case Uci.BackgammonEndTurn(_)  => GameLogic.Backgammon()
+      case Uci.BackgammonLift(_)     => GameLogic.Backgammon()
     }
   }
 

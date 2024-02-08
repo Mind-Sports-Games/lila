@@ -52,7 +52,8 @@ export const justIcon = (icon: string): VNodeData => ({
 
 // TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
-  if (!uci || uci == 'pass' || uci == 'roll' || uci.includes('/') || uci.substring(0, 3) == 'ss:') return undefined;
+  if (!uci || uci == 'pass' || uci == 'roll' || uci == 'endturn' || uci.includes('/') || uci.substring(0, 3) == 'ss:')
+    return undefined;
   const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
   return [pos[0], pos[1]] as cg.Key[];
@@ -100,6 +101,14 @@ export function parsePossibleMoves(dests?: EncodedDests, activeDiceValue?: numbe
   }
 
   return dec;
+}
+
+export function parsePossibleLifts(line?: string | null, activeDiceValue?: number): cg.Key[] {
+  if (typeof line === 'undefined' || line === null) return [];
+  const pos = (line.match(/[a-z][1-9][0-9]?/g) as cg.Key[]) || [];
+  //TODO filter backgammon moves based on active dice value
+  console.log(activeDiceValue);
+  return pos;
 }
 
 function backgammonPosDiff(orig: cg.Key, dest: cg.Key): number {

@@ -296,7 +296,7 @@ object RoundSocket {
             raw.get(6) {
               case Array(fullId, gfS, uciS, blurS, lagS, mtS) => {
                 val gf = GameFamily(gfS.toInt)
-                Uci(gf.gameLogic, gf, uciS) map { uci =>
+                Uci(gf.gameLogic, gf, uciS).map { uci =>
                   PlayerMove(
                     FullId(fullId),
                     uci,

@@ -452,14 +452,20 @@ function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   //TODO support all uci from actions, current missing
   //end turn - need to skip this ''
   //cant move - 'no-play'
+  let isLift = false;
   if (move.uci === 'roll') return '';
+  if (move.uci === 'endturn') return '';
   if (move.uci.includes('/')) return `${move.uci.replace('/', '')}:`;
+  if (move.uci.includes('^')) {
+    isLift = true;
+  }
 
-  const reg = move.uci.match(/[a-lsA-LS][1-2@^]/g) as string[];
+  const reg = isLift
+    ? (move.uci.replace('^', 'a1').match(/[a-lsA-LS][1-2@]/g) as string[])
+    : (move.uci.match(/[a-lsA-LS][1-2@]/g) as string[]);
   const orig = reg[0];
   const dest = reg[1];
   const isDrop = reg[0].includes('@');
-  const isLift = reg[0].includes('^');
   const movePlayer = move.prevFen.split(' ')[3] === 'w' ? 'p1' : 'p2';
   const moveOpponent = move.prevFen.split(' ')[3] === 'w' ? 'p2' : 'p1';
 

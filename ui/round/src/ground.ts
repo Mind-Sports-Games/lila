@@ -20,6 +20,9 @@ export function makeConfig(ctrl: RoundController): Config {
     variantKey = data.game.variant.key as cg.Variant,
     turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount),
     dice = data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key);
+  console.log('possibleLifts', data.possibleLifts);
+  console.log('parsemoves', util.parsePossibleMoves(data.possibleMoves, ctrl.activeDiceValue(dice)));
+  console.log('parselifsts', util.parsePossibleLifts(data.possibleLifts, ctrl.activeDiceValue(dice)));
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -55,6 +58,12 @@ export function makeConfig(ctrl: RoundController): Config {
       events: {
         after: hooks.onUserMove,
         afterNewPiece: hooks.onUserNewPiece,
+      },
+    },
+    liftable: {
+      liftDests: playing ? util.parsePossibleLifts(data.possibleLifts, ctrl.activeDiceValue(dice)) : [],
+      events: {
+        after: hooks.onUserLift,
       },
     },
     animation: {

@@ -78,6 +78,7 @@ export interface RoundData extends GameData {
   possibleMoves?: EncodedDests;
   possibleDrops?: string;
   possibleDropsByRole?: string;
+  possibleLifts?: string;
   multiActionMetaData?: MultiActionMetaData;
   selectMode: boolean;
   selectedSquares?: cg.Key[];
@@ -181,6 +182,7 @@ export interface ApiMove extends Step {
   role?: cg.Role;
   drops?: string;
   dropsByRole?: string;
+  lifts?: string;
   canOnlyRollDice: boolean;
   canUndo: boolean;
   canEndTurn: boolean;

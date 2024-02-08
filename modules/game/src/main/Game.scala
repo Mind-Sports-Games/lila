@@ -19,8 +19,10 @@ import strategygames.{
   Mode,
   Move,
   Drop,
+  Lift,
   Pass,
   DiceRoll,
+  EndTurn,
   SelectSquares,
   Action,
   Pos,
@@ -272,8 +274,10 @@ case class Game(
       action match {
         case m: Move     => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
         case d: Drop     => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
+        case l: Lift     => Event.Lift(l, game.situation, state, clockEvent, updated.board.pocketData)
         case p: Pass     => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
         case r: DiceRoll => Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
+        case et: EndTurn => Event.EndTurn(et, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
       }
@@ -332,6 +336,8 @@ case class Game(
     history.lastAction map {
       case d: Uci.Drop          => s"${d.pos}${d.pos}"
       case m: Uci.Move          => m.keys
+      case l: Uci.Lift          => s"^${l.pos}"
+      case _: Uci.EndTurn       => "endturn"
       case _: Uci.Pass          => "pass"
       case _: Uci.DiceRoll      => "roll"
       case _: Uci.SelectSquares => "ss:"

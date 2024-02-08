@@ -50,7 +50,10 @@ export const renderTablePlay = (ctrl: RoundController) => {
               ? button.standard(ctrl, undefined, 'L', 'abortGame', 'abort')
               : game.takebackable(d)
               ? button.standard(ctrl, game.takebackable, 'i', 'proposeATakeback', 'takeback-yes', ctrl.takebackYes)
-              : button.standard(ctrl, (d: RoundData) => d.canUndo, 'i', 'undo', 'undo-yes', ctrl.undoAction),
+              : null,
+            d.canUndo && ctrl.data.player.playerIndex === ctrl.data.game.player
+              ? button.standard(ctrl, (d: RoundData) => d.canUndo, 'i', 'undo', 'undo-yes', ctrl.undoAction)
+              : null,
             ctrl.drawConfirm
               ? button.drawConfirm(ctrl)
               : d.game.canOfferDraw
@@ -79,7 +82,7 @@ export const renderTablePlay = (ctrl: RoundController) => {
           button.cancelTakebackProposition(ctrl),
           button.answerOpponentTakebackProposition(ctrl),
           button.selectSquaresOfferOptions(ctrl),
-          ctrl.data.canEndTurn ? button.endTurnConfirm(ctrl) : null,
+          button.endTurnConfirm(ctrl),
         ];
   return [
     replay.render(ctrl),

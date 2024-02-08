@@ -196,6 +196,12 @@ export default class RoundController {
     }
   };
 
+  private onUserLift = (dest: cg.Key) => {
+    //TODO remove role?
+    console.log('User lift from chessground, dest:', dest);
+    this.sendLift(this.data.game.variant.key, 's-piece', dest);
+  };
+
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
@@ -324,6 +330,7 @@ export default class RoundController {
   makeCgHooks = () => ({
     onUserMove: this.onUserMove,
     onUserNewPiece: this.onUserNewPiece,
+    onUserLift: this.onUserLift,
     onMove: this.onMove,
     onNewPiece: sound.move,
     onPremove: this.onPremove,
@@ -376,6 +383,9 @@ export default class RoundController {
       config.movable = {
         playerIndex: this.isPlaying() ? this.data.player.playerIndex : undefined,
         dests: util.parsePossibleMoves(this.data.possibleMoves, this.activeDiceValue(dice)),
+      };
+      config.liftable = {
+        liftDests: util.parsePossibleLifts(this.data.possibleLifts, this.activeDiceValue(dice)),
       };
     }
     config.dropmode = {
@@ -547,6 +557,10 @@ export default class RoundController {
     console.log('fen', o.fen);
 
     if (['amazons', 'backgammon'].includes(d.game.variant.key)) {
+      if (d.onlyDropsVariant && !o.drops) {
+        cancelDropMode(this.chessground.state);
+        this.redraw();
+      }
       d.onlyDropsVariant = o.drops ? true : false;
     }
     d.multiActionMetaData = o.multiActionMetaData;
@@ -560,6 +574,7 @@ export default class RoundController {
     d.possibleMoves = activePlayerIndex ? o.dests : undefined;
     d.possibleDrops = activePlayerIndex ? o.drops : undefined;
     d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
+    d.possibleLifts = activePlayerIndex ? o.lifts : undefined;
 
     //TODO set the right data from all backgammon actions
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
@@ -637,6 +652,9 @@ export default class RoundController {
         turnPlayerIndex: d.game.player,
         movable: {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves, d.activeDiceValue) : new Map(),
+        },
+        liftable: {
+          liftDests: playing ? util.parsePossibleLifts(d.possibleLifts, d.activeDiceValue) : [],
         },
         dropmode: {
           dropDests: playing ? stratUtils.readDropsByRole(d.possibleDropsByRole) : new Map(),
@@ -778,7 +796,7 @@ export default class RoundController {
     };
     if (blur.get()) endTurn.b = 1;
     this.resign(false);
-    this.actualSendMove('endTurn', endTurn);
+    this.actualSendMove('endturn', endTurn);
   };
 
   private playPredrop = () => {
