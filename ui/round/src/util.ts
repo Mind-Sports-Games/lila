@@ -106,8 +106,12 @@ export function parsePossibleMoves(dests?: EncodedDests, activeDiceValue?: numbe
 export function parsePossibleLifts(line?: string | null, activeDiceValue?: number): cg.Key[] {
   if (typeof line === 'undefined' || line === null) return [];
   const pos = (line.match(/[a-z][1-9][0-9]?/g) as cg.Key[]) || [];
-  //TODO filter backgammon moves based on active dice value
-  console.log(activeDiceValue);
+
+  //filter backgammon lifts based on active dice value
+  if (activeDiceValue) {
+    const comparisonSquare = line.includes('1') ? 'm1' : 'm2';
+    return pos.filter(p => backgammonPosDiff(p, comparisonSquare) === activeDiceValue);
+  }
   return pos;
 }
 

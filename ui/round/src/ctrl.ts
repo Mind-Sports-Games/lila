@@ -211,6 +211,7 @@ export default class RoundController {
       }
       if (this.data.game.variant.key === 'backgammon') {
         backgammon.updateBoardFromDrop(this, key, this.data.player.playerIndex);
+        cancelDropMode(this.chessground.state);
         this.redraw();
       }
     } else this.jump(this.ply);
