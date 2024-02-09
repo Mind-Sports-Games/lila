@@ -110,7 +110,15 @@ export function parsePossibleLifts(line?: string | null, activeDiceValue?: numbe
   //filter backgammon lifts based on active dice value
   if (activeDiceValue) {
     const comparisonSquare = line.includes('1') ? 'm1' : 'm2';
-    return pos.filter(p => backgammonPosDiff(p, comparisonSquare) === activeDiceValue);
+    const posDiff = pos.map(p => backgammonPosDiff(p, comparisonSquare));
+    return pos.filter(
+      p =>
+        backgammonPosDiff(p, comparisonSquare) === activeDiceValue ||
+        (pos.length === 1 && activeDiceValue > backgammonPosDiff(p, comparisonSquare)) ||
+        (pos.length === 2 &&
+          activeDiceValue > backgammonPosDiff(p, comparisonSquare) &&
+          backgammonPosDiff(p, comparisonSquare) === Math.max(...posDiff))
+    );
   }
   return pos;
 }

@@ -726,17 +726,23 @@ export default class RoundController {
     if (this.keyboardMove) this.keyboardMove.update(step, playedPlayerIndex != d.player.playerIndex);
     if (this.music) this.music.jump(o);
     speech.step(step);
-    if (
-      playing &&
-      !this.replaying() &&
-      (d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') &&
-      d.possibleMoves
-    ) {
-      this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
+
+    //forced moves
+    if (playing && !this.replaying()) {
+      //flipello pass
+      if ((d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') && d.possibleMoves) {
+        this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
+      }
+      //backgammon roll dice at start of turn or end turn when no moves
+      if (d.game.variant.key === 'backgammon') {
+        if (d.canOnlyRollDice) this.forceRollDice(d.game.variant.key);
+        else if (d.canEndTurn) {
+          const playedNoMoves = o.uci.includes('/'); //dice roll
+          if (playedNoMoves) this.sendEndTurn(d.game.variant.key);
+        }
+      }
     }
-    if (playing && !this.replaying() && d.game.variant.key === 'backgammon' && d.canOnlyRollDice) {
-      this.forceRollDice(d.game.variant.key);
-    }
+
     return true; // prevents default socket pubsub
   };
 
@@ -1150,16 +1156,20 @@ export default class RoundController {
 
   private delayedInit = () => {
     const d = this.data;
-    if (
-      this.isPlaying() &&
-      !this.replaying() &&
-      (d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') &&
-      d.possibleMoves
-    ) {
-      this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
-    }
-    if (this.isPlaying() && !this.replaying() && d.game.variant.key === 'backgammon' && d.canOnlyRollDice) {
-      this.forceRollDice(d.game.variant.key);
+    //forced moves
+    if (this.isPlaying() && !this.replaying()) {
+      //flipello pass
+      if ((d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') && d.possibleMoves) {
+        this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
+      }
+      //backgammon roll dice at start of turn or end turn when no moves
+      if (d.game.variant.key === 'backgammon') {
+        if (d.canOnlyRollDice) this.forceRollDice(d.game.variant.key);
+        else if (d.canEndTurn) {
+          const playedNoMoves = round.lastStep(d).uci.includes('/'); //dice roll
+          if (playedNoMoves) this.sendEndTurn(d.game.variant.key);
+        }
+      }
     }
     if (this.isPlaying() && game.nbMoves(d, d.player.playerIndex) === 0 && !this.isSimulHost()) {
       playstrategy.sound.play('genericNotify');

@@ -592,6 +592,20 @@ test('combinedNotationForBackgammonActions with 1 capture and 1 non capture', ()
   expect(notation).toBe('34: 8/4* 10/7');
 });
 
+test('combinedNotationForBackgammonActions with endturn', () => {
+  const actions = ['34:', '(no-play)'];
+
+  const notation = combinedNotationForBackgammonActions(actions);
+  expect(notation).toBe('34: (no-play)');
+});
+
+test('combinedNotationForBackgammonActions with endturn', () => {
+  const actions = ['34:', '34: 8/4*', '(no-play)'];
+
+  const notation = combinedNotationForBackgammonActions(actions);
+  expect(notation).toBe('34: 8/4*');
+});
+
 //Hit and move (https://backgammon-hub.com/how-to-read-and-use-backgammon-notation/)
 //We dont follow backgmmon hub but instead split out moves as easier to manage
 test('combinedNotationForBackgammonActions with 4 actions and captures', () => {
