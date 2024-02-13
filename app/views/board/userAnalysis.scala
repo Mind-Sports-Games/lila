@@ -41,7 +41,7 @@ object userAnalysis {
       title = trans.analysis.txt(),
       moreCss = frag(
         cssTag("analyse.free"),
-        (pov.game.variant.dropsVariant && !pov.game.variant.onlyDropsVariant && pov.game.variant.key != "backgammon") option cssTag(
+        (pov.game.variant.hasDetatchedPocket) option cssTag(
           "analyse.zh"
         ),
         withForecast option cssTag("analyse.forecast"),

@@ -146,6 +146,7 @@ final class JsonView(
               .add("clockSound" -> pref.clockSound)
               .add("confirmResign" -> (!nvui && pref.confirmResign == Pref.ConfirmResign.YES))
               .add("confirmPass" -> (!nvui && pref.confirmPass == Pref.ConfirmPass.YES))
+              .add("playForcedAction" -> (!nvui && pref.playForcedAction == Pref.PlayForcedAction.YES))
               .add("keyboardMove" -> (!nvui && pref.keyboardMove == Pref.KeyboardMove.YES))
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("blindfold" -> pref.isBlindfold)
@@ -156,13 +157,13 @@ final class JsonView(
               .add("showCaptured" -> pref.captured)
               .add("submitMove" -> {
                 import Pref.SubmitMove._
-                pref.submitMove match {
+                (pref.submitMove match {
                   case _ if pov.game.hasAi || nvui                            => false
                   case ALWAYS                                                 => true
                   case CORRESPONDENCE_UNLIMITED if pov.game.isCorrespondence  => true
                   case CORRESPONDENCE_ONLY if pov.game.hasCorrespondenceClock => true
                   case _                                                      => false
-                }
+                }) && !pov.game.variant.ignoreSubmitAction
               })
           )
           .add("clock" -> pov.game.clock.map(clockJson))

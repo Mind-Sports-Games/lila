@@ -1182,6 +1182,9 @@ cg-container .cg-custom-svgs svg {
       &.unavailable {
         opacity: 0.35;
       }
+      &:first-child.available {
+        outline: thin solid green;
+      }
     }
     &.p1 {
       left: calc(100% * 8 / 15);

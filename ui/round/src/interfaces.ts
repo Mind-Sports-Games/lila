@@ -235,6 +235,7 @@ export interface Pref {
   clockTenths: Prefs.ShowClockTenths;
   confirmResign: boolean;
   confirmPass: boolean;
+  playForcedAction: boolean;
   coords: Prefs.Coords;
   destination: boolean;
   playerTurnIndicator: boolean;

@@ -736,7 +736,7 @@ export default class RoundController {
       //backgammon roll dice at start of turn or end turn when no moves
       if (d.game.variant.key === 'backgammon') {
         if (d.canOnlyRollDice) this.forceRollDice(d.game.variant.key);
-        else if (d.canEndTurn) {
+        else if (d.canEndTurn && this.data.pref.playForcedAction) {
           const playedNoMoves = o.uci.includes('/'); //dice roll
           if (playedNoMoves) this.sendEndTurn(d.game.variant.key);
         }
@@ -1165,7 +1165,7 @@ export default class RoundController {
       //backgammon roll dice at start of turn or end turn when no moves
       if (d.game.variant.key === 'backgammon') {
         if (d.canOnlyRollDice) this.forceRollDice(d.game.variant.key);
-        else if (d.canEndTurn) {
+        else if (d.canEndTurn && this.data.pref.playForcedAction) {
           const playedNoMoves = round.lastStep(d).uci.includes('/'); //dice roll
           if (playedNoMoves) this.sendEndTurn(d.game.variant.key);
         }

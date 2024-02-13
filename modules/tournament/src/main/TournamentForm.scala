@@ -49,7 +49,8 @@ final class TournamentForm {
         flipello = true.some,
         mancala = true.some,
         amazons = true.some,
-        go = true.some
+        go = true.some,
+        backgammon = true.some
       ),
       position = None,
       password = None,
@@ -91,7 +92,8 @@ final class TournamentForm {
         flipello = gameGroupInMedley(tour.medleyVariants, GameGroup.Flipello()).some,
         mancala = gameGroupInMedley(tour.medleyVariants, GameGroup.Mancala()).some,
         amazons = gameGroupInMedley(tour.medleyVariants, GameGroup.Amazons()).some,
-        go = gameGroupInMedley(tour.medleyVariants, GameGroup.Go()).some
+        go = gameGroupInMedley(tour.medleyVariants, GameGroup.Go()).some,
+        backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some
       ),
       position = tour.position,
       mode = none,
@@ -164,15 +166,16 @@ final class TournamentForm {
           "draughts64Variants"  -> optional(boolean)
         )(MedleyDefaults.apply)(MedleyDefaults.unapply),
         "medleyGameFamilies" -> mapping(
-          "chess"    -> optional(boolean),
-          "draughts" -> optional(boolean),
-          "shogi"    -> optional(boolean),
-          "xiangqi"  -> optional(boolean),
-          "loa"      -> optional(boolean),
-          "flipello" -> optional(boolean),
-          "mancala"  -> optional(boolean),
-          "amazons"  -> optional(boolean),
-          "go"       -> optional(boolean)
+          "chess"      -> optional(boolean),
+          "draughts"   -> optional(boolean),
+          "shogi"      -> optional(boolean),
+          "xiangqi"    -> optional(boolean),
+          "loa"        -> optional(boolean),
+          "flipello"   -> optional(boolean),
+          "mancala"    -> optional(boolean),
+          "amazons"    -> optional(boolean),
+          "go"         -> optional(boolean),
+          "backgammon" -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
@@ -467,7 +470,8 @@ case class MedleyGameFamilies(
     flipello: Option[Boolean],
     mancala: Option[Boolean],
     amazons: Option[Boolean],
-    go: Option[Boolean]
+    go: Option[Boolean],
+    backgammon: Option[Boolean]
 ) {
 
   lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -480,5 +484,6 @@ case class MedleyGameFamilies(
     .filterNot(gg => if (!mancala.getOrElse(false)) gg == GameGroup.Mancala() else false)
     .filterNot(gg => if (!amazons.getOrElse(false)) gg == GameGroup.Amazons() else false)
     .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
+    .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
 
 }

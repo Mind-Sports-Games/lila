@@ -38,6 +38,7 @@ case class Pref(
     submitMove: Int,
     confirmResign: Int,
     confirmPass: Int,
+    playForcedAction: Int,
     insightShare: Int,
     keyboardMove: Int,
     zen: Int,
@@ -213,8 +214,9 @@ object Pref {
     )
   }
 
-  object ConfirmResign extends BooleanPref
-  object ConfirmPass   extends BooleanPref
+  object ConfirmResign    extends BooleanPref
+  object ConfirmPass      extends BooleanPref
+  object PlayForcedAction extends BooleanPref
 
   object InsightShare {
     val NOBODY    = 0
@@ -484,6 +486,7 @@ object Pref {
     submitMove = SubmitMove.CORRESPONDENCE_ONLY,
     confirmResign = ConfirmResign.YES,
     confirmPass = ConfirmPass.YES,
+    playForcedAction = PlayForcedAction.NO,
     insightShare = InsightShare.FRIENDS,
     keyboardMove = KeyboardMove.NO,
     zen = Zen.NO,

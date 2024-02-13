@@ -34,17 +34,18 @@ object PrefForm {
         "blindfold"     -> checkedNumber(Pref.Blindfold.choices)
       )(DisplayData.apply)(DisplayData.unapply),
       "behavior" -> mapping(
-        "moveEvent"     -> optional(numberIn(Set(0, 1, 2))),
-        "mancalaMove"   -> optional(booleanNumber),
-        "premove"       -> booleanNumber,
-        "takeback"      -> checkedNumber(Pref.Takeback.choices),
-        "autoQueen"     -> checkedNumber(Pref.AutoQueen.choices),
-        "autoThreefold" -> checkedNumber(Pref.AutoThreefold.choices),
-        "submitMove"    -> checkedNumber(Pref.SubmitMove.choices),
-        "confirmResign" -> checkedNumber(Pref.ConfirmResign.choices),
-        "confirmPass"   -> checkedNumber(Pref.ConfirmPass.choices),
-        "keyboardMove"  -> optional(booleanNumber),
-        "rookCastle"    -> optional(booleanNumber)
+        "moveEvent"        -> optional(numberIn(Set(0, 1, 2))),
+        "mancalaMove"      -> optional(booleanNumber),
+        "premove"          -> booleanNumber,
+        "takeback"         -> checkedNumber(Pref.Takeback.choices),
+        "autoQueen"        -> checkedNumber(Pref.AutoQueen.choices),
+        "autoThreefold"    -> checkedNumber(Pref.AutoThreefold.choices),
+        "submitMove"       -> checkedNumber(Pref.SubmitMove.choices),
+        "confirmResign"    -> checkedNumber(Pref.ConfirmResign.choices),
+        "confirmPass"      -> checkedNumber(Pref.ConfirmPass.choices),
+        "playForcedAction" -> checkedNumber(Pref.PlayForcedAction.choices),
+        "keyboardMove"     -> optional(booleanNumber),
+        "rookCastle"       -> optional(booleanNumber)
       )(BehaviorData.apply)(BehaviorData.unapply),
       "clock" -> mapping(
         "tenths"   -> checkedNumber(Pref.ClockTenths.choices),
@@ -86,6 +87,7 @@ object PrefForm {
       submitMove: Int,
       confirmResign: Int,
       confirmPass: Int,
+      playForcedAction: Int,
       keyboardMove: Option[Int],
       rookCastle: Option[Int]
   )
@@ -135,6 +137,7 @@ object PrefForm {
         insightShare = insightShare,
         confirmResign = behavior.confirmResign,
         confirmPass = behavior.confirmPass,
+        playForcedAction = behavior.playForcedAction,
         captured = display.captured == 1,
         keyboardMove = behavior.keyboardMove | pref.keyboardMove,
         zen = display.zen | pref.zen,
@@ -174,6 +177,7 @@ object PrefForm {
           submitMove = pref.submitMove,
           confirmResign = pref.confirmResign,
           confirmPass = pref.confirmPass,
+          playForcedAction = pref.playForcedAction,
           keyboardMove = pref.keyboardMove.some,
           rookCastle = pref.rookCastle.some
         ),
