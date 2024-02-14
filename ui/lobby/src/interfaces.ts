@@ -19,7 +19,8 @@ export interface Seek extends Untyped {}
 export interface Pool {
   id: PoolId;
   lim: number;
-  inc: number;
+  inc?: number;
+  delay?: number;
   byoyomi?: number;
   periods?: number;
   perf: string;

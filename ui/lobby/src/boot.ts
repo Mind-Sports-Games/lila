@@ -111,9 +111,9 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variantId: '9_4',
     },
     {
-      id: '5+3-backgammon',
-      lim: 5,
-      inc: 3,
+      id: '2d12-backgammon',
+      lim: 2,
+      delay: 12,
       perf: 'Backgammon',
       variant: 'backgammon',
       variantDisplayName: 'Backgammon',

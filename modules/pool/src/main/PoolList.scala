@@ -37,7 +37,7 @@ object PoolList {
     ),
     PoolConfig(5 ++ 3, Wave(22 seconds, 30 players), Variant.Go(strategygames.go.variant.Go19x19)),
     PoolConfig(
-      5 ++ 3,
+      strategygames.Clock.SimpleDelayConfig(2 * 60, 12),
       Wave(22 seconds, 30 players),
       Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
     )

@@ -462,6 +462,9 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
         new DateTime(2024, 9, 13, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay212)(
+        new DateTime(2024, 9, 20, 0, 0)
       )
       //Fri 27th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }

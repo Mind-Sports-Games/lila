@@ -549,7 +549,7 @@ object TournamentShield {
     case object Backgammon
         extends Category(
           Variant.Backgammon(strategygames.backgammon.variant.Backgammon),
-          Blitz53,
+          Delay212,
           22,
           1
         )
