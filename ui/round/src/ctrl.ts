@@ -209,7 +209,7 @@ export default class RoundController {
         flipello.flip(this, key, this.data.player.playerIndex);
         this.redraw();
       }
-      if (this.data.game.variant.key === 'backgammon') {
+      if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
         backgammon.updateBoardFromDrop(this, key, this.data.player.playerIndex);
         cancelDropMode(this.chessground.state);
         this.redraw();
@@ -233,7 +233,7 @@ export default class RoundController {
       } else if (this.data.game.variant.key === 'togyzkumalak') {
         mancala.updateBoardFromTogyzkumalakMove(this, orig, dest);
         sound.capture();
-      } else if (this.data.game.variant.key === 'backgammon') {
+      } else if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
         backgammon.updateBoardFromMove(this, orig, dest);
         sound.capture();
       } else sound.capture();
@@ -245,7 +245,7 @@ export default class RoundController {
     } else if (this.data.game.variant.key === 'togyzkumalak') {
       mancala.updateBoardFromTogyzkumalakMove(this, orig, dest);
       sound.capture();
-    } else if (this.data.game.variant.key === 'backgammon') {
+    } else if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
       backgammon.updateBoardFromMove(this, orig, dest);
     } else sound.move();
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
@@ -304,6 +304,7 @@ export default class RoundController {
         'go13x13',
         'go19x19',
         'backgammon',
+        'nackgammon',
       ].includes(this.data.game.variant.key)
     )
       return false;
@@ -394,17 +395,17 @@ export default class RoundController {
     };
     this.chessground.set(config);
 
-    if (['togyzkumalak', 'backgammon'].includes(this.data.game.variant.key)) {
+    if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
       this.chessground.redrawAll(); //redraw board scores or coordinates
     }
     const variantActionToEnforceDrop =
-      ['amazons', 'backgammon'].includes(this.data.game.variant.key) &&
+      ['amazons', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key) &&
       this.data.possibleDropsByRole &&
       this.data.possibleDropsByRole.length > 0;
     if (this.data.onlyDropsVariant) {
       if (
         ply == this.lastPly() &&
-        (!['amazons', 'backgammon'].includes(this.data.game.variant.key) || variantActionToEnforceDrop)
+        (!['amazons', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key) || variantActionToEnforceDrop)
       ) {
         this.setDropOnlyVariantDropMode(
           this.data.player.playerIndex === this.data.game.player,
@@ -557,7 +558,7 @@ export default class RoundController {
     console.log('uci', o.uci);
     console.log('fen', o.fen);
 
-    if (['amazons', 'backgammon'].includes(d.game.variant.key)) {
+    if (['amazons', 'backgammon', 'nackgammon'].includes(d.game.variant.key)) {
       if (d.onlyDropsVariant && !o.drops) {
         cancelDropMode(this.chessground.state);
         this.redraw();
@@ -606,7 +607,7 @@ export default class RoundController {
       this.ply++;
       this.turnCount = o.turnCount;
       //TODO backgammon actually support drops and moves in chessground for backgammon
-      if (o.role && !['backgammon'].includes(d.game.variant.key)) {
+      if (o.role && !['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
         this.chessground.newPiece(
           {
             role: o.role,
@@ -626,7 +627,7 @@ export default class RoundController {
           if (
             (!o.castle ||
               (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')) &&
-            !['backgammon'].includes(d.game.variant.key)
+            !['backgammon', 'nackgammon'].includes(d.game.variant.key)
           ) {
             if (['oware', 'togyzkumalak'].includes(d.game.variant.key)) {
               this.chessground.moveNoAnim(keys[0], keys[1]);
@@ -640,7 +641,7 @@ export default class RoundController {
         // a lot of pieces can change from 1 move so update them all
         mancala.updateBoardFromFen(this, o.fen);
       }
-      if (['backgammon'].includes(d.game.variant.key)) {
+      if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
         this.chessground.set({ dice: d.dice ? d.dice : [] });
         backgammon.updateBoardFromFen(this, o.fen);
       }
@@ -665,7 +666,7 @@ export default class RoundController {
         selectOnly: d.selectMode,
         highlight: {
           //TODO do we want a different highlight for backgammon?
-          lastMove: d.pref.highlight && !d.selectMode && !['backgammon'].includes(d.game.variant.key),
+          lastMove: d.pref.highlight && !d.selectMode && !['backgammon', 'nackgammon'].includes(d.game.variant.key),
         },
       });
       if (o.check) sound.check();
@@ -734,7 +735,7 @@ export default class RoundController {
         this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
       }
       //backgammon roll dice at start of turn or end turn when no moves
-      if (d.game.variant.key === 'backgammon') {
+      if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
         if (d.canOnlyRollDice) this.forceRollDice(d.game.variant.key);
         else if (d.canEndTurn && this.data.pref.playForcedAction) {
           const playedNoMoves = o.uci.includes('/'); //dice roll
@@ -1163,7 +1164,7 @@ export default class RoundController {
         this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
       }
       //backgammon roll dice at start of turn or end turn when no moves
-      if (d.game.variant.key === 'backgammon') {
+      if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
         if (d.canOnlyRollDice) this.forceRollDice(d.game.variant.key);
         else if (d.canEndTurn && this.data.pref.playForcedAction) {
           const playedNoMoves = round.lastStep(d).uci.includes('/'); //dice roll

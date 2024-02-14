@@ -268,6 +268,7 @@ const noCevalVariants = [
   'go13x13',
   'go19x19',
   'backgammon',
+  'nackgammon',
 ];
 
 export function allowCevalForVariant(variant: VariantKey) {
@@ -366,5 +367,7 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'go19x19';
     case 'backgammon':
       return 'backgammon';
+    case 'nackgammon':
+      return 'nackgammon';
   }
 };

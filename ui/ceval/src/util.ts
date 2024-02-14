@@ -26,6 +26,7 @@ const noCevalVariants = [
   'go13x13',
   'go19x19',
   'backgammon',
+  'nackgammon',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {

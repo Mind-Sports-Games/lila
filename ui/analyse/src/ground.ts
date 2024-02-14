@@ -110,7 +110,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             ? 'https://playstrategy.org/assets/piece/go/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
               '/'
-            : variantKey === 'backgammon'
+            : variantKey === 'backgammon' || variantKey === 'nackgammon'
             ? 'https://playstrategy.org/assets/piece/backgammon/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
               '/'
@@ -138,7 +138,8 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       },
     },
     draggable: {
-      enabled: pref.moveEvent !== Prefs.MoveEvent.Click && !['oware', 'backgammon'].includes(d.game.variant.key),
+      enabled:
+        pref.moveEvent !== Prefs.MoveEvent.Click && !['oware', 'backgammon', 'nackgammon'].includes(d.game.variant.key),
       showGhost: pref.highlight,
     },
     disableContextMenu: true,

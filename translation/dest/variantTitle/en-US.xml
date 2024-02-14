@@ -38,4 +38,5 @@
   <string name="go13x13">Surround the largest area(s) of the 13 by 13 board with your stones to win</string>
   <string name="go19x19">Surround the largest area(s) of the 19 by 19 board with your stones to win</string>
   <string name="backgammon">Get all your pieces into your home and then bear them off first to win</string>
+  <string name="nackgammon">Get all your pieces into your home and then bear them off first to win</string>
 </resources>

@@ -71,4 +71,5 @@ export const perfIcons = {
   Go13x13: '',
   Go19x19: '',
   Backgammon: '',
+  Nackgammon: '',
 };

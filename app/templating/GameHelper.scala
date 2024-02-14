@@ -225,6 +225,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
           case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
             trans.gameFinished.txt()
+          case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
+            trans.gameFinished.txt()
           case _ => trans.variantEnding.txt()
         }
       case _ => ""

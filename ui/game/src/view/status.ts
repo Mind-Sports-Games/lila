@@ -75,6 +75,7 @@ export default function status(ctrl: Ctrl): string {
             return noarg('gameFinished');
           }
         case 'backgammon':
+        case 'nackgammon':
           return noarg('gameFinished');
       }
       return noarg('variantEnding');

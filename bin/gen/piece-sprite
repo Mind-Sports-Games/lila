@@ -649,7 +649,9 @@ backgammon_themes.map { |theme|
         image_pos = direction[0]
         pos_class = '.' + direction
       end
-      initial_css = '.backgammon.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + ', ' + '.is2d .variant-backgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+      initial_css = '.backgammon.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+       ', ' + '.is2d .variant-backgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+       ', ' + '.is2d .variant-nackgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
       file = source_dir + 'backgammon/' + name + '/' + color + image_name + image_pos + '.' + ext
         File.open(file, 'r') do|image_file|
           image = image_file.read
@@ -677,7 +679,9 @@ backgammon_themes.map { |theme|
           image_pos = direction[0]
           pos_class = '.' + direction
         end
-        initial_css = '.backgammon.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + ', ' + '.is2d .variant-backgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+        initial_css = '.backgammon.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
+         ', ' + '.is2d .variant-backgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
+         ', ' + '.is2d .variant-nackgammon' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
         initial_css + ' {' +
           "background-image:url('/assets/piece/" + 'backgammon/' + name + "/" + color + image_name + image_pos + "." + ext + "')}"
     }

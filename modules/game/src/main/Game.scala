@@ -309,7 +309,7 @@ case class Game(
       // TODO Backgammon how do we want to represent score?
       else if (updated.board.variant.gameLogic == GameLogic.Backgammon())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.key == "backgammon") ?? List(
+        (updated.board.variant.key == "backgammon" || updated.board.variant.key == "nackgammon") ?? List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else //chess. Is this even necessary as checkCount is in the fen?

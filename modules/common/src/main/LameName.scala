@@ -5,7 +5,8 @@ import scala.util.matching.Regex
 object LameName {
 
   def username(name: String): Boolean =
-    usernameRegex.find(name.replaceIf('_', "")) || containsTitleRegex.matches(name) || containsUsRegex.matches(name)
+    usernameRegex.find(name.replaceIf('_', "")) || containsTitleRegex.matches(name) || containsUsRegex
+      .matches(name)
 
   def tournament(name: String): Boolean = tournamentRegex find name
 
@@ -89,7 +90,8 @@ object LameName {
     "mindsportsolympiad",
     "lidraughts",
     "lishogi",
-    "pychess"
+    "pychess",
+    "backgammonhub"
   )
 
   private val usernameRegex = lameWords(baseWords)

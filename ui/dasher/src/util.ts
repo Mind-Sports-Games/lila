@@ -94,6 +94,7 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'go13x13':
     case 'go19x19':
       return 'go';
+    case 'nackgammon':
     case 'backgammon':
       return 'backgammon';
     case 'russian':

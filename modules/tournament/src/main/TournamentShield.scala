@@ -553,6 +553,13 @@ object TournamentShield {
           22,
           1
         )
+    case object Nackgammon
+        extends Category(
+          Variant.Backgammon(strategygames.backgammon.variant.Nackgammon),
+          Delay212,
+          7,
+          1
+        )
 
     val all: List[Category] = List(
       Chess,
@@ -591,7 +598,8 @@ object TournamentShield {
       Go9x9,
       Go13x13,
       Go19x19,
-      Backgammon
+      Backgammon,
+      Nackgammon
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

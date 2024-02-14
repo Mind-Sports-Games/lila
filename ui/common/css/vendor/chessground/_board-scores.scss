@@ -79,6 +79,7 @@ board-scores {
     flex: 1 1 auto;
   }
 
+  .variant-nackgammon .orientation-p1 &,
   .variant-backgammon .orientation-p1 & {
     &.p1 {
       bottom: 6%;
@@ -87,6 +88,7 @@ board-scores {
       top: 6%;
     }
   }
+  .variant-nackgammon .orientation-p2 &,
   .variant-backgammon .orientation-p2 & {
     &.p1 {
       top: 6%;

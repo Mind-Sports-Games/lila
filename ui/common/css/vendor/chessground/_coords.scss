@@ -128,6 +128,7 @@ coords {
     }
   }
 
+  .variant-nackgammon &,
   .variant-backgammon & {
     text-shadow: 0.5px -1px 0px rgba(0, 0, 0, 0.25), -0.5px 1px 0px rgba(255, 255, 255, 0.6);
     .backgammon-classic & coord {
@@ -143,6 +144,7 @@ coords {
     }
   }
 
+  .variant-nackgammon .orientation-p1 &.files,
   .variant-backgammon .orientation-p1 &.files {
     &.p1 {
       left: 0;
@@ -162,6 +164,7 @@ coords {
     }
   }
 
+  .variant-nackgammon .orientation-p2 &.files,
   .variant-backgammon .orientation-p2 &.files {
     &.p1 {
       left: 0;
@@ -251,6 +254,10 @@ coords {
     display: none;
   }
 
+  .coords-out .variant-nackgammon coords {
+    display: none;
+  }
+
   .coords-out .variant-togyzkumalak coords {
     display: none;
   }
@@ -280,6 +287,7 @@ coords {
   }
 
   //always show for backgammon single column and make smaller
+  .variant-nackgammon .orientation-p1 coords.files,
   .variant-backgammon .orientation-p1 coords.files {
     &.p1 {
       bottom: 0.7em;
@@ -288,6 +296,7 @@ coords {
       top: 0.7em;
     }
   }
+  .variant-nackgammon .orientation-p2 coords.files,
   .variant-backgammon .orientation-p2 coords.files {
     &.p1 {
       top: 0.7em;

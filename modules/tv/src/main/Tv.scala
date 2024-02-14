@@ -618,6 +618,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "backgammon"
         )
+    case object Nackgammon
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(BV.Nackgammon)),
+          icon = BV.Nackgammon.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(BV.Nackgammon)), noBot),
+          familyChannel = false,
+          gameFamily = "backgammon"
+        )
     case object Bot
         extends Channel(
           name = "Bot",
@@ -689,6 +698,7 @@ object Tv {
       Go9x9,
       BackgammonFamily,
       Backgammon,
+      Nackgammon,
       Bot,
       Computer
     )

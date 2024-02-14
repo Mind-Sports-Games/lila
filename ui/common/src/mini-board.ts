@@ -47,7 +47,11 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
           dice: readDice(fen, variantFromElement($el) as VariantKey),
           lastMove: lm && (lm == 'pass' ? undefined : lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
           highlight: {
-            lastMove: lm != undefined && lm! == 'pass' && variantFromElement($el) != 'backgammon',
+            lastMove:
+              lm != undefined &&
+              lm! == 'pass' &&
+              variantFromElement($el) != 'backgammon' &&
+              variantFromElement($el) != 'nackgammon',
           },
           drawable: {
             enabled: false,
@@ -75,7 +79,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? { width: 13, height: 13 }
             : $el.hasClass('variant-go19x19')
             ? { width: 19, height: 19 }
-            : $el.hasClass('variant-backgammon')
+            : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
             ? { width: 12, height: 2 }
             : { width: 8, height: 8 },
           variant: variantFromElement($el),
@@ -113,5 +117,7 @@ export const variantFromElement = (element: Cash): string => {
     ? 'go19x19'
     : element.hasClass('variant-backgammon')
     ? 'backgammon'
+    : element.hasClass('variant-nackgammon')
+    ? 'nackgammon'
     : 'standard';
 };

@@ -303,7 +303,8 @@ declare type VariantKey =
   | 'go9x9'
   | 'go13x13'
   | 'go19x19'
-  | 'backgammon';
+  | 'backgammon'
+  | 'nackgammon';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -362,7 +363,8 @@ declare type Perf =
   | 'go9x9'
   | 'go13x13'
   | 'go19x19'
-  | 'backgammon';
+  | 'backgammon'
+  | 'nackgammon';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red' | 'South' | 'North' | 'Bastaushi' | 'Kostaushi';

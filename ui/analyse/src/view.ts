@@ -423,7 +423,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     }
   }
   //Togyzkumalak and backgammon board always has coodinates on the inside
-  if (['togyzkumalak', 'backgammon'].includes(variantKey)) {
+  if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-out').addClass('coords-in');
     }
@@ -441,6 +441,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'go13x13',
     'go19x19',
     'backgammon',
+    'nackgammon',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

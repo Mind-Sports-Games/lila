@@ -394,7 +394,14 @@ export default class Setup {
           }
           break;
         case '10':
-          key = 'backgammon';
+          switch (variantId[1]) {
+            case '1':
+              key = 'backgammon';
+              break;
+            case '2':
+              key = 'nackgammon';
+              break;
+          }
           break;
       }
       const $selected = $ratings

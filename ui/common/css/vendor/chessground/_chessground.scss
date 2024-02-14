@@ -134,6 +134,7 @@ span.mini-game.variant-togyzkumalak.is2d {
   height: calc(100% / 19);
 }
 
+.variant-nackgammon square,
 .variant-backgammon square {
   width: calc(100% / 15);
   height: calc(100% * 6.5 / 15);
@@ -857,6 +858,7 @@ square {
   height: calc(100% / 19);
 }
 
+.variant-nackgammon piece,
 .variant-backgammon piece {
   width: calc(100% / 15);
   height: calc(100% * 6.5 / 15);
@@ -871,6 +873,7 @@ square {
   }
 }
 
+.variant-nackgammon,
 .variant-backgammon {
   .orientation-p1 piece.pocket {
     &.p1 {
@@ -979,6 +982,7 @@ piece {
   padding-bottom: calc(100% / 19);
 }
 
+.variant-nackgammon cg-helper,
 .variant-backgammon cg-helper {
   width: calc(100% / 15);
   padding-bottom: calc(100% * 6.5 / 15);
@@ -1047,6 +1051,7 @@ cg-helper {
   height: calc(100% * 19);
 }
 
+.variant-nackgammon cg-container,
 .variant-backgammon cg-container {
   width: calc(100% * 15);
   height: calc(100% * 15 / 6.5);
@@ -1166,6 +1171,7 @@ cg-container .cg-custom-svgs svg {
   }
 }
 
+.variant-nackgammon,
 .variant-backgammon {
   cg-dice {
     width: calc(100% * 6 / 15);

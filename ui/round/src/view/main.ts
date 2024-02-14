@@ -80,7 +80,7 @@ function renderPlayerScore(
       },
       children
     );
-  } else if (variantKey === 'backgammon') {
+  } else if (variantKey === 'backgammon' || variantKey === 'nackgammon') {
     for (let i = 0; i < score; i++) {
       children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
     }
@@ -173,11 +173,12 @@ export function main(ctrl: RoundController): VNode {
         }
         break;
       }
+      case 'nackgammon':
       case 'backgammon': {
         const startingNumberOfPieces = 15;
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
         const pieces = cgState ? cgState.pieces : fenRead(fen, boardSize, variantKey);
-        const pocketPieces = pocketRead(fen, 'backgammon');
+        const pocketPieces = pocketRead(fen, variantKey);
 
         const p1PiecesOffBoard: number =
           fen.split(' ').length > 5
@@ -232,7 +233,7 @@ export function main(ctrl: RoundController): VNode {
     }
   }
   //Togyzkumalak and backgammon board always has coodinates on the inside
-  if (['togyzkumalak', 'backgammon'].includes(variantKey)) {
+  if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-out').addClass('coords-in');
     }
@@ -250,6 +251,7 @@ export function main(ctrl: RoundController): VNode {
     'go13x13',
     'go19x19',
     'backgammon',
+    'nackgammon',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

@@ -116,7 +116,7 @@ function updatePocketPieces(
   isCapture: boolean
 ): void {
   const currentFen = ctrl.data.steps[ctrl.data.steps.length - 1].fen;
-  const pocketPieces = cgFen.readPocket(currentFen, 'backgammon');
+  const pocketPieces = cgFen.readPocket(currentFen, ctrl.data.game.variant.key as cg.Variant);
 
   let playerCount = 0;
   let enemyCount = 0;
