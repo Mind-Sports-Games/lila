@@ -30,7 +30,7 @@
     "game": "2.0.0",
     "nvui": "2.0.0",
     "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#442-backgammon",
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat4.0",
     "stratutils": "2.0.0",
     "tree": "2.0.0"
   },
