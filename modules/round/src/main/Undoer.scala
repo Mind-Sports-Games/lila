@@ -1,19 +1,13 @@
 package lila.round
 
-import strategygames.{ Player => PlayerIndex, Situation }
 import lila.common.Bus
 import lila.game.{ Event, Game, GameRepo, Pov, Progress, Rewind, UciMemo }
-import lila.pref.{ Pref, PrefApi }
-import lila.i18n.{ defaultLang, I18nKeys => trans }
 
 final private class Undoer(
     messenger: Messenger,
     gameRepo: GameRepo,
-    uciMemo: UciMemo,
-    prefApi: PrefApi
+    uciMemo: UciMemo
 )(implicit ec: scala.concurrent.ExecutionContext) {
-
-  implicit private val chatLang = defaultLang
 
   def apply(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
     IfAllowed(pov.game) {
@@ -40,7 +34,7 @@ final private class Undoer(
 
   private def save(p1: Progress)(implicit proxy: GameProxy): Fu[Events] = {
     val p2 = p1 + Event.Reload
-    messenger.system(p2.game, "Undo action taken")
+    //messenger.system(p2.game, "Undo action taken")
     proxy.save(p2) inject p2.events
   }
 }

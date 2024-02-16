@@ -152,7 +152,6 @@ export const update = (node: HTMLElement, data: UpdateData) => {
         pause: playerIndex != turnPlayerIndex,
       });
   };
-  console.log(data);
   renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
   renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
 };

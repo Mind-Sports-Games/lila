@@ -196,9 +196,7 @@ export default class RoundController {
   };
 
   private onUserLift = (dest: cg.Key) => {
-    //TODO remove role?
-    console.log('User lift from chessground, dest:', dest);
-    this.sendLift(this.data.game.variant.key, 's-piece', dest);
+    this.sendLift(this.data.game.variant.key, dest);
   };
 
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
@@ -221,7 +219,6 @@ export default class RoundController {
   };
 
   private onMove = (orig: cg.Key, dest: cg.Key, captured?: cg.Piece) => {
-    console.log('onMove called');
     if (captured || this.enpassant(orig, dest)) {
       if (this.data.game.variant.key === 'atomic') {
         sound.explode();
@@ -553,10 +550,6 @@ export default class RoundController {
     d.game.turns = o.turnCount;
     d.game.player = util.turnPlayerIndexFromLastTurn(o.turnCount);
 
-    console.log('api move');
-    console.log('uci', o.uci);
-    console.log('fen', o.fen);
-
     if (['amazons', 'backgammon', 'nackgammon'].includes(d.game.variant.key)) {
       if (d.onlyDropsVariant && !o.drops) {
         cancelDropMode(this.chessground.state);
@@ -758,7 +751,6 @@ export default class RoundController {
   }
 
   private forceRollDice(variantKey: VariantKey) {
-    console.log('forceDiceRoll');
     this.sendRollDice(variantKey);
   }
 
@@ -771,9 +763,8 @@ export default class RoundController {
     this.actualSendMove('diceroll', roll);
   };
 
-  sendLift = (variant: VariantKey, role: cg.Role, key: cg.Key): void => {
+  sendLift = (variant: VariantKey, key: cg.Key): void => {
     const lift: SocketLift = {
-      role: role,
       pos: key,
       variant: variant,
     };
@@ -830,7 +821,8 @@ export default class RoundController {
     this.onChange();
     this.setLoading(false);
     if (this.keyboardMove) this.keyboardMove.update(d.steps[d.steps.length - 1]);
-    if (this.data.game.variant.key === 'togyzkumalak') this.chessground.redrawAll(); //redraw board scores
+    //redraw board scores/dice, items in CG wrap layer
+    if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) this.chessground.redrawAll();
   };
 
   endWithData = (o: ApiEnd): void => {
@@ -1116,7 +1108,6 @@ export default class RoundController {
   };
 
   undoAction = (): void => {
-    console.log('undoAction called');
     if (this.data.canUndo) {
       this.sendUndo();
     }
@@ -1124,7 +1115,6 @@ export default class RoundController {
   };
 
   endTurnAction = (): void => {
-    console.log('endTurnAction called');
     if (this.data.canEndTurn) {
       this.sendEndTurn(this.data.game.variant.key);
     }

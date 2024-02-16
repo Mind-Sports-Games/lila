@@ -46,7 +46,6 @@ export interface SocketDoRoll {
   b?: 1;
 }
 export interface SocketLift {
-  role: cg.Role;
   pos: cg.Key;
   variant: string;
   b?: 1;
