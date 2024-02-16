@@ -570,7 +570,7 @@ export default class RoundController {
     d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
     d.possibleLifts = activePlayerIndex ? o.lifts : undefined;
 
-    //TODO set the right data from all backgammon actions
+    //set the right data from all backgammon actions
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
     d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key);
     d.activeDiceValue = this.activeDiceValue(d.dice);
@@ -598,7 +598,7 @@ export default class RoundController {
     if (!this.replaying()) {
       this.ply++;
       this.turnCount = o.turnCount;
-      //TODO backgammon actually support drops and moves in chessground for backgammon
+      //drops and moves are not really supported for backgammon in chessground, we compute changes ourselves
       if (o.role && !['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
         this.chessground.newPiece(
           {
@@ -657,7 +657,6 @@ export default class RoundController {
         onlyDropsVariant: d.onlyDropsVariant, //need to update every move (amazons, backgammon)
         selectOnly: d.selectMode,
         highlight: {
-          //TODO do we want a different highlight for backgammon?
           lastMove: d.pref.highlight && !d.selectMode && !['backgammon', 'nackgammon'].includes(d.game.variant.key),
         },
       });
