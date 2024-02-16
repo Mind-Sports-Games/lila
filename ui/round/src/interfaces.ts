@@ -51,10 +51,6 @@ export interface SocketLift {
   variant: string;
   b?: 1;
 }
-export interface SocketUndo {
-  variant: string;
-  b?: 1;
-}
 export interface SocketEndTurn {
   variant: string;
   b?: 1;

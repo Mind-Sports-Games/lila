@@ -22,7 +22,8 @@ object SimulForm {
   val clockTimeDefault = 20
   val clockTimeChoices = clockTimeChoicesFromMinutes(clockTimes.map(_.toDouble))
 
-  val clockIncrements       = (0 to 2 by 1) ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10) ++ (90 to 180 by 30)
+  val clockIncrements =
+    (0 to 5) ++ (8 to 12 by 2) ++ (15 to 30 by 5) ++ (40 to 60 by 10) ++ (90 to 180 by 30)
   val clockIncrementDefault = 60
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
   val clockDelayChoices     = clockIncrementChoices

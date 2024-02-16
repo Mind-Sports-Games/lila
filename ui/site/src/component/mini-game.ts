@@ -131,6 +131,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
       dice: readDice(data.fen, variantFromElement($el) as VariantKey),
       lastMove,
     });
+  cg.redrawAll();
   if (dg)
     dg.set({
       fen: data.fen,
