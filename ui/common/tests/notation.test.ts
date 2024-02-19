@@ -563,6 +563,18 @@ test('moveFromNotationStyle backgammon testing capture', () => {
   expect(notation).toBe('11: 6/5');
 });
 
+test('moveFromNotationStyle backgammon testing capture', () => {
+  const move = {
+    san: '',
+    uci: 'f2a2',
+    fen: '5S,3,2s,1,5s,2,1s,1,1S/4s,3,3S,1S,5S,4,2s[1s] - 5/6 w',
+    prevFen: '4S,3,2s,1S,5s,2,1s,1,1S/4s,3,3S,1S,5S,4,2s[1s] 5 6 w',
+  };
+
+  const notation = moveFromNotationStyle('bkg')(move, backgammonVariant);
+  expect(notation).toBe('56: 18/13');
+});
+
 test('combinedNotationForBackgammonActions with 2 same actions', () => {
   const actions = ['44:', '44: 8/4', '44: 8/4'];
 
