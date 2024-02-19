@@ -82,6 +82,9 @@ export type StatusName =
   | 'outoftime'
   | 'noStart'
   | 'cheat'
+  | 'singleWin'
+  | 'gammonWin'
+  | 'backgammonWin'
   | 'variantEnd'
   | 'perpetualCheck'
   | 'unknownFinish';

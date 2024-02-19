@@ -51,6 +51,9 @@
   <string name="raceFinished">Race finished</string>
   <string name="checkersConnected">All checkers connected</string>
   <string name="gameFinished">Game finished</string>
+  <string name="backgammonSingleWin">Standard win</string>
+  <string name="backgammonGammonWin">Gammon win</string>
+  <string name="backgammonBackgammonWin">Backgammon win</string>
   <string name="variantEnding">Variant ending</string>
   <string name="gameFinishedRepetition">Game finished via repetition</string>
   <string name="newOpponent">New opponent</string>

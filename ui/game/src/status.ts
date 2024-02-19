@@ -14,6 +14,9 @@ export const ids = {
   outoftime: 35,
   cheat: 36,
   noStart: 37,
+  singleWin: 40,
+  gammonWin: 41,
+  backgammonWin: 42,
   variantEnd: 60,
 };
 

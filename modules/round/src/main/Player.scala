@@ -212,6 +212,9 @@ final private class Player(
       case Status.Mate           => finisher.other(game, _.Mate, game.situation.winner)
       case Status.PerpetualCheck => finisher.other(game, _.PerpetualCheck, game.situation.winner)
       case Status.VariantEnd     => finisher.other(game, _.VariantEnd, game.situation.winner)
+      case Status.SingleWin      => finisher.other(game, _.SingleWin, game.situation.winner)
+      case Status.GammonWin      => finisher.other(game, _.GammonWin, game.situation.winner)
+      case Status.BackgammonWin  => finisher.other(game, _.BackgammonWin, game.situation.winner)
       case Status.Stalemate if !game.variant.stalemateIsDraw =>
         finisher.other(game, _.Stalemate, game.situation.winner)
       case status @ (Status.Stalemate | Status.Draw) => finisher.other(game, _ => status, None)
