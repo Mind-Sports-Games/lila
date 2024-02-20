@@ -558,6 +558,8 @@ export function combinedNotationForBackgammonActions(actionNotations: string[]):
       }
     } else if (notation === '(no-play)' && actionNotations.length === 2) {
       return actionNotations[0].split(' ')[0] + ' ' + notation;
+    } else if (notation === '(no-play)' && actionNotations.length === 1) {
+      return '...';
     }
   }
 

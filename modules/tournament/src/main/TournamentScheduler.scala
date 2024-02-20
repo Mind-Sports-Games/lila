@@ -321,8 +321,8 @@ final private class TournamentScheduler(
       (Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510),
       (Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32),
-      (Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay212),
       (Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32),
+      (Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay212),
       (Variant.FairySF(strategygames.fairysf.variant.Flipello10), Blitz32),
       (Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz32),
@@ -331,8 +331,8 @@ final private class TournamentScheduler(
       (Variant.Draughts(strategygames.draughts.variant.English), Blitz32),
       (Variant.Chess(strategygames.chess.variant.ScrambledEggs), Blitz32),
       (Variant.Chess(strategygames.chess.variant.ThreeCheck), Blitz32),
-      (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay212),
       (Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32),
+      (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay212),
       (Variant.Go(strategygames.go.variant.Go13x13), Blitz53),
       (Variant.Chess(strategygames.chess.variant.Standard), Blitz32)
     )

@@ -666,6 +666,23 @@ export default class RoundController {
     }
     d.game.threefold = !!o.threefold;
     d.game.perpetualWarning = !!o.perpetualWarning;
+
+    //backgammon initial Endturn isn't in the starting json data so add to step before p2 roll is applied
+    if (['backgammon', 'nackgammon'].includes(d.game.variant.key) && this.lastPly() === 0 && o.fen.includes('b')) {
+      const initialStep = round.lastStep(d);
+      const step = {
+        ply: this.lastPly() + 1,
+        turnCount: initialStep.turnCount + 1,
+        fen: initialStep.fen.replace('w', 'b'),
+        san: initialStep.san,
+        uci: 'endturn',
+        check: initialStep.check,
+        crazy: initialStep.crazy,
+      };
+      d.steps.push(step);
+      this.ply++;
+    }
+
     const step = {
       ply: this.lastPly() + 1,
       turnCount: o.turnCount,
@@ -718,6 +735,11 @@ export default class RoundController {
     if (this.keyboardMove) this.keyboardMove.update(step, playedPlayerIndex != d.player.playerIndex);
     if (this.music) this.music.jump(o);
     speech.step(step);
+
+    //as we need to update step data at start of game also jump to latest action
+    if (['backgammon', 'nackgammon'].includes(d.game.variant.key) && o.ply <= 2 && !this.replaying()) {
+      this.jump(o.ply);
+    }
 
     //forced moves
     if (playing && !this.replaying()) {
