@@ -123,6 +123,8 @@ case class Game(
 
   def fullIdOf(playerIndex: PlayerIndex): String = s"$id${player(playerIndex).id}"
 
+  def swapPlayersOnRematch: Boolean = variant.key != "backgammon" && variant.key != "nackgammon"
+
   def tournamentId = metadata.tournamentId
   def simulId      = metadata.simulId
   def swissId      = metadata.swissId
