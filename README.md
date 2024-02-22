@@ -70,3 +70,6 @@ details.
 This code is forked from, and exists because of [ornicar](https://github.com/ornicar), and the whole [Lichess project](https://github.com/ornicar/lila).
 
 [playstrategy.org](https://playstrategy.org/) currently supports the [Mind Sports Olympiad](https://mindsportsolympiad.com/).
+
+[![saythanks](https://img.shields.io/badge/say-thanks-ff69b4.svg)](https://github.com/Mind-Sports-Games/lila/graphs/contributors)
+[![GitHub contributors](https://contrib.rocks/image?repo=Mind-Sports-Games/lila)](https://github.com/Mind-Sports-Games/lila/graphs/contributors)
