@@ -328,7 +328,7 @@ case class Game(
     history.lastAction map {
       case d: Uci.Drop          => s"${d.pos}${d.pos}"
       case m: Uci.Move          => m.keys
-      case l: Uci.Lift          => s"^${l.pos}"
+      case l: Uci.Lift          => s"${l.pos}${l.pos}"
       case _: Uci.EndTurn       => "endturn"
       case _: Uci.Pass          => "pass"
       case _: Uci.DiceRoll      => "roll"

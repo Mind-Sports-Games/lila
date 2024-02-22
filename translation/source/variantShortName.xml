@@ -38,6 +38,6 @@
   <string name="go9x9">Go9</string>
   <string name="go13x13">Go13</string>
   <string name="go19x19">Go19</string>
-  <string name="backgammon">Backgammon</string>
-  <string name="nackgammon">Nackgammon</string>
+  <string name="backgammon">Backg</string>
+  <string name="nackgammon">Nackg</string>
 </resources>

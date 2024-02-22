@@ -122,7 +122,6 @@ object BSONHandlers {
               }
             )
           )
-        //TODO consider what we want to read out for backgammon pocket
         case GameLogic.Backgammon() =>
           PocketData.Backgammon(
             backgammon.PocketData(
@@ -595,7 +594,6 @@ object BSONHandlers {
                 history = backgammon.History(
                   lastTurn = turnUcis(r strO F.historyLastTurn),
                   currentTurn = turnUcis(r strO F.historyCurrentTurn),
-                  //we can flatten as backgammon does not have any multiaction games
                   //TODO: Is halfMoveClock even doing anything for backgammon?
                   halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
                     san.contains("x") || san.headOption.exists(_.isLower)
