@@ -1,9 +1,12 @@
 import * as domData from './data';
+import { readDice } from 'stratutils';
 
 export const init = (node: HTMLElement): void => {
   const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|');
   initWith(node, fen, orientation as PlayerIndex, lm);
 };
+
+const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
 
 export const initWith = (node: HTMLElement, fen: string, orientation: PlayerIndex, lm?: string): void => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 500);
@@ -29,7 +32,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
         })
       );
     } else {
-      const [_, myPlayerIndex, __] = $el.data('state').split('|');
+      const [, myPlayerIndex] = $el.data('state').split('|');
       domData.set(
         node,
         'chessground',
@@ -37,12 +40,18 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
           orientation,
           coordinates: false,
           myPlayerIndex: myPlayerIndex,
+          turnPlayerIndex: fenPlayerIndex(fen),
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
           fen,
+          dice: readDice(fen, variantFromElement($el) as VariantKey),
           lastMove: lm && (lm == 'pass' ? undefined : lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
           highlight: {
-            lastMove: lm != undefined && lm! == 'pass',
+            lastMove:
+              lm != undefined &&
+              lm! == 'pass' &&
+              variantFromElement($el) != 'backgammon' &&
+              variantFromElement($el) != 'nackgammon',
           },
           drawable: {
             enabled: false,
@@ -70,30 +79,10 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
             ? { width: 13, height: 13 }
             : $el.hasClass('variant-go19x19')
             ? { width: 19, height: 19 }
+            : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
+            ? { width: 12, height: 2 }
             : { width: 8, height: 8 },
-          variant: $el.hasClass('variant-shogi')
-            ? 'shogi'
-            : $el.hasClass('variant-xiangqi')
-            ? 'xiangqi'
-            : $el.hasClass('variant-minishogi')
-            ? 'minishogi'
-            : $el.hasClass('variant-minixiangqi')
-            ? 'minixiangqi'
-            : $el.hasClass('variant-flipello10')
-            ? 'flipello10'
-            : $el.hasClass('variant-amazons')
-            ? 'amazons'
-            : $el.hasClass('variant-oware')
-            ? 'oware'
-            : $el.hasClass('variant-togyzkumalak')
-            ? 'togyzkumalak'
-            : $el.hasClass('variant-go9x9')
-            ? 'go9x9'
-            : $el.hasClass('variant-go13x13')
-            ? 'go13x13'
-            : $el.hasClass('variant-go19x19')
-            ? 'go19x19'
-            : 'standard',
+          variant: variantFromElement($el),
         })
       );
     }
@@ -102,3 +91,33 @@ export const initWith = (node: HTMLElement, fen: string, orientation: PlayerInde
 
 export const initAll = (parent?: HTMLElement) =>
   Array.from((parent || document).getElementsByClassName('mini-board--init')).forEach(init);
+
+export const variantFromElement = (element: Cash): string => {
+  return element.hasClass('variant-shogi')
+    ? 'shogi'
+    : element.hasClass('variant-xiangqi')
+    ? 'xiangqi'
+    : element.hasClass('variant-minishogi')
+    ? 'minishogi'
+    : element.hasClass('variant-minixiangqi')
+    ? 'minixiangqi'
+    : element.hasClass('variant-flipello10')
+    ? 'flipello10'
+    : element.hasClass('variant-amazons')
+    ? 'amazons'
+    : element.hasClass('variant-oware')
+    ? 'oware'
+    : element.hasClass('variant-togyzkumalak')
+    ? 'togyzkumalak'
+    : element.hasClass('variant-go9x9')
+    ? 'go9x9'
+    : element.hasClass('variant-go13x13')
+    ? 'go13x13'
+    : element.hasClass('variant-go19x19')
+    ? 'go19x19'
+    : element.hasClass('variant-backgammon')
+    ? 'backgammon'
+    : element.hasClass('variant-nackgammon')
+    ? 'nackgammon'
+    : 'standard';
+};

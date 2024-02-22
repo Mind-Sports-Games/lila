@@ -1,4 +1,6 @@
 import * as domData from 'common/data';
+import { variantFromElement } from 'common/mini-board';
+import { readDice } from 'stratutils';
 
 interface UpdateData {
   lm: string;
@@ -52,10 +54,15 @@ export const init = (node: HTMLElement) => {
           coordinates: false,
           viewOnly: true,
           myPlayerIndex: orientation,
+          turnPlayerIndex: fenPlayerIndex(fen),
           resizable: false,
           fen,
+          dice: readDice(fen, variantFromElement($el) as VariantKey),
           orientation,
           lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          highlight: {
+            lastMove: variantFromElement($el) != 'backgammon' && variantFromElement($el) != 'nackgammon',
+          },
           drawable: {
             enabled: false,
             visible: false,
@@ -82,30 +89,10 @@ export const init = (node: HTMLElement) => {
             ? { width: 13, height: 13 }
             : $el.hasClass('variant-go19x19')
             ? { width: 19, height: 19 }
+            : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
+            ? { width: 12, height: 2 }
             : { width: 8, height: 8 },
-          variant: $el.hasClass('variant-shogi')
-            ? 'shogi'
-            : $el.hasClass('variant-xiangqi')
-            ? 'xiangqi'
-            : $el.hasClass('variant-minishogi')
-            ? 'minishogi'
-            : $el.hasClass('variant-minixiangqi')
-            ? 'minixiangqi'
-            : $el.hasClass('variant-flipello10')
-            ? 'flipello10'
-            : $el.hasClass('variant-amazons')
-            ? 'amazons'
-            : $el.hasClass('variant-oware')
-            ? 'oware'
-            : $el.hasClass('variant-togyzkumalak')
-            ? 'togyzkumalak'
-            : $el.hasClass('variant-go9x9')
-            ? 'go9x9'
-            : $el.hasClass('variant-go13x13')
-            ? 'go13x13'
-            : $el.hasClass('variant-go19x19')
-            ? 'go19x19'
-            : 'standard',
+          variant: variantFromElement($el),
         },
         $cg = $el.find('.cg-wrap'),
         turnPlayerIndex = fenPlayerIndex(fen);
@@ -140,8 +127,11 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   if (cg)
     cg.set({
       fen: data.fen,
+      turnPlayerIndex: fenPlayerIndex(data.fen),
+      dice: readDice(data.fen, variantFromElement($el) as VariantKey),
       lastMove,
     });
+  cg.redrawAll();
   if (dg)
     dg.set({
       fen: data.fen,
@@ -162,7 +152,6 @@ export const update = (node: HTMLElement, data: UpdateData) => {
         pause: playerIndex != turnPlayerIndex,
       });
   };
-  console.log(data);
   renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
   renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
 };

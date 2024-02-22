@@ -197,12 +197,38 @@ final private class Rematcher(
   }
 
   private def returnPlayer(game: Game, playerIndex: PlayerIndex, users: List[User]): lila.game.Player =
-    game.opponent(playerIndex).aiLevel match {
-      case Some(ai) => lila.game.Player.make(playerIndex, ai.some)
-      case None =>
+    (game.opponent(playerIndex).aiLevel, game.player(playerIndex).aiLevel, game.swapPlayersOnRematch) match {
+      case (Some(ai), Some(_), _) => lila.game.Player.make(playerIndex, ai.some)
+      case (Some(ai), None, true) => lila.game.Player.make(playerIndex, ai.some)
+      case (Some(_), None, false) =>
+        lila.game.Player.make(
+          playerIndex,
+          game.player(playerIndex).userId.flatMap { id =>
+            users.find(_.id == id)
+          },
+          PerfPicker.mainOrDefault(game)
+        )
+      case (None, Some(_), true) =>
         lila.game.Player.make(
           playerIndex,
           game.opponent(playerIndex).userId.flatMap { id =>
+            users.find(_.id == id)
+          },
+          PerfPicker.mainOrDefault(game)
+        )
+      case (None, Some(ai), false) => lila.game.Player.make(playerIndex, ai.some)
+      case (None, None, true) =>
+        lila.game.Player.make(
+          playerIndex,
+          game.opponent(playerIndex).userId.flatMap { id =>
+            users.find(_.id == id)
+          },
+          PerfPicker.mainOrDefault(game)
+        )
+      case (None, None, false) =>
+        lila.game.Player.make(
+          playerIndex,
+          game.player(playerIndex).userId.flatMap { id =>
             users.find(_.id == id)
           },
           PerfPicker.mainOrDefault(game)
@@ -212,9 +238,10 @@ final private class Rematcher(
   private def redirectEvents(game: Game): Events = {
     val p1Id = game fullIdOf P1
     val p2Id = game fullIdOf P2
+
     List(
-      Event.RedirectOwner(P1, p2Id, AnonCookie.json(game pov P2)),
-      Event.RedirectOwner(P2, p1Id, AnonCookie.json(game pov P1)),
+      Event.RedirectOwner(if (game.swapPlayersOnRematch) P1 else P2, p2Id, AnonCookie.json(game pov P2)),
+      Event.RedirectOwner(if (game.swapPlayersOnRematch) P2 else P1, p1Id, AnonCookie.json(game pov P1)),
       // tell spectators about the rematch
       Event.RematchTaken(game.id)
     )

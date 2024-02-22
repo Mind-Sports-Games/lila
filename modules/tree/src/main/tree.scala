@@ -234,10 +234,11 @@ object Node {
         .storable(v.roles.headOption match {
           case Some(r) =>
             r match {
-              case Role.ChessRole(_)   => GameLogic.Chess()
-              case Role.FairySFRole(_) => GameLogic.FairySF()
-              case Role.GoRole(_)      => GameLogic.Go()
-              case _                   => sys.error("Pocket not implemented for GameLogic")
+              case Role.ChessRole(_)      => GameLogic.Chess()
+              case Role.FairySFRole(_)    => GameLogic.FairySF()
+              case Role.GoRole(_)         => GameLogic.Go()
+              case Role.BackgammonRole(_) => GameLogic.Backgammon()
+              case _                      => sys.error("Pocket not implemented for GameLogic")
             }
           case None => GameLogic.Chess()
         })

@@ -410,7 +410,7 @@ function renderPvMoves(pos: Position, pv: Uci[]): VNode[] {
       vnodes.push(h('span', { key: text }, text));
     }
     const uci = pv[i];
-    const san = makeSanAndPlay(pos, parseUci(uci)!);
+    const san = makeSanAndPlay('chess')(pos, parseUci('chess')(uci)!);
     const fen = makeBoardFen('chess')(pos.board); // Chessground uses only board fen
     if (san === '--') {
       break;

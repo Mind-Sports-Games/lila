@@ -27,6 +27,10 @@ function byoyomiDisplay(pool: Pool) {
   return pool.byoyomi && pool.byoyomi > 0 ? base + '|' + pool.byoyomi + periodsString : base;
 }
 
+function displayClockTime(pool: Pool) {
+  return pool.byoyomi ? byoyomiDisplay(pool) : pool.delay ? `${pool.lim} d/${pool.delay}` : pool.lim + '+' + pool.inc;
+}
+
 export function render(ctrl: LobbyController) {
   const member = ctrl.poolMember;
   return ctrl.pools
@@ -47,7 +51,7 @@ export function render(ctrl: LobbyController) {
           active && member!.range
             ? renderRange(member!.range!)
             : h('div.logo', { attrs: { 'data-icon': perfIcons[pool.perf] } }),
-          h('div.clock', pool.byoyomi ? byoyomiDisplay(pool) : pool.lim + '+' + pool.inc),
+          h('div.clock', displayClockTime(pool)),
           active ? spinner() : null,
         ]
       );

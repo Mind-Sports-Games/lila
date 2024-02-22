@@ -36,6 +36,9 @@
   <string name="raceFinished">Race finished</string>
   <string name="checkersConnected">All checkers connected</string>
   <string name="gameFinished">Game finished</string>
+  <string name="backgammonSingleWin">Standard win</string>
+  <string name="backgammonGammonWin">Gammon win</string>
+  <string name="backgammonBackgammonWin">Backgammon win</string>
   <string name="variantEnding">Variant ending</string>
   <string name="gameFinishedRepetition">Game finished via repetition</string>
   <string name="newOpponent">New opponent</string>
@@ -368,8 +371,8 @@
   <string name="youAreNotInTeam">You are not in the team %s</string>
   <string name="backToGame">Back to game</string>
   <string name="siteDescription">Free online chess server. Play chess in a clean interface. No registration, no ads, no plugin required. Play chess with the computer, friends or random opponents.</string>
-  <string name="playstrategySiteDescription">2 player strategy games platform. Chess, Draughts, Shogi, Xiangqi and more abstract games. Play in a clean interface against the computer, friends or random opponents.</string>
-  <string name="playstrategySiteTitle">The two player strategy games platform. Chess, Draughts, Shogi, Xiangqi and more!</string>
+  <string name="playstrategySiteDescription">2 player strategy games platform. Chess, Draughts, Backgammon, Go, Shogi, Xiangqi, and more abstract games. Play in a clean interface against the computer, friends or random opponents.</string>
+  <string name="playstrategySiteTitle">The two player strategy games platform. Chess, Draughts, Backgammon, Go, Shogi, Xiangqi and more!</string>
   <string name="playstrategySiteTitleShort">2 player strategy games</string>
   <string name="xJoinedTeamY">%1$s joined team %2$s</string>
   <string name="xCreatedTeamY">%1$s created team %2$s</string>

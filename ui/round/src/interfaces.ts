@@ -37,8 +37,20 @@ export interface SocketDrop {
   variant: string;
   b?: 1;
 }
-
 export interface SocketPass {
+  variant: string;
+  b?: 1;
+}
+export interface SocketDoRoll {
+  variant: string;
+  b?: 1;
+}
+export interface SocketLift {
+  pos: cg.Key;
+  variant: string;
+  b?: 1;
+}
+export interface SocketEndTurn {
   variant: string;
   b?: 1;
 }
@@ -61,12 +73,18 @@ export interface RoundData extends GameData {
   possibleMoves?: EncodedDests;
   possibleDrops?: string;
   possibleDropsByRole?: string;
+  possibleLifts?: string;
   multiActionMetaData?: MultiActionMetaData;
   selectMode: boolean;
   selectedSquares?: cg.Key[];
   currentSelectedSquares?: cg.Key[];
   calculatedCGGoScores?: cg.SimpleGoScores;
   deadStoneOfferState?: string;
+  dice?: cg.Dice[];
+  activeDiceValue?: number;
+  canOnlyRollDice: boolean;
+  canUndo: boolean;
+  canEndTurn: boolean;
   pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
@@ -159,6 +177,11 @@ export interface ApiMove extends Step {
   role?: cg.Role;
   drops?: string;
   dropsByRole?: string;
+  lifts?: string;
+  canOnlyRollDice: boolean;
+  canUndo: boolean;
+  canEndTurn: boolean;
+  dice?: string;
   multiActionMetaData?: MultiActionMetaData;
   canSelectSquares?: boolean;
   deadStoneOfferState?: string;
@@ -207,6 +230,7 @@ export interface Pref {
   clockTenths: Prefs.ShowClockTenths;
   confirmResign: boolean;
   confirmPass: boolean;
+  playForcedAction: boolean;
   coords: Prefs.Coords;
   destination: boolean;
   playerTurnIndicator: boolean;

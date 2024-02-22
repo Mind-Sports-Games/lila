@@ -19,7 +19,10 @@ import strategygames.{
   Mode,
   Move,
   Drop,
+  Lift,
   Pass,
+  DiceRoll,
+  EndTurn,
   SelectSquares,
   Action,
   Pos,
@@ -119,6 +122,8 @@ case class Game(
     (players contains player) option s"$id${player.id}"
 
   def fullIdOf(playerIndex: PlayerIndex): String = s"$id${player(playerIndex).id}"
+
+  def swapPlayersOnRematch: Boolean = variant.key != "backgammon" && variant.key != "nackgammon"
 
   def tournamentId = metadata.tournamentId
   def simulId      = metadata.simulId
@@ -269,9 +274,12 @@ case class Game(
 
     val events = {
       action match {
-        case m: Move => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
-        case d: Drop => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
-        case p: Pass => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
+        case m: Move     => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
+        case d: Drop     => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
+        case l: Lift     => Event.Lift(l, game.situation, state, clockEvent, updated.board.pocketData)
+        case p: Pass     => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
+        case r: DiceRoll => Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
+        case et: EndTurn => Event.EndTurn(et, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
       }
@@ -291,15 +299,11 @@ case class Game(
         (updated.board.variant.key == "togyzkumalak") ?? List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
-      //TODO: Review these extra pieces of info. This was determined unncecessary for Go
-      //after we put the captures info into the FEN
-      //else if (updated.board.variant.gameLogic == GameLogic.Go())
-      //  //(updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? List(
-      //  //  Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
-      //  //)
-      //  (updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? updated.displayScore
-      //    .map(s => Event.Score(p1 = s.p1, p2 = s.p2))
-      //    .toList
+      else if (updated.board.variant.gameLogic == GameLogic.Backgammon())
+        //Is this even necessary as score is in the fen?
+        (updated.board.variant.key == "backgammon" || updated.board.variant.key == "nackgammon") ?? List(
+          Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
+        )
       else //chess. Is this even necessary as checkCount is in the fen?
         ((updated.board.variant.key == "threeCheck" || updated.board.variant.key == "fiveCheck") && game.situation.check) ?? List(
           Event.CheckCount(
@@ -313,7 +317,8 @@ case class Game(
   }
 
   def displayScore: Option[Score] =
-    if (variant.gameLogic == GameLogic.Togyzkumalak()) history.score.some
+    if (variant.gameLogic == GameLogic.Togyzkumalak() || variant.gameLogic == GameLogic.Backgammon())
+      history.score.some
     else if (variant.gameLogic == GameLogic.Go()) {
       if (finished || selectSquaresPossible) history.score.some
       else history.captures.some
@@ -323,7 +328,10 @@ case class Game(
     history.lastAction map {
       case d: Uci.Drop          => s"${d.pos}${d.pos}"
       case m: Uci.Move          => m.keys
+      case l: Uci.Lift          => s"${l.pos}${l.pos}"
+      case _: Uci.EndTurn       => "endturn"
       case _: Uci.Pass          => "pass"
+      case _: Uci.DiceRoll      => "roll"
       case _: Uci.SelectSquares => "ss:"
       case _                    => sys.error("Type Error")
     }
@@ -1080,6 +1088,8 @@ object Game {
     val checkAt            = "ck"
     val perfType           = "pt"  // only set on student games for aggregation
     val drawOffers         = "do"
+    //backgammon
+    val unusedDice = "ud"
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" //state of the dead stone offer

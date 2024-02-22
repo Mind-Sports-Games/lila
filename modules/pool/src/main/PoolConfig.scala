@@ -36,7 +36,7 @@ object PoolConfig {
   //def clockToId(clock: Clock.Config) = Id(clock.show)
 
   def clockAndVariantToId(clock: ClockConfig, variant: Variant) = Id(
-    clock.show.replace("|", "-") + "-" + variant.key
+    clock.show.replace("|", "-").replace(" ", "").replace("/", "") + "-" + variant.key
   )
 
   import play.api.libs.json._

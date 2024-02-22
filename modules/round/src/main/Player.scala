@@ -11,6 +11,9 @@ import strategygames.{
   Drop => StratDrop,
   Move => StratMove,
   Pass => StratPass,
+  Lift => StratLift,
+  EndTurn => StratEndTurn,
+  DiceRoll => StratRollDice,
   SelectSquares => StratSelectSquares
 }
 import strategygames.chess
@@ -151,10 +154,10 @@ final private class Player(
       finalSquare: Boolean = false
   ): Validated[String, ActionResult] =
     game.stratGame.applyUci(uci, metrics, finalSquare).map {
-      case (ncg, _) if ncg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
-      case (newChessGame, action) =>
+      case (nsg, _) if nsg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
+      case (newStratGame, action) =>
         ActionApplied(
-          game.update(newChessGame, action, blur),
+          game.update(newStratGame, action, blur),
           action
         )
     }
@@ -169,6 +172,9 @@ final private class Player(
         case m: StratMove           => m.toUci.keys
         case d: StratDrop           => d.toUci.uci
         case p: StratPass           => p.toUci.uci
+        case l: StratLift           => l.toUci.uci
+        case et: StratEndTurn       => et.toUci.uci
+        case r: StratRollDice       => r.toUci.uci
         case ss: StratSelectSquares => ss.toUci.uci
       }
     )
@@ -206,6 +212,9 @@ final private class Player(
       case Status.Mate           => finisher.other(game, _.Mate, game.situation.winner)
       case Status.PerpetualCheck => finisher.other(game, _.PerpetualCheck, game.situation.winner)
       case Status.VariantEnd     => finisher.other(game, _.VariantEnd, game.situation.winner)
+      case Status.SingleWin      => finisher.other(game, _.SingleWin, game.situation.winner)
+      case Status.GammonWin      => finisher.other(game, _.GammonWin, game.situation.winner)
+      case Status.BackgammonWin  => finisher.other(game, _.BackgammonWin, game.situation.winner)
       case Status.Stalemate if !game.variant.stalemateIsDraw =>
         finisher.other(game, _.Stalemate, game.situation.winner)
       case status @ (Status.Stalemate | Status.Draw) => finisher.other(game, _ => status, None)

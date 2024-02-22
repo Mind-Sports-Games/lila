@@ -65,6 +65,8 @@ case class ImportData(pgn: String, analyse: Option[String]) {
       case Reader.Result.TogyzkumalakIncomplete(replay, _) => Replay.Togyzkumalak(replay)
       case Reader.Result.GoComplete(replay)                => Replay.Go(replay)
       case Reader.Result.GoIncomplete(replay, _)           => Replay.Go(replay)
+      case Reader.Result.BackgammonComplete(replay)        => Replay.Backgammon(replay)
+      case Reader.Result.BackgammonIncomplete(replay, _)   => Replay.Backgammon(replay)
     }
 
   def preprocess(user: Option[String]): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>

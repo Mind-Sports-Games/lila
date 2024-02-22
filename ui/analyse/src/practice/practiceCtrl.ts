@@ -5,7 +5,7 @@ import { tablebaseGuaranteed } from '../explorer/explorerCtrl';
 import AnalyseCtrl from '../ctrl';
 import { Redraw } from '../interfaces';
 import { defined, prop, Prop } from 'common';
-import { altCastles } from 'stratutils';
+import { altCastles, variantToRules } from 'stratutils';
 import { parseUci } from 'stratops/util';
 import { makeSan } from 'stratops/san';
 
@@ -113,6 +113,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
       else verdict = 'blunder';
     }
 
+    const rules = variantToRules(variant);
     return {
       prev,
       node,
@@ -122,7 +123,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
         ? {
             uci: best,
             san: root.position(prev).unwrap(
-              pos => makeSan(pos, parseUci(best!)!),
+              pos => makeSan(rules)(pos, parseUci(rules)(best!)!),
               _ => '--'
             ),
           }

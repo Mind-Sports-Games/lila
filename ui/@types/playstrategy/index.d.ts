@@ -302,7 +302,9 @@ declare type VariantKey =
   | 'togyzkumalak'
   | 'go9x9'
   | 'go13x13'
-  | 'go19x19';
+  | 'go19x19'
+  | 'backgammon'
+  | 'nackgammon';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -360,7 +362,9 @@ declare type Perf =
   | 'togyzkumalak'
   | 'go9x9'
   | 'go13x13'
-  | 'go19x19';
+  | 'go19x19'
+  | 'backgammon'
+  | 'nackgammon';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red' | 'South' | 'North' | 'Bastaushi' | 'Kostaushi';
@@ -379,7 +383,8 @@ declare type GameFamilyKey =
   | 'amazons'
   | 'oware'
   | 'togyzkumalak'
-  | 'go';
+  | 'go'
+  | 'backgammon';
 
 declare type Files =
   | 'a'

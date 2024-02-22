@@ -59,7 +59,7 @@ object StepBuilder {
               captLen = (g.situation, m) match {
                 case (Situation.Draughts(situation), Uci.DraughtsWithSan(m)) =>
                   if (situation.ghosts > 0)
-                    situation.captureLengthFrom(m.uci.origDest._2)
+                    situation.captureLengthFrom(m.uci.dest)
                   else
                     situation.allMovesCaptureLength.some
                 case _ => None

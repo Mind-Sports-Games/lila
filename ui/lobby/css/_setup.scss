@@ -2,7 +2,19 @@ $c-setup: $c-secondary;
 $c-slider: $c-setup;
 
 // these must all be the same size as we iterate through them...
-$game-family: ('chess', 'draughts', 'loa', 'shogi', 'xiangqi', 'flipello', 'amazons', 'oware', 'togyzkumalak', 'go');
+$game-family: (
+  'chess',
+  'draughts',
+  'loa',
+  'shogi',
+  'xiangqi',
+  'flipello',
+  'amazons',
+  'oware',
+  'togyzkumalak',
+  'go',
+  'backgammon'
+);
 
 $game-family-random-pieces: (
   'wbK.svg',
@@ -14,7 +26,8 @@ $game-family-random-pieces: (
   'wbQ.svg',
   'mixed.svg',
   'mixed.svg',
-  'bwS.svg'
+  'bwS.svg',
+  'wbS.svg'
 );
 
 $game-family-p1-pieces: (
@@ -27,7 +40,8 @@ $game-family-p1-pieces: (
   'amazons/arrow/wQ.svg',
   'oware/south.svg',
   'togyzkumalak/south.svg',
-  'go/classic_stone/bS.svg'
+  'go/classic_stone/bS.svg',
+  'backgammon/wooden/w.svg'
 );
 
 $game-family-p2-pieces: (
@@ -40,7 +54,8 @@ $game-family-p2-pieces: (
   'amazons/arrow/bQ.svg',
   'oware/north.svg',
   'togyzkumalak/north.svg',
-  'go/classic_stone/wS.svg'
+  'go/classic_stone/wS.svg',
+  'backgammon/wooden/b.svg'
 );
 
 .game-setup {

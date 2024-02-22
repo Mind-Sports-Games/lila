@@ -44,6 +44,9 @@ object jsI18n {
     trans.fiveChecks,
     trans.checkersConnected,
     trans.gameFinished,
+    trans.backgammonSingleWin,
+    trans.backgammonGammonWin,
+    trans.backgammonBackgammonWin,
     trans.variantEnding,
     trans.gameFinishedRepetition
   ).map(_.key)

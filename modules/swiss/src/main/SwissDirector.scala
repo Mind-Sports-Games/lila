@@ -139,14 +139,22 @@ final private class SwissDirector(
         p1Player = makePlayer(
           P1,
           players.get(
-            if (rematch && pairing.multiMatchGameIds.fold(false)(ids => ids.size % 2 == 1)) pairing.p2
+            if (
+              rematch && pairing.multiMatchGameIds
+                .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
+                .Backgammon()
+            ) pairing.p2
             else pairing.p1
           ) err s"Missing pairing p1 $pairing"
         ),
         p2Player = makePlayer(
           P2,
           players.get(
-            if (rematch && pairing.multiMatchGameIds.fold(false)(ids => ids.size % 2 == 1)) pairing.p1
+            if (
+              rematch && pairing.multiMatchGameIds
+                .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
+                .Backgammon()
+            ) pairing.p1
             else pairing.p2
           ) err s"Missing pairing p2 $pairing"
         ),

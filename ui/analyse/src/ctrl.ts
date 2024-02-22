@@ -878,13 +878,15 @@ export default class AnalyseCtrl {
   }
 
   playUci(uci: Uci): void {
-    const move = parseUci(uci)!;
-    const to = makeSquare(move.to);
+    const move = parseUci(stratUtils.variantToRules(this.data.game.variant.key))(uci)!;
+    const to = makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.to);
     if (isNormal(move)) {
-      const piece = this.chessground.state.pieces.get(makeSquare(move.from));
+      const piece = this.chessground.state.pieces.get(
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from)
+      );
       const capture = this.chessground.state.pieces.get(to);
       this.sendMove(
-        makeSquare(move.from),
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
         to,
         capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
         move.promotion

@@ -17,7 +17,7 @@ export default class CurrentPuzzle {
 
   position = (): Chess => {
     const pos = Chess.fromSetup(parseFen('chess')(this.puzzle.fen).unwrap()).unwrap();
-    this.line.slice(0, this.moveIndex + 1).forEach(uci => pos.play(parseUci(uci)!));
+    this.line.slice(0, this.moveIndex + 1).forEach(uci => pos.play(parseUci('chess')(uci)!));
     return pos;
   };
 

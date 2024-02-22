@@ -127,7 +127,7 @@ function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
           san: fixCrazySan(node.san || ''),
           uci: node.uci || '',
           fen: node.fen,
-          prevFen: node.parent?.fen,
+          prevFen: node.parent?.fen || '',
         },
         variant
       ),

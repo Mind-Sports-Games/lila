@@ -40,7 +40,7 @@ case object InsightEntry {
     val id                       = "_id"
     val number                   = "n"
     val userId                   = "u"
-    val playerIndex                    = "c"
+    val playerIndex              = "c"
     val perf                     = "p"
     val eco                      = "e"
     val myCastling               = "mc"
@@ -92,14 +92,14 @@ object Termination {
 
   def fromStatus(s: strategygames.Status) =
     s match {
-      case S.Timeout             => Disconnect
-      case S.Outoftime           => ClockFlag
-      case S.Resign              => Resignation
-      case S.Draw                => Draw
-      case S.Stalemate           => Stalemate
-      case S.Mate | S.VariantEnd => Checkmate
-      case S.PerpetualCheck      => Perpetual
-      case S.Cheat               => Resignation
+      case S.Timeout                                                           => Disconnect
+      case S.Outoftime                                                         => ClockFlag
+      case S.Resign                                                            => Resignation
+      case S.Draw                                                              => Draw
+      case S.Stalemate                                                         => Stalemate
+      case S.Mate | S.SingleWin | S.GammonWin | S.BackgammonWin | S.VariantEnd => Checkmate
+      case S.PerpetualCheck                                                    => Perpetual
+      case S.Cheat                                                             => Resignation
       case S.Created | S.Started | S.Aborted | S.NoStart | S.UnknownFinish =>
         logger.error(s"Unfinished game in the insight indexer: $s")
         Resignation

@@ -621,7 +621,7 @@ export function possibleMovesHandler(playerIndex: PlayerIndex, fen: () => string
     const $pos = (($btn.attr('file') ?? '') + $btn.attr('rank')) as SquareName;
 
     // possible ineffecient to reparse fen; but seems to work when it is AND when it is not the users' turn.
-    const possibleMoves = chessgroundDests(
+    const possibleMoves = chessgroundDests('chess')(
       Chess.fromSetup(
         parseFen('chess')(fen().replace(' ' + opponentTurnFen + ' ', ' ' + myTurnFen + ' ')).unwrap()
       ).unwrap()
