@@ -130,7 +130,7 @@ object BSONHandlers {
                 val (p1, p2) = {
                   r.str("p")
                     .view
-                    .flatMap(c => fromBackgammonChar(c))
+                    .flatMap(c => backgammon.Piece.fromChar(c))
                     .to(List)
                 }.partition(_ is P1)
                 Pockets(
@@ -141,12 +141,6 @@ object BSONHandlers {
             )
           )
         case _ => sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
-      }
-
-    //todo put this in SG Piece.scala
-    def fromBackgammonChar(c: Char): Option[backgammon.Piece] =
-      backgammon.Role.allByPgn get c.toUpper map {
-        backgammon.Piece(PlayerIndex.fromP1(c.isUpper), _)
       }
 
     def writes(w: BSON.Writer, o: PocketData) =

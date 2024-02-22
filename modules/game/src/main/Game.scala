@@ -299,16 +299,6 @@ case class Game(
         (updated.board.variant.key == "togyzkumalak") ?? List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
-      //TODO: Review these extra pieces of info. This was determined unncecessary for Go
-      //after we put the captures info into the FEN
-      //else if (updated.board.variant.gameLogic == GameLogic.Go())
-      //  //(updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? List(
-      //  //  Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
-      //  //)
-      //  (updated.board.variant.go9x9 | updated.board.variant.go13x13 | updated.board.variant.go19x19) ?? updated.displayScore
-      //    .map(s => Event.Score(p1 = s.p1, p2 = s.p2))
-      //    .toList
-      // TODO Backgammon how do we want to represent score?
       else if (updated.board.variant.gameLogic == GameLogic.Backgammon())
         //Is this even necessary as score is in the fen?
         (updated.board.variant.key == "backgammon" || updated.board.variant.key == "nackgammon") ?? List(
