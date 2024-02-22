@@ -317,7 +317,7 @@ object GameDiff {
             _.board.pocketData,
             (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
           )
-        //TODO backgammon add unusedDice here?
+        dOpt(unusedDice, _.board.unusedDice, (o: List[Int]) => w.listO[Int](o))
         dOpt(
           score,
           _.history.score,

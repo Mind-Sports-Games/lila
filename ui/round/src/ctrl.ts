@@ -433,7 +433,7 @@ export default class RoundController {
   };
 
   activeDiceValue = (dice: cg.Dice[]): number | undefined => {
-    return dice && dice.length >= 2 ? dice[0].value : undefined;
+    return dice && dice.length >= 2 && dice[0].isAvailable ? dice[0].value : undefined;
   };
 
   isLate = () => this.replaying() && status.playing(this.data);
@@ -634,7 +634,6 @@ export default class RoundController {
         mancala.updateBoardFromFen(this, o.fen);
       }
       if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
-        this.chessground.set({ dice: d.dice ? d.dice : [] });
         backgammon.updateBoardFromFen(this, o.fen);
       }
       if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) go.updateBoardFromFen(this, o.fen);

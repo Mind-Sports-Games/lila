@@ -3,7 +3,10 @@ import * as cgFen from 'chessground/fen';
 import RoundController from './ctrl';
 
 export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
-  ctrl.chessground.set({ fen: newFen });
+  ctrl.chessground.set({
+    dice: ctrl.data.dice ? ctrl.data.dice : [],
+    fen: newFen,
+  });
   ctrl.chessground.redrawAll();
 }
 
