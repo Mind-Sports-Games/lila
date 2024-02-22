@@ -115,7 +115,7 @@ object BinaryFormat {
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },
-        _ => some(ByoyomiClockHistory(Centis(0)))
+        some
       )
   }
 

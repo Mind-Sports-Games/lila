@@ -43,6 +43,10 @@ object form {
               fields.startsAt
             ),
             form3.split(
+              fields.halfwayBreak,
+              fields.minutesBeforeStartToJoin
+            ),
+            form3.split(
               fields.chatFor,
               fields.password
             ),
@@ -84,6 +88,10 @@ object form {
             form3.split(
               fields.roundInterval,
               swiss.isCreated option fields.startsAt
+            ),
+            form3.split(
+              fields.halfwayBreak,
+              fields.minutesBeforeStartToJoin
             ),
             form3.split(
               fields.chatFor,
@@ -351,6 +359,15 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     form3.group(form("roundInterval"), frag("Interval between rounds"), half = true)(
       form3.select(_, SwissForm.roundIntervalChoices)
     )
+  def halfwayBreak =
+    form3.group(form("halfwayBreak"), frag("Additional interval between rounds at halfway"), half = true)(
+      form3.select(_, SwissForm.halfwayBreakChoices)
+    )
+  def minutesBeforeStartToJoin =
+    form3.group(form("minutesBeforeStartToJoin"), frag("Time before start to join"), half = true)(
+      form3.select(_, SwissForm.timeBeforeStartToJoinIntervalChoices)
+    )
+
   def description =
     form3.group(
       form("description"),

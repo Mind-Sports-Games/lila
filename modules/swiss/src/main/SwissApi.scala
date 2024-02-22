@@ -92,10 +92,12 @@ final class SwissApi(
         position = data.realPosition,
         chatFor = data.realChatFor,
         roundInterval = data.realRoundInterval,
+        halfwayBreak = data.realHalfwayBreak,
         password = data.password,
         conditions = data.conditions.all,
         forbiddenPairings = ~data.forbiddenPairings,
-        medleyVariants = data.medleyVariants
+        medleyVariants = data.medleyVariants,
+        minutesBeforeStartToJoin = data.realMinutesBeforeStartToJoin
       )
     )
     colls.swiss.insert.one(addFeaturable(swiss)) >>-
@@ -132,9 +134,13 @@ final class SwissApi(
             roundInterval =
               if (data.roundInterval.isDefined) data.realRoundInterval
               else old.settings.roundInterval,
+            halfwayBreak =
+              if (data.halfwayBreak.isDefined) data.realHalfwayBreak
+              else old.settings.halfwayBreak,
             password = data.password,
             conditions = data.conditions.all,
             forbiddenPairings = ~data.forbiddenPairings,
+            minutesBeforeStartToJoin = data.realMinutesBeforeStartToJoin,
             medleyVariants =
               if (
                 old.medleyGameGroups != Some(
@@ -148,7 +154,17 @@ final class SwissApi(
           if (
             s.isStarted && s.nbOngoing == 0 && (s.nextRoundAt.isEmpty || old.settings.manualRounds) && !s.settings.manualRounds
           )
-            s.copy(nextRoundAt = DateTime.now.plusSeconds(s.settings.roundInterval.toSeconds.toInt).some)
+            if (s.isHalfway) {
+              s.copy(nextRoundAt =
+                DateTime.now
+                  .plusSeconds(
+                    s.settings.roundInterval.toSeconds.toInt + s.settings.halfwayBreak.toSeconds.toInt
+                  )
+                  .some
+              )
+            } else {
+              s.copy(nextRoundAt = DateTime.now.plusSeconds(s.settings.roundInterval.toSeconds.toInt).some)
+            }
           else if (s.settings.manualRounds && !old.settings.manualRounds)
             s.copy(nextRoundAt = none)
           else s
@@ -577,7 +593,11 @@ final class SwissApi(
                         swiss.settings.dailyInterval match {
                           case Some(days) => game.createdAt plusDays days
                           case None =>
-                            DateTime.now.plusSeconds(swiss.settings.roundInterval.toSeconds.toInt)
+                            DateTime.now.plusSeconds(
+                              swiss.settings.roundInterval.toSeconds.toInt + (if (swiss.isHalfway)
+                                                                                swiss.settings.halfwayBreak.toSeconds.toInt
+                                                                              else 0)
+                            )
                         }
                       )
                       .void >>-

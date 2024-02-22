@@ -71,7 +71,8 @@ object side {
                 a(href := routes.Swiss.edit(s.id.value), title := "Edit tournament")(iconTag("%"))
               )
             ),
-            bits.showInterval(s)
+            bits.showInterval(s),
+            p(bits.showHalfwayBreak(s))
           )
         ),
         s.isMedley option views.html.swiss.bits.medleyGames(

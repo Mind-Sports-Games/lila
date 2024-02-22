@@ -32,6 +32,7 @@ export interface SwissData {
   p2Color: PlayerColor;
   me?: MyInfo;
   canJoin: boolean;
+  timeBeforeStartToJoin?: string;
   joinTeam?: string;
   round: number;
   nbRounds: number;

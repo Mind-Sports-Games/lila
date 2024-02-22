@@ -59,16 +59,18 @@ final class SwissForm(implicit mode: Mode) {
             max = SwissBounds.maxGamesPerRound
           )
         )(XGamesChoice.apply)(XGamesChoice.unapply),
-        "nbRounds"             -> number(min = minRounds, max = SwissBounds.maxRounds),
-        "description"          -> optional(cleanNonEmptyText),
-        "drawTables"           -> optional(boolean),
-        "perPairingDrawTables" -> optional(boolean),
-        "position"             -> optional(lila.common.Form.fen.playableStrict),
-        "chatFor"              -> optional(numberIn(chatForChoices.map(_._1))),
-        "roundInterval"        -> optional(numberIn(roundIntervals)),
-        "password"             -> optional(cleanNonEmptyText),
-        "conditions"           -> SwissCondition.DataForm.all,
-        "forbiddenPairings"    -> optional(cleanNonEmptyText)
+        "nbRounds"                 -> number(min = minRounds, max = SwissBounds.maxRounds),
+        "description"              -> optional(cleanNonEmptyText),
+        "drawTables"               -> optional(boolean),
+        "perPairingDrawTables"     -> optional(boolean),
+        "position"                 -> optional(lila.common.Form.fen.playableStrict),
+        "chatFor"                  -> optional(numberIn(chatForChoices.map(_._1))),
+        "roundInterval"            -> optional(numberIn(roundIntervals)),
+        "halfwayBreak"             -> optional(numberIn(halfwayBreakOptions)),
+        "password"                 -> optional(cleanNonEmptyText),
+        "conditions"               -> SwissCondition.DataForm.all,
+        "forbiddenPairings"        -> optional(cleanNonEmptyText),
+        "minutesBeforeStartToJoin" -> optional(numberIn(timeBeforeStartToJoinOptions))
       )(SwissData.apply)(SwissData.unapply)
         .verifying("Invalid clock", _.validClock)
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
@@ -126,9 +128,11 @@ final class SwissForm(implicit mode: Mode) {
       position = none,
       chatFor = Swiss.ChatFor.default.some,
       roundInterval = Swiss.RoundInterval.auto.some,
+      halfwayBreak = None,
       password = None,
       conditions = SwissCondition.DataForm.AllSetup.default,
-      forbiddenPairings = none
+      forbiddenPairings = none,
+      minutesBeforeStartToJoin = none
     )
 
   def edit(s: Swiss) =
@@ -169,9 +173,11 @@ final class SwissForm(implicit mode: Mode) {
       position = s.settings.position,
       chatFor = s.settings.chatFor.some,
       roundInterval = s.settings.roundInterval.toSeconds.toInt.some,
+      halfwayBreak = s.settings.halfwayBreak.toSeconds.toInt.some,
       password = s.settings.password,
       conditions = SwissCondition.DataForm.AllSetup(s.settings.conditions),
-      forbiddenPairings = s.settings.forbiddenPairings.some.filter(_.nonEmpty)
+      forbiddenPairings = s.settings.forbiddenPairings.some.filter(_.nonEmpty),
+      minutesBeforeStartToJoin = s.settings.minutesBeforeStartToJoin
     )
 
   def nextRound =
@@ -249,6 +255,54 @@ object SwissForm {
       else s"${s / 24 / 3600} days(s)"
   )
 
+  val halfwayBreakOptions: Seq[Int] =
+    Seq(
+      0,
+      30,
+      60,
+      2 * 60,
+      5 * 60,
+      10 * 60,
+      20 * 60,
+      30 * 60,
+      45 * 60,
+      60 * 60,
+      2 * 60 * 60
+    )
+
+  val halfwayBreakChoices = options(
+    halfwayBreakOptions,
+    s =>
+      if (s == 0) "No additional interval"
+      else if (s < 60) s"$s seconds"
+      else if (s < 3600) s"${s / 60} minute${if (s == 60) "" else "s"}"
+      else if (s < 24 * 3600) s"${s / 3600} hour${if (s == 60 * 60) "" else "s"}"
+      else s"${s / 24 / 3600} day${if (s == 24 * 60 * 60) "" else "s"}"
+  )
+
+  val timeBeforeStartToJoinOptions: Seq[Int] =
+    Seq(
+      Swiss.TimeBeforeStartToJoin.nolimit,
+      15,
+      30,
+      60,
+      2 * 60,
+      6 * 60,
+      12 * 60,
+      24 * 60,
+      2 * 24 * 60,
+      7 * 24 * 60
+    )
+
+  val timeBeforeStartToJoinIntervalChoices = options(
+    timeBeforeStartToJoinOptions,
+    m =>
+      if (m == Swiss.TimeBeforeStartToJoin.nolimit) "No Limit"
+      else if (m < 60) s"$m minutes"
+      else if (m < 24 * 60) s"${m / 60} hour${if (m == 60) "" else "s"}"
+      else s"${m / 24 / 60} day${if (m == 24 * 60) "" else "s"}"
+  )
+
   val chatForChoices = List(
     Swiss.ChatFor.NONE    -> "No chat",
     Swiss.ChatFor.LEADERS -> "Team leaders only",
@@ -273,9 +327,11 @@ object SwissForm {
       position: Option[FEN],
       chatFor: Option[Int],
       roundInterval: Option[Int],
+      halfwayBreak: Option[Int],
       password: Option[String],
       conditions: SwissCondition.DataForm.AllSetup,
-      forbiddenPairings: Option[String]
+      forbiddenPairings: Option[String],
+      minutesBeforeStartToJoin: Option[Int]
   ) {
     def gameLogic = variant match {
       case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
@@ -301,6 +357,13 @@ object SwissForm {
         case i => i
       }
     }.seconds
+    def realHalfwayBreak = halfwayBreak.fold(0)(i => i).seconds
+    def realMinutesBeforeStartToJoin: Option[Int] =
+      minutesBeforeStartToJoin match {
+        case Some(Swiss.TimeBeforeStartToJoin.nolimit) => None
+        case Some(mbs)                                 => Some(mbs)
+        case _                                         => None
+      }
     def useDrawTables           = drawTables | false
     def usePerPairingDrawTables = perPairingDrawTables | false
     def realPosition            = position ifTrue realVariant.standardVariant

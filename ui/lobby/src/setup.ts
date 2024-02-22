@@ -177,7 +177,7 @@ export default class Setup {
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
-            this.ratedTimeModes.indexOf(timeMode) != -1 ||
+            this.ratedTimeModes.indexOf(timeMode) === -1 ||
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
             (vsPSBot && user == 'ps-random-mover') ||
@@ -195,7 +195,7 @@ export default class Setup {
           ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
           aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
           posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk,
-          botOK = !vsPSBot || psBotCanPlay(user, limit, inc);
+          botOK = !vsPSBot || psBotCanPlay(user, limit, inc, variantId);
         if (byoOk && delayOk && timeOk && ratedOk && aiOk && posOk && botOK) {
           $submits.toggleClass('nope', false);
           $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
@@ -205,20 +205,38 @@ export default class Setup {
         self.save($form[0] as HTMLFormElement);
       };
 
-    const psBotCanPlay = (user: string, limit: number, inc: number) => {
+    const psBotCanPlay = (user: string, limit: number, inc: number, variantId: string[]) => {
+      //TODO remove hard coded options and improve bot api flow
+      let variantCompatible = true;
+      switch (user) {
+        case 'ps-greedy-four-move': {
+          //in (draughts, oware, togy)
+          variantCompatible = ['1', '6', '7'].includes(variantId[0]);
+          break;
+        }
+        default:
+          variantCompatible = true;
+      }
+
+      let clockCompatible = true;
       if (isRealTime()) {
         switch (user) {
           case 'ps-random-mover': {
-            return limit >= 0.5;
+            clockCompatible = limit >= 0.5;
+            break;
           }
           case 'ps-greedy-one-move': {
-            return limit >= 1 && inc >= 1;
+            clockCompatible = limit >= 1 && inc >= 1;
+            break;
           }
           default: {
-            return limit >= 3 && inc >= 2;
+            clockCompatible = limit >= 3 && inc >= 2;
           }
         }
-      } else return false;
+      } else {
+        clockCompatible = true;
+      }
+      return variantCompatible && clockCompatible;
     };
     const clearFenInput = () => $fenInput.val('');
     const c = this.stores[typ].get();
