@@ -71,6 +71,7 @@ object Event {
         possibleDrops: Option[List[Pos]],
         possibleDropsByRole: Option[Map[Role, List[Pos]]],
         possibleLifts: Option[List[Pos]],
+        forcedAction: Option[String],
         pocketData: Option[PocketData],
         couldNextActionEndTurn: Option[Boolean] = None,
         captLen: Option[Int] = None
@@ -103,6 +104,7 @@ object Event {
         .add("drops" -> possibleDrops.map { squares =>
           JsString(squares.map(_.key).mkString)
         })
+        .add("forcedAction" -> forcedAction)
     }
   }
 
@@ -128,6 +130,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String],
       pocketData: Option[PocketData],
       couldNextActionEndTurn: Option[Boolean],
       captLen: Option[Int]
@@ -150,6 +153,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        forcedAction,
         pocketData,
         couldNextActionEndTurn,
         captLen
@@ -245,6 +249,9 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
         pocketData = pocketData,
         //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
@@ -284,6 +291,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String],
       couldNextActionEndTurn: Option[Boolean]
   ) extends Event {
     def typ = "drop"
@@ -304,6 +312,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        forcedAction,
         pocketData,
         couldNextActionEndTurn
       ) {
@@ -358,6 +367,9 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
         pocketData = pocketData,
         //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
@@ -388,6 +400,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String],
       couldNextActionEndTurn: Option[Boolean]
   ) extends Event {
     def typ = "lift"
@@ -408,6 +421,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        forcedAction,
         pocketData,
         couldNextActionEndTurn
       ) {
@@ -455,6 +469,9 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
         pocketData = pocketData,
         //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
@@ -483,7 +500,8 @@ object Event {
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
-      possibleLifts: Option[List[Pos]]
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String]
   ) extends Event {
     def typ = "endturn"
     def data =
@@ -503,6 +521,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        forcedAction,
         pocketData
       ) {
         Json.obj(
@@ -549,6 +568,9 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
         pocketData = pocketData
       )
   }
@@ -573,7 +595,8 @@ object Event {
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
-      possibleLifts: Option[List[Pos]]
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String]
   ) extends Event {
     def typ = "pass"
     def data =
@@ -593,6 +616,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        forcedAction,
         pocketData
       ) {
         Json.obj(
@@ -648,6 +672,9 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
         pocketData = pocketData
       )
   }
@@ -670,7 +697,8 @@ object Event {
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
-      possibleLifts: Option[List[Pos]]
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String]
   ) extends Event {
     def typ = "selectSquares"
     def data =
@@ -690,6 +718,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        forcedAction,
         pocketData
       ) {
         Json.obj(
@@ -738,6 +767,9 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
         pocketData = pocketData
       )
   }
@@ -760,7 +792,8 @@ object Event {
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
-      possibleLifts: Option[List[Pos]]
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String]
   ) extends Event {
     def typ = "diceroll"
     def data =
@@ -780,6 +813,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        forcedAction,
         pocketData
       ) {
         Json.obj(
@@ -825,6 +859,9 @@ object Event {
         possibleLifts = situation match {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
+        },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
         },
         pocketData = pocketData
       )

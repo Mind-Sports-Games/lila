@@ -1,6 +1,6 @@
 import * as cg from 'chessground/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
-import { opposite, calculatePieceGroup, key2pos } from 'chessground/util';
+import { opposite, calculatePieceGroup, backgammonPosDiff } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 
 function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
@@ -87,52 +87,26 @@ export function parsePossibleMoves(dests?: EncodedDests, activeDiceValue?: numbe
     }
   else for (const k in dests) dec.set(k, dests[k].match(/[a-z][1-9][0-9]?/g) as cg.Key[]);
 
-  //filter backgammon moves based on active dice value
+  //order backgammon moves based on active dice value as single click takes first preference
   if (activeDiceValue) {
-    const filtered = new Map();
+    const sorted = new Map();
     dec.forEach((value: cg.Key[], key: cg.Key) => {
-      for (const v of value) {
-        if (backgammonPosDiff(key, v) === activeDiceValue) {
-          filtered.set(key, [v]);
-        }
-      }
+      const newOrder = value.sort(
+        (a, b) =>
+          Math.abs(backgammonPosDiff(key, a) - activeDiceValue) - Math.abs(backgammonPosDiff(key, b) - activeDiceValue)
+      );
+      sorted.set(key, newOrder);
     });
-    return filtered;
+    return sorted;
   }
 
   return dec;
 }
 
-export function parsePossibleLifts(line?: string | null, activeDiceValue?: number): cg.Key[] {
+export function parsePossibleLifts(line?: string | null): cg.Key[] {
   if (typeof line === 'undefined' || line === null) return [];
   const pos = (line.match(/[a-z][1-9][0-9]?/g) as cg.Key[]) || [];
-
-  //filter backgammon lifts based on active dice value
-  if (activeDiceValue) {
-    const comparisonSquare = line.includes('1') ? 'm1' : 'm2';
-    const posDiff = pos.map(p => backgammonPosDiff(p, comparisonSquare));
-    return pos.filter(
-      p =>
-        backgammonPosDiff(p, comparisonSquare) === activeDiceValue ||
-        (pos.length === 1 && activeDiceValue > backgammonPosDiff(p, comparisonSquare)) ||
-        (pos.length === 2 &&
-          activeDiceValue > backgammonPosDiff(p, comparisonSquare) &&
-          backgammonPosDiff(p, comparisonSquare) === Math.max(...posDiff))
-    );
-  }
   return pos;
-}
-
-function backgammonPosDiff(orig: cg.Key, dest: cg.Key): number {
-  const origFile = key2pos(orig)[0];
-  const origRank = key2pos(orig)[1];
-  const destFile = key2pos(dest)[0];
-  const destRank = key2pos(dest)[1];
-  if (origRank === destRank) {
-    return Math.abs(origFile - destFile);
-  } else {
-    return origFile + destFile - 1;
-  }
 }
 
 // {p1: {'p-piece': 3 'q-piece': 1}, p2: {'b-piece': 2}}

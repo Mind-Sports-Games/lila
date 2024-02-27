@@ -1,7 +1,12 @@
 import { h } from 'snabbdom';
 import { Chessground } from 'chessground';
 import * as cg from 'chessground/types';
-import { oppositeOrientationForLOA, orientationForLOA } from 'chessground/util';
+import {
+  oppositeOrientationForLOA,
+  orientationForLOA,
+  oppositeOrientationForBackgammon,
+  orientationForBackgammon,
+} from 'chessground/util';
 import { Api as CgApi } from 'chessground/api';
 import { Config } from 'chessground/config';
 import changeColorHandle from 'common/coordsColor';
@@ -19,7 +24,7 @@ export function makeConfig(ctrl: RoundController): Config {
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
     turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount),
-    dice = data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key);
+    dice = data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -59,13 +64,13 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     liftable: {
-      liftDests: playing ? util.parsePossibleLifts(data.possibleLifts, ctrl.activeDiceValue(dice)) : [],
+      liftDests: playing ? util.parsePossibleLifts(data.possibleLifts) : [],
       events: {
         after: hooks.onUserLift,
       },
     },
     animation: {
-      enabled: true,
+      enabled: !['backgammon', 'nackgammon'].includes(data.game.variant.key),
       duration: data.pref.animationDuration,
     },
     premovable: {
@@ -218,6 +223,11 @@ export function boardOrientation(data: RoundData, flip: boolean): cg.Orientation
   if (data.game.variant.key === 'racingKings') return flip ? 'p2' : 'p1';
   if (data.game.variant.key === 'linesOfAction' || data.game.variant.key === 'scrambledEggs') {
     return flip ? oppositeOrientationForLOA(data.player.playerIndex) : orientationForLOA(data.player.playerIndex);
+  }
+  if (data.game.variant.key === 'backgammon' || data.game.variant.key === 'nackgammon') {
+    return flip
+      ? oppositeOrientationForBackgammon(data.player.playerIndex)
+      : orientationForBackgammon(data.player.playerIndex);
   } else return flip ? data.opponent.playerIndex : data.player.playerIndex;
 }
 

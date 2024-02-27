@@ -72,11 +72,20 @@ object mini {
     )
   }
 
+  def orientation(pov: Pov): String = {
+    (pov.game.variant.key, pov.playerIndex.name) match {
+      case ("backgammon", "p2") => "p1vflip"
+      case ("nackgammon", "p2") => "p1vflip"
+      case ("racingKings", _)   => "p1"
+      case (_, playerIndex)     => playerIndex
+    }
+  }
+
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Backgammon(_) =>
-        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${pov.playerIndex.name}|${~pov.game.lastActionKeys}"
+        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
           pov.game.variant.gameLogic,

@@ -875,6 +875,7 @@ square {
 
 .variant-nackgammon,
 .variant-backgammon {
+  &.orientation-p1 piece.pocket,
   .orientation-p1 piece.pocket {
     &.p1 {
       margin-top: 6%;
@@ -885,7 +886,8 @@ square {
       margin-left: calc(100% * 7 / 15);
     }
   }
-  .orientation-p2 piece.pocket {
+  &.orientation-p1vflip piece.pocket,
+  .orientation-p1vflip piece.pocket {
     &.p1 {
       margin-top: 50.66%;
       margin-left: calc(100% * 7 / 15);
@@ -1173,6 +1175,24 @@ cg-container .cg-custom-svgs svg {
 
 .variant-nackgammon,
 .variant-backgammon {
+  &.orientation-p1,
+  .orientation-p1 {
+    cg-dice.p1 {
+      left: calc(100% * 8 / 15);
+    }
+    cg-dice.p2 {
+      left: calc(100% * 1 / 15);
+    }
+  }
+  &.orientation-p1vflip,
+  .orientation-p1vflip {
+    cg-dice.p1 {
+      left: calc(100% * 1 / 15);
+    }
+    cg-dice.p2 {
+      left: calc(100% * 8 / 15);
+    }
+  }
   cg-dice {
     width: calc(100% * 6 / 15);
     top: 46.5%;
@@ -1193,7 +1213,6 @@ cg-container .cg-custom-svgs svg {
       }
     }
     &.p1 {
-      left: calc(100% * 8 / 15);
       dice {
         &.one {
           background: url(../images/board/backgammon/svg/dice/red1.svg);
@@ -1222,7 +1241,6 @@ cg-container .cg-custom-svgs svg {
       }
     }
     &.p2 {
-      left: calc(100% * 1 / 15);
       dice {
         &.one {
           background: url(../images/board/backgammon/svg/dice/cream1.svg);
