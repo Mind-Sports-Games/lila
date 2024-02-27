@@ -10,10 +10,19 @@ const renderGameClasses = (game: FeaturedGame): string =>
     ? `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLogic}.is${game.boardSize.key}.${game.variantKey}.variant-${game.variantKey}`
     : `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameFamily}.${game.variantKey}.variant-${game.variantKey}`;
 
+const orientation = (p: PlayerIndex, gl: string): string => {
+  switch (gl) {
+    case 'backgammon':
+      return p === 'p2' ? 'p1vflip' : 'p1';
+    default:
+      return p;
+  }
+};
+
 const renderGameState = (game: FeaturedGame): string =>
   game.gameLogic === 'draughts' && !!game.boardSize
     ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orientation}|${game.lastMove}`
-    : `${game.fen}|${game.orientation}|${game.lastMove}`;
+    : `${game.fen}|${orientation(game.orientation, game.gameLogic)}|${game.lastMove}`;
 
 function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating: boolean) {
   const player = game[playerIndex];

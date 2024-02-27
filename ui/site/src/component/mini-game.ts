@@ -53,7 +53,7 @@ export const init = (node: HTMLElement) => {
         config = {
           coordinates: false,
           viewOnly: true,
-          myPlayerIndex: orientation,
+          myPlayerIndex: orientation === 'p1vflip' ? 'p2' : orientation,
           turnPlayerIndex: fenPlayerIndex(fen),
           resizable: false,
           fen,

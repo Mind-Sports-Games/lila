@@ -370,7 +370,7 @@ declare type Perf =
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red' | 'South' | 'North' | 'Bastaushi' | 'Kostaushi';
 declare type PlayerIndex = 'p1' | 'p2';
 declare type PlayerColor = 'white' | 'black';
-declare type Orientation = 'p1' | 'p2' | 'left' | 'right';
+declare type Orientation = 'p1' | 'p2' | 'left' | 'right' | 'p1vflip';
 
 declare type PageVariant = VariantKey | DraughtsVariantKey | undefined;
 declare type GameFamilyKey =

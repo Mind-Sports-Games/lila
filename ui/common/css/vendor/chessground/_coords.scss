@@ -164,8 +164,8 @@ coords {
     }
   }
 
-  .variant-nackgammon .orientation-p2 &.files,
-  .variant-backgammon .orientation-p2 &.files {
+  .variant-nackgammon .orientation-p1vflip &.files,
+  .variant-backgammon .orientation-p1vflip &.files {
     &.p1 {
       left: 0;
       padding-left: 6.66%;
@@ -296,8 +296,8 @@ coords {
       top: 0.7em;
     }
   }
-  .variant-nackgammon .orientation-p2 coords.files,
-  .variant-backgammon .orientation-p2 coords.files {
+  .variant-nackgammon .orientation-p1vflip coords.files,
+  .variant-backgammon .orientation-p1vflip coords.files {
     &.p1 {
       top: 0.7em;
     }

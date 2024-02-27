@@ -88,8 +88,8 @@ board-scores {
       top: 6%;
     }
   }
-  .variant-nackgammon .orientation-p2 &,
-  .variant-backgammon .orientation-p2 & {
+  .variant-nackgammon .orientation-p1vflip &,
+  .variant-backgammon .orientation-p1vflip & {
     &.p1 {
       top: 6%;
     }

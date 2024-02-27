@@ -3,12 +3,12 @@ import { readDice } from 'stratutils';
 
 export const init = (node: HTMLElement): void => {
   const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|');
-  initWith(node, fen, orientation as PlayerIndex, lm);
+  initWith(node, fen, orientation as Orientation, lm);
 };
 
 const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
 
-export const initWith = (node: HTMLElement, fen: string, orientation: PlayerIndex, lm?: string): void => {
+export const initWith = (node: HTMLElement, fen: string, orientation: Orientation, lm?: string): void => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 500);
   else {
     const $el = $(node);
