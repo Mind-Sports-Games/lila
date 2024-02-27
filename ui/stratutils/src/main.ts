@@ -140,14 +140,18 @@ export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
 }
 
-export function readDice(fen: string, variant: VariantKey): cg.Dice[] {
+export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean): cg.Dice[] {
   if (!['backgammon', 'nackgammon'].includes(variant)) return [];
   if (fen.split(' ').length < 2) return [];
-  const unusedDice = fen.split(' ')[1].replace('-', '').split('/');
+  const unusedDice = fen
+    .split(' ')[1]
+    .replace('-', '')
+    .split('/')
+    .sort((a, b) => +b - +a);
   const usedDice = fen.split(' ')[2].replace('-', '').split('/');
   const dice = [];
   for (const d of unusedDice) {
-    if (+d) dice.push({ value: +d, isAvailable: true });
+    if (+d) dice.push({ value: +d, isAvailable: !canEndTurn ?? true });
   }
   for (const d of usedDice) {
     if (+d) dice.push({ value: +d, isAvailable: false });

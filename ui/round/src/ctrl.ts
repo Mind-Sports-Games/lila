@@ -276,6 +276,9 @@ export default class RoundController {
   private onSelectDice = (dice: cg.Dice[]) => {
     this.data.dice = dice;
     this.data.activeDiceValue = this.activeDiceValue(dice);
+    if (this.data.activeDiceValue === undefined && this.isPlaying()) {
+      this.endTurnAction();
+    }
     ground.reload(this); //update possible actions from new 'active' (be more restrictive?)
     this.chessground.redrawAll(); //redraw dice
   };
@@ -383,7 +386,7 @@ export default class RoundController {
         dests: util.parsePossibleMoves(this.data.possibleMoves, this.activeDiceValue(dice)),
       };
       config.liftable = {
-        liftDests: util.parsePossibleLifts(this.data.possibleLifts, this.activeDiceValue(dice)),
+        liftDests: util.parsePossibleLifts(this.data.possibleLifts),
       };
     }
     config.dropmode = {
@@ -572,7 +575,7 @@ export default class RoundController {
 
     //set the right data from all backgammon actions
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
-    d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key);
+    d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn);
     d.activeDiceValue = this.activeDiceValue(d.dice);
 
     d.crazyhouse = o.crazyhouse;
@@ -647,7 +650,7 @@ export default class RoundController {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves, d.activeDiceValue) : new Map(),
         },
         liftable: {
-          liftDests: playing ? util.parsePossibleLifts(d.possibleLifts, d.activeDiceValue) : [],
+          liftDests: playing ? util.parsePossibleLifts(d.possibleLifts) : [],
         },
         dropmode: {
           dropDests: playing ? stratUtils.readDropsByRole(d.possibleDropsByRole) : new Map(),
@@ -748,11 +751,8 @@ export default class RoundController {
       }
       //backgammon roll dice at start of turn or end turn when no moves
       if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
-        if (d.canOnlyRollDice) this.forceRollDice(d.game.variant.key);
-        else if (d.canEndTurn && this.data.pref.playForcedAction) {
-          const playedNoMoves = o.uci.includes('/'); //dice roll
-          if (playedNoMoves) this.sendEndTurn(d.game.variant.key);
-        }
+        if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), 500);
+        else if (d.pref.playForcedAction) this.playForcedAction();
       }
     }
 
@@ -841,6 +841,7 @@ export default class RoundController {
     this.onChange();
     this.setLoading(false);
     if (this.keyboardMove) this.keyboardMove.update(d.steps[d.steps.length - 1]);
+    this.bindSpaceToEndTurn();
     //redraw board scores/dice, items in CG wrap layer
     if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) this.chessground.redrawAll();
   };
@@ -1153,6 +1154,49 @@ export default class RoundController {
   stepAt = (ply: Ply) => round.plyStep(this.data, ply);
   StepAtTurn = (turn: number) => round.turnStep(this.data, turn);
 
+  bindSpaceToEndTurn = (): void => {
+    if (this.data.game.variant.key === 'backgammon' || this.data.game.variant.key === 'nackgammon') {
+      window.Mousetrap.bind('space', () => {
+        if (this.data.canEndTurn && this.isPlaying()) {
+          this.endTurnAction();
+        }
+      });
+    }
+  };
+
+  playForcedAction = (): void => {
+    const d = this.data;
+    const playedNoMoves = round.lastStep(d).uci.includes('/');
+    const dropDests = stratUtils.readDropsByRole(d.possibleDropsByRole).get('s-piece');
+    const delayMillis = 750;
+    if (
+      ['backgammon', 'nackgammon'].includes(d.game.variant.key) &&
+      this.isPlaying() &&
+      !this.replaying() &&
+      d.player.playerIndex === d.game.player &&
+      this.data.pref.playForcedAction
+    ) {
+      if (d.canEndTurn && playedNoMoves) setTimeout(() => this.sendEndTurn(d.game.variant.key), delayMillis);
+      else if (dropDests && dropDests.length === 1) {
+        setTimeout(() => this.onUserNewPiece('s-piece', dropDests[0], { premove: false }), delayMillis);
+      } else if (d.forcedAction !== undefined && d.forcedAction.includes('^')) {
+        setTimeout(() => this.sendLift(this.data.game.variant.key, d.forcedAction!.slice(1) as cg.Key), delayMillis);
+      } else if (d.forcedAction !== undefined && util.parsePossibleMoves(d.possibleMoves).keys.length == 1) {
+        setTimeout(
+          () =>
+            this.sendMove(
+              d.forcedAction!.slice(0, 1) as cg.Key,
+              d.forcedAction!.slice(2, 3) as cg.Key,
+              undefined,
+              this.data.game.variant.key,
+              { premove: false }
+            ),
+          delayMillis
+        );
+      }
+    }
+  };
+
   private delayedInit = () => {
     const d = this.data;
     //forced moves
@@ -1163,11 +1207,8 @@ export default class RoundController {
       }
       //backgammon roll dice at start of turn or end turn when no moves
       if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
-        if (d.canOnlyRollDice) this.forceRollDice(d.game.variant.key);
-        else if (d.canEndTurn && this.data.pref.playForcedAction) {
-          const playedNoMoves = round.lastStep(d).uci.includes('/'); //dice roll
-          if (playedNoMoves) this.sendEndTurn(d.game.variant.key);
-        }
+        if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), 500);
+        else if (d.pref.playForcedAction) this.playForcedAction();
       }
     }
     if (this.isPlaying() && game.nbMoves(d, d.player.playerIndex) === 0 && !this.isSimulHost()) {
@@ -1208,6 +1249,8 @@ export default class RoundController {
         }
         cevalSub.subscribe(this);
       }
+
+      this.bindSpaceToEndTurn();
 
       if (!this.nvui) keyboard.init(this);
 

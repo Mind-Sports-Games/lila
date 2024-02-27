@@ -19,7 +19,7 @@ export function makeConfig(ctrl: RoundController): Config {
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
     turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount),
-    dice = data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key);
+    dice = data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -59,13 +59,13 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     liftable: {
-      liftDests: playing ? util.parsePossibleLifts(data.possibleLifts, ctrl.activeDiceValue(dice)) : [],
+      liftDests: playing ? util.parsePossibleLifts(data.possibleLifts) : [],
       events: {
         after: hooks.onUserLift,
       },
     },
     animation: {
-      enabled: true,
+      enabled: !['backgammon', 'nackgammon'].includes(data.game.variant.key),
       duration: data.pref.animationDuration,
     },
     premovable: {

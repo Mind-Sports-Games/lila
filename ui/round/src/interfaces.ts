@@ -85,6 +85,7 @@ export interface RoundData extends GameData {
   canOnlyRollDice: boolean;
   canUndo: boolean;
   canEndTurn: boolean;
+  forcedAction?: string;
   pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
@@ -181,6 +182,7 @@ export interface ApiMove extends Step {
   canOnlyRollDice: boolean;
   canUndo: boolean;
   canEndTurn: boolean;
+  forcedAction?: string;
   dice?: string;
   multiActionMetaData?: MultiActionMetaData;
   canSelectSquares?: boolean;
