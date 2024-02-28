@@ -78,7 +78,7 @@ final class PlayApi(
       }
 
     def move(me: UserModel, pov: Pov, uci: String, offeringDraw: Option[Boolean]) =
-      env.bot.player(pov, me, uci.pp("uci move"), offeringDraw) pipe toResult
+      env.bot.player(pov, me, uci, offeringDraw) pipe toResult
 
     def command(me: UserModel, cmd: String)(
         as: (String, UserModel) => (Pov => Fu[Result]) => Fu[Result]
