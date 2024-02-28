@@ -577,6 +577,7 @@ export default class RoundController {
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
     d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn);
     d.activeDiceValue = this.activeDiceValue(d.dice);
+    d.forcedAction = o.forcedAction;
 
     d.crazyhouse = o.crazyhouse;
     d.takebackable = d.canTakeBack ? o.takebackable : false;
@@ -1168,7 +1169,7 @@ export default class RoundController {
     const d = this.data;
     const playedNoMoves = round.lastStep(d).uci.includes('/');
     const dropDests = stratUtils.readDropsByRole(d.possibleDropsByRole).get('s-piece');
-    const delayMillis = 750;
+    const delayMillis = 500;
     if (
       ['backgammon', 'nackgammon'].includes(d.game.variant.key) &&
       this.isPlaying() &&
@@ -1176,23 +1177,37 @@ export default class RoundController {
       d.player.playerIndex === d.game.player &&
       this.data.pref.playForcedAction
     ) {
-      if (d.canEndTurn && playedNoMoves) setTimeout(() => this.sendEndTurn(d.game.variant.key), delayMillis);
-      else if (dropDests && dropDests.length === 1) {
-        setTimeout(() => this.onUserNewPiece('s-piece', dropDests[0], { premove: false }), delayMillis);
+      if (d.canEndTurn && playedNoMoves) {
+        this.chessground.set({ viewOnly: true });
+        setTimeout(() => {
+          this.sendEndTurn(d.game.variant.key);
+          this.chessground.set({ viewOnly: false });
+        }, delayMillis);
+      } else if (dropDests && dropDests.length === 1) {
+        this.chessground.set({ viewOnly: true });
+        setTimeout(() => {
+          this.onUserNewPiece('s-piece', dropDests[0], { premove: false });
+          this.chessground.set({ viewOnly: false });
+        }, delayMillis);
       } else if (d.forcedAction !== undefined && d.forcedAction.includes('^')) {
-        setTimeout(() => this.sendLift(this.data.game.variant.key, d.forcedAction!.slice(1) as cg.Key), delayMillis);
-      } else if (d.forcedAction !== undefined && util.parsePossibleMoves(d.possibleMoves).keys.length == 1) {
-        setTimeout(
-          () =>
-            this.sendMove(
-              d.forcedAction!.slice(0, 1) as cg.Key,
-              d.forcedAction!.slice(2, 3) as cg.Key,
-              undefined,
-              this.data.game.variant.key,
-              { premove: false }
-            ),
-          delayMillis
-        );
+        // we dont handle lift in api move therefore call CG here todo action
+        this.chessground.set({ viewOnly: true });
+        setTimeout(() => {
+          this.chessground.liftNoAnim(d.forcedAction!.slice(1) as cg.Key);
+          this.chessground.set({ viewOnly: false });
+        }, delayMillis);
+      } else if (d.forcedAction !== undefined && util.parsePossibleMoves(d.possibleMoves).size == 1) {
+        this.chessground.set({ viewOnly: true });
+        setTimeout(() => {
+          this.sendMove(
+            d.forcedAction!.slice(0, 2) as cg.Key,
+            d.forcedAction!.slice(2, 4) as cg.Key,
+            undefined,
+            this.data.game.variant.key,
+            { premove: false }
+          );
+          this.chessground.set({ viewOnly: false });
+        }, delayMillis);
       }
     }
   };
