@@ -388,6 +388,11 @@ export default class RoundController {
       config.liftable = {
         liftDests: util.parsePossibleLifts(this.data.possibleLifts),
       };
+      // need to trigger dice roll as it's only supported automatically until multi-point backgammon
+      if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
+        if (this.data.canOnlyRollDice) setTimeout(() => this.forceRollDice(this.data.game.variant.key), 500);
+        else if (this.data.pref.playForcedAction) this.playForcedAction();
+      }
     }
     config.dropmode = {
       dropDests: this.isPlaying() ? stratUtils.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
