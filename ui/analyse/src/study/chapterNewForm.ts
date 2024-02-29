@@ -170,7 +170,7 @@ function fentab(ctrl: StudyChapterNewFormCtrl): VNode {
   return h('div.form-group', [
     h('input#chapter-fen.form-control', {
       attrs: {
-        value: ctrl.root.node.fen,
+        value: '',
         placeholder: noarg('loadAPositionFromFen'),
       },
     }),
