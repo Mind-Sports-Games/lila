@@ -66,7 +66,8 @@ object Rewind {
           BinaryFormat.plyTime.write(plyTimes.take(rewindedGame.plies))
         },
         loadClockHistory = _ => game.clockHistory.map(_.update(!playerIndex, _.dropRight(pliesRemoved))),
-        updatedAt = DateTime.now
+        updatedAt = DateTime.now,
+        turnAt = DateTime.now //this is not the actual turn start time but closer than not change it.
       )
       Progress(game, newGame)
     }

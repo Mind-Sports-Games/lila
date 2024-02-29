@@ -646,6 +646,7 @@ object BSONHandlers {
         bookmarks = r intD F.bookmarks,
         createdAt = createdAt,
         updatedAt = r.dateD(F.updatedAt, createdAt),
+        turnAt = r.dateD(F.turnAt, createdAt),
         metadata = metadata
       )
     }
@@ -685,6 +686,7 @@ object BSONHandlers {
         F.bookmarks      -> w.intO(o.bookmarks),
         F.createdAt      -> w.date(o.createdAt),
         F.updatedAt      -> w.date(o.updatedAt),
+        F.turnAt         -> w.date(o.turnAt),
         F.source         -> o.metadata.source.map(_.id),
         F.pgnImport      -> o.metadata.pgnImport,
         F.tournamentId   -> o.metadata.tournamentId,
