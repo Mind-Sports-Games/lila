@@ -144,13 +144,8 @@ object BSONHandlers {
 
     def writes(w: BSON.Writer, o: PocketData) =
       BSONDocument(
-        "l" -> (o match {
-          case PocketData.Chess(_)      => 0
-          case PocketData.FairySF(_)    => 2
-          case PocketData.Go(_)         => 5
-          case PocketData.Backgammon(_) => 6
-          case _                        => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
-        }),
+        "l" -> o.gameLogic.id,
+        //TODO Move this into SG
         "f" -> (o match {
           case PocketData.Chess(_)      => 0
           case PocketData.FairySF(pd)   => pd.gameFamily.getOrElse(GameFamily.Shogi()).id
