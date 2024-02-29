@@ -49,7 +49,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
   private type TagPicker = Tag.type => TagType
 
-  private val maxPlies = 600
+  private val maxPlies = 1000
 
   private def evenIncomplete(result: Reader.Result): Replay =
     result match {

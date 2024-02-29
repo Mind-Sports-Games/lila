@@ -388,6 +388,11 @@ export default class RoundController {
       config.liftable = {
         liftDests: util.parsePossibleLifts(this.data.possibleLifts),
       };
+      // need to trigger dice roll as it's only supported automatically until multi-point backgammon
+      if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
+        if (this.data.canOnlyRollDice) setTimeout(() => this.forceRollDice(this.data.game.variant.key), 500);
+        else if (this.data.pref.playForcedAction) this.playForcedAction();
+      }
     }
     config.dropmode = {
       dropDests: this.isPlaying() ? stratUtils.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
@@ -549,10 +554,10 @@ export default class RoundController {
 
   apiMove = (o: ApiMove): true => {
     const d = this.data,
-      playing = this.isPlaying();
+      playing = this.isPlaying(),
+      hasJustSwitchedTurns = d.game.turns != o.turnCount;
     d.game.turns = o.turnCount;
     d.game.player = util.turnPlayerIndexFromLastTurn(o.turnCount);
-
     if (['amazons', 'backgammon', 'nackgammon'].includes(d.game.variant.key)) {
       if (d.onlyDropsVariant && !o.drops) {
         cancelDropMode(this.chessground.state);
@@ -562,7 +567,7 @@ export default class RoundController {
     }
     d.multiActionMetaData = o.multiActionMetaData;
 
-    const playedPlayerIndex = opposite(d.game.player),
+    const playedPlayerIndex = hasJustSwitchedTurns ? opposite(d.game.player) : d.game.player,
       activePlayerIndex = d.player.playerIndex === d.game.player;
     if (o.status) d.game.status = o.status;
     if (o.winner) d.game.winner = o.winner;
@@ -713,7 +718,7 @@ export default class RoundController {
     if (d.expirationAtStart) {
       if (round.turnsTaken(d) > 1 && !d.pref.playerTurnIndicator) {
         d.expirationAtStart = undefined;
-      } else d.expirationAtStart.updatedAt = Date.now();
+      } else if (hasJustSwitchedTurns) d.expirationAtStart.updatedAt = Date.now();
     }
     this.redraw();
     if (playing && playedPlayerIndex == d.player.playerIndex) {

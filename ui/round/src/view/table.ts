@@ -82,7 +82,6 @@ export const renderTablePlay = (ctrl: RoundController) => {
           button.cancelTakebackProposition(ctrl),
           button.answerOpponentTakebackProposition(ctrl),
           button.selectSquaresOfferOptions(ctrl),
-          button.endTurnConfirm(ctrl),
         ];
   return [
     replay.render(ctrl),

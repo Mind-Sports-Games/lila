@@ -353,6 +353,7 @@ object GameDiff {
       dTry(s"$name$blursBits", player(_).blurs, Blurs.BlursBSONHandler.writeTry)
     }
     dTry(updatedAt, _.updatedAt, BSONJodaDateTimeHandler.writeTry)
+    dTry(turnAt, _.turnAt, BSONJodaDateTimeHandler.writeTry)
 
     (setBuilder.toList, unsetBuilder.toList)
   }

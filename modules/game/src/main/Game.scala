@@ -56,6 +56,7 @@ case class Game(
     bookmarks: Int = 0,
     createdAt: DateTime = DateTime.now,
     updatedAt: DateTime = DateTime.now,
+    turnAt: DateTime = DateTime.now,
     metadata: Metadata
 ) {
 
@@ -253,6 +254,7 @@ case class Game(
       loadClockHistory = _ => newClockHistory,
       status = game.situation.status | status,
       updatedAt = DateTime.now,
+      turnAt = if (game.hasJustSwitchedTurns) DateTime.now else turnAt,
       metadata = metadata.copy(deadStoneOfferState = deadStoneOfferStateAfterAction)
     )
 
@@ -716,7 +718,7 @@ case class Game(
     estimateClockTotalTime orElse
       correspondenceClock.map(_.estimateTotalTime) getOrElse 1200
 
-  def timeForFirstMove: Centis =
+  def timeForFirstTurn: Centis =
     Centis ofSeconds {
       import Speed._
       val base = if (isTournament) speed match {
@@ -746,7 +748,7 @@ case class Game(
 
   def timeBeforeExpirationAtStart: Option[Centis] =
     expirableAtStart option {
-      Centis.ofMillis(updatedAt.getMillis - nowMillis + timeForFirstMove.millis).nonNeg
+      Centis.ofMillis(turnAt.getMillis - nowMillis + timeForFirstTurn.millis).nonNeg
     }
 
   def timeWhenPaused: Centis =
@@ -909,7 +911,7 @@ object Game {
 
   val maxPlayingRealtime = 100 // plus 200 correspondence games
 
-  val maxPlies = 600      // unlimited can cause StackOverflowError
+  val maxPlies = 1000     // also in SG gl/format/pgn/Binary.scala (unlimited can cause StackOverflowError)
   val maxTurns = maxPlies // used for correct terminology where appropriate
 
   val analysableVariants: Set[Variant] = Variant.all.filter(_.hasFishnet).toSet
@@ -1018,7 +1020,8 @@ object Game {
             multiMatch = multiMatch
           ),
         createdAt = createdAt,
-        updatedAt = createdAt
+        updatedAt = createdAt,
+        turnAt = createdAt
       )
     )
   }
@@ -1076,6 +1079,7 @@ object Game {
     val bookmarks          = "bm"
     val createdAt          = "ca"
     val updatedAt          = "ua"
+    val turnAt             = "ta"
     val source             = "so"
     val pgnImport          = "pgni"
     val tournamentId       = "tid"

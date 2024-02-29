@@ -144,13 +144,8 @@ object BSONHandlers {
 
     def writes(w: BSON.Writer, o: PocketData) =
       BSONDocument(
-        "l" -> (o match {
-          case PocketData.Chess(_)      => 0
-          case PocketData.FairySF(_)    => 2
-          case PocketData.Go(_)         => 5
-          case PocketData.Backgammon(_) => 6
-          case _                        => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
-        }),
+        "l" -> o.gameLogic.id,
+        //TODO Move this into SG
         "f" -> (o match {
           case PocketData.Chess(_)      => 0
           case PocketData.FairySF(pd)   => pd.gameFamily.getOrElse(GameFamily.Shogi()).id
@@ -651,6 +646,7 @@ object BSONHandlers {
         bookmarks = r intD F.bookmarks,
         createdAt = createdAt,
         updatedAt = r.dateD(F.updatedAt, createdAt),
+        turnAt = r.dateD(F.turnAt, createdAt),
         metadata = metadata
       )
     }
@@ -690,6 +686,7 @@ object BSONHandlers {
         F.bookmarks      -> w.intO(o.bookmarks),
         F.createdAt      -> w.date(o.createdAt),
         F.updatedAt      -> w.date(o.updatedAt),
+        F.turnAt         -> w.date(o.turnAt),
         F.source         -> o.metadata.source.map(_.id),
         F.pgnImport      -> o.metadata.pgnImport,
         F.tournamentId   -> o.metadata.tournamentId,
