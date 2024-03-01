@@ -41,6 +41,14 @@ board-scores {
     }
   }
 
+  board-score {
+    width: 100%;
+    font-size: 130%;
+    .backgammon-contemporary & {
+      color: #a9ad7d;
+    }
+  }
+
   .variant-togyzkumalak .orientation-p1 & {
     &.p1 {
       left: 0;
@@ -69,6 +77,25 @@ board-scores {
 
   position-score {
     flex: 1 1 auto;
+  }
+
+  .variant-nackgammon .orientation-p1 &,
+  .variant-backgammon .orientation-p1 & {
+    &.p1 {
+      bottom: 6%;
+    }
+    &.p2 {
+      top: 6%;
+    }
+  }
+  .variant-nackgammon .orientation-p1vflip &,
+  .variant-backgammon .orientation-p1vflip & {
+    &.p1 {
+      top: 6%;
+    }
+    &.p2 {
+      bottom: 6%;
+    }
   }
 }
 

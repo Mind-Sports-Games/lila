@@ -254,6 +254,7 @@ object Schedule {
     case object Blitz35     extends Speed(75)
     case object Blitz51     extends Speed(80)
     case object Blitz53     extends Speed(85)
+    case object Delay212    extends Speed(212)
     case object Byoyomi35   extends Speed(305)
     case object Byoyomi510  extends Speed(510)
     val all: List[Speed] =
@@ -268,6 +269,7 @@ object Schedule {
         Blitz35,
         Blitz51,
         Blitz53,
+        Delay212,
         Byoyomi35,
         Byoyomi510,
         Rapid,
@@ -290,8 +292,9 @@ object Schedule {
           if (time <= (180 + 5 * 25)) Byoyomi35
           else Byoyomi510
         }
+        case Clock.SimpleDelayConfig(_, _) => Delay212
         // NOTE: not using case _ => here, because I want an error when a new clock is added.
-        case Clock.Config(_, _) | Clock.BronsteinConfig(_, _) | Clock.SimpleDelayConfig(_, _) => {
+        case Clock.Config(_, _) | Clock.BronsteinConfig(_, _) => {
           val time = clock.estimateTotalSeconds
           if (time < 30) UltraBullet
           else if (time < 60) HyperBullet
@@ -403,8 +406,9 @@ object Schedule {
     import Freq._, Speed._
     import strategygames.chess.variant._
 
-    val TC = Clock.Config
-    val BC = ByoyomiClock.Config
+    val TC  = Clock.Config
+    val BC  = ByoyomiClock.Config
+    val SDC = Clock.SimpleDelayConfig
 
     (s.freq, s.variant, s.speed) match {
       // Special cases.
@@ -425,6 +429,7 @@ object Schedule {
       case (_, _, Blitz35)     => TC(3 * 60, 5)
       case (_, _, Blitz51)     => TC(5 * 60, 1)
       case (_, _, Blitz53)     => TC(5 * 60, 3)
+      case (_, _, Delay212)    => SDC(2 * 60, 12)
       case (_, _, Byoyomi510)  => BC(5 * 60, 0, 10, 1)
       case (_, _, Byoyomi35)   => BC(3 * 60, 0, 5, 1)
       case (_, _, Rapid)       => TC(10 * 60, 0)

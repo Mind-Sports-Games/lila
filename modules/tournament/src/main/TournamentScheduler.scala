@@ -262,6 +262,7 @@ final private class TournamentScheduler(
       (nextWednesday, 15),
       (nextWednesday, 19),
       (nextThursday, 0),
+      (nextThursday, 3),
       (nextThursday, 6),
       (nextThursday, 9),
       (nextThursday, 14),
@@ -271,6 +272,7 @@ final private class TournamentScheduler(
       (nextFriday, 8),
       (nextFriday, 15),
       (nextFriday, 21),
+      (nextSaturday, 1),
       (nextSaturday, 4),
       (nextSaturday, 7),
       (nextSaturday, 10),
@@ -321,6 +323,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Flipello10), Blitz32),
+      (Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay212),
       (Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz32),
       (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz53),
@@ -330,6 +333,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.ThreeCheck), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32),
       (Variant.Go(strategygames.go.variant.Go13x13), Blitz53),
+      (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay212),
       (Variant.Chess(strategygames.chess.variant.Standard), Blitz32)
     )
 
@@ -462,7 +466,14 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
         new DateTime(2024, 9, 13, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay212)(
+        new DateTime(2024, 9, 20, 0, 0)
       )
+      //TODO seperate out both backgammon variants
+      // scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay212)(
+      //   new DateTime(2024, 9, 27, 0, 0)
+      // )
       //Fri 27th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }
 

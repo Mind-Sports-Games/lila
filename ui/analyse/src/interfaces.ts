@@ -62,6 +62,7 @@ export interface AnalysePref {
   rookCastle?: boolean;
   destination?: boolean;
   highlight?: boolean;
+  moveEvent: Prefs.MoveEvent;
   animationDuration?: number;
   mancalaMove: boolean;
 }

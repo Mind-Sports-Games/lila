@@ -22,7 +22,9 @@ object userAnalysis {
     Variant.FairySF(strategygames.fairysf.variant.Amazons),
     Variant.Go(strategygames.go.variant.Go9x9),
     Variant.Go(strategygames.go.variant.Go13x13),
-    Variant.Go(strategygames.go.variant.Go19x19)
+    Variant.Go(strategygames.go.variant.Go19x19),
+    Variant.Backgammon(strategygames.backgammon.variant.Backgammon),
+    Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)
   )
 
   def analysisVariants =
@@ -40,7 +42,9 @@ object userAnalysis {
       title = trans.analysis.txt(),
       moreCss = frag(
         cssTag("analyse.free"),
-        (pov.game.variant.dropsVariant && !pov.game.variant.onlyDropsVariant) option cssTag("analyse.zh"),
+        (pov.game.variant.hasDetatchedPocket) option cssTag(
+          "analyse.zh"
+        ),
         withForecast option cssTag("analyse.forecast"),
         ctx.blind option cssTag("round.nvui")
       ),

@@ -11,7 +11,7 @@ import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes, RoundData } from '../interfaces';
 import { NotationStyle, notationStyle } from 'stratutils';
-import { moveFromNotationStyle } from 'common/notation';
+import { moveFromNotationStyle, combinedNotationForBackgammonActions } from 'common/notation';
 
 const scrollMax = 99999,
   moveTag = 'u8t',
@@ -56,7 +56,7 @@ function renderMultiActionMove(
   step: (Step | null)[],
   notation: NotationStyle,
   variant: Variant,
-  prevFen: string,
+  prevStepFen: (s: Step) => string,
   curPly: number,
   orEmpty: boolean,
   drawOffers: Set<number>
@@ -70,19 +70,27 @@ function renderMultiActionMove(
           },
         },
         [
-          step
-            .map(s =>
+          combinedNotationOfTurn(
+            step.map(s =>
               s
-                ? moveFromNotationStyle(notation)({ san: s.san, uci: s.uci, fen: s.fen, prevFen: prevFen }, variant)
+                ? moveFromNotationStyle(notation)(
+                    { san: s.san, uci: s.uci, fen: s.fen, prevFen: prevStepFen(s) },
+                    variant
+                  )
                 : ''
-            )
-            .join(' '),
+            ),
+            notation
+          ),
           step.map(s => drawOffers.has(s ? s.turnCount : -1)).includes(true) ? renderDrawOffer() : undefined,
         ]
       )
     : orEmpty
     ? h(moveTag, '…')
     : undefined;
+}
+
+function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
+  return notation === 'bkg' ? combinedNotationForBackgammonActions(actionNotations) : actionNotations.join(' ');
 }
 
 export function renderResult(ctrl: RoundController): VNode | undefined {
@@ -147,18 +155,19 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     }
   }
 
-  const prevFen = (i: number) => {
-    if (i === 0) return initialFen;
-    const step = moveTurns[i];
-    return step && step[0] ? step[0].fen : initialFen;
+  const prevStepFen = (s: Step) => {
+    if (s.ply <= 1) return initialFen;
+    const stepIndex = steps.indexOf(s);
+    const prevStep = steps[stepIndex - 1];
+    return stepIndex && prevStep ? prevStep.fen : initialFen;
   };
 
   const els: MaybeVNodes = [],
     curPly = ctrl.ply;
   for (let i = 0; i < moveTurns.length; i = i + 2) {
     els.push(h(indexTag, Math.floor(i / 2) + 1 + ''));
-    els.push(renderMultiActionMove(moveTurns[i], notation, variant, prevFen(i), curPly, true, drawTurns));
-    els.push(renderMultiActionMove(moveTurns[i + 1], notation, variant, prevFen(i + 1), curPly, false, drawTurns));
+    els.push(renderMultiActionMove(moveTurns[i], notation, variant, prevStepFen, curPly, true, drawTurns));
+    els.push(renderMultiActionMove(moveTurns[i + 1], notation, variant, prevStepFen, curPly, false, drawTurns));
   }
   els.push(renderResult(ctrl));
 

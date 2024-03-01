@@ -39,13 +39,17 @@ final class ChallengeMaker(
         case (_, Some(days))  => TimeControl.Correspondence(days)
         case _                => TimeControl.Unlimited
       }
+      val playerIndexName =
+        if (pov.game.variant.key == "backgammon" || pov.game.variant.key == "nackgammon") {
+          pov.playerIndex.name
+        } else (!pov.playerIndex).name
       Challenge.make(
         variant = pov.game.variant,
         fenVariant = pov.game.variant.some,
         initialFen = initialFen,
         timeControl = timeControl,
         mode = pov.game.mode,
-        playerIndex = (!pov.playerIndex).name,
+        playerIndex = playerIndexName,
         challenger = Challenge.toRegistered(pov.game.variant, timeControl)(challenger),
         destUser = dest.some,
         rematchOf = pov.gameId.some,

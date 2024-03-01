@@ -94,6 +94,7 @@ const gameFamily: GameFamilyKey[] = [
   'oware',
   'togyzkumalak',
   'go',
+  'backgammon',
 ];
 
 function gameFamilyOption(v: GameFamilyKey, sv: string) {

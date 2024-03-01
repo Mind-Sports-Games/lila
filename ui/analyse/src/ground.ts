@@ -113,6 +113,10 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             ? 'https://playstrategy.org/assets/piece/go/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
               '/'
+            : cgVariantKey === 'backgammon' || cgVariantKey === 'nackgammon'
+            ? 'https://playstrategy.org/assets/piece/backgammon/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
+              '/'
             : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
@@ -135,6 +139,11 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       events: {
         cancel: hooks.onCancelDropMode,
       },
+    },
+    draggable: {
+      enabled:
+        pref.moveEvent !== Prefs.MoveEvent.Click && !['oware', 'backgammon', 'nackgammon'].includes(d.game.variant.key),
+      showGhost: pref.highlight,
     },
     disableContextMenu: true,
     dimensions: d.game.variant.boardSize,

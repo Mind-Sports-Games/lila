@@ -29,6 +29,7 @@ object TreeBuilder {
       case FEN.Samurai(fen)      => FullOpeningDB.findByFen(GameLogic.Samurai(), FEN.Samurai(fen))
       case FEN.Togyzkumalak(fen) => FullOpeningDB.findByFen(GameLogic.Togyzkumalak(), FEN.Togyzkumalak(fen))
       case FEN.Go(fen)           => FullOpeningDB.findByFen(GameLogic.Go(), FEN.Go(fen))
+      case FEN.Backgammon(fen)   => FullOpeningDB.findByFen(GameLogic.Backgammon(), FEN.Backgammon(fen))
     }
 
   def apply(
@@ -84,9 +85,9 @@ object TreeBuilder {
             variant = g.situation.board.variant,
             move = m,
             fen = fen,
-            captureLength = (g.situation, m.uci.origDest._2) match {
-              case (Situation.Draughts(situation), Pos.Draughts(pos)) =>
-                if (situation.ghosts > 0) situation.captureLengthFrom(pos)
+            captureLength = (g.situation, m) match {
+              case (Situation.Draughts(situation), Uci.DraughtsWithSan(uciMove)) =>
+                if (situation.ghosts > 0) situation.captureLengthFrom(uciMove.uci.dest)
                 else situation.allMovesCaptureLength.some
               case _ => None
             },

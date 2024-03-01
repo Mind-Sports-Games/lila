@@ -1,5 +1,5 @@
 import { h } from 'snabbdom';
-import { Position, MaybeVNodes } from '../interfaces';
+import { Position, MaybeVNodes, RoundData } from '../interfaces';
 import * as game from 'game';
 import * as status from 'game/status';
 import { renderClock } from '../clock/clockView';
@@ -48,7 +48,12 @@ export const renderTablePlay = (ctrl: RoundController) => {
         : [
             game.abortable(d)
               ? button.standard(ctrl, undefined, 'L', 'abortGame', 'abort')
-              : button.standard(ctrl, game.takebackable, 'i', 'proposeATakeback', 'takeback-yes', ctrl.takebackYes),
+              : game.takebackable(d)
+              ? button.standard(ctrl, game.takebackable, 'i', 'proposeATakeback', 'takeback-yes', ctrl.takebackYes)
+              : null,
+            d.canUndo && ctrl.data.player.playerIndex === ctrl.data.game.player
+              ? button.standard(ctrl, (d: RoundData) => d.canUndo, 'i', 'undo', 'undo-yes', ctrl.undoAction)
+              : null,
             ctrl.drawConfirm
               ? button.drawConfirm(ctrl)
               : d.game.canOfferDraw

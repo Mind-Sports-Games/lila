@@ -152,6 +152,10 @@ object pref {
               radios(form("behavior.confirmPass"), confirmPassChoices)
             ),
             setting(
+              playForcedAction(),
+              radios(form("behavior.playForcedAction"), playForcedActionChoices)
+            ),
+            setting(
               castleByMovingTheKingTwoSquaresOrOntoTheRook(),
               radios(form("behavior.rookCastle"), translatedRookCastleChoices)
             ),

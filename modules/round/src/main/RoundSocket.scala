@@ -104,6 +104,7 @@ final class RoundSocket(
         case "rematch-no"             => tellRound(id.gameId, RematchNo(id.playerId.value))
         case "takeback-yes"           => tellRound(id.gameId, TakebackYes(id.playerId))
         case "takeback-no"            => tellRound(id.gameId, TakebackNo(id.playerId))
+        case "undo"                   => tellRound(id.gameId, Undo(id.playerId))
         case "draw-yes"               => tellRound(id.gameId, DrawYes(id.playerId))
         case "draw-no"                => tellRound(id.gameId, DrawNo(id.playerId))
         case "draw-claim"             => tellRound(id.gameId, DrawClaim(id.playerId))
@@ -296,7 +297,7 @@ object RoundSocket {
             raw.get(6) {
               case Array(fullId, gfS, uciS, blurS, lagS, mtS) => {
                 val gf = GameFamily(gfS.toInt)
-                Uci(gf.gameLogic, gf, uciS) map { uci =>
+                Uci(gf.gameLogic, gf, uciS).map { uci =>
                   PlayerMove(
                     FullId(fullId),
                     uci,

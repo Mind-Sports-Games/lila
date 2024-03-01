@@ -53,7 +53,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             _,
             Mate,
             GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
-            GameLogic.Go()
+            GameLogic.Go() | GameLogic.Backgammon()
           ) =>
         s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate | PerpetualCheck, _) =>
@@ -66,6 +66,9 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (Some(w), _, UnknownFinish, _)              => s"${playerText(w)} won"
       case (_, _, Draw | Stalemate | UnknownFinish, _) => "Game is a draw"
       case (_, _, Aborted, _)                          => "Game has been aborted"
+      case (Some(w), _, SingleWin, _)                  => s"${playerText(w)} won"
+      case (Some(w), _, GammonWin, _)                  => s"${playerText(w)} won by gammon"
+      case (Some(w), _, BackgammonWin, _)              => s"${playerText(w)} won by backgammon"
       case (_, _, VariantEnd, _)                       => VariantKeys.variantTitle(game.variant)
       case _                                           => "Game is still being played"
     }
@@ -171,7 +174,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Mate =>
         game.variant.gameLogic match {
           case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
-              GameLogic.Go() =>
+              GameLogic.Go() | GameLogic.Backgammon() =>
             trans.checkmate.txt()
           case _ => ""
         }
@@ -201,6 +204,30 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         val playerIndex = game.loser.fold(PlayerIndex.p1)(_.playerIndex).name.capitalize
         s"$playerIndex didn't move"
       case S.Cheat => trans.cheatDetected.txt()
+      case S.SingleWin =>
+        game.variant match {
+          case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
+            trans.backgammonSingleWin.txt()
+          case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
+            trans.backgammonSingleWin.txt()
+          case _ => trans.variantEnding.txt()
+        }
+      case S.GammonWin =>
+        game.variant match {
+          case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
+            trans.backgammonGammonWin.txt()
+          case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
+            trans.backgammonGammonWin.txt()
+          case _ => trans.variantEnding.txt()
+        }
+      case S.BackgammonWin =>
+        game.variant match {
+          case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
+            trans.backgammonBackgammonWin.txt()
+          case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
+            trans.backgammonBackgammonWin.txt()
+          case _ => trans.variantEnding.txt()
+        }
       case S.VariantEnd =>
         game.variant match {
           case Variant.Chess(strategygames.chess.variant.KingOfTheHill)      => trans.kingInTheCenter.txt()
@@ -223,6 +250,10 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
           case Variant.Go(strategygames.go.variant.Go19x19) =>
             if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
+          case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
+            trans.gameFinished.txt()
+          case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
+            trans.gameFinished.txt()
           case _ => trans.variantEnding.txt()
         }
       case _ => ""

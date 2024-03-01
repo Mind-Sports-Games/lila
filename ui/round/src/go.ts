@@ -2,7 +2,6 @@ import * as util from 'chessground/util';
 import * as cg from 'chessground/types';
 import RoundController from './ctrl';
 
-//todo this would be faster if we just passed in the captures and removed them from chessground
 export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
   const diff: cg.PiecesDiff = new Map();
   const boardFen = newFen.split(' ')[0];

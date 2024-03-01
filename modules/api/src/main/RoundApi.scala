@@ -262,7 +262,7 @@ final private[api] class RoundApi(
         .add("berserkable" -> v.tour.isStarted.option(v.tour.berserkable))
         // mobile app API BC / should use game.expiration instead
         .add("nbSecondsForFirstMove" -> v.tour.isStarted.option {
-          pov.game.timeForFirstMove.toSeconds
+          pov.game.timeForFirstTurn.toSeconds
         })
         .add("ranks" -> v.ranks.map { r =>
           Json.obj(

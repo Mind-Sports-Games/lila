@@ -1,5 +1,11 @@
 import * as cg from 'chessground/types';
-import { oppositeOrientation, oppositeOrientationForLOA, orientationForLOA } from 'chessground/util';
+import {
+  oppositeOrientation,
+  oppositeOrientationForLOA,
+  orientationForLOA,
+  oppositeOrientationForBackgammon,
+  orientationForBackgammon,
+} from 'chessground/util';
 import * as stratUtils from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
@@ -241,6 +247,9 @@ export default class AnalyseCtrl {
     if (this.data.game.variant.key === 'linesOfAction' || this.data.game.variant.key === 'scrambledEggs') {
       const c = this.data.player.playerIndex;
       return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
+    } else if (this.data.game.variant.key === 'backgammon' || this.data.game.variant.key === 'nackgammon') {
+      const c = this.data.player.playerIndex;
+      return this.flipped ? oppositeOrientationForBackgammon(c) : orientationForBackgammon(c);
     } else if (this.data.game.variant.key === 'racingKings') {
       return 'p1';
     } else {

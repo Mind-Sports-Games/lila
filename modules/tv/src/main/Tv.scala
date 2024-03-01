@@ -94,6 +94,7 @@ object Tv {
   import strategygames.samurai.{ variant => MSV }
   import strategygames.togyzkumalak.{ variant => MTV }
   import strategygames.go.{ variant => GV }
+  import strategygames.backgammon.{ variant => BV }
   import strategygames.{ Speed => S, GameFamily }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
@@ -233,6 +234,15 @@ object Tv {
           ),
           familyChannel = true,
           gameFamily = "go"
+        )
+    case object BackgammonFamily
+        extends Channel(
+          name = s"All ${GameGroup(10).name}",
+          icon = BV.Backgammon.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(anyVariant(GameGroup(10).variants), noBot),
+          familyChannel = true,
+          gameFamily = "backgammon"
         )
     case object Bullet
         extends Channel(
@@ -599,6 +609,24 @@ object Tv {
           familyChannel = false,
           gameFamily = "go"
         )
+    case object Backgammon
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(BV.Backgammon)),
+          icon = BV.Backgammon.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(BV.Backgammon)), noBot),
+          familyChannel = false,
+          gameFamily = "backgammon"
+        )
+    case object Nackgammon
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(BV.Nackgammon)),
+          icon = BV.Nackgammon.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(BV.Nackgammon)), noBot),
+          familyChannel = false,
+          gameFamily = "backgammon"
+        )
     case object Bot
         extends Channel(
           name = "Bot",
@@ -668,6 +696,9 @@ object Tv {
       Go19x19,
       Go13x13,
       Go9x9,
+      BackgammonFamily,
+      Backgammon,
+      Nackgammon,
       Bot,
       Computer
     )

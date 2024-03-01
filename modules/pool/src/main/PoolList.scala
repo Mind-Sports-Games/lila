@@ -9,7 +9,7 @@ object PoolList {
   import PoolConfig._
 
   val all: List[PoolConfig] = List(
-    PoolConfig(1 ++ 0, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
+    //PoolConfig(1 ++ 0, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(
       3 ++ 2,
@@ -35,7 +35,12 @@ object PoolList {
       Wave(22 seconds, 30 players),
       Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak)
     ),
-    PoolConfig(5 ++ 3, Wave(22 seconds, 30 players), Variant.Go(strategygames.go.variant.Go19x19))
+    PoolConfig(5 ++ 3, Wave(22 seconds, 30 players), Variant.Go(strategygames.go.variant.Go19x19)),
+    PoolConfig(
+      strategygames.Clock.SimpleDelayConfig(2 * 60, 12),
+      Wave(22 seconds, 30 players),
+      Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
+    )
   )
 
   val clockStringSet: Set[String] = all.view.map(_.clock.show) to Set

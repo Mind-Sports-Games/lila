@@ -17,6 +17,7 @@ object ValidFen {
       case FEN.FairySF(_)      => GameLogic.FairySF()
       case FEN.Samurai(_)      => GameLogic.Samurai()
       case FEN.Togyzkumalak(_) => GameLogic.Togyzkumalak()
+      case FEN.Backgammon(_)   => GameLogic.Backgammon()
       case FEN.Go(_)           => GameLogic.Go()
     }
     for {

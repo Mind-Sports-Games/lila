@@ -7,7 +7,7 @@ import { h, VNode } from 'snabbdom';
 import { plyStep } from '../round';
 import { finished } from 'game/status';
 import { Position, MaterialDiff, MaterialDiffSide, CheckCount } from '../interfaces';
-import { read as fenRead } from 'chessground/fen';
+import { read as fenRead, readPocket as pocketRead } from 'chessground/fen';
 import * as cg from 'chessground/types';
 import { render as keyboardMove } from '../keyboardMove';
 import { render as renderGround } from '../ground';
@@ -80,6 +80,11 @@ function renderPlayerScore(
       },
       children
     );
+  } else if (variantKey === 'backgammon' || variantKey === 'nackgammon') {
+    for (let i = 0; i < score; i++) {
+      children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
+    }
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else {
     const pieceClass =
       variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
@@ -168,16 +173,28 @@ export function main(ctrl: RoundController): VNode {
         }
         break;
       }
-      // case 'togyzkumalak': {
-      // //togy uses game history to store the score while playing (its also in the full fen)
-      // const playerScore = d.player.score ? d.player.score : 0;
-      // const opponentScore = d.opponent.score ? d.opponent.score : 0;
-      // const p1Score = d.player.playerIndex === 'p1' ? playerScore : opponentScore;
-      // const p2Score = d.player.playerIndex === 'p2' ? playerScore : opponentScore;
-      // topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-      // bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
-      // break;
-      // }
+      case 'nackgammon':
+      case 'backgammon': {
+        const startingNumberOfPieces = 15;
+        const fen = plyStep(ctrl.data, ctrl.ply).fen;
+        const pieces = cgState ? cgState.pieces : fenRead(fen, boardSize, variantKey);
+        const pocketPieces = pocketRead(fen, variantKey);
+
+        const p1PiecesOffBoard: number =
+          fen.split(' ').length > 5
+            ? util.getBackgammonScoreFromFen(fen, 'p1')
+            : startingNumberOfPieces - util.getBackgammonScoreFromPieces(pieces, pocketPieces, 'p1');
+        const p2PiecesOffBoard: number =
+          fen.split(' ').length > 5
+            ? util.getBackgammonScoreFromFen(fen, 'p2')
+            : startingNumberOfPieces - util.getBackgammonScoreFromPieces(pieces, pocketPieces, 'p2');
+
+        const p1Score = p1PiecesOffBoard;
+        const p2Score = p2PiecesOffBoard;
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        break;
+      }
       default: {
         break;
       }
@@ -215,8 +232,8 @@ export function main(ctrl: RoundController): VNode {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
-  //Togyzkumalak board always has coodinates on the inside
-  if (['togyzkumalak'].includes(variantKey)) {
+  //Togyzkumalak and backgammon board always has coodinates on the inside
+  if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-out').addClass('coords-in');
     }
@@ -233,6 +250,8 @@ export function main(ctrl: RoundController): VNode {
     'go9x9',
     'go13x13',
     'go19x19',
+    'backgammon',
+    'nackgammon',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

@@ -15,11 +15,14 @@ import strategygames.{
   P2,
   Pass => StratPass,
   Player => PlayerIndex,
+  Lift => StratLift,
+  EndTurn => StratEndTurn,
+  SelectSquares => StratSelectSquares,
+  DiceRoll => StratDiceRoll,
   PocketData,
   Pos,
   PromotableRole,
   Role,
-  SelectSquares => StratSelectSquares,
   Situation,
   Status
 }
@@ -59,11 +62,16 @@ object Event {
         threefold: Boolean,
         perpetualWarning: Boolean,
         takebackable: Boolean,
+        canOnlyRollDice: Boolean,
+        canEndTurn: Boolean,
+        canUndo: Boolean,
         state: State,
         clock: Option[ClockEvent],
         possibleMoves: Map[Pos, List[Pos]],
         possibleDrops: Option[List[Pos]],
         possibleDropsByRole: Option[Map[Role, List[Pos]]],
+        possibleLifts: Option[List[Pos]],
+        forcedAction: Option[String],
         pocketData: Option[PocketData],
         couldNextActionEndTurn: Option[Boolean] = None,
         captLen: Option[Int] = None
@@ -77,6 +85,7 @@ object Event {
           "captLen"             -> ~captLen,
           "gf"                  -> gf.id,
           "dropsByRole"         -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty)),
+          "lifts"               -> possibleLifts.map { squares => JsString(squares.map(_.key).mkString) },
           "multiActionMetaData" -> couldNextActionEndTurn.map(b => Json.obj("couldNextActionEndTurn" -> b))
         )
         .add("clock" -> clock.map(_.data))
@@ -88,10 +97,14 @@ object Event {
         .add("takebackable" -> takebackable)
         .add("wDraw" -> state.p1OffersDraw)
         .add("bDraw" -> state.p2OffersDraw)
+        .add("canOnlyRollDice" -> canOnlyRollDice)
+        .add("canEndTurn" -> canEndTurn)
+        .add("canUndo" -> canUndo)
         .add("crazyhouse" -> pocketData)
         .add("drops" -> possibleDrops.map { squares =>
           JsString(squares.map(_.key).mkString)
         })
+        .add("forcedAction" -> forcedAction)
     }
   }
 
@@ -108,11 +121,16 @@ object Event {
       enpassant: Option[Enpassant],
       castle: Option[Castling],
       takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String],
       pocketData: Option[PocketData],
       couldNextActionEndTurn: Option[Boolean],
       captLen: Option[Int]
@@ -126,11 +144,16 @@ object Event {
         threefold,
         perpetualWarning,
         takebackable,
+        canOnlyRollDice: Boolean,
+        canEndTurn: Boolean,
+        canUndo: Boolean,
         state,
         clock,
         possibleMoves,
         possibleDrops,
         possibleDropsByRole,
+        possibleLifts,
+        forcedAction,
         pocketData,
         couldNextActionEndTurn,
         captLen
@@ -164,6 +187,7 @@ object Event {
           case StratMove.FairySF(move)      => strategygames.fairysf.format.pgn.Dumper(move)
           case StratMove.Samurai(move)      => strategygames.samurai.format.pgn.Dumper(move)
           case StratMove.Togyzkumalak(move) => strategygames.togyzkumalak.format.pgn.Dumper(move)
+          case StratMove.Backgammon(move)   => strategygames.backgammon.format.pgn.Dumper(move)
         },
         fen =
           if (
@@ -178,7 +202,7 @@ object Event {
             }
           else
             Forsyth
-              .exportBoard(situation.board.variant.gameLogic, situation.board),
+              .boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -190,6 +214,9 @@ object Event {
           Castling(king, rook, move.player)
         },
         takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
         state = state,
         clock = clock,
         possibleMoves = (situation, move.dest) match {
@@ -210,11 +237,19 @@ object Event {
         },
         possibleDrops = situation.drops,
         possibleDropsByRole = situation.dropsByRole,
+        possibleLifts = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
         pocketData = pocketData,
         // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
           case m: StratMove => m.autoEndTurn
           case d: StratDrop => d.autoEndTurn
+          case l: StratLift => l.autoEndTurn
           case _            => true
         }),
         captLen = (situation, move.dest) match {
@@ -238,12 +273,17 @@ object Event {
       threefold: Boolean,
       perpetualWarning: Boolean,
       takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String],
       couldNextActionEndTurn: Option[Boolean]
   ) extends Event {
     def typ             = "drop"
@@ -255,11 +295,16 @@ object Event {
         threefold,
         perpetualWarning,
         takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
         state,
         clock,
         possibleMoves,
         possibleDrops,
         possibleDropsByRole,
+        possibleLifts,
+        forcedAction,
         pocketData,
         couldNextActionEndTurn
       ) {
@@ -284,27 +329,233 @@ object Event {
         role = drop.piece.role,
         pos = drop.pos,
         san = drop match {
-          case StratDrop.Chess(drop)   => strategygames.chess.format.pgn.Dumper(drop)
-          case StratDrop.FairySF(drop) => strategygames.fairysf.format.pgn.Dumper(drop)
-          case StratDrop.Go(drop)      => strategygames.go.format.pgn.Dumper(drop)
+          case StratDrop.Chess(drop)      => strategygames.chess.format.pgn.Dumper(drop)
+          case StratDrop.FairySF(drop)    => strategygames.fairysf.format.pgn.Dumper(drop)
+          case StratDrop.Go(drop)         => strategygames.go.format.pgn.Dumper(drop)
+          case StratDrop.Backgammon(drop) => strategygames.backgammon.format.pgn.Dumper(drop)
         },
-        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
         takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
         possibleDropsByRole = situation.dropsByRole,
+        possibleLifts = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
         pocketData = pocketData,
         // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
           case m: StratMove => m.autoEndTurn
           case d: StratDrop => d.autoEndTurn
+          case l: StratLift => l.autoEndTurn
           case _            => true
         })
+      )
+  }
+
+  case class Lift(
+      gf: GameFamily,
+      pos: Pos,
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String],
+      couldNextActionEndTurn: Option[Boolean]
+  ) extends Event {
+    def typ = "lift"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        possibleLifts,
+        forcedAction,
+        pocketData,
+        couldNextActionEndTurn
+      ) {
+        Json.obj(
+          "uci" -> s"^${pos.key}",
+          "san" -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+  object Lift {
+    def apply(
+        lift: StratLift,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): Lift =
+      Lift(
+        gf = situation.board.variant.gameFamily,
+        pos = lift.pos,
+        san = s"^${lift.pos.key}",
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        possibleLifts = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
+        pocketData = pocketData,
+        //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
+        couldNextActionEndTurn = situation.actions.headOption.map(_ match {
+          case m: StratMove => m.autoEndTurn
+          case d: StratDrop => d.autoEndTurn
+          case l: StratLift => l.autoEndTurn
+          case _            => true
+        })
+      )
+  }
+
+  case class EndTurn(
+      gf: GameFamily,
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String]
+  ) extends Event {
+    def typ = "endturn"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        possibleLifts,
+        forcedAction,
+        pocketData
+      ) {
+        Json.obj(
+          "uci" -> "endturn",
+          "san" -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+
+  object EndTurn {
+    def apply(
+        endTurn: StratEndTurn,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): EndTurn =
+      EndTurn(
+        gf = situation.board.variant.gameFamily,
+        san = "endturn",
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        possibleLifts = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
+        pocketData = pocketData
       )
   }
 
@@ -319,12 +570,17 @@ object Event {
       threefold: Boolean,
       perpetualWarning: Boolean,
       takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
-      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String]
   ) extends Event {
     def typ             = "pass"
     def data            =
@@ -335,11 +591,16 @@ object Event {
         threefold,
         perpetualWarning,
         takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
         state,
         clock,
         possibleMoves,
         possibleDrops,
         possibleDropsByRole,
+        possibleLifts,
+        forcedAction,
         pocketData
       ) {
         Json.obj(
@@ -370,16 +631,26 @@ object Event {
           case _                 => false
         },
         san = "pass",
-        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
         takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
         possibleDropsByRole = situation.dropsByRole,
+        possibleLifts = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
         pocketData = pocketData
       )
   }
@@ -393,12 +664,17 @@ object Event {
       threefold: Boolean,
       perpetualWarning: Boolean,
       takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
       state: State,
       clock: Option[ClockEvent],
       possibleMoves: Map[Pos, List[Pos]],
       pocketData: Option[PocketData],
       possibleDrops: Option[List[Pos]],
-      possibleDropsByRole: Option[Map[Role, List[Pos]]]
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String]
   ) extends Event {
     def typ             = "selectSquares"
     def data            =
@@ -409,11 +685,16 @@ object Event {
         threefold,
         perpetualWarning,
         takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
         state,
         clock,
         possibleMoves,
         possibleDrops,
         possibleDropsByRole,
+        possibleLifts,
+        forcedAction,
         pocketData
       ) {
         Json.obj(
@@ -437,16 +718,120 @@ object Event {
         gf = situation.board.variant.gameFamily,
         squares = ss.squares,
         san = s"ss:${ss.squares.mkString(",")}",
-        fen = Forsyth.exportBoard(situation.board.variant.gameLogic, situation.board),
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
         takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
         state = state,
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
         possibleDropsByRole = situation.dropsByRole,
+        possibleLifts = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
+        pocketData = pocketData
+      )
+  }
+
+  case class DiceRoll(
+      gf: GameFamily,
+      dice: List[Int],
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String]
+  ) extends Event {
+    def typ = "diceroll"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        possibleLifts,
+        forcedAction,
+        pocketData
+      ) {
+        Json.obj(
+          "uci" -> dice.mkString("/"),
+          "san" -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+  object DiceRoll {
+    def apply(
+        dr: StratDiceRoll,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): DiceRoll =
+      DiceRoll(
+        gf = situation.board.variant.gameFamily,
+        dice = dr.dice,
+        san = dr.dice.mkString("/"),
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        possibleLifts = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
+          situation.actions.head.toUci.uci
+        },
+>>>>>>> 34f3b35e955b3857036c54bbf4c14f8ebbab5dd3
         pocketData = pocketData
       )
   }
@@ -540,6 +925,7 @@ object Event {
       case Pos.Samurai(_)      => GameLogic.Samurai().id
       case Pos.Togyzkumalak(_) => GameLogic.Togyzkumalak().id
       case Pos.Go(_)           => GameLogic.Go().id
+      case Pos.Backgammon(_)   => GameLogic.Backgammon().id
     }
     def typ         = "promotion"
     def data        =

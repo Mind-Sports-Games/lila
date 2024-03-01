@@ -134,6 +134,21 @@ span.mini-game.variant-togyzkumalak.is2d {
   height: calc(100% / 19);
 }
 
+.variant-nackgammon square,
+.variant-backgammon square {
+  width: calc(100% / 15);
+  height: calc(100% * 6.5 / 15);
+  &.top {
+    margin-top: 6.66%;
+  }
+  &.left {
+    margin-left: 6.66%;
+  }
+  &.right {
+    margin-left: 13.33%;
+  }
+}
+
 $alternate-board-highlights: (
   'flipello-green': 'flipello',
   'flipello-green-marble': 'flipello',
@@ -843,6 +858,47 @@ square {
   height: calc(100% / 19);
 }
 
+.variant-nackgammon piece,
+.variant-backgammon piece {
+  width: calc(100% / 15);
+  height: calc(100% * 6.5 / 15);
+  &.top {
+    margin-top: 6.66%;
+  }
+  &.left {
+    margin-left: 6.66%;
+  }
+  &.right {
+    margin-left: 13.33%;
+  }
+}
+
+.variant-nackgammon,
+.variant-backgammon {
+  &.orientation-p1 piece.pocket,
+  .orientation-p1 piece.pocket {
+    &.p1 {
+      margin-top: 6%;
+      margin-left: calc(100% * 7 / 15);
+    }
+    &.p2 {
+      margin-top: 50.66%;
+      margin-left: calc(100% * 7 / 15);
+    }
+  }
+  &.orientation-p1vflip piece.pocket,
+  .orientation-p1vflip piece.pocket {
+    &.p1 {
+      margin-top: 50.66%;
+      margin-left: calc(100% * 7 / 15);
+    }
+    &.p2 {
+      margin-top: 6%;
+      margin-left: calc(100% * 7 / 15);
+    }
+  }
+}
+
 piece {
   position: absolute;
   top: 0;
@@ -928,6 +984,12 @@ piece {
   padding-bottom: calc(100% / 19);
 }
 
+.variant-nackgammon cg-helper,
+.variant-backgammon cg-helper {
+  width: calc(100% / 15);
+  padding-bottom: calc(100% * 6.5 / 15);
+}
+
 cg-helper {
   position: absolute;
   width: 12.5%;
@@ -989,6 +1051,12 @@ cg-helper {
 .variant-go19x19 cg-container {
   width: calc(100% * 19);
   height: calc(100% * 19);
+}
+
+.variant-nackgammon cg-container,
+.variant-backgammon cg-container {
+  width: calc(100% * 15);
+  height: calc(100% * 15 / 6.5);
 }
 
 cg-container {
@@ -1058,7 +1126,6 @@ cg-container .cg-custom-svgs svg {
   }
 }
 
-//TODO check fix?
 .swiss__board,
 .tour__featured {
   &.variant-togyzkumalak .cg-wrap {
@@ -1103,5 +1170,103 @@ cg-container .cg-custom-svgs svg {
   @include breakpoint($mq-col1-uniboard) {
     margin-top: 5px;
     margin-bottom: 5px;
+  }
+}
+
+.variant-nackgammon,
+.variant-backgammon {
+  &.orientation-p1,
+  .orientation-p1 {
+    cg-dice.p1 {
+      left: calc(100% * 8 / 15);
+    }
+    cg-dice.p2 {
+      left: calc(100% * 1 / 15);
+    }
+  }
+  &.orientation-p1vflip,
+  .orientation-p1vflip {
+    cg-dice.p1 {
+      left: calc(100% * 1 / 15);
+    }
+    cg-dice.p2 {
+      left: calc(100% * 8 / 15);
+    }
+  }
+  cg-dice {
+    width: calc(100% * 6 / 15);
+    top: 46.5%;
+    height: 7%;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    position: absolute;
+    pointer-events: none;
+    dice {
+      width: calc(100% * 15 * 7 / 600);
+      margin: 0vw 0.25vw;
+      &.unavailable {
+        opacity: 0.35;
+      }
+      &:first-child.available {
+        outline: thin solid green;
+      }
+    }
+    &.p1 {
+      dice {
+        &.one {
+          background: url(../images/board/backgammon/svg/dice/red1.svg);
+          background-size: cover;
+        }
+        &.two {
+          background: url(../images/board/backgammon/svg/dice/red2.svg);
+          background-size: cover;
+        }
+        &.three {
+          background: url(../images/board/backgammon/svg/dice/red3.svg);
+          background-size: cover;
+        }
+        &.four {
+          background: url(../images/board/backgammon/svg/dice/red4.svg);
+          background-size: cover;
+        }
+        &.five {
+          background: url(../images/board/backgammon/svg/dice/red5.svg);
+          background-size: cover;
+        }
+        &.six {
+          background: url(../images/board/backgammon/svg/dice/red6.svg);
+          background-size: cover;
+        }
+      }
+    }
+    &.p2 {
+      dice {
+        &.one {
+          background: url(../images/board/backgammon/svg/dice/cream1.svg);
+          background-size: cover;
+        }
+        &.two {
+          background: url(../images/board/backgammon/svg/dice/cream2.svg);
+          background-size: cover;
+        }
+        &.three {
+          background: url(../images/board/backgammon/svg/dice/cream3.svg);
+          background-size: cover;
+        }
+        &.four {
+          background: url(../images/board/backgammon/svg/dice/cream4.svg);
+          background-size: cover;
+        }
+        &.five {
+          background: url(../images/board/backgammon/svg/dice/cream5.svg);
+          background-size: cover;
+        }
+        &.six {
+          background: url(../images/board/backgammon/svg/dice/cream6.svg);
+          background-size: cover;
+        }
+      }
+    }
   }
 }
