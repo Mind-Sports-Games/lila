@@ -146,7 +146,7 @@ export default class EditorCtrl {
     //TODO: rework this function
     if (orientation === undefined) return 'p1';
     else if (orientation === 'p1' || orientation === 'p2') return orientation;
-    else return 'p2'; // TODO: this needs to be fixed for games other than LinesOfAction
+    else return 'p2'; // TODO: this needs to be fixed for games other than LinesOfAction and backgammon
   }
 
   setCastlingToggle(id: CastlingToggle, value: boolean): void {

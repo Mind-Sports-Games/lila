@@ -16,6 +16,7 @@ object Rewind {
     Tags(List(variantTag, fenTag).flatten)
   }
 
+  //takeback
   def apply(game: Game, initialFen: Option[FEN], rewindPly: Boolean): Validated[String, Progress] =
     (game.variant.gameLogic match {
       case GameLogic.Chess() | GameLogic.Draughts() =>
@@ -27,7 +28,8 @@ object Rewind {
             op = sans => Sans(sans.value.dropRight(1)),
             tags = createTags(initialFen, game)
           )
-      case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() | GameLogic.Go() =>
+      case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() | GameLogic.Go() |
+          GameLogic.Backgammon() =>
         Reader
           .replayResultFromActionStrs(
             game.variant.gameLogic,
@@ -64,6 +66,53 @@ object Rewind {
           BinaryFormat.plyTime.write(plyTimes.take(rewindedGame.plies))
         },
         loadClockHistory = _ => game.clockHistory.map(_.update(!playerIndex, _.dropRight(pliesRemoved))),
+        updatedAt = DateTime.now,
+        turnAt = DateTime.now //this is not the actual turn start time but closer than not change it.
+      )
+      Progress(game, newGame)
+    }
+
+  //always 1 ply
+  def undo(
+      game: Game,
+      initialFen: Option[FEN]
+  ): Validated[String, Progress] =
+    (game.variant.gameLogic match {
+      case GameLogic.Chess() | GameLogic.Draughts() =>
+        Reader
+          .replayResultFromActionStrsUsingSan(
+            game.variant.gameLogic,
+            actionStrs = game.actionStrs,
+            //this is ok as sans uses a flattened version of actionStrs safely
+            op = sans => Sans(sans.value.dropRight(1)),
+            tags = createTags(initialFen, game)
+          )
+      case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() | GameLogic.Go() |
+          GameLogic.Backgammon() =>
+        Reader
+          .replayResultFromActionStrs(
+            game.variant.gameLogic,
+            actionStrs = game.actionStrs,
+            op = actionStrs => {
+              if (actionStrs.takeRight(1).flatten.size <= 1)
+                //adding empty Vector enables actionStrs to tell that the previous turn was complete
+                actionStrs.dropRight(1) :+ Vector()
+              //rewindPly - keeps the same turn
+              else actionStrs.dropRight(1) :+ actionStrs.takeRight(1).flatten.dropRight(1)
+            },
+            tags = createTags(initialFen, game)
+          )
+    }).flatMap(_.valid) map { replay =>
+      val playerIndex  = replay.state.player
+      val rewindedGame = replay.state
+      val pliesRemoved = game.stratGame.plies - rewindedGame.plies
+      val newGame = game.copy(
+        stratGame = rewindedGame.copy(clock = game.clock),
+        binaryPlyTimes = game.binaryPlyTimes.map { binary =>
+          val plyTimes = BinaryFormat.plyTime.read(binary, game.plies)
+          BinaryFormat.plyTime.write(plyTimes.take(rewindedGame.plies))
+        },
+        loadClockHistory = _ => game.clockHistory.map(_.update(playerIndex, _.dropRight(pliesRemoved))),
         updatedAt = DateTime.now
       )
       Progress(game, newGame)

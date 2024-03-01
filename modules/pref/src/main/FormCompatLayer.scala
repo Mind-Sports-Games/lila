@@ -34,6 +34,7 @@ object FormCompatLayer {
           "submitMove",
           "confirmResign",
           "confirmPass",
+          "playForcedAction",
           "keyboardMove"
         )
       ) pipe

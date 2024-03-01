@@ -1,5 +1,11 @@
 import * as cg from 'chessground/types';
-import { oppositeOrientation, oppositeOrientationForLOA, orientationForLOA } from 'chessground/util';
+import {
+  oppositeOrientation,
+  oppositeOrientationForLOA,
+  orientationForLOA,
+  oppositeOrientationForBackgammon,
+  orientationForBackgammon,
+} from 'chessground/util';
 import * as stratUtils from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
@@ -239,6 +245,9 @@ export default class AnalyseCtrl {
     if (this.data.game.variant.key === 'linesOfAction' || this.data.game.variant.key === 'scrambledEggs') {
       const c = this.data.player.playerIndex;
       return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
+    } else if (this.data.game.variant.key === 'backgammon' || this.data.game.variant.key === 'nackgammon') {
+      const c = this.data.player.playerIndex;
+      return this.flipped ? oppositeOrientationForBackgammon(c) : orientationForBackgammon(c);
     } else if (this.data.game.variant.key === 'racingKings') {
       return 'p1';
     } else {
@@ -878,13 +887,15 @@ export default class AnalyseCtrl {
   }
 
   playUci(uci: Uci): void {
-    const move = parseUci(uci)!;
-    const to = makeSquare(move.to);
+    const move = parseUci(stratUtils.variantToRules(this.data.game.variant.key))(uci)!;
+    const to = makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.to);
     if (isNormal(move)) {
-      const piece = this.chessground.state.pieces.get(makeSquare(move.from));
+      const piece = this.chessground.state.pieces.get(
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from)
+      );
       const capture = this.chessground.state.pieces.get(to);
       this.sendMove(
-        makeSquare(move.from),
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
         to,
         capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
         move.promotion

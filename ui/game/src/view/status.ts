@@ -39,6 +39,12 @@ export default function status(ctrl: Ctrl): string {
       return noarg('cheatDetected');
     case 'perpetualCheck':
       return noarg('perpetualCheck');
+    case 'singleWin':
+      return noarg('backgammonSingleWin');
+    case 'gammonWin':
+      return noarg('backgammonGammonWin');
+    case 'backgammonWin':
+      return noarg('backgammonBackgammonWin');
     case 'variantEnd':
       switch (d.game.variant.key) {
         case 'kingOfTheHill':
@@ -74,6 +80,9 @@ export default function status(ctrl: Ctrl): string {
           } else {
             return noarg('gameFinished');
           }
+        case 'backgammon':
+        case 'nackgammon':
+          return noarg('gameFinished');
       }
       return noarg('variantEnding');
     case 'unknownFinish':

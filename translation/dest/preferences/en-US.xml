@@ -42,6 +42,7 @@
   <string name="correspondenceAndUnlimited">Correspondence and unlimited</string>
   <string name="confirmResignationAndDrawOffers">Confirm resignation and draw offers</string>
   <string name="confirmPassAction">Confirm pass action</string>
+  <string name="playForcedAction">Play Forced Actions (e.g. backgammon no-play option)</string>
   <string name="castleByMovingTheKingTwoSquaresOrOntoTheRook">Castling method</string>
   <string name="castleByMovingTwoSquares">Move king two squares</string>
   <string name="castleByMovingOntoTheRook">Move king onto rook</string>

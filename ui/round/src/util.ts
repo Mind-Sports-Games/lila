@@ -1,6 +1,6 @@
 import * as cg from 'chessground/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
-import { opposite, calculatePieceGroup } from 'chessground/util';
+import { opposite, calculatePieceGroup, backgammonPosDiff } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 
 function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
@@ -52,7 +52,8 @@ export const justIcon = (icon: string): VNodeData => ({
 
 // TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
-  if (!uci || uci == 'pass' || uci.substring(0, 3) == 'ss:') return undefined;
+  if (!uci || uci == 'pass' || uci == 'roll' || uci == 'endturn' || uci.includes('/') || uci.substring(0, 3) == 'ss:')
+    return undefined;
   const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
   return [pos[0], pos[1]] as cg.Key[];
@@ -76,7 +77,7 @@ export const bind = (eventName: string, f: (e: Event) => void, redraw?: Redraw, 
     );
   });
 
-export function parsePossibleMoves(dests?: EncodedDests): Dests {
+export function parsePossibleMoves(dests?: EncodedDests, activeDiceValue?: number): Dests {
   const dec = new Map();
   if (!dests) return dec;
   if (typeof dests == 'string')
@@ -85,7 +86,27 @@ export function parsePossibleMoves(dests?: EncodedDests): Dests {
       dec.set(pos[0], pos.slice(1));
     }
   else for (const k in dests) dec.set(k, dests[k].match(/[a-z][1-9][0-9]?/g) as cg.Key[]);
+
+  //order backgammon moves based on active dice value as single click takes first preference
+  if (activeDiceValue) {
+    const sorted = new Map();
+    dec.forEach((value: cg.Key[], key: cg.Key) => {
+      const newOrder = value.sort(
+        (a, b) =>
+          Math.abs(backgammonPosDiff(key, a) - activeDiceValue) - Math.abs(backgammonPosDiff(key, b) - activeDiceValue)
+      );
+      sorted.set(key, newOrder);
+    });
+    return sorted;
+  }
+
   return dec;
+}
+
+export function parsePossibleLifts(line?: string | null): cg.Key[] {
+  if (typeof line === 'undefined' || line === null) return [];
+  const pos = (line.match(/[a-z][1-9][0-9]?/g) as cg.Key[]) || [];
+  return pos;
 }
 
 // {p1: {'p-piece': 3 'q-piece': 1}, p2: {'b-piece': 2}}
@@ -154,6 +175,21 @@ export function getGoKomi(fen: string): number {
   return +fen.split(' ')[7] / 10.0;
 }
 
+export function getBackgammonScoreFromFen(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
+}
+
+export function getBackgammonScoreFromPieces(pieces: cg.Pieces, pocketPieces: cg.Piece[], playerIndex: string): number {
+  let score = 0;
+  for (const p of pieces.values()) {
+    score += +p.role.split('-')[0].substring(1) * (p.playerIndex === playerIndex ? 1 : 0);
+  }
+  for (const p of pocketPieces) {
+    score += +p.role.split('-')[0].substring(1) * (p.playerIndex === playerIndex ? 1 : 0);
+  }
+  return score;
+}
+
 export function goStonesToSelect(deadstones: cg.Key[], pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
   const stonesToSelect: cg.Key[] = [];
   if (deadstones.length > 0) {
@@ -198,7 +234,15 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisBoardVariants: VariantKey[] = ['monster', 'amazons', 'go9x9', 'go13x13', 'go19x19'];
+const noAnalysisBoardVariants: VariantKey[] = [
+  'monster',
+  'amazons',
+  'go9x9',
+  'go13x13',
+  'go19x19',
+  'backgammon',
+  'nackgammon',
+];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisBoardVariants.indexOf(variant) == -1;

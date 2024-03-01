@@ -31,6 +31,7 @@ import strategygames.fairysf
 import strategygames.samurai
 import strategygames.togyzkumalak
 import strategygames.go
+import strategygames.backgammon
 import strategygames.format.Uci
 import strategygames.format.FEN
 import strategygames.variant.Variant
@@ -43,6 +44,7 @@ import strategygames.togyzkumalak.variant.{
   Togyzkumalak => TogyzkumalakStandard
 }
 import strategygames.go.variant.{ Variant => GoVariant, Go19x19 => GoStandard }
+import strategygames.backgammon.variant.{ Variant => BackgammonVariant, Backgammon => BackgammonStandard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
@@ -117,8 +119,24 @@ object BSONHandlers {
                   p1 = Pocket(p1.map(_.role).map(Role.GoRole)),
                   p2 = Pocket(p2.map(_.role).map(Role.GoRole))
                 )
-              },
-              promoted = r.str("t").view.flatMap(go.Pos.piotr).to(Set)
+              }
+            )
+          )
+        case GameLogic.Backgammon() =>
+          PocketData.Backgammon(
+            backgammon.PocketData(
+              pockets = {
+                val (p1, p2) = {
+                  r.str("p")
+                    .view
+                    .flatMap(c => backgammon.Piece.fromChar(c))
+                    .to(List)
+                }.partition(_ is P1)
+                Pockets(
+                  p1 = Pocket(p1.map(_.role).map(Role.BackgammonRole)),
+                  p2 = Pocket(p2.map(_.role).map(Role.BackgammonRole))
+                )
+              }
             )
           )
         case _ => sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
@@ -126,16 +144,13 @@ object BSONHandlers {
 
     def writes(w: BSON.Writer, o: PocketData) =
       BSONDocument(
-        "l" -> (o match {
-          case PocketData.Chess(_)   => 0
-          case PocketData.FairySF(_) => 2
-          case PocketData.Go(_)      => 5
-          case _                     => sys.error("Pocket Data BSON Handler not implemented for GameLogic")
-        }),
+        "l" -> o.gameLogic.id,
+        //TODO Move this into SG
         "f" -> (o match {
-          case PocketData.Chess(_)    => 0
-          case PocketData.FairySF(pd) => pd.gameFamily.getOrElse(GameFamily.Shogi()).id
-          case PocketData.Go(_)       => 9
+          case PocketData.Chess(_)      => 0
+          case PocketData.FairySF(pd)   => pd.gameFamily.getOrElse(GameFamily.Shogi()).id
+          case PocketData.Go(_)         => 9
+          case PocketData.Backgammon(_) => 10
         }),
         "p" -> {
           o.pockets.p1.roles.map(_.forsyth.toUpper).mkString +
@@ -555,6 +570,57 @@ object BSONHandlers {
 
       }
 
+      def readBackgammonGame(r: BSON.Reader): (StratGame, Metadata) = {
+
+        val gameVariant = BackgammonVariant(r intD F.variant) | BackgammonStandard
+
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Backgammon(), r bytesD F.oldPgn, playedPlies)
+
+        def turnUcis(turnStr: Option[String]) =
+          turnStr.map(_.split(",").toList.flatMap(backgammon.format.Uci.apply)).getOrElse(List.empty)
+
+        val backgammonGame = StratGame.Backgammon(
+          backgammon.Game(
+            situation = backgammon.Situation(
+              backgammon.Board(
+                pieces = BinaryFormat.piece
+                  .readBackgammon(r bytes F.binaryPieces, gameVariant)
+                  .filterNot { case (_, posInfo) => posInfo._2 == 0 },
+                history = backgammon.History(
+                  lastTurn = turnUcis(r strO F.historyLastTurn),
+                  currentTurn = turnUcis(r strO F.historyCurrentTurn),
+                  //TODO: Is halfMoveClock even doing anything for backgammon?
+                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
+                    san.contains("x") || san.headOption.exists(_.isLower)
+                  ) atLeast 0,
+                  positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
+                  score = {
+                    val counts = r.intsD(F.score)
+                    Score(~counts.headOption, ~counts.lastOption)
+                  }
+                ),
+                variant = gameVariant,
+                pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
+                  case Some(PocketData.Backgammon(pd)) => Some(pd)
+                  case None                            => None
+                  case _                               => sys.error("non backgammon pocket data")
+                },
+                unusedDice = r.getO[List[Int]](F.unusedDice).getOrElse(List.empty)
+              ),
+              player = turnPlayerIndex
+            ),
+            actionStrs = actionStrs,
+            clock = clock,
+            plies = plies,
+            turnCount = turns,
+            startedAtPly = startedAtPly,
+            startedAtTurn = startedAtTurn
+          )
+        )
+
+        (backgammonGame, defaultMetaData)
+      }
+
       val libId = r intD F.lib
       val (stratGame, metadata) = libId match {
         case 0 => readChessGame(r)
@@ -563,6 +629,7 @@ object BSONHandlers {
         case 3 => readSamuraiGame(r)
         case 4 => readTogyzkumalakGame(r)
         case 5 => readGoGame(r)
+        case 6 => readBackgammonGame(r)
         case _ => sys.error("Invalid game in the database")
       }
 
@@ -579,6 +646,7 @@ object BSONHandlers {
         bookmarks = r intD F.bookmarks,
         createdAt = createdAt,
         updatedAt = r.dateD(F.updatedAt, createdAt),
+        turnAt = r.dateD(F.turnAt, createdAt),
         metadata = metadata
       )
     }
@@ -618,6 +686,7 @@ object BSONHandlers {
         F.bookmarks      -> w.intO(o.bookmarks),
         F.createdAt      -> w.date(o.createdAt),
         F.updatedAt      -> w.date(o.updatedAt),
+        F.turnAt         -> w.date(o.turnAt),
         F.source         -> o.metadata.source.map(_.id),
         F.pgnImport      -> o.metadata.pgnImport,
         F.tournamentId   -> o.metadata.tournamentId,
@@ -694,6 +763,21 @@ object BSONHandlers {
               F.pocketData          -> o.board.pocketData,
               F.selectedSquares     -> o.metadata.selectedSquares.map(BinaryFormat.pos.writeGo),
               F.deadStoneOfferState -> o.metadata.deadStoneOfferState.map(_.id)
+            )
+          case GameLogic.Backgammon() =>
+            $doc(
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
+              F.binaryPieces -> BinaryFormat.piece.writeBackgammon(o.board match {
+                case Board.Backgammon(board) => board.pieces
+                case _                       => sys.error("invalid backgammon board")
+              }),
+              F.positionHashes     -> o.history.positionHashes,
+              F.historyLastTurn    -> o.history.lastTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString,
+              F.pocketData         -> o.board.pocketData,
+              F.unusedDice         -> o.board.unusedDice.nonEmpty.option(o.board.unusedDice),
+              F.score              -> o.history.score.nonEmpty.option(o.history.score)
             )
           case _ => //chess or fail
             if (o.variant.key == "standard")

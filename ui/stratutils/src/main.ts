@@ -1,5 +1,6 @@
 import { piotr } from './piotr';
 import * as cg from 'chessground/types';
+import { Rules } from 'stratops/types';
 
 // TODO: For some reason we can't import this like:
 // import * from 'stratutils/promotion'
@@ -15,7 +16,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -78,6 +79,10 @@ export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey)
   return ['oware', 'togyzkumalak'].includes(key);
 }
 
+export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['backgammon', 'nackgammon'].includes(key);
+}
+
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
   return variantUsesUCINotation(key)
     ? 'uci'
@@ -91,6 +96,8 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
     ? 'dpg'
     : variantUsesMancalaNotation(key)
     ? 'man'
+    : variantUsesBackgammonNotation(key)
+    ? 'bkg'
     : 'san';
 }
 
@@ -110,6 +117,9 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
     case 'go13x13':
     case 'go19x19':
       return { playerIndex: turnPlayerIndex, role: 's-piece' };
+    case 'nackgammon':
+    case 'backgammon':
+      return { playerIndex: turnPlayerIndex, role: 's-piece' }; //needs to match role from readdropsbyrole and SG role
     default:
       return undefined;
   }
@@ -123,7 +133,81 @@ const noFishnetVariants: VariantKey[] = [
   'go9x9',
   'go13x13',
   'go19x19',
+  'backgammon',
+  'nackgammon',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
 }
+
+export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean): cg.Dice[] {
+  if (!['backgammon', 'nackgammon'].includes(variant)) return [];
+  if (fen.split(' ').length < 2) return [];
+  const unusedDice = fen
+    .split(' ')[1]
+    .replace('-', '')
+    .split('/')
+    .sort((a, b) => +b - +a);
+  const usedDice = fen.split(' ')[2].replace('-', '').split('/');
+  const dice = [];
+  for (const d of unusedDice) {
+    if (+d) dice.push({ value: +d, isAvailable: !canEndTurn ?? true });
+  }
+  for (const d of usedDice) {
+    if (+d) dice.push({ value: +d, isAvailable: false });
+  }
+  return dice;
+}
+
+export const variantToRules = (v: VariantKey): Rules => {
+  switch (v) {
+    case 'standard':
+      return 'chess';
+    case 'chess960':
+      return 'chess';
+    case 'antichess':
+      return 'antichess';
+    case 'fromPosition':
+      return 'chess';
+    case 'kingOfTheHill':
+      return 'kingofthehill';
+    case 'threeCheck':
+      return '3check';
+    case 'fiveCheck':
+      return '5check';
+    case 'atomic':
+      return 'atomic';
+    case 'horde':
+      return 'horde';
+    case 'racingKings':
+      return 'racingkings';
+    case 'crazyhouse':
+      return 'crazyhouse';
+    case 'noCastling':
+      return 'nocastling';
+    case 'linesOfAction':
+      return 'linesofaction';
+    case 'scrambledEggs':
+      return 'scrambledeggs';
+    case 'shogi':
+      return 'shogi';
+    case 'xiangqi':
+      return 'xiangqi';
+    case 'minishogi':
+      return 'minishogi';
+    case 'minixiangqi':
+      return 'minixiangqi';
+    case 'flipello':
+      return 'flipello';
+    case 'flipello10':
+      return 'flipello10';
+    case 'amazons':
+      return 'amazons';
+    case 'oware':
+      return 'oware';
+    case 'togyzkumalak':
+      return 'togyzkumalak';
+    default:
+      return 'chess';
+  }
+};

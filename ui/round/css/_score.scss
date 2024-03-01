@@ -42,6 +42,22 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
   font-size: 1.5em;
 }
 
+.variant-nackgammon .game-score::after,
+.variant-backgammon .game-score::after {
+  @extend %active, %box-radius;
+
+  content: attr(data-score);
+  top: 0;
+  right: 0;
+  height: fit-content;
+  margin-left: auto;
+  position: relative;
+  line-height: 0.9em;
+  padding: 3px 0.3em;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
 body.oware-light-wood .variant-oware .game-score {
   background: url(../images/board/oware/oware_light_wood_house.png);
   background-size: cover;
@@ -59,6 +75,18 @@ body.togyzkumalak-blue .variant-togyzkumalak .game-score {
 
 body.togyzkumalak-wood .variant-togyzkumalak .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
+  background-size: cover;
+}
+
+body.backgammon-classic .variant-nackgammon .game-score,
+body.backgammon-classic .variant-backgammon .game-score {
+  background: url(../images/board/backgammon/svg/backgammon_classic_house.svg);
+  background-size: cover;
+}
+
+body.backgammon-contemporary .variant-nackgammon .game-score,
+body.backgammon-contemporary .variant-backgammon .game-score {
+  background: url(../images/board/backgammon/svg/backgammon_contemporary_house.svg);
   background-size: cover;
 }
 
@@ -190,6 +218,63 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
     margin-top: -10em !important;
     margin-left: 10.1em !important;
     transform: rotate(270deg);
+  }
+
+  &-top {
+    grid-area: mat-top;
+    margin-top: 2.5em;
+  }
+
+  &-bottom {
+    grid-area: mat-bot;
+  }
+
+  @include breakpoint($mq-col1) {
+    &-top {
+      grid-area: pocket-top;
+      margin-bottom: 0;
+      margin-top: 0;
+      margin-left: 1%;
+    }
+
+    &-bottom {
+      grid-area: pocket-top;
+      margin-top: 0;
+      margin-left: 43%;
+    }
+
+    //todo how to only affect phone screen?
+    transform: scale(0.65); //to fit large scores on phone screen
+  }
+
+  @include breakpoint($mq-col2-uniboard) {
+    &-top {
+      margin-bottom: $block-gap;
+    }
+
+    &-bottom {
+      margin-top: $block-gap;
+    }
+  }
+}
+
+.variant-nackgammon .game-score,
+.variant-backgammon .game-score {
+  @extend %box-radius;
+  display: flex;
+  width: 18em;
+  height: 6em;
+  gap: 0.13em;
+  background-color: #aaa;
+
+  piece {
+    width: 1em !important;
+    height: 4.7em !important;
+    position: relative;
+    margin-top: 0.65em !important;
+    &.first {
+      margin-left: 0.65em;
+    }
   }
 
   &-top {

@@ -16,10 +16,19 @@ const renderBoardClasses = (board: Board): string =>
     ? `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameLogic}.is${board.boardSize.key}.${board.variantKey}.variant-${board.variantKey}`
     : `.swiss__board.mini-game.mini-game-${board.id}.mini-game--init.is2d.${board.gameFamily}.${board.variantKey}.variant-${board.variantKey}`;
 
+const orientation = (p: PlayerIndex, gl: string): string => {
+  switch (gl) {
+    case 'backgammon':
+      return p === 'p2' ? 'p1vflip' : 'p1';
+    default:
+      return p;
+  }
+};
+
 const renderBoardState = (board: Board): string =>
   board.gameLogic === 'draughts' && !!board.boardSize
     ? `${board.fen}|${board.boardSize.size[0]}x${board.boardSize.size[1]}|${board.orientation}|${board.lastMove}`
-    : `${board.fen}|${board.orientation}|${board.lastMove}`;
+    : `${board.fen}|${orientation(board.orientation, board.gameLogic)}|${board.lastMove}`;
 
 const renderBoard = (incomingBoard: Board): VNode => {
   const board =

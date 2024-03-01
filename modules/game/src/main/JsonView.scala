@@ -108,16 +108,7 @@ object JsonView {
   implicit val pocketWriter: OWrites[Pocket] = OWrites { v =>
     JsObject(
       Role
-        .storable(v.roles.headOption match {
-          case Some(r) =>
-            r match {
-              case Role.ChessRole(_)   => GameLogic.Chess()
-              case Role.FairySFRole(_) => GameLogic.FairySF()
-              case Role.GoRole(_)      => GameLogic.Go()
-              case _                   => sys.error("Pocket not implemented for GameLogic")
-            }
-          case None => GameLogic.Chess()
-        })
+        .storable(v.roles.headOption.map(_.gameLogic).getOrElse(GameLogic.Chess()))
         .flatMap { role =>
           Some(v.roles.count(role ==)).filter(0 <).map { count =>
             role.groundName -> JsNumber(count)
@@ -181,6 +172,14 @@ object JsonView {
           "lib"       -> v.gameLogic.id,
           "boardSize" -> goVariant.boardSize
         )
+      case Variant.Backgammon(backgammonVariant) =>
+        Json.obj(
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
+          "boardSize" -> backgammonVariant.boardSize
+        )
       case _ =>
         Json.obj(
           "key"   -> v.key,
@@ -221,6 +220,14 @@ object JsonView {
 
   implicit val boardSizeGoWriter: Writes[strategygames.go.Board.BoardSize] =
     Writes[strategygames.go.Board.BoardSize] { b =>
+      Json.obj(
+        "width"  -> b.width,
+        "height" -> b.height
+      )
+    }
+
+  implicit val boardSizeBackgammonWriter: Writes[strategygames.backgammon.Board.BoardSize] =
+    Writes[strategygames.backgammon.Board.BoardSize] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

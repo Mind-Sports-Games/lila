@@ -40,5 +40,7 @@ export const perf = {
     go9x9: '',
     go13x13: '',
     go19x19: '',
+    backgammon: '',
+    nackgammon: '',
   },
 };
