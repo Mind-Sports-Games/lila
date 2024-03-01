@@ -69,7 +69,7 @@ final private class StudyMaker(
         conceal = None
       )
     } yield {
-      Study.WithChapter(study withChapter chapter, chapter)
+      Study.WithChapter(study.withChapter(chapter), chapter)
     }
   } addEffect { swc =>
     chapterMaker.notifyChat(swc.study, pov.game, user.id)

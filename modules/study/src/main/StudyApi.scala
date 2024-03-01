@@ -35,7 +35,7 @@ final class StudyApi(
 
   import sequencer._
 
-  def byId = studyRepo byId _
+  def byId = studyRepo.byId(_)
 
   def byIds = studyRepo byOrderedIds _
 
