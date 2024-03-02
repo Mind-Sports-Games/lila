@@ -92,7 +92,7 @@ object jsI18n {
       loadAGameFromPgn,
       automatic,
       urlOfTheGame,
-      loadAGameFromXOrY,
+      loadAGameFromX,
       createChapter,
       configureLiveBroadcast,
       createStudy,
