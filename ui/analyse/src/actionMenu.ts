@@ -8,6 +8,7 @@ import AnalyseCtrl from './ctrl';
 import { cont as contRoute } from 'game/router';
 import { bind, dataIcon } from './util';
 import * as pgnExport from './pgnExport';
+import { isChess } from 'common/analysis';
 
 interface AutoplaySpeed {
   name: string;
@@ -164,7 +165,8 @@ export function view(ctrl: AnalyseCtrl): VNode {
     noarg = ctrl.trans.noarg,
     canContinue = !ctrl.ongoing && !ctrl.embed && d.game.variant.key === 'standard',
     ceval = ctrl.getCeval(),
-    mandatoryCeval = ctrl.mandatoryCeval();
+    mandatoryCeval = ctrl.mandatoryCeval(),
+    canStudyFromHere = isChess(d.game.variant.key);
 
   const tools: MaybeVNodes = [
     h('div.action-menu__tools', [
@@ -206,7 +208,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
             noarg('continueFromHere')
           )
         : null,
-      studyButton(ctrl),
+      canStudyFromHere ? studyButton(ctrl) : null,
     ]),
   ];
 
