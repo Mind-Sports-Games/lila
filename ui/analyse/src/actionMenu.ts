@@ -108,6 +108,8 @@ function hiddenInput(name: string, value: string) {
 }
 
 function studyButton(ctrl: AnalyseCtrl) {
+  const canStudyFromHere = isChess(ctrl.data.game.variant.key) || !ctrl.synthetic;
+  if (!canStudyFromHere) return;
   if (ctrl.study && ctrl.embed && !ctrl.ongoing)
     return h(
       'a.button.button-empty',
@@ -165,8 +167,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
     noarg = ctrl.trans.noarg,
     canContinue = !ctrl.ongoing && !ctrl.embed && d.game.variant.key === 'standard',
     ceval = ctrl.getCeval(),
-    mandatoryCeval = ctrl.mandatoryCeval(),
-    canStudyFromHere = isChess(d.game.variant.key);
+    mandatoryCeval = ctrl.mandatoryCeval();
 
   const tools: MaybeVNodes = [
     h('div.action-menu__tools', [
@@ -208,7 +209,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
             noarg('continueFromHere')
           )
         : null,
-      canStudyFromHere ? studyButton(ctrl) : null,
+      studyButton(ctrl),
     ]),
   ];
 
