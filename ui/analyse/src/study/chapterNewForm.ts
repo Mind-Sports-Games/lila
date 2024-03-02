@@ -157,7 +157,7 @@ function gametab(ctrl: StudyChapterNewFormCtrl): VNode {
       {
         attrs: { for: 'chapter-game' },
       },
-      trans('loadAGameFromXOrY', 'playstrategy.org', 'chessgames.com')
+      trans('loadAGameFromXOrY', 'playstrategy.org')
     ),
     h('textarea#chapter-game.form-control', {
       attrs: { placeholder: noarg('urlOfTheGame') },
