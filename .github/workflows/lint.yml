@@ -3,7 +3,7 @@ name: Lint code
 on:
   push:
     branches-ignore:
-      - 'l10n_master'
+      - 'l10n3_master'
   pull_request:
     paths-ignore:
       - 'translation/dest/**'
