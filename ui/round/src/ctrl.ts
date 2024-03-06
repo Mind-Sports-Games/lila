@@ -79,6 +79,7 @@ export default class RoundController {
   loading = false;
   loadingTimeout: number;
   redirecting = false;
+  areDiceDescending = true;
   transientMove: TransientMove;
   moveToSubmit?: SocketMove;
   dropToSubmit?: SocketDrop;
@@ -274,6 +275,9 @@ export default class RoundController {
   };
 
   private onSelectDice = (dice: cg.Dice[]) => {
+    if (this.data.dice === undefined || this.data.dice[0].value !== dice[0].value) {
+      this.areDiceDescending = !this.areDiceDescending;
+    }
     this.data.dice = dice;
     this.data.activeDiceValue = this.activeDiceValue(dice);
     if (this.data.activeDiceValue === undefined && this.isPlaying()) {
@@ -441,7 +445,7 @@ export default class RoundController {
   };
 
   activeDiceValue = (dice: cg.Dice[]): number | undefined => {
-    return dice && dice.length >= 2 && dice[0].isAvailable ? dice[0].value : undefined;
+    return dice && dice.filter(d => d.isAvailable).length > 0 ? dice.filter(d => d.isAvailable)[0].value : undefined;
   };
 
   isLate = () => this.replaying() && status.playing(this.data);
@@ -579,8 +583,9 @@ export default class RoundController {
     d.possibleLifts = activePlayerIndex ? o.lifts : undefined;
 
     //set the right data from all backgammon actions
+    this.areDiceDescending = activePlayerIndex ? this.areDiceDescending : true;
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
-    d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn);
+    d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
     d.activeDiceValue = this.activeDiceValue(d.dice);
     d.forcedAction = o.forcedAction;
 
