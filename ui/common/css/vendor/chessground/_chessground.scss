@@ -1203,67 +1203,18 @@ cg-container .cg-custom-svgs svg {
     position: absolute;
     pointer-events: none;
     dice {
+      @include breakpoint($mq-col1-uniboard) {
+        margin: 0vw 0.75vw;
+      }
       width: calc(100% * 15 * 7 / 600);
       margin: 0vw 0.25vw;
       &.unavailable {
         opacity: 0.35;
       }
     }
-    &.p1 {
-      dice {
-        &.one {
-          background: url(../images/board/backgammon/svg/dice/red1.svg);
-          background-size: cover;
-        }
-        &.two {
-          background: url(../images/board/backgammon/svg/dice/red2.svg);
-          background-size: cover;
-        }
-        &.three {
-          background: url(../images/board/backgammon/svg/dice/red3.svg);
-          background-size: cover;
-        }
-        &.four {
-          background: url(../images/board/backgammon/svg/dice/red4.svg);
-          background-size: cover;
-        }
-        &.five {
-          background: url(../images/board/backgammon/svg/dice/red5.svg);
-          background-size: cover;
-        }
-        &.six {
-          background: url(../images/board/backgammon/svg/dice/red6.svg);
-          background-size: cover;
-        }
-      }
-    }
-    &.p2 {
-      dice {
-        &.one {
-          background: url(../images/board/backgammon/svg/dice/cream1.svg);
-          background-size: cover;
-        }
-        &.two {
-          background: url(../images/board/backgammon/svg/dice/cream2.svg);
-          background-size: cover;
-        }
-        &.three {
-          background: url(../images/board/backgammon/svg/dice/cream3.svg);
-          background-size: cover;
-        }
-        &.four {
-          background: url(../images/board/backgammon/svg/dice/cream4.svg);
-          background-size: cover;
-        }
-        &.five {
-          background: url(../images/board/backgammon/svg/dice/cream5.svg);
-          background-size: cover;
-        }
-        &.six {
-          background: url(../images/board/backgammon/svg/dice/cream6.svg);
-          background-size: cover;
-        }
-      }
+    &.p2 dice,
+    &.p1 dice {
+      background-size: cover;
     }
   }
 }
