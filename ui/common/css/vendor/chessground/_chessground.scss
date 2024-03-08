@@ -1203,6 +1203,9 @@ cg-container .cg-custom-svgs svg {
     position: absolute;
     pointer-events: none;
     dice {
+      @include breakpoint($mq-col1-uniboard) {
+        margin: 0vw 0.75vw;
+      }
       width: calc(100% * 15 * 7 / 600);
       margin: 0vw 0.25vw;
       &.unavailable {
