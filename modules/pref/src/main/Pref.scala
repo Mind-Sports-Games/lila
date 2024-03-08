@@ -486,7 +486,7 @@ object Pref {
     submitMove = SubmitMove.CORRESPONDENCE_ONLY,
     confirmResign = ConfirmResign.YES,
     confirmPass = ConfirmPass.YES,
-    playForcedAction = PlayForcedAction.YES,
+    playForcedAction = PlayForcedAction.NO,
     insightShare = InsightShare.FRIENDS,
     keyboardMove = KeyboardMove.NO,
     zen = Zen.NO,
