@@ -183,7 +183,9 @@ export default class Setup {
             (vsPSBot && user == 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
-              (($goHandicapInput.val() as string) != '0' || ($goKomiInput.val() as string) != '75'));
+              (($goHandicapInput.val() as string) != '0' ||
+                (variantId[1] !== '1' && ($goKomiInput.val() as string) != '75') ||
+                (variantId[1] == '1' && ($goKomiInput.val() as string) != '55')));
         if (cantBeRated && rated) {
           $casual.trigger('click');
           return toggleButtons();
