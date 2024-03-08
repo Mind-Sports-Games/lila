@@ -29,7 +29,11 @@ object side {
         st.section(dataIcon := (tour.iconChar.toString))(
           div(
             p(
-              tour.clock.show,
+              a(
+                title := "Clock info",
+                href := s"${routes.Page.loneBookmark("clocks")}",
+                target := "_blank"
+              )(tour.clock.show),
               separator,
               if (tour.isMedley) {
                 views.html.game.bits.medleyLink
