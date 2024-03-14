@@ -79,6 +79,7 @@ export default class RoundController {
   loading = false;
   loadingTimeout: number;
   redirecting = false;
+  areDiceDescending = true;
   transientMove: TransientMove;
   moveToSubmit?: SocketMove;
   dropToSubmit?: SocketDrop;
@@ -199,6 +200,10 @@ export default class RoundController {
     this.sendLift(this.data.game.variant.key, dest);
   };
 
+  private onNewPiece = () => {
+    if (!['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) sound.move();
+  };
+
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
@@ -207,6 +212,7 @@ export default class RoundController {
         this.redraw();
       }
       if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
+        sound.move();
         backgammon.updateBoardFromDrop(this, key, this.data.player.playerIndex);
         cancelDropMode(this.chessground.state);
         this.redraw();
@@ -243,6 +249,7 @@ export default class RoundController {
       sound.capture();
     } else if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
       backgammon.updateBoardFromMove(this, orig, dest);
+      sound.move();
     } else sound.move();
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
   };
@@ -274,6 +281,9 @@ export default class RoundController {
   };
 
   private onSelectDice = (dice: cg.Dice[]) => {
+    if (this.data.dice === undefined || this.data.dice[0].value !== dice[0].value) {
+      this.areDiceDescending = !this.areDiceDescending;
+    }
     this.data.dice = dice;
     this.data.activeDiceValue = this.activeDiceValue(dice);
     if (this.data.activeDiceValue === undefined && this.isPlaying()) {
@@ -333,7 +343,7 @@ export default class RoundController {
     onUserNewPiece: this.onUserNewPiece,
     onUserLift: this.onUserLift,
     onMove: this.onMove,
-    onNewPiece: sound.move,
+    onNewPiece: this.onNewPiece,
     onPremove: this.onPremove,
     onCancelPremove: this.onCancelPremove,
     onPredrop: this.onPredrop,
@@ -420,10 +430,15 @@ export default class RoundController {
         cancelDropMode(this.chessground.state);
       }
     }
-    if (s.san && isForwardStep) {
-      if (s.san.includes('x')) sound.capture();
-      else sound.move();
-      if (/[+#]/.test(s.san)) sound.check();
+    if (isForwardStep) {
+      if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
+        //Too noisy if playing dice roll sounds during scrolling, therefore just use move sound
+        sound.move();
+      } else if (s.san) {
+        if (s.san.includes('x')) sound.capture();
+        else sound.move();
+        if (/[+#]/.test(s.san)) sound.check();
+      }
     }
     this.autoScroll();
     if (this.keyboardMove) this.keyboardMove.update(s);
@@ -441,7 +456,7 @@ export default class RoundController {
   };
 
   activeDiceValue = (dice: cg.Dice[]): number | undefined => {
-    return dice && dice.length >= 2 && dice[0].isAvailable ? dice[0].value : undefined;
+    return dice && dice.filter(d => d.isAvailable).length > 0 ? dice.filter(d => d.isAvailable)[0].value : undefined;
   };
 
   isLate = () => this.replaying() && status.playing(this.data);
@@ -579,8 +594,9 @@ export default class RoundController {
     d.possibleLifts = activePlayerIndex ? o.lifts : undefined;
 
     //set the right data from all backgammon actions
+    this.areDiceDescending = activePlayerIndex ? this.areDiceDescending : true;
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
-    d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn);
+    d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
     d.activeDiceValue = this.activeDiceValue(d.dice);
     d.forcedAction = o.forcedAction;
 
@@ -781,6 +797,7 @@ export default class RoundController {
   }
 
   sendRollDice = (variant: VariantKey): void => {
+    sound.diceroll();
     const roll: SocketDoRoll = {
       variant: variant,
     };
@@ -790,6 +807,7 @@ export default class RoundController {
   };
 
   sendLift = (variant: VariantKey, key: cg.Key): void => {
+    sound.move();
     const lift: SocketLift = {
       pos: key,
       variant: variant,
@@ -804,6 +822,7 @@ export default class RoundController {
   };
 
   sendEndTurn = (variant: VariantKey): void => {
+    if (['backgammon', 'nackgammon'].includes(variant)) sound.dicepickup();
     const endTurn: SocketEndTurn = {
       variant: variant,
     };
@@ -1212,6 +1231,7 @@ export default class RoundController {
             { premove: false }
           );
           this.chessground.set({ viewOnly: false });
+          sound.move();
         }, delayMillis);
       }
     }
