@@ -31,7 +31,11 @@ object side {
         st.section(dataIcon := (if (s.isMedley) "5" else s.perfType.iconChar.toString))(
           div(
             p(
-              s.clock.show,
+              a(
+                title := "Clock info",
+                href := s"${routes.Page.loneBookmark("clocks")}",
+                target := "_blank"
+              )(s.clock.show),
               separator,
               if (s.isMedley) {
                 views.html.game.bits.medleyLink

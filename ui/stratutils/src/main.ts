@@ -140,7 +140,7 @@ export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
 }
 
-export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean): cg.Dice[] {
+export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean, isDescending?: boolean): cg.Dice[] {
   if (!['backgammon', 'nackgammon'].includes(variant)) return [];
   if (fen.split(' ').length < 2) return [];
   const unusedDice = fen
@@ -156,7 +156,10 @@ export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean)
   for (const d of usedDice) {
     if (+d) dice.push({ value: +d, isAvailable: false });
   }
-  return dice;
+  if (isDescending !== undefined) {
+    if (isDescending) return dice.sort((a, b) => +b.value - +a.value);
+    else return dice.sort((a, b) => +a.value - +b.value);
+  } else return dice.sort((a, b) => +b.value - +a.value);
 }
 
 export const variantToRules = (v: VariantKey): Rules => {

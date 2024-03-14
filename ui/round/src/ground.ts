@@ -24,7 +24,9 @@ export function makeConfig(ctrl: RoundController): Config {
     playing = ctrl.isPlaying(),
     variantKey = data.game.variant.key as cg.Variant,
     turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount),
-    dice = data.dice ? data.dice : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn);
+    dice = data.dice
+      ? data.dice
+      : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
