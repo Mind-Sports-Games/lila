@@ -89,7 +89,7 @@ export default class RoundController {
   passConfirm?: Timeout = undefined;
   selectSquaresConfirm?: Timeout = undefined;
   // will be replaced by view layer
-  autoScroll: () => void = () => { };
+  autoScroll: () => void = () => {};
   challengeRematched = false;
   justDropped?: cg.Role;
   justCaptured?: cg.Piece;
@@ -595,10 +595,10 @@ export default class RoundController {
       if (d.clock) {
         d.expirationOnPaused = o.canSelectSquares
           ? {
-            idleMillis: 0,
-            updatedAt: Date.now(),
-            millisToMove: d.pauseSecs ? d.pauseSecs : 60000,
-          }
+              idleMillis: 0,
+              updatedAt: Date.now(),
+              millisToMove: d.pauseSecs ? d.pauseSecs : 60000,
+            }
           : undefined;
         setTimeout(this.showExpiration, 350);
       }
