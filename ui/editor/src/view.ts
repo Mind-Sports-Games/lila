@@ -3,7 +3,7 @@ import { MouchEvent, NumberPair } from 'chessground/types';
 import { dragNewPiece } from 'chessground/drag';
 import { eventPosition, opposite } from 'chessground/util';
 import { Rules } from 'stratops/types';
-import { parseFen, EMPTY_FEN } from 'stratops/fen';
+import { parseFen } from 'stratops/fen';
 import modal from 'common/modal';
 import EditorCtrl from './ctrl';
 import chessground from './chessground';
@@ -101,6 +101,18 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
       pos.eco ? `${pos.eco} ${pos.name}` : pos.name
     );
   };
+  const buttonStart = (icon?: string) =>
+    h(
+      `a.button.button-empty${icon ? '.text' : ''}`,
+      { on: { click: ctrl.startPosition }, attrs: icon ? { 'data-icon': icon } : {} },
+      ctrl.trans.noarg('startPosition')
+    );
+  const buttonClear = (icon?: string) =>
+    h(
+      `a.button.button-empty${icon ? '.text' : ''}`,
+      { on: { click: ctrl.clearBoard }, attrs: icon ? { 'data-icon': icon } : {} },
+      ctrl.trans.noarg('clearBoard')
+    );
   return h('div.board-editor__tools', [
     ...(ctrl.cfg.embed || !ctrl.cfg.positions
       ? []
@@ -178,32 +190,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
       ]),
     ]),
     ...(ctrl.cfg.embed
-      ? [
-          h('div.actions', [
-            h(
-              'a.button.button-empty',
-              {
-                on: {
-                  click() {
-                    ctrl.startPosition();
-                  },
-                },
-              },
-              ctrl.trans.noarg('startPosition')
-            ),
-            h(
-              'a.button.button-empty',
-              {
-                on: {
-                  click() {
-                    ctrl.clearBoard();
-                  },
-                },
-              },
-              ctrl.trans.noarg('clearBoard')
-            ),
-          ]),
-        ]
+      ? [h('div.actions', [buttonStart(), buttonClear()])]
       : [
           h('div', [
             h(
@@ -220,18 +207,8 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
             ),
           ]),
           h('div.actions', [
-            h(
-              'a.button.button-empty.text',
-              {
-                attrs: { 'data-icon': 'q' },
-                on: {
-                  click() {
-                    ctrl.setFen(EMPTY_FEN);
-                  },
-                },
-              },
-              ctrl.trans.noarg('clearBoard')
-            ),
+            buttonStart('P'),
+            buttonClear('q'),
             h(
               'a.button.button-empty.text',
               {
@@ -488,6 +465,8 @@ function convertRulesToCGVariant(rule: Rules): string {
       return 'racingKings';
     case '3check':
       return 'threeCheck';
+    case '5check':
+      return 'fiveCheck';
     default:
       return rule;
   }

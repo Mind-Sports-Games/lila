@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
+import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
 import {
@@ -11,7 +12,6 @@ import {
   getPlayerScore,
   getMancalaScore,
   getGoScore,
-  variantToRules,
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
@@ -511,7 +511,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
                 ? [actionMenu(ctrl)]
                 : [
                     cevalView.renderCeval(ctrl),
-                    showCevalPvs ? cevalView.renderPvs(ctrl) : null,
+                    showCevalPvs ? cevalView.renderPvs(variantKey)(ctrl) : null,
                     renderAnalyse(ctrl, concealOf),
                     gamebookEditView || forkView(ctrl, concealOf),
                     retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),

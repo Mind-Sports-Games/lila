@@ -2,6 +2,7 @@ import * as game from 'game';
 import * as round from '../round';
 import * as status from 'game/status';
 import * as util from '../util';
+import { allowAnalysisForVariant } from 'common/analysis';
 import isCol1 from 'common/isCol1';
 import RoundController from '../ctrl';
 import throttle from 'common/throttle';
@@ -175,7 +176,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
 
 export function analysisButton(ctrl: RoundController): VNode | undefined {
   const forecastCount = ctrl.data.forecastCount;
-  return game.userAnalysable(ctrl.data) && util.allowAnalysisForVariant(ctrl.data.game.variant.key)
+  return game.userAnalysable(ctrl.data) && allowAnalysisForVariant(ctrl.data.game.variant.key)
     ? h(
         'a.fbt.analysis',
         {

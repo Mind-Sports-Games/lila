@@ -1,7 +1,7 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
 import { fixCrazySan } from 'stratutils';
 import * as cg from 'chessground/types';
-import { Rules } from 'stratops/types';
+import { Rules } from 'stratops';
 
 export { autolink, innerHTML, enrichText, richHTML, toYouTubeEmbed, toTwitchEmbed } from 'common/richText';
 
@@ -307,6 +307,11 @@ export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
     to: pos[1],
     promotion,
   };
+};
+
+export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultValue: boolean) => {
+  if (variantKey === 'amazons') return node.drops !== undefined && node.drops !== null && node.drops.length > 0;
+  else return defaultValue;
 };
 
 export const variantToRules = (v: VariantKey): Rules => {

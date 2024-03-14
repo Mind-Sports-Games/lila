@@ -61,6 +61,7 @@ object TreeBuilder {
         }.toMap)
         val root = Root(
           ply = init.plies,
+          variant = game.variant,
           fen = fen,
           check = init.situation.check,
           captureLength = init.situation match {
@@ -71,13 +72,7 @@ object TreeBuilder {
           clock = withClocks.flatMap(_.headOption),
           pocketData = init.situation.board.pocketData,
           eval = infos lift 0 map makeEval,
-          dropsByRole = init.situation match {
-            case (Situation.FairySF(_)) =>
-              init.situation.dropsByRole
-            case (Situation.Go(_)) =>
-              init.situation.dropsByRole
-            case _ => None
-          }
+          dropsByRole = init.situation.dropsByRole
         )
         def makeBranch(index: Int, g: Game, m: Uci.WithSan) = {
           val fen    = Forsyth.>>(g.situation.board.variant.gameLogic, g)
@@ -87,6 +82,7 @@ object TreeBuilder {
           val branch = Branch(
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.plies,
+            variant = g.situation.board.variant,
             move = m,
             fen = fen,
             captureLength = (g.situation, m) match {
@@ -101,13 +97,7 @@ object TreeBuilder {
             pocketData = g.situation.board.pocketData,
             eval = info map makeEval,
             glyphs = Glyphs.fromList(advice.map(_.judgment.glyph).toList),
-            dropsByRole = g.situation match {
-              case (Situation.FairySF(_)) =>
-                g.situation.dropsByRole
-              case (Situation.Go(_)) =>
-                g.situation.dropsByRole
-              case _ => None
-            },
+            dropsByRole = g.situation.dropsByRole,
             comments = Node.Comments {
               drawOfferTurnCount(g.turnCount)
                 .option(
@@ -163,18 +153,13 @@ object TreeBuilder {
       Branch(
         id = UciCharPair(variant.gameLogic, m.uci),
         ply = g.plies,
+        variant = variant,
         move = m,
         fen = fen,
         check = g.situation.check,
         opening = openingOf(fen),
         pocketData = g.situation.board.pocketData,
-        dropsByRole = g.situation match {
-          case (Situation.FairySF(_)) =>
-            g.situation.dropsByRole
-          case (Situation.Go(_)) =>
-            g.situation.dropsByRole
-          case _ => None
-        },
+        dropsByRole = g.situation.dropsByRole,
         eval = none
       )
     }

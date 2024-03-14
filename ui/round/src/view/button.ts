@@ -1,4 +1,5 @@
 import { h, VNode, Hooks } from 'snabbdom';
+import { allowAnalysisForVariant } from 'common/analysis';
 import * as util from '../util';
 import * as game from 'game';
 import * as status from 'game/status';
@@ -20,7 +21,7 @@ function poolUrl(clock: ClockData, variantKey: VariantKey, blocking?: game.Playe
 function analysisButton(ctrl: RoundController): VNode | null {
   const d = ctrl.data,
     url = gameRoute(d, analysisBoardOrientation(d)) + '#' + ctrl.turnCount;
-  return game.replayable(d) && util.allowAnalysisForVariant(ctrl.data.game.variant.key)
+  return game.replayable(d) && allowAnalysisForVariant(ctrl.data.game.variant.key)
     ? h(
         'a.fbt',
         {

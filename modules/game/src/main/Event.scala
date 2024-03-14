@@ -7,24 +7,24 @@ import strategygames.{
   ByoyomiClock,
   Centis,
   Clock => StratClock,
-  Player => PlayerIndex,
+  Drop => StratDrop,
   GameFamily,
   GameLogic,
   Move => StratMove,
-  Drop => StratDrop,
+  P1,
+  P2,
   Pass => StratPass,
+  Player => PlayerIndex,
   Lift => StratLift,
   EndTurn => StratEndTurn,
   SelectSquares => StratSelectSquares,
   DiceRoll => StratDiceRoll,
-  PromotableRole,
   PocketData,
   Pos,
-  Situation,
-  Status,
+  PromotableRole,
   Role,
-  P1,
-  P2
+  Situation,
+  Status
 }
 import strategygames.chess
 import strategygames.variant.Variant
@@ -220,9 +220,9 @@ object Event {
         state = state,
         clock = clock,
         possibleMoves = (situation, move.dest) match {
-          //TODO: The Draughts specific logic should be pushed into strategygames
-          //and should be ready to go now validMoves handles this ghosts logic internally
-          //see Situation.Draughts.destinations
+          // TODO: The Draughts specific logic should be pushed into strategygames
+          // and should be ready to go now validMoves handles this ghosts logic internally
+          // see Situation.Draughts.destinations
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
             if (situation.ghosts > 0)
               Map(
@@ -236,15 +236,7 @@ object Event {
           case _ => situation.destinations
         },
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case (Situation.Go(_)) =>
-            situation.dropsByRole
-          case (Situation.Backgammon(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         possibleLifts = situation match {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
@@ -253,7 +245,7 @@ object Event {
           situation.actions.head.toUci.uci
         },
         pocketData = pocketData,
-        //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
+        // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
           case m: StratMove => m.autoEndTurn
           case d: StratDrop => d.autoEndTurn
@@ -354,15 +346,7 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case (Situation.Go(_)) =>
-            situation.dropsByRole
-          case (Situation.Backgammon(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         possibleLifts = situation match {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
@@ -371,7 +355,7 @@ object Event {
           situation.actions.head.toUci.uci
         },
         pocketData = pocketData,
-        //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
+        // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
           case m: StratMove => m.autoEndTurn
           case d: StratDrop => d.autoEndTurn
@@ -659,15 +643,7 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case (Situation.Go(_)) =>
-            situation.dropsByRole
-          case (Situation.Backgammon(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         possibleLifts = situation match {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
@@ -754,15 +730,7 @@ object Event {
         clock = clock,
         possibleMoves = situation.destinations,
         possibleDrops = situation.drops,
-        possibleDropsByRole = situation match {
-          case (Situation.FairySF(_)) =>
-            situation.dropsByRole
-          case (Situation.Go(_)) =>
-            situation.dropsByRole
-          case (Situation.Backgammon(_)) =>
-            situation.dropsByRole
-          case _ => None
-        },
+        possibleDropsByRole = situation.dropsByRole,
         possibleLifts = situation match {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None

@@ -32,7 +32,7 @@ import { defined, prop, Prop } from 'common';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { playstrategyRules } from 'stratops/compat';
+import { playstrategyRules, amazonsChessgroundFen } from 'stratops/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -48,9 +48,10 @@ import { Position, PositionError } from 'stratops/chess';
 import { Result } from '@badrap/result';
 import { setupPosition } from 'stratops/variant';
 import { storedProp, StoredBooleanProp } from 'common/storage';
-import { AnaMove, AnaPass, StudyCtrl } from './study/interfaces';
+import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
+import { isOnlyDropsPly } from './util';
 
 export default class AnalyseCtrl {
   data: AnalyseData;
@@ -236,7 +237,8 @@ export default class AnalyseCtrl {
   }
 
   bottomPlayerIndex(): PlayerIndex {
-    return this.flipped ? opposite(this.data.player.playerIndex) : this.data.player.playerIndex;
+    const playerIndex = this.getOrientation() === 'p1' ? 'p1' : 'p2';
+    return this.flipped ? opposite(playerIndex) : playerIndex;
   }
 
   bottomIsP1 = () => this.bottomPlayerIndex() === 'p1';
@@ -277,20 +279,24 @@ export default class AnalyseCtrl {
     return [pos[0], pos[1]] as Key[];
   }
 
+  setDropMode(cg: ChessgroundApi) {
+    const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
+    setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
+    cg.set({
+      dropmode: {
+        showDropDests: true,
+        dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
+      },
+    });
+  }
+
   private showGround(): void {
     this.onChange();
     if (!defined(this.node.dests)) this.getDests();
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
       this.setAutoShapes();
-      const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
-      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
-      cg.set({
-        dropmode: {
-          showDropDests: true,
-          dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
-        },
-      });
+      this.setDropMode(cg);
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
     });
   }
@@ -311,6 +317,7 @@ export default class AnalyseCtrl {
       dests = stratUtils.readDests(this.node.dests),
       drops = stratUtils.readDrops(this.node.drops),
       dropsByRole = stratUtils.readDrops(this.node.dropsByRole),
+      variantKey = this.data.game.variant.key,
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
@@ -320,7 +327,7 @@ export default class AnalyseCtrl {
         ? playerIndex
         : undefined,
       config: ChessgroundConfig = {
-        fen: node.fen,
+        fen: this.data.game.variant.key == 'amazons' ? amazonsChessgroundFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
         movable: this.embed
           ? {
@@ -333,7 +340,7 @@ export default class AnalyseCtrl {
             },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
-        onlyDropsVariant: this.data.onlyDropsVariant,
+        onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
@@ -386,7 +393,7 @@ export default class AnalyseCtrl {
       isForwardStep = pathChanged && path.length == this.path.length + 2;
     this.setPath(path);
     this.showGround();
-    if (this.data.game.variant.key === 'togyzkumalak') {
+    if (this.data.game.variant.key === 'togyzkumalak' && this.chessground) {
       this.chessground.redrawAll(); //redraw board scores
     }
     if (pathChanged) {
@@ -502,7 +509,7 @@ export default class AnalyseCtrl {
       this.justDropped = piece.role;
       this.justCaptured = undefined;
       this.sound.move();
-      const drop = {
+      const drop: AnaDrop = {
         role: piece.role,
         pos,
         variant: this.data.game.variant.key,
@@ -510,11 +517,19 @@ export default class AnalyseCtrl {
         fen: this.node.fen,
         path: this.path,
       };
+      if (this.data.game.variant.key == 'amazons' && this.node.uci !== undefined) {
+        drop.halfMove = {
+          orig: this.node.uci.substring(0, 2),
+          dest: this.node.uci.substring(2, 4),
+        };
+        drop.fen = this.tree.parentNode(this.path).fen;
+        // Add in
+      }
       this.socket.sendAnaDrop(drop);
       this.preparePremoving();
       this.redraw();
     } else this.jump(this.path);
-    if (!this.data.onlyDropsVariant) {
+    if (!this.data.onlyDropsVariant || this.data.game.variant.key === 'amazons') {
       cancelDropMode(this.chessground.state);
       this.redraw();
     }
@@ -583,7 +598,6 @@ export default class AnalyseCtrl {
   addNode(node: Tree.Node, path: Tree.Path) {
     const newPath = this.tree.addNode(node, path);
     if (!newPath) {
-      console.log("Can't addNode", node, path);
       return this.redraw();
     }
     this.jump(newPath);
@@ -700,7 +714,7 @@ export default class AnalyseCtrl {
       variant: this.data.game.variant,
       standardMaterial:
         !this.data.game.initialFen ||
-        parseFen(util.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
+        parseFen(stratUtils.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
           setup =>
             PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
@@ -741,7 +755,7 @@ export default class AnalyseCtrl {
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    const setup = parseFen(util.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
+    const setup = parseFen(stratUtils.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
     return setupPosition(playstrategyRules(this.data.game.variant.key), setup);
   }
 
