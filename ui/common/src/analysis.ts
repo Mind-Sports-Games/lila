@@ -1,9 +1,11 @@
-// TODO: is amazons actually a noAnalysisVariant?
+// need to support multi action games in analysis
 const noAnalysisBoardVariants: string[] = [
   'amazons',
   'antidraughts',
   'brazilian',
   'breakthrough',
+  'backgammon',
+  'nackgammon',
   'english',
   'frisian',
   'frysk',
