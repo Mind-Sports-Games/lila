@@ -70,15 +70,15 @@ object replay {
         downloadAttr
       )(trans.downloadImported()),
       ctx.noBlind option frag(
-        a(dataIcon := "=", cls := "text embed-howto")(trans.embedInYourWebsite()),
-        a(
-          dataIcon := "$",
-          cls := "text",
-          targetBlank,
-          href := cdnUrl(routes.Export.gif(pov.gameId, pov.playerIndex.name).url)
-        )(
-          "Share as a GIF"
-        )
+        a(dataIcon := "=", cls := "text embed-howto")(trans.embedInYourWebsite())
+        // a(
+        //   dataIcon := "$",
+        //   cls := "text",
+        //   targetBlank,
+        //   href := cdnUrl(routes.Export.gif(pov.gameId, pov.playerIndex.name).url)
+        // )(
+        //   "Share as a GIF"
+        // )
       )
     )
 
