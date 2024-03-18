@@ -12,6 +12,7 @@ import {
   getPlayerScore,
   getMancalaScore,
   getGoScore,
+  allowCevalForVariant,
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
@@ -247,7 +248,7 @@ function controls(ctrl: AnalyseCtrl) {
                   }),
                 ]
               : [
-                  ctrl.ceval.allowed()
+                  ctrl.ceval.allowed() && allowCevalForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('openingExplorerAndTablebase'),
@@ -260,7 +261,10 @@ function controls(ctrl: AnalyseCtrl) {
                         },
                       })
                     : null,
-                  ctrl.ceval.possible && ctrl.ceval.allowed() && !ctrl.isGamebook()
+                  ctrl.ceval.possible &&
+                  ctrl.ceval.allowed() &&
+                  allowCevalForVariant(ctrl.ceval.variant.key) &&
+                  !ctrl.isGamebook()
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('practiceWithComputer'),
@@ -510,8 +514,10 @@ export default function (ctrl: AnalyseCtrl): VNode {
               ...(menuIsOpen
                 ? [actionMenu(ctrl)]
                 : [
-                    cevalView.renderCeval(ctrl),
-                    showCevalPvs ? cevalView.renderPvs(variantKey)(ctrl) : null,
+                    allowCevalForVariant(ctrl.ceval.variant.key) ? cevalView.renderCeval(ctrl) : null,
+                    allowCevalForVariant(ctrl.ceval.variant.key) && showCevalPvs
+                      ? cevalView.renderPvs(variantKey)(ctrl)
+                      : null,
                     renderAnalyse(ctrl, concealOf),
                     gamebookEditView || forkView(ctrl, concealOf),
                     retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
