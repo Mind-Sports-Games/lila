@@ -6,7 +6,7 @@ import { AutoplayDelay } from './autoplay';
 import { boolSetting, BoolSetting } from './boolSetting';
 import AnalyseCtrl from './ctrl';
 import { cont as contRoute } from 'game/router';
-import { bind, dataIcon, allowCevalForVariant } from './util';
+import { bind, dataIcon, allowClientEvalForVariant } from './util';
 import * as pgnExport from './pgnExport';
 import { isChess } from 'common/analysis';
 
@@ -216,7 +216,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
   ];
 
   const cevalConfig: MaybeVNodes =
-    ceval && ceval.possible && ceval.allowed() && allowCevalForVariant(ceval.variant.key)
+    ceval && ceval.possible && ceval.allowed() && allowClientEvalForVariant(ceval.variant.key)
       ? ([h('h2', noarg('computerAnalysis'))] as MaybeVNodes)
           .concat([
             ctrlBoolSetting(

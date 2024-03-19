@@ -12,7 +12,7 @@ import {
   getPlayerScore,
   getMancalaScore,
   getGoScore,
-  allowCevalForVariant,
+  allowClientEvalForVariant,
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
@@ -248,7 +248,7 @@ function controls(ctrl: AnalyseCtrl) {
                   }),
                 ]
               : [
-                  ctrl.ceval.allowed() && allowCevalForVariant(ctrl.ceval.variant.key)
+                  ctrl.ceval.allowed() && allowClientEvalForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('openingExplorerAndTablebase'),
@@ -263,7 +263,7 @@ function controls(ctrl: AnalyseCtrl) {
                     : null,
                   ctrl.ceval.possible &&
                   ctrl.ceval.allowed() &&
-                  allowCevalForVariant(ctrl.ceval.variant.key) &&
+                  allowClientEvalForVariant(ctrl.ceval.variant.key) &&
                   !ctrl.isGamebook()
                     ? h('button.fbt', {
                         attrs: {
@@ -514,8 +514,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
               ...(menuIsOpen
                 ? [actionMenu(ctrl)]
                 : [
-                    allowCevalForVariant(ctrl.ceval.variant.key) ? cevalView.renderCeval(ctrl) : null,
-                    allowCevalForVariant(ctrl.ceval.variant.key) && showCevalPvs
+                    allowClientEvalForVariant(ctrl.ceval.variant.key) ? cevalView.renderCeval(ctrl) : null,
+                    allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
                       ? cevalView.renderPvs(variantKey)(ctrl)
                       : null,
                     renderAnalyse(ctrl, concealOf),

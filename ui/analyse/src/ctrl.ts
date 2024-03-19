@@ -835,12 +835,16 @@ export default class AnalyseCtrl {
 
   showEvalGauge(): boolean {
     return (
-      this.cevalVariant() && this.hasAnyComputerAnalysis() && this.showGauge() && !this.outcome() && this.showComputer()
+      this.serverEvalVariant() &&
+      this.hasAnyComputerAnalysis() &&
+      this.showGauge() &&
+      !this.outcome() &&
+      this.showComputer()
     );
   }
 
-  cevalVariant(): boolean {
-    return util.allowCevalForVariant(this.data.game.variant.key);
+  serverEvalVariant(): boolean {
+    return util.allowServerEvalForVariant(this.data.game.variant.key);
   }
 
   hasAnyComputerAnalysis(): boolean {

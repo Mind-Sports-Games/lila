@@ -5,7 +5,7 @@ import { prop } from 'common';
 import { storedProp } from 'common/storage';
 import throttle from 'common/throttle';
 import { povChances } from './winningChances';
-import { sanIrreversible, allowCevalForVariant } from './util';
+import { sanIrreversible, allowClientEvalForVariant } from './util';
 import { Cache } from './cache';
 
 function sharedWasmMemory(initial: number, maximum: number): WebAssembly.Memory {
@@ -95,7 +95,7 @@ export default function (opts: CevalOpts): CevalCtrl {
   const multiPv = storedProp(storageKey('ceval.multipv'), opts.multiPvDefault || 1);
   const infinite = storedProp('ceval.infinite', false);
   let curEval: Tree.ClientEval | null = null;
-  const allowed = prop(allowCevalForVariant(opts.variant.key));
+  const allowed = prop(allowClientEvalForVariant(opts.variant.key));
   const enabled = prop(opts.possible && allowed() && enabledAfterDisable());
   const downloadProgress = prop(0);
   let started: Started | false = false;

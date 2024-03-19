@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { bind, dataIcon, iconTag, richHTML, allowCevalForVariant } from '../util';
+import { bind, dataIcon, iconTag, richHTML, allowServerEvalForVariant } from '../util';
 import { view as memberView } from './studyMembers';
 import { view as chapterView } from './studyChapters';
 import { view as chapterNewFormView } from './chapterNewForm';
@@ -105,7 +105,7 @@ function buttons(root: AnalyseCtrl): VNode {
             count: (root.node.glyphs || []).length,
           })
         : null,
-      allowCevalForVariant(ctrl.data.chapter.setup.variant.key)
+      allowServerEvalForVariant(ctrl.data.chapter.setup.variant.key)
         ? toolButton({
             ctrl,
             tab: 'serverEval',
