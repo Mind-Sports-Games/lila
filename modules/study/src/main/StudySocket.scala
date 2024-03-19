@@ -6,6 +6,7 @@ import strategygames.{ Centis, GameLogic }
 import strategygames.format.pgn.{ Glyph, Glyphs, Tags }
 import strategygames.format.FEN
 import strategygames.variant.Variant
+import strategygames.chess.variant.{ Variant => ChessVariant }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -67,7 +68,6 @@ final private class StudySocket(
     case RP.In.ChatSay(roomId, userId, msg) => api.talk(userId, roomId, msg)
     case RP.In.TellRoomSri(studyId, P.In.TellSri(sri, user, tpe, o)) =>
       import Protocol.In.Data._
-      import JsonView.shapeReader
       def who = user map { Who(_, sri) }
       tpe match {
         case "setPath" =>
@@ -123,8 +123,13 @@ final private class StudySocket(
           }
         case "shapes" =>
           reading[AtPosition](o) { position =>
-            (o \ "d" \ "shapes").asOpt[List[Shape]] foreach { shapes =>
-              who foreach api.setShapes(studyId, position.ref, Shapes(shapes take 32))
+            {
+              // TODO: this will only parse chess moves
+              val variantHandler = JsonView.VariantHandler()(Variant.Chess(ChessVariant.default))
+              import variantHandler._
+              (o \ "d" \ "shapes").asOpt[List[Shape]] foreach { shapes =>
+                who foreach api.setShapes(studyId, position.ref, Shapes(shapes take 32))
+              }
             }
           }
         case "addChapter" =>
@@ -432,7 +437,7 @@ object StudySocket {
     object In {
 
       object Data {
-        import lila.common.Json._
+        import lila.common.Json.stringIsoReader
         import play.api.libs.functional.syntax._
 
         def reading[A](o: JsValue)(f: A => Unit)(implicit reader: Reads[A]): Unit =
@@ -450,7 +455,6 @@ object StudySocket {
             (__ \ "ch").read[Chapter.Id]
         )(AtPosition.apply _)
         case class SetRole(userId: String, role: String)
-        implicit val FenReader: Reads[FEN]                               = Reads.of[String].map(s => FEN.apply(GameLogic.Chess(), s))
         implicit val SetRoleReader: Reads[SetRole]                       = Json.reads[SetRole]
         implicit val ChapterDataReader: Reads[ChapterMaker.Data]         = Json.reads[ChapterMaker.Data]
         implicit val ChapterEditDataReader: Reads[ChapterMaker.EditData] = Json.reads[ChapterMaker.EditData]
@@ -459,6 +463,9 @@ object StudySocket {
         implicit val setTagReader: Reads[actorApi.SetTag]                = Json.reads[actorApi.SetTag]
         implicit val gamebookReader: Reads[Gamebook]                     = Json.reads[Gamebook]
         implicit val explorerGame: Reads[actorApi.ExplorerGame]          = Json.reads[actorApi.ExplorerGame]
+        case class VariantHandler()(implicit variant: Variant) {
+          implicit val FenReader: Reads[FEN] = Reads.of[String].map(s => FEN.apply(variant.gameLogic, s))
+        }
       }
     }
 

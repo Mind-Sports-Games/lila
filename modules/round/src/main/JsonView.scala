@@ -49,6 +49,8 @@ final class JsonView(
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
+  // TODO: in analysis mode, this will be evaluated against the last move, but we don't want to set onlyDropsVariant
+  // in this case. Instead just have a return of pov.game.variant.onlyDropsVariant
   private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
     pov.game.variant.onlyDropsVariant || pov.game.situation.canOnlyDrop
   }

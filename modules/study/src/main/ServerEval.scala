@@ -78,7 +78,8 @@ object ServerEval {
     def apply(analysis: Analysis, complete: Boolean): Funit =
       analysis.studyId.map(Study.Id.apply) ?? { studyId =>
         sequencer.sequenceStudyWithChapter(studyId, Chapter.Id(analysis.id)) {
-          case Study.WithChapter(_, chapter) =>
+          case Study.WithChapter(_, chapter) => {
+            implicit val variant = chapter.root.variant
             (complete ?? chapterRepo.completeServerEval(chapter)) >> {
               lila.common.Future
                 .fold(chapter.root.mainline.zip(analysis.infoAdvices).toList)(Path.root) {
@@ -139,6 +140,7 @@ object ServerEval {
                 }
               }
             } logFailure logger
+          }
         }
       }
 
@@ -177,6 +179,7 @@ object ServerEval {
       Node(
         id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
         ply = g.plies,
+        variant = g.situation.board.variant,
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),
         check = g.situation.check,

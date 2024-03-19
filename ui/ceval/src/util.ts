@@ -1,4 +1,4 @@
-const noCevalVariants = [
+const noClientEvalVariants = [
   'monster',
   'linesOfAction',
   'scrambledEggs',
@@ -46,6 +46,6 @@ export function sanIrreversible(variant: VariantKey, san: string): boolean {
   return (variant === 'threeCheck' || variant === 'fiveCheck') && san.includes('+');
 }
 
-export function allowCevalForVariant(variant: VariantKey) {
-  return noCevalVariants.indexOf(variant) == -1;
+export function allowClientEvalForVariant(variant: VariantKey) {
+  return noClientEvalVariants.indexOf(variant) == -1;
 }

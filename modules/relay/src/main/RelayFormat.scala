@@ -5,6 +5,8 @@ import play.api.libs.json._
 import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.duration._
 
+import strategygames.variant.Variant
+import strategygames.chess.variant.{ Variant => ChessVariant }
 import lila.study.MultiPgn
 import lila.memo.CacheApi
 import lila.memo.CacheApi._
@@ -82,10 +84,13 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
         case _                        => none
       }
 
-  private def looksLikePgn(body: String): Boolean =
+  private def looksLikePgn(body: String): Boolean = {
+    // TODO: Only support chess PGN for now.
+    implicit val variant = Variant.Chess(ChessVariant.default)
     MultiPgn.split(body, 1).value.headOption ?? { pgn =>
       lila.study.PgnImport(pgn, Nil).isValid
     }
+  }
   private def looksLikePgn(url: Url): Fu[Boolean] = httpGet(url).map { _ exists looksLikePgn }
 
   private def looksLikeJson(body: String): Boolean =

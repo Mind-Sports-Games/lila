@@ -276,6 +276,11 @@ export interface AnaDrop {
   fen: Fen;
   path: string;
   ch?: string;
+  halfMove?: {
+    // Set this to indicate tt this is a half move for amazons
+    orig: string;
+    dest: string;
+  };
 }
 
 export interface AnaPass {
