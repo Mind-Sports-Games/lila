@@ -251,7 +251,21 @@ export function getGoScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
 }
 
-const noCevalVariants = [
+const noServerEvalVariants = [
+  'monster',
+  'linesOfAction',
+  'scrambledEggs',
+  'amazons',
+  'oware',
+  'togyzkumalak',
+  'go9x9',
+  'go13x13',
+  'go19x19',
+  'backgammon',
+  'nackgammon',
+];
+
+const noClientEvalVariants = [
   'monster',
   'linesOfAction',
   'scrambledEggs',
@@ -271,8 +285,12 @@ const noCevalVariants = [
   'nackgammon',
 ];
 
-export function allowCevalForVariant(variant: VariantKey) {
-  return noCevalVariants.indexOf(variant) == -1;
+export function allowClientEvalForVariant(variant: VariantKey) {
+  return noClientEvalVariants.indexOf(variant) == -1;
+}
+
+export function allowServerEvalForVariant(variant: VariantKey) {
+  return noServerEvalVariants.indexOf(variant) == -1;
 }
 
 export type LexicalUci = {
