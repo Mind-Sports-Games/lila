@@ -56,7 +56,7 @@ final private[forum] class TopicApi(
         name = noShouting(data.name),
         userId = me.id,
         troll = me.marks.troll,
-        hidden = categ.quiet || data.looksLikeVenting
+        hidden = false //categ.quiet || data.looksLikeVenting
       )
       val post = Post.make(
         topicId = topic.id,
