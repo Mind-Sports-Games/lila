@@ -82,10 +82,9 @@ object otherTrophies {
             ariaTitle(t.name match {
               case Some(name) => name
               case None       => t.kind.name
-            }),
-            style := "width: 65px; margin: 0 !important;"
+            })
           )(
-            img(src := assetUrl(s"images/trophy/${t.kind._id}.png"), width := 65, height := 80)
+            img(src := assetUrl(s"images/trophy/${t.kind._id}.png"))
           )
         },
       info.trophies.filter(_.kind.klass.has("icon3d")).sorted.map { trophy =>

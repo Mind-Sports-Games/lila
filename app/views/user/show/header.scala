@@ -32,7 +32,8 @@ object header {
         div(
           cls := List(
             "trophies" -> true,
-            "packed"   -> (info.countTrophiesAndPerfCups > 7)
+            "packed"   -> (info.countTrophiesAndPerfCups > 8 && info.countTrophiesAndPerfCups <= 10),
+            "toomany"  -> (info.countTrophiesAndPerfCups > 10)
           )
         )(
           views.html.user.bits.perfTrophies(u, info.ranks),
