@@ -10,6 +10,8 @@ import controllers.routes
 
 object index {
 
+  def urlencode(str: String): String =
+    java.net.URLEncoder.encode(str, "US-ASCII")
 
   def apply(
       pager: Paginator[io.prismic.Document]
@@ -65,16 +67,23 @@ object index {
 
   private def latestPost(
       doc: io.prismic.Document
-  )(implicit ctx: Context, prismic: lila.blog.BlogApi.Context) =
+  )(implicit ctx: Context, prismic: lila.blog.BlogApi.Context) = {
+    val urlEncodedTitle = urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-"));
     st.article(
       doc.getText("blog.title").map { title =>
-        h2(a(href := routes.Blog.show(doc.id, doc.slug, prismic.maybeRef))(title))
+        h2(
+          a(
+            href := routes.Blog.show(doc.id, urlEncodedTitle, prismic.maybeRef)
+          )(title)
+        )
       },
       bits.metas(doc),
       div(cls := "parts")(
         doc.getImage("blog.image", "main").map { img =>
           div(cls := "illustration")(
-            a(href := routes.Blog.show(doc.id, doc.slug, ref = prismic.maybeRef))(st.img(src := img.url))
+            a(
+              href := routes.Blog.show(doc.id, urlEncodedTitle, ref = prismic.maybeRef)
+            )(st.img(src := img.url))
           )
         },
         div(cls := "body")(
@@ -84,7 +93,7 @@ object index {
           p(cls := "more")(
             a(
               cls := "button",
-              href := routes.Blog.show(doc.id, doc.slug, ref = prismic.maybeRef),
+              href := routes.Blog.show(doc.id, urlEncodedTitle, ref = prismic.maybeRef),
               dataIcon := "G"
             )(
               " Continue reading this post"
@@ -93,4 +102,5 @@ object index {
         )
       )
     )
+  }
 }

@@ -9,7 +9,7 @@ final private[blog] class Notifier(
     blogApi: BlogApi,
     timelineApi: EntryApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
-  
+
   def apply(id: String): Funit =
     blogApi.prismicApi flatMap { prismicApi =>
       blogApi.one(prismicApi, none, id) orFail
@@ -22,5 +22,5 @@ final private[blog] class Notifier(
         BlogPost(id = post.id, slug = post.slug, title = title)
       }
     }
-  
+
 }
