@@ -10,7 +10,17 @@
   margin-top: 0 !important;
 
   @include breakpoint($mq-not-small) {
-    display: none;
+    position: unset;
+    height: 60px;
+    .trophy {
+      height: 60px;
+      &.patron {
+        margin: 20px -10px 0 30px;
+      }
+    }
+    .shield-trophy {
+      margin-top: 0px;
+    }
   }
 }
 
@@ -128,12 +138,18 @@
     img {
       height: 80px;
     }
-    .shield-trophy {
-      height: 60px;
-      font-size: 30px;
-      padding: 9px;
-      line-height: 35px;
-      margin-top: 40px;
+  }
+  .shield-trophy {
+    height: 60px;
+    font-size: 30px;
+    padding: 9px;
+    line-height: 35px;
+    margin-top: 40px;
+  }
+
+  @include breakpoint($mq-not-small) {
+    .trophy.patron {
+      margin: 0px -10px 0 30px;
     }
   }
 }

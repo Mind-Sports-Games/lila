@@ -3,6 +3,10 @@
   padding: 2em 1.5em 1em 1.5em;
   flex-flow: row nowrap;
 
+  &:has(div.trophies.toomany) {
+    padding: 1em 1.5em 1em 1.5em;
+  }
+
   h1 {
     flex: 0 0 auto;
     font-size: 2em;
