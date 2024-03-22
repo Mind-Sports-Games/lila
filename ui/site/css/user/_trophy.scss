@@ -14,8 +14,8 @@
     height: 60px;
     .trophy {
       height: 60px;
-      &.patron {
-        margin: 20px -10px 0 30px;
+      &.icon3d {
+        height: 60px;
       }
     }
     .shield-trophy {
@@ -145,12 +145,6 @@
     padding: 9px;
     line-height: 35px;
     margin-top: 40px;
-  }
-
-  @include breakpoint($mq-not-small) {
-    .trophy.patron {
-      margin: 0px -10px 0 30px;
-    }
   }
 }
 
