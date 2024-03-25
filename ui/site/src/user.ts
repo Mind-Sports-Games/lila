@@ -63,15 +63,4 @@ playstrategy.load.then(() => {
       return false;
     });
   });
-
-  const $trophies = $('.user-show .trophies');
-  const $userlink = $('.user-show .user-link');
-  const $boxtop = $('.user-show .box__top');
-  if ($trophies[0] && $trophies[0].children.length > 3) {
-    if ($trophies.width() + $userlink.width() > 0.9 * $boxtop.width()) {
-      $trophies.addClass('toomany');
-    } else {
-      $trophies.removeClass('toomany');
-    }
-  }
 });

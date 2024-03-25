@@ -29,15 +29,8 @@ object header {
           )
         else
           h1(userSpan(u, withPowerTip = false)),
-        div(
-          cls := List(
-            "trophies" -> true,
-            "packed"   -> (info.countTrophiesAndPerfCups > 8 && info.countTrophiesAndPerfCups <= 10),
-            "toomany"  -> (info.countTrophiesAndPerfCups > 10)
-          )
-        )(
-          views.html.user.bits.perfTrophies(u, info.ranks),
-          otherTrophies(info),
+        div(cls := "trophies")(
+          badges(info),
           u.plan.active option
             a(
               href := routes.Plan.index,
@@ -46,6 +39,12 @@ object header {
             )(patronIconChar)
         ),
         u.disabled option span(cls := "closed")("CLOSED")
+      ),
+      div(cls := "user-show__header")(
+        div(cls := "trophies toomany")(
+          views.html.user.bits.perfTrophies(u, info.ranks),
+          otherTrophies(info)
+        )
       ),
       div(cls := "user-show__social")(
         div(cls := "number-menu")(
